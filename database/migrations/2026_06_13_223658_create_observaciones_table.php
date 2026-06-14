@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('observaciones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('estudiante_id')->constrained('estudiantes')->cascadeOnDelete();
-            $table->foreignId('docente_id')->constrained('docentes')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('tema_id')->nullable()->constrained('temas')->nullOnDelete();
             $table->text('contenido');
             $table->enum('tipo', ['general', 'logro'])->default('general');

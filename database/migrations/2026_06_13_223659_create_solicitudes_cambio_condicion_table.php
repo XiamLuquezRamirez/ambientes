@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('solicitudes_cambio_condicion', function (Blueprint $table) {
             $table->id();
             $table->foreignId('estudiante_id')->constrained('estudiantes')->cascadeOnDelete();
-            $table->foreignId('docente_id')->constrained('docentes')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('condicion_actual');
             $table->string('condicion_solicitada');
             $table->text('justificacion');

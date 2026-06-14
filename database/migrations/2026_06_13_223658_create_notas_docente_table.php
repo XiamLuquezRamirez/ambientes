@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('notas_docente', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tema_id')->constrained('temas')->cascadeOnDelete();
-            $table->foreignId('docente_id')->constrained('docentes')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->text('contenido');
             $table->timestamps();
         });

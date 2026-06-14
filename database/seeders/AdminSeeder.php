@@ -3,8 +3,9 @@ namespace Database\Seeders;
 
 use App\Models\Ambiente;
 use App\Models\Configuracion;
-use App\Models\Docente;
+use App\Models\DocentePerfil;
 use App\Models\SyncQueue;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,30 +13,33 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // Crear admin (sin ambiente)
-        Docente::firstOrCreate(
+        // Admin (sin perfil de docente)
+        User::firstOrCreate(
             ['email' => 'admin@aulasreggio.test'],
             [
-                'nombre'     => 'Administrador',
-                'password'   => Hash::make('password'),
-                'rol'        => 'admin',
-                'ambiente_id'=> null,
-                'activo'     => true,
+                'nombre'   => 'Administrador',
+                'password' => Hash::make('password'),
+                'rol'      => 'admin',
+                'activo'   => true,
             ]
         );
 
         // Docente líder de Música
         $musica = Ambiente::where('slug', 'musica')->first();
         if ($musica) {
-            Docente::firstOrCreate(
+            $docente = User::firstOrCreate(
                 ['email' => 'docente.musica@aulasreggio.test'],
                 [
-                    'nombre'     => 'Docente Líder Música',
-                    'password'   => Hash::make('password'),
-                    'rol'        => 'docente_lider',
-                    'ambiente_id'=> $musica->id,
-                    'activo'     => true,
+                    'nombre'   => 'Docente Líder Música',
+                    'password' => Hash::make('password'),
+                    'rol'      => 'docente_lider',
+                    'activo'   => true,
                 ]
+            );
+
+            DocentePerfil::firstOrCreate(
+                ['user_id' => $docente->id],
+                ['ambiente_id' => $musica->id]
             );
         }
 
@@ -45,7 +49,7 @@ class AdminSeeder extends Seeder
         Configuracion::set('idioma', 'es');
         Configuracion::set('zona_horaria', 'America/Bogota');
 
-        // Datos mock de sync_queue (de los otros 4 servidores)
+        // Datos mock de sync_queue
         $servidores = ['polimotor', 'logico', 'multisensorial', 'tecnologia'];
         foreach ($servidores as $slug) {
             if (!SyncQueue::where('servidor_origen', $slug)->exists()) {

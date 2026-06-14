@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 class LoginLog extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['docente_id', 'ip', 'ambiente', 'fecha'];
+    protected $fillable = ['user_id', 'ip', 'ambiente', 'fecha'];
 
-    public function docente() { return $this->belongsTo(Docente::class); }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

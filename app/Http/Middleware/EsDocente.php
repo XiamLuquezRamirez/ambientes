@@ -9,12 +9,13 @@ class EsDocente
 {
     public function handle(Request $request, Closure $next)
     {
-        $docente = Auth::guard('docente')->user();
-        if (!$docente) {
+        $user = Auth::guard('docente')->user();
+        if (!$user) {
             return redirect()->route('docente.login');
         }
-        if (!$docente->esAdmin()) {
-            if ($docente->ambiente_id === null || $docente->ambiente?->slug !== config('ambiente.slug')) {
+        if (!$user->esAdmin()) {
+            $ambienteSlug = $user->perfil?->ambiente?->slug;
+            if (!$ambienteSlug || $ambienteSlug !== config('ambiente.slug')) {
                 abort(403, 'No tienes acceso a este ambiente.');
             }
         }

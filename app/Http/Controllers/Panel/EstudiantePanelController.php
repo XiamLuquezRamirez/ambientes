@@ -11,7 +11,7 @@ class EstudiantePanelController extends Controller
 {
     private function ambiente()
     {
-        return Auth::guard('docente')->user()->ambiente;
+        return Auth::guard('docente')->user()->perfil->ambiente;
     }
 
     public function index()

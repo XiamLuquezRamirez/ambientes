@@ -1,44 +1,34 @@
 <?php
-
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $fillable = ['nombre', 'email', 'password', 'rol', 'activo'];
+    protected $hidden = ['password', 'remember_token'];
+    protected $casts = ['activo' => 'boolean'];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    public function perfil()
+    {
+        return $this->hasOne(DocentePerfil::class);
+    }
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    public function loginLogs()
+    {
+        return $this->hasMany(LoginLog::class);
+    }
+
+    public function esAdmin(): bool
+    {
+        return $this->rol === 'admin';
+    }
+
+    public function esDocente(): bool
+    {
+        return in_array($this->rol, ['docente_lider', 'docente_auxiliar']);
+    }
 }

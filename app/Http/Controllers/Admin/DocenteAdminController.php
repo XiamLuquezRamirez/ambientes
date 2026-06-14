@@ -3,18 +3,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
-use App\Models\Docente;
+use App\Models\DocentePerfil;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class DocenteAdminController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Docente::with('ambiente');
+        $query = User::with('perfil.ambiente');
         if ($request->filled('ambiente_id')) {
-            $query->where('ambiente_id', $request->ambiente_id);
+            $query->whereHas('perfil', fn($q) => $q->where('ambiente_id', $request->ambiente_id));
         }
         if ($request->filled('rol')) {
             $query->where('rol', $request->rol);
@@ -34,23 +34,32 @@ class DocenteAdminController extends Controller
     {
         $data = $request->validate([
             'nombre'      => 'required|string|max:100',
-            'email'       => 'required|email|unique:docentes,email',
+            'email'       => 'required|email|unique:users,email',
             'password'    => 'required|min:8',
             'rol'         => 'required|in:admin,docente_lider,docente_auxiliar',
             'ambiente_id' => 'nullable|exists:ambientes,id',
         ]);
-        Docente::create([
-            ...$data,
+
+        $user = User::create([
+            'nombre'   => $data['nombre'],
+            'email'    => $data['email'],
             'password' => Hash::make($data['password']),
+            'rol'      => $data['rol'],
             'activo'   => true,
         ]);
+
+        if (!empty($data['ambiente_id'])) {
+            DocentePerfil::create([
+                'user_id'     => $user->id,
+                'ambiente_id' => $data['ambiente_id'],
+            ]);
+        }
+
         return redirect()->route('admin.docentes')->with('success', 'Docente creado.');
     }
 
     public function edit($docente) {}
     public function update(Request $request, $docente) {}
-
     public function destroy($docente) {}
-
     public function resetPassword($docente) {}
 }

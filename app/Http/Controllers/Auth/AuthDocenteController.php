@@ -24,17 +24,17 @@ class AuthDocenteController extends Controller
             return back()->withErrors(['email' => 'Credenciales incorrectas.'])->withInput();
         }
 
-        $docente = Auth::guard('docente')->user();
+        $user = Auth::guard('docente')->user();
 
         LoginLog::create([
-            'docente_id' => $docente->id,
-            'ip'         => $request->ip(),
-            'ambiente'   => config('ambiente.slug'),
+            'user_id' => $user->id,
+            'ip'      => $request->ip(),
+            'ambiente' => config('ambiente.slug'),
         ]);
 
         $request->session()->regenerate();
 
-        return $docente->esAdmin()
+        return $user->esAdmin()
             ? redirect()->route('admin.ambientes')
             : redirect()->route('panel.estudiantes');
     }
