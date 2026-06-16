@@ -8,9 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     @php
         $docenteActual = Auth::guard('docente')->user();
-        $colorAmbiente = $docenteActual?->perfil?->ambiente?->color_hex ?? '#0F6E56';
-        $nombreAmbiente = $docenteActual?->perfil?->ambiente?->nombre ?? 'Panel';
-        $iconoAmbiente  = $docenteActual?->perfil?->ambiente?->icono ?? '🏫';
+        $colorAmbiente = $docenteActual?->docente?->ambiente?->color_hex ?? '#0F6E56';
+        $nombreAmbiente = $docenteActual?->docente?->ambiente?->nombre ?? 'Panel';
+        $iconoAmbiente  = $docenteActual?->docente?->ambiente?->icono ?? '🏫';
     @endphp
     <style>
         :root { --color-ambiente: {{ $colorAmbiente }}; }

@@ -8,16 +8,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('docentes_perfil', function (Blueprint $table) {
+        Schema::create('docentes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('ambiente_id')->nullable()->constrained('ambientes')->nullOnDelete();
+            $table->string('telefono', 20)->nullable();
+            $table->string('especialidad', 100)->nullable();
+            $table->date('fecha_ingreso')->nullable();
+            $table->string('foto_url')->nullable();
+            $table->text('descripcion')->nullable();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('docentes_perfil');
+        Schema::dropIfExists('docentes');
     }
 };

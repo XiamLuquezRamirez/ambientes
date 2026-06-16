@@ -3,7 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
-use App\Models\DocentePerfil;
+use App\Models\Docente;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,9 +12,9 @@ class DocenteAdminController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::with('perfil.ambiente');
+        $query = User::with('docente.ambiente');
         if ($request->filled('ambiente_id')) {
-            $query->whereHas('perfil', fn($q) => $q->where('ambiente_id', $request->ambiente_id));
+            $query->whereHas('docente', fn($q) => $q->where('ambiente_id', $request->ambiente_id));
         }
         if ($request->filled('rol')) {
             $query->where('rol', $request->rol);
@@ -49,7 +49,7 @@ class DocenteAdminController extends Controller
         ]);
 
         if (!empty($data['ambiente_id'])) {
-            DocentePerfil::create([
+            Docente::create([
                 'user_id'     => $user->id,
                 'ambiente_id' => $data['ambiente_id'],
             ]);

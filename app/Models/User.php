@@ -12,9 +12,9 @@ class User extends Authenticatable
     protected $hidden = ['password', 'remember_token'];
     protected $casts = ['activo' => 'boolean'];
 
-    public function perfil()
+    public function docente()
     {
-        return $this->hasOne(DocentePerfil::class);
+        return $this->hasOne(Docente::class);
     }
 
     public function loginLogs()

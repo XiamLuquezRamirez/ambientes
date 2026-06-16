@@ -14,7 +14,7 @@ class EsDocente
             return redirect()->route('docente.login');
         }
         if (!$user->esAdmin()) {
-            $ambienteSlug = $user->perfil?->ambiente?->slug;
+            $ambienteSlug = $user->docente?->ambiente?->slug;
             if (!$ambienteSlug || $ambienteSlug !== config('ambiente.slug')) {
                 abort(403, 'No tienes acceso a este ambiente.');
             }

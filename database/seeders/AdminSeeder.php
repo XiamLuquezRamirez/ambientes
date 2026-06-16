@@ -3,7 +3,7 @@ namespace Database\Seeders;
 
 use App\Models\Ambiente;
 use App\Models\Configuracion;
-use App\Models\DocentePerfil;
+use App\Models\Docente;
 use App\Models\SyncQueue;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -37,7 +37,7 @@ class AdminSeeder extends Seeder
                 ]
             );
 
-            DocentePerfil::firstOrCreate(
+            Docente::firstOrCreate(
                 ['user_id' => $docente->id],
                 ['ambiente_id' => $musica->id]
             );

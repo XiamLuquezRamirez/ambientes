@@ -18,7 +18,7 @@ class Ambiente extends Model
 
     public function docentes()
     {
-        return $this->hasMany(DocentePerfil::class);
+        return $this->hasMany(Docente::class);
     }
 
     public function modulos()

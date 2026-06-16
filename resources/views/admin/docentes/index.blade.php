@@ -35,7 +35,7 @@
                 <td>{{ $d->nombre }}</td>
                 <td style="color:#64748B">{{ $d->email }}</td>
                 <td><span class="badge badge-yellow">{{ str_replace('_', ' ', $d->rol) }}</span></td>
-                <td>{{ $d->perfil?->ambiente?->nombre ?? '—' }}</td>
+                <td>{{ $d->docente?->ambiente?->nombre ?? '—' }}</td>
                 <td><span class="badge {{ $d->activo ? 'badge-green' : 'badge-red' }}">{{ $d->activo ? 'Activo' : 'Inactivo' }}</span></td>
             </tr>
         @empty
