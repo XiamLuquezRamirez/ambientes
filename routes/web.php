@@ -11,7 +11,6 @@ use App\Http\Controllers\Admin\EstudianteAdminController;
 use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Admin\ReportesController;
 use App\Http\Controllers\Admin\ConfiguracionAdminController;
-use App\Http\Controllers\Admin\SolicitudCondicionController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\SesionController;
@@ -66,8 +65,6 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('reportes/exportar', [ReportesController::class, 'exportar'])->name('admin.reportes.exportar');
     Route::get('configuracion', [ConfiguracionAdminController::class, 'index'])->name('admin.configuracion');
     Route::post('configuracion', [ConfiguracionAdminController::class, 'update'])->name('admin.configuracion.update');
-    Route::get('solicitudes', [SolicitudCondicionController::class, 'index'])->name('admin.solicitudes');
-    Route::post('solicitudes/{solicitud}/resolver', [SolicitudCondicionController::class, 'resolver'])->name('admin.solicitudes.resolver');
 });
 
 // ── Panel Docente ─────────────────────────────────────────────────────────

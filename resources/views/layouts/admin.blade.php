@@ -131,9 +131,6 @@
             <a href="{{ route('admin.configuracion') }}" class="{{ request()->routeIs('admin.configuracion*') ? 'active' : '' }}">
                 ⚙️ Configuración
             </a>
-            <a href="{{ route('admin.solicitudes') }}" class="{{ request()->routeIs('admin.solicitudes*') ? 'active' : '' }}">
-                📋 Solicitudes
-            </a>
         </nav>
     </aside>
 
