@@ -28,10 +28,13 @@
                     </td>
                     <td>
                         <div class="tabla-acciones">
+
                             <a href="{{ route('admin.docentes.edit', $d->id) }}" class="btn-accion btn-editar">
+                                <i class="fa-solid fa-pencil"></i>
                                 Editar</a>
                             <button type="button" class="btn-accion btn-eliminar" data-id="{{ $d->id }}"
                                 data-nombre="{{ e($d->nombre) }}">
+                                <i class="fa-solid fa-trash-can"></i>
                                 Eliminar
                             </button>
                         </div>
