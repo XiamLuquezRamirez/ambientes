@@ -7,160 +7,9 @@
     <title>@yield('title', 'Admin') — Aulas Reggio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #EFF6FF; color: #1E293B; font-family: 'Nunito', sans-serif; min-height: 100vh; }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
-            background: #1E3A8A; border-right: 1px solid #1E40AF;
-            display: flex; flex-direction: column; z-index: 100;
-            overflow-y: auto;
-        }
-        .sidebar-logo {
-            padding: 24px 20px 16px;
-            border-bottom: 1px solid rgba(255,255,255,.15);
-        }
-        .sidebar-logo .brand { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: #FFFFFF; }
-        .badge-admin {
-            display: inline-block; background: #F59E0B; color: #1C0A00;
-            font-size: 0.65rem; font-weight: 700; padding: 2px 8px;
-            border-radius: 99px; margin-left: 8px; vertical-align: middle;
-            font-family: 'Nunito', sans-serif; letter-spacing: 0.05em;
-        }
-        .nav { flex: 1; padding: 12px 0; }
-        .nav a {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 20px; color: rgba(255,255,255,.65);
-            text-decoration: none; font-size: 0.9rem;
-            transition: all 0.15s; border-left: 3px solid transparent;
-        }
-        .nav a:hover { color: #FFFFFF; background: rgba(255,255,255,.1); }
-        .nav a.active { color: #FFFFFF; border-left-color: #FFFFFF; background: rgba(255,255,255,.15); font-weight: 600; }
-
-        /* Header */
-        .header {
-            position: fixed; top: 0; left: 240px; right: 0; height: 60px;
-            background: #FFFFFF; border-bottom: 1px solid #DBEAFE;
-            display: flex; align-items: center; justify-content: flex-end;
-            padding: 0 24px; gap: 16px; z-index: 99;
-            box-shadow: 0 1px 3px rgba(37,99,235,.08);
-        }
-        /* Header — perfil con dropdown */
-        .header-perfil {
-            position: relative; display: flex; align-items: center; gap: 10px;
-            padding: 6px 10px; border-radius: 10px;
-            cursor: pointer; user-select: none; transition: background .15s;
-        }
-        .header-perfil:hover { background: #EFF6FF; }
-        .avatar {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, #1E3A8A, #2563EB);
-            border-radius: 50%; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-weight: 700; font-size: 0.78rem; letter-spacing: .05em;
-        }
-        .header-user-info { display: flex; flex-direction: column; line-height: 1.2; }
-        .header-user-nombre { font-size: 0.85rem; font-weight: 700; color: #1E293B; }
-        .header-user-rol    { font-size: 0.7rem; color: #64748B; }
-        .header-chevron { color: #94A3B8; font-size: 0.7rem; margin-left: 2px; transition: transform .2s; }
-        .header-perfil.open .header-chevron { transform: rotate(180deg); }
-
-        /* Dropdown */
-        .header-dropdown {
-            display: none; position: absolute; top: calc(100% + 10px); right: 0;
-            background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 14px;
-            box-shadow: 0 8px 32px rgba(37,99,235,.14); min-width: 256px; z-index: 300;
-            overflow: hidden; animation: dropdown-in .15s ease;
-        }
-        @keyframes dropdown-in {
-            from { opacity:0; transform: translateY(-6px); }
-            to   { opacity:1; transform: translateY(0); }
-        }
-        .header-perfil.open .header-dropdown { display: block; }
-
-        .dropdown-user-card {
-            display: flex; align-items: center; gap: 12px; padding: 16px;
-            background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
-            border-bottom: 1px solid #DBEAFE;
-        }
-        .dropdown-avatar {
-            width: 46px; height: 46px; flex-shrink: 0;
-            background: linear-gradient(135deg, #1E3A8A, #2563EB);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-weight: 700; font-size: 0.95rem; letter-spacing: .05em;
-        }
-        .dropdown-nombre { font-weight: 700; font-size: 0.88rem; color: #1E293B; }
-        .dropdown-email  { font-size: 0.73rem; color: #64748B; margin-top: 2px; }
-        .dropdown-rol {
-            display: inline-block; margin-top: 5px;
-            font-size: 0.68rem; font-weight: 700; letter-spacing: .04em;
-            background: #2563EB; color: #fff; padding: 2px 8px; border-radius: 99px;
-        }
-        .dropdown-section { padding: 6px 0; }
-        .dropdown-divider { height: 1px; background: #E2E8F0; }
-        .dropdown-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 16px; font-size: 0.84rem; color: #334155;
-            text-decoration: none; cursor: pointer; width: 100%;
-            background: transparent; border: none;
-            font-family: 'Nunito', sans-serif; text-align: left;
-            transition: background .12s, color .12s;
-        }
-        .dropdown-item:hover { background: #EFF6FF; color: #1E40AF; }
-        .dropdown-item-icon { width: 20px; text-align: center; flex-shrink: 0; font-size: 1rem; }
-        .dropdown-item-danger { color: #DC2626; }
-        .dropdown-item-danger:hover { background: #FEF2F2; color: #991B1B; }
-
-        /* Main */
-        .main { margin-left: 240px; padding-top: 60px; min-height: 100vh; }
-        .content { padding: 32px; }
-
-        /* Alerts */
-        .alert-success { background: #ECFDF5; border: 1px solid #059669; color: #065F46; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; }
-        .alert-error { background: #FEF2F2; border: 1px solid #DC2626; color: #991B1B; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; }
-
-        /* Tables */
-        .table-container { background: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #DBEAFE; box-shadow: 0 1px 4px rgba(37,99,235,.07); }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #EFF6FF; padding: 12px 16px; text-align: left; font-size: 0.8rem; color: #1E40AF; text-transform: uppercase; letter-spacing: 0.05em; }
-        td { padding: 12px 16px; border-top: 1px solid #E2E8F0; font-size: 0.9rem; color: #334155; }
-        tr:hover td { background: #F8FAFF; }
-
-        /* Badges */
-        .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
-        .badge-green { background: #DCFCE7; color: #166534; }
-        .badge-yellow { background: #FEF3C7; color: #92400E; }
-        .badge-red { background: #FEE2E2; color: #991B1B; }
-
-        /* Buttons */
-        .btn { display: inline-block; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-family: 'Nunito', sans-serif; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; }
-        .btn-primary { background: #2563EB; color: #FFFFFF; }
-        .btn-primary:hover { background: #1D4ED8; }
-        .btn-danger { background: transparent; border: 1px solid #DC2626; color: #DC2626; }
-        .btn-danger:hover { background: #FEE2E2; }
-        .btn-sm { padding: 4px 10px; font-size: 0.78rem; }
-
-        /* Forms */
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 0.85rem; color: #475569; margin-bottom: 6px; font-weight: 600; }
-        .form-control {
-            width: 100%; background: #FFFFFF; border: 1px solid #CBD5E1;
-            border-radius: 8px; padding: 10px 14px; color: #1E293B;
-            font-family: 'Nunito', sans-serif; font-size: 0.9rem; outline: none;
-            transition: border-color .15s, box-shadow .15s;
-        }
-        .form-control:focus { border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
-        select.form-control { cursor: pointer; }
-
-        /* Page header */
-        .page-header { margin-bottom: 28px; }
-        .page-header h1 { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: #1E3A8A; }
-        .page-header p { color: #64748B; margin-top: 4px; }
-
-    </style>
+    <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
     @stack('styles')
     @stack('head')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -171,29 +20,43 @@
             <span class="brand">Aulas Reggio</span>
             <span class="badge-admin">ADMIN</span>
         </div>
-        <nav class="nav">
-            <a href="{{ route('admin.ambientes') }}" class="{{ request()->routeIs('admin.ambientes*') ? 'active' : '' }}">
-                🌐 Ambientes
-            </a>
-            <a href="{{ route('admin.docentes') }}" class="{{ request()->routeIs('admin.docentes*') ? 'active' : '' }}">
-                👩‍🏫 Docentes
-            </a>
-            <a href="{{ route('admin.estudiantes') }}" class="{{ request()->routeIs('admin.estudiantes*') ? 'active' : '' }}">
-                🧒 Estudiantes
-            </a>
-            <a href="{{ route('admin.catalogo') }}" class="{{ request()->routeIs('admin.catalogo*') ? 'active' : '' }}">
-                📚 Catálogo
-            </a>
-            <a href="{{ route('admin.sync-log') }}" class="{{ request()->routeIs('admin.sync-log*') ? 'active' : '' }}">
-                🔄 Sync Log
-            </a>
-            <a href="{{ route('admin.reportes') }}" class="{{ request()->routeIs('admin.reportes*') ? 'active' : '' }}">
-                📊 Reportes
-            </a>
-            <a href="{{ route('admin.configuracion') }}" class="{{ request()->routeIs('admin.configuracion*') ? 'active' : '' }}">
-                ⚙️ Configuración
-            </a>
-        </nav>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="{{ route('admin.ambientes') }}" class="{{ request()->routeIs('admin.ambientes*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-house"></i> Ambientes
+                </a>
+            </li>
+            <li class="nav-item">       
+                <a href="{{ route('admin.docentes') }}" class="{{ request()->routeIs('admin.docentes*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-user-graduate"></i> Docentes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.estudiantes') }}" class="{{ request()->routeIs('admin.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-child"></i> Estudiantes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.catalogo') }}" class="{{ request()->routeIs('admin.catalogo*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-book"></i> Catálogo
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.sync-log') }}" class="{{ request()->routeIs('admin.sync-log*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-sync"></i> Sync Log
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.reportes') }}" class="{{ request()->routeIs('admin.reportes*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-chart-line"></i> Reportes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.configuracion') }}" class="{{ request()->routeIs('admin.configuracion*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-gear"></i> Configuración
+                </a>
+            </li>
+        </ul>
     </aside>
 
     @php
@@ -259,8 +122,8 @@
             @yield('content')
         </div>
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
     /* ── Utilidades globales AJAX ────────────────────────────── */
     async function ajaxRequest(url, method = 'GET', data = null) {
