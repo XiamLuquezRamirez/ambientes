@@ -16,7 +16,7 @@
 .modal-backdrop.open { display: flex; }
 
 /* ── Modal ───────────────────────────────────────────────────── */
-.modal {
+.dialogo {
     background: #FFFFFF;
     border: 1px solid #DBEAFE;
     border-radius: 16px;
@@ -167,7 +167,7 @@
 
 {{-- ── Modal Nuevo Docente ──────────────────────────────────────── --}}
 <div class="modal-backdrop" id="modalDocente" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal">
+    <div class="dialogo">
 
         <div class="modal-header">
             <div class="modal-header-icon">👩‍🏫</div>
