@@ -114,13 +114,13 @@
         <h1>Docentes</h1>
         <p>Gestión de cuentas de docentes y administradores</p>
     </div>
-    <button class="btn btn-primary" onclick="abrirModal()">+ Nuevo Docente</button>
+    <button class="btn btn-primary" onclick="abrirModal()"><i class="fas fa-plus"></i> Nuevo Docente</button>
 </div>
 
 {{-- ── Filtros ──────────────────────────────────────────────────── --}}
 <form id="formBuscar" style="display:flex;gap:12px;margin-bottom:24px;align-items:center;flex-wrap:wrap">
     <div class="input-buscar">
-        <span class="icono-buscar">🔍</span>
+        <span class="icono-buscar"><i class="fas fa-search"></i></span>
         <input type="text" name="buscar" placeholder="Buscar por nombre o correo..."
                value="{{ request('buscar') }}" autocomplete="off">
     </div>
@@ -136,11 +136,11 @@
             <option value="{{ $val }}" {{ request('rol') === $val ? 'selected' : '' }}>{{ $label }}</option>
         @endforeach
     </select>
-    <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-filter"></i> Filtrar</button>
     <a id="btnLimpiar" href="{{ route('admin.docentes') }}"
        class="btn btn-sm" style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
               display:{{ request()->hasAny(['buscar','ambiente_id','rol']) ? 'inline-flex' : 'none' }}">
-        ✕ Limpiar
+        <i class="fas fa-broom"></i> Limpiar
     </a>
 </form>
 
@@ -148,11 +148,10 @@
 <div id="contenedorTabla">
     @include('admin.docentes._tabla')
 </div>
-<div id="cargando-tabla">⏳ Cargando...</div>
+<div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 
 {{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
-{{-- data-bs-backdrop="static" → fondo oscuro + sacudida al clic fuera --}}
-{{-- data-bs-keyboard="false"  → ESC también sacude en vez de cerrar  --}}
+
 <div class="modal fade" id="modalDocente" tabindex="-1"
      data-bs-backdrop="static" data-bs-keyboard="false"
      aria-labelledby="modalDocenteLabel" aria-hidden="true">
@@ -160,12 +159,14 @@
         <div class="modal-content">
 
             <div class="modal-header">
-                <div class="modal-header-icon">👩‍🏫</div>
+                <div class="modal-header-icon"><i class="fas fa-user-graduate text-white"></i></div>
                 <div class="flex-grow-1">
                     <h5 class="modal-title mb-0" id="modalDocenteLabel">Nuevo Docente</h5>
                     <p class="modal-subtitle mb-0">Completa los datos para crear la cuenta</p>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                    <i class="fas fa-times"></i>    
+                </button>
             </div>
 
             <div class="modal-body">
