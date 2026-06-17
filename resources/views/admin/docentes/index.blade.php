@@ -15,9 +15,37 @@
             justify-content: center;
         }
 
-        .modal-backdrop.open {
+        <<<<<<< HEAD .modal-backdrop.open {
             display: flex;
         }
+
+        =======
+
+        /* ── Modal ───────────────────────────────────────────────────── */
+        .dialogo {
+            background: #FFFFFF;
+            border: 1px solid #DBEAFE;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 520px;
+            overflow: hidden;
+            animation: modal-in .18s cubic-bezier(.4, 0, .2, 1);
+            box-shadow: 0 24px 60px rgba(37, 99, 235, .18);
+        }
+
+        @keyframes modal-in {
+            from {
+                opacity: 0;
+                transform: translateY(-16px) scale(.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        >>>>>>>0b6f2c3d9f637236bc369984bf112da09a7f3eaf
 
         /* ── Modal ───────────────────────────────────────────────────── */
         .modal {
@@ -324,241 +352,246 @@
     <div class="modal-backdrop" id="modalDocente" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal">
 
-            <div class="modal-header">
-                <div class="modal-header-icon">👩‍🏫</div>
-                <div class="modal-header-text">
-                    <h2 id="modal-title">Nuevo Docente</h2>
-                    <p>Completa los datos para crear la cuenta</p>
+            {{-- ── Modal Nuevo Docente ──────────────────────────────────────── --}}
+            <div class="modal-backdrop" id="modalDocente" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                <div class="dialogo">
+
+                    <div class="modal-header">
+                        <div class="modal-header-icon">👩‍🏫</div>
+                        <div class="modal-header-text">
+                            <h2 id="modal-title">Nuevo Docente</h2>
+                            <p>Completa los datos para crear la cuenta</p>
+                        </div>
+
+                        <div class="modal-body">
+                            <form id="formCrearDocente">
+                                @csrf
+                                <div class="form-group">
+                                    <label>Nombre completo</label>
+                                    <input type="text" name="nombre" class="form-control" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label>Correo electrónico</label>
+                                    <input type="email" name="email" class="form-control" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label>Contraseña <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8
+                                            caracteres)</span></label>
+                                    <input type="password" name="password" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Rol</label>
+                                    <select name="rol" class="form-control">
+                                        @foreach (['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'] as $val => $label)
+                                            <option value="{{ $val }}">{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0">
+                                    <label>Ambiente <span style="color:#94A3B8;font-size:0.78rem">(no aplica si es
+                                            Administrador)</span></label>
+                                    <select name="ambiente_id" class="form-control">
+                                        <option value="">— Sin ambiente —</option>
+                                        @foreach ($ambientes as $a)
+                                            <option value="{{ $a->id }}">{{ $a->icono }} {{ $a->nombre }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="modal-actions">
+                                    <button type="submit" id="btnCrearDocente" class="btn btn-primary">Crear
+                                        Docente</button>
+                                    <button type="button" class="btn"
+                                        style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
+                                        onclick="cerrarModal()">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
                 </div>
-                <button class="modal-close" onclick="cerrarModal()" aria-label="Cerrar">✕</button>
-            </div>
+            @endsection
 
-            <div class="modal-body">
-                <form id="formCrearDocente">
-                    @csrf
-                    <div class="form-group">
-                        <label>Nombre completo</label>
-                        <input type="text" name="nombre" class="form-control" autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <label>Correo electrónico</label>
-                        <input type="email" name="email" class="form-control" autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span></label>
-                        <input type="password" name="password" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Rol</label>
-                        <select name="rol" class="form-control">
-                            @foreach (['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'] as $val => $label)
-                                <option value="{{ $val }}">{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0">
-                        <label>Ambiente <span style="color:#94A3B8;font-size:0.78rem">(no aplica si es
-                                Administrador)</span></label>
-                        <select name="ambiente_id" class="form-control">
-                            <option value="">— Sin ambiente —</option>
-                            @foreach ($ambientes as $a)
-                                <option value="{{ $a->id }}">{{ $a->icono }} {{ $a->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="modal-actions">
-                        <button type="submit" id="btnCrearDocente" class="btn btn-primary">Crear Docente</button>
-                        <button type="button" class="btn"
-                            style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
-                            onclick="cerrarModal()">Cancelar</button>
-                    </div>
-                </form>
-            </div>
+            @push('scripts')
+                <script>
+                    const URL_DOCENTES = "{{ route('admin.docentes') }}";
 
-        </div>
-    </div>
-@endsection
+                    /* ── Tabla AJAX ──────────────────────────────────────────────── */
+                    async function cargarTabla(url) {
+                        document.getElementById('contenedorTabla').style.opacity = '.4';
+                        document.getElementById('cargando-tabla').style.display = 'block';
 
-@push('scripts')
-    <script>
-        const URL_DOCENTES = "{{ route('admin.docentes') }}";
+                        const res = await ajaxRequest(url);
 
-        /* ── Tabla AJAX ──────────────────────────────────────────────── */
-        async function cargarTabla(url) {
-            document.getElementById('contenedorTabla').style.opacity = '.4';
-            document.getElementById('cargando-tabla').style.display = 'block';
+                        document.getElementById('contenedorTabla').style.opacity = '1';
+                        document.getElementById('cargando-tabla').style.display = 'none';
 
-            const res = await ajaxRequest(url);
-
-            document.getElementById('contenedorTabla').style.opacity = '1';
-            document.getElementById('cargando-tabla').style.display = 'none';
-
-            if (res.success) {
-                document.getElementById('contenedorTabla').innerHTML = res.html;
-                history.pushState(null, '', url);
-                // Mostrar/ocultar botón limpiar según params en la nueva URL
-                const params = new URL(url).searchParams;
-                const tieneFilros = params.has('buscar') || params.has('ambiente_id') || params.has('rol');
-                document.getElementById('btnLimpiar').style.display = tieneFilros ? 'inline-flex' : 'none';
-            } else {
-                mostrarToast('error', 'Error al cargar los datos');
-            }
-        }
-
-        /* Delegación: clics en paginación dinámica */
-        document.addEventListener('click', function(e) {
-            const pagBtn = e.target.closest('.pag-btn[href]');
-            if (pagBtn) {
-                e.preventDefault();
-                cargarTabla(pagBtn.href);
-            }
-        });
-
-        /* ── Filtros ─────────────────────────────────────────────────── */
-        function aplicarFiltros() {
-            const params = new URLSearchParams(new FormData(document.getElementById('formBuscar')));
-            for (const [k, v] of [...params.entries()]) {
-                if (!v) params.delete(k);
-            }
-            const url = params.toString() ? `${URL_DOCENTES}?${params.toString()}` : URL_DOCENTES;
-            cargarTabla(url);
-        }
-
-        // Selects: filtrar inmediatamente al cambiar
-        document.querySelectorAll('#formBuscar select').forEach(sel => {
-            sel.addEventListener('change', aplicarFiltros);
-        });
-
-        // Buscador de texto: filtrar con debounce para no disparar en cada tecla
-        let debounceTimer;
-        document.querySelector('#formBuscar input[name="buscar"]').addEventListener('input', function() {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(aplicarFiltros, 400);
-        });
-
-        // Submit (Enter en el campo de texto) sigue funcionando
-        document.getElementById('formBuscar').addEventListener('submit', function(e) {
-            e.preventDefault();
-            clearTimeout(debounceTimer);
-            aplicarFiltros();
-        });
-
-        document.getElementById('btnLimpiar').addEventListener('click', async function(e) {
-            e.preventDefault();
-            document.getElementById('formBuscar').reset();
-            await cargarTabla(URL_DOCENTES);
-        });
-
-        /* ── Modal ───────────────────────────────────────────────────── */
-        function abrirModal() {
-            document.getElementById('modalDocente').classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalDocente').classList.remove('open');
-            document.body.style.overflow = '';
-            limpiarErroresModal();
-            document.getElementById('formCrearDocente').reset();
-        }
-        document.getElementById('modalDocente').addEventListener('click', function(e) {
-            if (e.target === this) cerrarModal();
-        });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') cerrarModal();
-        });
-
-        /* ── Errores inline en modal ─────────────────────────────────── */
-        function limpiarErroresModal() {
-            document.querySelectorAll('#formCrearDocente .campo-error').forEach(el => el.remove());
-            document.querySelectorAll('#formCrearDocente .is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        }
-
-        function mostrarErroresModal(errors) {
-            limpiarErroresModal();
-            for (const [campo, mensajes] of Object.entries(errors)) {
-                const input = document.querySelector(`#formCrearDocente [name="${campo}"]`);
-                if (!input) continue;
-                input.classList.add('is-invalid');
-                const div = document.createElement('div');
-                div.className = 'campo-error';
-                div.textContent = mensajes[0];
-                input.insertAdjacentElement('afterend', div);
-            }
-            // Enfocar el primer campo con error
-            const primero = document.querySelector('#formCrearDocente .is-invalid');
-            if (primero) primero.focus();
-        }
-
-        /* ── Crear docente (AJAX) ────────────────────────────────────── */
-        document.getElementById('formCrearDocente').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnCrearDocente');
-            btn.disabled = true;
-            btn.textContent = 'Guardando…';
-
-            const formData = new FormData(this);
-            const datos = Object.fromEntries(formData.entries());
-            // Normalizar ambiente vacío a null
-            if (!datos.ambiente_id) datos.ambiente_id = null;
-
-            const res = await ajaxRequest(URL_DOCENTES, 'POST', datos);
-
-            btn.disabled = false;
-            btn.textContent = 'Crear Docente';
-
-            if (res.success) {
-                cerrarModal();
-                mostrarToast('success', res.message);
-                await cargarTabla(location.href);
-            } else if (res.errors && Object.keys(res.errors).length) {
-                mostrarErroresModal(res.errors);
-            } else {
-                mostrarToast('error', res.message || 'Error al crear el docente');
-            }
-        });
-
-        /* ── Eliminar docente (AJAX) ─────────────────────────────────── */
-        document.addEventListener('click', async function(e) {
-            const btn = e.target.closest('.btn-eliminar');
-            if (!btn) return;
-
-            const id = btn.dataset.id;
-            const nombre = btn.dataset.nombre;
-
-            const confirmacion = await Swal.fire({
-                title: '¿Eliminar docente?',
-                text: `"${nombre}" será eliminado permanentemente.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#DC2626',
-                cancelButtonColor: '#94A3B8',
-                iconColor: '#F59E0B',
-            });
-
-            if (!confirmacion.isConfirmed) return;
-
-            const res = await ajaxRequest(`${URL_DOCENTES}/${id}`, 'DELETE');
-
-            if (res.success) {
-                const fila = document.getElementById(`fila-${id}`);
-                if (fila) {
-                    fila.style.transition = 'opacity .25s';
-                    fila.style.opacity = '0';
-                    setTimeout(() => {
-                        fila.remove();
-                        // Si la página queda vacía, refresca
-                        if (!document.querySelector('#contenedorTabla tbody tr[id^="fila-"]')) {
-                            cargarTabla(URL_DOCENTES);
+                        if (res.success) {
+                            document.getElementById('contenedorTabla').innerHTML = res.html;
+                            history.pushState(null, '', url);
+                            // Mostrar/ocultar botón limpiar según params en la nueva URL
+                            const params = new URL(url).searchParams;
+                            const tieneFilros = params.has('buscar') || params.has('ambiente_id') || params.has('rol');
+                            document.getElementById('btnLimpiar').style.display = tieneFilros ? 'inline-flex' : 'none';
+                        } else {
+                            mostrarToast('error', 'Error al cargar los datos');
                         }
-                    }, 250);
-                }
-                mostrarToast('success', res.message);
-            } else {
-                mostrarToast('error', res.message || 'Error al eliminar');
-            }
-        });
-    </script>
-@endpush
+                    }
+
+                    /* Delegación: clics en paginación dinámica */
+                    document.addEventListener('click', function(e) {
+                        const pagBtn = e.target.closest('.pag-btn[href]');
+                        if (pagBtn) {
+                            e.preventDefault();
+                            cargarTabla(pagBtn.href);
+                        }
+                    });
+
+                    /* ── Filtros ─────────────────────────────────────────────────── */
+                    function aplicarFiltros() {
+                        const params = new URLSearchParams(new FormData(document.getElementById('formBuscar')));
+                        for (const [k, v] of [...params.entries()]) {
+                            if (!v) params.delete(k);
+                        }
+                        const url = params.toString() ? `${URL_DOCENTES}?${params.toString()}` : URL_DOCENTES;
+                        cargarTabla(url);
+                    }
+
+                    // Selects: filtrar inmediatamente al cambiar
+                    document.querySelectorAll('#formBuscar select').forEach(sel => {
+                        sel.addEventListener('change', aplicarFiltros);
+                    });
+
+                    // Buscador de texto: filtrar con debounce para no disparar en cada tecla
+                    let debounceTimer;
+                    document.querySelector('#formBuscar input[name="buscar"]').addEventListener('input', function() {
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(aplicarFiltros, 400);
+                    });
+
+                    // Submit (Enter en el campo de texto) sigue funcionando
+                    document.getElementById('formBuscar').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        clearTimeout(debounceTimer);
+                        aplicarFiltros();
+                    });
+
+                    document.getElementById('btnLimpiar').addEventListener('click', async function(e) {
+                        e.preventDefault();
+                        document.getElementById('formBuscar').reset();
+                        await cargarTabla(URL_DOCENTES);
+                    });
+
+                    /* ── Modal ───────────────────────────────────────────────────── */
+                    function abrirModal() {
+                        document.getElementById('modalDocente').classList.add('open');
+                        document.body.style.overflow = 'hidden';
+                    }
+
+                    function cerrarModal() {
+                        document.getElementById('modalDocente').classList.remove('open');
+                        document.body.style.overflow = '';
+                        limpiarErroresModal();
+                        document.getElementById('formCrearDocente').reset();
+                    }
+                    document.getElementById('modalDocente').addEventListener('click', function(e) {
+                        if (e.target === this) cerrarModal();
+                    });
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape') cerrarModal();
+                    });
+
+                    /* ── Errores inline en modal ─────────────────────────────────── */
+                    function limpiarErroresModal() {
+                        document.querySelectorAll('#formCrearDocente .campo-error').forEach(el => el.remove());
+                        document.querySelectorAll('#formCrearDocente .is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                    }
+
+                    function mostrarErroresModal(errors) {
+                        limpiarErroresModal();
+                        for (const [campo, mensajes] of Object.entries(errors)) {
+                            const input = document.querySelector(`#formCrearDocente [name="${campo}"]`);
+                            if (!input) continue;
+                            input.classList.add('is-invalid');
+                            const div = document.createElement('div');
+                            div.className = 'campo-error';
+                            div.textContent = mensajes[0];
+                            input.insertAdjacentElement('afterend', div);
+                        }
+                        // Enfocar el primer campo con error
+                        const primero = document.querySelector('#formCrearDocente .is-invalid');
+                        if (primero) primero.focus();
+                    }
+
+                    /* ── Crear docente (AJAX) ────────────────────────────────────── */
+                    document.getElementById('formCrearDocente').addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        const btn = document.getElementById('btnCrearDocente');
+                        btn.disabled = true;
+                        btn.textContent = 'Guardando…';
+
+                        const formData = new FormData(this);
+                        const datos = Object.fromEntries(formData.entries());
+                        // Normalizar ambiente vacío a null
+                        if (!datos.ambiente_id) datos.ambiente_id = null;
+
+                        const res = await ajaxRequest(URL_DOCENTES, 'POST', datos);
+
+                        btn.disabled = false;
+                        btn.textContent = 'Crear Docente';
+
+                        if (res.success) {
+                            cerrarModal();
+                            mostrarToast('success', res.message);
+                            await cargarTabla(location.href);
+                        } else if (res.errors && Object.keys(res.errors).length) {
+                            mostrarErroresModal(res.errors);
+                        } else {
+                            mostrarToast('error', res.message || 'Error al crear el docente');
+                        }
+                    });
+
+                    /* ── Eliminar docente (AJAX) ─────────────────────────────────── */
+                    document.addEventListener('click', async function(e) {
+                        const btn = e.target.closest('.btn-eliminar');
+                        if (!btn) return;
+
+                        const id = btn.dataset.id;
+                        const nombre = btn.dataset.nombre;
+
+                        const confirmacion = await Swal.fire({
+                            title: '¿Eliminar docente?',
+                            text: `"${nombre}" será eliminado permanentemente.`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, eliminar',
+                            cancelButtonText: 'Cancelar',
+                            confirmButtonColor: '#DC2626',
+                            cancelButtonColor: '#94A3B8',
+                            iconColor: '#F59E0B',
+                        });
+
+                        if (!confirmacion.isConfirmed) return;
+
+                        const res = await ajaxRequest(`${URL_DOCENTES}/${id}`, 'DELETE');
+
+                        if (res.success) {
+                            const fila = document.getElementById(`fila-${id}`);
+                            if (fila) {
+                                fila.style.transition = 'opacity .25s';
+                                fila.style.opacity = '0';
+                                setTimeout(() => {
+                                    fila.remove();
+                                    // Si la página queda vacía, refresca
+                                    if (!document.querySelector('#contenedorTabla tbody tr[id^="fila-"]')) {
+                                        cargarTabla(URL_DOCENTES);
+                                    }
+                                }, 250);
+                            }
+                            mostrarToast('success', res.message);
+                        } else {
+                            mostrarToast('error', res.message || 'Error al eliminar');
+                        }
+                    });
+                </script>
+            @endpush
