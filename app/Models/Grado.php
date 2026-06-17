@@ -20,6 +20,11 @@ class Grado extends Model
         return $this->hasMany(Grupo::class);
     }
 
+    public function gruposEnAmbiente(int $ambienteId)
+    {
+        return $this->grupos()->where('ambiente_id', $ambienteId);
+    }
+
     public function matriculas()
     {
         return $this->hasMany(Matricula::class);

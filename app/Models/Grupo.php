@@ -11,9 +11,14 @@ class Grupo extends Model
 
     protected $table = 'grupos';
 
-    protected $fillable = ['grado_id', 'nombre', 'anio_lectivo', 'cupo_maximo', 'activo'];
+    protected $fillable = ['ambiente_id', 'grado_id', 'nombre', 'anio_lectivo', 'cupo_maximo', 'activo'];
 
     protected $casts = ['activo' => 'boolean'];
+
+    public function ambiente()
+    {
+        return $this->belongsTo(Ambiente::class);
+    }
 
     public function grado()
     {
@@ -35,7 +40,7 @@ class Grupo extends Model
         return $this->grado->nombre . ' ' . $this->nombre;
     }
 
-    public function totalEstudiantes(): int
+    public function totalMatriculas(): int
     {
         return $this->matriculas()
             ->where('estado', 'activo')

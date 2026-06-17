@@ -30,4 +30,24 @@ class Ambiente extends Model
     {
         return $this->hasMany(Modulo::class)->orderBy('orden');
     }
+
+    public function gradosHabilitados()
+    {
+        return $this->belongsToMany(Grado::class, 'ambiente_grado')
+            ->withPivot('activo')
+            ->wherePivot('activo', 1)
+            ->orderBy('orden');
+    }
+
+    public function todosGrados()
+    {
+        return $this->belongsToMany(Grado::class, 'ambiente_grado')
+            ->withPivot('activo')
+            ->orderBy('orden');
+    }
+
+    public function grupos()
+    {
+        return $this->hasMany(Grupo::class);
+    }
 }
