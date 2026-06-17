@@ -295,7 +295,7 @@
                     <p class="modal-subtitle mb-0">Completa los datos para crear la cuenta</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
-                    <i class="fas fa-times"></i>
+                 
                 </button>
             </div>
 
@@ -341,9 +341,9 @@
             <div class="modal-footer">
                 <button type="button" class="btn"
                     style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
-                    data-bs-dismiss="modal">Cancelar</button>
+                    data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
                 <button type="submit" form="formCrearDocente" id="btnCrearDocente"
-                    class="btn btn-primary">Crear Docente</button>
+                    class="btn btn-primary"><i class="fas fa-plus"></i> Crear Docente</button>
             </div>
 
         </div>
