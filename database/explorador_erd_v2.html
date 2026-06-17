@@ -1,0 +1,465 @@
+
+<style>
+h2.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+*{box-sizing:border-box}
+.wrap{padding:1rem 0;font-size:13px}
+.top-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.top-bar input{flex:1;min-width:140px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:3px 10px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-secondary);cursor:pointer;font-size:12px;transition:background .15s}
+.chip.on{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:1rem}
+.tcard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;cursor:pointer;transition:border-color .15s}
+.tcard:hover,.tcard.sel{border-color:var(--color-border-info)}
+.tcard.sel{border-width:1.5px}
+.tcard-head{padding:9px 12px 8px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;gap:6px}
+.tcard-name{font-weight:500;font-size:13px;color:var(--color-text-primary)}
+.tcard-desc{font-size:11px;color:var(--color-text-secondary);padding:4px 12px 6px}
+.badge{font-size:11px;padding:1px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.tcard-cols{padding:4px 12px 8px;display:flex;flex-direction:column;gap:2px}
+.col-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.col-row:last-child{border-bottom:none}
+.col-name{color:var(--color-text-primary);font-size:12px;display:flex;align-items:center;gap:3px}
+.col-type{color:var(--color-text-tertiary);font-size:11px;font-family:var(--font-mono)}
+.pk{color:#085041;font-size:10px;background:#E1F5EE;padding:1px 5px;border-radius:4px}
+.fk{color:#0C447C;font-size:10px;background:#E6F1FB;padding:1px 5px;border-radius:4px}
+.uk{color:#633806;font-size:10px;background:#FAEEDA;padding:1px 5px;border-radius:4px}
+.detail-panel{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:1rem}
+.detail-head{padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.detail-title{font-weight:500;font-size:15px;color:var(--color-text-primary);margin-bottom:2px}
+.detail-desc{font-size:12px;color:var(--color-text-secondary)}
+.detail-cols table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.detail-cols th{padding:7px 12px;text-align:left;font-weight:500;font-size:11px;color:var(--color-text-secondary);background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.detail-cols td{padding:6px 12px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:top;word-break:break-word}
+.detail-cols tr:last-child td{border-bottom:none}
+.detail-cols tr:hover td{background:var(--color-background-secondary)}
+.col-w1{width:18%}.col-w2{width:16%}.col-w3{width:20%}.col-w4{width:46%}
+.rel-sec{padding:10px 16px;border-top:0.5px solid var(--color-border-tertiary)}
+.rel-sec h4{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:7px;text-transform:uppercase;letter-spacing:.04em}
+.rels{display:flex;flex-wrap:wrap;gap:6px}
+.rel-pill{padding:3px 10px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);font-size:12px;cursor:pointer;color:var(--color-text-secondary);background:var(--color-background-secondary)}
+.rel-pill:hover{border-color:var(--color-border-info);color:var(--color-text-info)}
+.enum-sec{padding:8px 16px 10px;border-top:0.5px solid var(--color-border-tertiary)}
+.enum-sec h4{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.enum-pills{display:flex;gap:5px;flex-wrap:wrap}
+.enum-pill{padding:2px 8px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);font-size:11px;color:var(--color-text-secondary);font-family:var(--font-mono)}
+.no-res{padding:24px;text-align:center;color:var(--color-text-tertiary);font-size:13px}
+.stat-bar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 14px;display:flex;flex-direction:column;gap:2px}
+.stat-n{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.stat-l{font-size:11px;color:var(--color-text-secondary)}
+</style>
+
+<h2 class="sr">Explorador interactivo del modelo de base de datos Aulas Reggio v2: 21 tablas con columnas, restricciones, descripciones y relaciones navegables.</h2>
+
+<div class="wrap">
+<div class="stat-bar" id="stats"></div>
+<div class="top-bar">
+  <input type="search" placeholder="Buscar tabla o columna..." id="q" oninput="render()">
+  <div class="chips" id="chips"></div>
+</div>
+<div class="grid" id="grid"></div>
+<div id="detail"></div>
+</div>
+
+<script>
+const GRUPOS={
+  "Autenticación":["users","docentes","registros_acceso"],
+  "Académico":["grados","grupos","carga_docente","matriculas"],
+  "Ambientes":["ambientes","modulos","temas","actividades"],
+  "Estudiantes":["estudiantes","configuracion_pins","piar","asistencias","ajustes_temporales"],
+  "Seguimiento":["portafolios","observaciones","notas_docente"],
+  "Sistema":["configuraciones","cola_sincronizacion"],
+};
+const COLOR={"Autenticación":"#185FA5","Académico":"#0F6E56","Ambientes":"#534AB7","Estudiantes":"#854F0B","Seguimiento":"#993C1D","Sistema":"#888780"};
+const COLORBG={"Autenticación":"#E6F1FB","Académico":"#E1F5EE","Ambientes":"#EEEDFE","Estudiantes":"#FAEEDA","Seguimiento":"#FAECE7","Sistema":"#F1EFE8"};
+
+const ENUMS={
+  rol:["admin","docente"],
+  condicion:["estandar","tea","tdah","disc_visual","disc_auditiva","disc_motriz","down"],
+  estado_matricula:["activo","promovido","graduado","retirado"],
+  figura:["circulo","estrella","corazon","triangulo","cuadrado","luna","diamante","rayo"],
+  estado_piar:["borrador","revisado","aprobado"],
+  tipo_actividad:["audio","video_lsc","animacion","juego","simulacion"],
+  tipo_registro:["foto","audio","emocion","resultado"],
+  tipo_obs:["general","logro"],
+  accion_sync:["create","update","delete","transfer"],
+  estado_sync:["pendiente","enviado","confirmado","error"],
+};
+
+const TABLAS={
+  users:{
+    desc:"Credenciales de acceso. Puede ser admin (acceso total) o docente (acceso al panel de su carga).",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:"Identificador único"},
+      {n:"nombre",t:"varchar(255)",k:"",d:"Nombre completo del usuario"},
+      {n:"email",t:"varchar(255)",k:"UK",d:"Correo institucional, usado como login"},
+      {n:"password",t:"varchar(255)",k:"",d:"Hash bcrypt de la contraseña"},
+      {n:"rol",t:"enum",k:"",d:"admin acceso total · docente acceso al panel",e:"rol"},
+      {n:"activo",t:"tinyint(1)",k:"",d:"0 bloquea el acceso sin eliminar la cuenta"},
+      {n:"remember_token",t:"varchar(100)",k:"",d:"Token de sesión persistente (Laravel)"},
+      {n:"created_at",t:"timestamp",k:"",d:"Trazabilidad Laravel"},
+      {n:"updated_at",t:"timestamp",k:"",d:"Trazabilidad Laravel"},
+    ]
+  },
+  docentes:{
+    desc:"Perfil profesional del docente. Extiende a User con datos pedagógicos.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"user_id",t:"bigint",k:"FK → users",d:"Credenciales del docente"},
+      {n:"telefono",t:"varchar(20)",k:"",d:"Contacto de emergencia"},
+      {n:"especialidad",t:"varchar(100)",k:"",d:"Área pedagógica (ej: Educación Musical)"},
+      {n:"fecha_ingreso",t:"date",k:"",d:"Fecha de vinculación al programa"},
+      {n:"foto_url",t:"varchar(255)",k:"",d:"Ruta al archivo de foto en storage"},
+      {n:"descripcion",t:"text",k:"",d:"Presentación o bio corta"},
+    ]
+  },
+  registros_acceso:{
+    desc:"Auditoría de accesos: IP, ambiente y hora de cada inicio de sesión.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"user_id",t:"bigint",k:"FK → users",d:"Usuario que inició sesión"},
+      {n:"ip",t:"varchar(45)",k:"",d:"IPv4 o IPv6 del cliente"},
+      {n:"ambiente",t:"varchar(255)",k:"",d:"Slug del ambiente desde donde se conectó"},
+      {n:"fecha",t:"timestamp",k:"",d:"Momento exacto del acceso"},
+    ]
+  },
+  ambientes:{
+    desc:"Uno de los 5 espacios físicos Reggio. Cada uno tiene su propio servidor en la red P2P.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"nombre",t:"varchar(255)",k:"",d:"Nombre del espacio (ej: Música)"},
+      {n:"slug",t:"varchar(255)",k:"UK",d:"Identificador de URL (ej: musica)"},
+      {n:"color_hex",t:"varchar(9)",k:"",d:"Color de identidad visual del ambiente"},
+      {n:"icono",t:"varchar(255)",k:"",d:"Emoji o código del ícono representativo"},
+      {n:"servidor_ip",t:"varchar(15)",k:"",d:"IP del servidor físico en la red local"},
+      {n:"activo",t:"tinyint(1)",k:"",d:"Habilita/deshabilita el ambiente"},
+    ]
+  },
+  grados:{
+    desc:"Nivel educativo fijo: Prejardín (3 años), Jardín (4 años), Transición (5 años).",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"nombre",t:"varchar(60)",k:"",d:"Prejardin · Jardin · Transicion"},
+      {n:"edad_anos",t:"tinyint",k:"",d:"Edad típica: 3, 4 o 5 años"},
+      {n:"descripcion",t:"varchar(255)",k:"",d:"Descripción pedagógica del nivel"},
+      {n:"orden",t:"tinyint",k:"",d:"Secuencia: 1, 2, 3"},
+      {n:"activo",t:"tinyint(1)",k:"",d:"Control de visibilidad"},
+    ]
+  },
+  grupos:{
+    desc:"Subdivisión de un grado para un año lectivo (ej: Jardín A 2026).",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"grado_id",t:"bigint",k:"FK → grados",d:"Grado al que pertenece"},
+      {n:"nombre",t:"varchar(10)",k:"",d:"Letra del grupo: A, B, C..."},
+      {n:"anio_lectivo",t:"year(4)",k:"",d:"Año escolar (ej: 2026)"},
+      {n:"cupo_maximo",t:"tinyint",k:"",d:"Límite de estudiantes matriculados"},
+      {n:"activo",t:"tinyint(1)",k:"",d:""},
+      {n:"UNIQUE",t:"—",k:"",d:"(grado_id, nombre, anio_lectivo) — sin duplicados"},
+    ]
+  },
+  carga_docente:{
+    desc:"Tabla central del panel docente. Conecta docente + ambiente + grado + grupo por año.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"docente_id",t:"bigint",k:"FK → docentes",d:"Docente asignado"},
+      {n:"ambiente_id",t:"bigint",k:"FK → ambientes",d:"Espacio físico donde opera"},
+      {n:"grado_id",t:"bigint",k:"FK → grados",d:"Nivel que atiende"},
+      {n:"grupo_id",t:"bigint",k:"FK → grupos",d:"Grupo específico"},
+      {n:"anio_lectivo",t:"year(4)",k:"",d:"Año de la asignación"},
+      {n:"activo",t:"tinyint(1)",k:"",d:"Permite desactivar sin eliminar"},
+      {n:"UNIQUE",t:"—",k:"",d:"(docente_id, ambiente_id, grado_id, grupo_id, anio_lectivo)"},
+    ]
+  },
+  matriculas:{
+    desc:"Inscripción de un estudiante en grado+grupo para un año lectivo.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"estudiante_id",t:"bigint",k:"FK → estudiantes",d:"Niño matriculado"},
+      {n:"grado_id",t:"bigint",k:"FK → grados",d:"Nivel académico"},
+      {n:"grupo_id",t:"bigint",k:"FK → grupos",d:"Grupo específico"},
+      {n:"anio_lectivo",t:"year(4)",k:"",d:"Año escolar"},
+      {n:"estado",t:"enum",k:"",d:"activo → promovido → graduado / retirado",e:"estado_matricula"},
+      {n:"fecha_ingreso",t:"date",k:"",d:"Inicio del año escolar"},
+      {n:"fecha_egreso",t:"date",k:"",d:"Se llena al cambiar estado a retirado/graduado"},
+      {n:"UNIQUE",t:"—",k:"",d:"(estudiante_id, anio_lectivo) — una matrícula activa por año"},
+    ]
+  },
+  estudiantes:{
+    desc:"Niño de 3–5 años. Se autentica con PIN de figuras. Sus datos se sincronizan entre los 5 servidores.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"nombre",t:"varchar(255)",k:"",d:"Nombre del niño (solo primer nombre es lo usual)"},
+      {n:"iniciales",t:"varchar(3)",k:"",d:"2 letras para el avatar (ej: VA)"},
+      {n:"color_avatar",t:"varchar(9)",k:"",d:"Color del círculo de avatar en la interfaz de selección"},
+      {n:"condicion",t:"enum",k:"",d:"Perfil de inclusión del estudiante",e:"condicion"},
+      {n:"activo",t:"tinyint(1)",k:"",d:"Oculta al niño sin eliminar sus datos"},
+    ]
+  },
+  configuracion_pins:{
+    desc:"Las 3 figuras geométricas que el niño selecciona para ingresar al ambiente.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"estudiante_id",t:"bigint",k:"FK → estudiantes",d:"Un PIN por estudiante"},
+      {n:"figura_1",t:"enum",k:"",d:"Primera figura de la secuencia",e:"figura"},
+      {n:"figura_2",t:"enum",k:"",d:"Segunda figura",e:"figura"},
+      {n:"figura_3",t:"enum",k:"",d:"Tercera figura",e:"figura"},
+      {n:"intentos_fallidos",t:"tinyint",k:"",d:"Al llegar al máximo configurable se bloquea la sesión"},
+    ]
+  },
+  piar:{
+    desc:"Plan Individual de Ajustes Razonables — documento oficial del MEN para estudiantes con necesidades especiales.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"estudiante_id",t:"bigint",k:"FK → estudiantes UK",d:"Un PIAR por estudiante"},
+      {n:"docente_id",t:"bigint",k:"FK → docentes",d:"Docente que lo elaboró (SET NULL si se elimina)"},
+      {n:"anio_lectivo",t:"year(4)",k:"",d:"Año del plan"},
+      {n:"descripcion_diagnostico",t:"text",k:"",d:"Diagnóstico clínico o pedagógico"},
+      {n:"barreras_aprendizaje",t:"text",k:"",d:"Obstáculos identificados (entorno, comunicación, etc.)"},
+      {n:"ajustes_propuestos",t:"text",k:"",d:"Estrategias de inclusión acordadas"},
+      {n:"estado",t:"enum",k:"",d:"Ciclo de vida del documento",e:"estado_piar"},
+      {n:"archivo_adjunto",t:"varchar(255)",k:"",d:"Ruta al PDF oficial del MEN en storage/app/public/piar/{id}/"},
+    ]
+  },
+  asistencias:{
+    desc:"Registro diario de presencia o ausencia de cada estudiante.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"estudiante_id",t:"bigint",k:"FK → estudiantes",d:""},
+      {n:"fecha",t:"date",k:"",d:"Día de la sesión"},
+      {n:"presente",t:"tinyint(1)",k:"",d:"1 asistió · 0 faltó"},
+    ]
+  },
+  ajustes_temporales:{
+    desc:"Configuración temporal específica para un estudiante. Expira automáticamente.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"estudiante_id",t:"bigint",k:"FK → estudiantes",d:""},
+      {n:"clave",t:"varchar(255)",k:"",d:"Nombre del ajuste (ej: fuente_grande, audio_auto)"},
+      {n:"valor",t:"varchar(255)",k:"",d:"Valor del ajuste (ej: true, 150%)"},
+      {n:"expira_en",t:"timestamp",k:"",d:"NULL = permanente · con fecha = expira automáticamente"},
+    ]
+  },
+  modulos:{
+    desc:"Agrupación temática dentro de un ambiente (ej: Ritmo y Movimiento en Música).",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"ambiente_id",t:"bigint",k:"FK → ambientes",d:"Ambiente al que pertenece"},
+      {n:"nombre",t:"varchar(255)",k:"",d:"Nombre del módulo"},
+      {n:"slug",t:"varchar(255)",k:"",d:"Identificador de ruta"},
+      {n:"descripcion",t:"text",k:"",d:"Descripción pedagógica"},
+      {n:"icono",t:"varchar(255)",k:"",d:"Ícono visual del módulo"},
+      {n:"orden",t:"tinyint",k:"",d:"Posición en la lista"},
+      {n:"activo",t:"tinyint(1)",k:"",d:""},
+      {n:"visible_estudiantes",t:"tinyint(1)",k:"",d:"Permite publicar/despublicar sin eliminar"},
+    ]
+  },
+  temas:{
+    desc:"Unidad de aprendizaje dentro de un módulo. Puede tener marcador de Realidad Aumentada.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"modulo_id",t:"bigint",k:"FK → modulos",d:"Módulo contenedor"},
+      {n:"nombre",t:"varchar(255)",k:"",d:"Nombre del tema"},
+      {n:"instruccion_corta",t:"varchar(255)",k:"",d:"Texto de guía que lee el docente antes de la actividad"},
+      {n:"orden",t:"tinyint",k:"",d:""},
+      {n:"marcador_ra",t:"varchar(255)",k:"",d:"ID del marcador RA (Vuforia/AR.js) si aplica"},
+      {n:"activo",t:"tinyint(1)",k:"",d:""},
+    ]
+  },
+  actividades:{
+    desc:"Recurso digital dentro de un tema: audio, video LSC, animación, juego o simulación.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"tema_id",t:"bigint",k:"FK → temas",d:"Tema al que pertenece"},
+      {n:"tipo",t:"enum",k:"",d:"Tipo de recurso multimedia",e:"tipo_actividad"},
+      {n:"contenido_path",t:"varchar(255)",k:"",d:"Ruta relativa al archivo en el servidor local"},
+      {n:"configuracion",t:"longtext",k:"",d:"JSON con parámetros específicos del tipo"},
+    ]
+  },
+  portafolios:{
+    desc:"Evidencias del trabajo del estudiante: fotos, audios, emoción seleccionada, resultados.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"estudiante_id",t:"bigint",k:"FK → estudiantes",d:"Autor del registro"},
+      {n:"tema_id",t:"bigint",k:"FK → temas",d:"Contexto pedagógico"},
+      {n:"tipo_registro",t:"enum",k:"",d:"Tipo de evidencia",e:"tipo_registro"},
+      {n:"contenido",t:"longtext",k:"",d:"Path al archivo o JSON con datos del resultado"},
+      {n:"emocion_seleccionada",t:"varchar(255)",k:"",d:"Solo cuando tipo = emocion"},
+      {n:"creado_en",t:"timestamp",k:"",d:"Sin updated_at — registros inmutables"},
+    ]
+  },
+  observaciones:{
+    desc:"Nota cualitativa del docente sobre un estudiante, vinculada opcionalmente a un tema.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"estudiante_id",t:"bigint",k:"FK → estudiantes",d:"Estudiante observado"},
+      {n:"user_id",t:"bigint",k:"FK → users",d:"Docente que registra"},
+      {n:"tema_id",t:"bigint",k:"FK → temas",d:"Vincula la observación a un tema (opcional)"},
+      {n:"contenido",t:"text",k:"",d:"Texto de la observación"},
+      {n:"tipo",t:"enum",k:"",d:"Tipo de anotación",e:"tipo_obs"},
+    ]
+  },
+  notas_docente:{
+    desc:"Apunte pedagógico privado del docente sobre un tema. No visible para estudiantes.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"tema_id",t:"bigint",k:"FK → temas",d:"Tema sobre el que se anota"},
+      {n:"user_id",t:"bigint",k:"FK → users",d:"Docente autor"},
+      {n:"contenido",t:"text",k:"",d:"Nota privada (preparación, reflexión post-clase)"},
+    ]
+  },
+  configuraciones:{
+    desc:"Parámetros globales del sistema en formato clave→valor.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"clave",t:"varchar(255)",k:"UK",d:"Identificador del parámetro (ej: intentos_max_pin)"},
+      {n:"valor",t:"text",k:"",d:"Valor en texto plano"},
+      {n:"descripcion",t:"varchar(255)",k:"",d:"Explicación para el admin"},
+    ]
+  },
+  cola_sincronizacion:{
+    desc:"Cola de operaciones pendientes de replicar a los otros 4 servidores.",
+    cols:[
+      {n:"id",t:"bigint",k:"PK",d:""},
+      {n:"entidad",t:"varchar(255)",k:"",d:"Nombre del modelo (ej: Estudiante)"},
+      {n:"entidad_id",t:"bigint",k:"",d:"ID del registro afectado"},
+      {n:"accion",t:"enum",k:"",d:"Operación a replicar",e:"accion_sync"},
+      {n:"servidor_origen",t:"varchar(255)",k:"",d:"Slug del ambiente que generó el cambio"},
+      {n:"payload",t:"longtext",k:"",d:"JSON con los datos a replicar"},
+      {n:"estado",t:"enum",k:"",d:"Estado del envío",e:"estado_sync"},
+      {n:"intentos",t:"tinyint",k:"",d:"Reintentos de envío"},
+      {n:"enviado_en",t:"timestamp",k:"",d:"Marca de tiempo del último intento"},
+    ]
+  },
+};
+
+const RELS={
+  users:["docentes","observaciones","notas_docente","registros_acceso"],
+  docentes:["carga_docente","piar"],
+  ambientes:["carga_docente","modulos"],
+  grados:["grupos","carga_docente","matriculas"],
+  grupos:["carga_docente","matriculas"],
+  estudiantes:["matriculas","configuracion_pins","piar","portafolios","observaciones","asistencias","ajustes_temporales"],
+  modulos:["temas"],
+  temas:["actividades","portafolios","observaciones","notas_docente"],
+  matriculas:[],configuracion_pins:[],piar:[],asistencias:[],
+  ajustes_temporales:[],actividades:[],portafolios:[],
+  observaciones:[],notas_docente:[],configuraciones:[],cola_sincronizacion:[],registros_acceso:[],
+};
+
+function grupoDeTabla(t){for(const[g,ts]of Object.entries(GRUPOS))if(ts.includes(t))return g;return"Sistema";}
+
+let selTab=null,filtroGrupo=null;
+
+function kBadge(k){
+  if(!k)return'';
+  if(k==='PK')return'<span class="pk">PK</span>';
+  if(k.includes('UK'))return'<span class="uk">UK</span>';
+  if(k.startsWith('FK'))return'<span class="fk">FK</span>';
+  return'';
+}
+
+function render(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  const keys=Object.keys(TABLAS).filter(t=>{
+    if(filtroGrupo&&!GRUPOS[filtroGrupo]?.includes(t))return false;
+    if(!q)return true;
+    if(t.includes(q))return true;
+    return TABLAS[t].cols.some(c=>c.n.includes(q)||c.t.includes(q)||c.d.toLowerCase().includes(q));
+  });
+  const grid=document.getElementById('grid');
+  if(!keys.length){grid.innerHTML='<div class="no-res">Sin resultados</div>';return;}
+  grid.innerHTML=keys.map(t=>{
+    const g=grupoDeTabla(t),col=COLOR[g]||'#888',bg=COLORBG[g]||'#f1efe8';
+    const colsPreview=TABLAS[t].cols.filter(c=>c.n!=='UNIQUE').slice(0,4);
+    const more=TABLAS[t].cols.filter(c=>c.n!=='UNIQUE').length-4;
+    return`<div class="tcard${selTab===t?' sel':''}" onclick="selectTab('${t}')">
+      <div class="tcard-head">
+        <span class="tcard-name">${t}</span>
+        <span class="badge" style="background:${bg};color:${col}">${g}</span>
+      </div>
+      <div class="tcard-desc">${TABLAS[t].desc.slice(0,60)}${TABLAS[t].desc.length>60?'…':''}</div>
+      <div class="tcard-cols">
+        ${colsPreview.map(c=>`<div class="col-row">
+          <span class="col-name">${c.n}${kBadge(c.k)}</span>
+          <span class="col-type">${c.t}</span>
+        </div>`).join('')}
+        ${more>0?`<div class="col-row" style="justify-content:center;color:var(--color-text-tertiary);font-size:11px">+${more} más</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  renderDetail();
+}
+
+function selectTab(t){selTab=selTab===t?null:t;render();}
+
+function renderDetail(){
+  const el=document.getElementById('detail');
+  if(!selTab){el.innerHTML='';return;}
+  const tab=TABLAS[selTab];
+  if(!tab){el.innerHTML='';return;}
+  const g=grupoDeTabla(selTab),col=COLOR[g]||'#888',bg=COLORBG[g]||'#f1efe8';
+  const rels=(RELS[selTab]||[]).filter(r=>TABLAS[r]);
+  const enumCols=tab.cols.filter(c=>c.e);
+  el.innerHTML=`<div class="detail-panel">
+    <div class="detail-head">
+      <div>
+        <div class="detail-title">${selTab}</div>
+        <div class="detail-desc">${tab.desc}</div>
+      </div>
+      <span class="badge" style="background:${bg};color:${col}">${g}</span>
+    </div>
+    <div class="detail-cols">
+      <table>
+        <colgroup><col class="col-w1"><col class="col-w2"><col class="col-w3"><col class="col-w4"></colgroup>
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Restricción</th><th>Descripción</th></tr></thead>
+        <tbody>${tab.cols.map(c=>{
+          const isUnique=c.n==='UNIQUE';
+          const ref=c.k&&c.k.startsWith('FK')?c.k.replace('FK → ','').replace(' UK',''):'';
+          const kshow=isUnique?'UNIQUE':c.k==='PK'?'PK':c.k.includes('UK')&&!c.k.startsWith('FK')?'UK':c.k.startsWith('FK')?'FK':'';
+          const ks=kshow==='PK'?'color:#085041':kshow==='UK'?'color:#633806':kshow==='FK'?'color:#0C447C':kshow==='UNIQUE'?'color:#634':'color:var(--color-text-tertiary)';
+          return`<tr>
+            <td style="font-weight:${c.k==='PK'?'500':'400'};color:var(--color-text-primary);font-family:${isUnique?'inherit':'var(--font-mono)'}">${c.n}</td>
+            <td style="font-family:var(--font-mono);color:var(--color-text-secondary)">${c.t}</td>
+            <td><span style="${ks};font-size:11px">${kshow}</span>${ref?` <span style="cursor:pointer;color:#185FA5;font-size:11px" onclick="selectTab('${ref}')">${ref} ↗</span>`:''}</td>
+            <td style="color:var(--color-text-secondary);font-size:12px">${c.d}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>
+    ${enumCols.length?`<div class="enum-sec">
+      <h4>Valores enum</h4>
+      ${enumCols.map(c=>`<div style="margin-bottom:6px">
+        <span style="font-size:11px;color:var(--color-text-secondary);margin-right:6px;font-family:var(--font-mono)">${c.n}:</span>
+        <span class="enum-pills" style="display:inline-flex;gap:4px;flex-wrap:wrap">
+          ${(ENUMS[c.e]||[]).map(v=>`<span class="enum-pill">${v}</span>`).join('')}
+        </span>
+      </div>`).join('')}
+    </div>`:''}
+    ${rels.length?`<div class="rel-sec">
+      <h4>Tablas relacionadas</h4>
+      <div class="rels">${rels.map(r=>`<span class="rel-pill" onclick="selectTab('${r}')">${r} →</span>`).join('')}</div>
+    </div>`:''}
+  </div>`;
+}
+
+function initChips(){
+  document.getElementById('chips').innerHTML=Object.keys(GRUPOS).map(g=>`<span class="chip${filtroGrupo===g?' on':''}" onclick="toggleGrupo('${g}')">${g}</span>`).join('');
+}
+function toggleGrupo(g){filtroGrupo=filtroGrupo===g?null:g;initChips();render();}
+
+function initStats(){
+  const total=Object.keys(TABLAS).length;
+  const totalCols=Object.values(TABLAS).reduce((a,t)=>a+t.cols.filter(c=>c.n!=='UNIQUE').length,0);
+  const totalFks=Object.values(TABLAS).reduce((a,t)=>a+t.cols.filter(c=>c.k&&c.k.startsWith('FK')).length,0);
+  const totalEnums=Object.values(TABLAS).reduce((a,t)=>a+t.cols.filter(c=>c.e).length,0);
+  document.getElementById('stats').innerHTML=
+    `<div class="stat"><span class="stat-n">${total}</span><span class="stat-l">tablas</span></div>
+     <div class="stat"><span class="stat-n">${totalCols}</span><span class="stat-l">columnas</span></div>
+     <div class="stat"><span class="stat-n">${totalFks}</span><span class="stat-l">FK</span></div>
+     <div class="stat"><span class="stat-n">${totalEnums}</span><span class="stat-l">enums</span></div>`;
+}
+
+initStats();initChips();render();
+</script>
