@@ -2,18 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\Sincronizable;
 use Illuminate\Database\Eloquent\Model;
 
 class Estudiante extends Model
 {
-    use HasFactory;
+    use Sincronizable;
 
     protected $fillable = ['nombre', 'iniciales', 'color_avatar', 'condicion', 'activo'];
 
-    public function ambientes()
+    protected $casts = ['activo' => 'boolean'];
+
+    public function matriculas()
     {
-        return $this->belongsToMany(Ambiente::class);
+        return $this->hasMany(Matricula::class);
+    }
+
+    public function matriculaActiva()
+    {
+        return $this->hasOne(Matricula::class)
+            ->where('estado', 'activo')
+            ->where('anio_lectivo', date('Y'));
+    }
+
+    public function piar()
+    {
+        return $this->hasOne(Piar::class);
     }
 
     public function configuracionPin()

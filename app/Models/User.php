@@ -29,6 +29,6 @@ class User extends Authenticatable
 
     public function esDocente(): bool
     {
-        return in_array($this->rol, ['docente_lider', 'docente_auxiliar']);
+        return $this->rol === 'docente';
     }
 }

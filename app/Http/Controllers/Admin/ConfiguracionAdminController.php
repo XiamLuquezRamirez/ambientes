@@ -6,6 +6,13 @@ use Illuminate\Http\Request;
 
 class ConfiguracionAdminController extends Controller
 {
-    public function index() {}
-    public function update(Request $request) {}
+    public function listar()
+    {
+        return view('admin.configuracion.index');
+    }
+
+    public function actualizar(Request $request)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
 }

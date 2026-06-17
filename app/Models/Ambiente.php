@@ -2,23 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\Sincronizable;
 use Illuminate\Database\Eloquent\Model;
 
 class Ambiente extends Model
 {
-    use HasFactory;
+    use Sincronizable;
 
     protected $fillable = ['nombre', 'slug', 'color_hex', 'icono', 'servidor_ip', 'activo'];
 
-    public function estudiantes()
+    protected $casts = ['activo' => 'boolean'];
+
+    public function cargasDocente()
     {
-        return $this->belongsToMany(Estudiante::class);
+        return $this->hasMany(CargaDocente::class);
     }
 
     public function docentes()
     {
-        return $this->hasMany(Docente::class);
+        return $this->belongsToMany(Docente::class, 'carga_docente')
+            ->where('carga_docente.activo', true)
+            ->where('carga_docente.anio_lectivo', date('Y'))
+            ->distinct();
     }
 
     public function modulos()

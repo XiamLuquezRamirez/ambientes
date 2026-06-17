@@ -8,38 +8,38 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthDocenteController extends Controller
 {
-    public function showLogin()
+    public function mostrarLogin()
     {
         return view('auth.login-docente');
     }
 
-    public function login(Request $request)
+    public function iniciarSesion(Request $request)
     {
-        $creds = $request->validate([
+        $credenciales = $request->validate([
             'email'    => 'required|email',
             'password' => 'required',
         ]);
 
-        if (!Auth::guard('docente')->attempt($creds, $request->boolean('recordar'))) {
+        if (!Auth::guard('docente')->attempt($credenciales, $request->boolean('recordar'))) {
             return back()->withErrors(['email' => 'Credenciales incorrectas.'])->withInput();
         }
 
-        $user = Auth::guard('docente')->user();
+        $usuario = Auth::guard('docente')->user();
 
         LoginLog::create([
-            'user_id' => $user->id,
-            'ip'      => $request->ip(),
+            'user_id'  => $usuario->id,
+            'ip'       => $request->ip(),
             'ambiente' => config('ambiente.slug'),
         ]);
 
         $request->session()->regenerate();
 
-        return $user->esAdmin()
+        return $usuario->esAdmin()
             ? redirect()->route('admin.ambientes')
             : redirect()->route('panel.estudiantes');
     }
 
-    public function logout(Request $request)
+    public function cerrarSesion(Request $request)
     {
         Auth::guard('docente')->logout();
         $request->session()->invalidate();

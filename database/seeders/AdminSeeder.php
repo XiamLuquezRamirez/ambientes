@@ -1,9 +1,13 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\Ambiente;
+use App\Models\CargaDocente;
 use App\Models\Configuracion;
 use App\Models\Docente;
+use App\Models\Grado;
+use App\Models\Grupo;
 use App\Models\SyncQueue;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -24,22 +28,45 @@ class AdminSeeder extends Seeder
             ]
         );
 
-        // Docente líder de Música
-        $musica = Ambiente::where('slug', 'musica')->first();
-        if ($musica) {
-            $docente = User::firstOrCreate(
-                ['email' => 'docente.musica@aulasreggio.test'],
-                [
-                    'nombre'   => 'Docente Líder Música',
-                    'password' => Hash::make('password'),
-                    'rol'      => 'docente_lider',
-                    'activo'   => true,
-                ]
-            );
+        // Docente demo — Música, Jardín A
+        $usuarioDocente = User::firstOrCreate(
+            ['email' => 'docente.musica@aulasreggio.test'],
+            [
+                'nombre'   => 'Docente Música',
+                'password' => Hash::make('password'),
+                'rol'      => 'docente',
+                'activo'   => true,
+            ]
+        );
 
-            Docente::firstOrCreate(
-                ['user_id' => $docente->id],
-                ['ambiente_id' => $musica->id]
+        // Actualizar rol si quedó con valor antiguo
+        if (in_array($usuarioDocente->rol, ['docente_lider', 'docente_auxiliar'])) {
+            $usuarioDocente->update(['rol' => 'docente']);
+        }
+
+        $docente = Docente::firstOrCreate(
+            ['user_id' => $usuarioDocente->id],
+            ['especialidad' => 'Educación Musical']
+        );
+
+        // Asignar carga: Música → Jardín A del año actual
+        $ambiente = Ambiente::where('slug', 'musica')->first();
+        $grado    = Grado::where('nombre', 'Jardin')->first();
+        $grupo    = $grado ? Grupo::where('grado_id', $grado->id)
+                                  ->where('nombre', 'A')
+                                  ->where('anio_lectivo', date('Y'))
+                                  ->first() : null;
+
+        if ($ambiente && $grado && $grupo) {
+            CargaDocente::updateOrCreate(
+                [
+                    'docente_id'   => $docente->id,
+                    'ambiente_id'  => $ambiente->id,
+                    'grado_id'     => $grado->id,
+                    'grupo_id'     => $grupo->id,
+                    'anio_lectivo' => date('Y'),
+                ],
+                ['activo' => true]
             );
         }
 
@@ -50,8 +77,7 @@ class AdminSeeder extends Seeder
         Configuracion::set('zona_horaria', 'America/Bogota');
 
         // Datos mock de sync_queue
-        $servidores = ['polimotor', 'logico', 'multisensorial', 'tecnologia'];
-        foreach ($servidores as $slug) {
+        foreach (['polimotor', 'logico', 'multisensorial', 'tecnologia'] as $slug) {
             if (!SyncQueue::where('servidor_origen', $slug)->exists()) {
                 SyncQueue::create([
                     'entidad'         => 'Estudiante',

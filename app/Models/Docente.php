@@ -1,18 +1,16 @@
 <?php
+
 namespace App\Models;
 
+use App\Traits\Sincronizable;
 use Illuminate\Database\Eloquent\Model;
 
 class Docente extends Model
 {
+    use Sincronizable;
+
     protected $fillable = [
-        'user_id',
-        'ambiente_id',
-        'telefono',
-        'especialidad',
-        'fecha_ingreso',
-        'foto_url',
-        'descripcion',
+        'user_id', 'telefono', 'especialidad', 'fecha_ingreso', 'foto_url', 'descripcion',
     ];
 
     protected $casts = [
@@ -24,8 +22,23 @@ class Docente extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function ambiente()
+    public function cargasDocente()
     {
-        return $this->belongsTo(Ambiente::class);
+        return $this->hasMany(CargaDocente::class);
+    }
+
+    public function cargasActivas()
+    {
+        return $this->hasMany(CargaDocente::class)
+            ->where('activo', true)
+            ->where('anio_lectivo', date('Y'));
+    }
+
+    public function ambientes()
+    {
+        return $this->belongsToMany(Ambiente::class, 'carga_docente')
+            ->where('carga_docente.activo', true)
+            ->where('carga_docente.anio_lectivo', date('Y'))
+            ->distinct();
     }
 }

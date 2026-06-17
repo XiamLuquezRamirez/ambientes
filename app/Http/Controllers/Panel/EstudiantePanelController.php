@@ -9,35 +9,37 @@ use Illuminate\Support\Facades\Auth;
 
 class EstudiantePanelController extends Controller
 {
-    private function ambiente()
+    private function obtenerAmbiente()
     {
         return Auth::guard('docente')->user()->docente->ambiente;
     }
 
-    public function index()
+    public function listar()
     {
-        $ambiente    = $this->ambiente();
+        $ambiente    = $this->obtenerAmbiente();
         $estudiantes = $ambiente->estudiantes()->orderBy('nombre')->get();
         return view('panel.estudiantes.index', compact('ambiente', 'estudiantes'));
     }
 
-    public function create()
+    public function formularioCrear()
     {
         $condiciones = ['estandar', 'tea', 'tdah', 'disc_visual', 'disc_auditiva', 'disc_motriz', 'down'];
         return view('panel.estudiantes.create', compact('condiciones'));
     }
 
-    public function store(Request $request)
+    public function guardar(Request $request)
     {
-        $ambiente = $this->ambiente();
-        $data = $request->validate([
+        $ambiente = $this->obtenerAmbiente();
+
+        $datos = $request->validate([
             'nombre'       => 'required|string|max:100',
             'iniciales'    => 'required|string|max:3',
             'color_avatar' => 'required|string|max:9',
             'condicion'    => 'required|in:estandar,tea,tdah,disc_visual,disc_auditiva,disc_motriz,down',
         ]);
-        $data['activo'] = true;
-        $estudiante = Estudiante::create($data);
+
+        $datos['activo'] = true;
+        $estudiante = Estudiante::create($datos);
         $ambiente->estudiantes()->attach($estudiante->id);
 
         SyncQueue::create([
@@ -45,15 +47,33 @@ class EstudiantePanelController extends Controller
             'entidad_id'      => $estudiante->id,
             'accion'          => 'create',
             'servidor_origen' => config('ambiente.slug'),
-            'payload'         => $data,
+            'payload'         => $datos,
             'estado'          => 'pendiente',
         ]);
 
-        return redirect()->route('panel.estudiantes')->with('success', 'Estudiante creado.');
+        return redirect()->route('panel.estudiantes')->with('success', 'Estudiante creado exitosamente.');
     }
 
-    public function edit($estudiante) {}
-    public function update(Request $request, $estudiante) {}
-    public function editPin($estudiante) {}
-    public function updatePin(Request $request, $estudiante) {}
+    public function formularioEditar($estudiante)
+    {
+        $estudiante  = Estudiante::findOrFail($estudiante);
+        $condiciones = ['estandar', 'tea', 'tdah', 'disc_visual', 'disc_auditiva', 'disc_motriz', 'down'];
+        return view('panel.estudiantes.edit', compact('estudiante', 'condiciones'));
+    }
+
+    public function actualizar(Request $request, $estudiante)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
+
+    public function formularioPin($estudiante)
+    {
+        $estudiante = Estudiante::findOrFail($estudiante);
+        return view('panel.estudiantes.pin', compact('estudiante'));
+    }
+
+    public function actualizarPin(Request $request, $estudiante)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
 }

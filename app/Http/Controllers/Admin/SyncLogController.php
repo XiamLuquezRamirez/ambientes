@@ -6,5 +6,8 @@ use Illuminate\Http\Request;
 
 class SyncLogController extends Controller
 {
-    public function index(Request $request) {}
+    public function listar(Request $request)
+    {
+        return view('admin.sync-log.index');
+    }
 }

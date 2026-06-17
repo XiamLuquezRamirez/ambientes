@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -9,61 +8,58 @@ use Illuminate\Http\Request;
 
 class SesionNinoController extends Controller
 {
-    private function ambiente(): Ambiente
+    private function obtenerAmbiente(): Ambiente
     {
         return Ambiente::where('slug', config('ambiente.slug'))->where('activo', true)->firstOrFail();
     }
 
-    public function bienvenida()
+    public function mostrarBienvenida()
     {
-        $ambiente = $this->ambiente();
+        $ambiente = $this->obtenerAmbiente();
         return view('auth.bienvenida', compact('ambiente'));
     }
 
-    public function seleccionarAlumno()
+    public function mostrarSeleccionAlumno()
     {
-        $ambiente = $this->ambiente();
+        $ambiente    = $this->obtenerAmbiente();
         $estudiantes = $ambiente->estudiantes()->where('activo', true)->get();
         return view('auth.seleccionar-alumno', compact('ambiente', 'estudiantes'));
     }
 
     public function mostrarPin(int $estudianteId)
     {
-        $ambiente = $this->ambiente();
+        $ambiente   = $this->obtenerAmbiente();
         $estudiante = $ambiente->estudiantes()->where('estudiantes.id', $estudianteId)->firstOrFail();
         return view('auth.pin-figuras', compact('ambiente', 'estudiante'));
     }
 
     public function verificarPin(Request $request, int $estudianteId)
     {
-        $ambiente = $this->ambiente();
+        $ambiente   = $this->obtenerAmbiente();
         $estudiante = $ambiente->estudiantes()->where('estudiantes.id', $estudianteId)->firstOrFail();
-        $pin = $estudiante->configuracionPin;
+        $pin        = $estudiante->configuracionPin;
 
         if (!$pin) {
             return response()->json(['ok' => false, 'mensaje' => 'Sin PIN configurado'], 422);
         }
 
-        $f1 = $request->input('figura_1');
-        $f2 = $request->input('figura_2');
-        $f3 = $request->input('figura_3');
+        $figura1 = $request->input('figura_1');
+        $figura2 = $request->input('figura_2');
+        $figura3 = $request->input('figura_3');
 
-        if ($pin->verificar($f1, $f2, $f3)) {
+        if ($pin->verificar($figura1, $figura2, $figura3)) {
             $pin->update(['intentos_fallidos' => 0]);
             $request->session()->put('estudiante_id', $estudiante->id);
-            return response()->json([
-                'ok' => true,
-                'redirect' => route('auth.bienvenida-ambiente'),
-            ]);
+            return response()->json(['ok' => true, 'redirect' => route('auth.bienvenida-ambiente')]);
         }
 
         $pin->increment('intentos_fallidos');
         return response()->json(['ok' => false, 'mensaje' => 'PIN incorrecto'], 422);
     }
 
-    public function bienvenidaAmbiente()
+    public function mostrarBienvenidaAmbiente()
     {
-        $ambiente = $this->ambiente();
+        $ambiente   = $this->obtenerAmbiente();
         $estudiante = Estudiante::findOrFail(session('estudiante_id'));
         return view('auth.bienvenida-ambiente', compact('ambiente', 'estudiante'));
     }

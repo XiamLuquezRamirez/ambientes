@@ -10,29 +10,46 @@ use Illuminate\Support\Facades\Hash;
 
 class DocenteAdminController extends Controller
 {
-    public function index(Request $request)
+    public function listar(Request $request)
     {
-        $query = User::with('docente.ambiente');
+        $consulta = User::with('docente.ambiente');
+
+        if ($request->filled('buscar')) {
+            $termino = $request->buscar;
+            $consulta->where(fn($q) => $q
+                ->where('nombre', 'like', "%{$termino}%")
+                ->orWhere('email', 'like', "%{$termino}%")
+            );
+        }
         if ($request->filled('ambiente_id')) {
-            $query->whereHas('docente', fn($q) => $q->where('ambiente_id', $request->ambiente_id));
+            $consulta->whereHas('docente', fn($q) => $q->where('ambiente_id', $request->ambiente_id));
         }
         if ($request->filled('rol')) {
-            $query->where('rol', $request->rol);
+            $consulta->where('rol', $request->rol);
         }
-        $docentes  = $query->paginate(20)->withQueryString();
+
+        $docentes  = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
         $ambientes = Ambiente::orderBy('nombre')->get();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'html'    => view('admin.docentes._tabla', compact('docentes'))->render(),
+            ]);
+        }
+
         return view('admin.docentes.index', compact('docentes', 'ambientes'));
     }
 
-    public function create()
+    public function formularioCrear()
     {
         $ambientes = Ambiente::orderBy('nombre')->get();
         return view('admin.docentes.create', compact('ambientes'));
     }
 
-    public function store(Request $request)
+    public function guardar(Request $request)
     {
-        $data = $request->validate([
+        $datos = $request->validate([
             'nombre'      => 'required|string|max:100',
             'email'       => 'required|email|unique:users,email',
             'password'    => 'required|min:8',
@@ -40,26 +57,53 @@ class DocenteAdminController extends Controller
             'ambiente_id' => 'nullable|exists:ambientes,id',
         ]);
 
-        $user = User::create([
-            'nombre'   => $data['nombre'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-            'rol'      => $data['rol'],
+        $usuario = User::create([
+            'nombre'   => $datos['nombre'],
+            'email'    => $datos['email'],
+            'password' => Hash::make($datos['password']),
+            'rol'      => $datos['rol'],
             'activo'   => true,
         ]);
 
-        if (!empty($data['ambiente_id'])) {
+        if (!empty($datos['ambiente_id'])) {
             Docente::create([
-                'user_id'     => $user->id,
-                'ambiente_id' => $data['ambiente_id'],
+                'user_id'     => $usuario->id,
+                'ambiente_id' => $datos['ambiente_id'],
             ]);
         }
 
-        return redirect()->route('admin.docentes')->with('success', 'Docente creado.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Docente creado exitosamente.',
+        ]);
     }
 
-    public function edit($docente) {}
-    public function update(Request $request, $docente) {}
-    public function destroy($docente) {}
-    public function resetPassword($docente) {}
+    public function formularioEditar($docente)
+    {
+        $docente   = User::with('docente')->findOrFail($docente);
+        $ambientes = Ambiente::orderBy('nombre')->get();
+        return view('admin.docentes.edit', compact('docente', 'ambientes'));
+    }
+
+    public function actualizar(Request $request, $docente)
+    {
+        return response()->json(['success' => false, 'message' => 'Pendiente de implementación.'], 501);
+    }
+
+    public function eliminar($docente)
+    {
+        $usuario = User::with('docente')->findOrFail($docente);
+        $usuario->docente?->delete();
+        $usuario->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Docente eliminado.',
+        ]);
+    }
+
+    public function restablecerContrasena($docente)
+    {
+        return response()->json(['success' => false, 'message' => 'Pendiente de implementación.'], 501);
+    }
 }

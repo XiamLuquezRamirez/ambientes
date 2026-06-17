@@ -6,10 +6,33 @@ use Illuminate\Http\Request;
 
 class CatalogoController extends Controller
 {
-    public function index(Request $request) {}
-    public function storeModulo(Request $request) {}
-    public function updateModulo(Request $request, $modulo) {}
-    public function destroyModulo($modulo) {}
-    public function storeTema(Request $request) {}
-    public function updateTema(Request $request, $tema) {}
+    public function listar(Request $request)
+    {
+        return view('admin.catalogo.index');
+    }
+
+    public function guardarModulo(Request $request)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
+
+    public function actualizarModulo(Request $request, $modulo)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
+
+    public function eliminarModulo($modulo)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
+
+    public function guardarTema(Request $request)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
+
+    public function actualizarTema(Request $request, $tema)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -9,16 +10,23 @@ class EsDocente
 {
     public function handle(Request $request, Closure $next)
     {
-        $user = Auth::guard('docente')->user();
-        if (!$user) {
+        $usuario = Auth::guard('docente')->user();
+
+        if (!$usuario) {
             return redirect()->route('docente.login');
         }
-        if (!$user->esAdmin()) {
-            $ambienteSlug = $user->docente?->ambiente?->slug;
-            if (!$ambienteSlug || $ambienteSlug !== config('ambiente.slug')) {
-                abort(403, 'No tienes acceso a este ambiente.');
-            }
+
+        if ($usuario->rol !== 'docente') {
+            abort(403, 'Acceso denegado');
         }
+
+        $cargasActivas = $usuario->docente
+            ->cargasActivas()
+            ->with(['ambiente', 'grado', 'grupo'])
+            ->get();
+
+        view()->share('cargasActivas', $cargasActivas);
+
         return $next($request);
     }
 }

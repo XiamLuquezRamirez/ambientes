@@ -6,8 +6,23 @@ use Illuminate\Http\Request;
 
 class SesionController extends Controller
 {
-    public function index() {}
-    public function registrarAsistencia(Request $request) {}
-    public function sesionAsistida(Request $request, $estudiante) {}
-    public function activas() {}
+    public function listar()
+    {
+        return view('panel.sesion.index');
+    }
+
+    public function registrarAsistencia(Request $request)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
+
+    public function registrarSesionAsistida(Request $request, $estudiante)
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
+
+    public function sesionesActivas()
+    {
+        return response()->json([]);
+    }
 }

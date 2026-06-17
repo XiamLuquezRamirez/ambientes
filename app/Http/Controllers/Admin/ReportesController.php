@@ -5,6 +5,13 @@ use App\Http\Controllers\Controller;
 
 class ReportesController extends Controller
 {
-    public function index() {}
-    public function exportar() {}
+    public function listar()
+    {
+        return view('admin.reportes.index');
+    }
+
+    public function exportar()
+    {
+        return back()->with('info', 'Pendiente de implementacion.');
+    }
 }
