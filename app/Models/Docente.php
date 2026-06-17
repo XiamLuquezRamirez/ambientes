@@ -41,4 +41,12 @@ class Docente extends Model
             ->where('carga_docente.anio_lectivo', date('Y'))
             ->distinct();
     }
+
+    public function getAmbienteAttribute()
+    {
+        if ($this->relationLoaded('ambientes')) {
+            return $this->ambientes->first();
+        }
+        return $this->ambientes()->first();
+    }
 }

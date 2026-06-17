@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
+use App\Models\CargaDocente;
 use App\Models\Docente;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class DocenteAdminController extends Controller
 {
     public function listar(Request $request)
     {
-        $consulta = User::with('docente.ambiente');
+        $consulta = User::with('docente.ambientes');
 
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
@@ -22,7 +23,7 @@ class DocenteAdminController extends Controller
             );
         }
         if ($request->filled('ambiente_id')) {
-            $consulta->whereHas('docente', fn($q) => $q->where('ambiente_id', $request->ambiente_id));
+            $consulta->whereHas('docente.ambientes', fn($q) => $q->where('ambientes.id', $request->ambiente_id));
         }
         if ($request->filled('rol')) {
             $consulta->where('rol', $request->rol);
@@ -65,10 +66,14 @@ class DocenteAdminController extends Controller
             'activo'   => true,
         ]);
 
+        $docente = Docente::create(['user_id' => $usuario->id]);
+
         if (!empty($datos['ambiente_id'])) {
-            Docente::create([
-                'user_id'     => $usuario->id,
-                'ambiente_id' => $datos['ambiente_id'],
+            CargaDocente::create([
+                'docente_id'   => $docente->id,
+                'ambiente_id'  => $datos['ambiente_id'],
+                'anio_lectivo' => date('Y'),
+                'activo'       => true,
             ]);
         }
 
