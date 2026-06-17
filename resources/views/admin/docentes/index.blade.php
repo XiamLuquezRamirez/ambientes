@@ -49,133 +49,61 @@
 .btn-eliminar:hover { background: #DC2626; border-color: #DC2626; color: #fff; }
 
 /* ── Loading overlay ─────────────────────────────────────────── */
-#cargando-tabla {
-    display: none; text-align: center; padding: 40px;
-    color: #64748B; font-size: 0.9rem;
-}
+#cargando-tabla { display: none; text-align: center; padding: 40px; color: #64748B; font-size: 0.9rem; }
 
 /* ── Errores de campo ────────────────────────────────────────── */
 .campo-error { color: #DC2626; font-size: 0.78rem; margin-top: 4px; }
 .form-control.is-invalid { border-color: #DC2626 !important; }
 
-/* ════════════════════════════════════════════════════════════════
-   MODAL CUSTOM – sin conflictos con Bootstrap
-   ════════════════════════════════════════════════════════════════ */
-
-/* Fondo oscuro con blur */
-.dlg-fondo {
-    position: fixed; inset: 0; z-index: 1060;
-    background: rgba(10, 18, 40, 0);
-    backdrop-filter: blur(0px);
-    visibility: hidden;
-    transition: background .3s ease, backdrop-filter .3s ease, visibility 0s .3s;
-}
-.dlg-fondo.abierto {
-    background: rgba(10, 18, 40, 0.65);
-    backdrop-filter: blur(5px);
-    visibility: visible;
-    transition: background .3s ease, backdrop-filter .3s ease;
-}
-
-/* Contenedor centrado */
-.dlg-wrap {
-    position: fixed; inset: 0; z-index: 1061;
-    display: flex; align-items: center; justify-content: center;
-    pointer-events: none;
-    padding: 16px;
-}
-
-/* Panel del diálogo */
-.dlg-panel {
-    background: #FFFFFF;
-    border-radius: 18px;
-    width: 100%; max-width: 520px;
+/* ── Modal – estilos visuales sobre Bootstrap ────────────────── */
+#modalDocente .modal-content {
+    border: none;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 32px 80px rgba(37,99,235,.25), 0 8px 24px rgba(0,0,0,.15);
-    pointer-events: auto;
-
-    /* estado inicial: invisible, encogido y elevado */
-    opacity: 0;
-    transform: scale(0.82) translateY(-40px);
-    transition: none;
+    box-shadow: 0 32px 80px rgba(37,99,235,.22), 0 8px 24px rgba(0,0,0,.12);
 }
-
-/* Keyframe de apertura: spring bounce */
-@keyframes dlgEntrar {
-    0%   { opacity: 0; transform: scale(0.82) translateY(-40px); }
-    55%  { opacity: 1; transform: scale(1.03) translateY(6px); }
-    75%  { transform: scale(0.98) translateY(-2px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-/* Keyframe de cierre: rápido y descendente */
-@keyframes dlgSalir {
-    0%   { opacity: 1; transform: scale(1) translateY(0); }
-    100% { opacity: 0; transform: scale(0.88) translateY(24px); }
-}
-
-.dlg-fondo.abierto + .dlg-wrap .dlg-panel {
-    animation: dlgEntrar .42s cubic-bezier(.34,1.56,.64,1) forwards;
-}
-.dlg-fondo.cerrando + .dlg-wrap .dlg-panel {
-    animation: dlgSalir .22s ease-in forwards;
-}
-
-/* Cabecera degradada */
-.dlg-header {
+#modalDocente .modal-header {
     background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+    border-bottom: none;
     padding: 20px 24px;
-    display: flex; align-items: center; gap: 14px;
+    gap: 14px;
+    align-items: center;
 }
-.dlg-header-icon {
+.modal-header-icon {
     width: 44px; height: 44px;
     background: rgba(255,255,255,.15);
     border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.35rem; flex-shrink: 0;
 }
-.dlg-header-text { flex: 1; }
-.dlg-header-text h2 {
+#modalDocente .modal-title {
     font-family: 'Fredoka One', cursive;
-    font-size: 1.2rem; color: #FFFFFF; line-height: 1.2; margin: 0;
+    font-size: 1.2rem; color: #FFFFFF; line-height: 1.2;
 }
-.dlg-header-text p { font-size: 0.78rem; color: rgba(255,255,255,.65); margin: 2px 0 0; }
-.dlg-btn-cerrar {
-    background: rgba(255,255,255,.12); border: none;
-    color: rgba(255,255,255,.8);
-    width: 32px; height: 32px; border-radius: 8px;
-    font-size: 1rem; cursor: pointer; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .15s, color .15s, transform .15s;
+.modal-subtitle { font-size: 0.78rem; color: rgba(255,255,255,.65); margin: 2px 0 0; }
+#modalDocente .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: .75;
+    transition: opacity .15s, transform .2s;
+    margin-left: auto;
 }
-.dlg-btn-cerrar:hover {
-    background: rgba(255,255,255,.25); color: #fff;
-    transform: rotate(90deg);
-}
-
-/* Sacudida cuando se intenta cerrar desde fuera */
-@keyframes dlgSacudir {
-    0%   { transform: scale(1)    translateX(0); }
-    15%  { transform: scale(1.03) translateX(-8px); }
-    35%  { transform: scale(1.03) translateX(8px); }
-    55%  { transform: scale(1.01) translateX(-5px); }
-    75%  { transform: scale(1.01) translateX(5px); }
-    90%  { transform: scale(1)    translateX(-2px); }
-    100% { transform: scale(1)    translateX(0); }
-}
-.dlg-panel.dlg-sacudir {
-    animation: dlgSacudir .45s cubic-bezier(.36,.07,.19,.97) forwards;
-}
-
-/* Cuerpo */
-.dlg-body { padding: 28px; }
-
-/* Pie */
-.dlg-footer {
-    display: flex; gap: 12px;
-    padding: 0 28px 24px;
+#modalDocente .btn-close:hover { opacity: 1; transform: rotate(90deg); }
+#modalDocente .modal-body  { padding: 28px; }
+#modalDocente .modal-footer {
     border-top: 1px solid #E2E8F0;
-    padding-top: 20px;
+    padding: 16px 28px 24px;
+    gap: 12px;
+}
+
+/* Animación de entrada personalizada (reemplaza la de Bootstrap) */
+#modalDocente.fade .modal-dialog {
+    transform: scale(0.85) translateY(-30px);
+    opacity: 0;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
+}
+#modalDocente.show .modal-dialog {
+    transform: scale(1) translateY(0);
+    opacity: 1;
 }
 </style>
 @endpush
@@ -222,63 +150,72 @@
 </div>
 <div id="cargando-tabla">⏳ Cargando...</div>
 
-{{-- ── Fondo oscuro ─────────────────────────────────────────────── --}}
-<div class="dlg-fondo" id="dlgFondo"></div>
+{{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
+{{-- data-bs-backdrop="static" → fondo oscuro + sacudida al clic fuera --}}
+{{-- data-bs-keyboard="false"  → ESC también sacude en vez de cerrar  --}}
+<div class="modal fade" id="modalDocente" tabindex="-1"
+     data-bs-backdrop="static" data-bs-keyboard="false"
+     aria-labelledby="modalDocenteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
 
-{{-- ── Modal custom – Nuevo Docente ───────────────────────────── --}}
-<div class="dlg-wrap" id="dlgWrap">
-    <div class="dlg-panel" id="dlgPanel" role="dialog" aria-modal="true" aria-labelledby="dlgTitulo">
-
-        <div class="dlg-header">
-            <div class="dlg-header-icon">👩‍🏫</div>
-            <div class="dlg-header-text">
-                <h2 id="dlgTitulo">Nuevo Docente</h2>
-                <p>Completa los datos para crear la cuenta</p>
+            <div class="modal-header">
+                <div class="modal-header-icon">👩‍🏫</div>
+                <div class="flex-grow-1">
+                    <h5 class="modal-title mb-0" id="modalDocenteLabel">Nuevo Docente</h5>
+                    <p class="modal-subtitle mb-0">Completa los datos para crear la cuenta</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <button class="dlg-btn-cerrar" onclick="cerrarModal()" aria-label="Cerrar">✕</button>
-        </div>
 
-        <div class="dlg-body">
-            <form id="formCrearDocente">
-                @csrf
-                <div class="form-group mb-3">
-                    <label class="form-label">Nombre completo</label>
-                    <input type="text" name="nombre" class="form-control" autocomplete="off">
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label">Correo electrónico</label>
-                    <input type="email" name="email" class="form-control" autocomplete="off">
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label">Contraseña <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span></label>
-                    <input type="password" name="password" class="form-control">
-                </div>
-                <div class="form-group mb-3">
-                    <label class="form-label">Rol</label>
-                    <select name="rol" class="form-control">
-                        @foreach(['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'] as $val => $label)
-                            <option value="{{ $val }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group mb-0">
-                    <label class="form-label">Ambiente <span style="color:#94A3B8;font-size:0.78rem">(no aplica si es Administrador)</span></label>
-                    <select name="ambiente_id" class="form-control">
-                        <option value="">— Sin ambiente —</option>
-                        @foreach($ambientes as $a)
-                            <option value="{{ $a->id }}">{{ $a->icono }} {{ $a->nombre }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </form>
-        </div>
+            <div class="modal-body">
+                <form id="formCrearDocente">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Nombre completo</label>
+                        <input type="text" name="nombre" class="form-control" autocomplete="off">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Correo electrónico</label>
+                        <input type="email" name="email" class="form-control" autocomplete="off">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña
+                            <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span>
+                        </label>
+                        <input type="password" name="password" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select name="rol" class="form-control">
+                            @foreach(['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'] as $val => $label)
+                                <option value="{{ $val }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">Ambiente
+                            <span style="color:#94A3B8;font-size:0.78rem">(no aplica si es Administrador)</span>
+                        </label>
+                        <select name="ambiente_id" class="form-control">
+                            <option value="">— Sin ambiente —</option>
+                            @foreach($ambientes as $a)
+                                <option value="{{ $a->id }}">{{ $a->icono }} {{ $a->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
+            </div>
 
-        <div class="dlg-footer">
-            <button type="button" class="btn" style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
-                    onclick="cerrarModal()">Cancelar</button>
-            <button type="submit" form="formCrearDocente" id="btnCrearDocente" class="btn btn-primary">Crear Docente</button>
-        </div>
+            <div class="modal-footer">
+                <button type="button" class="btn"
+                        style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="formCrearDocente" id="btnCrearDocente"
+                        class="btn btn-primary">Crear Docente</button>
+            </div>
 
+        </div>
     </div>
 </div>
 @endsection
@@ -287,38 +224,16 @@
 <script>
 const URL_DOCENTES = "{{ route('admin.docentes') }}";
 
-/* ── Modal custom ────────────────────────────────────────────── */
-const dlgFondo = document.getElementById('dlgFondo');
+/* ── Bootstrap Modal ─────────────────────────────────────────── */
+const modalBS = new bootstrap.Modal(document.getElementById('modalDocente'));
 
-function abrirModal() {
-    dlgFondo.classList.remove('cerrando');
-    dlgFondo.classList.add('abierto');
-    document.body.style.overflow = 'hidden';
-}
-
-function cerrarModal() {
-    dlgFondo.classList.replace('abierto', 'cerrando');
-    setTimeout(() => {
-        dlgFondo.classList.remove('cerrando');
-        document.body.style.overflow = '';
-        limpiarErroresModal();
-        document.getElementById('formCrearDocente').reset();
-    }, 220);
-}
-
-/* Clic en el fondo o ESC → sacudir el panel */
-function sacudirModal() {
-    const panel = document.getElementById('dlgPanel');
-    panel.classList.remove('dlg-sacudir');
-    void panel.offsetWidth; // reflow para reiniciar la animación
-    panel.classList.add('dlg-sacudir');
-}
-
-dlgFondo.addEventListener('click', sacudirModal);
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && dlgFondo.classList.contains('abierto')) sacudirModal();
+document.getElementById('modalDocente').addEventListener('hidden.bs.modal', function () {
+    limpiarErroresModal();
+    document.getElementById('formCrearDocente').reset();
 });
+
+function abrirModal() { modalBS.show(); }
+function cerrarModal() { modalBS.hide(); }
 
 /* ── Tabla AJAX ──────────────────────────────────────────────── */
 async function cargarTabla(url) {
@@ -341,7 +256,6 @@ async function cargarTabla(url) {
     }
 }
 
-/* Delegación: clics en paginación dinámica */
 document.addEventListener('click', function(e) {
     const pagBtn = e.target.closest('.pag-btn[href]');
     if (pagBtn) {
