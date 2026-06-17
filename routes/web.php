@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\SesionNinoController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AmbienteAdminController;
+use App\Http\Controllers\Admin\GradoGrupoController;
 use App\Http\Controllers\Admin\SyncLogController;
 use App\Http\Controllers\Admin\ConflictosController;
 use App\Http\Controllers\Admin\DocenteAdminController;
@@ -38,10 +39,18 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('/', fn () => redirect()->route('admin.ambientes'));
 
     // Ambientes
-    Route::get('ambientes',                    [AmbienteAdminController::class, 'listar'])->name('admin.ambientes');
-    Route::get('ambientes/{ambiente}/edit',    [AmbienteAdminController::class, 'formularioEditar'])->name('admin.ambientes.edit');
-    Route::put('ambientes/{ambiente}',         [AmbienteAdminController::class, 'actualizar'])->name('admin.ambientes.update');
-    Route::post('ambientes/{ambiente}/ping',   [AmbienteAdminController::class, 'verificarConexion'])->name('admin.ambientes.ping');
+    Route::get('ambientes',                         [AmbienteAdminController::class, 'listar'])->name('admin.ambientes');
+    Route::post('ambientes',                        [AmbienteAdminController::class, 'guardar'])->name('admin.ambientes.store');
+    Route::put('ambientes/{ambiente}',              [AmbienteAdminController::class, 'actualizar'])->name('admin.ambientes.update');
+    Route::patch('ambientes/{ambiente}/toggle',     [AmbienteAdminController::class, 'toggleActivo'])->name('admin.ambientes.toggle');
+    Route::post('ambientes/{ambiente}/ping',        [AmbienteAdminController::class, 'verificarConexion'])->name('admin.ambientes.ping');
+
+    // Grados y grupos dentro de un ambiente
+    Route::get('ambientes/{ambiente}/grados-grupos',              [GradoGrupoController::class, 'gestionar'])->name('admin.ambientes.grados-grupos');
+    Route::patch('ambientes/{ambiente}/grados/{grado}/toggle',   [GradoGrupoController::class, 'toggleGrado'])->name('admin.ambientes.grados.toggle');
+    Route::post('ambientes/{ambiente}/grupos',                    [GradoGrupoController::class, 'guardarGrupo'])->name('admin.ambientes.grupos.store');
+    Route::put('ambientes/{ambiente}/grupos/{grupo}',             [GradoGrupoController::class, 'actualizarGrupo'])->name('admin.ambientes.grupos.update');
+    Route::delete('ambientes/{ambiente}/grupos/{grupo}',          [GradoGrupoController::class, 'eliminarGrupo'])->name('admin.ambientes.grupos.destroy');
 
     // Sincronizacion y conflictos
     Route::get('sync-log',                     [SyncLogController::class, 'listar'])->name('admin.sync-log');
