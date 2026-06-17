@@ -10,7 +10,7 @@ class Docente extends Model
     use Sincronizable;
 
     protected $fillable = [
-        'user_id', 'telefono', 'especialidad', 'fecha_ingreso', 'foto_url', 'descripcion',
+        'user_id', 'telefono', 'especialidad', 'fecha_ingreso', 'foto_url', 'descripcion', 'grado_id',
     ];
 
     protected $casts = [
@@ -30,7 +30,7 @@ class Docente extends Model
     public function cargasActivas()
     {
         return $this->hasMany(CargaDocente::class)
-            ->where('activo', true)
+            ->where('estado', true)
             ->where('anio_lectivo', date('Y'));
     }
 

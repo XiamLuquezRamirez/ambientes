@@ -4,10 +4,9 @@
             <tr>
                 <th>Nombre</th>
                 <th>Email</th>
-                <th>Grupos Actuales</th>
                 <th>Fecha Ultimo Acceso</th>
                 <th>Estado</th>
-                <th>Acciones</th>
+                <th style="text-align:center">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -15,20 +14,20 @@
                 <tr id="fila-{{ $d->id }}">
                     <td style="font-weight:600;color:#1E293B">{{ $d->nombre }}</td>
                     <td style="color:#64748B">{{ $d->email }}</td>
-                    <td>
-                        <span class="badge badge-yellow">
-                            {{ ['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'][$d->rol] ?? $d->rol }}
-                        </span>
-                    </td>
-                    <td>{{ $d->docente?->ambiente?->nombre ?? '—' }}</td>
-                    <td>
-                        <span class="badge {{ $d->activo ? 'badge-green' : 'badge-red' }}">
-                            {{ $d->activo ? 'Activo' : 'Inactivo' }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="tabla-acciones">
 
+                    <td>
+                        {{ $d->docente?->fecha_ingreso ? date('d/m/Y', strtotime($d->docente?->fecha_ingreso)) : '—' }}
+                    </td>
+                    <td>
+                        <span class="badge {{ $d->estado ? 'badge-green' : 'badge-red' }}">
+                            {{ $d->estado ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="tabla-acciones" style="justify-content:center">
+                            <button class="btn-accion btn-asignar-grado"
+                                onclick="abrirModalAsignarGrado({{ $d->id }})"><i class="fa-solid fa-list"></i>
+                                Asignar Grado</button>
                             <a href="{{ route('admin.docentes.edit', $d->id) }}" class="btn-accion btn-editar">
                                 <i class="fa-solid fa-pencil"></i>
                                 Editar</a>

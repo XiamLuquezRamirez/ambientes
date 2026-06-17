@@ -8,9 +8,9 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $fillable = ['nombre', 'email', 'password', 'rol', 'activo'];
+    protected $fillable = ['nombre', 'email', 'password', 'rol', 'estado'];
     protected $hidden = ['password', 'remember_token'];
-    protected $casts = ['activo' => 'boolean'];
+    protected $casts = ['estado' => 'boolean'];
 
     public function docente()
     {

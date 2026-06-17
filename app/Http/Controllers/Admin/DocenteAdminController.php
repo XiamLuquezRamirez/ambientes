@@ -28,6 +28,9 @@ class DocenteAdminController extends Controller
         if ($request->filled('rol')) {
             $consulta->where('rol', $request->rol);
         }
+        if ($request->filled('estado')) {
+            $consulta->where('users.estado', $request->estado == 'true' ? true : false);
+        }
 
         $docentes  = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
         $ambientes = Ambiente::orderBy('nombre')->get();
@@ -56,6 +59,7 @@ class DocenteAdminController extends Controller
             'password'    => 'required|min:8',
             'rol'         => 'required|in:admin,docente_lider,docente_auxiliar',
             'ambiente_id' => 'nullable|exists:ambientes,id',
+            'grado_id'    => 'nullable|exists:grados,id',
         ]);
 
         $usuario = User::create([
@@ -63,7 +67,7 @@ class DocenteAdminController extends Controller
             'email'    => $datos['email'],
             'password' => Hash::make($datos['password']),
             'rol'      => $datos['rol'],
-            'activo'   => true,
+            'estado'   => true,
         ]);
 
         $docente = Docente::create(['user_id' => $usuario->id]);
@@ -73,7 +77,7 @@ class DocenteAdminController extends Controller
                 'docente_id'   => $docente->id,
                 'ambiente_id'  => $datos['ambiente_id'],
                 'anio_lectivo' => date('Y'),
-                'activo'       => true,
+                'estado'       => true,
             ]);
         }
 
