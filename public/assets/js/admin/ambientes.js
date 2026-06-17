@@ -19,8 +19,13 @@ async function apiFetch(url, method = 'GET', body = null) {
         opts.headers['Content-Type'] = 'application/json';
         opts.body = JSON.stringify(body);
     }
-    const res = await fetch(url, opts);
-    return { status: res.status, data: await res.json() };
+    try {
+        const res = await fetch(url, opts);
+        return { status: res.status, data: await res.json() };
+    } catch (err) {
+        console.error('apiFetch error:', err);
+        return { status: 0, data: { ok: false, mensaje: 'Error de conexión.' } };
+    }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -360,7 +365,7 @@ async function eliminarGrupo(ambienteId, grupoId, nombreGrupo) {
     } else {
         Swal.fire({
             title: 'No se puede eliminar',
-            text: data.mensaje,
+            text: data.mensaje ?? 'No se puede realizar esta acción.',
             icon: 'error',
             confirmButtonColor: '#2563EB',
         });
