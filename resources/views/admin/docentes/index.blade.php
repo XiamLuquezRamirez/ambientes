@@ -335,7 +335,6 @@
         aria-labelledby="modalDocenteLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
-
                 <div class="modal-header">
                     <div class="modal-header-icon"><i class="fas fa-user-graduate text-white"></i></div>
                     <div class="flex-grow-1">
@@ -345,59 +344,121 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
                     </button>
                 </div>
-
+                <ul class="nav nav-pills justify-content-center" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
+                            aria-selected="true">Datos Personales</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                            data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile"
+                            aria-selected="false">Gestion de Cuenta</button>
+                    </li>
+                </ul>
                 <div class="modal-body">
-                    <form id="formCrearDocente">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label class="form-label">Nombre completo</label>
-                                    <input type="text" name="nombre" class="form-control" autocomplete="off">
+
+                    <div class="tab-content" id="pills-tabContent">
+                        <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
+                            aria-labelledby="pills-home-tab">
+                            <form id="formCrearDocente">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Nombre(s)</strong>
+                                            <input type="text" name="nombre" class="form-control"
+                                                placeholder="Nombre del docente" value="{{ old('nombre') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Apellido(s)</strong>
+                                            <input type="text" name="apellido" class="form-control"
+                                                placeholder="Apellidos del docente" value="{{ old('apellido') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Identificación</strong>
+                                            <input type="text" name="identificacion" class="form-control"
+                                                placeholder="Identificación del docente"
+                                                value="{{ old('identificacion') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Telefono</strong>
+                                            <input type="tel" name="telefono" class="form-control"
+                                                placeholder="Telefono del docente" value="{{ old('telefono') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Dirección</strong>
+                                            <input type="text" name="direccion" class="form-control"
+                                                placeholder="Dirección del docente" value="{{ old('direccion') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Especialidad</strong>
+                                            <input type="text" name="especialidad" class="form-control"
+                                                placeholder="Especialidad del docente" value="{{ old('especialidad') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Fecha de ingreso</strong>
+                                            <input type="date" name="fecha_ingreso" class="form-control"
+                                                placeholder="Fecha de ingreso del docente"
+                                                value="{{ old('fecha_ingreso') }}">
+                                        </div>
+                                    </div>
+
                                 </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label class="form-label">Correo electrónico</label>
-                                    <input type="email" name="email" class="form-control" autocomplete="off">
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label class="form-label">Contraseña
-                                        <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span>
-                                    </label>
-                                    <input type="password" name="password" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Rol</label>
-                                    <select name="rol" class="form-control">
-                                        @foreach (['admin' => 'Administrador', 'docente' => 'Docente'] as $val => $label)
-                                            <option value="{{ $val }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Ambiente</label>
-                                    <select name="ambiente_id" class="form-control">
-                                        <option value="">— Sin ambiente —</option>
-                                        @foreach ($ambientes as $a)
-                                            <option value="{{ $a->id }}">{{ $a->icono }} {{ $a->nombre }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
+                            </form>
                         </div>
-                    </form>
+                        <div class="tab-pane fade" id="pills-profile" role="tabpanel"
+                            aria-labelledby="pills-profile-tab">
+                            <form id="formCrearDocente">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Correo electrónico</strong>
+                                            <input type="email" name="email" class="form-control"
+                                                autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Contraseña
+                                                <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span>
+                                            </strong>
+                                            <input type="password" name="password" class="form-control"
+                                                autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Confirmar contraseña
+                                                <span style="color:#94A3B8;font-size:0.78rem"></span>
+                                            </strong>
+                                            <input type="password" name="password_confirmation" class="form-control"
+                                                autocomplete="off">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn" style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
+                    <button type="button" class="btn"
+                        style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
                         data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" form="formCrearDocente" id="btnCrearDocente" class="btn btn-primary">Crear
                         Docente</button>

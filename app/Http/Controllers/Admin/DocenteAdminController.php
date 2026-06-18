@@ -79,9 +79,15 @@ class DocenteAdminController extends Controller
     {
         $datos = $request->validate([
             'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            'rol' => 'required|in:admin,docente',
+            'rol' => 'required|in:docente',
+            'telefono' => 'required|string|max:30',
+            'direccion' => 'required|string|max:150',
+            'identificacion' => 'required|string|max:150',
+            'especialidad' => 'required|string|max:150',
+            'fecha_ingreso' => 'required|date',
         ]);
 
         $usuario = User::create([
