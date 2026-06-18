@@ -103,6 +103,16 @@
             gap: 6px;
         }
 
+        .fila-cuenta-sin-usar {
+            background: #FFFBEB;
+        }
+
+        .badge-cuenta-nueva {
+            margin-left: 8px;
+            vertical-align: middle;
+            font-size: 0.7rem;
+        }
+
         .btn-accion {
             display: inline-flex;
             align-items: center;
@@ -120,7 +130,7 @@
         .btn-asignar-grado {
             background: #e2ffed;
             border-color: #a0f5be;
-            color: #19c051;
+            color: rgb(21, 160, 67);
         }
 
         .btn-asignar-grado:hover {
@@ -175,7 +185,7 @@
 
         /* ── Modal – estilos visuales sobre Bootstrap ────────────────── */
         #modalDocente .modal-content,
-        #modalAsignarDocente .modal-content {
+        #modalAsignarInfo .modal-content {
             border: none;
             border-radius: 16px;
             overflow: hidden;
@@ -183,7 +193,7 @@
         }
 
         #modalDocente .modal-header,
-        #modalAsignarDocente .modal-header {
+        #modalAsignarInfo .modal-header {
             background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
             border-bottom: none;
             padding: 20px 24px;
@@ -204,7 +214,7 @@
         }
 
         #modalDocente .modal-title,
-        #modalAsignarDocente .modal-title {
+        #modalAsignarInfo .modal-title {
             font-family: 'Fredoka One', cursive;
             font-size: 1.2rem;
             color: #FFFFFF;
@@ -218,7 +228,7 @@
         }
 
         #modalDocente .btn-close,
-        #modalAsignarDocente .btn-close {
+        #modalAsignarInfo .btn-close {
             filter: brightness(0) invert(1);
             opacity: .75;
             transition: opacity .15s, transform .2s;
@@ -226,18 +236,18 @@
         }
 
         #modalDocente .btn-close:hover,
-        #modalAsignarDocente .btn-close:hover {
+        #modalAsignarInfo .btn-close:hover {
             opacity: 1;
             transform: rotate(90deg);
         }
 
         #modalDocente .modal-body,
-        #modalAsignarDocente .modal-body {
+        #modalAsignarInfo .modal-body {
             padding: 28px;
         }
 
         #modalDocente .modal-footer,
-        #modalAsignarDocente .modal-footer {
+        #modalAsignarInfo .modal-footer {
             border-top: 1px solid #E2E8F0;
             padding: 16px 28px 24px;
             gap: 12px;
@@ -245,14 +255,14 @@
 
         /* Animación de entrada personalizada (reemplaza la de Bootstrap) */
         #modalDocente.fade .modal-dialog,
-        #modalAsignarDocente.fade .modal-dialog {
+        #modalAsignarInfo.fade .modal-dialog {
             transform: scale(0.85) translateY(-30px);
             opacity: 0;
             transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease;
         }
 
         #modalDocente.show .modal-dialog,
-        #modalAsignarDocente.show .modal-dialog {
+        #modalAsignarInfo.show .modal-dialog {
             transform: scale(1) translateY(0);
             opacity: 1;
         }
@@ -300,7 +310,7 @@
 
         {{-- <select name="rol" class="form-control" style="width:auto">
             <option value="">Todos los roles</option>
-            @foreach (['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'] as $val => $label)
+            @foreach (['admin' => 'Administrador', 'docente' => 'Docente'] as $val => $label)
                 <option value="{{ $val }}" {{ request('rol') === $val ? 'selected' : '' }}>{{ $label }}
                 </option>
             @endforeach
@@ -323,7 +333,7 @@
 
     <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         aria-labelledby="modalDocenteLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -339,38 +349,49 @@
                 <div class="modal-body">
                     <form id="formCrearDocente">
                         @csrf
-                        <div class="mb-3">
-                            <label class="form-label">Nombre completo</label>
-                            <input type="text" name="nombre" class="form-control" autocomplete="off">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Correo electrónico</label>
-                            <input type="email" name="email" class="form-control" autocomplete="off">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Contraseña
-                                <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span>
-                            </label>
-                            <input type="password" name="password" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Rol</label>
-                            <select name="rol" class="form-control">
-                                @foreach (['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'] as $val => $label)
-                                    <option value="{{ $val }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-0">
-                            <label class="form-label">Ambiente
-                                <span style="color:#94A3B8;font-size:0.78rem">(no aplica si es Administrador)</span>
-                            </label>
-                            <select name="ambiente_id" class="form-control">
-                                <option value="">— Sin ambiente —</option>
-                                @foreach ($ambientes as $a)
-                                    <option value="{{ $a->id }}">{{ $a->icono }} {{ $a->nombre }}</option>
-                                @endforeach
-                            </select>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre completo</label>
+                                    <input type="text" name="nombre" class="form-control" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Correo electrónico</label>
+                                    <input type="email" name="email" class="form-control" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Contraseña
+                                        <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span>
+                                    </label>
+                                    <input type="password" name="password" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Rol</label>
+                                    <select name="rol" class="form-control">
+                                        @foreach (['admin' => 'Administrador', 'docente' => 'Docente'] as $val => $label)
+                                            <option value="{{ $val }}">{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Ambiente</label>
+                                    <select name="ambiente_id" class="form-control">
+                                        <option value="">— Sin ambiente —</option>
+                                        @foreach ($ambientes as $a)
+                                            <option value="{{ $a->id }}">{{ $a->icono }} {{ $a->nombre }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -385,17 +406,16 @@
             </div>
         </div>
     </div>
-    {{-- ── Modal Bootstrap 5 – Asignar Grado ──────────────────────── --}}
+    {{-- ── Modal Bootstrap 5 – Asignar Informacion Del Docente ──────────────────────── --}}
 
-    <div class="modal fade" id="modalAsignarDocente" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
-        aria-labelledby="modalAsignarDocenteLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="modalAsignarInfo" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+        aria-labelledby="modalAsignarInfoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
-
                 <div class="modal-header">
                     <div class="modal-header-icon"><i class="fa-solid fa-list text-white"></i></div>
                     <div class="flex-grow-1">
-                        <h5 class="modal-title mb-0" id="modalAsignarDocenteLabel"> Completar Datos</h5>
+                        <h5 class="modal-title mb-0" id="modalAsignarInfoLabel"> Asignación de Grupo</h5>
                         <p class="modal-subtitle mb-0">Completa los datos faltantes del docente seleccionado</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
@@ -403,49 +423,60 @@
                 </div>
 
                 <div class="modal-body">
-                    <form id="formAsignarDocente">
+                    <form id="formAsignarInfo" method="POST">
                         @csrf
+                        @method('PUT')
                         <!-- Identificador del docente para enviar la actualización al endpoint PUT -->
                         <input type="hidden" name="id" id="asignar_docente_id">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong>Nombre</strong>
+                                    <label id="asignar_nombre" class="form-control" readonly>
+                                        -
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong class="form-label">Ambiente</strong>
+                                    <select name="ambiente_id" id="asignar_ambiente_id" class="form-control">
+                                        <option value="">— Selecciona un ambiente —</option>
+                                        @foreach ($ambientes as $a)
+                                            <option value="{{ $a->id }}">{{ $a->icono }}
+                                                {{ $a->nombre }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong class="form-label">Grado</strong>
+                                    <select name="grado_id" id="asignar_grado_id" class="form-control">
+                                        <option value="">— Sin grado —</option>
+                                        @foreach ($grados as $g)
+                                            <option value="{{ $g->id }}">{{ $g->nombre }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <strong class="form-label">Grupos</strong>
+                                    <select name="grupo_id" id="asignar_grupos_id" class="form-control">
+                                        <option value="">— Sin grupos —</option>
+                                        @foreach ($g->grupos as $gr)
+                                            <option value="{{ $gr->id }}">{{ $gr->nombre }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <strong class="form-label">Descripción</strong>
+                                <textarea name="descripcion" id="asignar_descripcion" class="form-control" rows="3"></textarea>
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Nombre</label>
-                            <input type="text" name="nombre" id="asignar_nombre" class="form-control" readonly>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Correo</label>
-                            <input type="email" name="email" id="asignar_email" class="form-control" readonly>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Teléfono</label>
-                            <input type="text" name="telefono" id="asignar_telefono" class="form-control">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Especialidad</label>
-                            <input type="text" name="especialidad" id="asignar_especialidad" class="form-control">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Fecha de ingreso</label>
-                            <input type="date" name="fecha_ingreso" id="asignar_fecha_ingreso" class="form-control">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Grado</label>
-                            <select name="grado_id" id="asignar_grado_id" class="form-control">
-                                <option value="">— Sin grado —</option>
-                                @foreach ($grados as $g)
-                                    <option value="{{ $g->id }}">{{ $g->nombre }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Descripción</label>
-                            <textarea name="descripcion" id="asignar_descripcion" class="form-control" rows="3"></textarea>
                         </div>
                     </form>
                 </div>
@@ -454,8 +485,7 @@
                     <button type="button" class="btn"
                         style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
                         data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="formAsignarDocente" id="btnAsignarDocente"
-                        class="btn btn-primary">Guardar
+                    <button type="submit" form="formAsignarInfo" id="btnAsignarInfo" class="btn btn-primary">Guardar
                         Datos</button>
                 </div>
 
@@ -470,16 +500,16 @@
 
         /* ── Bootstrap Modal ─────────────────────────────────────────── */
         const modalBS = new bootstrap.Modal(document.getElementById('modalDocente'));
-        const modalBSAsignarGrado = new bootstrap.Modal(document.getElementById('modalAsignarDocente'));
+        const modalBSAsignarInfo = new bootstrap.Modal(document.getElementById('modalAsignarInfo'));
 
         // Al cerrar cualquier modal, limpiar errores y resetear el formulario correspondiente.
         document.getElementById('modalDocente').addEventListener('hidden.bs.modal', function() {
             limpiarErroresModal();
             document.getElementById('formCrearDocente').reset();
         });
-        document.getElementById('modalAsignarDocente').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('modalAsignarInfo').addEventListener('hidden.bs.modal', function() {
             limpiarErroresModal();
-            document.getElementById('formAsignarDocente').reset();
+            document.getElementById('formAsignarInfo').reset();
         });
 
         function abrirModal() {
@@ -493,26 +523,15 @@
                 .then(resp => {
                     if (!resp.success) throw new Error('No data');
                     const data = resp.data;
-
                     document.getElementById('asignar_docente_id').value = data.id;
-                    document.getElementById('asignar_nombre').value = data.nombre ?? '';
-                    document.getElementById('asignar_email').value = data.email ?? '';
+                    document.getElementById('asignar_nombre').textContent = data.nombre ?? '';
                     const docente = data.docente ?? {};
-                    document.getElementById('asignar_telefono').value = docente.telefono ?? '';
-                    document.getElementById('asignar_especialidad').value = docente.especialidad ?? '';
-                    if (docente.fecha_ingreso) {
-                        const d = new Date(docente.fecha_ingreso);
-                        const yyyy = d.getFullYear();
-                        const mm = String(d.getMonth() + 1).padStart(2, '0');
-                        const dd = String(d.getDate()).padStart(2, '0');
-                        document.getElementById('asignar_fecha_ingreso').value = `${yyyy}-${mm}-${dd}`;
-                    } else {
-                        document.getElementById('asignar_fecha_ingreso').value = '';
-                    }
                     document.getElementById('asignar_descripcion').value = docente.descripcion ?? '';
+                    document.getElementById('asignar_ambiente_id').value = docente.ambiente_id ?? '';
                     document.getElementById('asignar_grado_id').value = docente.grado_id ?? '';
+                    document.getElementById('asignar_grupos_id').value = docente.grupo_id ?? '';
 
-                    modalBSAsignarGrado.show();
+                    modalBSAsignarInfo.show();
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -588,9 +607,9 @@
         /* ── Errores inline en modal ─────────────────────────────────── */
         // Elimina cualquier mensaje o estado de validación que haya quedado en los formularios.
         function limpiarErroresModal() {
-            document.querySelectorAll('#formCrearDocente .campo-error, #formAsignarDocente .campo-error').forEach(el => el
+            document.querySelectorAll('#formCrearDocente .campo-error, #formAsignarInfo .campo-error').forEach(el => el
                 .remove());
-            document.querySelectorAll('#formCrearDocente .is-invalid, #formAsignarDocente .is-invalid').forEach(el => el
+            document.querySelectorAll('#formCrearDocente .is-invalid, #formAsignarInfo .is-invalid').forEach(el => el
                 .classList.remove('is-invalid'));
         }
 
@@ -681,23 +700,25 @@
         /* ── Asignar / Completar datos docente ───────────────────────── */
         // Envía al backend los datos adicionales del docente seleccionado.
         // Este formulario trabaja con el modal de completar datos y actualiza el perfil del docente.
-        document.getElementById('formAsignarDocente').addEventListener('submit', async function(e) {
+        document.getElementById('formAsignarInfo').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('btnAsignarDocente');
+            const btn = document.getElementById('btnAsignarInfo');
+            console.log(btn);
             btn.disabled = true;
             btn.textContent = 'Guardando…';
 
             const formData = new FormData(this);
             const datos = Object.fromEntries(formData.entries());
             const id = datos.id;
-
-            const res = await ajaxRequest(`${URL_DOCENTES}/${id}`, 'PUT', datos);
+            console.log(datos);
+            const res = await ajaxRequest(`${URL_DOCENTES}/${id}/asignar-info`, 'PUT', datos);
+            console.log(res);
 
             btn.disabled = false;
             btn.textContent = 'Guardar Datos';
 
             if (res.success) {
-                modalBSAsignarGrado.hide();
+                modalBSAsignarInfo.hide();
                 mostrarToast('success', res.message);
                 await cargarTabla(location.href);
             } else if (res.errors && Object.keys(res.errors).length) {

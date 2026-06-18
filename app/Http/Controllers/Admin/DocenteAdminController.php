@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
-use App\Models\CargaDocente;
 use App\Models\Docente;
 use App\Models\Grado;
 use App\Models\User;
@@ -15,7 +14,9 @@ class DocenteAdminController extends Controller
 {
     public function listar(Request $request)
     {
-        $consulta = User::with('docente.ambientes');
+        $consulta = User::with('docente.ambientes')
+            ->withCount('loginLogs')
+            ->withMax('loginLogs as ultimo_acceso', 'fecha');
 
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
@@ -31,7 +32,7 @@ class DocenteAdminController extends Controller
             $consulta->where('rol', $request->rol);
         }
         if ($request->filled('estado')) {
-            $consulta->where('users.activo', $request->estado == 'true' ? true : false);
+            $consulta->where('users.estado', $request->estado === 'true');
         }
 
         $docentes = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
@@ -61,7 +62,7 @@ class DocenteAdminController extends Controller
                 'nombre' => $usuario->nombre,
                 'email' => $usuario->email,
                 'rol' => $usuario->rol,
-                'activo' => $usuario->activo,
+                'estado' => $usuario->estado,
                 'docente' => $usuario->docente ? $usuario->docente->toArray() : null,
             ],
         ]);
@@ -80,9 +81,7 @@ class DocenteAdminController extends Controller
             'nombre' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8',
-            'rol' => 'required|in:admin,docente_lider,docente_auxiliar',
-            'ambiente_id' => 'nullable|exists:ambientes,id',
-            'grado_id' => 'nullable|exists:grados,id',
+            'rol' => 'required|in:admin,docente',
         ]);
 
         $usuario = User::create([
@@ -90,18 +89,11 @@ class DocenteAdminController extends Controller
             'email' => $datos['email'],
             'password' => Hash::make($datos['password']),
             'rol' => $datos['rol'],
-            'activo' => true,
+            'estado' => true,
         ]);
 
-        $docente = Docente::create(['user_id' => $usuario->id]);
-
-        if (! empty($datos['ambiente_id'])) {
-            CargaDocente::create([
-                'docente_id' => $docente->id,
-                'ambiente_id' => $datos['ambiente_id'],
-                'anio_lectivo' => date('Y'),
-                'estado' => true,
-            ]);
+        if ($datos['rol'] === 'docente') {
+            Docente::create(['user_id' => $usuario->id]);
         }
 
         return response()->json([
@@ -128,15 +120,16 @@ class DocenteAdminController extends Controller
         $datos = $request->validate([
             'nombre' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,'.$usuario->id,
-            'rol' => 'nullable|in:admin,docente_lider,docente_auxiliar',
-            'activo' => 'nullable|boolean',
-
+            'rol' => 'nullable|in:admin,docente',
+            'estado' => 'nullable|boolean',
             'telefono' => 'nullable|string|max:30',
             'especialidad' => 'nullable|string|max:150',
             'fecha_ingreso' => 'nullable|date',
             'foto_url' => 'nullable|url',
             'descripcion' => 'nullable|string',
+            'ambiente_id' => 'nullable|exists:ambientes,id',
             'grado_id' => 'nullable|exists:grados,id',
+            'grupo_id' => 'nullable|exists:grupos,id',
         ]);
 
         $usuario->nombre = $datos['nombre'];
@@ -144,8 +137,8 @@ class DocenteAdminController extends Controller
         if (isset($datos['rol'])) {
             $usuario->rol = $datos['rol'];
         }
-        if (isset($datos['activo'])) {
-            $usuario->activo = $datos['activo'];
+        if (isset($datos['estado'])) {
+            $usuario->estado = $datos['estado'];
         }
         $usuario->save();
 
@@ -161,9 +154,43 @@ class DocenteAdminController extends Controller
         $doc->fecha_ingreso = $datos['fecha_ingreso'] ?? $doc->fecha_ingreso;
         $doc->foto_url = $datos['foto_url'] ?? $doc->foto_url;
         $doc->descripcion = $datos['descripcion'] ?? $doc->descripcion;
+        if (array_key_exists('ambiente_id', $datos)) {
+            $doc->ambiente_id = $datos['ambiente_id'];
+        }
         if (array_key_exists('grado_id', $datos)) {
             $doc->grado_id = $datos['grado_id'];
         }
+        if (array_key_exists('grupo_id', $datos)) {
+            $doc->grupo_id = $datos['grupo_id'];
+        }
+        $doc->save();
+
+        return response()->json(['success' => true, 'message' => 'Datos del docente actualizados.']);
+    }
+
+    public function asignarInfo(Request $request, $docente)
+    {
+        $docente = User::with('docente')->findOrFail($docente);
+
+        $datos = $request->validate([
+            'ambiente_id' => 'nullable|exists:ambientes,id',
+            'grado_id' => 'nullable|exists:grados,id',
+            'grupo_id' => 'nullable|exists:grupos,id',
+        ]);
+
+        $doc = $docente->docente;
+        if (! $doc) {
+            $doc = new Docente;
+            $doc->user_id = $docente->id;
+        }
+
+        // Guardar los datos del perfil docente si se proporcionan.
+        $doc->fill([
+            'ambiente_id' => $datos['ambiente_id'] ?? $doc->ambiente_id,
+            'grado_id' => $datos['grado_id'] ?? $doc->grado_id,
+            'grupo_id' => $datos['grupo_id'] ?? $doc->grupo_id,
+        ]);
+
         $doc->save();
 
         return response()->json(['success' => true, 'message' => 'Datos del docente actualizados.']);
@@ -172,8 +199,10 @@ class DocenteAdminController extends Controller
     public function eliminar($docente)
     {
         $usuario = User::with('docente')->findOrFail($docente);
-        $usuario->docente?->delete();
-        $usuario->delete();
+        $usuario->estado = false;
+        $usuario->save();
+        // $usuario->docente?->delete();
+        // $usuario->delete();
 
         return response()->json([
             'success' => true,

@@ -77,7 +77,7 @@
             mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
         );
         $rolAuthLabel =
-            ['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'][
+            ['admin' => 'Administrador', 'docente' => 'Docente'][
                 $usuarioAuth->rol
             ] ?? $usuarioAuth->rol;
     @endphp

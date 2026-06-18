@@ -55,6 +55,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('docentes', [DocenteAdminController::class, 'guardar'])->name('admin.docentes.store');
     Route::get('docentes/{docente}/edit', [DocenteAdminController::class, 'formularioEditar'])->name('admin.docentes.edit');
     Route::put('docentes/{docente}', [DocenteAdminController::class, 'actualizar'])->name('admin.docentes.update');
+    Route::put('docentes/{docente}/asignar-info', [DocenteAdminController::class, 'asignarInfo'])->name('admin.docentes.asignar-info');
     Route::delete('docentes/{docente}', [DocenteAdminController::class, 'eliminar'])->name('admin.docentes.destroy');
     Route::post('docentes/{docente}/reset-password', [DocenteAdminController::class, 'restablecerContrasena'])->name('admin.docentes.reset-password');
 

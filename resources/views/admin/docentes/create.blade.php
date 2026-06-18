@@ -23,7 +23,7 @@
             <div class="form-group">
                 <label>Rol</label>
                 <select name="rol" class="form-control" required>
-                    @foreach (['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'] as $val => $label)
+                    @foreach (['admin' => 'Administrador', 'docente' => 'Docente'] as $val => $label)
                         <option value="{{ $val }}" {{ old('rol') === $val ? 'selected' : '' }}>{{ $label }}
                         </option>
                     @endforeach
