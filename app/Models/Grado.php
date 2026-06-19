@@ -20,9 +20,9 @@ class Grado extends Model
         return $this->hasMany(Grupo::class);
     }
 
-    public function gruposEnAmbiente(int $ambienteId)
+    public function gruposDelAnio(int $anio = null)
     {
-        return $this->grupos()->where('ambiente_id', $ambienteId);
+        return $this->grupos()->where('anio_lectivo', $anio ?? date('Y'));
     }
 
     public function matriculas()

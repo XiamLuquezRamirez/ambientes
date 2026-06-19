@@ -11,14 +11,9 @@ class Grupo extends Model
 
     protected $table = 'grupos';
 
-    protected $fillable = ['ambiente_id', 'grado_id', 'nombre', 'anio_lectivo', 'cupo_maximo', 'activo'];
+    protected $fillable = ['grado_id', 'nombre', 'anio_lectivo', 'cupo_maximo', 'activo'];
 
     protected $casts = ['activo' => 'boolean'];
-
-    public function ambiente()
-    {
-        return $this->belongsTo(Ambiente::class);
-    }
 
     public function grado()
     {

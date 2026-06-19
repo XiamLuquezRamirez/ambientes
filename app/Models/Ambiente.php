@@ -9,9 +9,9 @@ class Ambiente extends Model
 {
     use Sincronizable;
 
-    protected $fillable = ['nombre', 'slug', 'color_hex', 'icono', 'servidor_ip', 'activo'];
+    protected $fillable = ['nombre', 'slug', 'color_hex', 'icono', 'servidor_ip', 'activo', 'cupo_defecto'];
 
-    protected $casts = ['activo' => 'boolean'];
+    protected $casts = ['activo' => 'boolean', 'cupo_defecto' => 'integer'];
 
     public function cargasDocente()
     {
@@ -46,8 +46,15 @@ class Ambiente extends Model
             ->orderBy('orden');
     }
 
-    public function grupos()
+    public function estudiantesAmbiente()
     {
-        return $this->hasMany(Grupo::class);
+        return $this->hasMany(EstudianteAmbiente::class);
+    }
+
+    public function estudiantes()
+    {
+        return $this->belongsToMany(Estudiante::class, 'estudiante_ambiente')
+            ->withPivot(['anio_lectivo', 'estado', 'observacion'])
+            ->withTimestamps();
     }
 }

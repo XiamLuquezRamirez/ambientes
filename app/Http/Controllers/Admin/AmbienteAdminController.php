@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
+use App\Models\Modulo;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class AmbienteAdminController extends Controller
 {
@@ -13,7 +13,10 @@ class AmbienteAdminController extends Controller
     {
         $ambientes = Ambiente::withCount([
             'gradosHabilitados',
-            'grupos' => fn($q) => $q->where('activo', true)->where('anio_lectivo', date('Y')),
+            'estudiantesAmbiente as estudiantes_count' => fn($q) => $q->where('anio_lectivo', date('Y')),
+            'cargasDocente' => fn($q) => $q->where('activo', true)->where('anio_lectivo', date('Y')),
+            'modulos',
+            'modulos as modulos_activos_count' => fn($q) => $q->where('activo', true),
         ])
         ->with('gradosHabilitados')
         ->orderBy('nombre')
@@ -22,57 +25,75 @@ class AmbienteAdminController extends Controller
         return view('admin.ambientes.index', compact('ambientes'));
     }
 
-    public function guardar(Request $request)
+    public function actualizarIp(Request $request, Ambiente $ambiente)
     {
-        $datos = $request->validate([
-            'nombre'      => 'required|string|max:255',
-            'slug'        => 'required|string|max:255|unique:ambientes,slug',
-            'color_hex'   => 'required|string|max:9',
-            'icono'       => 'required|string|max:255',
-            'servidor_ip' => 'nullable|ip',
-        ]);
+        $datos = $request->validate(['servidor_ip' => 'nullable|ip']);
+        $ambiente->update(['servidor_ip' => $datos['servidor_ip'] ?? null]);
 
-        $datos['activo'] = true;
-        Ambiente::create($datos);
-
-        if ($request->ajax()) {
-            return response()->json(['ok' => true, 'mensaje' => 'Ambiente creado exitosamente.']);
-        }
-
-        return redirect()->route('admin.ambientes')->with('success', 'Ambiente creado exitosamente.');
+        return response()->json(['ok' => true, 'servidor_ip' => $ambiente->servidor_ip]);
     }
 
-    public function actualizar(Request $request, Ambiente $ambiente)
+    public function actualizarCupo(Request $request, Ambiente $ambiente)
     {
-        $datos = $request->validate([
-            'nombre'      => 'required|string|max:255',
-            'slug'        => 'required|string|max:255|unique:ambientes,slug,' . $ambiente->id,
-            'color_hex'   => 'required|string|max:9',
-            'icono'       => 'required|string|max:255',
-            'servidor_ip' => 'nullable|ip',
-        ]);
-
+        $datos = $request->validate(['cupo_defecto' => 'required|integer|min:1|max:100']);
         $ambiente->update($datos);
 
-        if ($request->ajax()) {
-            return response()->json(['ok' => true, 'mensaje' => 'Ambiente actualizado exitosamente.']);
-        }
-
-        return redirect()->route('admin.ambientes')->with('success', 'Ambiente actualizado exitosamente.');
-    }
-
-    public function toggleActivo(Ambiente $ambiente)
-    {
-        $ambiente->update(['activo' => !$ambiente->activo]);
-
-        return response()->json([
-            'activo'  => $ambiente->activo,
-            'mensaje' => $ambiente->activo ? 'Ambiente activado.' : 'Ambiente desactivado.',
-        ]);
+        return response()->json(['ok' => true, 'cupo_defecto' => $ambiente->cupo_defecto]);
     }
 
     public function verificarConexion(Ambiente $ambiente)
     {
-        return response()->json(['ok' => false, 'mensaje' => 'Pendiente de implementación.'], 501);
+        $ip = $ambiente->servidor_ip;
+
+        if (!$ip) {
+            return response()->json(['ok' => false, 'mensaje' => 'IP no configurada para este ambiente.']);
+        }
+
+        $socket = @fsockopen($ip, 80, $errno, $errstr, 2);
+        $enLinea = false;
+
+        if ($socket) {
+            fclose($socket);
+            $enLinea = true;
+        }
+
+        return response()->json([
+            'ok'     => $enLinea,
+            'mensaje' => $enLinea ? "Servidor {$ip} en línea." : "Servidor {$ip} sin respuesta.",
+        ]);
+    }
+
+    public function docentesDelPeriodo(Ambiente $ambiente)
+    {
+        $cargas = $ambiente->cargasDocente()
+            ->where('activo', true)
+            ->where('anio_lectivo', date('Y'))
+            ->with(['docente.user', 'grado', 'grupo'])
+            ->get();
+
+        $docentes = $cargas->map(fn($c) => [
+            'nombre' => $c->docente->user->nombre ?? '—',
+            'email'  => $c->docente->user->email  ?? '—',
+            'grado'  => $c->grado?->nombre         ?? '—',
+            'grupo'  => $c->grupo?->nombre         ?? '—',
+        ]);
+
+        return response()->json(['ok' => true, 'docentes' => $docentes]);
+    }
+
+    public function modulos(Ambiente $ambiente)
+    {
+        $modulos = $ambiente->modulos()
+            ->get(['id', 'nombre', 'icono', 'orden', 'activo', 'visible_estudiantes']);
+
+        return response()->json(['ok' => true, 'modulos' => $modulos]);
+    }
+
+    public function toggleModulo(Request $request, Ambiente $ambiente, Modulo $modulo)
+    {
+        $campo = $request->validate(['campo' => 'required|in:activo,visible_estudiantes'])['campo'];
+        $modulo->update([$campo => !$modulo->$campo]);
+
+        return response()->json(['ok' => true, $campo => (bool) $modulo->$campo]);
     }
 }

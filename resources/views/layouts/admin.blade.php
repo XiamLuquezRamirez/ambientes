@@ -32,6 +32,18 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('admin.grupos') }}"
+                    class="{{ request()->routeIs('admin.grupos*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-layer-group"></i> Grupos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.matriculas.index') }}"
+                    class="{{ request()->routeIs('admin.matriculas*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-graduation-cap"></i> Matrículas
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('admin.docentes') }}"
                     class="{{ request()->routeIs('admin.docentes*') ? 'active nav-link' : 'nav-link' }}">
                     <i class="fa-solid fa-user-graduate"></i> Docentes
