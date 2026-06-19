@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AsignacionAmbienteController;
 use App\Http\Controllers\Admin\SyncLogController;
 use App\Http\Controllers\Admin\ConflictosController;
 use App\Http\Controllers\Admin\DocenteAdminController;
+use App\Http\Controllers\Admin\CierreAnioController;
 use App\Http\Controllers\Admin\MatriculaAdminController;
 use App\Http\Controllers\Admin\EstudianteAdminController;
 use App\Http\Controllers\Admin\CatalogoController;
@@ -67,6 +68,14 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('grupos',                   [GruposController::class, 'store'])->name('admin.grupos.store');
     Route::put('grupos/{grupo}',            [GruposController::class, 'update'])->name('admin.grupos.update');
     Route::delete('grupos/{grupo}',         [GruposController::class, 'destroy'])->name('admin.grupos.destroy');
+
+    // Cierre de año lectivo
+    Route::prefix('cierre')->name('admin.cierre.')->group(function () {
+        Route::get('/',            [CierreAnioController::class, 'index'])->name('index');
+        Route::get('/grupos',      [CierreAnioController::class, 'grupos'])->name('grupos');
+        Route::get('/estudiantes', [CierreAnioController::class, 'estudiantes'])->name('estudiantes');
+        Route::post('/aplicar',    [CierreAnioController::class, 'aplicar'])->name('aplicar');
+    });
 
     // Matrículas
     Route::prefix('matriculas')->name('admin.matriculas.')->group(function () {

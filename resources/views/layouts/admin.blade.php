@@ -44,6 +44,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{ route('admin.cierre.index') }}"
+                    class="{{ request()->routeIs('admin.cierre*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-calendar-check"></i> Cierre de año
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{ route('admin.docentes') }}"
                     class="{{ request()->routeIs('admin.docentes*') ? 'active nav-link' : 'nav-link' }}">
                     <i class="fa-solid fa-user-graduate"></i> Docentes
