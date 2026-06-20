@@ -71,6 +71,11 @@
 
 {{-- Filtros --}}
 <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+    <select id="filtroAnio" class="form-select" style="max-width:110px">
+        @foreach(range(2024, date('Y') + 1) as $y)
+            <option value="{{ $y }}" {{ $y == date('Y') ? 'selected' : '' }}>{{ $y }}</option>
+        @endforeach
+    </select>
     <input type="text" id="filtroBuscar" class="form-control" style="max-width:260px"
            placeholder="Buscar estudiante…">
     <select id="filtroGrupo" class="form-select" style="max-width:220px">
@@ -340,6 +345,7 @@ async function cargarTabla(url) {
     const cont = document.getElementById('contenedorTabla');
     cont.style.opacity = '.5';
     const params = new URLSearchParams({
+        anio:     document.getElementById('filtroAnio').value,
         buscar:   document.getElementById('filtroBuscar').value,
         grupo_id: document.getElementById('filtroGrupo').value,
         estado:   document.getElementById('filtroEstado').value,
@@ -352,6 +358,22 @@ async function cargarTabla(url) {
     }
 }
 
+document.getElementById('filtroAnio').addEventListener('change', async () => {
+    // Recargar grupos del año seleccionado
+    const anio    = document.getElementById('filtroAnio').value;
+    const grupoSel= document.getElementById('filtroGrupo');
+    grupoSel.innerHTML = '<option value="">Todos los grupos</option>';
+    const { data } = await apiFetch(`${URL_GRUPOS_EST}?anio=${anio}`);
+    if (data.ok) {
+        data.grupos.forEach(g => {
+            const o = document.createElement('option');
+            o.value = g.id;
+            o.textContent = `${g.grado_nombre} — Grupo ${g.nombre}`;
+            grupoSel.appendChild(o);
+        });
+    }
+    cargarTabla();
+});
 document.getElementById('filtroGrupo').addEventListener('change', () => cargarTabla());
 document.getElementById('filtroEstado').addEventListener('change',  () => cargarTabla());
 let _deb;
