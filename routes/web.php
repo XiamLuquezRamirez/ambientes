@@ -60,9 +60,11 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     // Estudiantes (admin)
     Route::get('estudiantes',                        [EstudianteAdminController::class, 'listar'])->name('admin.estudiantes');
     Route::get('estudiantes/{estudiante}/edit',      [EstudianteAdminController::class, 'formularioEditar'])->name('admin.estudiantes.edit');
+    Route::post('estudiantes',                       [EstudianteAdminController::class, 'guardar'])->name('admin.estudiantes.store');
     Route::put('estudiantes/{estudiante}',           [EstudianteAdminController::class, 'actualizar'])->name('admin.estudiantes.update');
     Route::post('estudiantes/{estudiante}/transferir',[EstudianteAdminController::class, 'transferir'])->name('admin.estudiantes.transferir');
     Route::post('estudiantes/{estudiante}/reset-pin',[EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.reset-pin');
+    Route::get('estudiantes/grupos',                  [EstudianteAdminController::class, 'listarGrupos'])->name('admin.estudiantes.grupos');
 
     // Catalogo
     Route::get('catalogo',                     [CatalogoController::class, 'listar'])->name('admin.catalogo');
