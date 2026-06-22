@@ -404,87 +404,84 @@
                     <div class="modal-header-icon"><i class="fas fa-user-graduate text-white"></i></div>
                     <div class="flex-grow-1">
                         <h5 class="modal-title mb-0" id="modalDocenteLabel">Nuevo Docente</h5>
-                        <p class="modal-subtitle mb-0">Completa los datos para crear la cuenta</p>
+                        <p class="modal-subtitle mb-0" id="modalDocenteSubtitle">Completa los datos para crear la cuenta</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
                     </button>
                 </div>
 
                 <div class="modal-body p-4">
-                    <ul class="nav nav-tabs" id="pills-tab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
-                                data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
-                                aria-selected="true"> <i class="fas fa-user"></i> Datos Personales</button>
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#datosPersonales"><i
+                                    class="fas fa-user"></i> Datos Personales</a>
                         </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
-                                data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile"
-                                aria-selected="false"> <i class="fas fa-key"></i> Gestion de Cuenta</button>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#gestionCuenta"><i class="fas fa-cog"></i>
+                                Gestion de Cuenta</a>
                         </li>
                     </ul>
                     {{-- Un solo formulario para ambas pestañas: evita IDs duplicados y envía todos los campos. --}}
                     <form id="formCrearDocente" method="POST">
                         @csrf
-                        <div class="tab-content p-4" id="pills-tabContent">
-                            <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
-                                aria-labelledby="pills-home-tab">
+                        <div class="tab-content" style="padding: 20px;">
+                            <div class="tab-pane container active" id="datosPersonales">
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Nombre(s)</strong>
-                                            <input type="text" name="nombre" class="form-control"
+                                            <input type="text" id="nombre" name="nombre" class="form-control"
                                                 placeholder="Nombre del docente" value="{{ old('nombre') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Apellido(s)</strong>
-                                            <input type="text" name="apellido" class="form-control"
+                                            <input type="text" id="apellido" name="apellido" class="form-control"
                                                 placeholder="Apellidos del docente" value="{{ old('apellido') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Identificación</strong>
-                                            <input type="text" name="identificacion" class="form-control"
-                                                placeholder="Identificación del docente"
+                                            <input type="text" id="identificacion" name="identificacion"
+                                                class="form-control" placeholder="Identificación del docente"
                                                 value="{{ old('identificacion') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Telefono</strong>
-                                            <input type="tel" name="telefono" class="form-control"
+                                            <input type="tel" id="telefono" name="telefono" class="form-control"
                                                 placeholder="Telefono del docente" value="{{ old('telefono') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Dirección</strong>
-                                            <input type="text" name="direccion" class="form-control"
+                                            <input type="text" id="direccion" name="direccion" class="form-control"
                                                 placeholder="Dirección del docente" value="{{ old('direccion') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Especialidad</strong>
-                                            <input type="text" name="especialidad" class="form-control"
-                                                placeholder="Especialidad del docente" value="{{ old('especialidad') }}">
+                                            <input type="text" id="especialidad" name="especialidad"
+                                                class="form-control" placeholder="Especialidad del docente"
+                                                value="{{ old('especialidad') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Fecha de ingreso</strong>
-                                            <input type="date" name="fecha_ingreso" class="form-control"
-                                                placeholder="Fecha de ingreso del docente"
+                                            <input type="date" id="fecha_ingreso" name="fecha_ingreso"
+                                                class="form-control" placeholder="Fecha de ingreso del docente"
                                                 value="{{ old('fecha_ingreso') }}">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="pills-profile" role="tabpanel"
-                                aria-labelledby="pills-profile-tab">
+                            <div class="tab-pane container" id="gestionCuenta">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
@@ -504,12 +501,12 @@
                                                     class="form-control pe-5" placeholder="Contraseña"
                                                     autocomplete="new-password">
                                                 <i id="togglePassword"
+                                                    onclick="verPassword('#password', '#togglePassword')"
                                                     class="fa-solid fa-eye position-absolute top-50 end-0 translate-middle-y me-3"
                                                     style="cursor:pointer;"></i>
                                             </div>
                                         </div>
-                                        <button type="button" id="btnGenerarPassword" name="btnGenerarPassword"
-                                            class="btn btn-primary"> Generar
+                                        <button type="button" id="btnGenerarPassword" class="btn btn-primary"> Generar
                                             Contraseña Aleatoria <i class="fa-solid fa-shuffle"></i></button>
                                     </div>
                                     <div class="col-md-6">
@@ -521,6 +518,7 @@
                                                     name="password_confirmation" class="form-control pe-5"
                                                     placeholder="Contraseña" autocomplete="new-password">
                                                 <i id="togglePasswordConfirmation"
+                                                    onclick="verPassword('#password_confirmation', '#togglePasswordConfirmation')"
                                                     class="fa-solid fa-eye position-absolute top-50 end-0 translate-middle-y me-3"
                                                     style="cursor:pointer;"></i>
                                             </div>
@@ -536,8 +534,8 @@
                     <button type="button" class="btn"
                         style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
                         onclick="cerrarModalDocente()">Cancelar</button>
-                    <button type="submit" form="formCrearDocente" id="btnCrearDocente" class="btn btn-primary">Crear
-                        Docente</button>
+                    <button type="submit" form="formCrearDocente" id="btnCrearDocente"
+                        class="btn btn-primary">Guardar</button>
                 </div>
             </div>
         </div>
@@ -563,7 +561,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminar</button>
+                        <button type="button" onclick=" cerrarModalDocente()" class="btn btn-primary"
+                            data-bs-dismiss="modal">Terminar</button>
                     </div>
                 </div>
             </div>
@@ -654,12 +653,13 @@
             </div>
         </div>
     </div>
-    @include('admin.docentes.edit')
 @endsection
 
 @push('scripts')
     <script>
         const URL_DOCENTES = "{{ route('admin.docentes') }}";
+        var tipoPost = 1; // 1: Crear, 2: Editar
+        var id_editar = '';
     </script>
     <script>
         /* ── Bootstrap Modal ─────────────────────────────────────────── */
@@ -677,13 +677,26 @@
             document.getElementById('formAsignarInfo').reset();
         });
 
-
         function abrirModal() {
+            $("#modalDocenteLabel").text('Crear Docente');
+            $("#modalDocenteSubtitle").text('Completa los datos para crear la cuenta');
+            tipoPost = 1;
+            modalBS.show();
+        }
+
+        function abrirModalEditar(id) {
+            $("#modalDocenteLabel").text('Editar Docente');
+            $("#modalDocenteSubtitle").text('Completa los datos para editar el docente');
+            tipoPost = 2;
+            cargarDatosDocente(id);
             modalBS.show();
         }
 
         /* ── Cerrar modal Nuevo Docente ─────────────────────────── */
         function cerrarModalDocente() {
+            bootstrap.Tab.getOrCreateInstance(
+                $('a[href="#datosPersonales"]')[0]
+            ).show();
             document.activeElement?.blur();
             modalBS.hide();
         }
@@ -811,29 +824,55 @@
         /* ── Crear docente (AJAX) ────────────────────────────────────── */
         document.getElementById('formCrearDocente').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = document.getElementById('btnCrearDocente');
-            btn.disabled = true;
-            btn.textContent = 'Guardando…';
 
-            const formData = new FormData(this);
-            const datos = Object.fromEntries(formData.entries());
-            const res = await ajaxRequest(URL_DOCENTES, 'POST', datos);
+            if (tipoPost == 1) {
+                const btn = document.getElementById('btnCrearDocente');
+                btn.disabled = true;
+                btn.textContent = 'Guardando…';
 
-            btn.disabled = false;
-            btn.textContent = 'Crear Docente';
-            if (res.success) {
-                document.getElementById('passwordGenerada').value =
-                    res.password_generada;
+                const formData = new FormData(this);
+                const datos = Object.fromEntries(formData.entries());
+                const res = await ajaxRequest(URL_DOCENTES, 'POST', datos);
 
-                abrirModalBSPasswordGenerada();
+                btn.disabled = false;
+                btn.textContent = 'Crear Docente';
+                if (res.success) {
+                    document.getElementById('passwordGenerada').value =
+                        res.password_generada;
 
-                mostrarToast('success', res.message);
+                    abrirModalBSPasswordGenerada();
 
-                await cargarTabla(location.href);
-            } else if (res.errors && Object.keys(res.errors).length) {
-                mostrarErroresModal(res.errors);
+                    mostrarToast('success', res.message);
+
+                    await cargarTabla(location.href);
+                } else if (res.errors && Object.keys(res.errors).length) {
+                    mostrarErroresModal(res.errors);
+                } else {
+                    mostrarToast('error', res.message || 'Error al crear el docente');
+                }
             } else {
-                mostrarToast('error', res.message || 'Error al crear el docente');
+                const btn = document.getElementById('btnCrearDocente');
+                btn.disabled = true;
+                btn.textContent = 'Guardando…';
+                const formData = new FormData(this);
+                const datos = Object.fromEntries(formData.entries());
+                const id = id_editar;
+                const res = await ajaxRequest(`${URL_DOCENTES}/${id}`, 'PUT', datos);
+                btn.disabled = false;
+                btn.textContent = 'Guardar';
+
+                if (res.success && res.password_generada) {
+                    document.getElementById('passwordGenerada').value =
+                        res.password_generada;
+                    abrirModalBSPasswordGenerada();
+                    mostrarToast('success', res.message || 'Datos del docente actualizados.');
+                    await cargarTabla(location.href);
+                } else if (res.success) {
+                    mostrarToast('success', res.message || 'Datos del docente actualizados.');
+                    await cargarTabla(location.href);
+                } else if (res.errors && Object.keys(res.errors).length) {
+                    mostrarErroresModal(res.errors);
+                }
             }
         });
 
@@ -907,38 +946,25 @@
             }
         });
 
-        const password = document.getElementById('password');
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordConfirmation = document.getElementById('password_confirmation');
-        const togglePasswordConfirmation = document.getElementById('togglePasswordConfirmation');
-        const mensaje = document.getElementById('mensajePassword');
-        const icon = document.getElementById('togglePassword');
+        function verPassword(inputId, iconId) {
+            const icon = $(iconId)[0];
+            const input = $(inputId)[0];
 
-        icon.addEventListener('click', () => {
-            if (password.type === 'password') {
-                password.type = 'text';
-                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            if (input.type == 'password') {
+                input.type = 'text';
+                $(icon).removeClass('fa-eye').addClass('fa-eye-slash');
             } else {
-                password.type = 'password';
-                icon.classList.replace('fa-eye-slash', 'fa-eye');
+                input.type = 'password';
+                $(icon).removeClass('fa-eye-slash').addClass('fa-eye');
             }
-        });
+        }
 
-        togglePasswordConfirmation.addEventListener('click', function() {
-            const icon = this.querySelector('i');
+        function validarPasswords(passwordId, passwordConfirmationId, mensajeId) {
+            const password = document.getElementById(passwordId);
+            const passwordConfirmation = document.getElementById(passwordConfirmationId);
+            const mensaje = document.getElementById(mensajeId);
 
-            if (passwordConfirmation.type === 'password') {
-                passwordConfirmation.type = 'text';
 
-                togglePasswordConfirmation.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                passwordConfirmation.type = 'password';
-
-                togglePasswordConfirmation.classList.replace('fa-eye-slash', 'fa-eye');
-            }
-        });
-
-        function validarPasswords() {
             if (!passwordConfirmation.value) {
                 mensaje.textContent = '';
                 return;
@@ -953,9 +979,6 @@
             }
         }
 
-        password.addEventListener('input', validarPasswords);
-        passwordConfirmation.addEventListener('input', validarPasswords);
-
         function generarPasswordAleatoria() {
             const length = 8;
             const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -966,13 +989,107 @@
             return password;
         }
 
-        $("button[name='btnGenerarPassword']").click(function() {
-            debugger;
+        $("#btnGenerarPassword").click(function() {
             const password = generarPasswordAleatoria();
-            document.getElementById('password').value = password;
-            document.getElementById('password_confirmation').value = password;
-            validarPasswords();
+            $("#password").val(password);
+            $("#password_confirmation").val(password);
+            validarPasswords('password', 'password_confirmation', 'mensajePassword');
         });
+
+        $("#password").on('input', function() {
+            validarPasswords('password', 'password_confirmation', 'mensajePassword');
+        });
+
+        $("#password_confirmation").on('input', function() {
+            validarPasswords('password', 'password_confirmation', 'mensajePassword');
+        });
+
+        function cargarDatosDocente(id) {
+            fetch(`${URL_DOCENTES}/datos/${id}`)
+                .then(response => response.json())
+                .then(resp => {
+                    if (!resp.success) throw new Error('No data');
+                    mapearDatosDocente(resp.data);
+                })
+                .catch(error => {
+                    mostrarToast('error', 'No se pudo cargar la información del docente');
+                });
+        }
+
+        function mapearDatosDocente(data) {
+            $('#nombre').val(data.user.nombre);
+            $('#apellido').val(data.user.apellido);
+            $('#email').val(data.user.email);
+            $('#identificacion').val(data.user.identificacion);
+            $('#telefono').val(data.telefono);
+            $('#direccion').val(data.direccion);
+            $('#especialidad').val(data.especialidad);
+            $('#fecha_ingreso').val(data.fecha_ingreso_set);
+            id_editar = data.user.id;
+        }
+
+        $(document).on('change', '.toggle-activo', function() {
+
+            let checkbox = $(this);
+            let id = checkbox.data('id');
+            let nombre = checkbox.data('nombre');
+            let apellido = checkbox.data('apellido');
+
+            // Si se está activando, ejecutar directamente
+            if (checkbox.prop('checked')) {
+                actualizarEstado(id, checkbox);
+                return;
+            }
+
+            // Solo mostrar confirmación al desactivar
+            Swal.fire({
+                title: `¿Desactivar a ${nombre} ${apellido} ?`,
+                html: `
+        Se cerrará cualquier sesión activa de este docente.
+        <br><br>
+        Los datos académicos y grupos asignados no serán eliminados.
+    `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Desactivar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    actualizarEstado(id, checkbox);
+                } else {
+                    // Revertir el switch
+                    checkbox.prop('checked', true);
+                }
+            });
+
+        });
+
+        function actualizarEstado(id, checkbox) {
+            $.ajax({
+                url: `${URL_DOCENTES}/${id}/toggle-activo`,
+                type: 'PATCH',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.estado ?
+                            'Docente activado' : 'Docente desactivado',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                },
+                error: function() {
+                    // Revertir el estado si falla
+                    checkbox.prop('checked', !checkbox.prop('checked'));
+                    Swal.fire(
+                        'Error',
+                        'No fue posible actualizar el estado.',
+                        'error'
+                    );
+                }
+            });
+        }
     </script>
-    <script src="{{ asset('assets/js/docente/editar.js') }}"></script>
 @endpush

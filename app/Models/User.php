@@ -36,6 +36,11 @@ class User extends Authenticatable
         return $this->rol === 'docente';
     }
 
+    public function accesos()
+    {
+        return $this->hasMany(LoginLog::class);
+    }
+
     /**
      * Determina si la cuenta nunca ha sido utilizada.
      *

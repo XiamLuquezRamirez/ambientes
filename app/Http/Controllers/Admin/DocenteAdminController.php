@@ -9,6 +9,7 @@ use App\Models\Docente;
 use App\Models\Grado;
 use App\Models\Grupo;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -17,32 +18,36 @@ class DocenteAdminController extends Controller
 {
     public function listar(Request $request)
     {
-        $consulta = User::with('docente.ambientes')
-            ->withCount('loginLogs')
-            ->withMax('loginLogs as ultimo_acceso', 'fecha');
+        $consulta = Docente::query()
+            ->join('users', 'users.id', '=', 'docentes.user_id')
+            ->select('docentes.*', 'users.*');
 
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
-            $consulta->where(fn ($q) => $q
-                ->where('nombre', 'like', "%{$termino}%")
-                ->orWhere('email', 'like', "%{$termino}%")
-            );
+            $consulta->where('users.nombre', 'like', "%{$termino}%")
+                ->orWhere('users.email', 'like', "%{$termino}%");
         }
+
         if ($request->filled('ambiente_id')) {
             $consulta->whereHas('docente.ambientes', fn ($q) => $q->where('ambientes.id', $request->ambiente_id));
         }
+
         if ($request->filled('rol')) {
             $consulta->where('rol', $request->rol);
         }
+
         if ($request->filled('estado')) {
             $consulta->where('users.estado', $request->estado === 'true');
         }
 
-        $docentes = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
+        // ordenar por nombre
+        $consulta->orderBy('users.nombre');
+        $docentes = $consulta->paginate(10);
+
         $ambientes = Ambiente::orderBy('nombre')->get();
         $grados = Grado::activos()->get();
-        // Grupos del año lectivo actual para el modal de asignación.
         $grupos = Grupo::activos()->delAnio()->orderBy('nombre')->get();
+        // Grupos del año lectivo actual para el modal de asignación.
 
         if ($request->ajax()) {
             return response()->json([
@@ -77,13 +82,6 @@ class DocenteAdminController extends Controller
                 ] : null,
             ],
         ]);
-    }
-
-    public function formularioCrear()
-    {
-        $ambientes = Ambiente::orderBy('nombre')->get();
-
-        return view('admin.docentes.create', compact('ambientes'));
     }
 
     public function guardar(Request $request)
@@ -135,7 +133,13 @@ class DocenteAdminController extends Controller
         $docente = User::with('docente')->findOrFail($docente);
         $ambientes = Ambiente::orderBy('nombre')->get();
 
-        return view('admin.docentes.edit', compact('docente', 'ambientes'));
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'docente' => $docente,
+                'ambientes' => $ambientes,
+            ],
+        ]);
     }
 
     public function actualizar(Request $request, $docente)
@@ -144,26 +148,48 @@ class DocenteAdminController extends Controller
 
         $datos = $request->validate([
             'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,'.$usuario->id,
-            'descripcion' => 'nullable|string',
+            'identificacion' => 'required|string|min:8|max:15|unique:users,identificacion,'.$usuario->id,
+            'telefono' => 'required|string|max:30',
+            'direccion' => 'required|string|max:150',
+            'especialidad' => 'required|string|max:150',
+            'fecha_ingreso' => 'required|date',
+            'password' => 'nullable|min:8|confirmed',
         ]);
 
         DB::transaction(function () use ($usuario, $datos) {
-            $usuario->nombre = $datos['nombre'];
-            $usuario->email = $datos['email'];
-            $usuario->save();
+            // Datos de users
+            $usuario->update([
+                'nombre' => $datos['nombre'],
+                'apellido' => $datos['apellido'],
+                'identificacion' => $datos['identificacion'],
+                'email' => $datos['email'],
+            ]);
 
-            $doc = $usuario->docente;
-            if (! $doc) {
-                $doc = new Docente;
-                $doc->user_id = $usuario->id;
+            // Datos de docentes
+            $usuario->docente->update([
+                'user_id' => $usuario->id,
+                'telefono' => $datos['telefono'],
+                'direccion' => $datos['direccion'],
+                'especialidad' => $datos['especialidad'],
+                'fecha_ingreso' => $datos['fecha_ingreso'],
+            ]);
+
+            if ($datos['password']) {
+                $usuario->password = Hash::make($datos['password']);
+                $usuario->save();
+            } else {
+                $usuario->password = $usuario->password;
+                $usuario->save();
             }
-
-            $doc->descripcion = $datos['descripcion'];
-            $doc->save();
         });
 
-        return response()->json(['success' => true, 'message' => 'Datos del docente actualizados.']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Datos del docente actualizados.',
+            'password_generada' => $datos['password'],
+        ]);
     }
 
     public function asignarInfo(Request $request, $docente)
@@ -254,5 +280,69 @@ class DocenteAdminController extends Controller
             ],
             ['activo' => true]
         );
+    }
+
+    public function verDatosDocente($docente_id)
+    {
+        $docente_id = (int) $docente_id;
+        $docente = Docente::with('user')->where('user_id', $docente_id)->first();
+
+        // setear fecha de ingreso en formato dd/mm/yyyy
+
+        $docente->fecha_ingreso_set = Carbon::parse($docente->fecha_ingreso)->format('Y-m-d');
+
+        if ($docente) {
+            return response()->json([
+                'success' => true,
+                'data' => $docente,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Docente no encontrado.',
+        ]);
+    }
+
+    public function toggleActivo($id)
+    {
+        $usuario = User::findOrFail($id);
+
+        $usuario->estado = ! $usuario->estado;
+        $usuario->save();
+
+        return response()->json([
+            'success' => true,
+            'estado' => $usuario->estado,
+            'message' => $usuario->estado
+                ? 'Docente activado correctamente.'
+                : 'Docente desactivado correctamente.',
+        ]);
+    }
+
+    public function verAccesos($id)
+    {
+        $user = User::with('docente')->findOrFail($id);
+
+        $user = $user->accesos()
+            ->orderByDesc('fecha')
+            ->paginate(30);
+
+        return view('admin.docentes.ver-accesos', compact(
+            'user',
+            'loginLogs'
+        ));
+
+    }
+
+    public function ipPermitida($ip)
+    {
+        return filter_var(
+            $ip,
+            FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV4
+        ) &&
+        ip2long($ip) >= ip2long('192.168.1.0') &&
+        ip2long($ip) <= ip2long('192.168.1.255');
     }
 }

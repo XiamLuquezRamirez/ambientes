@@ -4,6 +4,7 @@ ul.nav-tabs {
 
 .nav-tabs .nav-link:hover {
     background-color: #f8fbff !important;
+    color: #414141 !important;
 }
 
 .nav-tabs .nav-link {

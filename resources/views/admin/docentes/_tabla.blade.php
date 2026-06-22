@@ -15,7 +15,7 @@
             @forelse($docentes as $d)
                 <tr id="fila-{{ $d->id }}" @if ($d->cuenta_sin_usar)  @endif>
                     <td style="font-weight:600;color:#1E293B">
-                        {{ $d->nombre }}
+                        {{ $d->user->nombre }}
 
                         {{-- se deja comentado pero se puede activar para que se muestre el mensaje de cuenta nueva.
                          @if ($d->cuenta_sin_usar)
@@ -31,12 +31,14 @@
                         {{ $d->ultimo_acceso ? date('d/m/Y H:i', strtotime($d->ultimo_acceso)) : '—' }}
                     </td>
                     <td>
-                        <span class="badge {{ $d->estado ? 'badge-green-activo' : 'badge-red' }}">
-                            {{ $d->estado ? 'Activo' : 'Inactivo' }}
-                        </span>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input toggle-activo" type="checkbox" data-id="{{ $d->user->id }}"
+                                data-nombre="{{ $d->user->nombre }}" data-apellido="{{ $d->user->apellido }}"
+                                {{ $d->user->estado ? 'checked' : '' }}>
+                        </div>
                     </td>
                     <td style="text-align:center">
-                        @if ($d->cuenta_sin_usar)
+                        @if ($d->user->cuenta_sin_usar)
                             <span class="badge badge-yellow" title="Nunca ha iniciado sesión">
                                 <i class="fa-solid fa-circle-exclamation"></i> Sin usar
                             </span>
@@ -49,18 +51,19 @@
                             <button class="btn-accion btn-asignar-grado"
                                 onclick="abrirModalAsignarGrado({{ $d->id }})"><i class="fa-solid fa-list"></i>
                                 Asignar Grupo</button>
-                            <button class="btn-accion btn-editar"
-                                onclick="abrirModalEditarDocente({{ $d->id }})"><i
+                            <button class="btn-accion btn-editar" onclick="abrirModalEditar({{ $d->user_id }})"><i
                                     class="fa-solid fa-pencil"></i>
                                 Editar</button>
                             <button type="button" class="btn-accion btn-eliminar" data-id="{{ $d->id }}"
-                                data-nombre="{{ e($d->nombre) }}">
+                                data-nombre="{{ e($d->user->nombre) }}">
                                 <i class="fa-solid fa-trash-can"></i>
-                                Eliminar
+                            </button>
+                            <button type="button" class="btn-accion btn-ver-accesos"
+                                onclick="abrirModalVerAccesos({{ $d->user_id }})"><i
+                                    class="fa-solid fa-clock-rotate-left"></i>
                             </button>
                         </div>
                     </td>
-
                 </tr>
             @empty
                 <tr>
@@ -72,3 +75,4 @@
     </table>
 </div>
 {{ $docentes->links('vendor.pagination.proyecto') }}
+@include('admin.docentes.ver-accesos')

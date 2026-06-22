@@ -630,6 +630,18 @@ select.form-control {
     color: #fff;
 }
 
+.btn-ver-accesos {
+    background: #EFF6FF;
+    border-color: #BFDBFE;
+    color: #1D4ED8;
+}
+
+.btn-ver-accesos:hover {
+    background: #2563EB;
+    border-color: #2563EB;
+    color: #fff;
+}
+
 /* ── Loading overlay ─────────────────────────────────────────── */
 #cargando-tabla {
     display: none;

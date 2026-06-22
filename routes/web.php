@@ -53,20 +53,22 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     // Endpoint JSON para cargar los datos del docente en el modal de completar información.
     Route::get('docentes/{docente}', [DocenteAdminController::class, 'ver'])->name('admin.docentes.show');
     Route::post('docentes', [DocenteAdminController::class, 'guardar'])->name('admin.docentes.store');
-    Route::get('docentes/{docente}/edit', [DocenteAdminController::class, 'formularioEditar'])->name('admin.docentes.edit');
+    Route::get('docentes/datos/{docente_id}', [DocenteAdminController::class, 'verDatosDocente'])->name('admin.docentes.datos');
+    Route::patch('/docentes/{id}/toggle-activo', [DocenteAdminController::class, 'toggleActivo'])
+        ->name('admin.docentes.toggleActivo');
     Route::put('docentes/{docente}', [DocenteAdminController::class, 'actualizar'])->name('admin.docentes.update');
     Route::put('docentes/{docente}/asignar-info', [DocenteAdminController::class, 'asignarInfo'])->name('admin.docentes.asignar-info');
     Route::delete('docentes/{docente}', [DocenteAdminController::class, 'eliminar'])->name('admin.docentes.destroy');
     Route::post('docentes/{docente}/reset-password', [DocenteAdminController::class, 'restablecerContrasena'])->name('admin.docentes.reset-password');
 
     // Estudiantes (admin)
-    Route::get('estudiantes',                        [EstudianteAdminController::class, 'listar'])->name('admin.estudiantes');
-    Route::get('estudiantes/{estudiante}/edit',      [EstudianteAdminController::class, 'formularioEditar'])->name('admin.estudiantes.edit');
-    Route::post('estudiantes',                       [EstudianteAdminController::class, 'guardar'])->name('admin.estudiantes.store');
-    Route::put('estudiantes/{estudiante}',           [EstudianteAdminController::class, 'actualizar'])->name('admin.estudiantes.update');
-    Route::post('estudiantes/{estudiante}/transferir',[EstudianteAdminController::class, 'transferir'])->name('admin.estudiantes.transferir');
-    Route::post('estudiantes/{estudiante}/reset-pin',[EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.reset-pin');
-    Route::get('estudiantes/grupos',                  [EstudianteAdminController::class, 'listarGrupos'])->name('admin.estudiantes.grupos');
+    Route::get('estudiantes', [EstudianteAdminController::class, 'listar'])->name('admin.estudiantes');
+    Route::get('estudiantes/{estudiante}/edit', [EstudianteAdminController::class, 'formularioEditar'])->name('admin.estudiantes.edit');
+    Route::post('estudiantes', [EstudianteAdminController::class, 'guardar'])->name('admin.estudiantes.store');
+    Route::put('estudiantes/{estudiante}', [EstudianteAdminController::class, 'actualizar'])->name('admin.estudiantes.update');
+    Route::post('estudiantes/{estudiante}/transferir', [EstudianteAdminController::class, 'transferir'])->name('admin.estudiantes.transferir');
+    Route::post('estudiantes/{estudiante}/reset-pin', [EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.reset-pin');
+    Route::get('estudiantes/grupos', [EstudianteAdminController::class, 'listarGrupos'])->name('admin.estudiantes.grupos');
 
     // Catalogo
     Route::get('catalogo', [CatalogoController::class, 'listar'])->name('admin.catalogo');

@@ -16,7 +16,9 @@ return new class extends Migration
             $table->enum('rol', ['admin', 'docente_lider', 'docente_auxiliar'])->default('docente_lider');
             $table->boolean('estado')->default(true);
             $table->rememberToken();
+            $table->timestamp('bloqueado_en')->nullable();
             $table->timestamps();
+
         });
     }
 
