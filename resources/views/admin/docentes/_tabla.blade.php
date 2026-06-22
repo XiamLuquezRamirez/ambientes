@@ -49,9 +49,10 @@
                             <button class="btn-accion btn-asignar-grado"
                                 onclick="abrirModalAsignarGrado({{ $d->id }})"><i class="fa-solid fa-list"></i>
                                 Asignar Grupo</button>
-                            <a href="{{ route('admin.docentes.edit', $d->id) }}" class="btn-accion btn-editar">
-                                <i class="fa-solid fa-pencil"></i>
-                                Editar</a>
+                            <button class="btn-accion btn-editar"
+                                onclick="abrirModalEditarDocente({{ $d->id }})"><i
+                                    class="fa-solid fa-pencil"></i>
+                                Editar</button>
                             <button type="button" class="btn-accion btn-eliminar" data-id="{{ $d->id }}"
                                 data-nombre="{{ e($d->nombre) }}">
                                 <i class="fa-solid fa-trash-can"></i>

@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
+use App\Models\CargaDocente;
 use App\Models\Docente;
 use App\Models\Grado;
+use App\Models\Grupo;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class DocenteAdminController extends Controller
@@ -37,8 +40,9 @@ class DocenteAdminController extends Controller
 
         $docentes = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
         $ambientes = Ambiente::orderBy('nombre')->get();
-        // Cargar los grados activos para el selector dentro del modal de completar datos.
         $grados = Grado::activos()->get();
+        // Grupos del año lectivo actual para el modal de asignación.
+        $grupos = Grupo::activos()->delAnio()->orderBy('nombre')->get();
 
         if ($request->ajax()) {
             return response()->json([
@@ -47,23 +51,30 @@ class DocenteAdminController extends Controller
             ]);
         }
 
-        return view('admin.docentes.index', compact('docentes', 'ambientes', 'grados'));
+        return view('admin.docentes.index', compact('docentes', 'ambientes', 'grados', 'grupos'));
     }
 
-    // Devuelve los datos del usuario y su perfil docente para poblar el modal vía AJAX.
+    // Devuelve los datos del usuario, su perfil docente y la carga activa del año.
     public function ver($docente)
     {
-        $usuario = User::with('docente')->findOrFail($docente);
+        $usuario = User::with(['docente.cargasActivas'])->findOrFail($docente);
+        $carga = $usuario->docente?->cargasActivas->first();
 
         return response()->json([
             'success' => true,
             'data' => [
                 'id' => $usuario->id,
-                'nombre' => $usuario->nombre,
+                'nombre' => trim($usuario->nombre.' '.$usuario->apellido),
                 'email' => $usuario->email,
                 'rol' => $usuario->rol,
                 'estado' => $usuario->estado,
                 'docente' => $usuario->docente ? $usuario->docente->toArray() : null,
+                // La asignación ambiente/grado/grupo se lee desde carga_docente, no desde docentes.
+                'carga' => $carga ? [
+                    'ambiente_id' => $carga->ambiente_id,
+                    'grado_id' => $carga->grado_id,
+                    'grupo_id' => $carga->grupo_id,
+                ] : null,
             ],
         ]);
     }
@@ -81,30 +92,41 @@ class DocenteAdminController extends Controller
             'nombre' => 'required|string|max:100',
             'apellido' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8',
-            'rol' => 'required|in:docente',
+            'password' => 'required|min:8|confirmed',
             'telefono' => 'required|string|max:30',
             'direccion' => 'required|string|max:150',
-            'identificacion' => 'required|string|max:150',
+            'identificacion' => 'required|string|min:8|max:15|unique:users,identificacion',
             'especialidad' => 'required|string|max:150',
             'fecha_ingreso' => 'required|date',
         ]);
 
-        $usuario = User::create([
-            'nombre' => $datos['nombre'],
-            'email' => $datos['email'],
-            'password' => Hash::make($datos['password']),
-            'rol' => $datos['rol'],
-            'estado' => true,
-        ]);
+        // Transacción: si falla el perfil docente, no queda un usuario huérfano.
+        DB::transaction(function () use ($datos) {
+            // Paso 1 — Cuenta de acceso (tabla users).
+            $usuario = User::create([
+                'nombre' => $datos['nombre'],
+                'apellido' => $datos['apellido'],
+                'identificacion' => $datos['identificacion'],
+                'email' => $datos['email'],
+                'password' => Hash::make($datos['password']),
+                'rol' => 'docente',
+                'estado' => true,
+            ]);
 
-        if ($datos['rol'] === 'docente') {
-            Docente::create(['user_id' => $usuario->id]);
-        }
+            // Paso 2 — Perfil profesional (tabla docentes).
+            Docente::create([
+                'user_id' => $usuario->id,
+                'telefono' => $datos['telefono'],
+                'direccion' => $datos['direccion'],
+                'especialidad' => $datos['especialidad'],
+                'fecha_ingreso' => $datos['fecha_ingreso'],
+            ]);
+        });
 
         return response()->json([
             'success' => true,
             'message' => 'Docente creado exitosamente.',
+            'password_generada' => $datos['password'],
         ]);
     }
 
@@ -116,9 +138,6 @@ class DocenteAdminController extends Controller
         return view('admin.docentes.edit', compact('docente', 'ambientes'));
     }
 
-    // Actualiza los datos principales del usuario y los campos adicionales del perfil docente.
-    // Actualiza los datos del docente seleccionado desde el modal.
-    // Guarda tanto la información del usuario como los campos adicionales del perfil docente.
     public function actualizar(Request $request, $docente)
     {
         $usuario = User::with('docente')->findOrFail($docente);
@@ -126,80 +145,61 @@ class DocenteAdminController extends Controller
         $datos = $request->validate([
             'nombre' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,'.$usuario->id,
-            'rol' => 'nullable|in:admin,docente',
-            'estado' => 'nullable|boolean',
-            'telefono' => 'nullable|string|max:30',
-            'especialidad' => 'nullable|string|max:150',
-            'fecha_ingreso' => 'nullable|date',
-            'foto_url' => 'nullable|url',
             'descripcion' => 'nullable|string',
-            'ambiente_id' => 'nullable|exists:ambientes,id',
-            'grado_id' => 'nullable|exists:grados,id',
-            'grupo_id' => 'nullable|exists:grupos,id',
         ]);
 
-        $usuario->nombre = $datos['nombre'];
-        $usuario->email = $datos['email'];
-        if (isset($datos['rol'])) {
-            $usuario->rol = $datos['rol'];
-        }
-        if (isset($datos['estado'])) {
-            $usuario->estado = $datos['estado'];
-        }
-        $usuario->save();
+        DB::transaction(function () use ($usuario, $datos) {
+            $usuario->nombre = $datos['nombre'];
+            $usuario->email = $datos['email'];
+            $usuario->save();
 
-        $doc = $usuario->docente;
-        if (! $doc) {
-            $doc = new Docente;
-            $doc->user_id = $usuario->id;
-        }
+            $doc = $usuario->docente;
+            if (! $doc) {
+                $doc = new Docente;
+                $doc->user_id = $usuario->id;
+            }
 
-        // Guardar los datos del perfil docente si se proporcionan.
-        $doc->telefono = $datos['telefono'] ?? $doc->telefono;
-        $doc->especialidad = $datos['especialidad'] ?? $doc->especialidad;
-        $doc->fecha_ingreso = $datos['fecha_ingreso'] ?? $doc->fecha_ingreso;
-        $doc->foto_url = $datos['foto_url'] ?? $doc->foto_url;
-        $doc->descripcion = $datos['descripcion'] ?? $doc->descripcion;
-        if (array_key_exists('ambiente_id', $datos)) {
-            $doc->ambiente_id = $datos['ambiente_id'];
-        }
-        if (array_key_exists('grado_id', $datos)) {
-            $doc->grado_id = $datos['grado_id'];
-        }
-        if (array_key_exists('grupo_id', $datos)) {
-            $doc->grupo_id = $datos['grupo_id'];
-        }
-        $doc->save();
+            $doc->descripcion = $datos['descripcion'];
+            $doc->save();
+        });
 
         return response()->json(['success' => true, 'message' => 'Datos del docente actualizados.']);
     }
 
     public function asignarInfo(Request $request, $docente)
     {
-        $docente = User::with('docente')->findOrFail($docente);
+        $usuario = User::with('docente')->findOrFail($docente);
 
         $datos = $request->validate([
             'ambiente_id' => 'nullable|exists:ambientes,id',
             'grado_id' => 'nullable|exists:grados,id',
             'grupo_id' => 'nullable|exists:grupos,id',
+            'descripcion' => 'nullable|string',
         ]);
 
-        $doc = $docente->docente;
-        if (! $doc) {
-            $doc = new Docente;
-            $doc->user_id = $docente->id;
-        }
+        DB::transaction(function () use ($usuario, $datos) {
+            $doc = $usuario->docente;
+            if (! $doc) {
+                $doc = Docente::create(['user_id' => $usuario->id]);
+            }
 
-        // Guardar los datos del perfil docente si se proporcionan.
-        $doc->fill([
-            'ambiente_id' => $datos['ambiente_id'] ?? $doc->ambiente_id,
-            'grado_id' => $datos['grado_id'] ?? $doc->grado_id,
-            'grupo_id' => $datos['grupo_id'] ?? $doc->grupo_id,
-        ]);
+            // Descripción sí vive en docentes; ambiente/grado/grupo van en carga_docente.
+            if (array_key_exists('descripcion', $datos)) {
+                $doc->descripcion = $datos['descripcion'];
+                $doc->save();
+            }
 
-        $doc->save();
+            if (! empty($datos['ambiente_id']) && ! empty($datos['grado_id']) && ! empty($datos['grupo_id'])) {
+                $this->sincronizarCargaDocente(
+                    $doc,
+                    (int) $datos['ambiente_id'],
+                    (int) $datos['grado_id'],
+                    (int) $datos['grupo_id']
+                );
+            }
+        });
 
-        return response()->json(['success' => true, 'message' => 'Datos del docente actualizados.']);
+        return response()->json(['success' => true, 'message' => 'Asignación guardada correctamente.']);
     }
 
     public function eliminar($docente)
@@ -207,8 +207,6 @@ class DocenteAdminController extends Controller
         $usuario = User::with('docente')->findOrFail($docente);
         $usuario->estado = false;
         $usuario->save();
-        // $usuario->docente?->delete();
-        // $usuario->delete();
 
         return response()->json([
             'success' => true,
@@ -216,8 +214,45 @@ class DocenteAdminController extends Controller
         ]);
     }
 
-    public function restablecerContrasena($docente)
+    public function restablecerContrasena(Request $request, $docente)
     {
-        return response()->json(['success' => false, 'message' => 'Pendiente de implementación.'], 501);
+        $datos = $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+        $usuario = User::findOrFail($docente);
+        $usuario->password = Hash::make($datos['password']);
+        $usuario->save();
+        $usuario->refresh();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contraseña reestablecida.',
+            'data' => [
+                'id' => $usuario->id,
+            ],
+            'usuario' => $usuario->toArray(),
+        ]);
+    }
+
+    /**
+     * Registra o actualiza la carga docente del año lectivo actual.
+     * Ambiente, grado y grupo no se guardan en la tabla docentes.
+     */
+    private function sincronizarCargaDocente(
+        Docente $docente,
+        int $ambienteId,
+        int $gradoId,
+        int $grupoId
+    ): void {
+        CargaDocente::updateOrCreate(
+            [
+                'docente_id' => $docente->id,
+                'ambiente_id' => $ambienteId,
+                'grado_id' => $gradoId,
+                'grupo_id' => $grupoId,
+                'anio_lectivo' => (int) date('Y'),
+            ],
+            ['activo' => true]
+        );
     }
 }

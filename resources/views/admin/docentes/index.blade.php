@@ -163,6 +163,18 @@
             color: #fff;
         }
 
+        .btn-reestablecer-contrasena {
+            background: #EFF6FF;
+            border-color: #BFDBFE;
+            color: #1D4ED8;
+        }
+
+        .btn-reestablecer-contrasena:hover {
+            background: #2563EB;
+            border-color: #2563EB;
+            color: #fff;
+        }
+
         /* ── Loading overlay ─────────────────────────────────────────── */
         #cargando-tabla {
             display: none;
@@ -192,7 +204,29 @@
             box-shadow: 0 32px 80px rgba(37, 99, 235, .22), 0 8px 24px rgba(0, 0, 0, .12);
         }
 
-        #modalDocente .modal-header,
+        #modalEditarDocente .modal-content {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 32px 80px rgba(37, 99, 235, .22), 0 8px 24px rgba(0, 0, 0, .12);
+        }
+
+        #modalEditarDocente .modal-header {
+            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+            border-bottom: none;
+            padding: 20px 24px;
+            gap: 14px;
+            align-items: center;
+        }
+
+        #modalDocente .modal-header {
+            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+            border-bottom: none;
+            padding: 20px 24px;
+            gap: 14px;
+            align-items: center;
+        }
+
         #modalAsignarInfo .modal-header {
             background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
             border-bottom: none;
@@ -221,6 +255,13 @@
             line-height: 1.2;
         }
 
+        #modalEditarDocente .modal-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.2rem;
+            color: #FFFFFF;
+            line-height: 1.2;
+        }
+
         .modal-subtitle {
             font-size: 0.78rem;
             color: rgba(255, 255, 255, .65);
@@ -241,8 +282,24 @@
             transform: rotate(90deg);
         }
 
+        #modalEditarDocente .btn-close:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        #modalEditarDocente .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: .75;
+            transition: opacity .15s, transform .2s;
+            margin-left: auto;
+        }
+
         #modalDocente .modal-body,
         #modalAsignarInfo .modal-body {
+            padding: 28px;
+        }
+
+        #modalEditarDocente .modal-body {
             padding: 28px;
         }
 
@@ -253,20 +310,29 @@
             gap: 12px;
         }
 
+        #modalEditarDocente .modal-footer {
+            border-top: 1px solid #E2E8F0;
+            padding: 16px 28px 24px;
+            gap: 12px;
+        }
+
         /* Animación de entrada personalizada (reemplaza la de Bootstrap) */
         #modalDocente.fade .modal-dialog,
-        #modalAsignarInfo.fade .modal-dialog {
+        #modalAsignarInfo.fade .modal-dialog,
+        #modalEditarDocente.fade .modal-dialog {
             transform: scale(0.85) translateY(-30px);
             opacity: 0;
             transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease;
         }
 
         #modalDocente.show .modal-dialog,
-        #modalAsignarInfo.show .modal-dialog {
+        #modalAsignarInfo.show .modal-dialog,
+        #modalEditarDocente.show .modal-dialog {
             transform: scale(1) translateY(0);
             opacity: 1;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
 @endpush
 
 @section('content')
@@ -330,7 +396,6 @@
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 
     {{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
-
     <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         aria-labelledby="modalDocenteLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -344,25 +409,26 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
                     </button>
                 </div>
-                <ul class="nav nav-pills justify-content-center" id="pills-tab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
-                            data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
-                            aria-selected="true">Datos Personales</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
-                            data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile"
-                            aria-selected="false">Gestion de Cuenta</button>
-                    </li>
-                </ul>
-                <div class="modal-body">
 
-                    <div class="tab-content" id="pills-tabContent">
-                        <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
-                            aria-labelledby="pills-home-tab">
-                            <form id="formCrearDocente">
-                                @csrf
+                <div class="modal-body p-4">
+                    <ul class="nav nav-tabs" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home"
+                                aria-selected="true"> <i class="fas fa-user"></i> Datos Personales</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile"
+                                aria-selected="false"> <i class="fas fa-key"></i> Gestion de Cuenta</button>
+                        </li>
+                    </ul>
+                    {{-- Un solo formulario para ambas pestañas: evita IDs duplicados y envía todos los campos. --}}
+                    <form id="formCrearDocente" method="POST">
+                        @csrf
+                        <div class="tab-content p-4" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
+                                aria-labelledby="pills-home-tab">
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-3">
@@ -415,19 +481,16 @@
                                                 value="{{ old('fecha_ingreso') }}">
                                         </div>
                                     </div>
-
                                 </div>
-                            </form>
-                        </div>
-                        <div class="tab-pane fade" id="pills-profile" role="tabpanel"
-                            aria-labelledby="pills-profile-tab">
-                            <form id="formCrearDocente">
-                                @csrf
+                            </div>
+                            <div class="tab-pane fade" id="pills-profile" role="tabpanel"
+                                aria-labelledby="pills-profile-tab">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
                                             <strong class="form-label">Correo electrónico</strong>
-                                            <input type="email" name="email" class="form-control"
+                                            <input type="email" id="email" name="email" class="form-control"
+                                                placeholder="Correo electrónico" value="{{ old('email') }}"
                                                 autocomplete="off">
                                         </div>
                                     </div>
@@ -436,48 +499,87 @@
                                             <strong class="form-label">Contraseña
                                                 <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span>
                                             </strong>
-                                            <input type="password" name="password" class="form-control"
-                                                autocomplete="off">
+                                            <div class="position-relative">
+                                                <input type="password" id="password" name="password"
+                                                    class="form-control pe-5" placeholder="Contraseña"
+                                                    autocomplete="new-password">
+                                                <i id="togglePassword"
+                                                    class="fa-solid fa-eye position-absolute top-50 end-0 translate-middle-y me-3"
+                                                    style="cursor:pointer;"></i>
+                                            </div>
                                         </div>
+                                        <button type="button" id="btnGenerarPassword" name="btnGenerarPassword"
+                                            class="btn btn-primary"> Generar
+                                            Contraseña Aleatoria <i class="fa-solid fa-shuffle"></i></button>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <strong class="form-label">Confirmar contraseña
-                                                <span style="color:#94A3B8;font-size:0.78rem"></span>
                                             </strong>
-                                            <input type="password" name="password_confirmation" class="form-control"
-                                                autocomplete="off">
+                                            <div class="position-relative">
+                                                <input type="password" id="password_confirmation"
+                                                    name="password_confirmation" class="form-control pe-5"
+                                                    placeholder="Contraseña" autocomplete="new-password">
+                                                <i id="togglePasswordConfirmation"
+                                                    class="fa-solid fa-eye position-absolute top-50 end-0 translate-middle-y me-3"
+                                                    style="cursor:pointer;"></i>
+                                            </div>
+                                            <small id="mensajePassword"></small>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
-
+                    </form>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn"
                         style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
-                        data-bs-dismiss="modal">Cancelar</button>
+                        onclick="cerrarModalDocente()">Cancelar</button>
                     <button type="submit" form="formCrearDocente" id="btnCrearDocente" class="btn btn-primary">Crear
                         Docente</button>
                 </div>
-
             </div>
         </div>
     </div>
-    {{-- ── Modal Bootstrap 5 – Asignar Informacion Del Docente ──────────────────────── --}}
 
+    {{-- ── Modal Bootstrap 5 – Información de la Contraseña ──────────────────────── --}}
+    <div class="modal fade" id="modalBSPasswordGenerada" tabindex="-1" data-bs-backdrop="static"
+        data-bs-keyboard="false" aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalBSPasswordGeneradaLabel">Información de la Contraseña</h5>
+                </div>
+                <div class="modal-body">
+                    <p>La contraseña se ha creado correctamente. Por favor, anotarla antes de cerrar.</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Contraseña</strong>
+                                <input type="text" id="passwordGenerada" class="form-control"
+                                    value="{{ 'passwordGenerada' }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Terminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ── Modal Bootstrap 5 – Asignar Informacion Del Docente ──────────────────────── --}}
     <div class="modal fade" id="modalAsignarInfo" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
-        aria-labelledby="modalAsignarInfoLabel" aria-hidden="true">
+        aria-labelledby="modalAsignarInfoLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="modal-header-icon"><i class="fa-solid fa-list text-white"></i></div>
+                    <div class="modal-header-icon"><i class="fas fa-user-graduate text-white"></i></div>
                     <div class="flex-grow-1">
-                        <h5 class="modal-title mb-0" id="modalAsignarInfoLabel"> Asignación de Grupo</h5>
-                        <p class="modal-subtitle mb-0">Completa los datos faltantes del docente seleccionado</p>
+                        <h5 class="modal-title mb-0" id="modalAsignarInfoLabel">Asignar Información</h5>
+                        <p class="modal-subtitle mb-0">Completa los datos para crear la cuenta</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
                     </button>
@@ -527,7 +629,7 @@
                                     <strong class="form-label">Grupos</strong>
                                     <select name="grupo_id" id="asignar_grupos_id" class="form-control">
                                         <option value="">— Sin grupos —</option>
-                                        @foreach ($g->grupos as $gr)
+                                        @foreach ($grupos as $gr)
                                             <option value="{{ $gr->id }}">{{ $gr->nombre }}</option>
                                         @endforeach
                                     </select>
@@ -545,23 +647,25 @@
                 <div class="modal-footer">
                     <button type="button" class="btn"
                         style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
-                        data-bs-dismiss="modal">Cancelar</button>
+                        onclick="cerrarModalAsignarInfo()">Cancelar</button>
                     <button type="submit" form="formAsignarInfo" id="btnAsignarInfo" class="btn btn-primary">Guardar
                         Datos</button>
                 </div>
-
             </div>
         </div>
     </div>
+    @include('admin.docentes.edit')
 @endsection
 
 @push('scripts')
     <script>
         const URL_DOCENTES = "{{ route('admin.docentes') }}";
-
+    </script>
+    <script>
         /* ── Bootstrap Modal ─────────────────────────────────────────── */
         const modalBS = new bootstrap.Modal(document.getElementById('modalDocente'));
         const modalBSAsignarInfo = new bootstrap.Modal(document.getElementById('modalAsignarInfo'));
+        const modalBSPasswordGenerada = new bootstrap.Modal(document.getElementById('modalBSPasswordGenerada'));
 
         // Al cerrar cualquier modal, limpiar errores y resetear el formulario correspondiente.
         document.getElementById('modalDocente').addEventListener('hidden.bs.modal', function() {
@@ -573,8 +677,15 @@
             document.getElementById('formAsignarInfo').reset();
         });
 
+
         function abrirModal() {
             modalBS.show();
+        }
+
+        /* ── Cerrar modal Nuevo Docente ─────────────────────────── */
+        function cerrarModalDocente() {
+            document.activeElement?.blur();
+            modalBS.hide();
         }
 
         // Carga la información del docente seleccionado y abre el modal de completar datos.
@@ -587,10 +698,12 @@
                     document.getElementById('asignar_docente_id').value = data.id;
                     document.getElementById('asignar_nombre').textContent = data.nombre ?? '';
                     const docente = data.docente ?? {};
+                    const carga = data.carga ?? {};
                     document.getElementById('asignar_descripcion').value = docente.descripcion ?? '';
-                    document.getElementById('asignar_ambiente_id').value = docente.ambiente_id ?? '';
-                    document.getElementById('asignar_grado_id').value = docente.grado_id ?? '';
-                    document.getElementById('asignar_grupos_id').value = docente.grupo_id ?? '';
+                    // Los IDs de asignación provienen de carga_docente, no de la tabla docentes.
+                    document.getElementById('asignar_ambiente_id').value = carga.ambiente_id ?? '';
+                    document.getElementById('asignar_grado_id').value = carga.grado_id ?? '';
+                    document.getElementById('asignar_grupos_id').value = carga.grupo_id ?? '';
 
                     modalBSAsignarInfo.show();
                 })
@@ -600,8 +713,10 @@
                 });
         }
 
-        function cerrarModal() {
-            modalBS.hide();
+        /* ── Cerrar modal Asignar Información ─────────────────────────── */
+        function cerrarModalAsignarInfo() {
+            document.activeElement?.blur();
+            modalBSAsignarInfo.hide();
         }
 
         /* ── Tabla AJAX ──────────────────────────────────────────────── */
@@ -689,6 +804,10 @@
             if (primero) primero.focus();
         }
 
+        function abrirModalBSPasswordGenerada() {
+            modalBSPasswordGenerada.show();
+        }
+
         /* ── Crear docente (AJAX) ────────────────────────────────────── */
         document.getElementById('formCrearDocente').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -698,16 +817,18 @@
 
             const formData = new FormData(this);
             const datos = Object.fromEntries(formData.entries());
-            if (!datos.ambiente_id) datos.ambiente_id = null;
-
             const res = await ajaxRequest(URL_DOCENTES, 'POST', datos);
 
             btn.disabled = false;
             btn.textContent = 'Crear Docente';
-
             if (res.success) {
-                cerrarModal();
+                document.getElementById('passwordGenerada').value =
+                    res.password_generada;
+
+                abrirModalBSPasswordGenerada();
+
                 mostrarToast('success', res.message);
+
                 await cargarTabla(location.href);
             } else if (res.errors && Object.keys(res.errors).length) {
                 mostrarErroresModal(res.errors);
@@ -764,16 +885,13 @@
         document.getElementById('formAsignarInfo').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btnAsignarInfo');
-            console.log(btn);
             btn.disabled = true;
             btn.textContent = 'Guardando…';
 
             const formData = new FormData(this);
             const datos = Object.fromEntries(formData.entries());
             const id = datos.id;
-            console.log(datos);
             const res = await ajaxRequest(`${URL_DOCENTES}/${id}/asignar-info`, 'PUT', datos);
-            console.log(res);
 
             btn.disabled = false;
             btn.textContent = 'Guardar Datos';
@@ -788,5 +906,73 @@
                 mostrarToast('error', res.message || 'Error al guardar');
             }
         });
+
+        const password = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordConfirmation = document.getElementById('password_confirmation');
+        const togglePasswordConfirmation = document.getElementById('togglePasswordConfirmation');
+        const mensaje = document.getElementById('mensajePassword');
+        const icon = document.getElementById('togglePassword');
+
+        icon.addEventListener('click', () => {
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+
+        togglePasswordConfirmation.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+
+            if (passwordConfirmation.type === 'password') {
+                passwordConfirmation.type = 'text';
+
+                togglePasswordConfirmation.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordConfirmation.type = 'password';
+
+                togglePasswordConfirmation.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+
+        function validarPasswords() {
+            if (!passwordConfirmation.value) {
+                mensaje.textContent = '';
+                return;
+            }
+
+            if (password.value === passwordConfirmation.value) {
+                mensaje.textContent = 'Las contraseñas coinciden';
+                mensaje.className = 'text-success';
+            } else {
+                mensaje.textContent = 'Las contraseñas no coinciden';
+                mensaje.className = 'text-danger';
+            }
+        }
+
+        password.addEventListener('input', validarPasswords);
+        passwordConfirmation.addEventListener('input', validarPasswords);
+
+        function generarPasswordAleatoria() {
+            const length = 8;
+            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            return password;
+        }
+
+        $("button[name='btnGenerarPassword']").click(function() {
+            debugger;
+            const password = generarPasswordAleatoria();
+            document.getElementById('password').value = password;
+            document.getElementById('password_confirmation').value = password;
+            validarPasswords();
+        });
     </script>
+    <script src="{{ asset('assets/js/docente/editar.js') }}"></script>
 @endpush

@@ -1,0 +1,18 @@
+ul.nav-tabs {
+    padding: 0px;
+}
+
+.nav-tabs .nav-link:hover {
+    background-color: #f8fbff !important;
+}
+
+.nav-tabs .nav-link {
+    margin: 0px !important;
+    color: #64748B;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #ffffff !important;
+    border-color: #2045a3 #2045a3 #fff !important;
+    color: #2045a3 !important;
+}
