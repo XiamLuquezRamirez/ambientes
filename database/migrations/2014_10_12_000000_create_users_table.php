@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('rol', ['admin', 'docente_lider', 'docente_auxiliar'])->default('docente_lider');
-            $table->boolean('activo')->default(true);
+            $table->boolean('estado')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });

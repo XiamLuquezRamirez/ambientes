@@ -47,6 +47,7 @@ class Docente extends Model
         if ($this->relationLoaded('ambientes')) {
             return $this->ambientes->first();
         }
+
         return $this->ambientes()->first();
     }
 }
