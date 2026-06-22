@@ -407,10 +407,6 @@ tr:hover td {
     color: #DC2626;
 }
 
-.btn-danger:hover {
-    background: #FEE2E2;
-}
-
 .btn-sm {
     padding: 4px 10px;
     font-size: 0.78rem;

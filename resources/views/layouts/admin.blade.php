@@ -16,6 +16,7 @@
     @stack('styles')
     @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
+    <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
 </head>
 
 <body>
