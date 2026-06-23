@@ -51,6 +51,8 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('docentes', [DocenteAdminController::class, 'listar'])->name('admin.docentes');
     Route::get('docentes/create', [DocenteAdminController::class, 'formularioCrear'])->name('admin.docentes.create');
     // Endpoint JSON para cargar los datos del docente en el modal de completar información.
+    // Debe declararse antes de docentes/{docente}; si no, Laravel interpreta "accesos" como parte del detalle genérico.
+    Route::get('docentes/{docente}/accesos', [DocenteAdminController::class, 'verAccesos'])->name('admin.docentes.accesos');
     Route::get('docentes/{docente}', [DocenteAdminController::class, 'ver'])->name('admin.docentes.show');
     Route::post('docentes', [DocenteAdminController::class, 'guardar'])->name('admin.docentes.store');
     Route::get('docentes/datos/{docente_id}', [DocenteAdminController::class, 'verDatosDocente'])->name('admin.docentes.datos');

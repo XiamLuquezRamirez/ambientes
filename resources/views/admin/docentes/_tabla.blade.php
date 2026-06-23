@@ -75,4 +75,3 @@
     </table>
 </div>
 {{ $docentes->links('vendor.pagination.proyecto') }}
-@include('admin.docentes.ver-accesos')

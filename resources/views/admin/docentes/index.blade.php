@@ -394,6 +394,7 @@
         @include('admin.docentes._tabla')
     </div>
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+    @include('admin.docentes.ver-accesos')
 
     {{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
     <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
