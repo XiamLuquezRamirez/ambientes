@@ -9,10 +9,12 @@ use App\Models\Docente;
 use App\Models\Grado;
 use App\Models\Grupo;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DocenteAdminController extends Controller
 {
@@ -20,8 +22,14 @@ class DocenteAdminController extends Controller
     {
         $consulta = Docente::query()
             ->join('users', 'users.id', '=', 'docentes.user_id')
-            ->select('docentes.*', 'users.*');
+            ->select(
+                'docentes.*',
+                'users.nombre',
+                'users.apellido',
+                'users.email'
+            );
 
+        $consulta->orderBy('users.nombre');
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
             $consulta->where('users.nombre', 'like', "%{$termino}%")
@@ -37,11 +45,10 @@ class DocenteAdminController extends Controller
         }
 
         if ($request->filled('estado')) {
-            $consulta->where('users.estado', $request->estado === 'true');
+            $consulta->where('docentes.estado', $request->estado === 'true');
         }
 
         // ordenar por nombre
-        $consulta->orderBy('users.nombre');
         $docentes = $consulta->paginate(10);
 
         $ambientes = Ambiente::orderBy('nombre')->get();
@@ -72,7 +79,7 @@ class DocenteAdminController extends Controller
                 'nombre' => trim($usuario->nombre.' '.$usuario->apellido),
                 'email' => $usuario->email,
                 'rol' => $usuario->rol,
-                'estado' => $usuario->estado,
+                'estado' => $usuario->docente?->estado,
                 'docente' => $usuario->docente ? $usuario->docente->toArray() : null,
                 // La asignación ambiente/grado/grupo se lee desde carga_docente, no desde docentes.
                 'carga' => $carga ? [
@@ -97,9 +104,10 @@ class DocenteAdminController extends Controller
             'especialidad' => 'required|string|max:150',
             'fecha_ingreso' => 'required|date',
         ]);
-
         // Transacción: si falla el perfil docente, no queda un usuario huérfano.
-        DB::transaction(function () use ($datos) {
+
+        $docente = DB::transaction(function () use ($datos) {
+
             // Paso 1 — Cuenta de acceso (tabla users).
             $usuario = User::create([
                 'nombre' => $datos['nombre'],
@@ -112,19 +120,30 @@ class DocenteAdminController extends Controller
             ]);
 
             // Paso 2 — Perfil profesional (tabla docentes).
-            Docente::create([
+            return Docente::create([
                 'user_id' => $usuario->id,
                 'telefono' => $datos['telefono'],
                 'direccion' => $datos['direccion'],
                 'especialidad' => $datos['especialidad'],
                 'fecha_ingreso' => $datos['fecha_ingreso'],
+                'estado' => true,
             ]);
         });
 
+        session([
+            'password_temporal' => $datos['password'],
+        ]);
+
         return response()->json([
             'success' => true,
-            'message' => 'Docente creado exitosamente.',
+            'accion' => 'crear',
+            'message' => 'Docente creado correctamente.',
             'password_generada' => $datos['password'],
+            'docente' => [
+                'id' => $docente->id,
+                'nombre' => $datos['nombre'],
+                'apellido' => $datos['apellido'],
+            ],
         ]);
     }
 
@@ -176,6 +195,8 @@ class DocenteAdminController extends Controller
                 'fecha_ingreso' => $datos['fecha_ingreso'],
             ]);
 
+            // Si se proporciona una nueva contraseña, se actualiza la contraseña del usuario.
+            // Si no se proporciona una nueva contraseña, se mantiene la contraseña actual.
             if ($datos['password']) {
                 $usuario->password = Hash::make($datos['password']);
                 $usuario->save();
@@ -184,11 +205,18 @@ class DocenteAdminController extends Controller
                 $usuario->save();
             }
         });
+        session([
+            'password_temporal' => $datos['password'],
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Datos del docente actualizados.',
+            'accion' => 'actualizar',
+            'message' => 'Datos del docente actualizados correctamente.',
             'password_generada' => $datos['password'],
+            'docente' => [
+                'id' => $usuario->docente->id,
+            ],
         ]);
     }
 
@@ -230,14 +258,28 @@ class DocenteAdminController extends Controller
 
     public function eliminar($docente)
     {
-        $usuario = User::with('docente')->findOrFail($docente);
-        $usuario->estado = false;
-        $usuario->save();
+        try {
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Docente eliminado.',
-        ]);
+            $docente = Docente::findOrFail($docente);
+
+            $docente->estado = 'eliminado';
+
+            $docente->save();
+
+            return response()->json([
+                'success' => true,
+                'estado' => $docente->estado,
+                'message' => 'Docente eliminado correctamente.',
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
     }
 
     public function restablecerContrasena(Request $request, $docente)
@@ -288,7 +330,6 @@ class DocenteAdminController extends Controller
         $docente = Docente::with('user')->where('user_id', $docente_id)->first();
 
         // setear fecha de ingreso en formato dd/mm/yyyy
-
         $docente->fecha_ingreso_set = Carbon::parse($docente->fecha_ingreso)->format('Y-m-d');
 
         if ($docente) {
@@ -306,18 +347,32 @@ class DocenteAdminController extends Controller
 
     public function toggleActivo($id)
     {
-        $usuario = User::findOrFail($id);
+        try {
 
-        $usuario->estado = ! $usuario->estado;
-        $usuario->save();
+            $docente = Docente::findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'estado' => $usuario->estado,
-            'message' => $usuario->estado
-                ? 'Docente activado correctamente.'
-                : 'Docente desactivado correctamente.',
-        ]);
+            $docente->estado = $docente->estado === 'activo'
+                ? 'inactivo'
+                : 'activo';
+
+            $docente->save();
+
+            return response()->json([
+                'success' => true,
+                'estado' => $docente->estado,
+                'message' => $docente->estado === 'activo'
+                    ? 'Docente activado correctamente.'
+                    : 'Docente desactivado correctamente.',
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
     }
 
     public function verAccesos($id)
@@ -369,5 +424,24 @@ class DocenteAdminController extends Controller
 
         return $ipLong >= ip2long('192.168.1.0')
             && $ipLong <= ip2long('192.168.1.255');
+    }
+
+    public function generarPdf($id)
+    {
+        // Verificar si el docente tiene una cuenta activa
+        $docente = Docente::with('user')->findOrFail($id);
+        $password = session()->pull('password_temporal');
+        $pdf = Pdf::loadView(
+            'admin.pdf.docente',
+            compact('docente', 'password')
+        );
+        $nombreArchivo = 'Docente_'.
+        Str::slug(
+            $docente->user->nombre.' '.$docente->user->apellido,
+            ' '
+        ).
+        '.pdf';
+
+        return $pdf->download($nombreArchivo);
     }
 }

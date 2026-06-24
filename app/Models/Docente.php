@@ -11,7 +11,7 @@ class Docente extends Model
 
     // Perfil profesional del docente. La asignación ambiente/grado/grupo va en carga_docente.
     protected $fillable = [
-        'user_id', 'telefono', 'direccion', 'especialidad', 'fecha_ingreso', 'foto_url', 'descripcion',
+        'user_id', 'telefono', 'direccion', 'especialidad', 'fecha_ingreso', 'foto_url', 'descripcion', 'estado',
     ];
 
     protected $casts = [

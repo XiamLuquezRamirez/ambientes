@@ -22,7 +22,7 @@
 <body>
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <span class="brand">Aulas Reggio</span>
+            <span class="brand">PedNia</span>
             <span class="badge-admin">ADMIN</span>
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
@@ -77,10 +77,7 @@
         $inicialesAuth = mb_strtoupper(
             mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
         );
-        $rolAuthLabel =
-            ['admin' => 'Administrador', 'docente' => 'Docente'][
-                $usuarioAuth->rol
-            ] ?? $usuarioAuth->rol;
+        $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
     @endphp
     <header class="header">
         <div class="header-perfil" id="headerPerfil">

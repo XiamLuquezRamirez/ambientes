@@ -204,14 +204,16 @@
             box-shadow: 0 32px 80px rgba(37, 99, 235, .22), 0 8px 24px rgba(0, 0, 0, .12);
         }
 
-        #modalEditarDocente .modal-content {
+        #modalEditarDocente .modal-content,
+        #modalBSPasswordGenerada .modal-content {
             border: none;
             border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 32px 80px rgba(37, 99, 235, .22), 0 8px 24px rgba(0, 0, 0, .12);
         }
 
-        #modalEditarDocente .modal-header {
+        #modalEditarDocente .modal-header,
+        #modalBSPasswordGenerada .modal-header {
             background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
             border-bottom: none;
             padding: 20px 24px;
@@ -255,7 +257,8 @@
             line-height: 1.2;
         }
 
-        #modalEditarDocente .modal-title {
+        #modalEditarDocente .modal-title,
+        #modalBSPasswordGenerada .modal-title {
             font-family: 'Fredoka One', cursive;
             font-size: 1.2rem;
             color: #FFFFFF;
@@ -282,12 +285,14 @@
             transform: rotate(90deg);
         }
 
-        #modalEditarDocente .btn-close:hover {
+        #modalEditarDocente .btn-close:hover,
+        #modalBSPasswordGenerada .btn-close:hover {
             opacity: 1;
             transform: rotate(90deg);
         }
 
-        #modalEditarDocente .btn-close {
+        #modalEditarDocente .btn-close,
+        #modalBSPasswordGenerada .btn-close {
             filter: brightness(0) invert(1);
             opacity: .75;
             transition: opacity .15s, transform .2s;
@@ -299,7 +304,8 @@
             padding: 28px;
         }
 
-        #modalEditarDocente .modal-body {
+        #modalEditarDocente .modal-body,
+        #modalBSPasswordGenerada .modal-body {
             padding: 28px;
         }
 
@@ -310,7 +316,8 @@
             gap: 12px;
         }
 
-        #modalEditarDocente .modal-footer {
+        #modalEditarDocente .modal-footer,
+        #modalBSPasswordGenerada .modal-footer {
             border-top: 1px solid #E2E8F0;
             padding: 16px 28px 24px;
             gap: 12px;
@@ -319,7 +326,8 @@
         /* Animación de entrada personalizada (reemplaza la de Bootstrap) */
         #modalDocente.fade .modal-dialog,
         #modalAsignarInfo.fade .modal-dialog,
-        #modalEditarDocente.fade .modal-dialog {
+        #modalEditarDocente.fade .modal-dialog,
+        #modalBSPasswordGenerada.fade .modal-dialog {
             transform: scale(0.85) translateY(-30px);
             opacity: 0;
             transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease;
@@ -327,7 +335,8 @@
 
         #modalDocente.show .modal-dialog,
         #modalAsignarInfo.show .modal-dialog,
-        #modalEditarDocente.show .modal-dialog {
+        #modalEditarDocente.show .modal-dialog,
+        #modalBSPasswordGenerada.show .modal-dialog {
             transform: scale(1) translateY(0);
             opacity: 1;
         }
@@ -397,17 +406,19 @@
     @include('admin.docentes.ver-accesos')
 
     {{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
-    <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
-        aria-labelledby="modalDocenteLabel" aria-hidden="true">
+    <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-keyboard="false" aria-labelledby="modalDocenteLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div class="modal-header-icon"><i class="fas fa-user-graduate text-white"></i></div>
-                    <div class="flex-grow-1">
-                        <h5 class="modal-title mb-0" id="modalDocenteLabel">Nuevo Docente</h5>
-                        <p class="modal-subtitle mb-0" id="modalDocenteSubtitle">Completa los datos para crear la cuenta</p>
+                    <div class="modal-header-icon"><i id="modalDocenteIcon"></i>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                    <div class="flex-grow-1">
+                        <h5 class="modal-title mb-0" id="modalDocenteLabel"></h5>
+                        <p class="modal-subtitle mb-0" id="modalDocenteSubtitle"></p>
+                    </div>
+                    <button type="button" class="btn-close" onclick="cerrarModalDocente()" data-bs-dismiss="modal"
+                        aria-label="Cerrar">
                     </button>
                 </div>
 
@@ -423,7 +434,7 @@
                         </li>
                     </ul>
                     {{-- Un solo formulario para ambas pestañas: evita IDs duplicados y envía todos los campos. --}}
-                    <form id="formCrearDocente" method="POST">
+                    <form id="formDocente" method="POST">
                         @csrf
                         <div class="tab-content" style="padding: 20px;">
                             <div class="tab-pane container active" id="datosPersonales">
@@ -445,7 +456,7 @@
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Identificación</strong>
-                                            <input type="text" id="identificacion" name="identificacion"
+                                            <input type="number" id="identificacion" name="identificacion"
                                                 class="form-control" placeholder="Identificación del docente"
                                                 value="{{ old('identificacion') }}">
                                         </div>
@@ -453,7 +464,7 @@
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Telefono</strong>
-                                            <input type="tel" id="telefono" name="telefono" class="form-control"
+                                            <input type="number" id="telefono" name="telefono" class="form-control"
                                                 placeholder="Telefono del docente" value="{{ old('telefono') }}">
                                         </div>
                                     </div>
@@ -533,45 +544,68 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn"
-                        style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
-                        onclick="cerrarModalDocente()">Cancelar</button>
-                    <button type="submit" form="formCrearDocente" id="btnCrearDocente"
-                        class="btn btn-primary">Guardar</button>
+                        style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0" onclick="cerrarModalDocente()">
+                        <i class="fa-solid fa-xmark"></i> Cancelar</button>
+                    <button type="submit" form="formDocente" id="btnDocente" class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
     {{-- ── Modal Bootstrap 5 – Información de la Contraseña ──────────────────────── --}}
-    <div class="modal fade" id="modalBSPasswordGenerada" tabindex="-1" data-bs-backdrop="static"
-        data-bs-keyboard="false" aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
+    <div class="modal fade" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false"
+        aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalBSPasswordGeneradaLabel">Información de la Contraseña</h5>
+                    <h5 class="modal-title" id="modalBSPasswordGeneradaLabel"></h5>
                 </div>
                 <div class="modal-body">
-                    <p>La contraseña se ha creado correctamente. Por favor, anotarla antes de cerrar.</p>
+                    <p id="modalBSPasswordGeneradaSubtitle"></p>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
+                                <strong>Correo electrónico</strong>
+                                <div class="input-group">
+                                    <input type="text" id="asignar_email" class="form-control"
+                                        value="{{ old('email') ?? '-' }}" readonly>
+                                    <button type="button" class="btn btn-outline-secondary btn-copiar"
+                                        data-target="asignar_email" title="Copiar correo">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
                                 <strong>Contraseña</strong>
-                                <input type="text" id="passwordGenerada" class="form-control"
-                                    value="{{ 'passwordGenerada' }}" readonly>
+                                <div class="input-group">
+                                    <input type="text" id="passwordGenerada" class="form-control"
+                                        value="{{ $passwordGenerada ?? '' }}" readonly>
+                                    <button type="button" class="btn btn-outline-secondary btn-copiar"
+                                        data-target="passwordGenerada" title="Copiar contraseña">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" onclick=" cerrarModalDocente()" class="btn btn-primary"
-                            data-bs-dismiss="modal">Terminar</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnDescargarPdf" class="btn btn-danger">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        Descargar PDF
+                    </button>
+                    <button type="button" onclick="cerrarModalBSPasswordGenerada()" class="btn btn-primary"
+                        data-bs-dismiss="modal"> <i class="fa-solid fa-check"></i> Terminar</button>
                 </div>
             </div>
         </div>
     </div>
 
     {{-- ── Modal Bootstrap 5 – Asignar Informacion Del Docente ──────────────────────── --}}
-    <div class="modal fade" id="modalAsignarInfo" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+    <div class="modal fade" id="modalAsignarInfo" tabindex="-1" data-bs-keyboard="false"
         aria-labelledby="modalAsignarInfoLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
@@ -671,7 +705,7 @@
         // Al cerrar cualquier modal, limpiar errores y resetear el formulario correspondiente.
         document.getElementById('modalDocente').addEventListener('hidden.bs.modal', function() {
             limpiarErroresModal();
-            document.getElementById('formCrearDocente').reset();
+            document.getElementById('formDocente').reset();
         });
         document.getElementById('modalAsignarInfo').addEventListener('hidden.bs.modal', function() {
             limpiarErroresModal();
@@ -681,6 +715,10 @@
         function abrirModal() {
             $("#modalDocenteLabel").text('Crear Docente');
             $("#modalDocenteSubtitle").text('Completa los datos para crear la cuenta');
+            $("#modalDocenteIcon").html('<i class="fas fa-user-plus text-white"></i>');
+            bootstrap.Tab.getOrCreateInstance(
+                $('a[href="#datosPersonales"]')[0]
+            ).show();
             tipoPost = 1;
             modalBS.show();
         }
@@ -688,18 +726,52 @@
         function abrirModalEditar(id) {
             $("#modalDocenteLabel").text('Editar Docente');
             $("#modalDocenteSubtitle").text('Completa los datos para editar el docente');
+            $("#modalDocenteIcon").html('<i class="fas fa-user-edit text-white"></i>');
+            bootstrap.Tab.getOrCreateInstance(
+                $('a[href="#datosPersonales"]')[0]
+            ).show();
             tipoPost = 2;
             cargarDatosDocente(id);
             modalBS.show();
         }
 
+        /* ── Modal Bootstrap 5 – Información de la Cuenta ──────────────────────── */
+        function abrirModalBSPasswordGenerada() {
+            $("#modalBSPasswordGeneradaLabel").text('Información de la Cuenta');
+            $("#modalBSPasswordGeneradaSubtitle").text(
+                'La cuenta se ha creado correctamente. Por favor, anotar la contraseña antes de cerrar.');
+            $("#modalBSPasswordGeneradaIcon").html('<i class="fas fa-info-circle text-white"></i>');
+            modalBSPasswordGenerada.show();
+        }
+
+        /* ── Modal Bootstrap 5 – Información de la Cuenta Actualizada ────────── */
+        function abrirModalBSPasswordGeneradaEditar() {
+            $("#modalBSPasswordGeneradaLabel").text('Información de la Cuenta Actualizada');
+            $("#modalBSPasswordGeneradaSubtitle").text(
+                'La cuenta se ha actualizado correctamente. Por favor, anotar la contraseña antes de cerrar.');
+            $("#modalBSPasswordGeneradaIcon").html('<i class="fas fa-info-circle text-white"></i>');
+            modalBSPasswordGenerada.show();
+        }
+
+        function cerrarModalBSPasswordGenerada() {
+            limpiarErroresModal();
+            document.activeElement?.blur();
+            modalBSPasswordGenerada.hide();
+        }
+
+
         /* ── Cerrar modal Nuevo Docente ─────────────────────────── */
         function cerrarModalDocente() {
-            bootstrap.Tab.getOrCreateInstance(
-                $('a[href="#datosPersonales"]')[0]
-            ).show();
+            limpiarErroresModal();
             document.activeElement?.blur();
             modalBS.hide();
+        }
+
+        /* ── Cerrar modal Asignar Información ─────────────────────────── */
+        function cerrarModalAsignarInfo() {
+            limpiarErroresModal();
+            document.activeElement?.blur();
+            modalBSAsignarInfo.hide();
         }
 
         // Carga la información del docente seleccionado y abre el modal de completar datos.
@@ -727,11 +799,6 @@
                 });
         }
 
-        /* ── Cerrar modal Asignar Información ─────────────────────────── */
-        function cerrarModalAsignarInfo() {
-            document.activeElement?.blur();
-            modalBSAsignarInfo.hide();
-        }
 
         /* ── Tabla AJAX ──────────────────────────────────────────────── */
         async function cargarTabla(url) {
@@ -797,16 +864,16 @@
         /* ── Errores inline en modal ─────────────────────────────────── */
         // Elimina cualquier mensaje o estado de validación que haya quedado en los formularios.
         function limpiarErroresModal() {
-            document.querySelectorAll('#formCrearDocente .campo-error, #formAsignarInfo .campo-error').forEach(el => el
+            document.querySelectorAll('#formDocente .campo-error, #formAsignarInfo .campo-error').forEach(el => el
                 .remove());
-            document.querySelectorAll('#formCrearDocente .is-invalid, #formAsignarInfo .is-invalid').forEach(el => el
+            document.querySelectorAll('#formDocente .is-invalid, #formAsignarInfo .is-invalid').forEach(el => el
                 .classList.remove('is-invalid'));
         }
 
         function mostrarErroresModal(errors) {
             limpiarErroresModal();
             for (const [campo, mensajes] of Object.entries(errors)) {
-                const input = document.querySelector(`#formCrearDocente [name="${campo}"]`);
+                const input = document.querySelector(`#formDocente [name="${campo}"]`);
                 if (!input) continue;
                 input.classList.add('is-invalid');
                 const div = document.createElement('div');
@@ -814,68 +881,102 @@
                 div.textContent = mensajes[0];
                 input.insertAdjacentElement('afterend', div);
             }
-            const primero = document.querySelector('#formCrearDocente .is-invalid');
+            const primero = document.querySelector('#formDocente .is-invalid');
             if (primero) primero.focus();
         }
 
-        function abrirModalBSPasswordGenerada() {
-            modalBSPasswordGenerada.show();
-        }
-
         /* ── Crear docente (AJAX) ────────────────────────────────────── */
-        document.getElementById('formCrearDocente').addEventListener('submit', async function(e) {
+        document.getElementById('formDocente').addEventListener('submit', async function(e) {
             e.preventDefault();
 
             if (tipoPost == 1) {
-                const btn = document.getElementById('btnCrearDocente');
+                const btn = document.getElementById('btnDocente');
                 btn.disabled = true;
                 btn.textContent = 'Guardando…';
-
+                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardando…';
                 const formData = new FormData(this);
                 const datos = Object.fromEntries(formData.entries());
                 const res = await ajaxRequest(URL_DOCENTES, 'POST', datos);
-
+                let titulo = '';
                 btn.disabled = false;
                 btn.textContent = 'Crear Docente';
+                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardar';
                 if (res.success) {
                     document.getElementById('passwordGenerada').value =
                         res.password_generada;
-
+                    document.getElementById('asignar_email').value = datos.email ?? '';
+                    modalBS.hide();
+                    const btnPdf = document.getElementById('btnDescargarPdf');
+                    btnPdf.dataset.docenteId = res.docente.id;
                     abrirModalBSPasswordGenerada();
-
-                    mostrarToast('success', res.message);
-
                     await cargarTabla(location.href);
+                    document.getElementById('modalBSPasswordGenerada')
+                        .addEventListener('hidden.bs.modal', function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                timer: 1600,
+                                showConfirmButton: false,
+                            });
+                        });
                 } else if (res.errors && Object.keys(res.errors).length) {
                     mostrarErroresModal(res.errors);
                 } else {
-                    mostrarToast('error', res.message || 'Error al crear el docente');
+                    Swal.fire(
+                        'Error al crear el docente',
+                        res.message,
+                        'error'
+                    );
                 }
             } else {
-                const btn = document.getElementById('btnCrearDocente');
+                const btn = document.getElementById('btnDocente');
                 btn.disabled = true;
                 btn.textContent = 'Guardando…';
+                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardando…';
                 const formData = new FormData(this);
                 const datos = Object.fromEntries(formData.entries());
                 const id = id_editar;
                 const res = await ajaxRequest(`${URL_DOCENTES}/${id}`, 'PUT', datos);
                 btn.disabled = false;
                 btn.textContent = 'Guardar';
-
+                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardar';
+                let titulo = '';
+                let texto = '';
                 if (res.success && res.password_generada) {
                     document.getElementById('passwordGenerada').value =
                         res.password_generada;
-                    abrirModalBSPasswordGenerada();
-                    mostrarToast('success', res.message || 'Datos del docente actualizados.');
+                    document.getElementById('asignar_email').value = datos.email ?? '';
+                    modalBS.hide();
+                    const btnPdf = document.getElementById('btnDescargarPdf');
+                    btnPdf.dataset.docenteId = res.docente.id;
+                    btnPdf.dataset.nombre = res.docente.nombre;
+                    abrirModalBSPasswordGeneradaEditar();
                     await cargarTabla(location.href);
+                    document.getElementById('modalBSPasswordGenerada')
+                        .addEventListener('hidden.bs.modal', function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                timer: 1600,
+                                showConfirmButton: false,
+                            });
+                        });
                 } else if (res.success) {
-                    mostrarToast('success', res.message || 'Datos del docente actualizados.');
+                    modalBS.hide();
+                    Swal.fire({
+                        icon: 'success',
+                        title: res.message,
+                        timer: 1600,
+                        showConfirmButton: false,
+                    });
                     await cargarTabla(location.href);
                 } else if (res.errors && Object.keys(res.errors).length) {
                     mostrarErroresModal(res.errors);
                 }
             }
         });
+
+
 
         /* ── Eliminar docente (AJAX) ─────────────────────────────────── */
         document.addEventListener('click', async function(e) {
@@ -884,10 +985,11 @@
 
             const id = btn.dataset.id;
             const nombre = btn.dataset.nombre;
+            const apellido = btn.dataset.apellido;
 
             const confirmacion = await Swal.fire({
                 title: '¿Eliminar docente?',
-                text: `"${nombre}" será eliminado permanentemente.`,
+                text: `"${nombre} ${apellido}" será eliminado.`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, eliminar',
@@ -979,7 +1081,8 @@
                 mensaje.className = 'text-danger';
             }
         }
-
+        // Generar contraseña aleatoria.
+        // Esta función se utiliza para generar una contraseña aleatoria cuando se crea un nuevo docente.
         function generarPasswordAleatoria() {
             const length = 8;
             const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -1065,6 +1168,7 @@
 
         });
 
+        // Actualizar el estado del docente.
         function actualizarEstado(id, checkbox) {
             $.ajax({
                 url: `${URL_DOCENTES}/${id}/toggle-activo`,
@@ -1075,7 +1179,7 @@
                 success: function(response) {
                     Swal.fire({
                         icon: 'success',
-                        title: response.estado ?
+                        title: response.estado === 'activo' ?
                             'Docente activado' : 'Docente desactivado',
                         timer: 1500,
                         showConfirmButton: false
@@ -1092,5 +1196,33 @@
                 }
             });
         }
+        // Copiar contraseña al portapapeles.
+        $(document).on('click', '.btn-copiar', function() {
+            const inputId = $(this).data('target');
+            const texto = $('#' + inputId).val();
+            navigator.clipboard.writeText(texto)
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copiado al portapapeles',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                })
+                .catch(() => {
+                    Swal.fire(
+                        'Error',
+                        'No fue posible copiar el texto.',
+                        'error'
+                    );
+                });
+
+        });
+        // Descargar PDF del docente seleccionado.
+        document.getElementById('btnDescargarPdf')
+            .addEventListener('click', function() {
+                const id = this.dataset.docenteId;
+                window.open(`${URL_DOCENTES}/${id}/generar-pdf`, '_blank');
+            });
     </script>
 @endpush

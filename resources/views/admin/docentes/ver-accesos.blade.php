@@ -1,6 +1,6 @@
-<div class="modal fade" id="modalVerAccesos" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
-    aria-labelledby="modalVerAccesosLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
+<div class="modal fade" id="modalVerAccesos" tabindex="-1" data-bs-keyboard="false" aria-labelledby="modalVerAccesosLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl ">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-header-icon"><i class="fa-solid fa-clock-rotate-left text-white"></i></div>
@@ -12,21 +12,26 @@
             </div>
 
             <div class="modal-body">
+                {{-- ── Alerta de accesos fuera del rango permitido ──────────────────────── --}}
                 <div id="alertaAccesosFueraRango" class="alert alert-warning d-none" role="alert">
                     <i class="fa-solid fa-triangle-exclamation"></i>
-                    Hay accesos desde IP fuera del rango permitido <strong id="textoRangoPermitido">192.168.1.0/24</strong>.
+                    Hay accesos desde IP fuera del rango permitido <strong
+                        id="textoRangoPermitido">192.168.1.0/24</strong>.
                 </div>
 
+                {{-- ── Cargando historial de accesos ──────────────────────── --}}
                 <div id="cargandoAccesos" class="text-center py-4 text-muted">
                     <i class="fa-solid fa-spinner fa-spin"></i> Cargando historial...
                 </div>
 
+                {{-- ── Mensaje de que el docente no tiene accesos registrados ──────────────────────── --}}
                 <div id="mensajeSinAccesos" class="text-center py-4 text-muted d-none">
                     Este docente todavía no tiene accesos registrados.
                 </div>
 
+                {{-- ── Tabla de accesos ──────────────────────── --}}
                 <div class="table-container">
-                    <table class="table table-striped align-middle">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -41,7 +46,8 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn" style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
+                    data-bs-dismiss="modal"> <i class="fa-solid fa-xmark"></i> Cerrar</button>
             </div>
         </div>
     </div>
@@ -55,6 +61,9 @@
             limpiarModalVerAccesos();
         });
 
+        // Funcion para limpiar el modal de ver accesos
+        // Se limpia la tabla, se oculta el mensaje de que no hay accesos registrados y se oculta el alerta de accesos fuera del rango permitido
+        // Se muestra el cargando y se limpia el subtitulo del modal
         function limpiarModalVerAccesos() {
             document.getElementById('cuerpoTablaAccesos').innerHTML = '';
             document.getElementById('mensajeSinAccesos').classList.add('d-none');
@@ -63,6 +72,12 @@
             document.getElementById('modalVerAccesosSubtitle').textContent = 'Últimos 30 ingresos registrados';
         }
 
+        // Funcion para abrir el modal de ver accesos
+        // id es el id del docente
+        // Se limpia el modal y se muestra el cargando
+        // Se hace una peticion a la API para obtener los datos del historial de accesos
+        // Se pinta el historial de accesos en la tabla
+        // Si hay un error, se muestra un toast de error
         async function abrirModalVerAccesos(id) {
             limpiarModalVerAccesos();
             modalBSVerAccesos.show();
@@ -82,7 +97,13 @@
                 document.getElementById('cargandoAccesos').classList.add('d-none');
             }
         }
-
+        // Funcion para pintar el historial de accesos en la tabla
+        // data es el objeto que contiene los datos del historial de accesos
+        // data.accesos es el array de accesos
+        // data.docente.nombre es el nombre del docente
+        // data.docente.email es el email del docente
+        // data.tiene_accesos_fuera_rango es el booleano que indica si hay accesos fuera del rango permitido
+        // data.rango_permitido es el rango permitido
         function pintarHistorialAccesos(data) {
             const tbody = document.getElementById('cuerpoTablaAccesos');
             const accesos = data.accesos ?? [];
@@ -116,6 +137,10 @@
             `).join('');
         }
 
+        // Funcion para escapar el HTML de la IP registrada
+        // value es el valor de la IP registrada
+        // Se crea un div y se le asigna el valor de la IP registrada
+        // Se retorna el innerHTML del div
         function escapeHtml(value) {
             // Los accesos vienen de base de datos; escapar evita inyectar HTML accidentalmente desde la IP registrada.
             const div = document.createElement('div');
