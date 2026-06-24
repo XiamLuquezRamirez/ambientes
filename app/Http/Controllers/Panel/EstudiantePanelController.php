@@ -5,19 +5,23 @@ use App\Http\Controllers\Controller;
 use App\Models\Estudiante;
 use App\Models\SyncQueue;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class EstudiantePanelController extends Controller
 {
     private function obtenerAmbiente()
     {
-        return Auth::guard('docente')->user()->docente->ambiente;
+        return \App\Models\Ambiente::where('slug', config('ambiente.slug'))
+            ->where('activo', true)
+            ->firstOrFail();
     }
 
     public function listar()
     {
         $ambiente    = $this->obtenerAmbiente();
-        $estudiantes = $ambiente->estudiantes()->orderBy('nombre')->get();
+        $estudiantes = $ambiente->estudiantes()
+            ->wherePivot('anio_lectivo', date('Y'))
+            ->orderBy('nombre')
+            ->get();
         return view('panel.estudiantes.index', compact('ambiente', 'estudiantes'));
     }
 
@@ -40,7 +44,10 @@ class EstudiantePanelController extends Controller
 
         $datos['activo'] = true;
         $estudiante = Estudiante::create($datos);
-        $ambiente->estudiantes()->attach($estudiante->id);
+        $ambiente->estudiantes()->attach($estudiante->id, [
+            'anio_lectivo' => date('Y'),
+            'estado'       => 'activo',
+        ]);
 
         SyncQueue::create([
             'entidad'         => 'Estudiante',

@@ -35,7 +35,7 @@ class Grupo extends Model
         return $this->grado->nombre . ' ' . $this->nombre;
     }
 
-    public function totalEstudiantes(): int
+    public function totalMatriculas(): int
     {
         return $this->matriculas()
             ->where('estado', 'activo')

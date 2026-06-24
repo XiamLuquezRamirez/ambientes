@@ -22,21 +22,31 @@ class SesionNinoController extends Controller
     public function mostrarSeleccionAlumno()
     {
         $ambiente    = $this->obtenerAmbiente();
-        $estudiantes = $ambiente->estudiantes()->where('activo', true)->get();
+        $estudiantes = $ambiente->estudiantes()
+            ->wherePivot('anio_lectivo', date('Y'))
+            ->where('activo', true)
+            ->orderBy('nombre')
+            ->get();
         return view('auth.seleccionar-alumno', compact('ambiente', 'estudiantes'));
     }
 
     public function mostrarPin(int $estudianteId)
     {
         $ambiente   = $this->obtenerAmbiente();
-        $estudiante = $ambiente->estudiantes()->where('estudiantes.id', $estudianteId)->firstOrFail();
+        $estudiante = $ambiente->estudiantes()
+            ->wherePivot('anio_lectivo', date('Y'))
+            ->where('estudiantes.id', $estudianteId)
+            ->firstOrFail();
         return view('auth.pin-figuras', compact('ambiente', 'estudiante'));
     }
 
     public function verificarPin(Request $request, int $estudianteId)
     {
         $ambiente   = $this->obtenerAmbiente();
-        $estudiante = $ambiente->estudiantes()->where('estudiantes.id', $estudianteId)->firstOrFail();
+        $estudiante = $ambiente->estudiantes()
+            ->wherePivot('anio_lectivo', date('Y'))
+            ->where('estudiantes.id', $estudianteId)
+            ->firstOrFail();
         $pin        = $estudiante->configuracionPin;
 
         if (!$pin) {

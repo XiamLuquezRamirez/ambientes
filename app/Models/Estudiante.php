@@ -48,6 +48,13 @@ class Estudiante extends Model
             ->where('anio_lectivo', date('Y'));
     }
 
+    public function matriculasActivas()
+    {
+        return $this->hasMany(Matricula::class)
+            ->where('estado', 'activo')
+            ->where('anio_lectivo', date('Y'));
+    }
+
     public function piar()
     {
         return $this->hasOne(Piar::class);
@@ -66,5 +73,17 @@ class Estudiante extends Model
     public function ajustesTemporales()
     {
         return $this->hasMany(AjusteTemporal::class);
+    }
+
+    public function ambientes()
+    {
+        return $this->belongsToMany(Ambiente::class, 'estudiante_ambiente')
+            ->withPivot(['anio_lectivo', 'estado', 'observacion'])
+            ->withTimestamps();
+    }
+
+    public function asignacionesAmbiente()
+    {
+        return $this->hasMany(EstudianteAmbiente::class);
     }
 }

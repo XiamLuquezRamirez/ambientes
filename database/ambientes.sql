@@ -52,6 +52,38 @@ CREATE TABLE `ajustes_temporales` (
 
 /*Data for the table `ajustes_temporales` */
 
+/*Table structure for table `ambiente_grado` */
+
+DROP TABLE IF EXISTS `ambiente_grado`;
+
+CREATE TABLE `ambiente_grado` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `ambiente_id` bigint(20) unsigned NOT NULL,
+  `grado_id` bigint(20) unsigned NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ambiente_id` (`ambiente_id`,`grado_id`),
+  KEY `grado_id` (`grado_id`),
+  CONSTRAINT `ambiente_grado_ibfk_1` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`),
+  CONSTRAINT `ambiente_grado_ibfk_2` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Data for the table `ambiente_grado` */
+
+insert  into `ambiente_grado`(`id`,`ambiente_id`,`grado_id`,`activo`) values 
+(1,1,1,1),
+(2,1,2,1),
+(3,1,3,1),
+(4,2,1,1),
+(5,2,2,1),
+(6,3,2,1),
+(7,3,3,1),
+(8,4,1,1),
+(9,4,2,1),
+(10,4,3,1),
+(11,5,3,1),
+(12,3,1,1);
+
 /*Table structure for table `ambientes` */
 
 DROP TABLE IF EXISTS `ambientes`;
@@ -64,6 +96,7 @@ CREATE TABLE `ambientes` (
   `icono` varchar(255) NOT NULL,
   `servidor_ip` varchar(15) DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `cupo_defecto` smallint(5) unsigned NOT NULL DEFAULT 25,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -72,12 +105,12 @@ CREATE TABLE `ambientes` (
 
 /*Data for the table `ambientes` */
 
-insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`created_at`,`updated_at`) values 
-(1,'Música','musica','#0F6E56','?','192.168.1.20',1,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(2,'Polimotor','polimotor','#534AB7','?','192.168.1.21',1,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(3,'Lógico','logico','#854F0B','?','192.168.1.22',1,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(4,'Multisensorial','multisensorial','#185FA5','?','192.168.1.23',1,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(5,'Tecnología','tecnologia','#993C1D','?','192.168.1.24',1,'2026-06-16 00:02:01','2026-06-16 00:02:01');
+insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values 
+(1,'Música','musica','#0F6E56','?','192.168.1.20',1,25,'2026-06-16 00:02:01','2026-06-17 18:34:22'),
+(2,'Polimotor','polimotor','#534AB7','?','192.168.1.21',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
+(3,'Lógico','logico','#854F0B','?','192.168.1.22',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
+(4,'Multisensorial','multisensorial','#185FA5','?','192.168.1.23',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
+(5,'Tecnología','tecnologia','#993C1D','?','192.168.1.24',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01');
 
 /*Table structure for table `asistencias` */
 
@@ -162,26 +195,31 @@ DROP TABLE IF EXISTS `configuracion_pins`;
 CREATE TABLE `configuracion_pins` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint(20) unsigned NOT NULL,
-  `figura_1` enum('circulo','estrella','corazon','triangulo','cuadrado','luna','diamante','rayo') NOT NULL,
-  `figura_2` enum('circulo','estrella','corazon','triangulo','cuadrado','luna','diamante','rayo') NOT NULL,
-  `figura_3` enum('circulo','estrella','corazon','triangulo','cuadrado','luna','diamante','rayo') NOT NULL,
+  `figura_1` varchar(20) NOT NULL,
+  `color_figura_1` varchar(20) DEFAULT NULL,
+  `figura_2` varchar(20) NOT NULL,
+  `color_figura_2` varchar(20) DEFAULT NULL,
+  `figura_3` varchar(20) NOT NULL,
+  `color_figura_3` varchar(20) DEFAULT NULL,
   `intentos_fallidos` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `configuracion_pins_estudiante_id_foreign` (`estudiante_id`),
   CONSTRAINT `configuracion_pins_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `configuracion_pins` */
 
-insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`figura_2`,`figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values 
-(1,1,'circulo','estrella','corazon',0,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(2,2,'estrella','triangulo','luna',0,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(3,3,'corazon','diamante','cuadrado',0,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(4,4,'triangulo','rayo','estrella',0,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(5,5,'luna','circulo','diamante',0,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(6,6,'rayo','corazon','triangulo',0,'2026-06-16 00:02:01','2026-06-16 00:02:01');
+insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_1`,`figura_2`,`color_figura_2`,`figura_3`,`color_figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values 
+(7,31,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 15:23:30','2026-06-23 16:03:55'),
+(8,32,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-06-23 15:31:26','2026-06-23 16:03:33'),
+(9,33,'fas fa-star','#ff9019','fas fa-heart','#ff0606','fas fa-fish','#0f54ff',0,'2026-06-23 15:34:40','2026-06-23 15:34:40'),
+(10,34,'fas fa-fish','#0f54ff','fas fa-heart','#ff0606','fas fa-circle','#f933e9',0,'2026-06-23 15:35:48','2026-06-23 15:35:48'),
+(11,13,'fas fa-fish','#0f54ff','fas fa-fish','#0f54ff','fas fa-fish','#0f54ff',0,'2026-06-23 16:14:31','2026-06-23 17:12:10'),
+(12,11,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:15:42','2026-06-23 16:15:42'),
+(13,5,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:16:06','2026-06-23 16:16:06'),
+(14,12,'fas fa-heart','#ff0606','fas fa-fish','#0f54ff','fas fa-square','#437124',0,'2026-06-23 16:39:05','2026-06-23 16:39:05');
 
 /*Table structure for table `configuraciones` */
 
@@ -214,31 +252,51 @@ CREATE TABLE `docentes` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint(20) unsigned NOT NULL,
   `telefono` varchar(20) DEFAULT NULL,
+  `direccion` varchar(150) DEFAULT NULL,
   `especialidad` varchar(100) DEFAULT NULL,
   `fecha_ingreso` date DEFAULT NULL,
   `foto_url` varchar(255) DEFAULT NULL,
   `descripcion` text DEFAULT NULL,
+  `estado` enum('activo','inactivo','eliminado') DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `docentes_user_id_foreign` (`user_id`),
   CONSTRAINT `docentes_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `docentes` */
 
-insert  into `docentes`(`id`,`user_id`,`telefono`,`especialidad`,`fecha_ingreso`,`foto_url`,`descripcion`,`created_at`,`updated_at`) values 
-(1,2,NULL,NULL,NULL,NULL,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
-(2,4,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(3,5,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(4,6,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(5,7,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(6,8,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(7,9,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(8,10,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(9,11,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(10,12,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(11,13,NULL,NULL,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50');
+insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`foto_url`,`descripcion`,`estado`,`created_at`,`updated_at`) values 
+(1,2,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'eliminado','2026-06-16 00:02:02','2026-06-24 15:50:15'),
+(2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'activo','2026-06-16 17:32:50','2026-06-24 15:57:11'),
+(3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'activo','2026-06-16 17:32:50','2026-06-23 14:23:57');
+
+/*Table structure for table `estudiante_ambiente` */
+
+DROP TABLE IF EXISTS `estudiante_ambiente`;
+
+CREATE TABLE `estudiante_ambiente` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `estudiante_id` bigint(20) unsigned NOT NULL,
+  `ambiente_id` bigint(20) unsigned NOT NULL,
+  `anio_lectivo` smallint(5) unsigned NOT NULL,
+  `estado` enum('activo','restringido','adaptado') NOT NULL DEFAULT 'activo',
+  `observacion` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ea_unique` (`estudiante_id`,`ambiente_id`,`anio_lectivo`),
+  KEY `estudiante_ambiente_ambiente_id_foreign` (`ambiente_id`),
+  CONSTRAINT `estudiante_ambiente_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `estudiante_ambiente_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `estudiante_ambiente` */
+
+insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`created_at`,`updated_at`) values 
+(1,13,3,2026,'activo',NULL,'2026-06-24 09:05:13','2026-06-24 09:05:13'),
+(2,11,3,2026,'activo',NULL,'2026-06-24 09:05:13','2026-06-24 09:05:13');
 
 /*Table structure for table `estudiantes` */
 
@@ -247,24 +305,49 @@ DROP TABLE IF EXISTS `estudiantes`;
 CREATE TABLE `estudiantes` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(255) NOT NULL,
+  `avatar` text DEFAULT NULL,
+  `identificacion` int(11) DEFAULT NULL,
   `iniciales` varchar(3) NOT NULL,
+  `grado_id` text DEFAULT NULL,
   `color_avatar` varchar(9) NOT NULL DEFAULT '#0F6E56',
-  `condicion` enum('estandar','tea','tdah','disc_visual','disc_auditiva','disc_motriz','down') NOT NULL DEFAULT 'estandar',
+  `condicion_id` int(11) NOT NULL DEFAULT 1,
   `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `fecha_nacimiento` text DEFAULT NULL,
+  `acudiente` text DEFAULT NULL,
+  `telefono_acudiente` text DEFAULT NULL,
+  `requiere_apoyo` varchar(15) NOT NULL DEFAULT 'no',
+  `sexo` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `estado_piar` int(11) DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiantes` */
 
-insert  into `estudiantes`(`id`,`nombre`,`iniciales`,`color_avatar`,`condicion`,`activo`,`created_at`,`updated_at`) values 
-(1,'Valentina','VA','#0F6E56','estandar',1,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(2,'Mateo','MA','#534AB7','estandar',1,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(3,'Sofía','SO','#854F0B','estandar',1,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(4,'Juan','JU','#185FA5','estandar',1,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(5,'Camila','CA','#993C1D','estandar',1,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(6,'Luna','LU','#F59E0B','estandar',1,'2026-06-16 00:02:01','2026-06-16 00:02:01');
+insert  into `estudiantes`(`id`,`nombre`,`avatar`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`condicion_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`requiere_apoyo`,`sexo`,`created_at`,`updated_at`,`estado_piar`) values 
+(1,'Valentina',NULL,1111,'VA',NULL,'#0F6E56',1,1,'2021-01-17',NULL,NULL,'no',NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01',0),
+(2,'Mateo',NULL,2222,'MA',NULL,'#534AB7',1,1,'2018-01-22',NULL,NULL,'no',NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01',0),
+(3,'Sofía',NULL,3333,'SO',NULL,'#854F0B',1,0,'2018-01-22',NULL,NULL,'si',NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01',0),
+(4,'Juan',NULL,4444,'JU',NULL,'#185FA5',1,1,'2018-01-22',NULL,NULL,'no',NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01',0),
+(5,'Camila',NULL,5555,'CA',NULL,'#993C1D',1,1,'2018-01-22',NULL,NULL,'no',NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01',0),
+(6,'Luna',NULL,6666,'LU',NULL,'#F59E0B',1,1,'2018-01-22',NULL,NULL,'no',NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01',0),
+(7,'José',NULL,134123123,'Jo','1','#0F6E56',1,1,'2018-01-22','Juana','245234234','no',NULL,'2026-06-18 16:04:20','2026-06-18 16:04:20',0),
+(8,'José',NULL,134123123,'Jo','1','#0F6E56',1,1,'2018-01-22','Juana','245234234','no',NULL,'2026-06-18 16:04:36','2026-06-18 16:04:36',0),
+(9,'Fabian Mendez',NULL,123123123,'FM','3','#0F6E56',1,1,'2018-01-22','Juana 2','32434234','no',NULL,'2026-06-18 16:08:25','2026-06-18 16:08:25',0),
+(10,'Juan Lopez 3',NULL,3423423,'JL','2','#0F6E56',1,1,'2018-01-22','Juana 5','3423423','no',NULL,'2026-06-18 16:12:47','2026-06-18 16:12:47',0),
+(11,'Andres quintero',NULL,5345345,'AQ','1','#0F6E56',1,1,'2018-01-22','yyyyyyy','5345345','no',NULL,'2026-06-18 16:19:02','2026-06-18 16:19:02',0),
+(12,'Fabian Mendez Quintero',NULL,342423,'FM','1','#0F6E56',1,1,'2019-05-16','hfghfghfgh','634634','no',NULL,'2026-06-18 16:56:48','2026-06-18 16:56:48',0),
+(13,'Andrea Rodriguez','estudiantes/lNIZ6VFiTteCno5FKRNh5FCY37imQS7xXLNXdP9U.jpg',5345345,'AR','1','#ffb81f',1,1,'2023-12-10','Julian Rodriguez','45345','si','femenino','2026-06-18 17:15:22','2026-06-23 09:59:35',0),
+(14,'Xiamir luquez','estudiantes/23NS51sSHtdWtH2tQynzAD0EfRAd6m2WaZensqbP.webp',4353453,'XL','1','#0F6E56',1,1,'2021-06-12','yyyy','345345','no',NULL,'2026-06-18 17:20:14','2026-06-18 17:20:14',0),
+(15,'Juan David  Perez',NULL,6456456,'JD',NULL,'#ff8a05',1,1,'2023-06-07','tttt','345345','no',NULL,'2026-06-19 08:00:29','2026-06-19 08:00:29',0),
+(16,'Juana Lopera',NULL,654645,'JL',NULL,'#79fbf9',1,1,'2014-07-12','uuuu','6666','no',NULL,'2026-06-19 08:01:32','2026-06-19 08:01:32',0),
+(17,'Luisa Castro',NULL,525252,'LC',NULL,'#ff0000',1,1,'2020-01-12','yyyy','23423423','no',NULL,'2026-06-19 14:17:51','2026-06-19 14:17:51',0),
+(18,'pedro velazques',NULL,34534534,'PV',NULL,'#3d2258',1,1,'2026-06-23','ertert','334634634','no',NULL,'2026-06-20 10:12:28','2026-06-20 10:12:28',0),
+(19,'Julio Jaramillo',NULL,12323123,'JJ',NULL,'#ba79fb',1,1,'2017-05-23','ghdfh','345345','no',NULL,'2026-06-20 10:16:15','2026-06-20 10:16:15',0),
+(20,'Olimpo cardenas',NULL,324234,'OC',NULL,'#ba79fb',1,1,'2022-12-12','234234','45345','no',NULL,'2026-06-20 10:19:58','2026-06-20 10:19:58',0),
+(21,'Nicola Di Bari',NULL,5634545,'ND',NULL,'#ba79fb',1,1,'2000-01-22','fgfdgdfgdf','34534','no',NULL,'2026-06-20 10:39:00','2026-06-20 10:39:00',0),
+(26,'fghfghfg',NULL,45345,'FG','2','#ba79fb',1,1,'2024-06-17','5etrwetr','34534','en_proceso','femenino','2026-06-22 15:20:25','2026-06-22 15:20:25',0);
 
 /*Table structure for table `failed_jobs` */
 
@@ -321,19 +404,20 @@ CREATE TABLE `grupos` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `grupos_grado_id_nombre_anio_lectivo_unique` (`grado_id`,`nombre`,`anio_lectivo`),
+  UNIQUE KEY `grp_unique` (`grado_id`,`nombre`,`anio_lectivo`),
   CONSTRAINT `grupos_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `grupos` */
 
 insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`activo`,`created_at`,`updated_at`) values 
 (1,1,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
-(2,1,'B',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (3,2,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (4,2,'B',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (5,3,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
-(6,3,'B',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18');
+(6,3,'B',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
+(23,2,'C',2026,25,1,'2026-06-18 12:23:28','2026-06-18 12:23:28'),
+(26,1,'A',2027,25,1,'2026-06-19 09:57:51','2026-06-19 09:57:51');
 
 /*Table structure for table `matriculas` */
 
@@ -351,23 +435,28 @@ CREATE TABLE `matriculas` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_matricula_activa` (`estudiante_id`,`anio_lectivo`),
+  UNIQUE KEY `mat_unique` (`estudiante_id`,`anio_lectivo`),
   KEY `matriculas_grupo_id_anio_lectivo_estado_index` (`grupo_id`,`anio_lectivo`,`estado`),
   KEY `matriculas_grado_id_anio_lectivo_index` (`grado_id`,`anio_lectivo`),
   CONSTRAINT `matriculas_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
   CONSTRAINT `matriculas_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`),
   CONSTRAINT `matriculas_grupo_id_foreign` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `matriculas` */
 
 insert  into `matriculas`(`id`,`estudiante_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`estado`,`fecha_ingreso`,`fecha_egreso`,`created_at`,`updated_at`) values 
-(1,1,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-16 19:35:19'),
-(2,2,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-16 19:35:19'),
-(3,3,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-16 19:35:19'),
-(4,4,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-16 19:35:19'),
-(5,5,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-16 19:35:19'),
-(6,6,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-16 19:35:19');
+(1,1,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:32'),
+(2,2,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:36'),
+(3,3,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:39'),
+(4,4,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:43'),
+(5,5,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:50'),
+(17,5,1,1,2027,'activo','2026-06-19',NULL,'2026-06-19 17:54:51','2026-06-19 17:54:51'),
+(18,4,1,1,2027,'activo','2026-06-19',NULL,'2026-06-19 17:54:51','2026-06-19 17:54:51'),
+(19,1,1,26,2027,'promovido','2026-06-20','2026-06-20','2026-06-20 11:45:40','2026-06-20 11:53:46'),
+(20,2,1,26,2027,'promovido','2026-06-20','2026-06-20','2026-06-20 11:45:40','2026-06-20 11:53:46'),
+(21,3,1,26,2027,'promovido','2026-06-20','2026-06-20','2026-06-20 11:45:40','2026-06-20 11:53:46'),
+(22,12,1,1,2026,'promovido','2026-06-23','2026-06-23','2026-06-23 10:38:47','2026-06-23 15:32:21');
 
 /*Table structure for table `migrations` */
 
@@ -378,7 +467,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `migrations` */
 
@@ -412,7 +501,14 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (27,'2026_06_17_000006_eliminar_ambiente_estudiante',3),
 (28,'2026_06_17_000007_eliminar_ambiente_id_docentes',3),
 (29,'2026_06_17_000008_simplificar_rol_users',4),
-(30,'2026_06_17_000009_drop_docente_grupo',4);
+(31,'2026_06_17_000009_drop_docente_grupo',5),
+(32,'2026_06_17_155731_create_ambiente_grado_table',5),
+(34,'2026_06_17_155747_add_ambiente_id_to_grupos_table',5),
+(36,'2026_06_18_000001_add_cupo_defecto_to_ambientes_table',6),
+(37,'2026_06_19_000001_restructure_matriculas_y_grupos',7),
+(38,'2026_06_23_000001_actualizar_campos_estudiantes',8),
+(39,'2026_06_23_000002_actualizar_campos_docentes',9),
+(40,'2026_06_23_000003_actualizar_campos_configuracion_pins',10);
 
 /*Table structure for table `modulos` */
 
@@ -575,15 +671,29 @@ CREATE TABLE `registros_acceso` (
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `registros_acceso` */
 
 insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`) values 
-(1,1,'127.0.0.1','polimotor','2026-06-16 00:02:47'),
-(2,1,'127.0.0.1','polimotor','2026-06-16 16:48:49'),
-(3,1,'127.0.0.1','polimotor','2026-06-16 17:08:12'),
-(4,1,'127.0.0.1','polimotor','2026-06-16 17:10:36');
+(10,3,'127.0.0.1','polimotor','2026-06-18 17:16:38'),
+(11,3,'127.0.0.1','polimotor','2026-06-19 09:16:42'),
+(12,3,'127.0.0.1','polimotor','2026-06-19 10:46:12'),
+(13,3,'127.0.0.1','polimotor','2026-06-19 11:04:19'),
+(14,3,'127.0.0.1','polimotor','2026-06-19 15:46:05'),
+(15,3,'127.0.0.1','polimotor','2026-06-19 15:47:12'),
+(16,3,'127.0.0.1','polimotor','2026-06-19 17:36:25'),
+(17,3,'127.0.0.1','polimotor','2026-06-20 11:10:00'),
+(18,3,'127.0.0.1','polimotor','2026-06-20 11:53:57'),
+(19,3,'127.0.0.1','polimotor','2026-06-21 22:33:39'),
+(20,3,'127.0.0.1','polimotor','2026-06-22 08:43:43'),
+(21,3,'127.0.0.1','polimotor','2026-06-22 14:27:15'),
+(22,3,'127.0.0.1','polimotor','2026-06-23 08:26:20'),
+(23,3,'127.0.0.1','polimotor','2026-06-23 11:11:53'),
+(24,3,'127.0.0.1','polimotor','2026-06-23 15:28:21'),
+(25,3,'127.0.0.1','polimotor','2026-06-24 09:03:55'),
+(26,3,'127.0.0.1','polimotor','2026-06-24 09:13:34'),
+(27,3,'127.0.0.1','polimotor','2026-06-24 14:31:48');
 
 /*Table structure for table `temas` */
 
@@ -615,7 +725,9 @@ DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `identificacion` varchar(50) NOT NULL,
   `nombre` varchar(255) NOT NULL,
+  `apellido` varchar(255) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `rol` enum('admin','docente') NOT NULL DEFAULT 'docente',
@@ -623,28 +735,28 @@ CREATE TABLE `users` (
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `bloqueado_en` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `users` */
 
-insert  into `users`(`id`,`nombre`,`email`,`password`,`rol`,`activo`,`remember_token`,`created_at`,`updated_at`) values 
-(1,'Administrador','admin@aulasreggio.test','$2y$10$P1TQ9xzrgEwMxts8zd8I8ObTonAsb4zkJCcy/6Cec681x0jGYmc5e','admin',1,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(2,'Docente Líder Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente',1,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
-(3,'svsdv','admin@alcaldia.gov.co','$2y$10$09lQTSJMsJSqG1DBRQMF.u5RgT.gdg0wtwLbEaoy85I5/RRJBlXA2','docente',1,NULL,'2026-06-16 00:12:01','2026-06-16 00:12:01'),
-(4,'Ana Sofia Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(5,'Carlos Eduardo Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(6,'Maria Fernanda Lopez','maria.lopez@aulasreggio.test','$2y$10$IbOTCndCL4IOh8onIxVRiuJDeLpBfdEXDpxfdZuwIgq3Zi1vY8EqS','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(7,'Jorge Luis Martinez','jorge.martinez@aulasreggio.test','$2y$10$rDzC74Ze6pmumLs7bWBOjOwGNea5lCtZ9adym4fhrqSsb.26L4eG2','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(8,'Laura Valentina Torres','laura.torres@aulasreggio.test','$2y$10$ZDHYEz4BE9bk6klx3d1m0.ahZdMVbq529pq3zsturZltFeYOte/Vi','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(9,'Sebastian Felipe Gomez','sebastian.gomez@aulasreggio.test','$2y$10$Beizcu7u5jKpws.5KjvCQePwF2fJtB5cEdHdqD18bm4WlBsSYOhpy','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(10,'Daniela Paola Vargas','daniela.vargas@aulasreggio.test','$2y$10$ktfn.me/EGyB9U7ZcnO15uyIVgwctNshg9FngAUPMn451GErJxOnm','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(11,'Andres Felipe Rojas','andres.rojas@aulasreggio.test','$2y$10$iywC4mD8f5r13hPX6HGOOufZkCqMV.gAGRs/h3F3CN/V1rCvOt3sq','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(12,'Natalia Alejandra Cruz','natalia.cruz@aulasreggio.test','$2y$10$bN/LOLfQiKjTC12vdl3uTutiKsngQ344gDF507hc6YsdpRX85XKS2','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(13,'Juan Pablo Herrera','juan.herrera@aulasreggio.test','$2y$10$uiFhUMOeWjEjBtwY4kxcMewe9dXimg7ikaOJ3jFiY2P2AtWfjG9Uu','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(14,'Camila Andrea Mora','camila.mora@aulasreggio.test','$2y$10$ZVq5aurxoqa1KVRv7LgujO.zag/lhphPOf.0MsNkhgUulU3U./QmG','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(15,'Ricardo Andres Silva','ricardo.silva@aulasreggio.test','$2y$10$.bghvK6emeHQyaxnz3V2vOZVc1s/RkeSQpA8NZOdOrkqF29iGberC','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50');
+insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`activo`,`remember_token`,`created_at`,`updated_at`,`bloqueado_en`) values 
+(2,'2131231456','Docente Líder','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente',1,NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58',NULL),
+(3,'213123','Adminitrador del sistema',NULL,'admin@aulasreggio.test','$2y$10$wjLu1JkqDfVwAMR7VEkx0eN0K4jQVh5G/75sE.0V9wO1x4GO.3Wlq','admin',1,NULL,'2026-06-16 00:12:01','2026-06-18 17:16:17',NULL),
+(4,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente',1,NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35',NULL),
+(5,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(6,'5346345','Maria Fernanda ','Lopez','maria.lopez@aulasreggio.test','$2y$10$IbOTCndCL4IOh8onIxVRiuJDeLpBfdEXDpxfdZuwIgq3Zi1vY8EqS','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(7,'21341234','Jorge Luis ','Martinez','jorge.martinez@aulasreggio.test','$2y$10$rDzC74Ze6pmumLs7bWBOjOwGNea5lCtZ9adym4fhrqSsb.26L4eG2','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(8,'654645','Laura Valentina ','Torres','laura.torres@aulasreggio.test','$2y$10$ZDHYEz4BE9bk6klx3d1m0.ahZdMVbq529pq3zsturZltFeYOte/Vi','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(9,'2342342','Sebastian Felipe ','Gomez','sebastian.gomez@aulasreggio.test','$2y$10$Beizcu7u5jKpws.5KjvCQePwF2fJtB5cEdHdqD18bm4WlBsSYOhpy','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(10,'5656645','Daniela Paola ','Vargas','daniela.vargas@aulasreggio.test','$2y$10$ktfn.me/EGyB9U7ZcnO15uyIVgwctNshg9FngAUPMn451GErJxOnm','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(11,'234234234','Andres Felipe ','Rojas','andres.rojas@aulasreggio.test','$2y$10$iywC4mD8f5r13hPX6HGOOufZkCqMV.gAGRs/h3F3CN/V1rCvOt3sq','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(12,'43563456','Natalia Alejandra ','Cruz','natalia.cruz@aulasreggio.test','$2y$10$bN/LOLfQiKjTC12vdl3uTutiKsngQ344gDF507hc6YsdpRX85XKS2','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(13,'32454365','Juan Pablo ','Herrera','juan.herrera@aulasreggio.test','$2y$10$uiFhUMOeWjEjBtwY4kxcMewe9dXimg7ikaOJ3jFiY2P2AtWfjG9Uu','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(14,'5345345','Camila Andrea ','Mora','camila.mora@aulasreggio.test','$2y$10$ZVq5aurxoqa1KVRv7LgujO.zag/lhphPOf.0MsNkhgUulU3U./QmG','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(15,'657567567','Ricardo Andres ','Silva','ricardo.silva@aulasreggio.test','$2y$10$.bghvK6emeHQyaxnz3V2vOZVc1s/RkeSQpA8NZOdOrkqF29iGberC','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

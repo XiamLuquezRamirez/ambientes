@@ -20,6 +20,11 @@ class Grado extends Model
         return $this->hasMany(Grupo::class);
     }
 
+    public function gruposDelAnio(int $anio = null)
+    {
+        return $this->grupos()->where('anio_lectivo', $anio ?? date('Y'));
+    }
+
     public function matriculas()
     {
         return $this->hasMany(Matricula::class);
