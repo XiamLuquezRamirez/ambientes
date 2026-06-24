@@ -24,7 +24,7 @@ class AdminSeeder extends Seeder
                 'nombre' => 'Administrador',
                 'password' => Hash::make('password'),
                 'rol' => 'admin',
-                'estado' => true,
+                'estado' => 'activo',
             ]
         );
 
@@ -35,7 +35,7 @@ class AdminSeeder extends Seeder
                 'nombre' => 'Docente Música',
                 'password' => Hash::make('password'),
                 'rol' => 'docente',
-                'estado' => true,
+                'estado' => 'activo',
             ]
         );
 
@@ -84,7 +84,7 @@ class AdminSeeder extends Seeder
                     'entidad_id' => 1,
                     'accion' => 'update',
                     'servidor_origen' => $slug,
-                    'payload' => ['nombre' => 'Valentina', 'activo' => true],
+                    'payload' => ['nombre' => 'Valentina', 'estado' => 'activo'],
                     'estado' => 'confirmado',
                 ]);
             }

@@ -26,7 +26,7 @@ class AuthDocenteController extends Controller
         }
 
         $usuario = Auth::guard('docente')->user();
-        if (! $usuario->estado == true) {
+        if (! $usuario->estado === 'activo') {
             return back()->withErrors([
                 'email' => 'La cuenta se encuentra desactivada.',
             ])->withInput();

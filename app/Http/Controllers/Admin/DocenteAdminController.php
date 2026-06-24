@@ -104,8 +104,8 @@ class DocenteAdminController extends Controller
             'especialidad' => 'required|string|max:150',
             'fecha_ingreso' => 'required|date',
         ]);
-        // Transacción: si falla el perfil docente, no queda un usuario huérfano.
 
+        // Transacción: si falla el perfil docente, no queda un usuario huérfano.
         $docente = DB::transaction(function () use ($datos) {
 
             // Paso 1 — Cuenta de acceso (tabla users).
