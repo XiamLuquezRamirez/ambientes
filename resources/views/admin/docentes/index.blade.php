@@ -681,8 +681,9 @@
                 <div class="modal-footer">
                     <button type="button" class="btn"
                         style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
-                        onclick="cerrarModalAsignarInfo()">Cancelar</button>
-                    <button type="submit" form="formAsignarInfo" id="btnAsignarInfo" class="btn btn-primary">Guardar
+                        onclick="cerrarModalAsignarInfo()"><i class="fa-solid fa-xmark"></i> Cancelar</button>
+                    <button type="submit" form="formAsignarInfo" id="btnAsignarInfo" class="btn btn-primary"><i
+                            class="fa-solid fa-floppy-disk"></i> Guardar
                         Datos</button>
                 </div>
             </div>
