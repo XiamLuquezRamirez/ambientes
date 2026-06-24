@@ -52,8 +52,7 @@ class DocenteAdminController extends Controller
         $docentes = $consulta->paginate(10);
 
         $ambientes = Ambiente::orderBy('nombre')->get();
-        $grados = Grado::activos()->get();
-        $grupos = Grupo::activos()->delAnio()->orderBy('nombre')->get();
+
         // Grupos del año lectivo actual para el modal de asignación.
 
         if ($request->ajax()) {
@@ -63,7 +62,7 @@ class DocenteAdminController extends Controller
             ]);
         }
 
-        return view('admin.docentes.index', compact('docentes', 'ambientes', 'grados', 'grupos'));
+        return view('admin.docentes.index', compact('docentes', 'ambientes'));
     }
 
     // Devuelve los datos del usuario, su perfil docente y la carga activa del año.

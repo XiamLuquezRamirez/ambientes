@@ -652,9 +652,9 @@
                                     <strong class="form-label">Grado</strong>
                                     <select name="grado_id" id="asignar_grado_id" class="form-control">
                                         <option value="">— Sin grado —</option>
-                                        @foreach ($grados as $g)
+                                        {{-- @foreach ($grados as $g)
                                             <option value="{{ $g->id }}">{{ $g->nombre }}</option>
-                                        @endforeach
+                                        @endforeach --}}
                                     </select>
                                 </div>
                             </div>
@@ -663,9 +663,9 @@
                                     <strong class="form-label">Grupos</strong>
                                     <select name="grupo_id" id="asignar_grupos_id" class="form-control">
                                         <option value="">— Sin grupos —</option>
-                                        @foreach ($grupos as $gr)
+                                        {{-- @foreach ($grupos as $gr)
                                             <option value="{{ $gr->id }}">{{ $gr->nombre }}</option>
-                                        @endforeach
+                                        @endforeach --}}
                                     </select>
                                 </div>
                             </div>
