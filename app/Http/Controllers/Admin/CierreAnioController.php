@@ -12,7 +12,10 @@ class CierreAnioController extends Controller
 {
     public function index()
     {
-        return view('admin.cierre.index');
+        return view('admin.cierre.index', [
+            'anioInicio' => 2024,
+            'anioActual' => (int) date('Y'),
+        ]);
     }
 
     public function grupos(Request $request)
@@ -54,10 +57,12 @@ class CierreAnioController extends Controller
                 'nombre'       => $m->estudiante->nombre,
                 'iniciales'    => $m->estudiante->iniciales ?? mb_substr($m->estudiante->nombre, 0, 2),
                 'color_avatar' => $m->estudiante->color_avatar ?? '#2563EB',
+                'fecha_nacimiento' => $m->estudiante->fecha_nacimiento,
             ]);
 
         return response()->json(['ok' => true, 'estudiantes' => $matriculas]);
     }
+    
 
     public function aplicar(Request $request)
     {

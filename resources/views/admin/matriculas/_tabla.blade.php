@@ -35,32 +35,32 @@
                 </td>
                 <td>
                     @php
-                        $estadoMap = [
-                            'activo'   => ['badge-green', 'Activo'],
-                            'promovido'=> ['badge-blue',  'Promovido'],
-                            'graduado' => ['badge-yellow','Graduado'],
-                            'retirado' => ['badge-red',   'Retirado'],
-                        ];
-                        [$cls, $lbl] = $estadoMap[$m->estado] ?? ['badge-yellow', $m->estado];
+                    $estadoMap = [
+                    'activo' => ['badge-green', 'Activo'],
+                    'promovido'=> ['badge-blue', 'Promovido'],
+                    'graduado' => ['badge-yellow','Graduado'],
+                    'retirado' => ['badge-red', 'Retirado'],
+                    ];
+                    [$cls, $lbl] = $estadoMap[$m->estado] ?? ['badge-yellow', $m->estado];
                     @endphp
                     <span class="badge {{ $cls }}">{{ $lbl }}</span>
                 </td>
                 <td>
                     <div class="tabla-acciones">
                         <button class="btn-accion btn-editar"
-                                onclick="abrirEditarMatricula({{ $m->id }})"
-                                title="Cambiar grupo">
+                            onclick="abrirEditarMatricula({{ $m->id }})"
+                            title="Cambiar grupo">
                             <i class="fa-solid fa-pencil"></i> Editar
                         </button>
                         <button class="btn-accion"
-                                onclick="abrirEstadoMatricula({{ $m->id }}, '{{ $m->estado }}')"
-                                title="Cambiar estado"
-                                style="background:#F5F3FF;border:1px solid #DDD6FE;color:#5B21B6;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.75rem">
+                            onclick="abrirEstadoMatricula({{ $m->id }}, '{{ $m->estado }}')"
+                            title="Cambiar estado"
+                            style="background:#F5F3FF;border:1px solid #DDD6FE;color:#5B21B6;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.75rem">
                             <i class="fa-solid fa-arrow-right-arrow-left"></i>
                         </button>
                         <button class="btn-accion btn-eliminar"
-                                onclick="eliminarMatricula({{ $m->id }}, '{{ addslashes($m->estudiante->nombre) }}')"
-                                title="Eliminar matrícula">
+                            onclick="eliminarMatricula({{ $m->id }}, '{{ addslashes($m->estudiante->nombre) }}')"
+                            title="Eliminar matrícula">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>

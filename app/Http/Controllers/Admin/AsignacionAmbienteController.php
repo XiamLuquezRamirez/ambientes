@@ -64,6 +64,7 @@ class AsignacionAmbienteController extends Controller
                 'iniciales'    => $e->iniciales ?? mb_substr($e->nombre, 0, 2),
                 'color_avatar' => $e->color_avatar ?? '#2563EB',
                 'grado_grupo'  => $this->resolverGradoGrupo($e),
+                'fecha_nacimiento' => $e->fecha_nacimiento,
             ]);
 
         return response()->json(['ok' => true, 'estudiantes' => $estudiantes]);

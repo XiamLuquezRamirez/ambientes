@@ -19,7 +19,7 @@ class GruposController extends Controller
         return view('admin.grupos.index', compact('grados', 'anio'));
     }
 
-    public function store(Request $request)
+    public function guardar(Request $request)
     {
         $datos = $request->validate([
             'grado_id'     => 'required|exists:grados,id',
@@ -54,7 +54,7 @@ class GruposController extends Controller
         return response()->json(['ok' => true, 'grupo' => $grupo]);
     }
 
-    public function update(Request $request, Grupo $grupo)
+    public function actualizar(Request $request, Grupo $grupo)
     {
         $datos = $request->validate([
             'nombre'      => 'required|string|max:10',
@@ -84,7 +84,7 @@ class GruposController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    public function destroy(Grupo $grupo)
+    public function eliminar(Grupo $grupo)
     {
         $activos = $grupo->totalMatriculas();
 

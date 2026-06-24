@@ -49,25 +49,24 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('ambientes/{ambiente}/ping',                         [AmbienteAdminController::class, 'verificarConexion'])->name('admin.ambientes.ping');
     Route::get('ambientes/{ambiente}/docentes',                      [AmbienteAdminController::class, 'docentesDelPeriodo'])->name('admin.ambientes.docentes');
     Route::get('ambientes/{ambiente}/modulos',                       [AmbienteAdminController::class, 'modulos'])->name('admin.ambientes.modulos');
-    Route::patch('ambientes/{ambiente}/modulos/{modulo}/toggle',     [AmbienteAdminController::class, 'toggleModulo'])->name('admin.ambientes.modulos.toggle');
 
     // Grados habilitados por ambiente (solo toggles)
     Route::get('ambientes/{ambiente}/grados',                    [GradoGrupoController::class, 'gestionar'])->name('admin.ambientes.grados');
-    Route::patch('ambientes/{ambiente}/grados/{grado}/toggle',  [GradoGrupoController::class, 'toggleGrado'])->name('admin.ambientes.grados.toggle');
+    Route::patch('ambientes/{ambiente}/grados/{grado}/activar',  [GradoGrupoController::class, 'activarGrado'])->name('admin.ambientes.grados.activar');
 
     // Asignaciones de estudiantes a un ambiente
     Route::get('ambientes/{ambiente}/asignaciones',              [AsignacionAmbienteController::class, 'index'])->name('admin.ambientes.asignaciones');
     Route::get('ambientes/{ambiente}/asignaciones/tabla',        [AsignacionAmbienteController::class, 'tabla'])->name('admin.ambientes.asignaciones.tabla');
     Route::get('ambientes/{ambiente}/asignaciones/buscar',       [AsignacionAmbienteController::class, 'buscar'])->name('admin.ambientes.asignaciones.buscar');
-    Route::post('ambientes/{ambiente}/asignaciones',             [AsignacionAmbienteController::class, 'asignar'])->name('admin.ambientes.asignaciones.store');
-    Route::patch('ambientes/{ambiente}/asignaciones/{ea}',       [AsignacionAmbienteController::class, 'actualizar'])->name('admin.ambientes.asignaciones.update');
-    Route::delete('ambientes/{ambiente}/asignaciones/{ea}',      [AsignacionAmbienteController::class, 'quitar'])->name('admin.ambientes.asignaciones.destroy');
+    Route::post('ambientes/{ambiente}/asignaciones',             [AsignacionAmbienteController::class, 'asignar'])->name('admin.ambientes.asignaciones.asignar');
+    Route::patch('ambientes/{ambiente}/asignaciones/{ea}',       [AsignacionAmbienteController::class, 'actualizar'])->name('admin.ambientes.asignaciones.actualizar');
+    Route::delete('ambientes/{ambiente}/asignaciones/{ea}',      [AsignacionAmbienteController::class, 'quitar'])->name('admin.ambientes.asignaciones.quitar');
 
     // Grupos institucionales
     Route::get('grupos',                    [GruposController::class, 'index'])->name('admin.grupos');
-    Route::post('grupos',                   [GruposController::class, 'store'])->name('admin.grupos.store');
-    Route::put('grupos/{grupo}',            [GruposController::class, 'update'])->name('admin.grupos.update');
-    Route::delete('grupos/{grupo}',         [GruposController::class, 'destroy'])->name('admin.grupos.destroy');
+    Route::post('grupos',                   [GruposController::class, 'guardar'])->name('admin.grupos.guardar');
+    Route::put('grupos/{grupo}',            [GruposController::class, 'actualizar'])->name('admin.grupos.actualizar');
+    Route::delete('grupos/{grupo}',         [GruposController::class, 'eliminar'])->name('admin.grupos.eliminar');
 
     // Cierre de año lectivo
     Route::prefix('cierre')->name('admin.cierre.')->group(function () {

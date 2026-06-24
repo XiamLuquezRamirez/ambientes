@@ -3,185 +3,415 @@
 
 @push('styles')
 <style>
-/* ══════════════════════════════════════════════════════════
+    /* ══════════════════════════════════════════════════════════
    Grid y tarjetas
    ══════════════════════════════════════════════════════════ */
-.ambientes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-    gap: 20px;
-    margin-top: 24px;
-}
-.ambiente-card {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    border-radius: 14px;
-    overflow: visible;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-    transition: box-shadow .2s;
-    position: relative;
-}
-.ambiente-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.10); }
-.card-franja { height: 6px; border-radius: 14px 14px 0 0; }
+    .ambientes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+        gap: 20px;
+        margin-top: 24px;
+    }
 
-/* Cabecera */
-.card-head {
-    display: flex; align-items: flex-start; gap: 14px;
-    padding: 18px 18px 0;
-}
-.card-icono {
-    width: 48px; height: 48px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem; flex-shrink: 0;
-}
-.card-info { flex: 1; min-width: 0; }
-.card-nombre { font-weight: 700; font-size: .98rem; color: #1E293B; }
-.card-ip {
-    font-family: monospace; font-size: .77rem; color: #64748B;
-    margin-top: 3px; display: flex; align-items: center; gap: 6px;
-}
-.card-ip-texto { cursor: default; }
+    .ambiente-card {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 14px;
+        overflow: visible;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        transition: box-shadow .2s;
+        position: relative;
+    }
 
-/* Punto de conexión */
-.dot-conexion {
-    display: inline-block; width: 9px; height: 9px;
-    border-radius: 50%; background: #CBD5E1;
-    flex-shrink: 0; transition: background .3s;
-    cursor: default;
-}
-.dot-conexion.dot-online  { background: #22C55E; }
-.dot-conexion.dot-offline { background: #EF4444; }
-.dot-conexion.dot-check   { background: #F59E0B; animation: parpadeo .6s infinite alternate; }
-@keyframes parpadeo { to { opacity: .35; } }
+    .ambiente-card:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .10);
+    }
 
-/* Botón tres puntos */
-.btn-menu {
-    background: none; border: none; color: #94A3B8;
-    font-size: 1.25rem; cursor: pointer; padding: 2px 8px;
-    border-radius: 6px; transition: background .15s; line-height: 1;
-    flex-shrink: 0;
-}
-.btn-menu:hover { background: #F1F5F9; color: #475569; }
+    .card-franja {
+        height: 6px;
+        border-radius: 14px 14px 0 0;
+    }
 
-/* Dropdown */
-.dropdown-menu-card {
-    position: absolute; top: 52px; right: 12px;
-    background: #FFFFFF; border: 1px solid #E2E8F0;
-    border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.13);
-    z-index: 100; min-width: 220px; display: none; overflow: hidden;
-}
-.dropdown-menu-card.abierto { display: block; }
-.dropdown-menu-card button {
-    display: flex; align-items: center; gap: 10px;
-    width: 100%; padding: 10px 16px;
-    font-size: .85rem; color: #1E293B;
-    background: none; border: none; text-align: left;
-    cursor: pointer; transition: background .12s;
-    font-family: 'Nunito', sans-serif;
-}
-.dropdown-menu-card button:hover { background: #F8FAFC; }
-.dropdown-menu-card button i { width: 16px; text-align: center; color: #64748B; }
-.dropdown-sep { height: 1px; background: #F1F5F9; margin: 4px 0; }
+    /* Cabecera */
+    .card-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 18px 18px 0;
+    }
 
-/* Badges estadísticas */
-.card-stats {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    padding: 12px 18px 8px;
-}
-.badge-stat {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 4px 10px; border-radius: 99px;
-    font-size: .74rem; font-weight: 600;
-}
-.bs-azul   { background: #EFF6FF; color: #1D4ED8; }
-.bs-verde  { background: #F0FDF4; color: #166534; }
-.bs-morado { background: #F5F3FF; color: #5B21B6; }
-.bs-slate  { background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0; }
+    .card-icono {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
 
-/* Info secundaria */
-.card-meta {
-    padding: 0 18px 10px;
-    font-size: .78rem; color: #64748B;
-    display: flex; flex-wrap: wrap; gap: 14px;
-}
-.card-meta span { display: flex; align-items: center; gap: 5px; }
-.card-meta i { font-size: .72rem; }
+    .card-info {
+        flex: 1;
+        min-width: 0;
+    }
 
-/* Footer */
-.card-footer-amb {
-    padding: 12px 18px 16px;
-    border-top: 1px solid #F1F5F9;
-    background: #F8FAFC;
-}
-.grados-lista { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-.grado-chip {
-    background: #FFFFFF; border: 1px solid #E2E8F0;
-    border-radius: 6px; padding: 2px 8px;
-    font-size: .74rem; color: #475569;
-}
-.btn-gestionar {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    width: 100%; padding: 9px 16px;
-    background: linear-gradient(135deg,#1E3A8A,#2563EB);
-    color: #fff; border: none; border-radius: 8px;
-    font-size: .84rem; font-weight: 600;
-    cursor: pointer; text-decoration: none;
-    transition: opacity .15s;
-}
-.btn-gestionar:hover { opacity: .88; color: #fff; }
+    .card-nombre {
+        font-weight: 700;
+        font-size: .98rem;
+        color: #1E293B;
+    }
 
-/* ══════════════════════════════════════════════════════════
+    .card-ip {
+        font-family: monospace;
+        font-size: .77rem;
+        color: #64748B;
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .card-ip-texto {
+        cursor: default;
+    }
+
+    /* Punto de conexión */
+    .dot-conexion {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #CBD5E1;
+        flex-shrink: 0;
+        transition: background .3s;
+        cursor: default;
+    }
+
+    .dot-conexion.dot-online {
+        background: #22C55E;
+    }
+
+    .dot-conexion.dot-offline {
+        background: #EF4444;
+    }
+
+    .dot-conexion.dot-check {
+        background: #F59E0B;
+        animation: parpadeo .6s infinite alternate;
+    }
+
+    @keyframes parpadeo {
+        to {
+            opacity: .35;
+        }
+    }
+
+    /* Botón tres puntos */
+    .btn-menu {
+        background: none;
+        border: none;
+        color: #94A3B8;
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 2px 8px;
+        border-radius: 6px;
+        transition: background .15s;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+
+    .btn-menu:hover {
+        background: #F1F5F9;
+        color: #475569;
+    }
+
+    /* Dropdown */
+    .dropdown-menu-card {
+        position: absolute;
+        top: 52px;
+        right: 12px;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 10px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, .13);
+        z-index: 100;
+        min-width: 220px;
+        display: none;
+        overflow: hidden;
+    }
+
+    .dropdown-menu-card.abierto {
+        display: block;
+    }
+
+    .dropdown-menu-card button {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 10px 16px;
+        font-size: .85rem;
+        color: #1E293B;
+        background: none;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+        transition: background .12s;
+        font-family: 'Nunito', sans-serif;
+    }
+
+    .dropdown-menu-card button:hover {
+        background: #F8FAFC;
+    }
+
+    .dropdown-menu-card button i {
+        width: 16px;
+        text-align: center;
+        color: #64748B;
+    }
+
+    .dropdown-sep {
+        height: 1px;
+        background: #F1F5F9;
+        margin: 4px 0;
+    }
+
+    /* Badges estadísticas */
+    .card-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 12px 18px 8px;
+    }
+
+    .badge-stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 10px;
+        border-radius: 99px;
+        font-size: .74rem;
+        font-weight: 600;
+    }
+
+    .bs-azul {
+        background: #EFF6FF;
+        color: #1D4ED8;
+    }
+
+    .bs-verde {
+        background: #F0FDF4;
+        color: #166534;
+    }
+
+    .bs-morado {
+        background: #F5F3FF;
+        color: #5B21B6;
+    }
+
+    .bs-slate {
+        background: #F8FAFC;
+        color: #475569;
+        border: 1px solid #E2E8F0;
+    }
+
+    /* Info secundaria */
+    .card-meta {
+        padding: 0 18px 10px;
+        font-size: .78rem;
+        color: #64748B;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .card-meta span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .card-meta i {
+        font-size: .72rem;
+    }
+
+    /* Footer */
+    .card-footer-amb {
+        padding: 12px 18px 16px;
+        border-top: 1px solid #F1F5F9;
+        background: #F8FAFC;
+    }
+
+    .grados-lista {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    .grado-chip {
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: .74rem;
+        color: #475569;
+    }
+
+    .btn-gestionar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 9px 16px;
+        background: linear-gradient(135deg, #1E3A8A, #2563EB);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: .84rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: opacity .15s;
+    }
+
+    .btn-gestionar:hover {
+        opacity: .88;
+        color: #fff;
+    }
+
+    /* ══════════════════════════════════════════════════════════
    Estilos compartidos de modales
    ══════════════════════════════════════════════════════════ */
-.modal-header-azul {
-    background: linear-gradient(135deg,#1E3A8A 0%,#2563EB 100%);
-    border-bottom: none; padding: 18px 22px;
-}
-.modal-header-azul .modal-title { font-family:'Fredoka One',cursive; color:#fff; font-size:1.1rem; }
-.modal-header-azul .btn-close { filter: brightness(0) invert(1); opacity: .75; }
-.campo-error { font-size: .78rem; color: #DC2626; margin-top: 3px; min-height: 16px; }
+    .modal-header-azul {
+        background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+        border-bottom: none;
+        padding: 18px 22px;
+    }
 
-/* Módulos */
-.modulo-fila {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 0; border-bottom: 1px solid #F1F5F9;
-}
-.modulo-fila:last-child { border-bottom: none; }
-.modulo-icono { font-size: 1.4rem; width: 36px; text-align: center; flex-shrink: 0; }
-.modulo-nombre { flex: 1; font-weight: 600; font-size: .9rem; color: #1E293B; }
-.modulo-toggles { display: flex; gap: 10px; flex-shrink: 0; }
+    .modal-header-azul .modal-title {
+        font-family: 'Fredoka One', cursive;
+        color: #fff;
+        font-size: 1.1rem;
+    }
 
-.tog {
-    display: flex; align-items: center; gap: 5px;
-    cursor: pointer; font-size: .75rem; color: #64748B; user-select: none;
-}
-.tog input { display: none; }
-.tog-track {
-    width: 34px; height: 18px; border-radius: 9px;
-    background: #CBD5E1; position: relative;
-    transition: background .2s; flex-shrink: 0;
-}
-.tog-track::after {
-    content: ''; position: absolute;
-    top: 2px; left: 2px;
-    width: 14px; height: 14px; border-radius: 50%;
-    background: #fff; transition: transform .2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,.2);
-}
-.tog input:checked + .tog-track { background: #2563EB; }
-.tog input:checked + .tog-track::after { transform: translateX(16px); }
+    .modal-header-azul .btn-close {
+        filter: brightness(0) invert(1);
+        opacity: .75;
+    }
 
-/* Tabla docentes */
-.tabla-docentes { width: 100%; border-collapse: collapse; font-size: .85rem; }
-.tabla-docentes th {
-    background: #F8FAFC; padding: 8px 12px;
-    font-weight: 600; color: #475569; text-align: left;
-    border-bottom: 2px solid #E2E8F0;
-}
-.tabla-docentes td {
-    padding: 10px 12px; border-bottom: 1px solid #F1F5F9; color: #1E293B;
-}
-.tabla-docentes tr:last-child td { border-bottom: none; }
+    .campo-error {
+        font-size: .78rem;
+        color: #DC2626;
+        margin-top: 3px;
+        min-height: 16px;
+    }
+
+    /* Módulos */
+    .modulo-fila {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #F1F5F9;
+    }
+
+    .modulo-fila:last-child {
+        border-bottom: none;
+    }
+
+    .modulo-icono {
+        font-size: 1.4rem;
+        width: 36px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .modulo-nombre {
+        flex: 1;
+        font-weight: 600;
+        font-size: .9rem;
+        color: #1E293B;
+    }
+
+    .modulo-toggles {
+        display: flex;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .tog {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        font-size: .75rem;
+        color: #64748B;
+        user-select: none;
+    }
+
+    .tog input {
+        display: none;
+    }
+
+    .tog-track {
+        width: 34px;
+        height: 18px;
+        border-radius: 9px;
+        background: #CBD5E1;
+        position: relative;
+        transition: background .2s;
+        flex-shrink: 0;
+    }
+
+    .tog-track::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform .2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+    }
+
+    .tog input:checked+.tog-track {
+        background: #2563EB;
+    }
+
+    .tog input:checked+.tog-track::after {
+        transform: translateX(16px);
+    }
+
+    /* Tabla docentes */
+    .tabla-docentes {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .85rem;
+    }
+
+    .tabla-docentes th {
+        background: #F8FAFC;
+        padding: 8px 12px;
+        font-weight: 600;
+        color: #475569;
+        text-align: left;
+        border-bottom: 2px solid #E2E8F0;
+    }
+
+    .tabla-docentes td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #F1F5F9;
+        color: #1E293B;
+    }
+
+    .tabla-docentes tr:last-child td {
+        border-bottom: none;
+    }
 </style>
 @endpush
 
@@ -199,9 +429,9 @@
 <div class="ambientes-grid">
     @foreach($ambientes as $amb)
     <div class="ambiente-card"
-         data-id="{{ $amb->id }}"
-         data-ip="{{ $amb->servidor_ip ?? '' }}"
-         data-cupo="{{ $amb->cupo_defecto }}">
+        data-id="{{ $amb->id }}"
+        data-ip="{{ $amb->servidor_ip ?? '' }}"
+        data-cupo="{{ $amb->cupo_defecto }}">
 
         <div class="card-franja" style="background:{{ $amb->color_hex }}"></div>
 
@@ -265,9 +495,9 @@
         <div class="card-footer-amb">
             <div class="grados-lista">
                 @forelse($amb->gradosHabilitados as $g)
-                    <span class="grado-chip">{{ $g->nombre }}</span>
+                <span class="grado-chip">{{ $g->nombre }}</span>
                 @empty
-                    <span style="color:#94A3B8;font-size:.75rem">Sin grados habilitados</span>
+                <span style="color:#94A3B8;font-size:.75rem">Sin grados habilitados</span>
                 @endforelse
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">

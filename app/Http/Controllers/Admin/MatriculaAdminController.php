@@ -78,7 +78,7 @@ class MatriculaAdminController extends Controller
             ])
             ->orderBy('nombre')
             ->limit(100)
-            ->get(['id', 'nombre', 'iniciales', 'color_avatar']);
+            ->get(['id', 'nombre', 'iniciales', 'color_avatar', 'fecha_nacimiento']);
 
         return response()->json(['ok' => true, 'estudiantes' => $estudiantes]);
     }

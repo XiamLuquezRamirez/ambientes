@@ -89,7 +89,7 @@ class AmbienteAdminController extends Controller
         return response()->json(['ok' => true, 'modulos' => $modulos]);
     }
 
-    public function toggleModulo(Request $request, Ambiente $ambiente, Modulo $modulo)
+    public function activarModulo(Request $request, Ambiente $ambiente, Modulo $modulo)
     {
         $campo = $request->validate(['campo' => 'required|in:activo,visible_estudiantes'])['campo'];
         $modulo->update([$campo => !$modulo->$campo]);

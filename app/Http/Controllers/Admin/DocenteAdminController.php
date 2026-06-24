@@ -13,8 +13,9 @@ class DocenteAdminController extends Controller
 {
     public function listar(Request $request)
     {
-        $consulta = User::with('docente.ambientes');
-
+       // $consulta = User::with('docente.ambientes');
+        $consulta = Docente::with('user');
+        
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
             $consulta->where(fn($q) => $q

@@ -347,7 +347,7 @@ td {
 }
 
 tr:hover td {
-    background: #F8FAFF;
+    background: #F1F5F9;
 }
 
 /* Badges */
@@ -374,6 +374,15 @@ tr:hover td {
     color: #991B1B;
 }
 
+.badge-blue {
+    background: #EFF6FF;
+    color: #1E40AF;
+}
+
+.badge-gray {
+    background: #E2E8F0;
+    color: #64748B;
+}
 /* Buttons */
 .btn {
     display: inline-block;

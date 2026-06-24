@@ -9,7 +9,12 @@ class Estudiante extends Model
 {
     use Sincronizable;
 
-    protected $fillable = ['nombre', 'iniciales', 'color_avatar', 'condicion', 'activo'];
+    protected $fillable = [
+        'nombre', 'avatar', 'identificacion', 'iniciales', 'grado_id',
+        'color_avatar', 'condicion_id', 'activo',
+        'fecha_nacimiento', 'acudiente', 'telefono_acudiente',
+        'requiere_apoyo', 'sexo',
+    ];
 
     protected $casts = ['activo' => 'boolean'];
 

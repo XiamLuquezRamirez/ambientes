@@ -26,7 +26,7 @@ class GradoGrupoController extends Controller
         return view('admin.ambientes.grados-grupos', compact('ambiente', 'gradosConInfo'));
     }
 
-    public function toggleGrado(Request $request, Ambiente $ambiente, Grado $grado)
+    public function activarGrado(Request $request, Ambiente $ambiente, Grado $grado)
     {
         $pivot = $ambiente->todosGrados()->where('grado_id', $grado->id)->first();
 
