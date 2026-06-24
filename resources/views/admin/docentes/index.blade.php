@@ -410,13 +410,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
                     </button>
                 </div>
-<<<<<<< HEAD
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
-                 
-                </button>
-            </div>
-=======
->>>>>>> fe641097171ebcc70191dcdf670d8bd8dafcc7ac
 
                 <div class="modal-body p-4">
                     <ul class="nav nav-tabs">
