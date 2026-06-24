@@ -652,18 +652,6 @@
                         Datos</button>
                 </div>
             </div>
-<<<<<<< HEAD
-
-            <div class="modal-footer">
-                <button type="button" class="btn"
-                    style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
-                    data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
-                <button type="submit" form="formCrearDocente" id="btnCrearDocente"
-                    class="btn btn-primary"><i class="fas fa-plus"></i> Crear Docente</button>
-            </div>
-
-=======
->>>>>>> fe641097171ebcc70191dcdf670d8bd8dafcc7ac
         </div>
     </div>
 @endsection
