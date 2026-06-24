@@ -12,7 +12,7 @@ class EsDocente
     {
         $usuario = Auth::guard('docente')->user();
 
-        if (!$usuario) {
+        if (! $usuario) {
             return redirect()->route('docente.login');
         }
 
@@ -26,6 +26,17 @@ class EsDocente
             ->get();
 
         view()->share('cargasActivas', $cargasActivas);
+
+        if ($usuario->estado == false) {
+
+            Auth::logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect('/login')
+                ->with('error', 'Su cuenta ha sido desactivada.');
+        }
 
         return $next($request);
     }

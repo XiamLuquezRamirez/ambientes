@@ -16,6 +16,7 @@
     @stack('styles')
     @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
+    <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
 </head>
 
 <body>
@@ -119,7 +120,7 @@
             mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
         );
         $rolAuthLabel =
-            ['admin' => 'Administrador', 'docente_lider' => 'Docente Líder', 'docente_auxiliar' => 'Docente Auxiliar'][
+            ['admin' => 'Administrador', 'docente' => 'Docente'][
                 $usuarioAuth->rol
             ] ?? $usuarioAuth->rol;
     @endphp

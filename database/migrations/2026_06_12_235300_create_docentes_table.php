@@ -17,7 +17,9 @@ return new class extends Migration
             $table->date('fecha_ingreso')->nullable();
             $table->string('foto_url')->nullable();
             $table->text('descripcion')->nullable();
+            $table->timestamp('bloqueado_en')->nullable();
             $table->timestamps();
+
         });
     }
 
