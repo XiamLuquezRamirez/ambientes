@@ -57,7 +57,7 @@
                         <td>
                             <div class="tabla-acciones" style="justify-content:center">
                                 <button class="btn-accion btn-asignar-grado"
-                                    onclick="abrirModalAsignarGrado({{ $d->id }})"><i
+                                    onclick="abrirModalAsignarGrado({{ $d->user->id }})"><i
                                         class="fa-solid fa-list"></i>
                                     Asignar Grupo</button>
                                 <button class="btn-accion btn-editar" onclick="abrirModalEditar({{ $d->user_id }})"><i

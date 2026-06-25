@@ -491,6 +491,19 @@
                                                 value="{{ old('fecha_ingreso') }}">
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Firma</strong>
+                                            <input type="file" id="firma" name="firma" class="form-control"
+                                                placeholder="Firma del docente" value="{{ old('firma') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Vista previa de la firma</strong>
+                                            <img src="{{ old('firma') }}" alt="Firma del docente" class="img-fluid">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="tab-pane container" id="gestionCuenta">
@@ -629,9 +642,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <strong>Nombre</strong>
-                                    <label id="asignar_nombre" class="form-control" readonly>
-                                        -
-                                    </label>
+                                    <div id="asignar_nombre" class="form-control">-</div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -640,32 +651,39 @@
                                     <select name="ambiente_id" id="asignar_ambiente_id" class="form-control">
                                         <option value="">— Selecciona un ambiente —</option>
                                         @foreach ($ambientes as $a)
-                                            <option value="{{ $a->id }}">{{ $a->icono }}
-                                                {{ $a->nombre }}
+                                            <option value="{{ $a->id }}">
+                                                {{ $a->icono }} {{ $a->nombre }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <strong class="form-label">Grado</strong>
                                     <select name="grado_id" id="asignar_grado_id" class="form-control">
-                                        <option value="">— Sin grado —</option>
-                                        {{-- @foreach ($grados as $g)
-                                            <option value="{{ $g->id }}">{{ $g->nombre }}</option>
-                                        @endforeach --}}
+                                        <option value="">— Selecciona un grado —</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <strong class="form-label">Año lectivo</strong>
+                                    <select name="anio_lectivo" id="asignar_anio_lectivo" class="form-control">
+                                        @for ($anio = date('Y') + 1; $anio >= date('Y') - 5; $anio--)
+                                            <option value="{{ $anio }}"
+                                                {{ $anio == date('Y') ? 'selected' : '' }}>
+                                                {{ $anio }}
+                                            </option>
+                                        @endfor
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <strong class="form-label">Grupos</strong>
                                     <select name="grupo_id" id="asignar_grupos_id" class="form-control">
-                                        <option value="">— Sin grupos —</option>
-                                        {{-- @foreach ($grupos as $gr)
-                                            <option value="{{ $gr->id }}">{{ $gr->nombre }}</option>
-                                        @endforeach --}}
+                                        <option value="">— Selecciona un grupo —</option>
                                     </select>
                                 </div>
                             </div>
@@ -673,7 +691,6 @@
                                 <strong class="form-label">Descripción</strong>
                                 <textarea name="descripcion" id="asignar_descripcion" class="form-control" rows="3"></textarea>
                             </div>
-
                         </div>
                     </form>
                 </div>
@@ -1225,5 +1242,66 @@
                 const id = this.dataset.docenteId;
                 window.open(`${URL_DOCENTES}/${id}/generar-pdf`, '_blank');
             });
+
+        $('#asignar_ambiente_id').on('change', function() {
+
+            const ambienteId = $(this).val();
+
+            if (!ambienteId) return;
+
+            $.get(`/admin/ambientes/${ambienteId}/gradoslistado`, function(grados) {
+
+                $('#asignar_grado_id').html(
+                    '<option value="">— Selecciona un grado —</option>'
+                );
+
+                grados.forEach(grado => {
+                    $('#asignar_grado_id').append(
+                        `<option value="${grado.id}">${grado.nombre}</option>`
+                    );
+                });
+
+            });
+
+        });
+
+        function cargarGrupos() {
+
+            const gradoId = $('#asignar_grado_id').val();
+            const anio = $('#asignar_anio_lectivo').val();
+
+            $('#asignar_grupos_id').html(
+                '<option value="">— Selecciona un grupo —</option>'
+            );
+
+            if (!gradoId || !anio) {
+                return;
+            }
+
+            $.get(`/admin/grados/${gradoId}/grupos`, {
+                anio_lectivo: anio
+            }, function(grupos) {
+
+                grupos.forEach(grupo => {
+
+                    $('#asignar_grupos_id').append(
+                        `<option value="${grupo.id}">
+                ${grupo.nombre}
+            </option>`
+                    );
+
+                });
+
+            });
+
+        }
+
+        $('#asignar_grado_id').on('change', function() {
+            cargarGrupos();
+        });
+
+        $('#asignar_anio_lectivo').on('change', function() {
+            cargarGrupos();
+        });
     </script>
 @endpush

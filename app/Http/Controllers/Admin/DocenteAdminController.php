@@ -52,13 +52,10 @@ class DocenteAdminController extends Controller
         $docentes = $consulta->paginate(10);
 
         $ambientes = Ambiente::orderBy('nombre')->get();
-
-        // Grupos del año lectivo actual para el modal de asignación.
-
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'html' => view('admin.docentes._tabla', compact('docentes'))->render(),
+                'html' => view('admin.docentes._tabla', compact('docentes', 'ambientes'))->render(),
             ]);
         }
 
@@ -173,6 +170,7 @@ class DocenteAdminController extends Controller
             'direccion' => 'required|string|max:150',
             'especialidad' => 'required|string|max:150',
             'fecha_ingreso' => 'required|date',
+            'firma_url' => 'nullable|string|max:255',
             'password' => 'nullable|min:8|confirmed',
         ]);
 
@@ -192,6 +190,7 @@ class DocenteAdminController extends Controller
                 'direccion' => $datos['direccion'],
                 'especialidad' => $datos['especialidad'],
                 'fecha_ingreso' => $datos['fecha_ingreso'],
+                'firma_url' => $datos['firma_url'],
             ]);
 
             // Si se proporciona una nueva contraseña, se actualiza la contraseña del usuario.
@@ -224,12 +223,24 @@ class DocenteAdminController extends Controller
         $usuario = User::with('docente')->findOrFail($docente);
 
         $datos = $request->validate([
-            'ambiente_id' => 'nullable|exists:ambientes,id',
-            'grado_id' => 'nullable|exists:grados,id',
-            'grupo_id' => 'nullable|exists:grupos,id',
+            'ambiente_id' => 'required|exists:ambientes,id',
+            'grado_id' => 'required|exists:grados,id',
+            'grupo_id' => 'required|exists:grupos,id',
+            'anio_lectivo' => 'required|integer',
             'descripcion' => 'nullable|string',
         ]);
+        $ocupado = CargaDocente::where('ambiente_id', $datos['ambiente_id'])
+            ->where('grupo_id', $datos['grupo_id'])
+            ->where('anio_lectivo', $datos['anio_lectivo'])
+            ->where('activo', true)
+            ->exists();
 
+        if ($ocupado) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ese grupo ya tiene un docente asignado en este ambiente para el año lectivo seleccionado.',
+            ], 422);
+        }
         DB::transaction(function () use ($usuario, $datos) {
             $doc = $usuario->docente;
             if (! $doc) {
@@ -241,7 +252,8 @@ class DocenteAdminController extends Controller
                 $doc->descripcion = $datos['descripcion'];
                 $doc->save();
             }
-
+            // Asignar ambiente/grado/grupo/año lectivo
+            // Si no se proporciona un año lectivo, se usa el año actual.
             if (! empty($datos['ambiente_id']) && ! empty($datos['grado_id']) && ! empty($datos['grupo_id'])) {
                 $this->sincronizarCargaDocente(
                     $doc,

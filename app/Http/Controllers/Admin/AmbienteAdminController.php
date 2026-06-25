@@ -13,14 +13,14 @@ class AmbienteAdminController extends Controller
     {
         $ambientes = Ambiente::withCount([
             'gradosHabilitados',
-            'estudiantesAmbiente as estudiantes_count' => fn($q) => $q->where('anio_lectivo', date('Y')),
-            'cargasDocente' => fn($q) => $q->where('activo', true)->where('anio_lectivo', date('Y')),
+            'estudiantesAmbiente as estudiantes_count' => fn ($q) => $q->where('anio_lectivo', date('Y')),
+            'cargasDocente' => fn ($q) => $q->where('activo', true)->where('anio_lectivo', date('Y')),
             'modulos',
-            'modulos as modulos_activos_count' => fn($q) => $q->where('activo', true),
+            'modulos as modulos_activos_count' => fn ($q) => $q->where('activo', true),
         ])
-        ->with('gradosHabilitados')
-        ->orderBy('nombre')
-        ->get();
+            ->with('gradosHabilitados')
+            ->orderBy('nombre')
+            ->get();
 
         return view('admin.ambientes.index', compact('ambientes'));
     }
@@ -45,7 +45,7 @@ class AmbienteAdminController extends Controller
     {
         $ip = $ambiente->servidor_ip;
 
-        if (!$ip) {
+        if (! $ip) {
             return response()->json(['ok' => false, 'mensaje' => 'IP no configurada para este ambiente.']);
         }
 
@@ -58,7 +58,7 @@ class AmbienteAdminController extends Controller
         }
 
         return response()->json([
-            'ok'     => $enLinea,
+            'ok' => $enLinea,
             'mensaje' => $enLinea ? "Servidor {$ip} en línea." : "Servidor {$ip} sin respuesta.",
         ]);
     }
@@ -71,11 +71,11 @@ class AmbienteAdminController extends Controller
             ->with(['docente.user', 'grado', 'grupo'])
             ->get();
 
-        $docentes = $cargas->map(fn($c) => [
+        $docentes = $cargas->map(fn ($c) => [
             'nombre' => $c->docente->user->nombre ?? '—',
-            'email'  => $c->docente->user->email  ?? '—',
-            'grado'  => $c->grado?->nombre         ?? '—',
-            'grupo'  => $c->grupo?->nombre         ?? '—',
+            'email' => $c->docente->user->email ?? '—',
+            'grado' => $c->grado?->nombre ?? '—',
+            'grupo' => $c->grupo?->nombre ?? '—',
         ]);
 
         return response()->json(['ok' => true, 'docentes' => $docentes]);
@@ -92,8 +92,42 @@ class AmbienteAdminController extends Controller
     public function activarModulo(Request $request, Ambiente $ambiente, Modulo $modulo)
     {
         $campo = $request->validate(['campo' => 'required|in:activo,visible_estudiantes'])['campo'];
-        $modulo->update([$campo => !$modulo->$campo]);
+        $modulo->update([$campo => ! $modulo->$campo]);
 
         return response()->json(['ok' => true, $campo => (bool) $modulo->$campo]);
+    }
+
+    public function listado()
+    {
+        return response()->json(
+            Ambiente::select('id', 'nombre', 'icono')
+                ->orderBy('nombre')
+                ->get()
+        );
+    }
+
+    public function gradoslistado(Request $request, Ambiente $ambiente)
+    {
+        $anio = $request->anio_lectivo;
+
+        $grados = $ambiente->gradosHabilitados()
+            ->whereHas('grupos', function ($q) use ($anio, $ambiente) {
+
+                $q->where('anio_lectivo', $anio)
+                    ->where('activo', true)
+                    ->whereDoesntHave('cargasDocente', function ($sub) use ($anio, $ambiente) {
+
+                        $sub->where('anio_lectivo', $anio)
+                            ->where('ambiente_id', $ambiente->id)
+                            ->where('activo', true);
+
+                    });
+
+            })
+            ->select('grados.id', 'grados.nombre')
+            ->orderBy('orden')
+            ->get();
+
+        return response()->json($grados);
     }
 }

@@ -32,7 +32,7 @@ class Grupo extends Model
 
     public function getNombreCompletoAttribute(): string
     {
-        return $this->grado->nombre . ' ' . $this->nombre;
+        return $this->grado->nombre.' '.$this->nombre;
     }
 
     public function totalMatriculas(): int
