@@ -9,17 +9,5 @@ class ConfiguracionPin extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['estudiante_id', 'figura_1', 'figura_2', 'figura_3', 'intentos_fallidos'];
-
-    public function estudiante()
-    {
-        return $this->belongsTo(Estudiante::class);
-    }
-
-    public function verificar(string $f1, string $f2, string $f3): bool
-    {
-        return $this->figura_1 === $f1
-            && $this->figura_2 === $f2
-            && $this->figura_3 === $f3;
-    }
+    protected $fillable = ['estudiante_id', 'figura_1', 'color_figura_1', 'figura_2', 'color_figura_2', 'figura_3', 'color_figura_3', 'intentos_fallidos'];
 }

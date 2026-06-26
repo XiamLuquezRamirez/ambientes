@@ -67,6 +67,9 @@
 @push('scripts')
 <script>
     const URL_ESTUDIANTES = "{{ route('admin.estudiantes') }}";
+    var tipoPost = 1; // 1: nuevo estudiante, 2: editar estudiante
+    var pin = [];
 </script>
 <script src="{{ asset('assets/js/estudiantes/index.js') }}"></script>
+<script src="{{ asset('assets/js/estudiantes/pin.js') }}"></script>
 @endpush

@@ -15,6 +15,7 @@ use App\Http\Controllers\Panel\InclusionController;
 use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
+use App\Http\Controllers\Admin\PiarController;
 use Illuminate\Support\Facades\Route;
 
 // Raiz → bienvenida del ambiente configurado
@@ -61,13 +62,16 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
     // Estudiantes (admin)
     Route::get('estudiantes',                        [EstudianteAdminController::class, 'listar'])->name('admin.estudiantes');
-    Route::get('estudiantes/{estudiante}/edit',      [EstudianteAdminController::class, 'formularioEditar'])->name('admin.estudiantes.edit');
+    Route::get('estudiantes/{estudiante}',           [EstudianteAdminController::class, 'ver'])->name('admin.estudiantes.show');
     Route::post('estudiantes',                       [EstudianteAdminController::class, 'guardar'])->name('admin.estudiantes.store');
-    Route::put('estudiantes/{estudiante}',           [EstudianteAdminController::class, 'actualizar'])->name('admin.estudiantes.update');
+    Route::post('estudiantes/editar/{idEstudiante}',  [EstudianteAdminController::class, 'actualizar'])->name('admin.estudiantes.update');
     Route::post('estudiantes/{estudiante}/transferir',[EstudianteAdminController::class, 'transferir'])->name('admin.estudiantes.transferir');
     Route::post('estudiantes/{estudiante}/reset-pin',[EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.reset-pin');
     Route::get('estudiantes/grupos',                  [EstudianteAdminController::class, 'listarGrupos'])->name('admin.estudiantes.grupos');
-
+    Route::get('estudiantes/eliminar/{estudiante}',   [EstudianteAdminController::class, 'eliminar'])->name('admin.estudiantes.eliminar');
+    Route::get('estudiantes/cambiar-estado/{idEstudiante}/{estado}', [EstudianteAdminController::class, 'cambiarEstado'])->name('admin.estudiantes.cambiar-estado');
+    Route::get('estudiantes/diligenciar-piar/{idEstudiante}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
+    Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('admin.estudiantes.cargar-municipios');
     // Catalogo
     Route::get('catalogo', [CatalogoController::class, 'listar'])->name('admin.catalogo');
     Route::post('catalogo/modulos', [CatalogoController::class, 'guardarModulo'])->name('admin.catalogo.modulo.store');
