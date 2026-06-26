@@ -9,7 +9,8 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $fillable = ['id', 'nombre', 'email', 'password', 'rol', 'estado'];
+    // apellido e identificacion viven en users (datos de la cuenta).
+    protected $fillable = ['id', 'nombre', 'apellido', 'identificacion', 'email', 'password', 'rol', 'estado'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -33,6 +34,11 @@ class User extends Authenticatable
     public function esDocente(): bool
     {
         return $this->rol === 'docente';
+    }
+
+    public function accesos()
+    {
+        return $this->hasMany(LoginLog::class);
     }
 
     /**

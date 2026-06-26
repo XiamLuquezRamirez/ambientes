@@ -3,59 +3,57 @@
 namespace Database\Seeders;
 
 use App\Models\ConfiguracionPin;
-use App\Models\Estudiante;
-use App\Models\Grado;
-use App\Models\Grupo;
-use App\Models\Matricula;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class EstudiantesDemoSeeder extends Seeder
 {
     public function run(): void
     {
-        $estudiantesData = [
-            ['nombre' => 'Valentina', 'iniciales' => 'VA', 'color_avatar' => '#0F6E56', 'pin' => ['circulo',   'estrella',  'corazon']],
-            ['nombre' => 'Mateo',     'iniciales' => 'MA', 'color_avatar' => '#534AB7', 'pin' => ['estrella',  'triangulo', 'luna']],
-            ['nombre' => 'Sofía',     'iniciales' => 'SO', 'color_avatar' => '#854F0B', 'pin' => ['corazon',   'diamante',  'cuadrado']],
-            ['nombre' => 'Juan',      'iniciales' => 'JU', 'color_avatar' => '#185FA5', 'pin' => ['triangulo', 'rayo',      'estrella']],
-            ['nombre' => 'Camila',    'iniciales' => 'CA', 'color_avatar' => '#993C1D', 'pin' => ['luna',      'circulo',   'diamante']],
-            ['nombre' => 'Luna',      'iniciales' => 'LU', 'color_avatar' => '#F59E0B', 'pin' => ['rayo',      'corazon',   'triangulo']],
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        DB::table('estudiantes')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+        DB::table('estudiantes')->insert([
+            ['id' => 1,  'nombre' => 'Valentina',             'avatar' => null,                                                                    'identificacion' => 1111,      'iniciales' => 'VA', 'grado_id' => null, 'color_avatar' => '#0F6E56', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2021-01-17', 'acudiente' => null,          'telefono_acudiente' => null,        'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-16 00:02:01', 'updated_at' => '2026-06-16 00:02:01'],
+            ['id' => 2,  'nombre' => 'Mateo',                 'avatar' => null,                                                                    'identificacion' => 2222,      'iniciales' => 'MA', 'grado_id' => null, 'color_avatar' => '#534AB7', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => null,          'acudiente' => null,          'telefono_acudiente' => null,        'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-16 00:02:01', 'updated_at' => '2026-06-16 00:02:01'],
+            ['id' => 3,  'nombre' => 'Sofía',                 'avatar' => null,                                                                    'identificacion' => 3333,      'iniciales' => 'SO', 'grado_id' => null, 'color_avatar' => '#854F0B', 'condicion_id' => 1, 'activo' => 0, 'fecha_nacimiento' => null,          'acudiente' => null,          'telefono_acudiente' => null,        'requiere_apoyo' => 'si',        'sexo' => null,       'created_at' => '2026-06-16 00:02:01', 'updated_at' => '2026-06-16 00:02:01'],
+            ['id' => 4,  'nombre' => 'Juan',                  'avatar' => null,                                                                    'identificacion' => 4444,      'iniciales' => 'JU', 'grado_id' => null, 'color_avatar' => '#185FA5', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => null,          'acudiente' => null,          'telefono_acudiente' => null,        'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-16 00:02:01', 'updated_at' => '2026-06-16 00:02:01'],
+            ['id' => 5,  'nombre' => 'Camila',                'avatar' => null,                                                                    'identificacion' => 5555,      'iniciales' => 'CA', 'grado_id' => null, 'color_avatar' => '#993C1D', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => null,          'acudiente' => null,          'telefono_acudiente' => null,        'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-16 00:02:01', 'updated_at' => '2026-06-16 00:02:01'],
+            ['id' => 6,  'nombre' => 'Luna',                  'avatar' => null,                                                                    'identificacion' => 6666,      'iniciales' => 'LU', 'grado_id' => null, 'color_avatar' => '#F59E0B', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => null,          'acudiente' => null,          'telefono_acudiente' => null,        'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-16 00:02:01', 'updated_at' => '2026-06-16 00:02:01'],
+            ['id' => 7,  'nombre' => 'José',                  'avatar' => null,                                                                    'identificacion' => 134123123, 'iniciales' => 'Jo', 'grado_id' => '1',  'color_avatar' => '#0F6E56', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => null,          'acudiente' => 'Juana',       'telefono_acudiente' => '245234234', 'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-18 16:04:20', 'updated_at' => '2026-06-18 16:04:20'],
+            ['id' => 8,  'nombre' => 'José',                  'avatar' => null,                                                                    'identificacion' => 134123123, 'iniciales' => 'Jo', 'grado_id' => '1',  'color_avatar' => '#0F6E56', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => null,          'acudiente' => 'Juana',       'telefono_acudiente' => '245234234', 'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-18 16:04:36', 'updated_at' => '2026-06-18 16:04:36'],
+            ['id' => 9,  'nombre' => 'Fabian Mendez',         'avatar' => null,                                                                    'identificacion' => 123123123, 'iniciales' => 'FM', 'grado_id' => '3',  'color_avatar' => '#0F6E56', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => null,          'acudiente' => 'Juana 2',     'telefono_acudiente' => '32434234',  'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-18 16:08:25', 'updated_at' => '2026-06-18 16:08:25'],
+            ['id' => 10, 'nombre' => 'Juan Lopez 3',          'avatar' => null,                                                                    'identificacion' => 3423423,   'iniciales' => 'JL', 'grado_id' => '2',  'color_avatar' => '#0F6E56', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => null,          'acudiente' => 'Juana 5',     'telefono_acudiente' => '3423423',   'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-18 16:12:47', 'updated_at' => '2026-06-18 16:12:47'],
+            ['id' => 11, 'nombre' => 'Andres quintero',       'avatar' => null,                                                                    'identificacion' => 5345345,   'iniciales' => 'AQ', 'grado_id' => '1',  'color_avatar' => '#0F6E56', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2018-01-22',  'acudiente' => 'yyyyyyy',     'telefono_acudiente' => '5345345',   'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-18 16:19:02', 'updated_at' => '2026-06-18 16:19:02'],
+            ['id' => 12, 'nombre' => 'Fabian Mendez Quintero','avatar' => null,                                                                    'identificacion' => 342423,    'iniciales' => 'FM', 'grado_id' => '1',  'color_avatar' => '#0F6E56', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2019-05-16',  'acudiente' => 'hfghfghfgh',  'telefono_acudiente' => '634634',    'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-18 16:56:48', 'updated_at' => '2026-06-18 16:56:48'],
+            ['id' => 13, 'nombre' => 'Andrea Rodriguez',      'avatar' => 'estudiantes/lNIZ6VFiTteCno5FKRNh5FCY37imQS7xXLNXdP9U.jpg',           'identificacion' => 5345345,   'iniciales' => 'AR', 'grado_id' => '1',  'color_avatar' => '#ffb81f', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2023-12-10',  'acudiente' => 'Julian Rodriguez','telefono_acudiente' => '45345',   'requiere_apoyo' => 'si',        'sexo' => 'femenino', 'created_at' => '2026-06-18 17:15:22', 'updated_at' => '2026-06-23 09:59:35'],
+            ['id' => 14, 'nombre' => 'Xiamir luquez',         'avatar' => 'estudiantes/23NS51sSHtdWtH2tQynzAD0EfRAd6m2WaZensqbP.webp',          'identificacion' => 4353453,   'iniciales' => 'XL', 'grado_id' => '1',  'color_avatar' => '#0F6E56', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2021-06-12',  'acudiente' => 'yyyy',        'telefono_acudiente' => '345345',    'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-18 17:20:14', 'updated_at' => '2026-06-18 17:20:14'],
+            ['id' => 15, 'nombre' => 'Juan David  Perez',     'avatar' => null,                                                                    'identificacion' => 6456456,   'iniciales' => 'JD', 'grado_id' => null, 'color_avatar' => '#ff8a05', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2023-06-07',  'acudiente' => 'tttt',        'telefono_acudiente' => '345345',    'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-19 08:00:29', 'updated_at' => '2026-06-19 08:00:29'],
+            ['id' => 16, 'nombre' => 'Juana Lopera',          'avatar' => null,                                                                    'identificacion' => 654645,    'iniciales' => 'JL', 'grado_id' => null, 'color_avatar' => '#79fbf9', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2014-07-12',  'acudiente' => 'uuuu',        'telefono_acudiente' => '6666',      'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-19 08:01:32', 'updated_at' => '2026-06-19 08:01:32'],
+            ['id' => 17, 'nombre' => 'Luisa Castro',          'avatar' => null,                                                                    'identificacion' => 525252,    'iniciales' => 'LC', 'grado_id' => null, 'color_avatar' => '#ff0000', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2020-01-12',  'acudiente' => 'yyyy',        'telefono_acudiente' => '23423423',  'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-19 14:17:51', 'updated_at' => '2026-06-19 14:17:51'],
+            ['id' => 18, 'nombre' => 'pedro velazques',       'avatar' => null,                                                                    'identificacion' => 34534534,  'iniciales' => 'PV', 'grado_id' => null, 'color_avatar' => '#3d2258', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2026-06-23',  'acudiente' => 'ertert',      'telefono_acudiente' => '334634634', 'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-20 10:12:28', 'updated_at' => '2026-06-20 10:12:28'],
+            ['id' => 19, 'nombre' => 'Julio Jaramillo',       'avatar' => null,                                                                    'identificacion' => 12323123,  'iniciales' => 'JJ', 'grado_id' => null, 'color_avatar' => '#ba79fb', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2017-05-23',  'acudiente' => 'ghdfh',       'telefono_acudiente' => '345345',    'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-20 10:16:15', 'updated_at' => '2026-06-20 10:16:15'],
+            ['id' => 20, 'nombre' => 'Olimpo cardenas',       'avatar' => null,                                                                    'identificacion' => 324234,    'iniciales' => 'OC', 'grado_id' => null, 'color_avatar' => '#ba79fb', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2022-12-12',  'acudiente' => '234234',      'telefono_acudiente' => '45345',     'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-20 10:19:58', 'updated_at' => '2026-06-20 10:19:58'],
+            ['id' => 21, 'nombre' => 'Nicola Di Bari',        'avatar' => null,                                                                    'identificacion' => 5634545,   'iniciales' => 'ND', 'grado_id' => null, 'color_avatar' => '#ba79fb', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2000-01-22',  'acudiente' => 'fgfdgdfgdf',  'telefono_acudiente' => '34534',     'requiere_apoyo' => 'no',        'sexo' => null,       'created_at' => '2026-06-20 10:39:00', 'updated_at' => '2026-06-20 10:39:00'],
+            ['id' => 26, 'nombre' => 'fghfghfg',              'avatar' => null,                                                                    'identificacion' => 45345,     'iniciales' => 'FG', 'grado_id' => '2',  'color_avatar' => '#ba79fb', 'condicion_id' => 1, 'activo' => 1, 'fecha_nacimiento' => '2024-06-17',  'acudiente' => '5etrwetr',    'telefono_acudiente' => '34534',     'requiere_apoyo' => 'en_proceso', 'sexo' => 'femenino', 'created_at' => '2026-06-22 15:20:25', 'updated_at' => '2026-06-22 15:20:25'],
+        ]);
+
+        // PINs de los 6 estudiantes demo originales
+        $pins = [
+            1 => ['circulo',   'estrella',  'corazon'],
+            2 => ['estrella',  'triangulo', 'luna'],
+            3 => ['corazon',   'diamante',  'cuadrado'],
+            4 => ['triangulo', 'rayo',      'estrella'],
+            5 => ['luna',      'circulo',   'diamante'],
+            6 => ['rayo',      'corazon',   'triangulo'],
         ];
 
-        // Jardín A del año actual para todos los estudiantes demo
-        $grado = Grado::where('nombre', 'Jardin')->first();
-        $grupo = $grado ? Grupo::where('grado_id', $grado->id)
-                               ->where('nombre', 'A')
-                               ->where('anio_lectivo', date('Y'))
-                               ->first() : null;
-
-        foreach ($estudiantesData as $data) {
-            $pin = $data['pin'];
-            unset($data['pin']);
-            $data['condicion'] = 'estandar';
-            $data['activo']    = true;
-
-            $estudiante = Estudiante::firstOrCreate(['nombre' => $data['nombre']], $data);
-
+        foreach ($pins as $estudianteId => $pin) {
             ConfiguracionPin::firstOrCreate(
-                ['estudiante_id' => $estudiante->id],
+                ['estudiante_id' => $estudianteId],
                 ['figura_1' => $pin[0], 'figura_2' => $pin[1], 'figura_3' => $pin[2]]
             );
-
-            if ($grado && $grupo) {
-                Matricula::updateOrCreate(
-                    [
-                        'estudiante_id' => $estudiante->id,
-                        'anio_lectivo'  => date('Y'),
-                    ],
-                    [
-                        'grado_id'      => $grado->id,
-                        'grupo_id'      => $grupo->id,
-                        'estado'        => 'activo',
-                        'fecha_ingreso' => now()->startOfYear(),
-                    ]
-                );
-            }
         }
     }
 }

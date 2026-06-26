@@ -11,17 +11,17 @@ return new class extends Migration
         Schema::create('carga_docente', function (Blueprint $table) {
             $table->id();
             $table->foreignId('docente_id')
-                  ->constrained('docentes')
-                  ->onDelete('cascade');
+                ->constrained('docentes')
+                ->onDelete('cascade');
             $table->foreignId('ambiente_id')
-                  ->constrained('ambientes')
-                  ->onDelete('restrict');
+                ->constrained('ambientes')
+                ->onDelete('restrict');
             $table->foreignId('grado_id')
-                  ->constrained('grados')
-                  ->onDelete('restrict');
+                ->constrained('grados')
+                ->onDelete('restrict');
             $table->foreignId('grupo_id')
-                  ->constrained('grupos')
-                  ->onDelete('restrict');
+                ->constrained('grupos')
+                ->onDelete('restrict');
             $table->year('anio_lectivo');
             $table->boolean('activo')->default(true);
             $table->timestamps();
@@ -32,6 +32,10 @@ return new class extends Migration
             );
             $table->index(['docente_id', 'anio_lectivo']);
             $table->index(['ambiente_id', 'grado_id', 'grupo_id', 'anio_lectivo']);
+            $table->unique(
+                ['ambiente_id', 'grupo_id', 'anio_lectivo'],
+                'carga_docente_ambiente_grupo_anio_unique'
+            );
         });
     }
 

@@ -1,11 +1,16 @@
 <?php
 
 use App\Http\Controllers\Admin\AmbienteAdminController;
+use App\Http\Controllers\Admin\AsignacionAmbienteController;
 use App\Http\Controllers\Admin\CatalogoController;
+use App\Http\Controllers\Admin\CierreAnioController;
 use App\Http\Controllers\Admin\ConfiguracionAdminController;
 use App\Http\Controllers\Admin\ConflictosController;
 use App\Http\Controllers\Admin\DocenteAdminController;
 use App\Http\Controllers\Admin\EstudianteAdminController;
+use App\Http\Controllers\Admin\GradoGrupoController;
+use App\Http\Controllers\Admin\GruposController;
+use App\Http\Controllers\Admin\MatriculaAdminController;
 use App\Http\Controllers\Admin\ReportesController;
 use App\Http\Controllers\Admin\SyncLogController;
 use App\Http\Controllers\Auth\AuthDocenteController;
@@ -37,11 +42,59 @@ Route::post('/logout', [AuthDocenteController::class, 'cerrarSesion'])->name('do
 Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('/', fn () => redirect()->route('admin.ambientes'));
 
-    // Ambientes
+    // Ambientes (los 5 ambientes son fijos — solo configuración)
     Route::get('ambientes', [AmbienteAdminController::class, 'listar'])->name('admin.ambientes');
-    Route::get('ambientes/{ambiente}/edit', [AmbienteAdminController::class, 'formularioEditar'])->name('admin.ambientes.edit');
-    Route::put('ambientes/{ambiente}', [AmbienteAdminController::class, 'actualizar'])->name('admin.ambientes.update');
+    Route::patch('ambientes/{ambiente}/ip', [AmbienteAdminController::class, 'actualizarIp'])->name('admin.ambientes.ip');
+    Route::patch('ambientes/{ambiente}/cupo', [AmbienteAdminController::class, 'actualizarCupo'])->name('admin.ambientes.cupo');
     Route::post('ambientes/{ambiente}/ping', [AmbienteAdminController::class, 'verificarConexion'])->name('admin.ambientes.ping');
+    Route::get('ambientes/{ambiente}/docentes', [AmbienteAdminController::class, 'docentesDelPeriodo'])->name('admin.ambientes.docentes');
+    Route::get('ambientes/{ambiente}/modulos', [AmbienteAdminController::class, 'modulos'])->name('admin.ambientes.modulos');
+    Route::get('ambientes/listado', [AmbienteAdminController::class, 'listado'])->name('admin.ambientes.listado');
+    Route::get('ambientes/{ambiente}/gradoslistado', [AmbienteAdminController::class, 'gradoslistado'])->name('admin.ambientes.gradoslistado');
+
+    // Grados habilitados por ambiente (solo toggles)
+    Route::get('ambientes/{ambiente}/grados', [GradoGrupoController::class, 'gestionar'])->name('admin.ambientes.grados');
+    Route::patch('ambientes/{ambiente}/grados/{grado}/activar', [GradoGrupoController::class, 'activarGrado'])->name('admin.ambientes.grados.activar');
+    Route::get('grados/{grado}/grupos', [GradoGrupoController::class, 'grupos'])->name('admin.grados.grupos');
+    Route::get('grados/{grado}/anios', [GradoGrupoController::class, 'aniosLectivos'])->name('admin.grados.anios');
+
+    // Asignaciones de estudiantes a un ambiente
+    Route::get('ambientes/{ambiente}/asignaciones', [AsignacionAmbienteController::class, 'index'])->name('admin.ambientes.asignaciones');
+    Route::get('ambientes/{ambiente}/asignaciones/tabla', [AsignacionAmbienteController::class, 'tabla'])->name('admin.ambientes.asignaciones.tabla');
+    Route::get('ambientes/{ambiente}/asignaciones/buscar', [AsignacionAmbienteController::class, 'buscar'])->name('admin.ambientes.asignaciones.buscar');
+    Route::post('ambientes/{ambiente}/asignaciones', [AsignacionAmbienteController::class, 'asignar'])->name('admin.ambientes.asignaciones.asignar');
+    Route::patch('ambientes/{ambiente}/asignaciones/{ea}', [AsignacionAmbienteController::class, 'actualizar'])->name('admin.ambientes.asignaciones.actualizar');
+    Route::delete('ambientes/{ambiente}/asignaciones/{ea}', [AsignacionAmbienteController::class, 'quitar'])->name('admin.ambientes.asignaciones.quitar');
+
+    // Grupos institucionales
+    Route::get('grupos', [GruposController::class, 'index'])->name('admin.grupos');
+    Route::post('grupos', [GruposController::class, 'guardar'])->name('admin.grupos.guardar');
+    Route::post('grupos/{grupo}/asignar-docente', [GruposController::class, 'asignarDocente'])->name('admin.grupos.asignar-docente');
+    Route::put('grupos/{grupo}', [GruposController::class, 'actualizar'])->name('admin.grupos.actualizar');
+    Route::delete('grupos/{grupo}', [GruposController::class, 'eliminar'])->name('admin.grupos.eliminar');
+
+    // Cierre de año lectivo
+    Route::prefix('cierre')->name('admin.cierre.')->group(function () {
+        Route::get('/', [CierreAnioController::class, 'index'])->name('index');
+        Route::get('/grupos', [CierreAnioController::class, 'grupos'])->name('grupos');
+        Route::get('/estudiantes', [CierreAnioController::class, 'estudiantes'])->name('estudiantes');
+        Route::post('/aplicar', [CierreAnioController::class, 'aplicar'])->name('aplicar');
+    });
+
+    // Matrículas
+    Route::prefix('matriculas')->name('admin.matriculas.')->group(function () {
+        Route::get('/', [MatriculaAdminController::class, 'index'])->name('index');
+        Route::get('/tabla', [MatriculaAdminController::class, 'tabla'])->name('tabla');
+        Route::get('/buscar-estudiante', [MatriculaAdminController::class, 'buscarEstudiante'])->name('buscar');
+        Route::get('/grupos-disponibles', [MatriculaAdminController::class, 'gruposDisponibles'])->name('grupos');
+        Route::get('/grupos-estado', [MatriculaAdminController::class, 'gruposEstado'])->name('grupos-estado');
+        Route::patch('/estado-grupo', [MatriculaAdminController::class, 'cambiarEstadoPorGrupo'])->name('estado-grupo');
+        Route::post('/', [MatriculaAdminController::class, 'matricular'])->name('store');
+        Route::get('/{matricula}/datos', [MatriculaAdminController::class, 'datosEditar'])->name('datos');
+        Route::put('/{matricula}', [MatriculaAdminController::class, 'actualizar'])->name('update');
+        Route::patch('/{matricula}/estado', [MatriculaAdminController::class, 'cambiarEstado'])->name('estado');
+        Route::delete('/{matricula}', [MatriculaAdminController::class, 'eliminar'])->name('destroy');
+    });
 
     // Sincronizacion y conflictos
     Route::get('sync-log', [SyncLogController::class, 'listar'])->name('admin.sync-log');
@@ -52,13 +105,20 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('docentes', [DocenteAdminController::class, 'listar'])->name('admin.docentes');
     Route::get('docentes/create', [DocenteAdminController::class, 'formularioCrear'])->name('admin.docentes.create');
     // Endpoint JSON para cargar los datos del docente en el modal de completar información.
+    // Debe declararse antes de docentes/{docente}; si no, Laravel interpreta "accesos" como parte del detalle genérico.
+    Route::get('docentes/{docente}/accesos', [DocenteAdminController::class, 'verAccesos'])->name('admin.docentes.accesos');
+    Route::get('docentes/{docente}/asignaciones', [DocenteAdminController::class, 'asignacionesActuales'])->name('admin.docentes.asignaciones');
+    Route::post('docentes/{docente}/asignar-grupo', [DocenteAdminController::class, 'asignarGrupo'])->name('admin.docentes.asignar-grupo');
+    Route::delete('docentes/{docente}/asignaciones/{carga}', [DocenteAdminController::class, 'quitarAsignacion'])->name('admin.docentes.quitar-asignacion');
     Route::get('docentes/{docente}', [DocenteAdminController::class, 'ver'])->name('admin.docentes.show');
     Route::post('docentes', [DocenteAdminController::class, 'guardar'])->name('admin.docentes.store');
-    Route::get('docentes/{docente}/edit', [DocenteAdminController::class, 'formularioEditar'])->name('admin.docentes.edit');
+    Route::get('docentes/datos/{docente_id}', [DocenteAdminController::class, 'verDatosDocente'])->name('admin.docentes.datos');
+    Route::patch('docentes/{docente}/toggle-activo', [DocenteAdminController::class, 'toggleActivo'])->name('admin.docentes.toggleActivo');
     Route::put('docentes/{docente}', [DocenteAdminController::class, 'actualizar'])->name('admin.docentes.update');
     Route::put('docentes/{docente}/asignar-info', [DocenteAdminController::class, 'asignarInfo'])->name('admin.docentes.asignar-info');
     Route::delete('docentes/{docente}', [DocenteAdminController::class, 'eliminar'])->name('admin.docentes.destroy');
     Route::post('docentes/{docente}/reset-password', [DocenteAdminController::class, 'restablecerContrasena'])->name('admin.docentes.reset-password');
+    Route::get('docentes/{docente}/generar-pdf', [DocenteAdminController::class, 'generarPdf'])->name('admin.docentes.generar-pdf');
 
     // Estudiantes (admin)
     Route::get('estudiantes',                        [EstudianteAdminController::class, 'listar'])->name('admin.estudiantes');

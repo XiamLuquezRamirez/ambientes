@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -16,19 +17,33 @@ class AuthDocenteController extends Controller
     public function iniciarSesion(Request $request)
     {
         $credenciales = $request->validate([
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if (!Auth::guard('docente')->attempt($credenciales, $request->boolean('recordar'))) {
+        if (! Auth::guard('docente')->attempt($credenciales, $request->boolean('recordar'))) {
             return back()->withErrors(['email' => 'Credenciales incorrectas.'])->withInput();
         }
 
         $usuario = Auth::guard('docente')->user();
+        if ($usuario->estado === 'inactivo') {
+            Auth::guard('docente')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
+            return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra inactiva.');
+        }
+        if ($usuario->estado === 'eliminado') {
+            Auth::guard('docente')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra eliminada.');
+        }
         LoginLog::create([
-            'user_id'  => $usuario->id,
-            'ip'       => $request->ip(),
+            'user_id' => $usuario->id,
+            'ip' => $request->ip(),
+            'fecha' => now(),
             'ambiente' => config('ambiente.slug'),
         ]);
 
@@ -44,6 +59,7 @@ class AuthDocenteController extends Controller
         Auth::guard('docente')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('docente.login');
     }
 }

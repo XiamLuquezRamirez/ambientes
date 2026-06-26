@@ -9,9 +9,9 @@ class Ambiente extends Model
 {
     use Sincronizable;
 
-    protected $fillable = ['nombre', 'slug', 'color_hex', 'icono', 'servidor_ip', 'activo'];
+    protected $fillable = ['nombre', 'slug', 'color_hex', 'icono', 'servidor_ip', 'activo', 'cupo_defecto'];
 
-    protected $casts = ['activo' => 'boolean'];
+    protected $casts = ['activo' => 'boolean', 'cupo_defecto' => 'integer'];
 
     public function cargasDocente()
     {
@@ -29,5 +29,43 @@ class Ambiente extends Model
     public function modulos()
     {
         return $this->hasMany(Modulo::class)->orderBy('orden');
+    }
+
+    public function grados()
+    {
+        return $this->belongsToMany(
+            Grado::class,
+            'ambiente_grado'
+        );
+    }
+
+    public function gradosHabilitados()
+    {
+        return $this->belongsToMany(
+            Grado::class,
+            'ambiente_grado'
+        )
+            ->withPivot('activo')
+            ->wherePivot('activo', 1)
+            ->orderBy('orden');
+    }
+
+    public function todosGrados()
+    {
+        return $this->belongsToMany(Grado::class, 'ambiente_grado')
+            ->withPivot('activo')
+            ->orderBy('orden');
+    }
+
+    public function estudiantesAmbiente()
+    {
+        return $this->hasMany(EstudianteAmbiente::class);
+    }
+
+    public function estudiantes()
+    {
+        return $this->belongsToMany(Estudiante::class, 'estudiante_ambiente')
+            ->withPivot(['anio_lectivo', 'estado', 'observacion'])
+            ->withTimestamps();
     }
 }

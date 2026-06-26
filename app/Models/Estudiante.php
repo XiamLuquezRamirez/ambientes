@@ -44,7 +44,8 @@ class Estudiante extends Model
     {
         return $this->hasOne(Matricula::class)
             ->where('estado', 'activo')
-            ->where('anio_lectivo', date('Y'));
+            ->where('anio_lectivo', date('Y')
+        );
     }
 
     public function departamento()
@@ -55,6 +56,13 @@ class Estudiante extends Model
     public function municipio()
     {
         return $this->belongsTo(Municipio::class);
+    }
+
+    public function matriculasActivas()
+    {
+        return $this->hasMany(Matricula::class)
+            ->where('estado', 'activo')
+            ->where('anio_lectivo', date('Y'));
     }
 
     public function piar()
@@ -75,5 +83,17 @@ class Estudiante extends Model
     public function configuracionPin()
     {
         return $this->hasOne(ConfiguracionPin::class, 'estudiante_id', 'id');
+    }
+
+    public function ambientes()
+    {
+        return $this->belongsToMany(Ambiente::class, 'estudiante_ambiente')
+            ->withPivot(['anio_lectivo', 'estado', 'observacion'])
+            ->withTimestamps();
+    }
+
+    public function asignacionesAmbiente()
+    {
+        return $this->hasMany(EstudianteAmbiente::class);
     }
 }
