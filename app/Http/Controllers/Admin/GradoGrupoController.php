@@ -9,6 +9,11 @@ use Illuminate\Http\Request;
 
 class GradoGrupoController extends Controller
 {
+    /**
+     * Muestra los grados disponibles para un ambiente y si están habilitados.
+     *
+     * Permite alternar la habilitación de cada grado para ese ambiente.
+     */
     public function gestionar(Request $request, Ambiente $ambiente)
     {
         $grados = Grado::activos()->get();
@@ -26,6 +31,11 @@ class GradoGrupoController extends Controller
         return view('admin.ambientes.grados-grupos', compact('ambiente', 'gradosConInfo'));
     }
 
+    /**
+     * Activa o desactiva un grado en el ambiente seleccionado.
+     *
+     * Si no existe el registro pivot lo crea como activo.
+     */
     public function activarGrado(Request $request, Ambiente $ambiente, Grado $grado)
     {
         $pivot = $ambiente->todosGrados()->where('grado_id', $grado->id)->first();
@@ -41,14 +51,25 @@ class GradoGrupoController extends Controller
         return response()->json(['habilitado' => $nuevoEstado]);
     }
 
+    /**
+     * Devuelve grupos activos de un grado para un año lectivo,
+     * excluyendo aquellos ya ocupados en un ambiente específico.
+     */
     public function grupos(Request $request, Grado $grado)
     {
-        $anio = $request->anio_lectivo;
+        $anio = $request->anio_lectivo ?? date('Y');
+        $ambienteId = $request->ambiente_id;
 
         return response()->json(
             $grado->grupos()
-                ->when($anio, function ($query) use ($anio) {
-                    $query->where('anio_lectivo', $anio);
+                ->where('anio_lectivo', $anio)
+                ->where('activo', true)
+                ->when($ambienteId, function ($query) use ($anio, $ambienteId) {
+                    $query->whereDoesntHave('cargasDocente', function ($sub) use ($anio, $ambienteId) {
+                        $sub->where('anio_lectivo', $anio)
+                            ->where('ambiente_id', $ambienteId)
+                            ->where('activo', true);
+                    });
                 })
                 ->select('id', 'nombre')
                 ->orderBy('nombre')

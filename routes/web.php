@@ -68,6 +68,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     // Grupos institucionales
     Route::get('grupos', [GruposController::class, 'index'])->name('admin.grupos');
     Route::post('grupos', [GruposController::class, 'guardar'])->name('admin.grupos.guardar');
+    Route::post('grupos/{grupo}/asignar-docente', [GruposController::class, 'asignarDocente'])->name('admin.grupos.asignar-docente');
     Route::put('grupos/{grupo}', [GruposController::class, 'actualizar'])->name('admin.grupos.actualizar');
     Route::delete('grupos/{grupo}', [GruposController::class, 'eliminar'])->name('admin.grupos.eliminar');
 
@@ -105,6 +106,9 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     // Endpoint JSON para cargar los datos del docente en el modal de completar información.
     // Debe declararse antes de docentes/{docente}; si no, Laravel interpreta "accesos" como parte del detalle genérico.
     Route::get('docentes/{docente}/accesos', [DocenteAdminController::class, 'verAccesos'])->name('admin.docentes.accesos');
+    Route::get('docentes/{docente}/asignaciones', [DocenteAdminController::class, 'asignacionesActuales'])->name('admin.docentes.asignaciones');
+    Route::post('docentes/{docente}/asignar-grupo', [DocenteAdminController::class, 'asignarGrupo'])->name('admin.docentes.asignar-grupo');
+    Route::delete('docentes/{docente}/asignaciones/{carga}', [DocenteAdminController::class, 'quitarAsignacion'])->name('admin.docentes.quitar-asignacion');
     Route::get('docentes/{docente}', [DocenteAdminController::class, 'ver'])->name('admin.docentes.show');
     Route::post('docentes', [DocenteAdminController::class, 'guardar'])->name('admin.docentes.store');
     Route::get('docentes/datos/{docente_id}', [DocenteAdminController::class, 'verDatosDocente'])->name('admin.docentes.datos');

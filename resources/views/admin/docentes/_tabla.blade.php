@@ -20,7 +20,7 @@
                             {{ $d->nombre }}
 
                             {{-- se deja comentado pero se puede activar para que se muestre el mensaje de cuenta nueva.
-                         
+
                             @if ($d->user->cuenta_sin_usar)
                                 <span class="badge badge-yellow badge-cuenta-nueva"
                                     title="Cuenta creada pero nunca ha iniciado sesión">
@@ -60,8 +60,12 @@
                                     onclick="abrirModalAsignarGrado({{ $d->user->id }})"><i
                                         class="fa-solid fa-list"></i>
                                     Asignar Grupo</button>
-                                <button class="btn-accion btn-editar" onclick="abrirModalEditar({{ $d->user_id }})"><i
-                                        class="fa-solid fa-pencil"></i>
+                                <a class="btn-accion btn-editar"
+                                    href="{{ route('admin.docentes.show', $d->user_id) }}"><i
+                                        class="fa-solid fa-eye"></i>
+                                    Detalle</a>
+                                <button class="btn-accion btn-editar"
+                                    onclick="abrirModalEditar({{ $d->user_id }})"><i class="fa-solid fa-pencil"></i>
                                     Editar</button>
                                 <button type="button" class="btn-accion btn-eliminar" title="Eliminar"
                                     data-id="{{ $d->id }}" data-nombre="{{ e($d->nombre) }}"
