@@ -22,8 +22,9 @@
 <body>
     <aside class="sidebar">
         <div class="sidebar-logo">
-            <span class="brand">PedNia</span>
-            <span class="badge-admin">ADMIN</span>
+            <span class="brand">
+                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="PedNia" style="width:100%;height:100%;object-fit:contain">
+            </span>
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">

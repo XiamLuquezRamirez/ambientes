@@ -7,9 +7,9 @@
                 <div class="modal-header-icon"><i class="fas fa-user-graduate text-white"></i></div>
                 <div class="flex-grow-1">
                     <h5 class="modal-title mb-0" id="modalRegistroLabel">Nuevo Estudiante</h5>
-                    <p class="modal-subtitle mb-0">Completa los datos para crear el estudiante</p>
+                    <p class="modal-subtitle mb-0" id="modalRegistroSubtitle">Completa los datos para crear el estudiante</p>
                 </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
+                <button type="button" class="btn-close" onclick="cerrarModal()" aria-label="Cerrar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -22,6 +22,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#datos-atencion"><i class="fas fa-cog"></i> Ajuste en Proceso de Aprendizaje</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#configuracion_pin"><i class="fas fa-key"></i> Configuración de PIN</a>
                         </li>
                     </ul>
                     <!-- Tab panes -->
@@ -40,17 +43,41 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="identificacion">Identificación</label>
-                                        <input type="number" name="identificacion" id="identificacion" class="form-control">
+                                        <label for="nombre">Tipo identificación</label>
+                                        <select onchange="mostrarOtroTipoIdentificacion()" name="tipo_identificacion" id="tipo_identificacion" class="form-control">
+                                            <option value="">Seleccione</option>
+                                            <option value="TI">TI</option>
+                                            <option value="CC">CC</option>
+                                            <option value="RC">RC</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="otro_tipo_identificacion_container" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="identificacion">Otro tipo de identificación</label>
+                                        <input type="text" name="otro_tipo_identificacion" id="otro_tipo_identificacion" class="form-control">
                                     </div>
                                 </div>
                                 <div class="col-md-8">
                                     <div class="form-group">
-                                        <label for="nombre">Nombre</label>
+                                        <label for="identificacion">Identificación</label>
+                                        <input type="number" name="identificacion" id="identificacion" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="nombre">Nombres</label>
                                         <input type="text" name="nombre" id="nombre" class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="apellido">Apellidos</label>
+                                        <input type="text" name="apellido" id="apellido" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="grado_id_nuevo">Grado</label>
                                         <select name="grado_id_nuevo" id="grado_id_nuevo" class="form-control">
@@ -73,6 +100,55 @@
                                         <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control">
                                     </div>
                                 </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="lugar_nacimiento">Lugar de Nacimiento</label>
+                                        <input type="text" name="lugar_nacimiento" id="lugar_nacimiento" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="departamento">Departamento</label>
+                                        <select onchange="cargarMunicipios()" name="departamento_id" id="departamento_id" class="form-control">
+                                            <option value="">Seleccione</option>
+                                            @foreach($departamentos as $d)
+                                            <option value="{{ $d->codigo }}">{{ $d->descripcion }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="municipio">Municipio</label>
+                                        <select name="municipio_id" id="municipio_id" class="form-control">                                            
+                                            <option value="">Seleccione</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="barrio_vereda">Barrio/Vereda</label>
+                                        <input type="text" name="barrio_vereda" id="barrio_vereda" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="direccion">Dirección</label>
+                                        <input type="text" name="direccion" id="direccion" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="telefono">Teléfono</label>
+                                        <input type="text" name="telefono" id="telefono" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" name="email" id="email" class="form-control">
+                                    </div>
+                                </div>
                                 <div class="col-md-3">  
                                     <div class="form-group">
                                         <label for="sexo">Sexo</label>
@@ -83,7 +159,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-6">    
+                                <div class="col-md-5">    
                                     <div class="form-group">
                                         <label for="acudiente">Acudiente</label>
                                         <input type="text" name="acudiente" id="acudiente" class="form-control">
@@ -122,6 +198,33 @@
                                             <div class="alert alert-danger" id="alert-no-requiere-apoyo" onclick="seleccionarAlert('alert-no-requiere-apoyo')" role="alert">
                                                 <i class="fas fa-2x fa-times"></i>
                                                 <p>No, el estudiante no requiere apoyo educativo.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane container fade" id="configuracion_pin">
+                            <div class="row p-2 container-configuracion-pin" name="configuracion_pin">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <h5 class="mb-4" style="font-weight: 600;">Seleccione 3 figuras para conformar el PIN de acceso del estudiante</h5>
+                                        <div class="pin-container">
+                                            <div class="pin-item" id="pin-item-1">
+                                            </div>
+                                            <div class="pin-item" id="pin-item-2">
+                                            </div>
+                                            <div class="pin-item" id="pin-item-3">
+                                            </div>
+                                        </div>
+                                        <div class="figuras-container">
+                                            @foreach($figuras as $figura)
+                                                <div class="figura-item" onclick="agregarFigura('{{ $figura['icon'] }}', '{{ $figura['color'] }}')">
+                                                    <i class="{{ $figura['icon'] }}" style="color: {{ $figura['color'] }};"></i>
+                                                </div>
+                                            @endforeach
+                                            <div class="figura-item-borrar" onclick="borrarFigura()">
+                                                <i class="fas fa-arrow-left"></i>
                                             </div>
                                         </div>
                                     </div>
