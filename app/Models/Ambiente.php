@@ -31,9 +31,20 @@ class Ambiente extends Model
         return $this->hasMany(Modulo::class)->orderBy('orden');
     }
 
+    public function grados()
+    {
+        return $this->belongsToMany(
+            Grado::class,
+            'ambiente_grado'
+        );
+    }
+
     public function gradosHabilitados()
     {
-        return $this->belongsToMany(Grado::class, 'ambiente_grado')
+        return $this->belongsToMany(
+            Grado::class,
+            'ambiente_grado'
+        )
             ->withPivot('activo')
             ->wherePivot('activo', 1)
             ->orderBy('orden');

@@ -143,13 +143,20 @@
 @endpush
 
 @section('content')
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div>
             <h1>Grupos</h1>
-            <p>Grupos académicos institucionales · Año {{ $anio }}</p>
+            <p>Vista global de grupos y docentes asignados</p>
         </div>
-        <div style="display:flex;gap:10px;align-items:center">
-            <select class="form-select form-select-sm" style="width:110px" onchange="window.location.href='?anio='+this.value">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <select class="form-select form-select-sm" style="width:140px" id="filtroGrado" onchange="aplicarFiltros()">
+                <option value="">Todos los grados</option>
+                @foreach ($grados as $grado)
+                    <option value="{{ $grado->id }}" {{ isset($gradoId) && $gradoId == $grado->id ? 'selected' : '' }}>
+                        {{ $grado->nombre }}</option>
+                @endforeach
+            </select>
+            <select class="form-select form-select-sm" style="width:110px" id="filtroAnio" onchange="aplicarFiltros()">
                 @foreach (range(2024, date('Y') + 1) as $y)
                     <option value="{{ $y }}" {{ $anio == $y ? 'selected' : '' }}>{{ $y }}</option>
                 @endforeach
@@ -160,51 +167,59 @@
         </div>
     </div>
 
-    @if ($grados->isEmpty())
+    @if ($grupos->isEmpty())
         <div style="text-align:center;padding:60px;color:#94A3B8">
             <i class="fas fa-layer-group" style="font-size:2.5rem;opacity:.35;display:block;margin-bottom:12px"></i>
-            Sin grados configurados.
+            Sin grupos para los filtros seleccionados.
         </div>
     @else
-        @foreach ($grados as $grado)
-            <div class="grado-bloque">
-                <div class="grado-bloque-header">
-                    <span class="grado-nombre">{{ $grado->nombre }}</span>
-                    <span class="grado-edad">({{ $grado->edad_anos }} años)</span>
-                    <span style="margin-left:auto;font-size:.78rem;color:#94A3B8">
-                        {{ $grado->grupos->count() }} grupo(s)
-                    </span>
-                </div>
-                <div class="grado-bloque-body">
-                    @if ($grado->grupos->isEmpty())
-                        <p style="color:#94A3B8;font-size:.85rem;margin:0" id="sin-grupos-{{ $grado->id }}">
-                            Sin grupos creados para {{ $anio }}.
-                        </p>
-                    @else
-                        @foreach ($grado->grupos as $grupo)
-                            <div class="grupo-fila" id="fila-grupo-{{ $grupo->id }}">
-                                <span class="grupo-nombre-txt">{{ $grado->nombre }} {{ $grupo->nombre }}</span>
-                                <span class="grupo-chip">Grupo {{ $grupo->nombre }}</span>
-                                <span style="font-size:.78rem;color:#64748B">Cupo: {{ $grupo->cupo_maximo }}</span>
-                                <div class="grupo-acciones">
-                                    <button class="btn-grupo btn-editar-grupo"
-                                        onclick="abrirModalGrupo({{ $grado->id }}, {{ $grupo->id }}, '{{ addslashes($grupo->nombre) }}', {{ $grupo->cupo_maximo }})">
-                                        <i class="fas fa-edit"></i> Editar
-                                    </button>
-                                    <button class="btn-grupo btn-eliminar-grupo"
-                                        onclick="eliminarGrupo({{ $grupo->id }}, '{{ addslashes($grado->nombre . ' ' . $grupo->nombre) }}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        @endforeach
-                    @endif
-                    <a class="link-agregar-grupo" onclick="abrirModalGrupo({{ $grado->id }}); return false;">
-                        + Agregar grupo en {{ $grado->nombre }}
-                    </a>
-                </div>
-            </div>
-        @endforeach
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Grado</th>
+                        <th>Grupo</th>
+                        <th>Año lectivo</th>
+                        <th>Docentes asignados</th>
+                        <th>Estudiantes</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($grupos as $grupo)
+                        @php
+                            $docentesAsignados = $grupo->cargasDocente
+                                ->pluck('docente')
+                                ->filter()
+                                ->map(fn($docente) => trim($docente->user->nombre . ' ' . $docente->user->apellido));
+                            $tieneAlumnos = $grupo->totalMatriculas($anio) > 0;
+                            $sinDocentes = $docentesAsignados->count() === 0;
+                        @endphp
+                        <tr class="{{ $tieneAlumnos && $sinDocentes ? 'table-danger' : '' }}"
+                            id="fila-grupo-{{ $grupo->id }}">
+                            <td>{{ $grupo->grado->nombre }}</td>
+                            <td>{{ $grupo->nombre }}</td>
+                            <td>{{ $grupo->anio_lectivo }}</td>
+                            <td>
+                                @if ($docentesAsignados->isEmpty())
+                                    <span class="text-muted">Sin docentes asignados</span>
+                                @else
+                                    {{ $docentesAsignados->join(', ') }}
+                                @endif
+                            </td>
+                            <td>{{ $grupo->totalMatriculas($anio) }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" data-grupo-id="{{ $grupo->id }}"
+                                    data-grado-id="{{ $grupo->grado_id }}" data-grado-nombre="{{ $grupo->grado->nombre }}"
+                                    data-grupo-nombre="{{ $grupo->nombre }}" onclick="abrirModalAsignarDocente(this)">
+                                    <i class="fas fa-user-plus"></i> Asignar docente
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
 
     {{-- Modal Nuevo/Editar Grupo --}}
@@ -360,6 +375,22 @@
             }
         }
 
+        function aplicarFiltros() {
+            const gradoId = document.getElementById('filtroGrado').value;
+            const anio = document.getElementById('filtroAnio').value;
+            const params = new URLSearchParams();
+
+            if (gradoId) {
+                params.set('grado_id', gradoId);
+            }
+            if (anio) {
+                params.set('anio', anio);
+            }
+
+            const url = params.toString() ? `${window.location.pathname}?${params.toString()}` : window.location.pathname;
+            window.location.href = url;
+        }
+
         async function eliminarGrupo(id, nombre) {
             const {
                 isConfirmed
@@ -399,6 +430,105 @@
 
         document.getElementById('modalGrupo').addEventListener('hidden.bs.modal', () => {
             document.getElementById('grupoGradoId').disabled = false;
+        });
+    </script>
+@endpush
+
+@include('admin.docentes.partials.modal-asignar-grupo')
+
+@push('scripts')
+    <script>
+        const URL_GRUPOS_ASIGNAR = "{{ url('admin/grupos') }}/:id/asignar-docente";
+        let grupoAsignarId = null;
+
+        function abrirModalAsignarDocente(button) {
+            const grupoId = button.dataset.grupoId;
+            const gradoId = button.dataset.gradoId;
+            const gradoNombre = button.dataset.gradoNombre;
+            const grupoNombre = button.dataset.grupoNombre;
+
+            grupoAsignarId = grupoId;
+            const form = document.getElementById('formAsignarInfo');
+            if (form) {
+                form.reset();
+            }
+            const asignarDocenteId = document.getElementById('asignar_docente_id');
+            if (asignarDocenteId) asignarDocenteId.value = '';
+            const asignarDocenteSelect = document.getElementById('asignar_docente_id_select');
+            if (asignarDocenteSelect) asignarDocenteSelect.value = '';
+            const asignarNombre = document.getElementById('asignar_nombre');
+            if (asignarNombre) asignarNombre.textContent = gradoNombre + ' ' + grupoNombre;
+            const asignarAmbiente = document.getElementById('asignar_ambiente_id');
+            if (asignarAmbiente) asignarAmbiente.value = '';
+            const asignarAnio = document.getElementById('asignar_anio_lectivo');
+            if (asignarAnio) asignarAnio.value = ANIO_LECTIVO;
+            const gradoSelect = document.getElementById('asignar_grado_id');
+            if (gradoSelect) {
+                gradoSelect.innerHTML = '<option value="' + gradoId + '">' + gradoNombre + '</option>';
+                gradoSelect.value = gradoId;
+            }
+            const grupoSelect = document.getElementById('asignar_grupos_id');
+            if (grupoSelect) {
+                grupoSelect.innerHTML = '<option value="' + grupoId + '">' + grupoNombre + '</option>';
+                grupoSelect.value = grupoId;
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('modalAsignarInfo'));
+            modal.show();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('formAsignarInfo');
+            if (!form) return;
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                if (!grupoAsignarId) {
+                    return;
+                }
+
+                const btn = document.getElementById('btnAsignarInfo');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = 'Guardando…';
+                }
+
+                const formData = new FormData(this);
+                const datos = Object.fromEntries(formData.entries());
+                const url = URL_GRUPOS_ASIGNAR.replace(':id', grupoAsignarId);
+                const res = await ajaxRequest(url, 'POST', datos);
+
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar asignación';
+                }
+
+                if (res.success) {
+                    mostrarToast('success', res.message || 'Docente asignado correctamente.');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(
+                        'modalAsignarInfo'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    grupoAsignarId = null;
+                    this.reset();
+                } else if (res.errors && Object.keys(res.errors).length) {
+                    limpiarErroresModal();
+                    for (const [campo, mensajes] of Object.entries(res.errors)) {
+                        const input = document.querySelector(`#formAsignarInfo [name="${campo}"]`);
+                        if (!input) continue;
+                        input.classList.add('is-invalid');
+                        const div = document.createElement('div');
+                        div.className = 'campo-error';
+                        div.textContent = mensajes[0];
+                        input.insertAdjacentElement('afterend', div);
+                    }
+                    const primero = document.querySelector('#formAsignarInfo .is-invalid');
+                    if (primero) primero.focus();
+                } else {
+                    mostrarToast('error', res.message || 'Error al guardar.');
+                }
+            });
         });
     </script>
 @endpush

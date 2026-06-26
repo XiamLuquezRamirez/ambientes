@@ -290,11 +290,12 @@
 }
 
 #previewAvatar{
-    width:100%;
-    height:100%;
-    border-radius:50%;
-    object-fit:cover;
-    border:4px solid #ddd;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: contain;
+    border: 4px solid #ddd;
+    padding: 10px;
 }
 
 .text-purple{
@@ -342,7 +343,7 @@
 }
 
 .card-purple.is-invalid {
-    border: 3px solid #dc2626 !important;
+    border: 1px solid #dc2626 !important;
 }
 
 .avatar-img {
@@ -377,4 +378,80 @@ ul.nav-tabs {
     background-color: #ffffff !important;
     border-color: #2045a3 #2045a3 #fff !important;
     color: #2045a3 !important;
+}
+
+.pin-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.pin-item {
+    width: 100px;
+    height: 100px;
+    border: 3px dashed #93b2ff;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 2.7rem;
+}
+
+.pin-item-active {
+    border: 3px solid #924497;
+    background-color: #ede4ff;
+}
+
+.pin-item:hover {
+    border: 3px solid #2045a3;
+}
+
+.figuras-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.figura-item {
+    width: 60px;
+    height: 60px;
+    background-color: #dbe5ff;
+    border: 3px solid #93b2ff;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.7rem;
+}
+
+.figura-item-borrar {
+    width: 60px;
+    height: 60px;
+    background-color: #ffdbdb;
+    border: 3px solid #ff9393;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.7rem;
+    margin-left: 30px;
+}
+
+.figura-item:hover {
+    border: 3px solid #2045a3;
+}
+
+.container-configuracion-pin.is-invalid {
+    border: 1px solid #dc2626 !important;
 }

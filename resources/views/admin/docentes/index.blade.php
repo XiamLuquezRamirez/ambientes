@@ -195,6 +195,33 @@
             border-color: #DC2626 !important;
         }
 
+        .asignaciones-actuales {
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 12px;
+            background: #F8FAFC;
+        }
+
+        .asignaciones-actuales ul {
+            list-style: none;
+            margin: 8px 0 0;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+        }
+
+        .asignaciones-actuales li {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 10px;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            background: #FFFFFF;
+            color: #334155;
+            font-size: .86rem;
+        }
+
         /* ── Modal – estilos visuales sobre Bootstrap ────────────────── */
         #modalDocente .modal-content,
         #modalAsignarInfo .modal-content {
@@ -491,6 +518,19 @@
                                                 value="{{ old('fecha_ingreso') }}">
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Firma</strong>
+                                            <input type="file" id="firma" name="firma" class="form-control"
+                                                placeholder="Firma del docente" value="{{ old('firma') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Vista previa de la firma</strong>
+                                            <img src="{{ old('firma') }}" alt="Firma del docente" class="img-fluid">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="tab-pane container" id="gestionCuenta">
@@ -612,8 +652,8 @@
                 <div class="modal-header">
                     <div class="modal-header-icon"><i class="fas fa-user-graduate text-white"></i></div>
                     <div class="flex-grow-1">
-                        <h5 class="modal-title mb-0" id="modalAsignarInfoLabel">Asignar Información</h5>
-                        <p class="modal-subtitle mb-0">Completa los datos para crear la cuenta</p>
+                        <h5 class="modal-title mb-0" id="modalAsignarInfoLabel">Asignar grupo</h5>
+                        <p class="modal-subtitle mb-0">Agrega una carga docente para el año actual</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
                     </button>
@@ -622,58 +662,61 @@
                 <div class="modal-body">
                     <form id="formAsignarInfo" method="POST">
                         @csrf
-                        @method('PUT')
-                        <!-- Identificador del docente para enviar la actualización al endpoint PUT -->
+                        <!-- Identificador del usuario docente que recibirá la nueva carga en carga_docente. -->
                         <input type="hidden" name="id" id="asignar_docente_id">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <strong>Nombre</strong>
-                                    <label id="asignar_nombre" class="form-control" readonly>
-                                        -
-                                    </label>
+                                    <div id="asignar_nombre" class="form-control">-</div>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <strong class="form-label">Ambiente</strong>
                                     <select name="ambiente_id" id="asignar_ambiente_id" class="form-control">
                                         <option value="">— Selecciona un ambiente —</option>
                                         @foreach ($ambientes as $a)
-                                            <option value="{{ $a->id }}">{{ $a->icono }}
-                                                {{ $a->nombre }}
+                                            <option value="{{ $a->id }}">
+                                                {{ $a->icono }} {{ $a->nombre }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <strong class="form-label">Grado</strong>
                                     <select name="grado_id" id="asignar_grado_id" class="form-control">
-                                        <option value="">— Sin grado —</option>
-                                        @foreach ($grados as $g)
-                                            <option value="{{ $g->id }}">{{ $g->nombre }}</option>
-                                        @endforeach
+                                        <option value="">— Selecciona un grado —</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <strong class="form-label">Año lectivo</strong>
+                                    <input type="number" name="anio_lectivo" id="asignar_anio_lectivo"
+                                        class="form-control" value="{{ date('Y') }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="mb-3">
                                     <strong class="form-label">Grupos</strong>
                                     <select name="grupo_id" id="asignar_grupos_id" class="form-control">
-                                        <option value="">— Sin grupos —</option>
-                                        @foreach ($grupos as $gr)
-                                            <option value="{{ $gr->id }}">{{ $gr->nombre }}</option>
-                                        @endforeach
+                                        <option value="">— Selecciona un grupo —</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <strong class="form-label">Descripción</strong>
-                                <textarea name="descripcion" id="asignar_descripcion" class="form-control" rows="3"></textarea>
+                            <div class="col-md-12">
+                                <div class="mb-3 asignaciones-actuales">
+                                    <strong>Grupos asignados en {{ date('Y') }}</strong>
+                                    <div id="asignaciones_actuales_docente"
+                                        style="color:#64748B;font-size:.86rem;margin-top:8px">
+                                        Sin asignaciones para este año.
+                                    </div>
+                                </div>
                             </div>
-
                         </div>
                     </form>
                 </div>
@@ -683,8 +726,7 @@
                         style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
                         onclick="cerrarModalAsignarInfo()"><i class="fa-solid fa-xmark"></i> Cancelar</button>
                     <button type="submit" form="formAsignarInfo" id="btnAsignarInfo" class="btn btn-primary"><i
-                            class="fa-solid fa-floppy-disk"></i> Guardar
-                        Datos</button>
+                            class="fa-solid fa-floppy-disk"></i> Guardar asignación</button>
                 </div>
             </div>
         </div>
@@ -694,6 +736,7 @@
 @push('scripts')
     <script>
         const URL_DOCENTES = "{{ route('admin.docentes') }}";
+        const ANIO_LECTIVO_ACTUAL = "{{ date('Y') }}";
         var tipoPost = 1; // 1: Crear, 2: Editar
         var id_editar = '';
     </script>
@@ -711,6 +754,8 @@
         document.getElementById('modalAsignarInfo').addEventListener('hidden.bs.modal', function() {
             limpiarErroresModal();
             document.getElementById('formAsignarInfo').reset();
+            document.getElementById('asignar_anio_lectivo').value = ANIO_LECTIVO_ACTUAL;
+            renderizarAsignacionesActuales([]);
         });
 
         function abrirModal() {
@@ -775,29 +820,49 @@
             modalBSAsignarInfo.hide();
         }
 
-        // Carga la información del docente seleccionado y abre el modal de completar datos.
-        function abrirModalAsignarGrado(id) {
-            fetch(`${URL_DOCENTES}/${id}`)
-                .then(response => response.json())
-                .then(resp => {
-                    if (!resp.success) throw new Error('No data');
-                    const data = resp.data;
-                    document.getElementById('asignar_docente_id').value = data.id;
-                    document.getElementById('asignar_nombre').textContent = data.nombre ?? '';
-                    const docente = data.docente ?? {};
-                    const carga = data.carga ?? {};
-                    document.getElementById('asignar_descripcion').value = docente.descripcion ?? '';
-                    // Los IDs de asignación provienen de carga_docente, no de la tabla docentes.
-                    document.getElementById('asignar_ambiente_id').value = carga.ambiente_id ?? '';
-                    document.getElementById('asignar_grado_id').value = carga.grado_id ?? '';
-                    document.getElementById('asignar_grupos_id').value = carga.grupo_id ?? '';
+        // Carga el docente y sus cargas actuales; la nueva asignación se elige en blanco para evitar duplicados accidentales.
+        async function abrirModalAsignarGrado(id) {
+            try {
+                const resp = await ajaxRequest(`${URL_DOCENTES}/${id}`);
+                if (!resp.success) throw new Error('No data');
 
-                    modalBSAsignarInfo.show();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    mostrarToast('error', 'No se pudo cargar la información del docente');
-                });
+                const data = resp.data;
+                document.getElementById('formAsignarInfo').reset();
+                document.getElementById('asignar_docente_id').value = data.id;
+                document.getElementById('asignar_nombre').textContent = data.nombre ?? '';
+                document.getElementById('asignar_anio_lectivo').value = ANIO_LECTIVO_ACTUAL;
+                document.getElementById('asignar_grado_id').innerHTML =
+                    '<option value="">— Selecciona un grado —</option>';
+                document.getElementById('asignar_grupos_id').innerHTML =
+                    '<option value="">— Selecciona un grupo —</option>';
+                renderizarAsignacionesActuales(data.asignaciones ?? []);
+
+                modalBSAsignarInfo.show();
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarToast('error', 'No se pudo cargar la información del docente');
+            }
+        }
+
+        function renderizarAsignacionesActuales(asignaciones) {
+            const contenedor = document.getElementById('asignaciones_actuales_docente');
+
+            if (!asignaciones.length) {
+                contenedor.innerHTML = 'Sin asignaciones para este año.';
+                return;
+            }
+
+            // La lista usa carga_docente como fuente de verdad para que coincida con lo que verá el panel docente.
+            contenedor.innerHTML = `
+                <ul>
+                    ${asignaciones.map(asignacion => `
+                                        <li>
+                                            <span>${asignacion.ambiente}</span>
+                                            <strong>${asignacion.grado} ${asignacion.grupo}</strong>
+                                        </li>
+                                    `).join('')}
+                </ul>
+            `;
         }
 
 
@@ -1034,21 +1099,41 @@
             const formData = new FormData(this);
             const datos = Object.fromEntries(formData.entries());
             const id = datos.id;
-            const res = await ajaxRequest(`${URL_DOCENTES}/${id}/asignar-info`, 'PUT', datos);
+            const res = await ajaxRequest(`${URL_DOCENTES}/${id}/asignar-grupo`, 'POST', datos);
 
             btn.disabled = false;
-            btn.textContent = 'Guardar Datos';
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar asignación';
 
             if (res.success) {
-                modalBSAsignarInfo.hide();
+                renderizarAsignacionesActuales(res.data?.asignaciones ?? []);
+                document.getElementById('asignar_grado_id').innerHTML =
+                    '<option value="">— Selecciona un grado —</option>';
+                document.getElementById('asignar_grupos_id').innerHTML =
+                    '<option value="">— Selecciona un grupo —</option>';
+                document.getElementById('asignar_ambiente_id').value = '';
                 mostrarToast('success', res.message);
                 await cargarTabla(location.href);
             } else if (res.errors && Object.keys(res.errors).length) {
-                mostrarToast('error', 'Errores de validación');
+                mostrarErroresAsignacion(res.errors);
             } else {
                 mostrarToast('error', res.message || 'Error al guardar');
             }
         });
+
+        function mostrarErroresAsignacion(errors) {
+            limpiarErroresModal();
+            for (const [campo, mensajes] of Object.entries(errors)) {
+                const input = document.querySelector(`#formAsignarInfo [name="${campo}"]`);
+                if (!input) continue;
+                input.classList.add('is-invalid');
+                const div = document.createElement('div');
+                div.className = 'campo-error';
+                div.textContent = mensajes[0];
+                input.insertAdjacentElement('afterend', div);
+            }
+            const primero = document.querySelector('#formAsignarInfo .is-invalid');
+            if (primero) primero.focus();
+        }
 
         function verPassword(inputId, iconId) {
             const icon = $(iconId)[0];
@@ -1225,5 +1310,74 @@
                 const id = this.dataset.docenteId;
                 window.open(`${URL_DOCENTES}/${id}/generar-pdf`, '_blank');
             });
+
+        $('#asignar_ambiente_id').on('change', function() {
+
+            const ambienteId = $(this).val();
+            const anio = $('#asignar_anio_lectivo').val();
+
+            $('#asignar_grado_id').html(
+                '<option value="">— Selecciona un grado —</option>'
+            );
+            $('#asignar_grupos_id').html(
+                '<option value="">— Selecciona un grupo —</option>'
+            );
+
+            if (!ambienteId) return;
+
+            $.get(`/admin/ambientes/${ambienteId}/gradoslistado`, {
+                anio_lectivo: anio
+            }, function(grados) {
+                // El backend ya excluye grupos ocupados dentro del mismo ambiente/año.
+                grados.forEach(grado => {
+                    $('#asignar_grado_id').append(
+                        `<option value="${grado.id}">${grado.nombre}</option>`
+                    );
+                });
+
+            });
+
+        });
+
+        function cargarGrupos() {
+
+            const ambienteId = $('#asignar_ambiente_id').val();
+            const gradoId = $('#asignar_grado_id').val();
+            const anio = $('#asignar_anio_lectivo').val();
+
+            $('#asignar_grupos_id').html(
+                '<option value="">— Selecciona un grupo —</option>'
+            );
+
+            if (!ambienteId || !gradoId || !anio) {
+                return;
+            }
+
+            $.get(`/admin/grados/${gradoId}/grupos`, {
+                anio_lectivo: anio,
+                ambiente_id: ambienteId,
+            }, function(grupos) {
+
+                grupos.forEach(grupo => {
+
+                    $('#asignar_grupos_id').append(
+                        `<option value="${grupo.id}">
+                ${grupo.nombre}
+            </option>`
+                    );
+
+                });
+
+            });
+
+        }
+
+        $('#asignar_grado_id').on('change', function() {
+            cargarGrupos();
+        });
+
+        $('#asignar_anio_lectivo').on('change', function() {
+            cargarGrupos();
+        });
     </script>
 @endpush

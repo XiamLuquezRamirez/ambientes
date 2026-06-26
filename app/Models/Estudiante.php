@@ -10,10 +10,9 @@ class Estudiante extends Model
 {
     use Sincronizable;
 
-    protected $fillable = ['avatar', 'identificacion', 'nombre', 'iniciales', 'grado_id', 'atencion_id', 'estado_id', 'color_avatar', 'condicion', 'activo', 'fecha_nacimiento', 'sexo', 'acudiente', 'telefono_acudiente', 'correo_acudiente'];
+    protected $fillable = ['avatar', 'tipo_identificacion', 'otro_tipo_identificacion', 'identificacion', 'nombre', 'apellido', 'iniciales', 'grado_id', 'atencion_id', 'estado_id', 'color_avatar', 'condicion', 'activo', 'fecha_nacimiento', 'sexo', 'acudiente', 'telefono_acudiente', 'requiere_apoyo', 'estado_piar', 'lugar_nacimiento', 'departamento_id', 'municipio_id', 'barrio_vereda', 'direccion', 'telefono', 'email'];
 
     protected $casts = [
-        'activo' => 'boolean',
         'edad' => 'integer'
     ];
 
@@ -45,7 +44,18 @@ class Estudiante extends Model
     {
         return $this->hasOne(Matricula::class)
             ->where('estado', 'activo')
-            ->where('anio_lectivo', date('Y'));
+            ->where('anio_lectivo', date('Y')
+        );
+    }
+
+    public function departamento()
+    {
+        return $this->belongsTo(Departamento::class);
+    }
+
+    public function municipio()
+    {
+        return $this->belongsTo(Municipio::class);
     }
 
     public function matriculasActivas()
@@ -60,11 +70,6 @@ class Estudiante extends Model
         return $this->hasOne(Piar::class);
     }
 
-    public function configuracionPin()
-    {
-        return $this->hasOne(ConfiguracionPin::class);
-    }
-
     public function portafolios()
     {
         return $this->hasMany(Portafolio::class);
@@ -73,6 +78,11 @@ class Estudiante extends Model
     public function ajustesTemporales()
     {
         return $this->hasMany(AjusteTemporal::class);
+    }
+
+    public function configuracionPin()
+    {
+        return $this->hasOne(ConfiguracionPin::class, 'estudiante_id', 'id');
     }
 
     public function ambientes()

@@ -26,10 +26,19 @@ class AuthDocenteController extends Controller
         }
 
         $usuario = Auth::guard('docente')->user();
-        if (! $usuario->estado === 'activo') {
-            return back()->withErrors([
-                'email' => 'La cuenta se encuentra desactivada.',
-            ])->withInput();
+        if ($usuario->estado === 'inactivo') {
+            Auth::guard('docente')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra inactiva.');
+        }
+        if ($usuario->estado === 'eliminado') {
+            Auth::guard('docente')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra eliminada.');
         }
         LoginLog::create([
             'user_id' => $usuario->id,

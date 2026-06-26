@@ -15,12 +15,20 @@ class Grado extends Model
 
     protected $casts = ['activo' => 'boolean'];
 
+    public function ambientes()
+    {
+        return $this->belongsToMany(
+            Ambiente::class,
+            'ambiente_grado'
+        );
+    }
+
     public function grupos()
     {
         return $this->hasMany(Grupo::class);
     }
 
-    public function gruposDelAnio(int $anio = null)
+    public function gruposDelAnio(?int $anio = null)
     {
         return $this->grupos()->where('anio_lectivo', $anio ?? date('Y'));
     }
@@ -38,5 +46,13 @@ class Grado extends Model
     public function scopeActivos($query)
     {
         return $query->where('activo', true)->orderBy('orden');
+    }
+
+    public function aniosLectivos()
+    {
+        return $this->grupos()
+            ->select('anio_lectivo')
+            ->distinct()
+            ->orderByDesc('anio_lectivo');
     }
 }

@@ -323,7 +323,7 @@ CREATE TABLE `docentes` (
   `direccion` varchar(150) DEFAULT NULL,
   `especialidad` varchar(100) DEFAULT NULL,
   `fecha_ingreso` date DEFAULT NULL,
-  `foto_url` varchar(255) DEFAULT NULL,
+  `firma_url` varchar(255) DEFAULT NULL,
   `descripcion` text DEFAULT NULL,
   `estado` enum('activo','inactivo','eliminado') DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -335,7 +335,7 @@ CREATE TABLE `docentes` (
 
 /*Data for the table `docentes` */
 
-insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`foto_url`,`descripcion`,`estado`,`created_at`,`updated_at`) values 
+insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`descripcion`,`estado`,`created_at`,`updated_at`) values 
 (1,2,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'eliminado','2026-06-16 00:02:02','2026-06-24 15:50:15'),
 (2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'activo','2026-06-16 17:32:50','2026-06-24 15:57:11'),
 (3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'activo','2026-06-16 17:32:50','2026-06-23 14:23:57');
