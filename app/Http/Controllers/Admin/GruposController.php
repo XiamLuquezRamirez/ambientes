@@ -22,6 +22,16 @@ class GruposController extends Controller
     public function index(Request $request)
     {
         $anio = (int) $request->get('anio', date('Y'));
+        $grados = Grado::activos()
+            ->with(['grupos' => fn ($q) => $q->where('anio_lectivo', $anio)->orderBy('nombre')])
+            ->get();
+
+        return view('admin.grupos.index', compact('grados', 'anio'));
+    }
+
+    public function docentes(Request $request)
+    {
+        $anio = (int) $request->get('anio', date('Y'));
         $gradoId = $request->get('grado_id');
 
         $grados = Grado::activos()->orderBy('orden')->get();
