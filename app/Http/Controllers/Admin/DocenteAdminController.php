@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\CargaDocente;
 use App\Models\Docente;
+use App\Models\Grado;
 use App\Models\Grupo;
 use App\Models\SyncQueue;
 use App\Models\User;
@@ -59,6 +60,11 @@ class DocenteAdminController extends Controller
         $docentes = $consulta->paginate(10);
 
         $ambientes = Ambiente::orderBy('nombre')->get();
+
+        // Datos para el modal "Docentes asignados" (tabla global de grupos).
+        // Se cargan aquí porque ver_grupos.blade.php se incluye en index.
+        $datosGrupos = $this->datosVistaGrupos($request);
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -66,7 +72,47 @@ class DocenteAdminController extends Controller
             ]);
         }
 
-        return view('admin.docentes.index', compact('docentes', 'ambientes'));
+        return view('admin.docentes.index', array_merge(
+            compact('docentes', 'ambientes'),
+            $datosGrupos
+        ));
+    }
+
+    /**
+     * Prepara grados, grupos y docentes activos para la vista global de cobertura.
+     *
+     * Respeta los filtros ?grado_id= y ?anio= que envía el modal de grupos.
+     */
+    private function datosVistaGrupos(Request $request): array
+    {
+        $anio = (int) $request->get('anio', date('Y'));
+        $gradoId = $request->get('grado_id');
+
+        $grados = Grado::activos()->orderBy('orden')->get();
+
+        // Cargas docentes del año filtrado para listar nombres en la tabla.
+        $grupos = Grupo::with([
+            'grado',
+            'cargasDocente' => function ($q) use ($anio) {
+                $q->where('activo', true)
+                    ->where('anio_lectivo', $anio)
+                    ->with('docente.user');
+            },
+        ])
+            ->delAnio($anio)
+            ->when($gradoId, fn ($q) => $q->where('grado_id', $gradoId))
+            ->orderBy('grado_id')
+            ->orderBy('nombre')
+            ->get();
+
+        // Lista para el selector al asignar docente desde una fila de grupo.
+        $docentesActivos = Docente::where('estado', 'activo')
+            ->with('user')
+            ->get()
+            ->sortBy(fn ($docente) => trim($docente->user->nombre.' '.$docente->user->apellido))
+            ->values();
+
+        return compact('grados', 'grupos', 'anio', 'gradoId', 'docentesActivos');
     }
 
     /**
@@ -145,7 +191,7 @@ class DocenteAdminController extends Controller
     public function quitarAsignacion(User $docente, CargaDocente $carga)
     {
         $perfilDocente = $docente->docente;
-
+        
         if (! $perfilDocente || $carga->docente_id !== $perfilDocente->id || $carga->anio_lectivo !== (int) date('Y')) {
             return response()->json([
                 'success' => false,

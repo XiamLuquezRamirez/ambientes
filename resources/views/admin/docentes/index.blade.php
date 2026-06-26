@@ -224,7 +224,8 @@
 
         /* ── Modal – estilos visuales sobre Bootstrap ────────────────── */
         #modalDocente .modal-content,
-        #modalAsignarInfo .modal-content {
+        #modalAsignarInfo .modal-content,
+        #modalDocentesAsignados .modal-content {
             border: none;
             border-radius: 16px;
             overflow: hidden;
@@ -240,7 +241,8 @@
         }
 
         #modalEditarDocente .modal-header,
-        #modalBSPasswordGenerada .modal-header {
+        #modalBSPasswordGenerada .modal-header,
+        #modalDocentesAsignados .modal-header {
             background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
             border-bottom: none;
             padding: 20px 24px;
@@ -285,7 +287,8 @@
         }
 
         #modalEditarDocente .modal-title,
-        #modalBSPasswordGenerada .modal-title {
+        #modalBSPasswordGenerada .modal-title,
+        #modalDocentesAsignados .modal-title {
             font-family: 'Fredoka One', cursive;
             font-size: 1.2rem;
             color: #FFFFFF;
@@ -299,7 +302,8 @@
         }
 
         #modalDocente .btn-close,
-        #modalAsignarInfo .btn-close {
+        #modalAsignarInfo .btn-close,
+        #modalDocentesAsignados .btn-close {
             filter: brightness(0) invert(1);
             opacity: .75;
             transition: opacity .15s, transform .2s;
@@ -307,7 +311,8 @@
         }
 
         #modalDocente .btn-close:hover,
-        #modalAsignarInfo .btn-close:hover {
+        #modalAsignarInfo .btn-close:hover,
+        #modalDocentesAsignados .btn-close:hover {
             opacity: 1;
             transform: rotate(90deg);
         }
@@ -327,7 +332,8 @@
         }
 
         #modalDocente .modal-body,
-        #modalAsignarInfo .modal-body {
+        #modalAsignarInfo .modal-body,
+        #modalDocentesAsignados .modal-body {
             padding: 28px;
         }
 
@@ -337,7 +343,8 @@
         }
 
         #modalDocente .modal-footer,
-        #modalAsignarInfo .modal-footer {
+        #modalAsignarInfo .modal-footer,
+        #modalDocentesAsignados .modal-footer {
             border-top: 1px solid #E2E8F0;
             padding: 16px 28px 24px;
             gap: 12px;
@@ -354,7 +361,8 @@
         #modalDocente.fade .modal-dialog,
         #modalAsignarInfo.fade .modal-dialog,
         #modalEditarDocente.fade .modal-dialog,
-        #modalBSPasswordGenerada.fade .modal-dialog {
+        #modalBSPasswordGenerada.fade .modal-dialog,
+        #modalDocentesAsignados.fade .modal-dialog {
             transform: scale(0.85) translateY(-30px);
             opacity: 0;
             transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease;
@@ -363,7 +371,8 @@
         #modalDocente.show .modal-dialog,
         #modalAsignarInfo.show .modal-dialog,
         #modalEditarDocente.show .modal-dialog,
-        #modalBSPasswordGenerada.show .modal-dialog {
+        #modalBSPasswordGenerada.show .modal-dialog,
+        #modalDocentesAsignados.show .modal-dialog {
             transform: scale(1) translateY(0);
             opacity: 1;
         }
@@ -377,7 +386,11 @@
             <h1>Docentes</h1>
             <p>Gestión de cuentas de docentes y administradores</p>
         </div>
-        <button class="btn btn-primary" onclick="abrirModal()"><i class="fas fa-plus"></i> Nuevo Docente</button>
+        <div style="display:flex;gap:10px">
+            <button class="btn btn-info" onclick="abrirModalDocentesAsignados()"><i class="fas fa-eye"></i> Docentes
+                Asignados</button>
+            <button class="btn btn-primary" onclick="abrirModal()"><i class="fas fa-plus"></i> Nuevo Docente</button>
+        </div>
     </div>
 
     {{-- ── Filtros ──────────────────────────────────────────────────── --}}
@@ -430,7 +443,6 @@
         @include('admin.docentes._tabla')
     </div>
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
-    @include('admin.docentes.ver-accesos')
 
     {{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
     <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-keyboard="false" aria-labelledby="modalDocenteLabel"
@@ -461,7 +473,7 @@
                         </li>
                     </ul>
                     {{-- Un solo formulario para ambas pestañas: evita IDs duplicados y envía todos los campos. --}}
-                    <form id="formDocente" method="POST">
+                    <form id="formDocente" enctype="multipart/form-data" method="POST">
                         @csrf
                         <div class="tab-content" style="padding: 20px;">
                             <div class="tab-pane container active" id="datosPersonales">
@@ -522,13 +534,16 @@
                                         <div class="mb-3">
                                             <strong class="form-label">Firma</strong>
                                             <input type="file" id="firma" name="firma" class="form-control"
-                                                placeholder="Firma del docente" value="{{ old('firma') }}">
+                                                accept="image/*" onchange="previewImage(event, '#imgPreviewFirma')">
                                         </div>
                                     </div>
+
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Vista previa de la firma</strong>
-                                            <img src="{{ old('firma') }}" alt="Firma del docente" class="img-fluid">
+                                            <img id="imgPreviewFirma" class="w-50"
+                                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s"
+                                                alt="Firma del docente">
                                         </div>
                                     </div>
                                 </div>
@@ -546,7 +561,8 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <strong class="form-label">Contraseña
-                                                <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span>
+                                                <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8
+                                                    caracteres)</span>
                                             </strong>
                                             <div class="position-relative">
                                                 <input type="password" id="password" name="password"
@@ -558,7 +574,8 @@
                                                     style="cursor:pointer;"></i>
                                             </div>
                                         </div>
-                                        <button type="button" id="btnGenerarPassword" class="btn btn-primary"> Generar
+                                        <button type="button" id="btnGenerarPassword" class="btn btn-primary">
+                                            Generar
                                             Contraseña Aleatoria <i class="fa-solid fa-shuffle"></i></button>
                                     </div>
                                     <div class="col-md-6">
@@ -662,13 +679,39 @@
                 <div class="modal-body">
                     <form id="formAsignarInfo" method="POST">
                         @csrf
-                        <!-- Identificador del usuario docente que recibirá la nueva carga en carga_docente. -->
+                        {{-- Modo: "docente" = asignar grupo a un docente | "grupo" = asignar docente a un grupo --}}
+                        <input type="hidden" name="asignar_modo" id="asignar_modo" value="docente">
+                        {{-- user_id del docente; solo se usa en modo "docente" --}}
                         <input type="hidden" name="id" id="asignar_docente_id">
                         <div class="row">
-                            <div class="col-md-6">
+                            {{-- Visible solo en modo docente: muestra el nombre del docente seleccionado --}}
+                            <div class="col-md-6" id="asignar-campo-docente-nombre">
                                 <div class="mb-3">
-                                    <strong>Nombre</strong>
+                                    <strong>Docente</strong>
                                     <div id="asignar_nombre" class="form-control">-</div>
+                                </div>
+                            </div>
+
+                            {{-- Visible solo en modo grupo: muestra grado+grupo precargados desde la fila --}}
+                            <div class="col-md-6" id="asignar-campo-grupo-contexto" style="display:none">
+                                <div class="mb-3">
+                                    <strong>Grupo</strong>
+                                    <div id="asignar_grupo_contexto" class="form-control">-</div>
+                                </div>
+                            </div>
+
+                            {{-- Visible solo en modo grupo: el usuario elige qué docente asignar --}}
+                            <div class="col-md-6" id="asignar-campo-docente-select" style="display:none">
+                                <div class="mb-3">
+                                    <strong class="form-label">Docente a asignar</strong>
+                                    <select name="docente_id" id="asignar_docente_id_select" class="form-control">
+                                        <option value="">— Selecciona un docente —</option>
+                                        @foreach ($docentesActivos ?? [] as $docenteActivo)
+                                            <option value="{{ $docenteActivo->id }}">
+                                                {{ $docenteActivo->user->nombre }} {{ $docenteActivo->user->apellido }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
 
@@ -708,12 +751,14 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <div class="mb-3 asignaciones-actuales">
-                                    <strong>Grupos asignados en {{ date('Y') }}</strong>
-                                    <div id="asignaciones_actuales_docente"
-                                        style="color:#64748B;font-size:.86rem;margin-top:8px">
-                                        Sin asignaciones para este año.
+                            {{-- Solo en modo docente: historial de cargas del docente --}}
+                            <div class="col-md-12" id="asignar-seccion-asignaciones-docente">
+                                <div class="card p-4">
+                                    <h1>Grupos asignados</h1>
+                                    <p class="text-muted">Año lectivo {{ date('Y') }}</p>
+
+                                    <div id="asignaciones_actuales_docente">
+                                        Cargando...
                                     </div>
                                 </div>
                             </div>
@@ -731,14 +776,20 @@
             </div>
         </div>
     </div>
+    @include('admin.docentes.ver-accesos')
+    @include('admin.docentes.ver_grupos')
 @endsection
 
 @push('scripts')
     <script>
         const URL_DOCENTES = "{{ route('admin.docentes') }}";
         const ANIO_LECTIVO_ACTUAL = "{{ date('Y') }}";
+        // Endpoint para asignar docente a grupo (modo inverso al flujo docente→grupo).
+        const URL_GRUPOS_ASIGNAR = "{{ url('admin/grupos') }}/:id/asignar-docente";
         var tipoPost = 1; // 1: Crear, 2: Editar
         var id_editar = '';
+        // ID del grupo cuando se abre el modal desde la tabla global (modo "grupo").
+        let grupoAsignarId = null;
     </script>
     <script>
         /* ── Bootstrap Modal ─────────────────────────────────────────── */
@@ -756,7 +807,40 @@
             document.getElementById('formAsignarInfo').reset();
             document.getElementById('asignar_anio_lectivo').value = ANIO_LECTIVO_ACTUAL;
             renderizarAsignacionesActuales([]);
+            // Restaurar modo por defecto al cerrar.
+            grupoAsignarId = null;
+            configurarModalAsignarModo('docente');
         });
+
+        /**
+         * Alterna la UI del modal según el flujo:
+         * - docente: se elige grupo para un docente ya conocido.
+         * - grupo: se elige docente para un grupo ya precargado.
+         */
+        function configurarModalAsignarModo(modo) {
+            const esModoGrupo = modo === 'grupo';
+            document.getElementById('asignar_modo').value = modo;
+
+            document.getElementById('asignar-campo-docente-nombre').style.display = esModoGrupo ? 'none' : '';
+            document.getElementById('asignar-campo-grupo-contexto').style.display = esModoGrupo ? '' : 'none';
+            document.getElementById('asignar-campo-docente-select').style.display = esModoGrupo ? '' : 'none';
+            document.getElementById('asignar-seccion-asignaciones-docente').style.display = esModoGrupo ? 'none' : '';
+
+            // En modo grupo, grado y grupo vienen fijos desde la fila.
+            document.getElementById('asignar_grado_id').disabled = esModoGrupo;
+            document.getElementById('asignar_grupos_id').disabled = esModoGrupo;
+
+            const titulo = document.getElementById('modalAsignarInfoLabel');
+            const subtitulo = document.querySelector('#modalAsignarInfo .modal-subtitle');
+            if (titulo) {
+                titulo.textContent = esModoGrupo ? 'Asignar docente' : 'Asignar grupo';
+            }
+            if (subtitulo) {
+                subtitulo.textContent = esModoGrupo ?
+                    'Selecciona el docente y el ambiente para este grupo' :
+                    'Agrega una carga docente para el año actual';
+            }
+        }
 
         function abrirModal() {
             $("#modalDocenteLabel").text('Crear Docente');
@@ -827,9 +911,14 @@
                 if (!resp.success) throw new Error('No data');
 
                 const data = resp.data;
+                grupoAsignarId = null;
+                configurarModalAsignarModo('docente');
+
                 document.getElementById('formAsignarInfo').reset();
+                document.getElementById('asignar_modo').value = 'docente';
                 document.getElementById('asignar_docente_id').value = data.id;
-                document.getElementById('asignar_nombre').textContent = data.nombre ?? '';
+                document.getElementById('asignar_nombre').textContent =
+                    `${data.nombre ?? ''} ${data.apellido ?? ''}`.trim();
                 document.getElementById('asignar_anio_lectivo').value = ANIO_LECTIVO_ACTUAL;
                 document.getElementById('asignar_grado_id').innerHTML =
                     '<option value="">— Selecciona un grado —</option>';
@@ -846,23 +935,54 @@
 
         function renderizarAsignacionesActuales(asignaciones) {
             const contenedor = document.getElementById('asignaciones_actuales_docente');
+            const docenteId = document.getElementById('asignar_docente_id').value;
 
             if (!asignaciones.length) {
-                contenedor.innerHTML = 'Sin asignaciones para este año.';
+                contenedor.innerHTML = `
+            <div class="seccion-vacia">
+                <p>Este docente aún no tiene grupos asignados para el año actual.</p>
+            </div>
+        `;
                 return;
             }
 
-            // La lista usa carga_docente como fuente de verdad para que coincida con lo que verá el panel docente.
+            const filas = asignaciones.map(a => `
+        <tr id="fila-asignacion-${a.id}">
+            <td>${a.ambiente}</td>
+            <td>${a.grado}</td>
+            <td>${a.grupo}</td>
+            <td>${a.estudiantes}</td>
+            <td>${a.estado}</td>
+            <td style="text-align:center">
+                <button
+                    type="button"
+                    class="btn-accion btn-eliminar"
+                    onclick="quitarAsignacion(${docenteId}, ${a.id})">
+                    <i class="fa-solid fa-trash-can"></i> Quitar
+                </button>
+            </td>
+        </tr>
+    `).join('');
+
             contenedor.innerHTML = `
-                <ul>
-                    ${asignaciones.map(asignacion => `
-                                        <li>
-                                            <span>${asignacion.ambiente}</span>
-                                            <strong>${asignacion.grado} ${asignacion.grupo}</strong>
-                                        </li>
-                                    `).join('')}
-                </ul>
-            `;
+        <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ambiente</th>
+                    <th>Grado</th>
+                    <th>Grupo</th>
+                    <th>Estudiantes</th>
+                    <th>Estado</th>
+                    <th style="width:110px;text-align:center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${filas}
+            </tbody>
+        </table>
+        </div>
+    `;
         }
 
 
@@ -1046,7 +1166,7 @@
 
         /* ── Eliminar docente (AJAX) ─────────────────────────────────── */
         document.addEventListener('click', async function(e) {
-            const btn = e.target.closest('.btn-eliminar');
+            const btn = e.target.closest('#btn-eliminar');
             if (!btn) return;
 
             const id = btn.dataset.id;
@@ -1087,32 +1207,62 @@
             }
         });
 
-        /* ── Asignar / Completar datos docente ───────────────────────── */
-        // Envía al backend los datos adicionales del docente seleccionado.
-        // Este formulario trabaja con el modal de completar datos y actualiza el perfil del docente.
+        /* ── Asignar grupo/docente (un solo submit para ambos flujos) ── */
         document.getElementById('formAsignarInfo').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btnAsignarInfo');
             btn.disabled = true;
-            btn.textContent = 'Guardando…';
+
+            // Los <select> disabled no se incluyen en FormData; habilitarlos momentáneamente.
+            const gradoSelect = document.getElementById('asignar_grado_id');
+            const grupoSelect = document.getElementById('asignar_grupos_id');
+            const gradoEstabaDeshabilitado = gradoSelect.disabled;
+            const grupoEstabaDeshabilitado = grupoSelect.disabled;
+            gradoSelect.disabled = false;
+            grupoSelect.disabled = false;
 
             const formData = new FormData(this);
             const datos = Object.fromEntries(formData.entries());
-            const id = datos.id;
-            const res = await ajaxRequest(`${URL_DOCENTES}/${id}/asignar-grupo`, 'POST', datos);
+
+            if (gradoEstabaDeshabilitado) gradoSelect.disabled = true;
+            if (grupoEstabaDeshabilitado) grupoSelect.disabled = true;
+
+            const modo = datos.asignar_modo || 'docente';
+
+            let res;
+            if (modo === 'grupo' && grupoAsignarId) {
+                // Flujo grupo→docente: POST a /admin/grupos/{id}/asignar-docente
+                const url = URL_GRUPOS_ASIGNAR.replace(':id', grupoAsignarId);
+                res = await ajaxRequest(url, 'POST', datos);
+            } else {
+                // Flujo docente→grupo: POST a /admin/docentes/{user}/asignar-grupo
+                const id = datos.id;
+                res = await ajaxRequest(`${URL_DOCENTES}/${id}/asignar-grupo`, 'POST', datos);
+            }
 
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar asignación';
 
             if (res.success) {
-                renderizarAsignacionesActuales(res.data?.asignaciones ?? []);
-                document.getElementById('asignar_grado_id').innerHTML =
-                    '<option value="">— Selecciona un grado —</option>';
-                document.getElementById('asignar_grupos_id').innerHTML =
-                    '<option value="">— Selecciona un grupo —</option>';
-                document.getElementById('asignar_ambiente_id').value = '';
-                mostrarToast('success', res.message);
-                await cargarTabla(location.href);
+                if (modo === 'grupo') {
+                    mostrarToast('success', res.message || 'Docente asignado correctamente.');
+                    modalBSAsignarInfo.hide();
+                    grupoAsignarId = null;
+
+                    // Actualizar solo la fila afectada en el modal de grupos (sin reload).
+                    if (res.data && typeof actualizarFilaGrupoAsignado === 'function') {
+                        actualizarFilaGrupoAsignado(res.data);
+                    }
+                } else {
+                    renderizarAsignacionesActuales(res.data?.asignaciones ?? []);
+                    document.getElementById('asignar_grado_id').innerHTML =
+                        '<option value="">— Selecciona un grado —</option>';
+                    document.getElementById('asignar_grupos_id').innerHTML =
+                        '<option value="">— Selecciona un grupo —</option>';
+                    document.getElementById('asignar_ambiente_id').value = '';
+                    mostrarToast('success', res.message);
+                    await cargarTabla(location.href);
+                }
             } else if (res.errors && Object.keys(res.errors).length) {
                 mostrarErroresAsignacion(res.errors);
             } else {
@@ -1379,5 +1529,65 @@
         $('#asignar_anio_lectivo').on('change', function() {
             cargarGrupos();
         });
+
+        //Previsualizar imagen de la firma.
+        //esta funcion se usa en el modal de docentes para previsualizar la imagen de la firma.
+        function previewImage(event, previewSelector) {
+            const input = event.target;
+            const preview = document.querySelector(previewSelector);
+
+            if (!input.files || !input.files.length) {
+                return;
+            }
+
+            const file = input.files[0];
+
+            if (!file.type.startsWith('image/')) {
+                alert('Seleccione un archivo de imagen.');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        // Confirma la desasignación del docente desde el detalle individual.
+        function quitarAsignacion(docenteId, cargaId) {
+            Swal.fire({
+                title: '¿Quitar asignación?',
+                text: 'Se desasignará este grupo del docente para el año actual.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, quitar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+            }).then(async (result) => {
+                if (!result.isConfirmed) return;
+
+                // Llama al endpoint DELETE que marca la carga como inactiva.
+                const res = await ajaxRequest(`${URL_DOCENTES}/${docenteId}/asignaciones/${cargaId}`, 'DELETE');
+                if (res.success) {
+                    const fila = document.getElementById(`fila-asignacion-${cargaId}`);
+                    if (fila) {
+                        fila.remove();
+                    }
+
+                    mostrarToast('success', res.message);
+
+                    // Si ya no quedan filas en la tabla, recargamos para mostrar el estado vacío.
+                    if (!document.querySelector('.tabla-asignaciones tbody tr')) {
+                        location.reload();
+                    }
+                } else {
+                    mostrarToast('error', res.message || 'Error al quitar la asignación');
+                }
+            });
+        }
     </script>
 @endpush

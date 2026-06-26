@@ -51,32 +51,27 @@
 @section('content')
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
         <div>
-            <h1>Detalle del Docente</h1>
-            <p>Perfil y grupos asignados</p>
+            <h1>Información del docente</h1>
+            <dl class="row">
+                <dt class="col-4">Nombre</dt>
+                <dd class="col-8">{{ $usuario->nombre }} {{ $usuario->apellido }}</dd>
+
+                <dt class="col-4">Email</dt>
+                <dd class="col-8">{{ $usuario->email }}</dd>
+
+                <dt class="col-4">Estado</dt>
+                <dd class="col-8">{{ $usuario->docente?->estado ?? '—' }}</dd>
+            </dl>
         </div>
         <a href="{{ route('admin.docentes') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
     </div>
 
     <div class="row g-4">
-        <div class="col-md-6">
+
+
+        <div class="col-md-12">
             <div class="card p-4">
-                <h2>Información</h2>
-                <dl class="row">
-                    <dt class="col-4">Nombre</dt>
-                    <dd class="col-8">{{ $usuario->nombre }} {{ $usuario->apellido }}</dd>
-
-                    <dt class="col-4">Email</dt>
-                    <dd class="col-8">{{ $usuario->email }}</dd>
-
-                    <dt class="col-4">Estado</dt>
-                    <dd class="col-8">{{ $usuario->docente?->estado ?? '—' }}</dd>
-                </dl>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card p-4">
-                <h2>Grupos asignados</h2>
+                <h1>Grupos asignados</h1>
                 <p class="text-muted">Año lectivo {{ date('Y') }}</p>
                 @if ($asignaciones->isEmpty())
                     <div class="seccion-vacia">
