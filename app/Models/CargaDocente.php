@@ -15,7 +15,10 @@ class CargaDocente extends Model
         'docente_id', 'ambiente_id', 'grado_id', 'grupo_id', 'anio_lectivo', 'activo',
     ];
 
-    protected $casts = ['activo' => 'boolean'];
+    protected $casts = [
+        'activo' => 'boolean',
+        'anio_lectivo' => 'integer',
+    ];
 
     public function docente()
     {
