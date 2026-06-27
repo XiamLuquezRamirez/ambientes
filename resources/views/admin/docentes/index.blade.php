@@ -445,7 +445,7 @@
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 
     {{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
-    <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-keyboard="false" aria-labelledby="modalDocenteLabel"
+    <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-backdrop="static" aria-labelledby="modalDocenteLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
@@ -540,7 +540,8 @@
 
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <strong class="form-label">Vista previa de la firma</strong>
+                                            <strong class="form-label" id="lblVistaPreviaFirma">Vista previa de la
+                                                firma</strong>
                                             <img id="imgPreviewFirma" class="w-50"
                                                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s"
                                                 alt="Firma del docente">
@@ -612,7 +613,7 @@
 
     {{-- ── Modal Bootstrap 5 – Información de la Contraseña ──────────────────────── --}}
     <div class="modal fade" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false"
-        aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
+        data-bs-backdrop="static" aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -662,7 +663,7 @@
     </div>
 
     {{-- ── Modal Bootstrap 5 – Asignar Informacion Del Docente ──────────────────────── --}}
-    <div class="modal fade" id="modalAsignarInfo" tabindex="-1" data-bs-keyboard="false"
+    <div class="modal fade" id="modalAsignarInfo" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="static"
         aria-labelledby="modalAsignarInfoLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
@@ -892,6 +893,8 @@
 
         /* ── Cerrar modal Nuevo Docente ─────────────────────────── */
         function cerrarModalDocente() {
+            document.getElementById('imgPreviewFirma').src =
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s';
             limpiarErroresModal();
             document.activeElement?.blur();
             modalBS.hide();
@@ -1074,7 +1077,6 @@
         /* ── Crear docente (AJAX) ────────────────────────────────────── */
         document.getElementById('formDocente').addEventListener('submit', async function(e) {
             e.preventDefault();
-
             if (tipoPost == 1) {
                 const btn = document.getElementById('btnDocente');
                 btn.disabled = true;

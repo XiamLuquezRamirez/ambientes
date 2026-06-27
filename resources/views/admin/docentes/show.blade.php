@@ -118,7 +118,6 @@
         </div>
     </div>
 
-    @include('admin.docentes.partials.modal-asignar-grupo')
 @endsection
 
 @push('scripts')
