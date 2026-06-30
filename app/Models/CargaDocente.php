@@ -16,7 +16,6 @@ class CargaDocente extends Model
     ];
 
     protected $casts = [
-        'activo' => 'boolean',
         'anio_lectivo' => 'integer',
     ];
 
@@ -42,13 +41,13 @@ class CargaDocente extends Model
 
     public function getDescripcionAttribute(): string
     {
-        return $this->ambiente->nombre . ' → ' .
-               $this->grado->nombre . ' ' . $this->grupo->nombre;
+        return $this->ambiente->nombre.' → '.
+               $this->grado->nombre.' '.$this->grupo->nombre;
     }
 
     public function scopeActivas($query)
     {
-        return $query->where('activo', true);
+        return $query->where('estado', 'activo');
     }
 
     public function scopeDelAnio($query, $anio = null)

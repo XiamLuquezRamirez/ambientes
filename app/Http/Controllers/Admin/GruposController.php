@@ -216,32 +216,18 @@ class GruposController extends Controller
         // Devolver datos actualizados del grupo para refrescar la fila en el modal sin recargar la página.
         $grupo->refresh();
         $grupo->load([
+            'grado',
             'cargasDocente' => function ($q) use ($anioActual) {
                 $q->where('activo', true)
                     ->where('anio_lectivo', $anioActual)
-                    ->with('docente.user');
+                    ->with(['docente.user', 'ambiente']);
             },
         ]);
-
-        $nombresDocentes = $grupo->cargasDocente
-            ->pluck('docente')
-            ->filter()
-            ->map(fn ($docente) => trim($docente->user->nombre.' '.$docente->user->apellido))
-            ->values();
-
-        $totalEstudiantes = $grupo->totalMatriculas($anioActual);
-        $sinDocentes = $nombresDocentes->isEmpty();
 
         return response()->json([
             'success' => true,
             'message' => 'Docente asignado correctamente.',
-            'data' => [
-                'grupo_id' => $grupo->id,
-                'docentes' => $nombresDocentes->all(),
-                'estudiantes' => $totalEstudiantes,
-                // true = fila debe seguir en rojo (hay alumnos pero ningún docente).
-                'alerta_sin_docente' => $totalEstudiantes > 0 && $sinDocentes,
-            ],
+            'data' => $grupo->datosParaModalDocentesAsignados($anioActual),
         ]);
     }
 
