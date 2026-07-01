@@ -12,18 +12,6 @@ class Piar extends Model
     protected $table = 'piar';
 
     protected $fillable = [
-        'estudiante_id', 'docente_id', 'anio_lectivo',
-        'descripcion_diagnostico', 'barreras_aprendizaje', 'ajustes_propuestos',
-        'estado', 'archivo_adjunto',
+        'estudiante_id', 'docente_id', 'estado', 'paso', 'fecha_diligenciamiento',
     ];
-
-    public function estudiante()
-    {
-        return $this->belongsTo(Estudiante::class);
-    }
-
-    public function docente()
-    {
-        return $this->belongsTo(Docente::class);
-    }
 }

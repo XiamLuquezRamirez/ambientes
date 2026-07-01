@@ -132,6 +132,21 @@ function mostrarErroresModal(errors) {
             case 'validation.unique':
                 mensaje = 'Ya existe un registro con este valor';
                 break;
+            case 'validation.email':
+                mensaje = 'El correo electrónico no es válido';
+                break;
+            case 'validation.integer':
+                mensaje = 'El valor debe ser un número entero';
+                break;
+            case 'validation.string':
+                mensaje = 'El valor debe ser una cadena de texto';
+                break;
+            case 'validation.numeric':
+                mensaje = 'El valor debe ser un número';
+                break;
+            case 'validation.required':
+                mensaje = 'Este campo es requerido';
+                break;
             default:
                 mensaje = 'Este campo es requerido';
                 break;
@@ -139,6 +154,7 @@ function mostrarErroresModal(errors) {
 
         $('<div>', { class: 'campo-error', text: mensaje }).insertAfter($input);
     });
+    
     $('#formCrearEstudiante .is-invalid').first().focus();
 }
 
