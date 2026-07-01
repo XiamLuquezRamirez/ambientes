@@ -11,8 +11,10 @@ use App\Http\Controllers\Admin\EstudianteAdminController;
 use App\Http\Controllers\Admin\GradoGrupoController;
 use App\Http\Controllers\Admin\GruposController;
 use App\Http\Controllers\Admin\MatriculaAdminController;
+use App\Http\Controllers\Admin\PiarController;
 use App\Http\Controllers\Admin\ReportesController;
 use App\Http\Controllers\Admin\SyncLogController;
+use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
@@ -20,7 +22,6 @@ use App\Http\Controllers\Panel\InclusionController;
 use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
-use App\Http\Controllers\Admin\PiarController;
 use Illuminate\Support\Facades\Route;
 
 // Raiz → bienvenida del ambiente configurado
@@ -103,7 +104,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
     // Docentes
     Route::get('docentes', [DocenteAdminController::class, 'listar'])->name('admin.docentes');
-    Route::get('docentes/create', [DocenteAdminController::class, 'formularioCrear'])->name('admin.docentes.create');
+    Route::get('docentes/grupos-asignados', [DocenteAdminController::class, 'listarGruposAsignados'])->name('admin.docentes.grupos-asignados');
     // Endpoint JSON para cargar los datos del docente en el modal de completar información.
     // Debe declararse antes de docentes/{docente}; si no, Laravel interpreta "accesos" como parte del detalle genérico.
     Route::get('docentes/{docente}/accesos', [DocenteAdminController::class, 'verAccesos'])->name('admin.docentes.accesos');
@@ -111,7 +112,6 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('docentes/{docente}/asignar-grupo', [DocenteAdminController::class, 'asignarGrupo'])->name('admin.docentes.asignar-grupo');
     Route::delete('docentes/{docente}/asignaciones/{carga}', [DocenteAdminController::class, 'quitarAsignacion'])->name('admin.docentes.quitar-asignacion');
     Route::get('docentes/{docente}', [DocenteAdminController::class, 'ver'])->name('admin.docentes.show');
-    Route::post('docentes', [DocenteAdminController::class, 'guardar'])->name('admin.docentes.store');
     Route::get('docentes/datos/{docente_id}', [DocenteAdminController::class, 'verDatosDocente'])->name('admin.docentes.datos');
     Route::patch('docentes/{docente}/toggle-activo', [DocenteAdminController::class, 'toggleActivo'])->name('admin.docentes.toggleActivo');
     Route::put('docentes/{docente}', [DocenteAdminController::class, 'actualizar'])->name('admin.docentes.update');
@@ -121,14 +121,14 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('docentes/{docente}/generar-pdf', [DocenteAdminController::class, 'generarPdf'])->name('admin.docentes.generar-pdf');
 
     // Estudiantes (admin)
-    Route::get('estudiantes',                        [EstudianteAdminController::class, 'listar'])->name('admin.estudiantes');
-    Route::get('estudiantes/{estudiante}',           [EstudianteAdminController::class, 'ver'])->name('admin.estudiantes.show');
-    Route::post('estudiantes',                       [EstudianteAdminController::class, 'guardar'])->name('admin.estudiantes.store');
-    Route::post('estudiantes/editar/{idEstudiante}',  [EstudianteAdminController::class, 'actualizar'])->name('admin.estudiantes.update');
-    Route::post('estudiantes/{estudiante}/transferir',[EstudianteAdminController::class, 'transferir'])->name('admin.estudiantes.transferir');
-    Route::post('estudiantes/{estudiante}/reset-pin',[EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.reset-pin');
-    Route::get('estudiantes/grupos',                  [EstudianteAdminController::class, 'listarGrupos'])->name('admin.estudiantes.grupos');
-    Route::get('estudiantes/eliminar/{estudiante}',   [EstudianteAdminController::class, 'eliminar'])->name('admin.estudiantes.eliminar');
+    Route::get('estudiantes', [EstudianteAdminController::class, 'listar'])->name('admin.estudiantes');
+    Route::get('estudiantes/{estudiante}', [EstudianteAdminController::class, 'ver'])->name('admin.estudiantes.show');
+    Route::post('estudiantes', [EstudianteAdminController::class, 'guardar'])->name('admin.estudiantes.store');
+    Route::post('estudiantes/editar/{idEstudiante}', [EstudianteAdminController::class, 'actualizar'])->name('admin.estudiantes.update');
+    Route::post('estudiantes/{estudiante}/transferir', [EstudianteAdminController::class, 'transferir'])->name('admin.estudiantes.transferir');
+    Route::post('estudiantes/{estudiante}/reset-pin', [EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.reset-pin');
+    Route::get('estudiantes/grupos', [EstudianteAdminController::class, 'listarGrupos'])->name('admin.estudiantes.grupos');
+    Route::get('estudiantes/eliminar/{estudiante}', [EstudianteAdminController::class, 'eliminar'])->name('admin.estudiantes.eliminar');
     Route::get('estudiantes/cambiar-estado/{idEstudiante}/{estado}', [EstudianteAdminController::class, 'cambiarEstado'])->name('admin.estudiantes.cambiar-estado');
     Route::get('estudiantes/diligenciar-piar/{idEstudiante}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('admin.estudiantes.cargar-municipios');
@@ -153,6 +153,11 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     // Configuracion
     Route::get('configuracion', [ConfiguracionAdminController::class, 'listar'])->name('admin.configuracion');
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
+
+    // Usuarios
+    Route::get('usuarios', [UsuarioAdminController::class, 'listar'])->name('admin.usuarios');
+    Route::post('usuarios', [UsuarioAdminController::class, 'guardar'])->name('admin.usuarios.store');
+
 });
 
 // ── Panel Docente ─────────────────────────────────────────────────────────
@@ -189,6 +194,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('inclusion', [InclusionController::class, 'listar'])->name('panel.inclusion');
     Route::get('inclusion/{estudiante}', [InclusionController::class, 'verAjustes'])->name('panel.inclusion.ajustes');
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
+
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

@@ -51,7 +51,8 @@
                             <div class="form-check form-switch">
                                 <input class="form-check-input toggle-activo" type="checkbox"
                                     data-id="{{ $d->id }}" data-nombre="{{ $d->nombre }}"
-                                    data-apellido="{{ $d->apellido }}" @checked($d->estado === 'activo')>
+                                    style="cursor: pointer;" data-apellido="{{ $d->apellido }}"
+                                    @checked($d->estado === 'activo')>
                             </div>
                         </td>
                         <td>

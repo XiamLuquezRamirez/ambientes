@@ -1,6 +1,6 @@
 <div class="modal fade" id="modalVerAccesos" tabindex="-1" data-bs-keyboard="false" aria-labelledby="modalVerAccesosLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl ">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-header-icon"><i class="fa-solid fa-clock-rotate-left text-white"></i></div>

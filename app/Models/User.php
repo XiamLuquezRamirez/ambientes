@@ -14,8 +14,6 @@ class User extends Authenticatable
 
     protected $hidden = ['password', 'remember_token'];
 
-    protected $casts = ['estado' => 'boolean'];
-
     public function docente()
     {
         return $this->hasOne(Docente::class);

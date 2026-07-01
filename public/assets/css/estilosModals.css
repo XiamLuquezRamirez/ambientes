@@ -1,0 +1,420 @@
+ /* ── Buscador ────────────────────────────────────────────────── */
+ .input-buscar {
+     position: relative;
+     flex: 1;
+     min-width: 220px;
+ }
+
+ .input-buscar input {
+     width: 100%;
+     background: #FFFFFF;
+     border: 1px solid #CBD5E1;
+     border-radius: 8px;
+     padding: 9px 14px 9px 38px;
+     color: #1E293B;
+     font-family: 'Nunito', sans-serif;
+     font-size: 0.9rem;
+     outline: none;
+     transition: border-color .15s, box-shadow .15s;
+ }
+
+ .input-buscar input:focus {
+     border-color: #2563EB;
+     box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+ }
+
+ .input-buscar input::placeholder {
+     color: #94A3B8;
+ }
+
+ .input-buscar .icono-buscar {
+     position: absolute;
+     left: 12px;
+     top: 50%;
+     transform: translateY(-50%);
+     color: #94A3B8;
+     font-size: 0.95rem;
+     pointer-events: none;
+ }
+
+ /* ── Paginación ──────────────────────────────────────────────── */
+ .paginacion-wrapper {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     margin-top: 20px;
+     flex-wrap: wrap;
+     gap: 12px;
+ }
+
+ .paginacion-info {
+     font-size: 0.82rem;
+     color: #64748B;
+ }
+
+ .paginacion-controles {
+     display: flex;
+     gap: 6px;
+     flex-wrap: wrap;
+ }
+
+ .pag-btn {
+     display: inline-flex;
+     align-items: center;
+     padding: 6px 12px;
+     border-radius: 7px;
+     font-size: 0.82rem;
+     font-family: 'Nunito', sans-serif;
+     background: #FFFFFF;
+     border: 1px solid #E2E8F0;
+     color: #64748B;
+     text-decoration: none;
+     transition: all .15s;
+     cursor: pointer;
+ }
+
+ .pag-btn:hover {
+     background: #EFF6FF;
+     color: #1E40AF;
+     border-color: #BFDBFE;
+ }
+
+ .pag-btn-activo {
+     background: #2563EB;
+     border-color: #2563EB;
+     color: #FFFFFF;
+     font-weight: 700;
+ }
+
+ .pag-btn-disabled {
+     opacity: .4;
+     cursor: not-allowed;
+     pointer-events: none;
+ }
+
+ /* ── Acciones en tabla ───────────────────────────────────────── */
+ .tabla-acciones {
+     display: flex;
+     gap: 6px;
+ }
+
+ .fila-cuenta-sin-usar {
+     background: #FFFBEB;
+ }
+
+ .badge-cuenta-nueva {
+     margin-left: 8px;
+     vertical-align: middle;
+     font-size: 0.7rem;
+ }
+
+ .btn-accion {
+     display: inline-flex;
+     align-items: center;
+     gap: 4px;
+     padding: 4px 10px;
+     border-radius: 6px;
+     font-size: 0.76rem;
+     font-family: 'Nunito', sans-serif;
+     cursor: pointer;
+     border: 1px solid transparent;
+     text-decoration: none;
+     transition: all .15s;
+ }
+
+ .btn-asignar-grado {
+     background: #e2ffed;
+     border-color: #a0f5be;
+     color: rgb(21, 160, 67);
+ }
+
+ .btn-asignar-grado:hover {
+     background: #19c051;
+     border-color: #19c051;
+     color: #fff;
+ }
+
+ .btn-editar {
+     background: #EFF6FF;
+     border-color: #BFDBFE;
+     color: #1D4ED8;
+ }
+
+ .btn-editar:hover {
+     background: #2563EB;
+     border-color: #2563EB;
+     color: #fff;
+ }
+
+ .btn-eliminar {
+     background: #FEF2F2;
+     border-color: #FECACA;
+     color: #DC2626;
+ }
+
+ .btn-eliminar:hover {
+     background: #DC2626;
+     border-color: #DC2626;
+     color: #fff;
+ }
+
+ .btn-reestablecer-contrasena {
+     background: #EFF6FF;
+     border-color: #BFDBFE;
+     color: #1D4ED8;
+ }
+
+ .btn-reestablecer-contrasena:hover {
+     background: #2563EB;
+     border-color: #2563EB;
+     color: #fff;
+ }
+
+ /* ── Loading overlay ─────────────────────────────────────────── */
+ #cargando-tabla {
+     display: none;
+     text-align: center;
+     padding: 40px;
+     color: #64748B;
+     font-size: 0.9rem;
+ }
+
+ /* ── Errores de campo ────────────────────────────────────────── */
+ .campo-error {
+     color: #DC2626;
+     font-size: 0.78rem;
+     margin-top: 4px;
+ }
+
+ .form-control.is-invalid {
+     border-color: #DC2626 !important;
+ }
+
+ .asignaciones-actuales {
+     border: 1px solid #E2E8F0;
+     border-radius: 8px;
+     padding: 12px;
+     background: #F8FAFC;
+ }
+
+ .asignaciones-actuales ul {
+     list-style: none;
+     margin: 8px 0 0;
+     padding: 0;
+     display: grid;
+     gap: 8px;
+ }
+
+ .asignaciones-actuales li {
+     display: flex;
+     justify-content: space-between;
+     gap: 12px;
+     padding: 8px 10px;
+     border: 1px solid #E2E8F0;
+     border-radius: 6px;
+     background: #FFFFFF;
+     color: #334155;
+     font-size: .86rem;
+ }
+
+ /* ── Modal – estilos visuales sobre Bootstrap ────────────────── */
+ #modalDocente .modal-content,
+ #modalAsignarInfo .modal-content,
+ #modalDocentesAsignados .modal-content,
+ #modalUsuario .modal-content {
+     border: none;
+     border-radius: 16px;
+     overflow: hidden;
+     box-shadow: 0 32px 80px rgba(37, 99, 235, .22), 0 8px 24px rgba(0, 0, 0, .12);
+ }
+
+ #modalEditarDocente .modal-content,
+ #modalBSPasswordGenerada .modal-content {
+     border: none;
+     border-radius: 16px;
+     overflow: hidden;
+     box-shadow: 0 32px 80px rgba(37, 99, 235, .22), 0 8px 24px rgba(0, 0, 0, .12);
+ }
+
+ #modalEditarDocente .modal-header,
+ #modalBSPasswordGenerada .modal-header,
+ #modalDocentesAsignados .modal-header {
+     background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+     border-bottom: none;
+     padding: 20px 24px;
+     gap: 14px;
+     align-items: center;
+ }
+
+ #modalDocente .modal-header,
+ #modalUsuario .modal-header {
+     background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+     border-bottom: none;
+     padding: 20px 24px;
+     gap: 14px;
+     align-items: center;
+ }
+
+ #modalAsignarInfo .modal-header {
+     background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+     border-bottom: none;
+     padding: 20px 24px;
+     gap: 14px;
+     align-items: center;
+ }
+
+ .modal-header-icon {
+     width: 44px;
+     height: 44px;
+     background: rgba(255, 255, 255, .15);
+     border-radius: 10px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     font-size: 1.35rem;
+     flex-shrink: 0;
+ }
+
+ #modalDocente .modal-title,
+ #modalAsignarInfo .modal-title,
+ #modalUsuario .modal-title {
+     font-family: 'Fredoka One', cursive;
+     font-size: 1.2rem;
+     color: #FFFFFF;
+     line-height: 1.2;
+ }
+
+ #modalEditarDocente .modal-title,
+ #modalBSPasswordGenerada .modal-title,
+ #modalDocentesAsignados .modal-title {
+     font-family: 'Fredoka One', cursive;
+     font-size: 1.2rem;
+     color: #FFFFFF;
+     line-height: 1.2;
+ }
+
+ .modal-subtitle {
+     font-size: 0.78rem;
+     color: rgba(255, 255, 255, .65);
+     margin: 2px 0 0;
+ }
+
+ #modalDocente .btn-close,
+ #modalAsignarInfo .btn-close,
+ #modalDocentesAsignados .btn-close,
+ #modalUsuario .btn-close {
+     filter: brightness(0) invert(1);
+     opacity: .75;
+     transition: opacity .15s, transform .2s;
+     margin-left: auto;
+ }
+
+ #modalDocente .btn-close:hover,
+ #modalAsignarInfo .btn-close:hover,
+ #modalDocentesAsignados .btn-close:hover,
+ #modalUsuario .btn-close:hover {
+     opacity: 1;
+     transform: rotate(90deg);
+ }
+
+ #modalEditarDocente .btn-close:hover,
+ #modalBSPasswordGenerada .btn-close:hover {
+     opacity: 1;
+     transform: rotate(90deg);
+ }
+
+ #modalEditarDocente .btn-close,
+ #modalBSPasswordGenerada .btn-close {
+     filter: brightness(0) invert(1);
+     opacity: .75;
+     transition: opacity .15s, transform .2s;
+     margin-left: auto;
+ }
+
+ #modalDocente .modal-body,
+ #modalAsignarInfo .modal-body,
+ #modalDocentesAsignados .modal-body,
+ #modalUsuario .modal-body {
+     padding: 28px;
+ }
+
+ #modalEditarDocente .modal-body,
+ #modalBSPasswordGenerada .modal-body {
+     padding: 28px;
+ }
+
+ #modalDocente .modal-footer,
+ #modalAsignarInfo .modal-footer,
+ #modalDocentesAsignados .modal-footer,
+ #modalUsuario .modal-footer {
+     border-top: 1px solid #E2E8F0;
+     padding: 16px 28px 24px;
+     gap: 12px;
+ }
+
+ #modalEditarDocente .modal-footer,
+ #modalBSPasswordGenerada .modal-footer {
+     border-top: 1px solid #E2E8F0;
+     padding: 16px 28px 24px;
+     gap: 12px;
+ }
+
+ /* Animación de entrada personalizada (reemplaza la de Bootstrap) */
+ #modalDocente.fade .modal-dialog,
+ #modalAsignarInfo.fade .modal-dialog,
+ #modalEditarDocente.fade .modal-dialog,
+ #modalBSPasswordGenerada.fade .modal-dialog,
+ #modalDocentesAsignados.fade .modal-dialog,
+ #modalUsuario.fade .modal-dialog {
+     transform: scale(0.85) translateY(-30px);
+     opacity: 0;
+     transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease;
+ }
+
+ #modalDocente.show .modal-dialog,
+ #modalAsignarInfo.show .modal-dialog,
+ #modalEditarDocente.show .modal-dialog,
+ #modalBSPasswordGenerada.show .modal-dialog,
+ #modalDocentesAsignados.show .modal-dialog,
+ #modalUsuario.show .modal-dialog {
+     transform: scale(1) translateY(0);
+     opacity: 1;
+ }
+
+ /* Modal Docentes asignados: alerta y filas sin cobertura docente */
+ #modalDocentesAsignados .alerta-cobertura {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     background: #FEF2F2;
+     border: 1px solid #FECACA;
+     color: #991B1B;
+     padding: 12px 16px;
+     border-radius: 8px;
+     margin-bottom: 16px;
+     font-size: 0.9rem;
+ }
+
+ #modalDocentesAsignados .alerta-cobertura i {
+     color: #DC2626;
+     font-size: 1rem;
+ }
+
+ #modalDocentesAsignados tr.fila-grupo-sin-docente td {
+     background: #FEE2E2;
+     color: #7F1D1D;
+     border-top-color: #FECACA;
+ }
+
+ #modalDocentesAsignados tr.fila-grupo-sin-docente:hover td {
+     background: #FECACA;
+ }
+
+ /* Estado vacío dentro del modal asignar grupo */
+ .seccion-vacia {
+     padding: 22px;
+     background: #F8FAFC;
+     border: 1px solid #E2E8F0;
+     border-radius: 12px;
+     color: #475569;
+ }

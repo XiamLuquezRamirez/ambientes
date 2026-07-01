@@ -61,9 +61,8 @@ class DocenteAdminController extends Controller
 
         $ambientes = Ambiente::orderBy('nombre')->get();
 
-        // Datos para el modal "Docentes asignados" (tabla global de grupos).
-        // Se cargan aquí porque ver_grupos.blade.php se incluye en index.
-        $datosGrupos = $this->datosVistaGrupos($request);
+        // Datos para el modal "Docentes asignados" (solo filtros; la tabla se carga vía AJAX).
+        $datosGrupos = $this->datosVistaGrupos($request, cargarGrupos: false);
 
         if ($request->ajax()) {
             return response()->json([
@@ -83,27 +82,28 @@ class DocenteAdminController extends Controller
      *
      * Respeta los filtros ?grado_id= y ?anio= que envía el modal de grupos.
      */
-    private function datosVistaGrupos(Request $request): array
+    private function datosVistaGrupos(Request $request, bool $cargarGrupos = true): array
     {
         $anio = (int) $request->get('anio', date('Y'));
         $gradoId = $request->get('grado_id');
 
         $grados = Grado::activos()->orderBy('orden')->get();
 
-        // Cargas docentes del año filtrado para listar nombres en la tabla.
-        $grupos = Grupo::with([
-            'grado',
-            'cargasDocente' => function ($q) use ($anio) {
-                $q->where('activo', true)
-                    ->where('anio_lectivo', $anio)
-                    ->with('docente.user');
-            },
-        ])
-            ->delAnio($anio)
-            ->when($gradoId, fn ($q) => $q->where('grado_id', $gradoId))
-            ->orderBy('grado_id')
-            ->orderBy('nombre')
-            ->get();
+        $grupos = $cargarGrupos
+            ? Grupo::with([
+                'grado',
+                'cargasDocente' => function ($q) use ($anio) {
+                    $q->where('activo', true)
+                        ->where('anio_lectivo', $anio)
+                        ->with(['docente.user', 'ambiente']);
+                },
+            ])
+                ->delAnio($anio)
+                ->when($gradoId, fn ($q) => $q->where('grado_id', $gradoId))
+                ->orderBy('grado_id')
+                ->orderBy('nombre')
+                ->get()
+            : collect();
 
         // Lista para el selector al asignar docente desde una fila de grupo.
         $docentesActivos = Docente::where('estado', 'activo')
@@ -113,6 +113,22 @@ class DocenteAdminController extends Controller
             ->values();
 
         return compact('grados', 'grupos', 'anio', 'gradoId', 'docentesActivos');
+    }
+
+    /**
+     * Devuelve el HTML del modal de grupos/docentes asignados para peticiones AJAX.
+     *
+     * Respeta los filtros grado_id y anio sin recargar la página principal.
+     */
+    public function listarGruposAsignados(Request $request)
+    {
+        $datos = $this->datosVistaGrupos($request);
+
+        return response()->json([
+            'success' => true,
+            'html' => view('admin.docentes._grupos_asignados_contenido', $datos)->render(),
+            'anio' => $datos['anio'],
+        ]);
     }
 
     /**
@@ -127,6 +143,16 @@ class DocenteAdminController extends Controller
             'docente.cargasActivas.grado',
             'docente.cargasActivas.grupo',
         ])->findOrFail($docente);
+
+        if ($usuario->docente && $usuario->docente->estado !== 'activo') {
+            $this->liberarAsignacionesDocente($usuario->docente);
+            $usuario->docente->unsetRelation('cargasActivas');
+            $usuario->load([
+                'docente.cargasActivas.ambiente',
+                'docente.cargasActivas.grado',
+                'docente.cargasActivas.grupo',
+            ]);
+        }
 
         $carga = $usuario->docente?->cargasActivas->first();
         $asignaciones = $usuario->docente
@@ -156,7 +182,6 @@ class DocenteAdminController extends Controller
 
         $ambientes = Ambiente::orderBy('nombre')->get();
 
-        return view('admin.docentes.show', compact('usuario', 'asignaciones', 'ambientes'));
     }
 
     /**
@@ -191,13 +216,16 @@ class DocenteAdminController extends Controller
     public function quitarAsignacion(User $docente, CargaDocente $carga)
     {
         $perfilDocente = $docente->docente;
-        
+
         if (! $perfilDocente || $carga->docente_id !== $perfilDocente->id || $carga->anio_lectivo !== (int) date('Y')) {
             return response()->json([
                 'success' => false,
                 'message' => 'Asignación inválida o no corresponde al docente.',
             ], 422);
         }
+
+        $grupoId = $carga->grupo_id;
+        $anioLectivo = $carga->anio_lectivo;
 
         DB::transaction(function () use ($carga) {
             // Guardamos el cambio sin disparar eventos automáticos para evitar
@@ -215,11 +243,14 @@ class DocenteAdminController extends Controller
 
         $perfilDocente->load('cargasActivas.ambiente', 'cargasActivas.grado', 'cargasActivas.grupo');
 
+        $grupoModal = Grupo::find($grupoId)?->datosParaModalDocentesAsignados($anioLectivo);
+
         return response()->json([
             'success' => true,
             'message' => 'Grupo desasignado correctamente.',
             'data' => [
                 'asignaciones' => $this->formatearAsignacionesActuales($perfilDocente),
+                'grupo_modal' => $grupoModal,
             ],
         ]);
     }
@@ -318,6 +349,7 @@ class DocenteAdminController extends Controller
             'data' => [
                 'asignacion' => $carga->load('ambiente', 'grado', 'grupo'),
                 'asignaciones' => $this->formatearAsignacionesActuales($perfilDocente),
+                'grupo_modal' => $grupo->datosParaModalDocentesAsignados($anioActual),
             ],
         ]);
     }
@@ -339,12 +371,18 @@ class DocenteAdminController extends Controller
             'identificacion' => 'required|string|min:8|max:15|unique:users,identificacion',
             'especialidad' => 'required|string|max:150',
             'fecha_ingreso' => 'required|date',
+            'firma_url' => 'nullable|image|max:2048',
         ]);
 
         // Transacción: si falla el perfil docente, no queda un usuario huérfano.
-        $docente = DB::transaction(function () use ($datos) {
+        $docente = DB::transaction(function () use ($datos, $request) {
 
-            // Paso 1 — Cuenta de acceso (tabla users).
+            $firma_url = null;
+
+            if ($request->hasFile('firma_url')) {
+                $firma_url = $request->file('firma_url')->store('docentes', 'public');
+            }
+
             $usuario = User::create([
                 'nombre' => $datos['nombre'],
                 'apellido' => $datos['apellido'],
@@ -352,10 +390,9 @@ class DocenteAdminController extends Controller
                 'email' => $datos['email'],
                 'password' => Hash::make($datos['password']),
                 'rol' => 'docente',
-                'estado' => true,
+                'activo' => true,
             ]);
 
-            // Paso 2 — Perfil profesional (tabla docentes).
             return Docente::create([
                 'user_id' => $usuario->id,
                 'telefono' => $datos['telefono'],
@@ -363,6 +400,7 @@ class DocenteAdminController extends Controller
                 'especialidad' => $datos['especialidad'],
                 'fecha_ingreso' => $datos['fecha_ingreso'],
                 'estado' => true,
+                'firma_url' => $firma_url,
             ]);
         });
 
@@ -421,11 +459,18 @@ class DocenteAdminController extends Controller
             'direccion' => 'required|string|max:150',
             'especialidad' => 'required|string|max:150',
             'fecha_ingreso' => 'required|date',
-            'firma_url' => 'nullable|string|max:255',
+            'firma_url' => 'nullable|image|max:2048',
             'password' => 'nullable|min:8|confirmed',
         ]);
 
-        DB::transaction(function () use ($usuario, $datos) {
+        DB::transaction(function () use ($usuario, $datos, $request) {
+
+            $firma_url = null;
+
+            if ($request->hasFile('firma_url')) {
+                $firma_url = $request->file('firma_url')->store('docentes', 'public');
+            }
+
             // Datos de users
             $usuario->update([
                 'nombre' => $datos['nombre'],
@@ -441,7 +486,7 @@ class DocenteAdminController extends Controller
                 'direccion' => $datos['direccion'],
                 'especialidad' => $datos['especialidad'],
                 'fecha_ingreso' => $datos['fecha_ingreso'],
-                'firma_url' => $datos['firma_url'],
+                'firma_url' => $firma_url,
             ]);
 
             // Si se proporciona una nueva contraseña, se actualiza la contraseña del usuario.
@@ -669,6 +714,36 @@ class DocenteAdminController extends Controller
     }
 
     /**
+     * Desactiva las cargas docentes activas del año para liberar los grupos asignados.
+     */
+    private function liberarAsignacionesDocente(Docente $docente, ?int $anio = null): int
+    {
+        $anio = $anio ?? (int) date('Y');
+
+        $cargas = CargaDocente::where('docente_id', $docente->id)
+            ->where('anio_lectivo', $anio)
+            ->where('activo', true)
+            ->get();
+
+        if ($cargas->isEmpty()) {
+            return 0;
+        }
+
+        DB::transaction(function () use ($cargas) {
+            foreach ($cargas as $carga) {
+                CargaDocente::withoutEvents(function () use ($carga) {
+                    $carga->activo = false;
+                    $carga->save();
+                });
+
+                $this->encolarAsignacionParaServidores($carga->fresh(), 'update');
+            }
+        });
+
+        return $cargas->count();
+    }
+
+    /**
      * Devuelve los datos básicos del docente para el formulario de edición.
      *
      * Convierte la fecha de ingreso al formato Y-m-d usable por los inputs HTML.
@@ -676,21 +751,28 @@ class DocenteAdminController extends Controller
     public function verDatosDocente($docente_id)
     {
         $docente_id = (int) $docente_id;
-        $docente = Docente::with('user')->where('user_id', $docente_id)->first();
 
-        // setear fecha de ingreso en formato dd/mm/yyyy
-        $docente->fecha_ingreso_set = Carbon::parse($docente->fecha_ingreso)->format('Y-m-d');
+        $docente = Docente::with('user')
+            ->where('user_id', $docente_id)
+            ->first();
 
-        if ($docente) {
+        if (! $docente) {
             return response()->json([
-                'success' => true,
-                'data' => $docente,
+                'success' => false,
+                'message' => 'Docente no encontrado.',
             ]);
         }
 
+        $docente->fecha_ingreso_set = Carbon::parse($docente->fecha_ingreso)
+            ->format('Y-m-d');
+
+        $docente->firma_url = $docente->firma_url
+            ? asset('storage/'.$docente->firma_url)
+            : null;
+
         return response()->json([
-            'success' => false,
-            'message' => 'Docente no encontrado.',
+            'success' => true,
+            'data' => $docente,
         ]);
     }
 
@@ -704,16 +786,20 @@ class DocenteAdminController extends Controller
         try {
 
             $docente = Docente::findOrFail($id);
+            $pasaraAInactivo = $docente->estado === 'activo';
 
-            $docente->estado = $docente->estado === 'activo'
-                ? 'inactivo'
-                : 'activo';
-
+            $docente->estado = $pasaraAInactivo ? 'inactivo' : 'activo';
             $docente->save();
+
+            $asignacionesLiberadas = 0;
+            if ($docente->estado === 'inactivo') {
+                $asignacionesLiberadas = $this->liberarAsignacionesDocente($docente);
+            }
 
             return response()->json([
                 'success' => true,
                 'estado' => $docente->estado,
+                'asignaciones_liberadas' => $asignacionesLiberadas,
                 'message' => $docente->estado === 'activo'
                     ? 'Docente activado correctamente.'
                     : 'Docente desactivado correctamente.',
