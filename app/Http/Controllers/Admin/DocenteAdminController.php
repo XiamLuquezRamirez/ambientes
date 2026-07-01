@@ -399,7 +399,7 @@ class DocenteAdminController extends Controller
                 'direccion' => $datos['direccion'],
                 'especialidad' => $datos['especialidad'],
                 'fecha_ingreso' => $datos['fecha_ingreso'],
-                'estado' => true,
+                'estado' => 'activo',
                 'firma_url' => $firma_url,
             ]);
         });

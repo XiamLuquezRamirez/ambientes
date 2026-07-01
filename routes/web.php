@@ -111,6 +111,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('docentes/{docente}/asignaciones', [DocenteAdminController::class, 'asignacionesActuales'])->name('admin.docentes.asignaciones');
     Route::post('docentes/{docente}/asignar-grupo', [DocenteAdminController::class, 'asignarGrupo'])->name('admin.docentes.asignar-grupo');
     Route::delete('docentes/{docente}/asignaciones/{carga}', [DocenteAdminController::class, 'quitarAsignacion'])->name('admin.docentes.quitar-asignacion');
+    Route::post('docentes', [DocenteAdminController::class, 'guardar'])->name('admin.docentes.store');
     Route::get('docentes/{docente}', [DocenteAdminController::class, 'ver'])->name('admin.docentes.show');
     Route::get('docentes/datos/{docente_id}', [DocenteAdminController::class, 'verDatosDocente'])->name('admin.docentes.datos');
     Route::patch('docentes/{docente}/toggle-activo', [DocenteAdminController::class, 'toggleActivo'])->name('admin.docentes.toggleActivo');
@@ -151,7 +152,11 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     // Usuarios
     Route::get('usuarios', [UsuarioAdminController::class, 'listar'])->name('admin.usuarios');
     Route::post('usuarios', [UsuarioAdminController::class, 'guardar'])->name('admin.usuarios.store');
-
+    Route::get('usuarios/{usuario}/generar-pdf', [UsuarioAdminController::class, 'generarPdf'])->name('admin.usuarios.generar-pdf');
+    Route::put('usuarios/{usuario}/completar-info', [UsuarioAdminController::class, 'completarInfo'])->name('admin.usuarios.completar-info.store');
+    Route::get('usuarios/{usuario}', [UsuarioAdminController::class, 'ver'])->name('admin.usuarios.show');
+    Route::get('usuarios/datos/{usuario_id}', [UsuarioAdminController::class, 'verDatosUsuario'])->name('admin.usuarios.datos');
+    Route::put('usuarios/{usuario}', [UsuarioAdminController::class, 'actualizar'])->name('admin.usuarios.update');
 });
 
 // ── Panel Docente ─────────────────────────────────────────────────────────

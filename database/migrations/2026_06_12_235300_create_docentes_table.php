@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('telefono', 20)->nullable();
             $table->string('especialidad', 100)->nullable();
             $table->date('fecha_ingreso')->nullable();
+            $table->string('direccion', 150)->nullable();
             $table->string('firma_url')->nullable();
             $table->text('descripcion')->nullable();
             $table->enum('estado', ['activo', 'inactivo', 'eliminado'])->default('activo');

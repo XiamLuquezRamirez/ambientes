@@ -24,6 +24,8 @@
         if (typeof ANIO_LECTIVO_ACTUAL === 'undefined') {
             window.ANIO_LECTIVO_ACTUAL = "{{ date('Y') }}";
         }
+
+        /** URL para asignar un grupo a un docente. */
         if (typeof URL_GRUPOS_ASIGNAR === 'undefined') {
             window.URL_GRUPOS_ASIGNAR = "{{ url('admin/grupos') }}/:id/asignar-docente";
         }

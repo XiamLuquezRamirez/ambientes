@@ -444,17 +444,48 @@
 
         function mostrarErroresModal(errors) {
             limpiarErroresModal();
-            for (const [campo, mensajes] of Object.entries(errors)) {
-                const input = document.querySelector(`#formDocente [name="${campo}"]`);
-                if (!input) continue;
-                input.classList.add('is-invalid');
-                const div = document.createElement('div');
-                div.className = 'campo-error';
-                div.textContent = mensajes[0];
-                input.insertAdjacentElement('afterend', div);
-            }
-            const primero = document.querySelector('#formDocente .is-invalid');
-            if (primero) primero.focus();
+            $.each(errors, function(campo, mensajes) {
+                const $input = $(`#formDocente [name="${campo}"]`);
+                if (!$input.length) return;
+                $input.addClass('is-invalid');
+
+                var mensaje = '';
+                switch (mensajes[0]) {
+                    case 'validation.unique':
+                        mensaje = 'Ya existe un docente con';
+                        if (campo === 'email') {
+                            mensaje += ' este correo electrónico';
+                        } else if (campo === 'identificacion') {
+                            mensaje += ' esta identificación';
+                        }
+                        mensaje += '.';
+                        break;
+                    case 'validation.email':
+                        mensaje = 'El correo electrónico no es válido';
+                        break;
+                    case 'validation.integer':
+                        mensaje = 'El valor debe ser un número entero';
+                        break;
+                    case 'validation.string':
+                        mensaje = 'El valor debe ser una cadena de texto';
+                        break;
+                    case 'validation.numeric':
+                        mensaje = 'El valor debe ser un número';
+                        break;
+                    case 'validation.required':
+                        mensaje = 'Este campo es requerido';
+                        break;
+                    default:
+                        mensaje = 'Este campo es requerido';
+                        break;
+                }
+
+                $('<div>', {
+                    class: 'campo-error',
+                    text: mensaje
+                }).insertAfter($input);
+            });
+            $(`#formDocente .is-invalid`).first().focus();
         }
 
         /* ── Crear docente (AJAX) ────────────────────────────────────── */
@@ -519,7 +550,7 @@
                         mostrarErroresModal(xhr.responseJSON.errors);
                     },
                     complete: function() {
-                        $('#btnCrearDocente').prop('disabled', false).text('Crear Docente');
+                        $('#btnDocente').prop('disabled', false).text('Crear Docente');
                     }
                 });
 
@@ -588,7 +619,7 @@
                         mostrarErroresModal(xhr.responseJSON.errors);
                     },
                     complete: function() {
-                        $('#btnCrearDocente').prop('disabled', false).text('Crear Docente');
+                        $('#btnDocente').prop('disabled', false).text('Crear Docente');
                     }
                 });
             }
@@ -732,6 +763,8 @@
             id_editar = data.user.id;
         }
 
+
+
         $(document).on('change', '.toggle-activo', function() {
 
             let checkbox = $(this);
@@ -805,6 +838,8 @@
                 }
             });
         }
+
+
         // Copiar contraseña al portapapeles.
         $(document).on('click', '.btn-copiar', function() {
             const inputId = $(this).data('target');
