@@ -132,6 +132,12 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('estudiantes/cambiar-estado/{idEstudiante}/{estado}', [EstudianteAdminController::class, 'cambiarEstado'])->name('admin.estudiantes.cambiar-estado');
     Route::get('estudiantes/diligenciar-piar/{idEstudiante}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('admin.estudiantes.cargar-municipios');
+
+    // Endpoint para guardar los datos generales del Piar
+    // Piar
+    Route::get('piar', [PiarController::class, 'listado'])->name('admin.piar');
+    Route::get('piar/{idEstudiante}', [PiarController::class, 'verPiar'])->name('admin.piar.ver');
+    Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])->name('admin.piar.guardar-piar');
     // Catalogo
     Route::get('catalogo', [CatalogoController::class, 'listar'])->name('admin.catalogo');
     Route::post('catalogo/modulos', [CatalogoController::class, 'guardarModulo'])->name('admin.catalogo.modulo.store');
