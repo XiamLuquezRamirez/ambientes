@@ -1,4 +1,4 @@
-let paso = 6;
+let paso = 1;
 
 const TOTAL = 7;
 
@@ -24,9 +24,16 @@ function actualizarUI() {
 
     contador.textContent = paso;
     btnAnt.style.visibility = paso === 1 ? 'hidden' : 'visible';
-    btnSig.style.display    = paso === TOTAL ? 'none' : 'inline-block';
-    btnGuardar.style.display = paso === TOTAL ? 'inline-block' : 'none';
 
+    btnSig.innerHTML    = paso === TOTAL ? '<i class="fas fa-save"></i> Terminar y guardar' : '<i class="fas fa-arrow-right"></i> Siguiente';
+
+    if (paso > TOTAL) {
+        $('.piar-step-counter').hide();
+        btnSig.style.display = 'none';
+    } else {
+        $('.piar-step-counter').show();
+        btnSig.style.display = 'inline-block';
+    }
 }
 
 function validarPaso() {
@@ -63,8 +70,7 @@ function validarPaso() {
 
 
 btnSig.addEventListener('click', () => {
-    if (!validarPaso()) return;
-    if (paso < TOTAL) { 
+    if (paso <= TOTAL) { 
         switch (paso) {
             case 1:
                 if (!validarPaso()) return;
@@ -89,6 +95,10 @@ btnSig.addEventListener('click', () => {
             case 6:
                 if (!validarPaso()) return;
                 guardarPaso6();
+                break;
+            case 7:
+                if (!validarPaso()) return;
+                guardarPaso7();
                 break;
         }
     }
@@ -268,7 +278,7 @@ function agregarFirmaDocente() {
                         <td>
                             <div class="d-flex justify-content-between align-items-center gap-2">
                                 <input type="hidden" name="docente_firma[${firmas_docentes_cuenta-1}][id]" id="docente_firma_id_${firmas_docentes_cuenta}" value="">
-                                <input type="text" class="form-control" name="docente_firma[${firmas_docentes_cuenta-1}][nombre]" id="docente_firma_nombre_${firmas_docentes_cuenta}" required>
+                                <input type="text" readonly class="form-control" name="docente_firma[${firmas_docentes_cuenta-1}][nombre]" id="docente_firma_nombre_${firmas_docentes_cuenta}" required>
                                 <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente(${firmas_docentes_cuenta})"><i class="fas fa-search"></i> Buscar</button>
                             </div>
                         </td>
@@ -309,20 +319,20 @@ function agregarActividad() {
     actividades_cuenta++;
     document.getElementById('actividades_container').insertAdjacentHTML('beforeend', 
         `<tr id="actividad_${actividades_cuenta}">
-            <td><input type="text" class="form-control" name="actividad_nombre_${actividades_cuenta}"></td>
-            <td><input type="text" class="form-control" name="actividad_descripcion_${actividades_cuenta}"></td>
+            <td><textarea rows="3" class="form-control auto-grow" name="actividad[${actividades_cuenta-1}][nombre]" required></textarea></td>
+            <td><textarea rows="3" class="form-control auto-grow" name="actividad[${actividades_cuenta-1}][descripcion]" required></textarea></td>
                 <td>
                     <div class="d-flex justify-content-between align-items-center gap-2">
                         <div class="frecuencia-radio">
-                            <input type="radio" name="actividad_frecuencia_${actividades_cuenta}" value="D">
+                            <input type="radio" class="form-check-input" name="actividad[${actividades_cuenta-1}][frecuencia]" value="D" required>
                             <label class="form-check-label">D</label>
                         </div>
                         <div class="frecuencia-radio">
-                            <input type="radio" name="actividad_frecuencia_${actividades_cuenta}" value="S">
+                            <input type="radio" class="form-check-input" name="actividad[${actividades_cuenta-1}][frecuencia]" value="S" required>
                             <label class="form-check-label">S</label>
                         </div>
                         <div class="frecuencia-radio">
-                            <input type="radio" name="actividad_frecuencia_${actividades_cuenta}" value="P">
+                            <input type="radio" class="form-check-input" name="actividad[${actividades_cuenta-1}][frecuencia]" value="P" required>
                             <label class="form-check-label">P</label>
                         </div>
                     </div>
@@ -333,11 +343,12 @@ function agregarActividad() {
             </td>
         </tr>`
     );
+
+    autoGrowTextarea();
 }
 
 function eliminarActividad(id) {
     document.getElementById('actividad_' + id).remove();
-    actividades_cuenta--;
 }
 
 function colocarRequired(id, select) {
@@ -401,6 +412,12 @@ function guardarPaso6() {
     var formulario = new FormData($('#form-paso-6')[0]);
     var url = URL_PIAR + '/guardar-paso/6';
     guardarDatos(formulario, url, 'form-paso-6');
+}
+
+function guardarPaso7() {
+    var formulario = new FormData($('#form-paso-7')[0]);
+    var url = URL_PIAR + '/guardar-paso/7';
+    guardarDatos(formulario, url, 'form-paso-7');
 }
 
 function guardarDatos(datos, url, form) {
@@ -484,20 +501,17 @@ function buscarDocente(id) {
 }
 
 let debounceTimer;
+
 $('#form-buscar-docente input[name="nombre"]').on('input', function () {
     clearTimeout(debounceTimer);
     var texto = $(this).val();
-    debounceTimer = setTimeout(buscarDocentePiarTexto(texto), 400);
+    debounceTimer = setTimeout(() => {
+        if(texto == " " || texto == ""){
+            texto = 'primeros_10';
+        }
+        buscarDocentePiar(texto);
+    }, 400);
 });
-
-
-function buscarDocentePiarTexto(texto) {
-    var texto = $('#form-buscar-docente input[name="nombre"]').val();
-    if(texto == " " || texto == ""){
-        texto = 'primeros_10';
-    }
-    buscarDocentePiar(texto);
-}
 
 function buscarDocentePiar(texto) {
     $.ajax({
@@ -509,10 +523,17 @@ function buscarDocentePiar(texto) {
                 var html = '';
                 docentes = response.data;
                 response.data.forEach(function(docente){
+                    if(docente.firma_url != '' && docente.firma_url != null) {
+                        var url_firma = '/storage/' + docente.firma_url;
+                    } else {
+                        var url_firma = '/assets/images/firma.png';
+                    }
+
                     html += '<tr>';
                     html += '<td>' + docente.nombre + '</td>';
                     html += '<td>' + docente.apellido + '</td>';
                     html += '<td>' + docente.email + '</td>';
+                    html += '<td><img src="' + url_firma + '" alt="Firma" class="img-fluid" style="width: 100px; height: 50px; object-fit: contain;"></td>';
                     html += '<td class="text-center"><button type="button" class="btn btn-primary btn-sm" onclick="seleccionarDocente(' + docente.id + ')">Seleccionar</button></td>';
                     html += '</tr>';
                 });
@@ -526,17 +547,52 @@ function buscarDocentePiar(texto) {
 }
 
 function seleccionarDocente(id_docente) {
-    if(docentes_firma.includes(id_docente)) {
-        mostrarToast('error', 'El docente ya ha sido seleccionado.');
-        return;
-    }
     var docente = docentes.find(docente => docente.id == id_docente);
-    $('#img_firma_docente_' + id_docente_firma).attr('src', '/storage/' + docente.firma_url);
-    $('#docente_firma_nombre_' + id_docente_firma).val(docente.nombre);
-    $('#docente_firma_id_' + id_docente_firma).val(docente.id);
-    docentes_firma.push(id_docente);
-    console.log(docentes_firma);
+
+    if(docente.firma_url == '' || docente.firma_url == null) {
+        mostrarToast('error', 'El docente seleccionado no tiene firma, deberá firmar manualmente en la sección de ajuste razonable despues de generar el pdf del PIAR.');
+    }
+
+    if(id_docente_firma == 'orientador') {
+        $('#docente_orientador_nombre').val(docente.nombre + ' ' + docente.apellido);
+        $('#docente_orientador_id').val(docente.id);
+        colocarFirma('docente_orientador_firma', docente.firma_url);
+    } else if(id_docente_firma == 'apoyo_pedagogico') {
+        $('#docente_apoyo_pedagogico_nombre').val(docente.nombre + ' ' + docente.apellido);
+        $('#docente_apoyo_pedagogico_id').val(docente.id);
+        colocarFirma('docente_apoyo_pedagogico_firma', docente.firma_url);
+    } else if(id_docente_firma == 'coordinador_pedagogico') {
+        $('#docente_coordinador_pedagogico_nombre').val(docente.nombre + ' ' + docente.apellido);
+        $('#docente_coordinador_pedagogico_id').val(docente.id);
+        colocarFirma('docente_coordinador_pedagogico_firma', docente.firma_url);
+    } else {
+        if(docentes_firma.includes(id_docente)) {
+            mostrarToast('error', 'El docente ya ha sido seleccionado.');
+            return;
+        }
+
+        // verificar si se esta editando el docente que firma en esta casilla
+        var id_docente_firma_actual = parseInt($(`#docente_firma_id_${id_docente_firma}`).val());
+        if(id_docente_firma_actual != '') {
+            docentes_firma = docentes_firma.filter(id => id != id_docente_firma_actual);
+        }
+
+        colocarFirma('img_firma_docente_' + id_docente_firma, docente.firma_url);
+        $('#docente_firma_nombre_' + id_docente_firma).val(docente.nombre + ' ' + docente.apellido);
+        $('#docente_firma_id_' + id_docente_firma).val(docente.id);
+        docentes_firma.push(id_docente);
+        console.log(docentes_firma);
+    }
+    
     cerrarModalBuscarDocente();
+}
+
+function colocarFirma(id_img, url_firma) {
+    if(url_firma != null && url_firma != '') {
+        $('#' + id_img).attr('src', '/storage/' + url_firma);
+    } else {
+        $('#' + id_img).attr('src', '/assets/images/firma.png');
+    }
 }
 
 function cerrarModalBuscarDocente() {

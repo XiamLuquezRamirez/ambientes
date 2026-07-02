@@ -587,6 +587,11 @@
         right: -34px;
         bottom: 30%;
     }
+
+    .italic {
+        font-style: italic;
+        font-size: .9rem;
+    }
 </style>
 @endpush
 
@@ -605,7 +610,7 @@
     <div class="piar-stepper" id="piarStepper">
         <div class="piar-stepper-progress" id="piarProgress" style="width:0%"></div>
 
-        <div class="piar-step active" data-step="1">
+        <div class="piar-step" data-step="1">
             <div class="piar-step-circle">1</div>
             <span class="piar-step-label">Información general del estudiante</span>
         </div>
@@ -813,26 +818,32 @@
                     <div class="card-body row g-3">
                         <div class="col-12">
                             <label class="form-label">Capacidades</label>
+                            <p class="text-muted italic">Describa todas las fortalezas y habilidades del estudiante, teniendo en cuenta el mayor nivel de detalle posible. Incluya aspectos cognitivos, comunicativos, sociales, emocionales, motores, adaptativos y académicos. Considere aquello que el estudiante puede hacer de manera independiente, con apoyo o en proceso de adquirir.</p>
                             <textarea required class="form-control" rows="3" name="capacidades" required></textarea>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Gustos e intereses</label>
+                            <p class="text-muted italic">Describa las actividades, temas, juegos, objetos, personas o rutinas que motivan al estudiante y facilitan su participación. Estos intereses pueden utilizarse como reforzadores o estrategias pedagógicas dentro del aula.</p>
                             <textarea required class="form-control" rows="3" name="gustos" required></textarea>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Expectativas del estudiante</label>
+                            <p class="text-muted italic">Consigne los deseos, metas, intereses o expectativas que expresa el estudiante frente a su proceso escolar, sus relaciones con los demás o su proyecto de vida, de acuerdo con su edad y nivel de desarrollo. Si el estudiante no logra expresarlas verbalmente, pueden inferirse a partir de la observación o información suministrada por la familia</p>
                             <textarea required class="form-control" rows="3" name="expectativas_estudiante" required></textarea>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Expectativas de la familia</label>
+                            <p class="text-muted italic">Describa las expectativas, objetivos o aspiraciones que tiene la familia frente al proceso educativo, desarrollo integral, autonomía, participación y aprendizaje del estudiante.</p>
                             <textarea required class="form-control" rows="3" name="expectativas_familia" required></textarea>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Redes de apoyo</label>
+                            <p class="text-muted italic">Identifique las personas, instituciones o entidades que acompañan el proceso del estudiante y pueden contribuir a su desarrollo. Incluya apoyos familiares, escolares, comunitarios, terapéuticos o institucionales.</p>
                             <textarea required class="form-control" rows="3" name="redes_apoyo" required></textarea>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Otras</label>
+                            <p class="text-muted italic">Consigne información adicional que sea relevante para comprender las necesidades, fortalezas o condiciones del estudiante y que no haya sido registrada en los apartados anteriores.</p>
                             <textarea required class="form-control" rows="3" name="otras" required></textarea>
                         </div>
                     </div>
@@ -1996,7 +2007,7 @@
         </div>
 
         {{-- PASO 6: Ajustes Razonables --}}
-        <div class="piar-pane active card-item" data-pane="6">
+        <div class="piar-pane card-item" data-pane="6">
             <div class="piar-pane-title">
                 <div class="piar-pane-icon" style="background:#ECFDF5;color:#059669">
                     <i class="fas fa-cogs"></i>
@@ -2120,7 +2131,7 @@
                                     <td>
                                         <div class="d-flex justify-content-between align-items-center gap-2">
                                             <input type="hidden" name="docente_firma[0][id]" id="docente_firma_id_1" value="">
-                                            <input type="text" class="form-control" name="docente_firma[0][nombre]" id="docente_firma_nombre_1" required>
+                                            <input type="text" readonly class="form-control" name="docente_firma[0][nombre]" id="docente_firma_nombre_1" required>
                                             <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente(1)"><i class="fas fa-search"></i> Buscar</button>
                                         </div>
                                     </td>
@@ -2141,16 +2152,21 @@
                     <div class="col-md-4 pt-3" id="div_docente_1">
                         <table class="table table-bordered piar-valoracion-table mb-0">
                             <thead>
-                                <tr><th>Nombre docente orientador</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_orientador_nombre_ar"></td></tr>
+                                <tr>
+                                    <th>Nombre docente orientador</th></tr>
+                                <tr>
+                                    <td class="d-flex justify-content-between align-items-center gap-2">
+                                        <input type="hidden" name="docente_orientador_id" id="docente_orientador_id" value="">
+                                        <input type="text" readonly class="form-control" name="docente_orientador_nombre" id="docente_orientador_nombre" required>
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente('orientador')"><i class="fas fa-search"></i> Buscar</button>
+                                    </td>
+                                </tr>
                                 <tr><th>Área</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_orientador_area_ar"></td></tr>
+                                <tr><td><input type="text" class="form-control" name="docente_orientador_area" id="docente_orientador_area" required></td></tr>
                                 <tr><th>Firma</th></tr>
                                 <tr>
                                     <td class="d-flex justify-content-between align-items-center gap-2">
-                                        <input onchange="previewFirma('input_firma_docente_orientador', 'img_firma_docente_orientador')" id="input_firma_docente_orientador" type="file" style="display: none;" class="form-control" name="docente_orientador_firma_ar[]" accept="image/*">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarFirma('input_firma_docente_orientador')"><i class="fas fa-plus"></i> Añadir firma</button>
-                                        <img id="img_firma_docente_orientador" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
+                                        <img id="docente_orientador_firma" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
                                     </td>
                                 </tr>
                             </thead>
@@ -2160,15 +2176,19 @@
                         <table class="table table-bordered piar-valoracion-table mb-0">
                             <thead>
                                 <tr><th>Nombre docente de apoyo pedagógico</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_apoyo_pedagogico_nombre_ar"></td></tr>
+                                <tr>
+                                    <td class="d-flex justify-content-between align-items-center gap-2">
+                                        <input type="hidden" name="docente_apoyo_pedagogico_id" id="docente_apoyo_pedagogico_id" value="">
+                                        <input type="text" readonly class="form-control" name="docente_apoyo_pedagogico_nombre" id="docente_apoyo_pedagogico_nombre" required>
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente('apoyo_pedagogico')"><i class="fas fa-search"></i> Buscar</button>
+                                    </td>
+                                </tr>
                                 <tr><th>Área</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_apoyo_pedagogico_area_ar"></td></tr>
+                                <tr><td><input type="text" class="form-control" name="docente_apoyo_pedagogico_area" id="docente_apoyo_pedagogico_area" required></td></tr>
                                 <tr><th>Firma</th></tr>
                                 <tr>
                                     <td class="d-flex justify-content-between align-items-center gap-2">
-                                        <input onchange="previewFirma('input_firma_docente_apoyo_pedagogico', 'img_firma_docente_apoyo_pedagogico')" id="input_firma_docente_apoyo_pedagogico" type="file" style="display: none;" class="form-control" name="docente_apoyo_pedagogico_firma_ar[]" accept="image/*">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarFirma('input_firma_docente_apoyo_pedagogico')"><i class="fas fa-plus"></i> Añadir firma</button>
-                                        <img id="img_firma_docente_apoyo_pedagogico" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
+                                        <img id="docente_apoyo_pedagogico_firma" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
                                     </td>
                                 </tr>
                             </thead>
@@ -2178,15 +2198,19 @@
                         <table class="table table-bordered piar-valoracion-table mb-0">
                             <thead>
                                 <tr><th>Nombre coordinador pedagógico</th></tr>
-                                <tr><td><input type="text" class="form-control" name="coordinador_pedagogico_nombre_ar"></td></tr>
+                                <tr>
+                                    <td class="d-flex justify-content-between align-items-center gap-2">
+                                        <input type="hidden" name="docente_coordinador_pedagogico_id" id="docente_coordinador_pedagogico_id" value="">
+                                        <input type="text" readonly class="form-control" name="docente_coordinador_pedagogico_nombre" id="docente_coordinador_pedagogico_nombre" required>
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente('coordinador_pedagogico')"><i class="fas fa-search"></i> Buscar</button>
+                                    </td>
+                                </tr>
                                 <tr><th>Área</th></tr>
-                                <tr><td><input type="text" class="form-control" name="coordinador_pedagogico_area_ar"></td></tr>
+                                <tr><td><input type="text" class="form-control" name="docente_coordinador_pedagogico_area" id="docente_coordinador_pedagogico_area" required></td></tr>
                                 <tr><th>Firma</th></tr>
                                 <tr>
                                     <td class="d-flex justify-content-between align-items-center gap-2">
-                                        <input onchange="previewFirma('input_firma_coordinador_pedagogico', 'img_firma_coordinador_pedagogico')" id="input_firma_coordinador_pedagogico" type="file" style="display: none;" class="form-control" name="coordinador_pedagogico_firma_ar[]" accept="image/*">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarFirma('input_firma_coordinador_pedagogico')"><i class="fas fa-plus"></i> Añadir firma</button>
-                                        <img id="img_firma_coordinador_pedagogico" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
+                                        <img id="docente_coordinador_pedagogico_firma" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
                                     </td>
                                 </tr>
                             </thead>
@@ -2224,25 +2248,25 @@
                                     <td>
                                         <div class="row g-2">
                                             <div class="col-md-4">
-                                                <input type="date" class="form-control form-control-sm" name="acta_fecha" value="{{ date('Y-m-d') }}">
+                                                <input readonly type="date" class="form-control form-control-sm" name="acta_fecha" value="{{ date('Y-m-d') }}">
                                             </div>
                                             <div class="col-md-8">
-                                                <input type="text" class="form-control form-control-sm" name="acta_lugar" placeholder="Lugar de diligenciamiento">
+                                                <input readonly type="text" class="form-control form-control-sm" name="acta_lugar" placeholder="Lugar de diligenciamiento">
                                             </div>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Nombre y rol de la persona que diligencia</td>
-                                    <td><input type="text" class="form-control form-control-sm" name="acta_persona_diligencia"></td>
+                                    <td><input readonly value="{{ $docente_diligencia?->nombre . ' ' . $docente_diligencia?->apellido . ' - ' . $docente_diligencia?->rol }}" type="text" class="form-control form-control-sm" name="acta_persona_diligencia"></td>
                                 </tr>
                                 <tr>
                                     <td>Institución educativa</td>
-                                    <td><input type="text" class="form-control form-control-sm" name="acta_institucion"></td>
+                                    <td><input readonly type="text" class="form-control form-control-sm" name="acta_institucion"></td>
                                 </tr>
                                 <tr>
                                     <td>Sede</td>
-                                    <td><input type="text" class="form-control form-control-sm" name="acta_sede"></td>
+                                    <td><input type="text" readonly class="form-control form-control-sm" name="acta_sede"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -2258,11 +2282,11 @@
                             <tbody>
                                 <tr>
                                     <td style="width:12%">Nombre</td>
-                                    <td><input type="text" class="form-control form-control-sm" name="acta_estudiante_nombre"></td>
+                                    <td><input readonly value="{{ $estudiante?->nombre . ' ' . $estudiante?->apellido }}" type="text" class="form-control form-control-sm" name="acta_estudiante_nombre"></td>
                                     <td style="width:8%">Edad</td>
-                                    <td style="width:12%"><input type="number" class="form-control form-control-sm" name="acta_estudiante_edad"></td>
+                                    <td style="width:12%"><input readonly value="{{ $estudiante?->edad }}" type="number" class="form-control form-control-sm" name="acta_estudiante_edad"></td>
                                     <td style="width:10%">Grado</td>
-                                    <td style="width:15%"><input type="text" class="form-control form-control-sm" name="acta_estudiante_grado"></td>
+                                    <td style="width:15%"><input readonly value="{{ $estudiante?->grado?->nombre }}" type="text" class="form-control form-control-sm" name="acta_estudiante_grado"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -2286,58 +2310,75 @@
                 </p>
             </div>
 
-            {{-- Compromisos específicos --}}
-            <div class="card">
-                <div class="card-body">
-                    <p class="text-muted small mb-2">
-                        Incluya aquí los compromisos específicos para implementar en el aula que requieran ampliación o detalle adicional al incluido en el PIAR
-                    </p>
-                    <textarea class="form-control" rows="8" name="acta_compromisos"></textarea>
+            <form id="form-paso-7">
+                @csrf
+                <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
+                <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
+                {{-- Compromisos específicos --}}
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">
+                            Incluya aquí los compromisos específicos para implementar en el aula que requieran ampliación o detalle adicional al incluido en el PIAR
+                        </p>
+                        <textarea class="form-control" rows="8" name="compromisos" required></textarea>
+                    </div>
                 </div>
-            </div>
 
-            <div class="piar-acta-texto mb-4 mt-4">
-                <div class="d-flex justify-content-between py-2 align-items-center gap-2">
-                    <p> Y en casa apoyará con las siguientes actividades:</p>
-                    <button type="button" class="btn btn-success btn-sm" onclick="agregarActividad()"><i class="fas fa-plus"></i> Añadir actividad</button>
+                <div class="piar-acta-texto mb-4 mt-4">
+                    <div class="d-flex justify-content-between py-2 align-items-center gap-2">
+                        <p> Y en casa apoyará con las siguientes actividades:</p>
+                        <button type="button" class="btn btn-success btn-sm" onclick="agregarActividad()"><i class="fas fa-plus"></i> Añadir actividad</button>
+                    </div>
+                    <table class="table table-bordered piar-valoracion-table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Nombre de la Actividad</th>
+                                <th class="text-center">Descripción de la estrategia</th>
+                                <th class="text-center">
+                                    Frecuencia: D=Diaria, S=Semanal, P=Permanente
+                                </th>
+                                <th class="text-center"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="actividades_container">
+                            <tr id="actividad_1">
+                                <td><textarea rows="3" class="form-control auto-grow" name="actividad[0][nombre]" required></textarea></td>
+                                <td><textarea rows="3" class="form-control auto-grow" name="actividad[0][descripcion]" required></textarea></td>
+                                <td style="width: 20%">
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
+                                        <div class="frecuencia-radio">
+                                            <input type="radio" class="form-check-input" name="actividad[0][frecuencia]" value="D" required>
+                                            <label class="form-check-label">D</label>
+                                        </div>
+                                        <div class="frecuencia-radio">
+                                            <input type="radio" class="form-check-input" name="actividad[0][frecuencia]" value="S" required>
+                                            <label class="form-check-label">S</label>
+                                        </div>
+                                        <div class="frecuencia-radio">
+                                            <input type="radio" class="form-check-input" name="actividad[0][frecuencia]" value="P" required>
+                                            <label class="form-check-label">P</label>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <table class="table table-bordered piar-valoracion-table mb-0">
-                    <thead>
-                        <tr>
-                            <th class="text-center">Nombre de la Actividad</th>
-                            <th class="text-center">Descripción de la estrategia</th>
-                            <th class="text-center">
-                                Frecuencia: D=Diaria, S=Semanal, P=Permanente
-                            </th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="actividades_container">
-                        <tr id="actividad_1">
-                            <td><input type="text" class="form-control" name="actividad_nombre_1"></td>
-                            <td><input type="text" class="form-control" name="actividad_descripcion_1"></td>
-                            <td style="width: 20%">
-                                <div class="d-flex justify-content-between align-items-center gap-2">
-                                    <div class="frecuencia-radio">
-                                        <input type="radio" name="actividad_frecuencia_1" value="D">
-                                        <label class="form-check-label">D</label>
-                                    </div>
-                                    <div class="frecuencia-radio">
-                                        <input type="radio" name="actividad_frecuencia_1" value="S">
-                                        <label class="form-check-label">S</label>
-                                    </div>
-                                    <div class="frecuencia-radio">
-                                        <input type="radio" name="actividad_frecuencia_1" value="P">
-                                        <label class="form-check-label">P</label>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            </form>
+        </div>
+
+
+        {{-- PASO 8: mensaje de confirmación --}}
+        <div class="piar-pane active card-item" data-pane="8">
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-check-circle fa-5x" style="color: #28a745;"></i>
+                    <br>
+                    <h3 class="text-success">PIAR diligenciado correctamente</h3>
+                    <p class="text-muted">Si desea generar el PDF, por favor, haga click en el botón de abajo.</p>
+                    <button type="button" class="btn btn-warning" onclick="generarPDF()"><i class="fas fa-file-pdf"></i> Generar PDF</button>
+                </div>
         </div>
     </div>
 
@@ -2362,6 +2403,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal_buscar_docente_label">Buscar docente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="form-buscar-docente">
@@ -2378,6 +2420,7 @@
                                 <th>Nombre(s)</th>
                                 <th>Apellido(s)</th>
                                 <th>Email</th>
+                                <th>Firma</th>
                                 <th style="text-align:center">Seleccionar</th>
                             </tr>
                         </thead>

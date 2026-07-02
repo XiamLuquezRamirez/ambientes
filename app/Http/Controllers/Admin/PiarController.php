@@ -19,6 +19,12 @@ use App\Models\PiarEntornoHogar;
 use App\Models\PiarEntornoEducativo;
 use App\Models\PiarValoracionPedagogica;
 use App\Models\Docente;
+use Illuminate\Support\Facades\DB;
+use App\Models\PiarAjusteRazonable;
+use App\Models\PiarAjusteRazonableItem;
+use App\Models\PiarAjusteRazonableDocenteFirma;
+use App\Models\PiarActaCompromiso;
+use App\Models\PiarActaCompromisoActividad;
 
 class PiarController extends Controller
 {
@@ -52,6 +58,10 @@ class PiarController extends Controller
                 return $this->guardarPaso4($request);
             case 5:
                 return $this->guardarPaso5($request);
+            case 6:
+                return $this->guardarPaso6($request);
+            case 7:
+                return $this->guardarPaso7($request);
         }
     }
 
@@ -105,6 +115,8 @@ class PiarController extends Controller
                 'message' => 'Error al guardar los datos generales.',
             ]);
         }
+
+        $this->actualizarPasoPiar($id_piar, 2);
 
         return response()->json([
             'success' => true,
@@ -208,6 +220,7 @@ class PiarController extends Controller
             }
         }
 
+        $this->actualizarPasoPiar($id_piar, 3);
 
         return response()->json([
             'success' => true,
@@ -261,6 +274,8 @@ class PiarController extends Controller
             ]);
         }
 
+        $this->actualizarPasoPiar($id_piar, 4);
+
         return response()->json([
             'success' => true,
             'message' => 'Datos entorno hogar guardados correctamente.',
@@ -307,6 +322,8 @@ class PiarController extends Controller
                 'message' => 'Error al guardar los datos entorno educativo.',
             ]);
         }
+
+        $this->actualizarPasoPiar($id_piar, 5);
 
         return response()->json([
             'success' => true,
@@ -536,6 +553,8 @@ class PiarController extends Controller
             ]);
         }
 
+        $this->actualizarPasoPiar($id_piar, 6);
+
         return response()->json([
             'success' => true,
             'message' => 'Datos valoración pedagógica guardados correctamente.',
@@ -580,5 +599,186 @@ class PiarController extends Controller
             'success' => true,
             'data' => $docentes
         ]);
+    }
+
+    public function guardarPaso6(Request $request){
+        $datos = $request->validate([
+            "id_estudiante" => "required|integer",
+            "id_docente" => "required|integer",
+        
+            "ajuste_razonable" => "required|array",
+            "docente_firma" => "required|array",
+        
+            "docente_orientador_id" => "required|integer",
+            "docente_orientador_nombre" => "nullable|string",
+            "docente_orientador_area" => "nullable|string",
+        
+            "docente_apoyo_pedagogico_id" => "required|integer",
+            "docente_apoyo_pedagogico_nombre" => "nullable|string",
+            "docente_apoyo_pedagogico_area" => "nullable|string",
+        
+            "docente_coordinador_pedagogico_id" => "required|integer",
+            "docente_coordinador_pedagogico_nombre" => "nullable|string",
+            "docente_coordinador_pedagogico_area" => "nullable|string",
+        ]);
+
+        $piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
+
+        if ($piar) {
+            $id_piar = $piar->id;
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'El estudiante no tiene piar registrado.',
+            ]);
+        }
+
+        try {
+            DB::transaction(function () use ($datos, $id_piar) {
+                $ajuste = PiarAjusteRazonable::updateOrCreate(
+                    [
+                        'id_piar' => $id_piar
+                    ],
+                    [
+                        'docente_orientador_id' => $datos['docente_orientador_id'],
+                        'docente_apoyo_pedagogico_id' => $datos['docente_apoyo_pedagogico_id'],
+                        'docente_coordinador_pedagogico_id' => $datos['docente_coordinador_pedagogico_id'],
+                    ]
+                );
+            
+                // Eliminar detalles anteriores
+                PiarAjusteRazonableItem::where(
+                    'id_ajuste_razonable',
+                    $ajuste->id
+                )->delete();
+            
+                PiarAjusteRazonableDocenteFirma::where(
+                    'id_ajuste_razonable',
+                    $ajuste->id
+                )->delete();
+            
+                // Guardar ajustes razonables
+                foreach ($datos['ajuste_razonable'] as $item) {
+                    PiarAjusteRazonableItem::create([
+                        'id_ajuste_razonable' => $ajuste->id,
+                        'area' => $item['area'],
+                        'barrera' => $item['barrera'],
+                        'tipo' => $item['tipo'],
+                        'apoyo' => $item['apoyo'],
+                        'descripcion' => $item['descripcion'],
+                        'seguimiento' => $item['seguimiento'],
+                    ]);
+                }
+            
+                // Guardar docentes firmantes
+                foreach ($datos['docente_firma'] as $docente) {
+                    PiarAjusteRazonableDocenteFirma::create([
+                        'id_ajuste_razonable' => $ajuste->id,
+                        'id_docente' => $docente['id'],
+                    ]);
+                }
+            
+            });
+
+            $this->actualizarPasoPiar($id_piar, 7);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Datos ajuste razonable guardados correctamente.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar los datos ajuste razonable.'
+            ]);
+        }
+    }
+
+    public function guardarPaso7(Request $request){
+        $datos = $request->validate([
+            "id_estudiante" => "required|integer",
+            "id_docente" => "required|integer",
+            "compromisos" => "required|string",
+            "actividad" => "required|array",
+        
+            "actividad.*.nombre" => "required|string",
+            "actividad.*.descripcion" => "required|string",
+            "actividad.*.frecuencia" => "required|string",
+        ]);
+        
+        $id_piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
+
+        if ($id_piar) {
+            $id_piar = $id_piar->id;
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'El estudiante no tiene PIAR registrado.',
+            ]);
+        }
+        
+        try {
+            DB::transaction(function () use ($datos, $id_piar) {
+                $acta = PiarActaCompromiso::updateOrCreate(
+                    [
+                        'id_piar' => $id_piar
+                    ],
+                    [
+                        'compromisos' => $datos['compromisos']
+                    ]
+                );
+        
+                PiarActaCompromisoActividad::where(
+                    'id_acta_compromiso',
+                    $acta->id
+                )->delete();
+        
+                foreach ($datos['actividad'] as $actividad) {
+        
+                    PiarActaCompromisoActividad::create([
+                        'id_acta_compromiso' => $acta->id,
+                        'nombre' => $actividad['nombre'],
+                        'descripcion' => $actividad['descripcion'],
+                        'frecuencia' => $actividad['frecuencia'],
+                    ]);
+                }
+            });
+
+            $this->actualizarPasoPiar($id_piar, 8);
+        
+            return response()->json([
+                'success' => true,
+                'message' => 'Información guardada correctamente.',
+            ]);
+        
+        } catch (\Throwable $e) {
+        
+            Log::error($e);
+        
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error al guardar la información.',
+            ], 500);
+        }
+    }
+
+
+    public function actualizarPasoPiar($id_piar, $paso){
+
+        //verificar que si ya acabo no se pueda actualizar
+        $piar = Piar::where('id', $id_piar)->first();
+        if ($piar->paso == 8) {
+            return false;
+        }
+
+        $registro = Piar::where('id', $id_piar)->update([
+            'paso' => $paso
+        ]);
+
+        if (!$registro) {
+            return false;
+        }
+
+        return true;
     }
 }
