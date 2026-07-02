@@ -106,6 +106,10 @@ var ajustes_cuenta = 1;
 var firmas_docentes_cuenta = 1;
 var actividades_cuenta = 1;
 
+var id_docente_firma = '';
+var docentes = [];
+var docentes_firma = [];
+
 function agregarAtencionMedica() {
     atencion_medica_cuenta++;
     var value = $('select[name="atencion_medica"]').val();
@@ -259,16 +263,22 @@ function agregarFirmaDocente() {
         `<div class="col-md-4 pt-3" id="div_docente_${firmas_docentes_cuenta}">
             <table class="table table-bordered piar-valoracion-table mb-0">
                 <thead>
-                    <tr><th class="d-flex justify-content-between align-items-center">Nombre Docente <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFirmaDocente(${firmas_docentes_cuenta})"><i class="fas fa-trash"></i></button></th></tr>
-                    <tr><td><input type="text" class="form-control" name="docente_nombre_ar[]"></td></tr>
+                    <tr><th class="d-flex justify-content-between align-items-center gap-2">Nombre Docente <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFirmaDocente(${firmas_docentes_cuenta})">-</button></th></tr>
+                    <tr>
+                        <td>
+                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                <input type="hidden" name="docente_firma[${firmas_docentes_cuenta-1}][id]" id="docente_firma_id_${firmas_docentes_cuenta}" value="">
+                                <input type="text" class="form-control" name="docente_firma[${firmas_docentes_cuenta-1}][nombre]" id="docente_firma_nombre_${firmas_docentes_cuenta}" required>
+                                <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente(${firmas_docentes_cuenta})"><i class="fas fa-search"></i> Buscar</button>
+                            </div>
+                        </td>
+                    </tr>
                     <tr><th>Área</th></tr>
-                    <tr><td><input type="text" class="form-control" name="area_ar[]"></td></tr>
+                    <tr><td><input type="text" class="form-control" name="docente_firma[${firmas_docentes_cuenta-1}][area]" id="docente_firma_area_${firmas_docentes_cuenta}" required></td></tr>
                     <tr><th>Firma</th></tr>
                     <tr>
                         <td class="d-flex justify-content-between align-items-center gap-2">
-                            <input onchange="previewFirma('input_firma_docente_' + ${firmas_docentes_cuenta}, 'img_firma_docente_' + ${firmas_docentes_cuenta})" id="input_firma_docente_${firmas_docentes_cuenta}" type="file" style="display: none;" class="form-control" name="docente_firma_ar[]" accept="image/*">
-                            <button type="button" class="btn btn-primary btn-sm" onclick="agregarFirma('input_firma_docente_' + ${firmas_docentes_cuenta})"><i class="fas fa-plus"></i> Añadir firma</button>
-                            <img id="img_firma_docente_${firmas_docentes_cuenta}" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
+                            <img id="img_firma_docente_${firmas_docentes_cuenta}" class="firma-img" src="/assets/images/firma.png" alt="Firma" class="img-fluid">
                         </td>
                     </tr>
                 </thead>
@@ -278,8 +288,10 @@ function agregarFirmaDocente() {
 }
 
 function eliminarFirmaDocente(id) {
-    document.getElementById('div_docente_' + id).remove();
-    firmas_docentes_cuenta--;
+    var id_docente_eliminar = parseInt($(`#div_docente_${id} #docente_firma_id_${id}`).val());
+    docentes_firma = docentes_firma.filter(id => id != id_docente_eliminar);
+    $(`#div_docente_${id}`).remove();
+    console.log(docentes_firma);
 }
 
 function agregarFirma(id_input) {
@@ -463,4 +475,71 @@ function mostrarErroresModal(errors, id_form) {
         $('<div>', { class: 'campo-error', text: mensaje }).insertAfter($input);
     });
     $(`#${id_form} .is-invalid`).first().focus();
+}
+
+function buscarDocente(id) {
+    id_docente_firma = id;
+    $('#modal_buscar_docente').modal('show');
+    buscarDocentePiar('primeros_10');
+}
+
+let debounceTimer;
+$('#form-buscar-docente input[name="nombre"]').on('input', function () {
+    clearTimeout(debounceTimer);
+    var texto = $(this).val();
+    debounceTimer = setTimeout(buscarDocentePiarTexto(texto), 400);
+});
+
+
+function buscarDocentePiarTexto(texto) {
+    var texto = $('#form-buscar-docente input[name="nombre"]').val();
+    if(texto == " " || texto == ""){
+        texto = 'primeros_10';
+    }
+    buscarDocentePiar(texto);
+}
+
+function buscarDocentePiar(texto) {
+    $.ajax({
+        url: URL_PIAR + '/buscar-docente/' + texto,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+           if(response.success){
+                var html = '';
+                docentes = response.data;
+                response.data.forEach(function(docente){
+                    html += '<tr>';
+                    html += '<td>' + docente.nombre + '</td>';
+                    html += '<td>' + docente.apellido + '</td>';
+                    html += '<td>' + docente.email + '</td>';
+                    html += '<td class="text-center"><button type="button" class="btn btn-primary btn-sm" onclick="seleccionarDocente(' + docente.id + ')">Seleccionar</button></td>';
+                    html += '</tr>';
+                });
+                $('#tabla_docentes').html(html);
+           }
+        },
+        error: function(xhr, status, error) {
+            mostrarToast('error', 'Error al buscar el docente.');
+        }
+    });
+}
+
+function seleccionarDocente(id_docente) {
+    if(docentes_firma.includes(id_docente)) {
+        mostrarToast('error', 'El docente ya ha sido seleccionado.');
+        return;
+    }
+    var docente = docentes.find(docente => docente.id == id_docente);
+    $('#img_firma_docente_' + id_docente_firma).attr('src', '/storage/' + docente.firma_url);
+    $('#docente_firma_nombre_' + id_docente_firma).val(docente.nombre);
+    $('#docente_firma_id_' + id_docente_firma).val(docente.id);
+    docentes_firma.push(id_docente);
+    console.log(docentes_firma);
+    cerrarModalBuscarDocente();
+}
+
+function cerrarModalBuscarDocente() {
+    $('#modal_buscar_docente').modal('hide');
+    $('#form-buscar-docente input[name="nombre"]').val('');
 }

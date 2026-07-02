@@ -18,6 +18,7 @@ use App\Models\PiarMedicamento;
 use App\Models\PiarEntornoHogar;
 use App\Models\PiarEntornoEducativo;
 use App\Models\PiarValoracionPedagogica;
+use App\Models\Docente;
 
 class PiarController extends Controller
 {
@@ -33,6 +34,7 @@ class PiarController extends Controller
         //usuario logueado
         $user =Auth::guard('docente')->user();
         $docente_diligencia = User::where('id', $user->id)->first();
+
 
         return view('admin.estudiantes.diligenciarPiar', compact('estudiante', 'condiciones', 'docente_diligencia', 'municipios', 'departamentos'));
     }
@@ -538,6 +540,45 @@ class PiarController extends Controller
             'success' => true,
             'message' => 'Datos valoración pedagógica guardados correctamente.',
             'data' => $registro
+        ]);
+    }
+
+    public function buscarDocente($texto){
+        if($texto == 'primeros_10'){
+            $consulta = Docente::query()
+            ->with('user')
+            ->join('users', 'users.id', '=', 'docentes.user_id')
+            ->where('docentes.estado', 'activo')
+            ->select(
+                'docentes.*',
+                'users.nombre',
+                'users.apellido',
+                'users.email'
+            );
+
+            $docentes = $consulta->orderBy('users.nombre')->take(10)->get();
+
+        } else {
+            $consulta = Docente::query()
+            ->with('user')
+            ->join('users', 'users.id', '=', 'docentes.user_id')
+            ->where('docentes.estado', 'activo')
+            ->where(function($query) use ($texto){
+                $query->where('users.nombre', 'like', '%'.$texto.'%')
+                ->orWhere('users.email', 'like', '%'.$texto.'%');
+            })->select(
+                'docentes.*',
+                'users.nombre',
+                'users.apellido',
+                'users.email'
+            );
+
+            $docentes = $consulta->orderBy('users.nombre')->get();
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $docentes
         ]);
     }
 }
