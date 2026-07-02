@@ -67,6 +67,8 @@
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 
     @include('admin.usuarios.crear_usuario')
+    @include('admin.usuarios.ver_contra_gen')
+    @include('admin.usuarios.completar_info')
 @endsection
 
 @push('scripts')
@@ -75,27 +77,75 @@
         const URL_USUARIOS = window.URL_USUARIOS;
         var tipoPost = 1; // 1: Crear, 2: Editar
         var id_editar = '';
+
+        /* ── Bootstrap Modal ─────────────────────────────────────────── */
         const modalBSUsuario = new bootstrap.Modal(document.getElementById('modalUsuario'));
+        const modalBSPasswordGenerada = new bootstrap.Modal(document.getElementById('modalBSPasswordGenerada'));
+        const modalBSCompletarInfo = new bootstrap.Modal(document.getElementById('modalBSCompletarInfo'));
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
 
         // Al cerrar cualquier modal, limpiar errores y resetear el formulario correspondiente.
         document.getElementById('modalUsuario').addEventListener('hidden.bs.modal', function() {
             limpiarErroresModal();
+            document.getElementById('formUsuario').reset();
+        });
+        document.getElementById('modalBSCompletarInfo').addEventListener('hidden.bs.modal', function() {
+            limpiarErroresModal();
+        });
+        document.getElementById('modalBSPasswordGenerada').addEventListener('hidden.bs.modal', function() {
+            limpiarErroresModal();
+            document.getElementById('formPasswordGenerada').reset();
         });
 
         function abrirModal() {
             $("#modalUsuarioLabel").text('Crear Usuario');
             $("#modalUsuarioSubtitle").text('Completa los datos para crear el usuario');
             $("#modalUsuarioIcon").html('<i class="fas fa-user-plus text-white"></i>');
-            // bootstrap.Tab.getOrCreateInstance(
-            //     $('a[href="#datosUsuario"]')[0]
-            // ).show();
+            bootstrap.Tab.getOrCreateInstance(
+                $('a[href="#datosPersonales"]')[0]
+            ).show();
             tipoPost = 1;
             modalBSUsuario.show();
+        }
+
+        function abrirModalEditar(id) {
+            $("#modalUsuarioLabel").text('Editar Usuario');
+            $("#modalUsuarioSubtitle").text('Completa los datos para editar el usuario');
+            $("#modalUsuarioIcon").html('<i class="fas fa-user-edit text-white"></i>');
+            bootstrap.Tab.getOrCreateInstance(
+                $('a[href="#datosPersonales"]')[0]
+            ).show();
+            tipoPost = 2;
+            cargarDatosUsuario(id);
+            modalBSUsuario.show();
+        }
+
+
+        /* ── Modal Bootstrap 5 – Información de la Cuenta ──────────────────────── */
+        function abrirModalBSPasswordGenerada() {
+            $("#modalBSPasswordGeneradaLabel").text('Información de la Cuenta');
+            $("#modalBSPasswordGeneradaSubtitle").text(
+                'La cuenta se ha creado correctamente. Por favor, anotar la contraseña antes de cerrar.');
+            $("#modalBSPasswordGeneradaIcon").html('<i class="fas fa-info-circle text-white"></i>');
+            modalBSPasswordGenerada.show();
+        }
+
+        function cerrarModalBSCompletarInfo() {
+            modalBSCompletarInfo.hide();
         }
 
         function cerrarModalUsuario() {
             document.getElementById('formUsuario').reset();
             modalBSUsuario.hide();
+        }
+
+        /* ── Errores inline en modal ─────────────────────────────────── */
+        // Elimina cualquier mensaje o estado de validación que haya quedado en los formularios.
+        function limpiarErroresModal() {
+            document.querySelectorAll('#formUsuario .campo-error, #formCompletarInfo .campo-error').forEach(el => el
+                .remove());
+            document.querySelectorAll('#formUsuario .is-invalid, #formCompletarInfo .is-invalid').forEach(el => el
+                .classList.remove('is-invalid'));
         }
 
         /* ── Tabla AJAX ──────────────────────────────────────────────── */
@@ -168,22 +218,130 @@
                 .classList.remove('is-invalid'));
         }
 
-        function mostrarErroresModal(errors) {
+        function mostrarErroresModal(errors, form) {
             limpiarErroresModal();
-            for (const [campo, mensajes] of Object.entries(errors)) {
-                const input = document.querySelector(`#formBuscar [name="${campo}"]`);
-                if (!input) continue;
-                input.classList.add('is-invalid');
-                const div = document.createElement('div');
-                div.className = 'campo-error';
-                div.textContent = mensajes[0];
-                input.insertAdjacentElement('afterend', div);
-            }
-            const primero = document.querySelector('#formBuscar .is-invalid');
-            if (primero) primero.focus();
+            $.each(errors, function(campo, mensajes) {
+                const $input = $(`#${form} [name="${campo}"]`);
+                if (!$input.length) return;
+                $input.addClass('is-invalid');
+
+                var mensaje = '';
+                switch (mensajes[0]) {
+                    case 'validation.unique':
+                        mensaje = 'Ya existe un usuario con';
+                        if (campo === 'email') {
+                            mensaje += ' este correo electrónico';
+                        } else if (campo === 'identificacion') {
+                            mensaje += ' esta identificación';
+                        }
+                        mensaje += '.';
+                        break;
+                    case 'validation.email':
+                        mensaje = 'El correo electrónico no es válido';
+                        break;
+                    case 'validation.integer':
+                        mensaje = 'El valor debe ser un número entero';
+                        break;
+                    case 'validation.string':
+                        mensaje = 'El valor debe ser una cadena de texto';
+                        break;
+                    case 'validation.numeric':
+                        mensaje = 'El valor debe ser un número';
+                        break;
+                    case 'validation.required':
+                        mensaje = 'Este campo es requerido';
+                        break;
+                    default:
+                        mensaje = 'Este campo es requerido';
+                        break;
+                }
+                $('<div>', {
+                    class: 'campo-error',
+                    text: mensaje
+                }).insertAfter($input);
+            });
+            $(`#${form} .is-invalid`).first().focus();
         }
 
-        /* ── Crear docente (AJAX) ────────────────────────────────────── */
+        let idCompletarInfo = null;
+
+        async function abrirModalCompletarInfo(id) {
+            try {
+                idCompletarInfo = id;
+                const resp = await ajaxRequest(`${URL_USUARIOS}/${id}`);
+                if (!resp.success) throw new Error('No data');
+
+                const usuario = resp.usuario;
+
+                document.getElementById('formCompletarInfo').reset();
+
+                document.getElementById('nombre').value = usuario.nombre;
+                document.getElementById('apellido').value = usuario.apellido;
+                document.getElementById('email').value = usuario.email;
+                document.getElementById('identificacion').value = usuario.identificacion;
+
+                document.getElementById('telefono').value = usuario.telefono ?? '';
+                document.getElementById('direccion').value = usuario.direccion ?? '';
+                document.getElementById('especialidad').value = usuario.especialidad ?? '';
+                document.getElementById('fecha_ingreso').value = usuario.fecha_ingreso ?? '';
+                $("#modalBSCompletarInfoIcon").html('<i class="fas fa-user-edit text-white"></i>');
+                $("#modalBSCompletarInfoLabel").text('Completar Información');
+                $("#modalBSCompletarInfoSubtitle").text(`${usuario.nombre} ${usuario.apellido} · ${usuario.email}`);
+                modalBSCompletarInfo.show();
+            } catch (error) {
+                console.error(error);
+                mostrarToast('error', 'No se pudo cargar la información');
+            }
+        }
+
+        document.getElementById('formCompletarInfo')
+            .addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = document.getElementById('btnCompletarInfo');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardando...';
+                const formData = new FormData(this);
+                formData.append('_method', 'PUT');
+                $.ajax({
+                    url: `${URL_USUARIOS}/${idCompletarInfo}/completar-info`,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: async function(res) {
+                        modalBSCompletarInfo.hide();
+                        if (res.password_generada) {
+                            document.getElementById('passwordGenerada').value =
+                                res.password_generada;
+                            abrirModalBSPasswordGeneradaEditar();
+                        }
+                        await cargarTabla(location.href);
+                        Swal.fire({
+                            icon: 'success',
+                            title: res.message,
+                            timer: 1600,
+                            showConfirmButton: false
+                        });
+                    },
+                    error: function(xhr) {
+                        mostrarErroresModal(xhr.responseJSON.errors, 'formCompletarInfo');
+                        mostrarToast(
+                            'error',
+                            'Verifique la información ingresada.'
+                        );
+
+                    },
+                    complete: function() {
+                        btn.disabled = false;
+                        btn.innerHTML =
+                            '<i class="fa-solid fa-save"></i> Guardar';
+                    }
+
+                });
+
+            });
+
+        /* ── Crear usuario (AJAX) ────────────────────────────────────── */
         document.getElementById('formUsuario').addEventListener('submit', async function(e) {
             e.preventDefault();
             if (tipoPost == 1) {
@@ -209,7 +367,7 @@
                             document.getElementById('passwordGenerada').value =
                                 res.password_generada;
                             document.getElementById('asignar_email').value = datos.email ?? '';
-                            modalBS.hide();
+                            modalBSUsuario.hide();
                             const btnPdf = document.getElementById('btnDescargarPdf');
                             btnPdf.dataset.usuarioId = res.usuario.id;
                             abrirModalBSPasswordGenerada();
@@ -235,10 +393,10 @@
                             mostrarToast('error', "Error al crear el usuario");
                         }
 
-                        mostrarErroresModal(xhr.responseJSON.errors);
+                        mostrarErroresModal(xhr.responseJSON.errors, 'formCompletarInfo');
                     },
                     complete: function() {
-                        $('#btnCrearUsuario').prop('disabled', false).text('Crear Usuario');
+                        $('#btnUsuario').prop('disabled', false).text('Crear Usuario');
                     }
                 });
 
@@ -268,7 +426,7 @@
                             document.getElementById('passwordGenerada').value =
                                 res.password_generada;
                             document.getElementById('asignar_email').value = datos.email ?? '';
-                            modalBS.hide();
+                            modalBSUsuario.hide();
                             const btnPdf = document.getElementById('btnDescargarPdf');
                             btnPdf.dataset.usuarioId = res.usuario.id;
                             btnPdf.dataset.nombre = res.usuario.nombre;
@@ -284,7 +442,7 @@
                                     });
                                 });
                         } else if (res.success) {
-                            modalBS.hide();
+                            modalBSUsuario.hide();
                             Swal.fire({
                                 icon: 'success',
                                 title: res.message,
@@ -302,13 +460,203 @@
                             mostrarToast('error', "Error al crear el usuario");
                         }
 
-                        mostrarErroresModal(xhr.responseJSON.errors);
+                        mostrarErroresModal(xhr.responseJSON.errors, 'formUsuario');
                     },
                     complete: function() {
-                        $('#btnCrearUsuario').prop('disabled', false).text('Crear Usuario');
+                        $('#btnUsuario').prop('disabled', false).text('Crear Usuario');
                     }
                 });
             }
+        });
+
+        function verPassword(inputId, iconId) {
+            const icon = $(iconId)[0];
+            const input = $(inputId)[0];
+
+            if (input.type == 'password') {
+                input.type = 'text';
+                $(icon).removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                $(icon).removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        }
+
+        function validarPasswords(passwordId, passwordConfirmationId, mensajeId) {
+            const password = document.getElementById(passwordId);
+            const passwordConfirmation = document.getElementById(passwordConfirmationId);
+            const mensaje = document.getElementById(mensajeId);
+
+
+            if (!passwordConfirmation.value) {
+                mensaje.textContent = '';
+                return;
+            }
+
+            if (password.value === passwordConfirmation.value) {
+                mensaje.textContent = 'Las contraseñas coinciden';
+                mensaje.className = 'text-success';
+            } else {
+                mensaje.textContent = 'Las contraseñas no coinciden';
+                mensaje.className = 'text-danger';
+            }
+        }
+        // Generar contraseña aleatoria.
+        // Esta función se utiliza para generar una contraseña aleatoria cuando se crea un nuevo docente.
+        function generarPasswordAleatoria() {
+            const length = 8;
+            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            return password;
+        }
+
+        $("#btnGenerarPassword").click(function() {
+            const password = generarPasswordAleatoria();
+            $("#password").val(password);
+            $("#password_confirmation").val(password);
+            validarPasswords('password', 'password_confirmation', 'mensajePassword');
+        });
+
+        $("#password").on('input', function() {
+            validarPasswords('password', 'password_confirmation', 'mensajePassword');
+        });
+
+        $("#password_confirmation").on('input', function() {
+            validarPasswords('password', 'password_confirmation', 'mensajePassword');
+        });
+
+
+        $(document).on('change', '.toggle-activo', function() {
+
+            let checkbox = $(this);
+            let id = checkbox.data('id');
+            let nombre = checkbox.data('nombre');
+            let apellido = checkbox.data('apellido');
+
+            // Si se está activando, ejecutar directamente
+            if (checkbox.prop('checked')) {
+                actualizarEstado(id, checkbox);
+                return;
+            }
+
+            // Solo mostrar confirmación al desactivar
+            Swal.fire({
+                title: `¿Desactivar a ${nombre} ${apellido} ?`,
+                html: `
+Se cerrará cualquier sesión activa de este docente.
+<br><br>
+Las asignaciones de grupos quedarán liberadas.
+`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Desactivar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    actualizarEstado(id, checkbox);
+                } else {
+                    // Revertir el switch
+                    checkbox.prop('checked', true);
+                }
+            });
+
+        });
+
+        // Actualizar el estado del docente.
+        function actualizarEstado(id, checkbox) {
+            $.ajax({
+                url: `${URL_DOCENTES}/${id}/toggle-activo`,
+                type: 'PATCH',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: response.estado === 'activo' ?
+                            'Docente activado' : 'Docente desactivado',
+                        text: response.estado === 'inactivo' && response.asignaciones_liberadas > 0 ?
+                            `Se liberaron ${response.asignaciones_liberadas} asignación(es) de grupo.` :
+                            undefined,
+                        timer: response.estado === 'inactivo' && response.asignaciones_liberadas > 0 ?
+                            undefined : 1500,
+                        showConfirmButton: response.estado === 'inactivo' && response
+                            .asignaciones_liberadas > 0,
+                    });
+
+                    if (response.estado === 'inactivo') {
+                        refrescarModalDocentesAsignadosSiAbierto();
+                    }
+                },
+                error: function() {
+                    // Revertir el estado si falla
+                    checkbox.prop('checked', !checkbox.prop('checked'));
+                    Swal.fire(
+                        'Error',
+                        'No fue posible actualizar el estado.',
+                        'error'
+                    );
+                }
+            });
+        }
+
+        function cargarDatosUsuario(id) {
+            fetch(`${URL_USUARIOS}/datos/${id}`)
+                .then(response => response.json())
+                .then(resp => {
+                    if (!resp.success) throw new Error('No data');
+                    mapearDatosUsuario(resp.data);
+                })
+                .catch(error => {
+                    mostrarToast('error', 'No se pudo cargar la información del usuario');
+                });
+        }
+
+        function mapearDatosUsuario(data) {
+            $('#nombre').val(data.nombre);
+            $('#apellido').val(data.apellido);
+            $('#email').val(data.email);
+            $('#identificacion').val(data.identificacion);
+            $('#rol').val(data.rol);
+            id_editar = data.id;
+        }
+
+
+        // Copiar contraseña al portapapeles.
+        $(document).on('click', '.btn-copiar', function() {
+            const inputId = $(this).data('target');
+            const texto = $('#' + inputId).val();
+            navigator.clipboard.writeText(texto)
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copiado al portapapeles',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                })
+                .catch(() => {
+                    Swal.fire(
+                        'Error',
+                        'No fue posible copiar el texto.',
+                        'error'
+                    );
+                });
+
+        });
+        // Descargar PDF del usuario seleccionado.
+        document.getElementById('btnDescargarPdf')
+            .addEventListener('click', function() {
+                const id = this.dataset.usuarioId;
+                window.open(`${URL_USUARIOS}/${id}/generar-pdf`, '_blank');
+            });
+
+
+        tooltipTriggerList.forEach(el => {
+            new bootstrap.Tooltip(el);
         });
     </script>
 @endpush

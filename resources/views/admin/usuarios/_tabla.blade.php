@@ -48,6 +48,17 @@
                     </td>
                     <td>
                         <div class="tabla-acciones" style="justify-content:center">
+
+                            <span data-bs-toggle="tooltip"
+                                title="{{ $u->rol === 'docente' ? 'Completar información' : 'Solo disponible para usuarios con rol docente' }}">
+
+                                <button class="btn btn-primary btn-sm" {{ $u->rol !== 'docente' ? 'disabled' : '' }}
+                                    onclick="abrirModalCompletarInfo('{{ $u->id }}')">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                    Completar información
+                                </button>
+
+                            </span>
                             <button class="btn-accion btn-editar" onclick="abrirModalEditar({{ $u->id }})"><i
                                     class="fa-solid fa-pencil"></i>
                                 Editar</button>
