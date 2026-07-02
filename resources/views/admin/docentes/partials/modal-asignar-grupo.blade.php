@@ -7,7 +7,7 @@
 
     Incluir en index.blade.php y show.blade.php dentro de @section('content').
 --}}
-<div class="modal fade" id="modalAsignarInfo" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="static"
+<div class="modal fade modal-app" id="modalAsignarInfo" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="static"
     aria-labelledby="modalAsignarInfoLabel" aria-hidden="false">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
@@ -60,8 +60,9 @@
                                 <strong class="form-label">Ambiente</strong>
                                 <select name="ambiente_id" id="asignar_ambiente_id" class="form-control">
                                     <option value="">— Selecciona un ambiente —</option>
-                                    @foreach ($ambientes as $a)
-                                        <option value="{{ $a->id }}">{{ $a->icono }} {{ $a->nombre }}</option>
+                                    @foreach ($ambientes ?? [] as $a)
+                                        <option value="{{ $a->id }}">{{ $a->icono }} {{ $a->nombre }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>

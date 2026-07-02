@@ -4,8 +4,8 @@
 @endpush
 
 {{-- ── Modal Bootstrap 5 – Nuevo Usuario ──────────────────────── --}}
-<div class="modal fade" id="modalUsuario" tabindex="-1" data-bs-backdrop="static" aria-labelledby="modalUsuarioLabel"
-    aria-hidden="true">
+<div class="modal fade modal-app" id="modalUsuario" tabindex="-1" data-bs-backdrop="static"
+    aria-labelledby="modalUsuarioLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -32,7 +32,7 @@
                     </li>
                 </ul>
                 {{-- Un solo formulario para ambas pestañas: evita IDs duplicados y envía todos los campos. --}}
-                <form id="formUsuario" method="POST">
+                <form id="formUsuario" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="tab-content" style="padding: 20px;">
                         <div class="tab-pane container active" id="datosPersonales">
@@ -61,16 +61,78 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <strong class="form-label">Rol</strong>
-                                        <select name="rol" id="rol" class="form-control">
-                                            <option value="">-- Seleccione el rol --</option>
+
+                                        <select id="rol" name="rol" class="form-select">
+                                            <option value="">Seleccione...</option>
                                             <option value="admin">Administrador</option>
                                             <option value="docente">Docente</option>
                                         </select>
                                     </div>
                                 </div>
+                                <div id="seccionDocente" class="card mt-4 formulario-docente">
+                                    <div class="card-header">
+                                        Información del docente
+                                    </div>
+                                    <div class="row" style="padding: 20px;">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <strong class="form-label">Telefono</strong>
+                                                <input type="number" id="telefono" name="telefono"
+                                                    class="form-control" placeholder="Telefono del docente"
+                                                    value="{{ old('telefono') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <strong class="form-label">Dirección</strong>
+                                                <input type="text" id="direccion" name="direccion"
+                                                    class="form-control" placeholder="Dirección del docente"
+                                                    value="{{ old('direccion') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <strong class="form-label">Especialidad</strong>
+                                                <input type="text" id="especialidad" name="especialidad"
+                                                    class="form-control" placeholder="Especialidad del docente"
+                                                    value="{{ old('especialidad') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <strong class="form-label">Fecha de ingreso</strong>
+                                                <input type="date" id="fecha_ingreso" name="fecha_ingreso"
+                                                    class="form-control" placeholder="Fecha de ingreso del docente"
+                                                    value="{{ old('fecha_ingreso') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <strong class="form-label">Firma</strong>
+                                                <input type="file" id="firma_url" name="firma_url"
+                                                    class="form-control" accept="image/*"
+                                                    onchange="previewImage(event, '#imgPreviewFirma')">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <strong class="form-label" id="lblVistaPreviaFirma">Vista previa de la
+                                                    firma</strong>
+                                                <img id="imgPreviewFirma" class="w-50"
+                                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s"
+                                                    alt="Firma del docente">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            <small id="avisoCargaDocente" class="text-danger" style="display:none">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                Este usuario tiene cargas asignadas. Desasígnalas primero para cambiar el
+                                rol.
+                            </small>
                         </div>
+
                         <div class="tab-pane container" id="gestionCuenta">
                             <div class="row">
                                 <div class="col-md-12">
@@ -127,7 +189,7 @@
                     style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0" onclick="cerrarModalUsuario()">
                     <i class="fa-solid fa-xmark"></i> Cancelar</button>
                 <button type="submit" form="formUsuario" id="btnUsuario" class="btn btn-primary">
-                    <i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+                    <i class="fa-solid fa-floppy-disk"></i> Crear Usuario</button>
             </div>
         </div>
     </div>

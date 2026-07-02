@@ -71,8 +71,8 @@
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 
     {{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
-    <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-backdrop="static" aria-labelledby="modalDocenteLabel"
-        aria-hidden="true">
+    <div class="modal fade modal-app" id="modalDocente" tabindex="-1" data-bs-backdrop="static"
+        aria-labelledby="modalDocenteLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -238,8 +238,8 @@
     </div>
 
     {{-- ── Modal Bootstrap 5 – Información de la Contraseña ──────────────────────── --}}
-    <div class="modal fade" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false"
-        data-bs-backdrop="static" aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
+    <div class="modal fade modal-app" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false"
+        data-bs-backdrop="static" aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -783,8 +783,6 @@
                 title: `¿Desactivar a ${nombre} ${apellido} ?`,
                 html: `
         Se cerrará cualquier sesión activa de este docente.
-        <br><br>
-        Las asignaciones de grupos quedarán liberadas.
     `,
                 icon: 'warning',
                 showCancelButton: true,
@@ -827,14 +825,13 @@
                         refrescarModalDocentesAsignadosSiAbierto();
                     }
                 },
-                error: function() {
-                    // Revertir el estado si falla
+                error: function(xhr) {
                     checkbox.prop('checked', !checkbox.prop('checked'));
-                    Swal.fire(
-                        'Error',
-                        'No fue posible actualizar el estado.',
-                        'error'
-                    );
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message ?? 'No fue posible actualizar el estado.'
+                    });
                 }
             });
         }

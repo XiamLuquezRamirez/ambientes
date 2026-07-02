@@ -580,15 +580,20 @@ class DocenteAdminController extends Controller
 
             $docente = Docente::findOrFail($docente);
 
-            $docente->estado = 'eliminado';
+            if ($docente->cargasActivas->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Este usuario tiene cargas asignadas. Desasígnalas primero',
+                ], 422);
+            } else {
+                $docente->estado = 'eliminado';
+                $docente->save();
 
-            $docente->save();
-
-            return response()->json([
-                'success' => true,
-                'estado' => $docente->estado,
-                'message' => 'Docente eliminado correctamente.',
-            ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Docente eliminado correctamente.',
+                ]);
+            }
 
         } catch (\Throwable $e) {
 
@@ -786,20 +791,22 @@ class DocenteAdminController extends Controller
         try {
 
             $docente = Docente::findOrFail($id);
-            $pasaraAInactivo = $docente->estado === 'activo';
 
-            $docente->estado = $pasaraAInactivo ? 'inactivo' : 'activo';
-            $docente->save();
+            if ($docente->cargasActivas->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Este docente tiene cargas asignadas. Desasígnalas primero',
+                ], 422);
+            } else {
+                $pasaraAInactivo = $docente->estado === 'activo';
 
-            $asignacionesLiberadas = 0;
-            if ($docente->estado === 'inactivo') {
-                $asignacionesLiberadas = $this->liberarAsignacionesDocente($docente);
+                $docente->estado = $pasaraAInactivo ? 'inactivo' : 'activo';
+                $docente->save();
             }
 
             return response()->json([
                 'success' => true,
                 'estado' => $docente->estado,
-                'asignaciones_liberadas' => $asignacionesLiberadas,
                 'message' => $docente->estado === 'activo'
                     ? 'Docente activado correctamente.'
                     : 'Docente desactivado correctamente.',
