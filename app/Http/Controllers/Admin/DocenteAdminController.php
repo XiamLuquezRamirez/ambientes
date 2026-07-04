@@ -19,6 +19,11 @@ use Illuminate\Support\Str;
 
 class DocenteAdminController extends Controller
 {
+    public function panel()
+    {
+        return view('docente.panel');
+    }
+
     /**
      * Lista los docentes con filtros opcionales y paginación.
      *
@@ -583,7 +588,8 @@ class DocenteAdminController extends Controller
             if ($docente->cargasActivas->isNotEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Este usuario tiene cargas asignadas. Desasígnalas primero',
+                    'message' => 'Este usuario tiene cargas académicas asignadas. 
+                        Reasígnalas primero.',
                 ], 422);
             } else {
                 $docente->estado = 'eliminado';
@@ -795,7 +801,8 @@ class DocenteAdminController extends Controller
             if ($docente->cargasActivas->isNotEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Este docente tiene cargas asignadas. Desasígnalas primero',
+                    'message' => 'Este usuario tiene cargas académicas asignadas. 
+                        Reasígnalas primero.',
                 ], 422);
             } else {
                 $pasaraAInactivo = $docente->estado === 'activo';
@@ -820,6 +827,44 @@ class DocenteAdminController extends Controller
                 'file' => $e->getFile(),
             ], 500);
         }
+    }
+
+    public function validarDatos(Request $request)
+    {
+        $request->validate([
+            'identificacion' => 'nullable|string|max:30',
+            'email' => 'nullable|email|max:255',
+            'usuario_id' => 'nullable|integer',
+        ]);
+
+        $identificacionExiste = false;
+        $emailExiste = false;
+
+        if ($request->filled('identificacion')) {
+            $query = User::where('identificacion', $request->identificacion);
+
+            if ($request->filled('usuario_id')) {
+                $query->where('id', '!=', $request->usuario_id);
+            }
+
+            $identificacionExiste = $query->exists();
+        }
+
+        if ($request->filled('email')) {
+            $query = User::where('email', $request->email);
+
+            if ($request->filled('usuario_id')) {
+                $query->where('id', '!=', $request->usuario_id);
+            }
+
+            $emailExiste = $query->exists();
+        }
+
+        return response()->json([
+            'success' => true,
+            'identificacion_existe' => $identificacionExiste,
+            'email_existe' => $emailExiste,
+        ]);
     }
 
     /**

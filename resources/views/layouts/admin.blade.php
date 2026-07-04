@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
+
+
     @stack('styles')
     @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
@@ -141,7 +146,7 @@
             {{-- Dropdown --}}
             <div class="header-dropdown">
 
-                <div class="dropdown-user-card">
+                <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
                     <div class="dropdown-avatar">{{ $inicialesAuth }}</div>
                     <div>
                         <div class="dropdown-nombre">{{ $usuarioAuth->nombre }}</div>
@@ -151,12 +156,12 @@
                 </div>
 
                 <div class="dropdown-section">
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">👤</span>
+                    <a href="{{ route('admin.perfil') }}" class="dropdown-item">
+                        <i class="fa-solid fa-user"></i>
                         Mi Perfil
                     </a>
                     <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">🔑</span>
+                        <i class="fa-solid fa-key"></i>
                         Cambiar Contraseña
                     </a>
                 </div>
@@ -167,7 +172,7 @@
                     <form method="POST" action="{{ route('docente.logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon">🚪</span>
+                            <span class="dropdown-item-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
                             Cerrar Sesión
                         </button>
                     </form>

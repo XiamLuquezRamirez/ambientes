@@ -104,6 +104,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
     // Docentes
     Route::get('docentes', [DocenteAdminController::class, 'listar'])->name('admin.docentes');
+    Route::get('docentes/validar-datos', [DocenteAdminController::class, 'validarDatos'])->name('admin.docentes.validarDatos');
     Route::get('docentes/grupos-asignados', [DocenteAdminController::class, 'listarGruposAsignados'])->name('admin.docentes.grupos-asignados');
     // Debe declararse antes de docentes/{docente}; si no, Laravel interpreta "accesos" como parte del detalle genérico.
     Route::get('docentes/{docente}/accesos', [DocenteAdminController::class, 'verAccesos'])->name('admin.docentes.accesos');
@@ -119,6 +120,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::delete('docentes/{docente}', [DocenteAdminController::class, 'eliminar'])->name('admin.docentes.destroy');
     Route::post('docentes/{docente}/reset-password', [DocenteAdminController::class, 'restablecerContrasena'])->name('admin.docentes.reset-password');
     Route::get('docentes/{docente}/generar-pdf', [DocenteAdminController::class, 'generarPdf'])->name('admin.docentes.generar-pdf');
+    Route::get('docentes/panel', [DocenteAdminController::class, 'panel'])->name('admin.docentes.panel');
 
     // Estudiantes (admin)
     Route::get('estudiantes', [EstudianteAdminController::class, 'listar'])->name('admin.estudiantes');
@@ -155,8 +157,10 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('configuracion', [ConfiguracionAdminController::class, 'listar'])->name('admin.configuracion');
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
 
-    // Usuarios
+    // Usuario
+    Route::get('perfil', [UsuarioAdminController::class, 'perfil'])->name('admin.perfil');
     Route::get('usuarios', [UsuarioAdminController::class, 'listar'])->name('admin.usuarios');
+    Route::get('usuarios/validar-datos', [UsuarioAdminController::class, 'validarDatos'])->name('admin.usuarios.validarDatos');
     Route::post('usuarios', [UsuarioAdminController::class, 'guardar'])->name('admin.usuarios.store');
     Route::get('usuarios/{usuario}/generar-pdf', [UsuarioAdminController::class, 'generarPdf'])->name('admin.usuarios.generar-pdf');
     Route::get('usuarios/{usuario}/resumen', [UsuarioAdminController::class, 'resumenActividad'])->name('admin.usuarios.resumen');

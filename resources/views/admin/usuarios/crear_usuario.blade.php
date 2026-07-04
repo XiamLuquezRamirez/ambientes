@@ -40,9 +40,12 @@
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <strong class="form-label">Identificación</strong>
-                                        <input type="number" id="identificacion" name="identificacion"
-                                            class="form-control" placeholder="Identificación del usuario"
+                                        <input type="text" inputmode="numeric" pattern="[0-9]*" id="identificacion"
+                                            name="identificacion" class="form-control"
+                                            placeholder="Identificación del usuario"
                                             value="{{ old('identificacion') }}">
+                                        <div id="mensajeIdentificacion" class="invalid-feedback" style="display:none;">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -141,6 +144,7 @@
                                         <input type="email" id="email" name="email" class="form-control"
                                             placeholder="Correo electrónico" value="{{ old('email') }}"
                                             autocomplete="off">
+                                        <div id="mensajeEmail" class="invalid-feedback" style="display:none;"></div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

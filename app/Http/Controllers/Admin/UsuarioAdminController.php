@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Docente;
+use App\Models\Estudiante;
+use App\Models\Matricula;
+use App\Models\Observacion;
 use App\Models\User;
 use App\Services\ResumenActividadDocenteService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -20,6 +23,156 @@ class UsuarioAdminController extends Controller
     public function __construct(
         private ResumenActividadDocenteService $resumenActividadDocente
     ) {}
+
+    public function perfil()
+    {
+        $usuario = Auth::guard('docente')
+            ->user()
+            ->load([
+                'docente',
+                'ultimoLogin',
+            ]);
+
+        $estadisticas = [];
+
+        if ($usuario->esAdmin()) {
+
+            $informacionPersonal = [
+                'nombre' => $usuario->nombre,
+                'apellido' => $usuario->apellido,
+                'email' => $usuario->email,
+                'identificacion' => $usuario->identificacion,
+                'rol' => $usuario->rol,
+            ];
+
+            $estadisticas = [
+                [
+                    'titulo' => 'Docentes gestionados',
+                    'valor' => Docente::count(),
+                    'icono' => 'fa-chalkboard-user',
+                    'color' => 'green',
+                ],
+                [
+                    'titulo' => 'Estudiantes registrados',
+                    'valor' => Estudiante::count(),
+                    'icono' => 'fa-users',
+                    'color' => 'blue',
+                ],
+                [
+                    'titulo' => 'Matrículas activas',
+                    'valor' => Matricula::count(),
+                    'icono' => 'fa-book',
+                    'color' => 'purple',
+                ],
+                [
+                    'titulo' => 'Reportes generados',
+                    'valor' => Observacion::count(),
+                    'icono' => 'fa-users',
+                    'color' => 'orange',
+                ],
+            ];
+
+            $actividad = [
+                [
+                    'titulo' => 'Inicio de sesión',
+                    'descripcion' => 'Accedió al sistema desde Google Chrome.',
+                    'fecha' => 'Hace 2 horas',
+                    'icono' => 'fa-right-to-bracket',
+                    'color' => 'success',
+                ],
+                [
+                    'titulo' => 'Actualizó su información',
+                    'descripcion' => 'Modificó el número de teléfono.',
+                    'fecha' => 'Ayer',
+                    'icono' => 'fa-user-pen',
+                    'color' => 'primary',
+                ],
+                [
+                    'titulo' => 'Cambio de contraseña',
+                    'descripcion' => 'La contraseña fue actualizada correctamente.',
+                    'fecha' => 'Hace 4 días',
+                    'icono' => 'fa-key',
+                    'color' => 'warning',
+                ],
+            ];
+
+            $roles = [
+                [
+                    'titulo' => 'Administrador',
+                    'descripcion' => 'Acceso completo al sistema',
+                    'icono' => 'fa-user-shield',
+                    'color' => 'azul',
+                ],
+
+            ];
+
+            $sessionesActivas = $usuario->loginLogs->where('fecha', '>=', Carbon::now()->subMinutes(10))->count();
+            $sessiones = [
+                [
+                    'titulo' => 'Actual',
+                    'ambiente' => $usuario->ultimoLogin->ambiente,
+                    'ip' => 'IP: '.$usuario->ultimoLogin->ip,
+                    'fecha' => Carbon::parse($usuario->ultimoLogin->fecha)->format('d/m/Y H:i'),
+                    'icono' => 'fa-computer',
+                    'color' => 'success',
+                ],
+            ];
+
+        } else {
+
+            $informacionPersonal = [
+                'nombre' => $usuario->nombre,
+                'apellido' => $usuario->apellido,
+                'email' => $usuario->email,
+                'identificacion' => $usuario->identificacion,
+                'rol' => $usuario->rol,
+                'telefono' => $usuario->docente->telefono,
+                'direccion' => $usuario->docente->direccion,
+                'especialidad' => $usuario->docente->especialidad,
+                'fecha_ingreso' => $usuario->docente->fecha_ingreso,
+                'firma_url' => $usuario->docente->firma_url,
+            ];
+
+            $estadisticas = [
+                [
+                    'titulo' => 'Grupos',
+                    'valor' => $usuario->docente->cargasActivas->count(),
+                    'icono' => 'fa-users-rectangle',
+                    'color' => 'blue',
+                ],
+                [
+                    'titulo' => 'Horas',
+                    'valor' => $usuario->docente->cargasActivas->sum('horas'),
+                    'icono' => 'fa-clock',
+                    'color' => 'green',
+                ],
+                [
+                    'titulo' => 'Ambientes',
+                    'valor' => $usuario->docente->cargasActivas
+                        ->pluck('ambiente_id')
+                        ->unique()
+                        ->count(),
+                    'icono' => 'fa-building',
+                    'color' => 'purple',
+                ],
+                [
+                    'titulo' => 'Planeaciones',
+                    'valor' => 0,
+                    'icono' => 'fa-book-open',
+                    'color' => 'orange',
+                ],
+            ];
+        }
+
+        return view('admin.perfil.index', compact(
+            'usuario',
+            'informacionPersonal',
+            'estadisticas',
+            'actividad',
+            'roles',
+            'sessiones',
+        ));
+    }
 
     /**
      * Lista los docentes con filtros opcionales y paginación.
@@ -269,7 +422,8 @@ class UsuarioAdminController extends Controller
             if ($usuario->rol === 'docente' && $usuario->docente?->cargasActivas->isNotEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Este usuario tiene cargas asignadas. Desasígnalas primero',
+                    'message' => 'Este usuario tiene cargas académicas asignadas. 
+                        Reasígnalas primero.',
                 ], 422);
             }
 
@@ -452,7 +606,8 @@ class UsuarioAdminController extends Controller
                 ) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Este usuario tiene cargas asignadas. Desasígnalas primero.',
+                        'message' => 'Este usuario tiene cargas académicas asignadas. 
+                        Reasígnalas primero.',
                     ], 422);
                 }
             }
@@ -489,6 +644,44 @@ class UsuarioAdminController extends Controller
                 'file' => $e->getFile(),
             ], 500);
         }
+    }
+
+    public function validarDatos(Request $request)
+    {
+        $request->validate([
+            'identificacion' => 'nullable|string|max:30',
+            'email' => 'nullable|email|max:255',
+            'usuario_id' => 'nullable|integer',
+        ]);
+
+        $identificacionExiste = false;
+        $emailExiste = false;
+
+        if ($request->filled('identificacion')) {
+            $query = User::where('identificacion', $request->identificacion);
+
+            if ($request->filled('usuario_id')) {
+                $query->where('id', '!=', $request->usuario_id);
+            }
+
+            $identificacionExiste = $query->exists();
+        }
+
+        if ($request->filled('email')) {
+            $query = User::where('email', $request->email);
+
+            if ($request->filled('usuario_id')) {
+                $query->where('id', '!=', $request->usuario_id);
+            }
+
+            $emailExiste = $query->exists();
+        }
+
+        return response()->json([
+            'success' => true,
+            'identificacion_existe' => $identificacionExiste,
+            'email_existe' => $emailExiste,
+        ]);
     }
 
     /**
