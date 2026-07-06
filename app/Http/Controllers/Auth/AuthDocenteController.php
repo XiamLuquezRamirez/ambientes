@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\SeguridadAccion;
 use App\Http\Controllers\Controller;
 use App\Models\LoginLog;
+use App\Services\SeguridadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -46,6 +48,14 @@ class AuthDocenteController extends Controller
             'fecha' => now(),
             'ambiente' => config('ambiente.slug'),
         ]);
+
+        SeguridadService::registrar(
+            $usuario->id,
+            Auth::guard('docente')->id(),
+            SeguridadAccion::LOGIN,
+            'Inicio de sesión exitoso.',
+            $request
+        );
 
         $request->session()->regenerate();
 

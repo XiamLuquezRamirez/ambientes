@@ -14,5 +14,10 @@
         @include('admin.perfil.partials._page_header')
         @include('admin.perfil.partials._header')
         @include('admin.perfil.partials._tabs')
+        @include('admin.perfil.editar_usuario')
     </div>
+
+    @if ($rol === 'admin')
+        @include('admin.perfil.partials._historial_accesos')
+    @endif
 @endsection

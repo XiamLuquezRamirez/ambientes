@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SeguridadAccion;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -42,6 +43,23 @@ class User extends Authenticatable
     public function accesos()
     {
         return $this->hasMany(LoginLog::class);
+    }
+
+    public function seguridadLogs()
+    {
+        return $this->hasMany(SeguridadLog::class);
+    }
+
+    public function accionesRealizadas()
+    {
+        return $this->hasMany(SeguridadLog::class, 'actor_user_id');
+    }
+
+    public function ultimoCambioPassword()
+    {
+        return $this->hasOne(SeguridadLog::class)
+            ->where('accion', SeguridadAccion::PASSWORD_CHANGED)
+            ->latestOfMany();
     }
 
     /**

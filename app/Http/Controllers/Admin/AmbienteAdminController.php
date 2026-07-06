@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SeguridadAccion;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Modulo;
+use App\Services\SeguridadService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AmbienteAdminController extends Controller
 {
@@ -41,6 +44,15 @@ class AmbienteAdminController extends Controller
         $datos = $request->validate(['servidor_ip' => 'nullable|ip']);
         $ambiente->update(['servidor_ip' => $datos['servidor_ip'] ?? null]);
 
+        SeguridadService::registrar(
+            Auth::guard('docente')->id(),
+            Auth::guard('docente')->id(),
+            SeguridadAccion::AMBIENTE_EDITED,
+            'IP del servidor actualizada.',
+            $request,
+            $ambiente->nombre,
+        );
+
         return response()->json(['ok' => true, 'servidor_ip' => $ambiente->servidor_ip]);
     }
 
@@ -53,6 +65,15 @@ class AmbienteAdminController extends Controller
     {
         $datos = $request->validate(['cupo_defecto' => 'required|integer|min:1|max:100']);
         $ambiente->update($datos);
+
+        SeguridadService::registrar(
+            Auth::guard('docente')->id(),
+            Auth::guard('docente')->id(),
+            SeguridadAccion::AMBIENTE_EDITED,
+            'Cupo predeterminado actualizado.',
+            $request,
+            $ambiente->nombre,
+        );
 
         return response()->json(['ok' => true, 'cupo_defecto' => $ambiente->cupo_defecto]);
     }
