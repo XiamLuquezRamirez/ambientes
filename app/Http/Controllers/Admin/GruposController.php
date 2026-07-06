@@ -154,7 +154,7 @@ class GruposController extends Controller
         ]);
 
         if ($datos['grupo_id'] !== $grupo->id) {
-            return response()->json(['ok' => false, 'mensaje' => 'El grupo seleccionado no coincide.'], 422);
+            return response()->json(['success' => false, 'message' => 'El grupo seleccionado no coincide.'], 422);
         }
 
         $grupoValid = Grupo::where('id', $datos['grupo_id'])
@@ -164,12 +164,12 @@ class GruposController extends Controller
             ->first();
 
         if (! $grupoValid) {
-            return response()->json(['ok' => false, 'mensaje' => 'El grupo no pertenece al grado o al año actual.'], 422);
+            return response()->json(['success' => false, 'message' => 'El grupo no pertenece al grado o al año actual.'], 422);
         }
 
         $docente = Docente::find($datos['docente_id']);
         if (! $docente) {
-            return response()->json(['ok' => false, 'mensaje' => 'Docente no encontrado.'], 422);
+            return response()->json(['success' => false, 'message' => 'Docente no encontrado.'], 422);
         }
 
         $duplicada = CargaDocente::where('docente_id', $docente->id)
@@ -181,7 +181,7 @@ class GruposController extends Controller
             ->exists();
 
         if ($duplicada) {
-            return response()->json(['ok' => false, 'mensaje' => 'Ese docente ya tiene asignado ese grupo en el ambiente y año actual.'], 422);
+            return response()->json(['success' => false, 'message' => 'Ese docente ya tiene asignado ese grupo en el ambiente y año actual.'], 422);
         }
 
         $ocupadoEnAmbiente = CargaDocente::where('ambiente_id', $datos['ambiente_id'])
@@ -191,7 +191,7 @@ class GruposController extends Controller
             ->exists();
 
         if ($ocupadoEnAmbiente) {
-            return response()->json(['ok' => false, 'mensaje' => 'Ese grupo ya tiene un docente asignado en este ambiente para el año lectivo actual.'], 422);
+            return response()->json(['success' => false, 'message' => 'Ese grupo ya tiene un docente asignado en este ambiente para el año lectivo actual.'], 422);
         }
 
         $carga = DB::transaction(function () use ($docente, $datos, $anioActual) {
@@ -213,9 +213,21 @@ class GruposController extends Controller
             return $carga;
         });
 
+        // Devolver datos actualizados del grupo para refrescar la fila en el modal sin recargar la página.
+        $grupo->refresh();
+        $grupo->load([
+            'grado',
+            'cargasDocente' => function ($q) use ($anioActual) {
+                $q->where('activo', true)
+                    ->where('anio_lectivo', $anioActual)
+                    ->with(['docente.user', 'ambiente']);
+            },
+        ]);
+
         return response()->json([
-            'ok' => true,
-            'mensaje' => 'Docente asignado correctamente.',
+            'success' => true,
+            'message' => 'Docente asignado correctamente.',
+            'data' => $grupo->datosParaModalDocentesAsignados($anioActual),
         ]);
     }
 

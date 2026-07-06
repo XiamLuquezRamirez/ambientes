@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
+
+
     @stack('styles')
     @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
@@ -23,7 +28,8 @@
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="PedNia" style="width:100%;height:100%;object-fit:contain">
+                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="PedNia"
+                    style="width:100%;height:100%;object-fit:contain">
             </span>
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
@@ -40,6 +46,10 @@
                 <a href="#navAcademico"
                     data-bs-toggle="collapse"
                     aria-expanded="{{ $academico ? 'true' : 'false' }}"
+                $academico = request()->routeIs('admin.grupos*', 'admin.matriculas*', 'admin.cierre*');
+            @endphp
+            <li class="nav-item">
+                <a href="#navAcademico" data-bs-toggle="collapse" aria-expanded="{{ $academico ? 'true' : 'false' }}"
                     class="nav-link d-flex align-items-center gap-2 {{ $academico ? 'active' : '' }}"
                     style="cursor:pointer">
                     <i class="fa-solid fa-graduation-cap"></i>
@@ -111,6 +121,12 @@
                     <i class="fa-solid fa-gear"></i> Configuración
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.usuarios') }}"
+                    class="{{ request()->routeIs('admin.usuarios*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-users"></i> Usuarios
+                </a>
+            </li>
         </ul>
     </aside>
 
@@ -136,7 +152,7 @@
             {{-- Dropdown --}}
             <div class="header-dropdown">
 
-                <div class="dropdown-user-card">
+                <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
                     <div class="dropdown-avatar">{{ $inicialesAuth }}</div>
                     <div>
                         <div class="dropdown-nombre">{{ $usuarioAuth->nombre }}</div>
@@ -146,12 +162,12 @@
                 </div>
 
                 <div class="dropdown-section">
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">👤</span>
+                    <a href="{{ route('admin.perfil') }}" class="dropdown-item">
+                        <i class="fa-solid fa-user"></i>
                         Mi Perfil
                     </a>
                     <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">🔑</span>
+                        <i class="fa-solid fa-key"></i>
                         Cambiar Contraseña
                     </a>
                 </div>
@@ -162,7 +178,7 @@
                     <form method="POST" action="{{ route('docente.logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon">🚪</span>
+                            <span class="dropdown-item-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
                             Cerrar Sesión
                         </button>
                     </form>

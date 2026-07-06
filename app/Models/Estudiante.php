@@ -50,12 +50,12 @@ class Estudiante extends Model
 
     public function departamento()
     {
-        return $this->belongsTo(Departamento::class);
+        return $this->belongsTo(Departamento::class, 'departamento_id', 'codigo');
     }
 
     public function municipio()
     {
-        return $this->belongsTo(Municipio::class);
+        return $this->belongsTo(Municipio::class, 'municipio_id', 'id');
     }
 
     public function matriculasActivas()

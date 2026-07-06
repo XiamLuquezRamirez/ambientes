@@ -51,7 +51,8 @@
                             <div class="form-check form-switch">
                                 <input class="form-check-input toggle-activo" type="checkbox"
                                     data-id="{{ $d->id }}" data-nombre="{{ $d->nombre }}"
-                                    data-apellido="{{ $d->apellido }}" @checked($d->estado === 'activo')>
+                                    style="cursor: pointer;" data-apellido="{{ $d->apellido }}"
+                                    @checked($d->estado === 'activo')>
                             </div>
                         </td>
                         <td>
@@ -60,15 +61,11 @@
                                     onclick="abrirModalAsignarGrado({{ $d->user->id }})"><i
                                         class="fa-solid fa-list"></i>
                                     Asignar Grupo</button>
-                                <a class="btn-accion btn-editar"
-                                    href="{{ route('admin.docentes.show', $d->user_id) }}"><i
-                                        class="fa-solid fa-eye"></i>
-                                    Detalle</a>
-                                <button class="btn-accion btn-editar"
-                                    onclick="abrirModalEditar({{ $d->user_id }})"><i class="fa-solid fa-pencil"></i>
+                                <button class="btn-accion btn-editar" onclick="abrirModalEditar({{ $d->user_id }})"><i
+                                        class="fa-solid fa-pencil"></i>
                                     Editar</button>
-                                <button type="button" class="btn-accion btn-eliminar" title="Eliminar"
-                                    data-id="{{ $d->id }}" data-nombre="{{ e($d->nombre) }}"
+                                <button type="button" id="btn-eliminar" class="btn-accion btn-eliminar"
+                                    title="Eliminar" data-id="{{ $d->id }}" data-nombre="{{ e($d->nombre) }}"
                                     data-apellido="{{ e($d->apellido) }}">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>

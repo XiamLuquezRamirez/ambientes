@@ -26,6 +26,11 @@ class User extends Authenticatable
         return $this->hasMany(LoginLog::class);
     }
 
+    public function ultimoLogin()
+    {
+        return $this->hasOne(LoginLog::class)->latestOfMany('fecha');
+    }
+
     public function esAdmin(): bool
     {
         return $this->rol === 'admin';

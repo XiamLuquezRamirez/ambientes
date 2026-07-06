@@ -94,4 +94,42 @@ class Grupo extends Model
     {
         return $query->where('anio_lectivo', $anio ?? date('Y'));
     }
+
+    /**
+     * Datos del grupo para refrescar el modal "Docentes asignados" sin recargar la página.
+     */
+    public function datosParaModalDocentesAsignados(?int $anio = null): array
+    {
+        $anio = $anio ?? (int) date('Y');
+
+        $this->load([
+            'grado',
+            'cargasDocente' => function ($q) use ($anio) {
+                $q->where('activo', true)
+                    ->where('anio_lectivo', $anio)
+                    ->with(['docente.user', 'ambiente']);
+            },
+        ]);
+
+        $asignaciones = $this->cargasDocente
+            ->filter(fn ($carga) => $carga->docente)
+            ->map(fn ($carga) => [
+                'ambiente' => $carga->ambiente?->nombre ?? '—',
+                'docente' => trim($carga->docente->user->nombre.' '.$carga->docente->user->apellido),
+            ])
+            ->values();
+
+        $totalEstudiantes = $this->totalMatriculas($anio);
+
+        return [
+            'grupo_id' => $this->id,
+            'grado_id' => $this->grado_id,
+            'anio' => $anio,
+            'grado' => $this->grado->nombre,
+            'grupo' => $this->nombre,
+            'asignaciones' => $asignaciones->all(),
+            'estudiantes' => $totalEstudiantes,
+            'alerta_sin_docente' => $totalEstudiantes > 0 && $asignaciones->isEmpty(),
+        ];
+    }
 }

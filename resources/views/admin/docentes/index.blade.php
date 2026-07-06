@@ -1,383 +1,17 @@
 @extends('layouts.admin')
 @section('title', 'Docentes')
 
-@push('styles')
-    <style>
-        /* ── Buscador ────────────────────────────────────────────────── */
-        .input-buscar {
-            position: relative;
-            flex: 1;
-            min-width: 220px;
-        }
-
-        .input-buscar input {
-            width: 100%;
-            background: #FFFFFF;
-            border: 1px solid #CBD5E1;
-            border-radius: 8px;
-            padding: 9px 14px 9px 38px;
-            color: #1E293B;
-            font-family: 'Nunito', sans-serif;
-            font-size: 0.9rem;
-            outline: none;
-            transition: border-color .15s, box-shadow .15s;
-        }
-
-        .input-buscar input:focus {
-            border-color: #2563EB;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
-        }
-
-        .input-buscar input::placeholder {
-            color: #94A3B8;
-        }
-
-        .input-buscar .icono-buscar {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94A3B8;
-            font-size: 0.95rem;
-            pointer-events: none;
-        }
-
-        /* ── Paginación ──────────────────────────────────────────────── */
-        .paginacion-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .paginacion-info {
-            font-size: 0.82rem;
-            color: #64748B;
-        }
-
-        .paginacion-controles {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .pag-btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
-            border-radius: 7px;
-            font-size: 0.82rem;
-            font-family: 'Nunito', sans-serif;
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            color: #64748B;
-            text-decoration: none;
-            transition: all .15s;
-            cursor: pointer;
-        }
-
-        .pag-btn:hover {
-            background: #EFF6FF;
-            color: #1E40AF;
-            border-color: #BFDBFE;
-        }
-
-        .pag-btn-activo {
-            background: #2563EB;
-            border-color: #2563EB;
-            color: #FFFFFF;
-            font-weight: 700;
-        }
-
-        .pag-btn-disabled {
-            opacity: .4;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        /* ── Acciones en tabla ───────────────────────────────────────── */
-        .tabla-acciones {
-            display: flex;
-            gap: 6px;
-        }
-
-        .fila-cuenta-sin-usar {
-            background: #FFFBEB;
-        }
-
-        .badge-cuenta-nueva {
-            margin-left: 8px;
-            vertical-align: middle;
-            font-size: 0.7rem;
-        }
-
-        .btn-accion {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.76rem;
-            font-family: 'Nunito', sans-serif;
-            cursor: pointer;
-            border: 1px solid transparent;
-            text-decoration: none;
-            transition: all .15s;
-        }
-
-        .btn-asignar-grado {
-            background: #e2ffed;
-            border-color: #a0f5be;
-            color: rgb(21, 160, 67);
-        }
-
-        .btn-asignar-grado:hover {
-            background: #19c051;
-            border-color: #19c051;
-            color: #fff;
-        }
-
-        .btn-editar {
-            background: #EFF6FF;
-            border-color: #BFDBFE;
-            color: #1D4ED8;
-        }
-
-        .btn-editar:hover {
-            background: #2563EB;
-            border-color: #2563EB;
-            color: #fff;
-        }
-
-        .btn-eliminar {
-            background: #FEF2F2;
-            border-color: #FECACA;
-            color: #DC2626;
-        }
-
-        .btn-eliminar:hover {
-            background: #DC2626;
-            border-color: #DC2626;
-            color: #fff;
-        }
-
-        .btn-reestablecer-contrasena {
-            background: #EFF6FF;
-            border-color: #BFDBFE;
-            color: #1D4ED8;
-        }
-
-        .btn-reestablecer-contrasena:hover {
-            background: #2563EB;
-            border-color: #2563EB;
-            color: #fff;
-        }
-
-        /* ── Loading overlay ─────────────────────────────────────────── */
-        #cargando-tabla {
-            display: none;
-            text-align: center;
-            padding: 40px;
-            color: #64748B;
-            font-size: 0.9rem;
-        }
-
-        /* ── Errores de campo ────────────────────────────────────────── */
-        .campo-error {
-            color: #DC2626;
-            font-size: 0.78rem;
-            margin-top: 4px;
-        }
-
-        .form-control.is-invalid {
-            border-color: #DC2626 !important;
-        }
-
-        .asignaciones-actuales {
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            padding: 12px;
-            background: #F8FAFC;
-        }
-
-        .asignaciones-actuales ul {
-            list-style: none;
-            margin: 8px 0 0;
-            padding: 0;
-            display: grid;
-            gap: 8px;
-        }
-
-        .asignaciones-actuales li {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 8px 10px;
-            border: 1px solid #E2E8F0;
-            border-radius: 6px;
-            background: #FFFFFF;
-            color: #334155;
-            font-size: .86rem;
-        }
-
-        /* ── Modal – estilos visuales sobre Bootstrap ────────────────── */
-        #modalDocente .modal-content,
-        #modalAsignarInfo .modal-content {
-            border: none;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 32px 80px rgba(37, 99, 235, .22), 0 8px 24px rgba(0, 0, 0, .12);
-        }
-
-        #modalEditarDocente .modal-content,
-        #modalBSPasswordGenerada .modal-content {
-            border: none;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 32px 80px rgba(37, 99, 235, .22), 0 8px 24px rgba(0, 0, 0, .12);
-        }
-
-        #modalEditarDocente .modal-header,
-        #modalBSPasswordGenerada .modal-header {
-            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
-            border-bottom: none;
-            padding: 20px 24px;
-            gap: 14px;
-            align-items: center;
-        }
-
-        #modalDocente .modal-header {
-            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
-            border-bottom: none;
-            padding: 20px 24px;
-            gap: 14px;
-            align-items: center;
-        }
-
-        #modalAsignarInfo .modal-header {
-            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
-            border-bottom: none;
-            padding: 20px 24px;
-            gap: 14px;
-            align-items: center;
-        }
-
-        .modal-header-icon {
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 255, 255, .15);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.35rem;
-            flex-shrink: 0;
-        }
-
-        #modalDocente .modal-title,
-        #modalAsignarInfo .modal-title {
-            font-family: 'Fredoka One', cursive;
-            font-size: 1.2rem;
-            color: #FFFFFF;
-            line-height: 1.2;
-        }
-
-        #modalEditarDocente .modal-title,
-        #modalBSPasswordGenerada .modal-title {
-            font-family: 'Fredoka One', cursive;
-            font-size: 1.2rem;
-            color: #FFFFFF;
-            line-height: 1.2;
-        }
-
-        .modal-subtitle {
-            font-size: 0.78rem;
-            color: rgba(255, 255, 255, .65);
-            margin: 2px 0 0;
-        }
-
-        #modalDocente .btn-close,
-        #modalAsignarInfo .btn-close {
-            filter: brightness(0) invert(1);
-            opacity: .75;
-            transition: opacity .15s, transform .2s;
-            margin-left: auto;
-        }
-
-        #modalDocente .btn-close:hover,
-        #modalAsignarInfo .btn-close:hover {
-            opacity: 1;
-            transform: rotate(90deg);
-        }
-
-        #modalEditarDocente .btn-close:hover,
-        #modalBSPasswordGenerada .btn-close:hover {
-            opacity: 1;
-            transform: rotate(90deg);
-        }
-
-        #modalEditarDocente .btn-close,
-        #modalBSPasswordGenerada .btn-close {
-            filter: brightness(0) invert(1);
-            opacity: .75;
-            transition: opacity .15s, transform .2s;
-            margin-left: auto;
-        }
-
-        #modalDocente .modal-body,
-        #modalAsignarInfo .modal-body {
-            padding: 28px;
-        }
-
-        #modalEditarDocente .modal-body,
-        #modalBSPasswordGenerada .modal-body {
-            padding: 28px;
-        }
-
-        #modalDocente .modal-footer,
-        #modalAsignarInfo .modal-footer {
-            border-top: 1px solid #E2E8F0;
-            padding: 16px 28px 24px;
-            gap: 12px;
-        }
-
-        #modalEditarDocente .modal-footer,
-        #modalBSPasswordGenerada .modal-footer {
-            border-top: 1px solid #E2E8F0;
-            padding: 16px 28px 24px;
-            gap: 12px;
-        }
-
-        /* Animación de entrada personalizada (reemplaza la de Bootstrap) */
-        #modalDocente.fade .modal-dialog,
-        #modalAsignarInfo.fade .modal-dialog,
-        #modalEditarDocente.fade .modal-dialog,
-        #modalBSPasswordGenerada.fade .modal-dialog {
-            transform: scale(0.85) translateY(-30px);
-            opacity: 0;
-            transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), opacity .25s ease;
-        }
-
-        #modalDocente.show .modal-dialog,
-        #modalAsignarInfo.show .modal-dialog,
-        #modalEditarDocente.show .modal-dialog,
-        #modalBSPasswordGenerada.show .modal-dialog {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-    </style>
-    <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
-@endpush
-
 @section('content')
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
         <div>
             <h1>Docentes</h1>
             <p>Gestión de cuentas de docentes y administradores</p>
         </div>
-        <button class="btn btn-primary" onclick="abrirModal()"><i class="fas fa-plus"></i> Nuevo Docente</button>
+        <div style="display:flex;gap:10px">
+            <button class="btn btn-info" onclick="abrirModalDocentesAsignados()"><i class="fas fa-eye"></i> Docentes
+                Asignados</button>
+            <button class="btn btn-primary" onclick="abrirModal()"><i class="fas fa-plus"></i> Nuevo Docente</button>
+        </div>
     </div>
 
     {{-- ── Filtros ──────────────────────────────────────────────────── --}}
@@ -430,11 +64,10 @@
         @include('admin.docentes._tabla')
     </div>
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
-    @include('admin.docentes.ver-accesos')
 
     {{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
-    <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-keyboard="false" aria-labelledby="modalDocenteLabel"
-        aria-hidden="true">
+    <div class="modal fade modal-app" id="modalDocente" tabindex="-1" data-bs-backdrop="static"
+        aria-labelledby="modalDocenteLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -461,11 +94,22 @@
                         </li>
                     </ul>
                     {{-- Un solo formulario para ambas pestañas: evita IDs duplicados y envía todos los campos. --}}
-                    <form id="formDocente" method="POST">
+                    <form id="formDocente" enctype="multipart/form-data" method="POST">
                         @csrf
                         <div class="tab-content" style="padding: 20px;">
                             <div class="tab-pane container active" id="datosPersonales">
                                 <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Identificación</strong>
+                                            <input type="text" inputmode="numeric" pattern="[0-9]*" id="identificacion"
+                                                name="identificacion" class="form-control"
+                                                placeholder="Identificación del usuario"
+                                                value="{{ old('identificacion') }}">
+                                            <div id="mensajeIdentificacion" class="invalid-feedback" style="display:none;">
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Nombre(s)</strong>
@@ -478,14 +122,6 @@
                                             <strong class="form-label">Apellido(s)</strong>
                                             <input type="text" id="apellido" name="apellido" class="form-control"
                                                 placeholder="Apellidos del docente" value="{{ old('apellido') }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <strong class="form-label">Identificación</strong>
-                                            <input type="number" id="identificacion" name="identificacion"
-                                                class="form-control" placeholder="Identificación del docente"
-                                                value="{{ old('identificacion') }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -521,14 +157,18 @@
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Firma</strong>
-                                            <input type="file" id="firma" name="firma" class="form-control"
-                                                placeholder="Firma del docente" value="{{ old('firma') }}">
+                                            <input type="file" id="firma_url" name="firma_url" class="form-control"
+                                                accept="image/*" onchange="previewImage(event, '#imgPreviewFirma')">
                                         </div>
                                     </div>
+
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <strong class="form-label">Vista previa de la firma</strong>
-                                            <img src="{{ old('firma') }}" alt="Firma del docente" class="img-fluid">
+                                            <strong class="form-label" id="lblVistaPreviaFirma">Vista previa de la
+                                                firma</strong>
+                                            <img id="imgPreviewFirma" class="w-50"
+                                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s"
+                                                alt="Firma del docente">
                                         </div>
                                     </div>
                                 </div>
@@ -541,12 +181,14 @@
                                             <input type="email" id="email" name="email" class="form-control"
                                                 placeholder="Correo electrónico" value="{{ old('email') }}"
                                                 autocomplete="off">
+                                            <div id="mensajeEmail" class="invalid-feedback" style="display:none;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <strong class="form-label">Contraseña
-                                                <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8 caracteres)</span>
+                                                <span style="color:#94A3B8;font-size:0.78rem">(mínimo 8
+                                                    caracteres)</span>
                                             </strong>
                                             <div class="position-relative">
                                                 <input type="password" id="password" name="password"
@@ -558,7 +200,8 @@
                                                     style="cursor:pointer;"></i>
                                             </div>
                                         </div>
-                                        <button type="button" id="btnGenerarPassword" class="btn btn-primary"> Generar
+                                        <button type="button" id="btnGenerarPassword" class="btn btn-primary">
+                                            Generar
                                             Contraseña Aleatoria <i class="fa-solid fa-shuffle"></i></button>
                                     </div>
                                     <div class="col-md-6">
@@ -594,8 +237,8 @@
     </div>
 
     {{-- ── Modal Bootstrap 5 – Información de la Contraseña ──────────────────────── --}}
-    <div class="modal fade" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false"
-        aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
+    <div class="modal fade modal-app" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false"
+        data-bs-backdrop="static" aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -644,118 +287,30 @@
         </div>
     </div>
 
-    {{-- ── Modal Bootstrap 5 – Asignar Informacion Del Docente ──────────────────────── --}}
-    <div class="modal fade" id="modalAsignarInfo" tabindex="-1" data-bs-keyboard="false"
-        aria-labelledby="modalAsignarInfoLabel" aria-hidden="false">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-header-icon"><i class="fas fa-user-graduate text-white"></i></div>
-                    <div class="flex-grow-1">
-                        <h5 class="modal-title mb-0" id="modalAsignarInfoLabel">Asignar grupo</h5>
-                        <p class="modal-subtitle mb-0">Agrega una carga docente para el año actual</p>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar">
-                    </button>
-                </div>
-
-                <div class="modal-body">
-                    <form id="formAsignarInfo" method="POST">
-                        @csrf
-                        <!-- Identificador del usuario docente que recibirá la nueva carga en carga_docente. -->
-                        <input type="hidden" name="id" id="asignar_docente_id">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <strong>Nombre</strong>
-                                    <div id="asignar_nombre" class="form-control">-</div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <strong class="form-label">Ambiente</strong>
-                                    <select name="ambiente_id" id="asignar_ambiente_id" class="form-control">
-                                        <option value="">— Selecciona un ambiente —</option>
-                                        @foreach ($ambientes as $a)
-                                            <option value="{{ $a->id }}">
-                                                {{ $a->icono }} {{ $a->nombre }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <strong class="form-label">Grado</strong>
-                                    <select name="grado_id" id="asignar_grado_id" class="form-control">
-                                        <option value="">— Selecciona un grado —</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <strong class="form-label">Año lectivo</strong>
-                                    <input type="number" name="anio_lectivo" id="asignar_anio_lectivo"
-                                        class="form-control" value="{{ date('Y') }}" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <strong class="form-label">Grupos</strong>
-                                    <select name="grupo_id" id="asignar_grupos_id" class="form-control">
-                                        <option value="">— Selecciona un grupo —</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="mb-3 asignaciones-actuales">
-                                    <strong>Grupos asignados en {{ date('Y') }}</strong>
-                                    <div id="asignaciones_actuales_docente"
-                                        style="color:#64748B;font-size:.86rem;margin-top:8px">
-                                        Sin asignaciones para este año.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn"
-                        style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
-                        onclick="cerrarModalAsignarInfo()"><i class="fa-solid fa-xmark"></i> Cancelar</button>
-                    <button type="submit" form="formAsignarInfo" id="btnAsignarInfo" class="btn btn-primary"><i
-                            class="fa-solid fa-floppy-disk"></i> Guardar asignación</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('admin.docentes.partials.modal-asignar-grupo')
+    @include('admin.docentes.ver-accesos')
+    @include('admin.docentes.ver_grupos')
 @endsection
 
 @push('scripts')
     <script>
-        const URL_DOCENTES = "{{ route('admin.docentes') }}";
-        const ANIO_LECTIVO_ACTUAL = "{{ date('Y') }}";
+        window.URL_DOCENTES = "{{ route('admin.docentes') }}";
+        window.ANIO_LECTIVO_ACTUAL = "{{ date('Y') }}";
+        const URL_DOCENTES = window.URL_DOCENTES;
+        const ANIO_LECTIVO_ACTUAL = window.ANIO_LECTIVO_ACTUAL;
         var tipoPost = 1; // 1: Crear, 2: Editar
         var id_editar = '';
     </script>
+    @include('admin.docentes.partials.asignar-grupo-scripts')
     <script>
         /* ── Bootstrap Modal ─────────────────────────────────────────── */
         const modalBS = new bootstrap.Modal(document.getElementById('modalDocente'));
-        const modalBSAsignarInfo = new bootstrap.Modal(document.getElementById('modalAsignarInfo'));
         const modalBSPasswordGenerada = new bootstrap.Modal(document.getElementById('modalBSPasswordGenerada'));
 
         // Al cerrar cualquier modal, limpiar errores y resetear el formulario correspondiente.
         document.getElementById('modalDocente').addEventListener('hidden.bs.modal', function() {
             limpiarErroresModal();
             document.getElementById('formDocente').reset();
-        });
-        document.getElementById('modalAsignarInfo').addEventListener('hidden.bs.modal', function() {
-            limpiarErroresModal();
-            document.getElementById('formAsignarInfo').reset();
-            document.getElementById('asignar_anio_lectivo').value = ANIO_LECTIVO_ACTUAL;
-            renderizarAsignacionesActuales([]);
         });
 
         function abrirModal() {
@@ -800,71 +355,21 @@
         }
 
         function cerrarModalBSPasswordGenerada() {
+            document.getElementById('imgPreviewFirma').src =
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s';
             limpiarErroresModal();
             document.activeElement?.blur();
             modalBSPasswordGenerada.hide();
         }
 
-
         /* ── Cerrar modal Nuevo Docente ─────────────────────────── */
         function cerrarModalDocente() {
+            document.getElementById('imgPreviewFirma').src =
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s';
             limpiarErroresModal();
             document.activeElement?.blur();
             modalBS.hide();
         }
-
-        /* ── Cerrar modal Asignar Información ─────────────────────────── */
-        function cerrarModalAsignarInfo() {
-            limpiarErroresModal();
-            document.activeElement?.blur();
-            modalBSAsignarInfo.hide();
-        }
-
-        // Carga el docente y sus cargas actuales; la nueva asignación se elige en blanco para evitar duplicados accidentales.
-        async function abrirModalAsignarGrado(id) {
-            try {
-                const resp = await ajaxRequest(`${URL_DOCENTES}/${id}`);
-                if (!resp.success) throw new Error('No data');
-
-                const data = resp.data;
-                document.getElementById('formAsignarInfo').reset();
-                document.getElementById('asignar_docente_id').value = data.id;
-                document.getElementById('asignar_nombre').textContent = data.nombre ?? '';
-                document.getElementById('asignar_anio_lectivo').value = ANIO_LECTIVO_ACTUAL;
-                document.getElementById('asignar_grado_id').innerHTML =
-                    '<option value="">— Selecciona un grado —</option>';
-                document.getElementById('asignar_grupos_id').innerHTML =
-                    '<option value="">— Selecciona un grupo —</option>';
-                renderizarAsignacionesActuales(data.asignaciones ?? []);
-
-                modalBSAsignarInfo.show();
-            } catch (error) {
-                console.error('Error:', error);
-                mostrarToast('error', 'No se pudo cargar la información del docente');
-            }
-        }
-
-        function renderizarAsignacionesActuales(asignaciones) {
-            const contenedor = document.getElementById('asignaciones_actuales_docente');
-
-            if (!asignaciones.length) {
-                contenedor.innerHTML = 'Sin asignaciones para este año.';
-                return;
-            }
-
-            // La lista usa carga_docente como fuente de verdad para que coincida con lo que verá el panel docente.
-            contenedor.innerHTML = `
-                <ul>
-                    ${asignaciones.map(asignacion => `
-                                        <li>
-                                            <span>${asignacion.ambiente}</span>
-                                            <strong>${asignacion.grado} ${asignacion.grupo}</strong>
-                                        </li>
-                                    `).join('')}
-                </ul>
-            `;
-        }
-
 
         /* ── Tabla AJAX ──────────────────────────────────────────────── */
         async function cargarTabla(url) {
@@ -938,23 +443,53 @@
 
         function mostrarErroresModal(errors) {
             limpiarErroresModal();
-            for (const [campo, mensajes] of Object.entries(errors)) {
-                const input = document.querySelector(`#formDocente [name="${campo}"]`);
-                if (!input) continue;
-                input.classList.add('is-invalid');
-                const div = document.createElement('div');
-                div.className = 'campo-error';
-                div.textContent = mensajes[0];
-                input.insertAdjacentElement('afterend', div);
-            }
-            const primero = document.querySelector('#formDocente .is-invalid');
-            if (primero) primero.focus();
+            $.each(errors, function(campo, mensajes) {
+                const $input = $(`#formDocente [name="${campo}"]`);
+                if (!$input.length) return;
+                $input.addClass('is-invalid');
+
+                var mensaje = '';
+                switch (mensajes[0]) {
+                    case 'validation.unique':
+                        mensaje = 'Ya existe un docente con';
+                        if (campo === 'email') {
+                            mensaje += ' este correo electrónico';
+                        } else if (campo === 'identificacion') {
+                            mensaje += ' esta identificación';
+                        }
+                        mensaje += '.';
+                        break;
+                    case 'validation.email':
+                        mensaje = 'El correo electrónico no es válido';
+                        break;
+                    case 'validation.integer':
+                        mensaje = 'El valor debe ser un número entero';
+                        break;
+                    case 'validation.string':
+                        mensaje = 'El valor debe ser una cadena de texto';
+                        break;
+                    case 'validation.numeric':
+                        mensaje = 'El valor debe ser un número';
+                        break;
+                    case 'validation.required':
+                        mensaje = 'Este campo es requerido';
+                        break;
+                    default:
+                        mensaje = 'Este campo es requerido';
+                        break;
+                }
+
+                $('<div>', {
+                    class: 'campo-error',
+                    text: mensaje
+                }).insertAfter($input);
+            });
+            $(`#formDocente .is-invalid`).first().focus();
         }
 
         /* ── Crear docente (AJAX) ────────────────────────────────────── */
         document.getElementById('formDocente').addEventListener('submit', async function(e) {
             e.preventDefault();
-
             if (tipoPost == 1) {
                 const btn = document.getElementById('btnDocente');
                 btn.disabled = true;
@@ -962,38 +497,62 @@
                 btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardando…';
                 const formData = new FormData(this);
                 const datos = Object.fromEntries(formData.entries());
-                const res = await ajaxRequest(URL_DOCENTES, 'POST', datos);
                 let titulo = '';
                 btn.disabled = false;
                 btn.textContent = 'Crear Docente';
                 btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardar';
-                if (res.success) {
-                    document.getElementById('passwordGenerada').value =
-                        res.password_generada;
-                    document.getElementById('asignar_email').value = datos.email ?? '';
-                    modalBS.hide();
-                    const btnPdf = document.getElementById('btnDescargarPdf');
-                    btnPdf.dataset.docenteId = res.docente.id;
-                    abrirModalBSPasswordGenerada();
-                    await cargarTabla(location.href);
-                    document.getElementById('modalBSPasswordGenerada')
-                        .addEventListener('hidden.bs.modal', function() {
-                            Swal.fire({
-                                icon: 'success',
-                                title: res.message,
-                                timer: 1600,
-                                showConfirmButton: false,
-                            });
-                        });
-                } else if (res.errors && Object.keys(res.errors).length) {
-                    mostrarErroresModal(res.errors);
-                } else {
-                    Swal.fire(
-                        'Error al crear el docente',
-                        res.message,
-                        'error'
-                    );
+                // Archivo
+                const firmaUrl = $('#firma_url')[0].files[0];
+                if (firmaUrl) {
+                    formData.append('firma_url', firmaUrl);
                 }
+
+                $.ajax({
+                    url: URL_DOCENTES,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: async function(res) {
+                        Swal.close();
+                        if (res.success) {
+                            document.getElementById('passwordGenerada').value =
+                                res.password_generada;
+                            document.getElementById('asignar_email').value = datos.email ?? '';
+                            modalBS.hide();
+                            const btnPdf = document.getElementById('btnDescargarPdf');
+                            btnPdf.dataset.docenteId = res.docente.id;
+                            abrirModalBSPasswordGenerada();
+                            await cargarTabla(location.href);
+                            document.getElementById('modalBSPasswordGenerada')
+                                .addEventListener('hidden.bs.modal', function() {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: res.message,
+                                        timer: 1600,
+                                        showConfirmButton: false,
+                                    });
+                                });
+                        } else {
+                            mostrarToast('error', res.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.close();
+                        if (xhr.responseJSON.message.includes('validation.')) {
+                            mostrarToast('error', 'Verifique los datos ingresados');
+                        } else {
+                            mostrarToast('error', "Error al crear el docente");
+                        }
+
+                        mostrarErroresModal(xhr.responseJSON.errors);
+                    },
+                    complete: function() {
+                        $('#btnDocente').prop('disabled', false).text('Crear Docente');
+                    }
+                });
+
             } else {
                 const btn = document.getElementById('btnDocente');
                 btn.disabled = true;
@@ -1002,43 +561,66 @@
                 const formData = new FormData(this);
                 const datos = Object.fromEntries(formData.entries());
                 const id = id_editar;
-                const res = await ajaxRequest(`${URL_DOCENTES}/${id}`, 'PUT', datos);
                 btn.disabled = false;
                 btn.textContent = 'Guardar';
                 btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardar';
                 let titulo = '';
                 let texto = '';
-                if (res.success && res.password_generada) {
-                    document.getElementById('passwordGenerada').value =
-                        res.password_generada;
-                    document.getElementById('asignar_email').value = datos.email ?? '';
-                    modalBS.hide();
-                    const btnPdf = document.getElementById('btnDescargarPdf');
-                    btnPdf.dataset.docenteId = res.docente.id;
-                    btnPdf.dataset.nombre = res.docente.nombre;
-                    abrirModalBSPasswordGeneradaEditar();
-                    await cargarTabla(location.href);
-                    document.getElementById('modalBSPasswordGenerada')
-                        .addEventListener('hidden.bs.modal', function() {
+
+                formData.append('_method', 'PUT');
+                $.ajax({
+                    url: `${URL_DOCENTES}/${id}`,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: async function(res) {
+                        Swal.close();
+                        if (res.success && res.password_generada) {
+                            document.getElementById('passwordGenerada').value =
+                                res.password_generada;
+                            document.getElementById('asignar_email').value = datos.email ?? '';
+                            modalBS.hide();
+                            const btnPdf = document.getElementById('btnDescargarPdf');
+                            btnPdf.dataset.docenteId = res.docente.id;
+                            btnPdf.dataset.nombre = res.docente.nombre;
+                            abrirModalBSPasswordGeneradaEditar();
+                            await cargarTabla(location.href);
+                            document.getElementById('modalBSPasswordGenerada')
+                                .addEventListener('hidden.bs.modal', function() {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: res.message,
+                                        timer: 1600,
+                                        showConfirmButton: false,
+                                    });
+                                });
+                        } else if (res.success) {
+                            modalBS.hide();
                             Swal.fire({
                                 icon: 'success',
                                 title: res.message,
                                 timer: 1600,
                                 showConfirmButton: false,
                             });
-                        });
-                } else if (res.success) {
-                    modalBS.hide();
-                    Swal.fire({
-                        icon: 'success',
-                        title: res.message,
-                        timer: 1600,
-                        showConfirmButton: false,
-                    });
-                    await cargarTabla(location.href);
-                } else if (res.errors && Object.keys(res.errors).length) {
-                    mostrarErroresModal(res.errors);
-                }
+                            await cargarTabla(location.href);
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.close();
+                        if (xhr.responseJSON.message.includes('validation.')) {
+                            mostrarToast('error', 'Verifique los datos ingresados');
+                        } else {
+                            mostrarToast('error', "Error al crear el docente");
+                        }
+
+                        mostrarErroresModal(xhr.responseJSON.errors);
+                    },
+                    complete: function() {
+                        $('#btnDocente').prop('disabled', false).text('Crear Docente');
+                    }
+                });
             }
         });
 
@@ -1046,7 +628,7 @@
 
         /* ── Eliminar docente (AJAX) ─────────────────────────────────── */
         document.addEventListener('click', async function(e) {
-            const btn = e.target.closest('.btn-eliminar');
+            const btn = e.target.closest('#btn-eliminar');
             if (!btn) return;
 
             const id = btn.dataset.id;
@@ -1086,54 +668,6 @@
                 mostrarToast('error', res.message || 'Error al eliminar');
             }
         });
-
-        /* ── Asignar / Completar datos docente ───────────────────────── */
-        // Envía al backend los datos adicionales del docente seleccionado.
-        // Este formulario trabaja con el modal de completar datos y actualiza el perfil del docente.
-        document.getElementById('formAsignarInfo').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btnAsignarInfo');
-            btn.disabled = true;
-            btn.textContent = 'Guardando…';
-
-            const formData = new FormData(this);
-            const datos = Object.fromEntries(formData.entries());
-            const id = datos.id;
-            const res = await ajaxRequest(`${URL_DOCENTES}/${id}/asignar-grupo`, 'POST', datos);
-
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar asignación';
-
-            if (res.success) {
-                renderizarAsignacionesActuales(res.data?.asignaciones ?? []);
-                document.getElementById('asignar_grado_id').innerHTML =
-                    '<option value="">— Selecciona un grado —</option>';
-                document.getElementById('asignar_grupos_id').innerHTML =
-                    '<option value="">— Selecciona un grupo —</option>';
-                document.getElementById('asignar_ambiente_id').value = '';
-                mostrarToast('success', res.message);
-                await cargarTabla(location.href);
-            } else if (res.errors && Object.keys(res.errors).length) {
-                mostrarErroresAsignacion(res.errors);
-            } else {
-                mostrarToast('error', res.message || 'Error al guardar');
-            }
-        });
-
-        function mostrarErroresAsignacion(errors) {
-            limpiarErroresModal();
-            for (const [campo, mensajes] of Object.entries(errors)) {
-                const input = document.querySelector(`#formAsignarInfo [name="${campo}"]`);
-                if (!input) continue;
-                input.classList.add('is-invalid');
-                const div = document.createElement('div');
-                div.className = 'campo-error';
-                div.textContent = mensajes[0];
-                input.insertAdjacentElement('afterend', div);
-            }
-            const primero = document.querySelector('#formAsignarInfo .is-invalid');
-            if (primero) primero.focus();
-        }
 
         function verPassword(inputId, iconId) {
             const icon = $(iconId)[0];
@@ -1215,8 +749,20 @@
             $('#direccion').val(data.direccion);
             $('#especialidad').val(data.especialidad);
             $('#fecha_ingreso').val(data.fecha_ingreso_set);
+
+            // El input file siempre vacío
+            $('#firma_url').val('');
+
+            // Mostrar la firma existente
+            $('#imgPreviewFirma').attr(
+                'src',
+                data.firma_url ||
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s'
+            );
             id_editar = data.user.id;
         }
+
+
 
         $(document).on('change', '.toggle-activo', function() {
 
@@ -1236,8 +782,6 @@
                 title: `¿Desactivar a ${nombre} ${apellido} ?`,
                 html: `
         Se cerrará cualquier sesión activa de este docente.
-        <br><br>
-        Los datos académicos y grupos asignados no serán eliminados.
     `,
                 icon: 'warning',
                 showCancelButton: true,
@@ -1267,21 +811,90 @@
                         icon: 'success',
                         title: response.estado === 'activo' ?
                             'Docente activado' : 'Docente desactivado',
-                        timer: 1500,
-                        showConfirmButton: false
+                        text: response.estado === 'inactivo' && response.asignaciones_liberadas > 0 ?
+                            `Se liberaron ${response.asignaciones_liberadas} asignación(es) de grupo.` :
+                            undefined,
+                        timer: response.estado === 'inactivo' && response.asignaciones_liberadas > 0 ?
+                            undefined : 1500,
+                        showConfirmButton: response.estado === 'inactivo' && response
+                            .asignaciones_liberadas > 0,
                     });
+
+                    if (response.estado === 'inactivo') {
+                        refrescarModalDocentesAsignadosSiAbierto();
+                    }
                 },
-                error: function() {
-                    // Revertir el estado si falla
+                error: function(xhr) {
                     checkbox.prop('checked', !checkbox.prop('checked'));
-                    Swal.fire(
-                        'Error',
-                        'No fue posible actualizar el estado.',
-                        'error'
-                    );
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message ?? 'No fue posible actualizar el estado.'
+                    });
                 }
             });
         }
+
+        $(document).ready(function() {
+
+            let timerValidacion;
+
+            function validarCampo(input, mensaje, existe, texto) {
+
+                $(input)
+                    .toggleClass('is-invalid', existe)
+                    .toggleClass('is-valid', !existe);
+
+                $(mensaje)
+                    .text(existe ? texto : '')
+                    .toggle(existe);
+            }
+
+            function validarDatos() {
+                const identificacion = $('#identificacion').val().trim();
+                const email = $('#email').val().trim();
+
+                if (identificacion.length < 5 && email.length < 5) {
+                    return;
+                }
+
+                $.ajax({
+                    url: `${URL_DOCENTES}/validar-datos`,
+                    type: 'GET',
+                    data: {
+                        identificacion: $('#identificacion').val().trim(),
+                        email: $('#email').val().trim()
+                    },
+                    success: function(response) {
+
+                        validarCampo(
+                            '#identificacion',
+                            '#mensajeIdentificacion',
+                            response.identificacion_existe,
+                            'La identificación ya está registrada.'
+                        );
+
+                        validarCampo(
+                            '#email',
+                            '#mensajeEmail',
+                            response.email_existe,
+                            'El correo electrónico ya está registrado.'
+                        );
+                    }
+                });
+            }
+
+            // Se ejecuta cada vez que el usuario escribe
+            $('#identificacion, #email').on('input', function() {
+
+                clearTimeout(timerValidacion);
+
+                timerValidacion = setTimeout(validarDatos, 500);
+
+            });
+
+        });
+
         // Copiar contraseña al portapapeles.
         $(document).on('click', '.btn-copiar', function() {
             const inputId = $(this).data('target');
@@ -1311,73 +924,31 @@
                 window.open(`${URL_DOCENTES}/${id}/generar-pdf`, '_blank');
             });
 
-        $('#asignar_ambiente_id').on('change', function() {
+        //Previsualizar imagen de la firma.
+        //esta funcion se usa en el modal de docentes para previsualizar la imagen de la firma.
+        function previewImage(event, previewSelector) {
+            const input = event.target;
+            const preview = document.querySelector(previewSelector);
 
-            const ambienteId = $(this).val();
-            const anio = $('#asignar_anio_lectivo').val();
-
-            $('#asignar_grado_id').html(
-                '<option value="">— Selecciona un grado —</option>'
-            );
-            $('#asignar_grupos_id').html(
-                '<option value="">— Selecciona un grupo —</option>'
-            );
-
-            if (!ambienteId) return;
-
-            $.get(`/admin/ambientes/${ambienteId}/gradoslistado`, {
-                anio_lectivo: anio
-            }, function(grados) {
-                // El backend ya excluye grupos ocupados dentro del mismo ambiente/año.
-                grados.forEach(grado => {
-                    $('#asignar_grado_id').append(
-                        `<option value="${grado.id}">${grado.nombre}</option>`
-                    );
-                });
-
-            });
-
-        });
-
-        function cargarGrupos() {
-
-            const ambienteId = $('#asignar_ambiente_id').val();
-            const gradoId = $('#asignar_grado_id').val();
-            const anio = $('#asignar_anio_lectivo').val();
-
-            $('#asignar_grupos_id').html(
-                '<option value="">— Selecciona un grupo —</option>'
-            );
-
-            if (!ambienteId || !gradoId || !anio) {
+            if (!input.files || !input.files.length) {
                 return;
             }
 
-            $.get(`/admin/grados/${gradoId}/grupos`, {
-                anio_lectivo: anio,
-                ambiente_id: ambienteId,
-            }, function(grupos) {
+            const file = input.files[0];
 
-                grupos.forEach(grupo => {
+            if (!file.type.startsWith('image/')) {
+                alert('Seleccione un archivo de imagen.');
+                input.value = '';
+                return;
+            }
 
-                    $('#asignar_grupos_id').append(
-                        `<option value="${grupo.id}">
-                ${grupo.nombre}
-            </option>`
-                    );
+            const reader = new FileReader();
 
-                });
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            };
 
-            });
-
+            reader.readAsDataURL(file);
         }
-
-        $('#asignar_grado_id').on('change', function() {
-            cargarGrupos();
-        });
-
-        $('#asignar_anio_lectivo').on('change', function() {
-            cargarGrupos();
-        });
     </script>
 @endpush

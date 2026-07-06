@@ -533,7 +533,7 @@
     }
 
     .firma-img {
-        width: 220px;
+        width: 100%;
         height: 90px;
         object-fit: contain;
         border-radius: 5px;
@@ -587,6 +587,11 @@
         right: -34px;
         bottom: 30%;
     }
+
+    .italic {
+        font-style: italic;
+        font-size: .9rem;
+    }
 </style>
 @endpush
 
@@ -601,11 +606,12 @@
     </a>
 </div>
 <div class="piar-container">
+    <input type="hidden" id="id_estudiante_piar" value="{{ $estudiante?->id }}">
     {{-- Stepper --}}
     <div class="piar-stepper" id="piarStepper">
         <div class="piar-stepper-progress" id="piarProgress" style="width:0%"></div>
 
-        <div class="piar-step active" data-step="1">
+        <div class="piar-step" data-step="1">
             <div class="piar-step-circle">1</div>
             <span class="piar-step-label">Información general del estudiante</span>
         </div>
@@ -634,268 +640,275 @@
             <span class="piar-step-label">Acta de acuerdo</span>
         </div>
     </div>
-
-    <form id="formPiar" enctype="multipart/form-data">
-        @csrf
-        <input type="hidden" name="estudiante_id" value="">
-
-        <div class="piar-body">
-
-            {{-- PASO 1: Información General --}}
-            <div class="piar-pane active card-item" data-pane="1">
-                <div class="piar-pane-title">
-                    <div class="piar-pane-icon" style="background:#EFF6FF;color:#2563EB">
-                        <i class="fas fa-user-graduate"></i>
-                    </div>
-                    <div>
-                        <h3>Información general del estudiante</h3>
-                        <p>Por favor, complete los siguientes datos para el estudiante</p>
-                    </div>
+    <div class="piar-body">
+        {{-- PASO 1: Información General --}}
+        <div class="piar-pane active card-item" data-pane="1">
+            <div class="piar-pane-title">
+                <div class="piar-pane-icon" style="background:#EFF6FF;color:#2563EB">
+                    <i class="fas fa-user-graduate"></i>
                 </div>
                 <div>
-                    <!-- Datos de diligenciamiento -->
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            Información de diligenciamiento
-                        </div>
-                        <div class="card-body row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label">Fecha de diligenciamiento</label>
-                                <input readonly type="date" class="form-control" name="fecha_diligenciamiento" value="{{ date('Y-m-d') }}">
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label">Nombre y rol de quien diligencia</label>
-                                <input type="text" readonly class="form-control" name="persona_diligencia" value="{{ $docente_diligencia?->nombre }} - {{ $docente_diligencia?->rol }}">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Institución Educativa</label>
-                                <input type="text" readonly class="form-control" name="institucion" value="{{ config('ambiente.nombre') }}">
-                            </div>
-                        </div>
-                    </div>
-                
-                    <!-- Información general del estudiante -->
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            Información General del Estudiante
-                        </div>
-                        <div class="card-body row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Nombres</label>
-                                <input readonly type="text" class="form-control" name="nombres" value="{{ $estudiante?->nombre }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Apellidos</label>
-                                <input readonly type="text" class="form-control" name="apellidos" value="{{ $estudiante?->apellido }}">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Tipo identificación</label>
-                                <select class="form-select" name="tipo_identificacion" readonly>
-                                    <option {{ $estudiante?->tipo_identificacion == '' ? 'selected' : '' }} value="">Seleccione</option>
-                                    <option {{ $estudiante?->tipo_identificacion == 'TI' ? 'selected' : '' }} value="TI">TI</option>
-                                    <option {{ $estudiante?->tipo_identificacion == 'CC' ? 'selected' : '' }} value="CC">CC</option>
-                                    <option {{ $estudiante?->tipo_identificacion == 'RC' ? 'selected' : '' }} value="RC">RC</option>
-                                    <option {{ $estudiante?->tipo_identificacion == 'Otro' ? 'selected' : '' }} value="Otro">Otro</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">¿Cuál?</label>
-                                <input type="text" class="form-control" name="otro_tipo">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Número de identificación</label>
-                                <input readonly type="text" class="form-control" name="identificacion" value="{{ $estudiante?->identificacion }}">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Lugar de nacimiento</label>
-                                <input type="text" class="form-control" name="lugar_nacimiento">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Edad</label>
-                                <input type="number" class="form-control" name="edad">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Fecha nacimiento</label>
-                                <input type="date" class="form-control" name="fecha_nacimiento">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Grado actual</label>
-                                <input type="text" class="form-control" name="grado">
-                            </div>                
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    ¿El año anterior estuvo vinculado al sistema educativo?
-                                </label>
-                
-                                <select class="form-select" name="vinculado">
-                                    <option value="">Seleccione</option>
-                                    <option>Si</option>
-                                    <option>No</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Departamento</label>
-                                <input type="text" class="form-control" name="departamento">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Municipio</label>
-                                <input type="text" class="form-control" name="municipio">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Barrio / Vereda</label>
-                                <input type="text" class="form-control" name="barrio">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Dirección</label>
-                                <input type="text" class="form-control" name="direccion">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Teléfono</label>
-                                <input type="text" class="form-control" name="telefono">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Correo electrónico</label>
-                                <input type="email" class="form-control" name="correo">
-                            </div>                
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    ¿Se reconoce como víctima del conflicto armado?
-                                </label>
-                                <select class="form-select" name="victima">
-                                    <option value="">Seleccione</option>
-                                    <option>Si</option>
-                                    <option>No</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    ¿Cuenta con el respectivo registro?
-                                </label>
-                                <select class="form-select" name="registro_victima">
-                                    <option value="">Seleccione</option>
-                                    <option>Si</option>
-                                    <option>No</option>
-                                </select>
-                            </div>                
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    ¿Está en algún centro de protección?
-                                </label>
-                                <select class="form-select" name="centro_proteccion">
-                                    <option value="">Seleccione</option>
-                                    <option>Si</option>
-                                    <option>No</option>
-                                </select>
-                            </div>    
-                            <div class="col-6">
-                                <label class="form-label">¿Cuál centro de protección?</label>
-                                <input type="text" class="form-control" name="cual_etnico">
-                            </div>      
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    ¿Se reconoce o pertenece a un grupo étnico?
-                                </label>
-                                <select class="form-select" name="grupo_etnico">
-                                    <option value="">Seleccione</option>
-                                    <option>Si</option>
-                                    <option>No</option>
-                                </select>
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label">¿Cuál grupo étnico?</label>
-                                <input type="text" class="form-control" name="cual_etnico">
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Descripción general -->
-                    <div class="card">
-                
-                        <div class="card-header">
-                            Descripción general del  estudiante con énfasis en sus capacidades, gustos e intereses o  aspectos que le  desagradan,   expectativas del  estudiante y la familia,  acompañamiento familiar y redes de   apoyo con los que se  cuenta.
-                        </div>
-                        <div class="card-body row g-3">
-                            <div class="col-12">
-                                <label class="form-label">Capacidades</label>
-                                <textarea class="form-control" rows="3" name="capacidades"></textarea>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Gustos e intereses</label>
-                                <textarea class="form-control" rows="3" name="gustos"></textarea>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Expectativas del estudiante</label>
-                                <textarea class="form-control" rows="3" name="expectativas_estudiante"></textarea>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Expectativas de la familia</label>
-                                <textarea class="form-control" rows="3" name="expectativas_familia"></textarea>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Redes de apoyo</label>
-                                <textarea class="form-control" rows="3" name="redes_apoyo"></textarea>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Otras</label>
-                                <textarea class="form-control" rows="3" name="otras"></textarea>
-                            </div>
-                        </div>
-                    </div>
+                    <h3>Información general del estudiante</h3>
+                    <p>Por favor, complete los siguientes datos para el estudiante</p>
                 </div>
             </div>
-
-            {{-- PASO 2: Entorno Salud --}}
-            <div class="piar-pane card-item" data-pane="2">
-                <div class="piar-pane-title">
-                    <div class="piar-pane-icon" style="background:#F0FDF4;color:#059669">
-                        <i class="fas fa-stethoscope"></i>
+            <form action="" id="form-paso-1">
+                @csrf
+                <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
+                <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
+                <!-- Datos de diligenciamiento -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        Información de diligenciamiento
                     </div>
-                    <div>
-                        <h3>Entorno Salud</h3>
-                        <p>Por favor, complete los siguientes datos para el entorno salud del estudiante</p>
+                    <div class="card-body row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha de diligenciamiento</label>
+                            <input readonly type="date" class="form-control" name="fecha_diligenciamiento" value="{{ date('Y-m-d') }}">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Nombre y rol de quien diligencia</label>
+                            <input type="text" readonly class="form-control" name="persona_diligencia" value="{{ $docente_diligencia?->nombre }} - {{ $docente_diligencia?->rol }}">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Institución Educativa</label>
+                            <input type="text" readonly class="form-control" name="institucion" value="{{ config('ambiente.nombre') }}">
+                        </div>
                     </div>
                 </div>
+            
+                <!-- Información general del estudiante -->
                 <div class="card mb-3">
+                    <div class="card-header">
+                        Información General del Estudiante
+                    </div>
+                    <div class="card-body row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombres</label>
+                            <input readonly type="text" class="form-control" name="nombres" value="{{ $estudiante?->nombre }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellidos</label>
+                            <input readonly type="text" class="form-control" name="apellidos" value="{{ $estudiante?->apellido }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo identificación</label>
+                            <select class="form-select" name="tipo_identificacion" readonly>
+                                <option {{ $estudiante?->tipo_identificacion == '' ? 'selected' : '' }} value="">Seleccione</option>
+                                <option {{ $estudiante?->tipo_identificacion == 'TI' ? 'selected' : '' }} value="TI">TI</option>
+                                <option {{ $estudiante?->tipo_identificacion == 'CC' ? 'selected' : '' }} value="CC">CC</option>
+                                <option {{ $estudiante?->tipo_identificacion == 'RC' ? 'selected' : '' }} value="RC">RC</option>
+                                <option {{ $estudiante?->tipo_identificacion == 'Otro' ? 'selected' : '' }} value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">¿Cuál?</label>
+                            <input type="text" readonly value="{{ $estudiante?->otro_tipo_identificacion }}" class="form-control" name="otro_tipo">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Número de identificación</label>
+                            <input readonly type="text" class="form-control" name="identificacion" value="{{ $estudiante?->identificacion }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Lugar de nacimiento</label>
+                            <input type="text" readonly value="{{ $estudiante?->lugar_nacimiento }}" class="form-control" name="lugar_nacimiento">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Edad (años)</label>
+                            <input type="number" readonly value="{{ $estudiante?->edad }}" class="form-control" name="edad">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Fecha nacimiento</label>
+                            <input type="date" readonly value="{{ $estudiante?->fecha_nacimiento }}" class="form-control" name="fecha_nacimiento">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Grado actual</label>
+                            <input type="text" readonly value="{{ $estudiante?->grado?->nombre }}" class="form-control" name="grado">
+                        </div>     
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                ¿El año anterior estuvo vinculado al sistema educativo?
+                            </label>
+    
+                            <select class="form-select" name="vinculado" required>
+                                <option value="">Seleccione</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Departamento</label>
+                            <input readonly type="text" class="form-control" name="departamento" value="{{ $estudiante?->departamento?->descripcion }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Municipio</label>
+                            <input readonly type="text" class="form-control" name="municipio" value="{{ $estudiante?->municipio?->descripcion }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Barrio / Vereda</label>
+                            <input readonly type="text" class="form-control" name="barrio" value="{{ $estudiante?->barrio_vereda }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Dirección</label>
+                            <input readonly type="text" class="form-control" name="direccion" value="{{ $estudiante?->direccion }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono</label>
+                            <input readonly type="text" class="form-control" name="telefono" value="{{ $estudiante?->telefono }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo electrónico</label>
+                            <input readonly type="email" class="form-control" name="correo" value="{{ $estudiante?->email }}">
+                        </div>                
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                ¿Se reconoce como víctima del conflicto armado?
+                            </label>
+                            <select class="form-select" name="victima" required>
+                                <option value="">Seleccione</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                ¿Cuenta con el respectivo registro?
+                            </label>
+                            <select class="form-select" name="registro_victima" required>
+                                <option value="">Seleccione</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>                
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                ¿Está en algún centro de protección?
+                            </label>
+                            <select class="form-select" name="centro_proteccion" onchange="colocarRequired('cual_centro_proteccion', this)" required>
+                                <option value="">Seleccione</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>    
+                        <div class="col-6">
+                            <label class="form-label">¿Cuál centro de protección?</label>
+                            <input type="text" class="form-control" id="cual_centro_proteccion" name="cual_centro_proteccion">
+                        </div>      
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                ¿Se reconoce o pertenece a un grupo étnico?
+                            </label>
+                            <select class="form-select" name="grupo_etnico" onchange="colocarRequired('cual_etnico', this)" required>
+                                <option value="">Seleccione</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">¿Cuál grupo étnico?</label>
+                            <input type="text" class="form-control" id="cual_etnico" name="cual_etnico">
+                        </div>
+                    </div>
+                </div>
+                <!-- Descripción general -->
+                <div class="card">
+            
+                    <div class="card-header">
+                        Descripción general del  estudiante con énfasis en sus capacidades, gustos e intereses o  aspectos que le  desagradan,   expectativas del  estudiante y la familia,  acompañamiento familiar y redes de   apoyo con los que se  cuenta.
+                    </div>
+                    <div class="card-body row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Capacidades</label>
+                            <p class="text-muted italic">Describa todas las fortalezas y habilidades del estudiante, teniendo en cuenta el mayor nivel de detalle posible. Incluya aspectos cognitivos, comunicativos, sociales, emocionales, motores, adaptativos y académicos. Considere aquello que el estudiante puede hacer de manera independiente, con apoyo o en proceso de adquirir.</p>
+                            <textarea required class="form-control" rows="3" name="capacidades" required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Gustos e intereses</label>
+                            <p class="text-muted italic">Describa las actividades, temas, juegos, objetos, personas o rutinas que motivan al estudiante y facilitan su participación. Estos intereses pueden utilizarse como reforzadores o estrategias pedagógicas dentro del aula.</p>
+                            <textarea required class="form-control" rows="3" name="gustos" required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Expectativas del estudiante</label>
+                            <p class="text-muted italic">Consigne los deseos, metas, intereses o expectativas que expresa el estudiante frente a su proceso escolar, sus relaciones con los demás o su proyecto de vida, de acuerdo con su edad y nivel de desarrollo. Si el estudiante no logra expresarlas verbalmente, pueden inferirse a partir de la observación o información suministrada por la familia</p>
+                            <textarea required class="form-control" rows="3" name="expectativas_estudiante" required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Expectativas de la familia</label>
+                            <p class="text-muted italic">Describa las expectativas, objetivos o aspiraciones que tiene la familia frente al proceso educativo, desarrollo integral, autonomía, participación y aprendizaje del estudiante.</p>
+                            <textarea required class="form-control" rows="3" name="expectativas_familia" required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Redes de apoyo</label>
+                            <p class="text-muted italic">Identifique las personas, instituciones o entidades que acompañan el proceso del estudiante y pueden contribuir a su desarrollo. Incluya apoyos familiares, escolares, comunitarios, terapéuticos o institucionales.</p>
+                            <textarea required class="form-control" rows="3" name="redes_apoyo" required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Otras</label>
+                            <p class="text-muted italic">Consigne información adicional que sea relevante para comprender las necesidades, fortalezas o condiciones del estudiante y que no haya sido registrada en los apartados anteriores.</p>
+                            <textarea required class="form-control" rows="3" name="otras" required></textarea>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {{-- PASO 2: Entorno Salud --}}
+        <div class="piar-pane card-item" data-pane="2">
+            <div class="piar-pane-title">
+                <div class="piar-pane-icon" style="background:#F0FDF4;color:#059669">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <div>
+                    <h3>Entorno Salud</h3>
+                    <p>Por favor, complete los siguientes datos para el entorno salud del estudiante</p>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <form id="form-paso-2">
+                    @csrf
+                    <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
+                    <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
                     <div class="card-body row g-3">
                         <!-- Afiliación -->
                         <div class="col-md-4">
                             <label class="form-label">Afiliado al sistema de salud</label>
-                            <select class="form-select" name="afiliado_salud">
+                            <select class="form-select" name="afiliado_salud" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Régimen</label>
-                            <select class="form-select" name="regimen">
+                            <select class="form-select" name="regimen" required>
                                 <option value="">Seleccione</option>
-                                <option>Contributivo</option>
-                                <option>Subsidiado</option>
+                                <option value="Contributivo">Contributivo</option>
+                                <option value="Subsidiado">Subsidiado</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">EPS</label>
-                            <input type="text" class="form-control" name="eps">
+                            <input type="text" class="form-control" name="eps" required>
                         </div>
                         <!-- Emergencia -->
                         <div class="col-12">
                             <label class="form-label">
                                 Lugar donde le atienden en caso de emergencia
                             </label>
-                            <input type="text" class="form-control" name="lugar_emergencia">
+                            <input type="text" class="form-control" name="lugar_emergencia" required>
                         </div>
                         <!-- Diagnóstico -->
                         <div class="col-md-3">
                             <label class="form-label">Cuenta con diagnóstico médico</label>
-                            <select class="form-select" name="diagnostico_medico">
+                            <select class="form-select" name="diagnostico_medico" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>
                         <div class="col-md-9">
                             <label class="form-label">¿Cuál?</label>
-                            <select class="form-select" name="cual_diagnostico">
+                            <select class="form-select" name="cual_diagnostico" required>
                                 <option value="">Seleccione</option>
                                 @foreach ($condiciones as $condicion)
                                     <option value="{{ $condicion->id }}">{{ $condicion->nombre }}</option>
@@ -907,10 +920,10 @@
                             <div class="row m-1 mt-2 p-2" id="div_atencion_medica">
                                 <div class="col-md-4">
                                     <label class="form-label">¿Cuenta con atención médica?</label>
-                                    <select class="form-select" name="atencion_medica">
+                                    <select class="form-select" onchange="colocarRequiredVariable('atenciones_cuenta', this)" name="atencion_medica" required>
                                         <option value="">Seleccione</option>
-                                        <option>Si</option>
-                                        <option>No</option>
+                                        <option value="Si">Si</option>
+                                        <option value="No">No</option>
                                     </select>
                                 </div>
                                 <div class="col-md-7">
@@ -918,11 +931,11 @@
                                         <div class="col-md-12 row">
                                             <div class="col-md-6">
                                                 <label class="form-label">¿Cuál?</label>
-                                                <input type="text" class="form-control" name="atencion_medica[]">
+                                                <input type="text" class="form-control" name="atencion[0][cual]">
                                             </div>
                                             <div class="col-md-5">
                                                 <label class="form-label">Frecuencia</label>
-                                                <input type="text" class="form-control" name="frecuencia_atencion_medica[]">
+                                                <input type="text" class="form-control" name="atencion[0][frecuencia]">
                                             </div>
                                         </div>
                                     </div>
@@ -937,28 +950,28 @@
                                 <!-- Tratamiento terapéutico -->
                                 <div class="col-md-4">
                                     <label class="form-label">¿Cuenta con intervención o tratamiento terapéutico integral?</label>
-                                    <select class="form-select" name="tratamiento_integral">
+                                    <select class="form-select" onchange="colocarRequiredVariable('tratamientos_cuenta', this)" name="tratamiento_integral" required>
                                         <option value="">Seleccione</option>
-                                        <option>Si</option>
-                                        <option>No</option>
+                                        <option value="Si">Si</option>
+                                        <option value="No">No</option>
                                     </select>
                                 </div>
                                 <div class="col-md-7">
-                                    <div class="row" id="terapias_cuenta">
-                                        <div class="col-md-12 row pt-4" id="terapia_1">
-                                            <div class="col-md-6">
+                                    <div class="row" id="tratamientos_cuenta">
+                                        <div class="col-md-12 row pt-4" id="tratamiento_1">
+                                            <div class="col-md-6">  
                                                 <label class="form-label">¿Cuál?</label>
-                                                <input type="text" class="form-control" name="terapia[]">
+                                                <input type="text" class="form-control" name="tratamiento[0][cual]">
                                             </div>
                                             <div class="col-md-5">
                                                 <label class="form-label">Frecuencia</label>
-                                                <input type="text" class="form-control" name="frecuencia_terapia[]">
+                                                <input type="text" class="form-control" name="tratamiento[0][frecuencia]">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-1 d-flex justify-content-center align-items-end">
-                                    <button type="button" class="btn btn-primary" onclick="agregarTerapia()">+</button>
+                                    <button type="button" class="btn btn-primary" onclick="agregarTratamiento()">+</button>
                                 </div>
                             </div>
                         </div>
@@ -967,10 +980,10 @@
                             <div class="row m-1 mt-2 p-2" id="div_medicamentos">
                                 <div class="col-md-3">
                                     <label class="form-label">¿Consume medicamentos?</label>
-                                    <select class="form-select" name="consume_medicamentos">
+                                    <select class="form-select" onchange="colocarRequiredVariable('medicamentos_cuenta', this)" name="consume_medicamentos" required>
                                         <option value="">Seleccione</option>
-                                        <option>Si</option>
-                                        <option>No</option>
+                                        <option value="Si">Si</option>
+                                        <option value="No">No</option>
                                     </select>
                                 </div>
                                 <div class="col-md-8">
@@ -978,15 +991,15 @@
                                         <div class="col-md-12 row" id="medicamento_1">
                                             <div class="col-md-4">
                                                 <label class="form-label">¿Cuál?</label>
-                                                <input type="text" class="form-control" name="medicamento[]">
+                                                <input type="text" class="form-control" name="medicamento[0][cual]">
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="form-label">Frecuencia</label>
-                                                <input type="text" class="form-control" name="frecuencia_medicamento[]">
+                                                <input type="text" class="form-control" name="medicamento[0][frecuencia]">
                                             </div>
                                             <div class="col-md-3">
                                                 <label class="form-label">Horario</label>
-                                                <input type="text" class="form-control" name="horario_medicamento[]">
+                                                <input type="text" class="form-control" name="medicamento[0][horario]">
                                             </div>
                                         </div>
                                     </div>
@@ -1001,31 +1014,36 @@
                             <label class="form-label">
                                 ¿Cuenta con apoyos o ayudas técnicas o tecnológicas para favorecer su movilidad, comunicación e independencia?
                             </label>
-                            <select class="form-select" name="ayudas_tecnicas">
+                            <select class="form-select" onchange="colocarRequired('cuales_ayudas', this)" name="ayudas_tecnicas" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label">¿Cuáles?</label>
-                            <textarea class="form-control" rows="3" name="cuales_ayudas"></textarea>
+                            <textarea class="form-control" id="cuales_ayudas" rows="3" name="cuales_ayudas" ></textarea>
                         </div>
                     </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- PASO 3: Entorno Hogar --}}
+        <div class="piar-pane card-item" data-pane="3">
+            <div class="piar-pane-title">
+                <div class="piar-pane-icon" style="background:#FFF7ED;color:#EA580C">
+                    <i class="fas fa-house"></i>
+                </div>
+                <div>
+                    <h3>Entorno Hogar</h3>
+                    <p>Por favor, complete los siguientes datos para el entorno hogar del estudiante</p>
                 </div>
             </div>
-
-            {{-- PASO 3: Entorno Hogar --}}
-            <div class="piar-pane card-item" data-pane="3">
-                <div class="piar-pane-title">
-                    <div class="piar-pane-icon" style="background:#FFF7ED;color:#EA580C">
-                        <i class="fas fa-house"></i>
-                    </div>
-                    <div>
-                        <h3>Entorno Hogar</h3>
-                        <p>Por favor, complete los siguientes datos para el entorno hogar del estudiante</p>
-                    </div>
-                </div>
+            <form id="form-paso-3">
+                @csrf
+                <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
+                <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
                 <div class="card mb-3">
                     <div class="card-header">
                         Información de la Madre
@@ -1033,23 +1051,23 @@
                     <div class="card-body row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Nombre de la madre</label>
-                            <input type="text" class="form-control" name="nombre_madre">
+                            <input required type="text" class="form-control" name="nombre_madre">
                         </div>
                 
                         <div class="col-md-4">
                             <label class="form-label">Ocupación de la madre</label>
-                            <input type="text" class="form-control" name="ocupacion_madre">
+                            <input required type="text" class="form-control" name="ocupacion_madre">
                         </div>
                 
                         <div class="col-md-4">
                             <label class="form-label">Nivel educativo alcanzado</label>
-                            <select class="form-select" name="nivel_madre">
+                            <select required class="form-select" name="nivel_madre">
                                 <option value="">Seleccione</option>
-                                <option>Primaria</option>
-                                <option>Bachillerato</option>
-                                <option>Técnico</option>
-                                <option>Tecnólogo</option>
-                                <option>Universitario</option>
+                                <option value="Primaria">Primaria</option>
+                                <option value="Bachillerato">Bachillerato</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Tecnólogo">Tecnólogo</option>
+                                <option value="Universitario">Universitario</option>
                             </select>
                         </div>
                     </div>
@@ -1061,21 +1079,21 @@
                     <div class="card-body row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Nombre del padre</label>
-                            <input type="text" class="form-control" name="nombre_padre">
+                            <input required type="text" class="form-control" name="nombre_padre">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Ocupación del padre</label>
-                            <input type="text" class="form-control" name="ocupacion_padre">
+                            <input required type="text" class="form-control" name="ocupacion_padre">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Nivel educativo alcanzado</label>
-                            <select class="form-select" name="nivel_padre">
+                            <select required class="form-select" name="nivel_padre">
                                 <option value="">Seleccione</option>
-                                <option>Primaria</option>   
-                                <option>Bachillerato</option>
-                                <option>Técnico</option>
-                                <option>Tecnólogo</option>
-                                <option>Universitario</option>
+                                <option value="Primaria">Primaria</option>   
+                                <option value="Bachillerato">Bachillerato</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Tecnólogo">Tecnólogo</option>
+                                <option value="Universitario">Universitario</option>
                             </select>
                         </div>
                     </div>
@@ -1087,30 +1105,30 @@
                     <div class="card-body row g-3">
                         <div class="col-md-4">
                             <label class="form-label">Nombre del cuidador</label>
-                            <input type="text" class="form-control" name="nombre_cuidador">
+                            <input required type="text" class="form-control" name="nombre_cuidador">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Nivel educativo del cuidador</label>
-                            <select class="form-select" name="nivel_cuidador">
+                            <select required class="form-select" name="nivel_cuidador">
                                 <option value="">Seleccione</option>
-                                <option>Primaria</option>
-                                <option>Bachillerato</option>
-                                <option>Técnico</option>
-                                <option>Tecnólogo</option>
-                                <option>Universitario</option>
+                                <option value="Primaria">Primaria</option>
+                                <option value="Bachillerato">Bachillerato</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Tecnólogo">Tecnólogo</option>
+                                <option value="Universitario">Universitario</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Teléfono</label>
-                            <input type="text" class="form-control" name="telefono_cuidador">
+                            <input required type="text" class="form-control" name="telefono_cuidador">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Parentesco con el estudiante</label>
-                            <input type="text" class="form-control" name="parentesco_cuidador">
+                            <input required type="text" class="form-control" name="parentesco_cuidador">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" name="correo_cuidador">
+                            <input required type="email" class="form-control" name="correo_cuidador">
                         </div>
                     </div>
                 </div>
@@ -1122,53 +1140,58 @@
                         <!-- Hermanos -->
                         <div class="col-md-6">
                             <label class="form-label">Número de hermanos</label>
-                            <input type="number" class="form-control" name="numero_hermanos">
+                            <input required type="number" class="form-control" name="numero_hermanos">
                         </div>
                 
                         <div class="col-md-6">
                             <label class="form-label">Lugar que ocupa</label>
-                            <input type="number" class="form-control" name="lugar_ocupa">
+                            <input required type="number" class="form-control" name="lugar_ocupa">
                         </div>
                         <!-- Apoyos -->
                         <div class="col-12">
                             <label class="form-label">
                                 ¿Quiénes apoyan la crianza del estudiante?
                             </label>
-                            <textarea class="form-control" rows="3"
+                            <textarea required class="form-control" rows="3"
                                 name="apoyo_crianza"></textarea>
                         </div>
                         <div class="col-12">
                             <label class="form-label">
                                 Personas con quien vive
                             </label>
-                            <textarea class="form-control" rows="3"
+                            <textarea required class="form-control" rows="3"
                                 name="personas_con_quien_vive"></textarea>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
+        </div>
 
-            {{-- PASO 4: Entorno Educativo --}}
-            <div class="piar-pane card-item" data-pane="4">
-                <div class="piar-pane-title">
-                    <div class="piar-pane-icon" style="background:#F5F3FF;color:#7C3AED">
-                        <i class="fas fa-school"></i>
-                    </div>
-                    <div>
-                        <h3>Entorno Educativo</h3>
-                        <p>Por favor, complete los siguientes datos para el entorno educativo del estudiante</p>
-                    </div>
+        {{-- PASO 4: Entorno Educativo --}}
+        <div class="piar-pane card-item" data-pane="4">
+            <div class="piar-pane-title">
+                <div class="piar-pane-icon" style="background:#F5F3FF;color:#7C3AED">
+                    <i class="fas fa-school"></i>
                 </div>
+                <div>
+                    <h3>Entorno Educativo</h3>
+                    <p>Por favor, complete los siguientes datos para el entorno educativo del estudiante</p>
+                </div>
+            </div>
+            <form id="form-paso-4">
+                @csrf
+                <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
+                <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
                 <div class="row g-3">
                     <!-- Vinculación previa -->
                     <div class="col-md-12">
                         <label class="form-label">
                             ¿Ha estado vinculado en otra institución educativa, fundación o bajo otra modalidadde educación?
                         </label>
-                        <select onchange="mostrarMotivo(this)" class="form-select" name="vinculado_otra_institucion">
+                        <select required onchange="mostrarMotivo(this)" class="form-select" name="vinculado_otra_institucion">
                             <option value="">Seleccione</option>
-                            <option>Si</option>
-                            <option>No</option>
+                            <option value="Si">Si</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
             
@@ -1185,7 +1208,7 @@
                     <!-- Último grado -->
                     <div class="col-md-6">
                         <label class="form-label">Último grado cursado</label>
-                        <select class="form-select" name="ultimo_grado">
+                        <select required class="form-select" name="ultimo_grado">
                             <option value="">Seleccione</option>
                             <option value="transicion">Transición</option>
                             <option value="preescolar">Preescolar</option>
@@ -1206,16 +1229,16 @@
                     <div class="col-md-6">
                         <label class="form-label">Estado del último grado cursado</label>
             
-                        <select class="form-select" name="estado_ultimo_grado">
+                        <select required class="form-select" name="estado_ultimo_grado">
                             <option value="">Seleccione</option>
-                            <option>Aprobado</option>
-                            <option>Sin terminar</option>
+                            <option value="Aprobado">Aprobado</option>
+                            <option value="Sin terminar">Sin terminar</option>
                         </select>
                     </div>
             
                     <div class="col-md-12">
                         <label class="form-label">Observaciones</label>
-                        <textarea class="form-control" rows="3" name="observaciones_estado"></textarea>
+                        <textarea required class="form-control" rows="3" name="observaciones_estado" required></textarea>
                     </div>
         
                     <!-- Informe pedagógico -->
@@ -1224,11 +1247,11 @@
                             ¿Se recibe informe pedagógico cualitativo o certificado que describa el proceso de desarrollo
                             y aprendizaje del estudiante y/o PIAR?
                         </label>
-                        <select class="form-select"
+                        <select required class="form-select"
                                 name="recibe_informe_pedagogico">
                             <option value="">Seleccione</option>
-                            <option>Si</option>
-                            <option>No</option>
+                            <option value="Si">Si</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
             
@@ -1236,7 +1259,7 @@
                         <label class="form-label">
                             ¿De qué institución o modalidad proviene el informe?
                         </label>
-                        <input type="text" class="form-control" name="institucion_informe">
+                        <input required type="text" class="form-control" name="institucion_informe">
                     </div>
                     <!-- Programas complementarios -->
                     <div class="col-md-4">
@@ -1244,38 +1267,42 @@
                             ¿Asiste actualmente a programas complementarios?
                         </label>
             
-                        <select class="form-select"
-                                name="programas_complementarios">
+                        <select onchange="colocarRequired('cuales_programas', this)" required class="form-select" name="programas_complementarios">
                             <option value="">Seleccione</option>
-                            <option>Si</option>
-                            <option>No</option>
+                            <option value="Si">Si</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
             
                     <div class="col-md-8 d-flex justify-content-end flex-column">
                         <label class="form-label">¿Cuáles?</label>
-                        <input type="text" class="form-control" name="cuales_programas">
+                        <input  type="text" class="form-control" id="cuales_programas" name="cuales_programas">
                     </div>
+                </div>
+            </form>
+        </div>
+
+        {{-- PASO 5: Valoración Pedagógica --}}
+        <div class="piar-pane card-item" data-pane="5">
+            <div class="piar-pane-title">
+                <div class="piar-pane-icon" style="background:#ECFDF5;color:#059669">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <h3>Valoración Pedagógica</h3>
+                    <p>Por favor, complete los siguientes datos para la valoración pedagógica del estudiante</p>
                 </div>
             </div>
 
-            {{-- PASO 5: Valoración Pedagógica --}}
-            <div class="piar-pane card-item" data-pane="5">
-                <div class="piar-pane-title">
-                    <div class="piar-pane-icon" style="background:#ECFDF5;color:#059669">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div>
-                        <h3>Valoración Pedagógica</h3>
-                        <p>Por favor, complete los siguientes datos para la valoración pedagógica del estudiante</p>
-                    </div>
-                </div>
+            <div class="piar-alert-info">
+                <i class="fas fa-info-circle mt-1"></i>
+                <span>Marque la respuesta correspondiente para cada aspecto. En la columna «¿Cuál? / Observación» describa los apoyos, ajustes o detalles relevantes cuando aplique.</span>
+            </div>
 
-                <div class="piar-alert-info">
-                    <i class="fas fa-info-circle mt-1"></i>
-                    <span>Marque la respuesta correspondiente para cada aspecto. En la columna «¿Cuál? / Observación» describa los apoyos, ajustes o detalles relevantes cuando aplique.</span>
-                </div>
-
+            <form id="form-paso-5">
+                @csrf
+                <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
+                <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
                 {{-- MOVILIDAD --}}
                 <div class="card no-border-radio">
                     <div class="card-header text-center"><strong>MOVILIDAD</strong></div>
@@ -1295,60 +1322,60 @@
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_apoyo_sistema"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_apoyo_sistema"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_apoyo_sistema" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_apoyo_sistema" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_apoyo_sistema_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_apoyo_sistema_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Requiere ajustes en el espacio físico y en el ambiente para favorecer su movilidad?</td>
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_ajustes_espacio"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_ajustes_espacio"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_ajustes_espacio" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_ajustes_espacio" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_ajustes_espacio_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_ajustes_espacio_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Se necesitan ajustes para la movilidad?</td>
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_ajustes_movilidad"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_ajustes_movilidad"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_ajustes_movilidad" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_ajustes_movilidad" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_ajustes_movilidad_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_ajustes_movilidad_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Requiere apoyos para favorecer su motricidad fina? <small class="text-muted">(no es movilidad)</small></td>
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_motricidad_fina"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_motricidad_fina"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_motricidad_fina" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_motricidad_fina" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_motricidad_fina_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_motricidad_fina_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Requiere alguna adaptación para agarrar objetos?</td>
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_adaptacion_agarrar"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_adaptacion_agarrar"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_mov_adaptacion_agarrar" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_mov_adaptacion_agarrar" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_adaptacion_agarrar_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_adaptacion_agarrar_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1358,7 +1385,7 @@
                             <div class="piar-intensidad-group">
                                 @foreach (['ninguno' => 'Ninguno', 'intermitente' => 'Intermitente', 'extenso' => 'Extenso', 'generalizado' => 'Generalizado', 'no_aplica' => 'No aplica'] as $val => $label)
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="vp_mov_intensidad" id="vp_mov_intensidad_{{ $val }}" value="{{ $val }}">
+                                        <input class="form-check-input" type="radio" name="vp_mov_intensidad" id="vp_mov_intensidad_{{ $val }}" value="{{ $val }}" required>
                                         <label class="form-check-label" for="vp_mov_intensidad_{{ $val }}">{{ $label }}</label>
                                     </div>
                                 @endforeach
@@ -1385,36 +1412,36 @@
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_com_apoyo_sistema"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_com_apoyo_sistema"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_com_apoyo_sistema" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_com_apoyo_sistema" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_com_apoyo_sistema_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_com_apoyo_sistema_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Cuenta con los aditamentos de apoyo a la comunicación?</td>
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_com_aditamentos"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_com_aditamentos"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_com_aditamentos" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_com_aditamentos" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_com_aditamentos_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_com_aditamentos_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Se necesitan ajustes para garantizar la comunicación?</td>
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_com_ajustes"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_com_ajustes"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_com_ajustes" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_com_ajustes" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_com_ajustes_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_com_ajustes_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1424,7 +1451,7 @@
                             <div class="piar-intensidad-group">
                                 @foreach (['ninguno' => 'Ninguno', 'intermitente' => 'Intermitente', 'extenso' => 'Extenso', 'generalizado' => 'Generalizado', 'no_aplica' => 'No aplica'] as $val => $label)
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="vp_com_intensidad" id="vp_com_intensidad_{{ $val }}" value="{{ $val }}">
+                                        <input class="form-check-input" type="radio" name="vp_com_intensidad" id="vp_com_intensidad_{{ $val }}" value="{{ $val }}" required>
                                         <label class="form-check-label" for="vp_com_intensidad_{{ $val }}">{{ $label }}</label>
                                     </div>
                                 @endforeach
@@ -1451,24 +1478,24 @@
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_info_apoyo_sistema"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_info_apoyo_sistema"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_info_apoyo_sistema" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_info_apoyo_sistema" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_info_apoyo_sistema_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_info_apoyo_sistema_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Se necesitan ajustes para garantizar el acceso a la información?</td>
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_info_ajustes"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_info_ajustes"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_info_ajustes" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_info_ajustes" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_info_ajustes_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_info_ajustes_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1478,7 +1505,7 @@
                             <div class="piar-intensidad-group">
                                 @foreach (['ninguno' => 'Ninguno', 'intermitente' => 'Intermitente', 'extenso' => 'Extenso', 'generalizado' => 'Generalizado', 'no_aplica' => 'No aplica'] as $val => $label)
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="vp_info_intensidad" id="vp_info_intensidad_{{ $val }}" value="{{ $val }}">
+                                        <input class="form-check-input" type="radio" name="vp_info_intensidad" id="vp_info_intensidad_{{ $val }}" value="{{ $val }}" required>
                                         <label class="form-check-label" for="vp_info_intensidad_{{ $val }}">{{ $label }}</label>
                                     </div>
                                 @endforeach
@@ -1505,24 +1532,24 @@
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_soc_apoyo_regulacion"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_soc_apoyo_regulacion"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_soc_apoyo_regulacion" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_soc_apoyo_regulacion" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_soc_apoyo_regulacion_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_soc_apoyo_regulacion_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Se necesitan ajustes para garantizar la interacción con sus pares y maestros?</td>
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_soc_ajustes_interaccion"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_soc_ajustes_interaccion"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_soc_ajustes_interaccion" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_soc_ajustes_interaccion" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_soc_ajustes_interaccion_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_soc_ajustes_interaccion_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1532,7 +1559,7 @@
                             <div class="piar-intensidad-group">
                                 @foreach (['ninguno' => 'Ninguno', 'intermitente' => 'Intermitente', 'extenso' => 'Extenso', 'generalizado' => 'Generalizado', 'no_aplica' => 'No aplica'] as $val => $label)
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="vp_soc_intensidad" id="vp_soc_intensidad_{{ $val }}" value="{{ $val }}">
+                                        <input class="form-check-input" type="radio" name="vp_soc_intensidad" id="vp_soc_intensidad_{{ $val }}" value="{{ $val }}" required>
                                         <label class="form-check-label" for="vp_soc_intensidad_{{ $val }}">{{ $label }}</label>
                                     </div>
                                 @endforeach
@@ -1564,24 +1591,24 @@
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_acad_ajustes_permanencia"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_acad_ajustes_permanencia"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_acad_ajustes_permanencia" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_acad_ajustes_permanencia" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_acad_ajustes_permanencia_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_acad_ajustes_permanencia_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Requiere ajustes en los tiempos dedicados a una actividad?</td>
                                         <td>
                                             <table class="table table-no-border piar-valoracion-table mb-0">
                                                 <tr>
-                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_acad_ajustes_tiempos"> Si</td>
-                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_acad_ajustes_tiempos"> No</td>
+                                                    <td><input type="radio" value="Si" class="form-check-input" name="vp_acad_ajustes_tiempos" required> Si</td>
+                                                    <td><input type="radio" value="No" class="form-check-input" name="vp_acad_ajustes_tiempos" required> No</td>
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_acad_ajustes_tiempos_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_acad_ajustes_tiempos_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1591,7 +1618,7 @@
                             <div class="piar-intensidad-group">
                                 @foreach (['ninguno' => 'Ninguno', 'intermitente' => 'Intermitente', 'extenso' => 'Extenso', 'generalizado' => 'Generalizado', 'no_aplica' => 'No aplica'] as $val => $label)
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="vp_acad_intensidad" id="vp_acad_intensidad_{{ $val }}" value="{{ $val }}">
+                                        <input class="form-check-input" type="radio" name="vp_acad_intensidad" id="vp_acad_intensidad_{{ $val }}" value="{{ $val }}" required>
                                         <label class="form-check-label" for="vp_acad_intensidad_{{ $val }}">{{ $label }}</label>
                                     </div>
                                 @endforeach
@@ -1603,7 +1630,7 @@
                 <div class="card no-border-radio">
                     <div class="card-header"><strong>OBSERVACIONES</strong></div>
                     <div class="card-body">
-                        <textarea class="form-control" rows="4" name="vp_observaciones" placeholder="Registre observaciones adicionales sobre la valoración pedagógica"></textarea>
+                        <textarea required class="form-control" rows="4" name="vp_observaciones" placeholder="Registre observaciones adicionales sobre la valoración pedagógica"></textarea>
                     </div>
                 </div>
 
@@ -1721,12 +1748,12 @@
                                             <td>
                                                 <table class="table table-no-border piar-valoracion-table mb-0">
                                                     <tr>
-                                                        <td><input type="radio" value="Si" class="form-check-input" name="cle_{{ $i + 1 }}"> Si</td>
-                                                        <td><input type="radio" value="No" class="form-check-input" name="cle_{{ $i + 1 }}"> No</td>
+                                                        <td><input type="radio" value="Si" class="form-check-input" name="cle_{{ $i + 1 }}" required> Si</td>
+                                                        <td><input type="radio" value="No" class="form-check-input" name="cle_{{ $i + 1 }}" required> No</td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="cle_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="cle_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1734,7 +1761,7 @@
                         </div>
                         <div class="p-3 border-top">
                             <label class="form-label">Observaciones</label>
-                            <textarea class="form-control" rows="3" name="cle_observaciones"></textarea>
+                            <textarea class="form-control" rows="3" name="cle_observaciones" required></textarea>
                         </div>
                     </div>
                 </div>
@@ -1757,19 +1784,19 @@
                                         <tr>
                                             <td class="text-center">{{ $i + 1 }}</td>
                                             @if ($texto === 'num_rango')
-                                                <td>Identifica los números del <input type="text" class="form-control form-control-sm d-inline-block" style="width:70px" name="clm_5_desde"> al <input type="text" class="form-control form-control-sm d-inline-block" style="width:70px" name="clm_5_hasta"></td>
+                                                <td>Identifica los números del <input type="text" class="form-control form-control-sm d-inline-block" style="width:70px" name="clm_5_desde" required> al <input type="text" class="form-control form-control-sm d-inline-block" style="width:70px" name="clm_5_hasta" required></td>
                                             @else
                                                 <td>{{ $texto }}</td>
                                             @endif
                                             <td>
                                                 <table class="table table-no-border piar-valoracion-table mb-0">
                                                     <tr>
-                                                        <td><input type="radio" value="Si" class="form-check-input" name="clm_{{ $i + 1 }}"> Si</td>
-                                                        <td><input type="radio" value="No" class="form-check-input" name="clm_{{ $i + 1 }}"> No</td>
+                                                        <td><input type="radio" value="Si" class="form-check-input" name="clm_{{ $i + 1 }}" required> Si</td>
+                                                        <td><input type="radio" value="No" class="form-check-input" name="clm_{{ $i + 1 }}" required> No</td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="clm_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="clm_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1777,7 +1804,7 @@
                         </div>
                         <div class="p-3 border-top">
                             <label class="form-label">Observaciones</label>
-                            <textarea class="form-control" rows="3" name="clm_observaciones"></textarea>
+                            <textarea class="form-control" rows="3" name="clm_observaciones" required></textarea>
                         </div>
                     </div>
                 </div>
@@ -1806,12 +1833,12 @@
                                             <td>
                                                 <table class="table table-no-border piar-valoracion-table mb-0">
                                                     <tr>
-                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_mem_{{ $i + 1 }}"> Si</td>
-                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_mem_{{ $i + 1 }}"> No</td>
+                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_mem_{{ $i + 1 }}" required> Si</td>
+                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_mem_{{ $i + 1 }}" required> No</td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="dba_mem_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="dba_mem_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1841,14 +1868,15 @@
                                             <td>
                                                 <table class="table table-no-border piar-valoracion-table mb-0">
                                                     <tr>
-                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_ate_{{ $i + 1 }}"> Si</td>
-                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_ate_{{ $i + 1 }}"> No</td>
+                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_ate_{{ $i + 1 }}" required> Si</td>
+                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_ate_{{ $i + 1 }}" required> No</td>
                                                     </tr>
                                                 </table>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control form-control-sm" name="dba_ate_{{ $i + 1 }}_obs"
-                                                    @if($texto === 'ate_tiempo') placeholder="Especifique tiempo (5, 10, 15 o más de 20 minutos)" @endif>
+                                                <textarea class="auto-grow form-control" name="dba_ate_{{ $i + 1 }}_obs"
+                                                    @if($texto === 'ate_tiempo') placeholder="Especifique tiempo (5, 10, 15 o más de 20 minutos)" required @endif>
+                                                </textarea>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -1875,12 +1903,12 @@
                                             <td>
                                                 <table class="table table-no-border piar-valoracion-table mb-0">
                                                     <tr>
-                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_per_{{ $i + 1 }}"> Si</td>
-                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_per_{{ $i + 1 }}"> No</td>
+                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_per_{{ $i + 1 }}" required> Si</td>
+                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_per_{{ $i + 1 }}" required> No</td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="dba_per_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="dba_per_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1909,12 +1937,12 @@
                                             <td>
                                                 <table class="table table-no-border piar-valoracion-table mb-0">
                                                     <tr>
-                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_fe_{{ $i + 1 }}"> Si</td>
-                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_fe_{{ $i + 1 }}"> No</td>
+                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_fe_{{ $i + 1 }}" required> Si</td>
+                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_fe_{{ $i + 1 }}" required> No</td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="dba_fe_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="dba_fe_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1940,12 +1968,12 @@
                                             <td>
                                                 <table class="table table-no-border piar-valoracion-table mb-0">
                                                     <tr>
-                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_lc_{{ $i + 1 }}"> Si</td>
-                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_lc_{{ $i + 1 }}"> No</td>
+                                                        <td><input type="radio" value="Si" class="form-check-input" name="dba_lc_{{ $i + 1 }}" required> Si</td>
+                                                        <td><input type="radio" value="No" class="form-check-input" name="dba_lc_{{ $i + 1 }}" required> No</td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="dba_lc_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="dba_lc_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1962,7 +1990,7 @@
                             diferentes áreas de desarrollo, resaltando sus fortalezas, capacidades y potencial de aprendizaje. Esta información orienta
                             la implementación de estrategias pedagógicas y apoyos que favorezcan su proceso educativo y participación en el aula.
                         </p>
-                        <textarea class="form-control" rows="6" name="habilidades_destrezas" placeholder="Describa las habilidades y destrezas del estudiante"></textarea>
+                        <textarea required class="auto-grow form-control" rows="6" name="habilidades_destrezas" placeholder="Describa las habilidades y destrezas del estudiante"></textarea>
                     </div>
                 </div>
                 {{-- ESTRATEGIAS Y/O ACCIONES A DESARROLLAR CON EL ESTUDIANTE --}}
@@ -1974,22 +2002,27 @@
                             fortalecer sus procesos académicos, sociales, comunicativos y comportamentales. Estas acciones buscan responder a sus
                             necesidades educativas y potenciar sus habilidades, favoreciendo su participación activa y aprendizaje significativo.
                         </p>
-                        <textarea class="form-control" rows="6" name="estrategias_acciones" placeholder="Describa las estrategias y acciones a desarrollar con el estudiante"></textarea>
+                        <textarea required class="auto-grow form-control" rows="6" name="estrategias_acciones" placeholder="Describa las estrategias y acciones a desarrollar con el estudiante"></textarea>
                     </div>
+                </div>
+            </form>
+        </div>
+
+        {{-- PASO 6: Ajustes Razonables --}}
+        <div class="piar-pane card-item" data-pane="6">
+            <div class="piar-pane-title">
+                <div class="piar-pane-icon" style="background:#ECFDF5;color:#059669">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div>
+                    <h3>AJUSTES RAZONABLES</h3>
+                    <p>Por favor, complete los siguientes datos para los ajustes razonables del estudiante</p>
                 </div>
             </div>
-
-            {{-- PASO 6: Ajustes Razonables --}}
-            <div class="piar-pane card-item" data-pane="6">
-                <div class="piar-pane-title">
-                    <div class="piar-pane-icon" style="background:#ECFDF5;color:#059669">
-                        <i class="fas fa-cogs"></i>
-                    </div>
-                    <div>
-                        <h3>AJUSTES RAZONABLES</h3>
-                        <p>Por favor, complete los siguientes datos para los ajustes razonables del estudiante</p>
-                    </div>
-                </div>
+            <form id="form-paso-6">
+                @csrf
+                <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
+                <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
                 <div style="margin-right: 20px;">
                     <table class="table table-bordered piar-valoracion-table mb-0">
                         <thead>
@@ -2066,22 +2099,22 @@
                         <tbody id="ajustes_container">
                             <tr id="ajuste_1">
                                 <td>
-                                    <input type="text" class="form-control" name="ajuste_1_area">
+                                    <input type="text" class="form-control" name="ajuste_razonable[0][area]" required>
                                 </td>
                                 <td>
-                                    <textarea rows="3" class="form-control auto-grow" name="ajuste_barrera[]"></textarea>
+                                    <textarea rows="3" class="form-control auto-grow" name="ajuste_razonable[0][barrera]" required></textarea>
                                 </td>   
                                 <td>
-                                    <textarea rows="3" class="form-control auto-grow" name="ajuste_tipo[]"></textarea>
+                                    <textarea rows="3" class="form-control auto-grow" name="ajuste_razonable[0][tipo]" required></textarea>
                                 </td>
                                 <td>
-                                    <textarea rows="3" class="form-control auto-grow" name="ajuste_apoyo[]"></textarea>
+                                    <textarea rows="3" class="form-control auto-grow" name="ajuste_razonable[0][apoyo]" required></textarea>
                                 </td>
                                 <td>
-                                    <textarea rows="3" class="form-control auto-grow" name="ajuste_descripcion[]"></textarea>
+                                    <textarea rows="3" class="form-control auto-grow" name="ajuste_razonable[0][descripcion]" required></textarea>
                                 </td>
                                 <td>
-                                    <textarea rows="3" class="form-control auto-grow" style="resize: none; overflow: hidden;" name="ajuste_seguimiento[]"></textarea>
+                                    <textarea rows="3" class="form-control auto-grow" style="resize: none; overflow: hidden;" name="ajuste_razonable[0][seguimiento]" required></textarea>
                                 </td>
                             </tr>
                         </tbody>
@@ -2096,14 +2129,20 @@
                         <table class="table table-bordered piar-valoracion-table mb-0">
                             <thead>
                                 <tr><th>Nombre Docente</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_nombre_ar[]"></td></tr>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex justify-content-between align-items-center gap-2">
+                                            <input type="hidden" name="docente_firma[0][id]" id="docente_firma_id_1" value="">
+                                            <input type="text" readonly class="form-control" name="docente_firma[0][nombre]" id="docente_firma_nombre_1" required>
+                                            <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente(1)"><i class="fas fa-search"></i> Buscar</button>
+                                        </div>
+                                    </td>
+                                </tr>
                                 <tr><th>Área</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_area_ar[]"></td></tr>
+                                <tr><td><input type="text" class="form-control" name="docente_firma[0][area]" required></td></tr>
                                 <tr><th>Firma</th></tr>
                                 <tr>
                                     <td class="d-flex justify-content-between align-items-center gap-2">
-                                        <input onchange="previewFirma('input_firma_docente_1', 'img_firma_docente_1')" id="input_firma_docente_1" type="file" style="display: none;" class="form-control" name="docente_firma_ar[]" accept="image/*">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarFirma('input_firma_docente_1')"><i class="fas fa-plus"></i> Añadir firma</button>
                                         <img id="img_firma_docente_1" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
                                     </td>
                                 </tr>
@@ -2111,20 +2150,25 @@
                         </table>
                     </div>
                 </div>
-                <div class="row mt-3" id="div_docentes">
+                <div class="row mt-3" id="div_docentes_2">
                     <div class="col-md-4 pt-3" id="div_docente_1">
                         <table class="table table-bordered piar-valoracion-table mb-0">
                             <thead>
-                                <tr><th>Nombre docente orientador</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_orientador_nombre_ar"></td></tr>
+                                <tr>
+                                    <th>Nombre docente orientador</th></tr>
+                                <tr>
+                                    <td class="d-flex justify-content-between align-items-center gap-2">
+                                        <input type="hidden" name="docente_orientador_id" id="docente_orientador_id" value="">
+                                        <input type="text" readonly class="form-control" name="docente_orientador_nombre" id="docente_orientador_nombre" required>
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente('orientador')"><i class="fas fa-search"></i> Buscar</button>
+                                    </td>
+                                </tr>
                                 <tr><th>Área</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_orientador_area_ar"></td></tr>
+                                <tr><td><input type="text" class="form-control" name="docente_orientador_area" id="docente_orientador_area" required></td></tr>
                                 <tr><th>Firma</th></tr>
                                 <tr>
                                     <td class="d-flex justify-content-between align-items-center gap-2">
-                                        <input onchange="previewFirma('input_firma_docente_orientador', 'img_firma_docente_orientador')" id="input_firma_docente_orientador" type="file" style="display: none;" class="form-control" name="docente_orientador_firma_ar[]" accept="image/*">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarFirma('input_firma_docente_orientador')"><i class="fas fa-plus"></i> Añadir firma</button>
-                                        <img id="img_firma_docente_orientador" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
+                                        <img id="docente_orientador_firma" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
                                     </td>
                                 </tr>
                             </thead>
@@ -2134,15 +2178,19 @@
                         <table class="table table-bordered piar-valoracion-table mb-0">
                             <thead>
                                 <tr><th>Nombre docente de apoyo pedagógico</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_apoyo_pedagogico_nombre_ar"></td></tr>
+                                <tr>
+                                    <td class="d-flex justify-content-between align-items-center gap-2">
+                                        <input type="hidden" name="docente_apoyo_pedagogico_id" id="docente_apoyo_pedagogico_id" value="">
+                                        <input type="text" readonly class="form-control" name="docente_apoyo_pedagogico_nombre" id="docente_apoyo_pedagogico_nombre" required>
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente('apoyo_pedagogico')"><i class="fas fa-search"></i> Buscar</button>
+                                    </td>
+                                </tr>
                                 <tr><th>Área</th></tr>
-                                <tr><td><input type="text" class="form-control" name="docente_apoyo_pedagogico_area_ar"></td></tr>
+                                <tr><td><input type="text" class="form-control" name="docente_apoyo_pedagogico_area" id="docente_apoyo_pedagogico_area" required></td></tr>
                                 <tr><th>Firma</th></tr>
                                 <tr>
                                     <td class="d-flex justify-content-between align-items-center gap-2">
-                                        <input onchange="previewFirma('input_firma_docente_apoyo_pedagogico', 'img_firma_docente_apoyo_pedagogico')" id="input_firma_docente_apoyo_pedagogico" type="file" style="display: none;" class="form-control" name="docente_apoyo_pedagogico_firma_ar[]" accept="image/*">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarFirma('input_firma_docente_apoyo_pedagogico')"><i class="fas fa-plus"></i> Añadir firma</button>
-                                        <img id="img_firma_docente_apoyo_pedagogico" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
+                                        <img id="docente_apoyo_pedagogico_firma" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
                                     </td>
                                 </tr>
                             </thead>
@@ -2152,120 +2200,129 @@
                         <table class="table table-bordered piar-valoracion-table mb-0">
                             <thead>
                                 <tr><th>Nombre coordinador pedagógico</th></tr>
-                                <tr><td><input type="text" class="form-control" name="coordinador_pedagogico_nombre_ar"></td></tr>
+                                <tr>
+                                    <td class="d-flex justify-content-between align-items-center gap-2">
+                                        <input type="hidden" name="docente_coordinador_pedagogico_id" id="docente_coordinador_pedagogico_id" value="">
+                                        <input type="text" readonly class="form-control" name="docente_coordinador_pedagogico_nombre" id="docente_coordinador_pedagogico_nombre" required>
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="buscarDocente('coordinador_pedagogico')"><i class="fas fa-search"></i> Buscar</button>
+                                    </td>
+                                </tr>
                                 <tr><th>Área</th></tr>
-                                <tr><td><input type="text" class="form-control" name="coordinador_pedagogico_area_ar"></td></tr>
+                                <tr><td><input type="text" class="form-control" name="docente_coordinador_pedagogico_area" id="docente_coordinador_pedagogico_area" required></td></tr>
                                 <tr><th>Firma</th></tr>
                                 <tr>
                                     <td class="d-flex justify-content-between align-items-center gap-2">
-                                        <input onchange="previewFirma('input_firma_coordinador_pedagogico', 'img_firma_coordinador_pedagogico')" id="input_firma_coordinador_pedagogico" type="file" style="display: none;" class="form-control" name="coordinador_pedagogico_firma_ar[]" accept="image/*">
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="agregarFirma('input_firma_coordinador_pedagogico')"><i class="fas fa-plus"></i> Añadir firma</button>
-                                        <img id="img_firma_coordinador_pedagogico" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
+                                        <img id="docente_coordinador_pedagogico_firma" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
                                     </td>
                                 </tr>
                             </thead>
                         </table>
                     </div>
                 </div>
+            </form>
+        </div>
+
+        {{-- PASO 7: Acta de acuerdo --}}
+        <div class="piar-pane card-item" data-pane="7">
+            <div class="piar-pane-title">
+                <div class="piar-pane-icon" style="background:#ECFDF5;color:#059669">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div>
+                    <h3>ACTA DE ACUERDO</h3>
+                    <p>Por favor, complete los siguientes datos para la acta de acuerdo del estudiante</p>
+                </div>
             </div>
 
-            {{-- PASO 7: Acta de acuerdo --}}
-            <div class="piar-pane card-item" data-pane="7">
-                <div class="piar-pane-title">
-                    <div class="piar-pane-icon" style="background:#ECFDF5;color:#059669">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div>
-                        <h3>ACTA DE ACUERDO</h3>
-                        <p>Por favor, complete los siguientes datos para la acta de acuerdo del estudiante</p>
-                    </div>
-                </div>
-
-                {{-- Datos administrativos --}}
-                <div class="card mb-3">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-bordered piar-valoracion-table piar-acta-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th colspan="2" class="piar-acta-title text-center">Acta de acuerdo</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Fecha y lugar de diligenciamiento</td>
-                                        <td>
-                                            <div class="row g-2">
-                                                <div class="col-md-4">
-                                                    <input type="date" class="form-control form-control-sm" name="acta_fecha" value="{{ date('Y-m-d') }}">
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <input type="text" class="form-control form-control-sm" name="acta_lugar" placeholder="Lugar de diligenciamiento">
-                                                </div>
+            {{-- Datos administrativos --}}
+            <div class="card mb-3">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered piar-valoracion-table piar-acta-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th colspan="2" class="piar-acta-title text-center">Acta de acuerdo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Fecha y lugar de diligenciamiento</td>
+                                    <td>
+                                        <div class="row g-2">
+                                            <div class="col-md-4">
+                                                <input readonly type="date" class="form-control form-control-sm" name="acta_fecha" value="{{ date('Y-m-d') }}">
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Nombre y rol de la persona que diligencia</td>
-                                        <td><input type="text" class="form-control form-control-sm" name="acta_persona_diligencia"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Institución educativa</td>
-                                        <td><input type="text" class="form-control form-control-sm" name="acta_institucion"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Sede</td>
-                                        <td><input type="text" class="form-control form-control-sm" name="acta_sede"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                            <div class="col-md-8">
+                                                <input readonly type="text" class="form-control form-control-sm" name="acta_lugar" placeholder="Lugar de diligenciamiento">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Nombre y rol de la persona que diligencia</td>
+                                    <td><input readonly value="{{ $docente_diligencia?->nombre . ' ' . $docente_diligencia?->apellido . ' - ' . $docente_diligencia?->rol }}" type="text" class="form-control form-control-sm" name="acta_persona_diligencia"></td>
+                                </tr>
+                                <tr>
+                                    <td>Institución educativa</td>
+                                    <td><input readonly type="text" class="form-control form-control-sm" name="acta_institucion"></td>
+                                </tr>
+                                <tr>
+                                    <td>Sede</td>
+                                    <td><input type="text" readonly class="form-control form-control-sm" name="acta_sede"></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                {{-- Datos del estudiante --}}
-                <div class="card mb-3">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-bordered piar-valoracion-table piar-acta-table mb-0">
-                                <tbody>
-                                    <tr>
-                                        <td style="width:12%">Nombre</td>
-                                        <td><input type="text" class="form-control form-control-sm" name="acta_estudiante_nombre"></td>
-                                        <td style="width:8%">Edad</td>
-                                        <td style="width:12%"><input type="number" class="form-control form-control-sm" name="acta_estudiante_edad"></td>
-                                        <td style="width:10%">Grado</td>
-                                        <td style="width:15%"><input type="text" class="form-control form-control-sm" name="acta_estudiante_grado"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+            {{-- Datos del estudiante --}}
+            <div class="card mb-3">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered piar-valoracion-table piar-acta-table mb-0">
+                            <tbody>
+                                <tr>
+                                    <td style="width:12%">Nombre</td>
+                                    <td><input readonly value="{{ $estudiante?->nombre . ' ' . $estudiante?->apellido }}" type="text" class="form-control form-control-sm" name="acta_estudiante_nombre"></td>
+                                    <td style="width:8%">Edad</td>
+                                    <td style="width:12%"><input readonly value="{{ $estudiante?->edad }}" type="number" class="form-control form-control-sm" name="acta_estudiante_edad"></td>
+                                    <td style="width:10%">Grado</td>
+                                    <td style="width:15%"><input readonly value="{{ $estudiante?->grado?->nombre }}" type="text" class="form-control form-control-sm" name="acta_estudiante_grado"></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                {{-- Texto introductorio --}}
-                <div class="piar-acta-texto mb-4">
-                    <p>
-                        Según el Decreto 1421 de 2017 la educación inclusiva es un proceso permanente que reconoce, valora y responde a la diversidad de características, intereses, posibilidades y expectativas de los estudiantes para promover su desarrollo, aprendizaje y participación, en un ambiente de aprendizaje común, sin discriminación o exclusión.
-                    </p>
-                    <p>
-                        La inclusión solo es posible cuando se unen los esfuerzos del colegio, el estudiante, docentes, directivos docentes y familias. De ahí la importancia de formalizar con las firmas, la presente Acta de Acuerdo.
-                    </p>
-                    <p>
-                        <strong>El Establecimiento Educativo</strong> ha realizado la valoración pedagógica y definido los ajustes razonables que facilitarán al estudiante su proceso educativo.
-                    </p>
-                    <p>
-                        <strong>La Familia se compromete</strong> a cumplir y firmar los compromisos señalados en el PIAR y en las actas de acuerdo, para fortalecer los procesos escolares del estudiante y en particular a:
-                    </p>
-                </div>
+            {{-- Texto introductorio --}}
+            <div class="piar-acta-texto mb-4">
+                <p>
+                    Según el Decreto 1421 de 2017 la educación inclusiva es un proceso permanente que reconoce, valora y responde a la diversidad de características, intereses, posibilidades y expectativas de los estudiantes para promover su desarrollo, aprendizaje y participación, en un ambiente de aprendizaje común, sin discriminación o exclusión.
+                </p>
+                <p>
+                    La inclusión solo es posible cuando se unen los esfuerzos del colegio, el estudiante, docentes, directivos docentes y familias. De ahí la importancia de formalizar con las firmas, la presente Acta de Acuerdo.
+                </p>
+                <p>
+                    <strong>El Establecimiento Educativo</strong> ha realizado la valoración pedagógica y definido los ajustes razonables que facilitarán al estudiante su proceso educativo.
+                </p>
+                <p>
+                    <strong>La Familia se compromete</strong> a cumplir y firmar los compromisos señalados en el PIAR y en las actas de acuerdo, para fortalecer los procesos escolares del estudiante y en particular a:
+                </p>
+            </div>
 
+            <form id="form-paso-7">
+                @csrf
+                <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
+                <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
                 {{-- Compromisos específicos --}}
                 <div class="card">
                     <div class="card-body">
                         <p class="text-muted small mb-2">
                             Incluya aquí los compromisos específicos para implementar en el aula que requieran ampliación o detalle adicional al incluido en el PIAR
                         </p>
-                        <textarea class="form-control" rows="8" name="acta_compromisos"></textarea>
+                        <textarea class="form-control" rows="8" name="compromisos" required></textarea>
                     </div>
                 </div>
 
@@ -2282,25 +2339,25 @@
                                 <th class="text-center">
                                     Frecuencia: D=Diaria, S=Semanal, P=Permanente
                                 </th>
-                                <th class="text-center">Acciones</th>
+                                <th class="text-center"></th>
                             </tr>
                         </thead>
                         <tbody id="actividades_container">
                             <tr id="actividad_1">
-                                <td><input type="text" class="form-control" name="actividad_nombre_1"></td>
-                                <td><input type="text" class="form-control" name="actividad_descripcion_1"></td>
+                                <td><textarea rows="3" class="form-control auto-grow" name="actividad[0][nombre]" required></textarea></td>
+                                <td><textarea rows="3" class="form-control auto-grow" name="actividad[0][descripcion]" required></textarea></td>
                                 <td style="width: 20%">
                                     <div class="d-flex justify-content-between align-items-center gap-2">
                                         <div class="frecuencia-radio">
-                                            <input type="radio" name="actividad_frecuencia_1" value="D">
+                                            <input type="radio" class="form-check-input" name="actividad[0][frecuencia]" value="D" required>
                                             <label class="form-check-label">D</label>
                                         </div>
                                         <div class="frecuencia-radio">
-                                            <input type="radio" name="actividad_frecuencia_1" value="S">
+                                            <input type="radio" class="form-check-input" name="actividad[0][frecuencia]" value="S" required>
                                             <label class="form-check-label">S</label>
                                         </div>
                                         <div class="frecuencia-radio">
-                                            <input type="radio" name="actividad_frecuencia_1" value="P">
+                                            <input type="radio" class="form-check-input" name="actividad[0][frecuencia]" value="P" required>
                                             <label class="form-check-label">P</label>
                                         </div>
                                     </div>
@@ -2311,338 +2368,78 @@
                         </tbody>
                     </table>
                 </div>
+            </form>
+        </div>
+
+
+        {{-- PASO 8: mensaje de confirmación --}}
+        <div class="piar-pane card-item" data-pane="8">
+                <div class="d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-check-circle fa-5x" style="color: #28a745;"></i>
+                    <br>
+                    <h3 class="text-success">PIAR diligenciado correctamente</h3>
+                    <p class="text-muted">Si desea generar el PDF, por favor, haga click en el botón de abajo.</p>
+                    <button type="button" class="btn btn-warning" onclick="generarPDF()"><i class="fas fa-file-pdf"></i> Generar PDF</button>
+                </div>
+        </div>
+    </div>
+
+    {{-- Footer navegación --}}
+    <div class="piar-footer">
+        <button type="button" class="btn btn-piar-outline" id="btnAnterior" style="visibility:hidden">
+            <i class="fas fa-chevron-left me-1"></i> Anterior
+        </button>
+        <span class="piar-step-counter">Paso <span id="contadorActual">1</span> de 7</span>
+        <button type="button" class="btn btn-piar-next" id="btnSiguiente">
+            Siguiente <i class="fas fa-chevron-right ms-1"></i>
+        </button>
+        <button type="submit" class="btn btn-piar-save" id="btnGuardar" style="display:none">
+            <i class="fas fa-save me-1"></i> Guardar PIAR
+        </button>
+    </div>
+</div>
+
+{{-- Modal buscar docente --}}
+<div class="modal fade" id="modal_buscar_docente" tabindex="-1" aria-labelledby="modal_buscar_docente_label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_buscar_docente_label">Buscar docente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-buscar-docente">
+                    @csrf
+                    <div class="form-group">
+                        <label for="nombre">Buscar por nombre o email</label>
+                        <input type="text" class="form-control" name="nombre" id="nombre">
+                    </div>
+                </form>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre(s)</th>
+                                <th>Apellido(s)</th>
+                                <th>Email</th>
+                                <th>Firma</th>
+                                <th style="text-align:center">Seleccionar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla_docentes">
+                           
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-
-        {{-- Footer navegación --}}
-        <div class="piar-footer">
-            <button type="button" class="btn btn-piar-outline" id="btnAnterior" style="visibility:hidden">
-                <i class="fas fa-chevron-left me-1"></i> Anterior
-            </button>
-            <span class="piar-step-counter">Paso <span id="contadorActual">1</span> de 7</span>
-            <button type="button" class="btn btn-piar-next" id="btnSiguiente">
-                Siguiente <i class="fas fa-chevron-right ms-1"></i>
-            </button>
-            <button type="submit" class="btn btn-piar-save" id="btnGuardar" style="display:none">
-                <i class="fas fa-save me-1"></i> Guardar PIAR
-            </button>
-        </div>
-    </form>
+    </div>
 </div>
 @endsection
-
 @push('scripts')
 <script>
-        (function () {
-            const TOTAL = 7;
-            let paso = 1;
-
-            const panes      = document.querySelectorAll('.piar-pane');
-            const steps      = document.querySelectorAll('.piar-step');
-            const progress   = document.getElementById('piarProgress');
-            const btnAnt     = document.getElementById('btnAnterior');
-            const btnSig     = document.getElementById('btnSiguiente');
-            const btnGuardar = document.getElementById('btnGuardar');
-            const contador   = document.getElementById('contadorActual');
-
-            function actualizarUI() {
-                panes.forEach(p => p.classList.toggle('active', +p.dataset.pane === paso));
-                steps.forEach(s => {
-                    const n = +s.dataset.step;
-                    s.classList.remove('active', 'completed');
-                    if (n === paso) s.classList.add('active');
-                    else if (n < paso) s.classList.add('completed');
-                });
-
-                const pct = ((paso - 1) / (TOTAL)) * 100 ;
-                progress.style.width = pct + '%';
-
-                contador.textContent = paso;
-                btnAnt.style.visibility = paso === 1 ? 'hidden' : 'visible';
-                btnSig.style.display    = paso === TOTAL ? 'none' : 'inline-block';
-                btnGuardar.style.display = paso === TOTAL ? 'inline-block' : 'none';
-
-            }
-
-            function validarPaso() {
-                const pane = document.querySelector(`.piar-pane[data-pane="${paso}"]`);
-                const campos = pane.querySelectorAll('[required]');
-                for (const c of campos) {
-                    if (!c.value.trim()) {
-                        c.focus();
-                        c.classList.add('is-invalid');
-                        mostrarToast('error', 'Complete los campos obligatorios antes de continuar.');
-                        return false;
-                    }
-                    c.classList.remove('is-invalid');
-                }
-                return true;
-            }
-
-            btnSig.addEventListener('click', () => {
-                if (!validarPaso()) return;
-                if (paso < TOTAL) { paso++; actualizarUI(); }
-            });
-
-            btnAnt.addEventListener('click', () => {
-                if (paso > 1) { paso--; actualizarUI(); }
-            });
-
-            /* Upload drag & drop */
-            const zona = document.getElementById('zonaUpload');
-            const inputFile = document.getElementById('archivo_adjunto');
-            const nombreArchivo = document.getElementById('nombreArchivo');
-
-            ['dragenter', 'dragover'].forEach(ev =>
-                zona.addEventListener(ev, e => { e.preventDefault(); zona.classList.add('dragover'); })
-            );
-            ['dragleave', 'drop'].forEach(ev =>
-                zona.addEventListener(ev, e => { e.preventDefault(); zona.classList.remove('dragover'); })
-            );
-            zona.addEventListener('drop', e => {
-                if (e.dataTransfer.files.length) {
-                    inputFile.files = e.dataTransfer.files;
-                    mostrarNombreArchivo(e.dataTransfer.files[0].name);
-                }
-            });
-            inputFile.addEventListener('change', () => {
-                if (inputFile.files.length) mostrarNombreArchivo(inputFile.files[0].name);
-            });
-
-            function mostrarNombreArchivo(nombre) {
-                nombreArchivo.textContent = '📎 ' + nombre;
-                nombreArchivo.style.display = 'block';
-            }
-
-            /* Submit */
-            document.getElementById('formPiar').addEventListener('submit', function (e) {
-                e.preventDefault();
-                mostrarToast('success', 'PIAR guardado correctamente.');
-            });
-
-            actualizarUI();
-        })();
+    const URL_PIAR = "{{ route('admin.piar') }}";
 </script>
 
-<script>
-    var atencion_medica_cuenta = 1;
-    var terapias_cuenta = 1;
-    var medicamentos_cuenta = 1;
-    var ajustes_cuenta = 1;
-    var firmas_docentes_cuenta = 1;
-    var actividades_cuenta = 1;
-
-    function agregarAtencionMedica() {
-        atencion_medica_cuenta++;
-        document.getElementById('atenciones_cuenta').insertAdjacentHTML('beforeend', 
-            `<div class="col-md-12 row pt-3" id="div_atencion_medica_${atencion_medica_cuenta}">
-                <div class="col-md-6">
-                    <label class="form-label">¿Cuál?</label>
-                    <input type="text" class="form-control" id="atencion_medica_${atencion_medica_cuenta}" name="atencion_medica[]">
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">Frecuencia</label>
-                    <input type="text" class="form-control" id="frecuencia_atencion_medica_${atencion_medica_cuenta}" name="frecuencia_atencion_medica[]">
-                </div>
-                <div class="col-md-1 d-flex justify-content-center align-items-end">
-                    <button type="button" class="btn btn-danger" onclick="eliminarAtencionMedica(${atencion_medica_cuenta})">-</button>
-                </div>
-            </div>`
-        );
-    }
-
-    function agregarTerapia() {
-        terapias_cuenta++;
-        document.getElementById('terapias_cuenta').insertAdjacentHTML('beforeend', 
-            `<div class="col-md-12 row pt-3" id="div_terapia_${terapias_cuenta}">
-                <div class="col-md-6">
-                    <label class="form-label">¿Cuál?</label>
-                    <input type="text" class="form-control" id="terapia_${terapias_cuenta}" name="terapia[]">
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">Frecuencia</label>
-                    <input type="text" class="form-control" id="frecuencia_terapia_${terapias_cuenta}" name="frecuencia_terapia[]">
-                </div>
-                <div class="col-md-1 d-flex justify-content-center align-items-end">
-                    <button type="button" class="btn btn-danger" onclick="eliminarTerapia(${terapias_cuenta})">-</button>
-                </div>
-            </div>`
-        );
-    }
-
-    function agregarMedicamento() {
-        medicamentos_cuenta++;
-        document.getElementById('medicamentos_cuenta').insertAdjacentHTML('beforeend', 
-            `<div class="col-md-12 row pt-3" id="div_medicamento_${medicamentos_cuenta}">
-                <div class="col-md-4">
-                    <label class="form-label">¿Cuál?</label>
-                    <input type="text" class="form-control" id="medicamento_${medicamentos_cuenta}" name="medicamento[]">
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Frecuencia</label>
-                    <input type="text" class="form-control" id="frecuencia_medicamento_${medicamentos_cuenta}" name="frecuencia_medicamento[]">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label">Horario</label>
-                    <input type="text" class="form-control" id="horario_medicamento_${medicamentos_cuenta}" name="horario_medicamento[]">
-                </div>
-                <div class="col-md-1 d-flex justify-content-center align-items-end">
-                    <button type="button" class="btn btn-danger" onclick="eliminarMedicamento(${medicamentos_cuenta})">-</button>
-                </div>
-            </div>`
-        );
-    }
-
-    function eliminarAtencionMedica(id) {
-        document.getElementById('div_atencion_medica_' + id).remove();
-        atencion_medica_cuenta--;
-    }
-
-    function eliminarTerapia(id) {
-        document.getElementById('div_terapia_' + id).remove();
-        terapias_cuenta--;
-    }
-
-    function eliminarMedicamento(id) {
-        document.getElementById('div_medicamento_' + id).remove();
-        medicamentos_cuenta--;
-    }
-
-    function mostrarMotivo(select) {
-        const valor = select.value;
-        if (valor === 'Si') {
-            document.getElementById('div_motivo_si_vinculado').style.display = 'block';
-            document.getElementById('div_motivo_no_vinculado').style.display = 'none';
-        } else {
-            document.getElementById('div_motivo_si_vinculado').style.display = 'none';
-            document.getElementById('div_motivo_no_vinculado').style.display = 'block';
-        }
-    }
-
-    /* Auto grow textarea */
-    function autoGrowTextarea() {
-        document.querySelectorAll('.auto-grow').forEach(textarea => {
-            const minHeight = textarea.scrollHeight;
-
-            function resize() {
-                textarea.style.height = 'auto';
-                textarea.style.height = Math.max(textarea.scrollHeight, minHeight) + 'px';
-            }
-
-            textarea.addEventListener('input', resize);
-            resize(); // Ajusta si ya tiene contenido al cargar la página
-        });
-    }
-
-    autoGrowTextarea();
-
-    function agregarAjuste() {
-        ajustes_cuenta++;
-        document.getElementById('ajustes_container').insertAdjacentHTML('beforeend', 
-            `<tr id="ajuste_${ajustes_cuenta}">
-                <td>
-                    <input type="text" class="form-control" name="ajuste_area[]">
-                </td>
-                <td>
-                    <textarea rows="3" class="form-control auto-grow" name="ajuste_barrera[]"></textarea>
-                </td>
-                <td>
-                    <textarea rows="3" class="form-control auto-grow" name="ajuste_tipo[]"></textarea>
-                </td>
-                <td>
-                    <textarea rows="3" class="form-control auto-grow" name="ajuste_apoyo[]"></textarea>
-                </td>
-                <td>
-                    <textarea rows="3" class="form-control auto-grow" name="ajuste_descripcion[]"></textarea>
-                </td>
-                <td style="position: relative;">
-                    <button  type="button" class="btn btn-danger btn-eliminar-ajuste btn-sm" onclick="eliminarAjuste(${ajustes_cuenta})">-</button>
-                    <textarea rows="3" class="form-control auto-grow" name="ajuste_seguimiento[]"></textarea>
-                </td>
-            </tr>`
-        );
-
-        autoGrowTextarea();
-    }
-
-    function eliminarAjuste(id) {
-        document.getElementById('ajuste_' + id).remove();
-        ajustes_cuenta--;
-    }
-
-    function agregarFirmaDocente() {
-        firmas_docentes_cuenta++;
-        document.getElementById('div_docentes').insertAdjacentHTML('beforeend', 
-            `<div class="col-md-4 pt-3" id="div_docente_${firmas_docentes_cuenta}">
-                <table class="table table-bordered piar-valoracion-table mb-0">
-                    <thead>
-                        <tr><th class="d-flex justify-content-between align-items-center">Nombre Docente <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFirmaDocente(${firmas_docentes_cuenta})"><i class="fas fa-trash"></i></button></th></tr>
-                        <tr><td><input type="text" class="form-control" name="docente_nombre_ar[]"></td></tr>
-                        <tr><th>Área</th></tr>
-                        <tr><td><input type="text" class="form-control" name="area_ar[]"></td></tr>
-                        <tr><th>Firma</th></tr>
-                        <tr>
-                            <td class="d-flex justify-content-between align-items-center gap-2">
-                                <input onchange="previewFirma('input_firma_docente_' + ${firmas_docentes_cuenta}, 'img_firma_docente_' + ${firmas_docentes_cuenta})" id="input_firma_docente_${firmas_docentes_cuenta}" type="file" style="display: none;" class="form-control" name="docente_firma_ar[]" accept="image/*">
-                                <button type="button" class="btn btn-primary btn-sm" onclick="agregarFirma('input_firma_docente_' + ${firmas_docentes_cuenta})"><i class="fas fa-plus"></i> Añadir firma</button>
-                                <img id="img_firma_docente_${firmas_docentes_cuenta}" class="firma-img" src="{{ asset('assets/images/firma.png') }}" alt="Firma" class="img-fluid">
-                            </td>
-                        </tr>
-                    </thead>
-                </table>
-            </div>`
-        );
-    }
-
-    function eliminarFirmaDocente(id) {
-        document.getElementById('div_docente_' + id).remove();
-        firmas_docentes_cuenta--;
-    }
-
-    function agregarFirma(id_input) {
-        const input = document.getElementById(id_input);
-        input.click();
-    }
-
-    function previewFirma(id_input, id_img) {
-        const input = document.getElementById(id_input);
-        const img = document.getElementById(id_img);
-        img.src = URL.createObjectURL(input.files[0]);
-    }
-
-    function agregarActividad() {
-        actividades_cuenta++;
-        document.getElementById('actividades_container').insertAdjacentHTML('beforeend', 
-            `<tr id="actividad_${actividades_cuenta}">
-                <td><input type="text" class="form-control" name="actividad_nombre_${actividades_cuenta}"></td>
-                <td><input type="text" class="form-control" name="actividad_descripcion_${actividades_cuenta}"></td>
-                    <td>
-                        <div class="d-flex justify-content-between align-items-center gap-2">
-                            <div class="frecuencia-radio">
-                                <input type="radio" name="actividad_frecuencia_${actividades_cuenta}" value="D">
-                                <label class="form-check-label">D</label>
-                            </div>
-                            <div class="frecuencia-radio">
-                                <input type="radio" name="actividad_frecuencia_${actividades_cuenta}" value="S">
-                                <label class="form-check-label">S</label>
-                            </div>
-                            <div class="frecuencia-radio">
-                                <input type="radio" name="actividad_frecuencia_${actividades_cuenta}" value="P">
-                                <label class="form-check-label">P</label>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td class="text-center">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarActividad(${actividades_cuenta})">-</button>
-                </td>
-            </tr>`
-        );
-    }
-
-    function eliminarActividad(id) {
-        document.getElementById('actividad_' + id).remove();
-        actividades_cuenta--;
-    }
-</script>
+<script src="{{ asset('assets/js/estudiantes/piar.js') }}"></script>
 @endpush

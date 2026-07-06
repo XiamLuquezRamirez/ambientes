@@ -13,8 +13,8 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('rol', ['admin', 'docente_lider', 'docente_auxiliar'])->default('docente_lider');
-            $table->boolean('estado')->default(true);
+            $table->enum('rol', ['Admin', 'Docente'])->default('Docente');
+            $table->enum('estado', ['activo', 'inactivo', 'eliminado'])->default('activo');
             $table->rememberToken();
             $table->timestamp('bloqueado_en')->nullable();
             $table->timestamps();

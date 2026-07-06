@@ -1,12 +1,12 @@
-<div class="modal fade" id="modalVerAccesos" tabindex="-1" data-bs-keyboard="false" aria-labelledby="modalVerAccesosLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl ">
+<div class="modal fade modal-app" id="modalVerAccesos" tabindex="-1" data-bs-keyboard="false"
+    aria-labelledby="modalVerAccesosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-header-icon"><i class="fa-solid fa-clock-rotate-left text-white"></i></div>
                 <div class="flex-grow-1">
                     <h5 class="modal-title mb-0" id="modalVerAccesosLabel">Historial de accesos</h5>
-                    <p class="modal-subtitle mb-0" id="modalVerAccesosSubtitle">Últimos 30 ingresos registrados</p>
+                    <p class="modal-subtitle mb-0" id="modalVerAccesosSubtitle"></p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
