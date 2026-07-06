@@ -5,8 +5,8 @@
 
 
 {{-- ── Modal Bootstrap 5 – Información de la Contraseña ──────────────────────── --}}
-<div class="modal fade" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="static"
-    aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
+<div class="modal fade modal-app" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false"
+    data-bs-backdrop="static" aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">

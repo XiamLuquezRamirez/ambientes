@@ -15,65 +15,90 @@
         </thead>
         <tbody>
             @forelse($usuarios as $u)
-                <tr id="fila-{{ $u->id }}">
-                    <td style="font-weight:600;color:#1E293B">
-                        {{ $u->nombre }}
-                    </td>
-                    <td style="font-weight:600;color:#1E293B">
-                        {{ $u->apellido }}
-                    </td>
-                    <td style="color:#64748B">{{ $u->email }}</td>
+                @if ($u->estado !== 'eliminado')
+                    <tr id="fila-{{ $u->id }}">
+                        <td style="font-weight:600;color:#1E293B">
+                            {{ $u->nombre }}
+                        </td>
+                        <td style="font-weight:600;color:#1E293B">
+                            {{ $u->apellido }}
+                        </td>
+                        <td style="color:#64748B">{{ $u->email }}</td>
 
-                    <td style="color:#64748B">{{ ucfirst($u->rol) }}</td>
+                        <td style="color:#64748B">{{ ucfirst($u->rol) }}</td>
 
-                    <td>
-                        {{ $u->ultimo_acceso ? date('d/m/Y H:i', strtotime($u->ultimo_acceso)) : '—' }}
-                    </td>
+                        <td>
+                            {{ $u->ultimo_acceso ? date('d/m/Y H:i', strtotime($u->ultimo_acceso)) : '—' }}
+                        </td>
 
-                    <td style="text-align:center">
-                        @if ($u->cuenta_sin_usar)
-                            <span class="badge badge-yellow" title="Nunca ha iniciado sesión">
-                                <i class="fa-solid fa-circle-exclamation"></i> Sin usar
-                            </span>
-                        @else
-                            <span style="color:#94A3B8">—</span>
-                        @endif
-                    </td>
-                    <td>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input toggle-activo" type="checkbox" data-id="{{ $u->id }}"
-                                data-nombre="{{ $u->nombre }}" style="cursor: pointer;"
-                                data-apellido="{{ $u->apellido }}" @checked($u->estado === 'activo')>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tabla-acciones" style="justify-content:center">
-
-                            <span data-bs-toggle="tooltip"
-                                title="{{ $u->rol === 'docente' ? 'Completar información' : 'Solo disponible para usuarios con rol docente' }}">
-
-                                <button class="btn btn-primary btn-sm" {{ $u->rol !== 'docente' ? 'disabled' : '' }}
-                                    onclick="abrirModalCompletarInfo('{{ $u->id }}')">
-                                    <i class="bi bi-info-circle-fill"></i>
-                                    Completar información
-                                </button>
-
-                            </span>
-                            <button class="btn-accion btn-editar" onclick="abrirModalEditar({{ $u->id }})"><i
-                                    class="fa-solid fa-pencil"></i>
-                                Editar</button>
-                            <button type="button" id="btn-eliminar" class="btn-accion btn-eliminar" title="Eliminar"
-                                data-id="{{ $u->id }}" data-nombre="{{ e($u->nombre) }}"
-                                data-apellido="{{ e($u->apellido) }}">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                            <button type="button" class="btn-accion btn-ver-accesos" title="Ver Accesos"
-                                onclick="abrirModalVerAccesos({{ $u->id }})"><i
-                                    class="fa-solid fa-clock-rotate-left"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                        <td style="text-align:center">
+                            @if ($u->cuenta_sin_usar)
+                                <span class="badge badge-yellow" title="Nunca ha iniciado sesión">
+                                    <i class="fa-solid fa-circle-exclamation"></i> Sin usar
+                                </span>
+                            @else
+                                <span style="color:#94A3B8">—</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input toggle-activo" type="checkbox"
+                                    data-id="{{ $u->id }}" data-nombre="{{ $u->nombre }}"
+                                    style="cursor: pointer;" data-apellido="{{ $u->apellido }}"
+                                    @checked($u->estado === 'activo')>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="tabla-acciones" style="justify-content:center">
+                                <div class="dropdown tabla-opciones-dropdown">
+                                    <button class="btn-accion btn-opciones-toggle dropdown-toggle" type="button"
+                                        id="dropdownMenuButton{{ $u->id }}" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        Opciones
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-acciones"
+                                        aria-labelledby="dropdownMenuButton{{ $u->id }}">
+                                        <li>
+                                            <button type="button" class="btn-accion btn-editar"
+                                                onclick="abrirModalEditar({{ $u->id }})">
+                                                <i class="fa-solid fa-pencil"></i>
+                                                Editar
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" id="btn-eliminar" class="btn-accion btn-eliminar"
+                                                title="Eliminar" data-id="{{ $u->id }}"
+                                                data-nombre="{{ e($u->nombre) }}"
+                                                data-apellido="{{ e($u->apellido) }}">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                                Eliminar
+                                            </button>
+                                        </li>
+                                        @if ($u->rol === 'docente')
+                                            <li>
+                                                <button type="button" class="btn-accion btn-ver-resumen"
+                                                    title="Ver resumen de carga y actividad"
+                                                    onclick="abrirModalResumenDocente({{ $u->id }})">
+                                                    <i class="fa-solid fa-chart-pie"></i>
+                                                    Ver resumen de carga y actividad
+                                                </button>
+                                            </li>
+                                        @endif
+                                        <li>
+                                            <button type="button" class="btn-accion btn-ver-accesos"
+                                                title="Ver Accesos"
+                                                onclick="abrirModalVerAccesos({{ $u->id }})">
+                                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                                Ver Accesos
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                @endif
             @empty
                 <tr>
                     <td colspan="6" style="text-align:center;color:#94A3B8;padding:32px">Sin usuarios registrados

@@ -3,16 +3,177 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ambiente;
+use App\Models\Docente;
+use App\Models\Estudiante;
+use App\Models\Matricula;
+use App\Models\Observacion;
 use App\Models\User;
+use App\Services\ResumenActividadDocenteService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class UsuarioAdminController extends Controller
 {
+    public function __construct(
+        private ResumenActividadDocenteService $resumenActividadDocente
+    ) {}
+
+    public function perfil()
+    {
+        $usuario = Auth::guard('docente')
+            ->user()
+            ->load([
+                'docente',
+                'ultimoLogin',
+            ]);
+
+        $estadisticas = [];
+
+        if ($usuario->esAdmin()) {
+
+            $informacionPersonal = [
+                'nombre' => $usuario->nombre,
+                'apellido' => $usuario->apellido,
+                'email' => $usuario->email,
+                'identificacion' => $usuario->identificacion,
+                'rol' => $usuario->rol,
+            ];
+
+            $estadisticas = [
+                [
+                    'titulo' => 'Docentes gestionados',
+                    'valor' => Docente::count(),
+                    'icono' => 'fa-chalkboard-user',
+                    'color' => 'green',
+                ],
+                [
+                    'titulo' => 'Estudiantes registrados',
+                    'valor' => Estudiante::count(),
+                    'icono' => 'fa-users',
+                    'color' => 'blue',
+                ],
+                [
+                    'titulo' => 'Matrículas activas',
+                    'valor' => Matricula::count(),
+                    'icono' => 'fa-book',
+                    'color' => 'purple',
+                ],
+                [
+                    'titulo' => 'Reportes generados',
+                    'valor' => Observacion::count(),
+                    'icono' => 'fa-users',
+                    'color' => 'orange',
+                ],
+            ];
+
+            $actividad = [
+                [
+                    'titulo' => 'Inicio de sesión',
+                    'descripcion' => 'Accedió al sistema desde Google Chrome.',
+                    'fecha' => 'Hace 2 horas',
+                    'icono' => 'fa-right-to-bracket',
+                    'color' => 'success',
+                ],
+                [
+                    'titulo' => 'Actualizó su información',
+                    'descripcion' => 'Modificó el número de teléfono.',
+                    'fecha' => 'Ayer',
+                    'icono' => 'fa-user-pen',
+                    'color' => 'primary',
+                ],
+                [
+                    'titulo' => 'Cambio de contraseña',
+                    'descripcion' => 'La contraseña fue actualizada correctamente.',
+                    'fecha' => 'Hace 4 días',
+                    'icono' => 'fa-key',
+                    'color' => 'warning',
+                ],
+            ];
+
+            $roles = [
+                [
+                    'titulo' => 'Administrador',
+                    'descripcion' => 'Acceso completo al sistema',
+                    'icono' => 'fa-user-shield',
+                    'color' => 'azul',
+                ],
+
+            ];
+
+            $sessionesActivas = $usuario->loginLogs->where('fecha', '>=', Carbon::now()->subMinutes(10))->count();
+            $sessiones = [
+                [
+                    'titulo' => 'Actual',
+                    'ambiente' => $usuario->ultimoLogin->ambiente,
+                    'ip' => 'IP: '.$usuario->ultimoLogin->ip,
+                    'fecha' => Carbon::parse($usuario->ultimoLogin->fecha)->format('d/m/Y H:i'),
+                    'icono' => 'fa-computer',
+                    'color' => 'success',
+                ],
+            ];
+
+        } else {
+
+            $informacionPersonal = [
+                'nombre' => $usuario->nombre,
+                'apellido' => $usuario->apellido,
+                'email' => $usuario->email,
+                'identificacion' => $usuario->identificacion,
+                'rol' => $usuario->rol,
+                'telefono' => $usuario->docente->telefono,
+                'direccion' => $usuario->docente->direccion,
+                'especialidad' => $usuario->docente->especialidad,
+                'fecha_ingreso' => $usuario->docente->fecha_ingreso,
+                'firma_url' => $usuario->docente->firma_url,
+            ];
+
+            $estadisticas = [
+                [
+                    'titulo' => 'Grupos',
+                    'valor' => $usuario->docente->cargasActivas->count(),
+                    'icono' => 'fa-users-rectangle',
+                    'color' => 'blue',
+                ],
+                [
+                    'titulo' => 'Horas',
+                    'valor' => $usuario->docente->cargasActivas->sum('horas'),
+                    'icono' => 'fa-clock',
+                    'color' => 'green',
+                ],
+                [
+                    'titulo' => 'Ambientes',
+                    'valor' => $usuario->docente->cargasActivas
+                        ->pluck('ambiente_id')
+                        ->unique()
+                        ->count(),
+                    'icono' => 'fa-building',
+                    'color' => 'purple',
+                ],
+                [
+                    'titulo' => 'Planeaciones',
+                    'valor' => 0,
+                    'icono' => 'fa-book-open',
+                    'color' => 'orange',
+                ],
+            ];
+        }
+
+        return view('admin.perfil.index', compact(
+            'usuario',
+            'informacionPersonal',
+            'estadisticas',
+            'actividad',
+            'roles',
+            'sessiones',
+        ));
+    }
+
     /**
      * Lista los docentes con filtros opcionales y paginación.
      *
@@ -26,7 +187,7 @@ class UsuarioAdminController extends Controller
                 'users.*',
             );
 
-        $consulta->orderBy('nombre');
+        $consulta->orderBy('rol');
         /* ── Filtros ────────────────────────────────────── */
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
@@ -44,6 +205,7 @@ class UsuarioAdminController extends Controller
 
         // ordenar por nombre
         $usuarios = $consulta->orderBy('nombre')->paginate(10);
+        $datosModalAsignar = $this->datosModalAsignarGrupo();
 
         if ($request->ajax()) {
             return response()->json([
@@ -52,7 +214,25 @@ class UsuarioAdminController extends Controller
             ]);
         }
 
-        return view('admin.usuarios.index', compact('usuarios'));
+        return view('admin.usuarios.index', array_merge(
+            compact('usuarios'),
+            $datosModalAsignar
+        ));
+    }
+
+    /**
+     * Datos necesarios para el modal de asignar grupo incluido en la vista de usuarios.
+     */
+    private function datosModalAsignarGrupo(): array
+    {
+        $ambientes = Ambiente::orderBy('nombre')->get();
+        $docentesActivos = Docente::where('estado', 'activo')
+            ->with('user')
+            ->get()
+            ->sortBy(fn ($docente) => trim($docente->user->nombre.' '.$docente->user->apellido))
+            ->values();
+
+        return compact('ambientes', 'docentesActivos');
     }
 
     /**
@@ -81,7 +261,28 @@ class UsuarioAdminController extends Controller
         ]);
 
         if ($usuario->rol === 'docente') {
-            $usuario->docente()->create();
+            $datosDocente = $request->validate([
+                'telefono' => 'required|string|max:30',
+                'direccion' => 'required|string|max:150',
+                'especialidad' => 'required|string|max:150',
+                'fecha_ingreso' => 'required|date',
+                'firma_url' => 'nullable|image|max:2048',
+                'estado' => 'activo',
+            ]);
+
+            // Si se sube una imagen de firma, se guarda en el directorio de docentes.
+            // Si no se sube una imagen de firma, se crea el perfil docente con los datos obligatorios.
+            // Si se sube una imagen de firma, se crea el perfil docente con los datos obligatorios y la imagen de firma.
+            if ($request->hasFile('firma_url') || $request->filled('telefono') || $request->filled('direccion') ||
+                $request->filled('especialidad') || $request->filled('fecha_ingreso')) {
+                if ($request->hasFile('firma_url')) {
+                    $datosDocente['firma_url'] = $request->file('firma_url')
+                        ->store('docentes', 'public');
+                }
+                $usuario->docente()->create(array_filter($datosDocente));
+            } else {
+                $usuario->docente()->create();
+            }
         }
         session([
             'password_temporal' => $datos['password'],
@@ -108,133 +309,143 @@ class UsuarioAdminController extends Controller
      */
     public function actualizar(Request $request, $docente)
     {
-        $usuario = User::with('docente')->findOrFail($docente);
+        $usuario = User::with('docente.cargasActivas')->findOrFail($docente);
 
         $datos = $request->validate([
             'nombre' => 'required|string|max:100',
             'apellido' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,'.$usuario->id,
             'identificacion' => 'required|string|min:8|max:15|unique:users,identificacion,'.$usuario->id,
-            'telefono' => 'required|string|max:30',
-            'direccion' => 'required|string|max:150',
-            'especialidad' => 'required|string|max:150',
-            'fecha_ingreso' => 'required|date',
-            'firma_url' => 'nullable|image|max:2048',
+            'rol' => 'required|in:admin,docente',
             'password' => 'nullable|min:8|confirmed',
         ]);
 
+        $rolCambiado = $datos['rol'] !== $usuario->rol;
+
+        if ($rolCambiado && $usuario->docente?->cargasActivas->isNotEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este usuario tiene carga docente asignada. Desasígnala primero',
+            ], 422);
+        }
+
         DB::transaction(function () use ($usuario, $datos, $request) {
 
-            $firma_url = null;
-
-            if ($request->hasFile('firma_url')) {
-                $firma_url = $request->file('firma_url')->store('docentes', 'public');
-            }
-
-            // Datos de users
             $usuario->update([
+                'identificacion' => $datos['identificacion'],
                 'nombre' => $datos['nombre'],
                 'apellido' => $datos['apellido'],
-                'identificacion' => $datos['identificacion'],
                 'email' => $datos['email'],
+                'rol' => $datos['rol'],
             ]);
 
-            // Datos de docentes
-            $usuario->docente->update([
-                'user_id' => $usuario->id,
-                'telefono' => $datos['telefono'],
-                'direccion' => $datos['direccion'],
-                'especialidad' => $datos['especialidad'],
-                'fecha_ingreso' => $datos['fecha_ingreso'],
-                'firma_url' => $firma_url,
-            ]);
-
-            // Si se proporciona una nueva contraseña, se actualiza la contraseña del usuario.
-            // Si no se proporciona una nueva contraseña, se mantiene la contraseña actual.
-            if ($datos['password']) {
+            if (! empty($datos['password'])) {
                 $usuario->password = Hash::make($datos['password']);
                 $usuario->save();
-            } else {
-                $usuario->password = $usuario->password;
-                $usuario->save();
+            }
+
+            if ($datos['rol'] === 'docente') {
+                $datosDocente = $request->validate([
+                    'telefono' => 'nullable|string|max:30',
+                    'direccion' => 'nullable|string|max:150',
+                    'especialidad' => 'nullable|string|max:150',
+                    'fecha_ingreso' => 'nullable|date',
+                    'firma_url' => 'nullable|image|max:2048',
+                ]);
+
+                $perfilDocente = [
+                    'telefono' => $datosDocente['telefono'] ?? null,
+                    'direccion' => $datosDocente['direccion'] ?? null,
+                    'especialidad' => $datosDocente['especialidad'] ?? null,
+                    'fecha_ingreso' => $datosDocente['fecha_ingreso'] ?? null,
+                    'estado' => 'activo',
+                ];
+
+                if ($request->hasFile('firma_url')) {
+                    $perfilDocente['firma_url'] = $request->file('firma_url')
+                        ->store('docentes', 'public');
+                }
+
+                $usuario->docente()->updateOrCreate(
+                    ['user_id' => $usuario->id],
+                    array_filter($perfilDocente, fn ($valor) => $valor !== null)
+                );
             }
         });
         session([
-            'password_temporal' => $datos['password'],
+            'password_temporal' => $datos['password'] ?? null,
         ]);
 
         return response()->json([
             'success' => true,
             'accion' => 'actualizar',
-            'message' => 'Datos del docente actualizados correctamente.',
-            'password_generada' => $datos['password'],
-            'docente' => [
-                'id' => $usuario->docente->id,
-            ],
-        ]);
-    }
-
-    public function completarInfo(Request $request, $usuario)
-    {
-        $usuario = User::with('docente')->findOrFail($usuario);
-
-        if ($usuario->rol !== 'docente') {
-            return response()->json([
-                'success' => false,
-                'message' => 'El usuario no es un docente.',
-            ], 403);
-        }
-        $datos = $request->validate([
-            'telefono' => 'required|string|max:30',
-            'direccion' => 'required|string|max:150',
-            'especialidad' => 'required|string|max:150',
-            'fecha_ingreso' => 'required|date',
-            'firma_url' => 'nullable|image|max:2048',
-            'password' => 'nullable|min:8|confirmed',
-        ]);
-
-        DB::transaction(function () use ($usuario, $datos, $request) {
-
-            $datosDocente = [
-                'telefono' => $datos['telefono'],
-                'direccion' => $datos['direccion'],
-                'especialidad' => $datos['especialidad'],
-                'fecha_ingreso' => $datos['fecha_ingreso'],
-                'estado' => 'activo',
-            ];
-
-            if ($request->hasFile('firma_url')) {
-                $datosDocente['firma_url'] = $request->file('firma_url')
-                    ->store('docentes', 'public');
-            }
-
-            $usuario->docente()->updateOrCreate(
-                ['user_id' => $usuario->id],
-                $datosDocente
-            );
-            // Si se proporciona una nueva contraseña, se actualiza la contraseña del usuario.
-            // Si no se proporciona una nueva contraseña, se mantiene la contraseña actual.
-            if (! empty($datos['password'])) {
-                $usuario->update([
-                    'password' => Hash::make($datos['password']),
-                ]);
-            }
-        });
-        if (! empty($datos['password'])) {
-            session([
-                'password_temporal' => $datos['password'],
-            ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'accion' => 'actualizar',
-            'message' => 'Datos del docente actualizados correctamente.',
+            'message' => 'Datos del usuario actualizados correctamente.',
             'password_generada' => $datos['password'] ?? null,
             'usuario' => [
                 'id' => $usuario->id,
             ],
         ]);
+    }
+
+    /**
+     * Cambia el estado del usuario a eliminado.
+     *
+     * No borra el registro, lo marca como eliminado para mantener el historial.
+     */
+    public function eliminar($usuario)
+    {
+        try {
+
+            $usuario = User::findOrFail($usuario);
+
+            // Impedir que el usuario autenticado se elimine a sí mismo
+            if ($usuario->id === Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No puedes eliminar tu propia cuenta.',
+                ], 403);
+            }
+
+            // Contar únicamente administradores activos
+            $adminsActivos = User::where('rol', 'admin')
+                ->where('estado', 'activo')
+                ->count();
+
+            // Impedir eliminar al último administrador activo
+            if ($usuario->rol === 'admin' && $adminsActivos === 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede eliminar el administrador activo.',
+                ], 403);
+            }
+
+            if ($usuario->rol === 'docente' && $usuario->docente?->cargasActivas->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Este usuario tiene cargas académicas asignadas. 
+                        Reasígnalas primero.',
+                ], 422);
+            }
+
+            // Eliminación lógica
+            $usuario->estado = 'eliminado';
+            $usuario->save();
+
+            return response()->json([
+                'success' => true,
+                'estado' => $usuario->estado,
+                'message' => 'Usuario eliminado correctamente.',
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
     }
 
     /**
@@ -246,7 +457,7 @@ class UsuarioAdminController extends Controller
     {
         $usuario_id = (int) $usuario_id;
 
-        $usuario = User::with('docente')
+        $usuario = User::with('docente.cargasActivas')
             ->where('id', $usuario_id)
             ->first();
 
@@ -257,16 +468,23 @@ class UsuarioAdminController extends Controller
             ]);
         }
 
-        $usuario->fecha_ingreso_set = Carbon::parse($usuario->fecha_ingreso)
-            ->format('Y-m-d');
-
-        $usuario->firma_url = $usuario->firma_url
-            ? asset('storage/'.$usuario->firma_url)
+        $docente = $usuario->docente;
+        $usuario->telefono = $docente?->telefono;
+        $usuario->direccion = $docente?->direccion;
+        $usuario->especialidad = $docente?->especialidad;
+        $usuario->fecha_ingreso = $docente?->fecha_ingreso
+            ? Carbon::parse($docente->fecha_ingreso)->format('Y-m-d')
             : null;
+        $usuario->firma_url = $docente?->firma_url
+            ? asset('storage/'.$docente->firma_url)
+            : null;
+
+        $tieneCargaActiva = $usuario->docente?->cargasActivas->isNotEmpty();
 
         return response()->json([
             'success' => true,
             'data' => $usuario,
+            'tiene_carga_activa' => $tieneCargaActiva,
         ]);
     }
 
@@ -295,15 +513,174 @@ class UsuarioAdminController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Muestra el detalle del usuario. Para docentes incluye resumen de carga y actividad.
      */
-    public function ver(string $id)
+    public function ver(Request $request, string $id)
     {
         $usuario = User::with('docente')->findOrFail($id);
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'usuario' => $usuario,
+            ]);
+        }
+    }
+
+    /**
+     * Devuelve el resumen de carga y actividad del docente para el modal de la tabla.
+     */
+    public function resumenActividad($id)
+    {
+        $usuario = User::with('docente')->findOrFail($id);
+
+        if ($usuario->rol !== 'docente' || ! $usuario->docente) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario no tiene perfil docente.',
+            ], 404);
+        }
+
+        $resumen = $this->resumenActividadDocente->construir($usuario);
+
         return response()->json([
             'success' => true,
-            'usuario' => $usuario,
+            'data' => [
+                'docente' => [
+                    'id' => $usuario->id,
+                    'nombre' => trim($usuario->nombre.' '.$usuario->apellido),
+                    'email' => $usuario->email,
+                    'estado' => $usuario->docente->estado,
+                ],
+                'anio' => $resumen['anio'],
+                'cargas' => $resumen['cargas'],
+                'totales' => $resumen['totales'],
+                'tiene_carga' => $resumen['tiene_carga'],
+            ],
+        ]);
+    }
+
+    /**
+     * Alterna el estado activo/inactivo del perfil docente.
+     *
+     * Útil para habilitar o deshabilitar rápidamente un docente sin eliminarlo.
+     */
+    public function toggleActivo($id)
+    {
+        try {
+
+            $usuario = User::findOrFail($id);
+
+            if ($usuario->id === Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No puedes desactivar tu propia cuenta.',
+                ], 403);
+            }
+
+            $pasaraAInactivo = $usuario->estado === 'activo';
+
+            // Validaciones únicamente al desactivar
+            if ($pasaraAInactivo) {
+
+                // Impedir desactivar al último administrador activo
+                if ($usuario->rol === 'admin') {
+
+                    $adminsActivos = User::where('rol', 'admin')
+                        ->where('estado', 'activo')
+                        ->count();
+
+                    if ($adminsActivos === 1) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'No se puede desactivar el administrador activo.',
+                        ], 403);
+                    }
+                }
+
+                // Impedir desactivar docentes con cargas activas
+                if (
+                    $usuario->rol === 'docente' &&
+                    $usuario->docente &&
+                    $usuario->docente->cargasActivas()->exists()
+                ) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Este usuario tiene cargas académicas asignadas. 
+                        Reasígnalas primero.',
+                    ], 422);
+                }
+            }
+
+            $nuevoEstado = $pasaraAInactivo ? 'inactivo' : 'activo';
+
+            DB::transaction(function () use ($usuario, $nuevoEstado) {
+
+                $usuario->update([
+                    'estado' => $nuevoEstado,
+                ]);
+
+                if ($usuario->rol === 'docente' && $usuario->docente) {
+                    $usuario->docente->update([
+                        'estado' => $nuevoEstado,
+                    ]);
+                }
+
+            });
+
+            return response()->json([
+                'success' => true,
+                'estado' => $nuevoEstado,
+                'message' => $nuevoEstado === 'activo'
+                    ? 'Usuario activado correctamente.'
+                    : 'Usuario desactivado correctamente.',
+            ]);
+
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+            ], 500);
+        }
+    }
+
+    public function validarDatos(Request $request)
+    {
+        $request->validate([
+            'identificacion' => 'nullable|string|max:30',
+            'email' => 'nullable|email|max:255',
+            'usuario_id' => 'nullable|integer',
+        ]);
+
+        $identificacionExiste = false;
+        $emailExiste = false;
+
+        if ($request->filled('identificacion')) {
+            $query = User::where('identificacion', $request->identificacion);
+
+            if ($request->filled('usuario_id')) {
+                $query->where('id', '!=', $request->usuario_id);
+            }
+
+            $identificacionExiste = $query->exists();
+        }
+
+        if ($request->filled('email')) {
+            $query = User::where('email', $request->email);
+
+            if ($request->filled('usuario_id')) {
+                $query->where('id', '!=', $request->usuario_id);
+            }
+
+            $emailExiste = $query->exists();
+        }
+
+        return response()->json([
+            'success' => true,
+            'identificacion_existe' => $identificacionExiste,
+            'email_existe' => $emailExiste,
         ]);
     }
 

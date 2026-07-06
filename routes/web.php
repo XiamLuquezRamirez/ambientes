@@ -104,8 +104,8 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
     // Docentes
     Route::get('docentes', [DocenteAdminController::class, 'listar'])->name('admin.docentes');
+    Route::get('docentes/validar-datos', [DocenteAdminController::class, 'validarDatos'])->name('admin.docentes.validarDatos');
     Route::get('docentes/grupos-asignados', [DocenteAdminController::class, 'listarGruposAsignados'])->name('admin.docentes.grupos-asignados');
-    // Endpoint JSON para cargar los datos del docente en el modal de completar información.
     // Debe declararse antes de docentes/{docente}; si no, Laravel interpreta "accesos" como parte del detalle genérico.
     Route::get('docentes/{docente}/accesos', [DocenteAdminController::class, 'verAccesos'])->name('admin.docentes.accesos');
     Route::get('docentes/{docente}/asignaciones', [DocenteAdminController::class, 'asignacionesActuales'])->name('admin.docentes.asignaciones');
@@ -120,6 +120,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::delete('docentes/{docente}', [DocenteAdminController::class, 'eliminar'])->name('admin.docentes.destroy');
     Route::post('docentes/{docente}/reset-password', [DocenteAdminController::class, 'restablecerContrasena'])->name('admin.docentes.reset-password');
     Route::get('docentes/{docente}/generar-pdf', [DocenteAdminController::class, 'generarPdf'])->name('admin.docentes.generar-pdf');
+    Route::get('docentes/panel', [DocenteAdminController::class, 'panel'])->name('admin.docentes.panel');
 
     // Estudiantes (admin)
     Route::get('estudiantes', [EstudianteAdminController::class, 'listar'])->name('admin.estudiantes');
@@ -157,14 +158,18 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('configuracion', [ConfiguracionAdminController::class, 'listar'])->name('admin.configuracion');
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
 
-    // Usuarios
+    // Usuario
+    Route::get('perfil', [UsuarioAdminController::class, 'perfil'])->name('admin.perfil');
     Route::get('usuarios', [UsuarioAdminController::class, 'listar'])->name('admin.usuarios');
+    Route::get('usuarios/validar-datos', [UsuarioAdminController::class, 'validarDatos'])->name('admin.usuarios.validarDatos');
     Route::post('usuarios', [UsuarioAdminController::class, 'guardar'])->name('admin.usuarios.store');
     Route::get('usuarios/{usuario}/generar-pdf', [UsuarioAdminController::class, 'generarPdf'])->name('admin.usuarios.generar-pdf');
-    Route::put('usuarios/{usuario}/completar-info', [UsuarioAdminController::class, 'completarInfo'])->name('admin.usuarios.completar-info.store');
+    Route::get('usuarios/{usuario}/resumen', [UsuarioAdminController::class, 'resumenActividad'])->name('admin.usuarios.resumen');
     Route::get('usuarios/{usuario}', [UsuarioAdminController::class, 'ver'])->name('admin.usuarios.show');
     Route::get('usuarios/datos/{usuario_id}', [UsuarioAdminController::class, 'verDatosUsuario'])->name('admin.usuarios.datos');
     Route::put('usuarios/{usuario}', [UsuarioAdminController::class, 'actualizar'])->name('admin.usuarios.update');
+    Route::patch('usuarios/{usuario}/toggle-activo', [UsuarioAdminController::class, 'toggleActivo'])->name('admin.usuarios.toggleActivo');
+    Route::delete('usuarios/{usuario}', [UsuarioAdminController::class, 'eliminar'])->name('admin.usuarios.destroy');
 });
 
 // ── Panel Docente ─────────────────────────────────────────────────────────

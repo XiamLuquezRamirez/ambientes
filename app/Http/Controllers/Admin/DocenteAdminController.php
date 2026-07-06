@@ -19,6 +19,11 @@ use Illuminate\Support\Str;
 
 class DocenteAdminController extends Controller
 {
+    public function panel()
+    {
+        return view('docente.panel');
+    }
+
     /**
      * Lista los docentes con filtros opcionales y paginación.
      *
@@ -580,15 +585,21 @@ class DocenteAdminController extends Controller
 
             $docente = Docente::findOrFail($docente);
 
-            $docente->estado = 'eliminado';
+            if ($docente->cargasActivas->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Este usuario tiene cargas académicas asignadas. 
+                        Reasígnalas primero.',
+                ], 422);
+            } else {
+                $docente->estado = 'eliminado';
+                $docente->save();
 
-            $docente->save();
-
-            return response()->json([
-                'success' => true,
-                'estado' => $docente->estado,
-                'message' => 'Docente eliminado correctamente.',
-            ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Docente eliminado correctamente.',
+                ]);
+            }
 
         } catch (\Throwable $e) {
 
@@ -786,20 +797,23 @@ class DocenteAdminController extends Controller
         try {
 
             $docente = Docente::findOrFail($id);
-            $pasaraAInactivo = $docente->estado === 'activo';
 
-            $docente->estado = $pasaraAInactivo ? 'inactivo' : 'activo';
-            $docente->save();
+            if ($docente->cargasActivas->isNotEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Este usuario tiene cargas académicas asignadas. 
+                        Reasígnalas primero.',
+                ], 422);
+            } else {
+                $pasaraAInactivo = $docente->estado === 'activo';
 
-            $asignacionesLiberadas = 0;
-            if ($docente->estado === 'inactivo') {
-                $asignacionesLiberadas = $this->liberarAsignacionesDocente($docente);
+                $docente->estado = $pasaraAInactivo ? 'inactivo' : 'activo';
+                $docente->save();
             }
 
             return response()->json([
                 'success' => true,
                 'estado' => $docente->estado,
-                'asignaciones_liberadas' => $asignacionesLiberadas,
                 'message' => $docente->estado === 'activo'
                     ? 'Docente activado correctamente.'
                     : 'Docente desactivado correctamente.',
@@ -813,6 +827,44 @@ class DocenteAdminController extends Controller
                 'file' => $e->getFile(),
             ], 500);
         }
+    }
+
+    public function validarDatos(Request $request)
+    {
+        $request->validate([
+            'identificacion' => 'nullable|string|max:30',
+            'email' => 'nullable|email|max:255',
+            'usuario_id' => 'nullable|integer',
+        ]);
+
+        $identificacionExiste = false;
+        $emailExiste = false;
+
+        if ($request->filled('identificacion')) {
+            $query = User::where('identificacion', $request->identificacion);
+
+            if ($request->filled('usuario_id')) {
+                $query->where('id', '!=', $request->usuario_id);
+            }
+
+            $identificacionExiste = $query->exists();
+        }
+
+        if ($request->filled('email')) {
+            $query = User::where('email', $request->email);
+
+            if ($request->filled('usuario_id')) {
+                $query->where('id', '!=', $request->usuario_id);
+            }
+
+            $emailExiste = $query->exists();
+        }
+
+        return response()->json([
+            'success' => true,
+            'identificacion_existe' => $identificacionExiste,
+            'email_existe' => $emailExiste,
+        ]);
     }
 
     /**

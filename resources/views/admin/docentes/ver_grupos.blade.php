@@ -1,5 +1,5 @@
 {{-- Modal: vista global de cobertura docente por grupo --}}
-<div class="modal fade" id="modalDocentesAsignados" tabindex="-1" data-bs-keyboard="false"
+<div class="modal fade modal-app" id="modalDocentesAsignados" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalDocentesAsignadosLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
@@ -65,6 +65,17 @@
         document.getElementById('modalDocentesAsignados').addEventListener('hidden.bs.modal', function() {
             limpiarModalDocentesAsignados();
         });
+
+        /** Limpieza al cerrar el modal (reservado para futura lógica). */
+        function limpiarModalDocentesAsignados() {}
+
+        /**
+         * Abre el modal y carga los datos vía AJAX sin recargar la página.
+         */
+        async function abrirModalDocentesAsignados() {
+            modalDocentesAsignados.show();
+            await aplicarFiltrosGrupos();
+        }
 
         /**
          * Aplica filtros de grado/año vía AJAX sin recargar la página.

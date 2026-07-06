@@ -1,11 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Usuarios')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
-@endpush
-
 @section('content')
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
         <div>
@@ -68,34 +63,65 @@
 
     @include('admin.usuarios.crear_usuario')
     @include('admin.usuarios.ver_contra_gen')
-    @include('admin.usuarios.completar_info')
+    @include('admin.usuarios.ver-resumen')
+    @include('admin.docentes.ver-accesos')
+    @include('admin.docentes.partials.modal-asignar-grupo')
 @endsection
 
 @push('scripts')
     <script>
         window.URL_USUARIOS = "{{ route('admin.usuarios') }}";
+        window.ANIO_LECTIVO_ACTUAL = "{{ date('Y') }}";
         const URL_USUARIOS = window.URL_USUARIOS;
+        const ANIO_LECTIVO_ACTUAL = window.ANIO_LECTIVO_ACTUAL;
         var tipoPost = 1; // 1: Crear, 2: Editar
         var id_editar = '';
+        const FIRMA_PLACEHOLDER =
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s';
 
         /* ── Bootstrap Modal ─────────────────────────────────────────── */
         const modalBSUsuario = new bootstrap.Modal(document.getElementById('modalUsuario'));
         const modalBSPasswordGenerada = new bootstrap.Modal(document.getElementById('modalBSPasswordGenerada'));
-        const modalBSCompletarInfo = new bootstrap.Modal(document.getElementById('modalBSCompletarInfo'));
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+        const selectRol = document.getElementById('rol');
+        const seccionDocente = document.getElementById('seccionDocente');
+
+        function actualizarFormularioDocente() {
+            seccionDocente.classList.toggle(
+                'mostrar',
+                selectRol.value === 'docente'
+            );
+        }
+
+        selectRol.addEventListener('change', actualizarFormularioDocente);
+
+        // Ejecutar al cargar la página
+        actualizarFormularioDocente();
 
         // Al cerrar cualquier modal, limpiar errores y resetear el formulario correspondiente.
         document.getElementById('modalUsuario').addEventListener('hidden.bs.modal', function() {
-            limpiarErroresModal();
+            limpiarErroresModal('formUsuario');
             document.getElementById('formUsuario').reset();
-        });
-        document.getElementById('modalBSCompletarInfo').addEventListener('hidden.bs.modal', function() {
-            limpiarErroresModal();
+            document.getElementById('imgPreviewFirma').src = FIRMA_PLACEHOLDER;
+            $('#rol').prop('disabled', false);
+            $('#avisoCargaDocente').hide();
+            seccionDocente.classList.remove('mostrar');
+            tipoPost = 1;
         });
         document.getElementById('modalBSPasswordGenerada').addEventListener('hidden.bs.modal', function() {
-            limpiarErroresModal();
-            document.getElementById('formPasswordGenerada').reset();
+            limpiarErroresModal('formUsuario');
         });
+
+        function setBtnUsuario(modo) {
+            const btn = document.getElementById('btnUsuario');
+            btn.disabled = false;
+            if (modo === 'crear') {
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Crear Usuario';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar';
+            }
+        }
 
         function abrirModal() {
             $("#modalUsuarioLabel").text('Crear Usuario');
@@ -105,6 +131,10 @@
                 $('a[href="#datosPersonales"]')[0]
             ).show();
             tipoPost = 1;
+            setBtnUsuario('crear');
+            $('#rol').prop('disabled', false);
+            $('#avisoCargaDocente').hide();
+            document.getElementById('imgPreviewFirma').src = FIRMA_PLACEHOLDER;
             modalBSUsuario.show();
         }
 
@@ -116,10 +146,10 @@
                 $('a[href="#datosPersonales"]')[0]
             ).show();
             tipoPost = 2;
+            setBtnUsuario('editar');
             cargarDatosUsuario(id);
             modalBSUsuario.show();
         }
-
 
         /* ── Modal Bootstrap 5 – Información de la Cuenta ──────────────────────── */
         function abrirModalBSPasswordGenerada() {
@@ -130,25 +160,36 @@
             modalBSPasswordGenerada.show();
         }
 
-        function cerrarModalBSCompletarInfo() {
-            modalBSCompletarInfo.hide();
+        /* ── Modal Bootstrap 5 – Información de la Cuenta Actualizada ────────── */
+        function abrirModalBSPasswordGeneradaEditar() {
+            $("#modalBSPasswordGeneradaLabel").text('Información de la Cuenta Actualizada');
+            $("#modalBSPasswordGeneradaSubtitle").text(
+                'La cuenta se ha actualizado correctamente. Por favor, anotar la contraseña antes de cerrar.');
+            $("#modalBSPasswordGeneradaIcon").html('<i class="fas fa-info-circle text-white"></i>');
+            modalBSPasswordGenerada.show();
         }
 
         function cerrarModalUsuario() {
+            document.getElementById('seccionDocente').classList.remove('mostrar');
             document.getElementById('formUsuario').reset();
+            document.getElementById('imgPreviewFirma').src = FIRMA_PLACEHOLDER;
+            limpiarErroresModal('formUsuario');
+            $('#rol').prop('disabled', false);
+            tipoPost = 1;
             modalBSUsuario.hide();
         }
 
-        /* ── Errores inline en modal ─────────────────────────────────── */
-        // Elimina cualquier mensaje o estado de validación que haya quedado en los formularios.
-        function limpiarErroresModal() {
-            document.querySelectorAll('#formUsuario .campo-error, #formCompletarInfo .campo-error').forEach(el => el
-                .remove());
-            document.querySelectorAll('#formUsuario .is-invalid, #formCompletarInfo .is-invalid').forEach(el => el
-                .classList.remove('is-invalid'));
+        function cerrarModalBSPasswordGenerada() {
+            limpiarErroresModal('formUsuario');
+            document.activeElement?.blur();
+            modalBSPasswordGenerada.hide();
         }
 
-        /* ── Tabla AJAX ──────────────────────────────────────────────── */
+        /* ── Errores inline en modal ─────────────────────────────────── */
+        function limpiarErroresModal(form) {
+            document.querySelectorAll(`#${form} .campo-error`).forEach(el => el.remove());
+            document.querySelectorAll(`#${form} .is-invalid`).forEach(el => el.classList.remove('is-invalid'));
+        }
         async function cargarTabla(url) {
             document.getElementById('contenedorTabla').style.opacity = '.4';
             document.getElementById('cargando-tabla').style.display = 'block';
@@ -209,22 +250,12 @@
             await cargarTabla(URL_USUARIOS);
         });
 
-        /* ── Errores inline en modal ─────────────────────────────────── */
-        // Elimina cualquier mensaje o estado de validación que haya quedado en los formularios.
-        function limpiarErroresModal() {
-            document.querySelectorAll('#formBuscar .campo-error, #formAsignarInfo .campo-error').forEach(el => el
-                .remove());
-            document.querySelectorAll('#formBuscar .is-invalid, #formAsignarInfo .is-invalid').forEach(el => el
-                .classList.remove('is-invalid'));
-        }
-
         function mostrarErroresModal(errors, form) {
-            limpiarErroresModal();
+            limpiarErroresModal(form);
             $.each(errors, function(campo, mensajes) {
                 const $input = $(`#${form} [name="${campo}"]`);
                 if (!$input.length) return;
                 $input.addClass('is-invalid');
-
                 var mensaje = '';
                 switch (mensajes[0]) {
                     case 'validation.unique':
@@ -263,103 +294,23 @@
             $(`#${form} .is-invalid`).first().focus();
         }
 
-        let idCompletarInfo = null;
-
-        async function abrirModalCompletarInfo(id) {
-            try {
-                idCompletarInfo = id;
-                const resp = await ajaxRequest(`${URL_USUARIOS}/${id}`);
-                if (!resp.success) throw new Error('No data');
-
-                const usuario = resp.usuario;
-
-                document.getElementById('formCompletarInfo').reset();
-
-                document.getElementById('nombre').value = usuario.nombre;
-                document.getElementById('apellido').value = usuario.apellido;
-                document.getElementById('email').value = usuario.email;
-                document.getElementById('identificacion').value = usuario.identificacion;
-
-                document.getElementById('telefono').value = usuario.telefono ?? '';
-                document.getElementById('direccion').value = usuario.direccion ?? '';
-                document.getElementById('especialidad').value = usuario.especialidad ?? '';
-                document.getElementById('fecha_ingreso').value = usuario.fecha_ingreso ?? '';
-                $("#modalBSCompletarInfoIcon").html('<i class="fas fa-user-edit text-white"></i>');
-                $("#modalBSCompletarInfoLabel").text('Completar Información');
-                $("#modalBSCompletarInfoSubtitle").text(`${usuario.nombre} ${usuario.apellido} · ${usuario.email}`);
-                modalBSCompletarInfo.show();
-            } catch (error) {
-                console.error(error);
-                mostrarToast('error', 'No se pudo cargar la información');
-            }
-        }
-
-        document.getElementById('formCompletarInfo')
-            .addEventListener('submit', function(e) {
-                e.preventDefault();
-                const btn = document.getElementById('btnCompletarInfo');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardando...';
-                const formData = new FormData(this);
-                formData.append('_method', 'PUT');
-                $.ajax({
-                    url: `${URL_USUARIOS}/${idCompletarInfo}/completar-info`,
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: async function(res) {
-                        modalBSCompletarInfo.hide();
-                        if (res.password_generada) {
-                            document.getElementById('passwordGenerada').value =
-                                res.password_generada;
-                            abrirModalBSPasswordGeneradaEditar();
-                        }
-                        await cargarTabla(location.href);
-                        Swal.fire({
-                            icon: 'success',
-                            title: res.message,
-                            timer: 1600,
-                            showConfirmButton: false
-                        });
-                    },
-                    error: function(xhr) {
-                        mostrarErroresModal(xhr.responseJSON.errors, 'formCompletarInfo');
-                        mostrarToast(
-                            'error',
-                            'Verifique la información ingresada.'
-                        );
-
-                    },
-                    complete: function() {
-                        btn.disabled = false;
-                        btn.innerHTML =
-                            '<i class="fa-solid fa-save"></i> Guardar';
-                    }
-
-                });
-
-            });
-
         /* ── Crear usuario (AJAX) ────────────────────────────────────── */
         document.getElementById('formUsuario').addEventListener('submit', async function(e) {
             e.preventDefault();
             if (tipoPost == 1) {
                 const btn = document.getElementById('btnUsuario');
                 btn.disabled = true;
-                btn.textContent = 'Guardando…';
-                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardando…';
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Creando Usuario…';
                 const formData = new FormData(this);
                 const datos = Object.fromEntries(formData.entries());
                 let titulo = '';
-                btn.disabled = false;
-                btn.textContent = 'Crear Usuario';
-                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardar';
 
                 $.ajax({
                     url: URL_USUARIOS,
                     type: 'POST',
                     data: formData,
+                    processData: false,
+                    contentType: false,
                     dataType: 'json',
                     success: async function(res) {
                         Swal.close();
@@ -392,33 +343,32 @@
                         } else {
                             mostrarToast('error', "Error al crear el usuario");
                         }
-
-                        mostrarErroresModal(xhr.responseJSON.errors, 'formCompletarInfo');
+                        mostrarErroresModal(xhr.responseJSON.errors, 'formUsuario');
                     },
                     complete: function() {
-                        $('#btnUsuario').prop('disabled', false).text('Crear Usuario');
+                        setBtnUsuario('crear');
                     }
                 });
 
-            } else {
+            } else if (tipoPost == 2) {
                 const btn = document.getElementById('btnUsuario');
                 btn.disabled = true;
-                btn.textContent = 'Guardando…';
-                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardando…';
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardando…';
                 const formData = new FormData(this);
                 const datos = Object.fromEntries(formData.entries());
                 const id = id_editar;
-                btn.disabled = false;
-                btn.textContent = 'Guardar';
-                btn.innerHTML = '<i class="fa-solid fa-save"></i> Guardar';
-                let titulo = '';
-                let texto = '';
+
+                if ($('#rol').prop('disabled')) {
+                    formData.set('rol', $('#rol').val());
+                }
 
                 formData.append('_method', 'PUT');
                 $.ajax({
                     url: `${URL_USUARIOS}/${id}`,
                     type: 'POST',
                     data: formData,
+                    processData: false,
+                    contentType: false,
                     dataType: 'json',
                     success: async function(res) {
                         Swal.close();
@@ -454,19 +404,81 @@
                     },
                     error: function(xhr) {
                         Swal.close();
-                        if (xhr.responseJSON.message.includes('validation.')) {
+                        const mensaje = xhr.responseJSON?.message;
+                        if (mensaje && !mensaje.includes('validation.')) {
+                            mostrarToast('error', mensaje);
+                        } else if (mensaje?.includes('validation.')) {
                             mostrarToast('error', 'Verifique los datos ingresados');
                         } else {
-                            mostrarToast('error', "Error al crear el usuario");
+                            mostrarToast('error', "Error al actualizar el usuario");
                         }
-
-                        mostrarErroresModal(xhr.responseJSON.errors, 'formUsuario');
+                        mostrarErroresModal(xhr.responseJSON?.errors, 'formUsuario');
                     },
                     complete: function() {
-                        $('#btnUsuario').prop('disabled', false).text('Crear Usuario');
+                        setBtnUsuario('editar');
                     }
                 });
             }
+        });
+
+        $(document).ready(function() {
+
+            let timerValidacion;
+
+            function validarCampo(input, mensaje, existe, texto) {
+
+                $(input)
+                    .toggleClass('is-invalid', existe)
+                    .toggleClass('is-valid', !existe);
+
+                $(mensaje)
+                    .text(existe ? texto : '')
+                    .toggle(existe);
+            }
+
+            function validarDatos() {
+                const identificacion = $('#identificacion').val().trim();
+                const email = $('#email').val().trim();
+
+                if (identificacion.length < 5 && email.length < 5) {
+                    return;
+                }
+
+                $.ajax({
+                    url: `${URL_USUARIOS}/validar-datos`,
+                    type: 'GET',
+                    data: {
+                        identificacion: $('#identificacion').val().trim(),
+                        email: $('#email').val().trim()
+                    },
+                    success: function(response) {
+
+                        validarCampo(
+                            '#identificacion',
+                            '#mensajeIdentificacion',
+                            response.identificacion_existe,
+                            'La identificación ya está registrada.'
+                        );
+
+                        validarCampo(
+                            '#email',
+                            '#mensajeEmail',
+                            response.email_existe,
+                            'El correo electrónico ya está registrado.'
+                        );
+                    }
+                });
+            }
+
+            // Se ejecuta cada vez que el usuario escribe
+            $('#identificacion, #email').on('input', function() {
+
+                clearTimeout(timerValidacion);
+
+                timerValidacion = setTimeout(validarDatos, 500);
+
+            });
+
         });
 
         function verPassword(inputId, iconId) {
@@ -546,9 +558,7 @@
             Swal.fire({
                 title: `¿Desactivar a ${nombre} ${apellido} ?`,
                 html: `
-Se cerrará cualquier sesión activa de este docente.
-<br><br>
-Las asignaciones de grupos quedarán liberadas.
+Se cerrará cualquier sesión activa de este usuario.
 `,
                 icon: 'warning',
                 showCancelButton: true,
@@ -568,7 +578,7 @@ Las asignaciones de grupos quedarán liberadas.
         // Actualizar el estado del docente.
         function actualizarEstado(id, checkbox) {
             $.ajax({
-                url: `${URL_DOCENTES}/${id}/toggle-activo`,
+                url: `${URL_USUARIOS}/${id}/toggle-activo`,
                 type: 'PATCH',
                 data: {
                     _token: $('meta[name="csrf-token"]').attr('content')
@@ -577,28 +587,18 @@ Las asignaciones de grupos quedarán liberadas.
                     Swal.fire({
                         icon: 'success',
                         title: response.estado === 'activo' ?
-                            'Docente activado' : 'Docente desactivado',
-                        text: response.estado === 'inactivo' && response.asignaciones_liberadas > 0 ?
-                            `Se liberaron ${response.asignaciones_liberadas} asignación(es) de grupo.` :
-                            undefined,
-                        timer: response.estado === 'inactivo' && response.asignaciones_liberadas > 0 ?
-                            undefined : 1500,
-                        showConfirmButton: response.estado === 'inactivo' && response
-                            .asignaciones_liberadas > 0,
+                            'Usuario activado' : 'Usuario desactivado',
+                        timer: 1500,
+                        showConfirmButton: false,
                     });
-
-                    if (response.estado === 'inactivo') {
-                        refrescarModalDocentesAsignadosSiAbierto();
-                    }
                 },
-                error: function() {
-                    // Revertir el estado si falla
+                error: function(xhr) {
                     checkbox.prop('checked', !checkbox.prop('checked'));
-                    Swal.fire(
-                        'Error',
-                        'No fue posible actualizar el estado.',
-                        'error'
-                    );
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message ?? 'No fue posible actualizar el estado.'
+                    });
                 }
             });
         }
@@ -608,22 +608,36 @@ Las asignaciones de grupos quedarán liberadas.
                 .then(response => response.json())
                 .then(resp => {
                     if (!resp.success) throw new Error('No data');
-                    mapearDatosUsuario(resp.data);
+                    mapearDatosUsuario(resp.data, resp.tiene_carga_activa);
                 })
                 .catch(error => {
                     mostrarToast('error', 'No se pudo cargar la información del usuario');
                 });
         }
 
-        function mapearDatosUsuario(data) {
+        function mapearDatosUsuario(data, tieneCargaActiva = false) {
             $('#nombre').val(data.nombre);
             $('#apellido').val(data.apellido);
             $('#email').val(data.email);
             $('#identificacion').val(data.identificacion);
             $('#rol').val(data.rol);
+            $('#telefono').val(data.telefono ?? '');
+            $('#direccion').val(data.direccion ?? '');
+            $('#especialidad').val(data.especialidad ?? '');
+            $('#fecha_ingreso').val(data.fecha_ingreso ?? '');
+            $('#imgPreviewFirma').attr('src', data.firma_url ?? FIRMA_PLACEHOLDER);
             id_editar = data.id;
-        }
 
+            actualizarFormularioDocente();
+
+            if (tieneCargaActiva) {
+                $('#rol').prop('disabled', true);
+                $('#avisoCargaDocente').show();
+            } else {
+                $('#rol').prop('disabled', false);
+                $('#avisoCargaDocente').hide();
+            }
+        }
 
         // Copiar contraseña al portapapeles.
         $(document).on('click', '.btn-copiar', function() {
@@ -658,5 +672,76 @@ Las asignaciones de grupos quedarán liberadas.
         tooltipTriggerList.forEach(el => {
             new bootstrap.Tooltip(el);
         });
+
+        //Previsualizar imagen de la firma.
+        //esta funcion se usa en el modal de docentes para previsualizar la imagen de la firma.
+        function previewImage(event, previewSelector) {
+            const input = event.target;
+            const preview = document.querySelector(previewSelector);
+
+            if (!input.files || !input.files.length) {
+                return;
+            }
+
+            const file = input.files[0];
+
+            if (!file.type.startsWith('image/')) {
+                alert('Seleccione un archivo de imagen.');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        /* ── Eliminar docente (AJAX) ─────────────────────────────────── */
+        document.addEventListener('click', async function(e) {
+            const btn = e.target.closest('#btn-eliminar');
+            if (!btn) return;
+
+            const id = btn.dataset.id;
+            const nombre = btn.dataset.nombre;
+            const apellido = btn.dataset.apellido;
+
+            const confirmacion = await Swal.fire({
+                title: '¿Eliminar usuario?',
+                text: `"${nombre} ${apellido}" será eliminado.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#94A3B8',
+                iconColor: '#F59E0B',
+            });
+
+            if (!confirmacion.isConfirmed) return;
+
+            const res = await ajaxRequest(`${URL_USUARIOS}/${id}`, 'DELETE');
+
+            if (res.success) {
+                const fila = document.getElementById(`fila-${id}`);
+                if (fila) {
+                    fila.style.transition = 'opacity .25s';
+                    fila.style.opacity = '0';
+                    setTimeout(() => {
+                        fila.remove();
+                        if (!document.querySelector('#contenedorTabla tbody tr[id^="fila-"]')) {
+                            cargarTabla(URL_USUARIOS);
+                        }
+                    }, 250);
+                }
+                mostrarToast('success', res.message);
+            } else {
+                mostrarToast('error', res.message);
+            }
+        });
     </script>
+    @include('admin.docentes.partials.asignar-grupo-scripts')
 @endpush

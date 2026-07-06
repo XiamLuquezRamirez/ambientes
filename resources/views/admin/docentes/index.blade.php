@@ -1,11 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Docentes')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
-@endpush
-
 @section('content')
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
         <div>
@@ -71,8 +66,8 @@
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 
     {{-- ── Modal Bootstrap 5 – Nuevo Docente ──────────────────────── --}}
-    <div class="modal fade" id="modalDocente" tabindex="-1" data-bs-backdrop="static" aria-labelledby="modalDocenteLabel"
-        aria-hidden="true">
+    <div class="modal fade modal-app" id="modalDocente" tabindex="-1" data-bs-backdrop="static"
+        aria-labelledby="modalDocenteLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -107,9 +102,12 @@
                                     <div class="col-md-4">
                                         <div class="mb-3">
                                             <strong class="form-label">Identificación</strong>
-                                            <input type="number" id="identificacion" name="identificacion"
-                                                class="form-control" placeholder="Identificación del docente"
+                                            <input type="text" inputmode="numeric" pattern="[0-9]*" id="identificacion"
+                                                name="identificacion" class="form-control"
+                                                placeholder="Identificación del usuario"
                                                 value="{{ old('identificacion') }}">
+                                            <div id="mensajeIdentificacion" class="invalid-feedback" style="display:none;">
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -183,6 +181,7 @@
                                             <input type="email" id="email" name="email" class="form-control"
                                                 placeholder="Correo electrónico" value="{{ old('email') }}"
                                                 autocomplete="off">
+                                            <div id="mensajeEmail" class="invalid-feedback" style="display:none;"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -238,8 +237,8 @@
     </div>
 
     {{-- ── Modal Bootstrap 5 – Información de la Contraseña ──────────────────────── --}}
-    <div class="modal fade" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false"
-        data-bs-backdrop="static" aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="false">
+    <div class="modal fade modal-app" id="modalBSPasswordGenerada" tabindex="-1" data-bs-keyboard="false"
+        data-bs-backdrop="static" aria-labelledby="modalBSPasswordGeneradaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -783,8 +782,6 @@
                 title: `¿Desactivar a ${nombre} ${apellido} ?`,
                 html: `
         Se cerrará cualquier sesión activa de este docente.
-        <br><br>
-        Las asignaciones de grupos quedarán liberadas.
     `,
                 icon: 'warning',
                 showCancelButton: true,
@@ -827,18 +824,76 @@
                         refrescarModalDocentesAsignadosSiAbierto();
                     }
                 },
-                error: function() {
-                    // Revertir el estado si falla
+                error: function(xhr) {
                     checkbox.prop('checked', !checkbox.prop('checked'));
-                    Swal.fire(
-                        'Error',
-                        'No fue posible actualizar el estado.',
-                        'error'
-                    );
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message ?? 'No fue posible actualizar el estado.'
+                    });
                 }
             });
         }
 
+        $(document).ready(function() {
+
+            let timerValidacion;
+
+            function validarCampo(input, mensaje, existe, texto) {
+
+                $(input)
+                    .toggleClass('is-invalid', existe)
+                    .toggleClass('is-valid', !existe);
+
+                $(mensaje)
+                    .text(existe ? texto : '')
+                    .toggle(existe);
+            }
+
+            function validarDatos() {
+                const identificacion = $('#identificacion').val().trim();
+                const email = $('#email').val().trim();
+
+                if (identificacion.length < 5 && email.length < 5) {
+                    return;
+                }
+
+                $.ajax({
+                    url: `${URL_DOCENTES}/validar-datos`,
+                    type: 'GET',
+                    data: {
+                        identificacion: $('#identificacion').val().trim(),
+                        email: $('#email').val().trim()
+                    },
+                    success: function(response) {
+
+                        validarCampo(
+                            '#identificacion',
+                            '#mensajeIdentificacion',
+                            response.identificacion_existe,
+                            'La identificación ya está registrada.'
+                        );
+
+                        validarCampo(
+                            '#email',
+                            '#mensajeEmail',
+                            response.email_existe,
+                            'El correo electrónico ya está registrado.'
+                        );
+                    }
+                });
+            }
+
+            // Se ejecuta cada vez que el usuario escribe
+            $('#identificacion, #email').on('input', function() {
+
+                clearTimeout(timerValidacion);
+
+                timerValidacion = setTimeout(validarDatos, 500);
+
+            });
+
+        });
 
         // Copiar contraseña al portapapeles.
         $(document).on('click', '.btn-copiar', function() {

@@ -17,3 +17,51 @@ ul.nav-tabs {
     border-color: #2045a3 #2045a3 #fff !important;
     color: #2045a3 !important;
 }
+
+.btn-primary-perfil {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #1521cc;
+}
+
+.btn-primary-perfil:hover {
+    background-color: #1a3b85;
+    border-color: #1a3b85;
+    color: #ffffff;
+}
+
+.btn-primary-perfil:focus {
+    background-color: #2045a3;
+    border-color: #2045a3;
+    color: #ffffff;
+}
+
+.btn-primary-perfil:active {
+    background-color: #2045a3;
+    border-color: #2045a3;
+    color: #ffffff;
+}
+
+.btn-primary-accion {
+    background-color: #2045a3;
+    border-color: #2045a3;
+    color: #ffffff;
+}
+
+.btn-primary-accion:hover {
+    background-color: #2045a3;
+    border-color: #2045a3;
+    color: #ffffff;
+}
+
+.btn-primary-accion:focus {
+    background-color: #2045a3;
+    border-color: #2045a3;
+    color: #ffffff;
+}
+
+.btn-primary-accion:active {
+    background-color: #2045a3;
+    border-color: #2045a3;
+    color: #ffffff;
+}
