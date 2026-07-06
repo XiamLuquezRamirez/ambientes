@@ -151,7 +151,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
 // ── Panel Docente ─────────────────────────────────────────────────────────
 Route::prefix('panel')->middleware(['es.docente'])->group(function () {
-    Route::get('/', fn () => redirect()->route('panel.estudiantes'));
+    Route::get('principal', fn () => view('docentes.panel'))->name('panel.principal');
 
     // Estudiantes
     Route::get('estudiantes', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');

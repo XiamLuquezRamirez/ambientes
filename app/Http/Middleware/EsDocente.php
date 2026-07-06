@@ -21,15 +21,15 @@ class EsDocente
         }
 
         $cargasActivas = $usuario->docente
-            ->cargasActivas()
+            ?->cargasActivas()
             ->with(['ambiente', 'grado', 'grupo'])
-            ->get();
+            ->get() ?? collect();
 
         view()->share('cargasActivas', $cargasActivas);
 
-        if ($usuario->estado == false) {
+        if (! $usuario->activo) {
 
-            Auth::logout();
+            Auth::guard('docente')->logout();
 
             $request->session()->invalidate();
             $request->session()->regenerateToken();

@@ -34,41 +34,41 @@
                 </a>
             </li>
             @php
-                $academico = request()->routeIs('admin.grupos*','admin.matriculas*','admin.cierre*');
+            $academico = request()->routeIs('admin.grupos*','admin.matriculas*','admin.cierre*');
             @endphp
             <li class="nav-item">
                 <a href="#navAcademico"
-                   data-bs-toggle="collapse"
-                   aria-expanded="{{ $academico ? 'true' : 'false' }}"
-                   class="nav-link d-flex align-items-center gap-2 {{ $academico ? 'active' : '' }}"
-                   style="cursor:pointer">
+                    data-bs-toggle="collapse"
+                    aria-expanded="{{ $academico ? 'true' : 'false' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $academico ? 'active' : '' }}"
+                    style="cursor:pointer">
                     <i class="fa-solid fa-graduation-cap"></i>
                     <span>Matrículas</span>
                     <i class="fa-solid fa-chevron-down ms-auto"
-                       style="font-size:.65rem;transition:transform .2s;
+                        style="font-size:.65rem;transition:transform .2s;
                               {{ $academico ? 'transform:rotate(180deg)' : '' }}"
-                       id="chevronAcad"></i>
+                        id="chevronAcad"></i>
                 </a>
                 <div class="collapse {{ $academico ? 'show' : '' }}" id="navAcademico">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
                             <a href="{{ route('admin.grupos') }}"
-                               class="{{ request()->routeIs('admin.grupos*') ? 'active nav-link' : 'nav-link' }}"
-                               style="padding-left:42px;font-size:.85rem">
+                                class="{{ request()->routeIs('admin.grupos*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-layer-group" style="font-size:.8em"></i> Grupos
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.matriculas.index') }}"
-                               class="{{ request()->routeIs('admin.matriculas*') ? 'active nav-link' : 'nav-link' }}"
-                               style="padding-left:42px;font-size:.85rem">
+                                class="{{ request()->routeIs('admin.matriculas*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-list-check" style="font-size:.8em"></i> Lista
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.cierre.index') }}"
-                               class="{{ request()->routeIs('admin.cierre*') ? 'active nav-link' : 'nav-link' }}"
-                               style="padding-left:42px;font-size:.85rem">
+                                class="{{ request()->routeIs('admin.cierre*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-calendar-check" style="font-size:.8em"></i> Cierre de año
                             </a>
                         </li>
@@ -115,12 +115,12 @@
     </aside>
 
     @php
-        $usuarioAuth = Auth::guard('docente')->user();
-        $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
-        $inicialesAuth = mb_strtoupper(
-            mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
-        );
-        $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
+    $usuarioAuth = Auth::guard('docente')->user();
+    $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
+    $inicialesAuth = mb_strtoupper(
+    mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
+    );
+    $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
     @endphp
     <header class="header">
         <div class="header-perfil" id="headerPerfil">
@@ -214,12 +214,12 @@
         }
 
         /* ── Chevron sidebar group ───────────────────────────────── */
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const collapseEl = document.getElementById('navAcademico');
-            const chevron    = document.getElementById('chevronAcad');
+            const chevron = document.getElementById('chevronAcad');
             if (collapseEl && chevron) {
-                collapseEl.addEventListener('show.bs.collapse',  () => chevron.style.transform = 'rotate(180deg)');
-                collapseEl.addEventListener('hide.bs.collapse',  () => chevron.style.transform = 'rotate(0deg)');
+                collapseEl.addEventListener('show.bs.collapse', () => chevron.style.transform = 'rotate(180deg)');
+                collapseEl.addEventListener('hide.bs.collapse', () => chevron.style.transform = 'rotate(0deg)');
             }
         });
 
@@ -273,19 +273,19 @@
         }
     </script>
     @if (session('success'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => mostrarToast('success', @json(session('success'))));
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => mostrarToast('success', @json(session('success'))));
+    </script>
     @endif
     @if (session('error'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => mostrarToast('error', @json(session('error'))));
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => mostrarToast('error', @json(session('error'))));
+    </script>
     @endif
     @if (session('info'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => mostrarToast('info', @json(session('info'))));
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => mostrarToast('info', @json(session('info'))));
+    </script>
     @endif
     @stack('scripts')
 </body>
