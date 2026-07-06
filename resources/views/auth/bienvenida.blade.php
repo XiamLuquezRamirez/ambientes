@@ -12,7 +12,7 @@
             <span class="btn-jugar__texto">¡Vamos a jugar!</span>
         </a>
 
-        <a href="#" class="link-docente">Acceso docente</a>
+        <a href="{{ route('docente.login') }}" class="link-docente">Acceso Administrativo/ Docente</a>
     </div>
 </main>
 @endsection

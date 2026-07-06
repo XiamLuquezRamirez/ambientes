@@ -28,19 +28,19 @@ class AuthDocenteController extends Controller
         }
 
         $usuario = Auth::guard('docente')->user();
-        if ($usuario->estado === 'inactivo') {
+        if (! $usuario->activo) {
             Auth::guard('docente')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
             return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra inactiva.');
         }
-        if ($usuario->estado === 'eliminado') {
+        if ($usuario->docente && in_array($usuario->docente->estado, ['inactivo', 'eliminado'], true)) {
             Auth::guard('docente')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra eliminada.');
+            return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra inactiva.');
         }
         LoginLog::create([
             'user_id' => $usuario->id,
@@ -61,7 +61,7 @@ class AuthDocenteController extends Controller
 
         return $usuario->esAdmin()
             ? redirect()->route('admin.ambientes')
-            : redirect()->route('admin.docentes');
+            : redirect()->route('panel.principal');
     }
 
     public function cerrarSesion(Request $request)

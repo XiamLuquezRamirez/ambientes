@@ -15,6 +15,8 @@ class PiarActaCompromiso extends Model
         'compromisos',
     ];
 
+    protected $with = ['actividades'];
+
     public function actividades()
     {
         return $this->hasMany(

@@ -13,7 +13,10 @@ class PiarAjusteRazonableDocenteFirma extends Model
         'id',
         'id_ajuste_razonable',
         'id_docente',
+        'area'
     ];
+
+    protected $with = ['docente'];
 
     public function docente()
     {

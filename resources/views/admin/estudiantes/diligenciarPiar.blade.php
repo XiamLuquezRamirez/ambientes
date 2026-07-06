@@ -606,6 +606,7 @@
     </a>
 </div>
 <div class="piar-container">
+    <input type="hidden" id="id_estudiante_piar" value="{{ $estudiante?->id }}">
     {{-- Stepper --}}
     <div class="piar-stepper" id="piarStepper">
         <div class="piar-stepper-progress" id="piarProgress" style="width:0%"></div>
@@ -641,7 +642,7 @@
     </div>
     <div class="piar-body">
         {{-- PASO 1: Información General --}}
-        <div class="piar-pane card-item" data-pane="1">
+        <div class="piar-pane active card-item" data-pane="1">
             <div class="piar-pane-title">
                 <div class="piar-pane-icon" style="background:#EFF6FF;color:#2563EB">
                     <i class="fas fa-user-graduate"></i>
@@ -731,8 +732,8 @@
     
                             <select class="form-select" name="vinculado" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -765,8 +766,8 @@
                             </label>
                             <select class="form-select" name="victima" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -775,8 +776,8 @@
                             </label>
                             <select class="form-select" name="registro_victima" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>                
                         <div class="col-md-6">
@@ -785,8 +786,8 @@
                             </label>
                             <select class="form-select" name="centro_proteccion" onchange="colocarRequired('cual_centro_proteccion', this)" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>    
                         <div class="col-6">
@@ -799,8 +800,8 @@
                             </label>
                             <select class="form-select" name="grupo_etnico" onchange="colocarRequired('cual_etnico', this)" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>
                         <div class="col-6">
@@ -873,16 +874,16 @@
                             <label class="form-label">Afiliado al sistema de salud</label>
                             <select class="form-select" name="afiliado_salud" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Régimen</label>
                             <select class="form-select" name="regimen" required>
                                 <option value="">Seleccione</option>
-                                <option>Contributivo</option>
-                                <option>Subsidiado</option>
+                                <option value="Contributivo">Contributivo</option>
+                                <option value="Subsidiado">Subsidiado</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -901,8 +902,8 @@
                             <label class="form-label">Cuenta con diagnóstico médico</label>
                             <select class="form-select" name="diagnostico_medico" required>
                                 <option value="">Seleccione</option>
-                                <option>Si</option>
-                                <option>No</option>
+                                <option value="Si">Si</option>
+                                <option value="No">No</option>
                             </select>
                         </div>
                         <div class="col-md-9">
@@ -1062,11 +1063,11 @@
                             <label class="form-label">Nivel educativo alcanzado</label>
                             <select required class="form-select" name="nivel_madre">
                                 <option value="">Seleccione</option>
-                                <option>Primaria</option>
-                                <option>Bachillerato</option>
-                                <option>Técnico</option>
-                                <option>Tecnólogo</option>
-                                <option>Universitario</option>
+                                <option value="Primaria">Primaria</option>
+                                <option value="Bachillerato">Bachillerato</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Tecnólogo">Tecnólogo</option>
+                                <option value="Universitario">Universitario</option>
                             </select>
                         </div>
                     </div>
@@ -1088,11 +1089,11 @@
                             <label class="form-label">Nivel educativo alcanzado</label>
                             <select required class="form-select" name="nivel_padre">
                                 <option value="">Seleccione</option>
-                                <option>Primaria</option>   
-                                <option>Bachillerato</option>
-                                <option>Técnico</option>
-                                <option>Tecnólogo</option>
-                                <option>Universitario</option>
+                                <option value="Primaria">Primaria</option>   
+                                <option value="Bachillerato">Bachillerato</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Tecnólogo">Tecnólogo</option>
+                                <option value="Universitario">Universitario</option>
                             </select>
                         </div>
                     </div>
@@ -1110,11 +1111,11 @@
                             <label class="form-label">Nivel educativo del cuidador</label>
                             <select required class="form-select" name="nivel_cuidador">
                                 <option value="">Seleccione</option>
-                                <option>Primaria</option>
-                                <option>Bachillerato</option>
-                                <option>Técnico</option>
-                                <option>Tecnólogo</option>
-                                <option>Universitario</option>
+                                <option value="Primaria">Primaria</option>
+                                <option value="Bachillerato">Bachillerato</option>
+                                <option value="Técnico">Técnico</option>
+                                <option value="Tecnólogo">Tecnólogo</option>
+                                <option value="Universitario">Universitario</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -1189,8 +1190,8 @@
                         </label>
                         <select required onchange="mostrarMotivo(this)" class="form-select" name="vinculado_otra_institucion">
                             <option value="">Seleccione</option>
-                            <option>Si</option>
-                            <option>No</option>
+                            <option value="Si">Si</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
             
@@ -1230,8 +1231,8 @@
             
                         <select required class="form-select" name="estado_ultimo_grado">
                             <option value="">Seleccione</option>
-                            <option>Aprobado</option>
-                            <option>Sin terminar</option>
+                            <option value="Aprobado">Aprobado</option>
+                            <option value="Sin terminar">Sin terminar</option>
                         </select>
                     </div>
             
@@ -1249,8 +1250,8 @@
                         <select required class="form-select"
                                 name="recibe_informe_pedagogico">
                             <option value="">Seleccione</option>
-                            <option>Si</option>
-                            <option>No</option>
+                            <option value="Si">Si</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
             
@@ -1268,8 +1269,8 @@
             
                         <select onchange="colocarRequired('cuales_programas', this)" required class="form-select" name="programas_complementarios">
                             <option value="">Seleccione</option>
-                            <option>Si</option>
-                            <option>No</option>
+                            <option value="Si">Si</option>
+                            <option value="No">No</option>
                         </select>
                     </div>
             
@@ -1326,7 +1327,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_apoyo_sistema_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_apoyo_sistema_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Requiere ajustes en el espacio físico y en el ambiente para favorecer su movilidad?</td>
@@ -1338,7 +1339,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_ajustes_espacio_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_ajustes_espacio_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Se necesitan ajustes para la movilidad?</td>
@@ -1350,7 +1351,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_ajustes_movilidad_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_ajustes_movilidad_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Requiere apoyos para favorecer su motricidad fina? <small class="text-muted">(no es movilidad)</small></td>
@@ -1362,7 +1363,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_motricidad_fina_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_motricidad_fina_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Requiere alguna adaptación para agarrar objetos?</td>
@@ -1374,7 +1375,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_mov_adaptacion_agarrar_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_mov_adaptacion_agarrar_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1416,7 +1417,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_com_apoyo_sistema_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_com_apoyo_sistema_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Cuenta con los aditamentos de apoyo a la comunicación?</td>
@@ -1428,7 +1429,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_com_aditamentos_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_com_aditamentos_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Se necesitan ajustes para garantizar la comunicación?</td>
@@ -1440,7 +1441,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_com_ajustes_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_com_ajustes_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1482,7 +1483,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_info_apoyo_sistema_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_info_apoyo_sistema_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Se necesitan ajustes para garantizar el acceso a la información?</td>
@@ -1494,7 +1495,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_info_ajustes_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_info_ajustes_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1536,7 +1537,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_soc_apoyo_regulacion_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_soc_apoyo_regulacion_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Se necesitan ajustes para garantizar la interacción con sus pares y maestros?</td>
@@ -1548,7 +1549,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_soc_ajustes_interaccion_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_soc_ajustes_interaccion_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1595,7 +1596,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_acad_ajustes_permanencia_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_acad_ajustes_permanencia_obs"></textarea></td>
                                     </tr>
                                     <tr>
                                         <td>¿Requiere ajustes en los tiempos dedicados a una actividad?</td>
@@ -1607,7 +1608,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                        <td><input type="text" class="form-control form-control-sm" name="vp_acad_ajustes_tiempos_obs"></td>
+                                        <td><textarea class="auto-grow form-control" name="vp_acad_ajustes_tiempos_obs"></textarea></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1752,7 +1753,7 @@
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="cle_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="cle_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1795,7 +1796,7 @@
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="clm_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="clm_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1837,7 +1838,7 @@
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="dba_mem_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="dba_mem_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1873,8 +1874,9 @@
                                                 </table>
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control form-control-sm" name="dba_ate_{{ $i + 1 }}_obs"
+                                                <textarea class="auto-grow form-control" name="dba_ate_{{ $i + 1 }}_obs"
                                                     @if($texto === 'ate_tiempo') placeholder="Especifique tiempo (5, 10, 15 o más de 20 minutos)" required @endif>
+                                                </textarea>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -1906,7 +1908,7 @@
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="dba_per_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="dba_per_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1940,7 +1942,7 @@
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="dba_fe_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="dba_fe_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1971,7 +1973,7 @@
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td><input type="text" class="form-control form-control-sm" name="dba_lc_{{ $i + 1 }}_obs"></td>
+                                            <td><textarea class="auto-grow form-control" name="dba_lc_{{ $i + 1 }}_obs"></textarea></td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -1988,7 +1990,7 @@
                             diferentes áreas de desarrollo, resaltando sus fortalezas, capacidades y potencial de aprendizaje. Esta información orienta
                             la implementación de estrategias pedagógicas y apoyos que favorezcan su proceso educativo y participación en el aula.
                         </p>
-                        <textarea required class="form-control" rows="6" name="habilidades_destrezas" placeholder="Describa las habilidades y destrezas del estudiante"></textarea>
+                        <textarea required class="auto-grow form-control" rows="6" name="habilidades_destrezas" placeholder="Describa las habilidades y destrezas del estudiante"></textarea>
                     </div>
                 </div>
                 {{-- ESTRATEGIAS Y/O ACCIONES A DESARROLLAR CON EL ESTUDIANTE --}}
@@ -2000,7 +2002,7 @@
                             fortalecer sus procesos académicos, sociales, comunicativos y comportamentales. Estas acciones buscan responder a sus
                             necesidades educativas y potenciar sus habilidades, favoreciendo su participación activa y aprendizaje significativo.
                         </p>
-                        <textarea required class="form-control" rows="6" name="estrategias_acciones" placeholder="Describa las estrategias y acciones a desarrollar con el estudiante"></textarea>
+                        <textarea required class="auto-grow form-control" rows="6" name="estrategias_acciones" placeholder="Describa las estrategias y acciones a desarrollar con el estudiante"></textarea>
                     </div>
                 </div>
             </form>
@@ -2371,7 +2373,7 @@
 
 
         {{-- PASO 8: mensaje de confirmación --}}
-        <div class="piar-pane active card-item" data-pane="8">
+        <div class="piar-pane card-item" data-pane="8">
                 <div class="d-flex flex-column justify-content-center align-items-center">
                     <i class="fas fa-check-circle fa-5x" style="color: #28a745;"></i>
                     <br>

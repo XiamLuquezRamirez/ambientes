@@ -1,6 +1,15 @@
 let paso = 1;
-
 const TOTAL = 7;
+var atencion_medica_cuenta = 1;
+var tratamientos_cuenta = 1;
+var medicamentos_cuenta = 1;
+var ajustes_cuenta = 1;
+var firmas_docentes_cuenta = 1;
+var actividades_cuenta = 1;
+
+var id_docente_firma = '';
+var docentes = [];
+var docentes_firma = [];
 
 const panes      = document.querySelectorAll('.piar-pane');
 const steps      = document.querySelectorAll('.piar-step');
@@ -34,6 +43,8 @@ function actualizarUI() {
         $('.piar-step-counter').show();
         btnSig.style.display = 'inline-block';
     }
+
+    autoGrowTextarea();
 }
 
 function validarPaso() {
@@ -67,7 +78,6 @@ function validarPaso() {
 
     return error;
 }
-
 
 btnSig.addEventListener('click', () => {
     if (paso <= TOTAL) { 
@@ -105,20 +115,9 @@ btnSig.addEventListener('click', () => {
 });
 
 btnAnt.addEventListener('click', () => {
-    if (paso > 1) { paso--; actualizarUI(); }
+    if (paso > 1) { paso--; actualizarUI(); autoGrowTextarea(); }
 });
 
-
-var atencion_medica_cuenta = 1;
-var tratamientos_cuenta = 1;
-var medicamentos_cuenta = 1;
-var ajustes_cuenta = 1;
-var firmas_docentes_cuenta = 1;
-var actividades_cuenta = 1;
-
-var id_docente_firma = '';
-var docentes = [];
-var docentes_firma = [];
 
 function agregarAtencionMedica() {
     atencion_medica_cuenta++;
@@ -219,20 +218,18 @@ function mostrarMotivo(select) {
 
 /* Auto grow textarea */
 function autoGrowTextarea() {
-    document.querySelectorAll('.auto-grow').forEach(textarea => {
-        const minHeight = textarea.scrollHeight;
-
+    document.querySelectorAll('.auto-grow').forEach(textarea => {        
         function resize() {
-            textarea.style.height = 'auto';
-            textarea.style.height = Math.max(textarea.scrollHeight, minHeight) + 'px';
+            textarea.style.height = '40px';
+            textarea.style.height = textarea.scrollHeight + 'px';
         }
 
         textarea.addEventListener('input', resize);
+        textarea.autoResize = resize;
         resize(); // Ajusta si ya tiene contenido al cargar la página
     });
 }
 
-autoGrowTextarea();
 
 function agregarAjuste() {
     ajustes_cuenta++;
@@ -447,6 +444,7 @@ function guardarDatos(datos, url, form) {
             if (bandera) {
                 paso++;
                 actualizarUI();
+                autoGrowTextarea();
             }
         }
     });
@@ -598,4 +596,337 @@ function colocarFirma(id_img, url_firma) {
 function cerrarModalBuscarDocente() {
     $('#modal_buscar_docente').modal('hide');
     $('#form-buscar-docente input[name="nombre"]').val('');
+}
+
+var piar = null;
+$(document).ready(function() {
+    var id_estudiante = $('#id_estudiante_piar').val();
+    verificarSiComenzo(id_estudiante).then(function(data) {
+        if (data.comenzo) {
+            paso = parseInt(data.piar.paso);
+            piar = data.piar;
+            switch (paso) {
+                case 2:
+                    mapearPaso1();
+                    break;
+                case 3:
+                    mapearPaso1();
+                    mapearPaso2();
+                    break;
+                case 4:
+                    mapearPaso1();
+                    mapearPaso2();
+                    mapearPaso3();
+                    break;
+                case 5:
+                    mapearPaso1();
+                    mapearPaso2();
+                    mapearPaso3();
+                    mapearPaso4();
+                    break;
+                case 6:
+                    mapearPaso1();
+                    mapearPaso2();
+                    mapearPaso3();
+                    mapearPaso4();
+                    mapearPaso5();
+                    break;
+                case 7:
+                    mapearPaso1();
+                    mapearPaso2();
+                    mapearPaso3();
+                    mapearPaso4();
+                    mapearPaso5();
+                    mapearPaso6();
+                    break;
+                case 8:
+                    mapearPaso1();
+                    mapearPaso2();
+                    mapearPaso3();
+                    mapearPaso4();
+                    mapearPaso5();
+                    mapearPaso6();
+                    mapearPaso7();
+                    break;
+            }
+        } else {
+            paso = 1;
+        }
+        actualizarUI();
+    }).catch(function(error) {
+        paso = 1;
+        //actualizarUI();
+    });
+});
+
+async function verificarSiComenzo(id_estudiante) {
+    return new Promise(async (resolve) => {
+        var response = await fetch(URL_PIAR + '/verificar-si-comenzo/' + id_estudiante);
+        var data = await response.json();
+        if (data.success) {
+            resolve({comenzo: true, piar: data.data});
+        } else {
+            resolve({comenzo: false, piar: null});
+        }
+    });
+}
+
+function mapearPaso1() {
+    setValueSelect('#form-paso-1 select[name="vinculado"]', piar.datos_generales.vinculado);
+    setValueSelect('#form-paso-1 select[name="victima"]', piar.datos_generales.victima);
+    setValueSelect('#form-paso-1 select[name="registro_victima"]', piar.datos_generales.registro_victima);
+    setValueSelect('#form-paso-1 select[name="centro_proteccion"]', piar.datos_generales.centro_proteccion);
+    setValueInput('#form-paso-1 input[name="cual_centro_proteccion"]', piar.datos_generales.cual_centro_proteccion);
+    setValueSelect('#form-paso-1 select[name="grupo_etnico"]', piar.datos_generales.grupo_etnico);
+    setValueInput('#form-paso-1 input[name="cual_etnico"]', piar.datos_generales.cual_etnico);
+    setValueInput('#form-paso-1 textarea[name="capacidades"]', piar.datos_generales.capacidades);
+    setValueInput('#form-paso-1 textarea[name="gustos"]', piar.datos_generales.gustos);
+    setValueInput('#form-paso-1 textarea[name="expectativas_estudiante"]', piar.datos_generales.expectativas_estudiante);
+    setValueInput('#form-paso-1 textarea[name="expectativas_familia"]', piar.datos_generales.expectativas_familia);
+    setValueInput('#form-paso-1 textarea[name="redes_apoyo"]', piar.datos_generales.redes_apoyo);
+    setValueInput('#form-paso-1 textarea[name="otras"]', piar.datos_generales.otras);
+}
+
+function mapearPaso2() {
+    setValueSelect('#form-paso-2 select[name="afiliado_salud"]', piar.entorno_salud.afiliado_salud);
+    setValueSelect('#form-paso-2 select[name="regimen"]', piar.entorno_salud.regimen);
+    setValueInput('#form-paso-2 input[name="eps"]', piar.entorno_salud.eps);
+    setValueInput('#form-paso-2 input[name="lugar_emergencia"]', piar.entorno_salud.lugar_emergencia);
+    setValueSelect('#form-paso-2 select[name="diagnostico_medico"]', piar.entorno_salud.diagnostico_medico);
+    setValueSelect('#form-paso-2 select[name="cual_diagnostico"]', piar.entorno_salud.cual_diagnostico);
+    setValueSelect('#form-paso-2 select[name="atencion_medica"]', piar.entorno_salud.atencion_medica);
+    setValueSelect('#form-paso-2 select[name="consume_medicamentos"]', piar.entorno_salud.consume_medicamentos);
+    setValueSelect('#form-paso-2 select[name="tratamiento_integral"]', piar.entorno_salud.tratamiento_integral);
+
+    var index_atencion_medica = 0;
+    piar.entorno_salud.atenciones_medicas.forEach(function(atencion_medica) {
+        if(index_atencion_medica > 0) {
+            agregarAtencionMedica();
+        }
+        //setear valor de una vez
+        setValueInput('#form-paso-2 input[name="atencion['+index_atencion_medica+'][cual]"]', atencion_medica.cual);
+        setValueInput('#form-paso-2 input[name="atencion['+index_atencion_medica+'][frecuencia]"]', atencion_medica.frecuencia);
+        index_atencion_medica++;
+    });
+
+    var index_tratamiento = 0;
+    piar.entorno_salud.tratamientos.forEach(function(tratamiento) {
+        if(index_tratamiento > 0) {
+            agregarTratamiento();
+        }
+        setValueInput('#form-paso-2 input[name="tratamiento['+index_tratamiento+'][cual]"]', tratamiento.cual);
+        setValueInput('#form-paso-2 input[name="tratamiento['+index_tratamiento+'][frecuencia]"]', tratamiento.frecuencia);
+        index_tratamiento++;
+    });
+
+    var index_medicamento = 0;
+    piar.entorno_salud.medicamentos.forEach(function(medicamento) {
+        if(index_medicamento > 0) {
+            agregarMedicamento();
+        }
+        setValueInput('#form-paso-2 input[name="medicamento['+index_medicamento+'][cual]"]', medicamento.cual);
+        setValueInput('#form-paso-2 input[name="medicamento['+index_medicamento+'][frecuencia]"]', medicamento.frecuencia);
+        setValueInput('#form-paso-2 input[name="medicamento['+index_medicamento+'][horario]"]', medicamento.horario);
+        index_medicamento++;
+    });
+
+    setValueSelect('#form-paso-2 select[name="ayudas_tecnicas"]', piar.entorno_salud.ayudas_tecnicas);
+    setValueInput('#form-paso-2 textarea[name="cuales_ayudas"]', piar.entorno_salud.cuales_ayudas);
+}
+
+function mapearPaso3() {
+    setValueInput('#form-paso-3 input[name="nombre_madre"]', piar.entorno_hogar.nombre_madre);
+    setValueInput('#form-paso-3 input[name="ocupacion_madre"]', piar.entorno_hogar.ocupacion_madre);
+    setValueSelect('#form-paso-3 select[name="nivel_madre"]', piar.entorno_hogar.nivel_madre);
+    setValueInput('#form-paso-3 input[name="nombre_padre"]', piar.entorno_hogar.nombre_padre);
+    setValueInput('#form-paso-3 input[name="ocupacion_padre"]', piar.entorno_hogar.ocupacion_padre);
+    setValueSelect('#form-paso-3 select[name="nivel_padre"]', piar.entorno_hogar.nivel_padre);
+    setValueInput('#form-paso-3 input[name="nombre_cuidador"]', piar.entorno_hogar.nombre_cuidador);
+    setValueSelect('#form-paso-3 select[name="nivel_cuidador"]', piar.entorno_hogar.nivel_cuidador);
+    setValueInput('#form-paso-3 input[name="telefono_cuidador"]', piar.entorno_hogar.telefono_cuidador);
+    setValueInput('#form-paso-3 input[name="parentesco_cuidador"]', piar.entorno_hogar.parentesco_cuidador);
+    setValueInput('#form-paso-3 input[name="correo_cuidador"]', piar.entorno_hogar.correo_cuidador);
+    setValueInput('#form-paso-3 input[name="numero_hermanos"]', piar.entorno_hogar.numero_hermanos);
+    setValueInput('#form-paso-3 input[name="lugar_ocupa"]', piar.entorno_hogar.lugar_ocupa);
+    setValueInput('#form-paso-3 textarea[name="apoyo_crianza"]', piar.entorno_hogar.apoyo_crianza);
+    setValueInput('#form-paso-3 textarea[name="personas_con_quien_vive"]', piar.entorno_hogar.personas_con_quien_vive);
+}
+
+function mapearPaso4() {
+    setValueSelect('#form-paso-4 select[name="vinculado_otra_institucion"]', piar.entorno_educativo.vinculado_otra_institucion);
+    setValueInput('#form-paso-4 input[name="instituciones_anteriores"]', piar.entorno_educativo.instituciones_anteriores);
+    setValueInput('#form-paso-4 input[name="motivo_no_vinculado"]', piar.entorno_educativo.motivo_no_vinculado);
+    setValueSelect('#form-paso-4 select[name="ultimo_grado"]', piar.entorno_educativo.ultimo_grado);
+    setValueSelect('#form-paso-4 select[name="estado_ultimo_grado"]', piar.entorno_educativo.estado_ultimo_grado);
+    setValueInput('#form-paso-4 textarea[name="observaciones_estado"]', piar.entorno_educativo.observaciones_estado);
+    setValueSelect('#form-paso-4 select[name="recibe_informe_pedagogico"]', piar.entorno_educativo.recibe_informe_pedagogico);
+    setValueInput('#form-paso-4 input[name="institucion_informe"]', piar.entorno_educativo.institucion_informe);
+    setValueSelect('#form-paso-4 select[name="programas_complementarios"]', piar.entorno_educativo.programas_complementarios);
+    setValueInput('#form-paso-4 input[name="cuales_programas"]', piar.entorno_educativo.cuales_programas);
+}
+
+function mapearPaso5() {
+    setValueRadio('vp_mov_apoyo_sistema', piar.valoracion_pedagogica.vp_mov_apoyo_sistema);
+    setValueInput('#form-paso-5 textarea[name="vp_mov_apoyo_sistema_obs"]', piar.valoracion_pedagogica.vp_mov_apoyo_sistema_obs); 
+    setValueRadio('vp_mov_ajustes_espacio', piar.valoracion_pedagogica.vp_mov_ajustes_espacio);
+    setValueInput('#form-paso-5 textarea[name="vp_mov_ajustes_espacio_obs"]', piar.valoracion_pedagogica.vp_mov_ajustes_espacio_obs);
+    setValueRadio('vp_mov_ajustes_movilidad', piar.valoracion_pedagogica.vp_mov_ajustes_movilidad);
+    setValueInput('#form-paso-5 textarea[name="vp_mov_ajustes_movilidad_obs"]', piar.valoracion_pedagogica.vp_mov_ajustes_movilidad_obs);
+    setValueRadio('vp_mov_motricidad_fina', piar.valoracion_pedagogica.vp_mov_motricidad_fina);
+    setValueInput('#form-paso-5 textarea[name="vp_mov_motricidad_fina_obs"]', piar.valoracion_pedagogica.vp_mov_motricidad_fina_obs);
+    setValueRadio('vp_mov_adaptacion_agarrar', piar.valoracion_pedagogica.vp_mov_adaptacion_agarrar);
+    setValueInput('#form-paso-5 textarea[name="vp_mov_adaptacion_agarrar_obs"]', piar.valoracion_pedagogica.vp_mov_adaptacion_agarrar_obs);
+    setValueRadio('vp_mov_intensidad', piar.valoracion_pedagogica.vp_mov_intensidad);
+    setValueRadio('vp_com_apoyo_sistema', piar.valoracion_pedagogica.vp_com_apoyo_sistema);
+    setValueInput('#form-paso-5 textarea[name="vp_com_apoyo_sistema_obs"]', piar.valoracion_pedagogica.vp_com_apoyo_sistema_obs);
+    setValueRadio('vp_com_aditamentos', piar.valoracion_pedagogica.vp_com_aditamentos);
+    setValueInput('#form-paso-5 textarea[name="vp_com_aditamentos_obs"]', piar.valoracion_pedagogica.vp_com_aditamentos_obs);
+    setValueRadio('vp_com_ajustes', piar.valoracion_pedagogica.vp_com_ajustes);
+    setValueInput('#form-paso-5 textarea[name="vp_com_ajustes_obs"]', piar.valoracion_pedagogica.vp_com_ajustes_obs);
+    setValueRadio('vp_com_intensidad', piar.valoracion_pedagogica.vp_com_intensidad);
+    setValueRadio('vp_info_apoyo_sistema', piar.valoracion_pedagogica.vp_info_apoyo_sistema);
+    setValueInput('#form-paso-5 textarea[name="vp_info_apoyo_sistema_obs"]', piar.valoracion_pedagogica.vp_info_apoyo_sistema_obs);
+    setValueRadio('vp_info_ajustes', piar.valoracion_pedagogica.vp_info_ajustes);
+    setValueInput('#form-paso-5 textarea[name="vp_info_ajustes_obs"]', piar.valoracion_pedagogica.vp_info_ajustes_obs);
+    setValueRadio('vp_info_intensidad', piar.valoracion_pedagogica.vp_info_intensidad);
+    setValueRadio('vp_soc_apoyo_regulacion', piar.valoracion_pedagogica.vp_soc_apoyo_regulacion);
+    setValueInput('#form-paso-5 textarea[name="vp_soc_apoyo_regulacion_obs"]', piar.valoracion_pedagogica.vp_soc_apoyo_regulacion_obs);
+    setValueRadio('vp_soc_ajustes_interaccion', piar.valoracion_pedagogica.vp_soc_ajustes_interaccion);
+    setValueInput('#form-paso-5 textarea[name="vp_soc_ajustes_interaccion_obs"]', piar.valoracion_pedagogica.vp_soc_ajustes_interaccion_obs);
+    setValueRadio('vp_soc_intensidad', piar.valoracion_pedagogica.vp_soc_intensidad);
+    setValueRadio('vp_acad_ajustes_permanencia', piar.valoracion_pedagogica.vp_acad_ajustes_permanencia);
+    setValueInput('#form-paso-5 textarea[name="vp_acad_ajustes_permanencia_obs"]', piar.valoracion_pedagogica.vp_acad_ajustes_permanencia_obs);
+    setValueRadio('vp_acad_ajustes_tiempos', piar.valoracion_pedagogica.vp_acad_ajustes_tiempos);
+    setValueInput('#form-paso-5 textarea[name="vp_acad_ajustes_tiempos_obs"]', piar.valoracion_pedagogica.vp_acad_ajustes_tiempos_obs);
+    setValueRadio('vp_acad_intensidad', piar.valoracion_pedagogica.vp_acad_intensidad);
+    setValueInput('#form-paso-5 textarea[name="vp_observaciones"]', piar.valoracion_pedagogica.vp_observaciones);
+
+    for(var i = 1; i <= 18; i++) {
+        setValueRadio('cle_' + i, piar.valoracion_pedagogica["cle_" + i]);
+        setValueInput('#form-paso-5 textarea[name="cle_'+i+'_obs"]', piar.valoracion_pedagogica["cle_" + i + "_obs"]);
+    }
+    setValueInput('#form-paso-5 textarea[name="cle_observaciones"]', piar.valoracion_pedagogica.cle_observaciones);
+
+    for(var i = 1; i <= 19; i++) {
+        setValueRadio('clm_' + i, piar.valoracion_pedagogica["clm_" + i]);
+        setValueInput('#form-paso-5 textarea[name="clm_'+i+'_obs"]', piar.valoracion_pedagogica["clm_" + i + "_obs"]);
+    }
+
+    setValueInput('#form-paso-5 input[name="clm_5_desde"]', piar.valoracion_pedagogica.clm_5_desde);
+    setValueInput('#form-paso-5 input[name="clm_5_hasta"]', piar.valoracion_pedagogica.clm_5_hasta);
+    setValueInput('#form-paso-5 textarea[name="clm_observaciones"]', piar.valoracion_pedagogica.clm_observaciones);
+    
+    for(var i = 1; i <= 7; i++) {
+        setValueRadio('dba_mem_' + i, piar.valoracion_pedagogica["dba_mem_" + i]);
+        setValueInput('#form-paso-5 textarea[name="dba_mem_'+i+'_obs"]', piar.valoracion_pedagogica["dba_mem_" + i + "_obs"]);
+    }
+
+    for(var i = 1; i <= 4; i++) {
+        setValueRadio('dba_ate_' + i, piar.valoracion_pedagogica["dba_ate_" + i]);
+        setValueInput('#form-paso-5 textarea[name="dba_ate_'+i+'_obs"]', piar.valoracion_pedagogica["dba_ate_" + i + "_obs"]);
+    }
+
+    for(var i = 1; i <= 5; i++) {
+        setValueRadio('dba_per_' + i, piar.valoracion_pedagogica["dba_per_" + i]);
+        setValueInput('#form-paso-5 textarea[name="dba_per_'+i+'_obs"]', piar.valoracion_pedagogica["dba_per_" + i + "_obs"]);
+    }
+
+    for(var i = 1; i <= 6; i++) {
+        setValueRadio('dba_fe_' + i, piar.valoracion_pedagogica["dba_fe_" + i]);
+        setValueInput('#form-paso-5 textarea[name="dba_fe_'+i+'_obs"]', piar.valoracion_pedagogica["dba_fe_" + i + "_obs"]);
+    }
+
+    for(var i = 1; i <= 10; i++) {
+        setValueRadio('dba_lc_' + i, piar.valoracion_pedagogica["dba_lc_" + i]);
+        setValueInput('#form-paso-5 textarea[name="dba_lc_'+i+'_obs"]', piar.valoracion_pedagogica["dba_lc_" + i + "_obs"]);
+    }
+
+    setValueInput('#form-paso-5 textarea[name="habilidades_destrezas"]', piar.valoracion_pedagogica.habilidades_destrezas);
+    setValueInput('#form-paso-5 textarea[name="estrategias_acciones"]', piar.valoracion_pedagogica.estrategias_acciones);
+}
+
+function mapearPaso6() {
+    var index_item = 0;
+    piar.ajuste_razonable.items.forEach(function(item) {
+        if(index_item > 0) {
+            agregarAjuste();
+        }
+        setValueInput('#form-paso-6 input[name="ajuste_razonable['+index_item+'][area]"]', item.area);
+        setValueInput('#form-paso-6 textarea[name="ajuste_razonable['+index_item+'][barrera]"]', item.barrera);
+        setValueInput('#form-paso-6 textarea[name="ajuste_razonable['+index_item+'][tipo]"]', item.tipo);
+        setValueInput('#form-paso-6 textarea[name="ajuste_razonable['+index_item+'][apoyo]"]', item.apoyo);
+        setValueInput('#form-paso-6 textarea[name="ajuste_razonable['+index_item+'][descripcion]"]', item.descripcion);
+        setValueInput('#form-paso-6 textarea[name="ajuste_razonable['+index_item+'][seguimiento]"]', item.seguimiento);
+        index_item++;
+    });
+
+    var index_docente = 0;
+    piar.ajuste_razonable.docentes_firma.forEach(function(docente) {
+        if(index_docente > 0) {
+            agregarFirmaDocente();
+        }
+        setValueInput('#form-paso-6 input[name="docente_firma['+index_docente+'][id]"]', docente.id_docente);
+        setValueInput('#form-paso-6 input[name="docente_firma['+index_docente+'][nombre]"]', docente.docente.user.nombre + ' ' + docente.docente.user.apellido);
+        setValueInput('#form-paso-6 input[name="docente_firma['+index_docente+'][area]"]', docente.area);
+
+        setValueImg('img_firma_docente_' + (index_docente+1), docente.docente.firma_url);
+
+        docentes_firma.push(docente.id_docente);
+        index_docente++;
+    });
+
+    // docente orientador 
+    setValueInput('#form-paso-6 input[name="docente_orientador_id"]', piar.ajuste_razonable.docente_orientador.id);
+    setValueInput('#form-paso-6 input[name="docente_orientador_nombre"]', piar.ajuste_razonable.docente_orientador.user.nombre + ' ' + piar.ajuste_razonable.docente_orientador.user.apellido);
+    setValueInput('#form-paso-6 input[name="docente_orientador_area"]', piar.ajuste_razonable.docente_orientador_area);
+    setValueImg('docente_orientador_firma', piar.ajuste_razonable.docente_orientador.firma_url);
+
+    // docente apoyo pedagógico
+    setValueInput('#form-paso-6 input[name="docente_apoyo_pedagogico_id"]', piar.ajuste_razonable.docente_apoyo_pedagogico.id);
+    setValueInput('#form-paso-6 input[name="docente_apoyo_pedagogico_nombre"]', piar.ajuste_razonable.docente_apoyo_pedagogico.user.nombre + ' ' + piar.ajuste_razonable.docente_apoyo_pedagogico.user.apellido);
+    setValueInput('#form-paso-6 input[name="docente_apoyo_pedagogico_area"]', piar.ajuste_razonable.docente_apoyo_pedagogico_area);
+    setValueImg('docente_apoyo_pedagogico_firma', piar.ajuste_razonable.docente_apoyo_pedagogico.firma_url);
+
+    // docente coordinador pedagógico
+    setValueInput('#form-paso-6 input[name="docente_coordinador_pedagogico_id"]', piar.ajuste_razonable.docente_coordinador_pedagogico.id);
+    setValueInput('#form-paso-6 input[name="docente_coordinador_pedagogico_nombre"]', piar.ajuste_razonable.docente_coordinador_pedagogico.user.nombre + ' ' + piar.ajuste_razonable.docente_coordinador_pedagogico.user.apellido);
+    setValueInput('#form-paso-6 input[name="docente_coordinador_pedagogico_area"]', piar.ajuste_razonable.docente_coordinador_pedagogico_area);
+    setValueImg('docente_coordinador_pedagogico_firma', piar.ajuste_razonable.docente_coordinador_pedagogico.firma_url);
+}
+
+function mapearPaso7() {
+    $('#form-paso-7 textarea[name="compromisos"]').val(piar.acta_compromiso.compromisos);
+
+    var index_actividad = 0;
+    piar.acta_compromiso.actividades.forEach(function(actividad) {
+        if(index_actividad > 0) {
+            agregarActividad();
+        }
+        setValueInput('#form-paso-7 textarea[name="actividad['+index_actividad+'][nombre]"]', actividad.nombre);
+        setValueInput('#form-paso-7 textarea[name="actividad['+index_actividad+'][descripcion]"]', actividad.descripcion);
+        setValueRadio('actividad['+index_actividad+'][frecuencia]', actividad.frecuencia);
+        index_actividad++;
+    });
+}
+
+function setValueSelect(name_select, value) {
+    $(name_select).val(value).trigger('change');
+}
+
+function setValueRadio(name_radio, value) {
+    $(`input[name="${name_radio}"][value="${value}"]`)
+    .prop('checked', true)
+    .trigger('change');
+}
+
+function setValueInput(name_input, value) {
+    $(name_input).val(value);
+}
+
+function setValueImg(id_img, url_img) {
+    if(url_img) {
+        $('#' + id_img).attr('src', '/storage/' + url_img);
+    } else {
+        $('#' + id_img).attr('src', '/assets/images/firma.png');
+    }
 }

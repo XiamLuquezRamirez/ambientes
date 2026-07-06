@@ -9,6 +9,7 @@ class PiarEntornoEducativo extends Model
     protected $table = 'piar_entorno_educativo';
 
     protected $fillable = [
+        'id',
         'id_piar',
         'vinculado_otra_institucion',
         'instituciones_anteriores',

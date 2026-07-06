@@ -13,6 +13,7 @@ class PiarEntornoSalud extends Model
     protected $table = 'piar_entorno_salud';
 
     protected $fillable = [
+        'id',
         'id_piar',
         'afiliado_salud',
         'regimen',
@@ -25,6 +26,12 @@ class PiarEntornoSalud extends Model
         'consume_medicamentos',
         'ayudas_tecnicas',
         'cuales_ayudas',
+    ];
+
+    protected $with = [
+        'atencionesMedicas',
+        'tratamientos',
+        'medicamentos',
     ];
 
     public function atencionesMedicas()
