@@ -140,6 +140,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('piar/{idEstudiante}', [PiarController::class, 'verPiar'])->name('admin.piar.ver');
     Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])->name('admin.piar.guardar-piar');
     Route::get('piar/buscar-docente/{texto}', [PiarController::class, 'buscarDocente'])->name('admin.piar.buscar-docente');
+    Route::get('piar/verificar-si-comenzo/{idEstudiante}', [PiarController::class, 'verificarSiComenzo'])->name('admin.piar.verificar-si-comenzo');
     // Catalogo
     Route::get('catalogo', [CatalogoController::class, 'listar'])->name('admin.catalogo');
     Route::post('catalogo/modulos', [CatalogoController::class, 'guardarModulo'])->name('admin.catalogo.modulo.store');

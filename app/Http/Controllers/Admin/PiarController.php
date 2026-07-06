@@ -41,8 +41,26 @@ class PiarController extends Controller
         $user =Auth::guard('docente')->user();
         $docente_diligencia = User::where('id', $user->id)->first();
 
-
         return view('admin.estudiantes.diligenciarPiar', compact('estudiante', 'condiciones', 'docente_diligencia', 'municipios', 'departamentos'));
+    }
+
+    public function verificarSiComenzo($idEstudiante)
+    {
+        $piar = Piar::with('datosGenerales', 'entornoSalud', 'entornoHogar', 'entornoEducativo', 'valoracionPedagogica', 'ajusteRazonable', 'actaCompromiso')
+        ->where('estudiante_id', $idEstudiante)
+        ->first();
+        
+        if ($piar) {
+            return response()->json([
+                'success' => true,
+                'data' => $piar
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'data' => null
+            ]);
+        }
     }
 
     public function guardarPiar(Request $request, $paso)
@@ -169,7 +187,7 @@ class PiarController extends Controller
                 'tratamiento_integral' => $datos['tratamiento_integral'],
                 'consume_medicamentos' => $datos['consume_medicamentos'],
                 'ayudas_tecnicas' => $datos['ayudas_tecnicas'],
-                'cuales_ayudas' => $datos['atencion_medica'] == 'Si' ? $datos['cuales_ayudas'] : null,
+                'cuales_ayudas' => $datos['ayudas_tecnicas'] == 'Si' ? $datos['cuales_ayudas'] : null,
             ]
         );
 
@@ -643,6 +661,9 @@ class PiarController extends Controller
                         'docente_orientador_id' => $datos['docente_orientador_id'],
                         'docente_apoyo_pedagogico_id' => $datos['docente_apoyo_pedagogico_id'],
                         'docente_coordinador_pedagogico_id' => $datos['docente_coordinador_pedagogico_id'],
+                        'docente_orientador_area' => $datos['docente_orientador_area'],
+                        'docente_apoyo_pedagogico_area' => $datos['docente_apoyo_pedagogico_area'],
+                        'docente_coordinador_pedagogico_area' => $datos['docente_coordinador_pedagogico_area'],
                     ]
                 );
             
@@ -675,6 +696,7 @@ class PiarController extends Controller
                     PiarAjusteRazonableDocenteFirma::create([
                         'id_ajuste_razonable' => $ajuste->id,
                         'id_docente' => $docente['id'],
+                        'area' => $docente['area'],
                     ]);
                 }
             
@@ -762,12 +784,15 @@ class PiarController extends Controller
         }
     }
 
-
     public function actualizarPasoPiar($id_piar, $paso){
 
         //verificar que si ya acabo no se pueda actualizar
         $piar = Piar::where('id', $id_piar)->first();
-        if ($piar->paso == 8) {
+        if ($piar->paso == 8 ) {
+            return false;
+        }
+
+        if ($piar->paso > $paso) {
             return false;
         }
 

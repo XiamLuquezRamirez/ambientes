@@ -14,7 +14,12 @@ class PiarAjusteRazonable extends Model
         'docente_orientador_id',
         'docente_apoyo_pedagogico_id',
         'docente_coordinador_pedagogico_id',
+        'docente_orientador_area',
+        'docente_apoyo_pedagogico_area',
+        'docente_coordinador_pedagogico_area',
     ];
+
+    protected $with = ['items', 'docentesFirma', 'docenteOrientador', 'docenteApoyoPedagogico', 'docenteCoordinadorPedagogico'];
 
     public function items()
     {

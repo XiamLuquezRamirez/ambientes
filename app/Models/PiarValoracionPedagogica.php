@@ -9,6 +9,7 @@ class PiarValoracionPedagogica extends Model
     protected $table = 'piar_valoracion_pedagogica';
 
     protected $fillable = [
+        'id',
         'id_piar',
 
         // Valoración pedagógica

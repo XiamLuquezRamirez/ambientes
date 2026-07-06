@@ -9,6 +9,7 @@ class PiarEntornoHogar extends Model
     protected $table = 'piar_entorno_hogar';
 
     protected $fillable = [
+        'id',
         'id_piar',
         'nombre_madre',
         'ocupacion_madre',

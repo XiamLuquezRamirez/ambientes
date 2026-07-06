@@ -14,6 +14,8 @@ class Docente extends Model
         'user_id', 'telefono', 'direccion', 'especialidad', 'fecha_ingreso', 'descripcion', 'estado', 'firma_url',
     ];
 
+    protected $with = ['user'];
+
     protected $casts = [
         'fecha_ingreso' => 'date',
     ];
