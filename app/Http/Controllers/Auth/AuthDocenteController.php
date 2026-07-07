@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\SeguridadAccion;
 use App\Http\Controllers\Controller;
 use App\Models\LoginLog;
+use App\Services\SeguridadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,19 +28,19 @@ class AuthDocenteController extends Controller
         }
 
         $usuario = Auth::guard('docente')->user();
-        if ($usuario->estado === 'inactivo') {
+        if (! $usuario->activo) {
             Auth::guard('docente')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
             return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra inactiva.');
         }
-        if ($usuario->estado === 'eliminado') {
+        if ($usuario->docente && in_array($usuario->docente->estado, ['inactivo', 'eliminado'], true)) {
             Auth::guard('docente')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra eliminada.');
+            return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra inactiva.');
         }
         LoginLog::create([
             'user_id' => $usuario->id,
@@ -47,11 +49,19 @@ class AuthDocenteController extends Controller
             'ambiente' => config('ambiente.slug'),
         ]);
 
+        SeguridadService::registrar(
+            $usuario->id,
+            Auth::guard('docente')->id(),
+            SeguridadAccion::LOGIN,
+            'Inicio de sesión exitoso.',
+            $request
+        );
+
         $request->session()->regenerate();
 
         return $usuario->esAdmin()
             ? redirect()->route('admin.ambientes')
-            : redirect()->route('admin.docentes');
+            : redirect()->route('panel.principal');
     }
 
     public function cerrarSesion(Request $request)

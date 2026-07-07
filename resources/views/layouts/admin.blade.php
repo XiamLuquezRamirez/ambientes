@@ -40,6 +40,12 @@
                 </a>
             </li>
             @php
+            $academico = request()->routeIs('admin.grupos*','admin.matriculas*','admin.cierre*');
+            @endphp
+            <li class="nav-item">
+                <a href="#navAcademico"
+                    data-bs-toggle="collapse"
+                    aria-expanded="{{ $academico ? 'true' : 'false' }}"
                 $academico = request()->routeIs('admin.grupos*', 'admin.matriculas*', 'admin.cierre*');
             @endphp
             <li class="nav-item">
@@ -125,12 +131,12 @@
     </aside>
 
     @php
-        $usuarioAuth = Auth::guard('docente')->user();
-        $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
-        $inicialesAuth = mb_strtoupper(
-            mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
-        );
-        $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
+    $usuarioAuth = Auth::guard('docente')->user();
+    $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
+    $inicialesAuth = mb_strtoupper(
+    mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
+    );
+    $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
     @endphp
     <header class="header">
         <div class="header-perfil" id="headerPerfil">
@@ -283,19 +289,19 @@
         }
     </script>
     @if (session('success'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => mostrarToast('success', @json(session('success'))));
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => mostrarToast('success', @json(session('success'))));
+    </script>
     @endif
     @if (session('error'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => mostrarToast('error', @json(session('error'))));
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => mostrarToast('error', @json(session('error'))));
+    </script>
     @endif
     @if (session('info'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => mostrarToast('info', @json(session('info'))));
-        </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => mostrarToast('info', @json(session('info'))));
+    </script>
     @endif
     @stack('scripts')
 </body>

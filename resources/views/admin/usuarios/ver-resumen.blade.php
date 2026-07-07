@@ -50,7 +50,6 @@
     </style>
 @endpush
 
-
 <div class="modal fade modal-app" id="modalVerResumen" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalVerResumenLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">

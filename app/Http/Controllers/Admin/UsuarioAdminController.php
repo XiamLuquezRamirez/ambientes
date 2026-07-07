@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SeguridadAccion;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Docente;
@@ -9,7 +10,10 @@ use App\Models\Estudiante;
 use App\Models\Matricula;
 use App\Models\Observacion;
 use App\Models\User;
+use App\Services\ActividadAdminService;
+use App\Services\HistorialAccesosService;
 use App\Services\ResumenActividadDocenteService;
+use App\Services\SeguridadService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -21,7 +25,9 @@ use Illuminate\Support\Str;
 class UsuarioAdminController extends Controller
 {
     public function __construct(
-        private ResumenActividadDocenteService $resumenActividadDocente
+        private ResumenActividadDocenteService $resumenActividadDocente,
+        private ActividadAdminService $actividadAdmin,
+        private HistorialAccesosService $historialAccesos,
     ) {}
 
     public function perfil()
@@ -31,9 +37,14 @@ class UsuarioAdminController extends Controller
             ->load([
                 'docente',
                 'ultimoLogin',
+                'ultimoCambioPassword.actor',
             ]);
 
         $estadisticas = [];
+        $actividad = [];
+        $roles = [];
+        $sessiones = [];
+        $ultimoAcceso = $this->actividadAdmin->ultimoAcceso($usuario);
 
         if ($usuario->esAdmin()) {
 
@@ -67,34 +78,13 @@ class UsuarioAdminController extends Controller
                 [
                     'titulo' => 'Reportes generados',
                     'valor' => Observacion::count(),
-                    'icono' => 'fa-users',
+                    'icono' => 'fa-file-pen',
                     'color' => 'orange',
                 ],
             ];
 
-            $actividad = [
-                [
-                    'titulo' => 'Inicio de sesión',
-                    'descripcion' => 'Accedió al sistema desde Google Chrome.',
-                    'fecha' => 'Hace 2 horas',
-                    'icono' => 'fa-right-to-bracket',
-                    'color' => 'success',
-                ],
-                [
-                    'titulo' => 'Actualizó su información',
-                    'descripcion' => 'Modificó el número de teléfono.',
-                    'fecha' => 'Ayer',
-                    'icono' => 'fa-user-pen',
-                    'color' => 'primary',
-                ],
-                [
-                    'titulo' => 'Cambio de contraseña',
-                    'descripcion' => 'La contraseña fue actualizada correctamente.',
-                    'fecha' => 'Hace 4 días',
-                    'icono' => 'fa-key',
-                    'color' => 'warning',
-                ],
-            ];
+            $actividad = $this->actividadAdmin->actividadReciente($usuario);
+            $ultimoAcceso = $this->actividadAdmin->ultimoAcceso($usuario);
 
             $roles = [
                 [
@@ -106,13 +96,14 @@ class UsuarioAdminController extends Controller
 
             ];
 
-            $sessionesActivas = $usuario->loginLogs->where('fecha', '>=', Carbon::now()->subMinutes(10))->count();
             $sessiones = [
                 [
                     'titulo' => 'Actual',
-                    'ambiente' => $usuario->ultimoLogin->ambiente,
-                    'ip' => 'IP: '.$usuario->ultimoLogin->ip,
-                    'fecha' => Carbon::parse($usuario->ultimoLogin->fecha)->format('d/m/Y H:i'),
+                    'ambiente' => $usuario->ultimoLogin?->ambiente ?? '—',
+                    'ip' => 'IP: '.($usuario->ultimoLogin?->ip ?? 'Sin registrar'),
+                    'fecha' => $usuario->ultimoLogin
+                        ? Carbon::parse($usuario->ultimoLogin->fecha)->format('d/m/Y H:i')
+                        : 'Sin registros',
                     'icono' => 'fa-computer',
                     'color' => 'success',
                 ],
@@ -171,7 +162,18 @@ class UsuarioAdminController extends Controller
             'actividad',
             'roles',
             'sessiones',
+            'ultimoAcceso',
         ));
+    }
+
+    public function historialAccesos()
+    {
+        $usuario = Auth::guard('docente')->user();
+
+        return response()->json([
+            'success' => true,
+            'data' => $this->historialAccesos->paraUsuario($usuario),
+        ]);
     }
 
     /**
@@ -236,12 +238,14 @@ class UsuarioAdminController extends Controller
     }
 
     /**
-     * Crea un usuario y perfil de docente dentro de una transacción.
+     * Crea un usuario y, si corresponde, su perfil de docente dentro de una transacción.
      *
-     * Si falla la creación del perfil, el usuario no se deja en estado huérfano.
+     * La validación del perfil docente se ejecuta antes de persistir nada en BD,
+     * de modo que un error de validación no deje un registro huérfano en users.
      */
     public function guardar(Request $request)
     {
+        // Paso 1 — Validar siempre los datos de la cuenta (tabla users).
         $datos = $request->validate([
             'identificacion' => 'required|string|min:8|max:15|unique:users,identificacion',
             'nombre' => 'required|string|max:100',
@@ -251,47 +255,54 @@ class UsuarioAdminController extends Controller
             'rol' => 'required|in:admin,docente',
         ]);
 
-        $usuario = User::create([
-            'identificacion' => $datos['identificacion'],
-            'nombre' => $datos['nombre'],
-            'apellido' => $datos['apellido'],
-            'email' => $datos['email'],
-            'password' => Hash::make($datos['password']),
-            'rol' => $datos['rol'],
-        ]);
-
-        if ($usuario->rol === 'docente') {
+        // Paso 2 — Si el rol es docente, validar el perfil antes de abrir la transacción.
+        $datosDocente = null;
+        if ($datos['rol'] === 'docente') {
             $datosDocente = $request->validate([
                 'telefono' => 'required|string|max:30',
                 'direccion' => 'required|string|max:150',
                 'especialidad' => 'required|string|max:150',
                 'fecha_ingreso' => 'required|date',
                 'firma_url' => 'nullable|image|max:2048',
+            ]);
+        }
+
+        // Paso 3 — Persistir cuenta + perfil de forma atómica.
+        $usuario = DB::transaction(function () use ($datos, $datosDocente, $request) {
+            $usuario = User::create([
+                'identificacion' => $datos['identificacion'],
+                'nombre' => $datos['nombre'],
+                'apellido' => $datos['apellido'],
+                'email' => $datos['email'],
+                'password' => Hash::make($datos['password']),
+                'rol' => $datos['rol'],
                 'estado' => 'activo',
             ]);
 
-            // Si se sube una imagen de firma, se guarda en el directorio de docentes.
-            // Si no se sube una imagen de firma, se crea el perfil docente con los datos obligatorios.
-            // Si se sube una imagen de firma, se crea el perfil docente con los datos obligatorios y la imagen de firma.
-            if ($request->hasFile('firma_url') || $request->filled('telefono') || $request->filled('direccion') ||
-                $request->filled('especialidad') || $request->filled('fecha_ingreso')) {
-                if ($request->hasFile('firma_url')) {
-                    $datosDocente['firma_url'] = $request->file('firma_url')
-                        ->store('docentes', 'public');
-                }
-                $usuario->docente()->create(array_filter($datosDocente));
-            } else {
-                $usuario->docente()->create();
+            if ($datos['rol'] === 'docente') {
+                $this->crearPerfilDocente($usuario, $datosDocente, $request);
             }
-        }
-        session([
-            'password_temporal' => $datos['password'],
-        ]);
+
+            return $usuario;
+        });
+
+        // La contraseña en sesión alimenta la descarga del PDF posterior.
+        session(['password_temporal' => $datos['password']]);
+
+        SeguridadService::registrar(
+            $usuario->id,
+            Auth::guard('docente')->id(),
+            SeguridadAccion::USER_CREATED,
+            'Usuario creado correctamente.',
+            $request,
+            trim($usuario->nombre.' '.$usuario->apellido),
+        );
 
         return response()->json([
             'success' => true,
             'accion' => 'crear',
             'message' => 'Usuario creado correctamente.',
+            // Se devuelve para mostrarla una sola vez en el modal de credenciales.
             'password_generada' => $datos['password'],
             'usuario' => [
                 'id' => $usuario->id,
@@ -299,6 +310,30 @@ class UsuarioAdminController extends Controller
                 'apellido' => $datos['apellido'],
             ],
         ]);
+    }
+
+    /**
+     * Crea el registro en docentes asociado al usuario recién creado.
+     *
+     * El estado del perfil se asigna aquí; no se valida desde el request
+     * porque siempre inicia como activo al crear la cuenta.
+     */
+    private function crearPerfilDocente(User $usuario, array $datosDocente, Request $request): void
+    {
+        $perfil = [
+            'telefono' => $datosDocente['telefono'],
+            'direccion' => $datosDocente['direccion'],
+            'especialidad' => $datosDocente['especialidad'],
+            'fecha_ingreso' => $datosDocente['fecha_ingreso'],
+            'estado' => 'activo',
+        ];
+
+        if ($request->hasFile('firma_url')) {
+            $perfil['firma_url'] = $request->file('firma_url')
+                ->store('docentes', 'public');
+        }
+
+        $usuario->docente()->create($perfil);
     }
 
     /**
@@ -342,6 +377,13 @@ class UsuarioAdminController extends Controller
             if (! empty($datos['password'])) {
                 $usuario->password = Hash::make($datos['password']);
                 $usuario->save();
+                SeguridadService::registrar(
+                    $usuario->id,
+                    Auth::guard('docente')->id(),
+                    SeguridadAccion::PASSWORD_CHANGED,
+                    'Contraseña actualizada.',
+                    $request
+                );
             }
 
             if ($datos['rol'] === 'docente') {
@@ -685,26 +727,80 @@ class UsuarioAdminController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Actualiza el perfil del usuario autenticado (solo puede editar su propia cuenta).
+     *
+     * Reglas de negocio:
+     * - nombre, apellido y email son obligatorios.
+     * - Si el email cambia respecto al registrado, se exige password_actual y se valida con Hash::check.
+     * - Registra la acción en seguridad_logs (PROFILE_UPDATED o EMAIL_CHANGED).
+     *
+     * @param  int|string  $usuario  ID del usuario (debe coincidir con el autenticado).
+     * @return \Illuminate\Http\JsonResponse  Datos actualizados para refrescar la UI sin recargar.
      */
-    public function edit(string $id)
+    public function actualizarPerfil(Request $request, $usuario)
     {
-        //
-    }
+        $authUser = Auth::guard('docente')->user();
+        $usuario = User::findOrFail($usuario);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        if ($usuario->id !== $authUser->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No tienes permiso para editar este perfil.',
+            ], 403);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $emailCambiado = $request->filled('email')
+            && mb_strtolower(trim($request->email)) !== mb_strtolower($usuario->email);
+
+        $reglas = [
+            'email' => 'required|email|max:255|unique:users,email,'.$usuario->id,
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+        ];
+
+        if ($emailCambiado) {
+            $reglas['password_actual'] = 'required|string';
+        }
+
+        $datos = $request->validate($reglas);
+
+        if ($emailCambiado && ! Hash::check($datos['password_actual'], $usuario->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La contraseña actual no es correcta.',
+                'errors' => [
+                    'password_actual' => ['La contraseña actual no es correcta.'],
+                ],
+            ], 422);
+        }
+
+        $usuario->update([
+            'email' => $datos['email'],
+            'nombre' => $datos['nombre'],
+            'apellido' => $datos['apellido'],
+        ]);
+
+        SeguridadService::registrar(
+            $usuario->id,
+            $authUser->id,
+            $emailCambiado ? SeguridadAccion::EMAIL_CHANGED : SeguridadAccion::PROFILE_UPDATED,
+            $emailCambiado ? 'Correo electrónico actualizado.' : 'Perfil actualizado.',
+            $request,
+            $usuario->email,
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Perfil actualizado correctamente.',
+            'usuario' => [
+                'id' => $usuario->id,
+                'nombre' => $usuario->nombre,
+                'apellido' => $usuario->apellido,
+                'email' => $usuario->email,
+                'iniciales' => mb_strtoupper(
+                    mb_substr($usuario->nombre ?? '', 0, 1).mb_substr($usuario->apellido ?? '', 0, 1)
+                ),
+            ],
+        ]);
     }
 }

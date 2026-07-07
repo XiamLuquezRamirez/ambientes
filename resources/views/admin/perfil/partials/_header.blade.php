@@ -1,17 +1,17 @@
+@php
+    $iniciales = mb_strtoupper(mb_substr($usuario->nombre ?? '', 0, 1) . mb_substr($usuario->apellido ?? '', 0, 1));
+@endphp
+
 <div class="c-card">
     <div class="card-body p-4">
         <div class="row align-items-center">
             @if ($rol == 'admin')
                 {{-- Avatar --}}
                 <div class="col-lg-2 text-center mb-4 mb-lg-0">
-                    <div class="profile-avatar">
-                        <img src="https://st4.depositphotos.com/5934840/23454/v/450/depositphotos_234542254-stock-illustration-man-profile-smiling-cartoon-vector.jpg"
-                            alt="Avatar">
-                        {{-- @if (optional($usuario->docente)->foto)
-                        <img src="{{ asset('storage/' . $usuario->docente->foto) }}" alt="Avatar">
-                    @else
-                        <img src="{{ asset('img/avatar-default.png') }}" alt="Avatar">
-                    @endif --}}
+                    {{-- id usado por actualizarDatosPerfil() para refrescar iniciales sin recargar --}}
+                    <div class="profile-avatar" id="perfilAvatarIniciales">
+                        {{ $iniciales }}
+
                         <span class="profile-status {{ $usuario->estado == 'activo' ? 'online' : 'offline' }}"></span>
                     </div>
                 </div>
@@ -19,7 +19,8 @@
                 <div class="col-lg-6 ">
                     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
                         <div>
-                            <h1>
+                            {{-- Actualizado vía AJAX al guardar el modal Editar perfil --}}
+                            <h1 id="perfilNombreCompleto">
                                 {{ $informacionPersonal['nombre'] }}
                                 {{ $informacionPersonal['apellido'] }}
                             </h1>
@@ -34,7 +35,7 @@
                         <div class="col-md-6">
                             <div class="profile-item">
                                 <i class="fa-solid fa-envelope"></i>
-                                <span>{{ $informacionPersonal['email'] }}</span>
+                                <span id="perfilEmail">{{ $informacionPersonal['email'] }}</span>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -77,8 +78,17 @@
                                 Último acceso
                             </div>
                             <strong>
-                                {{ optional($usuario->ultimoLogin)->fecha?->diffForHumans() ?? 'Sin registros' }}
+                                @if ($ultimoAcceso ?? null)
+                                    {{ $ultimoAcceso['fecha'] }}
+                                @else
+                                    Sin registros
+                                @endif
                             </strong>
+                            @if ($ultimoAcceso ?? null)
+                                <div class="text-muted small text-end">
+                                    IP: {{ $ultimoAcceso['ip'] }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

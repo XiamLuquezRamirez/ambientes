@@ -64,7 +64,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
-
+                                        <strong class="form-label">Rol</strong>
                                         <select id="rol" name="rol" class="form-select">
                                             <option value="">Seleccione...</option>
                                             <option value="admin">Administrador</option>
@@ -80,7 +80,7 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <strong class="form-label">Telefono</strong>
-                                                <input type="number" id="telefono" name="telefono"
+                                                <input type="tel" id="telefono" name="telefono"
                                                     class="form-control" placeholder="Telefono del docente"
                                                     value="{{ old('telefono') }}">
                                             </div>

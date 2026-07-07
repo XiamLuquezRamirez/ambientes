@@ -161,6 +161,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
     // Usuario
     Route::get('perfil', [UsuarioAdminController::class, 'perfil'])->name('admin.perfil');
+    Route::get('perfil/accesos', [UsuarioAdminController::class, 'historialAccesos'])->name('admin.perfil.accesos');
     Route::get('usuarios', [UsuarioAdminController::class, 'listar'])->name('admin.usuarios');
     Route::get('usuarios/validar-datos', [UsuarioAdminController::class, 'validarDatos'])->name('admin.usuarios.validarDatos');
     Route::post('usuarios', [UsuarioAdminController::class, 'guardar'])->name('admin.usuarios.store');
@@ -168,6 +169,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('usuarios/{usuario}/resumen', [UsuarioAdminController::class, 'resumenActividad'])->name('admin.usuarios.resumen');
     Route::get('usuarios/{usuario}', [UsuarioAdminController::class, 'ver'])->name('admin.usuarios.show');
     Route::get('usuarios/datos/{usuario_id}', [UsuarioAdminController::class, 'verDatosUsuario'])->name('admin.usuarios.datos');
+    Route::put('usuarios/{usuario}/perfil', [UsuarioAdminController::class, 'actualizarPerfil'])->name('admin.usuarios.perfil.update');
     Route::put('usuarios/{usuario}', [UsuarioAdminController::class, 'actualizar'])->name('admin.usuarios.update');
     Route::patch('usuarios/{usuario}/toggle-activo', [UsuarioAdminController::class, 'toggleActivo'])->name('admin.usuarios.toggleActivo');
     Route::delete('usuarios/{usuario}', [UsuarioAdminController::class, 'eliminar'])->name('admin.usuarios.destroy');
@@ -175,7 +177,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
 // ── Panel Docente ─────────────────────────────────────────────────────────
 Route::prefix('panel')->middleware(['es.docente'])->group(function () {
-    Route::get('/', fn () => redirect()->route('panel.estudiantes'));
+    Route::get('principal', fn () => view('docentes.panel'))->name('panel.principal');
 
     // Estudiantes
     Route::get('estudiantes', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
