@@ -16,6 +16,8 @@ class Estudiante extends Model
         'edad' => 'integer'
     ];
 
+    protected $with = ['departamento', 'municipio'];
+
     public function getEdadAttribute()
     {
         if (!$this->fecha_nacimiento) {
