@@ -826,6 +826,8 @@ function mapearPaso5() {
         setValueInput('#form-paso-5 textarea[name="dba_ate_'+i+'_obs"]', piar.valoracion_pedagogica["dba_ate_" + i + "_obs"]);
     }
 
+    setValueInput('#form-paso-5 input[name="dba_ate_4_tiempo"]', piar.valoracion_pedagogica.dba_ate_4_tiempo);
+
     for(var i = 1; i <= 5; i++) {
         setValueRadio('dba_per_' + i, piar.valoracion_pedagogica["dba_per_" + i]);
         setValueInput('#form-paso-5 textarea[name="dba_per_'+i+'_obs"]', piar.valoracion_pedagogica["dba_per_" + i + "_obs"]);
