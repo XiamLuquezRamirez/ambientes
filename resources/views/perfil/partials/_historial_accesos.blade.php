@@ -53,7 +53,7 @@
 
 @push('scripts')
     <script>
-        const URL_PERFIL_ACCESOS = @json(route('admin.perfil.accesos'));
+        const URL_PERFIL_ACCESOS = @json($rutas['accesos']);
         const modalHistorialAccesosPerfil = new bootstrap.Modal(document.getElementById('modalHistorialAccesosPerfil'));
 
         document.getElementById('modalHistorialAccesosPerfil').addEventListener('hidden.bs.modal', function() {

@@ -9,6 +9,7 @@ class HistorialAccesosService
   public function paraUsuario(User $usuario, int $limite = 30): array
   {
     $accesos = $usuario->accesos()
+      ->where('tipo', \App\Models\LoginLog::TIPO_INICIO_SESION)
       ->orderByDesc('fecha')
       ->limit($limite)
       ->get()

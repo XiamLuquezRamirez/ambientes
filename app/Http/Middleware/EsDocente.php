@@ -27,17 +27,6 @@ class EsDocente
 
         view()->share('cargasActivas', $cargasActivas);
 
-        if (! $usuario->activo) {
-
-            Auth::guard('docente')->logout();
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return redirect('/login')
-                ->with('error', 'Su cuenta ha sido desactivada.');
-        }
-
         return $next($request);
     }
 }

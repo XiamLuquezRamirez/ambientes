@@ -171,7 +171,7 @@
                         <div class="resumen-stat-card">
                             <span class="resumen-stat-icon" style="background:#EFF6FF;color:#2563EB"><i class="fa-solid fa-user-graduate"></i></span>
                             <div>
-                                <span class="resumen-stat-value">${Number(totales.estudiantes ?? 0).toLocaleString('es-CO')}</span>
+                                <span class="resumen-stat-value">${Number(tota0les.estudiantes ?? 0).toLocaleString('es-CO')}</span>
                                 <span class="resumen-stat-label">Estudiantes a cargo</span>
                             </div>
                         </div>

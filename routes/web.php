@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
 use App\Http\Controllers\Admin\CatalogoController;
@@ -159,8 +160,10 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
 
     // Usuario
-    Route::get('perfil', [UsuarioAdminController::class, 'perfil'])->name('admin.perfil');
-    Route::get('perfil/accesos', [UsuarioAdminController::class, 'historialAccesos'])->name('admin.perfil.accesos');
+    Route::get('perfil', [PerfilController::class, 'mostrar'])->name('admin.perfil');
+    Route::get('perfil/accesos', [PerfilController::class, 'historialAccesos'])->name('admin.perfil.accesos');
+    Route::get('perfil/validar-datos', [PerfilController::class, 'validarDatos'])->name('admin.perfil.validarDatos');
+    Route::put('perfil/contrasena', [PerfilController::class, 'cambiarContrasena'])->name('admin.perfil.contrasena');
     Route::get('usuarios', [UsuarioAdminController::class, 'listar'])->name('admin.usuarios');
     Route::get('usuarios/validar-datos', [UsuarioAdminController::class, 'validarDatos'])->name('admin.usuarios.validarDatos');
     Route::post('usuarios', [UsuarioAdminController::class, 'guardar'])->name('admin.usuarios.store');
@@ -168,7 +171,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('usuarios/{usuario}/resumen', [UsuarioAdminController::class, 'resumenActividad'])->name('admin.usuarios.resumen');
     Route::get('usuarios/{usuario}', [UsuarioAdminController::class, 'ver'])->name('admin.usuarios.show');
     Route::get('usuarios/datos/{usuario_id}', [UsuarioAdminController::class, 'verDatosUsuario'])->name('admin.usuarios.datos');
-    Route::put('usuarios/{usuario}/perfil', [UsuarioAdminController::class, 'actualizarPerfil'])->name('admin.usuarios.perfil.update');
+    Route::put('usuarios/{usuario}/perfil', [PerfilController::class, 'actualizar'])->name('admin.usuarios.perfil.update');
     Route::put('usuarios/{usuario}', [UsuarioAdminController::class, 'actualizar'])->name('admin.usuarios.update');
     Route::patch('usuarios/{usuario}/toggle-activo', [UsuarioAdminController::class, 'toggleActivo'])->name('admin.usuarios.toggleActivo');
     Route::delete('usuarios/{usuario}', [UsuarioAdminController::class, 'eliminar'])->name('admin.usuarios.destroy');
@@ -177,6 +180,15 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 // ── Panel Docente ─────────────────────────────────────────────────────────
 Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('principal', fn () => view('docentes.panel'))->name('panel.principal');
+
+    // Perfil docente
+    Route::get('perfil', [PerfilController::class, 'mostrar'])->name('panel.perfil');
+    Route::get('perfil/accesos', [PerfilController::class, 'historialAccesos'])->name('panel.perfil.accesos');
+    Route::get('perfil/validar-datos', [PerfilController::class, 'validarDatos'])->name('panel.perfil.validarDatos');
+    Route::put('perfil/contrasena', [PerfilController::class, 'cambiarContrasena'])->name('panel.perfil.contrasena');
+    Route::put('perfil', [PerfilController::class, 'actualizar'])->name('panel.perfil.update');
+    Route::put('perfil/informacion-personal', [PerfilController::class, 'actualizarInformacionPersonal'])
+        ->name('panel.perfil.informacion-personal');
 
     // Estudiantes
     Route::get('estudiantes', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');

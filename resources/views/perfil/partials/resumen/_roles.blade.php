@@ -23,9 +23,9 @@
             @endforeach
         </div>
         <div class="mt-4">
-            <a class="btn btn-primary">
-                Ver todos los roles
-            </a>
+            @if ($rol === 'admin')
+                <span class="text-muted small">Rol asignado por el sistema</span>
+            @endif
         </div>
     </div>
 </div>

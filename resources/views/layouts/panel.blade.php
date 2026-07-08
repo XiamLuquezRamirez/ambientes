@@ -25,7 +25,7 @@
         <div class="sidebar-logo">
             <span class="brand">
                 <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="Aulas Reggio"
-                     style="width:100%;height:100%;object-fit:contain;filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
+                    style="width:100%;height:100%;object-fit:contain;filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
             </span>
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
@@ -68,7 +68,8 @@
         $inicialesAuth = mb_strtoupper(
             mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
         );
-        $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
+        $rolAuthLabel =
+            ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
     @endphp
     <header class="header">
         <div class="header-perfil" id="headerPerfil">
@@ -84,7 +85,7 @@
             {{-- Dropdown --}}
             <div class="header-dropdown">
 
-                <div class="dropdown-user-card">
+                <div class="dropdown-user-card" onclick="window.location.href='{{ route('panel.perfil') }}'">
                     <div class="dropdown-avatar">{{ $inicialesAuth }}</div>
                     <div>
                         <div class="dropdown-nombre">{{ $usuarioAuth?->nombre }}</div>
@@ -94,28 +95,25 @@
                 </div>
 
                 <div class="dropdown-section">
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">👤</span>
+                    <a href="{{ route('panel.perfil') }}" class="dropdown-item">
+                        <i class="fa-solid fa-user"></i>
                         Mi Perfil
-                    </a>
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">🔑</span>
-                        Cambiar Contraseña
                     </a>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
                 <div class="dropdown-section">
-                    <form method="POST" action="{{ route('docente.logout') }}">
+                    <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon">🚪</span>
+                            <span class="dropdown-item-icon">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </span>
                             Cerrar Sesión
                         </button>
                     </form>
                 </div>
-
             </div>
         </div>
     </header>
@@ -128,6 +126,27 @@
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
+        /* ── Cerrar sesión ────────────────────────────────────── */
+        document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: '¿Deseas cerrar tu sesión?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Cerrar sesión',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#6B7280',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        });
+
+
         /* ── Utilidades globales AJAX ────────────────────────────── */
         async function ajaxRequest(url, method = 'GET', data = null) {
             try {
@@ -179,9 +198,21 @@
 
         function mostrarToast(tipo, mensaje) {
             const paleta = {
-                success: { bg: '#ECFDF5', color: '#065F46', icon: '#059669' },
-                error:   { bg: '#FEF2F2', color: '#991B1B', icon: '#DC2626' },
-                info:    { bg: '#EFF6FF', color: '#1E40AF', icon: '#2563EB' },
+                success: {
+                    bg: '#ECFDF5',
+                    color: '#065F46',
+                    icon: '#059669'
+                },
+                error: {
+                    bg: '#FEF2F2',
+                    color: '#991B1B',
+                    icon: '#DC2626'
+                },
+                info: {
+                    bg: '#EFF6FF',
+                    color: '#1E40AF',
+                    icon: '#2563EB'
+                },
             };
             const c = paleta[tipo] ?? paleta.info;
             Swal.fire({

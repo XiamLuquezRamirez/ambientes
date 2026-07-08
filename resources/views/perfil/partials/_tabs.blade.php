@@ -33,16 +33,16 @@
     <div class="card-body">
         <div class="tab-content">
             <div class="tab-pane fade show active" id="tabResumen">
-                @include('admin.perfil.partials.resumen._resumen')
+                @include('perfil.partials.resumen._resumen')
             </div>
             <div class="tab-pane fade" id="tabInformacion">
-                @include('admin.perfil.partials.tabs-nav._informacion')
+                @include('perfil.partials.tabs-nav._informacion')
             </div>
             <div class="tab-pane fade" id="tabSeguridad">
-                @include('admin.perfil.partials.tabs-nav._seguridad')
+                @include('perfil.partials.tabs-nav._seguridad')
             </div>
             <div class="tab-pane fade" id="tabActividad">
-                @include('admin.perfil.partials.tabs-nav._actividad')
+                @include('perfil.partials.tabs-nav._actividad')
             </div>
         </div>
     </div>
