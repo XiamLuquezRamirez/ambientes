@@ -334,3 +334,26 @@ TIMELINE
 
     font-size: 1rem;
 }
+
+.section-subtitle {
+    font-weight: 600;
+    color: #374151;
+}
+
+.password-requisitos {
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.password-requisitos.valido {
+    color: #059669;
+}
+
+.password-requisitos.invalido {
+    color: #dc2626;
+}
+
+#seguridad_password_coincidencia,
+#modal_password_coincidencia {
+    color: #dc2626;
+}

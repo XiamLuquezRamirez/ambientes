@@ -29,7 +29,19 @@ class User extends Authenticatable
 
     public function ultimoLogin()
     {
-        return $this->hasOne(LoginLog::class)->latestOfMany('fecha');
+        return $this->hasOne(LoginLog::class)->ofMany(
+            ['fecha' => 'max'],
+            fn ($query) => $query->where('tipo', LoginLog::TIPO_INICIO_SESION)
+        );
+    }
+
+    /** Último cambio de contraseña registrado en registros_acceso. */
+    public function ultimoCambioContrasena()
+    {
+        return $this->hasOne(LoginLog::class)->ofMany(
+            ['fecha' => 'max'],
+            fn ($query) => $query->where('tipo', LoginLog::TIPO_CAMBIO_CONTRASENA)
+        );
     }
 
     public function esAdmin(): bool

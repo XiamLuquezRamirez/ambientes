@@ -17,7 +17,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-header-icon"><i class="fa-solid fa-pen"></i></div>
+                <div class="modal-header-icon"><i class="fa-solid fa-pen text-white"></i></div>
                 <div class="flex-grow-1">
                     <h5 class="modal-title mb-0" id="modalBSEditarPerfilLabel">Editar Perfil</h5>
                     <p class="modal-subtitle mb-0" id="modalBSEditarPerfilSubtitle">Edita la información de tu perfil
@@ -32,7 +32,7 @@
                     @csrf
                     <input type="hidden" name="_method" value="PUT">
                     {{-- Referencia del email actual; se usa en JS para detectar cambio de correo --}}
-                    <input type="hidden" id="emailOriginal" value="{{ $usuario->email }}">
+                    <input type="hidden" id="emailOriginalPerfil" value="{{ $usuario->email }}">
                     <div class="tab-content" style="padding: 20px;">
                         <div class="row">
                             <div class="col-md-4">
@@ -48,14 +48,15 @@
                                 <div class="mb-3">
                                     <strong class="form-label">Nombre(s)</strong>
                                     <input type="text" id="nombre" name="nombre" class="form-control"
-                                        placeholder="Nombre" value="{{ $usuario->nombre }}" required>
+                                        placeholder="Nombre" value="{{ $usuario->nombre }}" autocomplete="off" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <strong class="form-label">Apellido(s)</strong>
                                     <input type="text" id="apellido" name="apellido" class="form-control"
-                                        placeholder="Apellidos" value="{{ $usuario->apellido }}" required>
+                                        placeholder="Apellidos" value="{{ $usuario->apellido }}" autocomplete="off"
+                                        required>
                                 </div>
                             </div>
                         </div>
@@ -91,27 +92,115 @@
     </div>
 </div>
 
+@if ($rol !== 'admin')
+    {{--
+    Modal: Información personal del docente (teléfono, dirección, especialidad, descripción).
+    Endpoint: PUT panel/perfil/informacion-personal (solo docente autenticado).
+--}}
+    <div class="modal fade modal-app" id="modalEditarInformacionPersonal" tabindex="-1" data-bs-backdrop="static"
+        aria-labelledby="modalEditarInformacionPersonalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-header-icon"><i class="fa-solid fa-id-card text-white"></i></div>
+                    <div class="flex-grow-1">
+                        <h5 class="modal-title mb-0" id="modalEditarInformacionPersonalLabel">Editar información
+                            personal</h5>
+                        <p class="modal-subtitle mb-0">Actualiza tus datos de contacto y perfil profesional</p>
+                    </div>
+                    <button type="button" class="btn-close" onclick="cerrarModalEditarInformacionPersonal()"
+                        data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <form id="formEditarInformacionPersonal" method="POST" novalidate>
+                        @csrf
+                        <input type="hidden" name="_method" value="PUT">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <strong class="form-label">Teléfono</strong>
+                                    <input type="text" id="telefono" name="telefono" class="form-control"
+                                        placeholder="Teléfono" value="{{ $informacionPersonal['telefono'] ?? '' }}"
+                                        required maxlength="30">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <strong class="form-label">Dirección</strong>
+                                    <input type="text" id="direccion" name="direccion" class="form-control"
+                                        placeholder="Dirección" value="{{ $informacionPersonal['direccion'] ?? '' }}"
+                                        required maxlength="150">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <strong class="form-label">Especialidad</strong>
+                                    <input type="text" id="especialidad" name="especialidad" class="form-control"
+                                        placeholder="Especialidad"
+                                        value="{{ $informacionPersonal['especialidad'] ?? '' }}" required
+                                        maxlength="150">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <strong class="form-label">Descripción</strong>
+                                    <textarea id="descripcion" name="descripcion" class="form-control" rows="3"
+                                        placeholder="Breve descripción profesional" maxlength="1000">{{ $informacionPersonal['descripcion'] ?? '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn"
+                        style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0"
+                        onclick="cerrarModalEditarInformacionPersonal()">
+                        <i class="fa-solid fa-xmark"></i> Cancelar
+                    </button>
+                    <button type="submit" form="formEditarInformacionPersonal" id="btnEditarInformacionPersonal"
+                        class="btn btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif
+
 @push('scripts')
     <script>
-        /* ── Configuración ─────────────────────────────────────────── */
-        const URL_USUARIOS = @json(route('admin.usuarios'));
-        const URL_PERFIL_UPDATE = @json(route('admin.usuarios.perfil.update', $usuario->id));
+        /* ── Configuración de rutas (inyectadas por PerfilService) ─── */
+        const URL_PERFIL_UPDATE = @json($rutas['actualizar']);
+        const URL_PERFIL_VALIDAR_DATOS = @json($rutas['validar_datos']);
+        const URL_PERFIL_INFORMACION_PERSONAL = @json($rutas['informacion_personal'] ?? null);
+        const URL_PERFIL_CONTRASENA = @json($rutas['contrasena']);
         const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+        /** Estado en memoria de los datos del perfil (se actualiza tras cada guardado exitoso). */
         const PERFIL_INICIAL = {
             id: {{ $usuario->id }},
             nombre: @json($usuario->nombre),
             apellido: @json($usuario->apellido),
             email: @json($usuario->email),
+            telefono: @json($informacionPersonal['telefono'] ?? ''),
+            direccion: @json($informacionPersonal['direccion'] ?? ''),
+            especialidad: @json($informacionPersonal['especialidad'] ?? ''),
+            descripcion: @json($informacionPersonal['descripcion'] ?? ''),
         };
 
         const modalBSEditarPerfil = new bootstrap.Modal(document.getElementById('modalBSEditarPerfil'));
+        const modalEditarInformacionPersonal = document.getElementById('modalEditarInformacionPersonal') ?
+            new bootstrap.Modal(document.getElementById('modalEditarInformacionPersonal')) :
+            null;
 
-        /** Abre el modal y restaura los valores guardados en memoria (PERFIL_INICIAL). */
+        /** Abre el modal de cuenta y restaura los valores actuales. */
         function abrirModalEditarPerfil() {
             $('#email').val(PERFIL_INICIAL.email);
             $('#nombre').val(PERFIL_INICIAL.nombre);
             $('#apellido').val(PERFIL_INICIAL.apellido);
-            $('#emailOriginal').val(PERFIL_INICIAL.email);
+            $('#emailOriginalPerfil').val(PERFIL_INICIAL.email);
             $('#password_actual').val('');
             toggleSeccionPasswordActual();
             limpiarErroresModal('formBSEditarPerfil');
@@ -119,14 +208,37 @@
             modalBSEditarPerfil.show();
         }
 
-        /** Cierra el modal y limpia estados de error/validación. */
+        /** Abre el modal de información personal del docente. */
+        function abrirModalEditarInformacionPersonal() {
+            if (!modalEditarInformacionPersonal) return;
+            $('#telefono').val(PERFIL_INICIAL.telefono);
+            $('#direccion').val(PERFIL_INICIAL.direccion);
+            $('#especialidad').val(PERFIL_INICIAL.especialidad);
+            $('#descripcion').val(PERFIL_INICIAL.descripcion);
+            limpiarErroresModal('formEditarInformacionPersonal');
+            modalEditarInformacionPersonal.show();
+        }
+
+        function cerrarModalEditarInformacionPersonal() {
+            limpiarErroresModal('formEditarInformacionPersonal');
+            modalEditarInformacionPersonal?.hide();
+        }
+
         function cerrarModalBSEditarPerfil() {
             limpiarErroresModal('formBSEditarPerfil');
             resetValidacionEmail();
             modalBSEditarPerfil.hide();
         }
 
-        /** Alterna el texto y estado del botón Guardar / Guardando. */
+        function setBtnEditarInformacionPersonal(modo) {
+            const btn = document.getElementById('btnEditarInformacionPersonal');
+            if (!btn) return;
+            btn.disabled = modo === 'guardando';
+            btn.innerHTML = modo === 'guardando' ?
+                '<i class="fa-solid fa-spinner fa-spin"></i> Guardando cambios…' :
+                '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios';
+        }
+
         function setBtnBSEditarPerfil(modo) {
             const btn = document.getElementById('btnBSEditarPerfil');
             btn.disabled = modo === 'guardando';
@@ -135,13 +247,11 @@
                 '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios';
         }
 
-        /** Elimina mensajes de error inline y clases is-invalid del formulario. */
         function limpiarErroresModal(form) {
             document.querySelectorAll(`#${form} .campo-error`).forEach(el => el.remove());
             document.querySelectorAll(`#${form} .is-invalid`).forEach(el => el.classList.remove('is-invalid'));
         }
 
-        /** Pinta errores de validación (422) debajo de cada campo. */
         function mostrarErroresModal(errors, form) {
             limpiarErroresModal(form);
             $.each(errors, function(campo, mensajes) {
@@ -157,25 +267,21 @@
             $(`#${form} .is-invalid`).first().focus();
         }
 
-        /** Indica si el email del formulario difiere del email original del usuario. */
         function emailCambioPendiente() {
-            return $('#email').val().trim().toLowerCase() !== $('#emailOriginal').val().trim().toLowerCase();
+            return $('#email').val().trim().toLowerCase() !== $('#emailOriginalPerfil').val().trim().toLowerCase();
         }
 
-        /** Muestra u oculta la sección de contraseña según cambio de email. */
         function toggleSeccionPasswordActual() {
             const cambio = emailCambioPendiente();
             $('#seccionPasswordActual').toggleClass('d-none', !cambio);
             if (!cambio) $('#password_actual').val('');
         }
 
-        /** Restablece el estado visual de validación del campo email. */
         function resetValidacionEmail() {
             $('#email').removeClass('is-invalid is-valid');
             $('#mensajeEmail').text('').hide();
         }
 
-        /** Marca un campo como válido/inválido según la respuesta de validar-datos. */
         function validarCampo(input, mensaje, existe, texto) {
             $(input)
                 .toggleClass('is-invalid', existe)
@@ -183,20 +289,14 @@
             $(mensaje).text(existe ? texto : '').toggle(existe);
         }
 
-        /**
-         * Actualiza la UI del perfil y el header sin recargar la página.
-         * Elementos objetivo: #perfilNombreCompleto, #perfilEmail, #perfilAvatarIniciales y header global.
-         */
-        function actualizarDatosPerfil(usuario) {
+        /** Actualiza nombre, email e iniciales tras editar la cuenta. */
+        function actualizarDatosCuenta(usuario) {
             const nombreCompleto = `${usuario.nombre} ${usuario.apellido}`.trim();
             const iniciales = usuario.iniciales ?? '';
 
-            document.getElementById('perfilNombreCompleto')?.replaceChildren(
-                document.createTextNode(nombreCompleto)
-            );
-            document.getElementById('perfilEmail')?.replaceChildren(
-                document.createTextNode(usuario.email)
-            );
+            document.getElementById('perfilNombreCompleto')?.replaceChildren(document.createTextNode(nombreCompleto));
+            document.getElementById('perfilEmail')?.replaceChildren(document.createTextNode(usuario.email));
+
             const avatar = document.getElementById('perfilAvatarIniciales');
             if (avatar) {
                 const status = avatar.querySelector('.profile-status');
@@ -204,15 +304,9 @@
                 if (status) avatar.appendChild(status);
             }
 
-            document.querySelector('.header-user-nombre')?.replaceChildren(
-                document.createTextNode(usuario.nombre)
-            );
-            document.querySelector('.dropdown-nombre')?.replaceChildren(
-                document.createTextNode(usuario.nombre)
-            );
-            document.querySelector('.dropdown-email')?.replaceChildren(
-                document.createTextNode(usuario.email)
-            );
+            document.querySelector('.header-user-nombre')?.replaceChildren(document.createTextNode(usuario.nombre));
+            document.querySelector('.dropdown-nombre')?.replaceChildren(document.createTextNode(usuario.nombre));
+            document.querySelector('.dropdown-email')?.replaceChildren(document.createTextNode(usuario.email));
             document.querySelectorAll('.avatar, .dropdown-avatar').forEach(el => {
                 el.textContent = iniciales;
             });
@@ -220,13 +314,74 @@
             PERFIL_INICIAL.nombre = usuario.nombre;
             PERFIL_INICIAL.apellido = usuario.apellido;
             PERFIL_INICIAL.email = usuario.email;
-            $('#emailOriginal').val(usuario.email);
+            $('#emailOriginalPerfil').val(usuario.email);
         }
 
-        /**
-         * Envía el formulario vía AJAX.
-         * Usa POST + campo oculto _method=PUT para compatibilidad con FormData.
-         */
+        /** Actualiza teléfono, dirección, especialidad y descripción en pantalla sin recargar. */
+        function actualizarInformacionPersonalUI(informacion) {
+            const campos = {
+                perfilTelefono: informacion.telefono || '—',
+                perfilDireccion: informacion.direccion || '—',
+                perfilEspecialidad: informacion.especialidad || '—',
+                perfilTelefonoHeader: informacion.telefono || '—',
+                perfilEspecialidadHeader: informacion.especialidad || '—',
+            };
+
+            Object.entries(campos).forEach(([id, valor]) => {
+                document.getElementById(id)?.replaceChildren(document.createTextNode(valor));
+            });
+
+            const descripcion = informacion.descripcion?.trim() || 'Sin descripción registrada.';
+            document.getElementById('perfilDescripcion')?.replaceChildren(document.createTextNode(descripcion));
+
+            PERFIL_INICIAL.telefono = informacion.telefono ?? '';
+            PERFIL_INICIAL.direccion = informacion.direccion ?? '';
+            PERFIL_INICIAL.especialidad = informacion.especialidad ?? '';
+            PERFIL_INICIAL.descripcion = informacion.descripcion ?? '';
+        }
+
+        /** Envía información personal del docente a panel/perfil/informacion-personal. */
+        function enviarFormularioEditarInformacionPersonal(form) {
+            if (!URL_PERFIL_INFORMACION_PERSONAL) return;
+
+            setBtnEditarInformacionPersonal('guardando');
+
+            $.ajax({
+                url: URL_PERFIL_INFORMACION_PERSONAL,
+                type: 'POST',
+                data: new FormData(form),
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                success: function(res) {
+                    if (!res.success) {
+                        mostrarToast('error', res.message);
+                        return;
+                    }
+                    actualizarInformacionPersonalUI(res.informacion);
+                    cerrarModalEditarInformacionPersonal();
+                    mostrarToast('success', res.message);
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        const errores = xhr.responseJSON?.errors ?? {};
+                        if (Object.keys(errores).length) {
+                            mostrarErroresModal(errores, 'formEditarInformacionPersonal');
+                        }
+                    }
+                    mostrarToast('error', xhr.responseJSON?.message ?? 'Error al guardar los cambios');
+                },
+                complete: function() {
+                    setBtnEditarInformacionPersonal('editar');
+                },
+            });
+        }
+
+        /** Envía datos de cuenta (nombre, apellido, email) al endpoint de perfil. */
         function enviarFormularioPerfil(form) {
             if ($('#email').hasClass('is-invalid')) {
                 mostrarToast('error', 'El correo electrónico ya está registrado.');
@@ -263,7 +418,7 @@
                         mostrarToast('error', res.message);
                         return;
                     }
-                    actualizarDatosPerfil(res.usuario);
+                    actualizarDatosCuenta(res.usuario);
                     cerrarModalBSEditarPerfil();
                     mostrarToast('success', res.message);
                 },
@@ -273,14 +428,12 @@
                         if (Object.keys(errores).length) {
                             mostrarErroresModal(errores, 'formBSEditarPerfil');
                         }
-                        mostrarToast('error', xhr.responseJSON?.message ?? 'Verifique los datos ingresados');
-                        return;
                     }
                     mostrarToast('error', xhr.responseJSON?.message ?? 'Error al guardar los cambios');
                 },
                 complete: function() {
                     setBtnBSEditarPerfil('editar');
-                }
+                },
             });
         }
 
@@ -300,7 +453,7 @@
                 timerValidacion = setTimeout(function() {
                     if (email.length < 5) return;
                     $.ajax({
-                        url: `${URL_USUARIOS}/validar-datos`,
+                        url: URL_PERFIL_VALIDAR_DATOS,
                         type: 'GET',
                         data: {
                             email,
@@ -310,7 +463,7 @@
                             validarCampo('#email', '#mensajeEmail', response
                                 .email_existe,
                                 'El correo electrónico ya está registrado.');
-                        }
+                        },
                     });
                 }, 500);
             });
@@ -318,6 +471,11 @@
             $('#formBSEditarPerfil').on('submit', function(e) {
                 e.preventDefault();
                 enviarFormularioPerfil(this);
+            });
+
+            $('#formEditarInformacionPersonal').on('submit', function(e) {
+                e.preventDefault();
+                enviarFormularioEditarInformacionPersonal(this);
             });
         });
     </script>

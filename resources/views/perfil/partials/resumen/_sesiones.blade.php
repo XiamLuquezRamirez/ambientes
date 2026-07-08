@@ -4,21 +4,21 @@
             Sesiones activas
         </h5>
         <div class="row g-4">
-            @foreach ($sessiones as $session)
+            @foreach ($sesiones as $sesion)
                 <div class="col-12">
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <i class="fa-solid {{ $session['icono'] }}"></i>
+                            <i class="fa-solid {{ $sesion['icono'] }}"></i>
                         </div>
                         <div class="stat-content">
                             <strong>Ambiente:</strong>
-                            <small>{{ ucfirst($session['ambiente']) }}</small>
+                            <small>{{ ucfirst($sesion['ambiente']) }}</small>
                             <span class="bs-rol badge-stat" style="margin-left: 10px;">
-                                {{ $session['titulo'] }}
+                                {{ $sesion['titulo'] }}
                             </span>
                             <div class="text-muted">
-                                <small>{{ $session['ip'] }}</small>
-                                <small>{{ $session['fecha'] }}</small>
+                                <small>{{ $sesion['ip'] }}</small>
+                                <small>{{ $sesion['fecha'] }}</small>
                             </div>
                         </div>
                     </div>

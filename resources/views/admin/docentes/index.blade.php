@@ -487,7 +487,7 @@
             $(`#formDocente .is-invalid`).first().focus();
         }
 
-        /* ── Crear docente (AJAX) ────────────────────────────────────── */
+        /* ── Crear docente o editar información personal (AJAX) ────────────────────────────────────── */
         document.getElementById('formDocente').addEventListener('submit', async function(e) {
             e.preventDefault();
             if (tipoPost == 1) {

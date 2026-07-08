@@ -28,7 +28,7 @@ class AuthDocenteController extends Controller
         }
 
         $usuario = Auth::guard('docente')->user();
-        if (! $usuario->activo) {
+        if ($usuario->estado !== 'activo') {
             Auth::guard('docente')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -47,6 +47,7 @@ class AuthDocenteController extends Controller
             'ip' => $request->ip(),
             'fecha' => now(),
             'ambiente' => config('ambiente.slug'),
+            'tipo' => LoginLog::TIPO_INICIO_SESION,
         ]);
 
         SeguridadService::registrar(
