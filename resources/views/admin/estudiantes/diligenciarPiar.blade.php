@@ -2379,7 +2379,7 @@
                     <br>
                     <h3 class="text-success">PIAR diligenciado correctamente</h3>
                     <p class="text-muted">Si desea generar el PDF, por favor, haga click en el botón de abajo.</p>
-                    <button type="button" class="btn btn-warning" onclick="generarPDF()"><i class="fas fa-file-pdf"></i> Generar PDF</button>
+                    <a type="button" target="_blank" class="btn btn-warning" href="{{ route('admin.piar.exportar', $estudiante?->id) }}"><i class="fas fa-file-pdf"></i> Generar PDF</a>
                 </div>
         </div>
     </div>

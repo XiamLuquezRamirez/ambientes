@@ -55,4 +55,9 @@ class Piar extends Model
     {
         return $this->hasOne(PiarActaCompromiso::class, 'id_piar', 'id');
     }
+
+    public function estudiante()
+    {
+        return $this->belongsTo(Estudiante::class, 'estudiante_id', 'id');
+    }
 }

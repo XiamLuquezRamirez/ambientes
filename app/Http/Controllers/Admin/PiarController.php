@@ -25,6 +25,7 @@ use App\Models\PiarAjusteRazonableItem;
 use App\Models\PiarAjusteRazonableDocenteFirma;
 use App\Models\PiarActaCompromiso;
 use App\Models\PiarActaCompromisoActividad;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PiarController extends Controller
 {
@@ -160,7 +161,7 @@ class PiarController extends Controller
             "consume_medicamentos" => "nullable|string",
             "medicamento" => "nullable|array",
             "ayudas_tecnicas" => "required|string",
-            "cuales_ayudas" => "required|string",
+            "cuales_ayudas" => "nullable|string",
         ]);
         // verificcar que el estudiante no tenga piar registrado
         $piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
@@ -805,5 +806,17 @@ class PiarController extends Controller
         }
 
         return true;
+    }
+
+    public function exportar($idEstudiante){
+        $piar = Piar::with('datosGenerales', 'entornoSalud', 'entornoHogar', 'entornoEducativo', 'valoracionPedagogica', 'ajusteRazonable', 'actaCompromiso', 'estudiante')
+        ->where('estudiante_id', $idEstudiante)
+        ->first();
+
+        //return view('admin.estudiantes.exportarPiar', compact('piar'));
+        
+        $pdf = Pdf::loadView('admin.estudiantes.exportarPiar', compact('piar'));
+        return $pdf->stream('piar.pdf');
+        
     }
 }
