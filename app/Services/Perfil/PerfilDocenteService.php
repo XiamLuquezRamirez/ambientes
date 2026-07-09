@@ -49,6 +49,7 @@ class PerfilDocenteService
             'especialidad' => $docente?->especialidad,
             'fecha_ingreso' => $docente?->fecha_ingreso,
             'firma_url' => $docente?->firma_url,
+            'foto_url' => $docente?->foto_url,
             'descripcion' => $docente?->descripcion,
             'estado' => $docente?->estado ?? $usuario->estado,
         ];

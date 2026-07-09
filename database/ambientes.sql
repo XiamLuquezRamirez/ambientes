@@ -70,7 +70,7 @@ CREATE TABLE `ambiente_grado` (
 
 /*Data for the table `ambiente_grado` */
 
-insert  into `ambiente_grado`(`id`,`ambiente_id`,`grado_id`,`activo`) values 
+insert  into `ambiente_grado`(`id`,`ambiente_id`,`grado_id`,`activo`) values
 (1,1,1,1),
 (2,1,2,1),
 (3,1,3,1),
@@ -105,12 +105,12 @@ CREATE TABLE `ambientes` (
 
 /*Data for the table `ambientes` */
 
-insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values 
-(1,'Expresión Artística','Expresion-Artistica','#0F6E56','?','192.168.1.20',1,25,'2026-06-16 00:02:01','2026-06-17 18:34:22'),
-(2,'Polimotor','polimotor','#534AB7','?','192.168.1.21',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(3,'Multisaberes','Multisaberes','#854F0B','?','192.168.1.22',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(4,'Multisensorial','multisensorial','#185FA5','?','192.168.1.23',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(5,'Tecnología','tecnologia','#993C1D','?','192.168.1.24',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01');
+insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values
+(1,'Música','musica','#0F6E56','🎵','192.168.1.20',1,25,'2026-06-16 00:02:01','2026-06-17 18:34:22'),
+(2,'Polimotor','polimotor','#534AB7','🤸','192.168.1.21',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
+(3,'Lógico','logico','#854F0B','🧠','192.168.1.22',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
+(4,'Multisensorial','multisensorial','#185FA5','🌿','192.168.1.23',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
+(5,'Tecnología','tecnologia','#993C1D','💡','192.168.1.24',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01');
 
 /*Table structure for table `asistencias` */
 
@@ -158,7 +158,7 @@ CREATE TABLE `carga_docente` (
 
 /*Data for the table `carga_docente` */
 
-insert  into `carga_docente`(`id`,`docente_id`,`ambiente_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`activo`,`created_at`,`updated_at`) values 
+insert  into `carga_docente`(`id`,`docente_id`,`ambiente_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`activo`,`created_at`,`updated_at`) values
 (1,1,1,2,3,2026,1,'2026-06-16 19:35:18','2026-06-16 19:35:18');
 
 /*Table structure for table `cola_sincronizacion` */
@@ -182,7 +182,7 @@ CREATE TABLE `cola_sincronizacion` (
 
 /*Data for the table `cola_sincronizacion` */
 
-insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servidor_origen`,`payload`,`estado`,`intentos`,`enviado_en`,`created_at`,`updated_at`) values 
+insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servidor_origen`,`payload`,`estado`,`intentos`,`enviado_en`,`created_at`,`updated_at`) values
 (1,'Estudiante',1,'update','polimotor','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (2,'Estudiante',1,'update','logico','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (3,'Estudiante',1,'update','multisensorial','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
@@ -201,7 +201,7 @@ CREATE TABLE `condiciones` (
 
 /*Data for the table `condiciones` */
 
-insert  into `condiciones`(`id`,`nombre`,`estado`) values 
+insert  into `condiciones`(`id`,`nombre`,`estado`) values
 (1,'Estandar',1),
 (2,'TDAH',1),
 (3,'TEA',1),
@@ -232,7 +232,7 @@ CREATE TABLE `configuracion_pins` (
 
 /*Data for the table `configuracion_pins` */
 
-insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_1`,`figura_2`,`color_figura_2`,`figura_3`,`color_figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values 
+insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_1`,`figura_2`,`color_figura_2`,`figura_3`,`color_figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values
 (7,31,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 15:23:30','2026-06-23 16:03:55'),
 (8,32,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-06-23 15:31:26','2026-06-23 16:03:33'),
 (9,33,'fas fa-star','#ff9019','fas fa-heart','#ff0606','fas fa-fish','#0f54ff',0,'2026-06-23 15:34:40','2026-06-23 15:34:40'),
@@ -259,7 +259,7 @@ CREATE TABLE `configuraciones` (
 
 /*Data for the table `configuraciones` */
 
-insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values 
+insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values
 (1,'tiempo_sesion_minutos','60',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (2,'intentos_max_pin','5',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (3,'idioma','es',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
@@ -277,7 +277,7 @@ CREATE TABLE `departamentos` (
 
 /*Data for the table `departamentos` */
 
-insert  into `departamentos`(`codigo`,`descripcion`) values 
+insert  into `departamentos`(`codigo`,`descripcion`) values
 ('05','Antioquia'),
 ('08','Atlantico'),
 ('11','Bogota'),
@@ -324,8 +324,10 @@ CREATE TABLE `docentes` (
   `especialidad` varchar(100) DEFAULT NULL,
   `fecha_ingreso` date DEFAULT NULL,
   `firma_url` varchar(255) DEFAULT NULL,
+  `foto_url` varchar(255) DEFAULT NULL,
   `descripcion` text DEFAULT NULL,
-  `estado` enum('activo','inactivo','eliminado') DEFAULT NULL,
+  `estado` enum('activo','inactivo','eliminado') DEFAULT 'activo',
+  `bloqueado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -335,10 +337,10 @@ CREATE TABLE `docentes` (
 
 /*Data for the table `docentes` */
 
-insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`descripcion`,`estado`,`created_at`,`updated_at`) values 
-(1,2,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'eliminado','2026-06-16 00:02:02','2026-06-24 15:50:15'),
-(2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'activo','2026-06-16 17:32:50','2026-06-24 15:57:11'),
-(3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'activo','2026-06-16 17:32:50','2026-06-23 14:23:57');
+insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`foto_url`,`descripcion`,`estado`,`bloqueado_en`,`created_at`,`updated_at`) values
+(1,2,'12345678925','direc','Educación Musical','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:50:15'),
+(2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:57:11'),
+(3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-23 14:23:57');
 
 /*Table structure for table `estudiante_ambiente` */
 
@@ -362,7 +364,7 @@ CREATE TABLE `estudiante_ambiente` (
 
 /*Data for the table `estudiante_ambiente` */
 
-insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`created_at`,`updated_at`) values 
+insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`created_at`,`updated_at`) values
 (1,13,3,2026,'activo',NULL,'2026-06-24 09:05:13','2026-06-24 09:05:13'),
 (2,11,3,2026,'activo',NULL,'2026-06-24 09:05:13','2026-06-24 09:05:13'),
 (3,5,3,2026,'activo',NULL,'2026-06-24 16:06:12','2026-06-24 16:06:12'),
@@ -406,7 +408,7 @@ CREATE TABLE `estudiantes` (
 
 /*Data for the table `estudiantes` */
 
-insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`condicion_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`) values 
+insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`condicion_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`) values
 (1,'Valentina',NULL,NULL,NULL,1111,'VA',NULL,'#0F6E56',1,1,'2021-01-17',NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#534AB7',1,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#854F0B',1,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -474,7 +476,7 @@ CREATE TABLE `grados` (
 
 /*Data for the table `grados` */
 
-insert  into `grados`(`id`,`nombre`,`edad_anos`,`descripcion`,`orden`,`activo`,`created_at`,`updated_at`) values 
+insert  into `grados`(`id`,`nombre`,`edad_anos`,`descripcion`,`orden`,`activo`,`created_at`,`updated_at`) values
 (1,'Prejardin',3,'Para ninos de 3 anos. Socializacion y desarrollo motriz.',1,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
 (2,'Jardin',4,'Para ninos de 4 anos. Colores, numeros y letras.',2,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
 (3,'Transicion',5,'Para ninos de 5 anos. Lectoescritura y habilidades logicas.',3,1,'2026-06-16 19:34:40','2026-06-16 19:34:40');
@@ -499,7 +501,7 @@ CREATE TABLE `grupos` (
 
 /*Data for the table `grupos` */
 
-insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`activo`,`created_at`,`updated_at`) values 
+insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`activo`,`created_at`,`updated_at`) values
 (1,1,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (3,2,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (4,2,'B',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
@@ -534,7 +536,7 @@ CREATE TABLE `matriculas` (
 
 /*Data for the table `matriculas` */
 
-insert  into `matriculas`(`id`,`estudiante_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`estado`,`fecha_ingreso`,`fecha_egreso`,`created_at`,`updated_at`) values 
+insert  into `matriculas`(`id`,`estudiante_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`estado`,`fecha_ingreso`,`fecha_egreso`,`created_at`,`updated_at`) values
 (1,1,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:32'),
 (2,2,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:36'),
 (3,3,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:39'),
@@ -560,7 +562,7 @@ CREATE TABLE `migrations` (
 
 /*Data for the table `migrations` */
 
-insert  into `migrations`(`id`,`migration`,`batch`) values 
+insert  into `migrations`(`id`,`migration`,`batch`) values
 (1,'2014_10_12_000000_create_users_table',1),
 (2,'2014_10_12_100000_create_password_reset_tokens_table',1),
 (3,'2019_08_19_000000_create_failed_jobs_table',1),
@@ -635,7 +637,7 @@ CREATE TABLE `municipios` (
 
 /*Data for the table `municipios` */
 
-insert  into `municipios`(`id`,`descripcion`,`coddep`) values 
+insert  into `municipios`(`id`,`descripcion`,`coddep`) values
 (1,'MEDELLIN','05'),
 (2,'BARRANQUILLA','08'),
 (3,'BOGOTA D.C.','11'),
@@ -1898,7 +1900,7 @@ CREATE TABLE `registros_acceso` (
 
 /*Data for the table `registros_acceso` */
 
-insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`) values 
+insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`) values
 (10,3,'127.0.0.1','polimotor','2026-06-18 17:16:38'),
 (11,3,'127.0.0.1','polimotor','2026-06-19 09:16:42'),
 (12,3,'127.0.0.1','polimotor','2026-06-19 10:46:12'),
@@ -1971,9 +1973,9 @@ CREATE TABLE `users` (
 
 /*Data for the table `users` */
 
-insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`remember_token`,`created_at`,`updated_at`,`bloqueado_en`) values 
-(2,'2131231456','Docente Líder','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente','activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58',NULL),
-(3,'213123','Adminitrador del sistema',NULL,'admin@aulasreggio.test','$2y$10$wjLu1JkqDfVwAMR7VEkx0eN0K4jQVh5G/75sE.0V9wO1x4GO.3Wlq','admin','activo',NULL,'2026-06-16 00:12:01','2026-06-18 17:16:17',NULL),
+insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`remember_token`,`created_at`,`updated_at`,`bloqueado_en`) values
+(2,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente','activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58',NULL),
+(3,'213123','Administrador',NULL,'admin@aulasreggio.test','$2y$10$wjLu1JkqDfVwAMR7VEkx0eN0K4jQVh5G/75sE.0V9wO1x4GO.3Wlq','admin','activo',NULL,'2026-06-16 00:12:01','2026-06-18 17:16:17',NULL),
 (4,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35',NULL),
 (5,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
 (6,'5346345','Maria Fernanda ','Lopez','maria.lopez@aulasreggio.test','$2y$10$IbOTCndCL4IOh8onIxVRiuJDeLpBfdEXDpxfdZuwIgq3Zi1vY8EqS','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),

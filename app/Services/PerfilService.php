@@ -8,9 +8,12 @@ use App\Services\Perfil\PerfilDocenteService;
 
 class PerfilService
 {
+    private const AVATAR_COLOR = '#3155C6';
+
     public function __construct(
         protected PerfilAdminService $admin,
         protected PerfilDocenteService $docente,
+        protected PerfilFotoService $perfilFoto,
     ) {}
 
     /**
@@ -35,13 +38,21 @@ class PerfilService
      * - rutas.informacion_personal: solo docente (teléfono, dirección, etc.)
      * - rutas.validar_datos: unicidad de email al editar perfil (AJAX)
      * - rutas.contrasena: cambio de contraseña propio (sin cerrar sesión)
+     * - rutas.foto / foto_eliminar: solo docente (foto en tabla docentes)
      */
     private function metadatosVista(User $usuario): array
     {
         $esAdmin = $usuario->esAdmin();
+        $puedeCambiarFoto = ! $esAdmin && $usuario->docente !== null;
+        $fotoRelativa = $usuario->docente?->foto_url;
 
         return [
             'layout' => $esAdmin ? 'layouts.admin' : 'layouts.panel',
+            'puedeCambiarFoto' => $puedeCambiarFoto,
+            'foto' => $fotoRelativa,
+            'fotoUrlPublica' => $this->perfilFoto->urlPublica($fotoRelativa),
+            'iniciales' => $this->perfilFoto->iniciales($usuario),
+            'avatarColor' => self::AVATAR_COLOR,
             'rutas' => [
                 'accesos' => $esAdmin
                     ? route('admin.perfil.accesos')
@@ -58,6 +69,8 @@ class PerfilService
                 'informacion_personal' => $esAdmin
                     ? null
                     : route('panel.perfil.informacion-personal'),
+                'foto' => $puedeCambiarFoto ? route('panel.perfil.foto') : null,
+                'foto_eliminar' => $puedeCambiarFoto ? route('panel.perfil.foto.eliminar') : null,
             ],
         ];
     }

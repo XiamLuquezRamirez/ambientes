@@ -175,7 +175,6 @@
         const URL_PERFIL_UPDATE = @json($rutas['actualizar']);
         const URL_PERFIL_VALIDAR_DATOS = @json($rutas['validar_datos']);
         const URL_PERFIL_INFORMACION_PERSONAL = @json($rutas['informacion_personal'] ?? null);
-        const URL_PERFIL_CONTRASENA = @json($rutas['contrasena']);
         const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
         /** Estado en memoria de los datos del perfil (se actualiza tras cada guardado exitoso). */
@@ -253,17 +252,55 @@
         }
 
         function mostrarErroresModal(errors, form) {
+
             limpiarErroresModal(form);
+
             $.each(errors, function(campo, mensajes) {
+
                 const $input = $(`#${form} [name="${campo}"]`);
+
                 if (!$input.length) return;
+
                 $input.addClass('is-invalid');
-                const mensaje = Array.isArray(mensajes) ? mensajes[0] : mensajes;
+
+                let mensaje = mensajes[0];
+
+                switch (mensaje) {
+
+                    case 'validation.unique':
+                        mensaje = campo === 'email' ?
+                            'Ya existe un usuario con este correo electrónico.' :
+                            'Ya existe un usuario con esta identificación.';
+                        break;
+
+                    case 'validation.email':
+                        mensaje = 'El correo electrónico no es válido.';
+                        break;
+
+                    case 'validation.integer':
+                        mensaje = 'Debe ingresar un número entero.';
+                        break;
+
+                    case 'validation.numeric':
+                        mensaje = 'Debe ingresar un valor numérico.';
+                        break;
+
+                    case 'validation.string':
+                        mensaje = 'Debe ingresar un texto válido.';
+                        break;
+
+                    case 'validation.required':
+                        mensaje = 'Este campo es obligatorio.';
+                        break;
+                }
+
                 $('<div>', {
                     class: 'campo-error',
                     text: mensaje
                 }).insertAfter($input);
+
             });
+
             $(`#${form} .is-invalid`).first().focus();
         }
 
@@ -297,18 +334,20 @@
             document.getElementById('perfilNombreCompleto')?.replaceChildren(document.createTextNode(nombreCompleto));
             document.getElementById('perfilEmail')?.replaceChildren(document.createTextNode(usuario.email));
 
-            const avatar = document.getElementById('perfilAvatarIniciales');
-            if (avatar) {
-                const status = avatar.querySelector('.profile-status');
-                avatar.textContent = iniciales;
-                if (status) avatar.appendChild(status);
+            const avatarImg = document.getElementById('avatarPerfilImagen');
+            const avatarIniciales = document.getElementById('avatarPerfilIniciales');
+            if (avatarIniciales && (!avatarImg || avatarImg.classList.contains('d-none'))) {
+                avatarIniciales.textContent = iniciales;
             }
 
             document.querySelector('.header-user-nombre')?.replaceChildren(document.createTextNode(usuario.nombre));
             document.querySelector('.dropdown-nombre')?.replaceChildren(document.createTextNode(usuario.nombre));
             document.querySelector('.dropdown-email')?.replaceChildren(document.createTextNode(usuario.email));
-            document.querySelectorAll('.avatar, .dropdown-avatar').forEach(el => {
-                el.textContent = iniciales;
+
+            document.querySelectorAll('#headerAvatarIniciales, #dropdownAvatarIniciales').forEach(el => {
+                if (!el.classList.contains('d-none')) {
+                    el.textContent = iniciales;
+                }
             });
 
             PERFIL_INICIAL.nombre = usuario.nombre;
@@ -373,7 +412,7 @@
                             mostrarErroresModal(errores, 'formEditarInformacionPersonal');
                         }
                     }
-                    mostrarToast('error', xhr.responseJSON?.message ?? 'Error al guardar los cambios');
+                    mostrarToast('error', xhr.responseJSON?.mensaje ?? 'Error al guardar los cambios');
                 },
                 complete: function() {
                     setBtnEditarInformacionPersonal('editar');
@@ -423,17 +462,28 @@
                     mostrarToast('success', res.message);
                 },
                 error: function(xhr) {
+
                     if (xhr.status === 422) {
-                        const errores = xhr.responseJSON?.errors ?? {};
-                        if (Object.keys(errores).length) {
-                            mostrarErroresModal(errores, 'formBSEditarPerfil');
-                        }
+
+                        mostrarErroresModal(
+                            xhr.responseJSON?.errors ?? {},
+                            'formBSEditarPerfil'
+                        );
+
+                        return;
                     }
-                    mostrarToast('error', xhr.responseJSON?.message ?? 'Error al guardar los cambios');
+
+                    mostrarToast(
+                        'error',
+                        xhr.responseJSON?.message ??
+                        xhr.responseJSON?.mensaje ??
+                        'Ocurrió un error al guardar los cambios.'
+                    );
+
                 },
                 complete: function() {
                     setBtnBSEditarPerfil('editar');
-                },
+                }
             });
         }
 

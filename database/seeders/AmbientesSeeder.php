@@ -6,6 +6,7 @@ use App\Models\Ambiente;
 use App\Models\Grado;
 use App\Models\Grupo;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class AmbientesSeeder extends Seeder
 {
@@ -49,13 +50,18 @@ class AmbientesSeeder extends Seeder
 
                 // Crear grupos demo
                 foreach ($setup['letras'] as $letra) {
-                    Grupo::firstOrCreate(
-                        [
-                            'ambiente_id'  => $ambiente->id,
-                            'grado_id'     => $grado->id,
-                            'nombre'       => $letra,
-                            'anio_lectivo' => $anio,
-                        ],
+                    $criteriosGrupo = [
+                        'grado_id'     => $grado->id,
+                        'nombre'       => $letra,
+                        'anio_lectivo' => $anio,
+                    ];
+
+                    if (Schema::hasColumn('grupos', 'ambiente_id')) {
+                        $criteriosGrupo['ambiente_id'] = $ambiente->id;
+                    }
+
+                    Grupo::updateOrCreate(
+                        $criteriosGrupo,
                         ['cupo_maximo' => 25, 'activo' => true]
                     );
                 }

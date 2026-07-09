@@ -190,6 +190,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::put('perfil', [PerfilController::class, 'actualizar'])->name('panel.perfil.update');
     Route::put('perfil/informacion-personal', [PerfilController::class, 'actualizarInformacionPersonal'])
         ->name('panel.perfil.informacion-personal');
+    Route::post('perfil/foto', [PerfilController::class, 'subirFoto'])->name('panel.perfil.foto');
+    Route::delete('perfil/foto', [PerfilController::class, 'eliminarFoto'])->name('panel.perfil.foto.eliminar');
 
     // Estudiantes
     Route::get('estudiantes', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');

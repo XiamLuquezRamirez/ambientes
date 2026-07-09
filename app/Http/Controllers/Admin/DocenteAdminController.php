@@ -32,8 +32,19 @@ class DocenteAdminController extends Controller
      */
     public function listar(Request $request)
     {
+        // La fecha de último acceso no existe en docentes: se lee desde registros_acceso
+        // a través de user.ultimoLogin (mismo origen que en el listado de usuarios).
         $consulta = Docente::query()
-            ->with('user')
+            ->with([
+                'user' => fn ($q) => $q
+                    ->with('ultimoLogin')
+                    ->withCount([
+                        'loginLogs as login_logs_count' => fn ($lq) => $lq->where(
+                            'tipo',
+                            \App\Models\LoginLog::TIPO_INICIO_SESION
+                        ),
+                    ]),
+            ])
             ->join('users', 'users.id', '=', 'docentes.user_id')
             ->select(
                 'docentes.*',

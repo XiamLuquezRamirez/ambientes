@@ -18,9 +18,11 @@
     @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
 </head>
 
 <body>
+
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
@@ -63,19 +65,33 @@
     </aside>
 
     @php
+        use App\Models\User;
+        use App\Services\PerfilFotoService;
+
         $usuarioAuth = Auth::guard('docente')->user();
-        $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre ?? '')));
-        $inicialesAuth = mb_strtoupper(
-            mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
-        );
+        $perfilFoto = app(PerfilFotoService::class);
+
+        if ($usuarioAuth instanceof User) {
+            $usuarioAuth->loadMissing('docente');
+        }
+
+        $inicialesAuth = $usuarioAuth instanceof User ? $perfilFoto->iniciales($usuarioAuth) : 'NN';
+        $fotoUrlPublica =
+            $usuarioAuth instanceof User ? $perfilFoto->urlPublica($usuarioAuth->docente?->foto_url) : null;
         $rolAuthLabel =
             ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
     @endphp
     <header class="header">
         <div class="header-perfil" id="headerPerfil">
 
-            {{-- Chip visible siempre --}}
-            <div class="avatar">{{ $inicialesAuth }}</div>
+            {{-- Chip visible siempre (foto o iniciales) --}}
+            <div class="avatar" id="headerAvatar">
+                <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
+                    class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                <span id="headerAvatarIniciales" class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                    {{ $inicialesAuth }}
+                </span>
+            </div>
             <div class="header-user-info">
                 <span class="header-user-nombre">{{ $usuarioAuth?->nombre }}</span>
                 <span class="header-user-rol">{{ $rolAuthLabel }}</span>
@@ -86,7 +102,14 @@
             <div class="header-dropdown">
 
                 <div class="dropdown-user-card" onclick="window.location.href='{{ route('panel.perfil') }}'">
-                    <div class="dropdown-avatar">{{ $inicialesAuth }}</div>
+                    <div class="dropdown-avatar" id="dropdownAvatar">
+                        <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
+                            class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                        <span id="dropdownAvatarIniciales"
+                            class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                            {{ $inicialesAuth }}
+                        </span>
+                    </div>
                     <div>
                         <div class="dropdown-nombre">{{ $usuarioAuth?->nombre }}</div>
                         <div class="dropdown-email">{{ $usuarioAuth?->email }}</div>
@@ -98,6 +121,10 @@
                     <a href="{{ route('panel.perfil') }}" class="dropdown-item">
                         <i class="fa-solid fa-user"></i>
                         Mi Perfil
+                    </a>
+                    <a href="#" class="dropdown-item" onclick="abrirModalCambiarContrasena(); return false;">
+                        <i class="fa-solid fa-key"></i>
+                        Cambiar contraseña
                     </a>
                 </div>
 
@@ -117,6 +144,8 @@
             </div>
         </div>
     </header>
+
+    @include('perfil.cambiar_contrasena', ['rutaContrasena' => route('panel.perfil.contrasena')])
 
     <main class="main">
         <div class="content">

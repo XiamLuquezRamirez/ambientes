@@ -14,7 +14,9 @@
         @include('perfil.partials._header')
         @include('perfil.partials._tabs')
         @include('perfil.editar_usuario')
-        @include('perfil.cambiar_contrasena')
+        @if ($puedeCambiarFoto ?? false)
+            @include('perfil.partials._modal_foto_perfil')
+        @endif
     </div>
     @include('perfil.partials._historial_accesos')
 @endsection

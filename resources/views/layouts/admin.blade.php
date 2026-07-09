@@ -132,12 +132,13 @@
             mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
         );
         $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
+        $avatarColor = '#' . substr(md5($usuarioAuth->nombre . '|' . $usuarioAuth->apellido), 0, 6);
     @endphp
     <header class="header">
         <div class="header-perfil" id="headerPerfil">
 
             {{-- Chip visible siempre --}}
-            <div class="avatar">{{ $inicialesAuth }}</div>
+            <div class="avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
             <div class="header-user-info">
                 <span class="header-user-nombre">{{ $usuarioAuth->nombre }}</span>
                 <span class="header-user-rol">{{ $rolAuthLabel }}</span>
@@ -148,7 +149,7 @@
             <div class="header-dropdown">
 
                 <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
-                    <div class="dropdown-avatar">{{ $inicialesAuth }}</div>
+                    <div class="dropdown-avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
                     <div>
                         <div class="dropdown-nombre">{{ $usuarioAuth->nombre }}</div>
                         <div class="dropdown-email">{{ $usuarioAuth->email }}</div>
@@ -160,6 +161,10 @@
                     <a href="{{ route('admin.perfil') }}" class="dropdown-item">
                         <i class="fa-solid fa-user"></i>
                         Mi Perfil
+                    </a>
+                    <a href="#" class="dropdown-item" onclick="abrirModalCambiarContrasena(); return false;">
+                        <i class="fa-solid fa-key"></i>
+                        Cambiar contraseña
                     </a>
                 </div>
 
@@ -179,6 +184,8 @@
             </div>
         </div>
     </header>
+
+    @include('perfil.cambiar_contrasena', ['rutaContrasena' => route('admin.perfil.contrasena')])
 
     <main class="main">
         <div class="content">

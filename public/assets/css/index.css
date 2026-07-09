@@ -128,6 +128,22 @@ body {
     font-weight: 700;
     font-size: 0.78rem;
     letter-spacing: .05em;
+    overflow: hidden;
+    position: relative;
+}
+
+.avatar .avatar-img,
+.dropdown-avatar .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+.avatar .avatar-iniciales,
+.dropdown-avatar .avatar-iniciales {
+    line-height: 1;
 }
 
 .header-user-info {
@@ -212,6 +228,8 @@ body {
     font-weight: 700;
     font-size: 0.95rem;
     letter-spacing: .05em;
+    overflow: hidden;
+    position: relative;
 }
 
 .dropdown-nombre {
@@ -815,4 +833,22 @@ select.form-control {
     padding: 40px;
     color: #64748B;
     font-size: 0.9rem;
+}
+
+/* Modal cambiar contraseña (dropdown header panel) */
+.password-requisitos {
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+.password-requisitos.valido {
+    color: #059669;
+}
+
+.password-requisitos.invalido {
+    color: #dc2626;
+}
+
+#modal_password_coincidencia {
+    color: #dc2626;
 }

@@ -35,7 +35,11 @@
                         <td style="color:#64748B">{{ $d->email }}</td>
 
                         <td>
-                            {{ $d->ultimo_acceso ? date('d/m/Y H:i', strtotime($d->ultimo_acceso)) : '—' }}
+                            {{--
+                              ultimo_acceso NO es columna de docentes ni de users.
+                              Se toma de registros_acceso: docente -> user -> ultimoLogin.
+                            --}}
+                            {{ $d->user?->ultimoLogin?->fecha?->format('d/m/Y H:i') ?? '—' }}
                         </td>
 
                         <td style="text-align:center">

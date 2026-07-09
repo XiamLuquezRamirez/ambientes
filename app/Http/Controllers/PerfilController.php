@@ -6,6 +6,7 @@ use App\Enums\SeguridadAccion;
 use App\Models\LoginLog;
 use App\Models\User;
 use App\Services\HistorialAccesosService;
+use App\Services\PerfilFotoService;
 use App\Services\PerfilService;
 use App\Services\SeguridadService;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,7 @@ class PerfilController extends Controller
     public function __construct(
         private PerfilService $perfilService,
         private HistorialAccesosService $historialAccesos,
+        private PerfilFotoService $perfilFoto,
     ) {}
 
     /**
@@ -335,6 +337,64 @@ class PerfilController extends Controller
                 'fecha' => $fechaCambio->format('d/m/Y H:i'),
                 'fecha_relativa' => $fechaCambio->diffForHumans(),
             ],
+        ]);
+    }
+
+    /**
+     * Sube o reemplaza la foto de perfil del docente autenticado.
+     *
+     * Acepta JPG/PNG hasta 2 MB. La sesión permanece activa tras guardar.
+     */
+    public function subirFoto(Request $request): JsonResponse
+    {
+        $authUser = Auth::guard('docente')->user();
+
+        if (! $authUser instanceof User) {
+            return response()->json(['success' => false, 'message' => 'No autenticado.'], 401);
+        }
+
+        $request->validate([
+            'foto' => 'required|file|mimes:jpeg,jpg,png|max:'.PerfilFotoService::MAX_KILOBYTES,
+        ]);
+
+        try {
+            $resultado = $this->perfilFoto->guardar($authUser, $request->file('foto'));
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getStatusCode());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto guardada correctamente.',
+            ...$resultado,
+        ]);
+    }
+
+    /**
+     * Elimina la foto de perfil del docente autenticado.
+     */
+    public function eliminarFoto(): JsonResponse
+    {
+        $authUser = Auth::guard('docente')->user();
+
+        if (! $authUser instanceof User) {
+            return response()->json(['success' => false, 'message' => 'No autenticado.'], 401);
+        }
+
+        try {
+            $resultado = $this->perfilFoto->eliminar($authUser);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 403);
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getStatusCode());
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto eliminada correctamente.',
+            ...$resultado,
         ]);
     }
 }
