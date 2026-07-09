@@ -26,6 +26,7 @@ use App\Models\PiarAjusteRazonableDocenteFirma;
 use App\Models\PiarActaCompromiso;
 use App\Models\PiarActaCompromisoActividad;
 use Barryvdh\DomPDF\Facade\Pdf;
+use setasign\Fpdi\Fpdi;
 
 class PiarController extends Controller
 {
@@ -498,6 +499,7 @@ class PiarController extends Controller
             "dba_ate_3_obs" => "nullable|string",
             "dba_ate_4" => "required|string",
             "dba_ate_4_obs" => "nullable|string",
+            "dba_ate_4_tiempo" => "required|integer",
 
             "dba_per_1" => "required|string",
             "dba_per_1_obs" => "nullable|string",
@@ -813,10 +815,51 @@ class PiarController extends Controller
         ->where('estudiante_id', $idEstudiante)
         ->first();
 
-        //return view('admin.estudiantes.exportarPiar', compact('piar'));
+
+
+       // return view('admin.estudiantes.exportarPiar', compact('piar'));
         
-        $pdf = Pdf::loadView('admin.estudiantes.exportarPiar', compact('piar'));
-        return $pdf->stream('piar.pdf');
+        $pdf = Pdf::loadView('admin.estudiantes.exportarPiar', compact('piar'))->setPaper('a4', 'portrait');
+        $pdf2 = Pdf::loadView('admin.estudiantes.exportarPiarDos', compact('piar'))->setPaper('a4', 'landscape');
+        $pdf3 = Pdf::loadView('admin.estudiantes.exportarPiarTres', compact('piar'))->setPaper('a4', 'portrait');
+        $tmp1 = tempnam(sys_get_temp_dir(), 'pdf');
+        $tmp2 = tempnam(sys_get_temp_dir(), 'pdf');
+        $tmp3 = tempnam(sys_get_temp_dir(), 'pdf');
+
+        file_put_contents($tmp1, $pdf->output());
+        file_put_contents($tmp2, $pdf2->output());
+        file_put_contents($tmp3, $pdf3->output());
         
+        $fpdi = new Fpdi();
+
+        foreach ([$tmp1, $tmp2, $tmp3] as $file) {
+
+            $pageCount = $fpdi->setSourceFile($file);
+
+            for ($i = 1; $i <= $pageCount; $i++) {
+
+                $tpl = $fpdi->importPage($i);
+                $size = $fpdi->getTemplateSize($tpl);
+
+                $orientation = $size['width'] > $size['height'] ? 'L' : 'P';
+
+                $fpdi->AddPage($orientation, [$size['width'], $size['height']]);
+                $fpdi->useTemplate($tpl);
+            }
+        }
+
+        // Eliminar inmediatamente los temporales
+        unlink($tmp1);
+        unlink($tmp2);
+        unlink($tmp3);
+
+        return response(
+            $fpdi->Output('S'),
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="piar.pdf"',
+            ]
+        );
     }
 }

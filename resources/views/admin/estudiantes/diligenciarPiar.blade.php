@@ -1861,7 +1861,7 @@
                                         <tr>
                                             <td class="text-center">{{ $i + 1 }}</td>
                                             @if ($texto === 'ate_tiempo')
-                                                <td>Sus periodos de atención son de (indicar en tiempo: 5, 10, 15 o más de 20 minutos). Especifique:</td>
+                                                <td>Sus periodos de atención son de (indicar en tiempo: 5, 10, 15 o más de 20 minutos). Especifique: <input type="text" class="form-control form-control-sm d-inline-block" style="width:70px" name="dba_ate_4_tiempo" required></td>
                                             @else
                                                 <td>{{ $texto }}</td>
                                             @endif
