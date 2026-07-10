@@ -30,7 +30,7 @@ use setasign\Fpdi\Fpdi;
 
 class PiarController extends Controller
 {
-    public function diligenciarPiar($idEstudiante)
+    public function diligenciarPiar($idEstudiante, $tipo)
     {
         $estudiante = Estudiante::with('grado', 'departamento', 'municipio')->where('id', $idEstudiante)->first();
         $condiciones = Condicion::all();
@@ -43,7 +43,7 @@ class PiarController extends Controller
         $user =Auth::guard('docente')->user();
         $docente_diligencia = User::where('id', $user->id)->first();
 
-        return view('admin.estudiantes.diligenciarPiar', compact('estudiante', 'condiciones', 'docente_diligencia', 'municipios', 'departamentos'));
+        return view('admin.estudiantes.diligenciarPiar', compact('estudiante', 'condiciones', 'docente_diligencia', 'municipios', 'departamentos', 'tipo'));
     }
 
     public function verificarSiComenzo($idEstudiante)

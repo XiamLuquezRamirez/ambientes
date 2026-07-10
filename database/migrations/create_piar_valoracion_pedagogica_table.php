@@ -1,0 +1,154 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('piar_valoracion_pedagogica', function (Blueprint $table) {
+            $table->id();
+
+            $table->unsignedBigInteger('id_piar');
+
+            // =========================
+            // VALORACIÓN PEDAGÓGICA
+            // =========================
+
+            $table->string('vp_mov_apoyo_sistema', 10)->nullable();
+            $table->text('vp_mov_apoyo_sistema_obs')->nullable();
+            $table->string('vp_mov_ajustes_espacio', 10)->nullable();
+            $table->text('vp_mov_ajustes_espacio_obs')->nullable();
+            $table->string('vp_mov_ajustes_movilidad', 10)->nullable();
+            $table->text('vp_mov_ajustes_movilidad_obs')->nullable();
+            $table->string('vp_mov_motricidad_fina', 10)->nullable();
+            $table->text('vp_mov_motricidad_fina_obs')->nullable();
+            $table->string('vp_mov_adaptacion_agarrar', 10)->nullable();
+            $table->text('vp_mov_adaptacion_agarrar_obs')->nullable();
+            $table->string('vp_mov_intensidad', 50)->nullable();
+
+            $table->string('vp_com_apoyo_sistema', 10)->nullable();
+            $table->text('vp_com_apoyo_sistema_obs')->nullable();
+            $table->string('vp_com_aditamentos', 10)->nullable();
+            $table->text('vp_com_aditamentos_obs')->nullable();
+            $table->string('vp_com_ajustes', 10)->nullable();
+            $table->text('vp_com_ajustes_obs')->nullable();
+            $table->string('vp_com_intensidad', 50)->nullable();
+
+            $table->string('vp_info_apoyo_sistema', 10)->nullable();
+            $table->text('vp_info_apoyo_sistema_obs')->nullable();
+            $table->string('vp_info_ajustes', 10)->nullable();
+            $table->text('vp_info_ajustes_obs')->nullable();
+            $table->string('vp_info_intensidad', 50)->nullable();
+
+            $table->string('vp_soc_apoyo_regulacion', 10)->nullable();
+            $table->text('vp_soc_apoyo_regulacion_obs')->nullable();
+            $table->string('vp_soc_ajustes_interaccion', 10)->nullable();
+            $table->text('vp_soc_ajustes_interaccion_obs')->nullable();
+            $table->string('vp_soc_intensidad', 50)->nullable();
+
+            $table->string('vp_acad_ajustes_permanencia', 10)->nullable();
+            $table->text('vp_acad_ajustes_permanencia_obs')->nullable();
+            $table->string('vp_acad_ajustes_tiempos', 10)->nullable();
+            $table->text('vp_acad_ajustes_tiempos_obs')->nullable();
+            $table->string('vp_acad_intensidad', 50)->nullable();
+
+            $table->text('vp_observaciones')->nullable();
+
+            // =========================
+            // CLE 1 - 18
+            // =========================
+
+            for ($i = 1; $i <= 18; $i++) {
+                $table->string("cle_{$i}", 10)->nullable();
+                $table->text("cle_{$i}_obs")->nullable();
+            }
+
+            $table->text('cle_observaciones')->nullable();
+
+            // =========================
+            // CLM
+            // =========================
+
+            $table->string('clm_1',10)->nullable();
+            $table->text('clm_1_obs')->nullable();
+
+            $table->string('clm_2',10)->nullable();
+            $table->text('clm_2_obs')->nullable();
+
+            $table->string('clm_3',10)->nullable();
+            $table->text('clm_3_obs')->nullable();
+
+            $table->string('clm_4',10)->nullable();
+            $table->text('clm_4_obs')->nullable();
+
+            $table->integer('clm_5_desde')->nullable();
+            $table->integer('clm_5_hasta')->nullable();
+            $table->string('clm_5',10)->nullable();
+            $table->text('clm_5_obs')->nullable();
+
+            for ($i = 6; $i <= 19; $i++) {
+                $table->string("clm_{$i}",10)->nullable();
+                $table->text("clm_{$i}_obs")->nullable();
+            }
+
+            $table->text('clm_observaciones')->nullable();
+
+            // =========================
+            // DBA MEM
+            // =========================
+
+            for ($i = 1; $i <= 7; $i++) {
+                $table->string("dba_mem_{$i}",10)->nullable();
+                $table->text("dba_mem_{$i}_obs")->nullable();
+            }
+
+            // DBA ATE
+
+            for ($i = 1; $i <= 4; $i++) {
+                $table->string("dba_ate_{$i}",10)->nullable();
+                $table->text("dba_ate_{$i}_obs")->nullable();
+            }
+
+            $table->string('dba_ate_4_tiempo',10)->nullable();
+
+            // DBA PER
+
+            for ($i = 1; $i <= 5; $i++) {
+                $table->string("dba_per_{$i}",10)->nullable();
+                $table->text("dba_per_{$i}_obs")->nullable();
+            }
+
+            // DBA FE
+
+            for ($i = 1; $i <= 6; $i++) {
+                $table->string("dba_fe_{$i}",10)->nullable();
+                $table->text("dba_fe_{$i}_obs")->nullable();
+            }
+
+            // DBA LC
+
+            for ($i = 1; $i <= 10; $i++) {
+                $table->string("dba_lc_{$i}",10)->nullable();
+                $table->text("dba_lc_{$i}_obs")->nullable();
+            }
+
+            $table->text('habilidades_destrezas')->nullable();
+            $table->text('estrategias_acciones')->nullable();
+
+            $table->timestamps();
+
+            $table->foreign('id_piar')
+                ->references('id')
+                ->on('piar')
+                ->cascadeOnDelete();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('piar_valoracion_pedagogica');
+    }
+};

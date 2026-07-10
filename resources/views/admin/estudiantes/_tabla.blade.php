@@ -43,10 +43,20 @@
                                 <i class="fa-solid fa-trash-can"></i>
                                 Eliminar
                             </button>
-                            @if($e->requiere_apoyo == "si" && $e->estado_piar == 0)
-                                <a href="{{ route('admin.estudiantes.diligenciar-piar', ['idEstudiante' => $e->id]) }}" class="btn-accion btn-warning">
+                            @if($e->requiere_apoyo == "si" && $e->piar == null)
+                                <a href="{{ route('admin.estudiantes.diligenciar-piar', ['idEstudiante' => $e->id, 'tipo' => 'nuevo']) }}" class="btn-accion btn-warning">
                                     <i class="fa-solid fa-file-pen"></i>
                                     Diligenciar PIAR
+                                </a>
+                            @elseif($e->piar != null && ($e->piar->paso > 0 && $e->piar->paso < 8))
+                                <a href="{{ route('admin.estudiantes.diligenciar-piar', ['idEstudiante' => $e->id, 'tipo' => 'nuevo']) }}" class="btn-accion btn-warning">
+                                    <i class="fa-solid fa-file-pen"></i>
+                                    Completar PIAR
+                                </a>
+                            @elseif($e->piar != null && $e->piar->paso == 8)
+                                <a href="{{ route('admin.estudiantes.diligenciar-piar', ['idEstudiante' => $e->id, 'tipo' => 'actualizar']) }}" class="btn-accion btn-info">
+                                    <i class="fa-solid fa-file-pen"></i>
+                                    Actualizar PIAR
                                 </a>
                             @endif
                         </div>

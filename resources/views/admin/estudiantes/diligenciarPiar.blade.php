@@ -607,6 +607,7 @@
 </div>
 <div class="piar-container">
     <input type="hidden" id="id_estudiante_piar" value="{{ $estudiante?->id }}">
+    <input type="hidden" id="tipo_piar" value="{{ $tipo }}">
     {{-- Stepper --}}
     <div class="piar-stepper" id="piarStepper">
         <div class="piar-stepper-progress" id="piarProgress" style="width:0%"></div>
@@ -641,8 +642,22 @@
         </div>
     </div>
     <div class="piar-body">
+        {{-- PASO 0: Pestaña de espera --}}
+        <div class="piar-pane active card-item" data-pane="0">
+            <div class="piar-pane-title d-flex align-items-center justify-content-center">
+                <div class="d-flex align-items-center justify-content-center flex-column gap-2 p-5">
+                    <div class="piar-pane-icon" style="background:#EFF6FF;color:#2563EB">
+                        <i class="fas fa-user-graduate fa-3x"></i>
+                    </div>
+                    <div style="text-align: center;">
+                        <h3 style="font-size: 1.5rem;">Consultando información del estudiante</h3>
+                        <p>Por favor, espere mientras se consulta la información del estudiante</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         {{-- PASO 1: Información General --}}
-        <div class="piar-pane active card-item" data-pane="1">
+        <div class="piar-pane card-item" data-pane="1">
             <div class="piar-pane-title">
                 <div class="piar-pane-icon" style="background:#EFF6FF;color:#2563EB">
                     <i class="fas fa-user-graduate"></i>
@@ -2371,7 +2386,6 @@
             </form>
         </div>
 
-
         {{-- PASO 8: mensaje de confirmación --}}
         <div class="piar-pane card-item" data-pane="8">
                 <div class="d-flex flex-column justify-content-center align-items-center">
@@ -2385,7 +2399,7 @@
     </div>
 
     {{-- Footer navegación --}}
-    <div class="piar-footer">
+    <div class="piar-footer" id="piar-footer" style="display:none">
         <button type="button" class="btn btn-piar-outline" id="btnAnterior" style="visibility:hidden">
             <i class="fas fa-chevron-left me-1"></i> Anterior
         </button>
@@ -2440,6 +2454,6 @@
 <script>
     const URL_PIAR = "{{ route('admin.piar') }}";
 </script>
-
 <script src="{{ asset('assets/js/estudiantes/piar.js') }}"></script>
+
 @endpush

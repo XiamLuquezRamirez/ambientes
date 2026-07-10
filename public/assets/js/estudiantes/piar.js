@@ -600,63 +600,82 @@ function cerrarModalBuscarDocente() {
 
 var piar = null;
 $(document).ready(function() {
+    var tipo_piar = $('#tipo_piar').val();
     var id_estudiante = $('#id_estudiante_piar').val();
-    verificarSiComenzo(id_estudiante).then(function(data) {
-        if (data.comenzo) {
-            paso = parseInt(data.piar.paso);
-            piar = data.piar;
-            switch (paso) {
-                case 2:
-                    mapearPaso1();
-                    break;
-                case 3:
-                    mapearPaso1();
-                    mapearPaso2();
-                    break;
-                case 4:
-                    mapearPaso1();
-                    mapearPaso2();
-                    mapearPaso3();
-                    break;
-                case 5:
-                    mapearPaso1();
-                    mapearPaso2();
-                    mapearPaso3();
-                    mapearPaso4();
-                    break;
-                case 6:
-                    mapearPaso1();
-                    mapearPaso2();
-                    mapearPaso3();
-                    mapearPaso4();
-                    mapearPaso5();
-                    break;
-                case 7:
-                    mapearPaso1();
-                    mapearPaso2();
-                    mapearPaso3();
-                    mapearPaso4();
-                    mapearPaso5();
-                    mapearPaso6();
-                    break;
-                case 8:
-                    mapearPaso1();
-                    mapearPaso2();
-                    mapearPaso3();
-                    mapearPaso4();
-                    mapearPaso5();
-                    mapearPaso6();
-                    mapearPaso7();
-                    break;
+    if(tipo_piar == 'nuevo') {
+        verificarSiComenzo(id_estudiante).then(function(data) {
+            if (data.comenzo) {
+                paso = parseInt(data.piar.paso);
+                piar = data.piar;
+                switch (paso) {
+                    case 2:
+                        mapearPaso1();
+                        break;
+                    case 3:
+                        mapearPaso1();
+                        mapearPaso2();
+                        break;
+                    case 4:
+                        mapearPaso1();
+                        mapearPaso2();
+                        mapearPaso3();
+                        break;
+                    case 5:
+                        mapearPaso1();
+                        mapearPaso2();
+                        mapearPaso3();
+                        mapearPaso4();
+                        break;
+                    case 6:
+                        mapearPaso1();
+                        mapearPaso2();
+                        mapearPaso3();
+                        mapearPaso4();
+                        mapearPaso5();
+                        break;
+                    case 7:
+                        mapearPaso1();
+                        mapearPaso2();
+                        mapearPaso3();
+                        mapearPaso4();
+                        mapearPaso5();
+                        mapearPaso6();
+                        break;
+                    case 8:
+                        mapearPaso1();
+                        mapearPaso2();
+                        mapearPaso3();
+                        mapearPaso4();
+                        mapearPaso5();
+                        mapearPaso6();
+                        mapearPaso7();
+                        break;
+                }
+            } else {
+                paso = 1;
             }
-        } else {
+            actualizarUI();
+            $('#piar-footer').show();
+        }).catch(function(error) {
             paso = 1;
-        }
-        actualizarUI();
-    }).catch(function(error) {
-        paso = 1;
-        //actualizarUI();
-    });
+            actualizarUI();
+            $('#piar-footer').show();
+        });
+    } else if(tipo_piar == 'actualizar') {
+        verificarSiComenzo(id_estudiante).then(function(data) {
+            piar = data.piar;
+            paso = 1;
+            mapearPaso1();
+            mapearPaso2();
+            mapearPaso3();
+            mapearPaso4();
+            mapearPaso5();
+            mapearPaso6();
+            mapearPaso7();
+            actualizarUI();
+            $('#piar-footer').show();
+        });
+    }
 });
 
 async function verificarSiComenzo(id_estudiante) {

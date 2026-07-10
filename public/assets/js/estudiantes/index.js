@@ -539,15 +539,6 @@ async function cambiarEstadoEstudiante(id, input) {
         url: `${URL_ESTUDIANTES}/cambiar-estado/${id}/${estado}`,
         type: 'GET',
         dataType: 'json',
-        beforeSend: function () {
-            Swal.fire({
-                title: 'Cambiando estado de estudiante...',
-                text: 'Espere un momento mientras se cambia el estado del estudiante.',
-                icon: 'info',
-                showCancelButton: false,
-                showConfirmButton: false,
-            });
-        },
         success: async function (res) {
             if (res.success) {
                 await cargarTabla(location.href);
