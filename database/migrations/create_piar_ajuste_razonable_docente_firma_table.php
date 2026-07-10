@@ -18,16 +18,6 @@ return new class extends Migration
             $table->text('area')->nullable();
 
             $table->timestamps();
-
-            $table->foreign('id_ajuste_razonable')
-                ->references('id')
-                ->on('piar_ajuste_razonable')
-                ->cascadeOnDelete();
-
-            $table->foreign('id_docente')
-                ->references('id')
-                ->on('docentes')
-                ->cascadeOnDelete();
         });
     }
 

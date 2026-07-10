@@ -20,11 +20,6 @@ return new class extends Migration
             $table->string('frecuencia', 100)->nullable();
 
             $table->timestamps();
-
-            $table->foreign('id_acta_compromiso')
-                ->references('id')
-                ->on('piar_acta_compromiso')
-                ->cascadeOnDelete();
         });
     }
 

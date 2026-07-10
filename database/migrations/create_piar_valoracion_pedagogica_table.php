@@ -139,11 +139,6 @@ return new class extends Migration
             $table->text('estrategias_acciones')->nullable();
 
             $table->timestamps();
-
-            $table->foreign('id_piar')
-                ->references('id')
-                ->on('piar')
-                ->cascadeOnDelete();
         });
     }
 

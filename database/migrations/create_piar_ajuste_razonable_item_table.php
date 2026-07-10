@@ -26,11 +26,6 @@ return new class extends Migration
             $table->text('seguimiento')->nullable();
 
             $table->timestamps();
-
-            $table->foreign('id_ajuste_razonable')
-                ->references('id')
-                ->on('piar_ajuste_razonable')
-                ->cascadeOnDelete();
         });
     }
 

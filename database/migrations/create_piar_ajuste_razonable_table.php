@@ -26,11 +26,6 @@ return new class extends Migration
             $table->text('docente_coordinador_pedagogico_area')->nullable();
 
             $table->timestamps();
-
-            $table->foreign('id_piar')
-                ->references('id')
-                ->on('piar')
-                ->cascadeOnDelete();
         });
     }
 

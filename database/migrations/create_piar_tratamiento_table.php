@@ -18,11 +18,6 @@ return new class extends Migration
             $table->string('frecuencia');
 
             $table->timestamps();
-
-            $table->foreign('id_entorno_salud')
-                ->references('id')
-                ->on('piar_entorno_salud')
-                ->cascadeOnDelete();
         });
     }
 

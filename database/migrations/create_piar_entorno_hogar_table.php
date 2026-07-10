@@ -44,11 +44,6 @@ return new class extends Migration
             $table->text('personas_con_quien_vive')->nullable();
 
             $table->timestamps();
-
-            $table->foreign('id_piar')
-                ->references('id')
-                ->on('piar')
-                ->cascadeOnDelete();
         });
     }
 

@@ -36,11 +36,6 @@ return new class extends Migration
             $table->text('cuales_ayudas')->nullable();
 
             $table->timestamps();
-
-            $table->foreign('id_piar')
-                ->references('id')
-                ->on('piar')
-                ->cascadeOnDelete();
         });
     }
 
