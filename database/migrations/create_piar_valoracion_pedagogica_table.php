@@ -61,10 +61,44 @@ return new class extends Migration
             // CLE 1 - 18
             // =========================
 
-            for ($i = 1; $i <= 18; $i++) {
-                $table->string("cle_{$i}", 10)->nullable();
-                $table->text("cle_{$i}_obs")->nullable();
-            }
+          
+            $table->string("cle_1", 10)->nullable();
+            $table->text("cle_1_obs")->nullable();
+            $table->string("cle_2", 10)->nullable();
+            $table->text("cle_2_obs")->nullable();
+            $table->string("cle_3", 10)->nullable();
+            $table->text("cle_3_obs")->nullable();
+            $table->string("cle_4", 10)->nullable();
+            $table->text("cle_4_obs")->nullable();
+            $table->string("cle_5", 10)->nullable();
+            $table->text("cle_5_obs")->nullable();
+            $table->string("cle_6", 10)->nullable();
+            $table->text("cle_6_obs")->nullable();
+            $table->string("cle_7", 10)->nullable();
+            $table->text("cle_7_obs")->nullable();
+            $table->string("cle_8", 10)->nullable();
+            $table->text("cle_8_obs")->nullable();
+            $table->string("cle_9", 10)->nullable();
+            $table->text("cle_9_obs")->nullable();
+            $table->string("cle_10", 10)->nullable();
+            $table->text("cle_10_obs")->nullable();
+            $table->string("cle_11", 10)->nullable();
+            $table->text("cle_11_obs")->nullable();
+            $table->string("cle_12", 10)->nullable();
+            $table->text("cle_12_obs")->nullable();
+            $table->string("cle_13", 10)->nullable();
+            $table->text("cle_13_obs")->nullable();
+            $table->string("cle_14", 10)->nullable();
+            $table->text("cle_14_obs")->nullable();
+            $table->string("cle_15", 10)->nullable();
+            $table->text("cle_15_obs")->nullable();
+            $table->string("cle_16", 10)->nullable();
+            $table->text("cle_16_obs")->nullable();
+            $table->string("cle_17", 10)->nullable();
+            $table->text("cle_17_obs")->nullable();
+            $table->string("cle_18", 10)->nullable();
+            $table->text("cle_18_obs")->nullable();
+           
 
             $table->text('cle_observaciones')->nullable();
 
