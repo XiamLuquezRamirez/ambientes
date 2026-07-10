@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
 use App\Http\Controllers\Admin\CatalogoController;
@@ -18,11 +17,13 @@ use App\Http\Controllers\Admin\SyncLogController;
 use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
+use App\Http\Controllers\Docente\DocenteDashboardController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\InclusionController;
 use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
+use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
 
 // Raiz → bienvenida del ambiente configurado
@@ -180,7 +181,9 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
 // ── Panel Docente ─────────────────────────────────────────────────────────
 Route::prefix('panel')->middleware(['es.docente'])->group(function () {
-    Route::get('principal', fn () => view('docentes.panel'))->name('panel.principal');
+    Route::get('principal', [DocenteDashboardController::class, 'listar'])->name('panel.principal');
+    Route::get('principal/{ambiente}/grados', [DocenteDashboardController::class, 'obtenerGradosYGrupos'])->name('panel.principal.grados');
+    Route::get('principal/{carga}/estadisticas', [DocenteDashboardController::class, 'obtenerEstadisticasGrupo'])->name('panel.principal.estadisticas');
 
     // Perfil docente
     Route::get('perfil', [PerfilController::class, 'mostrar'])->name('panel.perfil');

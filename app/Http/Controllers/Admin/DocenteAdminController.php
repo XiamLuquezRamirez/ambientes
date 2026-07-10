@@ -8,6 +8,7 @@ use App\Models\CargaDocente;
 use App\Models\Docente;
 use App\Models\Grado;
 use App\Models\Grupo;
+use App\Models\LoginLog;
 use App\Models\SyncQueue;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -19,11 +20,6 @@ use Illuminate\Support\Str;
 
 class DocenteAdminController extends Controller
 {
-    public function panel()
-    {
-        return view('docente.panel');
-    }
-
     /**
      * Lista los docentes con filtros opcionales y paginación.
      *
@@ -41,7 +37,7 @@ class DocenteAdminController extends Controller
                     ->withCount([
                         'loginLogs as login_logs_count' => fn ($lq) => $lq->where(
                             'tipo',
-                            \App\Models\LoginLog::TIPO_INICIO_SESION
+                            LoginLog::TIPO_INICIO_SESION
                         ),
                     ]),
             ])

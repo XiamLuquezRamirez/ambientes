@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Traits\Sincronizable;
-use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 
 class Estudiante extends Model
 {
@@ -13,16 +13,16 @@ class Estudiante extends Model
     protected $fillable = ['avatar', 'tipo_identificacion', 'otro_tipo_identificacion', 'identificacion', 'nombre', 'apellido', 'iniciales', 'grado_id', 'atencion_id', 'estado_id', 'color_avatar', 'condicion', 'activo', 'fecha_nacimiento', 'sexo', 'acudiente', 'telefono_acudiente', 'requiere_apoyo', 'estado_piar', 'lugar_nacimiento', 'departamento_id', 'municipio_id', 'barrio_vereda', 'direccion', 'telefono', 'email'];
 
     protected $casts = [
-        'edad' => 'integer'
+        'edad' => 'integer',
     ];
 
-    protected $with = ['departamento', 'municipio'];
+    protected $with = ['departamento', 'municipio', 'piar'];
 
     public function getEdadAttribute()
     {
-        if (!$this->fecha_nacimiento) {
+        if (! $this->fecha_nacimiento) {
             return null;
-        }else{
+        } else {
             return Carbon::parse($this->fecha_nacimiento)->diffInYears(Carbon::now());
         }
     }
@@ -47,7 +47,7 @@ class Estudiante extends Model
         return $this->hasOne(Matricula::class)
             ->where('estado', 'activo')
             ->where('anio_lectivo', date('Y')
-        );
+            );
     }
 
     public function departamento()

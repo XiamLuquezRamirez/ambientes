@@ -16,8 +16,6 @@
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
-
-
     @stack('styles')
     @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
