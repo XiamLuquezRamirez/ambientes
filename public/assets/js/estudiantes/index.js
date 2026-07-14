@@ -61,8 +61,13 @@ function limpiarModal() {
 
 /* ── Tabla AJAX ──────────────────────────────────────────────── */
 async function cargarTabla(url) {
-    const $contenedor = $('#contenedorTabla');
-    const $cargando = $('#cargando-tabla');
+    var $contenedor = $('#contenedorTabla');
+    var $cargando = $('#cargando-tabla');
+
+    if(tipoGuardaEstudiante === 2) {
+        $contenedor = $('#container-grid');
+        $cargando = $('#cargando-grid');
+    }
 
     $contenedor.css('opacity', '.4');
     $cargando.show();

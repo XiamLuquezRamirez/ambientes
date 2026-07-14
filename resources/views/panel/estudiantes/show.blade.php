@@ -9,6 +9,12 @@
 @section('content')
     @php
         $condicionNombre = $estudiante->condicion_nombre;
+        $estadoPin = $estadoPin ?? $estudiante->estado_pin;
+        $estadoPinLabel = $estadoPinLabel ?? [
+            'sin_configurar' => 'Sin configurar',
+            'configurado' => 'Configurado',
+            'bloqueado' => 'Bloqueado',
+        ][$estadoPin];
         $tiposPortafolio = [
             'foto' => 'Foto',
             'audio' => 'Audio',
@@ -20,6 +26,12 @@
             'configurado' => 'ficha-pill--ok',
             'bloqueado' => 'ficha-pill--danger',
         ][$estadoPin] ?? 'ficha-pill--warn';
+        $matricula = $matricula ?? $estudiante->matriculaActiva;
+        $ambiente = $ambiente ?? null;
+        $portafolioReciente = $portafolioReciente ?? collect();
+        $observacionesRecientes = $observacionesRecientes ?? collect();
+        $mostrarVerPiar = $mostrarVerPiar ?? ! $estudiante->condicion_es_estandar;
+        $asistenciaHoy = $asistenciaHoy ?? null;
     @endphp
 
     <div class="ficha-page">
@@ -128,10 +140,12 @@
                 <a href="{{ route('panel.portafolio.estudiante', $estudiante) }}" class="btn btn-outline-primary">
                     <i class="fa-solid fa-folder-open"></i> Ver portafolio completo
                 </a>
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalObservacionFicha">
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                    data-bs-target="#modalObservacionFicha">
                     <i class="fa-solid fa-comment"></i> Agregar observación
                 </button>
-                <form method="POST" action="{{ route('panel.estudiantes.asistencia', $estudiante) }}" class="ficha-action-form">
+                <form method="POST" action="{{ route('panel.estudiantes.asistencia', $estudiante) }}"
+                    class="ficha-action-form">
                     @csrf
                     <button type="submit" class="btn btn-outline-primary"
                         @if ($asistenciaHoy?->presente) disabled title="Ya registrada hoy" @endif>
@@ -140,7 +154,8 @@
                     </button>
                 </form>
                 @if ($mostrarVerPiar)
-                    <a href="{{ route('panel.estudiantes.piar', $estudiante) }}" class="btn btn-primary" target="_blank" rel="noopener">
+                    <a href="{{ route('panel.estudiantes.piar', $estudiante) }}" class="btn btn-primary" target="_blank"
+                        rel="noopener">
                         <i class="fa-solid fa-file-medical"></i> Ver PIAR
                     </a>
                 @endif
@@ -153,7 +168,8 @@
                 <h3 class="ficha-section-title">Últimas entradas del portafolio</h3>
                 @forelse ($portafolioReciente as $entrada)
                     <div class="ficha-activity-row">
-                        <span class="ficha-activity-type">{{ $tiposPortafolio[$entrada->tipo_registro] ?? ucfirst($entrada->tipo_registro) }}</span>
+                        <span
+                            class="ficha-activity-type">{{ $tiposPortafolio[$entrada->tipo_registro] ?? ucfirst($entrada->tipo_registro) }}</span>
                         <span class="ficha-activity-date">
                             {{ $entrada->creado_en ? \Carbon\Carbon::parse($entrada->creado_en)->format('d/m/Y H:i') : '—' }}
                         </span>
@@ -181,7 +197,8 @@
     </div>
 
     {{-- Modal observación --}}
-    <div class="modal fade" id="modalObservacionFicha" tabindex="-1" aria-labelledby="modalObservacionFichaLabel" aria-hidden="true">
+    <div class="modal fade" id="modalObservacionFicha" tabindex="-1" aria-labelledby="modalObservacionFichaLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <form method="POST" action="{{ route('panel.portafolio.observacion', $estudiante) }}" class="modal-content">
                 @csrf

@@ -9,7 +9,7 @@
 
     <div class="student-top">
         <span class="status-dot {{ $e->activo ? 'status-dot--active' : 'status-dot--inactive' }}"
-              title="{{ $e->activo ? 'Activo' : 'Inactivo' }}"></span>
+            title="{{ $e->activo ? 'Activo' : 'Inactivo' }}"></span>
 
         @if ($e->avatar_url)
             <img src="{{ $e->avatar_url }}" class="student-avatar" alt="{{ $e->nombre_completo }}">
@@ -63,10 +63,10 @@
         <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-action" title="Ver ficha completa">
             <i class="fa-solid fa-eye"></i>
         </a>
-        <a href="{{ route('panel.estudiantes.edit', $e->id) }}" class="btn-action" title="Editar">
+        <button type="button" onclick="abrirModalEditarEstudiante('{{ $e->id }}')" class="btn-action"
+            title="Editar">
             <i class="fa-solid fa-pen"></i>
-        </a>
-        {{-- Mismo destino que "Ver ficha"; pendiente diferenciar documentos/PIAR --}}
+        </button>
         <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-action" title="Documentos">
             <i class="fa-solid fa-file-lines"></i>
         </a>

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\PiarController;
+use App\Models\Asistencia;
 use App\Models\CargaDocente;
 use App\Models\Condicion;
 use App\Models\Departamento;
@@ -158,6 +160,14 @@ class EstudiantePanelController extends Controller
         $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'html'    => view('panel.estudiantes.partials._grid', compact('estudiantes'))->render()
+            ]);
+        }
+
         return view('panel.estudiantes.index', compact(
             'estudiantes',
             'estadisticas',
@@ -170,40 +180,142 @@ class EstudiantePanelController extends Controller
             'figuras',
             'grados'
         ));
+
     }
 
     /**
      * Ficha completa del estudiante (panel docente).
-     *
      * Ruta: GET /panel/estudiantes/{estudiante} → panel.estudiantes.show
-     * Vista: resources/views/panel/estudiantes/show.blade.php
-     * Entrada UI: icono "ojo" en panel/estudiantes/partials/_card.blade.php
-     *
-     * HU (docente): ver en una sola pantalla datos personales, matrícula activa,
-     * estado del PIN, PIAR, actividad reciente y acciones rápidas.
-     *
-     * Carga actual:
-     * - configuracionPin → ¿tiene PIN? (aún no distingue "bloqueado")
-     * - piar             → ¿tiene PIAR diligenciado?
-     * - matriculas       → solo activas del año en curso + grado/grupo
-     *   (falta ambiente; Matricula no lo trae: usar ambientes / estudiante_ambiente)
-     *
-     * Pendiente para cerrar la HU:
-     * - Autorizar: el estudiante debe pertenecer a la carga del docente logueado
-     * - Portafolio reciente (últimas 5) y observaciones (últimas 3)
-     * - Estado PIN en 3 valores: configurado / sin configurar / bloqueado
-     * - Pasar a la vista datos listos para botones de acción
      */
     public function verFicha(Estudiante $estudiante)
     {
-        // Eager load de lo que la vista ya pinta; evita N+1 en matrículas.
-        $estudiante->load(['configuracionPin', 'piar', 'matriculas' => function ($query) {
-            $query->where('anio_lectivo', date('Y'))
-                ->where('estado', 'activo')
-                ->with(['grado', 'grupo']);
-        }]);
+        $docente = Auth::guard('docente')->user()->docente;
 
-        return view('panel.estudiantes.show', compact('estudiante'));
+        if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
+            abort(403, 'No tienes acceso a este estudiante.');
+        }
+
+        $anio = date('Y');
+
+        $estudiante->load([
+            'condicion:id,nombre',
+            'configuracionPin',
+            'piar',
+            'matriculaActiva.grado',
+            'matriculaActiva.grupo',
+        ]);
+
+        $ambiente = $estudiante->ambientes()
+            ->wherePivot('anio_lectivo', $anio)
+            ->wherePivot('estado', 'activo')
+            ->first();
+
+        $portafolioReciente = $estudiante->portafolios()
+            ->orderByDesc('creado_en')
+            ->limit(5)
+            ->get();
+
+        $observacionesRecientes = $estudiante->observaciones()
+            ->orderByDesc('created_at')
+            ->limit(3)
+            ->get();
+
+        $asistenciaHoy = Asistencia::query()
+            ->where('estudiante_id', $estudiante->id)
+            ->whereDate('fecha', now()->toDateString())
+            ->first();
+
+        $estadoPin = $estudiante->estado_pin;
+        $estadosPin = [
+            'sin_configurar' => 'Sin configurar',
+            'configurado' => 'Configurado',
+            'bloqueado' => 'Bloqueado',
+        ];
+
+        return view('panel.estudiantes.show', [
+            'estudiante' => $estudiante,
+            'matricula' => $estudiante->matriculaActiva,
+            'ambiente' => $ambiente,
+            'portafolioReciente' => $portafolioReciente,
+            'observacionesRecientes' => $observacionesRecientes,
+            'estadoPin' => $estadoPin,
+            'estadoPinLabel' => $estadosPin[$estadoPin] ?? 'Sin configurar',
+            'mostrarVerPiar' => ! $estudiante->condicion_es_estandar,
+            'asistenciaHoy' => $asistenciaHoy,
+        ]);
+    }
+
+    public function registrarAsistenciaPuntual(Estudiante $estudiante)
+    {
+        $docente = Auth::guard('docente')->user()->docente;
+
+        if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
+            abort(403, 'No tienes acceso a este estudiante.');
+        }
+
+        Asistencia::updateOrCreate(
+            [
+                'estudiante_id' => $estudiante->id,
+                'fecha' => now()->toDateString(),
+            ],
+            ['presente' => true]
+        );
+
+        return redirect()
+            ->route('panel.estudiantes.show', $estudiante)
+            ->with('success', 'Asistencia del día registrada.');
+    }
+
+    public function verPiar(Estudiante $estudiante)
+    {
+        $docente = Auth::guard('docente')->user()->docente;
+
+        if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
+            abort(403, 'No tienes acceso a este estudiante.');
+        }
+
+        $estudiante->load('condicion');
+
+        if ($estudiante->condicion_es_estandar) {
+            return redirect()
+                ->route('panel.estudiantes.show', $estudiante)
+                ->with('info', 'Ver PIAR solo aplica a condiciones distintas de estándar.');
+        }
+
+        if (! $estudiante->piar) {
+            return redirect()
+                ->route('panel.estudiantes.show', $estudiante)
+                ->with('info', 'Este estudiante aún no tiene un PIAR diligenciado.');
+        }
+
+        return app(PiarController::class)->exportar($estudiante->id);
+    }
+
+    private function docenteTieneAccesoAlEstudiante(int $docenteId, int $estudianteId): bool
+    {
+        $cargas = CargaDocente::query()
+            ->where('docente_id', $docenteId)
+            ->where('activo', true)
+            ->where('anio_lectivo', date('Y'))
+            ->get();
+
+        if ($cargas->isEmpty()) {
+            return false;
+        }
+
+        return Matricula::query()
+            ->where('estudiante_id', $estudianteId)
+            ->where('estado', 'activo')
+            ->where('anio_lectivo', date('Y'))
+            ->where(function ($query) use ($cargas) {
+                foreach ($cargas as $carga) {
+                    $query->orWhere(function ($q) use ($carga) {
+                        $q->where('grado_id', $carga->grado_id)
+                            ->where('grupo_id', $carga->grupo_id);
+                    });
+                }
+            })
+            ->exists();
     }
 
     public function formularioCrear()
