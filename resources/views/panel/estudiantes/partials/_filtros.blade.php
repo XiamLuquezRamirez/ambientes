@@ -2,14 +2,8 @@
 
     <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input
-            type="text"
-            name="q"
-            id="buscarEstudiante"
-            value="{{ $filtros['q'] ?? '' }}"
-            placeholder="Buscar por nombre, documento..."
-            autocomplete="off"
-        >
+        <input type="text" name="q" id="buscarEstudiante" value="{{ $filtros['q'] ?? '' }}"
+            placeholder="Buscar por nombre, documento..." autocomplete="off">
     </div>
 
     <div class="toolbar-actions">
@@ -20,7 +14,6 @@
             </option>
             <option value="piar" {{ ($filtros['filtro'] ?? '') === 'piar' ? 'selected' : '' }}>Con PIAR</option>
             <option value="sin_pin" {{ ($filtros['filtro'] ?? '') === 'sin_pin' ? 'selected' : '' }}>Sin PIN</option>
-            <option value="activos" {{ ($filtros['filtro'] ?? '') === 'activos' ? 'selected' : '' }}>Activos</option>
         </select>
 
         <select name="condicion_id" id="filtroCondicion" class="toolbar-select">
@@ -47,10 +40,12 @@
         <input type="hidden" name="vista" id="vistaActual" value="{{ $vista ?? 'grid' }}">
 
         <div class="view-toggle" role="group" aria-label="Vista">
-            <button type="button" class="view-btn {{ ($vista ?? 'grid') === 'grid' ? 'active' : '' }}" data-vista="grid" title="Vista cuadrícula">
+            <button type="button" class="view-btn {{ ($vista ?? 'grid') === 'grid' ? 'active' : '' }}"
+                data-vista="grid" title="Vista cuadrícula">
                 <i class="fa-solid fa-grip"></i>
             </button>
-            <button type="button" class="view-btn {{ ($vista ?? 'grid') === 'list' ? 'active' : '' }}" data-vista="list" title="Vista lista">
+            <button type="button" class="view-btn {{ ($vista ?? 'grid') === 'list' ? 'active' : '' }}"
+                data-vista="list" title="Vista lista">
                 <i class="fa-solid fa-list"></i>
             </button>
         </div>

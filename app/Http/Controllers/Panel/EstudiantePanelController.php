@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Panel;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\PiarController;
+use App\Http\Controllers\Controller;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
 use App\Models\Condicion;
@@ -104,7 +104,7 @@ class EstudiantePanelController extends Controller
 
         $paraStats = (clone $base)->get();
         $total = $paraStats->count();
-        $conPiar = $paraStats->filter(fn ($e) => $e->piar !== null)->count();
+        $conPiar = $paraStats->filter(fn ($e) => $e->piar !== null && $e->piar->paso == '8')->count();
         $sinPin = $paraStats->filter(fn ($e) => $e->configuracionPin === null)->count();
         $activos = $paraStats->where('activo', true)->count();
 
@@ -160,11 +160,10 @@ class EstudiantePanelController extends Controller
         $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
-
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'html'    => view('panel.estudiantes.partials._grid', compact('estudiantes'))->render()
+                'html' => view('panel.estudiantes.partials._grid', compact('estudiantes'))->render(),
             ]);
         }
 
@@ -185,7 +184,7 @@ class EstudiantePanelController extends Controller
 
     /**
      * Ficha completa del estudiante (panel docente).
-     * Ruta: GET /panel/estudiantes/{estudiante} → panel.estudiantes.show
+     * Ruta: GET /panel/estudiantes/ficha/{estudiante} → panel.estudiantes.show
      */
     public function verFicha(Estudiante $estudiante)
     {

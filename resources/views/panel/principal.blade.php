@@ -313,12 +313,23 @@
             border: 1px solid #E2E8F0;
             background: #F8FAFC;
             cursor: pointer;
+            text-decoration: none;
+            color: inherit;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .estudiante-card:hover {
+        .estudiante-card:hover,
+        .estudiante-card:focus,
+        .estudiante-card:visited {
             transform: translateY(-2px);
             box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .estudiante-card .estudiante-nombre,
+        .estudiante-card .estudiante-submeta {
+            text-decoration: none;
         }
 
         .estudiante-card__info {
@@ -882,9 +893,9 @@
         </div>
 
         <div class="estadisticas-grid">
-            <div id="card-estudiantes-activos" class="estadistica-item estadistica-item--clickable"
-                role="button" tabindex="0" title="Ver estudiantes del grupo activo"
-                aria-controls="panel-estudiantes-grupo" aria-expanded="false">
+            <div id="card-estudiantes-activos" class="estadistica-item estadistica-item--clickable" role="button"
+                tabindex="0" title="Ver estudiantes del grupo activo" aria-controls="panel-estudiantes-grupo"
+                aria-expanded="false">
                 <span class="estadistica-label">Estudiantes Activos</span>
                 <span class="estadistica-valor" id="stat-activos">0</span>
             </div>
@@ -924,13 +935,9 @@
                 </select>
                 <select id="filtro-condicion-estudiante" class="filtro-estudiantes">
                     <option value="todas">Todas las condiciones</option>
-                    <option value="estandar">Estándar</option>
-                    <option value="tea">TEA</option>
-                    <option value="tdah">TDAH</option>
-                    <option value="disc_visual">Discapacidad visual</option>
-                    <option value="disc_auditiva">Discapacidad auditiva</option>
-                    <option value="disc_motriz">Discapacidad motriz</option>
-                    <option value="down">Down</option>
+                    @foreach ($condiciones as $condicion)
+                        <option value="{{ $condicion->id }}">{{ $condicion->nombre }}</option>
+                    @endforeach
                 </select>
             </div>
         </div>
@@ -973,6 +980,8 @@
         // Mantiene el contexto activo del ambiente para actualizar el encabezado y las estadísticas.
         let nombreAmbienteActivo = "";
         let panelEstadisticas;
+        const URL_FICHA_ESTUDIANTE = @json(url('/panel/estudiantes/ficha'));
+        let estudiantesGrupoCache = [];
 
         document.addEventListener('DOMContentLoaded', function() {
             const tarjetas = document.querySelectorAll('.btn-seleccionar-ambiente');
@@ -1141,6 +1150,7 @@
             const listaEstudiantes = document.getElementById('lista-estudiantes');
             const cardActivos = document.getElementById('card-estudiantes-activos');
 
+            estudiantesGrupoCache = [];
             if (panelEstudiantes) {
                 panelEstudiantes.style.display = 'none';
             }
@@ -1256,7 +1266,8 @@
 
                     actualizarFeedback('ready', stats.tiene_alerta_pin ?
                         'Se encontraron estudiantes sin PIN configurado.' :
-                        'Las estadísticas del grupo están al día. Haz clic en Estudiantes Activos para ver el listado.');
+                        'Las estadísticas del grupo están al día. Haz clic en Estudiantes Activos para ver el listado.'
+                    );
                 })
                 .catch(err => {
                     console.error('Error al procesar la selección del grupo:', err);
@@ -1264,12 +1275,79 @@
                 });
         }
 
-        function cargarEstudiantesGrupo(cargaId) {
-            const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
+        function renderListaEstudiantesGrupo() {
             const listaEstudiantes = document.getElementById('lista-estudiantes');
             const buscador = document.getElementById('buscador-estudiantes');
             const filtroEstado = document.getElementById('filtro-estado-estudiante');
             const filtroCondicion = document.getElementById('filtro-condicion-estudiante');
+            let estudiantesFiltrados = estudiantesGrupoCache;
+
+            if (buscador) {
+                const texto = buscador.value.trim().toLowerCase();
+                if (texto) {
+                    estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
+                        (estudiante.nombre || '').toLowerCase().includes(texto)
+                    );
+                }
+            }
+
+            if (filtroEstado && filtroEstado.value !== 'todos') {
+                estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
+                    (estudiante.estado || '').toLowerCase() === filtroEstado.value
+                );
+            }
+
+            if (filtroCondicion && filtroCondicion.value !== 'todas') {
+                const condicionId = String(filtroCondicion.value);
+                estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
+                    String(estudiante.condicion_id ?? '') === condicionId
+                );
+            }
+
+            if (estudiantesFiltrados.length === 0) {
+                listaEstudiantes.innerHTML =
+                    '<p style="color:#64748B;padding:12px 0;">No hay estudiantes con esos filtros.</p>';
+                return;
+            }
+
+            listaEstudiantes.innerHTML = estudiantesFiltrados.map(estudiante => {
+                const estadoClase = estudiante.activo ? 'tag-estudiante--activo' :
+                    'tag-estudiante--inactivo';
+                const pinClase = estudiante.tiene_pin ? 'tag-estudiante--pin' :
+                    'tag-estudiante--pin-pendiente';
+                const piarClase = estudiante.requiere_atencion_piar ? 'tag-estudiante--piar-pendiente' :
+                    'tag-estudiante--piar';
+                const alerta = estudiante.requiere_atencion_piar ?
+                    '<i class="fas fa-exclamation-triangle estudiante-alerta" title="Requiere PIAR"></i>' :
+                    '';
+                const condicionLabel = estudiante.condicion_nombre || estudiante.condicion || 'Estandar';
+                const fichaUrl = `${URL_FICHA_ESTUDIANTE}/${estudiante.id}`;
+
+                return `
+                    <a href="${fichaUrl}" class="estudiante-card" title="Ver ficha completa">
+                        <div class="estudiante-card__info">
+                            <div class="estudiante-avatar" style="background:${estudiante.color_avatar || '#2563EB'}">
+                                ${estudiante.iniciales || 'E'}
+                            </div>
+                            <div class="estudiante-meta">
+                                <p class="estudiante-nombre">${estudiante.nombre}</p>
+                                <p class="estudiante-submeta">Condición: ${condicionLabel} · ${estudiante.estado || 'Activo'}</p>
+                            </div>
+                        </div>
+                        <div class="estudiante-tags">
+                            <span class="tag-estudiante ${estadoClase}">${estudiante.estado || 'Activo'}</span>
+                            <span class="tag-estudiante ${pinClase}">${estudiante.tiene_pin ? 'PIN' : 'Sin PIN'}</span>
+                            <span class="tag-estudiante ${piarClase}">${estudiante.estado_piar || 'No aplica'}</span>
+                            ${alerta}
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function cargarEstudiantesGrupo(cargaId) {
+            const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
+            const listaEstudiantes = document.getElementById('lista-estudiantes');
 
             panelEstudiantes.style.display = 'block';
             listaEstudiantes.innerHTML =
@@ -1282,69 +1360,12 @@
                 })
                 .then(res => res.json())
                 .then(estudiantes => {
-                    let estudiantesFiltrados = estudiantes;
-
-                    if (buscador) {
-                        const texto = buscador.value.trim().toLowerCase();
-                        if (texto) {
-                            estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
-                                (estudiante.nombre || '').toLowerCase().includes(texto)
-                            );
-                        }
-                    }
-
-                    if (filtroEstado && filtroEstado.value !== 'todos') {
-                        estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
-                            (estudiante.estado || '').toLowerCase() === filtroEstado.value
-                        );
-                    }
-
-                    if (filtroCondicion && filtroCondicion.value !== 'todas') {
-                        estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
-                            (estudiante.condicion || '').toLowerCase() === filtroCondicion.value
-                        );
-                    }
-
-                    if (estudiantesFiltrados.length === 0) {
-                        listaEstudiantes.innerHTML =
-                            '<p style="color:#64748B;padding:12px 0;">No hay estudiantes con esos filtros.</p>';
-                        return;
-                    }
-
-                    listaEstudiantes.innerHTML = estudiantesFiltrados.map(estudiante => {
-                        const estadoClase = estudiante.activo ? 'tag-estudiante--activo' :
-                            'tag-estudiante--inactivo';
-                        const pinClase = estudiante.tiene_pin ? 'tag-estudiante--pin' :
-                            'tag-estudiante--pin-pendiente';
-                        const piarClase = estudiante.requiere_atencion_piar ? 'tag-estudiante--piar-pendiente' :
-                            'tag-estudiante--piar';
-                        const alerta = estudiante.requiere_atencion_piar ?
-                            '<i class="fas fa-exclamation-triangle estudiante-alerta" title="Requiere PIAR"></i>' :
-                            '';
-
-                        return `
-                            <a href="/panel/estudiantes/${estudiante.id}" class="estudiante-card">
-                                <div class="estudiante-card__info">
-                                    <div class="estudiante-avatar" style="background:${estudiante.color_avatar || '#2563EB'}">
-                                        ${estudiante.iniciales || 'E'}
-                                    </div>
-                                    <div class="estudiante-meta">
-                                        <p class="estudiante-nombre">${estudiante.nombre}</p>
-                                        <p class="estudiante-submeta">Condición: ${estudiante.condicion || 'estandar'} · ${estudiante.estado || 'Activo'}</p>
-                                    </div>
-                                </div>
-                                <div class="estudiante-tags">
-                                    <span class="tag-estudiante ${estadoClase}">${estudiante.estado || 'Activo'}</span>
-                                    <span class="tag-estudiante ${pinClase}">${estudiante.tiene_pin ? 'PIN' : 'Sin PIN'}</span>
-                                    <span class="tag-estudiante ${piarClase}">${estudiante.estado_piar || 'No aplica'}</span>
-                                    ${alerta}
-                                </div>
-                            </a>
-                        `;
-                    }).join('');
+                    estudiantesGrupoCache = Array.isArray(estudiantes) ? estudiantes : [];
+                    renderListaEstudiantesGrupo();
                 })
                 .catch(err => {
                     console.error('Error al cargar los estudiantes del grupo:', err);
+                    estudiantesGrupoCache = [];
                     listaEstudiantes.innerHTML =
                         '<p style="color:#64748B;padding:12px 0;">No fue posible cargar el listado.</p>';
                 });
@@ -1363,25 +1384,22 @@
 
         document.getElementById('buscador-estudiantes').addEventListener('input', function() {
             const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
-            const cargaActiva = document.querySelector('.badge-grupo-chip.active');
-            if (cargaActiva && panelEstudiantes && panelEstudiantes.style.display !== 'none') {
-                cargarEstudiantesGrupo(cargaActiva.getAttribute('data-carga-id'));
+            if (panelEstudiantes && panelEstudiantes.style.display !== 'none') {
+                renderListaEstudiantesGrupo();
             }
         });
 
         document.getElementById('filtro-estado-estudiante').addEventListener('change', function() {
             const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
-            const cargaActiva = document.querySelector('.badge-grupo-chip.active');
-            if (cargaActiva && panelEstudiantes && panelEstudiantes.style.display !== 'none') {
-                cargarEstudiantesGrupo(cargaActiva.getAttribute('data-carga-id'));
+            if (panelEstudiantes && panelEstudiantes.style.display !== 'none') {
+                renderListaEstudiantesGrupo();
             }
         });
 
         document.getElementById('filtro-condicion-estudiante').addEventListener('change', function() {
             const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
-            const cargaActiva = document.querySelector('.badge-grupo-chip.active');
-            if (cargaActiva && panelEstudiantes && panelEstudiantes.style.display !== 'none') {
-                cargarEstudiantesGrupo(cargaActiva.getAttribute('data-carga-id'));
+            if (panelEstudiantes && panelEstudiantes.style.display !== 'none') {
+                renderListaEstudiantesGrupo();
             }
         });
     </script>
