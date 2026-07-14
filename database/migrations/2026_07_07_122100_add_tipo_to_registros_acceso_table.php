@@ -6,20 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Añade tipo de registro a registros_acceso (inicio_sesion, cambio_contrasena).
-     */
     public function up(): void
     {
-        Schema::table('registros_acceso', function (Blueprint $table) {
-            $table->string('tipo', 30)->default('inicio_sesion')->after('ambiente');
-        });
+        if (! Schema::hasTable('registros_acceso')) {
+            return;
+        }
+
+        if (! Schema::hasColumn('registros_acceso', 'tipo')) {
+            Schema::table('registros_acceso', function (Blueprint $table) {
+                if (Schema::hasColumn('registros_acceso', 'ambiente')) {
+                    $table->string('tipo', 30)->default('inicio_sesion')->after('ambiente');
+                } else {
+                    $table->string('tipo', 30)->default('inicio_sesion');
+                }
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('registros_acceso', function (Blueprint $table) {
-            $table->dropColumn('tipo');
-        });
+        if (Schema::hasTable('registros_acceso') && Schema::hasColumn('registros_acceso', 'tipo')) {
+            Schema::table('registros_acceso', function (Blueprint $table) {
+                $table->dropColumn('tipo');
+            });
+        }
     }
 };

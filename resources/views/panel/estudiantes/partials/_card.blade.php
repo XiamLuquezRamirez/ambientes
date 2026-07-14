@@ -1,0 +1,76 @@
+@php
+    $condicionNombre = $e->condicion?->nombre ?? 'Estándar';
+    $tienePiar = $e->piar !== null;
+    $requiereApoyo = in_array(strtolower((string) $e->requiere_apoyo), ['si', 'sí', '1', 'true'], true);
+    $docLabel = trim(($e->tipo_identificacion ? $e->tipo_identificacion . ' ' : 'Doc. ') . ($e->identificacion ?? '—'));
+@endphp
+
+<div class="student-card" data-estudiante-id="{{ $e->id }}">
+
+    <div class="student-top">
+        <span class="status-dot {{ $e->activo ? 'status-dot--active' : 'status-dot--inactive' }}"
+              title="{{ $e->activo ? 'Activo' : 'Inactivo' }}"></span>
+
+        @if ($e->avatar_url)
+            <img src="{{ $e->avatar_url }}" class="student-avatar" alt="{{ $e->nombre_completo }}">
+        @else
+            <div class="student-avatar initials" style="background: {{ $e->color_avatar }}">
+                {{ $e->iniciales }}
+            </div>
+        @endif
+
+        <div class="student-identity">
+            <h5>{{ $e->nombre_completo }}</h5>
+            <small>{{ $docLabel }}</small>
+        </div>
+    </div>
+
+    <div class="student-middle">
+        <span class="stu-badge stu-badge--condicion">{{ $condicionNombre }}</span>
+
+        <span class="stu-badge {{ $e->activo ? 'stu-badge--activo' : 'stu-badge--inactivo' }}">
+            {{ $e->estado_texto }}
+        </span>
+
+        @if ($tienePiar)
+            <span class="stu-badge stu-badge--piar">PIAR Activo</span>
+        @endif
+
+        @if ($requiereApoyo)
+            <span class="stu-badge stu-badge--apoyo">Apoyo pedagógico</span>
+        @endif
+    </div>
+
+    <div class="student-info {{ $e->tiene_pin ? '' : 'student-info--alert' }}">
+        @if ($e->tiene_pin)
+            <div class="pin-status">
+                <i class="fa-solid fa-lock"></i>
+                <span>PIN configurado</span>
+            </div>
+        @else
+            <div class="pin-status pin-status--alert">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Sin PIN</span>
+            </div>
+            <a href="{{ route('panel.estudiantes.pin', $e->id) }}" class="pin-requerido">
+                Requiere configuración
+            </a>
+        @endif
+    </div>
+
+    <div class="student-footer">
+        <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-action" title="Ver perfil">
+            <i class="fa-solid fa-eye"></i>
+        </a>
+        <a href="{{ route('panel.estudiantes.edit', $e->id) }}" class="btn-action" title="Editar">
+            <i class="fa-solid fa-pen"></i>
+        </a>
+        <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-action" title="Documentos">
+            <i class="fa-solid fa-file-lines"></i>
+        </a>
+        <button type="button" class="btn-action" title="Más opciones">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+    </div>
+
+</div>

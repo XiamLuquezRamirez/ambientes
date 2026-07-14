@@ -282,7 +282,7 @@ CREATE TABLE `departamentos` (
   `codigo` varchar(5) NOT NULL,
   `descripcion` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`codigo`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+) ENGINE=InnoDB ;
 
 /*Data for the table `departamentos` */
 
@@ -642,7 +642,7 @@ CREATE TABLE `municipios` (
   `descripcion` varchar(50) NOT NULL,
   `coddep` varchar(2) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1120 DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1120 ;
 
 /*Data for the table `municipios` */
 
@@ -1972,6 +1972,41 @@ insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password
 (14,'5345345','Camila Andrea ','Mora','camila.mora@aulasreggio.test','$2y$10$ZVq5aurxoqa1KVRv7LgujO.zag/lhphPOf.0MsNkhgUulU3U./QmG','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
 (15,'657567567','Ricardo Andres ','Silva','ricardo.silva@aulasreggio.test','$2y$10$.bghvK6emeHQyaxnz3V2vOZVc1s/RkeSQpA8NZOdOrkqF29iGberC','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL);
 
+DROP TABLE IF EXISTS `seguridad_logs`;
+
+CREATE TABLE `seguridad_logs` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `actor_user_id` BIGINT UNSIGNED DEFAULT NULL,
+
+    `accion` VARCHAR(50) NOT NULL,
+    `descripcion` VARCHAR(255) NOT NULL,
+    `registro_afectado` VARCHAR(255) DEFAULT NULL,
+
+    `ip` VARCHAR(45) DEFAULT NULL,
+    `user_agent` TEXT DEFAULT NULL,
+
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+
+    PRIMARY KEY (`id`),
+
+    INDEX `seguridad_logs_user_id_foreign` (`user_id`),
+    INDEX `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
+
+    CONSTRAINT `seguridad_logs_user_id_foreign`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `users` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `seguridad_logs_actor_user_id_foreign`
+        FOREIGN KEY (`actor_user_id`)
+        REFERENCES `users` (`id`)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+
 /*Table structure for table `condiciones` */
 
 DROP TABLE IF EXISTS `condiciones`;
@@ -1981,7 +2016,7 @@ CREATE TABLE `condiciones` (
   `nombre` text COLLATE utf8mb4_general_ci,
   `estado` int DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7  COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 ;
 
 /*Data for the table `condiciones` */
 
@@ -2025,7 +2060,7 @@ CREATE TABLE `piar_acta_compromiso` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6  ;
 
 /*Table structure for table `piar_acta_compromiso_actividades` */
 
@@ -2040,7 +2075,7 @@ CREATE TABLE `piar_acta_compromiso_actividades` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23  ;
 
 /*Table structure for table `piar_ajuste_razonable` */
 
@@ -2058,7 +2093,7 @@ CREATE TABLE `piar_ajuste_razonable` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8  ;
 
 /*Table structure for table `piar_ajuste_razonable_docente_firma` */
 
@@ -2072,7 +2107,7 @@ CREATE TABLE `piar_ajuste_razonable_docente_firma` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=43  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43  ;
 
 /*Table structure for table `piar_ajuste_razonable_item` */
 
@@ -2090,7 +2125,7 @@ CREATE TABLE `piar_ajuste_razonable_item` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=36  ;
 
 /*Table structure for table `piar_atencion_medica` */
 
@@ -2104,7 +2139,7 @@ CREATE TABLE `piar_atencion_medica` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49  ;
 
 /*Table structure for table `piar_datos_generales` */
 
@@ -2130,7 +2165,7 @@ CREATE TABLE `piar_datos_generales` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7  ;
 
 /*Table structure for table `piar_entorno_educativo` */
 
@@ -2152,7 +2187,7 @@ CREATE TABLE `piar_entorno_educativo` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6  ;
 
 /*Table structure for table `piar_entorno_hogar` */
 
@@ -2179,7 +2214,7 @@ CREATE TABLE `piar_entorno_hogar` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5  ;
 
 /*Table structure for table `piar_entorno_salud` */
 
@@ -2202,7 +2237,7 @@ CREATE TABLE `piar_entorno_salud` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9  ;
 
 /*Table structure for table `piar_medicamento` */
 
@@ -2217,7 +2252,7 @@ CREATE TABLE `piar_medicamento` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44  ;
 
 /*Table structure for table `piar_tratamiento` */
 
@@ -2231,7 +2266,7 @@ CREATE TABLE `piar_tratamiento` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48  COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48  ;
 
 /*Table structure for table `piar_valoracion_pedagogica` */
 

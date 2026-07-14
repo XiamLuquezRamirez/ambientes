@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
 </head>
 
 <body>

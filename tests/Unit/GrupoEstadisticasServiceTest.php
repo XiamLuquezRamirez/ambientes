@@ -45,6 +45,60 @@ class GrupoEstadisticasServiceTest extends TestCase
         $this->assertTrue($resultado['tiene_alerta_piar']);
     }
 
+    public function test_no_alerta_piar_si_todos_tienen_condicion_estandar(): void
+    {
+        $service = new GrupoEstadisticasService;
+
+        $condicionEstandar = (object) ['id' => 1, 'nombre' => 'Estandar'];
+
+        $matriculas = collect([
+            (object) [
+                'estudiante' => (object) [
+                    'condicion' => $condicionEstandar,
+                    'condicion_id' => 1,
+                    'piar' => null,
+                    'configuracionPin' => null,
+                ],
+            ],
+            (object) [
+                'estudiante' => (object) [
+                    'condicion' => $condicionEstandar,
+                    'condicion_id' => 1,
+                    'piar' => null,
+                    'configuracionPin' => (object) ['id' => 1],
+                ],
+            ],
+        ]);
+
+        $resultado = $service->calcular($matriculas);
+
+        $this->assertSame(0, $resultado['requiere_piar_sin_diligenciar']);
+        $this->assertFalse($resultado['tiene_alerta_piar']);
+    }
+
+    public function test_alerta_piar_con_relacion_condicion_diferente_de_estandar(): void
+    {
+        $service = new GrupoEstadisticasService;
+
+        $condicionTea = (object) ['id' => 3, 'nombre' => 'TEA'];
+
+        $matriculas = collect([
+            (object) [
+                'estudiante' => (object) [
+                    'condicion' => $condicionTea,
+                    'condicion_id' => 3,
+                    'piar' => null,
+                    'configuracionPin' => (object) ['id' => 1],
+                ],
+            ],
+        ]);
+
+        $resultado = $service->calcular($matriculas);
+
+        $this->assertSame(1, $resultado['requiere_piar_sin_diligenciar']);
+        $this->assertTrue($resultado['tiene_alerta_piar']);
+    }
+
     public function test_listar_estudiantes_del_grupo_con_estado_pin_y_piar(): void
     {
         $service = new GrupoEstadisticasService;
@@ -81,6 +135,7 @@ class GrupoEstadisticasServiceTest extends TestCase
         $this->assertSame('Activo', $resultado[0]['estado']);
         $this->assertTrue($resultado[0]['tiene_pin']);
         $this->assertSame('No aplica', $resultado[0]['estado_piar']);
+        $this->assertFalse($resultado[0]['requiere_atencion_piar']);
         $this->assertSame('Pendiente', $resultado[1]['estado_piar']);
         $this->assertTrue($resultado[1]['requiere_atencion_piar']);
     }
