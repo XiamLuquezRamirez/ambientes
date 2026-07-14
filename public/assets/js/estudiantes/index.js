@@ -168,6 +168,12 @@ $('#formCrearEstudiante').on('submit', function (e) {
     const formData = new FormData(this);
     const datos = Object.fromEntries(formData.entries());
 
+    if (tipoGuardaEstudiante === 1) {
+        datos.tipo_guarda = 1;
+    } else if (tipoGuardaEstudiante === 2) {
+        datos.tipo_guarda = 2;
+    }
+
     if (tipoPost === 1) {
         guardarEstudiante(datos);
     } else if (tipoPost === 2) {
@@ -554,4 +560,14 @@ async function cambiarEstadoEstudiante(id, input) {
             Swal.close();
         }
     });
+}
+
+
+// si es admin ocultar el grado y grupo
+if (tipoGuardaEstudiante === 1) {
+    $("#ambiente-grado-grupo-container-docente").hide();
+    $("#grado-container-admin").show();
+} else if (tipoGuardaEstudiante === 2) {
+    $("#ambiente-grado-grupo-container-docente").show();
+    $("#grado-container-admin").hide();
 }

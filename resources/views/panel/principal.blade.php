@@ -262,6 +262,7 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            min-width: 58%;
         }
 
         .filtro-estudiantes {

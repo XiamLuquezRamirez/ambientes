@@ -198,6 +198,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::delete('perfil/foto', [PerfilController::class, 'eliminarFoto'])->name('panel.perfil.foto.eliminar');
 
     // Estudiantes
+    Route::post('estudiante-guardar', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiante.guardar');
     Route::get('estudiantes', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
     Route::get('estudiantes/create', [EstudiantePanelController::class, 'formularioCrear'])->name('panel.estudiantes.create');
     Route::get('estudiantes/buscar', [EstudiantePanelController::class, 'buscarEstudiantes'])->name('panel.estudiantes.buscar');
@@ -230,6 +231,9 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('inclusion/{estudiante}', [InclusionController::class, 'verAjustes'])->name('panel.inclusion.ajustes');
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
 
+    // Grados por ambiente
+    Route::get('grados/ambiente/docente/{idAmbiente}', [EstudiantePanelController::class, 'obtenerGradosPorAmbiente'])->name('panel.grados.ambiente.docente');
+    Route::get('grupos/grados/docente/{idGrado}', [EstudiantePanelController::class, 'obtenerGruposPorGrado'])->name('panel.grupos.grados.docente');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

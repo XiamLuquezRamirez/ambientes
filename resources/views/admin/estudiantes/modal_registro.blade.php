@@ -77,7 +77,38 @@
                                         <input type="text" name="apellido" id="apellido" class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-12" id="ambiente-grado-grupo-container-docente" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="ambiente_id_nuevo">Ambiente</label>
+                                                <select name="ambiente_id_nuevo" id="ambiente_id_nuevo" class="form-control">
+                                                    <option value="">Seleccione</option>
+                                                    @foreach($ambientes as $a)
+                                                    <option value="{{ $a->id }}">{{ $a->nombre }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="grado_id_nuevo_docente">Grado</label>
+                                                <select name="grado_id_nuevo_docente" id="grado_id_nuevo_docente" class="form-control">
+                                                    <option value="">Seleccione</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="grupo_id_nuevo">Grupo</label>
+                                                <select name="grupo_id_nuevo" id="grupo_id_nuevo" class="form-control">
+                                                    <option value="">Seleccione</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="grado-container-admin" style="display: none;">
                                     <div class="form-group">
                                         <label for="grado_id_nuevo">Grado</label>
                                         <select name="grado_id_nuevo" id="grado_id_nuevo" class="form-control">
@@ -205,31 +236,7 @@
                             </div>
                         </div>
                         <div class="tab-pane container fade" id="configuracion_pin">
-                            <div class="row p-2 container-configuracion-pin" name="configuracion_pin">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <h5 class="mb-4" style="font-weight: 600;">Seleccione 3 figuras para conformar el PIN de acceso del estudiante</h5>
-                                        <div class="pin-container">
-                                            <div class="pin-item" id="pin-item-1">
-                                            </div>
-                                            <div class="pin-item" id="pin-item-2">
-                                            </div>
-                                            <div class="pin-item" id="pin-item-3">
-                                            </div>
-                                        </div>
-                                        <div class="figuras-container">
-                                            @foreach($figuras as $figura)
-                                                <div class="figura-item" onclick="agregarFigura('{{ $figura['icon'] }}', '{{ $figura['color'] }}')">
-                                                    <i class="{{ $figura['icon'] }}" style="color: {{ $figura['color'] }};"></i>
-                                                </div>
-                                            @endforeach
-                                            <div class="figura-item-borrar" onclick="borrarFigura()">
-                                                <i class="fas fa-arrow-left"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @include('admin.estudiantes.plantillaPin')
                         </div>
                     </div>
                 </div>

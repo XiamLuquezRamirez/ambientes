@@ -10,6 +10,9 @@ use App\Models\SyncQueue;
 use App\Services\Docente\DocenteAsignacionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Grado;
+use App\Models\Grupo;
+use App\Models\Departamento;
 
 class EstudiantePanelController extends Controller
 {
@@ -22,13 +25,65 @@ class EstudiantePanelController extends Controller
 
     public function listar()
     {
+        $figuras = [
+            [
+                'icon' => 'fas fa-circle',
+                'color' => '#f933e9',
+            ],
+            [
+                'icon' => 'fas fa-star',
+                'color' => '#ff9019',
+            ],
+            [
+                'icon' => 'fas fa-heart',
+                'color' => '#ff0606',
+            ],
+            [
+                'icon' => 'fas fa-fish',
+                'color' => '#0f54ff',
+            ],
+            [
+                'icon' => 'fas fa-square',
+                'color' => '#437124',
+            ],
+            [
+                'icon' => 'fas fa-moon',
+                'color' => '#3f51b5',
+            ],
+            [
+                'icon' => 'fas fa-diamond',
+                'color' => '#9c27b0',
+            ],
+            [
+                'icon' => 'fas fa-apple-whole',
+                'color' => '#fd0a5d',
+            ]
+        ];
+
         $ambiente = $this->obtenerAmbiente();
         $estudiantes = $ambiente->estudiantes()
             ->wherePivot('anio_lectivo', date('Y'))
             ->orderBy('nombre')
             ->get();
 
-        return view('panel.estudiantes.index', compact('ambiente', 'estudiantes'));
+        
+        /* obtener grados de docente logueado*/
+        $carga = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
+            ->where('activo', true)
+            ->where('anio_lectivo', date('Y'))
+            ->with(['ambiente'])
+            ->get();
+
+        $departamentos = Departamento::orderBy('descripcion')->get();
+
+        $ambientes = $carga->pluck('ambiente')
+            ->filter()
+            ->unique('id')
+            ->values();
+        
+        $grados = array();
+
+        return view('panel.estudiantes.index', compact('ambiente', 'estudiantes', 'carga', 'ambientes', 'departamentos', 'figuras', 'grados'));
     }
 
     public function verFicha(Estudiante $estudiante)
@@ -165,5 +220,33 @@ class EstudiantePanelController extends Controller
     public function actualizarPin(Request $request, $estudiante)
     {
         return back()->with('info', 'Pendiente de implementacion.');
+    }
+
+    public function obtenerGradosPorAmbiente($idAmbiente)
+    {
+        $gradoIds = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
+            ->where('anio_lectivo', date('Y'))
+            ->where('ambiente_id', $idAmbiente)
+            ->pluck('grado_id');
+        
+        $grados = Grado::whereIn('id', $gradoIds)->get();
+        
+        return response()->json([
+            'data' => $grados,
+        ]);
+    }
+
+    public function obtenerGruposPorGrado($idGrado)
+    {
+        $grupoIds = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
+            ->where('anio_lectivo', date('Y'))
+            ->where('grado_id', $idGrado)
+            ->pluck('grupo_id');
+        
+        $grupos = Grupo::whereIn('id', $grupoIds)->get();
+        
+        return response()->json([
+            'data' => $grupos,
+        ]);
     }
 }

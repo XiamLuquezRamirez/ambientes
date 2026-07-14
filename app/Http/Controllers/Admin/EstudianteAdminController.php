@@ -10,7 +10,9 @@ use App\Models\Condicion;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
 use App\Models\Municipio;
-
+use Illuminate\Support\Facades\DB;
+use App\Models\Ambiente;
+use App\Models\Grupo;
 class EstudianteAdminController extends Controller
 {
     public function listar(Request $request)
@@ -51,6 +53,7 @@ class EstudianteAdminController extends Controller
         ];
 
         $grados = Grado::where('activo', true)->orderBy('nombre')->get();
+        $ambientes = Ambiente::where('activo', true)->orderBy('nombre')->get();
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
         $consulta = Estudiante::with('grado')->where('activo', '<>', 2);
         $departamentos = Departamento::orderBy('descripcion')->get();
@@ -87,7 +90,7 @@ class EstudianteAdminController extends Controller
             ]);
         }
 
-        return view('admin.estudiantes.index', compact('grados', 'condiciones', 'estudiantes', 'figuras', 'departamentos'));
+        return view('admin.estudiantes.index', compact('grados', 'condiciones', 'estudiantes', 'figuras', 'departamentos', 'ambientes'));
     }
 
     public function cargarMunicipios($departamento)
@@ -125,11 +128,16 @@ class EstudianteAdminController extends Controller
             'direccion' => 'required|string|max:100',
             'telefono' => 'nullable',
             'email' => 'nullable',
+            'tipo_guarda' => 'required|in:1,2',
+            'ambiente_id_nuevo' => 'required_if:tipo_guarda,2|nullable',
+            'grado_id_nuevo_docente' => 'required_if:tipo_guarda,2|nullable',
+            'grupo_id_nuevo' => 'required_if:tipo_guarda,2|nullable',
         ]);
-
 
         if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar')->store('estudiantes', 'public');
+        }else{
+            $avatar = null;
         }
 
         //primera letra del nombre y apellido
@@ -138,58 +146,64 @@ class EstudianteAdminController extends Controller
         $iniciales = $inicial_nombre[0][0] . $inicial_apellido[0][0];
         $iniciales = strtoupper($iniciales);
 
-        $estudiante = Estudiante::create([
-            'nombre'   => $datos['nombre'],
-            'apellido' => $datos['apellido'],
-            'tipo_identificacion' => $datos['tipo_identificacion'],
-            'otro_tipo_identificacion' => $datos['otro_tipo_identificacion'] ?? null,
-            'identificacion' => $datos['identificacion'],
-            'grado_id' => $datos['grado_id_nuevo'] ?? null,
-            'avatar' => $avatar ?? null,
-            'requiere_apoyo' => $datos['requiere_apoyo'],
-            'acudiente' => $datos['acudiente'],
-            'telefono_acudiente' => $datos['telefono_acudiente'],
-            'fecha_nacimiento' => $datos['fecha_nacimiento'],
-            'iniciales' => $iniciales,
-            'color_avatar' => $datos['color_avatar'],
-            'sexo' => $datos['sexo'],
-            'lugar_nacimiento' => $datos['lugar_nacimiento'],
-            'departamento_id' => $datos['departamento_id'],
-            'municipio_id' => $datos['municipio_id'],
-            'barrio_vereda' => $datos['barrio_vereda'],
-            'direccion' => $datos['direccion'],
-            'telefono' => $datos['telefono'],
-            'email' => $datos['email'],
-        ]);
+        try {
+            $estudiante = DB::transaction(function () use ($datos, $avatar, $iniciales) {
+                
+                if ($datos['tipo_guarda'] == 1) {
+                    $grado_id = $datos['grado_id_nuevo'];
+                } else {
+                    $grado_id = $datos['grado_id_nuevo_docente'];
+                }
 
-
-        if ($estudiante) {
-
-            ConfiguracionPin::create([
-                'estudiante_id' => $estudiante->id,
-                'figura_1' => $datos['configuracion_pin'][0]['icon'],
-                'color_figura_1' => $datos['configuracion_pin'][0]['color'],
-                'figura_2' => $datos['configuracion_pin'][1]['icon'],
-                'color_figura_2' => $datos['configuracion_pin'][1]['color'],
-                'figura_3' => $datos['configuracion_pin'][2]['icon'],
-                'color_figura_3' => $datos['configuracion_pin'][2]['color'],
+                $estudiante = Estudiante::create([
+                    'nombre' => $datos['nombre'],
+                    'apellido' => $datos['apellido'],
+                    'tipo_identificacion' => $datos['tipo_identificacion'],
+                    'otro_tipo_identificacion' => $datos['otro_tipo_identificacion'] ?? null,
+                    'identificacion' => $datos['identificacion'],
+                    'grado_id' => $grado_id,
+                    'avatar' => $avatar,
+                    'requiere_apoyo' => $datos['requiere_apoyo'],
+                    'acudiente' => $datos['acudiente'],
+                    'telefono_acudiente' => $datos['telefono_acudiente'],
+                    'fecha_nacimiento' => $datos['fecha_nacimiento'],
+                    'iniciales' => $iniciales,
+                    'color_avatar' => $datos['color_avatar'],
+                    'sexo' => $datos['sexo'],
+                    'lugar_nacimiento' => $datos['lugar_nacimiento'],
+                    'departamento_id' => $datos['departamento_id'],
+                    'municipio_id' => $datos['municipio_id'],
+                    'barrio_vereda' => $datos['barrio_vereda'],
+                    'direccion' => $datos['direccion'],
+                    'telefono' => $datos['telefono'],
+                    'email' => $datos['email'],
+                ]);
+        
+                ConfiguracionPin::create([
+                    'estudiante_id' => $estudiante->id,
+                    'figura_1' => $datos['configuracion_pin'][0]['icon'],
+                    'color_figura_1' => $datos['configuracion_pin'][0]['color'],
+                    'figura_2' => $datos['configuracion_pin'][1]['icon'],
+                    'color_figura_2' => $datos['configuracion_pin'][1]['color'],
+                    'figura_3' => $datos['configuracion_pin'][2]['icon'],
+                    'color_figura_3' => $datos['configuracion_pin'][2]['color'],
+                ]);
+        
+                return $estudiante;
+            });
+        
+            return response()->json([
+                'success' => true,
+                'message' => 'Estudiante creado exitosamente.',
+                'requiere_apoyo' => $datos['requiere_apoyo'] == 'si',
+                'id_estudiante_creado' => $estudiante->id,
             ]);
 
-            if ($datos['requiere_apoyo'] =="si") {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Estudiante creado exitosamente.',
-                    'requiere_apoyo' => true,
-                    'id_estudiante_creado' => $estudiante->id,
-                ]);
-            } else {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Estudiante creado exitosamente.',
-                    'requiere_apoyo' => false,
-                    'id_estudiante_creado' => $estudiante->id,
-                ]);
-            }
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al crear el estudiante: ' . $e->getMessage(),
+            ]);
         }
     }
 
