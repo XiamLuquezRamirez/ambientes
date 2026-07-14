@@ -29,7 +29,7 @@ CREATE TABLE `actividades` (
   PRIMARY KEY (`id`),
   KEY `actividades_tema_id_foreign` (`tema_id`),
   CONSTRAINT `actividades_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `actividades` */
 
@@ -48,7 +48,7 @@ CREATE TABLE `ajustes_temporales` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `ajustes_temporales_estudiante_id_clave_unique` (`estudiante_id`,`clave`),
   CONSTRAINT `ajustes_temporales_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `ajustes_temporales` */
 
@@ -66,7 +66,7 @@ CREATE TABLE `ambiente_grado` (
   KEY `grado_id` (`grado_id`),
   CONSTRAINT `ambiente_grado_ibfk_1` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`),
   CONSTRAINT `ambiente_grado_ibfk_2` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13  COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `ambiente_grado` */
 
@@ -101,7 +101,7 @@ CREATE TABLE `ambientes` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ambientes_slug_unique` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=6  ;
 
 /*Data for the table `ambientes` */
 
@@ -135,7 +135,7 @@ CREATE TABLE `asistencias` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `asistencias_estudiante_id_fecha_unique` (`estudiante_id`,`fecha`),
   CONSTRAINT `asistencias_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `asistencias` */
 
@@ -163,7 +163,7 @@ CREATE TABLE `carga_docente` (
   CONSTRAINT `carga_docente_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `carga_docente_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`),
   CONSTRAINT `carga_docente_grupo_id_foreign` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=2  ;
 
 /*Data for the table `carga_docente` */
 
@@ -187,7 +187,7 @@ CREATE TABLE `cola_sincronizacion` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=5  ;
 
 /*Data for the table `cola_sincronizacion` */
 
@@ -206,7 +206,7 @@ CREATE TABLE `condiciones` (
   `nombre` text DEFAULT NULL,
   `estado` int(11) DEFAULT 1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7  COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `condiciones` */
 
@@ -237,7 +237,7 @@ CREATE TABLE `configuracion_pins` (
   PRIMARY KEY (`id`),
   KEY `configuracion_pins_estudiante_id_foreign` (`estudiante_id`),
   CONSTRAINT `configuracion_pins_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=15  ;
 
 /*Data for the table `configuracion_pins` */
 
@@ -264,7 +264,7 @@ CREATE TABLE `configuraciones` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `configuraciones_clave_unique` (`clave`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=5  ;
 
 /*Data for the table `configuraciones` */
 
@@ -342,7 +342,7 @@ CREATE TABLE `docentes` (
   PRIMARY KEY (`id`),
   KEY `docentes_user_id_foreign` (`user_id`),
   CONSTRAINT `docentes_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=4  ;
 
 /*Data for the table `docentes` */
 
@@ -369,7 +369,7 @@ CREATE TABLE `estudiante_ambiente` (
   KEY `estudiante_ambiente_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `estudiante_ambiente_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `estudiante_ambiente_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=6  ;
 
 /*Data for the table `estudiante_ambiente` */
 
@@ -413,7 +413,7 @@ CREATE TABLE `estudiantes` (
   `telefono` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`,`identificacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37  COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `estudiantes` */
 
@@ -463,7 +463,7 @@ CREATE TABLE `failed_jobs` (
   `failed_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `failed_jobs` */
 
@@ -481,7 +481,7 @@ CREATE TABLE `grados` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=4  ;
 
 /*Data for the table `grados` */
 
@@ -506,7 +506,7 @@ CREATE TABLE `grupos` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `grp_unique` (`grado_id`,`nombre`,`anio_lectivo`),
   CONSTRAINT `grupos_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=28  ;
 
 /*Data for the table `grupos` */
 
@@ -541,7 +541,7 @@ CREATE TABLE `matriculas` (
   CONSTRAINT `matriculas_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
   CONSTRAINT `matriculas_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`),
   CONSTRAINT `matriculas_grupo_id_foreign` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=23  ;
 
 /*Data for the table `matriculas` */
 
@@ -567,7 +567,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=41  ;
 
 /*Data for the table `migrations` */
 
@@ -629,7 +629,7 @@ CREATE TABLE `modulos` (
   PRIMARY KEY (`id`),
   KEY `modulos_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `modulos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `modulos` */
 
@@ -1783,7 +1783,7 @@ CREATE TABLE `notas_docente` (
   KEY `notas_docente_user_id_foreign` (`user_id`),
   CONSTRAINT `notas_docente_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE CASCADE,
   CONSTRAINT `notas_docente_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `notas_docente` */
 
@@ -1807,7 +1807,7 @@ CREATE TABLE `observaciones` (
   CONSTRAINT `observaciones_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `observaciones_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE SET NULL,
   CONSTRAINT `observaciones_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `observaciones` */
 
@@ -1820,7 +1820,7 @@ CREATE TABLE `password_reset_tokens` (
   `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `password_reset_tokens` */
 
@@ -1842,7 +1842,7 @@ CREATE TABLE `personal_access_tokens` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `personal_access_tokens` */
 
@@ -1867,7 +1867,7 @@ CREATE TABLE `piar` (
   KEY `piar_docente_id_foreign` (`docente_id`),
   CONSTRAINT `piar_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `piar_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `piar` */
 
@@ -1888,7 +1888,7 @@ CREATE TABLE `portafolios` (
   KEY `portafolios_tema_id_foreign` (`tema_id`),
   CONSTRAINT `portafolios_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `portafolios_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `portafolios` */
 
@@ -1906,35 +1906,8 @@ CREATE TABLE `registros_acceso` (
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=34  ;
 
-/*Data for the table `registros_acceso` */
-
-insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) values
-(10,3,'127.0.0.1','polimotor','2026-06-18 17:16:38'),
-(11,3,'127.0.0.1','polimotor','2026-06-19 09:16:42'),
-(12,3,'127.0.0.1','polimotor','2026-06-19 10:46:12'),
-(13,3,'127.0.0.1','polimotor','2026-06-19 11:04:19'),
-(14,3,'127.0.0.1','polimotor','2026-06-19 15:46:05'),
-(15,3,'127.0.0.1','polimotor','2026-06-19 15:47:12'),
-(16,3,'127.0.0.1','polimotor','2026-06-19 17:36:25'),
-(17,3,'127.0.0.1','polimotor','2026-06-20 11:10:00'),
-(18,3,'127.0.0.1','polimotor','2026-06-20 11:53:57'),
-(19,3,'127.0.0.1','polimotor','2026-06-21 22:33:39'),
-(20,3,'127.0.0.1','polimotor','2026-06-22 08:43:43'),
-(21,3,'127.0.0.1','polimotor','2026-06-22 14:27:15'),
-(22,3,'127.0.0.1','polimotor','2026-06-23 08:26:20'),
-(23,3,'127.0.0.1','polimotor','2026-06-23 11:11:53'),
-(24,3,'127.0.0.1','polimotor','2026-06-23 15:28:21'),
-(25,3,'127.0.0.1','polimotor','2026-06-24 09:03:55'),
-(26,3,'127.0.0.1','polimotor','2026-06-24 09:13:34'),
-(27,3,'127.0.0.1','polimotor','2026-06-24 14:31:48'),
-(28,3,'127.0.0.1','polimotor','2026-06-24 17:14:24'),
-(29,3,'127.0.0.1','polimotor','2026-06-25 09:40:32'),
-(30,3,'127.0.0.1','polimotor','2026-06-25 11:44:36'),
-(31,3,'127.0.0.1','polimotor','2026-06-25 14:25:29'),
-(32,3,'127.0.0.1','polimotor','2026-06-25 16:37:18'),
-(33,3,'127.0.0.1','polimotor','2026-06-26 08:27:36');
 
 /*Table structure for table `temas` */
 
@@ -1956,7 +1929,7 @@ CREATE TABLE `temas` (
   PRIMARY KEY (`id`),
   KEY `temas_modulo_id_foreign` (`modulo_id`),
   CONSTRAINT `temas_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `temas` */
 
@@ -1979,7 +1952,7 @@ CREATE TABLE `users` (
   `bloqueado_en` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=16  ;
 
 /*Data for the table `users` */
 
@@ -2008,7 +1981,7 @@ CREATE TABLE `condiciones` (
   `nombre` text COLLATE utf8mb4_general_ci,
   `estado` int DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7  COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `condiciones` */
 
@@ -2039,7 +2012,7 @@ CREATE TABLE `piar` (
   KEY `piar_docente_id_foreign` (`docente_id`),
   CONSTRAINT `piar_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `piar_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB AUTO_INCREMENT=8  ;
 
 /*Table structure for table `piar_acta_compromiso` */
 
@@ -2052,7 +2025,7 @@ CREATE TABLE `piar_acta_compromiso` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_acta_compromiso_actividades` */
 
@@ -2067,7 +2040,7 @@ CREATE TABLE `piar_acta_compromiso_actividades` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_ajuste_razonable` */
 
@@ -2085,7 +2058,7 @@ CREATE TABLE `piar_ajuste_razonable` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_ajuste_razonable_docente_firma` */
 
@@ -2099,7 +2072,7 @@ CREATE TABLE `piar_ajuste_razonable_docente_firma` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_ajuste_razonable_item` */
 
@@ -2117,7 +2090,7 @@ CREATE TABLE `piar_ajuste_razonable_item` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=36  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_atencion_medica` */
 
@@ -2131,7 +2104,7 @@ CREATE TABLE `piar_atencion_medica` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_datos_generales` */
 
@@ -2157,7 +2130,7 @@ CREATE TABLE `piar_datos_generales` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_entorno_educativo` */
 
@@ -2179,7 +2152,7 @@ CREATE TABLE `piar_entorno_educativo` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_entorno_hogar` */
 
@@ -2206,7 +2179,7 @@ CREATE TABLE `piar_entorno_hogar` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_entorno_salud` */
 
@@ -2229,7 +2202,7 @@ CREATE TABLE `piar_entorno_salud` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_medicamento` */
 
@@ -2244,7 +2217,7 @@ CREATE TABLE `piar_medicamento` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_tratamiento` */
 
@@ -2258,7 +2231,7 @@ CREATE TABLE `piar_tratamiento` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48  COLLATE=utf8mb4_0900_ai_ci;
 
 /*Table structure for table `piar_valoracion_pedagogica` */
 
@@ -2449,7 +2422,7 @@ CREATE TABLE `piar_valoracion_pedagogica` (
   `habilidades_destrezas` text COLLATE utf8mb4_unicode_ci,
   `estrategias_acciones` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB  ;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
