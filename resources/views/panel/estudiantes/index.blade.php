@@ -1,55 +1,45 @@
 @extends('layouts.panel')
 @section('title', 'Estudiantes')
+
 @section('content')
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-            <h1>Estudiantes</h1>
-            <p>{{ $ambiente->nombre }}</p>
-        </div>
-        <a href="#" data-bs-toggle="modal" data-bs-target="#modalRegistro" class="btn btn-primary">+ Nuevo</a>
-    </div>
+    <div class="students-page">
 
-    {{-- Si el docente no tiene cargas activas, mostramos un aviso claro en el panel. --}}
-    @if (isset($cargasActivas) && $cargasActivas->isEmpty())
-        <div
-            style="margin-bottom:20px;padding:16px;border-radius:12px;background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;">
-            <strong>No tienes grupos asignados.</strong> Contacta al administrador.
-        </div>
-    @endif
+        <div class="page-header students-header">
+            <div>
+                <h1>Estudiantes</h1>
+            </div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Avatar</th>
-                    <th>Nombre</th>
-                    <th>Condición</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($estudiantes as $e)
-                    <tr>
-                        <td>
-                            <div
-                                style="width:40px;height:40px;border-radius:50%;background:{{ $e->color_avatar }};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem">
-                                {{ $e->iniciales }}
-                            </div>
-                        </td>
-                        <td style="font-weight:600">{{ $e->nombre }}</td>
-                        <td><span class="badge badge-yellow">{{ $e->condicion }}</span></td>
-                        <td><span
-                                class="badge {{ $e->activo ? 'badge-green' : 'badge-red' }}">{{ $e->activo ? 'Activo' : 'Inactivo' }}</span>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" style="text-align:center;color:#64748B;padding:32px">Sin estudiantes en este
-                            ambiente</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#modalRegistro" class="btn btn-primary btn-nuevo">
+                <i class="fa-solid fa-plus"></i>
+                Nuevo
+            </a>
+        </div>
+
+        @include('panel.estudiantes.partials._filtros')
+
+        @include('panel.estudiantes.partials._estadisticas')
+
+
+        @php
+            $tieneFiltros = collect($filtros ?? [])
+                ->filter(fn($v) => $v !== null && $v !== '')
+                ->isNotEmpty();
+        @endphp
+
+        @if ($estudiantes->isEmpty() && !$tieneFiltros)
+            @include('panel.estudiantes.partials._empty')
+        @elseif ($estudiantes->isEmpty())
+            <div class="students-empty students-empty--filters">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <h3>Sin resultados</h3>
+                <p>No hay estudiantes que coincidan con los filtros aplicados.</p>
+                <a href="{{ route('panel.estudiantes') }}" class="btn btn-primary">Limpiar filtros</a>
+            </div>
+        @else
+            @include('panel.estudiantes.partials._grid')
+            @include('panel.estudiantes.partials._paginacion')
+        @endif
+
     </div>
     @include('admin.estudiantes.modal_registro')
 
@@ -113,3 +103,7 @@
     </script>
     @endpush
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/js/panel/estudiantes.js') }}"></script>
+@endpush

@@ -96,12 +96,26 @@
             border: 1px solid #E2E8F0;
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
             text-align: center;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
 
         .estadistica-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .estadistica-item--clickable {
+            cursor: pointer;
+        }
+
+        .estadistica-item--clickable:focus-visible {
+            outline: 2px solid #2563EB;
+            outline-offset: 2px;
+        }
+
+        .estadistica-item--activa {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
         }
 
         .estadistica-label {
@@ -868,7 +882,9 @@
         </div>
 
         <div class="estadisticas-grid">
-            <div class="estadistica-item">
+            <div id="card-estudiantes-activos" class="estadistica-item estadistica-item--clickable"
+                role="button" tabindex="0" title="Ver estudiantes del grupo activo"
+                aria-controls="panel-estudiantes-grupo" aria-expanded="false">
                 <span class="estadistica-label">Estudiantes Activos</span>
                 <span class="estadistica-valor" id="stat-activos">0</span>
             </div>
@@ -1041,6 +1057,7 @@
                             document.getElementById('stat-sin-pin').textContent = '0';
                             document.getElementById('link-configurar-pin').style.display = 'none';
                             document.getElementById('alerta-piar').style.display = 'none';
+                            ocultarPanelEstudiantesGrupo();
                             actualizarFeedback('idle', 'No hay grupos disponibles para este ambiente.');
                         }
                     });
@@ -1106,8 +1123,6 @@
             const cardSinPin = document.getElementById('card-sin-pin');
             const linkConfigurarPin = document.getElementById('link-configurar-pin');
             const alertaPiar = document.getElementById('alerta-piar');
-            const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
-            const listaEstudiantes = document.getElementById('lista-estudiantes');
 
             document.getElementById('titulo-grupo-seleccionado').innerHTML =
                 '<i class="fas fa-chart-bar"></i> Estadísticas del grupo seleccionado';
@@ -1117,9 +1132,42 @@
             cardSinPin.classList.remove('estadistica-item--alerta');
             linkConfigurarPin.style.display = 'none';
             alertaPiar.style.display = 'none';
-            panelEstudiantes.style.display = 'none';
-            listaEstudiantes.innerHTML = '';
+            ocultarPanelEstudiantesGrupo();
             actualizarFeedback('idle', 'Selecciona un ambiente para ver sus grupos y estadísticas.');
+        }
+
+        function ocultarPanelEstudiantesGrupo() {
+            const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
+            const listaEstudiantes = document.getElementById('lista-estudiantes');
+            const cardActivos = document.getElementById('card-estudiantes-activos');
+
+            if (panelEstudiantes) {
+                panelEstudiantes.style.display = 'none';
+            }
+            if (listaEstudiantes) {
+                listaEstudiantes.innerHTML = '';
+            }
+            if (cardActivos) {
+                cardActivos.classList.remove('estadistica-item--activa');
+                cardActivos.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        function mostrarEstudiantesGrupoActivo() {
+            const grupoActivo = document.querySelector('.badge-grupo-chip.active');
+            const cardActivos = document.getElementById('card-estudiantes-activos');
+
+            if (!grupoActivo) {
+                actualizarFeedback('idle', 'Selecciona un grupo antes de ver los estudiantes activos.');
+                return;
+            }
+
+            if (cardActivos) {
+                cardActivos.classList.add('estadistica-item--activa');
+                cardActivos.setAttribute('aria-expanded', 'true');
+            }
+
+            cargarEstudiantesGrupo(grupoActivo.getAttribute('data-carga-id'));
         }
 
         // Actualiza el texto y el estilo del estado de carga de las estadísticas.
@@ -1166,6 +1214,7 @@
 
             document.getElementById('titulo-grupo-seleccionado').innerHTML =
                 `<i class="fas fa-chart-bar"></i> Estadísticas para: <strong>${gradoNombre} - ${grupoNombre}</strong>`;
+            ocultarPanelEstudiantesGrupo();
             actualizarFeedback('loading', 'Consultando los indicadores del grupo seleccionado...');
 
             fetch(`/panel/principal/${cargaId}/estadisticas`, {
@@ -1207,9 +1256,7 @@
 
                     actualizarFeedback('ready', stats.tiene_alerta_pin ?
                         'Se encontraron estudiantes sin PIN configurado.' :
-                        'Las estadísticas del grupo están al día.');
-
-                    cargarEstudiantesGrupo(cargaId);
+                        'Las estadísticas del grupo están al día. Haz clic en Estudiantes Activos para ver el listado.');
                 })
                 .catch(err => {
                     console.error('Error al procesar la selección del grupo:', err);
@@ -1303,23 +1350,37 @@
                 });
         }
 
+        document.getElementById('card-estudiantes-activos').addEventListener('click', function() {
+            mostrarEstudiantesGrupoActivo();
+        });
+
+        document.getElementById('card-estudiantes-activos').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                mostrarEstudiantesGrupoActivo();
+            }
+        });
+
         document.getElementById('buscador-estudiantes').addEventListener('input', function() {
+            const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
             const cargaActiva = document.querySelector('.badge-grupo-chip.active');
-            if (cargaActiva) {
+            if (cargaActiva && panelEstudiantes && panelEstudiantes.style.display !== 'none') {
                 cargarEstudiantesGrupo(cargaActiva.getAttribute('data-carga-id'));
             }
         });
 
         document.getElementById('filtro-estado-estudiante').addEventListener('change', function() {
+            const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
             const cargaActiva = document.querySelector('.badge-grupo-chip.active');
-            if (cargaActiva) {
+            if (cargaActiva && panelEstudiantes && panelEstudiantes.style.display !== 'none') {
                 cargarEstudiantesGrupo(cargaActiva.getAttribute('data-carga-id'));
             }
         });
 
         document.getElementById('filtro-condicion-estudiante').addEventListener('change', function() {
+            const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
             const cargaActiva = document.querySelector('.badge-grupo-chip.active');
-            if (cargaActiva) {
+            if (cargaActiva && panelEstudiantes && panelEstudiantes.style.display !== 'none') {
                 cargarEstudiantesGrupo(cargaActiva.getAttribute('data-carga-id'));
             }
         });

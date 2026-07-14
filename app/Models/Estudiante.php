@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Traits\Sincronizable;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Estudiante extends Model
 {
@@ -25,6 +27,86 @@ class Estudiante extends Model
         } else {
             return Carbon::parse($this->fecha_nacimiento)->diffInYears(Carbon::now());
         }
+    }
+
+    protected function nombreCompleto(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => trim("{$this->nombre} {$this->apellido}")
+        );
+    }
+
+    protected function iniciales(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+
+                $nombre = collect(explode(' ', trim($this->nombre)))
+                    ->filter()
+                    ->map(fn ($p) => strtoupper(substr($p, 0, 1)));
+
+                $apellido = collect(explode(' ', trim($this->apellido)))
+                    ->filter()
+                    ->map(fn ($p) => strtoupper(substr($p, 0, 1)));
+
+                return ($nombre->first() ?? '').($apellido->first() ?? '');
+            }
+        );
+    }
+
+    protected function colorAvatar(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+
+                $colors = [
+                    '#2563EB',
+                    '#7C3AED',
+                    '#059669',
+                    '#DC2626',
+                    '#EA580C',
+                    '#0891B2',
+                    '#DB2777',
+                    '#4338CA',
+                ];
+
+                return $colors[$this->id % count($colors)];
+            }
+        );
+    }
+
+    protected function avatarUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->avatar
+                ? Storage::url($this->avatar)
+                : null
+        );
+    }
+
+    protected function tienePin(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->configuracionPin !== null
+        );
+    }
+
+    protected function estadoTexto(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->activo
+                ? 'Activo'
+                : 'Inactivo'
+        );
+    }
+
+    protected function estadoBadge(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->activo
+                ? 'badge-green'
+                : 'badge-red'
+        );
     }
 
     public function matriculas()

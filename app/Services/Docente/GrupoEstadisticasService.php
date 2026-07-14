@@ -17,10 +17,8 @@ class GrupoEstadisticasService
         })->count();
 
         $requierePiarSinDiligenciar = $matriculas->filter(function ($matricula) {
-            $condicion = $matricula->estudiante->condicion ?? 'estandar';
-            $condicionEstandar = strtolower($condicion) === 'estandar';
-
-            return ! $condicionEstandar && empty($matricula->estudiante->piar);
+            return ! $this->esCondicionEstandar($matricula->estudiante)
+                && empty($matricula->estudiante->piar);
         })->count();
 
         return [
@@ -40,8 +38,7 @@ class GrupoEstadisticasService
     {
         return $matriculas->map(function ($matricula) {
             $estudiante = $matricula->estudiante;
-            $condicion = strtolower($estudiante->condicion ?? 'estandar');
-            $condicionEstandar = $condicion === 'estandar';
+            $condicionEstandar = $this->esCondicionEstandar($estudiante);
             $tienePiar = ! empty($estudiante->piar);
             $tienePin = ! empty($estudiante->configuracionPin);
             $estado = strtoupper($matricula->estado ?? 'activo') === 'ACTIVO' ? 'Activo' : 'Inactivo';
@@ -52,7 +49,7 @@ class GrupoEstadisticasService
                 'id' => $estudiante->id,
                 'nombre' => $estudiante->nombre,
                 'iniciales' => $estudiante->iniciales ?? strtoupper(substr($estudiante->nombre ?? 'E', 0, 2)),
-                'condicion' => $estudiante->condicion ?? 'estandar',
+                'condicion' => $this->resolverClaveCondicion($estudiante),
                 'estado' => $estado,
                 'tiene_pin' => $tienePin,
                 'estado_piar' => $estadoPiar,
@@ -61,5 +58,76 @@ class GrupoEstadisticasService
                 'activo' => $estado === 'Activo',
             ];
         })->values()->all();
+    }
+
+    /**
+     * La alerta de PIAR solo aplica a matriculados con condición distinta de estándar.
+     */
+    public function esCondicionEstandar($estudiante): bool
+    {
+        return $this->resolverClaveCondicion($estudiante) === 'estandar';
+    }
+
+    /**
+     * Normaliza la condición del estudiante a una clave estable del panel
+     * (estandar, tea, tdah, etc.), ya sea string legado o relación Condicion.
+     */
+    public function resolverClaveCondicion($estudiante): string
+    {
+        $condicion = $estudiante->condicion ?? null;
+
+        // Relación Condicion (u objeto con nombre/id) — no usar el string del atributo legado.
+        if (is_object($condicion) && isset($condicion->nombre)) {
+            return $this->normalizarNombreCondicion(
+                $condicion->nombre,
+                isset($condicion->id) ? (int) $condicion->id : null
+            );
+        }
+
+        if (is_string($condicion) && $condicion !== '') {
+            return $this->normalizarNombreCondicion($condicion);
+        }
+
+        $condicionId = $estudiante->condicion_id ?? null;
+        if ($condicionId !== null) {
+            return $this->normalizarNombreCondicion(null, (int) $condicionId);
+        }
+
+        return 'estandar';
+    }
+
+    private function normalizarNombreCondicion(?string $nombre, ?int $condicionId = null): string
+    {
+        if ($condicionId === 1) {
+            return 'estandar';
+        }
+
+        $valor = strtolower(trim((string) $nombre));
+        $valor = strtr($valor, [
+            'á' => 'a',
+            'é' => 'e',
+            'í' => 'i',
+            'ó' => 'o',
+            'ú' => 'u',
+        ]);
+
+        if ($valor === '' || $valor === 'estandar') {
+            return 'estandar';
+        }
+
+        $mapa = [
+            'tea' => 'tea',
+            'tdah' => 'tdah',
+            'discapacidad visual' => 'disc_visual',
+            'disc_visual' => 'disc_visual',
+            'discapacidad auditiva' => 'disc_auditiva',
+            'disc_auditiva' => 'disc_auditiva',
+            'discapacidad motriz' => 'disc_motriz',
+            'disc_motriz' => 'disc_motriz',
+            'sindrome de down' => 'down',
+            'down' => 'down',
+        ];
+
+        return $mapa[$valor] ?? $valor;
     }
 }

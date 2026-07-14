@@ -99,7 +99,7 @@ class DocenteDashboardController extends Controller
             ->matriculas()
             ->activa()
             ->delAnio()
-            ->with(['estudiante.piar', 'estudiante.configuracionPin'])
+            ->with(['estudiante.piar', 'estudiante.configuracionPin', 'estudiante.condicion'])
             ->get();
 
         $estadisticas = app(GrupoEstadisticasService::class)->calcular($matriculas);
@@ -115,7 +115,7 @@ class DocenteDashboardController extends Controller
             ->matriculas()
             ->activa()
             ->delAnio()
-            ->with(['estudiante.piar', 'estudiante.configuracionPin'])
+            ->with(['estudiante.piar', 'estudiante.configuracionPin', 'estudiante.condicion'])
             ->get();
 
         $estudiantes = app(GrupoEstadisticasService::class)->listarEstudiantes($matriculas);
