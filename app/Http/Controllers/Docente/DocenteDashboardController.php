@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Docente;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\CargaDocente;
+use App\Services\Docente\GrupoEstadisticasService;
 use Illuminate\Support\Facades\Auth;
 
 class DocenteDashboardController extends Controller
@@ -97,19 +98,29 @@ class DocenteDashboardController extends Controller
         $matriculas = $carga->grupo
             ->matriculas()
             ->activa()
-            ->delAnio();
+            ->delAnio()
+            ->with(['estudiante.piar', 'estudiante.configuracionPin'])
+            ->get();
 
-        return response()->json([
-            'activos' => (clone $matriculas)->count(),
+        $estadisticas = app(GrupoEstadisticasService::class)->calcular($matriculas);
 
-            'piar' => (clone $matriculas)
-                ->whereHas('estudiante.piar')
-                ->count(),
+        return response()->json($estadisticas);
+    }
 
-            'sin_pin' => (clone $matriculas)
-                ->whereDoesntHave('estudiante.configuracionPin')
-                ->count(),
-        ]);
+    public function obtenerEstudiantesGrupo(CargaDocente $carga)
+    {
+        session(['carga_docente_id' => $carga->id]);
+
+        $matriculas = $carga->grupo
+            ->matriculas()
+            ->activa()
+            ->delAnio()
+            ->with(['estudiante.piar', 'estudiante.configuracionPin'])
+            ->get();
+
+        $estudiantes = app(GrupoEstadisticasService::class)->listarEstudiantes($matriculas);
+
+        return response()->json($estudiantes);
     }
 
     public function misEstudiantes()

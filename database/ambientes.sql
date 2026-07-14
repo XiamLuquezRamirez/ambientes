@@ -105,12 +105,21 @@ CREATE TABLE `ambientes` (
 
 /*Data for the table `ambientes` */
 
-insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values
-(1,'Música','musica','#0F6E56','🎵','192.168.1.20',1,25,'2026-06-16 00:02:01','2026-06-17 18:34:22'),
-(2,'Polimotor','polimotor','#534AB7','🤸','192.168.1.21',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(3,'Lógico','logico','#854F0B','🧠','192.168.1.22',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(4,'Multisensorial','multisensorial','#185FA5','🌿','192.168.1.23',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(5,'Tecnología','tecnologia','#993C1D','💡','192.168.1.24',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01');
+INSERT INTO ambientes (
+    nombre,
+    slug,
+    color_hex,
+    icono,
+    servidor_ip,
+    created_at,
+    updated_at
+)
+VALUES
+    ('Música', 'musica', '#0F6E56', '🎵', '192.168.1.20', NOW(), NOW()),
+    ('Polimotor', 'polimotor', '#534AB7', '🤸', '192.168.1.21', NOW(), NOW()),
+    ('Lógico', 'logico', '#854F0B', '🧠', '192.168.1.22', NOW(), NOW()),
+    ('Multisensorial', 'multisensorial', '#185FA5', '🌿', '192.168.1.23', NOW(), NOW()),
+    ('Tecnología', 'tecnologia', '#993C1D', '💡', '192.168.1.24', NOW(), NOW());
 
 /*Table structure for table `asistencias` */
 
@@ -1893,6 +1902,7 @@ CREATE TABLE `registros_acceso` (
   `ip` varchar(45) DEFAULT NULL,
   `ambiente` varchar(255) DEFAULT NULL,
   `fecha` timestamp NOT NULL DEFAULT current_timestamp(),
+  `tipo` varchar(30) NOT NULL DEFAULT 'inicio_sesion',
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
@@ -1900,7 +1910,7 @@ CREATE TABLE `registros_acceso` (
 
 /*Data for the table `registros_acceso` */
 
-insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`) values
+insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) values
 (10,3,'127.0.0.1','polimotor','2026-06-18 17:16:38'),
 (11,3,'127.0.0.1','polimotor','2026-06-19 09:16:42'),
 (12,3,'127.0.0.1','polimotor','2026-06-19 10:46:12'),

@@ -184,6 +184,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('principal', [DocenteDashboardController::class, 'listar'])->name('panel.principal');
     Route::get('principal/{ambiente}/grados', [DocenteDashboardController::class, 'obtenerGradosYGrupos'])->name('panel.principal.grados');
     Route::get('principal/{carga}/estadisticas', [DocenteDashboardController::class, 'obtenerEstadisticasGrupo'])->name('panel.principal.estadisticas');
+    Route::get('principal/{carga}/estudiantes', [DocenteDashboardController::class, 'obtenerEstudiantesGrupo'])->name('panel.principal.estudiantes');
 
     // Perfil docente
     Route::get('perfil', [PerfilController::class, 'mostrar'])->name('panel.perfil');
@@ -199,6 +200,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     // Estudiantes
     Route::get('estudiantes', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
     Route::get('estudiantes/create', [EstudiantePanelController::class, 'formularioCrear'])->name('panel.estudiantes.create');
+    Route::get('estudiantes/buscar', [EstudiantePanelController::class, 'buscarEstudiantes'])->name('panel.estudiantes.buscar');
+    Route::get('estudiantes/{estudiante}', [EstudiantePanelController::class, 'verFicha'])->name('panel.estudiantes.show');
     Route::post('estudiantes', [EstudiantePanelController::class, 'guardar'])->name('panel.estudiantes.store');
     Route::get('estudiantes/{estudiante}/edit', [EstudiantePanelController::class, 'formularioEditar'])->name('panel.estudiantes.edit');
     Route::put('estudiantes/{estudiante}', [EstudiantePanelController::class, 'actualizar'])->name('panel.estudiantes.update');

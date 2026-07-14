@@ -5,26 +5,395 @@
         .ambientes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-            gap: 50px;
+            gap: 28px;
             margin-top: 24px;
         }
 
         .ambiente-card {
             background: #FFFFFF;
             border: 1px solid #E2E8F0;
-            border-radius: 14px;
+            border-radius: 16px;
             overflow: visible;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
             cursor: pointer;
             position: relative;
         }
 
-
-        /* Efecto de ampliación al pasar el cursor */
         .ambiente-card:hover {
-            transform: translateY(-5px) scale(1.04);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+            border-color: #93C5FD;
+        }
+
+        .panel-estadisticas {
+            margin-top: 24px;
+            padding: 20px 22px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #f8fbff 0%, #f5f9ff 100%);
+            border: 1px solid #dbeafe;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+        }
+
+        .panel-estadisticas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .panel-estadisticas-title {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1E3A8A;
+        }
+
+        .panel-estadisticas-subtitle {
+            margin: 4px 0 0;
+            font-size: 0.9rem;
+            color: #64748B;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            white-space: nowrap;
+            background: #E2E8F0;
+            color: #475569;
+        }
+
+        .status-pill--loading {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .status-pill--ready {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .status-pill--idle {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .estadisticas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .estadistica-item {
+            padding: 16px;
+            border-radius: 14px;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .estadistica-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .estadistica-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #64748B;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .estadistica-valor {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #0F172A;
+        }
+
+        .estadistica-item--alerta {
+            background: #FFF8E1;
+            border-color: #FCD34D;
+        }
+
+        .link-configurar-pin {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #2563EB;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .link-configurar-pin:hover {
+            color: #1D4ED8;
+            text-decoration: underline;
+        }
+
+        .alerta-piar {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-left: 4px solid #DC2626;
+            background: #FFF5F5;
+            color: #842029;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .quick-action-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 18px;
+            border-radius: 16px;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quick-action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+            border-color: #93C5FD;
+        }
+
+        .quick-action-card__icon {
+            width: 46px;
+            height: 46px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #EFF6FF;
+            color: #2563EB;
+            font-size: 1.15rem;
+        }
+
+        .quick-action-card__title {
+            font-weight: 700;
+            color: #0F172A;
+            font-size: 0.98rem;
+        }
+
+        .quick-action-card__text {
+            font-size: 0.84rem;
+            color: #64748B;
+            line-height: 1.4;
+        }
+
+        .quick-action-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 7px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: #DC2626;
+            color: #FFFFFF;
+        }
+
+        .quick-action-badge--neutral {
+            background: #E2E8F0;
+            color: #475569;
+        }
+
+        .panel-estudiantes-grupo {
+            margin-top: 24px;
+            padding: 20px 22px;
+            border-radius: 18px;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .panel-estudiantes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .panel-estudiantes-title {
+            margin: 0;
+            font-size: 1.02rem;
+            font-weight: 700;
+            color: #0F172A;
+        }
+
+        .panel-estudiantes-subtitle {
+            margin: 4px 0 0;
+            font-size: 0.9rem;
+            color: #64748B;
+        }
+
+        .filtros-estudiantes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-estudiantes {
+            border: 1px solid #CBD5E1;
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            color: #334155;
+            background: #F8FAFC;
+        }
+
+        .buscador-estudiantes {
+            width: min(320px, 100%);
+            border: 1px solid #CBD5E1;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 0.9rem;
+            color: #334155;
+            background: #FFFFFF;
+        }
+
+        .lista-estudiantes {
+            display: grid;
+            gap: 12px;
+        }
+
+        .estudiante-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid #E2E8F0;
+            background: #F8FAFC;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .estudiante-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+        }
+
+        .estudiante-card__info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .estudiante-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #FFFFFF;
+            flex-shrink: 0;
+        }
+
+        .estudiante-meta {
+            min-width: 0;
+        }
+
+        .estudiante-nombre {
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0;
+        }
+
+        .estudiante-submeta {
+            font-size: 0.84rem;
+            color: #64748B;
+            margin: 3px 0 0;
+        }
+
+        .estudiante-tags {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .tag-estudiante {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tag-estudiante--activo {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .tag-estudiante--inactivo {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        .tag-estudiante--pin {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .tag-estudiante--pin-pendiente {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .tag-estudiante--piar {
+            background: #F5E7FF;
+            color: #7C3AED;
+        }
+
+        .tag-estudiante--piar-pendiente {
+            background: #FFF7ED;
+            color: #C2410C;
+        }
+
+        .estudiante-alerta {
+            color: #EA580C;
+            font-size: 1rem;
         }
 
         .card-franja {
@@ -419,6 +788,8 @@
         <!-- Envolvemos la bienvenida para controlarla con JS -->
         <div id="contenedor-bienvenida">
             <h1>¡Bienvenido, {{ Auth::guard('docente')->user()->nombre }}!</h1>
+            <strong>{{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</strong>
+
             <strong>Selecciona el ambiente con el que trabajarás hoy.</strong>
         </div>
 
@@ -480,66 +851,142 @@
         <div id="contenido-grados"
             style="display: flex; flex-wrap: nowrap; gap: 24px; overflow-x: auto; padding-bottom: 15px;"></div>
 
-        <!-- SECCIÓN DE ESTADÍSTICAS DEL GRUPO SELECCIONADO -->
-        <div id="panel-estadisticas-grupo"
-            style="margin-top: 25px; display: none; padding: 20px; background: #f9f9f9; border-left: 4px solid #007bff; border-radius: 4px;">
-            <h4 id="titulo-grupo-seleccionado" style="font-size: 1.1rem; margin-bottom: 15px; color: #555;"></h4>
+    </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
-                <div
-                    style="background: #fff; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                    <div style="font-size: 0.85rem; color: #666; font-weight: bold;">Estudiantes Activos</div>
-                    <div id="stat-activos" style="font-size: 1.8rem; font-weight: bold; color: #28a745;">0</div>
-                </div>
-                <div
-                    style="background: #fff; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                    <div style="font-size: 0.85rem; color: #666; font-weight: bold;">Con PIAR</div>
-                    <div id="stat-piar" style="font-size: 1.8rem; font-weight: bold; color: #dc3545;">0</div>
-                </div>
-                <div
-                    style="background: #fff; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                    <div style="font-size: 0.85rem; color: #666; font-weight: bold;">Sin PIN</div>
-                    <div id="stat-sin-pin" style="font-size: 1.8rem; font-weight: bold; color: #ffc107;">0</div>
-                </div>
+    <div id="panel-estadisticas-grupo" class="panel-estadisticas" aria-live="polite">
+        <div class="panel-estadisticas-header">
+            <div>
+                <h5 class="panel-estadisticas-title" id="titulo-grupo-seleccionado">
+                    <i class="fas fa-chart-bar"></i> Estadísticas del grupo seleccionado
+                </h5>
+                <p class="panel-estadisticas-subtitle" id="texto-feedback">
+                    Selecciona un grupo para ver el resumen del día.
+                </p>
             </div>
+            <span id="estado-estadisticas" class="status-pill status-pill--idle">Esperando selección</span>
+        </div>
+
+        <div class="estadisticas-grid">
+            <div class="estadistica-item">
+                <span class="estadistica-label">Estudiantes Activos</span>
+                <span class="estadistica-valor" id="stat-activos">0</span>
+            </div>
+            <div class="estadistica-item">
+                <span class="estadistica-label">Con PIAR</span>
+                <span class="estadistica-valor" id="stat-piar">0</span>
+            </div>
+            <div id="card-sin-pin" class="estadistica-item">
+                <span class="estadistica-label">Sin PIN</span>
+                <span class="estadistica-valor" id="stat-sin-pin">0</span>
+                <a id="link-configurar-pin" href="{{ route('panel.estudiantes') }}" class="link-configurar-pin"
+                    style="display: none;">
+                    <i class="fas fa-key"></i> Configurar PIN
+                </a>
+            </div>
+        </div>
+
+        <div id="alerta-piar" class="alerta-piar" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="texto-alerta-piar">0 estudiantes requieren PIAR sin diligenciar</span>
         </div>
     </div>
 
-    <div class="c-card" style="margin-top: 20px;">
-        <div class="c-card-body">
-            <h5 class="c-card-title">Estadísticas del día</h5>
-            <div class="c-card-text">
-                <div class="c-card-text-item">
-                    <span class="c-card-text-item-label">Estudiantes Activos</span>
-                    <span class="c-card-text-item-value">0</span>
-                </div>
+    <div class="panel-estudiantes-grupo" id="panel-estudiantes-grupo" style="display: none;">
+        <div class="panel-estudiantes-header">
+            <div>
+                <h5 class="panel-estudiantes-title"><i class="fas fa-users"></i> Estudiantes del grupo activo</h5>
+                <p class="panel-estudiantes-subtitle">Gestiona el alumnado matriculado en el grupo seleccionado.</p>
+            </div>
+            <div class="filtros-estudiantes">
+                <input id="buscador-estudiantes" class="buscador-estudiantes" type="text"
+                    placeholder="Buscar por nombre..." />
+                <select id="filtro-estado-estudiante" class="filtro-estudiantes">
+                    <option value="todos">Todos los estados</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                </select>
+                <select id="filtro-condicion-estudiante" class="filtro-estudiantes">
+                    <option value="todas">Todas las condiciones</option>
+                    <option value="estandar">Estándar</option>
+                    <option value="tea">TEA</option>
+                    <option value="tdah">TDAH</option>
+                    <option value="disc_visual">Discapacidad visual</option>
+                    <option value="disc_auditiva">Discapacidad auditiva</option>
+                    <option value="disc_motriz">Discapacidad motriz</option>
+                    <option value="down">Down</option>
+                </select>
             </div>
         </div>
+
+        <div id="lista-estudiantes" class="lista-estudiantes"></div>
+    </div>
+
+    <div class="quick-actions" id="quick-actions">
+        <a href="{{ route('panel.sesion') }}" class="quick-action-card" data-context-route="sesion">
+            <span class="quick-action-card__icon"><i class="fas fa-clipboard-check"></i></span>
+            <span class="quick-action-card__title">Registrar asistencia</span>
+            <span class="quick-action-card__text">Toma la asistencia del grupo activo de forma rápida.</span>
+            <span id="badge-asistencia" class="quick-action-badge quick-action-badge--neutral">0</span>
+        </a>
+
+        <a href="{{ route('panel.estudiantes') }}" class="quick-action-card" data-context-route="pin">
+            <span class="quick-action-card__icon"><i class="fas fa-key"></i></span>
+            <span class="quick-action-card__title">Configurar PIN</span>
+            <span class="quick-action-card__text">Revisa quién aún necesita un PIN configurado.</span>
+            <span id="badge-pin" class="quick-action-badge quick-action-badge--neutral">0</span>
+        </a>
+
+        <a href="{{ route('panel.sesion') }}" class="quick-action-card" data-context-route="monitor">
+            <span class="quick-action-card__icon"><i class="fas fa-desktop"></i></span>
+            <span class="quick-action-card__title">Monitor de sesión</span>
+            <span class="quick-action-card__text">Consulta en tiempo real quién está conectado.</span>
+            <span id="badge-monitor" class="quick-action-badge quick-action-badge--neutral">0</span>
+        </a>
+
+        <a href="{{ route('panel.portafolio') }}" class="quick-action-card" data-context-route="observacion">
+            <span class="quick-action-card__icon"><i class="fas fa-comment-medical"></i></span>
+            <span class="quick-action-card__title">Nueva observación</span>
+            <span class="quick-action-card__text">Registra una observación para el grupo activo.</span>
+            <span id="badge-observacion" class="quick-action-badge quick-action-badge--neutral">0</span>
+        </a>
     </div>
 
     <!-- CONTROL JAVASCRIPT -->
     <script>
-        // Variable global para retener el nombre del ambiente en el hilo del encabezado
+        // Mantiene el contexto activo del ambiente para actualizar el encabezado y las estadísticas.
         let nombreAmbienteActivo = "";
+        let panelEstadisticas;
 
         document.addEventListener('DOMContentLoaded', function() {
             const tarjetas = document.querySelectorAll('.btn-seleccionar-ambiente');
             const contenedorGrid = document.getElementById('ambientes-container');
+            const quickActions = document.querySelectorAll('.quick-action-card');
             const panelGradosGrupos = document.getElementById('panel-grados-grupos');
             const contenidoGrados = document.getElementById('contenido-grados');
-            const panelEstadisticas = document.getElementById('panel-estadisticas-grupo');
+            panelEstadisticas = document.getElementById('panel-estadisticas-grupo');
             const btnVolver = document.getElementById('btn-volver-ambientes');
 
-            // 1. Lógica para entrar al ambiente
+            // Muestra un estado temporal mientras se consultan los indicadores del grupo.
+            function mostrarEstadoCargaEstadisticas() {
+                document.getElementById('stat-activos').textContent = '—';
+                document.getElementById('stat-piar').textContent = '—';
+                document.getElementById('stat-sin-pin').textContent = '—';
+                document.getElementById('titulo-grupo-seleccionado').innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Cargando estadísticas...';
+                document.getElementById('link-configurar-pin').style.display = 'none';
+                document.getElementById('alerta-piar').style.display = 'none';
+                actualizarFeedback('loading', 'Consultando los indicadores del grupo seleccionado...');
+            }
+
+            // Carga los grados y grupos del ambiente seleccionado y activa el primer grupo por defecto.
             function cargarAmbiente(ambienteId, ambienteNombre) {
                 nombreAmbienteActivo = ambienteNombre;
 
-                // Ocultamos los ambientes y el bloque de bienvenida
+                // Ocultamos los ambientes y el bloque de bienvenida para enfocar la vista del ambiente.
                 contenedorGrid.style.display = 'none';
                 document.getElementById('contenedor-bienvenida').style.display = 'none';
-                panelEstadisticas.style.display = 'none';
+                mostrarEstadoCargaEstadisticas();
 
-                // Inicializamos el encabezado con el contexto del ambiente seleccionado
                 document.getElementById('txt-contexto-ambiente').textContent = `Ambiente: ${ambienteNombre}`;
                 document.getElementById('txt-contexto-detalle').textContent = '';
                 document.getElementById('contenedor-ambiente-activo').style.display = 'block';
@@ -554,6 +1001,7 @@
                         if (data.length === 0) {
                             contenidoGrados.innerHTML =
                                 '<p class="text-muted">No tienes grados asignados aquí para el año actual.</p>';
+                            actualizarFeedback('idle', 'No hay grupos disponibles para este ambiente.');
                             return;
                         }
 
@@ -566,12 +1014,13 @@
                             `;
                             grado.grupos.forEach(grupo => {
                                 html += `
-                                    <span class="badge-grupo-chip" 
+                                    <span class="badge-grupo-chip"
                                           style="padding: 6px 14px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 500; white-space: nowrap; display: inline-block; transition: all 0.2s;"
                                           data-carga-id="${grupo.carga_docente_id}"
                                           data-grado="${grado.nombre}"
                                           data-grupo="${grupo.nombre}"
                                           onclick="seleccionarGrupo(this)">
+                                          <i class="fas fa-graduation-cap"></i>
                                         ${grado.nombre} ${grupo.nombre}
                                     </span>
                                 `;
@@ -579,21 +1028,33 @@
                             html += `</div></div>`;
                         });
                         contenidoGrados.innerHTML = html;
+
+                        const primerGrupo = contenidoGrados.querySelector('.badge-grupo-chip');
+                        if (primerGrupo) {
+                            seleccionarGrupo(primerGrupo);
+                        } else {
+                            document.getElementById('titulo-grupo-seleccionado').innerHTML =
+                                '<i class="fas fa-exclamation-circle"></i> No hay grupos disponibles para este ambiente';
+                            document.getElementById('stat-activos').textContent = '0';
+                            document.getElementById('stat-piar').textContent = '0';
+                            document.getElementById('stat-sin-pin').textContent = '0';
+                            document.getElementById('link-configurar-pin').style.display = 'none';
+                            document.getElementById('alerta-piar').style.display = 'none';
+                            actualizarFeedback('idle', 'No hay grupos disponibles para este ambiente.');
+                        }
                     });
             }
 
-            // 2. Acción del botón Volver
+            // Vuelve a la vista inicial de ambientes y limpia el contexto activo.
             btnVolver.addEventListener('click', function() {
                 panelGradosGrupos.style.display = 'none';
-
-                // Ocultamos el encabezado de contexto activo y restauramos la bienvenida
                 document.getElementById('contenedor-ambiente-activo').style.display = 'none';
                 document.getElementById('contenedor-bienvenida').style.display = 'block';
-
                 contenedorGrid.style.display = 'grid';
+                resetearEstadisticas();
             });
 
-            // Asignar clics a las tarjetas
+            // Asigna el comportamiento de selección a cada tarjeta de ambiente.
             tarjetas.forEach(tarjeta => {
                 tarjeta.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
@@ -602,19 +1063,96 @@
                 });
             });
 
-            // Si hay un solo ambiente asignado, entra directo automáticamente
+            quickActions.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    const grupoActivo = document.querySelector('.badge-grupo-chip.active');
+                    if (!grupoActivo) {
+                        return;
+                    }
+
+                    const cargaId = grupoActivo.getAttribute('data-carga-id');
+                    const route = this.getAttribute('data-context-route');
+                    const baseUrl = this.getAttribute('href');
+
+                    if (route === 'pin') {
+                        event.preventDefault();
+                        const params = new URLSearchParams({
+                            carga: cargaId,
+                            contexto: nombreAmbienteActivo
+                        });
+                        window.location.href = `${baseUrl}?${params.toString()}`;
+                        return;
+                    }
+
+                    if (route === 'sesion' || route === 'monitor' || route === 'observacion') {
+                        event.preventDefault();
+                        const params = new URLSearchParams({
+                            carga: cargaId,
+                            contexto: nombreAmbienteActivo
+                        });
+                        window.location.href = `${baseUrl}?${params.toString()}`;
+                    }
+                });
+            });
+
+            // Si sólo existe un ambiente asignado, entra directamente a la vista del mismo.
             @if ($ambienteSeleccionado)
                 cargarAmbiente({{ $ambienteSeleccionado->id }}, '{{ $ambienteSeleccionado->nombre }}');
             @endif
         });
 
-        // 3. Cargar Estadísticas y guardar Contexto de Sesión del Grupo Seleccionado
+        function resetearEstadisticas() {
+            const cardSinPin = document.getElementById('card-sin-pin');
+            const linkConfigurarPin = document.getElementById('link-configurar-pin');
+            const alertaPiar = document.getElementById('alerta-piar');
+            const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
+            const listaEstudiantes = document.getElementById('lista-estudiantes');
+
+            document.getElementById('titulo-grupo-seleccionado').innerHTML =
+                '<i class="fas fa-chart-bar"></i> Estadísticas del grupo seleccionado';
+            document.getElementById('stat-activos').textContent = '0';
+            document.getElementById('stat-piar').textContent = '0';
+            document.getElementById('stat-sin-pin').textContent = '0';
+            cardSinPin.classList.remove('estadistica-item--alerta');
+            linkConfigurarPin.style.display = 'none';
+            alertaPiar.style.display = 'none';
+            panelEstudiantes.style.display = 'none';
+            listaEstudiantes.innerHTML = '';
+            actualizarFeedback('idle', 'Selecciona un ambiente para ver sus grupos y estadísticas.');
+        }
+
+        // Actualiza el texto y el estilo del estado de carga de las estadísticas.
+        function actualizarFeedback(estado, mensaje) {
+            const estadoEl = document.getElementById('estado-estadisticas');
+            const mensajeEl = document.getElementById('texto-feedback');
+
+            if (!estadoEl || !mensajeEl) {
+                return;
+            }
+
+            estadoEl.className = 'status-pill';
+            if (estado === 'loading') {
+                estadoEl.classList.add('status-pill--loading');
+                estadoEl.textContent = 'Actualizando...';
+            } else if (estado === 'ready') {
+                estadoEl.classList.add('status-pill--ready');
+                estadoEl.textContent = 'Actualizado';
+            } else {
+                estadoEl.classList.add('status-pill--idle');
+                estadoEl.textContent = 'Esperando selección';
+            }
+
+            mensajeEl.textContent = mensaje;
+        }
+
+        // Consulta las estadísticas del grupo seleccionado y refresca la tarjeta visual.
         function seleccionarGrupo(element) {
-            // Manejo visual de la selección de los chips
             document.querySelectorAll('.badge-grupo-chip').forEach(chip => {
+                chip.classList.remove('active');
                 chip.style.background = '#e9ecef';
                 chip.style.color = '#212529';
             });
+            element.classList.add('active');
             element.style.background = '#007bff';
             element.style.color = '#fff';
 
@@ -622,14 +1160,13 @@
             const gradoNombre = element.getAttribute('data-grado');
             const grupoNombre = element.getAttribute('data-grupo');
 
-            // Actualizar la ruta completa del contexto en el encabezado
             document.getElementById('txt-contexto-ambiente').textContent = `Ambiente: ${nombreAmbienteActivo}`;
             document.getElementById('txt-contexto-detalle').textContent = ` > ${gradoNombre} > Grupo ${grupoNombre}`;
 
             document.getElementById('titulo-grupo-seleccionado').innerHTML =
                 `<i class="fas fa-chart-bar"></i> Estadísticas para: <strong>${gradoNombre} - ${grupoNombre}</strong>`;
+            actualizarFeedback('loading', 'Consultando los indicadores del grupo seleccionado...');
 
-            // Petición POST para guardar la carga_docente_id en la sesión de Laravel y traer estadísticas
             fetch(`/panel/principal/${cargaId}/estadisticas`, {
                     headers: {
                         'Accept': 'application/json'
@@ -637,12 +1174,153 @@
                 })
                 .then(res => res.json())
                 .then(stats => {
-                    document.getElementById('panel-estadisticas-grupo').style.display = 'block';
+                    const cardSinPin = document.getElementById('card-sin-pin');
+                    const linkConfigurarPin = document.getElementById('link-configurar-pin');
+                    const alertaPiar = document.getElementById('alerta-piar');
+                    const textoAlertaPiar = document.getElementById('texto-alerta-piar');
+
+                    panelEstadisticas.style.display = 'block';
                     document.getElementById('stat-activos').textContent = stats.activos;
                     document.getElementById('stat-piar').textContent = stats.piar;
                     document.getElementById('stat-sin-pin').textContent = stats.sin_pin;
+                    document.getElementById('badge-pin').textContent = stats.sin_pin;
+                    document.getElementById('badge-asistencia').textContent = stats.asistencia_pendiente ?? 0;
+                    document.getElementById('badge-monitor').textContent = stats.conectados ?? 0;
+                    document.getElementById('badge-observacion').textContent = stats.observaciones ?? 0;
+
+                    if (stats.tiene_alerta_pin) {
+                        cardSinPin.classList.add('estadistica-item--alerta');
+                        linkConfigurarPin.style.display = 'inline-flex';
+                    } else {
+                        cardSinPin.classList.remove('estadistica-item--alerta');
+                        linkConfigurarPin.style.display = 'none';
+                    }
+
+                    if (stats.tiene_alerta_piar) {
+                        alertaPiar.style.display = 'block';
+                        textoAlertaPiar.textContent =
+                            `${stats.requiere_piar_sin_diligenciar} estudiantes requieren PIAR sin diligenciar`;
+                    } else {
+                        alertaPiar.style.display = 'none';
+                    }
+
+                    actualizarFeedback('ready', stats.tiene_alerta_pin ?
+                        'Se encontraron estudiantes sin PIN configurado.' :
+                        'Las estadísticas del grupo están al día.');
+
+                    cargarEstudiantesGrupo(cargaId);
                 })
-                .catch(err => console.error("Error al procesar la selección del grupo:", err));
+                .catch(err => {
+                    console.error('Error al procesar la selección del grupo:', err);
+                    actualizarFeedback('idle', 'No fue posible cargar las estadísticas.');
+                });
         }
+
+        function cargarEstudiantesGrupo(cargaId) {
+            const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
+            const listaEstudiantes = document.getElementById('lista-estudiantes');
+            const buscador = document.getElementById('buscador-estudiantes');
+            const filtroEstado = document.getElementById('filtro-estado-estudiante');
+            const filtroCondicion = document.getElementById('filtro-condicion-estudiante');
+
+            panelEstudiantes.style.display = 'block';
+            listaEstudiantes.innerHTML =
+                '<p style="color:#64748B"><i class="fas fa-spinner fa-spin"></i> Cargando estudiantes...</p>';
+
+            fetch(`/panel/principal/${cargaId}/estudiantes`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(estudiantes => {
+                    let estudiantesFiltrados = estudiantes;
+
+                    if (buscador) {
+                        const texto = buscador.value.trim().toLowerCase();
+                        if (texto) {
+                            estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
+                                (estudiante.nombre || '').toLowerCase().includes(texto)
+                            );
+                        }
+                    }
+
+                    if (filtroEstado && filtroEstado.value !== 'todos') {
+                        estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
+                            (estudiante.estado || '').toLowerCase() === filtroEstado.value
+                        );
+                    }
+
+                    if (filtroCondicion && filtroCondicion.value !== 'todas') {
+                        estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
+                            (estudiante.condicion || '').toLowerCase() === filtroCondicion.value
+                        );
+                    }
+
+                    if (estudiantesFiltrados.length === 0) {
+                        listaEstudiantes.innerHTML =
+                            '<p style="color:#64748B;padding:12px 0;">No hay estudiantes con esos filtros.</p>';
+                        return;
+                    }
+
+                    listaEstudiantes.innerHTML = estudiantesFiltrados.map(estudiante => {
+                        const estadoClase = estudiante.activo ? 'tag-estudiante--activo' :
+                            'tag-estudiante--inactivo';
+                        const pinClase = estudiante.tiene_pin ? 'tag-estudiante--pin' :
+                            'tag-estudiante--pin-pendiente';
+                        const piarClase = estudiante.requiere_atencion_piar ? 'tag-estudiante--piar-pendiente' :
+                            'tag-estudiante--piar';
+                        const alerta = estudiante.requiere_atencion_piar ?
+                            '<i class="fas fa-exclamation-triangle estudiante-alerta" title="Requiere PIAR"></i>' :
+                            '';
+
+                        return `
+                            <a href="/panel/estudiantes/${estudiante.id}" class="estudiante-card">
+                                <div class="estudiante-card__info">
+                                    <div class="estudiante-avatar" style="background:${estudiante.color_avatar || '#2563EB'}">
+                                        ${estudiante.iniciales || 'E'}
+                                    </div>
+                                    <div class="estudiante-meta">
+                                        <p class="estudiante-nombre">${estudiante.nombre}</p>
+                                        <p class="estudiante-submeta">Condición: ${estudiante.condicion || 'estandar'} · ${estudiante.estado || 'Activo'}</p>
+                                    </div>
+                                </div>
+                                <div class="estudiante-tags">
+                                    <span class="tag-estudiante ${estadoClase}">${estudiante.estado || 'Activo'}</span>
+                                    <span class="tag-estudiante ${pinClase}">${estudiante.tiene_pin ? 'PIN' : 'Sin PIN'}</span>
+                                    <span class="tag-estudiante ${piarClase}">${estudiante.estado_piar || 'No aplica'}</span>
+                                    ${alerta}
+                                </div>
+                            </a>
+                        `;
+                    }).join('');
+                })
+                .catch(err => {
+                    console.error('Error al cargar los estudiantes del grupo:', err);
+                    listaEstudiantes.innerHTML =
+                        '<p style="color:#64748B;padding:12px 0;">No fue posible cargar el listado.</p>';
+                });
+        }
+
+        document.getElementById('buscador-estudiantes').addEventListener('input', function() {
+            const cargaActiva = document.querySelector('.badge-grupo-chip.active');
+            if (cargaActiva) {
+                cargarEstudiantesGrupo(cargaActiva.getAttribute('data-carga-id'));
+            }
+        });
+
+        document.getElementById('filtro-estado-estudiante').addEventListener('change', function() {
+            const cargaActiva = document.querySelector('.badge-grupo-chip.active');
+            if (cargaActiva) {
+                cargarEstudiantesGrupo(cargaActiva.getAttribute('data-carga-id'));
+            }
+        });
+
+        document.getElementById('filtro-condicion-estudiante').addEventListener('change', function() {
+            const cargaActiva = document.querySelector('.badge-grupo-chip.active');
+            if (cargaActiva) {
+                cargarEstudiantesGrupo(cargaActiva.getAttribute('data-carga-id'));
+            }
+        });
     </script>
 @endsection
