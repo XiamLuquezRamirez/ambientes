@@ -53,6 +53,10 @@ class SesionNinoController extends Controller
             return response()->json(['ok' => false, 'mensaje' => 'Sin PIN configurado'], 422);
         }
 
+        if ($pin->estaBloqueado()) {
+            return response()->json(['ok' => false, 'mensaje' => 'PIN bloqueado por intentos fallidos'], 423);
+        }
+
         $figura1 = $request->input('figura_1');
         $figura2 = $request->input('figura_2');
         $figura3 = $request->input('figura_3');
@@ -64,6 +68,12 @@ class SesionNinoController extends Controller
         }
 
         $pin->increment('intentos_fallidos');
+        $pin->refresh();
+
+        if ($pin->estaBloqueado()) {
+            return response()->json(['ok' => false, 'mensaje' => 'PIN bloqueado por intentos fallidos'], 423);
+        }
+
         return response()->json(['ok' => false, 'mensaje' => 'PIN incorrecto'], 422);
     }
 

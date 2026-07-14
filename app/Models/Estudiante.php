@@ -91,6 +91,47 @@ class Estudiante extends Model
         );
     }
 
+    /** sin_configurar | configurado | bloqueado */
+    protected function estadoPin(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $pin = $this->configuracionPin;
+                if ($pin === null) {
+                    return 'sin_configurar';
+                }
+
+                return $pin->estaBloqueado() ? 'bloqueado' : 'configurado';
+            }
+        );
+    }
+
+    protected function condicionNombre(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $condicion = $this->relationLoaded('condicion')
+                    ? $this->getRelation('condicion')
+                    : $this->condicion()->first();
+
+                return $condicion?->nombre ?? 'Estándar';
+            }
+        );
+    }
+
+    /** Condición distinta de estándar → requiere seguimiento PIAR / botón Ver PIAR */
+    protected function condicionEsEstandar(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $nombre = mb_strtolower(trim((string) $this->condicion_nombre));
+                $normalizado = str_replace(['á', 'é', 'í', 'ó', 'ú'], ['a', 'e', 'i', 'o', 'u'], $nombre);
+
+                return $normalizado === '' || $normalizado === 'estandar';
+            }
+        );
+    }
+
     protected function estadoTexto(): Attribute
     {
         return Attribute::make(
@@ -121,7 +162,12 @@ class Estudiante extends Model
 
     public function condicion()
     {
-        return $this->belongsTo(Condicion::class);
+        return $this->belongsTo(Condicion::class, 'condicion_id');
+    }
+
+    public function observaciones()
+    {
+        return $this->hasMany(Observacion::class);
     }
 
     public function matriculaActiva()

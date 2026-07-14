@@ -5,15 +5,15 @@ namespace App\Http\Controllers\Panel;
 use App\Http\Controllers\Controller;
 use App\Models\CargaDocente;
 use App\Models\Condicion;
+use App\Models\Departamento;
 use App\Models\Estudiante;
+use App\Models\Grado;
+use App\Models\Grupo;
 use App\Models\Matricula;
 use App\Models\SyncQueue;
 use App\Services\Docente\DocenteAsignacionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Grado;
-use App\Models\Grupo;
-use App\Models\Departamento;
 
 class EstudiantePanelController extends Controller
 {
@@ -21,7 +21,6 @@ class EstudiantePanelController extends Controller
     {
         $docente = Auth::guard('docente')->user()->docente;
 
- 
         $figuras = [
             [
                 'icon' => 'fas fa-circle',
@@ -54,12 +53,10 @@ class EstudiantePanelController extends Controller
             [
                 'icon' => 'fas fa-apple-whole',
                 'color' => '#fd0a5d',
-            ]
+            ],
         ];
 
-       
-        
-        /* obtener grados de docente logueado*/
+        /* obtener grados de docente logueado */
         $carga = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
             ->where('activo', true)
             ->where('anio_lectivo', date('Y'))
@@ -72,8 +69,8 @@ class EstudiantePanelController extends Controller
             ->filter()
             ->unique('id')
             ->values();
-        
-        $grados = array();
+
+        $grados = [];
 
         $cargas = CargaDocente::where('docente_id', $docente->id)
             ->where('activo', true)
@@ -154,7 +151,7 @@ class EstudiantePanelController extends Controller
             $consulta->orderBy('nombre')->orderBy('apellido');
         }
 
-        $estudiantes = $consulta->paginate(9)->withQueryString();
+        $estudiantes = $consulta->paginate(12)->withQueryString();
 
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
         $ambiente = $cargas->first()?->ambiente;
@@ -175,10 +172,35 @@ class EstudiantePanelController extends Controller
         ));
     }
 
+    /**
+     * Ficha completa del estudiante (panel docente).
+     *
+     * Ruta: GET /panel/estudiantes/{estudiante} → panel.estudiantes.show
+     * Vista: resources/views/panel/estudiantes/show.blade.php
+     * Entrada UI: icono "ojo" en panel/estudiantes/partials/_card.blade.php
+     *
+     * HU (docente): ver en una sola pantalla datos personales, matrícula activa,
+     * estado del PIN, PIAR, actividad reciente y acciones rápidas.
+     *
+     * Carga actual:
+     * - configuracionPin → ¿tiene PIN? (aún no distingue "bloqueado")
+     * - piar             → ¿tiene PIAR diligenciado?
+     * - matriculas       → solo activas del año en curso + grado/grupo
+     *   (falta ambiente; Matricula no lo trae: usar ambientes / estudiante_ambiente)
+     *
+     * Pendiente para cerrar la HU:
+     * - Autorizar: el estudiante debe pertenecer a la carga del docente logueado
+     * - Portafolio reciente (últimas 5) y observaciones (últimas 3)
+     * - Estado PIN en 3 valores: configurado / sin configurar / bloqueado
+     * - Pasar a la vista datos listos para botones de acción
+     */
     public function verFicha(Estudiante $estudiante)
     {
+        // Eager load de lo que la vista ya pinta; evita N+1 en matrículas.
         $estudiante->load(['configuracionPin', 'piar', 'matriculas' => function ($query) {
-            $query->where('anio_lectivo', date('Y'))->where('estado', 'activo')->with(['grado', 'grupo']);
+            $query->where('anio_lectivo', date('Y'))
+                ->where('estado', 'activo')
+                ->with(['grado', 'grupo']);
         }]);
 
         return view('panel.estudiantes.show', compact('estudiante'));
@@ -317,9 +339,9 @@ class EstudiantePanelController extends Controller
             ->where('anio_lectivo', date('Y'))
             ->where('ambiente_id', $idAmbiente)
             ->pluck('grado_id');
-        
+
         $grados = Grado::whereIn('id', $gradoIds)->get();
-        
+
         return response()->json([
             'data' => $grados,
         ]);
@@ -331,9 +353,9 @@ class EstudiantePanelController extends Controller
             ->where('anio_lectivo', date('Y'))
             ->where('grado_id', $idGrado)
             ->pluck('grupo_id');
-        
+
         $grupos = Grupo::whereIn('id', $grupoIds)->get();
-        
+
         return response()->json([
             'data' => $grupos,
         ]);

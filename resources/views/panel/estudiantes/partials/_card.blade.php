@@ -58,13 +58,15 @@
         @endif
     </div>
 
+    {{-- Acciones de la card: el ojo abre la ficha completa (verFicha / show.blade.php) --}}
     <div class="student-footer">
-        <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-action" title="Ver perfil">
+        <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-action" title="Ver ficha completa">
             <i class="fa-solid fa-eye"></i>
         </a>
         <a href="{{ route('panel.estudiantes.edit', $e->id) }}" class="btn-action" title="Editar">
             <i class="fa-solid fa-pen"></i>
         </a>
+        {{-- Mismo destino que "Ver ficha"; pendiente diferenciar documentos/PIAR --}}
         <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-action" title="Documentos">
             <i class="fa-solid fa-file-lines"></i>
         </a>
