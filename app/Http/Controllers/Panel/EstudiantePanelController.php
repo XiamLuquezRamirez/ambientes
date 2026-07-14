@@ -161,6 +161,14 @@ class EstudiantePanelController extends Controller
         $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'html'    => view('panel.estudiantes.partials._grid', compact('estudiantes'))->render()
+            ]);
+        }
+
         return view('panel.estudiantes.index', compact(
             'estudiantes',
             'estadisticas',
@@ -173,6 +181,7 @@ class EstudiantePanelController extends Controller
             'figuras',
             'grados'
         ));
+
     }
 
     public function verFicha(Estudiante $estudiante)

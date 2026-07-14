@@ -46,7 +46,7 @@
 
     @push('scripts')
     <script>
-        const URL_ESTUDIANTES = "{{ route('panel.estudiante.guardar') }}";
+        const URL_ESTUDIANTES = "{{ route('panel.estudiantes.guardar') }}";
         var tipoPost = 1; // 1: nuevo estudiante, 2: editar estudiante
         var pin = [];
         var tipoGuardaEstudiante = 2; // 1: administrador, 2: docente

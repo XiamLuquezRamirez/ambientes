@@ -198,12 +198,13 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::delete('perfil/foto', [PerfilController::class, 'eliminarFoto'])->name('panel.perfil.foto.eliminar');
 
     // Estudiantes
-    Route::post('estudiante-guardar', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiante.guardar');
     Route::get('estudiantes', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
+    Route::post('estudiantes', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiantes.guardar');
+    Route::get('estudiantes/{estudiante}', [EstudianteAdminController::class, 'ver'])->name('panel.estudiantes.show');
+    Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('panel.estudiantes.cargar-municipios');
+    Route::post('estudiantes/editar/{idEstudiante}', [EstudianteAdminController::class, 'actualizar'])->name('panel.estudiantes.update');
     Route::get('estudiantes/create', [EstudiantePanelController::class, 'formularioCrear'])->name('panel.estudiantes.create');
     Route::get('estudiantes/buscar', [EstudiantePanelController::class, 'buscarEstudiantes'])->name('panel.estudiantes.buscar');
-    Route::get('estudiantes/{estudiante}', [EstudiantePanelController::class, 'verFicha'])->name('panel.estudiantes.show');
-    Route::post('estudiantes', [EstudiantePanelController::class, 'guardar'])->name('panel.estudiantes.store');
     Route::get('estudiantes/{estudiante}/edit', [EstudiantePanelController::class, 'formularioEditar'])->name('panel.estudiantes.edit');
     Route::put('estudiantes/{estudiante}', [EstudiantePanelController::class, 'actualizar'])->name('panel.estudiantes.update');
     Route::get('estudiantes/{estudiante}/pin', [EstudiantePanelController::class, 'formularioPin'])->name('panel.estudiantes.pin');
