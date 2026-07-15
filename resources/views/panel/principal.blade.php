@@ -806,6 +806,87 @@
         .tabla-docentes tr:last-child td {
             border-bottom: none;
         }
+
+        .estudiante-asistencia {
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin: 18px 0;
+
+            padding: 14px 0;
+
+            border-top: 1px solid #EEF2F7;
+            border-bottom: 1px solid #EEF2F7;
+
+        }
+
+        .switch {
+
+            position: relative;
+
+            display: inline-block;
+
+            width: 52px;
+
+            height: 28px;
+
+        }
+
+        .switch input {
+
+            display: none;
+
+        }
+
+        .slider {
+
+            position: absolute;
+
+            inset: 0;
+
+            background: #CBD5E1;
+
+            border-radius: 30px;
+
+            transition: .25s;
+
+        }
+
+        .slider::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 22px;
+
+            height: 22px;
+
+            left: 3px;
+
+            top: 3px;
+
+            border-radius: 50%;
+
+            background: white;
+
+            transition: .25s;
+
+        }
+
+        .switch input:checked+.slider {
+
+            background: #10B981;
+
+        }
+
+        .switch input:checked+.slider::before {
+
+            transform: translateX(24px);
+
+        }
     </style>
 @endpush
 

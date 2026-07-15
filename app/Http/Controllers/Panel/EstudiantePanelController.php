@@ -156,7 +156,6 @@ class EstudiantePanelController extends Controller
         $estudiantes = $consulta->paginate(12)->withQueryString();
 
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
-        $ambiente = $cargas->first()?->ambiente;
         $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
@@ -242,6 +241,25 @@ class EstudiantePanelController extends Controller
             'mostrarVerPiar' => ! $estudiante->condicion_es_estandar,
             'asistenciaHoy' => $asistenciaHoy,
         ]);
+    }
+
+    public function tomarAsistencia(CargaDocente $carga)
+    {
+        $fecha = today();
+
+        $asistencia = Asistencia::where('carga_docente_id', $carga->id)
+            ->whereDate('fecha', $fecha)
+            ->get()
+            ->keyBy('estudiante_id');
+
+        $estudiantes = $carga->estudiantes->transform(function ($e) use ($asistencia) {
+            $registro = $asistencia->get($e->id);
+            $e->presente = $registro ? $registro->estado === 'presente' : true;
+
+            return $e;
+        });
+
+        return view('panel.sesion.index', compact('estudiantes', 'carga'));
     }
 
     public function registrarAsistenciaPuntual(Estudiante $estudiante)

@@ -34,10 +34,10 @@
                 @foreach ($grupos as $grupo)
                     @php
                         $cargasAsignadas = $grupo->cargasDocente->filter(fn($c) => $c->docente);
-                        $tieneAlumnos = $grupo->totalMatriculas($anio) > 0;
+                        $tieneAlumnos = $carga->total_estudiantes ?? 0;
                         $sinDocentes = $cargasAsignadas->isEmpty();
                         $claseFila = $tieneAlumnos && $sinDocentes ? 'fila-grupo-sin-docente' : '';
-                        $estudiantes = $grupo->totalMatriculas($anio);
+                        $estudiantes = $carga->total_estudiantes ?? 0;
                     @endphp
                     @if ($cargasAsignadas->isEmpty())
                         <tr class="{{ $claseFila }}" data-grupo-id="{{ $grupo->id }}"

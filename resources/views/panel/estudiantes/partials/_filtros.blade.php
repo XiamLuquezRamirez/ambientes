@@ -26,6 +26,16 @@
             @endforeach
         </select>
 
+        <select name="grado_id" id="filtroGrado" class="toolbar-select">
+            <option value="">Grado</option>
+            @foreach ($grados as $grado)
+                <option value="{{ $grado->id }}"
+                    {{ (string) ($filtros['grado_id'] ?? '') === (string) $grado->id ? 'selected' : '' }}>
+                    {{ $grado->nombre }}
+                </option>
+            @endforeach
+        </select>
+
         <select name="estado" id="filtroEstado" class="toolbar-select">
             <option value="">Estado</option>
             <option value="1" {{ ($filtros['estado'] ?? '') === '1' ? 'selected' : '' }}>Activos</option>

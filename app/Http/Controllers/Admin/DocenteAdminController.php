@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\CargaDocente;
 use App\Models\Docente;
+use App\Models\EstudianteAmbiente;
 use App\Models\Grado;
 use App\Models\Grupo;
 use App\Models\LoginLog;
@@ -99,7 +100,9 @@ class DocenteAdminController extends Controller
         $anio = (int) $request->get('anio', date('Y'));
         $gradoId = $request->get('grado_id');
 
-        $grados = Grado::activos()->orderBy('orden')->get();
+        $grados = Grado::activos()
+            ->orderBy('orden')
+            ->get();
 
         $grupos = $cargarGrupos
             ? Grupo::with([
@@ -107,7 +110,10 @@ class DocenteAdminController extends Controller
                 'cargasDocente' => function ($q) use ($anio) {
                     $q->where('activo', true)
                         ->where('anio_lectivo', $anio)
-                        ->with(['docente.user', 'ambiente']);
+                        ->with([
+                            'docente.user',
+                            'ambiente',
+                        ]);
                 },
             ])
                 ->delAnio($anio)
@@ -117,6 +123,43 @@ class DocenteAdminController extends Controller
                 ->get()
             : collect();
 
+        if ($cargarGrupos && $grupos->isNotEmpty()) {
+
+            $conteos = EstudianteAmbiente::query()
+                ->join('matriculas', function ($join) {
+                    $join->on('matriculas.estudiante_id', '=', 'estudiante_ambiente.estudiante_id')
+                        ->whereColumn('matriculas.anio_lectivo', 'estudiante_ambiente.anio_lectivo')
+                        ->where('matriculas.estado', 'activo');
+                })
+                ->where('estudiante_ambiente.estado', 'activo')
+                ->where('estudiante_ambiente.anio_lectivo', $anio)
+                ->selectRaw('
+                estudiante_ambiente.ambiente_id,
+                matriculas.grado_id,
+                matriculas.grupo_id,
+                COUNT(DISTINCT estudiante_ambiente.estudiante_id) as total
+            ')
+                ->groupBy(
+                    'estudiante_ambiente.ambiente_id',
+                    'matriculas.grado_id',
+                    'matriculas.grupo_id'
+                )
+                ->get()
+                ->keyBy(function ($item) {
+                    return "{$item->ambiente_id}-{$item->grado_id}-{$item->grupo_id}";
+                });
+
+            $grupos->each(function ($grupo) use ($conteos) {
+
+                $grupo->cargasDocente->each(function ($carga) use ($conteos) {
+
+                    $clave = "{$carga->ambiente_id}-{$carga->grado_id}-{$carga->grupo_id}";
+
+                    $carga->total_estudiantes = $conteos[$clave]->total ?? 0;
+                });
+            });
+        }
+
         // Lista para el selector al asignar docente desde una fila de grupo.
         $docentesActivos = Docente::where('estado', 'activo')
             ->with('user')
@@ -124,7 +167,13 @@ class DocenteAdminController extends Controller
             ->sortBy(fn ($docente) => trim($docente->user->nombre.' '.$docente->user->apellido))
             ->values();
 
-        return compact('grados', 'grupos', 'anio', 'gradoId', 'docentesActivos');
+        return compact(
+            'grados',
+            'grupos',
+            'anio',
+            'gradoId',
+            'docentesActivos'
+        );
     }
 
     /**
@@ -191,8 +240,6 @@ class DocenteAdminController extends Controller
                 ],
             ]);
         }
-
-        $ambientes = Ambiente::orderBy('nombre')->get();
 
     }
 
@@ -268,31 +315,27 @@ class DocenteAdminController extends Controller
     }
 
     /**
-     * Asigna un grupo activo y valido al docente para el año lectivo actual.
+     * Asigna un grupo activo y válido al docente para el año lectivo actual.
      *
-     * Valida integridad del grado/grupo y evita duplicados o conflictos por ambiente.
+     * Valida integridad del ambiente/grado/grupo y evita duplicados o conflictos.
      */
     public function asignarGrupo(Request $request, User $docente)
     {
         $anioActual = (int) date('Y');
-
         $datos = $request->validate([
             'ambiente_id' => 'required|exists:ambientes,id',
             'grado_id' => 'required|exists:grados,id',
             'grupo_id' => 'required|exists:grupos,id',
             'anio_lectivo' => "required|integer|in:{$anioActual}",
         ]);
+        $ambiente = Ambiente::find($datos['ambiente_id']);
+        $grado = Grado::find($datos['grado_id']);
+        $grupo = Grupo::find($datos['grupo_id']);
 
-        $grupo = Grupo::where('id', $datos['grupo_id'])
-            ->where('grado_id', $datos['grado_id'])
-            ->where('anio_lectivo', $anioActual)
-            ->where('activo', true)
-            ->first();
-
-        if (! $grupo) {
+        if (! $ambiente || ! $grado || ! $grupo) {
             return response()->json([
                 'success' => false,
-                'message' => 'El grupo seleccionado no pertenece al grado o al año lectivo actual.',
+                'message' => 'El ambiente, grado o grupo seleccionado no existe.',
             ], 422);
         }
 
@@ -304,6 +347,59 @@ class DocenteAdminController extends Controller
                 'message' => 'El usuario seleccionado no tiene perfil docente.',
             ], 422);
         }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Validaciones de integridad
+        |--------------------------------------------------------------------------
+        */
+
+        // El grupo debe pertenecer al grado.
+        if ($grupo->grado_id !== (int) $datos['grado_id']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El grupo seleccionado no pertenece al grado indicado.',
+            ], 422);
+        }
+
+        // El grado debe estar habilitado para el ambiente.
+        $gradoHabilitado = $ambiente->grados()
+            ->where('grados.id', $grado->id)
+            ->exists();
+
+        if (! $gradoHabilitado) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El grado seleccionado no está habilitado para este ambiente.',
+            ], 422);
+        }
+
+        // Debe existir al menos un estudiante en ese ambiente y matriculado en ese grado y grupo.
+        $hayEstudiantes = EstudianteAmbiente::query()
+            ->join('matriculas', function ($join) use ($datos, $anioActual) {
+                $join->on('matriculas.estudiante_id', '=', 'estudiante_ambiente.estudiante_id')
+                    ->where('matriculas.grado_id', $datos['grado_id'])
+                    ->where('matriculas.grupo_id', $datos['grupo_id'])
+                    ->where('matriculas.anio_lectivo', $anioActual)
+                    ->where('matriculas.estado', 'activo');
+            })
+            ->where('estudiante_ambiente.ambiente_id', $datos['ambiente_id'])
+            ->where('estudiante_ambiente.anio_lectivo', $anioActual)
+            ->where('estudiante_ambiente.estado', 'activo')
+            ->exists();
+
+        if (! $hayEstudiantes) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No existen estudiantes asignados a ese ambiente y matriculados en el grado y grupo seleccionados.',
+            ], 422);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Validaciones de negocio
+        |--------------------------------------------------------------------------
+        */
 
         $duplicada = CargaDocente::where('docente_id', $perfilDocente->id)
             ->where('ambiente_id', $datos['ambiente_id'])
@@ -333,18 +429,27 @@ class DocenteAdminController extends Controller
             ], 422);
         }
 
+        /*
+        |--------------------------------------------------------------------------
+        | Asignación
+        |--------------------------------------------------------------------------
+        */
+
         $carga = DB::transaction(function () use ($perfilDocente, $datos, $anioActual) {
-            // carga_docente reemplaza a la tabla antigua docente_grupo y es lo que lee el panel docente.
+
             $carga = CargaDocente::withoutEvents(function () use ($perfilDocente, $datos, $anioActual) {
+
                 return CargaDocente::updateOrCreate(
                     [
                         'docente_id' => $perfilDocente->id,
-                        'ambiente_id' => (int) $datos['ambiente_id'],
-                        'grado_id' => (int) $datos['grado_id'],
-                        'grupo_id' => (int) $datos['grupo_id'],
+                        'ambiente_id' => $datos['ambiente_id'],
+                        'grado_id' => $datos['grado_id'],
+                        'grupo_id' => $datos['grupo_id'],
                         'anio_lectivo' => $anioActual,
                     ],
-                    ['activo' => true]
+                    [
+                        'activo' => true,
+                    ]
                 );
             });
 
@@ -353,7 +458,11 @@ class DocenteAdminController extends Controller
             return $carga;
         });
 
-        $perfilDocente->load('cargasActivas.ambiente', 'cargasActivas.grado', 'cargasActivas.grupo');
+        $perfilDocente->load(
+            'cargasActivas.ambiente',
+            'cargasActivas.grado',
+            'cargasActivas.grupo'
+        );
 
         return response()->json([
             'success' => true,
