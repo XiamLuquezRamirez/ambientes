@@ -1,5 +1,5 @@
 @if ($rol !== 'admin')
-{{--
+    {{--
     Pestaña Información personal (solo docente).
 
     Los campos editables (teléfono, dirección, especialidad, descripción) tienen IDs
@@ -92,6 +92,7 @@
                                 <th>Grado</th>
                                 <th>Grupo</th>
                                 <th>Horas</th>
+                                <th style="text-align:center">Estudiantes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -101,6 +102,7 @@
                                     <td>{{ $carga['grado'] }}</td>
                                     <td>{{ $carga['grupo'] }}</td>
                                     <td>{{ $carga['horas'] }}</td>
+                                    <td style="text-align:center">{{ $carga['estudiantes'] ?? 0 }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
