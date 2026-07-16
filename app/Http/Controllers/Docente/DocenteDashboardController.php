@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Docente;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\CargaDocente;
+use App\Models\Condicion;
 use App\Services\Docente\GrupoEstadisticasService;
 use Illuminate\Support\Facades\Auth;
 
@@ -50,9 +51,12 @@ class DocenteDashboardController extends Controller
             $ambienteSeleccionado = $ambientes->first();
         }
 
+        $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+
         return view('panel.principal', compact(
             'ambientes',
-            'ambienteSeleccionado'
+            'ambienteSeleccionado',
+            'condiciones'
         ));
     }
 

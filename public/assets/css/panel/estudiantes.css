@@ -363,8 +363,8 @@
 }
 
 .stu-badge--condicion {
-    background: #DCFCE7;
-    color: #166534;
+    background: #BBF7D0;
+    color: #15803D;
 }
 
 .stu-badge--activo {
@@ -378,8 +378,18 @@
 }
 
 .stu-badge--piar {
-    background: #FFEDD5;
-    color: #C2410C;
+    background: #BBF7D0;
+    color: #15803D;
+}
+
+.stu-badge--piar-incompleto {
+    background: #fec8b5;
+    color: #c9631f;
+}
+
+.stu-badge--piar-sin {
+    background: #fecaca;
+    color: #eb0b0b;
 }
 
 .stu-badge--apoyo {
@@ -888,6 +898,7 @@
 }
 
 @media (max-width: 992px) {
+
     .ficha-grid,
     .ficha-activity {
         grid-template-columns: 1fr;
@@ -903,4 +914,10 @@
     .ficha-actions .btn {
         width: 100%;
     }
+}
+
+.loading {
+    opacity: .5;
+    pointer-events: none;
+    transition: .2s;
 }

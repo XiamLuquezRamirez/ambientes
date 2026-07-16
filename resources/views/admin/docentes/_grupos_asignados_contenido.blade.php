@@ -34,28 +34,31 @@
                 @foreach ($grupos as $grupo)
                     @php
                         $cargasAsignadas = $grupo->cargasDocente->filter(fn($c) => $c->docente);
-                        $tieneAlumnos = $grupo->totalMatriculas($anio) > 0;
                         $sinDocentes = $cargasAsignadas->isEmpty();
-                        $claseFila = $tieneAlumnos && $sinDocentes ? 'fila-grupo-sin-docente' : '';
-                        $estudiantes = $grupo->totalMatriculas($anio);
+                        $estudiantesSinDocente = $grupo->totalMatriculas($anio);
+                        $claseFilaSinDocente =
+                            $estudiantesSinDocente > 0 && $sinDocentes ? 'fila-grupo-sin-docente' : '';
                     @endphp
                     @if ($cargasAsignadas->isEmpty())
-                        <tr class="{{ $claseFila }}" data-grupo-id="{{ $grupo->id }}"
+                        <tr class="{{ $claseFilaSinDocente }}" data-grupo-id="{{ $grupo->id }}"
                             id="fila-grupo-{{ $grupo->id }}" {{-- se muestra un tooltip con el mensaje de grupo con estudiantes matriculados sin docente asignado --}}
-                            @if ($tieneAlumnos && $sinDocentes) title="Grupo con estudiantes matriculados sin docente asignado" @endif>
+                            @if ($estudiantesSinDocente && $sinDocentes) title="Grupo con estudiantes matriculados sin docente asignado" @endif>
                             <td><span class="text-muted">—</span></td>
                             <td>{{ $grupo->grado->nombre }}</td>
                             <td>{{ $grupo->nombre }}</td>
                             <td class="celda-docentes-grupo">
                                 <span class="text-muted">Sin docentes asignados</span>
                             </td>
-                            <td class="celda-estudiantes-grupo">{{ $estudiantes }}</td>
+                            <td class="celda-estudiantes-grupo">{{ $estudiantesSinDocente }}</td>
                         </tr>
                     @else
                         @foreach ($cargasAsignadas as $index => $carga)
-                            <tr class="{{ $claseFila }}" data-grupo-id="{{ $grupo->id }}"
-                                @if ($index === 0) id="fila-grupo-{{ $grupo->id }}" @endif
-                                @if ($tieneAlumnos && $sinDocentes) title="Grupo con estudiantes matriculados sin docente asignado" @endif>
+                            @php
+                                $estudiantes = $carga->total_estudiantes ?? 0;
+                            @endphp
+                            <tr class="{{ $estudiantes > 0 && $sinDocentes ? 'fila-grupo-sin-docente' : '' }}"
+                                data-grupo-id="{{ $grupo->id }}"
+                                @if ($index === 0) id="fila-grupo-{{ $grupo->id }}" @endif>
                                 <td>{{ $carga->ambiente?->nombre ?? '—' }}</td>
                                 <td>{{ $grupo->grado->nombre }}</td>
                                 <td>{{ $grupo->nombre }}</td>

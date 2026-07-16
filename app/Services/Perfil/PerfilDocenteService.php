@@ -2,6 +2,7 @@
 
 namespace App\Services\Perfil;
 
+use App\Models\CargaDocente;
 use App\Models\Observacion;
 use App\Models\User;
 use App\Services\ActividadAdminService;
@@ -58,11 +59,8 @@ class PerfilDocenteService
     private function estadisticas(User $usuario): array
     {
         $cargas = $usuario->docente?->cargasActivas ?? collect();
-        $estudiantes = $cargas
-            ->pluck('ambiente.estudiantes')
-            ->flatten()
-            ->unique('id')
-            ->count();
+        CargaDocente::asignarConteoEstudiantes($cargas, (int) date('Y'));
+        $estudiantes = CargaDocente::obtenerIdsEstudiantesDeCargas($cargas, (int) date('Y'))->count();
         $planeaciones = Observacion::where('user_id', $usuario->id)
             ->whereYear('created_at', date('Y'))
             ->count();
@@ -126,12 +124,16 @@ class PerfilDocenteService
     /** Cargas docentes activas para la pestaña de información personal. */
     private function cargas(User $usuario): array
     {
-        return ($usuario->docente?->cargasActivas ?? collect())
+        $cargas = $usuario->docente?->cargasActivas ?? collect();
+        CargaDocente::asignarConteoEstudiantes($cargas, (int) date('Y'));
+
+        return $cargas
             ->map(fn ($carga) => [
                 'ambiente' => $carga->ambiente?->nombre ?? '—',
                 'grado' => $carga->grado?->nombre ?? '—',
                 'grupo' => $carga->grupo?->nombre ?? '—',
                 'horas' => $carga->horas ?? 0,
+                'estudiantes' => $carga->total_estudiantes ?? 0,
             ])
             ->values()
             ->all();

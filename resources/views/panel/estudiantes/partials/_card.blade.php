@@ -1,6 +1,5 @@
 @php
     $condicionNombre = $e->condicion?->nombre ?? 'Estándar';
-    $tienePiar = $e->piar !== null;
     $requiereApoyo = in_array(strtolower((string) $e->requiere_apoyo), ['si', 'sí', '1', 'true'], true);
     $docLabel = trim(($e->tipo_identificacion ? $e->tipo_identificacion . ' ' : 'Doc. ') . ($e->identificacion ?? '—'));
 @endphp
@@ -32,8 +31,12 @@
             {{ $e->estado_texto }}
         </span>
 
-        @if ($tienePiar)
+        @if ($e->piar !== null && $e->piar->paso == '8')
             <span class="stu-badge stu-badge--piar">PIAR Activo</span>
+        @elseif ($e->piar !== null && $e->piar->paso < '8')
+            <span class="stu-badge stu-badge--piar-incompleto">PIAR Incompleto</span>
+        @elseif ($e->piar == null && $requiereApoyo)
+            <span class="stu-badge stu-badge--piar-sin">Sin PIAR</span>
         @endif
 
         @if ($requiereApoyo)

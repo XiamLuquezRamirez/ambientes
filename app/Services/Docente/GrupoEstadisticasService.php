@@ -44,12 +44,15 @@ class GrupoEstadisticasService
             $estado = strtoupper($matricula->estado ?? 'activo') === 'ACTIVO' ? 'Activo' : 'Inactivo';
             $estadoPiar = $condicionEstandar || $tienePiar ? 'No aplica' : 'Pendiente';
             $requiereAtencionPiar = ! $condicionEstandar && ! $tienePiar;
+            [$condicionId, $condicionNombre] = $this->resolverCondicionDatos($estudiante);
 
             return [
                 'id' => $estudiante->id,
                 'nombre' => $estudiante->nombre,
                 'iniciales' => $estudiante->iniciales ?? strtoupper(substr($estudiante->nombre ?? 'E', 0, 2)),
                 'condicion' => $this->resolverClaveCondicion($estudiante),
+                'condicion_id' => $condicionId,
+                'condicion_nombre' => $condicionNombre,
                 'estado' => $estado,
                 'tiene_pin' => $tienePin,
                 'estado_piar' => $estadoPiar,
@@ -74,26 +77,35 @@ class GrupoEstadisticasService
      */
     public function resolverClaveCondicion($estudiante): string
     {
+        [$condicionId, $condicionNombre] = $this->resolverCondicionDatos($estudiante);
+
+        return $this->normalizarNombreCondicion($condicionNombre, $condicionId);
+    }
+
+    /**
+     * @return array{0: ?int, 1: string}
+     */
+    public function resolverCondicionDatos($estudiante): array
+    {
         $condicion = $estudiante->condicion ?? null;
 
-        // Relación Condicion (u objeto con nombre/id) — no usar el string del atributo legado.
         if (is_object($condicion) && isset($condicion->nombre)) {
-            return $this->normalizarNombreCondicion(
-                $condicion->nombre,
-                isset($condicion->id) ? (int) $condicion->id : null
-            );
+            return [
+                isset($condicion->id) ? (int) $condicion->id : ($estudiante->condicion_id ?? null),
+                (string) $condicion->nombre,
+            ];
         }
 
         if (is_string($condicion) && $condicion !== '') {
-            return $this->normalizarNombreCondicion($condicion);
+            return [
+                isset($estudiante->condicion_id) ? (int) $estudiante->condicion_id : null,
+                $condicion,
+            ];
         }
 
-        $condicionId = $estudiante->condicion_id ?? null;
-        if ($condicionId !== null) {
-            return $this->normalizarNombreCondicion(null, (int) $condicionId);
-        }
+        $condicionId = isset($estudiante->condicion_id) ? (int) $estudiante->condicion_id : null;
 
-        return 'estandar';
+        return [$condicionId, $condicionId === 1 || $condicionId === null ? 'Estandar' : ''];
     }
 
     private function normalizarNombreCondicion(?string $nombre, ?int $condicionId = null): string

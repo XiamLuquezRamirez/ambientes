@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
-use App\Models\CargaDocente;
 use App\Models\Docente;
 use App\Models\Grado;
 use App\Models\Grupo;
-use App\Models\SyncQueue;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class GruposController extends Controller
 {
@@ -134,126 +131,6 @@ class GruposController extends Controller
         ]);
 
         return response()->json(['ok' => true]);
-    }
-
-    /**
-     * Asigna un docente a un grupo específico y encola la sincronización remota.
-     *
-     * Valida que el grupo pertenezca al grado/año actual y evita conflictos ya asignados.
-     */
-    public function asignarDocente(Request $request, Grupo $grupo)
-    {
-        $anioActual = (int) date('Y');
-
-        $datos = $request->validate([
-            'docente_id' => 'required|exists:docentes,id',
-            'ambiente_id' => 'required|exists:ambientes,id',
-            'grado_id' => 'required|exists:grados,id',
-            'grupo_id' => 'required|exists:grupos,id',
-            'anio_lectivo' => "required|integer|in:{$anioActual}",
-        ]);
-
-        if ($datos['grupo_id'] !== $grupo->id) {
-            return response()->json(['success' => false, 'message' => 'El grupo seleccionado no coincide.'], 422);
-        }
-
-        $grupoValid = Grupo::where('id', $datos['grupo_id'])
-            ->where('grado_id', $datos['grado_id'])
-            ->where('anio_lectivo', $anioActual)
-            ->where('activo', true)
-            ->first();
-
-        if (! $grupoValid) {
-            return response()->json(['success' => false, 'message' => 'El grupo no pertenece al grado o al año actual.'], 422);
-        }
-
-        $docente = Docente::find($datos['docente_id']);
-        if (! $docente) {
-            return response()->json(['success' => false, 'message' => 'Docente no encontrado.'], 422);
-        }
-
-        $duplicada = CargaDocente::where('docente_id', $docente->id)
-            ->where('ambiente_id', $datos['ambiente_id'])
-            ->where('grado_id', $datos['grado_id'])
-            ->where('grupo_id', $datos['grupo_id'])
-            ->where('anio_lectivo', $anioActual)
-            ->where('activo', true)
-            ->exists();
-
-        if ($duplicada) {
-            return response()->json(['success' => false, 'message' => 'Ese docente ya tiene asignado ese grupo en el ambiente y año actual.'], 422);
-        }
-
-        $ocupadoEnAmbiente = CargaDocente::where('ambiente_id', $datos['ambiente_id'])
-            ->where('grupo_id', $datos['grupo_id'])
-            ->where('anio_lectivo', $anioActual)
-            ->where('activo', true)
-            ->exists();
-
-        if ($ocupadoEnAmbiente) {
-            return response()->json(['success' => false, 'message' => 'Ese grupo ya tiene un docente asignado en este ambiente para el año lectivo actual.'], 422);
-        }
-
-        $carga = DB::transaction(function () use ($docente, $datos, $anioActual) {
-            $carga = CargaDocente::withoutEvents(function () use ($docente, $datos, $anioActual) {
-                return CargaDocente::updateOrCreate(
-                    [
-                        'docente_id' => $docente->id,
-                        'ambiente_id' => (int) $datos['ambiente_id'],
-                        'grado_id' => (int) $datos['grado_id'],
-                        'grupo_id' => (int) $datos['grupo_id'],
-                        'anio_lectivo' => $anioActual,
-                    ],
-                    ['activo' => true]
-                );
-            });
-
-            $this->encolarAsignacionParaServidores($carga);
-
-            return $carga;
-        });
-
-        // Devolver datos actualizados del grupo para refrescar la fila en el modal sin recargar la página.
-        $grupo->refresh();
-        $grupo->load([
-            'grado',
-            'cargasDocente' => function ($q) use ($anioActual) {
-                $q->where('activo', true)
-                    ->where('anio_lectivo', $anioActual)
-                    ->with(['docente.user', 'ambiente']);
-            },
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Docente asignado correctamente.',
-            'data' => $grupo->datosParaModalDocentesAsignados($anioActual),
-        ]);
-    }
-
-    /**
-     * Encola la asignación docente para sincronizarla con otros servidores.
-     *
-     * Crea un registro por servidor destino con el payload completo.
-     */
-    private function encolarAsignacionParaServidores(CargaDocente $carga): void
-    {
-        $servidores = array_keys(config('red.servidores', []));
-        $origen = config('red.servidor_actual') ?: config('ambiente.slug', 'admin');
-
-        foreach ($servidores as $servidorDestino) {
-            SyncQueue::create([
-                'entidad' => 'CargaDocente',
-                'entidad_id' => $carga->id,
-                'accion' => 'create',
-                'servidor_origen' => $origen,
-                'payload' => [
-                    ...$carga->fresh()->toArray(),
-                    'servidor_destino' => $servidorDestino,
-                ],
-                'estado' => 'pendiente',
-            ]);
-        }
     }
 
     /**

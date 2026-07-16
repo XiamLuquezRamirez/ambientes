@@ -10,27 +10,30 @@
     @php
         $condicionNombre = $estudiante->condicion_nombre;
         $estadoPin = $estadoPin ?? $estudiante->estado_pin;
-        $estadoPinLabel = $estadoPinLabel ?? [
-            'sin_configurar' => 'Sin configurar',
-            'configurado' => 'Configurado',
-            'bloqueado' => 'Bloqueado',
-        ][$estadoPin];
+        $estadoPinLabel =
+            $estadoPinLabel ??
+            [
+                'sin_configurar' => 'Sin configurar',
+                'configurado' => 'Configurado',
+                'bloqueado' => 'Bloqueado',
+            ][$estadoPin];
         $tiposPortafolio = [
             'foto' => 'Foto',
             'audio' => 'Audio',
             'emocion' => 'Emoción',
             'resultado' => 'Resultado',
         ];
-        $pinClase = [
-            'sin_configurar' => 'ficha-pill--warn',
-            'configurado' => 'ficha-pill--ok',
-            'bloqueado' => 'ficha-pill--danger',
-        ][$estadoPin] ?? 'ficha-pill--warn';
+        $pinClase =
+            [
+                'sin_configurar' => 'ficha-pill--warn',
+                'configurado' => 'ficha-pill--ok',
+                'bloqueado' => 'ficha-pill--danger',
+            ][$estadoPin] ?? 'ficha-pill--warn';
         $matricula = $matricula ?? $estudiante->matriculaActiva;
         $ambiente = $ambiente ?? null;
         $portafolioReciente = $portafolioReciente ?? collect();
         $observacionesRecientes = $observacionesRecientes ?? collect();
-        $mostrarVerPiar = $mostrarVerPiar ?? ! $estudiante->condicion_es_estandar;
+        $mostrarVerPiar = $mostrarVerPiar ?? !$estudiante->condicion_es_estandar;
         $asistenciaHoy = $asistenciaHoy ?? null;
     @endphp
 
@@ -40,8 +43,8 @@
                 <h1>{{ $estudiante->nombre_completo }}</h1>
                 <p class="ficha-subtitle">Ficha completa del estudiante</p>
             </div>
-            <a href="{{ route('panel.estudiantes') }}" class="btn btn-outline-secondary">
-                <i class="fa-solid fa-arrow-left"></i> Volver a estudiantes
+            <a href="#" onclick="history.back()" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left"></i> Volver
             </a>
         </div>
 

@@ -136,7 +136,37 @@ class GrupoEstadisticasServiceTest extends TestCase
         $this->assertTrue($resultado[0]['tiene_pin']);
         $this->assertSame('No aplica', $resultado[0]['estado_piar']);
         $this->assertFalse($resultado[0]['requiere_atencion_piar']);
+        $this->assertSame('estandar', $resultado[0]['condicion']);
+        $this->assertSame('estandar', $resultado[0]['condicion_nombre']);
         $this->assertSame('Pendiente', $resultado[1]['estado_piar']);
         $this->assertTrue($resultado[1]['requiere_atencion_piar']);
+        $this->assertSame('tea', $resultado[1]['condicion']);
+        $this->assertSame('tea', $resultado[1]['condicion_nombre']);
+    }
+
+    public function test_listar_incluye_condicion_id_y_nombre_desde_relacion(): void
+    {
+        $service = new GrupoEstadisticasService;
+        $condicionTea = (object) ['id' => 3, 'nombre' => 'TEA'];
+
+        $matriculas = collect([
+            (object) [
+                'estado' => 'activo',
+                'estudiante' => (object) [
+                    'id' => 9,
+                    'nombre' => 'Camila Díaz',
+                    'condicion' => $condicionTea,
+                    'condicion_id' => 3,
+                    'configuracionPin' => null,
+                    'piar' => null,
+                ],
+            ],
+        ]);
+
+        $resultado = $service->listarEstudiantes($matriculas);
+
+        $this->assertSame(3, $resultado[0]['condicion_id']);
+        $this->assertSame('TEA', $resultado[0]['condicion_nombre']);
+        $this->assertSame('tea', $resultado[0]['condicion']);
     }
 }
