@@ -16,6 +16,7 @@ use App\Models\SyncQueue;
 use App\Services\Docente\DocenteAsignacionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Ambiente;
 
 class EstudiantePanelController extends Controller
 {
@@ -60,19 +61,18 @@ class EstudiantePanelController extends Controller
 
         /* obtener grados de docente logueado */
         $carga = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
-            ->where('activo', true)
-            ->where('anio_lectivo', date('Y'))
-            ->with(['ambiente'])
-            ->get();
+        ->where('activo', true)
+        ->where('anio_lectivo', date('Y'))
+        ->with(['grado'])
+        ->get();
 
         $departamentos = Departamento::orderBy('descripcion')->get();
 
-        $ambientes = $carga->pluck('ambiente')
-            ->filter()
-            ->unique('id')
-            ->values();
+        $grados = $carga->pluck('grado')
+        ->filter()
+        ->unique('id')
+        ->values();
 
-        $grados = [];
 
         $cargas = CargaDocente::where('docente_id', $docente->id)
             ->where('activo', true)
@@ -175,7 +175,6 @@ class EstudiantePanelController extends Controller
             'condiciones',
             'filtros',
             'vista',
-            'ambientes',
             'departamentos',
             'figuras',
             'grados'
@@ -445,31 +444,44 @@ class EstudiantePanelController extends Controller
         return back()->with('info', 'Pendiente de implementacion.');
     }
 
-    public function obtenerGradosPorAmbiente($idAmbiente)
-    {
-        $gradoIds = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
-            ->where('anio_lectivo', date('Y'))
-            ->where('ambiente_id', $idAmbiente)
-            ->pluck('grado_id');
-
-        $grados = Grado::whereIn('id', $gradoIds)->get();
-
-        return response()->json([
-            'data' => $grados,
-        ]);
-    }
 
     public function obtenerGruposPorGrado($idGrado)
     {
         $grupoIds = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
             ->where('anio_lectivo', date('Y'))
             ->where('grado_id', $idGrado)
-            ->pluck('grupo_id');
-
+            ->select('grupo_id')->get();
+    
         $grupos = Grupo::whereIn('id', $grupoIds)->get();
 
         return response()->json([
             'data' => $grupos,
+        ]);
+    }
+
+    public function obtenerAmbientesDisponibles($grado, $grupo)
+    {
+        $idAmbientes = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
+        ->where('anio_lectivo', date('Y'))
+        ->where('grado_id', $grado)
+        ->where('grupo_id', $grupo)
+        ->select('ambiente_id')
+        ->get();
+
+        $ambientes = Ambiente::whereIn('id', $idAmbientes)->get();
+
+        // obtener cantidad de estudiantes matriculados en el grupo
+        $ocupados = Matricula::where('grupo_id', $grupo)
+        ->where('anio_lectivo', date('Y'))
+        ->where('estado', 'activo')
+        ->count();
+
+        $cupoMaximo = Grupo::find($grupo)?->cupo_maximo;
+        $disponible = $cupoMaximo ? $cupoMaximo - $ocupados : 0;
+
+        return response()->json([
+            'disponible' => $disponible,
+            'ambientes' => $ambientes,
         ]);
     }
 }

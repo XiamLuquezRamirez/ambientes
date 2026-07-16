@@ -1,3 +1,96 @@
+@push('styles')
+    <style>
+        .content-ambientes-disponibles {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #e2e8f0;
+            margin: 10px;
+            margin-bottom: 20px;
+        }
+
+        .item-ambiente {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-top: 3px solid;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .item-ambiente-inactivo {
+            background-color:rgb(139, 139, 139) !important;
+            border-color:rgb(41, 41, 41) !important;
+            pointer-events: none !important;
+            opacity: 0.8 !important;
+            cursor: not-allowed !important;
+        }
+
+        .item-ambiente:hover {
+           background-color:rgb(187, 221, 255);
+           cursor: pointer;
+           transform: scale(1.05);
+        }
+
+        .item-ambiente-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        .bs-gris {
+            background-color: #6c757d;
+            color: #212529;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            padding: 5px 10px !important;
+            border: 1px solid #212529;
+        }
+
+        .bs-amarillo {
+            background-color: #ffc107;
+            color: #7a5c08;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            padding: 5px 10px !important;
+            border: 1px solid #7a5c08;
+        }
+
+        .bs-verde {
+            background-color: #28a745;
+            color: #144e21;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            padding: 5px 10px !important;
+            border: 1px solid #144e21;
+        }
+
+        .item-ambiente-seleccionado {
+            background-color: #28a745;
+            color:rgb(255, 255, 255);
+            border-color: #144e21 !important;
+        }
+
+        .item-ambiente-seleccionado:hover {
+            background-color: #28a745 !important;
+            color:rgb(255, 255, 255) !important;
+            border-color: #144e21 !important;
+        }
+
+        .item-ambiente-seleccionado label {
+            color:rgb(255, 255, 255) !important;
+        }
+
+        .content-ambientes-disponibles.is-invalid {
+            border: 1px solid #dc3545 !important;
+        }
+    </style>
+@endpush
 <div class="modal fade" id="modalRegistro" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
     aria-labelledby="modalRegistroLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -21,11 +114,11 @@
                             <a class="nav-link active" data-bs-toggle="tab" href="#datos-personales"><i
                                     class="fas fa-user"></i> Datos Personales</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" id="tab-atencion">
                             <a class="nav-link" data-bs-toggle="tab" href="#datos-atencion"><i class="fas fa-cog"></i>
                                 Ajuste en Proceso de Aprendizaje</a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item" id="tab-pin">
                             <a class="nav-link" data-bs-toggle="tab" href="#configuracion_pin"><i
                                     class="fas fa-key"></i> Configuración de PIN</a>
                         </li>
@@ -87,35 +180,34 @@
                                 <div class="col-md-12" id="ambiente-grado-grupo-container-docente"
                                     style="display: none;">
                                     <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label for="ambiente_id_nuevo">Ambiente</label>
-                                                <select name="ambiente_id_nuevo" id="ambiente_id_nuevo"
-                                                    class="form-control">
-                                                    <option value="">Seleccione</option>
-                                                    @foreach ($ambientes as $a)
-                                                        <option value="{{ $a->id }}">{{ $a->nombre }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="grado_id_nuevo_docente">Grado</label>
                                                 <select name="grado_id_nuevo_docente" id="grado_id_nuevo_docente"
                                                     class="form-control">
                                                     <option value="">Seleccione</option>
+                                                    @foreach ($grados as $g)
+                                                        <option value="{{ $g->id }}">{{ $g->nombre }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="grupo_id_nuevo">Grupo</label>
                                                 <select name="grupo_id_nuevo" id="grupo_id_nuevo"
                                                     class="form-control">
                                                     <option value="">Seleccione</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 content-ambientes-disponibles" name="ambientes_ids">
+                                            <div class="form-group">
+                                                <label for="ambientes_disponibles">Ambientes disponibles para el grado y grupo seleccionado</label>
+                                                <p class="text-muted small">por favor seleccione uno o varios ambientes</label>
+                                                <div id="contenedor-ambientes-disponibles" style="position: relative;" class="row">
+                                                    <div class="col-md-12 p-4 text-center"><h4 class="text-center">No hay ambientes disponibles</h4></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

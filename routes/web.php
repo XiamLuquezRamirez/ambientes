@@ -208,6 +208,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::post('estudiantes/editar/{idEstudiante}', [EstudianteAdminController::class, 'actualizar'])->name('panel.estudiantes.update');
     Route::get('estudiantes/create', [EstudiantePanelController::class, 'formularioCrear'])->name('panel.estudiantes.create');
     Route::get('estudiantes/buscar', [EstudiantePanelController::class, 'buscarEstudiantes'])->name('panel.estudiantes.buscar');
+    // Verificar cupos de grupo
     // Ficha completa HU seguimiento: verFicha → show.blade.php
     Route::get('estudiantes/ficha/{estudiante}', [EstudiantePanelController::class, 'verFicha'])->name('panel.estudiantes.show');
     Route::post('estudiantes/{estudiante}/asistencia-puntual', [EstudiantePanelController::class, 'registrarAsistenciaPuntual'])
@@ -242,8 +243,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
 
     // Grados por ambiente
-    Route::get('grados/ambiente/docente/{idAmbiente}', [EstudiantePanelController::class, 'obtenerGradosPorAmbiente'])->name('panel.grados.ambiente.docente');
     Route::get('grupos/grados/docente/{idGrado}', [EstudiantePanelController::class, 'obtenerGruposPorGrado'])->name('panel.grupos.grados.docente');
+    Route::get('grupos/ambientes-disponibles/{grado}/{grupo}', [EstudiantePanelController::class, 'obtenerAmbientesDisponibles'])->name('panel.estudiantes.ambientes-disponibles');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

@@ -13,6 +13,9 @@ use App\Models\Municipio;
 use Illuminate\Support\Facades\DB;
 use App\Models\Ambiente;
 use App\Models\Grupo;
+use App\Models\Matricula;
+use App\Models\EstudianteAmbiente;
+
 class EstudianteAdminController extends Controller
 {
     public function listar(Request $request)
@@ -53,7 +56,6 @@ class EstudianteAdminController extends Controller
         ];
 
         $grados = Grado::where('activo', true)->orderBy('nombre')->get();
-        $ambientes = Ambiente::where('activo', true)->orderBy('nombre')->get();
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
         $consulta = Estudiante::with('grado')->where('activo', '<>', 2);
         $departamentos = Departamento::orderBy('descripcion')->get();
@@ -90,7 +92,7 @@ class EstudianteAdminController extends Controller
             ]);
         }
 
-        return view('admin.estudiantes.index', compact('grados', 'condiciones', 'estudiantes', 'figuras', 'departamentos', 'ambientes'));
+        return view('admin.estudiantes.index', compact('grados', 'condiciones', 'estudiantes', 'figuras', 'departamentos'));
     }
 
     public function cargarMunicipios($departamento)
@@ -129,9 +131,9 @@ class EstudianteAdminController extends Controller
             'telefono' => 'nullable',
             'email' => 'nullable',
             'tipo_guarda' => 'required|in:1,2',
-            'ambiente_id_nuevo' => 'required_if:tipo_guarda,2|nullable',
-            'grado_id_nuevo_docente' => 'required_if:tipo_guarda,2|nullable',
-            'grupo_id_nuevo' => 'required_if:tipo_guarda,2|nullable',
+            'ambientes_ids' => 'required_if:tipo_guarda,2|array|min:1',
+            'grado_id_nuevo_docente' => 'required_if:tipo_guarda,2',
+            'grupo_id_nuevo' => 'required_if:tipo_guarda,2',
         ]);
 
         if ($request->hasFile('avatar')) {
@@ -141,10 +143,16 @@ class EstudianteAdminController extends Controller
         }
 
         //primera letra del nombre y apellido
+        // Primera letra del nombre y apellido de forma segura con UTF-8
         $inicial_nombre = explode(' ', $datos['nombre']);
         $inicial_apellido = explode(' ', $datos['apellido']);
-        $iniciales = $inicial_nombre[0][0] . $inicial_apellido[0][0];
-        $iniciales = strtoupper($iniciales);
+
+        // mb_substr(texto, inicio, longitud) extrae la letra completa de forma segura
+        $primera_letra_nombre = mb_substr($inicial_nombre[0], 0, 1, 'UTF-8');
+        $primera_letra_apellido = mb_substr($inicial_apellido[0], 0, 1, 'UTF-8');
+
+        $iniciales = $primera_letra_nombre . $primera_letra_apellido;
+        $iniciales = mb_strtoupper($iniciales, 'UTF-8');
 
         try {
             $estudiante = DB::transaction(function () use ($datos, $avatar, $iniciales) {
@@ -188,7 +196,30 @@ class EstudianteAdminController extends Controller
                     'figura_3' => $datos['configuracion_pin'][2]['icon'],
                     'color_figura_3' => $datos['configuracion_pin'][2]['color'],
                 ]);
-        
+
+
+                //SI ES TIPO GUARDA 2, CREAR MATRICULA
+                if ($datos['tipo_guarda'] == 2) {
+                    Matricula::create([
+                        'estudiante_id' => $estudiante->id,
+                        'grado_id' => $datos['grado_id_nuevo_docente'],
+                        'grupo_id' => $datos['grupo_id_nuevo'],
+                        'anio_lectivo' => date('Y'),
+                        'estado' => 'activo',
+                        'fecha_ingreso' => date('Y-m-d'),
+                    ]);
+
+                    foreach ($datos['ambientes_ids'] as $ambiente_id) {
+                        EstudianteAmbiente::create([
+                            'estudiante_id' => $estudiante->id,
+                            'ambiente_id' => $ambiente_id,
+                            'anio_lectivo' => date('Y'),
+                            'estado' => 'activo',
+                            'observacion' => 'Matricula inicial',
+                        ]);
+                    }
+                }
+
                 return $estudiante;
             });
         
@@ -209,7 +240,8 @@ class EstudianteAdminController extends Controller
 
     public function ver($estudianteId)
     {
-        $estudiante = Estudiante::with('configuracionPin')->where('id', $estudianteId)->first();
+        $estudiante = Estudiante::with('configuracionPin', 'matricula')->where('id', $estudianteId)->first();
+        
         if ($estudiante) {
             return response()->json([
                 'success' => true,
