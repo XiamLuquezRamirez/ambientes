@@ -6,6 +6,11 @@
 @extends('layouts.panel')
 @section('title', 'Ficha del estudiante')
 
+@php
+    $condicionNombre = $estudiante->condicion?->nombre ?? 'Estándar';
+    $requiereApoyo = in_array(strtolower((string) $estudiante->requiere_apoyo), ['si', 'sí', '1', 'true'], true);
+@endphp
+
 @section('content')
     @php
         $condicionNombre = $estudiante->condicion_nombre;
@@ -43,7 +48,7 @@
                 <h1>{{ $estudiante->nombre_completo }}</h1>
                 <p class="ficha-subtitle">Ficha completa del estudiante</p>
             </div>
-            <a href="#" onclick="history.back()" class="btn btn-outline-secondary">
+            <a href="#" onclick="history.back()" class="btn btn-outline-secondary mt-3">
                 <i class="fa-solid fa-arrow-left"></i> Volver
             </a>
         </div>
@@ -82,10 +87,16 @@
                         <span class="stu-badge {{ $estudiante->activo ? 'stu-badge--activo' : 'stu-badge--inactivo' }}">
                             {{ $estudiante->estado_texto }}
                         </span>
-                        @if ($estudiante->piar)
-                            <span class="stu-badge stu-badge--piar">PIAR activo</span>
-                        @elseif (!$estudiante->condicion_es_estandar)
-                            <span class="stu-badge stu-badge--apoyo">PIAR pendiente</span>
+                        @if ($estudiante->piar !== null && $estudiante->piar->paso == '8')
+                            <span class="stu-badge stu-badge--piar">PIAR Activo</span>
+                        @elseif ($estudiante->piar !== null && $estudiante->piar->paso < '8')
+                            <span class="stu-badge stu-badge--piar-incompleto">PIAR Incompleto</span>
+                        @elseif ($estudiante->piar == null && $requiereApoyo)
+                            <span class="stu-badge stu-badge--piar-sin">Sin PIAR</span>
+                        @endif
+
+                        @if ($requiereApoyo)
+                            <span class="stu-badge stu-badge--apoyo">Apoyo pedagógico</span>
                         @endif
                     </div>
                 </div>
@@ -93,45 +104,121 @@
         </section>
 
         {{-- Resumen: matrícula, PIN, PIAR --}}
-        <section class="ficha-grid">
-            <div class="ficha-card ficha-card--compact">
-                <h3>Matrícula activa</h3>
-                @if ($matricula)
-                    <dl class="ficha-dl">
-                        <div>
-                            <dt>Ambiente</dt>
-                            <dd>{{ $ambiente->nombre ?? 'Sin ambiente' }}</dd>
-                        </div>
-                        <div>
-                            <dt>Grado</dt>
-                            <dd>{{ $matricula->grado->nombre ?? 'Sin grado' }}</dd>
-                        </div>
-                        <div>
-                            <dt>Grupo</dt>
-                            <dd>{{ $matricula->grupo->nombre ?? 'Sin grupo' }}</dd>
-                        </div>
-                        <div>
-                            <dt>Año lectivo</dt>
-                            <dd>{{ $matricula->anio_lectivo }}</dd>
-                        </div>
-                    </dl>
-                @else
-                    <p class="ficha-empty">Sin matrícula activa este año.</p>
-                @endif
+
+
+        <div class="c-card shadow-sm mt-2">
+            <div class="c-head bg-white">
+                <ul class="nav nav-tabs" id="perfilTabs">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabResumen">
+                            <i class="fa-solid fa-book me-2"></i>
+                            Matrícula activa
+                        </button>
+                    </li>
+
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabAsistencia">
+                            <i class="fa-solid fa-calendar-check me-2"></i>
+                            Asistencia
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSeguridad">
+                            <i class="fa-solid fa-lock me-2"></i>
+                            Seguridad
+                        </button>
+                    </li>
+                </ul>
             </div>
 
-            <div class="ficha-card ficha-card--compact">
-                <h3>Estado del PIN</h3>
-                <span class="ficha-pill {{ $pinClase }}">{{ $estadoPinLabel }}</span>
-            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tabResumen">
+                        @if ($matricula)
+                            <dl class="ficha-dl">
+                                <div>
+                                    <dt>Ambiente</dt>
+                                    <dd>{{ $ambiente->nombre ?? 'Sin ambiente' }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Grado</dt>
+                                    <dd>{{ $matricula->grado->nombre ?? 'Sin grado' }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Grupo</dt>
+                                    <dd>{{ $matricula->grupo->nombre ?? 'Sin grupo' }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Año lectivo</dt>
+                                    <dd>{{ $matricula->anio_lectivo }}</dd>
+                                </div>
+                            </dl>
+                        @else
+                            <p class="ficha-empty">Sin matrícula activa este año.</p>
+                        @endif
+                    </div>
+                    <div class="tab-pane fade" id="tabAsistencia">
+                        @if ($historialAsistencia->isNotEmpty())
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($historialAsistencia as $registro)
+                                            <tr>
+                                                <td>
+                                                    {{ $registro['fecha']->format('d/m/Y') }}
+                                                </td>
+                                                <td>
+                                                    @switch($registro['estado'])
+                                                        @case('presente')
+                                                            <span class="estado-asistencia estado-asistencia--presente">
+                                                                <span class="estado-dot"></span>
+                                                                Presente
+                                                            </span>
+                                                        @break
 
-            <div class="ficha-card ficha-card--compact">
-                <h3>PIAR</h3>
-                <span class="ficha-pill {{ $estudiante->piar ? 'ficha-pill--ok' : 'ficha-pill--muted' }}">
-                    {{ $estudiante->piar ? 'Activo' : 'Sin diligenciar' }}
-                </span>
+                                                        @case('ausente')
+                                                            <span class="estado-asistencia estado-asistencia--ausente">
+                                                                <span class="estado-dot"></span>
+                                                                Ausente
+                                                            </span>
+                                                        @break
+
+                                                        @default
+                                                            <span class="estado-asistencia estado-asistencia--sin">
+                                                                <span class="estado-dot"></span>
+                                                                Sin registro
+                                                            </span>
+                                                    @endswitch
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @else
+                            <p class="ficha-empty">
+                                No hay información de asistencia.
+                            </p>
+
+                        @endif
+
+                    </div>
+
+                    <div class="tab-pane fade" id="tabSeguridad">
+
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
+
+
+
 
         {{-- Acciones --}}
         <section class="ficha-card">
@@ -156,12 +243,18 @@
                         {{ $asistenciaHoy?->presente ? 'Asistencia ya registrada' : 'Registrar asistencia puntual' }}
                     </button>
                 </form>
-                @if ($mostrarVerPiar)
-                    <a href="{{ route('panel.estudiantes.piar', $estudiante) }}" class="btn btn-primary" target="_blank"
-                        rel="noopener">
-                        <i class="fa-solid fa-file-medical"></i> Ver PIAR
-                    </a>
-                @endif
+                @php
+                    if ($mostrarVerPiar && $estudiante->piar !== null && $estudiante->piar->paso < 8) {
+                        $clase = 'btn btn-primary disabled';
+                        $texto = 'PIAR incompleto';
+                    } else {
+                        $clase = 'btn btn-primary';
+                        $texto = 'Ver PIAR';
+                    }
+                @endphp
+                <a class="btn {{ $clase }}" title="{{ $texto }}">
+                    <i class="fa-solid fa-file-medical"></i> {{ $texto }}
+                </a>
             </div>
         </section>
 
@@ -203,7 +296,8 @@
     <div class="modal fade" id="modalObservacionFicha" tabindex="-1" aria-labelledby="modalObservacionFichaLabel"
         aria-hidden="true">
         <div class="modal-dialog">
-            <form method="POST" action="{{ route('panel.portafolio.observacion', $estudiante) }}" class="modal-content">
+            <form method="POST" action="{{ route('panel.portafolio.observacion', $estudiante) }}"
+                class="modal-content">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalObservacionFichaLabel">Agregar observación</h5>

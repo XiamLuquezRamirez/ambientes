@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Panel;
 
-use App\Http\Controllers\Admin\PiarController;
 use App\Http\Controllers\Controller;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
@@ -13,6 +12,7 @@ use App\Models\Grado;
 use App\Models\Grupo;
 use App\Models\Matricula;
 use App\Models\SyncQueue;
+use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\DocenteAsignacionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -202,6 +202,7 @@ class EstudiantePanelController extends Controller
             'matriculaActiva.grado',
             'matriculaActiva.grupo',
         ]);
+        $historialAsistencia = app(AsistenciaService::class)->historialAsistencia($estudiante);
 
         $ambiente = $estudiante->ambientes()
             ->wherePivot('anio_lectivo', $anio)
@@ -240,6 +241,7 @@ class EstudiantePanelController extends Controller
             'estadoPinLabel' => $estadosPin[$estadoPin] ?? 'Sin configurar',
             'mostrarVerPiar' => ! $estudiante->condicion_es_estandar,
             'asistenciaHoy' => $asistenciaHoy,
+            'historialAsistencia' => $historialAsistencia,
         ]);
     }
 
@@ -281,31 +283,6 @@ class EstudiantePanelController extends Controller
         return redirect()
             ->route('panel.estudiantes.show', $estudiante)
             ->with('success', 'Asistencia del día registrada.');
-    }
-
-    public function verPiar(Estudiante $estudiante)
-    {
-        $docente = Auth::guard('docente')->user()->docente;
-
-        if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
-            abort(403, 'No tienes acceso a este estudiante.');
-        }
-
-        $estudiante->load('condicion');
-
-        if ($estudiante->condicion_es_estandar) {
-            return redirect()
-                ->route('panel.estudiantes.show', $estudiante)
-                ->with('info', 'Ver PIAR solo aplica a condiciones distintas de estándar.');
-        }
-
-        if (! $estudiante->piar) {
-            return redirect()
-                ->route('panel.estudiantes.show', $estudiante)
-                ->with('info', 'Este estudiante aún no tiene un PIAR diligenciado.');
-        }
-
-        return app(PiarController::class)->exportar($estudiante->id);
     }
 
     private function docenteTieneAccesoAlEstudiante(int $docenteId, int $estudianteId): bool
@@ -446,18 +423,6 @@ class EstudiantePanelController extends Controller
     }
 
     public function actualizar(Request $request, $estudiante)
-    {
-        return back()->with('info', 'Pendiente de implementacion.');
-    }
-
-    public function formularioPin($estudiante)
-    {
-        $estudiante = Estudiante::findOrFail($estudiante);
-
-        return view('panel.estudiantes.pin', compact('estudiante'));
-    }
-
-    public function actualizarPin(Request $request, $estudiante)
     {
         return back()->with('info', 'Pendiente de implementacion.');
     }

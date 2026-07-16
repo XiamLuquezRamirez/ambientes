@@ -2,9 +2,13 @@
 
 namespace App\Services\Docente;
 
+use App\Models\CargaDocente;
+use App\Models\Matricula;
+use Illuminate\Support\Collection;
+
 class GrupoEstadisticasService
 {
-    public function calcular($matriculas): array
+    public function calcular($matriculas, bool $listaTomada = false): array
     {
         $activos = $matriculas->count();
 
@@ -25,7 +29,7 @@ class GrupoEstadisticasService
             'activos' => $activos,
             'piar' => $conPiar,
             'sin_pin' => $sinPin,
-            'asistencia_pendiente' => $activos > 0 && $sinPin >= 0 ? 1 : 0,
+            'lista_tomada' => $listaTomada,
             'conectados' => 0,
             'observaciones' => 0,
             'requiere_piar_sin_diligenciar' => $requierePiarSinDiligenciar,
@@ -34,33 +38,26 @@ class GrupoEstadisticasService
         ];
     }
 
-    public function listarEstudiantes($matriculas): array
+    public function obtenerMatriculas(CargaDocente $carga): Collection
     {
-        return $matriculas->map(function ($matricula) {
-            $estudiante = $matricula->estudiante;
-            $condicionEstandar = $this->esCondicionEstandar($estudiante);
-            $tienePiar = ! empty($estudiante->piar);
-            $tienePin = ! empty($estudiante->configuracionPin);
-            $estado = strtoupper($matricula->estado ?? 'activo') === 'ACTIVO' ? 'Activo' : 'Inactivo';
-            $estadoPiar = $condicionEstandar || $tienePiar ? 'No aplica' : 'Pendiente';
-            $requiereAtencionPiar = ! $condicionEstandar && ! $tienePiar;
-            [$condicionId, $condicionNombre] = $this->resolverCondicionDatos($estudiante);
-
-            return [
-                'id' => $estudiante->id,
-                'nombre' => $estudiante->nombre,
-                'iniciales' => $estudiante->iniciales ?? strtoupper(substr($estudiante->nombre ?? 'E', 0, 2)),
-                'condicion' => $this->resolverClaveCondicion($estudiante),
-                'condicion_id' => $condicionId,
-                'condicion_nombre' => $condicionNombre,
-                'estado' => $estado,
-                'tiene_pin' => $tienePin,
-                'estado_piar' => $estadoPiar,
-                'requiere_atencion_piar' => $requiereAtencionPiar,
-                'color_avatar' => $estudiante->color_avatar ?? '#2563EB',
-                'activo' => $estado === 'Activo',
-            ];
-        })->values()->all();
+        return Matricula::query()
+            ->join('estudiante_ambiente', function ($join) use ($carga) {
+                $join->on('estudiante_ambiente.estudiante_id', '=', 'matriculas.estudiante_id')
+                    ->where('estudiante_ambiente.ambiente_id', $carga->ambiente_id)
+                    ->where('estudiante_ambiente.anio_lectivo', $carga->anio_lectivo)
+                    ->where('estudiante_ambiente.estado', 'activo');
+            })
+            ->where('matriculas.grado_id', $carga->grado_id)
+            ->where('matriculas.grupo_id', $carga->grupo_id)
+            ->where('matriculas.anio_lectivo', $carga->anio_lectivo)
+            ->where('matriculas.estado', 'activo')
+            ->with([
+                'estudiante.piar',
+                'estudiante.configuracionPin',
+                'estudiante.condicion',
+            ])
+            ->select('matriculas.*')
+            ->get();
     }
 
     /**

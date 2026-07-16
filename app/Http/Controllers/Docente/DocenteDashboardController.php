@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\CargaDocente;
 use App\Models\Condicion;
+use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\GrupoEstadisticasService;
+use App\Services\Docente\GrupoEstudiantesService;
 use Illuminate\Support\Facades\Auth;
 
 class DocenteDashboardController extends Controller
@@ -99,14 +101,13 @@ class DocenteDashboardController extends Controller
     {
         session(['carga_docente_id' => $carga->id]);
 
-        $matriculas = $carga->grupo
-            ->matriculas()
-            ->activa()
-            ->delAnio()
-            ->with(['estudiante.piar', 'estudiante.configuracionPin', 'estudiante.condicion'])
-            ->get();
+        $matriculas = app(GrupoEstadisticasService::class)->obtenerMatriculas($carga);
 
-        $estadisticas = app(GrupoEstadisticasService::class)->calcular($matriculas);
+        $listaTomada = app(AsistenciaService::class)
+            ->listaTomada($carga, $matriculas->count());
+
+        $estadisticas = app(GrupoEstadisticasService::class)
+            ->calcular($matriculas, $listaTomada);
 
         return response()->json($estadisticas);
     }
@@ -115,29 +116,31 @@ class DocenteDashboardController extends Controller
     {
         session(['carga_docente_id' => $carga->id]);
 
-        $matriculas = $carga->grupo
-            ->matriculas()
-            ->activa()
-            ->delAnio()
-            ->with(['estudiante.piar', 'estudiante.configuracionPin', 'estudiante.condicion'])
-            ->get();
-
-        $estudiantes = app(GrupoEstadisticasService::class)->listarEstudiantes($matriculas);
+        $estudiantes = app(GrupoEstudiantesService::class)->listar($carga);
 
         return response()->json($estudiantes);
     }
 
     public function misEstudiantes()
     {
-        // Verificamos si hay un grupo en la memoria de la sesión
         if (! session()->has('carga_docente_id')) {
-            return redirect()->route('panel.principal')
+            return redirect()
+                ->route('panel.principal')
                 ->with('warning', 'Primero selecciona un grupo desde el inicio.');
         }
 
-        $cargaId = session('carga_docente_id');
-        $carga = CargaDocente::with(['grado', 'grupo', 'matriculas'])->find($cargaId);
+        $carga = CargaDocente::with([
+            'ambiente',
+            'grado',
+            'grupo',
+        ])->findOrFail(session('carga_docente_id'));
 
-        return view('panel.estudiantes.index', compact('carga'));
+        $estudiantes = app(GrupoEstudiantesService::class)
+            ->listar($carga);
+
+        return view('panel.estudiantes.index', compact(
+            'carga',
+            'estudiantes'
+        ));
     }
 }

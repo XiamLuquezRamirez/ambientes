@@ -887,6 +887,16 @@
             transform: translateX(24px);
 
         }
+
+        .quick-action-badge--warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .quick-action-badge--success {
+            background: #DCFCE7;
+            color: #166534;
+        }
     </style>
 @endpush
 
@@ -1027,13 +1037,24 @@
     </div>
 
     <div class="quick-actions" id="quick-actions">
-        <a href="{{ route('panel.sesion') }}" class="quick-action-card" data-context-route="sesion">
-            <span class="quick-action-card__icon"><i class="fas fa-clipboard-check"></i></span>
-            <span class="quick-action-card__title">Registrar asistencia</span>
-            <span class="quick-action-card__text">Toma la asistencia del grupo activo de forma rápida.</span>
-            <span id="badge-asistencia" class="quick-action-badge quick-action-badge--neutral">0</span>
-        </a>
+        <a href="{{ route('panel.asistencia') }}" class="quick-action-card" data-context-route="asistencia">
 
+            <span class="quick-action-card__icon">
+                <i class="fas fa-clipboard-check"></i>
+            </span>
+
+            <span class="quick-action-card__title">
+                Registrar asistencia
+            </span>
+
+            <span class="quick-action-card__text">
+                Toma la asistencia del grupo activo de forma rápida.
+            </span>
+
+            <span id="badge-asistencia" class="quick-action-badge d-none">
+            </span>
+
+        </a>
         <a href="{{ route('panel.estudiantes') }}" class="quick-action-card" data-context-route="pin">
             <span class="quick-action-card__icon"><i class="fas fa-key"></i></span>
             <span class="quick-action-card__title">Configurar PIN</span>
@@ -1171,35 +1192,38 @@
                 });
             });
 
+            const rutasConContexto = ['pin', 'sesion', 'monitor', 'observacion', 'asistencia'];
+
             quickActions.forEach(link => {
                 link.addEventListener('click', function(event) {
                     const grupoActivo = document.querySelector('.badge-grupo-chip.active');
+
                     if (!grupoActivo) {
+                        event.preventDefault();
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Seleccione un grupo',
+                            text: 'Debe seleccionar un grupo antes de continuar.'
+                        });
+
                         return;
                     }
 
-                    const cargaId = grupoActivo.getAttribute('data-carga-id');
-                    const route = this.getAttribute('data-context-route');
-                    const baseUrl = this.getAttribute('href');
+                    const route = this.dataset.contextRoute;
 
-                    if (route === 'pin') {
-                        event.preventDefault();
-                        const params = new URLSearchParams({
-                            carga: cargaId,
-                            contexto: nombreAmbienteActivo
-                        });
-                        window.location.href = `${baseUrl}?${params.toString()}`;
+                    if (!rutasConContexto.includes(route)) {
                         return;
                     }
 
-                    if (route === 'sesion' || route === 'monitor' || route === 'observacion') {
-                        event.preventDefault();
-                        const params = new URLSearchParams({
-                            carga: cargaId,
-                            contexto: nombreAmbienteActivo
-                        });
-                        window.location.href = `${baseUrl}?${params.toString()}`;
-                    }
+                    event.preventDefault();
+
+                    const params = new URLSearchParams({
+                        carga: grupoActivo.dataset.cargaId,
+                        contexto: nombreAmbienteActivo
+                    });
+
+                    window.location.href = `${this.href}?${params}`;
                 });
             });
 
@@ -1319,15 +1343,37 @@
                     const linkConfigurarPin = document.getElementById('link-configurar-pin');
                     const alertaPiar = document.getElementById('alerta-piar');
                     const textoAlertaPiar = document.getElementById('texto-alerta-piar');
+                    const badge = document.getElementById('badge-asistencia');
 
                     panelEstadisticas.style.display = 'block';
                     document.getElementById('stat-activos').textContent = stats.activos;
                     document.getElementById('stat-piar').textContent = stats.piar;
                     document.getElementById('stat-sin-pin').textContent = stats.sin_pin;
                     document.getElementById('badge-pin').textContent = stats.sin_pin;
-                    document.getElementById('badge-asistencia').textContent = stats.asistencia_pendiente ?? 0;
                     document.getElementById('badge-monitor').textContent = stats.conectados ?? 0;
                     document.getElementById('badge-observacion').textContent = stats.observaciones ?? 0;
+
+                    badge.classList.remove('d-none');
+
+
+                    if (!cargaId) {
+                        badge.classList.add('d-none');
+                        return;
+                    }
+
+                    badge.classList.remove('d-none');
+
+                    if (stats.lista_tomada) {
+
+                        badge.textContent = 'Lista tomada';
+                        badge.className = 'quick-action-badge quick-action-badge--success';
+
+                    } else {
+
+                        badge.textContent = 'Lista de hoy sin tomar';
+                        badge.className = 'quick-action-badge quick-action-badge--warning';
+
+                    }
 
                     if (stats.tiene_alerta_pin) {
                         cardSinPin.classList.add('estadistica-item--alerta');
