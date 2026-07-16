@@ -55,9 +55,9 @@
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>Sin PIN</span>
             </div>
-            <a href="{{ route('panel.estudiantes.pin', $e->id) }}" class="pin-requerido">
+            <button type="button" class="pin-requerido" onclick="abrirModalConfigurarPin('{{ $e->id }}', '{{ $e->nombre }} {{ $e->apellido }}')">
                 Requiere configuración
-            </a>
+            </button>
         @endif
     </div>
 

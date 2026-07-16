@@ -158,14 +158,14 @@
 }
 
 /* ── Modal – estilos visuales sobre Bootstrap ────────────────── */
-#modalRegistro .modal-content {
+.modal-content {
     border: none;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 32px 80px rgba(37, 99, 235, .22), 0 8px 24px rgba(0, 0, 0, .12);
 }
 
-#modalRegistro .modal-header {
+.modal-header {
     background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
     border-bottom: none;
     padding: 20px 24px;
@@ -185,7 +185,7 @@
     flex-shrink: 0;
 }
 
-#modalRegistro .modal-title {
+.modal-title {
     font-family: 'Fredoka One', cursive;
     font-size: 1.2rem;
     color: #FFFFFF;
@@ -198,23 +198,23 @@
     margin: 2px 0 0;
 }
 
-#modalRegistro .btn-close {
+.btn-close {
     filter: brightness(0) invert(1);
     opacity: .75;
     transition: opacity .15s, transform .2s;
     margin-left: auto;
 }
 
-#modalRegistro .btn-close:hover {
+.btn-close:hover {
     opacity: 1;
     transform: rotate(90deg);
 }
 
-#modalRegistro .modal-body {
+.modal-body {
     padding: 28px;
 }
 
-#modalRegistro .modal-footer {
+.modal-footer {
     border-top: 1px solid #E2E8F0;
     padding: 16px 28px 24px;
     gap: 12px;
@@ -454,4 +454,10 @@ ul.nav-tabs {
 
 .container-configuracion-pin.is-invalid {
     border: 1px solid #dc2626 !important;
+}
+
+.btn-secondary{
+    color: #0f0f0f;
+    background-color: #cbcbcb; 
+    border-color: #6c757d !important;
 }

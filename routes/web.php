@@ -192,20 +192,17 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('perfil/validar-datos', [PerfilController::class, 'validarDatos'])->name('panel.perfil.validarDatos');
     Route::put('perfil/contrasena', [PerfilController::class, 'cambiarContrasena'])->name('panel.perfil.contrasena');
     Route::put('perfil', [PerfilController::class, 'actualizar'])->name('panel.perfil.update');
-    Route::put('perfil/informacion-personal', [PerfilController::class, 'actualizarInformacionPersonal'])
-        ->name('panel.perfil.informacion-personal');
+    Route::put('perfil/informacion-personal', [PerfilController::class, 'actualizarInformacionPersonal'])->name('panel.perfil.informacion-personal');
     Route::post('perfil/foto', [PerfilController::class, 'subirFoto'])->name('panel.perfil.foto');
     Route::delete('perfil/foto', [PerfilController::class, 'eliminarFoto'])->name('panel.perfil.foto.eliminar');
 
     // Estudiantes (panel docente)
     // Listado → card → ficha: panel.estudiantes → _card (ojo) → panel.estudiantes.show (verFicha)
-    Route::post('estudiante-guardar', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiante.guardar');
     Route::get('estudiantes', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
     Route::post('estudiantes', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiantes.guardar');
     // Rutas estáticas antes de {estudiante}
     Route::get('estudiantes/create', [EstudiantePanelController::class, 'formularioCrear'])->name('panel.estudiantes.create');
     Route::get('estudiantes/buscar', [EstudiantePanelController::class, 'buscarEstudiantes'])->name('panel.estudiantes.buscar');
-    // Verificar cupos de grupo
     // Ficha completa HU seguimiento: verFicha → show.blade.php
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('panel.estudiantes.cargar-municipios');
     Route::post('estudiantes/editar/{idEstudiante}', [EstudianteAdminController::class, 'actualizar'])->name('panel.estudiantes.editar');
@@ -220,6 +217,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::put('estudiantes/{estudiante}', [EstudiantePanelController::class, 'actualizar'])->name('panel.estudiantes.update');
     Route::get('estudiantes/{estudiante}/pin', [EstudiantePanelController::class, 'formularioPin'])->name('panel.estudiantes.pin');
     Route::post('estudiantes/{estudiante}/pin', [EstudiantePanelController::class, 'actualizarPin'])->name('panel.estudiantes.pin.update');
+    Route::post('estudiantes/configurar-pin', [EstudiantePanelController::class, 'configurarPin'])->name('panel.estudiantes.configurar-pin');
 
     // Planeacion
     Route::get('planeacion', [PlaneacionController::class, 'listar'])->name('panel.planeacion');

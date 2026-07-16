@@ -15,46 +15,14 @@ use App\Models\Ambiente;
 use App\Models\Grupo;
 use App\Models\Matricula;
 use App\Models\EstudianteAmbiente;
+use App\Models\FigurasModel;
 
 class EstudianteAdminController extends Controller
 {
     public function listar(Request $request)
     {
-        $figuras = [
-            [
-                'icon' => 'fas fa-circle',
-                'color' => '#f933e9',
-            ],
-            [
-                'icon' => 'fas fa-star',
-                'color' => '#ff9019',
-            ],
-            [
-                'icon' => 'fas fa-heart',
-                'color' => '#ff0606',
-            ],
-            [
-                'icon' => 'fas fa-fish',
-                'color' => '#0f54ff',
-            ],
-            [
-                'icon' => 'fas fa-square',
-                'color' => '#437124',
-            ],
-            [
-                'icon' => 'fas fa-moon',
-                'color' => '#3f51b5',
-            ],
-            [
-                'icon' => 'fas fa-diamond',
-                'color' => '#9c27b0',
-            ],
-            [
-                'icon' => 'fas fa-apple-whole',
-                'color' => '#fd0a5d',
-            ]
-        ];
-
+        $figuras = FigurasModel::getFiguras();
+        
         $grados = Grado::where('activo', true)->orderBy('nombre')->get();
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
         $consulta = Estudiante::with('grado')->where('activo', '<>', 2);
