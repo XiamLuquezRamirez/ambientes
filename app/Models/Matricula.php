@@ -21,6 +21,11 @@ class Matricula extends Model
         'fecha_egreso'  => 'date',
     ];
 
+    protected $with = [
+        'grado',
+        'grupo',
+    ];
+
     public function estudiante()
     {
         return $this->belongsTo(Estudiante::class);

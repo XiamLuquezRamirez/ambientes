@@ -10,6 +10,10 @@ class EstudianteAmbiente extends Model
 
     protected $fillable = ['estudiante_id', 'ambiente_id', 'anio_lectivo', 'estado', 'observacion'];
 
+    protected $with = [
+        'ambiente',
+    ];
+
     public function estudiante()
     {
         return $this->belongsTo(Estudiante::class);

@@ -13,7 +13,16 @@ function abrirModal() {
     $('#modalRegistroLabel').text('Nuevo Estudiante');
     $('#modalRegistroSubtitle').text('Completa los datos para crear el estudiante');
     $('#btnCrearEstudiante').text('Crear Estudiante');
+
+    $('#tab-atencion').show();
+    $('#tab-pin').show();
     tipoPost = 1;
+
+    
+    if(tipoGuardaEstudiante === 2) {
+        $("#ambiente-grado-grupo-container-docente").show();
+    }
+
     modalBS.show();
 }
 
@@ -57,6 +66,12 @@ function limpiarModal() {
     //resetear el valor de otro tipo identificacion
     $('#otro_tipo_identificacion').val('');
     $('#otro_tipo_identificacion_container').hide();
+
+    if(tipoGuardaEstudiante === 2) {
+        $("#grupo_id_nuevo").val('').empty().append('<option value="">Seleccione</option>');
+        $("#contenedor-ambientes-disponibles").html("<div class='col-md-12 p-4 text-center'><h4 class='text-center'>No hay ambientes disponibles</h4></div>");
+        ambientesSeleccionados = [];
+    }
 }
 
 /* ── Tabla AJAX ──────────────────────────────────────────────── */
@@ -152,6 +167,9 @@ function mostrarErroresModal(errors) {
             case 'validation.required':
                 mensaje = 'Este campo es requerido';
                 break;
+            case 'validation.required_if':
+                mensaje = 'Este campo es requerido';
+                break;
             default:
                 mensaje = 'Este campo es requerido';
                 break;
@@ -213,6 +231,13 @@ async function guardarEstudiante(datos) {
         });
     });
 
+    // Ambientes
+    if (tipoGuardaEstudiante === 2 && ambientesSeleccionados.length > 0) {
+        ambientesSeleccionados.forEach(function(id) {
+            formData.append('ambientes_ids[]', id);
+        });
+    }
+    
     $.ajax({
         url: URL_ESTUDIANTES,
         type: 'POST',
@@ -327,7 +352,20 @@ function abrirModalEditarEstudiante(id) {
     $('#modalRegistroLabel').text('Editar Estudiante');
     $('#modalRegistroSubtitle').text('Completa los datos para editar el estudiante');
     $('#btnCrearEstudiante').text('Editar Estudiante');
+
+    if(tipoGuardaEstudiante === 2) {
+        $('#tab-atencion').hide();
+        $('#tab-pin').hide();
+    } else {
+        $('#tab-atencion').show();
+        $('#tab-pin').show();
+    }
     cargarDatosEstudiante();
+
+    
+    if(tipoGuardaEstudiante === 2) {
+        $("#ambiente-grado-grupo-container-docente").hide();
+    }
     modalBS.show();
 }
 

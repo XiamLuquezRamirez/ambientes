@@ -36,23 +36,7 @@ class Estudiante extends Model
         );
     }
 
-    protected function iniciales(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
 
-                $nombre = collect(explode(' ', trim($this->nombre)))
-                    ->filter()
-                    ->map(fn ($p) => strtoupper(substr($p, 0, 1)));
-
-                $apellido = collect(explode(' ', trim($this->apellido)))
-                    ->filter()
-                    ->map(fn ($p) => strtoupper(substr($p, 0, 1)));
-
-                return ($nombre->first() ?? '').($apellido->first() ?? '');
-            }
-        );
-    }
 
     protected function colorAvatar(): Attribute
     {
@@ -153,6 +137,11 @@ class Estudiante extends Model
     public function matriculas()
     {
         return $this->hasMany(Matricula::class);
+    }
+
+    public function matricula()
+    {
+        return $this->hasOne(Matricula::class)->where('estado', 'activo');
     }
 
     public function grado()

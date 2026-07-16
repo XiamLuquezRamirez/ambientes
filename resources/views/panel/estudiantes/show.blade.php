@@ -224,9 +224,15 @@
         <section class="ficha-card">
             <h3 class="ficha-section-title">Acciones</h3>
             <div class="ficha-actions">
-                <a href="{{ route('panel.estudiantes.pin', $estudiante) }}" class="btn btn-outline-primary">
-                    <i class="fa-solid fa-key"></i> Configurar PIN
-                </a>
+                @if ($estudiante->configuracionPin == null)
+                    <button type="button" onclick="abrirModalConfigurarPin({{ $estudiante->id }})" class="btn btn-outline-primary">
+                        <i class="fa-solid fa-key"></i> Configurar PIN
+                    </button>
+                @else
+                    <button type="button" onclick="abrirModalSolicitarCambioPin({{ $estudiante->id }})" class="btn btn-outline-success">
+                        <i class="fa-solid fa-key"></i> Solicitar cambio de PIN
+                    </button>
+                @endif
                 <a href="{{ route('panel.portafolio.estudiante', $estudiante) }}" class="btn btn-outline-primary">
                     <i class="fa-solid fa-folder-open"></i> Ver portafolio completo
                 </a>
@@ -324,4 +330,18 @@
             </form>
         </div>
     </div>
+
+    @include('panel.estudiantes.modalConfigurarPin')
+
+    @push('scripts')
+        <script>
+            const URL_ESTUDIANTES = "{{ route('panel.estudiantes.guardar') }}";
+            var pin = [];
+            var idContainerPin = 'configuracion_pin_docente';
+            var idEstudianteConfigurarPin = 0;
+        </script>
+        <script src="{{ asset('assets/js/panel/estudiante_index.js') }}"></script>
+        <script src="{{ asset('assets/js/estudiantes/pin.js') }}"></script>
+        <script src="{{ asset('assets/js/panel/estudiantes.js') }}"></script>
+    @endpush
 @endsection
