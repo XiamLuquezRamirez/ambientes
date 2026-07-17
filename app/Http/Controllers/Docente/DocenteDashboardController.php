@@ -45,6 +45,7 @@ class DocenteDashboardController extends Controller
                 ->pluck('grupo_id')
                 ->unique()
                 ->count();
+
         });
 
         $ambienteSeleccionado = null;
@@ -58,7 +59,7 @@ class DocenteDashboardController extends Controller
         return view('panel.principal', compact(
             'ambientes',
             'ambienteSeleccionado',
-            'condiciones'
+            'condiciones',
         ));
     }
 

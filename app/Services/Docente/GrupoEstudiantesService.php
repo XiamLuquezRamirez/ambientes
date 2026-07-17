@@ -41,6 +41,7 @@ class GrupoEstudiantesService
             return [
                 'id' => $estudiante->id,
                 'nombre' => $estudiante->nombre,
+                'apellido' => $estudiante->apellido,
                 'color_avatar' => $estudiante->color_avatar ?? '#2563EB',
                 'avatar' => $estudiante->avatar,
                 'iniciales' => $estudiante->iniciales ?? strtoupper(substr($estudiante->nombre ?? 'E', 0, 2)),

@@ -71,4 +71,32 @@ class AsistenciaController extends Controller
             'message' => 'La asistencia fue registrada correctamente.',
         ]);
     }
+
+    public function reporteAsistencia(Request $request, CargaDocente $carga)
+    {
+        $reporte = app(AsistenciaService::class)
+            ->reportePeriodoGrupo(
+                $carga,
+                $request->desde,
+                $request->hasta
+            );
+
+        return response()->json($reporte);
+    }
+
+    public function exportarPdf(Request $request, CargaDocente $carga)
+    {
+        $pdf = app(AsistenciaService::class)
+            ->exportarReporteAsistencia(
+                $carga,
+                $request->desde,
+                $request->hasta
+            );
+
+        return $pdf->download(
+            'Reporte_Asistencia_'.
+            $carga->grado->nombre.'_'.
+            $carga->grupo->nombre.'.pdf'
+        );
+    }
 }

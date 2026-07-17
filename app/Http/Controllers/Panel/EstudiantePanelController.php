@@ -156,6 +156,7 @@ class EstudiantePanelController extends Controller
     {
         $figuras = FigurasModel::getFiguras();
         $docente = Auth::guard('docente')->user()->docente;
+        $asistenciaService = app(AsistenciaService::class);
 
         if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
             abort(403, 'No tienes acceso a este estudiante.');
@@ -170,7 +171,9 @@ class EstudiantePanelController extends Controller
             'matriculaActiva.grado',
             'matriculaActiva.grupo',
         ]);
-        $historialAsistencia = app(AsistenciaService::class)->historialAsistencia($estudiante);
+        $historialAsistencia = $asistenciaService->historialAsistencia($estudiante);
+
+        $resumenAsistencia = $asistenciaService->resumenAsistencia($estudiante);
 
         $ambiente = $estudiante->ambientes()
             ->wherePivot('anio_lectivo', $anio)
@@ -211,6 +214,7 @@ class EstudiantePanelController extends Controller
             'asistenciaHoy' => $asistenciaHoy,
             'figuras' => $figuras,
             'historialAsistencia' => $historialAsistencia,
+            'resumenAsistencia' => $resumenAsistencia,
         ]);
     }
 
@@ -356,31 +360,6 @@ class EstudiantePanelController extends Controller
         ]);
 
         return redirect()->route('panel.estudiantes')->with('success', 'Estudiante creado y asignado a tu grupo activo.');
-    }
-
-    public function buscarEstudiantes(Request $request)
-    {
-        $query = trim((string) $request->get('q', ''));
-
-        $estudiantes = Estudiante::query()
-            ->when($query !== '', function ($q) use ($query) {
-                $q->where(function ($sub) use ($query) {
-                    $sub->where('nombre', 'like', "%{$query}%")
-                        ->orWhere('apellido', 'like', "%{$query}%")
-                        ->orWhereRaw("CONCAT(nombre, ' ', COALESCE(apellido, '')) like ?", ["%{$query}%"]);
-                });
-            })
-            ->orderBy('nombre')
-            ->paginate(8);
-
-        return response()->json([
-            'data' => $estudiantes->items(),
-            'pagination' => [
-                'current_page' => $estudiantes->currentPage(),
-                'last_page' => $estudiantes->lastPage(),
-                'total' => $estudiantes->total(),
-            ],
-        ]);
     }
 
     public function formularioEditar($estudiante)

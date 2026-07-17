@@ -275,7 +275,6 @@
         .filtros-estudiantes {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
             min-width: 58%;
         }
 
@@ -1034,26 +1033,20 @@
         </div>
 
         <div id="lista-estudiantes" class="lista-estudiantes"></div>
+
+        <div class="d-flex justify-content-end mt-4">
+            <button class="btn btn-primary" onclick="abrirModalReporteAsistencia()">
+                <i class="fa-solid fa-clipboard-check"></i> Ver Reporte de Asistencia
+            </button>
+        </div>
     </div>
 
     <div class="quick-actions" id="quick-actions">
         <a href="{{ route('panel.asistencia') }}" class="quick-action-card" data-context-route="asistencia">
-
-            <span class="quick-action-card__icon">
-                <i class="fas fa-clipboard-check"></i>
-            </span>
-
-            <span class="quick-action-card__title">
-                Registrar asistencia
-            </span>
-
-            <span class="quick-action-card__text">
-                Toma la asistencia del grupo activo de forma rápida.
-            </span>
-
-            <span id="badge-asistencia" class="quick-action-badge d-none">
-            </span>
-
+            <span class="quick-action-card__icon"><i class="fas fa-clipboard-check"></i></span>
+            <span class="quick-action-card__title">Registrar asistencia</span>
+            <span class="quick-action-card__text">Toma la asistencia del grupo activo de forma rápida.</span>
+            <span id="badge-asistencia" class="quick-action-badge d-none"></span>
         </a>
         <a href="{{ route('panel.estudiantes') }}" class="quick-action-card" data-context-route="pin">
             <span class="quick-action-card__icon"><i class="fas fa-key"></i></span>
@@ -1077,6 +1070,8 @@
         </a>
     </div>
 
+    @include('panel.asistencia.modalAsistenciaGrupo')
+
     <!-- CONTROL JAVASCRIPT -->
     <script>
         // Mantiene el contexto activo del ambiente para actualizar el encabezado y las estadísticas.
@@ -1084,6 +1079,101 @@
         let panelEstadisticas;
         const URL_FICHA_ESTUDIANTE = @json(url('/panel/estudiantes/ficha'));
         let estudiantesGrupoCache = [];
+
+        async function abrirModalReporteAsistencia() {
+
+            const modal = new bootstrap.Modal(
+                document.getElementById('modalAsistenciaGrupo')
+            );
+
+            modal.show();
+
+            cargarReporteAsistencia();
+        }
+
+        async function cargarReporteAsistencia() {
+
+            const desde = document.getElementById('fechaInicio').value;
+            const hasta = document.getElementById('fechaFin').value;
+
+            const grupoActivo = document.querySelector('.badge-grupo-chip.active');
+
+            const cargaId = grupoActivo.dataset.cargaId;
+
+            const reporte = await ajaxRequest(
+                `/panel/asistencia/reporte/${cargaId}?desde=${desde}&hasta=${hasta}`
+            );
+            const tbody = document.getElementById(
+                'tablaReporteAsistencia'
+            );
+
+            tbody.innerHTML = '';
+
+            reporte.forEach(estudiante => {
+
+                tbody.innerHTML += `
+        <tr>
+
+            <td>
+                <strong>${estudiante.nombre} ${estudiante.apellido}</strong>
+            </td>
+
+            <td class="text-center">
+                ${estudiante.presentes}
+            </td>
+
+            <td class="text-center">
+                ${estudiante.registradas}
+            </td>
+
+            <td>
+
+                <div class="d-flex align-items-center gap-2">
+
+                    <div class="progress flex-grow-1" style="height:10px">
+
+                        <div
+                            class="progress-bar bg-${estudiante.color}"
+                            style="width:${estudiante.porcentaje}%">
+                        </div>
+
+                    </div>
+
+                    <strong style="width:45px">
+                        ${estudiante.porcentaje}%
+                    </strong>
+
+                </div>
+
+            </td>
+
+            <td class="text-center">
+
+                <span class="badge bg-${estudiante.color}">
+                    ${estudiante.icono}
+                    ${estudiante.estado}
+                </span>
+
+            </td>
+
+        </tr>
+    `;
+
+            });
+        }
+
+        function exportarReporteAsistencia() {
+
+            const grupoActivo = document.querySelector('.badge-grupo-chip.active');
+
+            const cargaId = grupoActivo.dataset.cargaId;
+
+            const desde = document.getElementById('fechaInicio').value;
+            const hasta = document.getElementById('fechaFin').value;
+
+            window.open(`/panel/asistencia/reporte/${cargaId}/pdf?desde=${desde}&hasta=${hasta}`, '_blank');
+
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             const tarjetas = document.querySelectorAll('.btn-seleccionar-ambiente');
@@ -1115,7 +1205,8 @@
                 document.getElementById('contenedor-bienvenida').style.display = 'none';
                 mostrarEstadoCargaEstadisticas();
 
-                document.getElementById('txt-contexto-ambiente').textContent = `Ambiente: ${ambienteNombre}`;
+                document.getElementById('txt-contexto-ambiente').textContent =
+                    `Ambiente: ${ambienteNombre}`;
                 document.getElementById('txt-contexto-detalle').textContent = '';
                 document.getElementById('contenedor-ambiente-activo').style.display = 'block';
 
@@ -1325,7 +1416,8 @@
             const grupoNombre = element.getAttribute('data-grupo');
 
             document.getElementById('txt-contexto-ambiente').textContent = `Ambiente: ${nombreAmbienteActivo}`;
-            document.getElementById('txt-contexto-detalle').textContent = ` > ${gradoNombre} > Grupo ${grupoNombre}`;
+            document.getElementById('txt-contexto-detalle').textContent =
+                ` > ${gradoNombre} > Grupo ${grupoNombre}`;
 
             document.getElementById('titulo-grupo-seleccionado').innerHTML =
                 `<i class="fas fa-chart-bar"></i> Estadísticas para: <strong>${gradoNombre} - ${grupoNombre}</strong>`;

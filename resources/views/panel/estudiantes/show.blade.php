@@ -158,6 +158,45 @@
                         @endif
                     </div>
                     <div class="tab-pane fade" id="tabAsistencia">
+
+                        <div class="attendance-summary">
+
+                            <div class="attendance-summary__header">
+                                <span>Asistencia del periodo</span>
+
+                                <strong>
+                                    {{ $resumenAsistencia['porcentaje'] }}%
+                                </strong>
+                            </div>
+
+                            <div class="progress">
+                                <div class="progress-bar {{ $resumenAsistencia['alerta'] ? 'bg-danger' : 'bg-success' }}"
+                                    style="width: {{ $resumenAsistencia['porcentaje'] }}%">
+                                </div>
+                            </div>
+
+                            <small>
+                                {{ $resumenAsistencia['presentes'] }} presentes ·
+                                {{ $resumenAsistencia['ausentes'] }} ausentes
+                            </small>
+
+                        </div>
+                        @if ($resumenAsistencia['alerta'])
+                            <div class="alert alert-warning mt-3">
+
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                                <strong>Asistencia baja.</strong>
+
+                                El estudiante registra una asistencia del
+
+                                <strong>{{ $resumenAsistencia['porcentaje'] }}%</strong>
+
+                                durante el periodo evaluado.
+
+                            </div>
+                        @endif
+                        <hr>
                         @if ($historialAsistencia->isNotEmpty())
                             <div class="table-container">
                                 <table>
@@ -225,11 +264,13 @@
             <h3 class="ficha-section-title">Acciones</h3>
             <div class="ficha-actions">
                 @if ($estudiante->configuracionPin == null)
-                    <button type="button" onclick="abrirModalConfigurarPin({{ $estudiante->id }})" class="btn btn-outline-primary">
+                    <button type="button" onclick="abrirModalConfigurarPin({{ $estudiante->id }})"
+                        class="btn btn-outline-primary">
                         <i class="fa-solid fa-key"></i> Configurar PIN
                     </button>
                 @else
-                    <button type="button" onclick="abrirModalSolicitarCambioPin({{ $estudiante->id }})" class="btn btn-outline-success">
+                    <button type="button" onclick="abrirModalSolicitarCambioPin({{ $estudiante->id }})"
+                        class="btn btn-outline-success">
                         <i class="fa-solid fa-key"></i> Solicitar cambio de PIN
                     </button>
                 @endif
