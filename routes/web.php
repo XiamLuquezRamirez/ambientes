@@ -227,9 +227,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Sesion
     Route::get('sesion', [SesionController::class, 'listar'])->name('panel.sesion');
-    Route::post('sesion/asistencia', [SesionController::class, 'registrarAsistencia'])->name('panel.sesion.asistencia');
-    Route::post('sesion/asistida/{estudiante}', [SesionController::class, 'registrarSesionAsistida'])->name('panel.sesion.asistida');
-    Route::get('sesion/activas', [SesionController::class, 'sesionesActivas'])->name('panel.sesion.activas');
+    Route::get('sesion/estudiantes', [SesionController::class, 'estudiantes'])->name('panel.sesion.estudiantes');
 
     // Portafolio
     Route::get('portafolio', [PortafolioController::class, 'listar'])->name('panel.portafolio');
@@ -245,6 +243,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     // Asistencia
     Route::get('asistencia', [AsistenciaController::class, 'listar'])->name('panel.asistencia');
     Route::post('asistencia/registrar-asistencia', [AsistenciaController::class, 'registrarAsistencia'])->name('panel.asistencia.registrar-asistencia');
+    Route::get('asistencia/reporte/{carga}', [AsistenciaController::class, 'reporteAsistencia'])->name('panel.asistencia.reporte');
+    Route::get('asistencia/reporte/{carga}/pdf', [AsistenciaController::class, 'exportarPdf'])->name('panel.asistencia.pdf');
 
     // Grados por ambiente
     Route::get('grupos/grados/docente/{idGrado}', [EstudiantePanelController::class, 'obtenerGruposPorGrado'])->name('panel.grupos.grados.docente');

@@ -70,8 +70,6 @@ class EstudiantePanelController extends Controller
             'piar',
         ])->whereIn('id', $matriculas);
 
-      
-
         $consulta = clone $base;
 
         if ($request->filled('q')) {
@@ -88,6 +86,10 @@ class EstudiantePanelController extends Controller
             $consulta->where('condicion_id', $request->get('condicion_id'));
         }
 
+        if ($request->filled('grado_id')) {
+            $consulta->where('grado_id', $request->get('grado_id'));
+        }
+
         // '0' falla con filled(); comparar de forma explícita.
         if ($request->has('estado') && $request->input('estado') !== null && $request->input('estado') !== '') {
             $consulta->where('activo', (int) $request->input('estado') === 1);
@@ -100,7 +102,6 @@ class EstudiantePanelController extends Controller
         } elseif ($request->get('filtro') === 'activos') {
             $consulta->where('activo', true);
         }
-        
 
         $orden = $request->get('orden', 'az');
         if ($orden === 'za') {
@@ -116,7 +117,7 @@ class EstudiantePanelController extends Controller
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
         $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
-        
+
         /* estadisticas */
         $total = $paraStats->count();
         $conPiar = $paraStats->filter(fn ($e) => $e->piar !== null && $e->piar->paso == '8')->count();
@@ -161,6 +162,7 @@ class EstudiantePanelController extends Controller
     {
         $figuras = FigurasModel::getFiguras();
         $docente = Auth::guard('docente')->user()->docente;
+        $asistenciaService = app(AsistenciaService::class);
 
         if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
             abort(403, 'No tienes acceso a este estudiante.');
@@ -175,7 +177,9 @@ class EstudiantePanelController extends Controller
             'matriculaActiva.grado',
             'matriculaActiva.grupo',
         ]);
-        $historialAsistencia = app(AsistenciaService::class)->historialAsistencia($estudiante);
+        $historialAsistencia = $asistenciaService->historialAsistencia($estudiante);
+
+        $resumenAsistencia = $asistenciaService->resumenAsistencia($estudiante);
 
         $ambiente = $estudiante->ambientes()
             ->wherePivot('anio_lectivo', $anio)
@@ -216,6 +220,7 @@ class EstudiantePanelController extends Controller
             'asistenciaHoy' => $asistenciaHoy,
             'figuras' => $figuras,
             'historialAsistencia' => $historialAsistencia,
+            'resumenAsistencia' => $resumenAsistencia,
         ]);
     }
 
@@ -361,31 +366,6 @@ class EstudiantePanelController extends Controller
         ]);
 
         return redirect()->route('panel.estudiantes')->with('success', 'Estudiante creado y asignado a tu grupo activo.');
-    }
-
-    public function buscarEstudiantes(Request $request)
-    {
-        $query = trim((string) $request->get('q', ''));
-
-        $estudiantes = Estudiante::query()
-            ->when($query !== '', function ($q) use ($query) {
-                $q->where(function ($sub) use ($query) {
-                    $sub->where('nombre', 'like', "%{$query}%")
-                        ->orWhere('apellido', 'like', "%{$query}%")
-                        ->orWhereRaw("CONCAT(nombre, ' ', COALESCE(apellido, '')) like ?", ["%{$query}%"]);
-                });
-            })
-            ->orderBy('nombre')
-            ->paginate(8);
-
-        return response()->json([
-            'data' => $estudiantes->items(),
-            'pagination' => [
-                'current_page' => $estudiantes->currentPage(),
-                'last_page' => $estudiantes->lastPage(),
-                'total' => $estudiantes->total(),
-            ],
-        ]);
     }
 
     public function formularioEditar($estudiante)
