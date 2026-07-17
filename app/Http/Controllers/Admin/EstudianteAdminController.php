@@ -25,7 +25,7 @@ class EstudianteAdminController extends Controller
         
         $grados = Grado::where('activo', true)->orderBy('nombre')->get();
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
-        $consulta = Estudiante::with('grado')->where('activo', '<>', 2);
+        $consulta = Estudiante::with('grado', 'configuracionPin')->where('activo', '<>', 2);
         $departamentos = Departamento::orderBy('descripcion')->get();
         /* ── Filtros ────────────────────────────────────── */
         if ($request->filled('buscar')) {

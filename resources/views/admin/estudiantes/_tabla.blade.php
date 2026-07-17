@@ -38,11 +38,8 @@
                         <div class="tabla-acciones d-flex justify-content-center align-items-center">
                             <a href="#" onclick="abrirModalEditarEstudiante('{{ $e->id }}')" class="btn-accion btn-editar">
                                 <i class="fa-solid fa-pencil"></i>
-                                Editar</a>
-                            <button type="button" class="btn-accion btn-eliminar" onclick="confirmarEliminacionEstudiante('{{ $e->id }}', '{{ $e->nombre }}')">
-                                <i class="fa-solid fa-trash-can"></i>
-                                Eliminar
-                            </button>
+                                Editar
+                            </a>
                             @if($e->requiere_apoyo == "si" && $e->piar == null)
                                 <a href="{{ route('admin.estudiantes.diligenciar-piar', ['idEstudiante' => $e->id, 'tipo' => 'nuevo']) }}" class="btn-accion btn-warning">
                                     <i class="fa-solid fa-file-pen"></i>
@@ -59,6 +56,16 @@
                                     Actualizar PIAR
                                 </a>
                             @endif
+                            @if($e->configuracionPin != null)
+                                <button type="button" class="btn-accion btn-primary" onclick="confirmarRestablecerPin('{{ $e->id }}')">
+                                    <i class="fa-solid fa-key"></i>
+                                   restablecer PIN
+                                </button>
+                            @endif
+                            <button type="button" class="btn-accion btn-eliminar" onclick="confirmarEliminacionEstudiante('{{ $e->id }}', '{{ $e->nombre }}')">
+                                <i class="fa-solid fa-trash-can"></i>
+                                Eliminar
+                            </button>
                         </div>
                     </td>
                 </tr>

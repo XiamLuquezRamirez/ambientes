@@ -915,7 +915,7 @@
                         <!-- Diagnóstico -->
                         <div class="col-md-3">
                             <label class="form-label">Cuenta con diagnóstico médico</label>
-                            <select class="form-select" name="diagnostico_medico" required>
+                            <select class="form-select" onchange="colocarRequired('cual_diagnostico', this)" name="diagnostico_medico" required>
                                 <option value="">Seleccione</option>
                                 <option value="Si">Si</option>
                                 <option value="No">No</option>
@@ -923,7 +923,7 @@
                         </div>
                         <div class="col-md-9">
                             <label class="form-label">¿Cuál?</label>
-                            <select class="form-select" name="cual_diagnostico" required>
+                            <select class="form-select" name="cual_diagnostico" id="cual_diagnostico">
                                 <option value="">Seleccione</option>
                                 @foreach ($condiciones as $condicion)
                                     <option value="{{ $condicion->id }}">{{ $condicion->nombre }}</option>
