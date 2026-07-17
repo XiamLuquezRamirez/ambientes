@@ -70,8 +70,6 @@ class EstudiantePanelController extends Controller
             'piar',
         ])->whereIn('id', $matriculas);
 
-      
-
         $consulta = clone $base;
 
         if ($request->filled('q')) {
@@ -88,6 +86,10 @@ class EstudiantePanelController extends Controller
             $consulta->where('condicion_id', $request->get('condicion_id'));
         }
 
+        if ($request->filled('grado_id')) {
+            $consulta->where('grado_id', $request->get('grado_id'));
+        }
+
         // '0' falla con filled(); comparar de forma explícita.
         if ($request->has('estado') && $request->input('estado') !== null && $request->input('estado') !== '') {
             $consulta->where('activo', (int) $request->input('estado') === 1);
@@ -100,7 +102,6 @@ class EstudiantePanelController extends Controller
         } elseif ($request->get('filtro') === 'activos') {
             $consulta->where('activo', true);
         }
-        
 
         $orden = $request->get('orden', 'az');
         if ($orden === 'za') {
@@ -116,7 +117,7 @@ class EstudiantePanelController extends Controller
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
         $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
-        
+
         /* estadisticas */
         $total = $paraStats->count();
         $conPiar = $paraStats->filter(fn ($e) => $e->piar !== null && $e->piar->paso == '8')->count();
