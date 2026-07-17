@@ -39,6 +39,11 @@ class CargaDocente extends Model
         return $this->belongsTo(Grupo::class);
     }
 
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class);
+    }
+
     public function getDescripcionAttribute(): string
     {
         return $this->ambiente->nombre.' → '.

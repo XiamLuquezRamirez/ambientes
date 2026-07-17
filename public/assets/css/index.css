@@ -852,3 +852,40 @@ select.form-control {
 #modal_password_coincidencia {
     color: #dc2626;
 }
+
+.estado-asistencia {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    font-weight: 600;
+}
+
+.estado-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.estado-asistencia--presente .estado-dot {
+    background: #22C55E;
+}
+
+.estado-asistencia--ausente .estado-dot {
+    background: #EF4444;
+}
+
+.estado-asistencia--sin .estado-dot {
+    background: #CBD5E1;
+}
+
+.estado-asistencia--presente {
+    color: #166534;
+}
+
+.estado-asistencia--ausente {
+    color: #991B1B;
+}
+
+.estado-asistencia--sin {
+    color: #64748B;
+}

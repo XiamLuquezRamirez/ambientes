@@ -2,45 +2,45 @@
 
 namespace App\Http\Controllers\Panel;
 
-use App\Http\Controllers\Admin\PiarController;
 use App\Http\Controllers\Controller;
+use App\Models\Ambiente;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
 use App\Models\Condicion;
+use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
 use App\Models\Estudiante;
+use App\Models\FigurasModel;
 use App\Models\Grado;
 use App\Models\Grupo;
 use App\Models\Matricula;
 use App\Models\SyncQueue;
+use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\DocenteAsignacionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Ambiente;
-use App\Models\ConfiguracionPin;
-use App\Models\FigurasModel;
+
 class EstudiantePanelController extends Controller
 {
     public function listar(Request $request)
     {
         $docente = Auth::guard('docente')->user()->docente;
 
-        $figuras =  FigurasModel::getFiguras();
+        $figuras = FigurasModel::getFiguras();
 
         /* obtener grados de docente logueado */
         $carga = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
-        ->where('activo', true)
-        ->where('anio_lectivo', date('Y'))
-        ->with(['grado'])
-        ->get();
+            ->where('activo', true)
+            ->where('anio_lectivo', date('Y'))
+            ->with(['grado'])
+            ->get();
 
         $departamentos = Departamento::orderBy('descripcion')->get();
 
         $grados = $carga->pluck('grado')
-        ->filter()
-        ->unique('id')
-        ->values();
-
+            ->filter()
+            ->unique('id')
+            ->values();
 
         $cargas = CargaDocente::where('docente_id', $docente->id)
             ->where('activo', true)
@@ -175,7 +175,7 @@ class EstudiantePanelController extends Controller
             'matriculaActiva.grado',
             'matriculaActiva.grupo',
         ]);
-
+        $historialAsistencia = app(AsistenciaService::class)->historialAsistencia($estudiante);
 
         $ambiente = $estudiante->ambientes()
             ->wherePivot('anio_lectivo', $anio)
@@ -215,6 +215,7 @@ class EstudiantePanelController extends Controller
             'mostrarVerPiar' => ! $estudiante->condicion_es_estandar,
             'asistenciaHoy' => $asistenciaHoy,
             'figuras' => $figuras,
+            'historialAsistencia' => $historialAsistencia,
         ]);
     }
 
@@ -256,31 +257,6 @@ class EstudiantePanelController extends Controller
         return redirect()
             ->route('panel.estudiantes.show', $estudiante)
             ->with('success', 'Asistencia del día registrada.');
-    }
-
-    public function verPiar(Estudiante $estudiante)
-    {
-        $docente = Auth::guard('docente')->user()->docente;
-
-        if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
-            abort(403, 'No tienes acceso a este estudiante.');
-        }
-
-        $estudiante->load('condicion');
-
-        if ($estudiante->condicion_es_estandar) {
-            return redirect()
-                ->route('panel.estudiantes.show', $estudiante)
-                ->with('info', 'Ver PIAR solo aplica a condiciones distintas de estándar.');
-        }
-
-        if (! $estudiante->piar) {
-            return redirect()
-                ->route('panel.estudiantes.show', $estudiante)
-                ->with('info', 'Este estudiante aún no tiene un PIAR diligenciado.');
-        }
-
-        return app(PiarController::class)->exportar($estudiante->id);
     }
 
     private function docenteTieneAccesoAlEstudiante(int $docenteId, int $estudianteId): bool
@@ -425,18 +401,19 @@ class EstudiantePanelController extends Controller
         return back()->with('info', 'Pendiente de implementacion.');
     }
 
-    public function formularioPin($estudiante)
+    public function obtenerGradosPorAmbiente($idAmbiente)
     {
-        $estudiante = Estudiante::findOrFail($estudiante);
+        $gradoIds = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
+            ->where('anio_lectivo', date('Y'))
+            ->where('ambiente_id', $idAmbiente)
+            ->pluck('grado_id');
 
-        return view('panel.estudiantes.pin', compact('estudiante'));
+        $grados = Grado::whereIn('id', $gradoIds)->get();
+
+        return response()->json([
+            'data' => $grados,
+        ]);
     }
-
-    public function actualizarPin(Request $request, $estudiante)
-    {
-        return back()->with('info', 'Pendiente de implementacion.');
-    }
-
 
     public function obtenerGruposPorGrado($idGrado)
     {
@@ -444,7 +421,7 @@ class EstudiantePanelController extends Controller
             ->where('anio_lectivo', date('Y'))
             ->where('grado_id', $idGrado)
             ->select('grupo_id')->get();
-    
+
         $grupos = Grupo::whereIn('id', $grupoIds)->get();
 
         return response()->json([
@@ -455,19 +432,19 @@ class EstudiantePanelController extends Controller
     public function obtenerAmbientesDisponibles($grado, $grupo)
     {
         $idAmbientes = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
-        ->where('anio_lectivo', date('Y'))
-        ->where('grado_id', $grado)
-        ->where('grupo_id', $grupo)
-        ->select('ambiente_id')
-        ->get();
+            ->where('anio_lectivo', date('Y'))
+            ->where('grado_id', $grado)
+            ->where('grupo_id', $grupo)
+            ->select('ambiente_id')
+            ->get();
 
         $ambientes = Ambiente::whereIn('id', $idAmbientes)->get();
 
         // obtener cantidad de estudiantes matriculados en el grupo
         $ocupados = Matricula::where('grupo_id', $grupo)
-        ->where('anio_lectivo', date('Y'))
-        ->where('estado', 'activo')
-        ->count();
+            ->where('anio_lectivo', date('Y'))
+            ->where('estado', 'activo')
+            ->count();
 
         $cupoMaximo = Grupo::find($grupo)?->cupo_maximo;
         $disponible = $cupoMaximo ? $cupoMaximo - $ocupados : 0;
@@ -488,7 +465,7 @@ class EstudiantePanelController extends Controller
         ]);
 
         $estudiante = Estudiante::findOrFail($datos['id']);
-        
+
         $exitoso = ConfiguracionPin::create([
             'estudiante_id' => $estudiante->id,
             'figura_1' => $datos['configuracion_pin'][0]['icon'],
@@ -505,7 +482,7 @@ class EstudiantePanelController extends Controller
                 'message' => 'PIN configurado correctamente.',
             ]);
         }
-        
+
         return response()->json([
             'success' => false,
             'message' => 'Error al configurar el PIN, intente nuevamente.',

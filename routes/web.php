@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
+use App\Http\Controllers\Panel\AsistenciaController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\InclusionController;
 use App\Http\Controllers\Panel\PlaneacionController;
@@ -240,6 +241,10 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('inclusion', [InclusionController::class, 'listar'])->name('panel.inclusion');
     Route::get('inclusion/{estudiante}', [InclusionController::class, 'verAjustes'])->name('panel.inclusion.ajustes');
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
+
+    // Asistencia
+    Route::get('asistencia', [AsistenciaController::class, 'listar'])->name('panel.asistencia');
+    Route::post('asistencia/registrar-asistencia', [AsistenciaController::class, 'registrarAsistencia'])->name('panel.asistencia.registrar-asistencia');
 
     // Grados por ambiente
     Route::get('grupos/grados/docente/{idGrado}', [EstudiantePanelController::class, 'obtenerGruposPorGrado'])->name('panel.grupos.grados.docente');
