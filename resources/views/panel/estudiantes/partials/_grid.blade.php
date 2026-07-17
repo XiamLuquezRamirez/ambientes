@@ -3,11 +3,22 @@
 @endphp
 
 <div class="container-grid" id="container-grid">
+    <div class="py-3 px-1">
+        @include('panel.estudiantes.partials._estadisticas')
+    </div>
     <div class="students-grid {{ $esLista ? 'students-grid--list' : '' }}" id="studentsGrid">
 
-        @foreach ($estudiantes as $e)
+        @forelse ($estudiantes as $e)
             @include('panel.estudiantes.partials._card')
-        @endforeach
+        @empty
+            <div class="students-empty students-empty--filters" style="grid-column: span 4;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <h3>Sin resultados</h3>
+                <p>No hay estudiantes que coincidan con los filtros aplicados.</p>
+                <a href="{{ route('panel.estudiantes') }}" class="btn btn-primary">Limpiar filtros</a>
+            </div>
+        @endforelse
 
     </div>
+    {{ $estudiantes->links('panel.estudiantes.partials._paginacion') }}
 </div>
