@@ -1,37 +1,39 @@
-@if ($estudiantes->hasPages() || $estudiantes->total() > 0)
-    <div class="students-footer">
-        <div class="students-pagination">
-            @if ($estudiantes->onFirstPage())
-                <span class="page-nav page-nav--disabled">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </span>
-            @else
-                <a href="{{ $estudiantes->previousPageUrl() }}" class="page-nav" aria-label="Anterior">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </a>
+@if ($paginator->hasPages())
+<div class="paginacion-wrapper">
+    <span class="paginacion-info">
+        Mostrando {{ $paginator->firstItem() }}–{{ $paginator->lastItem() }} de {{ $paginator->total() }} registros
+    </span>
+
+    <div class="paginacion-controles">
+        {{-- Anterior --}}
+        @if ($paginator->onFirstPage())
+            <span class="pag-btn pag-btn-disabled">&#8592; Anterior</span>
+        @else
+            <a href="{{ $paginator->previousPageUrl() }}" class="pag-btn">&#8592; Anterior</a>
+        @endif
+
+        {{-- Páginas --}}
+        @foreach ($elements as $element)
+            @if (is_string($element))
+                <span class="pag-btn pag-btn-disabled">{{ $element }}</span>
             @endif
-
-            @foreach ($estudiantes->getUrlRange(1, $estudiantes->lastPage()) as $page => $url)
-                @if ($page == $estudiantes->currentPage())
-                    <span class="page-num page-num--active">{{ $page }}</span>
-                @else
-                    <a href="{{ $url }}" class="page-num">{{ $page }}</a>
-                @endif
-            @endforeach
-
-            @if ($estudiantes->hasMorePages())
-                <a href="{{ $estudiantes->nextPageUrl() }}" class="page-nav" aria-label="Siguiente">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </a>
-            @else
-                <span class="page-nav page-nav--disabled">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </span>
+            @if (is_array($element))
+                @foreach ($element as $page => $url)
+                    @if ($page == $paginator->currentPage())
+                        <span class="pag-btn pag-btn-activo">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}" class="pag-btn">{{ $page }}</a>
+                    @endif
+                @endforeach
             @endif
-        </div>
+        @endforeach
 
-        <p class="students-count">
-            Mostrando {{ $estudiantes->firstItem() ?? 0 }} a {{ $estudiantes->lastItem() ?? 0 }} de {{ $estudiantes->total() }}
-        </p>
+        {{-- Siguiente --}}
+        @if ($paginator->hasMorePages())
+            <a href="{{ $paginator->nextPageUrl() }}" class="pag-btn">Siguiente &#8594;</a>
+        @else
+            <span class="pag-btn pag-btn-disabled">Siguiente &#8594;</span>
+        @endif
     </div>
+</div>
 @endif

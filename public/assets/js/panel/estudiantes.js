@@ -8,22 +8,35 @@
     let debounceTimer = null;
 
     form.querySelectorAll('select').forEach((select) => {
-        select.addEventListener('change', () => form.submit());
+        select.addEventListener('change', () => {
+            aplicarFiltrosEstudiantes();
+        });
     });
 
     if (buscaInput) {
         buscaInput.addEventListener('input', () => {
             clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => form.submit(), 400);
+            debounceTimer = setTimeout(() => {
+                aplicarFiltrosEstudiantes();
+            }, 400);
         });
 
         buscaInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 clearTimeout(debounceTimer);
-                form.submit();
+                aplicarFiltrosEstudiantes();
             }
         });
+    }
+
+    function aplicarFiltrosEstudiantes() {
+        const params = new URLSearchParams(new FormData($('#formFiltrosEstudiantes')[0]));
+        for (const [k, v] of [...params.entries()]) {
+            if (!v) params.delete(k);
+        }
+        const url = params.toString() ? `${URL_ESTUDIANTES}?${params.toString()}` : URL_ESTUDIANTES;
+        cargarTabla(url);
     }
 
     document.querySelectorAll('.view-btn').forEach((btn) => {

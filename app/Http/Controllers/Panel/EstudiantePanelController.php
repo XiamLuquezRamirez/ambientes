@@ -70,20 +70,7 @@ class EstudiantePanelController extends Controller
             'piar',
         ])->whereIn('id', $matriculas);
 
-        $paraStats = (clone $base)->get();
-        $total = $paraStats->count();
-        $conPiar = $paraStats->filter(fn ($e) => $e->piar !== null && $e->piar->paso == '8')->count();
-        $sinPin = $paraStats->filter(fn ($e) => $e->configuracionPin === null)->count();
-        $activos = $paraStats->where('activo', true)->count();
-
-        $estadisticas = [
-            'total' => $total,
-            'piar' => $conPiar,
-            'piar_pct' => $total > 0 ? round(($conPiar / $total) * 100, 1) : 0,
-            'sin_pin' => $sinPin,
-            'activos' => $activos,
-            'activos_pct' => $total > 0 ? round(($activos / $total) * 100, 1) : 0,
-        ];
+      
 
         $consulta = clone $base;
 
@@ -113,6 +100,7 @@ class EstudiantePanelController extends Controller
         } elseif ($request->get('filtro') === 'activos') {
             $consulta->where('activo', true);
         }
+        
 
         $orden = $request->get('orden', 'az');
         if ($orden === 'za') {
@@ -121,16 +109,33 @@ class EstudiantePanelController extends Controller
             $consulta->orderBy('nombre')->orderBy('apellido');
         }
 
+        $paraStats = (clone $consulta)->get();
+
         $estudiantes = $consulta->paginate(12)->withQueryString();
 
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
         $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
+        
+        /* estadisticas */
+        $total = $paraStats->count();
+        $conPiar = $paraStats->filter(fn ($e) => $e->piar !== null && $e->piar->paso == '8')->count();
+        $sinPin = $paraStats->filter(fn ($e) => $e->configuracionPin === null)->count();
+        $activos = $paraStats->where('activo', true)->count();
+
+        $estadisticas = [
+            'total' => $total,
+            'piar' => $conPiar,
+            'piar_pct' => $total > 0 ? round(($conPiar / $total) * 100, 1) : 0,
+            'sin_pin' => $sinPin,
+            'activos' => $activos,
+            'activos_pct' => $total > 0 ? round(($activos / $total) * 100, 1) : 0,
+        ];
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'html' => view('panel.estudiantes.partials._grid', compact('estudiantes'))->render(),
+                'html' => view('panel.estudiantes.partials._grid', compact('estudiantes', 'estadisticas'))->render(),
             ]);
         }
 

@@ -19,9 +19,6 @@
 
         @include('panel.estudiantes.partials._filtros')
 
-        @include('panel.estudiantes.partials._estadisticas')
-
-
         @php
             $tieneFiltros = collect($filtros ?? [])
                 ->filter(fn($v) => $v !== null && $v !== '')
@@ -30,16 +27,8 @@
 
         @if ($estudiantes->isEmpty() && !$tieneFiltros)
             @include('panel.estudiantes.partials._empty')
-        @elseif ($estudiantes->isEmpty())
-            <div class="students-empty students-empty--filters">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <h3>Sin resultados</h3>
-                <p>No hay estudiantes que coincidan con los filtros aplicados.</p>
-                <a href="{{ route('panel.estudiantes') }}" class="btn btn-primary">Limpiar filtros</a>
-            </div>
         @else
             @include('panel.estudiantes.partials._grid')
-            @include('panel.estudiantes.partials._paginacion')
         @endif
 
     </div>
