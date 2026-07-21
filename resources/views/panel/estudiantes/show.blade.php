@@ -123,9 +123,9 @@
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabSeguridad">
-                            <i class="fa-solid fa-lock me-2"></i>
-                            Seguridad
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabAmbientes">
+                            <i class="fa-solid fa-house me-2"></i>
+                            Ambientes
                         </button>
                     </li>
                 </ul>
@@ -136,10 +136,6 @@
                     <div class="tab-pane fade show active" id="tabResumen">
                         @if ($matricula)
                             <dl class="ficha-dl">
-                                <div>
-                                    <dt>Ambiente</dt>
-                                    <dd>{{ $ambiente->nombre ?? 'Sin ambiente' }}</dd>
-                                </div>
                                 <div>
                                     <dt>Grado</dt>
                                     <dd>{{ $matricula->grado->nombre ?? 'Sin grado' }}</dd>
@@ -249,8 +245,18 @@
 
                     </div>
 
-                    <div class="tab-pane fade" id="tabSeguridad">
-
+                    <div class="tab-pane fade" id="tabAmbientes">
+                        @if ($ambientesEstudiante->isNotEmpty())
+                            @foreach ($ambientesEstudiante as $ambiente)
+                                <div class="c-card-ambiente shadow-sm mt-2">
+                                    <div class="card-body">
+                                        <strong>{{ $ambiente->ambiente->nombre }}</strong>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <p class="ficha-empty">Sin ambientes asignados este año.</p>
+                        @endif
                     </div>
                 </div>
             </div>
