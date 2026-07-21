@@ -158,19 +158,40 @@
         </div>
     </main>
     <script>
-        var idAmbiente = localStorage.getItem('ambiente-seleccionado');
-    
-        if (idAmbiente) {
-            $('.link-ambiente').attr(
-                'href',
-                $('.link-ambiente').attr('href').replace('__ID__', idAmbiente)
-            );
-            
-            $('.link-ambiente-formulario').attr(
-                'action',
-                $('.link-ambiente-formulario').attr('action').replace('__ID__', idAmbiente)
-            );
+        function setAmbiente() {
+            const idAmbiente = localStorage.getItem('ambiente-seleccionado');
+
+            if (!idAmbiente) return;
+
+            $('.link-ambiente').each(function () {
+                if (!$(this).data('template')) {
+                    $(this).data('template', $(this).attr('href'));
+                }
+
+                $(this).attr(
+                    'href',
+                    $(this).data('template').replace('__ID__', idAmbiente)
+                );
+            });
+
+            $('.link-ambiente-formulario').each(function () {
+                if (!$(this).data('template')) {
+                    $(this).data('template', $(this).attr('action'));
+                }
+
+                $(this).attr(
+                    'action',
+                    $(this).data('template').replace('__ID__', idAmbiente)
+                );
+            });
         }
+
+        setAmbiente();
+
+
+        $(document).click(function() {
+            setAmbiente();
+        });
     </script>
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
