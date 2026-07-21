@@ -18,6 +18,7 @@ return new class extends Migration
                 $table->unsignedSmallInteger('anio_lectivo');
                 $table->enum('estado', ['activo', 'restringido', 'adaptado'])->default('activo');
                 $table->text('observacion')->nullable();
+                $table->tinyInteger('activo')->default(1);
                 $table->timestamps();
                 $table->unique(['estudiante_id', 'ambiente_id', 'anio_lectivo'], 'ea_unique');
             });
