@@ -30,43 +30,53 @@ class EstudiantePanelController extends Controller
 
         $figuras = FigurasModel::getFiguras();
 
-        /* obtener grados de docente logueado */
-        $carga = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)
-            ->where('activo', true)
-            ->where('anio_lectivo', date('Y'))
-            ->with(['grado'])
-            ->get();
-
         $departamentos = Departamento::orderBy('descripcion')->get();
 
-        $grados = $carga->pluck('grado')
-            ->filter()
-            ->unique('id')
-            ->values();
-
         $cargas = CargaDocente::where('docente_id', $docente->id)
+            ->where('ambiente_id', $ambiente->id)
             ->where('activo', true)
-            ->with('ambiente')
+            ->where('anio_lectivo', date('Y'))
+            ->with(['ambiente', 'grado', 'grupo'])
             ->get();
 
         $matriculas = collect();
 
+        $grados = $cargas->pluck('grado')
+            ->filter()
+            ->unique('id')
+            ->values();
+
         if ($cargas->isNotEmpty()) {
+
+            $anio = date('Y');
+
             $matriculas = Matricula::query()
-                ->where(function ($query) use ($cargas) {
-                    foreach ($cargas as $carga) {
-                        $query->orWhere(function ($q) use ($carga) {
-                            $q->where('grado_id', $carga->grado_id)
-                                ->where('grupo_id', $carga->grupo_id)
-                                ->where('anio_lectivo', $carga->anio_lectivo)
-                                ->where('estado', 'activo');
-                        });
-                    }
+                ->join('estudiante_ambiente', function ($join) use ($ambiente, $anio) {
+                    $join->on('estudiante_ambiente.estudiante_id', '=', 'matriculas.estudiante_id')
+                        ->where('estudiante_ambiente.ambiente_id', $ambiente->id)
+                        ->where('estudiante_ambiente.anio_lectivo', $anio)
+                        ->where('estudiante_ambiente.estado', 'activo');
                 })
-                ->pluck('estudiante_id');
+                ->where('matriculas.anio_lectivo', $anio)
+                ->where('matriculas.estado', 'activo')
+                ->where(function ($query) use ($cargas) {
+
+                    foreach ($cargas as $carga) {
+
+                        $query->orWhere(function ($q) use ($carga) {
+                            $q->where('matriculas.grado_id', $carga->grado_id)
+                                ->where('matriculas.grupo_id', $carga->grupo_id);
+                        });
+
+                    }
+
+                })
+                ->pluck('matriculas.estudiante_id');
+
         }
 
         $base = Estudiante::with([
+            'ambientes',
             'condicion:id,nombre',
             'configuracionPin',
             'piar',
@@ -89,7 +99,14 @@ class EstudiantePanelController extends Controller
         }
 
         if ($request->filled('grado_id')) {
-            $consulta->where('grado_id', $request->get('grado_id'));
+
+            $matriculas = Matricula::query()
+                ->whereIn('estudiante_id', $matriculas)
+                ->where('grado_id', $request->grado_id)
+                ->where('estado', 'activo')
+                ->pluck('estudiante_id');
+
+            $consulta->whereIn('id', $matriculas);
         }
 
         // '0' falla con filled(); comparar de forma explícita.
@@ -463,7 +480,7 @@ class EstudiantePanelController extends Controller
         $ambiente = Ambiente::findOrFail($datos['idAmbiente']);
         $estudiante = Estudiante::findOrFail($datos['idEstudiante']);
 
-        if (!$ambiente || !$estudiante) {
+        if (! $ambiente || ! $estudiante) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ambiente o estudiante no encontrado.',
@@ -477,10 +494,10 @@ class EstudiantePanelController extends Controller
         if ($estudianteAmbiente) {
             if ($datos['activo'] == 1) {
                 $tipo_alerta = 'success';
-                $message = 'El estudiante ' . $estudiante->nombre . ' ' . $estudiante->apellido . ' ha sido activado del ambiente ' . $ambiente->nombre . ' correctamente.';
+                $message = 'El estudiante '.$estudiante->nombre.' '.$estudiante->apellido.' ha sido activado del ambiente '.$ambiente->nombre.' correctamente.';
             } else {
                 $tipo_alerta = 'warning';
-                $message = 'El estudiante ' . $estudiante->nombre . ' ' . $estudiante->apellido . ' ha sido desactivado del ambiente ' . $ambiente->nombre . ' correctamente.';
+                $message = 'El estudiante '.$estudiante->nombre.' '.$estudiante->apellido.' ha sido desactivado del ambiente '.$ambiente->nombre.' correctamente.';
             }
 
             return response()->json([
