@@ -43,8 +43,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a id="link-estudiantes-menu" href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
-                    class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
+                <a  href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
+                    class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link link-ambiente' : 'nav-link link-ambiente' }}">
                     <i class="fa-solid fa-child"></i> Estudiantes
                 </a>
             </li>
@@ -157,6 +157,21 @@
             @yield('content')
         </div>
     </main>
+    <script>
+        var idAmbiente = localStorage.getItem('ambiente-seleccionado');
+    
+        if (idAmbiente) {
+            $('.link-ambiente').attr(
+                'href',
+                $('.link-ambiente').attr('href').replace('__ID__', idAmbiente)
+            );
+            
+            $('.link-ambiente-formulario').attr(
+                'action',
+                $('.link-ambiente-formulario').attr('action').replace('__ID__', idAmbiente)
+            );
+        }
+    </script>
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>

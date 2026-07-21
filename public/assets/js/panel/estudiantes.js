@@ -31,11 +31,12 @@
     }
 
     function aplicarFiltrosEstudiantes() {
+        var action = $('#formFiltrosEstudiantes').attr('action');
         const params = new URLSearchParams(new FormData($('#formFiltrosEstudiantes')[0]));
         for (const [k, v] of [...params.entries()]) {
             if (!v) params.delete(k);
         }
-        const url = params.toString() ? `${URL_ESTUDIANTES}?${params.toString()}` : URL_ESTUDIANTES;
+        const url = params.toString() ? `${action}?${params.toString()}` : action;
         cargarTabla(url);
     }
 

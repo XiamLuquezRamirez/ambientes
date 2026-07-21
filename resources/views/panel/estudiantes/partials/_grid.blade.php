@@ -15,7 +15,7 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <h3>Sin resultados</h3>
                 <p>No hay estudiantes que coincidan con los filtros aplicados.</p>
-                <a href="{{ route('panel.estudiantes') }}" class="btn btn-primary">Limpiar filtros</a>
+                <a href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" class="btn btn-primary link-ambiente">Limpiar filtros</a>
             </div>
         @endforelse
 

@@ -26,7 +26,6 @@ class EstudiantePanelController extends Controller
     public function listar(Request $request, $ambiente)
     {
         $ambiente = Ambiente::findOrFail($ambiente);
-        dd($ambiente);
         $docente = Auth::guard('docente')->user()->docente;
 
         $figuras = FigurasModel::getFiguras();

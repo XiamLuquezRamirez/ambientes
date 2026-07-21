@@ -1019,7 +1019,7 @@
             <div id="card-sin-pin" class="estadistica-item">
                 <span class="estadistica-label">Sin PIN</span>
                 <span class="estadistica-valor" id="stat-sin-pin">0</span>
-                <a id="link-configurar-pin" href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" class="link-configurar-pin"
+                <a id="link-configurar-pin" href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" class="link-configurar-pin link-ambiente"
                     style="display: none;">
                     <i class="fas fa-key"></i> Configurar PIN
                 </a>
@@ -1071,7 +1071,7 @@
             <span class="quick-action-card__text">Toma la asistencia del grupo activo de forma rápida.</span>
             <span id="badge-asistencia" class="quick-action-badge d-none"></span>
         </a>
-        <a id="link-configurar-pin-2" href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" class="quick-action-card" data-context-route="pin">
+        <a href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" class="quick-action-card link-ambiente" data-context-route="pin">
             <span class="quick-action-card__icon"><i class="fas fa-key"></i></span>
             <span class="quick-action-card__title">Configurar PIN</span>
             <span class="quick-action-card__text">Revisa quién aún necesita un PIN configurado.</span>
@@ -1094,15 +1094,6 @@
     </div>
 
     @include('panel.asistencia.modalAsistenciaGrupo')
-    <script>
-        var idAmbiente = localStorage.getItem('ambiente-seleccionado');
-    
-        if (idAmbiente) {
-           $('#link-configurar-pin').attr('href').replace('__ID__', idAmbiente);
-           $('#link-configurar-pin-2').attr('href').replace('__ID__', idAmbiente);
-           $('#link-estudiantes-menu').attr('href').replace('__ID__', idAmbiente);
-        }
-    </script>
     <!-- CONTROL JAVASCRIPT -->
     <script>
         // Mantiene el contexto activo del ambiente para actualizar el encabezado y las estadísticas.

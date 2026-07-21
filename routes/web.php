@@ -199,7 +199,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Estudiantes (panel docente)
     // Listado → card → ficha: panel.estudiantes → _card (ojo) → panel.estudiantes.show (verFicha)
-    Route::get('estudiantes/{ambiente}', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
+    
+    Route::get('estudiantes/lista/{ambiente}', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
     Route::post('estudiantes', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiantes.guardar');
     // Rutas estáticas antes de {estudiante}
     Route::get('estudiantes/create', [EstudiantePanelController::class, 'formularioCrear'])->name('panel.estudiantes.create');
