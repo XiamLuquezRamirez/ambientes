@@ -23,8 +23,10 @@ use Illuminate\Support\Facades\Auth;
 
 class EstudiantePanelController extends Controller
 {
-    public function listar(Request $request)
+    public function listar(Request $request, $ambiente)
     {
+        $ambiente = Ambiente::findOrFail($ambiente);
+        dd($ambiente);
         $docente = Auth::guard('docente')->user()->docente;
 
         $figuras = FigurasModel::getFiguras();
@@ -255,8 +257,14 @@ class EstudiantePanelController extends Controller
             abort(403, 'No tienes acceso a este estudiante.');
         }
 
+        $carga = CargaDocente::where('docente_id', $docente->id)
+            ->where('activo', true)
+            ->where('anio_lectivo', date('Y'))
+            ->first();
+
         Asistencia::updateOrCreate(
             [
+                'carga_docente_id' => $carga->id,
                 'estudiante_id' => $estudiante->id,
                 'fecha' => now()->toDateString(),
             ],
@@ -293,21 +301,6 @@ class EstudiantePanelController extends Controller
                 }
             })
             ->exists();
-    }
-
-    public function formularioCrear()
-    {
-        $docente = Auth::guard('docente')->user()->docente;
-        $anio = date('Y');
-        $carga = CargaDocente::where('docente_id', $docente->id)
-            ->where('activo', true)
-            ->where('anio_lectivo', $anio)
-            ->with(['ambiente', 'grado', 'grupo'])
-            ->first();
-
-        $condiciones = ['estandar', 'tea', 'tdah', 'disc_visual', 'disc_auditiva', 'disc_motriz', 'down'];
-
-        return view('panel.estudiantes.create', compact('condiciones', 'carga'));
     }
 
     public function guardar(Request $request)
@@ -370,19 +363,6 @@ class EstudiantePanelController extends Controller
         ]);
 
         return redirect()->route('panel.estudiantes')->with('success', 'Estudiante creado y asignado a tu grupo activo.');
-    }
-
-    public function formularioEditar($estudiante)
-    {
-        $estudiante = Estudiante::findOrFail($estudiante);
-        $condiciones = ['estandar', 'tea', 'tdah', 'disc_visual', 'disc_auditiva', 'disc_motriz', 'down'];
-
-        return view('panel.estudiantes.edit', compact('estudiante', 'condiciones'));
-    }
-
-    public function actualizar(Request $request, $estudiante)
-    {
-        return back()->with('info', 'Pendiente de implementacion.');
     }
 
     public function obtenerGradosPorAmbiente($idAmbiente)

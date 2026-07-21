@@ -922,6 +922,7 @@
     <div class="page-header">
         <!-- Envolvemos la bienvenida para controlarla con JS -->
         <div id="contenedor-bienvenida">
+
             <h1>¡Bienvenido, {{ Auth::guard('docente')->user()->nombre }}!</h1>
 
             <div class="bienvenida-meta">
@@ -931,13 +932,17 @@
 
                 <span>Selecciona el ambiente con el que trabajarás hoy.</span>
             </div>
+
         </div>
 
         <!-- Este contenedor empezará oculto y mostrará el contexto activo en tiempo real -->
         <div id="contenedor-ambiente-activo" style="display: none;">
             <h1 style="font-size: 1.8rem; margin: 0; color: #333;">
                 <span id="txt-contexto-ambiente"></span>
-                <span id="txt-contexto-detalle" style="color: #007bff;"></span>
+                <span id="txt-contexto-detalle"></span>
+                <button class="btn btn-primary float-end" id="btn-volver-ambientes">
+                    <i class="fas fa-arrow-left"></i> Volver a seleccionar ambiente
+                </button>
             </h1>
         </div>
     </div>
@@ -946,7 +951,7 @@
     <div class="ambientes-grid" id="ambientes-container">
         @foreach ($ambientes as $amb)
             <div class="ambiente-card btn-seleccionar-ambiente" id="tarjeta-amb-{{ $amb->id }}"
-                data-id="{{ $amb->id }}" data-nombre="{{ $amb->nombre }}">
+                data-id="{{ $amb->id }}" data-nombre="{{ $amb->nombre }}" onclick="seleccionarAmbiente(this)">
 
                 <div class="card-franja" style="background:{{ $amb->color_hex }}"></div>
 
@@ -975,12 +980,6 @@
 
     <!-- CONTENEDOR DE GRADOS Y GRUPOS (Reemplaza la vista de ambientes) -->
     <div id="panel-grados-grupos" class="c-card c-card-body" style="display: none; margin-top: 20px;">
-
-        <!-- Botón para regresar a los ambientes -->
-        <button id="btn-volver-ambientes" class="btn btn-link"
-            style="padding: 0; margin-bottom: 20px; text-decoration: none; color: #007bff; font-weight: 500; font-size: 0.95rem;">
-            <i class="fas fa-arrow-left"></i> Volver a Ambientes
-        </button>
 
         <h3
             style="margin-bottom: 20px; font-size: 1.3rem; color: #333; border-bottom: 2px solid #eee; padding-bottom: 8px;">
@@ -1344,6 +1343,16 @@
                 });
             });
 
+            function cargarAmbienteSeleccionado() {
+                const ambienteSeleccionado = localStorage.getItem('ambiente-seleccionado');
+                const ambienteNombre = localStorage.getItem('ambiente-nombre');
+                if (ambienteSeleccionado) {
+                    cargarAmbiente(ambienteSeleccionado, ambienteNombre);
+                }
+            }
+
+            cargarAmbienteSeleccionado();
+
             // Si sólo existe un ambiente asignado, entra directamente a la vista del mismo.
             @if ($ambienteSeleccionado)
                 cargarAmbiente({{ $ambienteSeleccionado->id }}, '{{ $ambienteSeleccionado->nombre }}');
@@ -1441,9 +1450,9 @@
             const gradoNombre = element.getAttribute('data-grado');
             const grupoNombre = element.getAttribute('data-grupo');
 
-            document.getElementById('txt-contexto-ambiente').textContent = `Ambiente: ${nombreAmbienteActivo}`;
+            document.getElementById('txt-contexto-ambiente').textContent = `${nombreAmbienteActivo}`;
             document.getElementById('txt-contexto-detalle').textContent =
-                ` > ${gradoNombre} > Grupo ${grupoNombre}`;
+                ` / ${gradoNombre} / Grupo ${grupoNombre}`;
 
             document.getElementById('titulo-grupo-seleccionado').innerHTML =
                 `<i class="fas fa-chart-bar"></i> Estadísticas para: <strong>${gradoNombre} - ${grupoNombre}</strong>`;
@@ -1647,5 +1656,14 @@
                 renderListaEstudiantesGrupo();
             }
         });
+
+        function seleccionarAmbiente(element) {
+            const ambienteId = element.getAttribute('data-id');
+            const ambienteNombre = element.getAttribute('data-nombre');
+
+            //guardar el ambiente seleccionado en el localStorage
+            localStorage.setItem('ambiente-seleccionado', ambienteId);
+            localStorage.setItem('ambiente-nombre', ambienteNombre);
+        }
     </script>
 @endsection
