@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('asistencias', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('carga_docente_id')->constrained('carga_docente')->cascadeOnDelete();
             $table->foreignId('estudiante_id')->constrained('estudiantes')->cascadeOnDelete();
             $table->date('fecha');
             $table->boolean('presente')->default(true);
-            $table->unique(['estudiante_id', 'fecha']);
+            $table->unique(['estudiante_id', 'fecha', 'carga_docente_id']);
             $table->timestamps();
         });
     }

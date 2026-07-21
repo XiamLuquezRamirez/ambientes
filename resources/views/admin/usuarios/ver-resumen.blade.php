@@ -98,7 +98,6 @@
             try {
                 const response = await fetch(`${URL_USUARIOS}/${id}/resumen`);
                 const resp = await response.json();
-                console.log('Respuesta del resumen:', resp);
                 if (!response.ok || !resp.success) {
                     throw new Error(resp.message || 'No se pudo cargar el resumen');
                 }

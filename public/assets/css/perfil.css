@@ -305,6 +305,12 @@ PROFILE HEADER
     margin-bottom: 0;
 }
 
+.c-card-ambiente {
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    background: #fff;
+}
+
 .c-head {
     display: flex;
     align-items: center;

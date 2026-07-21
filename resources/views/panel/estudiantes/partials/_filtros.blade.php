@@ -17,7 +17,7 @@
         </select>
 
         <select name="condicion_id" id="filtroCondicion" class="toolbar-select">
-            <option value="">Condición</option>
+            <option value="">Todas las condiciones</option>
             @foreach ($condiciones as $condicion)
                 <option value="{{ $condicion->id }}"
                     {{ (string) ($filtros['condicion_id'] ?? '') === (string) $condicion->id ? 'selected' : '' }}>
@@ -27,7 +27,7 @@
         </select>
 
         <select name="grado_id" id="filtroGrado" class="toolbar-select">
-            <option value="">Grado</option>
+            <option value="">Todos los grados</option>
             @foreach ($grados as $grado)
                 <option value="{{ $grado->id }}"
                     {{ (string) ($filtros['grado_id'] ?? '') === (string) $grado->id ? 'selected' : '' }}>
@@ -37,7 +37,7 @@
         </select>
 
         <select name="estado" id="filtroEstado" class="toolbar-select">
-            <option value="">Estado</option>
+            <option value="">Estados</option>
             <option value="1" {{ ($filtros['estado'] ?? '') === '1' ? 'selected' : '' }}>Activos</option>
             <option value="0" {{ ($filtros['estado'] ?? '') === '0' ? 'selected' : '' }}>Inactivos</option>
         </select>

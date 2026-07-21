@@ -896,6 +896,25 @@
             background: #DCFCE7;
             color: #166534;
         }
+
+        .bienvenida-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            color: #64748B;
+            font-size: .95rem;
+            font-weight: 500;
+        }
+
+        .bienvenida-separador {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #CBD5E1;
+            flex-shrink: 0;
+        }
     </style>
 @endpush
 
@@ -904,9 +923,14 @@
         <!-- Envolvemos la bienvenida para controlarla con JS -->
         <div id="contenedor-bienvenida">
             <h1>¡Bienvenido, {{ Auth::guard('docente')->user()->nombre }}!</h1>
-            <strong>{{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</strong>
 
-            <strong>Selecciona el ambiente con el que trabajarás hoy.</strong>
+            <div class="bienvenida-meta">
+                <span>{{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+
+                <span class="bienvenida-separador"></span>
+
+                <span>Selecciona el ambiente con el que trabajarás hoy.</span>
+            </div>
         </div>
 
         <!-- Este contenedor empezará oculto y mostrará el contexto activo en tiempo real -->
@@ -1114,9 +1138,11 @@
                 tbody.innerHTML += `
         <tr>
 
-            <td>
-                <strong>${estudiante.nombre} ${estudiante.apellido}</strong>
-            </td>
+                                    <td>
+                                        <strong>
+                                            ${estudiante.nombre} ${estudiante.apellido}
+                                        </strong>
+                                    </td>
 
             <td class="text-center">
                 ${estudiante.presentes}

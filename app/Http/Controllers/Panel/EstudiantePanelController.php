@@ -10,6 +10,7 @@ use App\Models\Condicion;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
 use App\Models\Estudiante;
+use App\Models\EstudianteAmbiente;
 use App\Models\FigurasModel;
 use App\Models\Grado;
 use App\Models\Grupo;
@@ -167,9 +168,6 @@ class EstudiantePanelController extends Controller
         if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
             abort(403, 'No tienes acceso a este estudiante.');
         }
-
-        $anio = date('Y');
-
         $estudiante->load([
             'condicion:id,nombre',
             'configuracionPin',
@@ -181,10 +179,16 @@ class EstudiantePanelController extends Controller
 
         $resumenAsistencia = $asistenciaService->resumenAsistencia($estudiante);
 
-        $ambiente = $estudiante->ambientes()
-            ->wherePivot('anio_lectivo', $anio)
-            ->wherePivot('estado', 'activo')
-            ->first();
+        $cargas = CargaDocente::where('docente_id', $docente->id)
+            ->where('activo', true)
+            ->where('anio_lectivo', date('Y'))
+            ->get();
+
+        $ambientesEstudiante = EstudianteAmbiente::where('estudiante_id', $estudiante->id)
+            ->where('anio_lectivo', date('Y'))
+            ->whereIn('ambiente_id', $cargas->pluck('ambiente_id'))
+            ->with('ambiente')
+            ->get();
 
         $portafolioReciente = $estudiante->portafolios()
             ->orderByDesc('creado_en')
@@ -211,7 +215,7 @@ class EstudiantePanelController extends Controller
         return view('panel.estudiantes.show', [
             'estudiante' => $estudiante,
             'matricula' => $estudiante->matriculaActiva,
-            'ambiente' => $ambiente,
+            'ambientesEstudiante' => $ambientesEstudiante,
             'portafolioReciente' => $portafolioReciente,
             'observacionesRecientes' => $observacionesRecientes,
             'estadoPin' => $estadoPin,

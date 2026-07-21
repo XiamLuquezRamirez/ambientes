@@ -9,6 +9,7 @@
         <div class="page-header students-header">
             <div>
                 <h1>Estudiantes</h1>
+                <p>Gestión de estudiantes</p>
             </div>
 
             <button type="button" onclick="abrirModal()" class="btn btn-primary btn-nuevo">

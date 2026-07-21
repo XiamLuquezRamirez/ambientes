@@ -18,7 +18,11 @@
             <tbody>
                 @foreach ($estudiantes as $estudiante)
                     <tr>
-                        <td>{{ $estudiante->nombre }}</td>
+                        <td>
+                            <strong>
+                                {{ $estudiante->nombre }} {{ $estudiante->apellido }}
+                            </strong>
+                        </td>
                         <td>
                             <div class="estado-asistencia">
                                 <button type="button"

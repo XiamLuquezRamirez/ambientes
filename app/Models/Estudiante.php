@@ -36,8 +36,6 @@ class Estudiante extends Model
         );
     }
 
-
-
     protected function colorAvatar(): Attribute
     {
         return Attribute::make(

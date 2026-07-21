@@ -127,6 +127,7 @@ DROP TABLE IF EXISTS `asistencias`;
 
 CREATE TABLE `asistencias` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `carga_docente_id` bigint(20) unsigned NOT NULL,
   `estudiante_id` bigint(20) unsigned NOT NULL,
   `fecha` date NOT NULL,
   `presente` tinyint(1) NOT NULL DEFAULT 1,
@@ -134,10 +135,9 @@ CREATE TABLE `asistencias` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `asistencias_estudiante_id_fecha_unique` (`estudiante_id`,`fecha`),
-  CONSTRAINT `asistencias_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
+  CONSTRAINT `asistencias_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `asistencias_carga_docente_id_foreign` FOREIGN KEY (`carga_docente_id`) REFERENCES `carga_docente` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB  ;
-
-/*Data for the table `asistencias` */
 
 /*Table structure for table `carga_docente` */
 
