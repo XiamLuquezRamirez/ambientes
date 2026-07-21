@@ -246,11 +246,23 @@
                     </div>
 
                     <div class="tab-pane fade" id="tabAmbientes">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <p class="ficha-section-title">Ambientes que estan a su cargo y a los que esta asignado este estudiante</p>
+                        <p class="text-muted">Si desea cambiar el estado de un ambiente, por favor, use el checkbox correspondiente.</p>
+                        <hr>
                         @if ($ambientesEstudiante->isNotEmpty())
                             @foreach ($ambientesEstudiante as $ambiente)
                                 <div class="c-card-ambiente shadow-sm mt-2">
                                     <div class="card-body">
-                                        <strong>{{ $ambiente->ambiente->nombre }}</strong>
+                                        <div class="card-body-content">
+                                            <div class="card-icono" style="background:{{ $ambiente->ambiente->color_hex }}22">{{ $ambiente->ambiente->icono }}</div>
+                                            <strong>Ambiente {{ $ambiente->ambiente->nombre }}</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            <div class="form-check form-switch">
+                                                <input onchange="cambiarEstadoEstudianteAmbiente({{ $ambiente->ambiente_id }},{{ $estudiante->id }}, '{{ $ambiente->ambiente->nombre }}', this)" {{ $ambiente->activo == 1 ? 'checked' : '' }} class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach

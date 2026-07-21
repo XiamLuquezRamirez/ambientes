@@ -95,6 +95,11 @@ function abrirModalConfigurarPin(id, nombre) {
     $("#modalConfigurarPin").modal("show");
 }
 
+function abrirModalVerPinEstudiante(figura1, figura2, figura3, colorfigura1, colorfigura2, colorfigura3) {
+  $("#modalConfigurarPin").modal("show");
+}
+
+
 function cerrarModalConfigurarPin() {
     idEstudianteConfigurarPin = 0;
     $("#modalConfigurarPin").modal("hide");
@@ -141,3 +146,48 @@ function guardarConfigurarPin() {
         }
     });
 }
+
+function cambiarEstadoEstudianteAmbiente(idAmbiente, idEstudiante, nombreAmbiente, element) { 
+    var texto = $(element).is(':checked') ? 'activar' : 'desactivar';
+    Swal.fire({
+        title: '¿Estás seguro ' + texto + ' al estudiante del ambiente ' + nombreAmbiente + '?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Confirmar',
+        cancelButtonText: 'Cancelar',
+    }) .then((result) => {
+        if (result.isConfirmed) {
+            confirmarCambiarEstadoEstudianteAmbiente(idAmbiente, idEstudiante, element);
+        }else{
+            $(element).prop('checked', !$(element).prop('checked'));
+        }
+    });
+}   
+
+function confirmarCambiarEstadoEstudianteAmbiente(idAmbiente, idEstudiante, element) { 
+    var CSRF_TOKEN = $("input[name='csrf_token']").val();
+    $.ajax({
+        url: `${URL_ESTUDIANTES}/cambiar-estado-ambiente-estudiante`,
+        type: "POST",
+        data: {
+            _token: CSRF_TOKEN,
+            idAmbiente: idAmbiente,
+            idEstudiante: idEstudiante,
+            activo: $(element).is(':checked') ? 1 : 0
+        },
+        success: function(response) {
+            if(response.success) {
+                mostrarToast(response.tipo_alerta, response.message);
+            } else {
+                mostrarToast("error", response.message);
+            }
+        },
+        error: function(xhr) {
+            // volver el checkbox a su estado anterior
+            $(element).prop('checked', !$(element).prop('checked'));
+            mostrarToast("error", xhr.responseJSON.message);
+        }
+    });
+}   

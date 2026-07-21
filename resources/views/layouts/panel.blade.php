@@ -43,7 +43,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('panel.estudiantes') }}"
+                <a id="link-estudiantes-menu" href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
                     class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
                     <i class="fa-solid fa-child"></i> Estudiantes
                 </a>

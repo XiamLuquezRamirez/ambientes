@@ -472,4 +472,49 @@ class EstudiantePanelController extends Controller
             'message' => 'Error al configurar el PIN, intente nuevamente.',
         ]);
     }
+
+    public function cambiarEstadoAmbienteEstudiante(Request $request)
+    {
+        $datos = $request->validate([
+            'idAmbiente' => 'required|exists:ambientes,id',
+            'idEstudiante' => 'required|exists:estudiantes,id',
+            'activo' => 'required|boolean',
+        ]);
+
+        $ambiente = Ambiente::findOrFail($datos['idAmbiente']);
+        $estudiante = Estudiante::findOrFail($datos['idEstudiante']);
+
+        if (!$ambiente || !$estudiante) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ambiente o estudiante no encontrado.',
+            ]);
+        }
+
+        $estudianteAmbiente = EstudianteAmbiente::where('estudiante_id', $datos['idEstudiante'])
+            ->where('ambiente_id', $datos['idAmbiente'])
+            ->update(['activo' => $datos['activo']]);
+
+        if ($estudianteAmbiente) {
+            if ($datos['activo'] == 1) {
+                $tipo_alerta = 'success';
+                $message = 'El estudiante ' . $estudiante->nombre . ' ' . $estudiante->apellido . ' ha sido activado del ambiente ' . $ambiente->nombre . ' correctamente.';
+            } else {
+                $tipo_alerta = 'warning';
+                $message = 'El estudiante ' . $estudiante->nombre . ' ' . $estudiante->apellido . ' ha sido desactivado del ambiente ' . $ambiente->nombre . ' correctamente.';
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'tipo_alerta' => $tipo_alerta,
+            ]);
+
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cambiar el estado del ambiente del estudiante.',
+            ]);
+        }
+    }
 }

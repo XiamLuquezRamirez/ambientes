@@ -309,6 +309,40 @@ PROFILE HEADER
     border: 1px solid #E2E8F0;
     border-radius: 16px;
     background: #fff;
+    transition: .25s;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+.c-card-ambiente:hover {
+    transform: scale(1.02);
+    box-shadow: 0 .2rem 1rem rgba(0, 0, 0, .05);
+    background: #f8fafc;
+}
+
+.c-card-ambiente .card-body {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.5rem;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.c-card-ambiente .card-body-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.c-card-ambiente .card-icono {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
 }
 
 .c-head {
