@@ -362,6 +362,7 @@ CREATE TABLE `estudiante_ambiente` (
   `anio_lectivo` smallint(5) unsigned NOT NULL,
   `estado` enum('activo','restringido','adaptado') NOT NULL DEFAULT 'activo',
   `observacion` text DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -374,11 +375,11 @@ CREATE TABLE `estudiante_ambiente` (
 /*Data for the table `estudiante_ambiente` */
 
 insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`created_at`,`updated_at`) values
-(1,13,3,2026,'activo',NULL,'2026-06-24 09:05:13','2026-06-24 09:05:13'),
-(2,11,3,2026,'activo',NULL,'2026-06-24 09:05:13','2026-06-24 09:05:13'),
-(3,5,3,2026,'activo',NULL,'2026-06-24 16:06:12','2026-06-24 16:06:12'),
-(4,9,3,2026,'activo',NULL,'2026-06-24 16:06:12','2026-06-24 16:06:12'),
-(5,12,3,2026,'activo',NULL,'2026-06-24 16:06:12','2026-06-24 16:06:12');
+(1,13,3,2026,'activo',NULL, 1,  '2026-06-24 09:05:13','2026-06-24 09:05:13'),
+(2,11,3,2026,'activo',NULL, 1, '2026-06-24 09:05:13','2026-06-24 09:05:13'),
+(3,5,3,2026,'activo',NULL, 1, '2026-06-24 16:06:12','2026-06-24 16:06:12'),
+(4,9,3,2026,'activo',NULL, 1, '2026-06-24 16:06:12','2026-06-24 16:06:12'),
+(5,12,3,2026,'activo',NULL, 1, '2026-06-24 16:06:12','2026-06-24 16:06:12');
 
 /*Table structure for table `estudiantes` */
 
