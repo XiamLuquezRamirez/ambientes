@@ -440,7 +440,6 @@ async function mapearDatosEstudiante(datos) {
     }
 }
 
-
 async function cargarMunicipios() {
     const departamento = $('#departamento_id').val();
     return new Promise((resolve, reject) => {
@@ -467,7 +466,6 @@ async function cargarMunicipios() {
         });
     });
 }
-
 
 function editarEstudiante(datos) {
     const formData = new FormData();
@@ -613,4 +611,42 @@ if (tipoGuardaEstudiante === 1) {
 } else if (tipoGuardaEstudiante === 2) {
     $("#ambiente-grado-grupo-container-docente").show();
     $("#grado-container-admin").hide();
+}
+
+/* ── Restablecer PIN ──────────────────────────────────────────── */
+async function confirmarRestablecerPin(id) {
+    Swal.fire({
+        title: '¿Restablecer PIN?',
+        text: '¿Estás seguro de querer restablecer el PIN del estudiante?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, restablecer',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#2045a3',
+        cancelButtonColor: '#94A3B8',
+        iconColor: '#F59E0B',
+    }).then(async function (result) {
+        if (result.isConfirmed) {
+            await restablecerPin(id);
+        }
+    }); 
+}
+
+async function restablecerPin(id) {
+    await $.ajax({
+        url: `${URL_ESTUDIANTES}/restablecer-pin/${id}`,
+        type: 'GET',
+        dataType: 'json',
+        success: async function (res) {
+            if (res.success) {
+                mostrarToast('success', res.message);
+                await cargarTabla(location.href);
+            } else {
+                mostrarToast('error', res.message);
+            }
+        },
+        error: function (xhr) {
+            mostrarToast('error', 'Error al restablecer el PIN');
+        },
+    });
 }

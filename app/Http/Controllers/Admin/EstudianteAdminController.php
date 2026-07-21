@@ -25,7 +25,7 @@ class EstudianteAdminController extends Controller
         
         $grados = Grado::where('activo', true)->orderBy('nombre')->get();
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
-        $consulta = Estudiante::with('grado')->where('activo', '<>', 2);
+        $consulta = Estudiante::with('grado', 'configuracionPin')->where('activo', '<>', 2);
         $departamentos = Departamento::orderBy('descripcion')->get();
         /* ── Filtros ────────────────────────────────────── */
         if ($request->filled('buscar')) {
@@ -313,10 +313,6 @@ class EstudianteAdminController extends Controller
         return back()->with('info', 'Pendiente de implementacion.');
     }
 
-    public function restablecerPin($estudiante)
-    {
-        return back()->with('info', 'Pendiente de implementacion.');
-    }
 
     public function listarGrupos(Request $request)
     {
@@ -364,6 +360,29 @@ class EstudianteAdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al cambiar el estado del estudiante.',
+            ]);
+        }
+    }
+
+    public function restablecerPin($idEstudiante)
+    {
+        $configuracionPin = ConfiguracionPin::where('estudiante_id', $idEstudiante)->first();
+
+        if ($configuracionPin) {
+            $exitoso = $configuracionPin->delete();
+        } else {
+            $exitoso = false;
+        }
+
+        if ($exitoso) {
+            return response()->json([
+                'success' => true,
+                'message' => 'PIN restablecido exitosamente.',
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al restablecer el PIN.',
             ]);
         }
     }

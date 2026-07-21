@@ -154,7 +154,7 @@ class PiarController extends Controller
             "eps" => "required|string",
             "lugar_emergencia" => "required|string",
             "diagnostico_medico" => "required|string",
-            "cual_diagnostico" => "required|string",
+            "cual_diagnostico" => "required_if:diagnostico_medico,Si",
             "atencion_medica" => "required|string",
             "atencion" => "required|array",
             "tratamiento_integral" => "nullable|string",
@@ -192,6 +192,12 @@ class PiarController extends Controller
                 'cuales_ayudas' => $datos['ayudas_tecnicas'] == 'Si' ? $datos['cuales_ayudas'] : null,
             ]
         );
+
+        if ($datos['diagnostico_medico'] == 'Si') {
+            Estudiante::where('id', $datos['id_estudiante'])->update([
+                'condicion_id' => $datos['cual_diagnostico'],
+            ]);
+        }
 
         if (!$registro) {
             return response()->json([
