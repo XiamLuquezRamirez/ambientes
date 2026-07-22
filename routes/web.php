@@ -42,6 +42,16 @@ Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('doce
 Route::post('/login', [AuthDocenteController::class, 'iniciarSesion'])->name('docente.login.post');
 Route::post('/logout', [AuthDocenteController::class, 'cerrarSesion'])->name('docente.logout');
 
+// Endpoint para guardar los datos generales del Piar
+// Piar
+Route::get('estudiantes/diligenciar-piar/{idEstudiante}/{tipo}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
+Route::get('piar', [PiarController::class, 'listado'])->name('admin.piar');
+Route::get('piar/{idEstudiante}', [PiarController::class, 'verPiar'])->name('admin.piar.ver');
+Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])->name('admin.piar.guardar-piar');
+Route::get('piar/buscar-docente/{texto}', [PiarController::class, 'buscarDocente'])->name('admin.piar.buscar-docente');
+Route::get('piar/verificar-si-comenzo/{idEstudiante}', [PiarController::class, 'verificarSiComenzo'])->name('admin.piar.verificar-si-comenzo');
+Route::get('piar/exportar/{idEstudiante}', [PiarController::class, 'exportar'])->name('admin.piar.exportar');
+
 // ── Panel Admin ───────────────────────────────────────────────────────────
 Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('/', fn () => redirect()->route('admin.ambientes'));
@@ -137,15 +147,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('estudiantes/cambiar-estado/{idEstudiante}/{estado}', [EstudianteAdminController::class, 'cambiarEstado'])->name('admin.estudiantes.cambiar-estado');
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('admin.estudiantes.cargar-municipios');
     Route::get('estudiantes/restablecer-pin/{idEstudiante}', [EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.restablecer-pin');
-    // Endpoint para guardar los datos generales del Piar
-    // Piar
-    Route::get('estudiantes/diligenciar-piar/{idEstudiante}/{tipo}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
-    Route::get('piar', [PiarController::class, 'listado'])->name('admin.piar');
-    Route::get('piar/{idEstudiante}', [PiarController::class, 'verPiar'])->name('admin.piar.ver');
-    Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])->name('admin.piar.guardar-piar');
-    Route::get('piar/buscar-docente/{texto}', [PiarController::class, 'buscarDocente'])->name('admin.piar.buscar-docente');
-    Route::get('piar/verificar-si-comenzo/{idEstudiante}', [PiarController::class, 'verificarSiComenzo'])->name('admin.piar.verificar-si-comenzo');
-    Route::get('piar/exportar/{idEstudiante}', [PiarController::class, 'exportar'])->name('admin.piar.exportar');
+
     // Catalogo
     Route::get('catalogo', [CatalogoController::class, 'listar'])->name('admin.catalogo');
     Route::post('catalogo/modulos', [CatalogoController::class, 'guardarModulo'])->name('admin.catalogo.modulo.store');
@@ -199,7 +201,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Estudiantes (panel docente)
     // Listado → card → ficha: panel.estudiantes → _card (ojo) → panel.estudiantes.show (verFicha)
-    
+
     Route::get('estudiantes/lista/{ambiente}', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
     Route::post('estudiantes', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiantes.guardar');
     // Rutas estáticas antes de {estudiante}

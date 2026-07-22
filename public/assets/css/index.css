@@ -853,17 +853,12 @@ select.form-control {
     color: #dc2626;
 }
 
+
 .estado-asistencia {
     display: inline-flex;
     align-items: center;
     gap: .55rem;
     font-weight: 600;
-}
-
-.estado-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
 }
 
 .estado-asistencia--presente .estado-dot {
@@ -888,4 +883,71 @@ select.form-control {
 
 .estado-asistencia--sin {
     color: #64748B;
+}
+
+.estado-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* Contenedor */
+.asistencia-switch {
+    display: flex;
+
+    gap: .75rem;
+}
+
+/* Switch */
+.asistencia-switch .form-check-input {
+    width: 2.8rem;
+    height: 1.45rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 999px;
+    transition: all .25s ease;
+    background-color: #EF4444;
+    box-shadow: none;
+}
+
+/* Bolita */
+.asistencia-switch .form-check-input::before {
+    transition: all .25s ease;
+}
+
+/* Presente */
+.asistencia-switch .form-check-input:checked {
+    background-color: #2563EB;
+}
+
+/* Ausente */
+.asistencia-switch .form-check-input:not(:checked) {
+    background-color: #EF4444;
+}
+
+/* Hover */
+.asistencia-switch .form-check-input:hover {
+    transform: scale(1.05);
+}
+
+/* Focus */
+.asistencia-switch .form-check-input:focus {
+    box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .15);
+}
+
+/* Texto */
+.estado-texto {
+    min-width: 72px;
+    font-size: .95rem;
+    font-weight: 500;
+    color: #334155;
+    transition: color .25s;
+}
+
+.form-check-input:checked+.estado-texto {
+    color: #2563EB;
+}
+
+.form-check-input:not(:checked)+.estado-texto {
+    color: #DC2626;
 }

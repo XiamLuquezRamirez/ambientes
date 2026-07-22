@@ -66,27 +66,6 @@ ul.nav-tabs {
     color: #ffffff;
 }
 
-.btn-asistencia {
-    min-width: 110px;
-    padding: 8px 18px;
-    border: none;
-    border-radius: 999px;
-    font-size: .9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .25s;
-}
-
-.btn-asistencia.presente {
-    background: #8ee7b9;
-    color: #16a34a;
-}
-
-.btn-asistencia.ausente {
-    background: #f88e8e;
-    color: #b61717;
-}
-
 .estudiante-card.ausente {
     border: 2px solid #b61717;
     background: #f88e8e;

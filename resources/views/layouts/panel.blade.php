@@ -43,7 +43,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a  href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
+                <a href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
                     class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link link-ambiente' : 'nav-link link-ambiente' }}">
                     <i class="fa-solid fa-child"></i> Estudiantes
                 </a>
@@ -163,7 +163,7 @@
 
             if (!idAmbiente) return;
 
-            $('.link-ambiente').each(function () {
+            $('.link-ambiente').each(function() {
                 if (!$(this).data('template')) {
                     $(this).data('template', $(this).attr('href'));
                 }
@@ -174,7 +174,7 @@
                 );
             });
 
-            $('.link-ambiente-formulario').each(function () {
+            $('.link-ambiente-formulario').each(function() {
                 if (!$(this).data('template')) {
                     $(this).data('template', $(this).attr('action'));
                 }

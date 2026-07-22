@@ -24,15 +24,14 @@
                             </strong>
                         </td>
                         <td>
-                            <div class="estado-asistencia">
-                                <button type="button"
-                                    class="btn-asistencia {{ $estudiante->presente ? 'presente' : 'ausente' }}"
-                                    data-id="{{ $estudiante->id }}"
-                                    data-estado="{{ $estudiante->presente ? 'presente' : 'ausente' }}">
+                            <div class="form-check form-switch asistencia-switch">
+                                <input class="form-check-input btn-asistencia" type="checkbox" role="switch"
+                                    id="asistencia{{ $estudiante->id }}" data-id="{{ $estudiante->id }}"
+                                    {{ $estudiante->presente ? 'checked' : '' }} style="cursor:pointer;">
 
+                                <label class="form-check-label estado-texto" for="asistencia{{ $estudiante->id }}">
                                     {{ $estudiante->presente ? 'Presente' : 'Ausente' }}
-
-                                </button>
+                                </label>
                             </div>
                         </td>
                     </tr>
@@ -56,43 +55,44 @@
         const CARGA_DOCENTE_ID = {{ $carga->id }};
         const URL_REGISTRAR_ASISTENCIA = '/panel/asistencia/registrar-asistencia';
 
-        const asistencia = {};
+        document.querySelectorAll('.btn-asistencia').forEach(switchAsistencia => {
 
-        document.addEventListener('click', function(e) {
+            actualizarEstado(switchAsistencia);
 
-            const boton = e.target.closest('.btn-asistencia');
-
-            if (!boton) return;
-
-            if (boton.dataset.estado === 'presente') {
-
-                boton.dataset.estado = 'ausente';
-                boton.textContent = 'Ausente';
-
-                boton.classList.remove('presente');
-                boton.classList.add('ausente');
-
-            } else {
-
-                boton.dataset.estado = 'presente';
-                boton.textContent = 'Presente';
-
-                boton.classList.remove('ausente');
-                boton.classList.add('presente');
-
-            }
+            switchAsistencia.addEventListener('change', function() {
+                actualizarEstado(this);
+            });
 
         });
 
+        function actualizarEstado(switchAsistencia) {
+
+            const label = switchAsistencia.parentElement.querySelector('.estado-texto');
+
+            if (!label) return;
+
+            if (switchAsistencia.checked) {
+
+                label.textContent = 'Presente';
+                label.classList.remove('text-danger');
+                label.classList.add('text-primary');
+
+            } else {
+
+                label.textContent = 'Ausente';
+                label.classList.remove('text-primary');
+                label.classList.add('text-danger');
+
+            }
+
+        }
 
         async function registrarAsistencia() {
 
             const asistencias = {};
 
-            document.querySelectorAll('.btn-asistencia').forEach(btn => {
-
-                asistencias[btn.dataset.id] = btn.dataset.estado === 'presente';
-
+            document.querySelectorAll('.btn-asistencia').forEach(input => {
+                asistencias[input.dataset.id] = input.checked;
             });
 
             try {
@@ -101,7 +101,7 @@
                     URL_REGISTRAR_ASISTENCIA,
                     'POST', {
                         carga_docente_id: CARGA_DOCENTE_ID,
-                        asistencias: asistencias
+                        asistencias
                     }
                 );
 

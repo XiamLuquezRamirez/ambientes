@@ -46,7 +46,8 @@
 
     <div class="student-info {{ $e->tiene_pin ? '' : 'student-info--alert' }}">
         @if ($e->tiene_pin)
-            <div class="pin-status" onclick="abrirModalVerPinEstudiante('{{ $e->figura1 }}', '{{ $e->figura2 }}', '{{ $e->figura3 }}', '{{ $e->colorfigura1 }}', '{{ $e->colorfigura2 }}', '{{ $e->colorfigura3 }}')">
+            <div class="pin-status"
+                onclick="abrirModalVerPinEstudiante('{{ $e->figura1 }}', '{{ $e->figura2 }}', '{{ $e->figura3 }}', '{{ $e->colorfigura1 }}', '{{ $e->colorfigura2 }}', '{{ $e->colorfigura3 }}')">
                 <i class="fa-solid fa-lock"></i>
                 <span>PIN configurado</span>
             </div>
@@ -55,27 +56,54 @@
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>Sin PIN</span>
             </div>
-            <button type="button" class="pin-requerido" onclick="abrirModalConfigurarPin('{{ $e->id }}', '{{ $e->nombre }} {{ $e->apellido }}')">
+            <button type="button" class="pin-requerido"
+                onclick="abrirModalConfigurarPin('{{ $e->id }}', '{{ $e->nombre }} {{ $e->apellido }}')">
                 Requiere configuración
             </button>
         @endif
     </div>
 
     {{-- Acciones de la card: el ojo abre la ficha completa (verFicha / show.blade.php) --}}
-    <div class="student-footer">
-        <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-action" title="Ver ficha completa">
-            <i class="fa-solid fa-eye"></i>
-        </a>
-        <button type="button" onclick="abrirModalEditarEstudiante('{{ $e->id }}')" class="btn-action"
-            title="Editar">
-            <i class="fa-solid fa-pen"></i>
-        </button>
-        <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-action" title="Documentos">
-            <i class="fa-solid fa-file-lines"></i>
-        </a>
-        <button type="button" class="btn-action" title="Más opciones">
-            <i class="fa-solid fa-ellipsis-vertical"></i>
-        </button>
-    </div>
+    <div class="student-footer d-flex justify-content-end">
+        <div class="student-footer">
+            <div class="dropdown tabla-opciones-dropdown">
+                <button class="btn-action btn-ver-resumen " type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                    Opciones
+                </button>
 
+                <ul class="dropdown-menu dropdown-menu-acciones">
+
+                    <li>
+                        <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-accion btn-ver-resumen">
+                            <i class="fa-solid fa-eye"></i>
+                            Ver ficha completa
+                        </a>
+                    </li>
+
+                    <li>
+                        <button type="button" class="btn-accion btn-editar"
+                            onclick="abrirModalEditarEstudiante('{{ $e->id }}')">
+                            <i class="fa-solid fa-pen"></i>
+                            Editar
+                        </button>
+                    </li>
+
+                    {{--
+                     para futuras acciones:
+        
+                    <li>
+                        <button type="button"
+                            class="btn-accion btn-eliminar"
+                            data-id="{{ $e->id }}">
+                            <i class="fa-solid fa-trash-can"></i>
+                            Eliminar
+                        </button>
+                    </li>
+                    --}}
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>

@@ -13,11 +13,26 @@ return new class extends Migration
     {
         Schema::create('asistencias', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('carga_docente_id')->constrained('carga_docente')->cascadeOnDelete();
-            $table->foreignId('estudiante_id')->constrained('estudiantes')->cascadeOnDelete();
+
+            $table->foreignId('carga_docente_id')
+                ->constrained('carga_docente')
+                ->cascadeOnDelete();
+
+            $table->foreignId('estudiante_id')
+                ->constrained('estudiantes')
+                ->cascadeOnDelete();
+
             $table->date('fecha');
+
             $table->boolean('presente')->default(true);
-            $table->unique(['estudiante_id', 'fecha', 'carga_docente_id']);
+
+            // Un registro por estudiante, carga y fecha
+            $table->unique([
+                'carga_docente_id',
+                'estudiante_id',
+                'fecha',
+            ], 'asistencias_carga_estudiante_fecha_unique');
+
             $table->timestamps();
         });
     }
