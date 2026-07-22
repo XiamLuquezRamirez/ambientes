@@ -601,7 +601,7 @@
         <h1>Diligenciar PIAR</h1>
         <p>Plan Individual de Ajustes Razonables</p>
     </div>
-    <a href="{{ route('admin.estudiantes') }}" class="btn btn-piar-outline">
+    <a href="window.history.back()" class="btn btn-piar-outline">
         <i class="fas fa-arrow-left me-1"></i> Volver
     </a>
 </div>

@@ -922,3 +922,20 @@
     pointer-events: none;
     transition: .2s;
 }
+
+/*==========================
+    MODAL
+===========================*/
+
+.pin-status--active {
+    padding: 4px 8px;
+    background: #eeeeee;
+    cursor: pointer;
+    transition: all .2s ease;
+    color: #464646;
+}
+
+.pin-status--active:hover {
+    background: #d4d4d4;
+    color: #242424;
+}
