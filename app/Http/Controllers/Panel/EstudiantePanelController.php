@@ -230,6 +230,7 @@ class EstudiantePanelController extends Controller
             'bloqueado' => 'Bloqueado',
         ];
 
+
         return view('panel.estudiantes.show', [
             'estudiante' => $estudiante,
             'matricula' => $estudiante->matriculaActiva,

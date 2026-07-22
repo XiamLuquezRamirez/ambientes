@@ -314,8 +314,8 @@
                     </button>
                 </form>
                 @php
-                    if (!$estudiante->condicion_es_estandar) {
-                        if ($mostrarVerPiar && $estudiante->piar !== null && $estudiante->piar->paso < 8) {
+                    if ($requiereApoyo) {
+                        if ($estudiante->piar !== null && $estudiante->piar->paso < 8) {
                             $clase = 'btn btn-primary';
                             $texto = 'PIAR incompleto';
                             $ruta = route('admin.estudiantes.diligenciar-piar', [
@@ -342,7 +342,7 @@
                         }
                     }
                 @endphp
-                @if (!$estudiante->condicion_es_estandar)
+                @if ($requiereApoyo)
                     <a class="btn {{ $clase }}" title="{{ $texto }}" href="{{ $ruta }}">
                         <i class="fa-solid fa-file-medical"></i> {{ $texto }}
                     </a>

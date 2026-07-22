@@ -632,13 +632,9 @@
             <h1>Diligenciar PIAR</h1>
             <p>Plan Individual de Ajustes Razonables</p>
         </div>
-        <a href="{{ route('admin.estudiantes') }}" class="btn btn-piar-outline">
+        <a href="javascript:window.history.back()" class="btn btn-piar-outline">
             <i class="fas fa-arrow-left me-1"></i> Volver
         </a>
-    </div>
-    <a href="window.history.back()" class="btn btn-piar-outline">
-        <i class="fas fa-arrow-left me-1"></i> Volver
-    </a>
     </div>
     <div class="piar-container">
         <input type="hidden" id="id_estudiante_piar" value="{{ $estudiante?->id }}">
