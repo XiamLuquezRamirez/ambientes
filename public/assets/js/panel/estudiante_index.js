@@ -93,10 +93,21 @@ function abrirModalConfigurarPin(id, nombre) {
     idEstudianteConfigurarPin = id;
     $("#nombreEstudiante").text(nombre);
     $("#modalConfigurarPin").modal("show");
+    $("#modalConfigurarPin .modal-footer").show();
 }
 
 function abrirModalVerPinEstudiante(figura1, figura2, figura3, colorfigura1, colorfigura2, colorfigura3) {
-  $("#modalConfigurarPin").modal("show");
+    var datos = {
+        figura_1: figura1,
+        figura_2: figura2,
+        figura_3: figura3,
+        color_figura_1: colorfigura1,
+        color_figura_2: colorfigura2,
+        color_figura_3: colorfigura3
+    };
+    mapearDatosPin(datos);
+    $("#modalConfigurarPin").modal("show");
+    $("#modalConfigurarPin .modal-footer").hide();
 }
 
 
