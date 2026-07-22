@@ -46,12 +46,8 @@
 
     <div class="student-info {{ $e->tiene_pin ? '' : 'student-info--alert' }}">
         @if ($e->tiene_pin)
-<<<<<<< HEAD
-            <div class="pin-status"
-                onclick="abrirModalVerPinEstudiante('{{ $e->figura1 }}', '{{ $e->figura2 }}', '{{ $e->figura3 }}', '{{ $e->colorfigura1 }}', '{{ $e->colorfigura2 }}', '{{ $e->colorfigura3 }}')">
-=======
-            <div class="pin-status" onclick="abrirModalVerPinEstudiante('{{ $e->configuracionPin->figura_1 }}', '{{ $e->configuracionPin->figura_2 }}', '{{ $e->configuracionPin->figura_3 }}', '{{ $e->configuracionPin->color_figura_1 }}', '{{ $e->configuracionPin->color_figura_2 }}', '{{ $e->configuracionPin->color_figura_3 }}')">
->>>>>>> 995d58c6e5d920eb5cfcbf00e98c6b358f3c8a55
+            <div class="pin-status pin-status--active"
+                onclick="abrirModalVerPinEstudiante('{{ $e->configuracionPin->figura_1 }}', '{{ $e->configuracionPin->figura_2 }}', '{{ $e->configuracionPin->figura_3 }}', '{{ $e->configuracionPin->color_figura_1 }}', '{{ $e->configuracionPin->color_figura_2 }}', '{{ $e->configuracionPin->color_figura_3 }}' , '{{ $e->nombre }} {{ $e->apellido }}')">
                 <i class="fa-solid fa-lock"></i>
                 <span>PIN configurado</span>
             </div>
