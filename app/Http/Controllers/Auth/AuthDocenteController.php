@@ -84,6 +84,9 @@ class AuthDocenteController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        session()->forget('ambiente_id');
+        session()->forget('ambiente_nombre');
+
         return redirect()->route('docente.login');
     }
 }

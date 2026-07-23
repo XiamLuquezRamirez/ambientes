@@ -1,4 +1,4 @@
-<form class="students-toolbar link-ambiente-formulario" method="GET" action="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" id="formFiltrosEstudiantes">
+<form class="students-toolbar" method="GET" action="{{ route('panel.estudiantes') }}" id="formFiltrosEstudiantes">
 
     <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>

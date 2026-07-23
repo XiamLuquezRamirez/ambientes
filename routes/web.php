@@ -202,7 +202,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     // Estudiantes (panel docente)
     // Listado → card → ficha: panel.estudiantes → _card (ojo) → panel.estudiantes.show (verFicha)
 
-    Route::get('estudiantes/lista/{ambiente}', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
+    Route::get('estudiantes/lista', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
     Route::post('estudiantes', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiantes.guardar');
     // Rutas estáticas antes de {estudiante}
     Route::get('estudiantes/create', [EstudiantePanelController::class, 'formularioCrear'])->name('panel.estudiantes.create');
@@ -252,6 +252,12 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     // Grados por ambiente
     Route::get('grupos/grados/docente/{idGrado}', [EstudiantePanelController::class, 'obtenerGruposPorGrado'])->name('panel.grupos.grados.docente');
     Route::get('grupos/ambientes-disponibles/{grado}/{grupo}', [EstudiantePanelController::class, 'obtenerAmbientesDisponibles'])->name('panel.estudiantes.ambientes-disponibles');
+
+    // Ambientes
+    //guardar el ambiente seleccionado en la sesion
+    Route::post('ambientes/seleccionar', [SesionController::class, 'seleccionarAmbiente'])->name('panel.ambientes.seleccionar');
+    Route::get('ambientes/eliminar', [SesionController::class, 'eliminarAmbienteSeleccionado'])->name('panel.ambientes.eliminar');
+    Route::get('ambientes/obtener', [SesionController::class, 'obtenerAmbienteSeleccionado'])->name('panel.ambientes.obtener');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

@@ -43,8 +43,8 @@
             </li>
             <div id="menu-lateral-ambiente">
                 <li class="nav-item">
-                    <a href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
-                        class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link link-ambiente' : 'nav-link link-ambiente' }}">
+                    <a href="{{ route('panel.estudiantes') }}"
+                        class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
                         <i class="fa-solid fa-child"></i> Estudiantes
                     </a>
                 </li>
@@ -158,81 +158,6 @@
             @yield('content')
         </div>
     </main>
-    <script>
-        function setAmbiente() {
-            const idAmbiente = localStorage.getItem('ambiente-seleccionado');
-
-            if (!idAmbiente) return;
-
-            $('.link-ambiente').each(function() {
-                if (!$(this).data('template')) {
-                    $(this).data('template', $(this).attr('href'));
-                }
-
-                $(this).attr(
-                    'href',
-                    $(this).data('template').replace('__ID__', idAmbiente)
-                );
-            });
-
-            $('.link-ambiente-formulario').each(function() {
-                if (!$(this).data('template')) {
-                    $(this).data('template', $(this).attr('action'));
-                }
-
-                $(this).attr(
-                    'action',
-                    $(this).data('template').replace('__ID__', idAmbiente)
-                );
-            });
-        }
-
-        setAmbiente();
-
-
-        $(document).click(function() {
-            setAmbiente();
-        });
-
-        /* ── Menu lateral ambiente ──────────────────────────────────── */
-        // Maneja la navegación de los enlaces del menú lateral de ambiente.
-        // Si no hay ambiente seleccionado, muestra un mensaje de error.
-        // Si hay ambiente seleccionado, reemplaza el __ID__ en los enlaces por el ID del ambiente.
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const menu = document.getElementById('menu-lateral-ambiente');
-
-            if (!menu) return;
-
-            menu.querySelectorAll('a').forEach(link => {
-
-                link.addEventListener('click', function(e) {
-
-                    const ambiente = localStorage.getItem('ambiente-seleccionado');
-
-                    if (!ambiente) {
-                        e.preventDefault();
-
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Seleccione un Ambiente',
-                            text: 'Debe seleccionar un ambiente antes de continuar.',
-                            confirmButtonText: 'Entendido'
-                        });
-
-                        return;
-                    }
-
-                    if (this.href.includes('__ID__')) {
-                        this.href = this.href.replace('__ID__', ambiente);
-                    }
-
-                });
-
-            });
-
-        });
-    </script>
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
 
@@ -245,7 +170,7 @@
                     text: 'Actualmente no tiene cargas académicas asignadas. Algunas funciones del sistema no estarán disponibles.',
                     confirmButtonText: 'Entendido'
                 });
-            });
+            });   
         </script>
     @endif
 
@@ -265,7 +190,6 @@
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    localStorage.clear();
                     this.submit();
                 }
             });

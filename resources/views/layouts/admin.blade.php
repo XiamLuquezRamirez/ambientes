@@ -209,7 +209,6 @@
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {
-                    localStorage.clear();
                     this.submit();
                 }
             });

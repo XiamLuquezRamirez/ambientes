@@ -915,187 +915,211 @@
             background: #CBD5E1;
             flex-shrink: 0;
         }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        #contenedor-cargando {
+            display: flex;
+            width: calc(100% - 240px);
+            left:  240px;
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+        }
     </style>
 @endpush
 
 @section('content')
-    <div class="page-header">
-        <!-- Envolvemos la bienvenida para controlarla con JS -->
-        <div id="contenedor-bienvenida">
+    <div id="contenedor" style="display: none;">
+        <div class="page-header">
+            <!-- Envolvemos la bienvenida para controlarla con JS -->
+            <div id="contenedor-bienvenida">
 
-            <h1>¡Bienvenido, {{ Auth::guard('docente')->user()->nombre }}!</h1>
+                <h1>¡Bienvenido, {{ Auth::guard('docente')->user()->nombre }}!</h1>
 
-            <div class="bienvenida-meta">
-                <span>{{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                <div class="bienvenida-meta">
+                    <span>{{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
 
-                <span class="bienvenida-separador"></span>
+                    <span class="bienvenida-separador"></span>
 
-                <span>Selecciona el ambiente con el que trabajarás hoy.</span>
+                    <span>Selecciona el ambiente con el que trabajarás hoy.</span>
+                </div>
+
             </div>
 
+            <!-- Este contenedor empezará oculto y mostrará el contexto activo en tiempo real -->
+            <div id="contenedor-ambiente-activo" style="display: none;">
+                <h1 style="font-size: 1.8rem; margin: 0; color: #333;">
+                    <span id="txt-contexto-ambiente"></span>
+                    <span id="txt-contexto-detalle"></span>
+                    <button class="btn btn-primary float-end" id="btn-volver-ambientes">
+                        <i class="fas fa-arrow-left"></i> Volver a seleccionar ambiente
+                    </button>
+                </h1>
+            </div>
         </div>
 
-        <!-- Este contenedor empezará oculto y mostrará el contexto activo en tiempo real -->
-        <div id="contenedor-ambiente-activo" style="display: none;">
-            <h1 style="font-size: 1.8rem; margin: 0; color: #333;">
-                <span id="txt-contexto-ambiente"></span>
-                <span id="txt-contexto-detalle"></span>
-                <button class="btn btn-primary float-end" id="btn-volver-ambientes">
-                    <i class="fas fa-arrow-left"></i> Volver a seleccionar ambiente
-                </button>
-            </h1>
-        </div>
-    </div>
+        <!-- GRID DE AMBIENTES (Se ocultará al seleccionar uno) -->
+        <div class="ambientes-grid" id="ambientes-container">
+            @foreach ($ambientes as $amb)
+                <div class="ambiente-card btn-seleccionar-ambiente" id="tarjeta-amb-{{ $amb->id }}"
+                    data-id="{{ $amb->id }}" data-nombre="{{ $amb->nombre }}" onclick="seleccionarAmbiente(this)">
 
-    <!-- GRID DE AMBIENTES (Se ocultará al seleccionar uno) -->
-    <div class="ambientes-grid" id="ambientes-container">
-        @foreach ($ambientes as $amb)
-            <div class="ambiente-card btn-seleccionar-ambiente" id="tarjeta-amb-{{ $amb->id }}"
-                data-id="{{ $amb->id }}" data-nombre="{{ $amb->nombre }}" onclick="seleccionarAmbiente(this)">
+                    <div class="card-franja" style="background:{{ $amb->color_hex }}"></div>
 
-                <div class="card-franja" style="background:{{ $amb->color_hex }}"></div>
-
-                <div class="card-head">
-                    <div class="card-icono" style="background:{{ $amb->color_hex }}22">{{ $amb->icono }}</div>
-                    <div class="card-info">
-                        <div class="card-nombre">{{ $amb->nombre }}</div>
-                        <div class="card-ip">
-                            <i class="fas fa-server" style="font-size:.7rem"></i>
-                            <span class="card-ip-texto">{{ $amb->servidor_ip ?? 'Sin IP configurada' }}</span>
+                    <div class="card-head">
+                        <div class="card-icono" style="background:{{ $amb->color_hex }}22">{{ $amb->icono }}</div>
+                        <div class="card-info">
+                            <div class="card-nombre">{{ $amb->nombre }}</div>
+                            <div class="card-ip">
+                                <i class="fas fa-server" style="font-size:.7rem"></i>
+                                <span class="card-ip-texto">{{ $amb->servidor_ip ?? 'Sin IP configurada' }}</span>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="card-stats">
+                        <span class="badge-stat bs-azul">
+                            <i class="fas fa-graduation-cap"></i> {{ $amb->grados_count }} grado(s)
+                        </span>
+                        
+                        <span class="badge-stat bs-verde">
+                            <i class="fas fa-child"></i> {{ $amb->grupos_count }} grupo(s)
+                        </span>
+                    </div>
                 </div>
+            @endforeach
+        </div>
 
-                <div class="card-stats">
-                    <span class="badge-stat bs-azul">
-                        <i class="fas fa-graduation-cap"></i> {{ $amb->grados_count }} grado(s)
-                    </span>
-                    <span class="badge-stat bs-verde">
-                        <i class="fas fa-child"></i> {{ $amb->grupos_count }} grupo(s)
-                    </span>
+        <!-- CONTENEDOR DE GRADOS Y GRUPOS (Reemplaza la vista de ambientes) -->
+        <div id="panel-grados-grupos" class="c-card c-card-body" style="display: none; margin-top: 20px;">
+
+            <h3
+                style="margin-bottom: 20px; font-size: 1.3rem; color: #333; border-bottom: 2px solid #eee; padding-bottom: 8px;">
+                <i class="fas fa-layer-group"></i> Grados y Grupos Habilitados
+            </h3>
+
+            <!-- Contenedor horizontal estricto para los grados -->
+            <div id="contenido-grados"
+                style="display: flex; flex-wrap: nowrap; gap: 24px; overflow-x: auto; padding-bottom: 15px;"></div>
+
+        </div>
+
+        <div id="panel-estadisticas-grupo" class="panel-estadisticas" aria-live="polite">
+            <div class="panel-estadisticas-header">
+                <div>
+                    <h5 class="panel-estadisticas-title" id="titulo-grupo-seleccionado">
+                        <i class="fas fa-chart-bar"></i> Estadísticas del grupo seleccionado
+                    </h5>
+                    <p class="panel-estadisticas-subtitle" id="texto-feedback">
+                        Selecciona un grupo para ver el resumen del día.
+                    </p>
+                </div>
+                <span id="estado-estadisticas" class="status-pill status-pill--idle">Esperando selección</span>
+            </div>
+
+            <div class="estadisticas-grid">
+                <div id="card-estudiantes-activos" class="estadistica-item estadistica-item--clickable" role="button"
+                    tabindex="0" title="Ver estudiantes del grupo activo" aria-controls="panel-estudiantes-grupo"
+                    aria-expanded="false">
+                    <span class="estadistica-label">Estudiantes Activos</span>
+                    <span class="estadistica-valor" id="stat-activos">0</span>
+                </div>
+                <div class="estadistica-item">
+                    <span class="estadistica-label">Con PIAR</span>
+                    <span class="estadistica-valor" id="stat-piar">0</span>
+                </div>
+                <div id="card-sin-pin" class="estadistica-item">
+                    <span class="estadistica-label">Sin PIN</span>
+                    <span class="estadistica-valor" id="stat-sin-pin">0</span>
+                    <a id="link-configurar-pin" href="{{ route('panel.estudiantes') }}"
+                        class="link-configurar-pin" style="display: none;">
+                        <i class="fas fa-key"></i> Configurar PIN
+                    </a>
                 </div>
             </div>
-        @endforeach
-    </div>
 
-    <!-- CONTENEDOR DE GRADOS Y GRUPOS (Reemplaza la vista de ambientes) -->
-    <div id="panel-grados-grupos" class="c-card c-card-body" style="display: none; margin-top: 20px;">
-
-        <h3
-            style="margin-bottom: 20px; font-size: 1.3rem; color: #333; border-bottom: 2px solid #eee; padding-bottom: 8px;">
-            <i class="fas fa-layer-group"></i> Grados y Grupos Habilitados
-        </h3>
-
-        <!-- Contenedor horizontal estricto para los grados -->
-        <div id="contenido-grados"
-            style="display: flex; flex-wrap: nowrap; gap: 24px; overflow-x: auto; padding-bottom: 15px;"></div>
-
-    </div>
-
-    <div id="panel-estadisticas-grupo" class="panel-estadisticas" aria-live="polite">
-        <div class="panel-estadisticas-header">
-            <div>
-                <h5 class="panel-estadisticas-title" id="titulo-grupo-seleccionado">
-                    <i class="fas fa-chart-bar"></i> Estadísticas del grupo seleccionado
-                </h5>
-                <p class="panel-estadisticas-subtitle" id="texto-feedback">
-                    Selecciona un grupo para ver el resumen del día.
-                </p>
-            </div>
-            <span id="estado-estadisticas" class="status-pill status-pill--idle">Esperando selección</span>
-        </div>
-
-        <div class="estadisticas-grid">
-            <div id="card-estudiantes-activos" class="estadistica-item estadistica-item--clickable" role="button"
-                tabindex="0" title="Ver estudiantes del grupo activo" aria-controls="panel-estudiantes-grupo"
-                aria-expanded="false">
-                <span class="estadistica-label">Estudiantes Activos</span>
-                <span class="estadistica-valor" id="stat-activos">0</span>
-            </div>
-            <div class="estadistica-item">
-                <span class="estadistica-label">Con PIAR</span>
-                <span class="estadistica-valor" id="stat-piar">0</span>
-            </div>
-            <div id="card-sin-pin" class="estadistica-item">
-                <span class="estadistica-label">Sin PIN</span>
-                <span class="estadistica-valor" id="stat-sin-pin">0</span>
-                <a id="link-configurar-pin" href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
-                    class="link-configurar-pin link-ambiente" style="display: none;">
-                    <i class="fas fa-key"></i> Configurar PIN
-                </a>
+            <div id="alerta-piar" class="alerta-piar" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="texto-alerta-piar">0 estudiantes requieren PIAR sin diligenciar</span>
             </div>
         </div>
 
-        <div id="alerta-piar" class="alerta-piar" style="display: none;">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span id="texto-alerta-piar">0 estudiantes requieren PIAR sin diligenciar</span>
-        </div>
-    </div>
-
-    <div class="panel-estudiantes-grupo" id="panel-estudiantes-grupo" style="display: none;">
-        <div class="panel-estudiantes-header">
-            <div>
-                <h5 class="panel-estudiantes-title"><i class="fas fa-users"></i> Estudiantes del grupo activo</h5>
-                <p class="panel-estudiantes-subtitle">Gestiona el alumnado matriculado en el grupo seleccionado.</p>
+        <div class="panel-estudiantes-grupo" id="panel-estudiantes-grupo" style="display: none;">
+            <div class="panel-estudiantes-header">
+                <div>
+                    <h5 class="panel-estudiantes-title"><i class="fas fa-users"></i> Estudiantes del grupo activo</h5>
+                    <p class="panel-estudiantes-subtitle">Gestiona el alumnado matriculado en el grupo seleccionado.</p>
+                </div>
+                <div class="filtros-estudiantes">
+                    <input id="buscador-estudiantes" class="buscador-estudiantes" type="text"
+                        placeholder="Buscar por nombre..." />
+                    <select id="filtro-estado-estudiante" class="filtro-estudiantes">
+                        <option value="todos">Todos los estados</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                    <select id="filtro-condicion-estudiante" class="filtro-estudiantes">
+                        <option value="todas">Todas las condiciones</option>
+                        @foreach ($condiciones as $condicion)
+                            <option value="{{ $condicion->id }}">{{ $condicion->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-            <div class="filtros-estudiantes">
-                <input id="buscador-estudiantes" class="buscador-estudiantes" type="text"
-                    placeholder="Buscar por nombre..." />
-                <select id="filtro-estado-estudiante" class="filtro-estudiantes">
-                    <option value="todos">Todos los estados</option>
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                </select>
-                <select id="filtro-condicion-estudiante" class="filtro-estudiantes">
-                    <option value="todas">Todas las condiciones</option>
-                    @foreach ($condiciones as $condicion)
-                        <option value="{{ $condicion->id }}">{{ $condicion->nombre }}</option>
-                    @endforeach
-                </select>
+
+            <div id="lista-estudiantes" class="lista-estudiantes"></div>
+
+            <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-primary" onclick="abrirModalReporteAsistencia()">
+                    <i class="fa-solid fa-clipboard-check"></i> Ver Reporte de Asistencia
+                </button>
             </div>
         </div>
 
-        <div id="lista-estudiantes" class="lista-estudiantes"></div>
+        <div class="quick-actions" id="quick-actions">
+            <a href="{{ route('panel.asistencia') }}" class="quick-action-card" data-context-route="asistencia">
+                <span class="quick-action-card__icon"><i class="fas fa-clipboard-check"></i></span>
+                <span class="quick-action-card__title">Registrar asistencia</span>
+                <span class="quick-action-card__text">Toma la asistencia del grupo activo de forma rápida.</span>
+                <span id="badge-asistencia" class="quick-action-badge d-none"></span>
+            </a>
+            <a href="{{ route('panel.estudiantes') }}" class="quick-action-card"
+                data-context-route="pin">
+                <span class="quick-action-card__icon"><i class="fas fa-key"></i></span>
+                <span class="quick-action-card__title">Configurar PIN</span>
+                <span class="quick-action-card__text">Revisa quién aún necesita un PIN configurado.</span>
+                <span id="badge-pin" class="quick-action-badge quick-action-badge--neutral">0</span>
+            </a>
 
-        <div class="d-flex justify-content-end mt-4">
-            <button class="btn btn-primary" onclick="abrirModalReporteAsistencia()">
-                <i class="fa-solid fa-clipboard-check"></i> Ver Reporte de Asistencia
-            </button>
+            <a href="{{ route('panel.sesion') }}" class="quick-action-card" data-context-route="monitor">
+                <span class="quick-action-card__icon"><i class="fas fa-desktop"></i></span>
+                <span class="quick-action-card__title">Monitor de sesión</span>
+                <span class="quick-action-card__text">Consulta en tiempo real quién está conectado.</span>
+                <span id="badge-monitor" class="quick-action-badge quick-action-badge--neutral">0</span>
+            </a>
+
+            <a href="{{ route('panel.portafolio') }}" class="quick-action-card" data-context-route="observacion">
+                <span class="quick-action-card__icon"><i class="fas fa-comment-medical"></i></span>
+                <span class="quick-action-card__title">Nueva observación</span>
+                <span class="quick-action-card__text">Registra una observación para el grupo activo.</span>
+                <span id="badge-observacion" class="quick-action-badge quick-action-badge--neutral">0</span>
+            </a>
         </div>
     </div>
-
-    <div class="quick-actions" id="quick-actions">
-        <a href="{{ route('panel.asistencia') }}" class="quick-action-card" data-context-route="asistencia">
-            <span class="quick-action-card__icon"><i class="fas fa-clipboard-check"></i></span>
-            <span class="quick-action-card__title">Registrar asistencia</span>
-            <span class="quick-action-card__text">Toma la asistencia del grupo activo de forma rápida.</span>
-            <span id="badge-asistencia" class="quick-action-badge d-none"></span>
-        </a>
-        <a href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" class="quick-action-card link-ambiente"
-            data-context-route="pin">
-            <span class="quick-action-card__icon"><i class="fas fa-key"></i></span>
-            <span class="quick-action-card__title">Configurar PIN</span>
-            <span class="quick-action-card__text">Revisa quién aún necesita un PIN configurado.</span>
-            <span id="badge-pin" class="quick-action-badge quick-action-badge--neutral">0</span>
-        </a>
-
-        <a href="{{ route('panel.sesion') }}" class="quick-action-card" data-context-route="monitor">
-            <span class="quick-action-card__icon"><i class="fas fa-desktop"></i></span>
-            <span class="quick-action-card__title">Monitor de sesión</span>
-            <span class="quick-action-card__text">Consulta en tiempo real quién está conectado.</span>
-            <span id="badge-monitor" class="quick-action-badge quick-action-badge--neutral">0</span>
-        </a>
-
-        <a href="{{ route('panel.portafolio') }}" class="quick-action-card" data-context-route="observacion">
-            <span class="quick-action-card__icon"><i class="fas fa-comment-medical"></i></span>
-            <span class="quick-action-card__title">Nueva observación</span>
-            <span class="quick-action-card__text">Registra una observación para el grupo activo.</span>
-            <span id="badge-observacion" class="quick-action-badge quick-action-badge--neutral">0</span>
-        </a>
+    <div id="contenedor-cargando" class="flex-column justify-content-center align-items-center" style="position: fixed; top: 0; height: 100%; background: rgba(255, 255, 255, 0.5); z-index: 1000;">
+        <div class="spinner-border text-primary" role="status"></div>
+        <br>
+        <span style="font-size: 1.2rem; font-weight: 500;">Consultando ambientes asignados...</span>    
     </div>
+
+    <input type="hidden" id="crf-token" value="{{ csrf_token() }}">
 
     @include('panel.asistencia.modalAsistenciaGrupo')
     <!-- CONTROL JAVASCRIPT -->
+
     <script>
         // Mantiene el contexto activo del ambiente para actualizar el encabezado y las estadísticas.
         let nombreAmbienteActivo = "";
@@ -1182,7 +1206,7 @@
             </td>
 
         </tr>
-    `;
+            `;
 
             });
         }
@@ -1201,6 +1225,28 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            function obtenerAmbienteSeleccionado() {
+                $.ajax({
+                    url: '{{ route('panel.ambientes.obtener') }}',
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            cargarAmbiente(response.ambiente_id, response.ambiente_nombre);
+                        } 
+
+                        setTimeout(() => {
+                            document.getElementById('contenedor-cargando').style.opacity = '0';
+                            setTimeout(() => {
+                                document.getElementById('contenedor-cargando').style.display = 'none';
+                            }, 300);
+                            document.getElementById('contenedor').style.display = 'block';
+                        }, 300);
+                    }
+                });
+            }
+
+            obtenerAmbienteSeleccionado();
+
             const tarjetas = document.querySelectorAll('.btn-seleccionar-ambiente');
             const contenedorGrid = document.getElementById('ambientes-container');
             const quickActions = document.querySelectorAll('.quick-action-card');
@@ -1296,9 +1342,8 @@
                 document.getElementById('contenedor-ambiente-activo').style.display = 'none';
                 document.getElementById('contenedor-bienvenida').style.display = 'block';
                 contenedorGrid.style.display = 'grid';
-                localStorage.clear();
-                window.location.reload();
                 resetearEstadisticas();
+                eliminarAmbienteSeleccionado();
             });
 
             // Asigna el comportamiento de selección a cada tarjeta de ambiente.
@@ -1345,16 +1390,6 @@
                     window.location.href = `${this.href}?${params}`;
                 });
             });
-
-            function cargarAmbienteSeleccionado() {
-                const ambienteSeleccionado = localStorage.getItem('ambiente-seleccionado');
-                const ambienteNombre = localStorage.getItem('ambiente-nombre');
-                if (ambienteSeleccionado) {
-                    cargarAmbiente(ambienteSeleccionado, ambienteNombre);
-                }
-            }
-
-            cargarAmbienteSeleccionado();
 
             // Si sólo existe un ambiente asignado, entra directamente a la vista del mismo.
             @if ($ambienteSeleccionado)
@@ -1660,14 +1695,6 @@
                 renderListaEstudiantesGrupo();
             }
         });
-
-        function seleccionarAmbiente(element) {
-            const ambienteId = element.getAttribute('data-id');
-            const ambienteNombre = element.getAttribute('data-nombre');
-
-            //guardar el ambiente seleccionado en el localStorage
-            localStorage.setItem('ambiente-seleccionado', ambienteId);
-            localStorage.setItem('ambiente-nombre', ambienteNombre);
-        }
     </script>
+    <script src="{{ asset('assets/js/seleccionar_ambiente.js') }}"></script>
 @endsection

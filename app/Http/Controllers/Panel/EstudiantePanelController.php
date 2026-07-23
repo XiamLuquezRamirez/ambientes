@@ -20,157 +20,201 @@ use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\DocenteAsignacionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Docente;
 
 class EstudiantePanelController extends Controller
 {
-    public function listar(Request $request, $ambiente)
+    public function listar(Request $request)
     {
-        $ambiente = Ambiente::findOrFail($ambiente);
+        if(session()->has('ambiente_id')) {    
+            $ambiente = session('ambiente_id');
+            $ambiente = Ambiente::findOrFail($ambiente);
+            $docente = Auth::guard('docente')->user()->docente;
+
+            $figuras = FigurasModel::getFiguras();
+
+            $departamentos = Departamento::orderBy('descripcion')->get();
+
+            $cargas = CargaDocente::where('docente_id', $docente->id)
+                ->where('ambiente_id', $ambiente->id)
+                ->where('activo', true)
+                ->where('anio_lectivo', date('Y'))
+                ->with(['ambiente', 'grado', 'grupo'])
+                ->get();
+
+            $matriculas = collect();
+
+            $grados = $cargas->pluck('grado')
+                ->filter()
+                ->unique('id')
+                ->values();
+
+            if ($cargas->isNotEmpty()) {
+
+                $anio = date('Y');
+
+                $matriculas = Matricula::query()
+                    ->join('estudiante_ambiente', function ($join) use ($ambiente, $anio) {
+                        $join->on('estudiante_ambiente.estudiante_id', '=', 'matriculas.estudiante_id')
+                            ->where('estudiante_ambiente.ambiente_id', $ambiente->id)
+                            ->where('estudiante_ambiente.anio_lectivo', $anio)
+                            ->where('estudiante_ambiente.estado', 'activo');
+                    })
+                    ->where('matriculas.anio_lectivo', $anio)
+                    ->where('matriculas.estado', 'activo')
+                    ->where(function ($query) use ($cargas) {
+
+                        foreach ($cargas as $carga) {
+
+                            $query->orWhere(function ($q) use ($carga) {
+                                $q->where('matriculas.grado_id', $carga->grado_id)
+                                    ->where('matriculas.grupo_id', $carga->grupo_id);
+                            });
+
+                        }
+
+                    })
+                    ->pluck('matriculas.estudiante_id');
+
+            }
+
+            $base = Estudiante::with([
+                'ambientes',
+                'condicion:id,nombre',
+                'configuracionPin',
+                'piar',
+            ])->whereIn('id', $matriculas);
+
+            $consulta = clone $base;
+
+            if ($request->filled('q')) {
+                $q = trim($request->get('q'));
+                $consulta->where(function ($sub) use ($q) {
+                    $sub->where('nombre', 'like', "%{$q}%")
+                        ->orWhere('apellido', 'like', "%{$q}%")
+                        ->orWhere('identificacion', 'like', "%{$q}%")
+                        ->orWhereRaw("CONCAT(nombre, ' ', COALESCE(apellido, '')) like ?", ["%{$q}%"]);
+                });
+            }
+
+            if ($request->filled('condicion_id')) {
+                $consulta->where('condicion_id', $request->get('condicion_id'));
+            }
+
+            if ($request->filled('grado_id')) {
+
+                $matriculas = Matricula::query()
+                    ->whereIn('estudiante_id', $matriculas)
+                    ->where('grado_id', $request->grado_id)
+                    ->where('estado', 'activo')
+                    ->pluck('estudiante_id');
+
+                $consulta->whereIn('id', $matriculas);
+            }
+
+            // '0' falla con filled(); comparar de forma explícita.
+            if ($request->has('estado') && $request->input('estado') !== null && $request->input('estado') !== '') {
+                $consulta->where('activo', (int) $request->input('estado') === 1);
+            }
+
+            if ($request->get('filtro') === 'piar') {
+                $consulta->whereHas('piar');
+            } elseif ($request->get('filtro') === 'sin_pin') {
+                $consulta->whereDoesntHave('configuracionPin');
+            } elseif ($request->get('filtro') === 'activos') {
+                $consulta->where('activo', true);
+            }
+
+            $orden = $request->get('orden', 'az');
+            if ($orden === 'za') {
+                $consulta->orderByDesc('nombre')->orderByDesc('apellido');
+            } else {
+                $consulta->orderBy('nombre')->orderBy('apellido');
+            }
+
+            $paraStats = (clone $consulta)->get();
+
+            $estudiantes = $consulta->paginate(12)->withQueryString();
+
+            $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
+            $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
+            $vista = $request->get('vista', 'grid');
+
+            /* estadisticas */
+            $total = $paraStats->count();
+            $conPiar = $paraStats->filter(fn ($e) => $e->piar !== null && $e->piar->paso == '8')->count();
+            $sinPin = $paraStats->filter(fn ($e) => $e->configuracionPin === null)->count();
+            $activos = $paraStats->where('activo', true)->count();
+
+            $estadisticas = [
+                'total' => $total,
+                'piar' => $conPiar,
+                'piar_pct' => $total > 0 ? round(($conPiar / $total) * 100, 1) : 0,
+                'sin_pin' => $sinPin,
+                'activos' => $activos,
+                'activos_pct' => $total > 0 ? round(($activos / $total) * 100, 1) : 0,
+            ];
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'html' => view('panel.estudiantes.partials._grid', compact('estudiantes', 'estadisticas'))->render(),
+                ]);
+            }
+            
+
+            return view('panel.estudiantes.index', compact(
+                'estudiantes',
+                'estadisticas',
+                'cargas',
+                'condiciones',
+                'filtros',
+                'vista',
+                'departamentos',
+                'figuras',
+                'grados'
+            ));
+        }else{
+            return $this->noSeleccionado();
+        }
+    }
+
+    public function noSeleccionado()
+    {
         $docente = Auth::guard('docente')->user()->docente;
+        $anio = date('Y');
+        $ambientes = Ambiente::whereHas('cargasDocente', function ($q) use ($docente, $anio) {
+            $q->where('docente_id', $docente->id)
+                ->where('activo', true)
+                ->where('anio_lectivo', $anio);
+        })->with([
+            'cargasDocente' => function ($q) use ($docente, $anio) {
+                $q->where('docente_id', $docente->id)
+                    ->where('activo', true)
+                    ->where('anio_lectivo', $anio);
+            },
+        ])
+        ->orderBy('nombre')
+        ->get();
 
-        $figuras = FigurasModel::getFiguras();
+        $ambientes->each(function ($ambiente) {
 
-        $departamentos = Departamento::orderBy('descripcion')->get();
+            $cargas = $ambiente->cargasDocente;
+            $ambiente->grados_count = $cargas
+                ->pluck('grado_id')
+                ->unique()
+                ->count();
 
-        $cargas = CargaDocente::where('docente_id', $docente->id)
-            ->where('ambiente_id', $ambiente->id)
-            ->where('activo', true)
-            ->where('anio_lectivo', date('Y'))
-            ->with(['ambiente', 'grado', 'grupo'])
-            ->get();
+            $ambiente->grupos_count = $cargas
+                ->pluck('grupo_id')
+                ->unique()
+                ->count();
 
-        $matriculas = collect();
+        });
 
-        $grados = $cargas->pluck('grado')
-            ->filter()
-            ->unique('id')
-            ->values();
+        $url_actual = url()->current();
 
-        if ($cargas->isNotEmpty()) {
-
-            $anio = date('Y');
-
-            $matriculas = Matricula::query()
-                ->join('estudiante_ambiente', function ($join) use ($ambiente, $anio) {
-                    $join->on('estudiante_ambiente.estudiante_id', '=', 'matriculas.estudiante_id')
-                        ->where('estudiante_ambiente.ambiente_id', $ambiente->id)
-                        ->where('estudiante_ambiente.anio_lectivo', $anio)
-                        ->where('estudiante_ambiente.estado', 'activo');
-                })
-                ->where('matriculas.anio_lectivo', $anio)
-                ->where('matriculas.estado', 'activo')
-                ->where(function ($query) use ($cargas) {
-
-                    foreach ($cargas as $carga) {
-
-                        $query->orWhere(function ($q) use ($carga) {
-                            $q->where('matriculas.grado_id', $carga->grado_id)
-                                ->where('matriculas.grupo_id', $carga->grupo_id);
-                        });
-
-                    }
-
-                })
-                ->pluck('matriculas.estudiante_id');
-
-        }
-
-        $base = Estudiante::with([
-            'ambientes',
-            'condicion:id,nombre',
-            'configuracionPin',
-            'piar',
-        ])->whereIn('id', $matriculas);
-
-        $consulta = clone $base;
-
-        if ($request->filled('q')) {
-            $q = trim($request->get('q'));
-            $consulta->where(function ($sub) use ($q) {
-                $sub->where('nombre', 'like', "%{$q}%")
-                    ->orWhere('apellido', 'like', "%{$q}%")
-                    ->orWhere('identificacion', 'like', "%{$q}%")
-                    ->orWhereRaw("CONCAT(nombre, ' ', COALESCE(apellido, '')) like ?", ["%{$q}%"]);
-            });
-        }
-
-        if ($request->filled('condicion_id')) {
-            $consulta->where('condicion_id', $request->get('condicion_id'));
-        }
-
-        if ($request->filled('grado_id')) {
-
-            $matriculas = Matricula::query()
-                ->whereIn('estudiante_id', $matriculas)
-                ->where('grado_id', $request->grado_id)
-                ->where('estado', 'activo')
-                ->pluck('estudiante_id');
-
-            $consulta->whereIn('id', $matriculas);
-        }
-
-        // '0' falla con filled(); comparar de forma explícita.
-        if ($request->has('estado') && $request->input('estado') !== null && $request->input('estado') !== '') {
-            $consulta->where('activo', (int) $request->input('estado') === 1);
-        }
-
-        if ($request->get('filtro') === 'piar') {
-            $consulta->whereHas('piar');
-        } elseif ($request->get('filtro') === 'sin_pin') {
-            $consulta->whereDoesntHave('configuracionPin');
-        } elseif ($request->get('filtro') === 'activos') {
-            $consulta->where('activo', true);
-        }
-
-        $orden = $request->get('orden', 'az');
-        if ($orden === 'za') {
-            $consulta->orderByDesc('nombre')->orderByDesc('apellido');
-        } else {
-            $consulta->orderBy('nombre')->orderBy('apellido');
-        }
-
-        $paraStats = (clone $consulta)->get();
-
-        $estudiantes = $consulta->paginate(12)->withQueryString();
-
-        $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
-        $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
-        $vista = $request->get('vista', 'grid');
-
-        /* estadisticas */
-        $total = $paraStats->count();
-        $conPiar = $paraStats->filter(fn ($e) => $e->piar !== null && $e->piar->paso == '8')->count();
-        $sinPin = $paraStats->filter(fn ($e) => $e->configuracionPin === null)->count();
-        $activos = $paraStats->where('activo', true)->count();
-
-        $estadisticas = [
-            'total' => $total,
-            'piar' => $conPiar,
-            'piar_pct' => $total > 0 ? round(($conPiar / $total) * 100, 1) : 0,
-            'sin_pin' => $sinPin,
-            'activos' => $activos,
-            'activos_pct' => $total > 0 ? round(($activos / $total) * 100, 1) : 0,
-        ];
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'html' => view('panel.estudiantes.partials._grid', compact('estudiantes', 'estadisticas'))->render(),
-            ]);
-        }
-
-        return view('panel.estudiantes.index', compact(
-            'estudiantes',
-            'estadisticas',
-            'cargas',
-            'condiciones',
-            'filtros',
-            'vista',
-            'departamentos',
-            'figuras',
-            'grados'
-        ));
-
+        return view('panel.estudiantes.noSeleccionado', compact('ambientes', 'url_actual'));
     }
 
     /**
