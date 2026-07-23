@@ -918,7 +918,6 @@
 
         .content {
             position: relative;
-            z-index: 1;
         }
 
         #contenedor-cargando {
@@ -927,6 +926,10 @@
             left:  240px;
             opacity: 1;
             transition: opacity 0.3s ease-in-out;
+        }
+
+        #modal-footer-seleccionar-ambiente {
+            display: none;
         }
     </style>
 @endpush
@@ -1108,6 +1111,7 @@
                 <span id="badge-observacion" class="quick-action-badge quick-action-badge--neutral">0</span>
             </a>
         </div>
+        
     </div>
     <div id="contenedor-cargando" class="flex-column justify-content-center align-items-center" style="position: fixed; top: 0; height: 100%; background: rgba(255, 255, 255, 0.5); z-index: 1000;">
         <div class="spinner-border text-primary" role="status"></div>
@@ -1118,6 +1122,7 @@
     <input type="hidden" id="crf-token" value="{{ csrf_token() }}">
 
     @include('panel.asistencia.modalAsistenciaGrupo')
+    @include('panel.estudiantes.modalSeleccionarAmbiente')
     <!-- CONTROL JAVASCRIPT -->
 
     <script>
@@ -1232,15 +1237,16 @@
                     success: function(response) {
                         if (response.success) {
                             cargarAmbiente(response.ambiente_id, response.ambiente_nombre);
-                        } 
-
-                        setTimeout(() => {
-                            document.getElementById('contenedor-cargando').style.opacity = '0';
-                            setTimeout(() => {
-                                document.getElementById('contenedor-cargando').style.display = 'none';
-                            }, 300);
-                            document.getElementById('contenedor').style.display = 'block';
-                        }, 300);
+                                setTimeout(() => {
+                                document.getElementById('contenedor-cargando').style.opacity = '0';
+                                setTimeout(() => {
+                                    document.getElementById('contenedor-cargando').style.display = 'none';
+                                }, 300);
+                                document.getElementById('contenedor').style.display = 'block';
+                            }, 100);
+                        }else{
+                            $('#modalSeleccionarAmbiente').modal('show');
+                        }
                     }
                 });
             }

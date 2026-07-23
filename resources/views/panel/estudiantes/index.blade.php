@@ -9,10 +9,16 @@
                 <p>Gestión de estudiantes</p>
             </div>
 
-            <button type="button" onclick="abrirModal()" class="btn btn-primary btn-nuevo">
-                <i class="fa-solid fa-plus"></i>
-                Nuevo
-            </button>
+            <div class="d-flex gap-2">
+                <button type="button" onclick="abrirModal()" class="btn btn-primary btn-nuevo">
+                    <i class="fa-solid fa-plus"></i>
+                    Nuevo
+                </button>
+                <button type="button" data-bs-toggle="modal" data-bs-target="#modalSeleccionarAmbiente" class="btn btn-secondary btn-nuevo">
+                    <i class="fa-solid fa-building"></i>
+                    Cambiar Ambiente
+                </button>
+            </div>
         </div>
 
         @include('panel.estudiantes.partials._filtros')
@@ -32,7 +38,7 @@
     </div>
     @include('admin.estudiantes.modal_registro')
     @include('panel.estudiantes.modalConfigurarPin')
-
+    @include('panel.estudiantes.modalSeleccionarAmbiente')
     @push('scripts')
         <script>
             const URL_ESTUDIANTES = "{{ route('panel.estudiantes.guardar') }}";

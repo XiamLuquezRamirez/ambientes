@@ -1076,3 +1076,56 @@ select.form-control {
 .form-check-input:not(:checked)+.estado-texto {
     color: var(--color-danger);
 }
+
+
+
+
+.modal-content {
+    border: none;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-modal);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    border-bottom: none;
+    padding: 20px 24px;
+    gap: 14px;
+    align-items: center;
+}
+
+.modal-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: #FFFFFF;
+    line-height: 1.2;
+}
+
+.modal-subtitle {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, .65);
+    margin: 2px 0 0;
+}
+
+.btn-close {
+    filter: brightness(0) invert(1);
+    opacity: .75;
+    transition: opacity var(--ease), transform .2s ease;
+    margin-left: auto;
+}
+
+.btn-close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 28px;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--color-border);
+    padding: 16px 28px 24px;
+    gap: 12px;
+}

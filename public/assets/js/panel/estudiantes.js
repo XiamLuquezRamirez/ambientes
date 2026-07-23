@@ -40,22 +40,20 @@
         cargarTabla(url);
     }
 
-    document.querySelectorAll('.view-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const vista = btn.dataset.vista;
-            if (!vista || !vistaInput) return;
+    const $viewButtons = $('.view-btn');
+    $viewButtons.on('click', function () {
+        const vista = $(this).data('vista');
+        if (!vista || !vistaInput) return;
 
-            vistaInput.value = vista;
-            document.querySelectorAll('.view-btn').forEach((b) => b.classList.remove('active'));
-            btn.classList.add('active');
+        vistaInput.value = vista;
 
-            if (grid) {
-                grid.classList.toggle('students-grid--list', vista === 'list');
-            }
+        $('.view-btn.active').removeClass('active');
+        $(this).addClass('active');
 
-            const url = new URL(window.location.href);
-            url.searchParams.set('vista', vista);
-            window.history.replaceState({}, '', url.toString());
-        });
+        if (grid) {
+            $(grid).toggleClass('students-grid--list', vista === 'list');
+        }
+
+        aplicarFiltrosEstudiantes();
     });
 })();

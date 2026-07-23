@@ -10,6 +10,7 @@ use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\GrupoEstadisticasService;
 use App\Services\Docente\GrupoEstudiantesService;
 use Illuminate\Support\Facades\Auth;
+use App\Services\AmbienteService;
 
 class DocenteDashboardController extends Controller
 {
@@ -56,10 +57,14 @@ class DocenteDashboardController extends Controller
 
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
 
+        $ambienteService = app(AmbienteService::class);
+        $ambientes_disponibles = $ambienteService->getAmbientes();
+
         return view('panel.principal', compact(
             'ambientes',
             'ambienteSeleccionado',
             'condiciones',
+            'ambientes_disponibles'
         ));
     }
 
