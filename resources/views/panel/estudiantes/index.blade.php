@@ -1,14 +1,11 @@
 @extends('layouts.panel')
 @section('title', 'Estudiantes')
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
-@endpush
 @section('content')
     <div class="students-page">
 
         <div class="page-header students-header">
             <div>
-                <h1>Estudiantes</h1>
+                <h1>Estudiantes en el ambiente</h1>
                 <p>Gestión de estudiantes</p>
             </div>
 

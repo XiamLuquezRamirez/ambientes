@@ -43,34 +43,51 @@
     @endphp
 
     <div class="ficha-page">
-        <div class="page-header ficha-header">
+
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
             <div>
                 <h1>{{ $estudiante->nombre_completo }}</h1>
-                <p class="ficha-subtitle">Ficha completa del estudiante</p>
+                <p>Ficha completa del estudiante</p>
             </div>
-            <a href="#" onclick="history.back()" class="btn btn-outline-secondary mt-3">
-                <i class="fa-solid fa-arrow-left"></i> Volver
+            <a href="javascript:window.history.back()" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-1"></i> Volver
             </a>
         </div>
-
         @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: @json(session('success')),
+                    confirmButtonColor: '#2563eb'
+                });
+            </script>
         @endif
+
         @if (session('info'))
-            <div class="alert alert-info">{{ session('info') }}</div>
+            <script>
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Información',
+                    text: @json(session('info')),
+                    confirmButtonColor: '#2563eb'
+                });
+            </script>
         @endif
+
         @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Se encontraron errores',
+                    html: `{!! implode('<br>', $errors->all()) !!}`,
+                    confirmButtonColor: '#dc3545'
+                });
+            </script>
         @endif
 
         {{-- Datos personales --}}
-        <section class="ficha-card">
+        <section class="c-card">
             <div class="ficha-identity">
                 @if ($estudiante->avatar_url)
                     <img src="{{ $estudiante->avatar_url }}" class="ficha-avatar" alt="{{ $estudiante->nombre_completo }}">
@@ -104,8 +121,6 @@
         </section>
 
         {{-- Resumen: matrícula, PIN, PIAR --}}
-
-
         <div class="c-card shadow-sm mt-2">
             <div class="c-head bg-white">
                 <ul class="nav nav-tabs" id="perfilTabs">
@@ -283,7 +298,7 @@
 
 
         {{-- Acciones --}}
-        <section class="ficha-card">
+        <section class="c-card">
             <h3 class="ficha-section-title">Acciones</h3>
             <div class="ficha-actions">
                 @if ($estudiante->configuracionPin == null)
@@ -314,36 +329,39 @@
                     </button>
                 </form>
                 @php
+                    $clase = null;
+                    $texto = null;
+                    $ruta = null;
+
                     if ($requiereApoyo) {
-                        if ($estudiante->piar !== null && $estudiante->piar->paso < 8) {
-                            $clase = 'btn btn-primary';
-                            $texto = 'PIAR incompleto';
-                            $ruta = route('admin.estudiantes.diligenciar-piar', [
-                                'idEstudiante' => $estudiante->id,
-                                'tipo' => 'nuevo',
-                            ]);
-                        } else {
-                            if ($estudiante->piar !== null && $estudiante->piar->paso == '8') {
+                        if ($estudiante->piar) {
+                            if ($estudiante->piar->paso < 8) {
+                                $clase = 'btn btn-primary';
+                                $texto = 'PIAR incompleto';
+                                $ruta = route('admin.estudiantes.diligenciar-piar', [
+                                    'idEstudiante' => $estudiante->id,
+                                    'tipo' => 'nuevo',
+                                ]);
+                            } elseif ($estudiante->piar->paso == 8) {
                                 $clase = 'btn btn-primary';
                                 $texto = 'Ver PIAR';
                                 $ruta = route('admin.piar.exportar', [
                                     'idEstudiante' => $estudiante->id,
                                 ]);
-                            } else {
-                                if ($estudiante->piar == null && $requiereApoyo) {
-                                    $clase = 'btn btn-primary';
-                                    $texto = 'Diligenciar PIAR';
-                                    $ruta = route('admin.estudiantes.diligenciar-piar', [
-                                        'idEstudiante' => $estudiante->id,
-                                        'tipo' => 'nuevo',
-                                    ]);
-                                }
                             }
+                        } else {
+                            $clase = 'btn btn-primary';
+                            $texto = 'Diligenciar PIAR';
+                            $ruta = route('admin.estudiantes.diligenciar-piar', [
+                                'idEstudiante' => $estudiante->id,
+                                'tipo' => 'nuevo',
+                            ]);
                         }
                     }
                 @endphp
-                @if ($requiereApoyo)
-                    <a class="btn {{ $clase }}" title="{{ $texto }}" href="{{ $ruta }}">
+
+                @if ($ruta)
+                    <a class="{{ $clase }}" href="{{ $ruta }}" title="{{ $texto }}">
                         <i class="fa-solid fa-file-medical"></i> {{ $texto }}
                     </a>
                 @endif
@@ -352,7 +370,7 @@
 
         {{-- Actividad reciente --}}
         <section class="ficha-activity">
-            <div class="ficha-card">
+            <div class="c-card">
                 <h3 class="ficha-section-title">Últimas entradas del portafolio</h3>
                 @forelse ($portafolioReciente as $entrada)
                     <div class="ficha-activity-row">
@@ -367,7 +385,7 @@
                 @endforelse
             </div>
 
-            <div class="ficha-card">
+            <div class="c-card">
                 <h3 class="ficha-section-title">Últimas observaciones</h3>
                 @forelse ($observacionesRecientes as $obs)
                     <div class="ficha-activity-row ficha-activity-row--stack">

@@ -1,10 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Estudiantes')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
-@endpush
-
 @section('content')
 <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
     <div>

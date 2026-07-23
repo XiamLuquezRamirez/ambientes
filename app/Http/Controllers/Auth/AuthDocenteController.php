@@ -28,6 +28,7 @@ class AuthDocenteController extends Controller
         }
 
         $usuario = Auth::guard('docente')->user();
+
         if ($usuario->estado !== 'activo') {
             Auth::guard('docente')->logout();
             $request->session()->invalidate();
@@ -59,6 +60,18 @@ class AuthDocenteController extends Controller
         );
 
         $request->session()->regenerate();
+
+        if (! $usuario->esAdmin()) {
+
+            $tieneCarga = $usuario->docente->cargasDocente()
+                ->where('activo', true)
+                ->where('anio_lectivo', date('Y'))
+                ->exists();
+
+            if (! $tieneCarga) {
+                session()->flash('alerta_sin_carga', true);
+            }
+        }
 
         return $usuario->esAdmin()
             ? redirect()->route('admin.ambientes')
