@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     @stack('styles')
     @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
@@ -208,6 +209,7 @@
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {
+                    localStorage.clear();
                     this.submit();
                 }
             });

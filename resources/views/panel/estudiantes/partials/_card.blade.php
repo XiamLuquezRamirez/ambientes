@@ -7,9 +7,6 @@
 <div class="student-card" data-estudiante-id="{{ $e->id }}">
 
     <div class="student-top">
-        <span class="status-dot {{ $e->activo ? 'status-dot--active' : 'status-dot--inactive' }}"
-            title="{{ $e->activo ? 'Activo' : 'Inactivo' }}"></span>
-
         @if ($e->avatar_url)
             <img src="{{ $e->avatar_url }}" class="student-avatar" alt="{{ $e->nombre_completo }}">
         @else
@@ -46,8 +43,9 @@
 
     <div class="student-info {{ $e->tiene_pin ? '' : 'student-info--alert' }}">
         @if ($e->tiene_pin)
-            <div class="pin-status pin-status--active"
-                onclick="abrirModalVerPinEstudiante('{{ $e->configuracionPin->figura_1 }}', '{{ $e->configuracionPin->figura_2 }}', '{{ $e->configuracionPin->figura_3 }}', '{{ $e->configuracionPin->color_figura_1 }}', '{{ $e->configuracionPin->color_figura_2 }}', '{{ $e->configuracionPin->color_figura_3 }}' , '{{ $e->nombre }} {{ $e->apellido }}')">
+            <div class="pin-status pin-status--active" role="button" tabindex="0"
+                onclick="abrirModalVerPinEstudiante('{{ $e->configuracionPin->figura_1 }}', '{{ $e->configuracionPin->figura_2 }}', '{{ $e->configuracionPin->figura_3 }}', '{{ $e->configuracionPin->color_figura_1 }}', '{{ $e->configuracionPin->color_figura_2 }}', '{{ $e->configuracionPin->color_figura_3 }}' , '{{ $e->nombre }} {{ $e->apellido }}')"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
                 <i class="fa-solid fa-lock"></i>
                 <span>PIN configurado</span>
             </div>
@@ -63,47 +61,29 @@
         @endif
     </div>
 
-    {{-- Acciones de la card: el ojo abre la ficha completa (verFicha / show.blade.php) --}}
-    <div class="student-footer d-flex justify-content-end">
-        <div class="student-footer">
-            <div class="dropdown tabla-opciones-dropdown">
-                <button class="btn-action btn-ver-resumen " type="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                    Opciones
-                </button>
+    <div class="student-options">
+        <div class="dropdown tabla-opciones-dropdown">
+            <button type="button" class="student-options-btn" data-bs-toggle="dropdown" aria-expanded="false"
+                aria-label="Opciones">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
 
-                <ul class="dropdown-menu dropdown-menu-acciones">
-
-                    <li>
-                        <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-accion btn-ver-resumen">
-                            <i class="fa-solid fa-eye"></i>
-                            Ver ficha completa
-                        </a>
-                    </li>
-
-                    <li>
-                        <button type="button" class="btn-accion btn-editar"
-                            onclick="abrirModalEditarEstudiante('{{ $e->id }}')">
-                            <i class="fa-solid fa-pen"></i>
-                            Editar
-                        </button>
-                    </li>
-
-                    {{--
-                     para futuras acciones:
-        
-                    <li>
-                        <button type="button"
-                            class="btn-accion btn-eliminar"
-                            data-id="{{ $e->id }}">
-                            <i class="fa-solid fa-trash-can"></i>
-                            Eliminar
-                        </button>
-                    </li>
-                    --}}
-                </ul>
-            </div>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-acciones">
+                <li>
+                    <a href="{{ route('panel.estudiantes.show', $e->id) }}" class="btn-accion btn-ver-resumen">
+                        <i class="fa-solid fa-eye"></i>
+                        Ver ficha completa
+                    </a>
+                </li>
+                <li>
+                    <button type="button" class="btn-accion btn-editar"
+                        onclick="abrirModalEditarEstudiante('{{ $e->id }}')">
+                        <i class="fa-solid fa-pen"></i>
+                        Editar
+                    </button>
+                </li>
+            </ul>
         </div>
     </div>
+
 </div>

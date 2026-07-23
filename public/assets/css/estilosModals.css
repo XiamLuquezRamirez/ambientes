@@ -1,184 +1,7 @@
-/* ==========================================================
-   BUSCADOR
-========================================================== */
-
-.input-buscar {
-    position: relative;
-    flex: 1;
-    min-width: 220px;
-}
-
-.input-buscar input {
-    width: 100%;
-    padding: 9px 14px 9px 38px;
-    background: #fff;
-    border: 1px solid #CBD5E1;
-    border-radius: 8px;
-    color: #1E293B;
-    font: 0.9rem 'Nunito', sans-serif;
-    outline: none;
-    transition: border-color .15s, box-shadow .15s;
-}
-
-.input-buscar input:focus {
-    border-color: #2563EB;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
-}
-
-.input-buscar input::placeholder {
-    color: #94A3B8;
-}
-
-.icono-buscar {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #94A3B8;
-    font-size: .95rem;
-    pointer-events: none;
-}
-
-/* ==========================================================
-   PAGINACIÓN
-========================================================== */
-
-.paginacion-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.paginacion-info {
-    color: #64748B;
-    font-size: .82rem;
-}
-
-.paginacion-controles {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.pag-btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    background: #fff;
-    border: 1px solid #E2E8F0;
-    border-radius: 7px;
-    color: #64748B;
-    text-decoration: none;
-    cursor: pointer;
-    font: .82rem 'Nunito', sans-serif;
-    transition: .15s;
-}
-
-.pag-btn:hover {
-    background: #EFF6FF;
-    border-color: #BFDBFE;
-    color: #1E40AF;
-}
-
-.pag-btn-activo {
-    background: #2563EB;
-    border-color: #2563EB;
-    color: #fff;
-    font-weight: 700;
-}
-
-.pag-btn-disabled {
-    opacity: .4;
-    pointer-events: none;
-    cursor: not-allowed;
-}
-
-/* ==========================================================
-   ACCIONES
-========================================================== */
-
-.tabla-acciones {
-    display: flex;
-    gap: 6px;
-}
-
-.btn-accion {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border: 1px solid transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    text-decoration: none;
-    font: .76rem 'Nunito', sans-serif;
-    transition: .15s;
-}
-
-.btn-asignar-grado {
-    background: #E2FFED;
-    border-color: #A0F5BE;
-    color: rgb(21, 160, 67);
-}
-
-.btn-asignar-grado:hover {
-    background: #19C051;
-    border-color: #19C051;
-    color: #fff;
-}
-
-.btn-editar,
-.btn-reestablecer-contrasena {
-    background: #EFF6FF;
-    border-color: #BFDBFE;
-    color: #1D4ED8;
-}
-
-.btn-editar:hover,
-.btn-reestablecer-contrasena:hover {
-    background: #2563EB;
-    border-color: #2563EB;
-    color: #fff;
-}
-
-.btn-eliminar {
-    background: #f8cfcf;
-    border-color: #f8cfcf;
-    color: #DC2626;
-}
-
-.btn-eliminar:hover {
-    background: #DC2626;
-    border-color: #DC2626;
-    color: #fff;
-}
-
-.btn-ver-resumen {
-    background: #E2FFED;
-    border-color: #A0F5BE;
-    color: rgb(21, 160, 67);
-}
-
-.btn-ver-resumen:hover {
-    background: #19C051;
-    border-color: #19C051;
-    color: #fff;
-}
-
-.btn-ver-accesos {
-    background: #FFE8D1;
-    border-color: #FFE8D1;
-    color: #FF8C00;
-}
-
-.btn-ver-accesos:hover {
-    background: #FF8C00;
-    border-color: #FF8C00;
-    color: #fff;
-}
+/*==========================================================
+  ESTILOS MODALS / ADMIN — solo lo específico de esta capa.
+  Buscador, paginación, btn-accion y modal chrome: index.css
+==========================================================*/
 
 /* ==========================================================
    ESTADOS
@@ -194,33 +17,15 @@
     font-size: .7rem;
 }
 
-#cargando-tabla {
-    display: none;
-    padding: 40px;
-    text-align: center;
-    color: #64748B;
-    font-size: .9rem;
-}
-
-.campo-error {
-    margin-top: 4px;
-    color: #DC2626;
-    font-size: .78rem;
-}
-
-.form-control.is-invalid {
-    border-color: #DC2626 !important;
-}
-
 /* ==========================================================
    ASIGNACIONES
 ========================================================== */
 
 .asignaciones-actuales {
     padding: 12px;
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-radius: 8px;
+    background: var(--color-surface-soft, #F8FAFC);
+    border: 1px solid var(--color-border, #E2E8F0);
+    border-radius: var(--radius-sm, 8px);
 }
 
 .asignaciones-actuales ul {
@@ -236,123 +41,40 @@
     justify-content: space-between;
     gap: 12px;
     padding: 8px 10px;
-    background: #fff;
-    border: 1px solid #E2E8F0;
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #E2E8F0);
     border-radius: 6px;
-    color: #334155;
+    color: var(--color-text-soft, #334155);
     font-size: .86rem;
 }
 
 .seccion-vacia {
     padding: 22px;
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
+    background: var(--color-surface-soft, #F8FAFC);
+    border: 1px solid var(--color-border, #E2E8F0);
     border-radius: 12px;
     color: #475569;
 }
 
 /* ==========================================================
-   MODALES
+   MODAL DOCENTES ASIGNADOS
 ========================================================== */
 
-.modal-app .modal-content {
-    border: none;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow:
-        0 32px 80px rgba(37, 99, 235, .22),
-        0 8px 24px rgba(0, 0, 0, .12);
-}
-
-.modal-app .modal-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 20px 24px;
-    border-bottom: none;
-    background: linear-gradient(135deg,
-            #1E3A8A 0%,
-            #2563EB 100%);
-}
-
-.modal-app .modal-title {
-    color: white;
-    font-size: 1.2rem;
-    line-height: 1.2;
-    font-family: 'Fredoka One', cursive;
-}
-
-.modal-app .modal-subtitle {
-    font-size: 0.78rem;
-    color: rgba(255, 255, 255, .65);
-    margin: 2px 0 0;
-}
-
-.modal-app .modal-body {
-    padding: 28px;
-}
-
-.modal-app .modal-footer {
-    padding: 16px 28px 24px;
-    gap: 12px;
-    border-top: 1px solid #E2E8F0;
-}
-
-.modal-app .btn-close {
-    margin-left: auto;
-    opacity: .75;
-    filter: brightness(0) invert(1);
-    transition: opacity .15s, transform .2s;
-}
-
-.modal-app .btn-close:hover {
-    opacity: 1;
-    transform: rotate(90deg);
-}
-
-.modal-app.fade .modal-dialog {
-    transform: scale(.85) translateY(-30px);
-    opacity: 0;
-    transition:
-        transform .35s cubic-bezier(.34, 1.56, .64, 1),
-        opacity .25s ease;
-}
-
-.modal-app.show .modal-dialog {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-}
-
-.modal-header-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: rgba(255, 255, 255, .15);
-    font-size: 1.35rem;
-}
-
-/* Modal Docentes asignados: alerta y filas sin cobertura docente */
 #modalDocentesAsignados .alerta-cobertura {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #FEF2F2;
+    background: var(--color-danger-soft, #FEF2F2);
     border: 1px solid #FECACA;
     color: #991B1B;
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm, 8px);
     margin-bottom: 16px;
     font-size: 0.9rem;
 }
 
 #modalDocentesAsignados .alerta-cobertura i {
-    color: #DC2626;
+    color: var(--color-danger, #DC2626);
     font-size: 1rem;
 }
 
@@ -366,20 +88,11 @@
     background: #FECACA;
 }
 
-/* Estado vacío dentro del modal asignar grupo */
-.seccion-vacia {
-    padding: 22px;
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    color: #475569;
-}
-
 .formulario-docente {
     max-height: 0;
     opacity: 0;
     overflow: hidden;
-    transition: all .35s ease;
+    transition: max-height .35s ease, opacity .35s ease, margin-top .35s ease;
     border: 0;
     margin-top: 0;
 }
@@ -391,8 +104,8 @@
 }
 
 .formulario-docente .card-header {
-    background: #EFF6FF;
-    color: #1D4ED8;
+    background: var(--color-primary-soft, #EFF6FF);
+    color: var(--color-primary-hover, #1D4ED8);
     font-weight: 700;
     border-bottom: 1px solid #BFDBFE;
 }

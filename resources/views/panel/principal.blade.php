@@ -1019,8 +1019,8 @@
             <div id="card-sin-pin" class="estadistica-item">
                 <span class="estadistica-label">Sin PIN</span>
                 <span class="estadistica-valor" id="stat-sin-pin">0</span>
-                <a id="link-configurar-pin" href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" class="link-configurar-pin link-ambiente"
-                    style="display: none;">
+                <a id="link-configurar-pin" href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
+                    class="link-configurar-pin link-ambiente" style="display: none;">
                     <i class="fas fa-key"></i> Configurar PIN
                 </a>
             </div>
@@ -1071,7 +1071,8 @@
             <span class="quick-action-card__text">Toma la asistencia del grupo activo de forma rápida.</span>
             <span id="badge-asistencia" class="quick-action-badge d-none"></span>
         </a>
-        <a href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" class="quick-action-card link-ambiente" data-context-route="pin">
+        <a href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}" class="quick-action-card link-ambiente"
+            data-context-route="pin">
             <span class="quick-action-card__icon"><i class="fas fa-key"></i></span>
             <span class="quick-action-card__title">Configurar PIN</span>
             <span class="quick-action-card__text">Revisa quién aún necesita un PIN configurado.</span>
@@ -1101,8 +1102,6 @@
         let panelEstadisticas;
         const URL_FICHA_ESTUDIANTE = @json(url('/panel/estudiantes/ficha'));
         let estudiantesGrupoCache = [];
-
-        
 
         async function abrirModalReporteAsistencia() {
 
@@ -1297,6 +1296,8 @@
                 document.getElementById('contenedor-ambiente-activo').style.display = 'none';
                 document.getElementById('contenedor-bienvenida').style.display = 'block';
                 contenedorGrid.style.display = 'grid';
+                localStorage.clear();
+                window.location.reload();
                 resetearEstadisticas();
             });
 
@@ -1320,8 +1321,9 @@
 
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Seleccione un grupo',
-                            text: 'Debe seleccionar un grupo antes de continuar.'
+                            title: 'Seleccione un Ambiente',
+                            text: 'Debe seleccionar un ambiente antes de continuar.',
+                            confirmButtonText: 'Entendido'
                         });
 
                         return;
@@ -1358,6 +1360,7 @@
             @if ($ambienteSeleccionado)
                 cargarAmbiente({{ $ambienteSeleccionado->id }}, '{{ $ambienteSeleccionado->nombre }}');
             @endif
+
         });
 
         function resetearEstadisticas() {

@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
 </head>
@@ -42,30 +41,32 @@
                     <i class="fa-solid fa-house"></i> Inicio
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
-                    class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link link-ambiente' : 'nav-link link-ambiente' }}">
-                    <i class="fa-solid fa-child"></i> Estudiantes
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('panel.planeacion') }}"
-                    class="{{ request()->routeIs('panel.planeacion*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-calendar-days"></i> Planeación
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('panel.portafolio') }}"
-                    class="{{ request()->routeIs('panel.portafolio*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-folder-open"></i> Portafolios
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('panel.inclusion') }}"
-                    class="{{ request()->routeIs('panel.inclusion*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-universal-access"></i> Inclusión
-                </a>
-            </li>
+            <div id="menu-lateral-ambiente">
+                <li class="nav-item">
+                    <a href="{{ route('panel.estudiantes', ['ambiente' => '__ID__']) }}"
+                        class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link link-ambiente' : 'nav-link link-ambiente' }}">
+                        <i class="fa-solid fa-child"></i> Estudiantes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('panel.planeacion') }}"
+                        class="{{ request()->routeIs('panel.planeacion*') ? 'active nav-link' : 'nav-link' }}">
+                        <i class="fa-solid fa-calendar-days"></i> Planeación
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('panel.portafolio') }}"
+                        class="{{ request()->routeIs('panel.portafolio*') ? 'active nav-link' : 'nav-link' }}">
+                        <i class="fa-solid fa-folder-open"></i> Portafolios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('panel.inclusion') }}"
+                        class="{{ request()->routeIs('panel.inclusion*') ? 'active nav-link' : 'nav-link' }}">
+                        <i class="fa-solid fa-universal-access"></i> Inclusión
+                    </a>
+                </li>
+            </div>
         </ul>
     </aside>
 
@@ -192,9 +193,62 @@
         $(document).click(function() {
             setAmbiente();
         });
+
+        /* ── Menu lateral ambiente ──────────────────────────────────── */
+        // Maneja la navegación de los enlaces del menú lateral de ambiente.
+        // Si no hay ambiente seleccionado, muestra un mensaje de error.
+        // Si hay ambiente seleccionado, reemplaza el __ID__ en los enlaces por el ID del ambiente.
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const menu = document.getElementById('menu-lateral-ambiente');
+
+            if (!menu) return;
+
+            menu.querySelectorAll('a').forEach(link => {
+
+                link.addEventListener('click', function(e) {
+
+                    const ambiente = localStorage.getItem('ambiente-seleccionado');
+
+                    if (!ambiente) {
+                        e.preventDefault();
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Seleccione un Ambiente',
+                            text: 'Debe seleccionar un ambiente antes de continuar.',
+                            confirmButtonText: 'Entendido'
+                        });
+
+                        return;
+                    }
+
+                    if (this.href.includes('__ID__')) {
+                        this.href = this.href.replace('__ID__', ambiente);
+                    }
+
+                });
+
+            });
+
+        });
     </script>
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
+
+    @if (session('alerta_sin_carga'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '¡Hola, {{ $usuarioAuth?->nombre }}!',
+                    text: 'Actualmente no tiene cargas académicas asignadas. Algunas funciones del sistema no estarán disponibles.',
+                    confirmButtonText: 'Entendido'
+                });
+            });
+        </script>
+    @endif
+
     <script>
         /* ── Cerrar sesión ────────────────────────────────────── */
         document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
@@ -211,6 +265,7 @@
                 reverseButtons: true,
             }).then((result) => {
                 if (result.isConfirmed) {
+                    localStorage.clear();
                     this.submit();
                 }
             });
