@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
 use App\Services\Docente\AsistenciaService;
-use App\Services\Docente\GrupoEstadisticasService;
+use App\Services\Docente\GrupoEstudiantesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +18,7 @@ class AsistenciaController extends Controller
 
         $asistenciaService = app(AsistenciaService::class);
 
-        $matriculas = app(GrupoEstadisticasService::class)->obtenerMatriculas($carga);
+        $matriculas = app(GrupoEstudiantesService::class)->obtenerMatriculas($carga);
 
         $asistencias = $asistenciaService->obtenerDelDia($carga);
         $listaTomada = $asistenciaService

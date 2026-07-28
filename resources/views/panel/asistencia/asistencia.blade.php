@@ -2,9 +2,9 @@
 @section('title', 'Registrar Asistencia')
 @section('content')
     <div class="page-header">
-        <h1>Registrar Asistencia
-            <small>Fecha: {{ today()->format('d/m/Y') }}</small>
-        </h1>
+        <p style="font-size: 1.2rem;">Registrar Asistencia
+            <strong>Fecha: {{ today()->format('d/m/Y') }}</strong>
+        </p>
     </div>
 
     <div class="table-container">

@@ -1,18 +1,18 @@
-(function () {
-    const form = document.getElementById('formFiltrosEstudiantes');
-    if (!form) return;
 
-    const buscaInput = document.getElementById('buscarEstudiante');
-    const vistaInput = document.getElementById('vistaActual');
-    const grid = document.getElementById('studentsGrid');
-    let debounceTimer = null;
+inicializarEventos();
 
-    form.querySelectorAll('select').forEach((select) => {
-        select.addEventListener('change', () => {
-            aplicarFiltrosEstudiantes();
-        });
+function inicializarEventos() {
+    const form = document.getElementById("formFiltrosEstudiantes");
+
+    if (!form) {
+        return;
+    }
+
+    form.querySelectorAll("select").forEach(select => {
+        select.addEventListener("change", aplicarFiltrosEstudiantes);
     });
 
+    var buscaInput = document.getElementById('buscarEstudiante');
     if (buscaInput) {
         buscaInput.addEventListener('input', () => {
             clearTimeout(debounceTimer);
@@ -30,15 +30,16 @@
         });
     }
 
-    function aplicarFiltrosEstudiantes() {
-        var action = $('#formFiltrosEstudiantes').attr('action');
-        const params = new URLSearchParams(new FormData($('#formFiltrosEstudiantes')[0]));
-        for (const [k, v] of [...params.entries()]) {
-            if (!v) params.delete(k);
-        }
-        const url = params.toString() ? `${action}?${params.toString()}` : action;
-        cargarTabla(url);
+    //autofocus en el input de busqueda despues de la ultima letra escrita
+    if (buscaInput) {
+        buscaInput.focus();
+        buscaInput.setSelectionRange(
+            buscaInput.value.length,
+            buscaInput.value.length
+        );
     }
+    var vistaInput = document.getElementById('vistaActual');
+    var grid = document.getElementById('studentsGrid');
 
     const $viewButtons = $('.view-btn');
     $viewButtons.on('click', function () {
@@ -56,4 +57,21 @@
 
         aplicarFiltrosEstudiantes();
     });
-})();
+}
+
+
+
+function aplicarFiltrosEstudiantes() {
+    var action = $('#formFiltrosEstudiantes').attr('action');
+    const params = new URLSearchParams(new FormData($('#formFiltrosEstudiantes')[0]));
+    for (const [k, v] of [...params.entries()]) {
+        if (!v) params.delete(k);
+    }
+    const url = params.toString() ? `${action}?${params.toString()}` : action;
+    cargarTabla(url);
+    setTimeout(() => {
+        inicializarEventos();
+    }, 500);
+}
+
+

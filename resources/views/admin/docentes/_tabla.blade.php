@@ -42,13 +42,15 @@
                             {{ $d->user?->ultimoLogin?->fecha?->format('d/m/Y H:i') ?? '—' }}
                         </td>
 
-                        <td style="text-align:center">
+                        <td>
                             @if ($d->user->cuenta_sin_usar)
                                 <span class="badge badge-yellow" title="Nunca ha iniciado sesión">
                                     <i class="fa-solid fa-circle-exclamation"></i> Sin usar
                                 </span>
                             @else
-                                <span style="color:#94A3B8">—</span>
+                                <span class="badge badge-green" title="En uso">
+                                    <i class="fa-solid fa-circle-check"></i> En uso
+                                </span>
                             @endif
                         </td>
                         <td>

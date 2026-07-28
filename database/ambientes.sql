@@ -101,7 +101,7 @@ CREATE TABLE `ambientes` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ambientes_slug_unique` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=6  ;
+) ENGINE=InnoDB COLLATE=utf8mb4_general_ci AUTO_INCREMENT=6  ;
 
 /*Data for the table `ambientes` */
 

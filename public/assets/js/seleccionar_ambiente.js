@@ -10,12 +10,12 @@ function seleccionarAmbiente(element, url_actual) {
             ambiente_id: ambienteId,
             ambiente_nombre: ambienteNombre
         },
-        success: function(response) {
-            if(url_actual) {
+        success: function (response) {
+            if (url_actual) {
                 irAlaUrlPorAjax(url_actual);
-            } 
+            }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -26,18 +26,38 @@ function seleccionarAmbiente(element, url_actual) {
     });
 }
 
+function seleccionarGradoGrupo(gradoId, grupoId) {
+    $.ajax({
+        url: '/panel/sesion/seleccionar-grado-grupo',
+        type: 'POST',
+        data: {
+            _token: document.getElementById('crf-token').value,
+            grado_id: gradoId,
+            grupo_id: grupoId
+        },
+        error: function (xhr, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No fue posible seleccionar el grado y grupo.',
+                confirmButtonText: 'Entendido'
+            });
+        }
+    });
+}
+
 function irAlaUrlPorAjax(url) {
-   window.location.href = url;
+    window.location.href = url;
 }
 
 function eliminarAmbienteSeleccionado() {
     $.ajax({
         url: '/panel/ambientes/eliminar',
         type: 'GET',
-        success: function(response) {
+        success: function (response) {
             console.log(response);
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',

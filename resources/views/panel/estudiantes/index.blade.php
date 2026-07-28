@@ -1,39 +1,28 @@
 @extends('layouts.panel')
 @section('title', 'Estudiantes')
+
 @section('content')
     <div class="students-page">
 
         <div class="page-header students-header">
-            <div>
-                <h1>Estudiantes en el ambiente</h1>
-                <p>Gestión de estudiantes</p>
-            </div>
+
+            <p style= "font-size: 1.2rem;">Gestión de estudiantes</p>
 
             <div class="d-flex gap-2">
                 <button type="button" onclick="abrirModal()" class="btn btn-primary btn-nuevo">
                     <i class="fa-solid fa-plus"></i>
                     Nuevo
                 </button>
-                <button type="button" data-bs-toggle="modal" data-bs-target="#modalSeleccionarAmbiente" class="btn btn-secondary btn-nuevo">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#modalSeleccionarAmbiente"
+                    class="btn btn-secondary btn-nuevo">
                     <i class="fa-solid fa-building"></i>
                     Cambiar Ambiente
                 </button>
             </div>
         </div>
 
-        @include('panel.estudiantes.partials._filtros')
 
-        @php
-            $tieneFiltros = collect($filtros ?? [])
-                ->filter(fn($v) => $v !== null && $v !== '')
-                ->isNotEmpty();
-        @endphp
-
-        @if ($estudiantes->isEmpty() && !$tieneFiltros)
-            @include('panel.estudiantes.partials._empty')
-        @else
-            @include('panel.estudiantes.partials._grid')
-        @endif
+        @include('panel.estudiantes.partials._grid')
 
     </div>
     @include('admin.estudiantes.modal_registro')

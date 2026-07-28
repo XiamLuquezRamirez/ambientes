@@ -146,7 +146,7 @@
                     </table>
                 </div>
             ` : `
-                <div class="resumen-sin-carga text-center py-4">
+                <div class=" text-center py-4">
                     <i class="fa-solid fa-folder-open fa-2x text-muted mb-3 d-block"></i>
                     <p class="text-muted mb-3">Este docente no tiene carga asignada para el año ${anio}.</p>
                 </div>
@@ -154,7 +154,7 @@
 
             document.getElementById('contenidoResumenDocente').innerHTML = `
                 <div class="resumen-actividad-docente">
-                    <p class="resumen-actividad-anio text-muted mb-3">
+                    <p class="text-muted mb-3">
                         <i class="fa-solid fa-calendar-days"></i> Año lectivo ${anio}
                     </p>
                     <div class="resumen-actividad-stats">

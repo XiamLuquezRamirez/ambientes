@@ -92,7 +92,7 @@
                         </div>
                         <div class="col-md-12" id="asignar-seccion-asignaciones-docente">
                             <div class="card p-4">
-                                <h1>Grupos asignados</h1>
+                                <h3>Grupos asignados</h3>
                                 <p class="text-muted">Año lectivo {{ date('Y') }}</p>
                                 <div id="asignaciones_actuales_docente">Cargando...</div>
                             </div>

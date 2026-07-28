@@ -2,8 +2,8 @@
 
     <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" name="q" id="buscarEstudiante" value="{{ $filtros['q'] ?? '' }}"
-            placeholder="Buscar por nombre, documento..." autocomplete="off">
+        <input type="text" name="q" id="buscarEstudiante" placeholder="Buscar por nombre, documento..."
+            autocomplete="off" value="{{ $texto_busqueda ?? '' }}">
     </div>
 
     <div class="toolbar-actions">
@@ -19,8 +19,7 @@
         <select name="condicion_id" id="filtroCondicion" class="toolbar-select">
             <option value="">Todas las condiciones</option>
             @foreach ($condiciones as $condicion)
-                <option value="{{ $condicion->id }}"
-                    {{ (string) ($filtros['condicion_id'] ?? '') === (string) $condicion->id ? 'selected' : '' }}>
+                <option value="{{ $condicion->id }}" {{ $condicion_id == $condicion->id ? 'selected' : '' }}>
                     {{ $condicion->nombre }}
                 </option>
             @endforeach
@@ -29,22 +28,26 @@
         <select name="grado_id" id="filtroGrado" class="toolbar-select">
             <option value="">Todos los grados</option>
             @foreach ($grados as $grado)
-                <option value="{{ $grado->id }}"
-                    {{ (string) ($filtros['grado_id'] ?? '') === (string) $grado->id ? 'selected' : '' }}>
+                <option value="{{ $grado->id }}" {{ $id_grado_seleccionado == $grado->id ? 'selected' : '' }}>
                     {{ $grado->nombre }}
                 </option>
             @endforeach
         </select>
 
+        <select name="grupo_id" id="filtroGrupo" class="toolbar-select">
+            <option value="">Todos los grupos</option>
+            @foreach ($grupos as $grupo)
+                <option value="{{ $grupo->id }}" {{ $id_grupo_seleccionado == $grupo->id ? 'selected' : '' }}>
+                    {{ $grupo->nombre }}
+                </option>
+            @endforeach
+        </select>
+
+
         <select name="estado" id="filtroEstado" class="toolbar-select">
             <option value="">Estados</option>
             <option value="1" {{ ($filtros['estado'] ?? '') === '1' ? 'selected' : '' }}>Activos</option>
             <option value="0" {{ ($filtros['estado'] ?? '') === '0' ? 'selected' : '' }}>Inactivos</option>
-        </select>
-
-        <select name="orden" id="filtroOrden" class="toolbar-select">
-            <option value="az" {{ ($filtros['orden'] ?? 'az') === 'az' ? 'selected' : '' }}>Ordenar: A-Z</option>
-            <option value="za" {{ ($filtros['orden'] ?? '') === 'za' ? 'selected' : '' }}>Ordenar: Z-A</option>
         </select>
 
         <input type="hidden" name="vista" id="vistaActual" value="{{ $vista ?? 'grid' }}">

@@ -204,6 +204,7 @@
             document.querySelectorAll(`#${form} .campo-error`).forEach(el => el.remove());
             document.querySelectorAll(`#${form} .is-invalid`).forEach(el => el.classList.remove('is-invalid'));
         }
+
         async function cargarTabla(url) {
             document.getElementById('contenedorTabla').style.opacity = '.4';
             document.getElementById('cargando-tabla').style.display = 'block';

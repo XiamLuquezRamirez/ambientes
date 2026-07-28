@@ -2,6 +2,7 @@
 
 @section('title', 'Monitor de Sesión')
 
+
 @section('content')
 
     <div class="page-header">

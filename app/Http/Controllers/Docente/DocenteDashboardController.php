@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\CargaDocente;
 use App\Models\Condicion;
+use App\Services\AmbienteService;
 use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\GrupoEstadisticasService;
 use App\Services\Docente\GrupoEstudiantesService;
 use Illuminate\Support\Facades\Auth;
-use App\Services\AmbienteService;
 
 class DocenteDashboardController extends Controller
 {
@@ -64,7 +64,7 @@ class DocenteDashboardController extends Controller
             'ambientes',
             'ambienteSeleccionado',
             'condiciones',
-            'ambientes_disponibles'
+            'ambientes_disponibles',
         ));
     }
 
@@ -94,6 +94,7 @@ class DocenteDashboardController extends Controller
                         'carga_docente_id' => $item->id, // ID clave para buscar sus alumnos luego
                         'id' => $item->grupo_id,
                         'nombre' => $item->grupo->nombre ?? 'Sin Grupo',
+                        'total_estudiantes' => app(GrupoEstudiantesService::class)->contar($item),
                     ];
                 })->values(),
             ];
@@ -107,7 +108,7 @@ class DocenteDashboardController extends Controller
     {
         session(['carga_docente_id' => $carga->id]);
 
-        $matriculas = app(GrupoEstadisticasService::class)->obtenerMatriculas($carga);
+        $matriculas = app(GrupoEstudiantesService::class)->obtenerMatriculas($carga);
 
         $listaTomada = app(AsistenciaService::class)
             ->listaTomada($carga, $matriculas->count());

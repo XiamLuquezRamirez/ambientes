@@ -155,26 +155,33 @@
 
     <main class="main">
         <div class="content">
+            <div class="page-header students-header">
+                <strong style="font-size: 1.6rem; display: none;" id="txt-seleccionar-ambiente">
+                    Selecciona un ambiente para comenzar.
+                </strong>
+                <h1 id="txt-trabajando-en-ambiente">
+                    Trabajando en el ambiente
+                    {{ session('ambiente_nombre') }}
+                </h1>
+                @if (request()->routeIs('panel.principal'))
+                    <button class="btn btn-primary float-end" id="btn-volver-ambientes" style="display: none;">
+                        <i class="fas fa-arrow-left"></i> Volver a seleccionar ambiente
+                    </button>
+                @endif
+            </div>
             @yield('content')
         </div>
     </main>
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
 
-    @if (session('alerta_sin_carga'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    icon: 'warning',
-                    title: '¡Hola, {{ $usuarioAuth?->nombre }}!',
-                    text: 'Actualmente no tiene cargas académicas asignadas. Algunas funciones del sistema no estarán disponibles.',
-                    confirmButtonText: 'Entendido'
-                });
-            });   
-        </script>
-    @endif
-
     <script>
+        const cargaAcademicaActiva = @json(session('ambiente_nombre'));
+        const menuLateralAmbiente = document.getElementById('menu-lateral-ambiente');
+
+        if (!cargaAcademicaActiva) {
+            menuLateralAmbiente.style.pointerEvents = 'none';
+        }
         /* ── Cerrar sesión ────────────────────────────────────── */
         document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
             e.preventDefault();

@@ -923,45 +923,111 @@
         #contenedor-cargando {
             display: flex;
             width: calc(100% - 240px);
-            left:  240px;
+            left: 240px;
             opacity: 1;
             transition: opacity 0.3s ease-in-out;
         }
 
-        #modal-footer-seleccionar-ambiente {
-            display: none;
+        .grado-section {
+            margin-bottom: 24px;
+        }
+
+        .grado-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .grupo-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .grupo-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: .25s;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+        }
+
+        .grupo-card:hover {
+            transform: translateY(-3px);
+            border-color: #2563eb;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, .15);
+        }
+
+        .grupo-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .grupo-card-content {
+            flex: 1;
+        }
+
+        .grupo-card-content h6 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .grupo-card-content small {
+            color: #64748b;
+        }
+
+        .grupo-card-arrow {
+            color: #94a3b8;
+            transition: .2s;
+        }
+
+        .grupo-card:hover .grupo-card-arrow {
+            color: #2563eb;
+            transform: translateX(4px);
+        }
+
+        .grupo-card.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
+        }
+
+        .grupo-card.active .grupo-card-content h6,
+        .grupo-card.active .grupo-card-content small,
+        .grupo-card.active .grupo-card-arrow {
+            color: #fff;
+        }
+
+        .grupo-card.active .grupo-card-icon {
+            background: rgba(255, 255, 255, .18);
+            color: #fff;
         }
     </style>
 @endpush
 
 @section('content')
     <div id="contenedor" style="display: none;">
+
         <div class="page-header">
-            <!-- Envolvemos la bienvenida para controlarla con JS -->
-            <div id="contenedor-bienvenida">
-
-                <h1>¡Bienvenido, {{ Auth::guard('docente')->user()->nombre }}!</h1>
-
-                <div class="bienvenida-meta">
-                    <span>{{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
-
-                    <span class="bienvenida-separador"></span>
-
-                    <span>Selecciona el ambiente con el que trabajarás hoy.</span>
-                </div>
-
-            </div>
-
-            <!-- Este contenedor empezará oculto y mostrará el contexto activo en tiempo real -->
-            <div id="contenedor-ambiente-activo" style="display: none;">
-                <h1 style="font-size: 1.8rem; margin: 0; color: #333;">
-                    <span id="txt-contexto-ambiente"></span>
-                    <span id="txt-contexto-detalle"></span>
-                    <button class="btn btn-primary float-end" id="btn-volver-ambientes">
-                        <i class="fas fa-arrow-left"></i> Volver a seleccionar ambiente
-                    </button>
-                </h1>
-            </div>
+            <p style="font-size: 1.2rem;">Dashboard principal</p>
         </div>
 
         <!-- GRID DE AMBIENTES (Se ocultará al seleccionar uno) -->
@@ -987,7 +1053,7 @@
                         <span class="badge-stat bs-azul">
                             <i class="fas fa-graduation-cap"></i> {{ $amb->grados_count }} grado(s)
                         </span>
-                        
+
                         <span class="badge-stat bs-verde">
                             <i class="fas fa-child"></i> {{ $amb->grupos_count }} grupo(s)
                         </span>
@@ -1037,8 +1103,8 @@
                 <div id="card-sin-pin" class="estadistica-item">
                     <span class="estadistica-label">Sin PIN</span>
                     <span class="estadistica-valor" id="stat-sin-pin">0</span>
-                    <a id="link-configurar-pin" href="{{ route('panel.estudiantes') }}"
-                        class="link-configurar-pin" style="display: none;">
+                    <a id="link-configurar-pin" href="{{ route('panel.estudiantes') }}" class="link-configurar-pin"
+                        style="display: none;">
                         <i class="fas fa-key"></i> Configurar PIN
                     </a>
                 </div>
@@ -1089,8 +1155,7 @@
                 <span class="quick-action-card__text">Toma la asistencia del grupo activo de forma rápida.</span>
                 <span id="badge-asistencia" class="quick-action-badge d-none"></span>
             </a>
-            <a href="{{ route('panel.estudiantes') }}" class="quick-action-card"
-                data-context-route="pin">
+            <a href="{{ route('panel.estudiantes') }}" class="quick-action-card" data-context-route="pin">
                 <span class="quick-action-card__icon"><i class="fas fa-key"></i></span>
                 <span class="quick-action-card__title">Configurar PIN</span>
                 <span class="quick-action-card__text">Revisa quién aún necesita un PIN configurado.</span>
@@ -1111,14 +1176,16 @@
                 <span id="badge-observacion" class="quick-action-badge quick-action-badge--neutral">0</span>
             </a>
         </div>
-        
-    </div>
-    <div id="contenedor-cargando" class="flex-column justify-content-center align-items-center" style="position: fixed; top: 0; height: 100%; background: rgba(255, 255, 255, 0.5); z-index: 1000;">
-        <div class="spinner-border text-primary" role="status"></div>
-        <br>
-        <span style="font-size: 1.2rem; font-weight: 500;">Consultando ambientes asignados...</span>    
-    </div>
 
+    </div>
+    @if (!empty($ambientes_disponibles['ambientes']))
+        <div id="contenedor-cargando" class="flex-column justify-content-center align-items-center"
+            style="position: fixed; top: 0; height: 100%; background: rgba(255, 255, 255, 0.5); z-index: 1000;">
+            <div class="spinner-border text-primary" role="status"></div>
+            <br>
+            <span style="font-size: 1.2rem; font-weight: 500;">Consultando ambientes asignados...</span>
+        </div>
+    @endif
     <input type="hidden" id="crf-token" value="{{ csrf_token() }}">
 
     @include('panel.asistencia.modalAsistenciaGrupo')
@@ -1148,7 +1215,7 @@
             const desde = document.getElementById('fechaInicio').value;
             const hasta = document.getElementById('fechaFin').value;
 
-            const grupoActivo = document.querySelector('.badge-grupo-chip.active');
+            const grupoActivo = document.querySelector('.grupo-card.active');
 
             const cargaId = grupoActivo.dataset.cargaId;
 
@@ -1218,7 +1285,7 @@
 
         function exportarReporteAsistencia() {
 
-            const grupoActivo = document.querySelector('.badge-grupo-chip.active');
+            const grupoActivo = document.querySelector('.grupo-card.active');
 
             const cargaId = grupoActivo.dataset.cargaId;
 
@@ -1237,14 +1304,16 @@
                     success: function(response) {
                         if (response.success) {
                             cargarAmbiente(response.ambiente_id, response.ambiente_nombre);
+                            setTimeout(() => {
+                                document.getElementById('contenedor-cargando').style.opacity =
+                                    '0';
                                 setTimeout(() => {
-                                document.getElementById('contenedor-cargando').style.opacity = '0';
-                                setTimeout(() => {
-                                    document.getElementById('contenedor-cargando').style.display = 'none';
+                                    document.getElementById('contenedor-cargando').style
+                                        .display = 'none';
                                 }, 300);
                                 document.getElementById('contenedor').style.display = 'block';
                             }, 100);
-                        }else{
+                        } else {
                             $('#modalSeleccionarAmbiente').modal('show');
                         }
                     }
@@ -1276,16 +1345,18 @@
             // Carga los grados y grupos del ambiente seleccionado y activa el primer grupo por defecto.
             function cargarAmbiente(ambienteId, ambienteNombre) {
                 nombreAmbienteActivo = ambienteNombre;
+                // Restaurar encabezado
+                document.getElementById('txt-seleccionar-ambiente').style.display = 'none';
+
+                const titulo = document.getElementById('txt-trabajando-en-ambiente');
+                titulo.style.display = 'block';
+                titulo.textContent = `Trabajando en el ambiente ${ambienteNombre}`;
+
+                document.getElementById('btn-volver-ambientes').style.display = 'inline-block';
 
                 // Ocultamos los ambientes y el bloque de bienvenida para enfocar la vista del ambiente.
                 contenedorGrid.style.display = 'none';
-                document.getElementById('contenedor-bienvenida').style.display = 'none';
                 mostrarEstadoCargaEstadisticas();
-
-                document.getElementById('txt-contexto-ambiente').textContent =
-                    `Ambiente: ${ambienteNombre}`;
-                document.getElementById('txt-contexto-detalle').textContent = '';
-                document.getElementById('contenedor-ambiente-activo').style.display = 'block';
 
                 panelGradosGrupos.style.display = 'block';
                 contenidoGrados.innerHTML =
@@ -1302,32 +1373,75 @@
                         }
 
                         let html = '';
+
                         data.forEach(grado => {
                             html += `
-                                <div style="flex: 0 0 auto; min-width: 220px;">
-                                    <h5 style="font-weight: bold; color: #444; margin-bottom: 10px; white-space: nowrap;">${grado.nombre}</h5>
-                                    <div style="display: flex; flex-wrap: nowrap; gap: 8px;">
-                            `;
+        <div class="grado-section">
+            <div class="grado-header">
+                <i class="fas fa-layer-group"></i>
+                <span>${grado.nombre}</span>
+            </div>
+
+            <div class="grupo-cards">
+    `;
+
                             grado.grupos.forEach(grupo => {
                                 html += `
-                                    <span class="badge-grupo-chip"
-                                          style="padding: 6px 14px; background: #e9ecef; border: 1px solid #ced4da; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 500; white-space: nowrap; display: inline-block; transition: all 0.2s;"
-                                          data-carga-id="${grupo.carga_docente_id}"
-                                          data-grado="${grado.nombre}"
-                                          data-grupo="${grupo.nombre}"
-                                          onclick="seleccionarGrupo(this)">
-                                          <i class="fas fa-graduation-cap"></i>
-                                        ${grado.nombre} ${grupo.nombre}
-                                    </span>
-                                `;
+            <div class="grupo-card"
+                 data-carga-id="${grupo.carga_docente_id}"
+                 data-grado-id="${grado.id}"
+                 data-grado="${grado.nombre}"
+                 data-grupo="${grupo.nombre}"
+                 data-grupo-id="${grupo.id}"
+                 onclick="seleccionarGrupo(this)">
+
+                <div class="grupo-card-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+
+                <div class="grupo-card-content">
+                    <h6>${grado.nombre} ${grupo.nombre}</h6>
+                    <span class="badge bs-verde">${grupo.total_estudiantes} Estudiantes</span>
+                </div>
+
+                <div class="grupo-card-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+
+            </div>
+        `;
                             });
-                            html += `</div></div>`;
+
+                            html += `
+            </div>
+        </div>
+    `;
                         });
+
                         contenidoGrados.innerHTML = html;
 
-                        const primerGrupo = contenidoGrados.querySelector('.badge-grupo-chip');
-                        if (primerGrupo) {
-                            seleccionarGrupo(primerGrupo);
+                        const ambienteSesion = "{{ session('ambiente_id') }}";
+                        const gradoSesion = "{{ session('grado_id') }}";
+                        const grupoSesion = "{{ session('grupo_id') }}";
+
+                        let grupo = null;
+
+                        if (
+                            ambienteSesion == ambienteId &&
+                            gradoSesion &&
+                            grupoSesion
+                        ) {
+                            grupo = contenidoGrados.querySelector(
+                                `[data-grado-id="${gradoSesion}"][data-grupo-id="${grupoSesion}"]`
+                            );
+                        }
+
+                        if (!grupo) {
+                            grupo = contenidoGrados.querySelector('.grupo-card');
+                        }
+
+                        if (grupo) {
+                            seleccionarGrupo(grupo);
                         } else {
                             document.getElementById('titulo-grupo-seleccionado').innerHTML =
                                 '<i class="fas fa-exclamation-circle"></i> No hay grupos disponibles para este ambiente';
@@ -1345,11 +1459,14 @@
             // Vuelve a la vista inicial de ambientes y limpia el contexto activo.
             btnVolver.addEventListener('click', function() {
                 panelGradosGrupos.style.display = 'none';
-                document.getElementById('contenedor-ambiente-activo').style.display = 'none';
-                document.getElementById('contenedor-bienvenida').style.display = 'block';
                 contenedorGrid.style.display = 'grid';
+
+                // Cambiar el encabezado
+                document.getElementById('txt-trabajando-en-ambiente').style.display = 'none';
+                document.getElementById('btn-volver-ambientes').style.display = 'none';
+                document.getElementById('txt-seleccionar-ambiente').style.display = 'block';
+
                 resetearEstadisticas();
-                eliminarAmbienteSeleccionado();
             });
 
             // Asigna el comportamiento de selección a cada tarjeta de ambiente.
@@ -1365,7 +1482,7 @@
 
             quickActions.forEach(link => {
                 link.addEventListener('click', function(event) {
-                    const grupoActivo = document.querySelector('.badge-grupo-chip.active');
+                    const grupoActivo = document.querySelector('.grupo-card.active');
 
                     if (!grupoActivo) {
                         event.preventDefault();
@@ -1440,7 +1557,7 @@
         }
 
         function mostrarEstudiantesGrupoActivo() {
-            const grupoActivo = document.querySelector('.badge-grupo-chip.active');
+            const grupoActivo = document.querySelector('.grupo-card.active');
             const cardActivos = document.getElementById('card-estudiantes-activos');
 
             if (!grupoActivo) {
@@ -1482,22 +1599,22 @@
 
         // Consulta las estadísticas del grupo seleccionado y refresca la tarjeta visual.
         function seleccionarGrupo(element) {
-            document.querySelectorAll('.badge-grupo-chip').forEach(chip => {
-                chip.classList.remove('active');
-                chip.style.background = '#e9ecef';
-                chip.style.color = '#212529';
+            document.querySelectorAll('.grupo-card').forEach(card => {
+                card.classList.remove('active');
             });
+
             element.classList.add('active');
-            element.style.background = '#007bff';
-            element.style.color = '#fff';
 
             const cargaId = element.getAttribute('data-carga-id');
             const gradoNombre = element.getAttribute('data-grado');
             const grupoNombre = element.getAttribute('data-grupo');
+            const gradoId = element.getAttribute('data-grado-id');
+            const grupoId = element.getAttribute('data-grupo-id');
+            seleccionarGradoGrupo(gradoId, grupoId);
 
-            document.getElementById('txt-contexto-ambiente').textContent = `${nombreAmbienteActivo}`;
-            document.getElementById('txt-contexto-detalle').textContent =
-                ` / ${gradoNombre} / Grupo ${grupoNombre}`;
+            // document.getElementById('txt-contexto-ambiente').textContent = `${nombreAmbienteActivo}`;
+            // document.getElementById('txt-contexto-detalle').textContent =
+            //     ` / ${gradoNombre} / Grupo ${grupoNombre}`;
 
             document.getElementById('titulo-grupo-seleccionado').innerHTML =
                 `<i class="fas fa-chart-bar"></i> Estadísticas para: <strong>${gradoNombre} - ${grupoNombre}</strong>`;
@@ -1625,21 +1742,31 @@
                 return `
                     <a href="${fichaUrl}" class="estudiante-card" title="Ver ficha completa">
                         <div class="estudiante-card__info">
-                            <div class="estudiante-avatar" style="background:${estudiante.color_avatar || '#2563EB'}">
-                                ${estudiante.iniciales || 'E'}
-                            </div>
-                            <div class="estudiante-meta">
-                                <p class="estudiante-nombre">${estudiante.nombre}</p>
-                                <p class="estudiante-submeta">Condición: ${condicionLabel} · ${estudiante.estado || 'Activo'}</p>
-                            </div>
+                           ${
+                    estudiante.avatar_url
+                    ? `
+                        <img
+                            src="${estudiante.avatar_url}"
+                            class="estudiante-avatar"
+                            alt="${estudiante.nombre} ${estudiante.apellido}">
+                        `: `
+                        <div class="estudiante-avatar"
+                                style="background:${estudiante.color_avatar || '#2563EB'}">
+                            ${estudiante.iniciales || 'E'}
                         </div>
-                        <div class="estudiante-tags">
-                            <span class="tag-estudiante ${estadoClase}">${estudiante.estado || 'Activo'}</span>
-                            <span class="tag-estudiante ${pinClase}">${estudiante.tiene_pin ? 'PIN' : 'Sin PIN'}</span>
-                            <span class="tag-estudiante ${piarClase}">${estudiante.estado_piar || 'No aplica'}</span>
-                            ${alerta}
-                        </div>
-                    </a>
+                        `}
+                <div class="estudiante-meta">
+                    <p class="estudiante-nombre">${estudiante.nombre}</p>
+                    <p class="estudiante-submeta">Condición: ${condicionLabel} · ${estudiante.estado || 'Activo'}</p>
+                </div>
+            </div>
+            <div class="estudiante-tags">
+                <span class="tag-estudiante ${estadoClase}">${estudiante.estado || 'Activo'}</span>
+                <span class="tag-estudiante ${pinClase}">${estudiante.tiene_pin ? 'PIN' : 'Sin PIN'}</span>
+                <span class="tag-estudiante ${piarClase}">${estudiante.estado_piar || 'No aplica'}</span>
+                ${alerta}
+            </div>
+        </a>
                 `;
             }).join('');
         }

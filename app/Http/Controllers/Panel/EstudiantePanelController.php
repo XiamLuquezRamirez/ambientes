@@ -9,6 +9,7 @@ use App\Models\CargaDocente;
 use App\Models\Condicion;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
+use App\Models\Docente;
 use App\Models\Estudiante;
 use App\Models\EstudianteAmbiente;
 use App\Models\FigurasModel;
@@ -16,12 +17,11 @@ use App\Models\Grado;
 use App\Models\Grupo;
 use App\Models\Matricula;
 use App\Models\SyncQueue;
+use App\Services\AmbienteService;
 use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\DocenteAsignacionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Docente;
-use App\Services\AmbienteService;
 
 class EstudiantePanelController extends Controller
 {
@@ -48,6 +48,31 @@ class EstudiantePanelController extends Controller
             ->filter()
             ->unique('id')
             ->values();
+
+        if ($request->get('grado_id')) {
+            $id_grado_seleccionado = $request->get('grado_id');
+        } else {
+            if (session('grado_id')) {
+                $id_grado_seleccionado = session('grado_id');
+            } else {
+                $id_grado_seleccionado = '';
+            }
+        }
+
+        $grupos = $cargas->pluck('grupo')
+            ->filter(fn ($grupo) => $grupo->grado_id == $id_grado_seleccionado)
+            ->unique('id')
+            ->values();
+
+        if ($request->get('grupo_id')) {
+            $id_grupo_seleccionado = $request->get('grupo_id');
+        } else {
+            if (session('grupo_id')) {
+                $id_grupo_seleccionado = session('grupo_id');
+            } else {
+                $id_grupo_seleccionado = '';
+            }
+        }
 
         if ($cargas->isNotEmpty()) {
 
@@ -88,6 +113,7 @@ class EstudiantePanelController extends Controller
         $consulta = clone $base;
 
         if ($request->filled('q')) {
+            $texto_busqueda = $request->get('q');
             $q = trim($request->get('q'));
             $consulta->where(function ($sub) use ($q) {
                 $sub->where('nombre', 'like', "%{$q}%")
@@ -95,17 +121,31 @@ class EstudiantePanelController extends Controller
                     ->orWhere('identificacion', 'like', "%{$q}%")
                     ->orWhereRaw("CONCAT(nombre, ' ', COALESCE(apellido, '')) like ?", ["%{$q}%"]);
             });
+        } else {
+            $texto_busqueda = '';
         }
 
         if ($request->filled('condicion_id')) {
+            $condicion_id = $request->get('condicion_id');
             $consulta->where('condicion_id', $request->get('condicion_id'));
+        } else {
+            $condicion_id = '';
         }
 
         if ($request->filled('grado_id')) {
-
             $matriculas = Matricula::query()
                 ->whereIn('estudiante_id', $matriculas)
                 ->where('grado_id', $request->grado_id)
+                ->where('estado', 'activo')
+                ->pluck('estudiante_id');
+
+            $consulta->whereIn('id', $matriculas);
+        }
+
+        if ($id_grupo_seleccionado) {
+            $matriculas = Matricula::query()
+                ->whereIn('estudiante_id', $matriculas)
+                ->where('grupo_id', $id_grupo_seleccionado)
                 ->where('estado', 'activo')
                 ->pluck('estudiante_id');
 
@@ -155,11 +195,22 @@ class EstudiantePanelController extends Controller
             'activos_pct' => $total > 0 ? round(($activos / $total) * 100, 1) : 0,
         ];
 
-
         if ($request->ajax()) {
+
             return response()->json([
                 'success' => true,
-                'html' => view('panel.estudiantes.partials._grid', compact('estudiantes', 'estadisticas', 'vista'))->render(),
+                'html' => view('panel.estudiantes.partials._grid', compact(
+                    'estudiantes',
+                    'estadisticas',
+                    'vista',
+                    'grupos',
+                    'condiciones',
+                    'grados',
+                    'id_grado_seleccionado',
+                    'id_grupo_seleccionado',
+                    'condicion_id',
+                    'texto_busqueda',
+                ))->render(),
             ]);
         }
 
@@ -176,7 +227,13 @@ class EstudiantePanelController extends Controller
             'departamentos',
             'figuras',
             'grados',
-            'ambientes_disponibles'
+            'grupos',
+            'ambientes_disponibles',
+            'ambiente',
+            'id_grado_seleccionado',
+            'condicion_id',
+            'id_grupo_seleccionado',
+            'texto_busqueda'
         ));
     }
 
@@ -236,7 +293,6 @@ class EstudiantePanelController extends Controller
             'configurado' => 'Configurado',
             'bloqueado' => 'Bloqueado',
         ];
-
 
         return view('panel.estudiantes.show', [
             'estudiante' => $estudiante,

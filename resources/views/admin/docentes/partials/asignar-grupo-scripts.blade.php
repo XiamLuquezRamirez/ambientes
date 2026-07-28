@@ -205,18 +205,48 @@
         }
 
         /** Muestra errores de validación del formulario de asignación. */
-        function mostrarErroresAsignacion(errors) {
-            limpiarErroresAsignacionForm();
-            for (const [campo, mensajes] of Object.entries(errors)) {
-                const input = document.querySelector(`#formAsignarInfo [name="${campo}"]`);
-                if (!input) continue;
-                input.classList.add('is-invalid');
-                const div = document.createElement('div');
-                div.className = 'campo-error';
-                div.textContent = mensajes[0];
-                input.insertAdjacentElement('afterend', div);
-            }
-            document.querySelector('#formAsignarInfo .is-invalid')?.focus();
+        function mostrarErroresAsignacion(errors, form) {
+            limpiarErroresAsignacionForm(form);
+            $.each(errors, function(campo, mensajes) {
+                const $input = $(`#${form} [name="${campo}"]`);
+                if (!$input.length) return;
+                $input.addClass('is-invalid');
+                var mensaje = '';
+                switch (mensajes[0]) {
+                    case 'validation.unique':
+                        mensaje = 'Ya existe un usuario con';
+                        if (campo === 'email') {
+                            mensaje += ' este correo electrónico';
+                        } else if (campo === 'identificacion') {
+                            mensaje += ' esta identificación';
+                        }
+                        mensaje += '.';
+                        break;
+                    case 'validation.email':
+                        mensaje = 'El correo electrónico no es válido';
+                        break;
+                    case 'validation.integer':
+                        mensaje = 'El valor debe ser un número entero';
+                        break;
+                    case 'validation.string':
+                        mensaje = 'El valor debe ser una cadena de texto';
+                        break;
+                    case 'validation.numeric':
+                        mensaje = 'El valor debe ser un número';
+                        break;
+                    case 'validation.required':
+                        mensaje = 'Este campo es requerido';
+                        break;
+                    default:
+                        mensaje = 'Este campo es requerido';
+                        break;
+                }
+                $('<div>', {
+                    class: 'campo-error',
+                    text: mensaje
+                }).insertAfter($input);
+            });
+            $(`#${form} .is-invalid`).first().focus();
         }
 
         /**
@@ -331,7 +361,7 @@
                     actualizarModalDocentesAsignados();
                 }
             } else if (res.errors && Object.keys(res.errors).length) {
-                mostrarErroresAsignacion(res.errors);
+                mostrarErroresAsignacion(res.errors, 'formAsignarInfo');
             } else {
                 mostrarToast('error', res.message || 'Error al guardar');
             }

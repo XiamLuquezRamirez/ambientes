@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\CargaDocente;
+use App\Models\Grado;
+use App\Models\Grupo;
 use App\Services\Docente\GrupoEstudiantesService;
 use Illuminate\Http\Request;
 
@@ -42,16 +44,15 @@ class SesionController extends Controller
             'message' => 'Ambiente seleccionado correctamente.',
         ]);
     }
-    
-    public function eliminarAmbienteSeleccionado(){
+
+    public function eliminarAmbienteSeleccionado()
+    {
         session()->forget('ambiente_id');
         session()->forget('ambiente_nombre');
+        session()->forget('grado_id');
+        session()->forget('grupo_id');
 
-        return redirect()->route('panel.principal');
-        return response()->json([
-            'success' => true,
-            'message' => 'Ambiente eliminado correctamente.',
-        ]);
+        return true;
     }
 
     public function obtenerAmbienteSeleccionado()
@@ -67,6 +68,27 @@ class SesionController extends Controller
             'success' => true,
             'ambiente_id' => session('ambiente_id'),
             'ambiente_nombre' => session('ambiente_nombre'),
+        ]);
+    }
+
+    public function obtenerGradoGrupoSeleccionado(Request $request)
+    {
+        $request->validate([
+            'grado_id' => 'required|exists:grados,id',
+            'grupo_id' => 'required|exists:grupos,id',
+        ]);
+
+        session(['grado_id' => $request->grado_id]);
+        session(['grupo_id' => $request->grupo_id]);
+
+        $grado = Grado::findOrFail($request->grado_id);
+        $grupo = Grupo::findOrFail($request->grupo_id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Grado y grupo seleccionado correctamente.',
+            'grado' => $grado,
+            'grupo' => $grupo,
         ]);
     }
 }

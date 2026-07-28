@@ -1,7 +1,6 @@
-
 @push('styles')
     <style>
-          .ambiente-card {
+        .ambiente-card {
             background: #FFFFFF;
             border: 1px solid #E2E8F0;
             border-radius: 16px;
@@ -93,6 +92,18 @@
             border: 1px solid #E2E8F0;
         }
 
+        .bienvenida-meta-texto {
+            width: 100%;
+            height: 100%;
+            color: #1E3A8A;
+            background: transparent;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+        }
     </style>
 @endpush
 
@@ -100,32 +111,47 @@
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-header-icon"><i class="fas fa-building text-white"></i></div>
-                <div class="flex-grow-1">
-                    <h5 class="modal-title mb-0" id="modalSeleccionarAmbienteLabel">Seleccionar Ambiente</h5>
+                <div class="modal-header-icon">
+                    <i class="fas fa-building text-white"></i>
                 </div>
+                <div class="flex-grow-1">
+                    <h5 class="modal-title mb-0" style="font-size: 1.4rem;" id="modal-title-seleccionar-ambiente">
+                        ¡Bienvenido(a), {{ Auth::guard('docente')->user()->nombre }}!</h5>
+                    <p class="modal-subtitle mb-0" style="font-size: 1rem;">
+                        {{ \Carbon\Carbon::now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</p>
+                </div>
+                <button type="button" class="btn-close" id="btn-close-modal-seleccionar-ambiente"
+                    data-bs-dismiss="modal" aria-label="Cerrar"></button>
+
             </div>
             <div class="modal-body">
+                <strong class="bienvenida-meta-texto" id="bienvenida-meta-texto">Selecciona el ambiente con el
+                    que trabajarás hoy</strong>
+
                 <div class="row">
-                    @foreach($ambientes_disponibles['ambientes'] as $amb)
+                    @foreach ($ambientes_disponibles['ambientes'] as $amb)
                         <div class="col-md-4">
                             <div class="ambiente-card btn-seleccionar-ambiente" id="tarjeta-amb-{{ $amb->id }}"
-                                data-id="{{ $amb->id }}" data-nombre="{{ $amb->nombre }}" onclick="seleccionarAmbiente(this, '{{ $ambientes_disponibles['url_actual'] }}')">
-            
+                                data-id="{{ $amb->id }}" data-nombre="{{ $amb->nombre }}"
+                                onclick="seleccionarAmbiente(this, '{{ $ambientes_disponibles['url_actual'] }}')">
+
                                 <div class="card-franja" style="background:{{ $amb->color_hex }}"></div>
-            
+
                                 <div class="py-3 px-4 d-flex align-items-center gap-3">
-                                    <div class="card-icono" style="background:{{ $amb->color_hex }}22">{{ $amb->icono }}</div>
+                                    <div class="card-icono" style="background:{{ $amb->color_hex }}22">
+                                        {{ $amb->icono }}</div>
                                     <div class="card-info">
-                                        <div class="card-nombre" style="font-size: 1.1rem; font-weight: 600;">Ambiente {{ $amb->nombre }}</div>
+                                        <div class="card-nombre" style="font-size: 1.1rem; font-weight: 600;">
+                                            Ambiente
+                                            {{ $amb->nombre }}</div>
                                     </div>
                                 </div>
-            
+
                                 <div class="card-stats">
                                     <span class="badge-stat bs-azul">
                                         <i class="fas fa-graduation-cap"></i> {{ $amb->grados_count }} grado(s)
                                     </span>
-                                    
+
                                     <span class="badge-stat bs-verde">
                                         <i class="fas fa-child"></i> {{ $amb->grupos_count }} grupo(s)
                                     </span>
@@ -137,11 +163,70 @@
                 <input type="hidden" id="crf-token" value="{{ csrf_token() }}">
             </div>
             <div class="modal-footer" id="modal-footer-seleccionar-ambiente">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 @push('scripts')
+    <script>
+        const sinAmbientes = @json($ambientes_disponibles['ambientes']->isEmpty());
+        const esPanelPrincipal = @json(request()->routeIs('panel.principal'));
+        const ambienteNombre = @json(session('ambiente_nombre'));
+
+        configurarModalSeleccionAmbiente(
+            sinAmbientes,
+            esPanelPrincipal,
+            ambienteNombre
+        );
+
+        function configurarModalSeleccionAmbiente(
+            sinAmbientes,
+            esPanelPrincipal,
+            ambienteNombre
+        ) {
+
+            const bienvenida = document.getElementById('bienvenida-meta-texto');
+            const contenedorCargando = document.getElementById('contenedor-cargando');
+            const txtTrabajando = document.getElementById('txt-trabajando-en-ambiente');
+            const footerModal = document.getElementById('modal-footer-seleccionar-ambiente');
+            const btnCerrar = document.getElementById('btn-close-modal-seleccionar-ambiente');
+            const tituloModal = document.getElementById('modal-title-seleccionar-ambiente');
+
+            if (sinAmbientes) {
+
+                bienvenida.innerHTML =
+                    '<strong><i class="fas fa-exclamation-triangle text-warning"></i> No tiene cargas académicas asignadas.</strong>';
+
+                contenedorCargando.style.display = 'none';
+
+                txtTrabajando.style.display = 'block';
+                txtTrabajando.textContent = 'No tiene cargas académicas asignadas.';
+
+                return;
+            }
+
+            if (esPanelPrincipal) {
+
+                bienvenida.innerHTML =
+                    '<strong>Selecciona el ambiente con el que trabajarás hoy</strong>';
+
+                txtTrabajando.style.display = 'block';
+                txtTrabajando.textContent =
+                    ` ${ambienteNombre ? 'Trabajando en el ambiente ' + ambienteNombre : 'No hay ambiente seleccionado'}`;
+
+                footerModal.style.display = 'none';
+                btnCerrar.style.display = 'none';
+
+                return;
+            }
+
+            bienvenida.innerHTML =
+                '<strong>Selecciona el ambiente</strong>';
+
+            tituloModal.innerHTML =
+                '<h5 class="modal-title mb-0" style="font-size:1.4rem;">Cambiar Ambiente</h5>';
+        }
+    </script>
     <script src="{{ asset('assets/js/seleccionar_ambiente.js') }}"></script>
 @endpush

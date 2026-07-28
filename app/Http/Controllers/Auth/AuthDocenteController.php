@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Enums\SeguridadAccion;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Panel\SesionController;
 use App\Models\LoginLog;
 use App\Services\SeguridadService;
 use Illuminate\Http\Request;
@@ -61,18 +62,6 @@ class AuthDocenteController extends Controller
 
         $request->session()->regenerate();
 
-        if (! $usuario->esAdmin()) {
-
-            $tieneCarga = $usuario->docente->cargasDocente()
-                ->where('activo', true)
-                ->where('anio_lectivo', date('Y'))
-                ->exists();
-
-            if (! $tieneCarga) {
-                session()->flash('alerta_sin_carga', true);
-            }
-        }
-
         return $usuario->esAdmin()
             ? redirect()->route('admin.ambientes')
             : redirect()->route('panel.principal');
@@ -84,8 +73,7 @@ class AuthDocenteController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        session()->forget('ambiente_id');
-        session()->forget('ambiente_nombre');
+        app(SesionController::class)->eliminarAmbienteSeleccionado();
 
         return redirect()->route('docente.login');
     }

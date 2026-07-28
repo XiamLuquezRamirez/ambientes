@@ -2,10 +2,6 @@
 
 namespace App\Services\Docente;
 
-use App\Models\CargaDocente;
-use App\Models\Matricula;
-use Illuminate\Support\Collection;
-
 class GrupoEstadisticasService
 {
     public function calcular($matriculas, bool $listaTomada = false): array
@@ -36,28 +32,6 @@ class GrupoEstadisticasService
             'tiene_alerta_pin' => $sinPin > 0,
             'tiene_alerta_piar' => $requierePiarSinDiligenciar > 0,
         ];
-    }
-
-    public function obtenerMatriculas(CargaDocente $carga): Collection
-    {
-        return Matricula::query()
-            ->join('estudiante_ambiente', function ($join) use ($carga) {
-                $join->on('estudiante_ambiente.estudiante_id', '=', 'matriculas.estudiante_id')
-                    ->where('estudiante_ambiente.ambiente_id', $carga->ambiente_id)
-                    ->where('estudiante_ambiente.anio_lectivo', $carga->anio_lectivo)
-                    ->where('estudiante_ambiente.estado', 'activo');
-            })
-            ->where('matriculas.grado_id', $carga->grado_id)
-            ->where('matriculas.grupo_id', $carga->grupo_id)
-            ->where('matriculas.anio_lectivo', $carga->anio_lectivo)
-            ->where('matriculas.estado', 'activo')
-            ->with([
-                'estudiante.piar',
-                'estudiante.configuracionPin',
-                'estudiante.condicion',
-            ])
-            ->select('matriculas.*')
-            ->get();
     }
 
     /**

@@ -1,8 +1,6 @@
-{{--
-    Ficha completa del estudiante (panel docente).
+{{-- Ficha completa del estudiante (panel docente).
     Controlador: EstudiantePanelController@verFicha
-    Ruta: panel.estudiantes.show
---}}
+    Ruta: panel.estudiantes.show --}}
 @extends('layouts.panel')
 @section('title', 'Ficha del estudiante')
 
@@ -46,8 +44,7 @@
 
         <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
             <div>
-                <h1>{{ $estudiante->nombre_completo }}</h1>
-                <p>Ficha completa del estudiante</p>
+                <p style= "font-size: 1.2rem;">Ficha completa del estudiante</p>
             </div>
             <a href="javascript:window.history.back()" class="btn btn-primary">
                 <i class="fas fa-arrow-left me-1"></i> Volver
@@ -98,7 +95,8 @@
                 @endif
 
                 <div class="ficha-identity-body">
-                    <h2>{{ $estudiante->nombre_completo }}</h2>
+                    <h1 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--color-primary-dark);">
+                        {{ $estudiante->nombre_completo }}</h1>
                     <div class="ficha-badges">
                         <span class="stu-badge stu-badge--condicion">{{ $condicionNombre }}</span>
                         <span class="stu-badge {{ $estudiante->activo ? 'stu-badge--activo' : 'stu-badge--inactivo' }}">

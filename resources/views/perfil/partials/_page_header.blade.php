@@ -1,3 +1,11 @@
+@push('styles')
+    <style>
+        #txt-trabajando-en-ambiente {
+            display: none;
+        }
+    </style>
+@endpush
+
 <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
     <div>
         <h1>Perfil</h1>

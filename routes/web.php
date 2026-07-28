@@ -231,7 +231,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     // Sesion
     Route::get('sesion', [SesionController::class, 'listar'])->name('panel.sesion');
     Route::get('sesion/estudiantes', [SesionController::class, 'estudiantes'])->name('panel.sesion.estudiantes');
-
+    Route::post('sesion/seleccionar-grado-grupo', [SesionController::class, 'obtenerGradoGrupoSeleccionado'])->name('panel.sesion.seleccionar-grado-grupo');
     // Portafolio
     Route::get('portafolio', [PortafolioController::class, 'listar'])->name('panel.portafolio');
     Route::get('portafolio/{estudiante}', [PortafolioController::class, 'verEstudiante'])->name('panel.portafolio.estudiante');
@@ -254,7 +254,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('grupos/ambientes-disponibles/{grado}/{grupo}', [EstudiantePanelController::class, 'obtenerAmbientesDisponibles'])->name('panel.estudiantes.ambientes-disponibles');
 
     // Ambientes
-    //guardar el ambiente seleccionado en la sesion
+    // guardar el ambiente seleccionado en la sesion
     Route::post('ambientes/seleccionar', [SesionController::class, 'seleccionarAmbiente'])->name('panel.ambientes.seleccionar');
     Route::get('ambientes/eliminar', [SesionController::class, 'eliminarAmbienteSeleccionado'])->name('panel.ambientes.eliminar');
     Route::get('ambientes/obtener', [SesionController::class, 'obtenerAmbienteSeleccionado'])->name('panel.ambientes.obtener');

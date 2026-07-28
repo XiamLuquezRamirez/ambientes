@@ -43,7 +43,7 @@ class GrupoEstudiantesService
                 'nombre' => $estudiante->nombre,
                 'apellido' => $estudiante->apellido,
                 'color_avatar' => $estudiante->color_avatar ?? '#2563EB',
-                'avatar' => $estudiante->avatar,
+                'avatar_url' => $estudiante->avatar_url,
                 'iniciales' => $estudiante->iniciales ?? strtoupper(substr($estudiante->nombre ?? 'E', 0, 2)),
                 'condicion' => $estudiante->condicion?->nombre,
                 'condicion_id' => $estudiante->condicion_id,
@@ -56,9 +56,19 @@ class GrupoEstudiantesService
         });
     }
 
-    public function obtener(CargaDocente $carga): Collection
+    public function contar(CargaDocente $carga): int
     {
-        return $this->obtenerMatriculas($carga)
-            ->pluck('estudiante');
+        return Matricula::query()
+            ->join('estudiante_ambiente', function ($join) use ($carga) {
+                $join->on('estudiante_ambiente.estudiante_id', '=', 'matriculas.estudiante_id')
+                    ->where('estudiante_ambiente.ambiente_id', $carga->ambiente_id)
+                    ->where('estudiante_ambiente.anio_lectivo', $carga->anio_lectivo)
+                    ->where('estudiante_ambiente.estado', 'activo');
+            })
+            ->where('matriculas.grado_id', $carga->grado_id)
+            ->where('matriculas.grupo_id', $carga->grupo_id)
+            ->where('matriculas.anio_lectivo', $carga->anio_lectivo)
+            ->where('matriculas.estado', 'activo')
+            ->count();
     }
 }
