@@ -50,8 +50,11 @@ class AsignacionAmbienteController extends Controller
         $yaAsignados = EstudianteAmbiente::where('ambiente_id', $ambiente->id)
             ->where('anio_lectivo', $anio)
             ->pluck('estudiante_id');
-
+        // solo buscar estudiantes que tengan matricula activa
         $estudiantes = Estudiante::where('activo', true)
+            ->whereHas('matriculaActiva', function ($query) use ($anio) {
+                $query->where('anio_lectivo', $anio);
+            })
             ->whereNotIn('id', $yaAsignados)
             ->when($termino, fn($q) => $q->where('nombre', 'like', "%{$termino}%"))
             ->with(['matriculaActiva.grupo.grado'])
