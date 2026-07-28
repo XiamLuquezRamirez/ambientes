@@ -13,6 +13,10 @@
                     <i class="fa-solid fa-plus"></i>
                     Nuevo
                 </button>
+                <button type="button" onclick="abrirModalAgregarEstudiante()" class="btn btn-agregar-estudiante btn-nuevo">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Agregar estudiantes
+                </button>
                 <button type="button" data-bs-toggle="modal" data-bs-target="#modalSeleccionarAmbiente"
                     class="btn btn-secondary btn-nuevo">
                     <i class="fa-solid fa-building"></i>
@@ -28,6 +32,7 @@
     @include('admin.estudiantes.modal_registro')
     @include('panel.estudiantes.modalConfigurarPin')
     @include('panel.estudiantes.modalSeleccionarAmbiente')
+    @include('panel.estudiantes.modalAgregarEstudiante')
     @push('scripts')
         <script>
             const URL_ESTUDIANTES = "{{ route('panel.estudiantes.guardar') }}";
@@ -37,6 +42,12 @@
             var ambientesSeleccionados = [];
             var idContainerPin = 'configuracion_pin_docente';
             var idEstudianteConfigurarPin = 0;
+
+            function abrirModalAgregarEstudiante() {
+                $('#modalAgregarEstudiante').modal('show');
+                cargarEstudiantes();
+
+            }
         </script>
         <script src="{{ asset('assets/js/panel/estudiante_index.js') }}"></script>
         <script src="{{ asset('assets/js/estudiantes/index.js') }}"></script>

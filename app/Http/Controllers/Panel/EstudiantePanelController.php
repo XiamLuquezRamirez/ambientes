@@ -445,6 +445,78 @@ class EstudiantePanelController extends Controller
         return redirect()->route('panel.estudiantes')->with('success', 'Estudiante creado y asignado a tu grupo activo.');
     }
 
+    public function obtenerEstudiantes(Ambiente $ambiente, int $grado, int $grupo)
+    {
+        $estudiantes = Estudiante::where('activo', true)
+            ->whereHas('matriculaActiva', function ($query) use ($grado, $grupo) {
+                $query->where('grado_id', $grado)
+                    ->where('grupo_id', $grupo)
+                    ->where('anio_lectivo', date('Y'));
+            })
+            ->whereDoesntHave('ambientes', function ($query) use ($ambiente) {
+                $query->where('ambientes.id', $ambiente->id)
+                    ->where('estudiante_ambiente.anio_lectivo', date('Y'))
+                    ->where('estudiante_ambiente.estado', 'activo');
+            })
+            ->get()
+
+            ->map(function ($e) {
+
+                return [
+                    'id' => $e->id,
+                    'nombre' => $e->nombre,
+                    'avatar_url' => $e->avatar_url,
+                    'iniciales' => $e->iniciales ?? mb_strtoupper(mb_substr($e->nombre, 0, 2)),
+                    'color_avatar' => $e->color_avatar ?? '#2563EB',
+                    'edad' => $e->edad,
+                ];
+
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $estudiantes,
+        ]);
+    }
+
+    public function agregarEstudiantes(Request $request, $ambienteId)
+    {
+        $datos = $request->validate([
+            'estudiante_ids' => 'required|array',
+            'estudiante_ids.*' => 'exists:estudiantes,id',
+            'anio_lectivo' => 'required|integer',
+        ]);
+
+        $creadas = 0;
+
+        foreach ($datos['estudiante_ids'] as $estudianteId) {
+            $existe = EstudianteAmbiente::where('estudiante_id', $estudianteId)
+                ->where('ambiente_id', $ambienteId)
+                ->where('anio_lectivo', $datos['anio_lectivo'])
+                ->exists();
+
+            if ($existe) {
+                continue;
+            }
+
+            EstudianteAmbiente::create([
+                'estudiante_id' => $estudianteId,
+                'ambiente_id' => $ambienteId,
+                'anio_lectivo' => $datos['anio_lectivo'],
+                'estado' => 'activo',
+            ]);
+            $creadas++;
+        }
+
+        return response()->json([
+            'success' => true,
+            'creadas' => $creadas,
+            'message' => $creadas > 0
+                ? "{$creadas} estudiante(s) asignado(s) al ambiente."
+                : 'Los estudiantes ya estaban asignados al ambiente.',
+        ]);
+    }
+
     public function obtenerGradosPorAmbiente($idAmbiente)
     {
         $gradoIds = CargaDocente::where('docente_id', Auth::guard('docente')->user()->docente->id)

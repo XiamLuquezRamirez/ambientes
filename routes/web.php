@@ -204,15 +204,21 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     Route::get('estudiantes/lista', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
     Route::post('estudiantes', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiantes.guardar');
+    Route::get('/panel/ambientes/{ambiente}/estudiantes/{grado}/{grupo}', [EstudiantePanelController::class, 'obtenerEstudiantes'])->name('panel.estudiantes.obtenerEstudiantes');
+    Route::post('estudiantes/agregar/{ambiente}', [EstudiantePanelController::class, 'agregarEstudiantes'])->name('panel.estudiantes.agregar');
+
     // Rutas estáticas antes de {estudiante}
     Route::get('estudiantes/create', [EstudiantePanelController::class, 'formularioCrear'])->name('panel.estudiantes.create');
     Route::get('estudiantes/buscar', [EstudiantePanelController::class, 'buscarEstudiantes'])->name('panel.estudiantes.buscar');
+
     // Ficha completa HU seguimiento: verFicha → show.blade.php
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('panel.estudiantes.cargar-municipios');
     Route::post('estudiantes/editar/{idEstudiante}', [EstudianteAdminController::class, 'actualizar'])->name('panel.estudiantes.editar');
     Route::get('estudiantes/filtrar', [EstudiantePanelController::class, 'filtrar'])->name('panel.estudiantes.filtrar');
+
     // Ficha completa: verFicha → show.blade.php
     Route::get('estudiantes/ficha/{estudiante}', [EstudiantePanelController::class, 'verFicha'])->name('panel.estudiantes.show');
+
     // Datos JSON para modal de edición (compartido con index.js)
     Route::get('estudiantes/{estudiante}', [EstudianteAdminController::class, 'ver'])->name('panel.estudiantes.datos');
     Route::post('estudiantes/{estudiante}/asistencia-puntual', [EstudiantePanelController::class, 'registrarAsistenciaPuntual'])->name('panel.estudiantes.asistencia');
