@@ -166,7 +166,7 @@
             </div>
             <div class="modal-body" style="padding:22px">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-5">
                         <input type="text" id="inputBuscarAgregar" class="form-control mb-3"
                             placeholder="Buscar estudiante…"
                             oninput="buscarParaAgregar()">
@@ -178,6 +178,14 @@
                             <option value="3-4">3-4 años</option>
                             <option value="5-6">5-6 años</option>
                         </select>
+                    </div>
+                    <!-- seleccionar todos esti -->
+                    <div class="col-md-3">
+                    <button type="button" class="btn"
+                            style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;white-space:nowrap"
+                            id="btnToggleTodos" onclick="seleccionarTodosEstudiantes()">
+                            Seleccionar todos
+                        </button>
                     </div>
                 </div>
                 <div id="listaBuscarAgregar"
@@ -368,6 +376,8 @@
         _modalAgregarBS.show();
         buscarParaAgregar('');
     }
+    
+    
 
     async function buscarParaAgregar() {
         clearTimeout(_debBusq);
@@ -427,6 +437,13 @@
             </div>
         </label>
     `).join('');
+    }
+
+    function seleccionarTodosEstudiantes() {
+        const estudiantes = document.querySelectorAll('.busq-fila');
+        estudiantes.forEach(e => {
+            seleccionarEstudiante(e.dataset.id, e);
+        });
     }
 
     function seleccionarEstudiante(id, fila) {

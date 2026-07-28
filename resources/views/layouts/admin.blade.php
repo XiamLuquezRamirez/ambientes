@@ -41,13 +41,7 @@
             </li>
             @php
             $academico = request()->routeIs('admin.grupos*','admin.matriculas*','admin.cierre*');
-            @endphp
-            <li class="nav-item">
-                <a href="#navAcademico"
-                    data-bs-toggle="collapse"
-                    aria-expanded="{{ $academico ? 'true' : 'false' }}"
-                $academico = request()->routeIs('admin.grupos*', 'admin.matriculas*', 'admin.cierre*');
-            @endphp
+            @endphp          
             <li class="nav-item">
                 <a href="#navAcademico" data-bs-toggle="collapse" aria-expanded="{{ $academico ? 'true' : 'false' }}"
                     class="nav-link d-flex align-items-center gap-2 {{ $academico ? 'active' : '' }}"
@@ -56,8 +50,7 @@
                     <span>Matrículas</span>
                     <i class="fa-solid fa-chevron-down ms-auto"
                         style="font-size:.65rem;transition:transform .2s;
-                              {{ $academico ? 'transform:rotate(180deg)' : '' }}"
-                        id="chevronAcad"></i>
+                              {{ $academico ? 'transform:rotate(180deg)' : '' }}"></i>
                 </a>
                 <div class="collapse {{ $academico ? 'show' : '' }}" id="navAcademico">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
