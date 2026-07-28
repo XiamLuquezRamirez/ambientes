@@ -17,11 +17,14 @@ use App\Http\Controllers\Admin\SyncLogController;
 use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
+use App\Http\Controllers\Docente\DocenteDashboardController;
+use App\Http\Controllers\Panel\AsistenciaController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\InclusionController;
 use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
+use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
 
 // Raiz → bienvenida del ambiente configurado
@@ -38,6 +41,16 @@ Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])
 Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('docente.login');
 Route::post('/login', [AuthDocenteController::class, 'iniciarSesion'])->name('docente.login.post');
 Route::post('/logout', [AuthDocenteController::class, 'cerrarSesion'])->name('docente.logout');
+
+// Endpoint para guardar los datos generales del Piar
+// Piar
+Route::get('estudiantes/diligenciar-piar/{idEstudiante}/{tipo}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
+Route::get('piar', [PiarController::class, 'listado'])->name('admin.piar');
+Route::get('piar/{idEstudiante}', [PiarController::class, 'verPiar'])->name('admin.piar.ver');
+Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])->name('admin.piar.guardar-piar');
+Route::get('piar/buscar-docente/{texto}', [PiarController::class, 'buscarDocente'])->name('admin.piar.buscar-docente');
+Route::get('piar/verificar-si-comenzo/{idEstudiante}', [PiarController::class, 'verificarSiComenzo'])->name('admin.piar.verificar-si-comenzo');
+Route::get('piar/exportar/{idEstudiante}', [PiarController::class, 'exportar'])->name('admin.piar.exportar');
 
 // ── Panel Admin ───────────────────────────────────────────────────────────
 Route::prefix('admin')->middleware(['es.admin'])->group(function () {
@@ -132,16 +145,9 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('estudiantes/grupos', [EstudianteAdminController::class, 'listarGrupos'])->name('admin.estudiantes.grupos');
     Route::get('estudiantes/eliminar/{estudiante}', [EstudianteAdminController::class, 'eliminar'])->name('admin.estudiantes.eliminar');
     Route::get('estudiantes/cambiar-estado/{idEstudiante}/{estado}', [EstudianteAdminController::class, 'cambiarEstado'])->name('admin.estudiantes.cambiar-estado');
-    Route::get('estudiantes/diligenciar-piar/{idEstudiante}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('admin.estudiantes.cargar-municipios');
+    Route::get('estudiantes/restablecer-pin/{idEstudiante}', [EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.restablecer-pin');
 
-    // Endpoint para guardar los datos generales del Piar
-    // Piar
-    Route::get('piar', [PiarController::class, 'listado'])->name('admin.piar');
-    Route::get('piar/{idEstudiante}', [PiarController::class, 'verPiar'])->name('admin.piar.ver');
-    Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])->name('admin.piar.guardar-piar');
-    Route::get('piar/buscar-docente/{texto}', [PiarController::class, 'buscarDocente'])->name('admin.piar.buscar-docente');
-    Route::get('piar/verificar-si-comenzo/{idEstudiante}', [PiarController::class, 'verificarSiComenzo'])->name('admin.piar.verificar-si-comenzo');
     // Catalogo
     Route::get('catalogo', [CatalogoController::class, 'listar'])->name('admin.catalogo');
     Route::post('catalogo/modulos', [CatalogoController::class, 'guardarModulo'])->name('admin.catalogo.modulo.store');
@@ -159,7 +165,10 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
 
     // Usuario
-    Route::get('perfil', [UsuarioAdminController::class, 'perfil'])->name('admin.perfil');
+    Route::get('perfil', [PerfilController::class, 'mostrar'])->name('admin.perfil');
+    Route::get('perfil/accesos', [PerfilController::class, 'historialAccesos'])->name('admin.perfil.accesos');
+    Route::get('perfil/validar-datos', [PerfilController::class, 'validarDatos'])->name('admin.perfil.validarDatos');
+    Route::put('perfil/contrasena', [PerfilController::class, 'cambiarContrasena'])->name('admin.perfil.contrasena');
     Route::get('usuarios', [UsuarioAdminController::class, 'listar'])->name('admin.usuarios');
     Route::get('usuarios/validar-datos', [UsuarioAdminController::class, 'validarDatos'])->name('admin.usuarios.validarDatos');
     Route::post('usuarios', [UsuarioAdminController::class, 'guardar'])->name('admin.usuarios.store');
@@ -167,6 +176,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('usuarios/{usuario}/resumen', [UsuarioAdminController::class, 'resumenActividad'])->name('admin.usuarios.resumen');
     Route::get('usuarios/{usuario}', [UsuarioAdminController::class, 'ver'])->name('admin.usuarios.show');
     Route::get('usuarios/datos/{usuario_id}', [UsuarioAdminController::class, 'verDatosUsuario'])->name('admin.usuarios.datos');
+    Route::put('usuarios/{usuario}/perfil', [PerfilController::class, 'actualizar'])->name('admin.usuarios.perfil.update');
     Route::put('usuarios/{usuario}', [UsuarioAdminController::class, 'actualizar'])->name('admin.usuarios.update');
     Route::patch('usuarios/{usuario}/toggle-activo', [UsuarioAdminController::class, 'toggleActivo'])->name('admin.usuarios.toggleActivo');
     Route::delete('usuarios/{usuario}', [UsuarioAdminController::class, 'eliminar'])->name('admin.usuarios.destroy');
@@ -174,17 +184,45 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
 // ── Panel Docente ─────────────────────────────────────────────────────────
 Route::prefix('panel')->middleware(['es.docente'])->group(function () {
-    Route::get('principal', fn () => view('docentes.panel'))->name('panel.principal');
+    Route::get('principal', [DocenteDashboardController::class, 'listar'])->name('panel.principal');
+    Route::get('principal/{ambiente}/grados', [DocenteDashboardController::class, 'obtenerGradosYGrupos'])->name('panel.principal.grados');
+    Route::get('principal/{carga}/estadisticas', [DocenteDashboardController::class, 'obtenerEstadisticasGrupo'])->name('panel.principal.estadisticas');
+    Route::get('principal/{carga}/estudiantes', [DocenteDashboardController::class, 'obtenerEstudiantesGrupo'])->name('panel.principal.estudiantes');
 
-    // Estudiantes
-    Route::get('estudiantes', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
+    // Perfil docente
+    Route::get('perfil', [PerfilController::class, 'mostrar'])->name('panel.perfil');
+    Route::get('perfil/accesos', [PerfilController::class, 'historialAccesos'])->name('panel.perfil.accesos');
+    Route::get('perfil/validar-datos', [PerfilController::class, 'validarDatos'])->name('panel.perfil.validarDatos');
+    Route::put('perfil/contrasena', [PerfilController::class, 'cambiarContrasena'])->name('panel.perfil.contrasena');
+    Route::put('perfil', [PerfilController::class, 'actualizar'])->name('panel.perfil.update');
+    Route::put('perfil/informacion-personal', [PerfilController::class, 'actualizarInformacionPersonal'])->name('panel.perfil.informacion-personal');
+    Route::post('perfil/foto', [PerfilController::class, 'subirFoto'])->name('panel.perfil.foto');
+    Route::delete('perfil/foto', [PerfilController::class, 'eliminarFoto'])->name('panel.perfil.foto.eliminar');
+
+    // Estudiantes (panel docente)
+    // Listado → card → ficha: panel.estudiantes → _card (ojo) → panel.estudiantes.show (verFicha)
+
+    Route::get('estudiantes/lista', [EstudiantePanelController::class, 'listar'])->name('panel.estudiantes');
+    Route::post('estudiantes', [EstudianteAdminController::class, 'guardar'])->name('panel.estudiantes.guardar');
+    // Rutas estáticas antes de {estudiante}
     Route::get('estudiantes/create', [EstudiantePanelController::class, 'formularioCrear'])->name('panel.estudiantes.create');
-    Route::post('estudiantes', [EstudiantePanelController::class, 'guardar'])->name('panel.estudiantes.store');
+    Route::get('estudiantes/buscar', [EstudiantePanelController::class, 'buscarEstudiantes'])->name('panel.estudiantes.buscar');
+    // Ficha completa HU seguimiento: verFicha → show.blade.php
+    Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('panel.estudiantes.cargar-municipios');
+    Route::post('estudiantes/editar/{idEstudiante}', [EstudianteAdminController::class, 'actualizar'])->name('panel.estudiantes.editar');
+    Route::get('estudiantes/filtrar', [EstudiantePanelController::class, 'filtrar'])->name('panel.estudiantes.filtrar');
+    // Ficha completa: verFicha → show.blade.php
+    Route::get('estudiantes/ficha/{estudiante}', [EstudiantePanelController::class, 'verFicha'])->name('panel.estudiantes.show');
+    // Datos JSON para modal de edición (compartido con index.js)
+    Route::get('estudiantes/{estudiante}', [EstudianteAdminController::class, 'ver'])->name('panel.estudiantes.datos');
+    Route::post('estudiantes/{estudiante}/asistencia-puntual', [EstudiantePanelController::class, 'registrarAsistenciaPuntual'])->name('panel.estudiantes.asistencia');
+    Route::get('estudiantes/{estudiante}/piar', [EstudiantePanelController::class, 'verPiar'])->name('panel.estudiantes.piar');
     Route::get('estudiantes/{estudiante}/edit', [EstudiantePanelController::class, 'formularioEditar'])->name('panel.estudiantes.edit');
     Route::put('estudiantes/{estudiante}', [EstudiantePanelController::class, 'actualizar'])->name('panel.estudiantes.update');
     Route::get('estudiantes/{estudiante}/pin', [EstudiantePanelController::class, 'formularioPin'])->name('panel.estudiantes.pin');
     Route::post('estudiantes/{estudiante}/pin', [EstudiantePanelController::class, 'actualizarPin'])->name('panel.estudiantes.pin.update');
-
+    Route::post('estudiantes/configurar-pin', [EstudiantePanelController::class, 'configurarPin'])->name('panel.estudiantes.configurar-pin');
+    Route::post('estudiantes/cambiar-estado-ambiente-estudiante', [EstudiantePanelController::class, 'cambiarEstadoAmbienteEstudiante'])->name('panel.estudiantes.cambiar-estado-ambiente-estudiante');
     // Planeacion
     Route::get('planeacion', [PlaneacionController::class, 'listar'])->name('panel.planeacion');
     Route::post('planeacion/modulos/{modulo}/toggle', [PlaneacionController::class, 'alternarVisibilidad'])->name('panel.planeacion.toggle');
@@ -192,9 +230,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Sesion
     Route::get('sesion', [SesionController::class, 'listar'])->name('panel.sesion');
-    Route::post('sesion/asistencia', [SesionController::class, 'registrarAsistencia'])->name('panel.sesion.asistencia');
-    Route::post('sesion/asistida/{estudiante}', [SesionController::class, 'registrarSesionAsistida'])->name('panel.sesion.asistida');
-    Route::get('sesion/activas', [SesionController::class, 'sesionesActivas'])->name('panel.sesion.activas');
+    Route::get('sesion/estudiantes', [SesionController::class, 'estudiantes'])->name('panel.sesion.estudiantes');
 
     // Portafolio
     Route::get('portafolio', [PortafolioController::class, 'listar'])->name('panel.portafolio');
@@ -207,6 +243,21 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('inclusion/{estudiante}', [InclusionController::class, 'verAjustes'])->name('panel.inclusion.ajustes');
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
 
+    // Asistencia
+    Route::get('asistencia', [AsistenciaController::class, 'listar'])->name('panel.asistencia');
+    Route::post('asistencia/registrar-asistencia', [AsistenciaController::class, 'registrarAsistencia'])->name('panel.asistencia.registrar-asistencia');
+    Route::get('asistencia/reporte/{carga}', [AsistenciaController::class, 'reporteAsistencia'])->name('panel.asistencia.reporte');
+    Route::get('asistencia/reporte/{carga}/pdf', [AsistenciaController::class, 'exportarPdf'])->name('panel.asistencia.pdf');
+
+    // Grados por ambiente
+    Route::get('grupos/grados/docente/{idGrado}', [EstudiantePanelController::class, 'obtenerGruposPorGrado'])->name('panel.grupos.grados.docente');
+    Route::get('grupos/ambientes-disponibles/{grado}/{grupo}', [EstudiantePanelController::class, 'obtenerAmbientesDisponibles'])->name('panel.estudiantes.ambientes-disponibles');
+
+    // Ambientes
+    //guardar el ambiente seleccionado en la sesion
+    Route::post('ambientes/seleccionar', [SesionController::class, 'seleccionarAmbiente'])->name('panel.ambientes.seleccionar');
+    Route::get('ambientes/eliminar', [SesionController::class, 'eliminarAmbienteSeleccionado'])->name('panel.ambientes.eliminar');
+    Route::get('ambientes/obtener', [SesionController::class, 'obtenerAmbienteSeleccionado'])->name('panel.ambientes.obtener');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

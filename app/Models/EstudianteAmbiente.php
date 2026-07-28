@@ -8,7 +8,11 @@ class EstudianteAmbiente extends Model
 {
     protected $table = 'estudiante_ambiente';
 
-    protected $fillable = ['estudiante_id', 'ambiente_id', 'anio_lectivo', 'estado', 'observacion'];
+    protected $fillable = ['estudiante_id', 'ambiente_id', 'anio_lectivo', 'estado', 'observacion', 'activo'];
+
+    protected $with = [
+        'ambiente',
+    ];
 
     public function estudiante()
     {

@@ -5,7 +5,7 @@
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
         <div>
             <h1>Docentes</h1>
-            <p>Gestión de cuentas de docentes y administradores</p>
+            <p>Gestión de cuentas de docentes</p>
         </div>
         <div style="display:flex;gap:10px">
             <button class="btn btn-info" onclick="abrirModalDocentesAsignados()"><i class="fas fa-eye"></i> Docentes
@@ -487,7 +487,7 @@
             $(`#formDocente .is-invalid`).first().focus();
         }
 
-        /* ── Crear docente (AJAX) ────────────────────────────────────── */
+        /* ── Crear docente o editar información personal (AJAX) ────────────────────────────────────── */
         document.getElementById('formDocente').addEventListener('submit', async function(e) {
             e.preventDefault();
             if (tipoPost == 1) {

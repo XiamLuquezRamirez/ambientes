@@ -16,8 +16,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
-
-
+    <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     @stack('styles')
     @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
@@ -124,18 +123,19 @@
     </aside>
 
     @php
-    $usuarioAuth = Auth::guard('docente')->user();
-    $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
-    $inicialesAuth = mb_strtoupper(
-    mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
-    );
-    $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
+        $usuarioAuth = Auth::guard('docente')->user();
+        $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
+        $inicialesAuth = mb_strtoupper(
+            mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
+        );
+        $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
+        $avatarColor = '#' . substr(md5($usuarioAuth->nombre . '|' . $usuarioAuth->apellido), 0, 6);
     @endphp
     <header class="header">
         <div class="header-perfil" id="headerPerfil">
 
             {{-- Chip visible siempre --}}
-            <div class="avatar">{{ $inicialesAuth }}</div>
+            <div class="avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
             <div class="header-user-info">
                 <span class="header-user-nombre">{{ $usuarioAuth->nombre }}</span>
                 <span class="header-user-rol">{{ $rolAuthLabel }}</span>
@@ -146,7 +146,7 @@
             <div class="header-dropdown">
 
                 <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
-                    <div class="dropdown-avatar">{{ $inicialesAuth }}</div>
+                    <div class="dropdown-avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
                     <div>
                         <div class="dropdown-nombre">{{ $usuarioAuth->nombre }}</div>
                         <div class="dropdown-email">{{ $usuarioAuth->email }}</div>
@@ -159,27 +159,30 @@
                         <i class="fa-solid fa-user"></i>
                         Mi Perfil
                     </a>
-                    <a href="#" class="dropdown-item">
+                    <a href="#" class="dropdown-item" onclick="abrirModalCambiarContrasena(); return false;">
                         <i class="fa-solid fa-key"></i>
-                        Cambiar Contraseña
+                        Cambiar contraseña
                     </a>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
                 <div class="dropdown-section">
-                    <form method="POST" action="{{ route('docente.logout') }}">
+                    <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+                            <span class="dropdown-item-icon">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </span>
                             Cerrar Sesión
                         </button>
                     </form>
                 </div>
-
             </div>
         </div>
     </header>
+
+    @include('perfil.cambiar_contrasena', ['rutaContrasena' => route('admin.perfil.contrasena')])
 
     <main class="main">
         <div class="content">
@@ -189,6 +192,25 @@
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
+        /* ── Cerrar sesión ────────────────────────────────────── */
+        document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: '¿Deseas cerrar tu sesión?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Cerrar sesión',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#6B7280',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        });
         /* ── Utilidades globales AJAX ────────────────────────────── */
         async function ajaxRequest(url, method = 'GET', data = null) {
             try {
@@ -282,19 +304,19 @@
         }
     </script>
     @if (session('success'))
-    <script>
-        document.addEventListener('DOMContentLoaded', () => mostrarToast('success', @json(session('success'))));
-    </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => mostrarToast('success', @json(session('success'))));
+        </script>
     @endif
     @if (session('error'))
-    <script>
-        document.addEventListener('DOMContentLoaded', () => mostrarToast('error', @json(session('error'))));
-    </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => mostrarToast('error', @json(session('error'))));
+        </script>
     @endif
     @if (session('info'))
-    <script>
-        document.addEventListener('DOMContentLoaded', () => mostrarToast('info', @json(session('info'))));
-    </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => mostrarToast('info', @json(session('info'))));
+        </script>
     @endif
     @stack('scripts')
 </body>

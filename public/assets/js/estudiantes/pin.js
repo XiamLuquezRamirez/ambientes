@@ -10,13 +10,13 @@ function agregarFigura(icon, color) {
 
 function mapPin() {
     for (let i = 1; i <= 3; i++) {
-        $(`#pin-item-${i}`)
+        $(`#${idContainerPin} #pin-item-${i}`)
         .html('')
         .removeClass('pin-item-active');
     }
 
     pin.forEach((item, index) => {
-       $(`#pin-item-${index + 1}`)
+       $(`#${idContainerPin} #pin-item-${index + 1}`)
        .html(`<i class="${item.icon}" style="color: ${item.color};"></i>`)
        .addClass('pin-item-active');
     });
@@ -33,7 +33,7 @@ function borrarFigura() {
 
 function vaciarPin() {
     for (let i = 1; i <= 3; i++) {
-        $(`#pin-item-${i}`)
+        $(`#${idContainerPin} #pin-item-${i}`)
         .html('')
         .removeClass('pin-item-active');
     }

@@ -50,7 +50,6 @@
     </style>
 @endpush
 
-
 <div class="modal fade modal-app" id="modalVerResumen" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalVerResumenLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -99,7 +98,6 @@
             try {
                 const response = await fetch(`${URL_USUARIOS}/${id}/resumen`);
                 const resp = await response.json();
-
                 if (!response.ok || !resp.success) {
                     throw new Error(resp.message || 'No se pudo cargar el resumen');
                 }
@@ -118,7 +116,6 @@
             const totales = data.totales ?? {};
             const anio = data.anio ?? new Date().getFullYear();
             const tieneCarga = data.tiene_carga ?? cargas.length > 0;
-            const puedeAsignar = typeof abrirModalAsignarGrado === 'function';
 
             document.getElementById('cargandoResumen').classList.add('d-none');
             document.getElementById('modalVerResumenSubtitle').textContent =
@@ -133,13 +130,6 @@
                 </tr>
             `).join('');
 
-            const botonAsignar = puedeAsignar ?
-                `<button type="button" class="btn btn-primary" onclick="modalBSVerResumen.hide(); abrirModalAsignarGrado(${docente.id})">
-                        <i class="fa-solid fa-list"></i> Asignar grupo
-                   </button>` :
-                `<a href="{{ route('admin.docentes') }}" class="btn btn-primary">
-                        <i class="fa-solid fa-list"></i> Ir a asignar grupo
-                   </a>`;
 
             const tablaCargas = tieneCarga ? `
                 <div class="table-container">
@@ -159,7 +149,6 @@
                 <div class="resumen-sin-carga text-center py-4">
                     <i class="fa-solid fa-folder-open fa-2x text-muted mb-3 d-block"></i>
                     <p class="text-muted mb-3">Este docente no tiene carga asignada para el año ${anio}.</p>
-                    ${botonAsignar}
                 </div>
             `;
 
@@ -191,7 +180,9 @@
                             </div>
                         </div>
                     </div>
-                    <h6 class="resumen-actividad-seccion-titulo mt-4 mb-2">Cargas activas</h6>
+                    <p class="resumen-actividad-anio mt-4 mb-2">
+                        <i class="fa-solid fa-list"></i> Cargas activas
+                    </p>
                     ${tablaCargas}
                 </div>
             `;

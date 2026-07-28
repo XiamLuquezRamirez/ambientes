@@ -110,7 +110,7 @@ class PiarValoracionPedagogica extends Model
         'dba_ate_1','dba_ate_1_obs',
         'dba_ate_2','dba_ate_2_obs',
         'dba_ate_3','dba_ate_3_obs',
-        'dba_ate_4','dba_ate_4_obs',
+        'dba_ate_4','dba_ate_4_obs', 'dba_ate_4_tiempo',
 
         // DBA Percepción
         'dba_per_1','dba_per_1_obs',

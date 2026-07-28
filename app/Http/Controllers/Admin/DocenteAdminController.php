@@ -8,6 +8,7 @@ use App\Models\CargaDocente;
 use App\Models\Docente;
 use App\Models\Grado;
 use App\Models\Grupo;
+use App\Models\LoginLog;
 use App\Models\SyncQueue;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -19,11 +20,6 @@ use Illuminate\Support\Str;
 
 class DocenteAdminController extends Controller
 {
-    public function panel()
-    {
-        return view('docente.panel');
-    }
-
     /**
      * Lista los docentes con filtros opcionales y paginación.
      *
@@ -32,8 +28,19 @@ class DocenteAdminController extends Controller
      */
     public function listar(Request $request)
     {
+        // La fecha de último acceso no existe en docentes: se lee desde registros_acceso
+        // a través de user.ultimoLogin (mismo origen que en el listado de usuarios).
         $consulta = Docente::query()
-            ->with('user')
+            ->with([
+                'user' => fn ($q) => $q
+                    ->with('ultimoLogin')
+                    ->withCount([
+                        'loginLogs as login_logs_count' => fn ($lq) => $lq->where(
+                            'tipo',
+                            LoginLog::TIPO_INICIO_SESION
+                        ),
+                    ]),
+            ])
             ->join('users', 'users.id', '=', 'docentes.user_id')
             ->select(
                 'docentes.*',
@@ -92,7 +99,9 @@ class DocenteAdminController extends Controller
         $anio = (int) $request->get('anio', date('Y'));
         $gradoId = $request->get('grado_id');
 
-        $grados = Grado::activos()->orderBy('orden')->get();
+        $grados = Grado::activos()
+            ->orderBy('orden')
+            ->get();
 
         $grupos = $cargarGrupos
             ? Grupo::with([
@@ -100,7 +109,10 @@ class DocenteAdminController extends Controller
                 'cargasDocente' => function ($q) use ($anio) {
                     $q->where('activo', true)
                         ->where('anio_lectivo', $anio)
-                        ->with(['docente.user', 'ambiente']);
+                        ->with([
+                            'docente.user',
+                            'ambiente',
+                        ]);
                 },
             ])
                 ->delAnio($anio)
@@ -110,6 +122,10 @@ class DocenteAdminController extends Controller
                 ->get()
             : collect();
 
+        if ($cargarGrupos && $grupos->isNotEmpty()) {
+            $grupos->each(fn ($grupo) => CargaDocente::asignarConteoEstudiantes($grupo->cargasDocente, $anio));
+        }
+
         // Lista para el selector al asignar docente desde una fila de grupo.
         $docentesActivos = Docente::where('estado', 'activo')
             ->with('user')
@@ -117,7 +133,13 @@ class DocenteAdminController extends Controller
             ->sortBy(fn ($docente) => trim($docente->user->nombre.' '.$docente->user->apellido))
             ->values();
 
-        return compact('grados', 'grupos', 'anio', 'gradoId', 'docentesActivos');
+        return compact(
+            'grados',
+            'grupos',
+            'anio',
+            'gradoId',
+            'docentesActivos'
+        );
     }
 
     /**
@@ -184,8 +206,6 @@ class DocenteAdminController extends Controller
                 ],
             ]);
         }
-
-        $ambientes = Ambiente::orderBy('nombre')->get();
 
     }
 
@@ -261,9 +281,9 @@ class DocenteAdminController extends Controller
     }
 
     /**
-     * Asigna un grupo activo y valido al docente para el año lectivo actual.
+     * Asigna un grupo activo y válido al docente para el año lectivo actual.
      *
-     * Valida integridad del grado/grupo y evita duplicados o conflictos por ambiente.
+     * Valida integridad del ambiente/grado/grupo y evita duplicados o conflictos.
      */
     public function asignarGrupo(Request $request, User $docente)
     {
@@ -588,7 +608,7 @@ class DocenteAdminController extends Controller
             if ($docente->cargasActivas->isNotEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Este usuario tiene cargas académicas asignadas. 
+                    'message' => 'Este usuario tiene cargas académicas asignadas.
                         Reasígnalas primero.',
                 ], 422);
             } else {
@@ -671,7 +691,10 @@ class DocenteAdminController extends Controller
      */
     private function formatearAsignacionesActuales(Docente $docente)
     {
-        return $docente->cargasActivas
+        $cargas = $docente->cargasActivas;
+        CargaDocente::asignarConteoEstudiantes($cargas, (int) date('Y'));
+
+        return $cargas
             ->sortBy([
                 ['ambiente.nombre', 'asc'],
                 ['grado.orden', 'asc'],
@@ -688,7 +711,7 @@ class DocenteAdminController extends Controller
                 'grupo_id' => $carga->grupo_id,
                 'anio_lectivo' => $carga->anio_lectivo,
                 'estado' => $carga->activo ? 'Activo' : 'Inactivo',
-                'estudiantes' => $carga->grupo?->totalMatriculas() ?? 0,
+                'estudiantes' => $carga->total_estudiantes ?? 0,
             ]);
     }
 
@@ -801,7 +824,7 @@ class DocenteAdminController extends Controller
             if ($docente->cargasActivas->isNotEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Este usuario tiene cargas académicas asignadas. 
+                    'message' => 'Este usuario tiene cargas académicas asignadas.
                         Reasígnalas primero.',
                 ], 422);
             } else {

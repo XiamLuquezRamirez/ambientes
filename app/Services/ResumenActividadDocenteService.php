@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
 use App\Models\Docente;
-use App\Models\Matricula;
 use App\Models\Observacion;
 use App\Models\User;
 
@@ -35,15 +34,7 @@ class ResumenActividadDocenteService
         $perfil->loadMissing(['cargasActivas.ambiente', 'cargasActivas.grado', 'cargasActivas.grupo']);
 
         $cargas = $this->formatearAsignacionesActuales($perfil)->values()->all();
-        $grupoIds = $perfil->cargasActivas->pluck('grupo_id')->unique()->filter();
-
-        $estudianteIds = $grupoIds->isEmpty()
-            ? collect()
-            : Matricula::activa()
-                ->delAnio($anio)
-                ->whereIn('grupo_id', $grupoIds)
-                ->pluck('estudiante_id')
-                ->unique();
+        $estudianteIds = CargaDocente::obtenerIdsEstudiantesDeCargas($perfil->cargasActivas, $anio);
 
         $totalObservaciones = Observacion::where('user_id', $usuario->id)
             ->whereYear('created_at', $anio)
@@ -69,7 +60,10 @@ class ResumenActividadDocenteService
 
     private function formatearAsignacionesActuales(Docente $docente)
     {
-        return $docente->cargasActivas
+        $cargas = $docente->cargasActivas;
+        CargaDocente::asignarConteoEstudiantes($cargas, (int) date('Y'));
+
+        return $cargas
             ->sortBy([
                 ['ambiente.nombre', 'asc'],
                 ['grado.orden', 'asc'],
@@ -86,7 +80,7 @@ class ResumenActividadDocenteService
                 'grupo_id' => $carga->grupo_id,
                 'anio_lectivo' => $carga->anio_lectivo,
                 'estado' => $carga->activo ? 'Activo' : 'Inactivo',
-                'estudiantes' => $carga->grupo?->totalMatriculas() ?? 0,
+                'estudiantes' => $carga->total_estudiantes ?? 0,
             ]);
     }
 }

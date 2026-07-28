@@ -28,7 +28,12 @@
                         <td style="color:#64748B">{{ ucfirst($u->rol) }}</td>
 
                         <td>
-                            {{ $u->ultimo_acceso ? date('d/m/Y H:i', strtotime($u->ultimo_acceso)) : '—' }}
+                            {{--
+                              ultimo_acceso NO es columna de users.
+                              La fecha sale de registros_acceso vía relación User::ultimoLogin
+                              (solo tipo inicio_sesion).
+                            --}}
+                            {{ $u->ultimoLogin?->fecha?->format('d/m/Y H:i') ?? '—' }}
                         </td>
 
                         <td style="text-align:center">

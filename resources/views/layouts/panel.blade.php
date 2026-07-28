@@ -12,20 +12,26 @@
         rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
     <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}">
     @stack('styles')
     @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
 </head>
 
 <body>
+
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
                 <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="Aulas Reggio"
-                     style="width:100%;height:100%;object-fit:contain;filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
+                    style="width:100%;height:100%;object-fit:contain;filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
             </span>
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
@@ -35,46 +41,63 @@
                     <i class="fa-solid fa-house"></i> Inicio
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ route('panel.estudiantes') }}"
-                    class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-child"></i> Estudiantes
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('panel.planeacion') }}"
-                    class="{{ request()->routeIs('panel.planeacion*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-calendar-days"></i> Planeación
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('panel.portafolio') }}"
-                    class="{{ request()->routeIs('panel.portafolio*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-folder-open"></i> Portafolios
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{{ route('panel.inclusion') }}"
-                    class="{{ request()->routeIs('panel.inclusion*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-universal-access"></i> Inclusión
-                </a>
-            </li>
+            <div id="menu-lateral-ambiente">
+                <li class="nav-item">
+                    <a href="{{ route('panel.estudiantes') }}"
+                        class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
+                        <i class="fa-solid fa-child"></i> Estudiantes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('panel.planeacion') }}"
+                        class="{{ request()->routeIs('panel.planeacion*') ? 'active nav-link' : 'nav-link' }}">
+                        <i class="fa-solid fa-calendar-days"></i> Planeación
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('panel.portafolio') }}"
+                        class="{{ request()->routeIs('panel.portafolio*') ? 'active nav-link' : 'nav-link' }}">
+                        <i class="fa-solid fa-folder-open"></i> Portafolios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('panel.inclusion') }}"
+                        class="{{ request()->routeIs('panel.inclusion*') ? 'active nav-link' : 'nav-link' }}">
+                        <i class="fa-solid fa-universal-access"></i> Inclusión
+                    </a>
+                </li>
+            </div>
         </ul>
     </aside>
 
     @php
+        use App\Models\User;
+        use App\Services\PerfilFotoService;
+
         $usuarioAuth = Auth::guard('docente')->user();
-        $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre ?? '')));
-        $inicialesAuth = mb_strtoupper(
-            mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
-        );
-        $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
+        $perfilFoto = app(PerfilFotoService::class);
+
+        if ($usuarioAuth instanceof User) {
+            $usuarioAuth->loadMissing('docente');
+        }
+
+        $inicialesAuth = $usuarioAuth instanceof User ? $perfilFoto->iniciales($usuarioAuth) : 'NN';
+        $fotoUrlPublica =
+            $usuarioAuth instanceof User ? $perfilFoto->urlPublica($usuarioAuth->docente?->foto_url) : null;
+        $rolAuthLabel =
+            ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
     @endphp
     <header class="header">
         <div class="header-perfil" id="headerPerfil">
 
-            {{-- Chip visible siempre --}}
-            <div class="avatar">{{ $inicialesAuth }}</div>
+            {{-- Chip visible siempre (foto o iniciales) --}}
+            <div class="avatar" id="headerAvatar">
+                <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
+                    class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                <span id="headerAvatarIniciales" class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                    {{ $inicialesAuth }}
+                </span>
+            </div>
             <div class="header-user-info">
                 <span class="header-user-nombre">{{ $usuarioAuth?->nombre }}</span>
                 <span class="header-user-rol">{{ $rolAuthLabel }}</span>
@@ -84,8 +107,15 @@
             {{-- Dropdown --}}
             <div class="header-dropdown">
 
-                <div class="dropdown-user-card">
-                    <div class="dropdown-avatar">{{ $inicialesAuth }}</div>
+                <div class="dropdown-user-card" onclick="window.location.href='{{ route('panel.perfil') }}'">
+                    <div class="dropdown-avatar" id="dropdownAvatar">
+                        <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
+                            class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                        <span id="dropdownAvatarIniciales"
+                            class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                            {{ $inicialesAuth }}
+                        </span>
+                    </div>
                     <div>
                         <div class="dropdown-nombre">{{ $usuarioAuth?->nombre }}</div>
                         <div class="dropdown-email">{{ $usuarioAuth?->email }}</div>
@@ -94,31 +124,34 @@
                 </div>
 
                 <div class="dropdown-section">
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">👤</span>
+                    <a href="{{ route('panel.perfil') }}" class="dropdown-item">
+                        <i class="fa-solid fa-user"></i>
                         Mi Perfil
                     </a>
-                    <a href="#" class="dropdown-item">
-                        <span class="dropdown-item-icon">🔑</span>
-                        Cambiar Contraseña
+                    <a href="#" class="dropdown-item" onclick="abrirModalCambiarContrasena(); return false;">
+                        <i class="fa-solid fa-key"></i>
+                        Cambiar contraseña
                     </a>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
                 <div class="dropdown-section">
-                    <form method="POST" action="{{ route('docente.logout') }}">
+                    <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon">🚪</span>
+                            <span class="dropdown-item-icon">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                            </span>
                             Cerrar Sesión
                         </button>
                     </form>
                 </div>
-
             </div>
         </div>
     </header>
+
+    @include('perfil.cambiar_contrasena', ['rutaContrasena' => route('panel.perfil.contrasena')])
 
     <main class="main">
         <div class="content">
@@ -127,7 +160,42 @@
     </main>
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
+
+    @if (session('alerta_sin_carga'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '¡Hola, {{ $usuarioAuth?->nombre }}!',
+                    text: 'Actualmente no tiene cargas académicas asignadas. Algunas funciones del sistema no estarán disponibles.',
+                    confirmButtonText: 'Entendido'
+                });
+            });   
+        </script>
+    @endif
+
     <script>
+        /* ── Cerrar sesión ────────────────────────────────────── */
+        document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: '¿Deseas cerrar tu sesión?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Cerrar sesión',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#6B7280',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit();
+                }
+            });
+        });
+
+
         /* ── Utilidades globales AJAX ────────────────────────────── */
         async function ajaxRequest(url, method = 'GET', data = null) {
             try {
@@ -179,9 +247,21 @@
 
         function mostrarToast(tipo, mensaje) {
             const paleta = {
-                success: { bg: '#ECFDF5', color: '#065F46', icon: '#059669' },
-                error:   { bg: '#FEF2F2', color: '#991B1B', icon: '#DC2626' },
-                info:    { bg: '#EFF6FF', color: '#1E40AF', icon: '#2563EB' },
+                success: {
+                    bg: '#ECFDF5',
+                    color: '#065F46',
+                    icon: '#059669'
+                },
+                error: {
+                    bg: '#FEF2F2',
+                    color: '#991B1B',
+                    icon: '#DC2626'
+                },
+                info: {
+                    bg: '#EFF6FF',
+                    color: '#1E40AF',
+                    icon: '#2563EB'
+                },
             };
             const c = paleta[tipo] ?? paleta.info;
             Swal.fire({

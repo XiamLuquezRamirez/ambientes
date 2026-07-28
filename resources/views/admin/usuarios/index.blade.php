@@ -169,6 +169,20 @@
             modalBSPasswordGenerada.show();
         }
 
+        // Muestra el toast de éxito una sola vez al cerrar el modal de credenciales.
+        function mostrarExitoAlCerrarModalPassword(mensaje) {
+            document.getElementById('modalBSPasswordGenerada').addEventListener('hidden.bs.modal', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: mensaje,
+                    timer: 1600,
+                    showConfirmButton: false,
+                });
+            }, {
+                once: true
+            });
+        }
+
         function cerrarModalUsuario() {
             document.getElementById('seccionDocente').classList.remove('mostrar');
             document.getElementById('formUsuario').reset();
@@ -323,27 +337,20 @@
                             btnPdf.dataset.usuarioId = res.usuario.id;
                             abrirModalBSPasswordGenerada();
                             await cargarTabla(location.href);
-                            document.getElementById('modalBSPasswordGenerada')
-                                .addEventListener('hidden.bs.modal', function() {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: res.message,
-                                        timer: 1600,
-                                        showConfirmButton: false,
-                                    });
-                                });
+                            mostrarExitoAlCerrarModalPassword(res.message);
                         } else {
                             mostrarToast('error', res.message);
                         }
                     },
                     error: function(xhr) {
                         Swal.close();
-                        if (xhr.responseJSON.message.includes('validation.')) {
+                        const mensaje = xhr.responseJSON?.message ?? '';
+                        if (mensaje.includes('validation.')) {
                             mostrarToast('error', 'Verifique los datos ingresados');
+                            mostrarErroresModal(xhr.responseJSON?.errors ?? {}, 'formUsuario');
                         } else {
-                            mostrarToast('error', "Error al crear el usuario");
+                            mostrarToast('error', mensaje || 'Error al crear el usuario');
                         }
-                        mostrarErroresModal(xhr.responseJSON.errors, 'formUsuario');
                     },
                     complete: function() {
                         setBtnUsuario('crear');
@@ -382,15 +389,7 @@
                             btnPdf.dataset.nombre = res.usuario.nombre;
                             abrirModalBSPasswordGeneradaEditar();
                             await cargarTabla(location.href);
-                            document.getElementById('modalBSPasswordGenerada')
-                                .addEventListener('hidden.bs.modal', function() {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: res.message,
-                                        timer: 1600,
-                                        showConfirmButton: false,
-                                    });
-                                });
+                            mostrarExitoAlCerrarModalPassword(res.message);
                         } else if (res.success) {
                             modalBSUsuario.hide();
                             Swal.fire({

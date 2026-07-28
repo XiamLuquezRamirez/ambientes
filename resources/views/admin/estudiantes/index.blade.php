@@ -1,10 +1,6 @@
 @extends('layouts.admin')
 @section('title', 'Estudiantes')
 
-@push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
-@endpush
-
 @section('content')
 <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
     <div>
@@ -69,6 +65,8 @@
     const URL_ESTUDIANTES = "{{ route('admin.estudiantes') }}";
     var tipoPost = 1; // 1: nuevo estudiante, 2: editar estudiante
     var pin = [];
+    var tipoGuardaEstudiante = 1; // 1: administrador, 2: docente
+    var idContainerPin = 'configuracion_pin';
 </script>
 <script src="{{ asset('assets/js/estudiantes/index.js') }}"></script>
 <script src="{{ asset('assets/js/estudiantes/pin.js') }}"></script>

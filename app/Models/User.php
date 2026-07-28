@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SeguridadAccion;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -28,7 +29,19 @@ class User extends Authenticatable
 
     public function ultimoLogin()
     {
-        return $this->hasOne(LoginLog::class)->latestOfMany('fecha');
+        return $this->hasOne(LoginLog::class)->ofMany(
+            ['fecha' => 'max'],
+            fn ($query) => $query->where('tipo', LoginLog::TIPO_INICIO_SESION)
+        );
+    }
+
+    /** Último cambio de contraseña registrado en registros_acceso. */
+    public function ultimoCambioContrasena()
+    {
+        return $this->hasOne(LoginLog::class)->ofMany(
+            ['fecha' => 'max'],
+            fn ($query) => $query->where('tipo', LoginLog::TIPO_CAMBIO_CONTRASENA)
+        );
     }
 
     public function esAdmin(): bool
@@ -44,6 +57,23 @@ class User extends Authenticatable
     public function accesos()
     {
         return $this->hasMany(LoginLog::class);
+    }
+
+    public function seguridadLogs()
+    {
+        return $this->hasMany(SeguridadLog::class);
+    }
+
+    public function accionesRealizadas()
+    {
+        return $this->hasMany(SeguridadLog::class, 'actor_user_id');
+    }
+
+    public function ultimoCambioPassword()
+    {
+        return $this->hasOne(SeguridadLog::class)
+            ->where('accion', SeguridadAccion::PASSWORD_CHANGED)
+            ->latestOfMany();
     }
 
     /**

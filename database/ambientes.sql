@@ -29,7 +29,7 @@ CREATE TABLE `actividades` (
   PRIMARY KEY (`id`),
   KEY `actividades_tema_id_foreign` (`tema_id`),
   CONSTRAINT `actividades_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `actividades` */
 
@@ -48,7 +48,7 @@ CREATE TABLE `ajustes_temporales` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `ajustes_temporales_estudiante_id_clave_unique` (`estudiante_id`,`clave`),
   CONSTRAINT `ajustes_temporales_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `ajustes_temporales` */
 
@@ -66,11 +66,11 @@ CREATE TABLE `ambiente_grado` (
   KEY `grado_id` (`grado_id`),
   CONSTRAINT `ambiente_grado_ibfk_1` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`),
   CONSTRAINT `ambiente_grado_ibfk_2` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13  COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `ambiente_grado` */
 
-insert  into `ambiente_grado`(`id`,`ambiente_id`,`grado_id`,`activo`) values 
+insert  into `ambiente_grado`(`id`,`ambiente_id`,`grado_id`,`activo`) values
 (1,1,1,1),
 (2,1,2,1),
 (3,1,3,1),
@@ -101,16 +101,25 @@ CREATE TABLE `ambientes` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ambientes_slug_unique` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6  ;
 
 /*Data for the table `ambientes` */
 
-insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values 
-(1,'Expresión Artística','Expresion-Artistica','#0F6E56','?','192.168.1.20',1,25,'2026-06-16 00:02:01','2026-06-17 18:34:22'),
-(2,'Polimotor','polimotor','#534AB7','?','192.168.1.21',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(3,'Multisaberes','Multisaberes','#854F0B','?','192.168.1.22',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(4,'Multisensorial','multisensorial','#185FA5','?','192.168.1.23',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01'),
-(5,'Tecnología','tecnologia','#993C1D','?','192.168.1.24',1,25,'2026-06-16 00:02:01','2026-06-16 00:02:01');
+INSERT INTO ambientes (
+    nombre,
+    slug,
+    color_hex,
+    icono,
+    servidor_ip,
+    created_at,
+    updated_at
+)
+VALUES
+    ('Música', 'musica', '#0F6E56', '🎵', '192.168.1.20', NOW(), NOW()),
+    ('Polimotor', 'polimotor', '#534AB7', '🤸', '192.168.1.21', NOW(), NOW()),
+    ('Lógico', 'logico', '#854F0B', '🧠', '192.168.1.22', NOW(), NOW()),
+    ('Multisensorial', 'multisensorial', '#185FA5', '🌿', '192.168.1.23', NOW(), NOW()),
+    ('Tecnología', 'tecnologia', '#993C1D', '💡', '192.168.1.24', NOW(), NOW());
 
 /*Table structure for table `asistencias` */
 
@@ -118,6 +127,7 @@ DROP TABLE IF EXISTS `asistencias`;
 
 CREATE TABLE `asistencias` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `carga_docente_id` bigint(20) unsigned NOT NULL,
   `estudiante_id` bigint(20) unsigned NOT NULL,
   `fecha` date NOT NULL,
   `presente` tinyint(1) NOT NULL DEFAULT 1,
@@ -125,10 +135,9 @@ CREATE TABLE `asistencias` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `asistencias_estudiante_id_fecha_unique` (`estudiante_id`,`fecha`),
-  CONSTRAINT `asistencias_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `asistencias` */
+  CONSTRAINT `asistencias_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `asistencias_carga_docente_id_foreign` FOREIGN KEY (`carga_docente_id`) REFERENCES `carga_docente` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB  ;
 
 /*Table structure for table `carga_docente` */
 
@@ -154,11 +163,11 @@ CREATE TABLE `carga_docente` (
   CONSTRAINT `carga_docente_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `carga_docente_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`),
   CONSTRAINT `carga_docente_grupo_id_foreign` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2  ;
 
 /*Data for the table `carga_docente` */
 
-insert  into `carga_docente`(`id`,`docente_id`,`ambiente_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`activo`,`created_at`,`updated_at`) values 
+insert  into `carga_docente`(`id`,`docente_id`,`ambiente_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`activo`,`created_at`,`updated_at`) values
 (1,1,1,2,3,2026,1,'2026-06-16 19:35:18','2026-06-16 19:35:18');
 
 /*Table structure for table `cola_sincronizacion` */
@@ -178,11 +187,11 @@ CREATE TABLE `cola_sincronizacion` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5  ;
 
 /*Data for the table `cola_sincronizacion` */
 
-insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servidor_origen`,`payload`,`estado`,`intentos`,`enviado_en`,`created_at`,`updated_at`) values 
+insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servidor_origen`,`payload`,`estado`,`intentos`,`enviado_en`,`created_at`,`updated_at`) values
 (1,'Estudiante',1,'update','polimotor','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (2,'Estudiante',1,'update','logico','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (3,'Estudiante',1,'update','multisensorial','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
@@ -197,11 +206,11 @@ CREATE TABLE `condiciones` (
   `nombre` text DEFAULT NULL,
   `estado` int(11) DEFAULT 1,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7  COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `condiciones` */
 
-insert  into `condiciones`(`id`,`nombre`,`estado`) values 
+insert  into `condiciones`(`id`,`nombre`,`estado`) values
 (1,'Estandar',1),
 (2,'TDAH',1),
 (3,'TEA',1),
@@ -228,11 +237,11 @@ CREATE TABLE `configuracion_pins` (
   PRIMARY KEY (`id`),
   KEY `configuracion_pins_estudiante_id_foreign` (`estudiante_id`),
   CONSTRAINT `configuracion_pins_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15  ;
 
 /*Data for the table `configuracion_pins` */
 
-insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_1`,`figura_2`,`color_figura_2`,`figura_3`,`color_figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values 
+insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_1`,`figura_2`,`color_figura_2`,`figura_3`,`color_figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values
 (7,31,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 15:23:30','2026-06-23 16:03:55'),
 (8,32,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-06-23 15:31:26','2026-06-23 16:03:33'),
 (9,33,'fas fa-star','#ff9019','fas fa-heart','#ff0606','fas fa-fish','#0f54ff',0,'2026-06-23 15:34:40','2026-06-23 15:34:40'),
@@ -255,11 +264,11 @@ CREATE TABLE `configuraciones` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `configuraciones_clave_unique` (`clave`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5  ;
 
 /*Data for the table `configuraciones` */
 
-insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values 
+insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values
 (1,'tiempo_sesion_minutos','60',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (2,'intentos_max_pin','5',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (3,'idioma','es',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
@@ -273,11 +282,11 @@ CREATE TABLE `departamentos` (
   `codigo` varchar(5) NOT NULL,
   `descripcion` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`codigo`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+) ENGINE=InnoDB ;
 
 /*Data for the table `departamentos` */
 
-insert  into `departamentos`(`codigo`,`descripcion`) values 
+insert  into `departamentos`(`codigo`,`descripcion`) values
 ('05','Antioquia'),
 ('08','Atlantico'),
 ('11','Bogota'),
@@ -324,21 +333,23 @@ CREATE TABLE `docentes` (
   `especialidad` varchar(100) DEFAULT NULL,
   `fecha_ingreso` date DEFAULT NULL,
   `firma_url` varchar(255) DEFAULT NULL,
+  `foto_url` varchar(255) DEFAULT NULL,
   `descripcion` text DEFAULT NULL,
-  `estado` enum('activo','inactivo','eliminado') DEFAULT NULL,
+  `estado` enum('activo','inactivo','eliminado') DEFAULT 'activo',
+  `bloqueado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `docentes_user_id_foreign` (`user_id`),
   CONSTRAINT `docentes_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4  ;
 
 /*Data for the table `docentes` */
 
-insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`descripcion`,`estado`,`created_at`,`updated_at`) values 
-(1,2,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'eliminado','2026-06-16 00:02:02','2026-06-24 15:50:15'),
-(2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'activo','2026-06-16 17:32:50','2026-06-24 15:57:11'),
-(3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,'activo','2026-06-16 17:32:50','2026-06-23 14:23:57');
+insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`foto_url`,`descripcion`,`estado`,`bloqueado_en`,`created_at`,`updated_at`) values
+(1,2,'12345678925','direc','Educación Musical','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:50:15'),
+(2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:57:11'),
+(3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-23 14:23:57');
 
 /*Table structure for table `estudiante_ambiente` */
 
@@ -351,6 +362,7 @@ CREATE TABLE `estudiante_ambiente` (
   `anio_lectivo` smallint(5) unsigned NOT NULL,
   `estado` enum('activo','restringido','adaptado') NOT NULL DEFAULT 'activo',
   `observacion` text DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -358,16 +370,16 @@ CREATE TABLE `estudiante_ambiente` (
   KEY `estudiante_ambiente_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `estudiante_ambiente_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `estudiante_ambiente_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6  ;
 
 /*Data for the table `estudiante_ambiente` */
 
-insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`created_at`,`updated_at`) values 
-(1,13,3,2026,'activo',NULL,'2026-06-24 09:05:13','2026-06-24 09:05:13'),
-(2,11,3,2026,'activo',NULL,'2026-06-24 09:05:13','2026-06-24 09:05:13'),
-(3,5,3,2026,'activo',NULL,'2026-06-24 16:06:12','2026-06-24 16:06:12'),
-(4,9,3,2026,'activo',NULL,'2026-06-24 16:06:12','2026-06-24 16:06:12'),
-(5,12,3,2026,'activo',NULL,'2026-06-24 16:06:12','2026-06-24 16:06:12');
+insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`created_at`,`updated_at`) values
+(1,13,3,2026,'activo',NULL, 1,  '2026-06-24 09:05:13','2026-06-24 09:05:13'),
+(2,11,3,2026,'activo',NULL, 1, '2026-06-24 09:05:13','2026-06-24 09:05:13'),
+(3,5,3,2026,'activo',NULL, 1, '2026-06-24 16:06:12','2026-06-24 16:06:12'),
+(4,9,3,2026,'activo',NULL, 1, '2026-06-24 16:06:12','2026-06-24 16:06:12'),
+(5,12,3,2026,'activo',NULL, 1, '2026-06-24 16:06:12','2026-06-24 16:06:12');
 
 /*Table structure for table `estudiantes` */
 
@@ -402,11 +414,11 @@ CREATE TABLE `estudiantes` (
   `telefono` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`,`identificacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37  COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `estudiantes` */
 
-insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`condicion_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`) values 
+insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`condicion_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`) values
 (1,'Valentina',NULL,NULL,NULL,1111,'VA',NULL,'#0F6E56',1,1,'2021-01-17',NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#534AB7',1,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#854F0B',1,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -452,7 +464,7 @@ CREATE TABLE `failed_jobs` (
   `failed_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `failed_jobs` */
 
@@ -470,11 +482,11 @@ CREATE TABLE `grados` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4  ;
 
 /*Data for the table `grados` */
 
-insert  into `grados`(`id`,`nombre`,`edad_anos`,`descripcion`,`orden`,`activo`,`created_at`,`updated_at`) values 
+insert  into `grados`(`id`,`nombre`,`edad_anos`,`descripcion`,`orden`,`activo`,`created_at`,`updated_at`) values
 (1,'Prejardin',3,'Para ninos de 3 anos. Socializacion y desarrollo motriz.',1,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
 (2,'Jardin',4,'Para ninos de 4 anos. Colores, numeros y letras.',2,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
 (3,'Transicion',5,'Para ninos de 5 anos. Lectoescritura y habilidades logicas.',3,1,'2026-06-16 19:34:40','2026-06-16 19:34:40');
@@ -495,11 +507,11 @@ CREATE TABLE `grupos` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `grp_unique` (`grado_id`,`nombre`,`anio_lectivo`),
   CONSTRAINT `grupos_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28  ;
 
 /*Data for the table `grupos` */
 
-insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`activo`,`created_at`,`updated_at`) values 
+insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`activo`,`created_at`,`updated_at`) values
 (1,1,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (3,2,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (4,2,'B',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
@@ -530,11 +542,11 @@ CREATE TABLE `matriculas` (
   CONSTRAINT `matriculas_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
   CONSTRAINT `matriculas_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`),
   CONSTRAINT `matriculas_grupo_id_foreign` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23  ;
 
 /*Data for the table `matriculas` */
 
-insert  into `matriculas`(`id`,`estudiante_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`estado`,`fecha_ingreso`,`fecha_egreso`,`created_at`,`updated_at`) values 
+insert  into `matriculas`(`id`,`estudiante_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`estado`,`fecha_ingreso`,`fecha_egreso`,`created_at`,`updated_at`) values
 (1,1,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:32'),
 (2,2,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:36'),
 (3,3,2,3,2026,'activo','2026-01-01',NULL,'2026-06-16 19:35:19','2026-06-22 15:46:39'),
@@ -556,11 +568,11 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41  ;
 
 /*Data for the table `migrations` */
 
-insert  into `migrations`(`id`,`migration`,`batch`) values 
+insert  into `migrations`(`id`,`migration`,`batch`) values
 (1,'2014_10_12_000000_create_users_table',1),
 (2,'2014_10_12_100000_create_password_reset_tokens_table',1),
 (3,'2019_08_19_000000_create_failed_jobs_table',1),
@@ -618,7 +630,7 @@ CREATE TABLE `modulos` (
   PRIMARY KEY (`id`),
   KEY `modulos_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `modulos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `modulos` */
 
@@ -631,11 +643,11 @@ CREATE TABLE `municipios` (
   `descripcion` varchar(50) NOT NULL,
   `coddep` varchar(2) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1120 DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1120 ;
 
 /*Data for the table `municipios` */
 
-insert  into `municipios`(`id`,`descripcion`,`coddep`) values 
+insert  into `municipios`(`id`,`descripcion`,`coddep`) values
 (1,'MEDELLIN','05'),
 (2,'BARRANQUILLA','08'),
 (3,'BOGOTA D.C.','11'),
@@ -1772,7 +1784,7 @@ CREATE TABLE `notas_docente` (
   KEY `notas_docente_user_id_foreign` (`user_id`),
   CONSTRAINT `notas_docente_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE CASCADE,
   CONSTRAINT `notas_docente_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `notas_docente` */
 
@@ -1796,7 +1808,7 @@ CREATE TABLE `observaciones` (
   CONSTRAINT `observaciones_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `observaciones_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE SET NULL,
   CONSTRAINT `observaciones_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `observaciones` */
 
@@ -1809,7 +1821,7 @@ CREATE TABLE `password_reset_tokens` (
   `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `password_reset_tokens` */
 
@@ -1831,7 +1843,7 @@ CREATE TABLE `personal_access_tokens` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `personal_access_tokens` */
 
@@ -1856,7 +1868,7 @@ CREATE TABLE `piar` (
   KEY `piar_docente_id_foreign` (`docente_id`),
   CONSTRAINT `piar_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `piar_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `piar` */
 
@@ -1877,7 +1889,7 @@ CREATE TABLE `portafolios` (
   KEY `portafolios_tema_id_foreign` (`tema_id`),
   CONSTRAINT `portafolios_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `portafolios_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `portafolios` */
 
@@ -1891,38 +1903,12 @@ CREATE TABLE `registros_acceso` (
   `ip` varchar(45) DEFAULT NULL,
   `ambiente` varchar(255) DEFAULT NULL,
   `fecha` timestamp NOT NULL DEFAULT current_timestamp(),
+  `tipo` varchar(30) NOT NULL DEFAULT 'inicio_sesion',
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34  ;
 
-/*Data for the table `registros_acceso` */
-
-insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`) values 
-(10,3,'127.0.0.1','polimotor','2026-06-18 17:16:38'),
-(11,3,'127.0.0.1','polimotor','2026-06-19 09:16:42'),
-(12,3,'127.0.0.1','polimotor','2026-06-19 10:46:12'),
-(13,3,'127.0.0.1','polimotor','2026-06-19 11:04:19'),
-(14,3,'127.0.0.1','polimotor','2026-06-19 15:46:05'),
-(15,3,'127.0.0.1','polimotor','2026-06-19 15:47:12'),
-(16,3,'127.0.0.1','polimotor','2026-06-19 17:36:25'),
-(17,3,'127.0.0.1','polimotor','2026-06-20 11:10:00'),
-(18,3,'127.0.0.1','polimotor','2026-06-20 11:53:57'),
-(19,3,'127.0.0.1','polimotor','2026-06-21 22:33:39'),
-(20,3,'127.0.0.1','polimotor','2026-06-22 08:43:43'),
-(21,3,'127.0.0.1','polimotor','2026-06-22 14:27:15'),
-(22,3,'127.0.0.1','polimotor','2026-06-23 08:26:20'),
-(23,3,'127.0.0.1','polimotor','2026-06-23 11:11:53'),
-(24,3,'127.0.0.1','polimotor','2026-06-23 15:28:21'),
-(25,3,'127.0.0.1','polimotor','2026-06-24 09:03:55'),
-(26,3,'127.0.0.1','polimotor','2026-06-24 09:13:34'),
-(27,3,'127.0.0.1','polimotor','2026-06-24 14:31:48'),
-(28,3,'127.0.0.1','polimotor','2026-06-24 17:14:24'),
-(29,3,'127.0.0.1','polimotor','2026-06-25 09:40:32'),
-(30,3,'127.0.0.1','polimotor','2026-06-25 11:44:36'),
-(31,3,'127.0.0.1','polimotor','2026-06-25 14:25:29'),
-(32,3,'127.0.0.1','polimotor','2026-06-25 16:37:18'),
-(33,3,'127.0.0.1','polimotor','2026-06-26 08:27:36');
 
 /*Table structure for table `temas` */
 
@@ -1944,7 +1930,7 @@ CREATE TABLE `temas` (
   PRIMARY KEY (`id`),
   KEY `temas_modulo_id_foreign` (`modulo_id`),
   CONSTRAINT `temas_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB  ;
 
 /*Data for the table `temas` */
 
@@ -1960,32 +1946,519 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `rol` enum('admin','docente') NOT NULL DEFAULT 'docente',
-  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `estado` enum('activo','inactivo','eliminado') NOT NULL DEFAULT 'activo',
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `bloqueado_en` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16  ;
 
 /*Data for the table `users` */
 
-insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`activo`,`remember_token`,`created_at`,`updated_at`,`bloqueado_en`) values 
-(2,'2131231456','Docente Líder','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente',1,NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58',NULL),
-(3,'213123','Adminitrador del sistema',NULL,'admin@aulasreggio.test','$2y$10$wjLu1JkqDfVwAMR7VEkx0eN0K4jQVh5G/75sE.0V9wO1x4GO.3Wlq','admin',1,NULL,'2026-06-16 00:12:01','2026-06-18 17:16:17',NULL),
-(4,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente',1,NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35',NULL),
-(5,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(6,'5346345','Maria Fernanda ','Lopez','maria.lopez@aulasreggio.test','$2y$10$IbOTCndCL4IOh8onIxVRiuJDeLpBfdEXDpxfdZuwIgq3Zi1vY8EqS','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(7,'21341234','Jorge Luis ','Martinez','jorge.martinez@aulasreggio.test','$2y$10$rDzC74Ze6pmumLs7bWBOjOwGNea5lCtZ9adym4fhrqSsb.26L4eG2','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(8,'654645','Laura Valentina ','Torres','laura.torres@aulasreggio.test','$2y$10$ZDHYEz4BE9bk6klx3d1m0.ahZdMVbq529pq3zsturZltFeYOte/Vi','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(9,'2342342','Sebastian Felipe ','Gomez','sebastian.gomez@aulasreggio.test','$2y$10$Beizcu7u5jKpws.5KjvCQePwF2fJtB5cEdHdqD18bm4WlBsSYOhpy','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(10,'5656645','Daniela Paola ','Vargas','daniela.vargas@aulasreggio.test','$2y$10$ktfn.me/EGyB9U7ZcnO15uyIVgwctNshg9FngAUPMn451GErJxOnm','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(11,'234234234','Andres Felipe ','Rojas','andres.rojas@aulasreggio.test','$2y$10$iywC4mD8f5r13hPX6HGOOufZkCqMV.gAGRs/h3F3CN/V1rCvOt3sq','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(12,'43563456','Natalia Alejandra ','Cruz','natalia.cruz@aulasreggio.test','$2y$10$bN/LOLfQiKjTC12vdl3uTutiKsngQ344gDF507hc6YsdpRX85XKS2','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(13,'32454365','Juan Pablo ','Herrera','juan.herrera@aulasreggio.test','$2y$10$uiFhUMOeWjEjBtwY4kxcMewe9dXimg7ikaOJ3jFiY2P2AtWfjG9Uu','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(14,'5345345','Camila Andrea ','Mora','camila.mora@aulasreggio.test','$2y$10$ZVq5aurxoqa1KVRv7LgujO.zag/lhphPOf.0MsNkhgUulU3U./QmG','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(15,'657567567','Ricardo Andres ','Silva','ricardo.silva@aulasreggio.test','$2y$10$.bghvK6emeHQyaxnz3V2vOZVc1s/RkeSQpA8NZOdOrkqF29iGberC','docente',1,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL);
+insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`remember_token`,`created_at`,`updated_at`,`bloqueado_en`) values
+(2,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente','activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58',NULL),
+(3,'213123','Administrador',NULL,'admin@aulasreggio.test','$2y$10$wjLu1JkqDfVwAMR7VEkx0eN0K4jQVh5G/75sE.0V9wO1x4GO.3Wlq','admin','activo',NULL,'2026-06-16 00:12:01','2026-06-18 17:16:17',NULL),
+(4,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35',NULL),
+(5,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(6,'5346345','Maria Fernanda ','Lopez','maria.lopez@aulasreggio.test','$2y$10$IbOTCndCL4IOh8onIxVRiuJDeLpBfdEXDpxfdZuwIgq3Zi1vY8EqS','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(7,'21341234','Jorge Luis ','Martinez','jorge.martinez@aulasreggio.test','$2y$10$rDzC74Ze6pmumLs7bWBOjOwGNea5lCtZ9adym4fhrqSsb.26L4eG2','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(8,'654645','Laura Valentina ','Torres','laura.torres@aulasreggio.test','$2y$10$ZDHYEz4BE9bk6klx3d1m0.ahZdMVbq529pq3zsturZltFeYOte/Vi','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(9,'2342342','Sebastian Felipe ','Gomez','sebastian.gomez@aulasreggio.test','$2y$10$Beizcu7u5jKpws.5KjvCQePwF2fJtB5cEdHdqD18bm4WlBsSYOhpy','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(10,'5656645','Daniela Paola ','Vargas','daniela.vargas@aulasreggio.test','$2y$10$ktfn.me/EGyB9U7ZcnO15uyIVgwctNshg9FngAUPMn451GErJxOnm','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(11,'234234234','Andres Felipe ','Rojas','andres.rojas@aulasreggio.test','$2y$10$iywC4mD8f5r13hPX6HGOOufZkCqMV.gAGRs/h3F3CN/V1rCvOt3sq','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(12,'43563456','Natalia Alejandra ','Cruz','natalia.cruz@aulasreggio.test','$2y$10$bN/LOLfQiKjTC12vdl3uTutiKsngQ344gDF507hc6YsdpRX85XKS2','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(13,'32454365','Juan Pablo ','Herrera','juan.herrera@aulasreggio.test','$2y$10$uiFhUMOeWjEjBtwY4kxcMewe9dXimg7ikaOJ3jFiY2P2AtWfjG9Uu','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(14,'5345345','Camila Andrea ','Mora','camila.mora@aulasreggio.test','$2y$10$ZVq5aurxoqa1KVRv7LgujO.zag/lhphPOf.0MsNkhgUulU3U./QmG','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
+(15,'657567567','Ricardo Andres ','Silva','ricardo.silva@aulasreggio.test','$2y$10$.bghvK6emeHQyaxnz3V2vOZVc1s/RkeSQpA8NZOdOrkqF29iGberC','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL);
+
+DROP TABLE IF EXISTS `seguridad_logs`;
+
+CREATE TABLE `seguridad_logs` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `actor_user_id` BIGINT UNSIGNED DEFAULT NULL,
+
+    `accion` VARCHAR(50) NOT NULL,
+    `descripcion` VARCHAR(255) NOT NULL,
+    `registro_afectado` VARCHAR(255) DEFAULT NULL,
+
+    `ip` VARCHAR(45) DEFAULT NULL,
+    `user_agent` TEXT DEFAULT NULL,
+
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+
+    PRIMARY KEY (`id`),
+
+    INDEX `seguridad_logs_user_id_foreign` (`user_id`),
+    INDEX `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
+
+    CONSTRAINT `seguridad_logs_user_id_foreign`
+        FOREIGN KEY (`user_id`)
+        REFERENCES `users` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `seguridad_logs_actor_user_id_foreign`
+        FOREIGN KEY (`actor_user_id`)
+        REFERENCES `users` (`id`)
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+
+/*Table structure for table `condiciones` */
+
+DROP TABLE IF EXISTS `condiciones`;
+
+CREATE TABLE `condiciones` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` text COLLATE utf8mb4_general_ci,
+  `estado` int DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 ;
+
+/*Data for the table `condiciones` */
+
+insert  into `condiciones`(`id`,`nombre`,`estado`) values 
+(1,'Estandar',1),
+(2,'TDAH',1),
+(3,'TEA',1),
+(4,'Sindrome de Down',1),
+(5,'Discapacidad Visual',1),
+(6,'Discapacidad Auditiva',1);
+
+/*Table structure for table `piar` */
+
+DROP TABLE IF EXISTS `piar`;
+
+CREATE TABLE `piar` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `docente_id` bigint unsigned DEFAULT NULL,
+  `estado` enum('borrador','revisado','aprobado') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'borrador',
+  `paso` int DEFAULT NULL,
+  `fecha_diligenciamiento` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `activo` int DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `piar_estudiante_id_unique` (`estudiante_id`),
+  KEY `piar_docente_id_foreign` (`docente_id`),
+  CONSTRAINT `piar_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `piar_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8  ;
+
+/*Table structure for table `piar_acta_compromiso` */
+
+DROP TABLE IF EXISTS `piar_acta_compromiso`;
+
+CREATE TABLE `piar_acta_compromiso` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_piar` bigint unsigned NOT NULL,
+  `compromisos` text,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6  ;
+
+/*Table structure for table `piar_acta_compromiso_actividades` */
+
+DROP TABLE IF EXISTS `piar_acta_compromiso_actividades`;
+
+CREATE TABLE `piar_acta_compromiso_actividades` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_acta_compromiso` bigint unsigned NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `descripcion` text,
+  `frecuencia` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23  ;
+
+/*Table structure for table `piar_ajuste_razonable` */
+
+DROP TABLE IF EXISTS `piar_ajuste_razonable`;
+
+CREATE TABLE `piar_ajuste_razonable` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_piar` bigint unsigned NOT NULL,
+  `docente_orientador_id` bigint unsigned DEFAULT NULL,
+  `docente_apoyo_pedagogico_id` bigint unsigned DEFAULT NULL,
+  `docente_coordinador_pedagogico_id` bigint unsigned DEFAULT NULL,
+  `docente_orientador_area` text,
+  `docente_apoyo_pedagogico_area` text,
+  `docente_coordinador_pedagogico_area` text,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8  ;
+
+/*Table structure for table `piar_ajuste_razonable_docente_firma` */
+
+DROP TABLE IF EXISTS `piar_ajuste_razonable_docente_firma`;
+
+CREATE TABLE `piar_ajuste_razonable_docente_firma` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_ajuste_razonable` bigint unsigned NOT NULL,
+  `id_docente` bigint unsigned NOT NULL,
+  `area` text,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=43  ;
+
+/*Table structure for table `piar_ajuste_razonable_item` */
+
+DROP TABLE IF EXISTS `piar_ajuste_razonable_item`;
+
+CREATE TABLE `piar_ajuste_razonable_item` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_ajuste_razonable` bigint unsigned NOT NULL,
+  `area` varchar(255) DEFAULT NULL,
+  `barrera` text,
+  `tipo` varchar(255) DEFAULT NULL,
+  `apoyo` text,
+  `descripcion` text,
+  `seguimiento` text,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=36  ;
+
+/*Table structure for table `piar_atencion_medica` */
+
+DROP TABLE IF EXISTS `piar_atencion_medica`;
+
+CREATE TABLE `piar_atencion_medica` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_entorno_salud` bigint unsigned NOT NULL,
+  `cual` varchar(255) NOT NULL,
+  `frecuencia` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=49  ;
+
+/*Table structure for table `piar_datos_generales` */
+
+DROP TABLE IF EXISTS `piar_datos_generales`;
+
+CREATE TABLE `piar_datos_generales` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_piar` bigint unsigned NOT NULL,
+  `vinculado` varchar(255) DEFAULT NULL,
+  `victima` varchar(10) DEFAULT NULL,
+  `registro_victima` varchar(255) DEFAULT NULL,
+  `centro_proteccion` varchar(10) DEFAULT NULL,
+  `cual_centro_proteccion` varchar(255) DEFAULT NULL,
+  `grupo_etnico` varchar(10) DEFAULT NULL,
+  `cual_etnico` varchar(255) DEFAULT NULL,
+  `capacidades` text,
+  `gustos` text,
+  `expectativas_estudiante` text,
+  `expectativas_familia` text,
+  `redes_apoyo` text,
+  `otras` text,
+  `fecha_diligenciamiento` date DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7  ;
+
+/*Table structure for table `piar_entorno_educativo` */
+
+DROP TABLE IF EXISTS `piar_entorno_educativo`;
+
+CREATE TABLE `piar_entorno_educativo` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_piar` bigint unsigned NOT NULL,
+  `vinculado_otra_institucion` varchar(10) DEFAULT NULL,
+  `instituciones_anteriores` text,
+  `motivo_no_vinculado` text,
+  `ultimo_grado` varchar(100) DEFAULT NULL,
+  `estado_ultimo_grado` varchar(100) DEFAULT NULL,
+  `observaciones_estado` text,
+  `recibe_informe_pedagogico` varchar(10) DEFAULT NULL,
+  `institucion_informe` varchar(255) DEFAULT NULL,
+  `programas_complementarios` varchar(10) DEFAULT NULL,
+  `cuales_programas` text,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6  ;
+
+/*Table structure for table `piar_entorno_hogar` */
+
+DROP TABLE IF EXISTS `piar_entorno_hogar`;
+
+CREATE TABLE `piar_entorno_hogar` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_piar` bigint unsigned NOT NULL,
+  `nombre_madre` varchar(255) DEFAULT NULL,
+  `ocupacion_madre` varchar(255) DEFAULT NULL,
+  `nivel_madre` varchar(100) DEFAULT NULL,
+  `nombre_padre` varchar(255) DEFAULT NULL,
+  `ocupacion_padre` varchar(255) DEFAULT NULL,
+  `nivel_padre` varchar(100) DEFAULT NULL,
+  `nombre_cuidador` varchar(255) DEFAULT NULL,
+  `nivel_cuidador` varchar(100) DEFAULT NULL,
+  `telefono_cuidador` varchar(30) DEFAULT NULL,
+  `parentesco_cuidador` varchar(100) DEFAULT NULL,
+  `correo_cuidador` varchar(255) DEFAULT NULL,
+  `numero_hermanos` int DEFAULT NULL,
+  `lugar_ocupa` int DEFAULT NULL,
+  `apoyo_crianza` text,
+  `personas_con_quien_vive` text,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5  ;
+
+/*Table structure for table `piar_entorno_salud` */
+
+DROP TABLE IF EXISTS `piar_entorno_salud`;
+
+CREATE TABLE `piar_entorno_salud` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_piar` bigint unsigned NOT NULL,
+  `afiliado_salud` varchar(10) DEFAULT NULL,
+  `regimen` varchar(50) DEFAULT NULL,
+  `eps` varchar(255) DEFAULT NULL,
+  `lugar_emergencia` varchar(255) DEFAULT NULL,
+  `diagnostico_medico` varchar(10) DEFAULT NULL,
+  `cual_diagnostico` text,
+  `atencion_medica` varchar(10) DEFAULT NULL,
+  `tratamiento_integral` varchar(10) DEFAULT NULL,
+  `consume_medicamentos` varchar(10) DEFAULT NULL,
+  `ayudas_tecnicas` varchar(10) DEFAULT NULL,
+  `cuales_ayudas` text,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9  ;
+
+/*Table structure for table `piar_medicamento` */
+
+DROP TABLE IF EXISTS `piar_medicamento`;
+
+CREATE TABLE `piar_medicamento` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_entorno_salud` bigint unsigned NOT NULL,
+  `cual` varchar(255) NOT NULL,
+  `frecuencia` varchar(255) NOT NULL,
+  `horario` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=44  ;
+
+/*Table structure for table `piar_tratamiento` */
+
+DROP TABLE IF EXISTS `piar_tratamiento`;
+
+CREATE TABLE `piar_tratamiento` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_entorno_salud` bigint unsigned NOT NULL,
+  `cual` varchar(255) NOT NULL,
+  `frecuencia` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=48  ;
+
+/*Table structure for table `piar_valoracion_pedagogica` */
+
+DROP TABLE IF EXISTS `piar_valoracion_pedagogica`;
+
+CREATE TABLE `piar_valoracion_pedagogica` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `id_piar` bigint unsigned NOT NULL,
+  `vp_mov_apoyo_sistema` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_apoyo_sistema_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_ajustes_espacio` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_ajustes_espacio_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_ajustes_movilidad` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_ajustes_movilidad_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_motricidad_fina` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_motricidad_fina_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_adaptacion_agarrar` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_adaptacion_agarrar_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_apoyo_sistema` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_apoyo_sistema_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_com_aditamentos` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_aditamentos_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_com_ajustes` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_ajustes_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_com_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_info_apoyo_sistema` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_info_apoyo_sistema_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_info_ajustes` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_info_ajustes_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_info_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_soc_apoyo_regulacion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_soc_apoyo_regulacion_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_soc_ajustes_interaccion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_soc_ajustes_interaccion_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_soc_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_acad_ajustes_permanencia` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_acad_ajustes_permanencia_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_acad_ajustes_tiempos` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_acad_ajustes_tiempos_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_acad_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_observaciones` text COLLATE utf8mb4_unicode_ci,
+  `cle_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_8` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_8_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_9` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_9_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_10` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_10_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_11` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_11_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_12` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_12_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_13` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_13_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_14` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_14_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_15` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_15_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_16` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_16_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_17` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_17_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_18` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_18_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_observaciones` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `clm_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_5_desde` int DEFAULT NULL,
+  `clm_5_hasta` int DEFAULT NULL,
+  `clm_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_8` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_8_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_9` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_9_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_10` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_10_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_11` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_11_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_12` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_12_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_13` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_13_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_14` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_14_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_15` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_15_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_16` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_16_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_17` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_17_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_18` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_18_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_19` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_19_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_observaciones` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_4_tiempo` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_8` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_8_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_9` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_9_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_10` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_10_obs` text COLLATE utf8mb4_unicode_ci,
+  `habilidades_destrezas` text COLLATE utf8mb4_unicode_ci,
+  `estrategias_acciones` text COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  ;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

@@ -13,7 +13,16 @@ function abrirModal() {
     $('#modalRegistroLabel').text('Nuevo Estudiante');
     $('#modalRegistroSubtitle').text('Completa los datos para crear el estudiante');
     $('#btnCrearEstudiante').text('Crear Estudiante');
+
+    $('#tab-atencion').show();
+    $('#tab-pin').show();
     tipoPost = 1;
+
+    
+    if(tipoGuardaEstudiante === 2) {
+        $("#ambiente-grado-grupo-container-docente").show();
+    }
+
     modalBS.show();
 }
 
@@ -57,12 +66,23 @@ function limpiarModal() {
     //resetear el valor de otro tipo identificacion
     $('#otro_tipo_identificacion').val('');
     $('#otro_tipo_identificacion_container').hide();
+
+    if(tipoGuardaEstudiante === 2) {
+        $("#grupo_id_nuevo").val('').empty().append('<option value="">Seleccione</option>');
+        $("#contenedor-ambientes-disponibles").html("<div class='col-md-12 p-4 text-center'><h4 class='text-center'>No hay ambientes disponibles</h4></div>");
+        ambientesSeleccionados = [];
+    }
 }
 
 /* ── Tabla AJAX ──────────────────────────────────────────────── */
 async function cargarTabla(url) {
-    const $contenedor = $('#contenedorTabla');
-    const $cargando = $('#cargando-tabla');
+    var $contenedor = $('#contenedorTabla');
+    var $cargando = $('#cargando-tabla');
+
+    if(tipoGuardaEstudiante === 2) {
+        $contenedor = $('#container-grid');
+        $cargando = $('#cargando-grid');
+    }
 
     $contenedor.css('opacity', '.4');
     $cargando.show();
@@ -147,6 +167,9 @@ function mostrarErroresModal(errors) {
             case 'validation.required':
                 mensaje = 'Este campo es requerido';
                 break;
+            case 'validation.required_if':
+                mensaje = 'Este campo es requerido';
+                break;
             default:
                 mensaje = 'Este campo es requerido';
                 break;
@@ -167,6 +190,12 @@ $('#formCrearEstudiante').on('submit', function (e) {
 
     const formData = new FormData(this);
     const datos = Object.fromEntries(formData.entries());
+
+    if (tipoGuardaEstudiante === 1) {
+        datos.tipo_guarda = 1;
+    } else if (tipoGuardaEstudiante === 2) {
+        datos.tipo_guarda = 2;
+    }
 
     if (tipoPost === 1) {
         guardarEstudiante(datos);
@@ -202,6 +231,13 @@ async function guardarEstudiante(datos) {
         });
     });
 
+    // Ambientes
+    if (tipoGuardaEstudiante === 2 && ambientesSeleccionados.length > 0) {
+        ambientesSeleccionados.forEach(function(id) {
+            formData.append('ambientes_ids[]', id);
+        });
+    }
+    
     $.ajax({
         url: URL_ESTUDIANTES,
         type: 'POST',
@@ -316,7 +352,20 @@ function abrirModalEditarEstudiante(id) {
     $('#modalRegistroLabel').text('Editar Estudiante');
     $('#modalRegistroSubtitle').text('Completa los datos para editar el estudiante');
     $('#btnCrearEstudiante').text('Editar Estudiante');
+
+    if(tipoGuardaEstudiante === 2) {
+        $('#tab-atencion').hide();
+        $('#tab-pin').hide();
+    } else {
+        $('#tab-atencion').show();
+        $('#tab-pin').show();
+    }
     cargarDatosEstudiante();
+
+    
+    if(tipoGuardaEstudiante === 2) {
+        $("#ambiente-grado-grupo-container-docente").hide();
+    }
     modalBS.show();
 }
 
@@ -391,7 +440,6 @@ async function mapearDatosEstudiante(datos) {
     }
 }
 
-
 async function cargarMunicipios() {
     const departamento = $('#departamento_id').val();
     return new Promise((resolve, reject) => {
@@ -418,7 +466,6 @@ async function cargarMunicipios() {
         });
     });
 }
-
 
 function editarEstudiante(datos) {
     const formData = new FormData();
@@ -539,15 +586,6 @@ async function cambiarEstadoEstudiante(id, input) {
         url: `${URL_ESTUDIANTES}/cambiar-estado/${id}/${estado}`,
         type: 'GET',
         dataType: 'json',
-        beforeSend: function () {
-            Swal.fire({
-                title: 'Cambiando estado de estudiante...',
-                text: 'Espere un momento mientras se cambia el estado del estudiante.',
-                icon: 'info',
-                showCancelButton: false,
-                showConfirmButton: false,
-            });
-        },
         success: async function (res) {
             if (res.success) {
                 await cargarTabla(location.href);
@@ -562,5 +600,53 @@ async function cambiarEstadoEstudiante(id, input) {
         complete: function () {
             Swal.close();
         }
+    });
+}
+
+
+// si es admin ocultar el grado y grupo
+if (tipoGuardaEstudiante === 1) {
+    $("#ambiente-grado-grupo-container-docente").hide();
+    $("#grado-container-admin").show();
+} else if (tipoGuardaEstudiante === 2) {
+    $("#ambiente-grado-grupo-container-docente").show();
+    $("#grado-container-admin").hide();
+}
+
+/* ── Restablecer PIN ──────────────────────────────────────────── */
+async function confirmarRestablecerPin(id) {
+    Swal.fire({
+        title: '¿Restablecer PIN?',
+        text: '¿Estás seguro de querer restablecer el PIN del estudiante?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, restablecer',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#2045a3',
+        cancelButtonColor: '#94A3B8',
+        iconColor: '#F59E0B',
+    }).then(async function (result) {
+        if (result.isConfirmed) {
+            await restablecerPin(id);
+        }
+    }); 
+}
+
+async function restablecerPin(id) {
+    await $.ajax({
+        url: `${URL_ESTUDIANTES}/restablecer-pin/${id}`,
+        type: 'GET',
+        dataType: 'json',
+        success: async function (res) {
+            if (res.success) {
+                mostrarToast('success', res.message);
+                await cargarTabla(location.href);
+            } else {
+                mostrarToast('error', res.message);
+            }
+        },
+        error: function (xhr) {
+            mostrarToast('error', 'Error al restablecer el PIN');
+        },
     });
 }

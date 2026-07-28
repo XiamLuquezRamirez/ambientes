@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SeguridadAccion;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Docente;
-use App\Models\Estudiante;
-use App\Models\Matricula;
-use App\Models\Observacion;
 use App\Models\User;
 use App\Services\ResumenActividadDocenteService;
+use App\Services\SeguridadService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -21,159 +20,8 @@ use Illuminate\Support\Str;
 class UsuarioAdminController extends Controller
 {
     public function __construct(
-        private ResumenActividadDocenteService $resumenActividadDocente
+        private ResumenActividadDocenteService $resumenActividadDocente,
     ) {}
-
-    public function perfil()
-    {
-        $usuario = Auth::guard('docente')
-            ->user()
-            ->load([
-                'docente',
-                'ultimoLogin',
-            ]);
-
-        $estadisticas = [];
-
-        if ($usuario->esAdmin()) {
-
-            $informacionPersonal = [
-                'nombre' => $usuario->nombre,
-                'apellido' => $usuario->apellido,
-                'email' => $usuario->email,
-                'identificacion' => $usuario->identificacion,
-                'rol' => $usuario->rol,
-            ];
-
-            $estadisticas = [
-                [
-                    'titulo' => 'Docentes gestionados',
-                    'valor' => Docente::count(),
-                    'icono' => 'fa-chalkboard-user',
-                    'color' => 'green',
-                ],
-                [
-                    'titulo' => 'Estudiantes registrados',
-                    'valor' => Estudiante::count(),
-                    'icono' => 'fa-users',
-                    'color' => 'blue',
-                ],
-                [
-                    'titulo' => 'Matrículas activas',
-                    'valor' => Matricula::count(),
-                    'icono' => 'fa-book',
-                    'color' => 'purple',
-                ],
-                [
-                    'titulo' => 'Reportes generados',
-                    'valor' => Observacion::count(),
-                    'icono' => 'fa-users',
-                    'color' => 'orange',
-                ],
-            ];
-
-            $actividad = [
-                [
-                    'titulo' => 'Inicio de sesión',
-                    'descripcion' => 'Accedió al sistema desde Google Chrome.',
-                    'fecha' => 'Hace 2 horas',
-                    'icono' => 'fa-right-to-bracket',
-                    'color' => 'success',
-                ],
-                [
-                    'titulo' => 'Actualizó su información',
-                    'descripcion' => 'Modificó el número de teléfono.',
-                    'fecha' => 'Ayer',
-                    'icono' => 'fa-user-pen',
-                    'color' => 'primary',
-                ],
-                [
-                    'titulo' => 'Cambio de contraseña',
-                    'descripcion' => 'La contraseña fue actualizada correctamente.',
-                    'fecha' => 'Hace 4 días',
-                    'icono' => 'fa-key',
-                    'color' => 'warning',
-                ],
-            ];
-
-            $roles = [
-                [
-                    'titulo' => 'Administrador',
-                    'descripcion' => 'Acceso completo al sistema',
-                    'icono' => 'fa-user-shield',
-                    'color' => 'azul',
-                ],
-
-            ];
-
-            $sessionesActivas = $usuario->loginLogs->where('fecha', '>=', Carbon::now()->subMinutes(10))->count();
-            $sessiones = [
-                [
-                    'titulo' => 'Actual',
-                    'ambiente' => $usuario->ultimoLogin->ambiente,
-                    'ip' => 'IP: '.$usuario->ultimoLogin->ip,
-                    'fecha' => Carbon::parse($usuario->ultimoLogin->fecha)->format('d/m/Y H:i'),
-                    'icono' => 'fa-computer',
-                    'color' => 'success',
-                ],
-            ];
-
-        } else {
-
-            $informacionPersonal = [
-                'nombre' => $usuario->nombre,
-                'apellido' => $usuario->apellido,
-                'email' => $usuario->email,
-                'identificacion' => $usuario->identificacion,
-                'rol' => $usuario->rol,
-                'telefono' => $usuario->docente->telefono,
-                'direccion' => $usuario->docente->direccion,
-                'especialidad' => $usuario->docente->especialidad,
-                'fecha_ingreso' => $usuario->docente->fecha_ingreso,
-                'firma_url' => $usuario->docente->firma_url,
-            ];
-
-            $estadisticas = [
-                [
-                    'titulo' => 'Grupos',
-                    'valor' => $usuario->docente->cargasActivas->count(),
-                    'icono' => 'fa-users-rectangle',
-                    'color' => 'blue',
-                ],
-                [
-                    'titulo' => 'Horas',
-                    'valor' => $usuario->docente->cargasActivas->sum('horas'),
-                    'icono' => 'fa-clock',
-                    'color' => 'green',
-                ],
-                [
-                    'titulo' => 'Ambientes',
-                    'valor' => $usuario->docente->cargasActivas
-                        ->pluck('ambiente_id')
-                        ->unique()
-                        ->count(),
-                    'icono' => 'fa-building',
-                    'color' => 'purple',
-                ],
-                [
-                    'titulo' => 'Planeaciones',
-                    'valor' => 0,
-                    'icono' => 'fa-book-open',
-                    'color' => 'orange',
-                ],
-            ];
-        }
-
-        return view('admin.perfil.index', compact(
-            'usuario',
-            'informacionPersonal',
-            'estadisticas',
-            'actividad',
-            'roles',
-            'sessiones',
-        ));
-    }
-
     /**
      * Lista los docentes con filtros opcionales y paginación.
      *
@@ -236,12 +84,14 @@ class UsuarioAdminController extends Controller
     }
 
     /**
-     * Crea un usuario y perfil de docente dentro de una transacción.
+     * Crea un usuario y, si corresponde, su perfil de docente dentro de una transacción.
      *
-     * Si falla la creación del perfil, el usuario no se deja en estado huérfano.
+     * La validación del perfil docente se ejecuta antes de persistir nada en BD,
+     * de modo que un error de validación no deje un registro huérfano en users.
      */
     public function guardar(Request $request)
     {
+        // Paso 1 — Validar siempre los datos de la cuenta (tabla users).
         $datos = $request->validate([
             'identificacion' => 'required|string|min:8|max:15|unique:users,identificacion',
             'nombre' => 'required|string|max:100',
@@ -251,47 +101,54 @@ class UsuarioAdminController extends Controller
             'rol' => 'required|in:admin,docente',
         ]);
 
-        $usuario = User::create([
-            'identificacion' => $datos['identificacion'],
-            'nombre' => $datos['nombre'],
-            'apellido' => $datos['apellido'],
-            'email' => $datos['email'],
-            'password' => Hash::make($datos['password']),
-            'rol' => $datos['rol'],
-        ]);
-
-        if ($usuario->rol === 'docente') {
+        // Paso 2 — Si el rol es docente, validar el perfil antes de abrir la transacción.
+        $datosDocente = null;
+        if ($datos['rol'] === 'docente') {
             $datosDocente = $request->validate([
                 'telefono' => 'required|string|max:30',
                 'direccion' => 'required|string|max:150',
                 'especialidad' => 'required|string|max:150',
                 'fecha_ingreso' => 'required|date',
                 'firma_url' => 'nullable|image|max:2048',
+            ]);
+        }
+
+        // Paso 3 — Persistir cuenta + perfil de forma atómica.
+        $usuario = DB::transaction(function () use ($datos, $datosDocente, $request) {
+            $usuario = User::create([
+                'identificacion' => $datos['identificacion'],
+                'nombre' => $datos['nombre'],
+                'apellido' => $datos['apellido'],
+                'email' => $datos['email'],
+                'password' => Hash::make($datos['password']),
+                'rol' => $datos['rol'],
                 'estado' => 'activo',
             ]);
 
-            // Si se sube una imagen de firma, se guarda en el directorio de docentes.
-            // Si no se sube una imagen de firma, se crea el perfil docente con los datos obligatorios.
-            // Si se sube una imagen de firma, se crea el perfil docente con los datos obligatorios y la imagen de firma.
-            if ($request->hasFile('firma_url') || $request->filled('telefono') || $request->filled('direccion') ||
-                $request->filled('especialidad') || $request->filled('fecha_ingreso')) {
-                if ($request->hasFile('firma_url')) {
-                    $datosDocente['firma_url'] = $request->file('firma_url')
-                        ->store('docentes', 'public');
-                }
-                $usuario->docente()->create(array_filter($datosDocente));
-            } else {
-                $usuario->docente()->create();
+            if ($datos['rol'] === 'docente') {
+                $this->crearPerfilDocente($usuario, $datosDocente, $request);
             }
-        }
-        session([
-            'password_temporal' => $datos['password'],
-        ]);
+
+            return $usuario;
+        });
+
+        // La contraseña en sesión alimenta la descarga del PDF posterior.
+        session(['password_temporal' => $datos['password']]);
+
+        SeguridadService::registrar(
+            $usuario->id,
+            Auth::guard('docente')->id(),
+            SeguridadAccion::USER_CREATED,
+            'Usuario creado correctamente.',
+            $request,
+            trim($usuario->nombre.' '.$usuario->apellido),
+        );
 
         return response()->json([
             'success' => true,
             'accion' => 'crear',
             'message' => 'Usuario creado correctamente.',
+            // Se devuelve para mostrarla una sola vez en el modal de credenciales.
             'password_generada' => $datos['password'],
             'usuario' => [
                 'id' => $usuario->id,
@@ -299,6 +156,30 @@ class UsuarioAdminController extends Controller
                 'apellido' => $datos['apellido'],
             ],
         ]);
+    }
+
+    /**
+     * Crea el registro en docentes asociado al usuario recién creado.
+     *
+     * El estado del perfil se asigna aquí; no se valida desde el request
+     * porque siempre inicia como activo al crear la cuenta.
+     */
+    private function crearPerfilDocente(User $usuario, array $datosDocente, Request $request): void
+    {
+        $perfil = [
+            'telefono' => $datosDocente['telefono'],
+            'direccion' => $datosDocente['direccion'],
+            'especialidad' => $datosDocente['especialidad'],
+            'fecha_ingreso' => $datosDocente['fecha_ingreso'],
+            'estado' => 'activo',
+        ];
+
+        if ($request->hasFile('firma_url')) {
+            $perfil['firma_url'] = $request->file('firma_url')
+                ->store('docentes', 'public');
+        }
+
+        $usuario->docente()->create($perfil);
     }
 
     /**
@@ -342,6 +223,13 @@ class UsuarioAdminController extends Controller
             if (! empty($datos['password'])) {
                 $usuario->password = Hash::make($datos['password']);
                 $usuario->save();
+                SeguridadService::registrar(
+                    $usuario->id,
+                    Auth::guard('docente')->id(),
+                    SeguridadAccion::PASSWORD_CHANGED,
+                    'Contraseña actualizada.',
+                    $request
+                );
             }
 
             if ($datos['rol'] === 'docente') {
@@ -682,29 +570,5 @@ class UsuarioAdminController extends Controller
             'identificacion_existe' => $identificacionExiste,
             'email_existe' => $emailExiste,
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
