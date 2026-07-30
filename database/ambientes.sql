@@ -1940,20 +1940,47 @@ DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `institucion_id` bigint(20) unsigned DEFAULT NULL,
   `identificacion` varchar(50) NOT NULL,
   `nombre` varchar(255) NOT NULL,
   `apellido` varchar(255) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `rol` enum('admin','docente') NOT NULL DEFAULT 'docente',
-  `estado` enum('activo','inactivo','eliminado') NOT NULL DEFAULT 'activo',
+  `rol` enum(
+    'superadmin',
+    'admin',
+    'docente'
+  ) NOT NULL DEFAULT 'docente',
+  `estado` enum(
+    'activo',
+    'inactivo',
+    'eliminado'
+  ) NOT NULL DEFAULT 'activo',
+  `creado_por` bigint(20) unsigned DEFAULT NULL,
   `remember_token` varchar(100) DEFAULT NULL,
+  `bloqueado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `bloqueado_en` timestamp NULL DEFAULT NULL,
+
   PRIMARY KEY (`id`),
-  UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=16  ;
+
+  UNIQUE KEY `users_email_unique` (`email`),
+
+  KEY `users_institucion_id_foreign` (`institucion_id`),
+  KEY `users_creado_por_foreign` (`creado_por`),
+
+  CONSTRAINT `users_institucion_id_foreign`
+    FOREIGN KEY (`institucion_id`)
+    REFERENCES `instituciones` (`id`)
+    ON DELETE SET NULL,
+
+  CONSTRAINT `users_creado_por_foreign`
+    FOREIGN KEY (`creado_por`)
+    REFERENCES `users` (`id`)
+    ON DELETE SET NULL
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `users` */
 
@@ -2021,7 +2048,7 @@ CREATE TABLE `condiciones` (
 
 /*Data for the table `condiciones` */
 
-insert  into `condiciones`(`id`,`nombre`,`estado`) values 
+insert  into `condiciones`(`id`,`nombre`,`estado`) values
 (1,'Estandar',1),
 (2,'TDAH',1),
 (3,'TEA',1),
@@ -2459,6 +2486,86 @@ CREATE TABLE `piar_valoracion_pedagogica` (
   `estrategias_acciones` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  ;
+
+
+/*Table structure for table `instituciones` */
+
+
+DROP TABLE IF EXISTS `instituciones`;
+
+CREATE TABLE `instituciones` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `municipio` varchar(100) NOT NULL,
+  `departamento` varchar(100) NOT NULL,
+  `codigo_dane` varchar(20) NOT NULL,
+  `logo` varchar(255) DEFAULT NULL,
+  `correo_contacto` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB COLLATE=utf8mb4_general_ci AUTO_INCREMENT=1;
+
+/*Data for the table `instituciones` */
+INSERT INTO instituciones (
+    nombre,
+    municipio,
+    departamento,
+    codigo_dane,
+    logo,
+    correo_contacto
+) VALUES (
+    'Institución Educativa Ejemplo',
+    'Medellín',
+    'Antioquia',
+    '050010000001',
+    'logos/institucion.png',
+    'contacto@institucion.edu.co'
+);
+
+/*Table structure for table `ambiente_institucion` */
+
+DROP TABLE IF EXISTS `ambiente_institucion`;
+
+CREATE TABLE `ambiente_institucion` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `ambiente_id` bigint(20) unsigned NOT NULL,
+  `institucion_id` bigint(20) unsigned NOT NULL,
+  `ip` varchar(45) DEFAULT NULL,
+  `puerto` smallint(5) unsigned DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ambiente_institucion_unique` (`ambiente_id`,`institucion_id`),
+  KEY `ambiente_institucion_institucion_id_foreign` (`institucion_id`),
+  CONSTRAINT `ambiente_institucion_ambiente_id_foreign`
+    FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `ambiente_institucion_institucion_id_foreign`
+    FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE=InnoDB COLLATE=utf8mb4_general_ci AUTO_INCREMENT=1;
+
+/*Data for the table `ambiente_institucion` */
+INSERT INTO ambiente_institucion (
+    ambiente_id,
+    institucion_id,
+    ip,
+    puerto,
+    activo
+) VALUES (
+    '1',
+    '1',
+    '127.0.0.1',
+    '8080',
+    '1'
+);
+
+
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

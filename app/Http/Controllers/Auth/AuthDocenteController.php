@@ -62,9 +62,11 @@ class AuthDocenteController extends Controller
 
         $request->session()->regenerate();
 
-        return $usuario->esAdmin()
-            ? redirect()->route('admin.ambientes')
-            : redirect()->route('panel.principal');
+        return $usuario->esSuperAdmin()
+            ? redirect()->route('superadmin.principal')
+            : ($usuario->esAdmin()
+                ? redirect()->route('admin.ambientes')
+                : redirect()->route('panel.principal'));
     }
 
     public function cerrarSesion(Request $request)

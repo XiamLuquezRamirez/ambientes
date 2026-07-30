@@ -68,4 +68,15 @@ class Ambiente extends Model
             ->withPivot(['anio_lectivo', 'estado', 'observacion'])
             ->withTimestamps();
     }
+
+    public function instituciones()
+    {
+        return $this->belongsToMany(
+            Institucion::class,
+            'ambiente_institucion',
+            'ambiente_id',
+            'institucion_id'
+        )->withPivot('ip', 'puerto', 'activo')
+            ->withTimestamps();
+    }
 }

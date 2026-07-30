@@ -944,7 +944,7 @@
 
         .grupo-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 16px;
         }
 
@@ -1612,10 +1612,6 @@
             const grupoId = element.getAttribute('data-grupo-id');
             seleccionarGradoGrupo(gradoId, grupoId);
 
-            // document.getElementById('txt-contexto-ambiente').textContent = `${nombreAmbienteActivo}`;
-            // document.getElementById('txt-contexto-detalle').textContent =
-            //     ` / ${gradoNombre} / Grupo ${grupoNombre}`;
-
             document.getElementById('titulo-grupo-seleccionado').innerHTML =
                 `<i class="fas fa-chart-bar"></i> Estadísticas para: <strong>${gradoNombre} - ${grupoNombre}</strong>`;
             ocultarPanelEstudiantesGrupo();
@@ -1745,16 +1741,16 @@
                            ${
                     estudiante.avatar_url
                     ? `
-                        <img
-                            src="${estudiante.avatar_url}"
-                            class="estudiante-avatar"
-                            alt="${estudiante.nombre} ${estudiante.apellido}">
-                        `: `
-                        <div class="estudiante-avatar"
-                                style="background:${estudiante.color_avatar || '#2563EB'}">
-                            ${estudiante.iniciales || 'E'}
-                        </div>
-                        `}
+                                                            <img
+                                                                src="${estudiante.avatar_url}"
+                                                                class="estudiante-avatar"
+                                                                alt="${estudiante.nombre} ${estudiante.apellido}">
+                                                            `: `
+                                                            <div class="estudiante-avatar"
+                                                                    style="background:${estudiante.color_avatar || '#2563EB'}">
+                                                                ${estudiante.iniciales || 'E'}
+                                                            </div>
+                                                            `}
                 <div class="estudiante-meta">
                     <p class="estudiante-nombre">${estudiante.nombre}</p>
                     <p class="estudiante-submeta">Condición: ${condicionLabel} · ${estudiante.estado || 'Activo'}</p>

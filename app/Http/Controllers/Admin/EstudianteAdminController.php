@@ -1,28 +1,27 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Estudiante;
-use Illuminate\Http\Request;
-use App\Models\Grado;
-use App\Models\Atencion;
 use App\Models\Condicion;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
-use App\Models\Municipio;
-use Illuminate\Support\Facades\DB;
-use App\Models\Ambiente;
-use App\Models\Grupo;
-use App\Models\Matricula;
+use App\Models\Estudiante;
 use App\Models\EstudianteAmbiente;
 use App\Models\FigurasModel;
+use App\Models\Grado;
+use App\Models\Grupo;
+use App\Models\Matricula;
+use App\Models\Municipio;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EstudianteAdminController extends Controller
 {
     public function listar(Request $request)
     {
         $figuras = FigurasModel::getFiguras();
-        
+
         $grados = Grado::where('activo', true)->orderBy('nombre')->get();
         $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
         $consulta = Estudiante::with('grado', 'configuracionPin')->where('activo', '<>', 2);
@@ -30,7 +29,7 @@ class EstudianteAdminController extends Controller
         /* ── Filtros ────────────────────────────────────── */
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
-            $consulta->where(fn($q) => $q
+            $consulta->where(fn ($q) => $q
                 ->where('nombre', 'like', "%{$termino}%")
             );
         }
@@ -51,12 +50,12 @@ class EstudianteAdminController extends Controller
             $consulta->where('activo', $request->estado);
         }
 
-        $estudiantes  = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
+        $estudiantes = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'html'    => view('admin.estudiantes._tabla', compact('estudiantes'))->render()
+                'html' => view('admin.estudiantes._tabla', compact('estudiantes'))->render(),
             ]);
         }
 
@@ -66,7 +65,7 @@ class EstudianteAdminController extends Controller
     public function cargarMunicipios($departamento)
     {
         $municipios = Municipio::where('coddep', $departamento)->orderBy('descripcion')->get();
-        
+
         if ($municipios) {
             return response()->json($municipios);
         } else {
@@ -77,8 +76,8 @@ class EstudianteAdminController extends Controller
     public function guardar(Request $request)
     {
         $datos = $request->validate([
-            'nombre'      => 'required|string|max:100',
-            'apellido'    => 'required|string|max:100',
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
             'tipo_identificacion' => 'required|string|max:100',
             'otro_tipo_identificacion' => 'nullable|string|max:100',
             'identificacion' => 'required|string|max:100|unique:estudiantes,identificacion',
@@ -106,11 +105,11 @@ class EstudianteAdminController extends Controller
 
         if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar')->store('estudiantes', 'public');
-        }else{
+        } else {
             $avatar = null;
         }
 
-        //primera letra del nombre y apellido
+        // primera letra del nombre y apellido
         // Primera letra del nombre y apellido de forma segura con UTF-8
         $inicial_nombre = explode(' ', $datos['nombre']);
         $inicial_apellido = explode(' ', $datos['apellido']);
@@ -119,12 +118,12 @@ class EstudianteAdminController extends Controller
         $primera_letra_nombre = mb_substr($inicial_nombre[0], 0, 1, 'UTF-8');
         $primera_letra_apellido = mb_substr($inicial_apellido[0], 0, 1, 'UTF-8');
 
-        $iniciales = $primera_letra_nombre . $primera_letra_apellido;
+        $iniciales = $primera_letra_nombre.$primera_letra_apellido;
         $iniciales = mb_strtoupper($iniciales, 'UTF-8');
 
         try {
             $estudiante = DB::transaction(function () use ($datos, $avatar, $iniciales) {
-                
+
                 if ($datos['tipo_guarda'] == 1) {
                     $grado_id = $datos['grado_id_nuevo'];
                 } else {
@@ -154,7 +153,7 @@ class EstudianteAdminController extends Controller
                     'telefono' => $datos['telefono'],
                     'email' => $datos['email'],
                 ]);
-        
+
                 ConfiguracionPin::create([
                     'estudiante_id' => $estudiante->id,
                     'figura_1' => $datos['configuracion_pin'][0]['icon'],
@@ -165,8 +164,7 @@ class EstudianteAdminController extends Controller
                     'color_figura_3' => $datos['configuracion_pin'][2]['color'],
                 ]);
 
-
-                //SI ES TIPO GUARDA 2, CREAR MATRICULA
+                // SI ES TIPO GUARDA 2, CREAR MATRICULA
                 if ($datos['tipo_guarda'] == 2) {
                     Matricula::create([
                         'estudiante_id' => $estudiante->id,
@@ -190,7 +188,7 @@ class EstudianteAdminController extends Controller
 
                 return $estudiante;
             });
-        
+
             return response()->json([
                 'success' => true,
                 'message' => 'Estudiante creado exitosamente.',
@@ -201,7 +199,7 @@ class EstudianteAdminController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear el estudiante: ' . $e->getMessage(),
+                'message' => 'Error al crear el estudiante: '.$e->getMessage(),
             ]);
         }
     }
@@ -209,11 +207,11 @@ class EstudianteAdminController extends Controller
     public function ver($estudianteId)
     {
         $estudiante = Estudiante::with('configuracionPin', 'matricula')->where('id', $estudianteId)->first();
-        
+
         if ($estudiante) {
             return response()->json([
                 'success' => true,
-                'data'    => $estudiante
+                'data' => $estudiante,
             ]);
         } else {
             return response()->json([
@@ -226,8 +224,8 @@ class EstudianteAdminController extends Controller
     public function actualizar(Request $request, $idEstudiante)
     {
         $datos = $request->validate([
-            'nombre'      => 'required|string|max:100',
-            'apellido'    => 'required|string|max:100',
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
             'tipo_identificacion' => 'required|string|max:100',
             'otro_tipo_identificacion' => 'nullable|string|max:100',
             'identificacion' => 'required|string|max:100',
@@ -251,11 +249,11 @@ class EstudianteAdminController extends Controller
 
         $inicial_nombre = explode(' ', $datos['nombre']);
         $inicial_apellido = explode(' ', $datos['apellido']);
-        $iniciales = $inicial_nombre[0][0] . $inicial_apellido[0][0];
+        $iniciales = $inicial_nombre[0][0].$inicial_apellido[0][0];
         $iniciales = strtoupper($iniciales);
-        
+
         $datosActualizar = [
-            'nombre'   => $datos['nombre'],
+            'nombre' => $datos['nombre'],
             'apellido' => $datos['apellido'],
             'tipo_identificacion' => $datos['tipo_identificacion'],
             'otro_tipo_identificacion' => $datos['otro_tipo_identificacion'] ?? null,
@@ -276,7 +274,7 @@ class EstudianteAdminController extends Controller
             'telefono' => $datos['telefono'],
             'email' => $datos['email'],
         ];
-        
+
         if ($request->hasFile('avatar')) {
             $avatar = $request->file('avatar')->store('estudiantes', 'public');
             $datosActualizar['avatar'] = $avatar;
@@ -286,7 +284,7 @@ class EstudianteAdminController extends Controller
 
         if ($exitoso) {
             ConfiguracionPin::updateOrCreate([
-                'estudiante_id' => $idEstudiante
+                'estudiante_id' => $idEstudiante,
             ], [
                 'figura_1' => $datos['configuracion_pin'][0]['icon'],
                 'color_figura_1' => $datos['configuracion_pin'][0]['color'],
@@ -295,7 +293,7 @@ class EstudianteAdminController extends Controller
                 'figura_3' => $datos['configuracion_pin'][2]['icon'],
                 'color_figura_3' => $datos['configuracion_pin'][2]['color'],
             ]);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Estudiante actualizado exitosamente.',
@@ -313,20 +311,20 @@ class EstudianteAdminController extends Controller
         return back()->with('info', 'Pendiente de implementacion.');
     }
 
-
     public function listarGrupos(Request $request)
     {
         $grupos = Grupo::where('grado_id', $request->grado_id)->where('activo', true)->get();
+
         return response()->json([
             'success' => true,
-            'data'    => $grupos
+            'data' => $grupos,
         ]);
     }
 
     public function eliminar($estudiante, $estado)
     {
         $exitoso = Estudiante::where('id', $estudiante)
-        ->update(['activo' => $estado]);
+            ->update(['activo' => $estado]);
 
         if ($exitoso) {
             return response()->json([
@@ -344,7 +342,7 @@ class EstudianteAdminController extends Controller
     public function cambiarEstado(Request $request, $idEstudiante)
     {
         $exitoso = Estudiante::where('id', $idEstudiante)
-        ->update(['activo' => $request->estado]);
+            ->update(['activo' => $request->estado]);
 
         if ($exitoso) {
             if ($request->estado == 1) {
@@ -352,6 +350,7 @@ class EstudianteAdminController extends Controller
             } else {
                 $message = 'Estado cambiado a inactivo exitosamente.';
             }
+
             return response()->json([
                 'success' => true,
                 'message' => $message,

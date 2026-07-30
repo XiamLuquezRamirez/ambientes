@@ -54,6 +54,11 @@ class User extends Authenticatable
         return $this->rol === 'docente';
     }
 
+    public function esSuperAdmin(): bool
+    {
+        return $this->rol === 'superAdmin';
+    }
+
     public function accesos()
     {
         return $this->hasMany(LoginLog::class);

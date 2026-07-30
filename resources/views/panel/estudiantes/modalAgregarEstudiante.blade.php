@@ -97,7 +97,7 @@
         }
     </style>
 @endpush
-<div class="modal fade" id="modalAgregarEstudiante" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+<div class="modal fade" id="modalAgregarEstudiante" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -262,16 +262,16 @@
                ${
 e.avatar_url
 ? `<img src="${e.avatar_url}"
-                        class="avatar-est"
-                        style="width:32px;height:32px;border-radius:50%;object-fit:cover;"
-                        alt="${e.nombre}">`
+    class="avatar-est"
+    style="width:32px;height:32px;border-radius:50%;object-fit:cover;"
+    alt="${e.nombre}">`
 : `<div class="avatar-est"
-                        style="background:${e.color_avatar};width:32px;height:32px;font-size:.75rem">
-                        ${e.iniciales}
-                        </div>`
+    style="background:${e.color_avatar};width:32px;height:32px;font-size:.75rem">
+    ${e.iniciales}
+    </div>`
 }
 </div>
-            <div>
+<div>
                 <div style="font-weight:600;font-size:.88rem;color:#1E293B">${e.nombre} (${e.edad} años)</div>
                 <div style="font-size:.75rem;color:#64748B">${e.grado_grupo ?? 'Sin grupo'}</div>
             </div>

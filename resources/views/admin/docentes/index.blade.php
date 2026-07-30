@@ -28,14 +28,6 @@
                     {{ $a->nombre }}</option>
             @endforeach
         </select> --}}
-
-        {{-- Este bloque genera las opciones del filtro "estado" para la búsqueda de docentes.
-                Se utiliza un array asociativo: clave => etiqueta a mostrar.
-                'true' => 'Activo', 'false' => 'Inactivo'.
-                Por cada opción,
-                  - value="{{ $val }}" es el valor enviado por el formulario.
-                  - Se marca como selected si el estado actual en la URL coincide exactamente (comparación estricta) con el $val.
-                  - La etiqueta visible será "Activo" o "Inactivo". --}}
         <select name="estado" class="form-control" style="width:auto">
             <option value="">Todos los estados</option>
             @foreach (['true' => 'Activo', 'false' => 'Inactivo'] as $val => $label)
@@ -44,13 +36,6 @@
             @endforeach
         </select>
 
-        {{-- <select name="rol" class="form-control" style="width:auto">
-            <option value="">Todos los roles</option>
-            @foreach (['admin' => 'Administrador', 'docente' => 'Docente'] as $val => $label)
-                <option value="{{ $val }}" {{ request('rol') === $val ? 'selected' : '' }}>{{ $label }}
-                </option>
-            @endforeach
-        </select> --}}
         <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-filter"></i> Filtrar</button>
         <a id="btnLimpiar" href="{{ route('admin.docentes') }}" class="btn btn-sm"
             style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;

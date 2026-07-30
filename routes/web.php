@@ -25,6 +25,8 @@ use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
+use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 
 // Raiz → bienvenida del ambiente configurado
@@ -264,6 +266,13 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::post('ambientes/seleccionar', [SesionController::class, 'seleccionarAmbiente'])->name('panel.ambientes.seleccionar');
     Route::get('ambientes/eliminar', [SesionController::class, 'eliminarAmbienteSeleccionado'])->name('panel.ambientes.eliminar');
     Route::get('ambientes/obtener', [SesionController::class, 'obtenerAmbienteSeleccionado'])->name('panel.ambientes.obtener');
+});
+
+// ── Super Admin ─────────────────────────────────────────────────────────
+Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
+    Route::get('principal', [SuperAdminController::class, 'index'])->name('superadmin.principal');
+    Route::get('instituciones', [InstitucionSuperAdminController::class, 'index'])->name('superadmin.instituciones.index');
+    Route::post('instituciones', [InstitucionSuperAdminController::class, 'guardar'])->name('superadmin.instituciones.guardar');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────
