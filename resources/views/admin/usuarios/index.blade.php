@@ -661,6 +661,7 @@ Se cerrará cualquier sesión activa de este usuario.
                 });
 
         });
+
         // Descargar PDF del usuario seleccionado.
         document.getElementById('btnDescargarPdf')
             .addEventListener('click', function() {
