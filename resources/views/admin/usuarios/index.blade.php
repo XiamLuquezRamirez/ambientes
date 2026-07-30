@@ -77,7 +77,7 @@
         var tipoPost = 1; // 1: Crear, 2: Editar
         var id_editar = '';
         const FIRMA_PLACEHOLDER =
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMmyTPv4M5fFPvYLrMzMQcPD_VO34ByNjouQ&s';
+            '/assets/images/no-image.png';
 
         /* ── Bootstrap Modal ─────────────────────────────────────────── */
         const modalBSUsuario = new bootstrap.Modal(document.getElementById('modalUsuario'));
