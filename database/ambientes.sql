@@ -197,27 +197,6 @@ insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servido
 (3,'Estudiante',1,'update','multisensorial','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (4,'Estudiante',1,'update','tecnologia','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02');
 
-/*Table structure for table `condiciones` */
-
-DROP TABLE IF EXISTS `condiciones`;
-
-CREATE TABLE `condiciones` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` text DEFAULT NULL,
-  `estado` int(11) DEFAULT 1,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7  COLLATE=utf8mb4_general_ci;
-
-/*Data for the table `condiciones` */
-
-insert  into `condiciones`(`id`,`nombre`,`estado`) values
-(1,'Estandar',1),
-(2,'TDAH',1),
-(3,'TEA',1),
-(4,'Sindrome de Down',1),
-(5,'Discapacidad Visual',1),
-(6,'Discapacidad Auditiva',1);
-
 /*Table structure for table `configuracion_pins` */
 
 DROP TABLE IF EXISTS `configuracion_pins`;
@@ -1947,7 +1926,7 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `rol` enum(
-    'superadmin',
+    'superAdmin',
     'admin',
     'docente'
   ) NOT NULL DEFAULT 'docente',
@@ -2000,6 +1979,11 @@ insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password
 (14,'5345345','Camila Andrea ','Mora','camila.mora@aulasreggio.test','$2y$10$ZVq5aurxoqa1KVRv7LgujO.zag/lhphPOf.0MsNkhgUulU3U./QmG','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
 (15,'657567567','Ricardo Andres ','Silva','ricardo.silva@aulasreggio.test','$2y$10$.bghvK6emeHQyaxnz3V2vOZVc1s/RkeSQpA8NZOdOrkqF29iGberC','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL);
 
+/* insertar superadmin password: password */
+
+INSERT INTO `users` (`id`, `identificacion`, `nombre`, `apellido`, `email`, `password`, `rol`, `estado`, `remember_token`, `created_at`, `updated_at`, `bloqueado_en`) VALUES
+(1, '1234567890', 'Super', 'Admin', 'superadmin@aulasreggio.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'superadmin', 'activo', NULL, '2026-06-16 17:32:50', '2026-06-16 17:32:50', NULL);
+
 DROP TABLE IF EXISTS `seguridad_logs`;
 
 CREATE TABLE `seguridad_logs` (
@@ -2034,27 +2018,6 @@ CREATE TABLE `seguridad_logs` (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-
-/*Table structure for table `condiciones` */
-
-DROP TABLE IF EXISTS `condiciones`;
-
-CREATE TABLE `condiciones` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` text COLLATE utf8mb4_general_ci,
-  `estado` int DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 ;
-
-/*Data for the table `condiciones` */
-
-insert  into `condiciones`(`id`,`nombre`,`estado`) values
-(1,'Estandar',1),
-(2,'TDAH',1),
-(3,'TEA',1),
-(4,'Sindrome de Down',1),
-(5,'Discapacidad Visual',1),
-(6,'Discapacidad Auditiva',1);
 
 /*Table structure for table `piar` */
 
@@ -2567,8 +2530,88 @@ INSERT INTO ambiente_institucion (
     '1'
 );
 
+/*Table structure for table `condiciones` */
 
+DROP TABLE IF EXISTS `condiciones`;
 
+CREATE TABLE condiciones (
+  id INT AUTO_INCREMENT PRIMARY KEY, -- Genera el ID secuencial automáticamente
+  codigo VARCHAR(50) UNIQUE NOT NULL,
+  nombre VARCHAR(100) NOT NULL,
+  descripcion_corta TEXT,
+  estado TINYINT(1) DEFAULT 1,
+  color_hex VARCHAR(7) DEFAULT '#000000',
+  es_sistema BOOLEAN DEFAULT TRUE,
+  fecha_ultima_edicion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  vista_info_asociada VARCHAR(100) NULL
+);
+
+/*Data for the table `condiciones` */
+INSERT INTO condiciones (codigo,nombre,descripcion_corta,estado,color_hex,es_sistema) VALUES
+('COND-001','Estandar','Descripción corta de la condición',1,'#000000',1),
+('COND-002','TDAH','Descripción corta de la condición',1,'#000000',1),
+('COND-003','TEA','Descripción corta de la condición',1,'#000000',1),
+('COND-004','Síndrome de Down','Descripción corta de la condición',1,'#000000',1),
+('COND-005','Discapacidad Visual','Descripción corta de la condición',1,'#000000',1),
+('COND-006','Discapacidad Auditiva','Descripción corta de la condición',1,'#000000',1);
+
+/*Table structure for table `condiciones_transitorias` */
+
+DROP TABLE IF EXISTS `condiciones_transitorias`;
+
+CREATE TABLE condiciones_transitorias (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  id_institucion BIGINT UNSIGNED NULL,
+  codigo VARCHAR(30) NOT NULL,
+  etiqueta VARCHAR(150) NOT NULL,
+  descripcion_interna TEXT NULL,
+  condicion_base_id BIGINT UNSIGNED NULL,
+  es_sistema TINYINT(1) NOT NULL DEFAULT 0,
+  estado TINYINT(1) NOT NULL DEFAULT 1,
+  usuario_crea BIGINT UNSIGNED NULL,
+  created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+/*Data for the table `condiciones_transitorias` */  
+INSERT INTO condiciones_transitorias (codigo, etiqueta, descripcion_interna, condicion_base_id, es_sistema, estado, usuario_crea) VALUES 
+('CTR-002', 'Sospecha de TDAH', 'Descripción corta de la condición', 2, 1, 1, 1),
+('CTR-003', 'Sospecha de TEA', 'Descripción corta de la condición', 3, 1, 1, 1),
+('CTR-004', 'Sospecha de Síndrome de Down', 'Descripción corta de la condición', 4, 1, 1, 1),
+('CTR-005', 'Sospecha de Discapacidad Visual', 'Descripción corta de la condición', 5, 1, 1, 1),
+('CTR-006', 'Sospecha de Discapacidad Auditiva', 'Descripción corta de la condición', 6, 1, 1, 1);
+
+/*Table structure for table `condiciones_orden` */
+
+DROP TABLE IF EXISTS `condiciones_orden`;
+
+CREATE TABLE condiciones_orden (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id_institucion BIGINT UNSIGNED NOT NULL,
+  id_condicion BIGINT UNSIGNED NOT NULL,
+  orden INT NOT NULL DEFAULT 0,
+  activa TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_institucion_condicion (id_institucion, id_condicion),
+  KEY idx_institucion_orden (id_institucion, orden)
+);
+
+DROP TABLE IF EXISTS `condiciones_transitorias_orden`;
+
+CREATE TABLE condiciones_transitorias_orden (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id_institucion BIGINT UNSIGNED NOT NULL,
+  id_condicion_transitoria BIGINT UNSIGNED NOT NULL,
+  orden INT NOT NULL DEFAULT 0,
+  activa TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_institucion_condicion_transitoria (id_institucion, id_condicion_transitoria),
+  KEY idx_institucion_orden (id_institucion, orden)
+);
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

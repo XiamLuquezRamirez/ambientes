@@ -38,4 +38,14 @@ class Institucion extends Model
     {
         return $this->hasMany(User::class, 'institucion_id');
     }
+
+    public function condicionesOrden()
+    {
+        return $this->hasMany(CondicionOrden::class, 'id_institucion');
+    }
+
+    public function condicionesTransitoriasOrden()
+    {
+        return $this->hasMany(CondicionTransitoriaOrden::class, 'id_institucion');
+    }
 }

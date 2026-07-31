@@ -152,6 +152,11 @@ class Estudiante extends Model
         return $this->belongsTo(Condicion::class, 'condicion_id');
     }
 
+    public function condicionTransitoria()
+    {
+        return $this->belongsTo(CondicionTransitoria::class, 'condicion_transitoria_id');
+    }
+
     public function observaciones()
     {
         return $this->hasMany(Observacion::class);

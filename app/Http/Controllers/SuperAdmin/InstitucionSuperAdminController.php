@@ -4,6 +4,8 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
+use App\Models\CondicionInclusion;
+use App\Models\CondicionTransitoria;
 use App\Models\Institucion;
 use App\Models\User;
 use App\Services\InstitucionLogoService;
@@ -20,6 +22,8 @@ class InstitucionSuperAdminController extends Controller
 {
     public function __construct(
         private InstitucionLogoService $logoService,
+        private readonly CondicionOrdenController $condicionOrdenController,
+        private readonly CondicionTransitoriaOrdenController $condicionTransitoriaOrdenController,
     ) {}
 
     /**
@@ -29,8 +33,21 @@ class InstitucionSuperAdminController extends Controller
     {
         $instituciones = Institucion::with('ambientes')->get();
         $ambientes = Ambiente::all();
+        $condiciones = CondicionInclusion::query()->ordenadas()->get();
 
-        return view('superAdmin.instituciones.index', compact('instituciones', 'ambientes'));
+        // solo las del sistemas y adicionales creadas por el super admin
+        $condicionesTransitorias = CondicionTransitoria::query()
+            ->with('condicionBase')
+            ->where('id_institucion', null)
+            ->ordenadas()
+            ->get();
+
+        return view('superAdmin.instituciones.index', compact(
+            'instituciones',
+            'ambientes',
+            'condiciones',
+            'condicionesTransitorias'
+        ));
     }
 
     /**
@@ -65,6 +82,8 @@ class InstitucionSuperAdminController extends Controller
                 'iniciales' => $this->logoService->iniciales($institucion),
                 'ambientes' => $ambientes,
             ],
+            'condiciones_orden' => $this->condicionOrdenController->listarPorInstitucion((int) $id),
+            'condiciones_transitorias_orden' => $this->condicionTransitoriaOrdenController->listarPorInstitucion((int) $id),
         ]);
     }
 
@@ -78,7 +97,6 @@ class InstitucionSuperAdminController extends Controller
         $this->validarAmbientes($request);
 
         $resultado = DB::transaction(function () use ($datos, $request) {
-
             $institucion = Institucion::create([
                 'nombre' => $datos['nombre'],
                 'codigo_dane' => $datos['codigo_dane'],
@@ -109,6 +127,16 @@ class InstitucionSuperAdminController extends Controller
                 $this->relacionesAmbientes($request)
             );
             session(['password_temporal' => $passwordTemporal]);
+
+            $this->condicionOrdenController->sincronizarParaInstitucion(
+                (int) $institucion->id,
+                $request->input('condiciones_orden', [])
+            );
+
+            $this->condicionTransitoriaOrdenController->sincronizarParaInstitucion(
+                (int) $institucion->id,
+                $request->input('condiciones_transitorias_orden', [])
+            );
 
             return [
                 'institucion' => $institucion,
@@ -149,8 +177,7 @@ class InstitucionSuperAdminController extends Controller
 
         $this->validarIpsDuplicadas($institucion->id, $relaciones);
 
-        DB::transaction(function () use ($institucion, $datos, $relaciones) {
-
+        DB::transaction(function () use ($institucion, $datos, $relaciones, $request) {
             $institucion->update([
                 'nombre' => $datos['nombre'],
                 'codigo_dane' => $datos['codigo_dane'],
@@ -160,6 +187,16 @@ class InstitucionSuperAdminController extends Controller
             ]);
 
             $institucion->ambientes()->sync($relaciones);
+
+            $this->condicionOrdenController->sincronizarParaInstitucion(
+                (int) $institucion->id,
+                $request->input('condiciones_orden', [])
+            );
+
+            $this->condicionTransitoriaOrdenController->sincronizarParaInstitucion(
+                (int) $institucion->id,
+                $request->input('condiciones_transitorias_orden', [])
+            );
         });
 
         return response()->json([
@@ -259,6 +296,8 @@ class InstitucionSuperAdminController extends Controller
             'correo_contacto' => 'required|email|max:255',
             'logo' => ($logoObligatorio ? 'required' : 'nullable')
                 .'|file|mimes:jpeg,jpg,png|max:'.InstitucionLogoService::MAX_KILOBYTES,
+            'condiciones_orden' => 'nullable|array',
+            'condiciones_transitorias_orden' => 'nullable|array',
         ], [
             'logo.required' => 'El logo de la institución es obligatorio.',
         ]);
@@ -368,7 +407,6 @@ class InstitucionSuperAdminController extends Controller
         $relaciones = [];
 
         foreach ($request->input('ambientes', []) as $ambienteId => $config) {
-
             if (empty($config['activo'])) {
                 continue;
             }

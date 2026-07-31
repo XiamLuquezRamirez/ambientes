@@ -26,6 +26,8 @@ use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SuperAdmin\AdminsSuperAdminController;
+use App\Http\Controllers\SuperAdmin\CondicionInclusionController;
+use App\Http\Controllers\SuperAdmin\CondicionTransitoriaController;
 use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use Illuminate\Support\Facades\Route;
@@ -287,6 +289,21 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::get('administradores', [AdminsSuperAdminController::class, 'listar'])->name('superadmin.administradores.listar');
     Route::post('administradores', [AdminsSuperAdminController::class, 'guardar'])->name('superadmin.administradores.guardar');
     Route::put('administradores/{id}', [AdminsSuperAdminController::class, 'actualizar'])->name('superadmin.administradores.actualizar');
+    Route::get('condiciones', [CondicionInclusionController::class, 'index'])->name('superadmin.condiciones.index');
+    Route::post('condiciones', [CondicionInclusionController::class, 'guardar'])->name('superadmin.condiciones.guardar');
+    Route::get('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'mostrar'])->name('superadmin.condiciones.mostrar');
+    Route::put('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'actualizar'])->name('superadmin.condiciones.actualizar');
+    Route::patch('condiciones/{condicionInclusion}/estado', [CondicionInclusionController::class, 'cambiarEstado'])->name('superadmin.condiciones.estado');
+    Route::patch('condiciones/{condicionInclusion}/vista-info', [CondicionInclusionController::class, 'actualizarVistaInfo'])->name('superadmin.condiciones.vista-info.actualizar');
+    Route::get('condiciones/{condicionInclusion}/vista-info', [CondicionInclusionController::class, 'verVistaInfo'])->name('superadmin.condiciones.vista-info.ver');
+    Route::delete('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'eliminar'])->name('superadmin.condiciones.eliminar');
+
+    Route::get('condiciones-transitorias', [CondicionTransitoriaController::class, 'index'])->name('superadmin.condiciones-transitorias.index');
+    Route::post('condiciones-transitorias', [CondicionTransitoriaController::class, 'guardar'])->name('superadmin.condiciones-transitorias.guardar');
+    Route::get('condiciones-transitorias/{condicionTransitoria}', [CondicionTransitoriaController::class, 'mostrar'])->name('superadmin.condiciones-transitorias.mostrar');
+    Route::put('condiciones-transitorias/{condicionTransitoria}', [CondicionTransitoriaController::class, 'actualizar'])->name('superadmin.condiciones-transitorias.actualizar');
+    Route::patch('condiciones-transitorias/{condicionTransitoria}/estado', [CondicionTransitoriaController::class, 'cambiarEstado'])->name('superadmin.condiciones-transitorias.estado');
+    Route::delete('condiciones-transitorias/{condicionTransitoria}', [CondicionTransitoriaController::class, 'eliminar'])->name('superadmin.condiciones-transitorias.eliminar');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────
