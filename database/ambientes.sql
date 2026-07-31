@@ -2543,7 +2543,8 @@ CREATE TABLE condiciones (
   estado TINYINT(1) DEFAULT 1,
   color_hex VARCHAR(7) DEFAULT '#000000',
   es_sistema BOOLEAN DEFAULT TRUE,
-  fecha_ultima_edicion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  fecha_ultima_edicion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  vista_info_asociada VARCHAR(100) NULL
 );
 
 /*Data for the table `condiciones` */
@@ -2555,24 +2556,63 @@ INSERT INTO condiciones (codigo,nombre,descripcion_corta,estado,color_hex,es_sis
 ('COND-005','Discapacidad Visual','Descripción corta de la condición',1,'#000000',1),
 ('COND-006','Discapacidad Auditiva','Descripción corta de la condición',1,'#000000',1);
 
-/*Table structure for table `documentos_condiciones` */
+/*Table structure for table `condiciones_transitorias` */
 
-DROP TABLE IF EXISTS `documentos_condiciones`;
+DROP TABLE IF EXISTS `condiciones_transitorias`;
 
-CREATE TABLE documentos_condiciones (
+CREATE TABLE condiciones_transitorias (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  condicion_id BIGINT UNSIGNED NOT NULL,
-  nombre_archivo VARCHAR(255) NOT NULL,
-  ruta_archivo VARCHAR(255) NOT NULL,
-  numero_paginas SMALLINT UNSIGNED NOT NULL,
-  tamano_mb DECIMAL(6,2) NOT NULL,
-  usuario_id BIGINT UNSIGNED NOT NULL,
-  fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  id_institucion BIGINT UNSIGNED NULL,
+  codigo VARCHAR(30) NOT NULL,
+  etiqueta VARCHAR(150) NOT NULL,
+  descripcion_interna TEXT NULL,
+  condicion_base_id BIGINT UNSIGNED NULL,
+  es_sistema TINYINT(1) NOT NULL DEFAULT 0,
+  estado TINYINT(1) NOT NULL DEFAULT 1,
+  usuario_crea BIGINT UNSIGNED NULL,
   created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
-  ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+/*Data for the table `condiciones_transitorias` */  
+INSERT INTO condiciones_transitorias (codigo, etiqueta, descripcion_interna, condicion_base_id, es_sistema, estado, usuario_crea) VALUES 
+('CTR-002', 'Sospecha de TDAH', 'Descripción corta de la condición', 2, 1, 1, 1),
+('CTR-003', 'Sospecha de TEA', 'Descripción corta de la condición', 3, 1, 1, 1),
+('CTR-004', 'Sospecha de Síndrome de Down', 'Descripción corta de la condición', 4, 1, 1, 1),
+('CTR-005', 'Sospecha de Discapacidad Visual', 'Descripción corta de la condición', 5, 1, 1, 1),
+('CTR-006', 'Sospecha de Discapacidad Auditiva', 'Descripción corta de la condición', 6, 1, 1, 1);
+
+/*Table structure for table `condiciones_orden` */
+
+DROP TABLE IF EXISTS `condiciones_orden`;
+
+CREATE TABLE condiciones_orden (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id_institucion BIGINT UNSIGNED NOT NULL,
+  id_condicion BIGINT UNSIGNED NOT NULL,
+  orden INT NOT NULL DEFAULT 0,
+  activa TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_institucion_condicion (id_institucion, id_condicion),
+  KEY idx_institucion_orden (id_institucion, orden)
+);
+
+DROP TABLE IF EXISTS `condiciones_transitorias_orden`;
+
+CREATE TABLE condiciones_transitorias_orden (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  id_institucion BIGINT UNSIGNED NOT NULL,
+  id_condicion_transitoria BIGINT UNSIGNED NOT NULL,
+  orden INT NOT NULL DEFAULT 0,
+  activa TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_institucion_condicion_transitoria (id_institucion, id_condicion_transitoria),
+  KEY idx_institucion_orden (id_institucion, orden)
+);
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

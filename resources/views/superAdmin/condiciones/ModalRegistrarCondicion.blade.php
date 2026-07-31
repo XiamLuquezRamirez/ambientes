@@ -267,11 +267,24 @@
 
                     $input.addClass('is-invalid');
                     $input.after(
-                        `<div class="invalid-feedback d-block">${mensajes[0]}</div>`
+                        `<div class="invalid-feedback d-block">${traducirErrores(mensajes[0])}</div>`
                     );
                 });
 
                 irATabDatosGenerales();
+            }
+
+            function traducirErrores(mensaje) {
+                switch (mensaje) {
+                    case 'validation.required':
+                        return 'El campo es requerido.';
+                    case 'validation.string':
+                        return 'El campo debe ser una cadena de texto.';
+                    case 'validation.max.string':
+                        return 'El campo debe tener menos de 150 caracteres.';
+                    case 'validation.min.string':
+                        return 'El campo debe tener al menos 10 caracteres.';
+                }
             }
 
             function guardarCondicion() {

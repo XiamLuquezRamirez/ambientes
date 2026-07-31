@@ -1,26 +1,35 @@
 @extends('layouts.superAdmin')
-@section('title', 'Condiciones Globales')
+@section('title', 'Condiciones Transitorias')
 
 @section('content')
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
         <div>
-            <h1>Condiciones Globales</h1>
-            <p>Catálogo de condiciones de inclusión</p>
+            <h1>Condiciones Transitorias Globales</h1>
+            <p>Opciones del selector para docentes, agrupadas por condición base</p>
         </div>
         <div style="display:flex;gap:10px">
-            <button type="button" class="btn btn-primary" onclick="abrirModalRegistrarCondicion()">
-                <i class="fas fa-plus"></i> Nueva Condición
+            <button type="button" class="btn btn-primary" onclick="abrirModalRegistrarTransitoria()">
+                <i class="fas fa-plus"></i> Nueva opción
             </button>
         </div>
     </div>
 
-    <form id="formBuscar" method="GET" action="{{ route('superadmin.condiciones.index') }}"
+    <form id="formBuscarTransitorias" method="GET" action="{{ route('superadmin.condiciones-transitorias.index') }}"
         style="display:flex;gap:12px;margin-bottom:24px;align-items:center;flex-wrap:wrap">
         <div class="input-buscar">
             <span class="icono-buscar"><i class="fas fa-search"></i></span>
-            <input type="text" name="buscar" placeholder="Buscar por código o nombre..."
+            <input type="text" name="buscar" placeholder="Buscar por código o etiqueta..."
                 value="{{ request('buscar') }}" autocomplete="off">
         </div>
+
+        <select name="condicion_base_id" class="form-control" style="width:auto;min-width:220px">
+            <option value="">Todas las condiciones base</option>
+            @foreach ($condicionesBase as $base)
+                <option value="{{ $base->id }}" @selected((string) request('condicion_base_id') === (string) $base->id)>
+                    {{ $base->codigo }} — {{ $base->nombre }}
+                </option>
+            @endforeach
+        </select>
 
         <select name="estado" class="form-control" style="width:auto">
             <option value="">Todos los estados</option>
@@ -31,35 +40,35 @@
 
         <select name="es_sistema" class="form-control" style="width:auto">
             <option value="">Todos los tipos</option>
-            @foreach (['1' => 'Sistema', '0' => 'Personalizada'] as $val => $label)
+            @foreach (['1' => 'Sistema', '0' => 'Adicional'] as $val => $label)
                 <option value="{{ $val }}" @selected(request('es_sistema') === $val)>{{ $label }}</option>
             @endforeach
         </select>
 
-        <a id="btnLimpiar" href="{{ route('superadmin.condiciones.index') }}" class="btn btn-sm"
+        <a id="btnLimpiarTransitorias" href="{{ route('superadmin.condiciones-transitorias.index') }}" class="btn btn-sm"
             style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
-              display:{{ request()->hasAny(['buscar', 'estado', 'es_sistema']) ? 'inline-flex' : 'none' }}">
+              display:{{ request()->hasAny(['buscar', 'estado', 'es_sistema', 'condicion_base_id']) ? 'inline-flex' : 'none' }}">
             <i class="fas fa-broom"></i> Limpiar
         </a>
     </form>
 
-    <div id="contenedorTabla">
-        @include('superAdmin.condiciones._tabla')
+    <div id="contenedorTablaTransitorias">
+        @include('superAdmin.condicionesTransitorias._tabla')
     </div>
-    <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+    <div id="cargando-tabla-transitorias" style="display:none;text-align:center;padding:40px;color:#64748B">
+        <i class="fas fa-spinner fa-spin"></i> Cargando...
+    </div>
 
-    @include('superAdmin.condiciones.ModalRegistrarCondicion')
-    @include('superAdmin.condiciones.ModalVistaInfoAsociada')
-    @include('superAdmin.condiciones.ModalVerInfoCondicion')
+    @include('superAdmin.condicionesTransitorias.ModalRegistrarTransitoria')
 @endsection
 
 @push('scripts')
     <script>
         (function() {
-            window.URL_CONDICIONES = @json(route('superadmin.condiciones.index'));
-            const URL_CONDICIONES = window.URL_CONDICIONES;
-            const URL_ESTADO = (id) => `${URL_CONDICIONES}/${id}/estado`;
-            const URL_ELIMINAR = (id) => `${URL_CONDICIONES}/${id}`;
+            window.URL_TRANSITORIAS = @json(route('superadmin.condiciones-transitorias.index'));
+            const URL_TRANSITORIAS = window.URL_TRANSITORIAS;
+            const URL_ESTADO = (id) => `${URL_TRANSITORIAS}/${id}/estado`;
+            const URL_ELIMINAR = (id) => `${URL_TRANSITORIAS}/${id}`;
 
             $.ajaxSetup({
                 headers: {
@@ -68,10 +77,10 @@
                 }
             });
 
-            window.cargarTablaCondiciones = async function(url = null) {
+            window.cargarTablaTransitorias = async function(url = null) {
                 const destino = url || construirUrlFiltros();
-                const $contenedor = $('#contenedorTabla');
-                const $cargando = $('#cargando-tabla');
+                const $contenedor = $('#contenedorTablaTransitorias');
+                const $cargando = $('#cargando-tabla-transitorias');
 
                 $contenedor.css('opacity', '.4');
                 $cargando.show();
@@ -89,10 +98,10 @@
                     if (res.success) {
                         $contenedor.html(res.html);
                         history.pushState(null, '', destino);
-
                         const params = new URL(destino, window.location.origin).searchParams;
-                        const tieneFiltros = params.has('buscar') || params.has('estado') || params.has('es_sistema');
-                        $('#btnLimpiar').css('display', tieneFiltros ? 'inline-flex' : 'none');
+                        const tieneFiltros = params.has('buscar') || params.has('estado') ||
+                            params.has('es_sistema') || params.has('condicion_base_id');
+                        $('#btnLimpiarTransitorias').css('display', tieneFiltros ? 'inline-flex' : 'none');
                     } else {
                         mostrarToast('error', 'Error al cargar los datos');
                     }
@@ -105,59 +114,53 @@
             };
 
             function construirUrlFiltros() {
-                const params = new URLSearchParams(new FormData(document.getElementById('formBuscar')));
+                const params = new URLSearchParams(new FormData(document.getElementById('formBuscarTransitorias')));
                 for (const [k, v] of [...params.entries()]) {
                     if (!v) params.delete(k);
                 }
-                return params.toString() ? `${URL_CONDICIONES}?${params.toString()}` : URL_CONDICIONES;
+                return params.toString() ? `${URL_TRANSITORIAS}?${params.toString()}` : URL_TRANSITORIAS;
             }
 
             function aplicarFiltros() {
-                cargarTablaCondiciones(construirUrlFiltros());
+                cargarTablaTransitorias(construirUrlFiltros());
             }
 
-            $('#formBuscar select').on('change', aplicarFiltros);
+            $('#formBuscarTransitorias select').on('change', aplicarFiltros);
 
             let debounceTimer;
-            $('#formBuscar input[name="buscar"]').on('input', function() {
+            $('#formBuscarTransitorias input[name="buscar"]').on('input', function() {
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(aplicarFiltros, 400);
             });
 
-            $('#formBuscar').on('submit', function(e) {
+            $('#formBuscarTransitorias').on('submit', function(e) {
                 e.preventDefault();
                 clearTimeout(debounceTimer);
                 aplicarFiltros();
             });
 
-            $('#btnLimpiar').on('click', function(e) {
+            $('#btnLimpiarTransitorias').on('click', function(e) {
                 e.preventDefault();
-                $('#formBuscar')[0].reset();
-                cargarTablaCondiciones(URL_CONDICIONES);
+                $('#formBuscarTransitorias')[0].reset();
+                cargarTablaTransitorias(URL_TRANSITORIAS);
             });
 
-            $(document).on('click', '.pag-btn[href]', function(e) {
+            $(document).on('click', '#contenedorTablaTransitorias .pag-btn[href]', function(e) {
                 e.preventDefault();
-                cargarTablaCondiciones(this.href);
+                cargarTablaTransitorias(this.href);
             });
 
-            $(document).on('change', '.toggle-estado-condicion', async function() {
+            $(document).on('change', '.toggle-estado-transitoria', async function() {
                 const $toggle = $(this);
                 const id = $toggle.data('id');
                 const nombre = $toggle.data('nombre');
-                const estudiantes = parseInt($toggle.data('estudiantes'), 10) || 0;
                 const quiereActivar = $toggle.is(':checked');
 
                 if (!quiereActivar) {
-                    let html = `¿Desea desactivar la condición <strong>"${nombre}"</strong>?`;
-                    if (estudiantes > 0) {
-                        html = `La condición <strong>"${nombre}"</strong> tiene <strong>${estudiantes}</strong> estudiante(s) asignado(s).<br><br>¿Desea desactivarla de todas formas?`;
-                    }
-
                     const confirmacion = await Swal.fire({
                         icon: 'question',
                         title: 'Confirmar desactivación',
-                        html: html,
+                        html: `¿Desea desactivar <strong>"${nombre}"</strong>?<br><small>Dejará de aparecer en el selector del docente.</small>`,
                         showCancelButton: true,
                         confirmButtonText: 'Sí, desactivar',
                         cancelButtonText: 'Cancelar',
@@ -177,13 +180,12 @@
                     url: URL_ESTADO(id),
                     type: 'PATCH',
                     data: {
-                        confirmar: 1,
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     dataType: 'json',
                     success: function(res) {
                         mostrarToast('success', res.message);
-                        cargarTablaCondiciones();
+                        cargarTablaTransitorias();
                     },
                     error: function(xhr) {
                         $toggle.prop('checked', !quiereActivar);
@@ -195,7 +197,7 @@
                 });
             });
 
-            $(document).on('click', '.btn-eliminar-condicion', async function() {
+            $(document).on('click', '.btn-eliminar-transitoria', async function() {
                 const id = $(this).data('id');
                 const nombre = $(this).data('nombre');
                 const estudiantes = parseInt($(this).data('estudiantes'), 10) || 0;
@@ -204,37 +206,25 @@
                     const result = await Swal.fire({
                         icon: 'warning',
                         title: 'No se puede eliminar',
-                        html: `La condición <strong>"${nombre}"</strong> tiene <strong>${estudiantes}</strong> estudiante(s) asignado(s).<br><br>No es posible eliminarla. ¿Desea desactivarla en su lugar?`,
+                        html: `La opción <strong>"${nombre}"</strong> tiene <strong>${estudiantes}</strong> estudiante(s) asociados.<br><br>Puede desactivarla en su lugar.`,
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, desactivar',
+                        confirmButtonText: 'Desactivar',
                         cancelButtonText: 'Cerrar',
                         confirmButtonColor: '#D97706',
                         cancelButtonColor: '#94A3B8',
                     });
 
                     if (result.isConfirmed) {
-                        $.ajax({
-                            url: URL_ESTADO(id),
-                            type: 'PATCH',
-                            data: {
-                                confirmar: 1,
-                                _token: $('meta[name="csrf-token"]').attr('content')
-                            },
-                            dataType: 'json',
-                            success: function(res) {
-                                mostrarToast('success', res.message);
-                                cargarTablaCondiciones();
-                            },
-                            error: function(xhr) {
-                                mostrarToast('error', xhr.responseJSON?.message || 'No fue posible desactivar la condición.');
-                            }
-                        });
+                        const $toggle = $(`#fila-transitoria-${id} .toggle-estado-transitoria`);
+                        if ($toggle.length && $toggle.is(':checked')) {
+                            $toggle.prop('checked', false).trigger('change');
+                        }
                     }
                     return;
                 }
 
                 const confirmacion = await Swal.fire({
-                    title: '¿Eliminar condición?',
+                    title: '¿Eliminar opción?',
                     text: `"${nombre}" será eliminada permanentemente.`,
                     icon: 'warning',
                     showCancelButton: true,
@@ -246,28 +236,16 @@
 
                 if (!confirmacion.isConfirmed) return;
 
-                Swal.fire({
-                    title: 'Eliminando...',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
                 $.ajax({
                     url: URL_ELIMINAR(id),
                     type: 'DELETE',
                     dataType: 'json',
                     success: function(res) {
-                        Swal.close();
                         mostrarToast('success', res.message);
-                        cargarTablaCondiciones();
+                        cargarTablaTransitorias();
                     },
                     error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: xhr.responseJSON?.message || 'No fue posible eliminar la condición.'
-                        });
+                        mostrarToast('error', xhr.responseJSON?.message || 'No fue posible eliminar.');
                     }
                 });
             });

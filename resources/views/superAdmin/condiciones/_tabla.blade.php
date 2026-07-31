@@ -7,7 +7,7 @@
                 <th class="text-center">Estudiantes</th>
                 <th class="text-center">Estado</th>
                 <th>Sistema</th>
-                <th class="text-center">PDF</th>
+                <th class="text-center">Vista info</th>
                 <th>Última edición</th>
                 <th style="text-align:center">Acciones</th>
             </tr>
@@ -54,18 +54,14 @@
                         @endif
                     </td>
                     <td class="text-center">
-                        @if ($condicion->documento)
+                        @if ($condicion->vista_info_asociada)
                             <button type="button" class="btn-accion btn btn-success"
-                                onclick="abrirModalDocumentoCondicion({{ $condicion->id }})"
-                                title="Ver / editar PDF">
-                                <i class="fa-solid fa-file-pdf"></i> Ver PDF
+                                onclick="abrirModalVerInfoCondicion({{ $condicion->id }})"
+                                title="{{ $condicion->vista_info_asociada }}">
+                                <i class="fa-solid fa-eye"></i> Ver
                             </button>
                         @else
-                            <button type="button" class="btn-accion btn btn-warning"
-                                onclick="abrirModalDocumentoCondicion({{ $condicion->id }})"
-                                title="Subir PDF">
-                                <i class="fa-solid fa-upload"></i> Subir PDF
-                            </button>
+                            <span class="badge badge-gray">Sin vista</span>
                         @endif
                     </td>
                     <td style="color:#64748B">
@@ -87,6 +83,13 @@
                                             onclick="abrirModalEditarCondicion({{ $condicion->id }})">
                                             <i class="fa-solid fa-pencil"></i>
                                             Editar
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="btn-accion"
+                                            onclick="abrirModalVistaInfoAsociada({{ $condicion->id }}, @js($condicion->vista_info_asociada ?? ''), @js($condicion->nombre))">
+                                            <i class="fa-solid fa-file-code"></i>
+                                            {{ $condicion->vista_info_asociada ? 'Editar vista info' : 'Asociar vista info' }}
                                         </button>
                                     </li>
                                     @if (!$condicion->es_sistema)

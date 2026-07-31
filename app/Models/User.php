@@ -11,7 +11,7 @@ class User extends Authenticatable
     use Notifiable;
 
     // apellido e identificacion viven en users (datos de la cuenta).
-    protected $fillable = ['id', 'nombre', 'apellido', 'identificacion', 'email', 'password', 'rol', 'activo'];
+    protected $fillable = ['id', 'nombre', 'apellido', 'identificacion', 'email', 'password', 'rol', 'activo', 'institucion_id'];
 
     protected $hidden = ['password', 'remember_token'];
 

@@ -122,6 +122,9 @@ class InstitucionSuperAdminController extends Controller
                 ];
             }
 
+            // insertar todas las condiciones del sistema por defecto en la tabla condiciones_orden
+            $condiciones = Condicion::all();
+
             $institucion->ambientes()->sync($relaciones);
 
             return [

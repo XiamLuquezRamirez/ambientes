@@ -5,13 +5,13 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\CondicionInclusion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 
 class CondicionInclusionController extends Controller
 {
     public function index(Request $request)
     {
         $consulta = CondicionInclusion::query()
-            ->with('documento')
             ->withCount([
                 'estudiantes',
                 'estudiantes as estudiantes_activos_count' => fn ($q) => $q->where('activo', true),
@@ -63,9 +63,80 @@ class CondicionInclusionController extends Controller
                 'estado' => (int) $condicionInclusion->estado,
                 'color_hex' => $condicionInclusion->color_hex,
                 'es_sistema' => (bool) $condicionInclusion->es_sistema,
+                'vista_info_asociada' => $condicionInclusion->vista_info_asociada,
                 'estudiantes_count' => $condicionInclusion->estudiantes_count,
                 'estudiantes_activos_count' => $condicionInclusion->estudiantes_activos_count,
             ],
+        ]);
+    }
+
+    public function actualizarVistaInfo(Request $request, CondicionInclusion $condicionInclusion)
+    {
+        $datos = $request->validate([
+            'vista_info_asociada' => [
+                'nullable',
+                'string',
+                'max:100'
+            ],
+        ]);
+        $vista = isset($datos['vista_info_asociada'])
+            ? trim($datos['vista_info_asociada'])
+            : null;
+
+        if ($vista === '') {
+            $vista = null;
+        }
+
+        if ($vista !== null && ! View::exists($vista)) {
+            return response()->json([
+                'success' => false,
+                'message' => "La vista \"{$vista}\" no existe en el sistema.",
+                'errors' => [
+                    'vista_info_asociada' => ["La vista \"{$vista}\" no existe."],
+                ],
+            ], 422);
+        }
+
+        $condicionInclusion->update(['vista_info_asociada' => $vista]);
+
+        return response()->json([
+            'success' => true,
+            'message' => $vista
+                ? 'Vista de información asociada correctamente.'
+                : 'Vista de información eliminada.',
+            'vista_info_asociada' => $vista,
+        ]);
+    }
+
+    public function verVistaInfo(CondicionInclusion $condicionInclusion)
+    {
+        $vista = $condicionInclusion->vista_info_asociada;
+
+        if (! $vista) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Esta condición no tiene una vista de información asociada.',
+            ], 422);
+        }
+
+        if (! View::exists($vista)) {
+            return response()->json([
+                'success' => false,
+                'message' => "La vista \"{$vista}\" no existe o fue eliminada.",
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'condicion' => [
+                'id' => $condicionInclusion->id,
+                'codigo' => $condicionInclusion->codigo,
+                'nombre' => $condicionInclusion->nombre,
+                'vista_info_asociada' => $vista,
+            ],
+            'html' => view($vista, [
+                'condicion' => $condicionInclusion,
+            ])->render(),
         ]);
     }
 
@@ -89,7 +160,7 @@ class CondicionInclusionController extends Controller
     public function actualizar(Request $request, CondicionInclusion $condicionInclusion)
     {
         $datos = $request->validate([
-            'nombre' => 'required|string|max:100|min:3',
+            'nombre' => 'required|string|max:100|min:10',
             'descripcion_corta' => 'required|string',
             'color_hex' => ['required', 'string', 'max:7', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'es_sistema' => 'nullable|boolean',
@@ -167,7 +238,7 @@ class CondicionInclusionController extends Controller
     private function validar(Request $request): array
     {
         return $request->validate([
-            'nombre' => 'required|string|max:100|min:3',
+            'nombre' => 'required|string|max:100|min:10',
             'descripcion_corta' => 'required|string',
             'estado' => 'nullable',
             'color_hex' => ['nullable', 'string', 'max:7', 'regex:/^#[0-9A-Fa-f]{6}$/'],

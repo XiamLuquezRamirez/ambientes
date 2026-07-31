@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CondicionInclusion extends Model
 {
@@ -23,6 +22,7 @@ class CondicionInclusion extends Model
         'estado',
         'color_hex',
         'es_sistema',
+        'vista_info_asociada',
     ];
 
     protected $casts = [
@@ -51,9 +51,9 @@ class CondicionInclusion extends Model
         return $this->hasMany(Estudiante::class, 'condicion_id');
     }
 
-    public function documento(): HasOne
+    public function condicionesTransitorias(): HasMany
     {
-        return $this->hasOne(DocumentoCondicion::class, 'condicion_id');
+        return $this->hasMany(CondicionTransitoria::class, 'condicion_base_id');
     }
 
     public function activa(): bool

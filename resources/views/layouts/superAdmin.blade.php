@@ -64,13 +64,13 @@
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
                             <a href="{{ route('superadmin.condiciones.index') }}"
-                                class="{{ request()->routeIs('superadmin.condiciones*') ? 'active nav-link' : 'nav-link' }}"
+                                class="{{ request()->routeIs('superadmin.condiciones.*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-layer-group" style="font-size:.8em"></i> Condiciones Globales
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#"
+                            <a href="{{ route('superadmin.condiciones-transitorias.index') }}"
                                 class="{{ request()->routeIs('superadmin.condiciones-transitorias*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-list-check" style="font-size:.8em"></i> Condiciones Transitorias Globales

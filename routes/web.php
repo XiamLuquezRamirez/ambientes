@@ -26,7 +26,7 @@ use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SuperAdmin\CondicionInclusionController;
-use App\Http\Controllers\SuperAdmin\DocumentoCondicionController;
+use App\Http\Controllers\SuperAdmin\CondicionTransitoriaController;
 use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use Illuminate\Support\Facades\Route;
@@ -284,12 +284,16 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::get('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'mostrar'])->name('superadmin.condiciones.mostrar');
     Route::put('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'actualizar'])->name('superadmin.condiciones.actualizar');
     Route::patch('condiciones/{condicionInclusion}/estado', [CondicionInclusionController::class, 'cambiarEstado'])->name('superadmin.condiciones.estado');
+    Route::patch('condiciones/{condicionInclusion}/vista-info', [CondicionInclusionController::class, 'actualizarVistaInfo'])->name('superadmin.condiciones.vista-info.actualizar');
+    Route::get('condiciones/{condicionInclusion}/vista-info', [CondicionInclusionController::class, 'verVistaInfo'])->name('superadmin.condiciones.vista-info.ver');
     Route::delete('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'eliminar'])->name('superadmin.condiciones.eliminar');
 
-    Route::get('condiciones/{condicionInclusion}/documento', [DocumentoCondicionController::class, 'mostrar'])->name('superadmin.condiciones.documento.mostrar');
-    Route::post('condiciones/{condicionInclusion}/documento', [DocumentoCondicionController::class, 'guardar'])->name('superadmin.condiciones.documento.guardar');
-    Route::get('condiciones/{condicionInclusion}/documento/ver', [DocumentoCondicionController::class, 'ver'])->name('superadmin.condiciones.documento.ver');
-    Route::delete('condiciones/{condicionInclusion}/documento', [DocumentoCondicionController::class, 'eliminar'])->name('superadmin.condiciones.documento.eliminar');
+    Route::get('condiciones-transitorias', [CondicionTransitoriaController::class, 'index'])->name('superadmin.condiciones-transitorias.index');
+    Route::post('condiciones-transitorias', [CondicionTransitoriaController::class, 'guardar'])->name('superadmin.condiciones-transitorias.guardar');
+    Route::get('condiciones-transitorias/{condicionTransitoria}', [CondicionTransitoriaController::class, 'mostrar'])->name('superadmin.condiciones-transitorias.mostrar');
+    Route::put('condiciones-transitorias/{condicionTransitoria}', [CondicionTransitoriaController::class, 'actualizar'])->name('superadmin.condiciones-transitorias.actualizar');
+    Route::patch('condiciones-transitorias/{condicionTransitoria}/estado', [CondicionTransitoriaController::class, 'cambiarEstado'])->name('superadmin.condiciones-transitorias.estado');
+    Route::delete('condiciones-transitorias/{condicionTransitoria}', [CondicionTransitoriaController::class, 'eliminar'])->name('superadmin.condiciones-transitorias.eliminar');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────
