@@ -4,6 +4,8 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
+use App\Models\CondicionInclusion;
+use App\Models\CondicionTransitoria;
 use App\Models\Institucion;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -14,21 +16,32 @@ use Illuminate\Support\Str;
 
 class InstitucionSuperAdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(
+        private readonly CondicionOrdenController $condicionOrdenController,
+        private readonly CondicionTransitoriaOrdenController $condicionTransitoriaOrdenController,
+    ) {}
+
     public function index()
     {
-
         $instituciones = Institucion::with('ambientes')->get();
         $ambientes = Ambiente::all();
+        $condiciones = CondicionInclusion::query()->ordenadas()->get();
 
-        return view('superAdmin.instituciones.index', compact('instituciones', 'ambientes'));
+        // solo las del sistemas y adicionales creadas por el super admin
+        $condicionesTransitorias = CondicionTransitoria::query()
+            ->with('condicionBase')
+            ->where('id_institucion', null)
+            ->ordenadas()
+            ->get();
+
+        return view('superAdmin.instituciones.index', compact(
+            'instituciones',
+            'ambientes',
+            'condiciones',
+            'condicionesTransitorias'
+        ));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function ver($id)
     {
         $institucion = Institucion::findOrFail($id);
@@ -36,12 +49,11 @@ class InstitucionSuperAdminController extends Controller
         return response()->json([
             'success' => true,
             'data' => $institucion,
+            'condiciones_orden' => $this->condicionOrdenController->listarPorInstitucion((int) $id),
+            'condiciones_transitorias_orden' => $this->condicionTransitoriaOrdenController->listarPorInstitucion((int) $id),
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function guardar(Request $request)
     {
         $datos = $request->validate([
@@ -53,9 +65,7 @@ class InstitucionSuperAdminController extends Controller
 
             'ambientes.*.ip' => [
                 function ($attribute, $value, $fail) use ($request) {
-
                     preg_match('/ambientes\.(\d+)\./', $attribute, $match);
-
                     $ambienteId = $match[1] ?? null;
 
                     if (
@@ -68,10 +78,11 @@ class InstitucionSuperAdminController extends Controller
             ],
 
             'ambientes.*.puerto' => 'nullable|integer|min:1|max:65535',
+            'condiciones_orden' => 'nullable|array',
+            'condiciones_transitorias_orden' => 'nullable|array',
         ]);
 
-        $institucion = DB::transaction(function () use ($datos, $request) {
-
+        $resultado = DB::transaction(function () use ($datos, $request) {
             $logo = null;
 
             if ($request->hasFile('logo_url')) {
@@ -110,7 +121,6 @@ class InstitucionSuperAdminController extends Controller
             $relaciones = [];
 
             foreach ($request->input('ambientes', []) as $ambienteId => $config) {
-
                 if (! isset($config['activo'])) {
                     continue;
                 }
@@ -122,10 +132,17 @@ class InstitucionSuperAdminController extends Controller
                 ];
             }
 
-            // insertar todas las condiciones del sistema por defecto en la tabla condiciones_orden
-            $condiciones = Condicion::all();
-
             $institucion->ambientes()->sync($relaciones);
+
+            $this->condicionOrdenController->sincronizarParaInstitucion(
+                (int) $institucion->id,
+                $request->input('condiciones_orden', [])
+            );
+
+            $this->condicionTransitoriaOrdenController->sincronizarParaInstitucion(
+                (int) $institucion->id,
+                $request->input('condiciones_transitorias_orden', [])
+            );
 
             return [
                 'institucion' => $institucion,
@@ -139,12 +156,12 @@ class InstitucionSuperAdminController extends Controller
             'success' => true,
             'message' => 'Institución creada correctamente.',
             'credenciales' => [
-                'correo' => $institucion['email'],
-                'password' => $institucion['password'],
+                'correo' => $resultado['email'],
+                'password' => $resultado['password'],
             ],
             'usuario' => [
-                'id' => $institucion['usuario']->id,
-                'nombre' => $institucion['usuario']->nombre,
+                'id' => $resultado['usuario']->id,
+                'nombre' => $resultado['usuario']->nombre,
             ],
         ]);
     }
@@ -157,14 +174,30 @@ class InstitucionSuperAdminController extends Controller
             'municipio' => 'required|string|max:100',
             'departamento' => 'required|string|max:100',
             'correo_contacto' => 'required|email',
+            'condiciones_orden' => 'nullable|array',
+            'condiciones_transitorias_orden' => 'nullable|array',
         ]);
 
         $institucion = Institucion::findOrFail($id);
 
-        $institucion = DB::transaction(function () use ($institucion, $datos) {
-            $institucion->update($datos);
+        DB::transaction(function () use ($institucion, $datos, $request) {
+            $institucion->update([
+                'nombre' => $datos['nombre'],
+                'codigo_dane' => $datos['codigo_dane'],
+                'municipio' => $datos['municipio'],
+                'departamento' => $datos['departamento'],
+                'correo_contacto' => $datos['correo_contacto'],
+            ]);
 
-            return $institucion;
+            $this->condicionOrdenController->sincronizarParaInstitucion(
+                (int) $institucion->id,
+                $request->input('condiciones_orden', [])
+            );
+
+            $this->condicionTransitoriaOrdenController->sincronizarParaInstitucion(
+                (int) $institucion->id,
+                $request->input('condiciones_transitorias_orden', [])
+            );
         });
 
         return response()->json([
@@ -175,7 +208,6 @@ class InstitucionSuperAdminController extends Controller
 
     public function generarPdf($id)
     {
-        // Verificar si la institución tiene una cuenta activa
         $usuario = User::findOrFail($id);
         $password = session()->pull('password_temporal');
         $pdf = Pdf::loadView(
@@ -192,41 +224,26 @@ class InstitucionSuperAdminController extends Controller
         return $pdf->download($nombreArchivo);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //

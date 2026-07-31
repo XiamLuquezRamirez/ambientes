@@ -20,4 +20,14 @@ class Institucion extends Model
         )->withPivot('ip', 'puerto', 'activo')
             ->withTimestamps();
     }
+
+    public function condicionesOrden()
+    {
+        return $this->hasMany(CondicionOrden::class, 'id_institucion');
+    }
+
+    public function condicionesTransitoriasOrden()
+    {
+        return $this->hasMany(CondicionTransitoriaOrden::class, 'id_institucion');
+    }
 }
