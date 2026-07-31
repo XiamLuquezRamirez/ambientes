@@ -197,27 +197,6 @@ insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servido
 (3,'Estudiante',1,'update','multisensorial','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (4,'Estudiante',1,'update','tecnologia','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02');
 
-/*Table structure for table `condiciones` */
-
-DROP TABLE IF EXISTS `condiciones`;
-
-CREATE TABLE `condiciones` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` text DEFAULT NULL,
-  `estado` int(11) DEFAULT 1,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7  COLLATE=utf8mb4_general_ci;
-
-/*Data for the table `condiciones` */
-
-insert  into `condiciones`(`id`,`nombre`,`estado`) values
-(1,'Estandar',1),
-(2,'TDAH',1),
-(3,'TEA',1),
-(4,'Sindrome de Down',1),
-(5,'Discapacidad Visual',1),
-(6,'Discapacidad Auditiva',1);
-
 /*Table structure for table `configuracion_pins` */
 
 DROP TABLE IF EXISTS `configuracion_pins`;
@@ -1947,7 +1926,7 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `rol` enum(
-    'superadmin',
+    'superAdmin',
     'admin',
     'docente'
   ) NOT NULL DEFAULT 'docente',
@@ -2000,6 +1979,11 @@ insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password
 (14,'5345345','Camila Andrea ','Mora','camila.mora@aulasreggio.test','$2y$10$ZVq5aurxoqa1KVRv7LgujO.zag/lhphPOf.0MsNkhgUulU3U./QmG','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
 (15,'657567567','Ricardo Andres ','Silva','ricardo.silva@aulasreggio.test','$2y$10$.bghvK6emeHQyaxnz3V2vOZVc1s/RkeSQpA8NZOdOrkqF29iGberC','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL);
 
+/* insertar superadmin password: password */
+
+INSERT INTO `users` (`id`, `identificacion`, `nombre`, `apellido`, `email`, `password`, `rol`, `estado`, `remember_token`, `created_at`, `updated_at`, `bloqueado_en`) VALUES
+(1, '1234567890', 'Super', 'Admin', 'superadmin@aulasreggio.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'superadmin', 'activo', NULL, '2026-06-16 17:32:50', '2026-06-16 17:32:50', NULL);
+
 DROP TABLE IF EXISTS `seguridad_logs`;
 
 CREATE TABLE `seguridad_logs` (
@@ -2034,27 +2018,6 @@ CREATE TABLE `seguridad_logs` (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-
-/*Table structure for table `condiciones` */
-
-DROP TABLE IF EXISTS `condiciones`;
-
-CREATE TABLE `condiciones` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` text COLLATE utf8mb4_general_ci,
-  `estado` int DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 ;
-
-/*Data for the table `condiciones` */
-
-insert  into `condiciones`(`id`,`nombre`,`estado`) values
-(1,'Estandar',1),
-(2,'TDAH',1),
-(3,'TEA',1),
-(4,'Sindrome de Down',1),
-(5,'Discapacidad Visual',1),
-(6,'Discapacidad Auditiva',1);
 
 /*Table structure for table `piar` */
 
@@ -2565,7 +2528,47 @@ INSERT INTO ambiente_institucion (
     '1'
 );
 
+/*Table structure for table `condiciones` */
 
+DROP TABLE IF EXISTS `condiciones`;
+
+CREATE TABLE condiciones (
+  id INT AUTO_INCREMENT PRIMARY KEY, -- Genera el ID secuencial automáticamente
+  codigo VARCHAR(50) UNIQUE NOT NULL,
+  nombre VARCHAR(100) NOT NULL,
+  descripcion_corta TEXT,
+  estado TINYINT(1) DEFAULT 1,
+  color_hex VARCHAR(7) DEFAULT '#000000',
+  es_sistema BOOLEAN DEFAULT TRUE,
+  fecha_ultima_edicion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+/*Data for the table `condiciones` */
+INSERT INTO condiciones (codigo,nombre,descripcion_corta,estado,color_hex,es_sistema) VALUES
+('COND-001','Estandar','Descripción corta de la condición',1,'#000000',1),
+('COND-002','TDAH','Descripción corta de la condición',1,'#000000',1),
+('COND-003','TEA','Descripción corta de la condición',1,'#000000',1),
+('COND-004','Síndrome de Down','Descripción corta de la condición',1,'#000000',1),
+('COND-005','Discapacidad Visual','Descripción corta de la condición',1,'#000000',1),
+('COND-006','Discapacidad Auditiva','Descripción corta de la condición',1,'#000000',1);
+
+/*Table structure for table `documentos_condiciones` */
+
+DROP TABLE IF EXISTS `documentos_condiciones`;
+
+CREATE TABLE documentos_condiciones (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  condicion_id BIGINT UNSIGNED NOT NULL,
+  nombre_archivo VARCHAR(255) NOT NULL,
+  ruta_archivo VARCHAR(255) NOT NULL,
+  numero_paginas SMALLINT UNSIGNED NOT NULL,
+  tamano_mb DECIMAL(6,2) NOT NULL,
+  usuario_id BIGINT UNSIGNED NOT NULL,
+  fecha_actualizacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
+  ON UPDATE CURRENT_TIMESTAMP
+);
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

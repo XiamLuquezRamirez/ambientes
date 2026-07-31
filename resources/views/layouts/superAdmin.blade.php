@@ -47,6 +47,38 @@
                     <i class="fa-solid fa-university"></i> Instituciones
                 </a>
             </li>
+            @php
+            $condiciones = request()->routeIs('superadmin.condiciones*','superadmin.condiciones-transitorias*');
+            @endphp          
+            <li class="nav-item">
+                <a href="#navCondiciones" data-bs-toggle="collapse" aria-expanded="{{ $condiciones ? 'true' : 'false' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $condiciones ? 'active' : '' }}"
+                    style="cursor:pointer">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Condiciones</span>
+                    <i class="fa-solid fa-chevron-down ms-auto"
+                        style="font-size:.65rem;transition:transform .2s;
+                              {{ $condiciones ? 'transform:rotate(180deg)' : '' }}"></i>
+                </a>
+                <div class="collapse {{ $condiciones ? 'show' : '' }}" id="navCondiciones">
+                    <ul class="nav flex-column" style="padding:2px 0 4px 0">
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.condiciones.index') }}"
+                                class="{{ request()->routeIs('superadmin.condiciones*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-layer-group" style="font-size:.8em"></i> Condiciones Globales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#"
+                                class="{{ request()->routeIs('superadmin.condiciones-transitorias*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-list-check" style="font-size:.8em"></i> Condiciones Transitorias Globales
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
         </ul>
     </aside>
 

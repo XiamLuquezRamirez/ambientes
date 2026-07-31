@@ -446,6 +446,11 @@ tr:hover td {
     color: var(--color-muted);
 }
 
+.badge-orange {
+    background: #FEE2E2;
+    color: #a34900;
+}
+
 /* Buttons */
 .btn {
     display: inline-block;

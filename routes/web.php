@@ -25,6 +25,8 @@ use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\SuperAdmin\CondicionInclusionController;
+use App\Http\Controllers\SuperAdmin\DocumentoCondicionController;
 use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use Illuminate\Support\Facades\Route;
@@ -273,6 +275,18 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::get('principal', [SuperAdminController::class, 'index'])->name('superadmin.principal');
     Route::get('instituciones', [InstitucionSuperAdminController::class, 'index'])->name('superadmin.instituciones.index');
     Route::post('instituciones', [InstitucionSuperAdminController::class, 'guardar'])->name('superadmin.instituciones.guardar');
+
+    Route::get('condiciones', [CondicionInclusionController::class, 'index'])->name('superadmin.condiciones.index');
+    Route::post('condiciones', [CondicionInclusionController::class, 'guardar'])->name('superadmin.condiciones.guardar');
+    Route::get('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'mostrar'])->name('superadmin.condiciones.mostrar');
+    Route::put('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'actualizar'])->name('superadmin.condiciones.actualizar');
+    Route::patch('condiciones/{condicionInclusion}/estado', [CondicionInclusionController::class, 'cambiarEstado'])->name('superadmin.condiciones.estado');
+    Route::delete('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'eliminar'])->name('superadmin.condiciones.eliminar');
+
+    Route::get('condiciones/{condicionInclusion}/documento', [DocumentoCondicionController::class, 'mostrar'])->name('superadmin.condiciones.documento.mostrar');
+    Route::post('condiciones/{condicionInclusion}/documento', [DocumentoCondicionController::class, 'guardar'])->name('superadmin.condiciones.documento.guardar');
+    Route::get('condiciones/{condicionInclusion}/documento/ver', [DocumentoCondicionController::class, 'ver'])->name('superadmin.condiciones.documento.ver');
+    Route::delete('condiciones/{condicionInclusion}/documento', [DocumentoCondicionController::class, 'eliminar'])->name('superadmin.condiciones.documento.eliminar');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────
