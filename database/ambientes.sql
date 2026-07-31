@@ -2496,7 +2496,6 @@ DROP TABLE IF EXISTS `instituciones`;
 CREATE TABLE `instituciones` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
   `municipio` varchar(100) NOT NULL,
   `departamento` varchar(100) NOT NULL,
   `codigo_dane` varchar(20) NOT NULL,
