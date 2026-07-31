@@ -47,6 +47,13 @@
                     <i class="fa-solid fa-university"></i> Instituciones
                 </a>
             </li>
+
+            <li class="nav-item">
+                <a href="{{ route('superadmin.administradores.listar') }}"
+                    class="{{ request()->routeIs('superadmin.administradores.index') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-users"></i> Administradores
+                </a>
+            </li>
         </ul>
     </aside>
 
@@ -88,7 +95,7 @@
             {{-- Dropdown --}}
             <div class="header-dropdown">
 
-                <div class="dropdown-user-card" onclick="window.location.href='{{ route('panel.perfil') }}'">
+                <div class="dropdown-user-card">
                     <div class="dropdown-avatar" id="dropdownAvatar">
                         <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
                             class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
@@ -103,19 +110,6 @@
                         <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
                     </div>
                 </div>
-
-                <div class="dropdown-section">
-                    <a href="{{ route('panel.perfil') }}" class="dropdown-item">
-                        <i class="fa-solid fa-user"></i>
-                        Mi Perfil
-                    </a>
-                    <a href="#" class="dropdown-item" onclick="abrirModalCambiarContrasena(); return false;">
-                        <i class="fa-solid fa-key"></i>
-                        Cambiar contraseña
-                    </a>
-                </div>
-
-                <div class="dropdown-divider"></div>
 
                 <div class="dropdown-section">
                     <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">

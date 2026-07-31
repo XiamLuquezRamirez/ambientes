@@ -25,6 +25,7 @@ use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\SuperAdmin\AdminsSuperAdminController;
 use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use Illuminate\Support\Facades\Route;
@@ -271,11 +272,21 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 // ── Super Admin ─────────────────────────────────────────────────────────
 Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::get('principal', [SuperAdminController::class, 'index'])->name('superadmin.principal');
+
+    // Instituciones
     Route::get('instituciones', [InstitucionSuperAdminController::class, 'index'])->name('superadmin.instituciones.index');
     Route::get('instituciones/datos/{id}', [InstitucionSuperAdminController::class, 'ver'])->name('superadmin.instituciones.ver');
     Route::post('instituciones', [InstitucionSuperAdminController::class, 'guardar'])->name('superadmin.instituciones.guardar');
     Route::put('instituciones/{id}', [InstitucionSuperAdminController::class, 'actualizar'])->name('superadmin.instituciones.actualizar');
+    Route::patch('instituciones/{id}/toggle-activo', [InstitucionSuperAdminController::class, 'toggleActivo'])->name('superadmin.instituciones.toggleActivo');
+    Route::post('instituciones/{id}/logo', [InstitucionSuperAdminController::class, 'subirLogo'])->name('superadmin.instituciones.logo');
+    Route::delete('instituciones/{id}/logo', [InstitucionSuperAdminController::class, 'eliminarLogo'])->name('superadmin.instituciones.logo.eliminar');
     Route::get('instituciones/{usuario_id}/generar-pdf', [InstitucionSuperAdminController::class, 'generarPdf'])->name('superadmin.instituciones.generar-pdf');
+
+    // Administradores
+    Route::get('administradores', [AdminsSuperAdminController::class, 'listar'])->name('superadmin.administradores.listar');
+    Route::post('administradores', [AdminsSuperAdminController::class, 'guardar'])->name('superadmin.administradores.guardar');
+    Route::put('administradores/{id}', [AdminsSuperAdminController::class, 'actualizar'])->name('superadmin.administradores.actualizar');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

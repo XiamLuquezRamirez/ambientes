@@ -29,6 +29,7 @@ class AuthDocenteController extends Controller
         }
 
         $usuario = Auth::guard('docente')->user();
+        $usuario->loadMissing('institucion', 'docente');
 
         if ($usuario->estado !== 'activo') {
             Auth::guard('docente')->logout();
@@ -36,6 +37,16 @@ class AuthDocenteController extends Controller
             $request->session()->regenerateToken();
 
             return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra inactiva.');
+        }
+        if ($usuario->institucionSuspendida()) {
+            Auth::guard('docente')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('docente.login')->with(
+                'error',
+                'La institución se encuentra suspendida. No es posible iniciar sesión.'
+            );
         }
         if ($usuario->docente && in_array($usuario->docente->estado, ['inactivo', 'eliminado'], true)) {
             Auth::guard('docente')->logout();

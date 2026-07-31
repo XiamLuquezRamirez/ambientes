@@ -11,15 +11,44 @@ class User extends Authenticatable
     use Notifiable;
 
     // apellido e identificacion viven en users (datos de la cuenta).
-    protected $fillable = ['id', 'nombre', 'apellido', 'identificacion', 'email', 'password', 'rol', 'activo'];
+    protected $fillable = [
+        'institucion_id',
+        'nombre',
+        'apellido',
+        'identificacion',
+        'email',
+        'password',
+        'rol',
+        'estado',
+        'creado_por',
+    ];
 
     protected $hidden = ['password', 'remember_token'];
 
-    protected $casts = ['activo' => 'boolean'];
+    protected $casts = [];
 
     public function docente()
     {
         return $this->hasOne(Docente::class);
+    }
+
+    public function institucion()
+    {
+        return $this->belongsTo(Institucion::class, 'institucion_id');
+    }
+
+    /** True si el colegio del usuario está suspendido (activo = false). SuperAdmin no aplica. */
+    public function institucionSuspendida(): bool
+    {
+        if ($this->esSuperAdmin() || ! $this->institucion_id) {
+            return false;
+        }
+
+        $institucion = $this->relationLoaded('institucion')
+            ? $this->institucion
+            : $this->institucion()->first();
+
+        return $institucion !== null && ! $institucion->activo;
     }
 
     public function loginLogs()
@@ -102,5 +131,10 @@ class User extends Authenticatable
         // al menos un login asociado al usuario.
         // Si no existe ninguno, retorna true.
         return ! $this->loginLogs()->exists();
+    }
+
+    public function creador()
+    {
+        return $this->belongsTo(User::class, 'creado_por');
     }
 }

@@ -20,6 +20,17 @@ class EsDocente
             abort(403, 'Acceso denegado');
         }
 
+        if ($usuario->institucionSuspendida()) {
+            Auth::guard('docente')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('docente.login')->with(
+                'error',
+                'La institución se encuentra suspendida. No es posible iniciar sesión.'
+            );
+        }
+
         $cargasActivas = $usuario->docente
             ?->cargasActivas()
             ->with(['ambiente', 'grado', 'grupo'])

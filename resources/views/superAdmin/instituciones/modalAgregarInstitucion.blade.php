@@ -1,22 +1,26 @@
 {{--
-    Modal: Agregar Institución (Super Admin)
-    - Tab 1: datos básicos + logo
-    - Tab 2: IP/puerto/activo por ambiente (name ambientes[id][...]; el backend espera "activo")
-    - Tab 3: módulos (pendiente de implementar)
-    Envío vía AJAX (FormData) → superadmin.instituciones.guardar
+    Modal: Agregar / Editar Institución (Super Admin)
+    - Tab 1: datos básicos + avatar de logo (abre modalLogoInstitucion)
+    - Tab 2: IP/puerto/activo por ambiente (name ambientes[id][...]; backend espera "activo")
+    - Tab 3: módulos (pendiente)
+
+    Crear  → POST  superadmin/instituciones
+    Editar → POST  superadmin/instituciones/{id} + _method=PUT  (FormData + multipart)
+    Logo   → gestionado en modalLogoInstitucion (independiente al guardar datos)
 --}}
 <div class="modal fade" id="modalAgregarInstitucion" tabindex="-1" data-bs-keyboard="false"
-    aria-labelledby="modalAgregarInstitucionTitle" aria-hidden="true">
+    aria-labelledby="modalAgregarInstitucionLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-header-icon"><i id="modalAgregarInstitucionIcon"></i>
+                <div class="modal-header-icon">
+                    <i id="modalAgregarInstitucionIcon" class="fas fa-university text-white"></i>
                 </div>
                 <div class="flex-grow-1">
                     <h5 class="modal-title mb-0" style="font-size: 1.4rem;" id="modalAgregarInstitucionLabel">
                         Agregar Institución</h5>
-                    <p class="modal-subtitle mb-0" id="modalAgregarInstitucionSubtitle">Ingrese los datos de la nueva
-                        institución.</p>
+                    <p class="modal-subtitle mb-0" id="modalAgregarInstitucionSubtitle">
+                        Ingrese los datos de la nueva institución.</p>
                 </div>
                 <button type="button" class="btn-close" id="btnCloseModalAgregarInstitucion" data-bs-dismiss="modal"
                     aria-label="Cerrar"></button>
@@ -46,10 +50,32 @@
                 <form id="formAgregarInstitucion" enctype="multipart/form-data" method="POST">
                     @csrf
                     <div class="tab-content" style="padding: 20px;">
-                        {{-- Tab: datos de la institución --}}
                         <div class="tab-pane container active" id="datosInstitucion" role="tabpanel"
                             aria-labelledby="tab-datos-institucion">
                             <div class="row">
+                                {{-- Avatar: misma UX que foto de perfil (overlay → modal de logo) --}}
+                                <div class="col-md-12 d-flex justify-content-center align-items-center">
+                                    <div class="mb-3">
+                                        <div class="avatar-wrapper mx-auto">
+                                            <div class="profile-avatar" id="logoPerfilPrincipal"
+                                                onclick="cambiarLogoPerfil()" title="Cambiar logo"
+                                                style="cursor:pointer;">
+                                                <img src="" id="logoPerfilImagen"
+                                                    class="profile-avatar-img d-none" alt="Logo institución">
+                                                <span id="logoPerfilIniciales" class="profile-avatar-iniciales">
+                                                    IE
+                                                </span>
+                                                <div class="avatar-overlay">
+                                                    <i class="fa-solid fa-camera"></i>
+                                                    <span>Cambiar logo</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="text-muted text-center small mt-2 mb-0">
+                                            JPG o PNG · máx. 2 MB · <span class="text-danger">obligatorio</span>
+                                        </p>
+                                    </div>
+                                </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold" for="nombre">Nombre</label>
@@ -74,8 +100,9 @@
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold" for="departamento">Departamento</label>
-                                        <input type="text" id="departamento" name="departamento" class="form-control"
-                                            placeholder="Departamento de la institución" required>
+                                        <input type="text" id="departamento" name="departamento"
+                                            class="form-control" placeholder="Departamento de la institución"
+                                            required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -87,31 +114,12 @@
                                             required>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        {{-- name logo_url: el controller guarda en storage y persiste en columna logo --}}
-                                        <label class="form-label fw-bold" for="logo_url">Logo</label>
-                                        <input type="file" id="logo_url" name="logo_url" class="form-control"
-                                            accept="image/*" onchange="previewImage(event, '#imgPreviewLogo')">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <span class="form-label fw-bold d-block" id="lblVistaPreviaLogo">Vista previa
-                                            del logo</span>
-                                        <img id="imgPreviewLogo" class="w-50 mt-1 d-none" src=""
-                                            alt="Vista previa del logo de la institución">
-                                    </div>
-                                </div>
                             </div>
                         </div>
 
                         {{--
-                            Tab: servidores
-                            name debe coincidir con InstitucionSuperAdminController::guardar():
-                            - ambientes[id][ip]
-                            - ambientes[id][puerto]
-                            - ambientes[id][activo]  ← checkbox; sin este name no se sincroniza el ambiente
+                            Tab servidores — names alineados con InstitucionSuperAdminController:
+                            ambientes[id][ip|puerto|activo]
                         --}}
                         <div class="tab-pane container" id="servidores" role="tabpanel"
                             aria-labelledby="tab-servidores">
@@ -122,7 +130,7 @@
                                             <th>Servidor</th>
                                             <th>IP</th>
                                             <th class="text-center">Puerto</th>
-                                            <th>Estado</th>
+                                            <th class="text-center">Activo</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -135,7 +143,7 @@
                                                     <input type="text" class="form-control"
                                                         id="ambiente_ip_{{ $a->id }}"
                                                         name="ambientes[{{ $a->id }}][ip]"
-                                                        placeholder="192.168.1.100">
+                                                        placeholder="192.168.1.100" autocomplete="off">
                                                 </td>
                                                 <td class="text-center">
                                                     <input type="number" class="form-control"
@@ -145,7 +153,8 @@
                                                         max="65535" placeholder="8080">
                                                 </td>
                                                 <td class="text-center">
-                                                    <div class="form-check form-switch">
+                                                    <div
+                                                        class="form-check form-switch d-inline-flex justify-content-center">
                                                         <input class="form-check-input" type="checkbox"
                                                             id="ambiente_activo_{{ $a->id }}"
                                                             name="ambientes[{{ $a->id }}][activo]"
@@ -166,7 +175,6 @@
                             </div>
                         </div>
 
-                        {{-- Tab: módulos — UI pendiente --}}
                         <div class="tab-pane container" id="modulos" role="tabpanel"
                             aria-labelledby="tab-modulos">
                             <p class="text-muted mb-0">La asignación de módulos estará disponible próximamente.</p>
@@ -190,79 +198,79 @@
 @push('scripts')
     <script>
         /**
-         * Modal Agregar Institución — scripts
-         * Depende de: Bootstrap 5 Modal, jQuery, mostrarToast(), modalBSPasswordGenerada (ver_contra_gen).
+         * Modal Agregar/Editar Institución
+         * Depende de: Bootstrap 5, jQuery, mostrarToast(), modalLogoInstitucion, ver_contra_gen.
          */
-        window.URL_INSTITUCIONES = "{{ route('superadmin.instituciones.guardar') }}";
-        const URL_INSTITUCIONES = window.URL_INSTITUCIONES;
-        var tipoPost = 1; // 1: Crear, 2: Editar
+        const URL_INSTITUCIONES_BASE = @json(url('superadmin/instituciones'));
+        const URL_INSTITUCIONES_GUARDAR = @json(route('superadmin.instituciones.guardar'));
+
+        /** 1 = crear, 2 = editar */
+        var tipoPost = 1;
         var id_editar = '';
 
-        const LOGO_PREVIEW_DEFAULT = '';
         const modalElAgregarInstitucion = document.getElementById('modalAgregarInstitucion');
-        const modalBSPasswordGenerada = new bootstrap.Modal(document.getElementById('modalBSPasswordGenerada'));
+        const modalBSPasswordGeneradaEl = document.getElementById('modalBSPasswordGenerada');
+        const modalBSPasswordGenerada = modalBSPasswordGeneradaEl ?
+            new bootstrap.Modal(modalBSPasswordGeneradaEl) :
+            null;
 
-        /**
-         * Obtiene la instancia Bootstrap existente del modal (no crea una nueva).
-         * Crear con `new bootstrap.Modal()` al cerrar no garantiza ocultar el modal ya abierto.
-         */
         function getModalAgregarInstitucion() {
             return bootstrap.Modal.getOrCreateInstance(modalElAgregarInstitucion);
         }
 
         function setBtnInstitucion(modo) {
             const btn = document.getElementById('btnAgregarInstitucion');
+            if (!btn) return;
             btn.disabled = false;
-            if (modo === 'crear') {
+            if (modo === 'creando') {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creando…';
+            } else if (modo === 'guardando') {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…';
+            } else if (modo === 'crear') {
                 btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Crear Institución';
             } else {
-                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar';
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios';
             }
         }
 
-        /** Abre el modal y deja el formulario limpio para un alta nueva. */
+        /** Abre modal limpio para alta. */
         function abrirModalInstituciones() {
+            tipoPost = 1;
+            id_editar = '';
             $("#modalAgregarInstitucionLabel").text('Agregar Institución');
             $("#modalAgregarInstitucionSubtitle").text('Completa los datos para agregar la institución');
-            $("#modalAgregarInstitucionIcon").html('<i class="fas fa-university text-white"></i>');
-            bootstrap.Tab.getOrCreateInstance(
-                $('a[href="#datosInstitucion"]')[0]
-            ).show();
-            tipoPost = 1;
+            $("#modalAgregarInstitucionIcon").attr('class', 'fas fa-university text-white');
             setBtnInstitucion('crear');
             resetFormAgregarInstitucion();
+            if (typeof window.resetEstadoLogoInstitucion === 'function') {
+                window.resetEstadoLogoInstitucion();
+            }
             getModalAgregarInstitucion().show();
         }
 
-        /* ── Modal Bootstrap 5 – Editar Institución ────────────────────────────── */
+        /** Abre modal en modo edición y carga datos + ambientes + logo. */
         function abrirModalEditarInstitucion(id) {
-            $("#modalAgregarInstitucionLabel").text('Editar Institución');
-            $("#modalAgregarInstitucionSubtitle").text('Completa los datos para editar la institución');
-            $("#modalAgregarInstitucionIcon").html('<i class="fas fa-university text-white"></i>');
-            bootstrap.Tab.getOrCreateInstance(
-                $('a[href="#datosInstitucion"]')[0]
-            ).show();
             tipoPost = 2;
+            id_editar = String(id);
+            $("#modalAgregarInstitucionLabel").text('Editar Institución');
+            $("#modalAgregarInstitucionSubtitle").text('Actualiza datos, servidores o el logo en cualquier momento');
+            $("#modalAgregarInstitucionIcon").attr('class', 'fas fa-pen text-white');
             setBtnInstitucion('editar');
             resetFormAgregarInstitucion();
             getModalAgregarInstitucion().show();
             cargarDatosInstitucion(id);
         }
 
-        /** Cierra el modal usando la instancia activa de Bootstrap. */
         function cerrarModalAgregarInstitucion() {
             bootstrap.Modal.getInstance(modalElAgregarInstitucion)?.hide();
         }
 
-        /** Alias por compatibilidad con botones/handlers existentes. */
         function cerrarModalInstituciones() {
             cerrarModalAgregarInstitucion();
         }
 
-        /**
-         * Limpia campos, errores, preview de logo y vuelve a la primera pestaña.
-         * Se llama al abrir para evitar datos residuales de un intento anterior.
-         */
         function resetFormAgregarInstitucion() {
             const form = document.getElementById('formAgregarInstitucion');
             if (!form) return;
@@ -270,11 +278,10 @@
             form.reset();
             limpiarErroresModal('formAgregarInstitucion');
 
-            const preview = document.getElementById('imgPreviewLogo');
-            if (preview) {
-                preview.src = LOGO_PREVIEW_DEFAULT;
-                preview.classList.add('d-none');
-            }
+            // Desmarca ambientes (reset no siempre limpia bien en algunos browsers con switches).
+            form.querySelectorAll('input[type="checkbox"][name*="[activo]"]').forEach(cb => {
+                cb.checked = false;
+            });
 
             const tabDatos = document.querySelector('#tab-datos-institucion');
             if (tabDatos) {
@@ -282,52 +289,35 @@
             }
         }
 
-        /**
-         * Tras crear la institución, muestra el modal de credenciales del admin generado.
-         * Reutiliza #modalBSPasswordGenerada (include de admin.usuarios.ver_contra_gen).
-         */
         function abrirModalBSPasswordGenerada() {
+            if (!modalBSPasswordGenerada) return;
             $("#modalBSPasswordGeneradaLabel").text('Información de la Institución');
             $("#modalBSPasswordGeneradaSubtitle").text(
                 'La institución se ha creado correctamente. Por favor, anotar la contraseña antes de cerrar.');
-            $("#modalBSPasswordGeneradaIcon").html('<i class="fas fa-info-circle text-white"></i>');
             modalBSPasswordGenerada.show();
         }
 
         function cerrarModalBSPasswordGenerada() {
-            modalBSPasswordGenerada.hide();
+            modalBSPasswordGenerada?.hide();
             window.location.reload();
         }
 
-        /** Quita marcas .is-invalid y mensajes .campo-error del formulario indicado. */
         function limpiarErroresModal(form) {
             document.querySelectorAll(`#${form} .campo-error`).forEach(el => el.remove());
             document.querySelectorAll(`#${form} .is-invalid`).forEach(el => el.classList.remove('is-invalid'));
         }
 
-        /**
-         * Convierte claves de error de Laravel (dot notation) al name HTML del input.
-         * Ej: ambientes.3.ip → ambientes[3][ip]
-         */
         function laravelKeyToInputName(campo) {
-            if (!campo.includes('.')) {
-                return campo;
-            }
-
+            if (!campo.includes('.')) return campo;
             const partes = campo.split('.');
             return partes[0] + partes.slice(1).map(p => `[${p}]`).join('');
         }
 
-        /** Mensajes amigables según regla Laravel / campo de institución. */
         function mensajeValidacionInstitucion(campo, codigo) {
             switch (codigo) {
                 case 'validation.unique':
-                    if (campo === 'codigo_dane') {
-                        return 'Ya existe una institución con este código DANE.';
-                    }
-                    if (campo === 'correo_contacto') {
-                        return 'Ya existe una institución con este correo de contacto.';
-                    }
+                    if (campo === 'codigo_dane') return 'Ya existe una institución con este código DANE.';
+                    if (campo === 'correo_contacto') return 'Ya existe una institución con este correo de contacto.';
                     return 'Este valor ya está registrado.';
                 case 'validation.email':
                     return 'El correo electrónico no es válido.';
@@ -339,108 +329,69 @@
                 case 'validation.required':
                     return 'Este campo es requerido.';
                 default:
-                    // Si Laravel ya envió texto legible (locale es), úsalo; si no, genérico.
-                    return (codigo && !codigo.startsWith('validation.')) ?
+                    return (codigo && !String(codigo).startsWith('validation.')) ?
                         codigo :
                         'Revise este campo.';
             }
         }
 
-        /**
-         * Pinta errores 422 bajo cada input y enfoca el primero.
-         * Si el campo está en otra pestaña (p. ej. IP de servidores), activa esa tab.
-         */
         function mostrarErroresModal(errors, form) {
             limpiarErroresModal(form);
+            if (!errors) return;
 
             let primerInput = null;
 
             $.each(errors, function(campo, mensajes) {
                 const nameAttr = laravelKeyToInputName(campo);
-                // Escapa caracteres especiales de name (corchetes) para el selector jQuery.
                 const $input = $(document.getElementById(form)).find(`[name="${nameAttr}"]`);
                 if (!$input.length) return;
 
                 $input.addClass('is-invalid');
-
-                const codigo = mensajes[0];
-                const mensaje = mensajeValidacionInstitucion(campo, codigo);
-
                 $('<div>', {
                     class: 'campo-error invalid-feedback d-block',
-                    text: mensaje
+                    text: mensajeValidacionInstitucion(campo, mensajes[0])
                 }).insertAfter($input);
 
-                if (!primerInput) {
-                    primerInput = $input.get(0);
-                }
+                if (!primerInput) primerInput = $input.get(0);
             });
 
             if (!primerInput) return;
 
-            // Activa la pestaña que contiene el primer campo con error.
             const tabPane = primerInput.closest('.tab-pane');
             if (tabPane && !tabPane.classList.contains('active')) {
                 const tabTrigger = document.querySelector(`[href="#${tabPane.id}"]`);
-                if (tabTrigger) {
-                    bootstrap.Tab.getOrCreateInstance(tabTrigger).show();
-                }
+                if (tabTrigger) bootstrap.Tab.getOrCreateInstance(tabTrigger).show();
             }
-
             primerInput.focus();
         }
 
         /**
-         * Vista previa del logo seleccionado.
-         * Local a este partial: en superAdmin no existe previewImage de admin/usuarios.
+         * Crear (POST) o actualizar (POST + _method PUT con FormData).
+         * Logo obligatorio: en alta viaja en inputLogoPendiente; en edición debe existir ya.
          */
-        function previewImage(event, previewSelector) {
-            const input = event.target;
-            const preview = document.querySelector(previewSelector);
+        async function guardarInstitucion() {
+            const form = document.getElementById('formAgregarInstitucion');
+            const formData = new FormData(form);
 
-            if (!preview || !input.files || !input.files.length) {
-                return;
-            }
+            if (tipoPost === 1) {
+                const logoPendiente = document.getElementById('inputLogoPendiente');
+                if (!logoPendiente?.files?.length) {
+                    mostrarToast('error', 'El logo de la institución es obligatorio.');
+                    if (typeof window.cambiarLogoPerfil === 'function') {
+                        window.cambiarLogoPerfil();
+                    }
+                    return;
+                }
 
-            const file = input.files[0];
-
-            if (!file.type.startsWith('image/')) {
-                mostrarToast('error', 'Seleccione un archivo de imagen.');
-                input.value = '';
-                preview.src = LOGO_PREVIEW_DEFAULT;
-                preview.classList.add('d-none');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                preview.classList.remove('d-none');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        /**
-         * POST FormData al endpoint de guardar.
-         * Éxito: cierra este modal y abre el de credenciales del admin generado.
-         * 422: errores inline + toast.
-         */
-        function guardarInstitucion() {
-            if (tipoPost == 1) {
-                const btn = document.getElementById('btnAgregarInstitucion');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Creando Institución…';
-                const form = document.getElementById('formAgregarInstitucion');
-                const formData = new FormData(form);
+                setBtnInstitucion('creando');
 
                 $.ajax({
-                    url: URL_INSTITUCIONES,
+                    url: URL_INSTITUCIONES_GUARDAR,
                     type: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
                     dataType: 'json',
-
                     success: function(res) {
                         if (!res.success) {
                             mostrarToast('error', res.message);
@@ -448,106 +399,175 @@
                         }
 
                         const credenciales = res.credenciales;
-
                         document.getElementById('passwordGenerada').value = credenciales.password;
                         document.getElementById('asignar_email').value = credenciales.correo;
+
                         const btnPdf = document.getElementById('btnDescargarPdf');
-                        btnPdf.dataset.usuarioId = res.usuario.id;
-                        btnPdf.dataset.nombre = res.usuario.nombre;
+                        if (btnPdf && res.usuario) {
+                            btnPdf.dataset.usuarioId = res.usuario.id;
+                            btnPdf.dataset.nombre = res.usuario.nombre;
+                        }
+
                         cerrarModalAgregarInstitucion();
                         abrirModalBSPasswordGenerada();
                     },
-
                     error: function(xhr) {
-                        Swal.close();
-                        const mensaje = xhr.responseJSON?.message ?? '';
-                        if (mensaje.includes('validation.')) {
-                            mostrarToast('error', 'Verifique los datos ingresados');
-                            mostrarErroresModal(xhr.responseJSON?.errors ?? {}, 'formUsuario');
-                        } else {
-                            mostrarToast('error', mensaje || 'Error al crear el usuario');
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON?.errors ?? {};
+                            const msgLogo = errors.logo?.[0];
+                            mostrarToast('error', msgLogo || 'Verifique los datos ingresados');
+                            mostrarErroresModal(errors, 'formAgregarInstitucion');
+                            return;
                         }
+                        mostrarToast('error', xhr.responseJSON?.message || 'Error al crear la institución');
                     },
                     complete: function() {
                         setBtnInstitucion('crear');
                     }
                 });
-            } else if (tipoPost == 2) {
-                const btn = document.getElementById('btnAgregarInstitucion');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardando…';
-                const form = document.getElementById('formAgregarInstitucion');
-                const formData = new FormData(form);
-                const id = id_editar;
+                return;
+            }
 
+            // Editar: PHP no parsea multipart en PUT → POST + _method
+            if (tipoPost === 2) {
+                if (!id_editar) {
+                    mostrarToast('error', 'No se identificó la institución a editar.');
+                    return;
+                }
+
+                if (huboCambioIp()) {
+                    const result = await Swal.fire({
+                        title: '¿Cambiar la IP?',
+                        text: 'Cambiar la IP puede interrumpir la sincronización activa. ¿Continuar?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, continuar',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true,
+                    });
+
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+                }
+                setBtnInstitucion('guardando');
                 formData.append('_method', 'PUT');
+
                 $.ajax({
-                    url: `${URL_INSTITUCIONES}/${id}`,
-                    type: 'PUT',
+                    url: `${URL_INSTITUCIONES_BASE}/${id_editar}`,
+                    type: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
                     dataType: 'json',
-                    success: async function(res) {
-                        Swal.close();
-                        if (res.success) {
-                            modalAgregarInstitucion.hide();
-                            Swal.fire({
-                                icon: 'success',
-                                title: res.message,
-                                timer: 1600,
-                                showConfirmButton: false,
-                            });
+                    success: function(res) {
+                        if (!res.success) {
+                            mostrarToast('error', res.message || 'No se pudo actualizar');
+                            return;
                         }
+                        cerrarModalAgregarInstitucion();
+                        mostrarToast('success', res.message || 'Institución actualizada');
+                        // Recarga para refrescar tarjetas (nombre, correo, etc.).
+                        setTimeout(() => window.location.reload(), 800);
                     },
                     error: function(xhr) {
-                        Swal.close();
-                        const mensaje = xhr.responseJSON?.message;
-                        if (mensaje && !mensaje.includes('validation.')) {
-                            mostrarToast('error', mensaje);
-                        } else if (mensaje?.includes('validation.')) {
-                            mostrarToast('error', 'Verifique los datos ingresados');
-                        } else {
-                            mostrarToast('error', "Error al actualizar la institución");
+                        if (xhr.status === 422) {
+                            const errors = xhr.responseJSON?.errors ?? {};
+                            const msgLogo = errors.logo?.[0];
+                            mostrarToast('error', msgLogo || 'Verifique los datos ingresados');
+                            mostrarErroresModal(errors, 'formAgregarInstitucion');
+                            return;
                         }
-                        mostrarErroresModal(xhr.responseJSON?.errors, 'formAgregarInstitucion');
+                        mostrarToast('error', xhr.responseJSON?.message ||
+                            'Error al actualizar la institución');
                     },
                     complete: function() {
                         setBtnInstitucion('editar');
                     }
                 });
-
             }
         }
 
-
-        // Descargar PDF de la institución seleccionada.
-        document.getElementById('btnDescargarPdf')
-            .addEventListener('click', function() {
-                const id = this.dataset.usuarioId;
-                window.open(`${URL_INSTITUCIONES}/${id}/generar-pdf`, '_blank');
-            });
-
+        document.getElementById('btnDescargarPdf')?.addEventListener('click', function() {
+            const id = this.dataset.usuarioId;
+            if (!id) return;
+            window.open(`${URL_INSTITUCIONES_BASE}/${id}/generar-pdf`, '_blank');
+        });
 
         function cargarDatosInstitucion(id) {
-            fetch(`${URL_INSTITUCIONES}/datos/${id}`)
-                .then(response => response.json())
+            fetch(`${URL_INSTITUCIONES_BASE}/datos/${id}`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(r => r.json())
                 .then(resp => {
                     if (!resp.success) throw new Error('No data');
                     mapearDatosInstitucion(resp.data);
                 })
-                .catch(error => {
+                .catch(() => {
                     mostrarToast('error', 'No se pudo cargar la información de la institución');
+                    cerrarModalAgregarInstitucion();
                 });
         }
 
+        function huboCambioIp() {
+            return [...document.querySelectorAll('#servidores input[name*="[ip]"]')]
+                .some(input => {
+                    const original = (input.dataset.original ?? '').trim();
+                    const actual = (input.value ?? '').trim();
+
+                    // Solo confirmar si la IP ya existía y fue modificada
+                    return original !== '' && original !== actual;
+                });
+        }
+
+        /**
+         * Rellena el formulario + switches de ambientes + estado del logo.
+         * Ambientes no vinculados llegan desmarcados (sync al guardar los quita del pivot).
+         */
         function mapearDatosInstitucion(data) {
-            $('#nombre').val(data.nombre);
-            $('#codigo_dane').val(data.codigo_dane);
-            $('#municipio').val(data.municipio);
-            $('#departamento').val(data.departamento);
-            $('#correo_contacto').val(data.correo_contacto);
-            $('#imgPreviewLogo').attr('src', data.logo_url ?? LOGO_PREVIEW_DEFAULT);
+            id_editar = String(data.id);
+            $('#nombre').val(data.nombre ?? '');
+            $('#codigo_dane').val(data.codigo_dane ?? '');
+            $('#municipio').val(data.municipio ?? '');
+            $('#departamento').val(data.departamento ?? '');
+            $('#correo_contacto').val(data.correo_contacto ?? '');
+
+            // Limpia ambientes antes de aplicar los de esta institución.
+            document.querySelectorAll('#servidores input[type="checkbox"][name*="[activo]"]').forEach(cb => {
+                cb.checked = false;
+            });
+            document.querySelectorAll('#servidores input[name*="[ip]"]').forEach(inp => {
+                inp.value = '';
+                inp.dataset.original = '';
+            });
+            document.querySelectorAll('#servidores input[name*="[puerto]"]').forEach(inp => {
+                inp.value = '';
+            });
+
+            (data.ambientes || []).forEach(function(amb) {
+                const ip = document.getElementById(`ambiente_ip_${amb.id}`);
+                const puerto = document.getElementById(`ambiente_puerto_${amb.id}`);
+                const activo = document.getElementById(`ambiente_activo_${amb.id}`);
+
+                if (ip) {
+                    const valorIp = amb.ip ?? '';
+                    ip.value = valorIp;
+                    ip.dataset.original = valorIp;
+                }
+
+                if (puerto) puerto.value = amb.puerto ?? '';
+                if (activo) activo.checked = Boolean(amb.activo);
+            });
+
+            if (typeof window.setEstadoLogoInstitucion === 'function') {
+                window.setEstadoLogoInstitucion({
+                    id: data.id,
+                    logoUrl: data.logo_url_publica,
+                    iniciales: data.iniciales || 'IE',
+                });
+            }
         }
     </script>
 @endpush

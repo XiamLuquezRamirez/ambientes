@@ -6,9 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Institucion extends Model
 {
-    protected $fillable = ['nombre', 'slug', 'municipio', 'departamento', 'codigo_dane', 'logo', 'correo_contacto', 'activo'];
+    protected $fillable = [
+        'nombre',
+        'slug',
+        'municipio',
+        'departamento',
+        'codigo_dane',
+        'logo',
+        'correo_contacto',
+        'activo',
+    ];
 
     protected $table = 'instituciones';
+
+    protected $casts = [
+        'activo' => 'boolean',
+    ];
 
     public function ambientes()
     {
@@ -19,5 +32,10 @@ class Institucion extends Model
             'ambiente_id'
         )->withPivot('ip', 'puerto', 'activo')
             ->withTimestamps();
+    }
+
+    public function usuarios()
+    {
+        return $this->hasMany(User::class, 'institucion_id');
     }
 }

@@ -6,20 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Institucion;
 use App\Models\User;
+use App\Services\InstitucionLogoService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 class InstitucionSuperAdminController extends Controller
 {
+    public function __construct(
+        private InstitucionLogoService $logoService,
+    ) {}
+
     /**
-     * Display a listing of the resource.
+     * Listado de instituciones con ambientes (pivot IP/puerto/activo).
      */
     public function index()
     {
-
         $instituciones = Institucion::with('ambientes')->get();
         $ambientes = Ambiente::all();
 
@@ -27,56 +34,50 @@ class InstitucionSuperAdminController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Datos de una institución para el modal de edición (incluye ambientes y logo público).
      */
     public function ver($id)
     {
-        $institucion = Institucion::findOrFail($id);
+        $institucion = Institucion::with('ambientes')->findOrFail($id);
+
+        $ambientes = $institucion->ambientes->map(function ($ambiente) {
+            return [
+                'id' => $ambiente->id,
+                'nombre' => $ambiente->nombre,
+                'ip' => $ambiente->pivot->ip,
+                'puerto' => $ambiente->pivot->puerto,
+                'activo' => (bool) $ambiente->pivot->activo,
+            ];
+        })->values();
 
         return response()->json([
             'success' => true,
-            'data' => $institucion,
+            'data' => [
+                'id' => $institucion->id,
+                'nombre' => $institucion->nombre,
+                'codigo_dane' => $institucion->codigo_dane,
+                'municipio' => $institucion->municipio,
+                'departamento' => $institucion->departamento,
+                'correo_contacto' => $institucion->correo_contacto,
+                'activo' => (bool) $institucion->activo,
+                'logo' => $institucion->logo,
+                'logo_url_publica' => $this->logoService->urlPublica($institucion->logo),
+                'iniciales' => $this->logoService->iniciales($institucion),
+                'ambientes' => $ambientes,
+            ],
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Crea institución + admin temporal + ambientes activos (opcionales).
+     * El logo es obligatorio; los ambientes son opcionales salvo la IP si se activan.
      */
     public function guardar(Request $request)
     {
-        $datos = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'codigo_dane' => 'required|string|max:20|unique:instituciones,codigo_dane',
-            'municipio' => 'required|string|max:100',
-            'departamento' => 'required|string|max:100',
-            'correo_contacto' => 'required|email',
+        $datos = $this->validarDatosInstitucion($request, logoObligatorio: true);
+        $this->validarAmbientes($request);
 
-            'ambientes.*.ip' => [
-                function ($attribute, $value, $fail) use ($request) {
-
-                    preg_match('/ambientes\.(\d+)\./', $attribute, $match);
-
-                    $ambienteId = $match[1] ?? null;
-
-                    if (
-                        isset($request->ambientes[$ambienteId]['activo']) &&
-                        empty($value)
-                    ) {
-                        $fail('La IP es obligatoria para un ambiente activo.');
-                    }
-                },
-            ],
-
-            'ambientes.*.puerto' => 'nullable|integer|min:1|max:65535',
-        ]);
-
-        $institucion = DB::transaction(function () use ($datos, $request) {
-
-            $logo = null;
-
-            if ($request->hasFile('logo_url')) {
-                $logo = $request->file('logo_url')->store('instituciones', 'public');
-            }
+        $resultado = DB::transaction(function () use ($datos, $request) {
 
             $institucion = Institucion::create([
                 'nombre' => $datos['nombre'],
@@ -84,51 +85,36 @@ class InstitucionSuperAdminController extends Controller
                 'municipio' => $datos['municipio'],
                 'departamento' => $datos['departamento'],
                 'correo_contacto' => $datos['correo_contacto'],
-                'logo' => $logo,
+                'logo' => null,
                 'activo' => true,
             ]);
 
+            $this->logoService->guardar($institucion, $request->file('logo'));
+            $institucion->refresh();
+
             $passwordTemporal = Str::password(8);
-            session([
-                'password_temporal' => $passwordTemporal,
-            ]);
-            $identificacion = Str::random(10);
-            $nombre = 'Admin '.$institucion->nombre;
-            $email = 'admin@'.Str::slug($institucion->nombre).'.local';
 
             $usuario = User::create([
                 'institucion_id' => $institucion->id,
-                'identificacion' => $identificacion,
-                'nombre' => $nombre,
-                'email' => $email,
+                'identificacion' => Str::random(10),
+                'nombre' => 'Admin '.$institucion->nombre,
+                'email' => 'admin@'.Str::slug($institucion->nombre).'.local',
                 'password' => Hash::make($passwordTemporal),
                 'rol' => 'admin',
                 'estado' => 'activo',
-                'creado_por' => auth()->id(),
+                'creado_por' => Auth::guard('docente')->id(),
             ]);
 
-            $relaciones = [];
-
-            foreach ($request->input('ambientes', []) as $ambienteId => $config) {
-
-                if (! isset($config['activo'])) {
-                    continue;
-                }
-
-                $relaciones[$ambienteId] = [
-                    'ip' => $config['ip'],
-                    'puerto' => $config['puerto'] ?: null,
-                    'activo' => true,
-                ];
-            }
-
-            $institucion->ambientes()->sync($relaciones);
+            $institucion->ambientes()->sync(
+                $this->relacionesAmbientes($request)
+            );
+            session(['password_temporal' => $passwordTemporal]);
 
             return [
                 'institucion' => $institucion,
                 'usuario' => $usuario,
                 'password' => $passwordTemporal,
-                'email' => $email,
+                'email' => $usuario->email,
             ];
         });
 
@@ -136,32 +122,44 @@ class InstitucionSuperAdminController extends Controller
             'success' => true,
             'message' => 'Institución creada correctamente.',
             'credenciales' => [
-                'correo' => $institucion['email'],
-                'password' => $institucion['password'],
+                'correo' => $resultado['email'],
+                'password' => $resultado['password'],
             ],
             'usuario' => [
-                'id' => $institucion['usuario']->id,
-                'nombre' => $institucion['usuario']->nombre,
+                'id' => $resultado['usuario']->id,
+                'nombre' => $resultado['usuario']->nombre,
             ],
         ]);
     }
 
+    /**
+     * Actualiza datos de la institución y sincroniza IPs/puertos/ambientes activos.
+     * El logo debe existir (se gestiona con subirLogo; no se puede eliminar).
+     * Ambientes opcionales; IP obligatoria solo en los que se activen.
+     */
     public function actualizar(Request $request, $id)
     {
-        $datos = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'codigo_dane' => 'required|string|max:20|unique:instituciones,codigo_dane,'.$id,
-            'municipio' => 'required|string|max:100',
-            'departamento' => 'required|string|max:100',
-            'correo_contacto' => 'required|email',
-        ]);
-
         $institucion = Institucion::findOrFail($id);
 
-        $institucion = DB::transaction(function () use ($institucion, $datos) {
-            $institucion->update($datos);
+        $datos = $this->validarDatosInstitucion($request, $institucion->id);
+        $this->validarLogoExistente($institucion);
+        $this->validarAmbientes($request);
 
-            return $institucion;
+        $relaciones = $this->relacionesAmbientes($request);
+
+        $this->validarIpsDuplicadas($institucion->id, $relaciones);
+
+        DB::transaction(function () use ($institucion, $datos, $relaciones) {
+
+            $institucion->update([
+                'nombre' => $datos['nombre'],
+                'codigo_dane' => $datos['codigo_dane'],
+                'municipio' => $datos['municipio'],
+                'departamento' => $datos['departamento'],
+                'correo_contacto' => $datos['correo_contacto'],
+            ]);
+
+            $institucion->ambientes()->sync($relaciones);
         });
 
         return response()->json([
@@ -170,62 +168,218 @@ class InstitucionSuperAdminController extends Controller
         ]);
     }
 
+    /**
+     * Sube o reemplaza el logo (misma idea que panel/perfil/foto).
+     */
+    public function subirLogo(Request $request, $id)
+    {
+        $institucion = Institucion::findOrFail($id);
+
+        $request->validate([
+            'logo' => 'required|file|mimes:jpeg,jpg,png|max:'.InstitucionLogoService::MAX_KILOBYTES,
+        ]);
+
+        try {
+            $resultado = $this->logoService->guardar($institucion, $request->file('logo'));
+        } catch (InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logo actualizado correctamente.',
+            'logo_url_publica' => $resultado['logo_url_publica'],
+            'iniciales' => $resultado['iniciales'],
+        ]);
+    }
+
+    /**
+     * El logo es obligatorio: no se permite eliminarlo, solo reemplazarlo con subirLogo.
+     */
+    public function eliminarLogo($id)
+    {
+        Institucion::findOrFail($id);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'El logo es obligatorio. Puede reemplazarlo, pero no eliminarlo.',
+        ], 422);
+    }
+
+    /**
+     * Alterna activo / suspendido. Suspendida: los usuarios del colegio no pueden iniciar sesión.
+     */
+    public function toggleActivo($id)
+    {
+        $institucion = Institucion::findOrFail($id);
+        $institucion->activo = ! $institucion->activo;
+        $institucion->save();
+
+        return response()->json([
+            'success' => true,
+            'activo' => (bool) $institucion->activo,
+            'message' => $institucion->activo
+                ? 'Institución activada correctamente.'
+                : 'Institución suspendida. Sus usuarios no podrán iniciar sesión.',
+        ]);
+    }
+
     public function generarPdf($id)
     {
-        // Verificar si la institución tiene una cuenta activa
         $usuario = User::findOrFail($id);
         $password = session()->pull('password_temporal');
         $pdf = Pdf::loadView(
             'superAdmin.pdf.admin',
             compact('usuario', 'password')
         );
-        $nombreArchivo = 'Admin_'.
-        Str::slug(
-            $usuario->nombre,
-            ' '
-        ).
-        '.pdf';
+        $nombreArchivo = 'Admin_'.Str::slug($usuario->nombre, ' ').'.pdf';
 
         return $pdf->download($nombreArchivo);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    /** Validación compartida create/update de campos básicos. */
+    private function validarDatosInstitucion(
+        Request $request,
+        ?int $ignoreId = null,
+        bool $logoObligatorio = false,
+    ): array {
+        $uniqueDane = 'unique:instituciones,codigo_dane';
+        if ($ignoreId) {
+            $uniqueDane .= ','.$ignoreId;
+        }
+
+        return $request->validate([
+            'nombre' => 'required|string|max:255',
+            'codigo_dane' => 'required|string|max:20|'.$uniqueDane,
+            'municipio' => 'required|string|max:100',
+            'departamento' => 'required|string|max:100',
+            'correo_contacto' => 'required|email|max:255',
+            'logo' => ($logoObligatorio ? 'required' : 'nullable')
+                .'|file|mimes:jpeg,jpg,png|max:'.InstitucionLogoService::MAX_KILOBYTES,
+        ], [
+            'logo.required' => 'El logo de la institución es obligatorio.',
+        ]);
+    }
+
+    /** En edición el logo no viaja en el form: debe existir ya en la institución. */
+    private function validarLogoExistente(Institucion $institucion): void
     {
-        //
+        if (filled($institucion->logo)) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'logo' => ['El logo de la institución es obligatorio. Suba uno antes de guardar.'],
+        ]);
+    }
+
+    private function validarIpsDuplicadas(int $institucionId, array $relaciones): void
+    {
+        $ips = collect($relaciones)
+            ->pluck('ip')
+            ->filter();
+
+        if ($ips->isEmpty()) {
+            return;
+        }
+
+        $ambientesActuales = array_keys($relaciones);
+
+        $ipsDuplicadas = DB::table('ambiente_institucion')
+            ->where('institucion_id', $institucionId)
+            ->whereIn('ip', $ips)
+            ->whereNotIn('ambiente_id', $ambientesActuales)
+            ->pluck('ip')
+            ->unique();
+
+        if ($ipsDuplicadas->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'ambientes' => [
+                    'Las siguientes IP ya están asignadas a otro ambiente de la institución: '
+                    .$ipsDuplicadas->implode(', '),
+                ],
+            ]);
+        }
     }
 
     /**
-     * Display the specified resource.
+     * Ambientes opcionales: IP, puerto y activo pueden omitirse.
+     * Solo si un ambiente se marca activo, su IP es obligatoria (y válida IPv4).
+     *
+     * Nota: no se puede poner la regla "IP requerida si activo" después de `nullable`,
+     * porque Laravel omite el resto de reglas cuando el valor está vacío.
      */
-    public function show(string $id)
+    private function validarAmbientes(Request $request): void
     {
-        //
+        $request->validate([
+            'ambientes' => 'nullable|array',
+            'ambientes.*.activo' => 'nullable|boolean',
+            'ambientes.*.puerto' => 'nullable|integer|min:1|max:65535',
+            'ambientes.*.ip' => 'nullable|ipv4',
+        ], [
+            'ambientes.*.ip.ipv4' => 'La IP del ambiente no es válida.',
+            'ambientes.*.puerto.integer' => 'El puerto debe ser un número entre 1 y 65535.',
+            'ambientes.*.puerto.min' => 'El puerto debe ser un número entre 1 y 65535.',
+            'ambientes.*.puerto.max' => 'El puerto debe ser un número entre 1 y 65535.',
+        ]);
+
+        $errores = [];
+        $ipsActivas = [];
+
+        foreach ($request->input('ambientes', []) as $id => $config) {
+            $activo = filter_var($config['activo'] ?? false, FILTER_VALIDATE_BOOLEAN);
+            if (! $activo) {
+                continue;
+            }
+
+            $ip = $config['ip'] ?? null;
+
+            if (blank($ip)) {
+                $errores["ambientes.{$id}.ip"] = ['La IP es obligatoria para un ambiente activo.'];
+
+                continue;
+            }
+
+            if (isset($ipsActivas[$ip])) {
+                $errores["ambientes.{$id}.ip"] = ["La IP {$ip} está repetida."];
+
+                continue;
+            }
+
+            $ipsActivas[$ip] = $id;
+        }
+
+        if ($errores !== []) {
+            throw ValidationException::withMessages($errores);
+        }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Construye el array para sync() del pivot ambiente_institucion.
+     * Solo incluye ambientes con checkbox activo.
+     *
+     * @return array<int, array{ip: mixed, puerto: mixed, activo: bool}>
      */
-    public function edit(string $id)
+    private function relacionesAmbientes(Request $request): array
     {
-        //
-    }
+        $relaciones = [];
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        foreach ($request->input('ambientes', []) as $ambienteId => $config) {
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            if (empty($config['activo'])) {
+                continue;
+            }
+
+            $relaciones[(int) $ambienteId] = [
+                'ip' => $config['ip'],
+                'puerto' => $config['puerto'] ?: null,
+                'activo' => true,
+            ];
+        }
+
+        return $relaciones;
     }
 }

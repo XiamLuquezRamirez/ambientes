@@ -26,6 +26,57 @@
             border-color: #93C5FD;
         }
 
+        .instituciones-card--suspendida {
+            opacity: 0.78;
+            border-color: #FECACA;
+            background: #FFFBFB;
+        }
+
+        .instituciones-card--suspendida:hover {
+            border-color: #FCA5A5;
+        }
+
+        .badge-estado-institucion {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 8px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .badge-estado-institucion--activa {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .badge-estado-institucion--suspendida {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .card-nombre-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .card-nombre-texto {
+            flex: 1;
+            min-width: 0;
+            word-break: break-word;
+        }
+
+        .switch-activo-institucion {
+            flex-shrink: 0;
+            margin: 0;
+            padding-top: 2px;
+        }
+
         .panel-estadisticas {
             margin-top: 24px;
             padding: 20px 22px;
@@ -443,6 +494,25 @@
             justify-content: center;
             font-size: 1.5rem;
             flex-shrink: 0;
+        }
+
+        .card-logo-wrap {
+            overflow: hidden;
+            background: #EFF6FF;
+            color: #1D4ED8;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0;
+        }
+
+        .card-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-logo-fallback {
+            line-height: 1;
         }
 
         .card-info {
@@ -1044,42 +1114,146 @@
         </div>
     </form>
 
-    <!-- GRID DE instituciones (Se ocultará al seleccionar uno) -->
+    @php
+        $logoService = app(\App\Services\InstitucionLogoService::class);
+    @endphp
+
+    <!-- GRID DE instituciones -->
     <div class="instituciones-grid" id="instituciones-container">
         @foreach ($instituciones as $inst)
-            <div class="instituciones-card btn-seleccionar-instituciones" id="tarjeta-amb-{{ $inst->id }}"
-                data-id="{{ $inst->id }}" data-nombre="{{ $inst->nombre }}"
+            @php
+                $logoUrl = $logoService->urlPublica($inst->logo);
+                $iniciales = $logoService->iniciales($inst);
+                $ambientesActivos = $inst->ambientes->filter(fn($a) => (bool) $a->pivot->activo)->count();
+            @endphp
+            <div class="instituciones-card btn-seleccionar-instituciones {{ $inst->activo ? '' : 'instituciones-card--suspendida' }}"
+                id="tarjeta-amb-{{ $inst->id }}" data-id="{{ $inst->id }}" data-nombre="{{ $inst->nombre }}"
                 onclick="abrirModalEditarInstitucion({{ $inst->id }})">
 
                 <div class="card-head">
-                    <div class="card-icono">🌿</div>
+                    <div class="card-icono card-logo-wrap">
+                        <img src="{{ $logoUrl ?? '' }}" alt="" class="card-logo-img {{ $logoUrl ? '' : 'd-none' }}">
+                        <span class="card-logo-fallback {{ $logoUrl ? 'd-none' : '' }}">{{ $iniciales }}</span>
+                    </div>
                     <div class="card-info">
-                        <div class="card-nombre">{{ $inst->nombre }}</div>
+                        <div class="card-nombre card-nombre-row">
+                            <span class="card-nombre-texto">{{ $inst->nombre }}</span>
+                            <div class="form-check form-switch switch-activo-institucion"
+                                onclick="event.stopPropagation()">
+                                <input class="form-check-input toggle-activo-institucion" type="checkbox"
+                                    id="institucion_activo_{{ $inst->id }}"
+                                    data-id="{{ $inst->id }}" data-nombre="{{ $inst->nombre }}"
+                                    value="1" style="cursor: pointer;"
+                                    title="{{ $inst->activo ? 'Suspender institución' : 'Activar institución' }}"
+                                    {{ $inst->activo ? 'checked' : '' }}>
+                            </div>
+                        </div>
                         <div class="card-ip">
                             <i class="fas fa-envelope" style="font-size:.7rem"></i>
                             {{ $inst->correo_contacto }}
                         </div>
                         <div class="card-ip">
-                            <i class="fas fa-server" style="font-size:.7rem"></i>
+                            <i class="fas fa-code" style="font-size:.7rem"></i>
                             {{ $inst->codigo_dane }}
                         </div>
-
                         <div class="card-ip">
                             <i class="fas fa-map-marker-alt" style="font-size:.7rem"></i>
                             {{ $inst->municipio }}, {{ $inst->departamento }}
                         </div>
+                        <span class="badge-estado-institucion {{ $inst->activo ? 'badge-estado-institucion--activa' : 'badge-estado-institucion--suspendida' }}"
+                            id="badge-estado-{{ $inst->id }}">
+                            {{ $inst->activo ? 'Activa' : 'Suspendida' }}
+                        </span>
                     </div>
                 </div>
 
                 <div class="card-stats">
                     <span class="badge-stat bs-azul">
-                        <i class="fas fa-graduation-cap"></i> {{ $inst->grados_count }} grado(s)
+                        <i class="fas fa-network-wired"></i> {{ $ambientesActivos }} ambiente(s)
                     </span>
                 </div>
             </div>
         @endforeach
     </div>
+
     @include('superAdmin.instituciones.modalAgregarInstitucion')
+    @include('superAdmin.instituciones.modalLogoInstitucion')
     @include('admin.usuarios.ver_contra_gen')
 
 @endsection
+
+@push('scripts')
+    <script>
+        const URL_TOGGLE_INSTITUCION =
+            "{{ route('superadmin.instituciones.toggleActivo', ['id' => '__ID__']) }}";
+
+        $(document).on('change', '.toggle-activo-institucion', function() {
+            const checkbox = $(this);
+            const id = checkbox.data('id');
+            const nombre = checkbox.data('nombre');
+            const activando = checkbox.prop('checked');
+
+            if (activando) {
+                actualizarEstadoInstitucion(id, checkbox);
+                return;
+            }
+
+            Swal.fire({
+                title: `¿Suspender ${nombre}?`,
+                html: 'Ningún usuario de esta institución podrá iniciar sesión mientras esté suspendida.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Suspender',
+                cancelButtonText: 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    actualizarEstadoInstitucion(id, checkbox);
+                } else {
+                    checkbox.prop('checked', true);
+                }
+            });
+        });
+
+        function actualizarEstadoInstitucion(id, checkbox) {
+            const url = URL_TOGGLE_INSTITUCION.replace('__ID__', id);
+
+            $.ajax({
+                url,
+                type: 'PATCH',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                },
+                success: function(response) {
+                    aplicarEstadoVisualInstitucion(id, checkbox, response.activo);
+                    mostrarToast('success', response.message);
+                },
+                error: function(xhr) {
+                    checkbox.prop('checked', !checkbox.prop('checked'));
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message ??
+                            'No fue posible actualizar el estado de la institución.',
+                    });
+                },
+            });
+        }
+
+        function aplicarEstadoVisualInstitucion(id, checkbox, activo) {
+            const tarjeta = document.getElementById(`tarjeta-amb-${id}`);
+            const badge = document.getElementById(`badge-estado-${id}`);
+
+            if (tarjeta) {
+                tarjeta.classList.toggle('instituciones-card--suspendida', !activo);
+            }
+
+            if (badge) {
+                badge.textContent = activo ? 'Activa' : 'Suspendida';
+                badge.classList.toggle('badge-estado-institucion--activa', activo);
+                badge.classList.toggle('badge-estado-institucion--suspendida', !activo);
+            }
+
+            checkbox.attr('title', activo ? 'Suspender institución' : 'Activar institución');
+        }
+    </script>
+@endpush
