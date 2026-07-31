@@ -1048,7 +1048,8 @@
     <div class="instituciones-grid" id="instituciones-container">
         @foreach ($instituciones as $inst)
             <div class="instituciones-card btn-seleccionar-instituciones" id="tarjeta-amb-{{ $inst->id }}"
-                data-id="{{ $inst->id }}" data-nombre="{{ $inst->nombre }}" onclick="seleccionarinstituciones(this)">
+                data-id="{{ $inst->id }}" data-nombre="{{ $inst->nombre }}"
+                onclick="abrirModalEditarInstitucion({{ $inst->id }})">
 
                 <div class="card-head">
                     <div class="card-icono">🌿</div>

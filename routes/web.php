@@ -274,7 +274,10 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::get('principal', [SuperAdminController::class, 'index'])->name('superadmin.principal');
     Route::get('instituciones', [InstitucionSuperAdminController::class, 'index'])->name('superadmin.instituciones.index');
+    Route::get('instituciones/datos/{id}', [InstitucionSuperAdminController::class, 'ver'])->name('superadmin.instituciones.ver');
     Route::post('instituciones', [InstitucionSuperAdminController::class, 'guardar'])->name('superadmin.instituciones.guardar');
+    Route::put('instituciones/{id}', [InstitucionSuperAdminController::class, 'actualizar'])->name('superadmin.instituciones.actualizar');
+    Route::get('instituciones/{usuario_id}/generar-pdf', [InstitucionSuperAdminController::class, 'generarPdf'])->name('superadmin.instituciones.generar-pdf');
 
     Route::get('condiciones', [CondicionInclusionController::class, 'index'])->name('superadmin.condiciones.index');
     Route::post('condiciones', [CondicionInclusionController::class, 'guardar'])->name('superadmin.condiciones.guardar');

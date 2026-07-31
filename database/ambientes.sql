@@ -2465,6 +2465,7 @@ CREATE TABLE `instituciones` (
   `codigo_dane` varchar(20) NOT NULL,
   `logo` varchar(255) DEFAULT NULL,
   `correo_contacto` varchar(255) NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2477,7 +2478,8 @@ INSERT INTO instituciones (
     departamento,
     codigo_dane,
     logo,
-    correo_contacto
+    correo_contacto,
+    activo
 ) VALUES (
     'Institución Educativa Ejemplo',
     'Medellín',
@@ -2485,6 +2487,7 @@ INSERT INTO instituciones (
     '050010000001',
     'logos/institucion.png',
     'contacto@institucion.edu.co'
+    '1'
 );
 
 /*Table structure for table `ambiente_institucion` */

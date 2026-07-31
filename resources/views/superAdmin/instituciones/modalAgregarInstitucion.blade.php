@@ -10,16 +10,16 @@
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-header-icon">
-                    <i class="fas fa-university text-white"></i>
+                <div class="modal-header-icon"><i id="modalAgregarInstitucionIcon"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <h5 class="modal-title mb-0" style="font-size: 1.4rem;" id="modalAgregarInstitucionTitle">
+                    <h5 class="modal-title mb-0" style="font-size: 1.4rem;" id="modalAgregarInstitucionLabel">
                         Agregar Institución</h5>
-                    <p class="modal-subtitle mb-0">Ingrese los datos de la nueva institución.</p>
+                    <p class="modal-subtitle mb-0" id="modalAgregarInstitucionSubtitle">Ingrese los datos de la nueva
+                        institución.</p>
                 </div>
-                <button type="button" class="btn-close" id="btnCloseModalAgregarInstitucion"
-                    data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close" id="btnCloseModalAgregarInstitucion" data-bs-dismiss="modal"
+                    aria-label="Cerrar"></button>
             </div>
             <div class="modal-body p-4">
                 <ul class="nav nav-tabs" role="tablist">
@@ -31,14 +31,14 @@
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-servidores" data-bs-toggle="tab" href="#servidores"
-                            role="tab" aria-controls="servidores" aria-selected="false">
+                        <a class="nav-link" id="tab-servidores" data-bs-toggle="tab" href="#servidores" role="tab"
+                            aria-controls="servidores" aria-selected="false">
                             <i class="fas fa-server"></i> Servidores
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-modulos" data-bs-toggle="tab" href="#modulos"
-                            role="tab" aria-controls="modulos" aria-selected="false">
+                        <a class="nav-link" id="tab-modulos" data-bs-toggle="tab" href="#modulos" role="tab"
+                            aria-controls="modulos" aria-selected="false">
                             <i class="fas fa-cube"></i> Módulos
                         </a>
                     </li>
@@ -92,8 +92,7 @@
                                         {{-- name logo_url: el controller guarda en storage y persiste en columna logo --}}
                                         <label class="form-label fw-bold" for="logo_url">Logo</label>
                                         <input type="file" id="logo_url" name="logo_url" class="form-control"
-                                            accept="image/*"
-                                            onchange="previewImage(event, '#imgPreviewLogo')">
+                                            accept="image/*" onchange="previewImage(event, '#imgPreviewLogo')">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -179,7 +178,8 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Cerrar
                 </button>
-                <button type="button" class="btn btn-primary" onclick="guardarInstitucion()">
+                <button type="button" class="btn btn-primary" id="btnAgregarInstitucion"
+                    onclick="guardarInstitucion()">
                     <i class="fas fa-save"></i> Guardar
                 </button>
             </div>
@@ -195,6 +195,8 @@
          */
         window.URL_INSTITUCIONES = "{{ route('superadmin.instituciones.guardar') }}";
         const URL_INSTITUCIONES = window.URL_INSTITUCIONES;
+        var tipoPost = 1; // 1: Crear, 2: Editar
+        var id_editar = '';
 
         const LOGO_PREVIEW_DEFAULT = '';
         const modalElAgregarInstitucion = document.getElementById('modalAgregarInstitucion');
@@ -208,10 +210,43 @@
             return bootstrap.Modal.getOrCreateInstance(modalElAgregarInstitucion);
         }
 
+        function setBtnInstitucion(modo) {
+            const btn = document.getElementById('btnAgregarInstitucion');
+            btn.disabled = false;
+            if (modo === 'crear') {
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Crear Institución';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar';
+            }
+        }
+
         /** Abre el modal y deja el formulario limpio para un alta nueva. */
         function abrirModalInstituciones() {
+            $("#modalAgregarInstitucionLabel").text('Agregar Institución');
+            $("#modalAgregarInstitucionSubtitle").text('Completa los datos para agregar la institución');
+            $("#modalAgregarInstitucionIcon").html('<i class="fas fa-university text-white"></i>');
+            bootstrap.Tab.getOrCreateInstance(
+                $('a[href="#datosInstitucion"]')[0]
+            ).show();
+            tipoPost = 1;
+            setBtnInstitucion('crear');
             resetFormAgregarInstitucion();
             getModalAgregarInstitucion().show();
+        }
+
+        /* ── Modal Bootstrap 5 – Editar Institución ────────────────────────────── */
+        function abrirModalEditarInstitucion(id) {
+            $("#modalAgregarInstitucionLabel").text('Editar Institución');
+            $("#modalAgregarInstitucionSubtitle").text('Completa los datos para editar la institución');
+            $("#modalAgregarInstitucionIcon").html('<i class="fas fa-university text-white"></i>');
+            bootstrap.Tab.getOrCreateInstance(
+                $('a[href="#datosInstitucion"]')[0]
+            ).show();
+            tipoPost = 2;
+            setBtnInstitucion('editar');
+            resetFormAgregarInstitucion();
+            getModalAgregarInstitucion().show();
+            cargarDatosInstitucion(id);
         }
 
         /** Cierra el modal usando la instancia activa de Bootstrap. */
@@ -261,6 +296,7 @@
 
         function cerrarModalBSPasswordGenerada() {
             modalBSPasswordGenerada.hide();
+            window.location.reload();
         }
 
         /** Quita marcas .is-invalid y mensajes .campo-error del formulario indicado. */
@@ -390,45 +426,128 @@
          * 422: errores inline + toast.
          */
         function guardarInstitucion() {
-            const form = document.getElementById('formAgregarInstitucion');
-            const formData = new FormData(form);
+            if (tipoPost == 1) {
+                const btn = document.getElementById('btnAgregarInstitucion');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Creando Institución…';
+                const form = document.getElementById('formAgregarInstitucion');
+                const formData = new FormData(form);
 
-            $.ajax({
-                url: URL_INSTITUCIONES,
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                dataType: 'json',
+                $.ajax({
+                    url: URL_INSTITUCIONES,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
 
-                success: function(res) {
-                    if (!res.success) {
-                        mostrarToast('error', res.message);
-                        return;
+                    success: function(res) {
+                        if (!res.success) {
+                            mostrarToast('error', res.message);
+                            return;
+                        }
+
+                        const credenciales = res.credenciales;
+
+                        document.getElementById('passwordGenerada').value = credenciales.password;
+                        document.getElementById('asignar_email').value = credenciales.correo;
+                        const btnPdf = document.getElementById('btnDescargarPdf');
+                        btnPdf.dataset.usuarioId = res.usuario.id;
+                        btnPdf.dataset.nombre = res.usuario.nombre;
+                        cerrarModalAgregarInstitucion();
+                        abrirModalBSPasswordGenerada();
+                    },
+
+                    error: function(xhr) {
+                        Swal.close();
+                        const mensaje = xhr.responseJSON?.message ?? '';
+                        if (mensaje.includes('validation.')) {
+                            mostrarToast('error', 'Verifique los datos ingresados');
+                            mostrarErroresModal(xhr.responseJSON?.errors ?? {}, 'formUsuario');
+                        } else {
+                            mostrarToast('error', mensaje || 'Error al crear el usuario');
+                        }
+                    },
+                    complete: function() {
+                        setBtnInstitucion('crear');
                     }
+                });
+            } else if (tipoPost == 2) {
+                const btn = document.getElementById('btnAgregarInstitucion');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardando…';
+                const form = document.getElementById('formAgregarInstitucion');
+                const formData = new FormData(form);
+                const id = id_editar;
 
-                    const credenciales = res.credenciales;
-
-                    document.getElementById('passwordGenerada').value = credenciales.password;
-                    document.getElementById('asignar_email').value = credenciales.correo;
-
-                    cerrarModalAgregarInstitucion();
-                    abrirModalBSPasswordGenerada();
-                },
-
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                        mostrarToast('error', 'Verifique los datos ingresados');
-                        mostrarErroresModal(xhr.responseJSON.errors ?? {}, 'formAgregarInstitucion');
-                        return;
+                formData.append('_method', 'PUT');
+                $.ajax({
+                    url: `${URL_INSTITUCIONES}/${id}`,
+                    type: 'PUT',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: async function(res) {
+                        Swal.close();
+                        if (res.success) {
+                            modalAgregarInstitucion.hide();
+                            Swal.fire({
+                                icon: 'success',
+                                title: res.message,
+                                timer: 1600,
+                                showConfirmButton: false,
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.close();
+                        const mensaje = xhr.responseJSON?.message;
+                        if (mensaje && !mensaje.includes('validation.')) {
+                            mostrarToast('error', mensaje);
+                        } else if (mensaje?.includes('validation.')) {
+                            mostrarToast('error', 'Verifique los datos ingresados');
+                        } else {
+                            mostrarToast('error', "Error al actualizar la institución");
+                        }
+                        mostrarErroresModal(xhr.responseJSON?.errors, 'formAgregarInstitucion');
+                    },
+                    complete: function() {
+                        setBtnInstitucion('editar');
                     }
+                });
 
-                    mostrarToast(
-                        'error',
-                        xhr.responseJSON?.message ?? 'Error al crear la institución.'
-                    );
-                }
+            }
+        }
+
+
+        // Descargar PDF de la institución seleccionada.
+        document.getElementById('btnDescargarPdf')
+            .addEventListener('click', function() {
+                const id = this.dataset.usuarioId;
+                window.open(`${URL_INSTITUCIONES}/${id}/generar-pdf`, '_blank');
             });
+
+
+        function cargarDatosInstitucion(id) {
+            fetch(`${URL_INSTITUCIONES}/datos/${id}`)
+                .then(response => response.json())
+                .then(resp => {
+                    if (!resp.success) throw new Error('No data');
+                    mapearDatosInstitucion(resp.data);
+                })
+                .catch(error => {
+                    mostrarToast('error', 'No se pudo cargar la información de la institución');
+                });
+        }
+
+        function mapearDatosInstitucion(data) {
+            $('#nombre').val(data.nombre);
+            $('#codigo_dane').val(data.codigo_dane);
+            $('#municipio').val(data.municipio);
+            $('#departamento').val(data.departamento);
+            $('#correo_contacto').val(data.correo_contacto);
+            $('#imgPreviewLogo').attr('src', data.logo_url ?? LOGO_PREVIEW_DEFAULT);
         }
     </script>
 @endpush
