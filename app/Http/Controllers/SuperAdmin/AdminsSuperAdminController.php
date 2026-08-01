@@ -152,4 +152,65 @@ class AdminsSuperAdminController extends Controller
                 : 'Administrador desactivado correctamente.',
         ]);
     }
+
+    /**
+     * Devuelve el historial de accesos del administrador y marca IPs fuera del rango permitido.
+     *
+     * La respuesta incluye un resumen que el frontend usa para mostrar advertencias.
+     */
+    public function verAccesos($id)
+    {
+        $usuario = User::with('docente')->findOrFail($id);
+
+        // La historia de auditoría muestra exactamente los 30 eventos más recientes;
+        // no se pagina porque el requisito pide un corte fijo y fácil de revisar.
+        $loginLogs = $usuario->accesos()
+            ->orderByDesc('fecha')
+            ->limit(30)
+            ->get()
+            ->map(function ($acceso) {
+                $ipFueraRango = ! $this->ipPermitida($acceso->ip);
+
+                return [
+                    'fecha' => optional($acceso->fecha)->format('d/m/Y'),
+                    'hora' => optional($acceso->fecha)->format('H:i:s'),
+                    'ip' => $acceso->ip ?: 'Sin registrar',
+                    // El frontend solo pinta la alerta; la regla de red queda centralizada aquí.
+                    'ip_fuera_rango' => $ipFueraRango,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'docente' => [
+                    'id' => $usuario->id,
+                    'nombre' => trim($usuario->nombre.' '.$usuario->apellido),
+                    'email' => $usuario->email,
+                ],
+                'accesos' => $loginLogs,
+                'tiene_accesos_fuera_rango' => $loginLogs->contains('ip_fuera_rango', true),
+                'rango_permitido' => '192.168.1.0/24',
+            ],
+        ]);
+    }
+
+    /**
+     * Valida si una IP se encuentra dentro del rango de red permitido.
+     *
+     * Actualmente solo admite IPv4 y rango 192.168.1.0/24.
+     */
+    public function ipPermitida($ip)
+    {
+        // Solo IPv4 dentro de 192.168.1.0/24 se considera confiable para esta auditoría.
+        // IPv6, IP vacía o valores inválidos se marcan como fuera de rango.
+        if (! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return false;
+        }
+
+        $ipLong = ip2long($ip);
+
+        return $ipLong >= ip2long('192.168.1.0')
+            && $ipLong <= ip2long('192.168.1.255');
+    }
 }

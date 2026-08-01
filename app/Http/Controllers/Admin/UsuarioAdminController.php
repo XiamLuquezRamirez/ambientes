@@ -32,6 +32,7 @@ class UsuarioAdminController extends Controller
     public function listar(Request $request)
     {
         $institucionId = session('institucion_id');
+
         $consulta = User::query()
             ->where('institucion_id', $institucionId)
             ->select(
@@ -43,6 +44,7 @@ class UsuarioAdminController extends Controller
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
             $consulta->where(fn ($q) => $q
+                ->where('institucion_id', $institucionId)
                 ->where('nombre', 'like', "%{$termino}%")
             );
         }
@@ -290,7 +292,7 @@ class UsuarioAdminController extends Controller
             $usuario = User::findOrFail($usuario);
 
             // Impedir que el usuario autenticado se elimine a sí mismo
-            if ($usuario->id === Auth::id()) {
+            if ($usuario->id === Auth::guard('docente')->id()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No puedes eliminar tu propia cuenta.',
@@ -462,7 +464,7 @@ class UsuarioAdminController extends Controller
 
             $usuario = User::findOrFail($id);
 
-            if ($usuario->id === Auth::id()) {
+            if ($usuario->id === Auth::guard('docente')->id()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'No puedes desactivar tu propia cuenta.',
