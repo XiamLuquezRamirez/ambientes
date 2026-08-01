@@ -434,8 +434,9 @@
         }
 
         function cerrarModalBSPasswordGenerada() {
-            modalBSPasswordGenerada?.hide();
-            window.location.reload();
+            limpiarErroresModal('formCrearAdministrador');
+            document.activeElement?.blur();
+            modalBSPasswordGenerada.hide();
         }
 
         function limpiarErroresModal(form) {
@@ -501,6 +502,19 @@
             primerInput.focus();
         }
 
+        function mostrarExitoAlCerrarModalPassword(mensaje) {
+            document.getElementById('modalBSPasswordGenerada').addEventListener('hidden.bs.modal', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: mensaje,
+                    timer: 1600,
+                    showConfirmButton: false,
+                }).then(() => window.location.reload());
+            }, {
+                once: true
+            });
+        }
+
         /**
          * Crear (POST) o actualizar (POST + _method PUT con FormData).
          * Logo obligatorio: en alta viaja en inputLogoPendiente; en edición debe existir ya.
@@ -546,6 +560,7 @@
 
                         cerrarModalAgregarInstitucion();
                         abrirModalBSPasswordGenerada();
+                        mostrarExitoAlCerrarModalPassword(res.message);
                     },
                     error: function(xhr) {
                         if (xhr.status === 422) {
@@ -602,9 +617,13 @@
                             return;
                         }
                         cerrarModalAgregarInstitucion();
-                        mostrarToast('success', res.message || 'Institución actualizada');
-                        // Recarga para refrescar tarjetas (nombre, correo, etc.).
-                        setTimeout(() => window.location.reload(), 800);
+                        Swal.fire({
+                            icon: 'success',
+                            title: res.message,
+                            timer: 1600,
+                            showConfirmButton: false,
+                        }).then(() => window.location.reload());
+
                     },
                     error: function(xhr) {
                         if (xhr.status === 422) {

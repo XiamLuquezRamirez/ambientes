@@ -72,6 +72,7 @@ class AuthDocenteController extends Controller
         );
 
         $request->session()->regenerate();
+        session(['institucion_id' => $usuario->institucion_id]);
 
         return $usuario->esSuperAdmin()
             ? redirect()->route('superadmin.principal')

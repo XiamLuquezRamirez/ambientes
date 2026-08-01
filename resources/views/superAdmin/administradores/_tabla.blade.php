@@ -11,27 +11,33 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($administradores as $admin)
+            @forelse ($administradores as $admin)
                 <tr>
                     <td style="font-weight:600;color:#1E293B">{{ $admin->nombre }}</td>
                     <td>{{ $admin->email }}</td>
-                    <td style="color:#64748B">{{ $institucion->nombre }}</td>
+                    <td style="color:#64748B">{{ $admin->institucion?->nombre ?? '—' }}</td>
                     <td>{{ ucfirst($admin->rol) }}</td>
                     <td>
-                        <div class="form-check form-switch switch-activo-institucion" onclick="event.stopPropagation()">
-                            <input class="form-check-input toggle-activo-institucion" type="checkbox"
-                                id="admin_estado_{{ $admin->id }}" data-id="{{ $admin->id }}"
-                                data-nombre="{{ $admin->nombre }}" value="1" style="cursor: pointer;"
-                                title="{{ $admin->estado ? 'Suspender administrador' : 'Activar administrador' }}"
-                                {{ $admin->estado ? 'checked' : '' }}>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input toggle-activo" type="checkbox" data-id="{{ $admin->id }}"
+                                data-nombre="{{ $admin->nombre }}" style="cursor: pointer;" @checked($admin->activo)>
                         </div>
                     </td>
                     <td style="text-align:center">
-                        <button class="btn btn-primary"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-primary"
+                            onclick="abrirModalEditarAdministrador({{ $admin->id }})">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button type="button" class="btn btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="6" style="text-align:center;color:#64748B;padding:24px">
+                        No hay administradores registrados.
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Institucion;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,13 +21,11 @@ class AdminsSuperAdminController extends Controller
         $superadmin = Auth::guard('docente')->user();
         $instituciones = Institucion::all();
         $administradores = User::where('rol', 'admin')
-            ->whereHas('creador', function ($query) use ($superadmin) {
-                $query->where('id', $superadmin->id);
-            })
+            ->where('creado_por', $superadmin->id)
+            ->with('institucion')
             ->get();
-        $institucion = $administradores->first()->institucion;
 
-        return view('superAdmin.administradores.index', compact('administradores', 'institucion', 'instituciones'));
+        return view('superAdmin.administradores.index', compact('administradores', 'instituciones'));
     }
 
     /**
@@ -38,67 +37,119 @@ class AdminsSuperAdminController extends Controller
             'nombre' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'institucion' => 'required|exists:instituciones,id',
+            'password' => 'required|min:8|confirmed',
         ]);
-
-        $passwordTemporal = Str::password(8);
 
         $administrador = User::create([
             'institucion_id' => $datos['institucion'],
             'identificacion' => Str::random(10),
             'nombre' => $datos['nombre'],
             'email' => $datos['email'],
-            'password' => Hash::make($passwordTemporal),
+            'password' => Hash::make($datos['password']),
             'rol' => 'admin',
             'estado' => 'activo',
             'creado_por' => Auth::guard('docente')->id(),
         ]);
 
-        session(['password_temporal' => $passwordTemporal]);
+        session(['password_temporal' => $datos['password']]);
 
         return response()->json([
             'success' => true,
             'message' => 'Administrador creado correctamente',
+            'credenciales' => [
+                'correo' => $datos['email'],
+                'password' => $datos['password'],
+            ],
+            'usuario' => [
+                'id' => $administrador->id,
+                'nombre' => $administrador->nombre,
+            ],
+        ]);
+    }
+
+    public function ver(string $id)
+    {
+        $administrador = $this->administradorDelSuperadmin($id);
+
+        return response()->json([
+            'success' => true,
             'data' => $administrador,
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function actualizar(Request $request, string $id)
     {
-        //
+        $administrador = $this->administradorDelSuperadmin($id);
+
+        $datos = $request->validate([
+            'nombre' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email,'.$administrador->id,
+            'institucion' => 'required|exists:instituciones,id',
+            'password' => 'nullable|min:8|confirmed',
+        ]);
+
+        $administrador->update([
+            'nombre' => $datos['nombre'],
+            'email' => $datos['email'],
+            'institucion_id' => $datos['institucion'],
+        ]);
+
+        if ($request->has('password')) {
+            $administrador->password = Hash::make($datos['password']);
+            $administrador->save();
+        }
+        session([
+            'password_temporal' => $datos['password'] ?? null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Administrador actualizado correctamente',
+            'credenciales' => [
+                'correo' => $datos['email'],
+                'password' => $datos['password'],
+            ],
+            'usuario' => [
+                'id' => $administrador->id,
+                'nombre' => $administrador->nombre,
+            ],
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function generarPdf($id)
     {
-        //
+        $usuario = $this->administradorDelSuperadmin($id);
+        $password = session()->pull('password_temporal');
+        $pdf = Pdf::loadView(
+            'superAdmin.pdf.admin',
+            compact('usuario', 'password')
+        );
+        $nombreArchivo = 'Admin_'.Str::slug($usuario->nombre, ' ').'.pdf';
+
+        return $pdf->download($nombreArchivo);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    private function administradorDelSuperadmin(string $id): User
     {
-        //
+        return User::where('rol', 'admin')
+            ->where('creado_por', Auth::guard('docente')->id())
+            ->findOrFail($id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function toggleActivo($id)
     {
-        //
-    }
+        $administrador = User::findOrFail($id);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $administrador->update([
+            'activo' => ! $administrador->activo,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'activo' => $administrador->activo,
+            'message' => $administrador->activo
+                ? 'Administrador activado correctamente.'
+                : 'Administrador desactivado correctamente.',
+        ]);
     }
 }
