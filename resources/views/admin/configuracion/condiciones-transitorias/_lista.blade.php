@@ -51,29 +51,31 @@
                     <h3 class="cfg-titulo">{{ $t?->etiqueta ?? 'Opción no disponible' }}</h3>
                 </div>
                 <div class="cfg-acciones">
-                    <div class="form-check form-switch mb-0">
-                        <input class="form-check-input toggle-activa-transitoria-orden" type="checkbox"
-                            role="switch" style="cursor:pointer"
-                            data-id="{{ $item->id }}"
-                            @checked($item->activa)
-                            title="{{ $item->activa ? 'Desactivar en la institución' : 'Activar en la institución' }}">
-                    </div>
-                    <small class="text-muted">Visible docentes</small>
-                    @if ($puedeGestionar)
-                        <div class="cfg-btns-crud">
-                            <button type="button" class="btn btn-sm btn-outline-primary btn-editar-transitoria"
+                    <div class="cfg-acciones-fila">
+                        <div class="form-check form-switch mb-0" title="Visible para docentes">
+                            <input class="form-check-input toggle-activa-transitoria-orden" type="checkbox"
+                                role="switch"
+                                data-id="{{ $item->id }}"
+                                @checked($item->activa)
+                                title="{{ $item->activa ? 'Desactivar en la institución' : 'Activar en la institución' }}">
+                        </div>
+                        @if ($puedeGestionar)
+                            <button type="button" class="btn-cfg btn-cfg-editar btn-editar-transitoria"
                                 data-id="{{ $t->id }}" title="Editar">
                                 <i class="fa-solid fa-pencil"></i>
+                                Editar
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-transitoria"
+                            <button type="button" class="btn-cfg btn-cfg-eliminar btn-eliminar-transitoria"
                                 data-id="{{ $t->id }}"
                                 data-nombre="{{ e($t->etiqueta) }}"
                                 data-estudiantes="{{ $conteo['total'] }}"
                                 title="Eliminar">
                                 <i class="fa-solid fa-trash-can"></i>
+                                Eliminar
                             </button>
-                        </div>
-                    @endif
+                        @endif
+                    </div>
+                    <small class="text-muted">Visible docentes</small>
                 </div>
             </article>
         @endforeach

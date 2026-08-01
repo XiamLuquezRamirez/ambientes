@@ -67,6 +67,32 @@ class InstitucionSuperAdminController extends Controller
             ];
         })->values();
 
+        $condicionesTransitoriasDisponibles = CondicionTransitoria::query()
+            ->with('condicionBase:id,codigo,nombre,color_hex')
+            ->where(function ($q) use ($id) {
+                $q->whereNull('id_institucion')
+                    ->orWhere('id_institucion', (int) $id);
+            })
+            ->ordenadas()
+            ->get(['id', 'codigo', 'etiqueta', 'condicion_base_id', 'id_institucion', 'es_sistema'])
+            ->map(function (CondicionTransitoria $t) {
+                $color = $t->condicionBase?->color_hex ?: '#64748B';
+
+                return [
+                    'id' => $t->id,
+                    'codigo' => $t->codigo,
+                    'etiqueta' => $t->etiqueta,
+                    'id_institucion' => $t->id_institucion,
+                    'es_sistema' => (bool) $t->es_sistema,
+                    'color' => $color,
+                    'condicion_base' => $t->condicionBase ? [
+                        'codigo' => $t->condicionBase->codigo,
+                        'nombre' => $t->condicionBase->nombre,
+                    ] : null,
+                ];
+            })
+            ->values();
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -84,6 +110,7 @@ class InstitucionSuperAdminController extends Controller
             ],
             'condiciones_orden' => $this->condicionOrdenController->listarPorInstitucion((int) $id),
             'condiciones_transitorias_orden' => $this->condicionTransitoriaOrdenController->listarPorInstitucion((int) $id),
+            'condiciones_transitorias_disponibles' => $condicionesTransitoriasDisponibles,
         ]);
     }
 

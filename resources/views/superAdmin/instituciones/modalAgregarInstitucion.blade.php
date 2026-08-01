@@ -243,17 +243,17 @@
                                     <h6>
                                         <i class="fa-solid fa-list-check me-2"></i>
                                         Condiciones transitorias
-                                        <span class="badge badge-blue ms-1">{{ $condicionesTransitorias->count() }}</span>
+                                        <span class="badge badge-blue ms-1" id="badgeCountTransitoriasOrden">{{ $condicionesTransitorias->count() }}</span>
                                     </h6>
                                     <i class="fa-solid fa-chevron-down chevron"></i>
                                 </div>
                                 <div id="collapseCondicionesTransitoriasOrden" class="collapse show">
-                                    <div class="lista-condiciones-orden">
+                                    <div class="lista-condiciones-orden" id="listaCondicionesTransitoriasOrden">
                                         @forelse ($condicionesTransitorias as $transitoria)
                                             @php
                                                 $colorT = $transitoria->condicionBase?->color_hex ?: '#64748B';
                                             @endphp
-                                            <div class="item-condicion-orden">
+                                            <div class="item-condicion-orden" data-origen="global">
                                                 <input type="hidden"
                                                     name="condiciones_transitorias_orden[{{ $transitoria->id }}][orden]"
                                                     value="{{ $loop->index }}">
@@ -272,7 +272,9 @@
                                                 </label>
                                             </div>
                                         @empty
-                                            <p class="text-muted text-center py-3 mb-0">Sin condiciones transitorias</p>
+                                            <p class="text-muted text-center py-3 mb-0" id="msgSinTransitoriasOrden">
+                                                Sin condiciones transitorias
+                                            </p>
                                         @endforelse
                                     </div>
                                 </div>
@@ -387,16 +389,87 @@
                 cb.checked = false;
             });
 
+            // Al crear: solo globales.
+            restaurarListaTransitoriasGlobales();
+
             // Por defecto todas las condiciones quedan chequeadas.
             document.querySelectorAll('.chk-condicion-orden, .chk-condicion-transitoria-orden')
-                .forEach(chk => {
-                    chk.checked = true;
-                });
+            .forEach(chk => {
+                chk.checked = true;
+            });
 
             const tabDatos = document.querySelector('#tab-datos-institucion');
             if (tabDatos) {
                 bootstrap.Tab.getOrCreateInstance(tabDatos).show();
             }
+        }
+
+        const listaTransitoriasEl = document.getElementById('listaCondicionesTransitoriasOrden');
+        const htmlTransitoriasGlobales = listaTransitoriasEl ? listaTransitoriasEl.innerHTML : '';
+
+        function restaurarListaTransitoriasGlobales() {
+            if (!listaTransitoriasEl) return;
+            listaTransitoriasEl.innerHTML = htmlTransitoriasGlobales;
+            const count = listaTransitoriasEl.querySelectorAll('.chk-condicion-transitoria-orden').length;
+            const badge = document.getElementById('badgeCountTransitoriasOrden');
+            if (badge) badge.textContent = String(count);
+        }
+
+        function renderListaTransitoriasDisponibles(disponibles = [], ordenGuardado = []) {
+            if (!listaTransitoriasEl) return;
+
+            const mapaActiva = {};
+            (ordenGuardado || []).forEach(item => {
+                mapaActiva[item.id_condicion_transitoria] = !!item.activa;
+            });
+            const hayOrden = Object.keys(mapaActiva).length > 0;
+
+            if (!disponibles.length) {
+                listaTransitoriasEl.innerHTML =
+                    '<p class="text-muted text-center py-3 mb-0">Sin condiciones transitorias</p>';
+                const badge = document.getElementById('badgeCountTransitoriasOrden');
+                if (badge) badge.textContent = '0';
+                return;
+            }
+
+            listaTransitoriasEl.innerHTML = disponibles.map((t, index) => {
+                const color = t.color || '#64748B';
+                const checked = hayOrden ? (mapaActiva[t.id] ?? false) : true;
+                const esLocal = t.id_institucion != null;
+                const badgeLocal = esLocal
+                    ? '<span class="badge badge-gray" style="margin-left:6px">Institución</span>'
+                    : '';
+                const baseTxt = t.condicion_base
+                    ? `<small class="text-muted" style="margin-left:6px">(${t.condicion_base.codigo})</small>`
+                    : '';
+
+                return `
+                    <div class="item-condicion-orden" data-origen="${esLocal ? 'institucion' : 'global'}">
+                        <input type="hidden"
+                            name="condiciones_transitorias_orden[${t.id}][orden]"
+                            value="${index}">
+                        <input class="form-check-input chk-condicion-transitoria-orden"
+                            type="checkbox"
+                            id="condicion_transitoria_orden_${t.id}"
+                            name="condiciones_transitorias_orden[${t.id}][activa]"
+                            value="1"
+                            data-id="${t.id}"
+                            ${checked ? 'checked' : ''}>
+                        <label for="condicion_transitoria_orden_${t.id}">
+                            <span class="badge"
+                                style="background:${color}22;color:${color};border:1px solid ${color}55">
+                                ${t.codigo || '—'}
+                            </span>
+                            ${t.etiqueta || ''}
+                            ${baseTxt}
+                            ${badgeLocal}
+                        </label>
+                    </div>
+                `;
+            }).join('');
+
+            const badge = document.getElementById('badgeCountTransitoriasOrden');
+            if (badge) badge.textContent = String(disponibles.length);
         }
 
         function aplicarSeleccionCondicionesOrden(condicionesOrden = [], condicionesTransitoriasOrden = []) {
@@ -661,7 +734,8 @@
                     mapearDatosInstitucion(
                         resp.data,
                         resp.condiciones_orden || [],
-                        resp.condiciones_transitorias_orden || []
+                        resp.condiciones_transitorias_orden || [],
+                        resp.condiciones_transitorias_disponibles || []
                     );
                 })
                 .catch(() => {
@@ -685,7 +759,12 @@
          * Rellena el formulario + switches de ambientes + estado del logo.
          * Ambientes no vinculados llegan desmarcados (sync al guardar los quita del pivot).
          */
-        function mapearDatosInstitucion(data, condicionesOrden = [], condicionesTransitoriasOrden = []) {
+        function mapearDatosInstitucion(
+            data,
+            condicionesOrden = [],
+            condicionesTransitoriasOrden = [],
+            condicionesTransitoriasDisponibles = []
+        ) {
             id_editar = String(data.id);
             $('#nombre').val(data.nombre ?? '');
             $('#codigo_dane').val(data.codigo_dane ?? '');
@@ -720,6 +799,11 @@
                 if (activo) activo.checked = Boolean(amb.activo);
             });
 
+            // En edición: globales + creadas por esa institución.
+            renderListaTransitoriasDisponibles(
+                condicionesTransitoriasDisponibles,
+                condicionesTransitoriasOrden
+            );
             aplicarSeleccionCondicionesOrden(condicionesOrden, condicionesTransitoriasOrden);
 
             if (typeof window.setEstadoLogoInstitucion === 'function') {

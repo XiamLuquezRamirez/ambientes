@@ -11,9 +11,13 @@
         }
     });
 
-    function hayFiltrosActivos() {
-        const params = new URLSearchParams(new FormData(document.getElementById('formFiltrosCondiciones')));
-        return [...params.values()].some(v => !!v);
+    function ordenSeleccionado() {
+        return ($('#selectOrdenarCondiciones').val() || '').trim();
+    }
+
+    function actualizarBotonGuardarOrden() {
+        const visible = !!ordenSeleccionado();
+        $('#btnGuardarOrdenCondiciones').css('display', visible ? 'inline-flex' : 'none');
     }
 
     function initSortable() {
@@ -25,9 +29,10 @@
             sortable = null;
         }
 
-        const filtrada = hayFiltrosActivos();
-        lista.classList.toggle('is-filtrada', filtrada);
-        if (filtrada) return;
+        // Con criterio del select, no se arrastra (se guarda con el botón).
+        const conCriterio = !!ordenSeleccionado();
+        lista.classList.toggle('is-filtrada', conCriterio);
+        if (conCriterio) return;
 
         sortable = Sortable.create(lista, {
             animation: 160,
@@ -38,10 +43,18 @@
         });
     }
 
-    function guardarOrden() {
+    function guardarOrden(despuesDeSelect = false) {
         const ids = [...document.querySelectorAll('#listaCondicionesOrden .cfg-card')]
             .map(el => parseInt(el.dataset.id, 10))
             .filter(Boolean);
+
+        if (!ids.length) {
+            mostrarToast('info', 'No hay condiciones para ordenar.');
+            return;
+        }
+
+        const $btn = $('#btnGuardarOrdenCondiciones');
+        $btn.prop('disabled', true);
 
         $.ajax({
             url: URL_ORDEN,
@@ -53,7 +66,13 @@
             dataType: 'json',
             success: function(res) {
                 if (res.success) {
-                    mostrarToast('success', res.message);
+                    mostrarToast('success', res.message || 'Orden guardado correctamente.');
+                    if (despuesDeSelect) {
+                        $('#selectOrdenarCondiciones').val('');
+                        actualizarBotonGuardarOrden();
+                        cargarLista(URL_INDEX + (construirParamsSinOrdenar() ? `?${construirParamsSinOrdenar()}` : ''));
+                        return;
+                    }
                 } else {
                     mostrarToast('error', res.message || 'No se pudo guardar el orden');
                     cargarLista();
@@ -62,8 +81,20 @@
             error: function(xhr) {
                 mostrarToast('error', xhr.responseJSON?.message || 'Error al guardar el orden');
                 cargarLista();
+            },
+            complete: function() {
+                $btn.prop('disabled', false);
             }
         });
+    }
+
+    function construirParamsSinOrdenar() {
+        const params = new URLSearchParams(new FormData(document.getElementById('formFiltrosCondiciones')));
+        params.delete('ordenar');
+        for (const [k, v] of [...params.entries()]) {
+            if (!v) params.delete(k);
+        }
+        return params.toString();
     }
 
     async function cargarLista(url = null) {
@@ -81,9 +112,7 @@
             if (res.success) {
                 $contenedor.html(res.html);
                 history.pushState(null, '', destino);
-                const params = new URL(destino, window.location.origin).searchParams;
-                const tiene = params.has('buscar') || params.has('ordenar') || params.has('activa');
-                $('#btnLimpiarCondiciones').css('display', tiene ? 'inline-flex' : 'none');
+                actualizarBotonGuardarOrden();
                 initSortable();
             } else {
                 mostrarToast('error', 'Error al cargar');
@@ -105,26 +134,44 @@
 
     window.cargarListaCondicionesAdmin = cargarLista;
 
-    $('#formFiltrosCondiciones select').on('change', () => cargarLista());
-    let debounce;
-    $('#formFiltrosCondiciones input[name="buscar"]').on('input', function() {
-        clearTimeout(debounce);
-        debounce = setTimeout(() => cargarLista(), 350);
+    $('#formFiltrosCondiciones select').on('change', function() {
+        actualizarBotonGuardarOrden();
+        cargarLista();
     });
+
     $('#formFiltrosCondiciones').on('submit', function(e) {
         e.preventDefault();
         cargarLista();
     });
-    $('#btnLimpiarCondiciones').on('click', function(e) {
-        e.preventDefault();
-        $('#formFiltrosCondiciones')[0].reset();
-        cargarLista(URL_INDEX);
+
+    $('#btnGuardarOrdenCondiciones').on('click', function() {
+        guardarOrden(true);
     });
 
-    $(document).on('change', '.toggle-activa-condicion-orden', function() {
+    $(document).on('change', '.toggle-activa-condicion-orden', async function() {
         const $toggle = $(this);
         const id = $toggle.data('id');
         const quiereActivar = $toggle.is(':checked');
+        const nombre = $toggle.closest('.cfg-card').find('.cfg-titulo').text().trim() || 'esta condición';
+
+        if (!quiereActivar) {
+            const confirmacion = await Swal.fire({
+                icon: 'question',
+                title: '¿Desactivar condición?',
+                html: `La condición <strong>"${nombre}"</strong> dejará de aparecer para los docentes.<br><br>¿Desea continuar?`,
+                showCancelButton: true,
+                confirmButtonText: 'Sí, desactivar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#D97706',
+                cancelButtonColor: '#94A3B8'
+            });
+
+            if (!confirmacion.isConfirmed) {
+                $toggle.prop('checked', true);
+                return;
+            }
+        }
+
         $toggle.prop('disabled', true);
 
         $.ajax({
@@ -153,5 +200,6 @@
         });
     });
 
+    actualizarBotonGuardarOrden();
     initSortable();
 })();

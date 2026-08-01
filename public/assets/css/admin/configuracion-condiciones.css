@@ -80,13 +80,62 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 10px;
-    min-width: 120px;
+    gap: 6px;
+    min-width: auto;
 }
 
-.cfg-btns-crud {
+.cfg-acciones-fila {
     display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.cfg-acciones-fila .form-check-input {
+    cursor: pointer;
+    width: 2.4em;
+    height: 1.25em;
+    margin: 0;
+}
+
+.btn-cfg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     gap: 6px;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: .82rem;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
+}
+
+.btn-cfg:active {
+    transform: translateY(1px);
+}
+
+.btn-cfg-editar {
+    background: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.btn-cfg-editar:hover {
+    background: #BFDBFE;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, .18);
+}
+
+.btn-cfg-eliminar {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+.btn-cfg-eliminar:hover {
+    background: #FECACA;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, .18);
 }
 
 .cfg-hint {
@@ -102,4 +151,10 @@
     border: 1px dashed #E2E8F0;
     border-radius: 14px;
     background: #F8FAFC;
+}
+
+.btn-condiciones {
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
 }

@@ -16,7 +16,14 @@ class CondicionTransitoriaOrdenController extends Controller
      */
     public function sincronizarParaInstitucion(int $institucionId, array $seleccion = []): void
     {
-        $catalogo = CondicionTransitoria::query()->ordenadas()->get(['id']);
+        // Globales (null) + propias de la institución.
+        $catalogo = CondicionTransitoria::query()
+            ->where(function ($q) use ($institucionId) {
+                $q->whereNull('id_institucion')
+                    ->orWhere('id_institucion', $institucionId);
+            })
+            ->ordenadas()
+            ->get(['id']);
 
         DB::transaction(function () use ($institucionId, $seleccion, $catalogo) {
             CondicionTransitoriaOrden::query()
