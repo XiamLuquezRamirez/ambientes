@@ -1,0 +1,105 @@
+.cfg-filtros {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.cfg-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 40px;
+}
+
+.cfg-card {
+    background: #fff;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 14px;
+    align-items: start;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, .04);
+    transition: box-shadow .2s, border-color .2s, opacity .2s;
+}
+
+.cfg-card:hover {
+    border-color: #BFDBFE;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, .08);
+}
+
+.cfg-card.is-inactive {
+    opacity: .72;
+    background: #F8FAFC;
+}
+
+.cfg-card.sortable-ghost {
+    opacity: .45;
+    border-style: dashed;
+}
+
+.cfg-card.sortable-drag {
+    box-shadow: 0 16px 32px rgba(15, 23, 42, .16);
+}
+
+.cfg-drag {
+    color: #94A3B8;
+    cursor: grab;
+    padding-top: 4px;
+    font-size: 1.1rem;
+}
+
+.cfg-drag:active {
+    cursor: grabbing;
+}
+
+.cfg-lista.is-filtrada .cfg-drag {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+.cfg-titulo {
+    font-weight: 700;
+    color: #1E293B;
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.cfg-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+.cfg-acciones {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    min-width: 120px;
+}
+
+.cfg-btns-crud {
+    display: flex;
+    gap: 6px;
+}
+
+.cfg-hint {
+    color: #64748B;
+    font-size: .88rem;
+    margin: 0 0 16px;
+}
+
+.cfg-empty {
+    text-align: center;
+    color: #94A3B8;
+    padding: 40px 16px;
+    border: 1px dashed #E2E8F0;
+    border-radius: 14px;
+    background: #F8FAFC;
+}
