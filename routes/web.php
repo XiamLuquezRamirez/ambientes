@@ -288,7 +288,12 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     // Administradores
     Route::get('administradores', [AdminsSuperAdminController::class, 'listar'])->name('superadmin.administradores.listar');
     Route::post('administradores', [AdminsSuperAdminController::class, 'guardar'])->name('superadmin.administradores.guardar');
+    Route::get('administradores/datos/{id}', [AdminsSuperAdminController::class, 'ver'])->name('superadmin.administradores.ver');
     Route::put('administradores/{id}', [AdminsSuperAdminController::class, 'actualizar'])->name('superadmin.administradores.actualizar');
+    Route::get('administradores/{id}/generar-pdf', [AdminsSuperAdminController::class, 'generarPdf'])->name('superadmin.administradores.generar-pdf');
+    Route::patch('administradores/{id}/toggle-activo', [AdminsSuperAdminController::class, 'toggleActivo'])->name('superadmin.administradores.toggleActivo');
+
+    // Condiciones
     Route::get('condiciones', [CondicionInclusionController::class, 'index'])->name('superadmin.condiciones.index');
     Route::post('condiciones', [CondicionInclusionController::class, 'guardar'])->name('superadmin.condiciones.guardar');
     Route::get('condiciones/{condicionInclusion}', [CondicionInclusionController::class, 'mostrar'])->name('superadmin.condiciones.mostrar');

@@ -21,11 +21,14 @@ class User extends Authenticatable
         'rol',
         'estado',
         'creado_por',
+        'activo',
     ];
 
     protected $hidden = ['password', 'remember_token'];
 
-    protected $casts = [];
+    protected $casts = [
+        'activo' => 'boolean',
+    ];
 
     public function docente()
     {

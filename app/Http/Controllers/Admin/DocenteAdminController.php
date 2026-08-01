@@ -28,9 +28,12 @@ class DocenteAdminController extends Controller
      */
     public function listar(Request $request)
     {
+
+        $institucionId = session('institucion_id');
         // La fecha de último acceso no existe en docentes: se lee desde registros_acceso
         // a través de user.ultimoLogin (mismo origen que en el listado de usuarios).
         $consulta = Docente::query()
+            ->where('institucion_id', $institucionId)
             ->with([
                 'user' => fn ($q) => $q
                     ->with('ultimoLogin')
@@ -386,6 +389,7 @@ class DocenteAdminController extends Controller
      */
     public function guardar(Request $request)
     {
+        $institucionId = session('institucion_id');
         $datos = $request->validate([
             'nombre' => 'required|string|max:100',
             'apellido' => 'required|string|max:100',
@@ -400,7 +404,7 @@ class DocenteAdminController extends Controller
         ]);
 
         // Transacción: si falla el perfil docente, no queda un usuario huérfano.
-        $docente = DB::transaction(function () use ($datos, $request) {
+        $docente = DB::transaction(function () use ($datos, $request, $institucionId) {
 
             $firma_url = null;
 
@@ -414,6 +418,7 @@ class DocenteAdminController extends Controller
                 'identificacion' => $datos['identificacion'],
                 'email' => $datos['email'],
                 'password' => Hash::make($datos['password']),
+                'institucion_id' => $institucionId,
                 'rol' => 'docente',
                 'activo' => true,
             ]);
@@ -473,6 +478,7 @@ class DocenteAdminController extends Controller
      */
     public function actualizar(Request $request, $docente)
     {
+        $institucionId = session('institucion_id');
         $usuario = User::with('docente')->findOrFail($docente);
 
         $datos = $request->validate([
@@ -488,7 +494,7 @@ class DocenteAdminController extends Controller
             'password' => 'nullable|min:8|confirmed',
         ]);
 
-        DB::transaction(function () use ($usuario, $datos, $request) {
+        DB::transaction(function () use ($usuario, $datos, $request, $institucionId) {
 
             $firma_url = null;
 
@@ -501,6 +507,7 @@ class DocenteAdminController extends Controller
                 'nombre' => $datos['nombre'],
                 'apellido' => $datos['apellido'],
                 'identificacion' => $datos['identificacion'],
+                'institucion_id' => $institucionId,
                 'email' => $datos['email'],
             ]);
 

@@ -22,6 +22,7 @@ class UsuarioAdminController extends Controller
     public function __construct(
         private ResumenActividadDocenteService $resumenActividadDocente,
     ) {}
+
     /**
      * Lista los docentes con filtros opcionales y paginación.
      *
@@ -30,7 +31,9 @@ class UsuarioAdminController extends Controller
      */
     public function listar(Request $request)
     {
+        $institucionId = session('institucion_id');
         $consulta = User::query()
+            ->where('institucion_id', $institucionId)
             ->select(
                 'users.*',
             );
@@ -310,7 +313,7 @@ class UsuarioAdminController extends Controller
             if ($usuario->rol === 'docente' && $usuario->docente?->cargasActivas->isNotEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Este usuario tiene cargas académicas asignadas. 
+                    'message' => 'Este usuario tiene cargas académicas asignadas.
                         Reasígnalas primero.',
                 ], 422);
             }
@@ -494,7 +497,7 @@ class UsuarioAdminController extends Controller
                 ) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Este usuario tiene cargas académicas asignadas. 
+                        'message' => 'Este usuario tiene cargas académicas asignadas.
                         Reasígnalas primero.',
                     ], 422);
                 }
