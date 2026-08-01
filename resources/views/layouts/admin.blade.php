@@ -105,11 +105,44 @@
                     <i class="fa-solid fa-chart-line"></i> Reportes
                 </a>
             </li>
+            @php
+            $configuracion = request()->routeIs('admin.configuracion*');
+            @endphp          
             <li class="nav-item">
-                <a href="{{ route('admin.configuracion') }}"
-                    class="{{ request()->routeIs('admin.configuracion*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-gear"></i> Configuración
+                <a href="#navConfiguracion" data-bs-toggle="collapse" aria-expanded="{{ $configuracion ? 'true' : 'false' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $configuracion ? 'active' : '' }}"
+                    style="cursor:pointer">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Configuración</span>
+                    <i class="fa-solid fa-chevron-down ms-auto"
+                        style="font-size:.65rem;transition:transform .2s;
+                              {{ $configuracion ? 'transform:rotate(180deg)' : '' }}"></i>
                 </a>
+                <div class="collapse {{ $configuracion ? 'show' : '' }}" id="navConfiguracion">
+                    <ul class="nav flex-column" style="padding:2px 0 4px 0">
+                        <li class="nav-item">
+                            <a href=""
+                                class="{{ request()->routeIs('admin.configuracion.institucion*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-school"></i> Institución
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href=""
+                                class="{{ request()->routeIs('admin.configuracion.condiciones*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-puzzle-piece"></i> Condiciones
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href=""
+                                class="{{ request()->routeIs('admin.configuracion.condiciones-transitorias*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-puzzle-piece"></i> Condiciones transitorias
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
             <li class="nav-item">
                 <a href="{{ route('admin.usuarios') }}"
