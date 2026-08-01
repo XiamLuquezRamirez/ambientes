@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
 use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Admin\CierreAnioController;
+use App\Http\Controllers\Admin\CondicionConfiguracionController;
+use App\Http\Controllers\Admin\CondicionTransitoriaConfiguracionController;
 use App\Http\Controllers\Admin\ConfiguracionAdminController;
 use App\Http\Controllers\Admin\ConflictosController;
 use App\Http\Controllers\Admin\DocenteAdminController;
@@ -168,6 +170,18 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     // Configuracion
     Route::get('configuracion', [ConfiguracionAdminController::class, 'listar'])->name('admin.configuracion');
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
+
+    Route::get('configuracion/condiciones', [CondicionConfiguracionController::class, 'index'])->name('admin.configuracion.condiciones.index');
+    Route::patch('configuracion/condiciones/orden', [CondicionConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.condiciones.orden');
+    Route::patch('configuracion/condiciones/{condicionOrden}/estado', [CondicionConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.condiciones.estado');
+
+    Route::get('configuracion/condiciones-transitorias', [CondicionTransitoriaConfiguracionController::class, 'index'])->name('admin.configuracion.condiciones-transitorias.index');
+    Route::post('configuracion/condiciones-transitorias', [CondicionTransitoriaConfiguracionController::class, 'guardar'])->name('admin.configuracion.condiciones-transitorias.guardar');
+    Route::patch('configuracion/condiciones-transitorias/orden', [CondicionTransitoriaConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.condiciones-transitorias.orden');
+    Route::get('configuracion/condiciones-transitorias/opcion/{condicionTransitoria}', [CondicionTransitoriaConfiguracionController::class, 'mostrar'])->name('admin.configuracion.condiciones-transitorias.mostrar');
+    Route::put('configuracion/condiciones-transitorias/opcion/{condicionTransitoria}', [CondicionTransitoriaConfiguracionController::class, 'actualizar'])->name('admin.configuracion.condiciones-transitorias.actualizar');
+    Route::delete('configuracion/condiciones-transitorias/opcion/{condicionTransitoria}', [CondicionTransitoriaConfiguracionController::class, 'eliminar'])->name('admin.configuracion.condiciones-transitorias.eliminar');
+    Route::patch('configuracion/condiciones-transitorias/{condicionTransitoriaOrden}/estado', [CondicionTransitoriaConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.condiciones-transitorias.estado');
 
     // Usuario
     Route::get('perfil', [PerfilController::class, 'mostrar'])->name('admin.perfil');

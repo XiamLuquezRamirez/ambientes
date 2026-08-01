@@ -375,6 +375,7 @@ CREATE TABLE `estudiantes` (
   `grado_id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `color_avatar` varchar(9) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#0F6E56',
   `condicion_id` int(11) DEFAULT 1,
+  `condicion_transitoria_id` int(11) DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT 1,
   `fecha_nacimiento` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `acudiente` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
