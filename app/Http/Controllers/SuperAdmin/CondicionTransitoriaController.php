@@ -28,7 +28,10 @@ class CondicionTransitoriaController extends Controller
             ]);
         }
 
-        if (! $esSuperAdmin) {
+        if ($esSuperAdmin) {
+            // Solo globales: sistema y adicionales creadas por super admin (sin institución).
+            $consulta->whereNull('id_institucion');
+        } else {
             $consulta->deInstitucion($usuario?->institucion_id);
         }
 

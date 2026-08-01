@@ -20,17 +20,11 @@
 
     <p class="cfg-hint">
         <i class="fa-solid fa-info-circle"></i>
-        Active/desactive opciones para su colegio y reordene arrastrando.
+        Arrastre para reordenar, o elija un criterio y guarde el orden.
         Solo puede editar o eliminar las opciones adicionales de su institución.
     </p>
 
     <form id="formFiltrosTransitorias" class="cfg-filtros">
-        <div class="input-buscar">
-            <span class="icono-buscar"><i class="fas fa-search"></i></span>
-            <input type="text" name="buscar" placeholder="Buscar por código o etiqueta..."
-                value="{{ request('buscar') }}" autocomplete="off">
-        </div>
-
         <select name="condicion_base_id" class="form-control" style="width:auto;min-width:220px">
             <option value="">Todas las condiciones base</option>
             @foreach ($condicionesBase as $base)
@@ -40,8 +34,8 @@
             @endforeach
         </select>
 
-        <select name="ordenar" class="form-control" style="width:auto;min-width:180px">
-            <option value="">Orden personalizado</option>
+        <select name="ordenar" id="selectOrdenarTransitorias" class="form-control" style="width:auto;min-width:200px">
+            <option value="">Orden personalizado (arrastrar)</option>
             <option value="nombre" @selected(request('ordenar') === 'nombre')>Ordenar por nombre</option>
             <option value="codigo" @selected(request('ordenar') === 'codigo')>Ordenar por código</option>
         </select>
@@ -52,12 +46,10 @@
             <option value="0" @selected(request('activa') === '0')>Desactivadas</option>
         </select>
 
-        <a id="btnLimpiarTransitorias" href="{{ route('admin.configuracion.condiciones-transitorias.index') }}"
-            class="btn btn-sm"
-            style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
-              display:{{ request()->hasAny(['buscar', 'ordenar', 'activa', 'condicion_base_id']) ? 'inline-flex' : 'none' }}">
-            <i class="fas fa-broom"></i> Limpiar
-        </a>
+        <button type="button" id="btnGuardarOrdenTransitorias" class="btn btn-primary btn-sm btn-condiciones"
+            style="display:{{ request('ordenar') ? 'inline-flex' : 'none' }}">
+            <i class="fas fa-save"></i> Guardar orden seleccionado
+        </button>
     </form>
 
     <div id="contenedorListaTransitorias">

@@ -15,18 +15,12 @@
 
     <p class="cfg-hint">
         <i class="fa-solid fa-info-circle"></i>
-        Arrastre las tarjetas para reordenar. Desactivar oculta la opción a los docentes sin modificar el catálogo global.
+        Arrastre las tarjetas para reordenar, o elija un criterio en el select y guarde el orden.
     </p>
 
     <form id="formFiltrosCondiciones" class="cfg-filtros">
-        <div class="input-buscar">
-            <span class="icono-buscar"><i class="fas fa-search"></i></span>
-            <input type="text" name="buscar" placeholder="Buscar por código o nombre..."
-                value="{{ request('buscar') }}" autocomplete="off">
-        </div>
-
-        <select name="ordenar" class="form-control" style="width:auto;min-width:180px">
-            <option value="">Orden personalizado</option>
+        <select name="ordenar" id="selectOrdenarCondiciones" class="form-control" style="width:auto;min-width:200px">
+            <option value="">Orden personalizado (arrastrar)</option>
             <option value="nombre" @selected(request('ordenar') === 'nombre')>Ordenar por nombre</option>
             <option value="codigo" @selected(request('ordenar') === 'codigo')>Ordenar por código</option>
         </select>
@@ -37,12 +31,10 @@
             <option value="0" @selected(request('activa') === '0')>Desactivadas</option>
         </select>
 
-        <a id="btnLimpiarCondiciones" href="{{ route('admin.configuracion.condiciones.index') }}"
-            class="btn btn-sm"
-            style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
-              display:{{ request()->hasAny(['buscar', 'ordenar', 'activa']) ? 'inline-flex' : 'none' }}">
-            <i class="fas fa-broom"></i> Limpiar
-        </a>
+        <button type="button" id="btnGuardarOrdenCondiciones" class="btn btn-primary btn-sm btn-condiciones"
+            style="display:{{ request('ordenar') ? 'inline-flex' : 'none' }}">
+            <i class="fas fa-save"></i> Guardar orden seleccionado
+        </button>
     </form>
 
     <div id="contenedorListaCondiciones">

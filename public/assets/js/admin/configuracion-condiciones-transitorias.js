@@ -12,9 +12,13 @@
         }
     });
 
-    function hayFiltrosActivos() {
-        const params = new URLSearchParams(new FormData(document.getElementById('formFiltrosTransitorias')));
-        return [...params.values()].some(v => !!v);
+    function ordenSeleccionado() {
+        return ($('#selectOrdenarTransitorias').val() || '').trim();
+    }
+
+    function actualizarBotonGuardarOrden() {
+        const visible = !!ordenSeleccionado();
+        $('#btnGuardarOrdenTransitorias').css('display', visible ? 'inline-flex' : 'none');
     }
 
     function initSortable() {
@@ -26,23 +30,31 @@
             sortable = null;
         }
 
-        const filtrada = hayFiltrosActivos();
-        lista.classList.toggle('is-filtrada', filtrada);
-        if (filtrada) return;
+        const conCriterio = !!ordenSeleccionado();
+        lista.classList.toggle('is-filtrada', conCriterio);
+        if (conCriterio) return;
 
         sortable = Sortable.create(lista, {
             animation: 160,
             handle: '.cfg-drag',
             ghostClass: 'sortable-ghost',
             dragClass: 'sortable-drag',
-            onEnd: guardarOrden
+            onEnd: () => guardarOrden(false)
         });
     }
 
-    function guardarOrden() {
+    function guardarOrden(despuesDeSelect = false) {
         const ids = [...document.querySelectorAll('#listaTransitoriasOrden .cfg-card')]
             .map(el => parseInt(el.dataset.id, 10))
             .filter(Boolean);
+
+        if (!ids.length) {
+            mostrarToast('info', 'No hay opciones para ordenar.');
+            return;
+        }
+
+        const $btn = $('#btnGuardarOrdenTransitorias');
+        $btn.prop('disabled', true);
 
         $.ajax({
             url: URL_ORDEN,
@@ -54,7 +66,14 @@
             dataType: 'json',
             success: function(res) {
                 if (res.success) {
-                    mostrarToast('success', res.message);
+                    mostrarToast('success', res.message || 'Orden guardado correctamente.');
+                    if (despuesDeSelect) {
+                        $('#selectOrdenarTransitorias').val('');
+                        actualizarBotonGuardarOrden();
+                        const qs = construirParamsSinOrdenar();
+                        cargarLista(qs ? `${URL_INDEX}?${qs}` : URL_INDEX);
+                        return;
+                    }
                 } else {
                     mostrarToast('error', res.message || 'No se pudo guardar el orden');
                     cargarLista();
@@ -63,8 +82,20 @@
             error: function(xhr) {
                 mostrarToast('error', xhr.responseJSON?.message || 'Error al guardar el orden');
                 cargarLista();
+            },
+            complete: function() {
+                $btn.prop('disabled', false);
             }
         });
+    }
+
+    function construirParamsSinOrdenar() {
+        const params = new URLSearchParams(new FormData(document.getElementById('formFiltrosTransitorias')));
+        params.delete('ordenar');
+        for (const [k, v] of [...params.entries()]) {
+            if (!v) params.delete(k);
+        }
+        return params.toString();
     }
 
     async function cargarLista(url = null) {
@@ -82,10 +113,7 @@
             if (res.success) {
                 $contenedor.html(res.html);
                 history.pushState(null, '', destino);
-                const params = new URL(destino, window.location.origin).searchParams;
-                const tiene = params.has('buscar') || params.has('ordenar') ||
-                    params.has('activa') || params.has('condicion_base_id');
-                $('#btnLimpiarTransitorias').css('display', tiene ? 'inline-flex' : 'none');
+                actualizarBotonGuardarOrden();
                 initSortable();
             } else {
                 mostrarToast('error', 'Error al cargar');
@@ -106,29 +134,46 @@
     }
 
     window.cargarListaTransitoriasAdmin = cargarLista;
-    // Alias para el modal de registro/edición
     window.cargarTablaTransitorias = cargarLista;
 
-    $('#formFiltrosTransitorias select').on('change', () => cargarLista());
-    let debounce;
-    $('#formFiltrosTransitorias input[name="buscar"]').on('input', function() {
-        clearTimeout(debounce);
-        debounce = setTimeout(() => cargarLista(), 350);
+    $('#formFiltrosTransitorias select').on('change', function() {
+        actualizarBotonGuardarOrden();
+        cargarLista();
     });
+
     $('#formFiltrosTransitorias').on('submit', function(e) {
         e.preventDefault();
         cargarLista();
     });
-    $('#btnLimpiarTransitorias').on('click', function(e) {
-        e.preventDefault();
-        $('#formFiltrosTransitorias')[0].reset();
-        cargarLista(URL_INDEX);
+
+    $('#btnGuardarOrdenTransitorias').on('click', function() {
+        guardarOrden(true);
     });
 
-    $(document).on('change', '.toggle-activa-transitoria-orden', function() {
+    $(document).on('change', '.toggle-activa-transitoria-orden', async function() {
         const $toggle = $(this);
         const id = $toggle.data('id');
         const quiereActivar = $toggle.is(':checked');
+        const nombre = $toggle.closest('.cfg-card').find('.cfg-titulo').text().trim() || 'esta opción';
+
+        if (!quiereActivar) {
+            const confirmacion = await Swal.fire({
+                icon: 'question',
+                title: '¿Desactivar opción?',
+                html: `La opción <strong>"${nombre}"</strong> dejará de aparecer para los docentes.<br><br>¿Desea continuar?`,
+                showCancelButton: true,
+                confirmButtonText: 'Sí, desactivar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#D97706',
+                cancelButtonColor: '#94A3B8'
+            });
+
+            if (!confirmacion.isConfirmed) {
+                $toggle.prop('checked', true);
+                return;
+            }
+        }
+
         $toggle.prop('disabled', true);
 
         $.ajax({
@@ -218,5 +263,6 @@
         });
     });
 
+    actualizarBotonGuardarOrden();
     initSortable();
 })();
