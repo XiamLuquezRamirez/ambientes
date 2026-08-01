@@ -170,6 +170,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     // Configuracion
     Route::get('configuracion', [ConfiguracionAdminController::class, 'listar'])->name('admin.configuracion');
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
+    Route::post('configuracion/logo', [ConfiguracionAdminController::class, 'subirLogo'])->name('admin.configuracion.logo');
     Route::get('configuracion/datos/{id}', [ConfiguracionAdminController::class, 'verDatosInstitucion'])->name('admin.configuracion.datos');
 
     Route::get('configuracion/condiciones', [CondicionConfiguracionController::class, 'index'])->name('admin.configuracion.condiciones.index');

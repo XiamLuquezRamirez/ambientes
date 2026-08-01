@@ -26,13 +26,13 @@
             </a>
         </li>
     </ul>
-    <form id="formAgregarInstitucion" enctype="multipart/form-data" method="POST">
+
+    <form id="formDatosInstitucion" method="POST">
         @csrf
         <div class="tab-content" style="padding: 20px;">
             <div class="tab-pane container active" id="datosInstitucion" role="tabpanel"
                 aria-labelledby="tab-datos-institucion">
                 <div class="row">
-                    {{-- Avatar: misma UX que foto de perfil (overlay → modal de logo) --}}
                     <div class="col-md-12 d-flex justify-content-center align-items-center">
                         <div class="mb-3">
                             <div class="avatar-wrapper mx-auto">
@@ -50,7 +50,7 @@
                                 </div>
                             </div>
                             <p class="text-muted text-center small mt-2 mb-0">
-                                JPG o PNG · máx. 2 MB · <span class="text-danger">obligatorio</span>
+                                JPG o PNG · máx. 2 MB
                             </p>
                         </div>
                     </div>
@@ -91,21 +91,27 @@
                         </div>
                     </div>
                 </div>
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button type="button" class="btn btn-primary" id="btnActualizarInstitucion"
+                        onclick="actualizarDatosInstitucion()">
+                        <i class="fas fa-save"></i> Guardar cambios
+                    </button>
+                </div>
             </div>
 
-            {{--
-                Tab servidores — names alineados con InstitucionSuperAdminController:
-                ambientes[id][ip|puerto|activo]
-            --}}
+            {{-- Servidores: solo lectura (gestionados por Super Admin) --}}
             <div class="tab-pane container" id="servidores" role="tabpanel" aria-labelledby="tab-servidores">
+                <p class="text-muted small mb-3">
+                    <i class="fas fa-lock me-1"></i>
+                    Información de servidores en solo lectura. Contacte al administrador del sistema para cambios.
+                </p>
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>Servidor</th>
-                                <th>IP</th>
+                                <th>IP de conexión</th>
                                 <th class="text-center">Puerto</th>
-                                <th class="text-center">Activo</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -116,27 +122,17 @@
                                     </td>
                                     <td>
                                         <input type="text" class="form-control" id="ambiente_ip_{{ $a->id }}"
-                                            name="ambientes[{{ $a->id }}][ip]" placeholder="192.168.1.100"
-                                            autocomplete="off" disabled>
+                                            value="{{ $a->pivot->ip }}" readonly tabindex="-1">
                                     </td>
                                     <td class="text-center">
-                                        <input type="number" class="form-control" style="width:90px;margin:auto"
-                                            id="ambiente_puerto_{{ $a->id }}"
-                                            name="ambientes[{{ $a->id }}][puerto]" min="1" max="65535"
-                                            placeholder="8080" disabled>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="form-check form-switch d-inline-flex justify-content-center">
-                                            <input class="form-check-input" type="checkbox"
-                                                id="ambiente_activo_{{ $a->id }}"
-                                                name="ambientes[{{ $a->id }}][activo]" value="1" disabled
-                                                style="cursor: pointer;" title="Activar integración con este ambiente">
-                                        </div>
+                                        <input type="text" class="form-control" style="width:90px;margin:auto"
+                                            id="ambiente_puerto_{{ $a->id }}" value="{{ $a->pivot->puerto }}"
+                                            readonly tabindex="-1">
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
+                                    <td colspan="3" class="text-center text-muted py-4">
                                         Sin ambientes registrados
                                     </td>
                                 </tr>
@@ -151,12 +147,17 @@
             </div>
         </div>
     </form>
+
+    @include('admin.configuracion.institucion.modalLogoInstitucion')
 @endsection
 
 @push('scripts')
     <script>
         const URL_CONFIGURACION_BASE = @json(url('admin/configuracion'));
-        cargarDatosInstitucion({{ session('institucion_id') }});
+        const URL_CONFIGURACION_UPDATE = @json(route('admin.configuracion.update'));
+        const INSTITUCION_ID = @json((int) session('institucion_id'));
+
+        cargarDatosInstitucion(INSTITUCION_ID);
 
         function cargarDatosInstitucion(id) {
             fetch(`${URL_CONFIGURACION_BASE}/datos/${id}`, {
@@ -164,7 +165,10 @@
                         'Accept': 'application/json'
                     }
                 })
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) throw new Error('No data');
+                    return r.json();
+                })
                 .then(resp => {
                     if (!resp.success) throw new Error('No data');
                     mapearDatosInstitucion(resp.data);
@@ -174,17 +178,19 @@
                 });
         }
 
-        /**
-         * Rellena el formulario + switches de ambientes + estado del logo.
-         * Ambientes no vinculados llegan desmarcados (sync al guardar los quita del pivot).
-         */
         function mapearDatosInstitucion(data) {
-            id_editar = String(data.id);
             $('#nombre').val(data.nombre ?? '');
             $('#codigo_dane').val(data.codigo_dane ?? '');
             $('#municipio').val(data.municipio ?? '');
             $('#departamento').val(data.departamento ?? '');
             $('#correo_contacto').val(data.correo_contacto ?? '');
+
+            (data.ambientes || []).forEach(function(amb) {
+                const ip = document.getElementById(`ambiente_ip_${amb.id}`);
+                const puerto = document.getElementById(`ambiente_puerto_${amb.id}`);
+                if (ip) ip.value = amb.ip ?? '';
+                if (puerto) puerto.value = amb.puerto ?? '';
+            });
 
             if (typeof window.setEstadoLogoInstitucion === 'function') {
                 window.setEstadoLogoInstitucion({
@@ -193,6 +199,76 @@
                     iniciales: data.iniciales || 'IE',
                 });
             }
+        }
+
+        function setBtnActualizar(modo) {
+            const btn = document.getElementById('btnActualizarInstitucion');
+            if (!btn) return;
+            if (modo === 'guardando') {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Guardar cambios';
+            }
+        }
+
+        function mostrarErroresFormulario(errors) {
+            const form = document.getElementById('formDatosInstitucion');
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+            form.querySelectorAll('.invalid-feedback.ajax-error').forEach(el => el.remove());
+
+            Object.entries(errors || {}).forEach(([campo, mensajes]) => {
+                const input = form.querySelector(`[name="${campo}"]`);
+                if (!input) return;
+                input.classList.add('is-invalid');
+                const div = document.createElement('div');
+                div.className = 'invalid-feedback ajax-error d-block';
+                div.textContent = Array.isArray(mensajes) ? mensajes[0] : mensajes;
+                input.parentNode.appendChild(div);
+            });
+        }
+
+        function actualizarDatosInstitucion() {
+            const form = document.getElementById('formDatosInstitucion');
+            const formData = new FormData(form);
+
+            setBtnActualizar('guardando');
+
+            $.ajax({
+                url: URL_CONFIGURACION_UPDATE,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? ''
+                },
+                success: function(res) {
+                    if (!res.success) {
+                        mostrarToast('error', res.message || 'No se pudo actualizar');
+                        return;
+                    }
+                    form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                    form.querySelectorAll('.invalid-feedback.ajax-error').forEach(el => el.remove());
+                    mostrarToast('success', res.message || 'Datos actualizados correctamente');
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        const errors = xhr.responseJSON?.errors ?? {};
+                        mostrarErroresFormulario(errors);
+                        const msgLogo = errors.logo?.[0];
+                        mostrarToast('error', msgLogo || 'Verifique los datos ingresados');
+                        return;
+                    }
+                    mostrarToast('error', xhr.responseJSON?.message || 'Error al actualizar la institución');
+                },
+                complete: function() {
+                    setBtnActualizar('listo');
+                }
+            });
         }
     </script>
 @endpush
