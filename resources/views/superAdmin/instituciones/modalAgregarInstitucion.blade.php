@@ -2,12 +2,20 @@
     Modal: Agregar / Editar Institución (Super Admin)
     - Tab 1: datos básicos + avatar de logo (abre modalLogoInstitucion)
     - Tab 2: IP/puerto/activo por ambiente (name ambientes[id][...]; backend espera "activo")
-    - Tab 3: módulos (pendiente)
+    - Tab 3: condiciones + condiciones transitorias (condiciones_orden / condiciones_transitorias_orden)
+    - Tab 4: módulos (pendiente)
 
     Crear  → POST  superadmin/instituciones
     Editar → POST  superadmin/instituciones/{id} + _method=PUT  (FormData + multipart)
     Logo   → gestionado en modalLogoInstitucion (independiente al guardar datos)
 --}}
+@php
+    $condiciones = $condiciones ?? collect();
+    $condicionesTransitorias = $condicionesTransitorias ?? collect();
+@endphp
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('assets/css/instituciones/index.css') }}">
+@endpush
 <div class="modal fade" id="modalAgregarInstitucion" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalAgregarInstitucionLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -38,6 +46,12 @@
                         <a class="nav-link" id="tab-servidores" data-bs-toggle="tab" href="#servidores" role="tab"
                             aria-controls="servidores" aria-selected="false">
                             <i class="fas fa-server"></i> Servidores
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="tab-condiciones" data-bs-toggle="tab" href="#condicionesInstitucion"
+                            role="tab" aria-controls="condicionesInstitucion" aria-selected="false">
+                            <i class="fas fa-layer-group"></i> Condiciones
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -175,6 +189,96 @@
                             </div>
                         </div>
 
+                        {{-- Tab: condiciones globales y transitorias --}}
+                        <div class="tab-pane container" id="condicionesInstitucion" role="tabpanel"
+                            aria-labelledby="tab-condiciones">
+                            <p class="text-muted mb-3" style="font-size:.9rem">
+                                Seleccione las condiciones disponibles para la institución.
+                                Por defecto todas quedan activas.
+                            </p>
+
+                            <div class="card card-condiciones-orden">
+                                <div class="card-header" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseCondicionesOrden" aria-expanded="true"
+                                    aria-controls="collapseCondicionesOrden">
+                                    <h6>
+                                        <i class="fa-solid fa-layer-group me-2"></i>
+                                        Condiciones
+                                        <span class="badge badge-blue ms-1">{{ $condiciones->count() }}</span>
+                                    </h6>
+                                    <i class="fa-solid fa-chevron-down chevron"></i>
+                                </div>
+                                <div id="collapseCondicionesOrden" class="collapse show">
+                                    <div class="lista-condiciones-orden">
+                                        @forelse ($condiciones as $condicion)
+                                            @php $color = $condicion->color_hex ?: '#64748B'; @endphp
+                                            <div class="item-condicion-orden">
+                                                <input type="hidden"
+                                                    name="condiciones_orden[{{ $condicion->id }}][orden]"
+                                                    value="{{ $loop->index }}">
+                                                <input class="form-check-input chk-condicion-orden" type="checkbox"
+                                                    id="condicion_orden_{{ $condicion->id }}"
+                                                    name="condiciones_orden[{{ $condicion->id }}][activa]"
+                                                    value="1" checked
+                                                    data-id="{{ $condicion->id }}">
+                                                <label for="condicion_orden_{{ $condicion->id }}">
+                                                    <span class="badge"
+                                                        style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55">
+                                                        {{ $condicion->codigo }}
+                                                    </span>
+                                                    {{ $condicion->nombre }}
+                                                </label>
+                                            </div>
+                                        @empty
+                                            <p class="text-muted text-center py-3 mb-0">Sin condiciones registradas</p>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card card-condiciones-orden">
+                                <div class="card-header" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseCondicionesTransitoriasOrden" aria-expanded="true"
+                                    aria-controls="collapseCondicionesTransitoriasOrden">
+                                    <h6>
+                                        <i class="fa-solid fa-list-check me-2"></i>
+                                        Condiciones transitorias
+                                        <span class="badge badge-blue ms-1">{{ $condicionesTransitorias->count() }}</span>
+                                    </h6>
+                                    <i class="fa-solid fa-chevron-down chevron"></i>
+                                </div>
+                                <div id="collapseCondicionesTransitoriasOrden" class="collapse show">
+                                    <div class="lista-condiciones-orden">
+                                        @forelse ($condicionesTransitorias as $transitoria)
+                                            @php
+                                                $colorT = $transitoria->condicionBase?->color_hex ?: '#64748B';
+                                            @endphp
+                                            <div class="item-condicion-orden">
+                                                <input type="hidden"
+                                                    name="condiciones_transitorias_orden[{{ $transitoria->id }}][orden]"
+                                                    value="{{ $loop->index }}">
+                                                <input class="form-check-input chk-condicion-transitoria-orden"
+                                                    type="checkbox"
+                                                    id="condicion_transitoria_orden_{{ $transitoria->id }}"
+                                                    name="condiciones_transitorias_orden[{{ $transitoria->id }}][activa]"
+                                                    value="1" checked
+                                                    data-id="{{ $transitoria->id }}">
+                                                <label for="condicion_transitoria_orden_{{ $transitoria->id }}">
+                                                    <span class="badge"
+                                                        style="background:{{ $colorT }}22;color:{{ $colorT }};border:1px solid {{ $colorT }}55">
+                                                        {{ $transitoria->codigo }}
+                                                    </span>
+                                                    {{ $transitoria->etiqueta }}
+                                                </label>
+                                            </div>
+                                        @empty
+                                            <p class="text-muted text-center py-3 mb-0">Sin condiciones transitorias</p>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="tab-pane container" id="modulos" role="tabpanel"
                             aria-labelledby="tab-modulos">
                             <p class="text-muted mb-0">La asignación de módulos estará disponible próximamente.</p>
@@ -279,14 +383,46 @@
             limpiarErroresModal('formAgregarInstitucion');
 
             // Desmarca ambientes (reset no siempre limpia bien en algunos browsers con switches).
-            form.querySelectorAll('input[type="checkbox"][name*="[activo]"]').forEach(cb => {
+            form.querySelectorAll('#servidores input[type="checkbox"][name*="[activo]"]').forEach(cb => {
                 cb.checked = false;
             });
+
+            // Por defecto todas las condiciones quedan chequeadas.
+            document.querySelectorAll('.chk-condicion-orden, .chk-condicion-transitoria-orden')
+                .forEach(chk => {
+                    chk.checked = true;
+                });
 
             const tabDatos = document.querySelector('#tab-datos-institucion');
             if (tabDatos) {
                 bootstrap.Tab.getOrCreateInstance(tabDatos).show();
             }
+        }
+
+        function aplicarSeleccionCondicionesOrden(condicionesOrden = [], condicionesTransitoriasOrden = []) {
+            const mapaCond = {};
+            (condicionesOrden || []).forEach(item => {
+                mapaCond[item.id_condicion] = !!item.activa;
+            });
+
+            document.querySelectorAll('.chk-condicion-orden').forEach(chk => {
+                const id = parseInt(chk.dataset.id, 10);
+                chk.checked = Object.keys(mapaCond).length
+                    ? (mapaCond[id] ?? false)
+                    : true;
+            });
+
+            const mapaTrans = {};
+            (condicionesTransitoriasOrden || []).forEach(item => {
+                mapaTrans[item.id_condicion_transitoria] = !!item.activa;
+            });
+
+            document.querySelectorAll('.chk-condicion-transitoria-orden').forEach(chk => {
+                const id = parseInt(chk.dataset.id, 10);
+                chk.checked = Object.keys(mapaTrans).length
+                    ? (mapaTrans[id] ?? false)
+                    : true;
+            });
         }
 
         function abrirModalBSPasswordGenerada() {
@@ -522,7 +658,11 @@
                 .then(r => r.json())
                 .then(resp => {
                     if (!resp.success) throw new Error('No data');
-                    mapearDatosInstitucion(resp.data);
+                    mapearDatosInstitucion(
+                        resp.data,
+                        resp.condiciones_orden || [],
+                        resp.condiciones_transitorias_orden || []
+                    );
                 })
                 .catch(() => {
                     mostrarToast('error', 'No se pudo cargar la información de la institución');
@@ -545,7 +685,7 @@
          * Rellena el formulario + switches de ambientes + estado del logo.
          * Ambientes no vinculados llegan desmarcados (sync al guardar los quita del pivot).
          */
-        function mapearDatosInstitucion(data) {
+        function mapearDatosInstitucion(data, condicionesOrden = [], condicionesTransitoriasOrden = []) {
             id_editar = String(data.id);
             $('#nombre').val(data.nombre ?? '');
             $('#codigo_dane').val(data.codigo_dane ?? '');
@@ -579,6 +719,8 @@
                 if (puerto) puerto.value = amb.puerto ?? '';
                 if (activo) activo.checked = Boolean(amb.activo);
             });
+
+            aplicarSeleccionCondicionesOrden(condicionesOrden, condicionesTransitoriasOrden);
 
             if (typeof window.setEstadoLogoInstitucion === 'function') {
                 window.setEstadoLogoInstitucion({

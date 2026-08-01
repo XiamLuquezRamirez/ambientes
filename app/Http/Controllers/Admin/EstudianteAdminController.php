@@ -29,9 +29,12 @@ class EstudianteAdminController extends Controller
         /* ── Filtros ────────────────────────────────────── */
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
-            $consulta->where(fn ($q) => $q
-                ->where('nombre', 'like', "%{$termino}%")
-            );
+
+            $consulta->where(function ($q) use ($termino) {
+                $q->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ["%{$termino}%"])
+                ->orWhere('nombre', 'like', "%{$termino}%")
+                ->orWhere('apellido', 'like', "%{$termino}%");
+            });
         }
 
         if ($request->filled('grado_id')) {
@@ -48,6 +51,11 @@ class EstudianteAdminController extends Controller
 
         if ($request->filled('estado')) {
             $consulta->where('activo', $request->estado);
+        }
+
+        // filtrar solo las de la institucion del usuario logueado con la variable de session 'institucion_id'
+        if (session('institucion_id')) {
+            $consulta->where('institucion_id', session('institucion_id'));
         }
 
         $estudiantes = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
@@ -152,6 +160,7 @@ class EstudianteAdminController extends Controller
                     'direccion' => $datos['direccion'],
                     'telefono' => $datos['telefono'],
                     'email' => $datos['email'],
+                    'institucion_id' => session('institucion_id')
                 ]);
 
                 ConfiguracionPin::create([
