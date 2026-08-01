@@ -1935,6 +1935,7 @@ CREATE TABLE `users` (
     'inactivo',
     'eliminado'
   ) NOT NULL DEFAULT 'activo',
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
   `creado_por` bigint(20) unsigned DEFAULT NULL,
   `remember_token` varchar(100) DEFAULT NULL,
   `bloqueado_en` timestamp NULL DEFAULT NULL,
@@ -1963,7 +1964,7 @@ COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `users` */
 
-insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`remember_token`,`created_at`,`updated_at`,`bloqueado_en`) values
+insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`activo`,`remember_token`,`created_at`,`updated_at`,`bloqueado_en`) values
 (2,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente','activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58',NULL),
 (3,'213123','Administrador',NULL,'admin@aulasreggio.test','$2y$10$wjLu1JkqDfVwAMR7VEkx0eN0K4jQVh5G/75sE.0V9wO1x4GO.3Wlq','admin','activo',NULL,'2026-06-16 00:12:01','2026-06-18 17:16:17',NULL),
 (4,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35',NULL),
@@ -1981,7 +1982,7 @@ insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password
 
 /* insertar superadmin password: password */
 
-INSERT INTO `users` (`id`, `identificacion`, `nombre`, `apellido`, `email`, `password`, `rol`, `estado`, `remember_token`, `created_at`, `updated_at`, `bloqueado_en`) VALUES
+INSERT INTO `users` (`id`, `identificacion`, `nombre`, `apellido`, `email`, `password`, `rol`, `estado`, `activo`, `remember_token`, `created_at`, `updated_at`, `bloqueado_en`) VALUES
 (1, '1234567890', 'Super', 'Admin', 'superadmin@aulasreggio.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'superadmin', 'activo', NULL, '2026-06-16 17:32:50', '2026-06-16 17:32:50', NULL);
 
 DROP TABLE IF EXISTS `seguridad_logs`;
@@ -2573,8 +2574,8 @@ CREATE TABLE condiciones_transitorias (
   updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-/*Data for the table `condiciones_transitorias` */  
-INSERT INTO condiciones_transitorias (codigo, etiqueta, descripcion_interna, condicion_base_id, es_sistema, estado, usuario_crea) VALUES 
+/*Data for the table `condiciones_transitorias` */
+INSERT INTO condiciones_transitorias (codigo, etiqueta, descripcion_interna, condicion_base_id, es_sistema, estado, usuario_crea) VALUES
 ('CTR-002', 'Sospecha de TDAH', 'Descripción corta de la condición', 2, 1, 1, 1),
 ('CTR-003', 'Sospecha de TEA', 'Descripción corta de la condición', 3, 1, 1, 1),
 ('CTR-004', 'Sospecha de Síndrome de Down', 'Descripción corta de la condición', 4, 1, 1, 1),
