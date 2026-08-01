@@ -53,22 +53,19 @@ class DocenteAdminController extends Controller
             );
 
         $consulta->orderBy('users.nombre');
+
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
-            $consulta->where('users.nombre', 'like', "%{$termino}%")
-                ->orWhere('users.email', 'like', "%{$termino}%");
-        }
-
-        if ($request->filled('ambiente_id')) {
-            $consulta->whereHas('ambientes', fn ($q) => $q->where('ambientes.id', $request->ambiente_id));
-        }
-
-        if ($request->filled('rol')) {
-            $consulta->where('rol', $request->rol);
+            $consulta->where(fn ($q) => $q
+                ->where('institucion_id', $institucionId)
+                ->where('users.nombre', 'like', "%{$termino}%")
+                ->orWhere('users.email', 'like', "%{$termino}%")
+            );
         }
 
         if ($request->filled('estado')) {
-            $consulta->where('docentes.estado', $request->estado === 'true');
+            $consulta->where('institucion_id', $institucionId)
+                ->where('docentes.estado', $request->estado === 'true');
         }
 
         // ordenar por nombre

@@ -23,12 +23,22 @@
                                 data-nombre="{{ $admin->nombre }}" style="cursor: pointer;" @checked($admin->activo)>
                         </div>
                     </td>
-                    <td style="text-align:center">
-                        <button type="button" class="btn btn-primary"
-                            onclick="abrirModalEditarAdministrador({{ $admin->id }})">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button type="button" class="btn btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
+                    <td>
+                        <div class="tabla-acciones" style="justify-content:center">
+                            <button type="button" class="btn-accion btn-asignar-grado"
+                                onclick="abrirModalEditarAdministrador({{ $admin->id }})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button type="button" class="btn-accion btn-eliminar"
+                                onclick="abrirModalEliminarAdministrador({{ $admin->id }})">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                            <button type="button" class="btn-accion btn-ver-accesos"
+                                onclick="abrirModalVerAccesos({{ $admin->id }})">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                Ver Accesos
+                            </button>
+                        </div>
                     </td>
                 </tr>
             @empty

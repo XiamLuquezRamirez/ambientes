@@ -19,6 +19,8 @@
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
     @include('superAdmin.administradores.modalCrearAdmins')
     @include('admin.usuarios.ver_contra_gen')
+    @include('superAdmin.administradores.ver-accesos')
+
 @endsection
 
 @push('scripts')

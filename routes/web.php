@@ -168,6 +168,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     // Configuracion
     Route::get('configuracion', [ConfiguracionAdminController::class, 'listar'])->name('admin.configuracion');
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
+    Route::get('configuracion/datos/{id}', [ConfiguracionAdminController::class, 'verDatosInstitucion'])->name('admin.configuracion.datos');
 
     // Usuario
     Route::get('perfil', [PerfilController::class, 'mostrar'])->name('admin.perfil');
@@ -292,6 +293,7 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::put('administradores/{id}', [AdminsSuperAdminController::class, 'actualizar'])->name('superadmin.administradores.actualizar');
     Route::get('administradores/{id}/generar-pdf', [AdminsSuperAdminController::class, 'generarPdf'])->name('superadmin.administradores.generar-pdf');
     Route::patch('administradores/{id}/toggle-activo', [AdminsSuperAdminController::class, 'toggleActivo'])->name('superadmin.administradores.toggleActivo');
+    Route::get('administradores/{id}/accesos', [AdminsSuperAdminController::class, 'verAccesos'])->name('superadmin.administradores.accesos');
 
     // Condiciones
     Route::get('condiciones', [CondicionInclusionController::class, 'index'])->name('superadmin.condiciones.index');
