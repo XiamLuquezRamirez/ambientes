@@ -2632,6 +2632,44 @@ CREATE TABLE condiciones_transitorias_orden (
   UNIQUE KEY uk_institucion_condicion_transitoria (id_institucion, id_condicion_transitoria),
   KEY idx_institucion_orden (id_institucion, orden)
 );
+
+
+/*Table structure for table `estudiante_condicion_transitoria` */
+
+DROP TABLE IF EXISTS `estudiante_condicion_transitoria`;
+
+CREATE TABLE estudiante_condicion_transitoria (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+
+    id_estudiante BIGINT UNSIGNED NOT NULL,
+    id_condicion_transitoria BIGINT UNSIGNED NOT NULL,
+    id_docente BIGINT UNSIGNED NOT NULL,
+
+    observacion TEXT NOT NULL,
+
+    fecha_activacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    activa TINYINT(1) NOT NULL DEFAULT 1,
+
+    fecha_cierre DATETIME NULL,
+    motivo_cierre ENUM(
+        'diagnostico_formal',
+        'condicion_no_confirmada',
+        'otro'
+    ) NULL,
+    observacion_cierre TEXT NULL,
+
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+
+    FOREIGN KEY (id_estudiante) REFERENCES estudiantes(id),
+    FOREIGN KEY (id_condicion_transitoria) REFERENCES condiciones_transitorias(id),
+    FOREIGN KEY (id_docente) REFERENCES docentes(id),
+
+    INDEX(id_estudiante),
+    INDEX(id_condicion_transitoria),
+    INDEX(activa)
+);
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

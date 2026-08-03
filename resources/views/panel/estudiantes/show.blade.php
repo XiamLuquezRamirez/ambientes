@@ -118,6 +118,77 @@
             </div>
         </section>
 
+        {{-- Acciones --}}
+        <section class="c-card">
+            <h3 class="ficha-section-title">Acciones</h3>
+            <div class="ficha-actions">
+                @if ($estudiante->configuracionPin == null)
+                    <button type="button" onclick="abrirModalConfigurarPin({{ $estudiante->id }})"
+                        class="btn btn-outline-primary">
+                        <i class="fa-solid fa-key"></i> Configurar PIN
+                    </button>
+                @else
+                    <button type="button" onclick="abrirModalSolicitarCambioPin({{ $estudiante->id }})"
+                        class="btn btn-outline-success">
+                        <i class="fa-solid fa-key"></i> Solicitar cambio de PIN
+                    </button>
+                @endif
+                <a href="{{ route('panel.portafolio.estudiante', $estudiante) }}" class="btn btn-outline-primary">
+                    <i class="fa-solid fa-folder-open"></i> Ver portafolio completo
+                </a>
+                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                    data-bs-target="#modalObservacionFicha">
+                    <i class="fa-solid fa-comment"></i> Agregar observación
+                </button>
+                <form method="POST" action="{{ route('panel.estudiantes.asistencia', $estudiante) }}"
+                    class="ficha-action-form">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-primary"
+                        @if ($asistenciaHoy?->presente) disabled title="Ya registrada hoy" @endif>
+                        <i class="fa-solid fa-calendar-check"></i>
+                        {{ $asistenciaHoy?->presente ? 'Asistencia ya registrada' : 'Registrar asistencia puntual' }}
+                    </button>
+                </form>
+                @php
+                    $clase = null;
+                    $texto = null;
+                    $ruta = null;
+
+                    if ($requiereApoyo) {
+                        if ($estudiante->piar) {
+                            if ($estudiante->piar->paso < 8) {
+                                $clase = 'btn btn-primary';
+                                $texto = 'PIAR incompleto';
+                                $ruta = route('admin.estudiantes.diligenciar-piar', [
+                                    'idEstudiante' => $estudiante->id,
+                                    'tipo' => 'nuevo',
+                                ]);
+                            } elseif ($estudiante->piar->paso == 8) {
+                                $clase = 'btn btn-primary';
+                                $texto = 'Ver PIAR';
+                                $ruta = route('admin.piar.exportar', [
+                                    'idEstudiante' => $estudiante->id,
+                                ]);
+                            }
+                        } else {
+                            $clase = 'btn btn-primary';
+                            $texto = 'Diligenciar PIAR';
+                            $ruta = route('admin.estudiantes.diligenciar-piar', [
+                                'idEstudiante' => $estudiante->id,
+                                'tipo' => 'nuevo',
+                            ]);
+                        }
+                    }
+                @endphp
+
+                @if ($ruta)
+                    <a class="{{ $clase }}" href="{{ $ruta }}" title="{{ $texto }}">
+                        <i class="fa-solid fa-file-medical"></i> {{ $texto }}
+                    </a>
+                @endif
+            </div>
+        </section>
+
         {{-- Resumen: matrícula, PIN, PIAR --}}
         <div class="c-card shadow-sm mt-2">
             <div class="c-head bg-white">
@@ -292,79 +363,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-
-        {{-- Acciones --}}
-        <section class="c-card">
-            <h3 class="ficha-section-title">Acciones</h3>
-            <div class="ficha-actions">
-                @if ($estudiante->configuracionPin == null)
-                    <button type="button" onclick="abrirModalConfigurarPin({{ $estudiante->id }})"
-                        class="btn btn-outline-primary">
-                        <i class="fa-solid fa-key"></i> Configurar PIN
-                    </button>
-                @else
-                    <button type="button" onclick="abrirModalSolicitarCambioPin({{ $estudiante->id }})"
-                        class="btn btn-outline-success">
-                        <i class="fa-solid fa-key"></i> Solicitar cambio de PIN
-                    </button>
-                @endif
-                <a href="{{ route('panel.portafolio.estudiante', $estudiante) }}" class="btn btn-outline-primary">
-                    <i class="fa-solid fa-folder-open"></i> Ver portafolio completo
-                </a>
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
-                    data-bs-target="#modalObservacionFicha">
-                    <i class="fa-solid fa-comment"></i> Agregar observación
-                </button>
-                <form method="POST" action="{{ route('panel.estudiantes.asistencia', $estudiante) }}"
-                    class="ficha-action-form">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-primary"
-                        @if ($asistenciaHoy?->presente) disabled title="Ya registrada hoy" @endif>
-                        <i class="fa-solid fa-calendar-check"></i>
-                        {{ $asistenciaHoy?->presente ? 'Asistencia ya registrada' : 'Registrar asistencia puntual' }}
-                    </button>
-                </form>
-                @php
-                    $clase = null;
-                    $texto = null;
-                    $ruta = null;
-
-                    if ($requiereApoyo) {
-                        if ($estudiante->piar) {
-                            if ($estudiante->piar->paso < 8) {
-                                $clase = 'btn btn-primary';
-                                $texto = 'PIAR incompleto';
-                                $ruta = route('admin.estudiantes.diligenciar-piar', [
-                                    'idEstudiante' => $estudiante->id,
-                                    'tipo' => 'nuevo',
-                                ]);
-                            } elseif ($estudiante->piar->paso == 8) {
-                                $clase = 'btn btn-primary';
-                                $texto = 'Ver PIAR';
-                                $ruta = route('admin.piar.exportar', [
-                                    'idEstudiante' => $estudiante->id,
-                                ]);
-                            }
-                        } else {
-                            $clase = 'btn btn-primary';
-                            $texto = 'Diligenciar PIAR';
-                            $ruta = route('admin.estudiantes.diligenciar-piar', [
-                                'idEstudiante' => $estudiante->id,
-                                'tipo' => 'nuevo',
-                            ]);
-                        }
-                    }
-                @endphp
-
-                @if ($ruta)
-                    <a class="{{ $clase }}" href="{{ $ruta }}" title="{{ $texto }}">
-                        <i class="fa-solid fa-file-medical"></i> {{ $texto }}
-                    </a>
-                @endif
-            </div>
-        </section>
+        </div>   
 
         {{-- Actividad reciente --}}
         <section class="ficha-activity">
