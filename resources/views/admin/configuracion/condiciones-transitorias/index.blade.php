@@ -21,7 +21,8 @@
     <p class="cfg-hint">
         <i class="fa-solid fa-info-circle"></i>
         Arrastre para reordenar, o elija un criterio y guarde el orden.
-        Solo puede editar o eliminar las opciones adicionales de su institución.
+        Solo puede editar o eliminar las opciones adicionales creadas por administración;
+        las creadas por docentes no se pueden editar, eliminar ni desactivar.
     </p>
 
     <form id="formFiltrosTransitorias" class="cfg-filtros">
@@ -62,6 +63,9 @@
         'urlTransitoriasBase' => route('admin.configuracion.condiciones-transitorias.index'),
         'urlTransitoriasItem' => url('admin/configuracion/condiciones-transitorias/opcion'),
     ])
+
+    @include('partials.condiciones-transitorias.modal-estudiantes-asociados')
+    @include('partials.condiciones-transitorias.modal-desactivar')
 @endsection
 
 @push('scripts')
@@ -69,6 +73,9 @@
     <script>
         window.URL_CFG_TRANSITORIAS = @json(route('admin.configuracion.condiciones-transitorias.index'));
         window.URL_CFG_TRANSITORIAS_ORDEN = @json(route('admin.configuracion.condiciones-transitorias.orden'));
+        window.CT_EST_URL_LIST = (id) => @json(url('admin/configuracion/condiciones-transitorias/opcion')) + `/${id}/estudiantes`;
+        window.CT_EST_URL_DESASOCIAR = (id) => @json(url('admin/configuracion/condiciones-transitorias/asignaciones')) + `/${id}/desasociar`;
     </script>
     <script src="{{ asset('assets/js/admin/configuracion-condiciones-transitorias.js') }}"></script>
+    <script src="{{ asset('assets/js/condiciones/estudiantes-asociados-transitoria.js') }}"></script>
 @endpush

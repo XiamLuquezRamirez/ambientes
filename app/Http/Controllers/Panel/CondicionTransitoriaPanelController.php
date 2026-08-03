@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
 use App\Models\CondicionInclusion;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 
-class CondicionTransitoriaConfiguracionController extends Controller
+class CondicionTransitoriaPanelController extends Controller
 {
     public function index(Request $request)
     {
@@ -45,38 +45,45 @@ class CondicionTransitoriaConfiguracionController extends Controller
             $consulta->where('condiciones_transitorias_orden.activa', (int) $request->activa);
         }
 
-        if ($request->filled('ordenar') && in_array($request->ordenar, ['nombre', 'codigo'], true)) {
-            $columna = $request->ordenar === 'nombre' ? 'etiqueta' : 'codigo';
-            $consulta->join(
-                'condiciones_transitorias',
-                'condiciones_transitorias.id',
-                '=',
-                'condiciones_transitorias_orden.id_condicion_transitoria'
-            )
-                ->orderBy('condiciones_transitorias.'.$columna)
-                ->select('condiciones_transitorias_orden.*');
-        } else {
-            $consulta->orderBy('condiciones_transitorias_orden.orden');
+        if ($request->filled('origen') && in_array($request->origen, ['propias', 'institucion'], true)) {
+            $userId = Auth::guard('docente')->id();
+            if ($request->origen === 'propias') {
+                $consulta->whereHas('condicionTransitoria', fn ($q) => $q->where('usuario_crea', $userId));
+            } else {
+                $consulta->whereHas('condicionTransitoria', fn ($q) => $q->where(function ($sub) use ($userId) {
+                    $sub->whereNull('usuario_crea')
+                        ->orWhere('usuario_crea', '!=', $userId);
+                }));
+            }
         }
 
+        $consulta->orderBy('condiciones_transitorias_orden.orden');
+
         $items = $consulta->get();
-        $conteos = app(EstudianteCondicionTransitoriaService::class)
-            ->conteoActivosPorCondicion($institucionId);
+        $docenteId = Auth::guard('docente')->user()->docente?->id;
+        $servicio = app(EstudianteCondicionTransitoriaService::class);
+        $conteos = $docenteId
+            ? $servicio->conteoActivosPorCondicionDocente($institucionId, $docenteId)
+            : [];
         $condicionesBase = CondicionInclusion::query()->ordenadas()->get(['id', 'codigo', 'nombre', 'color_hex']);
-        $esSuperAdmin = false;
+        $usuarioId = Auth::guard('docente')->id();
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'html' => view('admin.configuracion.condiciones-transitorias._lista', compact('items', 'conteos'))->render(),
+                'html' => view('panel.inclusion.condiciones-transitorias._lista', compact(
+                    'items',
+                    'conteos',
+                    'usuarioId'
+                ))->render(),
             ]);
         }
 
-        return view('admin.configuracion.condiciones-transitorias.index', compact(
+        return view('panel.inclusion.condiciones-transitorias.index', compact(
             'items',
             'conteos',
             'condicionesBase',
-            'esSuperAdmin'
+            'usuarioId'
         ));
     }
 
@@ -163,12 +170,13 @@ class CondicionTransitoriaConfiguracionController extends Controller
         $institucionId = $this->institucionId();
 
         $estudiantesAsignados = app(EstudianteCondicionTransitoriaService::class)
-            ->conteoActivosCondicion($condicionTransitoria->id, $institucionId);
+            ->conteoActivosCondicion($condicionTransitoria->id, $institucionId, Auth::guard('docente')->user()->docente?->id);
 
         if ($estudiantesAsignados > 0) {
             return response()->json([
                 'success' => false,
                 'estudiantes_asignados' => $estudiantesAsignados,
+                'puede_desactivar' => true,
                 'message' => "No se puede eliminar: tiene {$estudiantesAsignados} estudiante(s) asociados. Puede desactivarla en su lugar.",
             ], 422);
         }
@@ -190,73 +198,37 @@ class CondicionTransitoriaConfiguracionController extends Controller
 
     public function actualizarEstado(Request $request, CondicionTransitoriaOrden $condicionTransitoriaOrden)
     {
-        $this->autorizarOrden($condicionTransitoriaOrden);
-        $condicionTransitoriaOrden->load('condicionTransitoria.creador');
+        $this->autorizarOrdenPropia($condicionTransitoriaOrden);
 
-        if ($condicionTransitoriaOrden->condicionTransitoria?->creadaPorDocente()) {
-            abort(403, 'No puedes activar ni desactivar condiciones creadas por docentes.');
-        }
+        $nuevoEstado = $request->has('activa')
+            ? (bool) $request->boolean('activa')
+            : ! $condicionTransitoriaOrden->activa;
 
         $condicionTransitoriaOrden->update([
-            'activa' => ! $condicionTransitoriaOrden->activa,
+            'activa' => $nuevoEstado,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => $condicionTransitoriaOrden->activa
-                ? 'Opción activada para la institución.'
-                : 'Opción desactivada para la institución.',
+                ? 'Condición activada correctamente.'
+                : 'Condición desactivada correctamente.',
             'activa' => (bool) $condicionTransitoriaOrden->activa,
-        ]);
-    }
-
-    public function actualizarOrden(Request $request)
-    {
-        $institucionId = $this->institucionId();
-
-        $datos = $request->validate([
-            'orden' => 'required|array|min:1',
-            'orden.*' => 'integer|distinct',
-        ]);
-
-        $ids = array_map('intval', $datos['orden']);
-
-        $validos = CondicionTransitoriaOrden::query()
-            ->where('id_institucion', $institucionId)
-            ->whereIn('id', $ids)
-            ->pluck('id')
-            ->map(fn ($id) => (int) $id)
-            ->all();
-
-        if (count($validos) !== count($ids)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Hay opciones inválidas en el orden enviado.',
-            ], 422);
-        }
-
-        DB::transaction(function () use ($ids, $institucionId) {
-            foreach ($ids as $posicion => $id) {
-                CondicionTransitoriaOrden::query()
-                    ->where('id_institucion', $institucionId)
-                    ->where('id', $id)
-                    ->update(['orden' => $posicion]);
-            }
-        });
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Orden actualizado correctamente.',
         ]);
     }
 
     public function estudiantesAsociados(CondicionTransitoria $condicionTransitoria)
     {
         $institucionId = $this->institucionId();
+        $docente = Auth::guard('docente')->user()->docente;
+        if (! $docente) {
+            abort(403);
+        }
+
         $servicio = app(EstudianteCondicionTransitoriaService::class);
         $servicio->autorizarCondicionInstitucion($condicionTransitoria, $institucionId);
 
-        $asignaciones = $servicio->asignacionesActivas($condicionTransitoria, $institucionId);
+        $asignaciones = $servicio->asignacionesActivas($condicionTransitoria, $institucionId, $docente->id);
 
         return response()->json([
             'success' => true,
@@ -273,11 +245,20 @@ class CondicionTransitoriaConfiguracionController extends Controller
 
     public function desasociarEstudiante(Request $request, EstudianteCondicionTransitoria $asignacion)
     {
+        $docente = Auth::guard('docente')->user()->docente;
+        if (! $docente) {
+            abort(403);
+        }
+
         $institucionId = $this->institucionId();
         $servicio = app(EstudianteCondicionTransitoriaService::class);
 
         $asignacion->load('condicionTransitoria', 'estudiante');
         $servicio->autorizarCondicionInstitucion($asignacion->condicionTransitoria, $institucionId);
+
+        if ((int) $asignacion->id_docente !== (int) $docente->id) {
+            abort(403, 'Solo puedes Desactivar estudiantes que tú asociaste.');
+        }
 
         if ((int) $asignacion->estudiante?->institucion_id !== $institucionId) {
             abort(403, 'No autorizado.');
@@ -353,39 +334,47 @@ class CondicionTransitoriaConfiguracionController extends Controller
      */
     private function conteoEstudiantesPorTransitoria(int $institucionId): array
     {
+        $docenteId = Auth::guard('docente')->user()->docente?->id;
+
+        if (! $docenteId) {
+            return [];
+        }
+
         return app(EstudianteCondicionTransitoriaService::class)
-            ->conteoActivosPorCondicion($institucionId);
+            ->conteoActivosPorCondicionDocente($institucionId, $docenteId);
     }
 
     private function institucionId(): int
     {
-        $id = session('institucion_id');
+        $id = Auth::guard('docente')->user()?->institucion_id;
 
         if (! $id) {
-            abort(403, 'No se encontró la institución en sesión.');
+            abort(403, 'No se encontró la institución del docente.');
         }
 
         return (int) $id;
     }
 
-    private function autorizarOrden(CondicionTransitoriaOrden $orden): void
+    private function autorizarGestion(CondicionTransitoria $condicion): void
+    {
+        $usuarioId = Auth::guard('docente')->id();
+
+        if (
+            $condicion->es_sistema
+            || (int) $condicion->id_institucion !== $this->institucionId()
+            || ! $condicion->esDelUsuario($usuarioId)
+        ) {
+            abort(403, 'Solo puedes editar o eliminar las condiciones que tú creaste.');
+        }
+    }
+
+    private function autorizarOrdenPropia(CondicionTransitoriaOrden $orden): void
     {
         if ((int) $orden->id_institucion !== $this->institucionId()) {
             abort(403, 'No autorizado.');
         }
-    }
 
-    private function autorizarGestion(CondicionTransitoria $condicion): void
-    {
-        if (
-            $condicion->es_sistema
-            || (int) $condicion->id_institucion !== $this->institucionId()
-        ) {
-            abort(403, 'No autorizado para gestionar esta condición.');
-        }
-
-        if ($condicion->creadaPorDocente()) {
-            abort(403, 'No puedes editar ni eliminar condiciones creadas por docentes.');
-        }
+        $orden->load('condicionTransitoria');
+        $this->autorizarGestion($orden->condicionTransitoria);
     }
 }

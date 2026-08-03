@@ -29,9 +29,13 @@
                         @else
                             <span class="badge badge-gray">Adicional</span>
                         @endif
-                        <span class="badge badge-blue" title="Estudiantes de la institución">
+                        <span class="badge badge-blue badge-estudiantes-condicion {{ $conteo['activos'] > 0 ? 'badge-estudiantes-condicion--click' : '' }}"
+                            title="{{ $conteo['activos'] > 0 ? 'Ver estudiantes asociados' : 'Sin estudiantes activos' }}"
+                            data-condicion-id="{{ $c?->id }}"
+                            data-etiqueta="{{ $c?->nombre ?? '' }}"
+                            @if ($conteo['activos'] > 0) role="button" tabindex="0" @endif>
                             <i class="fa-solid fa-user-graduate"></i>
-                            {{ $conteo['activos'] }} activos / {{ $conteo['total'] }} total
+                            {{ $conteo['activos'] }} estudiante{{ $conteo['activos'] === 1 ? '' : 's' }} activo{{ $conteo['activos'] === 1 ? '' : 's' }}
                         </span>
                     </div>
                     <h3 class="cfg-titulo">{{ $c?->nombre ?? 'Condición no disponible' }}</h3>

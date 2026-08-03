@@ -347,6 +347,21 @@
     z-index: 1;
 }
 
+.student-card--transitoria {
+    background: #FFF7ED;
+    border-color: #FDBA74;
+    box-shadow: 0 1px 2px rgba(234, 88, 12, .06), 0 8px 20px rgba(234, 88, 12, .08);
+}
+
+.student-card--transitoria .student-top {
+    background: linear-gradient(180deg, #FFEDD5 0%, #FFF7ED 100%);
+}
+
+.student-card--transitoria:hover {
+    border-color: #FB923C;
+    box-shadow: 0 4px 16px rgba(234, 88, 12, .14);
+}
+
 .student-card:hover {
     transform: translateY(-3px);
     border-color: #BFDBFE;
@@ -499,6 +514,12 @@
     background: #FEF3C7;
     border-color: #FDE68A;
     color: #B45309;
+}
+
+.stu-badge--transitoria {
+    background: #FFF7ED;
+    border-color: #FDBA74;
+    color: #C2410C;
 }
 
 /*==========================
@@ -1145,4 +1166,165 @@
     opacity: .55;
     pointer-events: none;
     transition: opacity .2s ease;
+}
+
+/* Select filtrable — condición transitoria */
+.ct-select {
+    position: relative;
+}
+
+.ct-select-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+    text-align: left;
+}
+
+.ct-select-trigger:hover,
+.ct-select.open .ct-select-trigger {
+    border-color: #FDBA74;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, .12);
+}
+
+.ct-select-label {
+    flex: 1;
+    color: #0F172A;
+    font-weight: 600;
+    font-size: .92rem;
+}
+
+.ct-select-label.is-placeholder {
+    color: #94A3B8;
+    font-weight: 500;
+}
+
+.ct-select-chevron {
+    color: #64748B;
+    font-size: .75rem;
+    transition: transform .15s;
+}
+
+.ct-select.open .ct-select-chevron {
+    transform: rotate(180deg);
+}
+
+.ct-select-panel {
+    display: none;
+    position: absolute;
+    z-index: 1056;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    background: #fff;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, .12);
+    overflow: hidden;
+}
+
+.ct-select.open .ct-select-panel {
+    display: block;
+}
+
+.ct-select-search {
+    padding: 10px;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.ct-select-search-wrap {
+    position: relative;
+}
+
+.ct-select-search-wrap i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    font-size: .85rem;
+}
+
+.ct-select-search input {
+    width: 100%;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 8px 12px 8px 34px;
+    font-size: .9rem;
+    outline: none;
+}
+
+.ct-select-search input:focus {
+    border-color: #FDBA74;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, .1);
+}
+
+.ct-select-list {
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 6px;
+}
+
+.ct-select-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.ct-select-option:hover,
+.ct-select-option.active {
+    background: #FFF7ED;
+}
+
+.ct-select-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ct-select-option-text strong {
+    font-size: .9rem;
+    color: #0F172A;
+}
+
+.ct-select-option-text small {
+    font-size: .78rem;
+    color: #64748B;
+}
+
+.ct-select-empty {
+    padding: 18px 12px;
+    text-align: center;
+    color: #94A3B8;
+    font-size: .88rem;
+}
+
+/*==========================
+    MODAL ACTIVAR CONDICIÓN TRANSICTORIA
+===========================*/
+
+.btn-outline-pink {
+    border-color: #ff4684;
+    color: #ff4684;
+}
+
+.btn-outline-pink:hover {
+    background: #ff4684;
+    border-color: #ff4684;
+    color: #ffffff;
 }

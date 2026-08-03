@@ -58,9 +58,30 @@ class CondicionTransitoria extends Model
         return $this->hasMany(Estudiante::class, 'condicion_transitoria_id');
     }
 
+    public function asignacionesEstudiante(): HasMany
+    {
+        return $this->hasMany(EstudianteCondicionTransitoria::class, 'id_condicion_transitoria');
+    }
+
     public function activa(): bool
     {
         return (int) $this->estado === 1;
+    }
+
+    public function creadaPorDocente(): bool
+    {
+        $this->loadMissing('creador');
+
+        return $this->creador?->esDocente() ?? false;
+    }
+
+    public function esDelUsuario(?int $userId): bool
+    {
+        if ($userId === null) {
+            return false;
+        }
+
+        return (int) $this->usuario_crea === (int) $userId;
     }
 
     public function scopeActivas(Builder $query): Builder

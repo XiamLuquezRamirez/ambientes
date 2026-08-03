@@ -1,21 +1,22 @@
+@php
+    $usuarioId = $usuarioId ?? auth('docente')->id();
+@endphp
+
 @if ($items->isEmpty())
     <div class="cfg-empty">
         <i class="fa-solid fa-list-check" style="font-size:1.6rem;opacity:.4"></i>
         <p class="mt-2 mb-0">No hay opciones transitorias para mostrar con estos filtros.</p>
     </div>
 @else
-    <div class="cfg-lista lista-transitorias-orden" id="listaTransitoriasOrden">
+    <div class="cfg-lista cfg-lista--panel" id="listaTransitoriasPanel">
         @foreach ($items as $item)
             @php
                 $t = $item->condicionTransitoria;
                 $base = $t?->condicionBase;
                 $color = $base?->color_hex ?: '#64748B';
                 $conteo = $conteos[$item->id_condicion_transitoria] ?? ['total' => 0, 'activos' => 0];
+                $esPropia = $t && $t->esDelUsuario($usuarioId);
                 $creadaPorDocente = $t?->creadaPorDocente() ?? false;
-                $puedeGestionar = $t
-                    && ! $t->es_sistema
-                    && (int) $t->id_institucion === (int) session('institucion_id')
-                    && ! $creadaPorDocente;
                 $autorNombre = $t?->creador
                     ? trim(($t->creador->nombre ?? '') . ' ' . ($t->creador->apellido ?? ''))
                     : null;
@@ -29,12 +30,9 @@
                     $autorLabel = 'Institución';
                 }
             @endphp
-            <article class="cfg-card {{ $item->activa ? '' : 'is-inactive' }}"
+            <article class="cfg-card cfg-card--panel {{ $item->activa ? '' : 'is-inactive' }} {{ $esPropia ? 'cfg-card--propia' : '' }}"
                 data-id="{{ $item->id }}"
                 data-transitoria-id="{{ $t?->id }}">
-                <div class="cfg-drag" title="Arrastrar para reordenar">
-                    <i class="fa-solid fa-grip-vertical"></i>
-                </div>
                 <div>
                     <div class="cfg-meta">
                         <span class="badge"
@@ -57,8 +55,8 @@
                         </span>
                         @if ($t?->es_sistema)
                             <span class="badge badge-orange">Sistema</span>
-                        @elseif (! $creadaPorDocente)
-                            <span class="badge badge-gray">Adicional</span>
+                        @elseif ($esPropia)
+                            <span class="badge badge-blue">Creada por mí</span>
                         @endif
                         <span class="badge badge-blue badge-estudiantes-transitoria {{ $conteo['activos'] > 0 ? 'badge-estudiantes-transitoria--click' : '' }}"
                             title="{{ $conteo['activos'] > 0 ? 'Ver estudiantes asociados' : 'Sin estudiantes activos' }}"
@@ -70,34 +68,43 @@
                         </span>
                     </div>
                     <h3 class="cfg-titulo">{{ $t?->etiqueta ?? 'Opción no disponible' }}</h3>
+                    @if ($t?->descripcion_interna)
+                        <p class="cfg-desc text-muted mb-0">{{ \Illuminate\Support\Str::limit($t->descripcion_interna, 120) }}</p>
+                    @endif
                 </div>
                 <div class="cfg-acciones">
                     <div class="cfg-acciones-fila">
-                        <div class="form-check form-switch mb-0" title="{{ $creadaPorDocente ? 'Creada por docente — no se puede cambiar' : 'Visible para docentes' }}">
-                            <input class="form-check-input toggle-activa-transitoria-orden" type="checkbox"
-                                role="switch"
-                                data-id="{{ $item->id }}"
-                                @checked($item->activa)
-                                @disabled($creadaPorDocente)
-                                title="{{ $creadaPorDocente ? 'Creada por docente' : ($item->activa ? 'Desactivar en la institución' : 'Activar en la institución') }}">
-                        </div>
-                        @if ($puedeGestionar)
-                            <button type="button" class="btn-cfg btn-cfg-editar btn-editar-transitoria"
+                        @if ($esPropia)
+                            <div class="form-check form-switch mb-0" title="{{ $item->activa ? 'Desactivar' : 'Activar' }}">
+                                <input class="form-check-input toggle-activa-transitoria-panel" type="checkbox"
+                                    role="switch"
+                                    data-id="{{ $item->id }}"
+                                    data-nombre="{{ e($t->etiqueta) }}"
+                                    @checked($item->activa)
+                                    title="{{ $item->activa ? 'Desactivar condición' : 'Activar condición' }}">
+                            </div>
+                            <button type="button" class="btn-cfg btn-cfg-editar btn-editar-transitoria-panel"
                                 data-id="{{ $t->id }}" title="Editar">
                                 <i class="fa-solid fa-pencil"></i>
                                 Editar
                             </button>
-                            <button type="button" class="btn-cfg btn-cfg-eliminar btn-eliminar-transitoria"
+                            <button type="button" class="btn-cfg btn-cfg-eliminar btn-eliminar-transitoria-panel"
                                 data-id="{{ $t->id }}"
+                                data-orden-id="{{ $item->id }}"
                                 data-nombre="{{ e($t->etiqueta) }}"
                                 data-estudiantes="{{ $conteo['activos'] }}"
+                                data-activa="{{ $item->activa ? '1' : '0' }}"
                                 title="Eliminar">
                                 <i class="fa-solid fa-trash-can"></i>
                                 Eliminar
                             </button>
+                        @else
+                            <span class="text-muted" style="font-size:.82rem">Solo lectura</span>
                         @endif
                     </div>
-                    <small class="text-muted">Visible docentes</small>
+                    @if ($esPropia)
+                        <small class="text-muted">{{ $item->activa ? 'Activa' : 'Desactivada' }}</small>
+                    @endif
                 </div>
             </article>
         @endforeach

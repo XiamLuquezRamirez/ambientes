@@ -98,7 +98,11 @@
                     <h1 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--color-primary-dark);">
                         {{ $estudiante->nombre_completo }}</h1>
                     <div class="ficha-badges">
-                        <span class="stu-badge stu-badge--condicion">{{ $condicionNombre }}</span>
+                        @if ($estudiante->condicion->id == 1)
+                            <span class="stu-badge stu-badge--condicion">
+                               Perfil: {{ $estudiante->condicion->nombre }}
+                            </span>
+                        @endif
                         <span class="stu-badge {{ $estudiante->activo ? 'stu-badge--activo' : 'stu-badge--inactivo' }}">
                             {{ $estudiante->estado_texto }}
                         </span>
@@ -118,6 +122,51 @@
             </div>
         </section>
 
+        @if ($condicionTransitoriaActiva ?? null)
+            <section class="c-card" style="border-color:#FDBA74;background:#FFF7ED;">
+                <h3 class="ficha-section-title" style="color:#C2410C;">
+                    <i class="fa-solid fa-puzzle-piece me-1"></i> Condición transitoria activa
+                </h3>
+                <dl class="ficha-dl">
+                    <div>
+                        <dt>Condición</dt>
+                        <dd>{{ $condicionTransitoriaActiva->condicionTransitoria?->etiqueta ?? '—' }}</dd>
+                    </div>
+                    <div>
+                        <dt>Activada</dt>
+                        <dd>{{ $condicionTransitoriaActiva->fecha_activacion?->format('d/m/Y H:i') ?? '—' }}</dd>
+                    </div>
+                    <div>
+                        <dt>Docente</dt>
+                        <dd>
+                            {{ trim(($condicionTransitoriaActiva->docente?->user?->nombre ?? '') . ' ' . ($condicionTransitoriaActiva->docente?->user?->apellido ?? '')) ?: '—' }}
+                        </dd>
+                    </div>
+                </dl>
+                <p class="mb-0 mt-2" style="color:#9A3412;font-size:.92rem;">
+                    {{ $condicionTransitoriaActiva->observacion }}
+                </p>
+            </section>
+        @endif 
+
+        @if ($estudiante->condicion !== null && $estudiante->condicion->id != 1)
+            <section class="c-card" style="border-color:{{ $estudiante->condicion->color_hex }};background:#{{ $estudiante->condicion->color_hex }}22;">
+                <h3 class="ficha-section-title" style="color:{{ $estudiante->condicion->color_hex }};">
+                    <i class="fa-solid fa-puzzle-piece me-1"></i> Condición: {{ $estudiante->condicion->nombre }}
+                </h3>
+                <dl class="ficha-dl">   
+                    <div>
+                        <dt>Código</dt>
+                        <dd>{{ $estudiante->condicion->codigo }}</dd>
+                    </div>
+                    <div>
+                        <dt>Descripción</dt>
+                        <dd>{{ $estudiante->condicion->descripcion_corta }}</dd>
+                    </div>
+                </dl>
+            </section>
+        @endif
+
         {{-- Acciones --}}
         <section class="c-card">
             <h3 class="ficha-section-title">Acciones</h3>
@@ -126,11 +175,6 @@
                     <button type="button" onclick="abrirModalConfigurarPin({{ $estudiante->id }})"
                         class="btn btn-outline-primary">
                         <i class="fa-solid fa-key"></i> Configurar PIN
-                    </button>
-                @else
-                    <button type="button" onclick="abrirModalSolicitarCambioPin({{ $estudiante->id }})"
-                        class="btn btn-outline-success">
-                        <i class="fa-solid fa-key"></i> Solicitar cambio de PIN
                     </button>
                 @endif
                 <a href="{{ route('panel.portafolio.estudiante', $estudiante) }}" class="btn btn-outline-primary">
@@ -186,6 +230,21 @@
                         <i class="fa-solid fa-file-medical"></i> {{ $texto }}
                     </a>
                 @endif
+
+                @if ($estudiante->piar == null)
+                    @if (!($condicionesTransitorias ?? collect())->isEmpty())
+                        <button type="button" class="btn btn-outline-pink" data-bs-toggle="modal"
+                            data-bs-target="#modalCondicionTransitoria">
+                            <i class="fa-solid fa-puzzle-piece"></i> Activar condición transitoria
+                        </button>
+                    @endif
+                @endif
+
+                @if ($condicionTransitoriaActiva !== null)
+                    <button type="button" class="btn btn-outline-pink" onclick="desactivarCondicionTransitoria({{ $estudiante->id }})" title="Desactivar condición transitoria">
+                        <i class="fa-solid fa-puzzle-piece"></i> Desactivar condición transitoria
+                    </button>
+                @endif
             </div>
         </section>
 
@@ -212,6 +271,14 @@
                             Ambientes
                         </button>
                     </li>
+                    @if ($condicionTransitoriaActiva ?? null)
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabCondicionesTransitorias">
+                                <i class="fa-solid fa-puzzle-piece me-2"></i>
+                                Historial de condiciones transitorias
+                            </button>
+                        </li>
+                    @endif
                 </ul>
             </div>
 
@@ -328,7 +395,6 @@
                         @endif
 
                     </div>
-
                     <div class="tab-pane fade" id="tabAmbientes">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <p class="ficha-section-title">Ambientes que estan a su cargo y a los que esta asignado este
@@ -359,6 +425,76 @@
                             @endforeach
                         @else
                             <p class="ficha-empty">Sin ambientes asignados este año.</p>
+                        @endif
+                    </div>
+                    <div class="tab-pane fade" id="tabCondicionesTransitorias">
+                        <p class="ficha-section-title">Historial de condiciones transitorias</p>
+                        @php
+                            $motivosCierreTransitoria = \App\Services\EstudianteCondicionTransitoriaService::MOTIVOS_CIERRE;
+                            $historialCondicionesTransitorias = $historialCondicionesTransitorias ?? collect();
+                        @endphp
+                
+                        @if ($historialCondicionesTransitorias->isNotEmpty())
+                            <section class="c-card">
+                                <h3 class="ficha-section-title">
+                                    <i class="fa-solid fa-clock-rotate-left me-1"></i> Historial de condiciones transitorias
+                                </h3>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Condición</th>
+                                                <th>Estado</th>
+                                                <th>Activación</th>
+                                                <th>Cierre</th>
+                                                <th>Docente</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($historialCondicionesTransitorias as $registro)
+                                                <tr>
+                                                    <td>
+                                                        <strong>{{ $registro->condicionTransitoria?->etiqueta ?? '—' }}</strong>
+                                                        <small class="d-block text-muted">{{ $registro->condicionTransitoria?->codigo }}</small>
+                                                    </td>
+                                                    <td>
+                                                        @if ($registro->activa)
+                                                            <span class="stu-badge stu-badge--transitoria">Activa</span>
+                                                        @else
+                                                            <span class="stu-badge stu-badge--inactivo">Cerrada</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        {{ $registro->fecha_activacion?->format('d/m/Y H:i') ?? '—' }}
+                                                        @if ($registro->observacion)
+                                                            <small class="d-block text-muted">{{ \Illuminate\Support\Str::limit($registro->observacion, 80) }}</small>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if ($registro->fecha_cierre)
+                                                            {{ $registro->fecha_cierre->format('d/m/Y H:i') }}
+                                                            <small class="d-block text-muted">
+                                                                {{ $motivosCierreTransitoria[$registro->motivo_cierre] ?? $registro->motivo_cierre }}
+                                                            </small>
+                                                            @if ($registro->observacion_cierre)
+                                                                <small class="d-block text-muted">{{ \Illuminate\Support\Str::limit($registro->observacion_cierre, 80) }}</small>
+                                                            @endif
+                                                        @else
+                                                            —
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        {{ trim(($registro->docente?->user?->nombre ?? '') . ' ' . ($registro->docente?->user?->apellido ?? '')) ?: '—' }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p class="ficha-empty mb-0 mt-2" style="font-size:.85rem">
+                                    La condición permanente del estudiante no se modifica al cerrar una transitoria.
+                                </p>
+                            </section>
                         @endif
                     </div>
                 </div>
@@ -433,6 +569,9 @@
     </div>
 
     @include('panel.estudiantes.modalConfigurarPin')
+    @if (!($condicionTransitoriaActiva ?? null) && ($condicionesTransitorias ?? collect())->isNotEmpty())
+        @include('panel.estudiantes.modalActivarCondicionTransitoria')
+    @endif
 
     @push('scripts')
         <script>

@@ -2,9 +2,10 @@
     $condicionNombre = $e->condicion?->nombre ?? 'Estándar';
     $requiereApoyo = in_array(strtolower((string) $e->requiere_apoyo), ['si', 'sí', '1', 'true'], true);
     $docLabel = trim(($e->tipo_identificacion ? $e->tipo_identificacion . ' ' : 'Doc. ') . ($e->identificacion ?? '—'));
+    $tieneTransitoriaActiva = $e->condicionTransitoriaActiva !== null;
 @endphp
 
-<div class="student-card" data-estudiante-id="{{ $e->id }}">
+<div class="student-card{{ $tieneTransitoriaActiva ? ' student-card--transitoria' : '' }}" data-estudiante-id="{{ $e->id }}">
 
     <div class="student-top">
         @if ($e->avatar_url)
@@ -27,6 +28,12 @@
         <span class="stu-badge {{ $e->activo ? 'stu-badge--activo' : 'stu-badge--inactivo' }}">
             {{ $e->estado_texto }}
         </span>
+
+        @if ($tieneTransitoriaActiva)
+            <span class="stu-badge stu-badge--transitoria">
+                {{ $e->condicionTransitoriaActiva->condicionTransitoria?->etiqueta ?? 'Transitoria' }}
+            </span>
+        @endif
 
         @if ($e->piar !== null && $e->piar->paso == '8')
             <span class="stu-badge stu-badge--piar">PIAR Activo</span>
