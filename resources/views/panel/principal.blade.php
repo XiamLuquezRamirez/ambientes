@@ -1723,47 +1723,71 @@
             }
 
             listaEstudiantes.innerHTML = estudiantesFiltrados.map(estudiante => {
-                const estadoClase = estudiante.activo ? 'tag-estudiante--activo' :
+                const estadoTexto = estudiante.activo ? 'Activo' : 'Inactivo';
+                const estadoClase = estudiante.activo ?
+                    'tag-estudiante--activo' :
                     'tag-estudiante--inactivo';
-                const pinClase = estudiante.tiene_pin ? 'tag-estudiante--pin' :
+                const pinClase = estudiante.tiene_pin ?
+                    'tag-estudiante--pin' :
                     'tag-estudiante--pin-pendiente';
-                const piarClase = estudiante.requiere_atencion_piar ? 'tag-estudiante--piar-pendiente' :
+
+                const piarClase = estudiante.requiere_atencion_piar ?
+                    'tag-estudiante--piar-pendiente' :
                     'tag-estudiante--piar';
+
                 const alerta = estudiante.requiere_atencion_piar ?
                     '<i class="fas fa-exclamation-triangle estudiante-alerta" title="Requiere PIAR"></i>' :
                     '';
-                const condicionLabel = estudiante.condicion_nombre || estudiante.condicion || 'Estandar';
+
+                const condicionLabel = estudiante.condicion_nombre || estudiante.condicion || 'Estándar';
                 const fichaUrl = `${URL_FICHA_ESTUDIANTE}/${estudiante.id}`;
+                const nombreCompleto = `${estudiante.nombre ?? ''} ${estudiante.apellido ?? ''}`.trim();
+
+                const avatar = estudiante.avatar_url ?
+                    `
+            <img
+                src="${estudiante.avatar_url}"
+                class="estudiante-avatar"
+                alt="${nombreCompleto}">
+          ` :
+                    `
+            <div
+                class="estudiante-avatar"
+                style="background:${estudiante.color_avatar || '#2563EB'}">
+                ${estudiante.iniciales || 'E'}
+            </div>
+          `;
 
                 return `
-                    <a href="${fichaUrl}" class="estudiante-card" title="Ver ficha completa">
-                        <div class="estudiante-card__info">
-                           ${
-                    estudiante.avatar_url
-                    ? `
-                                                            <img
-                                                                src="${estudiante.avatar_url}"
-                                                                class="estudiante-avatar"
-                                                                alt="${estudiante.nombre} ${estudiante.apellido}">
-                                                            `: `
-                                                            <div class="estudiante-avatar"
-                                                                    style="background:${estudiante.color_avatar || '#2563EB'}">
-                                                                ${estudiante.iniciales || 'E'}
-                                                            </div>
-                                                            `}
+        <a href="${fichaUrl}" class="estudiante-card" title="Ver ficha completa">
+            <div class="estudiante-card__info">
+                ${avatar}
+
                 <div class="estudiante-meta">
-                    <p class="estudiante-nombre">${estudiante.nombre}</p>
-                    <p class="estudiante-submeta">Condición: ${condicionLabel} · ${estudiante.estado || 'Activo'}</p>
+                    <p class="estudiante-nombre">${nombreCompleto}</p>
+                   <p class="estudiante-submeta">
+    Condición: ${condicionLabel} · ${estadoTexto}
+</p>
                 </div>
             </div>
+
             <div class="estudiante-tags">
-                <span class="tag-estudiante ${estadoClase}">${estudiante.estado || 'Activo'}</span>
-                <span class="tag-estudiante ${pinClase}">${estudiante.tiene_pin ? 'PIN' : 'Sin PIN'}</span>
-                <span class="tag-estudiante ${piarClase}">${estudiante.estado_piar || 'No aplica'}</span>
+              <span class="tag-estudiante ${estadoClase}">
+    ${estadoTexto}
+</span>
+
+                <span class="tag-estudiante ${pinClase}">
+                    ${estudiante.tiene_pin ? 'PIN' : 'Sin PIN'}
+                </span>
+
+                <span class="tag-estudiante ${piarClase}">
+                    ${estudiante.estado_piar || 'No aplica'}
+                </span>
+
                 ${alerta}
             </div>
         </a>
-                `;
+    `;
             }).join('');
         }
 

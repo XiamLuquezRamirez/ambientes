@@ -78,9 +78,11 @@
     @php
         use App\Models\User;
         use App\Services\PerfilFotoService;
-
+        use App\Models\Institucion;
         $usuarioAuth = Auth::guard('docente')->user();
         $perfilFoto = app(PerfilFotoService::class);
+
+        $logoService = app(\App\Services\InstitucionLogoService::class);
 
         if ($usuarioAuth instanceof User) {
             $usuarioAuth->loadMissing('docente');
@@ -91,10 +93,38 @@
             $usuarioAuth instanceof User ? $perfilFoto->urlPublica($usuarioAuth->docente?->foto_url) : null;
         $rolAuthLabel =
             ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
+
+        $institucionId = session('institucion_id') ?? $usuarioAuth?->institucion_id;
+        $institucion = $institucionId ? Institucion::find($institucionId) : null;
+        $logoUrl = $institucion ? $logoService->urlPublica($institucion->logo) : null;
+        $inicialesInstitucion = $institucion ? $logoService->iniciales($institucion) : null;
+        $lugarInstitucion = $institucion
+            ? trim(collect([$institucion->municipio, $institucion->departamento])->filter()->implode(', '))
+            : '';
+
     @endphp
     <header class="header">
-        <div class="header-perfil" id="headerPerfil">
+        @if ($institucion)
+            <div class="header-institucion" title="{{ $institucion->nombre }}">
+                <div class="header-institucion-logo" aria-hidden="true">
+                    <img src="{{ $logoUrl ?? '' }}"
+                        alt=""
+                        class="header-institucion-img {{ $logoUrl ? '' : 'd-none' }}"
+                        onerror="this.classList.add('d-none');var f=this.nextElementSibling;if(f)f.classList.remove('d-none');">
+                    <span class="header-institucion-fallback {{ $logoUrl ? 'd-none' : '' }}">
+                        {{ $inicialesInstitucion }}
+                    </span>
+                </div>
+                <div class="header-institucion-meta">
+                    <span class="header-institucion-nombre">{{ $institucion->nombre }}</span>
+                    @if ($lugarInstitucion !== '')
+                        <span class="header-institucion-lugar">{{ $lugarInstitucion }}</span>
+                    @endif
+                </div>
+            </div>
+        @endif
 
+        <div class="header-perfil" id="headerPerfil">
             {{-- Chip visible siempre (foto o iniciales) --}}
             <div class="avatar" id="headerAvatar">
                 <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
