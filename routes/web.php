@@ -309,6 +309,7 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::get('administradores/{id}/generar-pdf', [AdminsSuperAdminController::class, 'generarPdf'])->name('superadmin.administradores.generar-pdf');
     Route::patch('administradores/{id}/toggle-activo', [AdminsSuperAdminController::class, 'toggleActivo'])->name('superadmin.administradores.toggleActivo');
     Route::get('administradores/{id}/accesos', [AdminsSuperAdminController::class, 'verAccesos'])->name('superadmin.administradores.accesos');
+    Route::delete('administradores/{id}', [AdminsSuperAdminController::class, 'eliminar'])->name('superadmin.administradores.eliminar');
 
     // Condiciones
     Route::get('condiciones', [CondicionInclusionController::class, 'index'])->name('superadmin.condiciones.index');

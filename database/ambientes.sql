@@ -1914,77 +1914,95 @@ CREATE TABLE `temas` (
 
 /*Data for the table `temas` */
 
+
 /*Table structure for table `users` */
 
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `institucion_id` bigint(20) unsigned DEFAULT NULL,
-  `identificacion` varchar(50) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `apellido` varchar(255) DEFAULT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `rol` enum(
-    'superAdmin',
-    'admin',
-    'docente'
-  ) NOT NULL DEFAULT 'docente',
-  `estado` enum(
-    'activo',
-    'inactivo',
-    'eliminado'
-  ) NOT NULL DEFAULT 'activo',
-  `activo` tinyint(1) NOT NULL DEFAULT 1,
-  `creado_por` bigint(20) unsigned DEFAULT NULL,
-  `remember_token` varchar(100) DEFAULT NULL,
-  `bloqueado_en` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `institucion_id` BIGINT(20) UNSIGNED DEFAULT NULL,
 
-  PRIMARY KEY (`id`),
+    `identificacion` VARCHAR(50) NOT NULL,
+    `nombre` VARCHAR(255) NOT NULL,
+    `apellido` VARCHAR(255) DEFAULT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
 
-  UNIQUE KEY `users_email_unique` (`email`),
+    `rol` ENUM(
+        'superAdmin',
+        'admin',
+        'docente'
+    ) NOT NULL DEFAULT 'docente',
 
-  KEY `users_institucion_id_foreign` (`institucion_id`),
-  KEY `users_creado_por_foreign` (`creado_por`),
+    `estado` ENUM(
+        'activo',
+        'inactivo',
+        'eliminado'
+    ) NOT NULL DEFAULT 'activo',
 
-  CONSTRAINT `users_institucion_id_foreign`
-    FOREIGN KEY (`institucion_id`)
-    REFERENCES `instituciones` (`id`)
-    ON DELETE SET NULL,
+    `creado_por` BIGINT(20) UNSIGNED DEFAULT NULL,
 
-  CONSTRAINT `users_creado_por_foreign`
-    FOREIGN KEY (`creado_por`)
-    REFERENCES `users` (`id`)
-    ON DELETE SET NULL
+    `remember_token` VARCHAR(100) DEFAULT NULL,
+    `bloqueado_en` TIMESTAMP NULL DEFAULT NULL,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+
+    PRIMARY KEY (`id`),
+
+    UNIQUE KEY `users_email_unique` (`email`),
+
+    KEY `users_institucion_id_foreign` (`institucion_id`),
+    KEY `users_creado_por_foreign` (`creado_por`),
+
+    CONSTRAINT `users_institucion_id_foreign`
+        FOREIGN KEY (`institucion_id`)
+        REFERENCES `instituciones` (`id`)
+        ON DELETE SET NULL,
+
+    CONSTRAINT `users_creado_por_foreign`
+        FOREIGN KEY (`creado_por`)
+        REFERENCES `users` (`id`)
+        ON DELETE SET NULL
+
 ) ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `users` */
 
-insert  into `users`(`id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`activo`,`remember_token`,`created_at`,`updated_at`,`bloqueado_en`) values
-(2,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente','activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58',NULL),
-(3,'213123','Administrador',NULL,'admin@aulasreggio.test','$2y$10$wjLu1JkqDfVwAMR7VEkx0eN0K4jQVh5G/75sE.0V9wO1x4GO.3Wlq','admin','activo',NULL,'2026-06-16 00:12:01','2026-06-18 17:16:17',NULL),
-(4,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35',NULL),
-(5,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(6,'5346345','Maria Fernanda ','Lopez','maria.lopez@aulasreggio.test','$2y$10$IbOTCndCL4IOh8onIxVRiuJDeLpBfdEXDpxfdZuwIgq3Zi1vY8EqS','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(7,'21341234','Jorge Luis ','Martinez','jorge.martinez@aulasreggio.test','$2y$10$rDzC74Ze6pmumLs7bWBOjOwGNea5lCtZ9adym4fhrqSsb.26L4eG2','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(8,'654645','Laura Valentina ','Torres','laura.torres@aulasreggio.test','$2y$10$ZDHYEz4BE9bk6klx3d1m0.ahZdMVbq529pq3zsturZltFeYOte/Vi','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(9,'2342342','Sebastian Felipe ','Gomez','sebastian.gomez@aulasreggio.test','$2y$10$Beizcu7u5jKpws.5KjvCQePwF2fJtB5cEdHdqD18bm4WlBsSYOhpy','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(10,'5656645','Daniela Paola ','Vargas','daniela.vargas@aulasreggio.test','$2y$10$ktfn.me/EGyB9U7ZcnO15uyIVgwctNshg9FngAUPMn451GErJxOnm','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(11,'234234234','Andres Felipe ','Rojas','andres.rojas@aulasreggio.test','$2y$10$iywC4mD8f5r13hPX6HGOOufZkCqMV.gAGRs/h3F3CN/V1rCvOt3sq','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(12,'43563456','Natalia Alejandra ','Cruz','natalia.cruz@aulasreggio.test','$2y$10$bN/LOLfQiKjTC12vdl3uTutiKsngQ344gDF507hc6YsdpRX85XKS2','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(13,'32454365','Juan Pablo ','Herrera','juan.herrera@aulasreggio.test','$2y$10$uiFhUMOeWjEjBtwY4kxcMewe9dXimg7ikaOJ3jFiY2P2AtWfjG9Uu','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(14,'5345345','Camila Andrea ','Mora','camila.mora@aulasreggio.test','$2y$10$ZVq5aurxoqa1KVRv7LgujO.zag/lhphPOf.0MsNkhgUulU3U./QmG','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL),
-(15,'657567567','Ricardo Andres ','Silva','ricardo.silva@aulasreggio.test','$2y$10$.bghvK6emeHQyaxnz3V2vOZVc1s/RkeSQpA8NZOdOrkqF29iGberC','docente','activo',NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50',NULL);
+INSERT INTO `users` (
+    `id`,
+    `institucion_id`,
+    `identificacion`,
+    `nombre`,
+    `apellido`,
+    `email`,
+    `password`,
+    `rol`,
+    `estado`,
+    `creado_por`,
+    `remember_token`,
+    `bloqueado_en`,
+    `created_at`,
+    `updated_at`
+) VALUES
+(1,NULL,'1234567890','Super','Admin','superadmin@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','superAdmin','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(2,NULL,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente','activo',NULL,NULL,NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58'),
+(3,NULL,'213123','Administrador',NULL,'admin@aulasreggio.test','$2y$10$wjLu1JkqDfVwAMR7VEkx0eN0K4jQVh5G/75sE.0V9wO1x4GO.3Wlq','admin','activo',NULL,NULL,NULL,'2026-06-16 00:12:01','2026-06-18 17:16:17'),
+(4,NULL,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente','activo' ,NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35'),
+(5,NULL,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(6,NULL,'5346345','Maria Fernanda ','Lopez','maria.lopez@aulasreggio.test','$2y$10$IbOTCndCL4IOh8onIxVRiuJDeLpBfdEXDpxfdZuwIgq3Zi1vY8EqS','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(7,NULL,'21341234','Jorge Luis ','Martinez','jorge.martinez@aulasreggio.test','$2y$10$rDzC74Ze6pmumLs7bWBOjOwGNea5lCtZ9adym4fhrqSsb.26L4eG2','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(8,NULL,'654645','Laura Valentina ','Torres','laura.torres@aulasreggio.test','$2y$10$ZDHYEz4BE9bk6klx3d1m0.ahZdMVbq529pq3zsturZltFeYOte/Vi','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(9,NULL,'2342342','Sebastian Felipe ','Gomez','sebastian.gomez@aulasreggio.test','$2y$10$Beizcu7u5jKpws.5KjvCQePwF2fJtB5cEdHdqD18bm4WlBsSYOhpy','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(10,NULL,'5656645','Daniela Paola ','Vargas','daniela.vargas@aulasreggio.test','$2y$10$ktfn.me/EGyB9U7ZcnO15uyIVgwctNshg9FngAUPMn451GErJxOnm','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(11,NULL,'234234234','Andres Felipe ','Rojas','andres.rojas@aulasreggio.test','$2y$10$iywC4mD8f5r13hPX6HGOOufZkCqMV.gAGRs/h3F3CN/V1rCvOt3sq','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(12,NULL,'43563456','Natalia Alejandra ','Cruz','natalia.cruz@aulasreggio.test','$2y$10$bN/LOLfQiKjTC12vdl3uTutiKsngQ344gDF507hc6YsdpRX85XKS2','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(13,NULL,'32454365','Juan Pablo ','Herrera','juan.herrera@aulasreggio.test','$2y$10$uiFhUMOeWjEjBtwY4kxcMewe9dXimg7ikaOJ3jFiY2P2AtWfjG9Uu','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(14,NULL,'5345345','Camila Andrea ','Mora','camila.mora@aulasreggio.test','$2y$10$ZVq5aurxoqa1KVRv7LgujO.zag/lhphPOf.0MsNkhgUulU3U./QmG','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(15,NULL,'657567567','Ricardo Andres ','Silva','ricardo.silva@aulasreggio.test','$2y$10$.bghvK6emeHQyaxnz3V2vOZVc1s/RkeSQpA8NZOdOrkqF29iGberC','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50');
 
-/* insertar superadmin password: password */
-
-INSERT INTO `users` (`id`, `identificacion`, `nombre`, `apellido`, `email`, `password`, `rol`, `estado`, `activo`, `remember_token`, `created_at`, `updated_at`, `bloqueado_en`) VALUES
-(1, '1234567890', 'Super', 'Admin', 'superadmin@aulasreggio.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'superadmin', 'activo', NULL, '2026-06-16 17:32:50', '2026-06-16 17:32:50', NULL);
 
 DROP TABLE IF EXISTS `seguridad_logs`;
 

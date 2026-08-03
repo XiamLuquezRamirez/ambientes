@@ -403,26 +403,27 @@
             // Solo mostrar confirmación al desactivar
             Swal.fire({
                 title: `¿Desactivar a ${nombre} ?`,
-                html: `
-Se cerrará cualquier sesión activa de este administrador.
-`,
+                html: `Se cerrará cualquier sesión activa de este administrador.`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Desactivar',
-                cancelButtonText: 'Cancelar'
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#94A3B8',
             }).then((result) => {
                 if (result.isConfirmed) {
                     actualizarEstado(id, checkbox);
                 } else {
-                    // Revertir el switch
                     checkbox.prop('checked', true);
                 }
             });
 
         });
 
-
-        // Actualizar el estado del docente.
+        /**
+         * Alterna users.estado (activo ↔ inactivo) vía PATCH.
+         * El backend responde con { success, estado, message }.
+         */
         function actualizarEstado(id, checkbox) {
             $.ajax({
                 url: `${URL_ADMINISTRADORES_BASE}/${id}/toggle-activo`,
@@ -433,7 +434,7 @@ Se cerrará cualquier sesión activa de este administrador.
                 success: function(response) {
                     Swal.fire({
                         icon: 'success',
-                        title: response.activo ?
+                        title: response.estado === 'activo' ?
                             'Administrador activado' : 'Administrador desactivado',
                         timer: 1500,
                         showConfirmButton: false,
@@ -443,12 +444,97 @@ Se cerrará cualquier sesión activa de este administrador.
                     checkbox.prop('checked', !checkbox.prop('checked'));
                     Swal.fire({
                         icon: 'warning',
-                        title: 'Error',
+                        title: 'No permitido',
                         text: xhr.responseJSON?.message ??
                             'No fue posible actualizar el estado.'
                     });
                 }
             });
+        }
+
+        /**
+         * Eliminar administrador (soft-delete vía DELETE).
+         * Patrón alineado con admin/usuarios + loading de superadmin/condiciones:
+         * 1) Swal de confirmación
+         * 2) Swal loading mientras corre la petición
+         * 3) Quita #fila-{id} con fade; si no quedan filas, recarga el partial por AJAX
+         * 4) En bloqueo de negocio (403) muestra Swal en lugar de solo toast
+         */
+        document.addEventListener('click', async function(e) {
+            const btn = e.target.closest('.btn-eliminar');
+            if (!btn) return;
+
+            const id = btn.dataset.id;
+            const nombre = btn.dataset.nombre;
+
+            const confirmacion = await Swal.fire({
+                title: '¿Eliminar administrador?',
+                text: `"${nombre}" será eliminado.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#94A3B8',
+                iconColor: '#F59E0B',
+            });
+
+            if (!confirmacion.isConfirmed) return;
+
+            Swal.fire({
+                title: 'Eliminando...',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            const res = await ajaxRequest(`${URL_ADMINISTRADORES_BASE}/${id}`, 'DELETE');
+
+            if (res.success) {
+                Swal.close();
+                const fila = document.getElementById(`fila-${id}`);
+                if (fila) {
+                    fila.style.transition = 'opacity .25s';
+                    fila.style.opacity = '0';
+                    setTimeout(() => {
+                        fila.remove();
+                        if (!document.querySelector('#contenedorTabla tbody tr[id^="fila-"]')) {
+                            cargarTabla(URL_ADMINISTRADORES_BASE);
+                        }
+                    }, 250);
+                }
+                mostrarToast('success', res.message);
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No permitido',
+                    text: res.message || 'No fue posible eliminar el administrador.'
+                });
+            }
+        });
+
+        /**
+         * Recarga el partial _tabla vía AJAX (listar responde { success, html }).
+         * Se usa cuando, tras eliminar, la tabla queda vacía y hay que pintar el empty state.
+         */
+        async function cargarTabla(url) {
+            const contenedor = document.getElementById('contenedorTabla');
+            const cargando = document.getElementById('cargando-tabla');
+            if (!contenedor) return;
+
+            contenedor.style.opacity = '.4';
+            if (cargando) cargando.style.display = 'block';
+
+            const res = await ajaxRequest(url);
+
+            contenedor.style.opacity = '1';
+            if (cargando) cargando.style.display = 'none';
+
+            if (res.success && res.html) {
+                contenedor.innerHTML = res.html;
+            } else {
+                mostrarToast('error', res.message || 'Error al cargar los datos');
+            }
         }
 
         document.getElementById('formCrearAdministrador')?.addEventListener('submit', function(e) {

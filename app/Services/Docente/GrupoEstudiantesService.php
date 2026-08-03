@@ -42,6 +42,7 @@ class GrupoEstudiantesService
                 'id' => $estudiante->id,
                 'nombre' => $estudiante->nombre,
                 'apellido' => $estudiante->apellido,
+                'activo' => $estudiante->activo,
                 'color_avatar' => $estudiante->color_avatar ?? '#2563EB',
                 'avatar_url' => $estudiante->avatar_url,
                 'iniciales' => $estudiante->iniciales ?? strtoupper(substr($estudiante->nombre ?? 'E', 0, 2)),

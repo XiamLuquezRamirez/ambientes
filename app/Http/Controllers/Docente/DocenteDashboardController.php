@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\CargaDocente;
 use App\Models\Condicion;
+use App\Models\Institucion;
 use App\Services\AmbienteService;
 use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\GrupoEstadisticasService;
@@ -18,6 +19,8 @@ class DocenteDashboardController extends Controller
     {
         $docente = Auth::guard('docente')->user()->docente;
         $anio = date('Y');
+
+        $instituciones = Institucion::find(session('institucion_id'));
 
         $ambientes = Ambiente::whereHas('cargasDocente', function ($q) use ($docente, $anio) {
             $q->where('docente_id', $docente->id)
@@ -61,6 +64,7 @@ class DocenteDashboardController extends Controller
         $ambientes_disponibles = $ambienteService->getAmbientes();
 
         return view('panel.principal', compact(
+            'instituciones',
             'ambientes',
             'ambienteSeleccionado',
             'condiciones',

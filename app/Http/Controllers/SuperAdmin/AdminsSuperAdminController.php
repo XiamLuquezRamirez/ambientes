@@ -14,16 +14,29 @@ use Illuminate\Support\Str;
 class AdminsSuperAdminController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista los administradores creados por el superadmin autenticado.
+     *
+     * Solo incluye cuentas con estado "activo" (la eliminación es lógica).
+     * Si la petición es AJAX, devuelve el HTML parcial de la tabla para
+     * refrescar el listado sin recargar la página (mismo patrón que admin/usuarios).
      */
-    public function listar()
+    public function listar(Request $request)
     {
         $superadmin = Auth::guard('docente')->user();
         $instituciones = Institucion::all();
         $administradores = User::where('rol', 'admin')
             ->where('creado_por', $superadmin->id)
+            ->where('estado', '!=', 'eliminado')
             ->with('institucion')
+            ->orderBy('nombre')
             ->get();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('superAdmin.administradores._tabla', compact('administradores'))->render(),
+            ]);
+        }
 
         return view('superAdmin.administradores.index', compact('administradores', 'instituciones'));
     }
@@ -129,6 +142,12 @@ class AdminsSuperAdminController extends Controller
         return $pdf->download($nombreArchivo);
     }
 
+    /**
+     * Resuelve un administrador perteneciente al superadmin autenticado.
+     *
+     * Centraliza el scope de autorización (rol admin + creado_por) usado por
+     * ver, actualizar, eliminar, toggle y PDF.
+     */
     private function administradorDelSuperadmin(string $id): User
     {
         return User::where('rol', 'admin')
@@ -136,18 +155,38 @@ class AdminsSuperAdminController extends Controller
             ->findOrFail($id);
     }
 
+    /**
+     * Alterna el estado activo/inactivo del administrador.
+     *
+     * Usa el enum `users.estado` (no existe columna `activo`).
+     * Al desactivar, exige que quede al menos un admin activo en la institución.
+     */
     public function toggleActivo($id)
     {
-        $administrador = User::findOrFail($id);
+        $administrador = $this->administradorDelSuperadmin($id);
+        $pasaraAInactivo = $administrador->estado === 'activo';
 
-        $administrador->update([
-            'activo' => ! $administrador->activo,
-        ]);
+        if ($pasaraAInactivo) {
+            $adminsActivos = User::where('rol', 'admin')
+                ->where('institucion_id', $administrador->institucion_id)
+                ->where('estado', 'activo')
+                ->count();
+
+            if ($adminsActivos <= 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede desactivar el único administrador activo de la institución.',
+                ], 403);
+            }
+        }
+
+        $nuevoEstado = $pasaraAInactivo ? 'inactivo' : 'activo';
+        $administrador->update(['estado' => $nuevoEstado]);
 
         return response()->json([
             'success' => true,
-            'activo' => $administrador->activo,
-            'message' => $administrador->activo
+            'estado' => $nuevoEstado,
+            'message' => $nuevoEstado === 'activo'
                 ? 'Administrador activado correctamente.'
                 : 'Administrador desactivado correctamente.',
         ]);
@@ -212,5 +251,46 @@ class AdminsSuperAdminController extends Controller
 
         return $ipLong >= ip2long('192.168.1.0')
             && $ipLong <= ip2long('192.168.1.255');
+    }
+
+    /**
+     * Eliminación lógica del administrador (estado → eliminado).
+     *
+     * No borra el registro para preservar historial de accesos y auditoría.
+     * Solo actúa sobre admins creados por el superadmin autenticado.
+     * Bloquea la operación si es el único administrador activo de su institución.
+     */
+    public function eliminar($id)
+    {
+        try {
+            $administrador = $this->administradorDelSuperadmin($id);
+
+            $totalAdministradores = User::where('rol', 'admin')
+                ->where('institucion_id', $administrador->institucion_id)
+                ->where('estado', 'activo')
+                ->count();
+
+            if ($totalAdministradores <= 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede eliminar el único administrador de la institución.',
+                ], 403);
+            }
+
+            $administrador->update([
+                'estado' => 'eliminado',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'estado' => 'eliminado',
+                'message' => 'Administrador eliminado correctamente.',
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

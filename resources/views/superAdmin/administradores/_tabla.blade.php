@@ -1,3 +1,9 @@
+{{--
+    Tabla de administradores (Super Admin).
+    - Cada fila usa id="fila-{id}" para que el JS pueda quitarla tras eliminar (AJAX).
+    - El botón Eliminar usa clase .btn-eliminar (no id repetido) + data-id / data-nombre.
+    - Estado de cuenta: users.estado (activo|inactivo|eliminado); el switch refleja activo.
+--}}
 <div class="table-container">
     <table>
         <thead>
@@ -12,7 +18,7 @@
         </thead>
         <tbody>
             @forelse ($administradores as $admin)
-                <tr>
+                <tr id="fila-{{ $admin->id }}">
                     <td style="font-weight:600;color:#1E293B">{{ $admin->nombre }}</td>
                     <td>{{ $admin->email }}</td>
                     <td style="color:#64748B">{{ $admin->institucion?->nombre ?? '—' }}</td>
@@ -20,7 +26,9 @@
                     <td>
                         <div class="form-check form-switch">
                             <input class="form-check-input toggle-activo" type="checkbox" data-id="{{ $admin->id }}"
-                                data-nombre="{{ $admin->nombre }}" style="cursor: pointer;" @checked($admin->activo)>
+                                data-nombre="{{ $admin->nombre }}" style="cursor: pointer;"
+                                title="{{ $admin->estado === 'activo' ? 'Desactivar administrador' : 'Activar administrador' }}"
+                                @checked($admin->estado === 'activo')>
                         </div>
                     </td>
                     <td>
@@ -29,9 +37,10 @@
                                 onclick="abrirModalEditarAdministrador({{ $admin->id }})">
                                 <i class="fas fa-edit"></i> Editar
                             </button>
-                            <button type="button" class="btn-accion btn-eliminar"
-                                onclick="abrirModalEliminarAdministrador({{ $admin->id }})">
-                                <i class="fas fa-trash"></i> Eliminar
+                            <button type="button" class="btn-accion btn-eliminar" title="Eliminar"
+                                data-id="{{ $admin->id }}" data-nombre="{{ e($admin->nombre) }}">
+                                <i class="fa-solid fa-trash-can"></i>
+                                Eliminar
                             </button>
                             <button type="button" class="btn-accion btn-ver-accesos"
                                 onclick="abrirModalVerAccesos({{ $admin->id }})">

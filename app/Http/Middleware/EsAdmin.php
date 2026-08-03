@@ -26,13 +26,6 @@ class EsAdmin
                 'La institución se encuentra suspendida. No es posible iniciar sesión.'
             );
         }
-        if ($usuario->activo !== true) {
-            Auth::guard('docente')->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return redirect()->route('docente.login')->with('error', 'La cuenta se encuentra desactivada.');
-        }
 
         if ($usuario->estado !== 'activo') {
             Auth::guard('docente')->logout();
