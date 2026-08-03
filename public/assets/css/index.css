@@ -459,10 +459,10 @@ tr:hover td {
     font-size: 0.85rem;
     font-family: var(--font-sans);
     cursor: pointer;
-    border: none;
     text-decoration: none;
     transition: background var(--ease), color var(--ease), border-color var(--ease), box-shadow var(--ease);
 }
+
 
 .btn-primary {
     background: var(--color-primary);
