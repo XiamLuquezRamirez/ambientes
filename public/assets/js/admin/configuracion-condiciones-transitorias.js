@@ -187,10 +187,6 @@
                 mostrarToast('success', res.message);
                 const $card = $toggle.closest('.cfg-card');
                 $card.toggleClass('is-inactive', !res.activa);
-                $card.find('.badge-estado-local')
-                    .toggleClass('badge-green', res.activa)
-                    .toggleClass('badge-gray', !res.activa)
-                    .text(res.activa ? 'Activa' : 'Desactivada');
             },
             error: function(xhr) {
                 $toggle.prop('checked', !quiereActivar);

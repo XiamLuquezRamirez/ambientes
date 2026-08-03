@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\SesionNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
 use App\Http\Controllers\Panel\AsistenciaController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
+use App\Http\Controllers\Panel\CondicionTransitoriaPanelController;
 use App\Http\Controllers\Panel\InclusionController;
 use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
@@ -176,6 +177,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('configuracion/condiciones', [CondicionConfiguracionController::class, 'index'])->name('admin.configuracion.condiciones.index');
     Route::patch('configuracion/condiciones/orden', [CondicionConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.condiciones.orden');
     Route::patch('configuracion/condiciones/{condicionOrden}/estado', [CondicionConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.condiciones.estado');
+    Route::get('configuracion/condiciones/{condicionInclusion}/estudiantes', [CondicionConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.condiciones.estudiantes');
 
     Route::get('configuracion/condiciones-transitorias', [CondicionTransitoriaConfiguracionController::class, 'index'])->name('admin.configuracion.condiciones-transitorias.index');
     Route::post('configuracion/condiciones-transitorias', [CondicionTransitoriaConfiguracionController::class, 'guardar'])->name('admin.configuracion.condiciones-transitorias.guardar');
@@ -184,6 +186,8 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::put('configuracion/condiciones-transitorias/opcion/{condicionTransitoria}', [CondicionTransitoriaConfiguracionController::class, 'actualizar'])->name('admin.configuracion.condiciones-transitorias.actualizar');
     Route::delete('configuracion/condiciones-transitorias/opcion/{condicionTransitoria}', [CondicionTransitoriaConfiguracionController::class, 'eliminar'])->name('admin.configuracion.condiciones-transitorias.eliminar');
     Route::patch('configuracion/condiciones-transitorias/{condicionTransitoriaOrden}/estado', [CondicionTransitoriaConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.condiciones-transitorias.estado');
+    Route::get('configuracion/condiciones-transitorias/opcion/{condicionTransitoria}/estudiantes', [CondicionTransitoriaConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.condiciones-transitorias.estudiantes');
+    Route::post('configuracion/condiciones-transitorias/asignaciones/{asignacion}/desasociar', [CondicionTransitoriaConfiguracionController::class, 'desasociarEstudiante'])->name('admin.configuracion.condiciones-transitorias.desasociar');
 
     // Usuario
     Route::get('perfil', [PerfilController::class, 'mostrar'])->name('admin.perfil');
@@ -239,6 +243,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Ficha completa: verFicha → show.blade.php
     Route::get('estudiantes/ficha/{estudiante}', [EstudiantePanelController::class, 'verFicha'])->name('panel.estudiantes.show');
+    Route::post('estudiantes/ficha/{estudiante}/condicion-transitoria', [EstudiantePanelController::class, 'activarCondicionTransitoria'])->name('panel.estudiantes.condicion-transitoria.activar');
 
     // Datos JSON para modal de edición (compartido con index.js)
     Route::get('estudiantes/{estudiante}', [EstudianteAdminController::class, 'ver'])->name('panel.estudiantes.datos');
@@ -267,6 +272,14 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Inclusion
     Route::get('inclusion', [InclusionController::class, 'listar'])->name('panel.inclusion');
+    Route::get('inclusion/condiciones-transitorias', [CondicionTransitoriaPanelController::class, 'index'])->name('panel.inclusion.condiciones-transitorias');
+    Route::post('inclusion/condiciones-transitorias', [CondicionTransitoriaPanelController::class, 'guardar'])->name('panel.inclusion.condiciones-transitorias.guardar');
+    Route::get('inclusion/condiciones-transitorias/opcion/{condicionTransitoria}', [CondicionTransitoriaPanelController::class, 'mostrar'])->name('panel.inclusion.condiciones-transitorias.mostrar');
+    Route::put('inclusion/condiciones-transitorias/opcion/{condicionTransitoria}', [CondicionTransitoriaPanelController::class, 'actualizar'])->name('panel.inclusion.condiciones-transitorias.actualizar');
+    Route::delete('inclusion/condiciones-transitorias/opcion/{condicionTransitoria}', [CondicionTransitoriaPanelController::class, 'eliminar'])->name('panel.inclusion.condiciones-transitorias.eliminar');
+    Route::patch('inclusion/condiciones-transitorias/{condicionTransitoriaOrden}/estado', [CondicionTransitoriaPanelController::class, 'actualizarEstado'])->name('panel.inclusion.condiciones-transitorias.estado');
+    Route::get('inclusion/condiciones-transitorias/opcion/{condicionTransitoria}/estudiantes', [CondicionTransitoriaPanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.condiciones-transitorias.estudiantes');
+    Route::post('inclusion/condiciones-transitorias/asignaciones/{asignacion}/desasociar', [CondicionTransitoriaPanelController::class, 'desasociarEstudiante'])->name('panel.inclusion.condiciones-transitorias.desasociar');
     Route::get('inclusion/{estudiante}', [InclusionController::class, 'verAjustes'])->name('panel.inclusion.ajustes');
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
 

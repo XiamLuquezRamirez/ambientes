@@ -110,6 +110,38 @@ class CondicionConfiguracionController extends Controller
         ]);
     }
 
+    public function estudiantesAsociados(CondicionInclusion $condicionInclusion)
+    {
+        $institucionId = $this->institucionId();
+
+        $estudiantes = Estudiante::query()
+            ->where('institucion_id', $institucionId)
+            ->where('condicion_id', $condicionInclusion->id)
+            ->where('activo', true)
+            ->with(['matriculaActiva.grado', 'matriculaActiva.grupo'])
+            ->orderBy('nombre')
+            ->orderBy('apellido')
+            ->get()
+            ->map(fn (Estudiante $e) => [
+                'estudiante_id' => $e->id,
+                'nombre' => $e->nombre_completo,
+                'grado' => $e->matriculaActiva?->grado?->nombre,
+                'grupo' => $e->matriculaActiva?->grupo?->nombre,
+                'ficha_url' => route('admin.estudiantes.show', $e),
+            ])
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'condicion' => [
+                'id' => $condicionInclusion->id,
+                'codigo' => $condicionInclusion->codigo,
+                'nombre' => $condicionInclusion->nombre,
+            ],
+            'estudiantes' => $estudiantes,
+        ]);
+    }
+
     private function asegurarPersonalizacion(int $institucionId): void
     {
         $catalogoIds = CondicionInclusion::query()->pluck('id');

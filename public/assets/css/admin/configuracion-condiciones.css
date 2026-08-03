@@ -26,6 +26,20 @@
     transition: box-shadow .2s, border-color .2s, opacity .2s;
 }
 
+.cfg-card--panel {
+    grid-template-columns: 1fr auto;
+}
+
+.cfg-card--propia {
+    border-color: #FDBA74;
+    background: #FFFBF5;
+}
+
+.cfg-desc {
+    margin-top: 6px;
+    font-size: .88rem;
+}
+
 .cfg-card:hover {
     border-color: #BFDBFE;
     box-shadow: 0 10px 24px rgba(15, 23, 42, .08);
@@ -157,4 +171,118 @@
     justify-content: center;
     align-items: center;
     gap: 5px;
+}
+
+.badge-estudiantes-transitoria--click {
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.badge-estudiantes-transitoria--click:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, .18);
+}
+
+.badge-estudiantes-condicion--click {
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.badge-estudiantes-condicion--click:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, .18);
+}
+
+.ct-est-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.ct-est-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #E2E8F0;
+    background: #F8FAFC;
+}
+
+.ct-est-filtros .form-control {
+    min-width: 160px;
+    flex: 1;
+}
+
+.ct-est-table-wrap {
+    margin: 0;
+    max-height: 420px;
+    overflow: auto;
+}
+
+.ct-est-table {
+    width: 100%;
+    margin: 0;
+}
+
+.ct-est-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #F8FAFC;
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: #64748B;
+    white-space: nowrap;
+}
+
+.ct-est-table td {
+    vertical-align: middle;
+    font-size: .9rem;
+}
+
+.ct-est-acciones-cell {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.ct-est-obs-inline {
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ct-est-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.ct-est-row:last-child {
+    border-bottom: 0;
+}
+
+.ct-est-row-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.ct-est-row-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.ct-est-obs {
+    margin-top: 6px;
+    font-size: .86rem;
+    color: #64748B;
 }

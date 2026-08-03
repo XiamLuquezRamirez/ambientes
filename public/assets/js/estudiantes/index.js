@@ -354,10 +354,8 @@ function abrirModalEditarEstudiante(id) {
     $('#btnCrearEstudiante').text('Editar Estudiante');
 
     if(tipoGuardaEstudiante === 2) {
-        $('#tab-atencion').hide();
         $('#tab-pin').hide();
     } else {
-        $('#tab-atencion').show();
         $('#tab-pin').show();
     }
     cargarDatosEstudiante();

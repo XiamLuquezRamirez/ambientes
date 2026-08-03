@@ -53,4 +53,9 @@ class Docente extends Model
 
         return $this->ambientes()->first();
     }
+
+    public function condicionesTransitoriasAsignadas()
+    {
+        return $this->hasMany(EstudianteCondicionTransitoria::class, 'id_docente');
+    }
 }

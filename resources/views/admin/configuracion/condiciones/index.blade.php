@@ -40,6 +40,8 @@
     <div id="contenedorListaCondiciones">
         @include('admin.configuracion.condiciones._lista')
     </div>
+
+    @include('partials.condiciones.modal-estudiantes-asociados')
 @endsection
 
 @push('scripts')
@@ -47,6 +49,8 @@
     <script>
         window.URL_CFG_CONDICIONES = @json(route('admin.configuracion.condiciones.index'));
         window.URL_CFG_CONDICIONES_ORDEN = @json(route('admin.configuracion.condiciones.orden'));
+        window.CN_EST_URL_LIST = (id) => @json(url('admin/configuracion/condiciones')) + `/${id}/estudiantes`;
     </script>
     <script src="{{ asset('assets/js/admin/configuracion-condiciones.js') }}"></script>
+    <script src="{{ asset('assets/js/condiciones/estudiantes-asociados-condicion.js') }}"></script>
 @endpush

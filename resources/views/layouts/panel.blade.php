@@ -60,8 +60,15 @@
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('panel.inclusion') }}"
-                        class="{{ request()->routeIs('panel.inclusion*') ? 'active nav-link' : 'nav-link' }}">
+                        class="{{ request()->routeIs('panel.inclusion') || request()->routeIs('panel.inclusion.ajustes') ? 'active nav-link' : 'nav-link' }}">
                         <i class="fa-solid fa-universal-access"></i> Inclusión
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('panel.inclusion.condiciones-transitorias') }}"
+                        class="{{ request()->routeIs('panel.inclusion.condiciones-transitorias*') ? 'active nav-link' : 'nav-link' }}"
+                        style="padding-left:2.1rem;font-size:.92rem">
+                        <i class="fa-solid fa-puzzle-piece"></i> Cond. transitorias
                     </a>
                 </li>
             </div>

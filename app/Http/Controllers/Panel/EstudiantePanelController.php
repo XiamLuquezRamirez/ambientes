@@ -7,11 +7,14 @@ use App\Models\Ambiente;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
 use App\Models\Condicion;
+use App\Models\CondicionTransitoria;
+use App\Models\CondicionTransitoriaOrden;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
 use App\Models\Docente;
 use App\Models\Estudiante;
 use App\Models\EstudianteAmbiente;
+use App\Models\EstudianteCondicionTransitoria;
 use App\Models\FigurasModel;
 use App\Models\Grado;
 use App\Models\Grupo;
@@ -22,6 +25,8 @@ use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\DocenteAsignacionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class EstudiantePanelController extends Controller
 {
@@ -108,6 +113,7 @@ class EstudiantePanelController extends Controller
             'condicion:id,nombre',
             'configuracionPin',
             'piar',
+            'condicionTransitoriaActiva.condicionTransitoria',
         ])->whereIn('id', $matriculas);
 
         $consulta = clone $base;
@@ -250,13 +256,17 @@ class EstudiantePanelController extends Controller
         if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
             abort(403, 'No tienes acceso a este estudiante.');
         }
+
         $estudiante->load([
-            'condicion:id,nombre',
+            'condicion',
             'configuracionPin',
             'piar',
             'matriculaActiva.grado',
             'matriculaActiva.grupo',
+            'condicionTransitoriaActiva.condicionTransitoria',
+            'condicionTransitoriaActiva.docente.user',
         ]);
+
         $historialAsistencia = $asistenciaService->historialAsistencia($estudiante);
 
         $resumenAsistencia = $asistenciaService->resumenAsistencia($estudiante);
@@ -294,6 +304,26 @@ class EstudiantePanelController extends Controller
             'bloqueado' => 'Bloqueado',
         ];
 
+        $institucionId = Auth::guard('docente')->user()->institucion_id;
+        $condicionesTransitorias = collect();
+
+        if ($institucionId && ! $estudiante->condicionTransitoriaActiva) {
+            $condicionesTransitorias = CondicionTransitoriaOrden::query()
+                ->where('id_institucion', $institucionId)
+                ->where('activa', true)
+                ->whereHas('condicionTransitoria', fn ($q) => $q->where('estado', 1))
+                ->with('condicionTransitoria:id,codigo,etiqueta,descripcion_interna')
+                ->orderBy('orden')
+                ->get()
+                ->pluck('condicionTransitoria')
+                ->filter();
+        }
+
+        $historialCondicionesTransitorias = $estudiante->condicionesTransitoriasAsignadas()
+            ->with(['condicionTransitoria', 'docente.user'])
+            ->orderByDesc('fecha_activacion')
+            ->get();
+        
         return view('panel.estudiantes.show', [
             'estudiante' => $estudiante,
             'matricula' => $estudiante->matriculaActiva,
@@ -307,7 +337,75 @@ class EstudiantePanelController extends Controller
             'figuras' => $figuras,
             'historialAsistencia' => $historialAsistencia,
             'resumenAsistencia' => $resumenAsistencia,
+            'condicionesTransitorias' => $condicionesTransitorias,
+            'condicionTransitoriaActiva' => $estudiante->condicionTransitoriaActiva,
+            'historialCondicionesTransitorias' => $historialCondicionesTransitorias,
         ]);
+    }
+
+    /**
+     * Activa una condición transitoria para el estudiante.
+     * Solo puede haber una activa por estudiante.
+     */
+    public function activarCondicionTransitoria(Request $request, Estudiante $estudiante)
+    {
+        $docente = Auth::guard('docente')->user()->docente;
+
+        if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
+            abort(403, 'No tienes acceso a este estudiante.');
+        }
+
+        $institucionId = Auth::guard('docente')->user()->institucion_id;
+
+        $datos = $request->validate([
+            'id_condicion_transitoria' => [
+                'required',
+                'integer',
+                Rule::exists('condiciones_transitorias', 'id')->where(fn ($q) => $q->where('estado', 1)),
+            ],
+            'observacion' => 'required|string|min:20|max:2000',
+        ]);
+
+        $permitida = CondicionTransitoriaOrden::query()
+            ->where('id_institucion', $institucionId)
+            ->where('id_condicion_transitoria', $datos['id_condicion_transitoria'])
+            ->where('activa', true)
+            ->exists();
+
+        if (! $permitida) {
+            return back()->withErrors([
+                'id_condicion_transitoria' => 'La condición transitoria no está habilitada para esta institución.',
+            ]);
+        }
+
+        if ($estudiante->condicionTransitoriaActiva()->exists()) {
+            return back()->withErrors([
+                'id_condicion_transitoria' => 'El estudiante ya tiene una condición transitoria activa.',
+            ]);
+        }
+
+        DB::transaction(function () use ($estudiante, $docente, $datos) {
+            EstudianteCondicionTransitoria::create([
+                'id_estudiante' => $estudiante->id,
+                'id_condicion_transitoria' => $datos['id_condicion_transitoria'],
+                'id_docente' => $docente->id,
+                'observacion' => trim($datos['observacion']),
+                'fecha_activacion' => now(),
+                'activa' => true,
+            ]);
+
+            $estudiante->update([
+                'condicion_transitoria_id' => $datos['id_condicion_transitoria'],
+            ]);
+        });
+
+        $etiqueta = CondicionTransitoria::query()
+            ->where('id', $datos['id_condicion_transitoria'])
+            ->value('etiqueta');
+
+        return redirect()
+            ->route('panel.estudiantes.show', $estudiante)
+            ->with('success', 'Condición transitoria'.($etiqueta ? " «{$etiqueta}»" : '').' activada correctamente.');
     }
 
     public function tomarAsistencia(CargaDocente $carga)
