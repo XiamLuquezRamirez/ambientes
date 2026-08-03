@@ -18,21 +18,7 @@
             <input type="text" name="buscar" placeholder="Buscar por nombre o correo..." value="{{ request('buscar') }}"
                 autocomplete="off">
         </div>
-        {{-- <select name="ambiente_id" class="form-control" style="width:auto">
-            <option value="">Todos los ambientes</option>
-            @foreach ($ambientes as $a)
-                <option value="{{ $a->id }}" {{ request('ambiente_id') == $a->id ? 'selected' : '' }}>
-                    {{ $a->nombre }}</option>
-            @endforeach
-        </select> --}}
 
-        {{-- Este bloque genera las opciones del filtro "estado" para la búsqueda de docentes.
-                Se utiliza un array asociativo: clave => etiqueta a mostrar.
-                'true' => 'Activo', 'false' => 'Inactivo'.
-                Por cada opción,
-                  - value="{{ $val }}" es el valor enviado por el formulario.
-                  - Se marca como selected si el estado actual en la URL coincide exactamente (comparación estricta) con el $val.
-                  - La etiqueta visible será "Activo" o "Inactivo". --}}
         <select name="estado" class="form-control" style="width:auto">
             <option value="">Todos los estados</option>
             @foreach (['activo' => 'Activo', 'inactivo' => 'Inactivo', 'eliminado' => 'Eliminado'] as $val => $label)

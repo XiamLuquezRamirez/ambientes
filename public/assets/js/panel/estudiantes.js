@@ -59,8 +59,6 @@ function inicializarEventos() {
     });
 }
 
-
-
 function aplicarFiltrosEstudiantes() {
     var action = $('#formFiltrosEstudiantes').attr('action');
     const params = new URLSearchParams(new FormData($('#formFiltrosEstudiantes')[0]));
@@ -73,5 +71,3 @@ function aplicarFiltrosEstudiantes() {
         inicializarEventos();
     }, 500);
 }
-
-

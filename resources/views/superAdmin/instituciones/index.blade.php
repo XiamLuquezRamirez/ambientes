@@ -1109,9 +1109,24 @@
     <form id="formBuscar" style="display:flex;gap:12px;margin-bottom:24px;align-items:center;flex-wrap:wrap">
         <div class="input-buscar">
             <span class="icono-buscar"><i class="fas fa-search"></i></span>
-            <input type="text" name="buscar" placeholder="Buscar por nombre o correo..." value="{{ request('buscar') }}"
+            <input type="text" name="buscar" placeholder="Buscar por nombre..." value="{{ request('buscar') }}"
                 autocomplete="off">
         </div>
+
+        <select name="estado" class="form-control" style="width:auto">
+            <option value="">Todos los estados</option>
+            @foreach (['true' => 'Activo', 'false' => 'Inactivo'] as $val => $label)
+                <option value="{{ $val }}" {{ request('estado') === $val ? 'selected' : '' }}>{{ $label }}
+                </option>
+            @endforeach
+        </select>
+
+        <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-filter"></i> Filtrar</button>
+        <a id="btnLimpiar" href="{{ route('superadmin.instituciones.index') }}" class="btn btn-sm"
+            style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
+              display:{{ request()->hasAny(['buscar', 'estado']) ? 'inline-flex' : 'none' }}">
+            <i class="fas fa-broom"></i> Limpiar
+        </a>
     </form>
 
     @php
@@ -1132,18 +1147,17 @@
 
                 <div class="card-head">
                     <div class="card-icono card-logo-wrap">
-                        <img src="{{ $logoUrl ?? '' }}" alt="" class="card-logo-img {{ $logoUrl ? '' : 'd-none' }}">
+                        <img src="{{ $logoUrl ?? '' }}" alt=""
+                            class="card-logo-img {{ $logoUrl ? '' : 'd-none' }}">
                         <span class="card-logo-fallback {{ $logoUrl ? 'd-none' : '' }}">{{ $iniciales }}</span>
                     </div>
                     <div class="card-info">
                         <div class="card-nombre card-nombre-row">
                             <span class="card-nombre-texto">{{ $inst->nombre }}</span>
-                            <div class="form-check form-switch switch-activo-institucion"
-                                onclick="event.stopPropagation()">
+                            <div class="form-check form-switch switch-activo-institucion" onclick="event.stopPropagation()">
                                 <input class="form-check-input toggle-activo-institucion" type="checkbox"
-                                    id="institucion_activo_{{ $inst->id }}"
-                                    data-id="{{ $inst->id }}" data-nombre="{{ $inst->nombre }}"
-                                    value="1" style="cursor: pointer;"
+                                    id="institucion_activo_{{ $inst->id }}" data-id="{{ $inst->id }}"
+                                    data-nombre="{{ $inst->nombre }}" value="1" style="cursor: pointer;"
                                     title="{{ $inst->activo ? 'Suspender institución' : 'Activar institución' }}"
                                     {{ $inst->activo ? 'checked' : '' }}>
                             </div>
@@ -1160,7 +1174,8 @@
                             <i class="fas fa-map-marker-alt" style="font-size:.7rem"></i>
                             {{ $inst->municipio }}, {{ $inst->departamento }}
                         </div>
-                        <span class="badge-estado-institucion {{ $inst->activo ? 'badge-estado-institucion--activa' : 'badge-estado-institucion--suspendida' }}"
+                        <span
+                            class="badge-estado-institucion {{ $inst->activo ? 'badge-estado-institucion--activa' : 'badge-estado-institucion--suspendida' }}"
                             id="badge-estado-{{ $inst->id }}">
                             {{ $inst->activo ? 'Activa' : 'Suspendida' }}
                         </span>
@@ -1255,5 +1270,37 @@
 
             checkbox.attr('title', activo ? 'Suspender institución' : 'Activar institución');
         }
+
+        /* ── Filtros ─────────────────────────────────────────────────── */
+        function aplicarFiltros() {
+            const params = new URLSearchParams(new FormData(document.getElementById('formBuscar')));
+            for (const [k, v] of [...params.entries()]) {
+                if (!v) params.delete(k);
+            }
+            const url = params.toString() ? `${URL_INSTITUCIONES_BASE}?${params.toString()}` : URL_INSTITUCIONES_BASE;
+            window.location.href = url;
+        }
+
+        document.querySelectorAll('#formBuscar select').forEach(sel => {
+            sel.addEventListener('change', aplicarFiltros);
+        });
+
+        let debounceTimer;
+        document.querySelector('#formBuscar input[name="buscar"]').addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(aplicarFiltros, 400);
+        });
+
+        document.getElementById('formBuscar').addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearTimeout(debounceTimer);
+            aplicarFiltros();
+        });
+
+        document.getElementById('btnLimpiar').addEventListener('click', async function(e) {
+            e.preventDefault();
+            document.getElementById('formBuscar').reset();
+            window.location.href = URL_INSTITUCIONES_BASE;
+        });
     </script>
 @endpush

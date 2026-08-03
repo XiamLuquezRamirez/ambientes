@@ -35,9 +35,9 @@
 
                 {{-- Menú desplegable --}}
                 <div class="dropdown-menu-card" id="menu-{{ $amb->id }}">
-                    <button onclick="abrirModalIp({{ $amb->id }})">
+                    {{-- <button onclick="abrirModalIp({{ $amb->id }})">
                         <i class="fas fa-network-wired"></i> Editar IP del servidor
-                    </button>
+                    </button> --}}
                     <button onclick="abrirModalCupo({{ $amb->id }})">
                         <i class="fas fa-users"></i> Configurar cupo por defecto
                     </button>

@@ -13,6 +13,30 @@
         </div>
     </div>
 
+    <form id="formBuscar" style="display:flex;gap:12px;margin-bottom:24px;align-items:center;flex-wrap:wrap">
+        <div class="input-buscar">
+            <span class="icono-buscar"><i class="fas fa-search"></i></span>
+            <input type="text" name="buscar" placeholder="Buscar por nombre o correo..." value="{{ request('buscar') }}"
+                autocomplete="off">
+        </div>
+
+        <select name="institucion_id" class="form-control" style="width:auto">
+            <option value="">Todas las instituciones</option>
+            @foreach ($instituciones as $institucion)
+                <option value="{{ $institucion->id }}"
+                    {{ request('institucion_id') === $institucion->id ? 'selected' : '' }}>{{ $institucion->nombre }}
+                </option>
+            @endforeach
+        </select>
+
+        <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-filter"></i> Filtrar</button>
+        <a id="btnLimpiar" href="{{ route('superadmin.administradores.listar') }}" class="btn btn-sm"
+            style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
+              display:{{ request()->hasAny(['buscar', 'institucion_id']) ? 'inline-flex' : 'none' }}">
+            <i class="fas fa-broom"></i> Limpiar
+        </a>
+    </form>
+
     <div id="contenedorTabla">
         @include('superAdmin.administradores._tabla')
     </div>
@@ -163,6 +187,39 @@
 
             if (primerInput) primerInput.focus();
         }
+
+        /* ── Filtros ─────────────────────────────────────────────────── */
+        function aplicarFiltros() {
+            const params = new URLSearchParams(new FormData(document.getElementById('formBuscar')));
+            for (const [k, v] of [...params.entries()]) {
+                if (!v) params.delete(k);
+            }
+            const url = params.toString() ? `${URL_ADMINISTRADORES_BASE}?${params.toString()}` : URL_ADMINISTRADORES_BASE;
+            cargarTabla(url);
+        }
+
+        document.querySelectorAll('#formBuscar select').forEach(sel => {
+            sel.addEventListener('change', aplicarFiltros);
+        });
+
+        let debounceTimer;
+        document.querySelector('#formBuscar input[name="buscar"]').addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(aplicarFiltros, 400);
+        });
+
+        document.getElementById('formBuscar').addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearTimeout(debounceTimer);
+            aplicarFiltros();
+        });
+
+        document.getElementById('btnLimpiar').addEventListener('click', async function(e) {
+            e.preventDefault();
+            document.getElementById('formBuscar').reset();
+            await cargarTabla(URL_ADMINISTRADORES_BASE);
+        });
+
 
         function mapearDatosAdministrador(data) {
             document.getElementById('nombre').value = data.nombre || '';
@@ -531,9 +588,13 @@
             if (cargando) cargando.style.display = 'none';
 
             if (res.success && res.html) {
-                contenedor.innerHTML = res.html;
+                document.getElementById('contenedorTabla').innerHTML = res.html;
+                history.pushState(null, '', url);
+                const params = new URL(url).searchParams;
+                const tieneFilros = params.has('buscar') || params.has('institucion_id');
+                document.getElementById('btnLimpiar').style.display = tieneFilros ? 'inline-flex' : 'none';
             } else {
-                mostrarToast('error', res.message || 'Error al cargar los datos');
+                mostrarToast('error', 'Error al cargar los datos');
             }
         }
 

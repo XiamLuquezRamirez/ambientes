@@ -31,6 +31,29 @@ class AdminsSuperAdminController extends Controller
             ->orderBy('nombre')
             ->get();
 
+        $consulta = User::query()
+            ->where('creado_por', $superadmin->id)
+            ->where('estado', '!=', 'eliminado')
+            ->orderBy('nombre')
+            ->select(
+                'users.*',
+            );
+
+        if ($request->filled('buscar')) {
+            $termino = $request->buscar;
+            $consulta->where(fn ($q) => $q
+                ->where('creado_por', $superadmin->id)
+                ->where('nombre', 'like', "%{$termino}%")
+            );
+        }
+
+        if ($request->filled('institucion_id')) {
+            $consulta->where('creado_por', $superadmin->id)
+                ->where('institucion_id', $request->institucion_id);
+        }
+
+        $administradores = $consulta->orderBy('nombre')->paginate(10);
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
