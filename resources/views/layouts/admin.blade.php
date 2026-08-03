@@ -37,8 +37,8 @@
                 </a>
             </li>
             @php
-            $academico = request()->routeIs('admin.grupos*','admin.matriculas*','admin.cierre*');
-            @endphp          
+                $academico = request()->routeIs('admin.grupos*', 'admin.matriculas*', 'admin.cierre*');
+            @endphp
             <li class="nav-item">
                 <a href="#navAcademico" data-bs-toggle="collapse" aria-expanded="{{ $academico ? 'true' : 'false' }}"
                     class="nav-link d-flex align-items-center gap-2 {{ $academico ? 'active' : '' }}"
@@ -106,10 +106,11 @@
                 </a>
             </li>
             @php
-            $configuracion = request()->routeIs('admin.configuracion*');
-            @endphp          
+                $configuracion = request()->routeIs('admin.configuracion*');
+            @endphp
             <li class="nav-item">
-                <a href="#navConfiguracion" data-bs-toggle="collapse" aria-expanded="{{ $configuracion ? 'true' : 'false' }}"
+                <a href="#navConfiguracion" data-bs-toggle="collapse"
+                    aria-expanded="{{ $configuracion ? 'true' : 'false' }}"
                     class="nav-link d-flex align-items-center gap-2 {{ $configuracion ? 'active' : '' }}"
                     style="cursor:pointer">
                     <i class="fa-solid fa-gear"></i>
@@ -121,8 +122,8 @@
                 <div class="collapse {{ $configuracion ? 'show' : '' }}" id="navConfiguracion">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
-                            <a href=""
-                                class="{{ request()->routeIs('admin.configuracion.institucion*') ? 'active nav-link' : 'nav-link' }}"
+                            <a href="{{ route('admin.configuracion') }}"
+                                class="{{ request()->routeIs('admin.configuracion*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-school"></i> Institución
                             </a>

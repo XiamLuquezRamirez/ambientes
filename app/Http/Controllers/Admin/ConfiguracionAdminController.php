@@ -3,40 +3,68 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\SuperAdmin\CondicionOrdenController;
-use App\Http\Controllers\SuperAdmin\CondicionTransitoriaOrdenController;
-use App\Models\Ambiente;
 use App\Models\Institucion;
 use App\Services\InstitucionLogoService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 class ConfiguracionAdminController extends Controller
 {
     public function __construct(
         private InstitucionLogoService $logoService,
-        private readonly CondicionOrdenController $condicionOrdenController,
-        private readonly CondicionTransitoriaOrdenController $condicionTransitoriaOrdenController,
     ) {}
 
     public function listar()
     {
-        $ambientes = Ambiente::all();
-        $institucion = session('institucion_id');
+        $institucion = Institucion::with('ambientes')->findOrFail($this->institucionId());
+        $ambientes = $institucion->ambientes;
 
-        return view('admin.configuracion.index', compact('ambientes', 'institucion'));
-    }
-
-    public function actualizar(Request $request)
-    {
-        return back()->with('info', 'Pendiente de implementacion.');
+        return view('admin.configuracion.institucion.index', compact('ambientes', 'institucion'));
     }
 
     /**
-     * Datos de una institución para el modal de edición (incluye ambientes y logo público).
+     * Actualiza solo datos básicos de la institución de la sesión.
+     * Servidores y módulos no se modifican desde el panel admin.
+     */
+    public function actualizar(Request $request)
+    {
+        $institucion = Institucion::findOrFail($this->institucionId());
+
+        $datos = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'codigo_dane' => 'required|string|max:20|unique:instituciones,codigo_dane,'.$institucion->id,
+            'municipio' => 'required|string|max:100',
+            'departamento' => 'required|string|max:100',
+            'correo_contacto' => 'required|email|max:255',
+        ]);
+
+        if (! filled($institucion->logo)) {
+            throw ValidationException::withMessages([
+                'logo' => ['El logo de la institución es obligatorio. Suba uno antes de guardar.'],
+            ]);
+        }
+
+        $institucion->update($datos);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Datos de la institución actualizados correctamente.',
+        ]);
+    }
+
+    /**
+     * Datos de la institución de la sesión (incluye ambientes y logo solo para lectura/visualización).
      */
     public function verDatosInstitucion($id)
     {
-        $institucion = Institucion::with('ambientes')->findOrFail($id);
+        $institucionId = $this->institucionId();
+
+        if ((int) $id !== $institucionId) {
+            abort(403, 'No autorizado.');
+        }
+
+        $institucion = Institucion::with('ambientes')->findOrFail($institucionId);
 
         $ambientes = $institucion->ambientes->map(function ($ambiente) {
             return [
@@ -63,8 +91,45 @@ class ConfiguracionAdminController extends Controller
                 'iniciales' => $this->logoService->iniciales($institucion),
                 'ambientes' => $ambientes,
             ],
-            'condiciones_orden' => $this->condicionOrdenController->listarPorInstitucion((int) $id),
-            'condiciones_transitorias_orden' => $this->condicionTransitoriaOrdenController->listarPorInstitucion((int) $id),
         ]);
+    }
+
+    /**
+     * Sube o reemplaza el logo de la institución de la sesión.
+     */
+    public function subirLogo(Request $request)
+    {
+        $institucion = Institucion::findOrFail($this->institucionId());
+
+        $request->validate([
+            'logo' => 'required|file|mimes:jpeg,jpg,png|max:'.InstitucionLogoService::MAX_KILOBYTES,
+        ]);
+
+        try {
+            $resultado = $this->logoService->guardar($institucion, $request->file('logo'));
+        } catch (InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logo actualizado correctamente.',
+            'logo_url_publica' => $resultado['logo_url_publica'],
+            'iniciales' => $resultado['iniciales'],
+        ]);
+    }
+
+    private function institucionId(): int
+    {
+        $id = session('institucion_id');
+
+        if (! $id) {
+            abort(403, 'No hay institución en sesión.');
+        }
+
+        return (int) $id;
     }
 }
