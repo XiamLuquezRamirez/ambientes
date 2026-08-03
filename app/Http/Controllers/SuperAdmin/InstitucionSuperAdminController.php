@@ -29,11 +29,31 @@ class InstitucionSuperAdminController extends Controller
     /**
      * Listado de instituciones con ambientes (pivot IP/puerto/activo).
      */
-    public function index()
+    public function index(Request $request)
     {
         $instituciones = Institucion::with('ambientes')->get();
         $ambientes = Ambiente::all();
         $condiciones = CondicionInclusion::query()->ordenadas()->get();
+
+        $consulta = Institucion::query()
+            ->where('activo', true)
+            ->orderBy('nombre')
+            ->select(
+                'instituciones.*',
+            );
+
+        if ($request->filled('buscar')) {
+            $termino = $request->buscar;
+            $consulta->where(fn ($q) => $q
+                ->where('nombre', 'like', "%{$termino}%")
+            );
+        }
+
+        if ($request->filled('estado')) {
+            $consulta->where('activo', $request->estado === 'true');
+        }
+
+        $instituciones = $consulta->orderBy('nombre')->paginate(10);
 
         // solo las del sistemas y adicionales creadas por el super admin
         $condicionesTransitorias = CondicionTransitoria::query()
