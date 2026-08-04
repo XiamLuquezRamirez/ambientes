@@ -282,33 +282,33 @@ insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servido
 (33,'CargaDocente',6,'create','musica','{\"id\":6,\"docente_id\":2,\"ambiente_id\":9,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-04T14:03:15.000000Z\",\"updated_at\":\"2026-08-04T14:03:15.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-04 09:03:15','2026-08-04 09:03:15'),
 (34,'CargaDocente',6,'create','musica','{\"id\":6,\"docente_id\":2,\"ambiente_id\":9,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-04T14:03:15.000000Z\",\"updated_at\":\"2026-08-04T14:03:15.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-04 09:03:15','2026-08-04 09:03:15');
 
-/*Table structure for table `condiciones` */
-
 DROP TABLE IF EXISTS `condiciones`;
 
 CREATE TABLE `condiciones` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `codigo` varchar(50) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `descripcion_corta` text,
+  `codigo` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion_corta` text COLLATE utf8mb4_unicode_ci,
   `estado` tinyint(1) DEFAULT '1',
-  `color_hex` varchar(7) DEFAULT '#000000',
+  `color_hex` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT '#000000',
   `es_sistema` tinyint(1) DEFAULT '1',
   `fecha_ultima_edicion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `vista_info_asociada` varchar(100) DEFAULT NULL,
+  `vista_info_asociada` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `eliminado` int DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo` (`codigo`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones` */
 
-insert  into `condiciones`(`id`,`codigo`,`nombre`,`descripcion_corta`,`estado`,`color_hex`,`es_sistema`,`fecha_ultima_edicion`,`vista_info_asociada`) values
-(1,'COND-001','Estandar','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(2,'COND-002','TDAH','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(3,'COND-003','TEA','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(4,'COND-004','Síndrome de Down','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(5,'COND-005','Discapacidad Visual','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(6,'COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL);
+insert  into `condiciones`(`id`,`codigo`,`nombre`,`descripcion_corta`,`estado`,`color_hex`,`es_sistema`,`fecha_ultima_edicion`,`vista_info_asociada`,`eliminado`) values 
+(1,'COND-001','Estandar','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:48',NULL,0),
+(2,'COND-002','TDAH','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
+(3,'COND-003','TEA','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:49',NULL,0),
+(4,'COND-004','Síndrome de Down','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
+(5,'COND-005','Discapacidad Visual','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:51',NULL,0),
+(6,'COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:53',NULL,0),
+(8,'COND-007','dfgdsfgdfg dsfgsdfg sdf g','fsdgsdfg sdfg gdfsg',1,'#2563EB',0,'2026-08-04 14:43:00',NULL,1);
 
 /*Table structure for table `condiciones_orden` */
 
@@ -316,20 +316,20 @@ DROP TABLE IF EXISTS `condiciones_orden`;
 
 CREATE TABLE `condiciones_orden` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `id_institucion` bigint unsigned NOT NULL,
-  `id_condicion` bigint unsigned NOT NULL,
+  `institucion_id` bigint unsigned NOT NULL,
+  `condicion_id` bigint unsigned NOT NULL,
   `orden` int NOT NULL DEFAULT '0',
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_institucion_condicion` (`id_institucion`,`id_condicion`),
-  KEY `idx_institucion_orden` (`id_institucion`,`orden`)
+  UNIQUE KEY `uk_institucion_condicion` (`institucion_id`,`condicion_id`),
+  KEY `idx_institucion_orden` (`institucion_id`,`orden`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones_orden` */
 
-insert  into `condiciones_orden`(`id`,`id_institucion`,`id_condicion`,`orden`,`activa`,`created_at`,`updated_at`) values
+insert  into `condiciones_orden`(`id`,`institucion_id`,`condicion_id`,`orden`,`activa`,`created_at`,`updated_at`) values
 (1,1,6,2,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
 (2,1,5,3,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
 (3,1,1,1,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
@@ -343,30 +343,28 @@ DROP TABLE IF EXISTS `condiciones_transitorias`;
 
 CREATE TABLE `condiciones_transitorias` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `id_institucion` bigint unsigned DEFAULT NULL,
-  `codigo` varchar(30) NOT NULL,
-  `etiqueta` varchar(150) NOT NULL,
-  `descripcion_interna` text,
+  `institucion_id` bigint unsigned DEFAULT NULL,
+  `codigo` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `etiqueta` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion_interna` text COLLATE utf8mb4_unicode_ci,
   `condicion_base_id` bigint unsigned DEFAULT NULL,
   `es_sistema` tinyint(1) NOT NULL DEFAULT '0',
   `estado` tinyint(1) NOT NULL DEFAULT '1',
   `usuario_crea` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `eliminado` int DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones_transitorias` */
 
-insert  into `condiciones_transitorias`(`id`,`id_institucion`,`codigo`,`etiqueta`,`descripcion_interna`,`condicion_base_id`,`es_sistema`,`estado`,`usuario_crea`,`created_at`,`updated_at`) values
-(1,NULL,'CTR-002','Sospecha de TDAH','Descripción corta del perfil de aprendizaje',2,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(2,NULL,'CTR-003','Sospecha de TEA','Descripción corta del perfil de aprendizaje',3,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(3,NULL,'CTR-004','Sospecha de Síndrome de Down','Descripción corta del perfil de aprendizaje',4,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(4,NULL,'CTR-005','Sospecha de Discapacidad Visual','Descripción corta del perfil de aprendizaje',5,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(5,NULL,'CTR-006','Sospecha de Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',6,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(7,NULL,'CTR-007','nueva perfil personalizado','nueva perfil personalizado',4,0,1,1,'2026-08-04 08:50:13','2026-08-04 08:50:13'),
-(10,1,'CTR-008','nueva creada por el admin','nueva creada por el admin',6,0,1,16,'2026-08-04 09:30:09','2026-08-04 09:30:09'),
-(11,1,'CTR-011','nueva creada por el admin 2','nueva creada por el admin',NULL,0,1,16,'2026-08-04 09:30:20','2026-08-04 09:30:20');
+insert  into `condiciones_transitorias`(`id`,`institucion_id`,`codigo`,`etiqueta`,`descripcion_interna`,`condicion_base_id`,`es_sistema`,`estado`,`usuario_crea`,`created_at`,`updated_at`,`eliminado`) values 
+(1,NULL,'CTR-002','Sospecha de TDAH','Descripción corta del perfil de aprendizaje',2,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
+(2,NULL,'CTR-003','Sospecha de TEA','Descripción corta del perfil de aprendizaje',3,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
+(3,NULL,'CTR-004','Sospecha de Síndrome de Down','Descripción corta del perfil de aprendizaje',4,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:34',0),
+(4,NULL,'CTR-005','Sospecha de Discapacidad Visual','Descripción corta del perfil de aprendizaje',5,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:32',0),
+(5,NULL,'CTR-006','Sospecha de Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',6,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:35',0);
 
 /*Table structure for table `condiciones_transitorias_orden` */
 
@@ -374,29 +372,25 @@ DROP TABLE IF EXISTS `condiciones_transitorias_orden`;
 
 CREATE TABLE `condiciones_transitorias_orden` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `id_institucion` bigint unsigned NOT NULL,
-  `id_condicion_transitoria` bigint unsigned NOT NULL,
+  `institucion_id` bigint unsigned NOT NULL,
+  `condicion_transitoria_id` bigint unsigned NOT NULL,
   `orden` int NOT NULL DEFAULT '0',
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_institucion_condicion_transitoria` (`id_institucion`,`id_condicion_transitoria`),
-  KEY `idx_institucion_orden` (`id_institucion`,`orden`)
+  UNIQUE KEY `uk_institucion_condicion_transitoria` (`institucion_id`,`condicion_transitoria_id`),
+  KEY `idx_institucion_orden` (`institucion_id`,`orden`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones_transitorias_orden` */
 
-insert  into `condiciones_transitorias_orden`(`id`,`id_institucion`,`id_condicion_transitoria`,`orden`,`activa`,`created_at`,`updated_at`) values
+insert  into `condiciones_transitorias_orden`(`id`,`institucion_id`,`condicion_transitoria_id`,`orden`,`activa`,`created_at`,`updated_at`) values
 (1,1,1,0,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
 (2,1,2,1,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(3,1,7,2,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
 (4,1,3,3,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
 (5,1,4,4,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(6,1,5,5,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(9,1,10,6,1,'2026-08-04 09:30:09','2026-08-04 09:30:09'),
-(10,1,11,7,0,'2026-08-04 09:30:20','2026-08-04 09:30:24');
-
+(6,1,5,5,1,'2026-08-04 08:52:01','2026-08-04 09:29:45');
 /*Table structure for table `configuracion_pins` */
 
 DROP TABLE IF EXISTS `configuracion_pins`;
@@ -621,9 +615,9 @@ DROP TABLE IF EXISTS `estudiante_condicion_transitoria`;
 
 CREATE TABLE `estudiante_condicion_transitoria` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `id_estudiante` bigint unsigned NOT NULL,
-  `id_condicion_transitoria` bigint unsigned NOT NULL,
-  `id_docente` bigint unsigned NOT NULL,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `condicion_transitoria_id` bigint unsigned NOT NULL,
+  `docente_id` bigint unsigned NOT NULL,
   `observacion` text NOT NULL,
   `fecha_activacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `activa` tinyint(1) NOT NULL DEFAULT '1',
@@ -633,19 +627,18 @@ CREATE TABLE `estudiante_condicion_transitoria` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `id_docente` (`id_docente`),
-  KEY `id_estudiante` (`id_estudiante`),
-  KEY `id_condicion_transitoria` (`id_condicion_transitoria`),
+  KEY `docente_id` (`docente_id`),
+  KEY `estudiante_id` (`estudiante_id`),
+  KEY `condicion_transitoria_id` (`condicion_transitoria_id`),
   KEY `activa` (`activa`),
-  CONSTRAINT `estudiante_condicion_transitoria_ibfk_1` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiantes` (`id`),
-  CONSTRAINT `estudiante_condicion_transitoria_ibfk_2` FOREIGN KEY (`id_condicion_transitoria`) REFERENCES `condiciones_transitorias` (`id`),
-  CONSTRAINT `estudiante_condicion_transitoria_ibfk_3` FOREIGN KEY (`id_docente`) REFERENCES `docentes` (`id`)
+  CONSTRAINT `estudiante_condicion_transitoria_ibfk_1` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
+  CONSTRAINT `estudiante_condicion_transitoria_ibfk_2` FOREIGN KEY (`condicion_transitoria_id`) REFERENCES `condiciones_transitorias` (`id`),
+  CONSTRAINT `estudiante_condicion_transitoria_ibfk_3` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiante_condicion_transitoria` */
 
-insert  into `estudiante_condicion_transitoria`(`id`,`id_estudiante`,`id_condicion_transitoria`,`id_docente`,`observacion`,`fecha_activacion`,`activa`,`fecha_cierre`,`motivo_cierre`,`observacion_cierre`,`created_at`,`updated_at`) values
-(1,11,7,2,'nueva creada por el admin','2026-08-04 11:01:51',0,'2026-08-04 11:02:16','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:01:51','2026-08-04 11:02:16'),
+insert  into `estudiante_condicion_transitoria`(`id`,`estudiante_id`,`condicion_transitoria_id`,`docente_id`,`observacion`,`fecha_activacion`,`activa`,`fecha_cierre`,`motivo_cierre`,`observacion_cierre`,`created_at`,`updated_at`) values
 (2,11,2,2,'nueva creada por el admin','2026-08-04 11:03:10',0,'2026-08-04 11:03:50','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:03:10','2026-08-04 11:03:50'),
 (3,5,1,2,'nueva creada por el admin','2026-08-04 11:03:28',0,'2026-08-04 11:03:58','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:03:28','2026-08-04 11:03:58');
 
@@ -914,7 +907,7 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (25,'2026_06_17_000004_create_matriculas_table',3),
 (26,'2026_06_17_000005_create_piar_table',3),
 (27,'2026_06_17_000006_eliminar_ambiente_estudiante',3),
-(28,'2026_06_17_000007_eliminar_ambiente_id_docentes',3),
+(28,'2026_06_17_000007_eliminar_ambiente_docente_ids',3),
 (29,'2026_06_17_000008_simplificar_rol_users',4),
 (31,'2026_06_17_000009_drop_docente_grupo',5),
 (32,'2026_06_17_155731_create_ambiente_grado_table',5),
@@ -2243,7 +2236,7 @@ DROP TABLE IF EXISTS `piar_ajuste_razonable_docente_firma`;
 CREATE TABLE `piar_ajuste_razonable_docente_firma` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_ajuste_razonable` bigint unsigned NOT NULL,
-  `id_docente` bigint unsigned NOT NULL,
+  `docente_id` bigint unsigned NOT NULL,
   `area` text,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
