@@ -2505,8 +2505,8 @@ INSERT INTO instituciones (
     'Medellín',
     'Antioquia',
     '050010000001',
-    'logos/institucion.png',
-    'contacto@institucion.edu.co'
+    'logos/institucion.png',  
+    'contacto@institucion.edu.co',
     '1'
 );
 
