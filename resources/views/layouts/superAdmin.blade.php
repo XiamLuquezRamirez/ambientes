@@ -53,12 +53,13 @@
                     class="{{ request()->routeIs('superadmin.administradores.index') ? 'active nav-link' : 'nav-link' }}">
                     <i class="fa-solid fa-users"></i> Administradores
                 </a>
-                @php
-                    $condiciones = request()->routeIs(
-                        'superadmin.perfil-aprendizaje*',
-                        'superadmin.perfil-aprendizaje-personalizado*',
-                    );
-                @endphp
+            </li>
+            @php
+                $condiciones = request()->routeIs(
+                    'superadmin.perfil-aprendizaje*',
+                    'superadmin.perfil-aprendizaje-personalizado*',
+                );
+            @endphp
             <li class="nav-item">
                 <a href="#navCondiciones" data-bs-toggle="collapse"
                     aria-expanded="{{ $condiciones ? 'true' : 'false' }}"
@@ -68,7 +69,8 @@
                     <span>Perfiles de Aprendizaje</span>
                     <i class="fa-solid fa-chevron-down ms-auto"
                         style="font-size:.65rem;transition:transform .2s;
-                              {{ $condiciones ? 'transform:rotate(180deg)' : '' }}"></i>
+                              {{ $condiciones ? 'transform:rotate(180deg)' : '' }}">
+                    </i>
                 </a>
                 <div class="collapse {{ $condiciones ? 'show' : '' }}" id="navCondiciones">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">

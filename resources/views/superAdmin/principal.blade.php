@@ -22,10 +22,9 @@
                         <div class="card-ip">
                             <i class="fas fa-server" style="font-size:.7rem"></i>
                             <span class="card-ip-texto">{{ $amb->servidor_ip ?? 'Sin IP configurada' }}</span>
-                            <span class="dot-conexion" id="dot-{{ $amb->id }}" title="Sin verificar"></span>
                         </div>
                     </div>
-                    <button class="btn-menu" onclick="abrirMenu({{ $amb->id }})" title="Opciones">⋯</button>
+                    {{-- <button class="btn-menu" onclick="abrirMenu({{ $amb->id }})" title="Opciones">⋯</button> --}}
                 </div>
 
                 {{-- Menú desplegable --}}
