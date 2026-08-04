@@ -45,8 +45,8 @@ class EstudianteAdminController extends Controller
             }
         }
 
-        if ($request->filled('condicion_id')) {
-            $consulta->where('condicion_id', $request->condicion_id);
+        if ($request->filled('id_condicion')) {
+            $consulta->where('id_condicion', $request->id_condicion);
         }
 
         if ($request->filled('estado')) {

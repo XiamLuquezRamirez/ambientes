@@ -48,7 +48,7 @@ class PerfilAprendizajeInclusion extends Model
 
     public function estudiantes(): HasMany
     {
-        return $this->hasMany(Estudiante::class, 'condicion_id');
+        return $this->hasMany(Estudiante::class, 'id_condicion');
     }
 
     public function condicionesTransitorias(): HasMany

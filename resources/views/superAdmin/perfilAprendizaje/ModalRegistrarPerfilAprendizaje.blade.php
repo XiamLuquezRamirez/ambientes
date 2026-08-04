@@ -38,7 +38,7 @@
 
                 <form id="formRegistrarCondicion" method="POST" autocomplete="off">
                     @csrf
-                    <input type="hidden" id="condicion_id" value="">
+                    <input type="hidden" id="id_condicion" value="">
 
                     <div class="tab-content" style="padding: 20px 0 0;">
                         <div class="tab-pane fade show active" id="datosGeneralesCondicion" role="tabpanel"

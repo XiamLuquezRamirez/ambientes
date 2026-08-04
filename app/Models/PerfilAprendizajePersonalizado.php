@@ -55,7 +55,7 @@ class PerfilAprendizajePersonalizado extends Model
 
     public function estudiantes(): HasMany
     {
-        return $this->hasMany(Estudiante::class, 'condicion_transitoria_id');
+        return $this->hasMany(Estudiante::class, 'id_condicion_transitoria');
     }
 
     public function asignacionesEstudiante(): HasMany

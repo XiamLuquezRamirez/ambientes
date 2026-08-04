@@ -156,8 +156,8 @@ class EstudiantePerfilAprendizajePersonalizadoService
 
             Estudiante::query()
                 ->where('id', $asignacion->id_estudiante)
-                ->where('condicion_transitoria_id', $asignacion->id_condicion_transitoria)
-                ->update(['condicion_transitoria_id' => null]);
+                ->where('id_condicion_transitoria', $asignacion->id_condicion_transitoria)
+                ->update(['id_condicion_transitoria' => null]);
         });
     }
 }
