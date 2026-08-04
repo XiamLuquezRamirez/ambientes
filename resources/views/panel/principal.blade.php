@@ -1131,7 +1131,7 @@
                         <option value="inactivo">Inactivo</option>
                     </select>
                     <select id="filtro-condicion-estudiante" class="filtro-estudiantes">
-                        <option value="todas">Todas las condiciones</option>
+                        <option value="todas">Todos los perfiles de aprendizaje</option>
                         @foreach ($condiciones as $condicion)
                             <option value="{{ $condicion->id }}">{{ $condicion->nombre }}</option>
                         @endforeach
@@ -1766,7 +1766,7 @@
                 <div class="estudiante-meta">
                     <p class="estudiante-nombre">${nombreCompleto}</p>
                    <p class="estudiante-submeta">
-    Condición: ${condicionLabel} · ${estadoTexto}
+    Perfil de aprendizaje: ${condicionLabel} · ${estadoTexto}
 </p>
                 </div>
             </div>

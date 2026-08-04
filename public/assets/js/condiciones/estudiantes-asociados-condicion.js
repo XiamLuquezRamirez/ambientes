@@ -1,5 +1,5 @@
 /**
- * Modal estudiantes asociados a condición normal — solo admin, solo lectura
+ * Modal estudiantes asociados a perfil de aprendizaje normal — solo admin, solo lectura
  */
 (function() {
     if (!window.CN_EST_URL_LIST) return;
@@ -82,7 +82,7 @@
     window.abrirModalEstudiantesCondicion = function(condicionId, etiqueta) {
         $filtroNombre.val('');
         estudiantesCache = [];
-        $('#modalEstudiantesCondicionSubtitle').text(etiqueta || 'Condición');
+        $('#modalEstudiantesCondicionSubtitle').text(etiqueta || 'Perfil de aprendizaje');
         $loading.show();
         $empty.hide();
         $contenedor.hide();

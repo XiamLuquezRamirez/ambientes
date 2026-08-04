@@ -44,7 +44,7 @@
                 <th>Avatar</th>
                 <th>Nombre</th>
                 <th>Grado</th>
-                <th>Condición</th>
+                <th>Perfil de Aprendizaje</th>
                 <th>Edad</th>
                 <th class="text-center">Estado</th>
                 <th class="text-center">Acciones</th>

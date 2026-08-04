@@ -1,0 +1,105 @@
+@if ($items->isEmpty())
+    <div class="cfg-empty">
+        <i class="fa-solid fa-list-check" style="font-size:1.6rem;opacity:.4"></i>
+        <p class="mt-2 mb-0">No hay perfiles de aprendizaje personalizados para mostrar con estos filtros.</p>
+    </div>
+@else
+    <div class="cfg-lista lista-transitorias-orden" id="listaTransitoriasOrden">
+        @foreach ($items as $item)
+            @php
+                $t = $item->condicionTransitoria;
+                $base = $t?->condicionBase;
+                $color = $base?->color_hex ?: '#64748B';
+                $conteo = $conteos[$item->id_condicion_transitoria] ?? ['total' => 0, 'activos' => 0];
+                $creadaPorDocente = $t?->creadaPorDocente() ?? false;
+                $puedeGestionar = $t
+                    && ! $t->es_sistema
+                    && (int) $t->id_institucion === (int) session('institucion_id')
+                    && ! $creadaPorDocente;
+                $autorNombre = $t?->creador
+                    ? trim(($t->creador->nombre ?? '') . ' ' . ($t->creador->apellido ?? ''))
+                    : null;
+                if ($t?->es_sistema) {
+                    $autorLabel = 'Sistema';
+                } elseif ($creadaPorDocente && $autorNombre) {
+                    $autorLabel = $autorNombre;
+                } elseif ($autorNombre) {
+                    $autorLabel = $autorNombre;
+                } else {
+                    $autorLabel = 'Institución';
+                }
+            @endphp
+            <article class="cfg-card {{ $item->activa ? '' : 'is-inactive' }}"
+                data-id="{{ $item->id }}"
+                data-transitoria-id="{{ $t?->id }}">
+                <div class="cfg-drag" title="Arrastrar para reordenar">
+                    <i class="fa-solid fa-grip-vertical"></i>
+                </div>
+                <div>
+                    <div class="cfg-meta">
+                        <span class="badge"
+                            style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55">
+                            {{ $t?->codigo ?? '—' }}
+                        </span>
+                        @if ($base)
+                            <span class="badge"
+                                style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55"
+                                title="Perfil de aprendizaje base / padre">
+                                <i class="fa-solid fa-link"></i>
+                                {{ $base->codigo }} — {{ $base->nombre }}
+                            </span>
+                        @else
+                            <span class="badge badge-gray">Sin perfil de aprendizaje base</span>
+                        @endif
+                        <span class="badge badge-gray" title="Creada por">
+                            <i class="fa-solid fa-user"></i>
+                            {{ $autorLabel }}
+                        </span>
+                        @if ($t?->es_sistema)
+                            <span class="badge badge-orange">Sistema</span>
+                        @elseif (! $creadaPorDocente)
+                            <span class="badge badge-gray">Adicional</span>
+                        @endif
+                        <span class="badge badge-blue badge-estudiantes-transitoria {{ $conteo['activos'] > 0 ? 'badge-estudiantes-transitoria--click' : '' }}"
+                            title="{{ $conteo['activos'] > 0 ? 'Ver estudiantes asociados' : 'Sin estudiantes activos' }}"
+                            data-transitoria-id="{{ $t?->id }}"
+                            data-etiqueta="{{ $t?->etiqueta ?? '' }}"
+                            @if ($conteo['activos'] > 0) role="button" tabindex="0" @endif>
+                            <i class="fa-solid fa-user-graduate"></i>
+                            {{ $conteo['activos'] }} estudiante{{ $conteo['activos'] === 1 ? '' : 's' }} activo{{ $conteo['activos'] === 1 ? '' : 's' }}
+                        </span>
+                    </div>
+                    <h3 class="cfg-titulo">{{ $t?->etiqueta ?? 'Opción no disponible' }}</h3>
+                </div>
+                <div class="cfg-acciones">
+                    <div class="cfg-acciones-fila">
+                        <div class="form-check form-switch mb-0" title="{{ $creadaPorDocente ? 'Creada por docente — no se puede cambiar' : 'Visible para docentes' }}">
+                            <input class="form-check-input toggle-activa-transitoria-orden" type="checkbox"
+                                role="switch"
+                                data-id="{{ $item->id }}"
+                                @checked($item->activa)
+                                @disabled($creadaPorDocente)
+                                title="{{ $creadaPorDocente ? 'Creada por docente' : ($item->activa ? 'Desactivar en la institución' : 'Activar en la institución') }}">
+                        </div>
+                        @if ($puedeGestionar)
+                            <button type="button" class="btn-cfg btn-cfg-editar btn-editar-transitoria"
+                                data-id="{{ $t->id }}" title="Editar">
+                                <i class="fa-solid fa-pencil"></i>
+                                Editar
+                            </button>
+                            <button type="button" class="btn-cfg btn-cfg-eliminar btn-eliminar-transitoria"
+                                data-id="{{ $t->id }}"
+                                data-nombre="{{ e($t->etiqueta) }}"
+                                data-estudiantes="{{ $conteo['activos'] }}"
+                                title="Eliminar">
+                                <i class="fa-solid fa-trash-can"></i>
+                                Eliminar
+                            </button>
+                        @endif
+                    </div>
+                    <small class="text-muted">Visible docentes</small>
+                </div>
+            </article>
+        @endforeach
+    </div>
+@endif

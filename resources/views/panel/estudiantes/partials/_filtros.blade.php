@@ -17,7 +17,7 @@
         </select>
 
         <select name="condicion_id" id="filtroCondicion" class="toolbar-select">
-            <option value="">Todas las condiciones</option>
+            <option value="">Todos los perfiles de aprendizaje</option>
             @foreach ($condiciones as $condicion)
                 <option value="{{ $condicion->id }}" {{ $condicion_id == $condicion->id ? 'selected' : '' }}>
                     {{ $condicion->nombre }}

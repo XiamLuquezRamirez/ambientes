@@ -6,15 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
-use App\Models\Condicion;
-use App\Models\CondicionTransitoria;
-use App\Models\CondicionTransitoriaOrden;
+use App\Models\PerfilAprendizaje;
+use App\Models\PerfilAprendizajePersonalizado;
+use App\Models\PerfilAprendizajePersonalizadoOrden;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
 use App\Models\Docente;
 use App\Models\Estudiante;
 use App\Models\EstudianteAmbiente;
-use App\Models\EstudianteCondicionTransitoria;
+use App\Models\EstudiantePerfilAprendizajePersonalizado;
 use App\Models\FigurasModel;
 use App\Models\Grado;
 use App\Models\Grupo;
@@ -182,7 +182,7 @@ class EstudiantePanelController extends Controller
 
         $estudiantes = $consulta->paginate(12)->withQueryString();
 
-        $condiciones = Condicion::where('estado', true)->orderBy('nombre')->get();
+        $condiciones = PerfilAprendizaje::where('estado', true)->orderBy('nombre')->get();
         $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
@@ -308,7 +308,7 @@ class EstudiantePanelController extends Controller
         $condicionesTransitorias = collect();
 
         if ($institucionId && ! $estudiante->condicionTransitoriaActiva) {
-            $condicionesTransitorias = CondicionTransitoriaOrden::query()
+            $condicionesTransitorias = PerfilAprendizajePersonalizadoOrden::query()
                 ->where('id_institucion', $institucionId)
                 ->where('activa', true)
                 ->whereHas('condicionTransitoria', fn ($q) => $q->where('estado', 1))
@@ -347,7 +347,7 @@ class EstudiantePanelController extends Controller
      * Activa una condición transitoria para el estudiante.
      * Solo puede haber una activa por estudiante.
      */
-    public function activarCondicionTransitoria(Request $request, Estudiante $estudiante)
+    public function activarPerfilAprendizajePersonalizado(Request $request, Estudiante $estudiante)
     {
         $docente = Auth::guard('docente')->user()->docente;
 
@@ -366,7 +366,7 @@ class EstudiantePanelController extends Controller
             'observacion' => 'required|string|min:20|max:2000',
         ]);
 
-        $permitida = CondicionTransitoriaOrden::query()
+        $permitida = PerfilAprendizajePersonalizadoOrden::query()
             ->where('id_institucion', $institucionId)
             ->where('id_condicion_transitoria', $datos['id_condicion_transitoria'])
             ->where('activa', true)
@@ -385,7 +385,7 @@ class EstudiantePanelController extends Controller
         }
 
         DB::transaction(function () use ($estudiante, $docente, $datos) {
-            EstudianteCondicionTransitoria::create([
+            EstudiantePerfilAprendizajePersonalizado::create([
                 'id_estudiante' => $estudiante->id,
                 'id_condicion_transitoria' => $datos['id_condicion_transitoria'],
                 'id_docente' => $docente->id,
@@ -399,7 +399,7 @@ class EstudiantePanelController extends Controller
             ]);
         });
 
-        $etiqueta = CondicionTransitoria::query()
+        $etiqueta = PerfilAprendizajePersonalizado::query()
             ->where('id', $datos['id_condicion_transitoria'])
             ->value('etiqueta');
 

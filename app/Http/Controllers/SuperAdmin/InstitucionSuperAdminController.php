@@ -4,8 +4,8 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
-use App\Models\CondicionInclusion;
-use App\Models\CondicionTransitoria;
+use App\Models\PerfilAprendizajeInclusion;
+use App\Models\PerfilAprendizajePersonalizado;
 use App\Models\Institucion;
 use App\Models\User;
 use App\Services\InstitucionLogoService;
@@ -22,8 +22,8 @@ class InstitucionSuperAdminController extends Controller
 {
     public function __construct(
         private InstitucionLogoService $logoService,
-        private readonly CondicionOrdenController $condicionOrdenController,
-        private readonly CondicionTransitoriaOrdenController $condicionTransitoriaOrdenController,
+        private readonly PerfilAprendizajeOrdenController $perfilAprendizajeOrdenController,
+        private readonly PerfilAprendizajePersonalizadoOrdenController $perfilAprendizajePersonalizadoOrdenController,
     ) {}
 
     /**
@@ -33,7 +33,7 @@ class InstitucionSuperAdminController extends Controller
     {
         $instituciones = Institucion::with('ambientes')->get();
         $ambientes = Ambiente::all();
-        $condiciones = CondicionInclusion::query()->ordenadas()->get();
+        $condiciones = PerfilAprendizajeInclusion::query()->ordenadas()->get();
 
         $consulta = Institucion::query()
             ->where('activo', true)
@@ -56,7 +56,7 @@ class InstitucionSuperAdminController extends Controller
         $instituciones = $consulta->orderBy('nombre')->paginate(10);
 
         // solo las del sistemas y adicionales creadas por el super admin
-        $condicionesTransitorias = CondicionTransitoria::query()
+        $condicionesTransitorias = PerfilAprendizajePersonalizado::query()
             ->with('condicionBase')
             ->where('id_institucion', null)
             ->ordenadas()
@@ -87,7 +87,7 @@ class InstitucionSuperAdminController extends Controller
             ];
         })->values();
 
-        $condicionesTransitoriasDisponibles = CondicionTransitoria::query()
+        $condicionesTransitoriasDisponibles = PerfilAprendizajePersonalizado::query()
             ->with('condicionBase:id,codigo,nombre,color_hex')
             ->where(function ($q) use ($id) {
                 $q->whereNull('id_institucion')
@@ -95,7 +95,7 @@ class InstitucionSuperAdminController extends Controller
             })
             ->ordenadas()
             ->get(['id', 'codigo', 'etiqueta', 'condicion_base_id', 'id_institucion', 'es_sistema'])
-            ->map(function (CondicionTransitoria $t) {
+            ->map(function (PerfilAprendizajePersonalizado $t) {
                 $color = $t->condicionBase?->color_hex ?: '#64748B';
 
                 return [
@@ -128,8 +128,8 @@ class InstitucionSuperAdminController extends Controller
                 'iniciales' => $this->logoService->iniciales($institucion),
                 'ambientes' => $ambientes,
             ],
-            'condiciones_orden' => $this->condicionOrdenController->listarPorInstitucion((int) $id),
-            'condiciones_transitorias_orden' => $this->condicionTransitoriaOrdenController->listarPorInstitucion((int) $id),
+            'condiciones_orden' => $this->perfilAprendizajeOrdenController->listarPorInstitucion((int) $id),
+            'condiciones_transitorias_orden' => $this->perfilAprendizajePersonalizadoOrdenController->listarPorInstitucion((int) $id),
             'condiciones_transitorias_disponibles' => $condicionesTransitoriasDisponibles,
         ]);
     }
@@ -175,12 +175,12 @@ class InstitucionSuperAdminController extends Controller
             );
             session(['password_temporal' => $passwordTemporal]);
 
-            $this->condicionOrdenController->sincronizarParaInstitucion(
+            $this->perfilAprendizajeOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
                 $request->input('condiciones_orden', [])
             );
 
-            $this->condicionTransitoriaOrdenController->sincronizarParaInstitucion(
+            $this->perfilAprendizajePersonalizadoOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
                 $request->input('condiciones_transitorias_orden', [])
             );
@@ -235,12 +235,12 @@ class InstitucionSuperAdminController extends Controller
 
             $institucion->ambientes()->sync($relaciones);
 
-            $this->condicionOrdenController->sincronizarParaInstitucion(
+            $this->perfilAprendizajeOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
                 $request->input('condiciones_orden', [])
             );
 
-            $this->condicionTransitoriaOrdenController->sincronizarParaInstitucion(
+            $this->perfilAprendizajePersonalizadoOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
                 $request->input('condiciones_transitorias_orden', [])
             );

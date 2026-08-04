@@ -30,7 +30,7 @@
         $('#condicion_base_id').val(id || '');
         if (!id) {
             $('#cbCondicionBaseSwatch').hide();
-            $('#cbCondicionBaseLabel').text('Sin condición base').addClass('is-placeholder');
+            $('#cbCondicionBaseLabel').text('Sin perfil de aprendizaje base').addClass('is-placeholder');
             $('.cb-select-option').removeClass('active');
             $('.cb-select-option[data-id=""]').addClass('active');
             return;
@@ -122,7 +122,7 @@
             success: function(res) {
                 Swal.close();
                 if (!res.success || !res.condicion) {
-                    mostrarToast('error', 'No fue posible cargar la condición.');
+                    mostrarToast('error', 'No fue posible cargar el perfil de aprendizaje.');
                     cerrarModal();
                     return;
                 }
@@ -137,7 +137,7 @@
     };
 
     function configurarModoCrear() {
-        $('#modalRegistrarTransitoriaTitle').text('Nueva condición transitoria');
+        $('#modalRegistrarTransitoriaTitle').text('Nuevo perfil de aprendizaje personalizado');
         $('#modalRegistrarTransitoriaSubtitle').text('Defina una opción para el selector del docente.');
         $('#hintCodigoTransitoria').show();
         $('#wrapCodigoTransitoria').hide();
@@ -151,8 +151,8 @@
     }
 
     function configurarModoEditar() {
-        $('#modalRegistrarTransitoriaTitle').text('Editar condición transitoria');
-        $('#modalRegistrarTransitoriaSubtitle').text('Actualice la etiqueta, descripción o condición base.');
+        $('#modalRegistrarTransitoriaTitle').text('Editar perfil de aprendizaje personalizado');
+        $('#modalRegistrarTransitoriaSubtitle').text('Actualice la etiqueta, descripción o perfil de aprendizaje base.');
         $('#hintCodigoTransitoria').hide();
         $('#wrapCodigoTransitoria').show();
         $('#wrapEtiquetaTransitoria').removeClass('col-12').addClass('col-md-8');
@@ -228,7 +228,7 @@
             case 'validation.min.string':
                 return 'El campo debe tener al menos 10 caracteres.';
             case 'validation.exists':
-                return 'La condición base no existe.';
+                return 'El perfil de aprendizaje base no existe.';
         }
     }
 

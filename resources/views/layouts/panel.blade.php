@@ -65,10 +65,10 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('panel.inclusion.condiciones-transitorias') }}"
-                        class="{{ request()->routeIs('panel.inclusion.condiciones-transitorias*') ? 'active nav-link' : 'nav-link' }}"
+                    <a href="{{ route('panel.inclusion.perfil-aprendizaje-personalizado') }}"
+                        class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
                         style="padding-left:2.1rem;font-size:.92rem">
-                        <i class="fa-solid fa-puzzle-piece"></i> Cond. transitorias
+                        <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje Personalizados
                     </a>
                 </li>
             </div>

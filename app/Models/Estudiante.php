@@ -149,22 +149,22 @@ class Estudiante extends Model
 
     public function condicion()
     {
-        return $this->belongsTo(CondicionInclusion::class, 'condicion_id');
+        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'condicion_id');
     }
 
     public function condicionTransitoria()
     {
-        return $this->belongsTo(CondicionTransitoria::class, 'condicion_transitoria_id');
+        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'condicion_transitoria_id');
     }
 
     public function condicionesTransitoriasAsignadas()
     {
-        return $this->hasMany(EstudianteCondicionTransitoria::class, 'id_estudiante');
+        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'id_estudiante');
     }
 
     public function condicionTransitoriaActiva()
     {
-        return $this->hasOne(EstudianteCondicionTransitoria::class, 'id_estudiante')
+        return $this->hasOne(EstudiantePerfilAprendizajePersonalizado::class, 'id_estudiante')
             ->where('activa', true);
     }
 
@@ -210,7 +210,7 @@ class Estudiante extends Model
 
     public function ajustesTemporales()
     {
-        return $this->hasMany(AjusteTemporal::class);
+        return $this->hasMany(PerfilAprendizajePersonalizadoAjuste::class);
     }
 
     public function configuracionPin()

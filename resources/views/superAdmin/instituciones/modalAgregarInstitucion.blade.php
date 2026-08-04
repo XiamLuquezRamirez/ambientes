@@ -2,7 +2,7 @@
     Modal: Agregar / Editar Institución (Super Admin)
     - Tab 1: datos básicos + avatar de logo (abre modalLogoInstitucion)
     - Tab 2: IP/puerto/activo por ambiente (name ambientes[id][...]; backend espera "activo")
-    - Tab 3: condiciones + condiciones transitorias (condiciones_orden / condiciones_transitorias_orden)
+    - Tab 3: perfiles de aprendizaje + perfiles de aprendizaje personalizados (condiciones_orden / condiciones_transitorias_orden)
     - Tab 4: módulos (pendiente)
 
     Crear  → POST  superadmin/instituciones
@@ -51,7 +51,7 @@
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" id="tab-condiciones" data-bs-toggle="tab" href="#condicionesInstitucion"
                             role="tab" aria-controls="condicionesInstitucion" aria-selected="false">
-                            <i class="fas fa-layer-group"></i> Condiciones
+                            <i class="fas fa-layer-group"></i> Perfiles de Aprendizaje
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -193,8 +193,8 @@
                         <div class="tab-pane container" id="condicionesInstitucion" role="tabpanel"
                             aria-labelledby="tab-condiciones">
                             <p class="text-muted mb-3" style="font-size:.9rem">
-                                Seleccione las condiciones disponibles para la institución.
-                                Por defecto todas quedan activas.
+                                Seleccione los perfiles de aprendizaje disponibles para la institución.
+                                Por defecto todos quedan activos.
                             </p>
 
                             <div class="card card-condiciones-orden">
@@ -203,7 +203,7 @@
                                     aria-controls="collapseCondicionesOrden">
                                     <h6>
                                         <i class="fa-solid fa-layer-group me-2"></i>
-                                        Condiciones
+                                        Perfiles de Aprendizaje
                                         <span class="badge badge-blue ms-1">{{ $condiciones->count() }}</span>
                                     </h6>
                                     <i class="fa-solid fa-chevron-down chevron"></i>
@@ -230,7 +230,7 @@
                                                 </label>
                                             </div>
                                         @empty
-                                            <p class="text-muted text-center py-3 mb-0">Sin condiciones registradas</p>
+                                            <p class="text-muted text-center py-3 mb-0">Sin perfiles de aprendizaje registrados</p>
                                         @endforelse
                                     </div>
                                 </div>
@@ -242,7 +242,7 @@
                                     aria-controls="collapseCondicionesTransitoriasOrden">
                                     <h6>
                                         <i class="fa-solid fa-list-check me-2"></i>
-                                        Condiciones transitorias
+                                        Perfiles de Aprendizaje Personalizados
                                         <span class="badge badge-blue ms-1" id="badgeCountTransitoriasOrden">{{ $condicionesTransitorias->count() }}</span>
                                     </h6>
                                     <i class="fa-solid fa-chevron-down chevron"></i>
@@ -273,7 +273,7 @@
                                             </div>
                                         @empty
                                             <p class="text-muted text-center py-3 mb-0" id="msgSinTransitoriasOrden">
-                                                Sin condiciones transitorias
+                                                Sin perfiles de aprendizaje personalizados
                                             </p>
                                         @endforelse
                                     </div>
@@ -426,7 +426,7 @@
 
             if (!disponibles.length) {
                 listaTransitoriasEl.innerHTML =
-                    '<p class="text-muted text-center py-3 mb-0">Sin condiciones transitorias</p>';
+                    '<p class="text-muted text-center py-3 mb-0">Sin perfiles de aprendizaje personalizados</p>';
                 const badge = document.getElementById('badgeCountTransitoriasOrden');
                 if (badge) badge.textContent = '0';
                 return;

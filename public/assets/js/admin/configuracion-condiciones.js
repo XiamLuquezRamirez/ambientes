@@ -49,7 +49,7 @@
             .filter(Boolean);
 
         if (!ids.length) {
-            mostrarToast('info', 'No hay condiciones para ordenar.');
+            mostrarToast('info', 'No hay perfiles de aprendizaje para ordenar.');
             return;
         }
 
@@ -152,13 +152,13 @@
         const $toggle = $(this);
         const id = $toggle.data('id');
         const quiereActivar = $toggle.is(':checked');
-        const nombre = $toggle.closest('.cfg-card').find('.cfg-titulo').text().trim() || 'esta condición';
+        const nombre = $toggle.closest('.cfg-card').find('.cfg-titulo').text().trim() || 'este perfil de aprendizaje';
 
         if (!quiereActivar) {
             const confirmacion = await Swal.fire({
                 icon: 'question',
-                title: '¿Desactivar condición?',
-                html: `La condición <strong>"${nombre}"</strong> dejará de aparecer para los docentes.<br><br>¿Desea continuar?`,
+                title: '¿Desactivar perfil de aprendizaje?',
+                html: `El perfil de aprendizaje <strong>"${nombre}"</strong> dejará de aparecer para los docentes.<br><br>¿Desea continuar?`,
                 showCancelButton: true,
                 confirmButtonText: 'Sí, desactivar',
                 cancelButtonText: 'Cancelar',

@@ -28,7 +28,7 @@
         </select>
     </div>
     <div class="form-group">
-        <label for="condicion_id">Condición</label>
+        <label for="condicion_id">Perfil de Aprendizaje</label>
         <select name="condicion_id" id="condicion_id" class="form-control" style="width:auto">
             <option value="">Todos</option>
             @foreach($condiciones as $c)

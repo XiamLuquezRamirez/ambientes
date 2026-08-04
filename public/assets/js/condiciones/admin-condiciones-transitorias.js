@@ -1,5 +1,5 @@
 /**
- * Modal crear/editar condición transitoria — Admin institución
+ * Modal crear/editar perfil de aprendizaje personalizado — Admin institución
  * No permite marcar "es_sistema".
  * Requiere: URL_BASE, URL_ITEM (definidos en la vista)
  */
@@ -37,7 +37,7 @@
         $('#condicion_base_id').val(id || '');
         if (!id) {
             $('#cbCondicionBaseSwatch').hide();
-            $('#cbCondicionBaseLabel').text('Sin condición base').addClass('is-placeholder');
+            $('#cbCondicionBaseLabel').text('Sin perfil de aprendizaje base').addClass('is-placeholder');
             $('.cb-select-option').removeClass('active');
             $('.cb-select-option[data-id=""]').addClass('active');
             return;
@@ -128,7 +128,7 @@
             success: function(res) {
                 Swal.close();
                 if (!res.success || !res.condicion) {
-                    mostrarToast('error', 'No fue posible cargar la condición.');
+                    mostrarToast('error', 'No fue posible cargar el perfil de aprendizaje.');
                     cerrarModal();
                     return;
                 }
@@ -143,7 +143,7 @@
     };
 
     function configurarModoCrear() {
-        $('#modalRegistrarTransitoriaTitle').text('Nueva condición transitoria');
+        $('#modalRegistrarTransitoriaTitle').text('Nuevo perfil de aprendizaje personalizado');
         $('#modalRegistrarTransitoriaSubtitle').text('Opción adicional para su institución.');
         $('#hintCodigoTransitoria').show();
         $('#wrapCodigoTransitoria').hide();
@@ -152,8 +152,8 @@
     }
 
     function configurarModoEditar() {
-        $('#modalRegistrarTransitoriaTitle').text('Editar condición transitoria');
-        $('#modalRegistrarTransitoriaSubtitle').text('Actualice la etiqueta o condición base.');
+        $('#modalRegistrarTransitoriaTitle').text('Editar perfil de aprendizaje personalizado');
+        $('#modalRegistrarTransitoriaSubtitle').text('Actualice la etiqueta o perfil de aprendizaje base.');
         $('#hintCodigoTransitoria').hide();
         $('#wrapCodigoTransitoria').show();
         $('#wrapEtiquetaTransitoria').removeClass('col-12').addClass('col-md-8');
@@ -221,7 +221,7 @@
             case 'validation.min.string':
                 return 'El campo debe tener al menos 10 caracteres.';
             case 'validation.exists':
-                return 'La condición base no existe.';
+                return 'El perfil de aprendizaje base no existe.';
             default:
                 return mensaje;
         }

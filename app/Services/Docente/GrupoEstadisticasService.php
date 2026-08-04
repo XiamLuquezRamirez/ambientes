@@ -44,7 +44,7 @@ class GrupoEstadisticasService
 
     /**
      * Normaliza la condición del estudiante a una clave estable del panel
-     * (estandar, tea, tdah, etc.), ya sea string legado o relación Condicion.
+     * (estandar, tea, tdah, etc.), ya sea string legado o relación PerfilAprendizaje.
      */
     public function resolverClaveCondicion($estudiante): string
     {

@@ -31,7 +31,7 @@
 
         @if ($tieneTransitoriaActiva)
             <span class="stu-badge stu-badge--transitoria">
-                {{ $e->condicionTransitoriaActiva->condicionTransitoria?->etiqueta ?? 'Transitoria' }}
+                {{ $e->condicionTransitoriaActiva->condicionTransitoria?->etiqueta ?? 'Perfil personalizado' }}
             </span>
         @endif
 

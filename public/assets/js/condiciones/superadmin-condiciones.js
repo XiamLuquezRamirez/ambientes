@@ -38,7 +38,7 @@
 
         Swal.fire({
             title: 'Cargando...',
-            text: 'Consultando datos de la condición',
+            text: 'Consultando datos del perfil de aprendizaje',
             allowOutsideClick: false,
             allowEscapeKey: false,
             didOpen: () => Swal.showLoading()
@@ -52,7 +52,7 @@
                 Swal.close();
 
                 if (!res.success || !res.condicion) {
-                    mostrarToast('error', 'No fue posible cargar la condición.');
+                    mostrarToast('error', 'No fue posible cargar el perfil de aprendizaje.');
                     cerrarModalRegistrarCondicion();
                     return;
                 }
@@ -61,15 +61,15 @@
             },
             error: function(xhr) {
                 Swal.close();
-                mostrarToast('error', xhr.responseJSON?.message || 'Error al consultar la condición.');
+                mostrarToast('error', xhr.responseJSON?.message || 'Error al consultar el perfil de aprendizaje.');
                 cerrarModalRegistrarCondicion();
             }
         });
     };
 
     function configurarModoCrear() {
-        $('#modalRegistrarCondicionTitle').text('Nueva Condición');
-        $('#modalRegistrarCondicionSubtitle').text('Registre una condición de inclusión global.');
+        $('#modalRegistrarCondicionTitle').text('Nuevo Perfil de Aprendizaje');
+        $('#modalRegistrarCondicionSubtitle').text('Registre un perfil de aprendizaje global.');
         $('#hintCodigoAuto').show();
         $('#wrapCodigo').hide();
         $('#wrapNombre').removeClass('col-md-8').addClass('col-12');
@@ -81,7 +81,7 @@
     }
 
     function configurarModoEditar() {
-        $('#modalRegistrarCondicionTitle').text('Editar Condición');
+        $('#modalRegistrarCondicionTitle').text('Editar Perfil de Aprendizaje');
         $('#modalRegistrarCondicionSubtitle').text('Puede modificar nombre, descripción y color.');
         $('#hintCodigoAuto').hide();
         $('#wrapCodigo').show();
@@ -206,14 +206,14 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: res.message || 'No fue posible guardar la condición.'
+                        text: res.message || 'No fue posible guardar el perfil de aprendizaje.'
                     });
                     return;
                 }
 
                 cerrarModalRegistrarCondicion();
                 Swal.close();
-                mostrarToast('success', res.message || 'La condición se guardó correctamente.');
+                mostrarToast('success', res.message || 'El perfil de aprendizaje se guardó correctamente.');
 
                 if (typeof window.cargarTablaCondiciones === 'function') {
                     window.cargarTablaCondiciones();
@@ -231,7 +231,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'No permitido',
-                        text: xhr.responseJSON?.message || 'No fue posible guardar la condición.'
+                        text: xhr.responseJSON?.message || 'No fue posible guardar el perfil de aprendizaje.'
                     });
                     return;
                 }
@@ -239,7 +239,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: xhr.responseJSON?.message || 'Error al guardar la condición.'
+                    text: xhr.responseJSON?.message || 'Error al guardar el perfil de aprendizaje.'
                 });
             }
         });

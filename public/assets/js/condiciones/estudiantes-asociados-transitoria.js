@@ -1,5 +1,5 @@
 /**
- * Modal estudiantes asociados a condición transitoria (admin / panel docente)
+ * Modal estudiantes asociados a perfil de aprendizaje personalizado (admin / panel docente)
  */
 (function() {
     if (!window.CT_EST_URL_LIST || !window.CT_EST_URL_DESASOCIAR) return;
@@ -162,7 +162,7 @@
     window.abrirModalEstudiantesTransitoria = function(condicionId, etiqueta) {
         condicionActualId = condicionId;
         estudiantesCache = [];
-        $('#modalEstudiantesTransitoriaSubtitle').text(etiqueta || 'Condición transitoria');
+        $('#modalEstudiantesTransitoriaSubtitle').text(etiqueta || 'Perfil de aprendizaje personalizado');
         limpiarFiltros();
         $loading.show();
         $empty.hide();

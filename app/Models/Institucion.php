@@ -41,11 +41,11 @@ class Institucion extends Model
 
     public function condicionesOrden()
     {
-        return $this->hasMany(CondicionOrden::class, 'id_institucion');
+        return $this->hasMany(PerfilAprendizajeOrden::class, 'id_institucion');
     }
 
     public function condicionesTransitoriasOrden()
     {
-        return $this->hasMany(CondicionTransitoriaOrden::class, 'id_institucion');
+        return $this->hasMany(PerfilAprendizajePersonalizadoOrden::class, 'id_institucion');
     }
 }

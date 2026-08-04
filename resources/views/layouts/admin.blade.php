@@ -129,17 +129,17 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.configuracion.condiciones.index') }}"
-                                class="{{ request()->routeIs('admin.configuracion.condiciones.index', 'admin.configuracion.condiciones.orden', 'admin.configuracion.condiciones.estado') ? 'active nav-link' : 'nav-link' }}"
+                            <a href="{{ route('admin.configuracion.perfil-aprendizaje.index') }}"
+                                class="{{ request()->routeIs('admin.configuracion.perfil-aprendizaje.index', 'admin.configuracion.perfil-aprendizaje.orden', 'admin.configuracion.perfil-aprendizaje.estado') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-layer-group"></i> Condiciones
+                                <i class="fa-solid fa-layer-group"></i> Perfiles de Aprendizaje
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.configuracion.condiciones-transitorias.index') }}"
-                                class="{{ request()->routeIs('admin.configuracion.condiciones-transitorias*') ? 'active nav-link' : 'nav-link' }}"
+                            <a href="{{ route('admin.configuracion.perfil-aprendizaje-personalizado.index') }}"
+                                class="{{ request()->routeIs('admin.configuracion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-list-check"></i> Condiciones transitorias
+                                <i class="fa-solid fa-list-check"></i> Perfiles de Aprendizaje Personalizados
                             </a>
                         </li>
                     </ul>

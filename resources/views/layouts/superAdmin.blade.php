@@ -55,8 +55,8 @@
                 </a>
                 @php
                     $condiciones = request()->routeIs(
-                        'superadmin.condiciones*',
-                        'superadmin.condiciones-transitorias*',
+                        'superadmin.perfil-aprendizaje*',
+                        'superadmin.perfil-aprendizaje-personalizado*',
                     );
                 @endphp
             <li class="nav-item">
@@ -65,7 +65,7 @@
                     class="nav-link d-flex align-items-center gap-2 {{ $condiciones ? 'active' : '' }}"
                     style="cursor:pointer">
                     <i class="fa-solid fa-graduation-cap"></i>
-                    <span>Condiciones</span>
+                    <span>Perfiles de Aprendizaje</span>
                     <i class="fa-solid fa-chevron-down ms-auto"
                         style="font-size:.65rem;transition:transform .2s;
                               {{ $condiciones ? 'transform:rotate(180deg)' : '' }}"></i>
@@ -73,18 +73,18 @@
                 <div class="collapse {{ $condiciones ? 'show' : '' }}" id="navCondiciones">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
-                            <a href="{{ route('superadmin.condiciones.index') }}"
-                                class="{{ request()->routeIs('superadmin.condiciones.*') ? 'active nav-link' : 'nav-link' }}"
+                            <a href="{{ route('superadmin.perfil-aprendizaje.index') }}"
+                                class="{{ request()->routeIs('superadmin.perfil-aprendizaje.*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-layer-group" style="font-size:.8em"></i> Condiciones Globales
+                                <i class="fa-solid fa-layer-group" style="font-size:.8em"></i> Perfiles de Aprendizaje
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('superadmin.condiciones-transitorias.index') }}"
-                                class="{{ request()->routeIs('superadmin.condiciones-transitorias*') ? 'active nav-link' : 'nav-link' }}"
+                            <a href="{{ route('superadmin.perfil-aprendizaje-personalizado.index') }}"
+                                class="{{ request()->routeIs('superadmin.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-list-check" style="font-size:.8em"></i> Condiciones Transitorias
-                                Globales
+                                <i class="fa-solid fa-list-check" style="font-size:.8em"></i> Perfiles de Aprendizaje
+                                Personalizados Globales
                             </a>
                         </li>
                     </ul>

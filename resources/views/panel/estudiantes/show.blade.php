@@ -125,11 +125,11 @@
         @if ($condicionTransitoriaActiva ?? null)
             <section class="c-card" style="border-color:#FDBA74;background:#FFF7ED;">
                 <h3 class="ficha-section-title" style="color:#C2410C;">
-                    <i class="fa-solid fa-puzzle-piece me-1"></i> Condición transitoria activa
+                    <i class="fa-solid fa-puzzle-piece me-1"></i> Perfil de aprendizaje personalizado activo
                 </h3>
                 <dl class="ficha-dl">
                     <div>
-                        <dt>Condición</dt>
+                        <dt>Perfil de aprendizaje</dt>
                         <dd>{{ $condicionTransitoriaActiva->condicionTransitoria?->etiqueta ?? '—' }}</dd>
                     </div>
                     <div>
@@ -152,7 +152,7 @@
         @if ($estudiante->condicion !== null && $estudiante->condicion->id != 1)
             <section class="c-card" style="border-color:{{ $estudiante->condicion->color_hex }};background:#{{ $estudiante->condicion->color_hex }}22;">
                 <h3 class="ficha-section-title" style="color:{{ $estudiante->condicion->color_hex }};">
-                    <i class="fa-solid fa-puzzle-piece me-1"></i> Condición: {{ $estudiante->condicion->nombre }}
+                    <i class="fa-solid fa-puzzle-piece me-1"></i> Perfil de aprendizaje: {{ $estudiante->condicion->nombre }}
                 </h3>
                 <dl class="ficha-dl">   
                     <div>
@@ -235,14 +235,14 @@
                     @if (!($condicionesTransitorias ?? collect())->isEmpty())
                         <button type="button" class="btn btn-outline-pink" data-bs-toggle="modal"
                             data-bs-target="#modalCondicionTransitoria">
-                            <i class="fa-solid fa-puzzle-piece"></i> Activar condición transitoria
+                            <i class="fa-solid fa-puzzle-piece"></i> Activar perfil de aprendizaje personalizado
                         </button>
                     @endif
                 @endif
 
                 @if ($condicionTransitoriaActiva !== null)
-                    <button type="button" class="btn btn-outline-pink" onclick="desactivarCondicionTransitoria({{ $estudiante->id }})" title="Desactivar condición transitoria">
-                        <i class="fa-solid fa-puzzle-piece"></i> Desactivar condición transitoria
+                    <button type="button" class="btn btn-outline-pink" onclick="desactivarCondicionTransitoria({{ $estudiante->id }})" title="Desactivar perfil de aprendizaje personalizado">
+                        <i class="fa-solid fa-puzzle-piece"></i> Desactivar perfil de aprendizaje personalizado
                     </button>
                 @endif
             </div>
@@ -275,7 +275,7 @@
                         <li class="nav-item">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabCondicionesTransitorias">
                                 <i class="fa-solid fa-puzzle-piece me-2"></i>
-                                Historial de condiciones transitorias
+                                Historial de perfiles de aprendizaje personalizados
                             </button>
                         </li>
                     @endif
@@ -428,22 +428,22 @@
                         @endif
                     </div>
                     <div class="tab-pane fade" id="tabCondicionesTransitorias">
-                        <p class="ficha-section-title">Historial de condiciones transitorias</p>
+                        <p class="ficha-section-title">Historial de perfiles de aprendizaje personalizados</p>
                         @php
-                            $motivosCierreTransitoria = \App\Services\EstudianteCondicionTransitoriaService::MOTIVOS_CIERRE;
+                            $motivosCierreTransitoria = \App\Services\EstudiantePerfilAprendizajePersonalizadoService::MOTIVOS_CIERRE;
                             $historialCondicionesTransitorias = $historialCondicionesTransitorias ?? collect();
                         @endphp
                 
                         @if ($historialCondicionesTransitorias->isNotEmpty())
                             <section class="c-card">
                                 <h3 class="ficha-section-title">
-                                    <i class="fa-solid fa-clock-rotate-left me-1"></i> Historial de condiciones transitorias
+                                    <i class="fa-solid fa-clock-rotate-left me-1"></i> Historial de perfiles de aprendizaje personalizados
                                 </h3>
                                 <div class="table-container">
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>Condición</th>
+                                                <th>Perfil de aprendizaje</th>
                                                 <th>Estado</th>
                                                 <th>Activación</th>
                                                 <th>Cierre</th>
@@ -492,7 +492,7 @@
                                     </table>
                                 </div>
                                 <p class="ficha-empty mb-0 mt-2" style="font-size:.85rem">
-                                    La condición permanente del estudiante no se modifica al cerrar una transitoria.
+                                    El perfil de aprendizaje permanente del estudiante no se modifica al cerrar uno personalizado.
                                 </p>
                             </section>
                         @endif
@@ -570,7 +570,7 @@
 
     @include('panel.estudiantes.modalConfigurarPin')
     @if (!($condicionTransitoriaActiva ?? null) && ($condicionesTransitorias ?? collect())->isNotEmpty())
-        @include('panel.estudiantes.modalActivarCondicionTransitoria')
+        @include('panel.estudiantes.modalActivarPerfilAprendizajePersonalizado')
     @endif
 
     @push('scripts')

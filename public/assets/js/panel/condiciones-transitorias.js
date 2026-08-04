@@ -1,5 +1,5 @@
 /**
- * Lista de condiciones transitorias — Panel docente
+ * Lista de perfiles de aprendizaje personalizados — Panel docente
  */
 (function() {
     const URL_INDEX = window.URL_PANEL_TRANSITORIAS;
@@ -101,7 +101,7 @@
         Swal.fire({
             icon: 'warning',
             title: 'No se puede eliminar',
-            html: `«<strong>${nombre}</strong>» tiene <strong>${estudiantes}</strong> estudiante(s) asociados.<br><br>¿Desea desactivarla en su lugar? Dejará de aparecer al asignar nuevas condiciones.`,
+            html: `«<strong>${nombre}</strong>» tiene <strong>${estudiantes}</strong> estudiante(s) asociados.<br><br>¿Desea desactivarla en su lugar? Dejará de aparecer al asignar nuevos perfiles de aprendizaje.`,
             showCancelButton: true,
             confirmButtonText: 'Sí, desactivar',
             cancelButtonText: 'Cancelar',
@@ -130,13 +130,13 @@
     $(document).on('change', '.toggle-activa-transitoria-panel', function() {
         const $toggle = $(this);
         const ordenId = $toggle.data('id');
-        const nombre = $toggle.data('nombre') || 'esta condición';
+        const nombre = $toggle.data('nombre') || 'este perfil de aprendizaje';
         const quiereActivar = $toggle.is(':checked');
 
         if (!quiereActivar) {
             Swal.fire({
                 icon: 'question',
-                title: '¿Desactivar condición?',
+                title: '¿Desactivar perfil de aprendizaje?',
                 html: `«<strong>${nombre}</strong>» dejará de estar disponible para asignar a estudiantes.`,
                 showCancelButton: true,
                 confirmButtonText: 'Sí, desactivar',
@@ -194,7 +194,7 @@
     $(document).on('click', '.btn-eliminar-transitoria-panel', function() {
         const id = $(this).data('id');
         const ordenId = $(this).data('orden-id');
-        const nombre = $(this).data('nombre') || 'esta condición';
+        const nombre = $(this).data('nombre') || 'este perfil de aprendizaje';
         const estudiantes = parseInt($(this).data('estudiantes'), 10) || 0;
 
         if (estudiantes > 0) {
@@ -204,7 +204,7 @@
 
         Swal.fire({
             icon: 'warning',
-            title: '¿Eliminar condición?',
+            title: '¿Eliminar perfil de aprendizaje?',
             html: `Se eliminará <strong>${nombre}</strong>. Esta acción no se puede deshacer.`,
             showCancelButton: true,
             confirmButtonText: 'Sí, eliminar',
