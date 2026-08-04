@@ -11,7 +11,7 @@ class PerfilAprendizajePersonalizado extends Model
     protected $table = 'condiciones_transitorias';
 
     protected $fillable = [
-        'id_institucion',
+        'institucion_id',
         'codigo',
         'etiqueta',
         'descripcion_interna',
@@ -19,11 +19,12 @@ class PerfilAprendizajePersonalizado extends Model
         'es_sistema',
         'estado',
         'usuario_crea',
+        'eliminado',
     ];
 
     protected $casts = [
         'es_sistema' => 'boolean',
-        'estado' => 'integer',
+        'estado' => 'integer',  
     ];
 
     public static function generarCodigo(): string
@@ -45,7 +46,7 @@ class PerfilAprendizajePersonalizado extends Model
 
     public function institucion(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion');
+        return $this->belongsTo(Institucion::class, 'institucion_id');
     }
 
     public function creador(): BelongsTo
@@ -55,12 +56,12 @@ class PerfilAprendizajePersonalizado extends Model
 
     public function estudiantes(): HasMany
     {
-        return $this->hasMany(Estudiante::class, 'id_condicion_transitoria');
+        return $this->hasMany(Estudiante::class, 'condicion_transitoria_id');
     }
 
     public function asignacionesEstudiante(): HasMany
     {
-        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'id_condicion_transitoria');
+        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'condicion_transitoria_id');
     }
 
     public function activa(): bool
@@ -99,12 +100,12 @@ class PerfilAprendizajePersonalizado extends Model
     public function scopeDeInstitucion(Builder $query, ?int $institucionId): Builder
     {
         if ($institucionId === null) {
-            return $query->whereNull('id_institucion');
+            return $query->whereNull('institucion_id');
         }
 
         return $query->where(function ($q) use ($institucionId) {
-            $q->whereNull('id_institucion')
-                ->orWhere('id_institucion', $institucionId);
+            $q->whereNull('institucion_id')
+                ->orWhere('institucion_id', $institucionId);
         });
     }
 }

@@ -4,7 +4,7 @@ MySQL - 8.0.41 : Database - ambientes
 *********************************************************************
 */
 
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
 
 /*!40101 SET SQL_MODE=''*/;
 
@@ -12,7 +12,7 @@ MySQL - 8.0.41 : Database - ambientes
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-CREATE DATABASE IF NOT EXISTS `ambientes` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`ambientes` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
 USE `ambientes`;
 
@@ -23,8 +23,8 @@ DROP TABLE IF EXISTS `actividades`;
 CREATE TABLE `actividades` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `tema_id` bigint unsigned NOT NULL,
-  `tipo` enum('audio','video_lsc','animacion','juego','simulacion') NOT NULL,
-  `contenido_path` varchar(255) NOT NULL,
+  `tipo` enum('audio','video_lsc','animacion','juego','simulacion') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `contenido_path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `configuracion` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -43,8 +43,8 @@ DROP TABLE IF EXISTS `ajustes_temporales`;
 CREATE TABLE `ajustes_temporales` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
-  `clave` varchar(255) NOT NULL,
-  `valor` varchar(255) NOT NULL,
+  `clave` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valor` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `expira_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE `ambiente_grado` (
 
 /*Data for the table `ambiente_grado` */
 
-insert  into `ambiente_grado`(`id`,`ambiente_id`,`grado_id`,`activo`) values
+insert  into `ambiente_grado`(`id`,`ambiente_id`,`grado_id`,`activo`) values 
 (1,1,1,1),
 (2,1,2,1),
 (3,1,3,1),
@@ -110,7 +110,7 @@ CREATE TABLE `ambiente_institucion` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `ambiente_id` bigint unsigned NOT NULL,
   `institucion_id` bigint unsigned NOT NULL,
-  `ip` varchar(45) DEFAULT NULL,
+  `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `puerto` smallint unsigned DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -124,7 +124,7 @@ CREATE TABLE `ambiente_institucion` (
 
 /*Data for the table `ambiente_institucion` */
 
-insert  into `ambiente_institucion`(`id`,`ambiente_id`,`institucion_id`,`ip`,`puerto`,`activo`,`created_at`,`updated_at`) values
+insert  into `ambiente_institucion`(`id`,`ambiente_id`,`institucion_id`,`ip`,`puerto`,`activo`,`created_at`,`updated_at`) values 
 (2,6,1,'192.168.1.11',NULL,1,'2026-08-04 08:52:01','2026-08-04 08:52:01'),
 (3,7,1,'192.168.1.12',NULL,1,'2026-08-04 08:52:01','2026-08-04 08:52:01'),
 (4,8,1,'192.168.1.13',NULL,1,'2026-08-04 08:52:01','2026-08-04 08:52:01'),
@@ -137,11 +137,11 @@ DROP TABLE IF EXISTS `ambientes`;
 
 CREATE TABLE `ambientes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `color_hex` varchar(9) NOT NULL,
-  `icono` varchar(255) NOT NULL,
-  `servidor_ip` varchar(15) DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_hex` varchar(9) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `icono` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `servidor_ip` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `cupo_defecto` smallint unsigned NOT NULL DEFAULT '25',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -152,12 +152,12 @@ CREATE TABLE `ambientes` (
 
 /*Data for the table `ambientes` */
 
-insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values
-(6,'Expresión Artística','expresion-artistica','#0F6E56','🎨','192.168.1.20',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(7,'Polimotor','polimotor','#534AB7','🤸','192.168.1.21',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(8,'Multisaberes','multisaberes','#854F0B','🧠','192.168.1.22',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values 
+(6,'Expresión Artística','expresion-artistica','#0F6E56','?','192.168.1.20',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(7,'Polimotor','polimotor','#534AB7','?','192.168.1.21',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(8,'Multisaberes','multisaberes','#854F0B','?','192.168.1.22',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
 (9,'Multisensorial','multisensorial','#185FA5','✋','192.168.1.23',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(10,'Tecnología','tecnologia','#993C1D','💻','192.168.1.24',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25');
+(10,'Tecnología','tecnologia','#993C1D','?','192.168.1.24',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25');
 
 /*Table structure for table `asistencias` */
 
@@ -208,7 +208,7 @@ CREATE TABLE `carga_docente` (
 
 /*Data for the table `carga_docente` */
 
-insert  into `carga_docente`(`id`,`docente_id`,`ambiente_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`activo`,`created_at`,`updated_at`) values
+insert  into `carga_docente`(`id`,`docente_id`,`ambiente_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`activo`,`created_at`,`updated_at`) values 
 (2,2,8,1,1,2026,1,'2026-08-04 09:02:28','2026-08-04 09:02:28'),
 (3,2,8,1,28,2026,1,'2026-08-04 09:02:35','2026-08-04 09:02:35'),
 (4,2,8,2,3,2026,1,'2026-08-04 09:02:44','2026-08-04 09:02:44'),
@@ -221,12 +221,12 @@ DROP TABLE IF EXISTS `cola_sincronizacion`;
 
 CREATE TABLE `cola_sincronizacion` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `entidad` varchar(255) NOT NULL,
+  `entidad` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `entidad_id` bigint unsigned NOT NULL,
-  `accion` enum('create','update','delete','transfer') NOT NULL,
-  `servidor_origen` varchar(255) NOT NULL DEFAULT 'musica',
+  `accion` enum('create','update','delete','transfer') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `servidor_origen` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'musica',
   `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `estado` enum('pendiente','enviado','confirmado','error') NOT NULL DEFAULT 'pendiente',
+  `estado` enum('pendiente','enviado','confirmado','error') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pendiente',
   `intentos` tinyint unsigned NOT NULL DEFAULT '0',
   `enviado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -237,7 +237,7 @@ CREATE TABLE `cola_sincronizacion` (
 
 /*Data for the table `cola_sincronizacion` */
 
-insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servidor_origen`,`payload`,`estado`,`intentos`,`enviado_en`,`created_at`,`updated_at`) values
+insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servidor_origen`,`payload`,`estado`,`intentos`,`enviado_en`,`created_at`,`updated_at`) values 
 (1,'Estudiante',1,'update','polimotor','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (2,'Estudiante',1,'update','logico','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (3,'Estudiante',1,'update','multisensorial','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
@@ -279,27 +279,29 @@ DROP TABLE IF EXISTS `condiciones`;
 
 CREATE TABLE `condiciones` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `codigo` varchar(50) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `descripcion_corta` text,
+  `codigo` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion_corta` text COLLATE utf8mb4_unicode_ci,
   `estado` tinyint(1) DEFAULT '1',
-  `color_hex` varchar(7) DEFAULT '#000000',
+  `color_hex` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT '#000000',
   `es_sistema` tinyint(1) DEFAULT '1',
   `fecha_ultima_edicion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `vista_info_asociada` varchar(100) DEFAULT NULL,
+  `vista_info_asociada` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `eliminado` int DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo` (`codigo`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones` */
 
-insert  into `condiciones`(`id`,`codigo`,`nombre`,`descripcion_corta`,`estado`,`color_hex`,`es_sistema`,`fecha_ultima_edicion`,`vista_info_asociada`) values
-(1,'COND-001','Estandar','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(2,'COND-002','TDAH','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(3,'COND-003','TEA','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(4,'COND-004','Síndrome de Down','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(5,'COND-005','Discapacidad Visual','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL),
-(6,'COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 08:38:26',NULL);
+insert  into `condiciones`(`id`,`codigo`,`nombre`,`descripcion_corta`,`estado`,`color_hex`,`es_sistema`,`fecha_ultima_edicion`,`vista_info_asociada`,`eliminado`) values 
+(1,'COND-001','Estandar','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:48',NULL,0),
+(2,'COND-002','TDAH','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
+(3,'COND-003','TEA','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:49',NULL,0),
+(4,'COND-004','Síndrome de Down','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
+(5,'COND-005','Discapacidad Visual','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:51',NULL,0),
+(6,'COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:53',NULL,0),
+(8,'COND-007','dfgdsfgdfg dsfgsdfg sdf g','fsdgsdfg sdfg gdfsg',1,'#2563EB',0,'2026-08-04 14:43:00',NULL,1);
 
 /*Table structure for table `condiciones_orden` */
 
@@ -307,26 +309,27 @@ DROP TABLE IF EXISTS `condiciones_orden`;
 
 CREATE TABLE `condiciones_orden` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `id_institucion` bigint unsigned NOT NULL,
-  `id_condicion` bigint unsigned NOT NULL,
+  `institucion_id` bigint unsigned NOT NULL,
+  `condicion_id` bigint unsigned NOT NULL,
   `orden` int NOT NULL DEFAULT '0',
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_institucion_condicion` (`id_institucion`,`id_condicion`),
-  KEY `idx_institucion_orden` (`id_institucion`,`orden`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `uk_institucion_condicion` (`institucion_id`,`condicion_id`),
+  KEY `idx_institucion_orden` (`institucion_id`,`orden`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones_orden` */
 
-insert  into `condiciones_orden`(`id`,`id_institucion`,`id_condicion`,`orden`,`activa`,`created_at`,`updated_at`) values
-(1,1,6,2,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(2,1,5,3,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(3,1,1,1,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(4,1,4,4,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(5,1,2,5,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(6,1,3,0,1,'2026-08-04 08:52:01','2026-08-04 09:28:15');
+insert  into `condiciones_orden`(`id`,`institucion_id`,`condicion_id`,`orden`,`activa`,`created_at`,`updated_at`) values 
+(1,1,6,2,1,'2026-08-04 08:52:01','2026-08-04 14:22:15'),
+(2,1,5,3,1,'2026-08-04 08:52:01','2026-08-04 14:22:15'),
+(3,1,1,0,1,'2026-08-04 08:52:01','2026-08-04 14:22:15'),
+(4,1,4,4,1,'2026-08-04 08:52:01','2026-08-04 14:22:15'),
+(5,1,2,5,1,'2026-08-04 08:52:01','2026-08-04 14:22:15'),
+(6,1,3,1,1,'2026-08-04 08:52:01','2026-08-04 14:22:15'),
+(7,1,8,6,1,'2026-08-04 14:43:40','2026-08-04 14:43:40');
 
 /*Table structure for table `condiciones_transitorias` */
 
@@ -334,30 +337,28 @@ DROP TABLE IF EXISTS `condiciones_transitorias`;
 
 CREATE TABLE `condiciones_transitorias` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `id_institucion` bigint unsigned DEFAULT NULL,
-  `codigo` varchar(30) NOT NULL,
-  `etiqueta` varchar(150) NOT NULL,
-  `descripcion_interna` text,
+  `institucion_id` bigint unsigned DEFAULT NULL,
+  `codigo` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `etiqueta` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion_interna` text COLLATE utf8mb4_unicode_ci,
   `condicion_base_id` bigint unsigned DEFAULT NULL,
   `es_sistema` tinyint(1) NOT NULL DEFAULT '0',
   `estado` tinyint(1) NOT NULL DEFAULT '1',
   `usuario_crea` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `eliminado` int DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones_transitorias` */
 
-insert  into `condiciones_transitorias`(`id`,`id_institucion`,`codigo`,`etiqueta`,`descripcion_interna`,`condicion_base_id`,`es_sistema`,`estado`,`usuario_crea`,`created_at`,`updated_at`) values
-(1,NULL,'CTR-002','Sospecha de TDAH','Descripción corta del perfil de aprendizaje',2,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(2,NULL,'CTR-003','Sospecha de TEA','Descripción corta del perfil de aprendizaje',3,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(3,NULL,'CTR-004','Sospecha de Síndrome de Down','Descripción corta del perfil de aprendizaje',4,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(4,NULL,'CTR-005','Sospecha de Discapacidad Visual','Descripción corta del perfil de aprendizaje',5,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(5,NULL,'CTR-006','Sospecha de Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',6,1,1,1,'2026-08-04 08:38:26','2026-08-04 08:38:26'),
-(7,NULL,'CTR-007','nueva perfil personalizado','nueva perfil personalizado',4,0,1,1,'2026-08-04 08:50:13','2026-08-04 08:50:13'),
-(10,1,'CTR-008','nueva creada por el admin','nueva creada por el admin',6,0,1,16,'2026-08-04 09:30:09','2026-08-04 09:30:09'),
-(11,1,'CTR-011','nueva creada por el admin 2','nueva creada por el admin',NULL,0,1,16,'2026-08-04 09:30:20','2026-08-04 09:30:20');
+insert  into `condiciones_transitorias`(`id`,`institucion_id`,`codigo`,`etiqueta`,`descripcion_interna`,`condicion_base_id`,`es_sistema`,`estado`,`usuario_crea`,`created_at`,`updated_at`,`eliminado`) values 
+(1,NULL,'CTR-002','Sospecha de TDAH','Descripción corta del perfil de aprendizaje',2,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
+(2,NULL,'CTR-003','Sospecha de TEA','Descripción corta del perfil de aprendizaje',3,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
+(3,NULL,'CTR-004','Sospecha de Síndrome de Down','Descripción corta del perfil de aprendizaje',4,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:34',0),
+(4,NULL,'CTR-005','Sospecha de Discapacidad Visual','Descripción corta del perfil de aprendizaje',5,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:32',0),
+(5,NULL,'CTR-006','Sospecha de Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',6,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:35',0);
 
 /*Table structure for table `condiciones_transitorias_orden` */
 
@@ -365,28 +366,25 @@ DROP TABLE IF EXISTS `condiciones_transitorias_orden`;
 
 CREATE TABLE `condiciones_transitorias_orden` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `id_institucion` bigint unsigned NOT NULL,
-  `id_condicion_transitoria` bigint unsigned NOT NULL,
+  `institucion_id` bigint unsigned NOT NULL,
+  `condicion_transitoria_id` bigint unsigned NOT NULL,
   `orden` int NOT NULL DEFAULT '0',
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_institucion_condicion_transitoria` (`id_institucion`,`id_condicion_transitoria`),
-  KEY `idx_institucion_orden` (`id_institucion`,`orden`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `uk_institucion_condicion_transitoria` (`institucion_id`,`condicion_transitoria_id`),
+  KEY `idx_institucion_orden` (`institucion_id`,`orden`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones_transitorias_orden` */
 
-insert  into `condiciones_transitorias_orden`(`id`,`id_institucion`,`id_condicion_transitoria`,`orden`,`activa`,`created_at`,`updated_at`) values
-(1,1,1,0,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(2,1,2,1,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(3,1,7,2,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(4,1,3,3,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(5,1,4,4,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(6,1,5,5,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(9,1,10,6,1,'2026-08-04 09:30:09','2026-08-04 09:30:09'),
-(10,1,11,7,0,'2026-08-04 09:30:20','2026-08-04 09:30:24');
+insert  into `condiciones_transitorias_orden`(`id`,`institucion_id`,`condicion_transitoria_id`,`orden`,`activa`,`created_at`,`updated_at`) values 
+(1,1,1,0,1,'2026-08-04 08:52:01','2026-08-04 14:22:40'),
+(2,1,2,1,1,'2026-08-04 08:52:01','2026-08-04 14:22:40'),
+(4,1,3,3,1,'2026-08-04 08:52:01','2026-08-04 14:22:40'),
+(5,1,4,4,1,'2026-08-04 08:52:01','2026-08-04 14:22:40'),
+(6,1,5,6,1,'2026-08-04 08:52:01','2026-08-04 14:22:40');
 
 /*Table structure for table `configuracion_pins` */
 
@@ -395,12 +393,12 @@ DROP TABLE IF EXISTS `configuracion_pins`;
 CREATE TABLE `configuracion_pins` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
-  `figura_1` varchar(20) NOT NULL,
-  `color_figura_1` varchar(20) DEFAULT NULL,
-  `figura_2` varchar(20) NOT NULL,
-  `color_figura_2` varchar(20) DEFAULT NULL,
-  `figura_3` varchar(20) NOT NULL,
-  `color_figura_3` varchar(20) DEFAULT NULL,
+  `figura_1` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_figura_1` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `figura_2` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_figura_2` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `figura_3` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_figura_3` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `intentos_fallidos` tinyint unsigned NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -411,7 +409,7 @@ CREATE TABLE `configuracion_pins` (
 
 /*Data for the table `configuracion_pins` */
 
-insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_1`,`figura_2`,`color_figura_2`,`figura_3`,`color_figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values
+insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_1`,`figura_2`,`color_figura_2`,`figura_3`,`color_figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values 
 (7,31,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 15:23:30','2026-06-23 16:03:55'),
 (8,32,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-06-23 15:31:26','2026-06-23 16:03:33'),
 (9,33,'fas fa-star','#ff9019','fas fa-heart','#ff0606','fas fa-fish','#0f54ff',0,'2026-06-23 15:34:40','2026-06-23 15:34:40'),
@@ -427,9 +425,9 @@ DROP TABLE IF EXISTS `configuraciones`;
 
 CREATE TABLE `configuraciones` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `clave` varchar(255) NOT NULL,
-  `valor` text,
-  `descripcion` varchar(255) DEFAULT NULL,
+  `clave` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valor` text COLLATE utf8mb4_unicode_ci,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -438,7 +436,7 @@ CREATE TABLE `configuraciones` (
 
 /*Data for the table `configuraciones` */
 
-insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values
+insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values 
 (1,'tiempo_sesion_minutos','60',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (2,'intentos_max_pin','5',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (3,'idioma','es',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
@@ -449,14 +447,14 @@ insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`
 DROP TABLE IF EXISTS `departamentos`;
 
 CREATE TABLE `departamentos` (
-  `codigo` varchar(5) NOT NULL,
-  `descripcion` varchar(100) DEFAULT NULL,
+  `codigo` varchar(5) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`codigo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `departamentos` */
 
-insert  into `departamentos`(`codigo`,`descripcion`) values
+insert  into `departamentos`(`codigo`,`descripcion`) values 
 ('05','Antioquia'),
 ('08','Atlantico'),
 ('11','Bogota'),
@@ -498,14 +496,14 @@ DROP TABLE IF EXISTS `docentes`;
 CREATE TABLE `docentes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
-  `direccion` varchar(150) DEFAULT NULL,
-  `especialidad` varchar(100) DEFAULT NULL,
+  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `direccion` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `especialidad` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha_ingreso` date DEFAULT NULL,
-  `firma_url` varchar(255) DEFAULT NULL,
-  `foto_url` varchar(255) DEFAULT NULL,
-  `descripcion` text,
-  `estado` enum('activo','inactivo','eliminado') DEFAULT 'activo',
+  `firma_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `foto_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `estado` enum('activo','inactivo','eliminado') COLLATE utf8mb4_unicode_ci DEFAULT 'activo',
   `bloqueado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -516,7 +514,7 @@ CREATE TABLE `docentes` (
 
 /*Data for the table `docentes` */
 
-insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`foto_url`,`descripcion`,`estado`,`bloqueado_en`,`created_at`,`updated_at`) values
+insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`foto_url`,`descripcion`,`estado`,`bloqueado_en`,`created_at`,`updated_at`) values 
 (1,2,'12345678925','direc','Educación Musical','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:50:15'),
 (2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:57:11'),
 (3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-23 14:23:57');
@@ -530,8 +528,8 @@ CREATE TABLE `estudiante_ambiente` (
   `estudiante_id` bigint unsigned NOT NULL,
   `ambiente_id` bigint unsigned NOT NULL,
   `anio_lectivo` smallint unsigned NOT NULL,
-  `estado` enum('activo','restringido','adaptado') NOT NULL DEFAULT 'activo',
-  `observacion` text,
+  `estado` enum('activo','restringido','adaptado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
+  `observacion` text COLLATE utf8mb4_unicode_ci,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -544,7 +542,7 @@ CREATE TABLE `estudiante_ambiente` (
 
 /*Data for the table `estudiante_ambiente` */
 
-insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`activo`,`created_at`,`updated_at`) values
+insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`activo`,`created_at`,`updated_at`) values 
 (6,13,8,2026,'activo',NULL,1,'2026-08-04 09:02:15','2026-08-04 09:02:15'),
 (7,11,8,2026,'activo',NULL,1,'2026-08-04 09:02:15','2026-08-04 09:02:15'),
 (8,5,8,2026,'activo',NULL,1,'2026-08-04 09:02:15','2026-08-04 09:02:15'),
@@ -612,33 +610,33 @@ DROP TABLE IF EXISTS `estudiante_condicion_transitoria`;
 
 CREATE TABLE `estudiante_condicion_transitoria` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `id_estudiante` bigint unsigned NOT NULL,
-  `id_condicion_transitoria` bigint unsigned NOT NULL,
-  `id_docente` bigint unsigned NOT NULL,
-  `observacion` text NOT NULL,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `condicion_transitoria_id` bigint unsigned NOT NULL,
+  `docente_id` bigint unsigned NOT NULL,
+  `observacion` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `fecha_activacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `fecha_cierre` datetime DEFAULT NULL,
-  `motivo_cierre` enum('diagnostico_formal','condicion_no_confirmada','otro') DEFAULT NULL,
-  `observacion_cierre` text,
+  `motivo_cierre` enum('diagnostico_formal','condicion_no_confirmada','otro') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observacion_cierre` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `id_docente` (`id_docente`),
-  KEY `id_estudiante` (`id_estudiante`),
-  KEY `id_condicion_transitoria` (`id_condicion_transitoria`),
+  KEY `docente_id` (`docente_id`),
+  KEY `estudiante_id` (`estudiante_id`),
+  KEY `condicion_transitoria_id` (`condicion_transitoria_id`),
   KEY `activa` (`activa`),
-  CONSTRAINT `estudiante_condicion_transitoria_ibfk_1` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiantes` (`id`),
-  CONSTRAINT `estudiante_condicion_transitoria_ibfk_2` FOREIGN KEY (`id_condicion_transitoria`) REFERENCES `condiciones_transitorias` (`id`),
-  CONSTRAINT `estudiante_condicion_transitoria_ibfk_3` FOREIGN KEY (`id_docente`) REFERENCES `docentes` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `estudiante_condicion_transitoria_ibfk_1` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
+  CONSTRAINT `estudiante_condicion_transitoria_ibfk_2` FOREIGN KEY (`condicion_transitoria_id`) REFERENCES `condiciones_transitorias` (`id`),
+  CONSTRAINT `estudiante_condicion_transitoria_ibfk_3` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiante_condicion_transitoria` */
 
-insert  into `estudiante_condicion_transitoria`(`id`,`id_estudiante`,`id_condicion_transitoria`,`id_docente`,`observacion`,`fecha_activacion`,`activa`,`fecha_cierre`,`motivo_cierre`,`observacion_cierre`,`created_at`,`updated_at`) values
-(1,11,7,2,'nueva creada por el admin','2026-08-04 11:01:51',0,'2026-08-04 11:02:16','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:01:51','2026-08-04 11:02:16'),
+insert  into `estudiante_condicion_transitoria`(`id`,`estudiante_id`,`condicion_transitoria_id`,`docente_id`,`observacion`,`fecha_activacion`,`activa`,`fecha_cierre`,`motivo_cierre`,`observacion_cierre`,`created_at`,`updated_at`) values 
 (2,11,2,2,'nueva creada por el admin','2026-08-04 11:03:10',0,'2026-08-04 11:03:50','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:03:10','2026-08-04 11:03:50'),
-(3,5,1,2,'nueva creada por el admin','2026-08-04 11:03:28',0,'2026-08-04 11:03:58','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:03:28','2026-08-04 11:03:58');
+(3,5,1,2,'nueva creada por el admin','2026-08-04 11:03:28',0,'2026-08-04 11:03:58','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:03:28','2026-08-04 11:03:58'),
+(4,11,1,2,'zdfdf df as df asdfsad f','2026-08-04 14:20:14',0,'2026-08-04 14:20:43','condicion_no_confirmada','fsdfasdfasdfasdf fadsf asdfasdfadsf','2026-08-04 14:20:14','2026-08-04 14:20:43');
 
 /*Table structure for table `estudiantes` */
 
@@ -646,40 +644,40 @@ DROP TABLE IF EXISTS `estudiantes`;
 
 CREATE TABLE `estudiantes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL,
-  `apellido` varchar(255) DEFAULT NULL,
-  `avatar` text,
-  `tipo_identificacion` varchar(10) DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` text COLLATE utf8mb4_unicode_ci,
+  `tipo_identificacion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `identificacion` int NOT NULL,
   `iniciales` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `grado_id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `color_avatar` varchar(9) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#0F6E56',
-  `id_condicion` int DEFAULT '1',
-  `id_condicion_transitoria` int DEFAULT NULL,
+  `condicion_id` int DEFAULT '1',
+  `condicion_transitoria_id` int DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
-  `fecha_nacimiento` text,
-  `acudiente` text,
-  `telefono_acudiente` text,
+  `fecha_nacimiento` text COLLATE utf8mb4_unicode_ci,
+  `acudiente` text COLLATE utf8mb4_unicode_ci,
+  `telefono_acudiente` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `requiere_apoyo` varchar(15) DEFAULT 'no',
-  `sexo` text,
+  `requiere_apoyo` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT 'no',
+  `sexo` text COLLATE utf8mb4_unicode_ci,
   `estado_piar` int DEFAULT '0',
-  `otro_tipo_identificacion` varchar(255) DEFAULT NULL,
-  `lugar_nacimiento` text,
+  `otro_tipo_identificacion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lugar_nacimiento` text COLLATE utf8mb4_unicode_ci,
   `departamento_id` int DEFAULT NULL,
   `municipio_id` int DEFAULT NULL,
-  `barrio_vereda` text,
-  `direccion` text,
-  `telefono` text,
-  `email` text,
+  `barrio_vereda` text COLLATE utf8mb4_unicode_ci,
+  `direccion` text COLLATE utf8mb4_unicode_ci,
+  `telefono` text COLLATE utf8mb4_unicode_ci,
+  `email` text COLLATE utf8mb4_unicode_ci,
   `institucion_id` int DEFAULT NULL,
   PRIMARY KEY (`id`,`identificacion`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiantes` */
 
-insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`id_condicion`,`id_condicion_transitoria`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values
+insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`condicion_id`,`condicion_transitoria_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values 
 (1,'Valentina',NULL,NULL,NULL,1111,'VA',NULL,'#0F6E56',1,NULL,1,'2021-01-17',NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#534AB7',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#854F0B',1,NULL,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
@@ -690,7 +688,7 @@ insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacio
 (8,'José',NULL,NULL,NULL,134123123,'Jo','1','#0F6E56',1,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:36','2026-06-18 16:04:36','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (9,'Fabian Mendez',NULL,NULL,NULL,123123123,'FM','3','#0F6E56',1,1,1,NULL,'Juana 2','32434234','2026-06-18 16:08:25','2026-08-03 11:04:28','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (10,'Juan Lopez 3',NULL,NULL,NULL,3423423,'JL','2','#0F6E56',1,NULL,1,NULL,'Juana 5','3423423','2026-06-18 16:12:47','2026-06-18 16:12:47','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(11,'Andres','quintero',NULL,'CC',5345345,'AQ',NULL,'#dc2626',1,NULL,1,'2018-01-22','yyyyyyy','5345345','2026-06-18 16:19:02','2026-08-04 11:03:50','si','masculino',0,NULL,'VALLEDUPAR',20,305,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveip@gmail.com',1),
+(11,'Andres','quintero',NULL,'CC',5345345,'AQ',NULL,'#dc2626',1,NULL,1,'2018-01-22','yyyyyyy','5345345','2026-06-18 16:19:02','2026-08-04 14:20:43','si','masculino',0,NULL,'VALLEDUPAR',20,305,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveip@gmail.com',1),
 (12,'Fabian','Mendez Quintero',NULL,'TI',342423,'FM',NULL,'#ea580c',1,NULL,1,'2019-05-16','hfghfghfgh','634634','2026-06-18 16:56:48','2026-08-03 15:45:48','si','femenino',0,NULL,'VALLEDUPAR',20,9,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveifdgdfgp@gmail.com',1),
 (13,'Andrea','Rodriguez','estudiantes/lNIZ6VFiTteCno5FKRNh5FCY37imQS7xXLNXdP9U.jpg','TI',5345345,'AR','1','#ffb81f',2,NULL,1,'2023-12-10','Julian Rodriguez','45345','2026-06-18 17:15:22','2026-08-03 14:53:19','si','femenino',0,NULL,'valledupar',20,9,'Los cortijos','manzana h casa 23','3042065930','hhhh@gmail.com',1),
 (14,'Xiamir luquez',NULL,'estudiantes/23NS51sSHtdWtH2tQynzAD0EfRAd6m2WaZensqbP.webp',NULL,4353453,'XL','1','#0F6E56',1,NULL,1,'2021-06-12','yyyy','345345','2026-06-18 17:20:14','2026-06-18 17:20:14','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
@@ -718,11 +716,11 @@ DROP TABLE IF EXISTS `failed_jobs`;
 
 CREATE TABLE `failed_jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(255) NOT NULL,
-  `connection` text NOT NULL,
-  `queue` text NOT NULL,
-  `payload` longtext NOT NULL,
-  `exception` longtext NOT NULL,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
@@ -736,9 +734,9 @@ DROP TABLE IF EXISTS `grados`;
 
 CREATE TABLE `grados` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(60) NOT NULL,
+  `nombre` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
   `edad_anos` tinyint NOT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `orden` tinyint NOT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -748,7 +746,7 @@ CREATE TABLE `grados` (
 
 /*Data for the table `grados` */
 
-insert  into `grados`(`id`,`nombre`,`edad_anos`,`descripcion`,`orden`,`activo`,`created_at`,`updated_at`) values
+insert  into `grados`(`id`,`nombre`,`edad_anos`,`descripcion`,`orden`,`activo`,`created_at`,`updated_at`) values 
 (1,'Prejardin',3,'Para ninos de 3 anos. Socializacion y desarrollo motriz.',1,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
 (2,'Jardin',4,'Para ninos de 4 anos. Colores, numeros y letras.',2,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
 (3,'Transicion',5,'Para ninos de 5 anos. Lectoescritura y habilidades logicas.',3,1,'2026-06-16 19:34:40','2026-06-16 19:34:40');
@@ -760,7 +758,7 @@ DROP TABLE IF EXISTS `grupos`;
 CREATE TABLE `grupos` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `grado_id` bigint unsigned NOT NULL,
-  `nombre` varchar(10) NOT NULL,
+  `nombre` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
   `anio_lectivo` year NOT NULL,
   `cupo_maximo` tinyint NOT NULL DEFAULT '30',
   `activo` tinyint(1) NOT NULL DEFAULT '1',
@@ -773,7 +771,7 @@ CREATE TABLE `grupos` (
 
 /*Data for the table `grupos` */
 
-insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`activo`,`created_at`,`updated_at`) values
+insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`activo`,`created_at`,`updated_at`) values 
 (1,1,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (3,2,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (4,2,'B',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
@@ -789,12 +787,12 @@ DROP TABLE IF EXISTS `instituciones`;
 
 CREATE TABLE `instituciones` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL,
-  `municipio` varchar(100) NOT NULL,
-  `departamento` varchar(100) NOT NULL,
-  `codigo_dane` varchar(20) NOT NULL,
-  `logo` varchar(255) DEFAULT NULL,
-  `correo_contacto` varchar(255) NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `municipio` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `departamento` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `codigo_dane` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `logo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `correo_contacto` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -803,7 +801,7 @@ CREATE TABLE `instituciones` (
 
 /*Data for the table `instituciones` */
 
-insert  into `instituciones`(`id`,`nombre`,`municipio`,`departamento`,`codigo_dane`,`logo`,`correo_contacto`,`activo`,`created_at`,`updated_at`) values
+insert  into `instituciones`(`id`,`nombre`,`municipio`,`departamento`,`codigo_dane`,`logo`,`correo_contacto`,`activo`,`created_at`,`updated_at`) values 
 (1,'Institución Educativa Ejemplo','Medellín','Antioquia','050010000001','logos/institucion.png','contacto@institucion.edu.co',1,NULL,NULL);
 
 /*Table structure for table `matriculas` */
@@ -816,7 +814,7 @@ CREATE TABLE `matriculas` (
   `grado_id` bigint unsigned NOT NULL,
   `grupo_id` bigint unsigned NOT NULL,
   `anio_lectivo` year NOT NULL,
-  `estado` enum('activo','promovido','graduado','retirado') NOT NULL DEFAULT 'activo',
+  `estado` enum('activo','promovido','graduado','retirado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
   `fecha_ingreso` date NOT NULL,
   `fecha_egreso` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -832,7 +830,7 @@ CREATE TABLE `matriculas` (
 
 /*Data for the table `matriculas` */
 
-insert  into `matriculas`(`id`,`estudiante_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`estado`,`fecha_ingreso`,`fecha_egreso`,`created_at`,`updated_at`) values
+insert  into `matriculas`(`id`,`estudiante_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`estado`,`fecha_ingreso`,`fecha_egreso`,`created_at`,`updated_at`) values 
 (23,13,1,1,2026,'activo','2026-08-04',NULL,'2026-08-04 09:00:54','2026-08-04 09:00:54'),
 (24,11,1,1,2026,'activo','2026-08-04',NULL,'2026-08-04 09:00:54','2026-08-04 09:00:54'),
 (25,5,1,1,2026,'activo','2026-08-04',NULL,'2026-08-04 09:00:54','2026-08-04 09:00:54'),
@@ -870,14 +868,14 @@ DROP TABLE IF EXISTS `migrations`;
 
 CREATE TABLE `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `migration` varchar(255) NOT NULL,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `migrations` */
 
-insert  into `migrations`(`id`,`migration`,`batch`) values
+insert  into `migrations`(`id`,`migration`,`batch`) values 
 (1,'2014_10_12_000000_create_users_table',1),
 (2,'2014_10_12_100000_create_password_reset_tokens_table',1),
 (3,'2019_08_19_000000_create_failed_jobs_table',1),
@@ -905,7 +903,7 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (25,'2026_06_17_000004_create_matriculas_table',3),
 (26,'2026_06_17_000005_create_piar_table',3),
 (27,'2026_06_17_000006_eliminar_ambiente_estudiante',3),
-(28,'2026_06_17_000007_eliminar_ambiente_id_docentes',3),
+(28,'2026_06_17_000007_eliminar_ambiente_docente_ids',3),
 (29,'2026_06_17_000008_simplificar_rol_users',4),
 (31,'2026_06_17_000009_drop_docente_grupo',5),
 (32,'2026_06_17_155731_create_ambiente_grado_table',5),
@@ -923,10 +921,10 @@ DROP TABLE IF EXISTS `modulos`;
 CREATE TABLE `modulos` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `ambiente_id` bigint unsigned NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `descripcion` text,
-  `icono` varchar(255) DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `icono` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `orden` tinyint unsigned NOT NULL DEFAULT '0',
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `visible_estudiantes` tinyint(1) NOT NULL DEFAULT '1',
@@ -945,14 +943,14 @@ DROP TABLE IF EXISTS `municipios`;
 
 CREATE TABLE `municipios` (
   `id` smallint unsigned NOT NULL AUTO_INCREMENT,
-  `descripcion` varchar(50) NOT NULL,
-  `coddep` varchar(2) NOT NULL,
+  `descripcion` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `coddep` varchar(2) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1120 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `municipios` */
 
-insert  into `municipios`(`id`,`descripcion`,`coddep`) values
+insert  into `municipios`(`id`,`descripcion`,`coddep`) values 
 (1,'MEDELLIN','05'),
 (2,'BARRANQUILLA','08'),
 (3,'BOGOTA D.C.','11'),
@@ -2081,7 +2079,7 @@ CREATE TABLE `notas_docente` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `tema_id` bigint unsigned NOT NULL,
   `user_id` bigint unsigned NOT NULL,
-  `contenido` text NOT NULL,
+  `contenido` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -2102,8 +2100,8 @@ CREATE TABLE `observaciones` (
   `estudiante_id` bigint unsigned NOT NULL,
   `user_id` bigint unsigned NOT NULL,
   `tema_id` bigint unsigned DEFAULT NULL,
-  `contenido` text NOT NULL,
-  `tipo` enum('general','logro') NOT NULL DEFAULT 'general',
+  `contenido` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo` enum('general','logro') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -2122,8 +2120,8 @@ CREATE TABLE `observaciones` (
 DROP TABLE IF EXISTS `password_reset_tokens`;
 
 CREATE TABLE `password_reset_tokens` (
-  `email` varchar(255) NOT NULL,
-  `token` varchar(255) NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -2136,11 +2134,11 @@ DROP TABLE IF EXISTS `personal_access_tokens`;
 
 CREATE TABLE `personal_access_tokens` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `tokenable_type` varchar(255) NOT NULL,
+  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `tokenable_id` bigint unsigned NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `token` varchar(64) NOT NULL,
-  `abilities` text,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci,
   `last_used_at` timestamp NULL DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -2160,9 +2158,9 @@ CREATE TABLE `piar` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
   `docente_id` bigint unsigned DEFAULT NULL,
-  `estado` enum('borrador','revisado','aprobado') NOT NULL DEFAULT 'borrador',
+  `estado` enum('borrador','revisado','aprobado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'borrador',
   `paso` int DEFAULT NULL,
-  `fecha_diligenciamiento` text,
+  `fecha_diligenciamiento` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `activo` int DEFAULT '1',
@@ -2182,7 +2180,7 @@ DROP TABLE IF EXISTS `piar_acta_compromiso`;
 CREATE TABLE `piar_acta_compromiso` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `compromisos` text,
+  `compromisos` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2197,9 +2195,9 @@ DROP TABLE IF EXISTS `piar_acta_compromiso_actividades`;
 CREATE TABLE `piar_acta_compromiso_actividades` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_acta_compromiso` bigint unsigned NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `descripcion` text,
-  `frecuencia` varchar(100) DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `frecuencia` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2217,9 +2215,9 @@ CREATE TABLE `piar_ajuste_razonable` (
   `docente_orientador_id` bigint unsigned DEFAULT NULL,
   `docente_apoyo_pedagogico_id` bigint unsigned DEFAULT NULL,
   `docente_coordinador_pedagogico_id` bigint unsigned DEFAULT NULL,
-  `docente_orientador_area` text,
-  `docente_apoyo_pedagogico_area` text,
-  `docente_coordinador_pedagogico_area` text,
+  `docente_orientador_area` text COLLATE utf8mb4_unicode_ci,
+  `docente_apoyo_pedagogico_area` text COLLATE utf8mb4_unicode_ci,
+  `docente_coordinador_pedagogico_area` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2234,8 +2232,8 @@ DROP TABLE IF EXISTS `piar_ajuste_razonable_docente_firma`;
 CREATE TABLE `piar_ajuste_razonable_docente_firma` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_ajuste_razonable` bigint unsigned NOT NULL,
-  `id_docente` bigint unsigned NOT NULL,
-  `area` text,
+  `docente_id` bigint unsigned NOT NULL,
+  `area` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2250,12 +2248,12 @@ DROP TABLE IF EXISTS `piar_ajuste_razonable_item`;
 CREATE TABLE `piar_ajuste_razonable_item` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_ajuste_razonable` bigint unsigned NOT NULL,
-  `area` varchar(255) DEFAULT NULL,
-  `barrera` text,
-  `tipo` varchar(255) DEFAULT NULL,
-  `apoyo` text,
-  `descripcion` text,
-  `seguimiento` text,
+  `area` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `barrera` text COLLATE utf8mb4_unicode_ci,
+  `tipo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `apoyo` text COLLATE utf8mb4_unicode_ci,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `seguimiento` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2270,8 +2268,8 @@ DROP TABLE IF EXISTS `piar_atencion_medica`;
 CREATE TABLE `piar_atencion_medica` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_entorno_salud` bigint unsigned NOT NULL,
-  `cual` varchar(255) NOT NULL,
-  `frecuencia` varchar(255) NOT NULL,
+  `cual` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `frecuencia` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2286,19 +2284,19 @@ DROP TABLE IF EXISTS `piar_datos_generales`;
 CREATE TABLE `piar_datos_generales` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `vinculado` varchar(255) DEFAULT NULL,
-  `victima` varchar(10) DEFAULT NULL,
-  `registro_victima` varchar(255) DEFAULT NULL,
-  `centro_proteccion` varchar(10) DEFAULT NULL,
-  `cual_centro_proteccion` varchar(255) DEFAULT NULL,
-  `grupo_etnico` varchar(10) DEFAULT NULL,
-  `cual_etnico` varchar(255) DEFAULT NULL,
-  `capacidades` text,
-  `gustos` text,
-  `expectativas_estudiante` text,
-  `expectativas_familia` text,
-  `redes_apoyo` text,
-  `otras` text,
+  `vinculado` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `victima` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `registro_victima` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `centro_proteccion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cual_centro_proteccion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `grupo_etnico` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cual_etnico` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `capacidades` text COLLATE utf8mb4_unicode_ci,
+  `gustos` text COLLATE utf8mb4_unicode_ci,
+  `expectativas_estudiante` text COLLATE utf8mb4_unicode_ci,
+  `expectativas_familia` text COLLATE utf8mb4_unicode_ci,
+  `redes_apoyo` text COLLATE utf8mb4_unicode_ci,
+  `otras` text COLLATE utf8mb4_unicode_ci,
   `fecha_diligenciamiento` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -2314,16 +2312,16 @@ DROP TABLE IF EXISTS `piar_entorno_educativo`;
 CREATE TABLE `piar_entorno_educativo` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `vinculado_otra_institucion` varchar(10) DEFAULT NULL,
-  `instituciones_anteriores` text,
-  `motivo_no_vinculado` text,
-  `ultimo_grado` varchar(100) DEFAULT NULL,
-  `estado_ultimo_grado` varchar(100) DEFAULT NULL,
-  `observaciones_estado` text,
-  `recibe_informe_pedagogico` varchar(10) DEFAULT NULL,
-  `institucion_informe` varchar(255) DEFAULT NULL,
-  `programas_complementarios` varchar(10) DEFAULT NULL,
-  `cuales_programas` text,
+  `vinculado_otra_institucion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `instituciones_anteriores` text COLLATE utf8mb4_unicode_ci,
+  `motivo_no_vinculado` text COLLATE utf8mb4_unicode_ci,
+  `ultimo_grado` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `estado_ultimo_grado` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observaciones_estado` text COLLATE utf8mb4_unicode_ci,
+  `recibe_informe_pedagogico` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `institucion_informe` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `programas_complementarios` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cuales_programas` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2338,21 +2336,21 @@ DROP TABLE IF EXISTS `piar_entorno_hogar`;
 CREATE TABLE `piar_entorno_hogar` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `nombre_madre` varchar(255) DEFAULT NULL,
-  `ocupacion_madre` varchar(255) DEFAULT NULL,
-  `nivel_madre` varchar(100) DEFAULT NULL,
-  `nombre_padre` varchar(255) DEFAULT NULL,
-  `ocupacion_padre` varchar(255) DEFAULT NULL,
-  `nivel_padre` varchar(100) DEFAULT NULL,
-  `nombre_cuidador` varchar(255) DEFAULT NULL,
-  `nivel_cuidador` varchar(100) DEFAULT NULL,
-  `telefono_cuidador` varchar(30) DEFAULT NULL,
-  `parentesco_cuidador` varchar(100) DEFAULT NULL,
-  `correo_cuidador` varchar(255) DEFAULT NULL,
+  `nombre_madre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ocupacion_madre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nivel_madre` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nombre_padre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ocupacion_padre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nivel_padre` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nombre_cuidador` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nivel_cuidador` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `telefono_cuidador` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `parentesco_cuidador` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `correo_cuidador` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `numero_hermanos` int DEFAULT NULL,
   `lugar_ocupa` int DEFAULT NULL,
-  `apoyo_crianza` text,
-  `personas_con_quien_vive` text,
+  `apoyo_crianza` text COLLATE utf8mb4_unicode_ci,
+  `personas_con_quien_vive` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2367,17 +2365,17 @@ DROP TABLE IF EXISTS `piar_entorno_salud`;
 CREATE TABLE `piar_entorno_salud` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `afiliado_salud` varchar(10) DEFAULT NULL,
-  `regimen` varchar(50) DEFAULT NULL,
-  `eps` varchar(255) DEFAULT NULL,
-  `lugar_emergencia` varchar(255) DEFAULT NULL,
-  `diagnostico_medico` varchar(10) DEFAULT NULL,
-  `cual_diagnostico` text,
-  `atencion_medica` varchar(10) DEFAULT NULL,
-  `tratamiento_integral` varchar(10) DEFAULT NULL,
-  `consume_medicamentos` varchar(10) DEFAULT NULL,
-  `ayudas_tecnicas` varchar(10) DEFAULT NULL,
-  `cuales_ayudas` text,
+  `afiliado_salud` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `regimen` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `eps` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lugar_emergencia` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `diagnostico_medico` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cual_diagnostico` text COLLATE utf8mb4_unicode_ci,
+  `atencion_medica` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tratamiento_integral` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `consume_medicamentos` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ayudas_tecnicas` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cuales_ayudas` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2392,9 +2390,9 @@ DROP TABLE IF EXISTS `piar_medicamento`;
 CREATE TABLE `piar_medicamento` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_entorno_salud` bigint unsigned NOT NULL,
-  `cual` varchar(255) NOT NULL,
-  `frecuencia` varchar(255) NOT NULL,
-  `horario` varchar(255) NOT NULL,
+  `cual` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `frecuencia` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `horario` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2409,8 +2407,8 @@ DROP TABLE IF EXISTS `piar_tratamiento`;
 CREATE TABLE `piar_tratamiento` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_entorno_salud` bigint unsigned NOT NULL,
-  `cual` varchar(255) NOT NULL,
-  `frecuencia` varchar(255) NOT NULL,
+  `cual` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `frecuencia` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -2425,187 +2423,187 @@ DROP TABLE IF EXISTS `piar_valoracion_pedagogica`;
 CREATE TABLE `piar_valoracion_pedagogica` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `vp_mov_apoyo_sistema` varchar(10) DEFAULT NULL,
-  `vp_mov_apoyo_sistema_obs` text,
-  `vp_mov_ajustes_espacio` varchar(10) DEFAULT NULL,
-  `vp_mov_ajustes_espacio_obs` text,
-  `vp_mov_ajustes_movilidad` varchar(10) DEFAULT NULL,
-  `vp_mov_ajustes_movilidad_obs` text,
-  `vp_mov_motricidad_fina` varchar(10) DEFAULT NULL,
-  `vp_mov_motricidad_fina_obs` text,
-  `vp_mov_adaptacion_agarrar` varchar(10) DEFAULT NULL,
-  `vp_mov_adaptacion_agarrar_obs` text,
-  `vp_mov_intensidad` varchar(50) DEFAULT NULL,
-  `vp_com_apoyo_sistema` varchar(10) DEFAULT NULL,
-  `vp_com_apoyo_sistema_obs` text,
-  `vp_com_aditamentos` varchar(10) DEFAULT NULL,
-  `vp_com_aditamentos_obs` text,
-  `vp_com_ajustes` varchar(10) DEFAULT NULL,
-  `vp_com_ajustes_obs` text,
-  `vp_com_intensidad` varchar(50) DEFAULT NULL,
-  `vp_info_apoyo_sistema` varchar(10) DEFAULT NULL,
-  `vp_info_apoyo_sistema_obs` text,
-  `vp_info_ajustes` varchar(10) DEFAULT NULL,
-  `vp_info_ajustes_obs` text,
-  `vp_info_intensidad` varchar(50) DEFAULT NULL,
-  `vp_soc_apoyo_regulacion` varchar(10) DEFAULT NULL,
-  `vp_soc_apoyo_regulacion_obs` text,
-  `vp_soc_ajustes_interaccion` varchar(10) DEFAULT NULL,
-  `vp_soc_ajustes_interaccion_obs` text,
-  `vp_soc_intensidad` varchar(50) DEFAULT NULL,
-  `vp_acad_ajustes_permanencia` varchar(10) DEFAULT NULL,
-  `vp_acad_ajustes_permanencia_obs` text,
-  `vp_acad_ajustes_tiempos` varchar(10) DEFAULT NULL,
-  `vp_acad_ajustes_tiempos_obs` text,
-  `vp_acad_intensidad` varchar(50) DEFAULT NULL,
-  `vp_observaciones` text,
-  `cle_1` varchar(10) DEFAULT NULL,
-  `cle_1_obs` text,
-  `cle_2` varchar(10) DEFAULT NULL,
-  `cle_2_obs` text,
-  `cle_3` varchar(10) DEFAULT NULL,
-  `cle_3_obs` text,
-  `cle_4` varchar(10) DEFAULT NULL,
-  `cle_4_obs` text,
-  `cle_5` varchar(10) DEFAULT NULL,
-  `cle_5_obs` text,
-  `cle_6` varchar(10) DEFAULT NULL,
-  `cle_6_obs` text,
-  `cle_7` varchar(10) DEFAULT NULL,
-  `cle_7_obs` text,
-  `cle_8` varchar(10) DEFAULT NULL,
-  `cle_8_obs` text,
-  `cle_9` varchar(10) DEFAULT NULL,
-  `cle_9_obs` text,
-  `cle_10` varchar(10) DEFAULT NULL,
-  `cle_10_obs` text,
-  `cle_11` varchar(10) DEFAULT NULL,
-  `cle_11_obs` text,
-  `cle_12` varchar(10) DEFAULT NULL,
-  `cle_12_obs` text,
-  `cle_13` varchar(10) DEFAULT NULL,
-  `cle_13_obs` text,
-  `cle_14` varchar(10) DEFAULT NULL,
-  `cle_14_obs` text,
-  `cle_15` varchar(10) DEFAULT NULL,
-  `cle_15_obs` text,
-  `cle_16` varchar(10) DEFAULT NULL,
-  `cle_16_obs` text,
-  `cle_17` varchar(10) DEFAULT NULL,
-  `cle_17_obs` text,
-  `cle_18` varchar(10) DEFAULT NULL,
-  `cle_18_obs` text,
-  `cle_observaciones` text,
+  `vp_mov_apoyo_sistema` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_apoyo_sistema_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_ajustes_espacio` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_ajustes_espacio_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_ajustes_movilidad` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_ajustes_movilidad_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_motricidad_fina` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_motricidad_fina_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_adaptacion_agarrar` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_adaptacion_agarrar_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_apoyo_sistema` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_apoyo_sistema_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_com_aditamentos` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_aditamentos_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_com_ajustes` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_ajustes_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_com_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_info_apoyo_sistema` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_info_apoyo_sistema_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_info_ajustes` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_info_ajustes_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_info_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_soc_apoyo_regulacion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_soc_apoyo_regulacion_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_soc_ajustes_interaccion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_soc_ajustes_interaccion_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_soc_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_acad_ajustes_permanencia` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_acad_ajustes_permanencia_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_acad_ajustes_tiempos` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_acad_ajustes_tiempos_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_acad_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_observaciones` text COLLATE utf8mb4_unicode_ci,
+  `cle_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_8` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_8_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_9` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_9_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_10` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_10_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_11` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_11_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_12` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_12_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_13` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_13_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_14` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_14_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_15` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_15_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_16` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_16_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_17` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_17_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_18` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_18_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_observaciones` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `clm_1` varchar(10) DEFAULT NULL,
-  `clm_1_obs` text,
-  `clm_2` varchar(10) DEFAULT NULL,
-  `clm_2_obs` text,
-  `clm_3` varchar(10) DEFAULT NULL,
-  `clm_3_obs` text,
-  `clm_4` varchar(10) DEFAULT NULL,
-  `clm_4_obs` text,
+  `clm_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_4_obs` text COLLATE utf8mb4_unicode_ci,
   `clm_5_desde` int DEFAULT NULL,
   `clm_5_hasta` int DEFAULT NULL,
-  `clm_5` varchar(10) DEFAULT NULL,
-  `clm_5_obs` text,
-  `clm_6` varchar(10) DEFAULT NULL,
-  `clm_6_obs` text,
-  `clm_7` varchar(10) DEFAULT NULL,
-  `clm_7_obs` text,
-  `clm_8` varchar(10) DEFAULT NULL,
-  `clm_8_obs` text,
-  `clm_9` varchar(10) DEFAULT NULL,
-  `clm_9_obs` text,
-  `clm_10` varchar(10) DEFAULT NULL,
-  `clm_10_obs` text,
-  `clm_11` varchar(10) DEFAULT NULL,
-  `clm_11_obs` text,
-  `clm_12` varchar(10) DEFAULT NULL,
-  `clm_12_obs` text,
-  `clm_13` varchar(10) DEFAULT NULL,
-  `clm_13_obs` text,
-  `clm_14` varchar(10) DEFAULT NULL,
-  `clm_14_obs` text,
-  `clm_15` varchar(10) DEFAULT NULL,
-  `clm_15_obs` text,
-  `clm_16` varchar(10) DEFAULT NULL,
-  `clm_16_obs` text,
-  `clm_17` varchar(10) DEFAULT NULL,
-  `clm_17_obs` text,
-  `clm_18` varchar(10) DEFAULT NULL,
-  `clm_18_obs` text,
-  `clm_19` varchar(10) DEFAULT NULL,
-  `clm_19_obs` text,
-  `clm_observaciones` text,
-  `dba_mem_1` varchar(10) DEFAULT NULL,
-  `dba_mem_1_obs` text,
-  `dba_mem_2` varchar(10) DEFAULT NULL,
-  `dba_mem_2_obs` text,
-  `dba_mem_3` varchar(10) DEFAULT NULL,
-  `dba_mem_3_obs` text,
-  `dba_mem_4` varchar(10) DEFAULT NULL,
-  `dba_mem_4_obs` text,
-  `dba_mem_5` varchar(10) DEFAULT NULL,
-  `dba_mem_5_obs` text,
-  `dba_mem_6` varchar(10) DEFAULT NULL,
-  `dba_mem_6_obs` text,
-  `dba_mem_7` varchar(10) DEFAULT NULL,
-  `dba_mem_7_obs` text,
-  `dba_ate_1` varchar(10) DEFAULT NULL,
-  `dba_ate_1_obs` text,
-  `dba_ate_2` varchar(10) DEFAULT NULL,
-  `dba_ate_2_obs` text,
-  `dba_ate_3` varchar(10) DEFAULT NULL,
-  `dba_ate_3_obs` text,
-  `dba_ate_4` varchar(10) DEFAULT NULL,
-  `dba_ate_4_obs` text,
-  `dba_ate_4_tiempo` varchar(10) DEFAULT NULL,
-  `dba_per_1` varchar(10) DEFAULT NULL,
-  `dba_per_1_obs` text,
-  `dba_per_2` varchar(10) DEFAULT NULL,
-  `dba_per_2_obs` text,
-  `dba_per_3` varchar(10) DEFAULT NULL,
-  `dba_per_3_obs` text,
-  `dba_per_4` varchar(10) DEFAULT NULL,
-  `dba_per_4_obs` text,
-  `dba_per_5` varchar(10) DEFAULT NULL,
-  `dba_per_5_obs` text,
-  `dba_fe_1` varchar(10) DEFAULT NULL,
-  `dba_fe_1_obs` text,
-  `dba_fe_2` varchar(10) DEFAULT NULL,
-  `dba_fe_2_obs` text,
-  `dba_fe_3` varchar(10) DEFAULT NULL,
-  `dba_fe_3_obs` text,
-  `dba_fe_4` varchar(10) DEFAULT NULL,
-  `dba_fe_4_obs` text,
-  `dba_fe_5` varchar(10) DEFAULT NULL,
-  `dba_fe_5_obs` text,
-  `dba_fe_6` varchar(10) DEFAULT NULL,
-  `dba_fe_6_obs` text,
-  `dba_lc_1` varchar(10) DEFAULT NULL,
-  `dba_lc_1_obs` text,
-  `dba_lc_2` varchar(10) DEFAULT NULL,
-  `dba_lc_2_obs` text,
-  `dba_lc_3` varchar(10) DEFAULT NULL,
-  `dba_lc_3_obs` text,
-  `dba_lc_4` varchar(10) DEFAULT NULL,
-  `dba_lc_4_obs` text,
-  `dba_lc_5` varchar(10) DEFAULT NULL,
-  `dba_lc_5_obs` text,
-  `dba_lc_6` varchar(10) DEFAULT NULL,
-  `dba_lc_6_obs` text,
-  `dba_lc_7` varchar(10) DEFAULT NULL,
-  `dba_lc_7_obs` text,
-  `dba_lc_8` varchar(10) DEFAULT NULL,
-  `dba_lc_8_obs` text,
-  `dba_lc_9` varchar(10) DEFAULT NULL,
-  `dba_lc_9_obs` text,
-  `dba_lc_10` varchar(10) DEFAULT NULL,
-  `dba_lc_10_obs` text,
-  `habilidades_destrezas` text,
-  `estrategias_acciones` text,
+  `clm_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_8` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_8_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_9` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_9_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_10` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_10_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_11` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_11_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_12` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_12_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_13` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_13_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_14` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_14_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_15` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_15_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_16` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_16_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_17` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_17_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_18` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_18_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_19` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_19_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_observaciones` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_4_tiempo` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_8` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_8_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_9` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_9_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_10` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_10_obs` text COLLATE utf8mb4_unicode_ci,
+  `habilidades_destrezas` text COLLATE utf8mb4_unicode_ci,
+  `estrategias_acciones` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -2619,9 +2617,9 @@ CREATE TABLE `portafolios` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
   `tema_id` bigint unsigned NOT NULL,
-  `tipo_registro` enum('foto','audio','emocion','resultado') NOT NULL,
+  `tipo_registro` enum('foto','audio','emocion','resultado') COLLATE utf8mb4_unicode_ci NOT NULL,
   `contenido` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `emocion_seleccionada` varchar(255) DEFAULT NULL,
+  `emocion_seleccionada` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `portafolios_estudiante_id_foreign` (`estudiante_id`),
@@ -2640,21 +2638,24 @@ DROP TABLE IF EXISTS `registros_acceso`;
 CREATE TABLE `registros_acceso` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `ip` varchar(45) DEFAULT NULL,
-  `ambiente` varchar(255) DEFAULT NULL,
+  `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ambiente` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `tipo` varchar(30) NOT NULL DEFAULT 'inicio_sesion',
+  `tipo` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'inicio_sesion',
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `registros_acceso` */
 
-insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) values
+insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) values 
 (34,1,'127.0.0.1','musica','2026-08-04 08:50:54','inicio_sesion'),
 (35,16,'127.0.0.1','musica','2026-08-04 08:54:22','inicio_sesion'),
-(36,4,'127.0.0.1','musica','2026-08-04 11:01:01','inicio_sesion');
+(36,4,'127.0.0.1','musica','2026-08-04 11:01:01','inicio_sesion'),
+(37,16,'127.0.0.1','musica','2026-08-04 14:21:43','inicio_sesion'),
+(38,1,'127.0.0.1','musica','2026-08-04 14:23:05','inicio_sesion'),
+(39,16,'127.0.0.1','musica','2026-08-04 14:43:37','inicio_sesion');
 
 /*Table structure for table `seguridad_logs` */
 
@@ -2664,11 +2665,11 @@ CREATE TABLE `seguridad_logs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
   `actor_user_id` bigint unsigned DEFAULT NULL,
-  `accion` varchar(50) NOT NULL,
-  `descripcion` varchar(255) NOT NULL,
-  `registro_afectado` varchar(255) DEFAULT NULL,
-  `ip` varchar(45) DEFAULT NULL,
-  `user_agent` text,
+  `accion` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `registro_afectado` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -2676,14 +2677,17 @@ CREATE TABLE `seguridad_logs` (
   KEY `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
   CONSTRAINT `seguridad_logs_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `seguridad_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `seguridad_logs` */
 
-insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripcion`,`registro_afectado`,`ip`,`user_agent`,`created_at`,`updated_at`) values
+insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripcion`,`registro_afectado`,`ip`,`user_agent`,`created_at`,`updated_at`) values 
 (1,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 08:50:54','2026-08-04 08:50:54'),
 (2,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 08:54:22','2026-08-04 08:54:22'),
-(3,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 11:01:01','2026-08-04 11:01:01');
+(3,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 11:01:01','2026-08-04 11:01:01'),
+(4,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 14:21:43','2026-08-04 14:21:43'),
+(5,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 14:23:05','2026-08-04 14:23:05'),
+(6,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 14:43:37','2026-08-04 14:43:37');
 
 /*Table structure for table `temas` */
 
@@ -2692,13 +2696,13 @@ DROP TABLE IF EXISTS `temas`;
 CREATE TABLE `temas` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `modulo_id` bigint unsigned NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `descripcion` text,
-  `icono` varchar(255) DEFAULT NULL,
-  `instruccion_corta` varchar(255) DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `icono` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `instruccion_corta` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `orden` tinyint unsigned NOT NULL DEFAULT '0',
-  `marcador_ra` varchar(255) DEFAULT NULL,
+  `marcador_ra` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -2716,15 +2720,15 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `institucion_id` bigint unsigned DEFAULT NULL,
-  `identificacion` varchar(50) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `apellido` varchar(255) DEFAULT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `rol` enum('superAdmin','admin','docente') NOT NULL DEFAULT 'docente',
-  `estado` enum('activo','inactivo','eliminado') NOT NULL DEFAULT 'activo',
+  `identificacion` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rol` enum('superAdmin','admin','docente') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'docente',
+  `estado` enum('activo','inactivo','eliminado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
   `creado_por` bigint unsigned DEFAULT NULL,
-  `remember_token` varchar(100) DEFAULT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `bloqueado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -2738,12 +2742,12 @@ CREATE TABLE `users` (
 
 /*Data for the table `users` */
 
-insert  into `users`(`id`,`institucion_id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`creado_por`,`remember_token`,`bloqueado_en`,`created_at`,`updated_at`) values
+insert  into `users`(`id`,`institucion_id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`creado_por`,`remember_token`,`bloqueado_en`,`created_at`,`updated_at`) values 
 (1,NULL,'1234567890','Super','Admin','superadmin@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','superAdmin','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(2,1,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','docente','activo',NULL,NULL,NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58'),
-(4,1,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35'),
-(5,1,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(16,1,'OSRaOLyVQB','Administrador',NULL,'fabian.quintero.2201@gmail.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','admin','activo',1,NULL,NULL,'2026-08-04 08:53:36','2026-08-04 08:53:36');
+(2,1,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente','activo',NULL,NULL,NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58'),
+(4,1,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35'),
+(5,1,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(16,1,'OSRaOLyVQB','Administrador',NULL,'fabian.quintero.2201@gmail.com','$2y$10$v8Np5rui71dWGOQFMtU3DOWfBNrJgjd.NqOhLUgwHHPYBOrHVt25y','admin','activo',1,NULL,NULL,'2026-08-04 08:53:36','2026-08-04 08:53:36');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

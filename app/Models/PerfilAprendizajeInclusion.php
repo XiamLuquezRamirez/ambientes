@@ -23,6 +23,7 @@ class PerfilAprendizajeInclusion extends Model
         'color_hex',
         'es_sistema',
         'vista_info_asociada',
+        'eliminado',
     ];
 
     protected $casts = [
@@ -48,7 +49,7 @@ class PerfilAprendizajeInclusion extends Model
 
     public function estudiantes(): HasMany
     {
-        return $this->hasMany(Estudiante::class, 'id_condicion');
+        return $this->hasMany(Estudiante::class, 'condicion_id');
     }
 
     public function condicionesTransitorias(): HasMany

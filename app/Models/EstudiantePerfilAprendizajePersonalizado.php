@@ -11,9 +11,9 @@ class EstudiantePerfilAprendizajePersonalizado extends Model
     protected $table = 'estudiante_condicion_transitoria';
 
     protected $fillable = [
-        'id_estudiante',
-        'id_condicion_transitoria',
-        'id_docente',
+        'estudiante_id',
+        'condicion_transitoria_id',
+        'docente_id',
         'observacion',
         'fecha_activacion',
         'activa',
@@ -30,17 +30,17 @@ class EstudiantePerfilAprendizajePersonalizado extends Model
 
     public function estudiante(): BelongsTo
     {
-        return $this->belongsTo(Estudiante::class, 'id_estudiante');
+        return $this->belongsTo(Estudiante::class, 'estudiante_id');
     }
 
     public function condicionTransitoria(): BelongsTo
     {
-        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'id_condicion_transitoria');
+        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'condicion_transitoria_id');
     }
 
     public function docente(): BelongsTo
     {
-        return $this->belongsTo(Docente::class, 'id_docente');
+        return $this->belongsTo(Docente::class, 'docente_id');
     }
 
     public function scopeActivas(Builder $query): Builder

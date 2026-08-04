@@ -12,7 +12,7 @@ class PiarAjusteRazonableDocenteFirma extends Model
     protected $fillable = [
         'id',
         'id_ajuste_razonable',
-        'id_docente',
+        'docente_id',
         'area'
     ];
 
@@ -20,6 +20,6 @@ class PiarAjusteRazonableDocenteFirma extends Model
 
     public function docente()
     {
-        return $this->belongsTo(Docente::class, 'id_docente');
+        return $this->belongsTo(Docente::class, 'docente_id');
     }
 }

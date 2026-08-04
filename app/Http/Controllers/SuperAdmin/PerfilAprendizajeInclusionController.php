@@ -34,6 +34,8 @@ class PerfilAprendizajeInclusionController extends Controller
             $consulta->where('es_sistema', (int) $request->es_sistema);
         }
 
+        $consulta->where('eliminado', 0);
+
         $condiciones = $consulta->paginate(10)->withQueryString();
 
         if ($request->ajax()) {
@@ -227,7 +229,7 @@ class PerfilAprendizajeInclusionController extends Controller
             ], 422);
         }
 
-        $condicionInclusion->delete();
+        $condicionInclusion->update(['eliminado' => true]);
 
         return response()->json([
             'success' => true,

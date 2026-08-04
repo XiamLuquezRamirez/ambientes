@@ -56,6 +56,6 @@ class Docente extends Model
 
     public function condicionesTransitoriasAsignadas()
     {
-        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'id_docente');
+        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'docente_id');
     }
 }

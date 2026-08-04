@@ -17,7 +17,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
         $this->asegurarPersonalizacion($institucionId);
 
         $consulta = PerfilAprendizajeOrden::query()
-            ->where('condiciones_orden.id_institucion', $institucionId)
+            ->where('condiciones_orden.institucion_id', $institucionId)
             ->with('condicion');
 
         if ($request->filled('buscar')) {
@@ -33,12 +33,16 @@ class PerfilAprendizajeConfiguracionController extends Controller
         }
 
         if ($request->filled('ordenar') && in_array($request->ordenar, ['nombre', 'codigo'], true)) {
-            $consulta->join('condiciones', 'condiciones.id', '=', 'condiciones_orden.id_condicion')
+            $consulta->join('condiciones', 'condiciones.id', '=', 'condiciones_orden.condicion_id')
                 ->orderBy('condiciones.'.$request->ordenar)
                 ->select('condiciones_orden.*');
         } else {
             $consulta->orderBy('condiciones_orden.orden');
         }
+
+        $consulta->whereHas('condicion', function ($q) {
+            $q->where('eliminado', 0);
+        });
 
         $items = $consulta->get();
         $conteos = $this->conteoEstudiantesPorCondicion($institucionId);
@@ -82,7 +86,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
         $ids = array_map('intval', $datos['orden']);
 
         $validos = PerfilAprendizajeOrden::query()
-            ->where('id_institucion', $institucionId)
+            ->where('institucion_id', $institucionId)
             ->whereIn('id', $ids)
             ->pluck('id')
             ->map(fn ($id) => (int) $id)
@@ -98,7 +102,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
         DB::transaction(function () use ($ids, $institucionId) {
             foreach ($ids as $posicion => $id) {
                 PerfilAprendizajeOrden::query()
-                    ->where('id_institucion', $institucionId)
+                    ->where('institucion_id', $institucionId)
                     ->where('id', $id)
                     ->update(['orden' => $posicion]);
             }
@@ -116,7 +120,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
 
         $estudiantes = Estudiante::query()
             ->where('institucion_id', $institucionId)
-            ->where('id_condicion', $condicionInclusion->id)
+            ->where('condicion_id', $condicionInclusion->id)
             ->where('activo', true)
             ->with(['matriculaActiva.grado', 'matriculaActiva.grupo'])
             ->orderBy('nombre')
@@ -146,8 +150,8 @@ class PerfilAprendizajeConfiguracionController extends Controller
     {
         $catalogoIds = PerfilAprendizajeInclusion::query()->pluck('id');
         $existentes = PerfilAprendizajeOrden::query()
-            ->where('id_institucion', $institucionId)
-            ->pluck('id_condicion');
+            ->where('institucion_id', $institucionId)
+            ->pluck('condicion_id');
 
         $faltantes = $catalogoIds->diff($existentes);
         if ($faltantes->isEmpty()) {
@@ -155,7 +159,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
         }
 
         $orden = (int) (PerfilAprendizajeOrden::query()
-            ->where('id_institucion', $institucionId)
+            ->where('institucion_id', $institucionId)
             ->max('orden') ?? -1);
         $ahora = now();
         $filas = [];
@@ -163,8 +167,8 @@ class PerfilAprendizajeConfiguracionController extends Controller
         foreach ($faltantes as $condicionId) {
             $orden++;
             $filas[] = [
-                'id_institucion' => $institucionId,
-                'id_condicion' => (int) $condicionId,
+                'institucion_id' => $institucionId,
+                'condicion_id' => (int) $condicionId,
                 'orden' => $orden,
                 'activa' => 1,
                 'created_at' => $ahora,
@@ -181,15 +185,15 @@ class PerfilAprendizajeConfiguracionController extends Controller
     private function conteoEstudiantesPorCondicion(int $institucionId): array
     {
         $filas = Estudiante::query()
-            ->selectRaw('id_condicion, COUNT(*) as total, SUM(CASE WHEN activo = 1 THEN 1 ELSE 0 END) as activos')
+            ->selectRaw('condicion_id, COUNT(*) as total, SUM(CASE WHEN activo = 1 THEN 1 ELSE 0 END) as activos')
             ->where('institucion_id', $institucionId)
-            ->whereNotNull('id_condicion')
-            ->groupBy('id_condicion')
+            ->whereNotNull('condicion_id')
+            ->groupBy('condicion_id')
             ->get();
 
         $mapa = [];
         foreach ($filas as $fila) {
-            $mapa[(int) $fila->id_condicion] = [
+            $mapa[(int) $fila->condicion_id] = [
                 'total' => (int) $fila->total,
                 'activos' => (int) $fila->activos,
             ];
@@ -211,7 +215,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
 
     private function autorizarOrden(PerfilAprendizajeOrden $orden): void
     {
-        if ((int) $orden->id_institucion !== $this->institucionId()) {
+        if ((int) $orden->institucion_id !== $this->institucionId()) {
             abort(403, 'No autorizado.');
         }
     }

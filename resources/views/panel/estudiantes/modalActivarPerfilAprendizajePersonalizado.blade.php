@@ -21,7 +21,7 @@
             <div class="modal-body" style="display:grid;gap:14px;">
                 <div>
                     <label class="form-label fw-semibold" for="ct_select_trigger">Perfil de aprendizaje personalizado</label>
-                    <input type="hidden" name="id_condicion_transitoria" id="id_condicion_transitoria" value="" required>
+                    <input type="hidden" name="condicion_transitoria_id" id="condicion_transitoria_id" value="" required>
 
                     <div class="ct-select" id="ctSelect">
                         <button type="button" class="ct-select-trigger" id="ct_select_trigger">
@@ -84,7 +84,7 @@
 
             const trigger = document.getElementById('ct_select_trigger');
             const label = document.getElementById('ctSelectLabel');
-            const hidden = document.getElementById('id_condicion_transitoria');
+            const hidden = document.getElementById('condicion_transitoria_id');
             const buscar = document.getElementById('ctBuscarCondicion');
             const empty = document.getElementById('ctSelectEmpty');
             const form = document.getElementById('formCondicionTransitoria');

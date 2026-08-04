@@ -18,8 +18,8 @@ class EstudiantePerfilAprendizajePersonalizadoService
 
     public function autorizarCondicionInstitucion(PerfilAprendizajePersonalizado $condicion, int $institucionId): void
     {
-        $pertenece = $condicion->id_institucion === null
-            || (int) $condicion->id_institucion === $institucionId;
+        $pertenece = $condicion->institucion_id === null
+            || (int) $condicion->institucion_id === $institucionId;
 
         if (! $pertenece) {
             abort(403, 'El perfil de aprendizaje personalizado no pertenece a esta institución.');
@@ -35,7 +35,7 @@ class EstudiantePerfilAprendizajePersonalizadoService
         ?int $docenteId = null
     ): Collection {
         $consulta = EstudiantePerfilAprendizajePersonalizado::query()
-            ->where('id_condicion_transitoria', $condicion->id)
+            ->where('condicion_transitoria_id', $condicion->id)
             ->activas()
             ->whereHas('estudiante', fn ($q) => $q->where('institucion_id', $institucionId))
             ->with([
@@ -46,7 +46,7 @@ class EstudiantePerfilAprendizajePersonalizadoService
             ->orderByDesc('fecha_activacion');
 
         if ($docenteId !== null) {
-            $consulta->where('id_docente', $docenteId);
+            $consulta->where('docente_id', $docenteId);
         }
 
         return $consulta->get();
@@ -58,16 +58,16 @@ class EstudiantePerfilAprendizajePersonalizadoService
     public function conteoActivosPorCondicion(int $institucionId): array
     {
         $filas = EstudiantePerfilAprendizajePersonalizado::query()
-            ->selectRaw('id_condicion_transitoria, COUNT(*) as activos')
+            ->selectRaw('condicion_transitoria_id, COUNT(*) as activos')
             ->activas()
             ->whereHas('estudiante', fn ($q) => $q->where('institucion_id', $institucionId))
-            ->groupBy('id_condicion_transitoria')
+            ->groupBy('condicion_transitoria_id')
             ->get();
 
         $mapa = [];
         foreach ($filas as $fila) {
             $activos = (int) $fila->activos;
-            $mapa[(int) $fila->id_condicion_transitoria] = [
+            $mapa[(int) $fila->condicion_transitoria_id] = [
                 'total' => $activos,
                 'activos' => $activos,
             ];
@@ -82,17 +82,17 @@ class EstudiantePerfilAprendizajePersonalizadoService
     public function conteoActivosPorCondicionDocente(int $institucionId, int $docenteId): array
     {
         $filas = EstudiantePerfilAprendizajePersonalizado::query()
-            ->selectRaw('id_condicion_transitoria, COUNT(*) as activos')
+            ->selectRaw('condicion_transitoria_id, COUNT(*) as activos')
             ->activas()
-            ->where('id_docente', $docenteId)
+            ->where('docente_id', $docenteId)
             ->whereHas('estudiante', fn ($q) => $q->where('institucion_id', $institucionId))
-            ->groupBy('id_condicion_transitoria')
+            ->groupBy('condicion_transitoria_id')
             ->get();
 
         $mapa = [];
         foreach ($filas as $fila) {
             $activos = (int) $fila->activos;
-            $mapa[(int) $fila->id_condicion_transitoria] = [
+            $mapa[(int) $fila->condicion_transitoria_id] = [
                 'total' => $activos,
                 'activos' => $activos,
             ];
@@ -104,12 +104,12 @@ class EstudiantePerfilAprendizajePersonalizadoService
     public function conteoActivosCondicion(int $condicionId, int $institucionId, ?int $docenteId = null): int
     {
         $consulta = EstudiantePerfilAprendizajePersonalizado::query()
-            ->where('id_condicion_transitoria', $condicionId)
+            ->where('condicion_transitoria_id', $condicionId)
             ->activas()
             ->whereHas('estudiante', fn ($q) => $q->where('institucion_id', $institucionId));
 
         if ($docenteId !== null) {
-            $consulta->where('id_docente', $docenteId);
+            $consulta->where('docente_id', $docenteId);
         }
 
         return $consulta->count();
@@ -155,9 +155,9 @@ class EstudiantePerfilAprendizajePersonalizadoService
             ]);
 
             Estudiante::query()
-                ->where('id', $asignacion->id_estudiante)
-                ->where('id_condicion_transitoria', $asignacion->id_condicion_transitoria)
-                ->update(['id_condicion_transitoria' => null]);
+                ->where('id', $asignacion->estudiante_id)
+                ->where('condicion_transitoria_id', $asignacion->condicion_transitoria_id)
+                ->update(['condicion_transitoria_id' => null]);
         });
     }
 }
