@@ -277,6 +277,8 @@ body {
 .header-user-rol {
     font-size: 0.7rem;
     color: #64748B;
+    text-transform: capitalize;
+
 }
 
 .header-chevron {

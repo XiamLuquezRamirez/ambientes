@@ -28,32 +28,12 @@ class InstitucionSuperAdminController extends Controller
 
     /**
      * Listado de instituciones con ambientes (pivot IP/puerto/activo).
+     * Soporta filtros por AJAX (buscar, estado) sin recargar la página.
      */
     public function index(Request $request)
     {
-        $instituciones = Institucion::with('ambientes')->get();
         $ambientes = Ambiente::all();
         $condiciones = PerfilAprendizajeInclusion::query()->ordenadas()->get();
-
-        $consulta = Institucion::query()
-            ->where('activo', true)
-            ->orderBy('nombre')
-            ->select(
-                'instituciones.*',
-            );
-
-        if ($request->filled('buscar')) {
-            $termino = $request->buscar;
-            $consulta->where(fn ($q) => $q
-                ->where('nombre', 'like', "%{$termino}%")
-            );
-        }
-
-        if ($request->filled('estado')) {
-            $consulta->where('activo', $request->estado === 'true');
-        }
-
-        $instituciones = $consulta->orderBy('nombre')->paginate(10);
 
         // solo las del sistemas y adicionales creadas por el super admin
         $condicionesTransitorias = PerfilAprendizajePersonalizado::query()
@@ -61,6 +41,26 @@ class InstitucionSuperAdminController extends Controller
             ->where('id_institucion', null)
             ->ordenadas()
             ->get();
+
+        $consulta = Institucion::query()->with('ambientes');
+
+        if ($request->filled('buscar')) {
+            $termino = $request->buscar;
+            $consulta->where('nombre', 'like', "%{$termino}%");
+        }
+
+        if ($request->filled('estado')) {
+            $consulta->where('activo', $request->estado === 'true');
+        }
+
+        $instituciones = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('superAdmin.instituciones._grid', compact('instituciones'))->render(),
+            ]);
+        }
 
         return view('superAdmin.instituciones.index', compact(
             'instituciones',
