@@ -30,7 +30,7 @@ class PerfilAprendizajePersonalizadoController extends Controller
 
         if ($esSuperAdmin) {
             // Solo globales: sistema y adicionales creadas por super admin (sin institución).
-            $consulta->whereNull('id_institucion');
+            $consulta->whereNull('institucion_id');
         } else {
             $consulta->deInstitucion($usuario?->institucion_id);
         }
@@ -55,6 +55,8 @@ class PerfilAprendizajePersonalizadoController extends Controller
         if ($request->filled('condicion_base_id')) {
             $consulta->where('condicion_base_id', (int) $request->condicion_base_id);
         }
+
+        $consulta->where('eliminado', 0);
 
         $condiciones = $consulta->paginate(15)->withQueryString();
         $condicionesBase = PerfilAprendizajeInclusion::ordenadas()->get(['id', 'codigo', 'nombre', 'color_hex', 'estado']);
@@ -113,7 +115,7 @@ class PerfilAprendizajePersonalizadoController extends Controller
         $datos['codigo'] = PerfilAprendizajePersonalizado::generarCodigo();
         $datos['estado'] = 1;
         $datos['es_sistema'] = $esSuperAdmin ? $request->boolean('es_sistema') : false;
-        $datos['id_institucion'] = $esSuperAdmin
+        $datos['institucion_id'] = $esSuperAdmin
             ? null
             : $usuario?->institucion_id;
         $datos['condicion_base_id'] = $datos['condicion_base_id'] ?? null;
@@ -191,7 +193,7 @@ class PerfilAprendizajePersonalizadoController extends Controller
             ], 422);
         }
 
-        $condicionTransitoria->delete();
+        $condicionTransitoria->update(['eliminado' => true]);
 
         return response()->json([
             'success' => true,
@@ -223,7 +225,7 @@ class PerfilAprendizajePersonalizadoController extends Controller
 
         if (
             $condicion->es_sistema
-            || ($condicion->id_institucion && $condicion->id_institucion !== $usuario?->institucion_id)
+            || ($condicion->institucion_id && $condicion->institucion_id !== $usuario?->institucion_id)
         ) {
             abort(403, 'No autorizado para gestionar este perfil de aprendizaje personalizado.');
         }
@@ -231,6 +233,6 @@ class PerfilAprendizajePersonalizadoController extends Controller
 
     private function tieneColumnaEstudiantes(): bool
     {
-        return Schema::hasColumn('estudiantes', 'id_condicion_transitoria');
+        return Schema::hasColumn('estudiantes', 'condicion_transitoria_id');
     }
 }

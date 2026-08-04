@@ -1712,7 +1712,7 @@
             if (filtroCondicion && filtroCondicion.value !== 'todas') {
                 const condicionId = String(filtroCondicion.value);
                 estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
-                    String(estudiante.id_condicion ?? '') === condicionId
+                    String(estudiante.condicion_id ?? '') === condicionId
                 );
             }
 

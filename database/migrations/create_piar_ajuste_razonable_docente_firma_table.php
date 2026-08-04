@@ -13,7 +13,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('id_ajuste_razonable');
 
-            $table->unsignedBigInteger('id_docente');
+            $table->unsignedBigInteger('docente_id');
 
             $table->text('area')->nullable();
 

@@ -45,8 +45,8 @@ class EstudianteAdminController extends Controller
             }
         }
 
-        if ($request->filled('id_condicion')) {
-            $consulta->where('id_condicion', $request->id_condicion);
+        if ($request->filled('condicion_id')) {
+            $consulta->where('condicion_id', $request->condicion_id);
         }
 
         if ($request->filled('estado')) {
@@ -202,7 +202,7 @@ class EstudianteAdminController extends Controller
                 'success' => true,
                 'message' => 'Estudiante creado exitosamente.',
                 'requiere_apoyo' => $datos['requiere_apoyo'] == 'si',
-                'id_estudiante_creado' => $estudiante->id,
+                'estudiante_id_creado' => $estudiante->id,
             ]);
 
         } catch (\Throwable $e) {

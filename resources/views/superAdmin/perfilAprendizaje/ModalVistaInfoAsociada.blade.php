@@ -20,7 +20,7 @@
             <div class="modal-body p-4">
                 <form id="formVistaInfoAsociada" autocomplete="off">
                     @csrf
-                    <input type="hidden" id="vista_info_id_condicion" value="">
+                    <input type="hidden" id="vista_info_condicion_id" value="">
 
                     <div class="mb-3">
                         <label class="form-label fw-bold" for="vista_info_asociada">Nombre de la vista</label>
@@ -59,7 +59,7 @@
                 $form.find('.is-invalid').removeClass('is-invalid');
                 $form.find('.invalid-feedback').remove();
 
-                $('#vista_info_id_condicion').val(condicionId);
+                $('#vista_info_condicion_id').val(condicionId);
                 $('#vista_info_asociada').val(vistaActual || '');
                 $('#modalVistaInfoAsociadaSubtitle').text(
                     nombre
@@ -71,7 +71,7 @@
             };
 
             function guardarVistaInfo() {
-                const id = $('#vista_info_id_condicion').val();
+                const id = $('#vista_info_condicion_id').val();
                 const vista = ($('#vista_info_asociada').val() || '').trim();
 
                

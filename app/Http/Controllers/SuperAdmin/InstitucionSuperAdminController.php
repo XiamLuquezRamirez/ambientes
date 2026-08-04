@@ -38,7 +38,7 @@ class InstitucionSuperAdminController extends Controller
         // solo las del sistemas y adicionales creadas por el super admin
         $condicionesTransitorias = PerfilAprendizajePersonalizado::query()
             ->with('condicionBase')
-            ->where('id_institucion', null)
+            ->where('institucion_id', null)
             ->ordenadas()
             ->get();
 
@@ -90,11 +90,11 @@ class InstitucionSuperAdminController extends Controller
         $condicionesTransitoriasDisponibles = PerfilAprendizajePersonalizado::query()
             ->with('condicionBase:id,codigo,nombre,color_hex')
             ->where(function ($q) use ($id) {
-                $q->whereNull('id_institucion')
-                    ->orWhere('id_institucion', (int) $id);
+                $q->whereNull('institucion_id')
+                    ->orWhere('institucion_id', (int) $id);
             })
             ->ordenadas()
-            ->get(['id', 'codigo', 'etiqueta', 'condicion_base_id', 'id_institucion', 'es_sistema'])
+            ->get(['id', 'codigo', 'etiqueta', 'condicion_base_id', 'institucion_id', 'es_sistema'])
             ->map(function (PerfilAprendizajePersonalizado $t) {
                 $color = $t->condicionBase?->color_hex ?: '#64748B';
 
@@ -102,7 +102,7 @@ class InstitucionSuperAdminController extends Controller
                     'id' => $t->id,
                     'codigo' => $t->codigo,
                     'etiqueta' => $t->etiqueta,
-                    'id_institucion' => $t->id_institucion,
+                    'institucion_id' => $t->institucion_id,
                     'es_sistema' => (bool) $t->es_sistema,
                     'color' => $color,
                     'condicion_base' => $t->condicionBase ? [

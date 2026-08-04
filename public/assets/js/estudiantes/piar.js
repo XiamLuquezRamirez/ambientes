@@ -7,7 +7,7 @@ var ajustes_cuenta = 1;
 var firmas_docentes_cuenta = 1;
 var actividades_cuenta = 1;
 
-var id_docente_firma = '';
+var docente_id_firma = '';
 var docentes = [];
 var docentes_firma = [];
 
@@ -295,8 +295,8 @@ function agregarFirmaDocente() {
 }
 
 function eliminarFirmaDocente(id) {
-    var id_docente_eliminar = parseInt($(`#div_docente_${id} #docente_firma_id_${id}`).val());
-    docentes_firma = docentes_firma.filter(id => id != id_docente_eliminar);
+    var docente_id_eliminar = parseInt($(`#div_docente_${id} #docente_firma_id_${id}`).val());
+    docentes_firma = docentes_firma.filter(id => id != docente_id_eliminar);
     $(`#div_docente_${id}`).remove();
     console.log(docentes_firma);
 }
@@ -493,7 +493,7 @@ function mostrarErroresModal(errors, id_form) {
 }
 
 function buscarDocente(id) {
-    id_docente_firma = id;
+    docente_id_firma = id;
     $('#modal_buscar_docente').modal('show');
     buscarDocentePiar('primeros_10');
 }
@@ -544,41 +544,41 @@ function buscarDocentePiar(texto) {
     });
 }
 
-function seleccionarDocente(id_docente) {
-    var docente = docentes.find(docente => docente.id == id_docente);
+function seleccionarDocente(docente_id) {
+    var docente = docentes.find(docente => docente.id == docente_id);
 
     if(docente.firma_url == '' || docente.firma_url == null) {
         mostrarToast('error', 'El docente seleccionado no tiene firma, deberá firmar manualmente en la sección de ajuste razonable despues de generar el pdf del PIAR.');
     }
 
-    if(id_docente_firma == 'orientador') {
+    if(docente_id_firma == 'orientador') {
         $('#docente_orientador_nombre').val(docente.nombre + ' ' + docente.apellido);
         $('#docente_orientador_id').val(docente.id);
         colocarFirma('docente_orientador_firma', docente.firma_url);
-    } else if(id_docente_firma == 'apoyo_pedagogico') {
+    } else if(docente_id_firma == 'apoyo_pedagogico') {
         $('#docente_apoyo_pedagogico_nombre').val(docente.nombre + ' ' + docente.apellido);
         $('#docente_apoyo_pedagogico_id').val(docente.id);
         colocarFirma('docente_apoyo_pedagogico_firma', docente.firma_url);
-    } else if(id_docente_firma == 'coordinador_pedagogico') {
+    } else if(docente_id_firma == 'coordinador_pedagogico') {
         $('#docente_coordinador_pedagogico_nombre').val(docente.nombre + ' ' + docente.apellido);
         $('#docente_coordinador_pedagogico_id').val(docente.id);
         colocarFirma('docente_coordinador_pedagogico_firma', docente.firma_url);
     } else {
-        if(docentes_firma.includes(id_docente)) {
+        if(docentes_firma.includes(docente_id)) {
             mostrarToast('error', 'El docente ya ha sido seleccionado.');
             return;
         }
 
         // verificar si se esta editando el docente que firma en esta casilla
-        var id_docente_firma_actual = parseInt($(`#docente_firma_id_${id_docente_firma}`).val());
-        if(id_docente_firma_actual != '') {
-            docentes_firma = docentes_firma.filter(id => id != id_docente_firma_actual);
+        var docente_id_firma_actual = parseInt($(`#docente_firma_id_${docente_id_firma}`).val());
+        if(docente_id_firma_actual != '') {
+            docentes_firma = docentes_firma.filter(id => id != docente_id_firma_actual);
         }
 
-        colocarFirma('img_firma_docente_' + id_docente_firma, docente.firma_url);
-        $('#docente_firma_nombre_' + id_docente_firma).val(docente.nombre + ' ' + docente.apellido);
-        $('#docente_firma_id_' + id_docente_firma).val(docente.id);
-        docentes_firma.push(id_docente);
+        colocarFirma('img_firma_docente_' + docente_id_firma, docente.firma_url);
+        $('#docente_firma_nombre_' + docente_id_firma).val(docente.nombre + ' ' + docente.apellido);
+        $('#docente_firma_id_' + docente_id_firma).val(docente.id);
+        docentes_firma.push(docente_id);
         console.log(docentes_firma);
     }
     
@@ -601,9 +601,9 @@ function cerrarModalBuscarDocente() {
 var piar = null;
 $(document).ready(function() {
     var tipo_piar = $('#tipo_piar').val();
-    var id_estudiante = $('#id_estudiante_piar').val();
+    var estudiante_id = $('#estudiante_id_piar').val();
     if(tipo_piar == 'nuevo') {
-        verificarSiComenzo(id_estudiante).then(function(data) {
+        verificarSiComenzo(estudiante_id).then(function(data) {
             if (data.comenzo) {
                 paso = parseInt(data.piar.paso);
                 piar = data.piar;
@@ -662,7 +662,7 @@ $(document).ready(function() {
             $('#piar-footer').show();
         });
     } else if(tipo_piar == 'actualizar') {
-        verificarSiComenzo(id_estudiante).then(function(data) {
+        verificarSiComenzo(estudiante_id).then(function(data) {
             piar = data.piar;
             paso = 1;
             mapearPaso1();
@@ -678,9 +678,9 @@ $(document).ready(function() {
     }
 });
 
-async function verificarSiComenzo(id_estudiante) {
+async function verificarSiComenzo(estudiante_id) {
     return new Promise(async (resolve) => {
-        var response = await fetch(URL_PIAR + '/verificar-si-comenzo/' + id_estudiante);
+        var response = await fetch(URL_PIAR + '/verificar-si-comenzo/' + estudiante_id);
         var data = await response.json();
         if (data.success) {
             resolve({comenzo: true, piar: data.data});
@@ -886,13 +886,13 @@ function mapearPaso6() {
         if(index_docente > 0) {
             agregarFirmaDocente();
         }
-        setValueInput('#form-paso-6 input[name="docente_firma['+index_docente+'][id]"]', docente.id_docente);
+        setValueInput('#form-paso-6 input[name="docente_firma['+index_docente+'][id]"]', docente.docente_id);
         setValueInput('#form-paso-6 input[name="docente_firma['+index_docente+'][nombre]"]', docente.docente.user.nombre + ' ' + docente.docente.user.apellido);
         setValueInput('#form-paso-6 input[name="docente_firma['+index_docente+'][area]"]', docente.area);
 
         setValueImg('img_firma_docente_' + (index_docente+1), docente.docente.firma_url);
 
-        docentes_firma.push(docente.id_docente);
+        docentes_firma.push(docente.docente_id);
         index_docente++;
     });
 

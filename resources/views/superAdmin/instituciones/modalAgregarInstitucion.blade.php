@@ -420,7 +420,7 @@
 
             const mapaActiva = {};
             (ordenGuardado || []).forEach(item => {
-                mapaActiva[item.id_condicion_transitoria] = !!item.activa;
+                mapaActiva[item.condicion_transitoria_id] = !!item.activa;
             });
             const hayOrden = Object.keys(mapaActiva).length > 0;
 
@@ -435,7 +435,7 @@
             listaTransitoriasEl.innerHTML = disponibles.map((t, index) => {
                 const color = t.color || '#64748B';
                 const checked = hayOrden ? (mapaActiva[t.id] ?? false) : true;
-                const esLocal = t.id_institucion != null;
+                const esLocal = t.institucion_id != null;
                 const badgeLocal = esLocal
                     ? '<span class="badge badge-gray" style="margin-left:6px">Institución</span>'
                     : '';
@@ -475,7 +475,7 @@
         function aplicarSeleccionCondicionesOrden(condicionesOrden = [], condicionesTransitoriasOrden = []) {
             const mapaCond = {};
             (condicionesOrden || []).forEach(item => {
-                mapaCond[item.id_condicion] = !!item.activa;
+                mapaCond[item.condicion_id] = !!item.activa;
             });
 
             document.querySelectorAll('.chk-condicion-orden').forEach(chk => {
@@ -487,7 +487,7 @@
 
             const mapaTrans = {};
             (condicionesTransitoriasOrden || []).forEach(item => {
-                mapaTrans[item.id_condicion_transitoria] = !!item.activa;
+                mapaTrans[item.condicion_transitoria_id] = !!item.activa;
             });
 
             document.querySelectorAll('.chk-condicion-transitoria-orden').forEach(chk => {

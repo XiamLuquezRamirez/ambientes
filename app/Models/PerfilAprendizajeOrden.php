@@ -10,8 +10,8 @@ class PerfilAprendizajeOrden extends Model
     protected $table = 'condiciones_orden';
 
     protected $fillable = [
-        'id_institucion',
-        'id_condicion',
+        'institucion_id',
+        'condicion_id',
         'orden',
         'activa',
     ];
@@ -23,11 +23,11 @@ class PerfilAprendizajeOrden extends Model
 
     public function institucion(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion');
+        return $this->belongsTo(Institucion::class, 'institucion_id');
     }
 
     public function condicion(): BelongsTo
     {
-        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'id_condicion');
+        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'condicion_id');
     }
 }

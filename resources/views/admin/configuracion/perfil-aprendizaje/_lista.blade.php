@@ -9,7 +9,7 @@
             @php
                 $c = $item->condicion;
                 $color = $c?->color_hex ?: '#64748B';
-                $conteo = $conteos[$item->id_condicion] ?? ['total' => 0, 'activos' => 0];
+                $conteo = $conteos[$item->condicion_id] ?? ['total' => 0, 'activos' => 0];
             @endphp
             <article class="cfg-card {{ $item->activa ? '' : 'is-inactive' }}" data-id="{{ $item->id }}">
                 <div class="cfg-drag" title="Arrastrar para reordenar">

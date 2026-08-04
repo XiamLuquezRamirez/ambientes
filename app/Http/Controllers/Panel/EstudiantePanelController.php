@@ -131,11 +131,11 @@ class EstudiantePanelController extends Controller
             $texto_busqueda = '';
         }
 
-        if ($request->filled('id_condicion')) {
-            $id_condicion = $request->get('id_condicion');
-            $consulta->where('id_condicion', $request->get('id_condicion'));
+        if ($request->filled('condicion_id')) {
+            $condicion_id = $request->get('condicion_id');
+            $consulta->where('condicion_id', $request->get('condicion_id'));
         } else {
-            $id_condicion = '';
+            $condicion_id = '';
         }
 
         if ($request->filled('grado_id')) {
@@ -183,7 +183,7 @@ class EstudiantePanelController extends Controller
         $estudiantes = $consulta->paginate(12)->withQueryString();
 
         $condiciones = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get();
-        $filtros = $request->only(['q', 'id_condicion', 'estado', 'filtro', 'orden']);
+        $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
         /* estadisticas */
@@ -214,7 +214,7 @@ class EstudiantePanelController extends Controller
                     'grados',
                     'id_grado_seleccionado',
                     'id_grupo_seleccionado',
-                    'id_condicion',
+                    'condicion_id',
                     'texto_busqueda',
                 ))->render(),
             ]);
@@ -237,7 +237,7 @@ class EstudiantePanelController extends Controller
             'ambientes_disponibles',
             'ambiente',
             'id_grado_seleccionado',
-            'id_condicion',
+            'condicion_id',
             'id_grupo_seleccionado',
             'texto_busqueda'
         ));
@@ -309,7 +309,7 @@ class EstudiantePanelController extends Controller
 
         if ($institucionId && ! $estudiante->condicionTransitoriaActiva) {
             $condicionesTransitorias = PerfilAprendizajePersonalizadoOrden::query()
-                ->where('id_institucion', $institucionId)
+                ->where('institucion_id', $institucionId)
                 ->where('activa', true)
                 ->whereHas('condicionTransitoria', fn ($q) => $q->where('estado', 1))
                 ->with('condicionTransitoria:id,codigo,etiqueta,descripcion_interna')
@@ -358,7 +358,7 @@ class EstudiantePanelController extends Controller
         $institucionId = Auth::guard('docente')->user()->institucion_id;
 
         $datos = $request->validate([
-            'id_condicion_transitoria' => [
+            'condicion_transitoria_id' => [
                 'required',
                 'integer',
                 Rule::exists('condiciones_transitorias', 'id')->where(fn ($q) => $q->where('estado', 1)),
@@ -367,40 +367,40 @@ class EstudiantePanelController extends Controller
         ]);
 
         $permitida = PerfilAprendizajePersonalizadoOrden::query()
-            ->where('id_institucion', $institucionId)
-            ->where('id_condicion_transitoria', $datos['id_condicion_transitoria'])
+            ->where('institucion_id', $institucionId)
+            ->where('condicion_transitoria_id', $datos['condicion_transitoria_id'])
             ->where('activa', true)
             ->exists();
 
         if (! $permitida) {
             return back()->withErrors([
-                'id_condicion_transitoria' => 'El perfil de aprendizaje personalizado no está habilitado para esta institución.',
+                'condicion_transitoria_id' => 'El perfil de aprendizaje personalizado no está habilitado para esta institución.',
             ]);
         }
 
         if ($estudiante->condicionTransitoriaActiva()->exists()) {
             return back()->withErrors([
-                'id_condicion_transitoria' => 'El estudiante ya tiene un perfil de aprendizaje personalizado activo.',
+                'condicion_transitoria_id' => 'El estudiante ya tiene un perfil de aprendizaje personalizado activo.',
             ]);
         }
 
         DB::transaction(function () use ($estudiante, $docente, $datos) {
             EstudiantePerfilAprendizajePersonalizado::create([
-                'id_estudiante' => $estudiante->id,
-                'id_condicion_transitoria' => $datos['id_condicion_transitoria'],
-                'id_docente' => $docente->id,
+                'estudiante_id' => $estudiante->id,
+                'condicion_transitoria_id' => $datos['condicion_transitoria_id'],
+                'docente_id' => $docente->id,
                 'observacion' => trim($datos['observacion']),
                 'fecha_activacion' => now(),
                 'activa' => true,
             ]);
 
             $estudiante->update([
-                'id_condicion_transitoria' => $datos['id_condicion_transitoria'],
+                'condicion_transitoria_id' => $datos['condicion_transitoria_id'],
             ]);
         });
 
         $etiqueta = PerfilAprendizajePersonalizado::query()
-            ->where('id', $datos['id_condicion_transitoria'])
+            ->where('id', $datos['condicion_transitoria_id'])
             ->value('etiqueta');
 
         return redirect()

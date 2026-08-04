@@ -14,7 +14,7 @@
                 $t = $item->condicionTransitoria;
                 $base = $t?->condicionBase;
                 $color = $base?->color_hex ?: '#64748B';
-                $conteo = $conteos[$item->id_condicion_transitoria] ?? ['total' => 0, 'activos' => 0];
+                $conteo = $conteos[$item->condicion_transitoria_id] ?? ['total' => 0, 'activos' => 0];
                 $esPropia = $t && $t->esDelUsuario($usuarioId);
                 $creadaPorDocente = $t?->creadaPorDocente() ?? false;
                 $autorNombre = $t?->creador

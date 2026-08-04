@@ -47,7 +47,7 @@ class GrupoEstudiantesService
                 'avatar_url' => $estudiante->avatar_url,
                 'iniciales' => $estudiante->iniciales ?? strtoupper(substr($estudiante->nombre ?? 'E', 0, 2)),
                 'condicion' => $estudiante->condicion?->nombre,
-                'id_condicion' => $estudiante->id_condicion,
+                'condicion_id' => $estudiante->condicion_id,
                 'tiene_pin' => $estudiante->configuracionPin !== null,
                 'tiene_piar' => $estudiante->piar !== null,
                 'estado' => $matricula->estado,

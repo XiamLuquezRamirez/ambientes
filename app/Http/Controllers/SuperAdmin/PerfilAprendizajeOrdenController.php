@@ -13,7 +13,7 @@ class PerfilAprendizajeOrdenController extends Controller
      * Sincroniza las condiciones de una institución.
      * Guarda todas las condiciones del catálogo; las marcadas quedan activas.
      *
-     * @param  array<int|string, mixed>  $seleccion  claves = id_condicion; valor con activa/orden opcionales
+     * @param  array<int|string, mixed>  $seleccion  claves = condicion_id; valor con activa/orden opcionales
      */
     public function sincronizarParaInstitucion(int $institucionId, array $seleccion = []): void
     {
@@ -21,7 +21,7 @@ class PerfilAprendizajeOrdenController extends Controller
 
         DB::transaction(function () use ($institucionId, $seleccion, $catalogo) {
             PerfilAprendizajeOrden::query()
-                ->where('id_institucion', $institucionId)
+                ->where('institucion_id', $institucionId)
                 ->delete();
 
             $filas = [];
@@ -44,8 +44,8 @@ class PerfilAprendizajeOrdenController extends Controller
                     : $ordenAuto;
 
                 $filas[] = [
-                    'id_institucion' => $institucionId,
-                    'id_condicion' => $id,
+                    'institucion_id' => $institucionId,
+                    'condicion_id' => $id,
                     'orden' => $orden,
                     'activa' => $activa ? 1 : 0,
                     'created_at' => $ahora,
@@ -61,16 +61,16 @@ class PerfilAprendizajeOrdenController extends Controller
     }
 
     /**
-     * @return array<int, array{id_condicion:int,orden:int,activa:bool}>
+     * @return array<int, array{condicion_id:int,orden:int,activa:bool}>
      */
     public function listarPorInstitucion(int $institucionId): array
     {
         return PerfilAprendizajeOrden::query()
-            ->where('id_institucion', $institucionId)
+            ->where('institucion_id', $institucionId)
             ->orderBy('orden')
-            ->get(['id_condicion', 'orden', 'activa'])
+            ->get(['condicion_id', 'orden', 'activa'])
             ->map(fn (PerfilAprendizajeOrden $row) => [
-                'id_condicion' => (int) $row->id_condicion,
+                'condicion_id' => (int) $row->condicion_id,
                 'orden' => (int) $row->orden,
                 'activa' => (bool) $row->activa,
             ])

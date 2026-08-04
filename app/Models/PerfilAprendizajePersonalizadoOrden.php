@@ -10,8 +10,8 @@ class PerfilAprendizajePersonalizadoOrden extends Model
     protected $table = 'condiciones_transitorias_orden';
 
     protected $fillable = [
-        'id_institucion',
-        'id_condicion_transitoria',
+        'institucion_id',
+        'condicion_transitoria_id',
         'orden',
         'activa',
     ];
@@ -23,11 +23,11 @@ class PerfilAprendizajePersonalizadoOrden extends Model
 
     public function institucion(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion');
+        return $this->belongsTo(Institucion::class, 'institucion_id');
     }
 
     public function condicionTransitoria(): BelongsTo
     {
-        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'id_condicion_transitoria');
+        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'condicion_transitoria_id');
     }
 }

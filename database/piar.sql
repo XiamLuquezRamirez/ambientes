@@ -71,7 +71,7 @@ DROP TABLE IF EXISTS `piar_ajuste_razonable_docente_firma`;
 CREATE TABLE `piar_ajuste_razonable_docente_firma` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_ajuste_razonable` bigint unsigned NOT NULL,
-  `id_docente` bigint unsigned NOT NULL,
+  `docente_id` bigint unsigned NOT NULL,
   `area` text,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
