@@ -12,7 +12,7 @@ class Estudiante extends Model
 {
     use Sincronizable;
 
-    protected $fillable = ['avatar', 'tipo_identificacion', 'otro_tipo_identificacion', 'identificacion', 'nombre', 'apellido', 'iniciales', 'grado_id', 'atencion_id', 'estado_id', 'color_avatar', 'condicion_id', 'condicion_transitoria_id', 'activo', 'fecha_nacimiento', 'sexo', 'acudiente', 'telefono_acudiente', 'requiere_apoyo', 'estado_piar', 'lugar_nacimiento', 'departamento_id', 'municipio_id', 'barrio_vereda', 'direccion', 'telefono', 'email', 'institucion_id'];
+    protected $fillable = ['avatar', 'tipo_identificacion', 'otro_tipo_identificacion', 'identificacion', 'nombre', 'apellido', 'iniciales', 'grado_id', 'atencion_id', 'estado_id', 'color_avatar', 'id_condicion', 'id_condicion_transitoria', 'activo', 'fecha_nacimiento', 'sexo', 'acudiente', 'telefono_acudiente', 'requiere_apoyo', 'estado_piar', 'lugar_nacimiento', 'departamento_id', 'municipio_id', 'barrio_vereda', 'direccion', 'telefono', 'email', 'institucion_id'];
 
     protected $casts = [
         'edad' => 'integer',
@@ -149,12 +149,12 @@ class Estudiante extends Model
 
     public function condicion()
     {
-        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'condicion_id');
+        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'id_condicion');
     }
 
     public function condicionTransitoria()
     {
-        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'condicion_transitoria_id');
+        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'id_condicion_transitoria');
     }
 
     public function condicionesTransitoriasAsignadas()

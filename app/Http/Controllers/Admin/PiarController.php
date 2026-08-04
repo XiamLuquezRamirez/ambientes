@@ -217,7 +217,7 @@ class PiarController extends Controller
 
         if ($datos['diagnostico_medico'] == 'Si') {
             Estudiante::where('id', $datos['id_estudiante'])->update([
-                'condicion_id' => $datos['cual_diagnostico'],
+                'id_condicion' => $datos['cual_diagnostico'],
             ]);
         }
 

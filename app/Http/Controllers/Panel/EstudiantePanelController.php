@@ -131,11 +131,11 @@ class EstudiantePanelController extends Controller
             $texto_busqueda = '';
         }
 
-        if ($request->filled('condicion_id')) {
-            $condicion_id = $request->get('condicion_id');
-            $consulta->where('condicion_id', $request->get('condicion_id'));
+        if ($request->filled('id_condicion')) {
+            $id_condicion = $request->get('id_condicion');
+            $consulta->where('id_condicion', $request->get('id_condicion'));
         } else {
-            $condicion_id = '';
+            $id_condicion = '';
         }
 
         if ($request->filled('grado_id')) {
@@ -183,7 +183,7 @@ class EstudiantePanelController extends Controller
         $estudiantes = $consulta->paginate(12)->withQueryString();
 
         $condiciones = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get();
-        $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
+        $filtros = $request->only(['q', 'id_condicion', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
         /* estadisticas */
@@ -214,7 +214,7 @@ class EstudiantePanelController extends Controller
                     'grados',
                     'id_grado_seleccionado',
                     'id_grupo_seleccionado',
-                    'condicion_id',
+                    'id_condicion',
                     'texto_busqueda',
                 ))->render(),
             ]);
@@ -237,7 +237,7 @@ class EstudiantePanelController extends Controller
             'ambientes_disponibles',
             'ambiente',
             'id_grado_seleccionado',
-            'condicion_id',
+            'id_condicion',
             'id_grupo_seleccionado',
             'texto_busqueda'
         ));
@@ -395,7 +395,7 @@ class EstudiantePanelController extends Controller
             ]);
 
             $estudiante->update([
-                'condicion_transitoria_id' => $datos['id_condicion_transitoria'],
+                'id_condicion_transitoria' => $datos['id_condicion_transitoria'],
             ]);
         });
 

@@ -231,6 +231,6 @@ class PerfilAprendizajePersonalizadoController extends Controller
 
     private function tieneColumnaEstudiantes(): bool
     {
-        return Schema::hasColumn('estudiantes', 'condicion_transitoria_id');
+        return Schema::hasColumn('estudiantes', 'id_condicion_transitoria');
     }
 }

@@ -12,8 +12,8 @@ return new class extends Migration
             if (Schema::hasColumn('estudiantes', 'condicion')) {
                 $table->dropColumn('condicion');
             }
-            if (!Schema::hasColumn('estudiantes', 'condicion_id')) {
-                $table->integer('condicion_id')->default(1)->after('color_avatar');
+            if (!Schema::hasColumn('estudiantes', 'id_condicion')) {
+                $table->integer('id_condicion')->default(1)->after('color_avatar');
             }
             if (!Schema::hasColumn('estudiantes', 'avatar')) {
                 $table->text('avatar')->nullable()->after('nombre');
@@ -46,7 +46,7 @@ return new class extends Migration
     {
         Schema::table('estudiantes', function (Blueprint $table) {
             $table->dropColumn(array_filter([
-                Schema::hasColumn('estudiantes', 'condicion_id') ? 'condicion_id' : null,
+                Schema::hasColumn('estudiantes', 'id_condicion') ? 'id_condicion' : null,
                 Schema::hasColumn('estudiantes', 'avatar') ? 'avatar' : null,
                 Schema::hasColumn('estudiantes', 'identificacion') ? 'identificacion' : null,
                 Schema::hasColumn('estudiantes', 'grado_id') ? 'grado_id' : null,

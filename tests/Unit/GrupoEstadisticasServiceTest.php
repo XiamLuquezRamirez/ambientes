@@ -55,7 +55,7 @@ class GrupoEstadisticasServiceTest extends TestCase
             (object) [
                 'estudiante' => (object) [
                     'condicion' => $condicionEstandar,
-                    'condicion_id' => 1,
+                    'id_condicion' => 1,
                     'piar' => null,
                     'configuracionPin' => null,
                 ],
@@ -63,7 +63,7 @@ class GrupoEstadisticasServiceTest extends TestCase
             (object) [
                 'estudiante' => (object) [
                     'condicion' => $condicionEstandar,
-                    'condicion_id' => 1,
+                    'id_condicion' => 1,
                     'piar' => null,
                     'configuracionPin' => (object) ['id' => 1],
                 ],
@@ -86,7 +86,7 @@ class GrupoEstadisticasServiceTest extends TestCase
             (object) [
                 'estudiante' => (object) [
                     'condicion' => $condicionTea,
-                    'condicion_id' => 3,
+                    'id_condicion' => 3,
                     'piar' => null,
                     'configuracionPin' => (object) ['id' => 1],
                 ],
@@ -144,7 +144,7 @@ class GrupoEstadisticasServiceTest extends TestCase
         $this->assertSame('tea', $resultado[1]['condicion_nombre']);
     }
 
-    public function test_listar_incluye_condicion_id_y_nombre_desde_relacion(): void
+    public function test_listar_incluye_id_condicion_y_nombre_desde_relacion(): void
     {
         $service = new GrupoEstadisticasService;
         $condicionTea = (object) ['id' => 3, 'nombre' => 'TEA'];
@@ -156,7 +156,7 @@ class GrupoEstadisticasServiceTest extends TestCase
                     'id' => 9,
                     'nombre' => 'Camila Díaz',
                     'condicion' => $condicionTea,
-                    'condicion_id' => 3,
+                    'id_condicion' => 3,
                     'configuracionPin' => null,
                     'piar' => null,
                 ],
@@ -165,7 +165,7 @@ class GrupoEstadisticasServiceTest extends TestCase
 
         $resultado = $service->listarEstudiantes($matriculas);
 
-        $this->assertSame(3, $resultado[0]['condicion_id']);
+        $this->assertSame(3, $resultado[0]['id_condicion']);
         $this->assertSame('TEA', $resultado[0]['condicion_nombre']);
         $this->assertSame('tea', $resultado[0]['condicion']);
     }

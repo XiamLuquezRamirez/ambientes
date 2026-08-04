@@ -94,7 +94,7 @@
     function setearDatosCondicion(condicion) {
         esSistemaActual = !!condicion.es_sistema;
 
-        $('#condicion_id').val(condicion.id);
+        $('#id_condicion').val(condicion.id);
         $('#codigo').val(condicion.codigo || '');
         $('#nombre').val(condicion.nombre || '');
         $('#descripcion_corta').val(condicion.descripcion_corta || '');
@@ -114,7 +114,7 @@
 
     function resetFormRegistrarCondicion() {
         $form[0].reset();
-        $('#condicion_id').val('');
+        $('#id_condicion').val('');
         $('#codigo').val('');
         $form.find('.is-invalid').removeClass('is-invalid');
         $form.find('.invalid-feedback').remove();
@@ -173,7 +173,7 @@
             return;
         }
 
-        const id = $('#condicion_id').val();
+        const id = $('#id_condicion').val();
         const datos = {
             nombre: ($('#nombre').val() || '').trim(),
             descripcion_corta: ($('#descripcion_corta').val() || '').trim(),

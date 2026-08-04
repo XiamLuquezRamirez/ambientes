@@ -116,7 +116,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
 
         $estudiantes = Estudiante::query()
             ->where('institucion_id', $institucionId)
-            ->where('condicion_id', $condicionInclusion->id)
+            ->where('id_condicion', $condicionInclusion->id)
             ->where('activo', true)
             ->with(['matriculaActiva.grado', 'matriculaActiva.grupo'])
             ->orderBy('nombre')
@@ -181,15 +181,15 @@ class PerfilAprendizajeConfiguracionController extends Controller
     private function conteoEstudiantesPorCondicion(int $institucionId): array
     {
         $filas = Estudiante::query()
-            ->selectRaw('condicion_id, COUNT(*) as total, SUM(CASE WHEN activo = 1 THEN 1 ELSE 0 END) as activos')
+            ->selectRaw('id_condicion, COUNT(*) as total, SUM(CASE WHEN activo = 1 THEN 1 ELSE 0 END) as activos')
             ->where('institucion_id', $institucionId)
-            ->whereNotNull('condicion_id')
-            ->groupBy('condicion_id')
+            ->whereNotNull('id_condicion')
+            ->groupBy('id_condicion')
             ->get();
 
         $mapa = [];
         foreach ($filas as $fila) {
-            $mapa[(int) $fila->condicion_id] = [
+            $mapa[(int) $fila->id_condicion] = [
                 'total' => (int) $fila->total,
                 'activos' => (int) $fila->activos,
             ];

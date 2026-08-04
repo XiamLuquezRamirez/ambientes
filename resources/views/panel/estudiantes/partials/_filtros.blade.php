@@ -16,10 +16,10 @@
             <option value="sin_pin" {{ ($filtros['filtro'] ?? '') === 'sin_pin' ? 'selected' : '' }}>Sin PIN</option>
         </select>
 
-        <select name="condicion_id" id="filtroCondicion" class="toolbar-select">
+        <select name="id_condicion" id="filtroCondicion" class="toolbar-select">
             <option value="">Todos los perfiles de aprendizaje</option>
             @foreach ($condiciones as $condicion)
-                <option value="{{ $condicion->id }}" {{ $condicion_id == $condicion->id ? 'selected' : '' }}>
+                <option value="{{ $condicion->id }}" {{ $id_condicion == $condicion->id ? 'selected' : '' }}>
                     {{ $condicion->nombre }}
                 </option>
             @endforeach

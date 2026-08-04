@@ -96,7 +96,7 @@ async function cargarTabla(url) {
         $contenedor.html(res.html);
         history.pushState(null, '', url);
         const params = new URL(url).searchParams;
-        const tieneFilros = params.has('buscar') || params.has('grado_id') || params.has('condicion_id') || params.has('estado');
+        const tieneFilros = params.has('buscar') || params.has('grado_id') || params.has('id_condicion') || params.has('estado');
         $('#btnLimpiar').css('display', tieneFilros ? 'inline-flex' : 'none');
     } else {
         mostrarToast('error', 'Error al cargar los datos');
@@ -128,7 +128,7 @@ $('#btnLimpiar').on('click', async function (e) {
     e.preventDefault();
     $('#formBuscar')[0].reset();
     $('#grado_id').val('');
-    $('#condicion_id').val('');
+    $('#id_condicion').val('');
     $('#estado').val('');
 
     await cargarTabla(URL_ESTUDIANTES);
@@ -303,7 +303,7 @@ $('#grado_id').on('change', async function () {
     aplicarFiltros();
 });
 
-$('#condicion_id').on('change', async function () {
+$('#id_condicion').on('change', async function () {
     aplicarFiltros();
 });
 

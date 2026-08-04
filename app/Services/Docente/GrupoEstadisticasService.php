@@ -62,19 +62,19 @@ class GrupoEstadisticasService
 
         if (is_object($condicion) && isset($condicion->nombre)) {
             return [
-                isset($condicion->id) ? (int) $condicion->id : ($estudiante->condicion_id ?? null),
+                isset($condicion->id) ? (int) $condicion->id : ($estudiante->id_condicion ?? null),
                 (string) $condicion->nombre,
             ];
         }
 
         if (is_string($condicion) && $condicion !== '') {
             return [
-                isset($estudiante->condicion_id) ? (int) $estudiante->condicion_id : null,
+                isset($estudiante->id_condicion) ? (int) $estudiante->id_condicion : null,
                 $condicion,
             ];
         }
 
-        $condicionId = isset($estudiante->condicion_id) ? (int) $estudiante->condicion_id : null;
+        $condicionId = isset($estudiante->id_condicion) ? (int) $estudiante->id_condicion : null;
 
         return [$condicionId, $condicionId === 1 || $condicionId === null ? 'Estandar' : ''];
     }
