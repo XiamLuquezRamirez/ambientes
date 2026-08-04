@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Panel Docente') — Aulas Reggio</title>
+    <title>@yield('title', 'Panel Docente') — PedNia</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
@@ -99,7 +99,11 @@
         $logoUrl = $institucion ? $logoService->urlPublica($institucion->logo) : null;
         $inicialesInstitucion = $institucion ? $logoService->iniciales($institucion) : null;
         $lugarInstitucion = $institucion
-            ? trim(collect([$institucion->municipio, $institucion->departamento])->filter()->implode(', '))
+            ? trim(
+                collect([$institucion->municipio, $institucion->departamento])
+                    ->filter()
+                    ->implode(', '),
+            )
             : '';
 
     @endphp
@@ -107,8 +111,7 @@
         @if ($institucion)
             <div class="header-institucion" title="{{ $institucion->nombre }}">
                 <div class="header-institucion-logo" aria-hidden="true">
-                    <img src="{{ $logoUrl ?? '' }}"
-                        alt=""
+                    <img src="{{ $logoUrl ?? '' }}" alt=""
                         class="header-institucion-img {{ $logoUrl ? '' : 'd-none' }}"
                         onerror="this.classList.add('d-none');var f=this.nextElementSibling;if(f)f.classList.remove('d-none');">
                     <span class="header-institucion-fallback {{ $logoUrl ? 'd-none' : '' }}">

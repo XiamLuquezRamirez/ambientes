@@ -651,11 +651,11 @@ CREATE TABLE `estudiantes` (
   `avatar` text,
   `tipo_identificacion` varchar(10) DEFAULT NULL,
   `identificacion` int NOT NULL,
-  `iniciales` varchar(3) NOT NULL,
-  `grado_id` text,
-  `color_avatar` varchar(9) NOT NULL DEFAULT '#0F6E56',
-  `condicion_id` int DEFAULT '1',
-  `condicion_transitoria_id` int DEFAULT NULL,
+  `iniciales` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `grado_id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `color_avatar` varchar(9) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#0F6E56',
+  `id_condicion` int DEFAULT '1',
+  `id_condicion_transitoria` int DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `fecha_nacimiento` text,
   `acudiente` text,
@@ -679,7 +679,7 @@ CREATE TABLE `estudiantes` (
 
 /*Data for the table `estudiantes` */
 
-insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`condicion_id`,`condicion_transitoria_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values
+insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`id_condicion`,`id_condicion_transitoria`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values
 (1,'Valentina',NULL,NULL,NULL,1111,'VA',NULL,'#0F6E56',1,NULL,1,'2021-01-17',NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#534AB7',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#854F0B',1,NULL,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
@@ -2740,10 +2740,10 @@ CREATE TABLE `users` (
 
 insert  into `users`(`id`,`institucion_id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`creado_por`,`remember_token`,`bloqueado_en`,`created_at`,`updated_at`) values
 (1,NULL,'1234567890','Super','Admin','superadmin@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','superAdmin','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(2,1,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente','activo',NULL,NULL,NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58'),
-(4,1,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35'),
-(5,1,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(16,1,'OSRaOLyVQB','Administrador',NULL,'fabian.quintero.2201@gmail.com','$2y$10$v8Np5rui71dWGOQFMtU3DOWfBNrJgjd.NqOhLUgwHHPYBOrHVt25y','admin','activo',1,NULL,NULL,'2026-08-04 08:53:36','2026-08-04 08:53:36');
+(2,1,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','docente','activo',NULL,NULL,NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58'),
+(4,1,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35'),
+(5,1,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(16,1,'OSRaOLyVQB','Administrador',NULL,'fabian.quintero.2201@gmail.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','admin','activo',1,NULL,NULL,'2026-08-04 08:53:36','2026-08-04 08:53:36');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
