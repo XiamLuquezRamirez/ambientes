@@ -248,6 +248,11 @@
             </div>
         </section>
 
+        @php
+            $motivosCierreTransitoria = \App\Services\EstudiantePerfilAprendizajePersonalizadoService::MOTIVOS_CIERRE;
+            $historialCondicionesTransitorias = $historialCondicionesTransitorias ?? collect();
+        @endphp
+
         {{-- Resumen: matrícula, PIN, PIAR --}}
         <div class="c-card shadow-sm mt-2">
             <div class="c-head bg-white">
@@ -271,7 +276,7 @@
                             Ambientes
                         </button>
                     </li>
-                    @if ($condicionTransitoriaActiva ?? null)
+                    @if ($historialCondicionesTransitorias->isNotEmpty())
                         <li class="nav-item">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabCondicionesTransitorias">
                                 <i class="fa-solid fa-puzzle-piece me-2"></i>
@@ -429,10 +434,7 @@
                     </div>
                     <div class="tab-pane fade" id="tabCondicionesTransitorias">
                         <p class="ficha-section-title">Historial de perfiles de aprendizaje personalizados</p>
-                        @php
-                            $motivosCierreTransitoria = \App\Services\EstudiantePerfilAprendizajePersonalizadoService::MOTIVOS_CIERRE;
-                            $historialCondicionesTransitorias = $historialCondicionesTransitorias ?? collect();
-                        @endphp
+                      
                 
                         @if ($historialCondicionesTransitorias->isNotEmpty())
                             <section class="c-card">
