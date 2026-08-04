@@ -4,7 +4,7 @@ MySQL - 8.0.41 : Database - ambientes
 *********************************************************************
 */
 
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 /*!40101 SET SQL_MODE=''*/;
 
@@ -12,7 +12,7 @@ MySQL - 8.0.41 : Database - ambientes
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`ambientes` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE IF NOT EXISTS `ambientes` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE `ambientes`;
 
@@ -32,7 +32,7 @@ CREATE TABLE `actividades` (
   KEY `actividades_tema_id_foreign` (`tema_id`),
   CONSTRAINT `actividades_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE CASCADE,
   CONSTRAINT `actividades_chk_1` CHECK (json_valid(`configuracion`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `actividades` */
 
@@ -51,7 +51,7 @@ CREATE TABLE `ajustes_temporales` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `ajustes_temporales_estudiante_id_clave_unique` (`estudiante_id`,`clave`),
   CONSTRAINT `ajustes_temporales_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `ajustes_temporales` */
 
@@ -69,7 +69,7 @@ CREATE TABLE `ambiente_grado` (
   KEY `grado_id` (`grado_id`),
   CONSTRAINT `ambiente_grado_ibfk_1` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`),
   CONSTRAINT `ambiente_grado_ibfk_2` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `ambiente_grado` */
 
@@ -110,7 +110,7 @@ CREATE TABLE `ambiente_institucion` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `ambiente_id` bigint unsigned NOT NULL,
   `institucion_id` bigint unsigned NOT NULL,
-  `ip` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `ip` varchar(45) DEFAULT NULL,
   `puerto` smallint unsigned DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE `ambiente_institucion` (
   KEY `ambiente_institucion_institucion_id_foreign` (`institucion_id`),
   CONSTRAINT `ambiente_institucion_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `ambiente_institucion_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `ambiente_institucion` */
 
@@ -137,27 +137,27 @@ DROP TABLE IF EXISTS `ambientes`;
 
 CREATE TABLE `ambientes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `color_hex` varchar(9) COLLATE utf8mb4_general_ci NOT NULL,
-  `icono` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `servidor_ip` varchar(15) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `color_hex` varchar(9) NOT NULL,
+  `icono` varchar(255) NOT NULL,
+  `servidor_ip` varchar(15) DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `cupo_defecto` smallint unsigned NOT NULL DEFAULT '25',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `ambientes_slug_unique` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `ambientes` */
 
 insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values
-(6,'Expresión Artística','expresion-artistica','#0F6E56','????','192.168.1.20',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(7,'Polimotor','polimotor','#534AB7','????','192.168.1.21',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(8,'Multisaberes','multisaberes','#854F0B','????','192.168.1.22',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(9,'Multisensorial','multisensorial','#185FA5','????','192.168.1.23',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(10,'Tecnología','tecnologia','#993C1D','????','192.168.1.24',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25');
+(6,'Expresión Artística','expresion-artistica','#0F6E56','🎨','192.168.1.20',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(7,'Polimotor','polimotor','#534AB7','🤸','192.168.1.21',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(8,'Multisaberes','multisaberes','#854F0B','🧠','192.168.1.22',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(9,'Multisensorial','multisensorial','#185FA5','✋','192.168.1.23',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(10,'Tecnología','tecnologia','#993C1D','💻','192.168.1.24',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25');
 
 /*Table structure for table `asistencias` */
 
@@ -176,7 +176,7 @@ CREATE TABLE `asistencias` (
   KEY `asistencias_carga_docente_id_foreign` (`carga_docente_id`),
   CONSTRAINT `asistencias_carga_docente_id_foreign` FOREIGN KEY (`carga_docente_id`) REFERENCES `carga_docente` (`id`) ON DELETE CASCADE,
   CONSTRAINT `asistencias_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `asistencias` */
 
@@ -204,7 +204,7 @@ CREATE TABLE `carga_docente` (
   CONSTRAINT `carga_docente_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `carga_docente_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`),
   CONSTRAINT `carga_docente_grupo_id_foreign` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `carga_docente` */
 
@@ -233,7 +233,7 @@ CREATE TABLE `cola_sincronizacion` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `cola_sincronizacion_chk_1` CHECK (json_valid(`payload`))
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `cola_sincronizacion` */
 
@@ -289,7 +289,7 @@ CREATE TABLE `condiciones` (
   `vista_info_asociada` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo` (`codigo`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones` */
 
@@ -316,7 +316,7 @@ CREATE TABLE `condiciones_orden` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_institucion_condicion` (`id_institucion`,`id_condicion`),
   KEY `idx_institucion_orden` (`id_institucion`,`orden`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones_orden` */
 
@@ -345,7 +345,7 @@ CREATE TABLE `condiciones_transitorias` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones_transitorias` */
 
@@ -374,7 +374,7 @@ CREATE TABLE `condiciones_transitorias_orden` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_institucion_condicion_transitoria` (`id_institucion`,`id_condicion_transitoria`),
   KEY `idx_institucion_orden` (`id_institucion`,`orden`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `condiciones_transitorias_orden` */
 
@@ -407,7 +407,7 @@ CREATE TABLE `configuracion_pins` (
   PRIMARY KEY (`id`),
   KEY `configuracion_pins_estudiante_id_foreign` (`estudiante_id`),
   CONSTRAINT `configuracion_pins_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `configuracion_pins` */
 
@@ -434,7 +434,7 @@ CREATE TABLE `configuraciones` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `configuraciones_clave_unique` (`clave`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `configuraciones` */
 
@@ -452,7 +452,7 @@ CREATE TABLE `departamentos` (
   `codigo` varchar(5) NOT NULL,
   `descripcion` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`codigo`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `departamentos` */
 
@@ -512,7 +512,7 @@ CREATE TABLE `docentes` (
   PRIMARY KEY (`id`),
   KEY `docentes_user_id_foreign` (`user_id`),
   CONSTRAINT `docentes_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `docentes` */
 
@@ -540,7 +540,7 @@ CREATE TABLE `estudiante_ambiente` (
   KEY `estudiante_ambiente_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `estudiante_ambiente_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `estudiante_ambiente_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiante_ambiente` */
 
@@ -631,7 +631,7 @@ CREATE TABLE `estudiante_condicion_transitoria` (
   CONSTRAINT `estudiante_condicion_transitoria_ibfk_1` FOREIGN KEY (`id_estudiante`) REFERENCES `estudiantes` (`id`),
   CONSTRAINT `estudiante_condicion_transitoria_ibfk_2` FOREIGN KEY (`id_condicion_transitoria`) REFERENCES `condiciones_transitorias` (`id`),
   CONSTRAINT `estudiante_condicion_transitoria_ibfk_3` FOREIGN KEY (`id_docente`) REFERENCES `docentes` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiante_condicion_transitoria` */
 
@@ -646,36 +646,36 @@ DROP TABLE IF EXISTS `estudiantes`;
 
 CREATE TABLE `estudiantes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `apellido` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `avatar` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `tipo_identificacion` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `apellido` varchar(255) DEFAULT NULL,
+  `avatar` text,
+  `tipo_identificacion` varchar(10) DEFAULT NULL,
   `identificacion` int NOT NULL,
-  `iniciales` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `grado_id` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `color_avatar` varchar(9) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#0F6E56',
+  `iniciales` varchar(3) NOT NULL,
+  `grado_id` text,
+  `color_avatar` varchar(9) NOT NULL DEFAULT '#0F6E56',
   `condicion_id` int DEFAULT '1',
   `condicion_transitoria_id` int DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
-  `fecha_nacimiento` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `acudiente` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `telefono_acudiente` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `fecha_nacimiento` text,
+  `acudiente` text,
+  `telefono_acudiente` text,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `requiere_apoyo` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'no',
-  `sexo` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `requiere_apoyo` varchar(15) DEFAULT 'no',
+  `sexo` text,
   `estado_piar` int DEFAULT '0',
-  `otro_tipo_identificacion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `lugar_nacimiento` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `otro_tipo_identificacion` varchar(255) DEFAULT NULL,
+  `lugar_nacimiento` text,
   `departamento_id` int DEFAULT NULL,
   `municipio_id` int DEFAULT NULL,
-  `barrio_vereda` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `direccion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `telefono` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `email` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `barrio_vereda` text,
+  `direccion` text,
+  `telefono` text,
+  `email` text,
   `institucion_id` int DEFAULT NULL,
   PRIMARY KEY (`id`,`identificacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiantes` */
 
@@ -726,7 +726,7 @@ CREATE TABLE `failed_jobs` (
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `failed_jobs` */
 
@@ -744,7 +744,7 @@ CREATE TABLE `grados` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `grados` */
 
@@ -769,7 +769,7 @@ CREATE TABLE `grupos` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `grp_unique` (`grado_id`,`nombre`,`anio_lectivo`),
   CONSTRAINT `grupos_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `grupos` */
 
@@ -789,17 +789,17 @@ DROP TABLE IF EXISTS `instituciones`;
 
 CREATE TABLE `instituciones` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `municipio` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `departamento` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `codigo_dane` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
-  `logo` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `correo_contacto` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `municipio` varchar(100) NOT NULL,
+  `departamento` varchar(100) NOT NULL,
+  `codigo_dane` varchar(20) NOT NULL,
+  `logo` varchar(255) DEFAULT NULL,
+  `correo_contacto` varchar(255) NOT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `instituciones` */
 
@@ -828,7 +828,7 @@ CREATE TABLE `matriculas` (
   CONSTRAINT `matriculas_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
   CONSTRAINT `matriculas_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`),
   CONSTRAINT `matriculas_grupo_id_foreign` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `matriculas` */
 
@@ -873,7 +873,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `migrations` */
 
@@ -935,7 +935,7 @@ CREATE TABLE `modulos` (
   PRIMARY KEY (`id`),
   KEY `modulos_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `modulos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `modulos` */
 
@@ -948,7 +948,7 @@ CREATE TABLE `municipios` (
   `descripcion` varchar(50) NOT NULL,
   `coddep` varchar(2) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1120 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1120 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `municipios` */
 
@@ -2089,7 +2089,7 @@ CREATE TABLE `notas_docente` (
   KEY `notas_docente_user_id_foreign` (`user_id`),
   CONSTRAINT `notas_docente_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE CASCADE,
   CONSTRAINT `notas_docente_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `notas_docente` */
 
@@ -2113,7 +2113,7 @@ CREATE TABLE `observaciones` (
   CONSTRAINT `observaciones_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `observaciones_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE SET NULL,
   CONSTRAINT `observaciones_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `observaciones` */
 
@@ -2126,7 +2126,7 @@ CREATE TABLE `password_reset_tokens` (
   `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `password_reset_tokens` */
 
@@ -2148,7 +2148,7 @@ CREATE TABLE `personal_access_tokens` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `personal_access_tokens` */
 
@@ -2160,9 +2160,9 @@ CREATE TABLE `piar` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
   `docente_id` bigint unsigned DEFAULT NULL,
-  `estado` enum('borrador','revisado','aprobado') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'borrador',
+  `estado` enum('borrador','revisado','aprobado') NOT NULL DEFAULT 'borrador',
   `paso` int DEFAULT NULL,
-  `fecha_diligenciamiento` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `fecha_diligenciamiento` text,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `activo` int DEFAULT '1',
@@ -2171,7 +2171,7 @@ CREATE TABLE `piar` (
   KEY `piar_docente_id_foreign` (`docente_id`),
   CONSTRAINT `piar_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `piar_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar` */
 
@@ -2186,7 +2186,7 @@ CREATE TABLE `piar_acta_compromiso` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_acta_compromiso` */
 
@@ -2203,7 +2203,7 @@ CREATE TABLE `piar_acta_compromiso_actividades` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_acta_compromiso_actividades` */
 
@@ -2223,7 +2223,7 @@ CREATE TABLE `piar_ajuste_razonable` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_ajuste_razonable` */
 
@@ -2239,7 +2239,7 @@ CREATE TABLE `piar_ajuste_razonable_docente_firma` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_ajuste_razonable_docente_firma` */
 
@@ -2259,7 +2259,7 @@ CREATE TABLE `piar_ajuste_razonable_item` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_ajuste_razonable_item` */
 
@@ -2275,7 +2275,7 @@ CREATE TABLE `piar_atencion_medica` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_atencion_medica` */
 
@@ -2303,7 +2303,7 @@ CREATE TABLE `piar_datos_generales` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_datos_generales` */
 
@@ -2327,7 +2327,7 @@ CREATE TABLE `piar_entorno_educativo` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_entorno_educativo` */
 
@@ -2356,7 +2356,7 @@ CREATE TABLE `piar_entorno_hogar` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_entorno_hogar` */
 
@@ -2381,7 +2381,7 @@ CREATE TABLE `piar_entorno_salud` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_entorno_salud` */
 
@@ -2398,7 +2398,7 @@ CREATE TABLE `piar_medicamento` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_medicamento` */
 
@@ -2414,7 +2414,7 @@ CREATE TABLE `piar_tratamiento` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_tratamiento` */
 
@@ -2425,189 +2425,189 @@ DROP TABLE IF EXISTS `piar_valoracion_pedagogica`;
 CREATE TABLE `piar_valoracion_pedagogica` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `vp_mov_apoyo_sistema` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_mov_apoyo_sistema_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_mov_ajustes_espacio` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_mov_ajustes_espacio_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_mov_ajustes_movilidad` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_mov_ajustes_movilidad_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_mov_motricidad_fina` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_mov_motricidad_fina_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_mov_adaptacion_agarrar` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_mov_adaptacion_agarrar_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_mov_intensidad` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_com_apoyo_sistema` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_com_apoyo_sistema_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_com_aditamentos` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_com_aditamentos_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_com_ajustes` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_com_ajustes_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_com_intensidad` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_info_apoyo_sistema` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_info_apoyo_sistema_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_info_ajustes` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_info_ajustes_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_info_intensidad` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_soc_apoyo_regulacion` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_soc_apoyo_regulacion_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_soc_ajustes_interaccion` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_soc_ajustes_interaccion_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_soc_intensidad` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_acad_ajustes_permanencia` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_acad_ajustes_permanencia_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_acad_ajustes_tiempos` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_acad_ajustes_tiempos_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `vp_acad_intensidad` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `vp_observaciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_1` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_1_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_2` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_2_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_3` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_3_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_4` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_4_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_5` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_5_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_6` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_6_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_7` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_7_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_8` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_8_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_9` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_9_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_10` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_10_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_11` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_11_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_12` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_12_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_13` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_13_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_14` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_14_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_15` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_15_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_16` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_16_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_17` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_17_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_18` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `cle_18_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `cle_observaciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `vp_mov_apoyo_sistema` varchar(10) DEFAULT NULL,
+  `vp_mov_apoyo_sistema_obs` text,
+  `vp_mov_ajustes_espacio` varchar(10) DEFAULT NULL,
+  `vp_mov_ajustes_espacio_obs` text,
+  `vp_mov_ajustes_movilidad` varchar(10) DEFAULT NULL,
+  `vp_mov_ajustes_movilidad_obs` text,
+  `vp_mov_motricidad_fina` varchar(10) DEFAULT NULL,
+  `vp_mov_motricidad_fina_obs` text,
+  `vp_mov_adaptacion_agarrar` varchar(10) DEFAULT NULL,
+  `vp_mov_adaptacion_agarrar_obs` text,
+  `vp_mov_intensidad` varchar(50) DEFAULT NULL,
+  `vp_com_apoyo_sistema` varchar(10) DEFAULT NULL,
+  `vp_com_apoyo_sistema_obs` text,
+  `vp_com_aditamentos` varchar(10) DEFAULT NULL,
+  `vp_com_aditamentos_obs` text,
+  `vp_com_ajustes` varchar(10) DEFAULT NULL,
+  `vp_com_ajustes_obs` text,
+  `vp_com_intensidad` varchar(50) DEFAULT NULL,
+  `vp_info_apoyo_sistema` varchar(10) DEFAULT NULL,
+  `vp_info_apoyo_sistema_obs` text,
+  `vp_info_ajustes` varchar(10) DEFAULT NULL,
+  `vp_info_ajustes_obs` text,
+  `vp_info_intensidad` varchar(50) DEFAULT NULL,
+  `vp_soc_apoyo_regulacion` varchar(10) DEFAULT NULL,
+  `vp_soc_apoyo_regulacion_obs` text,
+  `vp_soc_ajustes_interaccion` varchar(10) DEFAULT NULL,
+  `vp_soc_ajustes_interaccion_obs` text,
+  `vp_soc_intensidad` varchar(50) DEFAULT NULL,
+  `vp_acad_ajustes_permanencia` varchar(10) DEFAULT NULL,
+  `vp_acad_ajustes_permanencia_obs` text,
+  `vp_acad_ajustes_tiempos` varchar(10) DEFAULT NULL,
+  `vp_acad_ajustes_tiempos_obs` text,
+  `vp_acad_intensidad` varchar(50) DEFAULT NULL,
+  `vp_observaciones` text,
+  `cle_1` varchar(10) DEFAULT NULL,
+  `cle_1_obs` text,
+  `cle_2` varchar(10) DEFAULT NULL,
+  `cle_2_obs` text,
+  `cle_3` varchar(10) DEFAULT NULL,
+  `cle_3_obs` text,
+  `cle_4` varchar(10) DEFAULT NULL,
+  `cle_4_obs` text,
+  `cle_5` varchar(10) DEFAULT NULL,
+  `cle_5_obs` text,
+  `cle_6` varchar(10) DEFAULT NULL,
+  `cle_6_obs` text,
+  `cle_7` varchar(10) DEFAULT NULL,
+  `cle_7_obs` text,
+  `cle_8` varchar(10) DEFAULT NULL,
+  `cle_8_obs` text,
+  `cle_9` varchar(10) DEFAULT NULL,
+  `cle_9_obs` text,
+  `cle_10` varchar(10) DEFAULT NULL,
+  `cle_10_obs` text,
+  `cle_11` varchar(10) DEFAULT NULL,
+  `cle_11_obs` text,
+  `cle_12` varchar(10) DEFAULT NULL,
+  `cle_12_obs` text,
+  `cle_13` varchar(10) DEFAULT NULL,
+  `cle_13_obs` text,
+  `cle_14` varchar(10) DEFAULT NULL,
+  `cle_14_obs` text,
+  `cle_15` varchar(10) DEFAULT NULL,
+  `cle_15_obs` text,
+  `cle_16` varchar(10) DEFAULT NULL,
+  `cle_16_obs` text,
+  `cle_17` varchar(10) DEFAULT NULL,
+  `cle_17_obs` text,
+  `cle_18` varchar(10) DEFAULT NULL,
+  `cle_18_obs` text,
+  `cle_observaciones` text,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `clm_1` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_1_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_2` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_2_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_3` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_3_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_4` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_4_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `clm_1` varchar(10) DEFAULT NULL,
+  `clm_1_obs` text,
+  `clm_2` varchar(10) DEFAULT NULL,
+  `clm_2_obs` text,
+  `clm_3` varchar(10) DEFAULT NULL,
+  `clm_3_obs` text,
+  `clm_4` varchar(10) DEFAULT NULL,
+  `clm_4_obs` text,
   `clm_5_desde` int DEFAULT NULL,
   `clm_5_hasta` int DEFAULT NULL,
-  `clm_5` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_5_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_6` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_6_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_7` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_7_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_8` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_8_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_9` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_9_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_10` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_10_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_11` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_11_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_12` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_12_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_13` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_13_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_14` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_14_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_15` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_15_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_16` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_16_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_17` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_17_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_18` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_18_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_19` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `clm_19_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `clm_observaciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_mem_1` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_mem_1_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_mem_2` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_mem_2_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_mem_3` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_mem_3_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_mem_4` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_mem_4_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_mem_5` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_mem_5_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_mem_6` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_mem_6_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_mem_7` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_mem_7_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_ate_1` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_ate_1_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_ate_2` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_ate_2_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_ate_3` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_ate_3_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_ate_4` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_ate_4_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_ate_4_tiempo` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_per_1` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_per_1_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_per_2` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_per_2_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_per_3` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_per_3_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_per_4` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_per_4_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_per_5` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_per_5_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_fe_1` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_fe_1_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_fe_2` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_fe_2_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_fe_3` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_fe_3_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_fe_4` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_fe_4_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_fe_5` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_fe_5_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_fe_6` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_fe_6_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_1` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_1_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_2` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_2_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_3` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_3_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_4` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_4_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_5` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_5_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_6` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_6_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_7` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_7_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_8` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_8_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_9` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_9_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `dba_lc_10` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `dba_lc_10_obs` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `habilidades_destrezas` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `estrategias_acciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `clm_5` varchar(10) DEFAULT NULL,
+  `clm_5_obs` text,
+  `clm_6` varchar(10) DEFAULT NULL,
+  `clm_6_obs` text,
+  `clm_7` varchar(10) DEFAULT NULL,
+  `clm_7_obs` text,
+  `clm_8` varchar(10) DEFAULT NULL,
+  `clm_8_obs` text,
+  `clm_9` varchar(10) DEFAULT NULL,
+  `clm_9_obs` text,
+  `clm_10` varchar(10) DEFAULT NULL,
+  `clm_10_obs` text,
+  `clm_11` varchar(10) DEFAULT NULL,
+  `clm_11_obs` text,
+  `clm_12` varchar(10) DEFAULT NULL,
+  `clm_12_obs` text,
+  `clm_13` varchar(10) DEFAULT NULL,
+  `clm_13_obs` text,
+  `clm_14` varchar(10) DEFAULT NULL,
+  `clm_14_obs` text,
+  `clm_15` varchar(10) DEFAULT NULL,
+  `clm_15_obs` text,
+  `clm_16` varchar(10) DEFAULT NULL,
+  `clm_16_obs` text,
+  `clm_17` varchar(10) DEFAULT NULL,
+  `clm_17_obs` text,
+  `clm_18` varchar(10) DEFAULT NULL,
+  `clm_18_obs` text,
+  `clm_19` varchar(10) DEFAULT NULL,
+  `clm_19_obs` text,
+  `clm_observaciones` text,
+  `dba_mem_1` varchar(10) DEFAULT NULL,
+  `dba_mem_1_obs` text,
+  `dba_mem_2` varchar(10) DEFAULT NULL,
+  `dba_mem_2_obs` text,
+  `dba_mem_3` varchar(10) DEFAULT NULL,
+  `dba_mem_3_obs` text,
+  `dba_mem_4` varchar(10) DEFAULT NULL,
+  `dba_mem_4_obs` text,
+  `dba_mem_5` varchar(10) DEFAULT NULL,
+  `dba_mem_5_obs` text,
+  `dba_mem_6` varchar(10) DEFAULT NULL,
+  `dba_mem_6_obs` text,
+  `dba_mem_7` varchar(10) DEFAULT NULL,
+  `dba_mem_7_obs` text,
+  `dba_ate_1` varchar(10) DEFAULT NULL,
+  `dba_ate_1_obs` text,
+  `dba_ate_2` varchar(10) DEFAULT NULL,
+  `dba_ate_2_obs` text,
+  `dba_ate_3` varchar(10) DEFAULT NULL,
+  `dba_ate_3_obs` text,
+  `dba_ate_4` varchar(10) DEFAULT NULL,
+  `dba_ate_4_obs` text,
+  `dba_ate_4_tiempo` varchar(10) DEFAULT NULL,
+  `dba_per_1` varchar(10) DEFAULT NULL,
+  `dba_per_1_obs` text,
+  `dba_per_2` varchar(10) DEFAULT NULL,
+  `dba_per_2_obs` text,
+  `dba_per_3` varchar(10) DEFAULT NULL,
+  `dba_per_3_obs` text,
+  `dba_per_4` varchar(10) DEFAULT NULL,
+  `dba_per_4_obs` text,
+  `dba_per_5` varchar(10) DEFAULT NULL,
+  `dba_per_5_obs` text,
+  `dba_fe_1` varchar(10) DEFAULT NULL,
+  `dba_fe_1_obs` text,
+  `dba_fe_2` varchar(10) DEFAULT NULL,
+  `dba_fe_2_obs` text,
+  `dba_fe_3` varchar(10) DEFAULT NULL,
+  `dba_fe_3_obs` text,
+  `dba_fe_4` varchar(10) DEFAULT NULL,
+  `dba_fe_4_obs` text,
+  `dba_fe_5` varchar(10) DEFAULT NULL,
+  `dba_fe_5_obs` text,
+  `dba_fe_6` varchar(10) DEFAULT NULL,
+  `dba_fe_6_obs` text,
+  `dba_lc_1` varchar(10) DEFAULT NULL,
+  `dba_lc_1_obs` text,
+  `dba_lc_2` varchar(10) DEFAULT NULL,
+  `dba_lc_2_obs` text,
+  `dba_lc_3` varchar(10) DEFAULT NULL,
+  `dba_lc_3_obs` text,
+  `dba_lc_4` varchar(10) DEFAULT NULL,
+  `dba_lc_4_obs` text,
+  `dba_lc_5` varchar(10) DEFAULT NULL,
+  `dba_lc_5_obs` text,
+  `dba_lc_6` varchar(10) DEFAULT NULL,
+  `dba_lc_6_obs` text,
+  `dba_lc_7` varchar(10) DEFAULT NULL,
+  `dba_lc_7_obs` text,
+  `dba_lc_8` varchar(10) DEFAULT NULL,
+  `dba_lc_8_obs` text,
+  `dba_lc_9` varchar(10) DEFAULT NULL,
+  `dba_lc_9_obs` text,
+  `dba_lc_10` varchar(10) DEFAULT NULL,
+  `dba_lc_10_obs` text,
+  `habilidades_destrezas` text,
+  `estrategias_acciones` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_valoracion_pedagogica` */
 
@@ -2629,7 +2629,7 @@ CREATE TABLE `portafolios` (
   CONSTRAINT `portafolios_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `portafolios_tema_id_foreign` FOREIGN KEY (`tema_id`) REFERENCES `temas` (`id`) ON DELETE CASCADE,
   CONSTRAINT `portafolios_chk_1` CHECK (json_valid(`contenido`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `portafolios` */
 
@@ -2647,7 +2647,7 @@ CREATE TABLE `registros_acceso` (
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `registros_acceso` */
 
@@ -2676,7 +2676,7 @@ CREATE TABLE `seguridad_logs` (
   KEY `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
   CONSTRAINT `seguridad_logs_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `seguridad_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `seguridad_logs` */
 
@@ -2705,7 +2705,7 @@ CREATE TABLE `temas` (
   PRIMARY KEY (`id`),
   KEY `temas_modulo_id_foreign` (`modulo_id`),
   CONSTRAINT `temas_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `temas` */
 
@@ -2716,15 +2716,15 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `institucion_id` bigint unsigned DEFAULT NULL,
-  `identificacion` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `apellido` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `rol` enum('superAdmin','admin','docente') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'docente',
-  `estado` enum('activo','inactivo','eliminado') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'activo',
+  `identificacion` varchar(50) NOT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `apellido` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `rol` enum('superAdmin','admin','docente') NOT NULL DEFAULT 'docente',
+  `estado` enum('activo','inactivo','eliminado') NOT NULL DEFAULT 'activo',
   `creado_por` bigint unsigned DEFAULT NULL,
-  `remember_token` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `remember_token` varchar(100) DEFAULT NULL,
   `bloqueado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -2734,7 +2734,7 @@ CREATE TABLE `users` (
   KEY `users_creado_por_foreign` (`creado_por`),
   CONSTRAINT `users_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `users_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `users` */
 
