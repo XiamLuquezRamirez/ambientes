@@ -5,11 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Panel Docente') — Aulas Reggio</title>
+    <title>@yield('title', 'Super Admin') — PedNia</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
     <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}">
@@ -25,12 +23,13 @@
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
 </head>
 
+
 <body>
 
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="Aulas Reggio"
+                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="PedNia"
                     style="width:100%;height:100%;object-fit:contain;filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
             </span>
         </div>

@@ -28,7 +28,7 @@
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="Aulas Reggio"
+                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="PedNia"
                     style="width:100%;height:100%;object-fit:contain;filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
             </span>
         </div>
