@@ -101,7 +101,7 @@ class Estudiante extends Model
         );
     }
 
-    /** Condición distinta de estándar → requiere seguimiento PIAR / botón Ver PIAR */
+    /** perfil de aprendizaje distinta de estándar → requiere seguimiento PIAR / botón Ver PIAR */
     protected function condicionEsEstandar(): Attribute
     {
         return Attribute::make(

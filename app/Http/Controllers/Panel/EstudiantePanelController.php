@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
-use App\Models\PerfilAprendizaje;
+use App\Models\PerfilAprendizajeInclusion;
 use App\Models\PerfilAprendizajePersonalizado;
 use App\Models\PerfilAprendizajePersonalizadoOrden;
 use App\Models\ConfiguracionPin;
@@ -182,7 +182,7 @@ class EstudiantePanelController extends Controller
 
         $estudiantes = $consulta->paginate(12)->withQueryString();
 
-        $condiciones = PerfilAprendizaje::where('estado', true)->orderBy('nombre')->get();
+        $condiciones = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get();
         $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
@@ -344,7 +344,7 @@ class EstudiantePanelController extends Controller
     }
 
     /**
-     * Activa una condición transitoria para el estudiante.
+     * Activa un perfil de aprendizaje personalizado para el estudiante.
      * Solo puede haber una activa por estudiante.
      */
     public function activarPerfilAprendizajePersonalizado(Request $request, Estudiante $estudiante)
@@ -374,13 +374,13 @@ class EstudiantePanelController extends Controller
 
         if (! $permitida) {
             return back()->withErrors([
-                'id_condicion_transitoria' => 'La condición transitoria no está habilitada para esta institución.',
+                'id_condicion_transitoria' => 'El perfil de aprendizaje personalizado no está habilitado para esta institución.',
             ]);
         }
 
         if ($estudiante->condicionTransitoriaActiva()->exists()) {
             return back()->withErrors([
-                'id_condicion_transitoria' => 'El estudiante ya tiene una condición transitoria activa.',
+                'id_condicion_transitoria' => 'El estudiante ya tiene un perfil de aprendizaje personalizado activo.',
             ]);
         }
 
@@ -405,7 +405,7 @@ class EstudiantePanelController extends Controller
 
         return redirect()
             ->route('panel.estudiantes.show', $estudiante)
-            ->with('success', 'Condición transitoria'.($etiqueta ? " «{$etiqueta}»" : '').' activada correctamente.');
+            ->with('success', 'perfil de aprendizaje personalizado'.($etiqueta ? " «{$etiqueta}»" : '').' activado correctamente.');
     }
 
     public function tomarAsistencia(CargaDocente $carga)

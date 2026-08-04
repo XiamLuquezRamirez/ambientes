@@ -115,7 +115,7 @@ class PerfilAprendizajeInclusionController extends Controller
         if (! $vista) {
             return response()->json([
                 'success' => false,
-                'message' => 'Esta condición no tiene una vista de información asociada.',
+                'message' => 'Este perfil de aprendizaje no tiene una vista de información asociada.',
             ], 422);
         }
 
@@ -152,7 +152,7 @@ class PerfilAprendizajeInclusionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición creada correctamente.',
+            'message' => 'perfil de aprendizaje creado correctamente.',
             'condicion' => $condicion,
         ]);
     }
@@ -177,7 +177,7 @@ class PerfilAprendizajeInclusionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición actualizada correctamente.',
+            'message' => 'perfil de aprendizaje actualizado correctamente.',
             'condicion' => $condicionInclusion->fresh()->loadCount('estudiantes'),
         ]);
     }
@@ -192,7 +192,7 @@ class PerfilAprendizajeInclusionController extends Controller
                 'success' => false,
                 'requiere_confirmacion' => true,
                 'estudiantes_asignados' => $estudiantesAsignados,
-                'message' => "Esta condición tiene {$estudiantesAsignados} estudiante(s) asignado(s). ¿Desea desactivarla de todas formas?",
+                'message' => "Este perfil de aprendizaje tiene {$estudiantesAsignados} estudiante(s) asignado(s). ¿Desea desactivarla de todas formas?",
             ], 422);
         }
 
@@ -201,8 +201,8 @@ class PerfilAprendizajeInclusionController extends Controller
         return response()->json([
             'success' => true,
             'message' => $nuevoEstado === 1
-                ? 'Condición activada correctamente.'
-                : 'Condición desactivada correctamente.',
+                ? 'perfil de aprendizaje activado correctamente.'
+                : 'perfil de aprendizaje desactivado correctamente.',
             'estado' => $nuevoEstado,
             'estudiantes_asignados' => $estudiantesAsignados,
         ]);
@@ -213,7 +213,7 @@ class PerfilAprendizajeInclusionController extends Controller
         if ($condicionInclusion->es_sistema) {
             return response()->json([
                 'success' => false,
-                'message' => 'No se puede eliminar una condición de sistema.',
+                'message' => 'No se puede eliminar un perfil de aprendizaje de sistema.',
             ], 422);
         }
 
@@ -231,7 +231,7 @@ class PerfilAprendizajeInclusionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición eliminada correctamente.',
+            'message' => 'perfil de aprendizaje eliminado correctamente.',
         ]);
     }
 

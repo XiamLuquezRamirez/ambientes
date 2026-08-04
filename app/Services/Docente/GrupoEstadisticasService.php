@@ -35,7 +35,7 @@ class GrupoEstadisticasService
     }
 
     /**
-     * La alerta de PIAR solo aplica a matriculados con condición distinta de estándar.
+     * La alerta de PIAR solo aplica a matriculados con perfil de aprendizaje distinta de estándar.
      */
     public function esCondicionEstandar($estudiante): bool
     {
@@ -43,7 +43,7 @@ class GrupoEstadisticasService
     }
 
     /**
-     * Normaliza la condición del estudiante a una clave estable del panel
+     * Normaliza el perfil de aprendizaje del estudiante a una clave estable del panel
      * (estandar, tea, tdah, etc.), ya sea string legado o relación PerfilAprendizaje.
      */
     public function resolverClaveCondicion($estudiante): string

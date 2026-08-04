@@ -1168,7 +1168,7 @@
     transition: opacity .2s ease;
 }
 
-/* Select filtrable — condición transitoria */
+/* Select filtrable — perfil de aprendizaje personalizado */
 .ct-select {
     position: relative;
 }
@@ -1315,7 +1315,7 @@
 }
 
 /*==========================
-    MODAL ACTIVAR CONDICIÓN TRANSICTORIA
+    MODAL ACTIVAR PERFIL DE APRENDIZAJE PERSONALIZADO
 ===========================*/
 
 .btn-outline-pink {

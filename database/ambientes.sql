@@ -2569,12 +2569,12 @@ CREATE TABLE condiciones (
 
 /*Data for the table `condiciones` */
 INSERT INTO condiciones (codigo,nombre,descripcion_corta,estado,color_hex,es_sistema) VALUES
-('COND-001','Estandar','Descripción corta de la condición',1,'#000000',1),
-('COND-002','TDAH','Descripción corta de la condición',1,'#000000',1),
-('COND-003','TEA','Descripción corta de la condición',1,'#000000',1),
-('COND-004','Síndrome de Down','Descripción corta de la condición',1,'#000000',1),
-('COND-005','Discapacidad Visual','Descripción corta de la condición',1,'#000000',1),
-('COND-006','Discapacidad Auditiva','Descripción corta de la condición',1,'#000000',1);
+('COND-001','Estandar','Descripción corta del perfil de aprendizaje',1,'#000000',1),
+('COND-002','TDAH','Descripción corta del perfil de aprendizaje',1,'#000000',1),
+('COND-003','TEA','Descripción corta del perfil de aprendizaje',1,'#000000',1),
+('COND-004','Síndrome de Down','Descripción corta del perfil de aprendizaje',1,'#000000',1),
+('COND-005','Discapacidad Visual','Descripción corta del perfil de aprendizaje',1,'#000000',1),
+('COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1);
 
 /*Table structure for table `condiciones_transitorias` */
 
@@ -2596,11 +2596,11 @@ CREATE TABLE condiciones_transitorias (
 
 /*Data for the table `condiciones_transitorias` */
 INSERT INTO condiciones_transitorias (codigo, etiqueta, descripcion_interna, condicion_base_id, es_sistema, estado, usuario_crea) VALUES
-('CTR-002', 'Sospecha de TDAH', 'Descripción corta de la condición', 2, 1, 1, 1),
-('CTR-003', 'Sospecha de TEA', 'Descripción corta de la condición', 3, 1, 1, 1),
-('CTR-004', 'Sospecha de Síndrome de Down', 'Descripción corta de la condición', 4, 1, 1, 1),
-('CTR-005', 'Sospecha de Discapacidad Visual', 'Descripción corta de la condición', 5, 1, 1, 1),
-('CTR-006', 'Sospecha de Discapacidad Auditiva', 'Descripción corta de la condición', 6, 1, 1, 1);
+('CTR-002', 'Sospecha de TDAH', 'Descripción corta del perfil de aprendizaje', 2, 1, 1, 1),
+('CTR-003', 'Sospecha de TEA', 'Descripción corta del perfil de aprendizaje', 3, 1, 1, 1),
+('CTR-004', 'Sospecha de Síndrome de Down', 'Descripción corta del perfil de aprendizaje', 4, 1, 1, 1),
+('CTR-005', 'Sospecha de Discapacidad Visual', 'Descripción corta del perfil de aprendizaje', 5, 1, 1, 1),
+('CTR-006', 'Sospecha de Discapacidad Auditiva', 'Descripción corta del perfil de aprendizaje', 6, 1, 1, 1);
 
 /*Table structure for table `condiciones_orden` */
 

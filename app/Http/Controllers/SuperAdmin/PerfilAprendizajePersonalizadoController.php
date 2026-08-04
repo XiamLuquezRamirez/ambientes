@@ -123,7 +123,7 @@ class PerfilAprendizajePersonalizadoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición transitoria creada correctamente.',
+            'message' => 'perfil de aprendizaje personalizado creado correctamente.',
             'condicion' => $condicion,
         ]);
     }
@@ -147,7 +147,7 @@ class PerfilAprendizajePersonalizadoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición transitoria actualizada correctamente.',
+            'message' => 'perfil de aprendizaje personalizado actualizado correctamente.',
             'condicion' => $condicionTransitoria->fresh(),
         ]);
     }
@@ -162,8 +162,8 @@ class PerfilAprendizajePersonalizadoController extends Controller
         return response()->json([
             'success' => true,
             'message' => $nuevoEstado === 1
-                ? 'Condición activada correctamente.'
-                : 'Condición desactivada correctamente. Ya no aparecerá en el selector del docente.',
+                ? 'perfil de aprendizaje personalizado activado correctamente.'
+                : 'perfil de aprendizaje personalizado desactivado correctamente. Ya no aparecerá en el selector del docente.',
             'estado' => $nuevoEstado,
         ]);
     }
@@ -175,7 +175,7 @@ class PerfilAprendizajePersonalizadoController extends Controller
         if ($condicionTransitoria->es_sistema) {
             return response()->json([
                 'success' => false,
-                'message' => 'No se puede eliminar una condición de sistema.',
+                'message' => 'No se puede eliminar un perfil de aprendizaje de sistema.',
             ], 422);
         }
 
@@ -195,7 +195,7 @@ class PerfilAprendizajePersonalizadoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición transitoria eliminada correctamente.',
+            'message' => 'perfil de aprendizaje personalizado eliminado correctamente.',
         ]);
     }
 
@@ -225,7 +225,7 @@ class PerfilAprendizajePersonalizadoController extends Controller
             $condicion->es_sistema
             || ($condicion->id_institucion && $condicion->id_institucion !== $usuario?->institucion_id)
         ) {
-            abort(403, 'No autorizado para gestionar esta condición.');
+            abort(403, 'No autorizado para gestionar este perfil de aprendizaje personalizado.');
         }
     }
 

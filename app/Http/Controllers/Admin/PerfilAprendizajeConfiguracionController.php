@@ -64,8 +64,8 @@ class PerfilAprendizajeConfiguracionController extends Controller
         return response()->json([
             'success' => true,
             'message' => $condicionOrden->activa
-                ? 'Condición activada para la institución.'
-                : 'Condición desactivada para la institución.',
+                ? 'perfil de aprendizaje activado para la institución.'
+                : 'perfil de aprendizaje desactivado para la institución.',
             'activa' => (bool) $condicionOrden->activa,
         ]);
     }

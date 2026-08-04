@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\PerfilAprendizaje;
+use App\Models\PerfilAprendizajeInclusion;
 use App\Models\Departamento;
 use App\Models\Docente;
 use App\Models\Estudiante;
@@ -55,7 +55,7 @@ class PiarController extends Controller
     {
         $usuario = Auth::guard('docente')->user();
         $estudiante = Estudiante::with('grado', 'departamento', 'municipio')->where('id', $idEstudiante)->first();
-        $condiciones = PerfilAprendizaje::all();
+        $condiciones = PerfilAprendizajeInclusion::all();
 
         // municipios
         $municipios = Municipio::all();

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\PerfilAprendizaje;
+use App\Models\PerfilAprendizajeInclusion;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
 use App\Models\Estudiante;
@@ -23,7 +23,7 @@ class EstudianteAdminController extends Controller
         $figuras = FigurasModel::getFiguras();
 
         $grados = Grado::where('activo', true)->orderBy('nombre')->get();
-        $condiciones = PerfilAprendizaje::where('estado', true)->orderBy('nombre')->get();
+        $condiciones = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get();
         $consulta = Estudiante::with('grado', 'configuracionPin')->where('activo', '<>', 2);
         $departamentos = Departamento::orderBy('descripcion')->get();
         /* ── Filtros ────────────────────────────────────── */

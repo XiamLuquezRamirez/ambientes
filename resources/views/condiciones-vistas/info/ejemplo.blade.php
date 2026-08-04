@@ -1,9 +1,9 @@
 {{-- Vista de ejemplo para vista_info_asociada: condiciones.info.ejemplo --}}
 <div class="condicion-info-contenido">
-    <h6 class="fw-bold mb-2" style="color:#1E3A8A">Información de la condición</h6>
+    <h6 class="fw-bold mb-2" style="color:#1E3A8A">Información del perfil de aprendizaje</h6>
     <p class="mb-2" style="color:#475569">
         Esta es una vista de ejemplo asociada a
-        <strong>{{ $condicion->nombre ?? 'la condición' }}</strong>
+        <strong>{{ $condicion->nombre ?? 'el perfil de aprendizaje' }}</strong>
         ({{ $condicion->codigo ?? '—' }}).
     </p>
     @if (!empty($condicion->descripcion_corta))

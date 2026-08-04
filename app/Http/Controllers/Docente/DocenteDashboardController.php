@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Docente;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\CargaDocente;
-use App\Models\PerfilAprendizaje;
+use App\Models\PerfilAprendizajeInclusion;
 use App\Models\Institucion;
 use App\Services\AmbienteService;
 use App\Services\Docente\AsistenciaService;
@@ -58,7 +58,7 @@ class DocenteDashboardController extends Controller
             $ambienteSeleccionado = $ambientes->first();
         }
 
-        $condiciones = PerfilAprendizaje::where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+        $condiciones = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
 
         $ambienteService = app(AmbienteService::class);
         $ambientes_disponibles = $ambienteService->getAmbientes();

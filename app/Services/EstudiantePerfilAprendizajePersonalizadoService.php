@@ -12,7 +12,7 @@ class EstudiantePerfilAprendizajePersonalizadoService
 {
     public const MOTIVOS_CIERRE = [
         'diagnostico_formal' => 'Diagnóstico formal confirmado',
-        'condicion_no_confirmada' => 'Condición no confirmada',
+        'condicion_no_confirmada' => 'perfil de aprendizaje personalizado no confirmado',
         'otro' => 'Otro',
     ];
 
@@ -22,7 +22,7 @@ class EstudiantePerfilAprendizajePersonalizadoService
             || (int) $condicion->id_institucion === $institucionId;
 
         if (! $pertenece) {
-            abort(403, 'La condición no pertenece a esta institución.');
+            abort(403, 'El perfil de aprendizaje personalizado no pertenece a esta institución.');
         }
     }
 

@@ -141,7 +141,7 @@ class PerfilAprendizajePersonalizadoPanelController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición transitoria creada correctamente.',
+            'message' => 'perfil de aprendizaje personalizado creado correctamente.',
             'condicion' => $condicion,
         ]);
     }
@@ -159,7 +159,7 @@ class PerfilAprendizajePersonalizadoPanelController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición transitoria actualizada correctamente.',
+            'message' => 'perfil de aprendizaje personalizado actualizado correctamente.',
             'condicion' => $condicionTransitoria->fresh(),
         ]);
     }
@@ -192,7 +192,7 @@ class PerfilAprendizajePersonalizadoPanelController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición transitoria eliminada correctamente.',
+            'message' => 'perfil de aprendizaje personalizado eliminado correctamente.',
         ]);
     }
 
@@ -211,8 +211,8 @@ class PerfilAprendizajePersonalizadoPanelController extends Controller
         return response()->json([
             'success' => true,
             'message' => $condicionTransitoriaOrden->activa
-                ? 'Condición activada correctamente.'
-                : 'Condición desactivada correctamente.',
+                ? 'perfil de aprendizaje personalizado activado correctamente.'
+                : 'perfil de aprendizaje personalizado desactivado correctamente.',
             'activa' => (bool) $condicionTransitoriaOrden->activa,
         ]);
     }
@@ -273,7 +273,7 @@ class PerfilAprendizajePersonalizadoPanelController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Estudiante desvinculado de la condición transitoria correctamente.',
+            'message' => 'Estudiante desvinculado de perfil de aprendizaje personalizado correctamente.',
         ]);
     }
 
