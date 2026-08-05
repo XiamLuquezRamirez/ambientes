@@ -248,7 +248,7 @@ class EstudiantePanelController extends Controller
      * Ficha completa del estudiante (panel docente).
      * Ruta: GET /panel/estudiantes/ficha/{estudiante} → panel.estudiantes.show
      */
-    public function verFicha(Estudiante $estudiante)
+    public function verFicha(Request $request, Estudiante $estudiante)
     {
         $figuras = FigurasModel::getFiguras();
         $docente = Auth::guard('docente')->user()->docente;
@@ -257,6 +257,8 @@ class EstudiantePanelController extends Controller
         if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
             abort(403, 'No tienes acceso a este estudiante.');
         }
+
+        $urlVolver = $this->resolverUrlVolverFicha($request, $estudiante);
 
         $estudiante->load([
             'perfilAprendizaje',
@@ -321,6 +323,7 @@ class EstudiantePanelController extends Controller
             'historialAsistencia' => $historialAsistencia,
             'resumenAsistencia' => $resumenAsistencia,
             ...$datosPerfilPersonalizado,
+            'urlVolver' => $urlVolver,
         ]);
     }
 
@@ -333,6 +336,88 @@ class EstudiantePanelController extends Controller
         }
 
         return $this->respuestaFragmentosPerfilAprendizajePersonalizado($estudiante);
+    }
+
+    /**
+     * Resuelve a dónde debe regresar el botón Volver de la ficha.
+     * Prioridad: ?volver= → página de origen (referer) → sesión → listado de estudiantes.
+     */
+    private function resolverUrlVolverFicha(Request $request, Estudiante $estudiante): string
+    {
+        $sessionKey = "ficha_estudiante_volver.{$estudiante->id}";
+        $fallback = route('panel.estudiantes');
+
+        $explicita = $request->query('volver');
+        if (is_string($explicita) && $explicita !== '') {
+            $explicita = str_starts_with($explicita, '/') ? url($explicita) : $explicita;
+            if ($this->esUrlVolverSegura($explicita, $estudiante)) {
+                session([$sessionKey => $explicita]);
+
+                return $explicita;
+            }
+        }
+
+        $anterior = url()->previous();
+        if ($this->esUrlOrigenFicha($anterior, $estudiante)) {
+            session([$sessionKey => $anterior]);
+
+            return $anterior;
+        }
+
+        $guardada = session($sessionKey);
+        if (is_string($guardada) && $this->esUrlVolverSegura($guardada, $estudiante)) {
+            return $guardada;
+        }
+
+        return $fallback;
+    }
+
+    /**
+     * Indica si la URL puede usarse como destino del botón Volver (misma app, no la ficha).
+     */
+    private function esUrlVolverSegura(string $url, Estudiante $estudiante): bool
+    {
+        $partes = parse_url($url);
+        if ($partes === false || empty($partes['path'])) {
+            return false;
+        }
+
+        if (isset($partes['scheme']) && ! in_array($partes['scheme'], ['http', 'https'], true)) {
+            return false;
+        }
+
+        if (isset($partes['host']) && $partes['host'] !== request()->getHost()) {
+            return false;
+        }
+
+        $path = rtrim($partes['path'], '/');
+        $fichaPath = rtrim((string) parse_url(route('panel.estudiantes.show', $estudiante), PHP_URL_PATH), '/');
+
+        return $path !== $fichaPath;
+    }
+
+    /**
+     * Indica si la URL es un origen válido para actualizar el retorno
+     * (excluye la ficha y páginas hijas del flujo del estudiante).
+     */
+    private function esUrlOrigenFicha(string $url, Estudiante $estudiante): bool
+    {
+        if (! $this->esUrlVolverSegura($url, $estudiante)) {
+            return false;
+        }
+
+        $path = rtrim((string) parse_url($url, PHP_URL_PATH), '/');
+        $portafolioPath = rtrim((string) parse_url(route('panel.portafolio.estudiante', $estudiante), PHP_URL_PATH), '/');
+
+        if ($path === $portafolioPath) {
+            return false;
+        }
+
+        if (str_contains($path, '/piar') || str_contains($path, 'diligenciar-piar')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Departamento;
 use App\Models\Institucion;
+use App\Models\Municipio;
 use App\Services\InstitucionLogoService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -19,8 +21,21 @@ class ConfiguracionAdminController extends Controller
     {
         $institucion = Institucion::with('ambientes')->findOrFail($this->institucionId());
         $ambientes = $institucion->ambientes;
+        $departamentos = Departamento::orderBy('descripcion')->get();
 
-        return view('admin.configuracion.institucion.index', compact('ambientes', 'institucion'));
+        return view('admin.configuracion.institucion.index', compact('ambientes', 'institucion', 'departamentos'));
+    }
+
+    /**
+     * Municipios de un departamento (coddep = codigo del departamento).
+     */
+    public function cargarMunicipios($departamento)
+    {
+        $municipios = Municipio::where('coddep', $departamento)
+            ->orderBy('descripcion')
+            ->get(['id', 'descripcion', 'coddep']);
+
+        return response()->json($municipios);
     }
 
     /**
@@ -34,10 +49,26 @@ class ConfiguracionAdminController extends Controller
         $datos = $request->validate([
             'nombre' => 'required|string|max:255',
             'codigo_dane' => 'required|string|max:20|unique:instituciones,codigo_dane,'.$institucion->id,
-            'municipio' => 'required|string|max:100',
-            'departamento' => 'required|string|max:100',
+            'departamento_id' => 'required|exists:departamentos,codigo',
+            'municipio_id' => 'required|exists:municipios,id',
             'correo_contacto' => 'required|email|max:255',
+        ], [
+            'departamento_id.required' => 'Seleccione un departamento.',
+            'departamento_id.exists' => 'El departamento seleccionado no es válido.',
+            'municipio_id.required' => 'Seleccione un municipio.',
+            'municipio_id.exists' => 'El municipio seleccionado no es válido.',
         ]);
+
+        $departamento = Departamento::where('codigo', $datos['departamento_id'])->firstOrFail();
+        $municipio = Municipio::where('id', $datos['municipio_id'])
+            ->where('coddep', $departamento->codigo)
+            ->first();
+
+        if (! $municipio) {
+            throw ValidationException::withMessages([
+                'municipio_id' => ['El municipio no pertenece al departamento seleccionado.'],
+            ]);
+        }
 
         if (! filled($institucion->logo)) {
             throw ValidationException::withMessages([
@@ -45,7 +76,13 @@ class ConfiguracionAdminController extends Controller
             ]);
         }
 
-        $institucion->update($datos);
+        $institucion->update([
+            'nombre' => $datos['nombre'],
+            'codigo_dane' => $datos['codigo_dane'],
+            'departamento' => $departamento->descripcion,
+            'municipio' => $municipio->descripcion,
+            'correo_contacto' => $datos['correo_contacto'],
+        ]);
 
         return response()->json([
             'success' => true,
@@ -76,6 +113,11 @@ class ConfiguracionAdminController extends Controller
             ];
         })->values();
 
+        [$departamentoId, $municipioId] = $this->resolverIdsUbicacion(
+            $institucion->departamento,
+            $institucion->municipio
+        );
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -84,6 +126,8 @@ class ConfiguracionAdminController extends Controller
                 'codigo_dane' => $institucion->codigo_dane,
                 'municipio' => $institucion->municipio,
                 'departamento' => $institucion->departamento,
+                'departamento_id' => $departamentoId,
+                'municipio_id' => $municipioId,
                 'correo_contacto' => $institucion->correo_contacto,
                 'activo' => (bool) $institucion->activo,
                 'logo' => $institucion->logo,
@@ -120,6 +164,30 @@ class ConfiguracionAdminController extends Controller
             'logo_url_publica' => $resultado['logo_url_publica'],
             'iniciales' => $resultado['iniciales'],
         ]);
+    }
+
+    /**
+     * Resuelve descripciones guardadas → codigo departamento / id municipio.
+     */
+    private function resolverIdsUbicacion(?string $departamentoNombre, ?string $municipioNombre): array
+    {
+        if (! filled($departamentoNombre)) {
+            return [null, null];
+        }
+
+        $departamento = Departamento::where('descripcion', $departamentoNombre)->first();
+        if (! $departamento) {
+            return [null, null];
+        }
+
+        $municipioId = null;
+        if (filled($municipioNombre)) {
+            $municipioId = Municipio::where('descripcion', $municipioNombre)
+                ->where('coddep', $departamento->codigo)
+                ->value('id');
+        }
+
+        return [$departamento->codigo, $municipioId];
     }
 
     private function institucionId(): int

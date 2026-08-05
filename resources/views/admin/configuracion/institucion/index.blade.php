@@ -70,16 +70,22 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label class="form-label fw-bold" for="municipio">Municipio</label>
-                            <input type="text" id="municipio" name="municipio" class="form-control"
-                                placeholder="Municipio de la institución" required>
+                            <label class="form-label fw-bold" for="departamento_id">Departamento</label>
+                            <select id="departamento_id" name="departamento_id" class="form-control" required
+                                onchange="cargarMunicipiosInstitucion()">
+                                <option value="">Seleccione</option>
+                                @foreach ($departamentos as $d)
+                                    <option value="{{ $d->codigo }}">{{ $d->descripcion }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label class="form-label fw-bold" for="departamento">Departamento</label>
-                            <input type="text" id="departamento" name="departamento" class="form-control"
-                                placeholder="Departamento de la institución" required>
+                            <label class="form-label fw-bold" for="municipio_id">Municipio</label>
+                            <select id="municipio_id" name="municipio_id" class="form-control" required>
+                                <option value="">Seleccione</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -155,9 +161,42 @@
     <script>
         const URL_CONFIGURACION_BASE = @json(url('admin/configuracion'));
         const URL_CONFIGURACION_UPDATE = @json(route('admin.configuracion.update'));
+        const URL_CARGAR_MUNICIPIOS = @json(url('admin/configuracion/cargar-municipios'));
         const INSTITUCION_ID = @json((int) session('institucion_id'));
 
         cargarDatosInstitucion(INSTITUCION_ID);
+
+        async function cargarMunicipiosInstitucion(municipioSeleccionado = null) {
+            const departamento = document.getElementById('departamento_id')?.value;
+            const selMunicipio = document.getElementById('municipio_id');
+            if (!selMunicipio) return;
+
+            selMunicipio.innerHTML = '<option value="">Seleccione</option>';
+
+            if (!departamento) return;
+
+            try {
+                const res = await fetch(`${URL_CARGAR_MUNICIPIOS}/${departamento}`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!res.ok) throw new Error('Error al cargar municipios');
+                const municipios = await res.json();
+
+                (municipios || []).forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.id;
+                    opt.textContent = m.descripcion;
+                    if (municipioSeleccionado != null && String(m.id) === String(municipioSeleccionado)) {
+                        opt.selected = true;
+                    }
+                    selMunicipio.appendChild(opt);
+                });
+            } catch (e) {
+                mostrarToast('error', 'Error al cargar los municipios');
+            }
+        }
 
         function cargarDatosInstitucion(id) {
             fetch(`${URL_CONFIGURACION_BASE}/datos/${id}`, {
@@ -181,9 +220,18 @@
         function mapearDatosInstitucion(data) {
             $('#nombre').val(data.nombre ?? '');
             $('#codigo_dane').val(data.codigo_dane ?? '');
-            $('#municipio').val(data.municipio ?? '');
-            $('#departamento').val(data.departamento ?? '');
             $('#correo_contacto').val(data.correo_contacto ?? '');
+
+            const departamentoId = data.departamento_id ?? '';
+            $('#departamento_id').val(departamentoId);
+            if (departamentoId) {
+                cargarMunicipiosInstitucion(data.municipio_id ?? null);
+            } else {
+                const selMunicipio = document.getElementById('municipio_id');
+                if (selMunicipio) {
+                    selMunicipio.innerHTML = '<option value="">Seleccione</option>';
+                }
+            }
 
             (data.ambientes || []).forEach(function(amb) {
                 const ip = document.getElementById(`ambiente_ip_${amb.id}`);

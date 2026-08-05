@@ -603,6 +603,29 @@
             guardarAdministrador();
         });
 
+        // Copiar contraseña al portapapeles.
+        $(document).on('click', '.btn-copiar', function() {
+            const inputId = $(this).data('target');
+            const texto = $('#' + inputId).val();
+            navigator.clipboard.writeText(texto)
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copiado al portapapeles',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                })
+                .catch(() => {
+                    Swal.fire(
+                        'Error',
+                        'No fue posible copiar el texto.',
+                        'error'
+                    );
+                });
+
+        });
+
         document.getElementById('btnDescargarPdf')?.addEventListener('click', function() {
             const id = this.dataset.usuarioId;
             if (!id) return;

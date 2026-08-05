@@ -173,6 +173,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
     Route::post('configuracion/logo', [ConfiguracionAdminController::class, 'subirLogo'])->name('admin.configuracion.logo');
     Route::get('configuracion/datos/{id}', [ConfiguracionAdminController::class, 'verDatosInstitucion'])->name('admin.configuracion.datos');
+    Route::get('configuracion/cargar-municipios/{departamento}', [ConfiguracionAdminController::class, 'cargarMunicipios'])->name('admin.configuracion.cargar-municipios');
 
     Route::get('configuracion/perfil-aprendizaje', [PerfilAprendizajeConfiguracionController::class, 'index'])->name('admin.configuracion.perfil-aprendizaje.index');
     Route::patch('configuracion/perfil-aprendizaje/orden', [PerfilAprendizajeConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.perfil-aprendizaje.orden');
@@ -307,6 +308,7 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
 
     // Instituciones
     Route::get('instituciones', [InstitucionSuperAdminController::class, 'index'])->name('superadmin.instituciones.index');
+    Route::get('instituciones/cargar-municipios/{departamento}', [InstitucionSuperAdminController::class, 'cargarMunicipios'])->name('superadmin.instituciones.cargar-municipios');
     Route::get('instituciones/datos/{id}', [InstitucionSuperAdminController::class, 'ver'])->name('superadmin.instituciones.ver');
     Route::post('instituciones', [InstitucionSuperAdminController::class, 'guardar'])->name('superadmin.instituciones.guardar');
     Route::put('instituciones/{id}', [InstitucionSuperAdminController::class, 'actualizar'])->name('superadmin.instituciones.actualizar');
