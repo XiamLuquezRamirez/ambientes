@@ -15,26 +15,26 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($condiciones as $condicion)
+            @forelse ($perfilesAprendizajePersonalizado as $perfilAprendizajePersonalizado)
                 @php
-                    $claveGrupo = $condicion->condicion_base_id ?? '__sin_base__';
-                    $color = $condicion->condicionBase?->color_hex ?: '#64748B';
-                    $activos = $condicion->estudiantes_activos_count ?? 0;
-                    $total = $condicion->estudiantes_count ?? 0;
-                    $puedeGestionar = $esSuperAdmin || ! $condicion->es_sistema;
+                    $claveGrupo = $perfilAprendizajePersonalizado->perfil_aprendizaje_id ?? '__sin_base__';
+                    $color = $perfilAprendizajePersonalizado->perfilAprendizaje?->color_hex ?: '#64748B';
+                    $activos = $perfilAprendizajePersonalizado->estudiantes_activos_count ?? 0;
+                    $total = $perfilAprendizajePersonalizado->estudiantes_count ?? 0;
+                    $puedeGestionar = $esSuperAdmin || ! $perfilAprendizajePersonalizado->es_sistema;
                 @endphp
 
                 @if ($grupoActual !== $claveGrupo)
                     @php $grupoActual = $claveGrupo; @endphp
-                    <tr class="grupo-condicion-base">
+                    <tr class="grupo-perfil-aprendizaje-base">
                         <td colspan="6"
                             style="background:#F8FAFC;font-weight:700;color:#1E3A8A;padding:10px 16px;border-top:2px solid #DBEAFE">
-                            @if ($condicion->condicionBase)
+                            @if ($perfilAprendizajePersonalizado->perfilAprendizaje)
                                 <span class="badge"
                                     style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55;margin-right:8px">
-                                    {{ $condicion->condicionBase->codigo }}
+                                    {{ $perfilAprendizajePersonalizado->perfilAprendizaje->codigo }}
                                 </span>
-                                {{ $condicion->condicionBase->nombre }}
+                                {{ $perfilAprendizajePersonalizado->perfilAprendizaje->nombre }}
                             @else
                                 <span class="badge badge-gray" style="margin-right:8px">Sin base</span>
                                 Sin perfil de aprendizaje base
@@ -43,14 +43,14 @@
                     </tr>
                 @endif
 
-                <tr id="fila-transitoria-{{ $condicion->id }}">
+                <tr id="fila-transitoria-{{ $perfilAprendizajePersonalizado->id }}">
                     <td>
                         <span class="badge"
                             style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55">
-                            {{ $condicion->codigo }}
+                            {{ $perfilAprendizajePersonalizado->codigo }}
                         </span>
                     </td>
-                    <td style="font-weight:600;color:#1E293B">{{ $condicion->etiqueta }}</td>
+                    <td style="font-weight:600;color:#1E293B">{{ $perfilAprendizajePersonalizado->etiqueta }}</td>
                     <td class="text-center">
                         <span class="badge {{ $activos > 0 ? 'badge-blue' : 'badge-gray' }}"
                             title="Estudiantes activos / total asociados">
@@ -66,16 +66,16 @@
                             <div class="form-check form-switch mb-0">
                                 <input class="form-check-input toggle-estado-transitoria" type="checkbox"
                                     role="switch" style="cursor:pointer"
-                                    data-id="{{ $condicion->id }}"
-                                    data-nombre="{{ e($condicion->etiqueta) }}"
-                                    @checked($condicion->activa())
+                                    data-id="{{ $perfilAprendizajePersonalizado->id }}"
+                                    data-nombre="{{ e($perfilAprendizajePersonalizado->etiqueta) }}"
+                                    @checked($perfilAprendizajePersonalizado->activa())
                                     @disabled(! $puedeGestionar)
-                                    title="{{ $condicion->activa() ? 'Desactivar' : 'Activar' }}">
+                                    title="{{ $perfilAprendizajePersonalizado->activa() ? 'Desactivar' : 'Activar' }}">
                             </div>
                         </div>
                     </td>
                     <td>
-                        @if ($condicion->es_sistema)
+                        @if ($perfilAprendizajePersonalizado->es_sistema)
                             <span class="badge badge-orange">Sistema</span>
                         @else
                             <span class="badge badge-gray">Adicional</span>
@@ -86,26 +86,26 @@
                             <div class="tabla-acciones" style="justify-content:center">
                                 <div class="dropdown tabla-opciones-dropdown">
                                     <button class="btn-accion btn-opciones-toggle dropdown-toggle" type="button"
-                                        id="dropdownTransitoria{{ $condicion->id }}" data-bs-toggle="dropdown"
+                                        id="dropdownTransitoria{{ $perfilAprendizajePersonalizado->id }}" data-bs-toggle="dropdown"
                                         aria-expanded="false">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                         Opciones
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-acciones"
-                                        aria-labelledby="dropdownTransitoria{{ $condicion->id }}">
+                                        aria-labelledby="dropdownTransitoria{{ $perfilAprendizajePersonalizado->id }}">
                                         <li>
                                             <button type="button" class="btn-accion btn-editar"
-                                                onclick="abrirModalEditarTransitoria({{ $condicion->id }})">
+                                                onclick="abrirModalEditarTransitoria({{ $perfilAprendizajePersonalizado->id }})">
                                                 <i class="fa-solid fa-pencil"></i>
                                                 Editar
                                             </button>
                                         </li>
-                                        @if (!$condicion->es_sistema)
+                                        @if (!$perfilAprendizajePersonalizado->es_sistema)
                                             <li>
                                                 <button type="button"
                                                     class="btn-accion btn-eliminar btn-eliminar-transitoria"
-                                                    data-id="{{ $condicion->id }}"
-                                                    data-nombre="{{ e($condicion->etiqueta) }}"
+                                                    data-id="{{ $perfilAprendizajePersonalizado->id }}"
+                                                    data-nombre="{{ e($perfilAprendizajePersonalizado->etiqueta) }}"
                                                     data-estudiantes="{{ $total }}">
                                                     <i class="fa-solid fa-trash-can"></i>
                                                     Eliminar
@@ -131,4 +131,4 @@
     </table>
 </div>
 
-{{ $condiciones->links('vendor.pagination.proyecto') }}
+{{ $perfilesAprendizajePersonalizado->links('vendor.pagination.proyecto') }}

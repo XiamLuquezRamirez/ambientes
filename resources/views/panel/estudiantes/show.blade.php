@@ -5,13 +5,13 @@
 @section('title', 'Ficha del estudiante')
 
 @php
-    $condicionNombre = $estudiante->condicion?->nombre ?? 'Estándar';
+    $perfilAprendizajeNombre = $estudiante->perfilAprendizaje?->nombre ?? 'Estándar';
     $requiereApoyo = in_array(strtolower((string) $estudiante->requiere_apoyo), ['si', 'sí', '1', 'true'], true);
 @endphp
 
 @section('content')
     @php
-        $condicionNombre = $estudiante->condicion_nombre;
+        $perfilAprendizajeNombre = $estudiante->perfilAprendizaje_nombre;
         $estadoPin = $estadoPin ?? $estudiante->estado_pin;
         $estadoPinLabel =
             $estadoPinLabel ??
@@ -36,7 +36,7 @@
         $ambiente = $ambiente ?? null;
         $portafolioReciente = $portafolioReciente ?? collect();
         $observacionesRecientes = $observacionesRecientes ?? collect();
-        $mostrarVerPiar = $mostrarVerPiar ?? !$estudiante->condicion_es_estandar;
+        $mostrarVerPiar = $mostrarVerPiar ?? !$estudiante->perfil_aprendizaje_es_estandar;
         $asistenciaHoy = $asistenciaHoy ?? null;
     @endphp
 
@@ -98,9 +98,9 @@
                     <h1 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--color-primary-dark);">
                         {{ $estudiante->nombre_completo }}</h1>
                     <div class="ficha-badges">
-                        @if ($estudiante->condicion->id == 1)
-                            <span class="stu-badge stu-badge--condicion">
-                               Perfil: {{ $estudiante->condicion->nombre }}
+                        @if ($estudiante->perfilAprendizaje->id == 1)
+                            <span class="stu-badge stu-badge--perfil-aprendizaje">
+                               Perfil: {{ $estudiante->perfilAprendizaje->nombre }}
                             </span>
                         @endif
                         <span class="stu-badge {{ $estudiante->activo ? 'stu-badge--activo' : 'stu-badge--inactivo' }}">
@@ -122,7 +122,7 @@
             </div>
         </section>
 
-        @if ($condicionTransitoriaActiva ?? null)
+        @if ($perfilAprendizajePersonalizadoActiva ?? null)
             <section class="c-card" style="border-color:#FDBA74;background:#FFF7ED;">
                 <h3 class="ficha-section-title" style="color:#C2410C;">
                     <i class="fa-solid fa-puzzle-piece me-1"></i> Perfil de aprendizaje personalizado activo
@@ -130,38 +130,38 @@
                 <dl class="ficha-dl">
                     <div>
                         <dt>Perfil de aprendizaje</dt>
-                        <dd>{{ $condicionTransitoriaActiva->condicionTransitoria?->etiqueta ?? '—' }}</dd>
+                        <dd>{{ $perfilAprendizajePersonalizadoActiva->perfilAprendizajePersonalizado?->etiqueta ?? '—' }}</dd>
                     </div>
                     <div>
                         <dt>Activada</dt>
-                        <dd>{{ $condicionTransitoriaActiva->fecha_activacion?->format('d/m/Y H:i') ?? '—' }}</dd>
+                        <dd>{{ $perfilAprendizajePersonalizadoActiva->fecha_activacion?->format('d/m/Y H:i') ?? '—' }}</dd>
                     </div>
                     <div>
                         <dt>Docente</dt>
                         <dd>
-                            {{ trim(($condicionTransitoriaActiva->docente?->user?->nombre ?? '') . ' ' . ($condicionTransitoriaActiva->docente?->user?->apellido ?? '')) ?: '—' }}
+                            {{ trim(($perfilAprendizajePersonalizadoActiva->docente?->user?->nombre ?? '') . ' ' . ($perfilAprendizajePersonalizadoActiva->docente?->user?->apellido ?? '')) ?: '—' }}
                         </dd>
                     </div>
                 </dl>
                 <p class="mb-0 mt-2" style="color:#9A3412;font-size:.92rem;">
-                    {{ $condicionTransitoriaActiva->observacion }}
+                    {{ $perfilAprendizajePersonalizadoActiva->observacion }}
                 </p>
             </section>
         @endif 
 
-        @if ($estudiante->condicion !== null && $estudiante->condicion->id != 1)
-            <section class="c-card" style="border-color:{{ $estudiante->condicion->color_hex }};background:#{{ $estudiante->condicion->color_hex }}22;">
-                <h3 class="ficha-section-title" style="color:{{ $estudiante->condicion->color_hex }};">
-                    <i class="fa-solid fa-puzzle-piece me-1"></i> Perfil de aprendizaje: {{ $estudiante->condicion->nombre }}
+        @if ($estudiante->perfilAprendizaje !== null && $estudiante->perfilAprendizaje->id != 1)
+            <section class="c-card" style="border-color:{{ $estudiante->perfilAprendizaje->color_hex }};background:#{{ $estudiante->perfilAprendizaje->color_hex }}22;">
+                <h3 class="ficha-section-title" style="color:{{ $estudiante->perfilAprendizaje->color_hex }};">
+                    <i class="fa-solid fa-puzzle-piece me-1"></i> Perfil de aprendizaje: {{ $estudiante->perfilAprendizaje->nombre }}
                 </h3>
                 <dl class="ficha-dl">   
                     <div>
                         <dt>Código</dt>
-                        <dd>{{ $estudiante->condicion->codigo }}</dd>
+                        <dd>{{ $estudiante->perfilAprendizaje->codigo }}</dd>
                     </div>
                     <div>
                         <dt>Descripción</dt>
-                        <dd>{{ $estudiante->condicion->descripcion_corta }}</dd>
+                        <dd>{{ $estudiante->perfilAprendizaje->descripcion_corta }}</dd>
                     </div>
                 </dl>
             </section>
@@ -232,16 +232,16 @@
                 @endif
 
                 @if ($estudiante->piar == null)
-                    @if (!($condicionesTransitorias ?? collect())->isEmpty())
+                    @if (!($perfilesAprendizajePersonalizado ?? collect())->isEmpty())
                         <button type="button" class="btn btn-outline-pink" data-bs-toggle="modal"
-                            data-bs-target="#modalCondicionTransitoria">
+                            data-bs-target="#modalPerfilAprendizajePersonalizado">
                             <i class="fa-solid fa-puzzle-piece"></i> Activar perfil de aprendizaje personalizado
                         </button>
                     @endif
                 @endif
 
-                @if ($condicionTransitoriaActiva !== null)
-                    <button type="button" class="btn btn-outline-pink" onclick="desactivarCondicionTransitoria({{ $estudiante->id }})" title="Desactivar perfil de aprendizaje personalizado">
+                @if ($perfilAprendizajePersonalizadoActiva !== null)
+                    <button type="button" class="btn btn-outline-pink" onclick="desactivarPerfilAprendizajePersonalizado({{ $estudiante->id }})" title="Desactivar perfil de aprendizaje personalizado">
                         <i class="fa-solid fa-puzzle-piece"></i> Desactivar perfil de aprendizaje personalizado
                     </button>
                 @endif
@@ -250,7 +250,7 @@
 
         @php
             $motivosCierreTransitoria = \App\Services\EstudiantePerfilAprendizajePersonalizadoService::MOTIVOS_CIERRE;
-            $historialCondicionesTransitorias = $historialCondicionesTransitorias ?? collect();
+            $historialPerfilesAprendizajePersonalizado = $historialPerfilesAprendizajePersonalizado ?? collect();
         @endphp
 
         {{-- Resumen: matrícula, PIN, PIAR --}}
@@ -276,9 +276,9 @@
                             Ambientes
                         </button>
                     </li>
-                    @if ($historialCondicionesTransitorias->isNotEmpty())
+                    @if ($historialPerfilesAprendizajePersonalizado->isNotEmpty())
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabCondicionesTransitorias">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabPerfilesAprendizajePersonalizado">
                                 <i class="fa-solid fa-puzzle-piece me-2"></i>
                                 Historial de perfiles de aprendizaje personalizados
                             </button>
@@ -432,11 +432,11 @@
                             <p class="ficha-empty">Sin ambientes asignados este año.</p>
                         @endif
                     </div>
-                    <div class="tab-pane fade" id="tabCondicionesTransitorias">
+                    <div class="tab-pane fade" id="tabPerfilesAprendizajePersonalizado">
                         <p class="ficha-section-title">Historial de perfiles de aprendizaje personalizados</p>
                       
                 
-                        @if ($historialCondicionesTransitorias->isNotEmpty())
+                        @if ($historialPerfilesAprendizajePersonalizado->isNotEmpty())
                             <section class="c-card">
                                 <h3 class="ficha-section-title">
                                     <i class="fa-solid fa-clock-rotate-left me-1"></i> Historial de perfiles de aprendizaje personalizados
@@ -453,11 +453,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($historialCondicionesTransitorias as $registro)
+                                            @foreach ($historialPerfilesAprendizajePersonalizado as $registro)
                                                 <tr>
                                                     <td>
-                                                        <strong>{{ $registro->condicionTransitoria?->etiqueta ?? '—' }}</strong>
-                                                        <small class="d-block text-muted">{{ $registro->condicionTransitoria?->codigo }}</small>
+                                                        <strong>{{ $registro->perfilAprendizajePersonalizado?->etiqueta ?? '—' }}</strong>
+                                                        <small class="d-block text-muted">{{ $registro->perfilAprendizajePersonalizado?->codigo }}</small>
                                                     </td>
                                                     <td>
                                                         @if ($registro->activa)
@@ -571,7 +571,7 @@
     </div>
 
     @include('panel.estudiantes.modalConfigurarPin')
-    @if (!($condicionTransitoriaActiva ?? null) && ($condicionesTransitorias ?? collect())->isNotEmpty())
+    @if (!($perfilAprendizajePersonalizadoActiva ?? null) && ($perfilesAprendizajePersonalizado ?? collect())->isNotEmpty())
         @include('panel.estudiantes.modalActivarPerfilAprendizajePersonalizado')
     @endif
 

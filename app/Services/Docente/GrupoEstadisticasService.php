@@ -17,7 +17,7 @@ class GrupoEstadisticasService
         })->count();
 
         $requierePiarSinDiligenciar = $matriculas->filter(function ($matricula) {
-            return ! $this->esCondicionEstandar($matricula->estudiante)
+            return ! $this->esPerfilAprendizajeEstandar($matricula->estudiante)
                 && empty($matricula->estudiante->piar);
         })->count();
 
@@ -37,51 +37,51 @@ class GrupoEstadisticasService
     /**
      * La alerta de PIAR solo aplica a matriculados con perfil de aprendizaje distinta de estándar.
      */
-    public function esCondicionEstandar($estudiante): bool
+    public function esPerfilAprendizajeEstandar($estudiante): bool
     {
-        return $this->resolverClaveCondicion($estudiante) === 'estandar';
+        return $this->resolverClavePerfilAprendizaje($estudiante) === 'estandar';
     }
 
     /**
      * Normaliza el perfil de aprendizaje del estudiante a una clave estable del panel
      * (estandar, tea, tdah, etc.), ya sea string legado o relación PerfilAprendizaje.
      */
-    public function resolverClaveCondicion($estudiante): string
+    public function resolverClavePerfilAprendizaje($estudiante): string
     {
-        [$condicionId, $condicionNombre] = $this->resolverCondicionDatos($estudiante);
+        [$perfilAprendizajeId, $perfilAprendizajeNombre] = $this->resolverPerfilAprendizajeDatos($estudiante);
 
-        return $this->normalizarNombreCondicion($condicionNombre, $condicionId);
+        return $this->normalizarNombrePerfilAprendizaje($perfilAprendizajeNombre, $perfilAprendizajeId);
     }
 
     /**
      * @return array{0: ?int, 1: string}
      */
-    public function resolverCondicionDatos($estudiante): array
+    public function resolverPerfilAprendizajeDatos($estudiante): array
     {
-        $condicion = $estudiante->condicion ?? null;
+        $perfilAprendizaje = $estudiante->perfilAprendizaje ?? null;
 
-        if (is_object($condicion) && isset($condicion->nombre)) {
+        if (is_object($perfilAprendizaje) && isset($perfilAprendizaje->nombre)) {
             return [
-                isset($condicion->id) ? (int) $condicion->id : ($estudiante->condicion_id ?? null),
-                (string) $condicion->nombre,
+                isset($perfilAprendizaje->id) ? (int) $perfilAprendizaje->id : ($estudiante->perfil_aprendizaje_id ?? null),
+                (string) $perfilAprendizaje->nombre,
             ];
         }
 
-        if (is_string($condicion) && $condicion !== '') {
+        if (is_string($perfilAprendizaje) && $perfilAprendizaje !== '') {
             return [
-                isset($estudiante->condicion_id) ? (int) $estudiante->condicion_id : null,
-                $condicion,
+                isset($estudiante->perfil_aprendizaje_id) ? (int) $estudiante->perfil_aprendizaje_id : null,
+                $perfilAprendizaje,
             ];
         }
 
-        $condicionId = isset($estudiante->condicion_id) ? (int) $estudiante->condicion_id : null;
+        $perfilAprendizajeId = isset($estudiante->perfil_aprendizaje_id) ? (int) $estudiante->perfil_aprendizaje_id : null;
 
-        return [$condicionId, $condicionId === 1 || $condicionId === null ? 'Estandar' : ''];
+        return [$perfilAprendizajeId, $perfilAprendizajeId === 1 || $perfilAprendizajeId === null ? 'Estandar' : ''];
     }
 
-    private function normalizarNombreCondicion(?string $nombre, ?int $condicionId = null): string
+    private function normalizarNombrePerfilAprendizaje(?string $nombre, ?int $perfilAprendizajeId = null): string
     {
-        if ($condicionId === 1) {
+        if ($perfilAprendizajeId === 1) {
             return 'estandar';
         }
 

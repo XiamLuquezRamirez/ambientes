@@ -7,10 +7,10 @@
     <div class="cfg-lista lista-transitorias-orden" id="listaTransitoriasOrden">
         @foreach ($items as $item)
             @php
-                $t = $item->condicionTransitoria;
-                $base = $t?->condicionBase;
+                $t = $item->perfilAprendizajePersonalizado;
+                $base = $t?->perfilAprendizaje;
                 $color = $base?->color_hex ?: '#64748B';
-                $conteo = $conteos[$item->condicion_transitoria_id] ?? ['total' => 0, 'activos' => 0];
+                $conteo = $conteos[$item->perfil_aprendizaje_personalizado_id] ?? ['total' => 0, 'activos' => 0];
                 $creadaPorDocente = $t?->creadaPorDocente() ?? false;
                 $puedeGestionar = $t
                     && ! $t->es_sistema

@@ -1,18 +1,18 @@
 {{-- Modal: activar perfil de aprendizaje personalizado (panel docente) --}}
 @php
-    $condicionesTransitorias = $condicionesTransitorias ?? collect();
+    $perfilesAprendizajePersonalizado = $perfilesAprendizajePersonalizado ?? collect();
 @endphp
 
-<div class="modal fade" id="modalCondicionTransitoria" tabindex="-1" aria-labelledby="modalCondicionTransitoriaLabel"
+<div class="modal fade" id="modalPerfilAprendizajePersonalizado" tabindex="-1" aria-labelledby="modalPerfilAprendizajePersonalizadoLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <form method="POST" action="{{ route('panel.estudiantes.perfil-aprendizaje-personalizado.activar', $estudiante) }}"
-            class="modal-content" id="formCondicionTransitoria">
+            class="modal-content" id="formPerfilAprendizajePersonalizado">
             @csrf
             <div class="modal-header">
                 <div class="modal-header-icon"><i class="fas fa-puzzle-piece text-white"></i></div>
                 <div class="flex-grow-1">
-                    <h5 class="modal-title mb-0" id="modalCondicionTransitoriaLabel">Activar perfil de aprendizaje personalizado</h5>
+                    <h5 class="modal-title mb-0" id="modalPerfilAprendizajePersonalizadoLabel">Activar perfil de aprendizaje personalizado</h5>
                     <p class="modal-subtitle mb-0">Solo puede haber una activa por estudiante</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -21,7 +21,7 @@
             <div class="modal-body" style="display:grid;gap:14px;">
                 <div>
                     <label class="form-label fw-semibold" for="ct_select_trigger">Perfil de aprendizaje personalizado</label>
-                    <input type="hidden" name="condicion_transitoria_id" id="condicion_transitoria_id" value="" required>
+                    <input type="hidden" name="perfil_aprendizaje_personalizado_id" id="perfil_aprendizaje_personalizado_id" value="" required>
 
                     <div class="ct-select" id="ctSelect">
                         <button type="button" class="ct-select-trigger" id="ct_select_trigger">
@@ -33,19 +33,19 @@
                             <div class="ct-select-search">
                                 <div class="ct-select-search-wrap">
                                     <i class="fa-solid fa-search"></i>
-                                    <input type="text" id="ctBuscarCondicion" placeholder="Buscar por nombre o código…"
+                                    <input type="text" id="ctBuscarPerfilAprendizajePersonalizado" placeholder="Buscar por nombre o código…"
                                         autocomplete="off">
                                 </div>
                             </div>
                             <div class="ct-select-list" id="ctSelectList">
-                                @forelse ($condicionesTransitorias as $condicion)
+                                @forelse ($perfilesAprendizajePersonalizado as $perfilAprendizajePersonalizado)
                                     <button type="button" class="ct-select-option"
-                                        data-id="{{ $condicion->id }}"
-                                        data-label="{{ $condicion->etiqueta }}"
-                                        data-codigo="{{ $condicion->codigo }}">
+                                        data-id="{{ $perfilAprendizajePersonalizado->id }}"
+                                        data-label="{{ $perfilAprendizajePersonalizado->etiqueta }}"
+                                        data-codigo="{{ $perfilAprendizajePersonalizado->codigo }}">
                                         <span class="ct-select-option-text">
-                                            <strong>{{ $condicion->etiqueta }}</strong>
-                                            <small>{{ $condicion->codigo }}</small>
+                                            <strong>{{ $perfilAprendizajePersonalizado->etiqueta }}</strong>
+                                            <small>{{ $perfilAprendizajePersonalizado->codigo }}</small>
                                         </span>
                                     </button>
                                 @empty
@@ -84,10 +84,10 @@
 
             const trigger = document.getElementById('ct_select_trigger');
             const label = document.getElementById('ctSelectLabel');
-            const hidden = document.getElementById('condicion_transitoria_id');
-            const buscar = document.getElementById('ctBuscarCondicion');
+            const hidden = document.getElementById('perfil_aprendizaje_personalizado_id');
+            const buscar = document.getElementById('ctBuscarPerfilAprendizajePersonalizado');
             const empty = document.getElementById('ctSelectEmpty');
-            const form = document.getElementById('formCondicionTransitoria');
+            const form = document.getElementById('formPerfilAprendizajePersonalizado');
             const options = () => Array.from(root.querySelectorAll('.ct-select-option'));
 
             function cerrar() {
@@ -148,7 +148,7 @@
                 }
             });
 
-            document.getElementById('modalCondicionTransitoria')?.addEventListener('hidden.bs.modal', () => {
+            document.getElementById('modalPerfilAprendizajePersonalizado')?.addEventListener('hidden.bs.modal', () => {
                 cerrar();
                 hidden.value = '';
                 label.textContent = 'Selecciona un perfil de aprendizaje…';

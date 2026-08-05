@@ -167,7 +167,7 @@
     background: #F8FAFC;
 }
 
-.btn-condiciones {
+.btn-perfiles-aprendizaje {
     justify-content: center;
     align-items: center;
     gap: 5px;
@@ -183,12 +183,12 @@
     box-shadow: 0 2px 8px rgba(37, 99, 235, .18);
 }
 
-.badge-estudiantes-condicion--click {
+.badge-estudiantes-perfil-aprendizaje--click {
     cursor: pointer;
     transition: transform .12s ease, box-shadow .12s ease;
 }
 
-.badge-estudiantes-condicion--click:hover {
+.badge-estudiantes-perfil-aprendizaje--click:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(37, 99, 235, .18);
 }

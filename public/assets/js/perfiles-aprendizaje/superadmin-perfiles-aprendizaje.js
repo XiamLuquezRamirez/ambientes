@@ -1,6 +1,6 @@
 (function() {
-    const $modal = $('#modalRegistrarCondicion');
-    const $form = $('#formRegistrarCondicion');
+    const $modal = $('#modalRegistrarPerfilAprendizaje');
+    const $form = $('#formRegistrarPerfilAprendizaje');
     const $colorPicker = $('#color_hex_picker');
     const $colorHex = $('#color_hex');
     let modoEdicion = false;
@@ -20,18 +20,18 @@
         }
     }
 
-    window.abrirModalRegistrarCondicion = function() {
+    window.abrirModalRegistrarPerfilAprendizaje = function() {
         modoEdicion = false;
         esSistemaActual = false;
-        resetFormRegistrarCondicion();
+        resetFormRegistrarPerfilAprendizaje();
         configurarModoCrear();
         irATabDatosGenerales();
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
     };
 
-    window.abrirModalEditarCondicion = function(id) {
+    window.abrirModalEditarPerfilAprendizaje = function(id) {
         modoEdicion = true;
-        resetFormRegistrarCondicion();
+        resetFormRegistrarPerfilAprendizaje();
         configurarModoEditar();
         irATabDatosGenerales();
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
@@ -45,31 +45,31 @@
         });
 
         $.ajax({
-            url: URL_CONDICION(id),
+            url: URL_PERFIL_APRENDIZAJE(id),
             type: 'GET',
             dataType: 'json',
             success: function(res) {
                 Swal.close();
 
-                if (!res.success || !res.condicion) {
+                if (!res.success || !res.perfil_aprendizaje) {
                     mostrarToast('error', 'No fue posible cargar el perfil de aprendizaje.');
-                    cerrarModalRegistrarCondicion();
+                    cerrarModalRegistrarPerfilAprendizaje();
                     return;
                 }
 
-                setearDatosCondicion(res.condicion);
+                setearDatosPerfilAprendizaje(res.perfil_aprendizaje);
             },
             error: function(xhr) {
                 Swal.close();
                 mostrarToast('error', xhr.responseJSON?.message || 'Error al consultar el perfil de aprendizaje.');
-                cerrarModalRegistrarCondicion();
+                cerrarModalRegistrarPerfilAprendizaje();
             }
         });
     };
 
     function configurarModoCrear() {
-        $('#modalRegistrarCondicionTitle').text('Nuevo Perfil de Aprendizaje');
-        $('#modalRegistrarCondicionSubtitle').text('Registre un perfil de aprendizaje global.');
+        $('#modalRegistrarPerfilAprendizajeTitle').text('Nuevo Perfil de Aprendizaje');
+        $('#modalRegistrarPerfilAprendizajeSubtitle').text('Registre un perfil de aprendizaje global.');
         $('#hintCodigoAuto').show();
         $('#wrapCodigo').hide();
         $('#wrapNombre').removeClass('col-md-8').addClass('col-12');
@@ -81,8 +81,8 @@
     }
 
     function configurarModoEditar() {
-        $('#modalRegistrarCondicionTitle').text('Editar Perfil de Aprendizaje');
-        $('#modalRegistrarCondicionSubtitle').text('Puede modificar nombre, descripción y color.');
+        $('#modalRegistrarPerfilAprendizajeTitle').text('Editar Perfil de Aprendizaje');
+        $('#modalRegistrarPerfilAprendizajeSubtitle').text('Puede modificar nombre, descripción y color.');
         $('#hintCodigoAuto').hide();
         $('#wrapCodigo').show();
         $('#wrapNombre').removeClass('col-12').addClass('col-md-8');
@@ -91,15 +91,15 @@
         $('#wrapEsSistema').show();
     }
 
-    function setearDatosCondicion(condicion) {
-        esSistemaActual = !!condicion.es_sistema;
+    function setearDatosPerfilAprendizaje(perfilAprendizaje) {
+        esSistemaActual = !!perfilAprendizaje.es_sistema;
 
-        $('#condicion_id').val(condicion.id);
-        $('#codigo').val(condicion.codigo || '');
-        $('#nombre').val(condicion.nombre || '');
-        $('#descripcion_corta').val(condicion.descripcion_corta || '');
+        $('#perfil_aprendizaje_id').val(perfilAprendizaje.id);
+        $('#codigo').val(perfilAprendizaje.codigo || '');
+        $('#nombre').val(perfilAprendizaje.nombre || '');
+        $('#descripcion_corta').val(perfilAprendizaje.descripcion_corta || '');
 
-        const color = (condicion.color_hex || '#2563EB').toString().toUpperCase();
+        const color = (perfilAprendizaje.color_hex || '#2563EB').toString().toUpperCase();
         $colorPicker.val(color);
         $colorHex.val(color);
 
@@ -108,13 +108,13 @@
         $('#es_sistema').prop('disabled', esSistemaActual);
     }
 
-    function cerrarModalRegistrarCondicion() {
+    function cerrarModalRegistrarPerfilAprendizaje() {
         bootstrap.Modal.getInstance($modal[0])?.hide();
     }
 
-    function resetFormRegistrarCondicion() {
+    function resetFormRegistrarPerfilAprendizaje() {
         $form[0].reset();
-        $('#condicion_id').val('');
+        $('#perfil_aprendizaje_id').val('');
         $('#codigo').val('');
         $form.find('.is-invalid').removeClass('is-invalid');
         $form.find('.invalid-feedback').remove();
@@ -166,14 +166,14 @@
         }
     }
 
-    function guardarCondicion() {
+    function guardarPerfilAprendizaje() {
         if (!$form[0].checkValidity()) {
             $form[0].reportValidity();
             irATabDatosGenerales();
             return;
         }
 
-        const id = $('#condicion_id').val();
+        const id = $('#perfil_aprendizaje_id').val();
         const datos = {
             nombre: ($('#nombre').val() || '').trim(),
             descripcion_corta: ($('#descripcion_corta').val() || '').trim(),
@@ -197,7 +197,7 @@
         });
 
         $.ajax({
-            url: modoEdicion ? URL_CONDICION(id) : URL_GUARDAR_CONDICION,
+            url: modoEdicion ? URL_PERFIL_APRENDIZAJE(id) : URL_GUARDAR_PERFIL_APRENDIZAJE,
             type: modoEdicion ? 'PUT' : 'POST',
             data: datos,
             dataType: 'json',
@@ -211,12 +211,12 @@
                     return;
                 }
 
-                cerrarModalRegistrarCondicion();
+                cerrarModalRegistrarPerfilAprendizaje();
                 Swal.close();
                 mostrarToast('success', res.message || 'El perfil de aprendizaje se guardó correctamente.');
 
-                if (typeof window.cargarTablaCondiciones === 'function') {
-                    window.cargarTablaCondiciones();
+                if (typeof window.cargarTablaPerfilesAprendizaje === 'function') {
+                    window.cargarTablaPerfilesAprendizaje();
                 }
             },
             error: function(xhr) {
@@ -247,10 +247,10 @@
 
     $colorPicker.on('input change', sincronizarColorDesdePicker);
     $colorHex.on('change blur', sincronizarColorDesdeTexto);
-    $('#btnGuardarCondicion').on('click', guardarCondicion);
+    $('#btnGuardarPerfilAprendizaje').on('click', guardarPerfilAprendizaje);
 
     $form.on('submit', function(e) {
         e.preventDefault();
-        guardarCondicion();
+        guardarPerfilAprendizaje();
     });
 })();

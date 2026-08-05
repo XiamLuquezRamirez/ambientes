@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class PerfilAprendizajePersonalizado extends Model
 {
-    protected $table = 'condiciones_transitorias';
+    protected $table = 'perfil_aprendizaje_personalizado';
 
     protected $fillable = [
         'institucion_id',
         'codigo',
         'etiqueta',
         'descripcion_interna',
-        'condicion_base_id',
+        'perfil_aprendizaje_id',
         'es_sistema',
         'estado',
         'usuario_crea',
@@ -39,9 +39,9 @@ class PerfilAprendizajePersonalizado extends Model
         return $codigo;
     }
 
-    public function condicionBase(): BelongsTo
+    public function perfilAprendizaje(): BelongsTo
     {
-        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'condicion_base_id');
+        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'perfil_aprendizaje_id');
     }
 
     public function institucion(): BelongsTo
@@ -56,12 +56,12 @@ class PerfilAprendizajePersonalizado extends Model
 
     public function estudiantes(): HasMany
     {
-        return $this->hasMany(Estudiante::class, 'condicion_transitoria_id');
+        return $this->hasMany(Estudiante::class, 'perfil_aprendizaje_personalizado_id');
     }
 
     public function asignacionesEstudiante(): HasMany
     {
-        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'condicion_transitoria_id');
+        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'perfil_aprendizaje_personalizado_id');
     }
 
     public function activa(): bool
@@ -93,7 +93,7 @@ class PerfilAprendizajePersonalizado extends Model
     public function scopeOrdenadas(Builder $query): Builder
     {
         return $query
-            ->orderBy('condicion_base_id')
+            ->orderBy('perfil_aprendizaje_id')
             ->orderBy('etiqueta');
     }
 

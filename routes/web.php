@@ -176,17 +176,17 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
     Route::get('configuracion/perfil-aprendizaje', [PerfilAprendizajeConfiguracionController::class, 'index'])->name('admin.configuracion.perfil-aprendizaje.index');
     Route::patch('configuracion/perfil-aprendizaje/orden', [PerfilAprendizajeConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.perfil-aprendizaje.orden');
-    Route::patch('configuracion/perfil-aprendizaje/{condicionOrden}/estado', [PerfilAprendizajeConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje.estado');
-    Route::get('configuracion/perfil-aprendizaje/{condicionInclusion}/estudiantes', [PerfilAprendizajeConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje.estudiantes');
+    Route::patch('configuracion/perfil-aprendizaje/{perfilAprendizajeOrden}/estado', [PerfilAprendizajeConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje.estado');
+    Route::get('configuracion/perfil-aprendizaje/{perfilAprendizajeInclusion}/estudiantes', [PerfilAprendizajeConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje.estudiantes');
 
     Route::get('configuracion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'index'])->name('admin.configuracion.perfil-aprendizaje-personalizado.index');
     Route::post('configuracion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'guardar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.guardar');
     Route::patch('configuracion/perfil-aprendizaje-personalizado/orden', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.perfil-aprendizaje-personalizado.orden');
-    Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'mostrar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.mostrar');
-    Route::put('configuracion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.actualizar');
-    Route::delete('configuracion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'eliminar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.eliminar');
-    Route::patch('configuracion/perfil-aprendizaje-personalizado/{condicionTransitoriaOrden}/estado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estado');
-    Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}/estudiantes', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estudiantes');
+    Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'mostrar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.mostrar');
+    Route::put('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.actualizar');
+    Route::delete('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'eliminar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.eliminar');
+    Route::patch('configuracion/perfil-aprendizaje-personalizado/{personalizadoOrden}/estado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estado');
+    Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}/estudiantes', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estudiantes');
     Route::post('configuracion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desasociar', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'desasociarEstudiante'])->name('admin.configuracion.perfil-aprendizaje-personalizado.desasociar');
 
     // Usuario
@@ -274,11 +274,11 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('inclusion', [InclusionController::class, 'listar'])->name('panel.inclusion');
     Route::get('inclusion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoPanelController::class, 'index'])->name('panel.inclusion.perfil-aprendizaje-personalizado');
     Route::post('inclusion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoPanelController::class, 'guardar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.guardar');
-    Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoPanelController::class, 'mostrar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.mostrar');
-    Route::put('inclusion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoPanelController::class, 'actualizar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.actualizar');
-    Route::delete('inclusion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoPanelController::class, 'eliminar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.eliminar');
-    Route::patch('inclusion/perfil-aprendizaje-personalizado/{condicionTransitoriaOrden}/estado', [PerfilAprendizajePersonalizadoPanelController::class, 'actualizarEstado'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estado');
-    Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}/estudiantes', [PerfilAprendizajePersonalizadoPanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estudiantes');
+    Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoPanelController::class, 'mostrar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.mostrar');
+    Route::put('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoPanelController::class, 'actualizar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.actualizar');
+    Route::delete('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoPanelController::class, 'eliminar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.eliminar');
+    Route::patch('inclusion/perfil-aprendizaje-personalizado/{personalizadoOrden}/estado', [PerfilAprendizajePersonalizadoPanelController::class, 'actualizarEstado'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estado');
+    Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}/estudiantes', [PerfilAprendizajePersonalizadoPanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estudiantes');
     Route::post('inclusion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desasociar', [PerfilAprendizajePersonalizadoPanelController::class, 'desasociarEstudiante'])->name('panel.inclusion.perfil-aprendizaje-personalizado.desasociar');
     Route::get('inclusion/{estudiante}', [InclusionController::class, 'verAjustes'])->name('panel.inclusion.ajustes');
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
@@ -327,19 +327,19 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     // Perfiles de Aprendizaje
     Route::get('perfil-aprendizaje', [PerfilAprendizajeInclusionController::class, 'index'])->name('superadmin.perfil-aprendizaje.index');
     Route::post('perfil-aprendizaje', [PerfilAprendizajeInclusionController::class, 'guardar'])->name('superadmin.perfil-aprendizaje.guardar');
-    Route::get('perfil-aprendizaje/{condicionInclusion}', [PerfilAprendizajeInclusionController::class, 'mostrar'])->name('superadmin.perfil-aprendizaje.mostrar');
-    Route::put('perfil-aprendizaje/{condicionInclusion}', [PerfilAprendizajeInclusionController::class, 'actualizar'])->name('superadmin.perfil-aprendizaje.actualizar');
-    Route::patch('perfil-aprendizaje/{condicionInclusion}/estado', [PerfilAprendizajeInclusionController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje.estado');
-    Route::patch('perfil-aprendizaje/{condicionInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'actualizarVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.actualizar');
-    Route::get('perfil-aprendizaje/{condicionInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'verVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.ver');
-    Route::delete('perfil-aprendizaje/{condicionInclusion}', [PerfilAprendizajeInclusionController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje.eliminar');
+    Route::get('perfil-aprendizaje/{perfilAprendizajeInclusion}', [PerfilAprendizajeInclusionController::class, 'mostrar'])->name('superadmin.perfil-aprendizaje.mostrar');
+    Route::put('perfil-aprendizaje/{perfilAprendizajeInclusion}', [PerfilAprendizajeInclusionController::class, 'actualizar'])->name('superadmin.perfil-aprendizaje.actualizar');
+    Route::patch('perfil-aprendizaje/{perfilAprendizajeInclusion}/estado', [PerfilAprendizajeInclusionController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje.estado');
+    Route::patch('perfil-aprendizaje/{perfilAprendizajeInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'actualizarVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.actualizar');
+    Route::get('perfil-aprendizaje/{perfilAprendizajeInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'verVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.ver');
+    Route::delete('perfil-aprendizaje/{perfilAprendizajeInclusion}', [PerfilAprendizajeInclusionController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje.eliminar');
 
     Route::get('perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoController::class, 'index'])->name('superadmin.perfil-aprendizaje-personalizado.index');
     Route::post('perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoController::class, 'guardar'])->name('superadmin.perfil-aprendizaje-personalizado.guardar');
-    Route::get('perfil-aprendizaje-personalizado/{condicionTransitoria}', [PerfilAprendizajePersonalizadoController::class, 'mostrar'])->name('superadmin.perfil-aprendizaje-personalizado.mostrar');
-    Route::put('perfil-aprendizaje-personalizado/{condicionTransitoria}', [PerfilAprendizajePersonalizadoController::class, 'actualizar'])->name('superadmin.perfil-aprendizaje-personalizado.actualizar');
-    Route::patch('perfil-aprendizaje-personalizado/{condicionTransitoria}/estado', [PerfilAprendizajePersonalizadoController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje-personalizado.estado');
-    Route::delete('perfil-aprendizaje-personalizado/{condicionTransitoria}', [PerfilAprendizajePersonalizadoController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje-personalizado.eliminar');
+    Route::get('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'mostrar'])->name('superadmin.perfil-aprendizaje-personalizado.mostrar');
+    Route::put('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'actualizar'])->name('superadmin.perfil-aprendizaje-personalizado.actualizar');
+    Route::patch('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}/estado', [PerfilAprendizajePersonalizadoController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje-personalizado.estado');
+    Route::delete('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje-personalizado.eliminar');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

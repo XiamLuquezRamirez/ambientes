@@ -11,10 +11,10 @@
     <div class="cfg-lista cfg-lista--panel" id="listaTransitoriasPanel">
         @foreach ($items as $item)
             @php
-                $t = $item->condicionTransitoria;
-                $base = $t?->condicionBase;
+                $t = $item->perfilAprendizajePersonalizado;
+                $base = $t?->perfilAprendizaje;
                 $color = $base?->color_hex ?: '#64748B';
-                $conteo = $conteos[$item->condicion_transitoria_id] ?? ['total' => 0, 'activos' => 0];
+                $conteo = $conteos[$item->perfil_aprendizaje_personalizado_id] ?? ['total' => 0, 'activos' => 0];
                 $esPropia = $t && $t->esDelUsuario($usuarioId);
                 $creadaPorDocente = $t?->creadaPorDocente() ?? false;
                 $autorNombre = $t?->creador

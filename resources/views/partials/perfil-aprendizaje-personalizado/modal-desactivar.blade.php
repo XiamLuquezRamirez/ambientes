@@ -16,7 +16,7 @@
                     <select id="motivo_cierre" name="motivo_cierre" class="form-select" required>
                         <option value="">— Selecciona un motivo —</option>
                         <option value="diagnostico_formal">Diagnóstico formal confirmado</option>
-                        <option value="condicion_no_confirmada">Perfil de aprendizaje no confirmado</option>
+                        <option value="perfil_aprendizaje_no_confirmado">Perfil de aprendizaje no confirmado</option>
                         <option value="otro">Otro</option>
                     </select>
                 </div>

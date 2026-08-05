@@ -54,24 +54,24 @@
                 </a>
             </li>
             @php
-                $condiciones = request()->routeIs(
+                $perfilesAprendizaje = request()->routeIs(
                     'superadmin.perfil-aprendizaje*',
                     'superadmin.perfil-aprendizaje-personalizado*',
                 );
             @endphp
             <li class="nav-item">
-                <a href="#navCondiciones" data-bs-toggle="collapse"
-                    aria-expanded="{{ $condiciones ? 'true' : 'false' }}"
-                    class="nav-link d-flex align-items-center gap-2 {{ $condiciones ? 'active' : '' }}"
+                <a href="#navPerfilesAprendizaje" data-bs-toggle="collapse"
+                    aria-expanded="{{ $perfilesAprendizaje ? 'true' : 'false' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $perfilesAprendizaje ? 'active' : '' }}"
                     style="cursor:pointer">
                     <i class="fa-solid fa-graduation-cap"></i>
                     <span>Perfiles de Aprendizaje</span>
                     <i class="fa-solid fa-chevron-down ms-auto"
                         style="font-size:.65rem;transition:transform .2s;
-                              {{ $condiciones ? 'transform:rotate(180deg)' : '' }}">
+                              {{ $perfilesAprendizaje ? 'transform:rotate(180deg)' : '' }}">
                     </i>
                 </a>
-                <div class="collapse {{ $condiciones ? 'show' : '' }}" id="navCondiciones">
+                <div class="collapse {{ $perfilesAprendizaje ? 'show' : '' }}" id="navPerfilesAprendizaje">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
                             <a href="{{ route('superadmin.perfil-aprendizaje.index') }}"

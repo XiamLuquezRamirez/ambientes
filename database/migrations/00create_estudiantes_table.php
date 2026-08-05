@@ -24,7 +24,7 @@ return new class extends Migration
 
             $table->string('color_avatar', 9)->default('#0F6E56');
 
-            $table->integer('condicion_id')->nullable()->default(1);
+            $table->integer('perfil_aprendizaje_id')->nullable()->default(1);
 
             $table->boolean('activo')->default(true);
 

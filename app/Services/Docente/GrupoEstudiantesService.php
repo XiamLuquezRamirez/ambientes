@@ -24,7 +24,7 @@ class GrupoEstudiantesService
             ->with([
                 'estudiante.piar',
                 'estudiante.configuracionPin',
-                'estudiante.condicion',
+                'estudiante.perfilAprendizaje',
             ])
             ->select('matriculas.*')
             ->get();
@@ -46,8 +46,8 @@ class GrupoEstudiantesService
                 'color_avatar' => $estudiante->color_avatar ?? '#2563EB',
                 'avatar_url' => $estudiante->avatar_url,
                 'iniciales' => $estudiante->iniciales ?? strtoupper(substr($estudiante->nombre ?? 'E', 0, 2)),
-                'condicion' => $estudiante->condicion?->nombre,
-                'condicion_id' => $estudiante->condicion_id,
+                'perfil_aprendizaje_nombre' => $estudiante->perfilAprendizaje?->nombre,
+                'perfil_aprendizaje_id' => $estudiante->perfil_aprendizaje_id,
                 'tiene_pin' => $estudiante->configuracionPin !== null,
                 'tiene_piar' => $estudiante->piar !== null,
                 'estado' => $matricula->estado,

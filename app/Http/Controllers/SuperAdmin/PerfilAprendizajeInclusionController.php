@@ -36,43 +36,43 @@ class PerfilAprendizajeInclusionController extends Controller
 
         $consulta->where('eliminado', 0);
 
-        $condiciones = $consulta->paginate(10)->withQueryString();
+        $perfilesAprendizaje = $consulta->paginate(10)->withQueryString();
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'html' => view('superAdmin.perfilAprendizaje._tabla', compact('condiciones'))->render(),
+                'html' => view('superAdmin.perfilAprendizaje._tabla', compact('perfilesAprendizaje'))->render(),
             ]);
         }
 
-        return view('superAdmin.perfilAprendizaje.index', compact('condiciones'));
+        return view('superAdmin.perfilAprendizaje.index', compact('perfilesAprendizaje'));
     }
 
-    public function mostrar(PerfilAprendizajeInclusion $condicionInclusion)
+    public function mostrar(PerfilAprendizajeInclusion $perfilAprendizajeInclusion)
     {
-        $condicionInclusion->loadCount([
+        $perfilAprendizajeInclusion->loadCount([
             'estudiantes',
             'estudiantes as estudiantes_activos_count' => fn ($q) => $q->where('activo', true),
         ]);
 
         return response()->json([
             'success' => true,
-            'condicion' => [
-                'id' => $condicionInclusion->id,
-                'codigo' => $condicionInclusion->codigo,
-                'nombre' => $condicionInclusion->nombre,
-                'descripcion_corta' => $condicionInclusion->descripcion_corta,
-                'estado' => (int) $condicionInclusion->estado,
-                'color_hex' => $condicionInclusion->color_hex,
-                'es_sistema' => (bool) $condicionInclusion->es_sistema,
-                'vista_info_asociada' => $condicionInclusion->vista_info_asociada,
-                'estudiantes_count' => $condicionInclusion->estudiantes_count,
-                'estudiantes_activos_count' => $condicionInclusion->estudiantes_activos_count,
+            'perfil_aprendizaje' => [
+                'id' => $perfilAprendizajeInclusion->id,
+                'codigo' => $perfilAprendizajeInclusion->codigo,
+                'nombre' => $perfilAprendizajeInclusion->nombre,
+                'descripcion_corta' => $perfilAprendizajeInclusion->descripcion_corta,
+                'estado' => (int) $perfilAprendizajeInclusion->estado,
+                'color_hex' => $perfilAprendizajeInclusion->color_hex,
+                'es_sistema' => (bool) $perfilAprendizajeInclusion->es_sistema,
+                'vista_info_asociada' => $perfilAprendizajeInclusion->vista_info_asociada,
+                'estudiantes_count' => $perfilAprendizajeInclusion->estudiantes_count,
+                'estudiantes_activos_count' => $perfilAprendizajeInclusion->estudiantes_activos_count,
             ],
         ]);
     }
 
-    public function actualizarVistaInfo(Request $request, PerfilAprendizajeInclusion $condicionInclusion)
+    public function actualizarVistaInfo(Request $request, PerfilAprendizajeInclusion $perfilAprendizajeInclusion)
     {
         $datos = $request->validate([
             'vista_info_asociada' => [
@@ -99,7 +99,7 @@ class PerfilAprendizajeInclusionController extends Controller
             ], 422);
         }
 
-        $condicionInclusion->update(['vista_info_asociada' => $vista]);
+        $perfilAprendizajeInclusion->update(['vista_info_asociada' => $vista]);
 
         return response()->json([
             'success' => true,
@@ -110,9 +110,9 @@ class PerfilAprendizajeInclusionController extends Controller
         ]);
     }
 
-    public function verVistaInfo(PerfilAprendizajeInclusion $condicionInclusion)
+    public function verVistaInfo(PerfilAprendizajeInclusion $perfilAprendizajeInclusion)
     {
-        $vista = $condicionInclusion->vista_info_asociada;
+        $vista = $perfilAprendizajeInclusion->vista_info_asociada;
 
         if (! $vista) {
             return response()->json([
@@ -130,14 +130,14 @@ class PerfilAprendizajeInclusionController extends Controller
 
         return response()->json([
             'success' => true,
-            'condicion' => [
-                'id' => $condicionInclusion->id,
-                'codigo' => $condicionInclusion->codigo,
-                'nombre' => $condicionInclusion->nombre,
+            'perfil_aprendizaje' => [
+                'id' => $perfilAprendizajeInclusion->id,
+                'codigo' => $perfilAprendizajeInclusion->codigo,
+                'nombre' => $perfilAprendizajeInclusion->nombre,
                 'vista_info_asociada' => $vista,
             ],
             'html' => view($vista, [
-                'condicion' => $condicionInclusion,
+                'perfil_aprendizaje' => $perfilAprendizajeInclusion,
             ])->render(),
         ]);
     }
@@ -150,16 +150,16 @@ class PerfilAprendizajeInclusionController extends Controller
         $datos['color_hex'] = $datos['color_hex'] ?? '#000000';
         $datos['es_sistema'] = $request->boolean('es_sistema');
 
-        $condicion = PerfilAprendizajeInclusion::create($datos);
+        $perfilAprendizaje = PerfilAprendizajeInclusion::create($datos);
 
         return response()->json([
             'success' => true,
             'message' => 'perfil de aprendizaje creado correctamente.',
-            'condicion' => $condicion,
+            'perfil_aprendizaje' => $perfilAprendizaje,
         ]);
     }
 
-    public function actualizar(Request $request, PerfilAprendizajeInclusion $condicionInclusion)
+    public function actualizar(Request $request, PerfilAprendizajeInclusion $perfilAprendizajeInclusion)
     {
         $datos = $request->validate([
             'nombre' => 'required|string|max:100|min:10',
@@ -169,25 +169,25 @@ class PerfilAprendizajeInclusionController extends Controller
         ]);
 
         // Si ya es de sistema, no se permite quitar esa bandera.
-        if ($condicionInclusion->es_sistema) {
+        if ($perfilAprendizajeInclusion->es_sistema) {
             unset($datos['es_sistema']);
         } else {
             $datos['es_sistema'] = $request->boolean('es_sistema');
         }
 
-        $condicionInclusion->update($datos);
+        $perfilAprendizajeInclusion->update($datos);
 
         return response()->json([
             'success' => true,
             'message' => 'perfil de aprendizaje actualizado correctamente.',
-            'condicion' => $condicionInclusion->fresh()->loadCount('estudiantes'),
+            'perfil_aprendizaje' => $perfilAprendizajeInclusion->fresh()->loadCount('estudiantes'),
         ]);
     }
 
-    public function cambiarEstado(PerfilAprendizajeInclusion $condicionInclusion)
+    public function cambiarEstado(PerfilAprendizajeInclusion $perfilAprendizajeInclusion)
     {
-        $estudiantesAsignados = $condicionInclusion->estudiantes()->count();
-        $nuevoEstado = $condicionInclusion->activa() ? 0 : 1;
+        $estudiantesAsignados = $perfilAprendizajeInclusion->estudiantes()->count();
+        $nuevoEstado = $perfilAprendizajeInclusion->activa() ? 0 : 1;
 
         if ($nuevoEstado === 0 && $estudiantesAsignados > 0 && ! request()->boolean('confirmar')) {
             return response()->json([
@@ -198,7 +198,7 @@ class PerfilAprendizajeInclusionController extends Controller
             ], 422);
         }
 
-        $condicionInclusion->update(['estado' => $nuevoEstado]);
+        $perfilAprendizajeInclusion->update(['estado' => $nuevoEstado]);
 
         return response()->json([
             'success' => true,
@@ -210,16 +210,16 @@ class PerfilAprendizajeInclusionController extends Controller
         ]);
     }
 
-    public function eliminar(PerfilAprendizajeInclusion $condicionInclusion)
+    public function eliminar(PerfilAprendizajeInclusion $perfilAprendizajeInclusion)
     {
-        if ($condicionInclusion->es_sistema) {
+        if ($perfilAprendizajeInclusion->es_sistema) {
             return response()->json([
                 'success' => false,
                 'message' => 'No se puede eliminar un perfil de aprendizaje de sistema.',
             ], 422);
         }
 
-        $estudiantesAsignados = $condicionInclusion->estudiantes()->count();
+        $estudiantesAsignados = $perfilAprendizajeInclusion->estudiantes()->count();
 
         if ($estudiantesAsignados > 0) {
             return response()->json([
@@ -229,7 +229,7 @@ class PerfilAprendizajeInclusionController extends Controller
             ], 422);
         }
 
-        $condicionInclusion->update(['eliminado' => true]);
+        $perfilAprendizajeInclusion->update(['eliminado' => true]);
 
         return response()->json([
             'success' => true,

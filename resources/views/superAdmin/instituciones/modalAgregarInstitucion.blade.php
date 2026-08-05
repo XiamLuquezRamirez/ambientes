@@ -2,7 +2,7 @@
     Modal: Agregar / Editar Institución (Super Admin)
     - Tab 1: datos básicos + avatar de logo (abre modalLogoInstitucion)
     - Tab 2: IP/puerto/activo por ambiente (name ambientes[id][...]; backend espera "activo")
-    - Tab 3: perfiles de aprendizaje + perfiles de aprendizaje personalizados (condiciones_orden / condiciones_transitorias_orden)
+    - Tab 3: perfiles de aprendizaje + perfiles de aprendizaje personalizados (perfil_aprendizaje_orden / perfil_aprendizaje_personalizado_orden)
     - Tab 4: módulos (pendiente)
 
     Crear  → POST  superadmin/instituciones
@@ -10,8 +10,8 @@
     Logo   → gestionado en modalLogoInstitucion (independiente al guardar datos)
 --}}
 @php
-    $condiciones = $condiciones ?? collect();
-    $condicionesTransitorias = $condicionesTransitorias ?? collect();
+    $perfilesAprendizaje = $perfilesAprendizaje ?? collect();
+    $perfilesAprendizajePersonalizado = $perfilesAprendizajePersonalizado ?? collect();
 @endphp
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/instituciones/index.css') }}">
@@ -49,8 +49,8 @@
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-condiciones" data-bs-toggle="tab" href="#condicionesInstitucion"
-                            role="tab" aria-controls="condicionesInstitucion" aria-selected="false">
+                        <a class="nav-link" id="tab-perfiles-aprendizaje" data-bs-toggle="tab" href="#perfilesAprendizajeInstitucion"
+                            role="tab" aria-controls="perfilesAprendizajeInstitucion" aria-selected="false">
                             <i class="fas fa-layer-group"></i> Perfiles de Aprendizaje
                         </a>
                     </li>
@@ -189,44 +189,44 @@
                             </div>
                         </div>
 
-                        {{-- Tab: condiciones globales y transitorias --}}
-                        <div class="tab-pane container" id="condicionesInstitucion" role="tabpanel"
-                            aria-labelledby="tab-condiciones">
+                        {{-- Tab: perfiles de aprendizaje globales y personalizados --}}
+                        <div class="tab-pane container" id="perfilesAprendizajeInstitucion" role="tabpanel"
+                            aria-labelledby="tab-perfiles-aprendizaje">
                             <p class="text-muted mb-3" style="font-size:.9rem">
                                 Seleccione los perfiles de aprendizaje disponibles para la institución.
                                 Por defecto todos quedan activos.
                             </p>
 
-                            <div class="card card-condiciones-orden">
+                            <div class="card card-perfiles-aprendizaje-orden">
                                 <div class="card-header" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseCondicionesOrden" aria-expanded="true"
-                                    aria-controls="collapseCondicionesOrden">
+                                    data-bs-target="#collapsePerfilesAprendizajeOrden" aria-expanded="true"
+                                    aria-controls="collapsePerfilesAprendizajeOrden">
                                     <h6>
                                         <i class="fa-solid fa-layer-group me-2"></i>
                                         Perfiles de Aprendizaje
-                                        <span class="badge badge-blue ms-1">{{ $condiciones->count() }}</span>
+                                        <span class="badge badge-blue ms-1">{{ $perfilesAprendizaje->count() }}</span>
                                     </h6>
                                     <i class="fa-solid fa-chevron-down chevron"></i>
                                 </div>
-                                <div id="collapseCondicionesOrden" class="collapse show">
-                                    <div class="lista-condiciones-orden">
-                                        @forelse ($condiciones as $condicion)
-                                            @php $color = $condicion->color_hex ?: '#64748B'; @endphp
-                                            <div class="item-condicion-orden">
+                                <div id="collapsePerfilesAprendizajeOrden" class="collapse show">
+                                    <div class="lista-perfiles-aprendizaje-orden">
+                                        @forelse ($perfilesAprendizaje as $perfilAprendizaje)
+                                            @php $color = $perfilAprendizaje->color_hex ?: '#64748B'; @endphp
+                                            <div class="item-perfil-aprendizaje-orden">
                                                 <input type="hidden"
-                                                    name="condiciones_orden[{{ $condicion->id }}][orden]"
+                                                    name="perfil_aprendizaje_orden[{{ $perfilAprendizaje->id }}][orden]"
                                                     value="{{ $loop->index }}">
-                                                <input class="form-check-input chk-condicion-orden" type="checkbox"
-                                                    id="condicion_orden_{{ $condicion->id }}"
-                                                    name="condiciones_orden[{{ $condicion->id }}][activa]"
+                                                <input class="form-check-input chk-perfil-aprendizaje-orden" type="checkbox"
+                                                    id="perfil_aprendizaje_orden_{{ $perfilAprendizaje->id }}"
+                                                    name="perfil_aprendizaje_orden[{{ $perfilAprendizaje->id }}][activa]"
                                                     value="1" checked
-                                                    data-id="{{ $condicion->id }}">
-                                                <label for="condicion_orden_{{ $condicion->id }}">
+                                                    data-id="{{ $perfilAprendizaje->id }}">
+                                                <label for="perfil_aprendizaje_orden_{{ $perfilAprendizaje->id }}">
                                                     <span class="badge"
                                                         style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55">
-                                                        {{ $condicion->codigo }}
+                                                        {{ $perfilAprendizaje->codigo }}
                                                     </span>
-                                                    {{ $condicion->nombre }}
+                                                    {{ $perfilAprendizaje->nombre }}
                                                 </label>
                                             </div>
                                         @empty
@@ -236,34 +236,34 @@
                                 </div>
                             </div>
 
-                            <div class="card card-condiciones-orden">
+                            <div class="card card-perfiles-aprendizaje-orden">
                                 <div class="card-header" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseCondicionesTransitoriasOrden" aria-expanded="true"
-                                    aria-controls="collapseCondicionesTransitoriasOrden">
+                                    data-bs-target="#collapsePerfilesAprendizajePersonalizadoOrden" aria-expanded="true"
+                                    aria-controls="collapsePerfilesAprendizajePersonalizadoOrden">
                                     <h6>
                                         <i class="fa-solid fa-list-check me-2"></i>
                                         Perfiles de Aprendizaje Personalizados
-                                        <span class="badge badge-blue ms-1" id="badgeCountTransitoriasOrden">{{ $condicionesTransitorias->count() }}</span>
+                                        <span class="badge badge-blue ms-1" id="badgeCountPersonalizadoOrden">{{ $perfilesAprendizajePersonalizado->count() }}</span>
                                     </h6>
                                     <i class="fa-solid fa-chevron-down chevron"></i>
                                 </div>
-                                <div id="collapseCondicionesTransitoriasOrden" class="collapse show">
-                                    <div class="lista-condiciones-orden" id="listaCondicionesTransitoriasOrden">
-                                        @forelse ($condicionesTransitorias as $transitoria)
+                                <div id="collapsePerfilesAprendizajePersonalizadoOrden" class="collapse show">
+                                    <div class="lista-perfiles-aprendizaje-orden" id="listaPerfilesAprendizajePersonalizadoOrden">
+                                        @forelse ($perfilesAprendizajePersonalizado as $transitoria)
                                             @php
-                                                $colorT = $transitoria->condicionBase?->color_hex ?: '#64748B';
+                                                $colorT = $transitoria->perfilAprendizaje?->color_hex ?: '#64748B';
                                             @endphp
-                                            <div class="item-condicion-orden" data-origen="global">
+                                            <div class="item-perfil-aprendizaje-orden" data-origen="global">
                                                 <input type="hidden"
-                                                    name="condiciones_transitorias_orden[{{ $transitoria->id }}][orden]"
+                                                    name="perfil_aprendizaje_personalizado_orden[{{ $transitoria->id }}][orden]"
                                                     value="{{ $loop->index }}">
-                                                <input class="form-check-input chk-condicion-transitoria-orden"
+                                                <input class="form-check-input chk-perfil-aprendizaje-personalizado-orden"
                                                     type="checkbox"
-                                                    id="condicion_transitoria_orden_{{ $transitoria->id }}"
-                                                    name="condiciones_transitorias_orden[{{ $transitoria->id }}][activa]"
+                                                    id="perfil_aprendizaje_personalizado_orden_{{ $transitoria->id }}"
+                                                    name="perfil_aprendizaje_personalizado_orden[{{ $transitoria->id }}][activa]"
                                                     value="1" checked
                                                     data-id="{{ $transitoria->id }}">
-                                                <label for="condicion_transitoria_orden_{{ $transitoria->id }}">
+                                                <label for="perfil_aprendizaje_personalizado_orden_{{ $transitoria->id }}">
                                                     <span class="badge"
                                                         style="background:{{ $colorT }}22;color:{{ $colorT }};border:1px solid {{ $colorT }}55">
                                                         {{ $transitoria->codigo }}
@@ -272,7 +272,7 @@
                                                 </label>
                                             </div>
                                         @empty
-                                            <p class="text-muted text-center py-3 mb-0" id="msgSinTransitoriasOrden">
+                                            <p class="text-muted text-center py-3 mb-0" id="msgSinPersonalizadoOrden">
                                                 Sin perfiles de aprendizaje personalizados
                                             </p>
                                         @endforelse
@@ -392,8 +392,8 @@
             // Al crear: solo globales.
             restaurarListaTransitoriasGlobales();
 
-            // Por defecto todas las condiciones quedan chequeadas.
-            document.querySelectorAll('.chk-condicion-orden, .chk-condicion-transitoria-orden')
+            // Por defecto todos los perfiles de aprendizaje quedan chequeados.
+            document.querySelectorAll('.chk-perfil-aprendizaje-orden, .chk-perfil-aprendizaje-personalizado-orden')
             .forEach(chk => {
                 chk.checked = true;
             });
@@ -404,14 +404,14 @@
             }
         }
 
-        const listaTransitoriasEl = document.getElementById('listaCondicionesTransitoriasOrden');
+        const listaTransitoriasEl = document.getElementById('listaPerfilesAprendizajePersonalizadoOrden');
         const htmlTransitoriasGlobales = listaTransitoriasEl ? listaTransitoriasEl.innerHTML : '';
 
         function restaurarListaTransitoriasGlobales() {
             if (!listaTransitoriasEl) return;
             listaTransitoriasEl.innerHTML = htmlTransitoriasGlobales;
-            const count = listaTransitoriasEl.querySelectorAll('.chk-condicion-transitoria-orden').length;
-            const badge = document.getElementById('badgeCountTransitoriasOrden');
+            const count = listaTransitoriasEl.querySelectorAll('.chk-perfil-aprendizaje-personalizado-orden').length;
+            const badge = document.getElementById('badgeCountPersonalizadoOrden');
             if (badge) badge.textContent = String(count);
         }
 
@@ -420,14 +420,14 @@
 
             const mapaActiva = {};
             (ordenGuardado || []).forEach(item => {
-                mapaActiva[item.condicion_transitoria_id] = !!item.activa;
+                mapaActiva[item.perfil_aprendizaje_personalizado_id] = !!item.activa;
             });
             const hayOrden = Object.keys(mapaActiva).length > 0;
 
             if (!disponibles.length) {
                 listaTransitoriasEl.innerHTML =
                     '<p class="text-muted text-center py-3 mb-0">Sin perfiles de aprendizaje personalizados</p>';
-                const badge = document.getElementById('badgeCountTransitoriasOrden');
+                const badge = document.getElementById('badgeCountPersonalizadoOrden');
                 if (badge) badge.textContent = '0';
                 return;
             }
@@ -439,23 +439,23 @@
                 const badgeLocal = esLocal
                     ? '<span class="badge badge-gray" style="margin-left:6px">Institución</span>'
                     : '';
-                const baseTxt = t.condicion_base
-                    ? `<small class="text-muted" style="margin-left:6px">(${t.condicion_base.codigo})</small>`
+                const baseTxt = t.perfil_aprendizaje
+                    ? `<small class="text-muted" style="margin-left:6px">(${t.perfil_aprendizaje.codigo})</small>`
                     : '';
 
                 return `
-                    <div class="item-condicion-orden" data-origen="${esLocal ? 'institucion' : 'global'}">
+                    <div class="item-perfil-aprendizaje-orden" data-origen="${esLocal ? 'institucion' : 'global'}">
                         <input type="hidden"
-                            name="condiciones_transitorias_orden[${t.id}][orden]"
+                            name="perfil_aprendizaje_personalizado_orden[${t.id}][orden]"
                             value="${index}">
-                        <input class="form-check-input chk-condicion-transitoria-orden"
+                        <input class="form-check-input chk-perfil-aprendizaje-personalizado-orden"
                             type="checkbox"
-                            id="condicion_transitoria_orden_${t.id}"
-                            name="condiciones_transitorias_orden[${t.id}][activa]"
+                            id="perfil_aprendizaje_personalizado_orden_${t.id}"
+                            name="perfil_aprendizaje_personalizado_orden[${t.id}][activa]"
                             value="1"
                             data-id="${t.id}"
                             ${checked ? 'checked' : ''}>
-                        <label for="condicion_transitoria_orden_${t.id}">
+                        <label for="perfil_aprendizaje_personalizado_orden_${t.id}">
                             <span class="badge"
                                 style="background:${color}22;color:${color};border:1px solid ${color}55">
                                 ${t.codigo || '—'}
@@ -468,17 +468,17 @@
                 `;
             }).join('');
 
-            const badge = document.getElementById('badgeCountTransitoriasOrden');
+            const badge = document.getElementById('badgeCountPersonalizadoOrden');
             if (badge) badge.textContent = String(disponibles.length);
         }
 
-        function aplicarSeleccionCondicionesOrden(condicionesOrden = [], condicionesTransitoriasOrden = []) {
+        function aplicarSeleccionPerfilesAprendizajeOrden(perfilesAprendizajeOrden = [], perfilesAprendizajePersonalizadoOrden = []) {
             const mapaCond = {};
-            (condicionesOrden || []).forEach(item => {
-                mapaCond[item.condicion_id] = !!item.activa;
+            (perfilesAprendizajeOrden || []).forEach(item => {
+                mapaCond[item.perfil_aprendizaje_id] = !!item.activa;
             });
 
-            document.querySelectorAll('.chk-condicion-orden').forEach(chk => {
+            document.querySelectorAll('.chk-perfil-aprendizaje-orden').forEach(chk => {
                 const id = parseInt(chk.dataset.id, 10);
                 chk.checked = Object.keys(mapaCond).length
                     ? (mapaCond[id] ?? false)
@@ -486,11 +486,11 @@
             });
 
             const mapaTrans = {};
-            (condicionesTransitoriasOrden || []).forEach(item => {
-                mapaTrans[item.condicion_transitoria_id] = !!item.activa;
+            (perfilesAprendizajePersonalizadoOrden || []).forEach(item => {
+                mapaTrans[item.perfil_aprendizaje_personalizado_id] = !!item.activa;
             });
 
-            document.querySelectorAll('.chk-condicion-transitoria-orden').forEach(chk => {
+            document.querySelectorAll('.chk-perfil-aprendizaje-personalizado-orden').forEach(chk => {
                 const id = parseInt(chk.dataset.id, 10);
                 chk.checked = Object.keys(mapaTrans).length
                     ? (mapaTrans[id] ?? false)
@@ -733,9 +733,9 @@
                     if (!resp.success) throw new Error('No data');
                     mapearDatosInstitucion(
                         resp.data,
-                        resp.condiciones_orden || [],
-                        resp.condiciones_transitorias_orden || [],
-                        resp.condiciones_transitorias_disponibles || []
+                        resp.perfil_aprendizaje_orden || [],
+                        resp.perfil_aprendizaje_personalizado_orden || [],
+                        resp.perfil_aprendizaje_personalizado_disponibles || []
                     );
                 })
                 .catch(() => {
@@ -761,9 +761,9 @@
          */
         function mapearDatosInstitucion(
             data,
-            condicionesOrden = [],
-            condicionesTransitoriasOrden = [],
-            condicionesTransitoriasDisponibles = []
+            perfilesAprendizajeOrden = [],
+            perfilesAprendizajePersonalizadoOrden = [],
+            perfilesAprendizajePersonalizadoDisponibles = []
         ) {
             id_editar = String(data.id);
             $('#nombre').val(data.nombre ?? '');
@@ -801,10 +801,10 @@
 
             // En edición: globales + creadas por esa institución.
             renderListaTransitoriasDisponibles(
-                condicionesTransitoriasDisponibles,
-                condicionesTransitoriasOrden
+                perfilesAprendizajePersonalizadoDisponibles,
+                perfilesAprendizajePersonalizadoOrden
             );
-            aplicarSeleccionCondicionesOrden(condicionesOrden, condicionesTransitoriasOrden);
+            aplicarSeleccionPerfilesAprendizajeOrden(perfilesAprendizajeOrden, perfilesAprendizajePersonalizadoOrden);
 
             if (typeof window.setEstadoLogoInstitucion === 'function') {
                 window.setEstadoLogoInstitucion({

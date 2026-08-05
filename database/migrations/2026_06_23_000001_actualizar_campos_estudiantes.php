@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('estudiantes', function (Blueprint $table) {
-            if (Schema::hasColumn('estudiantes', 'condicion')) {
-                $table->dropColumn('condicion');
+            if (Schema::hasColumn('estudiantes', 'perfil_aprendizaje')) {
+                $table->dropColumn('perfil_aprendizaje');
             }
-            if (!Schema::hasColumn('estudiantes', 'condicion_id')) {
-                $table->integer('condicion_id')->default(1)->after('color_avatar');
+            if (!Schema::hasColumn('estudiantes', 'perfil_aprendizaje_id')) {
+                $table->integer('perfil_aprendizaje_id')->default(1)->after('color_avatar');
             }
             if (!Schema::hasColumn('estudiantes', 'avatar')) {
                 $table->text('avatar')->nullable()->after('nombre');
@@ -46,7 +46,7 @@ return new class extends Migration
     {
         Schema::table('estudiantes', function (Blueprint $table) {
             $table->dropColumn(array_filter([
-                Schema::hasColumn('estudiantes', 'condicion_id') ? 'condicion_id' : null,
+                Schema::hasColumn('estudiantes', 'perfil_aprendizaje_id') ? 'perfil_aprendizaje_id' : null,
                 Schema::hasColumn('estudiantes', 'avatar') ? 'avatar' : null,
                 Schema::hasColumn('estudiantes', 'identificacion') ? 'identificacion' : null,
                 Schema::hasColumn('estudiantes', 'grado_id') ? 'grado_id' : null,
@@ -56,8 +56,8 @@ return new class extends Migration
                 Schema::hasColumn('estudiantes', 'requiere_apoyo') ? 'requiere_apoyo' : null,
                 Schema::hasColumn('estudiantes', 'sexo') ? 'sexo' : null,
             ]));
-            if (!Schema::hasColumn('estudiantes', 'condicion')) {
-                $table->enum('condicion', ['estandar', 'tea', 'tdah', 'disc_visual', 'disc_auditiva', 'disc_motriz', 'down'])
+            if (!Schema::hasColumn('estudiantes', 'perfil_aprendizaje')) {
+                $table->enum('perfilAprendizaje', ['estandar', 'tea', 'tdah', 'disc_visual', 'disc_auditiva', 'disc_motriz', 'down'])
                     ->default('estandar')
                     ->after('color_avatar');
             }

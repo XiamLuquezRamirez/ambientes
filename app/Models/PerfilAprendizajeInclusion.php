@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PerfilAprendizajeInclusion extends Model
 {
-    protected $table = 'condiciones';
+    protected $table = 'perfil_aprendizaje';
 
     public const CREATED_AT = null;
 
@@ -49,12 +49,12 @@ class PerfilAprendizajeInclusion extends Model
 
     public function estudiantes(): HasMany
     {
-        return $this->hasMany(Estudiante::class, 'condicion_id');
+        return $this->hasMany(Estudiante::class, 'perfil_aprendizaje_id');
     }
 
-    public function condicionesTransitorias(): HasMany
+    public function perfilesAprendizajePersonalizado(): HasMany
     {
-        return $this->hasMany(PerfilAprendizajePersonalizado::class, 'condicion_base_id');
+        return $this->hasMany(PerfilAprendizajePersonalizado::class, 'perfil_aprendizaje_id');
     }
 
     public function activa(): bool

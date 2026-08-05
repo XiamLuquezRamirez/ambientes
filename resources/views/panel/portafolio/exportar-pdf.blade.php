@@ -15,7 +15,7 @@
 </head>
 <body>
     <h1>Avance de {{ $estudiante->nombre }}</h1>
-    <p><em>Iniciales: {{ $estudiante->iniciales }} &mdash; Perfil de aprendizaje: {{ $estudiante->condicion }}</em></p>
+    <p><em>Iniciales: {{ $estudiante->iniciales }} &mdash; Perfil de aprendizaje: {{ $estudiante->perfilAprendizaje }}</em></p>
 
     <h2>Observaciones</h2>
     @forelse($observaciones as $obs)

@@ -1,8 +1,8 @@
 @php
-    $condicionNombre = $e->condicion?->nombre ?? 'Estándar';
+    $perfilAprendizajeNombre = $e->perfilAprendizaje?->nombre ?? 'Estándar';
     $requiereApoyo = in_array(strtolower((string) $e->requiere_apoyo), ['si', 'sí', '1', 'true'], true);
     $docLabel = trim(($e->tipo_identificacion ? $e->tipo_identificacion . ' ' : 'Doc. ') . ($e->identificacion ?? '—'));
-    $tieneTransitoriaActiva = $e->condicionTransitoriaActiva !== null;
+    $tieneTransitoriaActiva = $e->perfilAprendizajePersonalizadoActiva !== null;
 @endphp
 
 <div class="student-card{{ $tieneTransitoriaActiva ? ' student-card--transitoria' : '' }}" data-estudiante-id="{{ $e->id }}">
@@ -23,7 +23,7 @@
     </div>
 
     <div class="student-middle">
-        <span class="stu-badge stu-badge--condicion">{{ $condicionNombre }}</span>
+        <span class="stu-badge stu-badge--perfil-aprendizaje">{{ $perfilAprendizajeNombre }}</span>
 
         <span class="stu-badge {{ $e->activo ? 'stu-badge--activo' : 'stu-badge--inactivo' }}">
             {{ $e->estado_texto }}
@@ -31,7 +31,7 @@
 
         @if ($tieneTransitoriaActiva)
             <span class="stu-badge stu-badge--transitoria">
-                {{ $e->condicionTransitoriaActiva->condicionTransitoria?->etiqueta ?? 'Perfil personalizado' }}
+                {{ $e->perfilAprendizajePersonalizadoActiva->perfilAprendizajePersonalizado?->etiqueta ?? 'Perfil personalizado' }}
             </span>
         @endif
 

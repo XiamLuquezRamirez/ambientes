@@ -16,7 +16,7 @@
     const $modalDesasociar = $('#modalDesasociarTransitoria');
     const $formDesasociar = $('#formDesasociarTransitoria');
 
-    let condicionActualId = null;
+    let perfilAprendizajePersonalizadoActualId = null;
     let estudiantesCache = [];
 
     $.ajaxSetup({
@@ -134,14 +134,14 @@
     }
 
     function recargarModalActual() {
-        if (!condicionActualId) return;
+        if (!perfilAprendizajePersonalizadoActualId) return;
         $loading.show();
         $empty.hide();
         $contenedor.hide();
         $sinResultados.hide();
 
         $.ajax({
-            url: window.CT_EST_URL_LIST(condicionActualId),
+            url: window.CT_EST_URL_LIST(perfilAprendizajePersonalizadoActualId),
             type: 'GET',
             dataType: 'json',
             success: function(res) {
@@ -159,8 +159,8 @@
         });
     }
 
-    window.abrirModalEstudiantesTransitoria = function(condicionId, etiqueta) {
-        condicionActualId = condicionId;
+    window.abrirModalEstudiantesTransitoria = function(perfilAprendizajeId, etiqueta) {
+        perfilAprendizajePersonalizadoActualId = perfilAprendizajeId;
         estudiantesCache = [];
         $('#modalEstudiantesTransitoriaSubtitle').text(etiqueta || 'Perfil de aprendizaje personalizado');
         limpiarFiltros();
@@ -174,7 +174,7 @@
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
 
         $.ajax({
-            url: window.CT_EST_URL_LIST(condicionId),
+            url: window.CT_EST_URL_LIST(perfilAprendizajeId),
             type: 'GET',
             dataType: 'json',
             success: function(res) {
@@ -183,9 +183,9 @@
                     $empty.show();
                     return;
                 }
-                if (res.condicion?.etiqueta) {
-                    const codigo = res.condicion.codigo ? `${res.condicion.codigo} — ` : '';
-                    $('#modalEstudiantesTransitoriaSubtitle').text(`${codigo}${res.condicion.etiqueta}`);
+                if (res.perfil_aprendizaje_personalizado?.etiqueta) {
+                    const codigo = res.perfil_aprendizaje_personalizado.codigo ? `${res.perfil_aprendizaje_personalizado.codigo} — ` : '';
+                    $('#modalEstudiantesTransitoriaSubtitle').text(`${codigo}${res.perfil_aprendizaje_personalizado.etiqueta}`);
                 }
                 mostrarEstudiantes(res.estudiantes || []);
             },

@@ -2,15 +2,15 @@
  * Modal estudiantes asociados a perfil de aprendizaje normal — solo admin, solo lectura
  */
 (function() {
-    if (!window.CN_EST_URL_LIST) return;
+    if (!window.PA_EST_URL_LIST) return;
 
-    const $modal = $('#modalEstudiantesCondicion');
-    const $contenedor = $('#modalEstudiantesCondicionContenedor');
-    const $tbody = $('#modalEstudiantesCondicionTbody');
-    const $loading = $('#modalEstudiantesCondicionLoading');
-    const $empty = $('#modalEstudiantesCondicionEmpty');
-    const $sinResultados = $('#modalEstudiantesCondicionSinResultados');
-    const $contador = $('#modalEstudiantesCondicionContador');
+    const $modal = $('#modalEstudiantesPerfilAprendizaje');
+    const $contenedor = $('#modalEstudiantesPerfilAprendizajeContenedor');
+    const $tbody = $('#modalEstudiantesPerfilAprendizajeTbody');
+    const $loading = $('#modalEstudiantesPerfilAprendizajeLoading');
+    const $empty = $('#modalEstudiantesPerfilAprendizajeEmpty');
+    const $sinResultados = $('#modalEstudiantesPerfilAprendizajeSinResultados');
+    const $contador = $('#modalEstudiantesPerfilAprendizajeContador');
     const $filtroNombre = $('#cnEstFiltroNombre');
 
     let estudiantesCache = [];
@@ -79,10 +79,10 @@
         aplicarFiltros();
     }
 
-    window.abrirModalEstudiantesCondicion = function(condicionId, etiqueta) {
+    window.abrirModalEstudiantesPerfilAprendizaje = function(perfilAprendizajeId, etiqueta) {
         $filtroNombre.val('');
         estudiantesCache = [];
-        $('#modalEstudiantesCondicionSubtitle').text(etiqueta || 'Perfil de aprendizaje');
+        $('#modalEstudiantesPerfilAprendizajeSubtitle').text(etiqueta || 'Perfil de aprendizaje');
         $loading.show();
         $empty.hide();
         $contenedor.hide();
@@ -93,7 +93,7 @@
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
 
         $.ajax({
-            url: window.CN_EST_URL_LIST(condicionId),
+            url: window.PA_EST_URL_LIST(perfilAprendizajeId),
             type: 'GET',
             dataType: 'json',
             headers: {
@@ -106,9 +106,9 @@
                     $empty.show();
                     return;
                 }
-                if (res.condicion?.nombre) {
-                    const codigo = res.condicion.codigo ? `${res.condicion.codigo} — ` : '';
-                    $('#modalEstudiantesCondicionSubtitle').text(`${codigo}${res.condicion.nombre}`);
+                if (res.perfil_aprendizaje?.nombre) {
+                    const codigo = res.perfil_aprendizaje.codigo ? `${res.perfil_aprendizaje.codigo} — ` : '';
+                    $('#modalEstudiantesPerfilAprendizajeSubtitle').text(`${codigo}${res.perfil_aprendizaje.nombre}`);
                 }
                 mostrarEstudiantes(res.estudiantes || []);
             },
@@ -124,11 +124,11 @@
 
     $filtroNombre.on('input', aplicarFiltros);
 
-    $(document).on('click keydown', '.badge-estudiantes-condicion--click', function(e) {
+    $(document).on('click keydown', '.badge-estudiantes-perfil-aprendizaje--click', function(e) {
         if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
         if (e.type === 'keydown') e.preventDefault();
-        const id = $(this).data('condicion-id');
+        const id = $(this).data('perfil-aprendizaje-id');
         const etiqueta = $(this).data('etiqueta') || '';
-        if (id) window.abrirModalEstudiantesCondicion(id, etiqueta);
+        if (id) window.abrirModalEstudiantesPerfilAprendizaje(id, etiqueta);
     });
 })();

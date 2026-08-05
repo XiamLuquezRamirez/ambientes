@@ -378,8 +378,8 @@
                                 <label class="form-label">¿Cuál?</label>
                                 <select class="form-select" name="cual_diagnostico" id="cual_diagnostico">
                                     <option value="">Seleccione</option>
-                                    @foreach ($condiciones as $condicion)
-                                        <option value="{{ $condicion->id }}">{{ $condicion->nombre }}</option>
+                                    @foreach ($perfilesAprendizaje as $perfilAprendizaje)
+                                        <option value="{{ $perfilAprendizaje->id }}">{{ $perfilAprendizaje->nombre }}</option>
                                     @endforeach
                                 </select>
                             </div>

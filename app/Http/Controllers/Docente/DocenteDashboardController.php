@@ -58,7 +58,7 @@ class DocenteDashboardController extends Controller
             $ambienteSeleccionado = $ambientes->first();
         }
 
-        $condiciones = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
+        $perfilesAprendizaje = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
 
         $ambienteService = app(AmbienteService::class);
         $ambientes_disponibles = $ambienteService->getAmbientes();
@@ -67,7 +67,7 @@ class DocenteDashboardController extends Controller
             'instituciones',
             'ambientes',
             'ambienteSeleccionado',
-            'condiciones',
+            'perfilesAprendizaje',
             'ambientes_disponibles',
         ));
     }
