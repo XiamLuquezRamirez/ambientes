@@ -3,8 +3,8 @@
     Pestañas: Datos generales | Ajustes (próximamente)
     En edición: carga datos por AJAX → superadmin.perfil-aprendizaje.mostrar
 --}}
-<div class="modal fade" id="modalRegistrarCondicion" tabindex="-1" data-bs-keyboard="false"
-    aria-labelledby="modalRegistrarCondicionTitle" aria-hidden="true">
+<div class="modal fade" id="modalRegistrarPerfilAprendizaje" tabindex="-1" data-bs-keyboard="false"
+    aria-labelledby="modalRegistrarPerfilAprendizajeTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,9 +12,9 @@
                     <i class="fas fa-layer-group text-white"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <h5 class="modal-title mb-0" style="font-size: 1.4rem;" id="modalRegistrarCondicionTitle">
+                    <h5 class="modal-title mb-0" style="font-size: 1.4rem;" id="modalRegistrarPerfilAprendizajeTitle">
                         Nuevo Perfil de Aprendizaje</h5>
-                    <p class="modal-subtitle mb-0" id="modalRegistrarCondicionSubtitle">
+                    <p class="modal-subtitle mb-0" id="modalRegistrarPerfilAprendizajeSubtitle">
                         Registre un perfil de aprendizaje global.</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -23,25 +23,25 @@
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <a class="nav-link active" id="tab-datos-generales" data-bs-toggle="tab"
-                            href="#datosGeneralesCondicion" role="tab" aria-controls="datosGeneralesCondicion"
+                            href="#datosGeneralesPerfilAprendizaje" role="tab" aria-controls="datosGeneralesPerfilAprendizaje"
                             aria-selected="true">
                             <i class="fas fa-circle-info"></i> Datos generales
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-ajustes" data-bs-toggle="tab" href="#ajustesCondicion"
-                            role="tab" aria-controls="ajustesCondicion" aria-selected="false">
+                        <a class="nav-link" id="tab-ajustes" data-bs-toggle="tab" href="#ajustesPerfilAprendizaje"
+                            role="tab" aria-controls="ajustesPerfilAprendizaje" aria-selected="false">
                             <i class="fas fa-sliders"></i> Ajustes
                         </a>
                     </li>
                 </ul>
 
-                <form id="formRegistrarCondicion" method="POST" autocomplete="off">
+                <form id="formRegistrarPerfilAprendizaje" method="POST" autocomplete="off">
                     @csrf
-                    <input type="hidden" id="condicion_id" value="">
+                    <input type="hidden" id="perfil_aprendizaje_id" value="">
 
                     <div class="tab-content" style="padding: 20px 0 0;">
-                        <div class="tab-pane fade show active" id="datosGeneralesCondicion" role="tabpanel"
+                        <div class="tab-pane fade show active" id="datosGeneralesPerfilAprendizaje" role="tabpanel"
                             aria-labelledby="tab-datos-generales">
                             <div class="row g-3">
                                 <div class="col-md-4" id="wrapCodigo" style="display:none">
@@ -90,7 +90,7 @@
                             </div>
                         </div>
 
-                        <div class="tab-pane fade" id="ajustesCondicion" role="tabpanel"
+                        <div class="tab-pane fade" id="ajustesPerfilAprendizaje" role="tabpanel"
                             aria-labelledby="tab-ajustes">
                             <div class="text-center text-muted py-5">
                                 <i class="fas fa-sliders" style="font-size:2rem;opacity:.45"></i>
@@ -107,7 +107,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> Cerrar
                 </button>
-                <button type="button" class="btn btn-primary" id="btnGuardarCondicion">
+                <button type="button" class="btn btn-primary" id="btnGuardarPerfilAprendizaje">
                     <i class="fas fa-save"></i> Guardar
                 </button>
             </div>
@@ -117,11 +117,11 @@
 
 @push('scripts')
     <script>
-         const URL_GUARDAR_CONDICION = @json(route('superadmin.perfil-aprendizaje.guardar'));
-         const URL_CONDICION = (id) => @json(url('/superadmin/perfil-aprendizaje')) + '/' + id;
+         const URL_GUARDAR_PERFIL_APRENDIZAJE = @json(route('superadmin.perfil-aprendizaje.guardar'));
+         const URL_PERFIL_APRENDIZAJE = (id) => @json(url('/superadmin/perfil-aprendizaje')) + '/' + id;
     </script>
-    <!-- si es super admin importar el script de superadmin-condiciones.js -->
+    <!-- si es super admin importar el script de superadmin-perfiles-aprendizaje.js -->
     @if(session('es_super_admin'))
-    <script src="{{ asset('assets/js/condiciones/superadmin-condiciones.js') }}"></script>
+    <script src="{{ asset('assets/js/perfiles-aprendizaje/superadmin-perfiles-aprendizaje.js') }}"></script>
     @endif
 @endpush

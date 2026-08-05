@@ -12,14 +12,14 @@ class EstudiantePerfilAprendizajePersonalizadoService
 {
     public const MOTIVOS_CIERRE = [
         'diagnostico_formal' => 'Diagnóstico formal confirmado',
-        'condicion_no_confirmada' => 'perfil de aprendizaje personalizado no confirmado',
+        'perfil_aprendizaje_no_confirmado' => 'perfil de aprendizaje personalizado no confirmado',
         'otro' => 'Otro',
     ];
 
-    public function autorizarCondicionInstitucion(PerfilAprendizajePersonalizado $condicion, int $institucionId): void
+    public function autorizarPerfilAprendizajePersonalizadoInstitucion(PerfilAprendizajePersonalizado $perfilAprendizajePersonalizado, int $institucionId): void
     {
-        $pertenece = $condicion->institucion_id === null
-            || (int) $condicion->institucion_id === $institucionId;
+        $pertenece = $perfilAprendizajePersonalizado->institucion_id === null
+            || (int) $perfilAprendizajePersonalizado->institucion_id === $institucionId;
 
         if (! $pertenece) {
             abort(403, 'El perfil de aprendizaje personalizado no pertenece a esta institución.');
@@ -30,12 +30,12 @@ class EstudiantePerfilAprendizajePersonalizadoService
      * @return Collection<int, EstudiantePerfilAprendizajePersonalizado>
      */
     public function asignacionesActivas(
-        PerfilAprendizajePersonalizado $condicion,
+        PerfilAprendizajePersonalizado $perfilAprendizajePersonalizado,
         int $institucionId,
         ?int $docenteId = null
     ): Collection {
         $consulta = EstudiantePerfilAprendizajePersonalizado::query()
-            ->where('condicion_transitoria_id', $condicion->id)
+            ->where('perfil_aprendizaje_personalizado_id', $perfilAprendizajePersonalizado->id)
             ->activas()
             ->whereHas('estudiante', fn ($q) => $q->where('institucion_id', $institucionId))
             ->with([
@@ -55,19 +55,19 @@ class EstudiantePerfilAprendizajePersonalizadoService
     /**
      * @return array<int, array{total:int,activos:int}>
      */
-    public function conteoActivosPorCondicion(int $institucionId): array
+    public function conteoActivosPorPerfilAprendizajePersonalizado(int $institucionId): array
     {
         $filas = EstudiantePerfilAprendizajePersonalizado::query()
-            ->selectRaw('condicion_transitoria_id, COUNT(*) as activos')
+            ->selectRaw('perfil_aprendizaje_personalizado_id, COUNT(*) as activos')
             ->activas()
             ->whereHas('estudiante', fn ($q) => $q->where('institucion_id', $institucionId))
-            ->groupBy('condicion_transitoria_id')
+            ->groupBy('perfil_aprendizaje_personalizado_id')
             ->get();
 
         $mapa = [];
         foreach ($filas as $fila) {
             $activos = (int) $fila->activos;
-            $mapa[(int) $fila->condicion_transitoria_id] = [
+            $mapa[(int) $fila->perfil_aprendizaje_personalizado_id] = [
                 'total' => $activos,
                 'activos' => $activos,
             ];
@@ -79,20 +79,20 @@ class EstudiantePerfilAprendizajePersonalizadoService
     /**
      * @return array<int, array{total:int,activos:int}>
      */
-    public function conteoActivosPorCondicionDocente(int $institucionId, int $docenteId): array
+    public function conteoActivosPorPerfilAprendizajePersonalizadoDocente(int $institucionId, int $docenteId): array
     {
         $filas = EstudiantePerfilAprendizajePersonalizado::query()
-            ->selectRaw('condicion_transitoria_id, COUNT(*) as activos')
+            ->selectRaw('perfil_aprendizaje_personalizado_id, COUNT(*) as activos')
             ->activas()
             ->where('docente_id', $docenteId)
             ->whereHas('estudiante', fn ($q) => $q->where('institucion_id', $institucionId))
-            ->groupBy('condicion_transitoria_id')
+            ->groupBy('perfil_aprendizaje_personalizado_id')
             ->get();
 
         $mapa = [];
         foreach ($filas as $fila) {
             $activos = (int) $fila->activos;
-            $mapa[(int) $fila->condicion_transitoria_id] = [
+            $mapa[(int) $fila->perfil_aprendizaje_personalizado_id] = [
                 'total' => $activos,
                 'activos' => $activos,
             ];
@@ -101,10 +101,10 @@ class EstudiantePerfilAprendizajePersonalizadoService
         return $mapa;
     }
 
-    public function conteoActivosCondicion(int $condicionId, int $institucionId, ?int $docenteId = null): int
+    public function conteoActivosPerfilAprendizajePersonalizado(int $perfilAprendizajeId, int $institucionId, ?int $docenteId = null): int
     {
         $consulta = EstudiantePerfilAprendizajePersonalizado::query()
-            ->where('condicion_transitoria_id', $condicionId)
+            ->where('perfil_aprendizaje_personalizado_id', $perfilAprendizajeId)
             ->activas()
             ->whereHas('estudiante', fn ($q) => $q->where('institucion_id', $institucionId));
 
@@ -156,8 +156,8 @@ class EstudiantePerfilAprendizajePersonalizadoService
 
             Estudiante::query()
                 ->where('id', $asignacion->estudiante_id)
-                ->where('condicion_transitoria_id', $asignacion->condicion_transitoria_id)
-                ->update(['condicion_transitoria_id' => null]);
+                ->where('perfil_aprendizaje_personalizado_id', $asignacion->perfil_aprendizaje_personalizado_id)
+                ->update(['perfil_aprendizaje_personalizado_id' => null]);
         });
     }
 }

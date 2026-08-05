@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PerfilAprendizaje extends Model
 {
     use Sincronizable;
-    protected $table = 'condiciones';
+    protected $table = 'perfil_aprendizaje';
 
     protected $fillable = ['nombre', 'estado'];
 

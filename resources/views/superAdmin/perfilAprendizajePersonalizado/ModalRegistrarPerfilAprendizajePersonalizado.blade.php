@@ -2,7 +2,7 @@
     Modal: Crear / Editar perfil de aprendizaje personalizado
 --}}
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/condiciones/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/perfiles-aprendizaje/index.css') }}">
 @endpush
 
 <div class="modal fade" id="modalRegistrarTransitoria" tabindex="-1" data-bs-keyboard="false"
@@ -42,7 +42,7 @@
                 <form id="formRegistrarTransitoria" autocomplete="off">
                     @csrf
                     <input type="hidden" id="transitoria_id" value="">
-                    <input type="hidden" id="condicion_base_id" name="condicion_base_id" value="">
+                    <input type="hidden" id="perfil_aprendizaje_id" name="perfil_aprendizaje_id" value="">
 
                     <div class="tab-content" style="padding: 20px 0 0;">
                         <div class="tab-pane fade show active" id="datosGeneralesTransitoria" role="tabpanel"
@@ -63,11 +63,11 @@
 
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Perfil de aprendizaje base</label>
-                                    <div class="cb-select" id="cbCondicionBase">
-                                        <button type="button" class="cb-select-trigger" id="cbCondicionBaseTrigger">
-                                            <span class="cb-select-swatch" id="cbCondicionBaseSwatch"
+                                    <div class="cb-select" id="cbPerfilAprendizajeBase">
+                                        <button type="button" class="cb-select-trigger" id="cbPerfilAprendizajeBaseTrigger">
+                                            <span class="cb-select-swatch" id="cbPerfilAprendizajeBaseSwatch"
                                                 style="display:none;background:#64748B"></span>
-                                            <span class="cb-select-label is-placeholder" id="cbCondicionBaseLabel">
+                                            <span class="cb-select-label is-placeholder" id="cbPerfilAprendizajeBaseLabel">
                                                 Sin perfil de aprendizaje base
                                             </span>
                                             <i class="fa-solid fa-chevron-down cb-select-chevron"></i>
@@ -76,11 +76,11 @@
                                             <div class="cb-select-search">
                                                 <div class="cb-select-search-wrap">
                                                     <i class="fa-solid fa-search"></i>
-                                                    <input type="text" id="buscar_condicion_base"
+                                                    <input type="text" id="buscar_perfil_aprendizaje"
                                                         placeholder="Buscar por código o nombre..." autocomplete="off">
                                                 </div>
                                             </div>
-                                            <div class="cb-select-list" id="cbCondicionBaseList">
+                                            <div class="cb-select-list" id="cbPerfilAprendizajeBaseList">
                                                 <button type="button" class="cb-select-option" data-id=""
                                                     data-codigo="" data-nombre="" data-color="">
                                                     <span class="cb-select-option-text">
@@ -88,7 +88,7 @@
                                                         <small>Opcional — no hereda ajustes</small>
                                                     </span>
                                                 </button>
-                                                @foreach ($condicionesBase as $base)
+                                                @foreach ($perfilesAprendizajeBase as $base)
                                                     <button type="button" class="cb-select-option"
                                                         data-id="{{ $base->id }}"
                                                         data-codigo="{{ $base->codigo }}"
@@ -102,7 +102,7 @@
                                                         </span>
                                                     </button>
                                                 @endforeach
-                                                <div class="cb-select-empty" id="cbCondicionBaseEmpty" style="display:none">
+                                                <div class="cb-select-empty" id="cbPerfilAprendizajeBaseEmpty" style="display:none">
                                                     Sin resultados
                                                 </div>
                                             </div>
@@ -167,8 +167,8 @@
         const esAdmin = @json(session('es_admin'));
     </script>
     @if (($esSuperAdmin ?? session('es_super_admin')))
-        <script src="{{ asset('assets/js/condiciones/superadmin-condiciones-transitorias.js') }}"></script>
+        <script src="{{ asset('assets/js/perfiles-aprendizaje/superadmin-perfiles-aprendizaje-personalizado.js') }}"></script>
     @elseif (session('es_admin') || (($esSuperAdmin ?? null) === false))
-        <script src="{{ asset('assets/js/condiciones/admin-condiciones-transitorias.js') }}"></script>
+        <script src="{{ asset('assets/js/perfiles-aprendizaje/admin-perfiles-aprendizaje-personalizado.js') }}"></script>
     @endif
 @endpush

@@ -1130,10 +1130,10 @@
                         <option value="activo">Activo</option>
                         <option value="inactivo">Inactivo</option>
                     </select>
-                    <select id="filtro-condicion-estudiante" class="filtro-estudiantes">
+                    <select id="filtro-perfil-aprendizaje-estudiante" class="filtro-estudiantes">
                         <option value="todas">Todos los perfiles de aprendizaje</option>
-                        @foreach ($condiciones as $condicion)
-                            <option value="{{ $condicion->id }}">{{ $condicion->nombre }}</option>
+                        @foreach ($perfilesAprendizaje as $perfilAprendizaje)
+                            <option value="{{ $perfilAprendizaje->id }}">{{ $perfilAprendizaje->nombre }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -1691,7 +1691,7 @@
             const listaEstudiantes = document.getElementById('lista-estudiantes');
             const buscador = document.getElementById('buscador-estudiantes');
             const filtroEstado = document.getElementById('filtro-estado-estudiante');
-            const filtroCondicion = document.getElementById('filtro-condicion-estudiante');
+            const filtroPerfilAprendizaje = document.getElementById('filtro-perfil-aprendizaje-estudiante');
             let estudiantesFiltrados = estudiantesGrupoCache;
 
             if (buscador) {
@@ -1709,10 +1709,10 @@
                 );
             }
 
-            if (filtroCondicion && filtroCondicion.value !== 'todas') {
-                const condicionId = String(filtroCondicion.value);
+            if (filtroPerfilAprendizaje && filtroPerfilAprendizaje.value !== 'todas') {
+                const perfilAprendizajeId = String(filtroPerfilAprendizaje.value);
                 estudiantesFiltrados = estudiantesFiltrados.filter(estudiante =>
-                    String(estudiante.condicion_id ?? '') === condicionId
+                    String(estudiante.perfil_aprendizaje_id ?? '') === perfilAprendizajeId
                 );
             }
 
@@ -1739,7 +1739,7 @@
                     '<i class="fas fa-exclamation-triangle estudiante-alerta" title="Requiere PIAR"></i>' :
                     '';
 
-                const condicionLabel = estudiante.condicion_nombre || estudiante.condicion || 'Estándar';
+                const perfilAprendizajeLabel = estudiante.perfil_aprendizaje_nombre || estudiante.perfil_aprendizaje || 'Estándar';
                 const fichaUrl = `${URL_FICHA_ESTUDIANTE}/${estudiante.id}`;
                 const nombreCompleto = `${estudiante.nombre ?? ''} ${estudiante.apellido ?? ''}`.trim();
 
@@ -1766,7 +1766,7 @@
                 <div class="estudiante-meta">
                     <p class="estudiante-nombre">${nombreCompleto}</p>
                    <p class="estudiante-submeta">
-    Perfil de aprendizaje: ${condicionLabel} · ${estadoTexto}
+    Perfil de aprendizaje: ${perfilAprendizajeLabel} · ${estadoTexto}
 </p>
                 </div>
             </div>
@@ -1842,7 +1842,7 @@
             }
         });
 
-        document.getElementById('filtro-condicion-estudiante').addEventListener('change', function() {
+        document.getElementById('filtro-perfil-aprendizaje-estudiante').addEventListener('change', function() {
             const panelEstudiantes = document.getElementById('panel-estudiantes-grupo');
             if (panelEstudiantes && panelEstudiantes.style.display !== 'none') {
                 renderListaEstudiantesGrupo();

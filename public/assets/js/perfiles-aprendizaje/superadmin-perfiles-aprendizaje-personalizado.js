@@ -1,7 +1,7 @@
 (function() {
     const $modal = $('#modalRegistrarTransitoria');
     const $form = $('#formRegistrarTransitoria');
-    const $cb = $('#cbCondicionBase');
+    const $cb = $('#cbPerfilAprendizajeBase');
     let modoEdicion = false;
     let esSistemaActual = false;
 
@@ -19,7 +19,7 @@
 
     function abrirCb() {
         $cb.addClass('open');
-        setTimeout(() => $('#buscar_condicion_base').trigger('focus'), 30);
+        setTimeout(() => $('#buscar_perfil_aprendizaje').trigger('focus'), 30);
     }
 
     function cerrarCb() {
@@ -27,22 +27,22 @@
     }
 
     function seleccionarBase(id, codigo, nombre, color) {
-        $('#condicion_base_id').val(id || '');
+        $('#perfil_aprendizaje_id').val(id || '');
         if (!id) {
-            $('#cbCondicionBaseSwatch').hide();
-            $('#cbCondicionBaseLabel').text('Sin perfil de aprendizaje base').addClass('is-placeholder');
+            $('#cbPerfilAprendizajeBaseSwatch').hide();
+            $('#cbPerfilAprendizajeBaseLabel').text('Sin perfil de aprendizaje base').addClass('is-placeholder');
             $('.cb-select-option').removeClass('active');
             $('.cb-select-option[data-id=""]').addClass('active');
             return;
         }
 
-        $('#cbCondicionBaseSwatch').css('background', color || '#64748B').show();
-        $('#cbCondicionBaseLabel').text(`${nombre} (${codigo})`).removeClass('is-placeholder');
+        $('#cbPerfilAprendizajeBaseSwatch').css('background', color || '#64748B').show();
+        $('#cbPerfilAprendizajeBaseLabel').text(`${nombre} (${codigo})`).removeClass('is-placeholder');
         $('.cb-select-option').removeClass('active');
         $(`.cb-select-option[data-id="${id}"]`).addClass('active');
     }
 
-    function filtrarCondicionesBase(texto) {
+    function filtrarPerfilesAprendizajeBase(texto) {
         const q = (texto || '').toLowerCase().trim();
         let visibles = 0;
 
@@ -60,10 +60,10 @@
             if (match) visibles++;
         });
 
-        $('#cbCondicionBaseEmpty').toggle(visibles === 0);
+        $('#cbPerfilAprendizajeBaseEmpty').toggle(visibles === 0);
     }
 
-    $('#cbCondicionBaseTrigger').on('click', function(e) {
+    $('#cbPerfilAprendizajeBaseTrigger').on('click', function(e) {
         e.preventDefault();
         $cb.hasClass('open') ? cerrarCb() : abrirCb();
     });
@@ -78,16 +78,16 @@
             $opt.data('color')
         );
         cerrarCb();
-        $('#buscar_condicion_base').val('');
-        filtrarCondicionesBase('');
+        $('#buscar_perfil_aprendizaje').val('');
+        filtrarPerfilesAprendizajeBase('');
     });
 
-    $('#buscar_condicion_base').on('input', function() {
-        filtrarCondicionesBase($(this).val());
+    $('#buscar_perfil_aprendizaje').on('input', function() {
+        filtrarPerfilesAprendizajeBase($(this).val());
     });
 
     $(document).on('click', function(e) {
-        if (!$(e.target).closest('#cbCondicionBase').length) {
+        if (!$(e.target).closest('#cbPerfilAprendizajeBase').length) {
             cerrarCb();
         }
     });
@@ -121,12 +121,12 @@
             dataType: 'json',
             success: function(res) {
                 Swal.close();
-                if (!res.success || !res.condicion) {
+                if (!res.success || !res.perfil_aprendizaje_personalizado) {
                     mostrarToast('error', 'No fue posible cargar el perfil de aprendizaje.');
                     cerrarModal();
                     return;
                 }
-                setearDatos(res.condicion);
+                setearDatos(res.perfil_aprendizaje_personalizado);
             },
             error: function(xhr) {
                 Swal.close();
@@ -168,9 +168,9 @@
         $('#etiqueta_transitoria').val(c.etiqueta || '');
         $('#descripcion_interna').val(c.descripcion_interna || '');
 
-        const base = c.condicion_base || {};
+        const base = c.perfil_aprendizaje || {};
         seleccionarBase(
-            c.condicion_base_id,
+            c.perfil_aprendizaje_id,
             base.codigo || '',
             base.nombre || '',
             base.color_hex || '#64748B'
@@ -191,8 +191,8 @@
         $('#codigo_transitoria').val('');
         $form.find('.is-invalid').removeClass('is-invalid');
         $form.find('.invalid-feedback').remove();
-        $('#buscar_condicion_base').val('');
-        filtrarCondicionesBase('');
+        $('#buscar_perfil_aprendizaje').val('');
+        filtrarPerfilesAprendizajeBase('');
         seleccionarBase('', '', '', '');
         cerrarCb();
     }
@@ -205,8 +205,8 @@
         $form.find('.is-invalid').removeClass('is-invalid');
         $form.find('.invalid-feedback').remove();
         $.each(errors || {}, function(campo, mensajes) {
-            if (campo === 'condicion_base_id') {
-                $('#cbCondicionBaseTrigger').css('border-color', '#DC2626');
+            if (campo === 'perfil_aprendizaje_id') {
+                $('#cbPerfilAprendizajeBaseTrigger').css('border-color', '#DC2626');
                 mostrarToast('error', traducirErrores(mensajes[0]));
             }
             const $input = $form.find(`[name="${campo}"]`);
@@ -239,14 +239,14 @@
             return;
         }
 
-        $('#cbCondicionBaseTrigger').css('border-color', '');
+        $('#cbPerfilAprendizajeBaseTrigger').css('border-color', '');
 
         const id = $('#transitoria_id').val();
-        const baseId = $('#condicion_base_id').val();
+        const baseId = $('#perfil_aprendizaje_id').val();
         const datos = {
             etiqueta: ($('#etiqueta_transitoria').val() || '').trim(),
             descripcion_interna: ($('#descripcion_interna').val() || '').trim(),
-            condicion_base_id: baseId || null,
+            perfil_aprendizaje_id: baseId || null,
             _token: $('meta[name="csrf-token"]').attr('content')
         };
 

@@ -511,7 +511,7 @@
 
         /**
          * Eliminar administrador (soft-delete vía DELETE).
-         * Patrón alineado con admin/usuarios + loading de superadmin/condiciones:
+         * Patrón alineado con admin/usuarios + loading de superadmin/perfiles-aprendizaje:
          * 1) Swal de confirmación
          * 2) Swal loading mientras corre la petición
          * 3) Quita #fila-{id} con fade; si no quedan filas, recarga el partial por AJAX

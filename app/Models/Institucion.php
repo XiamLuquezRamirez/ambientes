@@ -39,12 +39,12 @@ class Institucion extends Model
         return $this->hasMany(User::class, 'institucion_id');
     }
 
-    public function condicionesOrden()
+    public function perfilesAprendizajeOrden()
     {
         return $this->hasMany(PerfilAprendizajeOrden::class, 'institucion_id');
     }
 
-    public function condicionesTransitoriasOrden()
+    public function perfilesAprendizajePersonalizadoOrden()
     {
         return $this->hasMany(PerfilAprendizajePersonalizadoOrden::class, 'institucion_id');
     }

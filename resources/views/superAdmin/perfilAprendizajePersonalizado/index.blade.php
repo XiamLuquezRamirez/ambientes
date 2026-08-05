@@ -22,10 +22,10 @@
                 value="{{ request('buscar') }}" autocomplete="off">
         </div>
 
-        <select name="condicion_base_id" class="form-control" style="width:auto;min-width:220px">
+        <select name="perfil_aprendizaje_id" class="form-control" style="width:auto;min-width:220px">
             <option value="">Todos los perfiles de aprendizaje base</option>
-            @foreach ($condicionesBase as $base)
-                <option value="{{ $base->id }}" @selected((string) request('condicion_base_id') === (string) $base->id)>
+            @foreach ($perfilesAprendizajeBase as $base)
+                <option value="{{ $base->id }}" @selected((string) request('perfil_aprendizaje_id') === (string) $base->id)>
                     {{ $base->codigo }} — {{ $base->nombre }}
                 </option>
             @endforeach
@@ -47,7 +47,7 @@
 
         <a id="btnLimpiarTransitorias" href="{{ route('superadmin.perfil-aprendizaje-personalizado.index') }}" class="btn btn-sm"
             style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
-              display:{{ request()->hasAny(['buscar', 'estado', 'es_sistema', 'condicion_base_id']) ? 'inline-flex' : 'none' }}">
+              display:{{ request()->hasAny(['buscar', 'estado', 'es_sistema', 'perfil_aprendizaje_id']) ? 'inline-flex' : 'none' }}">
             <i class="fas fa-broom"></i> Limpiar
         </a>
     </form>
@@ -100,7 +100,7 @@
                         history.pushState(null, '', destino);
                         const params = new URL(destino, window.location.origin).searchParams;
                         const tieneFiltros = params.has('buscar') || params.has('estado') ||
-                            params.has('es_sistema') || params.has('condicion_base_id');
+                            params.has('es_sistema') || params.has('perfil_aprendizaje_id');
                         $('#btnLimpiarTransitorias').css('display', tieneFiltros ? 'inline-flex' : 'none');
                     } else {
                         mostrarToast('error', 'Error al cargar los datos');

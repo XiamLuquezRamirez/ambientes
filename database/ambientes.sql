@@ -282,9 +282,9 @@ insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servido
 (33,'CargaDocente',6,'create','musica','{\"id\":6,\"docente_id\":2,\"ambiente_id\":9,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-04T14:03:15.000000Z\",\"updated_at\":\"2026-08-04T14:03:15.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-04 09:03:15','2026-08-04 09:03:15'),
 (34,'CargaDocente',6,'create','musica','{\"id\":6,\"docente_id\":2,\"ambiente_id\":9,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-04T14:03:15.000000Z\",\"updated_at\":\"2026-08-04T14:03:15.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-04 09:03:15','2026-08-04 09:03:15');
 
-DROP TABLE IF EXISTS `condiciones`;
+DROP TABLE IF EXISTS `perfil_aprendizaje`;
 
-CREATE TABLE `condiciones` (
+CREATE TABLE `perfil_aprendizaje` (
   `id` int NOT NULL AUTO_INCREMENT,
   `codigo` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -299,37 +299,36 @@ CREATE TABLE `condiciones` (
   UNIQUE KEY `codigo` (`codigo`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `condiciones` */
+/*Data for the table `perfil_aprendizaje` */
 
-insert  into `condiciones`(`id`,`codigo`,`nombre`,`descripcion_corta`,`estado`,`color_hex`,`es_sistema`,`fecha_ultima_edicion`,`vista_info_asociada`,`eliminado`) values 
+insert  into `perfil_aprendizaje`(`id`,`codigo`,`nombre`,`descripcion_corta`,`estado`,`color_hex`,`es_sistema`,`fecha_ultima_edicion`,`vista_info_asociada`,`eliminado`) values 
 (1,'COND-001','Estandar','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:48',NULL,0),
 (2,'COND-002','TDAH','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
 (3,'COND-003','TEA','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:49',NULL,0),
 (4,'COND-004','Síndrome de Down','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
 (5,'COND-005','Discapacidad Visual','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:51',NULL,0),
-(6,'COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:53',NULL,0),
-(8,'COND-007','dfgdsfgdfg dsfgsdfg sdf g','fsdgsdfg sdfg gdfsg',1,'#2563EB',0,'2026-08-04 14:43:00',NULL,1);
+(6,'COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:53',NULL,0);
 
-/*Table structure for table `condiciones_orden` */
+/*Table structure for table `perfil_aprendizaje_orden` */
 
-DROP TABLE IF EXISTS `condiciones_orden`;
+DROP TABLE IF EXISTS `perfil_aprendizaje_orden`;
 
-CREATE TABLE `condiciones_orden` (
+CREATE TABLE `perfil_aprendizaje_orden` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `institucion_id` bigint unsigned NOT NULL,
-  `condicion_id` bigint unsigned NOT NULL,
+  `perfil_aprendizaje_id` bigint unsigned NOT NULL,
   `orden` int NOT NULL DEFAULT '0',
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_institucion_condicion` (`institucion_id`,`condicion_id`),
+  UNIQUE KEY `uk_institucion_perfil_aprendizaje` (`institucion_id`,`perfil_aprendizaje_id`),
   KEY `idx_institucion_orden` (`institucion_id`,`orden`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `condiciones_orden` */
+/*Data for the table `perfil_aprendizaje_orden` */
 
-insert  into `condiciones_orden`(`id`,`institucion_id`,`condicion_id`,`orden`,`activa`,`created_at`,`updated_at`) values
+insert  into `perfil_aprendizaje_orden`(`id`,`institucion_id`,`perfil_aprendizaje_id`,`orden`,`activa`,`created_at`,`updated_at`) values
 (1,1,6,2,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
 (2,1,5,3,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
 (3,1,1,1,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
@@ -337,17 +336,17 @@ insert  into `condiciones_orden`(`id`,`institucion_id`,`condicion_id`,`orden`,`a
 (5,1,2,5,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
 (6,1,3,0,1,'2026-08-04 08:52:01','2026-08-04 09:28:15');
 
-/*Table structure for table `condiciones_transitorias` */
+/*Table structure for table `perfil_aprendizaje_personalizado` */
 
-DROP TABLE IF EXISTS `condiciones_transitorias`;
+DROP TABLE IF EXISTS `perfil_aprendizaje_personalizado`;
 
-CREATE TABLE `condiciones_transitorias` (
+CREATE TABLE `perfil_aprendizaje_personalizado` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `institucion_id` bigint unsigned DEFAULT NULL,
   `codigo` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `etiqueta` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion_interna` text COLLATE utf8mb4_unicode_ci,
-  `condicion_base_id` bigint unsigned DEFAULT NULL,
+  `perfil_aprendizaje_id` bigint unsigned DEFAULT NULL,
   `es_sistema` tinyint(1) NOT NULL DEFAULT '0',
   `estado` tinyint(1) NOT NULL DEFAULT '1',
   `usuario_crea` bigint unsigned DEFAULT NULL,
@@ -357,35 +356,35 @@ CREATE TABLE `condiciones_transitorias` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `condiciones_transitorias` */
+/*Data for the table `perfil_aprendizaje_personalizado` */
 
-insert  into `condiciones_transitorias`(`id`,`institucion_id`,`codigo`,`etiqueta`,`descripcion_interna`,`condicion_base_id`,`es_sistema`,`estado`,`usuario_crea`,`created_at`,`updated_at`,`eliminado`) values 
+insert  into `perfil_aprendizaje_personalizado`(`id`,`institucion_id`,`codigo`,`etiqueta`,`descripcion_interna`,`perfil_aprendizaje_id`,`es_sistema`,`estado`,`usuario_crea`,`created_at`,`updated_at`,`eliminado`) values 
 (1,NULL,'CTR-002','Sospecha de TDAH','Descripción corta del perfil de aprendizaje',2,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
 (2,NULL,'CTR-003','Sospecha de TEA','Descripción corta del perfil de aprendizaje',3,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
 (3,NULL,'CTR-004','Sospecha de Síndrome de Down','Descripción corta del perfil de aprendizaje',4,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:34',0),
 (4,NULL,'CTR-005','Sospecha de Discapacidad Visual','Descripción corta del perfil de aprendizaje',5,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:32',0),
 (5,NULL,'CTR-006','Sospecha de Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',6,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:35',0);
 
-/*Table structure for table `condiciones_transitorias_orden` */
+/*Table structure for table `perfil_aprendizaje_personalizado_orden` */
 
-DROP TABLE IF EXISTS `condiciones_transitorias_orden`;
+DROP TABLE IF EXISTS `perfil_aprendizaje_personalizado_orden`;
 
-CREATE TABLE `condiciones_transitorias_orden` (
+CREATE TABLE `perfil_aprendizaje_personalizado_orden` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `institucion_id` bigint unsigned NOT NULL,
-  `condicion_transitoria_id` bigint unsigned NOT NULL,
+  `perfil_aprendizaje_personalizado_id` bigint unsigned NOT NULL,
   `orden` int NOT NULL DEFAULT '0',
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_institucion_condicion_transitoria` (`institucion_id`,`condicion_transitoria_id`),
+  UNIQUE KEY `uk_institucion_perfil_aprendizaje_personalizado` (`institucion_id`,`perfil_aprendizaje_personalizado_id`),
   KEY `idx_institucion_orden` (`institucion_id`,`orden`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `condiciones_transitorias_orden` */
+/*Data for the table `perfil_aprendizaje_personalizado_orden` */
 
-insert  into `condiciones_transitorias_orden`(`id`,`institucion_id`,`condicion_transitoria_id`,`orden`,`activa`,`created_at`,`updated_at`) values
+insert  into `perfil_aprendizaje_personalizado_orden`(`id`,`institucion_id`,`perfil_aprendizaje_personalizado_id`,`orden`,`activa`,`created_at`,`updated_at`) values
 (1,1,1,0,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
 (2,1,2,1,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
 (4,1,3,3,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
@@ -609,38 +608,38 @@ insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lect
 (64,33,9,2026,'activo',NULL,1,'2026-08-04 09:03:02','2026-08-04 09:03:02'),
 (65,34,9,2026,'activo',NULL,1,'2026-08-04 09:03:02','2026-08-04 09:03:02');
 
-/*Table structure for table `estudiante_condicion_transitoria` */
+/*Table structure for table `estudiante_perfil_aprendizaje_personalizado` */
 
-DROP TABLE IF EXISTS `estudiante_condicion_transitoria`;
+DROP TABLE IF EXISTS `estudiante_perfil_aprendizaje_personalizado`;
 
-CREATE TABLE `estudiante_condicion_transitoria` (
+CREATE TABLE `estudiante_perfil_aprendizaje_personalizado` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
-  `condicion_transitoria_id` bigint unsigned NOT NULL,
+  `perfil_aprendizaje_personalizado_id` bigint unsigned NOT NULL,
   `docente_id` bigint unsigned NOT NULL,
   `observacion` text NOT NULL,
   `fecha_activacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `fecha_cierre` datetime DEFAULT NULL,
-  `motivo_cierre` enum('diagnostico_formal','condicion_no_confirmada','otro') DEFAULT NULL,
+  `motivo_cierre` enum('diagnostico_formal','perfil_aprendizaje_no_confirmado','otro') DEFAULT NULL,
   `observacion_cierre` text,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `docente_id` (`docente_id`),
   KEY `estudiante_id` (`estudiante_id`),
-  KEY `condicion_transitoria_id` (`condicion_transitoria_id`),
+  KEY `perfil_aprendizaje_personalizado_id` (`perfil_aprendizaje_personalizado_id`),
   KEY `activa` (`activa`),
-  CONSTRAINT `estudiante_condicion_transitoria_ibfk_1` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
-  CONSTRAINT `estudiante_condicion_transitoria_ibfk_2` FOREIGN KEY (`condicion_transitoria_id`) REFERENCES `condiciones_transitorias` (`id`),
-  CONSTRAINT `estudiante_condicion_transitoria_ibfk_3` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`)
+  CONSTRAINT `estudiante_perfil_aprendizaje_personalizado_ibfk_1` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
+  CONSTRAINT `estudiante_perfil_aprendizaje_personalizado_ibfk_2` FOREIGN KEY (`perfil_aprendizaje_personalizado_id`) REFERENCES `perfil_aprendizaje_personalizado` (`id`),
+  CONSTRAINT `estudiante_perfil_aprendizaje_personalizado_ibfk_3` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `estudiante_condicion_transitoria` */
+/*Data for the table `estudiante_perfil_aprendizaje_personalizado` */
 
-insert  into `estudiante_condicion_transitoria`(`id`,`estudiante_id`,`condicion_transitoria_id`,`docente_id`,`observacion`,`fecha_activacion`,`activa`,`fecha_cierre`,`motivo_cierre`,`observacion_cierre`,`created_at`,`updated_at`) values
-(2,11,2,2,'nueva creada por el admin','2026-08-04 11:03:10',0,'2026-08-04 11:03:50','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:03:10','2026-08-04 11:03:50'),
-(3,5,1,2,'nueva creada por el admin','2026-08-04 11:03:28',0,'2026-08-04 11:03:58','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:03:28','2026-08-04 11:03:58');
+insert  into `estudiante_perfil_aprendizaje_personalizado`(`id`,`estudiante_id`,`perfil_aprendizaje_personalizado_id`,`docente_id`,`observacion`,`fecha_activacion`,`activa`,`fecha_cierre`,`motivo_cierre`,`observacion_cierre`,`created_at`,`updated_at`) values
+(2,11,2,2,'nueva creada por el admin','2026-08-04 11:03:10',0,'2026-08-04 11:03:50','perfil_aprendizaje_no_confirmado','nueva creada por el admin','2026-08-04 11:03:10','2026-08-04 11:03:50'),
+(3,5,1,2,'nueva creada por el admin','2026-08-04 11:03:28',0,'2026-08-04 11:03:58','perfil_aprendizaje_no_confirmado','nueva creada por el admin','2026-08-04 11:03:28','2026-08-04 11:03:58');
 
 /*Table structure for table `estudiantes` */
 
@@ -656,8 +655,8 @@ CREATE TABLE `estudiantes` (
   `iniciales` varchar(3) NOT NULL,
   `grado_id` text,
   `color_avatar` varchar(9) NOT NULL DEFAULT '#0F6E56',
-  `condicion_id` int DEFAULT '1',
-  `condicion_transitoria_id` int DEFAULT NULL,
+  `perfil_aprendizaje_id` int DEFAULT '1',
+  `perfil_aprendizaje_personalizado_id` int DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `fecha_nacimiento` text,
   `acudiente` text,
@@ -681,7 +680,7 @@ CREATE TABLE `estudiantes` (
 
 /*Data for the table `estudiantes` */
 
-insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`condicion_id`,`condicion_transitoria_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values
+insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`perfil_aprendizaje_id`,`perfil_aprendizaje_personalizado_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values
 (1,'Valentina',NULL,NULL,NULL,1111,'VA',NULL,'#0F6E56',1,NULL,1,'2021-01-17',NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#534AB7',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#854F0B',1,NULL,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),

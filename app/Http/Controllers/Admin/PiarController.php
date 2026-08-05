@@ -55,7 +55,7 @@ class PiarController extends Controller
     {
         $usuario = Auth::guard('docente')->user();
         $estudiante = Estudiante::with('grado', 'departamento', 'municipio')->where('id', $idEstudiante)->first();
-        $condiciones = PerfilAprendizajeInclusion::all();
+        $perfilesAprendizaje = PerfilAprendizajeInclusion::all();
 
         // municipios
         $municipios = Municipio::all();
@@ -65,7 +65,7 @@ class PiarController extends Controller
         $user = Auth::guard('docente')->user();
         $docente_diligencia = User::where('id', $user->id)->first();
 
-        return view('admin.estudiantes.diligenciarPiar', compact('estudiante', 'condiciones', 'docente_diligencia', 'municipios', 'departamentos', 'tipo', 'usuario'));
+        return view('admin.estudiantes.diligenciarPiar', compact('estudiante', 'perfilesAprendizaje', 'docente_diligencia', 'municipios', 'departamentos', 'tipo', 'usuario'));
     }
 
     public function verificarSiComenzo($idEstudiante)
@@ -217,7 +217,7 @@ class PiarController extends Controller
 
         if ($datos['diagnostico_medico'] == 'Si') {
             Estudiante::where('id', $datos['estudiante_id'])->update([
-                'condicion_id' => $datos['cual_diagnostico'],
+                'perfil_aprendizaje_id' => $datos['cual_diagnostico'],
             ]);
         }
 

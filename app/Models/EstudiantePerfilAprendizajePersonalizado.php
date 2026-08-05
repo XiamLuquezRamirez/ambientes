@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EstudiantePerfilAprendizajePersonalizado extends Model
 {
-    protected $table = 'estudiante_condicion_transitoria';
+    protected $table = 'estudiante_perfil_aprendizaje_personalizado';
 
     protected $fillable = [
         'estudiante_id',
-        'condicion_transitoria_id',
+        'perfil_aprendizaje_personalizado_id',
         'docente_id',
         'observacion',
         'fecha_activacion',
@@ -33,9 +33,9 @@ class EstudiantePerfilAprendizajePersonalizado extends Model
         return $this->belongsTo(Estudiante::class, 'estudiante_id');
     }
 
-    public function condicionTransitoria(): BelongsTo
+    public function perfilAprendizajePersonalizado(): BelongsTo
     {
-        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'condicion_transitoria_id');
+        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'perfil_aprendizaje_personalizado_id');
     }
 
     public function docente(): BelongsTo

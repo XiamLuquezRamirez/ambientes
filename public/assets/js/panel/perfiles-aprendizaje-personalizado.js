@@ -52,7 +52,7 @@
         });
     };
 
-    function desactivarCondicion(ordenId, nombre, onSuccess) {
+    function desactivarPerfilAprendizajePersonalizado(ordenId, nombre, onSuccess) {
         Swal.fire({
             title: 'Desactivando...',
             allowOutsideClick: false,
@@ -109,7 +109,7 @@
             cancelButtonColor: '#64748B'
         }).then((result) => {
             if (result.isConfirmed) {
-                desactivarCondicion(ordenId, nombre);
+                desactivarPerfilAprendizajePersonalizado(ordenId, nombre);
             }
         });
     }

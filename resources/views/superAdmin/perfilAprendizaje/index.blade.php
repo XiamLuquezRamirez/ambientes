@@ -8,7 +8,7 @@
             <p>Catálogo de perfiles de aprendizaje</p>
         </div>
         <div style="display:flex;gap:10px">
-            <button type="button" class="btn btn-primary" onclick="abrirModalRegistrarCondicion()">
+            <button type="button" class="btn btn-primary" onclick="abrirModalRegistrarPerfilAprendizaje()">
                 <i class="fas fa-plus"></i> Nuevo Perfil de Aprendizaje
             </button>
         </div>
@@ -56,10 +56,10 @@
 @push('scripts')
     <script>
         (function() {
-            window.URL_CONDICIONES = @json(route('superadmin.perfil-aprendizaje.index'));
-            const URL_CONDICIONES = window.URL_CONDICIONES;
-            const URL_ESTADO = (id) => `${URL_CONDICIONES}/${id}/estado`;
-            const URL_ELIMINAR = (id) => `${URL_CONDICIONES}/${id}`;
+            window.URL_PERFILES_APRENDIZAJE = @json(route('superadmin.perfil-aprendizaje.index'));
+            const URL_PERFILES_APRENDIZAJE = window.URL_PERFILES_APRENDIZAJE;
+            const URL_ESTADO = (id) => `${URL_PERFILES_APRENDIZAJE}/${id}/estado`;
+            const URL_ELIMINAR = (id) => `${URL_PERFILES_APRENDIZAJE}/${id}`;
 
             $.ajaxSetup({
                 headers: {
@@ -68,7 +68,7 @@
                 }
             });
 
-            window.cargarTablaCondiciones = async function(url = null) {
+            window.cargarTablaPerfilesAprendizaje = async function(url = null) {
                 const destino = url || construirUrlFiltros();
                 const $contenedor = $('#contenedorTabla');
                 const $cargando = $('#cargando-tabla');
@@ -109,11 +109,11 @@
                 for (const [k, v] of [...params.entries()]) {
                     if (!v) params.delete(k);
                 }
-                return params.toString() ? `${URL_CONDICIONES}?${params.toString()}` : URL_CONDICIONES;
+                return params.toString() ? `${URL_PERFILES_APRENDIZAJE}?${params.toString()}` : URL_PERFILES_APRENDIZAJE;
             }
 
             function aplicarFiltros() {
-                cargarTablaCondiciones(construirUrlFiltros());
+                cargarTablaPerfilesAprendizaje(construirUrlFiltros());
             }
 
             $('#formBuscar select').on('change', aplicarFiltros);
@@ -133,15 +133,15 @@
             $('#btnLimpiar').on('click', function(e) {
                 e.preventDefault();
                 $('#formBuscar')[0].reset();
-                cargarTablaCondiciones(URL_CONDICIONES);
+                cargarTablaPerfilesAprendizaje(URL_PERFILES_APRENDIZAJE);
             });
 
             $(document).on('click', '.pag-btn[href]', function(e) {
                 e.preventDefault();
-                cargarTablaCondiciones(this.href);
+                cargarTablaPerfilesAprendizaje(this.href);
             });
 
-            $(document).on('change', '.toggle-estado-condicion', async function() {
+            $(document).on('change', '.toggle-estado-perfil-aprendizaje', async function() {
                 const $toggle = $(this);
                 const id = $toggle.data('id');
                 const nombre = $toggle.data('nombre');
@@ -183,7 +183,7 @@
                     dataType: 'json',
                     success: function(res) {
                         mostrarToast('success', res.message);
-                        cargarTablaCondiciones();
+                        cargarTablaPerfilesAprendizaje();
                     },
                     error: function(xhr) {
                         $toggle.prop('checked', !quiereActivar);
@@ -195,7 +195,7 @@
                 });
             });
 
-            $(document).on('click', '.btn-eliminar-condicion', async function() {
+            $(document).on('click', '.btn-eliminar-perfil-aprendizaje', async function() {
                 const id = $(this).data('id');
                 const nombre = $(this).data('nombre');
                 const estudiantes = parseInt($(this).data('estudiantes'), 10) || 0;
@@ -223,7 +223,7 @@
                             dataType: 'json',
                             success: function(res) {
                                 mostrarToast('success', res.message);
-                                cargarTablaCondiciones();
+                                cargarTablaPerfilesAprendizaje();
                             },
                             error: function(xhr) {
                                 mostrarToast('error', xhr.responseJSON?.message || 'No fue posible desactivar el perfil de aprendizaje.');
@@ -260,7 +260,7 @@
                     success: function(res) {
                         Swal.close();
                         mostrarToast('success', res.message);
-                        cargarTablaCondiciones();
+                        cargarTablaPerfilesAprendizaje();
                     },
                     error: function(xhr) {
                         Swal.fire({

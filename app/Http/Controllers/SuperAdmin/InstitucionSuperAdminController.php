@@ -33,11 +33,11 @@ class InstitucionSuperAdminController extends Controller
     public function index(Request $request)
     {
         $ambientes = Ambiente::all();
-        $condiciones = PerfilAprendizajeInclusion::query()->ordenadas()->get();
+        $perfilesAprendizaje = PerfilAprendizajeInclusion::query()->ordenadas()->get();
 
         // solo las del sistemas y adicionales creadas por el super admin
-        $condicionesTransitorias = PerfilAprendizajePersonalizado::query()
-            ->with('condicionBase')
+        $perfilesAprendizajePersonalizado = PerfilAprendizajePersonalizado::query()
+            ->with('perfilAprendizaje')
             ->where('institucion_id', null)
             ->ordenadas()
             ->get();
@@ -65,8 +65,8 @@ class InstitucionSuperAdminController extends Controller
         return view('superAdmin.instituciones.index', compact(
             'instituciones',
             'ambientes',
-            'condiciones',
-            'condicionesTransitorias'
+            'perfilesAprendizaje',
+            'perfilesAprendizajePersonalizado'
         ));
     }
 
@@ -87,16 +87,16 @@ class InstitucionSuperAdminController extends Controller
             ];
         })->values();
 
-        $condicionesTransitoriasDisponibles = PerfilAprendizajePersonalizado::query()
-            ->with('condicionBase:id,codigo,nombre,color_hex')
+        $perfilesAprendizajePersonalizadoDisponibles = PerfilAprendizajePersonalizado::query()
+            ->with('perfilAprendizaje:id,codigo,nombre,color_hex')
             ->where(function ($q) use ($id) {
                 $q->whereNull('institucion_id')
                     ->orWhere('institucion_id', (int) $id);
             })
             ->ordenadas()
-            ->get(['id', 'codigo', 'etiqueta', 'condicion_base_id', 'institucion_id', 'es_sistema'])
+            ->get(['id', 'codigo', 'etiqueta', 'perfil_aprendizaje_id', 'institucion_id', 'es_sistema'])
             ->map(function (PerfilAprendizajePersonalizado $t) {
-                $color = $t->condicionBase?->color_hex ?: '#64748B';
+                $color = $t->perfilAprendizaje?->color_hex ?: '#64748B';
 
                 return [
                     'id' => $t->id,
@@ -105,9 +105,9 @@ class InstitucionSuperAdminController extends Controller
                     'institucion_id' => $t->institucion_id,
                     'es_sistema' => (bool) $t->es_sistema,
                     'color' => $color,
-                    'condicion_base' => $t->condicionBase ? [
-                        'codigo' => $t->condicionBase->codigo,
-                        'nombre' => $t->condicionBase->nombre,
+                    'perfil_aprendizaje' => $t->perfilAprendizaje ? [
+                        'codigo' => $t->perfilAprendizaje->codigo,
+                        'nombre' => $t->perfilAprendizaje->nombre,
                     ] : null,
                 ];
             })
@@ -128,9 +128,9 @@ class InstitucionSuperAdminController extends Controller
                 'iniciales' => $this->logoService->iniciales($institucion),
                 'ambientes' => $ambientes,
             ],
-            'condiciones_orden' => $this->perfilAprendizajeOrdenController->listarPorInstitucion((int) $id),
-            'condiciones_transitorias_orden' => $this->perfilAprendizajePersonalizadoOrdenController->listarPorInstitucion((int) $id),
-            'condiciones_transitorias_disponibles' => $condicionesTransitoriasDisponibles,
+            'perfil_aprendizaje_orden' => $this->perfilAprendizajeOrdenController->listarPorInstitucion((int) $id),
+            'perfil_aprendizaje_personalizado_orden' => $this->perfilAprendizajePersonalizadoOrdenController->listarPorInstitucion((int) $id),
+            'perfil_aprendizaje_personalizado_disponibles' => $perfilesAprendizajePersonalizadoDisponibles,
         ]);
     }
 
@@ -177,12 +177,12 @@ class InstitucionSuperAdminController extends Controller
 
             $this->perfilAprendizajeOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
-                $request->input('condiciones_orden', [])
+                $request->input('perfil_aprendizaje_orden', [])
             );
 
             $this->perfilAprendizajePersonalizadoOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
-                $request->input('condiciones_transitorias_orden', [])
+                $request->input('perfil_aprendizaje_personalizado_orden', [])
             );
 
             return [
@@ -237,12 +237,12 @@ class InstitucionSuperAdminController extends Controller
 
             $this->perfilAprendizajeOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
-                $request->input('condiciones_orden', [])
+                $request->input('perfil_aprendizaje_orden', [])
             );
 
             $this->perfilAprendizajePersonalizadoOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
-                $request->input('condiciones_transitorias_orden', [])
+                $request->input('perfil_aprendizaje_personalizado_orden', [])
             );
         });
 
@@ -343,8 +343,8 @@ class InstitucionSuperAdminController extends Controller
             'correo_contacto' => 'required|email|max:255',
             'logo' => ($logoObligatorio ? 'required' : 'nullable')
                 .'|file|mimes:jpeg,jpg,png|max:'.InstitucionLogoService::MAX_KILOBYTES,
-            'condiciones_orden' => 'nullable|array',
-            'condiciones_transitorias_orden' => 'nullable|array',
+            'perfil_aprendizaje_orden' => 'nullable|array',
+            'perfil_aprendizaje_personalizado_orden' => 'nullable|array',
         ], [
             'logo.required' => 'El logo de la institución es obligatorio.',
         ]);

@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PerfilAprendizajeOrden extends Model
 {
-    protected $table = 'condiciones_orden';
+    protected $table = 'perfil_aprendizaje_orden';
 
     protected $fillable = [
         'institucion_id',
-        'condicion_id',
+        'perfil_aprendizaje_id',
         'orden',
         'activa',
     ];
@@ -26,8 +26,8 @@ class PerfilAprendizajeOrden extends Model
         return $this->belongsTo(Institucion::class, 'institucion_id');
     }
 
-    public function condicion(): BelongsTo
+    public function perfilAprendizaje(): BelongsTo
     {
-        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'condicion_id');
+        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'perfil_aprendizaje_id');
     }
 }

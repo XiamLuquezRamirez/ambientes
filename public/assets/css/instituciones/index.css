@@ -1,4 +1,4 @@
-#modalAgregarInstitucion .card-condiciones-orden {
+#modalAgregarInstitucion .card-perfiles-aprendizaje-orden {
     border: 1px solid #E2E8F0;
     border-radius: 12px;
     overflow: hidden;
@@ -6,7 +6,7 @@
     box-shadow: none;
 }
 
-#modalAgregarInstitucion .card-condiciones-orden .card-header {
+#modalAgregarInstitucion .card-perfiles-aprendizaje-orden .card-header {
     background: #F8FAFC;
     border-bottom: 1px solid #E2E8F0;
     cursor: pointer;
@@ -18,29 +18,29 @@
     user-select: none;
 }
 
-#modalAgregarInstitucion .card-condiciones-orden .card-header h6 {
+#modalAgregarInstitucion .card-perfiles-aprendizaje-orden .card-header h6 {
     margin: 0;
     font-weight: 700;
     color: #1E3A8A;
     font-size: .95rem;
 }
 
-#modalAgregarInstitucion .card-condiciones-orden .card-header .chevron {
+#modalAgregarInstitucion .card-perfiles-aprendizaje-orden .card-header .chevron {
     color: #64748B;
     transition: transform .2s ease;
 }
 
-#modalAgregarInstitucion .card-condiciones-orden .card-header[aria-expanded="true"] .chevron {
+#modalAgregarInstitucion .card-perfiles-aprendizaje-orden .card-header[aria-expanded="true"] .chevron {
     transform: rotate(180deg);
 }
 
-#modalAgregarInstitucion .lista-condiciones-orden {
+#modalAgregarInstitucion .lista-perfiles-aprendizaje-orden {
     max-height: 280px;
     overflow-y: auto;
     padding: 8px 12px;
 }
 
-#modalAgregarInstitucion .item-condicion-orden {
+#modalAgregarInstitucion .item-perfil-aprendizaje-orden {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -48,16 +48,16 @@
     border-bottom: 1px solid #F1F5F9;
 }
 
-#modalAgregarInstitucion .item-condicion-orden:last-child {
+#modalAgregarInstitucion .item-perfil-aprendizaje-orden:last-child {
     border-bottom: 0;
 }
 
-#modalAgregarInstitucion .item-condicion-orden .form-check-input {
+#modalAgregarInstitucion .item-perfil-aprendizaje-orden .form-check-input {
     cursor: pointer;
     margin-top: 0;
 }
 
-#modalAgregarInstitucion .item-condicion-orden label {
+#modalAgregarInstitucion .item-perfil-aprendizaje-orden label {
     margin: 0;
     cursor: pointer;
     flex: 1;

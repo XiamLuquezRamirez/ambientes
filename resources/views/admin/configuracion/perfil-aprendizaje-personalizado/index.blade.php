@@ -2,7 +2,7 @@
 @section('title', 'Perfiles de Aprendizaje Personalizados')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/admin/configuracion-condiciones.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/configuracion-perfiles-aprendizaje.css') }}">
 @endpush
 
 @section('content')
@@ -26,10 +26,10 @@
     </p>
 
     <form id="formFiltrosTransitorias" class="cfg-filtros">
-        <select name="condicion_base_id" class="form-control" style="width:auto;min-width:220px">
+        <select name="perfil_aprendizaje_id" class="form-control" style="width:auto;min-width:220px">
             <option value="">Todos los perfiles de aprendizaje base</option>
-            @foreach ($condicionesBase as $base)
-                <option value="{{ $base->id }}" @selected((string) request('condicion_base_id') === (string) $base->id)>
+            @foreach ($perfilesAprendizajeBase as $base)
+                <option value="{{ $base->id }}" @selected((string) request('perfil_aprendizaje_id') === (string) $base->id)>
                     {{ $base->codigo }} — {{ $base->nombre }}
                 </option>
             @endforeach
@@ -47,7 +47,7 @@
             <option value="0" @selected(request('activa') === '0')>Desactivadas</option>
         </select>
 
-        <button type="button" id="btnGuardarOrdenTransitorias" class="btn btn-primary btn-sm btn-condiciones"
+        <button type="button" id="btnGuardarOrdenTransitorias" class="btn btn-primary btn-sm btn-perfiles-aprendizaje"
             style="display:{{ request('ordenar') ? 'inline-flex' : 'none' }}">
             <i class="fas fa-save"></i> Guardar orden seleccionado
         </button>
@@ -59,7 +59,7 @@
 
     @include('superAdmin.perfilAprendizajePersonalizado.ModalRegistrarPerfilAprendizajePersonalizado', [
         'esSuperAdmin' => false,
-        'condicionesBase' => $condicionesBase,
+        'perfilesAprendizajeBase' => $perfilesAprendizajeBase,
         'urlTransitoriasBase' => route('admin.configuracion.perfil-aprendizaje-personalizado.index'),
         'urlTransitoriasItem' => url('admin/configuracion/perfil-aprendizaje-personalizado/opcion'),
     ])
@@ -76,6 +76,6 @@
         window.CT_EST_URL_LIST = (id) => @json(url('admin/configuracion/perfil-aprendizaje-personalizado/opcion')) + `/${id}/estudiantes`;
         window.CT_EST_URL_DESASOCIAR = (id) => @json(url('admin/configuracion/perfil-aprendizaje-personalizado/asignaciones')) + `/${id}/desasociar`;
     </script>
-    <script src="{{ asset('assets/js/admin/configuracion-condiciones-transitorias.js') }}"></script>
-    <script src="{{ asset('assets/js/condiciones/estudiantes-asociados-transitoria.js') }}"></script>
+    <script src="{{ asset('assets/js/admin/configuracion-perfiles-aprendizaje-personalizado.js') }}"></script>
+    <script src="{{ asset('assets/js/perfiles-aprendizaje/estudiantes-asociados-perfil-aprendizaje-personalizado.js') }}"></script>
 @endpush

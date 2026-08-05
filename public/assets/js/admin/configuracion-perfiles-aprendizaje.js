@@ -29,7 +29,6 @@
             sortable = null;
         }
 
-        // Con criterio del select, no se arrastra (se guarda con el botón).
         const conCriterio = !!ordenSeleccionado();
         lista.classList.toggle('is-filtrada', conCriterio);
         if (conCriterio) return;
