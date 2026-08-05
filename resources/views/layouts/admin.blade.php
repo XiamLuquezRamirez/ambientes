@@ -43,13 +43,11 @@
             @endphp
             <li class="nav-item">
                 <a href="#navAcademico" data-bs-toggle="collapse" aria-expanded="{{ $academico ? 'true' : 'false' }}"
-                    class="nav-link d-flex align-items-center gap-2 {{ $academico ? 'active' : '' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $academico ? '' : 'collapsed' }}"
                     style="cursor:pointer">
                     <i class="fa-solid fa-graduation-cap"></i>
                     <span>Matrículas</span>
-                    <i class="fa-solid fa-chevron-down ms-auto"
-                        style="font-size:.65rem;transition:transform .2s;
-                              {{ $academico ? 'transform:rotate(180deg)' : '' }}"></i>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
                 </a>
                 <div class="collapse {{ $academico ? 'show' : '' }}" id="navAcademico">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
@@ -113,19 +111,17 @@
             <li class="nav-item">
                 <a href="#navConfiguracion" data-bs-toggle="collapse"
                     aria-expanded="{{ $configuracion ? 'true' : 'false' }}"
-                    class="nav-link d-flex align-items-center gap-2 {{ $configuracion ? 'active' : '' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $configuracion ? '' : 'collapsed' }}"
                     style="cursor:pointer">
                     <i class="fa-solid fa-gear"></i>
                     <span>Configuración</span>
-                    <i class="fa-solid fa-chevron-down ms-auto"
-                        style="font-size:.65rem;transition:transform .2s;
-                              {{ $configuracion ? 'transform:rotate(180deg)' : '' }}"></i>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
                 </a>
                 <div class="collapse {{ $configuracion ? 'show' : '' }}" id="navConfiguracion">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
                             <a href="{{ route('admin.configuracion') }}"
-                                class="{{ request()->routeIs('admin.configuracion*') ? 'active nav-link' : 'nav-link' }}"
+                                class="{{ request()->routeIs('admin.configuracion') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-school"></i> Institución
                             </a>
@@ -155,7 +151,6 @@
             </li>
         </ul>
     </aside>
-
     @php
         $usuarioAuth = Auth::guard('docente')->user();
         $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
@@ -167,7 +162,6 @@
     @endphp
     <header class="header">
         <div class="header-perfil" id="headerPerfil">
-
             {{-- Chip visible siempre --}}
             <div class="avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
             <div class="header-user-info">
@@ -175,10 +169,8 @@
                 <span class="header-user-rol">{{ $rolAuthLabel }}</span>
             </div>
             <span class="header-chevron">▾</span>
-
             {{-- Dropdown --}}
             <div class="header-dropdown">
-
                 <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
                     <div class="dropdown-avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
                     <div>
@@ -187,7 +179,6 @@
                         <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
                     </div>
                 </div>
-
                 <div class="dropdown-section">
                     <a href="{{ route('admin.perfil') }}" class="dropdown-item">
                         <i class="fa-solid fa-user"></i>
@@ -198,9 +189,7 @@
                         Cambiar contraseña
                     </a>
                 </div>
-
                 <div class="dropdown-divider"></div>
-
                 <div class="dropdown-section">
                     <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
                         @csrf
@@ -215,9 +204,7 @@
             </div>
         </div>
     </header>
-
     @include('perfil.cambiar_contrasena', ['rutaContrasena' => route('admin.perfil.contrasena')])
-
     <main class="main">
         <div class="content">
             @yield('content')
@@ -229,7 +216,6 @@
         /* ── Cerrar sesión ────────────────────────────────────── */
         document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
             e.preventDefault();
-
             Swal.fire({
                 title: '¿Deseas cerrar tu sesión?',
                 icon: 'question',
@@ -277,7 +263,6 @@
                 };
             }
         }
-
         /* ── Chevron sidebar group ───────────────────────────────── */
         document.addEventListener('DOMContentLoaded', function() {
             const collapseEl = document.getElementById('navAcademico');
@@ -287,7 +272,6 @@
                 collapseEl.addEventListener('hide.bs.collapse', () => chevron.style.transform = 'rotate(0deg)');
             }
         });
-
         /* ── Dropdown de perfil ──────────────────────────────────── */
         document.addEventListener('DOMContentLoaded', function() {
             const perfil = document.getElementById('headerPerfil');

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
+use App\Models\Departamento;
+use App\Models\Institucion;
+use App\Models\Municipio;
 use App\Models\PerfilAprendizajeInclusion;
 use App\Models\PerfilAprendizajePersonalizado;
-use App\Models\Institucion;
 use App\Models\User;
 use App\Services\InstitucionLogoService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -33,6 +35,7 @@ class InstitucionSuperAdminController extends Controller
     public function index(Request $request)
     {
         $ambientes = Ambiente::all();
+        $departamentos = Departamento::orderBy('descripcion')->get();
         $perfilesAprendizaje = PerfilAprendizajeInclusion::query()->ordenadas()->get();
 
         // solo las del sistemas y adicionales creadas por el super admin
@@ -65,9 +68,22 @@ class InstitucionSuperAdminController extends Controller
         return view('superAdmin.instituciones.index', compact(
             'instituciones',
             'ambientes',
+            'departamentos',
             'perfilesAprendizaje',
             'perfilesAprendizajePersonalizado'
         ));
+    }
+
+    /**
+     * Municipios de un departamento (coddep = codigo del departamento).
+     */
+    public function cargarMunicipios($departamento)
+    {
+        $municipios = Municipio::where('coddep', $departamento)
+            ->orderBy('descripcion')
+            ->get(['id', 'descripcion', 'coddep']);
+
+        return response()->json($municipios);
     }
 
     /**
@@ -113,6 +129,11 @@ class InstitucionSuperAdminController extends Controller
             })
             ->values();
 
+        [$departamentoId, $municipioId] = $this->resolverIdsUbicacion(
+            $institucion->departamento,
+            $institucion->municipio
+        );
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -121,6 +142,8 @@ class InstitucionSuperAdminController extends Controller
                 'codigo_dane' => $institucion->codigo_dane,
                 'municipio' => $institucion->municipio,
                 'departamento' => $institucion->departamento,
+                'departamento_id' => $departamentoId,
+                'municipio_id' => $municipioId,
                 'correo_contacto' => $institucion->correo_contacto,
                 'activo' => (bool) $institucion->activo,
                 'logo' => $institucion->logo,
@@ -147,8 +170,8 @@ class InstitucionSuperAdminController extends Controller
             $institucion = Institucion::create([
                 'nombre' => $datos['nombre'],
                 'codigo_dane' => $datos['codigo_dane'],
-                'municipio' => $datos['municipio'],
-                'departamento' => $datos['departamento'],
+                'municipio' => $datos['municipio_nombre'],
+                'departamento' => $datos['departamento_nombre'],
                 'correo_contacto' => $datos['correo_contacto'],
                 'logo' => null,
                 'activo' => true,
@@ -228,8 +251,8 @@ class InstitucionSuperAdminController extends Controller
             $institucion->update([
                 'nombre' => $datos['nombre'],
                 'codigo_dane' => $datos['codigo_dane'],
-                'municipio' => $datos['municipio'],
-                'departamento' => $datos['departamento'],
+                'municipio' => $datos['municipio_nombre'],
+                'departamento' => $datos['departamento_nombre'],
                 'correo_contacto' => $datos['correo_contacto'],
             ]);
 
@@ -335,11 +358,11 @@ class InstitucionSuperAdminController extends Controller
             $uniqueDane .= ','.$ignoreId;
         }
 
-        return $request->validate([
+        $datos = $request->validate([
             'nombre' => 'required|string|max:255',
             'codigo_dane' => 'required|string|max:20|'.$uniqueDane,
-            'municipio' => 'required|string|max:100',
-            'departamento' => 'required|string|max:100',
+            'departamento_id' => 'required|exists:departamentos,codigo',
+            'municipio_id' => 'required|exists:municipios,id',
             'correo_contacto' => 'required|email|max:255',
             'logo' => ($logoObligatorio ? 'required' : 'nullable')
                 .'|file|mimes:jpeg,jpg,png|max:'.InstitucionLogoService::MAX_KILOBYTES,
@@ -347,7 +370,51 @@ class InstitucionSuperAdminController extends Controller
             'perfil_aprendizaje_personalizado_orden' => 'nullable|array',
         ], [
             'logo.required' => 'El logo de la institución es obligatorio.',
+            'departamento_id.required' => 'Seleccione un departamento.',
+            'departamento_id.exists' => 'El departamento seleccionado no es válido.',
+            'municipio_id.required' => 'Seleccione un municipio.',
+            'municipio_id.exists' => 'El municipio seleccionado no es válido.',
         ]);
+
+        $departamento = Departamento::where('codigo', $datos['departamento_id'])->firstOrFail();
+        $municipio = Municipio::where('id', $datos['municipio_id'])
+            ->where('coddep', $departamento->codigo)
+            ->first();
+
+        if (! $municipio) {
+            throw ValidationException::withMessages([
+                'municipio_id' => ['El municipio no pertenece al departamento seleccionado.'],
+            ]);
+        }
+
+        $datos['departamento_nombre'] = $departamento->descripcion;
+        $datos['municipio_nombre'] = $municipio->descripcion;
+
+        return $datos;
+    }
+
+    /**
+     * Resuelve descripciones guardadas → codigo departamento / id municipio (para el modal de edición).
+     */
+    private function resolverIdsUbicacion(?string $departamentoNombre, ?string $municipioNombre): array
+    {
+        if (! filled($departamentoNombre)) {
+            return [null, null];
+        }
+
+        $departamento = Departamento::where('descripcion', $departamentoNombre)->first();
+        if (! $departamento) {
+            return [null, null];
+        }
+
+        $municipioId = null;
+        if (filled($municipioNombre)) {
+            $municipioId = Municipio::where('descripcion', $municipioNombre)
+                ->where('coddep', $departamento->codigo)
+                ->value('id');
+        }
+
+        return [$departamento->codigo, $municipioId];
     }
 
     /** En edición el logo no viaja en el form: debe existir ya en la institución. */

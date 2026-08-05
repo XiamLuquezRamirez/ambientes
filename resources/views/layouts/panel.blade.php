@@ -24,7 +24,6 @@
 </head>
 
 <body>
-
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
@@ -74,26 +73,21 @@
             </div>
         </ul>
     </aside>
-
     @php
         use App\Models\User;
         use App\Services\PerfilFotoService;
         use App\Models\Institucion;
         $usuarioAuth = Auth::guard('docente')->user();
         $perfilFoto = app(PerfilFotoService::class);
-
         $logoService = app(\App\Services\InstitucionLogoService::class);
-
         if ($usuarioAuth instanceof User) {
             $usuarioAuth->loadMissing('docente');
         }
-
         $inicialesAuth = $usuarioAuth instanceof User ? $perfilFoto->iniciales($usuarioAuth) : 'NN';
         $fotoUrlPublica =
             $usuarioAuth instanceof User ? $perfilFoto->urlPublica($usuarioAuth->docente?->foto_url) : null;
         $rolAuthLabel =
             ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
-
         $institucionId = session('institucion_id') ?? $usuarioAuth?->institucion_id;
         $institucion = $institucionId ? Institucion::find($institucionId) : null;
         $logoUrl = $institucion ? $logoService->urlPublica($institucion->logo) : null;
@@ -105,7 +99,6 @@
                     ->implode(', '),
             )
             : '';
-
     @endphp
     <header class="header">
         @if ($institucion)
@@ -126,7 +119,6 @@
                 </div>
             </div>
         @endif
-
         <div class="header-perfil" id="headerPerfil">
             {{-- Chip visible siempre (foto o iniciales) --}}
             <div class="avatar" id="headerAvatar">
@@ -141,10 +133,8 @@
                 <span class="header-user-rol">{{ $rolAuthLabel }}</span>
             </div>
             <span class="header-chevron">▾</span>
-
             {{-- Dropdown --}}
             <div class="header-dropdown">
-
                 <div class="dropdown-user-card" onclick="window.location.href='{{ route('panel.perfil') }}'">
                     <div class="dropdown-avatar" id="dropdownAvatar">
                         <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
@@ -160,7 +150,6 @@
                         <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
                     </div>
                 </div>
-
                 <div class="dropdown-section">
                     <a href="{{ route('panel.perfil') }}" class="dropdown-item">
                         <i class="fa-solid fa-user"></i>
@@ -171,9 +160,7 @@
                         Cambiar contraseña
                     </a>
                 </div>
-
                 <div class="dropdown-divider"></div>
-
                 <div class="dropdown-section">
                     <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
                         @csrf
@@ -188,9 +175,7 @@
             </div>
         </div>
     </header>
-
     @include('perfil.cambiar_contrasena', ['rutaContrasena' => route('panel.perfil.contrasena')])
-
     <main class="main">
         <div class="content">
             <div class="page-header students-header">
@@ -212,18 +197,15 @@
     </main>
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
-
     <script>
         const cargaAcademicaActiva = @json(session('ambiente_nombre'));
         const menuLateralAmbiente = document.getElementById('menu-lateral-ambiente');
-
         if (!cargaAcademicaActiva) {
             menuLateralAmbiente.style.pointerEvents = 'none';
         }
         /* ── Cerrar sesión ────────────────────────────────────── */
         document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
             e.preventDefault();
-
             Swal.fire({
                 title: '¿Deseas cerrar tu sesión?',
                 icon: 'question',
@@ -239,8 +221,6 @@
                 }
             });
         });
-
-
         /* ── Utilidades globales AJAX ────────────────────────────── */
         async function ajaxRequest(url, method = 'GET', data = null) {
             try {
@@ -273,7 +253,6 @@
                 };
             }
         }
-
         /* ── Dropdown de perfil ──────────────────────────────────── */
         document.addEventListener('DOMContentLoaded', function() {
             const perfil = document.getElementById('headerPerfil');

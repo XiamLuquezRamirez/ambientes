@@ -46,7 +46,7 @@
             <div>
                 <p style= "font-size: 1.2rem;">Ficha completa del estudiante</p>
             </div>
-            <a href="javascript:window.history.back()" class="btn btn-primary">
+            <a href="{{ $urlVolver ?? route('panel.estudiantes') }}" class="btn btn-primary">
                 <i class="fas fa-arrow-left me-1"></i> Volver
             </a>
         </div>

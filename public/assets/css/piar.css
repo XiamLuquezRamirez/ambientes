@@ -449,7 +449,6 @@
     background-color: rgb(217, 236, 255) !important;
 }
 
-
 #div_tratamiento_terapeutico {
     background: #F0FDF4;
     border: 1px solid #E2E8F0;
@@ -530,7 +529,6 @@ label {
 .table-no-border input[type="radio"] {
     scale: 1.5;
 }
-
 
 .no-border-radio {
     border-radius: 0px !important;

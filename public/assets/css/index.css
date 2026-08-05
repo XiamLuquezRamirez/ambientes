@@ -1,7 +1,6 @@
 /*==========================
     DESIGN TOKENS
 ===========================*/
-
 :root {
     --color-bg: #EFF6FF;
     --color-surface: #FFFFFF;
@@ -278,7 +277,6 @@ body {
     font-size: 0.7rem;
     color: #64748B;
     text-transform: capitalize;
-
 }
 
 .header-chevron {
@@ -541,7 +539,6 @@ tr:hover td {
     text-decoration: none;
     transition: background var(--ease), color var(--ease), border-color var(--ease), box-shadow var(--ease);
 }
-
 
 .btn-primary {
     background: var(--color-primary);
@@ -1064,7 +1061,6 @@ select.form-control {
     color: var(--color-danger);
 }
 
-
 .estado-asistencia {
     display: inline-flex;
     align-items: center;
@@ -1161,9 +1157,6 @@ select.form-control {
 .form-check-input:not(:checked)+.estado-texto {
     color: var(--color-danger);
 }
-
-
-
 
 .modal-content {
     border: none;
@@ -1623,4 +1616,12 @@ Estilos compartidos de modales
 
 .tabla-docentes tr:last-child td {
     border-bottom: none;
+}
+
+.chevron {
+    transition: transform .25s ease;
+}
+
+.nav-link:not(.collapsed) .chevron {
+    transform: rotate(180deg);
 }

@@ -12,6 +12,7 @@
 @php
     $perfilesAprendizaje = $perfilesAprendizaje ?? collect();
     $perfilesAprendizajePersonalizado = $perfilesAprendizajePersonalizado ?? collect();
+    $departamentos = $departamentos ?? collect();
 @endphp
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/instituciones/index.css') }}">
@@ -49,8 +50,9 @@
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-perfiles-aprendizaje" data-bs-toggle="tab" href="#perfilesAprendizajeInstitucion"
-                            role="tab" aria-controls="perfilesAprendizajeInstitucion" aria-selected="false">
+                        <a class="nav-link" id="tab-perfiles-aprendizaje" data-bs-toggle="tab"
+                            href="#perfilesAprendizajeInstitucion" role="tab"
+                            aria-controls="perfilesAprendizajeInstitucion" aria-selected="false">
                             <i class="fas fa-layer-group"></i> Perfiles de Aprendizaje
                         </a>
                     </li>
@@ -100,23 +102,28 @@
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold" for="codigo_dane">Código DANE</label>
-                                        <input type="text" id="codigo_dane" name="codigo_dane" class="form-control"
-                                            placeholder="Código DANE de la institución" required>
+                                        <input type="text" id="codigo_dane" name="codigo_dane"
+                                            class="form-control" placeholder="Código DANE de la institución" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold" for="municipio">Municipio</label>
-                                        <input type="text" id="municipio" name="municipio" class="form-control"
-                                            placeholder="Municipio de la institución" required>
+                                        <label class="form-label fw-bold" for="departamento_id">Departamento</label>
+                                        <select id="departamento_id" name="departamento_id" class="form-control"
+                                            required onchange="cargarMunicipiosInstitucion()">
+                                            <option value="">Seleccione</option>
+                                            @foreach ($departamentos as $d)
+                                                <option value="{{ $d->codigo }}">{{ $d->descripcion }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold" for="departamento">Departamento</label>
-                                        <input type="text" id="departamento" name="departamento"
-                                            class="form-control" placeholder="Departamento de la institución"
-                                            required>
+                                        <label class="form-label fw-bold" for="municipio_id">Municipio</label>
+                                        <select id="municipio_id" name="municipio_id" class="form-control" required>
+                                            <option value="">Seleccione</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -216,11 +223,11 @@
                                                 <input type="hidden"
                                                     name="perfil_aprendizaje_orden[{{ $perfilAprendizaje->id }}][orden]"
                                                     value="{{ $loop->index }}">
-                                                <input class="form-check-input chk-perfil-aprendizaje-orden" type="checkbox"
+                                                <input class="form-check-input chk-perfil-aprendizaje-orden"
+                                                    type="checkbox"
                                                     id="perfil_aprendizaje_orden_{{ $perfilAprendizaje->id }}"
                                                     name="perfil_aprendizaje_orden[{{ $perfilAprendizaje->id }}][activa]"
-                                                    value="1" checked
-                                                    data-id="{{ $perfilAprendizaje->id }}">
+                                                    value="1" checked data-id="{{ $perfilAprendizaje->id }}">
                                                 <label for="perfil_aprendizaje_orden_{{ $perfilAprendizaje->id }}">
                                                     <span class="badge"
                                                         style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55">
@@ -230,7 +237,8 @@
                                                 </label>
                                             </div>
                                         @empty
-                                            <p class="text-muted text-center py-3 mb-0">Sin perfiles de aprendizaje registrados</p>
+                                            <p class="text-muted text-center py-3 mb-0">Sin perfiles de aprendizaje
+                                                registrados</p>
                                         @endforelse
                                     </div>
                                 </div>
@@ -238,17 +246,20 @@
 
                             <div class="card card-perfiles-aprendizaje-orden">
                                 <div class="card-header" data-bs-toggle="collapse"
-                                    data-bs-target="#collapsePerfilesAprendizajePersonalizadoOrden" aria-expanded="true"
+                                    data-bs-target="#collapsePerfilesAprendizajePersonalizadoOrden"
+                                    aria-expanded="true"
                                     aria-controls="collapsePerfilesAprendizajePersonalizadoOrden">
                                     <h6>
                                         <i class="fa-solid fa-list-check me-2"></i>
                                         Perfiles de Aprendizaje Personalizados
-                                        <span class="badge badge-blue ms-1" id="badgeCountPersonalizadoOrden">{{ $perfilesAprendizajePersonalizado->count() }}</span>
+                                        <span class="badge badge-blue ms-1"
+                                            id="badgeCountPersonalizadoOrden">{{ $perfilesAprendizajePersonalizado->count() }}</span>
                                     </h6>
                                     <i class="fa-solid fa-chevron-down chevron"></i>
                                 </div>
                                 <div id="collapsePerfilesAprendizajePersonalizadoOrden" class="collapse show">
-                                    <div class="lista-perfiles-aprendizaje-orden" id="listaPerfilesAprendizajePersonalizadoOrden">
+                                    <div class="lista-perfiles-aprendizaje-orden"
+                                        id="listaPerfilesAprendizajePersonalizadoOrden">
                                         @forelse ($perfilesAprendizajePersonalizado as $transitoria)
                                             @php
                                                 $colorT = $transitoria->perfilAprendizaje?->color_hex ?: '#64748B';
@@ -257,13 +268,14 @@
                                                 <input type="hidden"
                                                     name="perfil_aprendizaje_personalizado_orden[{{ $transitoria->id }}][orden]"
                                                     value="{{ $loop->index }}">
-                                                <input class="form-check-input chk-perfil-aprendizaje-personalizado-orden"
+                                                <input
+                                                    class="form-check-input chk-perfil-aprendizaje-personalizado-orden"
                                                     type="checkbox"
                                                     id="perfil_aprendizaje_personalizado_orden_{{ $transitoria->id }}"
                                                     name="perfil_aprendizaje_personalizado_orden[{{ $transitoria->id }}][activa]"
-                                                    value="1" checked
-                                                    data-id="{{ $transitoria->id }}">
-                                                <label for="perfil_aprendizaje_personalizado_orden_{{ $transitoria->id }}">
+                                                    value="1" checked data-id="{{ $transitoria->id }}">
+                                                <label
+                                                    for="perfil_aprendizaje_personalizado_orden_{{ $transitoria->id }}">
                                                     <span class="badge"
                                                         style="background:{{ $colorT }}22;color:{{ $colorT }};border:1px solid {{ $colorT }}55">
                                                         {{ $transitoria->codigo }}
@@ -309,6 +321,7 @@
          */
         const URL_INSTITUCIONES_BASE = @json(url('superadmin/instituciones'));
         const URL_INSTITUCIONES_GUARDAR = @json(route('superadmin.instituciones.guardar'));
+        const URL_CARGAR_MUNICIPIOS = @json(url('superadmin/instituciones/cargar-municipios'));
 
         /** 1 = crear, 2 = editar */
         var tipoPost = 1;
@@ -384,6 +397,12 @@
             form.reset();
             limpiarErroresModal('formAgregarInstitucion');
 
+            // Municipios dependen del departamento: dejar solo placeholder.
+            const selMunicipio = document.getElementById('municipio_id');
+            if (selMunicipio) {
+                selMunicipio.innerHTML = '<option value="">Seleccione</option>';
+            }
+
             // Desmarca ambientes (reset no siempre limpia bien en algunos browsers con switches).
             form.querySelectorAll('#servidores input[type="checkbox"][name*="[activo]"]').forEach(cb => {
                 cb.checked = false;
@@ -394,13 +413,45 @@
 
             // Por defecto todos los perfiles de aprendizaje quedan chequeados.
             document.querySelectorAll('.chk-perfil-aprendizaje-orden, .chk-perfil-aprendizaje-personalizado-orden')
-            .forEach(chk => {
-                chk.checked = true;
-            });
+                .forEach(chk => {
+                    chk.checked = true;
+                });
 
             const tabDatos = document.querySelector('#tab-datos-institucion');
             if (tabDatos) {
                 bootstrap.Tab.getOrCreateInstance(tabDatos).show();
+            }
+        }
+
+        async function cargarMunicipiosInstitucion(municipioSeleccionado = null) {
+            const departamento = document.getElementById('departamento_id')?.value;
+            const selMunicipio = document.getElementById('municipio_id');
+            if (!selMunicipio) return;
+
+            selMunicipio.innerHTML = '<option value="">Seleccione</option>';
+
+            if (!departamento) return;
+
+            try {
+                const res = await fetch(`${URL_CARGAR_MUNICIPIOS}/${departamento}`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!res.ok) throw new Error('Error al cargar municipios');
+                const municipios = await res.json();
+
+                (municipios || []).forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.id;
+                    opt.textContent = m.descripcion;
+                    if (municipioSeleccionado != null && String(m.id) === String(municipioSeleccionado)) {
+                        opt.selected = true;
+                    }
+                    selMunicipio.appendChild(opt);
+                });
+            } catch (e) {
+                mostrarToast('error', 'Error al cargar los municipios');
             }
         }
 
@@ -436,12 +487,12 @@
                 const color = t.color || '#64748B';
                 const checked = hayOrden ? (mapaActiva[t.id] ?? false) : true;
                 const esLocal = t.institucion_id != null;
-                const badgeLocal = esLocal
-                    ? '<span class="badge badge-gray" style="margin-left:6px">Institución</span>'
-                    : '';
-                const baseTxt = t.perfil_aprendizaje
-                    ? `<small class="text-muted" style="margin-left:6px">(${t.perfil_aprendizaje.codigo})</small>`
-                    : '';
+                const badgeLocal = esLocal ?
+                    '<span class="badge badge-gray" style="margin-left:6px">Institución</span>' :
+                    '';
+                const baseTxt = t.perfil_aprendizaje ?
+                    `<small class="text-muted" style="margin-left:6px">(${t.perfil_aprendizaje.codigo})</small>` :
+                    '';
 
                 return `
                     <div class="item-perfil-aprendizaje-orden" data-origen="${esLocal ? 'institucion' : 'global'}">
@@ -472,7 +523,8 @@
             if (badge) badge.textContent = String(disponibles.length);
         }
 
-        function aplicarSeleccionPerfilesAprendizajeOrden(perfilesAprendizajeOrden = [], perfilesAprendizajePersonalizadoOrden = []) {
+        function aplicarSeleccionPerfilesAprendizajeOrden(perfilesAprendizajeOrden = [],
+            perfilesAprendizajePersonalizadoOrden = []) {
             const mapaCond = {};
             (perfilesAprendizajeOrden || []).forEach(item => {
                 mapaCond[item.perfil_aprendizaje_id] = !!item.activa;
@@ -480,9 +532,9 @@
 
             document.querySelectorAll('.chk-perfil-aprendizaje-orden').forEach(chk => {
                 const id = parseInt(chk.dataset.id, 10);
-                chk.checked = Object.keys(mapaCond).length
-                    ? (mapaCond[id] ?? false)
-                    : true;
+                chk.checked = Object.keys(mapaCond).length ?
+                    (mapaCond[id] ?? false) :
+                    true;
             });
 
             const mapaTrans = {};
@@ -492,9 +544,9 @@
 
             document.querySelectorAll('.chk-perfil-aprendizaje-personalizado-orden').forEach(chk => {
                 const id = parseInt(chk.dataset.id, 10);
-                chk.checked = Object.keys(mapaTrans).length
-                    ? (mapaTrans[id] ?? false)
-                    : true;
+                chk.checked = Object.keys(mapaTrans).length ?
+                    (mapaTrans[id] ?? false) :
+                    true;
             });
         }
 
@@ -716,6 +768,29 @@
             }
         }
 
+        // Copiar contraseña al portapapeles.
+        $(document).on('click', '.btn-copiar', function() {
+            const inputId = $(this).data('target');
+            const texto = $('#' + inputId).val();
+            navigator.clipboard.writeText(texto)
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copiado al portapapeles',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                })
+                .catch(() => {
+                    Swal.fire(
+                        'Error',
+                        'No fue posible copiar el texto.',
+                        'error'
+                    );
+                });
+
+        });
+
         document.getElementById('btnDescargarPdf')?.addEventListener('click', function() {
             const id = this.dataset.usuarioId;
             if (!id) return;
@@ -768,9 +843,18 @@
             id_editar = String(data.id);
             $('#nombre').val(data.nombre ?? '');
             $('#codigo_dane').val(data.codigo_dane ?? '');
-            $('#municipio').val(data.municipio ?? '');
-            $('#departamento').val(data.departamento ?? '');
             $('#correo_contacto').val(data.correo_contacto ?? '');
+
+            const departamentoId = data.departamento_id ?? '';
+            $('#departamento_id').val(departamentoId);
+            if (departamentoId) {
+                cargarMunicipiosInstitucion(data.municipio_id ?? null);
+            } else {
+                const selMunicipio = document.getElementById('municipio_id');
+                if (selMunicipio) {
+                    selMunicipio.innerHTML = '<option value="">Seleccione</option>';
+                }
+            }
 
             // Limpia ambientes antes de aplicar los de esta institución.
             document.querySelectorAll('#servidores input[type="checkbox"][name*="[activo]"]').forEach(cb => {

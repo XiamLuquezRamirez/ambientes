@@ -1,7 +1,6 @@
 /*==========================
     TOKENS (página estudiantes)
 ===========================*/
-
 .students-page,
 .ficha-page {
     --stu-bg: var(--color-surface, #fff);
@@ -26,7 +25,6 @@
 /*==========================
     PÁGINA
 ===========================*/
-
 .students-page {
     display: flex;
     flex-direction: column;
@@ -64,7 +62,6 @@
 /*==========================
     ESTADÍSTICAS
 ===========================*/
-
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -144,7 +141,6 @@
 /*==========================
     FILTROS
 ===========================*/
-
 .students-toolbar {
     background: var(--stu-bg);
     border-radius: var(--stu-radius);
@@ -268,7 +264,6 @@
 /*==========================
     GRID
 ===========================*/
-
 .students-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -332,7 +327,6 @@
 /*==========================
     TARJETAS
 ===========================*/
-
 .student-card {
     background: var(--stu-bg);
     border-radius: var(--stu-radius);
@@ -453,7 +447,6 @@
 /*==========================
     BADGES
 ===========================*/
-
 .student-middle {
     display: flex;
     justify-content: flex-start;
@@ -525,7 +518,6 @@
 /*==========================
     PIN / INFO
 ===========================*/
-
 .student-info {
     margin-top: auto;
     padding: 8px 14px 10px;
@@ -614,7 +606,6 @@
 /*==========================
     ACCIONES / OPCIONES
 ===========================*/
-
 /* Grid: mismo lugar visual (arriba a la derecha) */
 .student-options {
     position: absolute;
@@ -676,7 +667,7 @@
     margin-bottom: 2px;
 }
 
-.student-options .dropdown-menu-acciones > li:last-child .btn-accion {
+.student-options .dropdown-menu-acciones>li:last-child .btn-accion {
     margin-bottom: 0;
 }
 
@@ -704,7 +695,6 @@
 /*==========================
     CARD AGREGAR
 ===========================*/
-
 .student-card--add {
     border: 1.5px dashed #CBD5E1;
     background: var(--stu-surface);
@@ -767,7 +757,6 @@
 /*==========================
     VACÍO
 ===========================*/
-
 .students-empty {
     background: var(--stu-bg);
     border-radius: 16px;
@@ -805,7 +794,6 @@
 /*==========================
     PAGINACIÓN (propia)
 ===========================*/
-
 .students-footer {
     display: flex;
     align-items: center;
@@ -879,7 +867,6 @@
 /*==========================
     RESPONSIVE
 ===========================*/
-
 @media (max-width: 1400px) {
     .students-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -958,7 +945,6 @@
 /*==========================
     FICHA COMPLETA
 ===========================*/
-
 .ficha-page {
     display: flex;
     flex-direction: column;
@@ -1317,7 +1303,6 @@
 /*==========================
     MODAL ACTIVAR PERFIL DE APRENDIZAJE PERSONALIZADO
 ===========================*/
-
 .btn-outline-pink {
     border-color: #ff4684;
     color: #ff4684;

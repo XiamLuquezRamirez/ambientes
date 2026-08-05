@@ -23,9 +23,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
 </head>
 
-
 <body>
-
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
@@ -46,7 +44,6 @@
                     <i class="fa-solid fa-university"></i> Instituciones
                 </a>
             </li>
-
             <li class="nav-item">
                 <a href="{{ route('superadmin.administradores.listar') }}"
                     class="{{ request()->routeIs('superadmin.administradores.index') ? 'active nav-link' : 'nav-link' }}">
@@ -62,14 +59,10 @@
             <li class="nav-item">
                 <a href="#navPerfilesAprendizaje" data-bs-toggle="collapse"
                     aria-expanded="{{ $perfilesAprendizaje ? 'true' : 'false' }}"
-                    class="nav-link d-flex align-items-center gap-2 {{ $perfilesAprendizaje ? 'active' : '' }}"
-                    style="cursor:pointer">
-                    <i class="fa-solid fa-graduation-cap"></i>
+                    class="nav-link d-flex align-items-center gap-2 {{ $perfilesAprendizaje ? '' : 'collapsed' }}">
+                    <i class="fa-solid fa-brain"></i>
                     <span>Perfiles de Aprendizaje</span>
-                    <i class="fa-solid fa-chevron-down ms-auto"
-                        style="font-size:.65rem;transition:transform .2s;
-                              {{ $perfilesAprendizaje ? 'transform:rotate(180deg)' : '' }}">
-                    </i>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
                 </a>
                 <div class="collapse {{ $perfilesAprendizaje ? 'show' : '' }}" id="navPerfilesAprendizaje">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
@@ -93,28 +86,22 @@
             </li>
         </ul>
     </aside>
-
     @php
         use App\Models\User;
         use App\Services\PerfilFotoService;
-
         $usuarioAuth = Auth::guard('docente')->user();
         $perfilFoto = app(PerfilFotoService::class);
-
         if ($usuarioAuth instanceof User) {
             $usuarioAuth->loadMissing('docente');
         }
-
         $inicialesAuth = $usuarioAuth instanceof User ? $perfilFoto->iniciales($usuarioAuth) : 'NN';
         $fotoUrlPublica =
             $usuarioAuth instanceof User ? $perfilFoto->urlPublica($usuarioAuth->docente?->foto_url) : null;
         $rolAuthLabel =
             ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
     @endphp
-
     <header class="header">
         <div class="header-perfil" id="headerPerfil">
-
             {{-- Chip visible siempre (foto o iniciales) --}}
             <div class="avatar" id="headerAvatar">
                 <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
@@ -128,10 +115,8 @@
                 <span class="header-user-rol">{{ $rolAuthLabel }}</span>
             </div>
             <span class="header-chevron">▾</span>
-
             {{-- Dropdown --}}
             <div class="header-dropdown">
-
                 <div class="dropdown-user-card">
                     <div class="dropdown-avatar" id="dropdownAvatar">
                         <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
@@ -147,7 +132,6 @@
                         <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
                     </div>
                 </div>
-
                 <div class="dropdown-section">
                     <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
                         @csrf
@@ -162,21 +146,17 @@
             </div>
         </div>
     </header>
-
-
     <main class="main">
         <div class="content">
             @yield('content')
         </div>
     </main>
-
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
         /* ── Cerrar sesión ────────────────────────────────────── */
         document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
             e.preventDefault();
-
             Swal.fire({
                 title: '¿Deseas cerrar tu sesión?',
                 icon: 'question',
@@ -224,7 +204,6 @@
                 };
             }
         }
-
         /* ── Chevron sidebar group ───────────────────────────────── */
         document.addEventListener('DOMContentLoaded', function() {
             const collapseEl = document.getElementById('navAcademico');
@@ -234,7 +213,6 @@
                 collapseEl.addEventListener('hide.bs.collapse', () => chevron.style.transform = 'rotate(0deg)');
             }
         });
-
         /* ── Dropdown de perfil ──────────────────────────────────── */
         document.addEventListener('DOMContentLoaded', function() {
             const perfil = document.getElementById('headerPerfil');
