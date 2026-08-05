@@ -244,6 +244,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     // Ficha completa: verFicha → show.blade.php
     Route::get('estudiantes/ficha/{estudiante}', [EstudiantePanelController::class, 'verFicha'])->name('panel.estudiantes.show');
     Route::post('estudiantes/ficha/{estudiante}/perfil-aprendizaje-personalizado', [EstudiantePanelController::class, 'activarPerfilAprendizajePersonalizado'])->name('panel.estudiantes.perfil-aprendizaje-personalizado.activar');
+    Route::get('estudiantes/ficha/{estudiante}/perfil-aprendizaje-personalizado/fragmentos', [EstudiantePanelController::class, 'fragmentosPerfilAprendizajePersonalizado'])->name('panel.estudiantes.perfil-aprendizaje-personalizado.fragmentos');
 
     // Datos JSON para modal de edición (compartido con index.js)
     Route::get('estudiantes/{estudiante}', [EstudianteAdminController::class, 'ver'])->name('panel.estudiantes.datos');

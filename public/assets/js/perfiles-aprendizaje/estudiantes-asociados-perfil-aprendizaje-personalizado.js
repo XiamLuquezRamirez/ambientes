@@ -2,7 +2,7 @@
  * Modal estudiantes asociados a perfil de aprendizaje personalizado (admin / panel docente)
  */
 (function() {
-    if (!window.CT_EST_URL_LIST || !window.CT_EST_URL_DESASOCIAR) return;
+    if (!window.CT_EST_URL_DESASOCIAR) return;
 
     const $modal = $('#modalEstudiantesTransitoria');
     const $contenedor = $('#modalEstudiantesTransitoriaContenedor');
@@ -134,7 +134,7 @@
     }
 
     function recargarModalActual() {
-        if (!perfilAprendizajePersonalizadoActualId) return;
+        if (!perfilAprendizajePersonalizadoActualId || !window.CT_EST_URL_LIST) return;
         $loading.show();
         $empty.hide();
         $contenedor.hide();
@@ -226,7 +226,7 @@
         }
 
         Swal.fire({
-            title: 'Desvinculando...',
+            title: 'Desactivando...',
             allowOutsideClick: false,
             allowEscapeKey: false,
             didOpen: () => Swal.showLoading()
@@ -245,22 +245,37 @@
                 Swal.close();
                 if (res.success) {
                     bootstrap.Modal.getInstance($modalDesasociar[0])?.hide();
+                    if (typeof window.CT_EST_ON_DESASOCIAR_SUCCESS === 'function') {
+                        window.CT_EST_ON_DESASOCIAR_SUCCESS(res);
+                        return;
+                    }
                     if (typeof mostrarToast === 'function') {
                         mostrarToast('success', res.message);
                     }
                     refrescarListas();
                     recargarModalActual();
+                } else if (typeof window.CT_EST_ON_DESASOCIAR_SUCCESS === 'function') {
+                    if (typeof mostrarToast === 'function') {
+                        mostrarToast('error', res.message || 'No se pudo desactivar.');
+                    }
                 } else {
                     Swal.fire({ icon: 'error', title: 'Error', text: res.message || 'No se pudo Desactivar.' });
                 }
             },
             error: function(xhr) {
                 Swal.close();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: xhr.responseJSON?.message || 'No se pudo Desactivar.'
-                });
+                const msg = xhr.responseJSON?.message || 'No se pudo Desactivar.';
+                if (typeof window.CT_EST_ON_DESASOCIAR_SUCCESS === 'function') {
+                    if (typeof mostrarToast === 'function') {
+                        mostrarToast('error', msg);
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: msg
+                    });
+                }
             }
         });
     });
