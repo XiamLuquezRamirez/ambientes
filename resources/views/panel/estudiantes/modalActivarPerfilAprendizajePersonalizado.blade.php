@@ -3,9 +3,9 @@
     $perfilesAprendizajePersonalizado = $perfilesAprendizajePersonalizado ?? collect();
 @endphp
 
-<div class="modal fade" id="modalPerfilAprendizajePersonalizado" tabindex="-1" aria-labelledby="modalPerfilAprendizajePersonalizadoLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade modal-app" id="modalPerfilAprendizajePersonalizado" tabindex="-1"
+    aria-labelledby="modalPerfilAprendizajePersonalizadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <form method="POST" action="{{ route('panel.estudiantes.perfil-aprendizaje-personalizado.activar', $estudiante) }}"
             class="modal-content" id="formPerfilAprendizajePersonalizado">
             @csrf
@@ -18,7 +18,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
-            <div class="modal-body" style="display:grid;gap:14px;">
+            <div class="modal-body d-grid gap-3">
                 <div>
                     <label class="form-label fw-semibold" for="ct_select_trigger">Perfil de aprendizaje personalizado</label>
                     <input type="hidden" name="perfil_aprendizaje_personalizado_id" id="perfil_aprendizaje_personalizado_id" value="" required>
@@ -67,7 +67,9 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
                 <button type="submit" class="btn btn-primary" id="btnActivarPerfilAprendizajePersonalizado">
                     <i class="fa-solid fa-check"></i> Activar
                 </button>

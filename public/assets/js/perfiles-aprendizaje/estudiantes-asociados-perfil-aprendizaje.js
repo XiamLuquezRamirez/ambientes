@@ -1,5 +1,5 @@
 /**
- * Modal estudiantes asociados a perfil de aprendizaje normal — solo admin, solo lectura
+ * Modal estudiantes asociados a perfil de aprendizaje normal — solo lectura
  */
 (function() {
     if (!window.PA_EST_URL_LIST) return;
@@ -12,6 +12,8 @@
     const $sinResultados = $('#modalEstudiantesPerfilAprendizajeSinResultados');
     const $contador = $('#modalEstudiantesPerfilAprendizajeContador');
     const $filtroNombre = $('#cnEstFiltroNombre');
+    const $filtroGrado = $('#cnEstFiltroGrado');
+    const $filtroGrupo = $('#cnEstFiltroGrupo');
 
     let estudiantesCache = [];
 
@@ -21,6 +23,41 @@
 
     function normalizar(texto) {
         return (texto || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function valoresUnicosOrdenados(items, campo) {
+        return [...new Set(items.map((e) => e[campo]).filter(Boolean))].sort((a, b) =>
+            a.localeCompare(b, 'es', { sensitivity: 'base', numeric: true })
+        );
+    }
+
+    function limpiarFiltros() {
+        $filtroNombre.val('');
+        $filtroGrado.val('');
+        $filtroGrupo.val('');
+    }
+
+    function poblarSelectGrados(estudiantes) {
+        const grados = valoresUnicosOrdenados(estudiantes, 'grado');
+        $filtroGrado.html('<option value="">Todos los grados</option>' +
+            grados.map((g) => `<option value="${escapar(g)}">${escapar(g)}</option>`).join(''));
+    }
+
+    function poblarSelectGrupos(estudiantes, gradoSeleccionado) {
+        const fuente = gradoSeleccionado
+            ? estudiantes.filter((e) => (e.grado || '') === gradoSeleccionado)
+            : estudiantes;
+        const grupos = valoresUnicosOrdenados(fuente, 'grupo');
+        const valorActual = $filtroGrupo.val();
+
+        $filtroGrupo.html('<option value="">Todos los grupos</option>' +
+            grupos.map((g) => `<option value="${escapar(g)}">${escapar(g)}</option>`).join(''));
+
+        if (valorActual && grupos.includes(valorActual)) {
+            $filtroGrupo.val(valorActual);
+        } else {
+            $filtroGrupo.val('');
+        }
     }
 
     function renderFila(e) {
@@ -40,7 +77,15 @@
 
     function filtrarEstudiantes() {
         const q = normalizar($filtroNombre.val().trim());
-        return estudiantesCache.filter((e) => !q || normalizar(e.nombre).includes(q));
+        const grado = $filtroGrado.val();
+        const grupo = $filtroGrupo.val();
+
+        return estudiantesCache.filter((e) => {
+            const matchNombre = !q || normalizar(e.nombre).includes(q);
+            const matchGrado = !grado || (e.grado || '') === grado;
+            const matchGrupo = !grupo || (e.grupo || '') === grupo;
+            return matchNombre && matchGrado && matchGrupo;
+        });
     }
 
     function aplicarFiltros() {
@@ -49,10 +94,10 @@
 
         if (!filtrados.length) {
             $sinResultados.show();
-            $('.ct-est-table-wrap').hide();
+            $contenedor.find('.ct-est-table-wrap').hide();
         } else {
             $sinResultados.hide();
-            $('.ct-est-table-wrap').show();
+            $contenedor.find('.ct-est-table-wrap').show();
             $tbody.html(filtrados.map(renderFila).join(''));
         }
 
@@ -75,12 +120,14 @@
 
         $empty.hide();
         $contenedor.show();
-        $filtroNombre.val('');
+        limpiarFiltros();
+        poblarSelectGrados(estudiantesCache);
+        poblarSelectGrupos(estudiantesCache, '');
         aplicarFiltros();
     }
 
     window.abrirModalEstudiantesPerfilAprendizaje = function(perfilAprendizajeId, etiqueta) {
-        $filtroNombre.val('');
+        limpiarFiltros();
         estudiantesCache = [];
         $('#modalEstudiantesPerfilAprendizajeSubtitle').text(etiqueta || 'Perfil de aprendizaje');
         $loading.show();
@@ -123,6 +170,11 @@
     };
 
     $filtroNombre.on('input', aplicarFiltros);
+    $filtroGrado.on('change', function() {
+        poblarSelectGrupos(estudiantesCache, $(this).val());
+        aplicarFiltros();
+    });
+    $filtroGrupo.on('change', aplicarFiltros);
 
     $(document).on('click keydown', '.badge-estudiantes-perfil-aprendizaje--click', function(e) {
         if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;

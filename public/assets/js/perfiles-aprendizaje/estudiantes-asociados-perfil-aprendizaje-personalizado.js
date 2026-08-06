@@ -12,6 +12,8 @@
     const $sinResultados = $('#modalEstudiantesTransitoriaSinResultados');
     const $contador = $('#modalEstudiantesTransitoriaContador');
     const $filtroNombre = $('#ctEstFiltroNombre');
+    const $filtroGrado = $('#ctEstFiltroGrado');
+    const $filtroGrupo = $('#ctEstFiltroGrupo');
     const $filtroDocente = $('#ctEstFiltroDocente');
     const $modalDesasociar = $('#modalDesasociarTransitoria');
     const $formDesasociar = $('#formDesasociarTransitoria');
@@ -44,7 +46,38 @@
 
     function limpiarFiltros() {
         $filtroNombre.val('');
+        $filtroGrado.val('');
+        $filtroGrupo.val('');
         $filtroDocente.val('');
+    }
+
+    function valoresUnicosOrdenados(items, campo) {
+        return [...new Set(items.map((e) => e[campo]).filter(Boolean))].sort((a, b) =>
+            a.localeCompare(b, 'es', { sensitivity: 'base', numeric: true })
+        );
+    }
+
+    function poblarSelectGrados(estudiantes) {
+        const grados = valoresUnicosOrdenados(estudiantes, 'grado');
+        $filtroGrado.html('<option value="">Todos los grados</option>' +
+            grados.map((g) => `<option value="${escapar(g)}">${escapar(g)}</option>`).join(''));
+    }
+
+    function poblarSelectGrupos(estudiantes, gradoSeleccionado) {
+        const fuente = gradoSeleccionado
+            ? estudiantes.filter((e) => (e.grado || '') === gradoSeleccionado)
+            : estudiantes;
+        const grupos = valoresUnicosOrdenados(fuente, 'grupo');
+        const valorActual = $filtroGrupo.val();
+
+        $filtroGrupo.html('<option value="">Todos los grupos</option>' +
+            grupos.map((g) => `<option value="${escapar(g)}">${escapar(g)}</option>`).join(''));
+
+        if (valorActual && grupos.includes(valorActual)) {
+            $filtroGrupo.val(valorActual);
+        } else {
+            $filtroGrupo.val('');
+        }
     }
 
     function poblarSelectDocentes(estudiantes) {
@@ -58,12 +91,16 @@
 
     function filtrarEstudiantes() {
         const q = normalizar($filtroNombre.val().trim());
+        const grado = $filtroGrado.val();
+        const grupo = $filtroGrupo.val();
         const docente = $filtroDocente.val();
 
         return estudiantesCache.filter((e) => {
             const matchNombre = !q || normalizar(e.nombre).includes(q);
+            const matchGrado = !grado || (e.grado || '') === grado;
+            const matchGrupo = !grupo || (e.grupo || '') === grupo;
             const matchDocente = !docente || (e.docente || '') === docente;
-            return matchNombre && matchDocente;
+            return matchNombre && matchGrado && matchGrupo && matchDocente;
         });
     }
 
@@ -102,10 +139,10 @@
 
         if (!filtrados.length) {
             $sinResultados.show();
-            $('.ct-est-table-wrap').hide();
+            $contenedor.find('.ct-est-table-wrap').hide();
         } else {
             $sinResultados.hide();
-            $('.ct-est-table-wrap').show();
+            $contenedor.find('.ct-est-table-wrap').show();
             $tbody.html(filtrados.map(renderFila).join(''));
         }
 
@@ -129,6 +166,8 @@
         $empty.hide();
         $contenedor.show();
         limpiarFiltros();
+        poblarSelectGrados(estudiantesCache);
+        poblarSelectGrupos(estudiantesCache, '');
         poblarSelectDocentes(estudiantesCache);
         aplicarFiltros();
     }
@@ -200,6 +239,11 @@
     };
 
     $filtroNombre.on('input', aplicarFiltros);
+    $filtroGrado.on('change', function() {
+        poblarSelectGrupos(estudiantesCache, $(this).val());
+        aplicarFiltros();
+    });
+    $filtroGrupo.on('change', aplicarFiltros);
     $filtroDocente.on('change', aplicarFiltros);
 
     $(document).on('click keydown', '.badge-estudiantes-transitoria--click', function(e) {

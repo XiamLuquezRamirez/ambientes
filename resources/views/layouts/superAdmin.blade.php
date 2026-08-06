@@ -70,15 +70,14 @@
                             <a href="{{ route('superadmin.perfil-aprendizaje.index') }}"
                                 class="{{ request()->routeIs('superadmin.perfil-aprendizaje.*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-layer-group" style="font-size:.8em"></i> Perfiles de Aprendizaje
+                                <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i> Perfiles de Aprendizaje Globales
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('superadmin.perfil-aprendizaje-personalizado.index') }}"
                                 class="{{ request()->routeIs('superadmin.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-list-check" style="font-size:.8em"></i> Perfiles de Aprendizaje
-                                Personalizados Globales
+                                <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i> Perfiles de Aprendizaje Personalizados  Globales
                             </a>
                         </li>
                     </ul>
