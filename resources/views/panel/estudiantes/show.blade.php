@@ -122,32 +122,9 @@
             </div>
         </section>
 
-        @if ($perfilAprendizajePersonalizadoActiva ?? null)
-            <section class="c-card" style="border-color:#FDBA74;background:#FFF7ED;">
-                <h3 class="ficha-section-title" style="color:#C2410C;">
-                    <i class="fa-solid fa-puzzle-piece me-1"></i> Perfil de aprendizaje personalizado activo
-                </h3>
-                <dl class="ficha-dl">
-                    <div>
-                        <dt>Perfil de aprendizaje</dt>
-                        <dd>{{ $perfilAprendizajePersonalizadoActiva->perfilAprendizajePersonalizado?->etiqueta ?? '—' }}</dd>
-                    </div>
-                    <div>
-                        <dt>Activada</dt>
-                        <dd>{{ $perfilAprendizajePersonalizadoActiva->fecha_activacion?->format('d/m/Y H:i') ?? '—' }}</dd>
-                    </div>
-                    <div>
-                        <dt>Docente</dt>
-                        <dd>
-                            {{ trim(($perfilAprendizajePersonalizadoActiva->docente?->user?->nombre ?? '') . ' ' . ($perfilAprendizajePersonalizadoActiva->docente?->user?->apellido ?? '')) ?: '—' }}
-                        </dd>
-                    </div>
-                </dl>
-                <p class="mb-0 mt-2" style="color:#9A3412;font-size:.92rem;">
-                    {{ $perfilAprendizajePersonalizadoActiva->observacion }}
-                </p>
-            </section>
-        @endif 
+        <div id="fichaPerfilPersonalizadoActivo">
+            @include('panel.estudiantes.partials._perfilAprendizajePersonalizadoActivo')
+        </div>
 
         @if ($estudiante->perfilAprendizaje !== null && $estudiante->perfilAprendizaje->id != 1)
             <section class="c-card" style="border-color:{{ $estudiante->perfilAprendizaje->color_hex }};background:#{{ $estudiante->perfilAprendizaje->color_hex }}22;">
@@ -231,25 +208,13 @@
                     </a>
                 @endif
 
-                @if ($estudiante->piar == null)
-                    @if (!($perfilesAprendizajePersonalizado ?? collect())->isEmpty())
-                        <button type="button" class="btn btn-outline-pink" data-bs-toggle="modal"
-                            data-bs-target="#modalPerfilAprendizajePersonalizado">
-                            <i class="fa-solid fa-puzzle-piece"></i> Activar perfil de aprendizaje personalizado
-                        </button>
-                    @endif
-                @endif
-
-                @if ($perfilAprendizajePersonalizadoActiva !== null)
-                    <button type="button" class="btn btn-outline-pink" onclick="desactivarPerfilAprendizajePersonalizado({{ $estudiante->id }})" title="Desactivar perfil de aprendizaje personalizado">
-                        <i class="fa-solid fa-puzzle-piece"></i> Desactivar perfil de aprendizaje personalizado
-                    </button>
-                @endif
+                <span id="fichaAccionesPerfilPersonalizado">
+                    @include('panel.estudiantes.partials._accionesPerfilAprendizajePersonalizado')
+                </span>
             </div>
         </section>
 
         @php
-            $motivosCierreTransitoria = \App\Services\EstudiantePerfilAprendizajePersonalizadoService::MOTIVOS_CIERRE;
             $historialPerfilesAprendizajePersonalizado = $historialPerfilesAprendizajePersonalizado ?? collect();
         @endphp
 
@@ -276,14 +241,7 @@
                             Ambientes
                         </button>
                     </li>
-                    @if ($historialPerfilesAprendizajePersonalizado->isNotEmpty())
-                        <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabPerfilesAprendizajePersonalizado">
-                                <i class="fa-solid fa-puzzle-piece me-2"></i>
-                                Historial de perfiles de aprendizaje personalizados
-                            </button>
-                        </li>
-                    @endif
+                    @include('panel.estudiantes.partials._tabNavPerfilAprendizajePersonalizado')
                 </ul>
             </div>
 
@@ -432,72 +390,9 @@
                             <p class="ficha-empty">Sin ambientes asignados este año.</p>
                         @endif
                     </div>
-                    <div class="tab-pane fade" id="tabPerfilesAprendizajePersonalizado">
-                        <p class="ficha-section-title">Historial de perfiles de aprendizaje personalizados</p>
-                      
-                
-                        @if ($historialPerfilesAprendizajePersonalizado->isNotEmpty())
-                            <section class="c-card">
-                                <h3 class="ficha-section-title">
-                                    <i class="fa-solid fa-clock-rotate-left me-1"></i> Historial de perfiles de aprendizaje personalizados
-                                </h3>
-                                <div class="table-container">
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Perfil de aprendizaje</th>
-                                                <th>Estado</th>
-                                                <th>Activación</th>
-                                                <th>Cierre</th>
-                                                <th>Docente</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($historialPerfilesAprendizajePersonalizado as $registro)
-                                                <tr>
-                                                    <td>
-                                                        <strong>{{ $registro->perfilAprendizajePersonalizado?->etiqueta ?? '—' }}</strong>
-                                                        <small class="d-block text-muted">{{ $registro->perfilAprendizajePersonalizado?->codigo }}</small>
-                                                    </td>
-                                                    <td>
-                                                        @if ($registro->activa)
-                                                            <span class="stu-badge stu-badge--transitoria">Activa</span>
-                                                        @else
-                                                            <span class="stu-badge stu-badge--inactivo">Cerrada</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{ $registro->fecha_activacion?->format('d/m/Y H:i') ?? '—' }}
-                                                        @if ($registro->observacion)
-                                                            <small class="d-block text-muted">{{ \Illuminate\Support\Str::limit($registro->observacion, 80) }}</small>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if ($registro->fecha_cierre)
-                                                            {{ $registro->fecha_cierre->format('d/m/Y H:i') }}
-                                                            <small class="d-block text-muted">
-                                                                {{ $motivosCierreTransitoria[$registro->motivo_cierre] ?? $registro->motivo_cierre }}
-                                                            </small>
-                                                            @if ($registro->observacion_cierre)
-                                                                <small class="d-block text-muted">{{ \Illuminate\Support\Str::limit($registro->observacion_cierre, 80) }}</small>
-                                                            @endif
-                                                        @else
-                                                            —
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        {{ trim(($registro->docente?->user?->nombre ?? '') . ' ' . ($registro->docente?->user?->apellido ?? '')) ?: '—' }}
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <p class="ficha-empty mb-0 mt-2" style="font-size:.85rem">
-                                    El perfil de aprendizaje permanente del estudiante no se modifica al cerrar uno personalizado.
-                                </p>
-                            </section>
-                        @endif
+                    <div class="tab-pane fade" id="tabPerfilesAprendizajePersonalizado" role="tabpanel"
+                        aria-labelledby="fichaTabNavPerfilPersonalizado">
+                        @include('panel.estudiantes.partials._historialPerfilesAprendizajePersonalizado')
                     </div>
                 </div>
             </div>
@@ -571,9 +466,10 @@
     </div>
 
     @include('panel.estudiantes.modalConfigurarPin')
-    @if (!($perfilAprendizajePersonalizadoActiva ?? null) && ($perfilesAprendizajePersonalizado ?? collect())->isNotEmpty())
+    @if ($estudiante->piar == null)
         @include('panel.estudiantes.modalActivarPerfilAprendizajePersonalizado')
     @endif
+    @include('partials.perfil-aprendizaje-personalizado.modal-desactivar')
 
     @push('scripts')
         <script>
@@ -585,5 +481,14 @@
         <script src="{{ asset('assets/js/panel/estudiante_index.js') }}"></script>
         <script src="{{ asset('assets/js/estudiantes/pin.js') }}"></script>
         <script src="{{ asset('assets/js/panel/estudiantes.js') }}"></script>
+        <script>
+            window.URL_FICHA_FRAGMENTOS_PERFIL_PERSONALIZADO = @json(route('panel.estudiantes.perfil-aprendizaje-personalizado.fragmentos', $estudiante));
+            @if ($estudiante->piar == null)
+                window.URL_FICHA_ACTIVAR_PERFIL_PERSONALIZADO = @json(route('panel.estudiantes.perfil-aprendizaje-personalizado.activar', $estudiante));
+            @endif
+            window.CT_EST_URL_DESASOCIAR = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado/asignaciones')) + `/${id}/desasociar`;
+        </script>
+        <script src="{{ asset('assets/js/panel/ficha-perfil-aprendizaje-personalizado.js') }}"></script>
+        <script src="{{ asset('assets/js/perfiles-aprendizaje/estudiantes-asociados-perfil-aprendizaje-personalizado.js') }}"></script>
     @endpush
 @endsection

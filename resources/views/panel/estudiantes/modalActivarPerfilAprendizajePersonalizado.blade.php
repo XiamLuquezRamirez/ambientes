@@ -135,19 +135,6 @@
                 if (!root.contains(e.target)) cerrar();
             });
 
-            form?.addEventListener('submit', (e) => {
-                if (!hidden.value) {
-                    e.preventDefault();
-                    trigger.style.borderColor = '#DC2626';
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Selecciona un perfil de aprendizaje',
-                        text: 'Debes elegir un perfil de aprendizaje personalizado antes de activarlo.',
-                        confirmButtonColor: '#2563eb'
-                    });
-                }
-            });
-
             document.getElementById('modalPerfilAprendizajePersonalizado')?.addEventListener('hidden.bs.modal', () => {
                 cerrar();
                 hidden.value = '';
