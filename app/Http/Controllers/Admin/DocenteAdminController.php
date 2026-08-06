@@ -417,7 +417,6 @@ class DocenteAdminController extends Controller
                 'password' => Hash::make($datos['password']),
                 'institucion_id' => $institucionId,
                 'rol' => 'docente',
-                'activo' => true,
             ]);
 
             return Docente::create([
