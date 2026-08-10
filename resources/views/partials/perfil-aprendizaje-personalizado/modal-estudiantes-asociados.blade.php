@@ -1,5 +1,5 @@
-﻿<div class="modal fade modal-app" id="modalEstudiantesTransitoria" tabindex="-1" aria-labelledby="modalEstudiantesTransitoriaLabel"
-    aria-hidden="true">
+<div class="modal fade modal-app" id="modalEstudiantesTransitoria" tabindex="-1"
+    aria-labelledby="modalEstudiantesTransitoriaLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
@@ -17,12 +17,19 @@
                 </div>
                 <div id="modalEstudiantesTransitoriaEmpty" class="cfg-empty m-3" style="display:none">
                     <i class="fa-solid fa-user-slash" style="font-size:1.4rem;opacity:.45"></i>
-                    <p class="mt-2 mb-0">No hay estudiantes activos asociados a este perfil de aprendizaje personalizado.</p>
+                    <p class="mt-2 mb-0">No hay estudiantes activos asociados a este perfil de aprendizaje
+                        personalizado.</p>
                 </div>
                 <div id="modalEstudiantesTransitoriaContenedor" style="display:none">
                     <div class="ct-est-filtros">
                         <input type="search" id="ctEstFiltroNombre" class="form-control form-control-sm"
                             placeholder="Buscar por nombre del estudiante…" autocomplete="off">
+                        <select id="ctEstFiltroGrado" class="form-control form-control-sm">
+                            <option value="">Todos los grados</option>
+                        </select>
+                        <select id="ctEstFiltroGrupo" class="form-control form-control-sm">
+                            <option value="">Todos los grupos</option>
+                        </select>
                         <select id="ctEstFiltroDocente" class="form-control form-control-sm">
                             <option value="">Todos los docentes</option>
                         </select>
@@ -49,7 +56,9 @@
             </div>
             <div class="modal-footer">
                 <small class="text-muted me-auto" id="modalEstudiantesTransitoriaContador"></small>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
             </div>
         </div>
     </div>

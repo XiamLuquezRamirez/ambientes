@@ -186,9 +186,10 @@
                                 ]);
                             } elseif ($estudiante->piar->paso == 8) {
                                 $clase = 'btn btn-primary';
-                                $texto = 'Ver PIAR';
-                                $ruta = route('admin.piar.exportar', [
+                                $texto = 'Actualizar PIAR';
+                                $ruta = route('admin.estudiantes.diligenciar-piar', [
                                     'idEstudiante' => $estudiante->id,
+                                    'tipo' => 'actualizar',
                                 ]);
                             }
                         } else {
@@ -205,6 +206,12 @@
                 @if ($ruta)
                     <a class="{{ $clase }}" href="{{ $ruta }}" title="{{ $texto }}">
                         <i class="fa-solid fa-file-medical"></i> {{ $texto }}
+                    </a>
+                @endif
+
+                @if ($estudiante->piar->paso == 8)
+                    <a href="{{ route('admin.piar.exportar', $estudiante) }}" target="_blank" class="btn btn-warning">
+                        <i class="fas fa-file-pdf me-1"></i> Exportar PIAR
                     </a>
                 @endif
 

@@ -3,29 +3,34 @@
     $perfilesAprendizajePersonalizado = $perfilesAprendizajePersonalizado ?? collect();
 @endphp
 
-<div class="modal fade modal-app" id="modalPerfilAprendizajePersonalizado" tabindex="-1" aria-labelledby="modalPerfilAprendizajePersonalizadoLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <form method="POST" action="{{ route('panel.estudiantes.perfil-aprendizaje-personalizado.activar', $estudiante) }}"
+<div class="modal fade modal-app" id="modalPerfilAprendizajePersonalizado" tabindex="-1"
+    aria-labelledby="modalPerfilAprendizajePersonalizadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <form method="POST"
+            action="{{ route('panel.estudiantes.perfil-aprendizaje-personalizado.activar', $estudiante) }}"
             class="modal-content" id="formPerfilAprendizajePersonalizado">
             @csrf
             <div class="modal-header">
                 <div class="modal-header-icon"><i class="fas fa-puzzle-piece text-white"></i></div>
                 <div class="flex-grow-1">
-                    <h5 class="modal-title mb-0" id="modalPerfilAprendizajePersonalizadoLabel">Activar perfil de aprendizaje personalizado</h5>
+                    <h5 class="modal-title mb-0" id="modalPerfilAprendizajePersonalizadoLabel">Activar perfil de
+                        aprendizaje personalizado</h5>
                     <p class="modal-subtitle mb-0">Solo puede haber una activa por estudiante</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
-            <div class="modal-body" style="display:grid;gap:14px;">
+            <div class="modal-body d-grid gap-3">
                 <div>
-                    <label class="form-label fw-semibold" for="ct_select_trigger">Perfil de aprendizaje personalizado</label>
-                    <input type="hidden" name="perfil_aprendizaje_personalizado_id" id="perfil_aprendizaje_personalizado_id" value="" required>
+                    <label class="form-label fw-semibold" for="ct_select_trigger">Perfil de aprendizaje
+                        personalizado</label>
+                    <input type="hidden" name="perfil_aprendizaje_personalizado_id"
+                        id="perfil_aprendizaje_personalizado_id" value="" required>
 
                     <div class="ct-select" id="ctSelect">
                         <button type="button" class="ct-select-trigger" id="ct_select_trigger">
-                            <span class="ct-select-label is-placeholder" id="ctSelectLabel">Selecciona un perfil de aprendizaje…</span>
+                            <span class="ct-select-label is-placeholder" id="ctSelectLabel">Selecciona un perfil de
+                                aprendizaje…</span>
                             <i class="fa-solid fa-chevron-down ct-select-chevron"></i>
                         </button>
 
@@ -33,8 +38,8 @@
                             <div class="ct-select-search">
                                 <div class="ct-select-search-wrap">
                                     <i class="fa-solid fa-search"></i>
-                                    <input type="text" id="ctBuscarPerfilAprendizajePersonalizado" placeholder="Buscar por nombre o código…"
-                                        autocomplete="off">
+                                    <input type="text" id="ctBuscarPerfilAprendizajePersonalizado"
+                                        placeholder="Buscar por nombre o código…" autocomplete="off">
                                 </div>
                             </div>
                             <div class="ct-select-list" id="ctSelectList">
@@ -51,7 +56,8 @@
                                 @empty
                                     <div class="ct-select-empty">No hay perfiles de aprendizaje habilitados</div>
                                 @endforelse
-                                <div class="ct-select-empty" id="ctSelectEmpty" style="display:none">Sin resultados</div>
+                                <div class="ct-select-empty" id="ctSelectEmpty" style="display:none">Sin resultados
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -59,15 +65,16 @@
 
                 <div>
                     <label for="observacion_ct" class="form-label fw-semibold">Observación</label>
-                    <textarea name="observacion" id="observacion_ct" class="form-control" rows="4" required
-                        minlength="20" maxlength="2000"
-                        placeholder="Describe por qué se activa este perfil de aprendizaje personalizado…"></textarea>
+                    <textarea name="observacion" id="observacion_ct" class="form-control" rows="4" required minlength="20"
+                        maxlength="2000" placeholder="Describe por qué se activa este perfil de aprendizaje personalizado…"></textarea>
                     <small class="text-muted">Mínimo 20 caracteres.</small>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
                 <button type="submit" class="btn btn-primary" id="btnActivarPerfilAprendizajePersonalizado">
                     <i class="fa-solid fa-check"></i> Activar
                 </button>

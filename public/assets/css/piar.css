@@ -610,3 +610,20 @@ label {
     font-style: italic;
     font-size: .9rem;
 }
+
+.btn-danger {
+    background: #DC2626 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 9px 24px !important;
+    font-weight: 700 !important;
+    font-size: .88rem !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, .3) !important;
+}
+
+.btn-danger:hover {
+    background: #B91C1C !important;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, .4) !important;
+    color: #fff !important;
+}

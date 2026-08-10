@@ -23,11 +23,12 @@ use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
 use App\Http\Controllers\Panel\AsistenciaController;
+use App\Http\Controllers\Panel\EjesConfiguracionPanelController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\InclusionController;
+use App\Http\Controllers\Panel\PerfilAprendizajePanelController;
 use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
 use App\Http\Controllers\Panel\PlaneacionController;
-use App\Http\Controllers\Panel\EjesConfiguracionPanelController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\PerfilController;
@@ -301,6 +302,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Inclusion
     Route::get('inclusion', [InclusionController::class, 'listar'])->name('panel.inclusion');
+    Route::get('inclusion/perfil-aprendizaje', [PerfilAprendizajePanelController::class, 'index'])->name('panel.inclusion.perfil-aprendizaje');
+    Route::get('inclusion/perfil-aprendizaje/{perfilAprendizajeInclusion}/estudiantes', [PerfilAprendizajePanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.perfil-aprendizaje.estudiantes');
     Route::get('inclusion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoPanelController::class, 'index'])->name('panel.inclusion.perfil-aprendizaje-personalizado');
     Route::post('inclusion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoPanelController::class, 'guardar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.guardar');
     Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoPanelController::class, 'mostrar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.mostrar');

@@ -230,6 +230,10 @@ function autoGrowTextarea() {
     });
 }
 
+function scrollArribaPagina() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 
 function agregarAjuste() {
     ajustes_cuenta++;
@@ -445,6 +449,7 @@ function guardarDatos(datos, url, form) {
                 paso++;
                 actualizarUI();
                 autoGrowTextarea();
+                scrollArribaPagina();
             }
         }
     });

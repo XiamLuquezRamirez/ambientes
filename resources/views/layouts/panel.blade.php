@@ -64,6 +64,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('panel.inclusion.perfil-aprendizaje') }}"
+                        class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje') || request()->routeIs('panel.inclusion.perfil-aprendizaje.estudiantes') ? 'active nav-link' : 'nav-link' }}"
+                        style="padding-left:2.1rem;font-size:.92rem">
+                        <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ route('panel.inclusion.perfil-aprendizaje-personalizado') }}"
                         class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
                         style="padding-left:2.1rem;font-size:.92rem">

@@ -1,5 +1,5 @@
-﻿<div class="modal fade modal-app" id="modalEstudiantesPerfilAprendizaje" tabindex="-1" aria-labelledby="modalEstudiantesPerfilAprendizajeLabel"
-    aria-hidden="true">
+<div class="modal fade modal-app" id="modalEstudiantesPerfilAprendizaje" tabindex="-1"
+    aria-labelledby="modalEstudiantesPerfilAprendizajeLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
@@ -23,6 +23,12 @@
                     <div class="ct-est-filtros">
                         <input type="search" id="cnEstFiltroNombre" class="form-control form-control-sm"
                             placeholder="Buscar por nombre del estudiante…" autocomplete="off">
+                        <select id="cnEstFiltroGrado" class="form-control form-control-sm">
+                            <option value="">Todos los grados</option>
+                        </select>
+                        <select id="cnEstFiltroGrupo" class="form-control form-control-sm">
+                            <option value="">Todos los grupos</option>
+                        </select>
                     </div>
                     <div class="table-container ct-est-table-wrap">
                         <table class="ct-est-table">
@@ -44,7 +50,9 @@
             </div>
             <div class="modal-footer">
                 <small class="text-muted me-auto" id="modalEstudiantesPerfilAprendizajeContador"></small>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
             </div>
         </div>
     </div>
