@@ -40,6 +40,7 @@ class EjesConfiguracionPanelController extends Controller
                 'modulo' => [
                     'id' => $modulo->id,
                     'nombre' => $modulo->nombre,
+                    'es_oficial' => $modulo->esOficial(),
                     'activo_para_institucion' => $moduloActivo,
                 ],
                 'ejes' => $ejes,
@@ -251,7 +252,7 @@ class EjesConfiguracionPanelController extends Controller
                     ->ignore($ejeId),
             ],
             'descripcion' => ['nullable', 'string', 'max:1000'],
-            'orden' => ['nullable', 'integer', 'min:0', 'max:255'],
+            'orden' => ['nullable', 'integer', 'min:1', 'max:255'],
         ], [
             'nombre.required' => 'El nombre del eje es obligatorio.',
             'nombre.max' => 'El nombre no puede superar 100 caracteres.',
@@ -281,12 +282,16 @@ class EjesConfiguracionPanelController extends Controller
 
     private function siguienteOrden(int $moduloId, int $institucionId): int
     {
-        $max = (int) Eje::query()
+        $max = Eje::query()
             ->deInstitucion($institucionId)
             ->where('modulo_id', $moduloId)
             ->max('orden');
 
-        return min(255, $max + 1);
+        if ($max === null) {
+            return 1;
+        }
+
+        return min(255, (int) $max + 1);
     }
 
     private function asegurarModuloAccesible(Modulo $modulo, int $institucionId, bool $soloActivos = false): void

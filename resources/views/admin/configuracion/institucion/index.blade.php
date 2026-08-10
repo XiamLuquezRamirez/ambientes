@@ -338,5 +338,6 @@
             });
         }
     </script>
+    <script src="{{ asset('assets/js/configuracion-ejes-ui.js') }}"></script>
     <script src="{{ asset('assets/js/admin/configuracion-modulos.js') }}"></script>
 @endpush

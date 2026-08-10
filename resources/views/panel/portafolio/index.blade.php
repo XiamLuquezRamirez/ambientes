@@ -57,5 +57,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('assets/js/configuracion-ejes-ui.js') }}"></script>
     <script src="{{ asset('assets/js/panel/portafolio-ejes.js') }}"></script>
 @endpush

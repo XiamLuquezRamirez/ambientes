@@ -9,49 +9,6 @@
     max-width: 100%;
 }
 
-.config-sistema .cfg-filters {
-    background: #F8FAFC;
-    border: 1px solid var(--cfg-line);
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-}
-
-.config-sistema .cfg-filters-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 14px;
-    align-items: flex-end;
-}
-
-.config-sistema .cfg-filter {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 160px;
-    flex: 1 1 160px;
-}
-
-.config-sistema .cfg-filter-actions {
-    flex: 0 0 auto;
-    min-width: auto;
-}
-
-.config-sistema .cfg-filter-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--cfg-sub);
-    text-transform: uppercase;
-    letter-spacing: .03em;
-    margin: 0;
-}
-
-.config-sistema .cfg-filters .form-select {
-    border-color: var(--cfg-line);
-    color: var(--cfg-ink);
-    background-color: #fff;
-}
-
 .config-sistema .cfg-empty-filtros {
     border: 1px dashed var(--cfg-line);
     border-radius: 12px;
@@ -121,21 +78,23 @@
 
 .config-sistema .amb-body {
     border-top: 1px solid var(--cfg-line);
-    overflow: hidden;
-    max-height: 2400px;
+    display: grid;
+    grid-template-rows: 1fr;
     opacity: 1;
-    transform: translateY(0);
     transition:
-        max-height .52s ease,
+        grid-template-rows .52s ease,
         opacity .38s ease,
-        transform .38s ease,
         border-color .3s ease;
 }
 
+.config-sistema .amb-body > .amb-body-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
 .config-sistema .amb-group.is-collapsed .amb-body {
-    max-height: 0;
+    grid-template-rows: 0fr;
     opacity: 0;
-    transform: translateY(-6px);
     border-top-color: transparent;
     pointer-events: none;
 }
@@ -145,10 +104,6 @@
     .config-sistema .amb-body,
     .config-sistema .chev {
         transition: none;
-    }
-
-    .config-sistema .amb-group.is-collapsed .amb-body {
-        transform: none;
     }
 }
 
@@ -608,6 +563,7 @@
 .config-admin-ejes .mod-ejes-group,
 .config-panel-ejes .mod-ejes-group {
     border-bottom: 1px solid var(--cfg-line);
+    overflow: hidden;
 }
 
 .config-admin-ejes .mod-ejes-group:last-child,
@@ -619,12 +575,27 @@
 .config-panel-ejes .mod-ejes-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
-    padding: 14px 18px 6px;
+    width: 100%;
+    padding: 14px 18px;
     background: #F8FAFC;
-    border-bottom: 1px solid var(--cfg-line);
+    border: none;
+    border-bottom: 1px solid transparent;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    user-select: none;
+}
+
+.config-admin-ejes .mod-ejes-head:hover,
+.config-panel-ejes .mod-ejes-head:hover {
+    filter: brightness(0.985);
+}
+
+.config-admin-ejes .mod-ejes-group:not(.is-collapsed) .mod-ejes-head,
+.config-panel-ejes .mod-ejes-group:not(.is-collapsed) .mod-ejes-head {
+    border-bottom-color: var(--cfg-line);
 }
 
 .config-admin-ejes .mod-ejes-title,
@@ -633,6 +604,8 @@
     align-items: center;
     gap: 8px;
     flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
 }
 
 .config-admin-ejes .mod-ejes-nombre,
@@ -646,6 +619,43 @@
 .config-panel-ejes .mod-ejes-hint {
     font-size: 11px;
     color: var(--cfg-muted);
+    margin-left: auto;
+}
+
+.config-admin-ejes .mod-ejes-head .chev,
+.config-panel-ejes .mod-ejes-head .chev {
+    color: var(--cfg-muted);
+    font-size: 13px;
+    transition: transform .32s ease;
+    flex: none;
+}
+
+.config-admin-ejes .mod-ejes-group.is-collapsed .mod-ejes-head .chev,
+.config-panel-ejes .mod-ejes-group.is-collapsed .mod-ejes-head .chev {
+    transform: rotate(-90deg);
+}
+
+.config-admin-ejes .mod-ejes-body,
+.config-panel-ejes .mod-ejes-body {
+    display: grid;
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition:
+        grid-template-rows .52s ease,
+        opacity .38s ease;
+}
+
+.config-admin-ejes .mod-ejes-body > .mod-ejes-body-inner,
+.config-panel-ejes .mod-ejes-body > .mod-ejes-body-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.config-admin-ejes .mod-ejes-group.is-collapsed .mod-ejes-body,
+.config-panel-ejes .mod-ejes-group.is-collapsed .mod-ejes-body {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .config-admin-ejes .mod-ejes-foot,
@@ -657,15 +667,45 @@
     background: #fff;
 }
 
-.config-admin-ejes .amb-body,
-.config-panel-ejes .amb-body {
-    max-height: 6000px;
+.config-sistema .cfg-pager {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 14px 14px;
+    background: #fff;
+    border-top: 1px solid var(--cfg-line);
+}
+
+.config-sistema .cfg-pager-info {
+    font-size: 12px;
+    color: var(--cfg-muted);
+}
+
+.config-sistema .cfg-pager-btn {
+    appearance: none;
+    border: 1px solid var(--cfg-line);
+    background: #fff;
+    color: var(--cfg-ink);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.config-sistema .cfg-pager-btn:hover:not(:disabled) {
+    background: #F8FAFC;
+}
+
+.config-sistema .cfg-pager-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
 }
 
 .config-admin-modulos .amb-group:not(.is-collapsed) .modulos-seccion,
-.config-panel-modulos .amb-group:not(.is-collapsed) .modulos-seccion,
-.config-admin-ejes .amb-group:not(.is-collapsed) .mod-ejes-group,
-.config-panel-ejes .amb-group:not(.is-collapsed) .mod-ejes-group {
+.config-panel-modulos .amb-group:not(.is-collapsed) .modulos-seccion {
     animation: cfgModulosSeccionIn .42s ease both;
 }
 
@@ -675,8 +715,25 @@
 }
 
 .config-admin-modulos .amb-group:not(.is-collapsed) .amb-foot,
-.config-admin-ejes .amb-group:not(.is-collapsed) .mod-ejes-foot,
-.config-panel-ejes .amb-group:not(.is-collapsed) .mod-ejes-foot {
+.config-panel-modulos .amb-group:not(.is-collapsed) .amb-foot {
+    animation: cfgModulosSeccionIn .42s ease both;
+    animation-delay: .12s;
+}
+
+.config-admin-ejes .mod-ejes-group:not(.is-collapsed) .modulos-seccion,
+.config-panel-ejes .mod-ejes-group:not(.is-collapsed) .modulos-seccion,
+.config-sa-ejes .mod-ejes-group:not(.is-collapsed) .modulos-seccion {
+    animation: cfgModulosSeccionIn .42s ease both;
+}
+
+.config-admin-ejes .mod-ejes-group:not(.is-collapsed) .modulos-seccion-colegio,
+.config-panel-ejes .mod-ejes-group:not(.is-collapsed) .modulos-seccion-colegio {
+    animation-delay: .08s;
+}
+
+.config-admin-ejes .mod-ejes-group:not(.is-collapsed) .mod-ejes-foot,
+.config-panel-ejes .mod-ejes-group:not(.is-collapsed) .mod-ejes-foot,
+.config-sa-ejes .mod-ejes-group:not(.is-collapsed) .mod-ejes-foot {
     animation: cfgModulosSeccionIn .42s ease both;
     animation-delay: .12s;
 }
@@ -698,11 +755,19 @@
     .config-admin-modulos .amb-group:not(.is-collapsed) .modulos-seccion,
     .config-admin-modulos .amb-group:not(.is-collapsed) .amb-foot,
     .config-panel-modulos .amb-group:not(.is-collapsed) .modulos-seccion,
-    .config-admin-ejes .amb-group:not(.is-collapsed) .mod-ejes-group,
-    .config-admin-ejes .amb-group:not(.is-collapsed) .mod-ejes-foot,
-    .config-panel-ejes .amb-group:not(.is-collapsed) .mod-ejes-group,
-    .config-panel-ejes .amb-group:not(.is-collapsed) .mod-ejes-foot {
+    .config-panel-modulos .amb-group:not(.is-collapsed) .amb-foot,
+    .config-admin-ejes .mod-ejes-group:not(.is-collapsed) .modulos-seccion,
+    .config-admin-ejes .mod-ejes-group:not(.is-collapsed) .mod-ejes-foot,
+    .config-panel-ejes .mod-ejes-group:not(.is-collapsed) .modulos-seccion,
+    .config-panel-ejes .mod-ejes-group:not(.is-collapsed) .mod-ejes-foot,
+    .config-sa-ejes .mod-ejes-group:not(.is-collapsed) .modulos-seccion,
+    .config-sa-ejes .mod-ejes-group:not(.is-collapsed) .mod-ejes-foot,
+    .config-admin-ejes .mod-ejes-body,
+    .config-panel-ejes .mod-ejes-body,
+    .config-admin-ejes .mod-ejes-head .chev,
+    .config-panel-ejes .mod-ejes-head .chev {
         animation: none;
+        transition: none;
     }
 }
 

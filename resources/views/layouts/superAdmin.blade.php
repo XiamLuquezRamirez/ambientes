@@ -34,7 +34,7 @@
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
                 <a href="{{ route('superadmin.principal') }}"
-                    class="{{ request()->routeIs('superAdmin.principal') ? 'active nav-link' : 'nav-link' }}">
+                    class="{{ request()->routeIs('superadmin.principal') ? 'active nav-link' : 'nav-link' }}">
                     <i class="fa-solid fa-house"></i> Inicio
                 </a>
             </li>

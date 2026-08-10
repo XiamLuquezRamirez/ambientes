@@ -42,7 +42,7 @@
 
                     <div class="mb-1" style="max-width:120px">
                         <label class="form-label fw-bold" for="eje_pagina_orden">Orden</label>
-                        <input type="number" class="form-control" id="eje_pagina_orden" name="orden" min="0"
+                        <input type="number" class="form-control" id="eje_pagina_orden" name="orden" min="1"
                             max="255" placeholder="Auto">
                     </div>
                 </div>

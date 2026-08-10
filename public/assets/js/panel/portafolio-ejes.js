@@ -306,6 +306,10 @@ document.addEventListener('DOMContentLoaded', function () {
                </div>`
             : '';
 
+        const celdaAcciones = propio
+            ? `<td class="col-actions">${acciones}</td>`
+            : '';
+
         tr.innerHTML = `
             <td>${reorder}</td>
             <td>
@@ -318,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td class="col-tematicas">${Number(data.tematicas_oficiales_activas_count || 0)}</td>
             <td class="col-orden">${Number(data.orden ?? 0)}</td>
             <td>${estado}</td>
-            <td class="col-actions">${acciones}</td>
+            ${celdaAcciones}
         `;
         return tr;
     }
@@ -356,6 +360,9 @@ document.addEventListener('DOMContentLoaded', function () {
         sincronizarSeccionEjesColegio(scope);
         if (scope?.classList?.contains('mod-ejes-group')) {
             actualizarContadoresEjesGrupo(scope);
+            if (tbody.closest('[data-ejes-pager]')) {
+                window.ConfigEjesUi?.irAPaginaDelEje(tbody, data.id);
+            }
         }
         return row;
     }
@@ -366,6 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const tbody = contenedorEjesColegio(group);
         if (!tbody) return;
         insertarEjeEnTabla(data, tbody);
+        window.ConfigEjesUi?.irAPaginaDelEje(tbody, data.id);
     }
 
     function actualizarContadorEjesModuloEnTabModulos(moduloId, delta) {
@@ -484,9 +492,13 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll(`tr[data-eje-id="${ejeId}"]`).forEach((otra) => {
             const otroGroup = otra.closest('.mod-ejes-group');
             const otroScope = otroGroup || otra.closest('#ejesModuloContenido') || modalEjesEl;
+            const otroTbody = otra.parentElement;
             otra.remove();
             sincronizarSeccionEjesColegio(otroScope);
             if (otroGroup) actualizarContadoresEjesGrupo(otroGroup);
+            if (otroTbody?.closest('[data-ejes-pager]')) {
+                window.ConfigEjesUi?.aplicarPaginacion(otroTbody);
+            }
         });
 
         if (moduloId) actualizarContadorEjesModuloEnTabModulos(moduloId, -1);
@@ -533,13 +545,27 @@ document.addEventListener('DOMContentLoaded', function () {
         return true;
     }
 
-    async function abrirModalEjesModulo(moduloId, moduloNombre) {
+    async function abrirModalEjesModulo(moduloId, moduloNombre, esOficialHint = null) {
         if (!modalEjesEl) return;
+
+        function setVisibilidadSeccionEjesOficialesModal(mostrar) {
+            const seccion = modalEjesEl.querySelector('.modulos-seccion-oficiales[data-seccion="oficiales"]');
+            if (seccion) seccion.hidden = !mostrar;
+            const intro = modalEjesEl.querySelector('.ejes-modal-intro');
+            if (intro) {
+                intro.innerHTML = mostrar
+                    ? 'Los <span class="star">⭐ Oficiales</span> son del sistema (solo lectura). En <span class="badge-colegio">Del colegio</span> gestiona ejes propios del módulo.'
+                    : 'Gestione los <span class="badge-colegio">ejes del colegio</span> de este módulo adicional.';
+            }
+        }
 
         document.getElementById('ejes_modulo_id').value = moduloId;
         document.getElementById('modalVerEjesModuloLabel').textContent = 'Ejes del módulo';
         document.getElementById('modalVerEjesModuloSubtitle').textContent =
-            moduloNombre ? `Módulo: ${moduloNombre}` : 'Ejes oficiales y del colegio';
+            moduloNombre ? `Módulo: ${moduloNombre}` : 'Ejes del módulo';
+
+        const mostrarOficialesHint = esOficialHint == null ? true : !!esOficialHint;
+        setVisibilidadSeccionEjesOficialesModal(mostrarOficialesHint);
 
         resetFormEje();
         setFormularioEjesEditable(true);
@@ -557,6 +583,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const moduloActivo = !!res.data?.modulo?.activo_para_institucion;
+        const esOficial = res.data?.modulo?.es_oficial != null
+            ? !!res.data.modulo.es_oficial
+            : mostrarOficialesHint;
+        setVisibilidadSeccionEjesOficialesModal(esOficial);
         setFormularioEjesEditable(moduloActivo);
         renderTablaEjes(res.data?.ejes || []);
         setEstadoModalEjes('ready');
@@ -576,7 +606,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const moduloActual = document.getElementById('ejes_modulo_id')?.value;
 
         if (!modalAbierto || String(moduloActual) !== String(moduloId)) {
-            await abrirModalEjesModulo(moduloId, moduloNombre);
+            const esOficial = group?.dataset.esOficial !== '0';
+            await abrirModalEjesModulo(moduloId, moduloNombre, esOficial);
         }
 
         await cargarEjeEnFormulario(ejeId);
@@ -585,7 +616,9 @@ document.addEventListener('DOMContentLoaded', function () {
     async function onClickEjesDelegado(e, scopeRoot) {
         const btnCrear = e.target.closest('[data-crear-eje-modulo]');
         if (btnCrear && scopeRoot.contains(btnCrear)) {
-            abrirModalEjesModulo(btnCrear.dataset.moduloId, btnCrear.dataset.moduloNombre);
+            const group = btnCrear.closest('.mod-ejes-group');
+            const esOficial = group?.dataset.esOficial !== '0';
+            abrirModalEjesModulo(btnCrear.dataset.moduloId, btnCrear.dataset.moduloNombre, esOficial);
             return;
         }
 
@@ -660,6 +693,9 @@ document.addEventListener('DOMContentLoaded', function () {
         else tbody.insertBefore(vecino, row);
 
         actualizarBotonesReorderEjes(tbody);
+        if (tbody.closest('[data-ejes-pager]')) {
+            window.ConfigEjesUi?.irAPaginaDelEje(tbody, row.dataset.ejeId);
+        }
 
         const otra = [...document.querySelectorAll(`tr[data-eje-id="${row.dataset.ejeId}"]`)]
             .find((r) => r !== row);
@@ -676,6 +712,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (direccion === 'arriba') otra.parentElement.insertBefore(otra, otraVecina);
             else otra.parentElement.insertBefore(otraVecina, otra);
             actualizarBotonesReorderEjes(otra.parentElement);
+            if (otra.parentElement.closest('[data-ejes-pager]')) {
+                window.ConfigEjesUi?.irAPaginaDelEje(otra.parentElement, otra.dataset.ejeId);
+            }
         }
 
         mostrarToast('success', res.message || 'Orden actualizado');
@@ -683,7 +722,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     bindAmbienteToggles(rootModulos);
     bindAmbienteToggles(rootEjes);
+    window.ConfigEjesUi?.bindModuloToggles(rootEjes);
     rootEjes?.querySelectorAll('[data-tbody-ejes-colegio]').forEach(actualizarBotonesReorderEjes);
+    window.ConfigEjesUi?.refrescarPaginacion(rootEjes);
 
     document.getElementById('eje_nombre')?.addEventListener('input', (e) => {
         document.getElementById('eje_slug_preview').textContent = slugify(e.target.value);
@@ -693,7 +734,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const btnEjes = e.target.closest('[data-ejes-modulo]');
         if (!btnEjes) return;
         const row = btnEjes.closest('tr');
-        abrirModalEjesModulo(row.dataset.moduloId, row.dataset.nombre || '');
+        abrirModalEjesModulo(
+            row.dataset.moduloId,
+            row.dataset.nombre || '',
+            row.dataset.esOficial !== '0'
+        );
     });
 
     modalEjesEl?.addEventListener('click', (e) => onClickEjesDelegado(e, modalEjesEl));

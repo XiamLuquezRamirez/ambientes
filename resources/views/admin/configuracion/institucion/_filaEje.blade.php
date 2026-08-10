@@ -48,5 +48,18 @@
             </span>
         @endif
     </td>
-
+    @if ($esPropio)
+        <td class="col-actions">
+            @if ($puedeGestionar)
+                <div class="row-actions d-flex justify-content-center">
+                    <button type="button" class="btn-accion btn-editar" data-editar-eje title="Editar eje">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </button>
+                    <button type="button" class="btn-accion btn-eliminar" data-eliminar-eje title="Eliminar eje">
+                        <i class="fa-solid fa-trash"></i> Eliminar
+                    </button>
+                </div>
+            @endif
+        </td>
+    @endif
 </tr>

@@ -41,6 +41,7 @@
                 </button>
 
                 <div class="amb-body" id="amb-body-{{ $ambiente->id }}">
+                    <div class="amb-body-inner">
                     @if ($ambiente->modulosOficiales->isEmpty())
                         <div class="cfg-empty">Este ambiente aún no tiene módulos oficiales registrados.</div>
                     @else
@@ -122,6 +123,7 @@
                             <i class="fa-solid fa-plus"></i> Crear módulo
                         </button>
                     </div>
+                    </div>
                 </div>
             </div>
         @empty
@@ -135,6 +137,7 @@
     @include('superAdmin.configuracion.modulos.modalVerEjesModulo')
 @endsection
 
-@push('scripts')
+    @push('scripts')
+    <script src="{{ asset('assets/js/configuracion-ejes-ui.js') }}"></script>
     <script src="{{ asset('assets/js/superAdmin/configuracion.js') }}"></script>
 @endpush

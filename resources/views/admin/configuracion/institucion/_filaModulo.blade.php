@@ -7,6 +7,7 @@
 @endphp
 <tr data-modulo-id="{{ $modulo->id }}" data-nombre="{{ $modulo->nombre }}" data-orden="{{ $modulo->orden }}"
     data-activo="{{ $activo ? '1' : '0' }}" data-es-propio="{{ $esPropio ? '1' : '0' }}"
+    data-es-oficial="{{ $modulo->esOficial() ? '1' : '0' }}"
     data-puede-gestionar="{{ $item['puede_gestionar'] ? '1' : '0' }}"
     data-puede-gestionar-ejes="{{ $item['puede_gestionar_ejes'] ? '1' : '0' }}"
     data-temas-activos="{{ $modulo->temas_activos_count }}" data-ejes-count="{{ $ejesCount }}"

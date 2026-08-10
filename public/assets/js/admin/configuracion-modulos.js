@@ -177,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
         tr.dataset.orden = String(data.orden ?? 0);
         tr.dataset.activo = activo ? '1' : '0';
         tr.dataset.esPropio = '1';
+        tr.dataset.esOficial = '0';
         tr.dataset.puedeGestionar = '1';
         tr.dataset.puedeGestionarEjes = activo ? '1' : '0';
         tr.dataset.temasActivos = String(data.temas_activos_count ?? 0);
@@ -500,7 +501,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const filtros = valoresFiltrosModulos();
         const hayFiltros = !!(filtros.ambiente || filtros.tipo || filtros.estado);
         const emptyEl = root.querySelector('[data-empty-filtros-modulos]');
+        const btnLimpiar = root.querySelector('[data-limpiar-filtros-modulos]');
         let ambientesVisibles = 0;
+
+        if (btnLimpiar) btnLimpiar.style.display = hayFiltros ? 'inline-flex' : 'none';
 
         root.querySelectorAll('.amb-group').forEach((group) => {
             const matchAmbiente = !filtros.ambiente
@@ -606,7 +610,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (btnEjes) {
             e.preventDefault();
             const row = btnEjes.closest('tr');
-            abrirModalEjesModulo(row.dataset.moduloId, row.dataset.nombre || '');
+            abrirModalEjesModulo(
+                row.dataset.moduloId,
+                row.dataset.nombre || '',
+                row.dataset.esOficial !== '0'
+            );
             return;
         }
 
@@ -1026,6 +1034,10 @@ document.addEventListener('DOMContentLoaded', function () {
                </div>`
             : '';
 
+        const celdaAcciones = propio
+            ? `<td class="col-actions">${acciones}</td>`
+            : '';
+
         tr.innerHTML = `
             <td>${reorder}</td>
             <td>
@@ -1038,7 +1050,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td class="col-tematicas">${Number(data.tematicas_oficiales_activas_count || 0)}</td>
             <td class="col-orden">${Number(data.orden ?? 0)}</td>
             <td>${estado}</td>
-            <td class="col-actions">${acciones}</td>
+            ${celdaAcciones}
         `;
         return tr;
     }
@@ -1076,6 +1088,7 @@ document.addEventListener('DOMContentLoaded', function () {
         sincronizarSeccionEjesColegio(scope);
         if (scope?.classList?.contains('mod-ejes-group')) {
             actualizarContadoresEjesGrupo(scope);
+            paginarTbodyEjes(tbody, data.id);
         }
         return row;
     }
@@ -1087,6 +1100,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!tbody) return;
         insertarEjeEnTabla(data, tbody);
         aplicarFiltrosEjes();
+        paginarTbodyEjes(tbody, data.id);
     }
 
     function actualizarContadorEjesModuloEnTabModulos(moduloId, delta) {
@@ -1273,19 +1287,34 @@ document.addEventListener('DOMContentLoaded', function () {
         const moduloActual = document.getElementById('ejes_modulo_id')?.value;
 
         if (!modalAbierto || String(moduloActual) !== String(moduloId)) {
-            await abrirModalEjesModulo(moduloId, moduloNombre);
+            const esOficial = group?.dataset.esOficial !== '0';
+            await abrirModalEjesModulo(moduloId, moduloNombre, esOficial);
         }
 
         await cargarEjeEnFormulario(ejeId);
     }
 
-    async function abrirModalEjesModulo(moduloId, moduloNombre) {
+    function setVisibilidadSeccionEjesOficialesModal(mostrar) {
+        const seccion = modalEjesEl?.querySelector('.modulos-seccion-oficiales[data-seccion="oficiales"]');
+        if (seccion) seccion.hidden = !mostrar;
+        const intro = modalEjesEl?.querySelector('.ejes-modal-intro');
+        if (intro) {
+            intro.innerHTML = mostrar
+                ? 'Los <span class="star">⭐ Oficiales</span> son del sistema (solo lectura). En <span class="badge-colegio">Del colegio</span> gestiona ejes propios del módulo.'
+                : 'Gestione los <span class="badge-colegio">ejes del colegio</span> de este módulo adicional.';
+        }
+    }
+
+    async function abrirModalEjesModulo(moduloId, moduloNombre, esOficialHint = null) {
         if (!modalEjesEl) return;
 
         document.getElementById('ejes_modulo_id').value = moduloId;
         document.getElementById('modalVerEjesModuloLabel').textContent = 'Ejes del módulo';
         document.getElementById('modalVerEjesModuloSubtitle').textContent =
-            moduloNombre ? `Módulo: ${moduloNombre}` : 'Ejes oficiales y del colegio';
+            moduloNombre ? `Módulo: ${moduloNombre}` : 'Ejes del módulo';
+
+        const mostrarOficialesHint = esOficialHint == null ? true : !!esOficialHint;
+        setVisibilidadSeccionEjesOficialesModal(mostrarOficialesHint);
 
         resetFormEje();
         setFormularioEjesEditable(true);
@@ -1303,6 +1332,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const moduloActivo = !!res.data?.modulo?.activo_para_institucion;
+        const esOficial = res.data?.modulo?.es_oficial != null
+            ? !!res.data.modulo.es_oficial
+            : mostrarOficialesHint;
+        setVisibilidadSeccionEjesOficialesModal(esOficial);
         setFormularioEjesEditable(moduloActivo);
         renderTablaEjes(res.data?.ejes || []);
         setEstadoModalEjes('ready');
@@ -1328,7 +1361,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     bindAmbienteToggles(rootEjes);
+    window.ConfigEjesUi?.bindModuloToggles(rootEjes);
     rootEjes?.querySelectorAll('[data-tbody-ejes-colegio]').forEach(actualizarBotonesReorderEjes);
+    aplicarFiltrosEjes();
 
     /* ── Filtros de ejes (tab) ───────────────────────────────── */
     function valoresFiltrosEjes() {
@@ -1354,11 +1389,21 @@ document.addEventListener('DOMContentLoaded', function () {
             if (filtros.estado === '1' && !activo) ok = false;
             if (filtros.estado === '0' && activo) ok = false;
 
-            row.hidden = !ok;
+            row.dataset.filterHide = ok ? '0' : '1';
             if (ok) visibles += 1;
         });
 
         return visibles;
+    }
+
+    function refrescarPaginacionEjes(scope) {
+        window.ConfigEjesUi?.refrescarPaginacion(scope || rootEjes);
+    }
+
+    function paginarTbodyEjes(tbody, ejeId = null) {
+        if (!tbody || !window.ConfigEjesUi) return;
+        if (ejeId) window.ConfigEjesUi.irAPaginaDelEje(tbody, ejeId);
+        else window.ConfigEjesUi.aplicarPaginacion(tbody);
     }
 
     function aplicarFiltrosEjes() {
@@ -1367,7 +1412,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const filtros = valoresFiltrosEjes();
         const hayFiltros = !!(filtros.tipo || filtros.estado);
         const emptyEl = rootEjes.querySelector('[data-empty-filtros-ejes]');
+        const btnLimpiar = rootEjes.querySelector('[data-limpiar-filtros-ejes]');
         let ambientesVisibles = 0;
+
+        if (btnLimpiar) btnLimpiar.style.display = hayFiltros ? 'inline-flex' : 'none';
 
         rootEjes.querySelectorAll('.amb-group').forEach((ambGroup) => {
             let modulosVisibles = 0;
@@ -1419,6 +1467,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         if (emptyEl) emptyEl.hidden = ambientesVisibles > 0 || !hayFiltros;
+        rootEjes.querySelectorAll('[data-ejes-pager]').forEach((wrap) => {
+            wrap.dataset.page = '1';
+        });
+        refrescarPaginacionEjes(rootEjes);
     }
 
     rootEjes?.querySelectorAll('[data-filtros-ejes] select').forEach((select) => {
@@ -1439,7 +1491,10 @@ document.addEventListener('DOMContentLoaded', function () {
     async function onClickEjesDelegado(e, scopeRoot) {
         const btnCrear = e.target.closest('[data-crear-eje-modulo]');
         if (btnCrear && scopeRoot.contains(btnCrear)) {
-            abrirModalEjesModulo(btnCrear.dataset.moduloId, btnCrear.dataset.moduloNombre);
+            const group = btnCrear.closest('.mod-ejes-group');
+            const esOficial = group?.dataset.esOficial !== '0'
+                && btnCrear.dataset.esOficial !== '0';
+            abrirModalEjesModulo(btnCrear.dataset.moduloId, btnCrear.dataset.moduloNombre, esOficial);
             return;
         }
 
@@ -1514,6 +1569,9 @@ document.addEventListener('DOMContentLoaded', function () {
         else tbody.insertBefore(vecino, row);
 
         actualizarBotonesReorderEjes(tbody);
+        if (tbody.closest('[data-ejes-pager]')) {
+            paginarTbodyEjes(tbody, row.dataset.ejeId);
+        }
 
         // Reordenar gemela en el otro contenedor si existe
         const otra = [...document.querySelectorAll(`tr[data-eje-id="${row.dataset.ejeId}"]`)]
@@ -1531,6 +1589,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (direccion === 'arriba') otra.parentElement.insertBefore(otra, otraVecina);
             else otra.parentElement.insertBefore(otraVecina, otra);
             actualizarBotonesReorderEjes(otra.parentElement);
+            if (otra.parentElement.closest('[data-ejes-pager]')) {
+                paginarTbodyEjes(otra.parentElement, otra.dataset.ejeId);
+            }
         }
 
         mostrarToast('success', res.message || 'Orden actualizado');
