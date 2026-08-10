@@ -7,12 +7,15 @@
 @endpush
 
 @section('content')
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+    <div class="page-header"
+        style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
         <div>
-            <h1 style="font-family: var(--font-display); font-size: 1.6rem; color: var(--color-primary-dark); margin:0 0 4px">
+            <h1
+                style="font-family: var(--font-display); font-size: 1.6rem; color: var(--color-primary-dark); margin:0 0 4px">
                 Perfiles de Aprendizaje Personalizados
             </h1>
-            <p style="color:#64748B;margin:0">Opciones de tu institución. Solo puedes editar o eliminar las que tú creaste.</p>
+            <p style="color:#64748B;margin:0">Opciones de tu institución. Solo puedes editar o eliminar las que tú creaste.
+            </p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
             <a href="{{ route('panel.inclusion') }}" class="btn btn-outline-secondary">
@@ -69,6 +72,16 @@
 
     @include('partials.perfil-aprendizaje-personalizado.modal-estudiantes-asociados')
     @include('partials.perfil-aprendizaje-personalizado.modal-desactivar')
+
+    <script>
+        (function() {
+            const tituloAmbiente = document.getElementById('txt-trabajando-en-ambiente');
+            if (!tituloAmbiente) return;
+            tituloAmbiente.style.display = 'none';
+            const headerAmbiente = tituloAmbiente.closest('.students-header');
+            if (headerAmbiente) headerAmbiente.style.display = 'none';
+        })();
+    </script>
 @endsection
 
 @push('scripts')
@@ -84,5 +97,6 @@
         };
     </script>
     <script src="{{ asset('assets/js/panel/perfiles-aprendizaje-personalizado.js') }}"></script>
-    <script src="{{ asset('assets/js/perfiles-aprendizaje/estudiantes-asociados-perfil-aprendizaje-personalizado.js') }}"></script>
+    <script src="{{ asset('assets/js/perfiles-aprendizaje/estudiantes-asociados-perfil-aprendizaje-personalizado.js') }}">
+    </script>
 @endpush

@@ -7,12 +7,15 @@
 @endpush
 
 @section('content')
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+    <div class="page-header"
+        style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
         <div>
-            <h1 style="font-family: var(--font-display); font-size: 1.6rem; color: var(--color-primary-dark); margin:0 0 4px">
+            <h1
+                style="font-family: var(--font-display); font-size: 1.6rem; color: var(--color-primary-dark); margin:0 0 4px">
                 Perfiles de Aprendizaje
             </h1>
-            <p style="color:#64748B;margin:0">Perfiles de aprendizaje habilitados en tu institución. Solo consulta y revisión de estudiantes.</p>
+            <p style="color:#64748B;margin:0">Perfiles de aprendizaje habilitados en tu institución. Solo consulta y revisión
+                de estudiantes.</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
             <a href="{{ route('panel.inclusion') }}" class="btn btn-outline-secondary">
@@ -23,7 +26,8 @@
 
     <p class="cfg-hint">
         <i class="fa-solid fa-info-circle"></i>
-        Puedes consultar los perfiles de aprendizaje de la institución y ver los estudiantes de tus grupos asociados a cada uno.
+        Puedes consultar los perfiles de aprendizaje de la institución y ver los estudiantes de tus grupos asociados a cada
+        uno.
         No es posible desvincular estudiantes desde aquí.
     </p>
 
@@ -43,6 +47,16 @@
     </div>
 
     @include('partials.perfil-aprendizaje.modal-estudiantes-asociados')
+
+    <script>
+        (function() {
+            const tituloAmbiente = document.getElementById('txt-trabajando-en-ambiente');
+            if (!tituloAmbiente) return;
+            tituloAmbiente.style.display = 'none';
+            const headerAmbiente = tituloAmbiente.closest('.students-header');
+            if (headerAmbiente) headerAmbiente.style.display = 'none';
+        })();
+    </script>
 @endsection
 
 @push('scripts')
