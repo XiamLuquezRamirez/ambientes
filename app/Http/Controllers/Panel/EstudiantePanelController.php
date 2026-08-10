@@ -7,6 +7,7 @@ use App\Models\Ambiente;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
 use App\Models\PerfilAprendizajeInclusion;
+use App\Models\PerfilAprendizajeOrden;
 use App\Models\PerfilAprendizajePersonalizado;
 use App\Models\PerfilAprendizajePersonalizadoOrden;
 use App\Models\ConfiguracionPin;
@@ -27,7 +28,6 @@ use App\Services\EstudiantePerfilAprendizajePersonalizadoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class EstudiantePanelController extends Controller
 {
@@ -184,6 +184,7 @@ class EstudiantePanelController extends Controller
         $estudiantes = $consulta->paginate(12)->withQueryString();
 
         $perfilesAprendizaje = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get();
+        $datosPerfilesAsignables = $this->datosPerfilesAsignablesInstitucion();
         $filtros = $request->only(['q', 'perfil_aprendizaje_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
@@ -217,7 +218,7 @@ class EstudiantePanelController extends Controller
                     'id_grupo_seleccionado',
                     'perfil_aprendizaje_id',
                     'texto_busqueda',
-                ))->render(),
+                ) + $datosPerfilesAsignables)->render(),
             ]);
         }
 
@@ -241,7 +242,7 @@ class EstudiantePanelController extends Controller
             'perfil_aprendizaje_id',
             'id_grupo_seleccionado',
             'texto_busqueda'
-        ));
+        ) + $datosPerfilesAsignables);
     }
 
     /**
@@ -307,7 +308,7 @@ class EstudiantePanelController extends Controller
             'bloqueado' => 'Bloqueado',
         ];
 
-        $datosPerfilPersonalizado = $this->datosPerfilAprendizajePersonalizadoFicha($estudiante);
+        $datosPerfiles = $this->datosPerfilesAprendizajeFicha($estudiante);
 
         return view('panel.estudiantes.show', [
             'estudiante' => $estudiante,
@@ -322,12 +323,12 @@ class EstudiantePanelController extends Controller
             'figuras' => $figuras,
             'historialAsistencia' => $historialAsistencia,
             'resumenAsistencia' => $resumenAsistencia,
-            ...$datosPerfilPersonalizado,
+            ...$datosPerfiles,
             'urlVolver' => $urlVolver,
         ]);
     }
 
-    public function fragmentosPerfilAprendizajePersonalizado(Estudiante $estudiante)
+    public function fragmentosPerfilesAprendizaje(Estudiante $estudiante)
     {
         $docente = Auth::guard('docente')->user()->docente;
 
@@ -335,7 +336,14 @@ class EstudiantePanelController extends Controller
             abort(403, 'No tienes acceso a este estudiante.');
         }
 
-        return $this->respuestaFragmentosPerfilAprendizajePersonalizado($estudiante);
+        $estudiante->load(['perfilAprendizaje']);
+
+        return $this->respuestaFragmentosPerfilesAprendizaje($estudiante);
+    }
+
+    public function fragmentosPerfilAprendizajePersonalizado(Estudiante $estudiante)
+    {
+        return $this->fragmentosPerfilesAprendizaje($estudiante);
     }
 
     /**
@@ -420,89 +428,6 @@ class EstudiantePanelController extends Controller
         return true;
     }
 
-    /**
-     * Activa un perfil de aprendizaje personalizado para el estudiante.
-     * Solo puede haber una activa por estudiante.
-     */
-    public function activarPerfilAprendizajePersonalizado(Request $request, Estudiante $estudiante)
-    {
-        $docente = Auth::guard('docente')->user()->docente;
-
-        if (! $docente || ! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
-            abort(403, 'No tienes acceso a este estudiante.');
-        }
-
-        $institucionId = Auth::guard('docente')->user()->institucion_id;
-
-        $datos = $request->validate([
-            'perfil_aprendizaje_personalizado_id' => [
-                'required',
-                'integer',
-                Rule::exists('perfil_aprendizaje_personalizado', 'id')->where(fn ($q) => $q->where('estado', 1)),
-            ],
-            'observacion' => 'required|string|min:20|max:2000',
-        ]);
-
-        $permitida = PerfilAprendizajePersonalizadoOrden::query()
-            ->where('institucion_id', $institucionId)
-            ->where('perfil_aprendizaje_personalizado_id', $datos['perfil_aprendizaje_personalizado_id'])
-            ->where('activa', true)
-            ->exists();
-
-        if (! $permitida) {
-            $mensaje = 'El perfil de aprendizaje personalizado no está habilitado para esta institución.';
-
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => $mensaje], 422);
-            }
-
-            return back()->withErrors(['perfil_aprendizaje_personalizado_id' => $mensaje]);
-        }
-
-        if ($estudiante->perfilAprendizajePersonalizadoActiva()->exists()) {
-            $mensaje = 'El estudiante ya tiene un perfil de aprendizaje personalizado activo.';
-
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => $mensaje], 422);
-            }
-
-            return back()->withErrors(['perfil_aprendizaje_personalizado_id' => $mensaje]);
-        }
-
-        DB::transaction(function () use ($estudiante, $docente, $datos) {
-            EstudiantePerfilAprendizajePersonalizado::create([
-                'estudiante_id' => $estudiante->id,
-                'perfil_aprendizaje_personalizado_id' => $datos['perfil_aprendizaje_personalizado_id'],
-                'docente_id' => $docente->id,
-                'observacion' => trim($datos['observacion']),
-                'fecha_activacion' => now(),
-                'activa' => true,
-            ]);
-
-            $estudiante->update([
-                'perfil_aprendizaje_personalizado_id' => $datos['perfil_aprendizaje_personalizado_id'],
-            ]);
-        });
-
-        $etiqueta = PerfilAprendizajePersonalizado::query()
-            ->where('id', $datos['perfil_aprendizaje_personalizado_id'])
-            ->value('etiqueta');
-
-        $mensaje = 'Perfil de aprendizaje personalizado'.($etiqueta ? " «{$etiqueta}»" : '').' activado correctamente.';
-
-        if ($request->expectsJson()) {
-            $respuesta = $this->respuestaFragmentosPerfilAprendizajePersonalizado($estudiante->fresh());
-            $datosRespuesta = $respuesta->getData(true);
-            $datosRespuesta['message'] = $mensaje;
-
-            return response()->json($datosRespuesta);
-        }
-
-        return redirect()
-            ->route('panel.estudiantes.show', $estudiante)
-            ->with('success', $mensaje);
-    }
-
     public function tomarAsistencia(CargaDocente $carga)
     {
         $fecha = today();
@@ -552,6 +477,72 @@ class EstudiantePanelController extends Controller
     /**
      * @return array<string, mixed>
      */
+    private function datosPerfilesAsignablesInstitucion(): array
+    {
+        $institucionId = Auth::guard('docente')->user()->institucion_id;
+        $perfilesAprendizajeAsignables = collect();
+        $perfilesAprendizajePersonalizadoAsignables = collect();
+
+        if ($institucionId) {
+            $perfilesAprendizajeAsignables = PerfilAprendizajeOrden::query()
+                ->where('institucion_id', $institucionId)
+                ->where('activa', true)
+                ->whereHas('perfilAprendizaje', fn ($q) => $q->where('eliminado', 0)->where('id', '!=', 1))
+                ->with('perfilAprendizaje:id,codigo,nombre,descripcion_corta,color_hex')
+                ->orderBy('orden')
+                ->get()
+                ->pluck('perfilAprendizaje')
+                ->filter();
+
+            $perfilesAprendizajePersonalizadoAsignables = PerfilAprendizajePersonalizadoOrden::query()
+                ->where('institucion_id', $institucionId)
+                ->where('activa', true)
+                ->whereHas('perfilAprendizajePersonalizado', fn ($q) => $q->where('estado', 1))
+                ->with('perfilAprendizajePersonalizado:id,codigo,etiqueta,descripcion_interna')
+                ->orderBy('orden')
+                ->get()
+                ->pluck('perfilAprendizajePersonalizado')
+                ->filter();
+        }
+
+        return [
+            'perfilesAprendizajeAsignables' => $perfilesAprendizajeAsignables,
+            'perfilesAprendizajePersonalizadoAsignables' => $perfilesAprendizajePersonalizadoAsignables,
+        ];
+    }
+
+    private function respuestaCardEstudianteListado(Estudiante $estudiante): string
+    {
+        $estudiante->loadMissing([
+            'perfilAprendizaje:id,nombre',
+            'configuracionPin',
+            'piar',
+            'perfilAprendizajePersonalizadoActiva.perfilAprendizajePersonalizado',
+        ]);
+
+        return view('panel.estudiantes.partials._card', array_merge(
+            ['e' => $estudiante],
+            $this->datosPerfilesAsignablesInstitucion()
+        ))->render();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function datosPerfilesAprendizajeFicha(Estudiante $estudiante): array
+    {
+        $datosPersonalizado = $this->datosPerfilAprendizajePersonalizadoFicha($estudiante);
+        $asignables = $this->datosPerfilesAsignablesInstitucion();
+
+        return [
+            ...$datosPersonalizado,
+            'perfilesAprendizaje' => $asignables['perfilesAprendizajeAsignables'],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
     private function datosPerfilAprendizajePersonalizadoFicha(Estudiante $estudiante): array
     {
         $estudiante->loadMissing([
@@ -593,17 +584,33 @@ class EstudiantePanelController extends Controller
         ];
     }
 
-    private function respuestaFragmentosPerfilAprendizajePersonalizado(Estudiante $estudiante): \Illuminate\Http\JsonResponse
+    /**
+     * @return array<string, mixed>
+     */
+    private function datosAsignacionPerfilAprendizaje(Estudiante $estudiante): array
     {
-        $datos = $this->datosPerfilAprendizajePersonalizadoFicha($estudiante);
+        $datos = $this->datosPerfilesAprendizajeFicha($estudiante);
         $datos['estudiante'] = $estudiante;
+
+        return $datos;
+    }
+
+    private function respuestaFragmentosPerfilesAprendizaje(Estudiante $estudiante): \Illuminate\Http\JsonResponse
+    {
+        $datos = $this->datosAsignacionPerfilAprendizaje($estudiante);
 
         return response()->json([
             'success' => true,
+            'estudiante_id' => $estudiante->id,
+            'card_html' => $this->respuestaCardEstudianteListado($estudiante),
+            'perfil_normal_html' => view('panel.estudiantes.partials._perfilAprendizajeActivo', $datos)->render(),
             'activo_html' => view('panel.estudiantes.partials._perfilAprendizajePersonalizadoActivo', $datos)->render(),
-            'acciones_html' => view('panel.estudiantes.partials._accionesPerfilAprendizajePersonalizado', $datos)->render(),
+            'acciones_html' => view('panel.estudiantes.partials._accionesPerfilesAprendizaje', $datos)->render(),
             'historial_html' => view('panel.estudiantes.partials._historialPerfilesAprendizajePersonalizado', $datos)->render(),
             'mostrar_tab_historial' => $datos['historialPerfilesAprendizajePersonalizado']->isNotEmpty(),
+            'perfil_personalizado_activo_etiqueta' => $datos['perfilAprendizajePersonalizadoActiva']
+                ? ($datos['perfilAprendizajePersonalizadoActiva']->perfilAprendizajePersonalizado?->etiqueta ?? 'Perfil personalizado')
+                : null,
         ]);
     }
 

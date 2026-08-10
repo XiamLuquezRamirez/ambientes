@@ -6,7 +6,6 @@
 
 @php
     $perfilAprendizajeNombre = $estudiante->perfilAprendizaje?->nombre ?? 'Estándar';
-    $requiereApoyo = in_array(strtolower((string) $estudiante->requiere_apoyo), ['si', 'sí', '1', 'true'], true);
 @endphp
 
 @section('content')
@@ -98,11 +97,6 @@
                     <h1 style="font-family: var(--font-display); font-size: 1.8rem; color: var(--color-primary-dark);">
                         {{ $estudiante->nombre_completo }}</h1>
                     <div class="ficha-badges">
-                        @if ($estudiante->perfilAprendizaje->id == 1)
-                            <span class="stu-badge stu-badge--perfil-aprendizaje">
-                               Perfil: {{ $estudiante->perfilAprendizaje->nombre }}
-                            </span>
-                        @endif
                         <span class="stu-badge {{ $estudiante->activo ? 'stu-badge--activo' : 'stu-badge--inactivo' }}">
                             {{ $estudiante->estado_texto }}
                         </span>
@@ -110,11 +104,11 @@
                             <span class="stu-badge stu-badge--piar">PIAR Activo</span>
                         @elseif ($estudiante->piar !== null && $estudiante->piar->paso < '8')
                             <span class="stu-badge stu-badge--piar-incompleto">PIAR Incompleto</span>
-                        @elseif ($estudiante->piar == null && $requiereApoyo)
+                        @elseif ($estudiante->piar == null && $estudiante->requiere_apoyo === 'si')
                             <span class="stu-badge stu-badge--piar-sin">Sin PIAR</span>
                         @endif
 
-                        @if ($requiereApoyo)
+                        @if ($estudiante->requiere_apoyo === 'si')
                             <span class="stu-badge stu-badge--apoyo">Apoyo pedagógico</span>
                         @endif
                     </div>
@@ -122,27 +116,13 @@
             </div>
         </section>
 
+        <div id="fichaPerfilAprendizajeActivo">
+            @include('panel.estudiantes.partials._perfilAprendizajeActivo')
+        </div>
+
         <div id="fichaPerfilPersonalizadoActivo">
             @include('panel.estudiantes.partials._perfilAprendizajePersonalizadoActivo')
         </div>
-
-        @if ($estudiante->perfilAprendizaje !== null && $estudiante->perfilAprendizaje->id != 1)
-            <section class="c-card" style="border-color:{{ $estudiante->perfilAprendizaje->color_hex }};background:#{{ $estudiante->perfilAprendizaje->color_hex }}22;">
-                <h3 class="ficha-section-title" style="color:{{ $estudiante->perfilAprendizaje->color_hex }};">
-                    <i class="fa-solid fa-puzzle-piece me-1"></i> Perfil de aprendizaje: {{ $estudiante->perfilAprendizaje->nombre }}
-                </h3>
-                <dl class="ficha-dl">   
-                    <div>
-                        <dt>Código</dt>
-                        <dd>{{ $estudiante->perfilAprendizaje->codigo }}</dd>
-                    </div>
-                    <div>
-                        <dt>Descripción</dt>
-                        <dd>{{ $estudiante->perfilAprendizaje->descripcion_corta }}</dd>
-                    </div>
-                </dl>
-            </section>
-        @endif
 
         {{-- Acciones --}}
         <section class="c-card">
@@ -175,7 +155,7 @@
                     $texto = null;
                     $ruta = null;
 
-                    if ($requiereApoyo) {
+                    if ($estudiante->requiere_apoyo === 'si') {
                         if ($estudiante->piar) {
                             if ($estudiante->piar->paso < 8) {
                                 $clase = 'btn btn-primary';
@@ -209,14 +189,14 @@
                     </a>
                 @endif
 
-                @if ($estudiante->piar->paso == 8)
+                @if ($estudiante->piar && $estudiante->piar->paso == 8)
                     <a href="{{ route('admin.piar.exportar', $estudiante) }}" target="_blank" class="btn btn-warning">
                         <i class="fas fa-file-pdf me-1"></i> Exportar PIAR
                     </a>
                 @endif
 
-                <span id="fichaAccionesPerfilPersonalizado">
-                    @include('panel.estudiantes.partials._accionesPerfilAprendizajePersonalizado')
+                <span id="fichaAccionesPerfilesAprendizaje">
+                    @include('panel.estudiantes.partials._accionesPerfilesAprendizaje')
                 </span>
             </div>
         </section>
@@ -473,9 +453,8 @@
     </div>
 
     @include('panel.estudiantes.modalConfigurarPin')
-    @if ($estudiante->piar == null)
-        @include('panel.estudiantes.modalActivarPerfilAprendizajePersonalizado')
-    @endif
+    @include('panel.estudiantes.modalAsignarPerfilAprendizaje')
+    @include('panel.estudiantes.modalAsignarPerfilAprendizajePersonalizado')
     @include('partials.perfil-aprendizaje-personalizado.modal-desactivar')
 
     @push('scripts')
@@ -489,13 +468,18 @@
         <script src="{{ asset('assets/js/estudiantes/pin.js') }}"></script>
         <script src="{{ asset('assets/js/panel/estudiantes.js') }}"></script>
         <script>
-            window.URL_FICHA_FRAGMENTOS_PERFIL_PERSONALIZADO = @json(route('panel.estudiantes.perfil-aprendizaje-personalizado.fragmentos', $estudiante));
-            @if ($estudiante->piar == null)
-                window.URL_FICHA_ACTIVAR_PERFIL_PERSONALIZADO = @json(route('panel.estudiantes.perfil-aprendizaje-personalizado.activar', $estudiante));
-            @endif
-            window.CT_EST_URL_DESASOCIAR = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado/asignaciones')) + `/${id}/desasociar`;
+            window.URL_FICHA_FRAGMENTOS_PERFILES = @json(route('panel.estudiantes.perfiles-aprendizaje.fragmentos', $estudiante));
+            window.URL_FICHA_ASIGNAR_PERFIL = @json(route('panel.inclusion.perfil-aprendizaje.asignar-estudiante', $estudiante));
+            window.URL_FICHA_DESACTIVAR_PERFIL = @json(route('panel.inclusion.perfil-aprendizaje.desactivar-estudiante', $estudiante));
+            window.URL_FICHA_ASIGNAR_PERFIL_PERSONALIZADO = @json(route('panel.inclusion.perfil-aprendizaje-personalizado.asignar-estudiante', $estudiante));
+            window.CT_EST_URL_DESACTIVAR = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado/asignaciones')) + `/${id}/desactivar`;
+            window.FICHA_PERFIL_PERSONALIZADO_ACTIVO = @json(
+                ($perfilAprendizajePersonalizadoActiva ?? null)
+                    ? ($perfilAprendizajePersonalizadoActiva->perfilAprendizajePersonalizado?->etiqueta ?? 'Perfil personalizado')
+                    : null
+            );
         </script>
-        <script src="{{ asset('assets/js/panel/ficha-perfil-aprendizaje-personalizado.js') }}"></script>
+        <script src="{{ asset('assets/js/panel/asignar_perfil_aprendizaje.js') }}"></script>
         <script src="{{ asset('assets/js/perfiles-aprendizaje/estudiantes-asociados-perfil-aprendizaje-personalizado.js') }}"></script>
     @endpush
 @endsection

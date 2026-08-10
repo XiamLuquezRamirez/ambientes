@@ -89,7 +89,7 @@
         window.URL_PANEL_TRANSITORIAS = @json(route('panel.inclusion.perfil-aprendizaje-personalizado'));
         window.URL_PANEL_TRANSITORIAS_ESTADO = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado')) + `/${id}/estado`;
         window.CT_EST_URL_LIST = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado/opcion')) + `/${id}/estudiantes`;
-        window.CT_EST_URL_DESASOCIAR = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado/asignaciones')) + `/${id}/desasociar`;
+        window.CT_EST_URL_DESACTIVAR = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado/asignaciones')) + `/${id}/desactivar`;
         window.cargarListaTransitoriasAdmin = function() {
             if (typeof window.cargarListaTransitoriasPanel === 'function') {
                 window.cargarListaTransitoriasPanel();

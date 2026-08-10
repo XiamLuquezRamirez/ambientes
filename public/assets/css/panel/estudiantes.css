@@ -1252,6 +1252,18 @@
     box-shadow: 0 0 0 3px rgba(234, 88, 12, .1);
 }
 
+.modal-app .modal-content.modal-con-select {
+    overflow: visible;
+}
+
+.modal-app .modal-body.modal-body-con-select {
+    overflow: visible;
+}
+
+.modal .ct-select-panel {
+    z-index: 2000;
+}
+
 .ct-select-list {
     max-height: 220px;
     overflow-y: auto;
@@ -1311,5 +1323,16 @@
 .btn-outline-pink:hover {
     background: #ff4684;
     border-color: #ff4684;
+    color: #ffffff;
+}
+
+.btn-outline-purple {
+    border-color: #8B5CF6;
+    color: #8B5CF6;
+}
+
+.btn-outline-purple:hover {
+    background: #8B5CF6;
+    border-color: #8B5CF6;
     color: #ffffff;
 }

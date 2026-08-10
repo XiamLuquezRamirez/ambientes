@@ -265,7 +265,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Ficha completa: verFicha → show.blade.php
     Route::get('estudiantes/ficha/{estudiante}', [EstudiantePanelController::class, 'verFicha'])->name('panel.estudiantes.show');
-    Route::post('estudiantes/ficha/{estudiante}/perfil-aprendizaje-personalizado', [EstudiantePanelController::class, 'activarPerfilAprendizajePersonalizado'])->name('panel.estudiantes.perfil-aprendizaje-personalizado.activar');
+    Route::get('estudiantes/ficha/{estudiante}/perfiles-aprendizaje/fragmentos', [EstudiantePanelController::class, 'fragmentosPerfilesAprendizaje'])->name('panel.estudiantes.perfiles-aprendizaje.fragmentos');
     Route::get('estudiantes/ficha/{estudiante}/perfil-aprendizaje-personalizado/fragmentos', [EstudiantePanelController::class, 'fragmentosPerfilAprendizajePersonalizado'])->name('panel.estudiantes.perfil-aprendizaje-personalizado.fragmentos');
 
     // Datos JSON para modal de edición (compartido con index.js)
@@ -304,6 +304,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('inclusion', [InclusionController::class, 'listar'])->name('panel.inclusion');
     Route::get('inclusion/perfil-aprendizaje', [PerfilAprendizajePanelController::class, 'index'])->name('panel.inclusion.perfil-aprendizaje');
     Route::get('inclusion/perfil-aprendizaje/{perfilAprendizajeInclusion}/estudiantes', [PerfilAprendizajePanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.perfil-aprendizaje.estudiantes');
+    Route::post('inclusion/perfil-aprendizaje/estudiantes/{estudiante}/asignar', [PerfilAprendizajePanelController::class, 'asignarEstudiante'])->name('panel.inclusion.perfil-aprendizaje.asignar-estudiante');
+    Route::post('inclusion/perfil-aprendizaje/estudiantes/{estudiante}/desactivar', [PerfilAprendizajePanelController::class, 'desactivarEstudiante'])->name('panel.inclusion.perfil-aprendizaje.desactivar-estudiante');
     Route::get('inclusion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoPanelController::class, 'index'])->name('panel.inclusion.perfil-aprendizaje-personalizado');
     Route::post('inclusion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoPanelController::class, 'guardar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.guardar');
     Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoPanelController::class, 'mostrar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.mostrar');
@@ -311,7 +313,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::delete('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoPanelController::class, 'eliminar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.eliminar');
     Route::patch('inclusion/perfil-aprendizaje-personalizado/{personalizadoOrden}/estado', [PerfilAprendizajePersonalizadoPanelController::class, 'actualizarEstado'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estado');
     Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}/estudiantes', [PerfilAprendizajePersonalizadoPanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estudiantes');
-    Route::post('inclusion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desasociar', [PerfilAprendizajePersonalizadoPanelController::class, 'desasociarEstudiante'])->name('panel.inclusion.perfil-aprendizaje-personalizado.desasociar');
+    Route::post('inclusion/perfil-aprendizaje-personalizado/estudiantes/{estudiante}/asignar', [PerfilAprendizajePersonalizadoPanelController::class, 'asignarEstudiante'])->name('panel.inclusion.perfil-aprendizaje-personalizado.asignar-estudiante');
+    Route::post('inclusion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desactivar', [PerfilAprendizajePersonalizadoPanelController::class, 'desactivarEstudiante'])->name('panel.inclusion.perfil-aprendizaje-personalizado.desactivar-estudiante');
     Route::get('inclusion/{estudiante}', [InclusionController::class, 'verAjustes'])->name('panel.inclusion.ajustes');
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
 
