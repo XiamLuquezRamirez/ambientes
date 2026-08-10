@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalEstudiantesPerfilAprendizaje" tabindex="-1" aria-labelledby="modalEstudiantesPerfilAprendizajeLabel"
+﻿<div class="modal fade modal-app" id="modalEstudiantesPerfilAprendizaje" tabindex="-1" aria-labelledby="modalEstudiantesPerfilAprendizajeLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">

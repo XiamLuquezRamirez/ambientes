@@ -907,7 +907,11 @@ select.form-control {
     margin-bottom: 0;
 }
 
-/* ── Modal chrome compartido ─────────────────────────────────── */
+/* ── Modal chrome compartido ───────────────────────────────────
+   Estructura base: todos los .modal
+   Header azul: solo .modal-app, .modal-header-azul o IDs legacy
+   ───────────────────────────────────────────────────────────── */
+
 .modal-header-icon {
     width: 44px;
     height: 44px;
@@ -920,35 +924,12 @@ select.form-control {
     flex-shrink: 0;
 }
 
-.modal-app .modal-content,
-#modalVerAccesos .modal-content,
-#modalRegistro .modal-content,
-#modalConfigurarPin .modal-content {
+/* Base visual (no fuerza header azul) */
+.modal .modal-content {
     border: none;
     border-radius: var(--radius-xl);
     overflow: hidden;
     box-shadow: var(--shadow-modal);
-}
-
-.modal-app .modal-header,
-#modalVerAccesos .modal-header,
-#modalRegistro .modal-header,
-#modalConfigurarPin .modal-header {
-    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
-    border-bottom: none;
-    padding: 20px 24px;
-    gap: 14px;
-    align-items: center;
-}
-
-.modal-app .modal-title,
-#modalVerAccesos .modal-title,
-#modalRegistro .modal-title,
-#modalConfigurarPin .modal-title {
-    font-family: var(--font-display);
-    font-size: 1.2rem;
-    color: #FFFFFF;
-    line-height: 1.2;
 }
 
 .modal-subtitle {
@@ -957,10 +938,56 @@ select.form-control {
     margin: 2px 0 0;
 }
 
+/* Header institucional — opt-in */
+.modal-app .modal-header,
+.modal-header-azul,
+#modalVerAccesos .modal-header,
+#modalRegistro .modal-header,
+#modalConfigurarPin .modal-header,
+#modalAgregarEstudiante .modal-header,
+#modalSeleccionarAmbiente .modal-header,
+#modalCupo .modal-header,
+#modalDocentes .modal-header,
+#modalModulos .modal-header,
+#modalAgregar .modal-header,
+#modalGrupo .modal-header {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    border-bottom: none;
+    padding: 20px 24px;
+    gap: 14px;
+    align-items: center;
+}
+
+.modal-app .modal-title,
+.modal-header-azul .modal-title,
+#modalVerAccesos .modal-title,
+#modalRegistro .modal-title,
+#modalConfigurarPin .modal-title,
+#modalAgregarEstudiante .modal-title,
+#modalSeleccionarAmbiente .modal-title,
+#modalCupo .modal-title,
+#modalDocentes .modal-title,
+#modalModulos .modal-title,
+#modalAgregar .modal-title,
+#modalGrupo .modal-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: #FFFFFF;
+    line-height: 1.2;
+}
+
 .modal-app .btn-close,
+.modal-header-azul .btn-close,
 #modalVerAccesos .btn-close,
 #modalRegistro .btn-close,
-#modalConfigurarPin .btn-close {
+#modalConfigurarPin .btn-close,
+#modalAgregarEstudiante .btn-close,
+#modalSeleccionarAmbiente .btn-close,
+#modalCupo .btn-close,
+#modalDocentes .btn-close,
+#modalModulos .btn-close,
+#modalAgregar .btn-close,
+#modalGrupo .btn-close {
     filter: brightness(0) invert(1);
     opacity: .75;
     transition: opacity var(--ease), transform .2s ease;
@@ -968,29 +995,40 @@ select.form-control {
 }
 
 .modal-app .btn-close:hover,
+.modal-header-azul .btn-close:hover,
 #modalVerAccesos .btn-close:hover,
 #modalRegistro .btn-close:hover,
-#modalConfigurarPin .btn-close:hover {
+#modalConfigurarPin .btn-close:hover,
+#modalAgregarEstudiante .btn-close:hover,
+#modalSeleccionarAmbiente .btn-close:hover,
+#modalCupo .btn-close:hover,
+#modalDocentes .btn-close:hover,
+#modalModulos .btn-close:hover,
+#modalAgregar .btn-close:hover,
+#modalGrupo .btn-close:hover {
     opacity: 1;
     transform: rotate(90deg);
 }
 
 .modal-app .modal-body,
-#modalVerAccesos .modal-body,
+.modal:has(.modal-header-azul) .modal-body,
 #modalRegistro .modal-body,
-#modalConfigurarPin .modal-body {
+#modalConfigurarPin .modal-body,
+#modalVerAccesos .modal-body {
     padding: 28px;
 }
 
 .modal-app .modal-footer,
-#modalVerAccesos .modal-footer,
+.modal:has(.modal-header-azul) .modal-footer,
 #modalRegistro .modal-footer,
-#modalConfigurarPin .modal-footer {
+#modalConfigurarPin .modal-footer,
+#modalVerAccesos .modal-footer {
     border-top: 1px solid var(--color-border);
     padding: 16px 28px 24px;
     gap: 12px;
 }
 
+/* Animación de entrada — opt-in */
 .modal-app.fade:not(.show) .modal-dialog,
 #modalVerAccesos.fade:not(.show) .modal-dialog,
 #modalRegistro.fade:not(.show) .modal-dialog,

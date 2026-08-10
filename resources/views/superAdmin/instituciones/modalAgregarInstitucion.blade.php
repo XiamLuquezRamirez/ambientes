@@ -1,9 +1,9 @@
-{{--
+﻿{{--
     Modal: Agregar / Editar Institución (Super Admin)
     - Tab 1: datos básicos + avatar de logo (abre modalLogoInstitucion)
     - Tab 2: IP/puerto/activo por ambiente (name ambientes[id][...]; backend espera "activo")
     - Tab 3: perfiles de aprendizaje + perfiles de aprendizaje personalizados (perfil_aprendizaje_orden / perfil_aprendizaje_personalizado_orden)
-    - Tab 4: módulos (pendiente)
+    - Tab 4: módulos oficiales por ambiente activo (modulos[id][activo]; depende de Servidores)
 
     Crear  → POST  superadmin/instituciones
     Editar → POST  superadmin/instituciones/{id} + _method=PUT  (FormData + multipart)
@@ -17,7 +17,7 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/instituciones/index.css') }}">
 @endpush
-<div class="modal fade" id="modalAgregarInstitucion" tabindex="-1" data-bs-keyboard="false"
+<div class="modal fade modal-app" id="modalAgregarInstitucion" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalAgregarInstitucionLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -44,16 +44,16 @@
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-servidores" data-bs-toggle="tab" href="#servidores" role="tab"
-                            aria-controls="servidores" aria-selected="false">
-                            <i class="fas fa-server"></i> Servidores
-                        </a>
-                    </li>
-                    <li class="nav-item" role="presentation">
                         <a class="nav-link" id="tab-perfiles-aprendizaje" data-bs-toggle="tab"
                             href="#perfilesAprendizajeInstitucion" role="tab"
                             aria-controls="perfilesAprendizajeInstitucion" aria-selected="false">
                             <i class="fas fa-layer-group"></i> Perfiles de Aprendizaje
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="tab-servidores" data-bs-toggle="tab" href="#servidores" role="tab"
+                            aria-controls="servidores" aria-selected="false">
+                            <i class="fas fa-server"></i> Servidores
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -135,64 +135,6 @@
                                             required>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        {{--
-                            Tab servidores — names alineados con InstitucionSuperAdminController:
-                            ambientes[id][ip|puerto|activo]
-                        --}}
-                        <div class="tab-pane container" id="servidores" role="tabpanel"
-                            aria-labelledby="tab-servidores">
-                            <div class="table-container">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Servidor</th>
-                                            <th>IP</th>
-                                            <th class="text-center">Puerto</th>
-                                            <th class="text-center">Activo</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($ambientes as $a)
-                                            <tr>
-                                                <td style="font-weight:bold;color:#1E293B;font-size:1.2rem;">
-                                                    {{ $a->nombre }}
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control"
-                                                        id="ambiente_ip_{{ $a->id }}"
-                                                        name="ambientes[{{ $a->id }}][ip]"
-                                                        placeholder="192.168.1.100" autocomplete="off">
-                                                </td>
-                                                <td class="text-center">
-                                                    <input type="number" class="form-control"
-                                                        style="width:90px;margin:auto"
-                                                        id="ambiente_puerto_{{ $a->id }}"
-                                                        name="ambientes[{{ $a->id }}][puerto]" min="1"
-                                                        max="65535" placeholder="8080">
-                                                </td>
-                                                <td class="text-center">
-                                                    <div
-                                                        class="form-check form-switch d-inline-flex justify-content-center">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            id="ambiente_activo_{{ $a->id }}"
-                                                            name="ambientes[{{ $a->id }}][activo]"
-                                                            value="1" style="cursor: pointer;"
-                                                            title="Activar integración con este ambiente">
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="4" class="text-center text-muted py-4">
-                                                    Sin ambientes registrados
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
                             </div>
                         </div>
 
@@ -293,9 +235,127 @@
                             </div>
                         </div>
 
+                        {{--
+                            Tab servidores — names alineados con InstitucionSuperAdminController:
+                            ambientes[id][ip|puerto|activo]
+                        --}}
+                        <div class="tab-pane container" id="servidores" role="tabpanel"
+                            aria-labelledby="tab-servidores">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Servidor</th>
+                                            <th>IP</th>
+                                            <th class="text-center">Puerto</th>
+                                            <th class="text-center">Activo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($ambientes as $a)
+                                            <tr>
+                                                <td style="font-weight:bold;color:#1E293B;font-size:1.2rem;">
+                                                    {{ $a->nombre }}
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control"
+                                                        id="ambiente_ip_{{ $a->id }}"
+                                                        name="ambientes[{{ $a->id }}][ip]"
+                                                        placeholder="192.168.1.100" autocomplete="off">
+                                                </td>
+                                                <td class="text-center">
+                                                    <input type="number" class="form-control"
+                                                        style="width:90px;margin:auto"
+                                                        id="ambiente_puerto_{{ $a->id }}"
+                                                        name="ambientes[{{ $a->id }}][puerto]" min="1"
+                                                        max="65535" placeholder="8080">
+                                                </td>
+                                                <td class="text-center">
+                                                    <div
+                                                        class="form-check form-switch d-inline-flex justify-content-center">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            id="ambiente_activo_{{ $a->id }}"
+                                                            name="ambientes[{{ $a->id }}][activo]"
+                                                            value="1" style="cursor: pointer;"
+                                                            title="Activar integración con este ambiente">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-4">
+                                                    Sin ambientes registrados
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                         <div class="tab-pane container" id="modulos" role="tabpanel"
                             aria-labelledby="tab-modulos">
-                            <p class="text-muted mb-0">La asignación de módulos estará disponible próximamente.</p>
+                            <p class="text-muted mb-3" style="font-size:.9rem">
+                                Active o desactive los módulos oficiales disponibles para esta institución.
+                                Solo aparecen los de los ambientes marcados en la pestaña
+                                <strong>Servidores</strong>.
+                            </p>
+
+                            <div id="modulosEmptyHint" class="text-muted text-center py-4"
+                                style="border:1px dashed #E2E8F0;border-radius:12px;background:#FAFBFC">
+                                Active al menos un ambiente en <strong>Servidores</strong> para asignar módulos.
+                            </div>
+
+                            <div id="listaGruposModulos">
+                                @forelse ($ambientes as $ambiente)
+                                    @php $color = $ambiente->color_hex ?: '#64748B'; @endphp
+                                    <div class="card card-perfiles-aprendizaje-orden grupo-modulos-ambiente"
+                                        data-ambiente-id="{{ $ambiente->id }}" hidden>
+                                        <div class="card-header" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseModulosAmbiente{{ $ambiente->id }}"
+                                            aria-expanded="true"
+                                            aria-controls="collapseModulosAmbiente{{ $ambiente->id }}">
+                                            <h6>
+                                                <span class="me-2">{{ $ambiente->icono ?: '📦' }}</span>
+                                                {{ $ambiente->nombre }}
+                                                <span class="badge badge-blue ms-1 badge-count-modulos">
+                                                    {{ $ambiente->modulosOficiales->count() }}
+                                                </span>
+                                            </h6>
+                                            <i class="fa-solid fa-chevron-down chevron"></i>
+                                        </div>
+                                        <div id="collapseModulosAmbiente{{ $ambiente->id }}" class="collapse show">
+                                            <div class="lista-perfiles-aprendizaje-orden">
+                                                @forelse ($ambiente->modulosOficiales as $modulo)
+                                                    <div class="item-perfil-aprendizaje-orden">
+
+                                                        <label for="modulo_institucion_{{ $modulo->id }}">
+                                                            {{ $modulo->nombre }}
+                                                        </label>
+                                                        <div
+                                                            class="form-check form-switch d-inline-flex justify-content-center">
+                                                            <input
+                                                                class="form-check-input chk-modulo-institucion"type="checkbox"
+                                                                id="modulo_institucion_{{ $modulo->id }}"
+                                                                name="modulos[{{ $modulo->id }}][activo]"
+                                                                value="1" data-modulo-id="{{ $modulo->id }}"
+                                                                data-ambiente-id="{{ $ambiente->id }}"
+                                                                style="cursor: pointer;" title="Activar módulo"
+                                                                {{ $modulo->activo ? 'checked' : '' }}>
+                                                        </div>
+                                                    </div>
+                                                @empty
+                                                    <p class="text-muted text-center py-3 mb-0">
+                                                        Este ambiente no tiene módulos oficiales activos.
+                                                    </p>
+                                                @endforelse
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <p class="text-muted text-center py-3 mb-0">Sin ambientes registrados</p>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -374,7 +434,7 @@
             tipoPost = 2;
             id_editar = String(id);
             $("#modalAgregarInstitucionLabel").text('Editar Institución');
-            $("#modalAgregarInstitucionSubtitle").text('Actualiza datos, servidores o el logo en cualquier momento');
+            $("#modalAgregarInstitucionSubtitle").text('Actualiza información de la institución');
             $("#modalAgregarInstitucionIcon").attr('class', 'fas fa-pen text-white');
             setBtnInstitucion('editar');
             resetFormAgregarInstitucion();
@@ -407,6 +467,8 @@
             form.querySelectorAll('#servidores input[type="checkbox"][name*="[activo]"]').forEach(cb => {
                 cb.checked = false;
             });
+
+            resetModulosInstitucion();
 
             // Al crear: solo globales.
             restaurarListaTransitoriasGlobales();
@@ -810,7 +872,8 @@
                         resp.data,
                         resp.perfil_aprendizaje_orden || [],
                         resp.perfil_aprendizaje_personalizado_orden || [],
-                        resp.perfil_aprendizaje_personalizado_disponibles || []
+                        resp.perfil_aprendizaje_personalizado_disponibles || [],
+                        resp.modulos || []
                     );
                 })
                 .catch(() => {
@@ -838,7 +901,8 @@
             data,
             perfilesAprendizajeOrden = [],
             perfilesAprendizajePersonalizadoOrden = [],
-            perfilesAprendizajePersonalizadoDisponibles = []
+            perfilesAprendizajePersonalizadoDisponibles = [],
+            modulosInstitucion = []
         ) {
             id_editar = String(data.id);
             $('#nombre').val(data.nombre ?? '');
@@ -889,6 +953,7 @@
                 perfilesAprendizajePersonalizadoOrden
             );
             aplicarSeleccionPerfilesAprendizajeOrden(perfilesAprendizajeOrden, perfilesAprendizajePersonalizadoOrden);
+            aplicarModulosInstitucion(modulosInstitucion);
 
             if (typeof window.setEstadoLogoInstitucion === 'function') {
                 window.setEstadoLogoInstitucion({
@@ -898,5 +963,86 @@
                 });
             }
         }
+
+        /* ── Módulos oficiales por ambiente activo ───────────── */
+        function resetModulosInstitucion() {
+            document.querySelectorAll('.grupo-modulos-ambiente').forEach(grupo => {
+                delete grupo.dataset.initialized;
+                grupo.hidden = true;
+                grupo.querySelectorAll('.chk-modulo-institucion').forEach(chk => {
+                    chk.checked = true;
+                    chk.disabled = true;
+                });
+            });
+            actualizarHintModulos();
+        }
+
+        function actualizarHintModulos() {
+            const hint = document.getElementById('modulosEmptyHint');
+            if (!hint) return;
+            const algunoVisible = [...document.querySelectorAll('.grupo-modulos-ambiente')]
+                .some(g => !g.hidden);
+            hint.hidden = algunoVisible;
+        }
+
+        function sincronizarVisibilidadModulosDesdeServidores(opciones = {}) {
+            const forzarDefaultActivo = opciones.forzarDefaultActivo !== false;
+            const mapaGuardado = opciones.mapaGuardado || null;
+
+            document.querySelectorAll('.grupo-modulos-ambiente').forEach(grupo => {
+                const ambienteId = grupo.dataset.ambienteId;
+                const chkAmbiente = document.getElementById(`ambiente_activo_${ambienteId}`);
+                const ambienteActivo = !!chkAmbiente?.checked;
+
+                grupo.hidden = !ambienteActivo;
+
+                grupo.querySelectorAll('.chk-modulo-institucion').forEach(chk => {
+                    chk.disabled = !ambienteActivo;
+
+                    if (!ambienteActivo) {
+                        return;
+                    }
+
+                    const moduloId = String(chk.dataset.moduloId);
+                    if (mapaGuardado && Object.prototype.hasOwnProperty.call(mapaGuardado, moduloId)) {
+                        chk.checked = !!mapaGuardado[moduloId];
+                    } else if (forzarDefaultActivo && grupo.dataset.initialized !== '1') {
+                        chk.checked = true;
+                    }
+                });
+
+                if (ambienteActivo) {
+                    grupo.dataset.initialized = '1';
+                } else {
+                    delete grupo.dataset.initialized;
+                }
+            });
+
+            actualizarHintModulos();
+        }
+
+        function aplicarModulosInstitucion(modulos = []) {
+            const mapa = {};
+            (modulos || []).forEach(m => {
+                mapa[String(m.id)] = !!m.activo;
+            });
+
+            document.querySelectorAll('.grupo-modulos-ambiente').forEach(grupo => {
+                delete grupo.dataset.initialized;
+            });
+
+            sincronizarVisibilidadModulosDesdeServidores({
+                forzarDefaultActivo: true,
+                mapaGuardado: mapa,
+            });
+        }
+
+        document.querySelectorAll('#servidores input[type="checkbox"][name*="[activo]"]').forEach(chk => {
+            chk.addEventListener('change', function() {
+                sincronizarVisibilidadModulosDesdeServidores({
+                    forzarDefaultActivo: true,
+                });
+            });
+        });
     </script>
 @endpush

@@ -21,7 +21,7 @@
                     $color = $perfilAprendizajePersonalizado->perfilAprendizaje?->color_hex ?: '#64748B';
                     $activos = $perfilAprendizajePersonalizado->estudiantes_activos_count ?? 0;
                     $total = $perfilAprendizajePersonalizado->estudiantes_count ?? 0;
-                    $puedeGestionar = $esSuperAdmin || ! $perfilAprendizajePersonalizado->es_sistema;
+                    $puedeGestionar = $esSuperAdmin || !$perfilAprendizajePersonalizado->es_sistema;
                 @endphp
 
                 @if ($grupoActual !== $claveGrupo)
@@ -64,12 +64,10 @@
                     <td>
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="form-check form-switch mb-0">
-                                <input class="form-check-input toggle-estado-transitoria" type="checkbox"
-                                    role="switch" style="cursor:pointer"
-                                    data-id="{{ $perfilAprendizajePersonalizado->id }}"
+                                <input class="form-check-input toggle-estado-transitoria" type="checkbox" role="switch"
+                                    style="cursor:pointer" data-id="{{ $perfilAprendizajePersonalizado->id }}"
                                     data-nombre="{{ e($perfilAprendizajePersonalizado->etiqueta) }}"
-                                    @checked($perfilAprendizajePersonalizado->activa())
-                                    @disabled(! $puedeGestionar)
+                                    @checked($perfilAprendizajePersonalizado->activa()) @disabled(!$puedeGestionar)
                                     title="{{ $perfilAprendizajePersonalizado->activa() ? 'Desactivar' : 'Activar' }}">
                             </div>
                         </div>
@@ -86,8 +84,8 @@
                             <div class="tabla-acciones" style="justify-content:center">
                                 <div class="dropdown tabla-opciones-dropdown">
                                     <button class="btn-accion btn-opciones-toggle dropdown-toggle" type="button"
-                                        id="dropdownTransitoria{{ $perfilAprendizajePersonalizado->id }}" data-bs-toggle="dropdown"
-                                        aria-expanded="false">
+                                        id="dropdownTransitoria{{ $perfilAprendizajePersonalizado->id }}"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                         Opciones
                                     </button>

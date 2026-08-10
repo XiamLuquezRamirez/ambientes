@@ -1,4 +1,4 @@
-@push('styles')
+﻿@push('styles')
     <style>
         .est-row {
             display: flex;
@@ -97,7 +97,7 @@
         }
     </style>
 @endpush
-<div class="modal fade" id="modalAgregarEstudiante" tabindex="-1" aria-hidden="true">
+<div class="modal fade modal-app" id="modalAgregarEstudiante" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">

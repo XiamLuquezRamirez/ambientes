@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalDesasociarTransitoria" tabindex="-1" aria-hidden="true">
+﻿<div class="modal fade modal-app" id="modalDesasociarTransitoria" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <form id="formDesasociarTransitoria" class="modal-content">
             <div class="modal-header">

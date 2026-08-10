@@ -523,6 +523,34 @@ insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fe
 (2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:57:11'),
 (3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-23 14:23:57');
 
+/*Table structure for table `ejes` */
+
+DROP TABLE IF EXISTS `ejes`;
+
+CREATE TABLE `ejes` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `modulo_id` bigint unsigned NOT NULL,
+  `institucion_id` bigint unsigned DEFAULT NULL,
+  `creado_por` bigint unsigned DEFAULT NULL,
+  `nombre` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `descripcion` text,
+  `orden` tinyint unsigned NOT NULL DEFAULT '0',
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `es_oficial` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ejes_modulo_id_slug_unique` (`modulo_id`,`slug`),
+  KEY `ejes_institucion_id_foreign` (`institucion_id`),
+  KEY `ejes_creado_por_foreign` (`creado_por`),
+  CONSTRAINT `ejes_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ejes_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `ejes_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `docentes` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `ejes` */
+
 /*Table structure for table `estudiante_ambiente` */
 
 DROP TABLE IF EXISTS `estudiante_ambiente`;
@@ -874,7 +902,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `migrations` */
 
@@ -915,7 +943,30 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (37,'2026_06_19_000001_restructure_matriculas_y_grupos',7),
 (38,'2026_06_23_000001_actualizar_campos_estudiantes',8),
 (39,'2026_06_23_000002_actualizar_campos_docentes',9),
-(40,'2026_06_23_000003_actualizar_campos_configuracion_pins',10);
+(40,'2026_06_23_000003_actualizar_campos_configuracion_pins',10),
+(41,'2026_08_06_000001_create_modulo_institucion_and_ensure_modulos_oficiales',11),
+(42,'2026_08_06_000002_create_ejes_table',11),
+(43,'2026_08_10_000001_add_creado_por_to_ejes_table',11);
+
+/*Table structure for table `modulo_institucion` */
+
+DROP TABLE IF EXISTS `modulo_institucion`;
+
+CREATE TABLE `modulo_institucion` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `modulo_id` bigint unsigned NOT NULL,
+  `institucion_id` bigint unsigned NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `modulo_institucion_modulo_id_institucion_id_unique` (`modulo_id`,`institucion_id`),
+  KEY `modulo_institucion_institucion_id_foreign` (`institucion_id`),
+  CONSTRAINT `modulo_institucion_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `modulo_institucion_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `modulo_institucion` */
 
 /*Table structure for table `modulos` */
 
@@ -924,6 +975,7 @@ DROP TABLE IF EXISTS `modulos`;
 CREATE TABLE `modulos` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `ambiente_id` bigint unsigned NOT NULL,
+  `institucion_id` bigint unsigned DEFAULT NULL,
   `nombre` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
   `descripcion` text,
@@ -931,11 +983,14 @@ CREATE TABLE `modulos` (
   `orden` tinyint unsigned NOT NULL DEFAULT '0',
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `visible_estudiantes` tinyint(1) NOT NULL DEFAULT '1',
+  `es_oficial` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `modulos_ambiente_id_foreign` (`ambiente_id`),
-  CONSTRAINT `modulos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE
+  KEY `modulos_institucion_id_foreign` (`institucion_id`),
+  CONSTRAINT `modulos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `modulos_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `modulos` */
@@ -2694,6 +2749,7 @@ DROP TABLE IF EXISTS `temas`;
 CREATE TABLE `temas` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `modulo_id` bigint unsigned NOT NULL,
+  `eje_id` bigint unsigned DEFAULT NULL,
   `nombre` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
   `descripcion` text,
@@ -2702,11 +2758,14 @@ CREATE TABLE `temas` (
   `orden` tinyint unsigned NOT NULL DEFAULT '0',
   `marcador_ra` varchar(255) DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `es_oficial` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `temas_modulo_id_foreign` (`modulo_id`),
-  CONSTRAINT `temas_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
+  KEY `temas_eje_id_foreign` (`eje_id`),
+  CONSTRAINT `temas_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `temas_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `temas` */

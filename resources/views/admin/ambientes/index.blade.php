@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Ambientes')
 
 @push('styles')
@@ -105,7 +105,7 @@
         </div>
 
         {{-- Modal: Cupo por defecto --}}
-        <div class="modal fade" id="modalCupo" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+        <div class="modal fade modal-app" id="modalCupo" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content" style="border:none;border-radius:16px;overflow:hidden">
                     <div class="modal-header modal-header-azul">
@@ -129,7 +129,7 @@
         </div>
 
         {{-- Modal: Docentes del período --}}
-        <div class="modal fade" id="modalDocentes" tabindex="-1" aria-hidden="true">
+        <div class="modal fade modal-app" id="modalDocentes" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content" style="border:none;border-radius:16px;overflow:hidden">
                     <div class="modal-header modal-header-azul">
@@ -150,7 +150,7 @@
         </div>
 
         {{-- Modal: Módulos de contenido --}}
-        <div class="modal fade" id="modalModulos" tabindex="-1" aria-hidden="true">
+        <div class="modal fade modal-app" id="modalModulos" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="border:none;border-radius:16px;overflow:hidden">
                     <div class="modal-header modal-header-azul">

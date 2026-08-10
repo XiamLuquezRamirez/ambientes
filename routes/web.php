@@ -4,15 +4,17 @@ use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
 use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Admin\CierreAnioController;
-use App\Http\Controllers\Admin\PerfilAprendizajeConfiguracionController;
-use App\Http\Controllers\Admin\PerfilAprendizajePersonalizadoConfiguracionController;
 use App\Http\Controllers\Admin\ConfiguracionAdminController;
 use App\Http\Controllers\Admin\ConflictosController;
 use App\Http\Controllers\Admin\DocenteAdminController;
+use App\Http\Controllers\Admin\EjesConfiguracionAdminController;
 use App\Http\Controllers\Admin\EstudianteAdminController;
 use App\Http\Controllers\Admin\GradoGrupoController;
 use App\Http\Controllers\Admin\GruposController;
 use App\Http\Controllers\Admin\MatriculaAdminController;
+use App\Http\Controllers\Admin\ModulosConfiguracionAdminController;
+use App\Http\Controllers\Admin\PerfilAprendizajeConfiguracionController;
+use App\Http\Controllers\Admin\PerfilAprendizajePersonalizadoConfiguracionController;
 use App\Http\Controllers\Admin\PiarController;
 use App\Http\Controllers\Admin\ReportesController;
 use App\Http\Controllers\Admin\SyncLogController;
@@ -22,16 +24,19 @@ use App\Http\Controllers\Auth\SesionNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
 use App\Http\Controllers\Panel\AsistenciaController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
-use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
 use App\Http\Controllers\Panel\InclusionController;
+use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
 use App\Http\Controllers\Panel\PlaneacionController;
+use App\Http\Controllers\Panel\EjesConfiguracionPanelController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SuperAdmin\AdminsSuperAdminController;
+use App\Http\Controllers\SuperAdmin\EjesConfiguracionSuperAdminController;
+use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
+use App\Http\Controllers\SuperAdmin\ModulosConfiguracionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajeInclusionController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
-use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use Illuminate\Support\Facades\Route;
 
@@ -175,6 +180,21 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('configuracion/datos/{id}', [ConfiguracionAdminController::class, 'verDatosInstitucion'])->name('admin.configuracion.datos');
     Route::get('configuracion/cargar-municipios/{departamento}', [ConfiguracionAdminController::class, 'cargarMunicipios'])->name('admin.configuracion.cargar-municipios');
 
+    // Módulos / ejes del colegio (adicionales + ejes propios)
+    Route::post('configuracion/ambientes/{ambiente}/modulos', [ModulosConfiguracionAdminController::class, 'guardar'])->name('admin.modulos.guardar');
+    Route::get('configuracion/modulos/{modulo}', [ModulosConfiguracionAdminController::class, 'mostrar'])->name('admin.modulos.mostrar');
+    Route::put('configuracion/modulos/{modulo}', [ModulosConfiguracionAdminController::class, 'actualizar'])->name('admin.modulos.actualizar');
+    Route::patch('configuracion/modulos/{modulo}/estado', [ModulosConfiguracionAdminController::class, 'actualizarEstado'])->name('admin.modulos.estado');
+    Route::patch('configuracion/modulos/{modulo}/mover', [ModulosConfiguracionAdminController::class, 'mover'])->name('admin.modulos.mover');
+    Route::delete('configuracion/modulos/{modulo}', [ModulosConfiguracionAdminController::class, 'eliminar'])->name('admin.modulos.eliminar');
+    Route::get('configuracion/modulos/{modulo}/ejes', [EjesConfiguracionAdminController::class, 'listarPorModulo'])->name('admin.modulos.ejes');
+    Route::post('configuracion/modulos/{modulo}/ejes', [EjesConfiguracionAdminController::class, 'guardar'])->name('admin.ejes.guardar');
+    Route::get('configuracion/ejes/{eje}', [EjesConfiguracionAdminController::class, 'mostrar'])->name('admin.ejes.mostrar');
+    Route::put('configuracion/ejes/{eje}', [EjesConfiguracionAdminController::class, 'actualizar'])->name('admin.ejes.actualizar');
+    Route::patch('configuracion/ejes/{eje}/estado', [EjesConfiguracionAdminController::class, 'actualizarEstado'])->name('admin.ejes.estado');
+    Route::patch('configuracion/ejes/{eje}/mover', [EjesConfiguracionAdminController::class, 'mover'])->name('admin.ejes.mover');
+    Route::delete('configuracion/ejes/{eje}', [EjesConfiguracionAdminController::class, 'eliminar'])->name('admin.ejes.eliminar');
+
     Route::get('configuracion/perfil-aprendizaje', [PerfilAprendizajeConfiguracionController::class, 'index'])->name('admin.configuracion.perfil-aprendizaje.index');
     Route::patch('configuracion/perfil-aprendizaje/orden', [PerfilAprendizajeConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.perfil-aprendizaje.orden');
     Route::patch('configuracion/perfil-aprendizaje/{perfilAprendizajeOrden}/estado', [PerfilAprendizajeConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje.estado');
@@ -266,8 +286,15 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('sesion', [SesionController::class, 'listar'])->name('panel.sesion');
     Route::get('sesion/estudiantes', [SesionController::class, 'estudiantes'])->name('panel.sesion.estudiantes');
     Route::post('sesion/seleccionar-grado-grupo', [SesionController::class, 'obtenerGradoGrupoSeleccionado'])->name('panel.sesion.seleccionar-grado-grupo');
-    // Portafolio
+    // Portafolio (gestión de ejes en ambientes asignados)
     Route::get('portafolio', [PortafolioController::class, 'listar'])->name('panel.portafolio');
+    Route::get('portafolio/modulos/{modulo}/ejes', [EjesConfiguracionPanelController::class, 'listarPorModulo'])->name('panel.modulos.ejes');
+    Route::post('portafolio/modulos/{modulo}/ejes', [EjesConfiguracionPanelController::class, 'guardar'])->name('panel.ejes.guardar');
+    Route::get('portafolio/ejes/{eje}', [EjesConfiguracionPanelController::class, 'mostrar'])->name('panel.ejes.mostrar');
+    Route::put('portafolio/ejes/{eje}', [EjesConfiguracionPanelController::class, 'actualizar'])->name('panel.ejes.actualizar');
+    Route::patch('portafolio/ejes/{eje}/estado', [EjesConfiguracionPanelController::class, 'actualizarEstado'])->name('panel.ejes.estado');
+    Route::patch('portafolio/ejes/{eje}/mover', [EjesConfiguracionPanelController::class, 'mover'])->name('panel.ejes.mover');
+    Route::delete('portafolio/ejes/{eje}', [EjesConfiguracionPanelController::class, 'eliminar'])->name('panel.ejes.eliminar');
     Route::get('portafolio/{estudiante}', [PortafolioController::class, 'verEstudiante'])->name('panel.portafolio.estudiante');
     Route::post('portafolio/{estudiante}/observacion', [PortafolioController::class, 'guardarObservacion'])->name('panel.portafolio.observacion');
     Route::get('portafolio/{estudiante}/exportar', [PortafolioController::class, 'exportar'])->name('panel.portafolio.exportar');
@@ -300,6 +327,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::post('ambientes/seleccionar', [SesionController::class, 'seleccionarAmbiente'])->name('panel.ambientes.seleccionar');
     Route::get('ambientes/eliminar', [SesionController::class, 'eliminarAmbienteSeleccionado'])->name('panel.ambientes.eliminar');
     Route::get('ambientes/obtener', [SesionController::class, 'obtenerAmbienteSeleccionado'])->name('panel.ambientes.obtener');
+
 });
 
 // ── Super Admin ─────────────────────────────────────────────────────────
@@ -337,12 +365,31 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::get('perfil-aprendizaje/{perfilAprendizajeInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'verVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.ver');
     Route::delete('perfil-aprendizaje/{perfilAprendizajeInclusion}', [PerfilAprendizajeInclusionController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje.eliminar');
 
+    // Perfiles de Aprendizaje Personalizados
     Route::get('perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoController::class, 'index'])->name('superadmin.perfil-aprendizaje-personalizado.index');
     Route::post('perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoController::class, 'guardar'])->name('superadmin.perfil-aprendizaje-personalizado.guardar');
     Route::get('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'mostrar'])->name('superadmin.perfil-aprendizaje-personalizado.mostrar');
     Route::put('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'actualizar'])->name('superadmin.perfil-aprendizaje-personalizado.actualizar');
     Route::patch('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}/estado', [PerfilAprendizajePersonalizadoController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje-personalizado.estado');
     Route::delete('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje-personalizado.eliminar');
+
+    // Configuracion
+    Route::get('configuracion', [ModulosConfiguracionSuperAdminController::class, 'listar'])->name('superadmin.modulos.listar');
+    Route::post('configuracion/ambientes/{ambiente}/modulos', [ModulosConfiguracionSuperAdminController::class, 'guardar'])->name('superadmin.modulos.guardar');
+    Route::get('configuracion/modulos/{modulo}', [ModulosConfiguracionSuperAdminController::class, 'mostrar'])->name('superadmin.modulos.mostrar');
+    Route::put('configuracion/modulos/{modulo}', [ModulosConfiguracionSuperAdminController::class, 'actualizar'])->name('superadmin.modulos.actualizar');
+    Route::patch('configuracion/modulos/{modulo}/estado', [ModulosConfiguracionSuperAdminController::class, 'actualizarEstado'])->name('superadmin.modulos.estado');
+    Route::patch('configuracion/modulos/{modulo}/mover', [ModulosConfiguracionSuperAdminController::class, 'mover'])->name('superadmin.modulos.mover');
+
+    // Ejes (por módulo oficial)
+    Route::get('configuracion/modulos/{modulo}/ejes', [EjesConfiguracionSuperAdminController::class, 'listarPorModulo'])->name('superadmin.modulos.ejes');
+    Route::get('configuracion/ejes', [EjesConfiguracionSuperAdminController::class, 'listar'])->name('superadmin.ejes.listar');
+    Route::post('configuracion/modulos/{modulo}/ejes', [EjesConfiguracionSuperAdminController::class, 'guardar'])->name('superadmin.ejes.guardar');
+    Route::get('configuracion/ejes/{eje}', [EjesConfiguracionSuperAdminController::class, 'mostrar'])->name('superadmin.ejes.mostrar');
+    Route::put('configuracion/ejes/{eje}', [EjesConfiguracionSuperAdminController::class, 'actualizar'])->name('superadmin.ejes.actualizar');
+    Route::patch('configuracion/ejes/{eje}/estado', [EjesConfiguracionSuperAdminController::class, 'actualizarEstado'])->name('superadmin.ejes.estado');
+    Route::patch('configuracion/ejes/{eje}/mover', [EjesConfiguracionSuperAdminController::class, 'mover'])->name('superadmin.ejes.mover');
+
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

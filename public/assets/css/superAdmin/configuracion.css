@@ -1,0 +1,782 @@
+.config-sistema {
+    --cfg-ink: #1E293B;
+    --cfg-sub: #64748B;
+    --cfg-muted: #94A3B8;
+    --cfg-card: #fff;
+    --cfg-line: #E2E8F0;
+    --cfg-green: #0f8a5f;
+    --cfg-rust: #c14a2f;
+    max-width: 100%;
+}
+
+.config-sistema .cfg-filters {
+    background: #F8FAFC;
+    border: 1px solid var(--cfg-line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+}
+
+.config-sistema .cfg-filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 14px;
+    align-items: flex-end;
+}
+
+.config-sistema .cfg-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 160px;
+    flex: 1 1 160px;
+}
+
+.config-sistema .cfg-filter-actions {
+    flex: 0 0 auto;
+    min-width: auto;
+}
+
+.config-sistema .cfg-filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--cfg-sub);
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin: 0;
+}
+
+.config-sistema .cfg-filters .form-select {
+    border-color: var(--cfg-line);
+    color: var(--cfg-ink);
+    background-color: #fff;
+}
+
+.config-sistema .cfg-empty-filtros {
+    border: 1px dashed var(--cfg-line);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    background: #fff;
+}
+
+.config-sistema .amb-group {
+    background: var(--cfg-card);
+    border: 1px solid var(--cfg-line);
+    border-radius: 16px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.config-sistema .amb-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    cursor: pointer;
+    user-select: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    color: inherit;
+}
+
+.config-sistema .amb-head:hover {
+    filter: brightness(0.985);
+}
+
+.config-sistema .amb-ic {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex: none;
+    background: #fff;
+}
+
+.config-sistema .amb-title {
+    font-size: 15px;
+    font-weight: 700;
+    flex: 1;
+    color: var(--cfg-ink);
+}
+
+.config-sistema .amb-count {
+    font-size: 12px;
+    color: var(--cfg-muted);
+}
+
+.config-sistema .chev {
+    color: var(--cfg-muted);
+    font-size: 13px;
+    transition: transform .32s ease;
+}
+
+.config-sistema .amb-group.is-collapsed .chev {
+    transform: rotate(-90deg);
+}
+
+.config-sistema .amb-body {
+    border-top: 1px solid var(--cfg-line);
+    overflow: hidden;
+    max-height: 2400px;
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+        max-height .52s ease,
+        opacity .38s ease,
+        transform .38s ease,
+        border-color .3s ease;
+}
+
+.config-sistema .amb-group.is-collapsed .amb-body {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-6px);
+    border-top-color: transparent;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .config-sistema .amb-body,
+    .config-sistema .chev {
+        transition: none;
+    }
+
+    .config-sistema .amb-group.is-collapsed .amb-body {
+        transform: none;
+    }
+}
+
+.config-sistema .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.config-sistema .cfg-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.config-sistema .cfg-slug-preview,
+.cfg-slug-preview {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11.5px;
+    color: var(--cfg-muted, #94A3B8);
+}
+
+.config-sistema .cfg-table thead th {
+    text-align: left;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--cfg-muted);
+    font-weight: 700;
+    padding: 10px 18px;
+    background: #FAFBFC;
+    border-bottom: 1px solid var(--cfg-line);
+}
+
+.config-sistema .cfg-table tbody td {
+    padding: 12px 18px;
+    font-size: 13px;
+    border-bottom: 1px solid #F1F5F9;
+    vertical-align: middle;
+    color: var(--cfg-ink);
+}
+
+.config-sistema .cfg-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.config-sistema .mod-name {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.config-sistema .star {
+    font-size: 11px;
+    background: #FFF7E6;
+    color: #B5790F;
+    border: 1px solid #F3E3BB;
+    padding: 2px 7px;
+    border-radius: 99px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.config-sistema .slug {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11.5px;
+    color: var(--cfg-muted);
+}
+
+.config-sistema .switch,
+.config-sistema button.switch,
+#modalVerEjesModulo .switch,
+#modalVerEjesModulo button.switch {
+    position: relative;
+    box-sizing: border-box;
+    width: 42px;
+    height: 24px;
+    min-width: 42px;
+    min-height: 24px;
+    max-width: 42px;
+    max-height: 24px;
+    border-radius: 999px;
+    background: #CBD5E1;
+    display: inline-block;
+    flex: 0 0 42px;
+    border: 0;
+    padding: 0 !important;
+    margin: 0;
+    line-height: 1;
+    font-size: 0;
+    color: transparent;
+    text-indent: -9999px;
+    overflow: hidden;
+    cursor: pointer;
+    vertical-align: middle;
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .06);
+    appearance: none;
+    -webkit-appearance: none;
+    transition: background-color .18s ease;
+}
+
+.config-sistema .switch:hover,
+.config-sistema button.switch:hover,
+#modalVerEjesModulo .switch:hover,
+#modalVerEjesModulo button.switch:hover {
+    background: #94A3B8;
+}
+
+.config-sistema .switch:focus-visible,
+.config-sistema button.switch:focus-visible,
+#modalVerEjesModulo .switch:focus-visible,
+#modalVerEjesModulo button.switch:focus-visible {
+    outline: 2px solid #93C5FD;
+    outline-offset: 2px;
+}
+
+.config-sistema .switch:disabled,
+.config-sistema button.switch:disabled,
+#modalVerEjesModulo .switch:disabled,
+#modalVerEjesModulo button.switch:disabled {
+    opacity: .55;
+    cursor: wait;
+}
+
+.config-sistema .switch.on,
+.config-sistema button.switch.on,
+#modalVerEjesModulo .switch.on,
+#modalVerEjesModulo button.switch.on {
+    background: var(--cfg-green, #0f8a5f);
+}
+
+.config-sistema .switch.on:hover,
+.config-sistema button.switch.on:hover,
+#modalVerEjesModulo .switch.on:hover,
+#modalVerEjesModulo button.switch.on:hover {
+    background: #0c7350;
+}
+
+.config-sistema .switch::after,
+.config-sistema button.switch::after,
+#modalVerEjesModulo .switch::after,
+#modalVerEjesModulo button.switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .25);
+    transition: left .18s ease;
+}
+
+.config-sistema .switch.on::after,
+.config-sistema button.switch.on::after,
+#modalVerEjesModulo .switch.on::after,
+#modalVerEjesModulo button.switch.on::after {
+    left: 21px;
+}
+
+.config-sistema .state-row,
+#modalVerEjesModulo .state-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 28px;
+}
+
+.config-sistema .state-label {
+    font-size: 12px;
+    color: var(--cfg-sub);
+}
+
+.config-sistema .reorder {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.config-sistema .reorder button {
+    width: 22px;
+    height: 18px;
+    border: 1px solid var(--cfg-line);
+    background: #fff;
+    border-radius: 5px;
+    color: var(--cfg-muted);
+    font-size: 10px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.config-sistema .reorder button:hover:not(:disabled) {
+    background: #F8FAFC;
+    color: var(--cfg-ink);
+}
+
+.config-sistema .reorder button:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+.config-sistema .row-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* ── Modal ejes ─────────────────────────────────────────────── */
+#modalVerEjesModulo .ejes-modal-state {
+    padding: 28px 12px;
+    text-align: center;
+    color: var(--cfg-muted, #94A3B8);
+    font-size: 13px;
+}
+
+#modalVerEjesModulo .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#modalVerEjesModulo .mod-name {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+#modalVerEjesModulo .star {
+    font-size: 11px;
+    background: #FFF7E6;
+    color: #B5790F;
+    border: 1px solid #F3E3BB;
+    padding: 2px 7px;
+    border-radius: 99px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+#modalVerEjesModulo .reorder {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#modalVerEjesModulo .reorder button {
+    width: 22px;
+    height: 18px;
+    border: 1px solid var(--cfg-line, #E2E8F0);
+    background: #fff;
+    border-radius: 5px;
+    color: var(--cfg-muted, #94A3B8);
+    font-size: 10px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+#modalVerEjesModulo .reorder button:hover:not(:disabled) {
+    background: #F8FAFC;
+    color: var(--cfg-ink, #1E293B);
+}
+
+#modalVerEjesModulo .reorder button:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+#modalVerEjesModulo .eje-descripcion {
+    color: var(--cfg-sub, #64748B);
+    max-width: 280px;
+}
+
+#modalVerEjesModulo .eje-estado {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 99px;
+}
+
+#modalVerEjesModulo .eje-estado.is-activo {
+    background: #E8F8F1;
+    color: #0f8a5f;
+}
+
+#modalVerEjesModulo .eje-estado.is-inactivo {
+    background: #F1F5F9;
+    color: #64748B;
+}
+
+#modalVerEjesModulo .ejes-form-crear {
+    border: 1px solid var(--cfg-line, #E2E8F0);
+    border-radius: 12px;
+    padding: 16px 18px;
+    background: #FAFBFC;
+}
+
+#modalVerEjesModulo .ejes-form-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--cfg-ink, #1E293B);
+    margin: 0 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#modalVerEjesModulo .cfg-empty {
+    padding: 28px 18px;
+    text-align: center;
+    color: var(--cfg-muted, #94A3B8);
+    font-size: 13px;
+}
+
+.config-sistema .icon-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--cfg-line);
+    background: #fff;
+    color: var(--cfg-sub);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+}
+
+.config-sistema .no-delete {
+    font-size: 11px;
+    color: var(--cfg-muted);
+    font-style: italic;
+}
+
+.config-sistema .amb-foot {
+    padding: 12px 18px;
+    display: flex;
+    justify-content: flex-end;
+    background: #FAFBFC;
+    border-top: 1px solid var(--cfg-line);
+}
+
+.config-sistema .btn-new {
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 9px;
+    border: 1px dashed var(--cfg-line);
+    background: #fff;
+    color: var(--cfg-sub);
+    cursor: default;
+}
+
+.config-sistema .cfg-empty {
+    padding: 28px 18px;
+    text-align: center;
+    color: var(--cfg-muted);
+    font-size: 13px;
+}
+
+.config-sistema .cfg-empty-global {
+    background: var(--cfg-card);
+    border: 1px dashed var(--cfg-line);
+    border-radius: 16px;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--cfg-sub);
+}
+
+/* ── Admin: módulos / ejes (secciones + badges) ─────────────── */
+.config-sistema .badge-colegio,
+#modalVerEjesModulo .badge-colegio {
+    font-size: 11px;
+    background: #EEF2FF;
+    color: #3730A3;
+    border: 1px solid #C7D2FE;
+    padding: 2px 7px;
+    border-radius: 99px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+}
+
+.config-sistema .modulos-seccion,
+#modalVerEjesModulo .modulos-seccion {
+    border-bottom: 1px solid var(--cfg-line);
+}
+
+.config-sistema .modulos-seccion:last-of-type,
+.config-admin-ejes .mod-ejes-group .modulos-seccion:last-of-type,
+.config-panel-ejes .mod-ejes-group .modulos-seccion:last-of-type,
+#modalVerEjesModulo .modulos-seccion:last-of-type {
+    border-bottom: none;
+}
+
+.config-sistema .modulos-seccion-head,
+#modalVerEjesModulo .modulos-seccion-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 18px 8px;
+}
+
+.config-sistema .modulos-seccion-title,
+#modalVerEjesModulo .modulos-seccion-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cfg-ink);
+}
+
+.config-sistema .modulos-seccion-hint,
+#modalVerEjesModulo .modulos-seccion-hint {
+    font-size: 11px;
+    color: var(--cfg-muted);
+}
+
+.config-sistema .modulos-seccion-oficiales,
+#modalVerEjesModulo .modulos-seccion-oficiales {
+    background: linear-gradient(180deg, #FFFBEB 0%, #fff 48px);
+}
+
+.config-sistema .modulos-seccion-oficiales tbody tr.fila-oficial,
+#modalVerEjesModulo .modulos-seccion-oficiales tbody tr.fila-oficial {
+    background: #FFFCF3;
+}
+
+.config-sistema .modulos-seccion-oficiales tbody tr.fila-oficial:hover,
+#modalVerEjesModulo .modulos-seccion-oficiales tbody tr.fila-oficial:hover {
+    background: #FFF7E0;
+}
+
+.config-sistema .modulos-seccion-colegio,
+#modalVerEjesModulo .modulos-seccion-colegio {
+    background: #fff;
+}
+
+.config-sistema .modulos-seccion .cfg-empty,
+#modalVerEjesModulo .modulos-seccion .cfg-empty {
+    border-top: none;
+    padding-top: 8px;
+}
+
+.config-admin-ejes .mod-ejes-group,
+.config-panel-ejes .mod-ejes-group {
+    border-bottom: 1px solid var(--cfg-line);
+}
+
+.config-admin-ejes .mod-ejes-group:last-child,
+.config-panel-ejes .mod-ejes-group:last-child {
+    border-bottom: none;
+}
+
+.config-admin-ejes .mod-ejes-head,
+.config-panel-ejes .mod-ejes-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px 18px 6px;
+    background: #F8FAFC;
+    border-bottom: 1px solid var(--cfg-line);
+}
+
+.config-admin-ejes .mod-ejes-title,
+.config-panel-ejes .mod-ejes-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.config-admin-ejes .mod-ejes-nombre,
+.config-panel-ejes .mod-ejes-nombre {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--cfg-ink);
+}
+
+.config-admin-ejes .mod-ejes-hint,
+.config-panel-ejes .mod-ejes-hint {
+    font-size: 11px;
+    color: var(--cfg-muted);
+}
+
+.config-admin-ejes .mod-ejes-foot,
+.config-panel-ejes .mod-ejes-foot {
+    padding: 12px 18px 16px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background: #fff;
+}
+
+.config-admin-ejes .amb-body,
+.config-panel-ejes .amb-body {
+    max-height: 6000px;
+}
+
+.config-admin-modulos .amb-group:not(.is-collapsed) .modulos-seccion,
+.config-panel-modulos .amb-group:not(.is-collapsed) .modulos-seccion,
+.config-admin-ejes .amb-group:not(.is-collapsed) .mod-ejes-group,
+.config-panel-ejes .amb-group:not(.is-collapsed) .mod-ejes-group {
+    animation: cfgModulosSeccionIn .42s ease both;
+}
+
+.config-admin-modulos .amb-group:not(.is-collapsed) .modulos-seccion-colegio,
+.config-panel-modulos .amb-group:not(.is-collapsed) .modulos-seccion-colegio {
+    animation-delay: .08s;
+}
+
+.config-admin-modulos .amb-group:not(.is-collapsed) .amb-foot,
+.config-admin-ejes .amb-group:not(.is-collapsed) .mod-ejes-foot,
+.config-panel-ejes .amb-group:not(.is-collapsed) .mod-ejes-foot {
+    animation: cfgModulosSeccionIn .42s ease both;
+    animation-delay: .12s;
+}
+
+@keyframes cfgModulosSeccionIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .config-admin-modulos .amb-group:not(.is-collapsed) .modulos-seccion,
+    .config-admin-modulos .amb-group:not(.is-collapsed) .amb-foot,
+    .config-panel-modulos .amb-group:not(.is-collapsed) .modulos-seccion,
+    .config-admin-ejes .amb-group:not(.is-collapsed) .mod-ejes-group,
+    .config-admin-ejes .amb-group:not(.is-collapsed) .mod-ejes-foot,
+    .config-panel-ejes .amb-group:not(.is-collapsed) .mod-ejes-group,
+    .config-panel-ejes .amb-group:not(.is-collapsed) .mod-ejes-foot {
+        animation: none;
+    }
+}
+
+.config-sistema .eje-estado,
+#modalVerEjesModulo .eje-estado {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 99px;
+}
+
+.config-sistema .eje-estado.is-activo,
+#modalVerEjesModulo .eje-estado.is-activo {
+    background: #E8F8F1;
+    color: #0f8a5f;
+}
+
+.config-sistema .eje-estado.is-inactivo,
+#modalVerEjesModulo .eje-estado.is-inactivo {
+    background: #F1F5F9;
+    color: #64748B;
+}
+
+.config-sistema .eje-descripcion,
+#modalVerEjesModulo .eje-descripcion {
+    color: var(--cfg-sub);
+    max-width: 280px;
+}
+
+.config-sistema .col-actions .row-actions,
+#modalVerEjesModulo .col-actions .row-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+@media (max-width: 900px) {
+    .config-sistema .amb-count {
+        display: none;
+    }
+
+    .config-sistema .modulos-seccion-head,
+    #modalVerEjesModulo .modulos-seccion-head,
+    .config-admin-ejes .mod-ejes-head,
+    .config-panel-ejes .mod-ejes-head {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    /* SuperAdmin legado: cards apiladas solo en tablas .cfg-table */
+    .config-sistema .cfg-table thead {
+        display: none;
+    }
+
+    .config-sistema .cfg-table,
+    .config-sistema .cfg-table tbody,
+    .config-sistema .cfg-table tr,
+    .config-sistema .cfg-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .config-sistema .cfg-table tbody tr {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--cfg-line);
+    }
+
+    .config-sistema .cfg-table tbody td {
+        border: none;
+        padding: 4px 0;
+    }
+
+    .config-sistema .row-actions {
+        justify-content: flex-start;
+    }
+}

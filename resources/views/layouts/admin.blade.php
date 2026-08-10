@@ -248,9 +248,10 @@
                 const json = await response.json();
                 if (!response.ok) {
                     return {
+                        ...json,
                         success: false,
                         errors: json.errors ?? {},
-                        message: json.message ?? 'Error en la petición'
+                        message: json.message ?? 'Error en la petición',
                     };
                 }
                 return json;

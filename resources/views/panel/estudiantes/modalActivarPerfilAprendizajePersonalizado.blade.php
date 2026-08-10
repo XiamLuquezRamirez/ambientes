@@ -1,9 +1,9 @@
-{{-- Modal: activar perfil de aprendizaje personalizado (panel docente) --}}
+﻿{{-- Modal: activar perfil de aprendizaje personalizado (panel docente) --}}
 @php
     $perfilesAprendizajePersonalizado = $perfilesAprendizajePersonalizado ?? collect();
 @endphp
 
-<div class="modal fade" id="modalPerfilAprendizajePersonalizado" tabindex="-1" aria-labelledby="modalPerfilAprendizajePersonalizadoLabel"
+<div class="modal fade modal-app" id="modalPerfilAprendizajePersonalizado" tabindex="-1" aria-labelledby="modalPerfilAprendizajePersonalizadoLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <form method="POST" action="{{ route('panel.estudiantes.perfil-aprendizaje-personalizado.activar', $estudiante) }}"
