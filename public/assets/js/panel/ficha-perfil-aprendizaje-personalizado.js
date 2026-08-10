@@ -2,7 +2,8 @@
  * Activar / desactivar perfil de aprendizaje personalizado en la ficha del estudiante (AJAX parcial).
  */
 (function() {
-    if (!window.URL_FICHA_FRAGMENTOS_PERFIL_PERSONALIZADO) return;
+    const urlFragmentos = window.URL_FICHA_FRAGMENTOS_PERFILES || window.URL_FICHA_FRAGMENTOS_PERFIL_PERSONALIZADO;
+    if (!urlFragmentos) return;
 
     const TAB_LIST_ID = 'perfilTabs';
 
@@ -45,7 +46,11 @@
             $('#fichaPerfilPersonalizadoActivo').html(data.activo_html);
         }
         if (data.acciones_html !== undefined) {
-            $('#fichaAccionesPerfilPersonalizado').html(data.acciones_html);
+            const contenedor = document.getElementById('fichaAccionesPerfilesAprendizaje')
+                || document.getElementById('fichaAccionesPerfilPersonalizado');
+            if (contenedor) {
+                contenedor.innerHTML = data.acciones_html;
+            }
         }
         if (data.historial_html !== undefined) {
             $('#tabPerfilesAprendizajePersonalizado').html(data.historial_html);
@@ -64,7 +69,7 @@
 
     function recargarFragmentos(opciones = {}) {
         return $.ajax({
-            url: window.URL_FICHA_FRAGMENTOS_PERFIL_PERSONALIZADO,
+            url: urlFragmentos,
             type: 'GET',
             dataType: 'json'
         }).done(function(res) {

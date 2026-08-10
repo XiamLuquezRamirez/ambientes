@@ -160,4 +160,21 @@ class EstudiantePerfilAprendizajePersonalizadoService
                 ->update(['perfil_aprendizaje_personalizado_id' => null]);
         });
     }
+
+    public function cerrarAsignacionActivaAlAsignarPerfilAprendizaje(Estudiante $estudiante): bool
+    {
+        $asignacion = $estudiante->perfilAprendizajePersonalizadoActiva()->first();
+
+        if (! $asignacion) {
+            return false;
+        }
+
+        $this->desasociar(
+            $asignacion,
+            'diagnostico_formal',
+            'Cierre automático al asignar perfil de aprendizaje.'
+        );
+
+        return true;
+    }
 }

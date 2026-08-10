@@ -5,7 +5,7 @@
             <div class="modal-header">
                 <div class="modal-header-icon"><i class="fas fa-unlink text-white"></i></div>
                 <div class="flex-grow-1">
-                    <h5 class="modal-title mb-0" id="modalDesasociarTransitoriaLabel">Desactivar perfil personalizado</h5>
+                    <h5 class="modal-title mb-0" id="modalDesasociarTransitoriaLabel">Desactivar perfil de aprendizaje personalizado</h5>
                     <p class="modal-subtitle mb-0">Cierre la asignación del estudiante</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -29,7 +29,7 @@
                     <label for="observacion_cierre" class="form-label fw-semibold">Observación</label>
                     <textarea id="observacion_cierre" name="observacion_cierre" class="form-control" rows="4"
                         required minlength="20" maxlength="2000"
-                        placeholder="Indique por qué se desvincula al estudiante de este perfil de aprendizaje personalizado…"></textarea>
+                        placeholder="Indique por qué se desactiva el perfil de aprendizaje personalizado del estudiante…"></textarea>
                     <small class="text-muted">Mínimo 20 caracteres.</small>
                 </div>
             </div>

@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Panel;
 
 use App\Http\Controllers\Controller;
+use App\Models\Estudiante;
 use App\Models\PerfilAprendizajeInclusion;
 use App\Models\PerfilAprendizajeOrden;
+use App\Services\EstudiantePerfilAprendizajePersonalizadoService;
 use App\Services\EstudiantePerfilAprendizajeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class PerfilAprendizajePanelController extends Controller
 {
@@ -77,6 +81,147 @@ class PerfilAprendizajePanelController extends Controller
         ]);
     }
 
+    public function asignarEstudiante(Request $request, Estudiante $estudiante)
+    {
+        $docente = Auth::guard('docente')->user()->docente;
+        if (! $docente) {
+            abort(403);
+        }
+
+        if (! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
+            abort(403, 'No tienes acceso a este estudiante.');
+        }
+
+        if ($estudiante->requiere_apoyo !== 'si') {
+            $mensaje = 'Solo los estudiantes que requieren apoyo pedagógico pueden recibir un perfil de aprendizaje.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $mensaje], 422);
+            }
+
+            return back()->withErrors(['perfil_aprendizaje_id' => $mensaje]);
+        }
+
+        $institucionId = $this->institucionId();
+
+        $datos = $request->validate([
+            'perfil_aprendizaje_id' => [
+                'required',
+                'integer',
+                Rule::exists('perfil_aprendizaje', 'id')->where(fn ($q) => $q->where('eliminado', 0)),
+            ],
+        ]);
+
+        if ((int) $datos['perfil_aprendizaje_id'] === 1) {
+            $mensaje = 'No puedes asignar el perfil estándar desde esta acción.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $mensaje], 422);
+            }
+
+            return back()->withErrors(['perfil_aprendizaje_id' => $mensaje]);
+        }
+
+        $permitido = PerfilAprendizajeOrden::query()
+            ->where('institucion_id', $institucionId)
+            ->where('perfil_aprendizaje_id', $datos['perfil_aprendizaje_id'])
+            ->where('activa', true)
+            ->exists();
+
+        if (! $permitido) {
+            $mensaje = 'El perfil de aprendizaje no está habilitado para esta institución.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $mensaje], 422);
+            }
+
+            return back()->withErrors(['perfil_aprendizaje_id' => $mensaje]);
+        }
+
+        $estudiante->load('perfilAprendizajePersonalizadoActiva');
+
+        $servicioPersonalizado = app(EstudiantePerfilAprendizajePersonalizadoService::class);
+        $cerroPersonalizado = false;
+
+        DB::transaction(function () use ($estudiante, $datos, $servicioPersonalizado, &$cerroPersonalizado) {
+            $cerroPersonalizado = $servicioPersonalizado->cerrarAsignacionActivaAlAsignarPerfilAprendizaje($estudiante);
+
+            $estudiante->update([
+                'perfil_aprendizaje_id' => $datos['perfil_aprendizaje_id'],
+            ]);
+        });
+
+        $nombre = PerfilAprendizajeInclusion::query()
+            ->where('id', $datos['perfil_aprendizaje_id'])
+            ->value('nombre');
+
+        $mensaje = 'Perfil de aprendizaje'.($nombre ? " «{$nombre}»" : '').' asignado correctamente.';
+        if ($cerroPersonalizado) {
+            $mensaje .= ' El perfil de aprendizaje personalizado activo fue desactivado automáticamente.';
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $mensaje,
+            ]);
+        }
+
+        return redirect()
+            ->route('panel.estudiantes.show', $estudiante)
+            ->with('success', $mensaje);
+    }
+
+    public function desactivarEstudiante(Request $request, Estudiante $estudiante)
+    {
+        $docente = Auth::guard('docente')->user()->docente;
+        if (! $docente) {
+            abort(403);
+        }
+
+        if (! $this->docenteTieneAccesoAlEstudiante($docente->id, $estudiante->id)) {
+            abort(403, 'No tienes acceso a este estudiante.');
+        }
+
+        if ($estudiante->requiere_apoyo !== 'si') {
+            $mensaje = 'Solo los estudiantes que requieren apoyo pedagógico pueden modificar el perfil de aprendizaje.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $mensaje], 422);
+            }
+
+            return back()->withErrors(['perfil_aprendizaje_id' => $mensaje]);
+        }
+
+        $tienePerfilNormal = ($estudiante->perfil_aprendizaje_id ?? null)
+            && (int) $estudiante->perfil_aprendizaje_id !== 1;
+
+        if (! $tienePerfilNormal) {
+            $mensaje = 'El estudiante no tiene un perfil de aprendizaje asignado para desactivar.';
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $mensaje], 422);
+            }
+
+            return back()->withErrors(['perfil_aprendizaje_id' => $mensaje]);
+        }
+
+        $estudiante->update(['perfil_aprendizaje_id' => 1]);
+
+        $mensaje = 'Perfil de aprendizaje desactivado correctamente. El estudiante quedó con perfil Estándar.';
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $mensaje,
+            ]);
+        }
+
+        return redirect()
+            ->route('panel.estudiantes.show', $estudiante)
+            ->with('success', $mensaje);
+    }
+
     private function asegurarPersonalizacion(int $institucionId): void
     {
         $catalogoIds = PerfilAprendizajeInclusion::query()->pluck('id');
@@ -108,6 +253,13 @@ class PerfilAprendizajePanelController extends Controller
         }
 
         PerfilAprendizajeOrden::query()->insert($filas);
+    }
+
+    private function docenteTieneAccesoAlEstudiante(int $docenteId, int $estudianteId): bool
+    {
+        return app(EstudiantePerfilAprendizajeService::class)
+            ->estudiantesIdsAccesiblesDocente($docenteId)
+            ->contains($estudianteId);
     }
 
     private function institucionId(): int
