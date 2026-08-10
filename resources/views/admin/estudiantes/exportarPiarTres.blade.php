@@ -405,7 +405,7 @@
                 </tr>
                 @foreach ($piar->actaCompromiso->actividades as $actividad)
                     <tr>
-                        <td>{{ $actividad->actividad }}</td>
+                        <td>{{ $actividad->nombre }}</td>
                         <td>{{ $actividad->descripcion }}</td>
                         <td>{{ $actividad->frecuencia }}</td>
                     </tr>

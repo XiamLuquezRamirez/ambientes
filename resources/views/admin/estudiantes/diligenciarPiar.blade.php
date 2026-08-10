@@ -10,9 +10,16 @@
             <h1>Diligenciar PIAR</h1>
             <p>Plan Individual de Ajustes Razonables</p>
         </div>
-        <a href="javascript:window.history.back()" class="btn btn-piar-outline">
-            <i class="fas fa-arrow-left me-1"></i> Volver
-        </a>
+        <div>
+            @if ($tipo == 'actualizar')
+                <a href="{{ route('admin.piar.exportar', $estudiante) }}" target="_blank" class="btn btn-warning">
+                    <i class="fas fa-file-pdf me-1"></i> Exportar PIAR
+                </a>
+            @endif
+            <a href="javascript:window.history.back()" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-1"></i> Volver
+            </a>
+        </div>
     </div>
     <div class="piar-container">
         <input type="hidden" id="estudiante_id_piar" value="{{ $estudiante?->id }}">
@@ -376,12 +383,7 @@
                             </div>
                             <div class="col-md-9">
                                 <label class="form-label">¿Cuál?</label>
-                                <select class="form-select" name="cual_diagnostico" id="cual_diagnostico">
-                                    <option value="">Seleccione</option>
-                                    @foreach ($perfilesAprendizaje as $perfilAprendizaje)
-                                        <option value="{{ $perfilAprendizaje->id }}">{{ $perfilAprendizaje->nombre }}</option>
-                                    @endforeach
-                                </select>
+                                <input type="text" class="form-control" name="cual_diagnostico" id="cual_diagnostico">
                             </div>
                             <!-- Atención médica -->
                             <div class="col-md-12">
