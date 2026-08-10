@@ -1,4 +1,4 @@
-@extends($usuario->rol === 'admin' ? 'layouts.admin' : 'layouts.panel')
+﻿@extends($usuario->rol === 'admin' ? 'layouts.admin' : 'layouts.panel')
 @section('title', 'Diligenciar PIAR')
 @push('styles')
    <link rel="stylesheet" href="{{ asset('assets/css/piar.css') }}">
@@ -2132,7 +2132,7 @@
     </div>
 
     {{-- Modal buscar docente --}}
-    <div class="modal fade" id="modal_buscar_docente" tabindex="-1" aria-labelledby="modal_buscar_docente_label"
+    <div class="modal fade modal-app" id="modal_buscar_docente" tabindex="-1" aria-labelledby="modal_buscar_docente_label"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

@@ -1,5 +1,5 @@
-{{-- Modal: muestra el contenido de la vista asociada al perfil de aprendizaje --}}
-<div class="modal fade" id="modalVerInfoPerfilAprendizaje" tabindex="-1" data-bs-keyboard="false"
+﻿{{-- Modal: muestra el contenido de la vista asociada al perfil de aprendizaje --}}
+<div class="modal fade modal-app" id="modalVerInfoPerfilAprendizaje" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalVerInfoPerfilAprendizajeTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">

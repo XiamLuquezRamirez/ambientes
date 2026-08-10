@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Asignaciones — ' . $ambiente->nombre)
 
 @push('styles')
@@ -154,7 +154,7 @@
 </div>
 
 {{-- Modal: Agregar estudiantes --}}
-<div class="modal fade" id="modalAgregar" tabindex="-1"
+<div class="modal fade modal-app" id="modalAgregar" tabindex="-1"
     data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" style="border:none;border-radius:16px;overflow:hidden">
@@ -210,7 +210,7 @@
 </div>
 
 {{-- Modal: Editar estado --}}
-<div class="modal fade" id="modalEstadoEa" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+<div class="modal fade modal-app" id="modalEstadoEa" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content" style="border:none;border-radius:16px;overflow:hidden">
             <div class="modal-header modal-header-azul">

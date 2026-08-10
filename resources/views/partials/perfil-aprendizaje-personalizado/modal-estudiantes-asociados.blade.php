@@ -17,7 +17,8 @@
                 </div>
                 <div id="modalEstudiantesTransitoriaEmpty" class="cfg-empty m-3" style="display:none">
                     <i class="fa-solid fa-user-slash" style="font-size:1.4rem;opacity:.45"></i>
-                    <p class="mt-2 mb-0">No hay estudiantes activos asociados a este perfil de aprendizaje personalizado.</p>
+                    <p class="mt-2 mb-0">No hay estudiantes activos asociados a este perfil de aprendizaje
+                        personalizado.</p>
                 </div>
                 <div id="modalEstudiantesTransitoriaContenedor" style="display:none">
                     <div class="ct-est-filtros">

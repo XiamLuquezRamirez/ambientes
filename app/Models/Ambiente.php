@@ -31,6 +31,11 @@ class Ambiente extends Model
         return $this->hasMany(Modulo::class)->orderBy('orden');
     }
 
+    public function modulosOficiales()
+    {
+        return $this->hasMany(Modulo::class)->oficiales()->orderBy('orden');
+    }
+
     public function grados()
     {
         return $this->belongsToMany(

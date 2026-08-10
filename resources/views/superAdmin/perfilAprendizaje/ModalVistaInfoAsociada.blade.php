@@ -1,5 +1,5 @@
-{{-- Modal: asociar / editar nombre de vista de información --}}
-<div class="modal fade" id="modalVistaInfoAsociada" tabindex="-1" data-bs-keyboard="false"
+﻿{{-- Modal: asociar / editar nombre de vista de información --}}
+<div class="modal fade modal-app" id="modalVistaInfoAsociada" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalVistaInfoAsociadaTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">

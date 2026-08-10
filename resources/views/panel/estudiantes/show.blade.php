@@ -1,4 +1,4 @@
-{{-- Ficha completa del estudiante (panel docente).
+﻿{{-- Ficha completa del estudiante (panel docente).
     Controlador: EstudiantePanelController@verFicha
     Ruta: panel.estudiantes.show --}}
 @extends('layouts.panel')
@@ -420,7 +420,7 @@
     </div>
 
     {{-- Modal observación --}}
-    <div class="modal fade" id="modalObservacionFicha" tabindex="-1" aria-labelledby="modalObservacionFichaLabel"
+    <div class="modal fade modal-app" id="modalObservacionFicha" tabindex="-1" aria-labelledby="modalObservacionFichaLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <form method="POST" action="{{ route('panel.portafolio.observacion', $estudiante) }}"

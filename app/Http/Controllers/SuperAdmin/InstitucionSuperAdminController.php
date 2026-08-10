@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Departamento;
 use App\Models\Institucion;
+use App\Models\Modulo;
 use App\Models\Municipio;
 use App\Models\PerfilAprendizajeInclusion;
 use App\Models\PerfilAprendizajePersonalizado;
@@ -34,7 +35,14 @@ class InstitucionSuperAdminController extends Controller
      */
     public function index(Request $request)
     {
-        $ambientes = Ambiente::all();
+        $ambientes = Ambiente::query()
+            ->with([
+                'modulosOficiales' => fn ($q) => $q
+                    ->where('activo', true)
+                    ->orderBy('orden'),
+            ])
+            ->orderBy('nombre')
+            ->get();
         $departamentos = Departamento::orderBy('descripcion')->get();
         $perfilesAprendizaje = PerfilAprendizajeInclusion::query()->ordenadas()->get();
 
@@ -154,6 +162,7 @@ class InstitucionSuperAdminController extends Controller
             'perfil_aprendizaje_orden' => $this->perfilAprendizajeOrdenController->listarPorInstitucion((int) $id),
             'perfil_aprendizaje_personalizado_orden' => $this->perfilAprendizajePersonalizadoOrdenController->listarPorInstitucion((int) $id),
             'perfil_aprendizaje_personalizado_disponibles' => $perfilesAprendizajePersonalizadoDisponibles,
+            'modulos' => $this->listarModulosPorInstitucion((int) $id),
         ]);
     }
 
@@ -207,6 +216,8 @@ class InstitucionSuperAdminController extends Controller
                 (int) $institucion->id,
                 $request->input('perfil_aprendizaje_personalizado_orden', [])
             );
+
+            $this->sincronizarModulosOficiales($institucion, $request);
 
             return [
                 'institucion' => $institucion,
@@ -267,6 +278,8 @@ class InstitucionSuperAdminController extends Controller
                 (int) $institucion->id,
                 $request->input('perfil_aprendizaje_personalizado_orden', [])
             );
+
+            $this->sincronizarModulosOficiales($institucion, $request);
         });
 
         return response()->json([
@@ -368,6 +381,8 @@ class InstitucionSuperAdminController extends Controller
                 .'|file|mimes:jpeg,jpg,png|max:'.InstitucionLogoService::MAX_KILOBYTES,
             'perfil_aprendizaje_orden' => 'nullable|array',
             'perfil_aprendizaje_personalizado_orden' => 'nullable|array',
+            'modulos' => 'nullable|array',
+            'modulos.*.activo' => 'nullable|boolean',
         ], [
             'logo.required' => 'El logo de la institución es obligatorio.',
             'departamento_id.required' => 'Seleccione un departamento.',
@@ -533,5 +548,75 @@ class InstitucionSuperAdminController extends Controller
         }
 
         return $relaciones;
+    }
+
+    /**
+     * Estado de módulos oficiales vinculados a la institución (pivot modulo_institucion).
+     *
+     * @return list<array{id:int,activo:bool}>
+     */
+    private function listarModulosPorInstitucion(int $institucionId): array
+    {
+        return DB::table('modulo_institucion')
+            ->where('institucion_id', $institucionId)
+            ->get(['modulo_id', 'activo'])
+            ->map(fn ($row) => [
+                'id' => (int) $row->modulo_id,
+                'activo' => (bool) $row->activo,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Sincroniza módulos oficiales según ambientes activos y checkboxes del modal.
+     * Solo toca filas de módulos oficiales; no afecta módulos locales de institución.
+     */
+    private function sincronizarModulosOficiales(Institucion $institucion, Request $request): void
+    {
+        $ambientesActivos = array_keys($this->relacionesAmbientes($request));
+
+        $modulosOficialesIds = Modulo::query()
+            ->oficiales()
+            ->where('activo', true)
+            ->when(
+                $ambientesActivos === [],
+                fn ($q) => $q->whereRaw('1 = 0'),
+                fn ($q) => $q->whereIn('ambiente_id', $ambientesActivos)
+            )
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $todosOficialesIds = Modulo::query()->oficiales()->pluck('id')->all();
+
+        DB::table('modulo_institucion')
+            ->where('institucion_id', $institucion->id)
+            ->whereIn('modulo_id', $todosOficialesIds)
+            ->delete();
+
+        if ($modulosOficialesIds === []) {
+            return;
+        }
+
+        $checked = collect($request->input('modulos', []))
+            ->filter(fn ($cfg) => filter_var($cfg['activo'] ?? false, FILTER_VALIDATE_BOOLEAN))
+            ->keys()
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $ahora = now();
+        $filas = [];
+        foreach ($modulosOficialesIds as $moduloId) {
+            $filas[] = [
+                'modulo_id' => $moduloId,
+                'institucion_id' => $institucion->id,
+                'activo' => in_array($moduloId, $checked, true),
+                'created_at' => $ahora,
+                'updated_at' => $ahora,
+            ];
+        }
+
+        DB::table('modulo_institucion')->insert($filas);
     }
 }

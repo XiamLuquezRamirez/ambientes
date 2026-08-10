@@ -83,6 +83,38 @@
                     </ul>
                 </div>
             </li>
+
+            @php
+                $configuracion = request()->routeIs('superadmin.modulos.listar', 'superadmin.ejes.listar');
+            @endphp
+            <li class="nav-item">
+                <a href="#navConfiguracion" data-bs-toggle="collapse"
+                    aria-expanded="{{ $configuracion ? 'true' : 'false' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $configuracion ? '' : 'collapsed' }}"
+                    style="cursor:pointer">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Configuración</span>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
+                </a>
+                <div class="collapse {{ $configuracion ? 'show' : '' }}" id="navConfiguracion">
+                    <ul class="nav flex-column" style="padding:2px 0 4px 0">
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.modulos.listar') }}"
+                                class="{{ request()->routeIs('superadmin.modulos.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-cube"></i> Módulos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.ejes.listar') }}"
+                                class="{{ request()->routeIs('superadmin.ejes.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-diagram-project"></i> Ejes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
         </ul>
     </aside>
     @php

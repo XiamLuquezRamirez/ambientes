@@ -1,9 +1,9 @@
-{{--
+﻿{{--
     Modal: Registrar / Editar Perfil de Aprendizaje (Super Admin)
     Pestañas: Datos generales | Ajustes (próximamente)
     En edición: carga datos por AJAX → superadmin.perfil-aprendizaje.mostrar
 --}}
-<div class="modal fade" id="modalRegistrarPerfilAprendizaje" tabindex="-1" data-bs-keyboard="false"
+<div class="modal fade modal-app" id="modalRegistrarPerfilAprendizaje" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalRegistrarPerfilAprendizajeTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">

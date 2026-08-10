@@ -34,6 +34,12 @@ class Institucion extends Model
             ->withTimestamps();
     }
 
+    /** Ambientes contratados y activos para la institución. */
+    public function ambientesActivos()
+    {
+        return $this->ambientes()->wherePivot('activo', true);
+    }
+
     public function usuarios()
     {
         return $this->hasMany(User::class, 'institucion_id');
@@ -47,5 +53,12 @@ class Institucion extends Model
     public function perfilesAprendizajePersonalizadoOrden()
     {
         return $this->hasMany(PerfilAprendizajePersonalizadoOrden::class, 'institucion_id');
+    }
+
+    public function modulos()
+    {
+        return $this->belongsToMany(Modulo::class, 'modulo_institucion')
+            ->withPivot('activo')
+            ->withTimestamps();
     }
 }

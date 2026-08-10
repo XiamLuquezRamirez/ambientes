@@ -1,4 +1,4 @@
-@push('styles')
+﻿@push('styles')
     <style>
         .content-ambientes-disponibles {
             padding: 10px;
@@ -91,7 +91,7 @@
         }
     </style>
 @endpush
-<div class="modal fade" id="modalRegistro" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+<div class="modal fade modal-app" id="modalRegistro" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
     aria-labelledby="modalRegistroLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">

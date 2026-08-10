@@ -1,11 +1,11 @@
-{{--
+﻿{{--
     Modal: Crear / Editar perfil de aprendizaje personalizado
 --}}
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/perfiles-aprendizaje/index.css') }}">
 @endpush
 
-<div class="modal fade" id="modalRegistrarTransitoria" tabindex="-1" data-bs-keyboard="false"
+<div class="modal fade modal-app" id="modalRegistrarTransitoria" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalRegistrarTransitoriaTitle" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">

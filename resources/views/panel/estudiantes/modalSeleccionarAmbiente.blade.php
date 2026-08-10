@@ -1,4 +1,4 @@
-@push('styles')
+﻿@push('styles')
     <style>
         .ambiente-card {
             background: #FFFFFF;
@@ -107,7 +107,7 @@
     </style>
 @endpush
 
-<div class="modal fade" id="modalSeleccionarAmbiente" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade modal-app" id="modalSeleccionarAmbiente" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">

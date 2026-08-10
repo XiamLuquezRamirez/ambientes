@@ -13,7 +13,8 @@
             <div class="modal-body d-grid gap-3">
                 <p class="mb-0 fw-semibold" id="desasociarEstudianteNombre"></p>
                 <p class="mb-0 text-muted" style="font-size:.9rem">
-                    El perfil de aprendizaje permanente del estudiante no se modifica. Solo se cierra esta asignación del perfil personalizado.
+                    El perfil de aprendizaje permanente del estudiante no se modifica. Solo se cierra esta asignación
+                    del perfil personalizado.
                 </p>
                 <input type="hidden" id="desasociarAsignacionId" value="">
                 <div>
