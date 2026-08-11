@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
 use App\Http\Controllers\Admin\CatalogoController;
+use App\Http\Controllers\Admin\CatalogoDBAAdminController;
 use App\Http\Controllers\Admin\CierreAnioController;
 use App\Http\Controllers\Admin\ConfiguracionAdminController;
 use App\Http\Controllers\Admin\ConflictosController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\SuperAdmin\AdminsSuperAdminController;
+use App\Http\Controllers\SuperAdmin\CatalogoDBASuperAdminController;
 use App\Http\Controllers\SuperAdmin\EjesConfiguracionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ModulosConfiguracionSuperAdminController;
@@ -163,8 +165,8 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('admin.estudiantes.cargar-municipios');
     Route::get('estudiantes/restablecer-pin/{idEstudiante}', [EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.restablecer-pin');
 
-    // Catalogo
-    Route::get('catalogo', [CatalogoController::class, 'listar'])->name('admin.catalogo');
+    // Catalogo (vista unificada DBA MEN + colegio)
+    Route::get('catalogo', [CatalogoDBAAdminController::class, 'listarUnificado'])->name('admin.catalogo');
     Route::post('catalogo/modulos', [CatalogoController::class, 'guardarModulo'])->name('admin.catalogo.modulo.store');
     Route::put('catalogo/modulos/{modulo}', [CatalogoController::class, 'actualizarModulo'])->name('admin.catalogo.modulo.update');
     Route::delete('catalogo/modulos/{modulo}', [CatalogoController::class, 'eliminarModulo'])->name('admin.catalogo.modulo.destroy');
@@ -211,6 +213,14 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::patch('configuracion/perfil-aprendizaje-personalizado/{personalizadoOrden}/estado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estado');
     Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}/estudiantes', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estudiantes');
     Route::post('configuracion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desasociar', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'desasociarEstudiante'])->name('admin.configuracion.perfil-aprendizaje-personalizado.desasociar');
+
+    // Catalogo DBA
+    Route::get('configuracion/catalogo-dba', [CatalogoDBAAdminController::class, 'listar'])->name('admin.configuracion.catalogo-dba.listar');
+    Route::post('configuracion/catalogo-dba', [CatalogoDBAAdminController::class, 'guardar'])->name('admin.configuracion.catalogo-dba.guardar');
+    Route::get('configuracion/catalogo-dba/datos/{id}', [CatalogoDBAAdminController::class, 'ver'])->name('admin.configuracion.catalogo-dba.ver');
+    Route::get('configuracion/catalogo-dba/detalle/{id}', [CatalogoDBAAdminController::class, 'detalle'])->name('admin.configuracion.catalogo-dba.detalle');
+    Route::put('configuracion/catalogo-dba/{id}', [CatalogoDBAAdminController::class, 'actualizar'])->name('admin.configuracion.catalogo-dba.actualizar');
+    Route::patch('configuracion/catalogo-dba/{id}/toggle-activo', [CatalogoDBAAdminController::class, 'toggleActivo'])->name('admin.configuracion.catalogo-dba.toggleActivo');
 
     // Usuario
     Route::get('perfil', [PerfilController::class, 'mostrar'])->name('admin.perfil');
@@ -397,6 +407,12 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::patch('configuracion/ejes/{eje}/estado', [EjesConfiguracionSuperAdminController::class, 'actualizarEstado'])->name('superadmin.ejes.estado');
     Route::patch('configuracion/ejes/{eje}/mover', [EjesConfiguracionSuperAdminController::class, 'mover'])->name('superadmin.ejes.mover');
 
+    // Catalogos DBA
+    Route::get('configuracion/catalogo-dba', [CatalogoDBASuperAdminController::class, 'listar'])->name('superadmin.catalogo-dba.listar');
+    Route::post('configuracion/catalogo-dba', [CatalogoDBASuperAdminController::class, 'guardar'])->name('superadmin.catalogo-dba.guardar');
+    Route::get('configuracion/catalogo-dba/datos/{id}', [CatalogoDBASuperAdminController::class, 'ver'])->name('superadmin.catalogo-dba.ver');
+    Route::put('configuracion/catalogo-dba/{id}', [CatalogoDBASuperAdminController::class, 'actualizar'])->name('superadmin.catalogo-dba.actualizar');
+    Route::patch('configuracion/catalogo-dba/{id}/toggle-activo', [CatalogoDBASuperAdminController::class, 'toggleActivo'])->name('superadmin.catalogo-dba.toggleActivo');
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

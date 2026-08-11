@@ -70,14 +70,16 @@
                             <a href="{{ route('superadmin.perfil-aprendizaje.index') }}"
                                 class="{{ request()->routeIs('superadmin.perfil-aprendizaje.*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i> Perfiles de Aprendizaje Globales
+                                <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i> Perfiles de Aprendizaje
+                                Globales
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('superadmin.perfil-aprendizaje-personalizado.index') }}"
                                 class="{{ request()->routeIs('superadmin.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i> Perfiles de Aprendizaje Personalizados  Globales
+                                <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i> Perfiles de Aprendizaje
+                                Personalizados Globales
                             </a>
                         </li>
                     </ul>
@@ -110,6 +112,13 @@
                                 class="{{ request()->routeIs('superadmin.ejes.*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-diagram-project"></i> Ejes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.catalogo-dba.listar') }}"
+                                class="{{ request()->routeIs('superadmin.catalogo-dba.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-database"></i> Catálogo DBA
                             </a>
                         </li>
                     </ul>

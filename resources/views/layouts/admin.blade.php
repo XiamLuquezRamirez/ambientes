@@ -88,7 +88,7 @@
             </li>
             <li class="nav-item">
                 <a href="{{ route('admin.catalogo') }}"
-                    class="{{ request()->routeIs('admin.catalogo*') ? 'active nav-link' : 'nav-link' }}">
+                    class="{{ request()->routeIs('admin.catalogo') || request()->routeIs('admin.configuracion.catalogo-dba.*') ? 'active nav-link' : 'nav-link' }}">
                     <i class="fa-solid fa-book"></i> Catálogo
                 </a>
             </li>
@@ -105,7 +105,8 @@
                 </a>
             </li>
             @php
-                $configuracion = request()->routeIs('admin.configuracion*');
+                $configuracion = request()->routeIs('admin.configuracion*')
+                    && ! request()->routeIs('admin.configuracion.catalogo-dba.*');
             @endphp
             <li class="nav-item">
                 <a href="#navConfiguracion" data-bs-toggle="collapse"
