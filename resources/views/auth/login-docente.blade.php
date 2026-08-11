@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Docente — Aulas Reggio</title>
+    <title>Inicio de sesión — PedNia</title>
     <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <style>

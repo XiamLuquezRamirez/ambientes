@@ -571,6 +571,9 @@ class InstitucionSuperAdminController extends Controller
     /**
      * Sincroniza módulos oficiales según ambientes activos y checkboxes del modal.
      * Solo toca filas de módulos oficiales; no afecta módulos locales de institución.
+     *
+     * Checkbox marcado = asignado a la institución (existe fila).
+     * El estado `activo` del pivot lo gestiona el admin del colegio y se conserva.
      */
     private function sincronizarModulosOficiales(Institucion $institucion, Request $request): void
     {
@@ -590,6 +593,11 @@ class InstitucionSuperAdminController extends Controller
 
         $todosOficialesIds = Modulo::query()->oficiales()->pluck('id')->all();
 
+        $activosPrevios = DB::table('modulo_institucion')
+            ->where('institucion_id', $institucion->id)
+            ->whereIn('modulo_id', $todosOficialesIds)
+            ->pluck('activo', 'modulo_id');
+
         DB::table('modulo_institucion')
             ->where('institucion_id', $institucion->id)
             ->whereIn('modulo_id', $todosOficialesIds)
@@ -603,15 +611,24 @@ class InstitucionSuperAdminController extends Controller
             ->filter(fn ($cfg) => filter_var($cfg['activo'] ?? false, FILTER_VALIDATE_BOOLEAN))
             ->keys()
             ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => in_array($id, $modulosOficialesIds, true))
+            ->values()
             ->all();
+
+        if ($checked === []) {
+            return;
+        }
 
         $ahora = now();
         $filas = [];
-        foreach ($modulosOficialesIds as $moduloId) {
+        foreach ($checked as $moduloId) {
+            $activoPrevio = $activosPrevios[$moduloId] ?? $activosPrevios[(string) $moduloId] ?? null;
+
             $filas[] = [
                 'modulo_id' => $moduloId,
                 'institucion_id' => $institucion->id,
-                'activo' => in_array($moduloId, $checked, true),
+                // Nuevo enlace: activo. Enlace ya existente: conserva lo que dejó el admin.
+                'activo' => $activoPrevio === null ? true : (bool) $activoPrevio,
                 'created_at' => $ahora,
                 'updated_at' => $ahora,
             ];

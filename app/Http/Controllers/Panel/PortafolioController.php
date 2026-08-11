@@ -50,14 +50,14 @@ class PortafolioController extends Controller
         $ambientesModulos = $ambientes->map(function (Ambiente $ambiente) use ($institucionId) {
             $oficiales = Modulo::query()
                 ->oficiales()
+                ->where('activo', true)
                 ->where('ambiente_id', $ambiente->id)
                 ->whereHas(
                     'instituciones',
-                    fn ($q) => $q->where('instituciones.id', $institucionId)
+                    fn ($q) => $q
+                        ->where('instituciones.id', $institucionId)
+                        ->where('modulo_institucion.activo', true)
                 )
-                ->with([
-                    'instituciones' => fn ($q) => $q->where('instituciones.id', $institucionId),
-                ])
                 ->withCount([
                     'temas as temas_activos_count' => fn ($q) => $q->where('activo', true),
                     'temas as temas_count',
@@ -66,22 +66,18 @@ class PortafolioController extends Controller
                 ])
                 ->orderBy('orden')
                 ->get()
-                ->map(function (Modulo $modulo) {
-                    $activoInstitucion = (bool) optional($modulo->instituciones->first())->pivot?->activo;
-                    $disponible = (bool) $modulo->activo && $activoInstitucion;
-
-                    return [
-                        'modelo' => $modulo,
-                        'es_propio' => false,
-                        'activo_institucion' => $activoInstitucion,
-                        'puede_gestionar' => false,
-                        'puede_gestionar_ejes' => $disponible,
-                    ];
-                });
+                ->map(fn (Modulo $modulo) => [
+                    'modelo' => $modulo,
+                    'es_propio' => false,
+                    'activo_institucion' => true,
+                    'puede_gestionar' => false,
+                    'puede_gestionar_ejes' => true,
+                ]);
 
             $propios = Modulo::query()
                 ->deInstitucion($institucionId)
                 ->where('ambiente_id', $ambiente->id)
+                ->where('activo', true)
                 ->withCount([
                     'temas as temas_activos_count' => fn ($q) => $q->where('activo', true),
                     'temas as temas_count',
@@ -93,9 +89,9 @@ class PortafolioController extends Controller
                 ->map(fn (Modulo $modulo) => [
                     'modelo' => $modulo,
                     'es_propio' => true,
-                    'activo_institucion' => (bool) $modulo->activo,
+                    'activo_institucion' => true,
                     'puede_gestionar' => false,
-                    'puede_gestionar_ejes' => (bool) $modulo->activo,
+                    'puede_gestionar_ejes' => true,
                 ]);
 
             $ambiente->setRelation(

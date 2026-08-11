@@ -77,6 +77,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('ambientes/{ambiente}/ping', [AmbienteAdminController::class, 'verificarConexion'])->name('admin.ambientes.ping');
     Route::get('ambientes/{ambiente}/docentes', [AmbienteAdminController::class, 'docentesDelPeriodo'])->name('admin.ambientes.docentes');
     Route::get('ambientes/{ambiente}/modulos', [AmbienteAdminController::class, 'modulos'])->name('admin.ambientes.modulos');
+    Route::patch('ambientes/{ambiente}/modulos/{modulo}/toggle', [AmbienteAdminController::class, 'activarModulo'])->name('admin.ambientes.modulos.toggle');
     Route::get('ambientes/listado', [AmbienteAdminController::class, 'listado'])->name('admin.ambientes.listado');
     Route::get('ambientes/{ambiente}/gradoslistado', [AmbienteAdminController::class, 'gradoslistado'])->name('admin.ambientes.gradoslistado');
 

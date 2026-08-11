@@ -16,73 +16,59 @@
         {{-- KPIs (también son atajos) --}}
         <div class="sa-kpi-grid">
             <a href="{{ route('superadmin.instituciones.index') }}" class="sa-kpi-card">
-                <div class="sa-kpi-top">
-                    <span class="sa-kpi-icon sa-kpi-icon--blue"><i class="fa-solid fa-university"></i></span>
-                    <i class="fa-solid fa-arrow-right sa-kpi-arrow" aria-hidden="true"></i>
-                </div>
-                <div>
-                    <div class="sa-kpi-label">Instituciones</div>
-                    <div class="sa-kpi-value">{{ $stats['instituciones_total'] }}</div>
+                <span class="sa-kpi-icon sa-kpi-icon--blue"><i class="fa-solid fa-university"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Instituciones</div>
+                        <div class="sa-kpi-value">{{ $stats['instituciones_total'] }}</div>
+                    </div>
                     <div class="sa-kpi-meta">
-                        <strong>{{ $stats['instituciones_activas'] }}</strong> activas ·
-                        <strong>{{ $stats['instituciones_suspendidas'] }}</strong> suspendidas
+                        {{ $stats['instituciones_activas'] }} activas · {{ $stats['instituciones_suspendidas'] }} susp.
                     </div>
                 </div>
             </a>
 
             <a href="{{ route('superadmin.modulos.listar') }}" class="sa-kpi-card">
-                <div class="sa-kpi-top">
-                    <span class="sa-kpi-icon sa-kpi-icon--green"><i class="fa-solid fa-cube"></i></span>
-                    <i class="fa-solid fa-arrow-right sa-kpi-arrow" aria-hidden="true"></i>
-                </div>
-                <div>
-                    <div class="sa-kpi-label">Módulos oficiales</div>
-                    <div class="sa-kpi-value">{{ $stats['modulos_oficiales_activos'] }}</div>
-                    <div class="sa-kpi-meta">
-                        de <strong>{{ $stats['modulos_oficiales'] }}</strong> en el catálogo
+                <span class="sa-kpi-icon sa-kpi-icon--green"><i class="fa-solid fa-cube"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Módulos</div>
+                        <div class="sa-kpi-value">{{ $stats['modulos_oficiales_activos'] }}</div>
                     </div>
+                    <div class="sa-kpi-meta">de {{ $stats['modulos_oficiales'] }} oficiales</div>
                 </div>
             </a>
 
             <a href="{{ route('superadmin.ejes.listar') }}" class="sa-kpi-card">
-                <div class="sa-kpi-top">
-                    <span class="sa-kpi-icon sa-kpi-icon--amber"><i class="fa-solid fa-diagram-project"></i></span>
-                    <i class="fa-solid fa-arrow-right sa-kpi-arrow" aria-hidden="true"></i>
-                </div>
-                <div>
-                    <div class="sa-kpi-label">Ejes oficiales</div>
-                    <div class="sa-kpi-value">{{ $stats['ejes_oficiales_activos'] }}</div>
-                    <div class="sa-kpi-meta">
-                        de <strong>{{ $stats['ejes_oficiales'] }}</strong> en el catálogo
+                <span class="sa-kpi-icon sa-kpi-icon--amber"><i class="fa-solid fa-diagram-project"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Ejes</div>
+                        <div class="sa-kpi-value">{{ $stats['ejes_oficiales_activos'] }}</div>
                     </div>
+                    <div class="sa-kpi-meta">de {{ $stats['ejes_oficiales'] }} oficiales</div>
                 </div>
             </a>
 
             <a href="{{ route('superadmin.perfil-aprendizaje.index') }}" class="sa-kpi-card">
-                <div class="sa-kpi-top">
-                    <span class="sa-kpi-icon sa-kpi-icon--violet"><i class="fa-solid fa-puzzle-piece"></i></span>
-                    <i class="fa-solid fa-arrow-right sa-kpi-arrow" aria-hidden="true"></i>
-                </div>
-                <div>
-                    <div class="sa-kpi-label">Perfiles globales</div>
-                    <div class="sa-kpi-value">{{ $stats['perfiles_globales_activos'] }}</div>
-                    <div class="sa-kpi-meta">
-                        activos de <strong>{{ $stats['perfiles_globales'] }}</strong> registrados
+                <span class="sa-kpi-icon sa-kpi-icon--violet"><i class="fa-solid fa-puzzle-piece"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Perfiles</div>
+                        <div class="sa-kpi-value">{{ $stats['perfiles_globales_activos'] }}</div>
                     </div>
+                    <div class="sa-kpi-meta">de {{ $stats['perfiles_globales'] }} globales</div>
                 </div>
             </a>
 
             <a href="{{ route('superadmin.perfil-aprendizaje-personalizado.index') }}" class="sa-kpi-card">
-                <div class="sa-kpi-top">
-                    <span class="sa-kpi-icon sa-kpi-icon--slate"><i class="fa-solid fa-brain"></i></span>
-                    <i class="fa-solid fa-arrow-right sa-kpi-arrow" aria-hidden="true"></i>
-                </div>
-                <div>
-                    <div class="sa-kpi-label">Perfiles personalizados</div>
-                    <div class="sa-kpi-value">{{ $stats['perfiles_personalizados_activos'] }}</div>
-                    <div class="sa-kpi-meta">
-                        activos de <strong>{{ $stats['perfiles_personalizados'] }}</strong> globales
+                <span class="sa-kpi-icon sa-kpi-icon--slate"><i class="fa-solid fa-brain"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Personalizados</div>
+                        <div class="sa-kpi-value">{{ $stats['perfiles_personalizados_activos'] }}</div>
                     </div>
+                    <div class="sa-kpi-meta">de {{ $stats['perfiles_personalizados'] }} globales</div>
                 </div>
             </a>
         </div>

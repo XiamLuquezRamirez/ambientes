@@ -33,6 +33,7 @@ class ConfiguracionAdminController extends Controller
         $ambientesModulos = $ambientes->map(function ($ambiente) use ($institucionId) {
             $oficiales = Modulo::query()
                 ->oficiales()
+                ->where('activo', true)
                 ->where('ambiente_id', $ambiente->id)
                 ->whereHas(
                     'instituciones',
@@ -51,14 +52,13 @@ class ConfiguracionAdminController extends Controller
                 ->get()
                 ->map(function (Modulo $modulo) {
                     $activoInstitucion = (bool) optional($modulo->instituciones->first())->pivot?->activo;
-                    $disponible = (bool) $modulo->activo && $activoInstitucion;
 
                     return [
                         'modelo' => $modulo,
                         'es_propio' => false,
                         'activo_institucion' => $activoInstitucion,
                         'puede_gestionar' => false,
-                        'puede_gestionar_ejes' => $disponible,
+                        'puede_gestionar_ejes' => $activoInstitucion,
                     ];
                 });
 

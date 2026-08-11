@@ -245,37 +245,67 @@ async function abrirModalModulos(ambienteId, nombreAmbiente) {
     }
 }
 
+let _modulosModalCache = [];
+
 function renderModulos(modulos) {
     const contenedor = document.getElementById('listaModulos');
+    _modulosModalCache = Array.isArray(modulos) ? modulos : [];
 
-    if (!modulos || modulos.length === 0) {
+    if (!_modulosModalCache.length) {
         contenedor.innerHTML = '<p class="text-center text-muted py-4">Este ambiente no tiene módulos registrados.</p>';
         return;
     }
 
-    contenedor.innerHTML = modulos.map(m => `
-        <div class="modulo-fila" id="modfila-${m.id}">
+    contenedor.innerHTML = _modulosModalCache.map(m => htmlFilaModulo(m)).join('');
+}
+
+function htmlFilaModulo(m) {
+    const oficial = m.es_oficial ? ' <small style="color:#94A3B8;font-weight:400">(oficial)</small>' : '';
+    const activo = !!m.activo;
+    const filaClass = activo ? 'modulo-fila' : 'modulo-fila modulo-fila-inactivo';
+    const puedeToggleActivo = m.puede_toggle_activo !== false;
+
+    if (!puedeToggleActivo) {
+        return `
+        <div class="${filaClass}" id="modfila-${m.id}">
             <div class="modulo-icono">${m.icono ?? '📦'}</div>
-            <div class="modulo-nombre">${m.nombre}</div>
+            <div class="modulo-nombre">${m.nombre}${oficial}</div>
             <div class="modulo-toggles">
-                <label class="tog" title="Visible para docentes">
-                    <input type="checkbox" ${m.activo ? 'checked' : ''}
-                        onchange="toggleModulo(_modalModulosId, ${m.id}, 'activo', this)">
-                    <span class="tog-track"></span>
-                    <span>Activo</span>
-                </label>
-                <label class="tog" title="Visible para estudiantes">
-                    <input type="checkbox" ${m.visible_estudiantes ? 'checked' : ''}
-                        onchange="toggleModulo(_modalModulosId, ${m.id}, 'visible_estudiantes', this)">
-                    <span class="tog-track"></span>
-                    <span>Visible</span>
-                </label>
+                <span class="modulo-estado ${activo ? 'modulo-estado-activo' : 'modulo-estado-inactivo'}">${activo ? 'Activo' : 'Inactivo'}</span>
             </div>
+        </div>`;
+    }
+
+    const toggleVisible = (!m.es_oficial && activo) ? `
+            <label class="tog" title="Visible para estudiantes">
+                <input type="checkbox" ${m.visible_estudiantes ? 'checked' : ''}
+                    onchange="toggleModulo(_modalModulosId, ${m.id}, 'visible_estudiantes', this)">
+                <span class="tog-track"></span>
+                <span>Visible</span>
+            </label>` : '';
+
+    return `
+    <div class="${filaClass}" id="modfila-${m.id}" data-modulo-id="${m.id}">
+        <div class="modulo-icono">${m.icono ?? '📦'}</div>
+        <div class="modulo-nombre">${m.nombre}${oficial}</div>
+        <div class="modulo-toggles">
+            <label class="tog" title="${m.es_oficial ? 'Activar o desactivar solo para esta institución' : 'Estado del módulo'}">
+                <input type="checkbox" ${activo ? 'checked' : ''}
+                    onchange="toggleModulo(_modalModulosId, ${m.id}, 'activo', this)">
+                <span class="tog-track"></span>
+                <span class="tog-label-activo">${activo ? 'Activo' : 'Inactivo'}</span>
+            </label>
+            ${toggleVisible}
         </div>
-    `).join('');
+    </div>`;
 }
 
 async function toggleModulo(ambienteId, moduloId, campo, checkbox) {
+    const label = checkbox.closest('.tog')?.querySelector('.tog-label-activo');
+    if (campo === 'activo' && label) {
+        label.textContent = checkbox.checked ? 'Activo' : 'Inactivo';
+    }
+
     const { status, data } = await apiFetch(
         `/admin/ambientes/${ambienteId}/modulos/${moduloId}/toggle`,
         'PATCH',
@@ -284,7 +314,34 @@ async function toggleModulo(ambienteId, moduloId, campo, checkbox) {
 
     if (!data.ok) {
         checkbox.checked = !checkbox.checked;
-        mostrarToast('error', 'Error al cambiar el módulo.');
+        if (campo === 'activo' && label) {
+            label.textContent = checkbox.checked ? 'Activo' : 'Inactivo';
+        }
+        mostrarToast('error', data.mensaje || 'Error al cambiar el módulo.');
+        return;
+    }
+
+    const idx = _modulosModalCache.findIndex(m => m.id === moduloId);
+    if (idx === -1) return;
+
+    if (campo === 'activo') {
+        const activo = !!data.activo;
+        const esOficial = !!_modulosModalCache[idx].es_oficial;
+        _modulosModalCache[idx] = {
+            ..._modulosModalCache[idx],
+            activo,
+            disponible: activo,
+            puede_gestionar: true,
+            puede_toggle_activo: data.puede_toggle_activo !== false,
+            puede_toggle_visible: !esOficial && activo,
+        };
+        const fila = document.getElementById(`modfila-${moduloId}`);
+        if (fila) fila.outerHTML = htmlFilaModulo(_modulosModalCache[idx]);
+        return;
+    }
+
+    if (campo === 'visible_estudiantes') {
+        _modulosModalCache[idx].visible_estudiantes = !!data.visible_estudiantes;
     }
 }
 

@@ -1022,9 +1022,10 @@
         }
 
         function aplicarModulosInstitucion(modulos = []) {
+            // Checkbox = asignado a la institución (existe fila). El activo lo gestiona el admin.
             const mapa = {};
             (modulos || []).forEach(m => {
-                mapa[String(m.id)] = !!m.activo;
+                mapa[String(m.id)] = true;
             });
 
             document.querySelectorAll('.grupo-modulos-ambiente').forEach(grupo => {

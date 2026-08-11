@@ -310,14 +310,11 @@ class EjesConfiguracionAdminController extends Controller
 
         $vinculo = $modulo->instituciones()
             ->where('instituciones.id', $institucionId)
+            ->wherePivot('activo', true)
             ->first();
 
-        if (! $vinculo) {
-            abort(403, 'Este módulo oficial no está asignado a su institución.');
-        }
-
-        if ($soloActivos && (! $modulo->activo || ! $vinculo->pivot->activo)) {
-            abort(422, 'El módulo no está activo para su institución.');
+        if (! $vinculo || ! $modulo->activo) {
+            abort(403, 'Este módulo oficial no está activo para su institución.');
         }
     }
 

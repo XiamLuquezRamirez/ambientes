@@ -10,7 +10,7 @@
         <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
             <div>
                 <h1>Ambientes</h1>
-                <p>{{ $ambientes->count() }} ambientes de aprendizaje en la red local</p>
+                <p>{{ $ambientes->count() }} ambientes de aprendizaje de su institución</p>
             </div>
             <a href="{{ route('admin.matriculas.index') }}" class="btn btn-primary">
                 <i class="fas fa-graduation-cap"></i> Matrículas
@@ -160,8 +160,9 @@
                     </div>
                     <div class="modal-body" style="padding:22px;max-height:460px;overflow-y:auto">
                         <p style="font-size:.8rem;color:#64748B;margin-bottom:14px">
-                            <strong>Activo:</strong> visible para docentes.
-                            <strong>Visible:</strong> además visible para estudiantes.
+                            Puede activar o desactivar módulos <strong>solo para su institución</strong>
+                            (no afecta el catálogo del superadministrador).
+                            En módulos propios también puede cambiar la visibilidad para estudiantes.
                         </p>
                         <div id="listaModulos">
                             <p class="text-center text-muted py-3">Cargando…</p>
