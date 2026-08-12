@@ -49,10 +49,12 @@
                                 <div class="avatar-wrapper mx-auto">
                                     <div class="profile-avatar" id="logoPerfilPrincipal" onclick="cambiarLogoPerfil()"
                                         title="Cambiar logo" style="cursor:pointer;">
-                                        <img src="" id="logoPerfilImagen" class="profile-avatar-img d-none"
+                                        <img src="{{ $logoUrlPublica ?? '' }}" id="logoPerfilImagen"
+                                            class="profile-avatar-img {{ $logoUrlPublica ? '' : 'd-none' }}"
                                             alt="Logo institución">
-                                        <span id="logoPerfilIniciales" class="profile-avatar-iniciales">
-                                            IE
+                                        <span id="logoPerfilIniciales"
+                                            class="profile-avatar-iniciales {{ $logoUrlPublica ? 'd-none' : '' }}">
+                                            {{ $iniciales ?? 'IE' }}
                                         </span>
                                         <div class="avatar-overlay">
                                             <i class="fa-solid fa-camera"></i>
@@ -69,14 +71,16 @@
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="nombre">Nombre</label>
                                 <input type="text" id="nombre" name="nombre" class="form-control"
-                                    placeholder="Nombre de la institución" required>
+                                    placeholder="Nombre de la institución" value="{{ old('nombre', $institucion->nombre) }}"
+                                    required>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="codigo_dane">Código DANE</label>
                                 <input type="text" id="codigo_dane" name="codigo_dane" class="form-control"
-                                    placeholder="Código DANE de la institución" required>
+                                    placeholder="Código DANE de la institución"
+                                    value="{{ old('codigo_dane', $institucion->codigo_dane) }}" required>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -86,7 +90,10 @@
                                     onchange="cargarMunicipiosInstitucion()">
                                     <option value="">Seleccione</option>
                                     @foreach ($departamentos as $d)
-                                        <option value="{{ $d->codigo }}">{{ $d->descripcion }}</option>
+                                        <option value="{{ $d->codigo }}"
+                                            @selected((string) old('departamento_id', $departamentoId) === (string) $d->codigo)>
+                                            {{ $d->descripcion }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -96,6 +103,12 @@
                                 <label class="form-label fw-bold" for="municipio_id">Municipio</label>
                                 <select id="municipio_id" name="municipio_id" class="form-control" required>
                                     <option value="">Seleccione</option>
+                                    @foreach ($municipios as $m)
+                                        <option value="{{ $m->id }}"
+                                            @selected((string) old('municipio_id', $municipioId) === (string) $m->id)>
+                                            {{ $m->descripcion }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -104,7 +117,8 @@
                                 <label class="form-label fw-bold" for="correo_contacto">Correo de
                                     contacto</label>
                                 <input type="email" id="correo_contacto" name="correo_contacto" class="form-control"
-                                    placeholder="Correo de contacto de la institución" required>
+                                    placeholder="Correo de contacto de la institución"
+                                    value="{{ old('correo_contacto', $institucion->correo_contacto) }}" required>
                             </div>
                         </div>
                     </div>
@@ -178,12 +192,21 @@
 
 @push('scripts')
     <script>
-        const URL_CONFIGURACION_BASE = @json(url('admin/configuracion'));
         const URL_CONFIGURACION_UPDATE = @json(route('admin.configuracion.update'));
         const URL_CARGAR_MUNICIPIOS = @json(url('admin/configuracion/cargar-municipios'));
-        const INSTITUCION_ID = @json((int) session('institucion_id'));
+        const INSTITUCION_ID = @json((int) $institucion->id);
 
-        cargarDatosInstitucion(INSTITUCION_ID);
+        if (typeof window.setEstadoLogoInstitucion === 'function') {
+            window.setEstadoLogoInstitucion({
+                id: INSTITUCION_ID,
+                logoUrl: @json($logoUrlPublica),
+                iniciales: @json($iniciales ?? 'IE'),
+            });
+        } else {
+            window.idInstitucionEditando = INSTITUCION_ID;
+            window.logoInstitucionActualUrl = @json($logoUrlPublica);
+            window.logoInstitucionIniciales = @json($iniciales ?? 'IE');
+        }
 
         async function cargarMunicipiosInstitucion(municipioSeleccionado = null) {
             const departamento = document.getElementById('departamento_id')?.value;
@@ -214,57 +237,6 @@
                 });
             } catch (e) {
                 mostrarToast('error', 'Error al cargar los municipios');
-            }
-        }
-
-        function cargarDatosInstitucion(id) {
-            fetch(`${URL_CONFIGURACION_BASE}/datos/${id}`, {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(r => {
-                    if (!r.ok) throw new Error('No data');
-                    return r.json();
-                })
-                .then(resp => {
-                    if (!resp.success) throw new Error('No data');
-                    mapearDatosInstitucion(resp.data);
-                })
-                .catch(() => {
-                    mostrarToast('error', 'No se pudo cargar la información de la institución');
-                });
-        }
-
-        function mapearDatosInstitucion(data) {
-            $('#nombre').val(data.nombre ?? '');
-            $('#codigo_dane').val(data.codigo_dane ?? '');
-            $('#correo_contacto').val(data.correo_contacto ?? '');
-
-            const departamentoId = data.departamento_id ?? '';
-            $('#departamento_id').val(departamentoId);
-            if (departamentoId) {
-                cargarMunicipiosInstitucion(data.municipio_id ?? null);
-            } else {
-                const selMunicipio = document.getElementById('municipio_id');
-                if (selMunicipio) {
-                    selMunicipio.innerHTML = '<option value="">Seleccione</option>';
-                }
-            }
-
-            (data.ambientes || []).forEach(function(amb) {
-                const ip = document.getElementById(`ambiente_ip_${amb.id}`);
-                const puerto = document.getElementById(`ambiente_puerto_${amb.id}`);
-                if (ip) ip.value = amb.ip ?? '';
-                if (puerto) puerto.value = amb.puerto ?? '';
-            });
-
-            if (typeof window.setEstadoLogoInstitucion === 'function') {
-                window.setEstadoLogoInstitucion({
-                    id: data.id,
-                    logoUrl: data.logo_url_publica,
-                    iniciales: data.iniciales || 'IE',
-                });
             }
         }
 

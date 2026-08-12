@@ -53,8 +53,8 @@
                         <div class="col-md-12">
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="descripcion">Descripción</label>
-                                <textarea id="descripcion" name="descripcion" class="form-control" rows="3"
-                                    placeholder="Descripción del DBA personalizado" required maxlength="255"></textarea>
+                                <textarea id="descripcion" name="descripcion" class="form-control catalogo-dba-descripcion"
+                                    rows="6" placeholder="Descripción del DBA personalizado" required></textarea>
                             </div>
                         </div>
                     </div>

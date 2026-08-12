@@ -50,22 +50,11 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold" for="es_men">Origen</label>
-                                <select id="es_men" name="es_men" class="form-control" required
-                                    style="cursor:pointer;">
-                                    <option value="">Selecciona un origen</option>
-                                    <option value="1">MEN</option>
-                                    <option value="0">NO MEN</option>
-                                </select>
-                            </div>
-                        </div>
                         <div class="col-md-12">
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="descripcion">Descripción</label>
-                                <textarea id="descripcion" name="descripcion" class="form-control" rows="3"
-                                    placeholder="Descripción del catálogo" required maxlength="255"></textarea>
+                                <textarea id="descripcion" name="descripcion" class="form-control catalogo-dba-descripcion" rows="6"
+                                    placeholder="Descripción del catálogo" required></textarea>
                             </div>
                         </div>
                     </div>

@@ -33,10 +33,6 @@
                             <label class="form-label fw-bold text-muted mb-1" style="font-size:.8rem">Grado</label>
                             <div id="detalleGrado" class="catalogo-dba-detalle-valor"></div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-muted mb-1" style="font-size:.8rem">Estado</label>
-                            <div id="detalleEstado"></div>
-                        </div>
                         <div class="col-12">
                             <label class="form-label fw-bold text-muted mb-1" style="font-size:.8rem">Descripción</label>
                             <div id="detalleDescripcion" class="catalogo-dba-detalle-descripcion"></div>

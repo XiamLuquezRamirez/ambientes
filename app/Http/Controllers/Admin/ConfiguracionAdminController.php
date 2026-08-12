@@ -96,9 +96,33 @@ class ConfiguracionAdminController extends Controller
 
         $this->adjuntarEjesAModulos($ambientesModulos, $institucionId);
 
+        [$departamentoId, $municipioId] = $this->resolverIdsUbicacion(
+            $institucion->departamento,
+            $institucion->municipio
+        );
+
+        $municipios = $departamentoId
+            ? Municipio::where('coddep', $departamentoId)
+                ->orderBy('descripcion')
+                ->get(['id', 'descripcion', 'coddep'])
+            : collect();
+
+        $logoUrlPublica = $this->logoService->urlPublica($institucion->logo);
+        $iniciales = $this->logoService->iniciales($institucion);
+
         return view(
             'admin.configuracion.institucion.index',
-            compact('ambientes', 'institucion', 'departamentos', 'ambientesModulos')
+            compact(
+                'ambientes',
+                'institucion',
+                'departamentos',
+                'ambientesModulos',
+                'departamentoId',
+                'municipioId',
+                'municipios',
+                'logoUrlPublica',
+                'iniciales'
+            )
         );
     }
 

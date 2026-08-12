@@ -20,7 +20,9 @@
             @forelse ($catalogos as $catalogo)
                 <tr id="fila-{{ $catalogo->id }}">
                     <td style="font-weight:600;color:#1E293B">{{ $catalogo->codigo }}</td>
-                    <td style="color:#64748B">{{ $catalogo->descripcion }}</td>
+                    <td class="catalogo-dba-col-descripcion" title="{{ $catalogo->descripcion }}">
+                        {{ \Illuminate\Support\Str::limit($catalogo->descripcion, 80) }}
+                    </td>
                     <td>{{ $catalogo->area?->nombre ?? '—' }}</td>
                     <td>{{ $catalogo->grado?->nombre ?? '—' }}</td>
                     <td>
@@ -46,7 +48,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align:center;color:#64748B;padding:24px">
+                    <td colspan="8" style="text-align:center;color:#64748B;padding:24px">
                         No hay DBA personalizados registrados para la institución.
                     </td>
                 </tr>

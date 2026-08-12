@@ -58,6 +58,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('panel.catalogo') }}"
+                        class="{{ request()->routeIs('panel.catalogo*') ? 'active nav-link' : 'nav-link' }}">
+                        <i class="fa-solid fa-book"></i> Catalogo
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ route('panel.inclusion') }}"
                         class="{{ request()->routeIs('panel.inclusion') || request()->routeIs('panel.inclusion.ajustes') ? 'active nav-link' : 'nav-link' }}">
                         <i class="fa-solid fa-universal-access"></i> Inclusión

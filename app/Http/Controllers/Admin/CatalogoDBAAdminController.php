@@ -10,40 +10,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
+/**
+ * Gestión del Catálogo DBA personalizado del colegio (Configuración).
+ * La consulta unificada MEN + colegio vive en CatalogoAdminController.
+ */
 class CatalogoDBAAdminController extends Controller
 {
     /**
-     * Redirige a la vista unificada (bookmarks / enlaces antiguos).
-     * CRUD sigue en las rutas configuracion/catalogo-dba/*.
+     * Listado y filtros de DBA personalizados de la institución.
      */
     public function listar(Request $request)
     {
-        return redirect()->route('admin.catalogo', $request->query());
-    }
-
-    /**
-     * Vista unificada: DBA del MEN (solo lectura) + DBA del colegio (editables).
-     * Pestañas: men | colegio. Filtros: buscar, área, grado, estado.
-     */
-    public function listarUnificado(Request $request)
-    {
         $institucionId = $this->institucionId();
 
-        $consultaMen = CatalogoDBA::query()
-            ->with(['area:id,nombre', 'grado:id,nombre'])
-            ->whereNull('institucion_id')
-            ->where('es_men', true)
-            ->orderBy('codigo');
-        $this->aplicarFiltros($consultaMen, $request);
-        $catalogosMen = $consultaMen->paginate(10, ['*'], 'page_men')->withQueryString();
-
-        $consultaColegio = CatalogoDBA::query()
-            ->with(['area:id,nombre', 'grado:id,nombre'])
+        $consulta = CatalogoDBA::query()
+            ->with(['area:id,nombre', 'grado:id,nombre', 'creadoPor:id,nombre'])
             ->where('institucion_id', $institucionId)
             ->where('es_men', false)
             ->orderBy('codigo');
-        $this->aplicarFiltros($consultaColegio, $request);
-        $catalogosColegio = $consultaColegio->paginate(10, ['*'], 'page_colegio')->withQueryString();
+
+        $this->aplicarFiltros($consulta, $request);
+        $catalogos = $consulta->paginate(10)->withQueryString();
 
         $areas = Area::where('estado', true)->orderBy('nombre')->get(['id', 'nombre']);
         $grados = Grado::activos()->get(['id', 'nombre']);
@@ -51,34 +38,11 @@ class CatalogoDBAAdminController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'html' => view('admin.catalogo._contenido', compact('catalogosMen', 'catalogosColegio'))->render(),
+                'html' => view('admin.configuracion.catalogos-DBA._tabla', compact('catalogos'))->render(),
             ]);
         }
 
-        return view('admin.catalogo.index', compact('catalogosMen', 'catalogosColegio', 'areas', 'grados'));
-    }
-
-    private function aplicarFiltros($consulta, Request $request): void
-    {
-        if ($request->filled('buscar')) {
-            $termino = trim($request->buscar);
-            $consulta->where(function ($q) use ($termino) {
-                $q->where('codigo', 'like', "%{$termino}%")
-                    ->orWhere('descripcion', 'like', "%{$termino}%");
-            });
-        }
-
-        if ($request->filled('area_id')) {
-            $consulta->where('area_id', $request->area_id);
-        }
-
-        if ($request->filled('grado_id')) {
-            $consulta->where('grado_id', $request->grado_id);
-        }
-
-        if ($request->filled('estado') && in_array($request->estado, ['0', '1'], true)) {
-            $consulta->where('estado', (bool) (int) $request->estado);
-        }
+        return view('admin.configuracion.catalogos-DBA.index', compact('catalogos', 'areas', 'grados'));
     }
 
     public function guardar(Request $request)
@@ -96,7 +60,7 @@ class CatalogoDBAAdminController extends Controller
             ],
             'area_id' => 'required|exists:areas,id',
             'grado_id' => 'required|exists:grados,id',
-            'descripcion' => 'required|string|max:255',
+            'descripcion' => 'required|string|max:65000',
         ]);
 
         $catalogo = CatalogoDBA::create([
@@ -135,40 +99,6 @@ class CatalogoDBAAdminController extends Controller
         ]);
     }
 
-    /**
-     * Detalle de lectura: DBA del MEN oficiales o del colegio del Admin.
-     */
-    public function detalle(string $id)
-    {
-        $institucionId = $this->institucionId();
-
-        $catalogo = CatalogoDBA::with(['area:id,nombre', 'grado:id,nombre'])
-            ->where(function ($q) use ($institucionId) {
-                $q->where(function ($men) {
-                    $men->whereNull('institucion_id')->where('es_men', true);
-                })->orWhere(function ($colegio) use ($institucionId) {
-                    $colegio->where('institucion_id', $institucionId)->where('es_men', false);
-                });
-            })
-            ->findOrFail($id);
-
-        $esMen = (bool) $catalogo->es_men && $catalogo->institucion_id === null;
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'id' => $catalogo->id,
-                'codigo' => $catalogo->codigo,
-                'descripcion' => $catalogo->descripcion,
-                'area' => $catalogo->area?->nombre ?? '—',
-                'grado' => $catalogo->grado?->nombre ?? '—',
-                'origen' => $esMen ? 'MEN' : 'Del colegio',
-                'es_men' => $esMen,
-                'estado' => (bool) $catalogo->estado,
-            ],
-        ]);
-    }
-
     public function actualizar(Request $request, string $id)
     {
         $catalogo = $this->catalogoDeInstitucion($id);
@@ -185,7 +115,7 @@ class CatalogoDBAAdminController extends Controller
             ],
             'area_id' => 'required|exists:areas,id',
             'grado_id' => 'required|exists:grados,id',
-            'descripcion' => 'required|string|max:255',
+            'descripcion' => 'required|string|max:65000',
         ]);
 
         $catalogo->update($datos);
@@ -210,6 +140,25 @@ class CatalogoDBAAdminController extends Controller
                 ? 'Catálogo DBA activado correctamente.'
                 : 'Catálogo DBA desactivado correctamente.',
         ]);
+    }
+
+    private function aplicarFiltros($consulta, Request $request): void
+    {
+        if ($request->filled('buscar')) {
+            $termino = trim($request->buscar);
+            $consulta->where(function ($q) use ($termino) {
+                $q->where('codigo', 'like', "%{$termino}%")
+                    ->orWhere('descripcion', 'like', "%{$termino}%");
+            });
+        }
+
+        if ($request->filled('area_id')) {
+            $consulta->where('area_id', $request->area_id);
+        }
+
+        if ($request->filled('grado_id')) {
+            $consulta->where('grado_id', $request->grado_id);
+        }
     }
 
     private function institucionId(): int

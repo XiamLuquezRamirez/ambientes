@@ -3,6 +3,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/superAdmin/configuracion.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/catalogo-dba.css') }}">
 @endpush
 
 @section('content')

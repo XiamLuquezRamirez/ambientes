@@ -63,8 +63,7 @@ class CatalogoDBASuperAdminController extends Controller
             ],
             'area_id' => 'required|exists:areas,id',
             'grado_id' => 'required|exists:grados,id',
-            'descripcion' => 'required|string|max:255',
-            'es_men' => 'required|in:0,1',
+            'descripcion' => 'required|string|max:65000',
         ]);
 
         $catalogo = CatalogoDBA::create([
@@ -72,7 +71,7 @@ class CatalogoDBASuperAdminController extends Controller
             'area_id' => $datos['area_id'],
             'grado_id' => $datos['grado_id'],
             'descripcion' => $datos['descripcion'],
-            'es_men' => (bool) (int) $datos['es_men'],
+            'es_men' => true,
             'institucion_id' => null,
             'creado_por' => Auth::guard('docente')->id(),
             'estado' => true,
@@ -97,7 +96,7 @@ class CatalogoDBASuperAdminController extends Controller
                 'area_id' => $catalogo->area_id,
                 'grado_id' => $catalogo->grado_id,
                 'descripcion' => $catalogo->descripcion,
-                'es_men' => (bool) $catalogo->es_men,
+                'es_men' => $catalogo->es_men,
                 'estado' => (bool) $catalogo->estado,
             ],
         ]);
@@ -118,7 +117,7 @@ class CatalogoDBASuperAdminController extends Controller
             ],
             'area_id' => 'required|exists:areas,id',
             'grado_id' => 'required|exists:grados,id',
-            'descripcion' => 'required|string|max:255',
+            'descripcion' => 'required|string|max:65000',
         ]);
 
         $catalogo->update($datos);

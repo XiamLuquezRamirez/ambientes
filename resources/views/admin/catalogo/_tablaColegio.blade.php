@@ -15,7 +15,7 @@
             @forelse ($catalogosColegio as $catalogo)
                 <tr id="fila-{{ $catalogo->id }}">
                     <td style="font-weight:600;color:#1E293B">{{ $catalogo->codigo }}</td>
-                    <td style="color:#64748B">
+                    <td class="catalogo-dba-col-descripcion" title="{{ $catalogo->descripcion }}">
                         {{ \Illuminate\Support\Str::limit($catalogo->descripcion, 80) }}
                     </td>
                     <td>{{ $catalogo->area?->nombre ?? '—' }}</td>

@@ -69,8 +69,8 @@ async function verificarConexion(ambienteId) {
 /* ══════════════════════════════════════════════════════════════
    Modal: Editar IP
    ══════════════════════════════════════════════════════════════ */
-let _modalIpBS  = null;
-let _modalIpId  = null;
+let _modalIpBS = null;
+let _modalIpId = null;
 
 function abrirModalIp(ambienteId) {
     cerrarTodosMenus();
@@ -84,7 +84,7 @@ function abrirModalIp(ambienteId) {
 
 async function guardarIp() {
     const btn = document.getElementById('btnGuardarIp');
-    const ip  = document.getElementById('inputIp').value.trim();
+    const ip = document.getElementById('inputIp').value.trim();
     document.getElementById('errIp').textContent = '';
     btn.disabled = true;
 
@@ -134,7 +134,7 @@ function abrirModalCupo(ambienteId) {
 }
 
 async function guardarCupo() {
-    const btn  = document.getElementById('btnGuardarCupo');
+    const btn = document.getElementById('btnGuardarCupo');
     const cupo = parseInt(document.getElementById('inputCupo').value, 10);
     document.getElementById('errCupo').textContent = '';
     btn.disabled = true;
@@ -177,7 +177,7 @@ let _modalDocentesBS = null;
 
 async function abrirModalDocentes(ambienteId, nombreAmbiente) {
     cerrarTodosMenus();
-    const titulo     = document.getElementById('modalDocentesTitulo');
+    const titulo = document.getElementById('modalDocentesTitulo');
     const contenedor = document.getElementById('listaDocentes');
 
     if (titulo) titulo.innerHTML = `<i class="fas fa-chalkboard-teacher me-2"></i>${nombreAmbiente} — Docentes`;
@@ -221,13 +221,13 @@ async function abrirModalDocentes(ambienteId, nombreAmbiente) {
 /* ══════════════════════════════════════════════════════════════
    Modal: Módulos de contenido
    ══════════════════════════════════════════════════════════════ */
-let _modalModulosBS  = null;
-let _modalModulosId  = null;
+let _modalModulosBS = null;
+let _modalModulosId = null;
 
 async function abrirModalModulos(ambienteId, nombreAmbiente) {
     cerrarTodosMenus();
     _modalModulosId = ambienteId;
-    const titulo     = document.getElementById('modalModulosTitulo');
+    const titulo = document.getElementById('modalModulosTitulo');
     const contenedor = document.getElementById('listaModulos');
 
     if (titulo) titulo.innerHTML = `<i class="fas fa-cubes me-2"></i>${nombreAmbiente} — Módulos`;
@@ -289,13 +289,13 @@ function htmlFilaModulo(m) {
         <div class="modulo-icono">${m.icono ?? '📦'}</div>
         <div class="modulo-nombre">${m.nombre}${oficial}</div>
         <div class="modulo-toggles">
+        ${toggleVisible}
             <label class="tog" title="${m.es_oficial ? 'Activar o desactivar solo para esta institución' : 'Estado del módulo'}">
                 <input type="checkbox" ${activo ? 'checked' : ''}
                     onchange="toggleModulo(_modalModulosId, ${m.id}, 'activo', this)">
                 <span class="tog-track"></span>
                 <span class="tog-label-activo">${activo ? 'Activo' : 'Inactivo'}</span>
             </label>
-            ${toggleVisible}
         </div>
     </div>`;
 }
@@ -379,10 +379,10 @@ function abrirModalGrupo(gradoId = null, grupoId = null, grupoNombre = null, cup
     limpiarErroresGrupo();
     document.getElementById('formGrupo').reset();
 
-    const titulo     = document.getElementById('modalGrupoTitulo');
+    const titulo = document.getElementById('modalGrupoTitulo');
     const btnGuardar = document.getElementById('btnGuardarGrupo');
-    const idInput    = document.getElementById('grupoId');
-    const anioInput  = document.getElementById('grupoAnio');
+    const idInput = document.getElementById('grupoId');
+    const anioInput = document.getElementById('grupoAnio');
 
     idInput.value = grupoId ?? '';
 
@@ -392,17 +392,17 @@ function abrirModalGrupo(gradoId = null, grupoId = null, grupoNombre = null, cup
     }
 
     if (grupoId) {
-        titulo.textContent     = 'Editar Grupo';
+        titulo.textContent = 'Editar Grupo';
         btnGuardar.textContent = 'Guardar Cambios';
-        if (gradoId)     document.getElementById('grupoGradoId').value = gradoId;
-        if (grupoNombre) document.getElementById('grupoNombre').value  = grupoNombre;
-        document.getElementById('grupoCupo').value       = cupMaximo ?? (typeof CUPO_DEFECTO !== 'undefined' ? CUPO_DEFECTO : 25);
+        if (gradoId) document.getElementById('grupoGradoId').value = gradoId;
+        if (grupoNombre) document.getElementById('grupoNombre').value = grupoNombre;
+        document.getElementById('grupoCupo').value = cupMaximo ?? (typeof CUPO_DEFECTO !== 'undefined' ? CUPO_DEFECTO : 25);
         document.getElementById('grupoGradoId').disabled = true;
     } else {
-        titulo.textContent     = 'Nuevo Grupo';
+        titulo.textContent = 'Nuevo Grupo';
         btnGuardar.textContent = 'Crear Grupo';
         if (gradoId) document.getElementById('grupoGradoId').value = gradoId;
-        document.getElementById('grupoCupo').value       = typeof CUPO_DEFECTO !== 'undefined' ? CUPO_DEFECTO : 25;
+        document.getElementById('grupoCupo').value = typeof CUPO_DEFECTO !== 'undefined' ? CUPO_DEFECTO : 25;
         document.getElementById('grupoGradoId').disabled = false;
     }
 
@@ -442,21 +442,21 @@ async function guardarGrupo() {
     const ambienteId = typeof AMBIENTE_ID !== 'undefined' ? AMBIENTE_ID : null;
     if (!ambienteId) return;
 
-    const btn      = document.getElementById('btnGuardarGrupo');
-    const grupoId  = document.getElementById('grupoId').value;
+    const btn = document.getElementById('btnGuardarGrupo');
+    const grupoId = document.getElementById('grupoId').value;
     const esEdicion = !!grupoId;
 
     btn.disabled = true;
     btn.textContent = 'Guardando…';
 
     const body = {
-        grado_id:     document.getElementById('grupoGradoId').value,
-        nombre:       document.getElementById('grupoNombre').value,
+        grado_id: document.getElementById('grupoGradoId').value,
+        nombre: document.getElementById('grupoNombre').value,
         anio_lectivo: document.getElementById('grupoAnio').value,
-        cupo_maximo:  document.getElementById('grupoCupo').value,
+        cupo_maximo: document.getElementById('grupoCupo').value,
     };
 
-    const url    = esEdicion
+    const url = esEdicion
         ? `/admin/ambientes/${ambienteId}/grupos/${grupoId}`
         : `/admin/ambientes/${ambienteId}/grupos`;
     const method = esEdicion ? 'PUT' : 'POST';

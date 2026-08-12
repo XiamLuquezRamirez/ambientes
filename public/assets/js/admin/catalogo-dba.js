@@ -17,7 +17,7 @@
  *     manteniendo filtros y cambiando a la pestaña «colegio».
  *  3) Filtro/columna «Origen» eliminados: las pestañas ya diferencian MEN/colegio.
  *  4) Badges/botones usan clases propias (ver catalogo-dba.css).
- *  5) Entrada única de menú: Catálogo (Config › Catálogo DBA redirige aquí).
+ *  5) Sidebar «Catálogo» = esta vista. Config › Catálogo DBA = gestión solo colegio.
  * ---------------------------------------------------------------------------
  */
 
@@ -127,7 +127,7 @@
         document.getElementById('modalVerCatalogoDBASubtitle').textContent = 'Cargando información...';
         getModalVerCatalogoDBA().show();
 
-        fetch(`${URL_CATALOGO_DBA_BASE}/detalle/${id}`, {
+        fetch(`${URL_CATALOGO_BASE}/detalle/${id}`, {
             headers: { Accept: 'application/json' },
         })
             .then((r) => r.json())

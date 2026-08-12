@@ -69,11 +69,50 @@
 .catalogo-dba-detalle-descripcion {
     color: #334155;
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     line-height: 1.5;
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
     border-radius: 10px;
     padding: 14px;
+    max-height: 320px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Modal Ver: solo scroll vertical en descripción */
+#modalVerCatalogoDBA .modal-body {
+    overflow-x: hidden;
+}
+
+#modalVerCatalogoDBA .catalogo-dba-detalle-valor {
+    color: #334155;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+#modalVerCatalogoDBA #detalleCodigo {
+    font-weight: 600;
+    color: #1E293B;
+    font-size: 1.05rem;
+}
+
+/* Columna descripción en tablas: recorte; texto completo en modal Ver */
+.catalogo-dba-col-descripcion {
+    max-width: 260px;
+    color: #64748B;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* Textarea de descripción en modales crear/editar */
+textarea.catalogo-dba-descripcion {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.5;
 }
 
 .catalogo-dba-hint {
