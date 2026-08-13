@@ -245,7 +245,7 @@ class ModulosConfiguracionAdminController extends Controller
                     ->ignore($moduloId),
             ],
             'descripcion' => ['nullable', 'string', 'max:1000'],
-            'orden' => ['nullable', 'integer', 'min:0', 'max:255'],
+            'orden' => ['nullable', 'integer', 'min:1', 'max:255'],
         ], [
             'nombre.required' => 'El nombre del módulo es obligatorio.',
             'nombre.max' => 'El nombre no puede superar 100 caracteres.',
@@ -275,12 +275,16 @@ class ModulosConfiguracionAdminController extends Controller
 
     private function siguienteOrden(int $ambienteId, int $institucionId): int
     {
-        $max = (int) Modulo::query()
+        $max = Modulo::query()
             ->deInstitucion($institucionId)
             ->where('ambiente_id', $ambienteId)
             ->max('orden');
 
-        return min(255, $max + 1);
+        if ($max === null) {
+            return 1;
+        }
+
+        return min(255, (int) $max + 1);
     }
 
     private function asegurarModuloPropio(Modulo $modulo): void

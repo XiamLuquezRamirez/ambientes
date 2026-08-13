@@ -29,39 +29,28 @@
         En <span class="badge-colegio">Del colegio</span> gestiona módulos adicionales y ejes propios.
     </p>
 
-    <div class="cfg-filters" data-filtros-modulos>
-        <div class="cfg-filters-row">
-            <div class="cfg-filter">
-                <label class="cfg-filter-label" for="filtro_modulos_ambiente">Ambiente</label>
-                <select id="filtro_modulos_ambiente" class="form-select form-select-sm" data-filtro="ambiente">
-                    <option value="">Todos</option>
-                    @foreach ($ambientesModulos as $ambienteFiltro)
-                        <option value="{{ $ambienteFiltro->id }}">{{ $ambienteFiltro->nombre }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="cfg-filter">
-                <label class="cfg-filter-label" for="filtro_modulos_tipo">Tipo</label>
-                <select id="filtro_modulos_tipo" class="form-select form-select-sm" data-filtro="tipo">
-                    <option value="">Todos</option>
-                    <option value="oficial">Oficial</option>
-                    <option value="adicional">Adicional</option>
-                </select>
-            </div>
-            <div class="cfg-filter">
-                <label class="cfg-filter-label" for="filtro_modulos_estado">Estado</label>
-                <select id="filtro_modulos_estado" class="form-select form-select-sm" data-filtro="estado">
-                    <option value="">Todos</option>
-                    <option value="1">Activo</option>
-                    <option value="0">Inactivo</option>
-                </select>
-            </div>
-            <div class="cfg-filter cfg-filter-actions">
-                <button type="button" class="btn btn-sm btn-secondary" data-limpiar-filtros-modulos title="Limpiar filtros">
-                    <i class="fa-solid fa-filter-circle-xmark"></i> Limpiar
-                </button>
-            </div>
-        </div>
+    <div data-filtros-modulos
+        style="display:flex;gap:12px;margin-bottom:24px;align-items:center;flex-wrap:wrap">
+        <select id="filtro_modulos_ambiente" class="form-control" style="width:auto" data-filtro="ambiente">
+            <option value="">Todos los ambientes</option>
+            @foreach ($ambientesModulos as $ambienteFiltro)
+                <option value="{{ $ambienteFiltro->id }}">{{ $ambienteFiltro->nombre }}</option>
+            @endforeach
+        </select>
+        <select id="filtro_modulos_tipo" class="form-control" style="width:auto" data-filtro="tipo">
+            <option value="">Todos los tipos</option>
+            <option value="oficial">Oficial</option>
+            <option value="adicional">Adicional</option>
+        </select>
+        <select id="filtro_modulos_estado" class="form-control" style="width:auto" data-filtro="estado">
+            <option value="">Todos los estados</option>
+            <option value="1">Activo</option>
+            <option value="0">Inactivo</option>
+        </select>
+        <button type="button" class="btn btn-sm" data-limpiar-filtros-modulos
+            style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;display:none">
+            <i class="fas fa-broom"></i> Limpiar
+        </button>
     </div>
 
     <div class="cfg-empty cfg-empty-filtros" data-empty-filtros-modulos hidden>
@@ -90,6 +79,7 @@
             </button>
 
             <div class="amb-body" id="amb-body-admin-{{ $ambiente->id }}">
+                <div class="amb-body-inner">
                 {{-- Módulos oficiales --}}
                 <div class="modulos-seccion modulos-seccion-oficiales" data-seccion="oficiales">
                     <div class="modulos-seccion-head">
@@ -149,6 +139,7 @@
                         data-ambiente-id="{{ $ambiente->id }}" data-ambiente-nombre="{{ $ambiente->nombre }}">
                         <i class="fa-solid fa-plus"></i> Crear módulo adicional
                     </button>
+                </div>
                 </div>
             </div>
         </div>

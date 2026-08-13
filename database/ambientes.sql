@@ -2806,6 +2806,75 @@ insert  into `users`(`id`,`institucion_id`,`identificacion`,`nombre`,`apellido`,
 (5,1,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
 (16,1,'OSRaOLyVQB','Administrador',NULL,'fabian.quintero.2201@gmail.com','$2y$10$v8Np5rui71dWGOQFMtU3DOWfBNrJgjd.NqOhLUgwHHPYBOrHVt25y','admin','activo',1,NULL,NULL,'2026-08-04 08:53:36','2026-08-04 08:53:36');
 
+
+DROP TABLE IF EXISTS `areas`;
+
+CREATE TABLE `areas` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(100) NOT NULL,
+    `estado` BOOLEAN NOT NULL DEFAULT TRUE,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `areas_nombre_unique` (`nombre`)
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `areas` (`nombre`, `estado`, `created_at`, `updated_at`) VALUES
+('Lenguaje', TRUE, NOW(), NOW()),
+('Matemáticas', TRUE, NOW(), NOW()),
+('Ciencias Naturales', TRUE, NOW(), NOW()),
+('Ciencias Sociales', TRUE, NOW(), NOW()),
+('Artística', TRUE, NOW(), NOW()),
+('Corporal', TRUE, NOW(), NOW());
+
+DROP TABLE IF EXISTS `catalogo_dba`;
+
+CREATE TABLE `catalogo_dba` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `codigo` VARCHAR(50) NOT NULL,
+    `area_id` BIGINT UNSIGNED NOT NULL,
+    `grado_id` BIGINT UNSIGNED NOT NULL,
+    `descripcion` TEXT NULL,
+    `es_men` BOOLEAN NOT NULL DEFAULT TRUE,
+    `estado` BOOLEAN NOT NULL DEFAULT TRUE,
+    `institucion_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+    `creado_por` BIGINT UNSIGNED NOT NULL,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `catalogo_dba_institucion_codigo_unique` (`institucion_id`, `codigo`),
+    KEY `catalogo_dba_area_id_foreign` (`area_id`),
+    KEY `catalogo_dba_grado_id_foreign` (`grado_id`),
+    KEY `catalogo_dba_institucion_id_foreign` (`institucion_id`),
+    KEY `catalogo_dba_creado_por_foreign` (`creado_por`),
+
+    CONSTRAINT `catalogo_dba_area_id_foreign`
+        FOREIGN KEY (`area_id`)
+        REFERENCES `areas` (`id`)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT `catalogo_dba_grado_id_foreign`
+        FOREIGN KEY (`grado_id`)
+        REFERENCES `grados` (`id`)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT `catalogo_dba_institucion_id_foreign`
+        FOREIGN KEY (`institucion_id`)
+        REFERENCES `instituciones` (`id`)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT `catalogo_dba_creado_por_foreign`
+        FOREIGN KEY (`creado_por`)
+        REFERENCES `users` (`id`)
+        ON DELETE RESTRICT
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

@@ -253,7 +253,7 @@ class EjesConfiguracionSuperAdminController extends Controller
                     ->ignore($ejeId),
             ],
             'descripcion' => ['nullable', 'string', 'max:1000'],
-            'orden' => ['nullable', 'integer', 'min:0', 'max:255'],
+            'orden' => ['nullable', 'integer', 'min:1', 'max:255'],
         ], [
             'nombre.required' => 'El nombre del eje es obligatorio.',
             'nombre.max' => 'El nombre no puede superar 100 caracteres.',
@@ -283,12 +283,16 @@ class EjesConfiguracionSuperAdminController extends Controller
 
     private function siguienteOrden(int $moduloId): int
     {
-        $max = (int) Eje::query()
+        $max = Eje::query()
             ->oficiales()
             ->where('modulo_id', $moduloId)
             ->max('orden');
 
-        return min(255, $max + 1);
+        if ($max === null) {
+            return 1;
+        }
+
+        return min(255, (int) $max + 1);
     }
 
     private function asegurarModuloOficial(Modulo $modulo): void

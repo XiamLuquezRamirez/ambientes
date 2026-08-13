@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     bindAmbienteToggles(root);
+    window.ConfigEjesUi?.bindModuloToggles(rootEjes);
 
     /* ── Módulos ─────────────────────────────────────────────── */
     function limpiarErroresForm() {
@@ -787,6 +788,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (scope?.classList?.contains('mod-ejes-group')) {
                 actualizarContadoresEjesGrupo(scope);
             }
+            if (tbody.closest('[data-ejes-pager]')) {
+                window.ConfigEjesUi?.irAPaginaDelEje(tbody, data.id);
+            }
         });
     }
 
@@ -803,6 +807,9 @@ document.addEventListener('DOMContentLoaded', function () {
             oldRow.replaceWith(nueva);
             if (tbody) actualizarBotonesReorderEjes(tbody);
             if (group) actualizarContadoresEjesGrupo(group);
+            if (tbody?.closest('[data-ejes-pager]')) {
+                window.ConfigEjesUi?.aplicarPaginacion(tbody);
+            }
         });
     }
 
@@ -836,6 +843,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (direccion === 'arriba') otra.parentElement.insertBefore(otra, otraVecina);
         else otra.parentElement.insertBefore(otraVecina, otra);
         actualizarBotonesReorderEjes(otra.parentElement);
+        if (otra.parentElement.closest('[data-ejes-pager]')) {
+            window.ConfigEjesUi?.irAPaginaDelEje(otra.parentElement, otra.dataset.ejeId);
+        }
     }
 
     function abrirModalCrearEjePagina(moduloId, moduloNombre) {
@@ -1044,6 +1054,9 @@ document.addEventListener('DOMContentLoaded', function () {
         else tbody.insertBefore(vecino, row);
 
         actualizarBotonesReorderEjes(tbody);
+        if (tbody.closest('[data-ejes-pager]')) {
+            window.ConfigEjesUi?.irAPaginaDelEje(tbody, row.dataset.ejeId);
+        }
         aplicarReordenGemelo(row, vecino, direccion);
         mostrarToast('success', res.message || 'Orden actualizado');
     }
@@ -1165,4 +1178,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     rootEjes?.querySelectorAll('[data-tbody-ejes]').forEach(actualizarBotonesReorderEjes);
+    window.ConfigEjesUi?.refrescarPaginacion(rootEjes);
 });

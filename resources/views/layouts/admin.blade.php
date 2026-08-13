@@ -89,7 +89,7 @@
             </li>
             <li class="nav-item">
                 <a href="{{ route('admin.catalogo') }}"
-                    class="{{ request()->routeIs('admin.catalogo*') ? 'active nav-link' : 'nav-link' }}">
+                    class="{{ request()->routeIs('admin.catalogo') || request()->routeIs('admin.catalogo.*') ? 'active nav-link' : 'nav-link' }}">
                     <i class="fa-solid fa-book"></i> Catálogo
                 </a>
             </li>
@@ -124,6 +124,13 @@
                                 class="{{ request()->routeIs('admin.configuracion') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-school"></i> Institución
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.configuracion.catalogo-dba.listar') }}"
+                                class="{{ request()->routeIs('admin.configuracion.catalogo-dba.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-book-open"></i> Catálogo DBA
                             </a>
                         </li>
                         <li class="nav-item">

@@ -210,7 +210,7 @@ class ConfiguracionSuperAdminController extends Controller
                     ->ignore($moduloId),
             ],
             'descripcion' => ['nullable', 'string', 'max:1000'],
-            'orden' => ['nullable', 'integer', 'min:0', 'max:255'],
+            'orden' => ['nullable', 'integer', 'min:1', 'max:255'],
         ], [
             'nombre.required' => 'El nombre del módulo es obligatorio.',
             'nombre.max' => 'El nombre no puede superar 100 caracteres.',
@@ -240,12 +240,16 @@ class ConfiguracionSuperAdminController extends Controller
 
     private function siguienteOrden(int $ambienteId): int
     {
-        $max = (int) Modulo::query()
+        $max = Modulo::query()
             ->oficiales()
             ->where('ambiente_id', $ambienteId)
             ->max('orden');
 
-        return min(255, $max + 1);
+        if ($max === null) {
+            return 1;
+        }
+
+        return min(255, (int) $max + 1);
     }
 
     private function vincularInstitucionesAmbiente(Modulo $modulo, int $ambienteId): void

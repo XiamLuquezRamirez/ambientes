@@ -4,6 +4,7 @@
     $activo = $esPropio ? (bool) $modulo->activo : (bool) $item['puede_gestionar_ejes'];
 @endphp
 <tr data-modulo-id="{{ $modulo->id }}" data-nombre="{{ $modulo->nombre }}"
+    data-es-oficial="{{ $modulo->esOficial() ? '1' : '0' }}"
     data-puede-gestionar-ejes="{{ $item['puede_gestionar_ejes'] ? '1' : '0' }}"
     data-ejes-count="{{ (int) ($modulo->ejes_count ?? 0) }}" class="{{ $esPropio ? 'fila-colegio' : 'fila-oficial' }}">
     <td>

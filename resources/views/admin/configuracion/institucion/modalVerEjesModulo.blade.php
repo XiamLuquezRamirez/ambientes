@@ -1,5 +1,15 @@
 @php
-    $theadEjesModal = '
+    $theadEjesModalOficiales = '
+        <tr>
+            <th style="width:34px"></th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Temáticas</th>
+            <th>Orden</th>
+            <th>Estado</th>
+        </tr>
+    ';
+    $theadEjesModalColegio = '
         <tr>
             <th style="width:34px"></th>
             <th>Nombre</th>
@@ -41,7 +51,7 @@
                 <div id="ejesModuloError" class="ejes-modal-state text-danger" hidden></div>
 
                 <div id="ejesModuloContenido" hidden>
-                    <p class="text-muted small mb-3">
+                    <p class="text-muted small mb-3 ejes-modal-intro">
                         Los <span class="star">⭐ Oficiales</span> son del sistema (solo lectura).
                         En <span class="badge-colegio">Del colegio</span> gestiona ejes propios del módulo.
                     </p>
@@ -57,7 +67,7 @@
                         </div>
                         <div class="table-container" data-wrap-ejes-oficiales hidden>
                             <table id="tablaEjesOficiales">
-                                <thead>{!! $theadEjesModal !!}</thead>
+                                <thead>{!! $theadEjesModalOficiales !!}</thead>
                                 <tbody id="tablaEjesOficialesBody" data-tbody-ejes-oficiales></tbody>
                             </table>
                         </div>
@@ -77,7 +87,7 @@
                         </div>
                         <div class="table-container" data-wrap-ejes-colegio hidden>
                             <table id="tablaEjesColegio">
-                                <thead>{!! $theadEjesModal !!}</thead>
+                                <thead>{!! $theadEjesModalColegio !!}</thead>
                                 <tbody id="tablaEjesColegioBody" data-tbody-ejes-colegio></tbody>
                             </table>
                         </div>
@@ -114,7 +124,7 @@
                                 <div class="col-md-2">
                                     <label class="form-label fw-bold" for="eje_orden">Orden</label>
                                     <input type="number" class="form-control" id="eje_orden" name="orden"
-                                        min="0" max="255" placeholder="Auto">
+                                        min="1" max="255" placeholder="Auto">
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end gap-2 mt-3">

@@ -33,6 +33,7 @@ class ConfiguracionAdminController extends Controller
         $ambientesModulos = $ambientes->map(function ($ambiente) use ($institucionId) {
             $oficiales = Modulo::query()
                 ->oficiales()
+                ->where('activo', true)
                 ->where('ambiente_id', $ambiente->id)
                 ->whereHas(
                     'instituciones',
@@ -51,14 +52,13 @@ class ConfiguracionAdminController extends Controller
                 ->get()
                 ->map(function (Modulo $modulo) {
                     $activoInstitucion = (bool) optional($modulo->instituciones->first())->pivot?->activo;
-                    $disponible = (bool) $modulo->activo && $activoInstitucion;
 
                     return [
                         'modelo' => $modulo,
                         'es_propio' => false,
                         'activo_institucion' => $activoInstitucion,
                         'puede_gestionar' => false,
-                        'puede_gestionar_ejes' => $disponible,
+                        'puede_gestionar_ejes' => $activoInstitucion,
                     ];
                 });
 
@@ -96,9 +96,33 @@ class ConfiguracionAdminController extends Controller
 
         $this->adjuntarEjesAModulos($ambientesModulos, $institucionId);
 
+        [$departamentoId, $municipioId] = $this->resolverIdsUbicacion(
+            $institucion->departamento,
+            $institucion->municipio
+        );
+
+        $municipios = $departamentoId
+            ? Municipio::where('coddep', $departamentoId)
+                ->orderBy('descripcion')
+                ->get(['id', 'descripcion', 'coddep'])
+            : collect();
+
+        $logoUrlPublica = $this->logoService->urlPublica($institucion->logo);
+        $iniciales = $this->logoService->iniciales($institucion);
+
         return view(
             'admin.configuracion.institucion.index',
-            compact('ambientes', 'institucion', 'departamentos', 'ambientesModulos')
+            compact(
+                'ambientes',
+                'institucion',
+                'departamentos',
+                'ambientesModulos',
+                'departamentoId',
+                'municipioId',
+                'municipios',
+                'logoUrlPublica',
+                'iniciales'
+            )
         );
     }
 

@@ -38,6 +38,7 @@
             </button>
 
             <div class="amb-body" id="amb-body-panel-mod-{{ $ambiente->id }}">
+                <div class="amb-body-inner">
                 <div class="modulos-seccion modulos-seccion-oficiales" data-seccion="oficiales">
                     <div class="modulos-seccion-head">
                         <span class="modulos-seccion-title">
@@ -83,6 +84,7 @@
                     <div class="cfg-empty" @if ($propios->isNotEmpty()) hidden @endif>
                         Aún no hay módulos adicionales del colegio en este ambiente.
                     </div>
+                </div>
                 </div>
             </div>
         </div>

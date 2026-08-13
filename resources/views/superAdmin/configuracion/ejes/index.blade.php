@@ -55,49 +55,62 @@
                 </button>
 
                 <div class="amb-body" id="amb-body-ejes-{{ $ambiente->id }}">
-                    @forelse ($ambiente->modulosOficiales as $modulo)
-                        @php
-                            $ejes = $modulo->ejesOficiales;
-                        @endphp
+                    <div class="amb-body-inner">
+                        @forelse ($ambiente->modulosOficiales as $modulo)
+                            @php
+                                $ejes = $modulo->ejesOficiales;
+                                $modBodyId = 'mod-ejes-body-sa-' . $ambiente->id . '-' . $modulo->id;
+                            @endphp
 
-                        <div class="mod-ejes-group" data-modulo-id="{{ $modulo->id }}"
-                            data-modulo-nombre="{{ $modulo->nombre }}" data-puede-gestionar-ejes="1">
-                            <div class="mod-ejes-head">
-                                <div class="mod-ejes-title">
-                                    <span class="mod-ejes-nombre">{{ $modulo->nombre }}</span>
-                                    <span class="star">⭐ Oficial</span>
-                                </div>
-                                <span class="mod-ejes-hint">
-                                    {{ $modulo->ejes_total_count ?? 0 }}
-                                    {{ ($modulo->ejes_total_count ?? 0) === 1 ? 'eje' : 'ejes' }}
-                                    · {{ $modulo->ejes_activos_count ?? 0 }} activos
-                                </span>
-                            </div>
-
-                            <div class="table-container" data-wrap-ejes @if ($ejes->isEmpty()) hidden @endif>
-                                <table>
-                                    <thead>{!! $theadEjes !!}</thead>
-                                    <tbody data-tbody-ejes>
-                                        @foreach ($ejes as $eje)
-                                            @include('superAdmin.configuracion.ejes._filaEje', ['eje' => $eje])
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="cfg-empty" data-empty-ejes @if ($ejes->isNotEmpty()) hidden @endif>
-                                Este módulo aún no tiene ejes oficiales registrados.
-                            </div>
-
-                            <div class="mod-ejes-foot">
-                                <button type="button" class="btn btn-primary" data-crear-eje-modulo
-                                    data-modulo-id="{{ $modulo->id }}" data-modulo-nombre="{{ $modulo->nombre }}">
-                                    <i class="fa-solid fa-plus"></i> Crear eje
+                            <div class="mod-ejes-group is-collapsed" data-modulo-id="{{ $modulo->id }}"
+                                data-modulo-nombre="{{ $modulo->nombre }}" data-puede-gestionar-ejes="1">
+                                <button type="button" class="mod-ejes-head" data-mod-toggle
+                                    aria-expanded="false" aria-controls="{{ $modBodyId }}">
+                                    <div class="mod-ejes-title">
+                                        <span class="mod-ejes-nombre">{{ $modulo->nombre }}</span>
+                                        <span class="star">⭐ Oficial</span>
+                                    </div>
+                                    <span class="mod-ejes-hint">
+                                        {{ $modulo->ejes_total_count ?? 0 }}
+                                        {{ ($modulo->ejes_total_count ?? 0) === 1 ? 'eje' : 'ejes' }}
+                                        · {{ $modulo->ejes_activos_count ?? 0 }} activos
+                                    </span>
+                                    <span class="chev" aria-hidden="true">▾</span>
                                 </button>
+
+                                <div class="mod-ejes-body" id="{{ $modBodyId }}">
+                                    <div class="mod-ejes-body-inner">
+                                        <div class="table-container" data-wrap-ejes data-ejes-pager data-page-size="10"
+                                            @if ($ejes->isEmpty()) hidden @endif>
+                                            <table>
+                                                <thead>{!! $theadEjes !!}</thead>
+                                                <tbody data-tbody-ejes>
+                                                    @foreach ($ejes as $eje)
+                                                        @include('superAdmin.configuracion.ejes._filaEje', [
+                                                            'eje' => $eje,
+                                                        ])
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="cfg-empty" data-empty-ejes @if ($ejes->isNotEmpty()) hidden @endif>
+                                            Este módulo aún no tiene ejes oficiales registrados.
+                                        </div>
+
+                                        <div class="mod-ejes-foot">
+                                            <button type="button" class="btn btn-primary" data-crear-eje-modulo
+                                                data-modulo-id="{{ $modulo->id }}"
+                                                data-modulo-nombre="{{ $modulo->nombre }}">
+                                                <i class="fa-solid fa-plus"></i> Crear eje
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    @empty
-                        <div class="cfg-empty">Este ambiente aún no tiene módulos oficiales registrados.</div>
-                    @endforelse
+                        @empty
+                            <div class="cfg-empty">Este ambiente aún no tiene módulos oficiales registrados.</div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         @empty
@@ -111,5 +124,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('assets/js/configuracion-ejes-ui.js') }}"></script>
     <script src="{{ asset('assets/js/superAdmin/configuracion.js') }}"></script>
 @endpush

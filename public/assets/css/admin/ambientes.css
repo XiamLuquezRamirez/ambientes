@@ -366,6 +366,33 @@
     transform: translateX(16px);
 }
 
+.modulo-fila-inactivo {
+    opacity: .72;
+}
+
+.modulo-fila-inactivo .modulo-nombre {
+    color: #64748B;
+}
+
+.modulo-estado {
+    font-size: .75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.modulo-estado-inactivo {
+    color: #64748B;
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+}
+
+.modulo-estado-activo {
+    color: #166534;
+    background: #DCFCE7;
+    border: 1px solid #BBF7D0;
+}
+
 .tabla-docentes {
     width: 100%;
     border-collapse: collapse;
