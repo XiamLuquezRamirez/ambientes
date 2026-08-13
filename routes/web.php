@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\InfoCondicionesController;
 use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
 use App\Http\Controllers\Admin\CatalogoAdminController;
@@ -24,6 +23,7 @@ use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
+use App\Http\Controllers\InfoCondicionesController;
 use App\Http\Controllers\Panel\AsistenciaController;
 use App\Http\Controllers\Panel\CatalogoPanelController;
 use App\Http\Controllers\Panel\EjesConfiguracionPanelController;
