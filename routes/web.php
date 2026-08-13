@@ -171,9 +171,11 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('admin.estudiantes.cargar-municipios');
     Route::get('estudiantes/restablecer-pin/{idEstudiante}', [EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.restablecer-pin');
 
-    // Catálogo (sidebar): consulta unificada DBA MEN + colegio
-    Route::get('catalogo', [CatalogoAdminController::class, 'listar'])->name('admin.catalogo');
-    Route::get('catalogo/detalle/{id}', [CatalogoAdminController::class, 'detalle'])->name('admin.catalogo.detalle');
+    // Catálogo DBA (sidebar): MEN + colegio · detalle de lectura
+    Route::get('catalogo', [CatalogoDBAAdminController::class, 'listar'])->name('admin.catalogo');
+    Route::get('catalogo/detalle/{id}', [CatalogoDBAAdminController::class, 'detalle'])->name('admin.catalogo.detalle');
+
+    // Catálogo · módulos / temas (dominio distinto a DBA)
     Route::post('catalogo/modulos', [CatalogoAdminController::class, 'guardarModulo'])->name('admin.catalogo.modulo.store');
     Route::put('catalogo/modulos/{modulo}', [CatalogoAdminController::class, 'actualizarModulo'])->name('admin.catalogo.modulo.update');
     Route::delete('catalogo/modulos/{modulo}', [CatalogoAdminController::class, 'eliminarModulo'])->name('admin.catalogo.modulo.destroy');
