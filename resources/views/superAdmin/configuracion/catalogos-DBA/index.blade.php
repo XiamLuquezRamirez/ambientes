@@ -225,7 +225,6 @@
             document.getElementById('area_id').value = data.area_id || '';
             document.getElementById('grado_id').value = data.grado_id || '';
             document.getElementById('descripcion').value = data.descripcion || '';
-            document.getElementById('es_men').value = data.es_men ? '1' : '0';
         }
 
         function cargarDatosCatalogoDBA(id) {

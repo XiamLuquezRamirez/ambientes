@@ -96,7 +96,6 @@ class CatalogoDBASuperAdminController extends Controller
                 'area_id' => $catalogo->area_id,
                 'grado_id' => $catalogo->grado_id,
                 'descripcion' => $catalogo->descripcion,
-                'es_men' => $catalogo->es_men,
                 'estado' => (bool) $catalogo->estado,
             ],
         ]);

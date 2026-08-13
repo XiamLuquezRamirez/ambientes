@@ -11,7 +11,6 @@
                 <th>Descripción</th>
                 <th>Área</th>
                 <th>Grado</th>
-                <th>Origen</th>
                 <th>Estado</th>
                 <th style="text-align:center">Acciones</th>
             </tr>
@@ -25,18 +24,11 @@
                     </td>
                     <td>{{ $catalogo->area?->nombre ?? '—' }}</td>
                     <td>{{ $catalogo->grado?->nombre ?? '—' }}</td>
-                    <td>
-                        @if ($catalogo->es_men)
-                            <span class="badge" style="background:#DBEAFE;color:#1D4ED8">MEN</span>
-                        @else
-                            <span class="badge" style="background:#F1F5F9;color:#475569">NO MEN</span>
-                        @endif
-                    </td>
+
                     <td>
                         <div class="form-check form-switch">
-                            <input class="form-check-input toggle-activo" type="checkbox"
-                                data-id="{{ $catalogo->id }}" data-nombre="{{ e($catalogo->codigo) }}"
-                                style="cursor: pointer;"
+                            <input class="form-check-input toggle-activo" type="checkbox" data-id="{{ $catalogo->id }}"
+                                data-nombre="{{ e($catalogo->codigo) }}" style="cursor: pointer;"
                                 title="{{ $catalogo->estado ? 'Desactivar catálogo' : 'Activar catálogo' }}"
                                 @checked($catalogo->estado)>
                         </div>
