@@ -1,0 +1,93 @@
+{
+    "slug": "discapacidad-intelectual",
+    "titulo": "Discapacidad intelectual",
+    "etiqueta": "Conozcamos sobre",
+    "descripcion": "¿Qué es la discapacidad intelectual?",
+    "banner_imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/banner.png",
+    "color_fondo": "#C2E2F9",
+    "botones": [
+        {
+            "id": "que-es-discapacidad-intelectual",
+            "numero": 1,
+            "imagen_abajo": true,
+            "titulo": "¿Qué es la Discapacidad Intelectual / Retraso Global del Desarrollo?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/1.png",
+            "color_numero": "#22C55E",
+            "contenido_html": "<p>Condición caracterizada por limitaciones significativas en el funcionamiento intelectual y en la conducta adaptativa.</p>"
+        },
+        {
+            "id": "escala-gravedad-discapacidad-intelectual",
+            "numero": 2,
+            "titulo": "Escala de gravedad de la discapacidad intelectual",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/2.png",
+            "color_numero": "#3B82F6",
+            "contenido_html": "<p>Puede afectar el aprendizaje, la comunicación, la autonomía y las habilidades sociales.</p>"
+        },
+        {
+            "id": "señales-tempranas-problemas-aprendizaje-ninos",
+            "numero": 3,
+            "titulo": "Señales de alerta",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/3.png",
+            "color_numero": "#8B5CF6",
+            "contenido_html": "<p>Retrasos persistentes en hitos del desarrollo, comprensión y resolución de problemas cotidianos.</p>"
+        },
+        {
+            "id": "estrategias-pedagogicas-primera-infancia-discapacidad-intelectual",
+            "numero": 4,
+            "imagen_abajo": true,
+            "titulo": "Estrategias pedagógicas para primera infancia con discapacidad intelectual",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/4.png",
+            "color_numero": "#F97316",
+            "contenido_html": "<p>Fragmentar tareas, usar material concreto, repetición guiada y evaluación por procesos.</p>"
+        },
+        {
+            "id": "ajustes-razonables-discapacidad-intelectual",
+            "numero": 5,
+            "titulo": "Ajustes razonables para discapacidad intelectual",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/5.png",
+            "color_numero": "#EC4899",
+            "contenido_html": "<p>Apoyos visuales, tiempos flexibles, acompañamiento y objetivos ajustados al perfil del estudiante.</p>"
+        },
+        {
+            "id": "debe-evitar-docente",
+            "numero": 6,
+            "titulo": "¿Qué debe evitar el docente?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/6.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        },
+        {
+            "id": "mitos-realidades",
+            "numero": 7,
+            "titulo": "Mitos y realidades.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/7.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        },
+        {
+            "id": "que-hacer-ante-la-sospecha-de-que-un-niño-pueda-presentar-discapacidad-intelectual",
+            "numero": 8,
+            "titulo": "¿Qué hacer ante la sospecha de que un niño pueda presentar discapacidad intelectual?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/8.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        },
+        {
+            "id": "orientaciones-familia",
+            "numero": 9,
+            "imagen_abajo": true,
+            "titulo": "Orientaciones para la familia.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/9.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        },
+        {
+            "id": "Bibliografía.",
+            "numero": 10,
+            "titulo": "Bibliografía.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-intelectual/10.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        }
+    ]
+}

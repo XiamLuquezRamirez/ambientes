@@ -1,0 +1,94 @@
+{
+    "slug": "sindrome-down",
+    "titulo": "Síndrome de Down",
+    "etiqueta": "Conozcamos sobre",
+    "descripcion": "¿Qué es el síndrome de Down?",
+    "banner_imagen": "assets/info-condiciones/imagenes/sindrome-down/banner.png",
+    "color_fondo": "#F4D0CE",
+    "botones": [
+        {
+            "id": "que-es",
+            "numero": 1,
+            "imagen_abajo": true,
+            "titulo": "¿Qué es el síndrome de Down?",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/1.png",
+            "color_numero": "#22C55E",
+            "contenido_html": "<p>Condición genética por trisomía del cromosoma 21 que se asocia a un perfil de desarrollo propio.</p>"
+        },
+        {
+            "id": "tipos-sindrome-down",
+            "numero": 2,
+            "imagen_abajo": true,
+            "titulo": "Tipos de síndrome de Down",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/2.png",
+            "color_numero": "#3B82F6",
+            "contenido_html": "<p>Fortalezas en habilidades sociales y visuales; posibles retos en lenguaje, motricidad fina y aprendizaje.</p>"
+        },
+        {
+            "id": "senales-alerta",
+            "numero": 3,
+            "titulo": "Señales de alerta",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/3.png",
+            "color_numero": "#8B5CF6",
+            "contenido_html": "<p>Retrasos en lenguaje o motricidad que requieren intervención temprana y seguimiento.</p>"
+        },
+        {
+            "id": "estrategias",
+            "numero": 4,
+            "imagen_abajo": true,
+            "titulo": "Estrategias pedagógicas para primera infancia con síndrome de Down",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/4.png",
+            "color_numero": "#F97316",
+            "contenido_html": "<p>Aprendizaje visual, rutinas, refuerzo positivo y metas graduales.</p>"
+        },
+        {
+            "id": "ajustes",
+            "numero": 5,
+            "titulo": "Ajustes razonables",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/5.png",
+            "color_numero": "#EC4899",
+            "contenido_html": "<p>Material concreto, apoyo en lectoescritura, tiempos extendidos y evaluación formativa.</p>"
+        },
+        {
+            "id": "debe-evitar-docente",
+            "numero": 6,
+            "titulo": "¿Qué debe evitar el docente?",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/6.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Favorecer la movilidad segura, la lectura compartida y la coordinación con especialistas.</p>"
+        },
+        {
+            "id": "mitos-realidades",
+            "numero": 7,
+            "titulo": "Mitos y realidades.",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/7.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        },
+        {
+            "id": "que-hacer-ante-la-sospecha-de-que-un-niño-pueda-presentar-sindrome-down",
+            "numero": 8,
+            "titulo": "¿Qué hacer ante la sospecha de que un niño pueda presentar síndrome de Down?",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/8.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        },
+        {
+            "id": "orientacion-familia",
+            "numero": 9,
+            "imagen_abajo": true,
+            "titulo": "Orientaciones para la familia",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/9.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Estimulación temprana, inclusión social y trabajo en red con el colegio.</p>"
+        },
+        {
+            "id": "bibliografia",
+            "numero": 10,
+            "titulo": "Bibliografía.",
+            "imagen": "assets/info-condiciones/imagenes/sindrome-down/10.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        }
+    ]
+}

@@ -1,0 +1,93 @@
+{
+    "slug": "discapacidad-fisica",
+    "titulo": "Discapacidad física",
+    "etiqueta": "Conozcamos sobre",
+    "descripcion": "¿Qué es la discapacidad física?",
+    "banner_imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/banner.png",
+    "color_fondo": "#F7CBE8",
+    "botones": [
+        {
+            "id": "que-es",
+            "numero": 1,
+            "titulo": "¿Qué es la discapacidad física?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/1.png",
+            "color_numero": "#22C55E",
+            "contenido_html": "<p>Limitación en la movilidad o función motora que puede afectar el acceso a espacios y actividades escolares.</p>"
+        },
+        {
+            "id": "clasificaciones-discapacidad-fisica",
+            "numero": 2,
+            "titulo": "Clasificaciones de discapacidad física.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/2.png",
+            "color_numero": "#3B82F6",
+            "contenido_html": "<p>Variabilidad en tipo y grado; puede requerir apoyos técnicos, ortésicos o humanos.</p>"
+        },
+        {
+            "id": "senales-alerta",
+            "numero": 3,
+            "titulo": "Señales de alerta",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/3.png",
+            "color_numero": "#8B5CF6",
+            "contenido_html": "<p>Fatiga frecuente, dificultad motora sostenida o barreras físicas en la participación.</p>"
+        },
+        {
+            "id": "estrategias",
+            "numero": 4,
+            "imagen_abajo": true,
+            "titulo": "Estrategias pedagógicas para primera infancia con discapacidad física",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/4.png",
+            "color_numero": "#F97316",
+            "contenido_html": "<p>Adaptar espacios, permitir pausas, diversificar formas de participación y uso de tecnología.</p>"
+        },
+        {
+            "id": "ajustes-razonables-discapacidad-fisica",
+            "numero": 5,
+            "imagen_abajo": true,
+            "titulo": "Ajustes razonables para discapacidad física",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/5.png",
+            "color_numero": "#EC4899",
+            "contenido_html": "<p>Accesibilidad física, apoyos para escritura, tiempos flexibles y evaluación alternativa.</p>"
+        },
+        {
+            "id": "debe-evitar-docente",
+            "numero": 6,
+            "titulo": "¿Qué debe evitar el docente?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/6.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Coordinar terapias, cuidar ergonomía y promover autonomía segura.</p>"
+        },
+        {
+            "id": "mitos-realidades",
+            "numero": 7,
+            "titulo": "Mitos y realidades.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/7.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Coordinar terapias, cuidar ergonomía y promover autonomía segura.</p>"
+        },
+        {
+            "id": "¿Qué hacer ante la sospecha de que un niño pueda presentar Discapacidad visual?",
+            "numero": 8,
+            "titulo": "¿Qué hacer ante la sospecha de que un niño pueda presentar Discapacidad visual?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/8.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Coordinar terapias, cuidar ergonomía y promover autonomía segura.</p>"
+        },
+        {
+            "id": "orientaciones-familia",
+            "numero": 9,
+            "imagen_abajo": true,
+            "titulo": "Orientaciones para la familia.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/9.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Coordinar terapias, cuidar ergonomía y promover autonomía segura.</p>"
+        },
+        {
+            "id": "Bibliografía.",
+            "numero": 10,
+            "titulo": "Bibliografía.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-fisica/10.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Coordinar terapias, cuidar ergonomía y promover autonomía segura.</p>"
+        }
+    ]
+}

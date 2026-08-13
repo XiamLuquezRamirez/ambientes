@@ -1,0 +1,93 @@
+{
+    "slug": "autismo",
+    "titulo": "Autismo",
+    "etiqueta": "Conozcamos sobre",
+    "descripcion": "¿Qué es el autismo?",
+    "banner_imagen": "assets/info-condiciones/imagenes/autismo/banner.png",
+    "color_fondo": "#F6B399",
+    "botones": [
+        {
+            "id": "que-es",
+            "numero": 1,
+            "titulo": "Qué es el Trastorno del Espectro Autista (TEA)?",
+            "imagen": "assets/info-condiciones/imagenes/autismo/1.png",
+            "color_numero": "#0C9869",
+            "contenido_html": "<p>Condición del neurodesarrollo que puede influir en la comunicación, interacción social y flexibilidad conductual.</p>"
+        },
+        {
+            "id": "señales-alerta",
+            "numero": 2,
+            "titulo": "Señales de alerta",
+            "imagen": "assets/info-condiciones/imagenes/autismo/2.png",
+            "color_numero": "#0078EC",
+            "contenido_html": "<p>Perfil heterogéneo con fortalezas y necesidades de apoyo específicas en cada persona.</p>"
+        },
+        {
+            "id": "niveles-apoyo-tea",
+            "numero": 3,
+            "titulo": "Niveles de apoyo TEA",
+            "imagen": "assets/info-condiciones/imagenes/autismo/3.png",
+            "color_numero": "#5B28AE",
+            "contenido_html": "<p>Dificultades en reciprocidad social, lenguaje o patrones repetitivos de conducta.</p>"
+        },
+        {
+            "id": "perfil-sensorial-primera-infancia",
+            "numero": 4,
+            "imagen_abajo": true,
+            "titulo": "Perfil sensorial en primera infancia",
+            "imagen": "assets/info-condiciones/imagenes/autismo/4.png",
+            "color_numero": "#FEA614",
+            "contenido_html": "<p>Estructura visual, anticipación de cambios, apoyos comunicativos y refuerzo de habilidades sociales.</p>"
+        },
+        {
+            "id": "estrategias-pedagogicas-primera-infancia-autismo",
+            "numero": 5,
+            "imagen_abajo": true,
+            "titulo": "Estrategias pedagógicas",
+            "imagen": "assets/info-condiciones/imagenes/autismo/5.png",
+            "color_numero": "#E6007D",
+            "contenido_html": "<p>Espacios de autorregulación, apoyos visuales, tiempos flexibles y evaluaciones adaptadas.</p>"
+        },
+        {
+            "id": "ajustes-razonables-autismo",
+            "numero": 6,
+            "titulo": "Ajustes razonables y estrategias de apoyo",
+            "imagen": "assets/info-condiciones/imagenes/autismo/6.png",
+            "color_numero": "#0078EC",
+            "contenido_html": "<p>Rutinas consistentes, comunicación clara y articulación con el equipo educativo.</p>"
+        },
+        {
+            "id": "debe-evitar-docente",
+            "numero": 7,
+            "titulo": "¿Qué debe evitar el docente?",
+            "imagen": "assets/info-condiciones/imagenes/autismo/7.png",
+            "color_numero": "#FEA614",
+            "contenido_html": "<p>Condición del neurodesarrollo que puede influir en la comunicación, interacción social y flexibilidad conductual.</p>"
+        },
+        {
+            "id": "mitos-realidades",
+            "numero": 8,
+            "titulo": "Mitos y realidades.",
+            "imagen": "assets/info-condiciones/imagenes/autismo/8.png",
+            "color_numero": "#E6007D",
+            "contenido_html": "<p>Perfil heterogéneo con fortalezas y necesidades de apoyo específicas en cada persona.</p>"
+        },
+        {
+            "id": "que-hacer-ante-la-sospecha-de-que-un-niño-pueda-presentar-autismo",
+            "numero": 9,
+            "titulo": "¿Qué hacer ante la sospecha de un niño o niña que pueda presentar autismo?",
+            "imagen": "assets/info-condiciones/imagenes/autismo/9.png",
+            "color_numero": "#0C9869",
+            "contenido_html": "<p>Dificultades en reciprocidad social, lenguaje o patrones repetitivos de conducta.</p>"
+        },
+        {
+            "id": "orientaciones-familia",
+            "numero": 10,
+            "imagen_abajo": true,
+            "titulo": "Orientaciones para la familia.",
+            "imagen": "assets/info-condiciones/imagenes/autismo/10.png",
+            "color_numero": "#5B28AE",
+            "contenido_html": "<p>Estructura visual, anticipación de cambios, apoyos comunicativos y refuerzo de habilidades sociales.</p>"
+        }
+    ]
+}

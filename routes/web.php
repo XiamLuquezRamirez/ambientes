@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InfoCondicionesController;
 use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
 use App\Http\Controllers\Admin\CatalogoController;
@@ -65,6 +66,10 @@ Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])-
 Route::get('piar/buscar-docente/{texto}', [PiarController::class, 'buscarDocente'])->name('admin.piar.buscar-docente');
 Route::get('piar/verificar-si-comenzo/{idEstudiante}', [PiarController::class, 'verificarSiComenzo'])->name('admin.piar.verificar-si-comenzo');
 Route::get('piar/exportar/{idEstudiante}', [PiarController::class, 'exportar'])->name('admin.piar.exportar');
+
+// ── Info condiciones (público — todos los roles) ───────────────────────────
+Route::get('/info-condiciones', [InfoCondicionesController::class, 'index'])->name('info-condiciones.index');
+Route::get('/info-condiciones/{slug}', [InfoCondicionesController::class, 'mostrar'])->name('info-condiciones.mostrar');
 
 // ── Panel Admin ───────────────────────────────────────────────────────────
 Route::prefix('admin')->middleware(['es.admin'])->group(function () {

@@ -1,0 +1,103 @@
+{
+    "slug": "discapacidad-auditiva",
+    "titulo": "Discapacidad auditiva",
+    "etiqueta": "Conozcamos sobre",
+    "descripcion": "¿Qué es la discapacidad auditiva?",
+    "banner_imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/banner.png",
+    "color_fondo": "#FCE1C5",
+    "botones": [
+        {
+            "id": "que-es",
+            "numero": 1,
+            "imagen_abajo": true,
+            "titulo": "¿Qué es la discapacidad auditiva?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/1.png",
+            "color_numero": "#22C55E",
+            "contenido_html": "<p>Pérdida parcial o total de la audición que impacta el acceso a la información oral del aula.</p>"
+        },
+        {
+            "id": "grados-perdida-auditiva",
+            "numero": 2,
+            "titulo": "Grados de pérdida auditiva",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/2.png",
+            "color_numero": "#3B82F6",
+            "contenido_html": "<p>Puede ser leve, moderada, severa o profunda; uni o bilateral.</p>"
+        },
+        {
+            "id": "tipos-estudiantes",
+            "numero": 3,
+            "imagen_abajo": true,
+            "titulo": "Tipos de estudiantes según su condición auditiva.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/3.png",
+            "color_numero": "#8B5CF6",
+            "contenido_html": "<p>No responder a instrucciones orales, pedir repetición frecuente o dificultad en discriminación de sonidos.</p>"
+        },
+        {
+            "id": "senales-tempranas-problemas-audicion-ninos",
+            "numero": 4,
+            "imagen_abajo": true,
+            "titulo": "Señales tempranas de problemas de audición en niños.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/4.png",
+            "color_numero": "#F97316",
+            "contenido_html": "<p>Apoyos visuales, subtítulos, contacto visual, ambientes con bajo ruido y verificación de comprensión.</p>"
+        },
+        {
+            "id": "estrategias-pedagogicas-primera-infancia-discapacidad-auditiva",
+            "numero": 5,
+            "imagen_abajo": true,
+            "titulo": "Estrategias pedagógicas para primera infancia con discapacidad auditiva.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/5.png",
+            "color_numero": "#EC4899",
+            "contenido_html": "<p>Ubicación cercana al docente, uso de FM/implante, material escrito y tiempos adicionales.</p>"
+        },
+        {
+            "id": "ajustes-razonables-discapacidad-auditiva",
+            "numero": 6,
+            "titulo": "Ajustes razonables para discapacidad auditiva.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/6.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Cuidar dispositivos de apoyo, reforzar lenguaje y mantener comunicación con el colegio.</p>"
+        },
+        {
+            "id": "debe-evitar-docente",
+            "numero": 7,
+            "titulo": "¿Qué debe evitar el docente?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/7.png",
+            "color_numero": "#22C55E",
+            "contenido_html": "<p>Pérdida parcial o total de la audición que impacta el acceso a la información oral del aula.</p>"
+        },
+        {
+            "id": "mitos-realidades",
+            "numero": 8,
+            "titulo": "Mitos y realidades.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/8.png",
+            "color_numero": "#3B82F6",
+            "contenido_html": "<p>Puede ser leve, moderada, severa o profunda; uni o bilateral.</p>"
+        },
+        {
+            "id": "¿Qué hacer ante la sospecha de que un niño pueda presentar Discapacidad visual?",
+            "numero": 9,
+            "titulo": "¿Qué hacer ante la sospecha de que un niño pueda presentar Discapacidad visual?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/9.png",
+            "color_numero": "#8B5CF6",
+            "contenido_html": "<p>No responder a instrucciones orales, pedir repetición frecuente o dificultad en discriminación de sonidos.</p>"
+        },
+        {
+            "id": "orientaciones-familia",
+            "numero": 10,
+            "imagen_abajo": true,
+            "titulo": "Orientaciones para la familia.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/10.png",
+            "color_numero": "#F97316",
+            "contenido_html": "<p>Apoyos visuales, subtítulos, contacto visual, ambientes con bajo ruido y verificación de comprensión.</p>"
+        },
+        {
+            "id": "Bibliografía.",
+            "numero": 11,
+            "titulo": "Bibliografía.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-auditiva/11.png",
+            "color_numero": "#EC4899",
+            "contenido_html": "<p>Ubicación cercana al docente, uso de FM/implante, material escrito y tiempos adicionales.</p>"
+        }
+    ]
+}
