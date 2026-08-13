@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/info-condiciones/index.css') }}">
 </head>
 
 <body>
@@ -84,6 +85,7 @@
                     </a>
                 </li>
             </div>
+            @include('partials.nav-link-condiciones')
         </ul>
     </aside>
     @php
@@ -208,7 +210,9 @@
             @yield('content')
         </div>
     </main>
+    @include('partials.info-condiciones.embed')
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
         const cargaAcademicaActiva = @json(session('ambiente_nombre'));

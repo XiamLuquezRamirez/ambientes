@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     @stack('styles')
     @stack('head')
+    <link rel="stylesheet" href="{{ asset('assets/css/info-condiciones/index.css') }}">
 </head>
 
 <body>
@@ -149,6 +150,7 @@
                     </ul>
                 </div>
             </li>
+            @include('partials.nav-link-condiciones')
             <li class="nav-item">
                 <a href="{{ route('admin.usuarios') }}"
                     class="{{ request()->routeIs('admin.usuarios*') ? 'active nav-link' : 'nav-link' }}">
@@ -216,7 +218,9 @@
             @yield('content')
         </div>
     </main>
+    @include('partials.info-condiciones.embed')
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
         /* ── Cerrar sesión ────────────────────────────────────── */

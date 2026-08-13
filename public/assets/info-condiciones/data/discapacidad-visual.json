@@ -1,0 +1,93 @@
+{
+    "slug": "discapacidad-visual",
+    "titulo": "Discapacidad visual",
+    "etiqueta": "Conozcamos sobre",
+    "descripcion": "¿Qué es la discapacidad visual?",
+    "banner_imagen": "assets/info-condiciones/imagenes/discapacidad-visual/banner.png",
+    "color_fondo": "#E2D9FF",
+    "botones": [
+        {
+            "id": "que-es",
+            "numero": 1,
+            "imagen_abajo": true,
+            "titulo": "¿Qué es la discapacidad visual?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/1.png",
+            "color_numero": "#22C55E",
+            "contenido_html": "<p>Alteración en la función visual que limita la participación en actividades educativas, incluso con corrección.</p>"
+        },
+        {
+            "id": "grados-discapacidad-visual",
+            "numero": 2,
+            "titulo": "Grados de discapacidad visual",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/2.png",
+            "color_numero": "#3B82F6",
+            "contenido_html": "<p>Puede incluir baja visión o ceguera total, con distintos niveles de apoyo requeridos.</p>"
+        },
+        {
+            "id": "senales-alerta",
+            "numero": 3,
+            "titulo": "Señales de alerta",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/3.png",
+            "color_numero": "#8B5CF6",
+            "contenido_html": "<p>Dificultad para seguir lecturas, orientarse en el espacio o reconocer rostos y objetos.</p>"
+        },
+        {
+            "id": "estrategias-pedagogicas-primera-infancia-discapacidad-visual",
+            "numero": 4,
+            "imagen_abajo": true,
+            "titulo": "Estrategias pedagógicas para primera infancia con discapacidad visual",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/4.png",
+            "color_numero": "#F97316",
+            "contenido_html": "<p>Material en alto contraste, descripción verbal, organización del espacio y uso de tecnología de apoyo.</p>"
+        },
+        {
+            "id": "ajustes-razonables-discapacidad-visual",
+            "numero": 5,
+            "titulo": "Ajustes razonables para discapacidad visual",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/5.png",
+            "color_numero": "#EC4899",
+            "contenido_html": "<p>Formatos ampliados, audio, ubicación preferencial y evaluaciones accesibles.</p>"
+        },
+        {
+            "id": "debe-evitar-docente",
+            "numero": 6,
+            "titulo": "¿Qué debe evitar el docente?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/6.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Favorecer la movilidad segura, la lectura compartida y la coordinación con especialistas.</p>"
+        },
+        {
+            "id": "mitos-realidades",
+            "numero": 7,
+            "titulo": "Mitos y realidades.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/7.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        },
+        {
+            "id": "que-hacer-ante-la-sospecha-de-que-un-niño-pueda-presentar-discapacidad-visual",
+            "numero": 8,
+            "titulo": "¿Qué hacer ante la sospecha de que un niño pueda presentar discapacidad visual?",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/8.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        },
+        {
+            "id": "orientaciones-familia",
+            "numero": 9,
+            "imagen_abajo": true,
+            "titulo": "Orientaciones para la familia.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/9.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        },
+        {
+            "id": "bibliografia",
+            "numero": 10,
+            "titulo": "Bibliografía.",
+            "imagen": "assets/info-condiciones/imagenes/discapacidad-visual/10.png",
+            "color_numero": "#14B8A6",
+            "contenido_html": "<p>Promover autonomía progresiva, rutinas claras y participación activa en el proceso educativo.</p>"
+        }
+    ]
+}

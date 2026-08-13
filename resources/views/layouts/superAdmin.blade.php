@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/info-condiciones/index.css') }}">
 </head>
 
 <body>
@@ -85,7 +86,7 @@
                     </ul>
                 </div>
             </li>
-
+            @include('partials.nav-link-condiciones')
             @php
                 $configuracion = request()->routeIs('superadmin.modulos.listar', 'superadmin.ejes.listar');
             @endphp
@@ -191,7 +192,9 @@
             @yield('content')
         </div>
     </main>
+    @include('partials.info-condiciones.embed')
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
         /* ── Cerrar sesión ────────────────────────────────────── */
