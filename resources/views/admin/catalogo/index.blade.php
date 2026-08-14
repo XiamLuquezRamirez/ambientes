@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', 'Catálogo')
+@section('title', ($soloColegio ?? false) ? 'Catálogo DBA' : 'Catálogo')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/superAdmin/configuracion.css') }}">
@@ -7,17 +7,36 @@
 @endpush
 
 @section('content')
-    <div id="catalogoDBAApp" data-url-base="{{ url('admin/catalogo') }}"
+    @php
+        $soloColegio = (bool) ($soloColegio ?? false);
+        $urlListado = $soloColegio
+            ? url('admin/configuracion/catalogo-dba')
+            : url('admin/catalogo');
+        $rutaLimpiar = $soloColegio
+            ? route('admin.configuracion.catalogo-dba.listar')
+            : route('admin.catalogo');
+    @endphp
+
+    <div id="catalogoDBAApp"
+        data-url-base="{{ $urlListado }}"
         data-url-api="{{ url('admin/configuracion/catalogo-dba') }}"
-        data-url-guardar="{{ route('admin.configuracion.catalogo-dba.guardar') }}">
+        data-url-guardar="{{ route('admin.configuracion.catalogo-dba.guardar') }}"
+        data-url-detalle-base="{{ url('admin/catalogo') }}"
+        data-solo-colegio="{{ $soloColegio ? '1' : '0' }}">
 
         <div class="page-header catalogo-dba-page-header">
             <div>
-                <h1>Catálogo</h1>
-                <p>DBA del MEN (oficiales) y DBA personalizados del colegio</p>
+                @if ($soloColegio)
+                    <h1>Catálogo DBA</h1>
+                    <p>DBA personalizados de la institución</p>
+                @else
+                    <h1>Catálogo</h1>
+                    <p>DBA del MEN (oficiales) y DBA personalizados del colegio</p>
+                @endif
             </div>
             <div>
-                <button type="button" id="btnNuevoDbaColegio" class="btn btn-primary"
+                <button type="button" id="btnNuevoDbaColegio"
+                    class="btn btn-primary{{ $soloColegio ? ' is-visible' : '' }}"
                     onclick="abrirModalCrearCatalogoDBA()">
                     <i class="fas fa-plus"></i> Nuevo DBA del colegio
                 </button>
@@ -56,14 +75,14 @@
             </select>
 
             <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-filter"></i> Filtrar</button>
-            <a id="btnLimpiar" href="{{ route('admin.catalogo') }}" class="btn btn-sm btn-limpiar-filtros"
+            <a id="btnLimpiar" href="{{ $rutaLimpiar }}" class="btn btn-sm btn-limpiar-filtros"
                 style="display:{{ request()->hasAny(['buscar', 'area_id', 'grado_id', 'estado']) ? 'inline-flex' : 'none' }}">
                 <i class="fas fa-broom"></i> Limpiar
             </a>
         </form>
 
         <div id="contenedorCatalogo">
-            @include('admin.catalogo._contenido')
+            @include('admin.catalogo._contenido', ['soloColegio' => $soloColegio])
         </div>
         <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 

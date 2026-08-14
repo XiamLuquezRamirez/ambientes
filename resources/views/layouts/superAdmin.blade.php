@@ -88,7 +88,11 @@
             </li>
             @include('partials.nav-link-condiciones')
             @php
-                $configuracion = request()->routeIs('superadmin.modulos.listar', 'superadmin.ejes.listar');
+                $configuracion = request()->routeIs(
+                    'superadmin.modulos.listar',
+                    'superadmin.ejes.listar',
+                    'superadmin.catalogo-dba.listar',
+                );
             @endphp
             <li class="nav-item">
                 <a href="#navConfiguracion" data-bs-toggle="collapse"
