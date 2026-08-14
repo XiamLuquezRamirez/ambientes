@@ -1,0 +1,26 @@
+---
+description: Mapa PedNia — roles, ambientes y dónde tocar código
+alwaysApply: true
+---
+
+# PedNia
+
+Laravel 10, Blade + Bootstrap + jQuery, español. Guía completa: `AGENTS.md`.
+
+## Roles
+
+- Staff: guard `docente` sobre `User`. Roles: `superAdmin` (`/superadmin`), `admin` (`/admin`), `docente` (`/panel`).
+- Niño: sesión `estudiante_id` + PIN de 3 figuras. Middleware `sesion.nino`. El slug del nodo es `config('ambiente.slug')` (`AMBIENTE_SLUG`).
+
+## Ambientes fijos
+
+`musica`, `polimotor`, `logico`, `multisensorial`, `tecnologia`. Cada servidor carga `routes/ambientes/{slug}.php`.
+
+## Capas
+
+- Controladores delgados; lógica en `app/Services`.
+- Vistas en `resources/views/{admin,panel,superAdmin}`.
+- JS/CSS de features en `public/assets/js` y `public/assets/css` (no Vite).
+- Auditoría con `SeguridadService`. Sync con trait `Sincronizable` si `SERVIDOR_AMBIENTE` está definido.
+
+No añadir un sexto ambiente, SPA, Livewire ni Sanctum de sesión sin pedirlo.

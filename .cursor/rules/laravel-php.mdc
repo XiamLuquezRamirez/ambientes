@@ -1,0 +1,17 @@
+---
+description: Convenciones PHP/Laravel de PedNia
+globs: app/**/*.php,routes/**/*.php,database/**/*.php
+alwaysApply: false
+---
+
+# PHP / Laravel
+
+- PHP 8.1+, Laravel 10. Nombres de métodos, rutas y tablas en **español** como el archivo vecino (`listar`, `guardar`, `actualizar`).
+- Staff: `Auth::guard('docente')`. Roles con `User::esAdmin()` / `esDocente()` / `esSuperAdmin()`, no inventar guards.
+- Multi-tenant: filtrar por `institucion_id` del usuario en sesión. SuperAdmin es la excepción.
+- Año lectivo: la mayoría de listados usan `date('Y')` o el campo `anio_lectivo`.
+- `carga_docente` es la unidad de trabajo del docente (ambiente + grado + grupo).
+- Modelos sincronizables (`Estudiante`, `Docente`, `CargaDocente`, `Matricula`, `Piar`, `Grado`, `Grupo`, `Ambiente`, …): el trait `Sincronizable` encola solos; no duplicar writes a `cola_sincronizacion`.
+- Extraer a `app/Services` consultas pesadas, PDFs y ensamblado de payloads.
+- Rutas nombradas: `admin.*`, `panel.*`, `superadmin.*`. Prefijos y middleware ya están en `routes/web.php`.
+- No “arreglar” de paso: PIAR sin middleware, archivos mal nombrados (`MonitorSesionService.blade.php`, `Seguridadlog.php`).

@@ -1,0 +1,28 @@
+---
+description: Blade, layouts y JS estático de PedNia
+globs: resources/views/**/*.blade.php,public/assets/js/**/*.js,public/assets/css/**/*.css
+alwaysApply: false
+---
+
+# Frontend
+
+No es SPA. Blade + Bootstrap 5 + jQuery + SweetAlert2.
+
+## Layouts
+
+- Admin → `layouts.admin` | Docente → `layouts.panel` | SuperAdmin → `layouts.superAdmin`
+- Kiosco niño → `layouts.ambiente` (CSS propio, sin Bootstrap)
+- `InfoCondicionesComposer` inyecta `infoCondiciones` en los tres layouts de staff
+
+## Assets
+
+- Scripts de pantalla: `public/assets/js/{admin,panel,superAdmin,estudiantes,perfiles-aprendizaje}/`
+- Estilos: `public/assets/css/` (no `resources/css`; Vite no alimenta las features)
+- Incluir el JS al final de la Blade que lo usa. No meter lógica de negocio en JS: llamar rutas Laravel.
+
+## Vistas
+
+- Partials con `_` (`_tabla`, `_card`, `_contenido`).
+- Modales en el mismo folder de la feature.
+- PDF: vistas `*/pdf/*.blade.php` o `exportar-pdf.blade.php` vía DomPDF.
+- No editar `public/assets/css/fontawesome`.
