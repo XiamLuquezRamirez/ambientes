@@ -11,26 +11,28 @@
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
     <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}">
-    @stack('styles')
-    @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    @include('partials.sidebar-init')
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/info-condiciones/index.css') }}">
+    @stack('styles')
+    @stack('head')
 </head>
 
 <body>
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="PedNia"
-                    style="width:100%;height:100%;object-fit:contain;filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
+                <img src="{{ asset('assets/images/logo.png') }}" alt="PedNia" class="sidebar-brand-img"
+                    style="filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
             </span>
+            @include('partials.sidebar-toggle', ['only' => 'button'])
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
@@ -52,11 +54,41 @@
                 </a>
             </li>
             @php
+                $catalogo = request()->routeIs(
+                    'superadmin.tematicas.*',
+                    'superadmin.ejes.tematicas',
+                    'superadmin.experiencias.*',
+                );
                 $perfilesAprendizaje = request()->routeIs(
                     'superadmin.perfil-aprendizaje*',
                     'superadmin.perfil-aprendizaje-personalizado*',
                 );
+                $configuracion = request()->routeIs(
+                    'superadmin.modulos.listar',
+                    'superadmin.ejes.listar',
+                    'superadmin.catalogo-dba.listar',
+                );
             @endphp
+            <li class="nav-item">
+                <a href="#navCatalogo" data-bs-toggle="collapse" aria-expanded="{{ $catalogo ? 'true' : 'false' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $catalogo ? '' : 'collapsed' }}">
+                    <i class="fa-solid fa-database"></i>
+                    <span>Catálogo</span>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
+                </a>
+                <div class="collapse {{ $catalogo ? 'show' : '' }}" id="navCatalogo">
+                    <ul class="nav flex-column" style="padding:2px 0 4px 0">
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.tematicas.index') }}"
+                                class="{{ request()->routeIs('superadmin.tematicas.*', 'superadmin.ejes.tematicas', 'superadmin.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-layer-group"></i> Temáticas
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
             <li class="nav-item">
                 <a href="#navPerfilesAprendizaje" data-bs-toggle="collapse"
                     aria-expanded="{{ $perfilesAprendizaje ? 'true' : 'false' }}"
@@ -87,13 +119,7 @@
                 </div>
             </li>
             @include('partials.nav-link-condiciones')
-            @php
-                $configuracion = request()->routeIs(
-                    'superadmin.modulos.listar',
-                    'superadmin.ejes.listar',
-                    'superadmin.catalogo-dba.listar',
-                );
-            @endphp
+
             <li class="nav-item">
                 <a href="#navConfiguracion" data-bs-toggle="collapse"
                     aria-expanded="{{ $configuracion ? 'true' : 'false' }}"
@@ -131,6 +157,7 @@
             </li>
         </ul>
     </aside>
+    @include('partials.sidebar-toggle', ['only' => 'backdrop'])
     @php
         use App\Models\User;
         use App\Services\PerfilFotoService;
@@ -198,6 +225,7 @@
     </main>
     @include('partials.info-condiciones.embed')
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sidebar-toggle.js') }}"></script>
     <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>

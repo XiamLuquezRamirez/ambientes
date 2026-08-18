@@ -11,26 +11,28 @@
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
     <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}">
-    @stack('styles')
-    @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    @include('partials.sidebar-init')
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/info-condiciones/index.css') }}">
+    @stack('styles')
+    @stack('head')
 </head>
 
 <body>
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="PedNia"
-                    style="width:100%;height:100%;object-fit:contain;filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
+                <img src="{{ asset('assets/images/logo.png') }}" alt="PedNia" class="sidebar-brand-img"
+                    style="filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
             </span>
+            @include('partials.sidebar-toggle', ['only' => 'button'])
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
@@ -54,15 +56,64 @@
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('panel.portafolio') }}"
-                        class="{{ request()->routeIs('panel.portafolio*') ? 'active nav-link' : 'nav-link' }}">
+                        class="{{ request()->routeIs('panel.portafolio') || request()->routeIs('panel.portafolio.estudiante') ? 'active nav-link' : 'nav-link' }}">
                         <i class="fa-solid fa-folder-open"></i> Portafolios
                     </a>
                 </li>
+                @php
+                    $catalogoActivo = request()->routeIs(
+                        'panel.catalogo',
+                        'panel.catalogo.detalle',
+                        'panel.catalogo.modulos',
+                        'panel.catalogo.ejes',
+                        'panel.catalogo.tematicas',
+                        'panel.ejes.*',
+                        'panel.tematicas.*',
+                        'panel.experiencias.*',
+                        'panel.modulos.ejes',
+                    );
+                @endphp
                 <li class="nav-item">
-                    <a href="{{ route('panel.catalogo') }}"
-                        class="{{ request()->routeIs('panel.catalogo*') ? 'active nav-link' : 'nav-link' }}">
-                        <i class="fa-solid fa-book"></i> Catalogo
+                    <a href="#navCatalogoPanel" data-bs-toggle="collapse"
+                        aria-expanded="{{ $catalogoActivo ? 'true' : 'false' }}"
+                        class="nav-link d-flex align-items-center gap-2 {{ $catalogoActivo ? '' : 'collapsed' }}"
+                        style="cursor:pointer">
+                        <i class="fa-solid fa-book"></i>
+                        <span>Catálogo</span>
+                        <i class="fa-solid fa-chevron-down ms-auto chevron" id="chevronCatalogoPanel"></i>
                     </a>
+                    <div class="collapse {{ $catalogoActivo ? 'show' : '' }}" id="navCatalogoPanel">
+                        <ul class="nav flex-column" style="padding:2px 0 4px 0">
+                            <li class="nav-item">
+                                <a href="{{ route('panel.catalogo') }}"
+                                    class="{{ request()->routeIs('panel.catalogo') || request()->routeIs('panel.catalogo.detalle') ? 'active nav-link' : 'nav-link' }}"
+                                    style="padding-left:42px;font-size:.85rem">
+                                    <i class="fa-solid fa-book-open"></i> DBA
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('panel.catalogo.modulos') }}"
+                                    class="{{ request()->routeIs('panel.catalogo.modulos') ? 'active nav-link' : 'nav-link' }}"
+                                    style="padding-left:42px;font-size:.85rem">
+                                    <i class="fa-solid fa-cube"></i> Módulos
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('panel.catalogo.ejes') }}"
+                                    class="{{ request()->routeIs('panel.catalogo.ejes', 'panel.ejes.*', 'panel.modulos.ejes') ? 'active nav-link' : 'nav-link' }}"
+                                    style="padding-left:42px;font-size:.85rem">
+                                    <i class="fa-solid fa-diagram-project"></i> Ejes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('panel.catalogo.tematicas') }}"
+                                    class="{{ request()->routeIs('panel.catalogo.tematicas', 'panel.tematicas.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                                    style="padding-left:42px;font-size:.85rem">
+                                    <i class="fa-solid fa-layer-group"></i> Temáticas
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('panel.inclusion') }}"
@@ -88,6 +139,7 @@
             @include('partials.nav-link-condiciones')
         </ul>
     </aside>
+    @include('partials.sidebar-toggle', ['only' => 'backdrop'])
     @php
         use App\Models\User;
         use App\Services\PerfilFotoService;
@@ -212,6 +264,7 @@
     </main>
     @include('partials.info-condiciones.embed')
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sidebar-toggle.js') }}"></script>
     <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
@@ -270,6 +323,18 @@
                 };
             }
         }
+        /* ── Chevron sidebar Catálogo ─────────────────────────────── */
+        document.addEventListener('DOMContentLoaded', function() {
+            const collapseEl = document.getElementById('navCatalogoPanel');
+            const chevron = document.getElementById('chevronCatalogoPanel');
+            if (collapseEl && chevron) {
+                collapseEl.addEventListener('show.bs.collapse', () => chevron.style.transform = 'rotate(180deg)');
+                collapseEl.addEventListener('hide.bs.collapse', () => chevron.style.transform = 'rotate(0deg)');
+                if (collapseEl.classList.contains('show')) {
+                    chevron.style.transform = 'rotate(180deg)';
+                }
+            }
+        });
         /* ── Dropdown de perfil ──────────────────────────────────── */
         document.addEventListener('DOMContentLoaded', function() {
             const perfil = document.getElementById('headerPerfil');

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
-class EjesConfiguracionSuperAdminController extends Controller
+class EjesSuperAdminController extends Controller
 {
     public function listar()
     {
@@ -21,7 +21,7 @@ class EjesConfiguracionSuperAdminController extends Controller
                     ->with([
                         'ejesOficiales' => fn ($eq) => $eq
                             ->withCount([
-                                'temas as tematicas_oficiales_activas_count' => fn ($tq) => $tq
+                                'tematicas as tematicas_oficiales_activas_count' => fn ($tq) => $tq
                                     ->where('activo', true)
                                     ->where('es_oficial', true),
                                 'temas as temas_count',
@@ -62,7 +62,7 @@ class EjesConfiguracionSuperAdminController extends Controller
             ->oficiales()
             ->where('modulo_id', $modulo->id)
             ->withCount([
-                'temas as tematicas_oficiales_activas_count' => fn ($q) => $q
+                'tematicas as tematicas_oficiales_activas_count' => fn ($q) => $q
                     ->where('activo', true)
                     ->where('es_oficial', true),
                 'temas as temas_count',
@@ -104,7 +104,7 @@ class EjesConfiguracionSuperAdminController extends Controller
         ]);
 
         $eje->loadCount([
-            'temas as tematicas_oficiales_activas_count' => fn ($q) => $q
+            'tematicas as tematicas_oficiales_activas_count' => fn ($q) => $q
                 ->where('activo', true)
                 ->where('es_oficial', true),
             'temas as temas_count',
@@ -149,7 +149,7 @@ class EjesConfiguracionSuperAdminController extends Controller
 
         $eje->refresh();
         $eje->loadCount([
-            'temas as tematicas_oficiales_activas_count' => fn ($q) => $q
+            'tematicas as tematicas_oficiales_activas_count' => fn ($q) => $q
                 ->where('activo', true)
                 ->where('es_oficial', true),
             'temas as temas_count',

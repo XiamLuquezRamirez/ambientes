@@ -451,22 +451,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('modulo_slug_preview').textContent = data.slug || slugify(data.nombre);
     }
 
-    root.querySelectorAll('[data-amb-toggle]').forEach((head) => {
-        head.addEventListener('click', () => {
-            const group = head.closest('.amb-group');
-            if (!group) return;
-            const wasCollapsed = group.classList.contains('is-collapsed');
-            root.querySelectorAll('.amb-group').forEach((other) => {
-                other.classList.add('is-collapsed');
-                other.querySelector('[data-amb-toggle]')?.setAttribute('aria-expanded', 'false');
-            });
-            if (wasCollapsed) {
-                group.classList.remove('is-collapsed');
-                head.setAttribute('aria-expanded', 'true');
-            }
-        });
-    });
-
     /* ── Filtros de módulos ──────────────────────────────────── */
     function valoresFiltrosModulos() {
         return {
@@ -1341,26 +1325,8 @@ document.addEventListener('DOMContentLoaded', function () {
         setEstadoModalEjes('ready');
     }
 
-    function bindAmbienteToggles(container) {
-        if (!container) return;
-        container.querySelectorAll('[data-amb-toggle]').forEach((head) => {
-            head.addEventListener('click', () => {
-                const group = head.closest('.amb-group');
-                if (!group) return;
-                const wasCollapsed = group.classList.contains('is-collapsed');
-                container.querySelectorAll('.amb-group').forEach((other) => {
-                    other.classList.add('is-collapsed');
-                    other.querySelector('[data-amb-toggle]')?.setAttribute('aria-expanded', 'false');
-                });
-                if (wasCollapsed) {
-                    group.classList.remove('is-collapsed');
-                    head.setAttribute('aria-expanded', 'true');
-                }
-            });
-        });
-    }
-
-    bindAmbienteToggles(rootEjes);
+    window.ConfigEjesUi?.bindAmbienteToggles(root);
+    window.ConfigEjesUi?.bindAmbienteToggles(rootEjes);
     window.ConfigEjesUi?.bindModuloToggles(rootEjes);
     rootEjes?.querySelectorAll('[data-tbody-ejes-colegio]').forEach(actualizarBotonesReorderEjes);
     aplicarFiltrosEjes();

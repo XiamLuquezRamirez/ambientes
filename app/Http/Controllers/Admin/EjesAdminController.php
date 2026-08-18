@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
-class EjesConfiguracionAdminController extends Controller
+class EjesAdminController extends Controller
 {
     public function listarPorModulo(Modulo $modulo)
     {
@@ -26,7 +26,7 @@ class EjesConfiguracionAdminController extends Controller
                     ->orWhere(fn ($propio) => $propio->deInstitucion($institucionId));
             })
             ->withCount([
-                'temas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
+                'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
                 'temas as temas_count',
             ])
             ->orderBy('orden')
@@ -68,7 +68,7 @@ class EjesConfiguracionAdminController extends Controller
         ]);
 
         $eje->loadCount([
-            'temas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
+            'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
             'temas as temas_count',
         ]);
 
@@ -84,7 +84,7 @@ class EjesConfiguracionAdminController extends Controller
         $this->asegurarEjeGestionable($eje);
 
         $eje->loadCount([
-            'temas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
+            'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
             'temas as temas_count',
         ]);
 
@@ -109,7 +109,7 @@ class EjesConfiguracionAdminController extends Controller
 
         $eje->refresh();
         $eje->loadCount([
-            'temas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
+            'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
             'temas as temas_count',
         ]);
 

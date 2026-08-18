@@ -2875,6 +2875,175 @@ CREATE TABLE `catalogo_dba` (
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci;
 
+/*Table structure for curriculum tematicas / experiencias */
+
+DROP TABLE IF EXISTS `tematica_dba`;
+DROP TABLE IF EXISTS `indicadores_logro`;
+DROP TABLE IF EXISTS `experiencia_materiales`;
+DROP TABLE IF EXISTS `experiencias`;
+DROP TABLE IF EXISTS `versiones_tematica`;
+DROP TABLE IF EXISTS `tematicas`;
+
+CREATE TABLE `tematicas` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `eje_id` BIGINT UNSIGNED NOT NULL,
+    `nombre` VARCHAR(150) NOT NULL,
+    `competencia` VARCHAR(100) NULL,
+    `referente_alternativo` TEXT NULL,
+    `requiere_ra` TINYINT(1) NOT NULL DEFAULT 0,
+    `requiere_acompanamiento` TINYINT(1) NOT NULL DEFAULT 0,
+    `es_oficial` TINYINT(1) NOT NULL DEFAULT 1,
+    `institucion_id` BIGINT UNSIGNED NULL,
+    `estado` ENUM('borrador', 'activa', 'archivada') NOT NULL DEFAULT 'borrador',
+    `activo` TINYINT(1) NOT NULL DEFAULT 1,
+    `creado_por` BIGINT UNSIGNED NOT NULL,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `tematicas_eje_id_foreign` (`eje_id`),
+    KEY `tematicas_institucion_id_foreign` (`institucion_id`),
+    KEY `tematicas_creado_por_foreign` (`creado_por`),
+    KEY `tematicas_eje_oficial_institucion_index` (`eje_id`, `es_oficial`, `institucion_id`),
+    KEY `tematicas_estado_activo_index` (`estado`, `activo`),
+    CONSTRAINT `tematicas_eje_id_foreign`
+        FOREIGN KEY (`eje_id`)
+        REFERENCES `ejes` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `tematicas_institucion_id_foreign`
+        FOREIGN KEY (`institucion_id`)
+        REFERENCES `instituciones` (`id`)
+        ON DELETE SET NULL,
+    CONSTRAINT `tematicas_creado_por_foreign`
+        FOREIGN KEY (`creado_por`)
+        REFERENCES `users` (`id`)
+        ON DELETE RESTRICT
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `tematicas` */
+
+CREATE TABLE `experiencias` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `tematica_id` BIGINT UNSIGNED NOT NULL,
+    `grado_id` BIGINT UNSIGNED NOT NULL,
+    `nombre` VARCHAR(150) NOT NULL,
+    `objetivo` TEXT NOT NULL,
+    `proposito` TEXT NULL,
+    `habilidades` TEXT NULL,
+    `duracion_minutos` TINYINT UNSIGNED NOT NULL DEFAULT 20,
+    `referente_aprendizaje` TEXT NULL,
+    `estado` ENUM('borrador', 'activa', 'archivada') NOT NULL DEFAULT 'borrador',
+    `activo` TINYINT(1) NOT NULL DEFAULT 1,
+    `creado_por` BIGINT UNSIGNED NOT NULL,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `experiencias_tematica_id_foreign` (`tematica_id`),
+    KEY `experiencias_grado_id_foreign` (`grado_id`),
+    KEY `experiencias_creado_por_foreign` (`creado_por`),
+    KEY `experiencias_tematica_estado_activo_index` (`tematica_id`, `estado`, `activo`),
+    CONSTRAINT `experiencias_tematica_id_foreign`
+        FOREIGN KEY (`tematica_id`)
+        REFERENCES `tematicas` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `experiencias_grado_id_foreign`
+        FOREIGN KEY (`grado_id`)
+        REFERENCES `grados` (`id`)
+        ON DELETE RESTRICT,
+    CONSTRAINT `experiencias_creado_por_foreign`
+        FOREIGN KEY (`creado_por`)
+        REFERENCES `users` (`id`)
+        ON DELETE RESTRICT
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `experiencias` */
+
+CREATE TABLE `experiencia_materiales` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `experiencia_id` BIGINT UNSIGNED NOT NULL,
+    `nombre` VARCHAR(150) NOT NULL,
+    `cantidad` VARCHAR(60) NOT NULL,
+    `es_obligatorio` TINYINT(1) NOT NULL DEFAULT 1,
+    `orden` TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    PRIMARY KEY (`id`),
+    KEY `experiencia_materiales_experiencia_id_foreign` (`experiencia_id`),
+    KEY `experiencia_materiales_experiencia_orden_index` (`experiencia_id`, `orden`),
+    CONSTRAINT `experiencia_materiales_experiencia_id_foreign`
+        FOREIGN KEY (`experiencia_id`)
+        REFERENCES `experiencias` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `experiencia_materiales` */
+
+CREATE TABLE `indicadores_logro` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `tematica_id` BIGINT UNSIGNED NOT NULL,
+    `descripcion` VARCHAR(300) NOT NULL,
+    `orden` TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    PRIMARY KEY (`id`),
+    KEY `indicadores_logro_tematica_id_foreign` (`tematica_id`),
+    KEY `indicadores_logro_tematica_orden_index` (`tematica_id`, `orden`),
+    CONSTRAINT `indicadores_logro_tematica_id_foreign`
+        FOREIGN KEY (`tematica_id`)
+        REFERENCES `tematicas` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `indicadores_logro` */
+
+CREATE TABLE `tematica_dba` (
+    `tematica_id` BIGINT UNSIGNED NOT NULL,
+    `catalogo_dba_id` BIGINT UNSIGNED NOT NULL,
+    `relacion` ENUM('principal', 'complementario') NOT NULL DEFAULT 'principal',
+    `observacion` TEXT NULL,
+    PRIMARY KEY (`tematica_id`, `catalogo_dba_id`),
+    KEY `tematica_dba_catalogo_dba_id_foreign` (`catalogo_dba_id`),
+    CONSTRAINT `tematica_dba_tematica_id_foreign`
+        FOREIGN KEY (`tematica_id`)
+        REFERENCES `tematicas` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `tematica_dba_catalogo_dba_id_foreign`
+        FOREIGN KEY (`catalogo_dba_id`)
+        REFERENCES `catalogo_dba` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `tematica_dba` */
+
+CREATE TABLE `versiones_tematica` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `tematica_id` BIGINT UNSIGNED NOT NULL,
+    `snapshot` JSON NOT NULL,
+    `creado_por` BIGINT UNSIGNED NOT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `versiones_tematica_tematica_id_foreign` (`tematica_id`),
+    KEY `versiones_tematica_creado_por_foreign` (`creado_por`),
+    KEY `versiones_tematica_tematica_id_created_at_index` (`tematica_id`, `created_at`),
+    CONSTRAINT `versiones_tematica_tematica_id_foreign`
+        FOREIGN KEY (`tematica_id`)
+        REFERENCES `tematicas` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `versiones_tematica_creado_por_foreign`
+        FOREIGN KEY (`creado_por`)
+        REFERENCES `users` (`id`)
+        ON DELETE RESTRICT
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `versiones_tematica` */
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

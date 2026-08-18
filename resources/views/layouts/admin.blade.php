@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    @include('partials.sidebar-init')
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
@@ -27,9 +28,9 @@
     <aside class="sidebar">
         <div class="sidebar-logo">
             <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="PedNia"
-                    style="width:100%;height:100%;object-fit:contain">
+                <img src="{{ asset('assets/images/logo.png') }}" alt="PedNia" class="sidebar-brand-img">
             </span>
+            @include('partials.sidebar-toggle', ['only' => 'button'])
         </div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
@@ -87,11 +88,35 @@
                     <i class="fa-solid fa-child"></i> Estudiantes
                 </a>
             </li>
+            @php
+                $catalogo = request()->routeIs('admin.catalogo', 'admin.catalogo.*', 'admin.tematicas.*', 'admin.ejes.tematicas', 'admin.experiencias.*');
+            @endphp
             <li class="nav-item">
-                <a href="{{ route('admin.catalogo') }}"
-                    class="{{ request()->routeIs('admin.catalogo') || request()->routeIs('admin.catalogo.*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-book"></i> Catálogo
+                <a href="#navCatalogo" data-bs-toggle="collapse" aria-expanded="{{ $catalogo ? 'true' : 'false' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $catalogo ? '' : 'collapsed' }}"
+                    style="cursor:pointer">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Catálogo</span>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
                 </a>
+                <div class="collapse {{ $catalogo ? 'show' : '' }}" id="navCatalogo">
+                    <ul class="nav flex-column" style="padding:2px 0 4px 0">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.catalogo') }}"
+                                class="{{ request()->routeIs('admin.catalogo') || request()->routeIs('admin.catalogo.detalle') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-book-open"></i> DBA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.tematicas.index') }}"
+                                class="{{ request()->routeIs('admin.tematicas.*', 'admin.ejes.tematicas', 'admin.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-layer-group"></i> Temáticas
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
             <li class="nav-item">
                 <a href="{{ route('admin.sync-log') }}"
@@ -159,6 +184,7 @@
             </li>
         </ul>
     </aside>
+    @include('partials.sidebar-toggle', ['only' => 'backdrop'])
     @php
         $usuarioAuth = Auth::guard('docente')->user();
         $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
@@ -220,6 +246,7 @@
     </main>
     @include('partials.info-condiciones.embed')
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sidebar-toggle.js') }}"></script>
     <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>

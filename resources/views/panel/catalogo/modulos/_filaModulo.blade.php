@@ -24,11 +24,4 @@
         </span>
     </td>
     <td class="col-ejes-propios">{{ $modulo->ejes_propios_count }}</td>
-    <td class="col-actions">
-        <div class="row-actions d-flex justify-content-center">
-            <button type="button" class="btn-accion btn-asignar-grado" data-ejes-modulo title="Ver ejes del módulo">
-                <i class="fa-solid fa-diagram-project"></i> Ejes
-            </button>
-        </div>
-    </td>
 </tr>

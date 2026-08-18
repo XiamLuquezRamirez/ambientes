@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
-class ModulosConfiguracionAdminController extends Controller
+class ModulosAdminController extends Controller
 {
     public function mostrar(Modulo $modulo)
     {

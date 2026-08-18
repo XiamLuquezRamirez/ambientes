@@ -61,4 +61,9 @@ class Institucion extends Model
             ->withPivot('activo')
             ->withTimestamps();
     }
+
+    public function tematicas()
+    {
+        return $this->hasMany(Tematica::class);
+    }
 }

@@ -43,6 +43,11 @@ class Grado extends Model
         return $this->hasMany(CargaDocente::class);
     }
 
+    public function experiencias()
+    {
+        return $this->hasMany(Experiencia::class);
+    }
+
     public function scopeActivos($query)
     {
         return $query->where('activo', true)->orderBy('orden');

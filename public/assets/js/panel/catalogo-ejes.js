@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const root = document.querySelector('.config-panel-portafolio');
+    const root = document.querySelector('.config-panel-catalogo');
     if (!root) return;
 
     const rootModulos = root.querySelector('.config-panel-modulos');
@@ -58,22 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function bindAmbienteToggles(container) {
-        if (!container) return;
-        container.querySelectorAll('[data-amb-toggle]').forEach((head) => {
-            head.addEventListener('click', () => {
-                const group = head.closest('.amb-group');
-                if (!group) return;
-                const wasCollapsed = group.classList.contains('is-collapsed');
-                container.querySelectorAll('.amb-group').forEach((other) => {
-                    other.classList.add('is-collapsed');
-                    other.querySelector('[data-amb-toggle]')?.setAttribute('aria-expanded', 'false');
-                });
-                if (wasCollapsed) {
-                    group.classList.remove('is-collapsed');
-                    head.setAttribute('aria-expanded', 'true');
-                }
-            });
-        });
+        window.ConfigEjesUi?.bindAmbienteToggles(container);
     }
 
     function limpiarErroresFormEje() {
@@ -720,9 +705,6 @@ document.addEventListener('DOMContentLoaded', function () {
         mostrarToast('success', res.message || 'Orden actualizado');
     }
 
-    bindAmbienteToggles(rootModulos);
-    bindAmbienteToggles(rootEjes);
-    window.ConfigEjesUi?.bindModuloToggles(rootEjes);
     rootEjes?.querySelectorAll('[data-tbody-ejes-colegio]').forEach(actualizarBotonesReorderEjes);
     window.ConfigEjesUi?.refrescarPaginacion(rootEjes);
 

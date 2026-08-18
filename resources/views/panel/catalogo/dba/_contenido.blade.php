@@ -23,7 +23,7 @@
                 Catálogo oficial activo del MEN. Solo consulta.
             </p>
             <div id="contenedorTablaMen">
-                @include('panel.catalogo._tablaMen')
+                @include('panel.catalogo.dba._tablaMen')
             </div>
         </div>
 
@@ -32,7 +32,7 @@
                 DBA personalizados activos de tu institución. Solo consulta.
             </p>
             <div id="contenedorTablaColegio">
-                @include('panel.catalogo._tablaColegio')
+                @include('panel.catalogo.dba._tablaColegio')
             </div>
         </div>
     </div>

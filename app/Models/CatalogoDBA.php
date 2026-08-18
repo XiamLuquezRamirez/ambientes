@@ -34,4 +34,10 @@ class CatalogoDBA extends Model
     {
         return $this->belongsTo(User::class, 'creado_por');
     }
+
+    public function tematicas()
+    {
+        return $this->belongsToMany(Tematica::class, 'tematica_dba', 'catalogo_dba_id', 'tematica_id')
+            ->withPivot('relacion', 'observacion');
+    }
 }

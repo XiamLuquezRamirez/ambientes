@@ -47,6 +47,11 @@ class Eje extends Model
         return $this->hasMany(Tema::class)->orderBy('orden');
     }
 
+    public function tematicas()
+    {
+        return $this->hasMany(Tematica::class);
+    }
+
     public function scopeOficiales(Builder $query): Builder
     {
         return $query->where('es_oficial', true)->whereNull('institucion_id');

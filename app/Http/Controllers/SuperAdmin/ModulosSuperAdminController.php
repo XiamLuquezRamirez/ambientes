@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
-class ModulosConfiguracionSuperAdminController extends Controller
+class ModulosSuperAdminController extends Controller
 {
     /**
      * Listado de ambientes y módulos oficiales del catálogo del sistema.

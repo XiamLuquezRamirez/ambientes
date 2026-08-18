@@ -34,6 +34,12 @@
     --font-display: 'Fredoka One', cursive;
     --focus-ring: 0 0 0 3px rgba(37, 99, 235, .12);
     --ease: .15s ease;
+    --sidebar-width: 240px;
+    --sidebar-width-mini: 72px;
+    --sidebar-current-width: var(--sidebar-width);
+    --header-height: 60px;
+    --sidebar-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --sidebar-transition: 0.28s var(--sidebar-ease);
 }
 
 * {
@@ -49,12 +55,32 @@ body {
     min-height: 100vh;
 }
 
+html.sidebar-collapsed:not(.sidebar-mobile-open) {
+    --sidebar-current-width: var(--sidebar-width-mini);
+}
+
+html.sidebar-mobile-open {
+    --sidebar-current-width: var(--sidebar-width-mini);
+}
+
+/* Sin animación en la primera pintura: el JS añade .sidebar-ready después */
+html:not(.sidebar-ready) .sidebar,
+html:not(.sidebar-ready) .header,
+html:not(.sidebar-ready) .main,
+html:not(.sidebar-ready) .sidebar-logo .brand img,
+html:not(.sidebar-ready) .sidebar-brand-img,
+html:not(.sidebar-ready) .sidebar-toggle-icon-open,
+html:not(.sidebar-ready) .sidebar-toggle-icon-close,
+html:not(.sidebar-ready) .sidebar-backdrop {
+    transition: none !important;
+}
+
 /* Sidebar */
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 240px;
+    width: var(--sidebar-current-width);
     height: 100vh;
     background: var(--color-primary-dark);
     border-right: 1px solid #1E40AF;
@@ -62,17 +88,52 @@ body {
     flex-direction: column;
     z-index: 100;
     overflow-y: auto;
+    overflow-x: hidden;
+    transition: width var(--sidebar-transition), transform var(--sidebar-transition), box-shadow var(--sidebar-transition);
+}
+
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar {
+    width: var(--sidebar-width-mini);
+}
+
+html.sidebar-mobile-open .sidebar {
+    width: var(--sidebar-width);
+    box-shadow: 8px 0 32px rgba(15, 23, 42, .28);
 }
 
 .sidebar-logo {
-    padding: 24px 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 20px 14px 14px;
     border-bottom: 1px solid rgba(255, 255, 255, .15);
+    flex-shrink: 0;
 }
 
 .sidebar-logo .brand {
+    flex: 1;
+    min-width: 0;
     font-family: var(--font-display);
     font-size: 1.4rem;
     color: #FFFFFF;
+    transition: opacity var(--sidebar-transition), max-height var(--sidebar-transition);
+}
+
+.sidebar-logo .brand img,
+.sidebar-brand-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transition: max-width var(--sidebar-transition), width var(--sidebar-transition);
+}
+
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar-logo .brand img,
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar-brand-img {
+    width: 34px !important;
+    max-width: 34px !important;
+    height: auto !important;
 }
 
 .badge-admin {
@@ -118,13 +179,74 @@ body {
     font-weight: 600;
 }
 
+/* Sidebar — modo mini (solo iconos) */
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar-logo {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 6px 10px;
+    gap: 8px;
+}
+
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar-logo .brand {
+    flex: none;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav a,
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav button.nav-link {
+    justify-content: center !important;
+    gap: 0 !important;
+    padding: 11px 0 !important;
+    margin: 2px 6px !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    border-left-width: 0 !important;
+    border-radius: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    min-height: 42px;
+}
+
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav a>span,
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav a .chevron,
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav a .ms-auto,
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav .collapse {
+    display: none !important;
+}
+
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav a>i:not(.chevron),
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav button.nav-link>i {
+    font-size: 1.05rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    flex: none !important;
+    width: 1.25rem;
+    text-align: center;
+}
+
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav a.active {
+    background: rgba(255, 255, 255, .18);
+}
+
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar .nav {
+    padding: 6px 0;
+}
+
+html.sidebar-collapsed:not(.sidebar-mobile-open) .sidebar-toggle-btn {
+    width: 30px;
+    height: 30px;
+}
+
 /* Header */
 .header {
     position: fixed;
     top: 0;
-    left: 240px;
+    left: var(--sidebar-current-width);
     right: 0;
-    height: 60px;
+    height: var(--header-height);
     background: var(--color-surface);
     border-bottom: 1px solid var(--color-border-blue);
     display: flex;
@@ -134,6 +256,7 @@ body {
     gap: 16px;
     z-index: 99;
     box-shadow: var(--shadow-sm);
+    transition: left var(--sidebar-transition);
 }
 
 /* Header — marca de institución (logo + nombre) */
@@ -422,9 +545,10 @@ body {
 
 /* Main */
 .main {
-    margin-left: 240px;
-    padding-top: 60px;
+    margin-left: var(--sidebar-current-width);
+    padding-top: var(--header-height);
     min-height: 100vh;
+    transition: margin-left var(--sidebar-transition);
 }
 
 .content {
@@ -1203,4 +1327,121 @@ select.form-control {
 
 .nav-link:not(.collapsed) .chevron {
     transform: rotate(180deg);
+}
+
+/* Sidebar — toggle y backdrop */
+.sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 98;
+    background: rgba(15, 23, 42, .42);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--sidebar-transition), visibility var(--sidebar-transition);
+}
+
+html.sidebar-mobile-open .sidebar-backdrop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.sidebar-toggle-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, .22);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .1);
+    color: #FFFFFF;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--ease), color var(--ease), border-color var(--ease), transform var(--ease);
+}
+
+.sidebar-toggle-btn:hover {
+    background: rgba(255, 255, 255, .18);
+    border-color: rgba(255, 255, 255, .35);
+    color: #FFFFFF;
+}
+
+.sidebar-toggle-btn:active {
+    transform: scale(0.94);
+}
+
+.sidebar-toggle-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+}
+
+.sidebar-toggle-icon-open,
+.sidebar-toggle-icon-close {
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: opacity var(--sidebar-transition), transform var(--sidebar-transition);
+}
+
+.sidebar-toggle-icon-close {
+    position: absolute;
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.8);
+}
+
+html:not(.sidebar-collapsed) .sidebar-toggle-icon-open {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.8);
+}
+
+html:not(.sidebar-collapsed) .sidebar-toggle-icon-close {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+}
+
+html.sidebar-collapsed .sidebar-toggle-icon-open {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+}
+
+html.sidebar-collapsed .sidebar-toggle-icon-close {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.8);
+}
+
+@media (max-width: 991.98px) {
+    html.sidebar-mobile-open .sidebar {
+        z-index: 101;
+    }
+
+    html.sidebar-mobile-open .sidebar-logo {
+        flex-direction: row;
+        align-items: center;
+        padding: 20px 14px 14px;
+    }
+
+    html.sidebar-mobile-open .sidebar-logo .brand img {
+        max-width: 120px;
+    }
+
+    .header-institucion {
+        max-width: min(42vw, 280px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .sidebar,
+    .header,
+    .main,
+    .sidebar-backdrop,
+    .sidebar-toggle-icon-open,
+    .sidebar-toggle-icon-close {
+        transition-duration: 0.01ms !important;
+    }
 }

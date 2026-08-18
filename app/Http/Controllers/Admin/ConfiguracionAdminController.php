@@ -152,7 +152,7 @@ class ConfiguracionAdminController extends Controller
                     ->orWhere(fn ($propio) => $propio->deInstitucion($institucionId));
             })
             ->withCount([
-                'temas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
+                'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
                 'temas as temas_count',
             ])
             ->orderBy('orden')

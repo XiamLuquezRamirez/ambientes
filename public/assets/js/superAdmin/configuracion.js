@@ -92,26 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/^-+|-+$/g, '') || 'se genera automáticamente';
     }
 
-    function bindAmbienteToggles(container) {
-        if (!container) return;
-        container.querySelectorAll('[data-amb-toggle]').forEach((head) => {
-            head.addEventListener('click', () => {
-                const group = head.closest('.amb-group');
-                if (!group) return;
-                const wasCollapsed = group.classList.contains('is-collapsed');
-                container.querySelectorAll('.amb-group').forEach((other) => {
-                    other.classList.add('is-collapsed');
-                    other.querySelector('[data-amb-toggle]')?.setAttribute('aria-expanded', 'false');
-                });
-                if (wasCollapsed) {
-                    group.classList.remove('is-collapsed');
-                    head.setAttribute('aria-expanded', 'true');
-                }
-            });
-        });
-    }
-
-    bindAmbienteToggles(root);
+    window.ConfigEjesUi?.bindAmbienteToggles(root);
     window.ConfigEjesUi?.bindModuloToggles(rootEjes);
 
     /* ── Módulos ─────────────────────────────────────────────── */

@@ -50,11 +50,11 @@
         </form>
 
         <div id="contenedorCatalogo">
-            @include('panel.catalogo._contenido')
+            @include('panel.catalogo.dba._contenido')
         </div>
         <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 
-        @include('panel.catalogo.modalVerCatalogoDBA')
+        @include('panel.catalogo.dba.modalVerCatalogoDBA')
     </div>
 
     <script>

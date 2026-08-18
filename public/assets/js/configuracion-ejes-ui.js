@@ -1,33 +1,55 @@
 /**
- * Acordeón de módulos dentro de ambientes + paginación client-side de tablas de ejes.
+ * Acordeón de ambientes/módulos + paginación client-side de tablas de ejes.
  * Usado por admin, panel (docente) y superAdmin.
  */
 (function (global) {
     const PAGE_SIZE = 10;
 
-    function bindModuloToggles(container) {
-        if (!container) return;
+    function bindAmbienteToggles(container) {
+        if (!container || container.dataset.ambAcordeonBound === '1') return;
+        container.dataset.ambAcordeonBound = '1';
 
-        container.querySelectorAll('[data-mod-toggle]').forEach((head) => {
-            if (head.dataset.modToggleBound === '1') return;
-            head.dataset.modToggleBound = '1';
+        container.addEventListener('click', (event) => {
+            const head = event.target.closest('[data-amb-toggle]');
+            if (!head || !container.contains(head)) return;
 
-            head.addEventListener('click', () => {
-                const group = head.closest('.mod-ejes-group');
-                const amb = head.closest('.amb-group');
-                if (!group || !amb) return;
+            const group = head.closest('.amb-group');
+            if (!group || !container.contains(group)) return;
 
-                const wasCollapsed = group.classList.contains('is-collapsed');
-                amb.querySelectorAll('.mod-ejes-group').forEach((other) => {
-                    other.classList.add('is-collapsed');
-                    other.querySelector('[data-mod-toggle]')?.setAttribute('aria-expanded', 'false');
-                });
-
-                if (wasCollapsed) {
-                    group.classList.remove('is-collapsed');
-                    head.setAttribute('aria-expanded', 'true');
-                }
+            const wasCollapsed = group.classList.contains('is-collapsed');
+            container.querySelectorAll('.amb-group').forEach((other) => {
+                other.classList.add('is-collapsed');
+                other.querySelector('[data-amb-toggle]')?.setAttribute('aria-expanded', 'false');
             });
+            if (wasCollapsed) {
+                group.classList.remove('is-collapsed');
+                head.setAttribute('aria-expanded', 'true');
+            }
+        });
+    }
+
+    function bindModuloToggles(container) {
+        if (!container || container.dataset.modAcordeonBound === '1') return;
+        container.dataset.modAcordeonBound = '1';
+
+        container.addEventListener('click', (event) => {
+            const head = event.target.closest('[data-mod-toggle]');
+            if (!head || !container.contains(head)) return;
+
+            const group = head.closest('.mod-ejes-group');
+            const amb = head.closest('.amb-group');
+            if (!group || !amb || !container.contains(group)) return;
+
+            const wasCollapsed = group.classList.contains('is-collapsed');
+            amb.querySelectorAll('.mod-ejes-group').forEach((other) => {
+                other.classList.add('is-collapsed');
+                other.querySelector('[data-mod-toggle]')?.setAttribute('aria-expanded', 'false');
+            });
+
+            if (wasCollapsed) {
+                group.classList.remove('is-collapsed');
+                head.setAttribute('aria-expanded', 'true');
+            }
         });
     }
 
@@ -142,8 +164,32 @@
         aplicarPaginacion(wrap, Math.floor(idx / size) + 1);
     }
 
+    function autoBindAcordeones() {
+        const candidates = [
+            ...document.querySelectorAll(
+                '.config-sistema, .config-panel-catalogo, .config-panel-portafolio, .config-admin-modulos, .config-admin-ejes, .config-panel-modulos, .config-panel-ejes',
+            ),
+        ];
+
+        const roots = candidates.filter(
+            (el) => !candidates.some((other) => other !== el && other.contains(el)),
+        );
+
+        roots.forEach((root) => {
+            bindAmbienteToggles(root);
+            bindModuloToggles(root);
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', autoBindAcordeones);
+    } else {
+        autoBindAcordeones();
+    }
+
     global.ConfigEjesUi = {
         PAGE_SIZE,
+        bindAmbienteToggles,
         bindModuloToggles,
         aplicarPaginacion,
         refrescarPaginacion,

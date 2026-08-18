@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
-class EjesConfiguracionPanelController extends Controller
+class EjesPanelController extends Controller
 {
     public function listarPorModulo(Modulo $modulo)
     {
@@ -27,7 +27,7 @@ class EjesConfiguracionPanelController extends Controller
                     ->orWhere(fn ($propio) => $propio->deInstitucion($institucionId));
             })
             ->withCount([
-                'temas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
+                'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
                 'temas as temas_count',
             ])
             ->orderBy('orden')
@@ -70,7 +70,7 @@ class EjesConfiguracionPanelController extends Controller
         ]);
 
         $eje->loadCount([
-            'temas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
+            'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
             'temas as temas_count',
         ]);
 
@@ -86,7 +86,7 @@ class EjesConfiguracionPanelController extends Controller
         $this->asegurarEjeGestionable($eje);
 
         $eje->loadCount([
-            'temas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
+            'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
             'temas as temas_count',
         ]);
 
@@ -111,7 +111,7 @@ class EjesConfiguracionPanelController extends Controller
 
         $eje->refresh();
         $eje->loadCount([
-            'temas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
+            'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
             'temas as temas_count',
         ]);
 

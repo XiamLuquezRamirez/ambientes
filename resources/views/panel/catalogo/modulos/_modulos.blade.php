@@ -5,7 +5,6 @@
             <th>Slug</th>
             <th>Estado</th>
             <th>Ejes del colegio</th>
-            <th style="text-align:center">Acciones</th>
         </tr>
     ';
 @endphp
@@ -13,7 +12,7 @@
 <div class="config-sistema config-panel-modulos">
     <p class="text-muted small mb-3">
         Solo lectura: los módulos los administra la institución.
-        Use <b>Ejes</b> para gestionar ejes del colegio en módulos activos.
+        Para crear o editar ejes del colegio, use <b>Catálogo → Ejes</b>.
     </p>
 
     @forelse ($ambientesModulos as $ambiente)
@@ -55,7 +54,7 @@
                                 <thead>{!! $theadModulos !!}</thead>
                                 <tbody data-tbody-oficiales>
                                     @foreach ($oficiales as $item)
-                                        @include('panel.portafolio._filaModulo', ['item' => $item])
+                                        @include('panel.catalogo.modulos._filaModulo', ['item' => $item])
                                     @endforeach
                                 </tbody>
                             </table>
@@ -76,7 +75,7 @@
                             <thead>{!! $theadModulos !!}</thead>
                             <tbody data-tbody-colegio>
                                 @foreach ($propios as $item)
-                                    @include('panel.portafolio._filaModulo', ['item' => $item])
+                                    @include('panel.catalogo.modulos._filaModulo', ['item' => $item])
                                 @endforeach
                             </tbody>
                         </table>
