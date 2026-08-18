@@ -27,13 +27,6 @@
 
 <body>
     <aside class="sidebar">
-        <div class="sidebar-logo">
-            <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" alt="PedNia" class="sidebar-brand-img"
-                    style="filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
-            </span>
-            @include('partials.sidebar-toggle', ['only' => 'button'])
-        </div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
                 <a href="{{ route('panel.principal') }}"
@@ -168,76 +161,80 @@
             : '';
     @endphp
     <header class="header">
-        @if ($institucion)
-            <div class="header-institucion" title="{{ $institucion->nombre }}">
-                <div class="header-institucion-logo" aria-hidden="true">
-                    <img src="{{ $logoUrl ?? '' }}" alt=""
-                        class="header-institucion-img {{ $logoUrl ? '' : 'd-none' }}"
-                        onerror="this.classList.add('d-none');var f=this.nextElementSibling;if(f)f.classList.remove('d-none');">
-                    <span class="header-institucion-fallback {{ $logoUrl ? 'd-none' : '' }}">
-                        {{ $inicialesInstitucion }}
-                    </span>
-                </div>
-                <div class="header-institucion-meta">
-                    <span class="header-institucion-nombre">{{ $institucion->nombre }}</span>
-                    @if ($lugarInstitucion !== '')
-                        <span class="header-institucion-lugar">{{ $lugarInstitucion }}</span>
-                    @endif
-                </div>
-            </div>
-        @endif
-        <div class="header-perfil" id="headerPerfil">
-            {{-- Chip visible siempre (foto o iniciales) --}}
-            <div class="avatar" id="headerAvatar">
-                <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
-                    class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
-                <span id="headerAvatarIniciales" class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
-                    {{ $inicialesAuth }}
-                </span>
-            </div>
-            <div class="header-user-info">
-                <span class="header-user-nombre">{{ $usuarioAuth?->nombre }}</span>
-                <span class="header-user-rol">{{ $rolAuthLabel }}</span>
-            </div>
-            <span class="header-chevron">▾</span>
-            {{-- Dropdown --}}
-            <div class="header-dropdown">
-                <div class="dropdown-user-card" onclick="window.location.href='{{ route('panel.perfil') }}'">
-                    <div class="dropdown-avatar" id="dropdownAvatar">
-                        <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
-                            class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
-                        <span id="dropdownAvatarIniciales"
-                            class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
-                            {{ $inicialesAuth }}
+        @include('partials.header-start')
+        <div class="header-institucion-container">
+            @if ($institucion)
+                <div class="header-institucion" title="{{ $institucion->nombre }}">
+                    <div class="header-institucion-logo" aria-hidden="true">
+                        <img src="{{ $logoUrl ?? '' }}" alt=""
+                            class="header-institucion-img {{ $logoUrl ? '' : 'd-none' }}"
+                            onerror="this.classList.add('d-none');var f=this.nextElementSibling;if(f)f.classList.remove('d-none');">
+                        <span class="header-institucion-fallback {{ $logoUrl ? 'd-none' : '' }}">
+                            {{ $inicialesInstitucion }}
                         </span>
                     </div>
-                    <div>
-                        <div class="dropdown-nombre">{{ $usuarioAuth?->nombre }}</div>
-                        <div class="dropdown-email">{{ $usuarioAuth?->email }}</div>
-                        <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
+                    <div class="header-institucion-meta">
+                        <span class="header-institucion-nombre">{{ $institucion->nombre }}</span>
+                        @if ($lugarInstitucion !== '')
+                            <span class="header-institucion-lugar">{{ $lugarInstitucion }}</span>
+                        @endif
                     </div>
                 </div>
-                <div class="dropdown-section">
-                    <a href="{{ route('panel.perfil') }}" class="dropdown-item">
-                        <i class="fa-solid fa-user"></i>
-                        Mi Perfil
-                    </a>
-                    <a href="#" class="dropdown-item" onclick="abrirModalCambiarContrasena(); return false;">
-                        <i class="fa-solid fa-key"></i>
-                        Cambiar contraseña
-                    </a>
+            @endif
+            <div class="header-perfil" id="headerPerfil">
+                {{-- Chip visible siempre (foto o iniciales) --}}
+                <div class="avatar" id="headerAvatar">
+                    <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
+                        class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                    <span id="headerAvatarIniciales" class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                        {{ $inicialesAuth }}
+                    </span>
                 </div>
-                <div class="dropdown-divider"></div>
-                <div class="dropdown-section">
-                    <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
-                        @csrf
-                        <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon">
-                                <i class="fa-solid fa-right-from-bracket"></i>
+                <div class="header-user-info">
+                    <span class="header-user-nombre">{{ $usuarioAuth?->nombre }}</span>
+                    <span class="header-user-rol">{{ $rolAuthLabel }}</span>
+                </div>
+                <span class="header-chevron">▾</span>
+                {{-- Dropdown --}}
+                <div class="header-dropdown">
+                    <div class="dropdown-user-card" onclick="window.location.href='{{ route('panel.perfil') }}'">
+                        <div class="dropdown-avatar" id="dropdownAvatar">
+                            <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
+                                class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                            <span id="dropdownAvatarIniciales"
+                                class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                                {{ $inicialesAuth }}
                             </span>
-                            Cerrar Sesión
-                        </button>
-                    </form>
+                        </div>
+                        <div>
+                            <div class="dropdown-nombre">{{ $usuarioAuth?->nombre }}</div>
+                            <div class="dropdown-email">{{ $usuarioAuth?->email }}</div>
+                            <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-section">
+                        <a href="{{ route('panel.perfil') }}" class="dropdown-item">
+                            <i class="fa-solid fa-user"></i>
+                            Mi Perfil
+                        </a>
+                        <a href="#" class="dropdown-item"
+                            onclick="abrirModalCambiarContrasena(); return false;">
+                            <i class="fa-solid fa-key"></i>
+                            Cambiar contraseña
+                        </a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-section">
+                        <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item dropdown-item-danger">
+                                <span class="dropdown-item-icon">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                </span>
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

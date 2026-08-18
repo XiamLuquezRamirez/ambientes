@@ -26,12 +26,6 @@
 
 <body>
     <aside class="sidebar">
-        <div class="sidebar-logo">
-            <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" alt="PedNia" class="sidebar-brand-img">
-            </span>
-            @include('partials.sidebar-toggle', ['only' => 'button'])
-        </div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
                 <a href="{{ route('admin.ambientes') }}"
@@ -89,7 +83,13 @@
                 </a>
             </li>
             @php
-                $catalogo = request()->routeIs('admin.catalogo', 'admin.catalogo.*', 'admin.tematicas.*', 'admin.ejes.tematicas', 'admin.experiencias.*');
+                $catalogo = request()->routeIs(
+                    'admin.catalogo',
+                    'admin.catalogo.*',
+                    'admin.tematicas.*',
+                    'admin.ejes.tematicas',
+                    'admin.experiencias.*',
+                );
             @endphp
             <li class="nav-item">
                 <a href="#navCatalogo" data-bs-toggle="collapse" aria-expanded="{{ $catalogo ? 'true' : 'false' }}"
@@ -175,17 +175,19 @@
                     </ul>
                 </div>
             </li>
-            @include('partials.nav-link-condiciones')
             <li class="nav-item">
                 <a href="{{ route('admin.usuarios') }}"
                     class="{{ request()->routeIs('admin.usuarios*') ? 'active nav-link' : 'nav-link' }}">
                     <i class="fa-solid fa-users"></i> Usuarios
                 </a>
             </li>
+            @include('partials.nav-link-condiciones')
         </ul>
     </aside>
     @include('partials.sidebar-toggle', ['only' => 'backdrop'])
     @php
+        use App\Models\User;
+        use App\Models\Institucion;
         $usuarioAuth = Auth::guard('docente')->user();
         $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
         $inicialesAuth = mb_strtoupper(
@@ -193,47 +195,86 @@
         );
         $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
         $avatarColor = '#' . substr(md5($usuarioAuth->nombre . '|' . $usuarioAuth->apellido), 0, 6);
+        $logoService = app(\App\Services\InstitucionLogoService::class);
+        if ($usuarioAuth instanceof User) {
+            $usuarioAuth->loadMissing('docente');
+        }
+        $institucionId = session('institucion_id') ?? $usuarioAuth?->institucion_id;
+        $institucion = $institucionId ? Institucion::find($institucionId) : null;
+        $logoUrl = $institucion ? $logoService->urlPublica($institucion->logo) : null;
+        $inicialesInstitucion = $institucion ? $logoService->iniciales($institucion) : null;
+        $lugarInstitucion = $institucion
+            ? trim(
+                collect([$institucion->municipio, $institucion->departamento])
+                    ->filter()
+                    ->implode(', '),
+            )
+            : '';
     @endphp
     <header class="header">
-        <div class="header-perfil" id="headerPerfil">
-            {{-- Chip visible siempre --}}
-            <div class="avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
-            <div class="header-user-info">
-                <span class="header-user-nombre">{{ $usuarioAuth->nombre }}</span>
-                <span class="header-user-rol">{{ $rolAuthLabel }}</span>
-            </div>
-            <span class="header-chevron">▾</span>
-            {{-- Dropdown --}}
-            <div class="header-dropdown">
-                <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
-                    <div class="dropdown-avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
-                    <div>
-                        <div class="dropdown-nombre">{{ $usuarioAuth->nombre }}</div>
-                        <div class="dropdown-email">{{ $usuarioAuth->email }}</div>
-                        <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
+        @include('partials.header-start')
+        <div class="header-institucion-container">
+            @if ($institucion)
+                <div class="header-institucion" title="{{ $institucion->nombre }}"
+                    onclick="window.location.href='{{ route('admin.configuracion') }}'" style="cursor: pointer;">
+                    <div class="header-institucion-logo" aria-hidden="true">
+                        <img src="{{ $logoUrl ?? '' }}" alt=""
+                            class="header-institucion-img {{ $logoUrl ? '' : 'd-none' }}"
+                            onerror="this.classList.add('d-none');var f=this.nextElementSibling;if(f)f.classList.remove('d-none');">
+                        <span class="header-institucion-fallback {{ $logoUrl ? 'd-none' : '' }}">
+                            {{ $inicialesInstitucion }}
+                        </span>
+                    </div>
+                    <div class="header-institucion-meta">
+                        <span class="header-institucion-nombre">{{ $institucion->nombre }}</span>
+                        @if ($lugarInstitucion !== '')
+                            <span class="header-institucion-lugar">{{ $lugarInstitucion }}</span>
+                        @endif
                     </div>
                 </div>
-                <div class="dropdown-section">
-                    <a href="{{ route('admin.perfil') }}" class="dropdown-item">
-                        <i class="fa-solid fa-user"></i>
-                        Mi Perfil
-                    </a>
-                    <a href="#" class="dropdown-item" onclick="abrirModalCambiarContrasena(); return false;">
-                        <i class="fa-solid fa-key"></i>
-                        Cambiar contraseña
-                    </a>
+            @endif
+            <div class="header-perfil" id="headerPerfil">
+                {{-- Chip visible siempre --}}
+                <div class="avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
+                <div class="header-user-info">
+                    <span class="header-user-nombre">{{ $usuarioAuth->nombre }}</span>
+                    <span class="header-user-rol">{{ $rolAuthLabel }}</span>
                 </div>
-                <div class="dropdown-divider"></div>
-                <div class="dropdown-section">
-                    <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
-                        @csrf
-                        <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon">
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                            </span>
-                            Cerrar Sesión
-                        </button>
-                    </form>
+                <span class="header-chevron">▾</span>
+                {{-- Dropdown --}}
+                <div class="header-dropdown">
+                    <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
+                        <div class="dropdown-avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}
+                        </div>
+                        <div>
+                            <div class="dropdown-nombre">{{ $usuarioAuth->nombre }}</div>
+                            <div class="dropdown-email">{{ $usuarioAuth->email }}</div>
+                            <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-section">
+                        <a href="{{ route('admin.perfil') }}" class="dropdown-item">
+                            <i class="fa-solid fa-user"></i>
+                            Mi Perfil
+                        </a>
+                        <a href="#" class="dropdown-item"
+                            onclick="abrirModalCambiarContrasena(); return false;">
+                            <i class="fa-solid fa-key"></i>
+                            Cambiar contraseña
+                        </a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-section">
+                        <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item dropdown-item-danger">
+                                <span class="dropdown-item-icon">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                </span>
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

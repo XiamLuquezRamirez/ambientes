@@ -118,7 +118,6 @@
         const targetSelector = trigger.getAttribute('href');
 
         applyState(false);
-        savePreference(false);
 
         if (!targetSelector) {
             return;
@@ -133,6 +132,15 @@
                 bootstrap.Collapse.getOrCreateInstance(target, { toggle: false }).show();
             }
         }, EXPAND_DELAY_MS);
+    }
+
+    function restoreMiniIfPreferred() {
+        if (isMobile()) {
+            return;
+        }
+        if (readStoredPreference() === 'collapsed' && !isCollapsed()) {
+            applyState(true);
+        }
     }
 
     applyState(resolveInitialState());
@@ -185,7 +193,9 @@
         link.addEventListener('click', function () {
             if (isMobile() && root.classList.contains('sidebar-mobile-open')) {
                 closeSidebar();
+                return;
             }
+            restoreMiniIfPreferred();
         });
     });
 })();

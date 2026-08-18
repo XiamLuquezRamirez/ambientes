@@ -27,13 +27,6 @@
 
 <body>
     <aside class="sidebar">
-        <div class="sidebar-logo">
-            <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" alt="PedNia" class="sidebar-brand-img"
-                    style="filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
-            </span>
-            @include('partials.sidebar-toggle', ['only' => 'button'])
-        </div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
                 <a href="{{ route('superadmin.principal') }}"
@@ -118,8 +111,6 @@
                     </ul>
                 </div>
             </li>
-            @include('partials.nav-link-condiciones')
-
             <li class="nav-item">
                 <a href="#navConfiguracion" data-bs-toggle="collapse"
                     aria-expanded="{{ $configuracion ? 'true' : 'false' }}"
@@ -155,6 +146,8 @@
                     </ul>
                 </div>
             </li>
+            @include('partials.nav-link-condiciones')
+
         </ul>
     </aside>
     @include('partials.sidebar-toggle', ['only' => 'backdrop'])
@@ -173,47 +166,53 @@
             ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
     @endphp
     <header class="header">
-        <div class="header-perfil" id="headerPerfil">
-            {{-- Chip visible siempre (foto o iniciales) --}}
-            <div class="avatar" id="headerAvatar">
-                <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
-                    class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
-                <span id="headerAvatarIniciales" class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
-                    {{ $inicialesAuth }}
-                </span>
-            </div>
-            <div class="header-user-info">
-                <span class="header-user-nombre">{{ $usuarioAuth?->nombre . ' ' . $usuarioAuth?->apellido }}</span>
-                <span class="header-user-rol">{{ $rolAuthLabel }}</span>
-            </div>
-            <span class="header-chevron">▾</span>
-            {{-- Dropdown --}}
-            <div class="header-dropdown">
-                <div class="dropdown-user-card">
-                    <div class="dropdown-avatar" id="dropdownAvatar">
-                        <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
-                            class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
-                        <span id="dropdownAvatarIniciales"
-                            class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
-                            {{ $inicialesAuth }}
-                        </span>
-                    </div>
-                    <div>
-                        <div class="dropdown-nombre">{{ $usuarioAuth?->nombre . ' ' . $usuarioAuth?->apellido }}</div>
-                        <div class="dropdown-email">{{ $usuarioAuth?->email }}</div>
-                        <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
-                    </div>
+        @include('partials.header-start')
+        <div class="header-institucion-container">
+
+            <div class="header-perfil" id="headerPerfil">
+                {{-- Chip visible siempre (foto o iniciales) --}}
+                <div class="avatar" id="headerAvatar">
+                    <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
+                        class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                    <span id="headerAvatarIniciales" class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                        {{ $inicialesAuth }}
+                    </span>
                 </div>
-                <div class="dropdown-section">
-                    <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
-                        @csrf
-                        <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon">
-                                <i class="fa-solid fa-right-from-bracket"></i>
+                <div class="header-user-info">
+                    <span
+                        class="header-user-nombre">{{ $usuarioAuth?->nombre . ' ' . $usuarioAuth?->apellido }}</span>
+                    <span class="header-user-rol">{{ $rolAuthLabel }}</span>
+                </div>
+                <span class="header-chevron">▾</span>
+                {{-- Dropdown --}}
+                <div class="header-dropdown">
+                    <div class="dropdown-user-card">
+                        <div class="dropdown-avatar" id="dropdownAvatar">
+                            <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
+                                class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                            <span id="dropdownAvatarIniciales"
+                                class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                                {{ $inicialesAuth }}
                             </span>
-                            Cerrar Sesión
-                        </button>
-                    </form>
+                        </div>
+                        <div>
+                            <div class="dropdown-nombre">{{ $usuarioAuth?->nombre . ' ' . $usuarioAuth?->apellido }}
+                            </div>
+                            <div class="dropdown-email">{{ $usuarioAuth?->email }}</div>
+                            <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-section">
+                        <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item dropdown-item-danger">
+                                <span class="dropdown-item-icon">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                </span>
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
