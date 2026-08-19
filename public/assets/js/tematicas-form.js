@@ -25,6 +25,7 @@
         experienciasActualizar: $app.data('url-experiencias-actualizar-template') || '',
         experienciasFlujo: $app.data('url-experiencias-flujo-template') || '',
         experienciasEstado: $app.data('url-experiencias-estado-template') || '',
+        experienciasIndex: $app.data('url-experiencias-index') || '',
     };
 
     const csrf = $('meta[name="csrf-token"]').attr('content');
@@ -419,15 +420,57 @@
                 ? `${Number(t.experiencias_count)} exp.`
                 : 'Sin experiencias');
 
-        const acciones = [];
+        const partesFooter = [];
+
         if (editable) {
-            acciones.push(
-                `<div class="tematica-card-toggle">${htmlToggleActivo(t.id, !!t.activo, 'toggle-activo-tematica', t.nombre)}</div>`
-            );
+            partesFooter.push(`
+                <div class="tematica-card-toggle">
+                    ${htmlToggleActivo(
+                t.id,
+                !!t.activo,
+                'toggle-activo-tematica',
+                t.nombre
+            )}
+                </div>
+            `);
+
+            const itemsDropdown = [];
+
+            if (urls.experiencias) {
+                itemsDropdown.push(`
+                    <li>
+                        <button type="button" class="btn-accion btn-gestionar-exp" data-accion="experiencias" data-id="${t.id}">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            Gestionar experiencias
+                        </button>
+                    </li>
+                `);
+            }
+
             if (urls.eliminar) {
-                acciones.push(
-                    `<button type="button" class="btn-accion btn-eliminar" data-accion="eliminar" data-id="${t.id}" title="Eliminar"><i class="fa-solid fa-trash"></i> Eliminar</button>`
-                );
+                itemsDropdown.push(`
+                    <li>
+                        <button type="button" class="btn-accion btn-eliminar" data-accion="eliminar" data-id="${t.id}">
+                            <i class="fa-solid fa-trash"></i>
+                            Eliminar
+                        </button>
+                    </li>
+                `);
+            }
+
+            if (itemsDropdown.length) {
+                partesFooter.push(`
+                    <div class="dropdown catalogo-card-opciones tabla-opciones-dropdown">
+                        <button type="button" class="catalogo-card-opciones-btn" data-bs-toggle="dropdown"
+                            aria-expanded="false" aria-label="Acciones" title="Acciones"
+                            onclick="event.stopPropagation()">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-acciones">
+                            ${itemsDropdown.join('')}
+                        </ul>
+                    </div>
+                `);
             }
         }
 
@@ -435,8 +478,8 @@
         cardClases.push(t.es_oficial ? 'tematica-card--oficial' : 'tematica-card--colegio');
         if (!editable) cardClases.push('tematica-card--solo-lectura');
 
-        const accionesHtml = acciones.length
-            ? `<div class="tematica-card-actions">${acciones.join('')}</div>`
+        const accionesHtml = partesFooter.length
+            ? `<div class="tematica-card-actions">${partesFooter.join('')}</div>`
             : '';
 
         return `
@@ -555,7 +598,7 @@
     function renderIndicadores() {
         $listaIndicadores.empty();
         if (!indicadores.length) {
-            $listaIndicadores.append('<p class="text-muted small mb-0">Agregue al menos un indicador.</p>');
+            $listaIndicadores.append('<p class="text-muted small mb-0">Sin indicadores. Use «Agregar» si desea incluir alguno.</p>');
             return;
         }
         indicadores.forEach((ind, idx) => {
@@ -687,7 +730,7 @@
         $('#tematica_requiere_ra').prop('checked', false);
         $('#tematica_requiere_acompanamiento').prop('checked', false);
         $('#tematica_referente_alternativo').val('');
-        indicadores = [{ id: null, descripcion: '', orden: 1 }];
+        indicadores = [];
         dbasSeleccionados = [];
         tematicaActual = null;
         modoSoloLectura = false;
@@ -727,7 +770,7 @@
         mostrarModalRaiz(modalTematica);
     }
 
-    function cargarTematica(id, soloLecturaForzado) {
+    function cargarTematica(id, soloLecturaForzado, tabInicial) {
         const url = tpl(urls.mostrar, { __TEMATICA__: id });
         api(url, 'GET')
             .done((res) => {
@@ -750,13 +793,13 @@
                 $('#tematica_requiere_ra').prop('checked', !!t.requiere_ra);
                 $('#tematica_requiere_acompanamiento').prop('checked', !!t.requiere_acompanamiento);
                 $('#tematica_referente_alternativo').val(t.referente_alternativo || '');
-                indicadores = Array.isArray(t.indicadores) && t.indicadores.length
+                indicadores = Array.isArray(t.indicadores)
                     ? t.indicadores.map((i, idx) => ({
                         id: i.id || null,
                         descripcion: i.descripcion || '',
                         orden: i.orden || idx + 1,
                     }))
-                    : [{ id: null, descripcion: '', orden: 1 }];
+                    : [];
                 dbasSeleccionados = Array.isArray(t.dbas)
                     ? t.dbas.map((d) => ({
                         id: d.id,
@@ -772,10 +815,16 @@
                 renderDbas();
                 setBotonesCrearExperiencia(puedeCrearExperiencia(t));
                 cargarExperiencias(t.id, readonly);
-                activarTabTematica('tab-tematica-general');
+                activarTabTematica(tabInicial || 'tab-tematica-general');
                 mostrarModalRaiz(modalTematica);
             })
             .fail((xhr) => toast('error', errorAjax(xhr, 'No se pudo cargar la temática.')));
+    }
+
+    function gestionarExperienciasTematica(id) {
+        if (!id || !urls.experienciasIndex) return;
+        const destino = `${urls.experienciasIndex}${urls.experienciasIndex.includes('?') ? '&' : '?'}tematica=${encodeURIComponent(id)}`;
+        window.location.href = destino;
     }
 
     function payloadTematica() {
@@ -804,7 +853,6 @@
     function validarPayload(p) {
         if (!p.nombre) return 'El nombre es obligatorio.';
         if (p.nombre.length > 150) return 'El nombre no puede superar 150 caracteres.';
-        if (!p.indicadores.length) return 'Debe agregar al menos un indicador de logro.';
         if (p.indicadores.some((i) => i.descripcion.length > 300)) {
             return 'Cada indicador puede tener máximo 300 caracteres.';
         }
@@ -1435,10 +1483,6 @@
     $listaIndicadores.on('click', '.btn-quitar-indicador', function () {
         syncIndicadoresDesdeDom();
         const idx = Number($(this).closest('.indicador-item').data('idx'));
-        if (indicadores.length <= 1) {
-            toast('warning', 'Debe conservar al menos un indicador.');
-            return;
-        }
         indicadores.splice(idx, 1);
         renderIndicadores();
     });
@@ -1493,7 +1537,7 @@
     }
 
     $cardsWrap.on('click', '.tematica-card--clickable', function (e) {
-        if ($(e.target).closest('[data-accion], .tematica-card-toggle, .toggle-activo-tematica').length) return;
+        if ($(e.target).closest('[data-accion], .tematica-card-toggle, .toggle-activo-tematica, .catalogo-card-opciones').length) return;
         abrirTematicaDesdeCard($(this));
     });
 
@@ -1507,7 +1551,10 @@
         e.stopPropagation();
         const accion = $(this).data('accion');
         const id = $(this).data('id');
+        const $card = $(this).closest('.tematica-card');
+        const editable = String($card.data('editable')) === '1';
         if (accion === 'eliminar') eliminarTematica(id);
+        if (accion === 'experiencias') gestionarExperienciasTematica(id);
     });
     $cardsWrap.on('change', '.toggle-activo-tematica', onToggleActivoTematicaChange);
 

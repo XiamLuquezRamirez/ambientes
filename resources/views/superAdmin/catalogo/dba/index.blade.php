@@ -45,7 +45,7 @@
         </select>
 
         <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-filter"></i> Filtrar</button>
-        <a id="btnLimpiar" href="{{ route('superadmin.catalogo-dba.listar') }}" class="btn btn-sm"
+        <a id="btnLimpiar" href="{{ route('superadmin.catalogo') }}" class="btn btn-sm"
             style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;
               display:{{ request()->hasAny(['buscar', 'area_id', 'grado_id']) ? 'inline-flex' : 'none' }}">
             <i class="fas fa-broom"></i> Limpiar
@@ -53,17 +53,17 @@
     </form>
 
     <div id="contenedorTabla">
-        @include('superAdmin.configuracion.catalogos-DBA._tabla')
+        @include('superAdmin.catalogo.dba._tabla')
     </div>
     <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 
-    @include('superAdmin.configuracion.catalogos-DBA.modalCrearCatalogoDBA')
+    @include('superAdmin.catalogo.dba.modalCrearCatalogoDBA')
 @endsection
 
 @push('scripts')
     <script>
-        const URL_CATALOGO_DBA_BASE = @json(url('superadmin/configuracion/catalogo-dba'));
-        const URL_CATALOGO_DBA_GUARDAR = @json(route('superadmin.catalogo-dba.guardar'));
+        const URL_CATALOGO_DBA_BASE = @json(url('superadmin/catalogo'));
+        const URL_CATALOGO_DBA_GUARDAR = @json(route('superadmin.catalogo.guardar'));
 
         /** 1 = crear, 2 = editar */
         var tipoPost = 1;

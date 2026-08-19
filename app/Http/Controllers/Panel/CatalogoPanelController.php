@@ -85,6 +85,16 @@ class CatalogoPanelController extends Controller
     }
 
     /**
+     * Catálogo · Experiencias.
+     */
+    public function experiencias()
+    {
+        $datos = $this->datosCurriculoAsignado();
+
+        return view('panel.catalogo.experiencias.index', $datos);
+    }
+
+    /**
      * @return array{ambientesModulos: Collection, docenteId: int, areas: Collection, grados: Collection}
      */
     private function datosCurriculoAsignado(): array

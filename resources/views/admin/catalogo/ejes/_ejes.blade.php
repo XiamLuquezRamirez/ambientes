@@ -23,12 +23,12 @@
 @endphp
 
 <div class="config-sistema config-admin-ejes"
-    data-url-ejes-template="{{ url('admin/configuracion/modulos/__MODULO__/ejes') }}"
-    data-url-ejes-show-template="{{ url('admin/configuracion/ejes/__EJE__') }}"
-    data-url-ejes-update-template="{{ url('admin/configuracion/ejes/__EJE__') }}"
-    data-url-ejes-mover-template="{{ url('admin/configuracion/ejes/__EJE__/mover') }}"
-    data-url-ejes-estado-template="{{ url('admin/configuracion/ejes/__EJE__/estado') }}"
-    data-url-ejes-destroy-template="{{ url('admin/configuracion/ejes/__EJE__') }}">
+    data-url-ejes-template="{{ url('admin/catalogo/modulos/__MODULO__/ejes') }}"
+    data-url-ejes-show-template="{{ url('admin/catalogo/ejes/__EJE__') }}"
+    data-url-ejes-update-template="{{ url('admin/catalogo/ejes/__EJE__') }}"
+    data-url-ejes-mover-template="{{ url('admin/catalogo/ejes/__EJE__/mover') }}"
+    data-url-ejes-estado-template="{{ url('admin/catalogo/ejes/__EJE__/estado') }}"
+    data-url-ejes-destroy-template="{{ url('admin/catalogo/ejes/__EJE__') }}">
     <p class="text-muted small mb-3">
         Los <span class="star">⭐ Oficiales</span> son del sistema (solo lectura).
         En <span class="badge-colegio">Del colegio</span> gestiona ejes propios del módulo.
@@ -128,7 +128,7 @@
                                                         <thead>{!! $theadEjesOficiales !!}</thead>
                                                         <tbody data-tbody-ejes-oficiales>
                                                             @foreach ($oficiales as $eje)
-                                                                @include('admin.configuracion.institucion._filaEje', [
+                                                                @include('admin.catalogo.ejes._filaEje', [
                                                                     'eje' => $eje,
                                                                     'esPropio' => false,
                                                                     'puedeGestionar' => false,
@@ -156,7 +156,7 @@
                                                 <thead>{!! $theadEjesColegio !!}</thead>
                                                 <tbody data-tbody-ejes-colegio>
                                                     @foreach ($propios as $eje)
-                                                        @include('admin.configuracion.institucion._filaEje', [
+                                                        @include('admin.catalogo.ejes._filaEje', [
                                                             'eje' => $eje,
                                                             'esPropio' => true,
                                                             'puedeGestionar' => $puedeGestionar,

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Eje;
 use App\Models\Institucion;
 use App\Models\Modulo;
+use App\Services\CatalogoInstitucionAdminService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -13,6 +14,13 @@ use Illuminate\Validation\Rule;
 
 class EjesAdminController extends Controller
 {
+    public function listar(CatalogoInstitucionAdminService $catalogo)
+    {
+        $ambientesModulos = $catalogo->ambientesConModulosYEjes($this->institucionId());
+
+        return view('admin.catalogo.ejes.index', compact('ambientesModulos'));
+    }
+
     public function listarPorModulo(Modulo $modulo)
     {
         $institucionId = $this->institucionId();

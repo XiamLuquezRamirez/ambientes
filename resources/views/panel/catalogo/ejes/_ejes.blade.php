@@ -100,7 +100,7 @@
                                                         <thead>{!! $theadEjesOficiales !!}</thead>
                                                         <tbody data-tbody-ejes-oficiales>
                                                             @foreach ($oficiales as $eje)
-                                                                @include('admin.configuracion.institucion._filaEje', [
+                                                                @include('admin.catalogo.ejes._filaEje', [
                                                                     'eje' => $eje,
                                                                     'esPropio' => false,
                                                                     'puedeGestionar' => false,
@@ -129,7 +129,7 @@
                                                 <thead>{!! $theadEjesColegio !!}</thead>
                                                 <tbody data-tbody-ejes-colegio>
                                                     @foreach ($propios as $eje)
-                                                        @include('admin.configuracion.institucion._filaEje', [
+                                                        @include('admin.catalogo.ejes._filaEje', [
                                                             'eje' => $eje,
                                                             'esPropio' => true,
                                                             'puedeGestionar' =>

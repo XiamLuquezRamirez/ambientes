@@ -214,7 +214,7 @@ class TematicasSuperAdminController extends Controller
             'referente_alternativo' => ['nullable', 'string', 'max:1000'],
             'requiere_ra' => ['sometimes', 'boolean'],
             'requiere_acompanamiento' => ['sometimes', 'boolean'],
-            'indicadores' => ['required', 'array', 'min:1'],
+            'indicadores' => ['nullable', 'array'],
             'indicadores.*.id' => ['nullable', 'integer'],
             'indicadores.*.descripcion' => ['required', 'string', 'max:300'],
             'indicadores.*.orden' => ['nullable', 'integer', 'min:1', 'max:255'],
@@ -225,9 +225,7 @@ class TematicasSuperAdminController extends Controller
         ], [
             'nombre.required' => 'El nombre de la temática es obligatorio.',
             'nombre.unique' => 'Ya existe una temática oficial con ese nombre en este eje.',
-            'indicadores.required' => 'Debe registrar al menos un indicador de logro.',
-            'indicadores.min' => 'Debe registrar al menos un indicador de logro.',
-            'indicadores.*.descripcion.required' => 'Cada indicador de logro es obligatorio.',
+            'indicadores.*.descripcion.required' => 'La descripción del indicador es obligatoria.',
             'indicadores.*.descripcion.max' => 'Cada indicador de logro admite máximo 300 caracteres.',
         ]);
     }

@@ -673,6 +673,32 @@ class TematicaCurriculoService
             ->all();
     }
 
+    /**
+     * @param  array<string, mixed>  $extra
+     * @return array<string, mixed>
+     */
+    public function serializarTematicaParaExperiencias(Tematica $tematica, array $extra = []): array
+    {
+        $tematica->loadMissing([
+            'eje:id,nombre,modulo_id',
+            'eje.modulo:id,nombre,ambiente_id',
+            'eje.modulo.ambiente:id,nombre',
+            'institucion:id,nombre',
+        ]);
+
+        return array_merge([
+            'id' => $tematica->id,
+            'nombre' => $tematica->nombre,
+            'eje_id' => $tematica->eje_id,
+            'es_oficial' => $tematica->esOficial(),
+            'activo' => (bool) $tematica->activo,
+            'ambiente' => $tematica->eje?->modulo?->ambiente?->nombre,
+            'modulo' => $tematica->eje?->modulo?->nombre,
+            'eje' => $tematica->eje?->nombre,
+            'institucion' => $tematica->institucion?->nombre,
+        ], $extra);
+    }
+
     private function asegurarCatalogoDbaVisible(int $catalogoId, ?int $institucionId): void
     {
         $consulta = CatalogoDBA::query()->whereKey($catalogoId)->where('estado', true);

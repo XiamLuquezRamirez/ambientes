@@ -27,19 +27,17 @@ class ExperienciasPanelController extends Controller
             ->consultaExperienciasDeTematica($tematica)
             ->get();
 
+        $puedeEditar = $tematica->puedeGestionarComoDocente($institucionId, $this->usuarioId());
+
         return response()->json([
             'success' => true,
             'data' => [
-                'tematica' => [
-                    'id' => $tematica->id,
-                    'nombre' => $tematica->nombre,
-                    'eje_id' => $tematica->eje_id,
-                    'es_oficial' => $tematica->esOficial(),
+                'tematica' => $this->curriculo->serializarTematicaParaExperiencias($tematica, [
                     'es_propia' => $tematica->esDeInstitucion($institucionId),
                     'creado_por' => (int) $tematica->creado_por,
-                    'puede_editar' => $tematica->puedeGestionarComoDocente($institucionId, $this->usuarioId()),
-                    'activo' => (bool) $tematica->activo,
-                ],
+                    'puede_editar' => $puedeEditar,
+                    'puede_crear_experiencia' => $puedeEditar && $tematica->activo,
+                ]),
                 'experiencias' => $this->curriculo->serializarColeccionExperiencias(
                     $experiencias,
                     $this->opcionesSerializarExperiencia($institucionId)

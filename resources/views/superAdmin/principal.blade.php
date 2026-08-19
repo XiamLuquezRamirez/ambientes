@@ -28,7 +28,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('superadmin.modulos.listar') }}" class="sa-kpi-card">
+            <a href="{{ route('superadmin.catalogo.modulos') }}" class="sa-kpi-card">
                 <span class="sa-kpi-icon sa-kpi-icon--green"><i class="fa-solid fa-cube"></i></span>
                 <div class="sa-kpi-body">
                     <div class="sa-kpi-row">
@@ -39,7 +39,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('superadmin.ejes.listar') }}" class="sa-kpi-card">
+            <a href="{{ route('superadmin.catalogo.ejes') }}" class="sa-kpi-card">
                 <span class="sa-kpi-icon sa-kpi-icon--amber"><i class="fa-solid fa-diagram-project"></i></span>
                 <div class="sa-kpi-body">
                     <div class="sa-kpi-row">
@@ -78,9 +78,9 @@
             <div class="sa-section-head">
                 <div>
                     <h2 id="sa-ambientes-title">Ambientes del sistema</h2>
-                    <p>Resumen del catálogo. Gestiona módulos y ejes desde Configuración.</p>
+                    <p>Resumen del catálogo. Gestiona módulos y ejes desde Catálogo.</p>
                 </div>
-                <a href="{{ route('superadmin.modulos.listar') }}" class="sa-section-link">
+                <a href="{{ route('superadmin.catalogo.modulos') }}" class="sa-section-link">
                     Ir a módulos <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                 </a>
             </div>
@@ -92,7 +92,7 @@
                         $modulosActivos = (int) $amb->modulos_oficiales_activos_count;
                         $modulosTotal = (int) $amb->modulos_oficiales_count;
                     @endphp
-                    <a href="{{ route('superadmin.modulos.listar') }}" class="sa-ambiente-card"
+                    <a href="{{ route('superadmin.catalogo.modulos') }}" class="sa-ambiente-card"
                         title="Ver módulos de {{ $amb->nombre }}">
                         <div class="sa-ambiente-franja" style="background:{{ $color }}"></div>
                         <div class="sa-ambiente-body">

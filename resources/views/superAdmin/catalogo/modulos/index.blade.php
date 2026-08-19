@@ -12,16 +12,16 @@
     </div>
 
     <div class="config-sistema" data-total-instituciones="{{ $totalInstituciones }}"
-        data-url-store-template="{{ url('superadmin/configuracion/ambientes/__AMBIENTE__/modulos') }}"
-        data-url-show-template="{{ url('superadmin/configuracion/modulos/__MODULO__') }}"
-        data-url-update-template="{{ url('superadmin/configuracion/modulos/__MODULO__') }}"
-        data-url-estado-template="{{ url('superadmin/configuracion/modulos/__MODULO__/estado') }}"
-        data-url-mover-template="{{ url('superadmin/configuracion/modulos/__MODULO__/mover') }}"
-        data-url-ejes-template="{{ url('superadmin/configuracion/modulos/__MODULO__/ejes') }}"
-        data-url-ejes-show-template="{{ url('superadmin/configuracion/ejes/__EJE__') }}"
-        data-url-ejes-update-template="{{ url('superadmin/configuracion/ejes/__EJE__') }}"
-        data-url-ejes-mover-template="{{ url('superadmin/configuracion/ejes/__EJE__/mover') }}"
-        data-url-ejes-estado-template="{{ url('superadmin/configuracion/ejes/__EJE__/estado') }}">
+        data-url-store-template="{{ url('superadmin/catalogo/ambientes/__AMBIENTE__/modulos') }}"
+        data-url-show-template="{{ url('superadmin/catalogo/modulos/__MODULO__') }}"
+        data-url-update-template="{{ url('superadmin/catalogo/modulos/__MODULO__') }}"
+        data-url-estado-template="{{ url('superadmin/catalogo/modulos/__MODULO__/estado') }}"
+        data-url-mover-template="{{ url('superadmin/catalogo/modulos/__MODULO__/mover') }}"
+        data-url-ejes-template="{{ url('superadmin/catalogo/modulos/__MODULO__/ejes') }}"
+        data-url-ejes-show-template="{{ url('superadmin/catalogo/ejes/__EJE__') }}"
+        data-url-ejes-update-template="{{ url('superadmin/catalogo/ejes/__EJE__') }}"
+        data-url-ejes-mover-template="{{ url('superadmin/catalogo/ejes/__EJE__/mover') }}"
+        data-url-ejes-estado-template="{{ url('superadmin/catalogo/ejes/__EJE__/estado') }}">
         @forelse ($ambientes as $ambiente)
             @php
                 $color = $ambiente->color_hex ?: '#64748B';
@@ -133,11 +133,11 @@
         @endforelse
     </div>
 
-    @include('superAdmin.configuracion.modulos.modalCrearModulos')
-    @include('superAdmin.configuracion.modulos.modalVerEjesModulo')
+    @include('superAdmin.catalogo.modulos.modalCrearModulos')
+    @include('superAdmin.catalogo.modulos.modalVerEjesModulo')
 @endsection
 
     @push('scripts')
     <script src="{{ asset('assets/js/configuracion-ejes-ui.js') }}"></script>
-    <script src="{{ asset('assets/js/superAdmin/configuracion.js') }}"></script>
+    <script src="{{ asset('assets/js/superAdmin/catalogo-modulos-ejes.js') }}"></script>
 @endpush

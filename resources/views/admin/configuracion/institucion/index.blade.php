@@ -24,18 +24,6 @@
                     <i class="fas fa-server"></i> Servidores
                 </a>
             </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" id="tab-modulos" data-bs-toggle="tab" href="#modulos" role="tab"
-                    aria-controls="modulos" aria-selected="false">
-                    <i class="fas fa-cube"></i> Módulos
-                </a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" id="tab-ejes" data-bs-toggle="tab" href="#ejes" role="tab" aria-controls="ejes"
-                    aria-selected="false">
-                    <i class="fas fa-diagram-project"></i> Ejes
-                </a>
-            </li>
         </ul>
 
         <form id="formDatosInstitucion" method="POST">
@@ -173,21 +161,11 @@
                         </table>
                     </div>
                 </div>
-
-                <div class="tab-pane container" id="modulos" role="tabpanel" aria-labelledby="tab-modulos">
-                    @include('admin.configuracion.institucion._modulos')
-                </div>
-
-                <div class="tab-pane container" id="ejes" role="tabpanel" aria-labelledby="tab-ejes">
-                    @include('admin.configuracion.institucion._ejes')
-                </div>
             </div>
         </form>
     </div>
 
     @include('admin.configuracion.institucion.modalLogoInstitucion')
-    @include('admin.configuracion.institucion.modalCrearModulos')
-    @include('admin.configuracion.institucion.modalVerEjesModulo')
 @endsection
 
 @push('scripts')
@@ -310,6 +288,4 @@
             });
         }
     </script>
-    <script src="{{ asset('assets/js/configuracion-ejes-ui.js') }}"></script>
-    <script src="{{ asset('assets/js/admin/configuracion-modulos.js') }}"></script>
 @endpush

@@ -45,11 +45,11 @@ class CatalogoDBASuperAdminController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'html' => view('superAdmin.configuracion.catalogos-DBA._tabla', compact('catalogos'))->render(),
+                'html' => view('superAdmin.catalogo.dba._tabla', compact('catalogos'))->render(),
             ]);
         }
 
-        return view('superAdmin.configuracion.catalogos-DBA.index', compact('catalogos', 'areas', 'grados'));
+        return view('superAdmin.catalogo.dba.index', compact('catalogos', 'areas', 'grados'));
     }
 
     public function guardar(Request $request)

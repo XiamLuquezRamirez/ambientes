@@ -35,7 +35,7 @@ class ModulosSuperAdminController extends Controller
 
         $totalInstituciones = Institucion::query()->where('activo', true)->count();
 
-        return view('superAdmin.configuracion.modulos.index', compact('ambientes', 'totalInstituciones'));
+        return view('superAdmin.catalogo.modulos.index', compact('ambientes', 'totalInstituciones'));
     }
 
     public function mostrar(Modulo $modulo)

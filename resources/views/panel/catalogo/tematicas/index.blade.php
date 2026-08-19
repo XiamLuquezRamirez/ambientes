@@ -17,7 +17,7 @@
         </button>
     </div>
 
-    <div class="c-card config-sistema tematicas-app" data-rol="panel" style="padding: 20px;"
+    <div class="c-card config-sistema tematicas-app" data-rol="panel"
         data-url-listar="{{ route('panel.tematicas.listar') }}"
         data-url-guardar-template="{{ url('panel/catalogo/ejes/__EJE__/tematicas') }}"
         data-url-mostrar-template="{{ url('panel/catalogo/tematicas/__TEMATICA__') }}"
@@ -30,7 +30,8 @@
         data-url-experiencias-mostrar-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__') }}"
         data-url-experiencias-actualizar-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__') }}"
         data-url-experiencias-flujo-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__/flujo') }}"
-        data-url-experiencias-estado-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__/estado') }}">
+        data-url-experiencias-estado-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__/estado') }}"
+        data-url-experiencias-index="{{ route('panel.catalogo.experiencias.index') }}">
 
         <p class="text-muted small mb-3">
             Las temáticas <span class="star">⭐ Oficiales</span> son de solo lectura.

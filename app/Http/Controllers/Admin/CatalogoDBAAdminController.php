@@ -7,40 +7,28 @@ use App\Models\Area;
 use App\Models\CatalogoDBA;
 use App\Models\Grado;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 /**
- * Dominio DBA: consulta unificada (Catálogo) + gestión del colegio (Configuración).
+ * Dominio DBA: consulta unificada (Catálogo) + gestión del colegio.
  */
 class CatalogoDBAAdminController extends Controller
 {
     /**
-     * Listado compartido.
-     * - admin.catalogo → MEN + colegio
-     * - admin.configuracion.catalogo-dba.listar → solo colegio
+     * Listado MEN + DBA del colegio.
      */
     public function listar(Request $request)
     {
         $institucionId = $this->institucionId();
-        $soloColegio = $request->routeIs('admin.configuracion.catalogo-dba.listar');
 
-        if ($soloColegio) {
-            $catalogosMen = new LengthAwarePaginator([], 0, 10, 1, [
-                'path' => $request->url(),
-                'pageName' => 'page_men',
-                'query' => $request->query(),
-            ]);
-        } else {
-            $consultaMen = CatalogoDBA::query()
-                ->with(['area:id,nombre', 'grado:id,nombre'])
-                ->whereNull('institucion_id')
-                ->where('es_men', true)
-                ->orderBy('codigo');
-            $this->aplicarFiltros($consultaMen, $request);
-            $catalogosMen = $consultaMen->paginate(10, ['*'], 'page_men')->withQueryString();
-        }
+        $consultaMen = CatalogoDBA::query()
+            ->with(['area:id,nombre', 'grado:id,nombre'])
+            ->whereNull('institucion_id')
+            ->where('es_men', true)
+            ->orderBy('codigo');
+        $this->aplicarFiltros($consultaMen, $request);
+        $catalogosMen = $consultaMen->paginate(10, ['*'], 'page_men')->withQueryString();
 
         $consultaColegio = CatalogoDBA::query()
             ->with(['area:id,nombre', 'grado:id,nombre'])
@@ -59,7 +47,6 @@ class CatalogoDBAAdminController extends Controller
                 'html' => view('admin.catalogo._contenido', compact(
                     'catalogosMen',
                     'catalogosColegio',
-                    'soloColegio'
                 ))->render(),
             ]);
         }
@@ -69,7 +56,6 @@ class CatalogoDBAAdminController extends Controller
             'catalogosColegio',
             'areas',
             'grados',
-            'soloColegio'
         ));
     }
 

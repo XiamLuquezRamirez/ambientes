@@ -17,19 +17,20 @@
         </button>
     </div>
 
-    <div class="c-card config-sistema tematicas-app" data-rol="admin" data-url-listar="{{ route('admin.tematicas.listar') }}"
+    <div class="c-card config-sistema tematicas-app" data-rol="admin" data-url-listar="{{ route('admin.catalogo.tematicas.listar') }}"
         data-url-guardar-template="{{ url('admin/catalogo/ejes/__EJE__/tematicas') }}"
         data-url-mostrar-template="{{ url('admin/catalogo/tematicas/__TEMATICA__') }}"
         data-url-actualizar-template="{{ url('admin/catalogo/tematicas/__TEMATICA__') }}"
         data-url-estado-template="{{ url('admin/catalogo/tematicas/__TEMATICA__/estado') }}"
         data-url-eliminar-template="{{ url('admin/catalogo/tematicas/__TEMATICA__') }}"
-        data-url-dbas="{{ route('admin.tematicas.dbas') }}"
+        data-url-dbas="{{ route('admin.catalogo.tematicas.dbas') }}"
         data-url-experiencias-template="{{ url('admin/catalogo/tematicas/__TEMATICA__/experiencias') }}"
         data-url-experiencias-guardar-template="{{ url('admin/catalogo/tematicas/__TEMATICA__/experiencias') }}"
         data-url-experiencias-mostrar-template="{{ url('admin/catalogo/experiencias/__EXPERIENCIA__') }}"
         data-url-experiencias-actualizar-template="{{ url('admin/catalogo/experiencias/__EXPERIENCIA__') }}"
         data-url-experiencias-flujo-template="{{ url('admin/catalogo/experiencias/__EXPERIENCIA__/flujo') }}"
-        data-url-experiencias-estado-template="{{ url('admin/catalogo/experiencias/__EXPERIENCIA__/estado') }}">
+        data-url-experiencias-estado-template="{{ url('admin/catalogo/experiencias/__EXPERIENCIA__/estado') }}"
+        data-url-experiencias-index="{{ route('admin.catalogo.experiencias.index') }}">
 
         @include('partials.tematicas._filtros')
         @include('partials.tematicas._tabla')

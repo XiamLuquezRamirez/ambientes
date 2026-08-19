@@ -12,18 +12,18 @@
 @endphp
 
 <div class="config-sistema config-admin-modulos"
-    data-url-store-template="{{ url('admin/configuracion/ambientes/__AMBIENTE__/modulos') }}"
-    data-url-show-template="{{ url('admin/configuracion/modulos/__MODULO__') }}"
-    data-url-update-template="{{ url('admin/configuracion/modulos/__MODULO__') }}"
-    data-url-estado-template="{{ url('admin/configuracion/modulos/__MODULO__/estado') }}"
-    data-url-mover-template="{{ url('admin/configuracion/modulos/__MODULO__/mover') }}"
-    data-url-destroy-template="{{ url('admin/configuracion/modulos/__MODULO__') }}"
-    data-url-ejes-template="{{ url('admin/configuracion/modulos/__MODULO__/ejes') }}"
-    data-url-ejes-show-template="{{ url('admin/configuracion/ejes/__EJE__') }}"
-    data-url-ejes-update-template="{{ url('admin/configuracion/ejes/__EJE__') }}"
-    data-url-ejes-mover-template="{{ url('admin/configuracion/ejes/__EJE__/mover') }}"
-    data-url-ejes-estado-template="{{ url('admin/configuracion/ejes/__EJE__/estado') }}"
-    data-url-ejes-destroy-template="{{ url('admin/configuracion/ejes/__EJE__') }}">
+    data-url-store-template="{{ url('admin/catalogo/ambientes/__AMBIENTE__/modulos') }}"
+    data-url-show-template="{{ url('admin/catalogo/modulos/__MODULO__') }}"
+    data-url-update-template="{{ url('admin/catalogo/modulos/__MODULO__') }}"
+    data-url-estado-template="{{ url('admin/catalogo/modulos/__MODULO__/estado') }}"
+    data-url-mover-template="{{ url('admin/catalogo/modulos/__MODULO__/mover') }}"
+    data-url-destroy-template="{{ url('admin/catalogo/modulos/__MODULO__') }}"
+    data-url-ejes-template="{{ url('admin/catalogo/modulos/__MODULO__/ejes') }}"
+    data-url-ejes-show-template="{{ url('admin/catalogo/ejes/__EJE__') }}"
+    data-url-ejes-update-template="{{ url('admin/catalogo/ejes/__EJE__') }}"
+    data-url-ejes-mover-template="{{ url('admin/catalogo/ejes/__EJE__/mover') }}"
+    data-url-ejes-estado-template="{{ url('admin/catalogo/ejes/__EJE__/estado') }}"
+    data-url-ejes-destroy-template="{{ url('admin/catalogo/ejes/__EJE__') }}">
     <p class="text-muted small mb-3">
         Los <span class="star">⭐ Oficiales</span> son del sistema (solo lectura).
         En <span class="badge-colegio">Del colegio</span> gestiona módulos adicionales y ejes propios.
@@ -97,7 +97,7 @@
                                 <thead>{!! $theadModulos !!}</thead>
                                 <tbody data-tbody-oficiales>
                                     @foreach ($oficiales as $item)
-                                        @include('admin.configuracion.institucion._filaModulo', [
+                                        @include('admin.catalogo.modulos._filaModulo', [
                                             'item' => $item,
                                         ])
                                     @endforeach
@@ -121,7 +121,7 @@
                             <thead>{!! $theadModulos !!}</thead>
                             <tbody data-tbody-colegio>
                                 @foreach ($propios as $item)
-                                    @include('admin.configuracion.institucion._filaModulo', [
+                                    @include('admin.catalogo.modulos._filaModulo', [
                                         'item' => $item,
                                     ])
                                 @endforeach

@@ -18,18 +18,19 @@
     </div>
 
     <div class="c-card config-sistema tematicas-app" data-rol="superadmin"
-        data-url-listar="{{ route('superadmin.tematicas.listar') }}"
+        data-url-listar="{{ route('superadmin.catalogo.tematicas.listar') }}"
         data-url-guardar-template="{{ url('superadmin/catalogo/ejes/__EJE__/tematicas') }}"
         data-url-mostrar-template="{{ url('superadmin/catalogo/tematicas/__TEMATICA__') }}"
         data-url-actualizar-template="{{ url('superadmin/catalogo/tematicas/__TEMATICA__') }}"
         data-url-estado-template="{{ url('superadmin/catalogo/tematicas/__TEMATICA__/estado') }}"
-        data-url-eliminar-template="" data-url-dbas="{{ route('superadmin.tematicas.dbas') }}"
+        data-url-eliminar-template="" data-url-dbas="{{ route('superadmin.catalogo.tematicas.dbas') }}"
         data-url-experiencias-template="{{ url('superadmin/catalogo/tematicas/__TEMATICA__/experiencias') }}"
         data-url-experiencias-guardar-template="{{ url('superadmin/catalogo/tematicas/__TEMATICA__/experiencias') }}"
         data-url-experiencias-mostrar-template="{{ url('superadmin/catalogo/experiencias/__EXPERIENCIA__') }}"
         data-url-experiencias-actualizar-template="{{ url('superadmin/catalogo/experiencias/__EXPERIENCIA__') }}"
         data-url-experiencias-flujo-template="{{ url('superadmin/catalogo/experiencias/__EXPERIENCIA__/flujo') }}"
-        data-url-experiencias-estado-template="{{ url('superadmin/catalogo/experiencias/__EXPERIENCIA__/estado') }}">
+        data-url-experiencias-estado-template="{{ url('superadmin/catalogo/experiencias/__EXPERIENCIA__/estado') }}"
+        data-url-experiencias-index="{{ route('superadmin.catalogo.experiencias.index') }}">
 
         <p class="text-muted small mb-3">
             Puede consultar todas las temáticas.

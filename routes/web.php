@@ -177,28 +177,47 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('admin.estudiantes.cargar-municipios');
     Route::get('estudiantes/restablecer-pin/{idEstudiante}', [EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.restablecer-pin');
 
-    // Catálogo DBA (sidebar): MEN + colegio · detalle de lectura
+    // Catálogo
     Route::get('catalogo', [CatalogoDBAAdminController::class, 'listar'])->name('admin.catalogo');
     Route::get('catalogo/detalle/{id}', [CatalogoDBAAdminController::class, 'detalle'])->name('admin.catalogo.detalle');
+    Route::post('catalogo/dba', [CatalogoDBAAdminController::class, 'guardar'])->name('admin.catalogo.dba.guardar');
+    Route::get('catalogo/dba/datos/{id}', [CatalogoDBAAdminController::class, 'ver'])->name('admin.catalogo.dba.datos');
+    Route::put('catalogo/dba/{id}', [CatalogoDBAAdminController::class, 'actualizar'])->name('admin.catalogo.dba.actualizar');
+    Route::patch('catalogo/dba/{id}/toggle-activo', [CatalogoDBAAdminController::class, 'toggleActivo'])->name('admin.catalogo.dba.toggleActivo');
 
-    // Catálogo · módulos / temas (dominio distinto a DBA)
-    Route::post('catalogo/modulos', [CatalogoAdminController::class, 'guardarModulo'])->name('admin.catalogo.modulo.store');
-    Route::put('catalogo/modulos/{modulo}', [CatalogoAdminController::class, 'actualizarModulo'])->name('admin.catalogo.modulo.update');
-    Route::delete('catalogo/modulos/{modulo}', [CatalogoAdminController::class, 'eliminarModulo'])->name('admin.catalogo.modulo.destroy');
+    Route::get('catalogo/modulos', [ModulosAdminController::class, 'listar'])->name('admin.catalogo.modulos');
+    Route::post('catalogo/ambientes/{ambiente}/modulos', [ModulosAdminController::class, 'guardar'])->name('admin.modulos.guardar');
+    Route::get('catalogo/modulos/{modulo}', [ModulosAdminController::class, 'mostrar'])->name('admin.modulos.mostrar');
+    Route::put('catalogo/modulos/{modulo}', [ModulosAdminController::class, 'actualizar'])->name('admin.modulos.actualizar');
+    Route::patch('catalogo/modulos/{modulo}/estado', [ModulosAdminController::class, 'actualizarEstado'])->name('admin.modulos.estado');
+    Route::patch('catalogo/modulos/{modulo}/mover', [ModulosAdminController::class, 'mover'])->name('admin.modulos.mover');
+    Route::delete('catalogo/modulos/{modulo}', [ModulosAdminController::class, 'eliminar'])->name('admin.modulos.eliminar');
+
+    Route::get('catalogo/ejes', [EjesAdminController::class, 'listar'])->name('admin.catalogo.ejes');
+    Route::get('catalogo/modulos/{modulo}/ejes', [EjesAdminController::class, 'listarPorModulo'])->name('admin.modulos.ejes');
+    Route::post('catalogo/modulos/{modulo}/ejes', [EjesAdminController::class, 'guardar'])->name('admin.ejes.guardar');
+    Route::get('catalogo/ejes/{eje}', [EjesAdminController::class, 'mostrar'])->name('admin.ejes.mostrar');
+    Route::put('catalogo/ejes/{eje}', [EjesAdminController::class, 'actualizar'])->name('admin.ejes.actualizar');
+    Route::patch('catalogo/ejes/{eje}/estado', [EjesAdminController::class, 'actualizarEstado'])->name('admin.ejes.estado');
+    Route::patch('catalogo/ejes/{eje}/mover', [EjesAdminController::class, 'mover'])->name('admin.ejes.mover');
+    Route::delete('catalogo/ejes/{eje}', [EjesAdminController::class, 'eliminar'])->name('admin.ejes.eliminar');
+
+    // Catálogo · temas (dominio legacy, pendiente)
     Route::post('catalogo/temas', [CatalogoAdminController::class, 'guardarTema'])->name('admin.catalogo.tema.store');
     Route::put('catalogo/temas/{tema}', [CatalogoAdminController::class, 'actualizarTema'])->name('admin.catalogo.tema.update');
 
-    // Catálogo · temáticas / experiencias del colegio (propias; oficiales de solo lectura)
-    Route::get('catalogo/tematicas', [TematicasAdminController::class, 'index'])->name('admin.tematicas.index');
-    Route::get('catalogo/tematicas/listar', [TematicasAdminController::class, 'listar'])->name('admin.tematicas.listar');
-    Route::get('catalogo/tematicas/dbas', [TematicasAdminController::class, 'buscarDbas'])->name('admin.tematicas.dbas');
+    // Catálogo · temáticas / experiencias del colegio
+    Route::get('catalogo/tematicas', [TematicasAdminController::class, 'index'])->name('admin.catalogo.tematicas.index');
+    Route::get('catalogo/tematicas/listar', [TematicasAdminController::class, 'listar'])->name('admin.catalogo.tematicas.listar');
+    Route::get('catalogo/tematicas/dbas', [TematicasAdminController::class, 'buscarDbas'])->name('admin.catalogo.tematicas.dbas');
     Route::get('catalogo/ejes/{eje}/tematicas', [TematicasAdminController::class, 'listarPorEje'])->name('admin.ejes.tematicas');
-    Route::post('catalogo/ejes/{eje}/tematicas', [TematicasAdminController::class, 'guardar'])->name('admin.tematicas.guardar');
-    Route::get('catalogo/tematicas/{tematica}', [TematicasAdminController::class, 'mostrar'])->name('admin.tematicas.mostrar');
-    Route::put('catalogo/tematicas/{tematica}', [TematicasAdminController::class, 'actualizar'])->name('admin.tematicas.actualizar');
-    Route::patch('catalogo/tematicas/{tematica}/estado', [TematicasAdminController::class, 'actualizarEstado'])->name('admin.tematicas.estado');
-    Route::delete('catalogo/tematicas/{tematica}', [TematicasAdminController::class, 'eliminar'])->name('admin.tematicas.eliminar');
-    Route::get('catalogo/tematicas/{tematica}/experiencias', [ExperienciasAdminController::class, 'listarPorTematica'])->name('admin.tematicas.experiencias');
+    Route::post('catalogo/ejes/{eje}/tematicas', [TematicasAdminController::class, 'guardar'])->name('admin.catalogo.tematicas.guardar');
+    Route::get('catalogo/tematicas/{tematica}', [TematicasAdminController::class, 'mostrar'])->name('admin.catalogo.tematicas.mostrar');
+    Route::put('catalogo/tematicas/{tematica}', [TematicasAdminController::class, 'actualizar'])->name('admin.catalogo.tematicas.actualizar');
+    Route::patch('catalogo/tematicas/{tematica}/estado', [TematicasAdminController::class, 'actualizarEstado'])->name('admin.catalogo.tematicas.estado');
+    Route::delete('catalogo/tematicas/{tematica}', [TematicasAdminController::class, 'eliminar'])->name('admin.catalogo.tematicas.eliminar');
+    Route::get('catalogo/experiencias', [ExperienciasAdminController::class, 'index'])->name('admin.catalogo.experiencias.index');
+    Route::get('catalogo/tematicas/{tematica}/experiencias', [ExperienciasAdminController::class, 'listarPorTematica'])->name('admin.catalogo.tematicas.experiencias');
     Route::post('catalogo/tematicas/{tematica}/experiencias', [ExperienciasAdminController::class, 'guardar'])->name('admin.experiencias.guardar');
     Route::get('catalogo/experiencias/{experiencia}', [ExperienciasAdminController::class, 'mostrar'])->name('admin.experiencias.mostrar');
     Route::put('catalogo/experiencias/{experiencia}', [ExperienciasAdminController::class, 'actualizar'])->name('admin.experiencias.actualizar');
@@ -210,27 +229,12 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('reportes', [ReportesController::class, 'listar'])->name('admin.reportes');
     Route::get('reportes/exportar', [ReportesController::class, 'exportar'])->name('admin.reportes.exportar');
 
-    // Configuracion
+    // Configuracion (institución y perfiles)
     Route::get('configuracion', [ConfiguracionAdminController::class, 'listar'])->name('admin.configuracion');
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
     Route::post('configuracion/logo', [ConfiguracionAdminController::class, 'subirLogo'])->name('admin.configuracion.logo');
     Route::get('configuracion/datos/{id}', [ConfiguracionAdminController::class, 'verDatosInstitucion'])->name('admin.configuracion.datos');
     Route::get('configuracion/cargar-municipios/{departamento}', [ConfiguracionAdminController::class, 'cargarMunicipios'])->name('admin.configuracion.cargar-municipios');
-
-    // Módulos / ejes del colegio (adicionales + ejes propios)
-    Route::post('configuracion/ambientes/{ambiente}/modulos', [ModulosAdminController::class, 'guardar'])->name('admin.modulos.guardar');
-    Route::get('configuracion/modulos/{modulo}', [ModulosAdminController::class, 'mostrar'])->name('admin.modulos.mostrar');
-    Route::put('configuracion/modulos/{modulo}', [ModulosAdminController::class, 'actualizar'])->name('admin.modulos.actualizar');
-    Route::patch('configuracion/modulos/{modulo}/estado', [ModulosAdminController::class, 'actualizarEstado'])->name('admin.modulos.estado');
-    Route::patch('configuracion/modulos/{modulo}/mover', [ModulosAdminController::class, 'mover'])->name('admin.modulos.mover');
-    Route::delete('configuracion/modulos/{modulo}', [ModulosAdminController::class, 'eliminar'])->name('admin.modulos.eliminar');
-    Route::get('configuracion/modulos/{modulo}/ejes', [EjesAdminController::class, 'listarPorModulo'])->name('admin.modulos.ejes');
-    Route::post('configuracion/modulos/{modulo}/ejes', [EjesAdminController::class, 'guardar'])->name('admin.ejes.guardar');
-    Route::get('configuracion/ejes/{eje}', [EjesAdminController::class, 'mostrar'])->name('admin.ejes.mostrar');
-    Route::put('configuracion/ejes/{eje}', [EjesAdminController::class, 'actualizar'])->name('admin.ejes.actualizar');
-    Route::patch('configuracion/ejes/{eje}/estado', [EjesAdminController::class, 'actualizarEstado'])->name('admin.ejes.estado');
-    Route::patch('configuracion/ejes/{eje}/mover', [EjesAdminController::class, 'mover'])->name('admin.ejes.mover');
-    Route::delete('configuracion/ejes/{eje}', [EjesAdminController::class, 'eliminar'])->name('admin.ejes.eliminar');
 
     Route::get('configuracion/perfil-aprendizaje', [PerfilAprendizajeConfiguracionController::class, 'index'])->name('admin.configuracion.perfil-aprendizaje.index');
     Route::patch('configuracion/perfil-aprendizaje/orden', [PerfilAprendizajeConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.perfil-aprendizaje.orden');
@@ -246,13 +250,6 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::patch('configuracion/perfil-aprendizaje-personalizado/{personalizadoOrden}/estado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estado');
     Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}/estudiantes', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estudiantes');
     Route::post('configuracion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desasociar', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'desasociarEstudiante'])->name('admin.configuracion.perfil-aprendizaje-personalizado.desasociar');
-
-    // Configuración › Catálogo DBA (solo DBA personalizado del colegio)
-    Route::get('configuracion/catalogo-dba', [CatalogoDBAAdminController::class, 'listar'])->name('admin.configuracion.catalogo-dba.listar');
-    Route::post('configuracion/catalogo-dba', [CatalogoDBAAdminController::class, 'guardar'])->name('admin.configuracion.catalogo-dba.guardar');
-    Route::get('configuracion/catalogo-dba/datos/{id}', [CatalogoDBAAdminController::class, 'ver'])->name('admin.configuracion.catalogo-dba.ver');
-    Route::put('configuracion/catalogo-dba/{id}', [CatalogoDBAAdminController::class, 'actualizar'])->name('admin.configuracion.catalogo-dba.actualizar');
-    Route::patch('configuracion/catalogo-dba/{id}/toggle-activo', [CatalogoDBAAdminController::class, 'toggleActivo'])->name('admin.configuracion.catalogo-dba.toggleActivo');
 
     // Usuario
     Route::get('perfil', [PerfilController::class, 'mostrar'])->name('admin.perfil');
@@ -394,6 +391,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::patch('catalogo/tematicas/{tematica}/estado', [TematicasPanelController::class, 'actualizarEstado'])->name('panel.tematicas.estado');
     Route::delete('catalogo/tematicas/{tematica}', [TematicasPanelController::class, 'eliminar'])->name('panel.tematicas.eliminar');
 
+    Route::get('catalogo/experiencias', [CatalogoPanelController::class, 'experiencias'])->name('panel.catalogo.experiencias.index');
     Route::get('catalogo/tematicas/{tematica}/experiencias', [ExperienciasPanelController::class, 'listarPorTematica'])->name('panel.tematicas.experiencias');
     Route::post('catalogo/tematicas/{tematica}/experiencias', [ExperienciasPanelController::class, 'guardar'])->name('panel.experiencias.guardar');
     Route::get('catalogo/experiencias/{experiencia}', [ExperienciasPanelController::class, 'mostrar'])->name('panel.experiencias.mostrar');
@@ -446,45 +444,47 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::patch('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}/estado', [PerfilAprendizajePersonalizadoController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje-personalizado.estado');
     Route::delete('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje-personalizado.eliminar');
 
-    // Configuracion
-    Route::get('configuracion', [ModulosSuperAdminController::class, 'listar'])->name('superadmin.modulos.listar');
-    Route::post('configuracion/ambientes/{ambiente}/modulos', [ModulosSuperAdminController::class, 'guardar'])->name('superadmin.modulos.guardar');
-    Route::get('configuracion/modulos/{modulo}', [ModulosSuperAdminController::class, 'mostrar'])->name('superadmin.modulos.mostrar');
-    Route::put('configuracion/modulos/{modulo}', [ModulosSuperAdminController::class, 'actualizar'])->name('superadmin.modulos.actualizar');
-    Route::patch('configuracion/modulos/{modulo}/estado', [ModulosSuperAdminController::class, 'actualizarEstado'])->name('superadmin.modulos.estado');
-    Route::patch('configuracion/modulos/{modulo}/mover', [ModulosSuperAdminController::class, 'mover'])->name('superadmin.modulos.mover');
+    // Catálogo oficial (DBA, módulos, ejes)
+    Route::get('catalogo', [CatalogoDBASuperAdminController::class, 'listar'])->name('superadmin.catalogo');
+    Route::post('catalogo', [CatalogoDBASuperAdminController::class, 'guardar'])->name('superadmin.catalogo.guardar');
+    Route::get('catalogo/datos/{id}', [CatalogoDBASuperAdminController::class, 'ver'])->name('superadmin.catalogo.datos');
+    Route::put('catalogo/{id}', [CatalogoDBASuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.actualizar');
+    Route::patch('catalogo/{id}/toggle-activo', [CatalogoDBASuperAdminController::class, 'toggleActivo'])->name('superadmin.catalogo.toggleActivo');
 
-    // Ejes (por módulo oficial)
-    Route::get('configuracion/modulos/{modulo}/ejes', [EjesSuperAdminController::class, 'listarPorModulo'])->name('superadmin.modulos.ejes');
-    Route::get('configuracion/ejes', [EjesSuperAdminController::class, 'listar'])->name('superadmin.ejes.listar');
-    Route::post('configuracion/modulos/{modulo}/ejes', [EjesSuperAdminController::class, 'guardar'])->name('superadmin.ejes.guardar');
-    Route::get('configuracion/ejes/{eje}', [EjesSuperAdminController::class, 'mostrar'])->name('superadmin.ejes.mostrar');
-    Route::put('configuracion/ejes/{eje}', [EjesSuperAdminController::class, 'actualizar'])->name('superadmin.ejes.actualizar');
-    Route::patch('configuracion/ejes/{eje}/estado', [EjesSuperAdminController::class, 'actualizarEstado'])->name('superadmin.ejes.estado');
-    Route::patch('configuracion/ejes/{eje}/mover', [EjesSuperAdminController::class, 'mover'])->name('superadmin.ejes.mover');
+    Route::get('catalogo/modulos', [ModulosSuperAdminController::class, 'listar'])->name('superadmin.catalogo.modulos');
+    Route::post('catalogo/ambientes/{ambiente}/modulos', [ModulosSuperAdminController::class, 'guardar'])->name('superadmin.modulos.guardar');
+    Route::get('catalogo/modulos/{modulo}', [ModulosSuperAdminController::class, 'mostrar'])->name('superadmin.modulos.mostrar');
+    Route::put('catalogo/modulos/{modulo}', [ModulosSuperAdminController::class, 'actualizar'])->name('superadmin.modulos.actualizar');
+    Route::patch('catalogo/modulos/{modulo}/estado', [ModulosSuperAdminController::class, 'actualizarEstado'])->name('superadmin.modulos.estado');
+    Route::patch('catalogo/modulos/{modulo}/mover', [ModulosSuperAdminController::class, 'mover'])->name('superadmin.modulos.mover');
+
+    Route::get('catalogo/ejes', [EjesSuperAdminController::class, 'listar'])->name('superadmin.catalogo.ejes');
+    Route::get('catalogo/modulos/{modulo}/ejes', [EjesSuperAdminController::class, 'listarPorModulo'])->name('superadmin.modulos.ejes');
+    Route::post('catalogo/modulos/{modulo}/ejes', [EjesSuperAdminController::class, 'guardar'])->name('superadmin.ejes.guardar');
+    Route::get('catalogo/ejes/{eje}', [EjesSuperAdminController::class, 'mostrar'])->name('superadmin.ejes.mostrar');
+    Route::put('catalogo/ejes/{eje}', [EjesSuperAdminController::class, 'actualizar'])->name('superadmin.ejes.actualizar');
+    Route::patch('catalogo/ejes/{eje}/estado', [EjesSuperAdminController::class, 'actualizarEstado'])->name('superadmin.ejes.estado');
+    Route::patch('catalogo/ejes/{eje}/mover', [EjesSuperAdminController::class, 'mover'])->name('superadmin.ejes.mover');
 
     // Temáticas / experiencias oficiales
-    Route::get('catalogo/tematicas', [TematicasSuperAdminController::class, 'index'])->name('superadmin.tematicas.index');
-    Route::get('catalogo/tematicas/listar', [TematicasSuperAdminController::class, 'listar'])->name('superadmin.tematicas.listar');
-    Route::get('catalogo/tematicas/dbas', [TematicasSuperAdminController::class, 'buscarDbas'])->name('superadmin.tematicas.dbas');
+    Route::get('catalogo/tematicas', [TematicasSuperAdminController::class, 'index'])->name('superadmin.catalogo.tematicas.index');
+    Route::get('catalogo/tematicas/listar', [TematicasSuperAdminController::class, 'listar'])->name('superadmin.catalogo.tematicas.listar');
+    Route::get('catalogo/tematicas/dbas', [TematicasSuperAdminController::class, 'buscarDbas'])->name('superadmin.catalogo.tematicas.dbas');
     Route::get('catalogo/ejes/{eje}/tematicas', [TematicasSuperAdminController::class, 'listarPorEje'])->name('superadmin.ejes.tematicas');
-    Route::post('catalogo/ejes/{eje}/tematicas', [TematicasSuperAdminController::class, 'guardar'])->name('superadmin.tematicas.guardar');
-    Route::get('catalogo/tematicas/{tematica}', [TematicasSuperAdminController::class, 'mostrar'])->name('superadmin.tematicas.mostrar');
-    Route::put('catalogo/tematicas/{tematica}', [TematicasSuperAdminController::class, 'actualizar'])->name('superadmin.tematicas.actualizar');
-    Route::patch('catalogo/tematicas/{tematica}/estado', [TematicasSuperAdminController::class, 'actualizarEstado'])->name('superadmin.tematicas.estado');
-    Route::get('catalogo/tematicas/{tematica}/experiencias', [ExperienciasSuperAdminController::class, 'listarPorTematica'])->name('superadmin.tematicas.experiencias');
-    Route::post('catalogo/tematicas/{tematica}/experiencias', [ExperienciasSuperAdminController::class, 'guardar'])->name('superadmin.experiencias.guardar');
-    Route::get('catalogo/experiencias/{experiencia}', [ExperienciasSuperAdminController::class, 'mostrar'])->name('superadmin.experiencias.mostrar');
-    Route::put('catalogo/experiencias/{experiencia}', [ExperienciasSuperAdminController::class, 'actualizar'])->name('superadmin.experiencias.actualizar');
-    Route::patch('catalogo/experiencias/{experiencia}/estado', [ExperienciasSuperAdminController::class, 'actualizarEstado'])->name('superadmin.experiencias.estado');
-    Route::patch('catalogo/experiencias/{experiencia}/flujo', [ExperienciasSuperAdminController::class, 'cambiarEstado'])->name('superadmin.experiencias.flujo');
+    Route::post('catalogo/ejes/{eje}/tematicas', [TematicasSuperAdminController::class, 'guardar'])->name('superadmin.catalogo.tematicas.guardar');
+    Route::get('catalogo/tematicas/{tematica}', [TematicasSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo.tematicas.mostrar');
+    Route::put('catalogo/tematicas/{tematica}', [TematicasSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.tematicas.actualizar');
+    Route::patch('catalogo/tematicas/{tematica}/estado', [TematicasSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo.tematicas.estado');
+    Route::get('catalogo/tematicas/{tematica}/experiencias', [ExperienciasSuperAdminController::class, 'listarPorTematica'])->name('superadmin.catalogo.tematicas.experiencias');
+    Route::post('catalogo/tematicas/{tematica}/experiencias', [ExperienciasSuperAdminController::class, 'guardar'])->name('superadmin.catalogo.tematicas.experiencias.guardar');
+    Route::get('catalogo/experiencias/{experiencia}', [ExperienciasSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo.experiencias.mostrar');
+    Route::put('catalogo/experiencias/{experiencia}', [ExperienciasSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.experiencias.actualizar');
+    Route::patch('catalogo/experiencias/{experiencia}/estado', [ExperienciasSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo.experiencias.estado');
+    Route::patch('catalogo/experiencias/{experiencia}/flujo', [ExperienciasSuperAdminController::class, 'cambiarEstado'])->name('superadmin.catalogo.experiencias.flujo');
 
-    // Catalogos DBA
-    Route::get('configuracion/catalogo-dba', [CatalogoDBASuperAdminController::class, 'listar'])->name('superadmin.catalogo-dba.listar');
-    Route::post('configuracion/catalogo-dba', [CatalogoDBASuperAdminController::class, 'guardar'])->name('superadmin.catalogo-dba.guardar');
-    Route::get('configuracion/catalogo-dba/datos/{id}', [CatalogoDBASuperAdminController::class, 'ver'])->name('superadmin.catalogo-dba.ver');
-    Route::put('configuracion/catalogo-dba/{id}', [CatalogoDBASuperAdminController::class, 'actualizar'])->name('superadmin.catalogo-dba.actualizar');
-    Route::patch('configuracion/catalogo-dba/{id}/toggle-activo', [CatalogoDBASuperAdminController::class, 'toggleActivo'])->name('superadmin.catalogo-dba.toggleActivo');
+    // Vista catálogo experiencias
+    Route::get('catalogo/experiencias', [ExperienciasSuperAdminController::class, 'index'])->name('superadmin.catalogo.experiencias.index');
+
 });
 
 // ── Contenido del ambiente (protegido por sesion del nino) ────────────────

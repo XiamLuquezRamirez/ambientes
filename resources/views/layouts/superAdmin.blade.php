@@ -48,34 +48,61 @@
             </li>
             @php
                 $catalogo = request()->routeIs(
-                    'superadmin.tematicas.*',
+                    'superadmin.catalogo',
+                    'superadmin.catalogo.*',
+                    'superadmin.modulos.*',
+                    'superadmin.ejes.*',
+                    'superadmin.catalogo.tematicas.*',
                     'superadmin.ejes.tematicas',
-                    'superadmin.experiencias.*',
                 );
                 $perfilesAprendizaje = request()->routeIs(
                     'superadmin.perfil-aprendizaje*',
                     'superadmin.perfil-aprendizaje-personalizado*',
                 );
-                $configuracion = request()->routeIs(
-                    'superadmin.modulos.listar',
-                    'superadmin.ejes.listar',
-                    'superadmin.catalogo-dba.listar',
-                );
+                $configuracion = false;
             @endphp
             <li class="nav-item">
                 <a href="#navCatalogo" data-bs-toggle="collapse" aria-expanded="{{ $catalogo ? 'true' : 'false' }}"
                     class="nav-link d-flex align-items-center gap-2 {{ $catalogo ? '' : 'collapsed' }}">
-                    <i class="fa-solid fa-database"></i>
+                    <i class="fa-solid fa-book"></i>
                     <span>Catálogo</span>
                     <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
                 </a>
                 <div class="collapse {{ $catalogo ? 'show' : '' }}" id="navCatalogo">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
-                            <a href="{{ route('superadmin.tematicas.index') }}"
-                                class="{{ request()->routeIs('superadmin.tematicas.*', 'superadmin.ejes.tematicas', 'superadmin.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                            <a href="{{ route('superadmin.catalogo') }}"
+                                class="{{ request()->routeIs('superadmin.catalogo', 'superadmin.catalogo.guardar', 'superadmin.catalogo.datos', 'superadmin.catalogo.actualizar', 'superadmin.catalogo.toggleActivo') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-book-open"></i> DBA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.catalogo.modulos') }}"
+                                class="{{ request()->routeIs('superadmin.catalogo.modulos', 'superadmin.modulos.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-cube"></i> Módulos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.catalogo.ejes') }}"
+                                class="{{ request()->routeIs('superadmin.catalogo.ejes', 'superadmin.ejes.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-diagram-project"></i> Ejes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.catalogo.tematicas.index') }}"
+                                class="{{ request()->routeIs('superadmin.catalogo.tematicas.*', 'superadmin.ejes.tematicas') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-layer-group"></i> Temáticas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.catalogo.experiencias.index') }}"
+                                class="{{ request()->routeIs('superadmin.catalogo.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-book-open-reader"></i> Experiencias
                             </a>
                         </li>
                     </ul>
@@ -104,7 +131,8 @@
                             <a href="{{ route('superadmin.perfil-aprendizaje-personalizado.index') }}"
                                 class="{{ request()->routeIs('superadmin.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i> Perfiles de Aprendizaje
+                                <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i> Perfiles de
+                                Aprendizaje
                                 Personalizados Globales
                             </a>
                         </li>
@@ -122,27 +150,6 @@
                 </a>
                 <div class="collapse {{ $configuracion ? 'show' : '' }}" id="navConfiguracion">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
-                        <li class="nav-item">
-                            <a href="{{ route('superadmin.modulos.listar') }}"
-                                class="{{ request()->routeIs('superadmin.modulos.*') ? 'active nav-link' : 'nav-link' }}"
-                                style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-cube"></i> Módulos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('superadmin.ejes.listar') }}"
-                                class="{{ request()->routeIs('superadmin.ejes.*') ? 'active nav-link' : 'nav-link' }}"
-                                style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-diagram-project"></i> Ejes
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('superadmin.catalogo-dba.listar') }}"
-                                class="{{ request()->routeIs('superadmin.catalogo-dba.*') ? 'active nav-link' : 'nav-link' }}"
-                                style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-database"></i> Catálogo DBA
-                            </a>
-                        </li>
                     </ul>
                 </div>
             </li>

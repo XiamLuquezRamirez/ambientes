@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Experiencia;
+use App\Models\Grado;
 use App\Models\Institucion;
+use App\Models\Modulo;
 use App\Models\Tematica;
 use App\Services\TematicaCurriculoService;
 use Illuminate\Http\Request;
@@ -17,6 +19,62 @@ class ExperienciasAdminController extends Controller
         private TematicaCurriculoService $curriculo,
     ) {}
 
+    public function index()
+    {
+        $institucionId = $this->institucionId();
+        $institucion = Institucion::with(['ambientesActivos' => fn ($q) => $q->orderBy('nombre')])
+            ->findOrFail($institucionId);
+
+        $ambientes = $institucion->ambientesActivos->map(function ($ambiente) use ($institucionId) {
+            $oficiales = Modulo::query()
+                ->oficiales()
+                ->where('activo', true)
+                ->where('ambiente_id', $ambiente->id)
+                ->whereHas(
+                    'instituciones',
+                    fn ($q) => $q
+                        ->where('instituciones.id', $institucionId)
+                        ->where('modulo_institucion.activo', true)
+                )
+                ->with([
+                    'ejes' => fn ($q) => $q
+                        ->where(function ($inner) use ($institucionId) {
+                            $inner->where(fn ($oficial) => $oficial->oficiales()->where('activo', true))
+                                ->orWhere(fn ($propia) => $propia->deInstitucion($institucionId)->where('activo', true));
+                        })
+                        ->orderBy('orden'),
+                ])
+                ->orderBy('orden')
+                ->get();
+
+            $propios = Modulo::query()
+                ->deInstitucion($institucionId)
+                ->where('ambiente_id', $ambiente->id)
+                ->where('activo', true)
+                ->with([
+                    'ejes' => fn ($q) => $q
+                        ->where(function ($inner) use ($institucionId) {
+                            $inner->where(fn ($oficial) => $oficial->oficiales()->where('activo', true))
+                                ->orWhere(fn ($propia) => $propia->deInstitucion($institucionId)->where('activo', true));
+                        })
+                        ->orderBy('orden'),
+                ])
+                ->orderBy('orden')
+                ->get();
+
+            $ambiente->setRelation(
+                'modulos',
+                $oficiales->concat($propios)->sortBy('orden')->values()
+            );
+
+            return $ambiente;
+        });
+
+        $grados = Grado::activos()->get(['id', 'nombre']);
+
+        return view('admin.catalogo.experiencias.index', compact('ambientes', 'grados'));
+    }
+
     public function listarPorTematica(Tematica $tematica)
     {
         $institucionId = $this->institucionId();
@@ -26,16 +84,16 @@ class ExperienciasAdminController extends Controller
             ->consultaExperienciasDeTematica($tematica)
             ->get();
 
+        $puedeEditar = $tematica->esDeInstitucion($institucionId);
+
         return response()->json([
             'success' => true,
             'data' => [
-                'tematica' => [
-                    'id' => $tematica->id,
-                    'nombre' => $tematica->nombre,
-                    'eje_id' => $tematica->eje_id,
-                    'es_oficial' => $tematica->esOficial(),
+                'tematica' => $this->curriculo->serializarTematicaParaExperiencias($tematica, [
                     'es_propia' => $tematica->esDeInstitucion($institucionId),
-                ],
+                    'puede_editar' => $puedeEditar,
+                    'puede_crear_experiencia' => $puedeEditar && $tematica->activo,
+                ]),
                 'experiencias' => $this->curriculo->serializarColeccionExperiencias(
                     $experiencias,
                     $this->opcionesSerializarExperiencia($institucionId)

@@ -48,7 +48,7 @@ class EjesSuperAdminController extends Controller
                 $ambiente->ejes_activos_count = $activos;
             });
 
-        return view('superAdmin.configuracion.ejes.index', compact('ambientes'));
+        return view('superAdmin.catalogo.ejes.index', compact('ambientes'));
     }
 
     /**

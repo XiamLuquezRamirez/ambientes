@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Modulo;
+use App\Services\CatalogoInstitucionAdminService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -12,6 +13,13 @@ use Illuminate\Validation\Rule;
 
 class ModulosAdminController extends Controller
 {
+    public function listar(CatalogoInstitucionAdminService $catalogo)
+    {
+        $ambientesModulos = $catalogo->ambientesConModulos($this->institucionId());
+
+        return view('admin.catalogo.modulos.index', compact('ambientesModulos'));
+    }
+
     public function mostrar(Modulo $modulo)
     {
         $this->asegurarModuloPropio($modulo);

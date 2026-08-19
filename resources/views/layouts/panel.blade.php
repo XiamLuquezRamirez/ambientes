@@ -60,6 +60,8 @@
                         'panel.catalogo.modulos',
                         'panel.catalogo.ejes',
                         'panel.catalogo.tematicas',
+                        'panel.catalogo.experiencias',
+                        'panel.catalogo.experiencias.*',
                         'panel.ejes.*',
                         'panel.tematicas.*',
                         'panel.experiencias.*',
@@ -100,9 +102,16 @@
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('panel.catalogo.tematicas') }}"
-                                    class="{{ request()->routeIs('panel.catalogo.tematicas', 'panel.tematicas.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                                    class="{{ request()->routeIs('panel.catalogo.tematicas', 'panel.tematicas.*') && !request()->routeIs('panel.catalogo.experiencias.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
                                     style="padding-left:42px;font-size:.85rem">
                                     <i class="fa-solid fa-layer-group"></i> Temáticas
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('panel.catalogo.experiencias.index') }}"
+                                    class="{{ request()->routeIs('panel.catalogo.experiencias.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                                    style="padding-left:42px;font-size:.85rem">
+                                    <i class="fa-solid fa-book-open-reader"></i> Experiencias
                                 </a>
                             </li>
                         </ul>

@@ -26,11 +26,11 @@
     @endphp
 
     <div class="config-sistema config-sa-ejes config-admin-ejes"
-        data-url-ejes-template="{{ url('superadmin/configuracion/modulos/__MODULO__/ejes') }}"
-        data-url-ejes-show-template="{{ url('superadmin/configuracion/ejes/__EJE__') }}"
-        data-url-ejes-update-template="{{ url('superadmin/configuracion/ejes/__EJE__') }}"
-        data-url-ejes-mover-template="{{ url('superadmin/configuracion/ejes/__EJE__/mover') }}"
-        data-url-ejes-estado-template="{{ url('superadmin/configuracion/ejes/__EJE__/estado') }}">
+        data-url-ejes-template="{{ url('superadmin/catalogo/modulos/__MODULO__/ejes') }}"
+        data-url-ejes-show-template="{{ url('superadmin/catalogo/ejes/__EJE__') }}"
+        data-url-ejes-update-template="{{ url('superadmin/catalogo/ejes/__EJE__') }}"
+        data-url-ejes-mover-template="{{ url('superadmin/catalogo/ejes/__EJE__/mover') }}"
+        data-url-ejes-estado-template="{{ url('superadmin/catalogo/ejes/__EJE__/estado') }}">
         <p class="text-muted small mb-3">
             Gestiona los ejes <span class="star">⭐ Oficiales</span> del catálogo PedNia por ambiente y módulo.
             Puedes crear, editar, reordenar y activar/desactivar.
@@ -86,7 +86,7 @@
                                                 <thead>{!! $theadEjes !!}</thead>
                                                 <tbody data-tbody-ejes>
                                                     @foreach ($ejes as $eje)
-                                                        @include('superAdmin.configuracion.ejes._filaEje', [
+                                                        @include('superAdmin.catalogo.ejes._filaEje', [
                                                             'eje' => $eje,
                                                         ])
                                                     @endforeach
@@ -120,10 +120,10 @@
         @endforelse
     </div>
 
-    @include('superAdmin.configuracion.ejes.modalCrearEjes')
+    @include('superAdmin.catalogo.ejes.modalCrearEjes')
 @endsection
 
 @push('scripts')
     <script src="{{ asset('assets/js/configuracion-ejes-ui.js') }}"></script>
-    <script src="{{ asset('assets/js/superAdmin/configuracion.js') }}"></script>
+    <script src="{{ asset('assets/js/superAdmin/catalogo-modulos-ejes.js') }}"></script>
 @endpush

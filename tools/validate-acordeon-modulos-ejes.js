@@ -6,8 +6,8 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const uiPath = path.join(root, 'public/assets/js/configuracion-ejes-ui.js');
-const adminPath = path.join(root, 'public/assets/js/admin/configuracion-modulos.js');
-const saPath = path.join(root, 'public/assets/js/superAdmin/configuracion.js');
+const adminPath = path.join(root, 'public/assets/js/admin/catalogo-modulos-ejes.js');
+const saPath = path.join(root, 'public/assets/js/superAdmin/catalogo-modulos-ejes.js');
 
 const ui = fs.readFileSync(uiPath, 'utf8');
 const admin = fs.readFileSync(adminPath, 'utf8');
@@ -29,19 +29,19 @@ if (!ui.includes("container.addEventListener('click'")) {
 const duplicateAmbBind =
     /querySelectorAll\('\[data-amb-toggle\]'\)\.forEach\(\(head\)\s*=>\s*\{\s*head\.addEventListener\('click'/;
 if (duplicateAmbBind.test(admin)) {
-    errors.push('configuracion-modulos.js: aún registra listeners directos en [data-amb-toggle]');
+    errors.push('admin/catalogo-modulos-ejes.js: aún registra listeners directos en [data-amb-toggle]');
 }
 if (duplicateAmbBind.test(sa)) {
-    errors.push('superAdmin/configuracion.js: aún registra listeners directos en [data-amb-toggle]');
+    errors.push('superAdmin/catalogo-modulos-ejes.js: aún registra listeners directos en [data-amb-toggle]');
 }
 
 const bladePaths = [
     'resources/views/panel/catalogo/modulos/_modulos.blade.php',
     'resources/views/panel/catalogo/ejes/_ejes.blade.php',
-    'resources/views/admin/configuracion/institucion/_modulos.blade.php',
-    'resources/views/admin/configuracion/institucion/_ejes.blade.php',
-    'resources/views/superAdmin/configuracion/modulos/index.blade.php',
-    'resources/views/superAdmin/configuracion/ejes/index.blade.php',
+    'resources/views/admin/catalogo/modulos/_modulos.blade.php',
+    'resources/views/admin/catalogo/ejes/_ejes.blade.php',
+    'resources/views/superAdmin/catalogo/modulos/index.blade.php',
+    'resources/views/superAdmin/catalogo/ejes/index.blade.php',
 ];
 
 bladePaths.forEach((rel) => {

@@ -7,9 +7,11 @@
 
 .tematicas-page-header,
 .tematicas-app,
+.experiencias-app,
 #modalTematica,
 #modalSelectorDba,
-#modalExperienciaRapida {
+#modalExperienciaRapida,
+#modalSeleccionTematicaExp {
     --tm-text: var(--color-text, #1E293B);
     --tm-ink: #0F172A;
     --tm-soft: var(--color-text-soft, #334155);
@@ -54,6 +56,11 @@
     --tm-focus: var(--focus-ring, 0 0 0 3px rgba(37, 99, 235, .12));
 }
 
+.c-card.config-sistema.tematicas-app,
+.c-card.config-sistema.experiencias-app {
+    padding: 20px;
+}
+
 .tematicas-page-header {
     display: flex;
     justify-content: space-between;
@@ -69,6 +76,7 @@
 
 /* ── Tokens compartidos (star / colegio / empty / pager) ─────── */
 .tematicas-app .star,
+.experiencias-app .star,
 #modalTematica .star {
     font-size: 11px;
     background: var(--tm-star-bg);
@@ -84,6 +92,7 @@
 }
 
 .tematicas-app .badge-colegio,
+.experiencias-app .badge-colegio,
 #modalTematica .badge-colegio {
     font-size: 11px;
     background: var(--tm-colegio-bg);
@@ -98,7 +107,9 @@
 }
 
 .tematicas-app .cfg-empty,
-.tematicas-app .tematicas-empty {
+.tematicas-app .tematicas-empty,
+.experiencias-app .cfg-empty,
+.experiencias-app .experiencias-empty {
     padding: 28px 18px;
     text-align: center;
     color: var(--tm-muted);
@@ -108,7 +119,8 @@
     border-radius: var(--tm-radius-card);
 }
 
-.tematicas-app .cfg-pager {
+.tematicas-app .cfg-pager,
+.experiencias-app .cfg-pager {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -121,16 +133,19 @@
     border-radius: var(--tm-radius-md);
 }
 
-.tematicas-app .cfg-pager[hidden] {
+.tematicas-app .cfg-pager[hidden],
+.experiencias-app .cfg-pager[hidden] {
     display: none !important;
 }
 
-.tematicas-app .cfg-pager-info {
+.tematicas-app .cfg-pager-info,
+.experiencias-app .cfg-pager-info {
     font-size: 12px;
     color: var(--tm-muted);
 }
 
-.tematicas-app .cfg-pager-btn {
+.tematicas-app .cfg-pager-btn,
+.experiencias-app .cfg-pager-btn {
     appearance: none;
     border: 1px solid var(--tm-border);
     background: var(--tm-surface);
@@ -142,11 +157,13 @@
     cursor: pointer;
 }
 
-.tematicas-app .cfg-pager-btn:hover:not(:disabled) {
+.tematicas-app .cfg-pager-btn:hover:not(:disabled),
+.experiencias-app .cfg-pager-btn:hover:not(:disabled) {
     background: var(--tm-surface-soft);
 }
 
-.tematicas-app .cfg-pager-btn:disabled {
+.tematicas-app .cfg-pager-btn:disabled,
+.experiencias-app .cfg-pager-btn:disabled {
     opacity: .45;
     cursor: not-allowed;
 }
@@ -451,6 +468,8 @@
 /* Badges de estado (ganan a .badge genérico de index.css) */
 .tematicas-app .badge.badge-estado-activo,
 .tematicas-app .badge-estado-activo,
+.experiencias-app .badge.badge-estado-activo,
+.experiencias-app .badge-estado-activo,
 #modalTematica .badge.badge-estado-activo {
     background: var(--tm-success-soft) !important;
     color: var(--tm-success-fg) !important;
@@ -458,12 +477,15 @@
 
 .tematicas-app .badge.badge-estado-inactivo,
 .tematicas-app .badge-estado-inactivo,
+.experiencias-app .badge.badge-estado-inactivo,
+.experiencias-app .badge-estado-inactivo,
 #modalTematica .badge.badge-estado-inactivo {
     background: var(--tm-danger-bg) !important;
     color: var(--tm-danger-fg) !important;
 }
 
 .tematicas-app .badge-estado-exp,
+.experiencias-app .badge-estado-exp,
 #modalTematica .badge-estado-exp {
     display: inline-flex;
     align-items: center;
@@ -476,18 +498,21 @@
 }
 
 .tematicas-app .badge-estado-exp.es-activa,
+.experiencias-app .badge-estado-exp.es-activa,
 #modalTematica .badge-estado-exp.es-activa {
     background: var(--tm-success-soft);
     color: var(--tm-success-fg);
 }
 
 .tematicas-app .badge-estado-exp.es-archivada,
+.experiencias-app .badge-estado-exp.es-archivada,
 #modalTematica .badge-estado-exp.es-archivada {
     background: var(--tm-chip);
     color: var(--tm-muted);
 }
 
 .tematicas-app .badge-estado-exp.es-borrador,
+.experiencias-app .badge-estado-exp.es-borrador,
 #modalTematica .badge-estado-exp.es-borrador {
     background: var(--tm-warn-bg);
     color: var(--tm-warn-fg);
@@ -537,7 +562,9 @@
 #modalTematica.is-readonly #btnGuardarTematica,
 #modalTematica.is-readonly #btnAgregarIndicador,
 #modalTematica.is-readonly #btnAgregarDba,
-#modalTematica.is-readonly #btnCrearExperienciaDesdeTematica {
+#modalTematica.is-readonly #btnCrearExperienciaDesdeTematica,
+#modalExperienciaRapida.is-readonly #btnGuardarExperienciaRapida,
+#modalExperienciaRapida.is-readonly #btnAgregarMaterialExp {
     display: none !important;
 }
 
@@ -744,12 +771,180 @@
 
 .tematica-card-actions {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: 4px;
+    justify-content: space-between;
+    gap: 8px;
     padding: 8px 10px;
     border-top: 1px solid var(--tm-chip);
     background: var(--tm-card-foot);
+    overflow: visible;
+    position: relative;
+}
+
+.tematica-card:has(.catalogo-card-opciones .show) {
+    overflow: visible;
+    z-index: 12;
+}
+
+/* ── Dropdown acciones en footer de cards (patrón tabla-opciones / student-options) ── */
+.tematica-card-actions .catalogo-card-opciones {
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.catalogo-card-opciones-btn {
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid var(--tm-border);
+    border-radius: 8px;
+    padding: 0;
+    cursor: pointer;
+    color: var(--tm-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .9rem;
+    line-height: 1;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.catalogo-card-opciones-btn:hover,
+.catalogo-card-opciones-btn.show,
+.catalogo-card-opciones-btn:focus-visible {
+    background: var(--tm-primary-soft);
+    border-color: var(--tm-primary-border);
+    color: var(--tm-primary-tab);
+    outline: none;
+    box-shadow: var(--tm-focus);
+}
+
+.tematica-card-actions .catalogo-card-opciones .dropdown-menu-acciones {
+    min-width: 220px;
+    z-index: 1050;
+}
+
+.tematicas-app .btn-gestionar-exp,
+.experiencias-app .btn-gestionar-exp {
+    background: var(--tm-success-bg);
+    border-color: var(--tm-success-mid);
+    color: var(--tm-success-fg);
+}
+
+.tematicas-app .btn-gestionar-exp:hover,
+.experiencias-app .btn-gestionar-exp:hover {
+    background: var(--tm-success);
+    border-color: var(--tm-success);
+    color: var(--tm-surface);
+}
+
+.tematicas-app .btn-publicar-exp,
+.experiencias-app .btn-publicar-exp {
+    background: var(--tm-success-bg);
+    border-color: var(--tm-success-mid);
+    color: var(--tm-success-fg);
+}
+
+.tematicas-app .btn-publicar-exp:hover,
+.experiencias-app .btn-publicar-exp:hover {
+    background: var(--tm-success);
+    border-color: var(--tm-success);
+    color: var(--tm-surface);
+}
+
+.tematicas-app .btn-despublicar-exp,
+.experiencias-app .btn-despublicar-exp {
+    background: var(--tm-orange-bg);
+    border-color: var(--tm-orange-border);
+    color: var(--tm-orange-fg);
+}
+
+.tematicas-app .btn-despublicar-exp:hover,
+.experiencias-app .btn-despublicar-exp:hover {
+    background: var(--tm-orange-hover);
+    border-color: var(--tm-orange-hover);
+    color: var(--tm-surface);
+}
+
+/* ── Vista catálogo experiencias ─────────────────────────────── */
+.experiencias-listado-wrap {
+    width: 100%;
+}
+
+.experiencias-listado[hidden],
+.experiencias-empty[hidden] {
+    display: none !important;
+}
+
+.exp-contexto-tematica {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    border: 1px solid var(--tm-border);
+    border-radius: var(--tm-radius-card);
+    background: var(--tm-card-foot);
+}
+
+.exp-contexto-tematica-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+}
+
+.exp-contexto-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tm-success-bg);
+    color: var(--tm-success-icon);
+    flex-shrink: 0;
+}
+
+.exp-contexto-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--tm-muted);
+    font-weight: 700;
+}
+
+.exp-contexto-nombre {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--tm-ink);
+    line-height: 1.25;
+}
+
+.exp-contexto-ruta {
+    font-size: .78rem;
+    color: var(--tm-label);
+}
+
+.experiencia-card-icon {
+    background: var(--tm-success-bg);
+    color: var(--tm-success-icon);
+}
+
+.experiencia-card.tematica-card--oficial .experiencia-card-icon {
+    background: rgba(234, 179, 8, 0.15);
+    color: #ca8a04;
+}
+
+.experiencia-card.tematica-card--colegio .experiencia-card-icon {
+    background: var(--tm-success-bg);
+    color: var(--tm-success-icon);
+}
+
+#modalSeleccionTematicaExp .form-select:disabled {
+    opacity: .65;
 }
 
 .tematica-card-actions .btn-accion {
@@ -801,6 +996,200 @@
     .tematicas-materiales-lista .material-item-toggle {
         min-width: 0;
     }
+}
+
+/* ── Wizard selección temática (experiencias) ───────────────── */
+#modalSeleccionTematicaExp .exp-wizard-meta {
+    margin-bottom: 4px;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-paso-label {
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--tm-muted);
+}
+
+#modalSeleccionTematicaExp .exp-wizard-instruction {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--tm-ink);
+}
+
+#modalSeleccionTematicaExp .exp-wizard-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-crumb {
+    appearance: none;
+    border: none;
+    background: var(--tm-primary-soft);
+    color: var(--tm-primary-hover);
+    font-size: .78rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 99px;
+    cursor: pointer;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-crumb:hover,
+#modalSeleccionTematicaExp .exp-wizard-crumb:focus-visible {
+    background: var(--tm-primary-mid);
+    outline: none;
+    box-shadow: var(--tm-focus);
+}
+
+#modalSeleccionTematicaExp .exp-wizard-crumb-sep {
+    color: var(--tm-muted-light);
+    font-size: .85rem;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-loading,
+#modalSeleccionTematicaExp .exp-wizard-empty {
+    margin-top: 8px;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-card {
+    height: 100%;
+    background: var(--tm-surface);
+    border: 1px solid var(--tm-border);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-card:hover,
+#modalSeleccionTematicaExp .exp-wizard-card:focus-visible {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+    border-color: #93C5FD;
+    outline: none;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-ambiente-franja {
+    height: 6px;
+    border-radius: 14px 14px 0 0;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-ambiente-body {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 18px 0;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-ambiente-icono {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-ambiente-info {
+    flex: 1;
+    min-width: 0;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-ambiente-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 18px 16px;
+    align-items: center;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-stat {
+    white-space: nowrap;
+    flex: 1;
+    text-align: center;
+    font-size: .78rem;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 99px;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-stat-azul {
+    background: #EFF6FF;
+    color: #1D4ED8;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-stat-verde {
+    background: #F0FDF4;
+    color: #166534;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-item-card {
+    padding: 16px;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-item-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-item-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tm-primary-soft);
+    color: var(--tm-primary-hover);
+    flex-shrink: 0;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-card-title {
+    font-size: .98rem;
+    font-weight: 700;
+    color: var(--tm-ink);
+    line-height: 1.25;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-card-meta {
+    font-size: .78rem;
+    color: var(--tm-muted);
+}
+
+#modalSeleccionTematicaExp .exp-wizard-card-arrow {
+    color: var(--tm-muted-light);
+    margin-top: 4px;
+    flex-shrink: 0;
+    transition: transform .2s ease, color .2s ease;
+}
+
+#modalSeleccionTematicaExp .exp-wizard-card:hover .exp-wizard-card-arrow,
+#modalSeleccionTematicaExp .exp-wizard-card:focus-visible .exp-wizard-card-arrow {
+    transform: translateX(3px);
+    color: var(--tm-primary-hover);
+}
+
+.experiencias-empty .experiencias-empty-text {
+    margin: 0;
+    color: var(--tm-muted);
 }
 
 @media (prefers-reduced-motion: reduce) {

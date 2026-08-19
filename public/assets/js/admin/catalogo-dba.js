@@ -9,7 +9,7 @@
  *  - jQuery ($)
  *  - bootstrap, SweetAlert2 (Swal)
  *
- * Configuración: #catalogoDBAApp[data-url-base|data-url-api|data-url-guardar|data-url-detalle-base|data-solo-colegio]
+ * Configuración: #catalogoDBAApp[data-url-base|data-url-api|data-url-guardar|data-url-detalle-base]
  *
  * Cambios documentados (refactor):
  *  1) JS extraído desde el blade (~500 líneas) para mantenibilidad.
@@ -17,7 +17,6 @@
  *     manteniendo filtros y cambiando a la pestaña «colegio».
  *  3) Filtro/columna «Origen» eliminados: las pestañas ya diferencian MEN/colegio.
  *  4) Badges/botones usan clases propias (ver catalogo-dba.css).
- *  5) Misma vista en Catálogo y Config › Catálogo DBA (data-solo-colegio=1 oculta MEN).
  * ---------------------------------------------------------------------------
  */
 
@@ -31,13 +30,12 @@
     const URL_CATALOGO_DBA_BASE = app.dataset.urlApi;
     const URL_CATALOGO_DBA_GUARDAR = app.dataset.urlGuardar;
     const URL_DETALLE_BASE = app.dataset.urlDetalleBase || URL_CATALOGO_BASE;
-    const SOLO_COLEGIO = app.dataset.soloColegio === '1';
 
     /** 1 = crear, 2 = editar */
     let tipoPost = 1;
     let id_editar = '';
     /** Tab activa: men | colegio */
-    let tabActiva = SOLO_COLEGIO ? 'colegio' : 'men';
+    let tabActiva = 'men';
     let debounceTimer;
 
     const modalCrearCatalogoDBA = document.getElementById('modalCrearCatalogoDBA');
@@ -56,13 +54,11 @@
     }
 
     function sincronizarTabCatalogo(tab) {
-        tabActiva = SOLO_COLEGIO ? 'colegio' : tab === 'colegio' ? 'colegio' : 'men';
+        tabActiva = tab === 'colegio' ? 'colegio' : 'men';
         const btnNuevo = document.getElementById('btnNuevoDbaColegio');
         if (btnNuevo) {
             btnNuevo.classList.toggle('is-visible', tabActiva === 'colegio');
         }
-
-        if (SOLO_COLEGIO) return;
 
         const tabMen = document.getElementById('tab-dba-men');
         const tabColegio = document.getElementById('tab-dba-colegio');

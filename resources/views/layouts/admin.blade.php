@@ -86,8 +86,8 @@
                 $catalogo = request()->routeIs(
                     'admin.catalogo',
                     'admin.catalogo.*',
-                    'admin.tematicas.*',
-                    'admin.ejes.tematicas',
+                    'admin.modulos.*',
+                    'admin.ejes.*',
                     'admin.experiencias.*',
                 );
             @endphp
@@ -103,16 +103,37 @@
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
                             <a href="{{ route('admin.catalogo') }}"
-                                class="{{ request()->routeIs('admin.catalogo') || request()->routeIs('admin.catalogo.detalle') ? 'active nav-link' : 'nav-link' }}"
+                                class="{{ request()->routeIs('admin.catalogo', 'admin.catalogo.detalle', 'admin.catalogo.dba.*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-book-open"></i> DBA
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.tematicas.index') }}"
-                                class="{{ request()->routeIs('admin.tematicas.*', 'admin.ejes.tematicas', 'admin.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                            <a href="{{ route('admin.catalogo.modulos') }}"
+                                class="{{ request()->routeIs('admin.catalogo.modulos', 'admin.modulos.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-cube"></i> Módulos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.catalogo.ejes') }}"
+                                class="{{ request()->routeIs('admin.catalogo.ejes', 'admin.ejes.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-diagram-project"></i> Ejes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.catalogo.tematicas.index') }}"
+                                class="{{ request()->routeIs('admin.catalogo.tematicas.*', 'admin.ejes.tematicas') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-layer-group"></i> Temáticas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.catalogo.experiencias.index') }}"
+                                class="{{ request()->routeIs('admin.catalogo.experiencias.*', 'admin.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-book-open-reader"></i> Experiencias
                             </a>
                         </li>
                     </ul>
@@ -131,7 +152,15 @@
                 </a>
             </li>
             @php
-                $configuracion = request()->routeIs('admin.configuracion*');
+                $configuracion = request()->routeIs(
+                    'admin.configuracion',
+                    'admin.configuracion.update',
+                    'admin.configuracion.logo',
+                    'admin.configuracion.datos',
+                    'admin.configuracion.cargar-municipios',
+                    'admin.configuracion.perfil-aprendizaje*',
+                    'admin.configuracion.perfil-aprendizaje-personalizado*',
+                );
             @endphp
             <li class="nav-item">
                 <a href="#navConfiguracion" data-bs-toggle="collapse"
@@ -146,16 +175,9 @@
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
                             <a href="{{ route('admin.configuracion') }}"
-                                class="{{ request()->routeIs('admin.configuracion') ? 'active nav-link' : 'nav-link' }}"
+                                class="{{ request()->routeIs('admin.configuracion', 'admin.configuracion.update', 'admin.configuracion.logo', 'admin.configuracion.datos', 'admin.configuracion.cargar-municipios') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-school"></i> Institución
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.configuracion.catalogo-dba.listar') }}"
-                                class="{{ request()->routeIs('admin.configuracion.catalogo-dba.*') ? 'active nav-link' : 'nav-link' }}"
-                                style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-book-open"></i> Catálogo DBA
                             </a>
                         </li>
                         <li class="nav-item">

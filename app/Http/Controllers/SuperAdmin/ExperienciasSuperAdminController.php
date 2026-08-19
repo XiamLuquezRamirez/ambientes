@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ambiente;
 use App\Models\Experiencia;
+use App\Models\Grado;
 use App\Models\Tematica;
 use App\Services\TematicaCurriculoService;
 use Illuminate\Http\Request;
@@ -16,24 +18,41 @@ class ExperienciasSuperAdminController extends Controller
         private TematicaCurriculoService $curriculo,
     ) {}
 
+    public function index()
+    {
+        $ambientes = Ambiente::query()
+            ->with([
+                'modulosOficiales' => fn ($q) => $q
+                    ->where('activo', true)
+                    ->with([
+                        'ejesOficiales' => fn ($eq) => $eq->where('activo', true)->orderBy('orden'),
+                    ])
+                    ->orderBy('orden'),
+            ])
+            ->orderBy('nombre')
+            ->get();
+
+        $grados = Grado::activos()->get(['id', 'nombre']);
+
+        return view('superAdmin.catalogo.experiencias.index', compact('ambientes', 'grados'));
+    }
+
     public function listarPorTematica(Tematica $tematica)
     {
         $experiencias = $this->curriculo
             ->consultaExperienciasDeTematica($tematica)
             ->get();
 
+        $puedeEditar = $tematica->puedeGestionarComoSuperAdmin($this->usuarioId());
+
         return response()->json([
             'success' => true,
             'data' => [
-                'tematica' => [
-                    'id' => $tematica->id,
-                    'nombre' => $tematica->nombre,
-                    'eje_id' => $tematica->eje_id,
-                    'es_oficial' => $tematica->esOficial(),
+                'tematica' => $this->curriculo->serializarTematicaParaExperiencias($tematica, [
                     'creado_por' => (int) $tematica->creado_por,
-                    'puede_editar' => $tematica->puedeGestionarComoSuperAdmin($this->usuarioId()),
-                    'activo' => (bool) $tematica->activo,
-                ],
+                    'puede_editar' => $puedeEditar,
+                    'puede_crear_experiencia' => $puedeEditar && $tematica->activo,
+                ]),
                 'experiencias' => $this->curriculo->serializarColeccionExperiencias(
                     $experiencias,
                     $this->opcionesSerializarExperiencia()
