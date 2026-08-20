@@ -30,6 +30,7 @@
         data-url-experiencias-actualizar-template="{{ url('admin/catalogo/experiencias/__EXPERIENCIA__') }}"
         data-url-experiencias-flujo-template="{{ url('admin/catalogo/experiencias/__EXPERIENCIA__/flujo') }}"
         data-url-experiencias-estado-template="{{ url('admin/catalogo/experiencias/__EXPERIENCIA__/estado') }}"
+        data-url-experiencias-constructor-template="{{ url('admin/catalogo/experiencias/__EXPERIENCIA__/constructor') }}"
         data-url-experiencias-index="{{ route('admin.catalogo.experiencias.index') }}">
 
         @include('partials.tematicas._filtros')

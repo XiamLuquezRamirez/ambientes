@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Experiencia;
 use App\Models\Institucion;
 use App\Models\Tematica;
+use App\Services\BloqueExperienciaService;
 use App\Services\TematicaCurriculoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,7 @@ class ExperienciasPanelController extends Controller
 {
     public function __construct(
         private TematicaCurriculoService $curriculo,
+        private BloqueExperienciaService $bloques,
     ) {}
 
     public function listarPorTematica(Tematica $tematica)
@@ -78,12 +80,54 @@ class ExperienciasPanelController extends Controller
         ]);
     }
 
+    public function constructor(Experiencia $experiencia)
+    {
+        $institucionId = $this->institucionId();
+        $this->asegurarExperienciaVisible($experiencia, $institucionId);
+
+        $experiencia = $this->curriculo->cargarExperiencia($experiencia);
+        $userId = $this->usuarioId();
+        $puedeEditar = $experiencia->puedeGestionarComoDocente($institucionId, $userId);
+        $puedePublicar = $puedeEditar;
+        $volverUrl = route('panel.catalogo.experiencias.index', [
+            'tematica' => $experiencia->tematica_id,
+        ]);
+
+        $bloques = $puedeEditar
+            ? $this->bloques->asegurarObligatorios($experiencia)
+            : $this->bloques->listar($experiencia);
+        $catalogo = $this->bloques->registry()->catalogo();
+        $constructorUrls = [
+            'listar' => route('panel.experiencias.bloques.index', $experiencia),
+            'guardar' => route('panel.experiencias.bloques.guardar', $experiencia),
+            'reordenar' => route('panel.experiencias.bloques.reordenar', $experiencia),
+            'limpiar' => route('panel.experiencias.bloques.limpiar', $experiencia),
+            'upload' => route('panel.experiencias.bloques.upload', $experiencia),
+            'publicar' => route('panel.experiencias.publicar', $experiencia),
+            'actualizar_template' => route('panel.bloques.actualizar', ['bloque' => '__BLOQUE__']),
+            'eliminar_template' => route('panel.bloques.eliminar', ['bloque' => '__BLOQUE__']),
+        ];
+
+        return view('panel.catalogo.experiencias.constructor', compact(
+            'experiencia',
+            'puedeEditar',
+            'puedePublicar',
+            'volverUrl',
+            'bloques',
+            'catalogo',
+            'constructorUrls'
+        ));
+    }
+
     public function actualizar(Request $request, Experiencia $experiencia)
     {
         $institucionId = $this->institucionId();
         $this->asegurarExperienciaGestionable($experiencia, $institucionId);
 
         $datos = $this->validarExperiencia($request, $experiencia->tematica_id, $experiencia->id);
+        if (! $experiencia->puedeCambiarEstadoComoDocente($institucionId, $this->usuarioId())) {
+            unset($datos['estado']);
+        }
         $experiencia = $this->curriculo->actualizarExperiencia($experiencia, $datos);
 
         return response()->json([
@@ -100,6 +144,7 @@ class ExperienciasPanelController extends Controller
     {
         $institucionId = $this->institucionId();
         $this->asegurarExperienciaGestionable($experiencia, $institucionId);
+        $this->asegurarPuedeCambiarEstado($experiencia, $institucionId);
 
         $experiencia = $this->curriculo->toggleActivoExperiencia($experiencia);
 
@@ -116,6 +161,7 @@ class ExperienciasPanelController extends Controller
     {
         $institucionId = $this->institucionId();
         $this->asegurarExperienciaGestionable($experiencia, $institucionId);
+        $this->asegurarPuedeCambiarEstado($experiencia, $institucionId);
 
         $datos = $request->validate([
             'estado' => ['required', Rule::in(Experiencia::ESTADOS)],
@@ -221,7 +267,7 @@ class ExperienciasPanelController extends Controller
         $tematica = $experiencia->tematica;
 
         if (! $experiencia->puedeGestionarComoDocente($institucionId, $this->usuarioId())) {
-            abort(403, 'Solo puede editar experiencias que usted creó o las de temáticas que usted creó.');
+            abort(403, 'Solo puede editar experiencias que usted creó.');
         }
 
         if (! $tematica->activo) {
@@ -235,6 +281,13 @@ class ExperienciasPanelController extends Controller
         $this->asegurarAmbienteAsignadoAlDocente($tematica->eje->modulo->ambiente_id, $institucionId);
     }
 
+    private function asegurarPuedeCambiarEstado(Experiencia $experiencia, int $institucionId): void
+    {
+        if (! $experiencia->puedeCambiarEstadoComoDocente($institucionId, $this->usuarioId())) {
+            abort(403, 'Solo puede cambiar el estado de experiencias que usted creó.');
+        }
+    }
+
     private function opcionesSerializarExperiencia(?int $institucionId = null): array
     {
         $institucionId = $institucionId ?: $this->institucionId();
@@ -242,6 +295,7 @@ class ExperienciasPanelController extends Controller
 
         return [
             'resolver_puede_editar' => fn (Experiencia $e) => $e->puedeGestionarComoDocente($institucionId, $userId),
+            'resolver_puede_cambiar_estado' => fn (Experiencia $e) => $e->puedeCambiarEstadoComoDocente($institucionId, $userId),
         ];
     }
 

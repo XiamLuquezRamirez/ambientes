@@ -3042,7 +3042,206 @@ CREATE TABLE `versiones_tematica` (
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `versiones_tematica` */
+DROP TABLE IF EXISTS `bloques_experiencia`;
+
+/*Table structure for table `bloques_experiencia` */
+CREATE TABLE `bloques_experiencia` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `experiencia_id` BIGINT UNSIGNED NOT NULL,
+    `tipo` ENUM(
+        'bienvenida',
+        'audio',
+        'video',
+        'imagen',
+        'historia',
+        'ra',
+        'evidencia',
+        'juego',
+        'dibujo',
+        'pregunta',
+        'emparejar',
+        'clasificacion',
+        'arrastrar',
+        'reto',
+        'emocion',
+        'recompensa'
+    ) NOT NULL,
+    `orden` TINYINT UNSIGNED NOT NULL,
+    `datos` JSON NOT NULL,
+    `activo` BOOLEAN NOT NULL DEFAULT TRUE,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    UNIQUE KEY `bloques_experiencia_experiencia_orden_unique`
+        (`experiencia_id`, `orden`),
+
+    KEY `bloques_experiencia_experiencia_id_index`
+        (`experiencia_id`),
+
+    KEY `bloques_experiencia_tipo_index`
+        (`tipo`),
+
+    CONSTRAINT `bloques_experiencia_experiencia_id_foreign`
+        FOREIGN KEY (`experiencia_id`)
+        REFERENCES `experiencias` (`id`)
+        ON DELETE CASCADE
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `sesiones_experiencia`;
+
+/*Table structure for table `sesiones_experiencia` */
+CREATE TABLE `sesiones_experiencia` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `experiencia_id` BIGINT UNSIGNED NOT NULL,
+    `estudiante_id` BIGINT UNSIGNED NOT NULL,
+    `iniciada_en` TIMESTAMP NOT NULL,
+    `finalizada_en` TIMESTAMP NULL DEFAULT NULL,
+    `duracion_real_segundos` INT UNSIGNED NULL DEFAULT NULL,
+    `completada` BOOLEAN NOT NULL DEFAULT FALSE,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    KEY `sesiones_experiencia_experiencia_estudiante_index`
+        (`experiencia_id`, `estudiante_id`),
+
+    KEY `sesiones_experiencia_estudiante_iniciada_index`
+        (`estudiante_id`, `iniciada_en`),
+
+    KEY `sesiones_experiencia_completada_index`
+        (`completada`),
+
+    CONSTRAINT `sesiones_experiencia_experiencia_id_foreign`
+        FOREIGN KEY (`experiencia_id`)
+        REFERENCES `experiencias` (`id`)
+        ON DELETE RESTRICT,
+
+    CONSTRAINT `sesiones_experiencia_estudiante_id_foreign`
+        FOREIGN KEY (`estudiante_id`)
+        REFERENCES `estudiantes` (`id`)
+        ON DELETE RESTRICT
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `resultados_bloque`;
+
+/*Table structure for table `resultados_bloque` */
+CREATE TABLE `resultados_bloque` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `sesion_id` BIGINT UNSIGNED NOT NULL,
+    `bloque_id` BIGINT UNSIGNED NOT NULL,
+    `estudiante_id` BIGINT UNSIGNED NOT NULL,
+    `correcto` BOOLEAN NOT NULL,
+    `intentos` TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    `tiempo_segundos` SMALLINT UNSIGNED NULL DEFAULT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+
+    KEY `resultados_bloque_bloque_estudiante_index`
+        (`bloque_id`, `estudiante_id`),
+
+    KEY `resultados_bloque_sesion_index`
+        (`sesion_id`),
+
+    KEY `resultados_bloque_correcto_index`
+        (`correcto`),
+
+    CONSTRAINT `resultados_bloque_sesion_id_foreign`
+        FOREIGN KEY (`sesion_id`)
+        REFERENCES `sesiones_experiencia` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `resultados_bloque_bloque_id_foreign`
+        FOREIGN KEY (`bloque_id`)
+        REFERENCES `bloques_experiencia` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `resultados_bloque_estudiante_id_foreign`
+        FOREIGN KEY (`estudiante_id`)
+        REFERENCES `estudiantes` (`id`)
+        ON DELETE RESTRICT
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `participaciones_bloque`;
+
+/*Table structure for table `participaciones_bloque` */
+CREATE TABLE `participaciones_bloque` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `sesion_id` BIGINT UNSIGNED NOT NULL,
+    `bloque_id` BIGINT UNSIGNED NOT NULL,
+    `estudiante_id` BIGINT UNSIGNED NOT NULL,
+    `tipo` VARCHAR(30) NOT NULL,
+    `archivo_path` VARCHAR(255) NULL DEFAULT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `participaciones_bloque_bloque_estudiante_index`
+        (`bloque_id`, `estudiante_id`),
+    KEY `participaciones_bloque_sesion_index`
+        (`sesion_id`),
+    CONSTRAINT `participaciones_bloque_sesion_id_foreign`
+        FOREIGN KEY (`sesion_id`)
+        REFERENCES `sesiones_experiencia` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `participaciones_bloque_bloque_id_foreign`
+        FOREIGN KEY (`bloque_id`)
+        REFERENCES `bloques_experiencia` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `participaciones_bloque_estudiante_id_foreign`
+        FOREIGN KEY (`estudiante_id`)
+        REFERENCES `estudiantes` (`id`)
+        ON DELETE RESTRICT
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `emociones_sesion`;
+
+/*Table structure for table `emociones_sesion` */
+CREATE TABLE `emociones_sesion` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `sesion_id` BIGINT UNSIGNED NOT NULL,
+    `bloque_id` BIGINT UNSIGNED NOT NULL,
+    `estudiante_id` BIGINT UNSIGNED NOT NULL,
+    `emocion` VARCHAR(30) NOT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `emociones_sesion_sesion_id_unique`
+        (`sesion_id`),
+    KEY `emociones_sesion_estudiante_created_index`
+        (`estudiante_id`, `created_at`),
+    CONSTRAINT `emociones_sesion_sesion_id_foreign`
+        FOREIGN KEY (`sesion_id`)
+        REFERENCES `sesiones_experiencia` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `emociones_sesion_bloque_id_foreign`
+        FOREIGN KEY (`bloque_id`)
+        REFERENCES `bloques_experiencia` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `emociones_sesion_estudiante_id_foreign`
+        FOREIGN KEY (`estudiante_id`)
+        REFERENCES `estudiantes` (`id`)
+        ON DELETE RESTRICT
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

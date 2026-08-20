@@ -25,6 +25,7 @@
         experienciasActualizar: $app.data('url-experiencias-actualizar-template') || '',
         experienciasFlujo: $app.data('url-experiencias-flujo-template') || '',
         experienciasEstado: $app.data('url-experiencias-estado-template') || '',
+        experienciasConstructor: $app.data('url-experiencias-constructor-template') || '',
         experienciasIndex: $app.data('url-experiencias-index') || '',
     };
 
@@ -951,8 +952,16 @@
         }
         items.forEach((exp) => {
             const puedeEditar = puedeEditarExperiencia(exp);
+            const puedeEstado = puedeCambiarEstadoExperiencia(exp);
             const acciones = [];
-            if (puedeEditar) {
+            const hrefConstructor = tpl(urls.experienciasConstructor, { __EXPERIENCIA__: exp.id });
+            if (hrefConstructor) {
+                const labelConstructor = puedeEditar ? 'Abrir constructor' : 'Ver constructor';
+                acciones.push(
+                    `<a href="${escapar(hrefConstructor)}" class="btn-accion btn-abrir-constructor" onclick="event.stopPropagation()"><i class="fa-solid fa-screwdriver-wrench"></i> ${labelConstructor}</a>`
+                );
+            }
+            if (puedeEditar && puedeEstado) {
                 if (exp.estado !== 'activa') {
                     acciones.push(
                         `<button type="button" class="btn-accion btn-publicar-exp btn-exp-flujo" data-id="${exp.id}" data-estado="activa"><i class="fa-solid fa-upload"></i> Publicar</button>`
@@ -997,6 +1006,12 @@
         if (!exp) return false;
         if (typeof exp.puede_editar === 'boolean') return exp.puede_editar;
         return puedeEditarTematica(tematicaActual);
+    }
+
+    function puedeCambiarEstadoExperiencia(exp) {
+        if (!exp) return false;
+        if (typeof exp.puede_cambiar_estado === 'boolean') return exp.puede_cambiar_estado;
+        return puedeEditarExperiencia(exp);
     }
 
     function resetFormExperiencia() {
@@ -1212,8 +1227,13 @@
                 const exp = res?.data;
                 if (!exp) return;
                 const editable = !soloLecturaForzado && puedeEditarExperiencia(exp);
+                const puedeEstado = editable && puedeCambiarEstadoExperiencia(exp);
                 llenarFormExperiencia(exp);
                 aplicarSoloLecturaExperiencia(!editable);
+                if (editable && !puedeEstado) {
+                    $('#exp_publicar').prop('disabled', true);
+                    $('#exp_publicar_label').text('Estado (solo el creador puede cambiarlo)');
+                }
                 $('#modalExperienciaRapidaLabel').text(editable ? 'Editar experiencia' : 'Ver experiencia');
                 $('#modalExperienciaRapidaSubtitle').text(
                     editable
@@ -1242,6 +1262,9 @@
             estado: $('#exp_publicar').is(':checked') ? 'activa' : 'borrador',
             materiales: materialesParaEnvio(),
         };
+        if ($('#exp_publicar').prop('disabled') && experienciaActual?.estado) {
+            payload.estado = experienciaActual.estado;
+        }
         if (!payload.nombre || !payload.grado_id || !payload.objetivo) {
             return { error: 'Complete nombre, grado y objetivo.', tab: 'tab-datos-experiencia' };
         }

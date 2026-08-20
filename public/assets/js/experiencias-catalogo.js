@@ -20,6 +20,7 @@
         flujo: $app.data('url-flujo-template') || '',
         estado: $app.data('url-estado-template') || '',
         eliminar: $app.data('url-eliminar-template') || '',
+        constructor: $app.data('url-constructor-template') || '',
     };
 
     const csrf = $('meta[name="csrf-token"]').attr('content');
@@ -160,6 +161,12 @@
         return !!tematicaActual?.puede_editar;
     }
 
+    function puedeCambiarEstadoExperiencia(exp) {
+        if (!exp) return false;
+        if (typeof exp.puede_cambiar_estado === 'boolean') return exp.puede_cambiar_estado;
+        return puedeEditarExperiencia(exp);
+    }
+
     function puedeCrearExperiencia() {
         if (!tematicaActual?.id) return false;
         if (typeof tematicaActual.puede_crear_experiencia === 'boolean') {
@@ -228,36 +235,61 @@
         return `<div class="tematica-meta-row"><i class="fa-solid ${icono}"></i><span><strong>${escapar(etiqueta)}:</strong> ${escapar(valor)}</span></div>`;
     }
 
+    function urlConstructorExperiencia(id) {
+        return tpl(urls.constructor, { __EXPERIENCIA__: id });
+    }
+
+    function htmlItemAbrirConstructor(id, editable) {
+        const href = urlConstructorExperiencia(id);
+        if (!href) return '';
+        const label = editable ? 'Abrir constructor' : 'Ver constructor';
+        return `
+            <li>
+                <a href="${escapar(href)}" class="btn-accion btn-abrir-constructor"
+                    onclick="event.stopPropagation()">
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                    ${label}
+                </a>
+            </li>
+        `;
+    }
+
     function htmlCardExperiencia(exp) {
         const editable = puedeEditarExperiencia(exp);
+        const puedeEstado = puedeCambiarEstadoExperiencia(exp);
         const partesFooter = [];
+        const itemsDropdown = [];
+
+        const itemConstructor = htmlItemAbrirConstructor(exp.id, editable);
+        if (itemConstructor) itemsDropdown.push(itemConstructor);
 
         if (editable) {
-            partesFooter.push(`
-                <div class="tematica-card-toggle">
-                    ${htmlToggleActivo(exp.id, !!exp.activo, 'toggle-activo-exp-card', exp.nombre)}
-                </div>
-            `);
+            if (puedeEstado) {
+                partesFooter.push(`
+                    <div class="tematica-card-toggle">
+                        ${htmlToggleActivo(exp.id, !!exp.activo, 'toggle-activo-exp-card', exp.nombre)}
+                    </div>
+                `);
 
-            const itemsDropdown = [];
-            if (exp.estado !== 'activa') {
-                itemsDropdown.push(`
-                    <li>
-                        <button type="button" class="btn-accion btn-publicar-exp" data-accion="publicar" data-id="${exp.id}">
-                            <i class="fa-solid fa-upload"></i>
-                            Publicar
-                        </button>
-                    </li>
-                `);
-            } else {
-                itemsDropdown.push(`
-                    <li>
-                        <button type="button" class="btn-accion btn-despublicar-exp" data-accion="despublicar" data-id="${exp.id}">
-                            <i class="fa-solid fa-rotate-left"></i>
-                            Despublicar
-                        </button>
-                    </li>
-                `);
+                if (exp.estado !== 'activa') {
+                    itemsDropdown.push(`
+                        <li>
+                            <button type="button" class="btn-accion btn-publicar-exp" data-accion="publicar" data-id="${exp.id}">
+                                <i class="fa-solid fa-upload"></i>
+                                Publicar
+                            </button>
+                        </li>
+                    `);
+                } else {
+                    itemsDropdown.push(`
+                        <li>
+                            <button type="button" class="btn-accion btn-despublicar-exp" data-accion="despublicar" data-id="${exp.id}">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                Despublicar
+                            </button>
+                        </li>
+                    `);
+                }
             }
 
             if (urls.eliminar) {
@@ -270,21 +302,21 @@
                     </li>
                 `);
             }
+        }
 
-            if (itemsDropdown.length) {
-                partesFooter.push(`
-                    <div class="dropdown catalogo-card-opciones tabla-opciones-dropdown">
-                        <button type="button" class="catalogo-card-opciones-btn" data-bs-toggle="dropdown"
-                            aria-expanded="false" aria-label="Acciones" title="Acciones"
-                            onclick="event.stopPropagation()">
-                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-acciones">
-                            ${itemsDropdown.join('')}
-                        </ul>
-                    </div>
-                `);
-            }
+        if (itemsDropdown.length) {
+            partesFooter.push(`
+                <div class="dropdown catalogo-card-opciones tabla-opciones-dropdown">
+                    <button type="button" class="catalogo-card-opciones-btn" data-bs-toggle="dropdown"
+                        aria-expanded="false" aria-label="Acciones" title="Acciones"
+                        onclick="event.stopPropagation()">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-acciones">
+                        ${itemsDropdown.join('')}
+                    </ul>
+                </div>
+            `);
         }
 
         const cardClases = ['tematica-card', 'experiencia-card', 'tematica-card--clickable'];
@@ -782,10 +814,19 @@
                 const exp = res?.data;
                 if (!exp) return;
                 const editable = !soloLecturaForzado && puedeEditarExperiencia(exp);
+                const puedeEstado = editable && puedeCambiarEstadoExperiencia(exp);
                 llenarFormExperiencia(exp);
                 aplicarSoloLecturaExperiencia(!editable);
+                if (editable && !puedeEstado) {
+                    $('#exp_publicar').prop('disabled', true);
+                }
                 $('#modalExperienciaRapidaLabel').text(editable ? 'Editar experiencia' : 'Ver experiencia');
                 $('#modalExperienciaRapidaSubtitle').text(editable ? 'Actualice datos y materiales' : 'Solo lectura');
+                $('#exp_publicar_label').text(
+                    puedeEstado
+                        ? (String(exp.estado) === 'activa' ? 'Publicada (estado activa)' : 'Publicar ahora (estado activa)')
+                        : 'Estado (solo el creador puede cambiarlo)'
+                );
                 modalExp?.show();
             })
             .fail((xhr) => toast('error', errorAjax(xhr, 'No se pudo cargar la experiencia.')));
@@ -813,6 +854,9 @@
                     orden: idx + 1,
                 })),
         };
+        if ($('#exp_publicar').prop('disabled') && experienciaActual?.estado) {
+            payload.estado = experienciaActual.estado;
+        }
         if (!payload.nombre || !payload.grado_id || !payload.objetivo) {
             return { error: 'Complete nombre, grado y objetivo.' };
         }
@@ -958,7 +1002,7 @@
     });
 
     $cardsWrap.on('click', '.tematica-card--clickable', function (e) {
-        if ($(e.target).closest('[data-accion], .tematica-card-toggle, .toggle-activo-exp-card, .catalogo-card-opciones').length) return;
+        if ($(e.target).closest('[data-accion], .tematica-card-toggle, .toggle-activo-exp-card, .catalogo-card-opciones, .btn-abrir-constructor').length) return;
         const id = $(this).data('id');
         const editable = String($(this).data('editable')) === '1';
         abrirEditarExperiencia(id, !editable);

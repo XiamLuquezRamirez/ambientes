@@ -7,6 +7,7 @@ use App\Models\Ambiente;
 use App\Models\Experiencia;
 use App\Models\Grado;
 use App\Models\Tematica;
+use App\Services\BloqueExperienciaService;
 use App\Services\TematicaCurriculoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,7 @@ class ExperienciasSuperAdminController extends Controller
 {
     public function __construct(
         private TematicaCurriculoService $curriculo,
+        private BloqueExperienciaService $bloques,
     ) {}
 
     public function index()
@@ -39,6 +41,8 @@ class ExperienciasSuperAdminController extends Controller
 
     public function listarPorTematica(Tematica $tematica)
     {
+        $this->asegurarTematicaOficial($tematica, false);
+
         $experiencias = $this->curriculo
             ->consultaExperienciasDeTematica($tematica)
             ->get();
@@ -77,13 +81,54 @@ class ExperienciasSuperAdminController extends Controller
 
     public function mostrar(Experiencia $experiencia)
     {
+        $experiencia = $this->curriculo->cargarExperiencia($experiencia);
+        $this->asegurarTematicaOficial($experiencia->tematica, false);
+
         return response()->json([
             'success' => true,
             'data' => $this->curriculo->serializarExperiencia(
-                $this->curriculo->cargarExperiencia($experiencia),
+                $experiencia,
                 $this->opcionesSerializarExperiencia()
             ),
         ]);
+    }
+
+    public function constructor(Experiencia $experiencia)
+    {
+        $experiencia = $this->curriculo->cargarExperiencia($experiencia);
+        $this->asegurarTematicaOficial($experiencia->tematica, false);
+
+        $puedeEditar = $experiencia->puedeGestionarComoSuperAdmin($this->usuarioId());
+        $puedePublicar = $puedeEditar;
+        $volverUrl = route('superadmin.catalogo.experiencias.index', [
+            'tematica' => $experiencia->tematica_id,
+        ]);
+
+        // Solo el dueño editable siembra Bienvenida/Recompensa; la vista de lectura no escribe.
+        $bloques = $puedeEditar
+            ? $this->bloques->asegurarObligatorios($experiencia)
+            : $this->bloques->listar($experiencia);
+        $catalogo = $this->bloques->registry()->catalogo();
+        $constructorUrls = [
+            'listar' => route('superadmin.catalogo.experiencias.bloques.index', $experiencia),
+            'guardar' => route('superadmin.catalogo.experiencias.bloques.guardar', $experiencia),
+            'reordenar' => route('superadmin.catalogo.experiencias.bloques.reordenar', $experiencia),
+            'limpiar' => route('superadmin.catalogo.experiencias.bloques.limpiar', $experiencia),
+            'upload' => route('superadmin.catalogo.experiencias.bloques.upload', $experiencia),
+            'publicar' => route('superadmin.catalogo.experiencias.publicar', $experiencia),
+            'actualizar_template' => route('superadmin.catalogo.bloques.actualizar', ['bloque' => '__BLOQUE__']),
+            'eliminar_template' => route('superadmin.catalogo.bloques.eliminar', ['bloque' => '__BLOQUE__']),
+        ];
+
+        return view('superAdmin.catalogo.experiencias.constructor', compact(
+            'experiencia',
+            'puedeEditar',
+            'puedePublicar',
+            'volverUrl',
+            'bloques',
+            'catalogo',
+            'constructorUrls'
+        ));
     }
 
     public function actualizar(Request $request, Experiencia $experiencia)

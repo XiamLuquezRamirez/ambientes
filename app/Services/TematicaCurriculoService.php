@@ -505,6 +505,14 @@ class TematicaCurriculoService
             $puedeEditar = (bool) $opciones['resolver_puede_editar']($experiencia);
         }
 
+        $puedeCambiarEstado = $opciones['puede_cambiar_estado'] ?? null;
+        if ($puedeCambiarEstado === null && isset($opciones['resolver_puede_cambiar_estado']) && is_callable($opciones['resolver_puede_cambiar_estado'])) {
+            $puedeCambiarEstado = (bool) $opciones['resolver_puede_cambiar_estado']($experiencia);
+        }
+        if ($puedeCambiarEstado === null) {
+            $puedeCambiarEstado = (bool) $puedeEditar;
+        }
+
         return [
             'id' => $experiencia->id,
             'tematica_id' => $experiencia->tematica_id,
@@ -520,6 +528,7 @@ class TematicaCurriculoService
             'activo' => (bool) $experiencia->activo,
             'creado_por' => (int) $experiencia->creado_por,
             'puede_editar' => (bool) $puedeEditar,
+            'puede_cambiar_estado' => (bool) $puedeCambiarEstado,
             'materiales_count' => (int) ($experiencia->materiales_count ?? $experiencia->materiales()->count()),
             'materiales' => $experiencia->relationLoaded('materiales')
                 ? $experiencia->materiales->map(fn ($m) => [

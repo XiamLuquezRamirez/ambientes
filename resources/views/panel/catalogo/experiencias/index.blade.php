@@ -25,7 +25,8 @@
         data-url-actualizar-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__') }}"
         data-url-flujo-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__/flujo') }}"
         data-url-estado-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__/estado') }}"
-        data-url-eliminar-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__') }}">
+        data-url-eliminar-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__') }}"
+        data-url-constructor-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__/constructor') }}">
 
         @include('partials.experiencias._contexto')
         @include('partials.experiencias._tabla')

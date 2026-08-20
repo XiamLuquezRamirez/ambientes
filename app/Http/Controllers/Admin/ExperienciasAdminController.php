@@ -8,6 +8,7 @@ use App\Models\Grado;
 use App\Models\Institucion;
 use App\Models\Modulo;
 use App\Models\Tematica;
+use App\Services\BloqueExperienciaService;
 use App\Services\TematicaCurriculoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +18,7 @@ class ExperienciasAdminController extends Controller
 {
     public function __construct(
         private TematicaCurriculoService $curriculo,
+        private BloqueExperienciaService $bloques,
     ) {}
 
     public function index()
@@ -132,6 +134,44 @@ class ExperienciasAdminController extends Controller
                 $this->opcionesSerializarExperiencia($institucionId)
             ),
         ]);
+    }
+
+    public function constructor(Experiencia $experiencia)
+    {
+        $institucionId = $this->institucionId();
+        $this->asegurarExperienciaVisible($experiencia, $institucionId);
+
+        $experiencia = $this->curriculo->cargarExperiencia($experiencia);
+        $puedeEditar = $experiencia->puedeGestionarComoAdmin($institucionId);
+        $puedePublicar = $puedeEditar;
+        $volverUrl = route('admin.catalogo.experiencias.index', [
+            'tematica' => $experiencia->tematica_id,
+        ]);
+
+        $bloques = $puedeEditar
+            ? $this->bloques->asegurarObligatorios($experiencia)
+            : $this->bloques->listar($experiencia);
+        $catalogo = $this->bloques->registry()->catalogo();
+        $constructorUrls = [
+            'listar' => route('admin.experiencias.bloques.index', $experiencia),
+            'guardar' => route('admin.experiencias.bloques.guardar', $experiencia),
+            'reordenar' => route('admin.experiencias.bloques.reordenar', $experiencia),
+            'limpiar' => route('admin.experiencias.bloques.limpiar', $experiencia),
+            'upload' => route('admin.experiencias.bloques.upload', $experiencia),
+            'publicar' => route('admin.experiencias.publicar', $experiencia),
+            'actualizar_template' => route('admin.bloques.actualizar', ['bloque' => '__BLOQUE__']),
+            'eliminar_template' => route('admin.bloques.eliminar', ['bloque' => '__BLOQUE__']),
+        ];
+
+        return view('admin.catalogo.experiencias.constructor', compact(
+            'experiencia',
+            'puedeEditar',
+            'puedePublicar',
+            'volverUrl',
+            'bloques',
+            'catalogo',
+            'constructorUrls'
+        ));
     }
 
     public function actualizar(Request $request, Experiencia $experiencia)

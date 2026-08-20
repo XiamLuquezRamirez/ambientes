@@ -31,6 +31,7 @@
         data-url-experiencias-actualizar-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__') }}"
         data-url-experiencias-flujo-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__/flujo') }}"
         data-url-experiencias-estado-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__/estado') }}"
+        data-url-experiencias-constructor-template="{{ url('panel/catalogo/experiencias/__EXPERIENCIA__/constructor') }}"
         data-url-experiencias-index="{{ route('panel.catalogo.experiencias.index') }}">
 
         <p class="text-muted small mb-3">

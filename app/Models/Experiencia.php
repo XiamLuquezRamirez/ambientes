@@ -64,6 +64,11 @@ class Experiencia extends Model
         return $this->hasMany(ExperienciaMaterial::class)->orderBy('orden');
     }
 
+    public function bloques()
+    {
+        return $this->hasMany(BloqueExperiencia::class)->orderBy('orden');
+    }
+
     public function scopeActivas(Builder $query): Builder
     {
         return $query->where('activo', true)->where('estado', self::ESTADO_ACTIVA);
@@ -86,6 +91,9 @@ class Experiencia extends Model
         return $this->tematica && $this->tematica->esDeInstitucion($institucionId);
     }
 
+    /**
+     * Docente: solo gestiona (contenido, bloques, estado) experiencias que él creó.
+     */
     public function puedeGestionarComoDocente(int $institucionId, int $userId): bool
     {
         $this->loadMissing('tematica');
@@ -93,7 +101,15 @@ class Experiencia extends Model
             return false;
         }
 
-        return $this->tematica->esCreadaPor($userId) || $this->esCreadaPor($userId);
+        return $this->esCreadaPor($userId);
+    }
+
+    /**
+     * Alias explícito: cambiar activo/estado/publicar = misma regla de creador.
+     */
+    public function puedeCambiarEstadoComoDocente(int $institucionId, int $userId): bool
+    {
+        return $this->puedeGestionarComoDocente($institucionId, $userId);
     }
 
     public function puedeGestionarComoSuperAdmin(int $userId): bool

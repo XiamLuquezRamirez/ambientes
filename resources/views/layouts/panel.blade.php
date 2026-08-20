@@ -34,110 +34,124 @@
                     <i class="fa-solid fa-house"></i> Inicio
                 </a>
             </li>
-            <div id="menu-lateral-ambiente">
-                <li class="nav-item">
-                    <a href="{{ route('panel.estudiantes') }}"
-                        class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
-                        <i class="fa-solid fa-child"></i> Estudiantes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('panel.planeacion') }}"
-                        class="{{ request()->routeIs('panel.planeacion*') ? 'active nav-link' : 'nav-link' }}">
-                        <i class="fa-solid fa-calendar-days"></i> Planeación
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('panel.portafolio') }}"
-                        class="{{ request()->routeIs('panel.portafolio') || request()->routeIs('panel.portafolio.estudiante') ? 'active nav-link' : 'nav-link' }}">
-                        <i class="fa-solid fa-folder-open"></i> Portafolios
-                    </a>
-                </li>
-                @php
-                    $catalogoActivo = request()->routeIs(
-                        'panel.catalogo',
-                        'panel.catalogo.detalle',
-                        'panel.catalogo.modulos',
-                        'panel.catalogo.ejes',
-                        'panel.catalogo.tematicas',
-                        'panel.catalogo.experiencias',
-                        'panel.catalogo.experiencias.*',
-                        'panel.ejes.*',
-                        'panel.tematicas.*',
-                        'panel.experiencias.*',
-                        'panel.modulos.ejes',
-                    );
-                @endphp
-                <li class="nav-item">
-                    <a href="#navCatalogoPanel" data-bs-toggle="collapse"
-                        aria-expanded="{{ $catalogoActivo ? 'true' : 'false' }}"
-                        class="nav-link d-flex align-items-center gap-2 {{ $catalogoActivo ? '' : 'collapsed' }}"
-                        style="cursor:pointer">
-                        <i class="fa-solid fa-book"></i>
-                        <span>Catálogo</span>
-                        <i class="fa-solid fa-chevron-down ms-auto chevron" id="chevronCatalogoPanel"></i>
-                    </a>
-                    <div class="collapse {{ $catalogoActivo ? 'show' : '' }}" id="navCatalogoPanel">
-                        <ul class="nav flex-column" style="padding:2px 0 4px 0">
-                            <li class="nav-item">
-                                <a href="{{ route('panel.catalogo') }}"
-                                    class="{{ request()->routeIs('panel.catalogo') || request()->routeIs('panel.catalogo.detalle') ? 'active nav-link' : 'nav-link' }}"
-                                    style="padding-left:42px;font-size:.85rem">
-                                    <i class="fa-solid fa-book-open"></i> DBA
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('panel.catalogo.modulos') }}"
-                                    class="{{ request()->routeIs('panel.catalogo.modulos') ? 'active nav-link' : 'nav-link' }}"
-                                    style="padding-left:42px;font-size:.85rem">
-                                    <i class="fa-solid fa-cube"></i> Módulos
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('panel.catalogo.ejes') }}"
-                                    class="{{ request()->routeIs('panel.catalogo.ejes', 'panel.ejes.*', 'panel.modulos.ejes') ? 'active nav-link' : 'nav-link' }}"
-                                    style="padding-left:42px;font-size:.85rem">
-                                    <i class="fa-solid fa-diagram-project"></i> Ejes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('panel.catalogo.tematicas') }}"
-                                    class="{{ request()->routeIs('panel.catalogo.tematicas', 'panel.tematicas.*') && !request()->routeIs('panel.catalogo.experiencias.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
-                                    style="padding-left:42px;font-size:.85rem">
-                                    <i class="fa-solid fa-layer-group"></i> Temáticas
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('panel.catalogo.experiencias.index') }}"
-                                    class="{{ request()->routeIs('panel.catalogo.experiencias.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
-                                    style="padding-left:42px;font-size:.85rem">
-                                    <i class="fa-solid fa-book-open-reader"></i> Experiencias
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('panel.inclusion') }}"
-                        class="{{ request()->routeIs('panel.inclusion') || request()->routeIs('panel.inclusion.ajustes') ? 'active nav-link' : 'nav-link' }}">
-                        <i class="fa-solid fa-universal-access"></i> Inclusión
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('panel.inclusion.perfil-aprendizaje') }}"
-                        class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje') || request()->routeIs('panel.inclusion.perfil-aprendizaje.estudiantes') ? 'active nav-link' : 'nav-link' }}"
-                        style="padding-left:2.1rem;font-size:.92rem">
-                        <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('panel.inclusion.perfil-aprendizaje-personalizado') }}"
-                        class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
-                        style="padding-left:2.1rem;font-size:.92rem">
-                        <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje Personalizados
-                    </a>
-                </li>
-            </div>
+            @php
+                $sinCargaAmbiente = !session('ambiente_nombre');
+                $clsAmbiente = $sinCargaAmbiente ? ' nav-item--ambiente-bloqueado' : '';
+                $catalogoActivo = request()->routeIs(
+                    'panel.catalogo',
+                    'panel.catalogo.detalle',
+                    'panel.catalogo.modulos',
+                    'panel.catalogo.ejes',
+                    'panel.catalogo.tematicas',
+                    'panel.catalogo.experiencias',
+                    'panel.catalogo.experiencias.*',
+                    'panel.ejes.*',
+                    'panel.tematicas.*',
+                    'panel.experiencias.*',
+                    'panel.modulos.ejes',
+                );
+                $inclusionActivo = request()->routeIs(
+                    'panel.inclusion',
+                    'panel.inclusion.ajustes',
+                    'panel.inclusion.perfil-aprendizaje',
+                    'panel.inclusion.perfil-aprendizaje.estudiantes',
+                    'panel.inclusion.perfil-aprendizaje-personalizado*',
+                );
+            @endphp
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="{{ route('panel.estudiantes') }}"
+                    class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-child"></i> Estudiantes
+                </a>
+            </li>
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="{{ route('panel.planeacion') }}"
+                    class="{{ request()->routeIs('panel.planeacion*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-calendar-days"></i> Planeación
+                </a>
+            </li>
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="{{ route('panel.portafolio') }}"
+                    class="{{ request()->routeIs('panel.portafolio') || request()->routeIs('panel.portafolio.estudiante') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-folder-open"></i> Portafolios
+                </a>
+            </li>
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="#navCatalogoPanel" data-bs-toggle="collapse"
+                    aria-expanded="{{ $catalogoActivo ? 'true' : 'false' }}"
+                    class="nav-link {{ $catalogoActivo ? '' : 'collapsed' }}"
+                    style="cursor:pointer">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Catálogo</span>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
+                </a>
+                <div class="collapse {{ $catalogoActivo ? 'show' : '' }}" id="navCatalogoPanel">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo') }}"
+                                class="{{ request()->routeIs('panel.catalogo') || request()->routeIs('panel.catalogo.detalle') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-book-open"></i> DBA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo.modulos') }}"
+                                class="{{ request()->routeIs('panel.catalogo.modulos') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-cube"></i> Módulos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo.ejes') }}"
+                                class="{{ request()->routeIs('panel.catalogo.ejes', 'panel.ejes.*', 'panel.modulos.ejes') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-diagram-project"></i> Ejes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo.tematicas') }}"
+                                class="{{ request()->routeIs('panel.catalogo.tematicas', 'panel.tematicas.*') && !request()->routeIs('panel.catalogo.experiencias.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-layer-group"></i> Temáticas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo.experiencias.index') }}"
+                                class="{{ request()->routeIs('panel.catalogo.experiencias.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-book-open-reader"></i> Experiencias
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="#navInclusionPanel" data-bs-toggle="collapse"
+                    aria-expanded="{{ $inclusionActivo ? 'true' : 'false' }}"
+                    class="nav-link {{ $inclusionActivo ? '' : 'collapsed' }}"
+                    style="cursor:pointer">
+                    <i class="fa-solid fa-universal-access"></i>
+                    <span>Inclusión</span>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
+                </a>
+                <div class="collapse {{ $inclusionActivo ? 'show' : '' }}" id="navInclusionPanel">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="{{ route('panel.inclusion') }}"
+                                class="{{ request()->routeIs('panel.inclusion') || request()->routeIs('panel.inclusion.ajustes') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-universal-access"></i> Inclusión
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.inclusion.perfil-aprendizaje') }}"
+                                class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje') || request()->routeIs('panel.inclusion.perfil-aprendizaje.estudiantes') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.inclusion.perfil-aprendizaje-personalizado') }}"
+                                class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-puzzle-piece"></i> Perfiles personalizados
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
             @include('partials.nav-link-condiciones')
         </ul>
     </aside>
@@ -274,11 +288,6 @@
     <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
-        const cargaAcademicaActiva = @json(session('ambiente_nombre'));
-        const menuLateralAmbiente = document.getElementById('menu-lateral-ambiente');
-        if (!cargaAcademicaActiva) {
-            menuLateralAmbiente.style.pointerEvents = 'none';
-        }
         /* ── Cerrar sesión ────────────────────────────────────── */
         document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -329,19 +338,7 @@
                 };
             }
         }
-        /* ── Chevron sidebar Catálogo ─────────────────────────────── */
-        document.addEventListener('DOMContentLoaded', function() {
-            const collapseEl = document.getElementById('navCatalogoPanel');
-            const chevron = document.getElementById('chevronCatalogoPanel');
-            if (collapseEl && chevron) {
-                collapseEl.addEventListener('show.bs.collapse', () => chevron.style.transform = 'rotate(180deg)');
-                collapseEl.addEventListener('hide.bs.collapse', () => chevron.style.transform = 'rotate(0deg)');
-                if (collapseEl.classList.contains('show')) {
-                    chevron.style.transform = 'rotate(180deg)';
-                }
-            }
-        });
-        /* ── Dropdown de perfil ──────────────────────────────────── */
+        /* ── Chevron sidebar: usa CSS .chevron (index.css) ───────── */
         document.addEventListener('DOMContentLoaded', function() {
             const perfil = document.getElementById('headerPerfil');
             if (!perfil) return;
