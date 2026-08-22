@@ -119,10 +119,13 @@ class BloqueDatosRegistry
                 'juego_nombre' => '',
                 'juego_imagen' => '',
                 'juego_piezas' => '',
+                'colores_zonas' => [],
                 'imagen_1' => '',
                 'imagen_2' => '',
                 'imagen_3' => '',
                 'imagen_4' => '',
+                'imagen_5' => '',
+                'imagen_6' => '',
                 'seq_1' => '',
                 'seq_2' => '',
                 'seq_3' => '',
@@ -131,7 +134,6 @@ class BloqueDatosRegistry
             BloqueExperiencia::TIPO_DIBUJO => [
                 'instruccion' => '',
                 'fondo' => '',
-                'colores' => ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#000000'],
                 'guardar_evidencia' => true,
                 'nota_evidencia' => '',
             ],
@@ -294,10 +296,6 @@ class BloqueDatosRegistry
 
             case BloqueExperiencia::TIPO_DIBUJO:
                 $req('instruccion', 'Instrucción de audio');
-                $colores = $datos['colores'] ?? [];
-                if (! is_array($colores) || count($colores) < 3) {
-                    $pendientes[] = 'Paleta de colores (mín. 3)';
-                }
                 break;
 
             case BloqueExperiencia::TIPO_PREGUNTA:
@@ -438,13 +436,28 @@ class BloqueDatosRegistry
                 $out[] = 'Imagen del juego';
             }
             if ($this->vacio($datos['juego_piezas'] ?? null)) {
-                $out[] = 'Dificultad / piezas';
+                $out[] = $id === 'colorear' ? 'Colores en la paleta' : 'Dificultad / piezas';
+            }
+        }
+
+        if ($id === 'colorear') {
+            $piezas = (string) ($datos['juego_piezas'] ?? '');
+            $n = str_contains($piezas, '9') ? 9 : (str_contains($piezas, '6') ? 6 : (str_contains($piezas, '4') ? 4 : 0));
+            $cols = is_array($datos['colores_zonas'] ?? null) ? $datos['colores_zonas'] : [];
+            $llenas = 0;
+            foreach ($cols as $c) {
+                if (! $this->vacio($c)) {
+                    $llenas++;
+                }
+            }
+            if ($n > 0 && $llenas < $n) {
+                $out[] = "Colorear: define los {$n} colores de la paleta";
             }
         }
 
         if ($id === 'memoria') {
             $llenas = 0;
-            foreach (['imagen_1', 'imagen_2', 'imagen_3', 'imagen_4'] as $k) {
+            foreach (['imagen_1', 'imagen_2', 'imagen_3', 'imagen_4', 'imagen_5', 'imagen_6'] as $k) {
                 if (! $this->vacio($datos[$k] ?? null)) {
                     $llenas++;
                 }
@@ -461,8 +474,8 @@ class BloqueDatosRegistry
                     $llenas++;
                 }
             }
-            if ($llenas < 2) {
-                $out[] = 'Secuencia: al menos 2 pasos';
+            if ($llenas < 3) {
+                $out[] = 'Secuencia: sube 3 o 4 imágenes en el orden correcto';
             }
         }
 

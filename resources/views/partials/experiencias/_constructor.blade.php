@@ -16,8 +16,9 @@
         <p>{{ $experiencia->nombre }}</p>
     </div>
     <div>
-        <button type="button" class="btn btn-outline-secondary" disabled>
-            <i class="fa-solid fa-eye"></i> Vista Niño (próximamente)
+        <button type="button" class="btn btn-outline-primary" id="cxBtnVistaNino"
+            title="Previsualizar la experiencia como la vería el niño">
+            <i class="fa-solid fa-tablet-screen-button"></i> Vista Niño
         </button>
         <button type="button" class="btn btn-success cx-btn-publicar" title="{{ $tituloPublicar }}"
             @disabled(!$puedePublicar)>
@@ -31,6 +32,8 @@
 
 <div class="cx-app" data-puede-editar="{{ $puedeEditar ? '1' : '0' }}"
     data-puede-publicar="{{ $puedePublicar ? '1' : '0' }}" data-experiencia-id="{{ $experiencia->id }}"
+    data-experiencia-nombre="{{ $experiencia->nombre }}"
+    data-media-base="{{ asset('storage/experiencias/'.$experiencia->id.'/bloques') }}"
     data-experiencia-estado="{{ $experiencia->estado }}" data-url-listar="{{ $urls['listar'] }}"
     data-url-guardar="{{ $urls['guardar'] }}" data-url-reordenar="{{ $urls['reordenar'] }}"
     data-url-limpiar="{{ $urls['limpiar'] }}" data-url-upload="{{ $urls['upload'] }}"
@@ -84,5 +87,45 @@
                 <div class="cx-config-save-status" id="cxSaveStatus" hidden></div>
             </div>
         </aside>
+    </div>
+</div>
+
+{{-- Overlay Vista Niño: tablet simulada --}}
+<div class="vn-overlay" id="vnOverlay" hidden aria-hidden="true">
+    <div class="vn-backdrop" data-vn-close></div>
+    <div class="vn-shell" role="dialog" aria-modal="true" aria-labelledby="vnTitle">
+        <button type="button" class="vn-close" data-vn-close title="Cerrar vista niño" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="vn-tablet-stage" id="vnTabletStage">
+            <div class="vn-tablet" id="vnTablet" data-screen-w="1280" data-screen-h="800">
+                <div class="vn-tablet-bezel">
+                    <div class="vn-tablet-camera" aria-hidden="true"></div>
+                    <div class="vn-tablet-screen" id="vnTabletScreen">
+                        <header class="vn-screen-top">
+                            <div class="vn-progress" id="vnProgress" aria-hidden="true"></div>
+                            <p class="vn-step-label" id="vnStepLabel">Paso 1 de 1</p>
+                        </header>
+                        <div class="vn-screen-body" id="vnScreenBody"></div>
+                        <footer class="vn-screen-nav">
+                            <button type="button" class="vn-nav-btn vn-nav-prev" id="vnBtnPrev" aria-label="Anterior">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Atrás</span>
+                            </button>
+                            <div class="vn-nav-meta">
+                                <strong id="vnTitle">Vista niño</strong>
+                                <span id="vnBlockName">Bienvenida</span>
+                            </div>
+                            <button type="button" class="vn-nav-btn vn-nav-next" id="vnBtnNext" aria-label="Siguiente">
+                                <span>Siguiente</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </footer>
+                    </div>
+                    <div class="vn-tablet-home" aria-hidden="true"></div>
+                </div>
+            </div>
+        </div>
+        <p class="vn-hint">Vista previa 1280×800 · horizontal · el niño navega bloque por bloque</p>
     </div>
 </div>

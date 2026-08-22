@@ -65,6 +65,14 @@
             .replace(/"/g, '&quot;');
     }
 
+    function mediaUrlBloque(archivo) {
+        const base = String($app.data('media-base') || '').replace(/\/$/, '');
+        const name = String(archivo || '').trim();
+        if (!name || !base) return '';
+        if (/^https?:\/\//i.test(name) || name.startsWith('/')) return name;
+        return `${base}/${name.replace(/^\//, '')}`;
+    }
+
     function toast(icon, title) {
         if (window.Swal) {
             Swal.fire({ toast: true, position: 'top-end', icon, title, showConfirmButton: false, timer: 2600 });
@@ -179,14 +187,17 @@
 
         const disabledDel = !puedeEditar || !bloque.puede_eliminar ? 'disabled' : '';
         const dragClass = bloque.puede_mover ? 'is-movable' : '';
+        const bodyHint = seleccionado ? '' : '<div class="cx-block-hint">Clic para configurar</div>';
 
         return `
-            <div class="cx-block-row ${dragClass}" data-id="${bloque.id}" data-puede-mover="${bloque.puede_mover ? '1' : '0'}">
+            <div class="cx-block-row ${dragClass}${seleccionado ? ' is-active' : ''}" data-id="${bloque.id}" data-puede-mover="${bloque.puede_mover ? '1' : '0'}">
                 <div class="cx-block-node" aria-hidden="true">
                     <i class="fa-solid ${escapar(bloque.icono || 'fa-cube')}"></i>
                 </div>
-                <article class="cx-block-card ${seleccionado ? 'is-selected' : ''}" data-id="${bloque.id}"
-                    data-categoria="${escapar(bloque.categoria || '')}">
+                <article class="cx-block-card${seleccionado ? ' is-selected' : ''}" data-id="${bloque.id}"
+                    data-categoria="${escapar(bloque.categoria || '')}" role="button" tabindex="0"
+                    aria-selected="${seleccionado ? 'true' : 'false'}"
+                    aria-label="Bloque ${escapar(bloque.orden)}: ${escapar(bloque.nombre)}">
                     <div class="cx-block-card-head">
                         <span class="cx-block-num">${escapar(bloque.orden)}</span>
                         <span class="cx-block-title">${escapar(bloque.nombre)}</span>
@@ -195,7 +206,7 @@
                             <button type="button" class="cx-btn-config" title="Configurar" data-id="${bloque.id}">
                                 <i class="fa-solid fa-gear"></i>
                             </button>
-                            <button type="button" class="cx-btn-preview" title="Vista previa (próximamente)" disabled>
+                            <button type="button" class="cx-btn-preview" title="Vista niño desde este bloque" data-id="${bloque.id}">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                             <button type="button" class="cx-btn-eliminar" title="Eliminar" data-id="${bloque.id}" ${disabledDel}>
@@ -204,7 +215,7 @@
                         </div>
                     </div>
                     <div class="cx-block-body">
-                        <div>Configura este bloque →</div>
+                        ${bodyHint}
                         ${status}
                     </div>
                 </article>
@@ -269,10 +280,25 @@
         return bloques.find((b) => Number(b.id) === Number(id)) || null;
     }
 
+    function actualizarIndicadoresSeleccion() {
+        $timeline.find('.cx-block-row').each(function () {
+            const activo = Number(seleccionadoId) === Number($(this).data('id'));
+            const $body = $(this).find('.cx-block-body');
+            const $status = $body.find('.cx-block-status');
+            const statusHtml = $status.length ? $status.prop('outerHTML') : '';
+            $body.html((activo ? '' : '<div class="cx-block-hint">Clic para configurar</div>') + statusHtml);
+        });
+    }
+
     function seleccionarBloque(id, scroll) {
         seleccionadoId = Number(id);
-        $timeline.find('.cx-block-card').removeClass('is-selected');
-        $timeline.find(`.cx-block-card[data-id="${id}"]`).addClass('is-selected');
+        $timeline.find('.cx-block-row').removeClass('is-active');
+        $timeline.find('.cx-block-card').removeClass('is-selected').attr('aria-selected', 'false');
+        const $row = $timeline.find(`.cx-block-row[data-id="${id}"]`);
+        const $card = $timeline.find(`.cx-block-card[data-id="${id}"]`);
+        $row.addClass('is-active');
+        $card.addClass('is-selected').attr('aria-selected', 'true');
+        actualizarIndicadoresSeleccion();
         const bloque = bloquePorId(id);
         if (!bloque) {
             $configPanel.prop('hidden', true);
@@ -283,7 +309,7 @@
         $configPanel.prop('hidden', false);
         renderConfig(bloque);
         if (scroll) {
-            const el = $timeline.find(`.cx-block-card[data-id="${id}"]`)[0];
+            const el = $row[0] || $card[0];
             el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
@@ -337,6 +363,37 @@
             </div>`;
     }
 
+    /** Thumb clicable con preview (mismo patrón que Elementos en Clasificación). */
+    function imageThumbBtn(name, value, title) {
+        const archivo = value || '';
+        const url = mediaUrlBloque(archivo);
+        const thumb = url
+            ? `<img src="${escapar(url)}" alt="">`
+            : '<i class="fa-solid fa-image"></i>';
+        return `
+            <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(archivo)}">
+            ${puedeEditar
+                ? `<label class="cx-img-btn cx-image-preview-btn" title="${escapar(title || 'Subir imagen')}">
+                    ${thumb}
+                    <input type="file" class="cx-file" data-target="${escapar(name)}" accept="image/*" hidden>
+                   </label>`
+                : `<span class="cx-img-btn cx-image-preview-btn is-readonly">${thumb}</span>`}`;
+    }
+
+    function fieldImagePreview(name, label, value) {
+        const archivo = value || '';
+        return `<div class="cx-field">
+            <label>${escapar(label)}</label>
+            <div class="cx-media-preview-row">
+                ${imageThumbBtn(name, archivo, 'Subir imagen')}
+                <div class="cx-media-preview-meta">
+                    <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
+                    <div class="cx-help">Toca el recuadro para elegir o cambiar la imagen.</div>
+                </div>
+            </div>
+        </div>`;
+    }
+
     function fieldCheckbox(name, label, checked) {
         return `
             <div class="cx-field form-check">
@@ -344,6 +401,48 @@
                     id="cx_chk_${escapar(name)}" ${checked ? 'checked' : ''} ${puedeEditar ? '' : 'disabled'}>
                 <label class="form-check-label" for="cx_chk_${escapar(name)}">${escapar(label)}</label>
             </div>`;
+    }
+
+    /** Pestañas Bootstrap (mismo patrón que modales del proyecto). */
+    function configTabs(tabs) {
+        const uid = 'cxcfg';
+        let nav = '<ul class="nav nav-tabs cx-config-tabs" role="tablist">';
+        let panes = '<div class="tab-content cx-config-tab-content">';
+        tabs.forEach((t, i) => {
+            const active = i === 0;
+            const tabId = `${uid}-tab-${t.id}`;
+            const paneId = `${uid}-pane-${t.id}`;
+            nav += `<li class="nav-item" role="presentation">
+                <button type="button" class="nav-link${active ? ' active' : ''}" id="${tabId}"
+                    data-bs-toggle="tab" data-bs-target="#${paneId}" role="tab"
+                    aria-controls="${paneId}" aria-selected="${active ? 'true' : 'false'}"
+                    data-cx-tab="${escapar(t.id)}">
+                    ${t.icon ? `<i class="fa-solid ${escapar(t.icon)}"></i> ` : ''}${escapar(t.label)}
+                </button>
+            </li>`;
+            panes += `<div class="tab-pane fade${active ? ' show active' : ''}" id="${paneId}"
+                role="tabpanel" aria-labelledby="${tabId}" tabindex="0">
+                ${t.content || ''}
+            </div>`;
+        });
+        nav += '</ul>';
+        panes += '</div>';
+        return nav + panes;
+    }
+
+    function tabActivaId() {
+        return $configBody.find('.cx-config-tabs .nav-link.active').data('cx-tab') || null;
+    }
+
+    function restaurarTab(tabId) {
+        if (!tabId) return;
+        const $btn = $configBody.find(`.cx-config-tabs .nav-link[data-cx-tab="${tabId}"]`);
+        if (!$btn.length) return;
+        const target = $btn.attr('data-bs-target');
+        $configBody.find('.cx-config-tabs .nav-link').removeClass('active').attr('aria-selected', 'false');
+        $configBody.find('.cx-config-tab-content .tab-pane').removeClass('show active');
+        $btn.addClass('active').attr('aria-selected', 'true');
+        if (target) $configBody.find(target).addClass('show active');
     }
 
     function formBienvenida(d) {
@@ -364,28 +463,52 @@
     }
 
     function formVideo(d) {
+        const archivo = d.archivo || '';
+        const url = mediaUrlBloque(archivo);
+        const thumb = url
+            ? `<video src="${escapar(url)}" muted preload="metadata" playsinline></video>`
+            : '<i class="fa-solid fa-film"></i>';
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldUpload('archivo', 'Archivo de video (.mp4)', d.archivo, 'video/mp4,.mp4')
+            + `<div class="cx-field">
+                <label>Archivo de video (.mp4)</label>
+                <div class="cx-media-preview-row">
+                    <input type="hidden" class="cx-input" data-field="archivo" value="${escapar(archivo)}">
+                    ${puedeEditar
+                        ? `<label class="cx-img-btn cx-video-preview-btn" title="Subir video">
+                            ${thumb}
+                            <input type="file" class="cx-file" data-target="archivo" accept="video/mp4,.mp4" hidden>
+                           </label>`
+                        : `<span class="cx-img-btn cx-video-preview-btn is-readonly">${thumb}</span>`}
+                    <div class="cx-media-preview-meta">
+                        <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
+                        <div class="cx-help">Toca el recuadro para elegir o cambiar el video. Se muestra una vista previa del primer fotograma.</div>
+                    </div>
+                </div>
+            </div>`
             + fieldTextarea('descripcion_accesible', 'Descripción accesible', d.descripcion_accesible);
     }
 
     function formImagen(d) {
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldUpload('archivo', 'Archivo de imagen', d.archivo, 'image/*')
+            + fieldImagePreview('archivo', 'Archivo de imagen', d.archivo)
             + fieldTextarea('descripcion', 'Descripción accesible', d.descripcion);
     }
 
     function formHistoria(d) {
         const n = Number(d.paginas || 3);
         const pages = Array.isArray(d.paginas_data) ? d.paginas_data : [];
+        const badgeColors = ['#2563eb', '#0f6e56', '#d97706', '#7c3aed', '#dc2626'];
         let html = fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
             + fieldSelect('paginas', 'Número de páginas', String(n), ['2', '3', '4', '5']);
         for (let i = 0; i < n; i++) {
             const p = pages[i] || { imagen: '', audio: '' };
-            html += `<div class="cx-subcard" data-pagina="${i}">
-                <div class="cx-subcard-head">Página ${i + 1}</div>
-                ${fieldUpload(`paginas_data.${i}.imagen`, 'Imagen', p.imagen, 'image/*')}
-                ${fieldUpload(`paginas_data.${i}.audio`, 'Audio', p.audio, 'audio/mpeg,.mp3')}
+            const color = badgeColors[i % badgeColors.length];
+            html += `<div class="cx-subcard cx-paso-card" data-pagina="${i}" style="--cx-paso-color:${color}">
+                <div class="cx-subcard-head">
+                    <span class="cx-paso-badge" style="background:${color}">Página ${i + 1}</span>
+                </div>
+                ${fieldImagePreview(`paginas_data.${i}.imagen`, 'Imagen', p.imagen)}
+                ${fieldUpload(`paginas_data.${i}.audio`, 'Audio de la página (.mp3)', p.audio, 'audio/mpeg,.mp3')}
             </div>`;
         }
         return html;
@@ -408,19 +531,53 @@
 
     function formJuego(d) {
         const id = d.juego_id || '';
+        const defaultZonaColors = ['#EF4444', '#F59E0B', '#22C55E', '#3B82F6', '#A855F7', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
         let extra = '';
-        if (id === 'rompecabezas' || id === 'colorear') {
-            extra = fieldUpload('juego_imagen', 'Imagen del juego', d.juego_imagen, 'image/*')
+        if (id === 'rompecabezas') {
+            extra = fieldImagePreview('juego_imagen', 'Imagen del juego', d.juego_imagen)
                 + fieldSelect('juego_piezas', 'Dificultad', d.juego_piezas || '', [
                     { value: '', label: 'Seleccione…' },
                     '4 piezas (fácil)', '6 piezas (medio)', '9 piezas (difícil)',
                 ]);
         }
+        if (id === 'colorear') {
+            const n = (() => {
+                const s = String(d.juego_piezas || '');
+                if (s.includes('9')) return 9;
+                if (s.includes('6')) return 6;
+                if (s.includes('4')) return 4;
+                return 4;
+            })();
+            const colores = Array.isArray(d.colores_zonas) ? d.colores_zonas : [];
+            let zonasHtml = '';
+            for (let i = 0; i < n; i++) {
+                const color = colores[i] || defaultZonaColors[i] || '#22C55E';
+                zonasHtml += `<div class="cx-zona-color-row">
+                    <span class="cx-paso-badge cx-zona-color-badge" style="background:${escapar(color)}">Color ${i + 1}</span>
+                    ${fieldInput(`colores_zonas.${i}`, 'Color', color, 'color')}
+                </div>`;
+            }
+            extra = fieldImagePreview('juego_imagen', 'Imagen en blanco y negro', d.juego_imagen)
+                + fieldSelect('juego_piezas', 'Colores en la paleta', d.juego_piezas || '4 piezas (fácil)', [
+                    { value: '', label: 'Seleccione…' },
+                    '4 piezas (fácil)', '6 piezas (medio)', '9 piezas (difícil)',
+                ])
+                + `<div class="cx-field"><label>Paleta de colores</label>
+                    <div class="cx-help">El niño pinta con el dedo sobre la imagen. Tú revisas el dibujo después (no hay corrección automática por zonas).</div>
+                    <div class="cx-zonas-colores">${zonasHtml}</div>
+                </div>`;
+        }
         if (id === 'memoria') {
-            extra = [1, 2, 3, 4].map((i) => fieldUpload(`imagen_${i}`, `Par ${i}`, d[`imagen_${i}`], 'image/*')).join('');
+            extra = '<div class="cx-help mb-2">Hasta 6 pares. Mínimo 2 para marcar completo.</div>'
+                + [1, 2, 3, 4, 5, 6].map((i) =>
+                    fieldImagePreview(`imagen_${i}`, `Par ${i}`, d[`imagen_${i}`])
+                ).join('');
         }
         if (id === 'secuencia') {
-            extra = [1, 2, 3, 4].map((i) => fieldUpload(`seq_${i}`, `Paso ${i}`, d[`seq_${i}`], 'image/*')).join('');
+            extra = '<div class="cx-help mb-2">Sube 3 o 4 imágenes <strong>en el orden correcto</strong>. El niño las verá mezcladas y deberá ordenarlas arrastrando.</div>'
+                + [1, 2, 3, 4].map((i) =>
+                    fieldImagePreview(`seq_${i}`, `Paso ${i}${i <= 3 ? '' : ' (opcional)'}`, d[`seq_${i}`])
+                ).join('');
         }
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
             + fieldSelect('juego_id', 'Juego', id, [
@@ -435,164 +592,318 @@
     }
 
     function formDibujo(d) {
-        const colores = Array.isArray(d.colores) ? d.colores : [];
-        const chips = colores.map((c) => `<span class="cx-color-chip" style="background:${escapar(c)}" title="${escapar(c)}"></span>`).join('');
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldUpload('fondo', 'Imagen de fondo (opcional)', d.fondo, 'image/*')
-            + `<div class="cx-field"><label>Paleta de colores</label>
-                <input type="text" class="form-control cx-input" data-field="colores_csv"
-                    value="${escapar(colores.join(','))}" ${puedeEditar ? '' : 'readonly'}
-                    placeholder="#FF6B6B,#4ECDC4,#000000">
-                <div class="cx-help">Separe colores HEX con comas (mín. 3, máx. 12).</div>
-                <div class="cx-color-list mt-2">${chips}</div>
-            </div>`
+            + fieldImagePreview('fondo', 'Imagen de fondo (opcional)', d.fondo)
+            + `<div class="cx-help mb-2">El niño elige colores y herramientas libremente (pincel, goma, figuras, grosor y deshacer).</div>`
             + fieldCheckbox('guardar_evidencia', 'Guardar dibujo como evidencia', !!d.guardar_evidencia)
             + fieldInput('nota_evidencia', 'Nota de evidencia', d.nota_evidencia);
     }
 
     function formPregunta(d) {
         const ops = Array.isArray(d.opciones) ? d.opciones : [];
-        let html = fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldTextarea('texto', 'Texto de la pregunta', d.texto)
-            + fieldSelect('tipo_opts', 'Tipo de opciones', d.tipo_opts || 'emoji_texto', [
-                { value: 'emoji_texto', label: 'Emoji + texto' },
-                { value: 'imagen_texto', label: 'Imagen + texto' },
-                { value: 'solo_texto', label: 'Solo texto' },
-            ]);
+        const tipo = d.tipo_opts || 'emoji_texto';
+        const showEmoji = tipo === 'emoji_texto';
+        const showImagen = tipo === 'imagen_texto';
+        let opcionesHtml = '';
         ops.forEach((op, i) => {
-            html += `<div class="cx-subcard" data-opcion="${i}">
+            opcionesHtml += `<div class="cx-subcard" data-opcion="${i}">
                 <div class="cx-subcard-head">
                     <span>Opción ${i + 1}</span>
                     <label class="mb-0"><input type="radio" name="cx_correcta_pregunta" class="cx-correcta" data-index="${i}"
                         ${op.correcta ? 'checked' : ''} ${puedeEditar ? '' : 'disabled'}> Correcta</label>
                 </div>
                 ${fieldInput(`opciones.${i}.texto`, 'Texto', op.texto)}
-                ${fieldInput(`opciones.${i}.emoji`, 'Emoji', op.emoji)}
-                ${fieldUpload(`opciones.${i}.imagen`, 'Imagen', op.imagen, 'image/*')}
+                ${showEmoji ? fieldInput(`opciones.${i}.emoji`, 'Emoji', op.emoji) : ''}
+                ${showImagen ? fieldImagePreview(`opciones.${i}.imagen`, 'Imagen', op.imagen) : ''}
             </div>`;
         });
-        html += `<div class="cx-inline-actions">
+        opcionesHtml += `<div class="cx-inline-actions">
             ${puedeEditar ? '<button type="button" class="btn btn-sm btn-outline-primary cx-add-opcion" data-max="4">+ Opción</button>' : ''}
             ${puedeEditar && ops.length > 2 ? '<button type="button" class="btn btn-sm btn-outline-danger cx-rm-opcion">Quitar última</button>' : ''}
         </div>`;
-        html += fieldInput('fb_ok', 'Retroalimentación acierto', d.fb_ok)
-            + fieldInput('fb_err', 'Retroalimentación error', d.fb_err)
-            + fieldSelect('intentos', 'Intentos', d.intentos || '2', ['1', '2', '3', 'Sin límite'])
-            + fieldSelect('al_agotar', 'Al agotar intentos', d.al_agotar || 'Mostrar respuesta correcta', [
-                'Mostrar respuesta correcta', 'Continuar sin mostrar', 'Repetir desde el inicio',
-            ]);
-        return html;
+
+        return configTabs([
+            {
+                id: 'pregunta',
+                label: 'Pregunta',
+                icon: 'fa-circle-question',
+                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+                    + fieldTextarea('texto', 'Texto de la pregunta', d.texto)
+                    + fieldSelect('tipo_opts', 'Tipo de opciones', tipo, [
+                        { value: 'emoji_texto', label: 'Emoji + texto' },
+                        { value: 'imagen_texto', label: 'Imagen + texto' },
+                        { value: 'solo_texto', label: 'Solo texto' },
+                    ]),
+            },
+            {
+                id: 'opciones',
+                label: 'Opciones',
+                icon: 'fa-list-ul',
+                content: opcionesHtml,
+            },
+            {
+                id: 'retro',
+                label: 'Retroalimentación',
+                icon: 'fa-comment-dots',
+                content: fieldInput('fb_ok', 'Mensaje al acertar', d.fb_ok)
+                    + fieldInput('fb_err', 'Mensaje al fallar', d.fb_err)
+                    + fieldSelect('intentos', 'Intentos', d.intentos || '2', ['1', '2', '3', 'Sin límite'])
+                    + fieldSelect('al_agotar', 'Al agotar intentos', d.al_agotar || 'Mostrar respuesta correcta', [
+                        'Mostrar respuesta correcta', 'Continuar sin mostrar', 'Repetir desde el inicio',
+                    ]),
+            },
+        ]);
     }
 
     function formEmparejar(d) {
         const pares = Array.isArray(d.pares) ? d.pares : [];
         const modo = d.modo || 'texto';
-        let html = fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldSelect('modo', 'Modo', modo, [
-                { value: 'texto', label: 'Texto ↔ texto' },
-                { value: 'imagen_texto', label: 'Imagen ↔ texto' },
-                { value: 'imagen', label: 'Imagen ↔ imagen' },
-            ]);
+        let paresHtml = '';
         pares.forEach((par, i) => {
-            html += `<div class="cx-subcard" data-par="${i}">
+            paresHtml += `<div class="cx-subcard" data-par="${i}">
                 <div class="cx-subcard-head">Par ${i + 1}</div>
-                ${modo === 'imagen' || modo === 'imagen_texto' ? fieldUpload(`pares.${i}.izqImg`, 'Imagen izquierda', par.izqImg, 'image/*') : ''}
+                ${modo === 'imagen' || modo === 'imagen_texto' ? fieldImagePreview(`pares.${i}.izqImg`, 'Imagen izquierda', par.izqImg) : ''}
                 ${modo !== 'imagen' ? fieldInput(`pares.${i}.izq`, 'Texto izquierda', par.izq) : ''}
-                ${modo === 'imagen' ? fieldUpload(`pares.${i}.derImg`, 'Imagen derecha', par.derImg, 'image/*') : fieldInput(`pares.${i}.der`, 'Texto derecha', par.der)}
+                ${modo === 'imagen' ? fieldImagePreview(`pares.${i}.derImg`, 'Imagen derecha', par.derImg) : fieldInput(`pares.${i}.der`, 'Texto derecha', par.der)}
             </div>`;
         });
-        html += `<div class="cx-inline-actions">
+        paresHtml += `<div class="cx-inline-actions">
             ${puedeEditar ? '<button type="button" class="btn btn-sm btn-outline-primary cx-add-par">+ Par</button>' : ''}
             ${puedeEditar && pares.length > 2 ? '<button type="button" class="btn btn-sm btn-outline-danger cx-rm-par">Quitar último</button>' : ''}
         </div>`;
-        html += fieldInput('fb_ok', 'Retroalimentación acierto', d.fb_ok)
-            + fieldInput('fb_err', 'Retroalimentación error', d.fb_err)
-            + fieldSelect('intentos', 'Intentos por par', d.intentos || 'Sin límite', ['1', '2', '3', 'Sin límite']);
-        return html;
+
+        return configTabs([
+            {
+                id: 'actividad',
+                label: 'Actividad',
+                icon: 'fa-sliders',
+                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+                    + fieldSelect('modo', 'Modo de emparejamiento', modo, [
+                        { value: 'texto', label: 'Texto ↔ texto' },
+                        { value: 'imagen_texto', label: 'Imagen ↔ texto' },
+                        { value: 'imagen', label: 'Imagen ↔ imagen' },
+                    ]),
+            },
+            {
+                id: 'pares',
+                label: 'Pares',
+                icon: 'fa-link',
+                content: paresHtml,
+            },
+            {
+                id: 'retro',
+                label: 'Retroalimentación',
+                icon: 'fa-comment-dots',
+                content: fieldInput('fb_ok', 'Mensaje al acertar', d.fb_ok)
+                    + fieldInput('fb_err', 'Mensaje al fallar', d.fb_err)
+                    + fieldSelect('intentos', 'Intentos por par', d.intentos || 'Sin límite', ['1', '2', '3', 'Sin límite']),
+            },
+        ]);
     }
 
     function formClasificacion(d) {
-        const cats = Array.isArray(d.categorias) ? d.categorias : [];
+        const cats = Array.isArray(d.categorias) ? d.categorias.filter((c) => String(c || '').trim() !== '') : [];
         const items = Array.isArray(d.items) ? d.items : [];
-        let html = fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + `<div class="cx-field"><label>Categorías (una por línea)</label>
-                <textarea class="form-control cx-input" data-field="categorias_txt" rows="3"
-                    ${puedeEditar ? '' : 'readonly'}>${escapar(cats.join('\n'))}</textarea>
-            </div>`;
+        const catOpts = cats.length ? cats : ['Cat 1', 'Cat 2'];
+
+        const chipsHtml = cats.map((c, i) => `
+            <span class="cx-cat-chip" data-cat-index="${i}">
+                <span class="cx-cat-chip-label">${escapar(c)}</span>
+                ${puedeEditar && cats.length > 2
+                    ? `<button type="button" class="cx-cat-chip-rm" data-index="${i}" title="Quitar categoría" aria-label="Quitar">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>`
+                    : ''}
+            </span>`).join('');
+
+        const categoriasHtml = `
+            <div class="cx-field">
+                <label>Grupos / categorías</label>
+                <div class="cx-cat-chips" id="cxCatChips">${chipsHtml || '<span class="cx-help">Sin categorías aún</span>'}</div>
+                <div class="cx-help">Mínimo 2. Cada chip es un grupo donde el niño clasificará.</div>
+            </div>
+            ${puedeEditar ? `
+            <div class="cx-cat-add">
+                <input type="text" class="form-control form-control-sm" id="cxCatNueva"
+                    placeholder="Nombre de la categoría" maxlength="60">
+                <button type="button" class="btn btn-sm btn-outline-primary" id="cxCatAdd">
+                    <i class="fa-solid fa-plus"></i> Agregar
+                </button>
+            </div>` : ''}`;
+
+        let itemsHtml = '';
         items.forEach((item, i) => {
-            html += `<div class="cx-subcard" data-item="${i}">
-                <div class="cx-subcard-head">Ítem ${i + 1}</div>
-                ${fieldInput(`items.${i}.texto`, 'Texto', item.texto)}
-                ${fieldUpload(`items.${i}.imagen`, 'Imagen', item.imagen, 'image/*')}
-                ${fieldSelect(`items.${i}.categoria`, 'Categoría', item.categoria, cats.length ? cats : ['Cat 1', 'Cat 2'])}
+            itemsHtml += `
+            <div class="cx-item-row" data-item="${i}">
+                <div class="cx-item-img">
+                    ${imageThumbBtn(`items.${i}.imagen`, item.imagen, 'Imagen opcional')}
+                </div>
+                <div class="cx-item-texto">
+                    ${fieldInput(`items.${i}.texto`, 'Texto (o imagen)', item.texto)}
+                </div>
+                <div class="cx-item-cat">
+                    ${fieldSelect(`items.${i}.categoria`, 'Categoría destino', item.categoria, catOpts)}
+                </div>
+                ${puedeEditar && items.length > 2
+                    ? `<button type="button" class="btn btn-sm btn-outline-danger cx-rm-item-at" data-index="${i}" title="Quitar">
+                        <i class="fa-solid fa-trash"></i>
+                       </button>`
+                    : ''}
             </div>`;
         });
-        html += `<div class="cx-inline-actions">
-            ${puedeEditar ? '<button type="button" class="btn btn-sm btn-outline-primary cx-add-item">+ Ítem</button>' : ''}
-            ${puedeEditar && items.length > 2 ? '<button type="button" class="btn btn-sm btn-outline-danger cx-rm-item">Quitar último</button>' : ''}
-        </div>`;
-        return html;
+        itemsHtml += `<div class="cx-inline-actions">
+            ${puedeEditar ? '<button type="button" class="btn btn-sm btn-outline-primary cx-add-item">+ Elemento</button>' : ''}
+        </div>
+        <div class="cx-help">Mínimo 2. Completo con imagen o texto (no hace falta ambos).</div>`;
+
+        return configTabs([
+            {
+                id: 'actividad',
+                label: 'Actividad',
+                icon: 'fa-sliders',
+                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion),
+            },
+            {
+                id: 'categorias',
+                label: 'Categorías',
+                icon: 'fa-folder',
+                content: categoriasHtml,
+            },
+            {
+                id: 'elementos',
+                label: 'Elementos',
+                icon: 'fa-cubes',
+                content: itemsHtml,
+            },
+        ]);
     }
 
     function formArrastrar(d) {
         const zonas = Array.isArray(d.zonas) ? d.zonas : [];
         const items = Array.isArray(d.items) ? d.items : [];
-        let html = fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion);
+        let zonasHtml = '';
         zonas.forEach((z, i) => {
-            html += `<div class="cx-subcard" data-zona="${i}">
+            zonasHtml += `<div class="cx-subcard" data-zona="${i}">
                 <div class="cx-subcard-head">Zona ${i + 1}</div>
                 ${fieldInput(`zonas.${i}.nombre`, 'Nombre', z.nombre)}
                 ${fieldInput(`zonas.${i}.color`, 'Color HEX', z.color || '#0F6E56', 'color')}
             </div>`;
         });
-        html += `<div class="cx-inline-actions">
+        zonasHtml += `<div class="cx-inline-actions">
             ${puedeEditar ? '<button type="button" class="btn btn-sm btn-outline-primary cx-add-zona">+ Zona</button>' : ''}
             ${puedeEditar && zonas.length > 2 ? '<button type="button" class="btn btn-sm btn-outline-danger cx-rm-zona">Quitar última zona</button>' : ''}
         </div>`;
+
         const nombres = zonas.map((z) => z.nombre).filter(Boolean);
+        const zonaOpts = nombres.length ? nombres : ['Zona 1', 'Zona 2'];
+        let itemsHtml = '';
         items.forEach((item, i) => {
-            html += `<div class="cx-subcard" data-item="${i}">
-                <div class="cx-subcard-head">Ítem ${i + 1}</div>
-                ${fieldInput(`items.${i}.texto`, 'Texto', item.texto)}
-                ${fieldUpload(`items.${i}.imagen`, 'Imagen', item.imagen, 'image/*')}
-                ${fieldSelect(`items.${i}.zona`, 'Zona destino', item.zona, nombres.length ? nombres : ['Zona 1', 'Zona 2'])}
+            itemsHtml += `
+            <div class="cx-item-row" data-item="${i}">
+                <div class="cx-item-img">
+                    ${imageThumbBtn(`items.${i}.imagen`, item.imagen, 'Imagen opcional')}
+                </div>
+                <div class="cx-item-texto">
+                    ${fieldInput(`items.${i}.texto`, 'Texto (o imagen)', item.texto)}
+                </div>
+                <div class="cx-item-cat">
+                    ${fieldSelect(`items.${i}.zona`, 'Zona destino', item.zona, zonaOpts)}
+                </div>
+                ${puedeEditar && items.length > 2
+                    ? `<button type="button" class="btn btn-sm btn-outline-danger cx-rm-item-arr-at" data-index="${i}" title="Quitar">
+                        <i class="fa-solid fa-trash"></i>
+                       </button>`
+                    : ''}
             </div>`;
         });
-        html += `<div class="cx-inline-actions">
-            ${puedeEditar ? '<button type="button" class="btn btn-sm btn-outline-primary cx-add-item-arr">+ Ítem</button>' : ''}
-            ${puedeEditar && items.length > 2 ? '<button type="button" class="btn btn-sm btn-outline-danger cx-rm-item-arr">Quitar último ítem</button>' : ''}
-        </div>`;
-        return html;
+        itemsHtml += `<div class="cx-inline-actions">
+            ${puedeEditar ? '<button type="button" class="btn btn-sm btn-outline-primary cx-add-item-arr">+ Elemento</button>' : ''}
+        </div>
+        <div class="cx-help">Mínimo 2. Completo con imagen o texto (no hace falta ambos).</div>`;
+
+        return configTabs([
+            {
+                id: 'actividad',
+                label: 'Actividad',
+                icon: 'fa-sliders',
+                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion),
+            },
+            {
+                id: 'zonas',
+                label: 'Zonas',
+                icon: 'fa-map-location-dot',
+                content: zonasHtml,
+            },
+            {
+                id: 'elementos',
+                label: 'Elementos',
+                icon: 'fa-cubes',
+                content: itemsHtml,
+            },
+        ]);
     }
 
     function formReto(d) {
         const pasos = Array.isArray(d.pasos) ? d.pasos : [];
-        let html = fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldInput('descripcion', 'Nombre del reto', d.descripcion);
+        const badgeColors = ['#2563eb', '#0f6e56', '#d97706', '#7c3aed', '#dc2626', '#0891b2'];
+        let pasosHtml = '';
         pasos.forEach((paso, i) => {
-            html += `<div class="cx-subcard" data-paso="${i}">
-                <div class="cx-subcard-head">Paso ${i + 1}</div>
-                ${fieldTextarea(`pasos.${i}.pregunta`, 'Pregunta', paso.pregunta)}`;
+            const color = badgeColors[i % badgeColors.length];
+            pasosHtml += `<div class="cx-subcard cx-paso-card" data-paso="${i}" style="--cx-paso-color:${color}">
+                <div class="cx-subcard-head">
+                    <span class="cx-paso-badge" style="background:${color}">Paso ${i + 1}</span>
+                </div>
+                ${fieldTextarea(`pasos.${i}.pregunta`, 'Pregunta', paso.pregunta)}
+                <div class="cx-paso-opciones">`;
             const ops = Array.isArray(paso.opciones) ? paso.opciones : [];
             ops.forEach((op, j) => {
-                html += `<div class="border rounded p-2 mb-2 bg-white">
-                    <label class="small mb-1"><input type="radio" name="cx_correcta_paso_${i}" class="cx-correcta-paso"
-                        data-paso="${i}" data-index="${j}" ${op.correcta ? 'checked' : ''} ${puedeEditar ? '' : 'disabled'}> Correcta</label>
-                    ${fieldInput(`pasos.${i}.opciones.${j}.emoji`, 'Emoji', op.emoji)}
-                    ${fieldInput(`pasos.${i}.opciones.${j}.label`, 'Etiqueta', op.label)}
-                    ${fieldUpload(`pasos.${i}.opciones.${j}.imagen`, 'Imagen', op.imagen, 'image/*')}
+                pasosHtml += `<div class="cx-paso-opcion" data-opcion="${j}">
+                    <div class="cx-paso-opcion-head">
+                        <span>Opción ${j + 1}</span>
+                        <label class="mb-0"><input type="radio" name="cx_correcta_paso_${i}" class="cx-correcta-paso"
+                            data-paso="${i}" data-index="${j}" ${op.correcta ? 'checked' : ''} ${puedeEditar ? '' : 'disabled'}> Correcta</label>
+                    </div>
+                    <div class="cx-paso-opcion-body">
+                        <div class="cx-item-img">
+                            ${imageThumbBtn(`pasos.${i}.opciones.${j}.imagen`, op.imagen, 'Imagen opcional')}
+                        </div>
+                        <div class="cx-paso-opcion-fields">
+                            ${fieldInput(`pasos.${i}.opciones.${j}.emoji`, 'Emoji', op.emoji)}
+                            ${fieldInput(`pasos.${i}.opciones.${j}.label`, 'Etiqueta', op.label)}
+                        </div>
+                    </div>
                 </div>`;
             });
-            html += '</div>';
+            pasosHtml += '</div></div>';
         });
-        html += `<div class="cx-inline-actions">
+        pasosHtml += `<div class="cx-inline-actions">
             ${puedeEditar ? '<button type="button" class="btn btn-sm btn-outline-primary cx-add-paso">+ Paso</button>' : ''}
             ${puedeEditar && pasos.length > 2 ? '<button type="button" class="btn btn-sm btn-outline-danger cx-rm-paso">Quitar último paso</button>' : ''}
         </div>`;
-        html += fieldInput('fb_ok', 'Retroalimentación acierto', d.fb_ok)
-            + fieldInput('fb_err', 'Retroalimentación error', d.fb_err)
-            + fieldSelect('intentos', 'Intentos por paso', d.intentos || '2', ['1', '2', '3', 'Sin límite']);
-        return html;
+
+        return configTabs([
+            {
+                id: 'reto',
+                label: 'Reto',
+                icon: 'fa-flag',
+                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+                    + fieldInput('descripcion', 'Nombre del reto', d.descripcion),
+            },
+            {
+                id: 'pasos',
+                label: 'Pasos',
+                icon: 'fa-stairs',
+                content: pasosHtml,
+            },
+            {
+                id: 'retro',
+                label: 'Retroalimentación',
+                icon: 'fa-comment-dots',
+                content: fieldInput('fb_ok', 'Mensaje al acertar', d.fb_ok)
+                    + fieldInput('fb_err', 'Mensaje al fallar', d.fb_err)
+                    + fieldSelect('intentos', 'Intentos por paso', d.intentos || '2', ['1', '2', '3', 'Sin límite']),
+            },
+        ]);
     }
 
     function formEmocion(d) {
@@ -611,7 +922,7 @@
                 'Trofeo', 'Medalla', 'Estrella dorada', 'Insignia especial',
             ])
             + (tipo === 'Insignia especial'
-                ? fieldUpload('insignia', 'Imagen de insignia', d.insignia, 'image/*')
+                ? fieldImagePreview('insignia', 'Imagen de insignia', d.insignia)
                 : '');
     }
 
@@ -639,14 +950,17 @@
     }
 
     function renderConfig(bloque) {
+        const tabPrev = tabActivaId();
         $configHead.html(`
             <div class="cx-config-head-icon"><i class="fa-solid ${escapar(bloque.icono || 'fa-cube')}"></i></div>
             <div>
+                <p class="cx-config-head-meta">Bloque ${escapar(bloque.orden)} en la secuencia</p>
                 <h3>${escapar(bloque.nombre)}</h3>
                 <p>${escapar(bloque.categoria_label || '')}${bloque.obligatorio ? ' · Obligatorio' : ''}</p>
             </div>
         `);
         $configBody.html(htmlFormulario(bloque));
+        restaurarTab(tabPrev);
         $saveStatus.prop('hidden', true).removeClass('is-saving is-ok is-err');
     }
 
@@ -679,14 +993,6 @@
             const field = $el.data('field');
             if (!field) return;
             let val = $el.val();
-            if (field === 'colores_csv') {
-                datos.colores = String(val || '').split(',').map((s) => s.trim()).filter(Boolean);
-                return;
-            }
-            if (field === 'categorias_txt') {
-                datos.categorias = String(val || '').split('\n').map((s) => s.trim()).filter(Boolean);
-                return;
-            }
             if (field === 'juego_id' && val === '') val = null;
             if (field.includes('.')) setDeep(datos, field, val);
             else datos[field] = val;
@@ -880,6 +1186,21 @@
             const nombre = res?.data?.archivo || '';
             $configBody.find(`.cx-input[data-field="${target}"]`).val(nombre);
             $(input).closest('.cx-upload-row').find('.cx-file-name').text(nombre || 'Sin archivo');
+            const $imgBtn = $(input).closest('.cx-img-btn');
+            if ($imgBtn.length) {
+                $imgBtn.find('img, video, i.fa-image, i.fa-film').remove();
+                const url = mediaUrlBloque(nombre);
+                if (url && $imgBtn.hasClass('cx-video-preview-btn')) {
+                    $imgBtn.prepend(`<video src="${escapar(url)}" muted preload="metadata" playsinline></video>`);
+                } else if (url) {
+                    $imgBtn.prepend(`<img src="${escapar(url)}" alt="">`);
+                } else if ($imgBtn.hasClass('cx-video-preview-btn')) {
+                    $imgBtn.prepend('<i class="fa-solid fa-film"></i>');
+                } else {
+                    $imgBtn.prepend('<i class="fa-solid fa-image"></i>');
+                }
+                $imgBtn.closest('.cx-media-preview-row').find('.cx-file-name').text(nombre || 'Sin archivo');
+            }
             scheduleSave();
         }).fail((xhr) => {
             toast('error', errorAjax(xhr, 'No se pudo subir el archivo.'));
@@ -911,7 +1232,10 @@
 
     $configBody.on('input change', '.cx-input, .cx-check, .cx-correcta, .cx-correcta-paso', function () {
         const field = $(this).data('field');
-        if (field === 'paginas' || field === 'juego_id' || field === 'modo' || field === 'tipo' || field === 'tipo_opts' || field === 'categorias_txt') {
+        if (typeof field === 'string' && field.indexOf('colores_zonas.') === 0) {
+            $(this).closest('.cx-zona-color-row').find('.cx-zona-color-badge').css('background', $(this).val());
+        }
+        if (field === 'paginas' || field === 'juego_id' || field === 'juego_piezas' || field === 'modo' || field === 'tipo' || field === 'tipo_opts') {
             const bloque = bloquePorId(seleccionadoId);
             if (!bloque) return;
             const datos = leerDatosDesdeForm(bloque);
@@ -928,8 +1252,14 @@
                 };
                 datos.juego_nombre = mapNombres[datos.juego_id] || '';
             }
-            if (field === 'categorias_txt') {
-                // already in leerDatosDesdeForm
+            if (field === 'juego_piezas' && datos.juego_id === 'colorear') {
+                const s = String(datos.juego_piezas || '');
+                const n = s.includes('9') ? 9 : (s.includes('6') ? 6 : 4);
+                const defaults = ['#EF4444', '#F59E0B', '#22C55E', '#3B82F6', '#A855F7', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
+                const prev = Array.isArray(datos.colores_zonas) ? datos.colores_zonas : [];
+                const next = [];
+                for (let i = 0; i < n; i++) next.push(prev[i] || defaults[i] || '#22C55E');
+                datos.colores_zonas = next;
             }
             bloque.datos = datos;
             renderConfig(bloque);
@@ -978,6 +1308,54 @@
             if (Array.isArray(d.items) && d.items.length > 2) d.items.pop();
         });
     });
+    $configBody.on('click', '.cx-rm-item-at', function () {
+        const idx = Number($(this).data('index'));
+        mutarDatosLocales((d) => {
+            if (!Array.isArray(d.items) || d.items.length <= 2) return;
+            if (Number.isNaN(idx) || idx < 0 || idx >= d.items.length) return;
+            d.items.splice(idx, 1);
+        });
+    });
+    $configBody.on('click', '#cxCatAdd', function () {
+        const nombre = String($('#cxCatNueva').val() || '').trim();
+        if (!nombre) {
+            toast('warning', 'Escribe el nombre de la categoría.');
+            return;
+        }
+        const bloque = bloquePorId(seleccionadoId);
+        if (!bloque) return;
+        const cats = Array.isArray(bloque.datos?.categorias) ? bloque.datos.categorias : [];
+        if (cats.some((c) => String(c).toLowerCase() === nombre.toLowerCase())) {
+            toast('warning', 'Esa categoría ya existe.');
+            return;
+        }
+        mutarDatosLocales((d) => {
+            if (!Array.isArray(d.categorias)) d.categorias = [];
+            d.categorias.push(nombre);
+        });
+    });
+    $configBody.on('keydown', '#cxCatNueva', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            $('#cxCatAdd').trigger('click');
+        }
+    });
+    $configBody.on('click', '.cx-cat-chip-rm', function () {
+        const idx = Number($(this).data('index'));
+        mutarDatosLocales((d) => {
+            if (!Array.isArray(d.categorias) || d.categorias.length <= 2) return;
+            if (Number.isNaN(idx) || idx < 0 || idx >= d.categorias.length) return;
+            const removida = d.categorias[idx];
+            d.categorias.splice(idx, 1);
+            const fallback = d.categorias[0] || '';
+            if (Array.isArray(d.items)) {
+                d.items = d.items.map((it) => ({
+                    ...it,
+                    categoria: it.categoria === removida ? fallback : it.categoria,
+                }));
+            }
+        });
+    });
     $configBody.on('click', '.cx-add-zona', function () {
         mutarDatosLocales((d) => {
             if (!Array.isArray(d.zonas)) d.zonas = [];
@@ -999,6 +1377,14 @@
     $configBody.on('click', '.cx-rm-item-arr', function () {
         mutarDatosLocales((d) => {
             if (Array.isArray(d.items) && d.items.length > 2) d.items.pop();
+        });
+    });
+    $configBody.on('click', '.cx-rm-item-arr-at', function () {
+        const idx = Number($(this).data('index'));
+        mutarDatosLocales((d) => {
+            if (!Array.isArray(d.items) || d.items.length <= 2) return;
+            if (Number.isNaN(idx) || idx < 0 || idx >= d.items.length) return;
+            d.items.splice(idx, 1);
         });
     });
     $configBody.on('click', '.cx-add-paso', function () {
@@ -1023,6 +1409,20 @@
 
     $('#cxBtnLimpiar').on('click', limpiarSecuencia);
     $('.cx-btn-publicar').on('click', publicar);
+
+    /* ── API pública (Vista Niño y otros) ─────────────────────── */
+    window.CxConstructor = {
+        getBloques() {
+            return bloques.map((b) => ({ ...b, datos: { ...(b.datos || {}) } }));
+        },
+        getMeta() {
+            return {
+                experienciaId: $app.data('experiencia-id'),
+                nombre: $app.data('experiencia-nombre') || 'Experiencia',
+                mediaBase: $app.data('media-base') || '',
+            };
+        },
+    };
 
     /* ── Init ───────────────────────────────────────────────── */
 

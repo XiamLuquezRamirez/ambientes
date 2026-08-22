@@ -2226,7 +2226,6 @@ CREATE TABLE `piar` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `piar_estudiante_id_unique` (`estudiante_id`),
   KEY `piar_docente_id_foreign` (`docente_id`),
-  CONSTRAINT `piar_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `piar_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
