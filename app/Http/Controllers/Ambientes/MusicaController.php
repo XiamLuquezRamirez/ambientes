@@ -9,7 +9,7 @@ class MusicaController extends Controller
 {
     public function index()
     {
-        $ambiente = Ambiente::where('slug', 'musica')->firstOrFail();
+        $ambiente = Ambiente::where('slug', 'expresion-artistica')->firstOrFail();
         return view('ambientes.musica.inicio', compact('ambiente'));
     }
 }

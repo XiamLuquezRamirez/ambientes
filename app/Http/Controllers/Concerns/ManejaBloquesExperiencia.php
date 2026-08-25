@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Concerns;
 use App\Models\BloqueExperiencia;
 use App\Models\Experiencia;
 use App\Services\BloqueExperienciaService;
+use App\Services\RecorridoNinoService;
 use App\Services\VistaPreviaNinoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -250,5 +251,36 @@ trait ManejaBloquesExperiencia
         }
 
         return response()->json(['success' => true]);
+    }
+
+    public function crearRecorridoNino(Request $request, Experiencia $experiencia)
+    {
+        $this->asegurarExperienciaVisible($experiencia);
+
+        $servicio = app(RecorridoNinoService::class);
+        $ambiente = $servicio->ambienteDeExperiencia($experiencia);
+
+        if (! $servicio->esAmbienteDemo($ambiente)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El recorrido demo solo está disponible para Expresión Artística.',
+            ], 422);
+        }
+
+        $userId = (int) Auth::guard('docente')->id();
+        $sesion = $servicio->crear($ambiente, $userId, (int) $experiencia->id);
+        $enlace = $servicio->armarUrlTablet($request, $sesion['token']);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'token' => $sesion['token'],
+                'url' => $enlace['url'],
+                'expira_en' => $sesion['expira_en'],
+                'host_local' => $enlace['host_local'],
+                'ip_lan' => $enlace['ip_lan'],
+                'aviso_red' => $enlace['aviso_red'],
+            ],
+        ]);
     }
 }

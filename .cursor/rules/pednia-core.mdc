@@ -14,7 +14,7 @@ Laravel 10, Blade + Bootstrap + jQuery, español. Guía completa: `AGENTS.md`.
 
 ## Ambientes fijos
 
-`musica`, `polimotor`, `logico`, `multisensorial`, `tecnologia`. Cada servidor carga `routes/ambientes/{slug}.php`.
+`expresion-artistica` (Expresión Artística), `polimotor`, `multisaberes`, `multisensorial`, `tecnologia`. Cada servidor carga `routes/ambientes/{slug}.php` (aliases legacy: `musica`, `logico`).
 
 ## Capas
 

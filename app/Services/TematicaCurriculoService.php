@@ -549,7 +549,7 @@ class TematicaCurriculoService
                 'catalogosDba:id,codigo,descripcion',
                 'eje:id,nombre,modulo_id',
                 'eje.modulo:id,nombre,ambiente_id',
-                'eje.modulo.ambiente:id,nombre',
+                'eje.modulo.ambiente:id,nombre,slug',
                 'institucion:id,nombre',
                 'experiencias:id,tematica_id,grado_id',
                 'experiencias.grado:id,nombre',
@@ -567,7 +567,10 @@ class TematicaCurriculoService
         return $experiencia->fresh()->load([
             'grado:id,nombre',
             'materiales',
-            'tematica:id,institucion_id,es_oficial,creado_por',
+            'tematica:id,eje_id,nombre,institucion_id,es_oficial,creado_por',
+            'tematica.eje:id,nombre,modulo_id',
+            'tematica.eje.modulo:id,nombre,ambiente_id',
+            'tematica.eje.modulo.ambiente:id,nombre,slug,color_hex,icono',
         ])->loadCount('materiales');
     }
 

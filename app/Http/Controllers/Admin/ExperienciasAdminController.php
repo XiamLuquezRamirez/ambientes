@@ -9,6 +9,7 @@ use App\Models\Institucion;
 use App\Models\Modulo;
 use App\Models\Tematica;
 use App\Services\BloqueExperienciaService;
+use App\Services\RecorridoNinoService;
 use App\Services\TematicaCurriculoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -148,6 +149,9 @@ class ExperienciasAdminController extends Controller
             'tematica' => $experiencia->tematica_id,
         ]);
 
+        $recorridoNinoDisponible = app(RecorridoNinoService::class)
+            ->esAmbienteDemo($experiencia->tematica?->eje?->modulo?->ambiente);
+
         $bloques = $puedeEditar
             ? $this->bloques->asegurarObligatorios($experiencia)
             : $this->bloques->listar($experiencia);
@@ -162,6 +166,7 @@ class ExperienciasAdminController extends Controller
             'publicar' => route('admin.experiencias.publicar', $experiencia),
             'vista_previa' => route('admin.experiencias.vista-previa', $experiencia),
             'vista_previa_foco' => route('admin.experiencias.vista-previa.foco', $experiencia),
+            'recorrido_nino' => route('admin.experiencias.recorrido-nino', $experiencia),
             'actualizar_template' => route('admin.bloques.actualizar', ['bloque' => '__BLOQUE__']),
             'eliminar_template' => route('admin.bloques.eliminar', ['bloque' => '__BLOQUE__']),
         ];
@@ -173,7 +178,8 @@ class ExperienciasAdminController extends Controller
             'volverUrl',
             'bloques',
             'catalogo',
-            'constructorUrls'
+            'constructorUrls',
+            'recorridoNinoDisponible'
         ));
     }
 

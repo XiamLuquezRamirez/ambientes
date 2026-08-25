@@ -25,6 +25,12 @@
             title="Abrir la vista niño en una tablet de la misma red">
             <i class="fa-solid fa-qrcode"></i> Probar en tablet
         </button>
+        @if(!empty($recorridoNinoDisponible))
+            <button type="button" class="btn btn-outline-info" id="cxBtnRecorrido"
+                title="Demo del recorrido del niño: ambiente → módulos → ejes → temáticas → experiencia">
+                <i class="fa-solid fa-route"></i> Recorrido niño
+            </button>
+        @endif
         <button type="button" class="btn btn-success cx-btn-publicar" title="{{ $tituloPublicar }}"
             @disabled(!$puedePublicar)>
             <i class="fa-solid fa-rocket"></i> Publicar
@@ -43,7 +49,8 @@
     data-url-guardar="{{ $urls['guardar'] }}" data-url-reordenar="{{ $urls['reordenar'] }}"
     data-url-limpiar="{{ $urls['limpiar'] }}" data-url-upload="{{ $urls['upload'] }}"
     data-url-tts="{{ $urls['tts'] ?? '' }}" data-url-vista-previa="{{ $urls['vista_previa'] ?? '' }}"
-    data-url-vista-previa-foco="{{ $urls['vista_previa_foco'] ?? '' }}" data-url-publicar="{{ $urls['publicar'] }}"
+    data-url-vista-previa-foco="{{ $urls['vista_previa_foco'] ?? '' }}"
+    data-url-recorrido-nino="{{ $urls['recorrido_nino'] ?? '' }}" data-url-publicar="{{ $urls['publicar'] }}"
     data-url-actualizar-template="{{ $urls['actualizar_template'] }}"
     data-url-eliminar-template="{{ $urls['eliminar_template'] }}">
 
@@ -147,7 +154,7 @@
             <i class="fa-solid fa-xmark"></i>
         </button>
         <h2 id="vnTabletModalTitle">Probar en tablet</h2>
-        <p class="vn-tablet-modal-lead">Abre este enlace en la tablet (misma red Wi‑Fi). La vista se actualiza al
+        <p class="vn-tablet-modal-lead" id="vnTabletModalLead">Abre este enlace en la tablet (misma red Wi‑Fi). La vista se actualiza al
             guardar bloques en el constructor.</p>
         <div class="vn-tablet-qr-wrap">
             <canvas id="vnTabletQr" width="220" height="220" aria-label="Código QR"></canvas>
@@ -159,7 +166,7 @@
             <button type="button" class="btn btn-primary" id="vnTabletCopy">Copiar</button>
         </div>
         <p class="vn-tablet-warn" id="vnTabletLocalWarn" hidden></p>
-        <label class="vn-tablet-follow">
+        <label class="vn-tablet-follow" id="vnTabletFollowWrap">
             <input type="checkbox" id="vnTabletFollow" checked>
             Seguir el bloque seleccionado en el constructor
         </label>

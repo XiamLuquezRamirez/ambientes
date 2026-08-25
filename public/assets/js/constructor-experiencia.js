@@ -22,6 +22,7 @@
         eliminarTpl: $app.data('url-eliminar-template') || '',
         vistaPrevia: $app.data('url-vista-previa') || '',
         vistaPreviaFoco: $app.data('url-vista-previa-foco') || '',
+        recorridoNino: $app.data('url-recorrido-nino') || '',
     };
 
     let bloques = [];
@@ -371,8 +372,27 @@
     }
 
     function abrirModalTablet() {
-        if (!urls.vistaPrevia) {
-            toast('error', 'No hay URL de vista previa configurada.');
+        abrirModalEnlaceTablet({
+            urlApi: urls.vistaPrevia,
+            titulo: 'Probar en tablet',
+            lead: 'Abre este enlace en la tablet (misma red Wi‑Fi). La vista se actualiza al guardar bloques en el constructor.',
+            seguirFoco: true,
+        });
+    }
+
+    function abrirModalRecorrido() {
+        abrirModalEnlaceTablet({
+            urlApi: urls.recorridoNino,
+            titulo: 'Recorrido niño (demo)',
+            lead: 'Abre este enlace en la tablet para probar el recorrido: ambiente → módulos → ejes → camino → experiencia.',
+            seguirFoco: false,
+        });
+    }
+
+    function abrirModalEnlaceTablet(opts) {
+        opts = opts || {};
+        if (!opts.urlApi) {
+            toast('error', 'No hay URL configurada para este enlace.');
             return;
         }
         const $modal = $('#vnTabletModal');
@@ -380,6 +400,9 @@
         const $img = $('#vnTabletQrImg');
         $modal.prop('hidden', false);
         $('body').css('overflow', 'hidden');
+        $('#vnTabletModalTitle').text(opts.titulo || 'Probar en tablet');
+        $('#vnTabletModalLead').text(opts.lead || '');
+        $('#vnTabletFollowWrap').prop('hidden', !opts.seguirFoco);
         $('#vnTabletUrl').val('Generando…');
         if ($img.length) {
             $img.prop('hidden', true).removeAttr('src');
@@ -390,12 +413,13 @@
             if (ctx) ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
         }
         $('#vnTabletLocalWarn').prop('hidden', true).empty();
-        api(urls.vistaPrevia, 'POST', {})
+        tabletToken = '';
+        api(opts.urlApi, 'POST', {})
             .done((res) => {
                 const data = res?.data || {};
-                tabletToken = data.token || '';
+                tabletToken = opts.seguirFoco ? (data.token || '') : '';
                 const url = data.url || '';
-                if (!tabletToken || !url) {
+                if (!url) {
                     toast('error', 'Respuesta incompleta al crear el enlace.');
                     cerrarModalTablet();
                     return;
@@ -415,7 +439,9 @@
                 const mins = Math.max(1, Math.round((data.expira_en || 3600) / 60));
                 $('#vnTabletExpira').text(`El enlace dura ${mins} minutos. Al generar uno nuevo, el anterior deja de funcionar.`);
                 pintarQrTablet(url);
-                if (seleccionadoId) enviarFocoTablet(seleccionadoId);
+                if (opts.seguirFoco && tabletToken && seleccionadoId) {
+                    enviarFocoTablet(seleccionadoId);
+                }
             })
             .fail((xhr) => {
                 toast('error', errorAjax(xhr, 'No se pudo crear el enlace.'));
@@ -430,13 +456,34 @@
 
     /* ── Formularios ────────────────────────────────────────── */
 
+    function detenerAudiosConfig() {
+        $configBody.find('.cx-audio-el').each(function () {
+            try {
+                this.pause();
+                this.currentTime = 0;
+            } catch (e) { /* noop */ }
+        });
+        $configBody.find('.cx-audio-play-btn i').removeClass('fa-pause').addClass('fa-play');
+        if (window.speechSynthesis) {
+            try { window.speechSynthesis.cancel(); } catch (e) { /* noop */ }
+        }
+    }
+
     function fieldTextarea(name, label, value, help) {
         const helpText = help || (name === 'instruccion'
             ? 'Este texto se lee en voz alta al entrar al bloque. Usa frases cortas y claras para niños de 4 años.'
             : '');
+        const ttsBtn = name === 'instruccion'
+            ? `<button type="button" class="cx-tts-preview-btn" data-cx-tts-preview title="Escuchar instrucción">
+                <i class="fa-solid fa-volume-high"></i> Escuchar
+               </button>`
+            : '';
         return `
             <div class="cx-field">
-                <label>${escapar(label)}</label>
+                <div class="cx-field-label-row">
+                    <label>${escapar(label)}</label>
+                    ${ttsBtn}
+                </div>
                 <textarea class="form-control cx-input" data-field="${escapar(name)}" rows="3"
                     ${puedeEditar ? '' : 'readonly'}>${escapar(value || '')}</textarea>
                 ${helpText ? `<div class="cx-help">${escapar(helpText)}</div>` : ''}
@@ -481,20 +528,21 @@
     }
 
     /** Thumb clicable con preview (mismo patrón que Elementos en Clasificación). */
-    function imageThumbBtn(name, value, title) {
+    function imageThumbBtn(name, value, title, large) {
         const archivo = value || '';
         const url = mediaUrlBloque(archivo);
         const thumb = url
             ? `<img src="${escapar(url)}" alt="">`
             : '<i class="fa-solid fa-image"></i>';
+        const sizeClass = large ? ' cx-image-preview-btn' : '';
         return `
             <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(archivo)}">
             ${puedeEditar
-                ? `<label class="cx-img-btn cx-image-preview-btn" title="${escapar(title || 'Subir imagen')}">
+                ? `<label class="cx-img-btn${sizeClass}" title="${escapar(title || 'Subir imagen')}">
                     ${thumb}
                     <input type="file" class="cx-file" data-target="${escapar(name)}" accept="image/*" hidden>
                    </label>`
-                : `<span class="cx-img-btn cx-image-preview-btn is-readonly">${thumb}</span>`}`;
+                : `<span class="cx-img-btn${sizeClass} is-readonly">${thumb}</span>`}`;
     }
 
     function fieldImagePreview(name, label, value) {
@@ -502,10 +550,38 @@
         return `<div class="cx-field">
             <label>${escapar(label)}</label>
             <div class="cx-media-preview-row">
-                ${imageThumbBtn(name, archivo, 'Subir imagen')}
+                ${imageThumbBtn(name, archivo, 'Subir imagen', true)}
                 <div class="cx-media-preview-meta">
                     <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
                     <div class="cx-help">Toca el recuadro para elegir o cambiar la imagen.</div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function fieldAudioPreview(name, label, value) {
+        const archivo = value || '';
+        const url = mediaUrlBloque(archivo);
+        const hasAudio = !!url;
+        return `<div class="cx-field">
+            <label>${escapar(label)}</label>
+            <div class="cx-media-preview-row cx-audio-preview-row">
+                <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(archivo)}">
+                <button type="button" class="cx-audio-btn cx-audio-play-btn" title="Reproducir audio"
+                    ${hasAudio ? '' : 'disabled'} aria-label="Reproducir audio">
+                    <i class="fa-solid fa-${hasAudio ? 'play' : 'volume-high'}"></i>
+                </button>
+                ${hasAudio ? `<audio class="cx-audio-el" preload="metadata" src="${escapar(url)}" hidden></audio>` : ''}
+                <div class="cx-media-preview-meta">
+                    <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
+                    ${puedeEditar
+                        ? `<label class="cx-audio-upload-btn">
+                            <i class="fa-solid fa-upload"></i> Elegir archivo
+                            <input type="file" class="cx-file" data-target="${escapar(name)}"
+                                accept="audio/mpeg,.mp3,audio/wav,.wav" hidden>
+                           </label>`
+                        : ''}
+                    <div class="cx-help">Toca ▶ para escuchar el audio. Formatos: MP3, WAV.</div>
                 </div>
             </div>
         </div>`;
@@ -610,7 +686,7 @@
 
     function formAudio(d) {
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldUpload('archivo', 'Archivo de audio (.mp3)', d.archivo, 'audio/mpeg,.mp3')
+            + fieldAudioPreview('archivo', 'Archivo de audio (.mp3)', d.archivo)
             + fieldSelect('repeticiones', 'Repeticiones', d.repeticiones || '1 vez', ['1 vez', '2 veces', '3 veces', 'Sin límite'])
             + fieldTextarea('descripcion_accesible', 'Descripción accesible', d.descripcion_accesible);
     }
@@ -641,7 +717,7 @@
                     <span class="cx-paso-badge" style="background:${color}">Página ${i + 1}</span>
                 </div>
                 ${fieldImagePreview(`paginas_data.${i}.imagen`, 'Imagen', p.imagen)}
-                ${fieldUpload(`paginas_data.${i}.audio`, 'Audio de la página (.mp3)', p.audio, 'audio/mpeg,.mp3')}
+                ${fieldAudioPreview(`paginas_data.${i}.audio`, 'Audio de la página (.mp3)', p.audio)}
             </div>`;
         }
         return html;
@@ -1084,7 +1160,21 @@
     }
 
     function renderConfig(bloque) {
+        detenerAudiosConfig();
         const tabPrev = tabActivaId();
+        const pendientes = Array.isArray(bloque.pendientes) ? bloque.pendientes : [];
+        const pendHtml = bloque.completo
+            ? `<div class="cx-pendientes-banner cx-pendientes-banner--ok">
+                <i class="fa-solid fa-circle-check"></i> Bloque completo
+               </div>`
+            : (pendientes.length
+                ? `<div class="cx-pendientes-banner cx-pendientes-banner--warn">
+                    <strong>Campos pendientes</strong>
+                    <ul class="cx-pendientes-items">${pendientes.map((p) => `<li>${escapar(p)}</li>`).join('')}</ul>
+                   </div>`
+                : `<div class="cx-pendientes-banner cx-pendientes-banner--warn">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Campos pendientes
+                   </div>`);
         $configHead.html(`
             <div class="cx-config-head-icon"><i class="fa-solid ${escapar(bloque.icono || 'fa-cube')}"></i></div>
             <div>
@@ -1093,7 +1183,7 @@
                 <p>${escapar(bloque.categoria_label || '')}${bloque.obligatorio ? ' · Obligatorio' : ''}</p>
             </div>
         `);
-        $configBody.html(htmlFormulario(bloque));
+        $configBody.html(pendHtml + htmlFormulario(bloque));
         restaurarTab(tabPrev);
         $saveStatus.prop('hidden', true).removeClass('is-saving is-ok is-err');
     }
@@ -1320,6 +1410,26 @@
             const nombre = res?.data?.archivo || '';
             $configBody.find(`.cx-input[data-field="${target}"]`).val(nombre);
             $(input).closest('.cx-upload-row').find('.cx-file-name').text(nombre || 'Sin archivo');
+            const $audioRow = $(input).closest('.cx-audio-preview-row');
+            if ($audioRow.length) {
+                const url = mediaUrlBloque(nombre);
+                $audioRow.find('.cx-file-name').text(nombre || 'Sin archivo');
+                let $audio = $audioRow.find('.cx-audio-el');
+                const $btn = $audioRow.find('.cx-audio-play-btn');
+                if (url) {
+                    if (!$audio.length) {
+                        $btn.after(`<audio class="cx-audio-el" preload="metadata" hidden></audio>`);
+                        $audio = $audioRow.find('.cx-audio-el');
+                    }
+                    $audio.attr('src', url);
+                    $btn.prop('disabled', false);
+                    $btn.find('i').removeClass('fa-volume-high fa-pause').addClass('fa-play');
+                } else {
+                    $audio.remove();
+                    $btn.prop('disabled', true);
+                    $btn.find('i').removeClass('fa-play fa-pause').addClass('fa-volume-high');
+                }
+            }
             const $imgBtn = $(input).closest('.cx-img-btn');
             if ($imgBtn.length) {
                 $imgBtn.find('img, video, i.fa-image, i.fa-film').remove();
@@ -1413,6 +1523,59 @@
 
     $configBody.on('change', '.cx-file', function () {
         uploadArchivo(this);
+    });
+
+    $configBody.on('click', '.cx-audio-play-btn', function () {
+        const $btn = $(this);
+        if ($btn.prop('disabled')) return;
+        const $row = $btn.closest('.cx-audio-preview-row');
+        const audio = $row.find('.cx-audio-el')[0];
+        if (!audio) return;
+        $configBody.find('.cx-audio-el').each(function () {
+            if (this !== audio) {
+                try {
+                    this.pause();
+                    this.currentTime = 0;
+                } catch (e) { /* noop */ }
+            }
+        });
+        $configBody.find('.cx-audio-play-btn').not($btn).each(function () {
+            $(this).find('i').removeClass('fa-pause').addClass('fa-play');
+        });
+        if (window.speechSynthesis) {
+            try { window.speechSynthesis.cancel(); } catch (e) { /* noop */ }
+        }
+        const $icon = $btn.find('i');
+        if (audio.paused) {
+            audio.onended = function () {
+                $icon.removeClass('fa-pause').addClass('fa-play');
+            };
+            const p = audio.play();
+            $icon.removeClass('fa-play').addClass('fa-pause');
+            if (p && typeof p.catch === 'function') {
+                p.catch(() => $icon.removeClass('fa-pause').addClass('fa-play'));
+            }
+        } else {
+            audio.pause();
+            $icon.removeClass('fa-pause').addClass('fa-play');
+        }
+    });
+
+    $configBody.on('click', '[data-cx-tts-preview]', function () {
+        detenerAudiosConfig();
+        const texto = String($(this).closest('.cx-field').find('textarea[data-field="instruccion"]').val() || '').trim();
+        if (!texto) {
+            toast('info', 'Escribe la instrucción para escucharla.');
+            return;
+        }
+        if (!window.speechSynthesis) {
+            toast('info', 'Tu navegador no soporta vista previa de voz.');
+            return;
+        }
+        const u = new SpeechSynthesisUtterance(texto);
+        u.lang = 'es-CO';
+        u.rate = 0.92;
+        window.speechSynthesis.speak(u);
     });
 
     $configBody.on('click', '.cx-add-opcion', function () {
@@ -1552,6 +1715,7 @@
     $('#cxBtnLimpiar').on('click', limpiarSecuencia);
     $('.cx-btn-publicar').on('click', publicar);
     $('#cxBtnTablet').on('click', abrirModalTablet);
+    $('#cxBtnRecorrido').on('click', abrirModalRecorrido);
     $('#vnTabletModal').on('click', '[data-vn-tablet-close]', cerrarModalTablet);
     $(document).on('keydown', function (e) {
         if (e.key === 'Escape' && !$('#vnTabletModal').prop('hidden')) {

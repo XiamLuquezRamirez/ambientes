@@ -550,6 +550,43 @@
     margin-bottom: 6px;
 }
 
+.cx-field-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.cx-field-label-row > label {
+    margin-bottom: 0;
+}
+
+.cx-tts-preview-btn {
+    border: 0;
+    border-radius: 999px;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.cx-tts-preview-btn:hover {
+    background: #bae6fd;
+}
+
+.cx-tts-preview-btn:active {
+    transform: scale(0.97);
+}
+
 /* El thumb de imagen no es un label de campo: mantener centrado */
 .cx-field label.cx-img-btn {
     display: inline-flex;
@@ -572,6 +609,40 @@
     font-size: 0.72rem;
     color: var(--cx-muted);
     margin-top: 4px;
+}
+
+.cx-pendientes-banner {
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-size: 0.82rem;
+}
+
+.cx-pendientes-banner--ok {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #047857;
+    font-weight: 700;
+}
+
+.cx-pendientes-banner--warn {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+}
+
+.cx-pendientes-banner--warn strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.cx-pendientes-items {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.cx-pendientes-items li {
+    margin-bottom: 2px;
 }
 
 .cx-upload-row {
@@ -662,7 +733,7 @@
 
 .cx-item-row {
     display: grid;
-    grid-template-columns: 100px minmax(0, 1fr) minmax(110px, 140px) auto;
+    grid-template-columns: 56px minmax(0, 1fr) minmax(110px, 140px) auto;
     gap: 8px;
     align-items: end;
     margin-bottom: 12px;
@@ -678,6 +749,17 @@
 
 .cx-item-img {
     align-self: center;
+    width: 52px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.cx-item-img > .cx-input[type="hidden"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .cx-img-btn {
@@ -694,6 +776,7 @@
     overflow: hidden;
     margin: 0;
     position: relative;
+    flex-shrink: 0;
 }
 
 .cx-img-btn:hover {
@@ -738,6 +821,71 @@
 .cx-media-preview-meta {
     flex: 1;
     min-width: 0;
+}
+
+.cx-audio-preview-row {
+    align-items: flex-start;
+}
+
+.cx-audio-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 0;
+    background: #2563eb;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    box-shadow: 0 4px 0 #1e40af;
+    font-size: 1.1rem;
+}
+
+.cx-audio-btn:hover:not(:disabled) {
+    filter: brightness(1.06);
+}
+
+.cx-audio-btn:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #1e40af;
+}
+
+.cx-audio-btn:disabled {
+    background: #cbd5e1;
+    color: #64748b;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.cx-audio-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px dashed #94a3b8;
+    background: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+}
+
+.cx-audio-upload-btn:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.cx-audio-preview-row .cx-file-name {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--cx-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .cx-video-preview-btn {
@@ -829,17 +977,48 @@
 
 .cx-paso-opcion-body {
     display: grid;
-    grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-columns: 76px minmax(0, 1fr);
     gap: 10px;
     align-items: start;
 }
 
+.cx-paso-opcion-body .cx-item-img {
+    width: 72px;
+}
+
+.cx-paso-opcion-body .cx-img-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+}
+
+.cx-paso-opcion-body .cx-img-btn > i {
+    font-size: 1.35rem;
+}
+
+.cx-paso-opcion-fields {
+    min-width: 0;
+}
+
 .cx-paso-opcion-fields .cx-field {
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .cx-paso-opcion-fields .cx-field:last-child {
     margin-bottom: 0;
+}
+
+.cx-paso-opcion-fields .cx-field > label {
+    font-size: 0.72rem;
+    margin-bottom: 2px;
+}
+
+.cx-paso-opcion-fields .cx-field .form-control,
+.cx-paso-opcion-fields .cx-field .form-select {
+    padding: 0.28rem 0.5rem;
+    font-size: 0.82rem;
+    min-height: 0;
+    height: calc(1.4em + 0.56rem + 2px);
 }
 
 .cx-inline-actions {

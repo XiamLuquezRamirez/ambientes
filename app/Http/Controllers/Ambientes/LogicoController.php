@@ -9,7 +9,7 @@ class LogicoController extends Controller
 {
     public function index()
     {
-        $ambiente = Ambiente::where('slug', 'logico')->firstOrFail();
+        $ambiente = Ambiente::where('slug', 'multisaberes')->firstOrFail();
         return view('ambientes.logico.inicio', compact('ambiente'));
     }
 }

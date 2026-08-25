@@ -257,12 +257,24 @@ class BloqueDatosRegistry
         $datos = $this->normalizar($tipo, $datos);
         $pendientes = [];
 
-        $req = fn (string $campo, string $label) => $this->vacio($datos[$campo] ?? null)
-            ? $pendientes[] = $label
-            : null;
+        $req = function (string $campo, string $label) use (&$pendientes, $datos): void {
+            if ($this->vacio($datos[$campo] ?? null)) {
+                $pendientes[] = $label;
+            }
+        };
 
         switch ($tipo) {
             case BloqueExperiencia::TIPO_BIENVENIDA:
+                $req('instruccion', 'Instrucción de audio');
+                $tipoMedia = $datos['tipo_media'] ?? 'ninguno';
+                if ($tipoMedia === 'imagen' && $this->vacio($datos['imagen'] ?? null)) {
+                    $pendientes[] = 'Imagen de bienvenida';
+                }
+                if ($tipoMedia === 'video' && $this->vacio($datos['video'] ?? null)) {
+                    $pendientes[] = 'Video de bienvenida';
+                }
+                break;
+
             case BloqueExperiencia::TIPO_EMOCION:
                 $req('instruccion', 'Instrucción de audio');
                 break;
@@ -339,6 +351,7 @@ class BloqueDatosRegistry
 
             case BloqueExperiencia::TIPO_RETO:
                 $req('instruccion', 'Instrucción de audio');
+                $req('descripcion', 'Nombre del reto');
                 $pendientes = array_merge($pendientes, $this->pendientesReto($datos));
                 break;
         }
@@ -588,6 +601,13 @@ class BloqueDatosRegistry
         if (! is_array($cats) || count($cats) < 2) {
             $out[] = 'Categorías: mínimo 2';
         }
+
+        foreach ((array) $cats as $i => $cat) {
+            if ($this->vacio($cat)) {
+                $out[] = 'Categoría '.($i + 1).': nombre';
+            }
+        }
+
         if (! is_array($items) || count($items) < 2) {
             $out[] = 'Ítems: mínimo 2';
         }

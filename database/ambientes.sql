@@ -778,10 +778,10 @@ CREATE TABLE `grados` (
 /*Data for the table `grados` */
 
 insert  into `grados`(`id`,`nombre`,`edad_anos`,`descripcion`,`orden`,`activo`,`created_at`,`updated_at`) values
-(1,'Párvulo',2,'Para ninos de 2 a 3 años. Socializacion y desarrollo motriz.',1,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
-(2,'Prejardin',3,'Para ninos de 3 a 4 años. curiosidad, movimiento e interacción con otros pares.',2,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
-(3,'Jardin',4,'Para ninos de 4 a 5 años. Colores, numeros y letras.',3,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
-(4,'Transicion',5,'Para ninos de 5 a 6 años. Lectoescritura y habilidades logicas.',4,1,'2026-06-16 19:34:40','2026-06-16 19:34:40');
+(1,'Prejardin',3,'Para ninos de 3 anos. Socializacion y desarrollo motriz.',1,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
+(2,'Jardin',4,'Para ninos de 4 anos. Colores, numeros y letras.',2,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
+(3,'Transicion',5,'Para ninos de 5 anos. Lectoescritura y habilidades logicas.',3,1,'2026-06-16 19:34:40','2026-06-16 19:34:40');
+
 
 /*Table structure for table `grupos` */
 

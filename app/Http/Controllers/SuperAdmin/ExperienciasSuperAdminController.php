@@ -8,6 +8,7 @@ use App\Models\Experiencia;
 use App\Models\Grado;
 use App\Models\Tematica;
 use App\Services\BloqueExperienciaService;
+use App\Services\RecorridoNinoService;
 use App\Services\TematicaCurriculoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -104,6 +105,9 @@ class ExperienciasSuperAdminController extends Controller
             'tematica' => $experiencia->tematica_id,
         ]);
 
+        $recorridoNinoDisponible = app(RecorridoNinoService::class)
+            ->esAmbienteDemo($experiencia->tematica?->eje?->modulo?->ambiente);
+
         // Solo el dueño editable siembra Bienvenida/Recompensa; la vista de lectura no escribe.
         $bloques = $puedeEditar
             ? $this->bloques->asegurarObligatorios($experiencia)
@@ -119,6 +123,7 @@ class ExperienciasSuperAdminController extends Controller
             'publicar' => route('superadmin.catalogo.experiencias.publicar', $experiencia),
             'vista_previa' => route('superadmin.catalogo.experiencias.vista-previa', $experiencia),
             'vista_previa_foco' => route('superadmin.catalogo.experiencias.vista-previa.foco', $experiencia),
+            'recorrido_nino' => route('superadmin.catalogo.experiencias.recorrido-nino', $experiencia),
             'actualizar_template' => route('superadmin.catalogo.bloques.actualizar', ['bloque' => '__BLOQUE__']),
             'eliminar_template' => route('superadmin.catalogo.bloques.eliminar', ['bloque' => '__BLOQUE__']),
         ];
@@ -130,7 +135,8 @@ class ExperienciasSuperAdminController extends Controller
             'volverUrl',
             'bloques',
             'catalogo',
-            'constructorUrls'
+            'constructorUrls',
+            'recorridoNinoDisponible'
         ));
     }
 

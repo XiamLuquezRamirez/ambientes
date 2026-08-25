@@ -213,10 +213,26 @@
         `, bloque, 'imagen');
     }
 
+    function totalPaginasHistoria(bloque) {
+        const d = datos(bloque);
+        const pages = Array.isArray(d.paginas_data) ? d.paginas_data : [];
+        return Math.max(pages.length, Number(d.paginas) || 0, 1);
+    }
+
+    function navegarHistoria(delta) {
+        const bloque = bloques[index];
+        if (!bloque || bloque.tipo !== 'historia') return;
+        const total = totalPaginasHistoria(bloque);
+        const next = historiaPage + delta;
+        if (next < 0 || next >= total) return;
+        historiaPage = next;
+        pintar();
+    }
+
     function renderHistoria(bloque) {
         const d = datos(bloque);
         const pages = Array.isArray(d.paginas_data) ? d.paginas_data : [];
-        const total = Math.max(pages.length, Number(d.paginas) || 0, 1);
+        const total = totalPaginasHistoria(bloque);
         if (historiaPage >= total) historiaPage = total - 1;
         if (historiaPage < 0) historiaPage = 0;
         const page = pages[historiaPage] || {};
@@ -552,20 +568,26 @@
         const d = datos(bloque);
         const cats = Array.isArray(d.categorias) ? d.categorias : [];
         const items = Array.isArray(d.items) ? d.items : [];
-        const zonas = cats.map((c) =>
-            `<div class="vn-zone" data-vn-cat="${escapar(c)}" style="background:${pickColor(c)}">${escapar(c)}</div>`
+        const zonas = cats.map((c, i) =>
+            `<div class="vn-zone" data-vn-cat="${escapar(c)}" style="background:${pickColor(c)}; --vn-i:${i}">
+                <span class="vn-zone-label">${escapar(c)}</span>
+                <div class="vn-zone-slots" aria-hidden="true"></div>
+            </div>`
         ).join('');
         const pool = items.map((it, i) => {
             const label = it.texto || (it.imagen ? '' : 'Ítem');
             const img = it.imagen ? `<img src="${escapar(mediaUrl(it.imagen))}" alt="">` : '';
             const text = label ? `<span>${escapar(label)}</span>` : '';
-            return `<button type="button" class="vn-chip" data-vn-item="${i}" data-cat="${escapar(it.categoria || '')}">${img}${text || '—'}</button>`;
+            return `<button type="button" class="vn-chip" data-vn-item="${i}" data-cat="${escapar(it.categoria || '')}" style="--vn-i:${i}">${img}${text || '—'}</button>`;
         }).join('');
         return wrap(`
             <h2 class="vn-title">Clasifica</h2>
             ${instruccionHtml(d.instruccion)}
-            <div class="vn-zones" data-vn-clasif>${zonas}</div>
-            <div class="vn-pool" data-vn-clasif-pool>${pool}</div>
+            <p class="vn-hint-drag">Toca un elemento y luego su categoría</p>
+            <div class="vn-sort-board" data-vn-clasif-board>
+                <div class="vn-sort-col vn-sort-col--pool" data-vn-clasif-pool>${pool}</div>
+                <div class="vn-sort-col vn-sort-col--zones" data-vn-clasif>${zonas}</div>
+            </div>
             <div class="vn-feedback" id="vnFb" hidden></div>
         `, bloque, 'clasificacion');
     }
@@ -574,24 +596,50 @@
         const d = datos(bloque);
         const zonas = Array.isArray(d.zonas) ? d.zonas : [];
         const items = Array.isArray(d.items) ? d.items : [];
-        const zHtml = zonas.map((z) =>
-            `<div class="vn-zone" data-vn-zona="${escapar(z.nombre || '')}" style="background:${escapar(z.color || '#0F6E56')}">${escapar(z.nombre || 'Zona')}</div>`
+        const zHtml = zonas.map((z, i) =>
+            `<div class="vn-zone" data-vn-zona="${escapar(z.nombre || '')}" style="background:${escapar(z.color || '#0F6E56')}; --vn-i:${i}">
+                <span class="vn-zone-label">${escapar(z.nombre || 'Zona')}</span>
+                <div class="vn-zone-slots" aria-hidden="true"></div>
+            </div>`
         ).join('');
         const pool = items.map((it, i) => {
             const label = it.texto || (it.imagen ? '' : 'Ítem');
             const img = it.imagen ? `<img src="${escapar(mediaUrl(it.imagen))}" alt="">` : '';
             const text = label ? `<span>${escapar(label)}</span>` : '';
             return `<button type="button" class="vn-chip vn-chip-drag" data-vn-item="${i}" data-zona="${escapar(it.zona || '')}"
-                aria-grabbed="false">${img}${text || '—'}</button>`;
+                aria-grabbed="false" style="--vn-i:${i}">${img}${text || '—'}</button>`;
         }).join('');
         return wrap(`
             <h2 class="vn-title">Arrastra</h2>
             ${instruccionHtml(d.instruccion)}
             <p class="vn-hint-drag">Arrastra cada elemento a su zona</p>
-            <div class="vn-zones" data-vn-arrastrar>${zHtml}</div>
-            <div class="vn-pool" data-vn-arrastrar-pool>${pool}</div>
+            <div class="vn-sort-board" data-vn-arrastrar-board>
+                <div class="vn-sort-col vn-sort-col--pool" data-vn-arrastrar-pool>${pool}</div>
+                <div class="vn-sort-col vn-sort-col--zones" data-vn-arrastrar>${zHtml}</div>
+            </div>
             <div class="vn-feedback" id="vnFb" hidden></div>
         `, bloque, 'arrastrar');
+    }
+
+    function colocarChipEnZona($chip, zoneEl) {
+        if (!$chip || !$chip.length || !zoneEl) return;
+        const $slots = $(zoneEl).find('.vn-zone-slots').first();
+        if (!$slots.length) {
+            $chip.addClass('is-matched').removeClass('is-selected');
+            return;
+        }
+        const placed = $chip[0].cloneNode(true);
+        placed.classList.remove('is-selected', 'is-dragging', 'vn-chip-drag');
+        placed.classList.add('is-placed', 'vn-chip--placed');
+        placed.removeAttribute('aria-grabbed');
+        placed.style.pointerEvents = 'none';
+        placed.type = 'button';
+        placed.disabled = true;
+        $slots.append(placed);
+        $chip.addClass('is-matched is-leaving').removeClass('is-selected');
+        setTimeout(() => { $chip.prop('hidden', true); }, 280);
+        zoneEl.classList.add('is-landed');
+        setTimeout(() => { zoneEl.classList.remove('is-landed'); }, 450);
     }
 
     function renderReto(bloque) {
@@ -1584,6 +1632,7 @@
     function pedirFullscreen() {
         const candidatos = [
             document.documentElement,
+            document.getElementById('rnApp'),
             document.getElementById('vnDispositivo'),
             document.getElementById('vnTabletScreen'),
         ].filter(Boolean);
@@ -1621,6 +1670,31 @@
         $btnFullscreen.prop('hidden', estaEnFullscreen());
     }
 
+    let handlersFsListos = false;
+
+    function asegurarHandlersFullscreen() {
+        if (handlersFsListos || !$btnFullscreen.length) return;
+        handlersFsListos = true;
+        $btnFullscreen.off('click.vnFs').on('click.vnFs', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (estaEnFullscreen()) {
+                const salir = document.exitFullscreen
+                    || document.webkitExitFullscreen
+                    || document.webkitCancelFullScreen
+                    || document.msExitFullscreen;
+                if (salir) {
+                    Promise.resolve(salir.call(document)).finally(actualizarBtnFullscreen);
+                }
+                return;
+            }
+            pedirFullscreen()
+                .catch(function () { ocultarBarraNavegador(); })
+                .finally(actualizarBtnFullscreen);
+        });
+        $(document).on('fullscreenchange.vnFs webkitfullscreenchange.vnFs MSFullscreenChange.vnFs', actualizarBtnFullscreen);
+    }
+
     function iniciarDispositivo() {
         try {
             bloques = JSON.parse(document.getElementById('vn-bloques-iniciales')?.textContent || '[]');
@@ -1635,7 +1709,10 @@
         retoPaso = 0;
         desbloquearAudioTts();
         pintar();
-        pollTimer = setInterval(pollEstado, POLL_MS);
+        if ($root.data('url-estado')) {
+            pollTimer = setInterval(pollEstado, POLL_MS);
+        }
+        asegurarHandlersFullscreen();
         actualizarBtnFullscreen();
 
         // La API de fullscreen exige un gesto del usuario (toque).
@@ -1645,16 +1722,46 @@
             intentoFs = true;
             pedirFullscreen().finally(actualizarBtnFullscreen);
         };
-        $(document).one('pointerdown touchstart click', intentarFsUnaVez);
-        $btnFullscreen.on('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            pedirFullscreen()
-                .catch(function () { ocultarBarraNavegador(); })
-                .finally(actualizarBtnFullscreen);
-        });
-        $(document).on('fullscreenchange webkitfullscreenchange MSFullscreenChange', actualizarBtnFullscreen);
+        $(document).one('pointerdown.vnFsAuto touchstart.vnFsAuto click.vnFsAuto', intentarFsUnaVez);
     }
+
+    function iniciarDispositivoCon(opts) {
+        opts = opts || {};
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+        }
+        bloques = Array.isArray(opts.bloques) ? opts.bloques : [];
+        mediaBase = opts.mediaBase || '';
+        experienciaNombre = opts.experienciaNombre || 'Experiencia';
+        versionActual = '';
+        index = 0;
+        historiaPage = 0;
+        retoPaso = 0;
+        intentosRestantes = null;
+        desbloquearAudioTts();
+        pintar();
+        if (opts.poll && $root.data('url-estado')) {
+            pollTimer = setInterval(pollEstado, POLL_MS);
+        }
+        asegurarHandlersFullscreen();
+        actualizarBtnFullscreen();
+    }
+
+    function detenerDispositivo() {
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+        }
+        bloques = [];
+        index = 0;
+        $body.empty();
+    }
+
+    window.VistaNino = {
+        iniciar: iniciarDispositivoCon,
+        detener: detenerDispositivo,
+    };
 
     /* ── Eventos UI ──────────────────────────────────────────── */
 
@@ -1668,14 +1775,32 @@
     $(document).on('keydown', function (e) {
         if (!overlayAbierto()) return;
         if (!modoDispositivo && e.key === 'Escape') cerrar();
+        const bloque = bloques[index];
+        if (bloque && bloque.tipo === 'historia') {
+            const total = totalPaginasHistoria(bloque);
+            if (e.key === 'ArrowLeft' && historiaPage > 0) {
+                e.preventDefault();
+                navegarHistoria(-1);
+                return;
+            }
+            if (e.key === 'ArrowRight' && historiaPage < total - 1) {
+                e.preventDefault();
+                navegarHistoria(1);
+                return;
+            }
+        }
         if (e.key === 'ArrowLeft') ir(-1);
         if (e.key === 'ArrowRight') ir(1);
     });
 
     $body.on('click', '[data-vn-hist-prev]', function () {
         if ($(this).prop('disabled')) return;
-        historiaPage = Math.max(0, historiaPage - 1);
-        pintar();
+        navegarHistoria(-1);
+    });
+
+    $body.on('click', '[data-vn-hist-next]', function () {
+        if ($(this).prop('disabled')) return;
+        navegarHistoria(1);
     });
 
     $body.on('click', '[data-vn-tts-replay]', function (e) {
@@ -1842,6 +1967,7 @@
     });
 
     $body.on('click', '[data-vn-clasif-pool] [data-vn-item]', function () {
+        if ($(this).hasClass('is-matched') || $(this).prop('hidden')) return;
         $body.find('[data-vn-clasif-pool] .vn-chip').removeClass('is-selected');
         $(this).addClass('is-selected');
         $body.data('pick-item', $(this));
@@ -1853,7 +1979,12 @@
         if (!$item || !$item.length) return;
         const ok = String($item.data('cat')) === String($(this).data('vn-cat'));
         showFb(ok, '¡Muy bien!', 'Prueba otra categoría');
-        if (ok) $item.addClass('is-matched').removeClass('is-selected');
+        if (ok) colocarChipEnZona($item, this);
+        else {
+            $item.removeClass('is-selected');
+            this.classList.add('is-wrong');
+            setTimeout(() => { this.classList.remove('is-wrong'); }, 400);
+        }
         $body.data('pick-item', null);
         $body.find('.vn-zone').removeClass('is-target');
     });
@@ -1926,7 +2057,11 @@
         if (!zone || !drag.moved) return;
         const ok = String($chip.data('zona')) === String($(zone).data('vn-zona'));
         showFb(ok, '¡Muy bien!', 'Esa no es la zona');
-        if (ok) $chip.addClass('is-matched');
+        if (ok) colocarChipEnZona($chip, zone);
+        else {
+            zone.classList.add('is-wrong');
+            setTimeout(() => { zone.classList.remove('is-wrong'); }, 400);
+        }
     });
 
     function limpiarDragPuzzle() {
@@ -2162,6 +2297,13 @@
     });
 
     if (modoDispositivo) {
-        iniciarDispositivo();
+        const defer = String($root.data('vn-defer') || '') === '1';
+        if (!defer) {
+            iniciarDispositivo();
+        } else {
+            // Recorrido niño: el player arranca después; dejar el botón listo.
+            asegurarHandlersFullscreen();
+            actualizarBtnFullscreen();
+        }
     }
 })(jQuery);

@@ -582,6 +582,160 @@
     margin-top: 16px;
 }
 
+/* Clasificación / Arrastrar: tablero en dos columnas verticales */
+.vn-sort-board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: stretch;
+    max-width: 920px;
+    margin: 0 auto 8px;
+    min-height: 280px;
+}
+
+.vn-sort-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 100%;
+}
+
+.vn-sort-col--pool {
+    padding: 12px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(241, 245, 249, .88));
+    border: 3px dashed rgba(100, 116, 139, .35);
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, .7);
+}
+
+.vn-sort-col--zones {
+    gap: 14px;
+}
+
+.vn-sort-col .vn-chip {
+    width: 100%;
+    animation: vnSortIn .45s cubic-bezier(.34, 1.45, .64, 1) both;
+    animation-delay: calc(var(--vn-i, 0) * 55ms);
+}
+
+.vn-sort-col--pool .vn-chip:not(.is-matched):not(.is-selected):not(.is-dragging):not(.is-leaving) {
+    animation:
+        vnSortIn .45s cubic-bezier(.34, 1.45, .64, 1) both,
+        vnChipGlow 2.4s ease-in-out calc(var(--vn-i, 0) * 55ms + .5s) infinite;
+}
+
+.vn-sort-col .vn-chip.is-selected {
+    transform: scale(1.04);
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, .35), 0 6px 0 rgba(15, 23, 42, .1);
+    animation: vnChipPick .35s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.vn-sort-col .vn-chip.is-leaving {
+    animation: vnSortOut .28s ease forwards;
+}
+
+.vn-sort-col .vn-zone {
+    animation: vnSortIn .5s cubic-bezier(.34, 1.45, .64, 1) both;
+    animation-delay: calc(var(--vn-i, 0) * 70ms + 80ms);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-height: 110px;
+    padding: 14px 12px 12px;
+    border: 3px dashed rgba(255, 255, 255, .55);
+    box-shadow: 0 8px 0 rgba(15, 23, 42, .12);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease, outline-color .2s ease;
+}
+
+.vn-zone-label {
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: .01em;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.vn-zone-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-content: flex-start;
+    min-height: 48px;
+    flex: 1;
+    padding: 6px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .18);
+}
+
+.vn-chip--placed,
+.vn-zone-slots .vn-chip {
+    min-height: 56px;
+    padding: 8px 10px;
+    font-size: 1rem;
+    box-shadow: 0 3px 0 rgba(15, 23, 42, .12);
+    animation: vnPlacePop .4s cubic-bezier(.34, 1.56, .64, 1);
+    pointer-events: none;
+    opacity: 1;
+    border-color: rgba(255, 255, 255, .7);
+    background: rgba(255, 255, 255, .95);
+    color: #0f172a;
+    text-shadow: none;
+}
+
+.vn-zone-slots .vn-chip img {
+    width: 40px;
+    height: 40px;
+}
+
+.vn-zone.is-target {
+    outline: 3px solid #fbbf24;
+    outline-offset: 3px;
+    animation: vnZonePulse 1s ease-in-out infinite;
+}
+
+.vn-zone.is-drop-hover,
+.vn-zone.is-landed {
+    transform: scale(1.04);
+    filter: brightness(1.08);
+    box-shadow: 0 10px 0 rgba(15, 23, 42, .14);
+}
+
+.vn-zone.is-wrong {
+    animation: vnShake .4s ease;
+}
+
+@keyframes vnSortIn {
+    from { opacity: 0; transform: translateY(16px) scale(.94); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes vnSortOut {
+    to { opacity: 0; transform: scale(.7) translateX(24px); }
+}
+
+@keyframes vnPlacePop {
+    from { opacity: 0; transform: scale(.6); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes vnZonePulse {
+    0%, 100% { outline-color: #fbbf24; transform: scale(1); }
+    50% { outline-color: #fde68a; transform: scale(1.02); }
+}
+
+@keyframes vnChipGlow {
+    0%, 100% { box-shadow: 0 4px 0 rgba(15, 23, 42, .08); }
+    50% { box-shadow: 0 6px 14px rgba(56, 189, 248, .22); }
+}
+
+@keyframes vnChipPick {
+    from { transform: scale(.96); }
+    to { transform: scale(1.04); }
+}
+
 /* Clasificación: tipografía legible en tablet */
 .vn-card--clasificacion .vn-title {
     font-size: 2.15rem;
@@ -594,15 +748,22 @@
     line-height: 1.4;
 }
 
+.vn-card--clasificacion .vn-hint-drag {
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #64748b;
+    margin: -6px 0 14px;
+}
+
 .vn-card--clasificacion .vn-zone {
     font-size: 1.35rem;
-    padding: 16px 14px;
-    min-height: 72px;
+    min-height: 120px;
 }
 
 .vn-card--clasificacion .vn-chip {
     font-size: 1.3rem;
-    min-height: 80px;
+    min-height: 84px;
     padding: 14px 12px;
     border-radius: 18px;
     gap: 10px;
@@ -643,13 +804,12 @@
 
 .vn-card--arrastrar .vn-zone {
     font-size: 1.35rem;
-    padding: 18px 14px;
-    min-height: 88px;
+    min-height: 130px;
 }
 
 .vn-card--arrastrar .vn-chip {
     font-size: 1.3rem;
-    min-height: 80px;
+    min-height: 84px;
     padding: 14px 12px;
     border-radius: 18px;
     gap: 10px;
@@ -673,14 +833,24 @@
 .vn-card--arrastrar .vn-zone.is-drop-hover {
     outline: 4px solid #fff;
     outline-offset: 2px;
-    filter: brightness(1.08);
-    transform: scale(1.02);
 }
 
 .vn-card--arrastrar .vn-feedback {
     font-size: 1.45rem;
     padding: 16px 18px;
     margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+    .vn-sort-board {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        min-height: 0;
+    }
+
+    .vn-sort-col--zones {
+        order: -1;
+    }
 }
 
 .vn-drag-ghost {
@@ -1251,29 +1421,6 @@
     50% { transform: scale(1.06); }
 }
 
-.vn-historia-nav {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.vn-historia-nav button {
-    min-width: 44px;
-    min-height: 44px;
-    border-radius: 50%;
-    border: 0;
-    background: #fff;
-    font-weight: 800;
-    box-shadow: 0 4px 0 rgba(15, 23, 42, .1);
-    cursor: pointer;
-}
-
-.vn-historia-nav button.is-on {
-    background: #38bdf8;
-    color: #fff;
-}
-
 .vn-match-cols {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1339,7 +1486,7 @@
 
 .vn-zone.is-target {
     outline: 3px solid #fbbf24;
-    outline-offset: 2px;
+    outline-offset: 3px;
 }
 
 .vn-pool {

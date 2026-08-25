@@ -35,7 +35,8 @@ Login staff: `AuthDocenteController`. Login niño: `SesionNinoController`. Helpe
 
 ## Dominio (términos fijos)
 
-- **Ambiente**: uno de 5 nodos fijos — `musica`, `polimotor`, `logico`, `multisensorial`, `tecnologia`. No crear un sexto sin decisión explícita.
+- **Ambiente**: uno de 5 nodos fijos — `expresion-artistica` (Expresión Artística), `polimotor`, `multisaberes`, `multisensorial`, `tecnologia`. No crear un sexto sin decisión explícita.
+  - Nota: rutas kiosco / sync aún usan aliases legacy `musica` → Expresión Artística y `logico` → Multisaberes (`routes/ambientes/{AMBIENTE_SLUG}.php`, `config/red.php`).
 - **Institución**: colegio (multi-tenant vía `institucion_id`).
 - **Carga docente**: asignación `docente + ambiente + grado + grupo + año lectivo`. Unidad de trabajo del panel.
 - **Matrícula**: inscripción anual (`anio_lectivo`, suele filtrarse con `date('Y')`).
