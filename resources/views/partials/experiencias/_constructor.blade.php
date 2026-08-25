@@ -13,12 +13,17 @@
 <div class="page-header tematicas-page-header cx-page-header">
     <div>
         <h1>Constructor de experiencia</h1>
-        <p>{{ $experiencia->nombre }}</p>
+        <p>{{ $experiencia->nombre }} - {{ $experiencia->grado->nombre }}</p>
+
     </div>
     <div>
         <button type="button" class="btn btn-outline-primary" id="cxBtnVistaNino"
             title="Previsualizar la experiencia como la vería el niño">
             <i class="fa-solid fa-tablet-screen-button"></i> Vista Niño
+        </button>
+        <button type="button" class="btn btn-outline-secondary" id="cxBtnTablet"
+            title="Abrir la vista niño en una tablet de la misma red">
+            <i class="fa-solid fa-qrcode"></i> Probar en tablet
         </button>
         <button type="button" class="btn btn-success cx-btn-publicar" title="{{ $tituloPublicar }}"
             @disabled(!$puedePublicar)>
@@ -33,11 +38,13 @@
 <div class="cx-app" data-puede-editar="{{ $puedeEditar ? '1' : '0' }}"
     data-puede-publicar="{{ $puedePublicar ? '1' : '0' }}" data-experiencia-id="{{ $experiencia->id }}"
     data-experiencia-nombre="{{ $experiencia->nombre }}"
-    data-media-base="{{ asset('storage/experiencias/'.$experiencia->id.'/bloques') }}"
+    data-media-base="{{ asset('storage/experiencias/' . $experiencia->id . '/bloques') }}"
     data-experiencia-estado="{{ $experiencia->estado }}" data-url-listar="{{ $urls['listar'] }}"
     data-url-guardar="{{ $urls['guardar'] }}" data-url-reordenar="{{ $urls['reordenar'] }}"
     data-url-limpiar="{{ $urls['limpiar'] }}" data-url-upload="{{ $urls['upload'] }}"
-    data-url-publicar="{{ $urls['publicar'] }}" data-url-actualizar-template="{{ $urls['actualizar_template'] }}"
+    data-url-tts="{{ $urls['tts'] ?? '' }}" data-url-vista-previa="{{ $urls['vista_previa'] ?? '' }}"
+    data-url-vista-previa-foco="{{ $urls['vista_previa_foco'] ?? '' }}" data-url-publicar="{{ $urls['publicar'] }}"
+    data-url-actualizar-template="{{ $urls['actualizar_template'] }}"
     data-url-eliminar-template="{{ $urls['eliminar_template'] }}">
 
     <script type="application/json" id="cx-bloques-iniciales">@json($bloquesJson)</script>
@@ -108,7 +115,8 @@
                         </header>
                         <div class="vn-screen-body" id="vnScreenBody"></div>
                         <footer class="vn-screen-nav">
-                            <button type="button" class="vn-nav-btn vn-nav-prev" id="vnBtnPrev" aria-label="Anterior">
+                            <button type="button" class="vn-nav-btn vn-nav-prev" id="vnBtnPrev"
+                                aria-label="Anterior">
                                 <i class="fa-solid fa-arrow-left"></i>
                                 <span>Atrás</span>
                             </button>
@@ -116,7 +124,8 @@
                                 <strong id="vnTitle">Vista niño</strong>
                                 <span id="vnBlockName">Bienvenida</span>
                             </div>
-                            <button type="button" class="vn-nav-btn vn-nav-next" id="vnBtnNext" aria-label="Siguiente">
+                            <button type="button" class="vn-nav-btn vn-nav-next" id="vnBtnNext"
+                                aria-label="Siguiente">
                                 <span>Siguiente</span>
                                 <i class="fa-solid fa-arrow-right"></i>
                             </button>
@@ -127,5 +136,33 @@
             </div>
         </div>
         <p class="vn-hint">Vista previa 1280×800 · horizontal · el niño navega bloque por bloque</p>
+    </div>
+</div>
+
+{{-- Modal enlace tablet --}}
+<div class="vn-tablet-modal" id="vnTabletModal" hidden>
+    <div class="vn-tablet-modal-backdrop" data-vn-tablet-close></div>
+    <div class="vn-tablet-modal-card" role="dialog" aria-modal="true" aria-labelledby="vnTabletModalTitle">
+        <button type="button" class="vn-close" data-vn-tablet-close title="Cerrar" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h2 id="vnTabletModalTitle">Probar en tablet</h2>
+        <p class="vn-tablet-modal-lead">Abre este enlace en la tablet (misma red Wi‑Fi). La vista se actualiza al
+            guardar bloques en el constructor.</p>
+        <div class="vn-tablet-qr-wrap">
+            <canvas id="vnTabletQr" width="220" height="220" aria-label="Código QR"></canvas>
+            <img id="vnTabletQrImg" width="220" height="220" alt="Código QR" hidden>
+        </div>
+        <label class="vn-tablet-url-label" for="vnTabletUrl">Enlace</label>
+        <div class="vn-tablet-url-row">
+            <input type="text" class="form-control" id="vnTabletUrl" readonly>
+            <button type="button" class="btn btn-primary" id="vnTabletCopy">Copiar</button>
+        </div>
+        <p class="vn-tablet-warn" id="vnTabletLocalWarn" hidden></p>
+        <label class="vn-tablet-follow">
+            <input type="checkbox" id="vnTabletFollow" checked>
+            Seguir el bloque seleccionado en el constructor
+        </label>
+        <p class="vn-tablet-expira" id="vnTabletExpira">El enlace dura 60 minutos.</p>
     </div>
 </div>

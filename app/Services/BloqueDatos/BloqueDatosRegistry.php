@@ -77,6 +77,9 @@ class BloqueDatosRegistry
             BloqueExperiencia::TIPO_BIENVENIDA => [
                 'instruccion' => '',
                 'personaje' => 'personaje',
+                'tipo_media' => 'ninguno',
+                'imagen' => '',
+                'video' => '',
                 'descripcion_accesible' => '',
             ],
             BloqueExperiencia::TIPO_AUDIO => [
@@ -140,6 +143,7 @@ class BloqueDatosRegistry
             BloqueExperiencia::TIPO_PREGUNTA => [
                 'instruccion' => '',
                 'texto' => '',
+                'imagen' => '',
                 'tipo_opts' => 'emoji_texto',
                 'opciones' => [
                     ['texto' => '', 'emoji' => '', 'imagen' => '', 'correcta' => true],
@@ -225,6 +229,20 @@ class BloqueDatosRegistry
 
         if ($tipo === BloqueExperiencia::TIPO_JUEGO && ($merged['juego_id'] === '' || $merged['juego_id'] === false)) {
             $merged['juego_id'] = null;
+        }
+
+        if ($tipo === BloqueExperiencia::TIPO_BIENVENIDA) {
+            $tipoMedia = $merged['tipo_media'] ?? 'ninguno';
+            if (! in_array($tipoMedia, ['ninguno', 'imagen', 'video'], true)) {
+                $tipoMedia = 'ninguno';
+            }
+            $merged['tipo_media'] = $tipoMedia;
+            if ($tipoMedia !== 'imagen') {
+                $merged['imagen'] = '';
+            }
+            if ($tipoMedia !== 'video') {
+                $merged['video'] = '';
+            }
         }
 
         return $merged;

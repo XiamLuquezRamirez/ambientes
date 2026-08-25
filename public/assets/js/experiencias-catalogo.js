@@ -337,7 +337,7 @@
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
                     </div>
                     <div class="tematica-card-identity">
-                        <h5>${escapar(exp.nombre || 'Sin nombre')}</h5>
+                        <h5>${escapar(exp.nombre || 'Sin nombre')} ${exp.grado ? `(${exp.grado})` : ''}</h5>
                         <div class="tematica-card-badges">
                             ${badgeEstadoExp(exp.estado)}
                             ${etiquetaEstado(!!exp.activo)}
@@ -346,7 +346,6 @@
                     <span class="tematica-card-arrow" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
                 </div>
                 <div class="tematica-card-body">
-                    ${metaFila('fa-graduation-cap', 'Grado', exp.grado || '')}
                     ${metaFila('fa-clock', 'Duración', `${Number(exp.duracion_minutos || DURACION_EXP_DEFAULT)} min`)}
                     ${metaFila('fa-toolbox', 'Materiales', `${Number(exp.materiales_count || 0)}`)}
                     ${objetivo ? `<div class="tematica-meta-row tematica-meta-row--exp"><i class="fa-solid fa-bullseye"></i><span>${escapar(objetivo)}</span></div>` : ''}

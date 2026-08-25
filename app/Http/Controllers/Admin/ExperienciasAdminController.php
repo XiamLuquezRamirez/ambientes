@@ -158,7 +158,10 @@ class ExperienciasAdminController extends Controller
             'reordenar' => route('admin.experiencias.bloques.reordenar', $experiencia),
             'limpiar' => route('admin.experiencias.bloques.limpiar', $experiencia),
             'upload' => route('admin.experiencias.bloques.upload', $experiencia),
+            'tts' => route('admin.experiencias.bloques.tts', $experiencia),
             'publicar' => route('admin.experiencias.publicar', $experiencia),
+            'vista_previa' => route('admin.experiencias.vista-previa', $experiencia),
+            'vista_previa_foco' => route('admin.experiencias.vista-previa.foco', $experiencia),
             'actualizar_template' => route('admin.bloques.actualizar', ['bloque' => '__BLOQUE__']),
             'eliminar_template' => route('admin.bloques.eliminar', ['bloque' => '__BLOQUE__']),
         ];
@@ -253,6 +256,7 @@ class ExperienciasAdminController extends Controller
                 'max:150',
                 Rule::unique('experiencias', 'nombre')
                     ->where(fn ($q) => $q->where('tematica_id', $tematicaId))
+                    ->where(fn ($q) => $q->where('grado_id', $request->grado_id))
                     ->ignore($experienciaId),
             ],
             'objetivo' => ['required', 'string'],
@@ -269,7 +273,7 @@ class ExperienciasAdminController extends Controller
             'materiales.*.orden' => ['nullable', 'integer', 'min:1', 'max:255'],
         ], [
             'nombre.required' => 'El nombre de la experiencia es obligatorio.',
-            'nombre.unique' => 'Ya existe una experiencia con ese nombre en esta temática.',
+            'nombre.unique' => 'Ya existe una experiencia con ese nombre en esta temática y grado.',
             'objetivo.required' => 'El objetivo de la experiencia es obligatorio.',
             'grado_id.required' => 'El grado es obligatorio.',
             'duracion_minutos.required' => 'La duración estimada es obligatoria.',

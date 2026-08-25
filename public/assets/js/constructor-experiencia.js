@@ -20,6 +20,8 @@
         publicar: $app.data('url-publicar') || '',
         actualizarTpl: $app.data('url-actualizar-template') || '',
         eliminarTpl: $app.data('url-eliminar-template') || '',
+        vistaPrevia: $app.data('url-vista-previa') || '',
+        vistaPreviaFoco: $app.data('url-vista-previa-foco') || '',
     };
 
     let bloques = [];
@@ -28,6 +30,8 @@
     let sortable = null;
     let saveTimer = null;
     let saving = false;
+    let tabletToken = '';
+    let tabletFollow = true;
 
     const $catalogo = $('#cxCatalogo');
     const $timeline = $('#cxTimeline');
@@ -312,17 +316,130 @@
             const el = $row[0] || $card[0];
             el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+        enviarFocoTablet(seleccionadoId);
+    }
+
+    function enviarFocoTablet(bloqueId) {
+        if (!tabletToken || !tabletFollow || !urls.vistaPreviaFoco) return;
+        api(urls.vistaPreviaFoco, 'POST', {
+            token: tabletToken,
+            bloque_id: bloqueId || null,
+        }).fail(() => { /* enlace expirado: se regenera desde el modal */ });
+    }
+
+    function pintarQrTablet(url) {
+        const canvas = document.getElementById('vnTabletQr');
+        const img = document.getElementById('vnTabletQrImg');
+        if (!url) return;
+
+        if (canvas && typeof window.QRious === 'function') {
+            if (img) img.hidden = true;
+            canvas.hidden = false;
+            try {
+                // eslint-disable-next-line no-new
+                new window.QRious({
+                    element: canvas,
+                    value: url,
+                    size: 220,
+                    level: 'M',
+                    background: '#ffffff',
+                    foreground: '#0f172a',
+                });
+                return;
+            } catch (e) { /* fallback abajo */ }
+        }
+
+        if (img) {
+            if (canvas) canvas.hidden = true;
+            img.hidden = false;
+            img.alt = 'Código QR de la vista previa';
+            img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data='
+                + encodeURIComponent(url);
+            return;
+        }
+
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            ctx.fillStyle = '#f1f5f9';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#64748b';
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Use el enlace', canvas.width / 2, canvas.height / 2);
+        }
+    }
+
+    function abrirModalTablet() {
+        if (!urls.vistaPrevia) {
+            toast('error', 'No hay URL de vista previa configurada.');
+            return;
+        }
+        const $modal = $('#vnTabletModal');
+        const $canvas = $('#vnTabletQr');
+        const $img = $('#vnTabletQrImg');
+        $modal.prop('hidden', false);
+        $('body').css('overflow', 'hidden');
+        $('#vnTabletUrl').val('Generando…');
+        if ($img.length) {
+            $img.prop('hidden', true).removeAttr('src');
+        }
+        if ($canvas.length) {
+            $canvas.prop('hidden', false);
+            const ctx = $canvas[0].getContext('2d');
+            if (ctx) ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
+        }
+        $('#vnTabletLocalWarn').prop('hidden', true).empty();
+        api(urls.vistaPrevia, 'POST', {})
+            .done((res) => {
+                const data = res?.data || {};
+                tabletToken = data.token || '';
+                const url = data.url || '';
+                if (!tabletToken || !url) {
+                    toast('error', 'Respuesta incompleta al crear el enlace.');
+                    cerrarModalTablet();
+                    return;
+                }
+                $('#vnTabletUrl').val(url);
+                const $warn = $('#vnTabletLocalWarn');
+                if (data.aviso_red) {
+                    const aviso = String(data.aviso_red);
+                    const conCodigo = aviso.replace(
+                        /(php artisan serve --host=0\.0\.0\.0 --port=\d+)/g,
+                        '<code>$1</code>'
+                    );
+                    $warn.prop('hidden', false).html(conCodigo);
+                } else {
+                    $warn.prop('hidden', true).empty();
+                }
+                const mins = Math.max(1, Math.round((data.expira_en || 3600) / 60));
+                $('#vnTabletExpira').text(`El enlace dura ${mins} minutos. Al generar uno nuevo, el anterior deja de funcionar.`);
+                pintarQrTablet(url);
+                if (seleccionadoId) enviarFocoTablet(seleccionadoId);
+            })
+            .fail((xhr) => {
+                toast('error', errorAjax(xhr, 'No se pudo crear el enlace.'));
+                cerrarModalTablet();
+            });
+    }
+
+    function cerrarModalTablet() {
+        $('#vnTabletModal').prop('hidden', true);
+        $('body').css('overflow', '');
     }
 
     /* ── Formularios ────────────────────────────────────────── */
 
     function fieldTextarea(name, label, value, help) {
+        const helpText = help || (name === 'instruccion'
+            ? 'Este texto se lee en voz alta al entrar al bloque. Usa frases cortas y claras para niños de 4 años.'
+            : '');
         return `
             <div class="cx-field">
                 <label>${escapar(label)}</label>
                 <textarea class="form-control cx-input" data-field="${escapar(name)}" rows="3"
                     ${puedeEditar ? '' : 'readonly'}>${escapar(value || '')}</textarea>
-                ${help ? `<div class="cx-help">${escapar(help)}</div>` : ''}
+                ${helpText ? `<div class="cx-help">${escapar(helpText)}</div>` : ''}
             </div>`;
     }
 
@@ -445,13 +562,49 @@
         if (target) $configBody.find(target).addClass('show active');
     }
 
+    function fieldVideoPreview(name, label, value) {
+        const archivo = value || '';
+        const url = mediaUrlBloque(archivo);
+        const thumb = url
+            ? `<video src="${escapar(url)}" muted preload="metadata" playsinline></video>`
+            : '<i class="fa-solid fa-film"></i>';
+        return `<div class="cx-field">
+            <label>${escapar(label)}</label>
+            <div class="cx-media-preview-row">
+                <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(archivo)}">
+                ${puedeEditar
+                    ? `<label class="cx-img-btn cx-video-preview-btn" title="Subir video">
+                        ${thumb}
+                        <input type="file" class="cx-file" data-target="${escapar(name)}" accept="video/mp4,.mp4" hidden>
+                       </label>`
+                    : `<span class="cx-img-btn cx-video-preview-btn is-readonly">${thumb}</span>`}
+                <div class="cx-media-preview-meta">
+                    <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
+                    <div class="cx-help">Toca el recuadro para elegir o cambiar el video.</div>
+                </div>
+            </div>
+        </div>`;
+    }
+
     function formBienvenida(d) {
+        const tipoMedia = d.tipo_media || 'ninguno';
+        let mediaHtml = fieldSelect('tipo_media', 'Imagen o video (opcional)', tipoMedia, [
+            { value: 'ninguno', label: 'Ninguno' },
+            { value: 'imagen', label: 'Imagen' },
+            { value: 'video', label: 'Video' },
+        ]);
+        if (tipoMedia === 'imagen') {
+            mediaHtml += fieldImagePreview('imagen', 'Imagen de bienvenida (opcional)', d.imagen);
+        } else if (tipoMedia === 'video') {
+            mediaHtml += fieldVideoPreview('video', 'Video de bienvenida (opcional)', d.video);
+        }
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion,
             'Este texto se leerá en audio. Usa frases cortas y amigables.')
             + fieldSelect('personaje', 'Personaje narrador', d.personaje || 'personaje', [
                 { value: 'personaje', label: 'Personaje del ambiente' },
                 { value: 'ninguno', label: 'Ninguno' },
             ])
+            + mediaHtml
             + fieldTextarea('descripcion_accesible', 'Descripción accesible', d.descripcion_accesible);
     }
 
@@ -463,28 +616,8 @@
     }
 
     function formVideo(d) {
-        const archivo = d.archivo || '';
-        const url = mediaUrlBloque(archivo);
-        const thumb = url
-            ? `<video src="${escapar(url)}" muted preload="metadata" playsinline></video>`
-            : '<i class="fa-solid fa-film"></i>';
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + `<div class="cx-field">
-                <label>Archivo de video (.mp4)</label>
-                <div class="cx-media-preview-row">
-                    <input type="hidden" class="cx-input" data-field="archivo" value="${escapar(archivo)}">
-                    ${puedeEditar
-                        ? `<label class="cx-img-btn cx-video-preview-btn" title="Subir video">
-                            ${thumb}
-                            <input type="file" class="cx-file" data-target="archivo" accept="video/mp4,.mp4" hidden>
-                           </label>`
-                        : `<span class="cx-img-btn cx-video-preview-btn is-readonly">${thumb}</span>`}
-                    <div class="cx-media-preview-meta">
-                        <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
-                        <div class="cx-help">Toca el recuadro para elegir o cambiar el video. Se muestra una vista previa del primer fotograma.</div>
-                    </div>
-                </div>
-            </div>`
+            + fieldVideoPreview('archivo', 'Archivo de video (.mp4)', d.archivo)
             + fieldTextarea('descripcion_accesible', 'Descripción accesible', d.descripcion_accesible);
     }
 
@@ -629,6 +762,7 @@
                 icon: 'fa-circle-question',
                 content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
                     + fieldTextarea('texto', 'Texto de la pregunta', d.texto)
+                    + fieldImagePreview('imagen', 'Imagen de la pregunta (opcional)', d.imagen)
                     + fieldSelect('tipo_opts', 'Tipo de opciones', tipo, [
                         { value: 'emoji_texto', label: 'Emoji + texto' },
                         { value: 'imagen_texto', label: 'Imagen + texto' },
@@ -1235,10 +1369,18 @@
         if (typeof field === 'string' && field.indexOf('colores_zonas.') === 0) {
             $(this).closest('.cx-zona-color-row').find('.cx-zona-color-badge').css('background', $(this).val());
         }
-        if (field === 'paginas' || field === 'juego_id' || field === 'juego_piezas' || field === 'modo' || field === 'tipo' || field === 'tipo_opts') {
+        if (field === 'paginas' || field === 'juego_id' || field === 'juego_piezas' || field === 'modo' || field === 'tipo' || field === 'tipo_opts' || field === 'tipo_media') {
             const bloque = bloquePorId(seleccionadoId);
             if (!bloque) return;
             const datos = leerDatosDesdeForm(bloque);
+            if (field === 'tipo_media') {
+                if (datos.tipo_media === 'imagen') datos.video = '';
+                else if (datos.tipo_media === 'video') datos.imagen = '';
+                else {
+                    datos.imagen = '';
+                    datos.video = '';
+                }
+            }
             if (field === 'paginas') {
                 const n = Math.max(2, Math.min(5, Number(datos.paginas || 3)));
                 datos.paginas = String(n);
@@ -1409,6 +1551,33 @@
 
     $('#cxBtnLimpiar').on('click', limpiarSecuencia);
     $('.cx-btn-publicar').on('click', publicar);
+    $('#cxBtnTablet').on('click', abrirModalTablet);
+    $('#vnTabletModal').on('click', '[data-vn-tablet-close]', cerrarModalTablet);
+    $(document).on('keydown', function (e) {
+        if (e.key === 'Escape' && !$('#vnTabletModal').prop('hidden')) {
+            cerrarModalTablet();
+        }
+    });
+    $('#vnTabletFollow').on('change', function () {
+        tabletFollow = $(this).prop('checked');
+        if (tabletFollow && seleccionadoId) enviarFocoTablet(seleccionadoId);
+    });
+    $('#vnTabletCopy').on('click', function () {
+        const url = String($('#vnTabletUrl').val() || '');
+        if (!url || url === 'Generando…') return;
+        const done = () => toast('success', 'Enlace copiado');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(() => {
+                $('#vnTabletUrl').trigger('select');
+                document.execCommand('copy');
+                done();
+            });
+            return;
+        }
+        $('#vnTabletUrl').trigger('select');
+        document.execCommand('copy');
+        done();
+    });
 
     /* ── API pública (Vista Niño y otros) ─────────────────────── */
     window.CxConstructor = {

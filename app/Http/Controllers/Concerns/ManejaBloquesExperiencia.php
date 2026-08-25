@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Concerns;
 use App\Models\BloqueExperiencia;
 use App\Models\Experiencia;
 use App\Services\BloqueExperienciaService;
+use App\Services\VistaPreviaNinoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -178,5 +180,75 @@ trait ManejaBloquesExperiencia
                 'path' => 'experiencias/'.$experiencia->id.'/bloques/'.$nombre,
             ],
         ]);
+    }
+
+    public function tts(Request $request, Experiencia $experiencia)
+    {
+        $this->asegurarExperienciaVisible($experiencia);
+
+        $datos = $request->validate([
+            'texto' => ['required', 'string', 'max:800'],
+        ]);
+
+        try {
+            $url = app(\App\Services\TextoAVozService::class)->urlPublica($datos['texto']);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo generar la voz.',
+            ], 502);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => ['url' => $url],
+        ]);
+    }
+
+    public function crearVistaPrevia(Request $request, Experiencia $experiencia)
+    {
+        $this->asegurarExperienciaVisible($experiencia);
+
+        $userId = (int) Auth::guard('docente')->id();
+        $servicio = app(VistaPreviaNinoService::class);
+        $sesion = $servicio->crear($experiencia, $userId);
+        $enlace = $servicio->armarUrlTablet($request, $sesion['token']);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'token' => $sesion['token'],
+                'url' => $enlace['url'],
+                'expira_en' => $sesion['expira_en'],
+                'host_local' => $enlace['host_local'],
+                'ip_lan' => $enlace['ip_lan'],
+                'aviso_red' => $enlace['aviso_red'],
+            ],
+        ]);
+    }
+
+    public function focoVistaPrevia(Request $request, Experiencia $experiencia)
+    {
+        $this->asegurarExperienciaVisible($experiencia);
+
+        $datos = $request->validate([
+            'token' => ['required', 'string', 'size:40'],
+            'bloque_id' => ['nullable', 'integer'],
+        ]);
+
+        $ok = app(VistaPreviaNinoService::class)->actualizarFoco(
+            $datos['token'],
+            (int) $experiencia->id,
+            isset($datos['bloque_id']) ? (int) $datos['bloque_id'] : null
+        );
+
+        if (! $ok) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El enlace de tablet expiró. Genere uno nuevo.',
+            ], 410);
+        }
+
+        return response()->json(['success' => true]);
     }
 }

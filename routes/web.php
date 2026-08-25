@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\TematicasAdminController;
 use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
+use App\Http\Controllers\VistaPreviaNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
 use App\Http\Controllers\InfoCondicionesController;
 use App\Http\Controllers\Panel\AsistenciaController;
@@ -68,6 +69,20 @@ Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])
 Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('docente.login');
 Route::post('/login', [AuthDocenteController::class, 'iniciarSesion'])->name('docente.login.post');
 Route::post('/logout', [AuthDocenteController::class, 'cerrarSesion'])->name('docente.logout');
+
+// Vista previa en tablet (token temporal, sin sesión de staff)
+Route::get('/vista-previa-nino/{token}', [VistaPreviaNinoController::class, 'mostrar'])
+    ->middleware('throttle:30,1')
+    ->where('token', '[a-f0-9]{40}')
+    ->name('vista-previa-nino.mostrar');
+Route::get('/vista-previa-nino/{token}/estado', [VistaPreviaNinoController::class, 'estado'])
+    ->middleware('throttle:90,1')
+    ->where('token', '[a-f0-9]{40}')
+    ->name('vista-previa-nino.estado');
+Route::get('/vista-previa-nino/{token}/tts', [VistaPreviaNinoController::class, 'tts'])
+    ->middleware('throttle:30,1')
+    ->where('token', '[a-f0-9]{40}')
+    ->name('vista-previa-nino.tts');
 
 // Endpoint para guardar los datos generales del Piar
 // Piar
@@ -228,6 +243,9 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::patch('catalogo/experiencias/{experiencia}/bloques/reordenar', [BloquesExperienciaAdminController::class, 'reordenar'])->name('admin.experiencias.bloques.reordenar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaAdminController::class, 'limpiar'])->name('admin.experiencias.bloques.limpiar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaAdminController::class, 'upload'])->name('admin.experiencias.bloques.upload');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaAdminController::class, 'tts'])->name('admin.experiencias.bloques.tts');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaAdminController::class, 'crearVistaPrevia'])->name('admin.experiencias.vista-previa');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaAdminController::class, 'focoVistaPrevia'])->name('admin.experiencias.vista-previa.foco');
     Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaAdminController::class, 'publicar'])->name('admin.experiencias.publicar');
     Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaAdminController::class, 'actualizar'])->name('admin.bloques.actualizar');
     Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaAdminController::class, 'eliminar'])->name('admin.bloques.eliminar');
@@ -412,6 +430,9 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::patch('catalogo/experiencias/{experiencia}/bloques/reordenar', [BloquesExperienciaPanelController::class, 'reordenar'])->name('panel.experiencias.bloques.reordenar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaPanelController::class, 'limpiar'])->name('panel.experiencias.bloques.limpiar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaPanelController::class, 'upload'])->name('panel.experiencias.bloques.upload');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaPanelController::class, 'tts'])->name('panel.experiencias.bloques.tts');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaPanelController::class, 'crearVistaPrevia'])->name('panel.experiencias.vista-previa');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaPanelController::class, 'focoVistaPrevia'])->name('panel.experiencias.vista-previa.foco');
     Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaPanelController::class, 'publicar'])->name('panel.experiencias.publicar');
     Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaPanelController::class, 'actualizar'])->name('panel.bloques.actualizar');
     Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaPanelController::class, 'eliminar'])->name('panel.bloques.eliminar');
@@ -504,6 +525,9 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::patch('catalogo/experiencias/{experiencia}/bloques/reordenar', [BloquesExperienciaSuperAdminController::class, 'reordenar'])->name('superadmin.catalogo.experiencias.bloques.reordenar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaSuperAdminController::class, 'limpiar'])->name('superadmin.catalogo.experiencias.bloques.limpiar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaSuperAdminController::class, 'upload'])->name('superadmin.catalogo.experiencias.bloques.upload');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaSuperAdminController::class, 'tts'])->name('superadmin.catalogo.experiencias.bloques.tts');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaSuperAdminController::class, 'crearVistaPrevia'])->name('superadmin.catalogo.experiencias.vista-previa');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaSuperAdminController::class, 'focoVistaPrevia'])->name('superadmin.catalogo.experiencias.vista-previa.foco');
     Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaSuperAdminController::class, 'publicar'])->name('superadmin.catalogo.experiencias.publicar');
     Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.bloques.actualizar');
     Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaSuperAdminController::class, 'eliminar'])->name('superadmin.catalogo.bloques.eliminar');

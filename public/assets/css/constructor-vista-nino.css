@@ -292,6 +292,39 @@
     line-height: 1.35;
     box-shadow: 0 8px 20px rgba(14, 165, 233, .12);
     margin: 0 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.vn-tts-replay {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #38bdf8, #0284c7);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #0369a1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vn-tts-replay:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #0369a1;
+}
+
+.vn-tts-replay.is-speaking {
+    animation: vnTtsPulse 1s ease-in-out infinite;
+}
+
+@keyframes vnTtsPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
 }
 
 .vn-badge-warn {
@@ -428,6 +461,55 @@
 .vn-card--pregunta .vn-pregunta-texto {
     background: #fff7ed;
     font-size: 1.65rem;
+}
+
+.vn-pregunta-media {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 16px;
+}
+
+.vn-pregunta-media img {
+    max-width: min(360px, 90%);
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
+}
+
+.vn-bienvenida-media {
+    margin-top: 12px;
+}
+
+.vn-bienvenida-video-wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.vn-bienvenida-video {
+    width: 100%;
+    max-width: min(920px, 100%);
+    max-height: min(52vh, 420px);
+    object-fit: contain;
+    border-radius: 18px;
+    background: #000;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
+    display: block;
+}
+
+.vn-bienvenida-media.vn-video-stage {
+    min-height: 0;
+    margin-bottom: 8px;
+}
+
+.vn-video-btn--compact {
+    width: min(280px, 85vw);
+    min-height: 160px;
+}
+
+.vn-video-btn--compact .vn-video-btn-label {
+    font-size: 1rem;
 }
 
 .vn-card--pregunta .vn-options {
@@ -1805,4 +1887,231 @@
         text-align: center;
         padding: 0 12px;
     }
+}
+
+/* Tablet real: pantalla completa, sin marco (sin :has — se ignora en WebViews viejos) */
+html.vn-dispositivo {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #e0f2fe;
+}
+
+body.vn-dispositivo {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
+    overflow: hidden;
+    background: linear-gradient(180deg, #e0f2fe 0%, #f0fdf4 42%, #fff7ed 100%);
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body.vn-dispositivo #vnDispositivo {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
+    z-index: 1;
+    overflow: hidden;
+}
+
+body.vn-dispositivo #vnTabletScreen.vn-tablet-screen,
+body.vn-dispositivo .vn-tablet-screen {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    flex-shrink: 1 !important;
+    box-sizing: border-box !important;
+    /* anula el canvas fijo 1280×800 del overlay del constructor */
+    --vn-screen-w: 100vw;
+    --vn-screen-h: 100vh;
+}
+
+body.vn-dispositivo .vn-screen-body {
+    padding: 12px 4vw 16px;
+}
+
+body.vn-dispositivo .vn-card {
+    max-width: min(980px, 100%);
+}
+
+.vn-fs-btn {
+    position: fixed;
+    left: 50%;
+    bottom: 88px;
+    z-index: 6;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    border-radius: 999px;
+    padding: 12px 18px;
+    background: rgba(15, 23, 42, .88);
+    color: #fff;
+    font-family: Nunito, sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, .28);
+    cursor: pointer;
+}
+
+.vn-fs-btn[hidden] {
+    display: none !important;
+}
+
+.vn-sync-badge {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    margin: 0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, .65);
+    color: #e2e8f0;
+    font-size: .72rem;
+    font-family: Nunito, sans-serif;
+    pointer-events: none;
+}
+
+.vn-expirado {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, .88);
+    color: #e2e8f0;
+    text-align: center;
+    font-family: Nunito, sans-serif;
+    font-size: 1.15rem;
+}
+
+.vn-expirado[hidden] {
+    display: none !important;
+}
+
+.vn-tablet-modal[hidden] {
+    display: none !important;
+}
+
+.vn-tablet-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.vn-tablet-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, .6);
+}
+
+.vn-tablet-modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(440px, 100%);
+    background: #fff;
+    color: #0f172a;
+    border-radius: 16px;
+    padding: 28px 24px 22px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, .25);
+}
+
+.vn-tablet-modal-card h2 {
+    font-size: 1.25rem;
+    margin: 0 0 8px;
+}
+
+.vn-tablet-modal-lead {
+    color: #475569;
+    font-size: .92rem;
+    margin: 0 0 16px;
+}
+
+.vn-tablet-qr-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.vn-tablet-qr-wrap canvas,
+.vn-tablet-qr-wrap img {
+    width: 220px;
+    height: 220px;
+    border-radius: 8px;
+    background: #fff;
+    display: block;
+}
+
+.vn-tablet-qr-wrap canvas[hidden],
+.vn-tablet-qr-wrap img[hidden] {
+    display: none !important;
+}
+
+.vn-tablet-url-label {
+    font-size: .8rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.vn-tablet-url-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.vn-tablet-url-row input {
+    font-size: .78rem;
+}
+
+.vn-tablet-warn {
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: .82rem;
+    margin-bottom: 12px;
+}
+
+.vn-tablet-follow {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: .88rem;
+    margin: 0 0 8px;
+}
+
+.vn-tablet-follow input {
+    margin-top: 3px;
+}
+
+.vn-tablet-expira {
+    margin: 0;
+    color: #64748b;
+    font-size: .78rem;
 }

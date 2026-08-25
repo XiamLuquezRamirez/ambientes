@@ -290,7 +290,6 @@ class TematicaCurriculoService
                 'activo' => true,
                 'creado_por' => $userId,
             ]);
-
             $this->sincronizarMateriales($experiencia, $datos['materiales'] ?? []);
             $this->sincronizarEstadoPublicacionTematica($tematica);
 
