@@ -1,0 +1,496 @@
+        * {
+            box-sizing: border-box;
+        }
+
+        .autismo-section {
+            font-size: 22px;
+        }
+
+
+        /* =========================
+           CONTENEDOR GENERAL
+        ========================= */
+
+        .autismo-page {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* =========================
+           ENCABEZADO
+        ========================= */
+
+        .autismo-header {
+            position: relative;
+            overflow: hidden;
+            min-height: 270px;
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 12px 30px rgba(44, 62, 80, .10);
+        }
+
+        .header-content {
+            width: 58%;
+            padding: 55px 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-label {
+            display: inline-flex;
+            padding: 7px 16px;
+            border-radius: 30px;
+            background: #f8d2df;
+            color: #b31858;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .header-content h1 {
+            margin: 0;
+            color: #202c44;
+            font-size: clamp(42px, 5vw, 70px);
+            line-height: 1;
+            font-weight: 800;
+        }
+
+        .header-decoration {
+            position: absolute;
+            right: -80px;
+            top: 0;
+            width: 52%;
+            height: 100%;
+            background: #a8d996;
+            border-radius: 50% 0 0 50%;
+            transform: skewX(-15deg);
+        }
+
+        .header-decoration::after {
+            content: "";
+            position: absolute;
+            inset: 30px 50px;
+            border-radius: 30px;
+            background:
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, .18),
+                    rgba(255, 255, 255, 0));
+        }
+
+        /* =========================
+           NAVEGACIÓN
+        ========================= */
+
+        .autismo-nav {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .autismo-nav a {
+            text-decoration: none;
+            color: #253047;
+            background: #fff;
+            border-radius: 16px;
+            padding: 13px 15px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(44, 62, 80, .08);
+            transition: .25s ease;
+            border: 1px solid #edf0f5;
+        }
+
+        .autismo-nav a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 22px rgba(44, 62, 80, .13);
+        }
+
+        /* =========================
+           SECCIONES
+        ========================= */
+
+        .autismo-section {
+            background: #ffffff;
+            border-radius: 28px;
+            margin-bottom: 28px;
+            overflow: hidden;
+            box-shadow: 0 10px 28px rgba(44, 62, 80, .08);
+            border: 1px solid #edf0f5;
+            scroll-margin-top: 25px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 24px 30px;
+            color: #ffffff;
+        }
+
+        .section-number {
+            flex: 0 0 50px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, .22);
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .section-content {
+            padding: 35px 40px 42px;
+        }
+
+        .section-content h3 {
+            color: #26354c;
+            margin-top: 30px;
+            margin-bottom: 12px;
+            font-size: 21px;
+        }
+
+        .section-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .section-content p {
+            margin: 0 0 18px;
+        }
+
+        .section-content ul {
+            margin: 10px 0 25px;
+            padding-left: 28px;
+        }
+
+        .section-content li {
+            margin-bottom: 10px;
+            padding-left: 4px;
+        }
+
+        .section-content strong {
+            color: #243249;
+        }
+
+        /* =========================
+           COLORES DE SECCIONES
+        ========================= */
+
+        #apartado-1 .section-header {
+            background: linear-gradient(135deg, #149b72, #087b5a);
+        }
+
+        #apartado-2 .section-header {
+            background: linear-gradient(135deg, #1677e8, #1457b7);
+        }
+
+        #apartado-3 .section-header {
+            background: linear-gradient(135deg, #6837bd, #4b2198);
+        }
+
+        #apartado-4 .section-header {
+            background: linear-gradient(135deg, #f6a313, #df7600);
+        }
+
+        #apartado-5 .section-header {
+            background: linear-gradient(135deg, #ec0873, #b70054);
+        }
+
+        #apartado-6 .section-header {
+            background: linear-gradient(135deg, #1677e8, #124fa4);
+        }
+
+        #apartado-7 .section-header {
+            background: linear-gradient(135deg, #f6a313, #d76d00);
+        }
+
+        #apartado-8 .section-header {
+            background: linear-gradient(135deg, #ec0873, #ae004f);
+        }
+
+        #apartado-9 .section-header {
+            background: linear-gradient(135deg, #149b72, #087052);
+        }
+
+        #apartado-10 .section-header {
+            background: linear-gradient(135deg, #6837bd, #43218d);
+        }
+
+        /* =========================
+           CAJAS DESTACADAS
+        ========================= */
+
+        .quote {
+            margin: 0 0 30px;
+            padding: 22px 26px;
+            background: #f6f8fb;
+            border-left: 5px solid #ec0873;
+            border-radius: 0 15px 15px 0;
+            font-style: italic;
+            color: #4c596d;
+        }
+
+        .info-box {
+            padding: 22px;
+            background: #f7f9fc;
+            border: 1px solid #e6ebf2;
+            border-radius: 18px;
+            margin: 20px 0;
+        }
+
+        .level-box {
+            border-radius: 20px;
+            padding: 25px;
+            margin: 22px 0;
+            border: 1px solid #e8eaf0;
+            background: #fafbfc;
+        }
+
+        .level-box h3 {
+            margin-top: 0;
+        }
+
+        /* =========================
+           TABLA MITOS
+        ========================= */
+
+        .myths-table-wrapper {
+            overflow-x: auto;
+            margin: 25px 0;
+        }
+
+        .myths-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        .myths-table th {
+            background: #f0eafa;
+            color: #492398;
+            text-align: left;
+            padding: 16px;
+            font-size: 17px;
+        }
+
+        .myths-table td {
+            border-bottom: 1px solid #e9edf2;
+            padding: 17px 16px;
+            vertical-align: top;
+        }
+
+        .myths-table tr:nth-child(even) td {
+            background: #fafbfc;
+        }
+
+        /* =========================
+           PASOS
+        ========================= */
+
+        .steps {
+            display: grid;
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: 55px 1fr;
+            gap: 18px;
+            align-items: start;
+            padding: 22px;
+            border-radius: 18px;
+            background: #fafbfc;
+            border: 1px solid #e8edf3;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #149b72;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .step h3 {
+            margin: 0 0 8px;
+        }
+
+        /* =========================
+           BIBLIOGRAFÍA
+        ========================= */
+
+        .bibliografia {
+            background: #202c44;
+            color: #ffffff;
+            border-radius: 28px;
+            padding: 40px;
+            margin-top: 35px;
+        }
+
+        .bibliografia h2 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+
+        .bibliografia p {
+            margin-bottom: 16px;
+        }
+
+        .bibliografia a {
+            color: #bfe8ff;
+            word-break: break-word;
+        }
+
+        /* =========================
+           FUENTE
+        ========================= */
+
+        .source {
+            margin-top: 30px;
+            padding: 18px 20px;
+            border-radius: 15px;
+            background: #f2f5f8;
+            font-size: 14px;
+            color: #566273;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1000px) {
+            .autismo-nav {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header-content {
+                width: 70%;
+            }
+
+            .header-decoration {
+                width: 45%;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .autismo-page {
+                padding: 15px;
+            }
+
+            .autismo-header {
+                min-height: 220px;
+            }
+
+            .header-content {
+                width: 100%;
+                padding: 35px 28px;
+            }
+
+            .header-decoration {
+                display: none;
+            }
+
+            .autismo-nav {
+                grid-template-columns: 1fr;
+            }
+
+            .section-content {
+                padding: 25px 22px 30px;
+            }
+
+            .section-header {
+                padding: 20px;
+            }
+
+            .section-number {
+                flex-basis: 42px;
+                width: 42px;
+                height: 42px;
+                font-size: 18px;
+            }
+
+            .step {
+                grid-template-columns: 1fr;
+            }
+
+            .bibliografia {
+                padding: 25px;
+            }
+        }
+
+        .card-azul {
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #1e78ff;
+        }
+
+        /* Contenedor principal para dar espacio a la flecha superior */
+        .bocadillo-contenedor {
+            position: relative;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        /* Estilo del cuadro principal */
+        .bocadillo {
+            background-color: #8cb6ec;
+            /* Azul claro del fondo */
+            color: #ffffff;
+            /* Texto blanco */
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            /* Tipografía estilo manuscrito/escolar */
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: center;
+            padding: 25px 35px;
+            border-radius: 30px;
+            /* Bordes muy redondeados */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            /* Sombra sutil inferior */
+        }
+
+        /* Creación de la flecha superior usando un pseudoelemento */
+        .bocadillo-contenedor::before {
+            content: "";
+            position: absolute;
+            top: -15px;
+            /* Coloca la flecha sobre el borde superior */
+            left: 10%;
+            /* Posición horizontal de la flecha (ajústala si lo deseas) */
+            transform: translateX(-50%);
+            border-width: 0 15px 15px 15px;
+            /* Define el tamaño del triángulo */
+            border-style: solid;
+            border-color: transparent transparent #8cb6ec transparent;
+            /* Mismo color azul */
+            z-index: 1;
+        }
+
+        .titulo-seccion {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
