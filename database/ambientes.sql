@@ -2506,7 +2506,7 @@ INSERT INTO instituciones (
     'Antioquia',
     '050010000001',
     'logos/institucion.png',
-    'contacto@institucion.edu.co'
+    'contacto@institucion.edu.co',
     '1'
 );
 
