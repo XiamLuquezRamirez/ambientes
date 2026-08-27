@@ -4,9 +4,12 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
+use App\Models\Departamento;
+use App\Models\Institucion;
+use App\Models\Modulo;
+use App\Models\Municipio;
 use App\Models\PerfilAprendizajeInclusion;
 use App\Models\PerfilAprendizajePersonalizado;
-use App\Models\Institucion;
 use App\Models\User;
 use App\Services\InstitucionLogoService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -28,46 +31,67 @@ class InstitucionSuperAdminController extends Controller
 
     /**
      * Listado de instituciones con ambientes (pivot IP/puerto/activo).
+     * Soporta filtros por AJAX (buscar, estado) sin recargar la página.
      */
     public function index(Request $request)
     {
-        $instituciones = Institucion::with('ambientes')->get();
-        $ambientes = Ambiente::all();
-        $condiciones = PerfilAprendizajeInclusion::query()->ordenadas()->get();
-
-        $consulta = Institucion::query()
-            ->where('activo', true)
+        $ambientes = Ambiente::query()
+            ->with([
+                'modulosOficiales' => fn ($q) => $q
+                    ->where('activo', true)
+                    ->orderBy('orden'),
+            ])
             ->orderBy('nombre')
-            ->select(
-                'instituciones.*',
-            );
+            ->get();
+        $departamentos = Departamento::orderBy('descripcion')->get();
+        $perfilesAprendizaje = PerfilAprendizajeInclusion::query()->ordenadas()->get();
+
+        // solo las del sistemas y adicionales creadas por el super admin
+        $perfilesAprendizajePersonalizado = PerfilAprendizajePersonalizado::query()
+            ->with('perfilAprendizaje')
+            ->where('institucion_id', null)
+            ->ordenadas()
+            ->get();
+
+        $consulta = Institucion::query()->with('ambientes');
 
         if ($request->filled('buscar')) {
             $termino = $request->buscar;
-            $consulta->where(fn ($q) => $q
-                ->where('nombre', 'like', "%{$termino}%")
-            );
+            $consulta->where('nombre', 'like', "%{$termino}%");
         }
 
         if ($request->filled('estado')) {
             $consulta->where('activo', $request->estado === 'true');
         }
 
-        $instituciones = $consulta->orderBy('nombre')->paginate(10);
+        $instituciones = $consulta->orderBy('nombre')->paginate(10)->withQueryString();
 
-        // solo las del sistemas y adicionales creadas por el super admin
-        $condicionesTransitorias = PerfilAprendizajePersonalizado::query()
-            ->with('condicionBase')
-            ->where('id_institucion', null)
-            ->ordenadas()
-            ->get();
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('superAdmin.instituciones._grid', compact('instituciones'))->render(),
+            ]);
+        }
 
         return view('superAdmin.instituciones.index', compact(
             'instituciones',
             'ambientes',
-            'condiciones',
-            'condicionesTransitorias'
+            'departamentos',
+            'perfilesAprendizaje',
+            'perfilesAprendizajePersonalizado'
         ));
+    }
+
+    /**
+     * Municipios de un departamento (coddep = codigo del departamento).
+     */
+    public function cargarMunicipios($departamento)
+    {
+        $municipios = Municipio::where('coddep', $departamento)
+            ->orderBy('descripcion')
+            ->get(['id', 'descripcion', 'coddep']);
+
+        return response()->json($municipios);
     }
 
     /**
@@ -87,31 +111,36 @@ class InstitucionSuperAdminController extends Controller
             ];
         })->values();
 
-        $condicionesTransitoriasDisponibles = PerfilAprendizajePersonalizado::query()
-            ->with('condicionBase:id,codigo,nombre,color_hex')
+        $perfilesAprendizajePersonalizadoDisponibles = PerfilAprendizajePersonalizado::query()
+            ->with('perfilAprendizaje:id,codigo,nombre,color_hex')
             ->where(function ($q) use ($id) {
-                $q->whereNull('id_institucion')
-                    ->orWhere('id_institucion', (int) $id);
+                $q->whereNull('institucion_id')
+                    ->orWhere('institucion_id', (int) $id);
             })
             ->ordenadas()
-            ->get(['id', 'codigo', 'etiqueta', 'condicion_base_id', 'id_institucion', 'es_sistema'])
+            ->get(['id', 'codigo', 'etiqueta', 'perfil_aprendizaje_id', 'institucion_id', 'es_sistema'])
             ->map(function (PerfilAprendizajePersonalizado $t) {
-                $color = $t->condicionBase?->color_hex ?: '#64748B';
+                $color = $t->perfilAprendizaje?->color_hex ?: '#64748B';
 
                 return [
                     'id' => $t->id,
                     'codigo' => $t->codigo,
                     'etiqueta' => $t->etiqueta,
-                    'id_institucion' => $t->id_institucion,
+                    'institucion_id' => $t->institucion_id,
                     'es_sistema' => (bool) $t->es_sistema,
                     'color' => $color,
-                    'condicion_base' => $t->condicionBase ? [
-                        'codigo' => $t->condicionBase->codigo,
-                        'nombre' => $t->condicionBase->nombre,
+                    'perfil_aprendizaje' => $t->perfilAprendizaje ? [
+                        'codigo' => $t->perfilAprendizaje->codigo,
+                        'nombre' => $t->perfilAprendizaje->nombre,
                     ] : null,
                 ];
             })
             ->values();
+
+        [$departamentoId, $municipioId] = $this->resolverIdsUbicacion(
+            $institucion->departamento,
+            $institucion->municipio
+        );
 
         return response()->json([
             'success' => true,
@@ -121,6 +150,8 @@ class InstitucionSuperAdminController extends Controller
                 'codigo_dane' => $institucion->codigo_dane,
                 'municipio' => $institucion->municipio,
                 'departamento' => $institucion->departamento,
+                'departamento_id' => $departamentoId,
+                'municipio_id' => $municipioId,
                 'correo_contacto' => $institucion->correo_contacto,
                 'activo' => (bool) $institucion->activo,
                 'logo' => $institucion->logo,
@@ -128,9 +159,10 @@ class InstitucionSuperAdminController extends Controller
                 'iniciales' => $this->logoService->iniciales($institucion),
                 'ambientes' => $ambientes,
             ],
-            'condiciones_orden' => $this->perfilAprendizajeOrdenController->listarPorInstitucion((int) $id),
-            'condiciones_transitorias_orden' => $this->perfilAprendizajePersonalizadoOrdenController->listarPorInstitucion((int) $id),
-            'condiciones_transitorias_disponibles' => $condicionesTransitoriasDisponibles,
+            'perfil_aprendizaje_orden' => $this->perfilAprendizajeOrdenController->listarPorInstitucion((int) $id),
+            'perfil_aprendizaje_personalizado_orden' => $this->perfilAprendizajePersonalizadoOrdenController->listarPorInstitucion((int) $id),
+            'perfil_aprendizaje_personalizado_disponibles' => $perfilesAprendizajePersonalizadoDisponibles,
+            'modulos' => $this->listarModulosPorInstitucion((int) $id),
         ]);
     }
 
@@ -147,8 +179,8 @@ class InstitucionSuperAdminController extends Controller
             $institucion = Institucion::create([
                 'nombre' => $datos['nombre'],
                 'codigo_dane' => $datos['codigo_dane'],
-                'municipio' => $datos['municipio'],
-                'departamento' => $datos['departamento'],
+                'municipio' => $datos['municipio_nombre'],
+                'departamento' => $datos['departamento_nombre'],
                 'correo_contacto' => $datos['correo_contacto'],
                 'logo' => null,
                 'activo' => true,
@@ -177,13 +209,15 @@ class InstitucionSuperAdminController extends Controller
 
             $this->perfilAprendizajeOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
-                $request->input('condiciones_orden', [])
+                $request->input('perfil_aprendizaje_orden', [])
             );
 
             $this->perfilAprendizajePersonalizadoOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
-                $request->input('condiciones_transitorias_orden', [])
+                $request->input('perfil_aprendizaje_personalizado_orden', [])
             );
+
+            $this->sincronizarModulosOficiales($institucion, $request);
 
             return [
                 'institucion' => $institucion,
@@ -228,8 +262,8 @@ class InstitucionSuperAdminController extends Controller
             $institucion->update([
                 'nombre' => $datos['nombre'],
                 'codigo_dane' => $datos['codigo_dane'],
-                'municipio' => $datos['municipio'],
-                'departamento' => $datos['departamento'],
+                'municipio' => $datos['municipio_nombre'],
+                'departamento' => $datos['departamento_nombre'],
                 'correo_contacto' => $datos['correo_contacto'],
             ]);
 
@@ -237,13 +271,15 @@ class InstitucionSuperAdminController extends Controller
 
             $this->perfilAprendizajeOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
-                $request->input('condiciones_orden', [])
+                $request->input('perfil_aprendizaje_orden', [])
             );
 
             $this->perfilAprendizajePersonalizadoOrdenController->sincronizarParaInstitucion(
                 (int) $institucion->id,
-                $request->input('condiciones_transitorias_orden', [])
+                $request->input('perfil_aprendizaje_personalizado_orden', [])
             );
+
+            $this->sincronizarModulosOficiales($institucion, $request);
         });
 
         return response()->json([
@@ -335,19 +371,65 @@ class InstitucionSuperAdminController extends Controller
             $uniqueDane .= ','.$ignoreId;
         }
 
-        return $request->validate([
+        $datos = $request->validate([
             'nombre' => 'required|string|max:255',
             'codigo_dane' => 'required|string|max:20|'.$uniqueDane,
-            'municipio' => 'required|string|max:100',
-            'departamento' => 'required|string|max:100',
+            'departamento_id' => 'required|exists:departamentos,codigo',
+            'municipio_id' => 'required|exists:municipios,id',
             'correo_contacto' => 'required|email|max:255',
             'logo' => ($logoObligatorio ? 'required' : 'nullable')
                 .'|file|mimes:jpeg,jpg,png|max:'.InstitucionLogoService::MAX_KILOBYTES,
-            'condiciones_orden' => 'nullable|array',
-            'condiciones_transitorias_orden' => 'nullable|array',
+            'perfil_aprendizaje_orden' => 'nullable|array',
+            'perfil_aprendizaje_personalizado_orden' => 'nullable|array',
+            'modulos' => 'nullable|array',
+            'modulos.*.activo' => 'nullable|boolean',
         ], [
             'logo.required' => 'El logo de la institución es obligatorio.',
+            'departamento_id.required' => 'Seleccione un departamento.',
+            'departamento_id.exists' => 'El departamento seleccionado no es válido.',
+            'municipio_id.required' => 'Seleccione un municipio.',
+            'municipio_id.exists' => 'El municipio seleccionado no es válido.',
         ]);
+
+        $departamento = Departamento::where('codigo', $datos['departamento_id'])->firstOrFail();
+        $municipio = Municipio::where('id', $datos['municipio_id'])
+            ->where('coddep', $departamento->codigo)
+            ->first();
+
+        if (! $municipio) {
+            throw ValidationException::withMessages([
+                'municipio_id' => ['El municipio no pertenece al departamento seleccionado.'],
+            ]);
+        }
+
+        $datos['departamento_nombre'] = $departamento->descripcion;
+        $datos['municipio_nombre'] = $municipio->descripcion;
+
+        return $datos;
+    }
+
+    /**
+     * Resuelve descripciones guardadas → codigo departamento / id municipio (para el modal de edición).
+     */
+    private function resolverIdsUbicacion(?string $departamentoNombre, ?string $municipioNombre): array
+    {
+        if (! filled($departamentoNombre)) {
+            return [null, null];
+        }
+
+        $departamento = Departamento::where('descripcion', $departamentoNombre)->first();
+        if (! $departamento) {
+            return [null, null];
+        }
+
+        $municipioId = null;
+        if (filled($municipioNombre)) {
+            $municipioId = Municipio::where('descripcion', $municipioNombre)
+                ->where('coddep', $departamento->codigo)
+                ->value('id');
+        }
+
+        return [$departamento->codigo, $municipioId];
     }
 
     /** En edición el logo no viaja en el form: debe existir ya en la institución. */
@@ -466,5 +548,92 @@ class InstitucionSuperAdminController extends Controller
         }
 
         return $relaciones;
+    }
+
+    /**
+     * Estado de módulos oficiales vinculados a la institución (pivot modulo_institucion).
+     *
+     * @return list<array{id:int,activo:bool}>
+     */
+    private function listarModulosPorInstitucion(int $institucionId): array
+    {
+        return DB::table('modulo_institucion')
+            ->where('institucion_id', $institucionId)
+            ->get(['modulo_id', 'activo'])
+            ->map(fn ($row) => [
+                'id' => (int) $row->modulo_id,
+                'activo' => (bool) $row->activo,
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Sincroniza módulos oficiales según ambientes activos y checkboxes del modal.
+     * Solo toca filas de módulos oficiales; no afecta módulos locales de institución.
+     *
+     * Checkbox marcado = asignado a la institución (existe fila).
+     * El estado `activo` del pivot lo gestiona el admin del colegio y se conserva.
+     */
+    private function sincronizarModulosOficiales(Institucion $institucion, Request $request): void
+    {
+        $ambientesActivos = array_keys($this->relacionesAmbientes($request));
+
+        $modulosOficialesIds = Modulo::query()
+            ->oficiales()
+            ->where('activo', true)
+            ->when(
+                $ambientesActivos === [],
+                fn ($q) => $q->whereRaw('1 = 0'),
+                fn ($q) => $q->whereIn('ambiente_id', $ambientesActivos)
+            )
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $todosOficialesIds = Modulo::query()->oficiales()->pluck('id')->all();
+
+        $activosPrevios = DB::table('modulo_institucion')
+            ->where('institucion_id', $institucion->id)
+            ->whereIn('modulo_id', $todosOficialesIds)
+            ->pluck('activo', 'modulo_id');
+
+        DB::table('modulo_institucion')
+            ->where('institucion_id', $institucion->id)
+            ->whereIn('modulo_id', $todosOficialesIds)
+            ->delete();
+
+        if ($modulosOficialesIds === []) {
+            return;
+        }
+
+        $checked = collect($request->input('modulos', []))
+            ->filter(fn ($cfg) => filter_var($cfg['activo'] ?? false, FILTER_VALIDATE_BOOLEAN))
+            ->keys()
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => in_array($id, $modulosOficialesIds, true))
+            ->values()
+            ->all();
+
+        if ($checked === []) {
+            return;
+        }
+
+        $ahora = now();
+        $filas = [];
+        foreach ($checked as $moduloId) {
+            $activoPrevio = $activosPrevios[$moduloId] ?? $activosPrevios[(string) $moduloId] ?? null;
+
+            $filas[] = [
+                'modulo_id' => $moduloId,
+                'institucion_id' => $institucion->id,
+                // Nuevo enlace: activo. Enlace ya existente: conserva lo que dejó el admin.
+                'activo' => $activoPrevio === null ? true : (bool) $activoPrevio,
+                'created_at' => $ahora,
+                'updated_at' => $ahora,
+            ];
+        }
+
+        DB::table('modulo_institucion')->insert($filas);
     }
 }

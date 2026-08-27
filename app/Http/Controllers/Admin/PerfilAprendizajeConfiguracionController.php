@@ -17,31 +17,35 @@ class PerfilAprendizajeConfiguracionController extends Controller
         $this->asegurarPersonalizacion($institucionId);
 
         $consulta = PerfilAprendizajeOrden::query()
-            ->where('condiciones_orden.id_institucion', $institucionId)
-            ->with('condicion');
+            ->where('perfil_aprendizaje_orden.institucion_id', $institucionId)
+            ->with('perfilAprendizaje');
 
         if ($request->filled('buscar')) {
             $buscar = trim($request->get('buscar'));
-            $consulta->whereHas('condicion', function ($q) use ($buscar) {
+            $consulta->whereHas('perfilAprendizaje', function ($q) use ($buscar) {
                 $q->where('nombre', 'like', "%{$buscar}%")
                     ->orWhere('codigo', 'like', "%{$buscar}%");
             });
         }
 
         if ($request->filled('activa') && in_array($request->activa, ['1', '0'], true)) {
-            $consulta->where('condiciones_orden.activa', (int) $request->activa);
+            $consulta->where('perfil_aprendizaje_orden.activa', (int) $request->activa);
         }
 
         if ($request->filled('ordenar') && in_array($request->ordenar, ['nombre', 'codigo'], true)) {
-            $consulta->join('condiciones', 'condiciones.id', '=', 'condiciones_orden.id_condicion')
-                ->orderBy('condiciones.'.$request->ordenar)
-                ->select('condiciones_orden.*');
+            $consulta->join('perfil_aprendizaje', 'perfil_aprendizaje.id', '=', 'perfil_aprendizaje_orden.perfil_aprendizaje_id')
+                ->orderBy('perfil_aprendizaje.'.$request->ordenar)
+                ->select('perfil_aprendizaje_orden.*');
         } else {
-            $consulta->orderBy('condiciones_orden.orden');
+            $consulta->orderBy('perfil_aprendizaje_orden.orden');
         }
 
+        $consulta->whereHas('perfilAprendizaje', function ($q) {
+            $q->where('eliminado', 0);
+        });
+
         $items = $consulta->get();
-        $conteos = $this->conteoEstudiantesPorCondicion($institucionId);
+        $conteos = $this->conteoEstudiantesPorPerfilAprendizaje($institucionId);
 
         if ($request->ajax()) {
             return response()->json([
@@ -53,20 +57,20 @@ class PerfilAprendizajeConfiguracionController extends Controller
         return view('admin.configuracion.perfil-aprendizaje.index', compact('items', 'conteos'));
     }
 
-    public function actualizarEstado(Request $request, PerfilAprendizajeOrden $condicionOrden)
+    public function actualizarEstado(Request $request, PerfilAprendizajeOrden $perfilAprendizajeOrden)
     {
-        $this->autorizarOrden($condicionOrden);
+        $this->autorizarOrden($perfilAprendizajeOrden);
 
-        $condicionOrden->update([
-            'activa' => ! $condicionOrden->activa,
+        $perfilAprendizajeOrden->update([
+            'activa' => ! $perfilAprendizajeOrden->activa,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => $condicionOrden->activa
-                ? 'Condición activada para la institución.'
-                : 'Condición desactivada para la institución.',
-            'activa' => (bool) $condicionOrden->activa,
+            'message' => $perfilAprendizajeOrden->activa
+                ? 'perfil de aprendizaje activado para la institución.'
+                : 'perfil de aprendizaje desactivado para la institución.',
+            'activa' => (bool) $perfilAprendizajeOrden->activa,
         ]);
     }
 
@@ -82,7 +86,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
         $ids = array_map('intval', $datos['orden']);
 
         $validos = PerfilAprendizajeOrden::query()
-            ->where('id_institucion', $institucionId)
+            ->where('institucion_id', $institucionId)
             ->whereIn('id', $ids)
             ->pluck('id')
             ->map(fn ($id) => (int) $id)
@@ -91,14 +95,14 @@ class PerfilAprendizajeConfiguracionController extends Controller
         if (count($validos) !== count($ids)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Hay condiciones inválidas en el orden enviado.',
+                'message' => 'Hay perfiles de aprendizaje inválidos en el orden enviado.',
             ], 422);
         }
 
         DB::transaction(function () use ($ids, $institucionId) {
             foreach ($ids as $posicion => $id) {
                 PerfilAprendizajeOrden::query()
-                    ->where('id_institucion', $institucionId)
+                    ->where('institucion_id', $institucionId)
                     ->where('id', $id)
                     ->update(['orden' => $posicion]);
             }
@@ -110,13 +114,13 @@ class PerfilAprendizajeConfiguracionController extends Controller
         ]);
     }
 
-    public function estudiantesAsociados(PerfilAprendizajeInclusion $condicionInclusion)
+    public function estudiantesAsociados(PerfilAprendizajeInclusion $perfilAprendizajeInclusion)
     {
         $institucionId = $this->institucionId();
 
         $estudiantes = Estudiante::query()
             ->where('institucion_id', $institucionId)
-            ->where('condicion_id', $condicionInclusion->id)
+            ->where('perfil_aprendizaje_id', $perfilAprendizajeInclusion->id)
             ->where('activo', true)
             ->with(['matriculaActiva.grado', 'matriculaActiva.grupo'])
             ->orderBy('nombre')
@@ -133,10 +137,10 @@ class PerfilAprendizajeConfiguracionController extends Controller
 
         return response()->json([
             'success' => true,
-            'condicion' => [
-                'id' => $condicionInclusion->id,
-                'codigo' => $condicionInclusion->codigo,
-                'nombre' => $condicionInclusion->nombre,
+            'perfil_aprendizaje' => [
+                'id' => $perfilAprendizajeInclusion->id,
+                'codigo' => $perfilAprendizajeInclusion->codigo,
+                'nombre' => $perfilAprendizajeInclusion->nombre,
             ],
             'estudiantes' => $estudiantes,
         ]);
@@ -146,8 +150,8 @@ class PerfilAprendizajeConfiguracionController extends Controller
     {
         $catalogoIds = PerfilAprendizajeInclusion::query()->pluck('id');
         $existentes = PerfilAprendizajeOrden::query()
-            ->where('id_institucion', $institucionId)
-            ->pluck('id_condicion');
+            ->where('institucion_id', $institucionId)
+            ->pluck('perfil_aprendizaje_id');
 
         $faltantes = $catalogoIds->diff($existentes);
         if ($faltantes->isEmpty()) {
@@ -155,16 +159,16 @@ class PerfilAprendizajeConfiguracionController extends Controller
         }
 
         $orden = (int) (PerfilAprendizajeOrden::query()
-            ->where('id_institucion', $institucionId)
+            ->where('institucion_id', $institucionId)
             ->max('orden') ?? -1);
         $ahora = now();
         $filas = [];
 
-        foreach ($faltantes as $condicionId) {
+        foreach ($faltantes as $perfilAprendizajeId) {
             $orden++;
             $filas[] = [
-                'id_institucion' => $institucionId,
-                'id_condicion' => (int) $condicionId,
+                'institucion_id' => $institucionId,
+                'perfil_aprendizaje_id' => (int) $perfilAprendizajeId,
                 'orden' => $orden,
                 'activa' => 1,
                 'created_at' => $ahora,
@@ -178,18 +182,18 @@ class PerfilAprendizajeConfiguracionController extends Controller
     /**
      * @return array<int, array{total:int,activos:int}>
      */
-    private function conteoEstudiantesPorCondicion(int $institucionId): array
+    private function conteoEstudiantesPorPerfilAprendizaje(int $institucionId): array
     {
         $filas = Estudiante::query()
-            ->selectRaw('condicion_id, COUNT(*) as total, SUM(CASE WHEN activo = 1 THEN 1 ELSE 0 END) as activos')
+            ->selectRaw('perfil_aprendizaje_id, COUNT(*) as total, SUM(CASE WHEN activo = 1 THEN 1 ELSE 0 END) as activos')
             ->where('institucion_id', $institucionId)
-            ->whereNotNull('condicion_id')
-            ->groupBy('condicion_id')
+            ->whereNotNull('perfil_aprendizaje_id')
+            ->groupBy('perfil_aprendizaje_id')
             ->get();
 
         $mapa = [];
         foreach ($filas as $fila) {
-            $mapa[(int) $fila->condicion_id] = [
+            $mapa[(int) $fila->perfil_aprendizaje_id] = [
                 'total' => (int) $fila->total,
                 'activos' => (int) $fila->activos,
             ];
@@ -211,7 +215,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
 
     private function autorizarOrden(PerfilAprendizajeOrden $orden): void
     {
-        if ((int) $orden->id_institucion !== $this->institucionId()) {
+        if ((int) $orden->institucion_id !== $this->institucionId()) {
             abort(403, 'No autorizado.');
         }
     }

@@ -5,31 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}" type="image/x-icon">
     <title>@yield('title', 'Admin') — PedNia</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
+    <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    @include('partials.sidebar-init')
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     @stack('styles')
     @stack('head')
-    <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
-    <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/css/info-condiciones/index.css') }}">
 </head>
 
 <body>
     <aside class="sidebar">
-        <div class="sidebar-logo">
-            <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="PedNia"
-                    style="width:100%;height:100%;object-fit:contain">
-            </span>
-        </div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
                 <a href="{{ route('admin.ambientes') }}"
@@ -42,13 +38,11 @@
             @endphp
             <li class="nav-item">
                 <a href="#navAcademico" data-bs-toggle="collapse" aria-expanded="{{ $academico ? 'true' : 'false' }}"
-                    class="nav-link d-flex align-items-center gap-2 {{ $academico ? 'active' : '' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $academico ? '' : 'collapsed' }}"
                     style="cursor:pointer">
                     <i class="fa-solid fa-graduation-cap"></i>
                     <span>Matrículas</span>
-                    <i class="fa-solid fa-chevron-down ms-auto"
-                        style="font-size:.65rem;transition:transform .2s;
-                              {{ $academico ? 'transform:rotate(180deg)' : '' }}"></i>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
                 </a>
                 <div class="collapse {{ $academico ? 'show' : '' }}" id="navAcademico">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
@@ -88,11 +82,62 @@
                     <i class="fa-solid fa-child"></i> Estudiantes
                 </a>
             </li>
+            @php
+                $catalogo = request()->routeIs(
+                    'admin.catalogo',
+                    'admin.catalogo.*',
+                    'admin.modulos.*',
+                    'admin.ejes.*',
+                    'admin.experiencias.*',
+                );
+            @endphp
             <li class="nav-item">
-                <a href="{{ route('admin.catalogo') }}"
-                    class="{{ request()->routeIs('admin.catalogo*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-book"></i> Catálogo
+                <a href="#navCatalogo" data-bs-toggle="collapse" aria-expanded="{{ $catalogo ? 'true' : 'false' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $catalogo ? '' : 'collapsed' }}"
+                    style="cursor:pointer">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Catálogo</span>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
                 </a>
+                <div class="collapse {{ $catalogo ? 'show' : '' }}" id="navCatalogo">
+                    <ul class="nav flex-column" style="padding:2px 0 4px 0">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.catalogo') }}"
+                                class="{{ request()->routeIs('admin.catalogo', 'admin.catalogo.detalle', 'admin.catalogo.dba.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-book-open"></i> DBA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.catalogo.modulos') }}"
+                                class="{{ request()->routeIs('admin.catalogo.modulos', 'admin.modulos.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-cube"></i> Módulos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.catalogo.ejes') }}"
+                                class="{{ request()->routeIs('admin.catalogo.ejes', 'admin.ejes.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-diagram-project"></i> Ejes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.catalogo.tematicas.index') }}"
+                                class="{{ request()->routeIs('admin.catalogo.tematicas.*', 'admin.ejes.tematicas') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-layer-group"></i> Temáticas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.catalogo.experiencias.index') }}"
+                                class="{{ request()->routeIs('admin.catalogo.experiencias.*', 'admin.experiencias.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-book-open-reader"></i> Experiencias
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
             <li class="nav-item">
                 <a href="{{ route('admin.sync-log') }}"
@@ -107,24 +152,30 @@
                 </a>
             </li>
             @php
-                $configuracion = request()->routeIs('admin.configuracion*');
+                $configuracion = request()->routeIs(
+                    'admin.configuracion',
+                    'admin.configuracion.update',
+                    'admin.configuracion.logo',
+                    'admin.configuracion.datos',
+                    'admin.configuracion.cargar-municipios',
+                    'admin.configuracion.perfil-aprendizaje*',
+                    'admin.configuracion.perfil-aprendizaje-personalizado*',
+                );
             @endphp
             <li class="nav-item">
                 <a href="#navConfiguracion" data-bs-toggle="collapse"
                     aria-expanded="{{ $configuracion ? 'true' : 'false' }}"
-                    class="nav-link d-flex align-items-center gap-2 {{ $configuracion ? 'active' : '' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $configuracion ? '' : 'collapsed' }}"
                     style="cursor:pointer">
                     <i class="fa-solid fa-gear"></i>
                     <span>Configuración</span>
-                    <i class="fa-solid fa-chevron-down ms-auto"
-                        style="font-size:.65rem;transition:transform .2s;
-                              {{ $configuracion ? 'transform:rotate(180deg)' : '' }}"></i>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
                 </a>
                 <div class="collapse {{ $configuracion ? 'show' : '' }}" id="navConfiguracion">
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
                             <a href="{{ route('admin.configuracion') }}"
-                                class="{{ request()->routeIs('admin.configuracion*') ? 'active nav-link' : 'nav-link' }}"
+                                class="{{ request()->routeIs('admin.configuracion', 'admin.configuracion.update', 'admin.configuracion.logo', 'admin.configuracion.datos', 'admin.configuracion.cargar-municipios') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-school"></i> Institución
                             </a>
@@ -133,14 +184,14 @@
                             <a href="{{ route('admin.configuracion.perfil-aprendizaje.index') }}"
                                 class="{{ request()->routeIs('admin.configuracion.perfil-aprendizaje.index', 'admin.configuracion.perfil-aprendizaje.orden', 'admin.configuracion.perfil-aprendizaje.estado') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-layer-group"></i> Perfiles de Aprendizaje
+                                <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.configuracion.perfil-aprendizaje-personalizado.index') }}"
                                 class="{{ request()->routeIs('admin.configuracion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-list-check"></i> Perfiles de Aprendizaje Personalizados
+                                <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje Personalizados
                             </a>
                         </li>
                     </ul>
@@ -152,10 +203,13 @@
                     <i class="fa-solid fa-users"></i> Usuarios
                 </a>
             </li>
+            @include('partials.nav-link-condiciones')
         </ul>
     </aside>
-
+    @include('partials.sidebar-toggle', ['only' => 'backdrop'])
     @php
+        use App\Models\User;
+        use App\Models\Institucion;
         $usuarioAuth = Auth::guard('docente')->user();
         $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
         $inicialesAuth = mb_strtoupper(
@@ -163,72 +217,105 @@
         );
         $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
         $avatarColor = '#' . substr(md5($usuarioAuth->nombre . '|' . $usuarioAuth->apellido), 0, 6);
+        $logoService = app(\App\Services\InstitucionLogoService::class);
+        if ($usuarioAuth instanceof User) {
+            $usuarioAuth->loadMissing('docente');
+        }
+        $institucionId = session('institucion_id') ?? $usuarioAuth?->institucion_id;
+        $institucion = $institucionId ? Institucion::find($institucionId) : null;
+        $logoUrl = $institucion ? $logoService->urlPublica($institucion->logo) : null;
+        $inicialesInstitucion = $institucion ? $logoService->iniciales($institucion) : null;
+        $lugarInstitucion = $institucion
+            ? trim(
+                collect([$institucion->municipio, $institucion->departamento])
+                    ->filter()
+                    ->implode(', '),
+            )
+            : '';
     @endphp
     <header class="header">
-        <div class="header-perfil" id="headerPerfil">
-
-            {{-- Chip visible siempre --}}
-            <div class="avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
-            <div class="header-user-info">
-                <span class="header-user-nombre">{{ $usuarioAuth->nombre }}</span>
-                <span class="header-user-rol">{{ $rolAuthLabel }}</span>
-            </div>
-            <span class="header-chevron">▾</span>
-
-            {{-- Dropdown --}}
-            <div class="header-dropdown">
-
-                <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
-                    <div class="dropdown-avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
-                    <div>
-                        <div class="dropdown-nombre">{{ $usuarioAuth->nombre }}</div>
-                        <div class="dropdown-email">{{ $usuarioAuth->email }}</div>
-                        <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
+        @include('partials.header-start')
+        <div class="header-institucion-container">
+            @if ($institucion)
+                <div class="header-institucion" title="{{ $institucion->nombre }}"
+                    onclick="window.location.href='{{ route('admin.configuracion') }}'" style="cursor: pointer;">
+                    <div class="header-institucion-logo" aria-hidden="true">
+                        <img src="{{ $logoUrl ?? '' }}" alt=""
+                            class="header-institucion-img {{ $logoUrl ? '' : 'd-none' }}"
+                            onerror="this.classList.add('d-none');var f=this.nextElementSibling;if(f)f.classList.remove('d-none');">
+                        <span class="header-institucion-fallback {{ $logoUrl ? 'd-none' : '' }}">
+                            {{ $inicialesInstitucion }}
+                        </span>
+                    </div>
+                    <div class="header-institucion-meta">
+                        <span class="header-institucion-nombre">{{ $institucion->nombre }}</span>
+                        @if ($lugarInstitucion !== '')
+                            <span class="header-institucion-lugar">{{ $lugarInstitucion }}</span>
+                        @endif
                     </div>
                 </div>
-
-                <div class="dropdown-section">
-                    <a href="{{ route('admin.perfil') }}" class="dropdown-item">
-                        <i class="fa-solid fa-user"></i>
-                        Mi Perfil
-                    </a>
-                    <a href="#" class="dropdown-item" onclick="abrirModalCambiarContrasena(); return false;">
-                        <i class="fa-solid fa-key"></i>
-                        Cambiar contraseña
-                    </a>
+            @endif
+            <div class="header-perfil" id="headerPerfil">
+                {{-- Chip visible siempre --}}
+                <div class="avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
+                <div class="header-user-info">
+                    <span class="header-user-nombre">{{ $usuarioAuth->nombre }}</span>
+                    <span class="header-user-rol">{{ $rolAuthLabel }}</span>
                 </div>
-
-                <div class="dropdown-divider"></div>
-
-                <div class="dropdown-section">
-                    <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
-                        @csrf
-                        <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon">
-                                <i class="fa-solid fa-right-from-bracket"></i>
-                            </span>
-                            Cerrar Sesión
-                        </button>
-                    </form>
+                <span class="header-chevron">▾</span>
+                {{-- Dropdown --}}
+                <div class="header-dropdown">
+                    <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
+                        <div class="dropdown-avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}
+                        </div>
+                        <div>
+                            <div class="dropdown-nombre">{{ $usuarioAuth->nombre }}</div>
+                            <div class="dropdown-email">{{ $usuarioAuth->email }}</div>
+                            <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-section">
+                        <a href="{{ route('admin.perfil') }}" class="dropdown-item">
+                            <i class="fa-solid fa-user"></i>
+                            Mi Perfil
+                        </a>
+                        <a href="#" class="dropdown-item"
+                            onclick="abrirModalCambiarContrasena(); return false;">
+                            <i class="fa-solid fa-key"></i>
+                            Cambiar contraseña
+                        </a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-section">
+                        <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item dropdown-item-danger">
+                                <span class="dropdown-item-icon">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                </span>
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
-
     @include('perfil.cambiar_contrasena', ['rutaContrasena' => route('admin.perfil.contrasena')])
-
     <main class="main">
         <div class="content">
             @yield('content')
         </div>
     </main>
+    @include('partials.info-condiciones.embed')
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sidebar-toggle.js') }}"></script>
+    <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
     <script>
         /* ── Cerrar sesión ────────────────────────────────────── */
         document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
             e.preventDefault();
-
             Swal.fire({
                 title: '¿Deseas cerrar tu sesión?',
                 icon: 'question',
@@ -262,9 +349,10 @@
                 const json = await response.json();
                 if (!response.ok) {
                     return {
+                        ...json,
                         success: false,
                         errors: json.errors ?? {},
-                        message: json.message ?? 'Error en la petición'
+                        message: json.message ?? 'Error en la petición',
                     };
                 }
                 return json;
@@ -276,7 +364,6 @@
                 };
             }
         }
-
         /* ── Chevron sidebar group ───────────────────────────────── */
         document.addEventListener('DOMContentLoaded', function() {
             const collapseEl = document.getElementById('navAcademico');
@@ -286,7 +373,6 @@
                 collapseEl.addEventListener('hide.bs.collapse', () => chevron.style.transform = 'rotate(0deg)');
             }
         });
-
         /* ── Dropdown de perfil ──────────────────────────────────── */
         document.addEventListener('DOMContentLoaded', function() {
             const perfil = document.getElementById('headerPerfil');

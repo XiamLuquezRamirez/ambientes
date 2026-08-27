@@ -44,6 +44,11 @@ class CargaDocente extends Model
         return $this->hasMany(Asistencia::class);
     }
 
+    public function clases()
+    {
+        return $this->hasMany(Clase::class);
+    }
+
     public function getDescripcionAttribute(): string
     {
         return $this->ambiente->nombre.' → '.

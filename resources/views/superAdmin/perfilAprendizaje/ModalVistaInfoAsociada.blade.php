@@ -1,5 +1,5 @@
-{{-- Modal: asociar / editar nombre de vista de información --}}
-<div class="modal fade" id="modalVistaInfoAsociada" tabindex="-1" data-bs-keyboard="false"
+﻿{{-- Modal: asociar / editar nombre de vista de información --}}
+<div class="modal fade modal-app" id="modalVistaInfoAsociada" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalVistaInfoAsociadaTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -20,16 +20,16 @@
             <div class="modal-body p-4">
                 <form id="formVistaInfoAsociada" autocomplete="off">
                     @csrf
-                    <input type="hidden" id="vista_info_condicion_id" value="">
+                    <input type="hidden" id="vista_info_perfil_aprendizaje_id" value="">
 
                     <div class="mb-3">
                         <label class="form-label fw-bold" for="vista_info_asociada">Nombre de la vista</label>
                         <input type="text" id="vista_info_asociada" name="vista_info_asociada"
                             class="form-control" maxlength="100"
-                            placeholder="condiciones.info.ejemplo"
+                            placeholder="perfiles-aprendizaje.info.ejemplo"
                             pattern="^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)*$">
                         <small class="text-muted">
-                            Formato Laravel (ej: <code>condiciones.info.ejemplo</code>).
+                            Formato Laravel (ej: <code>perfiles-aprendizaje.info.ejemplo</code>).
                             Déjelo vacío para quitar la asociación.
                         </small>
                     </div>
@@ -50,16 +50,16 @@
 @push('scripts')
     <script>
         (function() {
-            const URL_VISTA = (id) => `${window.URL_CONDICIONES}/${id}/vista-info`;
+            const URL_VISTA = (id) => `${window.URL_PERFILES_APRENDIZAJE}/${id}/vista-info`;
             const $modal = $('#modalVistaInfoAsociada');
             const $form = $('#formVistaInfoAsociada');
 
-            window.abrirModalVistaInfoAsociada = function(condicionId, vistaActual = '', nombre = '') {
+            window.abrirModalVistaInfoAsociada = function(perfilAprendizajeId, vistaActual = '', nombre = '') {
                 $form[0].reset();
                 $form.find('.is-invalid').removeClass('is-invalid');
                 $form.find('.invalid-feedback').remove();
 
-                $('#vista_info_condicion_id').val(condicionId);
+                $('#vista_info_perfil_aprendizaje_id').val(perfilAprendizajeId);
                 $('#vista_info_asociada').val(vistaActual || '');
                 $('#modalVistaInfoAsociadaSubtitle').text(
                     nombre
@@ -71,7 +71,7 @@
             };
 
             function guardarVistaInfo() {
-                const id = $('#vista_info_condicion_id').val();
+                const id = $('#vista_info_perfil_aprendizaje_id').val();
                 const vista = ($('#vista_info_asociada').val() || '').trim();
 
                
@@ -99,8 +99,8 @@
                         }
                         bootstrap.Modal.getInstance($modal[0])?.hide();
                         mostrarToast('success', res.message);
-                        if (typeof window.cargarTablaCondiciones === 'function') {
-                            window.cargarTablaCondiciones();
+                        if (typeof window.cargarTablaPerfilesAprendizaje === 'function') {
+                            window.cargarTablaPerfilesAprendizaje();
                         }
                     },
                     error: function(xhr) {

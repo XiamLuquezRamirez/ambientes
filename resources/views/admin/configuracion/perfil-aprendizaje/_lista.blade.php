@@ -4,12 +4,12 @@
         <p class="mt-2 mb-0">No hay perfiles de aprendizaje para mostrar con estos filtros.</p>
     </div>
 @else
-    <div class="cfg-lista" id="listaCondicionesOrden">
+    <div class="cfg-lista" id="listaPerfilesAprendizajeOrden">
         @foreach ($items as $item)
             @php
-                $c = $item->condicion;
+                $c = $item->perfilAprendizaje;
                 $color = $c?->color_hex ?: '#64748B';
-                $conteo = $conteos[$item->id_condicion] ?? ['total' => 0, 'activos' => 0];
+                $conteo = $conteos[$item->perfil_aprendizaje_id] ?? ['total' => 0, 'activos' => 0];
             @endphp
             <article class="cfg-card {{ $item->activa ? '' : 'is-inactive' }}" data-id="{{ $item->id }}">
                 <div class="cfg-drag" title="Arrastrar para reordenar">
@@ -29,9 +29,9 @@
                         @else
                             <span class="badge badge-gray">Adicional</span>
                         @endif
-                        <span class="badge badge-blue badge-estudiantes-condicion {{ $conteo['activos'] > 0 ? 'badge-estudiantes-condicion--click' : '' }}"
+                        <span class="badge badge-blue badge-estudiantes-perfil-aprendizaje {{ $conteo['activos'] > 0 ? 'badge-estudiantes-perfil-aprendizaje--click' : '' }}"
                             title="{{ $conteo['activos'] > 0 ? 'Ver estudiantes asociados' : 'Sin estudiantes activos' }}"
-                            data-condicion-id="{{ $c?->id }}"
+                            data-perfil-aprendizaje-id="{{ $c?->id }}"
                             data-etiqueta="{{ $c?->nombre ?? '' }}"
                             @if ($conteo['activos'] > 0) role="button" tabindex="0" @endif>
                             <i class="fa-solid fa-user-graduate"></i>
@@ -42,7 +42,7 @@
                 </div>
                 <div class="cfg-acciones">
                     <div class="form-check form-switch mb-0">
-                        <input class="form-check-input toggle-activa-condicion-orden" type="checkbox"
+                        <input class="form-check-input toggle-activa-perfil-aprendizaje-orden" type="checkbox"
                             role="switch" style="cursor:pointer"
                             data-id="{{ $item->id }}"
                             @checked($item->activa)

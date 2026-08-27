@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\PerfilAprendizaje;
+use App\Models\PerfilAprendizajeInclusion;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
 use App\Models\Estudiante;
@@ -23,7 +23,7 @@ class EstudianteAdminController extends Controller
         $figuras = FigurasModel::getFiguras();
 
         $grados = Grado::where('activo', true)->orderBy('nombre')->get();
-        $condiciones = PerfilAprendizaje::where('estado', true)->orderBy('nombre')->get();
+        $perfilesAprendizaje = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get();
         $consulta = Estudiante::with('grado', 'configuracionPin')->where('activo', '<>', 2);
         $departamentos = Departamento::orderBy('descripcion')->get();
         /* ── Filtros ────────────────────────────────────── */
@@ -45,8 +45,8 @@ class EstudianteAdminController extends Controller
             }
         }
 
-        if ($request->filled('condicion_id')) {
-            $consulta->where('condicion_id', $request->condicion_id);
+        if ($request->filled('perfil_aprendizaje_id')) {
+            $consulta->where('perfil_aprendizaje_id', $request->perfil_aprendizaje_id);
         }
 
         if ($request->filled('estado')) {
@@ -67,7 +67,7 @@ class EstudianteAdminController extends Controller
             ]);
         }
 
-        return view('admin.estudiantes.index', compact('grados', 'condiciones', 'estudiantes', 'figuras', 'departamentos'));
+        return view('admin.estudiantes.index', compact('grados', 'perfilesAprendizaje', 'estudiantes', 'figuras', 'departamentos'));
     }
 
     public function cargarMunicipios($departamento)
@@ -202,7 +202,7 @@ class EstudianteAdminController extends Controller
                 'success' => true,
                 'message' => 'Estudiante creado exitosamente.',
                 'requiere_apoyo' => $datos['requiere_apoyo'] == 'si',
-                'id_estudiante_creado' => $estudiante->id,
+                'estudiante_id_creado' => $estudiante->id,
             ]);
 
         } catch (\Throwable $e) {

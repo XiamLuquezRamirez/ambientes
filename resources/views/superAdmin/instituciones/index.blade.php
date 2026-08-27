@@ -1129,67 +1129,10 @@
         </a>
     </form>
 
-    @php
-        $logoService = app(\App\Services\InstitucionLogoService::class);
-    @endphp
-
-    <!-- GRID DE instituciones -->
-    <div class="instituciones-grid" id="instituciones-container">
-        @foreach ($instituciones as $inst)
-            @php
-                $logoUrl = $logoService->urlPublica($inst->logo);
-                $iniciales = $logoService->iniciales($inst);
-                $ambientesActivos = $inst->ambientes->filter(fn($a) => (bool) $a->pivot->activo)->count();
-            @endphp
-            <div class="instituciones-card btn-seleccionar-instituciones {{ $inst->activo ? '' : 'instituciones-card--suspendida' }}"
-                id="tarjeta-amb-{{ $inst->id }}" data-id="{{ $inst->id }}" data-nombre="{{ $inst->nombre }}"
-                onclick="abrirModalEditarInstitucion({{ $inst->id }})">
-
-                <div class="card-head">
-                    <div class="card-icono card-logo-wrap">
-                        <img src="{{ $logoUrl ?? '' }}" alt=""
-                            class="card-logo-img {{ $logoUrl ? '' : 'd-none' }}">
-                        <span class="card-logo-fallback {{ $logoUrl ? 'd-none' : '' }}">{{ $iniciales }}</span>
-                    </div>
-                    <div class="card-info">
-                        <div class="card-nombre card-nombre-row">
-                            <span class="card-nombre-texto">{{ $inst->nombre }}</span>
-                            <div class="form-check form-switch switch-activo-institucion" onclick="event.stopPropagation()">
-                                <input class="form-check-input toggle-activo-institucion" type="checkbox"
-                                    id="institucion_activo_{{ $inst->id }}" data-id="{{ $inst->id }}"
-                                    data-nombre="{{ $inst->nombre }}" value="1" style="cursor: pointer;"
-                                    title="{{ $inst->activo ? 'Suspender institución' : 'Activar institución' }}"
-                                    {{ $inst->activo ? 'checked' : '' }}>
-                            </div>
-                        </div>
-                        <div class="card-ip">
-                            <i class="fas fa-envelope" style="font-size:.7rem"></i>
-                            {{ $inst->correo_contacto }}
-                        </div>
-                        <div class="card-ip">
-                            <i class="fas fa-code" style="font-size:.7rem"></i>
-                            {{ $inst->codigo_dane }}
-                        </div>
-                        <div class="card-ip">
-                            <i class="fas fa-map-marker-alt" style="font-size:.7rem"></i>
-                            {{ $inst->municipio }}, {{ $inst->departamento }}
-                        </div>
-                        <span
-                            class="badge-estado-institucion {{ $inst->activo ? 'badge-estado-institucion--activa' : 'badge-estado-institucion--suspendida' }}"
-                            id="badge-estado-{{ $inst->id }}">
-                            {{ $inst->activo ? 'Activa' : 'Suspendida' }}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="card-stats">
-                    <span class="badge-stat bs-azul">
-                        <i class="fas fa-network-wired"></i> {{ $ambientesActivos }} ambiente(s)
-                    </span>
-                </div>
-            </div>
-        @endforeach
+    <div id="contenedorGrid">
+        @include('superAdmin.instituciones._grid')
     </div>
+    <div id="cargando-tabla"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
 
     @include('superAdmin.instituciones.modalAgregarInstitucion')
     @include('superAdmin.instituciones.modalLogoInstitucion')
@@ -1199,6 +1142,7 @@
 
 @push('scripts')
     <script>
+        const URL_INSTITUCIONES_INDEX = @json(route('superadmin.instituciones.index'));
         const URL_TOGGLE_INSTITUCION =
             "{{ route('superadmin.instituciones.toggleActivo', ['id' => '__ID__']) }}";
 
@@ -1271,14 +1215,49 @@
             checkbox.attr('title', activo ? 'Suspender institución' : 'Activar institución');
         }
 
+        /* ── Grid AJAX (filtros / paginación sin recargar) ───────────── */
+        async function cargarGrid(url) {
+            const contenedor = document.getElementById('contenedorGrid');
+            const cargando = document.getElementById('cargando-tabla');
+            if (!contenedor) return;
+
+            contenedor.style.opacity = '.4';
+            if (cargando) cargando.style.display = 'block';
+
+            const res = await ajaxRequest(url);
+
+            contenedor.style.opacity = '1';
+            if (cargando) cargando.style.display = 'none';
+
+            if (res.success && res.html) {
+                contenedor.innerHTML = res.html;
+                history.pushState(null, '', url);
+                const params = new URL(url, window.location.origin).searchParams;
+                const tieneFiltros = params.has('buscar') || params.has('estado');
+                document.getElementById('btnLimpiar').style.display = tieneFiltros ? 'inline-flex' : 'none';
+            } else {
+                mostrarToast('error', 'Error al cargar las instituciones');
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const pagBtn = e.target.closest('#contenedorGrid .pag-btn[href]');
+            if (pagBtn) {
+                e.preventDefault();
+                cargarGrid(pagBtn.href);
+            }
+        });
+
         /* ── Filtros ─────────────────────────────────────────────────── */
         function aplicarFiltros() {
             const params = new URLSearchParams(new FormData(document.getElementById('formBuscar')));
             for (const [k, v] of [...params.entries()]) {
                 if (!v) params.delete(k);
             }
-            const url = params.toString() ? `${URL_INSTITUCIONES_BASE}?${params.toString()}` : URL_INSTITUCIONES_BASE;
-            window.location.href = url;
+            const url = params.toString()
+                ? `${URL_INSTITUCIONES_INDEX}?${params.toString()}`
+                : URL_INSTITUCIONES_INDEX;
+            cargarGrid(url);
         }
 
         document.querySelectorAll('#formBuscar select').forEach(sel => {
@@ -1300,7 +1279,7 @@
         document.getElementById('btnLimpiar').addEventListener('click', async function(e) {
             e.preventDefault();
             document.getElementById('formBuscar').reset();
-            window.location.href = URL_INSTITUCIONES_BASE;
+            await cargarGrid(URL_INSTITUCIONES_INDEX);
         });
     </script>
 @endpush

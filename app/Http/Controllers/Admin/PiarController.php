@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\PerfilAprendizaje;
+use App\Models\PerfilAprendizajeInclusion;
 use App\Models\Departamento;
 use App\Models\Docente;
 use App\Models\Estudiante;
@@ -55,7 +55,6 @@ class PiarController extends Controller
     {
         $usuario = Auth::guard('docente')->user();
         $estudiante = Estudiante::with('grado', 'departamento', 'municipio')->where('id', $idEstudiante)->first();
-        $condiciones = PerfilAprendizaje::all();
 
         // municipios
         $municipios = Municipio::all();
@@ -65,7 +64,7 @@ class PiarController extends Controller
         $user = Auth::guard('docente')->user();
         $docente_diligencia = User::where('id', $user->id)->first();
 
-        return view('admin.estudiantes.diligenciarPiar', compact('estudiante', 'condiciones', 'docente_diligencia', 'municipios', 'departamentos', 'tipo', 'usuario'));
+        return view('admin.estudiantes.diligenciarPiar', compact('estudiante', 'docente_diligencia', 'municipios', 'departamentos', 'tipo', 'usuario'));
     }
 
     public function verificarSiComenzo($idEstudiante)
@@ -110,8 +109,8 @@ class PiarController extends Controller
     public function guardarPaso1(Request $request)
     {
         $datos = $request->validate([
-            'id_estudiante' => 'required|integer',
-            'id_docente' => 'required|integer',
+            'estudiante_id' => 'required|integer',
+            'docente_id' => 'required|integer',
             'vinculado' => 'nullable|string|max:255',
             'victima' => 'nullable|string',
             'registro_victima' => 'nullable|string|max:255',
@@ -129,14 +128,14 @@ class PiarController extends Controller
         ]);
 
         // verificcar que el estudiante no tenga piar registrado
-        $piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
+        $piar = Piar::where('estudiante_id', $datos['estudiante_id'])->first();
 
         if ($piar) {
             $id_piar = $piar->id;
         } else {
             $piar = Piar::create([
-                'estudiante_id' => $datos['id_estudiante'],
-                'docente_id' => $datos['id_docente'],
+                'estudiante_id' => $datos['estudiante_id'],
+                'docente_id' => $datos['docente_id'],
                 'estado' => 'borrador',
                 'paso' => 1,
                 'fecha_diligenciamiento' => $datos['fecha_diligenciamiento'],
@@ -169,8 +168,8 @@ class PiarController extends Controller
     public function guardarPaso2(Request $request)
     {
         $datos = $request->validate([
-            'id_estudiante' => 'required|integer',
-            'id_docente' => 'required|integer',
+            'estudiante_id' => 'required|integer',
+            'docente_id' => 'required|integer',
             'afiliado_salud' => 'required|string',
             'regimen' => 'required|string',
             'eps' => 'required|string',
@@ -187,7 +186,7 @@ class PiarController extends Controller
             'cuales_ayudas' => 'nullable|string',
         ]);
         // verificcar que el estudiante no tenga piar registrado
-        $piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
+        $piar = Piar::where('estudiante_id', $datos['estudiante_id'])->first();
 
         if ($piar) {
             $id_piar = $piar->id;
@@ -214,12 +213,6 @@ class PiarController extends Controller
                 'cuales_ayudas' => $datos['ayudas_tecnicas'] == 'Si' ? $datos['cuales_ayudas'] : null,
             ]
         );
-
-        if ($datos['diagnostico_medico'] == 'Si') {
-            Estudiante::where('id', $datos['id_estudiante'])->update([
-                'condicion_id' => $datos['cual_diagnostico'],
-            ]);
-        }
 
         if (! $registro) {
             return response()->json([
@@ -280,8 +273,8 @@ class PiarController extends Controller
     public function guardarPaso3(Request $request)
     {
         $datos = $request->validate([
-            'id_estudiante' => 'required|integer',
-            'id_docente' => 'required|integer',
+            'estudiante_id' => 'required|integer',
+            'docente_id' => 'required|integer',
             'nombre_madre' => 'required|string',
             'ocupacion_madre' => 'required|string',
             'nivel_madre' => 'required|string',
@@ -300,7 +293,7 @@ class PiarController extends Controller
         ]);
 
         // verificcar que el estudiante no tenga piar registrado
-        $piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
+        $piar = Piar::where('estudiante_id', $datos['estudiante_id'])->first();
 
         if ($piar) {
             $id_piar = $piar->id;
@@ -335,8 +328,8 @@ class PiarController extends Controller
     public function guardarPaso4(Request $request)
     {
         $datos = $request->validate([
-            'id_estudiante' => 'required|integer',
-            'id_docente' => 'required|integer',
+            'estudiante_id' => 'required|integer',
+            'docente_id' => 'required|integer',
             'vinculado_otra_institucion' => 'required|string',
             'instituciones_anteriores' => 'nullable|string',
             'motivo_no_vinculado' => 'nullable|string',
@@ -350,7 +343,7 @@ class PiarController extends Controller
         ]);
 
         // verificcar que el estudiante no tenga piar registrado
-        $piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
+        $piar = Piar::where('estudiante_id', $datos['estudiante_id'])->first();
 
         if ($piar) {
             $id_piar = $piar->id;
@@ -385,8 +378,8 @@ class PiarController extends Controller
     public function guardarPaso5(Request $request)
     {
         $datos = $request->validate([
-            'id_estudiante' => 'required|integer',
-            'id_docente' => 'required|integer',
+            'estudiante_id' => 'required|integer',
+            'docente_id' => 'required|integer',
 
             'vp_mov_apoyo_sistema' => 'required|string',
             'vp_mov_apoyo_sistema_obs' => 'nullable|string',
@@ -582,7 +575,7 @@ class PiarController extends Controller
         ]);
 
         // verificcar que el estudiante no tenga piar registrado
-        $piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
+        $piar = Piar::where('estudiante_id', $datos['estudiante_id'])->first();
 
         if ($piar) {
             $id_piar = $piar->id;
@@ -657,8 +650,8 @@ class PiarController extends Controller
     public function guardarPaso6(Request $request)
     {
         $datos = $request->validate([
-            'id_estudiante' => 'required|integer',
-            'id_docente' => 'required|integer',
+            'estudiante_id' => 'required|integer',
+            'docente_id' => 'required|integer',
 
             'ajuste_razonable' => 'required|array',
             'docente_firma' => 'required|array',
@@ -676,7 +669,7 @@ class PiarController extends Controller
             'docente_coordinador_pedagogico_area' => 'nullable|string',
         ]);
 
-        $piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
+        $piar = Piar::where('estudiante_id', $datos['estudiante_id'])->first();
 
         if ($piar) {
             $id_piar = $piar->id;
@@ -731,7 +724,7 @@ class PiarController extends Controller
                 foreach ($datos['docente_firma'] as $docente) {
                     PiarAjusteRazonableDocenteFirma::create([
                         'id_ajuste_razonable' => $ajuste->id,
-                        'id_docente' => $docente['id'],
+                        'docente_id' => $docente['id'],
                         'area' => $docente['area'],
                     ]);
                 }
@@ -755,8 +748,8 @@ class PiarController extends Controller
     public function guardarPaso7(Request $request)
     {
         $datos = $request->validate([
-            'id_estudiante' => 'required|integer',
-            'id_docente' => 'required|integer',
+            'estudiante_id' => 'required|integer',
+            'docente_id' => 'required|integer',
             'compromisos' => 'required|string',
             'actividad' => 'required|array',
 
@@ -765,7 +758,7 @@ class PiarController extends Controller
             'actividad.*.frecuencia' => 'required|string',
         ]);
 
-        $id_piar = Piar::where('estudiante_id', $datos['id_estudiante'])->first();
+        $id_piar = Piar::where('estudiante_id', $datos['estudiante_id'])->first();
 
         if ($id_piar) {
             $id_piar = $id_piar->id;

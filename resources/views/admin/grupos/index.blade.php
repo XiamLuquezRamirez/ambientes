@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Grupos — Año ' . $anio)
 
 @push('styles')
@@ -208,7 +208,7 @@
     @endif
 
     {{-- Modal Nuevo/Editar Grupo --}}
-    <div class="modal fade" id="modalGrupo" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+    <div class="modal fade modal-app" id="modalGrupo" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">

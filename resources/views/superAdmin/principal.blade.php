@@ -1,85 +1,133 @@
 @extends('layouts.superAdmin')
 @section('title', 'Principal')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('assets/css/superAdmin/principal.css') }}">
+@endpush
+
 @section('content')
-    <div class="page-header">
-        <h1>Panel de Super Administrador</h1>
-        <p style="font-size: 1.2rem;">Dashboard principal</p>
-    </div>
+    <div class="sa-dashboard">
 
-    <div class="ambientes-grid">
-        @foreach ($ambientes as $amb)
-            <div class="ambiente-card" data-id="{{ $amb->id }}" data-ip="{{ $amb->servidor_ip ?? '' }}"
-                data-cupo="{{ $amb->cupo_defecto }}">
+        <div class="page-header">
+            <h1>Panel de Super Administrador</h1>
+            <p>Resumen del sistema y acceso rápido a la gestión global de PedNia</p>
+        </div>
 
-                <div class="card-franja" style="background:{{ $amb->color_hex }}"></div>
-
-                {{-- Cabecera --}}
-                <div class="card-head">
-                    <div class="card-icono" style="background:{{ $amb->color_hex }}22">{{ $amb->icono }}</div>
-                    <div class="card-info">
-                        <div class="card-nombre">{{ $amb->nombre }}</div>
-                        <div class="card-ip">
-                            <i class="fas fa-server" style="font-size:.7rem"></i>
-                            <span class="card-ip-texto">{{ $amb->servidor_ip ?? 'Sin IP configurada' }}</span>
-                            <span class="dot-conexion" id="dot-{{ $amb->id }}" title="Sin verificar"></span>
-                        </div>
+        {{-- KPIs (también son atajos) --}}
+        <div class="sa-kpi-grid">
+            <a href="{{ route('superadmin.instituciones.index') }}" class="sa-kpi-card">
+                <span class="sa-kpi-icon sa-kpi-icon--blue"><i class="fa-solid fa-university"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Instituciones</div>
+                        <div class="sa-kpi-value">{{ $stats['instituciones_total'] }}</div>
                     </div>
-                    <button class="btn-menu" onclick="abrirMenu({{ $amb->id }})" title="Opciones">⋯</button>
-                </div>
-
-                {{-- Menú desplegable --}}
-                <div class="dropdown-menu-card" id="menu-{{ $amb->id }}">
-                    <button onclick="abrirModalIp({{ $amb->id }})">
-                        <i class="fas fa-network-wired"></i> Editar IP del servidor
-                    </button>
-                    <button onclick="abrirModalCupo({{ $amb->id }})">
-                        <i class="fas fa-users"></i> Configurar cupo por defecto
-                    </button>
-                    <div class="dropdown-sep"></div>
-                    <button onclick="abrirModalDocentes({{ $amb->id }}, '{{ addslashes($amb->nombre) }}')">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                        Ver docentes
-                        <span
-                            style="margin-left:auto;color:#94A3B8;font-size:.78rem">{{ $amb->cargas_docente_count }}</span>
-                    </button>
-                    <button onclick="abrirModalModulos({{ $amb->id }}, '{{ addslashes($amb->nombre) }}')">
-                        <i class="fas fa-cubes"></i>
-                        Gestionar módulos
-                        <span
-                            style="margin-left:auto;color:#94A3B8;font-size:.78rem">{{ $amb->modulos_activos_count }}/{{ $amb->modulos_count }}</span>
-                    </button>
-                    <div class="dropdown-sep"></div>
-                    <button onclick="verificarConexion({{ $amb->id }})">
-                        <i class="fas fa-wifi"></i> Verificar conexión
-                    </button>
-                </div>
-
-                {{-- Estadísticas --}}
-                <div class="card-stats">
-                    <span class="badge-stat bs-azul">
-                        <i class="fas fa-cube"></i> {{ $amb->modulos_activos_count }}/{{ $amb->modulos_count }}
-                        módulos activos
-                    </span>
-
-
-                </div>
-                <div class="card-meta">
-                    <span><i class="fas fa-cube"></i> Vacio</span>
-                </div>
-
-                {{-- Footer --}}
-                <div class="card-footer-amb">
-                    <div class="grados-lista">
-
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-
+                    <div class="sa-kpi-meta">
+                        {{ $stats['instituciones_activas'] }} activas · {{ $stats['instituciones_suspendidas'] }} susp.
                     </div>
                 </div>
+            </a>
 
+            <a href="{{ route('superadmin.catalogo.modulos') }}" class="sa-kpi-card">
+                <span class="sa-kpi-icon sa-kpi-icon--green"><i class="fa-solid fa-cube"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Módulos</div>
+                        <div class="sa-kpi-value">{{ $stats['modulos_oficiales_activos'] }}</div>
+                    </div>
+                    <div class="sa-kpi-meta">de {{ $stats['modulos_oficiales'] }} oficiales</div>
+                </div>
+            </a>
+
+            <a href="{{ route('superadmin.catalogo.ejes') }}" class="sa-kpi-card">
+                <span class="sa-kpi-icon sa-kpi-icon--amber"><i class="fa-solid fa-diagram-project"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Ejes</div>
+                        <div class="sa-kpi-value">{{ $stats['ejes_oficiales_activos'] }}</div>
+                    </div>
+                    <div class="sa-kpi-meta">de {{ $stats['ejes_oficiales'] }} oficiales</div>
+                </div>
+            </a>
+
+            <a href="{{ route('superadmin.perfil-aprendizaje.index') }}" class="sa-kpi-card">
+                <span class="sa-kpi-icon sa-kpi-icon--violet"><i class="fa-solid fa-puzzle-piece"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Perfiles</div>
+                        <div class="sa-kpi-value">{{ $stats['perfiles_globales_activos'] }}</div>
+                    </div>
+                    <div class="sa-kpi-meta">de {{ $stats['perfiles_globales'] }} globales</div>
+                </div>
+            </a>
+
+            <a href="{{ route('superadmin.perfil-aprendizaje-personalizado.index') }}" class="sa-kpi-card">
+                <span class="sa-kpi-icon sa-kpi-icon--slate"><i class="fa-solid fa-brain"></i></span>
+                <div class="sa-kpi-body">
+                    <div class="sa-kpi-row">
+                        <div class="sa-kpi-label">Personalizados</div>
+                        <div class="sa-kpi-value">{{ $stats['perfiles_personalizados_activos'] }}</div>
+                    </div>
+                    <div class="sa-kpi-meta">de {{ $stats['perfiles_personalizados'] }} globales</div>
+                </div>
+            </a>
+        </div>
+
+        {{-- Resumen de ambientes --}}
+        <section class="sa-section" aria-labelledby="sa-ambientes-title">
+            <div class="sa-section-head">
+                <div>
+                    <h2 id="sa-ambientes-title">Ambientes del sistema</h2>
+                    <p>Resumen del catálogo. Gestiona módulos y ejes desde Catálogo.</p>
+                </div>
+                <a href="{{ route('superadmin.catalogo.modulos') }}" class="sa-section-link">
+                    Ir a módulos <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </a>
             </div>
-        @endforeach
-    </div>
 
+            <div class="sa-ambientes-grid">
+                @forelse ($ambientes as $amb)
+                    @php
+                        $color = $amb->color_hex ?: '#64748B';
+                        $modulosActivos = (int) $amb->modulos_oficiales_activos_count;
+                        $modulosTotal = (int) $amb->modulos_oficiales_count;
+                    @endphp
+                    <a href="{{ route('superadmin.catalogo.modulos') }}" class="sa-ambiente-card"
+                        title="Ver módulos de {{ $amb->nombre }}">
+                        <div class="sa-ambiente-franja" style="background:{{ $color }}"></div>
+                        <div class="sa-ambiente-body">
+                            <div class="sa-ambiente-head">
+                                <div class="sa-ambiente-icono" style="background:{{ $color }}22">
+                                    {{ $amb->icono ?: '📦' }}
+                                </div>
+                                <div>
+                                    <div class="sa-ambiente-nombre">{{ $amb->nombre }}</div>
+                                    <div class="sa-ambiente-hint">Catálogo oficial</div>
+                                </div>
+                            </div>
+
+                            <div class="sa-ambiente-stats">
+                                <div class="sa-ambiente-stat">
+                                    <span class="sa-ambiente-stat-label">
+                                        <i class="fa-solid fa-cube" style="color:{{ $color }}"></i>
+                                        Módulos oficiales
+                                    </span>
+                                    <span class="sa-ambiente-stat-value">{{ $modulosActivos }}/{{ $modulosTotal }}</span>
+                                </div>
+                            </div>
+
+                            <div class="sa-ambiente-foot">
+                                <span>Gestionar módulos</span>
+                                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </a>
+                @empty
+                    <div class="sa-empty">
+                        Aún no hay ambientes registrados en el sistema.
+                    </div>
+                @endforelse
+            </div>
+        </section>
+    </div>
 @endsection

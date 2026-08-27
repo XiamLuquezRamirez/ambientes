@@ -64,7 +64,7 @@
                     </td>
                     <td style="text-transform: capitalize;">{{ $e->nombre }} {{ $e->apellido }}</td>
                     <td>{{ $e->grado?->nombre }}</td>
-                    <td>{{ $e->condicion?->nombre }}</td>
+                    <td>{{ $e->perfilAprendizaje?->nombre }}</td>
                     <td>{{ $e->edad ? $e->edad . ' Años' : 'N/A' }}</td>
                     <td>
                         <div class="d-flex justify-content-center align-items-center">

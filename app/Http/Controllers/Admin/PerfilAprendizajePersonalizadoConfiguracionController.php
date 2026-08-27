@@ -23,46 +23,50 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         $this->asegurarPersonalizacion($institucionId);
 
         $consulta = PerfilAprendizajePersonalizadoOrden::query()
-            ->where('condiciones_transitorias_orden.id_institucion', $institucionId)
-            ->with(['condicionTransitoria.condicionBase', 'condicionTransitoria.creador']);
+            ->where('perfil_aprendizaje_personalizado_orden.institucion_id', $institucionId)
+            ->with(['perfilAprendizajePersonalizado.perfilAprendizaje', 'perfilAprendizajePersonalizado.creador']);
 
         if ($request->filled('buscar')) {
             $buscar = trim($request->get('buscar'));
-            $consulta->whereHas('condicionTransitoria', function ($q) use ($buscar) {
+            $consulta->whereHas('perfilAprendizajePersonalizado', function ($q) use ($buscar) {
                 $q->where('etiqueta', 'like', "%{$buscar}%")
                     ->orWhere('codigo', 'like', "%{$buscar}%");
             });
         }
 
-        if ($request->filled('condicion_base_id')) {
-            $baseId = (int) $request->condicion_base_id;
-            $consulta->whereHas('condicionTransitoria', function ($q) use ($baseId) {
-                $q->where('condicion_base_id', $baseId);
+        if ($request->filled('perfil_aprendizaje_id')) {
+            $baseId = (int) $request->perfil_aprendizaje_id;
+            $consulta->whereHas('perfilAprendizajePersonalizado', function ($q) use ($baseId) {
+                $q->where('perfil_aprendizaje_id', $baseId);
             });
         }
 
         if ($request->filled('activa') && in_array($request->activa, ['1', '0'], true)) {
-            $consulta->where('condiciones_transitorias_orden.activa', (int) $request->activa);
+            $consulta->where('perfil_aprendizaje_personalizado_orden.activa', (int) $request->activa);
         }
 
         if ($request->filled('ordenar') && in_array($request->ordenar, ['nombre', 'codigo'], true)) {
             $columna = $request->ordenar === 'nombre' ? 'etiqueta' : 'codigo';
             $consulta->join(
-                'condiciones_transitorias',
-                'condiciones_transitorias.id',
+                'perfil_aprendizaje_personalizado',
+                'perfil_aprendizaje_personalizado.id',
                 '=',
-                'condiciones_transitorias_orden.id_condicion_transitoria'
+                'perfil_aprendizaje_personalizado_orden.perfil_aprendizaje_personalizado_id'
             )
-                ->orderBy('condiciones_transitorias.'.$columna)
-                ->select('condiciones_transitorias_orden.*');
+                ->orderBy('perfil_aprendizaje_personalizado.'.$columna)
+                ->select('perfil_aprendizaje_personalizado_orden.*');
         } else {
-            $consulta->orderBy('condiciones_transitorias_orden.orden');
+            $consulta->orderBy('perfil_aprendizaje_personalizado_orden.orden');
         }
+
+        $consulta->whereHas('perfilAprendizajePersonalizado', function ($q) {
+            $q->where('eliminado', 0);
+        });
 
         $items = $consulta->get();
         $conteos = app(EstudiantePerfilAprendizajePersonalizadoService::class)
-            ->conteoActivosPorCondicion($institucionId);
-        $condicionesBase = PerfilAprendizajeInclusion::query()->ordenadas()->get(['id', 'codigo', 'nombre', 'color_hex']);
+            ->conteoActivosPorPerfilAprendizajePersonalizado($institucionId);
+        $perfilesAprendizajeBase = PerfilAprendizajeInclusion::query()->ordenadas()->get(['id', 'codigo', 'nombre', 'color_hex']);
         $esSuperAdmin = false;
 
         if ($request->ajax()) {
@@ -75,27 +79,27 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         return view('admin.configuracion.perfil-aprendizaje-personalizado.index', compact(
             'items',
             'conteos',
-            'condicionesBase',
+            'perfilesAprendizajeBase',
             'esSuperAdmin'
         ));
     }
 
-    public function mostrar(PerfilAprendizajePersonalizado $condicionTransitoria)
+    public function mostrar(PerfilAprendizajePersonalizado $perfilAprendizajePersonalizado)
     {
-        $this->autorizarGestion($condicionTransitoria);
-        $condicionTransitoria->load('condicionBase:id,codigo,nombre,color_hex');
+        $this->autorizarGestion($perfilAprendizajePersonalizado);
+        $perfilAprendizajePersonalizado->load('perfilAprendizaje:id,codigo,nombre,color_hex');
 
         return response()->json([
             'success' => true,
-            'condicion' => [
-                'id' => $condicionTransitoria->id,
-                'codigo' => $condicionTransitoria->codigo,
-                'etiqueta' => $condicionTransitoria->etiqueta,
-                'descripcion_interna' => $condicionTransitoria->descripcion_interna,
-                'condicion_base_id' => $condicionTransitoria->condicion_base_id,
-                'es_sistema' => (bool) $condicionTransitoria->es_sistema,
-                'estado' => (int) $condicionTransitoria->estado,
-                'condicion_base' => $condicionTransitoria->condicionBase,
+            'perfil_aprendizaje_personalizado' => [
+                'id' => $perfilAprendizajePersonalizado->id,
+                'codigo' => $perfilAprendizajePersonalizado->codigo,
+                'etiqueta' => $perfilAprendizajePersonalizado->etiqueta,
+                'descripcion_interna' => $perfilAprendizajePersonalizado->descripcion_interna,
+                'perfil_aprendizaje_id' => $perfilAprendizajePersonalizado->perfil_aprendizaje_id,
+                'es_sistema' => (bool) $perfilAprendizajePersonalizado->es_sistema,
+                'estado' => (int) $perfilAprendizajePersonalizado->estado,
+                'perfil_aprendizaje' => $perfilAprendizajePersonalizado->perfilAprendizaje,
             ],
         ]);
     }
@@ -106,64 +110,64 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         $usuario = Auth::guard('docente')->user();
         $datos = $this->validar($request);
 
-        $condicion = DB::transaction(function () use ($datos, $institucionId, $usuario) {
-            $condicion = PerfilAprendizajePersonalizado::create([
+        $perfilAprendizajePersonalizado = DB::transaction(function () use ($datos, $institucionId, $usuario) {
+            $perfilAprendizajePersonalizado = PerfilAprendizajePersonalizado::create([
                 'codigo' => PerfilAprendizajePersonalizado::generarCodigo(),
                 'etiqueta' => $datos['etiqueta'],
                 'descripcion_interna' => $datos['descripcion_interna'] ?? null,
-                'condicion_base_id' => $datos['condicion_base_id'] ?? null,
+                'perfil_aprendizaje_id' => $datos['perfil_aprendizaje_id'] ?? null,
                 'es_sistema' => false,
                 'estado' => 1,
-                'id_institucion' => $institucionId,
+                'institucion_id' => $institucionId,
                 'usuario_crea' => $usuario?->id,
             ]);
 
             $orden = (int) (PerfilAprendizajePersonalizadoOrden::query()
-                ->where('id_institucion', $institucionId)
+                ->where('institucion_id', $institucionId)
                 ->max('orden') ?? -1) + 1;
 
             PerfilAprendizajePersonalizadoOrden::create([
-                'id_institucion' => $institucionId,
-                'id_condicion_transitoria' => $condicion->id,
+                'institucion_id' => $institucionId,
+                'perfil_aprendizaje_personalizado_id' => $perfilAprendizajePersonalizado->id,
                 'orden' => $orden,
                 'activa' => true,
             ]);
 
-            return $condicion;
+            return $perfilAprendizajePersonalizado;
         });
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición transitoria creada correctamente.',
-            'condicion' => $condicion,
+            'message' => 'perfil de aprendizaje personalizado creado correctamente.',
+            'perfil_aprendizaje_personalizado' => $perfilAprendizajePersonalizado,
         ]);
     }
 
-    public function actualizar(Request $request, PerfilAprendizajePersonalizado $condicionTransitoria)
+    public function actualizar(Request $request, PerfilAprendizajePersonalizado $perfilAprendizajePersonalizado)
     {
-        $this->autorizarGestion($condicionTransitoria);
-        $datos = $this->validar($request, $condicionTransitoria->id);
+        $this->autorizarGestion($perfilAprendizajePersonalizado);
+        $datos = $this->validar($request, $perfilAprendizajePersonalizado->id);
 
-        $condicionTransitoria->update([
+        $perfilAprendizajePersonalizado->update([
             'etiqueta' => $datos['etiqueta'],
             'descripcion_interna' => $datos['descripcion_interna'] ?? null,
-            'condicion_base_id' => $datos['condicion_base_id'] ?? null,
+            'perfil_aprendizaje_id' => $datos['perfil_aprendizaje_id'] ?? null,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición transitoria actualizada correctamente.',
-            'condicion' => $condicionTransitoria->fresh(),
+            'message' => 'perfil de aprendizaje personalizado actualizado correctamente.',
+            'perfil_aprendizaje_personalizado' => $perfilAprendizajePersonalizado->fresh(),
         ]);
     }
 
-    public function eliminar(PerfilAprendizajePersonalizado $condicionTransitoria)
+    public function eliminar(PerfilAprendizajePersonalizado $perfilAprendizajePersonalizado)
     {
-        $this->autorizarGestion($condicionTransitoria);
+        $this->autorizarGestion($perfilAprendizajePersonalizado);
         $institucionId = $this->institucionId();
 
         $estudiantesAsignados = app(EstudiantePerfilAprendizajePersonalizadoService::class)
-            ->conteoActivosCondicion($condicionTransitoria->id, $institucionId);
+            ->conteoActivosPerfilAprendizajePersonalizado($perfilAprendizajePersonalizado->id, $institucionId);
 
         if ($estudiantesAsignados > 0) {
             return response()->json([
@@ -173,40 +177,40 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
             ], 422);
         }
 
-        DB::transaction(function () use ($condicionTransitoria, $institucionId) {
+        DB::transaction(function () use ($perfilAprendizajePersonalizado, $institucionId) {
             PerfilAprendizajePersonalizadoOrden::query()
-                ->where('id_institucion', $institucionId)
-                ->where('id_condicion_transitoria', $condicionTransitoria->id)
+                ->where('institucion_id', $institucionId)
+                ->where('perfil_aprendizaje_personalizado_id', $perfilAprendizajePersonalizado->id)
                 ->delete();
 
-            $condicionTransitoria->delete();
+            $perfilAprendizajePersonalizado->update(['eliminado' => true]);
         });
 
         return response()->json([
             'success' => true,
-            'message' => 'Condición transitoria eliminada correctamente.',
+            'message' => 'perfil de aprendizaje personalizado eliminado correctamente.',
         ]);
     }
 
-    public function actualizarEstado(Request $request, PerfilAprendizajePersonalizadoOrden $condicionTransitoriaOrden)
+    public function actualizarEstado(Request $request, PerfilAprendizajePersonalizadoOrden $personalizadoOrden)
     {
-        $this->autorizarOrden($condicionTransitoriaOrden);
-        $condicionTransitoriaOrden->load('condicionTransitoria.creador');
+        $this->autorizarOrden($personalizadoOrden);
+        $personalizadoOrden->load('perfilAprendizajePersonalizado.creador');
 
-        if ($condicionTransitoriaOrden->condicionTransitoria?->creadaPorDocente()) {
-            abort(403, 'No puedes activar ni desactivar condiciones creadas por docentes.');
+        if ($personalizadoOrden->perfilAprendizajePersonalizado?->creadaPorDocente()) {
+            abort(403, 'No puedes activar ni desactivar perfiles de aprendizaje personalizados creados por docentes.');
         }
 
-        $condicionTransitoriaOrden->update([
-            'activa' => ! $condicionTransitoriaOrden->activa,
+        $personalizadoOrden->update([
+            'activa' => ! $personalizadoOrden->activa,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => $condicionTransitoriaOrden->activa
-                ? 'Opción activada para la institución.'
-                : 'Opción desactivada para la institución.',
-            'activa' => (bool) $condicionTransitoriaOrden->activa,
+            'message' => $personalizadoOrden->activa
+                ? 'perfil de aprendizaje personalizado activado para la institución.'
+                : 'perfil de aprendizaje personalizado desactivado para la institución.',
+            'activa' => (bool) $personalizadoOrden->activa,
         ]);
     }
 
@@ -222,7 +226,7 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         $ids = array_map('intval', $datos['orden']);
 
         $validos = PerfilAprendizajePersonalizadoOrden::query()
-            ->where('id_institucion', $institucionId)
+            ->where('institucion_id', $institucionId)
             ->whereIn('id', $ids)
             ->pluck('id')
             ->map(fn ($id) => (int) $id)
@@ -238,7 +242,7 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         DB::transaction(function () use ($ids, $institucionId) {
             foreach ($ids as $posicion => $id) {
                 PerfilAprendizajePersonalizadoOrden::query()
-                    ->where('id_institucion', $institucionId)
+                    ->where('institucion_id', $institucionId)
                     ->where('id', $id)
                     ->update(['orden' => $posicion]);
             }
@@ -250,20 +254,20 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         ]);
     }
 
-    public function estudiantesAsociados(PerfilAprendizajePersonalizado $condicionTransitoria)
+    public function estudiantesAsociados(PerfilAprendizajePersonalizado $perfilAprendizajePersonalizado)
     {
         $institucionId = $this->institucionId();
         $servicio = app(EstudiantePerfilAprendizajePersonalizadoService::class);
-        $servicio->autorizarCondicionInstitucion($condicionTransitoria, $institucionId);
+        $servicio->autorizarPerfilAprendizajePersonalizadoInstitucion($perfilAprendizajePersonalizado, $institucionId);
 
-        $asignaciones = $servicio->asignacionesActivas($condicionTransitoria, $institucionId);
+        $asignaciones = $servicio->asignacionesActivas($perfilAprendizajePersonalizado, $institucionId);
 
         return response()->json([
             'success' => true,
-            'condicion' => [
-                'id' => $condicionTransitoria->id,
-                'codigo' => $condicionTransitoria->codigo,
-                'etiqueta' => $condicionTransitoria->etiqueta,
+            'perfil_aprendizaje_personalizado' => [
+                'id' => $perfilAprendizajePersonalizado->id,
+                'codigo' => $perfilAprendizajePersonalizado->codigo,
+                'etiqueta' => $perfilAprendizajePersonalizado->etiqueta,
             ],
             'estudiantes' => $asignaciones->map(
                 fn ($a) => $servicio->serializarAsignacion($a, true)
@@ -276,15 +280,15 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         $institucionId = $this->institucionId();
         $servicio = app(EstudiantePerfilAprendizajePersonalizadoService::class);
 
-        $asignacion->load('condicionTransitoria', 'estudiante');
-        $servicio->autorizarCondicionInstitucion($asignacion->condicionTransitoria, $institucionId);
+        $asignacion->load('perfilAprendizajePersonalizado', 'estudiante');
+        $servicio->autorizarPerfilAprendizajePersonalizadoInstitucion($asignacion->perfilAprendizajePersonalizado, $institucionId);
 
         if ((int) $asignacion->estudiante?->institucion_id !== $institucionId) {
             abort(403, 'No autorizado.');
         }
 
         $datos = $request->validate([
-            'motivo_cierre' => 'required|in:diagnostico_formal,condicion_no_confirmada,otro',
+            'motivo_cierre' => 'required|in:diagnostico_formal,perfil_aprendizaje_no_confirmado,otro',
             'observacion_cierre' => 'required|string|min:20|max:2000',
         ]);
 
@@ -292,7 +296,7 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Estudiante desvinculado de la condición transitoria correctamente.',
+            'message' => 'Estudiante desvinculado de perfil de aprendizaje personalizado correctamente.',
         ]);
     }
 
@@ -301,10 +305,10 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         return $request->validate([
             'etiqueta' => 'required|string|max:150|min:10',
             'descripcion_interna' => 'nullable|string',
-            'condicion_base_id' => [
+            'perfil_aprendizaje_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('condiciones', 'id'),
+                Rule::exists('perfil_aprendizaje', 'id'),
             ],
         ]);
     }
@@ -313,14 +317,14 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
     {
         $catalogoIds = PerfilAprendizajePersonalizado::query()
             ->where(function ($q) use ($institucionId) {
-                $q->whereNull('id_institucion')
-                    ->orWhere('id_institucion', $institucionId);
+                $q->whereNull('institucion_id')
+                    ->orWhere('institucion_id', $institucionId);
             })
             ->pluck('id');
 
         $existentes = PerfilAprendizajePersonalizadoOrden::query()
-            ->where('id_institucion', $institucionId)
-            ->pluck('id_condicion_transitoria');
+            ->where('institucion_id', $institucionId)
+            ->pluck('perfil_aprendizaje_personalizado_id');
 
         $faltantes = $catalogoIds->diff($existentes);
         if ($faltantes->isEmpty()) {
@@ -328,7 +332,7 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         }
 
         $orden = (int) (PerfilAprendizajePersonalizadoOrden::query()
-            ->where('id_institucion', $institucionId)
+            ->where('institucion_id', $institucionId)
             ->max('orden') ?? -1);
         $ahora = now();
         $filas = [];
@@ -336,8 +340,8 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
         foreach ($faltantes as $transitoriaId) {
             $orden++;
             $filas[] = [
-                'id_institucion' => $institucionId,
-                'id_condicion_transitoria' => (int) $transitoriaId,
+                'institucion_id' => $institucionId,
+                'perfil_aprendizaje_personalizado_id' => (int) $transitoriaId,
                 'orden' => $orden,
                 'activa' => 1,
                 'created_at' => $ahora,
@@ -354,7 +358,7 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
     private function conteoEstudiantesPorTransitoria(int $institucionId): array
     {
         return app(EstudiantePerfilAprendizajePersonalizadoService::class)
-            ->conteoActivosPorCondicion($institucionId);
+            ->conteoActivosPorPerfilAprendizajePersonalizado($institucionId);
     }
 
     private function institucionId(): int
@@ -370,22 +374,22 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
 
     private function autorizarOrden(PerfilAprendizajePersonalizadoOrden $orden): void
     {
-        if ((int) $orden->id_institucion !== $this->institucionId()) {
+        if ((int) $orden->institucion_id !== $this->institucionId()) {
             abort(403, 'No autorizado.');
         }
     }
 
-    private function autorizarGestion(PerfilAprendizajePersonalizado $condicion): void
+    private function autorizarGestion(PerfilAprendizajePersonalizado $perfilAprendizajePersonalizado): void
     {
         if (
-            $condicion->es_sistema
-            || (int) $condicion->id_institucion !== $this->institucionId()
+            $perfilAprendizajePersonalizado->es_sistema
+            || (int) $perfilAprendizajePersonalizado->institucion_id !== $this->institucionId()
         ) {
-            abort(403, 'No autorizado para gestionar esta condición.');
+            abort(403, 'No autorizado para gestionar este perfil de aprendizaje personalizado.');
         }
 
-        if ($condicion->creadaPorDocente()) {
-            abort(403, 'No puedes editar ni eliminar condiciones creadas por docentes.');
+        if ($perfilAprendizajePersonalizado->creadaPorDocente()) {
+            abort(403, 'No puedes editar ni eliminar perfiles de aprendizaje personalizados creados por docentes.');
         }
     }
 }

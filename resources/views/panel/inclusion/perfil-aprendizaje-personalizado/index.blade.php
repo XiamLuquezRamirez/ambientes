@@ -2,17 +2,20 @@
 @section('title', 'Perfiles de Aprendizaje Personalizados')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/admin/configuracion-condiciones.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/condiciones/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/configuracion-perfiles-aprendizaje.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/perfiles-aprendizaje/index.css') }}">
 @endpush
 
 @section('content')
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+    <div class="page-header"
+        style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
         <div>
-            <h1 style="font-family: var(--font-display); font-size: 1.6rem; color: var(--color-primary-dark); margin:0 0 4px">
+            <h1
+                style="font-family: var(--font-display); font-size: 1.6rem; color: var(--color-primary-dark); margin:0 0 4px">
                 Perfiles de Aprendizaje Personalizados
             </h1>
-            <p style="color:#64748B;margin:0">Opciones de tu institución. Solo puedes editar o eliminar las que tú creaste.</p>
+            <p style="color:#64748B;margin:0">Opciones de tu institución. Solo puedes editar o eliminar las que tú creaste.
+            </p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
             <a href="{{ route('panel.inclusion') }}" class="btn btn-outline-secondary">
@@ -34,10 +37,10 @@
         <input type="search" name="buscar" class="form-control" style="width:auto;min-width:220px"
             placeholder="Buscar por nombre o código…" value="{{ request('buscar') }}">
 
-        <select name="condicion_base_id" class="form-control" style="width:auto;min-width:220px">
+        <select name="perfil_aprendizaje_id" class="form-control" style="width:auto;min-width:220px">
             <option value="">Todos los perfiles de aprendizaje base</option>
-            @foreach ($condicionesBase as $base)
-                <option value="{{ $base->id }}" @selected((string) request('condicion_base_id') === (string) $base->id)>
+            @foreach ($perfilesAprendizajeBase as $base)
+                <option value="{{ $base->id }}" @selected((string) request('perfil_aprendizaje_id') === (string) $base->id)>
                     {{ $base->codigo }} — {{ $base->nombre }}
                 </option>
             @endforeach
@@ -62,13 +65,23 @@
 
     @include('superAdmin.perfilAprendizajePersonalizado.ModalRegistrarPerfilAprendizajePersonalizado', [
         'esSuperAdmin' => false,
-        'condicionesBase' => $condicionesBase,
+        'perfilesAprendizajeBase' => $perfilesAprendizajeBase,
         'urlTransitoriasBase' => route('panel.inclusion.perfil-aprendizaje-personalizado'),
         'urlTransitoriasItem' => url('panel/inclusion/perfil-aprendizaje-personalizado/opcion'),
     ])
 
     @include('partials.perfil-aprendizaje-personalizado.modal-estudiantes-asociados')
     @include('partials.perfil-aprendizaje-personalizado.modal-desactivar')
+
+    <script>
+        (function() {
+            const tituloAmbiente = document.getElementById('txt-trabajando-en-ambiente');
+            if (!tituloAmbiente) return;
+            tituloAmbiente.style.display = 'none';
+            const headerAmbiente = tituloAmbiente.closest('.students-header');
+            if (headerAmbiente) headerAmbiente.style.display = 'none';
+        })();
+    </script>
 @endsection
 
 @push('scripts')
@@ -76,13 +89,14 @@
         window.URL_PANEL_TRANSITORIAS = @json(route('panel.inclusion.perfil-aprendizaje-personalizado'));
         window.URL_PANEL_TRANSITORIAS_ESTADO = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado')) + `/${id}/estado`;
         window.CT_EST_URL_LIST = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado/opcion')) + `/${id}/estudiantes`;
-        window.CT_EST_URL_DESASOCIAR = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado/asignaciones')) + `/${id}/desasociar`;
+        window.CT_EST_URL_DESACTIVAR = (id) => @json(url('panel/inclusion/perfil-aprendizaje-personalizado/asignaciones')) + `/${id}/desactivar`;
         window.cargarListaTransitoriasAdmin = function() {
             if (typeof window.cargarListaTransitoriasPanel === 'function') {
                 window.cargarListaTransitoriasPanel();
             }
         };
     </script>
-    <script src="{{ asset('assets/js/panel/condiciones-transitorias.js') }}"></script>
-    <script src="{{ asset('assets/js/condiciones/estudiantes-asociados-transitoria.js') }}"></script>
+    <script src="{{ asset('assets/js/panel/perfiles-aprendizaje-personalizado.js') }}"></script>
+    <script src="{{ asset('assets/js/perfiles-aprendizaje/estudiantes-asociados-perfil-aprendizaje-personalizado.js') }}">
+    </script>
 @endpush

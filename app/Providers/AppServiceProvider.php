@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\View\Composers\InfoCondicionesComposer;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer(
+            ['layouts.panel', 'layouts.admin', 'layouts.superAdmin'],
+            InfoCondicionesComposer::class
+        );
     }
 }

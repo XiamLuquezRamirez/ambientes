@@ -1,0 +1,49 @@
+@if ($items->isEmpty())
+    <div class="cfg-empty">
+        <i class="fa-solid fa-layer-group" style="font-size:1.6rem;opacity:.4"></i>
+        <p class="mt-2 mb-0">No hay perfiles de aprendizaje para mostrar con estos filtros.</p>
+    </div>
+@else
+    <div class="cfg-lista cfg-lista--panel" id="listaPerfilesAprendizajePanel">
+        @foreach ($items as $item)
+            @php
+                $c = $item->perfilAprendizaje;
+                $color = $c?->color_hex ?: '#64748B';
+                $conteo = $conteos[$item->perfil_aprendizaje_id] ?? ['total' => 0, 'activos' => 0];
+            @endphp
+            <article class="cfg-card cfg-card--panel {{ $item->activa ? '' : 'is-inactive' }}" data-id="{{ $item->id }}">
+                <div>
+                    <div class="cfg-meta">
+                        <span class="badge"
+                            style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55">
+                            {{ $c?->codigo ?? '—' }}
+                        </span>
+                        <span class="badge badge-estado-local {{ $item->activa ? 'badge-green' : 'badge-gray' }}">
+                            {{ $item->activa ? 'Activa' : 'Desactivada' }}
+                        </span>
+                        @if ($c?->es_sistema)
+                            <span class="badge badge-orange">Sistema</span>
+                        @else
+                            <span class="badge badge-gray">Adicional</span>
+                        @endif
+                        <span class="badge badge-blue badge-estudiantes-perfil-aprendizaje {{ $conteo['activos'] > 0 ? 'badge-estudiantes-perfil-aprendizaje--click' : '' }}"
+                            title="{{ $conteo['activos'] > 0 ? 'Ver estudiantes asociados' : 'Sin estudiantes activos en tus grupos' }}"
+                            data-perfil-aprendizaje-id="{{ $c?->id }}"
+                            data-etiqueta="{{ $c?->nombre ?? '' }}"
+                            @if ($conteo['activos'] > 0) role="button" tabindex="0" @endif>
+                            <i class="fa-solid fa-user-graduate"></i>
+                            {{ $conteo['activos'] }} estudiante{{ $conteo['activos'] === 1 ? '' : 's' }} activo{{ $conteo['activos'] === 1 ? '' : 's' }}
+                        </span>
+                    </div>
+                    <h3 class="cfg-titulo">{{ $c?->nombre ?? 'Perfil de aprendizaje no disponible' }}</h3>
+                    @if ($c?->descripcion_corta)
+                        <p class="cfg-desc text-muted mb-0">{{ \Illuminate\Support\Str::limit($c->descripcion_corta, 120) }}</p>
+                    @endif
+                </div>
+                <div class="cfg-acciones">
+                    <span class="text-muted" style="font-size:.82rem">Solo lectura</span>
+                </div>
+            </article>
+        @endforeach
+    </div>
+@endif

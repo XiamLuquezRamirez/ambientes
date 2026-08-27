@@ -34,18 +34,36 @@ class Institucion extends Model
             ->withTimestamps();
     }
 
+    /** Ambientes contratados y activos para la institución. */
+    public function ambientesActivos()
+    {
+        return $this->ambientes()->wherePivot('activo', true);
+    }
+
     public function usuarios()
     {
         return $this->hasMany(User::class, 'institucion_id');
     }
 
-    public function condicionesOrden()
+    public function perfilesAprendizajeOrden()
     {
-        return $this->hasMany(PerfilAprendizajeOrden::class, 'id_institucion');
+        return $this->hasMany(PerfilAprendizajeOrden::class, 'institucion_id');
     }
 
-    public function condicionesTransitoriasOrden()
+    public function perfilesAprendizajePersonalizadoOrden()
     {
-        return $this->hasMany(PerfilAprendizajePersonalizadoOrden::class, 'id_institucion');
+        return $this->hasMany(PerfilAprendizajePersonalizadoOrden::class, 'institucion_id');
+    }
+
+    public function modulos()
+    {
+        return $this->belongsToMany(Modulo::class, 'modulo_institucion')
+            ->withPivot('activo')
+            ->withTimestamps();
+    }
+
+    public function tematicas()
+    {
+        return $this->hasMany(Tematica::class);
     }
 }

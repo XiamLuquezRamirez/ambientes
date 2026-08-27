@@ -1,0 +1,132 @@
+.kiosco-fs-btn {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    right: max(12px, env(safe-area-inset-right, 0px));
+    z-index: 200;
+    width: 52px;
+    height: 52px;
+    border: 0;
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.78);
+    color: #f0faf4;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(6px);
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s, background 0.15s;
+}
+
+.kiosco-salir-btn {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    left: max(12px, env(safe-area-inset-left, 0px));
+    z-index: 200;
+    min-height: 52px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.78);
+    color: #f0faf4;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(6px);
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s, background 0.15s;
+}
+
+.kiosco-salir-btn:active {
+    transform: scale(0.94);
+}
+
+.kiosco-salir-btn[hidden] {
+    display: none !important;
+}
+
+.kiosco-fs-btn:active {
+    transform: scale(0.94);
+}
+
+.kiosco-fs-btn svg {
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
+}
+
+.kiosco-fs-btn[hidden] {
+    display: none !important;
+}
+
+.kiosco-fs-hint {
+    position: fixed;
+    top: max(72px, calc(env(safe-area-inset-top, 0px) + 60px));
+    right: max(12px, env(safe-area-inset-right, 0px));
+    z-index: 199;
+    max-width: min(260px, calc(100vw - 24px));
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.92);
+    color: rgba(240, 250, 244, 0.92);
+    font-size: 0.85rem;
+    line-height: 1.35;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    animation: kiosco-hint-in 0.35s ease;
+}
+
+.kiosco-fs-hint[hidden] {
+    display: none !important;
+}
+
+.kiosco-fs-btn svg[hidden] {
+    display: none !important;
+}
+
+.kiosco-fs-hint__texto {
+    margin: 0;
+}
+
+.kiosco-fs-hint__texto strong {
+    color: #fff;
+}
+
+.kiosco-fs-hint__cerrar {
+    margin-top: 8px;
+    padding: 6px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--color-ambiente, #0f6e56);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+@keyframes kiosco-hint-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+html:fullscreen,
+html:-webkit-full-screen,
+html.kiosco-fullscreen-active {
+    width: 100%;
+    height: 100%;
+}
+
+html:fullscreen body,
+html:-webkit-full-screen body,
+html.kiosco-fullscreen-active body {
+    min-height: 100%;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+html.kiosco-fullscreen-active .kiosco-fs-btn {
+    background: rgba(15, 23, 42, 0.65);
+}

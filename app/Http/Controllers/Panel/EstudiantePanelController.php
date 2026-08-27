@@ -6,27 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
-use App\Models\PerfilAprendizaje;
-use App\Models\PerfilAprendizajePersonalizado;
-use App\Models\PerfilAprendizajePersonalizadoOrden;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
-use App\Models\Docente;
 use App\Models\Estudiante;
 use App\Models\EstudianteAmbiente;
-use App\Models\EstudiantePerfilAprendizajePersonalizado;
 use App\Models\FigurasModel;
 use App\Models\Grado;
 use App\Models\Grupo;
 use App\Models\Matricula;
+use App\Models\PerfilAprendizajeInclusion;
+use App\Models\PerfilAprendizajeOrden;
+use App\Models\PerfilAprendizajePersonalizadoOrden;
 use App\Models\SyncQueue;
 use App\Services\AmbienteService;
 use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\DocenteAsignacionService;
+use App\Services\EstudiantePerfilAprendizajePersonalizadoService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class EstudiantePanelController extends Controller
 {
@@ -110,10 +108,10 @@ class EstudiantePanelController extends Controller
 
         $base = Estudiante::with([
             'ambientes',
-            'condicion:id,nombre',
+            'perfilAprendizaje:id,nombre',
             'configuracionPin',
             'piar',
-            'condicionTransitoriaActiva.condicionTransitoria',
+            'perfilAprendizajePersonalizadoActiva.perfilAprendizajePersonalizado',
         ])->whereIn('id', $matriculas);
 
         $consulta = clone $base;
@@ -131,11 +129,11 @@ class EstudiantePanelController extends Controller
             $texto_busqueda = '';
         }
 
-        if ($request->filled('condicion_id')) {
-            $condicion_id = $request->get('condicion_id');
-            $consulta->where('condicion_id', $request->get('condicion_id'));
+        if ($request->filled('perfil_aprendizaje_id')) {
+            $perfil_aprendizaje_id = $request->get('perfil_aprendizaje_id');
+            $consulta->where('perfil_aprendizaje_id', $request->get('perfil_aprendizaje_id'));
         } else {
-            $condicion_id = '';
+            $perfil_aprendizaje_id = '';
         }
 
         if ($request->filled('grado_id')) {
@@ -182,8 +180,9 @@ class EstudiantePanelController extends Controller
 
         $estudiantes = $consulta->paginate(12)->withQueryString();
 
-        $condiciones = PerfilAprendizaje::where('estado', true)->orderBy('nombre')->get();
-        $filtros = $request->only(['q', 'condicion_id', 'estado', 'filtro', 'orden']);
+        $perfilesAprendizaje = PerfilAprendizajeInclusion::where('estado', true)->orderBy('nombre')->get();
+        $datosPerfilesAsignables = $this->datosPerfilesAsignablesInstitucion();
+        $filtros = $request->only(['q', 'perfil_aprendizaje_id', 'estado', 'filtro', 'orden']);
         $vista = $request->get('vista', 'grid');
 
         /* estadisticas */
@@ -210,13 +209,13 @@ class EstudiantePanelController extends Controller
                     'estadisticas',
                     'vista',
                     'grupos',
-                    'condiciones',
+                    'perfilesAprendizaje',
                     'grados',
                     'id_grado_seleccionado',
                     'id_grupo_seleccionado',
-                    'condicion_id',
+                    'perfil_aprendizaje_id',
                     'texto_busqueda',
-                ))->render(),
+                ) + $datosPerfilesAsignables)->render(),
             ]);
         }
 
@@ -227,7 +226,7 @@ class EstudiantePanelController extends Controller
             'estudiantes',
             'estadisticas',
             'cargas',
-            'condiciones',
+            'perfilesAprendizaje',
             'filtros',
             'vista',
             'departamentos',
@@ -237,17 +236,17 @@ class EstudiantePanelController extends Controller
             'ambientes_disponibles',
             'ambiente',
             'id_grado_seleccionado',
-            'condicion_id',
+            'perfil_aprendizaje_id',
             'id_grupo_seleccionado',
             'texto_busqueda'
-        ));
+        ) + $datosPerfilesAsignables);
     }
 
     /**
      * Ficha completa del estudiante (panel docente).
      * Ruta: GET /panel/estudiantes/ficha/{estudiante} → panel.estudiantes.show
      */
-    public function verFicha(Estudiante $estudiante)
+    public function verFicha(Request $request, Estudiante $estudiante)
     {
         $figuras = FigurasModel::getFiguras();
         $docente = Auth::guard('docente')->user()->docente;
@@ -257,14 +256,16 @@ class EstudiantePanelController extends Controller
             abort(403, 'No tienes acceso a este estudiante.');
         }
 
+        $urlVolver = $this->resolverUrlVolverFicha($request, $estudiante);
+
         $estudiante->load([
-            'condicion',
+            'perfilAprendizaje',
             'configuracionPin',
             'piar',
             'matriculaActiva.grado',
             'matriculaActiva.grupo',
-            'condicionTransitoriaActiva.condicionTransitoria',
-            'condicionTransitoriaActiva.docente.user',
+            'perfilAprendizajePersonalizadoActiva.perfilAprendizajePersonalizado',
+            'perfilAprendizajePersonalizadoActiva.docente.user',
         ]);
 
         $historialAsistencia = $asistenciaService->historialAsistencia($estudiante);
@@ -304,26 +305,8 @@ class EstudiantePanelController extends Controller
             'bloqueado' => 'Bloqueado',
         ];
 
-        $institucionId = Auth::guard('docente')->user()->institucion_id;
-        $condicionesTransitorias = collect();
+        $datosPerfiles = $this->datosPerfilesAprendizajeFicha($estudiante);
 
-        if ($institucionId && ! $estudiante->condicionTransitoriaActiva) {
-            $condicionesTransitorias = PerfilAprendizajePersonalizadoOrden::query()
-                ->where('id_institucion', $institucionId)
-                ->where('activa', true)
-                ->whereHas('condicionTransitoria', fn ($q) => $q->where('estado', 1))
-                ->with('condicionTransitoria:id,codigo,etiqueta,descripcion_interna')
-                ->orderBy('orden')
-                ->get()
-                ->pluck('condicionTransitoria')
-                ->filter();
-        }
-
-        $historialCondicionesTransitorias = $estudiante->condicionesTransitoriasAsignadas()
-            ->with(['condicionTransitoria', 'docente.user'])
-            ->orderByDesc('fecha_activacion')
-            ->get();
-        
         return view('panel.estudiantes.show', [
             'estudiante' => $estudiante,
             'matricula' => $estudiante->matriculaActiva,
@@ -332,22 +315,17 @@ class EstudiantePanelController extends Controller
             'observacionesRecientes' => $observacionesRecientes,
             'estadoPin' => $estadoPin,
             'estadoPinLabel' => $estadosPin[$estadoPin] ?? 'Sin configurar',
-            'mostrarVerPiar' => ! $estudiante->condicion_es_estandar,
+            'mostrarVerPiar' => ! $estudiante->perfil_aprendizaje_es_estandar,
             'asistenciaHoy' => $asistenciaHoy,
             'figuras' => $figuras,
             'historialAsistencia' => $historialAsistencia,
             'resumenAsistencia' => $resumenAsistencia,
-            'condicionesTransitorias' => $condicionesTransitorias,
-            'condicionTransitoriaActiva' => $estudiante->condicionTransitoriaActiva,
-            'historialCondicionesTransitorias' => $historialCondicionesTransitorias,
+            ...$datosPerfiles,
+            'urlVolver' => $urlVolver,
         ]);
     }
 
-    /**
-     * Activa una condición transitoria para el estudiante.
-     * Solo puede haber una activa por estudiante.
-     */
-    public function activarPerfilAprendizajePersonalizado(Request $request, Estudiante $estudiante)
+    public function fragmentosPerfilesAprendizaje(Estudiante $estudiante)
     {
         $docente = Auth::guard('docente')->user()->docente;
 
@@ -355,57 +333,96 @@ class EstudiantePanelController extends Controller
             abort(403, 'No tienes acceso a este estudiante.');
         }
 
-        $institucionId = Auth::guard('docente')->user()->institucion_id;
+        $estudiante->load(['perfilAprendizaje']);
 
-        $datos = $request->validate([
-            'id_condicion_transitoria' => [
-                'required',
-                'integer',
-                Rule::exists('condiciones_transitorias', 'id')->where(fn ($q) => $q->where('estado', 1)),
-            ],
-            'observacion' => 'required|string|min:20|max:2000',
-        ]);
+        return $this->respuestaFragmentosPerfilesAprendizaje($estudiante);
+    }
 
-        $permitida = PerfilAprendizajePersonalizadoOrden::query()
-            ->where('id_institucion', $institucionId)
-            ->where('id_condicion_transitoria', $datos['id_condicion_transitoria'])
-            ->where('activa', true)
-            ->exists();
+    public function fragmentosPerfilAprendizajePersonalizado(Estudiante $estudiante)
+    {
+        return $this->fragmentosPerfilesAprendizaje($estudiante);
+    }
 
-        if (! $permitida) {
-            return back()->withErrors([
-                'id_condicion_transitoria' => 'La condición transitoria no está habilitada para esta institución.',
-            ]);
+    /**
+     * Resuelve a dónde debe regresar el botón Volver de la ficha.
+     * Prioridad: ?volver= → página de origen (referer) → sesión → listado de estudiantes.
+     */
+    private function resolverUrlVolverFicha(Request $request, Estudiante $estudiante): string
+    {
+        $sessionKey = "ficha_estudiante_volver.{$estudiante->id}";
+        $fallback = route('panel.estudiantes');
+
+        $explicita = $request->query('volver');
+        if (is_string($explicita) && $explicita !== '') {
+            $explicita = str_starts_with($explicita, '/') ? url($explicita) : $explicita;
+            if ($this->esUrlVolverSegura($explicita, $estudiante)) {
+                session([$sessionKey => $explicita]);
+
+                return $explicita;
+            }
         }
 
-        if ($estudiante->condicionTransitoriaActiva()->exists()) {
-            return back()->withErrors([
-                'id_condicion_transitoria' => 'El estudiante ya tiene una condición transitoria activa.',
-            ]);
+        $anterior = url()->previous();
+        if ($this->esUrlOrigenFicha($anterior, $estudiante)) {
+            session([$sessionKey => $anterior]);
+
+            return $anterior;
         }
 
-        DB::transaction(function () use ($estudiante, $docente, $datos) {
-            EstudiantePerfilAprendizajePersonalizado::create([
-                'id_estudiante' => $estudiante->id,
-                'id_condicion_transitoria' => $datos['id_condicion_transitoria'],
-                'id_docente' => $docente->id,
-                'observacion' => trim($datos['observacion']),
-                'fecha_activacion' => now(),
-                'activa' => true,
-            ]);
+        $guardada = session($sessionKey);
+        if (is_string($guardada) && $this->esUrlVolverSegura($guardada, $estudiante)) {
+            return $guardada;
+        }
 
-            $estudiante->update([
-                'condicion_transitoria_id' => $datos['id_condicion_transitoria'],
-            ]);
-        });
+        return $fallback;
+    }
 
-        $etiqueta = PerfilAprendizajePersonalizado::query()
-            ->where('id', $datos['id_condicion_transitoria'])
-            ->value('etiqueta');
+    /**
+     * Indica si la URL puede usarse como destino del botón Volver (misma app, no la ficha).
+     */
+    private function esUrlVolverSegura(string $url, Estudiante $estudiante): bool
+    {
+        $partes = parse_url($url);
+        if ($partes === false || empty($partes['path'])) {
+            return false;
+        }
 
-        return redirect()
-            ->route('panel.estudiantes.show', $estudiante)
-            ->with('success', 'Condición transitoria'.($etiqueta ? " «{$etiqueta}»" : '').' activada correctamente.');
+        if (isset($partes['scheme']) && ! in_array($partes['scheme'], ['http', 'https'], true)) {
+            return false;
+        }
+
+        if (isset($partes['host']) && $partes['host'] !== request()->getHost()) {
+            return false;
+        }
+
+        $path = rtrim($partes['path'], '/');
+        $fichaPath = rtrim((string) parse_url(route('panel.estudiantes.show', $estudiante), PHP_URL_PATH), '/');
+
+        return $path !== $fichaPath;
+    }
+
+    /**
+     * Indica si la URL es un origen válido para actualizar el retorno
+     * (excluye la ficha y páginas hijas del flujo del estudiante).
+     */
+    private function esUrlOrigenFicha(string $url, Estudiante $estudiante): bool
+    {
+        if (! $this->esUrlVolverSegura($url, $estudiante)) {
+            return false;
+        }
+
+        $path = rtrim((string) parse_url($url, PHP_URL_PATH), '/');
+        $portafolioPath = rtrim((string) parse_url(route('panel.portafolio.estudiante', $estudiante), PHP_URL_PATH), '/');
+
+        if ($path === $portafolioPath) {
+            return false;
+        }
+
+        if (str_contains($path, '/piar') || str_contains($path, 'diligenciar-piar')) {
+            return false;
+        }
+
+        return true;
     }
 
     public function tomarAsistencia(CargaDocente $carga)
@@ -454,6 +471,146 @@ class EstudiantePanelController extends Controller
             ->with('success', 'Asistencia del día registrada.');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    private function datosPerfilesAsignablesInstitucion(): array
+    {
+        $institucionId = Auth::guard('docente')->user()->institucion_id;
+        $perfilesAprendizajeAsignables = collect();
+        $perfilesAprendizajePersonalizadoAsignables = collect();
+
+        if ($institucionId) {
+            $perfilesAprendizajeAsignables = PerfilAprendizajeOrden::query()
+                ->where('institucion_id', $institucionId)
+                ->where('activa', true)
+                ->whereHas('perfilAprendizaje', fn ($q) => $q->where('eliminado', 0)->where('id', '!=', 1))
+                ->with('perfilAprendizaje:id,codigo,nombre,descripcion_corta,color_hex')
+                ->orderBy('orden')
+                ->get()
+                ->pluck('perfilAprendizaje')
+                ->filter();
+
+            $perfilesAprendizajePersonalizadoAsignables = PerfilAprendizajePersonalizadoOrden::query()
+                ->where('institucion_id', $institucionId)
+                ->where('activa', true)
+                ->whereHas('perfilAprendizajePersonalizado', fn ($q) => $q->where('estado', 1))
+                ->with('perfilAprendizajePersonalizado:id,codigo,etiqueta,descripcion_interna')
+                ->orderBy('orden')
+                ->get()
+                ->pluck('perfilAprendizajePersonalizado')
+                ->filter();
+        }
+
+        return [
+            'perfilesAprendizajeAsignables' => $perfilesAprendizajeAsignables,
+            'perfilesAprendizajePersonalizadoAsignables' => $perfilesAprendizajePersonalizadoAsignables,
+        ];
+    }
+
+    private function respuestaCardEstudianteListado(Estudiante $estudiante): string
+    {
+        $estudiante->loadMissing([
+            'perfilAprendizaje:id,nombre',
+            'configuracionPin',
+            'piar',
+            'perfilAprendizajePersonalizadoActiva.perfilAprendizajePersonalizado',
+        ]);
+
+        return view('panel.estudiantes.partials._card', array_merge(
+            ['e' => $estudiante],
+            $this->datosPerfilesAsignablesInstitucion()
+        ))->render();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function datosPerfilesAprendizajeFicha(Estudiante $estudiante): array
+    {
+        $datosPersonalizado = $this->datosPerfilAprendizajePersonalizadoFicha($estudiante);
+        $asignables = $this->datosPerfilesAsignablesInstitucion();
+
+        return [
+            ...$datosPersonalizado,
+            'perfilesAprendizaje' => $asignables['perfilesAprendizajeAsignables'],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function datosPerfilAprendizajePersonalizadoFicha(Estudiante $estudiante): array
+    {
+        $estudiante->loadMissing([
+            'perfilAprendizajePersonalizadoActiva.perfilAprendizajePersonalizado',
+            'perfilAprendizajePersonalizadoActiva.docente.user',
+        ]);
+
+        $institucionId = Auth::guard('docente')->user()->institucion_id;
+        $docente = Auth::guard('docente')->user()->docente;
+        $perfilesAprendizajePersonalizado = collect();
+
+        if ($institucionId) {
+            $perfilesAprendizajePersonalizado = PerfilAprendizajePersonalizadoOrden::query()
+                ->where('institucion_id', $institucionId)
+                ->where('activa', true)
+                ->whereHas('perfilAprendizajePersonalizado', fn ($q) => $q->where('estado', 1))
+                ->with('perfilAprendizajePersonalizado:id,codigo,etiqueta,descripcion_interna')
+                ->orderBy('orden')
+                ->get()
+                ->pluck('perfilAprendizajePersonalizado')
+                ->filter();
+        }
+
+        $historialPerfilesAprendizajePersonalizado = $estudiante->asignacionesPerfilAprendizajePersonalizado()
+            ->with(['perfilAprendizajePersonalizado', 'docente.user'])
+            ->orderByDesc('fecha_activacion')
+            ->get();
+
+        $puedeDesactivarPerfilAprendizajePersonalizado = $estudiante->perfilAprendizajePersonalizadoActiva
+            && $docente
+            && (int) $estudiante->perfilAprendizajePersonalizadoActiva->docente_id === (int) $docente->id;
+
+        return [
+            'perfilesAprendizajePersonalizado' => $perfilesAprendizajePersonalizado,
+            'perfilAprendizajePersonalizadoActiva' => $estudiante->perfilAprendizajePersonalizadoActiva,
+            'historialPerfilesAprendizajePersonalizado' => $historialPerfilesAprendizajePersonalizado,
+            'puedeDesactivarPerfilAprendizajePersonalizado' => $puedeDesactivarPerfilAprendizajePersonalizado,
+            'motivosCierreTransitoria' => EstudiantePerfilAprendizajePersonalizadoService::MOTIVOS_CIERRE,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function datosAsignacionPerfilAprendizaje(Estudiante $estudiante): array
+    {
+        $datos = $this->datosPerfilesAprendizajeFicha($estudiante);
+        $datos['estudiante'] = $estudiante;
+
+        return $datos;
+    }
+
+    private function respuestaFragmentosPerfilesAprendizaje(Estudiante $estudiante): JsonResponse
+    {
+        $datos = $this->datosAsignacionPerfilAprendizaje($estudiante);
+
+        return response()->json([
+            'success' => true,
+            'estudiante_id' => $estudiante->id,
+            'card_html' => $this->respuestaCardEstudianteListado($estudiante),
+            'perfil_normal_html' => view('panel.estudiantes.partials._perfilAprendizajeActivo', $datos)->render(),
+            'activo_html' => view('panel.estudiantes.partials._perfilAprendizajePersonalizadoActivo', $datos)->render(),
+            'acciones_html' => view('panel.estudiantes.partials._accionesPerfilesAprendizaje', $datos)->render(),
+            'historial_html' => view('panel.estudiantes.partials._historialPerfilesAprendizajePersonalizado', $datos)->render(),
+            'mostrar_tab_historial' => $datos['historialPerfilesAprendizajePersonalizado']->isNotEmpty(),
+            'perfil_personalizado_activo_etiqueta' => $datos['perfilAprendizajePersonalizadoActiva']
+                ? ($datos['perfilAprendizajePersonalizadoActiva']->perfilAprendizajePersonalizado?->etiqueta ?? 'Perfil personalizado')
+                : null,
+        ]);
+    }
+
     private function docenteTieneAccesoAlEstudiante(int $docenteId, int $estudianteId): bool
     {
         $cargas = CargaDocente::query()
@@ -495,7 +652,6 @@ class EstudiantePanelController extends Controller
             'apellido' => 'nullable|string|max:100',
             'iniciales' => 'required|string|max:3',
             'color_avatar' => 'required|string|max:9',
-            'condicion' => 'required|in:estandar,tea,tdah,disc_visual,disc_auditiva,disc_motriz,down',
             'tipo_identificacion' => 'nullable|string|max:100',
             'identificacion' => 'nullable|string|max:100',
             'sexo' => 'nullable|string|max:20',

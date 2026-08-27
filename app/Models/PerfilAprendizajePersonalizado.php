@@ -8,22 +8,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class PerfilAprendizajePersonalizado extends Model
 {
-    protected $table = 'condiciones_transitorias';
+    protected $table = 'perfil_aprendizaje_personalizado';
 
     protected $fillable = [
-        'id_institucion',
+        'institucion_id',
         'codigo',
         'etiqueta',
         'descripcion_interna',
-        'condicion_base_id',
+        'perfil_aprendizaje_id',
         'es_sistema',
         'estado',
         'usuario_crea',
+        'eliminado',
     ];
 
     protected $casts = [
         'es_sistema' => 'boolean',
-        'estado' => 'integer',
+        'estado' => 'integer',  
     ];
 
     public static function generarCodigo(): string
@@ -38,14 +39,14 @@ class PerfilAprendizajePersonalizado extends Model
         return $codigo;
     }
 
-    public function condicionBase(): BelongsTo
+    public function perfilAprendizaje(): BelongsTo
     {
-        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'condicion_base_id');
+        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'perfil_aprendizaje_id');
     }
 
     public function institucion(): BelongsTo
     {
-        return $this->belongsTo(Institucion::class, 'id_institucion');
+        return $this->belongsTo(Institucion::class, 'institucion_id');
     }
 
     public function creador(): BelongsTo
@@ -55,12 +56,12 @@ class PerfilAprendizajePersonalizado extends Model
 
     public function estudiantes(): HasMany
     {
-        return $this->hasMany(Estudiante::class, 'condicion_transitoria_id');
+        return $this->hasMany(Estudiante::class, 'perfil_aprendizaje_personalizado_id');
     }
 
     public function asignacionesEstudiante(): HasMany
     {
-        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'id_condicion_transitoria');
+        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'perfil_aprendizaje_personalizado_id');
     }
 
     public function activa(): bool
@@ -92,19 +93,19 @@ class PerfilAprendizajePersonalizado extends Model
     public function scopeOrdenadas(Builder $query): Builder
     {
         return $query
-            ->orderBy('condicion_base_id')
+            ->orderBy('perfil_aprendizaje_id')
             ->orderBy('etiqueta');
     }
 
     public function scopeDeInstitucion(Builder $query, ?int $institucionId): Builder
     {
         if ($institucionId === null) {
-            return $query->whereNull('id_institucion');
+            return $query->whereNull('institucion_id');
         }
 
         return $query->where(function ($q) use ($institucionId) {
-            $q->whereNull('id_institucion')
-                ->orWhere('id_institucion', $institucionId);
+            $q->whereNull('institucion_id')
+                ->orWhere('institucion_id', $institucionId);
         });
     }
 }

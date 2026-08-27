@@ -511,7 +511,7 @@
 
         /**
          * Eliminar administrador (soft-delete vía DELETE).
-         * Patrón alineado con admin/usuarios + loading de superadmin/condiciones:
+         * Patrón alineado con admin/usuarios + loading de superadmin/perfiles-aprendizaje:
          * 1) Swal de confirmación
          * 2) Swal loading mientras corre la petición
          * 3) Quita #fila-{id} con fade; si no quedan filas, recarga el partial por AJAX
@@ -601,6 +601,29 @@
         document.getElementById('formCrearAdministrador')?.addEventListener('submit', function(e) {
             e.preventDefault();
             guardarAdministrador();
+        });
+
+        // Copiar contraseña al portapapeles.
+        $(document).on('click', '.btn-copiar', function() {
+            const inputId = $(this).data('target');
+            const texto = $('#' + inputId).val();
+            navigator.clipboard.writeText(texto)
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copiado al portapapeles',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                })
+                .catch(() => {
+                    Swal.fire(
+                        'Error',
+                        'No fue posible copiar el texto.',
+                        'error'
+                    );
+                });
+
         });
 
         document.getElementById('btnDescargarPdf')?.addEventListener('click', function() {

@@ -13,11 +13,11 @@ class AmbientesSeeder extends Seeder
     public function run(): void
     {
         $ambientes = [
-            ['nombre' => 'Música',         'slug' => 'musica',         'color_hex' => '#0F6E56', 'icono' => '🎵', 'servidor_ip' => '192.168.1.20'],
-            ['nombre' => 'Polimotor',      'slug' => 'polimotor',      'color_hex' => '#534AB7', 'icono' => '🤸', 'servidor_ip' => '192.168.1.21'],
-            ['nombre' => 'Lógico',         'slug' => 'logico',         'color_hex' => '#854F0B', 'icono' => '🧠', 'servidor_ip' => '192.168.1.22'],
-            ['nombre' => 'Multisensorial', 'slug' => 'multisensorial', 'color_hex' => '#185FA5', 'icono' => '🌿', 'servidor_ip' => '192.168.1.23'],
-            ['nombre' => 'Tecnología',     'slug' => 'tecnologia',     'color_hex' => '#993C1D', 'icono' => '💡', 'servidor_ip' => '192.168.1.24'],
+            ['nombre' => 'Expresión Artística', 'slug' => 'expresion-artistica', 'color_hex' => '#0F6E56', 'icono' => '🎨', 'servidor_ip' => '192.168.1.20'],
+            ['nombre' => 'Polimotor',           'slug' => 'polimotor',           'color_hex' => '#534AB7', 'icono' => '🤸', 'servidor_ip' => '192.168.1.21'],
+            ['nombre' => 'Multisaberes',        'slug' => 'multisaberes',        'color_hex' => '#854F0B', 'icono' => '🧠', 'servidor_ip' => '192.168.1.22'],
+            ['nombre' => 'Multisensorial',      'slug' => 'multisensorial',      'color_hex' => '#185FA5', 'icono' => '✋', 'servidor_ip' => '192.168.1.23'],
+            ['nombre' => 'Tecnología',          'slug' => 'tecnologia',          'color_hex' => '#993C1D', 'icono' => '💻', 'servidor_ip' => '192.168.1.24'],
         ];
 
         foreach ($ambientes as $data) {
@@ -28,11 +28,11 @@ class AmbientesSeeder extends Seeder
         $anio   = date('Y');
 
         $config = [
-            'musica'         => ['grados' => ['Prejardin', 'Jardin', 'Transicion'], 'letras' => ['A', 'B']],
-            'polimotor'      => ['grados' => ['Prejardin', 'Jardin'],               'letras' => ['A', 'B']],
-            'logico'         => ['grados' => ['Jardin', 'Transicion'],              'letras' => ['A', 'B']],
-            'multisensorial' => ['grados' => ['Prejardin', 'Jardin', 'Transicion'], 'letras' => ['A', 'B']],
-            'tecnologia'     => ['grados' => ['Transicion'],                        'letras' => ['A']],
+            'expresion-artistica' => ['grados' => ['Prejardin', 'Jardin', 'Transicion'], 'letras' => ['A', 'B']],
+            'polimotor'           => ['grados' => ['Prejardin', 'Jardin'],               'letras' => ['A', 'B']],
+            'multisaberes'        => ['grados' => ['Jardin', 'Transicion'],              'letras' => ['A', 'B']],
+            'multisensorial'      => ['grados' => ['Prejardin', 'Jardin', 'Transicion'], 'letras' => ['A', 'B']],
+            'tecnologia'          => ['grados' => ['Transicion'],                        'letras' => ['A']],
         ];
 
         foreach ($config as $slug => $setup) {

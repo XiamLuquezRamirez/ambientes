@@ -1,22 +1,23 @@
-{{--
+﻿{{--
     Modal: Agregar / Editar Institución (Super Admin)
     - Tab 1: datos básicos + avatar de logo (abre modalLogoInstitucion)
     - Tab 2: IP/puerto/activo por ambiente (name ambientes[id][...]; backend espera "activo")
-    - Tab 3: perfiles de aprendizaje + perfiles de aprendizaje personalizados (condiciones_orden / condiciones_transitorias_orden)
-    - Tab 4: módulos (pendiente)
+    - Tab 3: perfiles de aprendizaje + perfiles de aprendizaje personalizados (perfil_aprendizaje_orden / perfil_aprendizaje_personalizado_orden)
+    - Tab 4: módulos oficiales por ambiente activo (modulos[id][activo]; depende de Servidores)
 
     Crear  → POST  superadmin/instituciones
     Editar → POST  superadmin/instituciones/{id} + _method=PUT  (FormData + multipart)
     Logo   → gestionado en modalLogoInstitucion (independiente al guardar datos)
 --}}
 @php
-    $condiciones = $condiciones ?? collect();
-    $condicionesTransitorias = $condicionesTransitorias ?? collect();
+    $perfilesAprendizaje = $perfilesAprendizaje ?? collect();
+    $perfilesAprendizajePersonalizado = $perfilesAprendizajePersonalizado ?? collect();
+    $departamentos = $departamentos ?? collect();
 @endphp
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/instituciones/index.css') }}">
 @endpush
-<div class="modal fade" id="modalAgregarInstitucion" tabindex="-1" data-bs-keyboard="false"
+<div class="modal fade modal-app" id="modalAgregarInstitucion" tabindex="-1" data-bs-keyboard="false"
     aria-labelledby="modalAgregarInstitucionLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
@@ -43,15 +44,16 @@
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-servidores" data-bs-toggle="tab" href="#servidores" role="tab"
-                            aria-controls="servidores" aria-selected="false">
-                            <i class="fas fa-server"></i> Servidores
+                        <a class="nav-link" id="tab-perfiles-aprendizaje" data-bs-toggle="tab"
+                            href="#perfilesAprendizajeInstitucion" role="tab"
+                            aria-controls="perfilesAprendizajeInstitucion" aria-selected="false">
+                            <i class="fas fa-layer-group"></i> Perfiles de Aprendizaje
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="tab-condiciones" data-bs-toggle="tab" href="#condicionesInstitucion"
-                            role="tab" aria-controls="condicionesInstitucion" aria-selected="false">
-                            <i class="fas fa-layer-group"></i> Perfiles de Aprendizaje
+                        <a class="nav-link" id="tab-servidores" data-bs-toggle="tab" href="#servidores" role="tab"
+                            aria-controls="servidores" aria-selected="false">
+                            <i class="fas fa-server"></i> Servidores
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -100,23 +102,28 @@
                                 <div class="col-md-4">
                                     <div class="mb-3">
                                         <label class="form-label fw-bold" for="codigo_dane">Código DANE</label>
-                                        <input type="text" id="codigo_dane" name="codigo_dane" class="form-control"
-                                            placeholder="Código DANE de la institución" required>
+                                        <input type="text" id="codigo_dane" name="codigo_dane"
+                                            class="form-control" placeholder="Código DANE de la institución" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold" for="municipio">Municipio</label>
-                                        <input type="text" id="municipio" name="municipio" class="form-control"
-                                            placeholder="Municipio de la institución" required>
+                                        <label class="form-label fw-bold" for="departamento_id">Departamento</label>
+                                        <select id="departamento_id" name="departamento_id" class="form-control"
+                                            required onchange="cargarMunicipiosInstitucion()">
+                                            <option value="">Seleccione</option>
+                                            @foreach ($departamentos as $d)
+                                                <option value="{{ $d->codigo }}">{{ $d->descripcion }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold" for="departamento">Departamento</label>
-                                        <input type="text" id="departamento" name="departamento"
-                                            class="form-control" placeholder="Departamento de la institución"
-                                            required>
+                                        <label class="form-label fw-bold" for="municipio_id">Municipio</label>
+                                        <select id="municipio_id" name="municipio_id" class="form-control" required>
+                                            <option value="">Seleccione</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -126,6 +133,103 @@
                                         <input type="email" id="correo_contacto" name="correo_contacto"
                                             class="form-control" placeholder="Correo de contacto de la institución"
                                             required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Tab: perfiles de aprendizaje globales y personalizados --}}
+                        <div class="tab-pane container" id="perfilesAprendizajeInstitucion" role="tabpanel"
+                            aria-labelledby="tab-perfiles-aprendizaje">
+                            <p class="text-muted mb-3" style="font-size:.9rem">
+                                Seleccione los perfiles de aprendizaje disponibles para la institución.
+                                Por defecto todos quedan activos.
+                            </p>
+
+                            <div class="card card-perfiles-aprendizaje-orden">
+                                <div class="card-header" data-bs-toggle="collapse"
+                                    data-bs-target="#collapsePerfilesAprendizajeOrden" aria-expanded="true"
+                                    aria-controls="collapsePerfilesAprendizajeOrden">
+                                    <h6>
+                                        <i class="fa-solid fa-layer-group me-2"></i>
+                                        Perfiles de Aprendizaje
+                                        <span class="badge badge-blue ms-1">{{ $perfilesAprendizaje->count() }}</span>
+                                    </h6>
+                                    <i class="fa-solid fa-chevron-down chevron"></i>
+                                </div>
+                                <div id="collapsePerfilesAprendizajeOrden" class="collapse show">
+                                    <div class="lista-perfiles-aprendizaje-orden">
+                                        @forelse ($perfilesAprendizaje as $perfilAprendizaje)
+                                            @php $color = $perfilAprendizaje->color_hex ?: '#64748B'; @endphp
+                                            <div class="item-perfil-aprendizaje-orden">
+                                                <input type="hidden"
+                                                    name="perfil_aprendizaje_orden[{{ $perfilAprendizaje->id }}][orden]"
+                                                    value="{{ $loop->index }}">
+                                                <input class="form-check-input chk-perfil-aprendizaje-orden"
+                                                    type="checkbox"
+                                                    id="perfil_aprendizaje_orden_{{ $perfilAprendizaje->id }}"
+                                                    name="perfil_aprendizaje_orden[{{ $perfilAprendizaje->id }}][activa]"
+                                                    value="1" checked data-id="{{ $perfilAprendizaje->id }}">
+                                                <label for="perfil_aprendizaje_orden_{{ $perfilAprendizaje->id }}">
+                                                    <span class="badge"
+                                                        style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55">
+                                                        {{ $perfilAprendizaje->codigo }}
+                                                    </span>
+                                                    {{ $perfilAprendizaje->nombre }}
+                                                </label>
+                                            </div>
+                                        @empty
+                                            <p class="text-muted text-center py-3 mb-0">Sin perfiles de aprendizaje
+                                                registrados</p>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card card-perfiles-aprendizaje-orden">
+                                <div class="card-header" data-bs-toggle="collapse"
+                                    data-bs-target="#collapsePerfilesAprendizajePersonalizadoOrden"
+                                    aria-expanded="true"
+                                    aria-controls="collapsePerfilesAprendizajePersonalizadoOrden">
+                                    <h6>
+                                        <i class="fa-solid fa-list-check me-2"></i>
+                                        Perfiles de Aprendizaje Personalizados
+                                        <span class="badge badge-blue ms-1"
+                                            id="badgeCountPersonalizadoOrden">{{ $perfilesAprendizajePersonalizado->count() }}</span>
+                                    </h6>
+                                    <i class="fa-solid fa-chevron-down chevron"></i>
+                                </div>
+                                <div id="collapsePerfilesAprendizajePersonalizadoOrden" class="collapse show">
+                                    <div class="lista-perfiles-aprendizaje-orden"
+                                        id="listaPerfilesAprendizajePersonalizadoOrden">
+                                        @forelse ($perfilesAprendizajePersonalizado as $transitoria)
+                                            @php
+                                                $colorT = $transitoria->perfilAprendizaje?->color_hex ?: '#64748B';
+                                            @endphp
+                                            <div class="item-perfil-aprendizaje-orden" data-origen="global">
+                                                <input type="hidden"
+                                                    name="perfil_aprendizaje_personalizado_orden[{{ $transitoria->id }}][orden]"
+                                                    value="{{ $loop->index }}">
+                                                <input
+                                                    class="form-check-input chk-perfil-aprendizaje-personalizado-orden"
+                                                    type="checkbox"
+                                                    id="perfil_aprendizaje_personalizado_orden_{{ $transitoria->id }}"
+                                                    name="perfil_aprendizaje_personalizado_orden[{{ $transitoria->id }}][activa]"
+                                                    value="1" checked data-id="{{ $transitoria->id }}">
+                                                <label
+                                                    for="perfil_aprendizaje_personalizado_orden_{{ $transitoria->id }}">
+                                                    <span class="badge"
+                                                        style="background:{{ $colorT }}22;color:{{ $colorT }};border:1px solid {{ $colorT }}55">
+                                                        {{ $transitoria->codigo }}
+                                                    </span>
+                                                    {{ $transitoria->etiqueta }}
+                                                </label>
+                                            </div>
+                                        @empty
+                                            <p class="text-muted text-center py-3 mb-0" id="msgSinPersonalizadoOrden">
+                                                Sin perfiles de aprendizaje personalizados
+                                            </p>
+                                        @endforelse
                                     </div>
                                 </div>
                             </div>
@@ -189,101 +293,69 @@
                             </div>
                         </div>
 
-                        {{-- Tab: condiciones globales y transitorias --}}
-                        <div class="tab-pane container" id="condicionesInstitucion" role="tabpanel"
-                            aria-labelledby="tab-condiciones">
-                            <p class="text-muted mb-3" style="font-size:.9rem">
-                                Seleccione los perfiles de aprendizaje disponibles para la institución.
-                                Por defecto todos quedan activos.
-                            </p>
-
-                            <div class="card card-condiciones-orden">
-                                <div class="card-header" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseCondicionesOrden" aria-expanded="true"
-                                    aria-controls="collapseCondicionesOrden">
-                                    <h6>
-                                        <i class="fa-solid fa-layer-group me-2"></i>
-                                        Perfiles de Aprendizaje
-                                        <span class="badge badge-blue ms-1">{{ $condiciones->count() }}</span>
-                                    </h6>
-                                    <i class="fa-solid fa-chevron-down chevron"></i>
-                                </div>
-                                <div id="collapseCondicionesOrden" class="collapse show">
-                                    <div class="lista-condiciones-orden">
-                                        @forelse ($condiciones as $condicion)
-                                            @php $color = $condicion->color_hex ?: '#64748B'; @endphp
-                                            <div class="item-condicion-orden">
-                                                <input type="hidden"
-                                                    name="condiciones_orden[{{ $condicion->id }}][orden]"
-                                                    value="{{ $loop->index }}">
-                                                <input class="form-check-input chk-condicion-orden" type="checkbox"
-                                                    id="condicion_orden_{{ $condicion->id }}"
-                                                    name="condiciones_orden[{{ $condicion->id }}][activa]"
-                                                    value="1" checked
-                                                    data-id="{{ $condicion->id }}">
-                                                <label for="condicion_orden_{{ $condicion->id }}">
-                                                    <span class="badge"
-                                                        style="background:{{ $color }}22;color:{{ $color }};border:1px solid {{ $color }}55">
-                                                        {{ $condicion->codigo }}
-                                                    </span>
-                                                    {{ $condicion->nombre }}
-                                                </label>
-                                            </div>
-                                        @empty
-                                            <p class="text-muted text-center py-3 mb-0">Sin perfiles de aprendizaje registrados</p>
-                                        @endforelse
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card card-condiciones-orden">
-                                <div class="card-header" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseCondicionesTransitoriasOrden" aria-expanded="true"
-                                    aria-controls="collapseCondicionesTransitoriasOrden">
-                                    <h6>
-                                        <i class="fa-solid fa-list-check me-2"></i>
-                                        Perfiles de Aprendizaje Personalizados
-                                        <span class="badge badge-blue ms-1" id="badgeCountTransitoriasOrden">{{ $condicionesTransitorias->count() }}</span>
-                                    </h6>
-                                    <i class="fa-solid fa-chevron-down chevron"></i>
-                                </div>
-                                <div id="collapseCondicionesTransitoriasOrden" class="collapse show">
-                                    <div class="lista-condiciones-orden" id="listaCondicionesTransitoriasOrden">
-                                        @forelse ($condicionesTransitorias as $transitoria)
-                                            @php
-                                                $colorT = $transitoria->condicionBase?->color_hex ?: '#64748B';
-                                            @endphp
-                                            <div class="item-condicion-orden" data-origen="global">
-                                                <input type="hidden"
-                                                    name="condiciones_transitorias_orden[{{ $transitoria->id }}][orden]"
-                                                    value="{{ $loop->index }}">
-                                                <input class="form-check-input chk-condicion-transitoria-orden"
-                                                    type="checkbox"
-                                                    id="condicion_transitoria_orden_{{ $transitoria->id }}"
-                                                    name="condiciones_transitorias_orden[{{ $transitoria->id }}][activa]"
-                                                    value="1" checked
-                                                    data-id="{{ $transitoria->id }}">
-                                                <label for="condicion_transitoria_orden_{{ $transitoria->id }}">
-                                                    <span class="badge"
-                                                        style="background:{{ $colorT }}22;color:{{ $colorT }};border:1px solid {{ $colorT }}55">
-                                                        {{ $transitoria->codigo }}
-                                                    </span>
-                                                    {{ $transitoria->etiqueta }}
-                                                </label>
-                                            </div>
-                                        @empty
-                                            <p class="text-muted text-center py-3 mb-0" id="msgSinTransitoriasOrden">
-                                                Sin perfiles de aprendizaje personalizados
-                                            </p>
-                                        @endforelse
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="tab-pane container" id="modulos" role="tabpanel"
                             aria-labelledby="tab-modulos">
-                            <p class="text-muted mb-0">La asignación de módulos estará disponible próximamente.</p>
+                            <p class="text-muted mb-3" style="font-size:.9rem">
+                                Active o desactive los módulos oficiales disponibles para esta institución.
+                                Solo aparecen los de los ambientes marcados en la pestaña
+                                <strong>Servidores</strong>.
+                            </p>
+
+                            <div id="modulosEmptyHint" class="text-muted text-center py-4"
+                                style="border:1px dashed #E2E8F0;border-radius:12px;background:#FAFBFC">
+                                Active al menos un ambiente en <strong>Servidores</strong> para asignar módulos.
+                            </div>
+
+                            <div id="listaGruposModulos">
+                                @forelse ($ambientes as $ambiente)
+                                    @php $color = $ambiente->color_hex ?: '#64748B'; @endphp
+                                    <div class="card card-perfiles-aprendizaje-orden grupo-modulos-ambiente"
+                                        data-ambiente-id="{{ $ambiente->id }}" hidden>
+                                        <div class="card-header" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseModulosAmbiente{{ $ambiente->id }}"
+                                            aria-expanded="true"
+                                            aria-controls="collapseModulosAmbiente{{ $ambiente->id }}">
+                                            <h6>
+                                                <span class="me-2">{{ $ambiente->icono ?: '📦' }}</span>
+                                                {{ $ambiente->nombre }}
+                                                <span class="badge badge-blue ms-1 badge-count-modulos">
+                                                    {{ $ambiente->modulosOficiales->count() }}
+                                                </span>
+                                            </h6>
+                                            <i class="fa-solid fa-chevron-down chevron"></i>
+                                        </div>
+                                        <div id="collapseModulosAmbiente{{ $ambiente->id }}" class="collapse show">
+                                            <div class="lista-perfiles-aprendizaje-orden">
+                                                @forelse ($ambiente->modulosOficiales as $modulo)
+                                                    <div class="item-perfil-aprendizaje-orden">
+
+                                                        <label for="modulo_institucion_{{ $modulo->id }}">
+                                                            {{ $modulo->nombre }}
+                                                        </label>
+                                                        <div
+                                                            class="form-check form-switch d-inline-flex justify-content-center">
+                                                            <input
+                                                                class="form-check-input chk-modulo-institucion"type="checkbox"
+                                                                id="modulo_institucion_{{ $modulo->id }}"
+                                                                name="modulos[{{ $modulo->id }}][activo]"
+                                                                value="1" data-modulo-id="{{ $modulo->id }}"
+                                                                data-ambiente-id="{{ $ambiente->id }}"
+                                                                style="cursor: pointer;" title="Activar módulo"
+                                                                {{ $modulo->activo ? 'checked' : '' }}>
+                                                        </div>
+                                                    </div>
+                                                @empty
+                                                    <p class="text-muted text-center py-3 mb-0">
+                                                        Este ambiente no tiene módulos oficiales activos.
+                                                    </p>
+                                                @endforelse
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <p class="text-muted text-center py-3 mb-0">Sin ambientes registrados</p>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -309,6 +381,7 @@
          */
         const URL_INSTITUCIONES_BASE = @json(url('superadmin/instituciones'));
         const URL_INSTITUCIONES_GUARDAR = @json(route('superadmin.instituciones.guardar'));
+        const URL_CARGAR_MUNICIPIOS = @json(url('superadmin/instituciones/cargar-municipios'));
 
         /** 1 = crear, 2 = editar */
         var tipoPost = 1;
@@ -361,7 +434,7 @@
             tipoPost = 2;
             id_editar = String(id);
             $("#modalAgregarInstitucionLabel").text('Editar Institución');
-            $("#modalAgregarInstitucionSubtitle").text('Actualiza datos, servidores o el logo en cualquier momento');
+            $("#modalAgregarInstitucionSubtitle").text('Actualiza información de la institución');
             $("#modalAgregarInstitucionIcon").attr('class', 'fas fa-pen text-white');
             setBtnInstitucion('editar');
             resetFormAgregarInstitucion();
@@ -384,19 +457,27 @@
             form.reset();
             limpiarErroresModal('formAgregarInstitucion');
 
+            // Municipios dependen del departamento: dejar solo placeholder.
+            const selMunicipio = document.getElementById('municipio_id');
+            if (selMunicipio) {
+                selMunicipio.innerHTML = '<option value="">Seleccione</option>';
+            }
+
             // Desmarca ambientes (reset no siempre limpia bien en algunos browsers con switches).
             form.querySelectorAll('#servidores input[type="checkbox"][name*="[activo]"]').forEach(cb => {
                 cb.checked = false;
             });
 
+            resetModulosInstitucion();
+
             // Al crear: solo globales.
             restaurarListaTransitoriasGlobales();
 
-            // Por defecto todas las condiciones quedan chequeadas.
-            document.querySelectorAll('.chk-condicion-orden, .chk-condicion-transitoria-orden')
-            .forEach(chk => {
-                chk.checked = true;
-            });
+            // Por defecto todos los perfiles de aprendizaje quedan chequeados.
+            document.querySelectorAll('.chk-perfil-aprendizaje-orden, .chk-perfil-aprendizaje-personalizado-orden')
+                .forEach(chk => {
+                    chk.checked = true;
+                });
 
             const tabDatos = document.querySelector('#tab-datos-institucion');
             if (tabDatos) {
@@ -404,14 +485,46 @@
             }
         }
 
-        const listaTransitoriasEl = document.getElementById('listaCondicionesTransitoriasOrden');
+        async function cargarMunicipiosInstitucion(municipioSeleccionado = null) {
+            const departamento = document.getElementById('departamento_id')?.value;
+            const selMunicipio = document.getElementById('municipio_id');
+            if (!selMunicipio) return;
+
+            selMunicipio.innerHTML = '<option value="">Seleccione</option>';
+
+            if (!departamento) return;
+
+            try {
+                const res = await fetch(`${URL_CARGAR_MUNICIPIOS}/${departamento}`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!res.ok) throw new Error('Error al cargar municipios');
+                const municipios = await res.json();
+
+                (municipios || []).forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.id;
+                    opt.textContent = m.descripcion;
+                    if (municipioSeleccionado != null && String(m.id) === String(municipioSeleccionado)) {
+                        opt.selected = true;
+                    }
+                    selMunicipio.appendChild(opt);
+                });
+            } catch (e) {
+                mostrarToast('error', 'Error al cargar los municipios');
+            }
+        }
+
+        const listaTransitoriasEl = document.getElementById('listaPerfilesAprendizajePersonalizadoOrden');
         const htmlTransitoriasGlobales = listaTransitoriasEl ? listaTransitoriasEl.innerHTML : '';
 
         function restaurarListaTransitoriasGlobales() {
             if (!listaTransitoriasEl) return;
             listaTransitoriasEl.innerHTML = htmlTransitoriasGlobales;
-            const count = listaTransitoriasEl.querySelectorAll('.chk-condicion-transitoria-orden').length;
-            const badge = document.getElementById('badgeCountTransitoriasOrden');
+            const count = listaTransitoriasEl.querySelectorAll('.chk-perfil-aprendizaje-personalizado-orden').length;
+            const badge = document.getElementById('badgeCountPersonalizadoOrden');
             if (badge) badge.textContent = String(count);
         }
 
@@ -420,14 +533,14 @@
 
             const mapaActiva = {};
             (ordenGuardado || []).forEach(item => {
-                mapaActiva[item.id_condicion_transitoria] = !!item.activa;
+                mapaActiva[item.perfil_aprendizaje_personalizado_id] = !!item.activa;
             });
             const hayOrden = Object.keys(mapaActiva).length > 0;
 
             if (!disponibles.length) {
                 listaTransitoriasEl.innerHTML =
                     '<p class="text-muted text-center py-3 mb-0">Sin perfiles de aprendizaje personalizados</p>';
-                const badge = document.getElementById('badgeCountTransitoriasOrden');
+                const badge = document.getElementById('badgeCountPersonalizadoOrden');
                 if (badge) badge.textContent = '0';
                 return;
             }
@@ -435,27 +548,27 @@
             listaTransitoriasEl.innerHTML = disponibles.map((t, index) => {
                 const color = t.color || '#64748B';
                 const checked = hayOrden ? (mapaActiva[t.id] ?? false) : true;
-                const esLocal = t.id_institucion != null;
-                const badgeLocal = esLocal
-                    ? '<span class="badge badge-gray" style="margin-left:6px">Institución</span>'
-                    : '';
-                const baseTxt = t.condicion_base
-                    ? `<small class="text-muted" style="margin-left:6px">(${t.condicion_base.codigo})</small>`
-                    : '';
+                const esLocal = t.institucion_id != null;
+                const badgeLocal = esLocal ?
+                    '<span class="badge badge-gray" style="margin-left:6px">Institución</span>' :
+                    '';
+                const baseTxt = t.perfil_aprendizaje ?
+                    `<small class="text-muted" style="margin-left:6px">(${t.perfil_aprendizaje.codigo})</small>` :
+                    '';
 
                 return `
-                    <div class="item-condicion-orden" data-origen="${esLocal ? 'institucion' : 'global'}">
+                    <div class="item-perfil-aprendizaje-orden" data-origen="${esLocal ? 'institucion' : 'global'}">
                         <input type="hidden"
-                            name="condiciones_transitorias_orden[${t.id}][orden]"
+                            name="perfil_aprendizaje_personalizado_orden[${t.id}][orden]"
                             value="${index}">
-                        <input class="form-check-input chk-condicion-transitoria-orden"
+                        <input class="form-check-input chk-perfil-aprendizaje-personalizado-orden"
                             type="checkbox"
-                            id="condicion_transitoria_orden_${t.id}"
-                            name="condiciones_transitorias_orden[${t.id}][activa]"
+                            id="perfil_aprendizaje_personalizado_orden_${t.id}"
+                            name="perfil_aprendizaje_personalizado_orden[${t.id}][activa]"
                             value="1"
                             data-id="${t.id}"
                             ${checked ? 'checked' : ''}>
-                        <label for="condicion_transitoria_orden_${t.id}">
+                        <label for="perfil_aprendizaje_personalizado_orden_${t.id}">
                             <span class="badge"
                                 style="background:${color}22;color:${color};border:1px solid ${color}55">
                                 ${t.codigo || '—'}
@@ -468,33 +581,34 @@
                 `;
             }).join('');
 
-            const badge = document.getElementById('badgeCountTransitoriasOrden');
+            const badge = document.getElementById('badgeCountPersonalizadoOrden');
             if (badge) badge.textContent = String(disponibles.length);
         }
 
-        function aplicarSeleccionCondicionesOrden(condicionesOrden = [], condicionesTransitoriasOrden = []) {
+        function aplicarSeleccionPerfilesAprendizajeOrden(perfilesAprendizajeOrden = [],
+            perfilesAprendizajePersonalizadoOrden = []) {
             const mapaCond = {};
-            (condicionesOrden || []).forEach(item => {
-                mapaCond[item.id_condicion] = !!item.activa;
+            (perfilesAprendizajeOrden || []).forEach(item => {
+                mapaCond[item.perfil_aprendizaje_id] = !!item.activa;
             });
 
-            document.querySelectorAll('.chk-condicion-orden').forEach(chk => {
+            document.querySelectorAll('.chk-perfil-aprendizaje-orden').forEach(chk => {
                 const id = parseInt(chk.dataset.id, 10);
-                chk.checked = Object.keys(mapaCond).length
-                    ? (mapaCond[id] ?? false)
-                    : true;
+                chk.checked = Object.keys(mapaCond).length ?
+                    (mapaCond[id] ?? false) :
+                    true;
             });
 
             const mapaTrans = {};
-            (condicionesTransitoriasOrden || []).forEach(item => {
-                mapaTrans[item.id_condicion_transitoria] = !!item.activa;
+            (perfilesAprendizajePersonalizadoOrden || []).forEach(item => {
+                mapaTrans[item.perfil_aprendizaje_personalizado_id] = !!item.activa;
             });
 
-            document.querySelectorAll('.chk-condicion-transitoria-orden').forEach(chk => {
+            document.querySelectorAll('.chk-perfil-aprendizaje-personalizado-orden').forEach(chk => {
                 const id = parseInt(chk.dataset.id, 10);
-                chk.checked = Object.keys(mapaTrans).length
-                    ? (mapaTrans[id] ?? false)
-                    : true;
+                chk.checked = Object.keys(mapaTrans).length ?
+                    (mapaTrans[id] ?? false) :
+                    true;
             });
         }
 
@@ -716,6 +830,29 @@
             }
         }
 
+        // Copiar contraseña al portapapeles.
+        $(document).on('click', '.btn-copiar', function() {
+            const inputId = $(this).data('target');
+            const texto = $('#' + inputId).val();
+            navigator.clipboard.writeText(texto)
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Copiado al portapapeles',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                })
+                .catch(() => {
+                    Swal.fire(
+                        'Error',
+                        'No fue posible copiar el texto.',
+                        'error'
+                    );
+                });
+
+        });
+
         document.getElementById('btnDescargarPdf')?.addEventListener('click', function() {
             const id = this.dataset.usuarioId;
             if (!id) return;
@@ -733,9 +870,10 @@
                     if (!resp.success) throw new Error('No data');
                     mapearDatosInstitucion(
                         resp.data,
-                        resp.condiciones_orden || [],
-                        resp.condiciones_transitorias_orden || [],
-                        resp.condiciones_transitorias_disponibles || []
+                        resp.perfil_aprendizaje_orden || [],
+                        resp.perfil_aprendizaje_personalizado_orden || [],
+                        resp.perfil_aprendizaje_personalizado_disponibles || [],
+                        resp.modulos || []
                     );
                 })
                 .catch(() => {
@@ -761,16 +899,26 @@
          */
         function mapearDatosInstitucion(
             data,
-            condicionesOrden = [],
-            condicionesTransitoriasOrden = [],
-            condicionesTransitoriasDisponibles = []
+            perfilesAprendizajeOrden = [],
+            perfilesAprendizajePersonalizadoOrden = [],
+            perfilesAprendizajePersonalizadoDisponibles = [],
+            modulosInstitucion = []
         ) {
             id_editar = String(data.id);
             $('#nombre').val(data.nombre ?? '');
             $('#codigo_dane').val(data.codigo_dane ?? '');
-            $('#municipio').val(data.municipio ?? '');
-            $('#departamento').val(data.departamento ?? '');
             $('#correo_contacto').val(data.correo_contacto ?? '');
+
+            const departamentoId = data.departamento_id ?? '';
+            $('#departamento_id').val(departamentoId);
+            if (departamentoId) {
+                cargarMunicipiosInstitucion(data.municipio_id ?? null);
+            } else {
+                const selMunicipio = document.getElementById('municipio_id');
+                if (selMunicipio) {
+                    selMunicipio.innerHTML = '<option value="">Seleccione</option>';
+                }
+            }
 
             // Limpia ambientes antes de aplicar los de esta institución.
             document.querySelectorAll('#servidores input[type="checkbox"][name*="[activo]"]').forEach(cb => {
@@ -801,10 +949,11 @@
 
             // En edición: globales + creadas por esa institución.
             renderListaTransitoriasDisponibles(
-                condicionesTransitoriasDisponibles,
-                condicionesTransitoriasOrden
+                perfilesAprendizajePersonalizadoDisponibles,
+                perfilesAprendizajePersonalizadoOrden
             );
-            aplicarSeleccionCondicionesOrden(condicionesOrden, condicionesTransitoriasOrden);
+            aplicarSeleccionPerfilesAprendizajeOrden(perfilesAprendizajeOrden, perfilesAprendizajePersonalizadoOrden);
+            aplicarModulosInstitucion(modulosInstitucion);
 
             if (typeof window.setEstadoLogoInstitucion === 'function') {
                 window.setEstadoLogoInstitucion({
@@ -814,5 +963,87 @@
                 });
             }
         }
+
+        /* ── Módulos oficiales por ambiente activo ───────────── */
+        function resetModulosInstitucion() {
+            document.querySelectorAll('.grupo-modulos-ambiente').forEach(grupo => {
+                delete grupo.dataset.initialized;
+                grupo.hidden = true;
+                grupo.querySelectorAll('.chk-modulo-institucion').forEach(chk => {
+                    chk.checked = true;
+                    chk.disabled = true;
+                });
+            });
+            actualizarHintModulos();
+        }
+
+        function actualizarHintModulos() {
+            const hint = document.getElementById('modulosEmptyHint');
+            if (!hint) return;
+            const algunoVisible = [...document.querySelectorAll('.grupo-modulos-ambiente')]
+                .some(g => !g.hidden);
+            hint.hidden = algunoVisible;
+        }
+
+        function sincronizarVisibilidadModulosDesdeServidores(opciones = {}) {
+            const forzarDefaultActivo = opciones.forzarDefaultActivo !== false;
+            const mapaGuardado = opciones.mapaGuardado || null;
+
+            document.querySelectorAll('.grupo-modulos-ambiente').forEach(grupo => {
+                const ambienteId = grupo.dataset.ambienteId;
+                const chkAmbiente = document.getElementById(`ambiente_activo_${ambienteId}`);
+                const ambienteActivo = !!chkAmbiente?.checked;
+
+                grupo.hidden = !ambienteActivo;
+
+                grupo.querySelectorAll('.chk-modulo-institucion').forEach(chk => {
+                    chk.disabled = !ambienteActivo;
+
+                    if (!ambienteActivo) {
+                        return;
+                    }
+
+                    const moduloId = String(chk.dataset.moduloId);
+                    if (mapaGuardado && Object.prototype.hasOwnProperty.call(mapaGuardado, moduloId)) {
+                        chk.checked = !!mapaGuardado[moduloId];
+                    } else if (forzarDefaultActivo && grupo.dataset.initialized !== '1') {
+                        chk.checked = true;
+                    }
+                });
+
+                if (ambienteActivo) {
+                    grupo.dataset.initialized = '1';
+                } else {
+                    delete grupo.dataset.initialized;
+                }
+            });
+
+            actualizarHintModulos();
+        }
+
+        function aplicarModulosInstitucion(modulos = []) {
+            // Checkbox = asignado a la institución (existe fila). El activo lo gestiona el admin.
+            const mapa = {};
+            (modulos || []).forEach(m => {
+                mapa[String(m.id)] = true;
+            });
+
+            document.querySelectorAll('.grupo-modulos-ambiente').forEach(grupo => {
+                delete grupo.dataset.initialized;
+            });
+
+            sincronizarVisibilidadModulosDesdeServidores({
+                forzarDefaultActivo: true,
+                mapaGuardado: mapa,
+            });
+        }
+
+        document.querySelectorAll('#servidores input[type="checkbox"][name*="[activo]"]').forEach(chk => {
+            chk.addEventListener('change', function() {
+                sincronizarVisibilidadModulosDesdeServidores({
+                    forzarDefaultActivo: true,
+                });
+            });
+        });
     </script>
 @endpush

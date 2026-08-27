@@ -12,7 +12,7 @@ class Estudiante extends Model
 {
     use Sincronizable;
 
-    protected $fillable = ['avatar', 'tipo_identificacion', 'otro_tipo_identificacion', 'identificacion', 'nombre', 'apellido', 'iniciales', 'grado_id', 'atencion_id', 'estado_id', 'color_avatar', 'condicion_id', 'condicion_transitoria_id', 'activo', 'fecha_nacimiento', 'sexo', 'acudiente', 'telefono_acudiente', 'requiere_apoyo', 'estado_piar', 'lugar_nacimiento', 'departamento_id', 'municipio_id', 'barrio_vereda', 'direccion', 'telefono', 'email', 'institucion_id'];
+    protected $fillable = ['avatar', 'tipo_identificacion', 'otro_tipo_identificacion', 'identificacion', 'nombre', 'apellido', 'iniciales', 'grado_id', 'atencion_id', 'estado_id', 'color_avatar', 'perfil_aprendizaje_id', 'perfil_aprendizaje_personalizado_id', 'activo', 'fecha_nacimiento', 'sexo', 'acudiente', 'telefono_acudiente', 'requiere_apoyo', 'estado_piar', 'lugar_nacimiento', 'departamento_id', 'municipio_id', 'barrio_vereda', 'direccion', 'telefono', 'email', 'institucion_id'];
 
     protected $casts = [
         'edad' => 'integer',
@@ -88,25 +88,25 @@ class Estudiante extends Model
         );
     }
 
-    protected function condicionNombre(): Attribute
+    protected function perfilAprendizajeNombre(): Attribute
     {
         return Attribute::make(
             get: function () {
-                $condicion = $this->relationLoaded('condicion')
-                    ? $this->getRelation('condicion')
-                    : $this->condicion()->first();
+                $perfilAprendizaje = $this->relationLoaded('perfilAprendizaje')
+                    ? $this->getRelation('perfilAprendizaje')
+                    : $this->perfilAprendizaje()->first();
 
-                return $condicion?->nombre ?? 'Estándar';
+                return $perfilAprendizaje?->nombre ?? 'Estándar';
             }
         );
     }
 
-    /** Condición distinta de estándar → requiere seguimiento PIAR / botón Ver PIAR */
-    protected function condicionEsEstandar(): Attribute
+    /** perfil de aprendizaje distinta de estándar → requiere seguimiento PIAR / botón Ver PIAR */
+    protected function perfilAprendizajeEsEstandar(): Attribute
     {
         return Attribute::make(
             get: function () {
-                $nombre = mb_strtolower(trim((string) $this->condicion_nombre));
+                $nombre = mb_strtolower(trim((string) $this->perfil_aprendizaje_nombre));
                 $normalizado = str_replace(['á', 'é', 'í', 'ó', 'ú'], ['a', 'e', 'i', 'o', 'u'], $nombre);
 
                 return $normalizado === '' || $normalizado === 'estandar';
@@ -147,24 +147,24 @@ class Estudiante extends Model
         return $this->belongsTo(Grado::class);
     }
 
-    public function condicion()
+    public function perfilAprendizaje()
     {
-        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'condicion_id');
+        return $this->belongsTo(PerfilAprendizajeInclusion::class, 'perfil_aprendizaje_id');
     }
 
-    public function condicionTransitoria()
+    public function perfilAprendizajePersonalizado()
     {
-        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'condicion_transitoria_id');
+        return $this->belongsTo(PerfilAprendizajePersonalizado::class, 'perfil_aprendizaje_personalizado_id');
     }
 
-    public function condicionesTransitoriasAsignadas()
+    public function asignacionesPerfilAprendizajePersonalizado()
     {
-        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'id_estudiante');
+        return $this->hasMany(EstudiantePerfilAprendizajePersonalizado::class, 'estudiante_id');
     }
 
-    public function condicionTransitoriaActiva()
+    public function perfilAprendizajePersonalizadoActiva()
     {
-        return $this->hasOne(EstudiantePerfilAprendizajePersonalizado::class, 'id_estudiante')
+        return $this->hasOne(EstudiantePerfilAprendizajePersonalizado::class, 'estudiante_id')
             ->where('activa', true);
     }
 
@@ -221,7 +221,7 @@ class Estudiante extends Model
     public function ambientes()
     {
         return $this->belongsToMany(Ambiente::class, 'estudiante_ambiente')
-            ->withPivot(['anio_lectivo', 'estado', 'observacion'])
+            ->withPivot(['anio_lectivo', 'estado', 'observacion', 'activo'])
             ->withTimestamps();
     }
 

@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Matrículas')
 
 @push('styles')
@@ -197,7 +197,7 @@
 {{-- ══════════════════════════════════════════════════════
      Modal: Matricular (2 pasos)
      ══════════════════════════════════════════════════════ --}}
-<div class="modal fade" id="modalMatricular" tabindex="-1"
+<div class="modal fade modal-app" id="modalMatricular" tabindex="-1"
     data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border:none;border-radius:16px;overflow:hidden">
@@ -315,7 +315,7 @@
 </div>
 
 {{-- Modal: Promover / Graduar por grupo --}}
-<div class="modal fade" id="modalEstadoGrupo" tabindex="-1"
+<div class="modal fade modal-app" id="modalEstadoGrupo" tabindex="-1"
     data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border:none;border-radius:16px;overflow:hidden">
@@ -363,7 +363,7 @@
 </div>
 
 {{-- Modal: Editar grupo --}}
-<div class="modal fade" id="modalEditar" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+<div class="modal fade modal-app" id="modalEditar" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content" style="border:none;border-radius:16px;overflow:hidden">
             <div class="modal-header modal-header-azul">
@@ -386,7 +386,7 @@
 </div>
 
 {{-- Modal: Cambiar estado individual --}}
-<div class="modal fade" id="modalEstado" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+<div class="modal fade modal-app" id="modalEstado" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content" style="border:none;border-radius:16px;overflow:hidden">
             <div class="modal-header modal-header-azul">

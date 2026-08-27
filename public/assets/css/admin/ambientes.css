@@ -1,0 +1,419 @@
+/*==========================================================
+  Admin — Ambientes
+  Estilos de página: no van en index.css para no pisar
+  clases globales (.btn-accion, .modal-*, .card-*, etc.).
+==========================================================*/
+
+.ambientes-page .ambientes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+    font-family: var(--font-sans, 'Nunito', sans-serif);
+}
+
+.ambientes-page .ambiente-card {
+    background: var(--color-surface, #FFFFFF);
+    border: 1px solid var(--color-border, #E2E8F0);
+    border-radius: 16px;
+    overflow: visible;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .03), 0 6px 16px -6px rgba(16, 24, 40, .07);
+    transition: box-shadow .2s, transform .15s;
+    position: relative;
+    padding: 18px;
+}
+
+.ambientes-page .ambiente-card:hover {
+    box-shadow: 0 3px 6px rgba(16, 24, 40, .05), 0 14px 28px -8px rgba(16, 24, 40, .11);
+    transform: translateY(-2px);
+}
+
+.ambientes-page .card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.ambientes-page .card-icono {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+}
+
+.ambientes-page .card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ambientes-page .card-nombre {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-text, #1E293B);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ambientes-page .card-ip {
+    font-family: monospace;
+    font-size: .74rem;
+    color: var(--color-muted, #64748B);
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ambientes-page .card-ip-texto {
+    cursor: default;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ambientes-page .dot-conexion {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #CBD5E1;
+    flex-shrink: 0;
+    transition: background .3s;
+    cursor: default;
+}
+
+.ambientes-page .dot-conexion.dot-online {
+    background: #22C55E;
+}
+
+.ambientes-page .dot-conexion.dot-offline {
+    background: #EF4444;
+}
+
+.ambientes-page .dot-conexion.dot-check {
+    background: #F59E0B;
+    animation: amb-parpadeo .6s infinite alternate;
+}
+
+@keyframes amb-parpadeo {
+    to {
+        opacity: .35;
+    }
+}
+
+.ambientes-page .btn-menu {
+    background: none;
+    border: none;
+    color: #94A3B8;
+    font-size: 1.15rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background .15s;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.ambientes-page .btn-menu:hover {
+    background: #F1F5F9;
+    color: #475569;
+}
+
+.ambientes-page .dropdown-menu-card {
+    position: absolute;
+    top: 52px;
+    right: 12px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .13);
+    z-index: 100;
+    min-width: 220px;
+    display: none;
+    overflow: hidden;
+}
+
+.ambientes-page .dropdown-menu-card.abierto {
+    display: block;
+}
+
+.ambientes-page .dropdown-menu-card button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    font-size: .85rem;
+    color: #1E293B;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background .12s;
+    font-family: inherit;
+}
+
+.ambientes-page .dropdown-menu-card button:hover {
+    background: #F8FAFC;
+}
+
+.ambientes-page .dropdown-menu-card button i {
+    width: 16px;
+    text-align: center;
+    color: #64748B;
+}
+
+.ambientes-page .dropdown-sep {
+    height: 1px;
+    background: #F1F5F9;
+    margin: 4px 0;
+}
+
+.ambientes-page .card-stats {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.ambientes-page .stat-cell {
+    flex: 1;
+    background: #F8FAFC;
+    border-radius: 10px;
+    padding: 8px 6px;
+    text-align: center;
+}
+
+.ambientes-page .stat-n {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1E293B;
+}
+
+.ambientes-page .stat-l {
+    font-size: .64rem;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-top: 1px;
+}
+
+.ambientes-page .card-footline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: .74rem;
+    color: #64748B;
+    margin-bottom: 16px;
+}
+
+.ambientes-page .footline-grados {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.ambientes-page .footline-meta {
+    color: #94A3B8;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ambientes-page .card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+/* Scope estricto: no redefinir .btn-accion global del proyecto */
+.ambientes-page .card-actions .btn-accion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 9px 0;
+    border-radius: 10px;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: opacity .15s, background .15s;
+}
+
+.ambientes-page .card-actions .btn-primaria {
+    color: #fff;
+}
+
+.ambientes-page .card-actions .btn-primaria:hover {
+    opacity: .88;
+    color: #fff;
+}
+
+.ambientes-page .card-actions .btn-secundaria {
+    background: #a1a3a5;
+    color: #fff;
+    border-color: #E2E8F0;
+}
+
+.ambientes-page .card-actions .btn-secundaria:hover {
+    background: #b3b7bb;
+    color: #fff;
+}
+
+/* Modales de esta página */
+.ambientes-page .modal-header-azul,
+.modal-header-azul {
+    background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+    border-bottom: none;
+    padding: 18px 22px;
+}
+
+.modal-header-azul .modal-title {
+    font-family: var(--font-display, 'Fredoka One', cursive);
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.modal-header-azul .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: .75;
+}
+
+/* Contenido dinámico de modales (módulos / docentes) */
+.modulo-fila {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.modulo-fila:last-child {
+    border-bottom: none;
+}
+
+.modulo-icono {
+    font-size: 1.4rem;
+    width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.modulo-nombre {
+    flex: 1;
+    font-weight: 600;
+    font-size: .9rem;
+    color: #1E293B;
+}
+
+.modulo-toggles {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.tog {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    font-size: .75rem;
+    color: #64748B;
+    user-select: none;
+}
+
+.tog input {
+    display: none;
+}
+
+.tog-track {
+    width: 34px;
+    height: 18px;
+    border-radius: 9px;
+    background: #CBD5E1;
+    position: relative;
+    transition: background .2s;
+    flex-shrink: 0;
+}
+
+.tog-track::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform .2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+}
+
+.tog input:checked + .tog-track {
+    background: #2563EB;
+}
+
+.tog input:checked + .tog-track::after {
+    transform: translateX(16px);
+}
+
+.modulo-fila-inactivo {
+    opacity: .72;
+}
+
+.modulo-fila-inactivo .modulo-nombre {
+    color: #64748B;
+}
+
+.modulo-estado {
+    font-size: .75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.modulo-estado-inactivo {
+    color: #64748B;
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+}
+
+.modulo-estado-activo {
+    color: #166534;
+    background: #DCFCE7;
+    border: 1px solid #BBF7D0;
+}
+
+.tabla-docentes {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .85rem;
+}
+
+.tabla-docentes th {
+    background: #F8FAFC;
+    padding: 8px 12px;
+    font-weight: 600;
+    color: #475569;
+    text-align: left;
+    border-bottom: 2px solid #E2E8F0;
+}
+
+.tabla-docentes td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #F1F5F9;
+    color: #1E293B;
+}
+
+.tabla-docentes tr:last-child td {
+    border-bottom: none;
+}

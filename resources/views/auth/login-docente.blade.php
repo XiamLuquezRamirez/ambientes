@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Docente — Aulas Reggio</title>
+    <title>Inicio de sesión — PedNia</title>
     <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <style>
@@ -177,7 +177,7 @@
         .login-card {
             background: var(--tarjeta);
             border-radius: 24px;
-            padding: 40px 36px 32px;
+            padding: 0 36px 32px;
             box-shadow:
                 0 4px 6px rgba(37, 99, 235, .06),
                 0 20px 48px rgba(30, 58, 138, .12);
@@ -185,13 +185,16 @@
         }
 
         .login-logo {
-            text-align: center;
-            margin-bottom: 8px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .login-logo img {
-            max-width: 500px;
             width: 100%;
+            max-width: 250px;
+            /* Antes 300px */
             height: auto;
         }
 
@@ -399,27 +402,27 @@
     <div class="login-wrap">
         <div class="login-card">
             <div class="login-logo">
-                <img src="{{ asset('assets/images/login-logo.png') }}" alt="PedNia — Aulas Reggio">
+                <img src="{{ asset('assets/images/Logo-PedNia.png') }}" alt="PedNia">
             </div>
             <h1 class="login-titulo">Iniciar sesión</h1>
-           
 
-            @if(session('error'))
-            <div class="error-box">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span>{{ session('error') }}</span>
-            </div>
+
+            @if (session('error'))
+                <div class="error-box">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
             @endif
 
-            @if($errors->any())
-            <div class="error-box">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <div>
-                    @foreach($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                    @endforeach
+            @if ($errors->any())
+                <div class="error-box">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div>
+                        @foreach ($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                        @endforeach
+                    </div>
                 </div>
-            </div>
             @endif
 
             <form method="POST" action="{{ route('docente.login.post') }}">
@@ -429,8 +432,8 @@
                     <label for="email">Correo electrónico</label>
                     <div class="input-wrap">
                         <i class="fa-solid fa-envelope"></i>
-                        <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
-                            placeholder="tu@correo.com">
+                        <input type="email" id="email" name="email" value="{{ old('email') }}" required
+                            autofocus placeholder="tu@correo.com">
                     </div>
                 </div>
 
@@ -438,8 +441,7 @@
                     <label for="password">Contraseña</label>
                     <div class="input-wrap">
                         <i class="fa-solid fa-lock"></i>
-                        <input type="password" id="password" name="password" required
-                            placeholder="••••••••">
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
                     </div>
                 </div>
 
@@ -451,7 +453,7 @@
                 <button type="submit" class="btn-submit">Ingresar</button>
             </form>
 
-            <a href="{{ route('auth.bienvenida') }}" class="back-link">
+            <a href="{{ route('ambiente.inicio') }}" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i> Volver al inicio
             </a>
         </div>

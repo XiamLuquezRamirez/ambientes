@@ -1,6 +1,6 @@
 (function() {
-    const URL_INDEX = window.URL_CFG_CONDICIONES;
-    const URL_ORDEN = window.URL_CFG_CONDICIONES_ORDEN;
+    const URL_INDEX = window.URL_CFG_PERFILES_APRENDIZAJE;
+    const URL_ORDEN = window.URL_CFG_PERFILES_APRENDIZAJE_ORDEN;
     const URL_ESTADO = (id) => `${URL_INDEX}/${id}/estado`;
     let sortable = null;
 
@@ -12,16 +12,16 @@
     });
 
     function ordenSeleccionado() {
-        return ($('#selectOrdenarCondiciones').val() || '').trim();
+        return ($('#selectOrdenarPerfilesAprendizaje').val() || '').trim();
     }
 
     function actualizarBotonGuardarOrden() {
         const visible = !!ordenSeleccionado();
-        $('#btnGuardarOrdenCondiciones').css('display', visible ? 'inline-flex' : 'none');
+        $('#btnGuardarOrdenPerfilesAprendizaje').css('display', visible ? 'inline-flex' : 'none');
     }
 
     function initSortable() {
-        const lista = document.getElementById('listaCondicionesOrden');
+        const lista = document.getElementById('listaPerfilesAprendizajeOrden');
         if (!lista || typeof Sortable === 'undefined') return;
 
         if (sortable) {
@@ -44,7 +44,7 @@
     }
 
     function guardarOrden(despuesDeSelect = false) {
-        const ids = [...document.querySelectorAll('#listaCondicionesOrden .cfg-card')]
+        const ids = [...document.querySelectorAll('#listaPerfilesAprendizajeOrden .cfg-card')]
             .map(el => parseInt(el.dataset.id, 10))
             .filter(Boolean);
 
@@ -53,7 +53,7 @@
             return;
         }
 
-        const $btn = $('#btnGuardarOrdenCondiciones');
+        const $btn = $('#btnGuardarOrdenPerfilesAprendizaje');
         $btn.prop('disabled', true);
 
         $.ajax({
@@ -68,7 +68,7 @@
                 if (res.success) {
                     mostrarToast('success', res.message || 'Orden guardado correctamente.');
                     if (despuesDeSelect) {
-                        $('#selectOrdenarCondiciones').val('');
+                        $('#selectOrdenarPerfilesAprendizaje').val('');
                         actualizarBotonGuardarOrden();
                         cargarLista(URL_INDEX + (construirParamsSinOrdenar() ? `?${construirParamsSinOrdenar()}` : ''));
                         return;
@@ -89,7 +89,7 @@
     }
 
     function construirParamsSinOrdenar() {
-        const params = new URLSearchParams(new FormData(document.getElementById('formFiltrosCondiciones')));
+        const params = new URLSearchParams(new FormData(document.getElementById('formFiltrosPerfilesAprendizaje')));
         params.delete('ordenar');
         for (const [k, v] of [...params.entries()]) {
             if (!v) params.delete(k);
@@ -99,7 +99,7 @@
 
     async function cargarLista(url = null) {
         const destino = url || construirUrl();
-        const $contenedor = $('#contenedorListaCondiciones');
+        const $contenedor = $('#contenedorListaPerfilesAprendizaje');
         $contenedor.css('opacity', '.45');
 
         try {
@@ -125,30 +125,30 @@
     }
 
     function construirUrl() {
-        const params = new URLSearchParams(new FormData(document.getElementById('formFiltrosCondiciones')));
+        const params = new URLSearchParams(new FormData(document.getElementById('formFiltrosPerfilesAprendizaje')));
         for (const [k, v] of [...params.entries()]) {
             if (!v) params.delete(k);
         }
         return params.toString() ? `${URL_INDEX}?${params}` : URL_INDEX;
     }
 
-    window.cargarListaCondicionesAdmin = cargarLista;
+    window.cargarListaPerfilesAprendizajeAdmin = cargarLista;
 
-    $('#formFiltrosCondiciones select').on('change', function() {
+    $('#formFiltrosPerfilesAprendizaje select').on('change', function() {
         actualizarBotonGuardarOrden();
         cargarLista();
     });
 
-    $('#formFiltrosCondiciones').on('submit', function(e) {
+    $('#formFiltrosPerfilesAprendizaje').on('submit', function(e) {
         e.preventDefault();
         cargarLista();
     });
 
-    $('#btnGuardarOrdenCondiciones').on('click', function() {
+    $('#btnGuardarOrdenPerfilesAprendizaje').on('click', function() {
         guardarOrden(true);
     });
 
-    $(document).on('change', '.toggle-activa-condicion-orden', async function() {
+    $(document).on('change', '.toggle-activa-perfil-aprendizaje-orden', async function() {
         const $toggle = $(this);
         const id = $toggle.data('id');
         const quiereActivar = $toggle.is(':checked');

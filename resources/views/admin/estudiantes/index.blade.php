@@ -28,11 +28,11 @@
         </select>
     </div>
     <div class="form-group">
-        <label for="condicion_id">Perfil de Aprendizaje</label>
-        <select name="condicion_id" id="condicion_id" class="form-control" style="width:auto">
+        <label for="perfil_aprendizaje_id">Perfil de Aprendizaje</label>
+        <select name="perfil_aprendizaje_id" id="perfil_aprendizaje_id" class="form-control" style="width:auto">
             <option value="">Todos</option>
-            @foreach($condiciones as $c)
-            <option value="{{ $c->id }}" {{ request('condicion_id') == $c->id ? 'selected' : '' }}>{{ $c->nombre }}</option>
+            @foreach($perfilesAprendizaje as $c)
+            <option value="{{ $c->id }}" {{ request('perfil_aprendizaje_id') == $c->id ? 'selected' : '' }}>{{ $c->nombre }}</option>
             @endforeach
         </select>
     </div>
@@ -44,7 +44,7 @@
             <option value="1">Activo</option>
         </select>
     </div>
-    <a id="btnLimpiar" id="btnLimpiar" type="button" href="#" class="btn btn-danger" style="display:{{ request()->hasAny(['buscar','grado_id','grupo_id','condicion_id','estado']) ? 'inline-flex' : 'none' }}">
+    <a id="btnLimpiar" id="btnLimpiar" type="button" href="#" class="btn btn-danger" style="display:{{ request()->hasAny(['buscar','grado_id','grupo_id','perfil_aprendizaje_id','estado']) ? 'inline-flex' : 'none' }}">
         <i class="fas fa-broom"></i> Limpiar
     </a>
 </form>

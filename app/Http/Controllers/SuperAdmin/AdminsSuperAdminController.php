@@ -44,6 +44,7 @@ class AdminsSuperAdminController extends Controller
             $consulta->where(fn ($q) => $q
                 ->where('creado_por', $superadmin->id)
                 ->where('nombre', 'like', "%{$termino}%")
+                ->orWhere('email', 'like', "%{$termino}%")
             );
         }
 

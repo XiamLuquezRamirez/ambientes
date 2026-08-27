@@ -8,41 +8,75 @@ use App\Models\Ambiente;
 use App\Models\Modulo;
 use App\Services\SeguridadService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AmbienteAdminController extends Controller
 {
     /**
-     * Lista los ambientes configurados para el administrador.
+     * Lista los ambientes contratados por la institución del administrador.
      *
-     * El listado incluye conteos relacionados de grados habilitados, estudiantes activos,
-     * cargas docentes activas y módulos (incluyendo módulos activos).
+     * IP/puerto vienen del pivot ambiente_institucion. Conteos de estudiantes,
+     * docentes y módulos se limitan a esa institución.
      */
     public function listar()
     {
-        $ambientes = Ambiente::withCount([
-            'gradosHabilitados',
-            'estudiantesAmbiente as estudiantes_count' => fn ($q) => $q->where('anio_lectivo', date('Y')),
-            'cargasDocente' => fn ($q) => $q->where('activo', true)->where('anio_lectivo', date('Y')),
-            'modulos',
-            'modulos as modulos_activos_count' => fn ($q) => $q->where('activo', true),
-        ])
-            ->with('gradosHabilitados')
+        $institucionId = $this->institucionId();
+
+        $ambientes = Ambiente::whereHas('instituciones', function ($q) use ($institucionId) {
+            $q->where('instituciones.id', $institucionId)
+                ->where('ambiente_institucion.activo', true);
+        })
+            ->with([
+                'gradosHabilitados',
+                'instituciones' => function ($q) use ($institucionId) {
+                    $q->where('instituciones.id', $institucionId);
+                },
+            ])
+            ->withCount([
+                'gradosHabilitados',
+                'estudiantesAmbiente as estudiantes_count' => fn ($q) => $q
+                    ->where('anio_lectivo', date('Y'))
+                    ->whereHas('estudiante', fn ($e) => $e->where('institucion_id', $institucionId)),
+                'cargasDocente' => fn ($q) => $q
+                    ->where('activo', true)
+                    ->where('anio_lectivo', date('Y'))
+                    ->whereHas('docente.user', fn ($u) => $u->where('institucion_id', $institucionId)),
+            ])
             ->orderBy('nombre')
             ->get();
+
+        $conteosModulos = $this->conteosModulosPorAmbiente($ambientes->pluck('id'), $institucionId);
+
+        foreach ($ambientes as $ambiente) {
+            $vinculo = $ambiente->instituciones->first();
+            $ambiente->setAttribute('servidor_ip', $vinculo?->pivot?->ip);
+            $ambiente->setAttribute('servidor_puerto', $vinculo?->pivot?->puerto);
+
+            $conteo = $conteosModulos[$ambiente->id] ?? ['total' => 0, 'activos' => 0];
+            $ambiente->modulos_count = $conteo['total'];
+            $ambiente->modulos_activos_count = $conteo['activos'];
+        }
 
         return view('admin.ambientes.index', compact('ambientes'));
     }
 
     /**
-     * Actualiza la dirección IP del servidor asociado a un ambiente.
-     *
-     * Valida el campo como IP opcional y guarda el valor en el modelo.
+     * Actualiza la IP del servidor del ambiente para la institución en sesión.
      */
     public function actualizarIp(Request $request, Ambiente $ambiente)
     {
+        $institucionId = $this->institucionId();
+        $this->asegurarAmbienteDeInstitucion($ambiente, $institucionId);
+
         $datos = $request->validate(['servidor_ip' => 'nullable|ip']);
-        $ambiente->update(['servidor_ip' => $datos['servidor_ip'] ?? null]);
+        $ip = $datos['servidor_ip'] ?? null;
+
+        $ambiente->instituciones()->updateExistingPivot($institucionId, [
+            'ip' => $ip,
+            'updated_at' => now(),
+        ]);
 
         SeguridadService::registrar(
             Auth::guard('docente')->id(),
@@ -53,7 +87,7 @@ class AmbienteAdminController extends Controller
             $ambiente->nombre,
         );
 
-        return response()->json(['ok' => true, 'servidor_ip' => $ambiente->servidor_ip]);
+        return response()->json(['ok' => true, 'servidor_ip' => $ip]);
     }
 
     /**
@@ -63,6 +97,9 @@ class AmbienteAdminController extends Controller
      */
     public function actualizarCupo(Request $request, Ambiente $ambiente)
     {
+        $institucionId = $this->institucionId();
+        $this->asegurarAmbienteDeInstitucion($ambiente, $institucionId);
+
         $datos = $request->validate(['cupo_defecto' => 'required|integer|min:1|max:100']);
         $ambiente->update($datos);
 
@@ -79,19 +116,20 @@ class AmbienteAdminController extends Controller
     }
 
     /**
-     * Verifica si el servidor del ambiente responde en el puerto HTTP 80.
-     *
-     * Retorna JSON con estado de conexión y mensaje legible.
+     * Verifica si el servidor del ambiente (IP de la institución) responde en el puerto HTTP.
      */
     public function verificarConexion(Ambiente $ambiente)
     {
-        $ip = $ambiente->servidor_ip;
+        $institucionId = $this->institucionId();
+        $vinculo = $this->asegurarAmbienteDeInstitucion($ambiente, $institucionId);
+        $ip = $vinculo->pivot->ip;
+        $puerto = (int) ($vinculo->pivot->puerto ?: 80);
 
         if (! $ip) {
             return response()->json(['ok' => false, 'mensaje' => 'IP no configurada para este ambiente.']);
         }
 
-        $socket = @fsockopen($ip, 80, $errno, $errstr, 2);
+        $socket = @fsockopen($ip, $puerto, $errno, $errstr, 2);
         $enLinea = false;
 
         if ($socket) {
@@ -106,15 +144,17 @@ class AmbienteAdminController extends Controller
     }
 
     /**
-     * Devuelve la lista de docentes asignados a un ambiente en el periodo actual.
-     *
-     * Incluye relaciones de ambiente, grado y grupo para mostrar datos completos.
+     * Docentes de la institución asignados al ambiente en el periodo actual.
      */
     public function docentesDelPeriodo(Ambiente $ambiente)
     {
+        $institucionId = $this->institucionId();
+        $this->asegurarAmbienteDeInstitucion($ambiente, $institucionId);
+
         $cargas = $ambiente->cargasDocente()
             ->where('activo', true)
             ->where('anio_lectivo', date('Y'))
+            ->whereHas('docente.user', fn ($u) => $u->where('institucion_id', $institucionId))
             ->with(['docente.user', 'grado', 'grupo'])
             ->get();
 
@@ -129,33 +169,114 @@ class AmbienteAdminController extends Controller
     }
 
     /**
-     * Devuelve los módulos disponibles de un ambiente.
-     *
-     * Se utiliza en la administración para gestionar visibilidad y activación.
+     * Módulos del ambiente para la institución (oficiales vinculados + propios).
      */
     public function modulos(Ambiente $ambiente)
     {
-        $modulos = $ambiente->modulos()
-            ->get(['id', 'nombre', 'icono', 'orden', 'activo', 'visible_estudiantes']);
+        $institucionId = $this->institucionId();
+        $this->asegurarAmbienteDeInstitucion($ambiente, $institucionId);
 
-        return response()->json(['ok' => true, 'modulos' => $modulos]);
+        $modulos = $this->modulosDeInstitucion($ambiente->id, $institucionId);
+
+        return response()->json(['ok' => true, 'modulos' => $modulos->values()]);
     }
 
     /**
-     * Alterna un campo booleano del módulo (activo o visible para estudiantes).
+     * Alterna estado de módulo para la institución:
+     * - Oficiales: solo `modulo_institucion.activo` (no toca el catálogo del superAdmin).
+     * - Propios: `activo` / `visible_estudiantes` del módulo local.
      */
     public function activarModulo(Request $request, Ambiente $ambiente, Modulo $modulo)
     {
-        $campo = $request->validate(['campo' => 'required|in:activo,visible_estudiantes'])['campo'];
-        $modulo->update([$campo => ! $modulo->$campo]);
+        $institucionId = $this->institucionId();
+        $this->asegurarAmbienteDeInstitucion($ambiente, $institucionId);
 
-        return response()->json(['ok' => true, $campo => (bool) $modulo->$campo]);
+        if ((int) $modulo->ambiente_id !== (int) $ambiente->id) {
+            abort(404);
+        }
+
+        $campo = $request->validate(['campo' => 'required|in:activo,visible_estudiantes'])['campo'];
+
+        if ($modulo->esOficial()) {
+            if ($campo !== 'activo') {
+                return response()->json([
+                    'ok' => false,
+                    'mensaje' => 'En módulos oficiales solo puede activar o desactivar para su institución.',
+                ], 422);
+            }
+
+            if (! $modulo->activo) {
+                return response()->json([
+                    'ok' => false,
+                    'mensaje' => 'Este módulo oficial está desactivado en el catálogo.',
+                ], 422);
+            }
+
+            $vinculo = DB::table('modulo_institucion')
+                ->where('modulo_id', $modulo->id)
+                ->where('institucion_id', $institucionId)
+                ->first();
+
+            if (! $vinculo) {
+                return response()->json([
+                    'ok' => false,
+                    'mensaje' => 'Este módulo no está asignado a su institución.',
+                ], 403);
+            }
+
+            $nuevo = ! (bool) $vinculo->activo;
+
+            DB::table('modulo_institucion')
+                ->where('modulo_id', $modulo->id)
+                ->where('institucion_id', $institucionId)
+                ->update([
+                    'activo' => $nuevo,
+                    'updated_at' => now(),
+                ]);
+
+            return response()->json([
+                'ok' => true,
+                'activo' => $nuevo,
+                'puede_gestionar' => true,
+                'puede_toggle_activo' => true,
+                'puede_toggle_visible' => false,
+            ]);
+        }
+
+        if (! $modulo->esDeInstitucion($institucionId)) {
+            abort(403, 'Solo puede gestionar módulos de su institución.');
+        }
+
+        if ($campo === 'visible_estudiantes' && ! $modulo->activo) {
+            return response()->json([
+                'ok' => false,
+                'mensaje' => 'Active el módulo antes de cambiar la visibilidad.',
+            ], 422);
+        }
+
+        $modulo->update([$campo => ! $modulo->$campo]);
+        $modulo->refresh();
+
+        return response()->json([
+            'ok' => true,
+            $campo => (bool) $modulo->$campo,
+            'activo' => (bool) $modulo->activo,
+            'puede_gestionar' => (bool) $modulo->activo,
+            'puede_toggle_activo' => true,
+            'puede_toggle_visible' => (bool) $modulo->activo,
+        ]);
     }
 
     public function listado()
     {
+        $institucionId = $this->institucionId();
+
         return response()->json(
             Ambiente::select('id', 'nombre', 'icono')
+                ->whereHas('instituciones', function ($q) use ($institucionId) {
+                    $q->where('instituciones.id', $institucionId)
+                        ->where('ambiente_institucion.activo', true);
+                })
                 ->orderBy('nombre')
                 ->get()
         );
@@ -163,6 +284,9 @@ class AmbienteAdminController extends Controller
 
     public function gradoslistado(Request $request, Ambiente $ambiente)
     {
+        $institucionId = $this->institucionId();
+        $this->asegurarAmbienteDeInstitucion($ambiente, $institucionId);
+
         $anio = $request->anio_lectivo ?? date('Y');
 
         $grados = $ambiente->gradosHabilitados()
@@ -185,5 +309,134 @@ class AmbienteAdminController extends Controller
             ->get();
 
         return response()->json($grados);
+    }
+
+    /**
+     * @param  Collection<int, int|string>  $ambienteIds
+     * @return array<int, array{total: int, activos: int}>
+     */
+    private function conteosModulosPorAmbiente(Collection $ambienteIds, int $institucionId): array
+    {
+        if ($ambienteIds->isEmpty()) {
+            return [];
+        }
+
+        $conteos = [];
+        foreach ($ambienteIds as $id) {
+            $conteos[(int) $id] = ['total' => 0, 'activos' => 0];
+        }
+
+        foreach ($this->modulosDeInstitucion($ambienteIds, $institucionId) as $modulo) {
+            $ambienteId = (int) $modulo['ambiente_id'];
+            if (! isset($conteos[$ambienteId])) {
+                continue;
+            }
+            $conteos[$ambienteId]['total']++;
+            if ($modulo['disponible']) {
+                $conteos[$ambienteId]['activos']++;
+            }
+        }
+
+        return $conteos;
+    }
+
+    /**
+     * @param  int|Collection<int, int|string>  $ambienteId
+     */
+    private function modulosDeInstitucion(int|Collection $ambienteId, int $institucionId): Collection
+    {
+        $ids = $ambienteId instanceof Collection
+            ? $ambienteId->map(fn ($id) => (int) $id)->values()
+            : collect([(int) $ambienteId]);
+
+        if ($ids->isEmpty()) {
+            return collect();
+        }
+
+        $oficiales = Modulo::query()
+            ->oficiales()
+            ->where('activo', true)
+            ->whereIn('ambiente_id', $ids)
+            ->whereHas(
+                'instituciones',
+                fn ($q) => $q->where('instituciones.id', $institucionId)
+            )
+            ->with([
+                'instituciones' => fn ($q) => $q->where('instituciones.id', $institucionId),
+            ])
+            ->orderBy('orden')
+            ->get(['id', 'ambiente_id', 'nombre', 'icono', 'orden', 'activo', 'visible_estudiantes', 'es_oficial', 'institucion_id'])
+            ->map(function (Modulo $modulo) {
+                $activoInstitucion = (bool) optional($modulo->instituciones->first())->pivot?->activo;
+
+                return [
+                    'id' => $modulo->id,
+                    'ambiente_id' => $modulo->ambiente_id,
+                    'nombre' => $modulo->nombre,
+                    'icono' => $modulo->icono,
+                    'orden' => $modulo->orden,
+                    'activo' => $activoInstitucion,
+                    'visible_estudiantes' => (bool) $modulo->visible_estudiantes,
+                    'es_oficial' => true,
+                    'disponible' => $activoInstitucion,
+                    'puede_gestionar' => true,
+                    'puede_toggle_activo' => true,
+                    'puede_toggle_visible' => false,
+                ];
+            });
+
+        $propios = Modulo::query()
+            ->deInstitucion($institucionId)
+            ->whereIn('ambiente_id', $ids)
+            ->orderBy('orden')
+            ->get(['id', 'ambiente_id', 'nombre', 'icono', 'orden', 'activo', 'visible_estudiantes', 'es_oficial', 'institucion_id'])
+            ->map(function (Modulo $modulo) {
+                $activo = (bool) $modulo->activo;
+
+                return [
+                    'id' => $modulo->id,
+                    'ambiente_id' => $modulo->ambiente_id,
+                    'nombre' => $modulo->nombre,
+                    'icono' => $modulo->icono,
+                    'orden' => $modulo->orden,
+                    'activo' => $activo,
+                    'visible_estudiantes' => (bool) $modulo->visible_estudiantes,
+                    'es_oficial' => false,
+                    'disponible' => $activo,
+                    'puede_gestionar' => true,
+                    'puede_toggle_activo' => true,
+                    'puede_toggle_visible' => $activo,
+                ];
+            });
+
+        return $oficiales
+            ->concat($propios)
+            ->sortBy('orden')
+            ->values();
+    }
+
+    private function asegurarAmbienteDeInstitucion(Ambiente $ambiente, int $institucionId)
+    {
+        $vinculo = $ambiente->instituciones()
+            ->where('instituciones.id', $institucionId)
+            ->wherePivot('activo', true)
+            ->first();
+
+        if (! $vinculo) {
+            abort(403, 'El ambiente no está activo para esta institución.');
+        }
+
+        return $vinculo;
+    }
+
+    private function institucionId(): int
+    {
+        $id = session('institucion_id');
+
+        if (! $id) {
+            abort(403, 'No hay institución en sesión.');
+        }
+
+        return (int) $id;
     }
 }

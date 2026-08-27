@@ -2,53 +2,105 @@
 
 use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
-use App\Http\Controllers\Admin\CatalogoController;
+use App\Http\Controllers\Admin\BloquesExperienciaAdminController;
+use App\Http\Controllers\Admin\CatalogoAdminController;
+use App\Http\Controllers\Admin\CatalogoDBAAdminController;
 use App\Http\Controllers\Admin\CierreAnioController;
-use App\Http\Controllers\Admin\PerfilAprendizajeConfiguracionController;
-use App\Http\Controllers\Admin\PerfilAprendizajePersonalizadoConfiguracionController;
 use App\Http\Controllers\Admin\ConfiguracionAdminController;
 use App\Http\Controllers\Admin\ConflictosController;
 use App\Http\Controllers\Admin\DocenteAdminController;
+use App\Http\Controllers\Admin\EjesAdminController;
 use App\Http\Controllers\Admin\EstudianteAdminController;
+use App\Http\Controllers\Admin\ExperienciasAdminController;
 use App\Http\Controllers\Admin\GradoGrupoController;
 use App\Http\Controllers\Admin\GruposController;
 use App\Http\Controllers\Admin\MatriculaAdminController;
+use App\Http\Controllers\Admin\ModulosAdminController;
+use App\Http\Controllers\Admin\PerfilAprendizajeConfiguracionController;
+use App\Http\Controllers\Admin\PerfilAprendizajePersonalizadoConfiguracionController;
 use App\Http\Controllers\Admin\PiarController;
 use App\Http\Controllers\Admin\ReportesController;
 use App\Http\Controllers\Admin\SyncLogController;
+use App\Http\Controllers\Admin\TematicasAdminController;
 use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
+use App\Http\Controllers\Ambientes\AmbienteNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
+use App\Http\Controllers\InfoCondicionesController;
 use App\Http\Controllers\Panel\AsistenciaController;
+use App\Http\Controllers\Panel\BloquesExperienciaPanelController;
+use App\Http\Controllers\Panel\CatalogoPanelController;
+use App\Http\Controllers\Panel\ClasesPanelController;
+use App\Http\Controllers\Panel\EjesPanelController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
-use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
+use App\Http\Controllers\Panel\ExperienciasPanelController;
 use App\Http\Controllers\Panel\InclusionController;
+use App\Http\Controllers\Panel\PerfilAprendizajePanelController;
+use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
 use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
+use App\Http\Controllers\Panel\TematicasPanelController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\RecorridoNinoController;
 use App\Http\Controllers\SuperAdmin\AdminsSuperAdminController;
+use App\Http\Controllers\SuperAdmin\BloquesExperienciaSuperAdminController;
+use App\Http\Controllers\SuperAdmin\CatalogoDBASuperAdminController;
+use App\Http\Controllers\SuperAdmin\EjesSuperAdminController;
+use App\Http\Controllers\SuperAdmin\ExperienciasSuperAdminController;
+use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
+use App\Http\Controllers\SuperAdmin\ModulosSuperAdminController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajeInclusionController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
-use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\SuperAdmin\TematicasSuperAdminController;
+use App\Http\Controllers\VistaPreviaNinoController;
 use Illuminate\Support\Facades\Route;
 
-// Raiz → bienvenida del ambiente configurado
-Route::get('/', fn () => redirect()->route('auth.bienvenida'));
+// Raíz → portada del ambiente (kiosco). Docente: /login
+Route::get('/', fn () => redirect()->route('ambiente.inicio'));
 
-// ── Autenticacion del nino ────────────────────────────────────────────────
+// ── Autenticacion del nino (público) ───────────────────────────────────────
 Route::get('/bienvenida', [SesionNinoController::class, 'mostrarBienvenida'])->name('auth.bienvenida');
+Route::get('/inicio', [AmbienteNinoController::class, 'inicio'])->name('ambiente.inicio');
+Route::get('/kiosco/diagnostico-ip', [AmbienteNinoController::class, 'diagnosticoIp'])->name('ambiente.diagnostico-ip');
 Route::get('/alumnos', [SesionNinoController::class, 'mostrarSeleccionAlumno'])->name('auth.alumnos');
 Route::get('/alumnos/{estudianteId}/pin', [SesionNinoController::class, 'mostrarPin'])->name('auth.pin');
 Route::post('/alumnos/{estudianteId}/verificar', [SesionNinoController::class, 'verificarPin'])->name('auth.verificar-pin');
-Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
 
 // ── Auth Docente ──────────────────────────────────────────────────────────
 Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('docente.login');
 Route::post('/login', [AuthDocenteController::class, 'iniciarSesion'])->name('docente.login.post');
 Route::post('/logout', [AuthDocenteController::class, 'cerrarSesion'])->name('docente.logout');
+
+// Vista previa en tablet (token temporal, sin sesión de staff)
+Route::get('/vista-previa-nino/{token}', [VistaPreviaNinoController::class, 'mostrar'])
+    ->middleware('throttle:30,1')
+    ->where('token', '[a-f0-9]{40}')
+    ->name('vista-previa-nino.mostrar');
+Route::get('/vista-previa-nino/{token}/estado', [VistaPreviaNinoController::class, 'estado'])
+    ->middleware('throttle:90,1')
+    ->where('token', '[a-f0-9]{40}')
+    ->name('vista-previa-nino.estado');
+Route::get('/vista-previa-nino/{token}/tts', [VistaPreviaNinoController::class, 'tts'])
+    ->middleware('throttle:30,1')
+    ->where('token', '[a-f0-9]{40}')
+    ->name('vista-previa-nino.tts');
+
+// Recorrido niño demo (Expresión Artística): portada → módulos → ejes → camino → experiencia
+Route::get('/recorrido-nino/{token}', [RecorridoNinoController::class, 'mostrar'])
+    ->middleware('throttle:30,1')
+    ->where('token', '[a-f0-9]{40}')
+    ->name('recorrido-nino.mostrar');
+Route::get('/recorrido-nino/{token}/experiencia/{experiencia}', [RecorridoNinoController::class, 'experiencia'])
+    ->middleware('throttle:60,1')
+    ->where('token', '[a-f0-9]{40}')
+    ->name('recorrido-nino.experiencia');
+Route::get('/recorrido-nino/{token}/tts', [RecorridoNinoController::class, 'tts'])
+    ->middleware('throttle:30,1')
+    ->where('token', '[a-f0-9]{40}')
+    ->name('recorrido-nino.tts');
 
 // Endpoint para guardar los datos generales del Piar
 // Piar
@@ -59,6 +111,10 @@ Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])-
 Route::get('piar/buscar-docente/{texto}', [PiarController::class, 'buscarDocente'])->name('admin.piar.buscar-docente');
 Route::get('piar/verificar-si-comenzo/{idEstudiante}', [PiarController::class, 'verificarSiComenzo'])->name('admin.piar.verificar-si-comenzo');
 Route::get('piar/exportar/{idEstudiante}', [PiarController::class, 'exportar'])->name('admin.piar.exportar');
+
+// ── Info condiciones (público — todos los roles) ───────────────────────────
+Route::get('/info-condiciones', [InfoCondicionesController::class, 'index'])->name('info-condiciones.index');
+Route::get('/info-condiciones/{slug}', [InfoCondicionesController::class, 'mostrar'])->name('info-condiciones.mostrar');
 
 // ── Panel Admin ───────────────────────────────────────────────────────────
 Route::prefix('admin')->middleware(['es.admin'])->group(function () {
@@ -71,6 +127,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('ambientes/{ambiente}/ping', [AmbienteAdminController::class, 'verificarConexion'])->name('admin.ambientes.ping');
     Route::get('ambientes/{ambiente}/docentes', [AmbienteAdminController::class, 'docentesDelPeriodo'])->name('admin.ambientes.docentes');
     Route::get('ambientes/{ambiente}/modulos', [AmbienteAdminController::class, 'modulos'])->name('admin.ambientes.modulos');
+    Route::patch('ambientes/{ambiente}/modulos/{modulo}/toggle', [AmbienteAdminController::class, 'activarModulo'])->name('admin.ambientes.modulos.toggle');
     Route::get('ambientes/listado', [AmbienteAdminController::class, 'listado'])->name('admin.ambientes.listado');
     Route::get('ambientes/{ambiente}/gradoslistado', [AmbienteAdminController::class, 'gradoslistado'])->name('admin.ambientes.gradoslistado');
 
@@ -156,37 +213,91 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('estudiantes/cargar-municipios/{departamento}', [EstudianteAdminController::class, 'cargarMunicipios'])->name('admin.estudiantes.cargar-municipios');
     Route::get('estudiantes/restablecer-pin/{idEstudiante}', [EstudianteAdminController::class, 'restablecerPin'])->name('admin.estudiantes.restablecer-pin');
 
-    // Catalogo
-    Route::get('catalogo', [CatalogoController::class, 'listar'])->name('admin.catalogo');
-    Route::post('catalogo/modulos', [CatalogoController::class, 'guardarModulo'])->name('admin.catalogo.modulo.store');
-    Route::put('catalogo/modulos/{modulo}', [CatalogoController::class, 'actualizarModulo'])->name('admin.catalogo.modulo.update');
-    Route::delete('catalogo/modulos/{modulo}', [CatalogoController::class, 'eliminarModulo'])->name('admin.catalogo.modulo.destroy');
-    Route::post('catalogo/temas', [CatalogoController::class, 'guardarTema'])->name('admin.catalogo.tema.store');
-    Route::put('catalogo/temas/{tema}', [CatalogoController::class, 'actualizarTema'])->name('admin.catalogo.tema.update');
+    // Catálogo
+    Route::get('catalogo', [CatalogoDBAAdminController::class, 'listar'])->name('admin.catalogo');
+    Route::get('catalogo/detalle/{id}', [CatalogoDBAAdminController::class, 'detalle'])->name('admin.catalogo.detalle');
+    Route::post('catalogo/dba', [CatalogoDBAAdminController::class, 'guardar'])->name('admin.catalogo.dba.guardar');
+    Route::get('catalogo/dba/datos/{id}', [CatalogoDBAAdminController::class, 'ver'])->name('admin.catalogo.dba.datos');
+    Route::put('catalogo/dba/{id}', [CatalogoDBAAdminController::class, 'actualizar'])->name('admin.catalogo.dba.actualizar');
+    Route::patch('catalogo/dba/{id}/toggle-activo', [CatalogoDBAAdminController::class, 'toggleActivo'])->name('admin.catalogo.dba.toggleActivo');
+
+    Route::get('catalogo/modulos', [ModulosAdminController::class, 'listar'])->name('admin.catalogo.modulos');
+    Route::post('catalogo/ambientes/{ambiente}/modulos', [ModulosAdminController::class, 'guardar'])->name('admin.modulos.guardar');
+    Route::get('catalogo/modulos/{modulo}', [ModulosAdminController::class, 'mostrar'])->name('admin.modulos.mostrar');
+    Route::put('catalogo/modulos/{modulo}', [ModulosAdminController::class, 'actualizar'])->name('admin.modulos.actualizar');
+    Route::patch('catalogo/modulos/{modulo}/estado', [ModulosAdminController::class, 'actualizarEstado'])->name('admin.modulos.estado');
+    Route::patch('catalogo/modulos/{modulo}/mover', [ModulosAdminController::class, 'mover'])->name('admin.modulos.mover');
+    Route::delete('catalogo/modulos/{modulo}', [ModulosAdminController::class, 'eliminar'])->name('admin.modulos.eliminar');
+
+    Route::get('catalogo/ejes', [EjesAdminController::class, 'listar'])->name('admin.catalogo.ejes');
+    Route::get('catalogo/modulos/{modulo}/ejes', [EjesAdminController::class, 'listarPorModulo'])->name('admin.modulos.ejes');
+    Route::post('catalogo/modulos/{modulo}/ejes', [EjesAdminController::class, 'guardar'])->name('admin.ejes.guardar');
+    Route::get('catalogo/ejes/{eje}', [EjesAdminController::class, 'mostrar'])->name('admin.ejes.mostrar');
+    Route::put('catalogo/ejes/{eje}', [EjesAdminController::class, 'actualizar'])->name('admin.ejes.actualizar');
+    Route::patch('catalogo/ejes/{eje}/estado', [EjesAdminController::class, 'actualizarEstado'])->name('admin.ejes.estado');
+    Route::patch('catalogo/ejes/{eje}/mover', [EjesAdminController::class, 'mover'])->name('admin.ejes.mover');
+    Route::delete('catalogo/ejes/{eje}', [EjesAdminController::class, 'eliminar'])->name('admin.ejes.eliminar');
+
+    // Catálogo · temas (dominio legacy, pendiente)
+    Route::post('catalogo/temas', [CatalogoAdminController::class, 'guardarTema'])->name('admin.catalogo.tema.store');
+    Route::put('catalogo/temas/{tema}', [CatalogoAdminController::class, 'actualizarTema'])->name('admin.catalogo.tema.update');
+
+    // Catálogo · temáticas / experiencias del colegio
+    Route::get('catalogo/tematicas', [TematicasAdminController::class, 'index'])->name('admin.catalogo.tematicas.index');
+    Route::get('catalogo/tematicas/listar', [TematicasAdminController::class, 'listar'])->name('admin.catalogo.tematicas.listar');
+    Route::get('catalogo/tematicas/dbas', [TematicasAdminController::class, 'buscarDbas'])->name('admin.catalogo.tematicas.dbas');
+    Route::get('catalogo/ejes/{eje}/tematicas', [TematicasAdminController::class, 'listarPorEje'])->name('admin.ejes.tematicas');
+    Route::post('catalogo/ejes/{eje}/tematicas', [TematicasAdminController::class, 'guardar'])->name('admin.catalogo.tematicas.guardar');
+    Route::get('catalogo/tematicas/{tematica}', [TematicasAdminController::class, 'mostrar'])->name('admin.catalogo.tematicas.mostrar');
+    Route::put('catalogo/tematicas/{tematica}', [TematicasAdminController::class, 'actualizar'])->name('admin.catalogo.tematicas.actualizar');
+    Route::patch('catalogo/tematicas/{tematica}/estado', [TematicasAdminController::class, 'actualizarEstado'])->name('admin.catalogo.tematicas.estado');
+    Route::delete('catalogo/tematicas/{tematica}', [TematicasAdminController::class, 'eliminar'])->name('admin.catalogo.tematicas.eliminar');
+    Route::get('catalogo/experiencias', [ExperienciasAdminController::class, 'index'])->name('admin.catalogo.experiencias.index');
+    Route::get('catalogo/tematicas/{tematica}/experiencias', [ExperienciasAdminController::class, 'listarPorTematica'])->name('admin.catalogo.tematicas.experiencias');
+    Route::post('catalogo/tematicas/{tematica}/experiencias', [ExperienciasAdminController::class, 'guardar'])->name('admin.experiencias.guardar');
+    Route::get('catalogo/experiencias/{experiencia}/constructor', [ExperienciasAdminController::class, 'constructor'])->name('admin.experiencias.constructor');
+    Route::get('catalogo/experiencias/{experiencia}/bloques', [BloquesExperienciaAdminController::class, 'listar'])->name('admin.experiencias.bloques.index');
+    Route::post('catalogo/experiencias/{experiencia}/bloques', [BloquesExperienciaAdminController::class, 'guardar'])->name('admin.experiencias.bloques.guardar');
+    Route::patch('catalogo/experiencias/{experiencia}/bloques/reordenar', [BloquesExperienciaAdminController::class, 'reordenar'])->name('admin.experiencias.bloques.reordenar');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaAdminController::class, 'limpiar'])->name('admin.experiencias.bloques.limpiar');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaAdminController::class, 'upload'])->name('admin.experiencias.bloques.upload');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaAdminController::class, 'tts'])->name('admin.experiencias.bloques.tts');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaAdminController::class, 'crearVistaPrevia'])->name('admin.experiencias.vista-previa');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaAdminController::class, 'focoVistaPrevia'])->name('admin.experiencias.vista-previa.foco');
+    Route::post('catalogo/experiencias/{experiencia}/recorrido-nino', [BloquesExperienciaAdminController::class, 'crearRecorridoNino'])->name('admin.experiencias.recorrido-nino');
+    Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaAdminController::class, 'publicar'])->name('admin.experiencias.publicar');
+    Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaAdminController::class, 'actualizar'])->name('admin.bloques.actualizar');
+    Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaAdminController::class, 'eliminar'])->name('admin.bloques.eliminar');
+    Route::get('catalogo/experiencias/{experiencia}', [ExperienciasAdminController::class, 'mostrar'])->name('admin.experiencias.mostrar');
+    Route::put('catalogo/experiencias/{experiencia}', [ExperienciasAdminController::class, 'actualizar'])->name('admin.experiencias.actualizar');
+    Route::patch('catalogo/experiencias/{experiencia}/estado', [ExperienciasAdminController::class, 'actualizarEstado'])->name('admin.experiencias.estado');
+    Route::patch('catalogo/experiencias/{experiencia}/flujo', [ExperienciasAdminController::class, 'cambiarEstado'])->name('admin.experiencias.flujo');
+    Route::delete('catalogo/experiencias/{experiencia}', [ExperienciasAdminController::class, 'eliminar'])->name('admin.experiencias.eliminar');
 
     // Reportes
     Route::get('reportes', [ReportesController::class, 'listar'])->name('admin.reportes');
     Route::get('reportes/exportar', [ReportesController::class, 'exportar'])->name('admin.reportes.exportar');
 
-    // Configuracion
+    // Configuracion (institución y perfiles)
     Route::get('configuracion', [ConfiguracionAdminController::class, 'listar'])->name('admin.configuracion');
     Route::post('configuracion', [ConfiguracionAdminController::class, 'actualizar'])->name('admin.configuracion.update');
     Route::post('configuracion/logo', [ConfiguracionAdminController::class, 'subirLogo'])->name('admin.configuracion.logo');
     Route::get('configuracion/datos/{id}', [ConfiguracionAdminController::class, 'verDatosInstitucion'])->name('admin.configuracion.datos');
+    Route::get('configuracion/cargar-municipios/{departamento}', [ConfiguracionAdminController::class, 'cargarMunicipios'])->name('admin.configuracion.cargar-municipios');
 
     Route::get('configuracion/perfil-aprendizaje', [PerfilAprendizajeConfiguracionController::class, 'index'])->name('admin.configuracion.perfil-aprendizaje.index');
     Route::patch('configuracion/perfil-aprendizaje/orden', [PerfilAprendizajeConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.perfil-aprendizaje.orden');
-    Route::patch('configuracion/perfil-aprendizaje/{condicionOrden}/estado', [PerfilAprendizajeConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje.estado');
-    Route::get('configuracion/perfil-aprendizaje/{condicionInclusion}/estudiantes', [PerfilAprendizajeConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje.estudiantes');
+    Route::patch('configuracion/perfil-aprendizaje/{perfilAprendizajeOrden}/estado', [PerfilAprendizajeConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje.estado');
+    Route::get('configuracion/perfil-aprendizaje/{perfilAprendizajeInclusion}/estudiantes', [PerfilAprendizajeConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje.estudiantes');
 
     Route::get('configuracion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'index'])->name('admin.configuracion.perfil-aprendizaje-personalizado.index');
     Route::post('configuracion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'guardar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.guardar');
     Route::patch('configuracion/perfil-aprendizaje-personalizado/orden', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizarOrden'])->name('admin.configuracion.perfil-aprendizaje-personalizado.orden');
-    Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'mostrar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.mostrar');
-    Route::put('configuracion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.actualizar');
-    Route::delete('configuracion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'eliminar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.eliminar');
-    Route::patch('configuracion/perfil-aprendizaje-personalizado/{condicionTransitoriaOrden}/estado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estado');
-    Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}/estudiantes', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estudiantes');
+    Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'mostrar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.mostrar');
+    Route::put('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.actualizar');
+    Route::delete('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'eliminar'])->name('admin.configuracion.perfil-aprendizaje-personalizado.eliminar');
+    Route::patch('configuracion/perfil-aprendizaje-personalizado/{personalizadoOrden}/estado', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'actualizarEstado'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estado');
+    Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}/estudiantes', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estudiantes');
     Route::post('configuracion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desasociar', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'desasociarEstudiante'])->name('admin.configuracion.perfil-aprendizaje-personalizado.desasociar');
 
     // Usuario
@@ -205,6 +316,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::put('usuarios/{usuario}', [UsuarioAdminController::class, 'actualizar'])->name('admin.usuarios.update');
     Route::patch('usuarios/{usuario}/toggle-activo', [UsuarioAdminController::class, 'toggleActivo'])->name('admin.usuarios.toggleActivo');
     Route::delete('usuarios/{usuario}', [UsuarioAdminController::class, 'eliminar'])->name('admin.usuarios.destroy');
+
 });
 
 // ── Panel Docente ─────────────────────────────────────────────────────────
@@ -243,7 +355,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Ficha completa: verFicha → show.blade.php
     Route::get('estudiantes/ficha/{estudiante}', [EstudiantePanelController::class, 'verFicha'])->name('panel.estudiantes.show');
-    Route::post('estudiantes/ficha/{estudiante}/perfil-aprendizaje-personalizado', [EstudiantePanelController::class, 'activarPerfilAprendizajePersonalizado'])->name('panel.estudiantes.perfil-aprendizaje-personalizado.activar');
+    Route::get('estudiantes/ficha/{estudiante}/perfiles-aprendizaje/fragmentos', [EstudiantePanelController::class, 'fragmentosPerfilesAprendizaje'])->name('panel.estudiantes.perfiles-aprendizaje.fragmentos');
+    Route::get('estudiantes/ficha/{estudiante}/perfil-aprendizaje-personalizado/fragmentos', [EstudiantePanelController::class, 'fragmentosPerfilAprendizajePersonalizado'])->name('panel.estudiantes.perfil-aprendizaje-personalizado.fragmentos');
 
     // Datos JSON para modal de edición (compartido con index.js)
     Route::get('estudiantes/{estudiante}', [EstudianteAdminController::class, 'ver'])->name('panel.estudiantes.datos');
@@ -264,7 +377,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('sesion', [SesionController::class, 'listar'])->name('panel.sesion');
     Route::get('sesion/estudiantes', [SesionController::class, 'estudiantes'])->name('panel.sesion.estudiantes');
     Route::post('sesion/seleccionar-grado-grupo', [SesionController::class, 'obtenerGradoGrupoSeleccionado'])->name('panel.sesion.seleccionar-grado-grupo');
-    // Portafolio
+    // Portafolio del estudiante
     Route::get('portafolio', [PortafolioController::class, 'listar'])->name('panel.portafolio');
     Route::get('portafolio/{estudiante}', [PortafolioController::class, 'verEstudiante'])->name('panel.portafolio.estudiante');
     Route::post('portafolio/{estudiante}/observacion', [PortafolioController::class, 'guardarObservacion'])->name('panel.portafolio.observacion');
@@ -272,14 +385,19 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     // Inclusion
     Route::get('inclusion', [InclusionController::class, 'listar'])->name('panel.inclusion');
+    Route::get('inclusion/perfil-aprendizaje', [PerfilAprendizajePanelController::class, 'index'])->name('panel.inclusion.perfil-aprendizaje');
+    Route::get('inclusion/perfil-aprendizaje/{perfilAprendizajeInclusion}/estudiantes', [PerfilAprendizajePanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.perfil-aprendizaje.estudiantes');
+    Route::post('inclusion/perfil-aprendizaje/estudiantes/{estudiante}/asignar', [PerfilAprendizajePanelController::class, 'asignarEstudiante'])->name('panel.inclusion.perfil-aprendizaje.asignar-estudiante');
+    Route::post('inclusion/perfil-aprendizaje/estudiantes/{estudiante}/desactivar', [PerfilAprendizajePanelController::class, 'desactivarEstudiante'])->name('panel.inclusion.perfil-aprendizaje.desactivar-estudiante');
     Route::get('inclusion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoPanelController::class, 'index'])->name('panel.inclusion.perfil-aprendizaje-personalizado');
     Route::post('inclusion/perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoPanelController::class, 'guardar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.guardar');
-    Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoPanelController::class, 'mostrar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.mostrar');
-    Route::put('inclusion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoPanelController::class, 'actualizar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.actualizar');
-    Route::delete('inclusion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}', [PerfilAprendizajePersonalizadoPanelController::class, 'eliminar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.eliminar');
-    Route::patch('inclusion/perfil-aprendizaje-personalizado/{condicionTransitoriaOrden}/estado', [PerfilAprendizajePersonalizadoPanelController::class, 'actualizarEstado'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estado');
-    Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{condicionTransitoria}/estudiantes', [PerfilAprendizajePersonalizadoPanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estudiantes');
-    Route::post('inclusion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desasociar', [PerfilAprendizajePersonalizadoPanelController::class, 'desasociarEstudiante'])->name('panel.inclusion.perfil-aprendizaje-personalizado.desasociar');
+    Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoPanelController::class, 'mostrar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.mostrar');
+    Route::put('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoPanelController::class, 'actualizar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.actualizar');
+    Route::delete('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoPanelController::class, 'eliminar'])->name('panel.inclusion.perfil-aprendizaje-personalizado.eliminar');
+    Route::patch('inclusion/perfil-aprendizaje-personalizado/{personalizadoOrden}/estado', [PerfilAprendizajePersonalizadoPanelController::class, 'actualizarEstado'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estado');
+    Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}/estudiantes', [PerfilAprendizajePersonalizadoPanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estudiantes');
+    Route::post('inclusion/perfil-aprendizaje-personalizado/estudiantes/{estudiante}/asignar', [PerfilAprendizajePersonalizadoPanelController::class, 'asignarEstudiante'])->name('panel.inclusion.perfil-aprendizaje-personalizado.asignar-estudiante');
+    Route::post('inclusion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desactivar', [PerfilAprendizajePersonalizadoPanelController::class, 'desactivarEstudiante'])->name('panel.inclusion.perfil-aprendizaje-personalizado.desactivar-estudiante');
     Route::get('inclusion/{estudiante}', [InclusionController::class, 'verAjustes'])->name('panel.inclusion.ajustes');
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
 
@@ -298,6 +416,57 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::post('ambientes/seleccionar', [SesionController::class, 'seleccionarAmbiente'])->name('panel.ambientes.seleccionar');
     Route::get('ambientes/eliminar', [SesionController::class, 'eliminarAmbienteSeleccionado'])->name('panel.ambientes.eliminar');
     Route::get('ambientes/obtener', [SesionController::class, 'obtenerAmbienteSeleccionado'])->name('panel.ambientes.obtener');
+
+    // Catálogo DBA + módulos / ejes / temáticas / experiencias
+    Route::get('catalogo', [CatalogoPanelController::class, 'index'])->name('panel.catalogo');
+    Route::get('catalogo/detalle/{id}', [CatalogoPanelController::class, 'detalle'])->name('panel.catalogo.detalle');
+    Route::get('catalogo/modulos', [CatalogoPanelController::class, 'modulos'])->name('panel.catalogo.modulos');
+    Route::get('catalogo/ejes', [CatalogoPanelController::class, 'ejes'])->name('panel.catalogo.ejes');
+    Route::get('catalogo/tematicas', [CatalogoPanelController::class, 'tematicas'])->name('panel.catalogo.tematicas');
+
+    Route::get('catalogo/modulos/{modulo}/ejes', [EjesPanelController::class, 'listarPorModulo'])->name('panel.modulos.ejes');
+    Route::post('catalogo/modulos/{modulo}/ejes', [EjesPanelController::class, 'guardar'])->name('panel.ejes.guardar');
+    Route::get('catalogo/ejes/{eje}', [EjesPanelController::class, 'mostrar'])->name('panel.ejes.mostrar');
+    Route::put('catalogo/ejes/{eje}', [EjesPanelController::class, 'actualizar'])->name('panel.ejes.actualizar');
+    Route::patch('catalogo/ejes/{eje}/estado', [EjesPanelController::class, 'actualizarEstado'])->name('panel.ejes.estado');
+    Route::patch('catalogo/ejes/{eje}/mover', [EjesPanelController::class, 'mover'])->name('panel.ejes.mover');
+    Route::delete('catalogo/ejes/{eje}', [EjesPanelController::class, 'eliminar'])->name('panel.ejes.eliminar');
+
+    Route::get('catalogo/tematicas/dbas', [TematicasPanelController::class, 'buscarDbas'])->name('panel.tematicas.dbas');
+    Route::get('catalogo/tematicas/listar', [TematicasPanelController::class, 'listar'])->name('panel.tematicas.listar');
+    Route::get('catalogo/ejes/{eje}/tematicas', [TematicasPanelController::class, 'listarPorEje'])->name('panel.ejes.tematicas');
+    Route::post('catalogo/ejes/{eje}/tematicas', [TematicasPanelController::class, 'guardar'])->name('panel.tematicas.guardar');
+    Route::get('catalogo/tematicas/{tematica}', [TematicasPanelController::class, 'mostrar'])->name('panel.tematicas.mostrar');
+    Route::put('catalogo/tematicas/{tematica}', [TematicasPanelController::class, 'actualizar'])->name('panel.tematicas.actualizar');
+    Route::patch('catalogo/tematicas/{tematica}/estado', [TematicasPanelController::class, 'actualizarEstado'])->name('panel.tematicas.estado');
+    Route::delete('catalogo/tematicas/{tematica}', [TematicasPanelController::class, 'eliminar'])->name('panel.tematicas.eliminar');
+
+    Route::get('catalogo/experiencias', [CatalogoPanelController::class, 'experiencias'])->name('panel.catalogo.experiencias.index');
+    Route::get('catalogo/tematicas/{tematica}/experiencias', [ExperienciasPanelController::class, 'listarPorTematica'])->name('panel.tematicas.experiencias');
+    Route::post('catalogo/tematicas/{tematica}/experiencias', [ExperienciasPanelController::class, 'guardar'])->name('panel.experiencias.guardar');
+    Route::get('catalogo/experiencias/{experiencia}/constructor', [ExperienciasPanelController::class, 'constructor'])->name('panel.experiencias.constructor');
+    Route::get('catalogo/experiencias/{experiencia}/bloques', [BloquesExperienciaPanelController::class, 'listar'])->name('panel.experiencias.bloques.index');
+    Route::post('catalogo/experiencias/{experiencia}/bloques', [BloquesExperienciaPanelController::class, 'guardar'])->name('panel.experiencias.bloques.guardar');
+    Route::patch('catalogo/experiencias/{experiencia}/bloques/reordenar', [BloquesExperienciaPanelController::class, 'reordenar'])->name('panel.experiencias.bloques.reordenar');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaPanelController::class, 'limpiar'])->name('panel.experiencias.bloques.limpiar');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaPanelController::class, 'upload'])->name('panel.experiencias.bloques.upload');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaPanelController::class, 'tts'])->name('panel.experiencias.bloques.tts');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaPanelController::class, 'crearVistaPrevia'])->name('panel.experiencias.vista-previa');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaPanelController::class, 'focoVistaPrevia'])->name('panel.experiencias.vista-previa.foco');
+    Route::post('catalogo/experiencias/{experiencia}/recorrido-nino', [BloquesExperienciaPanelController::class, 'crearRecorridoNino'])->name('panel.experiencias.recorrido-nino');
+    Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaPanelController::class, 'publicar'])->name('panel.experiencias.publicar');
+    Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaPanelController::class, 'actualizar'])->name('panel.bloques.actualizar');
+    Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaPanelController::class, 'eliminar'])->name('panel.bloques.eliminar');
+    Route::get('catalogo/experiencias/{experiencia}', [ExperienciasPanelController::class, 'mostrar'])->name('panel.experiencias.mostrar');
+    Route::put('catalogo/experiencias/{experiencia}', [ExperienciasPanelController::class, 'actualizar'])->name('panel.experiencias.actualizar');
+    Route::patch('catalogo/experiencias/{experiencia}/estado', [ExperienciasPanelController::class, 'actualizarEstado'])->name('panel.experiencias.estado');
+    Route::patch('catalogo/experiencias/{experiencia}/flujo', [ExperienciasPanelController::class, 'cambiarEstado'])->name('panel.experiencias.flujo');
+    Route::delete('catalogo/experiencias/{experiencia}', [ExperienciasPanelController::class, 'eliminar'])->name('panel.experiencias.eliminar');
+
+    // Clases
+    Route::get('clases', [ClasesPanelController::class, 'listar'])->name('panel.clases');
+    Route::post('clases', [ClasesPanelController::class, 'guardar'])->name('panel.clases.guardar');
+    Route::patch('clases/{clase}/estado', [ClasesPanelController::class, 'actualizarEstado'])->name('panel.clases.estado');
 });
 
 // ── Super Admin ─────────────────────────────────────────────────────────
@@ -306,6 +475,7 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
 
     // Instituciones
     Route::get('instituciones', [InstitucionSuperAdminController::class, 'index'])->name('superadmin.instituciones.index');
+    Route::get('instituciones/cargar-municipios/{departamento}', [InstitucionSuperAdminController::class, 'cargarMunicipios'])->name('superadmin.instituciones.cargar-municipios');
     Route::get('instituciones/datos/{id}', [InstitucionSuperAdminController::class, 'ver'])->name('superadmin.instituciones.ver');
     Route::post('instituciones', [InstitucionSuperAdminController::class, 'guardar'])->name('superadmin.instituciones.guardar');
     Route::put('instituciones/{id}', [InstitucionSuperAdminController::class, 'actualizar'])->name('superadmin.instituciones.actualizar');
@@ -327,22 +497,80 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     // Perfiles de Aprendizaje
     Route::get('perfil-aprendizaje', [PerfilAprendizajeInclusionController::class, 'index'])->name('superadmin.perfil-aprendizaje.index');
     Route::post('perfil-aprendizaje', [PerfilAprendizajeInclusionController::class, 'guardar'])->name('superadmin.perfil-aprendizaje.guardar');
-    Route::get('perfil-aprendizaje/{condicionInclusion}', [PerfilAprendizajeInclusionController::class, 'mostrar'])->name('superadmin.perfil-aprendizaje.mostrar');
-    Route::put('perfil-aprendizaje/{condicionInclusion}', [PerfilAprendizajeInclusionController::class, 'actualizar'])->name('superadmin.perfil-aprendizaje.actualizar');
-    Route::patch('perfil-aprendizaje/{condicionInclusion}/estado', [PerfilAprendizajeInclusionController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje.estado');
-    Route::patch('perfil-aprendizaje/{condicionInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'actualizarVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.actualizar');
-    Route::get('perfil-aprendizaje/{condicionInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'verVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.ver');
-    Route::delete('perfil-aprendizaje/{condicionInclusion}', [PerfilAprendizajeInclusionController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje.eliminar');
+    Route::get('perfil-aprendizaje/{perfilAprendizajeInclusion}', [PerfilAprendizajeInclusionController::class, 'mostrar'])->name('superadmin.perfil-aprendizaje.mostrar');
+    Route::put('perfil-aprendizaje/{perfilAprendizajeInclusion}', [PerfilAprendizajeInclusionController::class, 'actualizar'])->name('superadmin.perfil-aprendizaje.actualizar');
+    Route::patch('perfil-aprendizaje/{perfilAprendizajeInclusion}/estado', [PerfilAprendizajeInclusionController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje.estado');
+    Route::patch('perfil-aprendizaje/{perfilAprendizajeInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'actualizarVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.actualizar');
+    Route::get('perfil-aprendizaje/{perfilAprendizajeInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'verVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.ver');
+    Route::delete('perfil-aprendizaje/{perfilAprendizajeInclusion}', [PerfilAprendizajeInclusionController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje.eliminar');
 
+    // Perfiles de Aprendizaje Personalizados
     Route::get('perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoController::class, 'index'])->name('superadmin.perfil-aprendizaje-personalizado.index');
     Route::post('perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoController::class, 'guardar'])->name('superadmin.perfil-aprendizaje-personalizado.guardar');
-    Route::get('perfil-aprendizaje-personalizado/{condicionTransitoria}', [PerfilAprendizajePersonalizadoController::class, 'mostrar'])->name('superadmin.perfil-aprendizaje-personalizado.mostrar');
-    Route::put('perfil-aprendizaje-personalizado/{condicionTransitoria}', [PerfilAprendizajePersonalizadoController::class, 'actualizar'])->name('superadmin.perfil-aprendizaje-personalizado.actualizar');
-    Route::patch('perfil-aprendizaje-personalizado/{condicionTransitoria}/estado', [PerfilAprendizajePersonalizadoController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje-personalizado.estado');
-    Route::delete('perfil-aprendizaje-personalizado/{condicionTransitoria}', [PerfilAprendizajePersonalizadoController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje-personalizado.eliminar');
+    Route::get('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'mostrar'])->name('superadmin.perfil-aprendizaje-personalizado.mostrar');
+    Route::put('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'actualizar'])->name('superadmin.perfil-aprendizaje-personalizado.actualizar');
+    Route::patch('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}/estado', [PerfilAprendizajePersonalizadoController::class, 'cambiarEstado'])->name('superadmin.perfil-aprendizaje-personalizado.estado');
+    Route::delete('perfil-aprendizaje-personalizado/{perfilAprendizajePersonalizado}', [PerfilAprendizajePersonalizadoController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje-personalizado.eliminar');
+
+    // Catálogo oficial (DBA, módulos, ejes)
+    Route::get('catalogo', [CatalogoDBASuperAdminController::class, 'listar'])->name('superadmin.catalogo');
+    Route::post('catalogo', [CatalogoDBASuperAdminController::class, 'guardar'])->name('superadmin.catalogo.guardar');
+    Route::get('catalogo/datos/{id}', [CatalogoDBASuperAdminController::class, 'ver'])->name('superadmin.catalogo.datos');
+    Route::put('catalogo/{id}', [CatalogoDBASuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.actualizar');
+    Route::patch('catalogo/{id}/toggle-activo', [CatalogoDBASuperAdminController::class, 'toggleActivo'])->name('superadmin.catalogo.toggleActivo');
+
+    Route::get('catalogo/modulos', [ModulosSuperAdminController::class, 'listar'])->name('superadmin.catalogo.modulos');
+    Route::post('catalogo/ambientes/{ambiente}/modulos', [ModulosSuperAdminController::class, 'guardar'])->name('superadmin.modulos.guardar');
+    Route::get('catalogo/modulos/{modulo}', [ModulosSuperAdminController::class, 'mostrar'])->name('superadmin.modulos.mostrar');
+    Route::put('catalogo/modulos/{modulo}', [ModulosSuperAdminController::class, 'actualizar'])->name('superadmin.modulos.actualizar');
+    Route::patch('catalogo/modulos/{modulo}/estado', [ModulosSuperAdminController::class, 'actualizarEstado'])->name('superadmin.modulos.estado');
+    Route::patch('catalogo/modulos/{modulo}/mover', [ModulosSuperAdminController::class, 'mover'])->name('superadmin.modulos.mover');
+
+    Route::get('catalogo/ejes', [EjesSuperAdminController::class, 'listar'])->name('superadmin.catalogo.ejes');
+    Route::get('catalogo/modulos/{modulo}/ejes', [EjesSuperAdminController::class, 'listarPorModulo'])->name('superadmin.modulos.ejes');
+    Route::post('catalogo/modulos/{modulo}/ejes', [EjesSuperAdminController::class, 'guardar'])->name('superadmin.ejes.guardar');
+    Route::get('catalogo/ejes/{eje}', [EjesSuperAdminController::class, 'mostrar'])->name('superadmin.ejes.mostrar');
+    Route::put('catalogo/ejes/{eje}', [EjesSuperAdminController::class, 'actualizar'])->name('superadmin.ejes.actualizar');
+    Route::patch('catalogo/ejes/{eje}/estado', [EjesSuperAdminController::class, 'actualizarEstado'])->name('superadmin.ejes.estado');
+    Route::patch('catalogo/ejes/{eje}/mover', [EjesSuperAdminController::class, 'mover'])->name('superadmin.ejes.mover');
+
+    // Temáticas / experiencias oficiales
+    Route::get('catalogo/tematicas', [TematicasSuperAdminController::class, 'index'])->name('superadmin.catalogo.tematicas.index');
+    Route::get('catalogo/tematicas/listar', [TematicasSuperAdminController::class, 'listar'])->name('superadmin.catalogo.tematicas.listar');
+    Route::get('catalogo/tematicas/dbas', [TematicasSuperAdminController::class, 'buscarDbas'])->name('superadmin.catalogo.tematicas.dbas');
+    Route::get('catalogo/ejes/{eje}/tematicas', [TematicasSuperAdminController::class, 'listarPorEje'])->name('superadmin.ejes.tematicas');
+    Route::post('catalogo/ejes/{eje}/tematicas', [TematicasSuperAdminController::class, 'guardar'])->name('superadmin.catalogo.tematicas.guardar');
+    Route::get('catalogo/tematicas/{tematica}', [TematicasSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo.tematicas.mostrar');
+    Route::put('catalogo/tematicas/{tematica}', [TematicasSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.tematicas.actualizar');
+    Route::patch('catalogo/tematicas/{tematica}/estado', [TematicasSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo.tematicas.estado');
+    Route::get('catalogo/tematicas/{tematica}/experiencias', [ExperienciasSuperAdminController::class, 'listarPorTematica'])->name('superadmin.catalogo.tematicas.experiencias');
+    Route::post('catalogo/tematicas/{tematica}/experiencias', [ExperienciasSuperAdminController::class, 'guardar'])->name('superadmin.catalogo.tematicas.experiencias.guardar');
+    Route::get('catalogo/experiencias/{experiencia}/constructor', [ExperienciasSuperAdminController::class, 'constructor'])->name('superadmin.catalogo.experiencias.constructor');
+    Route::get('catalogo/experiencias/{experiencia}/bloques', [BloquesExperienciaSuperAdminController::class, 'listar'])->name('superadmin.catalogo.experiencias.bloques.index');
+    Route::post('catalogo/experiencias/{experiencia}/bloques', [BloquesExperienciaSuperAdminController::class, 'guardar'])->name('superadmin.catalogo.experiencias.bloques.guardar');
+    Route::patch('catalogo/experiencias/{experiencia}/bloques/reordenar', [BloquesExperienciaSuperAdminController::class, 'reordenar'])->name('superadmin.catalogo.experiencias.bloques.reordenar');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaSuperAdminController::class, 'limpiar'])->name('superadmin.catalogo.experiencias.bloques.limpiar');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaSuperAdminController::class, 'upload'])->name('superadmin.catalogo.experiencias.bloques.upload');
+    Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaSuperAdminController::class, 'tts'])->name('superadmin.catalogo.experiencias.bloques.tts');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaSuperAdminController::class, 'crearVistaPrevia'])->name('superadmin.catalogo.experiencias.vista-previa');
+    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaSuperAdminController::class, 'focoVistaPrevia'])->name('superadmin.catalogo.experiencias.vista-previa.foco');
+    Route::post('catalogo/experiencias/{experiencia}/recorrido-nino', [BloquesExperienciaSuperAdminController::class, 'crearRecorridoNino'])->name('superadmin.catalogo.experiencias.recorrido-nino');
+    Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaSuperAdminController::class, 'publicar'])->name('superadmin.catalogo.experiencias.publicar');
+    Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.bloques.actualizar');
+    Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaSuperAdminController::class, 'eliminar'])->name('superadmin.catalogo.bloques.eliminar');
+    Route::get('catalogo/experiencias/{experiencia}', [ExperienciasSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo.experiencias.mostrar');
+    Route::put('catalogo/experiencias/{experiencia}', [ExperienciasSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.experiencias.actualizar');
+    Route::patch('catalogo/experiencias/{experiencia}/estado', [ExperienciasSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo.experiencias.estado');
+    Route::patch('catalogo/experiencias/{experiencia}/flujo', [ExperienciasSuperAdminController::class, 'cambiarEstado'])->name('superadmin.catalogo.experiencias.flujo');
+
+    // Vista catálogo experiencias
+    Route::get('catalogo/experiencias', [ExperienciasSuperAdminController::class, 'index'])->name('superadmin.catalogo.experiencias.index');
+
 });
 
-// ── Contenido del ambiente (protegido por sesion del nino) ────────────────
+// ── Sesión del niño + contenido del ambiente ──────────────────────────────
 Route::middleware('sesion.nino')->group(function () {
+    Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
+    Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
     require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
 });

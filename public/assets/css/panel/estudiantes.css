@@ -1,7 +1,6 @@
 /*==========================
     TOKENS (página estudiantes)
 ===========================*/
-
 .students-page,
 .ficha-page {
     --stu-bg: var(--color-surface, #fff);
@@ -26,7 +25,6 @@
 /*==========================
     PÁGINA
 ===========================*/
-
 .students-page {
     display: flex;
     flex-direction: column;
@@ -64,7 +62,6 @@
 /*==========================
     ESTADÍSTICAS
 ===========================*/
-
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -144,7 +141,6 @@
 /*==========================
     FILTROS
 ===========================*/
-
 .students-toolbar {
     background: var(--stu-bg);
     border-radius: var(--stu-radius);
@@ -268,7 +264,6 @@
 /*==========================
     GRID
 ===========================*/
-
 .students-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -332,7 +327,6 @@
 /*==========================
     TARJETAS
 ===========================*/
-
 .student-card {
     background: var(--stu-bg);
     border-radius: var(--stu-radius);
@@ -453,7 +447,6 @@
 /*==========================
     BADGES
 ===========================*/
-
 .student-middle {
     display: flex;
     justify-content: flex-start;
@@ -474,7 +467,7 @@
     border: 1px solid transparent;
 }
 
-.stu-badge--condicion {
+.stu-badge--perfil-aprendizaje {
     background: var(--stu-primary-soft);
     border-color: #BFDBFE;
     color: #1D4ED8;
@@ -525,7 +518,6 @@
 /*==========================
     PIN / INFO
 ===========================*/
-
 .student-info {
     margin-top: auto;
     padding: 8px 14px 10px;
@@ -614,7 +606,6 @@
 /*==========================
     ACCIONES / OPCIONES
 ===========================*/
-
 /* Grid: mismo lugar visual (arriba a la derecha) */
 .student-options {
     position: absolute;
@@ -676,7 +667,7 @@
     margin-bottom: 2px;
 }
 
-.student-options .dropdown-menu-acciones > li:last-child .btn-accion {
+.student-options .dropdown-menu-acciones>li:last-child .btn-accion {
     margin-bottom: 0;
 }
 
@@ -704,7 +695,6 @@
 /*==========================
     CARD AGREGAR
 ===========================*/
-
 .student-card--add {
     border: 1.5px dashed #CBD5E1;
     background: var(--stu-surface);
@@ -767,7 +757,6 @@
 /*==========================
     VACÍO
 ===========================*/
-
 .students-empty {
     background: var(--stu-bg);
     border-radius: 16px;
@@ -805,7 +794,6 @@
 /*==========================
     PAGINACIÓN (propia)
 ===========================*/
-
 .students-footer {
     display: flex;
     align-items: center;
@@ -879,7 +867,6 @@
 /*==========================
     RESPONSIVE
 ===========================*/
-
 @media (max-width: 1400px) {
     .students-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -958,7 +945,6 @@
 /*==========================
     FICHA COMPLETA
 ===========================*/
-
 .ficha-page {
     display: flex;
     flex-direction: column;
@@ -1168,7 +1154,7 @@
     transition: opacity .2s ease;
 }
 
-/* Select filtrable — condición transitoria */
+/* Select filtrable — perfil de aprendizaje personalizado */
 .ct-select {
     position: relative;
 }
@@ -1266,6 +1252,18 @@
     box-shadow: 0 0 0 3px rgba(234, 88, 12, .1);
 }
 
+.modal-app .modal-content.modal-con-select {
+    overflow: visible;
+}
+
+.modal-app .modal-body.modal-body-con-select {
+    overflow: visible;
+}
+
+.modal .ct-select-panel {
+    z-index: 2000;
+}
+
 .ct-select-list {
     max-height: 220px;
     overflow-y: auto;
@@ -1315,9 +1313,8 @@
 }
 
 /*==========================
-    MODAL ACTIVAR CONDICIÓN TRANSICTORIA
+    MODAL ACTIVAR PERFIL DE APRENDIZAJE PERSONALIZADO
 ===========================*/
-
 .btn-outline-pink {
     border-color: #ff4684;
     color: #ff4684;
@@ -1326,5 +1323,16 @@
 .btn-outline-pink:hover {
     background: #ff4684;
     border-color: #ff4684;
+    color: #ffffff;
+}
+
+.btn-outline-purple {
+    border-color: #8B5CF6;
+    color: #8B5CF6;
+}
+
+.btn-outline-purple:hover {
+    background: #8B5CF6;
+    border-color: #8B5CF6;
     color: #ffffff;
 }

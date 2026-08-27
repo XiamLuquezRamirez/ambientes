@@ -1,0 +1,53 @@
+{
+    "condiciones": [
+        {
+            "slug": "tdah",
+            "nombre": "TDAH",
+            "descripcion_corta": "Información y orientaciones pedagógicas",
+            "color": "#D1F2E5",
+            "color_accent": "#22C55E"
+        },
+        {
+            "slug": "discapacidad-auditiva",
+            "nombre": "Discapacidad auditiva",
+            "descripcion_corta": "Información y orientaciones pedagógicas",
+            "color": "#FFEDD5",
+            "color_accent": "#F97316"
+        },
+        {
+            "slug": "discapacidad-intelectual",
+            "nombre": "Discapacidad intelectual",
+            "descripcion_corta": "Información y orientaciones pedagógicas",
+            "color": "#DBEAFE",
+            "color_accent": "#3B82F6"
+        },
+        {
+            "slug": "discapacidad-visual",
+            "nombre": "Discapacidad visual",
+            "descripcion_corta": "Información y orientaciones pedagógicas",
+            "color": "#EDE9FE",
+            "color_accent": "#8B5CF6"
+        },
+        {
+            "slug": "discapacidad-fisica",
+            "nombre": "Discapacidad física",
+            "descripcion_corta": "Información y orientaciones pedagógicas",
+            "color": "#FCE7F3",
+            "color_accent": "#EC4899"
+        },
+        {
+            "slug": "sindrome-down",
+            "nombre": "Síndrome de Down",
+            "descripcion_corta": "Información y orientaciones pedagógicas",
+            "color": "#FEE2E2",
+            "color_accent": "#EF4444"
+        },
+        {
+            "slug": "autismo",
+            "nombre": "Autismo",
+            "descripcion_corta": "Información y orientaciones pedagógicas",
+            "color": "#ff9f79",
+            "color_accent": "#ff9f79"
+        }
+    ]
+}

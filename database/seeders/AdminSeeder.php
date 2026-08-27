@@ -28,11 +28,11 @@ class AdminSeeder extends Seeder
             ]
         );
 
-        // Docente demo — Música, Jardín A
+        // Docente demo — Expresión Artística, Jardín A
         $usuarioDocente = User::firstOrCreate(
             ['email' => 'docente.musica@aulasreggio.test'],
             [
-                'nombre' => 'Docente Música',
+                'nombre' => 'Docente Expresión Artística',
                 'password' => Hash::make('password'),
                 'rol' => 'docente',
                 'estado' => 'activo',
@@ -46,11 +46,11 @@ class AdminSeeder extends Seeder
 
         $docente = Docente::firstOrCreate(
             ['user_id' => $usuarioDocente->id],
-            ['especialidad' => 'Educación Musical']
+            ['especialidad' => 'Expresión Artística']
         );
 
-        // Asignar carga: Música → Jardín A del año actual
-        $ambiente = Ambiente::where('slug', 'musica')->first();
+        // Asignar carga: Expresión Artística → Jardín A del año actual
+        $ambiente = Ambiente::where('slug', 'expresion-artistica')->first();
         $grado = Grado::where('nombre', 'Jardin')->first();
         $grupo = $grado ? Grupo::where('grado_id', $grado->id)
             ->where('nombre', 'A')
@@ -77,7 +77,7 @@ class AdminSeeder extends Seeder
         Configuracion::set('zona_horaria', 'America/Bogota');
 
         // Datos mock de sync_queue
-        foreach (['polimotor', 'logico', 'multisensorial', 'tecnologia'] as $slug) {
+        foreach (['polimotor', 'multisaberes', 'multisensorial', 'tecnologia'] as $slug) {
             if (! SyncQueue::where('servidor_origen', $slug)->exists()) {
                 SyncQueue::create([
                     'entidad' => 'Estudiante',

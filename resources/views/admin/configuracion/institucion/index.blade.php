@@ -1,203 +1,220 @@
 @extends('layouts.admin')
 @section('title', 'Configuración')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('assets/css/superAdmin/configuracion.css') }}">
+@endpush
+
 @section('content')
     <div class="page-header">
         <h1>Configuración</h1>
         <p style="color:#64748B">Configuración de la institución</p>
     </div>
+    <div class="c-card ">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="tab-datos-institucion" data-bs-toggle="tab" href="#datosInstitucion"
+                    role="tab" aria-controls="datosInstitucion" aria-selected="true">
+                    <i class="fas fa-university"></i> Datos de la Institución
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="tab-servidores" data-bs-toggle="tab" href="#servidores" role="tab"
+                    aria-controls="servidores" aria-selected="false">
+                    <i class="fas fa-server"></i> Servidores
+                </a>
+            </li>
+        </ul>
 
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <a class="nav-link active" id="tab-datos-institucion" data-bs-toggle="tab" href="#datosInstitucion" role="tab"
-                aria-controls="datosInstitucion" aria-selected="true">
-                <i class="fas fa-university"></i> Datos de la Institución
-            </a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" id="tab-servidores" data-bs-toggle="tab" href="#servidores" role="tab"
-                aria-controls="servidores" aria-selected="false">
-                <i class="fas fa-server"></i> Servidores
-            </a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link" id="tab-modulos" data-bs-toggle="tab" href="#modulos" role="tab" aria-controls="modulos"
-                aria-selected="false">
-                <i class="fas fa-cube"></i> Módulos
-            </a>
-        </li>
-    </ul>
-
-    <form id="formDatosInstitucion" method="POST">
-        @csrf
-        <div class="tab-content" style="padding: 20px;">
-            <div class="tab-pane container active" id="datosInstitucion" role="tabpanel"
-                aria-labelledby="tab-datos-institucion">
-                <div class="row">
-                    <div class="col-md-12 d-flex justify-content-center align-items-center">
-                        <div class="mb-3">
-                            <div class="avatar-wrapper mx-auto">
-                                <div class="profile-avatar" id="logoPerfilPrincipal" onclick="cambiarLogoPerfil()"
-                                    title="Cambiar logo" style="cursor:pointer;">
-                                    <img src="" id="logoPerfilImagen" class="profile-avatar-img d-none"
-                                        alt="Logo institución">
-                                    <span id="logoPerfilIniciales" class="profile-avatar-iniciales">
-                                        IE
-                                    </span>
-                                    <div class="avatar-overlay">
-                                        <i class="fa-solid fa-camera"></i>
-                                        <span>Cambiar logo</span>
+        <form id="formDatosInstitucion" method="POST">
+            @csrf
+            <div class="tab-content" style="padding: 20px;">
+                <div class="tab-pane container active" id="datosInstitucion" role="tabpanel"
+                    aria-labelledby="tab-datos-institucion">
+                    <div class="row">
+                        <div class="col-md-12 d-flex justify-content-center align-items-center">
+                            <div class="mb-3">
+                                <div class="avatar-wrapper mx-auto">
+                                    <div class="profile-avatar" id="logoPerfilPrincipal" onclick="cambiarLogoPerfil()"
+                                        title="Cambiar logo" style="cursor:pointer;">
+                                        <img src="{{ $logoUrlPublica ?? '' }}" id="logoPerfilImagen"
+                                            class="profile-avatar-img {{ $logoUrlPublica ? '' : 'd-none' }}"
+                                            alt="Logo institución">
+                                        <span id="logoPerfilIniciales"
+                                            class="profile-avatar-iniciales {{ $logoUrlPublica ? 'd-none' : '' }}">
+                                            {{ $iniciales ?? 'IE' }}
+                                        </span>
+                                        <div class="avatar-overlay">
+                                            <i class="fa-solid fa-camera"></i>
+                                            <span>Cambiar logo</span>
+                                        </div>
                                     </div>
                                 </div>
+                                <p class="text-muted text-center small mt-2 mb-0">
+                                    JPG o PNG · máx. 2 MB
+                                </p>
                             </div>
-                            <p class="text-muted text-center small mt-2 mb-0">
-                                JPG o PNG · máx. 2 MB
-                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" for="nombre">Nombre</label>
+                                <input type="text" id="nombre" name="nombre" class="form-control"
+                                    placeholder="Nombre de la institución" value="{{ old('nombre', $institucion->nombre) }}"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" for="codigo_dane">Código DANE</label>
+                                <input type="text" id="codigo_dane" name="codigo_dane" class="form-control"
+                                    placeholder="Código DANE de la institución"
+                                    value="{{ old('codigo_dane', $institucion->codigo_dane) }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" for="departamento_id">Departamento</label>
+                                <select id="departamento_id" name="departamento_id" class="form-control" required
+                                    onchange="cargarMunicipiosInstitucion()">
+                                    <option value="">Seleccione</option>
+                                    @foreach ($departamentos as $d)
+                                        <option value="{{ $d->codigo }}"
+                                            @selected((string) old('departamento_id', $departamentoId) === (string) $d->codigo)>
+                                            {{ $d->descripcion }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" for="municipio_id">Municipio</label>
+                                <select id="municipio_id" name="municipio_id" class="form-control" required>
+                                    <option value="">Seleccione</option>
+                                    @foreach ($municipios as $m)
+                                        <option value="{{ $m->id }}"
+                                            @selected((string) old('municipio_id', $municipioId) === (string) $m->id)>
+                                            {{ $m->descripcion }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold" for="correo_contacto">Correo de
+                                    contacto</label>
+                                <input type="email" id="correo_contacto" name="correo_contacto" class="form-control"
+                                    placeholder="Correo de contacto de la institución"
+                                    value="{{ old('correo_contacto', $institucion->correo_contacto) }}" required>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold" for="nombre">Nombre</label>
-                            <input type="text" id="nombre" name="nombre" class="form-control"
-                                placeholder="Nombre de la institución" required>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold" for="codigo_dane">Código DANE</label>
-                            <input type="text" id="codigo_dane" name="codigo_dane" class="form-control"
-                                placeholder="Código DANE de la institución" required>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold" for="municipio">Municipio</label>
-                            <input type="text" id="municipio" name="municipio" class="form-control"
-                                placeholder="Municipio de la institución" required>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold" for="departamento">Departamento</label>
-                            <input type="text" id="departamento" name="departamento" class="form-control"
-                                placeholder="Departamento de la institución" required>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold" for="correo_contacto">Correo de
-                                contacto</label>
-                            <input type="email" id="correo_contacto" name="correo_contacto" class="form-control"
-                                placeholder="Correo de contacto de la institución" required>
-                        </div>
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button type="button" class="btn btn-primary" id="btnActualizarInstitucion"
+                            onclick="actualizarDatosInstitucion()">
+                            <i class="fas fa-save"></i> Guardar cambios
+                        </button>
                     </div>
                 </div>
-                <div class="d-flex justify-content-end gap-2 mt-3">
-                    <button type="button" class="btn btn-primary" id="btnActualizarInstitucion"
-                        onclick="actualizarDatosInstitucion()">
-                        <i class="fas fa-save"></i> Guardar cambios
-                    </button>
-                </div>
-            </div>
 
-            {{-- Servidores: solo lectura (gestionados por Super Admin) --}}
-            <div class="tab-pane container" id="servidores" role="tabpanel" aria-labelledby="tab-servidores">
-                <p class="text-muted small mb-3">
-                    <i class="fas fa-lock me-1"></i>
-                    Información de servidores en solo lectura. Contacte al administrador del sistema para cambios.
-                </p>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Servidor</th>
-                                <th>IP de conexión</th>
-                                <th class="text-center">Puerto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($ambientes as $a)
+                {{-- Servidores: solo lectura (gestionados por Super Admin) --}}
+                <div class="tab-pane container" id="servidores" role="tabpanel" aria-labelledby="tab-servidores">
+                    <p class="text-muted small mb-3">
+                        <i class="fas fa-lock me-1"></i>
+                        Información de servidores en solo lectura. Contacte al administrador del sistema para cambios.
+                    </p>
+                    <div class="table-container">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td style="font-weight:bold;color:#1E293B;font-size:1.2rem;">
-                                        {{ $a->nombre }}
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control" id="ambiente_ip_{{ $a->id }}"
-                                            value="{{ $a->pivot->ip }}" readonly tabindex="-1">
-                                    </td>
-                                    <td class="text-center">
-                                        <input type="text" class="form-control" style="width:90px;margin:auto"
-                                            id="ambiente_puerto_{{ $a->id }}" value="{{ $a->pivot->puerto }}"
-                                            readonly tabindex="-1">
-                                    </td>
+                                    <th>Servidor</th>
+                                    <th>IP de conexión</th>
+                                    <th class="text-center">Puerto</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted py-4">
-                                        Sin ambientes registrados
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @forelse($ambientes as $a)
+                                    <tr>
+                                        <td style="font-weight:bold;color:#1E293B;font-size:1.2rem;">
+                                            {{ $a->nombre }}
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control"
+                                                id="ambiente_ip_{{ $a->id }}" value="{{ $a->pivot->ip }}" readonly
+                                                tabindex="-1">
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="text" class="form-control" style="width:90px;margin:auto"
+                                                id="ambiente_puerto_{{ $a->id }}" value="{{ $a->pivot->puerto }}"
+                                                readonly tabindex="-1">
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-4">
+                                            Sin ambientes activos contratados
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-
-            <div class="tab-pane container" id="modulos" role="tabpanel" aria-labelledby="tab-modulos">
-                <p class="text-muted mb-0">La asignación de módulos estará disponible próximamente.</p>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
     @include('admin.configuracion.institucion.modalLogoInstitucion')
 @endsection
 
 @push('scripts')
     <script>
-        const URL_CONFIGURACION_BASE = @json(url('admin/configuracion'));
         const URL_CONFIGURACION_UPDATE = @json(route('admin.configuracion.update'));
-        const INSTITUCION_ID = @json((int) session('institucion_id'));
+        const URL_CARGAR_MUNICIPIOS = @json(url('admin/configuracion/cargar-municipios'));
+        const INSTITUCION_ID = @json((int) $institucion->id);
 
-        cargarDatosInstitucion(INSTITUCION_ID);
+        if (typeof window.setEstadoLogoInstitucion === 'function') {
+            window.setEstadoLogoInstitucion({
+                id: INSTITUCION_ID,
+                logoUrl: @json($logoUrlPublica),
+                iniciales: @json($iniciales ?? 'IE'),
+            });
+        } else {
+            window.idInstitucionEditando = INSTITUCION_ID;
+            window.logoInstitucionActualUrl = @json($logoUrlPublica);
+            window.logoInstitucionIniciales = @json($iniciales ?? 'IE');
+        }
 
-        function cargarDatosInstitucion(id) {
-            fetch(`${URL_CONFIGURACION_BASE}/datos/${id}`, {
+        async function cargarMunicipiosInstitucion(municipioSeleccionado = null) {
+            const departamento = document.getElementById('departamento_id')?.value;
+            const selMunicipio = document.getElementById('municipio_id');
+            if (!selMunicipio) return;
+
+            selMunicipio.innerHTML = '<option value="">Seleccione</option>';
+
+            if (!departamento) return;
+
+            try {
+                const res = await fetch(`${URL_CARGAR_MUNICIPIOS}/${departamento}`, {
                     headers: {
                         'Accept': 'application/json'
                     }
-                })
-                .then(r => {
-                    if (!r.ok) throw new Error('No data');
-                    return r.json();
-                })
-                .then(resp => {
-                    if (!resp.success) throw new Error('No data');
-                    mapearDatosInstitucion(resp.data);
-                })
-                .catch(() => {
-                    mostrarToast('error', 'No se pudo cargar la información de la institución');
                 });
-        }
+                if (!res.ok) throw new Error('Error al cargar municipios');
+                const municipios = await res.json();
 
-        function mapearDatosInstitucion(data) {
-            $('#nombre').val(data.nombre ?? '');
-            $('#codigo_dane').val(data.codigo_dane ?? '');
-            $('#municipio').val(data.municipio ?? '');
-            $('#departamento').val(data.departamento ?? '');
-            $('#correo_contacto').val(data.correo_contacto ?? '');
-
-            (data.ambientes || []).forEach(function(amb) {
-                const ip = document.getElementById(`ambiente_ip_${amb.id}`);
-                const puerto = document.getElementById(`ambiente_puerto_${amb.id}`);
-                if (ip) ip.value = amb.ip ?? '';
-                if (puerto) puerto.value = amb.puerto ?? '';
-            });
-
-            if (typeof window.setEstadoLogoInstitucion === 'function') {
-                window.setEstadoLogoInstitucion({
-                    id: data.id,
-                    logoUrl: data.logo_url_publica,
-                    iniciales: data.iniciales || 'IE',
+                (municipios || []).forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.id;
+                    opt.textContent = m.descripcion;
+                    if (municipioSeleccionado != null && String(m.id) === String(municipioSeleccionado)) {
+                        opt.selected = true;
+                    }
+                    selMunicipio.appendChild(opt);
                 });
+            } catch (e) {
+                mostrarToast('error', 'Error al cargar los municipios');
             }
         }
 

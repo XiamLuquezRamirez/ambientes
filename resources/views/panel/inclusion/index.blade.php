@@ -11,10 +11,31 @@
 
     <div class="row g-3">
         <div class="col-md-6 col-lg-4">
+            <a href="{{ route('panel.inclusion.perfil-aprendizaje') }}" class="c-card inclusion-nav-card"
+                style="display:block;text-decoration:none;color:inherit;height:100%">
+                <div style="display:flex;align-items:flex-start;gap:14px">
+                    <div
+                        style="width:44px;height:44px;border-radius:12px;background:#EFF6FF;color:#2563EB;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h3 style="margin:0 0 6px;font-size:1.05rem;font-weight:700;color:#0F172A">
+                            Perfiles de Aprendizaje
+                        </h3>
+                        <p style="margin:0;color:#64748B;font-size:.9rem;line-height:1.45">
+                            Consulta los perfiles de aprendizaje de tu institución y revisa los estudiantes de tus grupos
+                            asociados a cada uno.
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-4">
             <a href="{{ route('panel.inclusion.perfil-aprendizaje-personalizado') }}" class="c-card inclusion-nav-card"
                 style="display:block;text-decoration:none;color:inherit;height:100%">
                 <div style="display:flex;align-items:flex-start;gap:14px">
-                    <div style="width:44px;height:44px;border-radius:12px;background:#FFF7ED;color:#C2410C;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <div
+                        style="width:44px;height:44px;border-radius:12px;background:#FFF7ED;color:#C2410C;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                         <i class="fa-solid fa-puzzle-piece"></i>
                     </div>
                     <div>
@@ -22,7 +43,8 @@
                             Perfiles de Aprendizaje Personalizados
                         </h3>
                         <p style="margin:0;color:#64748B;font-size:.9rem;line-height:1.45">
-                            Consulta las opciones de tu institución, crea nuevas y gestiona solo las que tú hayas registrado.
+                            Consulta las opciones de tu institución, crea nuevas y gestiona solo las que tú hayas
+                            registrado.
                         </p>
                     </div>
                 </div>

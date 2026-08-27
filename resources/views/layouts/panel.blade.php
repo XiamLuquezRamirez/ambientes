@@ -5,33 +5,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Panel Docente') — Aulas Reggio</title>
+    <title>@yield('title', 'Panel Docente') — PedNia</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
     <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}">
-    @stack('styles')
-    @stack('head')
     <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    @include('partials.sidebar-init')
     <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/info-condiciones/index.css') }}">
+    @stack('styles')
+    @stack('head')
 </head>
 
 <body>
-
     <aside class="sidebar">
-        <div class="sidebar-logo">
-            <span class="brand">
-                <img src="{{ asset('assets/images/logo.png') }}" width="100" alt="Aulas Reggio"
-                    style="width:100%;height:100%;object-fit:contain;filter: drop-shadow(0 0 0.5px rgba(238, 230, 230, 0.81));">
-            </span>
-        </div>
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
                 <a href="{{ route('panel.principal') }}"
@@ -39,155 +34,239 @@
                     <i class="fa-solid fa-house"></i> Inicio
                 </a>
             </li>
-            <div id="menu-lateral-ambiente">
-                <li class="nav-item">
-                    <a href="{{ route('panel.estudiantes') }}"
-                        class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
-                        <i class="fa-solid fa-child"></i> Estudiantes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('panel.planeacion') }}"
-                        class="{{ request()->routeIs('panel.planeacion*') ? 'active nav-link' : 'nav-link' }}">
-                        <i class="fa-solid fa-calendar-days"></i> Planeación
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('panel.portafolio') }}"
-                        class="{{ request()->routeIs('panel.portafolio*') ? 'active nav-link' : 'nav-link' }}">
-                        <i class="fa-solid fa-folder-open"></i> Portafolios
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('panel.inclusion') }}"
-                        class="{{ request()->routeIs('panel.inclusion') || request()->routeIs('panel.inclusion.ajustes') ? 'active nav-link' : 'nav-link' }}">
-                        <i class="fa-solid fa-universal-access"></i> Inclusión
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('panel.inclusion.perfil-aprendizaje-personalizado') }}"
-                        class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
-                        style="padding-left:2.1rem;font-size:.92rem">
-                        <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje Personalizados
-                    </a>
-                </li>
-            </div>
+            @php
+                $sinCargaAmbiente = !session('ambiente_nombre');
+                $clsAmbiente = $sinCargaAmbiente ? ' nav-item--ambiente-bloqueado' : '';
+                $catalogoActivo = request()->routeIs(
+                    'panel.catalogo',
+                    'panel.catalogo.detalle',
+                    'panel.catalogo.modulos',
+                    'panel.catalogo.ejes',
+                    'panel.catalogo.tematicas',
+                    'panel.catalogo.experiencias',
+                    'panel.catalogo.experiencias.*',
+                    'panel.ejes.*',
+                    'panel.tematicas.*',
+                    'panel.experiencias.*',
+                    'panel.modulos.ejes',
+                );
+                $inclusionActivo = request()->routeIs(
+                    'panel.inclusion',
+                    'panel.inclusion.ajustes',
+                    'panel.inclusion.perfil-aprendizaje',
+                    'panel.inclusion.perfil-aprendizaje.estudiantes',
+                    'panel.inclusion.perfil-aprendizaje-personalizado*',
+                );
+            @endphp
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="{{ route('panel.estudiantes') }}"
+                    class="{{ request()->routeIs('panel.estudiantes*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-child"></i> Estudiantes
+                </a>
+            </li>
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="{{ route('panel.planeacion') }}"
+                    class="{{ request()->routeIs('panel.planeacion*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-calendar-days"></i> Planeación
+                </a>
+            </li>
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="{{ route('panel.portafolio') }}"
+                    class="{{ request()->routeIs('panel.portafolio') || request()->routeIs('panel.portafolio.estudiante') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-folder-open"></i> Portafolios
+                </a>
+            </li>
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="#navCatalogoPanel" data-bs-toggle="collapse"
+                    aria-expanded="{{ $catalogoActivo ? 'true' : 'false' }}"
+                    class="nav-link {{ $catalogoActivo ? '' : 'collapsed' }}" style="cursor:pointer">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Catálogo</span>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
+                </a>
+                <div class="collapse {{ $catalogoActivo ? 'show' : '' }}" id="navCatalogoPanel">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo') }}"
+                                class="{{ request()->routeIs('panel.catalogo') || request()->routeIs('panel.catalogo.detalle') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-book-open"></i> DBA
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo.modulos') }}"
+                                class="{{ request()->routeIs('panel.catalogo.modulos') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-cube"></i> Módulos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo.ejes') }}"
+                                class="{{ request()->routeIs('panel.catalogo.ejes', 'panel.ejes.*', 'panel.modulos.ejes') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-diagram-project"></i> Ejes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo.tematicas') }}"
+                                class="{{ request()->routeIs('panel.catalogo.tematicas', 'panel.tematicas.*') && !request()->routeIs('panel.catalogo.experiencias.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-layer-group"></i> Temáticas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.catalogo.experiencias.index') }}"
+                                class="{{ request()->routeIs('panel.catalogo.experiencias.*', 'panel.experiencias.*') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-book-open-reader"></i> Experiencias
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item{{ $clsAmbiente }}">
+                <a href="#navInclusionPanel" data-bs-toggle="collapse"
+                    aria-expanded="{{ $inclusionActivo ? 'true' : 'false' }}"
+                    class="nav-link {{ $inclusionActivo ? '' : 'collapsed' }}" style="cursor:pointer">
+                    <i class="fa-solid fa-universal-access"></i>
+                    <span>Inclusión</span>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
+                </a>
+                <div class="collapse {{ $inclusionActivo ? 'show' : '' }}" id="navInclusionPanel">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="{{ route('panel.inclusion') }}"
+                                class="{{ request()->routeIs('panel.inclusion') || request()->routeIs('panel.inclusion.ajustes') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-universal-access"></i> Inclusión
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.inclusion.perfil-aprendizaje') }}"
+                                class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje') || request()->routeIs('panel.inclusion.perfil-aprendizaje.estudiantes') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.inclusion.perfil-aprendizaje-personalizado') }}"
+                                class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-puzzle-piece"></i> Perfiles personalizados
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            @include('partials.nav-link-condiciones')
+            <li class="nav-item">
+                <a href="{{ route('panel.clases') }}"
+                    class="{{ request()->routeIs('panel.clases') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-chalkboard-user"></i> Clases
+                </a>
+            </li>
         </ul>
     </aside>
-
+    @include('partials.sidebar-toggle', ['only' => 'backdrop'])
     @php
         use App\Models\User;
         use App\Services\PerfilFotoService;
         use App\Models\Institucion;
         $usuarioAuth = Auth::guard('docente')->user();
         $perfilFoto = app(PerfilFotoService::class);
-
         $logoService = app(\App\Services\InstitucionLogoService::class);
-
         if ($usuarioAuth instanceof User) {
             $usuarioAuth->loadMissing('docente');
         }
-
         $inicialesAuth = $usuarioAuth instanceof User ? $perfilFoto->iniciales($usuarioAuth) : 'NN';
         $fotoUrlPublica =
             $usuarioAuth instanceof User ? $perfilFoto->urlPublica($usuarioAuth->docente?->foto_url) : null;
         $rolAuthLabel =
             ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol ?? ''] ?? ($usuarioAuth->rol ?? '');
-
         $institucionId = session('institucion_id') ?? $usuarioAuth?->institucion_id;
         $institucion = $institucionId ? Institucion::find($institucionId) : null;
         $logoUrl = $institucion ? $logoService->urlPublica($institucion->logo) : null;
         $inicialesInstitucion = $institucion ? $logoService->iniciales($institucion) : null;
         $lugarInstitucion = $institucion
-            ? trim(collect([$institucion->municipio, $institucion->departamento])->filter()->implode(', '))
+            ? trim(
+                collect([$institucion->municipio, $institucion->departamento])
+                    ->filter()
+                    ->implode(', '),
+            )
             : '';
-
     @endphp
     <header class="header">
-        @if ($institucion)
-            <div class="header-institucion" title="{{ $institucion->nombre }}">
-                <div class="header-institucion-logo" aria-hidden="true">
-                    <img src="{{ $logoUrl ?? '' }}"
-                        alt=""
-                        class="header-institucion-img {{ $logoUrl ? '' : 'd-none' }}"
-                        onerror="this.classList.add('d-none');var f=this.nextElementSibling;if(f)f.classList.remove('d-none');">
-                    <span class="header-institucion-fallback {{ $logoUrl ? 'd-none' : '' }}">
-                        {{ $inicialesInstitucion }}
-                    </span>
-                </div>
-                <div class="header-institucion-meta">
-                    <span class="header-institucion-nombre">{{ $institucion->nombre }}</span>
-                    @if ($lugarInstitucion !== '')
-                        <span class="header-institucion-lugar">{{ $lugarInstitucion }}</span>
-                    @endif
-                </div>
-            </div>
-        @endif
-
-        <div class="header-perfil" id="headerPerfil">
-            {{-- Chip visible siempre (foto o iniciales) --}}
-            <div class="avatar" id="headerAvatar">
-                <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
-                    class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
-                <span id="headerAvatarIniciales" class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
-                    {{ $inicialesAuth }}
-                </span>
-            </div>
-            <div class="header-user-info">
-                <span class="header-user-nombre">{{ $usuarioAuth?->nombre }}</span>
-                <span class="header-user-rol">{{ $rolAuthLabel }}</span>
-            </div>
-            <span class="header-chevron">▾</span>
-
-            {{-- Dropdown --}}
-            <div class="header-dropdown">
-
-                <div class="dropdown-user-card" onclick="window.location.href='{{ route('panel.perfil') }}'">
-                    <div class="dropdown-avatar" id="dropdownAvatar">
-                        <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
-                            class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
-                        <span id="dropdownAvatarIniciales"
-                            class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
-                            {{ $inicialesAuth }}
+        @include('partials.header-start')
+        <div class="header-institucion-container">
+            @if ($institucion)
+                <div class="header-institucion" title="{{ $institucion->nombre }}">
+                    <div class="header-institucion-logo" aria-hidden="true">
+                        <img src="{{ $logoUrl ?? '' }}" alt=""
+                            class="header-institucion-img {{ $logoUrl ? '' : 'd-none' }}"
+                            onerror="this.classList.add('d-none');var f=this.nextElementSibling;if(f)f.classList.remove('d-none');">
+                        <span class="header-institucion-fallback {{ $logoUrl ? 'd-none' : '' }}">
+                            {{ $inicialesInstitucion }}
                         </span>
                     </div>
-                    <div>
-                        <div class="dropdown-nombre">{{ $usuarioAuth?->nombre }}</div>
-                        <div class="dropdown-email">{{ $usuarioAuth?->email }}</div>
-                        <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
+                    <div class="header-institucion-meta">
+                        <span class="header-institucion-nombre">{{ $institucion->nombre }}</span>
+                        @if ($lugarInstitucion !== '')
+                            <span class="header-institucion-lugar">{{ $lugarInstitucion }}</span>
+                        @endif
                     </div>
                 </div>
-
-                <div class="dropdown-section">
-                    <a href="{{ route('panel.perfil') }}" class="dropdown-item">
-                        <i class="fa-solid fa-user"></i>
-                        Mi Perfil
-                    </a>
-                    <a href="#" class="dropdown-item" onclick="abrirModalCambiarContrasena(); return false;">
-                        <i class="fa-solid fa-key"></i>
-                        Cambiar contraseña
-                    </a>
+            @endif
+            <div class="header-perfil" id="headerPerfil">
+                {{-- Chip visible siempre (foto o iniciales) --}}
+                <div class="avatar" id="headerAvatar">
+                    <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="headerAvatarImagen"
+                        class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                    <span id="headerAvatarIniciales" class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                        {{ $inicialesAuth }}
+                    </span>
                 </div>
-
-                <div class="dropdown-divider"></div>
-
-                <div class="dropdown-section">
-                    <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
-                        @csrf
-                        <button type="submit" class="dropdown-item dropdown-item-danger">
-                            <span class="dropdown-item-icon">
-                                <i class="fa-solid fa-right-from-bracket"></i>
+                <div class="header-user-info">
+                    <span class="header-user-nombre">{{ $usuarioAuth?->nombre }}</span>
+                    <span class="header-user-rol">{{ $rolAuthLabel }}</span>
+                </div>
+                <span class="header-chevron">▾</span>
+                {{-- Dropdown --}}
+                <div class="header-dropdown">
+                    <div class="dropdown-user-card" onclick="window.location.href='{{ route('panel.perfil') }}'">
+                        <div class="dropdown-avatar" id="dropdownAvatar">
+                            <img src="{{ $fotoUrlPublica ?? '' }}" alt="" id="dropdownAvatarImagen"
+                                class="avatar-img {{ $fotoUrlPublica ? '' : 'd-none' }}">
+                            <span id="dropdownAvatarIniciales"
+                                class="avatar-iniciales {{ $fotoUrlPublica ? 'd-none' : '' }}">
+                                {{ $inicialesAuth }}
                             </span>
-                            Cerrar Sesión
-                        </button>
-                    </form>
+                        </div>
+                        <div>
+                            <div class="dropdown-nombre">{{ $usuarioAuth?->nombre }}</div>
+                            <div class="dropdown-email">{{ $usuarioAuth?->email }}</div>
+                            <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-section">
+                        <a href="{{ route('panel.perfil') }}" class="dropdown-item">
+                            <i class="fa-solid fa-user"></i>
+                            Mi Perfil
+                        </a>
+                        <a href="#" class="dropdown-item"
+                            onclick="abrirModalCambiarContrasena(); return false;">
+                            <i class="fa-solid fa-key"></i>
+                            Cambiar contraseña
+                        </a>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-section">
+                        <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item dropdown-item-danger">
+                                <span class="dropdown-item-icon">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                </span>
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
-
     @include('perfil.cambiar_contrasena', ['rutaContrasena' => route('panel.perfil.contrasena')])
-
     <main class="main">
         <div class="content">
             <div class="page-header students-header">
@@ -207,20 +286,15 @@
             @yield('content')
         </div>
     </main>
+    @include('partials.info-condiciones.embed')
     <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sidebar-toggle.js') }}"></script>
+    <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
     <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
-
     <script>
-        const cargaAcademicaActiva = @json(session('ambiente_nombre'));
-        const menuLateralAmbiente = document.getElementById('menu-lateral-ambiente');
-
-        if (!cargaAcademicaActiva) {
-            menuLateralAmbiente.style.pointerEvents = 'none';
-        }
         /* ── Cerrar sesión ────────────────────────────────────── */
         document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
             e.preventDefault();
-
             Swal.fire({
                 title: '¿Deseas cerrar tu sesión?',
                 icon: 'question',
@@ -236,8 +310,6 @@
                 }
             });
         });
-
-
         /* ── Utilidades globales AJAX ────────────────────────────── */
         async function ajaxRequest(url, method = 'GET', data = null) {
             try {
@@ -270,8 +342,7 @@
                 };
             }
         }
-
-        /* ── Dropdown de perfil ──────────────────────────────────── */
+        /* ── Chevron sidebar: usa CSS .chevron (index.css) ───────── */
         document.addEventListener('DOMContentLoaded', function() {
             const perfil = document.getElementById('headerPerfil');
             if (!perfil) return;

@@ -10,32 +10,32 @@ use Illuminate\Support\Facades\DB;
 class PerfilAprendizajePersonalizadoOrdenController extends Controller
 {
     /**
-     * Sincroniza las condiciones transitorias de una institución.
+     * Sincroniza los perfiles de aprendizaje personalizados de una institución.
      *
-     * @param  array<int|string, mixed>  $seleccion  claves = id_condicion_transitoria
+     * @param  array<int|string, mixed>  $seleccion  claves = perfil_aprendizaje_personalizado_id
      */
     public function sincronizarParaInstitucion(int $institucionId, array $seleccion = []): void
     {
         // Globales (null) + propias de la institución.
         $catalogo = PerfilAprendizajePersonalizado::query()
             ->where(function ($q) use ($institucionId) {
-                $q->whereNull('id_institucion')
-                    ->orWhere('id_institucion', $institucionId);
+                $q->whereNull('institucion_id')
+                    ->orWhere('institucion_id', $institucionId);
             })
             ->ordenadas()
             ->get(['id']);
 
         DB::transaction(function () use ($institucionId, $seleccion, $catalogo) {
             PerfilAprendizajePersonalizadoOrden::query()
-                ->where('id_institucion', $institucionId)
+                ->where('institucion_id', $institucionId)
                 ->delete();
 
             $filas = [];
             $ahora = now();
             $ordenAuto = 0;
 
-            foreach ($catalogo as $condicion) {
-                $id = (int) $condicion->id;
+            foreach ($catalogo as $perfilAprendizajePersonalizado) {
+                $id = (int) $perfilAprendizajePersonalizado->id;
                 $item = $seleccion[$id] ?? $seleccion[(string) $id] ?? null;
 
                 if ($seleccion === []) {
@@ -49,8 +49,8 @@ class PerfilAprendizajePersonalizadoOrdenController extends Controller
                     : $ordenAuto;
 
                 $filas[] = [
-                    'id_institucion' => $institucionId,
-                    'id_condicion_transitoria' => $id,
+                    'institucion_id' => $institucionId,
+                    'perfil_aprendizaje_personalizado_id' => $id,
                     'orden' => $orden,
                     'activa' => $activa ? 1 : 0,
                     'created_at' => $ahora,
@@ -66,16 +66,16 @@ class PerfilAprendizajePersonalizadoOrdenController extends Controller
     }
 
     /**
-     * @return array<int, array{id_condicion_transitoria:int,orden:int,activa:bool}>
+     * @return array<int, array{perfil_aprendizaje_personalizado_id:int,orden:int,activa:bool}>
      */
     public function listarPorInstitucion(int $institucionId): array
     {
         return PerfilAprendizajePersonalizadoOrden::query()
-            ->where('id_institucion', $institucionId)
+            ->where('institucion_id', $institucionId)
             ->orderBy('orden')
-            ->get(['id_condicion_transitoria', 'orden', 'activa'])
+            ->get(['perfil_aprendizaje_personalizado_id', 'orden', 'activa'])
             ->map(fn (PerfilAprendizajePersonalizadoOrden $row) => [
-                'id_condicion_transitoria' => (int) $row->id_condicion_transitoria,
+                'perfil_aprendizaje_personalizado_id' => (int) $row->perfil_aprendizaje_personalizado_id,
                 'orden' => (int) $row->orden,
                 'activa' => (bool) $row->activa,
             ])

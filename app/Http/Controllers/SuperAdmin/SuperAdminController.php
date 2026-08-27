@@ -3,73 +3,52 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreSuperAdminRequest;
-use App\Http\Requests\UpdateSuperAdminRequest;
 use App\Models\Ambiente;
-use App\Models\SuperAdmin;
+use App\Models\Eje;
+use App\Models\Institucion;
+use App\Models\Modulo;
+use App\Models\PerfilAprendizajeInclusion;
+use App\Models\PerfilAprendizajePersonalizado;
 
 class SuperAdminController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Dashboard principal del superadministrador.
      */
     public function index()
     {
-        $ambientes = Ambiente::withCount([
-            'modulos',
-            'modulos as modulos_activos_count' => fn ($q) => $q->where('activo', true),
-        ])
+        $stats = [
+            'instituciones_total' => Institucion::query()->count(),
+            'instituciones_activas' => Institucion::query()->where('activo', true)->count(),
+            'instituciones_suspendidas' => Institucion::query()->where('activo', false)->count(),
+            'modulos_oficiales' => Modulo::query()->oficiales()->count(),
+            'modulos_oficiales_activos' => Modulo::query()->oficiales()->where('activo', true)->count(),
+            'ejes_oficiales' => Eje::query()->oficiales()->count(),
+            'ejes_oficiales_activos' => Eje::query()->oficiales()->where('activo', true)->count(),
+            'perfiles_globales' => PerfilAprendizajeInclusion::query()->where('eliminado', 0)->count(),
+            'perfiles_globales_activos' => PerfilAprendizajeInclusion::query()
+                ->where('eliminado', 0)
+                ->where('estado', 1)
+                ->count(),
+            'perfiles_personalizados' => PerfilAprendizajePersonalizado::query()
+                ->whereNull('institucion_id')
+                ->where('eliminado', 0)
+                ->count(),
+            'perfiles_personalizados_activos' => PerfilAprendizajePersonalizado::query()
+                ->whereNull('institucion_id')
+                ->where('eliminado', 0)
+                ->where('estado', 1)
+                ->count(),
+        ];
+
+        $ambientes = Ambiente::query()
+            ->withCount([
+                'modulosOficiales',
+                'modulosOficiales as modulos_oficiales_activos_count' => fn ($q) => $q->where('activo', true),
+            ])
             ->orderBy('nombre')
             ->get();
 
-        return view('superAdmin.principal', compact('ambientes'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreSuperAdminRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(SuperAdmin $superAdmin)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(SuperAdmin $superAdmin)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateSuperAdminRequest $request, SuperAdmin $superAdmin)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(SuperAdmin $superAdmin)
-    {
-        //
+        return view('superAdmin.principal', compact('stats', 'ambientes'));
     }
 }

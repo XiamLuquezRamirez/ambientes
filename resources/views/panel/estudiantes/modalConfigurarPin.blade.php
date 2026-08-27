@@ -1,4 +1,4 @@
-<div class="modal fade" id="modalConfigurarPin" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+﻿<div class="modal fade modal-app" id="modalConfigurarPin" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
     aria-labelledby="modalConfigurarPinLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">

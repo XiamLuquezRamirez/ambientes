@@ -1,4 +1,4 @@
-@extends($usuario->rol === 'admin' ? 'layouts.admin' : 'layouts.panel')
+﻿@extends($usuario->rol === 'admin' ? 'layouts.admin' : 'layouts.panel')
 @section('title', 'Diligenciar PIAR')
 @push('styles')
    <link rel="stylesheet" href="{{ asset('assets/css/piar.css') }}">
@@ -10,12 +10,19 @@
             <h1>Diligenciar PIAR</h1>
             <p>Plan Individual de Ajustes Razonables</p>
         </div>
-        <a href="javascript:window.history.back()" class="btn btn-piar-outline">
-            <i class="fas fa-arrow-left me-1"></i> Volver
-        </a>
+        <div>
+            @if ($tipo == 'actualizar')
+                <a href="{{ route('admin.piar.exportar', $estudiante) }}" target="_blank" class="btn btn-warning">
+                    <i class="fas fa-file-pdf me-1"></i> Exportar PIAR
+                </a>
+            @endif
+            <a href="javascript:window.history.back()" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-1"></i> Volver
+            </a>
+        </div>
     </div>
     <div class="piar-container">
-        <input type="hidden" id="id_estudiante_piar" value="{{ $estudiante?->id }}">
+        <input type="hidden" id="estudiante_id_piar" value="{{ $estudiante?->id }}">
         <input type="hidden" id="tipo_piar" value="{{ $tipo }}">
         {{-- Stepper --}}
         <div class="piar-stepper" id="piarStepper">
@@ -78,8 +85,8 @@
                 </div>
                 <form action="" id="form-paso-1">
                     @csrf
-                    <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
-                    <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
+                    <input type="hidden" name="estudiante_id" value="{{ $estudiante?->id }}">
+                    <input type="hidden" name="docente_id" value="{{ $docente_diligencia?->id }}">
                     <!-- Datos de diligenciamiento -->
                     <div class="card mb-3">
                         <div class="card-header">
@@ -333,8 +340,8 @@
                 <div class="card mb-3">
                     <form id="form-paso-2">
                         @csrf
-                        <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
-                        <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
+                        <input type="hidden" name="estudiante_id" value="{{ $estudiante?->id }}">
+                        <input type="hidden" name="docente_id" value="{{ $docente_diligencia?->id }}">
                         <div class="card-body row g-3">
                             <!-- Afiliación -->
                             <div class="col-md-4">
@@ -376,12 +383,7 @@
                             </div>
                             <div class="col-md-9">
                                 <label class="form-label">¿Cuál?</label>
-                                <select class="form-select" name="cual_diagnostico" id="cual_diagnostico">
-                                    <option value="">Seleccione</option>
-                                    @foreach ($condiciones as $condicion)
-                                        <option value="{{ $condicion->id }}">{{ $condicion->nombre }}</option>
-                                    @endforeach
-                                </select>
+                                <input type="text" class="form-control" name="cual_diagnostico" id="cual_diagnostico">
                             </div>
                             <!-- Atención médica -->
                             <div class="col-md-12">
@@ -528,8 +530,8 @@
                 </div>
                 <form id="form-paso-3">
                     @csrf
-                    <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
-                    <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
+                    <input type="hidden" name="estudiante_id" value="{{ $estudiante?->id }}">
+                    <input type="hidden" name="docente_id" value="{{ $docente_diligencia?->id }}">
                     <div class="card mb-3">
                         <div class="card-header">
                             Información de la Madre
@@ -664,8 +666,8 @@
                 </div>
                 <form id="form-paso-4">
                     @csrf
-                    <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
-                    <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
+                    <input type="hidden" name="estudiante_id" value="{{ $estudiante?->id }}">
+                    <input type="hidden" name="docente_id" value="{{ $docente_diligencia?->id }}">
                     <div class="row g-3">
                         <!-- Vinculación previa -->
                         <div class="col-md-12">
@@ -789,8 +791,8 @@
 
                 <form id="form-paso-5">
                     @csrf
-                    <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
-                    <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
+                    <input type="hidden" name="estudiante_id" value="{{ $estudiante?->id }}">
+                    <input type="hidden" name="docente_id" value="{{ $docente_diligencia?->id }}">
                     {{-- MOVILIDAD --}}
                     <div class="card no-border-radio">
                         <div class="card-header text-center"><strong>MOVILIDAD</strong></div>
@@ -1649,8 +1651,8 @@
                 </div>
                 <form id="form-paso-6">
                     @csrf
-                    <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
-                    <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
+                    <input type="hidden" name="estudiante_id" value="{{ $estudiante?->id }}">
+                    <input type="hidden" name="docente_id" value="{{ $docente_diligencia?->id }}">
                     <div style="margin-right: 20px;">
                         <table class="table table-bordered piar-valoracion-table mb-0">
                             <thead>
@@ -2034,8 +2036,8 @@
 
                 <form id="form-paso-7">
                     @csrf
-                    <input type="hidden" name="id_estudiante" value="{{ $estudiante?->id }}">
-                    <input type="hidden" name="id_docente" value="{{ $docente_diligencia?->id }}">
+                    <input type="hidden" name="estudiante_id" value="{{ $estudiante?->id }}">
+                    <input type="hidden" name="docente_id" value="{{ $docente_diligencia?->id }}">
                     {{-- Compromisos específicos --}}
                     <div class="card">
                         <div class="card-body">
@@ -2130,7 +2132,7 @@
     </div>
 
     {{-- Modal buscar docente --}}
-    <div class="modal fade" id="modal_buscar_docente" tabindex="-1" aria-labelledby="modal_buscar_docente_label"
+    <div class="modal fade modal-app" id="modal_buscar_docente" tabindex="-1" aria-labelledby="modal_buscar_docente_label"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

@@ -2,11 +2,9 @@
   ESTILOS MODALS / ADMIN — solo lo específico de esta capa.
   Buscador, paginación, btn-accion y modal chrome: index.css
 ==========================================================*/
-
 /* ==========================================================
    ESTADOS
 ========================================================== */
-
 .fila-cuenta-sin-usar {
     background: #FFFBEB;
 }
@@ -20,7 +18,6 @@
 /* ==========================================================
    ASIGNACIONES
 ========================================================== */
-
 .asignaciones-actuales {
     padding: 12px;
     background: var(--color-surface-soft, #F8FAFC);
@@ -59,7 +56,6 @@
 /* ==========================================================
    MODAL DOCENTES ASIGNADOS
 ========================================================== */
-
 #modalDocentesAsignados .alerta-cobertura {
     display: flex;
     align-items: center;

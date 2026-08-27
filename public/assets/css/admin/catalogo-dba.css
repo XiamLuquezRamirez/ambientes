@@ -1,0 +1,144 @@
+/**
+ * catalogo-dba.css — Admin · Catálogo unificado (MEN + colegio)
+ *
+ * Cargado en: resources/views/admin/catalogo/index.blade.php
+ *
+ * Tokens:
+ *  - badge-men / badge-colegio: origen
+ *  - badge-estado-activo / badge-estado-inactivo
+ *  - btn-ver-dba / btn-editar-dba: acciones de tabla (evita reusar btn-ver-accesos)
+ *  - #btnLimpiarFiltrosCatalogo / .btn-limpiar-filtros: estilo del botón Limpiar
+ *  - #btnNuevoDbaColegio.is-visible: evita saltos con display inline
+ */
+.badge-men {
+    background: #DBEAFE;
+    color: #1D4ED8;
+}
+
+.badge-colegio {
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.badge-estado-activo {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+.badge-estado-inactivo {
+    background: #FEE2E2;
+    color: #B91C1C;
+}
+
+.btn-limpiar-filtros {
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+}
+
+#btnNuevoDbaColegio {
+    display: none;
+}
+
+#btnNuevoDbaColegio.is-visible {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.catalogo-dba-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.catalogo-dba-page-header p {
+    color: #64748B;
+}
+
+.catalogo-dba-filtros {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.catalogo-dba-detalle-descripcion {
+    color: #334155;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 14px;
+    max-height: 320px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Modal Ver: solo scroll vertical en descripción */
+#modalVerCatalogoDBA .modal-body {
+    overflow-x: hidden;
+}
+
+#modalVerCatalogoDBA .catalogo-dba-detalle-valor {
+    color: #334155;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+#modalVerCatalogoDBA #detalleCodigo {
+    font-weight: 600;
+    color: #1E293B;
+    font-size: 1.05rem;
+}
+
+/* Columna descripción en tablas: recorte; texto completo en modal Ver */
+.catalogo-dba-col-descripcion {
+    max-width: 260px;
+    color: #64748B;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* Textarea de descripción en modales crear/editar */
+textarea.catalogo-dba-descripcion {
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.catalogo-dba-hint {
+    color: #94A3B8;
+}
+
+.btn-ver-dba {
+    background: #E2FFED;
+    border-color: #A0F5BE;
+    color: rgb(21, 160, 67);
+}
+
+.btn-ver-dba:hover {
+    background: #19C051;
+    border-color: #19C051;
+    color: #fff;
+}
+
+.btn-editar-dba {
+    background: #e4f4ff;
+    border-color: #b0d9f7;
+    color: #0541e4;
+}
+
+.btn-editar-dba:hover:not(:disabled) {
+    background: #0541e4;
+    border-color: #0541e4;
+    color: #fff;
+}
