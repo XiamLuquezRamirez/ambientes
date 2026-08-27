@@ -11,9 +11,86 @@
 }
 
 .ic-modal-shell {
+    position: relative;
     border: none;
     border-radius: 24px;
     box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.ic-btn-cerrar-seccion {
+    display: none;
+    position: absolute;
+    top: 1.35rem;
+    right: 1.35rem;
+    z-index: 5;
+    filter: invert(1) grayscale(1) brightness(2);
+}
+
+.modal-info-condicion-contenido.ic-modal-solo-seccion .ic-modal-header-contenido {
+    display: none;
+}
+
+.modal-info-condicion-contenido.ic-modal-solo-seccion .ic-btn-cerrar-seccion {
+    display: block;
+}
+
+.modal-info-condicion-contenido.ic-modal-solo-seccion .modal-content {
+    overflow: hidden;
+    max-height: 86vh;
+}
+
+.modal-info-condicion-contenido.ic-modal-solo-seccion .ic-modal-body-contenido {
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    max-height: 86vh;
+}
+
+.modal-info-condicion-contenido.ic-modal-solo-seccion .ic-contenido-html {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.modal-info-condicion-contenido.ic-modal-solo-seccion .ic-condicion-pagina {
+    padding: 0;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+}
+
+.modal-info-condicion-contenido.ic-modal-solo-seccion .autismo-section {
+    margin-bottom: 0;
+    border: none;
+    border-radius: 24px;
+    box-shadow: none;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+}
+
+.modal-info-condicion-contenido.ic-modal-solo-seccion .section-header {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.modal-info-condicion-contenido.ic-modal-solo-seccion .section-content {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
 .modal-info-condicion .modal-dialog {

@@ -9,7 +9,7 @@
     const modalCondicion = bootstrap.Modal.getOrCreateInstance(modalCondicionEl);
     const modalContenido = bootstrap.Modal.getOrCreateInstance(modalContenidoEl);
     const tituloContenido = document.getElementById('modalInfoCondicionContenidoTitulo');
-    const cuerpoContenido = document.getElementById('modalInfoCondicionContenidoBody');
+    const htmlDinamico = document.getElementById('ic-contenido-html-dinamico');
     const mapa = window.INFO_CONDICIONES_MAP || {};
 
     function abrirPrincipal() {
@@ -29,23 +29,82 @@
         modalCondicion.show();
     }
 
+    function esSelectorSeccion(valor) {
+        if (typeof valor !== 'string') return false;
+        const texto = valor.trim();
+        return texto.charAt(0) === '.' || texto.charAt(0) === '#';
+    }
+
+    function ocultarTodoContenido() {
+        document.querySelectorAll('.ic-condicion-pagina').forEach(function(pagina) {
+            pagina.style.display = 'none';
+        });
+        document.querySelectorAll('.condicion-seccion').forEach(function(seccion) {
+            seccion.style.display = 'none';
+        });
+        if (htmlDinamico) {
+            htmlDinamico.classList.add('d-none');
+            htmlDinamico.innerHTML = '';
+        }
+    }
+
+    function mostrarSeccion(selector) {
+        const seccion = document.querySelector(selector);
+        if (!seccion) return false;
+
+        const pagina = seccion.closest('.ic-condicion-pagina');
+        if (pagina) pagina.style.display = '';
+        seccion.style.display = '';
+
+        const contenido = seccion.querySelector('.section-content');
+        if (contenido) contenido.scrollTop = 0;
+
+        return true;
+    }
+
+    function mostrarHtml(html) {
+        if (!htmlDinamico) return;
+        htmlDinamico.innerHTML = html || '';
+        htmlDinamico.classList.remove('d-none');
+    }
+
     function abrirContenidoBoton(condicionSlug, botonId) {
-        const data = mapa[condicionSlug]?.[botonId];
-        if (!data) return;
+        const info = (mapa[condicionSlug] || {})[botonId];
+        if (!info) return;
+
+        ocultarTodoContenido();
+
+        const contenido = (info.contenido_html || '').trim();
+        const esSeccion = esSelectorSeccion(contenido);
+
+        modalContenidoEl.classList.toggle('ic-modal-solo-seccion', esSeccion);
 
         if (tituloContenido) {
-            tituloContenido.textContent = data.titulo || '';
-        }
-        if (cuerpoContenido) {
-            cuerpoContenido.innerHTML = data.contenido_html || '';
+            tituloContenido.textContent = esSeccion ? '' : (info.titulo || '');
         }
 
-        modalCondicionEl.addEventListener('hidden.bs.modal', function onCondicionOculta() {
-            modalCondicionEl.removeEventListener('hidden.bs.modal', onCondicionOculta);
+        if (esSeccion) {
+            mostrarSeccion(contenido);
+        } else {
+            mostrarHtml(contenido);
+        }
+
+        const cuerpoModal = modalContenidoEl.querySelector('.modal-body');
+        if (cuerpoModal) cuerpoModal.scrollTop = 0;
+
+        function mostrarModalContenido() {
             modalContenido.show();
-        });
+        }
 
-        modalCondicion.hide();
+        if (modalCondicionEl.classList.contains('show')) {
+            modalCondicionEl.addEventListener('hidden.bs.modal', function onCondicionOculta() {
+                modalCondicionEl.removeEventListener('hidden.bs.modal', onCondicionOculta);
+                mostrarModalContenido();
+            });
+            modalCondicion.hide();
+        } else {
+            mostrarModalContenido();
+        }
     }
 
     const btnVolverExterior = modalCondicionEl.querySelector('.ic-btn-volver-exterior');
