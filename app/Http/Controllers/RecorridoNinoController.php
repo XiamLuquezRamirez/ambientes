@@ -32,10 +32,12 @@ class RecorridoNinoController extends Controller
         );
 
         return view('experiencias.recorrido-nino', [
+            'modo' => 'demo',
             'token' => $token,
             'arbol' => $arbol,
             'urlExperienciaTemplate' => url('/recorrido-nino/'.$token.'/experiencia/__ID__'),
             'urlTts' => route('recorrido-nino.tts', $token),
+            'portadaImg' => asset('assets/images/ambientes/expresion-artistica-portada.png'),
         ]);
     }
 

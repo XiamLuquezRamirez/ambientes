@@ -676,15 +676,15 @@
         return wrap(`
             <h2 class="vn-title">Ahora cuéntame, ¿cómo te sentiste?</h2>
             ${instruccionHtml(d.instruccion)}
-            <div class="vn-emociones" data-vn-emocion>
+            <div class="vn-emociones" data-vn-emocion data-count="${n}">
                 ${list.map((e) => `
                     <button type="button" class="vn-emocion" data-id="${e.id}">
                         <span class="vn-op-emoji">${e.emoji}</span>
-                        ${escapar(e.label)}
+                        <span class="vn-emocion-label">${escapar(e.label)}</span>
                     </button>
                 `).join('')}
             </div>
-        `, bloque);
+        `, bloque, 'emocion');
     }
 
     function renderRecompensa(bloque) {
@@ -1352,7 +1352,6 @@
             $btn.addClass('is-playing');
             $icon.html('<i class="fa-solid fa-volume-high"></i>');
             $label.text('Sonando…');
-            $status.prop('hidden', false).text('Sonando…');
         } else if (estado === 'done') {
             $btn.addClass('is-done');
             $icon.html('<i class="fa-solid fa-rotate-right"></i>');

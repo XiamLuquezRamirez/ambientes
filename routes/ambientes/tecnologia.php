@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Controllers\Ambientes\TecnologiaController;
+use App\Http\Controllers\Ambientes\AmbienteNinoController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/inicio', [TecnologiaController::class, 'index'])->name('ambiente.inicio');
+Route::get('/recorrido', [AmbienteNinoController::class, 'recorrido'])->name('ambiente.recorrido');
+Route::get('/experiencia/{experiencia}', [AmbienteNinoController::class, 'experiencia'])->name('ambiente.experiencia');
+Route::get('/tts', [AmbienteNinoController::class, 'tts'])->name('ambiente.tts');

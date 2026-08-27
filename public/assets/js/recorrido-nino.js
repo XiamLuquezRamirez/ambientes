@@ -5,24 +5,26 @@
 (function ($) {
     'use strict';
 
-    const $app = $('#rnApp');
-    if (!$app.length) return;
+    let $app;
+    let $shell;
+    let $paso;
+    let $btnBack;
+    let $player;
+    let $btnFs;
+    let arbol;
+    let urlExperienciaTpl;
+    let urlSalir;
+    let urlContinuar;
+    let portadaImg;
+    let modo;
+    let modoSesion;
+    let modoPortada;
+    let pasoInicial;
+    let estudianteNombre;
+    let estudianteIniciales;
+    let estudianteColor;
+    let estado;
 
-    const $shell = $('#rnShell');
-    const $paso = $('#rnPaso');
-    const $btnBack = $('#rnBtnBack');
-    const $player = $('#vnDispositivo');
-    const $btnFs = $('#rnBtnFullscreen');
-
-    let arbol = { ambiente: {}, modulos: [] };
-    try {
-        arbol = JSON.parse(document.getElementById('rn-arbol')?.textContent || '{}');
-    } catch (e) {
-        arbol = { ambiente: {}, modulos: [] };
-    }
-
-    const urlExperienciaTpl = String($app.data('url-experiencia') || '');
-    const portadaImg = String($app.data('portada-img') || '');
     const DEMO_NOMBRE = 'Valentina';
     const DEMO_INICIALES = 'VA';
 
@@ -35,14 +37,6 @@
         luna: '☽',
         diamante: '◆',
         rayo: '⚡',
-    };
-
-    const estado = {
-        paso: 'pin',
-        pin: [],
-        modulo: null,
-        eje: null,
-        tematica: null,
     };
 
     const NUBE_COLORES = [
@@ -75,6 +69,7 @@
         $shell.toggleClass('rn-shell--modulos', vista === 'modulos');
         $shell.toggleClass('rn-shell--ejes', vista === 'ejes');
         $shell.toggleClass('rn-shell--info', vista === 'info');
+        $shell.toggleClass('rn-shell--camino', vista === 'camino');
     }
 
     function reiniciarAnimacionPaso() {
@@ -101,10 +96,12 @@
             return;
         }
         if (estado.paso === 'modulos') {
+            if (modoSesion || modoPortada) return;
             renderPortada();
             return;
         }
         if (estado.paso === 'portada') {
+            if (modoSesion || modoPortada) return;
             renderPin();
         }
     }
@@ -168,8 +165,8 @@
         $paso.html(`
             <div class="rn-pin">
                 <div class="rn-pin-izquierda">
-                    <div class="rn-pin-avatar" aria-hidden="true">${escapar(DEMO_INICIALES)}</div>
-                    <p class="rn-pin-nombre">${escapar(DEMO_NOMBRE)}</p>
+                    <div class="rn-pin-avatar" style="background:${escapar(estudianteColor)}" aria-hidden="true">${escapar(estudianteIniciales)}</div>
+                    <p class="rn-pin-nombre">${escapar(estudianteNombre)}</p>
                     <p class="rn-pin-instruccion">Toca tus 3 figuras</p>
                     <div class="rn-pin-indicadores" id="rnPinIndicadores">
                         <div class="rn-pin-ind" id="rnInd0"></div>
@@ -192,7 +189,7 @@
             <div class="rn-bienvenida" role="status">
                 <div class="rn-bienvenida-card">
                     <span class="rn-bienvenida-icono" aria-hidden="true">✓</span>
-                    <p class="rn-bienvenida-titulo">¡Bienvenida ${escapar(DEMO_NOMBRE)}!</p>
+                    <p class="rn-bienvenida-titulo">¡Hola, ${escapar(estudianteNombre)}!</p>
                     <p class="rn-bienvenida-sub">Vamos a explorar el ambiente</p>
                 </div>
             </div>
@@ -355,7 +352,7 @@
     function renderModulos() {
         estado.paso = 'modulos';
         marcarShellVista('modulos');
-        mostrarBack(true);
+        mostrarBack(!modoSesion);
         $paso.attr('data-paso', 'modulos');
         reiniciarAnimacionPaso();
         const modulos = arbol.modulos || [];
@@ -677,47 +674,22 @@
     }
 
     function estaEnFullscreen() {
-        return !!(document.fullscreenElement
-            || document.webkitFullscreenElement
-            || document.msFullscreenElement);
-    }
-
-    function ocultarBarraNavegador() {
-        try {
-            window.scrollTo(0, 1);
-            setTimeout(function () { window.scrollTo(0, 0); }, 120);
-        } catch (e) { /* noop */ }
+        return window.KioscoFsCore
+            ? window.KioscoFsCore.estaEnFullscreen()
+            : !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
     }
 
     function pedirFullscreen() {
-        const candidatos = [
-            document.documentElement,
-            document.getElementById('rnApp'),
-            document.body,
-        ].filter(Boolean);
-
-        let ultimoError = null;
-        const intentar = function (i) {
-            if (i >= candidatos.length) {
-                ocultarBarraNavegador();
-                return Promise.reject(ultimoError || new Error('fullscreen no soportado'));
-            }
-            const el = candidatos[i];
-            const req = el.requestFullscreen
-                || el.webkitRequestFullscreen
-                || el.webkitRequestFullScreen
-                || el.msRequestFullscreen;
-            if (!req) return intentar(i + 1);
-            return Promise.resolve(req.call(el)).catch(function (err) {
-                ultimoError = err;
-                return intentar(i + 1);
-            });
-        };
-
-        return intentar(0);
+        if (window.KioscoFsCore) {
+            return window.KioscoFsCore.entrarFullscreen(true);
+        }
+        return Promise.reject(new Error('KioscoFsCore no disponible'));
     }
 
     function salirFullscreen() {
+        if (window.KioscoFsCore) {
+            return window.KioscoFsCore.salirFullscreenExplicito();
+        }
         const salir = document.exitFullscreen
             || document.webkitExitFullscreen
             || document.webkitCancelFullScreen
@@ -729,57 +701,189 @@
     function actualizarBtnFullscreen() {
         if (!$btnFs.length) return;
         const activo = estaEnFullscreen();
+        if (window.KioscoFsCore) {
+            window.KioscoFsCore.marcarClaseFullscreen(activo);
+        }
         $btnFs.prop('hidden', activo);
         $btnFs.attr('title', activo ? 'Pantalla completa activa' : 'Pantalla completa');
         $btnFs.find('i').attr('class', activo ? 'fa-solid fa-compress' : 'fa-solid fa-expand');
     }
 
     function toggleFullscreen() {
+        if (window.KioscoFsCore) {
+            return window.KioscoFsCore.toggleFullscreen().finally(actualizarBtnFullscreen);
+        }
         if (estaEnFullscreen()) {
             return salirFullscreen().finally(actualizarBtnFullscreen);
         }
         return pedirFullscreen()
-            .catch(function () { /* iOS / navegadores sin FS */ })
+            .catch(function () { /* noop */ })
             .finally(actualizarBtnFullscreen);
     }
 
     /* ── Eventos ─────────────────────────────────────────────── */
 
-    $btnBack.on('click', irAtras);
-    $('#rnBtnSalirExperiencia').on('click', salirExperiencia);
+    function csrfToken() {
+        return String($('meta[name="csrf-token"]').attr('content') || '');
+    }
 
-    $paso.on('click', '#rnBtnIniciarAmbiente', renderModulos);
-    $paso.on('click', '[data-rn-figura]', function () {
-        seleccionarFiguraPin(String($(this).data('rn-figura') || ''), $(this));
-    });
-    $paso.on('click', '#rnBtnBorrarPin', borrarUltimaFiguraPin);
-    $paso.on('click', '[data-rn-modulo]', function () {
-        const id = Number($(this).data('rn-modulo'));
-        estado.modulo = (arbol.modulos || []).find((m) => Number(m.id) === id) || null;
-        estado.eje = null;
-        if (estado.modulo) renderEjes();
-    });
-    $paso.on('click', '[data-rn-eje]', function () {
-        seleccionarEje($(this).data('rn-eje'));
-    });
-    $paso.on('click', '[data-rn-tematica]', function () {
-        const id = Number($(this).data('rn-tematica'));
-        estado.tematica = (estado.eje?.tematicas || []).find((t) => Number(t.id) === id) || null;
-        if (estado.tematica) renderInfo();
-    });
-    $paso.on('click', '[data-rn-tab]', function () {
-        cambiarPestanaInfo(String($(this).data('rn-tab') || 'tema'));
-    });
-    $paso.on('click', '#rnBtnTtsInfo', narrarInfo);
-    $paso.on('click', '#rnBtnIniciarExperiencia', iniciarExperiencia);
+    function salirSesion() {
+        function irInicio() {
+            if (window.KioscoNav && window.KioscoNav.esRutaKiosco('/inicio')) {
+                window.KioscoNav.ir('/inicio', true);
+                return;
+            }
+            window.location.href = '/inicio';
+        }
 
-    $btnFs.on('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleFullscreen();
-    });
-    $(document).on('fullscreenchange webkitfullscreenchange MSFullscreenChange', actualizarBtnFullscreen);
-    actualizarBtnFullscreen();
+        if (!urlSalir) {
+            irInicio();
+            return;
+        }
 
-    renderPin();
+        $.ajax({
+            url: urlSalir,
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrfToken(),
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            data: JSON.stringify({ _token: csrfToken() }),
+            contentType: 'application/json',
+        }).always(irInicio);
+    }
+
+    function enlazarEventos() {
+        $btnBack.off('click.rn').on('click.rn', irAtras);
+        $('#rnBtnSalirExperiencia').off('click.rn').on('click.rn', salirExperiencia);
+
+        $paso.off('click.rn');
+        $paso.on('click.rn', '#rnBtnIniciarAmbiente', function () {
+            if (modoPortada && urlContinuar) {
+                if (window.KioscoNav && window.KioscoNav.esRutaKiosco(urlContinuar)) {
+                    window.KioscoNav.ir(urlContinuar);
+                    return;
+                }
+                window.location.href = urlContinuar;
+                return;
+            }
+            renderModulos();
+        });
+        $paso.on('click.rn', '[data-rn-figura]', function () {
+            seleccionarFiguraPin(String($(this).data('rn-figura') || ''), $(this));
+        });
+        $paso.on('click.rn', '#rnBtnBorrarPin', borrarUltimaFiguraPin);
+        $paso.on('click.rn', '[data-rn-modulo]', function () {
+            const id = Number($(this).data('rn-modulo'));
+            estado.modulo = (arbol.modulos || []).find((m) => Number(m.id) === id) || null;
+            estado.eje = null;
+            if (estado.modulo) renderEjes();
+        });
+        $paso.on('click.rn', '[data-rn-eje]', function () {
+            seleccionarEje($(this).data('rn-eje'));
+        });
+        $paso.on('click.rn', '[data-rn-tematica]', function () {
+            const id = Number($(this).data('rn-tematica'));
+            estado.tematica = (estado.eje?.tematicas || []).find((t) => Number(t.id) === id) || null;
+            if (estado.tematica) renderInfo();
+        });
+        $paso.on('click.rn', '[data-rn-tab]', function () {
+            cambiarPestanaInfo(String($(this).data('rn-tab') || 'tema'));
+        });
+        $paso.on('click.rn', '#rnBtnTtsInfo', narrarInfo);
+        $paso.on('click.rn', '#rnBtnIniciarExperiencia', iniciarExperiencia);
+
+        if ($btnFs.length) {
+            $btnFs.off('click.rn').on('click.rn', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleFullscreen();
+            });
+            actualizarBtnFullscreen();
+        }
+
+        $('#rnBtnSalirSesion').off('click.rn').on('click.rn', function (e) {
+            e.preventDefault();
+            salirSesion();
+        });
+    }
+
+    function renderInicial() {
+        if (pasoInicial === 'modulos') {
+            renderModulos();
+        } else if (pasoInicial === 'portada' || modoSesion || modoPortada) {
+            renderPortada();
+        } else {
+            renderPin();
+        }
+    }
+
+    function boot() {
+        if (window.VistaNino && typeof window.VistaNino.detener === 'function') {
+            window.VistaNino.detener();
+        }
+
+        $app = $('#rnApp');
+        if (!$app.length) return;
+
+        $shell = $('#rnShell');
+        $paso = $('#rnPaso');
+        $btnBack = $('#rnBtnBack');
+        $player = $('#vnDispositivo');
+        $btnFs = $('#rnBtnFullscreen');
+
+        try {
+            arbol = JSON.parse(document.getElementById('rn-arbol')?.textContent || '{}');
+        } catch (e) {
+            arbol = { ambiente: {}, modulos: [] };
+        }
+
+        urlExperienciaTpl = String($app.data('url-experiencia') || '');
+        urlSalir = String($app.data('url-salir') || '');
+        urlContinuar = String($app.data('url-continuar') || '');
+        portadaImg = String($app.data('portada-img') || '');
+        modo = String($app.data('modo') || 'demo');
+        modoSesion = modo === 'sesion';
+        modoPortada = modo === 'portada';
+        pasoInicial = String($app.data('paso-inicial') || (modoSesion ? 'modulos' : (modoPortada ? 'portada' : 'pin')));
+        estudianteNombre = String($app.data('estudiante-nombre') || DEMO_NOMBRE);
+        estudianteIniciales = String($app.data('estudiante-iniciales') || DEMO_INICIALES);
+        estudianteColor = String($app.data('estudiante-color') || '#7C3AED');
+
+        estado = {
+            paso: pasoInicial,
+            pin: [],
+            modulo: null,
+            eje: null,
+            tematica: null,
+        };
+
+        $shell.prop('hidden', false);
+        $player.prop('hidden', true);
+
+        if (String($app.data('ui') || '') === 'camino-lineal' && window.KioscoCamino) {
+            const ok = window.KioscoCamino.boot({
+                $app: $app,
+                $shell: $shell,
+                $paso: $paso,
+                $player: $player,
+                urlExperienciaTpl: urlExperienciaTpl,
+                onSalir: salirSesion,
+            });
+            if (ok) {
+                return;
+            }
+        }
+
+        enlazarEventos();
+        renderInicial();
+    }
+
+    $(document).on('fullscreenchange webkitfullscreenchange MSFullscreenChange', function () {
+        if ($btnFs && $btnFs.length) actualizarBtnFullscreen();
+    });
+
+    window.KioscoRecorrido = { boot };
+    $(boot);
 })(jQuery);

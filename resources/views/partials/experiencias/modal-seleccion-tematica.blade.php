@@ -1,4 +1,4 @@
-<div class="modal fade modal-app" id="modalSeleccionTematicaExp" tabindex="-1"
+<div class="modal fade modal-app exp-wizard-modal" id="modalSeleccionTematicaExp" tabindex="-1"
     aria-labelledby="modalSeleccionTematicaExpLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Ambiente;
+use App\Models\Clase;
 use App\Models\Eje;
 use App\Models\Experiencia;
 use App\Models\Modulo;
@@ -111,34 +112,54 @@ class RecorridoNinoService
     }
 
     /**
-     * Árbol curricular para el demo: módulos → ejes → temáticas (camino).
+     * Árbol curricular: módulos → ejes → temáticas (camino).
+     * Con $clase se acota a módulo/eje/temática/experiencia de esa clase.
      *
      * @return array{ambiente: array, modulos: array<int, array>}
      */
-    public function armarArbol(Ambiente $ambiente, ?int $experienciaOrigenId = null): array
+    public function armarArbol(Ambiente $ambiente, ?int $experienciaOrigenId = null, ?Clase $clase = null): array
     {
         $experienciaOrigen = null;
-        if ($experienciaOrigenId) {
+        if ($clase?->experiencia_id) {
+            $experienciaOrigen = Experiencia::query()->find($clase->experiencia_id);
+        } elseif ($experienciaOrigenId) {
             $experienciaOrigen = Experiencia::query()->find($experienciaOrigenId);
         }
 
-        $modulos = $ambiente->modulos()
+        $modulosQuery = $ambiente->modulos()
             ->where('activo', true)
             ->orderBy('orden')
-            ->orderBy('id')
+            ->orderBy('id');
+
+        if ($clase?->modulo_id) {
+            $modulosQuery->where('id', $clase->modulo_id);
+        }
+
+        $modulos = $modulosQuery
             ->with([
-                'ejes' => fn ($q) => $q->where('activo', true)->orderBy('orden')->orderBy('id'),
+                'ejes' => function ($q) use ($clase) {
+                    $q->where('activo', true)->orderBy('orden')->orderBy('id');
+                    if ($clase?->eje_id) {
+                        $q->where('id', $clase->eje_id);
+                    }
+                },
             ])
             ->get();
 
-        $modulosPayload = $modulos->map(function (Modulo $modulo) use ($experienciaOrigen) {
-            $ejes = collect($modulo->ejes)->map(function (Eje $eje) use ($experienciaOrigen) {
-                $tematicas = Tematica::query()
+        $modulosPayload = $modulos->map(function (Modulo $modulo) use ($experienciaOrigen, $clase) {
+            $ejes = collect($modulo->ejes)->map(function (Eje $eje) use ($experienciaOrigen, $clase) {
+                $tematicasQuery = Tematica::query()
                     ->where('eje_id', $eje->id)
                     ->where('activo', true)
                     ->where('estado', '!=', Tematica::ESTADO_ARCHIVADA)
                     ->with(['catalogosDba:id,codigo,descripcion'])
-                    ->orderBy('id')
+                    ->orderBy('id');
+
+                if ($clase?->tematica_id) {
+                    $tematicasQuery->where('id', $clase->tematica_id);
+                }
+
+                $tematicas = $tematicasQuery
                     ->get()
                     ->map(fn (Tematica $t) => $this->serializarTematicaCamino($t, $experienciaOrigen))
                     ->values()
@@ -182,6 +203,146 @@ class RecorridoNinoService
     }
 
     /**
+     * Valida que el árbol acotado por clase sea una sola ruta curricular.
+     */
+    public function arbolEsCaminoUnico(array $arbol, Clase $clase): bool
+    {
+        return $this->motivoArbolNoLineal($arbol, $clase) === null;
+    }
+
+    public function motivoArbolNoLineal(array $arbol, Clase $clase): ?string
+    {
+        $modulos = $arbol['modulos'] ?? [];
+
+        if (count($modulos) !== 1) {
+            return 'Se esperaba un solo módulo en el recorrido de la clase.';
+        }
+
+        $modulo = $modulos[0];
+        $ejes = $modulo['ejes'] ?? [];
+
+        if (count($ejes) !== 1) {
+            return 'Se esperaba un solo eje en el recorrido de la clase.';
+        }
+
+        $eje = $ejes[0];
+        $tematicas = $eje['tematicas'] ?? [];
+
+        if (count($tematicas) !== 1) {
+            return 'Se esperaba una sola temática en el recorrido de la clase.';
+        }
+
+        $tematica = $tematicas[0];
+        $expId = (int) ($tematica['experiencia_id'] ?? 0);
+
+        if ($expId <= 0) {
+            return 'La temática de la clase no tiene experiencia asociada.';
+        }
+
+        if ((int) $clase->experiencia_id !== $expId) {
+            return 'La experiencia del árbol no coincide con la clase activa.';
+        }
+
+        if ((int) $modulo['id'] !== (int) $clase->modulo_id
+            || (int) $eje['id'] !== (int) $clase->eje_id
+            || (int) $tematica['id'] !== (int) $clase->tematica_id) {
+            return 'El árbol curricular no coincide con la clase activa.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Datos del camino lineal del kiosco (paradas + coordenadas del mapa).
+     *
+     * @return array<string, mixed>|null
+     */
+    public function armarCaminoLineal(array $arbol, Clase $clase, ?\App\Models\Estudiante $estudiante = null): ?array
+    {
+        if ($this->motivoArbolNoLineal($arbol, $clase) !== null) {
+            return null;
+        }
+
+        $modulo = $arbol['modulos'][0];
+        $eje = $modulo['ejes'][0];
+        $tematica = $eje['tematicas'][0];
+        $ambiente = $arbol['ambiente'] ?? [];
+        $nombreEst = $estudiante?->nombre ?? 'Amigo';
+
+        $paradas = [
+            [
+                'id' => 'inicio',
+                'etiqueta' => 'Inicio',
+                'titulo' => '¡Hola, '.$nombreEst.'!',
+                'texto' => 'Hoy explorarás '.$ambiente['nombre'].' '.$ambiente['icono'].'. ¡Vamos a recorrer el camino!',
+            ],
+            [
+                'id' => 'modulo',
+                'etiqueta' => 'Módulo',
+                'titulo' => $modulo['nombre'],
+                'texto' => $modulo['descripcion'] ?: 'Este es el módulo de la clase de hoy.',
+                'icono' => $modulo['icono'] ?? '📚',
+            ],
+            [
+                'id' => 'eje',
+                'etiqueta' => 'Eje',
+                'titulo' => $eje['nombre'],
+                'texto' => $eje['descripcion'] ?: 'Seguimos por este eje de aprendizaje.',
+            ],
+            [
+                'id' => 'tematica',
+                'etiqueta' => 'Temática',
+                'titulo' => $tematica['nombre'],
+                'texto' => $tematica['competencia'] ?: 'Llegaste a la temática del día.',
+            ],
+            [
+                'id' => 'info',
+                'etiqueta' => 'Info',
+                'titulo' => $tematica['nombre'],
+                'texto' => trim(implode("\n\n", array_filter([
+                    $tematica['competencia'] ?? null,
+                    $tematica['experiencia_objetivo'] ?? null,
+                    $tematica['experiencia_proposito'] ?? null,
+                ]))) ?: 'Conoce un poco más antes de la experiencia.',
+                'tematica' => $tematica,
+            ],
+            [
+                'id' => 'experiencia',
+                'etiqueta' => 'Experiencia',
+                'titulo' => $tematica['experiencia_nombre'] ?? 'Experiencia',
+                'texto' => $tematica['experiencia_objetivo'] ?? '¡Es hora de vivir la experiencia!',
+                'experiencia_id' => (int) $tematica['experiencia_id'],
+            ],
+            [
+                'id' => 'fin',
+                'etiqueta' => 'Fin',
+                'titulo' => '¡Terminaste!',
+                'texto' => 'Completaste el recorrido de hoy. ¡Muy bien!',
+            ],
+        ];
+
+        // Camino horizontal sinuoso (izquierda → derecha), estilo mapa de temáticas.
+        $puntos = [
+            ['x' => 8, 'y' => 52],
+            ['x' => 22, 'y' => 30],
+            ['x' => 36, 'y' => 68],
+            ['x' => 50, 'y' => 36],
+            ['x' => 64, 'y' => 64],
+            ['x' => 78, 'y' => 40],
+            ['x' => 92, 'y' => 54],
+        ];
+
+        return [
+            'paradas' => $paradas,
+            'puntos' => $puntos,
+            'experiencia_id' => (int) $tematica['experiencia_id'],
+            'tematica' => $tematica,
+            'modulo' => ['id' => $modulo['id'], 'nombre' => $modulo['nombre']],
+            'eje' => ['id' => $eje['id'], 'nombre' => $eje['nombre']],
+        ];
+    }
+
+    /**
      * @return array{experiencia: array, bloques: array, media_base: string}|null
      */
     public function payloadExperiencia(Experiencia $experiencia): ?array
@@ -203,6 +364,12 @@ class RecorridoNinoService
     public function experienciaPermitidaEnSesion(array $sesion, Experiencia $experiencia): bool
     {
         $ambienteId = (int) ($sesion['ambiente_id'] ?? 0);
+        $claseExperienciaId = isset($sesion['experiencia_id']) ? (int) $sesion['experiencia_id'] : null;
+
+        if ($claseExperienciaId) {
+            return (int) $experiencia->id === $claseExperienciaId;
+        }
+
         $experiencia->loadMissing('tematica.eje.modulo');
 
         return $experiencia->tematica?->eje?->modulo

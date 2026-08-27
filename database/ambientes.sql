@@ -1,14 +1,10 @@
 /*
-SQLyog Community v13.3.0 (64 bit)
+SQLyog Community v13.3.1 (64 bit)
 MySQL - 8.0.41 : Database - ambientes
-Charset / Collation: utf8mb4 / utf8mb4_unicode_ci
 *********************************************************************
 */
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci */;
+/*!40101 SET NAMES utf8 */;
 
 /*!40101 SET SQL_MODE=''*/;
 
@@ -16,14 +12,9 @@ Charset / Collation: utf8mb4 / utf8mb4_unicode_ci
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
-CREATE DATABASE IF NOT EXISTS `ambientes`
-  DEFAULT CHARACTER SET utf8mb4
-  DEFAULT COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`ambientes` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
 USE `ambientes`;
-
-/*!40101 SET character_set_client = utf8mb4 */;
 
 /*Table structure for table `actividades` */
 
@@ -32,8 +23,8 @@ DROP TABLE IF EXISTS `actividades`;
 CREATE TABLE `actividades` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `tema_id` bigint unsigned NOT NULL,
-  `tipo` enum('audio','video_lsc','animacion','juego','simulacion') NOT NULL,
-  `contenido_path` varchar(255) NOT NULL,
+  `tipo` enum('audio','video_lsc','animacion','juego','simulacion') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `contenido_path` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `configuracion` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -52,8 +43,8 @@ DROP TABLE IF EXISTS `ajustes_temporales`;
 CREATE TABLE `ajustes_temporales` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
-  `clave` varchar(255) NOT NULL,
-  `valor` varchar(255) NOT NULL,
+  `clave` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valor` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `expira_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -82,7 +73,7 @@ CREATE TABLE `ambiente_grado` (
 
 /*Data for the table `ambiente_grado` */
 
-insert  into `ambiente_grado`(`id`,`ambiente_id`,`grado_id`,`activo`) values
+insert  into `ambiente_grado`(`id`,`ambiente_id`,`grado_id`,`activo`) values 
 (1,1,1,1),
 (2,1,2,1),
 (3,1,3,1),
@@ -119,7 +110,7 @@ CREATE TABLE `ambiente_institucion` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `ambiente_id` bigint unsigned NOT NULL,
   `institucion_id` bigint unsigned NOT NULL,
-  `ip` varchar(45) DEFAULT NULL,
+  `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `puerto` smallint unsigned DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -129,16 +120,16 @@ CREATE TABLE `ambiente_institucion` (
   KEY `ambiente_institucion_institucion_id_foreign` (`institucion_id`),
   CONSTRAINT `ambiente_institucion_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `ambiente_institucion_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `ambiente_institucion` */
 
-insert  into `ambiente_institucion`(`id`,`ambiente_id`,`institucion_id`,`ip`,`puerto`,`activo`,`created_at`,`updated_at`) values
-(2,6,1,'192.168.1.11',NULL,1,'2026-08-04 08:52:01','2026-08-04 08:52:01'),
-(3,7,1,'192.168.1.12',NULL,1,'2026-08-04 08:52:01','2026-08-04 08:52:01'),
-(4,8,1,'192.168.1.13',NULL,1,'2026-08-04 08:52:01','2026-08-04 08:52:01'),
-(5,9,1,'192.168.1.14',NULL,1,'2026-08-04 08:52:01','2026-08-04 08:52:01'),
-(6,10,1,'192.168.1.15',NULL,1,'2026-08-04 08:52:01','2026-08-04 08:52:01');
+insert  into `ambiente_institucion`(`id`,`ambiente_id`,`institucion_id`,`ip`,`puerto`,`activo`,`created_at`,`updated_at`) values 
+(2,6,1,'192.168.1.22',NULL,1,'2026-08-04 08:52:01','2026-08-27 14:21:35'),
+(3,7,1,'192.168.1.12',NULL,1,'2026-08-04 08:52:01','2026-08-15 08:50:18'),
+(4,8,1,'192.168.1.13',NULL,1,'2026-08-04 08:52:01','2026-08-15 08:50:18'),
+(7,9,1,'192.168.1.14',NULL,1,'2026-08-10 12:01:57','2026-08-15 08:50:18'),
+(8,10,1,'192.168.1.15',NULL,1,'2026-08-11 09:47:09','2026-08-15 08:50:18');
 
 /*Table structure for table `ambientes` */
 
@@ -146,11 +137,11 @@ DROP TABLE IF EXISTS `ambientes`;
 
 CREATE TABLE `ambientes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `color_hex` varchar(9) NOT NULL,
-  `icono` varchar(255) NOT NULL,
-  `servidor_ip` varchar(15) DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_hex` varchar(9) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `icono` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `servidor_ip` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `cupo_defecto` smallint unsigned NOT NULL DEFAULT '25',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -161,12 +152,36 @@ CREATE TABLE `ambientes` (
 
 /*Data for the table `ambientes` */
 
-insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values
-(6,'Expresión Artística','expresion-artistica','#0F6E56','🎨','192.168.1.20',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(7,'Polimotor','polimotor','#534AB7','🤸','192.168.1.21',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(8,'Multisaberes','multisaberes','#854F0B','🧠','192.168.1.22',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values 
+(6,'Expresión Artística','expresion-artistica','#0F6E56','?','192.168.1.20',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(7,'Polimotor','polimotor','#534AB7','?','192.168.1.21',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(8,'Multisaberes','multisaberes','#854F0B','?','192.168.1.22',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
 (9,'Multisensorial','multisensorial','#185FA5','✋','192.168.1.23',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(10,'Tecnología','tecnologia','#993C1D','💻','192.168.1.24',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25');
+(10,'Tecnología','tecnologia','#993C1D','?','192.168.1.24',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25');
+
+/*Table structure for table `areas` */
+
+DROP TABLE IF EXISTS `areas`;
+
+CREATE TABLE `areas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `estado` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `areas_nombre_unique` (`nombre`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `areas` */
+
+insert  into `areas`(`id`,`nombre`,`estado`,`created_at`,`updated_at`) values 
+(1,'Lenguaje',1,'2026-08-11 14:22:04','2026-08-11 14:22:04'),
+(2,'Matemáticas',1,'2026-08-11 14:22:04','2026-08-11 14:22:04'),
+(3,'Ciencias Naturales',1,'2026-08-11 14:22:04','2026-08-11 14:22:04'),
+(4,'Ciencias Sociales',1,'2026-08-11 14:22:04','2026-08-11 14:22:04'),
+(5,'Artística',1,'2026-08-11 14:22:04','2026-08-11 14:22:04'),
+(6,'Corporal',1,'2026-08-11 14:22:04','2026-08-11 14:22:04');
 
 /*Table structure for table `asistencias` */
 
@@ -188,6 +203,39 @@ CREATE TABLE `asistencias` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `asistencias` */
+
+/*Table structure for table `bloques_experiencia` */
+
+DROP TABLE IF EXISTS `bloques_experiencia`;
+
+CREATE TABLE `bloques_experiencia` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `experiencia_id` bigint unsigned NOT NULL,
+  `tipo` enum('bienvenida','audio','video','imagen','historia','ra','evidencia','juego','dibujo','pregunta','emparejar','clasificacion','arrastrar','reto','emocion','recompensa') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `orden` tinyint unsigned NOT NULL,
+  `datos` json NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bloques_experiencia_experiencia_orden_unique` (`experiencia_id`,`orden`),
+  KEY `bloques_experiencia_experiencia_id_index` (`experiencia_id`),
+  KEY `bloques_experiencia_tipo_index` (`tipo`),
+  CONSTRAINT `bloques_experiencia_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=198 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `bloques_experiencia` */
+
+insert  into `bloques_experiencia`(`id`,`experiencia_id`,`tipo`,`orden`,`datos`,`activo`,`created_at`,`updated_at`) values 
+(152,23,'bienvenida',1,'{\"video\": \"Hola_bienvenidos_como_estan_amigos_karol_sevilla_6a8cb9b05b33c.mp4\", \"imagen\": \"\", \"personaje\": \"personaje\", \"tipo_media\": \"video\", \"instruccion\": null, \"descripcion_accesible\": null}',1,'2026-08-24 16:19:30','2026-08-26 16:30:53'),
+(153,23,'recompensa',7,'{\"tipo\": \"Insignia especial\", \"insignia\": \"buen_trabajo_6a8cc29d10dbd.jpg\", \"instruccion\": \"“¡Excelente trabajo! Completaste la actividad de identifica los colores.”\\n“¡Sigue explorando y aprendiendo con tus sentidos!”\"}',1,'2026-08-24 16:19:30','2026-08-26 16:30:53'),
+(154,23,'imagen',2,'{\"archivo\": \"images_1__6a8cba946059d.jpg\", \"descripcion\": null, \"instruccion\": \"Zoe: “Mira estos colores. ¿Reconoces alguno?”.\\nZeus: “Observa muy bien, porque los colores nos ayudan a describir lo que vemos.”\"}',1,'2026-08-24 16:37:57','2026-08-26 16:30:53'),
+(155,23,'pregunta',3,'{\"fb_ok\": \"¡Muy bien! Es de color rojo.\", \"texto\": \"¿Qué pintamos de este color?\", \"fb_err\": \"Mira otra vez. Busca el color rojo.\", \"imagen\": \"paint-splash-red-abstract-blot-burgundy-cartoon-paint-splatter-vector_6a8cbf87ca7de.jpg\", \"intentos\": \"2\", \"opciones\": [{\"emoji\": null, \"texto\": null, \"imagen\": \"fire-truck-coloring-page-isolated-for-kids-free-vector_6a8cbf91021b8.jpg\", \"correcta\": true}, {\"emoji\": null, \"texto\": null, \"imagen\": \"Dibujo-Basico-Limon_6a8cbf9516212.jpg\", \"correcta\": false}, {\"emoji\": null, \"texto\": null, \"imagen\": \"images_2__6a8cbfb90a163.jpg\", \"correcta\": false}], \"al_agotar\": \"Mostrar respuesta correcta\", \"tipo_opts\": \"imagen_texto\", \"instruccion\": \"¿Qué pintamos de este color?\"}',1,'2026-08-24 17:02:14','2026-08-26 16:30:53'),
+(156,23,'pregunta',4,'{\"fb_ok\": \"¡Muy bien! Es de color amarillo.\", \"texto\": \"¿Qué podemos pintar de amarillo?\", \"fb_err\": \"Mira otra vez. Busca el color amarillo.\", \"imagen\": null, \"intentos\": \"2\", \"opciones\": [{\"emoji\": null, \"texto\": null, \"imagen\": \"images_6a8cc1b76bb75.png\", \"correcta\": true}, {\"emoji\": null, \"texto\": null, \"imagen\": \"icon-bunch-of-grapes-with-a-leaf-contour-drawing-of-fruit-illustration-vector_6a8cc1baac6b0.jpg\", \"correcta\": false}, {\"texto\": null, \"imagen\": \"c08d236bc31419bd543bb9f56f0348c2_6a8cc1c00bee4.jpg\", \"correcta\": false}], \"al_agotar\": \"Mostrar respuesta correcta\", \"tipo_opts\": \"imagen_texto\", \"instruccion\": null}',1,'2026-08-24 17:10:19','2026-08-26 16:30:53'),
+(157,23,'pregunta',5,'{\"fb_ok\": \"¡Muy bien! Es de color azul.\", \"texto\": \"¿Qué podemos pintar de azul?\", \"fb_err\": \"Mira otra vez. Busca el color azul\", \"imagen\": null, \"intentos\": \"2\", \"opciones\": [{\"emoji\": null, \"texto\": null, \"imagen\": \"Fresa-Facil_6a8cc23286b4e.jpg\", \"correcta\": false}, {\"emoji\": null, \"texto\": null, \"imagen\": \"mar_6a8cc2377e437.jpg\", \"correcta\": true}, {\"texto\": null, \"imagen\": \"girasol_6a8cc23b19083.jpg\", \"correcta\": false}], \"al_agotar\": \"Mostrar respuesta correcta\", \"tipo_opts\": \"imagen_texto\", \"instruccion\": null}',1,'2026-08-24 17:13:34','2026-08-26 16:30:53'),
+(158,23,'emocion',6,'{\"cantidad\": \"6\", \"instruccion\": \"Ahora cuéntame, ¿cómo te sentiste?\"}',1,'2026-08-24 17:15:28','2026-08-26 16:30:53'),
+(159,24,'bienvenida',1,'{\"video\": \"\", \"imagen\": \"\", \"personaje\": \"personaje\", \"tipo_media\": \"ninguno\", \"instruccion\": \"\", \"descripcion_accesible\": \"\"}',1,'2026-08-25 08:17:10','2026-08-25 08:57:10'),
+(160,24,'recompensa',2,'{\"tipo\": \"Trofeo\", \"insignia\": \"\", \"instruccion\": \"\"}',1,'2026-08-25 08:17:10','2026-08-25 08:57:10');
 
 /*Table structure for table `carga_docente` */
 
@@ -213,16 +261,97 @@ CREATE TABLE `carga_docente` (
   CONSTRAINT `carga_docente_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `carga_docente_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`),
   CONSTRAINT `carga_docente_grupo_id_foreign` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `carga_docente` */
 
-insert  into `carga_docente`(`id`,`docente_id`,`ambiente_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`activo`,`created_at`,`updated_at`) values
+insert  into `carga_docente`(`id`,`docente_id`,`ambiente_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`activo`,`created_at`,`updated_at`) values 
 (2,2,8,1,1,2026,1,'2026-08-04 09:02:28','2026-08-04 09:02:28'),
 (3,2,8,1,28,2026,1,'2026-08-04 09:02:35','2026-08-04 09:02:35'),
 (4,2,8,2,3,2026,1,'2026-08-04 09:02:44','2026-08-04 09:02:44'),
 (5,2,8,2,4,2026,0,'2026-08-04 09:02:52','2026-08-04 09:02:54'),
-(6,2,9,1,1,2026,1,'2026-08-04 09:03:15','2026-08-04 09:03:15');
+(6,2,9,1,1,2026,1,'2026-08-04 09:03:15','2026-08-04 09:03:15'),
+(7,2,6,1,1,2026,1,'2026-08-10 14:57:09','2026-08-10 14:57:09'),
+(8,2,6,1,28,2026,1,'2026-08-26 14:57:46','2026-08-26 14:59:51'),
+(9,2,6,2,3,2026,0,'2026-08-26 14:58:00','2026-08-26 14:58:05');
+
+/*Table structure for table `catalogo_dba` */
+
+DROP TABLE IF EXISTS `catalogo_dba`;
+
+CREATE TABLE `catalogo_dba` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `codigo` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `area_id` bigint unsigned NOT NULL,
+  `grado_id` bigint unsigned NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `es_men` tinyint(1) NOT NULL DEFAULT '1',
+  `estado` tinyint(1) NOT NULL DEFAULT '1',
+  `institucion_id` bigint unsigned DEFAULT NULL,
+  `creado_por` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `catalogo_dba_institucion_codigo_unique` (`institucion_id`,`codigo`),
+  KEY `catalogo_dba_area_id_foreign` (`area_id`),
+  KEY `catalogo_dba_grado_id_foreign` (`grado_id`),
+  KEY `catalogo_dba_institucion_id_foreign` (`institucion_id`),
+  KEY `catalogo_dba_creado_por_foreign` (`creado_por`),
+  CONSTRAINT `catalogo_dba_area_id_foreign` FOREIGN KEY (`area_id`) REFERENCES `areas` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `catalogo_dba_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `catalogo_dba_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `catalogo_dba_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `catalogo_dba` */
+
+insert  into `catalogo_dba`(`id`,`codigo`,`area_id`,`grado_id`,`descripcion`,`es_men`,`estado`,`institucion_id`,`creado_por`,`created_at`,`updated_at`) values 
+(1,'1',5,1,'asdsadasdasdasdasdsadasdasdasd',0,1,1,16,'2026-08-11 15:18:50','2026-08-12 10:16:14'),
+(2,'1',3,1,'esto es prueba',1,1,NULL,1,'2026-08-11 16:10:24','2026-08-11 16:10:24'),
+(3,'2',5,2,'asdasdasdasdasdsad',1,1,NULL,1,'2026-08-12 11:57:22','2026-08-12 11:57:22');
+
+/*Table structure for table `clases` */
+
+DROP TABLE IF EXISTS `clases`;
+
+CREATE TABLE `clases` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `carga_docente_id` bigint unsigned NOT NULL,
+  `docente_id` bigint unsigned NOT NULL,
+  `ambiente_id` bigint unsigned NOT NULL,
+  `modulo_id` bigint unsigned DEFAULT NULL,
+  `eje_id` bigint unsigned DEFAULT NULL,
+  `tematica_id` bigint unsigned DEFAULT NULL,
+  `experiencia_id` bigint unsigned DEFAULT NULL,
+  `nombre` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `fecha` date DEFAULT NULL,
+  `estado` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'borrador',
+  `anio_lectivo` smallint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `clases_ambiente_id_foreign` (`ambiente_id`),
+  KEY `clases_modulo_id_foreign` (`modulo_id`),
+  KEY `clases_eje_id_foreign` (`eje_id`),
+  KEY `clases_tematica_id_foreign` (`tematica_id`),
+  KEY `clases_experiencia_id_foreign` (`experiencia_id`),
+  KEY `clases_carga_docente_id_anio_lectivo_index` (`carga_docente_id`,`anio_lectivo`),
+  KEY `clases_docente_id_ambiente_id_anio_lectivo_index` (`docente_id`,`ambiente_id`,`anio_lectivo`),
+  CONSTRAINT `clases_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `clases_carga_docente_id_foreign` FOREIGN KEY (`carga_docente_id`) REFERENCES `carga_docente` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `clases_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `clases_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `clases_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `clases_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `clases_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `clases` */
+
+insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`modulo_id`,`eje_id`,`tematica_id`,`experiencia_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values 
+(1,7,2,6,1,1,5,23,'Identifica los colores',NULL,'2026-08-27','activa',2026,'2026-08-26 14:30:12','2026-08-27 14:13:34'),
+(4,8,2,6,1,1,5,23,'Identifica los colores',NULL,'2026-08-27','finalizada',2026,'2026-08-27 14:12:40','2026-08-27 14:13:18');
 
 /*Table structure for table `cola_sincronizacion` */
 
@@ -230,23 +359,23 @@ DROP TABLE IF EXISTS `cola_sincronizacion`;
 
 CREATE TABLE `cola_sincronizacion` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `entidad` varchar(255) NOT NULL,
+  `entidad` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `entidad_id` bigint unsigned NOT NULL,
-  `accion` enum('create','update','delete','transfer') NOT NULL,
-  `servidor_origen` varchar(255) NOT NULL DEFAULT 'musica',
+  `accion` enum('create','update','delete','transfer') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `servidor_origen` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'musica',
   `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `estado` enum('pendiente','enviado','confirmado','error') NOT NULL DEFAULT 'pendiente',
+  `estado` enum('pendiente','enviado','confirmado','error') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pendiente',
   `intentos` tinyint unsigned NOT NULL DEFAULT '0',
   `enviado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `cola_sincronizacion_chk_1` CHECK (json_valid(`payload`))
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `cola_sincronizacion` */
 
-insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servidor_origen`,`payload`,`estado`,`intentos`,`enviado_en`,`created_at`,`updated_at`) values
+insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servidor_origen`,`payload`,`estado`,`intentos`,`enviado_en`,`created_at`,`updated_at`) values 
 (1,'Estudiante',1,'update','polimotor','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (2,'Estudiante',1,'update','logico','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (3,'Estudiante',1,'update','multisensorial','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
@@ -280,73 +409,107 @@ insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servido
 (31,'CargaDocente',6,'create','musica','{\"id\":6,\"docente_id\":2,\"ambiente_id\":9,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-04T14:03:15.000000Z\",\"updated_at\":\"2026-08-04T14:03:15.000000Z\",\"servidor_destino\":\"polimotor\"}','pendiente',0,NULL,'2026-08-04 09:03:15','2026-08-04 09:03:15'),
 (32,'CargaDocente',6,'create','musica','{\"id\":6,\"docente_id\":2,\"ambiente_id\":9,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-04T14:03:15.000000Z\",\"updated_at\":\"2026-08-04T14:03:15.000000Z\",\"servidor_destino\":\"logico\"}','pendiente',0,NULL,'2026-08-04 09:03:15','2026-08-04 09:03:15'),
 (33,'CargaDocente',6,'create','musica','{\"id\":6,\"docente_id\":2,\"ambiente_id\":9,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-04T14:03:15.000000Z\",\"updated_at\":\"2026-08-04T14:03:15.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-04 09:03:15','2026-08-04 09:03:15'),
-(34,'CargaDocente',6,'create','musica','{\"id\":6,\"docente_id\":2,\"ambiente_id\":9,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-04T14:03:15.000000Z\",\"updated_at\":\"2026-08-04T14:03:15.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-04 09:03:15','2026-08-04 09:03:15');
+(34,'CargaDocente',6,'create','musica','{\"id\":6,\"docente_id\":2,\"ambiente_id\":9,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-04T14:03:15.000000Z\",\"updated_at\":\"2026-08-04T14:03:15.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-04 09:03:15','2026-08-04 09:03:15'),
+(35,'CargaDocente',7,'create','musica','{\"id\":7,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-10T19:57:09.000000Z\",\"updated_at\":\"2026-08-10T19:57:09.000000Z\",\"servidor_destino\":\"musica\"}','pendiente',0,NULL,'2026-08-10 14:57:09','2026-08-10 14:57:09'),
+(36,'CargaDocente',7,'create','musica','{\"id\":7,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-10T19:57:09.000000Z\",\"updated_at\":\"2026-08-10T19:57:09.000000Z\",\"servidor_destino\":\"polimotor\"}','pendiente',0,NULL,'2026-08-10 14:57:09','2026-08-10 14:57:09'),
+(37,'CargaDocente',7,'create','musica','{\"id\":7,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-10T19:57:09.000000Z\",\"updated_at\":\"2026-08-10T19:57:09.000000Z\",\"servidor_destino\":\"logico\"}','pendiente',0,NULL,'2026-08-10 14:57:09','2026-08-10 14:57:09'),
+(38,'CargaDocente',7,'create','musica','{\"id\":7,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-10T19:57:09.000000Z\",\"updated_at\":\"2026-08-10T19:57:09.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-10 14:57:09','2026-08-10 14:57:09'),
+(39,'CargaDocente',7,'create','musica','{\"id\":7,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-10T19:57:09.000000Z\",\"updated_at\":\"2026-08-10T19:57:09.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-10 14:57:09','2026-08-10 14:57:09'),
+(40,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:46.000000Z\",\"servidor_destino\":\"musica\"}','pendiente',0,NULL,'2026-08-26 14:57:46','2026-08-26 14:57:46'),
+(41,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:46.000000Z\",\"servidor_destino\":\"polimotor\"}','pendiente',0,NULL,'2026-08-26 14:57:46','2026-08-26 14:57:46'),
+(42,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:46.000000Z\",\"servidor_destino\":\"logico\"}','pendiente',0,NULL,'2026-08-26 14:57:46','2026-08-26 14:57:46'),
+(43,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:46.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-26 14:57:46','2026-08-26 14:57:46'),
+(44,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:46.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-26 14:57:46','2026-08-26 14:57:46'),
+(45,'CargaDocente',8,'update','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:52.000000Z\",\"servidor_destino\":\"musica\"}','pendiente',0,NULL,'2026-08-26 14:57:52','2026-08-26 14:57:52'),
+(46,'CargaDocente',8,'update','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:52.000000Z\",\"servidor_destino\":\"polimotor\"}','pendiente',0,NULL,'2026-08-26 14:57:52','2026-08-26 14:57:52'),
+(47,'CargaDocente',8,'update','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:52.000000Z\",\"servidor_destino\":\"logico\"}','pendiente',0,NULL,'2026-08-26 14:57:52','2026-08-26 14:57:52'),
+(48,'CargaDocente',8,'update','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:52.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-26 14:57:52','2026-08-26 14:57:52'),
+(49,'CargaDocente',8,'update','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:57:52.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-26 14:57:52','2026-08-26 14:57:52'),
+(50,'CargaDocente',9,'create','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:00.000000Z\",\"servidor_destino\":\"musica\"}','pendiente',0,NULL,'2026-08-26 14:58:00','2026-08-26 14:58:00'),
+(51,'CargaDocente',9,'create','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:00.000000Z\",\"servidor_destino\":\"polimotor\"}','pendiente',0,NULL,'2026-08-26 14:58:00','2026-08-26 14:58:00'),
+(52,'CargaDocente',9,'create','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:00.000000Z\",\"servidor_destino\":\"logico\"}','pendiente',0,NULL,'2026-08-26 14:58:00','2026-08-26 14:58:00'),
+(53,'CargaDocente',9,'create','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:00.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-26 14:58:00','2026-08-26 14:58:00'),
+(54,'CargaDocente',9,'create','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:00.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-26 14:58:00','2026-08-26 14:58:00'),
+(55,'CargaDocente',9,'update','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:05.000000Z\",\"servidor_destino\":\"musica\"}','pendiente',0,NULL,'2026-08-26 14:58:05','2026-08-26 14:58:05'),
+(56,'CargaDocente',9,'update','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:05.000000Z\",\"servidor_destino\":\"polimotor\"}','pendiente',0,NULL,'2026-08-26 14:58:05','2026-08-26 14:58:05'),
+(57,'CargaDocente',9,'update','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:05.000000Z\",\"servidor_destino\":\"logico\"}','pendiente',0,NULL,'2026-08-26 14:58:05','2026-08-26 14:58:05'),
+(58,'CargaDocente',9,'update','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:05.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-26 14:58:05','2026-08-26 14:58:05'),
+(59,'CargaDocente',9,'update','musica','{\"id\":9,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":2,\"grupo_id\":3,\"anio_lectivo\":2026,\"activo\":0,\"created_at\":\"2026-08-26T19:58:00.000000Z\",\"updated_at\":\"2026-08-26T19:58:05.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-26 14:58:05','2026-08-26 14:58:05'),
+(60,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"musica\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51'),
+(61,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"polimotor\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51'),
+(62,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"logico\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51'),
+(63,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51'),
+(64,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51');
 
-DROP TABLE IF EXISTS `perfil_aprendizaje`;
+/*Table structure for table `condiciones` */
 
-CREATE TABLE `perfil_aprendizaje` (
+DROP TABLE IF EXISTS `condiciones`;
+
+CREATE TABLE `condiciones` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `codigo` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion_corta` text COLLATE utf8mb4_unicode_ci,
+  `codigo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion_corta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `estado` tinyint(1) DEFAULT '1',
-  `color_hex` varchar(7) COLLATE utf8mb4_unicode_ci DEFAULT '#000000',
+  `color_hex` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '#000000',
   `es_sistema` tinyint(1) DEFAULT '1',
   `fecha_ultima_edicion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `vista_info_asociada` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vista_info_asociada` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `eliminado` int DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo` (`codigo`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `perfil_aprendizaje` */
+/*Data for the table `condiciones` */
 
-insert  into `perfil_aprendizaje`(`id`,`codigo`,`nombre`,`descripcion_corta`,`estado`,`color_hex`,`es_sistema`,`fecha_ultima_edicion`,`vista_info_asociada`,`eliminado`) values
+insert  into `condiciones`(`id`,`codigo`,`nombre`,`descripcion_corta`,`estado`,`color_hex`,`es_sistema`,`fecha_ultima_edicion`,`vista_info_asociada`,`eliminado`) values 
 (1,'COND-001','Estandar','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:48',NULL,0),
 (2,'COND-002','TDAH','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
 (3,'COND-003','TEA','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:49',NULL,0),
 (4,'COND-004','Síndrome de Down','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
 (5,'COND-005','Discapacidad Visual','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:51',NULL,0),
-(6,'COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:53',NULL,0);
+(6,'COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:53',NULL,0),
+(8,'COND-007','dfgdsfgdfg dsfgsdfg sdf g','fsdgsdfg sdfg gdfsg',1,'#2563EB',0,'2026-08-04 14:43:00',NULL,1);
 
-/*Table structure for table `perfil_aprendizaje_orden` */
+/*Table structure for table `condiciones_orden` */
 
-DROP TABLE IF EXISTS `perfil_aprendizaje_orden`;
+DROP TABLE IF EXISTS `condiciones_orden`;
 
-CREATE TABLE `perfil_aprendizaje_orden` (
+CREATE TABLE `condiciones_orden` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `institucion_id` bigint unsigned NOT NULL,
-  `perfil_aprendizaje_id` bigint unsigned NOT NULL,
+  `condicion_id` bigint unsigned NOT NULL,
   `orden` int NOT NULL DEFAULT '0',
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_institucion_perfil_aprendizaje` (`institucion_id`,`perfil_aprendizaje_id`),
+  UNIQUE KEY `uk_institucion_condicion` (`institucion_id`,`condicion_id`),
   KEY `idx_institucion_orden` (`institucion_id`,`orden`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `perfil_aprendizaje_orden` */
+/*Data for the table `condiciones_orden` */
 
-insert  into `perfil_aprendizaje_orden`(`id`,`institucion_id`,`perfil_aprendizaje_id`,`orden`,`activa`,`created_at`,`updated_at`) values
-(1,1,6,2,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(2,1,5,3,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(3,1,1,1,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(4,1,4,4,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(5,1,2,5,1,'2026-08-04 08:52:01','2026-08-04 09:28:15'),
-(6,1,3,0,1,'2026-08-04 08:52:01','2026-08-04 09:28:15');
+insert  into `condiciones_orden`(`id`,`institucion_id`,`condicion_id`,`orden`,`activa`,`created_at`,`updated_at`) values 
+(7,1,8,0,0,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(8,1,6,1,1,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(9,1,5,2,1,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(10,1,1,3,1,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(11,1,4,4,1,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(12,1,2,5,1,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(13,1,3,6,1,'2026-08-04 15:38:27','2026-08-04 15:38:27');
 
-/*Table structure for table `perfil_aprendizaje_personalizado` */
+/*Table structure for table `condiciones_transitorias` */
 
-DROP TABLE IF EXISTS `perfil_aprendizaje_personalizado`;
+DROP TABLE IF EXISTS `condiciones_transitorias`;
 
-CREATE TABLE `perfil_aprendizaje_personalizado` (
+CREATE TABLE `condiciones_transitorias` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `institucion_id` bigint unsigned DEFAULT NULL,
-  `codigo` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `etiqueta` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion_interna` text COLLATE utf8mb4_unicode_ci,
-  `perfil_aprendizaje_id` bigint unsigned DEFAULT NULL,
+  `codigo` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `etiqueta` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion_interna` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `condicion_base_id` bigint unsigned DEFAULT NULL,
   `es_sistema` tinyint(1) NOT NULL DEFAULT '0',
   `estado` tinyint(1) NOT NULL DEFAULT '1',
   `usuario_crea` bigint unsigned DEFAULT NULL,
@@ -356,40 +519,41 @@ CREATE TABLE `perfil_aprendizaje_personalizado` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `perfil_aprendizaje_personalizado` */
+/*Data for the table `condiciones_transitorias` */
 
-insert  into `perfil_aprendizaje_personalizado`(`id`,`institucion_id`,`codigo`,`etiqueta`,`descripcion_interna`,`perfil_aprendizaje_id`,`es_sistema`,`estado`,`usuario_crea`,`created_at`,`updated_at`,`eliminado`) values
+insert  into `condiciones_transitorias`(`id`,`institucion_id`,`codigo`,`etiqueta`,`descripcion_interna`,`condicion_base_id`,`es_sistema`,`estado`,`usuario_crea`,`created_at`,`updated_at`,`eliminado`) values 
 (1,NULL,'CTR-002','Sospecha de TDAH','Descripción corta del perfil de aprendizaje',2,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
 (2,NULL,'CTR-003','Sospecha de TEA','Descripción corta del perfil de aprendizaje',3,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
 (3,NULL,'CTR-004','Sospecha de Síndrome de Down','Descripción corta del perfil de aprendizaje',4,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:34',0),
 (4,NULL,'CTR-005','Sospecha de Discapacidad Visual','Descripción corta del perfil de aprendizaje',5,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:32',0),
 (5,NULL,'CTR-006','Sospecha de Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',6,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:35',0);
 
-/*Table structure for table `perfil_aprendizaje_personalizado_orden` */
+/*Table structure for table `condiciones_transitorias_orden` */
 
-DROP TABLE IF EXISTS `perfil_aprendizaje_personalizado_orden`;
+DROP TABLE IF EXISTS `condiciones_transitorias_orden`;
 
-CREATE TABLE `perfil_aprendizaje_personalizado_orden` (
+CREATE TABLE `condiciones_transitorias_orden` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `institucion_id` bigint unsigned NOT NULL,
-  `perfil_aprendizaje_personalizado_id` bigint unsigned NOT NULL,
+  `condicion_transitoria_id` bigint unsigned NOT NULL,
   `orden` int NOT NULL DEFAULT '0',
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_institucion_perfil_aprendizaje_personalizado` (`institucion_id`,`perfil_aprendizaje_personalizado_id`),
+  UNIQUE KEY `uk_institucion_condicion_transitoria` (`institucion_id`,`condicion_transitoria_id`),
   KEY `idx_institucion_orden` (`institucion_id`,`orden`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*Data for the table `perfil_aprendizaje_personalizado_orden` */
+/*Data for the table `condiciones_transitorias_orden` */
 
-insert  into `perfil_aprendizaje_personalizado_orden`(`id`,`institucion_id`,`perfil_aprendizaje_personalizado_id`,`orden`,`activa`,`created_at`,`updated_at`) values
-(1,1,1,0,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(2,1,2,1,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(4,1,3,3,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(5,1,4,4,1,'2026-08-04 08:52:01','2026-08-04 09:29:45'),
-(6,1,5,5,1,'2026-08-04 08:52:01','2026-08-04 09:29:45');
+insert  into `condiciones_transitorias_orden`(`id`,`institucion_id`,`condicion_transitoria_id`,`orden`,`activa`,`created_at`,`updated_at`) values 
+(11,1,1,0,1,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(12,1,2,1,1,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(13,1,3,2,1,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(14,1,4,3,1,'2026-08-04 15:38:27','2026-08-04 15:38:27'),
+(15,1,5,4,1,'2026-08-04 15:38:27','2026-08-04 15:38:27');
+
 /*Table structure for table `configuracion_pins` */
 
 DROP TABLE IF EXISTS `configuracion_pins`;
@@ -397,31 +561,33 @@ DROP TABLE IF EXISTS `configuracion_pins`;
 CREATE TABLE `configuracion_pins` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
-  `figura_1` varchar(20) NOT NULL,
-  `color_figura_1` varchar(20) DEFAULT NULL,
-  `figura_2` varchar(20) NOT NULL,
-  `color_figura_2` varchar(20) DEFAULT NULL,
-  `figura_3` varchar(20) NOT NULL,
-  `color_figura_3` varchar(20) DEFAULT NULL,
+  `figura_1` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_figura_1` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `figura_2` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_figura_2` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `figura_3` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_figura_3` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `intentos_fallidos` tinyint unsigned NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `configuracion_pins_estudiante_id_foreign` (`estudiante_id`),
   CONSTRAINT `configuracion_pins_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `configuracion_pins` */
 
-insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_1`,`figura_2`,`color_figura_2`,`figura_3`,`color_figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values
+insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_1`,`figura_2`,`color_figura_2`,`figura_3`,`color_figura_3`,`intentos_fallidos`,`created_at`,`updated_at`) values 
 (7,31,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 15:23:30','2026-06-23 16:03:55'),
 (8,32,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-06-23 15:31:26','2026-06-23 16:03:33'),
 (9,33,'fas fa-star','#ff9019','fas fa-heart','#ff0606','fas fa-fish','#0f54ff',0,'2026-06-23 15:34:40','2026-06-23 15:34:40'),
 (10,34,'fas fa-fish','#0f54ff','fas fa-heart','#ff0606','fas fa-circle','#f933e9',0,'2026-06-23 15:35:48','2026-06-23 15:35:48'),
-(11,13,'fas fa-fish','#0f54ff','fas fa-fish','#0f54ff','fas fa-fish','#0f54ff',0,'2026-06-23 16:14:31','2026-06-23 17:12:10'),
+(11,13,'fas fa-fish','#0f54ff','fas fa-fish','#0f54ff','fas fa-fish','#0f54ff',0,'2026-06-23 16:14:31','2026-08-27 10:32:13'),
 (12,11,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:15:42','2026-06-23 16:15:42'),
 (13,5,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:16:06','2026-06-23 16:16:06'),
-(14,12,'fas fa-heart','#ff0606','fas fa-fish','#0f54ff','fas fa-square','#437124',0,'2026-06-23 16:39:05','2026-06-23 16:39:05');
+(14,12,'fas fa-heart','#ff0606','fas fa-fish','#0f54ff','fas fa-square','#437124',0,'2026-06-23 16:39:05','2026-06-23 16:39:05'),
+(15,38,'fas fa-circle','#f933e9','fas fa-star','#ff9019','fas fa-circle','#f933e9',0,'2026-08-21 10:58:13','2026-08-21 10:58:13'),
+(16,39,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-08-22 10:14:17','2026-08-22 10:14:17');
 
 /*Table structure for table `configuraciones` */
 
@@ -429,9 +595,9 @@ DROP TABLE IF EXISTS `configuraciones`;
 
 CREATE TABLE `configuraciones` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `clave` varchar(255) NOT NULL,
-  `valor` text,
-  `descripcion` varchar(255) DEFAULT NULL,
+  `clave` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valor` text COLLATE utf8mb4_unicode_ci,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -440,7 +606,7 @@ CREATE TABLE `configuraciones` (
 
 /*Data for the table `configuraciones` */
 
-insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values
+insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values 
 (1,'tiempo_sesion_minutos','60',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (2,'intentos_max_pin','5',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (3,'idioma','es',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
@@ -451,14 +617,14 @@ insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`
 DROP TABLE IF EXISTS `departamentos`;
 
 CREATE TABLE `departamentos` (
-  `codigo` varchar(5) NOT NULL,
-  `descripcion` varchar(100) DEFAULT NULL,
+  `codigo` varchar(5) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`codigo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `departamentos` */
 
-insert  into `departamentos`(`codigo`,`descripcion`) values
+insert  into `departamentos`(`codigo`,`descripcion`) values 
 ('05','Antioquia'),
 ('08','Atlantico'),
 ('11','Bogota'),
@@ -500,25 +666,25 @@ DROP TABLE IF EXISTS `docentes`;
 CREATE TABLE `docentes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `telefono` varchar(20) DEFAULT NULL,
-  `direccion` varchar(150) DEFAULT NULL,
-  `especialidad` varchar(100) DEFAULT NULL,
+  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `direccion` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `especialidad` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha_ingreso` date DEFAULT NULL,
-  `firma_url` varchar(255) DEFAULT NULL,
-  `foto_url` varchar(255) DEFAULT NULL,
-  `descripcion` text,
-  `estado` enum('activo','inactivo','eliminado') DEFAULT 'activo',
+  `firma_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `foto_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `estado` enum('activo','inactivo','eliminado') COLLATE utf8mb4_unicode_ci DEFAULT 'activo',
   `bloqueado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `docentes_user_id_foreign` (`user_id`),
   CONSTRAINT `docentes_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `docentes` */
 
-insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`foto_url`,`descripcion`,`estado`,`bloqueado_en`,`created_at`,`updated_at`) values
+insert  into `docentes`(`id`,`user_id`,`telefono`,`direccion`,`especialidad`,`fecha_ingreso`,`firma_url`,`foto_url`,`descripcion`,`estado`,`bloqueado_en`,`created_at`,`updated_at`) values 
 (1,2,'12345678925','direc','Educación Musical','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 00:02:02','2026-06-24 15:50:15'),
 (2,4,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-24 15:57:11'),
 (3,5,'12345678925','direc','maestro','2026-06-23',NULL,NULL,NULL,'activo',NULL,'2026-06-16 17:32:50','2026-06-23 14:23:57');
@@ -532,9 +698,9 @@ CREATE TABLE `ejes` (
   `modulo_id` bigint unsigned NOT NULL,
   `institucion_id` bigint unsigned DEFAULT NULL,
   `creado_por` bigint unsigned DEFAULT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `descripcion` text,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
   `orden` tinyint unsigned NOT NULL DEFAULT '0',
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `es_oficial` tinyint(1) NOT NULL DEFAULT '1',
@@ -544,12 +710,42 @@ CREATE TABLE `ejes` (
   UNIQUE KEY `ejes_modulo_id_slug_unique` (`modulo_id`,`slug`),
   KEY `ejes_institucion_id_foreign` (`institucion_id`),
   KEY `ejes_creado_por_foreign` (`creado_por`),
-  CONSTRAINT `ejes_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ejes_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `docentes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `ejes_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `ejes_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `docentes` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `ejes_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `ejes` */
+
+insert  into `ejes`(`id`,`modulo_id`,`institucion_id`,`creado_por`,`nombre`,`slug`,`descripcion`,`orden`,`activo`,`es_oficial`,`created_at`,`updated_at`) values 
+(1,1,NULL,NULL,'La Vista','explora-la-cancion',NULL,1,1,1,'2026-08-07 08:35:28','2026-08-24 08:17:35'),
+(2,1,NULL,NULL,'Prueba','prueba',NULL,2,1,1,'2026-08-07 08:56:33','2026-08-11 08:54:43'),
+(3,1,NULL,NULL,'Canto','canto',NULL,4,1,1,'2026-08-07 09:16:48','2026-08-07 09:17:48'),
+(4,1,NULL,NULL,'Explora','explora',NULL,3,1,1,'2026-08-07 09:17:25','2026-08-11 08:55:56'),
+(7,1,1,2,'Baile','baile',NULL,1,1,0,'2026-08-10 10:17:27','2026-08-10 10:17:27'),
+(8,3,1,2,'Integrales','integrales',NULL,1,1,0,'2026-08-10 14:26:47','2026-08-10 14:27:38');
+
+/*Table structure for table `emociones_sesion` */
+
+DROP TABLE IF EXISTS `emociones_sesion`;
+
+CREATE TABLE `emociones_sesion` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `sesion_id` bigint unsigned NOT NULL,
+  `bloque_id` bigint unsigned NOT NULL,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `emocion` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `emociones_sesion_sesion_id_unique` (`sesion_id`),
+  KEY `emociones_sesion_estudiante_created_index` (`estudiante_id`,`created_at`),
+  KEY `emociones_sesion_bloque_id_foreign` (`bloque_id`),
+  CONSTRAINT `emociones_sesion_bloque_id_foreign` FOREIGN KEY (`bloque_id`) REFERENCES `bloques_experiencia` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `emociones_sesion_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `emociones_sesion_sesion_id_foreign` FOREIGN KEY (`sesion_id`) REFERENCES `sesiones_experiencia` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `emociones_sesion` */
 
 /*Table structure for table `estudiante_ambiente` */
 
@@ -560,8 +756,8 @@ CREATE TABLE `estudiante_ambiente` (
   `estudiante_id` bigint unsigned NOT NULL,
   `ambiente_id` bigint unsigned NOT NULL,
   `anio_lectivo` smallint unsigned NOT NULL,
-  `estado` enum('activo','restringido','adaptado') NOT NULL DEFAULT 'activo',
-  `observacion` text,
+  `estado` enum('activo','restringido','adaptado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
+  `observacion` text COLLATE utf8mb4_unicode_ci,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -570,12 +766,12 @@ CREATE TABLE `estudiante_ambiente` (
   KEY `estudiante_ambiente_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `estudiante_ambiente_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `estudiante_ambiente_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiante_ambiente` */
 
-insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`activo`,`created_at`,`updated_at`) values
-(6,13,8,2026,'activo',NULL,1,'2026-08-04 09:02:15','2026-08-04 09:02:15'),
+insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lectivo`,`estado`,`observacion`,`activo`,`created_at`,`updated_at`) values 
+(6,13,8,2026,'restringido',NULL,1,'2026-08-04 09:02:15','2026-08-04 09:02:15'),
 (7,11,8,2026,'activo',NULL,1,'2026-08-04 09:02:15','2026-08-04 09:02:15'),
 (8,5,8,2026,'activo',NULL,1,'2026-08-04 09:02:15','2026-08-04 09:02:15'),
 (9,12,8,2026,'activo',NULL,1,'2026-08-04 09:02:15','2026-08-04 09:02:15'),
@@ -634,7 +830,50 @@ insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lect
 (62,31,9,2026,'activo',NULL,1,'2026-08-04 09:03:02','2026-08-04 09:03:02'),
 (63,32,9,2026,'activo',NULL,1,'2026-08-04 09:03:02','2026-08-04 09:03:02'),
 (64,33,9,2026,'activo',NULL,1,'2026-08-04 09:03:02','2026-08-04 09:03:02'),
-(65,34,9,2026,'activo',NULL,1,'2026-08-04 09:03:02','2026-08-04 09:03:02');
+(65,34,9,2026,'activo',NULL,1,'2026-08-04 09:03:02','2026-08-04 09:03:02'),
+(66,13,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-27 10:12:03'),
+(67,11,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
+(68,5,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
+(69,12,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
+(70,9,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
+(71,26,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
+(72,28,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
+(73,35,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
+(74,8,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
+(75,7,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37');
+
+/*Table structure for table `estudiante_condicion_transitoria` */
+
+DROP TABLE IF EXISTS `estudiante_condicion_transitoria`;
+
+CREATE TABLE `estudiante_condicion_transitoria` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `condicion_transitoria_id` bigint unsigned NOT NULL,
+  `docente_id` bigint unsigned NOT NULL,
+  `observacion` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `fecha_activacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `activa` tinyint(1) NOT NULL DEFAULT '1',
+  `fecha_cierre` datetime DEFAULT NULL,
+  `motivo_cierre` enum('diagnostico_formal','condicion_no_confirmada','otro') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observacion_cierre` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `docente_id` (`docente_id`),
+  KEY `estudiante_id` (`estudiante_id`),
+  KEY `condicion_transitoria_id` (`condicion_transitoria_id`),
+  KEY `activa` (`activa`),
+  CONSTRAINT `estudiante_condicion_transitoria_ibfk_1` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
+  CONSTRAINT `estudiante_condicion_transitoria_ibfk_2` FOREIGN KEY (`condicion_transitoria_id`) REFERENCES `condiciones_transitorias` (`id`),
+  CONSTRAINT `estudiante_condicion_transitoria_ibfk_3` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `estudiante_condicion_transitoria` */
+
+insert  into `estudiante_condicion_transitoria`(`id`,`estudiante_id`,`condicion_transitoria_id`,`docente_id`,`observacion`,`fecha_activacion`,`activa`,`fecha_cierre`,`motivo_cierre`,`observacion_cierre`,`created_at`,`updated_at`) values 
+(2,11,2,2,'nueva creada por el admin','2026-08-04 11:03:10',0,'2026-08-04 11:03:50','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:03:10','2026-08-04 11:03:50'),
+(3,5,1,2,'nueva creada por el admin','2026-08-04 11:03:28',0,'2026-08-04 11:03:58','condicion_no_confirmada','nueva creada por el admin','2026-08-04 11:03:28','2026-08-04 11:03:58');
 
 /*Table structure for table `estudiante_perfil_aprendizaje_personalizado` */
 
@@ -645,12 +884,12 @@ CREATE TABLE `estudiante_perfil_aprendizaje_personalizado` (
   `estudiante_id` bigint unsigned NOT NULL,
   `perfil_aprendizaje_personalizado_id` bigint unsigned NOT NULL,
   `docente_id` bigint unsigned NOT NULL,
-  `observacion` text NOT NULL,
+  `observacion` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `fecha_activacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `activa` tinyint(1) NOT NULL DEFAULT '1',
   `fecha_cierre` datetime DEFAULT NULL,
-  `motivo_cierre` enum('diagnostico_formal','perfil_aprendizaje_no_confirmado','otro') DEFAULT NULL,
-  `observacion_cierre` text,
+  `motivo_cierre` enum('diagnostico_formal','perfil_aprendizaje_no_confirmado','otro') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observacion_cierre` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -661,13 +900,15 @@ CREATE TABLE `estudiante_perfil_aprendizaje_personalizado` (
   CONSTRAINT `estudiante_perfil_aprendizaje_personalizado_ibfk_1` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`),
   CONSTRAINT `estudiante_perfil_aprendizaje_personalizado_ibfk_2` FOREIGN KEY (`perfil_aprendizaje_personalizado_id`) REFERENCES `perfil_aprendizaje_personalizado` (`id`),
   CONSTRAINT `estudiante_perfil_aprendizaje_personalizado_ibfk_3` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiante_perfil_aprendizaje_personalizado` */
 
-insert  into `estudiante_perfil_aprendizaje_personalizado`(`id`,`estudiante_id`,`perfil_aprendizaje_personalizado_id`,`docente_id`,`observacion`,`fecha_activacion`,`activa`,`fecha_cierre`,`motivo_cierre`,`observacion_cierre`,`created_at`,`updated_at`) values
+insert  into `estudiante_perfil_aprendizaje_personalizado`(`id`,`estudiante_id`,`perfil_aprendizaje_personalizado_id`,`docente_id`,`observacion`,`fecha_activacion`,`activa`,`fecha_cierre`,`motivo_cierre`,`observacion_cierre`,`created_at`,`updated_at`) values 
 (2,11,2,2,'nueva creada por el admin','2026-08-04 11:03:10',0,'2026-08-04 11:03:50','perfil_aprendizaje_no_confirmado','nueva creada por el admin','2026-08-04 11:03:10','2026-08-04 11:03:50'),
-(3,5,1,2,'nueva creada por el admin','2026-08-04 11:03:28',0,'2026-08-04 11:03:58','perfil_aprendizaje_no_confirmado','nueva creada por el admin','2026-08-04 11:03:28','2026-08-04 11:03:58');
+(3,5,1,2,'nueva creada por el admin','2026-08-04 11:03:28',0,'2026-08-04 11:03:58','perfil_aprendizaje_no_confirmado','nueva creada por el admin','2026-08-04 11:03:28','2026-08-04 11:03:58'),
+(4,13,1,2,'adssadasdasdasdsadasdasdasdasdsad','2026-08-05 10:01:01',1,NULL,NULL,NULL,'2026-08-05 10:01:01','2026-08-05 10:01:01'),
+(5,11,1,2,'ewfewfdsfdsffdssdfdsfdsfds','2026-08-05 10:10:20',1,NULL,NULL,NULL,'2026-08-05 10:10:20','2026-08-05 10:10:20');
 
 /*Table structure for table `estudiantes` */
 
@@ -675,40 +916,40 @@ DROP TABLE IF EXISTS `estudiantes`;
 
 CREATE TABLE `estudiantes` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL,
-  `apellido` varchar(255) DEFAULT NULL,
-  `avatar` text,
-  `tipo_identificacion` varchar(10) DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` text COLLATE utf8mb4_unicode_ci,
+  `tipo_identificacion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `identificacion` int NOT NULL,
-  `iniciales` varchar(3) NOT NULL,
-  `grado_id` text,
-  `color_avatar` varchar(9) NOT NULL DEFAULT '#0F6E56',
+  `iniciales` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `grado_id` text COLLATE utf8mb4_unicode_ci,
+  `color_avatar` varchar(9) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#0F6E56',
   `perfil_aprendizaje_id` int DEFAULT '1',
   `perfil_aprendizaje_personalizado_id` int DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
-  `fecha_nacimiento` text,
-  `acudiente` text,
-  `telefono_acudiente` text,
+  `fecha_nacimiento` text COLLATE utf8mb4_unicode_ci,
+  `acudiente` text COLLATE utf8mb4_unicode_ci,
+  `telefono_acudiente` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `requiere_apoyo` varchar(15) DEFAULT 'no',
-  `sexo` text,
+  `requiere_apoyo` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT 'no',
+  `sexo` text COLLATE utf8mb4_unicode_ci,
   `estado_piar` int DEFAULT '0',
-  `otro_tipo_identificacion` varchar(255) DEFAULT NULL,
-  `lugar_nacimiento` text,
+  `otro_tipo_identificacion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lugar_nacimiento` text COLLATE utf8mb4_unicode_ci,
   `departamento_id` int DEFAULT NULL,
   `municipio_id` int DEFAULT NULL,
-  `barrio_vereda` text,
-  `direccion` text,
-  `telefono` text,
-  `email` text,
+  `barrio_vereda` text COLLATE utf8mb4_unicode_ci,
+  `direccion` text COLLATE utf8mb4_unicode_ci,
+  `telefono` text COLLATE utf8mb4_unicode_ci,
+  `email` text COLLATE utf8mb4_unicode_ci,
   `institucion_id` int DEFAULT NULL,
   PRIMARY KEY (`id`,`identificacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiantes` */
 
-insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`perfil_aprendizaje_id`,`perfil_aprendizaje_personalizado_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values
+insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`perfil_aprendizaje_id`,`perfil_aprendizaje_personalizado_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values 
 (1,'Valentina',NULL,NULL,NULL,1111,'VA',NULL,'#0F6E56',1,NULL,1,'2021-01-17',NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#534AB7',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#854F0B',1,NULL,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
@@ -719,9 +960,9 @@ insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacio
 (8,'José',NULL,NULL,NULL,134123123,'Jo','1','#0F6E56',1,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:36','2026-06-18 16:04:36','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (9,'Fabian Mendez',NULL,NULL,NULL,123123123,'FM','3','#0F6E56',1,1,1,NULL,'Juana 2','32434234','2026-06-18 16:08:25','2026-08-03 11:04:28','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (10,'Juan Lopez 3',NULL,NULL,NULL,3423423,'JL','2','#0F6E56',1,NULL,1,NULL,'Juana 5','3423423','2026-06-18 16:12:47','2026-06-18 16:12:47','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(11,'Andres','quintero',NULL,'CC',5345345,'AQ',NULL,'#dc2626',1,NULL,1,'2018-01-22','yyyyyyy','5345345','2026-06-18 16:19:02','2026-08-04 11:03:50','si','masculino',0,NULL,'VALLEDUPAR',20,305,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveip@gmail.com',1),
+(11,'Andres','quintero',NULL,'CC',5345345,'AQ',NULL,'#dc2626',1,1,1,'2018-01-22','yyyyyyy','5345345','2026-06-18 16:19:02','2026-08-05 10:10:20','si','masculino',0,NULL,'VALLEDUPAR',20,305,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveip@gmail.com',1),
 (12,'Fabian','Mendez Quintero',NULL,'TI',342423,'FM',NULL,'#ea580c',1,NULL,1,'2019-05-16','hfghfghfgh','634634','2026-06-18 16:56:48','2026-08-03 15:45:48','si','femenino',0,NULL,'VALLEDUPAR',20,9,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveifdgdfgp@gmail.com',1),
-(13,'Andrea','Rodriguez','estudiantes/lNIZ6VFiTteCno5FKRNh5FCY37imQS7xXLNXdP9U.jpg','TI',5345345,'AR','1','#ffb81f',2,NULL,1,'2023-12-10','Julian Rodriguez','45345','2026-06-18 17:15:22','2026-08-03 14:53:19','si','femenino',0,NULL,'valledupar',20,9,'Los cortijos','manzana h casa 23','3042065930','hhhh@gmail.com',1),
+(13,'Andrea','Rodriguez','estudiantes/5dzmv171bioMovIFlbhyFrz20bsrGB4f6y9EXVIE.jpg','TI',5345345,'AR','1','#0891b2',2,1,1,'2023-12-10','Julian Rodriguez','45345','2026-06-18 17:15:22','2026-08-05 10:01:01','si','femenino',0,NULL,'valledupar',20,9,'Los cortijos','manzana h casa 23','3042065930','hhhh@gmail.com',1),
 (14,'Xiamir luquez',NULL,'estudiantes/23NS51sSHtdWtH2tQynzAD0EfRAd6m2WaZensqbP.webp',NULL,4353453,'XL','1','#0F6E56',1,NULL,1,'2021-06-12','yyyy','345345','2026-06-18 17:20:14','2026-06-18 17:20:14','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (15,'Juan David  Perez',NULL,NULL,NULL,6456456,'JD',NULL,'#ff8a05',1,NULL,1,'2023-06-07','tttt','345345','2026-06-19 08:00:29','2026-06-19 08:00:29','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (16,'Juana Lopera',NULL,NULL,NULL,654645,'JL',NULL,'#79fbf9',1,NULL,1,'2014-07-12','uuuu','6666','2026-06-19 08:01:32','2026-06-19 08:01:32','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
@@ -739,7 +980,64 @@ insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacio
 (34,'yyyy bbbb',NULL,NULL,NULL,1007615656,'WE','1','#ba79fb',1,NULL,1,'2026-06-08','retwert','43534','2026-06-23 15:35:48','2026-06-23 15:35:48','si','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (35,'Hugo','Chavez',NULL,NULL,777888999,'HC','1','#302839',1,NULL,1,'2025-06-01','Juana kkk','3423423','2026-06-26 11:41:33','2026-06-26 11:42:28','no','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (36,'Valentina','Madrid',NULL,'Otro',88880000,'VM','1','#ba79fb',1,NULL,1,'2016-05-26','Yo mero','3232323','2026-06-26 16:44:51','2026-06-26 16:44:51','no','femenino',0,'Pasaporte','Aguachica - Cesar',20,9,'La Nevada','Manzana B casa 43',NULL,NULL,1),
-(37,'Nuevo','Magola',NULL,'TI',777666544,'NM','1','#ba79fb',1,NULL,1,'2006-01-22','jjjhhhgfff','456456456','2026-08-01 10:20:50','2026-08-01 10:20:50','en_proceso','masculino',0,NULL,'valledupar',8,398,'Los cortijos','Carrera 51 #23-51','3042065930','grovveip@gmail.com',1);
+(37,'Nuevo','Magola',NULL,'TI',777666544,'NM','1','#ba79fb',1,NULL,1,'2006-01-22','jjjhhhgfff','456456456','2026-08-01 10:20:50','2026-08-01 10:20:50','en_proceso','masculino',0,NULL,'valledupar',8,398,'Los cortijos','Carrera 51 #23-51','3042065930','grovveip@gmail.com',1),
+(38,'Juan José','Machado Rojas',NULL,'TI',123456789,'JM','2','#ba79fb',1,NULL,1,'2022-08-20','Julitza rojas vuelvas','5800123','2026-08-21 10:58:13','2026-08-21 10:58:13','si','masculino',0,NULL,'Valledupar',20,9,'Los cortijos','Calle 16b #19c-45','5600903','a_penaloza@ingeer.co',1),
+(39,'Angelito','Diaz',NULL,'RC',12345678,'AD','1','#ba79fb',1,NULL,1,'2023-08-12','yaleynis rincones','3125799611','2026-08-22 10:14:17','2026-08-22 10:14:17','si','masculino',0,NULL,'Valledupar',20,9,'Los cortijos','Calle 16b #19c-45','245567899','a_penaloza@ingeer.co',1);
+
+/*Table structure for table `experiencia_materiales` */
+
+DROP TABLE IF EXISTS `experiencia_materiales`;
+
+CREATE TABLE `experiencia_materiales` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `experiencia_id` bigint unsigned NOT NULL,
+  `nombre` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cantidad` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `es_obligatorio` tinyint(1) NOT NULL DEFAULT '1',
+  `orden` tinyint unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `experiencia_materiales_experiencia_id_foreign` (`experiencia_id`),
+  KEY `experiencia_materiales_experiencia_orden_index` (`experiencia_id`,`orden`),
+  CONSTRAINT `experiencia_materiales_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `experiencia_materiales` */
+
+/*Table structure for table `experiencias` */
+
+DROP TABLE IF EXISTS `experiencias`;
+
+CREATE TABLE `experiencias` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tematica_id` bigint unsigned NOT NULL,
+  `grado_id` bigint unsigned NOT NULL,
+  `nombre` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `objetivo` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `proposito` text COLLATE utf8mb4_unicode_ci,
+  `habilidades` text COLLATE utf8mb4_unicode_ci,
+  `duracion_minutos` tinyint unsigned NOT NULL DEFAULT '20',
+  `referente_aprendizaje` text COLLATE utf8mb4_unicode_ci,
+  `estado` enum('borrador','activa','archivada') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'borrador',
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `creado_por` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `experiencia_validacion` (`tematica_id`,`grado_id`,`nombre`),
+  KEY `experiencias_tematica_id_foreign` (`tematica_id`),
+  KEY `experiencias_grado_id_foreign` (`grado_id`),
+  KEY `experiencias_creado_por_foreign` (`creado_por`),
+  KEY `experiencias_tematica_estado_activo_index` (`tematica_id`,`estado`,`activo`),
+  CONSTRAINT `experiencias_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `experiencias_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `experiencias_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `experiencias` */
+
+insert  into `experiencias`(`id`,`tematica_id`,`grado_id`,`nombre`,`objetivo`,`proposito`,`habilidades`,`duracion_minutos`,`referente_aprendizaje`,`estado`,`activo`,`creado_por`,`created_at`,`updated_at`) values 
+(23,5,1,'Identifica los colores','Identifica los colores',NULL,NULL,20,NULL,'borrador',1,1,'2026-08-24 16:17:23','2026-08-24 16:17:23'),
+(24,5,2,'Identifica los colores','Identifica los colores',NULL,NULL,20,NULL,'borrador',1,1,'2026-08-24 16:17:39','2026-08-24 16:17:39');
 
 /*Table structure for table `failed_jobs` */
 
@@ -747,11 +1045,11 @@ DROP TABLE IF EXISTS `failed_jobs`;
 
 CREATE TABLE `failed_jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(255) NOT NULL,
-  `connection` text NOT NULL,
-  `queue` text NOT NULL,
-  `payload` longtext NOT NULL,
-  `exception` longtext NOT NULL,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
@@ -765,23 +1063,22 @@ DROP TABLE IF EXISTS `grados`;
 
 CREATE TABLE `grados` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(60) NOT NULL,
+  `nombre` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
   `edad_anos` tinyint NOT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `orden` tinyint NOT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `grados` */
 
-insert  into `grados`(`id`,`nombre`,`edad_anos`,`descripcion`,`orden`,`activo`,`created_at`,`updated_at`) values
-(1,'Prejardin',3,'Para ninos de 3 anos. Socializacion y desarrollo motriz.',1,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
-(2,'Jardin',4,'Para ninos de 4 anos. Colores, numeros y letras.',2,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
-(3,'Transicion',5,'Para ninos de 5 anos. Lectoescritura y habilidades logicas.',3,1,'2026-06-16 19:34:40','2026-06-16 19:34:40');
-
+insert  into `grados`(`id`,`nombre`,`edad_anos`,`descripcion`,`orden`,`activo`,`created_at`,`updated_at`) values 
+(1,'Prejardín',3,'Para ninos de 3 a 4 años. curiosidad, movimiento e interacción con otros pares.',1,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
+(2,'Jardín',4,'Para ninos de 4 a 5 años. Colores, numeros y letras.',2,1,'2026-06-16 19:34:40','2026-06-16 19:34:40'),
+(3,'Transición',5,'Para ninos de 5 a 6 años. Lectoescritura y habilidades logicas.',3,1,'2026-06-16 19:34:40','2026-06-16 19:34:40');
 
 /*Table structure for table `grupos` */
 
@@ -790,7 +1087,7 @@ DROP TABLE IF EXISTS `grupos`;
 CREATE TABLE `grupos` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `grado_id` bigint unsigned NOT NULL,
-  `nombre` varchar(10) NOT NULL,
+  `nombre` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
   `anio_lectivo` year NOT NULL,
   `cupo_maximo` tinyint NOT NULL DEFAULT '30',
   `activo` tinyint(1) NOT NULL DEFAULT '1',
@@ -803,7 +1100,7 @@ CREATE TABLE `grupos` (
 
 /*Data for the table `grupos` */
 
-insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`activo`,`created_at`,`updated_at`) values
+insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`activo`,`created_at`,`updated_at`) values 
 (1,1,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (3,2,'A',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
 (4,2,'B',2026,25,1,'2026-06-16 19:35:18','2026-06-16 19:35:18'),
@@ -813,28 +1110,50 @@ insert  into `grupos`(`id`,`grado_id`,`nombre`,`anio_lectivo`,`cupo_maximo`,`act
 (26,1,'A',2027,25,1,'2026-06-19 09:57:51','2026-06-19 09:57:51'),
 (28,1,'B',2026,25,1,'2026-08-04 09:00:30','2026-08-04 09:00:30');
 
+/*Table structure for table `indicadores_logro` */
+
+DROP TABLE IF EXISTS `indicadores_logro`;
+
+CREATE TABLE `indicadores_logro` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tematica_id` bigint unsigned NOT NULL,
+  `descripcion` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `orden` tinyint unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `indicadores_logro_tematica_id_foreign` (`tematica_id`),
+  KEY `indicadores_logro_tematica_orden_index` (`tematica_id`,`orden`),
+  CONSTRAINT `indicadores_logro_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `indicadores_logro` */
+
+insert  into `indicadores_logro`(`id`,`tematica_id`,`descripcion`,`orden`) values 
+(1,1,'Ganaste',1),
+(3,3,'Ganaste',1);
+
 /*Table structure for table `instituciones` */
 
 DROP TABLE IF EXISTS `instituciones`;
 
 CREATE TABLE `instituciones` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL,
-  `municipio` varchar(100) NOT NULL,
-  `departamento` varchar(100) NOT NULL,
-  `codigo_dane` varchar(20) NOT NULL,
-  `logo` varchar(255) DEFAULT NULL,
-  `correo_contacto` varchar(255) NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `municipio` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `departamento` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `codigo_dane` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `logo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `correo_contacto` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `instituciones` */
 
-insert  into `instituciones`(`id`,`nombre`,`municipio`,`departamento`,`codigo_dane`,`logo`,`correo_contacto`,`activo`,`created_at`,`updated_at`) values
-(1,'Institución Educativa Ejemplo','Medellín','Antioquia','050010000001','logos/institucion.png','contacto@institucion.edu.co',1,NULL,NULL);
+insert  into `instituciones`(`id`,`nombre`,`municipio`,`departamento`,`codigo_dane`,`logo`,`correo_contacto`,`activo`,`created_at`,`updated_at`) values 
+(1,'Preescolar EDUKIDS','Valledupar','Cesar','050010000001','instituciones/1/logo.jpg','contacto@institucion.edu.co',1,NULL,'2026-08-22 11:01:26'),
+(3,'Institución Educativa Loperena','Valledupar','Cesar','12345678','instituciones/3/logo.jpg','primeraprueba@pednia.test',1,'2026-08-05 11:52:16','2026-08-05 15:37:26');
 
 /*Table structure for table `matriculas` */
 
@@ -846,7 +1165,7 @@ CREATE TABLE `matriculas` (
   `grado_id` bigint unsigned NOT NULL,
   `grupo_id` bigint unsigned NOT NULL,
   `anio_lectivo` year NOT NULL,
-  `estado` enum('activo','promovido','graduado','retirado') NOT NULL DEFAULT 'activo',
+  `estado` enum('activo','promovido','graduado','retirado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
   `fecha_ingreso` date NOT NULL,
   `fecha_egreso` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -862,7 +1181,7 @@ CREATE TABLE `matriculas` (
 
 /*Data for the table `matriculas` */
 
-insert  into `matriculas`(`id`,`estudiante_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`estado`,`fecha_ingreso`,`fecha_egreso`,`created_at`,`updated_at`) values
+insert  into `matriculas`(`id`,`estudiante_id`,`grado_id`,`grupo_id`,`anio_lectivo`,`estado`,`fecha_ingreso`,`fecha_egreso`,`created_at`,`updated_at`) values 
 (23,13,1,1,2026,'activo','2026-08-04',NULL,'2026-08-04 09:00:54','2026-08-04 09:00:54'),
 (24,11,1,1,2026,'activo','2026-08-04',NULL,'2026-08-04 09:00:54','2026-08-04 09:00:54'),
 (25,5,1,1,2026,'activo','2026-08-04',NULL,'2026-08-04 09:00:54','2026-08-04 09:00:54'),
@@ -900,14 +1219,14 @@ DROP TABLE IF EXISTS `migrations`;
 
 CREATE TABLE `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `migration` varchar(255) NOT NULL,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `migrations` */
 
-insert  into `migrations`(`id`,`migration`,`batch`) values
+insert  into `migrations`(`id`,`migration`,`batch`) values 
 (1,'2014_10_12_000000_create_users_table',1),
 (2,'2014_10_12_100000_create_password_reset_tokens_table',1),
 (3,'2019_08_19_000000_create_failed_jobs_table',1),
@@ -946,8 +1265,10 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (39,'2026_06_23_000002_actualizar_campos_docentes',9),
 (40,'2026_06_23_000003_actualizar_campos_configuracion_pins',10),
 (41,'2026_08_06_000001_create_modulo_institucion_and_ensure_modulos_oficiales',11),
-(42,'2026_08_06_000002_create_ejes_table',11),
-(43,'2026_08_10_000001_add_creado_por_to_ejes_table',11);
+(42,'2026_08_06_000002_create_ejes_table',12),
+(43,'2026_08_10_000001_add_creado_por_to_ejes_table',13),
+(44,'2026_08_14_000003_create_versiones_tematica_table',14),
+(45,'2026_08_26_000001_create_clases_table',15);
 
 /*Table structure for table `modulo_institucion` */
 
@@ -963,11 +1284,17 @@ CREATE TABLE `modulo_institucion` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `modulo_institucion_modulo_id_institucion_id_unique` (`modulo_id`,`institucion_id`),
   KEY `modulo_institucion_institucion_id_foreign` (`institucion_id`),
-  CONSTRAINT `modulo_institucion_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `modulo_institucion_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `modulo_institucion_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `modulo_institucion_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `modulo_institucion` */
+
+insert  into `modulo_institucion`(`id`,`modulo_id`,`institucion_id`,`activo`,`created_at`,`updated_at`) values 
+(42,1,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(43,2,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:34'),
+(44,4,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(46,3,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18');
 
 /*Table structure for table `modulos` */
 
@@ -976,25 +1303,29 @@ DROP TABLE IF EXISTS `modulos`;
 CREATE TABLE `modulos` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `ambiente_id` bigint unsigned NOT NULL,
-  `institucion_id` bigint unsigned DEFAULT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `descripcion` text,
-  `icono` varchar(255) DEFAULT NULL,
+  `institucion_id` bigint DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `icono` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `orden` tinyint unsigned NOT NULL DEFAULT '0',
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `visible_estudiantes` tinyint(1) NOT NULL DEFAULT '1',
-  `es_oficial` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `es_oficial` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `modulos_ambiente_id_foreign` (`ambiente_id`),
-  KEY `modulos_institucion_id_foreign` (`institucion_id`),
-  CONSTRAINT `modulos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `modulos_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `modulos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `modulos` */
+
+insert  into `modulos`(`id`,`ambiente_id`,`institucion_id`,`nombre`,`slug`,`descripcion`,`icono`,`orden`,`activo`,`visible_estudiantes`,`created_at`,`updated_at`,`es_oficial`) values 
+(1,6,NULL,'Explorando los sentidos','musica',NULL,NULL,1,1,1,'2026-08-06 11:39:29','2026-08-24 08:15:32',1),
+(2,6,NULL,'Dibujo','dibujo',NULL,NULL,2,1,1,'2026-08-06 11:39:29','2026-08-11 09:09:48',1),
+(3,8,NULL,'Matematicas','matematicas',NULL,NULL,1,1,1,'2026-08-06 11:41:54','2026-08-06 11:41:54',1),
+(4,6,NULL,'Canto','canto',NULL,NULL,3,1,1,'2026-08-06 14:19:49','2026-08-06 14:42:48',1);
 
 /*Table structure for table `municipios` */
 
@@ -1002,14 +1333,14 @@ DROP TABLE IF EXISTS `municipios`;
 
 CREATE TABLE `municipios` (
   `id` smallint unsigned NOT NULL AUTO_INCREMENT,
-  `descripcion` varchar(50) NOT NULL,
-  `coddep` varchar(2) NOT NULL,
+  `descripcion` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `coddep` varchar(2) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1120 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `municipios` */
 
-insert  into `municipios`(`id`,`descripcion`,`coddep`) values
+insert  into `municipios`(`id`,`descripcion`,`coddep`) values 
 (1,'Medellin','05'),
 (2,'Barranquilla','08'),
 (3,'Bogota D.c.','11'),
@@ -2130,7 +2461,6 @@ insert  into `municipios`(`id`,`descripcion`,`coddep`) values
 (1118,'Zapayan','47'),
 (1119,'Zona Bananera','47');
 
-
 /*Table structure for table `notas_docente` */
 
 DROP TABLE IF EXISTS `notas_docente`;
@@ -2139,7 +2469,7 @@ CREATE TABLE `notas_docente` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `tema_id` bigint unsigned NOT NULL,
   `user_id` bigint unsigned NOT NULL,
-  `contenido` text NOT NULL,
+  `contenido` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -2160,8 +2490,8 @@ CREATE TABLE `observaciones` (
   `estudiante_id` bigint unsigned NOT NULL,
   `user_id` bigint unsigned NOT NULL,
   `tema_id` bigint unsigned DEFAULT NULL,
-  `contenido` text NOT NULL,
-  `tipo` enum('general','logro') NOT NULL DEFAULT 'general',
+  `contenido` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo` enum('general','logro') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'general',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -2175,18 +2505,174 @@ CREATE TABLE `observaciones` (
 
 /*Data for the table `observaciones` */
 
+/*Table structure for table `participaciones_bloque` */
+
+DROP TABLE IF EXISTS `participaciones_bloque`;
+
+CREATE TABLE `participaciones_bloque` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `sesion_id` bigint unsigned NOT NULL,
+  `bloque_id` bigint unsigned NOT NULL,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `tipo` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `archivo_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `participaciones_bloque_bloque_estudiante_index` (`bloque_id`,`estudiante_id`),
+  KEY `participaciones_bloque_sesion_index` (`sesion_id`),
+  KEY `participaciones_bloque_estudiante_id_foreign` (`estudiante_id`),
+  CONSTRAINT `participaciones_bloque_bloque_id_foreign` FOREIGN KEY (`bloque_id`) REFERENCES `bloques_experiencia` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `participaciones_bloque_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `participaciones_bloque_sesion_id_foreign` FOREIGN KEY (`sesion_id`) REFERENCES `sesiones_experiencia` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `participaciones_bloque` */
+
 /*Table structure for table `password_reset_tokens` */
 
 DROP TABLE IF EXISTS `password_reset_tokens`;
 
 CREATE TABLE `password_reset_tokens` (
-  `email` varchar(255) NOT NULL,
-  `token` varchar(255) NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `password_reset_tokens` */
+
+/*Table structure for table `perfil_aprendizaje` */
+
+DROP TABLE IF EXISTS `perfil_aprendizaje`;
+
+CREATE TABLE `perfil_aprendizaje` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `codigo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion_corta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `estado` tinyint(1) DEFAULT '1',
+  `color_hex` varchar(7) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT '#000000',
+  `es_sistema` tinyint(1) DEFAULT '1',
+  `fecha_ultima_edicion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `vista_info_asociada` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `eliminado` int DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `codigo` (`codigo`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `perfil_aprendizaje` */
+
+insert  into `perfil_aprendizaje`(`id`,`codigo`,`nombre`,`descripcion_corta`,`estado`,`color_hex`,`es_sistema`,`fecha_ultima_edicion`,`vista_info_asociada`,`eliminado`) values 
+(1,'COND-001','Estandar','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:48',NULL,0),
+(2,'COND-002','TDAH','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
+(3,'COND-003','TEA','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:49',NULL,0),
+(4,'COND-004','Síndrome de Down','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:50',NULL,0),
+(5,'COND-005','Discapacidad Visual','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:51',NULL,0),
+(6,'COND-006','Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',1,'#000000',1,'2026-08-04 14:41:53',NULL,0);
+
+/*Table structure for table `perfil_aprendizaje_orden` */
+
+DROP TABLE IF EXISTS `perfil_aprendizaje_orden`;
+
+CREATE TABLE `perfil_aprendizaje_orden` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `institucion_id` bigint unsigned NOT NULL,
+  `perfil_aprendizaje_id` bigint unsigned NOT NULL,
+  `orden` int NOT NULL DEFAULT '0',
+  `activa` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_institucion_perfil_aprendizaje` (`institucion_id`,`perfil_aprendizaje_id`),
+  KEY `idx_institucion_orden` (`institucion_id`,`orden`)
+) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `perfil_aprendizaje_orden` */
+
+insert  into `perfil_aprendizaje_orden`(`id`,`institucion_id`,`perfil_aprendizaje_id`,`orden`,`activa`,`created_at`,`updated_at`) values 
+(19,2,6,0,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(20,2,5,1,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(21,2,1,2,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(22,2,4,3,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(23,2,2,4,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(24,2,3,5,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(37,3,6,0,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(38,3,5,1,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(39,3,1,2,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(40,3,4,3,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(41,3,2,4,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(42,3,3,5,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(85,1,6,0,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(86,1,5,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(87,1,1,2,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(88,1,4,3,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(89,1,2,4,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(90,1,3,5,1,'2026-08-15 08:50:18','2026-08-15 08:50:18');
+
+/*Table structure for table `perfil_aprendizaje_personalizado` */
+
+DROP TABLE IF EXISTS `perfil_aprendizaje_personalizado`;
+
+CREATE TABLE `perfil_aprendizaje_personalizado` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `institucion_id` bigint unsigned DEFAULT NULL,
+  `codigo` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `etiqueta` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion_interna` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `perfil_aprendizaje_id` bigint unsigned DEFAULT NULL,
+  `es_sistema` tinyint(1) NOT NULL DEFAULT '0',
+  `estado` tinyint(1) NOT NULL DEFAULT '1',
+  `usuario_crea` bigint unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `eliminado` int DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `perfil_aprendizaje_personalizado` */
+
+insert  into `perfil_aprendizaje_personalizado`(`id`,`institucion_id`,`codigo`,`etiqueta`,`descripcion_interna`,`perfil_aprendizaje_id`,`es_sistema`,`estado`,`usuario_crea`,`created_at`,`updated_at`,`eliminado`) values 
+(1,NULL,'CTR-002','Sospecha de TDAH','Descripción corta del perfil de aprendizaje',2,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
+(2,NULL,'CTR-003','Sospecha de TEA','Descripción corta del perfil de aprendizaje',3,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:30',0),
+(3,NULL,'CTR-004','Sospecha de Síndrome de Down','Descripción corta del perfil de aprendizaje',4,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:34',0),
+(4,NULL,'CTR-005','Sospecha de Discapacidad Visual','Descripción corta del perfil de aprendizaje',5,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:32',0),
+(5,NULL,'CTR-006','Sospecha de Discapacidad Auditiva','Descripción corta del perfil de aprendizaje',6,1,1,1,'2026-08-04 08:38:26','2026-08-04 14:39:35',0);
+
+/*Table structure for table `perfil_aprendizaje_personalizado_orden` */
+
+DROP TABLE IF EXISTS `perfil_aprendizaje_personalizado_orden`;
+
+CREATE TABLE `perfil_aprendizaje_personalizado_orden` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `institucion_id` bigint unsigned NOT NULL,
+  `perfil_aprendizaje_personalizado_id` bigint unsigned NOT NULL,
+  `orden` int NOT NULL DEFAULT '0',
+  `activa` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_institucion_perfil_aprendizaje_personalizado` (`institucion_id`,`perfil_aprendizaje_personalizado_id`),
+  KEY `idx_institucion_orden` (`institucion_id`,`orden`)
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `perfil_aprendizaje_personalizado_orden` */
+
+insert  into `perfil_aprendizaje_personalizado_orden`(`id`,`institucion_id`,`perfil_aprendizaje_personalizado_id`,`orden`,`activa`,`created_at`,`updated_at`) values 
+(21,2,1,0,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(22,2,2,1,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(23,2,3,2,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(24,2,4,3,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(25,2,5,4,1,'2026-08-05 11:42:28','2026-08-05 11:42:28'),
+(36,3,1,0,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(37,3,2,1,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(38,3,3,2,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(39,3,4,3,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(40,3,5,4,1,'2026-08-05 15:37:26','2026-08-05 15:37:26'),
+(76,1,1,0,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(77,1,2,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(78,1,3,2,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(79,1,4,3,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(80,1,5,4,1,'2026-08-15 08:50:18','2026-08-15 08:50:18');
 
 /*Table structure for table `personal_access_tokens` */
 
@@ -2194,11 +2680,11 @@ DROP TABLE IF EXISTS `personal_access_tokens`;
 
 CREATE TABLE `personal_access_tokens` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `tokenable_type` varchar(255) NOT NULL,
+  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `tokenable_id` bigint unsigned NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `token` varchar(64) NOT NULL,
-  `abilities` text,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci,
   `last_used_at` timestamp NULL DEFAULT NULL,
   `expires_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -2218,9 +2704,9 @@ CREATE TABLE `piar` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
   `docente_id` bigint unsigned DEFAULT NULL,
-  `estado` enum('borrador','revisado','aprobado') NOT NULL DEFAULT 'borrador',
+  `estado` enum('borrador','revisado','aprobado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'borrador',
   `paso` int DEFAULT NULL,
-  `fecha_diligenciamiento` text,
+  `fecha_diligenciamiento` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `activo` int DEFAULT '1',
@@ -2228,9 +2714,13 @@ CREATE TABLE `piar` (
   UNIQUE KEY `piar_estudiante_id_unique` (`estudiante_id`),
   KEY `piar_docente_id_foreign` (`docente_id`),
   CONSTRAINT `piar_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar` */
+
+insert  into `piar`(`id`,`estudiante_id`,`docente_id`,`estado`,`paso`,`fecha_diligenciamiento`,`created_at`,`updated_at`,`activo`) values 
+(12,38,16,'borrador',8,'2026-08-21','2026-08-21 11:05:13','2026-08-21 11:23:19',1),
+(13,39,16,'borrador',8,'2026-08-22','2026-08-22 10:20:33','2026-08-22 10:29:10',1);
 
 /*Table structure for table `piar_acta_compromiso` */
 
@@ -2239,13 +2729,17 @@ DROP TABLE IF EXISTS `piar_acta_compromiso`;
 CREATE TABLE `piar_acta_compromiso` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `compromisos` text,
+  `compromisos` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_acta_compromiso` */
+
+insert  into `piar_acta_compromiso`(`id`,`id_piar`,`compromisos`,`created_at`,`updated_at`) values 
+(6,12,'TRABAJAR POR PAUTAS, Y PICTOGRAMAS','2026-08-21 11:23:19','2026-08-21 11:23:19'),
+(7,13,'zdjsbfvldnwsñgneñgneñhg','2026-08-22 10:29:10','2026-08-22 10:29:10');
 
 /*Table structure for table `piar_acta_compromiso_actividades` */
 
@@ -2254,15 +2748,19 @@ DROP TABLE IF EXISTS `piar_acta_compromiso_actividades`;
 CREATE TABLE `piar_acta_compromiso_actividades` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_acta_compromiso` bigint unsigned NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `descripcion` text,
-  `frecuencia` varchar(100) DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `frecuencia` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_acta_compromiso_actividades` */
+
+insert  into `piar_acta_compromiso_actividades`(`id`,`id_acta_compromiso`,`nombre`,`descripcion`,`frecuencia`,`created_at`,`updated_at`) values 
+(23,6,'RETEÑIR','EL NIÑO REPINTA EL CIRCULO','S','2026-08-21 11:23:19','2026-08-21 11:23:19'),
+(24,7,'hswogthephtp3e','alhefohwhftwoht','D','2026-08-22 10:29:10','2026-08-22 10:29:10');
 
 /*Table structure for table `piar_ajuste_razonable` */
 
@@ -2274,15 +2772,19 @@ CREATE TABLE `piar_ajuste_razonable` (
   `docente_orientador_id` bigint unsigned DEFAULT NULL,
   `docente_apoyo_pedagogico_id` bigint unsigned DEFAULT NULL,
   `docente_coordinador_pedagogico_id` bigint unsigned DEFAULT NULL,
-  `docente_orientador_area` text,
-  `docente_apoyo_pedagogico_area` text,
-  `docente_coordinador_pedagogico_area` text,
+  `docente_orientador_area` text COLLATE utf8mb4_unicode_ci,
+  `docente_apoyo_pedagogico_area` text COLLATE utf8mb4_unicode_ci,
+  `docente_coordinador_pedagogico_area` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_ajuste_razonable` */
+
+insert  into `piar_ajuste_razonable`(`id`,`id_piar`,`docente_orientador_id`,`docente_apoyo_pedagogico_id`,`docente_coordinador_pedagogico_id`,`docente_orientador_area`,`docente_apoyo_pedagogico_area`,`docente_coordinador_pedagogico_area`,`created_at`,`updated_at`) values 
+(8,12,3,3,3,'MATEMATICAS','MATEMATICAS','MATEMÁTICAS','2026-08-21 11:22:19','2026-08-21 11:22:19'),
+(9,13,3,1,2,'MATEMATICAS','MATEMATICAS','MATEMÁTICAS','2026-08-22 10:28:40','2026-08-22 10:28:40');
 
 /*Table structure for table `piar_ajuste_razonable_docente_firma` */
 
@@ -2292,13 +2794,17 @@ CREATE TABLE `piar_ajuste_razonable_docente_firma` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_ajuste_razonable` bigint unsigned NOT NULL,
   `docente_id` bigint unsigned NOT NULL,
-  `area` text,
+  `area` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_ajuste_razonable_docente_firma` */
+
+insert  into `piar_ajuste_razonable_docente_firma`(`id`,`id_ajuste_razonable`,`docente_id`,`area`,`created_at`,`updated_at`) values 
+(43,8,2,'NATURALES','2026-08-21 11:22:19','2026-08-21 11:22:19'),
+(44,9,2,'bkblsvd','2026-08-22 10:28:40','2026-08-22 10:28:40');
 
 /*Table structure for table `piar_ajuste_razonable_item` */
 
@@ -2307,18 +2813,22 @@ DROP TABLE IF EXISTS `piar_ajuste_razonable_item`;
 CREATE TABLE `piar_ajuste_razonable_item` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_ajuste_razonable` bigint unsigned NOT NULL,
-  `area` varchar(255) DEFAULT NULL,
-  `barrera` text,
-  `tipo` varchar(255) DEFAULT NULL,
-  `apoyo` text,
-  `descripcion` text,
-  `seguimiento` text,
+  `area` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `barrera` text COLLATE utf8mb4_unicode_ci,
+  `tipo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `apoyo` text COLLATE utf8mb4_unicode_ci,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `seguimiento` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_ajuste_razonable_item` */
+
+insert  into `piar_ajuste_razonable_item`(`id`,`id_ajuste_razonable`,`area`,`barrera`,`tipo`,`apoyo`,`descripcion`,`seguimiento`,`created_at`,`updated_at`) values 
+(36,8,'naturales','comunicativas','pautas','omunicativo','apoyo en la counicacion e interaccion','MEDIOS','2026-08-21 11:22:19','2026-08-21 11:22:19'),
+(37,9,'naturales','gibkj','nlhblhb','lolhbln','.nlb','lnolhbl','2026-08-22 10:28:40','2026-08-22 10:28:40');
 
 /*Table structure for table `piar_atencion_medica` */
 
@@ -2327,14 +2837,17 @@ DROP TABLE IF EXISTS `piar_atencion_medica`;
 CREATE TABLE `piar_atencion_medica` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_entorno_salud` bigint unsigned NOT NULL,
-  `cual` varchar(255) NOT NULL,
-  `frecuencia` varchar(255) NOT NULL,
+  `cual` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `frecuencia` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_atencion_medica` */
+
+insert  into `piar_atencion_medica`(`id`,`id_entorno_salud`,`cual`,`frecuencia`,`created_at`,`updated_at`) values 
+(49,10,'Terapia Ocupacional','3 por semana','2026-08-22 10:22:15','2026-08-22 10:22:15');
 
 /*Table structure for table `piar_datos_generales` */
 
@@ -2343,26 +2856,30 @@ DROP TABLE IF EXISTS `piar_datos_generales`;
 CREATE TABLE `piar_datos_generales` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `vinculado` varchar(255) DEFAULT NULL,
-  `victima` varchar(10) DEFAULT NULL,
-  `registro_victima` varchar(255) DEFAULT NULL,
-  `centro_proteccion` varchar(10) DEFAULT NULL,
-  `cual_centro_proteccion` varchar(255) DEFAULT NULL,
-  `grupo_etnico` varchar(10) DEFAULT NULL,
-  `cual_etnico` varchar(255) DEFAULT NULL,
-  `capacidades` text,
-  `gustos` text,
-  `expectativas_estudiante` text,
-  `expectativas_familia` text,
-  `redes_apoyo` text,
-  `otras` text,
+  `vinculado` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `victima` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `registro_victima` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `centro_proteccion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cual_centro_proteccion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `grupo_etnico` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cual_etnico` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `capacidades` text COLLATE utf8mb4_unicode_ci,
+  `gustos` text COLLATE utf8mb4_unicode_ci,
+  `expectativas_estudiante` text COLLATE utf8mb4_unicode_ci,
+  `expectativas_familia` text COLLATE utf8mb4_unicode_ci,
+  `redes_apoyo` text COLLATE utf8mb4_unicode_ci,
+  `otras` text COLLATE utf8mb4_unicode_ci,
   `fecha_diligenciamiento` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_datos_generales` */
+
+insert  into `piar_datos_generales`(`id`,`id_piar`,`vinculado`,`victima`,`registro_victima`,`centro_proteccion`,`cual_centro_proteccion`,`grupo_etnico`,`cual_etnico`,`capacidades`,`gustos`,`expectativas_estudiante`,`expectativas_familia`,`redes_apoyo`,`otras`,`fecha_diligenciamiento`,`created_at`,`updated_at`) values 
+(7,12,'Si','No','Si','No','salud total','No',NULL,'le gusta dibuja e interectuar con sus compañeros','pintar, arma rompecabezas, dibujar,','que quiere ser pintor cuando grande','que el niño logre leer e interactuar con sus compeñaero','padres, docente, psicorienctaion, especialista.','es un niño muy inteligente trabaja rapido.','2026-08-21','2026-08-21 11:05:13','2026-08-21 11:05:13'),
+(8,13,'Si','No','Si','No',NULL,'No',NULL,'El estudiante cuenta con grandes habilidades para relacionarse con sus compañeros','Se interesa mucho al ejecutar juegos con bloques y que requieran procesos para armar, enhebrar y construir piramides','Segun lo observado el estudiante en ocasiones hace cuestionamientos cientificos, usa terminos bastantes avanzados para su edad, y se interesa por descubrir las dudas que tiene con relacion a los temas vistos dentro del aula.','Sus familiares tienen el deseo de poder regular al estudiante en cuanto al comportamiento, manifiestan que en ocasiones tienen crisis y les cuesta mucho regularlo, en encuentros con la maestra, psicologa y directora han expresado que la mayor preocupacion y el reto que tienen es poder moderar y mejorar su conducta.','Centro de estimulacion y apoyo SIRAMAT','Es un estudiante estrella, pero su comportamiento es bastante fuerte, por tal motivo el docente encargado de liderarlo debe tener a la mano estrategias que sean de su interes para poder impartir en él los contenidos acordado durante el año lectivo.','2026-08-22','2026-08-22 10:20:33','2026-08-22 10:20:33');
 
 /*Table structure for table `piar_entorno_educativo` */
 
@@ -2371,22 +2888,26 @@ DROP TABLE IF EXISTS `piar_entorno_educativo`;
 CREATE TABLE `piar_entorno_educativo` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `vinculado_otra_institucion` varchar(10) DEFAULT NULL,
-  `instituciones_anteriores` text,
-  `motivo_no_vinculado` text,
-  `ultimo_grado` varchar(100) DEFAULT NULL,
-  `estado_ultimo_grado` varchar(100) DEFAULT NULL,
-  `observaciones_estado` text,
-  `recibe_informe_pedagogico` varchar(10) DEFAULT NULL,
-  `institucion_informe` varchar(255) DEFAULT NULL,
-  `programas_complementarios` varchar(10) DEFAULT NULL,
-  `cuales_programas` text,
+  `vinculado_otra_institucion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `instituciones_anteriores` text COLLATE utf8mb4_unicode_ci,
+  `motivo_no_vinculado` text COLLATE utf8mb4_unicode_ci,
+  `ultimo_grado` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `estado_ultimo_grado` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observaciones_estado` text COLLATE utf8mb4_unicode_ci,
+  `recibe_informe_pedagogico` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `institucion_informe` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `programas_complementarios` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cuales_programas` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_entorno_educativo` */
+
+insert  into `piar_entorno_educativo`(`id`,`id_piar`,`vinculado_otra_institucion`,`instituciones_anteriores`,`motivo_no_vinculado`,`ultimo_grado`,`estado_ultimo_grado`,`observaciones_estado`,`recibe_informe_pedagogico`,`institucion_informe`,`programas_complementarios`,`cuales_programas`,`created_at`,`updated_at`) values 
+(6,12,'No',NULL,'no aplica','preescolar','Aprobado','apoyo para escribir','No','oscar pupo martinez','No','no','2026-08-21 11:10:33','2026-08-21 11:10:33'),
+(7,13,'No',NULL,'no aplica','preescolar','Aprobado',',vcujcjvkkblj','Si','lhoihoihdfshogfh','Si','lbhohilblb','2026-08-22 10:24:24','2026-08-22 10:24:24');
 
 /*Table structure for table `piar_entorno_hogar` */
 
@@ -2395,27 +2916,31 @@ DROP TABLE IF EXISTS `piar_entorno_hogar`;
 CREATE TABLE `piar_entorno_hogar` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `nombre_madre` varchar(255) DEFAULT NULL,
-  `ocupacion_madre` varchar(255) DEFAULT NULL,
-  `nivel_madre` varchar(100) DEFAULT NULL,
-  `nombre_padre` varchar(255) DEFAULT NULL,
-  `ocupacion_padre` varchar(255) DEFAULT NULL,
-  `nivel_padre` varchar(100) DEFAULT NULL,
-  `nombre_cuidador` varchar(255) DEFAULT NULL,
-  `nivel_cuidador` varchar(100) DEFAULT NULL,
-  `telefono_cuidador` varchar(30) DEFAULT NULL,
-  `parentesco_cuidador` varchar(100) DEFAULT NULL,
-  `correo_cuidador` varchar(255) DEFAULT NULL,
+  `nombre_madre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ocupacion_madre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nivel_madre` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nombre_padre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ocupacion_padre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nivel_padre` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nombre_cuidador` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nivel_cuidador` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `telefono_cuidador` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `parentesco_cuidador` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `correo_cuidador` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `numero_hermanos` int DEFAULT NULL,
   `lugar_ocupa` int DEFAULT NULL,
-  `apoyo_crianza` text,
-  `personas_con_quien_vive` text,
+  `apoyo_crianza` text COLLATE utf8mb4_unicode_ci,
+  `personas_con_quien_vive` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_entorno_hogar` */
+
+insert  into `piar_entorno_hogar`(`id`,`id_piar`,`nombre_madre`,`ocupacion_madre`,`nivel_madre`,`nombre_padre`,`ocupacion_padre`,`nivel_padre`,`nombre_cuidador`,`nivel_cuidador`,`telefono_cuidador`,`parentesco_cuidador`,`correo_cuidador`,`numero_hermanos`,`lugar_ocupa`,`apoyo_crianza`,`personas_con_quien_vive`,`created_at`,`updated_at`) values 
+(5,12,'sssss','ssssss','Bachillerato','ssss','sssss','Bachillerato','sasasasa','Técnico','3002658974','padre','lic.yoimar122@gmail.com',2,3,'padres','PADRES, FAMILIAS Y ABUELOS','2026-08-21 11:09:18','2026-08-21 11:09:18'),
+(6,13,'sefnashfws','wfasfhiowuafe','Universitario',',bsdfohoswhfb','dfsowhoefhw','Universitario','ksbfohsohgf','Primaria','23456789','biugigg','a_penaloza@ingeer.co',2,1,'jbififvivbboho','jgoghohgo','2026-08-22 10:23:22','2026-08-22 10:23:22');
 
 /*Table structure for table `piar_entorno_salud` */
 
@@ -2424,23 +2949,27 @@ DROP TABLE IF EXISTS `piar_entorno_salud`;
 CREATE TABLE `piar_entorno_salud` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `afiliado_salud` varchar(10) DEFAULT NULL,
-  `regimen` varchar(50) DEFAULT NULL,
-  `eps` varchar(255) DEFAULT NULL,
-  `lugar_emergencia` varchar(255) DEFAULT NULL,
-  `diagnostico_medico` varchar(10) DEFAULT NULL,
-  `cual_diagnostico` text,
-  `atencion_medica` varchar(10) DEFAULT NULL,
-  `tratamiento_integral` varchar(10) DEFAULT NULL,
-  `consume_medicamentos` varchar(10) DEFAULT NULL,
-  `ayudas_tecnicas` varchar(10) DEFAULT NULL,
-  `cuales_ayudas` text,
+  `afiliado_salud` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `regimen` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `eps` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lugar_emergencia` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `diagnostico_medico` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cual_diagnostico` text COLLATE utf8mb4_unicode_ci,
+  `atencion_medica` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tratamiento_integral` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `consume_medicamentos` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ayudas_tecnicas` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cuales_ayudas` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_entorno_salud` */
+
+insert  into `piar_entorno_salud`(`id`,`id_piar`,`afiliado_salud`,`regimen`,`eps`,`lugar_emergencia`,`diagnostico_medico`,`cual_diagnostico`,`atencion_medica`,`tratamiento_integral`,`consume_medicamentos`,`ayudas_tecnicas`,`cuales_ayudas`,`created_at`,`updated_at`) values 
+(9,12,'Si','Subsidiado','salud total','valledupar','Si','autismo','No','No','No','No',NULL,'2026-08-21 11:07:26','2026-08-21 11:07:26'),
+(10,13,'Si','Contributivo','sanitas','Clinica del norte','Si','TDAH','Si','Si','Si','No',NULL,'2026-08-22 10:22:15','2026-08-22 10:22:15');
 
 /*Table structure for table `piar_medicamento` */
 
@@ -2449,15 +2978,18 @@ DROP TABLE IF EXISTS `piar_medicamento`;
 CREATE TABLE `piar_medicamento` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_entorno_salud` bigint unsigned NOT NULL,
-  `cual` varchar(255) NOT NULL,
-  `frecuencia` varchar(255) NOT NULL,
-  `horario` varchar(255) NOT NULL,
+  `cual` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `frecuencia` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `horario` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_medicamento` */
+
+insert  into `piar_medicamento`(`id`,`id_entorno_salud`,`cual`,`frecuencia`,`horario`,`created_at`,`updated_at`) values 
+(44,10,'jguyf','jhguyyg','9:00 am','2026-08-22 10:22:15','2026-08-22 10:22:15');
 
 /*Table structure for table `piar_tratamiento` */
 
@@ -2466,14 +2998,17 @@ DROP TABLE IF EXISTS `piar_tratamiento`;
 CREATE TABLE `piar_tratamiento` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_entorno_salud` bigint unsigned NOT NULL,
-  `cual` varchar(255) NOT NULL,
-  `frecuencia` varchar(255) NOT NULL,
+  `cual` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `frecuencia` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_tratamiento` */
+
+insert  into `piar_tratamiento`(`id`,`id_entorno_salud`,`cual`,`frecuencia`,`created_at`,`updated_at`) values 
+(48,10,'jjh','nkjjj','2026-08-22 10:22:15','2026-08-22 10:22:15');
 
 /*Table structure for table `piar_valoracion_pedagogica` */
 
@@ -2482,191 +3017,195 @@ DROP TABLE IF EXISTS `piar_valoracion_pedagogica`;
 CREATE TABLE `piar_valoracion_pedagogica` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `id_piar` bigint unsigned NOT NULL,
-  `vp_mov_apoyo_sistema` varchar(10) DEFAULT NULL,
-  `vp_mov_apoyo_sistema_obs` text,
-  `vp_mov_ajustes_espacio` varchar(10) DEFAULT NULL,
-  `vp_mov_ajustes_espacio_obs` text,
-  `vp_mov_ajustes_movilidad` varchar(10) DEFAULT NULL,
-  `vp_mov_ajustes_movilidad_obs` text,
-  `vp_mov_motricidad_fina` varchar(10) DEFAULT NULL,
-  `vp_mov_motricidad_fina_obs` text,
-  `vp_mov_adaptacion_agarrar` varchar(10) DEFAULT NULL,
-  `vp_mov_adaptacion_agarrar_obs` text,
-  `vp_mov_intensidad` varchar(50) DEFAULT NULL,
-  `vp_com_apoyo_sistema` varchar(10) DEFAULT NULL,
-  `vp_com_apoyo_sistema_obs` text,
-  `vp_com_aditamentos` varchar(10) DEFAULT NULL,
-  `vp_com_aditamentos_obs` text,
-  `vp_com_ajustes` varchar(10) DEFAULT NULL,
-  `vp_com_ajustes_obs` text,
-  `vp_com_intensidad` varchar(50) DEFAULT NULL,
-  `vp_info_apoyo_sistema` varchar(10) DEFAULT NULL,
-  `vp_info_apoyo_sistema_obs` text,
-  `vp_info_ajustes` varchar(10) DEFAULT NULL,
-  `vp_info_ajustes_obs` text,
-  `vp_info_intensidad` varchar(50) DEFAULT NULL,
-  `vp_soc_apoyo_regulacion` varchar(10) DEFAULT NULL,
-  `vp_soc_apoyo_regulacion_obs` text,
-  `vp_soc_ajustes_interaccion` varchar(10) DEFAULT NULL,
-  `vp_soc_ajustes_interaccion_obs` text,
-  `vp_soc_intensidad` varchar(50) DEFAULT NULL,
-  `vp_acad_ajustes_permanencia` varchar(10) DEFAULT NULL,
-  `vp_acad_ajustes_permanencia_obs` text,
-  `vp_acad_ajustes_tiempos` varchar(10) DEFAULT NULL,
-  `vp_acad_ajustes_tiempos_obs` text,
-  `vp_acad_intensidad` varchar(50) DEFAULT NULL,
-  `vp_observaciones` text,
-  `cle_1` varchar(10) DEFAULT NULL,
-  `cle_1_obs` text,
-  `cle_2` varchar(10) DEFAULT NULL,
-  `cle_2_obs` text,
-  `cle_3` varchar(10) DEFAULT NULL,
-  `cle_3_obs` text,
-  `cle_4` varchar(10) DEFAULT NULL,
-  `cle_4_obs` text,
-  `cle_5` varchar(10) DEFAULT NULL,
-  `cle_5_obs` text,
-  `cle_6` varchar(10) DEFAULT NULL,
-  `cle_6_obs` text,
-  `cle_7` varchar(10) DEFAULT NULL,
-  `cle_7_obs` text,
-  `cle_8` varchar(10) DEFAULT NULL,
-  `cle_8_obs` text,
-  `cle_9` varchar(10) DEFAULT NULL,
-  `cle_9_obs` text,
-  `cle_10` varchar(10) DEFAULT NULL,
-  `cle_10_obs` text,
-  `cle_11` varchar(10) DEFAULT NULL,
-  `cle_11_obs` text,
-  `cle_12` varchar(10) DEFAULT NULL,
-  `cle_12_obs` text,
-  `cle_13` varchar(10) DEFAULT NULL,
-  `cle_13_obs` text,
-  `cle_14` varchar(10) DEFAULT NULL,
-  `cle_14_obs` text,
-  `cle_15` varchar(10) DEFAULT NULL,
-  `cle_15_obs` text,
-  `cle_16` varchar(10) DEFAULT NULL,
-  `cle_16_obs` text,
-  `cle_17` varchar(10) DEFAULT NULL,
-  `cle_17_obs` text,
-  `cle_18` varchar(10) DEFAULT NULL,
-  `cle_18_obs` text,
-  `cle_observaciones` text,
+  `vp_mov_apoyo_sistema` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_apoyo_sistema_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_ajustes_espacio` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_ajustes_espacio_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_ajustes_movilidad` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_ajustes_movilidad_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_motricidad_fina` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_motricidad_fina_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_adaptacion_agarrar` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_mov_adaptacion_agarrar_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_mov_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_apoyo_sistema` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_apoyo_sistema_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_com_aditamentos` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_aditamentos_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_com_ajustes` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_com_ajustes_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_com_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_info_apoyo_sistema` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_info_apoyo_sistema_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_info_ajustes` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_info_ajustes_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_info_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_soc_apoyo_regulacion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_soc_apoyo_regulacion_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_soc_ajustes_interaccion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_soc_ajustes_interaccion_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_soc_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_acad_ajustes_permanencia` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_acad_ajustes_permanencia_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_acad_ajustes_tiempos` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_acad_ajustes_tiempos_obs` text COLLATE utf8mb4_unicode_ci,
+  `vp_acad_intensidad` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vp_observaciones` text COLLATE utf8mb4_unicode_ci,
+  `cle_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_8` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_8_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_9` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_9_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_10` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_10_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_11` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_11_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_12` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_12_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_13` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_13_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_14` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_14_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_15` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_15_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_16` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_16_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_17` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_17_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_18` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cle_18_obs` text COLLATE utf8mb4_unicode_ci,
+  `cle_observaciones` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `clm_1` varchar(10) DEFAULT NULL,
-  `clm_1_obs` text,
-  `clm_2` varchar(10) DEFAULT NULL,
-  `clm_2_obs` text,
-  `clm_3` varchar(10) DEFAULT NULL,
-  `clm_3_obs` text,
-  `clm_4` varchar(10) DEFAULT NULL,
-  `clm_4_obs` text,
+  `clm_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_4_obs` text COLLATE utf8mb4_unicode_ci,
   `clm_5_desde` int DEFAULT NULL,
   `clm_5_hasta` int DEFAULT NULL,
-  `clm_5` varchar(10) DEFAULT NULL,
-  `clm_5_obs` text,
-  `clm_6` varchar(10) DEFAULT NULL,
-  `clm_6_obs` text,
-  `clm_7` varchar(10) DEFAULT NULL,
-  `clm_7_obs` text,
-  `clm_8` varchar(10) DEFAULT NULL,
-  `clm_8_obs` text,
-  `clm_9` varchar(10) DEFAULT NULL,
-  `clm_9_obs` text,
-  `clm_10` varchar(10) DEFAULT NULL,
-  `clm_10_obs` text,
-  `clm_11` varchar(10) DEFAULT NULL,
-  `clm_11_obs` text,
-  `clm_12` varchar(10) DEFAULT NULL,
-  `clm_12_obs` text,
-  `clm_13` varchar(10) DEFAULT NULL,
-  `clm_13_obs` text,
-  `clm_14` varchar(10) DEFAULT NULL,
-  `clm_14_obs` text,
-  `clm_15` varchar(10) DEFAULT NULL,
-  `clm_15_obs` text,
-  `clm_16` varchar(10) DEFAULT NULL,
-  `clm_16_obs` text,
-  `clm_17` varchar(10) DEFAULT NULL,
-  `clm_17_obs` text,
-  `clm_18` varchar(10) DEFAULT NULL,
-  `clm_18_obs` text,
-  `clm_19` varchar(10) DEFAULT NULL,
-  `clm_19_obs` text,
-  `clm_observaciones` text,
-  `dba_mem_1` varchar(10) DEFAULT NULL,
-  `dba_mem_1_obs` text,
-  `dba_mem_2` varchar(10) DEFAULT NULL,
-  `dba_mem_2_obs` text,
-  `dba_mem_3` varchar(10) DEFAULT NULL,
-  `dba_mem_3_obs` text,
-  `dba_mem_4` varchar(10) DEFAULT NULL,
-  `dba_mem_4_obs` text,
-  `dba_mem_5` varchar(10) DEFAULT NULL,
-  `dba_mem_5_obs` text,
-  `dba_mem_6` varchar(10) DEFAULT NULL,
-  `dba_mem_6_obs` text,
-  `dba_mem_7` varchar(10) DEFAULT NULL,
-  `dba_mem_7_obs` text,
-  `dba_ate_1` varchar(10) DEFAULT NULL,
-  `dba_ate_1_obs` text,
-  `dba_ate_2` varchar(10) DEFAULT NULL,
-  `dba_ate_2_obs` text,
-  `dba_ate_3` varchar(10) DEFAULT NULL,
-  `dba_ate_3_obs` text,
-  `dba_ate_4` varchar(10) DEFAULT NULL,
-  `dba_ate_4_obs` text,
-  `dba_ate_4_tiempo` varchar(10) DEFAULT NULL,
-  `dba_per_1` varchar(10) DEFAULT NULL,
-  `dba_per_1_obs` text,
-  `dba_per_2` varchar(10) DEFAULT NULL,
-  `dba_per_2_obs` text,
-  `dba_per_3` varchar(10) DEFAULT NULL,
-  `dba_per_3_obs` text,
-  `dba_per_4` varchar(10) DEFAULT NULL,
-  `dba_per_4_obs` text,
-  `dba_per_5` varchar(10) DEFAULT NULL,
-  `dba_per_5_obs` text,
-  `dba_fe_1` varchar(10) DEFAULT NULL,
-  `dba_fe_1_obs` text,
-  `dba_fe_2` varchar(10) DEFAULT NULL,
-  `dba_fe_2_obs` text,
-  `dba_fe_3` varchar(10) DEFAULT NULL,
-  `dba_fe_3_obs` text,
-  `dba_fe_4` varchar(10) DEFAULT NULL,
-  `dba_fe_4_obs` text,
-  `dba_fe_5` varchar(10) DEFAULT NULL,
-  `dba_fe_5_obs` text,
-  `dba_fe_6` varchar(10) DEFAULT NULL,
-  `dba_fe_6_obs` text,
-  `dba_lc_1` varchar(10) DEFAULT NULL,
-  `dba_lc_1_obs` text,
-  `dba_lc_2` varchar(10) DEFAULT NULL,
-  `dba_lc_2_obs` text,
-  `dba_lc_3` varchar(10) DEFAULT NULL,
-  `dba_lc_3_obs` text,
-  `dba_lc_4` varchar(10) DEFAULT NULL,
-  `dba_lc_4_obs` text,
-  `dba_lc_5` varchar(10) DEFAULT NULL,
-  `dba_lc_5_obs` text,
-  `dba_lc_6` varchar(10) DEFAULT NULL,
-  `dba_lc_6_obs` text,
-  `dba_lc_7` varchar(10) DEFAULT NULL,
-  `dba_lc_7_obs` text,
-  `dba_lc_8` varchar(10) DEFAULT NULL,
-  `dba_lc_8_obs` text,
-  `dba_lc_9` varchar(10) DEFAULT NULL,
-  `dba_lc_9_obs` text,
-  `dba_lc_10` varchar(10) DEFAULT NULL,
-  `dba_lc_10_obs` text,
-  `habilidades_destrezas` text,
-  `estrategias_acciones` text,
+  `clm_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_8` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_8_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_9` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_9_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_10` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_10_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_11` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_11_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_12` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_12_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_13` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_13_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_14` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_14_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_15` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_15_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_16` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_16_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_17` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_17_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_18` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_18_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_19` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clm_19_obs` text COLLATE utf8mb4_unicode_ci,
+  `clm_observaciones` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_mem_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_mem_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_ate_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_ate_4_tiempo` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_per_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_per_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_fe_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_fe_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_1` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_1_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_2` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_2_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_3` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_3_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_4` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_4_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_5` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_5_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_6` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_6_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_7` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_7_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_8` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_8_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_9` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_9_obs` text COLLATE utf8mb4_unicode_ci,
+  `dba_lc_10` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `dba_lc_10_obs` text COLLATE utf8mb4_unicode_ci,
+  `habilidades_destrezas` text COLLATE utf8mb4_unicode_ci,
+  `estrategias_acciones` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `piar_valoracion_pedagogica` */
+
+insert  into `piar_valoracion_pedagogica`(`id`,`id_piar`,`vp_mov_apoyo_sistema`,`vp_mov_apoyo_sistema_obs`,`vp_mov_ajustes_espacio`,`vp_mov_ajustes_espacio_obs`,`vp_mov_ajustes_movilidad`,`vp_mov_ajustes_movilidad_obs`,`vp_mov_motricidad_fina`,`vp_mov_motricidad_fina_obs`,`vp_mov_adaptacion_agarrar`,`vp_mov_adaptacion_agarrar_obs`,`vp_mov_intensidad`,`vp_com_apoyo_sistema`,`vp_com_apoyo_sistema_obs`,`vp_com_aditamentos`,`vp_com_aditamentos_obs`,`vp_com_ajustes`,`vp_com_ajustes_obs`,`vp_com_intensidad`,`vp_info_apoyo_sistema`,`vp_info_apoyo_sistema_obs`,`vp_info_ajustes`,`vp_info_ajustes_obs`,`vp_info_intensidad`,`vp_soc_apoyo_regulacion`,`vp_soc_apoyo_regulacion_obs`,`vp_soc_ajustes_interaccion`,`vp_soc_ajustes_interaccion_obs`,`vp_soc_intensidad`,`vp_acad_ajustes_permanencia`,`vp_acad_ajustes_permanencia_obs`,`vp_acad_ajustes_tiempos`,`vp_acad_ajustes_tiempos_obs`,`vp_acad_intensidad`,`vp_observaciones`,`cle_1`,`cle_1_obs`,`cle_2`,`cle_2_obs`,`cle_3`,`cle_3_obs`,`cle_4`,`cle_4_obs`,`cle_5`,`cle_5_obs`,`cle_6`,`cle_6_obs`,`cle_7`,`cle_7_obs`,`cle_8`,`cle_8_obs`,`cle_9`,`cle_9_obs`,`cle_10`,`cle_10_obs`,`cle_11`,`cle_11_obs`,`cle_12`,`cle_12_obs`,`cle_13`,`cle_13_obs`,`cle_14`,`cle_14_obs`,`cle_15`,`cle_15_obs`,`cle_16`,`cle_16_obs`,`cle_17`,`cle_17_obs`,`cle_18`,`cle_18_obs`,`cle_observaciones`,`created_at`,`updated_at`,`clm_1`,`clm_1_obs`,`clm_2`,`clm_2_obs`,`clm_3`,`clm_3_obs`,`clm_4`,`clm_4_obs`,`clm_5_desde`,`clm_5_hasta`,`clm_5`,`clm_5_obs`,`clm_6`,`clm_6_obs`,`clm_7`,`clm_7_obs`,`clm_8`,`clm_8_obs`,`clm_9`,`clm_9_obs`,`clm_10`,`clm_10_obs`,`clm_11`,`clm_11_obs`,`clm_12`,`clm_12_obs`,`clm_13`,`clm_13_obs`,`clm_14`,`clm_14_obs`,`clm_15`,`clm_15_obs`,`clm_16`,`clm_16_obs`,`clm_17`,`clm_17_obs`,`clm_18`,`clm_18_obs`,`clm_19`,`clm_19_obs`,`clm_observaciones`,`dba_mem_1`,`dba_mem_1_obs`,`dba_mem_2`,`dba_mem_2_obs`,`dba_mem_3`,`dba_mem_3_obs`,`dba_mem_4`,`dba_mem_4_obs`,`dba_mem_5`,`dba_mem_5_obs`,`dba_mem_6`,`dba_mem_6_obs`,`dba_mem_7`,`dba_mem_7_obs`,`dba_ate_1`,`dba_ate_1_obs`,`dba_ate_2`,`dba_ate_2_obs`,`dba_ate_3`,`dba_ate_3_obs`,`dba_ate_4`,`dba_ate_4_obs`,`dba_ate_4_tiempo`,`dba_per_1`,`dba_per_1_obs`,`dba_per_2`,`dba_per_2_obs`,`dba_per_3`,`dba_per_3_obs`,`dba_per_4`,`dba_per_4_obs`,`dba_per_5`,`dba_per_5_obs`,`dba_fe_1`,`dba_fe_1_obs`,`dba_fe_2`,`dba_fe_2_obs`,`dba_fe_3`,`dba_fe_3_obs`,`dba_fe_4`,`dba_fe_4_obs`,`dba_fe_5`,`dba_fe_5_obs`,`dba_fe_6`,`dba_fe_6_obs`,`dba_lc_1`,`dba_lc_1_obs`,`dba_lc_2`,`dba_lc_2_obs`,`dba_lc_3`,`dba_lc_3_obs`,`dba_lc_4`,`dba_lc_4_obs`,`dba_lc_5`,`dba_lc_5_obs`,`dba_lc_6`,`dba_lc_6_obs`,`dba_lc_7`,`dba_lc_7_obs`,`dba_lc_8`,`dba_lc_8_obs`,`dba_lc_9`,`dba_lc_9_obs`,`dba_lc_10`,`dba_lc_10_obs`,`habilidades_destrezas`,`estrategias_acciones`) values 
+(1,12,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'intermitente','Si',NULL,'No',NULL,'Si',NULL,'no_aplica','No',NULL,'No',NULL,'intermitente','Si',NULL,'Si',NULL,'intermitente','Si','pictogramas','Si','por  partes','intermitente','el niño necesita apoyo, en sus actividades  recurente, y darselo por pautas','Si',NULL,'Si',NULL,'Si',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'el niño necesito apoyo para desarrollar las actividades','2026-08-21 11:18:18','2026-08-21 11:18:18','Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,3,10,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'dfrgtnyfvr dtefrrtr9igfrsd hsdgfberf','No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si','djndfurgryg','5','Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'No',NULL,'colorear','ajshbsyde'),
+(2,13,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'extenso','No',NULL,'Si',NULL,'No',NULL,'extenso','Si',NULL,'No',NULL,'generalizado','Si',NULL,'No',NULL,'generalizado','Si',NULL,'Si',NULL,'extenso',', hj hkjvkb','Si',NULL,'No',NULL,'Si',NULL,'No',NULL,'Si',NULL,'No',NULL,'Si',NULL,'No',NULL,'Si',NULL,'No',NULL,'Si',NULL,'No',NULL,'Si',NULL,'No',NULL,'Si',NULL,'No',NULL,'Si',NULL,'No',NULL,'n jjhkvbl','2026-08-22 10:27:16','2026-08-22 10:27:16','Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,0,10,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,', zxdjbdfsjlc','Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si','z xdbvckjbdsv','5','Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'Si',NULL,'zcxbdljbvndszñnmxvb','ksxnhfroghreogjens');
 
 /*Table structure for table `portafolios` */
 
@@ -2676,9 +3215,9 @@ CREATE TABLE `portafolios` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
   `tema_id` bigint unsigned NOT NULL,
-  `tipo_registro` enum('foto','audio','emocion','resultado') NOT NULL,
+  `tipo_registro` enum('foto','audio','emocion','resultado') COLLATE utf8mb4_unicode_ci NOT NULL,
   `contenido` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `emocion_seleccionada` varchar(255) DEFAULT NULL,
+  `emocion_seleccionada` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `portafolios_estudiante_id_foreign` (`estudiante_id`),
@@ -2697,21 +3236,359 @@ DROP TABLE IF EXISTS `registros_acceso`;
 CREATE TABLE `registros_acceso` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `ip` varchar(45) DEFAULT NULL,
-  `ambiente` varchar(255) DEFAULT NULL,
+  `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ambiente` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `tipo` varchar(30) NOT NULL DEFAULT 'inicio_sesion',
+  `tipo` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'inicio_sesion',
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=352 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `registros_acceso` */
 
-insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) values
+insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) values 
 (34,1,'127.0.0.1','musica','2026-08-04 08:50:54','inicio_sesion'),
 (35,16,'127.0.0.1','musica','2026-08-04 08:54:22','inicio_sesion'),
-(36,4,'127.0.0.1','musica','2026-08-04 11:01:01','inicio_sesion');
+(36,4,'127.0.0.1','musica','2026-08-04 11:01:01','inicio_sesion'),
+(37,1,'127.0.0.1','musica','2026-08-05 09:52:15','inicio_sesion'),
+(38,4,'127.0.0.1','musica','2026-08-05 09:53:07','inicio_sesion'),
+(39,4,'127.0.0.1','musica','2026-08-05 09:59:43','cambio_contrasena'),
+(40,16,'127.0.0.1','musica','2026-08-05 10:23:20','inicio_sesion'),
+(41,4,'127.0.0.1','musica','2026-08-05 10:49:34','inicio_sesion'),
+(42,16,'127.0.0.1','musica','2026-08-05 10:51:54','inicio_sesion'),
+(43,1,'127.0.0.1','musica','2026-08-05 10:52:13','inicio_sesion'),
+(44,4,'127.0.0.1','musica','2026-08-05 10:57:30','inicio_sesion'),
+(45,4,'127.0.0.1','musica','2026-08-05 10:57:57','inicio_sesion'),
+(46,16,'127.0.0.1','musica','2026-08-05 10:58:23','inicio_sesion'),
+(47,1,'127.0.0.1','musica','2026-08-05 11:01:34','inicio_sesion'),
+(48,4,'127.0.0.1','musica','2026-08-05 11:02:17','inicio_sesion'),
+(49,1,'127.0.0.1','musica','2026-08-05 11:06:06','inicio_sesion'),
+(50,1,'127.0.0.1','musica','2026-08-05 11:25:20','inicio_sesion'),
+(51,1,'127.0.0.1','musica','2026-08-05 14:02:12','inicio_sesion'),
+(54,1,'127.0.0.1','musica','2026-08-05 17:28:43','inicio_sesion'),
+(55,16,'127.0.0.1','musica','2026-08-05 17:37:52','inicio_sesion'),
+(56,16,'127.0.0.1','musica','2026-08-06 08:23:35','inicio_sesion'),
+(57,16,'127.0.0.1','musica','2026-08-06 09:18:07','inicio_sesion'),
+(58,1,'127.0.0.1','musica','2026-08-06 09:22:27','inicio_sesion'),
+(59,4,'127.0.0.1','musica','2026-08-06 09:22:56','inicio_sesion'),
+(60,4,'127.0.0.1','musica','2026-08-06 09:27:13','inicio_sesion'),
+(61,16,'127.0.0.1','musica','2026-08-06 09:27:23','inicio_sesion'),
+(62,4,'127.0.0.1','musica','2026-08-06 09:28:25','inicio_sesion'),
+(63,1,'127.0.0.1','musica','2026-08-06 09:29:13','inicio_sesion'),
+(64,1,'127.0.0.1','musica','2026-08-06 09:48:53','inicio_sesion'),
+(65,1,'127.0.0.1','musica','2026-08-06 14:18:09','inicio_sesion'),
+(66,1,'127.0.0.1','musica','2026-08-07 08:12:32','inicio_sesion'),
+(67,1,'127.0.0.1','musica','2026-08-07 08:27:23','inicio_sesion'),
+(68,16,'127.0.0.1','musica','2026-08-07 09:31:04','inicio_sesion'),
+(69,1,'127.0.0.1','musica','2026-08-07 09:45:30','inicio_sesion'),
+(70,16,'127.0.0.1','musica','2026-08-07 09:45:48','inicio_sesion'),
+(71,16,'127.0.0.1','musica','2026-08-10 08:17:57','inicio_sesion'),
+(72,1,'127.0.0.1','musica','2026-08-10 08:19:51','inicio_sesion'),
+(73,16,'127.0.0.1','musica','2026-08-10 08:20:44','inicio_sesion'),
+(74,16,'127.0.0.1','musica','2026-08-10 08:51:40','inicio_sesion'),
+(75,1,'127.0.0.1','musica','2026-08-10 08:51:49','inicio_sesion'),
+(76,16,'127.0.0.1','musica','2026-08-10 08:54:42','inicio_sesion'),
+(77,1,'127.0.0.1','musica','2026-08-10 09:59:14','inicio_sesion'),
+(78,16,'127.0.0.1','musica','2026-08-10 09:59:55','inicio_sesion'),
+(79,1,'127.0.0.1','musica','2026-08-10 10:33:19','inicio_sesion'),
+(80,16,'127.0.0.1','musica','2026-08-10 11:17:58','inicio_sesion'),
+(81,1,'127.0.0.1','musica','2026-08-10 11:19:17','inicio_sesion'),
+(82,4,'127.0.0.1','musica','2026-08-10 11:20:57','inicio_sesion'),
+(83,4,'127.0.0.1','musica','2026-08-10 11:39:06','inicio_sesion'),
+(84,4,'127.0.0.1','musica','2026-08-10 11:41:24','inicio_sesion'),
+(85,1,'127.0.0.1','musica','2026-08-10 12:01:38','inicio_sesion'),
+(86,4,'127.0.0.1','musica','2026-08-10 12:02:04','inicio_sesion'),
+(87,4,'127.0.0.1','musica','2026-08-10 14:16:39','inicio_sesion'),
+(88,16,'127.0.0.1','musica','2026-08-10 14:30:03','inicio_sesion'),
+(89,1,'127.0.0.1','musica','2026-08-10 14:31:27','inicio_sesion'),
+(90,16,'127.0.0.1','musica','2026-08-10 14:43:59','inicio_sesion'),
+(91,1,'127.0.0.1','musica','2026-08-10 14:55:33','inicio_sesion'),
+(92,16,'127.0.0.1','musica','2026-08-10 14:56:36','inicio_sesion'),
+(93,4,'127.0.0.1','musica','2026-08-10 14:57:18','inicio_sesion'),
+(94,1,'127.0.0.1','musica','2026-08-10 15:38:26','inicio_sesion'),
+(95,16,'127.0.0.1','musica','2026-08-10 15:38:54','inicio_sesion'),
+(96,1,'127.0.0.1','musica','2026-08-10 15:39:16','inicio_sesion'),
+(97,1,'127.0.0.1','musica','2026-08-10 16:19:52','inicio_sesion'),
+(98,16,'127.0.0.1','musica','2026-08-10 17:26:24','inicio_sesion'),
+(99,4,'127.0.0.1','musica','2026-08-10 17:27:45','inicio_sesion'),
+(100,16,'127.0.0.1','musica','2026-08-10 17:36:49','inicio_sesion'),
+(101,1,'127.0.0.1','musica','2026-08-10 17:51:08','inicio_sesion'),
+(102,4,'127.0.0.1','musica','2026-08-10 17:53:57','inicio_sesion'),
+(103,16,'127.0.0.1','musica','2026-08-10 17:56:36','inicio_sesion'),
+(104,1,'127.0.0.1','musica','2026-08-10 17:59:03','inicio_sesion'),
+(105,16,'127.0.0.1','musica','2026-08-10 18:07:52','inicio_sesion'),
+(106,4,'127.0.0.1','musica','2026-08-10 18:17:56','inicio_sesion'),
+(107,16,'127.0.0.1','musica','2026-08-10 18:19:59','inicio_sesion'),
+(108,4,'127.0.0.1','musica','2026-08-10 18:25:15','inicio_sesion'),
+(109,16,'127.0.0.1','musica','2026-08-10 18:26:40','inicio_sesion'),
+(110,4,'127.0.0.1','musica','2026-08-10 18:30:30','inicio_sesion'),
+(111,1,'127.0.0.1','musica','2026-08-10 18:34:06','inicio_sesion'),
+(112,16,'127.0.0.1','musica','2026-08-10 18:36:24','inicio_sesion'),
+(113,4,'127.0.0.1','musica','2026-08-10 18:46:28','inicio_sesion'),
+(114,16,'127.0.0.1','musica','2026-08-10 18:47:27','inicio_sesion'),
+(115,16,'127.0.0.1','musica','2026-08-11 08:14:39','inicio_sesion'),
+(116,16,'127.0.0.1','musica','2026-08-11 08:43:56','inicio_sesion'),
+(117,1,'127.0.0.1','musica','2026-08-11 08:44:10','inicio_sesion'),
+(118,1,'127.0.0.1','musica','2026-08-11 08:53:50','inicio_sesion'),
+(119,16,'127.0.0.1','musica','2026-08-11 08:57:53','inicio_sesion'),
+(120,4,'127.0.0.1','musica','2026-08-11 08:58:50','inicio_sesion'),
+(121,1,'127.0.0.1','musica','2026-08-11 08:59:52','inicio_sesion'),
+(122,16,'127.0.0.1','musica','2026-08-11 09:01:17','inicio_sesion'),
+(123,4,'127.0.0.1','musica','2026-08-11 09:02:06','inicio_sesion'),
+(124,1,'127.0.0.1','musica','2026-08-11 09:02:53','inicio_sesion'),
+(125,1,'127.0.0.1','musica','2026-08-11 09:34:03','inicio_sesion'),
+(126,16,'127.0.0.1','musica','2026-08-11 09:39:18','inicio_sesion'),
+(127,1,'127.0.0.1','musica','2026-08-11 09:39:42','inicio_sesion'),
+(128,16,'127.0.0.1','musica','2026-08-11 09:45:34','inicio_sesion'),
+(129,1,'127.0.0.1','musica','2026-08-11 09:46:54','inicio_sesion'),
+(130,16,'127.0.0.1','musica','2026-08-11 09:47:19','inicio_sesion'),
+(131,1,'127.0.0.1','musica','2026-08-11 09:57:51','inicio_sesion'),
+(132,22,'127.0.0.1','musica','2026-08-11 09:59:36','inicio_sesion'),
+(133,16,'127.0.0.1','musica','2026-08-11 10:00:38','inicio_sesion'),
+(134,1,'127.0.0.1','musica','2026-08-11 10:47:33','inicio_sesion'),
+(135,16,'127.0.0.1','musica','2026-08-11 10:47:52','inicio_sesion'),
+(136,1,'127.0.0.1','musica','2026-08-11 10:56:40','inicio_sesion'),
+(137,1,'127.0.0.1','musica','2026-08-11 10:59:52','inicio_sesion'),
+(138,1,'127.0.0.1','musica','2026-08-11 11:00:04','inicio_sesion'),
+(139,4,'127.0.0.1','musica','2026-08-11 11:04:58','inicio_sesion'),
+(140,16,'127.0.0.1','musica','2026-08-11 11:08:01','inicio_sesion'),
+(141,1,'127.0.0.1','musica','2026-08-11 11:14:22','inicio_sesion'),
+(142,16,'127.0.0.1','musica','2026-08-11 11:14:47','inicio_sesion'),
+(143,4,'127.0.0.1','musica','2026-08-11 11:15:11','inicio_sesion'),
+(144,16,'127.0.0.1','musica','2026-08-11 11:15:28','inicio_sesion'),
+(145,1,'127.0.0.1','musica','2026-08-11 11:22:58','inicio_sesion'),
+(146,1,'127.0.0.1','musica','2026-08-11 14:10:46','inicio_sesion'),
+(147,16,'127.0.0.1','musica','2026-08-11 14:44:17','inicio_sesion'),
+(148,16,'127.0.0.1','musica','2026-08-11 14:59:06','inicio_sesion'),
+(149,1,'127.0.0.1','musica','2026-08-11 15:25:41','inicio_sesion'),
+(150,16,'127.0.0.1','musica','2026-08-11 15:26:09','inicio_sesion'),
+(151,1,'127.0.0.1','musica','2026-08-11 16:09:53','inicio_sesion'),
+(152,16,'127.0.0.1','musica','2026-08-11 16:10:33','inicio_sesion'),
+(153,4,'127.0.0.1','musica','2026-08-11 16:51:21','inicio_sesion'),
+(154,1,'127.0.0.1','musica','2026-08-11 16:54:29','inicio_sesion'),
+(155,16,'127.0.0.1','musica','2026-08-11 16:54:50','inicio_sesion'),
+(156,1,'127.0.0.1','musica','2026-08-11 18:00:48','inicio_sesion'),
+(157,1,'127.0.0.1','musica','2026-08-12 08:16:27','inicio_sesion'),
+(158,1,'127.0.0.1','musica','2026-08-12 08:56:42','inicio_sesion'),
+(159,16,'127.0.0.1','musica','2026-08-12 09:28:01','inicio_sesion'),
+(160,4,'127.0.0.1','musica','2026-08-12 09:32:27','inicio_sesion'),
+(161,4,'127.0.0.1','musica','2026-08-12 09:32:36','inicio_sesion'),
+(162,16,'127.0.0.1','musica','2026-08-12 09:48:53','inicio_sesion'),
+(163,4,'127.0.0.1','musica','2026-08-12 09:50:41','inicio_sesion'),
+(164,16,'127.0.0.1','musica','2026-08-12 10:05:01','inicio_sesion'),
+(165,4,'127.0.0.1','musica','2026-08-12 10:13:35','inicio_sesion'),
+(166,1,'127.0.0.1','musica','2026-08-12 10:15:35','inicio_sesion'),
+(167,16,'127.0.0.1','musica','2026-08-12 10:15:57','inicio_sesion'),
+(168,1,'127.0.0.1','musica','2026-08-12 11:53:45','inicio_sesion'),
+(169,16,'127.0.0.1','musica','2026-08-12 12:02:43','inicio_sesion'),
+(170,16,'127.0.0.1','musica','2026-08-12 14:12:18','inicio_sesion'),
+(171,4,'127.0.0.1','musica','2026-08-12 14:29:39','inicio_sesion'),
+(172,16,'127.0.0.1','musica','2026-08-12 14:30:24','inicio_sesion'),
+(173,4,'127.0.0.1','musica','2026-08-12 14:30:38','inicio_sesion'),
+(174,16,'127.0.0.1','musica','2026-08-12 14:31:10','inicio_sesion'),
+(175,16,'127.0.0.1','musica','2026-08-13 08:08:26','inicio_sesion'),
+(176,4,'127.0.0.1','musica','2026-08-13 09:55:06','inicio_sesion'),
+(177,4,'127.0.0.1','musica','2026-08-13 10:07:19','inicio_sesion'),
+(178,1,'127.0.0.1','musica','2026-08-13 10:09:10','inicio_sesion'),
+(179,4,'127.0.0.1','musica','2026-08-13 10:22:05','inicio_sesion'),
+(180,4,'127.0.0.1','musica','2026-08-13 14:29:51','inicio_sesion'),
+(181,1,'127.0.0.1','musica','2026-08-13 14:30:00','inicio_sesion'),
+(182,16,'127.0.0.1','musica','2026-08-13 15:59:32','inicio_sesion'),
+(183,4,'127.0.0.1','musica','2026-08-13 16:24:53','inicio_sesion'),
+(184,1,'127.0.0.1','musica','2026-08-13 16:25:03','inicio_sesion'),
+(185,1,'127.0.0.1','musica','2026-08-13 16:33:08','inicio_sesion'),
+(186,1,'127.0.0.1','musica','2026-08-14 08:15:37','inicio_sesion'),
+(187,16,'127.0.0.1','musica','2026-08-14 08:16:14','inicio_sesion'),
+(188,1,'127.0.0.1','musica','2026-08-14 10:05:53','inicio_sesion'),
+(189,1,'127.0.0.1','musica','2026-08-14 11:08:49','inicio_sesion'),
+(190,1,'127.0.0.1','musica','2026-08-14 14:14:59','inicio_sesion'),
+(191,1,'127.0.0.1','musica','2026-08-14 14:42:09','inicio_sesion'),
+(192,1,'127.0.0.1','musica','2026-08-14 14:44:10','inicio_sesion'),
+(193,1,'127.0.0.1','musica','2026-08-14 15:19:59','inicio_sesion'),
+(194,16,'127.0.0.1','musica','2026-08-14 15:45:20','inicio_sesion'),
+(195,4,'127.0.0.1','musica','2026-08-14 15:49:17','inicio_sesion'),
+(196,16,'127.0.0.1','musica','2026-08-14 15:54:24','inicio_sesion'),
+(197,1,'127.0.0.1','musica','2026-08-14 16:12:59','inicio_sesion'),
+(198,16,'127.0.0.1','musica','2026-08-14 16:13:36','inicio_sesion'),
+(199,4,'127.0.0.1','musica','2026-08-14 16:15:14','inicio_sesion'),
+(200,1,'127.0.0.1','musica','2026-08-14 16:16:20','inicio_sesion'),
+(201,16,'127.0.0.1','musica','2026-08-14 16:16:28','inicio_sesion'),
+(202,1,'127.0.0.1','musica','2026-08-14 16:32:17','inicio_sesion'),
+(203,4,'127.0.0.1','musica','2026-08-14 16:42:03','inicio_sesion'),
+(204,1,'127.0.0.1','musica','2026-08-14 16:54:33','inicio_sesion'),
+(205,4,'127.0.0.1','musica','2026-08-14 16:55:46','inicio_sesion'),
+(206,4,'127.0.0.1','musica','2026-08-15 08:17:22','inicio_sesion'),
+(207,16,'127.0.0.1','musica','2026-08-15 08:24:49','inicio_sesion'),
+(208,4,'127.0.0.1','musica','2026-08-15 08:25:52','inicio_sesion'),
+(209,16,'127.0.0.1','musica','2026-08-15 08:35:02','inicio_sesion'),
+(210,1,'127.0.0.1','musica','2026-08-15 08:48:41','inicio_sesion'),
+(211,16,'127.0.0.1','musica','2026-08-15 08:50:27','inicio_sesion'),
+(212,4,'127.0.0.1','musica','2026-08-15 09:02:33','inicio_sesion'),
+(213,4,'127.0.0.1','musica','2026-08-15 10:02:17','inicio_sesion'),
+(214,4,'127.0.0.1','musica','2026-08-18 08:03:36','inicio_sesion'),
+(215,1,'127.0.0.1','musica','2026-08-18 09:01:05','inicio_sesion'),
+(216,4,'127.0.0.1','musica','2026-08-18 09:03:08','inicio_sesion'),
+(217,1,'127.0.0.1','musica','2026-08-18 09:28:48','inicio_sesion'),
+(218,4,'127.0.0.1','musica','2026-08-18 09:32:54','inicio_sesion'),
+(219,1,'127.0.0.1','musica','2026-08-18 09:47:35','inicio_sesion'),
+(220,16,'127.0.0.1','musica','2026-08-18 09:47:53','inicio_sesion'),
+(221,1,'127.0.0.1','musica','2026-08-18 09:50:10','inicio_sesion'),
+(222,4,'127.0.0.1','musica','2026-08-18 10:01:28','inicio_sesion'),
+(223,1,'127.0.0.1','musica','2026-08-18 11:30:06','inicio_sesion'),
+(224,4,'127.0.0.1','musica','2026-08-18 11:55:53','inicio_sesion'),
+(225,4,'127.0.0.1','musica','2026-08-18 14:08:21','inicio_sesion'),
+(226,1,'127.0.0.1','musica','2026-08-18 14:10:15','inicio_sesion'),
+(227,1,'127.0.0.1','musica','2026-08-18 14:10:29','inicio_sesion'),
+(228,16,'127.0.0.1','musica','2026-08-18 14:10:52','inicio_sesion'),
+(229,1,'127.0.0.1','musica','2026-08-18 14:14:08','inicio_sesion'),
+(230,16,'127.0.0.1','musica','2026-08-18 14:36:16','inicio_sesion'),
+(231,1,'127.0.0.1','musica','2026-08-18 14:51:34','inicio_sesion'),
+(232,16,'127.0.0.1','musica','2026-08-18 15:12:02','inicio_sesion'),
+(233,4,'127.0.0.1','musica','2026-08-18 15:12:25','inicio_sesion'),
+(234,16,'127.0.0.1','musica','2026-08-18 15:13:04','inicio_sesion'),
+(235,1,'127.0.0.1','musica','2026-08-18 15:16:16','inicio_sesion'),
+(236,4,'127.0.0.1','musica','2026-08-18 15:21:29','inicio_sesion'),
+(237,1,'127.0.0.1','musica','2026-08-18 15:44:02','inicio_sesion'),
+(238,4,'127.0.0.1','musica','2026-08-18 15:48:20','inicio_sesion'),
+(239,4,'127.0.0.1','musica','2026-08-18 15:56:11','inicio_sesion'),
+(240,1,'127.0.0.1','musica','2026-08-18 16:03:37','inicio_sesion'),
+(241,4,'127.0.0.1','musica','2026-08-18 16:05:19','inicio_sesion'),
+(242,4,'127.0.0.1','musica','2026-08-18 16:37:40','inicio_sesion'),
+(243,1,'127.0.0.1','musica','2026-08-18 16:39:43','inicio_sesion'),
+(244,4,'127.0.0.1','musica','2026-08-18 16:40:15','inicio_sesion'),
+(245,4,'127.0.0.1','musica','2026-08-18 16:41:24','inicio_sesion'),
+(246,16,'127.0.0.1','musica','2026-08-18 16:41:33','inicio_sesion'),
+(247,16,'127.0.0.1','musica','2026-08-18 17:24:25','inicio_sesion'),
+(248,4,'127.0.0.1','musica','2026-08-18 17:24:33','inicio_sesion'),
+(249,1,'127.0.0.1','musica','2026-08-18 17:26:44','inicio_sesion'),
+(250,4,'127.0.0.1','musica','2026-08-18 17:36:24','inicio_sesion'),
+(251,16,'127.0.0.1','musica','2026-08-18 17:36:50','inicio_sesion'),
+(252,4,'127.0.0.1','musica','2026-08-18 17:58:11','inicio_sesion'),
+(253,1,'127.0.0.1','musica','2026-08-18 17:58:20','inicio_sesion'),
+(254,1,'127.0.0.1','musica','2026-08-19 08:11:38','inicio_sesion'),
+(255,4,'127.0.0.1','musica','2026-08-19 10:04:27','inicio_sesion'),
+(256,16,'127.0.0.1','musica','2026-08-19 10:04:43','inicio_sesion'),
+(257,1,'127.0.0.1','musica','2026-08-19 10:07:28','inicio_sesion'),
+(258,16,'127.0.0.1','musica','2026-08-19 10:24:02','inicio_sesion'),
+(259,1,'127.0.0.1','musica','2026-08-19 10:27:08','inicio_sesion'),
+(260,16,'127.0.0.1','musica','2026-08-19 10:47:56','inicio_sesion'),
+(261,1,'127.0.0.1','musica','2026-08-19 10:59:18','inicio_sesion'),
+(262,16,'127.0.0.1','musica','2026-08-19 11:06:21','inicio_sesion'),
+(263,4,'127.0.0.1','musica','2026-08-19 11:09:21','inicio_sesion'),
+(264,4,'127.0.0.1','musica','2026-08-19 11:11:28','inicio_sesion'),
+(265,16,'127.0.0.1','musica','2026-08-19 11:11:41','inicio_sesion'),
+(266,4,'127.0.0.1','musica','2026-08-19 11:20:35','inicio_sesion'),
+(267,1,'127.0.0.1','musica','2026-08-19 11:22:50','inicio_sesion'),
+(268,16,'127.0.0.1','musica','2026-08-19 11:32:36','inicio_sesion'),
+(269,16,'127.0.0.1','musica','2026-08-19 14:22:49','inicio_sesion'),
+(270,1,'127.0.0.1','musica','2026-08-19 14:32:38','inicio_sesion'),
+(271,16,'127.0.0.1','musica','2026-08-19 14:50:50','inicio_sesion'),
+(272,4,'127.0.0.1','musica','2026-08-19 14:51:15','inicio_sesion'),
+(273,1,'127.0.0.1','musica','2026-08-19 15:05:34','inicio_sesion'),
+(274,4,'127.0.0.1','musica','2026-08-19 15:22:41','inicio_sesion'),
+(275,1,'127.0.0.1','musica','2026-08-19 15:57:09','inicio_sesion'),
+(276,16,'127.0.0.1','musica','2026-08-19 16:03:24','inicio_sesion'),
+(277,1,'127.0.0.1','musica','2026-08-19 16:18:54','inicio_sesion'),
+(278,16,'127.0.0.1','musica','2026-08-19 16:46:43','inicio_sesion'),
+(279,16,'127.0.0.1','musica','2026-08-20 08:19:57','inicio_sesion'),
+(280,1,'127.0.0.1','musica','2026-08-20 08:21:24','inicio_sesion'),
+(281,16,'127.0.0.1','musica','2026-08-20 11:09:39','inicio_sesion'),
+(282,1,'127.0.0.1','musica','2026-08-20 11:12:09','inicio_sesion'),
+(283,16,'127.0.0.1','musica','2026-08-20 11:14:48','inicio_sesion'),
+(284,1,'127.0.0.1','musica','2026-08-20 11:18:28','inicio_sesion'),
+(285,16,'127.0.0.1','musica','2026-08-20 11:19:29','inicio_sesion'),
+(286,1,'127.0.0.1','musica','2026-08-20 11:20:00','inicio_sesion'),
+(287,16,'127.0.0.1','musica','2026-08-20 11:31:48','inicio_sesion'),
+(288,1,'127.0.0.1','musica','2026-08-20 11:32:03','inicio_sesion'),
+(289,16,'127.0.0.1','musica','2026-08-20 11:34:27','inicio_sesion'),
+(290,1,'127.0.0.1','musica','2026-08-20 11:35:09','inicio_sesion'),
+(291,1,'127.0.0.1','musica','2026-08-20 14:09:52','inicio_sesion'),
+(292,1,'127.0.0.1','musica','2026-08-20 14:29:32','inicio_sesion'),
+(293,16,'127.0.0.1','musica','2026-08-20 16:24:41','inicio_sesion'),
+(294,1,'127.0.0.1','musica','2026-08-20 16:40:13','inicio_sesion'),
+(295,4,'127.0.0.1','musica','2026-08-20 16:54:08','inicio_sesion'),
+(296,4,'127.0.0.1','musica','2026-08-20 16:56:25','inicio_sesion'),
+(297,16,'127.0.0.1','musica','2026-08-20 16:57:41','inicio_sesion'),
+(298,1,'127.0.0.1','musica','2026-08-20 16:57:48','inicio_sesion'),
+(299,4,'127.0.0.1','musica','2026-08-20 16:57:58','inicio_sesion'),
+(300,16,'127.0.0.1','musica','2026-08-20 17:03:19','inicio_sesion'),
+(301,4,'127.0.0.1','musica','2026-08-20 17:03:29','inicio_sesion'),
+(302,4,'127.0.0.1','musica','2026-08-20 17:16:24','inicio_sesion'),
+(303,16,'127.0.0.1','musica','2026-08-20 17:16:39','inicio_sesion'),
+(304,1,'127.0.0.1','musica','2026-08-20 17:18:25','inicio_sesion'),
+(305,4,'127.0.0.1','musica','2026-08-20 17:20:07','inicio_sesion'),
+(306,1,'127.0.0.1','musica','2026-08-20 17:47:46','inicio_sesion'),
+(307,1,'127.0.0.1','musica','2026-08-21 08:14:32','inicio_sesion'),
+(308,4,'127.0.0.1','musica','2026-08-21 08:56:51','inicio_sesion'),
+(309,16,'127.0.0.1','musica','2026-08-21 10:54:57','inicio_sesion'),
+(310,1,'127.0.0.1','musica','2026-08-21 11:57:29','inicio_sesion'),
+(311,1,'127.0.0.1','musica','2026-08-21 14:06:05','inicio_sesion'),
+(312,1,'127.0.0.1','musica','2026-08-22 08:22:03','inicio_sesion'),
+(313,4,'127.0.0.1','musica','2026-08-22 10:11:04','inicio_sesion'),
+(314,16,'127.0.0.1','musica','2026-08-22 10:11:18','inicio_sesion'),
+(315,1,'127.0.0.1','musica','2026-08-22 10:30:42','inicio_sesion'),
+(316,4,'127.0.0.1','musica','2026-08-22 10:46:52','inicio_sesion'),
+(317,16,'127.0.0.1','musica','2026-08-22 10:57:32','inicio_sesion'),
+(318,16,'127.0.0.1','musica','2026-08-22 11:05:14','inicio_sesion'),
+(319,4,'127.0.0.1','musica','2026-08-22 11:20:10','inicio_sesion'),
+(320,16,'127.0.0.1','musica','2026-08-22 11:24:14','inicio_sesion'),
+(321,1,'127.0.0.1','musica','2026-08-24 08:13:26','inicio_sesion'),
+(322,1,'127.0.0.1','musica','2026-08-24 14:12:21','inicio_sesion'),
+(323,1,'127.0.0.1','musica','2026-08-25 08:16:22','inicio_sesion'),
+(324,4,'127.0.0.1','musica','2026-08-25 11:23:15','inicio_sesion'),
+(325,16,'127.0.0.1','musica','2026-08-25 11:48:01','inicio_sesion'),
+(326,1,'127.0.0.1','musica','2026-08-25 11:48:22','inicio_sesion'),
+(327,1,'127.0.0.1','musica','2026-08-25 14:02:20','inicio_sesion'),
+(328,1,'127.0.0.1','musica','2026-08-25 17:22:41','inicio_sesion'),
+(329,1,'127.0.0.1','musica','2026-08-25 18:03:24','inicio_sesion'),
+(330,1,'127.0.0.1','musica','2026-08-26 08:04:45','inicio_sesion'),
+(331,4,'127.0.0.1','musica','2026-08-26 10:02:59','inicio_sesion'),
+(332,1,'127.0.0.1','musica','2026-08-26 10:08:45','inicio_sesion'),
+(333,4,'127.0.0.1','musica','2026-08-26 11:01:03','inicio_sesion'),
+(334,4,'127.0.0.1','musica','2026-08-26 11:03:31','inicio_sesion'),
+(335,4,'127.0.0.1','musica','2026-08-26 11:03:54','inicio_sesion'),
+(336,4,'127.0.0.1','musica','2026-08-26 14:09:45','inicio_sesion'),
+(337,4,'127.0.0.1','musica','2026-08-26 14:57:01','inicio_sesion'),
+(338,16,'127.0.0.1','musica','2026-08-26 14:57:12','inicio_sesion'),
+(339,4,'127.0.0.1','musica','2026-08-26 14:58:46','inicio_sesion'),
+(340,16,'127.0.0.1','musica','2026-08-26 14:59:39','inicio_sesion'),
+(341,4,'127.0.0.1','musica','2026-08-26 15:00:01','inicio_sesion'),
+(342,1,'127.0.0.1','musica','2026-08-26 16:08:38','inicio_sesion'),
+(343,4,'127.0.0.1','musica','2026-08-26 16:35:10','inicio_sesion'),
+(344,4,'127.0.0.1','musica','2026-08-26 17:41:10','inicio_sesion'),
+(345,4,'127.0.0.1','musica','2026-08-27 08:18:03','inicio_sesion'),
+(346,4,'127.0.0.1','musica','2026-08-27 10:08:40','inicio_sesion'),
+(347,16,'127.0.0.1','musica','2026-08-27 10:08:56','inicio_sesion'),
+(348,2,'127.0.0.1','musica','2026-08-27 11:22:07','inicio_sesion'),
+(349,4,'127.0.0.1','musica','2026-08-27 11:22:19','inicio_sesion'),
+(350,4,'127.0.0.1','musica','2026-08-27 14:08:23','inicio_sesion'),
+(351,4,'127.0.0.1','musica','2026-08-27 14:42:35','inicio_sesion');
+
+/*Table structure for table `resultados_bloque` */
+
+DROP TABLE IF EXISTS `resultados_bloque`;
+
+CREATE TABLE `resultados_bloque` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `sesion_id` bigint unsigned NOT NULL,
+  `bloque_id` bigint unsigned NOT NULL,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `correcto` tinyint(1) NOT NULL,
+  `intentos` tinyint unsigned NOT NULL DEFAULT '1',
+  `tiempo_segundos` smallint unsigned DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `resultados_bloque_bloque_estudiante_index` (`bloque_id`,`estudiante_id`),
+  KEY `resultados_bloque_sesion_index` (`sesion_id`),
+  KEY `resultados_bloque_correcto_index` (`correcto`),
+  KEY `resultados_bloque_estudiante_id_foreign` (`estudiante_id`),
+  CONSTRAINT `resultados_bloque_bloque_id_foreign` FOREIGN KEY (`bloque_id`) REFERENCES `bloques_experiencia` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `resultados_bloque_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `resultados_bloque_sesion_id_foreign` FOREIGN KEY (`sesion_id`) REFERENCES `sesiones_experiencia` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `resultados_bloque` */
 
 /*Table structure for table `seguridad_logs` */
 
@@ -2721,11 +3598,11 @@ CREATE TABLE `seguridad_logs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
   `actor_user_id` bigint unsigned DEFAULT NULL,
-  `accion` varchar(50) NOT NULL,
-  `descripcion` varchar(255) NOT NULL,
-  `registro_afectado` varchar(255) DEFAULT NULL,
-  `ip` varchar(45) DEFAULT NULL,
-  `user_agent` text,
+  `accion` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `registro_afectado` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -2733,14 +3610,350 @@ CREATE TABLE `seguridad_logs` (
   KEY `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
   CONSTRAINT `seguridad_logs_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `seguridad_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=319 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `seguridad_logs` */
 
-insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripcion`,`registro_afectado`,`ip`,`user_agent`,`created_at`,`updated_at`) values
+insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripcion`,`registro_afectado`,`ip`,`user_agent`,`created_at`,`updated_at`) values 
 (1,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 08:50:54','2026-08-04 08:50:54'),
 (2,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 08:54:22','2026-08-04 08:54:22'),
-(3,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 11:01:01','2026-08-04 11:01:01');
+(3,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36','2026-08-04 11:01:01','2026-08-04 11:01:01'),
+(4,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 09:52:15','2026-08-05 09:52:15'),
+(5,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 09:53:07','2026-08-05 09:53:07'),
+(6,4,4,'password_changed','Contraseña actualizada por el usuario.','Ana Sofia Ramirez','127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 09:59:43','2026-08-05 09:59:43'),
+(7,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 10:23:20','2026-08-05 10:23:20'),
+(8,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 10:49:34','2026-08-05 10:49:34'),
+(9,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 10:51:54','2026-08-05 10:51:54'),
+(10,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 10:52:13','2026-08-05 10:52:13'),
+(11,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 10:57:30','2026-08-05 10:57:30'),
+(12,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 10:57:57','2026-08-05 10:57:57'),
+(13,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 10:58:23','2026-08-05 10:58:23'),
+(14,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 11:01:34','2026-08-05 11:01:34'),
+(15,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 11:02:17','2026-08-05 11:02:17'),
+(16,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 11:06:06','2026-08-05 11:06:06'),
+(17,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 11:25:20','2026-08-05 11:25:20'),
+(18,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 14:02:13','2026-08-05 14:02:13'),
+(21,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 17:28:43','2026-08-05 17:28:43'),
+(22,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-05 17:37:52','2026-08-05 17:37:52'),
+(23,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 08:23:35','2026-08-06 08:23:35'),
+(24,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 09:18:08','2026-08-06 09:18:08'),
+(25,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 09:22:27','2026-08-06 09:22:27'),
+(26,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 09:22:56','2026-08-06 09:22:56'),
+(27,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 09:27:13','2026-08-06 09:27:13'),
+(28,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 09:27:23','2026-08-06 09:27:23'),
+(29,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 09:28:25','2026-08-06 09:28:25'),
+(30,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 09:29:13','2026-08-06 09:29:13'),
+(31,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 09:48:53','2026-08-06 09:48:53'),
+(32,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-06 14:18:09','2026-08-06 14:18:09'),
+(33,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-07 08:12:32','2026-08-07 08:12:32'),
+(34,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-07 08:27:23','2026-08-07 08:27:23'),
+(35,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-07 09:31:04','2026-08-07 09:31:04'),
+(36,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-07 09:45:30','2026-08-07 09:45:30'),
+(37,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-07 09:45:48','2026-08-07 09:45:48'),
+(38,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 08:17:57','2026-08-10 08:17:57'),
+(39,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 08:19:51','2026-08-10 08:19:51'),
+(40,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 08:20:44','2026-08-10 08:20:44'),
+(41,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 08:51:40','2026-08-10 08:51:40'),
+(42,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 08:51:50','2026-08-10 08:51:50'),
+(43,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 08:54:42','2026-08-10 08:54:42'),
+(44,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 09:59:14','2026-08-10 09:59:14'),
+(45,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 09:59:55','2026-08-10 09:59:55'),
+(46,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 10:33:19','2026-08-10 10:33:19'),
+(47,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 11:17:58','2026-08-10 11:17:58'),
+(48,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 11:19:17','2026-08-10 11:19:17'),
+(49,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 11:20:57','2026-08-10 11:20:57'),
+(50,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 11:39:06','2026-08-10 11:39:06'),
+(51,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 11:41:24','2026-08-10 11:41:24'),
+(52,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 12:01:38','2026-08-10 12:01:38'),
+(53,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 12:02:04','2026-08-10 12:02:04'),
+(54,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 14:16:39','2026-08-10 14:16:39'),
+(55,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 14:30:03','2026-08-10 14:30:03'),
+(56,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 14:31:27','2026-08-10 14:31:27'),
+(57,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 14:43:59','2026-08-10 14:43:59'),
+(58,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 14:55:33','2026-08-10 14:55:33'),
+(59,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 14:56:36','2026-08-10 14:56:36'),
+(60,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 14:57:18','2026-08-10 14:57:18'),
+(61,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 15:38:26','2026-08-10 15:38:26'),
+(62,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 15:38:54','2026-08-10 15:38:54'),
+(63,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 15:39:16','2026-08-10 15:39:16'),
+(64,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 16:19:52','2026-08-10 16:19:52'),
+(65,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 17:26:24','2026-08-10 17:26:24'),
+(66,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 17:27:45','2026-08-10 17:27:45'),
+(67,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 17:36:49','2026-08-10 17:36:49'),
+(68,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 17:51:08','2026-08-10 17:51:08'),
+(69,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 17:53:57','2026-08-10 17:53:57'),
+(70,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 17:56:36','2026-08-10 17:56:36'),
+(71,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 17:59:03','2026-08-10 17:59:03'),
+(72,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:07:52','2026-08-10 18:07:52'),
+(73,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:17:56','2026-08-10 18:17:56'),
+(74,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:19:59','2026-08-10 18:19:59'),
+(75,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:25:15','2026-08-10 18:25:15'),
+(76,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:26:40','2026-08-10 18:26:40'),
+(77,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:30:30','2026-08-10 18:30:30'),
+(78,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:34:06','2026-08-10 18:34:06'),
+(79,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:36:24','2026-08-10 18:36:24'),
+(80,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:46:28','2026-08-10 18:46:28'),
+(81,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-10 18:47:27','2026-08-10 18:47:27'),
+(82,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 08:14:39','2026-08-11 08:14:39'),
+(83,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 08:43:56','2026-08-11 08:43:56'),
+(84,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 08:44:10','2026-08-11 08:44:10'),
+(85,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 08:53:50','2026-08-11 08:53:50'),
+(86,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 08:57:53','2026-08-11 08:57:53'),
+(87,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 08:58:50','2026-08-11 08:58:50'),
+(88,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 08:59:52','2026-08-11 08:59:52'),
+(89,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:01:17','2026-08-11 09:01:17'),
+(90,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:02:06','2026-08-11 09:02:06'),
+(91,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:02:53','2026-08-11 09:02:53'),
+(92,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:34:03','2026-08-11 09:34:03'),
+(93,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:39:18','2026-08-11 09:39:18'),
+(94,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:39:42','2026-08-11 09:39:42'),
+(95,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:45:34','2026-08-11 09:45:34'),
+(96,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:46:54','2026-08-11 09:46:54'),
+(97,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:47:19','2026-08-11 09:47:19'),
+(98,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:57:51','2026-08-11 09:57:51'),
+(99,22,22,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 09:59:36','2026-08-11 09:59:36'),
+(100,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 10:00:38','2026-08-11 10:00:38'),
+(101,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 10:47:33','2026-08-11 10:47:33'),
+(102,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 10:47:52','2026-08-11 10:47:52'),
+(103,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 10:56:40','2026-08-11 10:56:40'),
+(104,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 10:59:52','2026-08-11 10:59:52'),
+(105,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 11:00:04','2026-08-11 11:00:04'),
+(106,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 11:04:58','2026-08-11 11:04:58'),
+(107,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 11:08:01','2026-08-11 11:08:01'),
+(108,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 11:14:22','2026-08-11 11:14:22'),
+(109,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 11:14:47','2026-08-11 11:14:47'),
+(110,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 11:15:11','2026-08-11 11:15:11'),
+(111,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 11:15:28','2026-08-11 11:15:28'),
+(112,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 11:22:58','2026-08-11 11:22:58'),
+(113,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 14:10:46','2026-08-11 14:10:46'),
+(114,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 14:44:17','2026-08-11 14:44:17'),
+(115,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 14:59:06','2026-08-11 14:59:06'),
+(116,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 15:25:41','2026-08-11 15:25:41'),
+(117,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 15:26:09','2026-08-11 15:26:09'),
+(118,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 16:09:53','2026-08-11 16:09:53'),
+(119,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 16:10:33','2026-08-11 16:10:33'),
+(120,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 16:51:21','2026-08-11 16:51:21'),
+(121,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 16:54:29','2026-08-11 16:54:29'),
+(122,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 16:54:50','2026-08-11 16:54:50'),
+(123,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-11 18:00:48','2026-08-11 18:00:48'),
+(124,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 08:16:27','2026-08-12 08:16:27'),
+(125,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 08:56:42','2026-08-12 08:56:42'),
+(126,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 09:28:01','2026-08-12 09:28:01'),
+(127,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 09:32:27','2026-08-12 09:32:27'),
+(128,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 09:32:36','2026-08-12 09:32:36'),
+(129,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 09:48:53','2026-08-12 09:48:53'),
+(130,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 09:50:41','2026-08-12 09:50:41'),
+(131,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 10:05:01','2026-08-12 10:05:01'),
+(132,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 10:13:35','2026-08-12 10:13:35'),
+(133,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 10:15:35','2026-08-12 10:15:35'),
+(134,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 10:15:57','2026-08-12 10:15:57'),
+(135,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 11:53:45','2026-08-12 11:53:45'),
+(136,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 12:02:43','2026-08-12 12:02:43'),
+(137,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 14:12:18','2026-08-12 14:12:18'),
+(138,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 14:29:39','2026-08-12 14:29:39'),
+(139,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 14:30:24','2026-08-12 14:30:24'),
+(140,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 14:30:38','2026-08-12 14:30:38'),
+(141,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-12 14:31:10','2026-08-12 14:31:10'),
+(142,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 08:08:26','2026-08-13 08:08:26'),
+(143,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 09:55:06','2026-08-13 09:55:06'),
+(144,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 10:07:19','2026-08-13 10:07:19'),
+(145,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 10:09:10','2026-08-13 10:09:10'),
+(146,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 10:22:05','2026-08-13 10:22:05'),
+(147,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 14:29:51','2026-08-13 14:29:51'),
+(148,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 14:30:00','2026-08-13 14:30:00'),
+(149,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 15:59:32','2026-08-13 15:59:32'),
+(150,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 16:24:53','2026-08-13 16:24:53'),
+(151,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 16:25:03','2026-08-13 16:25:03'),
+(152,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-13 16:33:08','2026-08-13 16:33:08'),
+(153,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 08:15:37','2026-08-14 08:15:37'),
+(154,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 08:16:14','2026-08-14 08:16:14'),
+(155,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 10:05:53','2026-08-14 10:05:53'),
+(156,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 11:08:49','2026-08-14 11:08:49'),
+(157,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 14:14:59','2026-08-14 14:14:59'),
+(158,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 14:42:09','2026-08-14 14:42:09'),
+(159,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 14:44:10','2026-08-14 14:44:10'),
+(160,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 15:19:59','2026-08-14 15:19:59'),
+(161,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 15:45:20','2026-08-14 15:45:20'),
+(162,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 15:49:17','2026-08-14 15:49:17'),
+(163,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 15:54:24','2026-08-14 15:54:24'),
+(164,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 16:12:59','2026-08-14 16:12:59'),
+(165,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 16:13:36','2026-08-14 16:13:36'),
+(166,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 16:15:14','2026-08-14 16:15:14'),
+(167,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 16:16:20','2026-08-14 16:16:20'),
+(168,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 16:16:28','2026-08-14 16:16:28'),
+(169,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 16:32:17','2026-08-14 16:32:17'),
+(170,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 16:42:03','2026-08-14 16:42:03'),
+(171,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 16:54:33','2026-08-14 16:54:33'),
+(172,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-14 16:55:46','2026-08-14 16:55:46'),
+(173,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-15 08:17:22','2026-08-15 08:17:22'),
+(174,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-15 08:24:49','2026-08-15 08:24:49'),
+(175,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-15 08:25:52','2026-08-15 08:25:52'),
+(176,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-15 08:35:02','2026-08-15 08:35:02'),
+(177,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-15 08:48:41','2026-08-15 08:48:41'),
+(178,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-15 08:50:27','2026-08-15 08:50:27'),
+(179,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-15 09:02:33','2026-08-15 09:02:33'),
+(180,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-15 10:02:17','2026-08-15 10:02:17'),
+(181,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 08:03:36','2026-08-18 08:03:36'),
+(182,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 09:01:05','2026-08-18 09:01:05'),
+(183,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 09:03:08','2026-08-18 09:03:08'),
+(184,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 09:28:48','2026-08-18 09:28:48'),
+(185,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 09:32:54','2026-08-18 09:32:54'),
+(186,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 09:47:35','2026-08-18 09:47:35'),
+(187,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 09:47:53','2026-08-18 09:47:53'),
+(188,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 09:50:10','2026-08-18 09:50:10'),
+(189,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 10:01:28','2026-08-18 10:01:28'),
+(190,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 11:30:06','2026-08-18 11:30:06'),
+(191,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 11:55:53','2026-08-18 11:55:53'),
+(192,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 14:08:21','2026-08-18 14:08:21'),
+(193,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 14:10:15','2026-08-18 14:10:15'),
+(194,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 14:10:29','2026-08-18 14:10:29'),
+(195,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 14:10:52','2026-08-18 14:10:52'),
+(196,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 14:14:08','2026-08-18 14:14:08'),
+(197,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 14:36:16','2026-08-18 14:36:16'),
+(198,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 14:51:34','2026-08-18 14:51:34'),
+(199,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 15:12:02','2026-08-18 15:12:02'),
+(200,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 15:12:25','2026-08-18 15:12:25'),
+(201,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 15:13:04','2026-08-18 15:13:04'),
+(202,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 15:16:16','2026-08-18 15:16:16'),
+(203,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 15:21:29','2026-08-18 15:21:29'),
+(204,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 15:44:02','2026-08-18 15:44:02'),
+(205,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 15:48:20','2026-08-18 15:48:20'),
+(206,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 15:56:11','2026-08-18 15:56:11'),
+(207,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 16:03:37','2026-08-18 16:03:37'),
+(208,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 16:05:19','2026-08-18 16:05:19'),
+(209,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 16:37:40','2026-08-18 16:37:40'),
+(210,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 16:39:43','2026-08-18 16:39:43'),
+(211,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 16:40:15','2026-08-18 16:40:15'),
+(212,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 16:41:24','2026-08-18 16:41:24'),
+(213,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 16:41:33','2026-08-18 16:41:33'),
+(214,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 17:24:25','2026-08-18 17:24:25'),
+(215,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 17:24:33','2026-08-18 17:24:33'),
+(216,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 17:26:44','2026-08-18 17:26:44'),
+(217,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 17:36:24','2026-08-18 17:36:24'),
+(218,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 17:36:50','2026-08-18 17:36:50'),
+(219,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 17:58:11','2026-08-18 17:58:11'),
+(220,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-18 17:58:20','2026-08-18 17:58:20'),
+(221,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 08:11:38','2026-08-19 08:11:38'),
+(222,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 10:04:27','2026-08-19 10:04:27'),
+(223,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 10:04:43','2026-08-19 10:04:43'),
+(224,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 10:07:28','2026-08-19 10:07:28'),
+(225,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 10:24:02','2026-08-19 10:24:02'),
+(226,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 10:27:08','2026-08-19 10:27:08'),
+(227,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 10:47:56','2026-08-19 10:47:56'),
+(228,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 10:59:18','2026-08-19 10:59:18'),
+(229,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 11:06:21','2026-08-19 11:06:21'),
+(230,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 11:09:21','2026-08-19 11:09:21'),
+(231,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 11:11:28','2026-08-19 11:11:28'),
+(232,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 11:11:41','2026-08-19 11:11:41'),
+(233,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 11:20:35','2026-08-19 11:20:35'),
+(234,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 11:22:50','2026-08-19 11:22:50'),
+(235,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 11:32:36','2026-08-19 11:32:36'),
+(236,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 14:22:49','2026-08-19 14:22:49'),
+(237,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 14:32:38','2026-08-19 14:32:38'),
+(238,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 14:50:50','2026-08-19 14:50:50'),
+(239,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 14:51:15','2026-08-19 14:51:15'),
+(240,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 15:05:34','2026-08-19 15:05:34'),
+(241,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 15:22:41','2026-08-19 15:22:41'),
+(242,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 15:57:09','2026-08-19 15:57:09'),
+(243,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 16:03:24','2026-08-19 16:03:24'),
+(244,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 16:18:54','2026-08-19 16:18:54'),
+(245,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-19 16:46:43','2026-08-19 16:46:43'),
+(246,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 08:19:57','2026-08-20 08:19:57'),
+(247,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 08:21:24','2026-08-20 08:21:24'),
+(248,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:09:39','2026-08-20 11:09:39'),
+(249,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:12:09','2026-08-20 11:12:09'),
+(250,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:14:48','2026-08-20 11:14:48'),
+(251,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:18:28','2026-08-20 11:18:28'),
+(252,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:19:29','2026-08-20 11:19:29'),
+(253,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:20:00','2026-08-20 11:20:00'),
+(254,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:31:48','2026-08-20 11:31:48'),
+(255,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:32:03','2026-08-20 11:32:03'),
+(256,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:34:27','2026-08-20 11:34:27'),
+(257,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 11:35:09','2026-08-20 11:35:09'),
+(258,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 14:09:52','2026-08-20 14:09:52'),
+(259,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 14:29:32','2026-08-20 14:29:32'),
+(260,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 16:24:41','2026-08-20 16:24:41'),
+(261,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 16:40:13','2026-08-20 16:40:13'),
+(262,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 16:54:08','2026-08-20 16:54:08'),
+(263,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 16:56:25','2026-08-20 16:56:25'),
+(264,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 16:57:41','2026-08-20 16:57:41'),
+(265,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 16:57:48','2026-08-20 16:57:48'),
+(266,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 16:57:58','2026-08-20 16:57:58'),
+(267,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 17:03:19','2026-08-20 17:03:19'),
+(268,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 17:03:29','2026-08-20 17:03:29'),
+(269,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 17:16:24','2026-08-20 17:16:24'),
+(270,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 17:16:39','2026-08-20 17:16:39'),
+(271,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 17:18:25','2026-08-20 17:18:25'),
+(272,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 17:20:07','2026-08-20 17:20:07'),
+(273,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-20 17:47:46','2026-08-20 17:47:46'),
+(274,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-21 08:14:32','2026-08-21 08:14:32'),
+(275,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-21 08:56:51','2026-08-21 08:56:51'),
+(276,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-21 10:54:57','2026-08-21 10:54:57'),
+(277,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-21 11:57:29','2026-08-21 11:57:29'),
+(278,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-21 14:06:05','2026-08-21 14:06:05'),
+(279,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-22 08:22:03','2026-08-22 08:22:03'),
+(280,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-22 10:11:04','2026-08-22 10:11:04'),
+(281,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-22 10:11:18','2026-08-22 10:11:18'),
+(282,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-22 10:30:42','2026-08-22 10:30:42'),
+(283,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-22 10:46:52','2026-08-22 10:46:52'),
+(284,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-22 10:57:32','2026-08-22 10:57:32'),
+(285,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-22 11:05:14','2026-08-22 11:05:14'),
+(286,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-22 11:20:10','2026-08-22 11:20:10'),
+(287,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-22 11:24:14','2026-08-22 11:24:14'),
+(288,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-24 08:13:26','2026-08-24 08:13:26'),
+(289,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-24 14:12:21','2026-08-24 14:12:21'),
+(290,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-25 08:16:22','2026-08-25 08:16:22'),
+(291,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-25 11:23:15','2026-08-25 11:23:15'),
+(292,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-25 11:48:01','2026-08-25 11:48:01'),
+(293,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-25 11:48:22','2026-08-25 11:48:22'),
+(294,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-25 14:02:20','2026-08-25 14:02:20'),
+(295,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-25 17:22:41','2026-08-25 17:22:41'),
+(296,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-25 18:03:24','2026-08-25 18:03:24'),
+(297,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 08:04:45','2026-08-26 08:04:45'),
+(298,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 10:02:59','2026-08-26 10:02:59'),
+(299,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 10:08:45','2026-08-26 10:08:45'),
+(300,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 11:01:03','2026-08-26 11:01:03'),
+(301,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 11:03:31','2026-08-26 11:03:31'),
+(302,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 11:03:54','2026-08-26 11:03:54'),
+(303,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 14:09:45','2026-08-26 14:09:45'),
+(304,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 14:57:01','2026-08-26 14:57:01'),
+(305,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 14:57:12','2026-08-26 14:57:12'),
+(306,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 14:58:46','2026-08-26 14:58:46'),
+(307,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 14:59:39','2026-08-26 14:59:39'),
+(308,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 15:00:01','2026-08-26 15:00:01'),
+(309,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 16:08:38','2026-08-26 16:08:38'),
+(310,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 16:35:10','2026-08-26 16:35:10'),
+(311,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-26 17:41:10','2026-08-26 17:41:10'),
+(312,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-27 08:18:03','2026-08-27 08:18:03'),
+(313,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-27 10:08:40','2026-08-27 10:08:40'),
+(314,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-27 10:08:56','2026-08-27 10:08:56'),
+(315,2,2,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-27 11:22:07','2026-08-27 11:22:07'),
+(316,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-27 11:22:19','2026-08-27 11:22:19'),
+(317,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-27 14:08:23','2026-08-27 14:08:23'),
+(318,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36','2026-08-27 14:42:35','2026-08-27 14:42:35');
+
+/*Table structure for table `sesiones_experiencia` */
+
+DROP TABLE IF EXISTS `sesiones_experiencia`;
+
+CREATE TABLE `sesiones_experiencia` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `experiencia_id` bigint unsigned NOT NULL,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `iniciada_en` timestamp NOT NULL,
+  `finalizada_en` timestamp NULL DEFAULT NULL,
+  `duracion_real_segundos` int unsigned DEFAULT NULL,
+  `completada` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `sesiones_experiencia_experiencia_estudiante_index` (`experiencia_id`,`estudiante_id`),
+  KEY `sesiones_experiencia_estudiante_iniciada_index` (`estudiante_id`,`iniciada_en`),
+  KEY `sesiones_experiencia_completada_index` (`completada`),
+  CONSTRAINT `sesiones_experiencia_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `sesiones_experiencia_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `sesiones_experiencia` */
 
 /*Table structure for table `temas` */
 
@@ -2750,13 +3963,13 @@ CREATE TABLE `temas` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `modulo_id` bigint unsigned NOT NULL,
   `eje_id` bigint unsigned DEFAULT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `descripcion` text,
-  `icono` varchar(255) DEFAULT NULL,
-  `instruccion_corta` varchar(255) DEFAULT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `icono` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `instruccion_corta` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `orden` tinyint unsigned NOT NULL DEFAULT '0',
-  `marcador_ra` varchar(255) DEFAULT NULL,
+  `marcador_ra` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `es_oficial` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -2764,11 +3977,69 @@ CREATE TABLE `temas` (
   PRIMARY KEY (`id`),
   KEY `temas_modulo_id_foreign` (`modulo_id`),
   KEY `temas_eje_id_foreign` (`eje_id`),
-  CONSTRAINT `temas_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `temas_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL
+  CONSTRAINT `temas_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `temas_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `temas` */
+
+/*Table structure for table `tematica_dba` */
+
+DROP TABLE IF EXISTS `tematica_dba`;
+
+CREATE TABLE `tematica_dba` (
+  `tematica_id` bigint unsigned NOT NULL,
+  `catalogo_dba_id` bigint unsigned NOT NULL,
+  `relacion` enum('principal','complementario') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'principal',
+  `observacion` text COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`tematica_id`,`catalogo_dba_id`),
+  KEY `tematica_dba_catalogo_dba_id_foreign` (`catalogo_dba_id`),
+  CONSTRAINT `tematica_dba_catalogo_dba_id_foreign` FOREIGN KEY (`catalogo_dba_id`) REFERENCES `catalogo_dba` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tematica_dba_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `tematica_dba` */
+
+insert  into `tematica_dba`(`tematica_id`,`catalogo_dba_id`,`relacion`,`observacion`) values 
+(3,2,'principal',NULL);
+
+/*Table structure for table `tematicas` */
+
+DROP TABLE IF EXISTS `tematicas`;
+
+CREATE TABLE `tematicas` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `eje_id` bigint unsigned NOT NULL,
+  `nombre` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `competencia` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `referente_alternativo` text COLLATE utf8mb4_unicode_ci,
+  `requiere_ra` tinyint(1) NOT NULL DEFAULT '0',
+  `requiere_acompanamiento` tinyint(1) NOT NULL DEFAULT '0',
+  `es_oficial` tinyint(1) NOT NULL DEFAULT '1',
+  `institucion_id` bigint unsigned DEFAULT NULL,
+  `estado` enum('borrador','activa','archivada') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'borrador',
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `creado_por` bigint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tematicas_eje_id_foreign` (`eje_id`),
+  KEY `tematicas_institucion_id_foreign` (`institucion_id`),
+  KEY `tematicas_creado_por_foreign` (`creado_por`),
+  KEY `tematicas_eje_oficial_institucion_index` (`eje_id`,`es_oficial`,`institucion_id`),
+  KEY `tematicas_estado_activo_index` (`estado`,`activo`),
+  CONSTRAINT `tematicas_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `tematicas_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tematicas_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `tematicas` */
+
+insert  into `tematicas`(`id`,`eje_id`,`nombre`,`competencia`,`referente_alternativo`,`requiere_ra`,`requiere_acompanamiento`,`es_oficial`,`institucion_id`,`estado`,`activo`,`creado_por`,`created_at`,`updated_at`) values 
+(1,8,'Primera Prueba',NULL,NULL,1,0,0,1,'activa',1,16,'2026-08-14 16:27:43','2026-08-14 16:28:49'),
+(3,8,'Prueba docente',NULL,NULL,0,1,0,1,'activa',1,4,'2026-08-15 08:28:19','2026-08-18 15:12:47'),
+(5,1,'Identifica los colores',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-08-24 08:20:38','2026-08-24 08:20:38'),
+(6,2,'Identifica los colores',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-08-24 14:59:55','2026-08-24 14:59:55');
 
 /*Table structure for table `users` */
 
@@ -2777,15 +4048,15 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `institucion_id` bigint unsigned DEFAULT NULL,
-  `identificacion` varchar(50) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `apellido` varchar(255) DEFAULT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `rol` enum('superAdmin','admin','docente') NOT NULL DEFAULT 'docente',
-  `estado` enum('activo','inactivo','eliminado') NOT NULL DEFAULT 'activo',
+  `identificacion` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rol` enum('superAdmin','admin','docente') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'docente',
+  `estado` enum('activo','inactivo','eliminado') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'activo',
   `creado_por` bigint unsigned DEFAULT NULL,
-  `remember_token` varchar(100) DEFAULT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `bloqueado_en` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -2795,459 +4066,41 @@ CREATE TABLE `users` (
   KEY `users_creado_por_foreign` (`creado_por`),
   CONSTRAINT `users_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `users_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `users` */
 
-insert  into `users`(`id`,`institucion_id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`creado_por`,`remember_token`,`bloqueado_en`,`created_at`,`updated_at`) values
+insert  into `users`(`id`,`institucion_id`,`identificacion`,`nombre`,`apellido`,`email`,`password`,`rol`,`estado`,`creado_por`,`remember_token`,`bloqueado_en`,`created_at`,`updated_at`) values 
 (1,NULL,'1234567890','Super','Admin','superadmin@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','superAdmin','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(2,1,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$1ayJZZHZTm69wZ3YQcU4ZewcwdSd7GDpGKMR2LH0reayC5g6Rg1bW','docente','activo',NULL,NULL,NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58'),
-(4,1,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$xaq8IzkCANMR486WjHqUOORDgCC9BuwE7sIUUgKMYWCbhEHKcGi5q','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-24 15:36:35'),
-(5,1,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$CrH2dWYlMdA4gcmrQ6J2ReOmOFUb3oq47nb6PxSdjxpjHRkSfMWVC','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
-(16,1,'OSRaOLyVQB','Administrador',NULL,'fabian.quintero.2201@gmail.com','$2y$10$v8Np5rui71dWGOQFMtU3DOWfBNrJgjd.NqOhLUgwHHPYBOrHVt25y','admin','activo',1,NULL,NULL,'2026-08-04 08:53:36','2026-08-04 08:53:36');
+(2,1,'2131231456','Docente Música','Música','docente.musica@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','docente','activo',NULL,NULL,NULL,'2026-06-16 00:02:02','2026-06-24 15:36:58'),
+(4,1,'3423445664','Ana Sofia','Ramirez','ana.sofia@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-08-05 09:59:43'),
+(5,1,'32434','Carlos Eduardo',' Perez','carlos.perez@aulasreggio.test','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','docente','activo',NULL,NULL,NULL,'2026-06-16 17:32:50','2026-06-16 17:32:50'),
+(16,1,'OSRaOLyVQB','Administrador',NULL,'fabian.quintero.2201@gmail.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','admin','activo',1,NULL,NULL,'2026-08-04 08:53:36','2026-08-04 08:53:36'),
+(22,3,'BNsz8FXBES','Ana Sofia Ramirez',NULL,'anasofia@admin.com','$2y$10$rngQeezoZKiaqQSdpMy8teTS1EURd77eK8hOid.mKli6QMtblBOPu','admin','activo',1,NULL,NULL,'2026-08-11 09:59:02','2026-08-11 09:59:02');
 
+/*Table structure for table `versiones_tematica` */
 
-DROP TABLE IF EXISTS `areas`;
-
-CREATE TABLE `areas` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `nombre` VARCHAR(100) NOT NULL,
-    `estado` BOOLEAN NOT NULL DEFAULT TRUE,
-    `created_at` TIMESTAMP NULL DEFAULT NULL,
-    `updated_at` TIMESTAMP NULL DEFAULT NULL,
-
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `areas_nombre_unique` (`nombre`)
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-INSERT INTO `areas` (`nombre`, `estado`, `created_at`, `updated_at`) VALUES
-('Lenguaje', TRUE, NOW(), NOW()),
-('Matemáticas', TRUE, NOW(), NOW()),
-('Ciencias Naturales', TRUE, NOW(), NOW()),
-('Ciencias Sociales', TRUE, NOW(), NOW()),
-('Artística', TRUE, NOW(), NOW()),
-('Corporal', TRUE, NOW(), NOW());
-
-DROP TABLE IF EXISTS `catalogo_dba`;
-
-CREATE TABLE `catalogo_dba` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `codigo` VARCHAR(50) NOT NULL,
-    `area_id` BIGINT UNSIGNED NOT NULL,
-    `grado_id` BIGINT UNSIGNED NOT NULL,
-    `descripcion` TEXT NULL,
-    `es_men` BOOLEAN NOT NULL DEFAULT TRUE,
-    `estado` BOOLEAN NOT NULL DEFAULT TRUE,
-    `institucion_id` BIGINT UNSIGNED NULL DEFAULT NULL,
-    `creado_por` BIGINT UNSIGNED NOT NULL,
-    `created_at` TIMESTAMP NULL DEFAULT NULL,
-    `updated_at` TIMESTAMP NULL DEFAULT NULL,
-
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `catalogo_dba_institucion_codigo_unique` (`institucion_id`, `codigo`),
-    KEY `catalogo_dba_area_id_foreign` (`area_id`),
-    KEY `catalogo_dba_grado_id_foreign` (`grado_id`),
-    KEY `catalogo_dba_institucion_id_foreign` (`institucion_id`),
-    KEY `catalogo_dba_creado_por_foreign` (`creado_por`),
-
-    CONSTRAINT `catalogo_dba_area_id_foreign`
-        FOREIGN KEY (`area_id`)
-        REFERENCES `areas` (`id`)
-        ON DELETE RESTRICT,
-
-    CONSTRAINT `catalogo_dba_grado_id_foreign`
-        FOREIGN KEY (`grado_id`)
-        REFERENCES `grados` (`id`)
-        ON DELETE RESTRICT,
-
-    CONSTRAINT `catalogo_dba_institucion_id_foreign`
-        FOREIGN KEY (`institucion_id`)
-        REFERENCES `instituciones` (`id`)
-        ON DELETE RESTRICT,
-
-    CONSTRAINT `catalogo_dba_creado_por_foreign`
-        FOREIGN KEY (`creado_por`)
-        REFERENCES `users` (`id`)
-        ON DELETE RESTRICT
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-/*Table structure for curriculum tematicas / experiencias */
-
-DROP TABLE IF EXISTS `tematica_dba`;
-DROP TABLE IF EXISTS `indicadores_logro`;
-DROP TABLE IF EXISTS `experiencia_materiales`;
-DROP TABLE IF EXISTS `experiencias`;
 DROP TABLE IF EXISTS `versiones_tematica`;
-DROP TABLE IF EXISTS `tematicas`;
-
-CREATE TABLE `tematicas` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `eje_id` BIGINT UNSIGNED NOT NULL,
-    `nombre` VARCHAR(150) NOT NULL,
-    `competencia` VARCHAR(100) NULL,
-    `referente_alternativo` TEXT NULL,
-    `requiere_ra` TINYINT(1) NOT NULL DEFAULT 0,
-    `requiere_acompanamiento` TINYINT(1) NOT NULL DEFAULT 0,
-    `es_oficial` TINYINT(1) NOT NULL DEFAULT 1,
-    `institucion_id` BIGINT UNSIGNED NULL,
-    `estado` ENUM('borrador', 'activa', 'archivada') NOT NULL DEFAULT 'borrador',
-    `activo` TINYINT(1) NOT NULL DEFAULT 1,
-    `creado_por` BIGINT UNSIGNED NOT NULL,
-    `created_at` TIMESTAMP NULL DEFAULT NULL,
-    `updated_at` TIMESTAMP NULL DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `tematicas_eje_id_foreign` (`eje_id`),
-    KEY `tematicas_institucion_id_foreign` (`institucion_id`),
-    KEY `tematicas_creado_por_foreign` (`creado_por`),
-    KEY `tematicas_eje_oficial_institucion_index` (`eje_id`, `es_oficial`, `institucion_id`),
-    KEY `tematicas_estado_activo_index` (`estado`, `activo`),
-    CONSTRAINT `tematicas_eje_id_foreign`
-        FOREIGN KEY (`eje_id`)
-        REFERENCES `ejes` (`id`)
-        ON DELETE CASCADE,
-    CONSTRAINT `tematicas_institucion_id_foreign`
-        FOREIGN KEY (`institucion_id`)
-        REFERENCES `instituciones` (`id`)
-        ON DELETE SET NULL,
-    CONSTRAINT `tematicas_creado_por_foreign`
-        FOREIGN KEY (`creado_por`)
-        REFERENCES `users` (`id`)
-        ON DELETE RESTRICT
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `tematicas` */
-
-CREATE TABLE `experiencias` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `tematica_id` BIGINT UNSIGNED NOT NULL,
-    `grado_id` BIGINT UNSIGNED NOT NULL,
-    `nombre` VARCHAR(150) NOT NULL,
-    `objetivo` TEXT NOT NULL,
-    `proposito` TEXT NULL,
-    `habilidades` TEXT NULL,
-    `duracion_minutos` TINYINT UNSIGNED NOT NULL DEFAULT 20,
-    `referente_aprendizaje` TEXT NULL,
-    `estado` ENUM('borrador', 'activa', 'archivada') NOT NULL DEFAULT 'borrador',
-    `activo` TINYINT(1) NOT NULL DEFAULT 1,
-    `creado_por` BIGINT UNSIGNED NOT NULL,
-    `created_at` TIMESTAMP NULL DEFAULT NULL,
-    `updated_at` TIMESTAMP NULL DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `experiencias_tematica_id_foreign` (`tematica_id`),
-    KEY `experiencias_grado_id_foreign` (`grado_id`),
-    KEY `experiencias_creado_por_foreign` (`creado_por`),
-    KEY `experiencias_tematica_estado_activo_index` (`tematica_id`, `estado`, `activo`),
-    UNIQUE KEY `experiencias_validacion` (`tematica_id`, `grado_id`, `nombre`),
-    CONSTRAINT `experiencias_tematica_id_foreign`
-        FOREIGN KEY (`tematica_id`)
-        REFERENCES `tematicas` (`id`)
-        ON DELETE CASCADE,
-    CONSTRAINT `experiencias_grado_id_foreign`
-        FOREIGN KEY (`grado_id`)
-        REFERENCES `grados` (`id`)
-        ON DELETE RESTRICT,
-    CONSTRAINT `experiencias_creado_por_foreign`
-        FOREIGN KEY (`creado_por`)
-        REFERENCES `users` (`id`)
-        ON DELETE RESTRICT
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `experiencias` */
-
-CREATE TABLE `experiencia_materiales` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `experiencia_id` BIGINT UNSIGNED NOT NULL,
-    `nombre` VARCHAR(150) NOT NULL,
-    `cantidad` VARCHAR(60) NOT NULL,
-    `es_obligatorio` TINYINT(1) NOT NULL DEFAULT 1,
-    `orden` TINYINT UNSIGNED NOT NULL DEFAULT 1,
-    PRIMARY KEY (`id`),
-    KEY `experiencia_materiales_experiencia_id_foreign` (`experiencia_id`),
-    KEY `experiencia_materiales_experiencia_orden_index` (`experiencia_id`, `orden`),
-    CONSTRAINT `experiencia_materiales_experiencia_id_foreign`
-        FOREIGN KEY (`experiencia_id`)
-        REFERENCES `experiencias` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `experiencia_materiales` */
-
-CREATE TABLE `indicadores_logro` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `tematica_id` BIGINT UNSIGNED NOT NULL,
-    `descripcion` VARCHAR(300) NOT NULL,
-    `orden` TINYINT UNSIGNED NOT NULL DEFAULT 1,
-    PRIMARY KEY (`id`),
-    KEY `indicadores_logro_tematica_id_foreign` (`tematica_id`),
-    KEY `indicadores_logro_tematica_orden_index` (`tematica_id`, `orden`),
-    CONSTRAINT `indicadores_logro_tematica_id_foreign`
-        FOREIGN KEY (`tematica_id`)
-        REFERENCES `tematicas` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `indicadores_logro` */
-
-CREATE TABLE `tematica_dba` (
-    `tematica_id` BIGINT UNSIGNED NOT NULL,
-    `catalogo_dba_id` BIGINT UNSIGNED NOT NULL,
-    `relacion` ENUM('principal', 'complementario') NOT NULL DEFAULT 'principal',
-    `observacion` TEXT NULL,
-    PRIMARY KEY (`tematica_id`, `catalogo_dba_id`),
-    KEY `tematica_dba_catalogo_dba_id_foreign` (`catalogo_dba_id`),
-    CONSTRAINT `tematica_dba_tematica_id_foreign`
-        FOREIGN KEY (`tematica_id`)
-        REFERENCES `tematicas` (`id`)
-        ON DELETE CASCADE,
-    CONSTRAINT `tematica_dba_catalogo_dba_id_foreign`
-        FOREIGN KEY (`catalogo_dba_id`)
-        REFERENCES `catalogo_dba` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `tematica_dba` */
 
 CREATE TABLE `versiones_tematica` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `tematica_id` BIGINT UNSIGNED NOT NULL,
-    `snapshot` JSON NOT NULL,
-    `creado_por` BIGINT UNSIGNED NOT NULL,
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `versiones_tematica_tematica_id_foreign` (`tematica_id`),
-    KEY `versiones_tematica_creado_por_foreign` (`creado_por`),
-    KEY `versiones_tematica_tematica_id_created_at_index` (`tematica_id`, `created_at`),
-    CONSTRAINT `versiones_tematica_tematica_id_foreign`
-        FOREIGN KEY (`tematica_id`)
-        REFERENCES `tematicas` (`id`)
-        ON DELETE CASCADE,
-    CONSTRAINT `versiones_tematica_creado_por_foreign`
-        FOREIGN KEY (`creado_por`)
-        REFERENCES `users` (`id`)
-        ON DELETE RESTRICT
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `tematica_id` bigint unsigned NOT NULL,
+  `snapshot` json NOT NULL,
+  `creado_por` bigint unsigned NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `versiones_tematica_creado_por_foreign` (`creado_por`),
+  KEY `versiones_tematica_tematica_id_created_at_index` (`tematica_id`,`created_at`),
+  CONSTRAINT `versiones_tematica_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `versiones_tematica_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `bloques_experiencia`;
+/*Data for the table `versiones_tematica` */
 
-/*Table structure for table `bloques_experiencia` */
-CREATE TABLE `bloques_experiencia` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `experiencia_id` BIGINT UNSIGNED NOT NULL,
-    `tipo` ENUM(
-        'bienvenida',
-        'audio',
-        'video',
-        'imagen',
-        'historia',
-        'ra',
-        'evidencia',
-        'juego',
-        'dibujo',
-        'pregunta',
-        'emparejar',
-        'clasificacion',
-        'arrastrar',
-        'reto',
-        'emocion',
-        'recompensa'
-    ) NOT NULL,
-    `orden` TINYINT UNSIGNED NOT NULL,
-    `datos` JSON NOT NULL,
-    `activo` BOOLEAN NOT NULL DEFAULT TRUE,
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (`id`),
-
-    UNIQUE KEY `bloques_experiencia_experiencia_orden_unique`
-        (`experiencia_id`, `orden`),
-
-    KEY `bloques_experiencia_experiencia_id_index`
-        (`experiencia_id`),
-
-    KEY `bloques_experiencia_tipo_index`
-        (`tipo`),
-
-    CONSTRAINT `bloques_experiencia_experiencia_id_foreign`
-        FOREIGN KEY (`experiencia_id`)
-        REFERENCES `experiencias` (`id`)
-        ON DELETE CASCADE
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-DROP TABLE IF EXISTS `sesiones_experiencia`;
-
-/*Table structure for table `sesiones_experiencia` */
-CREATE TABLE `sesiones_experiencia` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `experiencia_id` BIGINT UNSIGNED NOT NULL,
-    `estudiante_id` BIGINT UNSIGNED NOT NULL,
-    `iniciada_en` TIMESTAMP NOT NULL,
-    `finalizada_en` TIMESTAMP NULL DEFAULT NULL,
-    `duracion_real_segundos` INT UNSIGNED NULL DEFAULT NULL,
-    `completada` BOOLEAN NOT NULL DEFAULT FALSE,
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (`id`),
-
-    KEY `sesiones_experiencia_experiencia_estudiante_index`
-        (`experiencia_id`, `estudiante_id`),
-
-    KEY `sesiones_experiencia_estudiante_iniciada_index`
-        (`estudiante_id`, `iniciada_en`),
-
-    KEY `sesiones_experiencia_completada_index`
-        (`completada`),
-
-    CONSTRAINT `sesiones_experiencia_experiencia_id_foreign`
-        FOREIGN KEY (`experiencia_id`)
-        REFERENCES `experiencias` (`id`)
-        ON DELETE RESTRICT,
-
-    CONSTRAINT `sesiones_experiencia_estudiante_id_foreign`
-        FOREIGN KEY (`estudiante_id`)
-        REFERENCES `estudiantes` (`id`)
-        ON DELETE RESTRICT
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-DROP TABLE IF EXISTS `resultados_bloque`;
-
-/*Table structure for table `resultados_bloque` */
-CREATE TABLE `resultados_bloque` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `sesion_id` BIGINT UNSIGNED NOT NULL,
-    `bloque_id` BIGINT UNSIGNED NOT NULL,
-    `estudiante_id` BIGINT UNSIGNED NOT NULL,
-    `correcto` BOOLEAN NOT NULL,
-    `intentos` TINYINT UNSIGNED NOT NULL DEFAULT 1,
-    `tiempo_segundos` SMALLINT UNSIGNED NULL DEFAULT NULL,
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (`id`),
-
-    KEY `resultados_bloque_bloque_estudiante_index`
-        (`bloque_id`, `estudiante_id`),
-
-    KEY `resultados_bloque_sesion_index`
-        (`sesion_id`),
-
-    KEY `resultados_bloque_correcto_index`
-        (`correcto`),
-
-    CONSTRAINT `resultados_bloque_sesion_id_foreign`
-        FOREIGN KEY (`sesion_id`)
-        REFERENCES `sesiones_experiencia` (`id`)
-        ON DELETE CASCADE,
-
-    CONSTRAINT `resultados_bloque_bloque_id_foreign`
-        FOREIGN KEY (`bloque_id`)
-        REFERENCES `bloques_experiencia` (`id`)
-        ON DELETE CASCADE,
-
-    CONSTRAINT `resultados_bloque_estudiante_id_foreign`
-        FOREIGN KEY (`estudiante_id`)
-        REFERENCES `estudiantes` (`id`)
-        ON DELETE RESTRICT
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-DROP TABLE IF EXISTS `participaciones_bloque`;
-
-/*Table structure for table `participaciones_bloque` */
-CREATE TABLE `participaciones_bloque` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `sesion_id` BIGINT UNSIGNED NOT NULL,
-    `bloque_id` BIGINT UNSIGNED NOT NULL,
-    `estudiante_id` BIGINT UNSIGNED NOT NULL,
-    `tipo` VARCHAR(30) NOT NULL,
-    `archivo_path` VARCHAR(255) NULL DEFAULT NULL,
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `participaciones_bloque_bloque_estudiante_index`
-        (`bloque_id`, `estudiante_id`),
-    KEY `participaciones_bloque_sesion_index`
-        (`sesion_id`),
-    CONSTRAINT `participaciones_bloque_sesion_id_foreign`
-        FOREIGN KEY (`sesion_id`)
-        REFERENCES `sesiones_experiencia` (`id`)
-        ON DELETE CASCADE,
-
-    CONSTRAINT `participaciones_bloque_bloque_id_foreign`
-        FOREIGN KEY (`bloque_id`)
-        REFERENCES `bloques_experiencia` (`id`)
-        ON DELETE CASCADE,
-
-    CONSTRAINT `participaciones_bloque_estudiante_id_foreign`
-        FOREIGN KEY (`estudiante_id`)
-        REFERENCES `estudiantes` (`id`)
-        ON DELETE RESTRICT
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
-
-DROP TABLE IF EXISTS `emociones_sesion`;
-
-/*Table structure for table `emociones_sesion` */
-CREATE TABLE `emociones_sesion` (
-    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `sesion_id` BIGINT UNSIGNED NOT NULL,
-    `bloque_id` BIGINT UNSIGNED NOT NULL,
-    `estudiante_id` BIGINT UNSIGNED NOT NULL,
-    `emocion` VARCHAR(30) NOT NULL,
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `emociones_sesion_sesion_id_unique`
-        (`sesion_id`),
-    KEY `emociones_sesion_estudiante_created_index`
-        (`estudiante_id`, `created_at`),
-    CONSTRAINT `emociones_sesion_sesion_id_foreign`
-        FOREIGN KEY (`sesion_id`)
-        REFERENCES `sesiones_experiencia` (`id`)
-        ON DELETE CASCADE,
-
-    CONSTRAINT `emociones_sesion_bloque_id_foreign`
-        FOREIGN KEY (`bloque_id`)
-        REFERENCES `bloques_experiencia` (`id`)
-        ON DELETE CASCADE,
-
-    CONSTRAINT `emociones_sesion_estudiante_id_foreign`
-        FOREIGN KEY (`estudiante_id`)
-        REFERENCES `estudiantes` (`id`)
-        ON DELETE RESTRICT
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_unicode_ci;
+insert  into `versiones_tematica`(`id`,`tematica_id`,`snapshot`,`creado_por`,`created_at`) values 
+(1,3,'{\"id\": 3, \"dbas\": [{\"codigo\": \"1\", \"relacion\": \"principal\", \"descripcion\": \"esto es prueba\", \"observacion\": null, \"catalogo_dba_id\": 2}], \"activo\": true, \"eje_id\": 8, \"estado\": \"activa\", \"nombre\": \"Prueba docente\", \"creado_por\": 4, \"es_oficial\": false, \"competencia\": null, \"indicadores\": [{\"id\": 3, \"orden\": 1, \"descripcion\": \"Ganaste\"}], \"requiere_ra\": false, \"institucion_id\": 1, \"referente_alternativo\": null, \"requiere_acompanamiento\": true}',4,'2026-08-18 10:03:15');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

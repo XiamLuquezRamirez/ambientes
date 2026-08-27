@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
+use App\Http\Controllers\Admin\BloquesExperienciaAdminController;
 use App\Http\Controllers\Admin\CatalogoAdminController;
 use App\Http\Controllers\Admin\CatalogoDBAAdminController;
 use App\Http\Controllers\Admin\CierreAnioController;
@@ -11,7 +12,6 @@ use App\Http\Controllers\Admin\DocenteAdminController;
 use App\Http\Controllers\Admin\EjesAdminController;
 use App\Http\Controllers\Admin\EstudianteAdminController;
 use App\Http\Controllers\Admin\ExperienciasAdminController;
-use App\Http\Controllers\Admin\BloquesExperienciaAdminController;
 use App\Http\Controllers\Admin\GradoGrupoController;
 use App\Http\Controllers\Admin\GruposController;
 use App\Http\Controllers\Admin\MatriculaAdminController;
@@ -25,16 +25,16 @@ use App\Http\Controllers\Admin\TematicasAdminController;
 use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
-use App\Http\Controllers\RecorridoNinoController;
-use App\Http\Controllers\VistaPreviaNinoController;
+use App\Http\Controllers\Ambientes\AmbienteNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
 use App\Http\Controllers\InfoCondicionesController;
 use App\Http\Controllers\Panel\AsistenciaController;
+use App\Http\Controllers\Panel\BloquesExperienciaPanelController;
 use App\Http\Controllers\Panel\CatalogoPanelController;
+use App\Http\Controllers\Panel\ClasesPanelController;
 use App\Http\Controllers\Panel\EjesPanelController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\ExperienciasPanelController;
-use App\Http\Controllers\Panel\BloquesExperienciaPanelController;
 use App\Http\Controllers\Panel\InclusionController;
 use App\Http\Controllers\Panel\PerfilAprendizajePanelController;
 use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
@@ -43,6 +43,7 @@ use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\Panel\TematicasPanelController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\RecorridoNinoController;
 use App\Http\Controllers\SuperAdmin\AdminsSuperAdminController;
 use App\Http\Controllers\SuperAdmin\BloquesExperienciaSuperAdminController;
 use App\Http\Controllers\SuperAdmin\CatalogoDBASuperAdminController;
@@ -54,17 +55,19 @@ use App\Http\Controllers\SuperAdmin\PerfilAprendizajeInclusionController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\TematicasSuperAdminController;
+use App\Http\Controllers\VistaPreviaNinoController;
 use Illuminate\Support\Facades\Route;
 
-// Raiz → bienvenida del ambiente configurado
-Route::get('/', fn () => redirect()->route('auth.bienvenida'));
+// Raíz → portada del ambiente (kiosco). Docente: /login
+Route::get('/', fn () => redirect()->route('ambiente.inicio'));
 
-// ── Autenticacion del nino ────────────────────────────────────────────────
+// ── Autenticacion del nino (público) ───────────────────────────────────────
 Route::get('/bienvenida', [SesionNinoController::class, 'mostrarBienvenida'])->name('auth.bienvenida');
+Route::get('/inicio', [AmbienteNinoController::class, 'inicio'])->name('ambiente.inicio');
+Route::get('/kiosco/diagnostico-ip', [AmbienteNinoController::class, 'diagnosticoIp'])->name('ambiente.diagnostico-ip');
 Route::get('/alumnos', [SesionNinoController::class, 'mostrarSeleccionAlumno'])->name('auth.alumnos');
 Route::get('/alumnos/{estudianteId}/pin', [SesionNinoController::class, 'mostrarPin'])->name('auth.pin');
 Route::post('/alumnos/{estudianteId}/verificar', [SesionNinoController::class, 'verificarPin'])->name('auth.verificar-pin');
-Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
 
 // ── Auth Docente ──────────────────────────────────────────────────────────
 Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('docente.login');
@@ -313,6 +316,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::put('usuarios/{usuario}', [UsuarioAdminController::class, 'actualizar'])->name('admin.usuarios.update');
     Route::patch('usuarios/{usuario}/toggle-activo', [UsuarioAdminController::class, 'toggleActivo'])->name('admin.usuarios.toggleActivo');
     Route::delete('usuarios/{usuario}', [UsuarioAdminController::class, 'eliminar'])->name('admin.usuarios.destroy');
+
 });
 
 // ── Panel Docente ─────────────────────────────────────────────────────────
@@ -458,6 +462,11 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::patch('catalogo/experiencias/{experiencia}/estado', [ExperienciasPanelController::class, 'actualizarEstado'])->name('panel.experiencias.estado');
     Route::patch('catalogo/experiencias/{experiencia}/flujo', [ExperienciasPanelController::class, 'cambiarEstado'])->name('panel.experiencias.flujo');
     Route::delete('catalogo/experiencias/{experiencia}', [ExperienciasPanelController::class, 'eliminar'])->name('panel.experiencias.eliminar');
+
+    // Clases
+    Route::get('clases', [ClasesPanelController::class, 'listar'])->name('panel.clases');
+    Route::post('clases', [ClasesPanelController::class, 'guardar'])->name('panel.clases.guardar');
+    Route::patch('clases/{clase}/estado', [ClasesPanelController::class, 'actualizarEstado'])->name('panel.clases.estado');
 });
 
 // ── Super Admin ─────────────────────────────────────────────────────────
@@ -559,7 +568,9 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
 
 });
 
-// ── Contenido del ambiente (protegido por sesion del nino) ────────────────
+// ── Sesión del niño + contenido del ambiente ──────────────────────────────
 Route::middleware('sesion.nino')->group(function () {
+    Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
+    Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
     require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
 });

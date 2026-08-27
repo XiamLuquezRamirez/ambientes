@@ -17,6 +17,7 @@
     --cx-warn: #d97706;
     --cx-primary: #2563eb;
     --cx-radius: 12px;
+    --cx-primary-soft: #aeb3f7;
 }
 
 .cx-layout {
@@ -252,20 +253,23 @@
 
 /* Bloque seleccionado — solo el círculo de la línea de tiempo */
 @keyframes cxNodePulse {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(139, 94, 52, .5);
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 var(--cx-primary-soft);
         transform: scale(1);
     }
+
     50% {
-        box-shadow: 0 0 0 10px rgba(139, 94, 52, 0);
+        box-shadow: 0 0 0 8px var(--cx-primary-soft);
         transform: scale(1.06);
     }
 }
 
 .cx-block-row.is-active .cx-block-node {
-    border-color: var(--cx-brown);
-    background: var(--cx-brown-soft);
-    color: var(--cx-brown);
+    border-color: var(--cx-primary);
+    background: var(--cx-primary);
+    color: #fff;
     animation: cxNodePulse 1.5s ease-in-out infinite;
 }
 
@@ -558,7 +562,7 @@
     margin-bottom: 6px;
 }
 
-.cx-field-label-row > label {
+.cx-field-label-row>label {
     margin-bottom: 0;
 }
 
@@ -754,7 +758,7 @@
     position: relative;
 }
 
-.cx-item-img > .cx-input[type="hidden"] {
+.cx-item-img>.cx-input[type="hidden"] {
     position: absolute;
     width: 0;
     height: 0;
@@ -794,13 +798,13 @@
     object-fit: cover;
 }
 
-.cx-img-btn > i {
+.cx-img-btn>i {
     font-size: 1.1rem;
     line-height: 1;
     margin: 0;
 }
 
-.cx-img-btn > .cx-file {
+.cx-img-btn>.cx-file {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -910,7 +914,7 @@
     flex-shrink: 0;
 }
 
-.cx-image-preview-btn > i {
+.cx-image-preview-btn>i {
     font-size: 1.5rem;
 }
 
@@ -992,7 +996,7 @@
     border-radius: 12px;
 }
 
-.cx-paso-opcion-body .cx-img-btn > i {
+.cx-paso-opcion-body .cx-img-btn>i {
     font-size: 1.35rem;
 }
 
@@ -1008,7 +1012,7 @@
     margin-bottom: 0;
 }
 
-.cx-paso-opcion-fields .cx-field > label {
+.cx-paso-opcion-fields .cx-field>label {
     font-size: 0.72rem;
     margin-bottom: 2px;
 }

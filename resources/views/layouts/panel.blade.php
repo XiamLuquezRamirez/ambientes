@@ -79,8 +79,7 @@
             <li class="nav-item{{ $clsAmbiente }}">
                 <a href="#navCatalogoPanel" data-bs-toggle="collapse"
                     aria-expanded="{{ $catalogoActivo ? 'true' : 'false' }}"
-                    class="nav-link {{ $catalogoActivo ? '' : 'collapsed' }}"
-                    style="cursor:pointer">
+                    class="nav-link {{ $catalogoActivo ? '' : 'collapsed' }}" style="cursor:pointer">
                     <i class="fa-solid fa-book"></i>
                     <span>Catálogo</span>
                     <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
@@ -123,8 +122,7 @@
             <li class="nav-item{{ $clsAmbiente }}">
                 <a href="#navInclusionPanel" data-bs-toggle="collapse"
                     aria-expanded="{{ $inclusionActivo ? 'true' : 'false' }}"
-                    class="nav-link {{ $inclusionActivo ? '' : 'collapsed' }}"
-                    style="cursor:pointer">
+                    class="nav-link {{ $inclusionActivo ? '' : 'collapsed' }}" style="cursor:pointer">
                     <i class="fa-solid fa-universal-access"></i>
                     <span>Inclusión</span>
                     <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
@@ -153,6 +151,12 @@
                 </div>
             </li>
             @include('partials.nav-link-condiciones')
+            <li class="nav-item">
+                <a href="{{ route('panel.clases') }}"
+                    class="{{ request()->routeIs('panel.clases') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-chalkboard-user"></i> Clases
+                </a>
+            </li>
         </ul>
     </aside>
     @include('partials.sidebar-toggle', ['only' => 'backdrop'])

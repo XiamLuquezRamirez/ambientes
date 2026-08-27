@@ -254,8 +254,15 @@
 
 /* ── Contenido por bloque ── */
 @keyframes vnPop {
-    from { opacity: 0; transform: scale(.92) translateY(10px); }
-    to { opacity: 1; transform: none; }
+    from {
+        opacity: 0;
+        transform: scale(.92) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 .vn-hero-emoji {
@@ -268,8 +275,15 @@
 }
 
 @keyframes vnBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 .vn-title {
@@ -323,8 +337,15 @@
 }
 
 @keyframes vnTtsPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
 }
 
 .vn-badge-warn {
@@ -708,32 +729,70 @@
 }
 
 @keyframes vnSortIn {
-    from { opacity: 0; transform: translateY(16px) scale(.94); }
-    to { opacity: 1; transform: none; }
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 @keyframes vnSortOut {
-    to { opacity: 0; transform: scale(.7) translateX(24px); }
+    to {
+        opacity: 0;
+        transform: scale(.7) translateX(24px);
+    }
 }
 
 @keyframes vnPlacePop {
-    from { opacity: 0; transform: scale(.6); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(.6);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes vnZonePulse {
-    0%, 100% { outline-color: #fbbf24; transform: scale(1); }
-    50% { outline-color: #fde68a; transform: scale(1.02); }
+
+    0%,
+    100% {
+        outline-color: #fbbf24;
+        transform: scale(1);
+    }
+
+    50% {
+        outline-color: #fde68a;
+        transform: scale(1.02);
+    }
 }
 
 @keyframes vnChipGlow {
-    0%, 100% { box-shadow: 0 4px 0 rgba(15, 23, 42, .08); }
-    50% { box-shadow: 0 6px 14px rgba(56, 189, 248, .22); }
+
+    0%,
+    100% {
+        box-shadow: 0 4px 0 rgba(15, 23, 42, .08);
+    }
+
+    50% {
+        box-shadow: 0 6px 14px rgba(56, 189, 248, .22);
+    }
 }
 
 @keyframes vnChipPick {
-    from { transform: scale(.96); }
-    to { transform: scale(1.04); }
+    from {
+        transform: scale(.96);
+    }
+
+    to {
+        transform: scale(1.04);
+    }
 }
 
 /* Clasificación: tipografía legible en tablet */
@@ -1002,11 +1061,12 @@
 }
 
 .vn-audio-status {
-    font-size: 1.35rem;
+    font-size: 2.2rem;
     font-weight: 800;
     color: #0369a1;
     margin: 8px 0 0;
     min-height: 1.4em;
+    margin-top: 50px;
 }
 
 .vn-audio-btn.is-playing {
@@ -1025,13 +1085,27 @@
 }
 
 @keyframes vnAudioPulse {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.08); }
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.08);
+    }
 }
 
 @keyframes vnAudioBounce {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.12); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+    }
 }
 
 /* Video: tipografía + botón interactivo */
@@ -1344,9 +1418,19 @@
 }
 
 @keyframes vnShake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-6px); }
-    75% { transform: translateX(6px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-6px);
+    }
+
+    75% {
+        transform: translateX(6px);
+    }
 }
 
 .vn-feedback {
@@ -1368,30 +1452,73 @@
     color: #9f1239;
 }
 
+/* Emoción: botones grandes para tablet / niño */
+.vn-card--emocion {
+    text-align: center;
+}
+
+.vn-card--emocion .vn-title {
+    font-size: 2.1rem;
+    margin-bottom: 12px;
+}
+
+.vn-card--emocion .vn-instruccion {
+    font-size: 1.45rem;
+    padding: 18px 22px;
+    line-height: 1.4;
+}
+
 .vn-emociones {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 16px;
+    max-width: 720px;
+    margin: 8px auto 0;
+}
+
+.vn-emociones[data-count="4"] {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 640px;
 }
 
 .vn-emocion {
     border: 0;
-    border-radius: 20px;
+    border-radius: 24px;
     background: #fff;
-    padding: 14px 8px;
+    padding: 22px 14px;
+    min-height: 140px;
     cursor: pointer;
     box-shadow: 0 8px 0 rgba(15, 23, 42, .08);
     font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+
+.vn-emocion:active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 rgba(15, 23, 42, .08);
 }
 
 .vn-emocion .vn-op-emoji {
-    font-size: 2.6rem;
+    font-size: 4.2rem;
     display: block;
+    line-height: 1;
+}
+
+.vn-emocion-label {
+    font-size: 1.45rem;
+    color: #0f172a;
+    line-height: 1.2;
 }
 
 .vn-emocion.is-picked {
     background: #fef08a;
-    transform: scale(1.04);
+    transform: scale(1.05);
+    box-shadow: 0 10px 0 rgba(202, 138, 4, .25);
 }
 
 .vn-ra-stage {
@@ -1417,8 +1544,15 @@
 }
 
 @keyframes vnPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.06); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.06);
+    }
 }
 
 .vn-match-cols {
