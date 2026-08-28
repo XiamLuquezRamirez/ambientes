@@ -293,17 +293,11 @@ class RecorridoNinoService
                 'id' => 'tematica',
                 'etiqueta' => 'Temática',
                 'titulo' => $tematica['nombre'],
-                'texto' => $tematica['competencia'] ?: 'Llegaste a la temática del día.',
-            ],
-            [
-                'id' => 'info',
-                'etiqueta' => 'Info',
-                'titulo' => $tematica['nombre'],
                 'texto' => trim(implode("\n\n", array_filter([
                     $tematica['competencia'] ?? null,
                     $tematica['experiencia_objetivo'] ?? null,
                     $tematica['experiencia_proposito'] ?? null,
-                ]))) ?: 'Conoce un poco más antes de la experiencia.',
+                ]))) ?: 'Llegaste a la temática del día.',
                 'tematica' => $tematica,
             ],
             [
@@ -321,16 +315,17 @@ class RecorridoNinoService
             ],
         ];
 
-        // Camino horizontal sinuoso (izquierda → derecha), estilo mapa de temáticas.
-        $puntos = [
-            ['x' => 8, 'y' => 52],
-            ['x' => 22, 'y' => 30],
-            ['x' => 36, 'y' => 68],
-            ['x' => 50, 'y' => 36],
-            ['x' => 64, 'y' => 64],
-            ['x' => 78, 'y' => 40],
-            ['x' => 92, 'y' => 54],
-        ];
+        // Camino horizontal sinuoso (izquierda → derecha), generado según el
+        // número real de paradas para que coincida siempre con ellas.
+        $total = count($paradas);
+        $puntos = [];
+        for ($i = 0; $i < $total; $i++) {
+            $t = $total > 1 ? $i / ($total - 1) : 0.5;
+            $puntos[] = [
+                'x' => (int) round(8 + $t * 84),                    // de 8% a 92%
+                'y' => (int) round(52 + sin($t * M_PI * 2.4) * 18), // serpentea 34%–70%
+            ];
+        }
 
         return [
             'paradas' => $paradas,

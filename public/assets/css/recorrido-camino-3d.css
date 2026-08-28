@@ -1,0 +1,253 @@
+/* recorrido-camino-3d.css — overlay 2D sobre el canvas Three.js del recorrido.
+   El canvas ocupa toda la pantalla; encima van HUD, botón Iniciar, etiqueta y
+   (reusados del kiosco) los modales #rnCaminoModal / player. */
+
+.rn-shell--3d .rn3d-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    touch-action: none;
+    z-index: 0;
+}
+
+.rn3d-overlay { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.rn3d-overlay button { pointer-events: auto; }
+
+/* HUD superior */
+.rn3d-hud {
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    text-align: center; color: #fff; width: min(80%, 520px);
+    text-shadow: 0 2px 8px rgba(0,0,0,.55);
+}
+.rn3d-hud__bar {
+    height: 10px; border-radius: 999px; background: rgba(255,255,255,.28);
+    overflow: hidden; margin: 0 auto 8px; max-width: 320px;
+}
+.rn3d-hud__fill {
+    height: 100%; width: 0; border-radius: 999px;
+    background: linear-gradient(90deg, #4ade80, #22c55e); transition: width .5s ease;
+}
+.rn3d-hud__paso { font-family: 'Fredoka One', system-ui, sans-serif; font-weight: 800; font-size: clamp(1rem, 2.4vw, 1.3rem); }
+.rn3d-hud__hint { font-size: clamp(.8rem, 1.8vw, .95rem); opacity: .92; margin-top: 2px; }
+
+/* Botón Iniciar (color del ambiente) */
+.rn3d-iniciar {
+    position: absolute; left: 50%; bottom: 7%; transform: translateX(-50%);
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 34px; border: 0; border-radius: 999px; cursor: pointer;
+    font-family: 'Fredoka One', system-ui, sans-serif; font-size: clamp(1.2rem, 3.2vw, 1.7rem);
+    color: #fff; overflow: hidden;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--rn-color, #22c55e) 78%, #fff) 0%,
+        var(--rn-color, #22c55e) 55%,
+        color-mix(in srgb, var(--rn-color, #22c55e) 72%, #000) 100%);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--rn-color, #22c55e) 26%, transparent),
+                0 14px 26px -6px color-mix(in srgb, var(--rn-color, #22c55e) 70%, transparent),
+                inset 0 2px 0 rgba(255,255,255,.45);
+    text-shadow: 0 2px 0 rgba(0,0,0,.18);
+    animation: rn3d-latido 1.5s ease-in-out infinite;
+    transition: transform .14s cubic-bezier(.34,1.56,.64,1);
+}
+.rn3d-iniciar:active { transform: translateX(-50%) scale(.94); }
+.rn3d-iniciar.rn3d-oculto { opacity: 0; transform: translateX(-50%) translateY(-14px) scale(.8); pointer-events: none; animation: none; transition: opacity .25s, transform .25s; }
+.rn3d-flecha { animation: rn3d-flecha 1s ease-in-out infinite; }
+@keyframes rn3d-latido {
+    0%,100% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--rn-color, #22c55e) 26%, transparent), 0 14px 26px -6px color-mix(in srgb, var(--rn-color, #22c55e) 70%, transparent), inset 0 2px 0 rgba(255,255,255,.45); }
+    50%     { box-shadow: 0 0 0 14px color-mix(in srgb, var(--rn-color, #22c55e) 8%, transparent), 0 18px 30px -6px color-mix(in srgb, var(--rn-color, #22c55e) 70%, transparent), inset 0 2px 0 rgba(255,255,255,.45); }
+}
+@keyframes rn3d-flecha { 0%,100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+
+/* Etiqueta flotante de la próxima estación */
+.rn3d-etiqueta {
+    position: absolute; transform: translate(-50%, -100%); display: none;
+    background: rgba(255,255,255,.95); color: #713f12;
+    font-family: 'Fredoka One', system-ui, sans-serif; font-weight: 800;
+    font-size: clamp(.8rem, 1.9vw, 1rem); padding: 4px 12px; border-radius: 999px;
+    box-shadow: 0 6px 14px rgba(0,0,0,.22); white-space: nowrap;
+}
+.rn3d-etiqueta::after { content: '👆'; margin-left: 6px; }
+
+/* ===== Bocadillo tipo NUBE (CSS) de bienvenida, centrado sobre el personaje =====
+   El punto de anclaje (left/top que fija el JS) coincide con la PUNTA del pico,
+   centrada abajo. translate(-50%,-100%) sube la nube justo encima del personaje. */
+.rn3d-bocadillo {
+    position: absolute; display: none;
+    transform: translate(-50%, -100%);
+    transform-origin: bottom center;
+    z-index: 6; pointer-events: none;
+    animation: rn3d-boc-entra .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+.rn3d-bocadillo.rn3d-oculto {
+    opacity: 0; transform: translate(-50%, -100%) scale(.6) translateY(10px);
+    pointer-events: none; transition: opacity .28s, transform .28s;
+}
+/* La nube: caja blanca muy redondeada que CRECE con el texto (sin desborde),
+   con lóbulos redondos alrededor mediante pseudo-elementos. Deja hueco abajo
+   (margin-bottom) para el pico. */
+.rn3d-bocadillo__nube {
+    position: relative; pointer-events: auto;
+    box-sizing: border-box;
+    width: max-content; max-width: min(80vw, 340px);
+    margin-bottom: 22px;               /* espacio para el pico */
+    background: #ffffff; border: 3px solid #fde68a;
+    border-radius: 30px; padding: 16px 22px;
+    box-shadow: 0 14px 30px -8px rgba(0,0,0,.32);
+}
+/* lóbulos de nube (bultos redondos en el contorno superior e inferior) */
+.rn3d-bocadillo__nube::before,
+.rn3d-bocadillo__nube::after {
+    content: ''; position: absolute; background: #ffffff;
+    border: 3px solid #fde68a; border-radius: 50%; z-index: -1;
+}
+.rn3d-bocadillo__nube::before { width: 40px; height: 40px; top: -16px; left: 26px; }
+.rn3d-bocadillo__nube::after  { width: 30px; height: 30px; top: -12px; right: 34px; }
+.rn3d-bocadillo__texto {
+    font-family: 'Nunito', system-ui, sans-serif; font-weight: 800;
+    color: #4b3a12; font-size: clamp(.9rem, 2.1vw, 1.08rem); line-height: 1.34;
+    text-align: center; margin: 0;
+}
+/* pico/colita centrada abajo (círculos que decrecen hacia el personaje) */
+.rn3d-bocadillo__pico {
+    position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%);
+    width: 22px; height: 22px; background: #fff; border: 3px solid #fde68a;
+    border-radius: 50%;
+}
+.rn3d-bocadillo__pico::before,
+.rn3d-bocadillo__pico::after {
+    content: ''; position: absolute; background: #fff; border: 3px solid #fde68a;
+    border-radius: 50%;
+}
+.rn3d-bocadillo__pico::before { width: 14px; height: 14px; bottom: -13px; left: 50%; transform: translateX(-50%); }
+.rn3d-bocadillo__pico::after  { width: 9px;  height: 9px;  bottom: -23px; left: 50%; transform: translateX(-50%); }
+@keyframes rn3d-boc-entra {
+    0%   { opacity: 0; transform: translate(-50%, -100%) scale(.5) translateY(16px); }
+    100% { opacity: 1; transform: translate(-50%, -100%) scale(1) translateY(0); }
+}
+
+/* ===== Botón "¡Comenzar!" abajo del mapa (aparece al terminar el diálogo) ===== */
+.rn3d-comenzar {
+    position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%);
+    z-index: 6; pointer-events: auto; cursor: pointer; border: 0;
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Fredoka One', system-ui, sans-serif;
+    font-size: clamp(1.2rem, 3.2vw, 1.7rem); color: #fff;
+    padding: 15px 40px; border-radius: 999px;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--rn-color, #22c55e) 82%, #fff) 0%,
+        var(--rn-color, #22c55e) 58%,
+        color-mix(in srgb, var(--rn-color, #22c55e) 74%, #000) 100%);
+    box-shadow: 0 7px 0 color-mix(in srgb, var(--rn-color, #22c55e) 65%, #000),
+                0 16px 28px -6px color-mix(in srgb, var(--rn-color, #22c55e) 70%, transparent),
+                inset 0 2px 0 rgba(255,255,255,.4);
+    text-shadow: 0 2px 0 rgba(0,0,0,.18);
+    animation: rn3d-comenzar-entra .45s cubic-bezier(.34,1.56,.64,1) both,
+               rn3d-latido-boc 1.5s ease-in-out .45s infinite;
+    transition: transform .12s cubic-bezier(.34,1.56,.64,1);
+}
+.rn3d-comenzar:active { transform: translateX(-50%) translateY(3px); }
+.rn3d-comenzar.rn3d-oculto {
+    opacity: 0; transform: translateX(-50%) translateY(18px) scale(.8);
+    pointer-events: none; animation: none;
+    transition: opacity .25s, transform .25s;
+}
+@keyframes rn3d-comenzar-entra {
+    0%   { opacity: 0; transform: translateX(-50%) translateY(24px) scale(.7); }
+    100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+@keyframes rn3d-latido-boc {
+    0%,100% { filter: brightness(1); }
+    50%     { filter: brightness(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rn3d-bocadillo, .rn3d-comenzar { animation: none !important; }
+}
+
+/* El modal del kiosco y el player deben quedar por encima del canvas 3D */
+.rn-shell--3d .rn-camino-modal,
+.rn-shell--3d #rnCaminoModalPlayer,
+.rn-shell--3d .rn-player { z-index: 20; }
+
+/* Modal centrado y con más altura útil sobre el 3D (evita que el botón
+   "¡Seguir!" / "Iniciar experiencia" se recorte en pantallas bajas). */
+.rn-shell--3d .rn-camino-modal {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+.rn-shell--3d .rn-camino-modal[hidden] { display: none; }
+/* Transición suave de entrada del modal: el fondo se funde y el panel entra
+   con un leve zoom/elevación (efecto "pop" amable, no un corte brusco). */
+.rn-shell--3d .rn-camino-modal:not([hidden]) {
+    animation: rn3d-modal-fondo .32s ease both;
+}
+.rn-shell--3d .rn-camino-modal:not([hidden]) .rn-camino-modal__backdrop {
+    animation: rn3d-modal-fondo .32s ease both;
+}
+.rn-shell--3d .rn-camino-modal__panel {
+    max-height: min(88vh, 640px);
+    border-radius: 28px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, .28);
+}
+.rn-shell--3d .rn-camino-modal:not([hidden]) .rn-camino-modal__panel {
+    animation: rn3d-modal-panel .42s cubic-bezier(.34,1.4,.5,1) both;
+}
+@keyframes rn3d-modal-fondo {
+    from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes rn3d-modal-panel {
+    0%   { opacity: 0; transform: translateY(18px) scale(.9); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rn-shell--3d .rn-camino-modal:not([hidden]),
+    .rn-shell--3d .rn-camino-modal:not([hidden]) .rn-camino-modal__backdrop,
+    .rn-shell--3d .rn-camino-modal:not([hidden]) .rn-camino-modal__panel { animation: none !important; }
+}
+/* El video del modal no debe empujar el botón fuera de vista */
+.rn-shell--3d .rn-camino-modal__video video {
+    max-height: 42vh;
+}
+
+/* ===== Modal de EXPERIENCIA (festivo) ===== */
+.rn3d-modal-exp .rn-camino-modal__panel {
+    background: linear-gradient(160deg, #fff 0%, #fef9ff 100%);
+    border: 3px solid #fde047;
+}
+.rn3d-modal-exp .rn-camino-modal__etiqueta { color: #d97706; letter-spacing: .08em; }
+.rn3d-modal-exp .rn-camino-modal__titulo { color: #7c3aed; }
+.rn3d-exp-fiesta {
+    position: relative; height: 92px; display: grid; place-items: center; margin: 4px 0 10px;
+}
+.rn3d-exp-estrella {
+    font-size: 4rem; line-height: 1; animation: rn3d-estrella-late 1.3s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,.18));
+}
+@keyframes rn3d-estrella-late {
+    0%,100% { transform: scale(1) rotate(-6deg); } 50% { transform: scale(1.18) rotate(6deg); }
+}
+.rn3d-confeti {
+    position: absolute; width: 12px; height: 12px; border-radius: 3px; opacity: .9;
+    animation: rn3d-confeti-cae 1.8s ease-in-out infinite;
+}
+.rn3d-confeti--1 { left: 12%; background: #f87171; animation-delay: 0s; }
+.rn3d-confeti--2 { left: 28%; background: #60a5fa; animation-delay: .25s; border-radius: 50%; }
+.rn3d-confeti--3 { left: 46%; background: #34d399; animation-delay: .5s; }
+.rn3d-confeti--4 { left: 62%; background: #fbbf24; animation-delay: .1s; border-radius: 50%; }
+.rn3d-confeti--5 { left: 78%; background: #f472b6; animation-delay: .4s; }
+.rn3d-confeti--6 { left: 90%; background: #a78bfa; animation-delay: .6s; border-radius: 50%; }
+@keyframes rn3d-confeti-cae {
+    0% { transform: translateY(-14px) rotate(0); opacity: 0; }
+    30% { opacity: .95; }
+    100% { transform: translateY(70px) rotate(220deg); opacity: 0; }
+}
+.rn3d-modal-exp .rn-camino-btn--pri {
+    background: linear-gradient(180deg, #a78bfa, #7c3aed);
+    box-shadow: 0 6px 0 #6d28d9, 0 10px 20px rgba(124,58,237,.4);
+    font-size: 1.15rem;
+}
+@media (prefers-reduced-motion: reduce) {
+    .rn3d-exp-estrella, .rn3d-confeti { animation: none !important; }
+    .rn3d-confeti { opacity: .8; }
+}

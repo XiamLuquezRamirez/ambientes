@@ -574,3 +574,35 @@ Route::middleware('sesion.nino')->group(function () {
     Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
     require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
 });
+
+// === PREVIEW TABLET — recorrido 3D con experiencia real (ELIMINAR tras probar) ===
+Route::get('/__preview-experiencia/{experiencia}', function (\App\Models\Experiencia $experiencia) {
+    $payload = app(\App\Services\RecorridoNinoService::class)->payloadExperiencia($experiencia);
+    return response()->json(['success' => true, 'data' => $payload]);
+});
+Route::get('/__preview-camino', function () {
+    $ambiente = (object) ['id' => 1, 'nombre' => 'Multisensorial', 'slug' => 'multisensorial', 'color_hex' => '#0F6E56', 'icono' => '🌈'];
+    $arbol = ['ambiente' => ['id' => 1, 'nombre' => 'Multisensorial', 'icono' => '🌈', 'color_hex' => '#0F6E56']];
+    $paradas = [
+        ['id' => 'inicio', 'etiqueta' => 'Inicio', 'titulo' => '¡Hola, Valentina!', 'texto' => '¡Vamos a recorrer el camino!'],
+        ['id' => 'modulo', 'etiqueta' => 'Módulo', 'titulo' => 'Exploro mi cuerpo', 'texto' => 'Este es el módulo de la clase de hoy.', 'icono' => '📚', 'video_url' => 'https://www.w3schools.com/html/mov_bbb.mp4'],
+        ['id' => 'eje', 'etiqueta' => 'Eje', 'titulo' => 'Sentidos y percepción', 'texto' => 'Seguimos por este eje de aprendizaje.', 'video_url' => 'https://www.w3schools.com/html/mov_bbb.mp4'],
+        ['id' => 'tematica', 'etiqueta' => 'Temática', 'titulo' => 'El tacto y las texturas', 'texto' => 'Explora las texturas con tus manos.'],
+        ['id' => 'experiencia', 'etiqueta' => 'Experiencia', 'titulo' => 'Identifica los colores', 'texto' => '¡Es hora de vivir la experiencia!', 'experiencia_id' => 23],
+        ['id' => 'fin', 'etiqueta' => 'Fin', 'titulo' => '¡Terminaste!', 'texto' => 'Completaste el recorrido de hoy. ¡Muy bien!'],
+    ];
+    $total = count($paradas);
+    $puntos = [];
+    for ($i = 0; $i < $total; $i++) {
+        $tt = $total > 1 ? $i / ($total - 1) : 0.5;
+        $puntos[] = ['x' => (int) round(8 + $tt * 84), 'y' => (int) round(52 + sin($tt * M_PI * 2.4) * 18)];
+    }
+    $camino = ['paradas' => $paradas, 'puntos' => $puntos, 'experiencia_id' => 23];
+    return view('ambientes.kiosco-recorrido', [
+        'ambiente' => $ambiente, 'modo' => 'sesion', 'ui' => 'camino-lineal', 'token' => null,
+        'arbol' => $arbol, 'camino' => $camino,
+        'estudiante' => (object) ['nombre' => 'Valentina', 'iniciales' => 'VA', 'color_avatar' => '#7C3AED'],
+        'urlExperienciaTemplate' => '/__preview-experiencia/__ID__', 'urlTts' => '/tts',
+        'urlSalir' => '#', 'urlContinuar' => '', 'portadaImg' => '', 'pasoInicial' => 'camino',
+    ]);
+});

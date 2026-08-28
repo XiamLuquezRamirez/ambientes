@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/kiosco-fullscreen.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/kiosco-auth.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/recorrido-camino.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/recorrido-camino-3d.css') }}?v={{ @filemtime(public_path('assets/css/recorrido-camino-3d.css')) ?: time() }}">
     <style id="kioscoLayoutStyles">
         :root {
             --color-ambiente: {{ $ambiente->color_hex }};
@@ -89,8 +90,15 @@
     <script src="{{ asset('assets/js/kiosco-fs-core.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
     <script src="{{ asset('assets/js/constructor-vista-nino.js') }}"></script>
+    {{-- Recorrido en 3D (Three.js). Reemplaza al mapa 2D recorrido-camino.js
+         (respaldo en recorrido-camino.2d.backup.js). Expone window.KioscoCamino.boot(). --}}
+    <script type="importmap">
+    { "imports": {
+        "three": "{{ asset('assets/vendor/three/three.module.js') }}"
+    } }
+    </script>
+    <script type="module" src="{{ asset('assets/js/recorrido-camino-3d.js') }}?v={{ @filemtime(public_path('assets/js/recorrido-camino-3d.js')) ?: time() }}"></script>
     <script src="{{ asset('assets/js/recorrido-nino.js') }}"></script>
-    <script src="{{ asset('assets/js/recorrido-camino.js') }}"></script>
     <script src="{{ asset('assets/js/kiosco-bienvenida.js') }}"></script>
     <script src="{{ asset('assets/js/pin-figuras.js') }}"></script>
     <script src="{{ asset('assets/js/kiosco-navegacion.js') }}"></script>

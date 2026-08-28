@@ -862,18 +862,36 @@
         $shell.prop('hidden', false);
         $player.prop('hidden', true);
 
-        if (String($app.data('ui') || '') === 'camino-lineal' && window.KioscoCamino) {
-            const ok = window.KioscoCamino.boot({
-                $app: $app,
-                $shell: $shell,
-                $paso: $paso,
-                $player: $player,
-                urlExperienciaTpl: urlExperienciaTpl,
-                onSalir: salirSesion,
-            });
-            if (ok) {
+        if (String($app.data('ui') || '') === 'camino-lineal') {
+            // KioscoCamino puede provenir de un <script type="module"> (3D), que se
+            // ejecuta de forma diferida. Esperamos a que esté disponible antes de
+            // caer al flujo 2D de módulos.
+            const ctxCamino = {
+                $app: $app, $shell: $shell, $paso: $paso, $player: $player,
+                urlExperienciaTpl: urlExperienciaTpl, onSalir: salirSesion,
+            };
+            const montarCamino = function () {
+                if (window.KioscoCamino) {
+                    return !!window.KioscoCamino.boot(ctxCamino);
+                }
+                return false;
+            };
+            if (montarCamino()) {
                 return;
             }
+            // reintenta hasta ~3s mientras el módulo 3D termina de cargar
+            let intentos = 0;
+            const timer = setInterval(function () {
+                intentos += 1;
+                if (montarCamino() || intentos > 60) {
+                    clearInterval(timer);
+                    if (intentos > 60 && !window.KioscoCamino) {
+                        enlazarEventos();
+                        renderInicial();
+                    }
+                }
+            }, 50);
+            return;
         }
 
         enlazarEventos();
