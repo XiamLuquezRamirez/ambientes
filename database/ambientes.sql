@@ -310,6 +310,40 @@ insert  into `catalogo_dba`(`id`,`codigo`,`area_id`,`grado_id`,`descripcion`,`es
 (2,'1',3,1,'esto es prueba',1,1,NULL,1,'2026-08-11 16:10:24','2026-08-11 16:10:24'),
 (3,'2',5,2,'asdasdasdasdasdsad',1,1,NULL,1,'2026-08-12 11:57:22','2026-08-12 11:57:22');
 
+/*Table structure for table `clase_experiencias` */
+
+DROP TABLE IF EXISTS `clase_experiencias`;
+
+CREATE TABLE `clase_experiencias` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `clase_id` bigint unsigned NOT NULL,
+  `experiencia_id` bigint unsigned NOT NULL,
+  `modulo_id` bigint unsigned NOT NULL,
+  `eje_id` bigint unsigned NOT NULL,
+  `tematica_id` bigint unsigned NOT NULL,
+  `orden` smallint unsigned NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `clase_experiencias_clase_exp_unique` (`clase_id`,`experiencia_id`),
+  KEY `clase_experiencias_experiencia_id_foreign` (`experiencia_id`),
+  KEY `clase_experiencias_modulo_id_foreign` (`modulo_id`),
+  KEY `clase_experiencias_eje_id_foreign` (`eje_id`),
+  KEY `clase_experiencias_tematica_id_foreign` (`tematica_id`),
+  KEY `clase_experiencias_clase_id_orden_index` (`clase_id`,`orden`),
+  CONSTRAINT `clase_experiencias_clase_id_foreign` FOREIGN KEY (`clase_id`) REFERENCES `clases` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `clase_experiencias_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `clase_experiencias_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `clase_experiencias_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `clase_experiencias_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `clase_experiencias` */
+
+insert  into `clase_experiencias`(`id`,`clase_id`,`experiencia_id`,`modulo_id`,`eje_id`,`tematica_id`,`orden`,`created_at`,`updated_at`) values 
+(1,1,23,1,1,5,0,'2026-08-26 14:30:12','2026-08-27 14:13:34'),
+(2,4,23,1,1,5,0,'2026-08-27 14:12:40','2026-08-27 14:13:18');
+
 /*Table structure for table `clases` */
 
 DROP TABLE IF EXISTS `clases`;
@@ -319,10 +353,6 @@ CREATE TABLE `clases` (
   `carga_docente_id` bigint unsigned NOT NULL,
   `docente_id` bigint unsigned NOT NULL,
   `ambiente_id` bigint unsigned NOT NULL,
-  `modulo_id` bigint unsigned DEFAULT NULL,
-  `eje_id` bigint unsigned DEFAULT NULL,
-  `tematica_id` bigint unsigned DEFAULT NULL,
-  `experiencia_id` bigint unsigned DEFAULT NULL,
   `nombre` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` text COLLATE utf8mb4_unicode_ci,
   `fecha` date DEFAULT NULL,
@@ -332,26 +362,18 @@ CREATE TABLE `clases` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `clases_ambiente_id_foreign` (`ambiente_id`),
-  KEY `clases_modulo_id_foreign` (`modulo_id`),
-  KEY `clases_eje_id_foreign` (`eje_id`),
-  KEY `clases_tematica_id_foreign` (`tematica_id`),
-  KEY `clases_experiencia_id_foreign` (`experiencia_id`),
   KEY `clases_carga_docente_id_anio_lectivo_index` (`carga_docente_id`,`anio_lectivo`),
   KEY `clases_docente_id_ambiente_id_anio_lectivo_index` (`docente_id`,`ambiente_id`,`anio_lectivo`),
   CONSTRAINT `clases_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clases_carga_docente_id_foreign` FOREIGN KEY (`carga_docente_id`) REFERENCES `carga_docente` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `clases_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `clases_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `clases_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `clases_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `clases_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL
+  CONSTRAINT `clases_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `clases` */
 
-insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`modulo_id`,`eje_id`,`tematica_id`,`experiencia_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values 
-(1,7,2,6,1,1,5,23,'Identifica los colores',NULL,'2026-08-27','activa',2026,'2026-08-26 14:30:12','2026-08-27 14:13:34'),
-(4,8,2,6,1,1,5,23,'Identifica los colores',NULL,'2026-08-27','finalizada',2026,'2026-08-27 14:12:40','2026-08-27 14:13:18');
+insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values 
+(1,7,2,6,'Identifica los colores',NULL,'2026-08-27','activa',2026,'2026-08-26 14:30:12','2026-08-27 14:13:34'),
+(4,8,2,6,'Identifica los colores',NULL,'2026-08-27','finalizada',2026,'2026-08-27 14:12:40','2026-08-27 14:13:18');
 
 /*Table structure for table `cola_sincronizacion` */
 
@@ -701,6 +723,11 @@ CREATE TABLE `ejes` (
   `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `tipo_media` enum('ninguno','imagen','video') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ninguno',
+  `media_origen` enum('local','url') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `media_archivo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `media_url` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `media_embed` enum('directo','youtube','vimeo') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `orden` tinyint unsigned NOT NULL DEFAULT '0',
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `es_oficial` tinyint(1) NOT NULL DEFAULT '1',
@@ -717,13 +744,13 @@ CREATE TABLE `ejes` (
 
 /*Data for the table `ejes` */
 
-insert  into `ejes`(`id`,`modulo_id`,`institucion_id`,`creado_por`,`nombre`,`slug`,`descripcion`,`orden`,`activo`,`es_oficial`,`created_at`,`updated_at`) values 
-(1,1,NULL,NULL,'La Vista','explora-la-cancion',NULL,1,1,1,'2026-08-07 08:35:28','2026-08-24 08:17:35'),
-(2,1,NULL,NULL,'Prueba','prueba',NULL,2,1,1,'2026-08-07 08:56:33','2026-08-11 08:54:43'),
-(3,1,NULL,NULL,'Canto','canto',NULL,4,1,1,'2026-08-07 09:16:48','2026-08-07 09:17:48'),
-(4,1,NULL,NULL,'Explora','explora',NULL,3,1,1,'2026-08-07 09:17:25','2026-08-11 08:55:56'),
-(7,1,1,2,'Baile','baile',NULL,1,1,0,'2026-08-10 10:17:27','2026-08-10 10:17:27'),
-(8,3,1,2,'Integrales','integrales',NULL,1,1,0,'2026-08-10 14:26:47','2026-08-10 14:27:38');
+insert  into `ejes`(`id`,`modulo_id`,`institucion_id`,`creado_por`,`nombre`,`slug`,`descripcion`,`tipo_media`,`media_origen`,`media_archivo`,`media_url`,`media_embed`,`orden`,`activo`,`es_oficial`,`created_at`,`updated_at`) values 
+(1,1,NULL,NULL,'La Vista','explora-la-cancion',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,1,'2026-08-07 08:35:28','2026-08-24 08:17:35'),
+(2,1,NULL,NULL,'Prueba','prueba',NULL,'ninguno',NULL,NULL,NULL,NULL,2,1,1,'2026-08-07 08:56:33','2026-08-11 08:54:43'),
+(3,1,NULL,NULL,'Canto','canto',NULL,'ninguno',NULL,NULL,NULL,NULL,4,1,1,'2026-08-07 09:16:48','2026-08-07 09:17:48'),
+(4,1,NULL,NULL,'Explora','explora',NULL,'ninguno',NULL,NULL,NULL,NULL,3,1,1,'2026-08-07 09:17:25','2026-08-11 08:55:56'),
+(7,1,1,2,'Baile','baile',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,0,'2026-08-10 10:17:27','2026-08-10 10:17:27'),
+(8,3,1,2,'Integrales','integrales',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,0,'2026-08-10 14:26:47','2026-08-10 14:27:38');
 
 /*Table structure for table `emociones_sesion` */
 
@@ -1222,7 +1249,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `migrations` */
 
@@ -1268,7 +1295,9 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (42,'2026_08_06_000002_create_ejes_table',12),
 (43,'2026_08_10_000001_add_creado_por_to_ejes_table',13),
 (44,'2026_08_14_000003_create_versiones_tematica_table',14),
-(45,'2026_08_26_000001_create_clases_table',15);
+(45,'2026_08_26_000001_create_clases_table',15),
+(46,'2026_08_28_000001_create_clase_experiencias_table',16),
+(47,'2026_08_28_000002_add_media_to_modulos_and_ejes',17);
 
 /*Table structure for table `modulo_institucion` */
 
@@ -1307,6 +1336,11 @@ CREATE TABLE `modulos` (
   `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `tipo_media` enum('ninguno','imagen','video') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ninguno',
+  `media_origen` enum('local','url') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `media_archivo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `media_url` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `media_embed` enum('directo','youtube','vimeo') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `icono` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `orden` tinyint unsigned NOT NULL DEFAULT '0',
   `activo` tinyint(1) NOT NULL DEFAULT '1',
@@ -1321,11 +1355,11 @@ CREATE TABLE `modulos` (
 
 /*Data for the table `modulos` */
 
-insert  into `modulos`(`id`,`ambiente_id`,`institucion_id`,`nombre`,`slug`,`descripcion`,`icono`,`orden`,`activo`,`visible_estudiantes`,`created_at`,`updated_at`,`es_oficial`) values 
-(1,6,NULL,'Explorando los sentidos','musica',NULL,NULL,1,1,1,'2026-08-06 11:39:29','2026-08-24 08:15:32',1),
-(2,6,NULL,'Dibujo','dibujo',NULL,NULL,2,1,1,'2026-08-06 11:39:29','2026-08-11 09:09:48',1),
-(3,8,NULL,'Matematicas','matematicas',NULL,NULL,1,1,1,'2026-08-06 11:41:54','2026-08-06 11:41:54',1),
-(4,6,NULL,'Canto','canto',NULL,NULL,3,1,1,'2026-08-06 14:19:49','2026-08-06 14:42:48',1);
+insert  into `modulos`(`id`,`ambiente_id`,`institucion_id`,`nombre`,`slug`,`descripcion`,`tipo_media`,`media_origen`,`media_archivo`,`media_url`,`media_embed`,`icono`,`orden`,`activo`,`visible_estudiantes`,`created_at`,`updated_at`,`es_oficial`) values 
+(1,6,NULL,'Explorando los sentidos','musica',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,1,1,1,'2026-08-06 11:39:29','2026-08-24 08:15:32',1),
+(2,6,NULL,'Dibujo','dibujo',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,2,1,1,'2026-08-06 11:39:29','2026-08-11 09:09:48',1),
+(3,8,NULL,'Matematicas','matematicas',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,1,1,1,'2026-08-06 11:41:54','2026-08-06 11:41:54',1),
+(4,6,NULL,'Canto','canto',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,3,1,1,'2026-08-06 14:19:49','2026-08-06 14:42:48',1);
 
 /*Table structure for table `municipios` */
 
