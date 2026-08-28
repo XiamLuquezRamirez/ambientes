@@ -1,27 +1,34 @@
 @php
-    $modo = $modo ?? 'demo';
+    $modo = $modo ?? 'sesion';
     $esSesion = $modo === 'sesion';
     $esPortada = $modo === 'portada';
     $enKioscoShell = $enKioscoShell ?? false;
     $ui = $ui ?? '';
     $esCaminoLineal = $ui === 'camino-lineal';
-    $pasoInicial = $pasoInicial ?? ($esSesion ? 'modulos' : ($esPortada ? 'portada' : 'pin'));
+    $pasoInicial = $pasoInicial ?? ($esSesion ? 'camino' : 'portada');
     $nombreEstudiante = $esSesion
         ? ($estudiante->nombre ?? 'Amigo')
-        : 'Valentina';
+        : 'Amigo';
     $inicialesEstudiante = $esSesion
         ? ($estudiante->iniciales ?? 'AM')
-        : 'VA';
+        : 'AM';
     $colorEstudiante = $esSesion
         ? ($estudiante->color_avatar ?? '#2563EB')
-        : '#7C3AED';
-    $portadaImg = $portadaImg ?? '/assets/images/ambientes/expresion-artistica-portada.png';
+        : '#2563EB';
+    $slugPortada = $arbol['ambiente']['slug']
+        ?? config('ambiente.slugs_bd.'.config('ambiente.slug'), config('ambiente.slug'));
+    $portadaImg = $portadaImg ?? '/assets/images/ambientes/'.$slugPortada.'-portada.png';
     $shellClase = match ($pasoInicial) {
         'camino' => 'rn-shell--camino',
         'portada' => 'rn-shell--portada',
         'modulos' => 'rn-shell--modulos',
         default => 'rn-shell--pin',
     };
+    $sexoEstudiante = '';
+    if ($esSesion && isset($estudiante) && $estudiante) {
+        $sexoEstudiante = $estudiante->sexo ?? '';
+    }
+    $emocionesBase = asset('assets/images/emociones');
 @endphp
 <div id="rnApp"
     data-modo="{{ $modo }}"
@@ -30,6 +37,8 @@
     data-estudiante-nombre="{{ $nombreEstudiante }}"
     data-estudiante-iniciales="{{ $inicialesEstudiante }}"
     data-estudiante-color="{{ $colorEstudiante }}"
+    data-estudiante-sexo="{{ $sexoEstudiante }}"
+    data-emociones-base="{{ $emocionesBase }}"
     data-url-experiencia="{{ $urlExperienciaTemplate }}"
     data-url-tts="{{ $urlTts }}"
     data-url-salir="{{ $urlSalir ?? '' }}"
@@ -68,13 +77,11 @@
         data-url-tts="{{ $urlTts }}"
         data-media-base=""
         data-experiencia-nombre=""
+        data-estudiante-sexo="{{ $sexoEstudiante }}"
+        data-emociones-base="{{ $emocionesBase }}"
         data-version="">
-        <button type="button" class="vn-fs-btn" id="vnBtnFullscreen" title="Pantalla completa">
+        <button type="button" class="vn-fs-btn" id="vnBtnFullscreen" title="Pantalla completa" aria-label="Pantalla completa">
             <i class="fa-solid fa-expand"></i> Pantalla completa
-        </button>
-        <button type="button" class="rn-back rn-back--player" id="rnBtnSalirExperiencia">
-            <i class="fa-solid fa-arrow-left"></i>
-            <span>Salir</span>
         </button>
         <div class="vn-tablet-screen" id="vnTabletScreen">
             <header class="vn-screen-top">

@@ -25,7 +25,12 @@ class TextoAVozService
             $this->generar($texto, $relativo);
         }
 
-        return Storage::disk('public')->url($relativo);
+        return $this->urlArchivoPublico($relativo);
+    }
+
+    private function urlArchivoPublico(string $rutaRelativa): string
+    {
+        return '/storage/'.ltrim(str_replace('\\', '/', $rutaRelativa), '/');
     }
 
     private function generar(string $texto, string $relativo): void

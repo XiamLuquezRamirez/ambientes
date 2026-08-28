@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Sincronizable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class Eje extends Model
 {
     use HasFactory;
+    use Sincronizable;
 
     protected $fillable = [
         'modulo_id',
@@ -17,6 +19,11 @@ class Eje extends Model
         'nombre',
         'slug',
         'descripcion',
+        'tipo_media',
+        'media_origen',
+        'media_archivo',
+        'media_url',
+        'media_embed',
         'orden',
         'activo',
         'es_oficial',

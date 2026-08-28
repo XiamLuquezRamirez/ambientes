@@ -26,20 +26,22 @@ class SesionNinoService
     }
 
     /**
-     * Ambiente del nodo: IP en ambiente_institucion (fuente de verdad), o fallback AMBIENTE_SLUG en dev.
+     * Ambiente del nodo: IP en ambiente_institucion (producción), o AMBIENTE_SLUG en dev.
      */
     public function obtenerAmbiente(?Request $request = null): Ambiente
     {
         $request = $request ?? request();
 
-        foreach ($this->ipsCandidatasNodo($request) as $ip) {
-            if ($this->esLoopback($ip)) {
-                continue;
-            }
+        if (! config('ambiente.priorizar_slug', false)) {
+            foreach ($this->ipsCandidatasNodo($request) as $ip) {
+                if ($this->esLoopback($ip)) {
+                    continue;
+                }
 
-            $ambiente = $this->ambientePorIpInstitucion($ip);
-            if ($ambiente) {
-                return $ambiente;
+                $ambiente = $this->ambientePorIpInstitucion($ip);
+                if ($ambiente) {
+                    return $ambiente;
+                }
             }
         }
 
@@ -70,18 +72,20 @@ class SesionNinoService
     {
         $request = $request ?? request();
 
-        foreach ($this->ipsCandidatasNodo($request) as $ip) {
-            if ($this->esLoopback($ip)) {
-                continue;
-            }
+        if (! config('ambiente.priorizar_slug', false)) {
+            foreach ($this->ipsCandidatasNodo($request) as $ip) {
+                if ($this->esLoopback($ip)) {
+                    continue;
+                }
 
-            $ambiente = $this->ambientePorIpInstitucion($ip);
-            if ($ambiente) {
-                return [
-                    'ambiente' => $ambiente,
-                    'ip' => $ip,
-                    'fuente' => 'ambiente_institucion',
-                ];
+                $ambiente = $this->ambientePorIpInstitucion($ip);
+                if ($ambiente) {
+                    return [
+                        'ambiente' => $ambiente,
+                        'ip' => $ip,
+                        'fuente' => 'ambiente_institucion',
+                    ];
+                }
             }
         }
 
@@ -94,7 +98,7 @@ class SesionNinoService
             return [
                 'ambiente' => $ambiente,
                 'ip' => null,
-                'fuente' => 'ambiente_slug',
+                'fuente' => config('ambiente.priorizar_slug', false) ? 'ambiente_slug_forzado' : 'ambiente_slug',
             ];
         } catch (\Throwable) {
             return [

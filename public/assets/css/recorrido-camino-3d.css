@@ -166,8 +166,14 @@
 
 /* El modal del kiosco y el player deben quedar por encima del canvas 3D */
 .rn-shell--3d .rn-camino-modal,
-.rn-shell--3d #rnCaminoModalPlayer,
-.rn-shell--3d .rn-player { z-index: 20; }
+.rn-shell--3d #rnCaminoModalPlayer {
+    z-index: 20;
+}
+
+#vnDispositivo.rn-player,
+#vnDispositivo.rn-player--camino-overlay {
+    z-index: 50;
+}
 
 /* Modal centrado y con más altura útil sobre el 3D (evita que el botón
    "¡Seguir!" / "Iniciar experiencia" se recorte en pantallas bajas). */
@@ -208,6 +214,75 @@
 /* El video del modal no debe empujar el botón fuera de vista */
 .rn-shell--3d .rn-camino-modal__video video {
     max-height: 42vh;
+}
+
+/* Pantalla completa visual del video (overlay CSS; no usa Fullscreen API del navegador) */
+.rn3d-video-fs {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+}
+.rn3d-video-fs[hidden] {
+    display: none !important;
+}
+.rn3d-video-fs--activo {
+    animation: rn3d-video-fs-in .25s ease both;
+}
+@keyframes rn3d-video-fs-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+/* Mientras el video está activo, el modal queda detrás del overlay */
+body.rn3d-video-reproduciendo .rn-camino-modal {
+    visibility: hidden;
+    pointer-events: none;
+}
+body.rn3d-video-reproduciendo .kiosco-fs-btn {
+    z-index: 150;
+}
+.rn3d-video-fs__inner,
+.rn3d-video-fs__inner video,
+.rn3d-video-fs__inner iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+.rn3d-video-fs__inner video {
+    object-fit: contain;
+    background: #000;
+}
+.rn3d-video-replay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(140px, 28vh, 220px);
+    padding: 20px 16px;
+}
+.rn3d-video-replay__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    padding: 16px 32px;
+    font-family: 'Fredoka One', system-ui, sans-serif;
+    font-size: clamp(1.05rem, 2.6vw, 1.35rem);
+    color: #fff;
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--rn-color, #22c55e) 82%, #fff) 0%,
+        var(--rn-color, #22c55e) 58%,
+        color-mix(in srgb, var(--rn-color, #22c55e) 74%, #000) 100%);
+    box-shadow: 0 6px 0 color-mix(in srgb, var(--rn-color, #22c55e) 65%, #000),
+                0 12px 24px color-mix(in srgb, var(--rn-color, #22c55e) 45%, transparent);
+}
+.rn3d-video-replay__btn:active {
+    transform: translateY(2px);
 }
 
 /* ===== Modal de EXPERIENCIA (festivo) ===== */

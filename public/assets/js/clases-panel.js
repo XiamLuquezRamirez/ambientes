@@ -15,7 +15,7 @@
     const gruposReplica = Array.isArray(window.CLASES_GRUPOS_REPLICA)
         ? window.CLASES_GRUPOS_REPLICA
         : [];
-    const experienciasUsadasPorCarga = window.CLASES_EXPERIENCIAS_USADAS || {};
+    const clasesContexto = window.CLASES_CONTEXTO || {};
 
     const urls = {
         tematicasEje: $app.data('url-tematicas-eje-template') || '',
@@ -51,6 +51,10 @@
         tematicas: null,
         experiencia: null,
         experiencias: null,
+        experienciasSeleccionadas: [],
+        modoAgregar: false,
+        claseId: null,
+        claseNombre: '',
     };
 
     const $wizardCards = $('#claseWizardCards');
@@ -72,6 +76,11 @@
     const $replicaHint = $('#claseReplicaHint');
     const $btnReplicaTodos = $('#btnClaseReplicaTodos');
     const $btnReplicaNinguno = $('#btnClaseReplicaNinguno');
+    const $modalTitle = $('#modalCrearClaseLabel');
+    const $modalSubtitle = $('#claseWizardSubtitle');
+    const $expBar = $('#claseWizardExpBar');
+    const $expBarText = $('#claseWizardExpBarText');
+    const $btnContinuar = $('#btnClaseWizardContinuar');
 
     const modalEl = document.getElementById('modalCrearClase');
     const modal = modalEl ? bootstrap.Modal.getOrCreateInstance(modalEl) : null;
@@ -144,20 +153,32 @@
             : '<span class="badge-colegio">Del colegio</span>';
     }
 
-    function experienciasUsadasEnCarga(cargaId) {
-        const ids = experienciasUsadasPorCarga[cargaId]
-            ?? experienciasUsadasPorCarga[String(cargaId)]
-            ?? [];
+    function contextoClase(claseId) {
+        if (!claseId) return null;
 
-        return ids.map(Number);
+        return clasesContexto[claseId] ?? clasesContexto[String(claseId)] ?? null;
     }
 
-    function experienciaYaUsadaEnCarga(expId, cargaId) {
-        return experienciasUsadasEnCarga(cargaId).includes(Number(expId));
+    function experienciasUsadasEnClase(claseId) {
+        const ctx = contextoClase(claseId);
+
+        return (ctx?.experiencia_ids ?? []).map(Number);
+    }
+
+    function experienciaYaUsadaEnClase(expId, claseId) {
+        if (!claseId) return false;
+
+        return experienciasUsadasEnClase(claseId).includes(Number(expId));
+    }
+
+    function experienciaEstaSeleccionada(expId) {
+        return wizard.experienciasSeleccionadas.some((item) => Number(item.id) === Number(expId));
     }
 
     function htmlCardExperiencia(exp) {
-        const yaUsadaActual = experienciaYaUsadaEnCarga(exp.id, cargaActualId);
+        const claseObjetivo = wizard.modoAgregar ? wizard.claseId : null;
+        const yaUsada = experienciaYaUsadaEnClase(exp.id, claseObjetivo);
+        const seleccionada = !wizard.modoAgregar && experienciaEstaSeleccionada(exp.id);
         const partes = [];
         if (exp.grado) partes.push(exp.grado);
         if (exp.duracion_minutos) partes.push(`${exp.duracion_minutos} min`);
@@ -166,21 +187,29 @@
             : '';
 
         const cardClases = ['exp-wizard-item-card', 'exp-wizard-card'];
-        if (yaUsadaActual) {
+        if (yaUsada) {
             cardClases.push('exp-wizard-card--usada');
+        } else if (seleccionada) {
+            cardClases.push('exp-wizard-card--seleccionada');
         }
 
-        const badges = yaUsadaActual
+        const badges = yaUsada
             ? '<div class="exp-wizard-card-badges"><span class="clase-exp-badge-usada">Ya agregada</span></div>'
-            : '';
+            : (seleccionada
+                ? '<div class="exp-wizard-card-badges"><span class="clase-exp-badge-usada" style="background:#DBEAFE;color:#1D4ED8">Seleccionada</span></div>'
+                : '');
 
-        const attrs = yaUsadaActual
+        const attrs = yaUsada
             ? ' aria-disabled="true" tabindex="-1"'
             : ' role="button" tabindex="0"';
 
+        const iconoFlecha = yaUsada
+            ? 'fa-check'
+            : (seleccionada ? 'fa-check' : 'fa-chevron-right');
+
         return `
             <div class="col-md-4 col-sm-6">
-                <article class="${cardClases.join(' ')}" data-id="${exp.id}" data-usada="${yaUsadaActual ? '1' : '0'}"
+                <article class="${cardClases.join(' ')}" data-id="${exp.id}" data-usada="${yaUsada ? '1' : '0'}"
                     ${attrs} aria-label="${escapar(exp.nombre || 'Sin nombre')}">
                     <div class="exp-wizard-item-top">
                         <div class="exp-wizard-item-icon" aria-hidden="true">
@@ -192,7 +221,7 @@
                             ${meta}
                         </div>
                         <span class="exp-wizard-card-arrow" aria-hidden="true">
-                            <i class="fa-solid ${yaUsadaActual ? 'fa-check' : 'fa-chevron-right'}"></i>
+                            <i class="fa-solid ${iconoFlecha}"></i>
                         </span>
                     </div>
                 </article>
@@ -242,13 +271,29 @@
 
     function actualizarChrome() {
         const paso = pasoActual();
-        const total = WIZARD_PASOS.length;
-        $wizardPasoLabel.text(`Paso ${wizard.paso + 1} de ${total} · ${WIZARD_LABELS[paso]}`);
-        $wizardInstruction.text(WIZARD_INSTRUCCIONES[paso]);
-        $btnVolver.prop('hidden', wizard.paso <= 0);
-        $btnGuardar.prop('hidden', paso !== 'datos');
+        const totalPasos = wizard.modoAgregar ? WIZARD_PASOS.length - 1 : WIZARD_PASOS.length;
+        const pasoNum = wizard.modoAgregar && paso === 'datos'
+            ? totalPasos
+            : Math.min(wizard.paso + 1, totalPasos);
 
-        const enDatos = paso === 'datos';
+        $wizardPasoLabel.text(`Paso ${pasoNum} de ${totalPasos} · ${WIZARD_LABELS[paso]}`);
+        $wizardInstruction.text(
+            wizard.modoAgregar && paso === 'experiencia'
+                ? `Elige una experiencia de «${wizard.tematica?.nombre || 'la temática'}»`
+                : (paso === 'experiencia' && !wizard.modoAgregar
+                    ? 'Marca una o más experiencias de la temática y pulsa Continuar'
+                    : WIZARD_INSTRUCCIONES[paso])
+        );
+        $btnVolver.prop('hidden', wizard.modoAgregar || wizard.paso <= 0);
+        $btnGuardar.prop('hidden', wizard.modoAgregar || paso !== 'datos');
+        $expBar.prop('hidden', wizard.modoAgregar || paso !== 'experiencia');
+        $btnGuardar.html(
+            wizard.modoAgregar
+                ? '<i class="fa-solid fa-check"></i> Agregar experiencia'
+                : '<i class="fa-solid fa-check"></i> Crear clase'
+        );
+
+        const enDatos = paso === 'datos' && !wizard.modoAgregar;
         $wizardSeleccion.prop('hidden', enDatos);
         $wizardDatos.prop('hidden', !enDatos);
 
@@ -256,10 +301,15 @@
         if (wizard.ambiente) {
             crumbs.push({ paso: null, nombre: wizard.ambiente.nombre });
         }
-        if (wizard.modulo) crumbs.push({ paso: 0, nombre: wizard.modulo.nombre });
-        if (wizard.eje) crumbs.push({ paso: 1, nombre: wizard.eje.nombre });
-        if (wizard.tematica) crumbs.push({ paso: 2, nombre: wizard.tematica.nombre });
-        if (wizard.experiencia) crumbs.push({ paso: 3, nombre: wizard.experiencia.nombre });
+        if (wizard.modulo) crumbs.push({ paso: wizard.modoAgregar ? null : 0, nombre: wizard.modulo.nombre });
+        if (wizard.eje) crumbs.push({ paso: wizard.modoAgregar ? null : 1, nombre: wizard.eje.nombre });
+        if (wizard.tematica) crumbs.push({ paso: wizard.modoAgregar ? null : 2, nombre: wizard.tematica.nombre });
+        if (!wizard.modoAgregar && wizard.experienciasSeleccionadas.length) {
+            crumbs.push({
+                paso: null,
+                nombre: pluralizar(wizard.experienciasSeleccionadas.length, 'experiencia', 'experiencias'),
+            });
+        }
 
         if (!crumbs.length) {
             $wizardBreadcrumb.prop('hidden', true).empty();
@@ -357,6 +407,7 @@
             }
 
             renderCards(lista.map((e) => htmlCardExperiencia(e)).join(''));
+            actualizarBarraExperiencias();
         };
 
         if (Array.isArray(wizard.experiencias)) {
@@ -384,17 +435,42 @@
             });
     }
 
+    function actualizarBarraExperiencias() {
+        const total = wizard.experienciasSeleccionadas.length;
+
+        if (wizard.modoAgregar || pasoActual() !== 'experiencia') {
+            $expBar.prop('hidden', true);
+            return;
+        }
+
+        $expBar.prop('hidden', false);
+        $expBarText.text(
+            total === 0
+                ? 'Selecciona al menos una experiencia para continuar.'
+                : `${pluralizar(total, 'experiencia seleccionada', 'experiencias seleccionadas')}.`
+        );
+        $btnContinuar.prop('disabled', total === 0);
+    }
+
     function prepararPasoDatos() {
-        $inputNombre.val(wizard.experiencia?.nombre || '');
+        const primera = wizard.experienciasSeleccionadas[0];
+        $inputNombre.val(wizard.tematica?.nombre || primera?.nombre || '');
         $inputFecha.val(hoyIso());
         $inputDescripcion.val('');
+
+        const listaExp = wizard.experienciasSeleccionadas
+            .map((exp) => `• ${escapar(exp.nombre || 'Sin nombre')}`)
+            .join('<br>');
+
         $wizardResumen.html(`
             <strong>Ruta curricular</strong><br>
             ${escapar(wizard.ambiente?.nombre || '—')}
             › ${escapar(wizard.modulo?.nombre || '—')}
             › ${escapar(wizard.eje?.nombre || '—')}
             › ${escapar(wizard.tematica?.nombre || '—')}
-            › ${escapar(wizard.experiencia?.nombre || '—')}
+            <br><br>
+            <strong>${pluralizar(wizard.experienciasSeleccionadas.length, 'Experiencia', 'Experiencias')}</strong><br>
+            ${listaExp}
         `);
         renderGruposReplica();
     }
@@ -425,23 +501,16 @@
                 : 'Marca los grupos del grado donde quieres replicar esta clase.'
         );
 
-        const expId = wizard.experiencia?.id;
         const html = gruposReplica.map((grupo) => {
             const id = Number(grupo.carga_docente_id);
-            const yaTieneExp = expId && experienciaYaUsadaEnCarga(expId, id);
-            const checked = !yaTieneExp && (grupo.es_actual || gruposReplica.length === 1);
-            const disabled = yaTieneExp ? 'disabled' : '';
-            const bloqueadaBadge = yaTieneExp
-                ? '<span class="clase-replica-badge clase-replica-badge--bloqueada">Experiencia ya agregada</span>'
-                : '';
+            const checked = grupo.es_actual || gruposReplica.length === 1;
 
-            const actualBadge = grupo.es_actual && !yaTieneExp
+            const actualBadge = grupo.es_actual
                 ? '<span class="clase-replica-badge">Actual</span>'
                 : '';
 
             const labelClases = ['clase-replica-grupo'];
             if (grupo.es_actual) labelClases.push('es-actual');
-            if (yaTieneExp) labelClases.push('es-bloqueada');
 
             return `
                 <div class="col-md-4 col-sm-6">
@@ -450,12 +519,10 @@
                             id="clase_replica_${id}"
                             value="${id}"
                             data-es-actual="${grupo.es_actual ? '1' : '0'}"
-                            ${checked ? 'checked' : ''}
-                            ${disabled}>
+                            ${checked ? 'checked' : ''}>
                         <span class="clase-replica-grupo-nombre">
                             Grupo ${escapar(grupo.nombre)}
                             ${actualBadge}
-                            ${bloqueadaBadge}
                         </span>
                     </label>
                 </div>
@@ -500,21 +567,44 @@
             wizard.tematicas = null;
             wizard.experiencia = null;
             wizard.experiencias = null;
+            wizard.experienciasSeleccionadas = [];
         } else if (indice <= 1) {
             wizard.eje = null;
             wizard.tematica = null;
             wizard.tematicas = null;
             wizard.experiencia = null;
             wizard.experiencias = null;
-        } else if (indice <= 2) {
+            wizard.experienciasSeleccionadas = [];
+        } else         if (indice <= 2) {
             wizard.tematica = null;
             wizard.tematicas = null;
             wizard.experiencia = null;
             wizard.experiencias = null;
+            wizard.experienciasSeleccionadas = [];
         } else if (indice <= 3) {
             wizard.experiencia = null;
             wizard.experiencias = null;
         }
+    }
+
+    function toggleExperienciaSeleccionada(exp) {
+        if (experienciaEstaSeleccionada(exp.id)) {
+            wizard.experienciasSeleccionadas = wizard.experienciasSeleccionadas
+                .filter((item) => Number(item.id) !== Number(exp.id));
+        } else {
+            wizard.experienciasSeleccionadas.push(exp);
+        }
+
+        renderExperiencias();
+    }
+
+    function continuarDesdeExperiencias() {
+        if (!wizard.experienciasSeleccionadas.length) {
+            toast('warning', 'Selecciona al menos una experiencia.');
+            return;
+        }
+
+        irPaso(4);
     }
 
     function irPaso(indice) {
@@ -546,29 +636,119 @@
         if (paso === 'tematica') {
             wizard.tematica = (wizard.tematicas || []).find((item) => Number(item.id) === numId) || null;
             if (!wizard.tematica) return;
+            wizard.experienciasSeleccionadas = [];
             irPaso(3);
             return;
         }
 
         if (paso === 'experiencia') {
-            if (experienciaYaUsadaEnCarga(numId, cargaActualId)) {
-                toast('info', 'Esta experiencia ya está agregada en este grupo.');
+            const exp = (wizard.experiencias || []).find((item) => Number(item.id) === numId) || null;
+            if (!exp) return;
+
+            if (wizard.modoAgregar) {
+                if (experienciaYaUsadaEnClase(numId, wizard.claseId)) {
+                    toast('info', 'Esta experiencia ya está agregada en esta clase.');
+                    return;
+                }
+                wizard.experiencia = exp;
+                guardarExperienciaEnClase();
                 return;
             }
-            wizard.experiencia = (wizard.experiencias || []).find((item) => Number(item.id) === numId) || null;
-            if (!wizard.experiencia) return;
-            irPaso(4);
+
+            toggleExperienciaSeleccionada(exp);
         }
     }
 
-    function abrirModal() {
+    function resetWizardModo() {
+        wizard.modoAgregar = false;
+        wizard.claseId = null;
+        wizard.claseNombre = '';
+        wizard.experienciasSeleccionadas = [];
+        $modalTitle.text('Nueva clase');
+        $modalSubtitle.text('Seleccione módulo, eje, temática y experiencias');
+        $expBar.prop('hidden', true);
+    }
+
+    function abrirModalNueva() {
         if (!ambienteFijo) {
             toast('warning', 'No hay currículo disponible para este ambiente.');
             return;
         }
+        resetWizardModo();
         wizard.ambiente = ambienteFijo;
         irPaso(0);
         modal?.show();
+    }
+
+    function abrirModalAgregar(claseId, claseNombre) {
+        if (!ambienteFijo) {
+            toast('warning', 'No hay currículo disponible para este ambiente.');
+            return;
+        }
+
+        const ctx = contextoClase(claseId);
+        if (!ctx?.tematica_id) {
+            toast('warning', 'Esta clase aún no tiene temática definida.');
+            return;
+        }
+
+        resetWizardModo();
+        wizard.modoAgregar = true;
+        wizard.claseId = Number(claseId) || null;
+        wizard.claseNombre = String(claseNombre || '').trim();
+        wizard.ambiente = ambienteFijo;
+        wizard.modulo = {
+            id: ctx.modulo_id,
+            nombre: ctx.modulo_nombre || 'Módulo',
+        };
+        wizard.eje = {
+            id: ctx.eje_id,
+            nombre: ctx.eje_nombre || 'Eje',
+        };
+        wizard.tematica = {
+            id: ctx.tematica_id,
+            nombre: ctx.tematica_nombre || 'Temática',
+        };
+        wizard.experiencias = null;
+
+        $modalTitle.text('Agregar experiencia');
+        $modalSubtitle.text(
+            wizard.claseNombre
+                ? `Clase: ${wizard.claseNombre} · Temática: ${wizard.tematica.nombre}`
+                : `Temática: ${wizard.tematica.nombre}`
+        );
+
+        wizard.paso = 3;
+        $wizardEmpty.text('No hay experiencias disponibles en esta temática.');
+        renderPaso();
+        modal?.show();
+    }
+
+    function guardarExperienciaEnClase() {
+        if (!wizard.modulo || !wizard.eje || !wizard.tematica || !wizard.experiencia || !wizard.claseId) {
+            toast('error', 'Completa la selección curricular.');
+            return;
+        }
+
+        const payload = {
+            modulo_id: wizard.modulo.id,
+            eje_id: wizard.eje.id,
+            tematica_id: wizard.tematica.id,
+            experiencia_id: wizard.experiencia.id,
+            clase_id: wizard.claseId,
+        };
+
+        mostrarEstado('loading');
+        api(urls.guardar, 'POST', payload)
+            .done((res) => {
+                toast('success', res?.message || 'Experiencia agregada.');
+                modal?.hide();
+                window.location.reload();
+            })
+            .fail((xhr) => {
+                toast('error', errorAjax(xhr, 'No se pudo agregar la experiencia.'));
+                renderPaso();
+            });
     }
 
     function guardarClase() {
@@ -579,8 +759,8 @@
             return;
         }
 
-        if (!wizard.modulo || !wizard.eje || !wizard.tematica || !wizard.experiencia) {
-            toast('error', 'Completa la selección curricular.');
+        if (!wizard.modulo || !wizard.eje || !wizard.tematica || !wizard.experienciasSeleccionadas.length) {
+            toast('error', 'Completa la selección curricular y elige al menos una experiencia.');
             return;
         }
 
@@ -598,7 +778,7 @@
             modulo_id: wizard.modulo.id,
             eje_id: wizard.eje.id,
             tematica_id: wizard.tematica.id,
-            experiencia_id: wizard.experiencia.id,
+            experiencia_ids: wizard.experienciasSeleccionadas.map((exp) => exp.id),
             nombre,
             descripcion: String($inputDescripcion.val() || '').trim() || null,
             fecha: String($inputFecha.val() || '').trim() || null,
@@ -621,12 +801,20 @@
             });
     }
 
-    $btnNueva.on('click', abrirModal);
+    $btnNueva.on('click', abrirModalNueva);
+
+    $app.on('click', '.btn-clase-agregar-exp', function () {
+        const claseId = Number($(this).data('clase-id') || 0);
+        const claseNombre = String($(this).data('clase-nombre') || '');
+        if (!claseId) return;
+        abrirModalAgregar(claseId, claseNombre);
+    });
     $btnVolver.on('click', () => {
         if (wizard.paso <= 0) return;
         irPaso(wizard.paso - 1);
     });
     $btnGuardar.on('click', guardarClase);
+    $btnContinuar.on('click', continuarDesdeExperiencias);
     $btnReplicaTodos.on('click', () => marcarReplicaTodos(false));
     $btnReplicaNinguno.on('click', () => marcarReplicaTodos(true));
 

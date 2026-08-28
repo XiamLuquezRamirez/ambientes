@@ -119,6 +119,7 @@
 }
 
 .vn-screen-top {
+    flex-shrink: 0;
     padding: 12px 14px 6px;
     text-align: center;
 }
@@ -159,19 +160,37 @@
 }
 
 .vn-screen-body {
-    flex: 1;
-    overflow: auto;
-    padding: 16px 48px 20px;
-    -webkit-overflow-scrolling: touch;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: clamp(8px, 1.2vh, 16px) clamp(12px, 3vw, 48px) clamp(8px, 1vh, 20px);
+}
+
+.vn-block-fit {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .vn-card {
     max-width: 980px;
+    width: 100%;
     margin: 0 auto;
+    transform-origin: center top;
     animation: vnPop .35s cubic-bezier(.34, 1.45, .64, 1);
 }
 
 .vn-screen-nav {
+    flex-shrink: 0;
     display: grid;
     grid-template-columns: auto 1fr auto;
     gap: 8px;
@@ -1481,12 +1500,30 @@
     max-width: 640px;
 }
 
+/* 6 emociones: 3×2 en horizontal para caber sin scroll en tablet */
+.vn-emociones[data-count="6"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: min(980px, 100%);
+    gap: 14px 12px;
+}
+
+.vn-card--emocion:has(.vn-emociones[data-count="6"]) {
+    max-width: 100%;
+}
+
+@media (max-width: 560px) {
+    .vn-emociones[data-count="6"] {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 640px;
+    }
+}
+
 .vn-emocion {
     border: 0;
     border-radius: 24px;
     background: #fff;
-    padding: 22px 14px;
-    min-height: 140px;
+    padding: 18px 12px;
+    min-height: 168px;
     cursor: pointer;
     box-shadow: 0 8px 0 rgba(15, 23, 42, .08);
     font-weight: 800;
@@ -1494,7 +1531,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
 }
 
@@ -1503,10 +1540,15 @@
     box-shadow: 0 4px 0 rgba(15, 23, 42, .08);
 }
 
-.vn-emocion .vn-op-emoji {
-    font-size: 4.2rem;
+.vn-emocion-img {
+    width: 100%;
+    max-width: 140px;
+    height: auto;
+    max-height: 130px;
+    object-fit: contain;
     display: block;
-    line-height: 1;
+    pointer-events: none;
+    user-select: none;
 }
 
 .vn-emocion-label {
@@ -1631,6 +1673,24 @@
 }
 
 /* ── Paint: barra lateral + lienzo ───────────────────────── */
+.vn-block-fit .vn-paint {
+    min-height: 0;
+}
+
+.vn-block-fit .vn-card--dibujo,
+.vn-block-fit .vn-card--juego-colorear {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: 100%;
+}
+
+.vn-block-fit .vn-card--dibujo .vn-paint,
+.vn-block-fit .vn-card--juego-colorear .vn-paint {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
 .vn-paint {
     display: flex;
     gap: 14px;
@@ -2221,15 +2281,87 @@ body.vn-dispositivo .vn-tablet-screen {
     box-sizing: border-box !important;
     /* anula el canvas fijo 1280×800 del overlay del constructor */
     --vn-screen-w: 100vw;
-    --vn-screen-h: 100vh;
+    --vn-screen-h: 100dvh;
 }
 
-body.vn-dispositivo .vn-screen-body {
-    padding: 12px 4vw 16px;
+body.vn-dispositivo .vn-screen-body,
+body.rn-player-activo .vn-screen-body,
+.rn-player .vn-screen-body {
+    padding: clamp(6px, 1vh, 12px) clamp(8px, 2.5vw, 24px) clamp(6px, 1vh, 16px);
 }
 
-body.vn-dispositivo .vn-card {
+body.vn-dispositivo .vn-card,
+body.rn-player-activo .vn-card,
+.rn-player .vn-card {
     max-width: min(980px, 100%);
+    max-height: none;
+}
+
+body.vn-dispositivo #vnDispositivo,
+body.rn-player-activo #vnDispositivo {
+    overflow: hidden;
+    touch-action: manipulation;
+}
+
+body.vn-dispositivo #vnTabletScreen,
+body.rn-player-activo #vnTabletScreen,
+.rn-player #vnTabletScreen {
+    min-height: 0;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-paint,
+body.rn-player-activo .vn-paint,
+.rn-player .vn-paint {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    height: auto;
+}
+
+body.vn-dispositivo .vn-paint-stage,
+body.rn-player-activo .vn-paint-stage,
+.rn-player .vn-paint-stage {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+body.vn-dispositivo .vn-draw-canvas,
+body.rn-player-activo .vn-draw-canvas,
+.rn-player .vn-draw-canvas,
+body.vn-dispositivo .vn-draw-wrap canvas,
+body.rn-player-activo .vn-draw-wrap canvas,
+.rn-player .vn-draw-wrap canvas {
+    min-height: 0;
+    height: 100%;
+}
+
+@media (max-height: 720px) {
+    body.vn-dispositivo .vn-emocion,
+    body.rn-player-activo .vn-emocion,
+    .rn-player .vn-emocion {
+        min-height: clamp(96px, 16vh, 168px);
+        padding: 10px 8px;
+    }
+
+    body.vn-dispositivo .vn-emocion-label,
+    body.rn-player-activo .vn-emocion-label,
+    .rn-player .vn-emocion-label {
+        font-size: clamp(1rem, 2.4vh, 1.45rem);
+    }
+
+    body.vn-dispositivo .vn-emocion-img,
+    body.rn-player-activo .vn-emocion-img,
+    .rn-player .vn-emocion-img {
+        max-height: clamp(68px, 13vh, 130px);
+    }
+
+    body.vn-dispositivo .vn-card--emocion .vn-instruccion,
+    body.rn-player-activo .vn-card--emocion .vn-instruccion,
+    .rn-player .vn-card--emocion .vn-instruccion {
+        font-size: clamp(1.05rem, 2.6vh, 1.45rem);
+        padding: 12px 16px;
+    }
 }
 
 .vn-fs-btn {

@@ -1,10 +1,6 @@
 /**
  * recorrido-camino-3d.js — Camino lineal del kiosco en 3D (Three.js).
- *
- * Reemplaza visualmente al mapa 2D (recorrido-camino.js) pero conserva EXACTAMENTE
- * la misma lógica del kiosco:
  *   - Lee #rn-camino (paradas de la Clase del docente: modulo→eje→tematica→info→experiencia).
- *   - Expone window.KioscoCamino.boot(ctx) con la misma firma; el kiosco no cambia.
  *   - Reusa los modales del kiosco: #rnCaminoModal (info/video) y el player VistaNino
  *     (experiencia real). NO duplica esa lógica.
  *   - Al LLEGAR a cada estación abre el modal automáticamente (video en modulo/eje si
@@ -18,14 +14,14 @@ import * as THREE from 'three';
 (function () {
     'use strict';
 
-    // ---- Estado (misma semántica que recorrido-camino.js) ----
+    // ---- Estado del recorrido ----
     let ctx = {};
     let camino = { paradas: [], puntos: [] };
     let indiceActual = 0;
     let indiceMaximoVisitado = 0;
     let caminando = false;
     let recorridoIniciado = false;
-    let experienciaCargada = false;
+    let experienciaCargada = null;
     let indiceModal = null;
 
     // ---- Three.js refs ----
@@ -37,7 +33,12 @@ import * as THREE from 'three';
     let ultimoNow = 0; // timestamp previo del loop (para delta time)
     let colorAmbiente = new THREE.Color('#0ea5e9');
     let rafId = null;
+    let onCanvasClick = null;
     let N = 0;
+    let audioNarracion = null;
+    let narrando = false;
+    let paradaVideoActual = null;
+    let escuchandoEmbedVideo = false;
 
     const $ = window.jQuery;
 
@@ -46,37 +47,63 @@ import * as THREE from 'three';
             .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // ===================== Voz de niño (Web Speech API) =====================
-    // No hay voz "infantil" nativa; se simula con una voz española y un pitch
-    // alto (agudo) + velocidad algo más lenta, que suena a vocecita de niño.
-    let vozNino = null, vozLista = false;
-    function prepararVoz() {
-        if (!('speechSynthesis' in window)) return;
-        const elegir = () => {
-            const vs = speechSynthesis.getVoices();
-            if (!vs.length) return;
-            const es = vs.filter(v => /^es/i.test(v.lang));
-            // preferir femenina (más creíble como niño al subir el tono)
-            vozNino = es.find(v => /helena|laura|sabina|paulina|mónica|monica|female|mujer/i.test(v.name))
-                   || es[0] || vs.find(v => v.default) || vs[0];
-            vozLista = true;
-        };
-        elegir();
-        if (!vozLista) speechSynthesis.onvoiceschanged = elegir;
-    }
-    function hablar(texto, alTerminar) {
-        if (!('speechSynthesis' in window) || !texto) { if (alTerminar) alTerminar(); return; }
+    // ===================== Voz (TTS del servidor, igual que el player) =====================
+    function detenerNarracion() {
+        narrando = false;
+        if (!audioNarracion) return;
         try {
-            speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(texto);
-            if (vozNino) u.voice = vozNino;
-            u.lang = (vozNino && vozNino.lang) || 'es-ES';
-            u.pitch = 2.0;   // tono MUY agudo → vocecita de niño (máximo de la API)
-            u.rate = 0.80;   // más lento, muy claro para primera infancia
-            u.volume = 1;
-            if (alTerminar) { u.onend = alTerminar; u.onerror = alTerminar; }
-            speechSynthesis.speak(u);
-        } catch (e) { if (alTerminar) alTerminar(); }
+            audioNarracion.pause();
+            audioNarracion.currentTime = 0;
+        } catch (e) { /* noop */ }
+        audioNarracion = null;
+    }
+
+    function hablar(texto, alTerminar) {
+        if (!texto) {
+            if (alTerminar) alTerminar();
+            return;
+        }
+        const urlTts = String(ctx.$app?.data('url-tts') || '');
+        if (!urlTts || !$) {
+            if (alTerminar) alTerminar();
+            return;
+        }
+
+        detenerNarracion();
+        narrando = true;
+
+        $.ajax({
+            url: urlTts,
+            method: 'GET',
+            data: { texto },
+            dataType: 'json',
+        }).done(function (res) {
+            const audioUrl = res?.data?.url;
+            if (!audioUrl) {
+                narrando = false;
+                if (alTerminar) alTerminar();
+                return;
+            }
+            audioNarracion = new Audio(audioUrl);
+            audioNarracion.onended = function () {
+                narrando = false;
+                audioNarracion = null;
+                if (alTerminar) alTerminar();
+            };
+            audioNarracion.onerror = function () {
+                narrando = false;
+                audioNarracion = null;
+                if (alTerminar) alTerminar();
+            };
+            audioNarracion.play().catch(function () {
+                narrando = false;
+                audioNarracion = null;
+                if (alTerminar) alTerminar();
+            });
+        }).fail(function () {
+            narrando = false;
+            if (alTerminar) alTerminar();
+        });
     }
 
     // Label de una parada: "N. Nombre real" (ej. "1. Exploro mi cuerpo").
@@ -89,7 +116,13 @@ import * as THREE from 'three';
     function numeroParada(par, i) {
         if (par.id === 'inicio') return '▶';
         if (par.id === 'fin') return '★';
-        return String(i);   // módulo=1, eje=2, temática=3, experiencia=4
+        return String(i);   // módulo=1, eje=2, temática=3, experiencia=4...
+    }
+
+    function esParadaExperiencia(par) {
+        if (!par || !par.id) return false;
+        const id = String(par.id);
+        return id === 'experiencia' || id.indexOf('experiencia-') === 0;
     }
 
     // ===================== Ruido fractal (terreno) =====================
@@ -777,7 +810,7 @@ import * as THREE from 'three';
         const cb = alLlegarCb; alLlegarCb = null;
         // AUTOMÁTICO al llegar: abrir el modal de la parada (video/info) o la experiencia
         const p = camino.paradas[indiceActual];
-        if (p && p.id === 'experiencia') {
+        if (p && esParadaExperiencia(p)) {
             abrirExperiencia();
         } else if (p && p.id !== 'inicio' && p.id !== 'fin') {
             abrirModalParada(indiceActual);
@@ -795,28 +828,207 @@ import * as THREE from 'three';
             case 'modulo':      return '¡Mira! Nuestro módulo es: ' + t + '. Veamos el video.';
             case 'eje':         return 'Ahora seguimos con el eje: ' + t + '.';
             case 'tematica':    return 'La temática de hoy es: ' + t + '.';
-            case 'experiencia': return '¡Llegamos a la experiencia: ' + t + '! ¿La hacemos juntos?';
             case 'fin':         return '¡Lo lograste! Terminamos la aventura. ¡Muy bien!';
-            default:            return t;
+            default:
+                if (esParadaExperiencia(p)) {
+                    return '¡Llegamos a la experiencia: ' + t + '! ¿La hacemos juntos?';
+                }
+                return t;
         }
     }
-    function narrarParada(p) { hablar(fraseParada(p)); }
+    function narrarParada(p, alTerminar) { hablar(fraseParada(p), alTerminar); }
+
+    function tipoMediaParada(p) {
+        if (!p) return 'ninguno';
+        return p.tipo_media || (p.imagen_url ? 'imagen' : (p.video_url || p.videoUrl ? 'video' : 'ninguno'));
+    }
+
+    function esVideoParada(p) {
+        return tipoMediaParada(p) === 'video';
+    }
+
+    function datosVideoParada(p) {
+        const embed = p.media_embed || 'directo';
+        const embedUrl = p.embed_url || p.media_url || p.video_url || p.videoUrl || '';
+        return { embed, embedUrl };
+    }
+
+    function mostrarOverlayVideo() {
+        const $fs = $('#rn3dVideoFs');
+        $fs.prop('hidden', false).attr('aria-hidden', 'false').addClass('rn3d-video-fs--activo');
+        document.body.classList.add('rn3d-video-reproduciendo');
+    }
+
+    function ocultarOverlayVideo() {
+        const $fs = $('#rn3dVideoFs');
+        $fs.prop('hidden', true).attr('aria-hidden', 'true').removeClass('rn3d-video-fs--activo');
+        document.body.classList.remove('rn3d-video-reproduciendo');
+    }
+
+    function desactivarEscuchaEmbedVideo() {
+        if (!escuchandoEmbedVideo) return;
+        escuchandoEmbedVideo = false;
+        window.removeEventListener('message', onMensajeEmbedVideo);
+    }
+
+    function onMensajeEmbedVideo(e) {
+        if (!paradaVideoActual) return;
+        const embed = paradaVideoActual.media_embed || 'directo';
+
+        if (embed === 'youtube' && String(e.origin || '').includes('youtube.com')) {
+            try {
+                const d = JSON.parse(e.data);
+                const finYoutube = (d.event === 'infoDelivery' && d.info && d.info.playerState === 0)
+                    || (d.event === 'onStateChange' && d.info === 0);
+                if (finYoutube) finalizarVideoParada();
+            } catch (err) { /* noop */ }
+        }
+
+        if (embed === 'vimeo' && String(e.origin || '').includes('vimeo.com')) {
+            try {
+                const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+                if (d && d.event === 'finish') finalizarVideoParada();
+            } catch (err) { /* noop */ }
+        }
+    }
+
+    function activarEscuchaEmbedVideo() {
+        if (escuchandoEmbedVideo) return;
+        escuchandoEmbedVideo = true;
+        window.addEventListener('message', onMensajeEmbedVideo);
+    }
+
+    function mostrarVolverAVerVideo() {
+        const $v = $('#rnModalVideo');
+        $v.prop('hidden', false).attr('aria-hidden', 'false').html(
+            '<div class="rn3d-video-replay">'
+            + '<button type="button" class="rn3d-video-replay__btn" data-accion="rever-video">'
+            + '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Volver a ver'
+            + '</button></div>'
+        );
+    }
+
+    function finalizarVideoParada() {
+        const $fs = $('#rn3dVideoFs');
+        const vid = $fs.find('video')[0];
+        if (vid) {
+            try { vid.pause(); } catch (e) { /* noop */ }
+        }
+        $fs.find('iframe').each(function () { this.src = ''; });
+        $('#rn3dVideoFsInner').empty();
+        ocultarOverlayVideo();
+        desactivarEscuchaEmbedVideo();
+        if (paradaVideoActual) mostrarVolverAVerVideo();
+    }
+
+    function detenerVideoParada() {
+        paradaVideoActual = null;
+        const $fs = $('#rn3dVideoFs');
+        const vid = $fs.find('video')[0];
+        if (vid) {
+            try { vid.pause(); } catch (e) { /* noop */ }
+        }
+        $fs.find('iframe').each(function () { this.src = ''; });
+        $('#rn3dVideoFsInner').empty();
+        ocultarOverlayVideo();
+        desactivarEscuchaEmbedVideo();
+        $('#rnModalVideo').prop('hidden', true).attr('aria-hidden', 'true').empty();
+    }
+
+    function reproducirVideoParada(p) {
+        if (!p || !esVideoParada(p)) return;
+
+        paradaVideoActual = p;
+        const { embed, embedUrl } = datosVideoParada(p);
+        if (!embedUrl) return;
+
+        const $fs = $('#rn3dVideoFs');
+        const $inner = $('#rn3dVideoFsInner');
+        $inner.empty();
+        $('#rnModalVideo').prop('hidden', true).empty();
+
+        if (embed === 'youtube' || embed === 'vimeo') {
+            let src = p.embed_url || embedUrl;
+            src += (src.indexOf('?') >= 0 ? '&' : '?') + 'autoplay=1&playsinline=1';
+            if (embed === 'youtube') src += '&enablejsapi=1&rel=0';
+            if (embed === 'vimeo') src += '&autopause=0';
+
+            const iframe = document.createElement('iframe');
+            iframe.src = src;
+            iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media; picture-in-picture');
+            iframe.setAttribute('allowfullscreen', 'true');
+            iframe.setAttribute('title', p.titulo || 'Video');
+            iframe.addEventListener('load', function () {
+                try {
+                    iframe.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1 }), '*');
+                } catch (err) { /* noop */ }
+            });
+            $inner[0].appendChild(iframe);
+            activarEscuchaEmbedVideo();
+            mostrarOverlayVideo();
+            return;
+        }
+
+        const video = document.createElement('video');
+        video.src = embedUrl;
+        video.playsInline = true;
+        video.autoplay = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        $inner[0].appendChild(video);
+
+        const alFinDirecto = function () { finalizarVideoParada(); };
+        video.addEventListener('ended', alFinDirecto, { once: true });
+        video.addEventListener('error', alFinDirecto, { once: true });
+
+        mostrarOverlayVideo();
+        video.play().catch(function () {
+            finalizarVideoParada();
+        });
+    }
 
     // ===================== MODALES — reusa el DOM del kiosco =====================
     function htmlModalFooter(p) {
         if (p.id === 'fin') return '<button type="button" class="rn-camino-btn rn-camino-btn--pri" id="rnModalSalirKiosco">Salir</button>';
-        if (p.id === 'experiencia') {
+        if (esParadaExperiencia(p)) {
             return '<button type="button" class="rn-camino-btn rn-camino-btn--sec" data-accion="cerrar">Cerrar</button>'
                 + '<button type="button" class="rn-camino-btn rn-camino-btn--pri" data-accion="iniciar-experiencia">Iniciar experiencia</button>';
         }
         // módulo / eje / temática / info: botón "Continuar" cierra y deja resaltada la siguiente
         return '<button type="button" class="rn-camino-btn rn-camino-btn--pri" data-accion="cerrar">¡Seguir!</button>';
     }
+    function renderMediaParada(p) {
+        const $v = $('#rnModalVideo');
+        const tipo = tipoMediaParada(p);
+
+        if (tipo === 'video') {
+            $v.prop('hidden', true).attr('aria-hidden', 'true').empty();
+            return;
+        }
+
+        if (tipo === 'ninguno') {
+            $v.prop('hidden', true).attr('aria-hidden', 'true').empty();
+            return;
+        }
+
+        if (tipo === 'imagen') {
+            const url = p.imagen_url || p.media_url;
+            if (!url) {
+                $v.prop('hidden', true).attr('aria-hidden', 'true').empty();
+                return;
+            }
+            $v.prop('hidden', false).attr('aria-hidden', 'false').html(
+                '<img src="' + escapar(url) + '" alt="" style="width:100%;max-height:240px;object-fit:contain;border-radius:12px;">'
+            );
+        }
+    }
+
     function abrirModalParada(indice) {
         const p = camino.paradas[indice];
         if (!p || indice > indiceMaximoVisitado) return;
+        detenerVideoParada();
         indiceModal = indice;
-        const tieneVideo = !!(p.video_url || p.videoUrl);
+        paradaVideoActual = esVideoParada(p) ? p : null;
         $('#rnModalEtiqueta').text(p.etiqueta || '');
         $('#rnModalTitulo').text(p.titulo || '');
         const cuerpoTexto = escapar(p.texto || '').replace(/\n\n/g, '</p><p class="rn-camino-modal__texto">');
@@ -826,46 +1038,63 @@ import * as THREE from 'three';
         } else {
             $('#rnModalBody').html('<p class="rn-camino-modal__texto">' + cuerpoTexto + '</p>');
         }
-        // Video (módulo / eje) — el kiosco ya tiene el contenedor #rnModalVideo
-        if (tieneVideo) {
-            const url = p.video_url || p.videoUrl;
-            $('#rnModalVideo').prop('hidden', false).html(
-                '<video src="' + escapar(url) + '" controls autoplay playsinline style="width:100%;border-radius:12px;"></video>'
-            );
-        } else {
-            $('#rnModalVideo').prop('hidden', true).empty();
-        }
+        renderMediaParada(p);
         $('#rnModalFooter').html(htmlModalFooter(p));
         $('#rnCaminoModal').prop('hidden', false);
-        narrarParada(p); // el personaje anuncia la estación con voz de niño
+
+        if (esVideoParada(p)) {
+            narrarParada(p, function () { reproducirVideoParada(p); });
+        } else {
+            narrarParada(p);
+        }
     }
     function cerrarModal() {
-        const $v = $('#rnModalVideo');
-        const vid = $v.find('video')[0]; if (vid) { try { vid.pause(); } catch (e) {} }
-        $v.prop('hidden', true).empty();
+        detenerVideoParada();
         $('#rnCaminoModal').prop('hidden', true).removeClass('rn3d-modal-exp');
         indiceModal = null;
     }
 
     // ===================== Experiencia — reusa VistaNino =====================
     function urlExperiencia(id) { return String(ctx.urlExperienciaTpl || '').replace('__ID__', String(id)); }
-    function indiceParadaExperiencia() { return camino.paradas.findIndex(p => p.id === 'experiencia'); }
     function cerrarPlayer() {
+        detenerNarracion();
         if (window.VistaNino && typeof window.VistaNino.detener === 'function') window.VistaNino.detener();
         const $player = ctx.$player;
-        if ($player && $player.length) $player.prop('hidden', true).removeClass('rn-player--camino-overlay').attr('aria-hidden', 'true');
+        if ($player && $player.length) {
+            $player.prop('hidden', true).removeClass('rn-player--camino-overlay').attr('aria-hidden', 'true');
+        }
+        if (ctx.$shell && ctx.$shell.length) {
+            ctx.$shell.prop('hidden', false).attr('aria-hidden', 'false');
+        }
+        if (renderer && renderer.domElement) renderer.domElement.hidden = false;
         $('#rnCaminoModalPlayer').prop('hidden', true);
-        experienciaCargada = false;
+        $('body').removeClass('rn-player-activo');
+        experienciaCargada = null;
     }
+
+    function volverAlMapaDesdeExperiencia() {
+        cerrarPlayer();
+        refrescarEstaciones();
+        actualizarHud(false);
+    }
+
+    function opcionesVistaNino(bloques, mediaBase, nombre) {
+        return {
+            bloques,
+            mediaBase: mediaBase || '',
+            experienciaNombre: nombre || 'Experiencia',
+            estudianteSexo: String($('#rnApp').data('estudiante-sexo') || ''),
+            alTerminarExperiencia: volverAlMapaDesdeExperiencia,
+        };
+    }
+
     function abrirExperiencia() {
         cerrarModal();
-        const idxExp = indiceParadaExperiencia();
-        if (idxExp < 0 || indiceActual !== idxExp) return;
-        const p = camino.paradas[idxExp];
-        const expId = p?.experiencia_id || camino.experiencia_id;
+        const p = camino.paradas[indiceActual];
+        if (!esParadaExperiencia(p)) return;
+        const expId = p.experiencia_id || camino.experiencia_id;
         if (!expId) return;
-        // Modal-tarjeta festivo de la experiencia con su nombre y botón "Iniciar"
-        indiceModal = idxExp;
+        indiceModal = indiceActual;
         $('#rnModalEtiqueta').text(p.etiqueta || 'Experiencia');
         $('#rnModalTitulo').text(p.titulo || 'Experiencia');
         const cuerpoTexto = escapar(p.texto || '').replace(/\n\n/g, '</p><p class="rn-camino-modal__texto">');
@@ -881,30 +1110,85 @@ import * as THREE from 'three';
         );
         $('#rnModalFooter').html(htmlModalFooter(p));
         $('#rnCaminoModal').addClass('rn3d-modal-exp').prop('hidden', false);
-        narrarParada(p); // anuncia la experiencia con voz de niño
+        narrarParada(p);
     }
     function iniciarExperiencia() {
         cerrarModal();
-        const idxExp = indiceParadaExperiencia();
+        const idxExp = indiceModal !== null ? indiceModal : indiceActual;
         const p = camino.paradas[idxExp];
+        if (!esParadaExperiencia(p)) return;
         const expId = p?.experiencia_id || camino.experiencia_id;
         if (!expId) return;
+
+        if (experienciaCargada && experienciaCargada.id && Number(experienciaCargada.id) !== Number(expId)) {
+            experienciaCargada = null;
+        }
+
         const $player = ctx.$player;
+        if (!$player || !$player.length) {
+            alert('No se encontró el reproductor de la experiencia.');
+            return;
+        }
+
+        if (ctx.$shell && ctx.$shell.length) ctx.$shell.prop('hidden', true).attr('aria-hidden', 'true');
+        if (renderer && renderer.domElement) renderer.domElement.hidden = true;
+
         $player.prop('hidden', false).attr('aria-hidden', 'false').addClass('rn-player--camino-overlay');
-        $('#rnCaminoModalPlayer').prop('hidden', false);
-        if (experienciaCargada) return;
-        $.ajax({ url: urlExperiencia(expId), method: 'GET', dataType: 'json' }).done(function (res) {
-            const data = res?.data;
-            if (!data?.bloques) { alert('No se pudo cargar la experiencia.'); cerrarPlayer(); return; }
-            experienciaCargada = true;
+        $('body').addClass('rn-player-activo');
+
+        if (experienciaCargada) {
             if (window.VistaNino && typeof window.VistaNino.iniciar === 'function') {
-                window.VistaNino.iniciar({
-                    bloques: data.bloques, mediaBase: data.media_base || '',
-                    experienciaNombre: data.experiencia?.nombre || 'Experiencia', poll: false,
-                });
+                window.VistaNino.iniciar(opcionesVistaNino(
+                    experienciaCargada.bloques,
+                    experienciaCargada.mediaBase,
+                    experienciaCargada.nombre
+                ));
             }
+            return;
+        }
+
+        $.ajax({
+            url: urlExperiencia(expId),
+            method: 'GET',
+            dataType: 'json',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        }).done(function (res) {
+            if (!res?.success) {
+                alert(res?.message || 'No se pudo cargar la experiencia.');
+                cerrarPlayer();
+                return;
+            }
+            const data = res?.data;
+            if (!data?.bloques?.length) {
+                alert(res?.message || 'La experiencia no tiene bloques activos.');
+                cerrarPlayer();
+                return;
+            }
+            experienciaCargada = {
+                id: expId,
+                bloques: data.bloques,
+                mediaBase: data.media_base || '',
+                nombre: data.experiencia?.nombre || 'Experiencia',
+            };
+            if (window.VistaNino && typeof window.VistaNino.iniciar === 'function') {
+                window.VistaNino.iniciar(opcionesVistaNino(
+                    experienciaCargada.bloques,
+                    experienciaCargada.mediaBase,
+                    experienciaCargada.nombre
+                ));
+                return;
+            }
+            alert('El reproductor no está disponible. Recarga la página.');
+            cerrarPlayer();
         }).fail(function (xhr) {
-            alert(xhr?.responseJSON?.message || 'No se pudo cargar la experiencia.'); cerrarPlayer();
+            const msg = xhr?.responseJSON?.message
+                || xhr?.responseJSON?.mensaje
+                || 'No se pudo cargar la experiencia.';
+            alert(msg);
+            cerrarPlayer();
         });
     }
 
@@ -954,6 +1238,9 @@ import * as THREE from 'three';
             + '</div>'
             + '<div class="rn-camino-modal rn-camino-modal--player" id="rnCaminoModalPlayer" hidden role="dialog" aria-modal="true">'
             +   '<div class="rn-camino-modal__backdrop"></div>'
+            + '</div>'
+            + '<div class="rn3d-video-fs" id="rn3dVideoFs" hidden aria-hidden="true">'
+            +   '<div class="rn3d-video-fs__inner" id="rn3dVideoFsInner"></div>'
             + '</div>';
         while (wrap.firstChild) ctx.$paso[0].appendChild(wrap.firstChild);
     }
@@ -983,7 +1270,6 @@ import * as THREE from 'three';
         elBocadillo = raiz.querySelector('#rn3dBocadillo');
         const btnIniciar = raiz.querySelector('#rn3dIniciar');
 
-        prepararVoz();
         const saludo = '¡Hola! Bienvenido a esta aventura. Yo te voy a acompañar. ¡Vamos juntos!';
 
         // FLUJO: [botón Iniciar] → (toque) → [nube: personaje hablando] →
@@ -1070,7 +1356,7 @@ import * as THREE from 'three';
         }
         // "Hablar": la boca se abre/cierra mientras hay voz (o durante el diálogo).
         if (boca) {
-            const hablando = ('speechSynthesis' in window && speechSynthesis.speaking) || mostrandoBocadillo;
+            const hablando = narrando || mostrandoBocadillo;
             if (hablando) {
                 const abrir = 0.5 + Math.abs(Math.sin(now / 90)) * 1.1; // boca articulando
                 boca.scale.set(1.3, abrir, 0.5);
@@ -1103,13 +1389,14 @@ import * as THREE from 'three';
 
     // ===================== boot(ctx) — misma firma que el 2D =====================
     function boot(options) {
+        destroy();
         ctx = options || {};
         try { camino = JSON.parse(document.getElementById('rn-camino')?.textContent || '{}'); }
         catch (e) { camino = { paradas: [], puntos: [] }; }
         if (!camino.paradas?.length) return false;
 
         N = camino.paradas.length;
-        indiceActual = 0; indiceMaximoVisitado = 0; caminando = false; recorridoIniciado = false; experienciaCargada = false;
+        indiceActual = 0; indiceMaximoVisitado = 0; caminando = false; recorridoIniciado = false; experienciaCargada = null;
         lagoCentro = null; ultimoNow = 0; mostrandoBocadillo = false;
 
         // color del ambiente desde --rn-color
@@ -1144,7 +1431,8 @@ import * as THREE from 'three';
         camPos.set(-54, 34, 48); camTarget.set(-43, 2, -6); actualizarCamara(true);
 
         raycaster = new THREE.Raycaster(); puntero = new THREE.Vector2();
-        renderer.domElement.addEventListener('click', e => alTocar(e.clientX, e.clientY));
+        onCanvasClick = function (e) { alTocar(e.clientX, e.clientY); };
+        renderer.domElement.addEventListener('click', onCanvasClick);
 
         construirModales();
         construirOverlay();
@@ -1152,9 +1440,12 @@ import * as THREE from 'three';
         // Eventos de los modales (delegados en $paso, como el 2D)
         ctx.$paso.off('click.rn3d');
         ctx.$paso.on('click.rn3d', '[data-accion="cerrar"]', function (e) { e.preventDefault(); cerrarModal(); });
+        ctx.$paso.on('click.rn3d', '[data-accion="rever-video"]', function (e) {
+            e.preventDefault();
+            if (paradaVideoActual) reproducirVideoParada(paradaVideoActual);
+        });
         ctx.$paso.on('click.rn3d', '[data-accion="iniciar-experiencia"]', function (e) { e.preventDefault(); iniciarExperiencia(); });
         ctx.$paso.on('click.rn3d', '#rnModalSalirKiosco', function (e) { e.preventDefault(); salirKiosco(); });
-        $('#rnBtnSalirExperiencia').off('click.rn3d').on('click.rn3d', function (e) { e.preventDefault(); irAFinRecorrido(); });
 
         window.removeEventListener('resize', onResize);
         window.addEventListener('resize', onResize);
@@ -1171,14 +1462,49 @@ import * as THREE from 'three';
         renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    function destroy() {
+        detenerNarracion();
+        detenerVideoParada();
+        cerrarPlayer();
+        cerrarModal();
+
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+
+        if (renderer) {
+            if (renderer.domElement && onCanvasClick) {
+                renderer.domElement.removeEventListener('click', onCanvasClick);
+            }
+            try { renderer.dispose(); } catch (e) { /* noop */ }
+            if (renderer.domElement && renderer.domElement.parentNode) {
+                renderer.domElement.parentNode.removeChild(renderer.domElement);
+            }
+            renderer = null;
+        }
+        onCanvasClick = null;
+
+        window.removeEventListener('resize', onResize);
+        if (ctx.$paso && ctx.$paso.length) ctx.$paso.off('click.rn3d');
+
+        scene = null;
+        camera = null;
+        estaciones = [];
+        nubes = [];
+        caminando = false;
+        recorridoIniciado = false;
+        experienciaCargada = null;
+        indiceActual = 0;
+        indiceMaximoVisitado = 0;
+        indiceModal = null;
+    }
+
     function salirKiosco() { cerrarModal(); if (typeof ctx.onSalir === 'function') ctx.onSalir(); }
 
     function irAFinRecorrido() {
-        cerrarPlayer(); cerrarModal();
-        const idxFin = camino.paradas.findIndex(p => p.id === 'fin');
-        if (idxFin < 0 || indiceActual === idxFin) return;
-        caminarA(idxFin);
+        volverAlMapaDesdeExperiencia();
     }
 
-    window.KioscoCamino = { boot: boot, irAFinRecorrido: irAFinRecorrido };
+    window.KioscoCamino = { boot: boot, destroy: destroy, irAFinRecorrido: irAFinRecorrido };
 })();

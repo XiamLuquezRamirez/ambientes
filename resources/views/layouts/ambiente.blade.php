@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $ambiente->nombre }} — PedNia</title>
-    <link rel="icon" href="{{ asset('assets/images/isotipo.ico') }}">
+    <link rel="icon" href="{{ asset('assets/images/isotipo.png') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/kiosco-fullscreen.css') }}">
@@ -90,8 +90,7 @@
     <script src="{{ asset('assets/js/kiosco-fs-core.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
     <script src="{{ asset('assets/js/constructor-vista-nino.js') }}"></script>
-    {{-- Recorrido en 3D (Three.js). Reemplaza al mapa 2D recorrido-camino.js
-         (respaldo en recorrido-camino.2d.backup.js). Expone window.KioscoCamino.boot(). --}}
+    {{-- Camino 3D (Three.js). Expone window.KioscoCamino.boot(). --}}
     <script type="importmap">
     { "imports": {
         "three": "{{ asset('assets/vendor/three/three.module.js') }}"

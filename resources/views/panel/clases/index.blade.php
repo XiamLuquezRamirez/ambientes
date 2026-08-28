@@ -38,7 +38,7 @@
     @include('partials.experiencias._script-arbol-tematicas', ['tipoArbol' => 'panel'])
     <script>
         window.CLASES_GRUPOS_REPLICA = @json($gruposReplica);
-        window.CLASES_EXPERIENCIAS_USADAS = @json($experienciasUsadasPorCarga);
+        window.CLASES_CONTEXTO = @json($contextoClases);
     </script>
 @endsection
 

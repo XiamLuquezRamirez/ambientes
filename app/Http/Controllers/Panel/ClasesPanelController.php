@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\CargaDocente;
 use App\Models\Clase;
+use App\Models\ClaseExperiencia;
 use App\Models\Eje;
 use App\Models\Experiencia;
 use App\Models\Modulo;
@@ -36,6 +37,7 @@ class ClasesPanelController extends Controller
             ->deCarga($carga->id)
             ->delDocente($carga->docente_id)
             ->delAnio($carga->anio_lectivo)
+            ->withCount('experienciasClase')
             ->orderByDesc('fecha')
             ->orderByDesc('id')
             ->get();
@@ -46,14 +48,14 @@ class ClasesPanelController extends Controller
         );
 
         $gruposReplica = $this->gruposReplicaDelGrado($carga);
-        $experienciasUsadasPorCarga = $this->experienciasUsadasPorCarga($carga, $gruposReplica);
+        $contextoClases = $this->contextoClasesDelGrupo($carga);
 
         return view('panel.clases.index', compact(
             'carga',
             'clases',
             'ambientesModulos',
             'gruposReplica',
-            'experienciasUsadasPorCarga',
+            'contextoClases',
         ));
     }
 
@@ -68,29 +70,70 @@ class ClasesPanelController extends Controller
             ], 422);
         }
 
+        $agregarAExistente = $request->filled('clase_id');
+
         $datos = $request->validate([
+            'clase_id' => ['nullable', 'integer', 'exists:clases,id'],
             'modulo_id' => ['required', 'integer', 'exists:modulos,id'],
             'eje_id' => ['required', 'integer', 'exists:ejes,id'],
             'tematica_id' => ['required', 'integer', 'exists:tematicas,id'],
-            'experiencia_id' => ['required', 'integer', 'exists:experiencias,id'],
-            'nombre' => ['required', 'string', 'max:150'],
+            'experiencia_id' => ['nullable', 'integer', 'exists:experiencias,id'],
+            'experiencia_ids' => ['nullable', 'array', 'min:1'],
+            'experiencia_ids.*' => ['integer', 'exists:experiencias,id'],
+            'nombre' => [Rule::requiredIf(! $agregarAExistente), 'nullable', 'string', 'max:150'],
             'descripcion' => ['nullable', 'string', 'max:1000'],
             'fecha' => ['nullable', 'date'],
             'estado' => ['nullable', Rule::in(Clase::ESTADOS)],
-            'carga_docente_ids' => ['required', 'array', 'min:1'],
+            'carga_docente_ids' => [Rule::requiredIf(! $agregarAExistente), 'nullable', 'array', 'min:1'],
             'carga_docente_ids.*' => ['integer', 'exists:carga_docente,id'],
         ]);
 
-        $experiencia = Experiencia::query()
-            ->with(['tematica.eje.modulo'])
-            ->findOrFail($datos['experiencia_id']);
+        $experienciaIds = $this->resolverExperienciaIds($datos);
 
-        $errorCadena = $this->validarCadenaCurricular($carga, $datos, $experiencia);
-        if ($errorCadena) {
+        if ($experienciaIds === []) {
             return response()->json([
                 'success' => false,
-                'message' => $errorCadena,
+                'message' => 'Selecciona al menos una experiencia.',
             ], 422);
+        }
+
+        $experiencias = Experiencia::query()
+            ->with(['tematica.eje.modulo'])
+            ->whereIn('id', $experienciaIds)
+            ->get()
+            ->keyBy('id');
+
+        if ($experiencias->count() !== count($experienciaIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Una o más experiencias no existen.',
+            ], 422);
+        }
+
+        foreach ($experienciaIds as $expId) {
+            $errorCadena = $this->validarCadenaCurricular($carga, $datos, $experiencias->get($expId));
+            if ($errorCadena) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorCadena,
+                ], 422);
+            }
+        }
+
+        if ($agregarAExistente) {
+            if (count($experienciaIds) > 1) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Agrega una experiencia a la vez en una clase existente.',
+                ], 422);
+            }
+
+            return $this->agregarExperienciaAClase(
+                $carga,
+                (int) $datos['clase_id'],
+                $datos,
+                $experiencias->first()
+            );
         }
 
         $cargasDestino = CargaDocente::query()
@@ -106,26 +149,6 @@ class ClasesPanelController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Uno o más grupos seleccionados no pertenecen a tu carga en este grado y ambiente.',
-            ], 422);
-        }
-
-        $cargasConDuplicado = Clase::query()
-            ->with('cargaDocente.grupo')
-            ->where('experiencia_id', $datos['experiencia_id'])
-            ->where('anio_lectivo', $carga->anio_lectivo)
-            ->whereIn('carga_docente_id', $cargasDestino->pluck('id'))
-            ->get();
-
-        if ($cargasConDuplicado->isNotEmpty()) {
-            $grupos = $cargasConDuplicado
-                ->map(fn (Clase $clase) => $clase->cargaDocente?->grupo?->nombre ?? 'grupo')
-                ->unique()
-                ->values()
-                ->join(', ');
-
-            return response()->json([
-                'success' => false,
-                'message' => "Esta experiencia ya está agregada en: {$grupos}.",
             ], 422);
         }
 
@@ -149,7 +172,7 @@ class ClasesPanelController extends Controller
 
         $creadas = [];
 
-        DB::transaction(function () use ($cargasDestino, $datos, $estado, &$creadas) {
+        DB::transaction(function () use ($cargasDestino, $datos, $estado, $experienciaIds, &$creadas) {
             if ($estado === Clase::ESTADO_ACTIVA && ! empty($datos['fecha'])) {
                 $this->claseKiosco->demotarOtrasActivas(
                     (int) $cargasDestino->first()->ambiente_id,
@@ -162,16 +185,21 @@ class ClasesPanelController extends Controller
                     'carga_docente_id' => $cargaDestino->id,
                     'docente_id' => $cargaDestino->docente_id,
                     'ambiente_id' => $cargaDestino->ambiente_id,
-                    'modulo_id' => $datos['modulo_id'],
-                    'eje_id' => $datos['eje_id'],
-                    'tematica_id' => $datos['tematica_id'],
-                    'experiencia_id' => $datos['experiencia_id'],
                     'nombre' => $datos['nombre'],
                     'descripcion' => $datos['descripcion'] ?? null,
                     'fecha' => $datos['fecha'] ?? null,
                     'estado' => $estado,
                     'anio_lectivo' => $cargaDestino->anio_lectivo,
                 ]);
+
+                foreach ($experienciaIds as $expId) {
+                    $this->crearExperienciaEnClase($clase, [
+                        'modulo_id' => $datos['modulo_id'],
+                        'eje_id' => $datos['eje_id'],
+                        'tematica_id' => $datos['tematica_id'],
+                        'experiencia_id' => $expId,
+                    ]);
+                }
 
                 $creadas[] = $clase;
             }
@@ -190,6 +218,80 @@ class ClasesPanelController extends Controller
                 'ids' => collect($creadas)->pluck('id')->values(),
             ],
         ], 201);
+    }
+
+    /**
+     * @param  array{modulo_id:int,eje_id:int,tematica_id:int,experiencia_id:int}  $datos
+     */
+    private function agregarExperienciaAClase(
+        CargaDocente $carga,
+        int $claseId,
+        array $datos,
+        Experiencia $experiencia
+    ) {
+        $clase = Clase::query()
+            ->where('id', $claseId)
+            ->where('carga_docente_id', $carga->id)
+            ->where('docente_id', $carga->docente_id)
+            ->where('anio_lectivo', $carga->anio_lectivo)
+            ->with('experienciasClase')
+            ->first();
+
+        if (! $clase) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No puedes modificar esta clase.',
+            ], 403);
+        }
+
+        $tematicaClase = $clase->experienciasClase->first()?->tematica_id;
+
+        if ($tematicaClase && (int) $datos['tematica_id'] !== (int) $tematicaClase) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Solo puedes agregar experiencias de la misma temática de la clase.',
+            ], 422);
+        }
+
+        if (ClaseExperiencia::query()
+            ->where('clase_id', $clase->id)
+            ->where('experiencia_id', $datos['experiencia_id'])
+            ->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Esta experiencia ya está agregada en la clase.',
+            ], 422);
+        }
+
+        $this->crearExperienciaEnClase($clase, $datos);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Experiencia agregada a la clase.',
+            'data' => [
+                'clase_id' => $clase->id,
+                'experiencias_count' => $clase->experienciasClase()->count(),
+            ],
+        ], 201);
+    }
+
+    /**
+     * @param  array{modulo_id:int,eje_id:int,tematica_id:int,experiencia_id:int}  $datos
+     */
+    private function crearExperienciaEnClase(Clase $clase, array $datos): ClaseExperiencia
+    {
+        $orden = (int) ClaseExperiencia::query()
+            ->where('clase_id', $clase->id)
+            ->max('orden') + 1;
+
+        return ClaseExperiencia::create([
+            'clase_id' => $clase->id,
+            'experiencia_id' => $datos['experiencia_id'],
+            'modulo_id' => $datos['modulo_id'],
+            'eje_id' => $datos['eje_id'],
+            'tematica_id' => $datos['tematica_id'],
+            'orden' => $orden,
+        ]);
     }
 
     public function actualizarEstado(Request $request, Clase $clase)
@@ -321,28 +423,63 @@ class ClasesPanelController extends Controller
     }
 
     /**
-     * Experiencias ya vinculadas a una clase por carga (mismo docente y año).
-     *
-     * @return array<int|string, list<int>>
+     * @param  array{experiencia_id?:int,experiencia_ids?:list<int>}  $datos
+     * @return list<int>
      */
-    private function experienciasUsadasPorCarga(CargaDocente $carga, Collection $gruposReplica): array
+    private function resolverExperienciaIds(array $datos): array
     {
-        $cargaIds = $gruposReplica
-            ->pluck('carga_docente_id')
-            ->unique()
-            ->values();
+        $ids = $datos['experiencia_ids'] ?? [];
 
-        if ($cargaIds->isEmpty()) {
-            return [];
+        if ($ids === [] && ! empty($datos['experiencia_id'])) {
+            $ids = [(int) $datos['experiencia_id']];
         }
 
+        return array_values(array_unique(array_map('intval', $ids)));
+    }
+
+    /**
+     * Contexto curricular y experiencias ya usadas por clase del grupo.
+     *
+     * @return array<int|string, array{
+     *     experiencia_ids: list<int>,
+     *     modulo_id: ?int,
+     *     eje_id: ?int,
+     *     tematica_id: ?int,
+     *     modulo_nombre: ?string,
+     *     eje_nombre: ?string,
+     *     tematica_nombre: ?string
+     * }>
+     */
+    private function contextoClasesDelGrupo(CargaDocente $carga): array
+    {
         return Clase::query()
-            ->whereIn('carga_docente_id', $cargaIds)
-            ->where('docente_id', $carga->docente_id)
-            ->where('anio_lectivo', $carga->anio_lectivo)
-            ->get(['carga_docente_id', 'experiencia_id'])
-            ->groupBy('carga_docente_id')
-            ->map(fn (Collection $filas) => $filas->pluck('experiencia_id')->unique()->values()->all())
+            ->deCarga($carga->id)
+            ->delDocente($carga->docente_id)
+            ->delAnio($carga->anio_lectivo)
+            ->with([
+                'experienciasClase.modulo:id,nombre',
+                'experienciasClase.eje:id,nombre',
+                'experienciasClase.tematica:id,nombre',
+            ])
+            ->get()
+            ->mapWithKeys(function (Clase $clase) {
+                $primera = $clase->experienciasClase->sortBy('orden')->first();
+
+                return [
+                    $clase->id => [
+                        'experiencia_ids' => $clase->experienciasClase
+                            ->pluck('experiencia_id')
+                            ->values()
+                            ->all(),
+                        'modulo_id' => $primera?->modulo_id,
+                        'eje_id' => $primera?->eje_id,
+                        'tematica_id' => $primera?->tematica_id,
+                        'modulo_nombre' => $primera?->modulo?->nombre,
+                        'eje_nombre' => $primera?->eje?->nombre,
+                        'tematica_nombre' => $primera?->tematica?->nombre,
+                    ],
+                ];
+            })
             ->all();
     }
 

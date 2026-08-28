@@ -29,6 +29,12 @@
                         No hay opciones disponibles en este nivel.
                     </div>
                     <div id="claseWizardCards" class="exp-wizard-cards row g-3"></div>
+                    <div id="claseWizardExpBar" class="clase-wizard-exp-bar" hidden>
+                        <p class="clase-wizard-exp-bar-text mb-0" id="claseWizardExpBarText"></p>
+                        <button type="button" class="btn btn-sm btn-primary" id="btnClaseWizardContinuar">
+                            Continuar <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div id="claseWizardDatos" hidden>

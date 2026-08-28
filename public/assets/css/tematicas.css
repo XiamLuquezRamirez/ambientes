@@ -1333,6 +1333,34 @@
     color: #B45309;
 }
 
+.exp-wizard-modal .exp-wizard-card--seleccionada {
+    border-color: var(--tm-primary, #2563EB);
+    background: #EFF6FF;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, .25);
+}
+
+.exp-wizard-modal .exp-wizard-card--seleccionada .exp-wizard-card-arrow {
+    color: #2563EB;
+}
+
+.exp-wizard-modal .clase-wizard-exp-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--tm-surface-soft, #F8FAFC);
+    border: 1px solid #E2E8F0;
+}
+
+.exp-wizard-modal .clase-wizard-exp-bar-text {
+    color: #334155;
+    font-size: .92rem;
+}
+
 .exp-wizard-modal .clase-replica-grupo.es-bloqueada {
     opacity: .72;
     cursor: not-allowed;

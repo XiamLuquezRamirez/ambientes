@@ -102,8 +102,16 @@ class ClaseKioscoService
 
     public function motivoClaseInvalida(Clase $clase): ?string
     {
-        if (! $clase->modulo_id || ! $clase->eje_id || ! $clase->tematica_id || ! $clase->experiencia_id) {
-            return 'Faltan módulo, eje, temática o experiencia en la clase activa.';
+        $clase->loadMissing('experienciasClase');
+
+        if ($clase->experienciasClase->isEmpty()) {
+            return 'La clase no tiene experiencias asociadas.';
+        }
+
+        foreach ($clase->experienciasClase as $item) {
+            if (! $item->modulo_id || ! $item->eje_id || ! $item->tematica_id || ! $item->experiencia_id) {
+                return 'Hay una experiencia con cadena curricular incompleta en la clase activa.';
+            }
         }
 
         if ($clase->estado !== Clase::ESTADO_ACTIVA || ! $clase->fecha) {
@@ -120,7 +128,7 @@ class ClaseKioscoService
         }
 
         return Clase::query()
-            ->with(['cargaDocente', 'modulo', 'eje', 'tematica', 'experiencia'])
+            ->with(['cargaDocente', 'experienciasClase.experiencia', 'experienciasClase.modulo', 'experienciasClase.eje', 'experienciasClase.tematica'])
             ->find($claseId);
     }
 

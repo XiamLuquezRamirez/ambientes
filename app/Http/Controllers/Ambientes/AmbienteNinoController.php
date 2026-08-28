@@ -108,13 +108,18 @@ class AmbienteNinoController extends Controller
             return view('ambientes.inicio-placeholder', [
                 'ambiente' => $ambiente,
                 'estudiante' => $estudiante,
+                'motivoRecorrido' => true,
             ]);
         }
 
         $camino = $this->recorrido->armarCaminoLineal($arbol, $clase, $estudiante);
 
         if (! $camino) {
-            return view('ambientes.inicio-placeholder', compact('ambiente', 'estudiante'));
+            return view('ambientes.inicio-placeholder', [
+                'ambiente' => $ambiente,
+                'estudiante' => $estudiante,
+                'motivoRecorrido' => true,
+            ]);
         }
 
         return view('ambientes.kiosco-recorrido', [
@@ -139,8 +144,13 @@ class AmbienteNinoController extends Controller
         $ambiente = $this->sesionNino->obtenerAmbiente($request);
         $clase = $this->claseKiosco->obtenerClaseSesion($this->sesionNino->claseIdEnSesion($request));
 
+        if (! $clase) {
+            $clase = $this->claseKiosco->claseActivaHoy($ambiente);
+        }
+
         $sesion = [
             'ambiente_id' => $ambiente->id,
+            'clase_id' => $clase?->id,
             'experiencia_id' => $clase?->experiencia_id,
         ];
 
@@ -193,11 +203,6 @@ class AmbienteNinoController extends Controller
 
         if (File::exists($absoluto)) {
             return '/'.$relativo;
-        }
-
-        $fallback = 'assets/images/ambientes/expresion-artistica-portada.png';
-        if (File::exists(public_path($fallback))) {
-            return '/'.$fallback;
         }
 
         return '';

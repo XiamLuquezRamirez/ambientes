@@ -43,7 +43,6 @@ use App\Http\Controllers\Panel\PortafolioController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\Panel\TematicasPanelController;
 use App\Http\Controllers\PerfilController;
-use App\Http\Controllers\RecorridoNinoController;
 use App\Http\Controllers\SuperAdmin\AdminsSuperAdminController;
 use App\Http\Controllers\SuperAdmin\BloquesExperienciaSuperAdminController;
 use App\Http\Controllers\SuperAdmin\CatalogoDBASuperAdminController;
@@ -55,7 +54,6 @@ use App\Http\Controllers\SuperAdmin\PerfilAprendizajeInclusionController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\TematicasSuperAdminController;
-use App\Http\Controllers\VistaPreviaNinoController;
 use Illuminate\Support\Facades\Route;
 
 // Raíz → portada del ambiente (kiosco). Docente: /login
@@ -75,33 +73,6 @@ Route::post('/login', [AuthDocenteController::class, 'iniciarSesion'])->name('do
 Route::post('/logout', [AuthDocenteController::class, 'cerrarSesion'])->name('docente.logout');
 
 // Vista previa en tablet (token temporal, sin sesión de staff)
-Route::get('/vista-previa-nino/{token}', [VistaPreviaNinoController::class, 'mostrar'])
-    ->middleware('throttle:30,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('vista-previa-nino.mostrar');
-Route::get('/vista-previa-nino/{token}/estado', [VistaPreviaNinoController::class, 'estado'])
-    ->middleware('throttle:90,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('vista-previa-nino.estado');
-Route::get('/vista-previa-nino/{token}/tts', [VistaPreviaNinoController::class, 'tts'])
-    ->middleware('throttle:30,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('vista-previa-nino.tts');
-
-// Recorrido niño demo (Expresión Artística): portada → módulos → ejes → camino → experiencia
-Route::get('/recorrido-nino/{token}', [RecorridoNinoController::class, 'mostrar'])
-    ->middleware('throttle:30,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('recorrido-nino.mostrar');
-Route::get('/recorrido-nino/{token}/experiencia/{experiencia}', [RecorridoNinoController::class, 'experiencia'])
-    ->middleware('throttle:60,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('recorrido-nino.experiencia');
-Route::get('/recorrido-nino/{token}/tts', [RecorridoNinoController::class, 'tts'])
-    ->middleware('throttle:30,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('recorrido-nino.tts');
-
 // Endpoint para guardar los datos generales del Piar
 // Piar
 Route::get('estudiantes/diligenciar-piar/{idEstudiante}/{tipo}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
@@ -262,9 +233,6 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaAdminController::class, 'limpiar'])->name('admin.experiencias.bloques.limpiar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaAdminController::class, 'upload'])->name('admin.experiencias.bloques.upload');
     Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaAdminController::class, 'tts'])->name('admin.experiencias.bloques.tts');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaAdminController::class, 'crearVistaPrevia'])->name('admin.experiencias.vista-previa');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaAdminController::class, 'focoVistaPrevia'])->name('admin.experiencias.vista-previa.foco');
-    Route::post('catalogo/experiencias/{experiencia}/recorrido-nino', [BloquesExperienciaAdminController::class, 'crearRecorridoNino'])->name('admin.experiencias.recorrido-nino');
     Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaAdminController::class, 'publicar'])->name('admin.experiencias.publicar');
     Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaAdminController::class, 'actualizar'])->name('admin.bloques.actualizar');
     Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaAdminController::class, 'eliminar'])->name('admin.bloques.eliminar');
@@ -451,9 +419,6 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaPanelController::class, 'limpiar'])->name('panel.experiencias.bloques.limpiar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaPanelController::class, 'upload'])->name('panel.experiencias.bloques.upload');
     Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaPanelController::class, 'tts'])->name('panel.experiencias.bloques.tts');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaPanelController::class, 'crearVistaPrevia'])->name('panel.experiencias.vista-previa');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaPanelController::class, 'focoVistaPrevia'])->name('panel.experiencias.vista-previa.foco');
-    Route::post('catalogo/experiencias/{experiencia}/recorrido-nino', [BloquesExperienciaPanelController::class, 'crearRecorridoNino'])->name('panel.experiencias.recorrido-nino');
     Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaPanelController::class, 'publicar'])->name('panel.experiencias.publicar');
     Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaPanelController::class, 'actualizar'])->name('panel.bloques.actualizar');
     Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaPanelController::class, 'eliminar'])->name('panel.bloques.eliminar');
@@ -552,9 +517,6 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaSuperAdminController::class, 'limpiar'])->name('superadmin.catalogo.experiencias.bloques.limpiar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaSuperAdminController::class, 'upload'])->name('superadmin.catalogo.experiencias.bloques.upload');
     Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaSuperAdminController::class, 'tts'])->name('superadmin.catalogo.experiencias.bloques.tts');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaSuperAdminController::class, 'crearVistaPrevia'])->name('superadmin.catalogo.experiencias.vista-previa');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaSuperAdminController::class, 'focoVistaPrevia'])->name('superadmin.catalogo.experiencias.vista-previa.foco');
-    Route::post('catalogo/experiencias/{experiencia}/recorrido-nino', [BloquesExperienciaSuperAdminController::class, 'crearRecorridoNino'])->name('superadmin.catalogo.experiencias.recorrido-nino');
     Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaSuperAdminController::class, 'publicar'])->name('superadmin.catalogo.experiencias.publicar');
     Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.bloques.actualizar');
     Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaSuperAdminController::class, 'eliminar'])->name('superadmin.catalogo.bloques.eliminar');
@@ -573,36 +535,4 @@ Route::middleware('sesion.nino')->group(function () {
     Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
     Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
     require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
-});
-
-// === PREVIEW TABLET — recorrido 3D con experiencia real (ELIMINAR tras probar) ===
-Route::get('/__preview-experiencia/{experiencia}', function (\App\Models\Experiencia $experiencia) {
-    $payload = app(\App\Services\RecorridoNinoService::class)->payloadExperiencia($experiencia);
-    return response()->json(['success' => true, 'data' => $payload]);
-});
-Route::get('/__preview-camino', function () {
-    $ambiente = (object) ['id' => 1, 'nombre' => 'Multisensorial', 'slug' => 'multisensorial', 'color_hex' => '#0F6E56', 'icono' => '🌈'];
-    $arbol = ['ambiente' => ['id' => 1, 'nombre' => 'Multisensorial', 'icono' => '🌈', 'color_hex' => '#0F6E56']];
-    $paradas = [
-        ['id' => 'inicio', 'etiqueta' => 'Inicio', 'titulo' => '¡Hola, Valentina!', 'texto' => '¡Vamos a recorrer el camino!'],
-        ['id' => 'modulo', 'etiqueta' => 'Módulo', 'titulo' => 'Exploro mi cuerpo', 'texto' => 'Este es el módulo de la clase de hoy.', 'icono' => '📚', 'video_url' => 'https://www.w3schools.com/html/mov_bbb.mp4'],
-        ['id' => 'eje', 'etiqueta' => 'Eje', 'titulo' => 'Sentidos y percepción', 'texto' => 'Seguimos por este eje de aprendizaje.', 'video_url' => 'https://www.w3schools.com/html/mov_bbb.mp4'],
-        ['id' => 'tematica', 'etiqueta' => 'Temática', 'titulo' => 'El tacto y las texturas', 'texto' => 'Explora las texturas con tus manos.'],
-        ['id' => 'experiencia', 'etiqueta' => 'Experiencia', 'titulo' => 'Identifica los colores', 'texto' => '¡Es hora de vivir la experiencia!', 'experiencia_id' => 23],
-        ['id' => 'fin', 'etiqueta' => 'Fin', 'titulo' => '¡Terminaste!', 'texto' => 'Completaste el recorrido de hoy. ¡Muy bien!'],
-    ];
-    $total = count($paradas);
-    $puntos = [];
-    for ($i = 0; $i < $total; $i++) {
-        $tt = $total > 1 ? $i / ($total - 1) : 0.5;
-        $puntos[] = ['x' => (int) round(8 + $tt * 84), 'y' => (int) round(52 + sin($tt * M_PI * 2.4) * 18)];
-    }
-    $camino = ['paradas' => $paradas, 'puntos' => $puntos, 'experiencia_id' => 23];
-    return view('ambientes.kiosco-recorrido', [
-        'ambiente' => $ambiente, 'modo' => 'sesion', 'ui' => 'camino-lineal', 'token' => null,
-        'arbol' => $arbol, 'camino' => $camino,
-        'estudiante' => (object) ['nombre' => 'Valentina', 'iniciales' => 'VA', 'color_avatar' => '#7C3AED'],
-        'urlExperienciaTemplate' => '/__preview-experiencia/__ID__', 'urlTts' => '/tts',
-        'urlSalir' => '#', 'urlContinuar' => '', 'portadaImg' => '', 'pasoInicial' => 'camino',
-    ]);
 });

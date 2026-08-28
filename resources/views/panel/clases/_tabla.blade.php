@@ -4,6 +4,7 @@
             <tr>
                 <th>Nombre</th>
                 <th>Fecha</th>
+                <th style="text-align:center">Experiencias</th>
                 <th>Estado</th>
                 <th style="text-align:center">Acciones</th>
             </tr>
@@ -15,6 +16,9 @@
                     <td style="color:#64748B">
                         {{ $clase->fecha?->format('d/m/Y') ?? '—' }}
                     </td>
+                    <td style="text-align:center;color:#64748B">
+                        {{ $clase->experiencias_clase_count ?? 0 }}
+                    </td>
                     <td>
                         <span class="badge {{ $clase->badgeEstado() }}" data-clase-badge>
                             {{ $clase->etiquetaEstado() }}
@@ -22,6 +26,13 @@
                     </td>
                     <td style="text-align:center">
                         <div class="d-inline-flex gap-2 flex-wrap justify-content-center">
+                            <button type="button"
+                                class="btn btn-sm btn-outline-primary btn-clase-agregar-exp"
+                                data-clase-id="{{ $clase->id }}"
+                                data-clase-nombre="{{ $clase->nombre }}"
+                                title="Agregar otra experiencia a esta clase">
+                                <i class="fas fa-plus"></i> Experiencia
+                            </button>
                             @if ($clase->estado !== \App\Models\Clase::ESTADO_ACTIVA)
                                 <button type="button"
                                     class="btn btn-sm btn-success btn-clase-estado"
@@ -54,7 +65,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" style="text-align:center;color:#64748B;padding:24px">
+                    <td colspan="5" style="text-align:center;color:#64748B;padding:24px">
                         Aún no hay clases para este grupo. Usa <strong>Nueva Clase</strong> para crear la primera.
                     </td>
                 </tr>

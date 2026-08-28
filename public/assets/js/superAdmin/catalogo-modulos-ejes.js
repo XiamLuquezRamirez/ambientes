@@ -22,6 +22,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const ejesError = document.getElementById('ejesModuloError');
     const ejesContenido = document.getElementById('ejesModuloContenido');
 
+    const modalCrearEjeEl = document.getElementById('modalCrearEjes');
+    const formEjePagina = document.getElementById('formCrearEjePagina');
+    const btnGuardarEjePagina = document.getElementById('btnGuardarEjePagina');
+
     function urlFromTemplate(template, replacements) {
         let url = template || '';
         Object.entries(replacements).forEach(([key, value]) => {
@@ -95,6 +99,10 @@ document.addEventListener('DOMContentLoaded', function () {
     window.ConfigEjesUi?.bindAmbienteToggles(root);
     window.ConfigEjesUi?.bindModuloToggles(rootEjes);
 
+    window.CatalogoMediaCurriculo?.initForm(form);
+    window.CatalogoMediaCurriculo?.initForm(formEje);
+    window.CatalogoMediaCurriculo?.initForm(formEjePagina);
+
     /* ── Módulos ─────────────────────────────────────────────── */
     function limpiarErroresForm() {
         if (!form) return;
@@ -148,6 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('modulo_ambiente_id').value = '';
         document.getElementById('modulo_slug_preview').textContent = 'se genera automáticamente';
         setOrdenEditable(true);
+        window.CatalogoMediaCurriculo?.resetForm(form);
     }
 
     function getGroup(ambienteId) {
@@ -362,6 +371,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('modulo_descripcion').value = data.descripcion || '';
         document.getElementById('modulo_orden').value = data.orden ?? '';
         document.getElementById('modulo_slug_preview').textContent = data.slug || slugify(data.nombre);
+        window.CatalogoMediaCurriculo?.fillForm(form, data);
     }
 
     if (form || root.querySelector('[data-crear-modulo]')) {
@@ -498,18 +508,19 @@ document.addEventListener('DOMContentLoaded', function () {
             const moduloId = document.getElementById('modulo_id').value;
             const ambienteId = document.getElementById('modulo_ambiente_id').value;
             const esEdicion = Boolean(moduloId);
-            const payload = {
+            const fields = {
                 nombre: document.getElementById('modulo_nombre').value.trim(),
                 descripcion: document.getElementById('modulo_descripcion').value.trim() || null,
             };
             const ordenVal = document.getElementById('modulo_orden').value;
-            if (!esEdicion && ordenVal !== '') payload.orden = Number(ordenVal);
+            if (ordenVal !== '') fields.orden = Number(ordenVal);
 
             setBtnGuardar(esEdicion ? 'guardando' : 'creando');
 
             const endpoint = esEdicion ? urls().update(moduloId) : urls().store(ambienteId);
             const method = esEdicion ? 'PUT' : 'POST';
-            const res = await ajaxRequest(endpoint, method, payload);
+            const formData = window.CatalogoMediaCurriculo?.buildFormData(form, fields);
+            const res = await window.CatalogoMediaCurriculo.ajaxFormRequest(endpoint, method, formData);
 
             setBtnGuardar(esEdicion ? 'editar' : 'crear');
 
@@ -530,10 +541,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* ── Ejes (modal Ver + modal Crear/Editar página) ────────── */
-    const modalCrearEjeEl = document.getElementById('modalCrearEjes');
-    const formEjePagina = document.getElementById('formCrearEjePagina');
-    const btnGuardarEjePagina = document.getElementById('btnGuardarEjePagina');
-
     function getModalCrearEje() {
         return modalCrearEjeEl ? bootstrap.Modal.getOrCreateInstance(modalCrearEjeEl) : null;
     }
@@ -602,6 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setOrdenEjeEditable(true, document.getElementById('eje_orden'));
         setTituloFormEjeModal('crear');
         setBtnGuardarEje('crear', btnGuardarEje);
+        window.CatalogoMediaCurriculo?.resetForm(formEje);
     }
 
     function resetFormEjePagina() {
@@ -613,6 +621,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('eje_pagina_slug_preview').textContent = 'se genera automáticamente';
         setOrdenEjeEditable(true, document.getElementById('eje_pagina_orden'));
         setBtnGuardarEje('crear', btnGuardarEjePagina);
+        window.CatalogoMediaCurriculo?.resetForm(formEjePagina);
     }
 
     function setEstadoModalEjes(estado, mensajeError = '') {
@@ -867,6 +876,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('eje_pagina_descripcion').value = data.descripcion || '';
         document.getElementById('eje_pagina_orden').value = data.orden ?? '';
         document.getElementById('eje_pagina_slug_preview').textContent = data.slug || slugify(data.nombre);
+        window.CatalogoMediaCurriculo?.fillForm(formEjePagina, data);
     }
 
     async function cargarEjeEnFormularioModal(ejeId) {
@@ -888,6 +898,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('eje_descripcion').value = data.descripcion || '';
         document.getElementById('eje_orden').value = data.orden ?? '';
         document.getElementById('eje_slug_preview').textContent = data.slug || slugify(data.nombre);
+        window.CatalogoMediaCurriculo?.fillForm(formEje, data);
         document.getElementById('ejesFormCrearWrap')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         return true;
     }
@@ -1055,19 +1066,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const payload = {
+        const fields = {
             nombre: (document.getElementById('eje_nombre')?.value || '').trim(),
             descripcion: (document.getElementById('eje_descripcion')?.value || '').trim() || null,
         };
         const ordenVal = document.getElementById('eje_orden')?.value ?? '';
-        if (!esEdicion && ordenVal !== '') payload.orden = Number(ordenVal);
-        if (esEdicion && ordenVal !== '') payload.orden = Number(ordenVal);
+        if (ordenVal !== '') fields.orden = Number(ordenVal);
 
         setBtnGuardarEje(esEdicion ? 'guardando' : 'creando', btnGuardarEje);
-        const res = await ajaxRequest(
+        const formData = window.CatalogoMediaCurriculo?.buildFormData(formEje, fields);
+        const res = await window.CatalogoMediaCurriculo.ajaxFormRequest(
             esEdicion ? urls().ejesUpdate(ejeId) : urls().ejes(moduloId),
             esEdicion ? 'PUT' : 'POST',
-            payload
+            formData
         );
         setBtnGuardarEje(esEdicion ? 'editar' : 'crear', btnGuardarEje);
 
@@ -1099,19 +1110,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const payload = {
+        const fields = {
             nombre: (document.getElementById('eje_pagina_nombre')?.value || '').trim(),
             descripcion: (document.getElementById('eje_pagina_descripcion')?.value || '').trim() || null,
         };
         const ordenVal = document.getElementById('eje_pagina_orden')?.value ?? '';
-        if (!esEdicion && ordenVal !== '') payload.orden = Number(ordenVal);
-        if (esEdicion && ordenVal !== '') payload.orden = Number(ordenVal);
+        if (ordenVal !== '') fields.orden = Number(ordenVal);
 
         setBtnGuardarEje(esEdicion ? 'guardando' : 'creando', btnGuardarEjePagina);
-        const res = await ajaxRequest(
+        const formData = window.CatalogoMediaCurriculo?.buildFormData(formEjePagina, fields);
+        const res = await window.CatalogoMediaCurriculo.ajaxFormRequest(
             esEdicion ? urls().ejesUpdate(ejeId) : urls().ejes(moduloId),
             esEdicion ? 'PUT' : 'POST',
-            payload
+            formData
         );
         setBtnGuardarEje(esEdicion ? 'editar' : 'crear', btnGuardarEjePagina);
 

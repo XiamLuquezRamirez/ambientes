@@ -25,10 +25,6 @@ class Clase extends Model
         'carga_docente_id',
         'docente_id',
         'ambiente_id',
-        'modulo_id',
-        'eje_id',
-        'tematica_id',
-        'experiencia_id',
         'nombre',
         'descripcion',
         'fecha',
@@ -56,24 +52,47 @@ class Clase extends Model
         return $this->belongsTo(Ambiente::class);
     }
 
-    public function modulo()
+    public function experienciasClase()
     {
-        return $this->belongsTo(Modulo::class);
+        return $this->hasMany(ClaseExperiencia::class)->orderBy('orden')->orderBy('id');
     }
 
-    public function eje()
+    public function experiencias()
     {
-        return $this->belongsTo(Eje::class);
+        return $this->belongsToMany(Experiencia::class, 'clase_experiencias')
+            ->withPivot(['modulo_id', 'eje_id', 'tematica_id', 'orden'])
+            ->orderByPivot('orden')
+            ->orderByPivot('id');
     }
 
-    public function tematica()
+    /** Compatibilidad kiosco: primera experiencia de la clase. */
+    public function getExperienciaIdAttribute(): ?int
     {
-        return $this->belongsTo(Tematica::class);
+        return $this->primeraExperienciaClase()?->experiencia_id;
     }
 
-    public function experiencia()
+    public function getModuloIdAttribute(): ?int
     {
-        return $this->belongsTo(Experiencia::class);
+        return $this->primeraExperienciaClase()?->modulo_id;
+    }
+
+    public function getEjeIdAttribute(): ?int
+    {
+        return $this->primeraExperienciaClase()?->eje_id;
+    }
+
+    public function getTematicaIdAttribute(): ?int
+    {
+        return $this->primeraExperienciaClase()?->tematica_id;
+    }
+
+    public function primeraExperienciaClase(): ?ClaseExperiencia
+    {
+        if ($this->relationLoaded('experienciasClase')) {
+            return $this->experienciasClase->first();
+        }
+
+        return $this->experienciasClase()->first();
     }
 
     public function scopeDeCarga(Builder $query, int $cargaDocenteId): Builder

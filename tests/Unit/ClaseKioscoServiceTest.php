@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Clase;
+use App\Models\ClaseExperiencia;
 use App\Models\Experiencia;
 use App\Services\AccesoAmbienteService;
 use App\Services\BloqueExperienciaService;
@@ -95,10 +96,12 @@ class ClaseKioscoServiceTest extends TestCase
         $service = new RecorridoNinoService($bloques);
 
         $clase = new Clase;
-        $clase->modulo_id = 1;
-        $clase->eje_id = 2;
-        $clase->tematica_id = 3;
-        $clase->experiencia_id = 9;
+        $item = new ClaseExperiencia;
+        $item->modulo_id = 1;
+        $item->eje_id = 2;
+        $item->tematica_id = 3;
+        $item->experiencia_id = 9;
+        $clase->setRelation('experienciasClase', collect([$item]));
 
         $arbolValido = [
             'modulos' => [[
@@ -142,10 +145,13 @@ class ClaseKioscoServiceTest extends TestCase
         $clase = new Clase;
         $clase->estado = Clase::ESTADO_ACTIVA;
         $clase->fecha = now();
-        $clase->modulo_id = 1;
-        $clase->eje_id = null;
-        $clase->tematica_id = 3;
-        $clase->experiencia_id = 9;
+
+        $item = new ClaseExperiencia;
+        $item->modulo_id = 1;
+        $item->eje_id = null;
+        $item->tematica_id = 3;
+        $item->experiencia_id = 9;
+        $clase->setRelation('experienciasClase', collect([$item]));
 
         $this->assertFalse($servicio->claseValidaParaRecorrido($clase));
         $this->assertNotNull($servicio->motivoClaseInvalida($clase));

@@ -536,10 +536,51 @@
 #vnDispositivo.rn-player--camino-overlay {
     position: fixed !important;
     inset: 0 !important;
-    z-index: 35 !important;
+    z-index: 50 !important;
     width: 100% !important;
     height: 100% !important;
-    background: #060c0a;
+    min-height: 100dvh !important;
+    background: linear-gradient(180deg, #e0f2fe 0%, #f0fdf4 42%, #fff7ed 100%) !important;
+}
+
+#vnDispositivo.rn-player--camino-overlay .vn-tablet-screen {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    --vn-screen-w: 100vw;
+    --vn-screen-h: 100dvh;
+}
+
+#vnDispositivo.rn-player--camino-overlay .vn-screen-top {
+    padding-top: max(10px, env(safe-area-inset-top, 0px));
+}
+
+#vnDispositivo.rn-player--camino-overlay .vn-screen-body {
+    padding: 16px max(12px, env(safe-area-inset-right, 0px)) 20px max(12px, env(safe-area-inset-left, 0px));
+}
+
+#vnDispositivo.rn-player--camino-overlay .vn-screen-nav {
+    padding-bottom: max(14px, env(safe-area-inset-bottom, 0px));
+}
+
+#vnDispositivo.rn-player--camino-overlay .vn-fs-btn {
+    bottom: max(88px, calc(72px + env(safe-area-inset-bottom, 0px)));
+}
+
+/* Evitar que el Salir del kiosco tape el botón de la experiencia */
+body.rn-player-activo .kiosco-salir-btn,
+body.rn-player-activo .kiosco-fs-btn {
+    display: none !important;
+}
+
+/* Botón superior de salir de experiencia retirado; al terminar se usa "Seguir" en el pie del player. */
+
+body.rn-player-activo {
+    overflow: hidden;
 }
 
 .rn-camino-modal__header {

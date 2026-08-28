@@ -94,6 +94,10 @@
             return;
         }
 
+        if (window.KioscoCamino && typeof window.KioscoCamino.destroy === 'function') {
+            window.KioscoCamino.destroy();
+        }
+
         sincronizarEstilos(doc);
         pane.innerHTML = nuevoPane.innerHTML;
         document.title = doc.title || document.title;
