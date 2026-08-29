@@ -23,5 +23,7 @@ return [
         'Grado',
         'Grupo',
         'Ambiente',
+        'Modulo',
+        'Eje',
     ],
 ];

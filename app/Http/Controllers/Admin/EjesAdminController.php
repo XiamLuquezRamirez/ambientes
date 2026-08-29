@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\ManejaMediaCurriculo;
 use App\Http\Controllers\Controller;
 use App\Models\Eje;
 use App\Models\Institucion;
@@ -14,6 +15,7 @@ use Illuminate\Validation\Rule;
 
 class EjesAdminController extends Controller
 {
+    use ManejaMediaCurriculo;
     public function listar(CatalogoInstitucionAdminService $catalogo)
     {
         $ambientesModulos = $catalogo->ambientesConModulosYEjes($this->institucionId());
@@ -61,6 +63,7 @@ class EjesAdminController extends Controller
         $this->asegurarModuloAccesible($modulo, $institucionId, true);
 
         $datos = $this->validarEje($request, $modulo->id, $institucionId);
+        $mediaDatos = $this->validarMediaCurriculo($request);
         $slug = $this->generarSlugUnico($datos['nombre'], $modulo->id);
         $orden = $datos['orden'] ?? $this->siguienteOrden($modulo->id, $institucionId);
 
@@ -74,6 +77,9 @@ class EjesAdminController extends Controller
             'activo' => true,
             'es_oficial' => false,
         ]);
+
+        $this->aplicarMediaEje($eje, $mediaDatos, $request);
+        $eje->refresh();
 
         $eje->loadCount([
             'tematicas as tematicas_activas_count' => fn ($q) => $q->where('activo', true),
@@ -108,12 +114,15 @@ class EjesAdminController extends Controller
         $institucionId = $this->institucionId();
 
         $datos = $this->validarEje($request, $eje->modulo_id, $institucionId, $eje->id);
+        $mediaDatos = $this->validarMediaCurriculo($request, $eje);
 
         $eje->update([
             'nombre' => $datos['nombre'],
             'descripcion' => $datos['descripcion'] ?? null,
             'orden' => $datos['orden'] ?? $eje->orden,
         ]);
+
+        $this->aplicarMediaEje($eje, $mediaDatos, $request);
 
         $eje->refresh();
         $eje->loadCount([
@@ -240,7 +249,9 @@ class EjesAdminController extends Controller
             'puede_gestionar' => $esPropio && $activoModulo,
             'tematicas_oficiales_activas_count' => (int) ($eje->tematicas_activas_count ?? 0),
             'temas_count' => (int) ($eje->temas_count ?? 0),
-        ];
+        ] + ($esPropio ? $this->serializarMediaEje($eje) : [
+            'tipo_media' => $eje->tipo_media ?? 'ninguno',
+        ]);
     }
 
     private function validarEje(Request $request, int $moduloId, int $institucionId, ?int $ejeId = null): array

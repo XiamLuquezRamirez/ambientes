@@ -36,5 +36,6 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/configuracion-ejes-ui.js') }}"></script>
+    <script src="{{ asset('assets/js/catalogo-media-curriculo.js') }}"></script>
     <script src="{{ asset('assets/js/panel/catalogo-ejes.js') }}"></script>
 @endpush

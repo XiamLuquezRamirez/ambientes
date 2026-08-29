@@ -5,10 +5,7 @@ namespace App\Http\Controllers\Concerns;
 use App\Models\BloqueExperiencia;
 use App\Models\Experiencia;
 use App\Services\BloqueExperienciaService;
-use App\Services\RecorridoNinoService;
-use App\Services\VistaPreviaNinoService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -203,84 +200,6 @@ trait ManejaBloquesExperiencia
         return response()->json([
             'success' => true,
             'data' => ['url' => $url],
-        ]);
-    }
-
-    public function crearVistaPrevia(Request $request, Experiencia $experiencia)
-    {
-        $this->asegurarExperienciaVisible($experiencia);
-
-        $userId = (int) Auth::guard('docente')->id();
-        $servicio = app(VistaPreviaNinoService::class);
-        $sesion = $servicio->crear($experiencia, $userId);
-        $enlace = $servicio->armarUrlTablet($request, $sesion['token']);
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'token' => $sesion['token'],
-                'url' => $enlace['url'],
-                'expira_en' => $sesion['expira_en'],
-                'host_local' => $enlace['host_local'],
-                'ip_lan' => $enlace['ip_lan'],
-                'aviso_red' => $enlace['aviso_red'],
-            ],
-        ]);
-    }
-
-    public function focoVistaPrevia(Request $request, Experiencia $experiencia)
-    {
-        $this->asegurarExperienciaVisible($experiencia);
-
-        $datos = $request->validate([
-            'token' => ['required', 'string', 'size:40'],
-            'bloque_id' => ['nullable', 'integer'],
-        ]);
-
-        $ok = app(VistaPreviaNinoService::class)->actualizarFoco(
-            $datos['token'],
-            (int) $experiencia->id,
-            isset($datos['bloque_id']) ? (int) $datos['bloque_id'] : null
-        );
-
-        if (! $ok) {
-            return response()->json([
-                'success' => false,
-                'message' => 'El enlace de tablet expiró. Genere uno nuevo.',
-            ], 410);
-        }
-
-        return response()->json(['success' => true]);
-    }
-
-    public function crearRecorridoNino(Request $request, Experiencia $experiencia)
-    {
-        $this->asegurarExperienciaVisible($experiencia);
-
-        $servicio = app(RecorridoNinoService::class);
-        $ambiente = $servicio->ambienteDeExperiencia($experiencia);
-
-        if (! $servicio->esAmbienteDemo($ambiente)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'El recorrido demo solo está disponible para Expresión Artística.',
-            ], 422);
-        }
-
-        $userId = (int) Auth::guard('docente')->id();
-        $sesion = $servicio->crear($ambiente, $userId, (int) $experiencia->id);
-        $enlace = $servicio->armarUrlTablet($request, $sesion['token']);
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'token' => $sesion['token'],
-                'url' => $enlace['url'],
-                'expira_en' => $sesion['expira_en'],
-                'host_local' => $enlace['host_local'],
-                'ip_lan' => $enlace['ip_lan'],
-                'aviso_red' => $enlace['aviso_red'],
-            ],
         ]);
     }
 }

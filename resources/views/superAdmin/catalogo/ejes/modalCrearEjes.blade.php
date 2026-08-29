@@ -45,6 +45,8 @@
                         <input type="number" class="form-control" id="eje_pagina_orden" name="orden" min="1"
                             max="255" placeholder="Auto">
                     </div>
+
+                    @include('partials.catalogo._campos-media-curriculo', ['mediaIdPrefix' => 'eje_pagina'])
                 </div>
 
                 <div class="modal-footer">

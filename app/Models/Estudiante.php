@@ -221,7 +221,7 @@ class Estudiante extends Model
     public function ambientes()
     {
         return $this->belongsToMany(Ambiente::class, 'estudiante_ambiente')
-            ->withPivot(['anio_lectivo', 'estado', 'observacion'])
+            ->withPivot(['anio_lectivo', 'estado', 'observacion', 'activo'])
             ->withTimestamps();
     }
 

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Recorrido 3D — Prototipo PedNia</title>
+<style>
+    :root { --rn-color: #0F6E56; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #1a2436; font-family: system-ui, sans-serif; }
+    #escena { position: fixed; inset: 0; touch-action: none; }
+
+    /* --- HUD superpuesto (2D sobre el canvas 3D), reusa el lenguaje del kiosco --- */
+    .hud {
+        position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+        z-index: 10; text-align: center; color: #fff; pointer-events: none;
+        text-shadow: 0 2px 8px rgba(0,0,0,.55); width: min(80%, 520px);
+    }
+    .hud__bar {
+        height: 10px; border-radius: 999px; background: rgba(255,255,255,.28);
+        overflow: hidden; margin: 0 auto 8px; max-width: 320px;
+    }
+    .hud__fill {
+        height: 100%; width: 0; border-radius: 999px;
+        background: linear-gradient(90deg, #4ade80, #22c55e);
+        transition: width .5s ease;
+    }
+    .hud__paso { font-family: 'Fredoka One', system-ui, sans-serif; font-weight: 800; font-size: clamp(1rem, 2.4vw, 1.3rem); }
+    .hud__hint { font-size: clamp(.8rem, 1.8vw, .95rem); opacity: .92; margin-top: 2px; }
+
+    /* --- Botón "¡Iniciar!" (mismo patrón visual que el kiosco) --- */
+    .iniciar {
+        position: fixed; left: 50%; bottom: 8%; transform: translateX(-50%);
+        z-index: 12; display: inline-flex; align-items: center; gap: 10px;
+        padding: 16px 34px; border: 0; border-radius: 999px; cursor: pointer;
+        font-family: 'Fredoka One', system-ui, sans-serif; font-size: clamp(1.2rem, 3.2vw, 1.7rem);
+        color: #fff; overflow: hidden;
+        background: linear-gradient(180deg,
+            color-mix(in srgb, var(--rn-color) 78%, #fff) 0%,
+            var(--rn-color) 55%,
+            color-mix(in srgb, var(--rn-color) 72%, #000) 100%);
+        box-shadow: 0 0 0 6px color-mix(in srgb, var(--rn-color) 26%, transparent),
+                    0 14px 26px -6px color-mix(in srgb, var(--rn-color) 70%, transparent),
+                    inset 0 2px 0 rgba(255,255,255,.45);
+        text-shadow: 0 2px 0 rgba(0,0,0,.18);
+        animation: latido 1.5s ease-in-out infinite;
+        transition: transform .14s cubic-bezier(.34,1.56,.64,1);
+    }
+    .iniciar:active { transform: translateX(-50%) scale(.94); }
+    .iniciar.oculto { opacity: 0; transform: translateX(-50%) translateY(-14px) scale(.8); pointer-events: none; animation: none; transition: opacity .25s, transform .25s; }
+    .iniciar .flecha { animation: flecha 1s ease-in-out infinite; }
+    @keyframes latido {
+        0%,100% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--rn-color) 26%, transparent), 0 14px 26px -6px color-mix(in srgb, var(--rn-color) 70%, transparent), inset 0 2px 0 rgba(255,255,255,.45); }
+        50%     { box-shadow: 0 0 0 14px color-mix(in srgb, var(--rn-color) 8%, transparent), 0 18px 30px -6px color-mix(in srgb, var(--rn-color) 70%, transparent), inset 0 2px 0 rgba(255,255,255,.45); }
+    }
+    @keyframes flecha { 0%,100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+
+    /* --- Etiqueta flotante de la próxima estación (proyectada desde el 3D) --- */
+    .etiqueta-3d {
+        position: fixed; z-index: 8; transform: translate(-50%, -100%);
+        background: rgba(255,255,255,.95); color: #713f12;
+        font-family: 'Fredoka One', system-ui, sans-serif; font-weight: 800;
+        font-size: clamp(.8rem, 1.9vw, 1rem); padding: 4px 12px; border-radius: 999px;
+        box-shadow: 0 6px 14px rgba(0,0,0,.22); pointer-events: none; white-space: nowrap;
+        display: none;
+    }
+    .etiqueta-3d::after { content: '👆'; margin-left: 6px; }
+
+    /* --- Selector de ambiente (solo para el prototipo) --- */
+    .ambientes {
+        position: fixed; top: 12px; right: 12px; z-index: 12; display: flex; gap: 6px;
+    }
+    .amb-btn {
+        width: 34px; height: 34px; border-radius: 50%; border: 3px solid #fff; cursor: pointer;
+        box-shadow: 0 3px 8px rgba(0,0,0,.3); padding: 0;
+    }
+    .salir {
+        position: fixed; top: 12px; left: 12px; z-index: 12;
+        padding: 8px 16px; border: 0; border-radius: 14px; cursor: pointer;
+        background: rgba(15,23,42,.6); color: #fff; font-weight: 800; backdrop-filter: blur(4px);
+    }
+    .cargando {
+        position: fixed; inset: 0; display: grid; place-items: center; z-index: 20;
+        color: #fff; font-family: system-ui; font-size: 1.1rem; background: #1a2436;
+    }
+</style>
+</head>
+<body>
+    <div id="escena"></div>
+    <div class="cargando" id="cargando">Cargando el mundo 3D…</div>
+
+    <button class="salir">Salir</button>
+    <div class="ambientes" id="ambientes"></div>
+
+    <div class="hud">
+        <div class="hud__bar"><span class="hud__fill" id="hudFill"></span></div>
+        <div class="hud__paso" id="hudPaso">Paso 1 de 7 · Inicio</div>
+        <div class="hud__hint" id="hudHint">Toca ¡Iniciar! para comenzar el recorrido</div>
+    </div>
+
+    <button class="iniciar" id="btnIniciar">
+        <span class="texto">¡Iniciar!</span>
+        <span class="flecha">▶</span>
+    </button>
+
+    <div class="etiqueta-3d" id="etiquetaSiguiente"></div>
+
+    <script type="importmap">
+    { "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    } }
+    </script>
+
+    <script type="module">
+    import * as THREE from 'three';
+
+    /* ============================================================
+       PROTOTIPO — Recorrido 3D low-poly (PedNia / Aulas Reggio)
+       Conserva la lógica del kiosco: 7 estaciones de la clase
+       (Inicio→Módulo→Eje→Temática→Info→Experiencia→Fin), flujo
+       guiado (Iniciar → caminar → tocar la siguiente), progreso
+       verde del tramo recorrido, y color por --rn-color del ambiente.
+       ============================================================ */
+
+    // --- Datos: las 7 paradas de la clase (mismas que armarCaminoLineal) ---
+    const PARADAS = [
+        { id:'inicio',      etiqueta:'Inicio',      color:'#facc15' },
+        { id:'modulo',      etiqueta:'Módulo',      color:'#f59e0b' },
+        { id:'eje',         etiqueta:'Eje',         color:'#f59e0b' },
+        { id:'tematica',    etiqueta:'Temática',    color:'#f59e0b' },
+        { id:'info',        etiqueta:'Info',        color:'#f59e0b' },
+        { id:'experiencia', etiqueta:'Experiencia', color:'#f59e0b' },
+        { id:'fin',         etiqueta:'Fin',         color:'#ec4899' },
+    ];
+
+    const AMBIENTES = [
+        { nombre:'Multisensorial', color:'#0F6E56' },
+        { nombre:'Música',         color:'#7C3AED' },
+        { nombre:'Lógico',         color:'#2563EB' },
+        { nombre:'Tecnología',     color:'#EA580C' },
+        { nombre:'Polimotor',      color:'#DB2777' },
+    ];
+
+    // --- Ruido pseudo-Perlin (value noise 2D con interpolación suave) ---
+    function hash(x, y) {
+        let h = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+        return h - Math.floor(h);
+    }
+    function suavizar(t) { return t * t * (3 - 2 * t); }
+    function ruido(x, y) {
+        const xi = Math.floor(x), yi = Math.floor(y);
+        const xf = x - xi, yf = y - yi;
+        const a = hash(xi, yi), b = hash(xi + 1, yi);
+        const c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+        const u = suavizar(xf), v = suavizar(yf);
+        return (a * (1 - u) + b * u) * (1 - v) + (c * (1 - u) + d * u) * v;
+    }
+    // Ruido fractal (varias octavas) para colinas orgánicas
+    function ruidoFractal(x, y) {
+        let val = 0, amp = 1, frec = 1, norm = 0;
+        for (let o = 0; o < 4; o++) {
+            val += ruido(x * frec, y * frec) * amp;
+            norm += amp; amp *= 0.5; frec *= 2;
+        }
+        return val / norm;
+    }
+
+    // ---------- Escena, cámara, render ----------
+    const cont = document.getElementById('escena');
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    cont.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 400);
+
+    // ---------- Estado del recorrido (misma semántica que recorrido-camino.js) ----------
+    let indiceActual = 0;
+    let indiceMaximoVisitado = 0;
+    let caminando = false;
+    let recorridoIniciado = false;   // el personaje ESPERA hasta tocar "¡Iniciar!"
+    let colorAmbiente = new THREE.Color(AMBIENTES[0].color);
+
+    // ---------- El camino: curva sinuosa (Catmull-Rom) con 7 puntos ----------
+    // Puntos en el plano XZ; la Y (altura) se define por el terreno más abajo.
+    const N = PARADAS.length;
+    const puntosCamino = [];
+    for (let i = 0; i < N; i++) {
+        const t = i / (N - 1);
+        const x = (t - 0.5) * 90;                 // avanza en X de -45 a 45
+        const z = Math.sin(t * Math.PI * 2.4) * 14; // serpentea en Z
+        puntosCamino.push(new THREE.Vector3(x, 0, z));
+    }
+    const curva = new THREE.CatmullRomCurve3(puntosCamino, false, 'catmullrom', 0.5);
+
+    // Altura del terreno base (colinas). El camino "aplana" el terreno cerca de él.
+    const ALTURA_MAX = 9;
+    function alturaBase(x, z) {
+        return (ruidoFractal(x * 0.035 + 10, z * 0.035 + 10) - 0.35) * ALTURA_MAX;
+    }
+    // Distancia mínima (en XZ) de un punto al camino — para el blending orgánico
+    function distanciaAlCamino(x, z) {
+        let min = Infinity;
+        const MUESTRAS = 120;
+        for (let i = 0; i <= MUESTRAS; i++) {
+            const p = curva.getPoint(i / MUESTRAS);
+            const dx = p.x - x, dz = p.z - z;
+            const d = dx * dx + dz * dz;
+            if (d < min) min = d;
+        }
+        return Math.sqrt(min);
+    }
+    const ANCHO_CAMINO = 5;      // media-anchura de la calzada
+    const ZONA_LIMPIA = 8;       // margen aplanado a los lados (sin árboles)
+    // Altura final del terreno: 0 sobre el camino, sube con la distancia (blending)
+    function alturaTerreno(x, z) {
+        const d = distanciaAlCamino(x, z);
+        const base = alturaBase(x, z);
+        if (d < ANCHO_CAMINO) return 0;                 // calzada: plano a Y=0
+        // transición suave de 0 -> base entre ANCHO_CAMINO y ANCHO_CAMINO+12
+        const t = Math.min(1, (d - ANCHO_CAMINO) / 12);
+        return base * suavizar(t);
+    }
+
+    // ---------- Terreno low-poly (plano subdividido, vértices desplazados) ----------
+    const TAM = 140, SEG = 90;
+    const geoTerreno = new THREE.PlaneGeometry(TAM, TAM, SEG, SEG);
+    geoTerreno.rotateX(-Math.PI / 2);
+    const posT = geoTerreno.attributes.position;
+    const colorAttr = [];
+    const cVerdeBajo = new THREE.Color('#4b7f52');
+    const cVerdeAlto = new THREE.Color('#6ba368');
+    const cTierra    = new THREE.Color('#7c6a52');
+    const cRoca      = new THREE.Color('#8a8175');
+    for (let i = 0; i < posT.count; i++) {
+        const x = posT.getX(i), z = posT.getZ(i);
+        const y = alturaTerreno(x, z);
+        posT.setY(i, y);
+        // color por altura (bandas: pasto bajo → pasto alto → tierra → roca)
+        let c;
+        const h = y / ALTURA_MAX;
+        if (h < 0.05) c = cVerdeBajo;
+        else if (h < 0.4) c = cVerdeBajo.clone().lerp(cVerdeAlto, h / 0.4);
+        else if (h < 0.7) c = cVerdeAlto.clone().lerp(cTierra, (h - 0.4) / 0.3);
+        else c = cTierra.clone().lerp(cRoca, (h - 0.7) / 0.3);
+        colorAttr.push(c.r, c.g, c.b);
+    }
+    geoTerreno.setAttribute('color', new THREE.Float32BufferAttribute(colorAttr, 3));
+    geoTerreno.computeVertexNormals();
+    const matTerreno = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 });
+    const terreno = new THREE.Mesh(geoTerreno, matTerreno);
+    terreno.receiveShadow = true;
+    scene.add(terreno);
+
+    // ---------- La carretera (tubo aplanado a lo largo de la curva) ----------
+    // Usamos una geometría de "cinta": muestreamos la curva y extruimos ancho.
+    function construirCalzada(colorHex, hasta01) {
+        const M = 200;
+        const vertices = [], indices = [], uvs = [];
+        const hastaIdx = Math.floor(M * hasta01);
+        for (let i = 0; i <= hastaIdx; i++) {
+            const u = i / M;
+            const p = curva.getPoint(u);
+            const tang = curva.getTangent(u).normalize();
+            const normal = new THREE.Vector3(-tang.z, 0, tang.x).normalize(); // perpendicular en XZ
+            const izq = p.clone().addScaledVector(normal, ANCHO_CAMINO);
+            const der = p.clone().addScaledVector(normal, -ANCHO_CAMINO);
+            vertices.push(izq.x, 0.05, izq.z);
+            vertices.push(der.x, 0.05, der.z);
+            uvs.push(0, u * 20); uvs.push(1, u * 20);
+        }
+        for (let i = 0; i < hastaIdx; i++) {
+            const a = i * 2, b = i * 2 + 1, c = i * 2 + 2, d = i * 2 + 3;
+            indices.push(a, b, c, b, d, c);
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        g.setIndex(indices);
+        g.computeVertexNormals();
+        return g;
+    }
+
+    // Calzada base (gris, todo el camino)
+    const matAsfalto = new THREE.MeshStandardMaterial({ color: '#5b6472', roughness: .95, flatShading: true });
+    const calzada = new THREE.Mesh(construirCalzada('#5b6472', 1), matAsfalto);
+    calzada.receiveShadow = true;
+    scene.add(calzada);
+
+    // Progreso (verde, SOLO el tramo recorrido) — se re-genera al avanzar
+    const matProgreso = new THREE.MeshStandardMaterial({
+        color: '#22c55e', roughness: .55, flatShading: true,
+        emissive: new THREE.Color('#16a34a'), emissiveIntensity: 0.35
+    });
+    let progresoMesh = new THREE.Mesh(construirCalzada('#22c55e', 0.0001), matProgreso);
+    progresoMesh.position.y = 0.08;
+    scene.add(progresoMesh);
+    function actualizarProgreso() {
+        const hasta = indiceMaximoVisitado / (N - 1);
+        scene.remove(progresoMesh);
+        progresoMesh.geometry.dispose();
+        progresoMesh = new THREE.Mesh(construirCalzada('#22c55e', Math.max(0.0001, hasta)), matProgreso);
+        progresoMesh.position.y = 0.08;
+        if (indiceMaximoVisitado > 0) scene.add(progresoMesh);
+    }
+
+    // Raya central discontinua (pequeños cubos amarillos a lo largo de la curva)
+    const rayaGrupo = new THREE.Group();
+    const geoRaya = new THREE.BoxGeometry(1.4, 0.05, 0.35);
+    const matRaya = new THREE.MeshStandardMaterial({ color: '#fde047', roughness: .6 });
+    for (let i = 0; i < 60; i++) {
+        const u = i / 60;
+        const p = curva.getPoint(u);
+        const tang = curva.getTangent(u).normalize();
+        const raya = new THREE.Mesh(geoRaya, matRaya);
+        raya.position.set(p.x, 0.11, p.z);
+        raya.rotation.y = Math.atan2(tang.x, tang.z);
+        rayaGrupo.add(raya);
+    }
+    scene.add(rayaGrupo);
+
+    // ---------- Estaciones (postes con medallón numérico) ----------
+    const estaciones = [];
+    const grupoEstaciones = new THREE.Group();
+    scene.add(grupoEstaciones);
+    PARADAS.forEach((par, i) => {
+        const p = curva.getPoint(i / (N - 1));
+        const g = new THREE.Group();
+        g.position.set(p.x, 0, p.z);
+
+        // poste
+        const poste = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.18, 0.18, 3, 8),
+            new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: .7 })
+        );
+        poste.position.y = 1.5; poste.castShadow = true;
+        g.add(poste);
+
+        // medallón (esfera achatada) con color de estado
+        const medallon = new THREE.Mesh(
+            new THREE.SphereGeometry(1.1, 20, 16),
+            new THREE.MeshStandardMaterial({ color: par.color, roughness: .45, flatShading: false })
+        );
+        medallon.position.y = 3.4; medallon.scale.set(1, 1, .5); medallon.castShadow = true;
+        g.add(medallon);
+        medallon.userData.baseY = 3.4;
+
+        // anillo (aro) para la estación siguiente
+        const aro = new THREE.Mesh(
+            new THREE.TorusGeometry(1.5, 0.12, 10, 28),
+            new THREE.MeshBasicMaterial({ color: '#fde047' })
+        );
+        aro.position.y = 3.4; aro.rotation.x = Math.PI / 2; aro.visible = false;
+        g.add(aro);
+
+        grupoEstaciones.add(g);
+        estaciones.push({ grupo: g, medallon, aro, parada: par, indice: i });
+    });
+
+    // ---------- Vegetación low-poly (árboles + rocas) con margen limpio ----------
+    const grupoVeg = new THREE.Group();
+    scene.add(grupoVeg);
+    function arbol(x, y, z, tint) {
+        const g = new THREE.Group();
+        const tronco = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.22, 0.3, 1.4, 6),
+            new THREE.MeshStandardMaterial({ color: '#6b4f2a', roughness: 1, flatShading: true })
+        );
+        tronco.position.y = 0.7; tronco.castShadow = true;
+        const copa = new THREE.Mesh(
+            new THREE.ConeGeometry(1.5, 3, 7),
+            new THREE.MeshStandardMaterial({ color: tint, roughness: 1, flatShading: true })
+        );
+        copa.position.y = 2.6; copa.castShadow = true;
+        g.add(tronco); g.add(copa);
+        g.position.set(x, y, z);
+        const s = 0.7 + Math.random() * 0.7; g.scale.setScalar(s);
+        return g;
+    }
+    function roca(x, y, z) {
+        const m = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(0.6 + Math.random() * 0.6, 0),
+            new THREE.MeshStandardMaterial({ color: '#8a8175', roughness: 1, flatShading: true })
+        );
+        m.position.set(x, y + 0.3, z); m.rotation.set(Math.random(), Math.random(), Math.random());
+        m.castShadow = true; m.receiveShadow = true;
+        return m;
+    }
+    const tonosCopa = ['#3f7a4b', '#4b8c57', '#356b41', '#5a9c63'];
+    let intentos = 0, colocados = 0;
+    while (colocados < 90 && intentos < 900) {
+        intentos++;
+        const x = (Math.random() - 0.5) * TAM * 0.9;
+        const z = (Math.random() - 0.5) * TAM * 0.9;
+        const d = distanciaAlCamino(x, z);
+        if (d < ZONA_LIMPIA) continue;              // respeta la zona limpia del camino
+        const y = alturaTerreno(x, z);
+        if (Math.random() < 0.78) {
+            grupoVeg.add(arbol(x, y, z, tonosCopa[(Math.random() * tonosCopa.length) | 0]));
+        } else {
+            grupoVeg.add(roca(x, y, z));
+        }
+        colocados++;
+    }
+
+    // ---------- El personaje (blob low-poly) ----------
+    const personaje = new THREE.Group();
+    const cuerpo = new THREE.Mesh(
+        new THREE.CapsuleGeometry(0.8, 1.1, 6, 12),
+        new THREE.MeshStandardMaterial({ color: '#4338ca', roughness: .5, flatShading: false })
+    );
+    cuerpo.position.y = 1.3; cuerpo.castShadow = true;
+    personaje.add(cuerpo);
+    // ojos
+    const matOjo = new THREE.MeshStandardMaterial({ color: '#fff' });
+    const matPupila = new THREE.MeshStandardMaterial({ color: '#1e1b4b' });
+    [-0.32, 0.32].forEach(dx => {
+        const ojo = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 10), matOjo);
+        ojo.position.set(dx, 1.9, 0.66); personaje.add(ojo);
+        const pup = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), matPupila);
+        pup.position.set(dx, 1.9, 0.86); personaje.add(pup);
+    });
+    scene.add(personaje);
+    function colocarPersonajeEn(i) {
+        const p = curva.getPoint(i / (N - 1));
+        personaje.position.set(p.x, 0, p.z);
+    }
+    colocarPersonajeEn(0);
+
+    // ---------- Luces: sol direccional + ambiental (cielo crepuscular) ----------
+    const sol = new THREE.DirectionalLight(0xfff2d6, 2.1);
+    sol.position.set(-40, 60, 30);
+    sol.castShadow = true;
+    sol.shadow.mapSize.set(2048, 2048);
+    sol.shadow.camera.left = -90; sol.shadow.camera.right = 90;
+    sol.shadow.camera.top = 90; sol.shadow.camera.bottom = -90;
+    sol.shadow.camera.near = 1; sol.shadow.camera.far = 220;
+    sol.shadow.bias = -0.0004;
+    scene.add(sol);
+    // luz ambiental más alta para que los valles no queden negros
+    const ambiental = new THREE.HemisphereLight(0xd6e4ff, 0x6b5a44, 1.15);
+    scene.add(ambiental);
+    // relleno suave desde el lado opuesto al sol
+    const relleno = new THREE.DirectionalLight(0xffffff, 0.35);
+    relleno.position.set(40, 30, -30);
+    scene.add(relleno);
+
+    // Cielo crepuscular (gradiente via fog + background)
+    function aplicarColorAmbiente(hex) {
+        colorAmbiente = new THREE.Color(hex);
+        const cielo = colorAmbiente.clone().lerp(new THREE.Color('#ffd9a0'), 0.35).lerp(new THREE.Color('#2a2352'), 0.15);
+        scene.background = cielo;
+        scene.fog = new THREE.Fog(cielo.getHex(), 90, 190);
+        document.documentElement.style.setProperty('--rn-color', hex);
+    }
+    aplicarColorAmbiente(AMBIENTES[0].color);
+
+    // ---------- Cámara: sigue al personaje en perspectiva 3/4 ----------
+    const camTarget = new THREE.Vector3();
+    const camPos = new THREE.Vector3();
+    function actualizarCamara(inmediato) {
+        const p = personaje.position;
+        const deseadaPos = new THREE.Vector3(p.x - 6, 22, p.z + 26);
+        const deseadaTgt = new THREE.Vector3(p.x + 4, 2, p.z - 2);
+        const k = inmediato ? 1 : 0.06;
+        camPos.lerp(deseadaPos, k);
+        camTarget.lerp(deseadaTgt, k);
+        camera.position.copy(camPos);
+        camera.lookAt(camTarget);
+    }
+    camPos.set(-46, 22, 30); camTarget.set(-40, 2, 0);
+    actualizarCamara(true);
+
+    // ---------- Estados visuales de las estaciones (visitada / siguiente / futura) ----------
+    function refrescarEstaciones() {
+        estaciones.forEach((e, i) => {
+            const visitada = i <= indiceMaximoVisitado;
+            const esSiguiente = recorridoIniciado && i === indiceActual + 1 && indiceActual < N - 1 && !caminando;
+            const futura = i > indiceMaximoVisitado + 1;
+            e.aro.visible = esSiguiente;
+            const m = e.medallon.material;
+            if (i < indiceMaximoVisitado && i !== 0 && i !== N - 1) m.color.set('#22c55e'); // visitada → verde ✓
+            else if (esSiguiente) m.color.set('#fde047');                                   // siguiente → amarillo
+            else m.color.set(e.parada.color);
+            e.grupo.scale.setScalar(esSiguiente ? 1.15 : 1);
+            e.medallon.userData.futura = futura;
+            e.grupo.traverse(o => { if (o.material && o.material.opacity !== undefined) {} });
+        });
+    }
+    refrescarEstaciones();
+
+    // ---------- Interacción: raycaster para tocar estaciones ----------
+    const raycaster = new THREE.Raycaster();
+    const puntero = new THREE.Vector2();
+    function alTocar(clientX, clientY) {
+        if (caminando || !recorridoIniciado) return;   // no responde antes de Iniciar
+        puntero.x = (clientX / window.innerWidth) * 2 - 1;
+        puntero.y = -(clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(puntero, camera);
+        const objetos = [];
+        estaciones.forEach(e => e.grupo.traverse(o => { if (o.isMesh) { o.userData.estIdx = e.indice; objetos.push(o); } }));
+        const hit = raycaster.intersectObjects(objetos, false)[0];
+        if (!hit) return;
+        const idx = hit.object.userData.estIdx;
+        if (idx === indiceActual + 1) irAParada(idx);
+    }
+    renderer.domElement.addEventListener('click', e => alTocar(e.clientX, e.clientY));
+
+    // ---------- Avance guiado ----------
+    let animInicio = 0, animDesde = 0, animHasta = 0, animDur = 0;
+    function irAParada(idx) {
+        if (caminando || idx <= indiceActual) return;
+        caminando = true;
+        ocultarEtiqueta();
+        animDesde = indiceActual / (N - 1);
+        animHasta = idx / (N - 1);
+        const p0 = curva.getPoint(animDesde), p1 = curva.getPoint(animHasta);
+        animDur = Math.max(900, p0.distanceTo(p1) * 55);
+        animInicio = performance.now();
+        indiceActual = idx;
+        actualizarHud(true);
+    }
+    function terminarAvance() {
+        caminando = false;
+        indiceMaximoVisitado = Math.max(indiceMaximoVisitado, indiceActual);
+        actualizarProgreso();
+        refrescarEstaciones();
+        actualizarHud(false);
+        if (PARADAS[indiceActual].id === 'experiencia') {
+            document.getElementById('hudHint').textContent = 'Toca la experiencia para vivirla 🎉';
+        }
+    }
+
+    // ---------- HUD + etiqueta de la siguiente ----------
+    const hudFill = document.getElementById('hudFill');
+    const hudPaso = document.getElementById('hudPaso');
+    const hudHint = document.getElementById('hudHint');
+    const etiqueta = document.getElementById('etiquetaSiguiente');
+    function actualizarHud(enMovimiento) {
+        const pct = Math.round((indiceMaximoVisitado / (N - 1)) * 100);
+        hudFill.style.width = pct + '%';
+        hudPaso.textContent = `Paso ${indiceActual + 1} de ${N} · ${PARADAS[indiceActual].etiqueta}`;
+        hudHint.textContent = enMovimiento ? 'Caminando…' :
+            (indiceActual < N - 1 ? 'Toca la siguiente parada que brilla' : '¡Completaste el recorrido!');
+    }
+    function ocultarEtiqueta() { etiqueta.style.display = 'none'; }
+    function actualizarEtiquetaSiguiente() {
+        const idx = indiceActual + 1;
+        if (!recorridoIniciado || caminando || idx >= N) { ocultarEtiqueta(); return; }
+        const e = estaciones[idx];
+        const v = new THREE.Vector3(); e.medallon.getWorldPosition(v); v.y += 1.4;
+        v.project(camera);
+        if (v.z > 1) { ocultarEtiqueta(); return; }
+        const x = (v.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (-v.y * 0.5 + 0.5) * window.innerHeight;
+        etiqueta.style.display = 'block';
+        etiqueta.style.left = x + 'px';
+        etiqueta.style.top = y + 'px';
+        etiqueta.textContent = e.parada.etiqueta;
+    }
+
+    // ---------- Botón Iniciar ----------
+    const btnIniciar = document.getElementById('btnIniciar');
+    btnIniciar.addEventListener('click', () => {
+        btnIniciar.classList.add('oculto');
+        recorridoIniciado = true;
+        refrescarEstaciones();
+        irAParada(1);
+    });
+
+    // ---------- Selector de ambiente (prototipo) ----------
+    const cAmb = document.getElementById('ambientes');
+    AMBIENTES.forEach((a, i) => {
+        const b = document.createElement('button');
+        b.className = 'amb-btn'; b.style.background = a.color; b.title = a.nombre;
+        b.addEventListener('click', () => aplicarColorAmbiente(a.color));
+        cAmb.appendChild(b);
+    });
+    document.querySelector('.salir').addEventListener('click', () => history.length > 1 ? history.back() : location.reload());
+
+    // ---------- Loop ----------
+    let t0 = performance.now();
+    function animar(now) {
+        const dt = (now - t0) / 1000; t0 = now;
+
+        // avance del personaje sobre la curva
+        if (caminando) {
+            const k = Math.min(1, (now - animInicio) / animDur);
+            const ease = k < .5 ? 2*k*k : 1 - Math.pow(-2*k+2, 2)/2;
+            const u = animDesde + (animHasta - animDesde) * ease;
+            const p = curva.getPoint(u);
+            const tang = curva.getTangent(u).normalize();
+            personaje.position.set(p.x, 0, p.z);
+            personaje.rotation.y = Math.atan2(tang.x, tang.z);
+            // saltito al caminar
+            cuerpo.position.y = 1.3 + Math.abs(Math.sin(k * Math.PI * 8)) * 0.18;
+            if (k >= 1) { cuerpo.position.y = 1.3; terminarAvance(); }
+        }
+
+        // idle: respiración del personaje
+        if (!caminando) cuerpo.scale.y = 1 + Math.sin(now / 500) * 0.03;
+
+        // animación de estaciones: la siguiente rebota y su aro gira
+        estaciones.forEach((e, i) => {
+            const esSiguiente = recorridoIniciado && i === indiceActual + 1 && !caminando;
+            if (esSiguiente) {
+                e.medallon.position.y = e.medallon.userData.baseY + Math.abs(Math.sin(now/300)) * 0.5;
+                e.aro.rotation.z += 0.04;
+                e.aro.scale.setScalar(1 + Math.sin(now/300) * 0.12);
+            } else {
+                e.medallon.position.y += (e.medallon.userData.baseY - e.medallon.position.y) * 0.2;
+            }
+        });
+
+        actualizarCamara(false);
+        actualizarEtiquetaSiguiente();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animar);
+    }
+
+    // Arranque
+    document.getElementById('cargando').style.display = 'none';
+    actualizarHud(false);
+    requestAnimationFrame(animar);
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+    </script>
+</body>
+</html>

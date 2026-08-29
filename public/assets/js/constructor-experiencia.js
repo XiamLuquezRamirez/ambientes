@@ -20,9 +20,6 @@
         publicar: $app.data('url-publicar') || '',
         actualizarTpl: $app.data('url-actualizar-template') || '',
         eliminarTpl: $app.data('url-eliminar-template') || '',
-        vistaPrevia: $app.data('url-vista-previa') || '',
-        vistaPreviaFoco: $app.data('url-vista-previa-foco') || '',
-        recorridoNino: $app.data('url-recorrido-nino') || '',
     };
 
     let bloques = [];
@@ -31,8 +28,6 @@
     let sortable = null;
     let saveTimer = null;
     let saving = false;
-    let tabletToken = '';
-    let tabletFollow = true;
 
     const $catalogo = $('#cxCatalogo');
     const $timeline = $('#cxTimeline');
@@ -317,141 +312,6 @@
             const el = $row[0] || $card[0];
             el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-        enviarFocoTablet(seleccionadoId);
-    }
-
-    function enviarFocoTablet(bloqueId) {
-        if (!tabletToken || !tabletFollow || !urls.vistaPreviaFoco) return;
-        api(urls.vistaPreviaFoco, 'POST', {
-            token: tabletToken,
-            bloque_id: bloqueId || null,
-        }).fail(() => { /* enlace expirado: se regenera desde el modal */ });
-    }
-
-    function pintarQrTablet(url) {
-        const canvas = document.getElementById('vnTabletQr');
-        const img = document.getElementById('vnTabletQrImg');
-        if (!url) return;
-
-        if (canvas && typeof window.QRious === 'function') {
-            if (img) img.hidden = true;
-            canvas.hidden = false;
-            try {
-                // eslint-disable-next-line no-new
-                new window.QRious({
-                    element: canvas,
-                    value: url,
-                    size: 220,
-                    level: 'M',
-                    background: '#ffffff',
-                    foreground: '#0f172a',
-                });
-                return;
-            } catch (e) { /* fallback abajo */ }
-        }
-
-        if (img) {
-            if (canvas) canvas.hidden = true;
-            img.hidden = false;
-            img.alt = 'Código QR de la vista previa';
-            img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data='
-                + encodeURIComponent(url);
-            return;
-        }
-
-        if (canvas) {
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-            ctx.fillStyle = '#f1f5f9';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#64748b';
-            ctx.font = '14px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('Use el enlace', canvas.width / 2, canvas.height / 2);
-        }
-    }
-
-    function abrirModalTablet() {
-        abrirModalEnlaceTablet({
-            urlApi: urls.vistaPrevia,
-            titulo: 'Probar en tablet',
-            lead: 'Abre este enlace en la tablet (misma red Wi‑Fi). La vista se actualiza al guardar bloques en el constructor.',
-            seguirFoco: true,
-        });
-    }
-
-    function abrirModalRecorrido() {
-        abrirModalEnlaceTablet({
-            urlApi: urls.recorridoNino,
-            titulo: 'Recorrido niño (demo)',
-            lead: 'Abre este enlace en la tablet para probar el recorrido: ambiente → módulos → ejes → camino → experiencia.',
-            seguirFoco: false,
-        });
-    }
-
-    function abrirModalEnlaceTablet(opts) {
-        opts = opts || {};
-        if (!opts.urlApi) {
-            toast('error', 'No hay URL configurada para este enlace.');
-            return;
-        }
-        const $modal = $('#vnTabletModal');
-        const $canvas = $('#vnTabletQr');
-        const $img = $('#vnTabletQrImg');
-        $modal.prop('hidden', false);
-        $('body').css('overflow', 'hidden');
-        $('#vnTabletModalTitle').text(opts.titulo || 'Probar en tablet');
-        $('#vnTabletModalLead').text(opts.lead || '');
-        $('#vnTabletFollowWrap').prop('hidden', !opts.seguirFoco);
-        $('#vnTabletUrl').val('Generando…');
-        if ($img.length) {
-            $img.prop('hidden', true).removeAttr('src');
-        }
-        if ($canvas.length) {
-            $canvas.prop('hidden', false);
-            const ctx = $canvas[0].getContext('2d');
-            if (ctx) ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
-        }
-        $('#vnTabletLocalWarn').prop('hidden', true).empty();
-        tabletToken = '';
-        api(opts.urlApi, 'POST', {})
-            .done((res) => {
-                const data = res?.data || {};
-                tabletToken = opts.seguirFoco ? (data.token || '') : '';
-                const url = data.url || '';
-                if (!url) {
-                    toast('error', 'Respuesta incompleta al crear el enlace.');
-                    cerrarModalTablet();
-                    return;
-                }
-                $('#vnTabletUrl').val(url);
-                const $warn = $('#vnTabletLocalWarn');
-                if (data.aviso_red) {
-                    const aviso = String(data.aviso_red);
-                    const conCodigo = aviso.replace(
-                        /(php artisan serve --host=0\.0\.0\.0 --port=\d+)/g,
-                        '<code>$1</code>'
-                    );
-                    $warn.prop('hidden', false).html(conCodigo);
-                } else {
-                    $warn.prop('hidden', true).empty();
-                }
-                const mins = Math.max(1, Math.round((data.expira_en || 3600) / 60));
-                $('#vnTabletExpira').text(`El enlace dura ${mins} minutos. Al generar uno nuevo, el anterior deja de funcionar.`);
-                pintarQrTablet(url);
-                if (opts.seguirFoco && tabletToken && seleccionadoId) {
-                    enviarFocoTablet(seleccionadoId);
-                }
-            })
-            .fail((xhr) => {
-                toast('error', errorAjax(xhr, 'No se pudo crear el enlace.'));
-                cerrarModalTablet();
-            });
-    }
-
-    function cerrarModalTablet() {
-        $('#vnTabletModal').prop('hidden', true);
-        $('body').css('overflow', '');
     }
 
     /* ── Formularios ────────────────────────────────────────── */
@@ -1121,7 +981,8 @@
             + fieldSelect('cantidad', 'Cantidad de emociones', d.cantidad || '6', [
                 { value: '4', label: '4 (feliz, emocionado, tranquilo, confundido)' },
                 { value: '6', label: '6 (+ cansado, nervioso)' },
-            ]);
+            ])
+            + '<p class="text-muted small mt-2 mb-0">En el kiosco cada niño verá ilustraciones y textos de niño o niña según su sexo registrado. La previsualización del constructor usa la forma masculina.</p>';
     }
 
     function formRecompensa(d) {
@@ -1714,34 +1575,6 @@
 
     $('#cxBtnLimpiar').on('click', limpiarSecuencia);
     $('.cx-btn-publicar').on('click', publicar);
-    $('#cxBtnTablet').on('click', abrirModalTablet);
-    $('#cxBtnRecorrido').on('click', abrirModalRecorrido);
-    $('#vnTabletModal').on('click', '[data-vn-tablet-close]', cerrarModalTablet);
-    $(document).on('keydown', function (e) {
-        if (e.key === 'Escape' && !$('#vnTabletModal').prop('hidden')) {
-            cerrarModalTablet();
-        }
-    });
-    $('#vnTabletFollow').on('change', function () {
-        tabletFollow = $(this).prop('checked');
-        if (tabletFollow && seleccionadoId) enviarFocoTablet(seleccionadoId);
-    });
-    $('#vnTabletCopy').on('click', function () {
-        const url = String($('#vnTabletUrl').val() || '');
-        if (!url || url === 'Generando…') return;
-        const done = () => toast('success', 'Enlace copiado');
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(url).then(done).catch(() => {
-                $('#vnTabletUrl').trigger('select');
-                document.execCommand('copy');
-                done();
-            });
-            return;
-        }
-        $('#vnTabletUrl').trigger('select');
-        document.execCommand('copy');
-        done();
-    });
 
     /* ── API pública (Vista Niño y otros) ─────────────────────── */
     window.CxConstructor = {

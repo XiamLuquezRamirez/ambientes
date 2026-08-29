@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AmbienteAdminController;
 use App\Http\Controllers\Admin\AsignacionAmbienteController;
+use App\Http\Controllers\Admin\BloquesExperienciaAdminController;
 use App\Http\Controllers\Admin\CatalogoAdminController;
 use App\Http\Controllers\Admin\CatalogoDBAAdminController;
 use App\Http\Controllers\Admin\CierreAnioController;
@@ -11,7 +12,6 @@ use App\Http\Controllers\Admin\DocenteAdminController;
 use App\Http\Controllers\Admin\EjesAdminController;
 use App\Http\Controllers\Admin\EstudianteAdminController;
 use App\Http\Controllers\Admin\ExperienciasAdminController;
-use App\Http\Controllers\Admin\BloquesExperienciaAdminController;
 use App\Http\Controllers\Admin\GradoGrupoController;
 use App\Http\Controllers\Admin\GruposController;
 use App\Http\Controllers\Admin\MatriculaAdminController;
@@ -25,16 +25,16 @@ use App\Http\Controllers\Admin\TematicasAdminController;
 use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
-use App\Http\Controllers\RecorridoNinoController;
-use App\Http\Controllers\VistaPreviaNinoController;
+use App\Http\Controllers\Ambientes\AmbienteNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
 use App\Http\Controllers\InfoCondicionesController;
 use App\Http\Controllers\Panel\AsistenciaController;
+use App\Http\Controllers\Panel\BloquesExperienciaPanelController;
 use App\Http\Controllers\Panel\CatalogoPanelController;
+use App\Http\Controllers\Panel\ClasesPanelController;
 use App\Http\Controllers\Panel\EjesPanelController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\ExperienciasPanelController;
-use App\Http\Controllers\Panel\BloquesExperienciaPanelController;
 use App\Http\Controllers\Panel\InclusionController;
 use App\Http\Controllers\Panel\PerfilAprendizajePanelController;
 use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
@@ -56,15 +56,16 @@ use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\TematicasSuperAdminController;
 use Illuminate\Support\Facades\Route;
 
-// Raiz → bienvenida del ambiente configurado
-Route::get('/', fn () => redirect()->route('auth.bienvenida'));
+// Raíz → portada del ambiente (kiosco). Docente: /login
+Route::get('/', fn () => redirect()->route('ambiente.inicio'));
 
-// ── Autenticacion del nino ────────────────────────────────────────────────
+// ── Autenticacion del nino (público) ───────────────────────────────────────
 Route::get('/bienvenida', [SesionNinoController::class, 'mostrarBienvenida'])->name('auth.bienvenida');
+Route::get('/inicio', [AmbienteNinoController::class, 'inicio'])->name('ambiente.inicio');
+Route::get('/kiosco/diagnostico-ip', [AmbienteNinoController::class, 'diagnosticoIp'])->name('ambiente.diagnostico-ip');
 Route::get('/alumnos', [SesionNinoController::class, 'mostrarSeleccionAlumno'])->name('auth.alumnos');
 Route::get('/alumnos/{estudianteId}/pin', [SesionNinoController::class, 'mostrarPin'])->name('auth.pin');
 Route::post('/alumnos/{estudianteId}/verificar', [SesionNinoController::class, 'verificarPin'])->name('auth.verificar-pin');
-Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
 
 // ── Auth Docente ──────────────────────────────────────────────────────────
 Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('docente.login');
@@ -72,33 +73,6 @@ Route::post('/login', [AuthDocenteController::class, 'iniciarSesion'])->name('do
 Route::post('/logout', [AuthDocenteController::class, 'cerrarSesion'])->name('docente.logout');
 
 // Vista previa en tablet (token temporal, sin sesión de staff)
-Route::get('/vista-previa-nino/{token}', [VistaPreviaNinoController::class, 'mostrar'])
-    ->middleware('throttle:30,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('vista-previa-nino.mostrar');
-Route::get('/vista-previa-nino/{token}/estado', [VistaPreviaNinoController::class, 'estado'])
-    ->middleware('throttle:90,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('vista-previa-nino.estado');
-Route::get('/vista-previa-nino/{token}/tts', [VistaPreviaNinoController::class, 'tts'])
-    ->middleware('throttle:30,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('vista-previa-nino.tts');
-
-// Recorrido niño demo (Expresión Artística): portada → módulos → ejes → camino → experiencia
-Route::get('/recorrido-nino/{token}', [RecorridoNinoController::class, 'mostrar'])
-    ->middleware('throttle:30,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('recorrido-nino.mostrar');
-Route::get('/recorrido-nino/{token}/experiencia/{experiencia}', [RecorridoNinoController::class, 'experiencia'])
-    ->middleware('throttle:60,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('recorrido-nino.experiencia');
-Route::get('/recorrido-nino/{token}/tts', [RecorridoNinoController::class, 'tts'])
-    ->middleware('throttle:30,1')
-    ->where('token', '[a-f0-9]{40}')
-    ->name('recorrido-nino.tts');
-
 // Endpoint para guardar los datos generales del Piar
 // Piar
 Route::get('estudiantes/diligenciar-piar/{idEstudiante}/{tipo}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
@@ -259,9 +233,6 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaAdminController::class, 'limpiar'])->name('admin.experiencias.bloques.limpiar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaAdminController::class, 'upload'])->name('admin.experiencias.bloques.upload');
     Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaAdminController::class, 'tts'])->name('admin.experiencias.bloques.tts');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaAdminController::class, 'crearVistaPrevia'])->name('admin.experiencias.vista-previa');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaAdminController::class, 'focoVistaPrevia'])->name('admin.experiencias.vista-previa.foco');
-    Route::post('catalogo/experiencias/{experiencia}/recorrido-nino', [BloquesExperienciaAdminController::class, 'crearRecorridoNino'])->name('admin.experiencias.recorrido-nino');
     Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaAdminController::class, 'publicar'])->name('admin.experiencias.publicar');
     Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaAdminController::class, 'actualizar'])->name('admin.bloques.actualizar');
     Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaAdminController::class, 'eliminar'])->name('admin.bloques.eliminar');
@@ -313,6 +284,7 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::put('usuarios/{usuario}', [UsuarioAdminController::class, 'actualizar'])->name('admin.usuarios.update');
     Route::patch('usuarios/{usuario}/toggle-activo', [UsuarioAdminController::class, 'toggleActivo'])->name('admin.usuarios.toggleActivo');
     Route::delete('usuarios/{usuario}', [UsuarioAdminController::class, 'eliminar'])->name('admin.usuarios.destroy');
+
 });
 
 // ── Panel Docente ─────────────────────────────────────────────────────────
@@ -447,9 +419,6 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaPanelController::class, 'limpiar'])->name('panel.experiencias.bloques.limpiar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaPanelController::class, 'upload'])->name('panel.experiencias.bloques.upload');
     Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaPanelController::class, 'tts'])->name('panel.experiencias.bloques.tts');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaPanelController::class, 'crearVistaPrevia'])->name('panel.experiencias.vista-previa');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaPanelController::class, 'focoVistaPrevia'])->name('panel.experiencias.vista-previa.foco');
-    Route::post('catalogo/experiencias/{experiencia}/recorrido-nino', [BloquesExperienciaPanelController::class, 'crearRecorridoNino'])->name('panel.experiencias.recorrido-nino');
     Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaPanelController::class, 'publicar'])->name('panel.experiencias.publicar');
     Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaPanelController::class, 'actualizar'])->name('panel.bloques.actualizar');
     Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaPanelController::class, 'eliminar'])->name('panel.bloques.eliminar');
@@ -458,6 +427,11 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::patch('catalogo/experiencias/{experiencia}/estado', [ExperienciasPanelController::class, 'actualizarEstado'])->name('panel.experiencias.estado');
     Route::patch('catalogo/experiencias/{experiencia}/flujo', [ExperienciasPanelController::class, 'cambiarEstado'])->name('panel.experiencias.flujo');
     Route::delete('catalogo/experiencias/{experiencia}', [ExperienciasPanelController::class, 'eliminar'])->name('panel.experiencias.eliminar');
+
+    // Clases
+    Route::get('clases', [ClasesPanelController::class, 'listar'])->name('panel.clases');
+    Route::post('clases', [ClasesPanelController::class, 'guardar'])->name('panel.clases.guardar');
+    Route::patch('clases/{clase}/estado', [ClasesPanelController::class, 'actualizarEstado'])->name('panel.clases.estado');
 });
 
 // ── Super Admin ─────────────────────────────────────────────────────────
@@ -543,9 +517,6 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::post('catalogo/experiencias/{experiencia}/bloques/limpiar', [BloquesExperienciaSuperAdminController::class, 'limpiar'])->name('superadmin.catalogo.experiencias.bloques.limpiar');
     Route::post('catalogo/experiencias/{experiencia}/bloques/upload', [BloquesExperienciaSuperAdminController::class, 'upload'])->name('superadmin.catalogo.experiencias.bloques.upload');
     Route::post('catalogo/experiencias/{experiencia}/bloques/tts', [BloquesExperienciaSuperAdminController::class, 'tts'])->name('superadmin.catalogo.experiencias.bloques.tts');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa', [BloquesExperienciaSuperAdminController::class, 'crearVistaPrevia'])->name('superadmin.catalogo.experiencias.vista-previa');
-    Route::post('catalogo/experiencias/{experiencia}/vista-previa/foco', [BloquesExperienciaSuperAdminController::class, 'focoVistaPrevia'])->name('superadmin.catalogo.experiencias.vista-previa.foco');
-    Route::post('catalogo/experiencias/{experiencia}/recorrido-nino', [BloquesExperienciaSuperAdminController::class, 'crearRecorridoNino'])->name('superadmin.catalogo.experiencias.recorrido-nino');
     Route::post('catalogo/experiencias/{experiencia}/publicar', [BloquesExperienciaSuperAdminController::class, 'publicar'])->name('superadmin.catalogo.experiencias.publicar');
     Route::put('catalogo/bloques/{bloque}', [BloquesExperienciaSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.bloques.actualizar');
     Route::delete('catalogo/bloques/{bloque}', [BloquesExperienciaSuperAdminController::class, 'eliminar'])->name('superadmin.catalogo.bloques.eliminar');
@@ -559,7 +530,37 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
 
 });
 
-// ── Contenido del ambiente (protegido por sesion del nino) ────────────────
+// ── Sesión del niño + contenido del ambiente ──────────────────────────────
 Route::middleware('sesion.nino')->group(function () {
+    Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
+    Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
     require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
+});
+
+// === PREVIEW TABLET (TEMPORAL — quitar antes de commit) ====================
+// Muestra el recorrido de una clase sin pasar por PIN. ?clase=ID (default 1).
+Route::get('/__preview-camino', function (\Illuminate\Http\Request $request) {
+    $svc = app(\App\Services\RecorridoNinoService::class);
+    $clase = \App\Models\Clase::find((int) $request->query('clase', 1));
+    abort_unless($clase, 404, 'Clase no encontrada');
+    $ambiente = \App\Models\Ambiente::find($clase->ambiente_id);
+    $arbol = $svc->armarArbol($ambiente, null, $clase);
+    $camino = $svc->armarCaminoLineal($arbol, $clase, null);
+    abort_unless($camino, 422, 'No se pudo armar el camino');
+
+    return view('ambientes.kiosco-recorrido', [
+        'ambiente' => $ambiente,
+        'modo' => 'sesion',
+        'ui' => 'camino-lineal',
+        'token' => null,
+        'arbol' => $arbol,
+        'camino' => $camino,
+        'estudiante' => null,
+        'urlExperienciaTemplate' => '/experiencia/__ID__',
+        'urlTts' => '/tts',
+        'urlSalir' => '/salir',
+        'urlContinuar' => '',
+        'portadaImg' => null,
+        'pasoInicial' => 'camino',
+    ]);
 });

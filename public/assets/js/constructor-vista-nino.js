@@ -1,30 +1,51 @@
 /**
- * constructor-vista-nino.js — Overlay tablet / dispositivo real
+ * constructor-vista-nino.js — Vista niño (overlay constructor + player kiosco)
  */
 (function ($) {
     'use strict';
 
-    const modoDispositivo = $('#vnDispositivo').length > 0;
     const $overlay = $('#vnOverlay');
-    if (!modoDispositivo && !$overlay.length) return;
+    const enKiosco = $('#kioscoPane').length > 0;
+    if (!$overlay.length && !enKiosco) return;
 
-    const $root = modoDispositivo ? $('#vnDispositivo') : $('.cx-app').first();
-    const $body = $('#vnScreenBody');
-    const $progress = $('#vnProgress');
-    const $stepLabel = $('#vnStepLabel');
-    const $title = $('#vnTitle');
-    const $blockName = $('#vnBlockName');
-    const $btnPrev = $('#vnBtnPrev');
-    const $btnNext = $('#vnBtnNext');
-    const $tablet = $('#vnTablet');
-    const $stage = $('#vnTabletStage');
-    const $syncBadge = $('#vnSyncBadge');
-    const $expirado = $('#vnExpirado');
-    const $btnFullscreen = $('#vnBtnFullscreen');
+    let $root;
+    let $body;
+    let $progress;
+    let $stepLabel;
+    let $title;
+    let $blockName;
+    let $btnPrev;
+    let $btnNext;
+    let $tablet;
+    let $stage;
+    let $btnFullscreen;
+
+    function esModoDispositivo() {
+        return $('#vnDispositivo').length > 0;
+    }
+
+    function vincularElementos() {
+        $root = esModoDispositivo() ? $('#vnDispositivo') : $('.cx-app').first();
+        $body = $('#vnScreenBody');
+        $progress = $('#vnProgress');
+        $stepLabel = $('#vnStepLabel');
+        $title = $('#vnTitle');
+        $blockName = $('#vnBlockName');
+        $btnPrev = $('#vnBtnPrev');
+        $btnNext = $('#vnBtnNext');
+        $tablet = $('#vnTablet');
+        $stage = $('#vnTabletStage');
+        $btnFullscreen = $('#vnBtnFullscreen');
+    }
+
+    function onBody(events, selector, handler) {
+        $(document).on(events + '.vnBody', '#vnScreenBody ' + selector, handler);
+    }
+
+    vincularElementos();
 
     const SCREEN_W = 1280;
     const SCREEN_H = 800;
-    const POLL_MS = 1200;
 
     let bloques = [];
     let index = 0;
@@ -37,10 +58,7 @@
     let paint = null;
     let paintListeners = [];
     let resizeTimer = null;
-    let pollTimer = null;
-    let versionActual = '';
-    let focoSeqAplicado = 0;
-    let pollEnCurso = false;
+    let alTerminarExperiencia = null;
 
     const PAINT_SIZE_MAP = { s: 6, m: 12, l: 22 };
     const PAINT_DEFAULT_COLORS = [
@@ -49,22 +67,50 @@
         '#EC4899', '#78716C', '#94A3B8', '#64748B',
     ];
 
-    const EMOCIONES = {
-        4: [
-            { id: 'feliz', emoji: '😊', label: 'Feliz' },
-            { id: 'emocionado', emoji: '🤩', label: 'Emocionado' },
-            { id: 'tranquilo', emoji: '😌', label: 'Tranquilo' },
-            { id: 'confundido', emoji: '😕', label: 'Confundido' },
-        ],
-        6: [
-            { id: 'feliz', emoji: '😊', label: 'Feliz' },
-            { id: 'emocionado', emoji: '🤩', label: 'Emocionado' },
-            { id: 'tranquilo', emoji: '😌', label: 'Tranquilo' },
-            { id: 'confundido', emoji: '😕', label: 'Confundido' },
-            { id: 'cansado', emoji: '😴', label: 'Cansado' },
-            { id: 'nervioso', emoji: '😬', label: 'Nervioso' },
-        ],
+    const EMOCION_IDS = {
+        4: ['feliz', 'emocionado', 'tranquilo', 'confundido'],
+        6: ['feliz', 'emocionado', 'tranquilo', 'confundido', 'cansado', 'nervioso'],
     };
+
+    const EMOCION_ETIQUETA = {
+        nino: {
+            feliz: 'Feliz',
+            emocionado: 'Emocionado',
+            tranquilo: 'Tranquilo',
+            confundido: 'Confundido',
+            cansado: 'Cansado',
+            nervioso: 'Nervioso',
+        },
+        nina: {
+            feliz: 'Feliz',
+            emocionado: 'Emocionada',
+            tranquilo: 'Tranquila',
+            confundido: 'Confundida',
+            cansado: 'Cansada',
+            nervioso: 'Nerviosa',
+        },
+    };
+
+    const EMOCION_IMAGEN = {
+        nino: {
+            feliz: 'NIÑO_FELIZ.png',
+            emocionado: 'NIÑO_EMOCIONADO.png',
+            tranquilo: 'NIÑO_TRANQUILO.png',
+            confundido: 'NIÑO_CONFUNDIDO.png',
+            cansado: 'NIÑO_CANSADO.png',
+            nervioso: 'NIÑO_NERVIOSO.png',
+        },
+        nina: {
+            feliz: 'NIÑA_FELIZ.png',
+            emocionado: 'NIÑA_EMOCIONADA.png',
+            tranquilo: 'NIÑA_TRANQUILA.png',
+            confundido: 'NIÑA_CONFUNDIDA.png',
+            cansado: 'NIÑA_CANSADA.png',
+            nervioso: 'NIÑA_NERVIOSA.png',
+        },
+    };
+
+    let estudianteSexo = '';
 
     function escapar(str) {
         return String(str ?? '')
@@ -81,6 +127,39 @@
         return String(mediaBase || '').replace(/\/$/, '') + '/' + s.replace(/^\//, '');
     }
 
+    function emocionesAssetsBase() {
+        const base = $root.data('emociones-base')
+            || $('#rnApp').data('emociones-base')
+            || '/assets/images/emociones';
+        return String(base).replace(/\/$/, '');
+    }
+
+    function normalizarSexoEmocion(valor) {
+        const s = String(valor || '').trim().toLowerCase();
+        if (s === 'femenino' || s === 'f' || s === 'niña' || s === 'nina' || s === 'mujer') return 'nina';
+        return 'nino';
+    }
+
+    function resolverSexoEmocion() {
+        return normalizarSexoEmocion(
+            estudianteSexo
+            || $root.data('estudiante-sexo')
+            || $('#rnApp').data('estudiante-sexo')
+        );
+    }
+
+    function emocionImgUrl(id) {
+        const sexo = resolverSexoEmocion();
+        const archivo = EMOCION_IMAGEN[sexo]?.[id] || EMOCION_IMAGEN.nino[id];
+        if (!archivo) return '';
+        return `${emocionesAssetsBase()}/${encodeURIComponent(archivo)}`;
+    }
+
+    function emocionLabel(id) {
+        const sexo = resolverSexoEmocion();
+        return EMOCION_ETIQUETA[sexo]?.[id] || EMOCION_ETIQUETA.nino[id] || id;
+    }
+
     function datos(bloque) {
         return bloque?.datos || {};
     }
@@ -90,7 +169,7 @@
             ? '<div class="text-center"><span class="vn-badge-warn"><i class="fa-solid fa-triangle-exclamation"></i> Bloque incompleto</span></div>'
             : '';
         const cls = extraClass ? ` vn-card--${escapar(extraClass)}` : '';
-        return `<div class="vn-card${cls}">${warn}${html}</div>`;
+        return `<div class="vn-block-fit"><div class="vn-card${cls}">${warn}${html}</div></div>`;
     }
 
     function instruccionHtml(texto) {
@@ -672,19 +751,21 @@
     function renderEmocion(bloque) {
         const d = datos(bloque);
         const n = String(d.cantidad || '6') === '4' ? 4 : 6;
-        const list = EMOCIONES[n];
+        const list = EMOCION_IDS[n];
         return wrap(`
             <h2 class="vn-title">Ahora cuéntame, ¿cómo te sentiste?</h2>
             ${instruccionHtml(d.instruccion)}
-            <div class="vn-emociones" data-vn-emocion>
-                ${list.map((e) => `
-                    <button type="button" class="vn-emocion" data-id="${e.id}">
-                        <span class="vn-op-emoji">${e.emoji}</span>
-                        ${escapar(e.label)}
-                    </button>
-                `).join('')}
+            <div class="vn-emociones" data-vn-emocion data-count="${n}" data-sexo="${escapar(resolverSexoEmocion())}">
+                ${list.map((id) => {
+                    const label = emocionLabel(id);
+                    const imgUrl = emocionImgUrl(id);
+                    return `<button type="button" class="vn-emocion" data-id="${escapar(id)}">
+                        <img class="vn-emocion-img" src="${escapar(imgUrl)}" alt="${escapar(label)}">
+                        <span class="vn-emocion-label">${escapar(label)}</span>
+                    </button>`;
+                }).join('')}
             </div>
-        `, bloque);
+        `, bloque, 'emocion');
     }
 
     function renderRecompensa(bloque) {
@@ -752,12 +833,12 @@
     }
 
     function overlayAbierto() {
-        if (modoDispositivo) return !$expirado.length || $expirado.prop('hidden');
+        if (esModoDispositivo()) return true;
         return !$overlay.prop('hidden');
     }
 
     function ajustarEscalaTablet() {
-        if (modoDispositivo || !$tablet.length || !overlayAbierto()) return;
+        if (esModoDispositivo() || !$tablet.length || !overlayAbierto()) return;
 
         $tablet.css('transform', 'none');
         const padX = 48;
@@ -781,6 +862,96 @@
         }
     }
 
+    function ajustarBloqueAlViewport() {
+        if (!$body || !$body.length || !overlayAbierto()) return;
+
+        const $fit = $body.children('.vn-block-fit').first();
+        const $card = $fit.length ? $fit.children('.vn-card').first() : $body.children('.vn-card').first();
+        if (!$card.length) return;
+
+        $card.css({ transform: 'none', marginTop: '', marginBottom: '' });
+
+        const bodyEl = $body[0];
+        const cardEl = $card[0];
+        const availW = bodyEl.clientWidth;
+        const availH = bodyEl.clientHeight;
+        if (availW <= 0 || availH <= 0) return;
+
+        const naturalW = cardEl.scrollWidth;
+        const naturalH = cardEl.scrollHeight;
+        if (naturalW <= 0 || naturalH <= 0) return;
+
+        let scale = Math.min(availW / naturalW, availH / naturalH, 1);
+        if (scale >= 0.999) return;
+
+        scale = Math.max(0.42, scale);
+        const visualH = naturalH * scale;
+        const padTop = Math.max(0, (availH - visualH) / 2);
+
+        $card.css({
+            transform: `scale(${scale})`,
+            transformOrigin: 'top center',
+            marginTop: padTop + 'px',
+            marginBottom: (visualH - naturalH) + 'px',
+        });
+    }
+
+    function ajustarCanvasPaint() {
+        const canvas = document.getElementById('vnCanvas');
+        if (!canvas || !drawCtx || !paint) return;
+        const stage = canvas.closest('.vn-paint-stage');
+        if (!stage) return;
+
+        const rect = stage.getBoundingClientRect();
+        const w = Math.round(Math.max(200, rect.width));
+        const h = Math.round(Math.max(160, rect.height));
+        if (w <= 0 || h <= 0) return;
+        if (canvas.width === w && canvas.height === h) return;
+
+        let snap = null;
+        try {
+            snap = canvas.toDataURL();
+        } catch (e) { /* noop */ }
+
+        canvas.width = w;
+        canvas.height = h;
+
+        if (snap) {
+            const img = new Image();
+            img.onload = function () {
+                if (!drawCtx || !paint) return;
+                if (paint.mode === 'dibujo' && !paint.hasFondo) {
+                    drawCtx.fillStyle = '#ffffff';
+                    drawCtx.fillRect(0, 0, w, h);
+                }
+                drawCtx.drawImage(img, 0, 0, w, h);
+                paint.history = [];
+                paintSaveState();
+            };
+            img.src = snap;
+            return;
+        }
+
+        if (paint.mode === 'dibujo' && !paint.hasFondo) {
+            drawCtx.fillStyle = '#ffffff';
+            drawCtx.fillRect(0, 0, w, h);
+        }
+        paint.history = [];
+        paintSaveState();
+    }
+
+    function programarAjusteLayout() {
+        requestAnimationFrame(function () {
+            ajustarEscalaTablet();
+            ajustarBloqueAlViewport();
+            ajustarCanvasPaint();
+            requestAnimationFrame(function () {
+                ajustarBloqueAlViewport();
+                ajustarCanvasPaint();
+            });
+        });
+    }
+
     function pintar() {
         if (typeof limpiarDragArrastrar === 'function') limpiarDragArrastrar();
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
@@ -800,11 +971,18 @@
         $blockName.text(bloque.nombre || bloque.tipo);
         $body.html(renderBloque(bloque));
         $btnPrev.prop('disabled', index <= 0);
-        $btnNext.prop('disabled', index >= bloques.length - 1);
+        const esUltimoBloque = index >= bloques.length - 1;
+        if (alTerminarExperiencia && esUltimoBloque) {
+            $btnNext.prop('disabled', false);
+            $btnNext.find('span').first().text('Seguir');
+        } else {
+            $btnNext.find('span').first().text('Siguiente');
+            $btnNext.prop('disabled', esUltimoBloque);
+        }
         renderProgress();
         initInteracciones(bloque);
         $body.scrollTop(0);
-        requestAnimationFrame(ajustarEscalaTablet);
+        programarAjusteLayout();
     }
 
     let ttsToken = 0;
@@ -955,9 +1133,9 @@
         }
 
         $body.find('.vn-tts-replay').addClass('is-speaking');
-        const ttsUrl = (modoDispositivo ? $root.data('url-tts') : $('.cx-app').data('url-tts')) || '';
+        const ttsUrl = (esModoDispositivo() ? $root.data('url-tts') : $('.cx-app').data('url-tts')) || '';
         const csrf = $('meta[name="csrf-token"]').attr('content');
-        const ttsGet = modoDispositivo;
+        const ttsGet = esModoDispositivo();
 
         const terminar = function () {
             if (myToken !== ttsToken) return;
@@ -1002,6 +1180,7 @@
             // Solo una reproducción neuronal; no mezclar con voz del navegador.
             player.src = src;
             player.onended = terminar;
+            player.onerror = terminar;
             const p = player.play();
             if (p && typeof p.then === 'function') {
                 p.then(function () {
@@ -1279,9 +1458,6 @@
         if (bloque.tipo === 'video') {
             setVideoUi('idle');
         }
-        if (bloque.tipo === 'bienvenida' && (datos(bloque).tipo_media || '') === 'video') {
-            reproducirVideoBienvenida();
-        }
         if (bloque.tipo === 'historia') {
             const texto = String(datos(bloque).instruccion || '').trim();
             if (historiaPage === 0 && texto) {
@@ -1289,6 +1465,8 @@
             } else {
                 iniciarAudioHistoria();
             }
+        } else if (bloque.tipo === 'bienvenida' && (datos(bloque).tipo_media || '') === 'video') {
+            reproducirVideoBienvenida();
         } else {
             const texto = String(datos(bloque).instruccion || '').trim();
             if (texto) hablarTexto(texto);
@@ -1352,7 +1530,6 @@
             $btn.addClass('is-playing');
             $icon.html('<i class="fa-solid fa-volume-high"></i>');
             $label.text('Sonando…');
-            $status.prop('hidden', false).text('Sonando…');
         } else if (estado === 'done') {
             $btn.addClass('is-done');
             $icon.html('<i class="fa-solid fa-rotate-right"></i>');
@@ -1483,8 +1660,16 @@
         pintar();
     }
 
+    function alClicSiguiente() {
+        if (alTerminarExperiencia && index >= bloques.length - 1) {
+            alTerminarExperiencia();
+            return;
+        }
+        ir(1);
+    }
+
     function abrir() {
-        if (modoDispositivo) return;
+        if (esModoDispositivo()) return;
         if (window.speechSynthesis) {
             try { window.speechSynthesis.getVoices(); } catch (e) { /* noop */ }
         }
@@ -1495,6 +1680,9 @@
             const meta = api.getMeta ? api.getMeta() : {};
             mediaBase = meta.mediaBase || $('.cx-app').data('media-base') || '';
             experienciaNombre = meta.nombre || 'Experiencia';
+            estudianteSexo = normalizarSexoEmocion(
+                meta.estudianteSexo || $('.cx-app').data('estudiante-sexo')
+            );
         } else {
             try {
                 bloques = JSON.parse(document.getElementById('cx-bloques-iniciales')?.textContent || '[]');
@@ -1503,6 +1691,7 @@
             }
             mediaBase = $('.cx-app').data('media-base') || '';
             experienciaNombre = $('.cx-app').data('experiencia-nombre') || 'Experiencia';
+            estudianteSexo = normalizarSexoEmocion($('.cx-app').data('estudiante-sexo'));
         }
 
         if (!bloques.length) {
@@ -1521,13 +1710,11 @@
         $('body').css('overflow', 'hidden');
         pintar();
         requestAnimationFrame(function () {
-            ajustarEscalaTablet();
-            requestAnimationFrame(ajustarEscalaTablet);
+            programarAjusteLayout();
         });
     }
 
-    function cerrar() {
-        if (modoDispositivo) return;
+    function limpiarMediosPlayer() {
         if (typeof limpiarDragArrastrar === 'function') limpiarDragArrastrar();
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
         if (typeof limpiarDragSecuencia === 'function') limpiarDragSecuencia();
@@ -1536,91 +1723,19 @@
         detenerVideoBloque();
         detenerAudioHistoria();
         detenerVoz();
+        if ($body && $body.length) {
+            $body.find('audio, video').each(function () {
+                try { this.pause(); } catch (e) { /* noop */ }
+            });
+        }
+    }
+
+    function cerrar() {
+        if (esModoDispositivo()) return;
+        limpiarMediosPlayer();
         $overlay.prop('hidden', true).attr('aria-hidden', 'true');
         $('body').css('overflow', '');
         $tablet.css('transform', 'none');
-        $body.find('audio, video').each(function () {
-            try { this.pause(); } catch (e) { /* noop */ }
-        });
-    }
-
-    function aplicarEstadoRemoto(data) {
-        if (!data) return;
-        const focoSeq = Number(data.foco_seq || 0);
-        const idActual = bloques[index] ? Number(bloques[index].id) : null;
-        let debePintar = false;
-
-        if (Array.isArray(data.bloques)) {
-            bloques = data.bloques;
-            debePintar = true;
-        }
-        if (data.nombre) experienciaNombre = data.nombre;
-        if (data.media_base) mediaBase = data.media_base;
-        if (data.version) versionActual = data.version;
-
-        if (focoSeq > focoSeqAplicado && data.foco_bloque_id) {
-            const i = bloques.findIndex((b) => Number(b.id) === Number(data.foco_bloque_id));
-            if (i >= 0) {
-                index = i;
-                historiaPage = 0;
-                retoPaso = 0;
-                debePintar = true;
-            }
-            focoSeqAplicado = focoSeq;
-        } else if (debePintar && idActual) {
-            const i = bloques.findIndex((b) => Number(b.id) === idActual);
-            index = i >= 0 ? i : Math.min(index, Math.max(0, bloques.length - 1));
-            historiaPage = 0;
-            retoPaso = 0;
-        }
-
-        if (debePintar) pintar();
-        if ($syncBadge.length) {
-            $syncBadge.prop('hidden', false).text('Sincronizado');
-            clearTimeout($syncBadge.data('hideTimer'));
-            $syncBadge.data('hideTimer', setTimeout(function () {
-                $syncBadge.prop('hidden', true);
-            }, 1600));
-        }
-    }
-
-    function marcarExpirado() {
-        if (pollTimer) {
-            clearInterval(pollTimer);
-            pollTimer = null;
-        }
-        if ($expirado.length) $expirado.prop('hidden', false);
-        detenerVoz();
-        detenerAudioBloque();
-        detenerVideoBloque();
-        detenerAudioHistoria();
-    }
-
-    function pollEstado() {
-        if (pollEnCurso || !modoDispositivo) return;
-        const url = $root.data('url-estado');
-        if (!url) return;
-        pollEnCurso = true;
-        $.ajax({
-            url,
-            method: 'GET',
-            data: { version: versionActual || '' },
-            headers: { Accept: 'application/json' },
-        }).done(function (res) {
-            if (!res || !res.success || !res.data) return;
-            if (res.data.version && res.data.version === versionActual && !Array.isArray(res.data.bloques)) {
-                const focoSeq = Number(res.data.foco_seq || 0);
-                if (focoSeq > focoSeqAplicado && res.data.foco_bloque_id) {
-                    aplicarEstadoRemoto(res.data);
-                }
-                return;
-            }
-            aplicarEstadoRemoto(res.data);
-        }).fail(function (xhr) {
-            if (xhr && xhr.status === 410) marcarExpirado();
-        }).always(function () {
-            pollEnCurso = false;
-        });
     }
 
     function estaEnFullscreen() {
@@ -1695,86 +1810,58 @@
         $(document).on('fullscreenchange.vnFs webkitfullscreenchange.vnFs MSFullscreenChange.vnFs', actualizarBtnFullscreen);
     }
 
-    function iniciarDispositivo() {
-        try {
-            bloques = JSON.parse(document.getElementById('vn-bloques-iniciales')?.textContent || '[]');
-        } catch (e) {
-            bloques = [];
-        }
-        mediaBase = $root.data('media-base') || '';
-        experienciaNombre = $root.data('experiencia-nombre') || 'Experiencia';
-        versionActual = String($root.data('version') || '');
-        index = 0;
-        historiaPage = 0;
-        retoPaso = 0;
-        desbloquearAudioTts();
-        pintar();
-        if ($root.data('url-estado')) {
-            pollTimer = setInterval(pollEstado, POLL_MS);
-        }
-        asegurarHandlersFullscreen();
-        actualizarBtnFullscreen();
-
-        // La API de fullscreen exige un gesto del usuario (toque).
-        let intentoFs = false;
-        const intentarFsUnaVez = function () {
-            if (intentoFs || estaEnFullscreen()) return;
-            intentoFs = true;
-            pedirFullscreen().finally(actualizarBtnFullscreen);
-        };
-        $(document).one('pointerdown.vnFsAuto touchstart.vnFsAuto click.vnFsAuto', intentarFsUnaVez);
-    }
-
     function iniciarDispositivoCon(opts) {
+        vincularElementos();
         opts = opts || {};
-        if (pollTimer) {
-            clearInterval(pollTimer);
-            pollTimer = null;
-        }
         bloques = Array.isArray(opts.bloques) ? opts.bloques : [];
         mediaBase = opts.mediaBase || '';
         experienciaNombre = opts.experienciaNombre || 'Experiencia';
-        versionActual = '';
+        estudianteSexo = normalizarSexoEmocion(
+            opts.estudianteSexo
+            || $root.data('estudiante-sexo')
+            || $('#rnApp').data('estudiante-sexo')
+        );
+        alTerminarExperiencia = typeof opts.alTerminarExperiencia === 'function'
+            ? opts.alTerminarExperiencia
+            : null;
         index = 0;
         historiaPage = 0;
         retoPaso = 0;
         intentosRestantes = null;
         desbloquearAudioTts();
         pintar();
-        if (opts.poll && $root.data('url-estado')) {
-            pollTimer = setInterval(pollEstado, POLL_MS);
-        }
         asegurarHandlersFullscreen();
         actualizarBtnFullscreen();
     }
 
     function detenerDispositivo() {
-        if (pollTimer) {
-            clearInterval(pollTimer);
-            pollTimer = null;
-        }
+        vincularElementos();
+        limpiarMediosPlayer();
         bloques = [];
         index = 0;
-        $body.empty();
+        alTerminarExperiencia = null;
+        if ($body && $body.length) $body.empty();
+        $('body').removeClass('rn-player-activo');
     }
 
     window.VistaNino = {
         iniciar: iniciarDispositivoCon,
         detener: detenerDispositivo,
+        vincular: vincularElementos,
     };
 
     /* ── Eventos UI ──────────────────────────────────────────── */
 
-    if (!modoDispositivo) {
+    if (!esModoDispositivo()) {
         $('#cxBtnVistaNino').on('click', abrir);
         $overlay.on('click', '[data-vn-close]', cerrar);
     }
-    $btnPrev.on('click', () => ir(-1));
-    $btnNext.on('click', () => ir(1));
+    $(document).on('click.vnNav', '#vnBtnPrev', () => ir(-1));
+    $(document).on('click.vnNav', '#vnBtnNext', () => alClicSiguiente());
 
     $(document).on('keydown', function (e) {
         if (!overlayAbierto()) return;
-        if (!modoDispositivo && e.key === 'Escape') cerrar();
+        if (!esModoDispositivo() && e.key === 'Escape') cerrar();
         const bloque = bloques[index];
         if (bloque && bloque.tipo === 'historia') {
             const total = totalPaginasHistoria(bloque);
@@ -1790,27 +1877,27 @@
             }
         }
         if (e.key === 'ArrowLeft') ir(-1);
-        if (e.key === 'ArrowRight') ir(1);
+        if (e.key === 'ArrowRight') alClicSiguiente();
     });
 
-    $body.on('click', '[data-vn-hist-prev]', function () {
+    onBody('click', '[data-vn-hist-prev]', function () {
         if ($(this).prop('disabled')) return;
         navegarHistoria(-1);
     });
 
-    $body.on('click', '[data-vn-hist-next]', function () {
+    onBody('click', '[data-vn-hist-next]', function () {
         if ($(this).prop('disabled')) return;
         navegarHistoria(1);
     });
 
-    $body.on('click', '[data-vn-tts-replay]', function (e) {
+    onBody('click', '[data-vn-tts-replay]', function (e) {
         e.stopPropagation();
         const texto = $(this).closest('[data-vn-tts-text]').attr('data-vn-tts-text')
             || $(this).closest('.vn-instruccion').text();
         hablarTexto(texto);
     });
 
-    $body.on('click', '[data-vn-audio-play]', function () {
+    onBody('click', '[data-vn-audio-play]', function () {
         const $btn = $(this);
         const audio = $body.find('.vn-audio-el')[0];
         if (!audio) return;
@@ -1825,18 +1912,18 @@
         reproducirAudioConReps();
     });
 
-    $body.on('click', '[data-vn-video-play]', function () {
+    onBody('click', '[data-vn-video-play]', function () {
         reproducirVideo();
     });
 
-    $body.on('click', '[data-vn-paint-tool]', function () {
+    onBody('click', '[data-vn-paint-tool]', function () {
         if (!paint) return;
         paint.tool = String($(this).data('vn-paint-tool'));
         $body.find('[data-vn-paint-tool]').removeClass('is-on');
         $(this).addClass('is-on');
     });
 
-    $body.on('click', '[data-vn-paint-size]', function () {
+    onBody('click', '[data-vn-paint-size]', function () {
         if (!paint) return;
         const key = String($(this).data('vn-paint-size'));
         paint.lineWidth = PAINT_SIZE_MAP[key] || PAINT_SIZE_MAP.m;
@@ -1858,33 +1945,33 @@
         });
     }
 
-    $body.on('click', '[data-vn-paint-color]', function () {
+    onBody('click', '[data-vn-paint-color]', function () {
         paintSelectColor(String($(this).data('vn-paint-color')));
     });
 
-    $body.on('input change', '.vn-paint-color-input', function () {
+    onBody('input change', '.vn-paint-color-input', function () {
         const color = String(this.value || '');
         paintSelectColor(color);
         $body.find('[data-vn-paint-color]').removeClass('is-on');
     });
 
-    $body.on('click', '[data-vn-paint-undo]', function () {
+    onBody('click', '[data-vn-paint-undo]', function () {
         if ($(this).prop('disabled')) return;
         paintUndo();
     });
 
-    $body.on('click', '[data-vn-evidencia]', function () {
+    onBody('click', '[data-vn-evidencia]', function () {
         $('#vnEvidenciaMsg').prop('hidden', false);
         $(this).css('transform', 'scale(0.92)');
         setTimeout(() => $(this).css('transform', ''), 180);
     });
 
-    $body.on('click', '[data-vn-emocion] .vn-emocion', function () {
+    onBody('click', '[data-vn-emocion] .vn-emocion', function () {
         $body.find('.vn-emocion').removeClass('is-picked');
         $(this).addClass('is-picked');
     });
 
-    $body.on('click', '[data-vn-pregunta] .vn-option', function () {
+    onBody('click', '[data-vn-pregunta] .vn-option', function () {
         const $box = $body.find('[data-vn-pregunta]');
         if ($box.data('locked')) return;
         const ok = String($(this).data('correcta')) === '1';
@@ -1906,7 +1993,7 @@
         }
     });
 
-    $body.on('click', '[data-vn-reto] .vn-option', function () {
+    onBody('click', '[data-vn-reto] .vn-option', function () {
         const $box = $body.find('[data-vn-reto]');
         if ($box.data('locked')) return;
         const ok = String($(this).data('correcta')) === '1';
@@ -1942,14 +2029,14 @@
         }
     });
 
-    $body.on('click', '[data-vn-emparejar] [data-vn-izq]', function () {
+    onBody('click', '[data-vn-emparejar] [data-vn-izq]', function () {
         if ($(this).hasClass('is-matched')) return;
         $body.find('[data-vn-izq]').removeClass('is-selected');
         $(this).addClass('is-selected');
         $body.data('emp-izq', Number($(this).data('vn-izq')));
     });
 
-    $body.on('click', '[data-vn-emparejar] [data-vn-der]', function () {
+    onBody('click', '[data-vn-emparejar] [data-vn-der]', function () {
         if ($(this).hasClass('is-matched')) return;
         const izq = $body.data('emp-izq');
         if (izq === null || izq === undefined) return;
@@ -1966,7 +2053,7 @@
         $body.data('emp-izq', null);
     });
 
-    $body.on('click', '[data-vn-clasif-pool] [data-vn-item]', function () {
+    onBody('click', '[data-vn-clasif-pool] [data-vn-item]', function () {
         if ($(this).hasClass('is-matched') || $(this).prop('hidden')) return;
         $body.find('[data-vn-clasif-pool] .vn-chip').removeClass('is-selected');
         $(this).addClass('is-selected');
@@ -1974,7 +2061,7 @@
         $body.find('[data-vn-clasif] .vn-zone').addClass('is-target');
     });
 
-    $body.on('click', '[data-vn-clasif] .vn-zone', function () {
+    onBody('click', '[data-vn-clasif] .vn-zone', function () {
         const $item = $body.data('pick-item');
         if (!$item || !$item.length) return;
         const ok = String($item.data('cat')) === String($(this).data('vn-cat'));
@@ -2006,7 +2093,7 @@
         return el.closest('[data-vn-arrastrar] .vn-zone');
     }
 
-    $body.on('pointerdown', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
+    onBody('pointerdown', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
         if ($(this).hasClass('is-matched')) return;
         if (e.button != null && e.button !== 0) return;
         e.preventDefault();
@@ -2034,7 +2121,7 @@
         });
     });
 
-    $body.on('pointermove', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
+    onBody('pointermove', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
         const drag = $body.data('vn-drag');
         if (!drag || drag.pointerId !== e.pointerId) return;
         e.preventDefault();
@@ -2048,7 +2135,7 @@
         if (zone) zone.classList.add('is-drop-hover');
     });
 
-    $body.on('pointerup pointercancel', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
+    onBody('pointerup pointercancel', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
         const drag = $body.data('vn-drag');
         if (!drag || drag.pointerId !== e.pointerId) return;
         const zone = zonaBajoPuntero(e.clientX, e.clientY);
@@ -2090,7 +2177,7 @@
         }
     }
 
-    $body.on('pointerdown', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
+    onBody('pointerdown', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
         if ($(this).hasClass('is-placed')) return;
         if (e.button != null && e.button !== 0) return;
         e.preventDefault();
@@ -2118,7 +2205,7 @@
         });
     });
 
-    $body.on('pointermove', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
+    onBody('pointermove', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
         const drag = $body.data('vn-puzzle-drag');
         if (!drag || drag.pointerId !== e.pointerId) return;
         e.preventDefault();
@@ -2130,7 +2217,7 @@
         if (slot) slot.classList.add('is-drop-hover');
     });
 
-    $body.on('pointerup pointercancel', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
+    onBody('pointerup pointercancel', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
         const drag = $body.data('vn-puzzle-drag');
         if (!drag || drag.pointerId !== e.pointerId) return;
         const slot = slotPuzzleBajoPuntero(e.clientX, e.clientY);
@@ -2182,7 +2269,7 @@
         }
     }
 
-    $body.on('pointerdown', '[data-vn-seq-card]', function (e) {
+    onBody('pointerdown', '[data-vn-seq-card]', function (e) {
         if ($(this).prop('disabled')) return;
         if (e.button != null && e.button !== 0) return;
         e.preventDefault();
@@ -2209,7 +2296,7 @@
         });
     });
 
-    $body.on('pointermove', '[data-vn-seq-card]', function (e) {
+    onBody('pointermove', '[data-vn-seq-card]', function (e) {
         const drag = $body.data('vn-seq-drag');
         if (!drag || drag.pointerId !== e.pointerId) return;
         e.preventDefault();
@@ -2221,7 +2308,7 @@
         if (target) target.classList.add('is-drop-hover');
     });
 
-    $body.on('pointerup pointercancel', '[data-vn-seq-card]', function (e) {
+    onBody('pointerup pointercancel', '[data-vn-seq-card]', function (e) {
         const drag = $body.data('vn-seq-drag');
         if (!drag || drag.pointerId !== e.pointerId) return;
         const target = cardSecuenciaBajoPuntero(e.clientX, e.clientY, drag.$card[0]);
@@ -2239,7 +2326,7 @@
         revisarSecuenciaOrden();
     });
 
-    $body.on('click', '[data-vn-memory] .vn-memory-card', function () {
+    onBody('click', '[data-vn-memory] .vn-memory-card', function () {
         const $card = $(this);
         if ($card.hasClass('is-flipped') || $card.hasClass('is-done')) return;
         let flipped = $body.data('mem-flipped') || [];
@@ -2272,15 +2359,15 @@
         }
     });
 
-    $(window).on('resize', function () {
+    $(window).on('resize orientationchange', function () {
         if (!overlayAbierto()) return;
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(ajustarEscalaTablet, 80);
+        resizeTimer = setTimeout(programarAjusteLayout, 80);
     });
 
     // Per-block eye button in timeline → open at that block
     $(document).on('click', '.cx-btn-preview', function (e) {
-        if (modoDispositivo) return;
+        if (esModoDispositivo()) return;
         e.preventDefault();
         e.stopPropagation();
         const id = Number($(this).data('id'));
@@ -2296,12 +2383,9 @@
         }
     });
 
-    if (modoDispositivo) {
+    if (esModoDispositivo()) {
         const defer = String($root.data('vn-defer') || '') === '1';
-        if (!defer) {
-            iniciarDispositivo();
-        } else {
-            // Recorrido niño: el player arranca después; dejar el botón listo.
+        if (defer) {
             asegurarHandlersFullscreen();
             actualizarBtnFullscreen();
         }

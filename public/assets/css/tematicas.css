@@ -8,10 +8,13 @@
 .tematicas-page-header,
 .tematicas-app,
 .experiencias-app,
+.clases-app,
 #modalTematica,
 #modalSelectorDba,
 #modalExperienciaRapida,
-#modalSeleccionTematicaExp {
+#modalSeleccionTematicaExp,
+#modalCrearClase,
+.exp-wizard-modal {
     --tm-text: var(--color-text, #1E293B);
     --tm-ink: #0F172A;
     --tm-soft: var(--color-text-soft, #334155);
@@ -77,6 +80,8 @@
 /* ── Tokens compartidos (star / colegio / empty / pager) ─────── */
 .tematicas-app .star,
 .experiencias-app .star,
+.clases-app .star,
+.exp-wizard-modal .star,
 #modalTematica .star {
     font-size: 11px;
     background: var(--tm-star-bg);
@@ -93,6 +98,8 @@
 
 .tematicas-app .badge-colegio,
 .experiencias-app .badge-colegio,
+.clases-app .badge-colegio,
+.exp-wizard-modal .badge-colegio,
 #modalTematica .badge-colegio {
     font-size: 11px;
     background: var(--tm-colegio-bg);
@@ -109,7 +116,9 @@
 .tematicas-app .cfg-empty,
 .tematicas-app .tematicas-empty,
 .experiencias-app .cfg-empty,
-.experiencias-app .experiencias-empty {
+.experiencias-app .experiencias-empty,
+.clases-app .cfg-empty,
+.exp-wizard-modal .cfg-empty {
     padding: 28px 18px;
     text-align: center;
     color: var(--tm-muted);
@@ -998,12 +1007,12 @@
     }
 }
 
-/* ── Wizard selección temática (experiencias) ───────────────── */
-#modalSeleccionTematicaExp .exp-wizard-meta {
+/* ── Wizard selección temática / nueva clase ───────────────── */
+.exp-wizard-modal .exp-wizard-meta {
     margin-bottom: 4px;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-paso-label {
+.exp-wizard-modal .exp-wizard-paso-label {
     font-size: .78rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -1011,13 +1020,13 @@
     color: var(--tm-muted);
 }
 
-#modalSeleccionTematicaExp .exp-wizard-instruction {
+.exp-wizard-modal .exp-wizard-instruction {
     font-size: 1rem;
     font-weight: 600;
     color: var(--tm-ink);
 }
 
-#modalSeleccionTematicaExp .exp-wizard-breadcrumb {
+.exp-wizard-modal .exp-wizard-breadcrumb {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1025,7 +1034,7 @@
     margin-bottom: 2px;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-crumb {
+.exp-wizard-modal .exp-wizard-crumb {
     appearance: none;
     border: none;
     background: var(--tm-primary-soft);
@@ -1037,24 +1046,31 @@
     cursor: pointer;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-crumb:hover,
-#modalSeleccionTematicaExp .exp-wizard-crumb:focus-visible {
+.exp-wizard-modal .exp-wizard-crumb:hover,
+.exp-wizard-modal .exp-wizard-crumb:focus-visible {
     background: var(--tm-primary-mid);
     outline: none;
     box-shadow: var(--tm-focus);
 }
 
-#modalSeleccionTematicaExp .exp-wizard-crumb-sep {
+.exp-wizard-modal .exp-wizard-crumb[disabled],
+.exp-wizard-modal .exp-wizard-crumb:disabled {
+    cursor: default;
+    opacity: .85;
+    pointer-events: none;
+}
+
+.exp-wizard-modal .exp-wizard-crumb-sep {
     color: var(--tm-muted-light);
     font-size: .85rem;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-loading,
-#modalSeleccionTematicaExp .exp-wizard-empty {
+.exp-wizard-modal .exp-wizard-loading,
+.exp-wizard-modal .exp-wizard-empty {
     margin-top: 8px;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-card {
+.exp-wizard-modal .exp-wizard-card {
     height: 100%;
     background: var(--tm-surface);
     border: 1px solid var(--tm-border);
@@ -1065,27 +1081,27 @@
     overflow: hidden;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-card:hover,
-#modalSeleccionTematicaExp .exp-wizard-card:focus-visible {
+.exp-wizard-modal .exp-wizard-card:hover,
+.exp-wizard-modal .exp-wizard-card:focus-visible {
     transform: translateY(-4px) scale(1.01);
     box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
     border-color: #93C5FD;
     outline: none;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-ambiente-franja {
+.exp-wizard-modal .exp-wizard-ambiente-franja {
     height: 6px;
     border-radius: 14px 14px 0 0;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-ambiente-body {
+.exp-wizard-modal .exp-wizard-ambiente-body {
     display: flex;
     align-items: center;
     gap: 14px;
     padding: 18px 18px 0;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-ambiente-icono {
+.exp-wizard-modal .exp-wizard-ambiente-icono {
     width: 48px;
     height: 48px;
     border-radius: 12px;
@@ -1096,12 +1112,12 @@
     flex-shrink: 0;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-ambiente-info {
+.exp-wizard-modal .exp-wizard-ambiente-info {
     flex: 1;
     min-width: 0;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-ambiente-stats {
+.exp-wizard-modal .exp-wizard-ambiente-stats {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -1109,7 +1125,7 @@
     align-items: center;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-stat {
+.exp-wizard-modal .exp-wizard-stat {
     white-space: nowrap;
     flex: 1;
     text-align: center;
@@ -1119,27 +1135,27 @@
     border-radius: 99px;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-stat-azul {
+.exp-wizard-modal .exp-wizard-stat-azul {
     background: #EFF6FF;
     color: #1D4ED8;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-stat-verde {
+.exp-wizard-modal .exp-wizard-stat-verde {
     background: #F0FDF4;
     color: #166534;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-item-card {
+.exp-wizard-modal .exp-wizard-item-card {
     padding: 16px;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-item-top {
+.exp-wizard-modal .exp-wizard-item-top {
     display: flex;
     align-items: flex-start;
     gap: 12px;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-item-icon {
+.exp-wizard-modal .exp-wizard-item-icon {
     width: 42px;
     height: 42px;
     border-radius: 10px;
@@ -1151,40 +1167,210 @@
     flex-shrink: 0;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-item-info {
+.exp-wizard-modal .exp-wizard-item-info {
     flex: 1;
     min-width: 0;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-card-title {
+.exp-wizard-modal .exp-wizard-card-title {
     font-size: .98rem;
     font-weight: 700;
     color: var(--tm-ink);
     line-height: 1.25;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-card-badges {
+.exp-wizard-modal .exp-wizard-card-badges {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-card-meta {
+.exp-wizard-modal .exp-wizard-card-meta {
     font-size: .78rem;
     color: var(--tm-muted);
 }
 
-#modalSeleccionTematicaExp .exp-wizard-card-arrow {
+.exp-wizard-modal .exp-wizard-card-arrow {
     color: var(--tm-muted-light);
     margin-top: 4px;
     flex-shrink: 0;
     transition: transform .2s ease, color .2s ease;
 }
 
-#modalSeleccionTematicaExp .exp-wizard-card:hover .exp-wizard-card-arrow,
-#modalSeleccionTematicaExp .exp-wizard-card:focus-visible .exp-wizard-card-arrow {
+.exp-wizard-modal .exp-wizard-card:hover .exp-wizard-card-arrow,
+.exp-wizard-modal .exp-wizard-card:focus-visible .exp-wizard-card-arrow {
     transform: translateX(3px);
     color: var(--tm-primary-hover);
+}
+
+/* ── Réplica de clase en grupos del grado ───────────────────── */
+.exp-wizard-modal .clase-replica-card {
+    background: var(--tm-surface);
+    border: 1px solid var(--tm-border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.exp-wizard-modal .clase-replica-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.exp-wizard-modal .clase-replica-card-title {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--tm-ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.exp-wizard-modal .clase-replica-card-title i {
+    color: var(--tm-primary-hover);
+}
+
+.exp-wizard-modal .clase-replica-card-hint {
+    font-size: .8rem;
+    color: var(--tm-muted);
+}
+
+.exp-wizard-modal .clase-replica-card-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.exp-wizard-modal .clase-replica-grupo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin: 0;
+    padding: 12px 14px;
+    border: 1px solid var(--tm-border);
+    border-radius: 12px;
+    background: var(--tm-surface-soft);
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.exp-wizard-modal .clase-replica-grupo:hover {
+    border-color: #93C5FD;
+    background: #fff;
+}
+
+.exp-wizard-modal .clase-replica-grupo:has(.clase-replica-check:checked) {
+    border-color: #93C5FD;
+    background: var(--tm-primary-soft);
+    box-shadow: 0 0 0 1px #BFDBFE inset;
+}
+
+.exp-wizard-modal .clase-replica-grupo.es-actual {
+    border-color: #93C5FD;
+}
+
+.exp-wizard-modal .clase-replica-grupo-nombre {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--tm-ink);
+}
+
+.exp-wizard-modal .clase-replica-badge {
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    padding: 2px 7px;
+    border-radius: 99px;
+    background: var(--tm-primary-mid);
+    color: var(--tm-primary-hover);
+}
+
+.exp-wizard-modal .clase-replica-check {
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.exp-wizard-modal .exp-wizard-card--usada {
+    cursor: not-allowed;
+    border-color: #CBD5E1;
+    background: var(--tm-surface-soft);
+    box-shadow: none;
+    pointer-events: none;
+}
+
+.exp-wizard-modal .exp-wizard-card--usada .exp-wizard-item-icon {
+    background: #E2E8F0;
+    color: #64748B;
+}
+
+.exp-wizard-modal .exp-wizard-card--usada .exp-wizard-card-title {
+    color: var(--tm-muted);
+}
+
+.exp-wizard-modal .exp-wizard-card--usada .exp-wizard-card-arrow {
+    color: #16A34A;
+}
+
+.exp-wizard-modal .clase-exp-badge-usada {
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    padding: 2px 7px;
+    border-radius: 99px;
+    background: #FEF3C7;
+    color: #B45309;
+}
+
+.exp-wizard-modal .exp-wizard-card--seleccionada {
+    border-color: var(--tm-primary, #2563EB);
+    background: #EFF6FF;
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, .25);
+}
+
+.exp-wizard-modal .exp-wizard-card--seleccionada .exp-wizard-card-arrow {
+    color: #2563EB;
+}
+
+.exp-wizard-modal .clase-wizard-exp-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--tm-surface-soft, #F8FAFC);
+    border: 1px solid #E2E8F0;
+}
+
+.exp-wizard-modal .clase-wizard-exp-bar-text {
+    color: #334155;
+    font-size: .92rem;
+}
+
+.exp-wizard-modal .clase-replica-grupo.es-bloqueada {
+    opacity: .72;
+    cursor: not-allowed;
+    border-color: #E2E8F0;
+    background: #F8FAFC;
+}
+
+.exp-wizard-modal .clase-replica-badge--bloqueada {
+    background: #FEE2E2;
+    color: #B91C1C;
 }
 
 .experiencias-empty .experiencias-empty-text {

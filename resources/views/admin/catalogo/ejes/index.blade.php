@@ -14,9 +14,11 @@
     <div class="c-card" style="padding: 20px;">
         @include('admin.catalogo.ejes._ejes')
     </div>
+    @include('admin.catalogo.modulos.modalVerEjesModulo')
 @endsection
 
 @push('scripts')
     <script src="{{ asset('assets/js/configuracion-ejes-ui.js') }}"></script>
+    <script src="{{ asset('assets/js/catalogo-media-curriculo.js') }}"></script>
     <script src="{{ asset('assets/js/admin/catalogo-modulos-ejes.js') }}"></script>
 @endpush

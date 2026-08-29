@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\SuperAdmin;
 
+use App\Http\Controllers\Concerns\ManejaMediaCurriculo;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Eje;
@@ -13,6 +14,7 @@ use Illuminate\Validation\Rule;
 
 class EjesSuperAdminController extends Controller
 {
+    use ManejaMediaCurriculo;
     public function listar()
     {
         $ambientes = Ambiente::query()
@@ -89,6 +91,7 @@ class EjesSuperAdminController extends Controller
         $this->asegurarModuloOficial($modulo);
 
         $datos = $this->validarEje($request, $modulo->id);
+        $mediaDatos = $this->validarMediaCurriculo($request);
         $slug = $this->generarSlugUnico($datos['nombre'], $modulo->id);
         $orden = $datos['orden'] ?? $this->siguienteOrden($modulo->id);
 
@@ -102,6 +105,9 @@ class EjesSuperAdminController extends Controller
             'activo' => true,
             'es_oficial' => true,
         ]);
+
+        $this->aplicarMediaEje($eje, $mediaDatos, $request);
+        $eje->refresh();
 
         $eje->loadCount([
             'tematicas as tematicas_oficiales_activas_count' => fn ($q) => $q
@@ -131,7 +137,7 @@ class EjesSuperAdminController extends Controller
                 'descripcion' => $eje->descripcion,
                 'orden' => $eje->orden,
                 'activo' => (bool) $eje->activo,
-            ],
+            ] + $this->serializarMediaEje($eje),
         ]);
     }
 
@@ -140,12 +146,15 @@ class EjesSuperAdminController extends Controller
         $this->asegurarEjeOficial($eje);
 
         $datos = $this->validarEje($request, $eje->modulo_id, $eje->id);
+        $mediaDatos = $this->validarMediaCurriculo($request, $eje);
 
         $eje->update([
             'nombre' => $datos['nombre'],
             'descripcion' => $datos['descripcion'] ?? null,
             'orden' => $datos['orden'] ?? $eje->orden,
         ]);
+
+        $this->aplicarMediaEje($eje, $mediaDatos, $request);
 
         $eje->refresh();
         $eje->loadCount([
@@ -235,7 +244,7 @@ class EjesSuperAdminController extends Controller
             'puede_gestionar' => true,
             'tematicas_oficiales_activas_count' => (int) ($eje->tematicas_oficiales_activas_count ?? 0),
             'temas_count' => (int) ($eje->temas_count ?? 0),
-        ];
+        ] + $this->serializarMediaEje($eje);
     }
 
     private function validarEje(Request $request, int $moduloId, ?int $ejeId = null): array

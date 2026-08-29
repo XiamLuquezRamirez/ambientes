@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const ejesError = document.getElementById('ejesModuloError');
     const ejesContenido = document.getElementById('ejesModuloContenido');
 
+    window.CatalogoMediaCurriculo?.initForm(formEje);
+
     function urlFromTemplate(template, replacements) {
         let url = template;
         Object.entries(replacements).forEach(([key, value]) => {
@@ -125,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setOrdenEjeEditable(true);
         setTituloFormEje('crear');
         setBtnGuardarEje('crear');
+        window.CatalogoMediaCurriculo?.resetForm(formEje);
     }
 
     function setEstadoModalEjes(estado, mensajeError = '') {
@@ -524,6 +527,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('eje_descripcion').value = data.descripcion || '';
         document.getElementById('eje_orden').value = data.orden ?? '';
         document.getElementById('eje_slug_preview').textContent = data.slug || slugify(data.nombre);
+        window.CatalogoMediaCurriculo?.fillForm(formEje, data);
         setFormularioEjesEditable(true);
 
         document.getElementById('ejesFormCrearWrap')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -743,18 +747,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const payload = {
+        const fields = {
             nombre: document.getElementById('eje_nombre').value.trim(),
             descripcion: document.getElementById('eje_descripcion').value.trim() || null,
         };
         const ordenVal = document.getElementById('eje_orden').value;
-        if (ordenVal !== '') payload.orden = Number(ordenVal);
+        if (ordenVal !== '') fields.orden = Number(ordenVal);
 
         setBtnGuardarEje(esEdicion ? 'guardando' : 'creando');
-        const res = await ajaxRequest(
+        const formData = window.CatalogoMediaCurriculo?.buildFormData(formEje, fields);
+        const res = await window.CatalogoMediaCurriculo.ajaxFormRequest(
             esEdicion ? urls().ejesUpdate(ejeId) : urls().ejes(moduloId),
             esEdicion ? 'PUT' : 'POST',
-            payload
+            formData
         );
         setBtnGuardarEje(esEdicion ? 'editar' : 'crear');
 

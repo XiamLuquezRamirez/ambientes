@@ -453,7 +453,7 @@
                 <button type="submit" class="btn-submit">Ingresar</button>
             </form>
 
-            <a href="{{ route('auth.bienvenida') }}" class="back-link">
+            <a href="{{ route('ambiente.inicio') }}" class="back-link">
                 <i class="fa-solid fa-arrow-left"></i> Volver al inicio
             </a>
         </div>

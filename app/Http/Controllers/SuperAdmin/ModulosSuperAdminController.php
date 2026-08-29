@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\SuperAdmin;
 
+use App\Http\Controllers\Concerns\ManejaMediaCurriculo;
 use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Institucion;
@@ -13,6 +14,7 @@ use Illuminate\Validation\Rule;
 
 class ModulosSuperAdminController extends Controller
 {
+    use ManejaMediaCurriculo;
     /**
      * Listado de ambientes y módulos oficiales del catálogo del sistema.
      */
@@ -52,7 +54,7 @@ class ModulosSuperAdminController extends Controller
                 'descripcion' => $modulo->descripcion,
                 'orden' => $modulo->orden,
                 'activo' => (bool) $modulo->activo,
-            ],
+            ] + $this->serializarMediaModulo($modulo),
         ]);
     }
 
@@ -64,11 +66,12 @@ class ModulosSuperAdminController extends Controller
     public function store(Request $request, Ambiente $ambiente)
     {
         $datos = $this->validarModulo($request, $ambiente->id);
+        $mediaDatos = $this->validarMediaCurriculo($request);
 
         $slug = $this->generarSlugUnico($datos['nombre'], $ambiente->id);
         $orden = $datos['orden'] ?? $this->siguienteOrden($ambiente->id);
 
-        $modulo = DB::transaction(function () use ($ambiente, $datos, $slug, $orden) {
+        $modulo = DB::transaction(function () use ($ambiente, $datos, $slug, $orden, $request, $mediaDatos) {
             $modulo = Modulo::create([
                 'ambiente_id' => $ambiente->id,
                 'institucion_id' => null,
@@ -82,8 +85,9 @@ class ModulosSuperAdminController extends Controller
             ]);
 
             $this->vincularInstitucionesAmbiente($modulo, $ambiente->id);
+            $this->aplicarMediaModulo($modulo, $mediaDatos, $request);
 
-            return $modulo;
+            return $modulo->fresh();
         });
 
         $modulo->loadCount([
@@ -109,12 +113,15 @@ class ModulosSuperAdminController extends Controller
         $this->asegurarOficial($modulo);
 
         $datos = $this->validarModulo($request, $modulo->ambiente_id, $modulo->id);
+        $mediaDatos = $this->validarMediaCurriculo($request, $modulo);
 
         $modulo->update([
             'nombre' => $datos['nombre'],
             'descripcion' => $datos['descripcion'] ?? null,
             'orden' => $datos['orden'] ?? $modulo->orden,
         ]);
+
+        $this->aplicarMediaModulo($modulo, $mediaDatos, $request);
 
         $modulo->refresh();
         $modulo->loadCount([
@@ -202,7 +209,7 @@ class ModulosSuperAdminController extends Controller
             'instituciones_activas_count' => (int) ($modulo->instituciones_activas_count ?? 0),
             'temas_activos_count' => (int) ($modulo->temas_activos_count ?? 0),
             'created_at' => $modulo->created_at?->translatedFormat('d M Y') ?? '—',
-        ];
+        ] + $this->serializarMediaModulo($modulo);
     }
 
     private function validarModulo(Request $request, int $ambienteId, ?int $moduloId = null): array

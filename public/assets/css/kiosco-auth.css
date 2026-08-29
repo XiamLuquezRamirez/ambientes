@@ -1,0 +1,590 @@
+/* Estilos compartidos del login kiosco (bienvenida, selector, PIN, saludo) */
+
+/* ── Bienvenida ─────────────────────────────────────────────── */
+.bienvenida-wrap {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 60% 40%, color-mix(in srgb, var(--color-ambiente) 25%, transparent), transparent 70%),
+                var(--fondo);
+}
+
+.bienvenida-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+}
+
+.ambiente-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.ambiente-icono {
+    font-size: 6rem;
+    filter: drop-shadow(0 0 32px var(--color-ambiente));
+    animation: kiosco-flotar 3s ease-in-out infinite;
+}
+
+.ambiente-nombre {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--color-ambiente);
+    text-shadow: 0 0 40px color-mix(in srgb, var(--color-ambiente) 60%, transparent);
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.btn-jugar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 280px;
+    min-height: 80px;
+    background: var(--color-ambiente);
+    border-radius: 40px;
+    text-decoration: none;
+    animation: kiosco-pulso 2s ease-in-out infinite;
+}
+
+.btn-jugar__texto {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2rem;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.link-docente {
+    font-size: 0.85rem;
+    color: rgba(240, 250, 244, 0.35);
+    text-decoration: none;
+}
+
+.link-docente:hover {
+    color: rgba(240, 250, 244, 0.7);
+}
+
+/* ── Selector de alumnos ────────────────────────────────────── */
+.selector-wrap {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    padding: 32px 20px;
+    background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--color-ambiente) 20%, transparent), transparent 65%),
+                var(--fondo);
+}
+
+.selector-titulo {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    color: var(--dorado);
+    text-align: center;
+}
+
+.avatares-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    justify-content: center;
+    max-width: 960px;
+}
+
+.avatar-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.18s;
+    text-decoration: none;
+    color: inherit;
+    min-width: 110px;
+}
+
+.avatar-btn:hover {
+    transform: scale(1.08);
+}
+
+.avatar-btn:active {
+    transform: scale(0.96);
+}
+
+.avatar-btn--sin-pin {
+    opacity: 0.72;
+}
+
+.avatar-circulo {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: var(--color-av);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.2rem;
+    color: #fff;
+    box-shadow: 0 4px 24px color-mix(in srgb, var(--color-av) 50%, transparent);
+}
+
+.avatar-badge {
+    position: absolute;
+    top: 0;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1f2937;
+    border: 2px solid var(--dorado);
+    color: var(--dorado);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+}
+
+.avatar-nombre {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--texto);
+    text-align: center;
+    max-width: 120px;
+}
+
+.avatar-meta {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(240, 250, 244, 0.45);
+}
+
+.selector-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    max-width: 420px;
+    text-align: center;
+    padding: 28px 24px;
+    border-radius: 24px;
+    background: rgba(240, 250, 244, 0.05);
+    border: 2px dashed rgba(240, 250, 244, 0.18);
+}
+
+.selector-vacio__icono {
+    font-size: 2.5rem;
+    color: var(--dorado);
+}
+
+.selector-vacio__titulo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5rem;
+    color: var(--texto);
+}
+
+.selector-vacio__texto {
+    font-size: 1rem;
+    line-height: 1.45;
+    color: rgba(240, 250, 244, 0.65);
+}
+
+.link-volver {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(240, 250, 244, 0.45);
+    text-decoration: none;
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.link-volver:hover {
+    color: var(--texto);
+}
+
+/* ── PIN ────────────────────────────────────────────────────── */
+.pin-wrap {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+    padding: 40px 24px;
+    background: radial-gradient(ellipse at 30% 50%, color-mix(in srgb, var(--color-ambiente) 18%, transparent), transparent 60%),
+                var(--fondo);
+}
+
+.pin-izquierda {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.pin-avatar__circulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--color-av);
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.6rem;
+    color: #fff;
+    box-shadow: 0 0 0 5px var(--dorado), 0 8px 32px color-mix(in srgb, var(--color-av) 50%, transparent);
+}
+
+.pin-nombre {
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.pin-instruccion {
+    font-size: 1rem;
+    color: rgba(240, 250, 244, 0.6);
+}
+
+.pin-mensaje {
+    min-height: 28px;
+    max-width: 280px;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fca5a5;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.pin-mensaje.visible {
+    opacity: 1;
+}
+
+.pin-mensaje--aviso {
+    color: var(--dorado);
+}
+
+.indicadores {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.indicador {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 3px solid rgba(240, 250, 244, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    transition: all 0.25s;
+}
+
+.indicador.activo {
+    border-color: var(--color-ambiente);
+    background: color-mix(in srgb, var(--color-ambiente) 25%, transparent);
+}
+
+.btn-borrar {
+    margin-top: 8px;
+    background: rgba(240, 250, 244, 0.08);
+    border: 2px solid rgba(240, 250, 244, 0.15);
+    border-radius: 24px;
+    color: var(--texto);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 12px 28px;
+    cursor: pointer;
+    min-height: 52px;
+    transition: background 0.2s;
+}
+
+.btn-borrar:hover {
+    background: rgba(240, 250, 244, 0.16);
+}
+
+.btn-borrar:active {
+    transform: scale(0.96);
+}
+
+.pin-figuras-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.figura-btn {
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+    border: 2px solid rgba(240, 250, 244, 0.18);
+    background: rgba(240, 250, 244, 0.05);
+    font-size: 2.2rem;
+    cursor: pointer;
+    color: var(--texto);
+    transition: transform 0.15s, background 0.15s, border-color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.figura-btn i {
+    pointer-events: none;
+}
+
+.figura-btn:hover {
+    background: color-mix(in srgb, var(--color-ambiente) 25%, transparent);
+    border-color: var(--color-ambiente);
+    transform: scale(1.1);
+}
+
+.figura-btn:active {
+    transform: scale(0.93);
+}
+
+.figura-btn:focus-visible {
+    outline: 3px solid var(--dorado);
+    outline-offset: 3px;
+}
+
+.pin-bloqueado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 420px;
+    text-align: center;
+    padding: 32px 28px;
+    border-radius: 28px;
+    background: rgba(240, 250, 244, 0.05);
+    border: 2px solid rgba(245, 158, 11, 0.35);
+}
+
+.pin-bloqueado__icono {
+    font-size: 3rem;
+    color: var(--dorado);
+}
+
+.pin-bloqueado__titulo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: var(--dorado);
+}
+
+.pin-bloqueado__texto {
+    font-size: 1.05rem;
+    line-height: 1.45;
+    color: rgba(240, 250, 244, 0.7);
+}
+
+/* ── Overlays ───────────────────────────────────────────────── */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 12, 10, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.overlay-contenido {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.overlay-icono {
+    font-size: 6rem;
+    color: var(--color-ambiente);
+    animation: kiosco-aparecer 0.4s ease;
+}
+
+.overlay-contenido p {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.5rem;
+    color: var(--dorado);
+}
+
+/* ── Saludo post-login ──────────────────────────────────────── */
+.bienambiente-wrap {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--color-ambiente) 30%, transparent), transparent 70%),
+                var(--fondo);
+}
+
+.bienambiente-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 24px;
+}
+
+.estudiante-avatar__circulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: var(--color-av);
+    font-family: 'Fredoka One', cursive;
+    font-size: 3rem;
+    color: #fff;
+    box-shadow: 0 0 0 6px var(--dorado), 0 12px 40px color-mix(in srgb, var(--color-av) 60%, transparent);
+    animation: kiosco-aparecer 0.5s ease;
+}
+
+.saludo {
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--dorado);
+    text-align: center;
+    animation: kiosco-aparecer 0.5s ease 0.15s both;
+}
+
+.ambiente-label {
+    font-size: 1.3rem;
+    color: rgba(240, 250, 244, 0.75);
+    text-align: center;
+    animation: kiosco-aparecer 0.5s ease 0.3s both;
+}
+
+.estrellas {
+    display: flex;
+    gap: 24px;
+    font-size: 2.5rem;
+}
+
+.estrella {
+    opacity: 0;
+    animation: kiosco-estrella 0.5s ease var(--delay) forwards;
+}
+
+.btn-entrar {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 220px;
+    min-height: 72px;
+    background: var(--color-ambiente);
+    border-radius: 36px;
+    text-decoration: none;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: #fff;
+    box-shadow: 0 8px 32px color-mix(in srgb, var(--color-ambiente) 50%, transparent);
+    animation: kiosco-aparecer 0.5s ease 0.7s both;
+    transition: transform 0.15s;
+}
+
+.btn-entrar:hover {
+    transform: scale(1.05);
+}
+
+.btn-entrar:active {
+    transform: scale(0.96);
+}
+
+/* ── Responsive PIN ─────────────────────────────────────────── */
+@media (orientation: portrait), (max-width: 900px) {
+    .pin-wrap {
+        flex-direction: column;
+        gap: 36px;
+        padding: 28px 16px 40px;
+    }
+
+    .pin-figuras-grid {
+        gap: 14px;
+    }
+
+    .figura-btn {
+        width: 76px;
+        height: 76px;
+        font-size: 1.9rem;
+        border-radius: 18px;
+    }
+
+    .pin-avatar__circulo {
+        width: 100px;
+        height: 100px;
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .figura-btn {
+        width: 68px;
+        height: 68px;
+        font-size: 1.7rem;
+    }
+
+    .avatares-grid {
+        gap: 20px;
+    }
+
+    .avatar-circulo {
+        width: 92px;
+        height: 92px;
+        font-size: 1.8rem;
+    }
+}
+
+/* ── Animaciones ────────────────────────────────────────────── */
+@keyframes kiosco-flotar {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+}
+
+@keyframes kiosco-pulso {
+    0%, 100% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-ambiente) 60%, transparent);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 20px transparent;
+        transform: scale(1.04);
+    }
+}
+
+@keyframes kiosco-aparecer {
+    from { opacity: 0; transform: scale(0.85) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes kiosco-estrella {
+    from { opacity: 0; transform: scale(0) rotate(-30deg); }
+    to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes kiosco-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+}
+
+.shake {
+    animation: kiosco-shake 0.4s ease;
+}

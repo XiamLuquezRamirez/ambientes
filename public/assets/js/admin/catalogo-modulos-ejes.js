@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
     const root = document.querySelector('.config-admin-modulos');
-    if (!root) return;
-
     const rootEjes = document.querySelector('.config-admin-ejes');
+    if (!root && !rootEjes) return;
+
+    function cfgRoot() {
+        return root || rootEjes;
+    }
 
     const modalEl = document.getElementById('modalCrearModulos');
     const form = document.getElementById('formCrearModulo');
@@ -18,6 +21,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const ejesError = document.getElementById('ejesModuloError');
     const ejesContenido = document.getElementById('ejesModuloContenido');
 
+    window.CatalogoMediaCurriculo?.initForm(form);
+    window.CatalogoMediaCurriculo?.initForm(formEje);
+
     function urlFromTemplate(template, replacements) {
         let url = template;
         Object.entries(replacements).forEach(([key, value]) => {
@@ -27,19 +33,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function urls() {
+        const src = cfgRoot();
         return {
-            store: (ambienteId) => urlFromTemplate(root.dataset.urlStoreTemplate, { '__AMBIENTE__': ambienteId }),
-            show: (moduloId) => urlFromTemplate(root.dataset.urlShowTemplate, { '__MODULO__': moduloId }),
-            update: (moduloId) => urlFromTemplate(root.dataset.urlUpdateTemplate, { '__MODULO__': moduloId }),
-            estado: (moduloId) => urlFromTemplate(root.dataset.urlEstadoTemplate, { '__MODULO__': moduloId }),
-            mover: (moduloId) => urlFromTemplate(root.dataset.urlMoverTemplate, { '__MODULO__': moduloId }),
-            destroy: (moduloId) => urlFromTemplate(root.dataset.urlDestroyTemplate, { '__MODULO__': moduloId }),
-            ejes: (moduloId) => urlFromTemplate(root.dataset.urlEjesTemplate, { '__MODULO__': moduloId }),
-            ejesShow: (ejeId) => urlFromTemplate(root.dataset.urlEjesShowTemplate, { '__EJE__': ejeId }),
-            ejesUpdate: (ejeId) => urlFromTemplate(root.dataset.urlEjesUpdateTemplate, { '__EJE__': ejeId }),
-            ejesMover: (ejeId) => urlFromTemplate(root.dataset.urlEjesMoverTemplate, { '__EJE__': ejeId }),
-            ejesEstado: (ejeId) => urlFromTemplate(root.dataset.urlEjesEstadoTemplate, { '__EJE__': ejeId }),
-            ejesDestroy: (ejeId) => urlFromTemplate(root.dataset.urlEjesDestroyTemplate, { '__EJE__': ejeId }),
+            store: (ambienteId) => urlFromTemplate(src?.dataset?.urlStoreTemplate || '', { '__AMBIENTE__': ambienteId }),
+            show: (moduloId) => urlFromTemplate(src?.dataset?.urlShowTemplate || '', { '__MODULO__': moduloId }),
+            update: (moduloId) => urlFromTemplate(src?.dataset?.urlUpdateTemplate || '', { '__MODULO__': moduloId }),
+            estado: (moduloId) => urlFromTemplate(src?.dataset?.urlEstadoTemplate || '', { '__MODULO__': moduloId }),
+            mover: (moduloId) => urlFromTemplate(src?.dataset?.urlMoverTemplate || '', { '__MODULO__': moduloId }),
+            destroy: (moduloId) => urlFromTemplate(src?.dataset?.urlDestroyTemplate || '', { '__MODULO__': moduloId }),
+            ejes: (moduloId) => urlFromTemplate(src?.dataset?.urlEjesTemplate || '', { '__MODULO__': moduloId }),
+            ejesShow: (ejeId) => urlFromTemplate(src?.dataset?.urlEjesShowTemplate || '', { '__EJE__': ejeId }),
+            ejesUpdate: (ejeId) => urlFromTemplate(src?.dataset?.urlEjesUpdateTemplate || '', { '__EJE__': ejeId }),
+            ejesMover: (ejeId) => urlFromTemplate(src?.dataset?.urlEjesMoverTemplate || '', { '__EJE__': ejeId }),
+            ejesEstado: (ejeId) => urlFromTemplate(src?.dataset?.urlEjesEstadoTemplate || '', { '__EJE__': ejeId }),
+            ejesDestroy: (ejeId) => urlFromTemplate(src?.dataset?.urlEjesDestroyTemplate || '', { '__EJE__': ejeId }),
         };
     }
 
@@ -71,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function limpiarErroresForm() {
+        if (!form) return;
         form.querySelectorAll('.campo-error').forEach((el) => el.remove());
         form.querySelectorAll('.is-invalid').forEach((el) => el.classList.remove('is-invalid'));
     }
@@ -113,16 +121,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function resetFormModulo() {
+        if (!form) return;
         form.reset();
         limpiarErroresForm();
         document.getElementById('modulo_id').value = '';
         document.getElementById('modulo_ambiente_id').value = '';
         document.getElementById('modulo_slug_preview').textContent = 'se genera automáticamente';
         setOrdenEditable(true);
+        window.CatalogoMediaCurriculo?.resetForm(form);
     }
 
     function getGroup(ambienteId) {
-        return root.querySelector(`.amb-group[data-ambiente-id="${ambienteId}"]`);
+        return cfgRoot()?.querySelector(`.amb-group[data-ambiente-id="${ambienteId}"]`);
     }
 
     function getTbodyColegio(group) {
@@ -449,10 +459,12 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('modulo_descripcion').value = data.descripcion || '';
         document.getElementById('modulo_orden').value = data.orden ?? '';
         document.getElementById('modulo_slug_preview').textContent = data.slug || slugify(data.nombre);
+        window.CatalogoMediaCurriculo?.fillForm(form, data);
     }
 
     /* ── Filtros de módulos ──────────────────────────────────── */
     function valoresFiltrosModulos() {
+        if (!root) return { ambiente: '', tipo: '', estado: '' };
         return {
             ambiente: root.querySelector('[data-filtro="ambiente"]')?.value || '',
             tipo: root.querySelector('[data-filtro="tipo"]')?.value || '',
@@ -482,6 +494,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function aplicarFiltrosModulos() {
+        if (!root) return;
         const filtros = valoresFiltrosModulos();
         const hayFiltros = !!(filtros.ambiente || filtros.tipo || filtros.estado);
         const emptyEl = root.querySelector('[data-empty-filtros-modulos]');
@@ -551,6 +564,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (emptyEl) emptyEl.hidden = ambientesVisibles > 0 || !hayFiltros;
     }
 
+    if (root) {
     root.querySelectorAll('[data-filtros-modulos] select').forEach((select) => {
         select.addEventListener('change', aplicarFiltrosModulos);
     });
@@ -714,17 +728,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const moduloId = document.getElementById('modulo_id').value;
         const ambienteId = document.getElementById('modulo_ambiente_id').value;
         const esEdicion = Boolean(moduloId);
-        const payload = {
+        const fields = {
             nombre: document.getElementById('modulo_nombre').value.trim(),
             descripcion: document.getElementById('modulo_descripcion').value.trim() || null,
         };
         const ordenVal = document.getElementById('modulo_orden').value;
-        if (!esEdicion && ordenVal !== '') payload.orden = Number(ordenVal);
+        if (ordenVal !== '') fields.orden = Number(ordenVal);
 
         setBtnGuardar(esEdicion ? 'guardando' : 'creando');
         const endpoint = esEdicion ? urls().update(moduloId) : urls().store(ambienteId);
         const method = esEdicion ? 'PUT' : 'POST';
-        const res = await ajaxRequest(endpoint, method, payload);
+        const formData = window.CatalogoMediaCurriculo?.buildFormData(form, fields);
+        const res = await window.CatalogoMediaCurriculo.ajaxFormRequest(endpoint, method, formData);
         setBtnGuardar(esEdicion ? 'editar' : 'crear');
 
         if (!res.success) {
@@ -737,6 +752,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (res.data) insertarOActualizarModulo(res.data);
         mostrarToast('success', res.message || 'Guardado');
     });
+
+    root.querySelectorAll('[data-tbody-colegio]').forEach(actualizarBotonesReorder);
+    }
 
     /* ── Modal / tab ejes ────────────────────────────────────── */
     function limpiarErroresFormEje() {
@@ -803,6 +821,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setOrdenEjeEditable(true);
         setTituloFormEje('crear');
         setBtnGuardarEje('crear');
+        window.CatalogoMediaCurriculo?.resetForm(formEje);
     }
 
     function setEstadoModalEjes(estado, mensajeError = '') {
@@ -1088,6 +1107,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function actualizarContadorEjesModuloEnTabModulos(moduloId, delta) {
+        if (!root) return;
         const moduloRow = root.querySelector(`tr[data-modulo-id="${moduloId}"]`);
         if (!moduloRow) return;
         const cell = moduloRow.querySelector('.col-ejes-propios');
@@ -1251,6 +1271,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('eje_descripcion').value = data.descripcion || '';
         document.getElementById('eje_orden').value = data.orden ?? '';
         document.getElementById('eje_slug_preview').textContent = data.slug || slugify(data.nombre);
+        window.CatalogoMediaCurriculo?.fillForm(formEje, data);
         setFormularioEjesEditable(true);
 
         document.getElementById('ejesFormCrearWrap')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1583,19 +1604,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const payload = {
+        const fields = {
             nombre: document.getElementById('eje_nombre').value.trim(),
             descripcion: document.getElementById('eje_descripcion').value.trim() || null,
         };
         const ordenVal = document.getElementById('eje_orden').value;
-        if (!esEdicion && ordenVal !== '') payload.orden = Number(ordenVal);
-        if (esEdicion && ordenVal !== '') payload.orden = Number(ordenVal);
+        if (ordenVal !== '') fields.orden = Number(ordenVal);
 
         setBtnGuardarEje(esEdicion ? 'guardando' : 'creando');
-        const res = await ajaxRequest(
+        const formData = window.CatalogoMediaCurriculo?.buildFormData(formEje, fields);
+        const res = await window.CatalogoMediaCurriculo.ajaxFormRequest(
             esEdicion ? urls().ejesUpdate(ejeId) : urls().ejes(moduloId),
             esEdicion ? 'PUT' : 'POST',
-            payload
+            formData
         );
         setBtnGuardarEje(esEdicion ? 'editar' : 'crear');
 
@@ -1617,6 +1638,4 @@ document.addEventListener('DOMContentLoaded', function () {
         resetFormEje();
         mostrarToast('success', res.message || (esEdicion ? 'Eje actualizado' : 'Eje creado'));
     });
-
-    root.querySelectorAll('[data-tbody-colegio]').forEach(actualizarBotonesReorder);
 });

@@ -87,6 +87,7 @@
                                         min="1" max="255" placeholder="Auto">
                                 </div>
                             </div>
+                            @include('partials.catalogo._campos-media-curriculo', ['mediaIdPrefix' => 'eje'])
                             <div class="d-flex justify-content-end gap-2 mt-3">
                                 <button type="button" class="btn btn-secondary" id="btnCancelarEje" hidden>
                                     Cancelar

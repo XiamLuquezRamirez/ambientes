@@ -119,6 +119,7 @@
 }
 
 .vn-screen-top {
+    flex-shrink: 0;
     padding: 12px 14px 6px;
     text-align: center;
 }
@@ -159,19 +160,37 @@
 }
 
 .vn-screen-body {
-    flex: 1;
-    overflow: auto;
-    padding: 16px 48px 20px;
-    -webkit-overflow-scrolling: touch;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: clamp(8px, 1.2vh, 16px) clamp(12px, 3vw, 48px) clamp(8px, 1vh, 20px);
+}
+
+.vn-block-fit {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .vn-card {
     max-width: 980px;
+    width: 100%;
     margin: 0 auto;
+    transform-origin: center top;
     animation: vnPop .35s cubic-bezier(.34, 1.45, .64, 1);
 }
 
 .vn-screen-nav {
+    flex-shrink: 0;
     display: grid;
     grid-template-columns: auto 1fr auto;
     gap: 8px;
@@ -254,8 +273,15 @@
 
 /* ── Contenido por bloque ── */
 @keyframes vnPop {
-    from { opacity: 0; transform: scale(.92) translateY(10px); }
-    to { opacity: 1; transform: none; }
+    from {
+        opacity: 0;
+        transform: scale(.92) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 .vn-hero-emoji {
@@ -268,8 +294,15 @@
 }
 
 @keyframes vnBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 .vn-title {
@@ -323,8 +356,15 @@
 }
 
 @keyframes vnTtsPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
 }
 
 .vn-badge-warn {
@@ -708,32 +748,70 @@
 }
 
 @keyframes vnSortIn {
-    from { opacity: 0; transform: translateY(16px) scale(.94); }
-    to { opacity: 1; transform: none; }
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 @keyframes vnSortOut {
-    to { opacity: 0; transform: scale(.7) translateX(24px); }
+    to {
+        opacity: 0;
+        transform: scale(.7) translateX(24px);
+    }
 }
 
 @keyframes vnPlacePop {
-    from { opacity: 0; transform: scale(.6); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(.6);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes vnZonePulse {
-    0%, 100% { outline-color: #fbbf24; transform: scale(1); }
-    50% { outline-color: #fde68a; transform: scale(1.02); }
+
+    0%,
+    100% {
+        outline-color: #fbbf24;
+        transform: scale(1);
+    }
+
+    50% {
+        outline-color: #fde68a;
+        transform: scale(1.02);
+    }
 }
 
 @keyframes vnChipGlow {
-    0%, 100% { box-shadow: 0 4px 0 rgba(15, 23, 42, .08); }
-    50% { box-shadow: 0 6px 14px rgba(56, 189, 248, .22); }
+
+    0%,
+    100% {
+        box-shadow: 0 4px 0 rgba(15, 23, 42, .08);
+    }
+
+    50% {
+        box-shadow: 0 6px 14px rgba(56, 189, 248, .22);
+    }
 }
 
 @keyframes vnChipPick {
-    from { transform: scale(.96); }
-    to { transform: scale(1.04); }
+    from {
+        transform: scale(.96);
+    }
+
+    to {
+        transform: scale(1.04);
+    }
 }
 
 /* Clasificación: tipografía legible en tablet */
@@ -1002,11 +1080,12 @@
 }
 
 .vn-audio-status {
-    font-size: 1.35rem;
+    font-size: 2.2rem;
     font-weight: 800;
     color: #0369a1;
     margin: 8px 0 0;
     min-height: 1.4em;
+    margin-top: 50px;
 }
 
 .vn-audio-btn.is-playing {
@@ -1025,13 +1104,27 @@
 }
 
 @keyframes vnAudioPulse {
-    0%, 100% { filter: brightness(1); }
-    50% { filter: brightness(1.08); }
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.08);
+    }
 }
 
 @keyframes vnAudioBounce {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.12); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+    }
 }
 
 /* Video: tipografía + botón interactivo */
@@ -1344,9 +1437,19 @@
 }
 
 @keyframes vnShake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-6px); }
-    75% { transform: translateX(6px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-6px);
+    }
+
+    75% {
+        transform: translateX(6px);
+    }
 }
 
 .vn-feedback {
@@ -1368,30 +1471,96 @@
     color: #9f1239;
 }
 
+/* Emoción: botones grandes para tablet / niño */
+.vn-card--emocion {
+    text-align: center;
+}
+
+.vn-card--emocion .vn-title {
+    font-size: 2.1rem;
+    margin-bottom: 12px;
+}
+
+.vn-card--emocion .vn-instruccion {
+    font-size: 1.45rem;
+    padding: 18px 22px;
+    line-height: 1.4;
+}
+
 .vn-emociones {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    gap: 16px;
+    max-width: 720px;
+    margin: 8px auto 0;
+}
+
+.vn-emociones[data-count="4"] {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 640px;
+}
+
+/* 6 emociones: 3×2 en horizontal para caber sin scroll en tablet */
+.vn-emociones[data-count="6"] {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: min(980px, 100%);
+    gap: 14px 12px;
+}
+
+.vn-card--emocion:has(.vn-emociones[data-count="6"]) {
+    max-width: 100%;
+}
+
+@media (max-width: 560px) {
+    .vn-emociones[data-count="6"] {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 640px;
+    }
 }
 
 .vn-emocion {
     border: 0;
-    border-radius: 20px;
+    border-radius: 24px;
     background: #fff;
-    padding: 14px 8px;
+    padding: 18px 12px;
+    min-height: 168px;
     cursor: pointer;
     box-shadow: 0 8px 0 rgba(15, 23, 42, .08);
     font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
 }
 
-.vn-emocion .vn-op-emoji {
-    font-size: 2.6rem;
+.vn-emocion:active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 rgba(15, 23, 42, .08);
+}
+
+.vn-emocion-img {
+    width: 100%;
+    max-width: 140px;
+    height: auto;
+    max-height: 130px;
+    object-fit: contain;
     display: block;
+    pointer-events: none;
+    user-select: none;
+}
+
+.vn-emocion-label {
+    font-size: 1.45rem;
+    color: #0f172a;
+    line-height: 1.2;
 }
 
 .vn-emocion.is-picked {
     background: #fef08a;
-    transform: scale(1.04);
+    transform: scale(1.05);
+    box-shadow: 0 10px 0 rgba(202, 138, 4, .25);
 }
 
 .vn-ra-stage {
@@ -1417,8 +1586,15 @@
 }
 
 @keyframes vnPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.06); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.06);
+    }
 }
 
 .vn-match-cols {
@@ -1497,6 +1673,24 @@
 }
 
 /* ── Paint: barra lateral + lienzo ───────────────────────── */
+.vn-block-fit .vn-paint {
+    min-height: 0;
+}
+
+.vn-block-fit .vn-card--dibujo,
+.vn-block-fit .vn-card--juego-colorear {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: 100%;
+}
+
+.vn-block-fit .vn-card--dibujo .vn-paint,
+.vn-block-fit .vn-card--juego-colorear .vn-paint {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
 .vn-paint {
     display: flex;
     gap: 14px;
@@ -2087,15 +2281,87 @@ body.vn-dispositivo .vn-tablet-screen {
     box-sizing: border-box !important;
     /* anula el canvas fijo 1280×800 del overlay del constructor */
     --vn-screen-w: 100vw;
-    --vn-screen-h: 100vh;
+    --vn-screen-h: 100dvh;
 }
 
-body.vn-dispositivo .vn-screen-body {
-    padding: 12px 4vw 16px;
+body.vn-dispositivo .vn-screen-body,
+body.rn-player-activo .vn-screen-body,
+.rn-player .vn-screen-body {
+    padding: clamp(6px, 1vh, 12px) clamp(8px, 2.5vw, 24px) clamp(6px, 1vh, 16px);
 }
 
-body.vn-dispositivo .vn-card {
+body.vn-dispositivo .vn-card,
+body.rn-player-activo .vn-card,
+.rn-player .vn-card {
     max-width: min(980px, 100%);
+    max-height: none;
+}
+
+body.vn-dispositivo #vnDispositivo,
+body.rn-player-activo #vnDispositivo {
+    overflow: hidden;
+    touch-action: manipulation;
+}
+
+body.vn-dispositivo #vnTabletScreen,
+body.rn-player-activo #vnTabletScreen,
+.rn-player #vnTabletScreen {
+    min-height: 0;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-paint,
+body.rn-player-activo .vn-paint,
+.rn-player .vn-paint {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    height: auto;
+}
+
+body.vn-dispositivo .vn-paint-stage,
+body.rn-player-activo .vn-paint-stage,
+.rn-player .vn-paint-stage {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+body.vn-dispositivo .vn-draw-canvas,
+body.rn-player-activo .vn-draw-canvas,
+.rn-player .vn-draw-canvas,
+body.vn-dispositivo .vn-draw-wrap canvas,
+body.rn-player-activo .vn-draw-wrap canvas,
+.rn-player .vn-draw-wrap canvas {
+    min-height: 0;
+    height: 100%;
+}
+
+@media (max-height: 720px) {
+    body.vn-dispositivo .vn-emocion,
+    body.rn-player-activo .vn-emocion,
+    .rn-player .vn-emocion {
+        min-height: clamp(96px, 16vh, 168px);
+        padding: 10px 8px;
+    }
+
+    body.vn-dispositivo .vn-emocion-label,
+    body.rn-player-activo .vn-emocion-label,
+    .rn-player .vn-emocion-label {
+        font-size: clamp(1rem, 2.4vh, 1.45rem);
+    }
+
+    body.vn-dispositivo .vn-emocion-img,
+    body.rn-player-activo .vn-emocion-img,
+    .rn-player .vn-emocion-img {
+        max-height: clamp(68px, 13vh, 130px);
+    }
+
+    body.vn-dispositivo .vn-card--emocion .vn-instruccion,
+    body.rn-player-activo .vn-card--emocion .vn-instruccion,
+    .rn-player .vn-card--emocion .vn-instruccion {
+        font-size: clamp(1.05rem, 2.6vh, 1.45rem);
+        padding: 12px 16px;
+    }
 }
 
 .vn-fs-btn {

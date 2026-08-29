@@ -6,28 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Asistencia;
 use App\Models\CargaDocente;
-use App\Models\PerfilAprendizajeInclusion;
-use App\Models\PerfilAprendizajeOrden;
-use App\Models\PerfilAprendizajePersonalizado;
-use App\Models\PerfilAprendizajePersonalizadoOrden;
 use App\Models\ConfiguracionPin;
 use App\Models\Departamento;
-use App\Models\Docente;
 use App\Models\Estudiante;
 use App\Models\EstudianteAmbiente;
-use App\Models\EstudiantePerfilAprendizajePersonalizado;
 use App\Models\FigurasModel;
 use App\Models\Grado;
 use App\Models\Grupo;
 use App\Models\Matricula;
+use App\Models\PerfilAprendizajeInclusion;
+use App\Models\PerfilAprendizajeOrden;
+use App\Models\PerfilAprendizajePersonalizadoOrden;
 use App\Models\SyncQueue;
 use App\Services\AmbienteService;
 use App\Services\Docente\AsistenciaService;
 use App\Services\Docente\DocenteAsignacionService;
 use App\Services\EstudiantePerfilAprendizajePersonalizadoService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class EstudiantePanelController extends Controller
 {
@@ -595,7 +592,7 @@ class EstudiantePanelController extends Controller
         return $datos;
     }
 
-    private function respuestaFragmentosPerfilesAprendizaje(Estudiante $estudiante): \Illuminate\Http\JsonResponse
+    private function respuestaFragmentosPerfilesAprendizaje(Estudiante $estudiante): JsonResponse
     {
         $datos = $this->datosAsignacionPerfilAprendizaje($estudiante);
 
