@@ -186,10 +186,10 @@
 /* Transición suave de entrada del modal: el fondo se funde y el panel entra
    con un leve zoom/elevación (efecto "pop" amable, no un corte brusco). */
 .rn-shell--3d .rn-camino-modal:not([hidden]) {
-    animation: rn3d-modal-fondo .32s ease both;
+    animation: rn3d-modal-fondo .6s ease both;
 }
 .rn-shell--3d .rn-camino-modal:not([hidden]) .rn-camino-modal__backdrop {
-    animation: rn3d-modal-fondo .32s ease both;
+    animation: rn3d-modal-fondo .6s ease both;
 }
 .rn-shell--3d .rn-camino-modal__panel {
     max-height: min(88vh, 640px);
@@ -197,7 +197,7 @@
     box-shadow: 0 24px 60px rgba(15, 23, 42, .28);
 }
 .rn-shell--3d .rn-camino-modal:not([hidden]) .rn-camino-modal__panel {
-    animation: rn3d-modal-panel .42s cubic-bezier(.34,1.4,.5,1) both;
+    animation: rn3d-modal-panel .8s cubic-bezier(.22,1,.36,1) both;
 }
 @keyframes rn3d-modal-fondo {
     from { opacity: 0; } to { opacity: 1; }
@@ -326,3 +326,30 @@ body.rn3d-video-reproduciendo .kiosco-fs-btn {
     .rn3d-exp-estrella, .rn3d-confeti { animation: none !important; }
     .rn3d-confeti { opacity: .8; }
 }
+
+/* ===== Celebración al llegar al fin (confeti + mensaje) ===== */
+.rn3d-celebracion {
+    position: absolute; inset: 0; z-index: 9; pointer-events: none; overflow: hidden;
+    opacity: 1; transition: opacity .6s ease;
+}
+.rn3d-celebracion.rn3d-cel-ocultar { opacity: 0; }
+.rn3d-celebracion__confeti { position: absolute; inset: 0; }
+.rn3d-confeti-p {
+    position: absolute; top: -20px; width: 12px; height: 16px; border-radius: 2px;
+    animation-name: rn3d-cel-caer; animation-timing-function: linear; animation-iteration-count: infinite;
+}
+@keyframes rn3d-cel-caer {
+    0%   { transform: translateY(-20px) rotate(0); opacity: 1; }
+    100% { transform: translateY(105vh) rotate(540deg); opacity: .9; }
+}
+.rn3d-celebracion__msg {
+    position: absolute; top: 16%; left: 50%; transform: translateX(-50%);
+    text-align: center; color: #fff; font-family: 'Fredoka One', system-ui, sans-serif;
+    font-size: clamp(1.6rem, 5vw, 3rem); font-weight: 800;
+    text-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 22px rgba(255,220,90,.7);
+    animation: rn3d-cel-pop .6s cubic-bezier(.34,1.7,.5,1) both;
+}
+.rn3d-celebracion__msg small { display:block; font-size: .45em; opacity: .95; margin-top: .3em; }
+@keyframes rn3d-cel-pop { 0% { opacity:0; transform: translateX(-50%) scale(.5); } 100% { opacity:1; transform: translateX(-50%) scale(1); } }
+@keyframes rn3d-cel-fade { 0%,80% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .rn3d-confeti-p { animation: none !important; } }

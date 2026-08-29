@@ -536,3 +536,31 @@ Route::middleware('sesion.nino')->group(function () {
     Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
     require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
 });
+
+// === PREVIEW TABLET (TEMPORAL — quitar antes de commit) ====================
+// Muestra el recorrido de una clase sin pasar por PIN. ?clase=ID (default 1).
+Route::get('/__preview-camino', function (\Illuminate\Http\Request $request) {
+    $svc = app(\App\Services\RecorridoNinoService::class);
+    $clase = \App\Models\Clase::find((int) $request->query('clase', 1));
+    abort_unless($clase, 404, 'Clase no encontrada');
+    $ambiente = \App\Models\Ambiente::find($clase->ambiente_id);
+    $arbol = $svc->armarArbol($ambiente, null, $clase);
+    $camino = $svc->armarCaminoLineal($arbol, $clase, null);
+    abort_unless($camino, 422, 'No se pudo armar el camino');
+
+    return view('ambientes.kiosco-recorrido', [
+        'ambiente' => $ambiente,
+        'modo' => 'sesion',
+        'ui' => 'camino-lineal',
+        'token' => null,
+        'arbol' => $arbol,
+        'camino' => $camino,
+        'estudiante' => null,
+        'urlExperienciaTemplate' => '/experiencia/__ID__',
+        'urlTts' => '/tts',
+        'urlSalir' => '/salir',
+        'urlContinuar' => '',
+        'portadaImg' => null,
+        'pasoInicial' => 'camino',
+    ]);
+});
