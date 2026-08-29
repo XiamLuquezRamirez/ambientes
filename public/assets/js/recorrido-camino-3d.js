@@ -55,6 +55,7 @@ import * as THREE from 'three';
     let colorAmbiente = new THREE.Color('#0ea5e9');
     let ambienteSlug = '';
     let rafId = null;
+    let equipoModesto = false; // tablet/móvil: recorta calidad para ganar fluidez
     let onCanvasClick = null;
     let N = 0;
     let audioNarracion = null;
@@ -1458,33 +1459,57 @@ import * as THREE from 'three';
         pezT = 0;
     }
 
-    // Ave low-poly (cuerpo + dos alas que aletean). Devuelve {grupo, alaIzq, alaDer}.
-    function crearAve(color) {
+    // Gaviota blanca low-poly: cuerpo fusiforme + dos alas planas que baten desde
+    //  el hombro, formando la silueta en "V" típica de un ave a lo lejos (no un
+    //  murciélago). Vuela mirando hacia +X. Devuelve {grupo, alaIzq, alaDer}.
+    function crearAve() {
         const g = new THREE.Group();
-        const mat = new THREE.MeshStandardMaterial({ color, roughness: .7, flatShading: true });
-        const cuerpo = new THREE.Mesh(new THREE.SphereGeometry(0.35, 8, 6), mat);
-        cuerpo.scale.set(1.4, 0.8, 0.8); g.add(cuerpo);
-        const ala = () => new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.12, 3), mat);
-        const alaIzq = ala(); alaIzq.position.set(0, 0.1, -0.5); alaIzq.rotation.x = -Math.PI / 2; g.add(alaIzq);
-        const alaDer = ala(); alaDer.position.set(0, 0.1, 0.5); alaDer.rotation.x = Math.PI / 2; g.add(alaDer);
+        // Blanco cálido, no metálico. Emisivo leve para que resalte sobre el cielo.
+        const matAve = new THREE.MeshStandardMaterial({
+            color: '#ffffff', roughness: .85, flatShading: true,
+            emissive: new THREE.Color('#dfe9f5'), emissiveIntensity: .35,
+        });
+        // Cuerpo alargado (fuselaje) apuntando en X.
+        const cuerpo = new THREE.Mesh(new THREE.CapsuleGeometry(0.14, 0.7, 4, 8), matAve);
+        cuerpo.rotation.z = Math.PI / 2; g.add(cuerpo);
+        // Cabecita al frente.
+        const cabeza = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), matAve);
+        cabeza.position.x = 0.5; g.add(cabeza);
+        // Cola en abanico (triángulo plano) atrás.
+        const cola = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.4, 3), matAve);
+        cola.rotation.z = -Math.PI / 2; cola.position.x = -0.55; cola.scale.set(1, 1, 0.35); g.add(cola);
+        // Alas: triángulos delgados y anchos que salen a los lados (eje Z), con
+        //  pivote en el hombro para que las puntas suban/bajen al aletear.
+        const geoAla = new THREE.ConeGeometry(0.28, 1.25, 3);
+        const hacerAla = (signo) => {
+            const pivote = new THREE.Group();          // pivote en el hombro
+            const ala = new THREE.Mesh(geoAla, matAve);
+            ala.rotation.x = signo * Math.PI / 2;      // apunta la punta hacia ±Z
+            ala.scale.set(1.6, 1, 0.12);               // plana y ancha, look de pluma
+            ala.position.z = signo * 0.62;             // desplaza la punta lejos del cuerpo
+            pivote.add(ala);
+            g.add(pivote);
+            return pivote;
+        };
+        const alaIzq = hacerAla(-1);
+        const alaDer = hacerAla(1);
         return { grupo: g, alaIzq, alaDer };
     }
 
-    // Crea varias aves volando en círculos amplios por el cielo.
+    // Crea varias gaviotas blancas volando en círculos amplios por el cielo.
     function construirAves() {
         aves = [];
-        const cols = ['#4a4a4a', '#5a3a2a', '#3a3a5a', '#4a4a4a'];
-        const N_AVES = 5;
+        const N_AVES = equipoModesto ? 3 : 5; // menos aves en tablet
         for (let i = 0; i < N_AVES; i++) {
-            const a = crearAve(cols[i % cols.length]);
+            const a = crearAve();
             const radio = 22 + Math.random() * 26;
             const cx = (Math.random() - 0.5) * 40, cz = (Math.random() - 0.5) * 40;
             const alt = 20 + Math.random() * 12;
             const vel = 0.15 + Math.random() * 0.2;
             const fase = Math.random() * Math.PI * 2;
-            a.grupo.scale.setScalar(0.8 + Math.random() * 0.6);
+            a.grupo.scale.setScalar(0.9 + Math.random() * 0.6);
             scene.add(a.grupo);
-            aves.push({ ...a, radio, cx, cz, alt, vel, fase, aleteo: 3 + Math.random() * 3 });
+            aves.push({ ...a, radio, cx, cz, alt, vel, fase, aleteo: 2.2 + Math.random() * 1.8 });
         }
     }
 
@@ -1517,12 +1542,15 @@ import * as THREE from 'three';
             const x = a.cx + Math.cos(a.fase) * a.radio;
             const z = a.cz + Math.sin(a.fase) * a.radio;
             a.grupo.position.set(x, a.alt + Math.sin(a.fase * 2) * 1.5, z);
-            // orientar en la dirección de vuelo
-            a.grupo.rotation.y = -a.fase - Math.PI / 2;
-            // aleteo
-            const flap = Math.sin(now / 1000 * a.aleteo * 6) * 0.7;
-            a.alaIzq.rotation.x = -Math.PI / 2 + flap;
-            a.alaDer.rotation.x = Math.PI / 2 - flap;
+            // orientar en la dirección de vuelo (el cuerpo apunta a +X)
+            a.grupo.rotation.y = -a.fase;
+            // leve alabeo al girar en círculo (como un ave inclinándose)
+            a.grupo.rotation.z = Math.sin(a.fase) * 0.12;
+            // aleteo: el pivote de cada ala sube/baja la punta desde el hombro,
+            //  formando la "V" batiente característica de una gaviota.
+            const flap = Math.sin(now / 1000 * a.aleteo * 6);
+            a.alaIzq.rotation.x = -flap * 0.9;   // punta izq (−Z) sube con flap>0
+            a.alaDer.rotation.x = flap * 0.9;    // punta der (+Z) sube con flap>0
         }
     }
 
@@ -1645,7 +1673,9 @@ import * as THREE from 'three';
 
         // ---- MOCHILA roja (a la espalda) ----
         const mochila = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.62, 0.28), mat(cMochila, .6));
-        mochila.position.set(0, 1.55, -0.42); mochila.castShadow = true; personaje.add(mochila);
+        // sin castShadow: el personaje se mueve y las sombras del sol están
+        //  congeladas (autoUpdate=false); su sombra la da el disco falso del suelo.
+        mochila.position.set(0, 1.55, -0.42); personaje.add(mochila);
         [-0.22, 0.22].forEach(dx => { // tirantes
             const t = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.6, 0.06), mat(cMochila, .6));
             t.position.set(dx, 1.6, 0.34); personaje.add(t);
@@ -1732,12 +1762,21 @@ import * as THREE from 'three';
         // hemisférica, para bajar el contraste y las sombras duras (look plano).
         sol = new THREE.DirectionalLight(0xfff4e0, 1.25);
         sol.position.set(-40, 60, 30); sol.castShadow = true;
-        sol.shadow.mapSize.set(2048, 2048);
+        // Shadow map más pequeño en tablet (1024) que en desktop (2048): 4x menos
+        //  texels que sombrear, apenas perceptible con estas sombras suaves.
+        const smSize = equipoModesto ? 1024 : 2048;
+        sol.shadow.mapSize.set(smSize, smSize);
         sol.shadow.camera.left = -60; sol.shadow.camera.right = 60;
         sol.shadow.camera.top = 42; sol.shadow.camera.bottom = -42;
         sol.shadow.camera.near = 1; sol.shadow.camera.far = 220;
         sol.shadow.bias = -0.0005; sol.shadow.normalBias = 0.08; sol.shadow.radius = 4;
         scene.add(sol);
+        // El sol NO se mueve y la escena (casas, árboles, terreno) es estática: la
+        //  sombra se calcula una sola vez y se congela. Esto evita re-renderizar el
+        //  shadow map en cada frame → gran ahorro de GPU en tablet.
+        //  (El personaje camina, pero su sombra es un disco falso, no de shadow map.)
+        renderer.shadowMap.autoUpdate = false;
+        renderer.shadowMap.needsUpdate = true; // fuerza el cálculo en el primer frame
         // Hemisférica fuerte y clara: aplana el sombreado y da el aire pastel.
         scene.add(new THREE.HemisphereLight(0xeaf3ff, 0x9fc46a, 1.55));
         const relleno = new THREE.DirectionalLight(0xffffff, 0.25);
@@ -2663,10 +2702,25 @@ import * as THREE from 'three';
         ctx.$paso.attr('data-paso', 'camino').empty();
 
         // Canvas 3D
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        // --- Detección de tablet/dispositivo modesto para bajar la carga gráfica ---
+        //  El coste principal en tablet es el nº de píxeles (pixelRatio alto) y el
+        //  antialias MSAA. En pantallas de mucha densidad (DPR>=2) casi no se nota
+        //  la diferencia visual bajando el pixelRatio, y el rendimiento sube mucho.
+        const esTactil = (('ontouchstart' in window) || navigator.maxTouchPoints > 0);
+        const dpr = window.devicePixelRatio || 1;
+        equipoModesto = esTactil || dpr >= 2;
+        renderer = new THREE.WebGLRenderer({
+            antialias: !equipoModesto,          // MSAA solo en desktop
+            powerPreference: 'high-performance',
+            stencil: false,
+        });
+        // Techo de pixelRatio: 1.5 en tablet (menos píxeles = más fluido), 2 en desktop.
+        renderer.setPixelRatio(Math.min(dpr, equipoModesto ? 1.5 : 2));
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.shadowMap.enabled = true;
+        // Sombras: PCFSoft (suaves) en desktop; PCF simple en tablet. Además se
+        //  calculan una sola vez (el sol es fijo) → ver `shadowMap.autoUpdate=false`.
+        renderer.shadowMap.type = equipoModesto ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
         renderer.domElement.className = 'rn3d-canvas';
         ctx.$paso[0].appendChild(renderer.domElement);
 
