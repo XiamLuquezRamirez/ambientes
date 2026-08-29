@@ -216,14 +216,15 @@
     max-height: 42vh;
 }
 
-/* Pantalla completa visual del video (overlay CSS; no usa Fullscreen API del navegador) */
+/* Pantalla completa visual de video/imagen (overlay CSS; no usa Fullscreen API del navegador) */
 .rn3d-video-fs {
     position: fixed;
     inset: 0;
     z-index: 200;
     background: #000;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     justify-content: center;
     pointer-events: auto;
 }
@@ -247,14 +248,47 @@ body.rn3d-video-reproduciendo .kiosco-fs-btn {
 }
 .rn3d-video-fs__inner,
 .rn3d-video-fs__inner video,
-.rn3d-video-fs__inner iframe {
+.rn3d-video-fs__inner iframe,
+.rn3d-video-fs__inner img {
     width: 100%;
     height: 100%;
     border: 0;
 }
-.rn3d-video-fs__inner video {
+.rn3d-video-fs__inner {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.rn3d-video-fs__inner video,
+.rn3d-media-fs__img {
     object-fit: contain;
     background: #000;
+}
+.rn3d-media-fs__cerrar {
+    flex: 0 0 auto;
+    align-self: center;
+    margin: 0 auto max(20px, env(safe-area-inset-bottom, 0px));
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    padding: 16px 32px;
+    font-family: 'Fredoka One', system-ui, sans-serif;
+    font-size: clamp(1.05rem, 2.6vw, 1.35rem);
+    color: #fff;
+    background: linear-gradient(180deg, #4ade80 0%, #22c55e 58%, #15803d 100%);
+    box-shadow: 0 6px 0 #14532d, 0 12px 24px rgba(34, 197, 94, .35);
+    z-index: 1;
+}
+.rn3d-media-fs__cerrar:active {
+    transform: translateY(2px);
+}
+.rn3d-media-fs__cerrar[hidden] {
+    display: none !important;
 }
 .rn3d-video-replay {
     display: flex;
