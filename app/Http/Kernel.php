@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\CapturarNodoIpPrueba;
 use App\Http\Middleware\EncryptCookies;
 use App\Http\Middleware\EsAdmin;
 use App\Http\Middleware\EsDocente;
@@ -59,6 +60,7 @@ class Kernel extends HttpKernel
             EncryptCookies::class,
             AddQueuedCookiesToResponse::class,
             StartSession::class,
+            CapturarNodoIpPrueba::class,
             ShareErrorsFromSession::class,
             VerifyCsrfToken::class,
             SubstituteBindings::class,

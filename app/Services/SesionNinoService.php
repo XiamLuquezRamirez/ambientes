@@ -14,6 +14,9 @@ class SesionNinoService
 
     public const SESSION_CLASE_ID = 'clase_id';
 
+    /** Solo local: simula la IP del nodo (?nodo_ip=) sin tocar la red. */
+    public const SESSION_NODO_IP = 'nodo_ip_prueba';
+
     public function __construct(
         private AccesoAmbienteService $accesoAmbiente,
     ) {}
@@ -33,7 +36,7 @@ class SesionNinoService
         $request = $request ?? request();
 
         if (! config('ambiente.priorizar_slug', false)) {
-            foreach ($this->ipsCandidatasNodo($request) as $ip) {
+            foreach ($this->ipsParaResolucionAmbiente($request) as $ip) {
                 if ($this->esLoopback($ip)) {
                     continue;
                 }
@@ -73,7 +76,7 @@ class SesionNinoService
         $request = $request ?? request();
 
         if (! config('ambiente.priorizar_slug', false)) {
-            foreach ($this->ipsCandidatasNodo($request) as $ip) {
+            foreach ($this->ipsParaResolucionAmbiente($request) as $ip) {
                 if ($this->esLoopback($ip)) {
                     continue;
                 }
@@ -83,7 +86,7 @@ class SesionNinoService
                     return [
                         'ambiente' => $ambiente,
                         'ip' => $ip,
-                        'fuente' => 'ambiente_institucion',
+                        'fuente' => $this->fuenteResolucionIp($request, $ip),
                     ];
                 }
             }
@@ -178,7 +181,80 @@ class SesionNinoService
     }
 
     /**
-     * IPs locales del nodo para cruzar con ambiente_institucion.ip.
+     * IPs usadas para resolver el ambiente del kiosco.
+     * Producción: IPv4 del Host (http://{ip-bd}:8000).
+     * Local: ?nodo_ip= simula la IP de ambiente_institucion sin alias de red.
+     *
+     * @return list<string>
+     */
+    public function ipsParaResolucionAmbiente(?Request $request = null): array
+    {
+        $request = $request ?? request();
+
+        $ipSimulada = $this->ipSimuladaLocal($request);
+        if ($ipSimulada !== null) {
+            return [$ipSimulada];
+        }
+
+        $host = $request->getHost();
+
+        if (is_string($host) && filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return [$host];
+        }
+
+        return array_values(array_filter(
+            $this->ipsCandidatasNodo($request),
+            fn (string $ip) => ! $this->esLoopback($ip)
+        ));
+    }
+
+    public function ipSimuladaLocal(?Request $request = null): ?string
+    {
+        if (! app()->environment('local')) {
+            return null;
+        }
+
+        $request = $request ?? request();
+        $nodoIp = $request->query('nodo_ip');
+
+        if (in_array($nodoIp, ['reset', 'clear'], true)) {
+            $request->session()->forget(self::SESSION_NODO_IP);
+
+            return null;
+        }
+
+        if (is_string($nodoIp) && filter_var($nodoIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $request->session()->put(self::SESSION_NODO_IP, $nodoIp);
+
+            return $nodoIp;
+        }
+
+        $guardada = $request->session()->get(self::SESSION_NODO_IP);
+
+        if (is_string($guardada) && filter_var($guardada, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return $guardada;
+        }
+
+        $configIp = config('ambiente.nodo_ip_local');
+        if (is_string($configIp) && filter_var($configIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return $configIp;
+        }
+
+        return null;
+    }
+
+    private function fuenteResolucionIp(Request $request, string $ip): string
+    {
+        if (app()->environment('local') && $this->ipSimuladaLocal($request) === $ip) {
+            return 'ambiente_institucion_simulada';
+        }
+
+        return 'ambiente_institucion';
+    }
+
+    /**
+     * IPs para cruzar con ambiente_institucion.ip (diagnóstico).
+     * Prioridad: Host de la URL → IP del servidor → LAN detectada.
      *
      * @return list<string>
      */
@@ -186,6 +262,11 @@ class SesionNinoService
     {
         $request = $request ?? request();
         $ips = [];
+
+        $host = $request->getHost();
+        if (is_string($host) && filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $ips[] = $host;
+        }
 
         $serverAddr = $request->server('SERVER_ADDR');
         if (is_string($serverAddr) && filter_var($serverAddr, FILTER_VALIDATE_IP)) {

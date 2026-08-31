@@ -55,9 +55,12 @@ use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\TematicasSuperAdminController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Raíz → portada del ambiente (kiosco). Docente: /login
-Route::get('/', fn () => redirect()->route('ambiente.inicio'));
+Route::get('/', function (Request $request) {
+    return redirect()->route('ambiente.inicio', $request->query());
+});
 
 // ── Autenticacion del nino (público) ───────────────────────────────────────
 Route::get('/bienvenida', [SesionNinoController::class, 'mostrarBienvenida'])->name('auth.bienvenida');

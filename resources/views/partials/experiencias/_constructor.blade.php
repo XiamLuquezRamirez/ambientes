@@ -8,6 +8,17 @@
         : ($puedeEditar
             ? 'Solo el creador puede publicar o cambiar el estado de esta experiencia'
             : 'No tiene permiso para publicar');
+    $gnPreview = mb_strtolower($experiencia->grado->nombre ?? '');
+    $nivelPreview = 'jardin';
+    if (str_contains($gnPreview, 'prejardín') || str_contains($gnPreview, 'prejardin')) {
+        $nivelPreview = 'prejardin';
+    } elseif (str_contains($gnPreview, 'jardín') || str_contains($gnPreview, 'jardin')) {
+        $nivelPreview = 'jardin';
+    } elseif (str_contains($gnPreview, 'transición') || str_contains($gnPreview, 'transicion')) {
+        $nivelPreview = 'transicion';
+    } elseif (str_contains($gnPreview, 'primaria') || (int) ($experiencia->grado->edad_anos ?? 0) >= 6) {
+        $nivelPreview = 'primaria';
+    }
 @endphp
 
 <div class="page-header tematicas-page-header cx-page-header">
@@ -36,6 +47,7 @@
     data-experiencia-nombre="{{ $experiencia->nombre }}"
     data-media-base="{{ asset('storage/experiencias/' . $experiencia->id . '/bloques') }}"
     data-estudiante-sexo="masculino"
+    data-nivel-etario="{{ $nivelPreview }}"
     data-emociones-base="{{ asset('assets/images/emociones') }}"
     data-experiencia-estado="{{ $experiencia->estado }}" data-url-listar="{{ $urls['listar'] }}"
     data-url-guardar="{{ $urls['guardar'] }}" data-url-reordenar="{{ $urls['reordenar'] }}"

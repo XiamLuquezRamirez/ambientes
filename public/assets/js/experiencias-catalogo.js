@@ -412,6 +412,19 @@
         return `${n} ${n === 1 ? singular : plural}`;
     }
 
+    function htmlWizardStatBadge(icono, texto, variante) {
+        if (!texto) return '';
+        const clase = variante ? ` exp-wizard-stat-${variante}` : '';
+        return `<span class="exp-wizard-stat${clase}"><i class="fa-solid ${icono}"></i> ${escapar(texto)}</span>`;
+    }
+
+    function htmlWizardStatBadges(badges, wrapperClass) {
+        const items = (badges || []).filter(Boolean);
+        if (!items.length) return '';
+        const clase = wrapperClass || 'exp-wizard-item-stats';
+        return `<div class="${clase}">${items.join('')}</div>`;
+    }
+
     function badgeOrigen(esOficial) {
         return esOficial
             ? '<span class="star">⭐ Oficial</span>'
@@ -421,8 +434,11 @@
     function htmlCardAmbiente(ambiente) {
         const color = ambiente.color_hex || '#64748B';
         const icono = ambiente.icono || '📦';
-        const modulos = pluralizar(ambiente.modulos_count, 'módulo', 'módulos');
-        const ejes = pluralizar(ambiente.ejes_count, 'eje', 'ejes');
+        const stats = htmlWizardStatBadges([
+            htmlWizardStatBadge('fa-cube', pluralizar(ambiente.modulos_count, 'módulo', 'módulos'), 'azul'),
+            htmlWizardStatBadge('fa-diagram-project', pluralizar(ambiente.ejes_count, 'eje', 'ejes'), 'verde'),
+            htmlWizardStatBadge('fa-layer-group', pluralizar(ambiente.tematicas_count, 'temática', 'temáticas'), 'morado'),
+        ], 'exp-wizard-ambiente-stats');
 
         return `
             <div class="col-md-4 col-sm-6">
@@ -435,17 +451,37 @@
                             <h6 class="exp-wizard-card-title mb-0">Ambiente ${escapar(ambiente.nombre)}</h6>
                         </div>
                     </div>
-                    <div class="exp-wizard-ambiente-stats">
-                        <span class="exp-wizard-stat exp-wizard-stat-azul">
-                            <i class="fa-solid fa-cube"></i> ${escapar(modulos)}
-                        </span>
-                        <span class="exp-wizard-stat exp-wizard-stat-verde">
-                            <i class="fa-solid fa-diagram-project"></i> ${escapar(ejes)}
-                        </span>
-                    </div>
+                    ${stats}
                 </article>
             </div>
         `;
+    }
+
+    function statsCardWizard(item, tipo) {
+        if (tipo === 'modulo') {
+            const ejes = Number(item.ejes_count ?? item.ejes?.length ?? 0);
+            const tematicas = Number(item.tematicas_count ?? 0);
+            return htmlWizardStatBadges([
+                htmlWizardStatBadge('fa-diagram-project', pluralizar(ejes, 'eje', 'ejes'), 'verde'),
+                htmlWizardStatBadge('fa-layer-group', pluralizar(tematicas, 'temática', 'temáticas'), 'morado'),
+            ]);
+        }
+
+        if (tipo === 'eje') {
+            const tematicas = Number(item.tematicas_count ?? 0);
+            return htmlWizardStatBadges([
+                htmlWizardStatBadge('fa-layer-group', pluralizar(tematicas, 'temática', 'temáticas'), 'morado'),
+            ]);
+        }
+
+        if (tipo === 'tematica') {
+            const experiencias = Number(item.experiencias_count ?? 0);
+            return htmlWizardStatBadges([
+                htmlWizardStatBadge('fa-wand-magic-sparkles', pluralizar(experiencias, 'experiencia', 'experiencias'), 'naranja'),
+            ]);
+        }
+
+        return '';
     }
 
     function htmlCardItem(item, tipo) {
@@ -456,9 +492,7 @@
         };
         const icono = iconos[tipo] || 'fa-circle';
         const badge = typeof item.es_oficial === 'boolean' ? badgeOrigen(item.es_oficial) : '';
-        const meta = tipo === 'modulo' && Array.isArray(item.ejes)
-            ? `<p class="exp-wizard-card-meta mb-0">${escapar(pluralizar(item.ejes.length, 'eje', 'ejes'))}</p>`
-            : '';
+        const stats = statsCardWizard(item, tipo);
 
         return `
             <div class="col-md-4 col-sm-6">
@@ -471,12 +505,12 @@
                         <div class="exp-wizard-item-info">
                             <h6 class="exp-wizard-card-title mb-1">${escapar(item.nombre || 'Sin nombre')}</h6>
                             ${badge ? `<div class="exp-wizard-card-badges">${badge}</div>` : ''}
-                            ${meta}
                         </div>
                         <span class="exp-wizard-card-arrow" aria-hidden="true">
                             <i class="fa-solid fa-chevron-right"></i>
                         </span>
                     </div>
+                    ${stats}
                 </article>
             </div>
         `;

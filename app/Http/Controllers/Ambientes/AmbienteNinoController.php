@@ -38,6 +38,9 @@ class AmbienteNinoController extends Controller
             ->get();
 
         return response()->json([
+            'host_solicitud' => $request->getHost(),
+            'nodo_ip_simulada' => $this->sesionNino->ipSimuladaLocal($request),
+            'ips_resolucion' => $this->sesionNino->ipsParaResolucionAmbiente($request),
             'ips_candidatas_nodo' => $this->sesionNino->ipsCandidatasNodo($request),
             'server_addr' => $request->server('SERVER_ADDR'),
             'ambiente_resuelto' => $ambiente ? [
@@ -81,6 +84,7 @@ class AmbienteNinoController extends Controller
             'urlSalir' => '',
             'urlContinuar' => '/alumnos',
             'portadaImg' => $this->urlPortada($ambiente->slug),
+            'fondoImg' => $this->urlFondo($ambiente->slug),
             'pasoInicial' => 'portada',
         ]);
     }
@@ -135,6 +139,7 @@ class AmbienteNinoController extends Controller
             'urlSalir' => '/salir',
             'urlContinuar' => '',
             'portadaImg' => $this->urlPortada($ambiente->slug),
+            'fondoImg' => $this->urlFondo($ambiente->slug),
             'pasoInicial' => 'camino',
         ]);
     }
@@ -199,6 +204,18 @@ class AmbienteNinoController extends Controller
     private function urlPortada(string $slug): string
     {
         $relativo = 'assets/images/ambientes/'.$slug.'-portada.png';
+        $absoluto = public_path($relativo);
+
+        if (File::exists($absoluto)) {
+            return '/'.$relativo;
+        }
+
+        return '';
+    }
+
+    private function urlFondo(string $slug): string
+    {
+        $relativo = 'assets/images/ambientes/'.$slug.'-fondo.png';
         $absoluto = public_path($relativo);
 
         if (File::exists($absoluto)) {

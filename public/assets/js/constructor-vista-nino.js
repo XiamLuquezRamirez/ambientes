@@ -111,6 +111,126 @@
     };
 
     let estudianteSexo = '';
+    let nivelEtario = 'jardin';
+    let estudianteNombre = '';
+
+    const NIVEL_ETARIO = {
+        prejardin: { ttsRate: 0.82, touchScale: 1.35, simplificar: true, iconosNav: true },
+        jardin: { ttsRate: 0.88, touchScale: 1.22, simplificar: true, iconosNav: true },
+        transicion: { ttsRate: 0.94, touchScale: 1.1, simplificar: false, iconosNav: false },
+        primaria: { ttsRate: 1.0, touchScale: 1.0, simplificar: false, iconosNav: false },
+    };
+
+    const ICONOS_BLOQUE = {
+        bienvenida: '👋', audio: '🔊', video: '🎬', imagen: '🖼️', historia: '📖',
+        ra: '📱', evidencia: '📸', juego: '🎮', dibujo: '🎨', pregunta: '❓',
+        emparejar: '🔗', clasificacion: '📦', arrastrar: '✋', reto: '🏅',
+        emocion: '💛', recompensa: '🏆',
+    };
+
+    const TITULOS_POR_NIVEL = {
+        prejardin: {
+            bienvenida: '¡Hola!', audio: '¡Escucha!', video: '¡Mira!', imagen: '¡Mira!',
+            historia: 'Cuento', evidencia: '¡Tu foto!', dibujo: '¡Pinta!', pregunta: '¿Cuál?',
+            emparejar: '¡Une!', clasificacion: '¡Ordena!', arrastrar: '¡Mueve!',
+            reto: '¡Reto!', emocion: '¿Cómo estás?', recompensa: '¡Ganaste!',
+        },
+        jardin: {
+            bienvenida: '¡Hola!', audio: 'Escucha', video: 'Mira el video', imagen: 'Observa',
+            historia: 'Cuento', evidencia: '¡Tu evidencia!', dibujo: 'Dibuja', pregunta: 'Pregunta',
+            emparejar: 'Empareja', clasificacion: 'Clasifica', arrastrar: 'Arrastra',
+            reto: 'Reto', emocion: '¿Cómo te sentiste?', recompensa: '¡Lo lograste!',
+        },
+        transicion: {
+            bienvenida: '¡Bienvenido!', audio: 'Escucha con atención', video: 'Observa el video',
+            imagen: 'Mira la imagen', historia: 'Historia', evidencia: 'Registra tu evidencia',
+            dibujo: 'Dibuja aquí', pregunta: 'Responde', emparejar: 'Empareja los pares',
+            clasificacion: 'Clasifica', arrastrar: 'Arrastra a su lugar', reto: 'Supera el reto',
+            emocion: '¿Cómo te sentiste?', recompensa: '¡Excelente trabajo!',
+        },
+    };
+
+    function configNivel() {
+        return NIVEL_ETARIO[nivelEtario] || NIVEL_ETARIO.jardin;
+    }
+
+    function resolverNivelEtario(valor) {
+        const s = String(valor || '').trim().toLowerCase();
+        if (s === 'prejardin' || s === 'prejardín') return 'prejardin';
+        if (s === 'jardin' || s === 'jardín') return 'jardin';
+        if (s === 'transicion' || s === 'transición') return 'transicion';
+        if (s === 'primaria') return 'primaria';
+        return 'jardin';
+    }
+
+    function aplicarNivelEtario() {
+        if (!$root || !$root.length) return;
+        $root.removeClass('vn-nivel--prejardin vn-nivel--jardin vn-nivel--transicion vn-nivel--primaria');
+        $root.addClass(`vn-nivel--${nivelEtario}`);
+        const cfg = configNivel();
+        $root.css('--vn-touch-scale', String(cfg.touchScale));
+    }
+
+    function tituloBloque(tipo, fallback) {
+        const map = TITULOS_POR_NIVEL[nivelEtario] || TITULOS_POR_NIVEL.jardin;
+        return map[tipo] || fallback;
+    }
+
+    function primerNombre() {
+        const n = String(estudianteNombre || '').trim();
+        if (!n) return configNivel().simplificar ? 'amiguito' : 'amigo';
+        return n.split(/\s+/)[0];
+    }
+
+    function celebrarExito(intenso) {
+        const host = $body[0] || $root[0];
+        if (!host) return;
+        const $burst = $('<div class="vn-celebrate" aria-hidden="true"></div>');
+        const emojis = intenso ? ['⭐', '🌟', '✨', '🎉', '💫', '🎊'] : ['⭐', '✨', '🎉'];
+        for (let i = 0; i < (intenso ? 14 : 8); i++) {
+            const $p = $('<span class="vn-celebrate-p"></span>');
+            $p.text(emojis[i % emojis.length]);
+            $p.css({
+                left: `${10 + Math.random() * 80}%`,
+                top: `${15 + Math.random() * 50}%`,
+                animationDelay: `${Math.random() * 0.35}s`,
+                fontSize: `${1.2 + Math.random() * 1.4}rem`,
+            });
+            $burst.append($p);
+        }
+        $(host).append($burst);
+        setTimeout(() => { $burst.remove(); }, 1600);
+        reproducirSfx('ok');
+    }
+
+    function reproducirSfx(tipo) {
+        try {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return;
+            const ctx = new Ctx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            if (tipo === 'ok') {
+                osc.frequency.setValueAtTime(523, ctx.currentTime);
+                osc.frequency.setValueAtTime(659, ctx.currentTime + 0.08);
+                osc.frequency.setValueAtTime(784, ctx.currentTime + 0.16);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.35);
+            } else if (tipo === 'err') {
+                osc.frequency.setValueAtTime(280, ctx.currentTime);
+                osc.frequency.setValueAtTime(220, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.25);
+            }
+            setTimeout(() => { ctx.close(); }, 500);
+        } catch (e) { /* noop */ }
+    }
 
     function escapar(str) {
         return String(str ?? '')
@@ -207,25 +327,39 @@
         const d = datos(bloque);
         const personaje = (d.personaje || 'personaje') !== 'ninguno';
         const tipoMedia = d.tipo_media || 'ninguno';
+        const saludo = configNivel().simplificar
+            ? `¡Hola, ${escapar(primerNombre())}!`
+            : tituloBloque('bienvenida', '¡Hola!');
         let mediaHtml = '';
         if (tipoMedia === 'imagen') {
             const imgUrl = mediaUrl(d.imagen);
             if (imgUrl) {
-                mediaHtml = `<div class="vn-pregunta-media vn-bienvenida-media"><img src="${escapar(imgUrl)}" alt=""></div>`;
+                mediaHtml = `<div class="vn-pregunta-media vn-bienvenida-media vn-media-zoomable"><img src="${escapar(imgUrl)}" alt=""></div>`;
             }
         } else if (tipoMedia === 'video') {
             const vidUrl = mediaUrl(d.video);
             if (vidUrl) {
                 mediaHtml = `
-                    <div class="vn-bienvenida-media vn-bienvenida-video-wrap" data-vn-bienvenida-video>
+                    <div class="vn-bienvenida-media vn-bienvenida-video-wrap" data-vn-bienvenida-video-wrap>
+                        <button type="button" class="vn-video-btn vn-bienvenida-play-btn vn-pulse-hint"
+                            data-vn-bienvenida-play aria-label="Reproducir video de bienvenida">
+                            <span class="vn-video-btn-ring" aria-hidden="true"></span>
+                            <span class="vn-video-btn-icon"><i class="fa-solid fa-play"></i></span>
+                            <span class="vn-video-btn-label">${configNivel().simplificar ? '¡Toca!' : 'Toca para ver'}</span>
+                        </button>
                         <video class="vn-video-el vn-bienvenida-video" playsinline preload="auto"
-                            src="${escapar(vidUrl)}" aria-label="Video de bienvenida"></video>
+                            src="${escapar(vidUrl)}" hidden aria-label="Video de bienvenida"></video>
+                        <p class="vn-video-status" data-vn-bienvenida-status hidden>Reproduciendo…</p>
                     </div>`;
             }
         }
+        const emoji = personaje ? '🦊' : '👋';
         return wrap(`
-            ${personaje ? '<div class="vn-hero-emoji" aria-hidden="true">🦊</div>' : '<div class="vn-hero-emoji">👋</div>'}
-            <h2 class="vn-title">¡Hola!</h2>
+            <div class="vn-bienvenida-hero">
+                <div class="vn-hero-emoji vn-hero-emoji--wave" aria-hidden="true">${emoji}</div>
+                <div class="vn-sparkles" aria-hidden="true"><span>✨</span><span>⭐</span><span>✨</span></div>
+            </div>
+            <h2 class="vn-title">${saludo}</h2>
             ${instruccionHtml(d.instruccion)}
             ${mediaHtml}
         `, bloque, 'bienvenida');
@@ -244,13 +378,14 @@
             `, bloque, 'audio');
         }
         return wrap(`
-            <h2 class="vn-title">Escucha</h2>
+            <h2 class="vn-title">${tituloBloque('audio', 'Escucha')}</h2>
             ${instruccionHtml(d.instruccion)}
-            <button type="button" class="vn-audio-btn" data-vn-audio-play
+            <button type="button" class="vn-audio-btn vn-pulse-hint" data-vn-audio-play
                 data-reps="${escapar(reps)}" aria-label="Reproducir audio">
                 <span class="vn-audio-btn-ring" aria-hidden="true"></span>
+                <span class="vn-audio-waves" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
                 <span class="vn-audio-btn-icon"><i class="fa-solid fa-play"></i></span>
-                <span class="vn-audio-btn-label">Toca para escuchar</span>
+                <span class="vn-audio-btn-label">${configNivel().simplificar ? '¡Toca!' : 'Toca para escuchar'}</span>
             </button>
             <p class="vn-audio-status" data-vn-audio-status hidden>Sonando…</p>
             <audio class="vn-audio-el" preload="auto" src="${escapar(url)}" hidden></audio>
@@ -269,13 +404,13 @@
             `, bloque, 'video');
         }
         return wrap(`
-            <h2 class="vn-title">Mira el video</h2>
+            <h2 class="vn-title">${tituloBloque('video', 'Mira el video')}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-video-stage" data-vn-video-stage>
-                <button type="button" class="vn-video-btn" data-vn-video-play aria-label="Reproducir video">
+                <button type="button" class="vn-video-btn vn-pulse-hint" data-vn-video-play aria-label="Reproducir video">
                     <span class="vn-video-btn-ring" aria-hidden="true"></span>
                     <span class="vn-video-btn-icon"><i class="fa-solid fa-play"></i></span>
-                    <span class="vn-video-btn-label">Toca para ver</span>
+                    <span class="vn-video-btn-label">${configNivel().simplificar ? '¡Toca!' : 'Toca para ver'}</span>
                 </button>
                 <video class="vn-video-el" playsinline preload="metadata" src="${escapar(url)}" hidden></video>
                 <p class="vn-video-status" data-vn-video-status hidden>Reproduciendo…</p>
@@ -285,10 +420,15 @@
 
     function renderImagen(bloque) {
         const d = datos(bloque);
+        const img = imgTag(d.archivo, d.descripcion || 'Imagen');
+        const imgHtml = img
+            ? img.replace('class="vn-media"', 'class="vn-media vn-media-zoomable"')
+            : '<p class="vn-empty">Sin imagen</p>';
         return wrap(`
-            <h2 class="vn-title">Observa</h2>
+            <h2 class="vn-title">${tituloBloque('imagen', 'Observa')}</h2>
             ${instruccionHtml(d.instruccion)}
-            ${imgTag(d.archivo, d.descripcion || 'Imagen') || '<p class="vn-empty">Sin imagen</p>'}
+            ${imgHtml}
+            ${img ? '<p class="vn-hint-tap">Toca la imagen para agrandarla</p>' : ''}
         `, bloque, 'imagen');
     }
 
@@ -318,18 +458,24 @@
         const audioUrl = mediaUrl(page.audio);
         const puedeAnt = historiaPage > 0;
         const puedeSig = historiaPage < total - 1;
+        const dots = Array.from({ length: total }, (_, i) =>
+            `<span class="vn-hist-dot${i === historiaPage ? ' is-current' : ''}${i < historiaPage ? ' is-done' : ''}"></span>`
+        ).join('');
         return wrap(`
-            <h2 class="vn-title">Cuento</h2>
+            <h2 class="vn-title">${tituloBloque('historia', 'Cuento')}</h2>
+            <div class="vn-historia-progress" aria-hidden="true">${dots}</div>
             <p class="vn-paso-badge vn-historia-badge">Página ${historiaPage + 1} de ${total}</p>
             ${historiaPage === 0 ? instruccionHtml(d.instruccion) : ''}
-            ${imgTag(page.imagen, `Página ${historiaPage + 1}`) || '<p class="vn-empty">Sin imagen en esta página</p>'}
+            <div class="vn-historia-page vn-historia-page--enter">
+                ${imgTag(page.imagen, `Página ${historiaPage + 1}`) || '<p class="vn-empty">Sin imagen en esta página</p>'}
+            </div>
             ${audioUrl ? `<audio class="vn-historia-audio" preload="auto" src="${escapar(audioUrl)}" hidden></audio>` : ''}
             <div class="vn-historia-nav">
-                <button type="button" class="vn-hist-nav-btn" data-vn-hist-prev ${puedeAnt ? '' : 'disabled'}>
-                    <i class="fa-solid fa-arrow-left"></i> Anterior
+                <button type="button" class="vn-hist-nav-btn vn-hist-nav-btn--big" data-vn-hist-prev ${puedeAnt ? '' : 'disabled'}>
+                    <i class="fa-solid fa-arrow-left"></i> ${configNivel().simplificar ? '' : 'Anterior'}
                 </button>
-                <button type="button" class="vn-hist-nav-btn" data-vn-hist-next ${puedeSig ? '' : 'disabled'}>
-                    Siguiente <i class="fa-solid fa-arrow-right"></i>
+                <button type="button" class="vn-hist-nav-btn vn-hist-nav-btn--big" data-vn-hist-next ${puedeSig ? '' : 'disabled'}>
+                    ${configNivel().simplificar ? '' : 'Siguiente'} <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
         `, bloque, 'historia');
@@ -339,28 +485,54 @@
         const d = datos(bloque);
         return wrap(`
             <div class="vn-ra-stage">
-                <div class="vn-hero-emoji">📱</div>
-                <h2 class="vn-title">Realidad aumentada</h2>
+                <div class="vn-ra-scanner" aria-hidden="true">
+                    <div class="vn-ra-scan-frame">
+                        <span class="vn-ra-corner vn-ra-corner--tl"></span>
+                        <span class="vn-ra-corner vn-ra-corner--tr"></span>
+                        <span class="vn-ra-corner vn-ra-corner--bl"></span>
+                        <span class="vn-ra-corner vn-ra-corner--br"></span>
+                        <div class="vn-ra-marker">${escapar(d.marcador || '?')}</div>
+                        <div class="vn-ra-scan-line"></div>
+                    </div>
+                </div>
+                <h2 class="vn-title">${configNivel().simplificar ? '¡Mira con el celular!' : 'Realidad aumentada'}</h2>
                 ${instruccionHtml(d.instruccion)}
-                <div class="vn-ra-marker">${escapar(d.marcador || '?')}</div>
-                <p class="vn-empty">Apunta al marcador ${escapar(d.marcador || '')}<br><small>${escapar(d.contenido || 'Animación 3D')}</small></p>
+                <p class="vn-ra-hint">${escapar(d.contenido || 'Animación 3D')}</p>
+                <button type="button" class="vn-ra-listo-btn" data-vn-ra-listo>
+                    <i class="fa-solid fa-check"></i>
+                    ${configNivel().simplificar ? '¡Lo vi!' : 'Ya vi el marcador'}
+                </button>
             </div>
-        `, bloque);
+        `, bloque, 'ra');
     }
 
     function renderEvidencia(bloque) {
         const d = datos(bloque);
         const tipo = d.tipo || 'Foto';
-        const icon = tipo.includes('Audio') ? 'fa-microphone' : (tipo.includes('Video') ? 'fa-video' : 'fa-camera');
+        const tipoKey = tipo.includes('Audio') ? 'audio' : (tipo.includes('Video') ? 'video' : 'foto');
+        const icon = tipoKey === 'audio' ? 'fa-microphone' : (tipoKey === 'video' ? 'fa-video' : 'fa-camera');
+        const label = configNivel().simplificar
+            ? (tipoKey === 'audio' ? '¡Graba!' : (tipoKey === 'video' ? '¡Graba!' : '¡Foto!'))
+            : tipo;
         return wrap(`
-            <h2 class="vn-title">¡Tu evidencia!</h2>
+            <h2 class="vn-title">${tituloBloque('evidencia', '¡Tu evidencia!')}</h2>
             ${instruccionHtml(d.instruccion)}
-            <button type="button" class="vn-evidencia-btn" data-vn-evidencia>
+            <div class="vn-evidencia-stage" data-vn-evidencia-stage hidden>
+                <video class="vn-evidencia-preview" playsinline muted hidden></video>
+                <div class="vn-evidencia-preview-placeholder" hidden>
+                    <i class="fa-solid ${icon}"></i>
+                    <span>¡Listo!</span>
+                </div>
+            </div>
+            <button type="button" class="vn-evidencia-btn" data-vn-evidencia data-vn-evidencia-tipo="${escapar(tipoKey)}">
                 <i class="fa-solid ${icon}"></i>
-                ${escapar(tipo)}
+                <span>${escapar(label)}</span>
             </button>
-            <div id="vnEvidenciaMsg" class="vn-feedback is-ok" hidden>¡Listo! (simulación)</div>
-        `, bloque);
+            <button type="button" class="vn-evidencia-captura-btn" data-vn-evidencia-captura hidden>
+                <i class="fa-solid fa-circle"></i> Capturar
+            </button>
+            <div id="vnEvidenciaMsg" class="vn-feedback is-ok" hidden>¡Muy bien! Tu evidencia quedó lista.</div>
+        `, bloque, 'evidencia');
     }
 
     function puzzleDims(piezasStr) {
@@ -413,9 +585,11 @@
         const colors = options.colors || PAINT_DEFAULT_COLORS;
         const showShapes = !!options.showShapes;
         const customColor = options.fixedColors ? '' : `
-            <label class="vn-paint-picker" title="Elegir otro color">
-                <span class="vn-paint-picker-icon"><i class="fa-solid fa-eyedropper"></i></span>
-                <input type="color" class="vn-paint-color-input" value="${escapar(colors[2] || '#EF4444')}" aria-label="Elegir color">
+            <label class="vn-paint-swatch vn-paint-swatch--custom" title="Más colores" aria-label="Elegir otro color">
+                <span class="vn-paint-swatch-custom-bg" style="background:${escapar(colors[2] || '#EF4444')}"></span>
+                <span class="vn-paint-swatch-custom-icon" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+                <span class="vn-paint-swatch-custom-label">Más</span>
+                <input type="color" class="vn-paint-color-input" value="${escapar(colors[2] || '#EF4444')}" aria-label="Elegir color personalizado">
             </label>`;
         const shapes = showShapes ? `
             <button type="button" class="vn-paint-tool" data-vn-paint-tool="line" title="Línea" aria-label="Línea">
@@ -427,7 +601,7 @@
             <button type="button" class="vn-paint-tool" data-vn-paint-tool="triangle" title="Triángulo" aria-label="Triángulo">
                 <i class="fa-solid fa-play vn-icon-triangle"></i></button>` : '';
         const swatches = colors.map((c, i) =>
-            `<button type="button" class="vn-paint-swatch ${i === 0 ? 'is-on' : ''}"
+            `<button type="button" class="vn-paint-swatch"
                 data-vn-paint-color="${escapar(c)}" style="background:${escapar(c)}"
                 title="Color ${i + 1}" aria-label="Color ${i + 1}"></button>`
         ).join('');
@@ -486,12 +660,11 @@
         while (colores.length < n) colores.push(defaults[colores.length] || '#22C55E');
         const toolbar = renderPaintToolbar({ colors: colores, fixedColors: true, showShapes: false });
         return `
-            <p class="vn-puzzle-meta">Elige un color y pinta con el dedo. El docente revisará tu dibujo.</p>
             <div class="vn-paint vn-paint--colorear" data-vn-paint="colorear">
                 ${toolbar}
                 <div class="vn-paint-stage vn-colorear-stage">
                     <div class="vn-colorear-bg" style="background-image:url('${escapar(url)}')"></div>
-                    <canvas id="vnCanvas" class="vn-colorear-canvas" width="1100" height="825"></canvas>
+                    <canvas id="vnCanvas" class="vn-colorear-canvas" aria-label="Lienzo para colorear"></canvas>
                 </div>
             </div>`;
     }
@@ -532,8 +705,12 @@
             const imgs = [1, 2, 3, 4, 5, 6].map((i) => d[`imagen_${i}`]).filter(Boolean);
             const deck = imgs.concat(imgs).map((f, i) => ({ key: i, file: f, pair: f }));
             shuffleInPlace(deck);
-            extra = `<div class="vn-memory" data-vn-memory>${deck.map((c, i) =>
-                `<button type="button" class="vn-memory-card" data-i="${i}" data-pair="${escapar(c.pair)}">?</button>`
+            const paresTotal = imgs.length;
+            extra = `<p class="vn-memory-score" data-vn-memory-score>0 / ${paresTotal} parejas</p>
+            <div class="vn-memory" data-vn-memory data-pares="${paresTotal}">${deck.map((c, i) =>
+                `<button type="button" class="vn-memory-card" data-i="${i}" data-pair="${escapar(c.pair)}" aria-label="Tarjeta">
+                    <span class="vn-memory-back" aria-hidden="true">?</span>
+                </button>`
             ).join('')}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>`;
         } else if (id === 'rompecabezas') {
@@ -547,6 +724,15 @@
             extra = renderSecuencia(d);
         } else {
             extra = '<p class="vn-empty">Elige un juego en la configuración</p>';
+        }
+        if (id === 'colorear') {
+            return wrap(`
+                <div class="vn-paint-head vn-paint-head--compact">
+                    <h2 class="vn-title vn-title--compact">${escapar(d.juego_nombre || 'Colorea')}</h2>
+                    ${instruccionHtml(d.instruccion)}
+                </div>
+                ${extra}
+            `, bloque, cardClass);
         }
         return wrap(`
             <h2 class="vn-title">${escapar(d.juego_nombre || 'Juego')}</h2>
@@ -563,22 +749,26 @@
             fixedColors: false,
             showShapes: true,
         });
-        const canvasBg = fondo
-            ? `background:url('${escapar(fondo)}') center/contain no-repeat #fff`
+        const stageStyle = fondo
+            ? ` style="background:url('${escapar(fondo)}') center/contain no-repeat #fff"`
             : '';
         return wrap(`
-            <h2 class="vn-title">Dibuja</h2>
-            ${instruccionHtml(d.instruccion)}
+            <div class="vn-paint-head">
+                <h2 class="vn-title vn-title--compact">${tituloBloque('dibujo', 'Dibuja')}</h2>
+                ${instruccionHtml(d.instruccion)}
+            </div>
             <div class="vn-paint vn-paint--dibujo" data-vn-paint="dibujo">
                 ${toolbar}
-                <div class="vn-paint-stage vn-draw-stage">
-                    <canvas id="vnCanvas" class="vn-draw-canvas" width="1100" height="560"
-                        style="${canvasBg}"></canvas>
+                <div class="vn-paint-stage vn-draw-stage"${stageStyle}>
+                    <canvas id="vnCanvas" class="vn-draw-canvas" aria-label="Lienzo de dibujo"></canvas>
                 </div>
             </div>
-            ${d.guardar_evidencia ? `<button type="button" class="vn-evidencia-btn" data-vn-evidencia>
-                <i class="fa-solid fa-camera"></i><span>Guardar</span></button>
-                <p class="vn-evidencia-msg" id="vnEvidenciaMsg" hidden>¡Listo! Tu dibujo quedó guardado.</p>` : ''}
+            ${d.guardar_evidencia ? `<div class="vn-paint-foot">
+                <button type="button" class="vn-dibujo-guardar-btn" data-vn-dibujo-guardar>
+                    <i class="fa-solid fa-check"></i><span>${configNivel().simplificar ? '¡Listo!' : 'Guardar dibujo'}</span>
+                </button>
+                <p class="vn-evidencia-msg" id="vnEvidenciaMsg" hidden>¡Listo! Tu dibujo quedó guardado.</p>
+            </div>` : ''}
         `, bloque, 'dibujo');
     }
 
@@ -601,13 +791,14 @@
             ? `<div class="vn-pregunta-media"><img src="${escapar(preguntaImg)}" alt=""></div>`
             : '';
         return wrap(`
-            <h2 class="vn-title">Pregunta</h2>
+            <h2 class="vn-title">${tituloBloque('pregunta', 'Pregunta')}</h2>
             ${instruccionHtml(d.instruccion)}
             <p class="vn-instruccion vn-pregunta-texto">${escapar(d.texto || '')}</p>
             ${preguntaImgHtml}
             <div class="vn-options" data-vn-pregunta data-fb-ok="${escapar(d.fb_ok || '¡Muy bien!')}"
                 data-fb-err="${escapar(d.fb_err || 'Inténtalo de nuevo')}"
-                data-intentos="${escapar(d.intentos || '2')}">${optsHtml}</div>
+                data-intentos="${escapar(d.intentos || '2')}"
+                data-al-agotar="${escapar(d.al_agotar || 'Mostrar respuesta correcta')}">${optsHtml}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>
         `, bloque, 'pregunta');
     }
@@ -632,7 +823,7 @@
             return `<button type="button" class="vn-chip" data-vn-der="${i}">${content || '—'}</button>`;
         });
         return wrap(`
-            <h2 class="vn-title">Empareja</h2>
+            <h2 class="vn-title">${tituloBloque('emparejar', 'Empareja')}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-match-cols" data-vn-emparejar data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
                 data-fb-err="${escapar(d.fb_err || 'Ese no va ahí…')}">
@@ -657,12 +848,12 @@
             const label = it.texto || (it.imagen ? '' : 'Ítem');
             const img = it.imagen ? `<img src="${escapar(mediaUrl(it.imagen))}" alt="">` : '';
             const text = label ? `<span>${escapar(label)}</span>` : '';
-            return `<button type="button" class="vn-chip" data-vn-item="${i}" data-cat="${escapar(it.categoria || '')}" style="--vn-i:${i}">${img}${text || '—'}</button>`;
+            return `<button type="button" class="vn-chip vn-chip-drag" data-vn-item="${i}" data-cat="${escapar(it.categoria || '')}" aria-grabbed="false" style="--vn-i:${i}">${img}${text || '—'}</button>`;
         }).join('');
         return wrap(`
-            <h2 class="vn-title">Clasifica</h2>
+            <h2 class="vn-title">${tituloBloque('clasificacion', 'Clasifica')}</h2>
             ${instruccionHtml(d.instruccion)}
-            <p class="vn-hint-drag">Toca un elemento y luego su categoría</p>
+            <p class="vn-hint-drag">${configNivel().simplificar ? '¡Arrastra cada cosa a su lugar!' : 'Arrastra cada elemento a su categoría'}</p>
             <div class="vn-sort-board" data-vn-clasif-board>
                 <div class="vn-sort-col vn-sort-col--pool" data-vn-clasif-pool>${pool}</div>
                 <div class="vn-sort-col vn-sort-col--zones" data-vn-clasif>${zonas}</div>
@@ -689,9 +880,9 @@
                 aria-grabbed="false" style="--vn-i:${i}">${img}${text || '—'}</button>`;
         }).join('');
         return wrap(`
-            <h2 class="vn-title">Arrastra</h2>
+            <h2 class="vn-title">${tituloBloque('arrastrar', 'Arrastra')}</h2>
             ${instruccionHtml(d.instruccion)}
-            <p class="vn-hint-drag">Arrastra cada elemento a su zona</p>
+            <p class="vn-hint-drag">${configNivel().simplificar ? '¡Llévalo a su lugar!' : 'Arrastra cada elemento a su zona'}</p>
             <div class="vn-sort-board" data-vn-arrastrar-board>
                 <div class="vn-sort-col vn-sort-col--pool" data-vn-arrastrar-pool>${pool}</div>
                 <div class="vn-sort-col vn-sort-col--zones" data-vn-arrastrar>${zHtml}</div>
@@ -705,6 +896,7 @@
         const $slots = $(zoneEl).find('.vn-zone-slots').first();
         if (!$slots.length) {
             $chip.addClass('is-matched').removeClass('is-selected');
+            alCompletarActividad();
             return;
         }
         const placed = $chip[0].cloneNode(true);
@@ -719,6 +911,7 @@
         setTimeout(() => { $chip.prop('hidden', true); }, 280);
         zoneEl.classList.add('is-landed');
         setTimeout(() => { zoneEl.classList.remove('is-landed'); }, 450);
+        alCompletarActividad();
     }
 
     function renderReto(bloque) {
@@ -752,8 +945,11 @@
         const d = datos(bloque);
         const n = String(d.cantidad || '6') === '4' ? 4 : 6;
         const list = EMOCION_IDS[n];
+        const titulo = configNivel().simplificar
+            ? '¿Cómo estás?'
+            : tituloBloque('emocion', 'Ahora cuéntame, ¿cómo te sentiste?');
         return wrap(`
-            <h2 class="vn-title">Ahora cuéntame, ¿cómo te sentiste?</h2>
+            <h2 class="vn-title">${titulo}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-emociones" data-vn-emocion data-count="${n}" data-sexo="${escapar(resolverSexoEmocion())}">
                 ${list.map((id) => {
@@ -780,13 +976,14 @@
         const icon = icons[tipo] || '🏆';
         const insignia = tipo === 'Insignia especial' && d.insignia ? imgTag(d.insignia, 'Insignia') : '';
         return wrap(`
-            <div class="vn-reward">
-                <div class="vn-reward-icon">${icon}</div>
-                <h2 class="vn-title">¡Lo lograste!</h2>
+            <div class="vn-reward vn-reward--celebrate">
+                <div class="vn-reward-rays" aria-hidden="true"></div>
+                <div class="vn-reward-icon vn-reward-icon--bounce">${icon}</div>
+                <h2 class="vn-title">${tituloBloque('recompensa', '¡Lo lograste!')}</h2>
                 ${instruccionHtml(d.instruccion)}
                 ${insignia}
             </div>
-        `, bloque);
+        `, bloque, 'recompensa');
     }
 
     function pickColor(seed) {
@@ -823,11 +1020,16 @@
     /* ── Chrome / navegación ─────────────────────────────────── */
 
     function renderProgress() {
-        $progress.html(bloques.map((_, i) => {
+        const usarIconos = configNivel().iconosNav && nivelEtario !== 'primaria';
+        $progress.html(bloques.map((b, i) => {
             let cls = 'vn-dot';
             if (i < index) cls += ' is-done';
             if (i === index) cls += ' is-current';
-            return `<span class="${cls}"></span>`;
+            const icon = usarIconos ? (ICONOS_BLOQUE[b.tipo] || '•') : '';
+            const inner = usarIconos
+                ? `<span class="vn-dot-icon">${icon}</span>`
+                : '';
+            return `<span class="${cls}" title="${escapar(b.nombre || b.tipo)}">${inner}</span>`;
         }).join(''));
         $stepLabel.text(`Paso ${index + 1} de ${bloques.length || 1}`);
     }
@@ -862,8 +1064,17 @@
         }
     }
 
+    function esBloquePintar(bloque) {
+        if (!bloque) return false;
+        if (bloque.tipo === 'dibujo') return true;
+        return bloque.tipo === 'juego' && datos(bloque).juego_id === 'colorear';
+    }
+
     function ajustarBloqueAlViewport() {
         if (!$body || !$body.length || !overlayAbierto()) return;
+
+        const bloque = bloques[index];
+        if (esBloquePintar(bloque)) return;
 
         const $fit = $body.children('.vn-block-fit').first();
         const $card = $fit.length ? $fit.children('.vn-card').first() : $body.children('.vn-card').first();
@@ -896,27 +1107,54 @@
         });
     }
 
+    function ajustarLayoutPintar() {
+        const bloque = bloques[index];
+        if (!esBloquePintar(bloque) || !$body || !$body.length) return;
+
+        const $card = $body.find('.vn-card--dibujo, .vn-card--juego-colorear').first();
+        if ($card.length) {
+            $card.css({ transform: 'none', marginTop: '', marginBottom: '' });
+        }
+
+        // Dejar que el flex CSS ocupe el espacio; limpiar tamaños inline previos.
+        $body.find('.vn-paint, .vn-paint-stage').css({
+            minHeight: '',
+            height: '',
+            maxHeight: '',
+            minWidth: '',
+            width: '',
+            flex: '',
+        });
+    }
+
     function ajustarCanvasPaint() {
         const canvas = document.getElementById('vnCanvas');
-        if (!canvas || !drawCtx || !paint) return;
+        if (!canvas) return;
         const stage = canvas.closest('.vn-paint-stage');
         if (!stage) return;
 
-        const rect = stage.getBoundingClientRect();
-        const w = Math.round(Math.max(200, rect.width));
-        const h = Math.round(Math.max(160, rect.height));
+        const w = Math.round(stage.clientWidth);
+        const h = Math.round(stage.clientHeight);
         if (w <= 0 || h <= 0) return;
-        if (canvas.width === w && canvas.height === h) return;
+
+        const needsResize = canvas.width !== w || canvas.height !== h;
+        if (!needsResize && drawCtx && paint) return;
 
         let snap = null;
-        try {
-            snap = canvas.toDataURL();
-        } catch (e) { /* noop */ }
+        if (needsResize && drawCtx && paint) {
+            try {
+                snap = canvas.toDataURL();
+            } catch (e) { /* noop */ }
+        }
 
-        canvas.width = w;
-        canvas.height = h;
+        if (needsResize) {
+            canvas.width = w;
+            canvas.height = h;
+        }
 
-        if (snap) {
+        if (!drawCtx || !paint) return;
+
+        if (snap && needsResize) {
             const img = new Image();
             img.onload = function () {
                 if (!drawCtx || !paint) return;
@@ -932,20 +1170,23 @@
             return;
         }
 
-        if (paint.mode === 'dibujo' && !paint.hasFondo) {
+        if (paint.mode === 'dibujo' && !paint.hasFondo && (!paint.history || paint.history.length <= 1)) {
             drawCtx.fillStyle = '#ffffff';
             drawCtx.fillRect(0, 0, w, h);
         }
-        paint.history = [];
-        paintSaveState();
+        if (!paint.history || !paint.history.length) {
+            paintSaveState();
+        }
     }
 
     function programarAjusteLayout() {
         requestAnimationFrame(function () {
             ajustarEscalaTablet();
+            ajustarLayoutPintar();
             ajustarBloqueAlViewport();
             ajustarCanvasPaint();
             requestAnimationFrame(function () {
+                ajustarLayoutPintar();
                 ajustarBloqueAlViewport();
                 ajustarCanvasPaint();
             });
@@ -969,20 +1210,18 @@
         }
         $title.text(experienciaNombre);
         $blockName.text(bloque.nombre || bloque.tipo);
+        $body.removeData('vn-bloque-visto vn-bienvenida-video-ok');
+        $body.toggleClass('vn-body--paint', esBloquePintar(bloque));
         $body.html(renderBloque(bloque));
         $btnPrev.prop('disabled', index <= 0);
-        const esUltimoBloque = index >= bloques.length - 1;
-        if (alTerminarExperiencia && esUltimoBloque) {
-            $btnNext.prop('disabled', false);
-            $btnNext.find('span').first().text('Seguir');
-        } else {
-            $btnNext.find('span').first().text('Siguiente');
-            $btnNext.prop('disabled', esUltimoBloque);
-        }
         renderProgress();
         initInteracciones(bloque);
+        actualizarNavBloque();
         $body.scrollTop(0);
         programarAjusteLayout();
+        if (bloque.tipo === 'recompensa') {
+            setTimeout(() => { celebrarExito(true); }, 400);
+        }
     }
 
     let ttsToken = 0;
@@ -1072,7 +1311,7 @@
         const voice = vozNaturalEspanol();
         u.lang = (voice && voice.lang) ? voice.lang : 'es-MX';
         if (voice) u.voice = voice;
-        u.rate = 0.98;
+        u.rate = configNivel().ttsRate;
         u.pitch = 1;
         u.volume = 1;
         u.onend = function () {
@@ -1206,12 +1445,231 @@
     }
 
     function showFb(ok, okMsg, errMsg) {
-        const $fb = $('#vnFb');
-        if (!$fb.length) return;
+        let $fb = $('#vnFb');
+        if (!$fb.length) {
+            $fb = $('<div class="vn-feedback vn-feedback--nav" id="vnFb" hidden></div>');
+            const $card = $body.find('.vn-card').first();
+            if ($card.length) $card.append($fb);
+            else return;
+        }
         $fb.prop('hidden', false)
             .toggleClass('is-ok', !!ok)
             .toggleClass('is-bad', !ok)
             .text(ok ? okMsg : errMsg);
+        if (ok) celebrarExito(false);
+        else reproducirSfx('err');
+    }
+
+    function marcarBloqueVisto() {
+        $body.data('vn-bloque-visto', true);
+        actualizarNavBloque();
+    }
+
+    function itemsPoolCompletos($items) {
+        if (!$items.length) return true;
+        return $items.filter(':not(.is-matched)').filter(function () {
+            return !this.hidden;
+        }).length === 0;
+    }
+
+    function bloqueEstaCompleto(bloque) {
+        if (!bloque) return false;
+        const d = datos(bloque);
+        const tipo = bloque.tipo;
+
+        switch (tipo) {
+            case 'bienvenida': {
+                const tipoMedia = d.tipo_media || 'ninguno';
+                if (tipoMedia === 'video' && mediaUrl(d.video)) {
+                    return !!$body.data('vn-bienvenida-video-ok');
+                }
+                return !!$body.data('vn-bloque-visto');
+            }
+            case 'audio':
+                if (!mediaUrl(d.archivo)) return !!$body.data('vn-bloque-visto');
+                return $body.find('[data-vn-audio-play].is-done').length > 0;
+            case 'video':
+                if (!mediaUrl(d.archivo)) return !!$body.data('vn-bloque-visto');
+                return $body.find('[data-vn-video-play].is-done').length > 0;
+            case 'imagen':
+            case 'recompensa':
+                return !!$body.data('vn-bloque-visto');
+            case 'ra':
+                return $body.find('[data-vn-ra-listo].is-done').length > 0;
+            case 'historia':
+                return historiaPage >= totalPaginasHistoria(bloque) - 1 && !!$body.data('vn-bloque-visto');
+            case 'evidencia':
+                return !$('#vnEvidenciaMsg').prop('hidden');
+            case 'pregunta':
+                return !!$body.find('[data-vn-pregunta]').data('locked');
+            case 'reto': {
+                const pasos = Array.isArray(d.pasos) ? d.pasos : [];
+                return pasos.length > 0
+                    && retoPaso >= pasos.length - 1
+                    && !!$body.find('[data-vn-reto]').data('locked');
+            }
+            case 'emocion':
+                return $body.find('.vn-emocion.is-picked').length > 0;
+            case 'emparejar': {
+                const total = $body.find('[data-vn-emparejar] [data-vn-izq]').length;
+                const matched = $body.find('[data-vn-emparejar] [data-vn-izq].is-matched').length;
+                return total > 0 && matched >= total;
+            }
+            case 'clasificacion':
+                return itemsPoolCompletos($body.find('[data-vn-clasif-pool] [data-vn-item]'));
+            case 'arrastrar':
+                return itemsPoolCompletos($body.find('[data-vn-arrastrar-pool] [data-vn-item]'));
+            case 'dibujo':
+                if (d.guardar_evidencia) return !$('#vnEvidenciaMsg').prop('hidden');
+                return !!(paint && paint.history && paint.history.length > 1);
+            case 'juego': {
+                const juegoId = d.juego_id || '';
+                if (juegoId === 'memoria') {
+                    const total = $body.find('[data-vn-memory] .vn-memory-card').length;
+                    const done = $body.find('[data-vn-memory] .vn-memory-card.is-done').length;
+                    return total > 0 && done >= total;
+                }
+                if (juegoId === 'rompecabezas') {
+                    return $body.find('[data-vn-puzzle].is-complete').length > 0;
+                }
+                if (juegoId === 'secuencia') {
+                    return $body.find('[data-vn-secuencia].is-complete').length > 0;
+                }
+                if (juegoId === 'colorear') {
+                    return !!(paint && paint.history && paint.history.length > 1);
+                }
+                return !!$body.data('vn-bloque-visto');
+            }
+            default:
+                return !!$body.data('vn-bloque-visto');
+        }
+    }
+
+    function mensajePendienteBloque(bloque) {
+        if (!bloque) return 'Termina esta actividad antes de continuar.';
+        const d = datos(bloque);
+        switch (bloque.tipo) {
+            case 'audio': return 'Escucha el audio hasta el final.';
+            case 'video': return 'Mira el video hasta el final.';
+            case 'historia': return 'Llega a la última página del cuento.';
+            case 'pregunta': return 'Responde la pregunta.';
+            case 'reto': return 'Completa todos los pasos del reto.';
+            case 'emparejar': return 'Empareja todos los elementos.';
+            case 'clasificacion': return 'Clasifica todos los elementos.';
+            case 'arrastrar': return 'Arrastra todos los elementos a su zona.';
+            case 'emocion': return 'Elige cómo te sentiste.';
+            case 'evidencia': return 'Toca el botón para registrar tu evidencia.';
+            case 'ra': return 'Toca el botón cuando veas el marcador.';
+            case 'dibujo':
+                return d.guardar_evidencia ? 'Guarda tu dibujo.' : 'Haz un dibujo en el lienzo.';
+            case 'juego': {
+                const juegoId = d.juego_id || '';
+                if (juegoId === 'memoria') return 'Encuentra todas las parejas.';
+                if (juegoId === 'rompecabezas') return 'Completa el rompecabezas.';
+                if (juegoId === 'secuencia') return 'Ordena las tarjetas correctamente.';
+                if (juegoId === 'colorear') return 'Colorea la imagen.';
+                return 'Termina el juego.';
+            }
+            case 'bienvenida':
+                return (d.tipo_media || '') === 'video'
+                    ? 'Mira el video de bienvenida.'
+                    : 'Escucha la bienvenida.';
+            default:
+                return 'Termina esta actividad antes de continuar.';
+        }
+    }
+
+    function actualizarNavBloque() {
+        const bloque = bloques[index];
+        if (!bloque) return;
+        const esUltimoBloque = index >= bloques.length - 1;
+        const completo = bloqueEstaCompleto(bloque);
+
+        if (alTerminarExperiencia && esUltimoBloque) {
+            $btnNext.find('span').first().text('Seguir');
+            $btnNext.prop('disabled', false);
+            $btnNext.toggleClass('is-blocked', !completo);
+        } else if (esUltimoBloque) {
+            $btnNext.find('span').first().text('Siguiente');
+            $btnNext.prop('disabled', true);
+            $btnNext.toggleClass('is-blocked', true);
+        } else {
+            $btnNext.find('span').first().text('Siguiente');
+            $btnNext.prop('disabled', false);
+            $btnNext.toggleClass('is-blocked', !completo);
+        }
+        $btnNext.attr('aria-disabled', completo ? 'false' : 'true');
+    }
+
+    function mostrarAvisoBloquePendiente() {
+        const bloque = bloques[index];
+        showFb(false, '', mensajePendienteBloque(bloque));
+        $btnNext.addClass('vn-nav-shake');
+        setTimeout(() => { $btnNext.removeClass('vn-nav-shake'); }, 520);
+    }
+
+    function alCompletarActividad() {
+        actualizarNavBloque();
+    }
+
+    function actualizarScoreMemoria() {
+        const $root = $body.find('[data-vn-memory]');
+        if (!$root.length) return;
+        const pares = Number($root.data('pares')) || 0;
+        const done = $root.find('.vn-memory-card.is-done').length / 2;
+        $body.find('[data-vn-memory-score]').text(`${done} / ${pares} parejas`);
+    }
+
+    function aplicarAlAgotar($box) {
+        const modo = String($box.data('al-agotar') || 'Mostrar respuesta correcta');
+        if (modo === 'Repetir desde el inicio') {
+            $box.data('locked', false);
+            $body.find('.vn-option').removeClass('is-ok is-bad');
+            const bloque = bloques[index];
+            if (bloque && bloque.tipo === 'pregunta') {
+                intentosRestantes = parseIntentos($box.data('intentos'));
+            }
+            const $fb = $('#vnFb');
+            if ($fb.length) $fb.prop('hidden', true).removeClass('is-ok is-bad').text('');
+            return;
+        }
+        if (modo !== 'Continuar sin mostrar') {
+            $body.find('.vn-option[data-correcta="1"]').addClass('is-ok');
+        }
+        $box.data('locked', true);
+        alCompletarActividad();
+    }
+
+    function revisarHistoriaVista() {
+        const bloque = bloques[index];
+        if (!bloque || bloque.tipo !== 'historia') return;
+        if (historiaPage < totalPaginasHistoria(bloque) - 1) return;
+        marcarBloqueVisto();
+    }
+
+    function trasInstruccionBloque(bloque) {
+        const d = datos(bloque);
+        const tipo = bloque.tipo;
+        if (tipo === 'historia') {
+            iniciarAudioHistoria();
+            return;
+        }
+        if (tipo === 'bienvenida' && (d.tipo_media || '') === 'video' && mediaUrl(d.video)) {
+            reproducirVideoBienvenida();
+            return;
+        }
+        if (['imagen', 'recompensa', 'bienvenida'].includes(tipo)) {
+            marcarBloqueVisto();
+        }
+    }
+
+    function iniciarInstruccionBloque(bloque) {
+        const texto = String(datos(bloque).instruccion || '').trim();
+        if (texto) {
+            hablarTexto(texto, () => trasInstruccionBloque(bloque));
+        } else {
+            trasInstruccionBloque(bloque);
+        }
     }
 
     function paintAddListener(el, type, fn, opts) {
@@ -1219,7 +1677,26 @@
         paintListeners.push({ el, type, fn, opts });
     }
 
+    let paintResizeObs = null;
+
+    function observarStagePaint() {
+        if (paintResizeObs) {
+            paintResizeObs.disconnect();
+            paintResizeObs = null;
+        }
+        const stage = $body && $body.find('.vn-paint-stage')[0];
+        if (!stage || typeof ResizeObserver === 'undefined') return;
+        paintResizeObs = new ResizeObserver(function () {
+            ajustarCanvasPaint();
+        });
+        paintResizeObs.observe(stage);
+    }
+
     function limpiarPaint() {
+        if (paintResizeObs) {
+            paintResizeObs.disconnect();
+            paintResizeObs = null;
+        }
         paintListeners.forEach(({ el, type, fn, opts }) => el.removeEventListener(type, fn, opts));
         paintListeners = [];
         paint = null;
@@ -1241,6 +1718,7 @@
         paint.history.push(drawCtx.getImageData(0, 0, canvas.width, canvas.height));
         if (paint.history.length > 40) paint.history.shift();
         paintUpdateActions();
+        alCompletarActividad();
     }
 
     function paintUndo() {
@@ -1309,17 +1787,19 @@
             drawCtx.fillStyle = '#ffffff';
             drawCtx.fillRect(0, 0, canvas.width, canvas.height);
         }
-        paintSaveState();
 
         const rect = () => canvas.getBoundingClientRect();
         const pos = (e) => {
             const r = rect();
+            if (r.width <= 0 || r.height <= 0) return { x: 0, y: 0 };
+            const scaleX = canvas.width / r.width;
+            const scaleY = canvas.height / r.height;
             const t = (e.touches && e.touches[0])
                 || (e.changedTouches && e.changedTouches[0])
                 || e;
             return {
-                x: (t.clientX - r.left) * (canvas.width / r.width),
-                y: (t.clientY - r.top) * (canvas.height / r.height),
+                x: (t.clientX - r.left) * scaleX,
+                y: (t.clientY - r.top) * scaleY,
             };
         };
 
@@ -1391,6 +1871,11 @@
         paintAddListener(canvas, 'touchmove', move, { passive: false });
         paintAddListener(canvas, 'touchend', end);
         paintUpdateActions();
+        observarStagePaint();
+        requestAnimationFrame(function () {
+            ajustarLayoutPintar();
+            ajustarCanvasPaint();
+        });
     }
 
     function initInteracciones(bloque) {
@@ -1401,11 +1886,15 @@
 
         if (bloque.tipo === 'dibujo') {
             const d = datos(bloque);
+            const brushKey = nivelEtario === 'prejardin' ? 'l' : (nivelEtario === 'jardin' ? 'm' : 'm');
+            const colorInicial = PAINT_DEFAULT_COLORS[2];
             initPaintCanvas({
                 mode: 'dibujo',
-                color: PAINT_DEFAULT_COLORS[2],
+                color: colorInicial,
                 hasFondo: !!d.fondo,
+                lineWidth: PAINT_SIZE_MAP[brushKey],
             });
+            paintSelectColor(colorInicial);
         }
 
         if (bloque.tipo === 'juego' && datos(bloque).juego_id === 'colorear') {
@@ -1423,9 +1912,10 @@
             initPaintCanvas({
                 mode: 'colorear',
                 color: colores[0] || '#EF4444',
-                lineWidth: PAINT_SIZE_MAP.m,
+                lineWidth: nivelEtario === 'prejardin' ? PAINT_SIZE_MAP.l : PAINT_SIZE_MAP.m,
                 hasFondo: true,
             });
+            paintSelectColor(colores[0] || '#EF4444');
         }
 
         if (bloque.tipo === 'pregunta') {
@@ -1465,12 +1955,21 @@
             } else {
                 iniciarAudioHistoria();
             }
+        } else if (bloque.tipo === 'audio' && !mediaUrl(datos(bloque).archivo)) {
+            iniciarInstruccionBloque(bloque);
+        } else if (bloque.tipo === 'video' && !mediaUrl(datos(bloque).archivo)) {
+            iniciarInstruccionBloque(bloque);
         } else if (bloque.tipo === 'bienvenida' && (datos(bloque).tipo_media || '') === 'video') {
-            reproducirVideoBienvenida();
-        } else {
             const texto = String(datos(bloque).instruccion || '').trim();
-            if (texto) hablarTexto(texto);
+            if (texto) {
+                hablarTexto(texto, () => pulsarBotonVideoBienvenida());
+            } else {
+                pulsarBotonVideoBienvenida();
+            }
+        } else {
+            iniciarInstruccionBloque(bloque);
         }
+        actualizarNavBloque();
     }
 
     function detenerAudioHistoria() {
@@ -1484,8 +1983,14 @@
 
     function iniciarAudioHistoria() {
         const audio = $body.find('.vn-historia-audio')[0];
-        if (!audio) return;
+        if (!audio) {
+            revisarHistoriaVista();
+            return;
+        }
         try { audio.currentTime = 0; } catch (e) { /* noop */ }
+        audio.onended = function () {
+            revisarHistoriaVista();
+        };
         const p = audio.play();
         if (p && typeof p.catch === 'function') {
             p.catch(() => { /* autoplay puede fallar sin gesto; el niño ya interactuó al navegar */ });
@@ -1527,7 +2032,7 @@
         const $label = $btn.find('.vn-audio-btn-label');
         $btn.removeClass('is-playing is-done');
         if (estado === 'playing') {
-            $btn.addClass('is-playing');
+            $btn.removeClass('vn-pulse-hint').addClass('is-playing');
             $icon.html('<i class="fa-solid fa-volume-high"></i>');
             $label.text('Sonando…');
         } else if (estado === 'done') {
@@ -1535,6 +2040,8 @@
             $icon.html('<i class="fa-solid fa-rotate-right"></i>');
             $label.text('Toca para oír otra vez');
             $status.prop('hidden', false).text('¡Listo!');
+            celebrarExito(false);
+            alCompletarActividad();
         } else {
             $icon.html('<i class="fa-solid fa-play"></i>');
             $label.text('Toca para escuchar');
@@ -1602,7 +2109,7 @@
         if (!$btn.length && !$video.length) return;
         $btn.removeClass('is-playing is-done');
         if (estado === 'playing') {
-            $btn.prop('hidden', true);
+            $btn.removeClass('vn-pulse-hint').prop('hidden', true);
             $video.prop('hidden', false);
             $status.prop('hidden', false).text('Reproduciendo…');
         } else if (estado === 'done') {
@@ -1611,6 +2118,8 @@
             $btn.find('.vn-video-btn-label').text('Toca para ver otra vez');
             $video.prop('hidden', true);
             $status.prop('hidden', false).text('¡Listo!');
+            celebrarExito(false);
+            alCompletarActividad();
         } else {
             $btn.prop('hidden', false);
             $btn.find('.vn-video-btn-icon').html('<i class="fa-solid fa-play"></i>');
@@ -1620,17 +2129,47 @@
         }
     }
 
+    function pulsarBotonVideoBienvenida() {
+        const $btn = $body.find('[data-vn-bienvenida-play]');
+        if ($btn.length) {
+            $btn.addClass('vn-pulse-hint');
+            return;
+        }
+        marcarBloqueVisto();
+    }
+
     function reproducirVideoBienvenida() {
         const video = $body.find('.vn-bienvenida-video')[0];
-        if (!video) return;
+        const $btn = $body.find('[data-vn-bienvenida-play]');
+        const $status = $body.find('[data-vn-bienvenida-status]');
+        if (!video) {
+            marcarBloqueVisto();
+            return;
+        }
+        detenerVoz();
+        $btn.removeClass('vn-pulse-hint').prop('hidden', true);
+        $status.prop('hidden', false).text('Reproduciendo…');
+        video.hidden = false;
         try { video.currentTime = 0; } catch (e) { /* noop */ }
+        video.onended = function () {
+            $body.data('vn-bienvenida-video-ok', true);
+            $status.text('¡Listo!');
+            celebrarExito(false);
+            alCompletarActividad();
+        };
         video.muted = false;
         const intentar = function (conMuted) {
             video.muted = !!conMuted;
             const p = video.play();
             if (!p || typeof p.catch !== 'function') return;
             p.catch(function () {
-                if (!conMuted) intentar(true);
+                if (!conMuted) {
+                    intentar(true);
+                } else {
+                    $btn.prop('hidden', false).addClass('vn-pulse-hint');
+                    $status.prop('hidden', true);
+                    video.hidden = true;
+                }
             });
         };
         intentar(false);
@@ -1661,6 +2200,11 @@
     }
 
     function alClicSiguiente() {
+        const bloque = bloques[index];
+        if (!bloqueEstaCompleto(bloque)) {
+            mostrarAvisoBloquePendiente();
+            return;
+        }
         if (alTerminarExperiencia && index >= bloques.length - 1) {
             alTerminarExperiencia();
             return;
@@ -1683,6 +2227,10 @@
             estudianteSexo = normalizarSexoEmocion(
                 meta.estudianteSexo || $('.cx-app').data('estudiante-sexo')
             );
+            nivelEtario = resolverNivelEtario(
+                meta.nivelEtario || $('.cx-app').data('nivel-etario')
+            );
+            estudianteNombre = meta.estudianteNombre || $('.cx-app').data('estudiante-nombre') || '';
         } else {
             try {
                 bloques = JSON.parse(document.getElementById('cx-bloques-iniciales')?.textContent || '[]');
@@ -1692,6 +2240,8 @@
             mediaBase = $('.cx-app').data('media-base') || '';
             experienciaNombre = $('.cx-app').data('experiencia-nombre') || 'Experiencia';
             estudianteSexo = normalizarSexoEmocion($('.cx-app').data('estudiante-sexo'));
+            nivelEtario = resolverNivelEtario($('.cx-app').data('nivel-etario'));
+            estudianteNombre = $('.cx-app').data('estudiante-nombre') || '';
         }
 
         if (!bloques.length) {
@@ -1706,6 +2256,7 @@
         index = 0;
         historiaPage = 0;
         retoPaso = 0;
+        aplicarNivelEtario();
         $overlay.prop('hidden', false).attr('aria-hidden', 'false');
         $('body').css('overflow', 'hidden');
         pintar();
@@ -1719,6 +2270,14 @@
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
         if (typeof limpiarDragSecuencia === 'function') limpiarDragSecuencia();
         if (typeof limpiarPaint === 'function') limpiarPaint();
+        const clasifDrag = $body && $body.data('vn-clasif-drag');
+        if (clasifDrag && clasifDrag.ghost && clasifDrag.ghost.parentNode) {
+            clasifDrag.ghost.parentNode.removeChild(clasifDrag.ghost);
+        }
+        if ($body && $body.length) $body.data('vn-clasif-drag', null);
+        const evStream = $body && $body.data('vn-evidencia-stream');
+        if (evStream && evStream.getTracks) evStream.getTracks().forEach((t) => t.stop());
+        if ($body && $body.length) $body.data('vn-evidencia-stream', null);
         detenerAudioBloque();
         detenerVideoBloque();
         detenerAudioHistoria();
@@ -1821,6 +2380,15 @@
             || $root.data('estudiante-sexo')
             || $('#rnApp').data('estudiante-sexo')
         );
+        nivelEtario = resolverNivelEtario(
+            opts.nivelEtario
+            || $root.data('nivel-etario')
+            || $('#rnApp').data('nivel-etario')
+        );
+        estudianteNombre = opts.estudianteNombre
+            || $root.data('estudiante-nombre')
+            || $('#rnApp').data('estudiante-nombre')
+            || '';
         alTerminarExperiencia = typeof opts.alTerminarExperiencia === 'function'
             ? opts.alTerminarExperiencia
             : null;
@@ -1829,6 +2397,7 @@
         retoPaso = 0;
         intentosRestantes = null;
         desbloquearAudioTts();
+        aplicarNivelEtario();
         pintar();
         asegurarHandlersFullscreen();
         actualizarBtnFullscreen();
@@ -1937,22 +2506,40 @@
         paint.tool = 'brush';
         $body.find('[data-vn-paint-tool]').removeClass('is-on');
         $body.find('[data-vn-paint-tool="brush"]').addClass('is-on');
-        $body.find('[data-vn-paint-color]').removeClass('is-on');
+
+        let matchedPreset = false;
         $body.find('[data-vn-paint-color]').each(function () {
-            if (String($(this).data('vn-paint-color')).toLowerCase() === color.toLowerCase()) {
-                $(this).addClass('is-on');
-            }
+            const isMatch = String($(this).data('vn-paint-color')).toLowerCase() === color.toLowerCase();
+            $(this).toggleClass('is-on', isMatch);
+            if (isMatch) matchedPreset = true;
         });
+
+        const $custom = $body.find('.vn-paint-swatch--custom');
+        if ($custom.length) {
+            $custom.toggleClass('is-on', !matchedPreset);
+            $custom.find('.vn-paint-swatch-custom-bg').css('background', color);
+            $custom.find('.vn-paint-color-input').val(color);
+            $custom.find('.vn-paint-swatch-custom-icon').toggleClass('is-hidden', !matchedPreset);
+            $custom.find('.vn-paint-swatch-custom-label').text(matchedPreset ? 'Más' : '');
+        }
     }
 
     onBody('click', '[data-vn-paint-color]', function () {
         paintSelectColor(String($(this).data('vn-paint-color')));
     });
 
+    onBody('click', '.vn-paint-swatch--custom', function (e) {
+        if ($(e.target).hasClass('vn-paint-color-input')) return;
+        const input = $(this).find('.vn-paint-color-input')[0];
+        if (!input) return;
+        e.preventDefault();
+        try { input.showPicker(); } catch (err) { input.click(); }
+    });
+
     onBody('input change', '.vn-paint-color-input', function () {
         const color = String(this.value || '');
+        if (!color) return;
         paintSelectColor(color);
-        $body.find('[data-vn-paint-color]').removeClass('is-on');
     });
 
     onBody('click', '[data-vn-paint-undo]', function () {
@@ -1960,15 +2547,97 @@
         paintUndo();
     });
 
-    onBody('click', '[data-vn-evidencia]', function () {
+    onBody('click', '[data-vn-bienvenida-play]', function () {
+        reproducirVideoBienvenida();
+    });
+
+    onBody('click', '[data-vn-dibujo-guardar]', function () {
+        const $btn = $(this);
+        if ($btn.prop('disabled')) return;
+        if (!paint || !paint.history || paint.history.length <= 1) {
+            showFb(false, '', configNivel().simplificar ? '¡Pinta algo primero!' : 'Haz un dibujo antes de guardar.');
+            return;
+        }
+        $btn.prop('disabled', true).addClass('is-done');
         $('#vnEvidenciaMsg').prop('hidden', false);
-        $(this).css('transform', 'scale(0.92)');
-        setTimeout(() => $(this).css('transform', ''), 180);
+        celebrarExito(false);
+        alCompletarActividad();
+    });
+
+    onBody('click', '[data-vn-evidencia]', function () {
+        const $btn = $(this);
+        if ($btn.prop('disabled')) return;
+        const tipo = String($btn.data('vn-evidencia-tipo') || 'foto');
+        const $stage = $body.find('[data-vn-evidencia-stage]');
+        const $preview = $stage.find('.vn-evidencia-preview');
+        const $placeholder = $stage.find('.vn-evidencia-preview-placeholder');
+        const $captura = $body.find('[data-vn-evidencia-captura]');
+
+        function finalizarEvidencia() {
+            $stage.prop('hidden', false);
+            $preview.prop('hidden', true);
+            $placeholder.prop('hidden', false);
+            $captura.prop('hidden', true);
+            $btn.prop('disabled', true).addClass('is-done');
+            $('#vnEvidenciaMsg').prop('hidden', false);
+            celebrarExito(false);
+            alCompletarActividad();
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            $btn.css('transform', 'scale(0.92)');
+            setTimeout(() => { $btn.css('transform', ''); }, 180);
+            finalizarEvidencia();
+            return;
+        }
+
+        const constraints = tipo === 'audio'
+            ? { audio: true }
+            : { video: { facingMode: 'environment' }, audio: tipo === 'video' };
+
+        navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+            $stage.prop('hidden', false);
+            $btn.prop('hidden', true);
+            $captura.prop('hidden', false);
+            if (tipo !== 'audio' && $preview.length) {
+                $preview[0].srcObject = stream;
+                $preview.prop('hidden', false);
+                $preview[0].play().catch(function () { /* noop */ });
+            }
+            $body.data('vn-evidencia-stream', stream);
+            $captura.off('click.vnEvid').on('click.vnEvid', function () {
+                const s = $body.data('vn-evidencia-stream');
+                if (s && s.getTracks) s.getTracks().forEach((t) => t.stop());
+                $body.data('vn-evidencia-stream', null);
+                finalizarEvidencia();
+            });
+        }).catch(function () {
+            $btn.css('transform', 'scale(0.92)');
+            setTimeout(() => { $btn.css('transform', ''); }, 180);
+            finalizarEvidencia();
+        });
+    });
+
+    onBody('click', '[data-vn-ra-listo]', function () {
+        $(this).addClass('is-done');
+        celebrarExito(false);
+        alCompletarActividad();
+    });
+
+    onBody('click', '.vn-media-zoomable img', function () {
+        const $media = $(this).closest('.vn-media');
+        $media.toggleClass('is-zoomed');
+        if ($media.hasClass('is-zoomed')) {
+            marcarBloqueVisto();
+        }
     });
 
     onBody('click', '[data-vn-emocion] .vn-emocion', function () {
         $body.find('.vn-emocion').removeClass('is-picked');
-        $(this).addClass('is-picked');
+        $(this).addClass('is-picked vn-emocion--pop');
+        setTimeout(() => { $(this).removeClass('vn-emocion--pop'); }, 450);
+        celebrarExito(false);
+        alCompletarActividad();
     });
 
     onBody('click', '[data-vn-pregunta] .vn-option', function () {
@@ -1977,18 +2646,20 @@
         const ok = String($(this).data('correcta')) === '1';
         $body.find('.vn-option').removeClass('is-ok is-bad');
         if (ok) {
-            $(this).addClass('is-ok');
+            $(this).addClass('is-ok vn-option--pop');
+            setTimeout(() => { $(this).removeClass('vn-option--pop'); }, 500);
             showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
             $box.data('locked', true);
+            alCompletarActividad();
             return;
         }
-        $(this).addClass('is-bad');
+        $(this).addClass('is-bad vn-option--shake');
+        setTimeout(() => { $(this).removeClass('vn-option--shake'); }, 450);
         showFb(false, $box.data('fb-ok'), $box.data('fb-err'));
         if (intentosRestantes !== Infinity) {
             intentosRestantes -= 1;
             if (intentosRestantes <= 0) {
-                $box.data('locked', true);
-                $body.find('.vn-option[data-correcta="1"]').addClass('is-ok');
+                aplicarAlAgotar($box);
             }
         }
     });
@@ -2008,6 +2679,7 @@
                     pintar();
                 } else {
                     $box.data('locked', true);
+                    alCompletarActividad();
                 }
             }, 650);
             return;
@@ -2023,6 +2695,9 @@
                     if (retoPaso < total - 1) {
                         retoPaso += 1;
                         pintar();
+                    } else {
+                        $box.data('locked', true);
+                        alCompletarActividad();
                     }
                 }, 800);
             }
@@ -2044,8 +2719,9 @@
         const $box = $body.find('[data-vn-emparejar]');
         const ok = izq === der;
         if (ok) {
-            $body.find(`[data-vn-izq="${izq}"], [data-vn-der="${der}"]`).addClass('is-matched').removeClass('is-selected');
+            $body.find(`[data-vn-izq="${izq}"], [data-vn-der="${der}"]`).addClass('is-matched vn-chip--matched').removeClass('is-selected');
             showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
+            alCompletarActividad();
         } else {
             showFb(false, $box.data('fb-ok'), $box.data('fb-err'));
             $body.find('[data-vn-izq]').removeClass('is-selected');
@@ -2064,7 +2740,7 @@
     onBody('click', '[data-vn-clasif] .vn-zone', function () {
         const $item = $body.data('pick-item');
         if (!$item || !$item.length) return;
-        const ok = String($item.data('cat')) === String($(this).data('vn-cat'));
+        const ok = String($item.attr('data-cat')) === String($(this).attr('data-vn-cat'));
         showFb(ok, '¡Muy bien!', 'Prueba otra categoría');
         if (ok) colocarChipEnZona($item, this);
         else {
@@ -2074,9 +2750,11 @@
         }
         $body.data('pick-item', null);
         $body.find('.vn-zone').removeClass('is-target');
+        alCompletarActividad();
     });
 
     function limpiarDragArrastrar() {
+        $(document).off('.vnArrDrag');
         const drag = $body.data('vn-drag');
         if (!drag) return;
         if (drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
@@ -2097,9 +2775,10 @@
         if ($(this).hasClass('is-matched')) return;
         if (e.button != null && e.button !== 0) return;
         e.preventDefault();
-        const $chip = $(this);
-        const rect = this.getBoundingClientRect();
-        const ghost = this.cloneNode(true);
+        const chipEl = this;
+        const $chip = $(chipEl);
+        const rect = chipEl.getBoundingClientRect();
+        const ghost = chipEl.cloneNode(true);
         ghost.classList.add('vn-drag-ghost');
         ghost.style.width = `${rect.width}px`;
         ghost.style.height = `${rect.height}px`;
@@ -2108,8 +2787,8 @@
         document.body.appendChild(ghost);
         $chip.addClass('is-dragging').attr('aria-grabbed', 'true');
         $body.find('[data-vn-arrastrar] .vn-zone').addClass('is-target');
-        try { this.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-        $body.data('vn-drag', {
+        try { chipEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        const drag = {
             $chip,
             ghost,
             pointerId: e.pointerId,
@@ -2118,40 +2797,116 @@
             moved: false,
             startX: e.clientX,
             startY: e.clientY,
-        });
+        };
+        $body.data('vn-drag', drag);
+
+        const onMove = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            ev.preventDefault();
+            const dx = ev.clientX - drag.startX;
+            const dy = ev.clientY - drag.startY;
+            if (Math.abs(dx) + Math.abs(dy) > 6) drag.moved = true;
+            drag.ghost.style.left = `${ev.clientX - drag.offsetX}px`;
+            drag.ghost.style.top = `${ev.clientY - drag.offsetY}px`;
+            $body.find('[data-vn-arrastrar] .vn-zone').removeClass('is-drop-hover');
+            const zone = zonaBajoPuntero(ev.clientX, ev.clientY);
+            if (zone) zone.classList.add('is-drop-hover');
+        };
+
+        const onUp = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            $(document).off('.vnArrDrag');
+            try { chipEl.releasePointerCapture(ev.pointerId); } catch (err) { /* ignore */ }
+            const zone = zonaBajoPuntero(ev.clientX, ev.clientY);
+            const $chipUp = drag.$chip;
+            limpiarDragArrastrar();
+            if (!zone || !drag.moved) return;
+            const ok = String($chipUp.attr('data-zona')) === String($(zone).attr('data-vn-zona'));
+            showFb(ok, '¡Muy bien!', 'Esa no es la zona');
+            if (ok) colocarChipEnZona($chipUp, zone);
+            else {
+                zone.classList.add('is-wrong');
+                setTimeout(() => { zone.classList.remove('is-wrong'); }, 400);
+            }
+        };
+
+        $(document).on('pointermove.vnArrDrag', onMove);
+        $(document).on('pointerup.vnArrDrag pointercancel.vnArrDrag', onUp);
     });
 
-    onBody('pointermove', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
-        const drag = $body.data('vn-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
+    function zonaClasifBajoPuntero(clientX, clientY) {
+        const el = document.elementFromPoint(clientX, clientY);
+        if (!el) return null;
+        return el.closest('[data-vn-clasif] .vn-zone');
+    }
+
+    onBody('pointerdown', '[data-vn-clasif-pool] .vn-chip-drag', function (e) {
+        if ($(this).hasClass('is-matched')) return;
+        if (e.button != null && e.button !== 0) return;
         e.preventDefault();
-        const dx = e.clientX - drag.startX;
-        const dy = e.clientY - drag.startY;
-        if (Math.abs(dx) + Math.abs(dy) > 6) drag.moved = true;
-        drag.ghost.style.left = `${e.clientX - drag.offsetX}px`;
-        drag.ghost.style.top = `${e.clientY - drag.offsetY}px`;
-        $body.find('[data-vn-arrastrar] .vn-zone').removeClass('is-drop-hover');
-        const zone = zonaBajoPuntero(e.clientX, e.clientY);
-        if (zone) zone.classList.add('is-drop-hover');
-    });
+        const chipEl = this;
+        const $chip = $(chipEl);
+        const rect = chipEl.getBoundingClientRect();
+        const ghost = chipEl.cloneNode(true);
+        ghost.classList.add('vn-drag-ghost');
+        ghost.style.width = `${rect.width}px`;
+        ghost.style.height = `${rect.height}px`;
+        ghost.style.left = `${rect.left}px`;
+        ghost.style.top = `${rect.top}px`;
+        document.body.appendChild(ghost);
+        $chip.addClass('is-dragging').attr('aria-grabbed', 'true');
+        $body.find('[data-vn-clasif] .vn-zone').addClass('is-target');
+        try { chipEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        const drag = {
+            $chip,
+            ghost,
+            pointerId: e.pointerId,
+            offsetX: e.clientX - rect.left,
+            offsetY: e.clientY - rect.top,
+            moved: false,
+            startX: e.clientX,
+            startY: e.clientY,
+        };
+        $body.data('vn-clasif-drag', drag);
 
-    onBody('pointerup pointercancel', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
-        const drag = $body.data('vn-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        const zone = zonaBajoPuntero(e.clientX, e.clientY);
-        const $chip = drag.$chip;
-        limpiarDragArrastrar();
-        if (!zone || !drag.moved) return;
-        const ok = String($chip.data('zona')) === String($(zone).data('vn-zona'));
-        showFb(ok, '¡Muy bien!', 'Esa no es la zona');
-        if (ok) colocarChipEnZona($chip, zone);
-        else {
-            zone.classList.add('is-wrong');
-            setTimeout(() => { zone.classList.remove('is-wrong'); }, 400);
-        }
+        const onMove = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            ev.preventDefault();
+            if (Math.abs(ev.clientX - drag.startX) + Math.abs(ev.clientY - drag.startY) > 6) drag.moved = true;
+            drag.ghost.style.left = `${ev.clientX - drag.offsetX}px`;
+            drag.ghost.style.top = `${ev.clientY - drag.offsetY}px`;
+            $body.find('[data-vn-clasif] .vn-zone').removeClass('is-drop-hover');
+            const zone = zonaClasifBajoPuntero(ev.clientX, ev.clientY);
+            if (zone) zone.classList.add('is-drop-hover');
+        };
+
+        const onUp = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            $(document).off('.vnClasifDrag');
+            try { chipEl.releasePointerCapture(ev.pointerId); } catch (err) { /* ignore */ }
+            const zone = zonaClasifBajoPuntero(ev.clientX, ev.clientY);
+            const $chipUp = drag.$chip;
+            if (drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
+            $chipUp.removeClass('is-dragging').attr('aria-grabbed', 'false');
+            $body.find('[data-vn-clasif] .vn-zone').removeClass('is-target is-drop-hover');
+            $body.data('vn-clasif-drag', null);
+            if (!zone || !drag.moved) return;
+            const ok = String($chipUp.attr('data-cat')) === String($(zone).attr('data-vn-cat'));
+            showFb(ok, '¡Muy bien!', 'Prueba otra categoría');
+            if (ok) colocarChipEnZona($chipUp, zone);
+            else {
+                zone.classList.add('is-wrong');
+                setTimeout(() => { zone.classList.remove('is-wrong'); }, 400);
+            }
+            alCompletarActividad();
+        };
+
+        $(document).on('pointermove.vnClasifDrag', onMove);
+        $(document).on('pointerup.vnClasifDrag pointercancel.vnClasifDrag', onUp);
     });
 
     function limpiarDragPuzzle() {
+        $(document).off('.vnPuzzleDrag');
         const drag = $body.data('vn-puzzle-drag');
         if (!drag) return;
         if (drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
@@ -2174,6 +2929,7 @@
         if (total > 0 && filled >= total) {
             showFb(true, '¡Rompecabezas listo!', '');
             $puzzle.addClass('is-complete');
+            alCompletarActividad();
         }
     }
 
@@ -2181,9 +2937,10 @@
         if ($(this).hasClass('is-placed')) return;
         if (e.button != null && e.button !== 0) return;
         e.preventDefault();
-        const $piece = $(this);
-        const rect = this.getBoundingClientRect();
-        const ghost = this.cloneNode(true);
+        const pieceEl = this;
+        const $piece = $(pieceEl);
+        const rect = pieceEl.getBoundingClientRect();
+        const ghost = pieceEl.cloneNode(true);
         ghost.classList.add('vn-drag-ghost', 'vn-puzzle-ghost');
         ghost.style.width = `${rect.width}px`;
         ghost.style.height = `${rect.height}px`;
@@ -2192,8 +2949,8 @@
         document.body.appendChild(ghost);
         $piece.addClass('is-dragging');
         $body.find('.vn-puzzle-slot:not(.is-filled)').addClass('is-target');
-        try { this.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-        $body.data('vn-puzzle-drag', {
+        try { pieceEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        const drag = {
             $piece,
             ghost,
             pointerId: e.pointerId,
@@ -2202,40 +2959,46 @@
             moved: false,
             startX: e.clientX,
             startY: e.clientY,
-        });
-    });
+        };
+        $body.data('vn-puzzle-drag', drag);
 
-    onBody('pointermove', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
-        const drag = $body.data('vn-puzzle-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        e.preventDefault();
-        if (Math.abs(e.clientX - drag.startX) + Math.abs(e.clientY - drag.startY) > 6) drag.moved = true;
-        drag.ghost.style.left = `${e.clientX - drag.offsetX}px`;
-        drag.ghost.style.top = `${e.clientY - drag.offsetY}px`;
-        $body.find('.vn-puzzle-slot').removeClass('is-drop-hover');
-        const slot = slotPuzzleBajoPuntero(e.clientX, e.clientY);
-        if (slot) slot.classList.add('is-drop-hover');
-    });
+        const onMove = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            ev.preventDefault();
+            if (Math.abs(ev.clientX - drag.startX) + Math.abs(ev.clientY - drag.startY) > 6) drag.moved = true;
+            drag.ghost.style.left = `${ev.clientX - drag.offsetX}px`;
+            drag.ghost.style.top = `${ev.clientY - drag.offsetY}px`;
+            $body.find('.vn-puzzle-slot').removeClass('is-drop-hover');
+            const slot = slotPuzzleBajoPuntero(ev.clientX, ev.clientY);
+            if (slot) slot.classList.add('is-drop-hover');
+        };
 
-    onBody('pointerup pointercancel', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
-        const drag = $body.data('vn-puzzle-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        const slot = slotPuzzleBajoPuntero(e.clientX, e.clientY);
-        const $piece = drag.$piece;
-        const pieceIdx = Number($piece.data('vn-puzzle-piece'));
-        limpiarDragPuzzle();
-        if (!slot || !drag.moved) return;
-        const slotIdx = Number($(slot).data('vn-puzzle-slot'));
-        if (pieceIdx === slotIdx) {
-            $piece.addClass('is-placed').prop('disabled', true);
-            $(slot).addClass('is-filled').empty().append($piece);
-            revisarPuzzleCompleto();
-        } else {
-            showFb(false, '¡Bien!', 'Esa pieza no va ahí');
-        }
+        const onUp = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            $(document).off('.vnPuzzleDrag');
+            try { pieceEl.releasePointerCapture(ev.pointerId); } catch (err) { /* ignore */ }
+            const slot = slotPuzzleBajoPuntero(ev.clientX, ev.clientY);
+            const $pieceUp = drag.$piece;
+            const pieceIdx = Number($pieceUp.data('vn-puzzle-piece'));
+            limpiarDragPuzzle();
+            if (!slot || !drag.moved) return;
+            const slotIdx = Number($(slot).data('vn-puzzle-slot'));
+            if (pieceIdx === slotIdx) {
+                $pieceUp.addClass('is-placed').prop('disabled', true);
+                $(slot).addClass('is-filled').empty().append($pieceUp);
+                reproducirSfx('ok');
+                revisarPuzzleCompleto();
+            } else {
+                showFb(false, '¡Bien!', 'Esa pieza no va ahí');
+            }
+        };
+
+        $(document).on('pointermove.vnPuzzleDrag', onMove);
+        $(document).on('pointerup.vnPuzzleDrag pointercancel.vnPuzzleDrag', onUp);
     });
 
     function limpiarDragSecuencia() {
+        $(document).off('.vnSeqDrag');
         const drag = $body.data('vn-seq-drag');
         if (!drag) return;
         if (drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
@@ -2263,6 +3026,7 @@
             showFb(true, '¡Orden correcto!', '');
             $root.addClass('is-complete');
             $root.find('[data-vn-seq-card]').prop('disabled', true);
+            alCompletarActividad();
         } else {
             const $fb = $('#vnFb');
             if ($fb.length) $fb.prop('hidden', true).removeClass('is-ok is-bad').text('');
@@ -2273,9 +3037,10 @@
         if ($(this).prop('disabled')) return;
         if (e.button != null && e.button !== 0) return;
         e.preventDefault();
-        const $card = $(this);
-        const rect = this.getBoundingClientRect();
-        const ghost = this.cloneNode(true);
+        const cardEl = this;
+        const $card = $(cardEl);
+        const rect = cardEl.getBoundingClientRect();
+        const ghost = cardEl.cloneNode(true);
         ghost.classList.add('vn-drag-ghost', 'vn-seq-ghost');
         ghost.style.width = `${rect.width}px`;
         ghost.style.height = `${rect.height}px`;
@@ -2283,8 +3048,8 @@
         ghost.style.top = `${rect.top}px`;
         document.body.appendChild(ghost);
         $card.addClass('is-dragging');
-        try { this.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-        $body.data('vn-seq-drag', {
+        try { cardEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        const drag = {
             $card,
             ghost,
             pointerId: e.pointerId,
@@ -2293,37 +3058,41 @@
             moved: false,
             startX: e.clientX,
             startY: e.clientY,
-        });
-    });
+        };
+        $body.data('vn-seq-drag', drag);
 
-    onBody('pointermove', '[data-vn-seq-card]', function (e) {
-        const drag = $body.data('vn-seq-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        e.preventDefault();
-        if (Math.abs(e.clientX - drag.startX) + Math.abs(e.clientY - drag.startY) > 6) drag.moved = true;
-        drag.ghost.style.left = `${e.clientX - drag.offsetX}px`;
-        drag.ghost.style.top = `${e.clientY - drag.offsetY}px`;
-        $body.find('.vn-seq-card').removeClass('is-drop-hover');
-        const target = cardSecuenciaBajoPuntero(e.clientX, e.clientY, drag.$card[0]);
-        if (target) target.classList.add('is-drop-hover');
-    });
+        const onMove = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            ev.preventDefault();
+            if (Math.abs(ev.clientX - drag.startX) + Math.abs(ev.clientY - drag.startY) > 6) drag.moved = true;
+            drag.ghost.style.left = `${ev.clientX - drag.offsetX}px`;
+            drag.ghost.style.top = `${ev.clientY - drag.offsetY}px`;
+            $body.find('.vn-seq-card').removeClass('is-drop-hover');
+            const target = cardSecuenciaBajoPuntero(ev.clientX, ev.clientY, drag.$card[0]);
+            if (target) target.classList.add('is-drop-hover');
+        };
 
-    onBody('pointerup pointercancel', '[data-vn-seq-card]', function (e) {
-        const drag = $body.data('vn-seq-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        const target = cardSecuenciaBajoPuntero(e.clientX, e.clientY, drag.$card[0]);
-        const $card = drag.$card;
-        const moved = drag.moved;
-        limpiarDragSecuencia();
-        if (!moved || !target) return;
-        const $target = $(target);
-        const rect = target.getBoundingClientRect();
-        if (e.clientX < rect.left + rect.width / 2) {
-            $target.before($card);
-        } else {
-            $target.after($card);
-        }
-        revisarSecuenciaOrden();
+        const onUp = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            $(document).off('.vnSeqDrag');
+            try { cardEl.releasePointerCapture(ev.pointerId); } catch (err) { /* ignore */ }
+            const target = cardSecuenciaBajoPuntero(ev.clientX, ev.clientY, drag.$card[0]);
+            const $cardUp = drag.$card;
+            const moved = drag.moved;
+            limpiarDragSecuencia();
+            if (!moved || !target) return;
+            const $target = $(target);
+            const rectT = target.getBoundingClientRect();
+            if (ev.clientX < rectT.left + rectT.width / 2) {
+                $target.before($cardUp);
+            } else {
+                $target.after($cardUp);
+            }
+            revisarSecuenciaOrden();
+        };
+
+        $(document).on('pointermove.vnSeqDrag', onMove);
+        $(document).on('pointerup.vnSeqDrag pointercancel.vnSeqDrag', onUp);
     });
 
     onBody('click', '[data-vn-memory] .vn-memory-card', function () {
@@ -2334,7 +3103,14 @@
 
         const pair = String($card.data('pair'));
         const url = mediaUrl(pair);
-        $card.addClass('is-flipped').html(url ? `<img src="${escapar(url)}" alt="">` : '★');
+        $card.addClass('is-flipped vn-memory-card--flip');
+        setTimeout(() => { $card.removeClass('vn-memory-card--flip'); }, 380);
+        if (url) {
+            $card.find('.vn-memory-back').remove();
+            $card.append(`<img src="${escapar(url)}" alt="" class="vn-memory-front">`);
+        } else {
+            $card.find('.vn-memory-back').text('★');
+        }
         flipped.push($card);
         $body.data('mem-flipped', flipped);
 
@@ -2345,17 +3121,23 @@
             a.addClass('is-done');
             b.addClass('is-done');
             $body.data('mem-flipped', []);
+            actualizarScoreMemoria();
+            celebrarExito(false);
             const total = $body.find('[data-vn-memory] .vn-memory-card').length;
             const done = $body.find('[data-vn-memory] .vn-memory-card.is-done').length;
             if (total > 0 && done >= total) {
                 showFb(true, '¡Todas las parejas!', '');
+                alCompletarActividad();
             }
         } else {
             setTimeout(() => {
-                a.removeClass('is-flipped').text('?');
-                b.removeClass('is-flipped').text('?');
+                a.removeClass('is-flipped').find('img, .vn-memory-front').remove();
+                b.removeClass('is-flipped').find('img, .vn-memory-front').remove();
+                if (!a.find('.vn-memory-back').length) a.prepend('<span class="vn-memory-back" aria-hidden="true">?</span>');
+                if (!b.find('.vn-memory-back').length) b.prepend('<span class="vn-memory-back" aria-hidden="true">?</span>');
                 $body.data('mem-flipped', []);
-            }, 700);
+                reproducirSfx('err');
+            }, 750);
         }
     });
 

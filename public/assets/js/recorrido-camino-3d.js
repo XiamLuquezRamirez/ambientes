@@ -2537,6 +2537,8 @@ import * as THREE from 'three';
             mediaBase: mediaBase || '',
             experienciaNombre: nombre || 'Experiencia',
             estudianteSexo: String($('#rnApp').data('estudiante-sexo') || ''),
+            estudianteNombre: String($('#rnApp').data('estudiante-nombre') || ''),
+            nivelEtario: String($('#rnApp').data('nivel-etario') || 'jardin'),
             alTerminarExperiencia: volverAlMapaDesdeExperiencia,
         };
     }
