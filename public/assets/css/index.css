@@ -60,7 +60,7 @@ html.sidebar-collapsed:not(.sidebar-mobile-open) {
     --sidebar-current-width: var(--sidebar-width-mini);
 }
 
-html.sidebar-collapsed:is(.sidebar-hover, .sidebar-pinned):not(.sidebar-mobile-open) {
+html.sidebar-collapsed.sidebar-pinned:not(.sidebar-mobile-open) {
     --sidebar-current-width: var(--sidebar-width);
 }
 
@@ -229,8 +229,16 @@ html.sidebar-collapsed:not(.sidebar-mobile-open):not(:is(.sidebar-hover, .sideba
 /* Desktop: expansión al hover o pin */
 html.sidebar-collapsed:is(.sidebar-hover, .sidebar-pinned):not(.sidebar-mobile-open) .sidebar {
     width: var(--sidebar-width);
-    z-index: 100;
     overflow-x: hidden;
+}
+
+html.sidebar-collapsed.sidebar-hover:not(.sidebar-pinned):not(.sidebar-mobile-open) .sidebar {
+    z-index: 120;
+    box-shadow: 10px 0 36px rgba(15, 23, 42, .16);
+}
+
+html.sidebar-collapsed.sidebar-pinned:not(.sidebar-mobile-open) .sidebar {
+    z-index: 100;
     box-shadow: none;
 }
 
