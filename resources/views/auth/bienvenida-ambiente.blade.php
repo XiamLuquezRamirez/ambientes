@@ -4,7 +4,9 @@
 <main class="bienambiente-wrap" data-kiosco-sesion="1" data-redirect-inicio="/recorrido">
     <div class="bienambiente-card">
         <div class="estudiante-avatar" style="--color-av: {{ $estudiante->color_avatar }};">
-            <span class="estudiante-avatar__circulo">{{ $estudiante->iniciales }}</span>
+            <span class="estudiante-avatar__circulo">
+                @include('auth._avatar-circulo')
+            </span>
         </div>
 
         <h1 class="saludo">¡Hola, {{ $estudiante->nombre }}!</h1>

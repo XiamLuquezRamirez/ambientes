@@ -193,8 +193,7 @@
 
         .login-logo img {
             width: 100%;
-            max-width: 250px;
-            /* Antes 300px */
+            max-width: 400px;
             height: auto;
         }
 
@@ -402,7 +401,7 @@
     <div class="login-wrap">
         <div class="login-card">
             <div class="login-logo">
-                <img src="{{ asset('assets/images/Logo-PedNia.png') }}" alt="PedNia">
+                <img src="{{ asset('assets/images/login-logo.png') }}" alt="PedNia">
             </div>
             <h1 class="login-titulo">Iniciar sesión</h1>
 
