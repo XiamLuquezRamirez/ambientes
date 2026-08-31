@@ -2212,13 +2212,20 @@ import * as THREE from 'three';
         if (cb) cb();
     }
 
+    function fraseMediaParada(p) {
+        const tipo = tipoMediaParada(p);
+        if (tipo === 'video') return ' Veamos el video.';
+        if (tipo === 'imagen') return ' Mira esta imagen.';
+        return '';
+    }
+
     // Frase que el personaje "dice" al llegar a cada estación, según su tipo.
     function fraseParada(p) {
         if (!p) return '';
         const t = p.titulo || '';
         switch (p.id) {
-            case 'modulo':      return '¡Mira! Nuestro módulo es: ' + t + '. Veamos el video.';
-            case 'eje':         return 'Ahora seguimos con el eje: ' + t + '.';
+            case 'modulo':      return '¡Mira! Nuestro módulo es: ' + t + '.' + fraseMediaParada(p);
+            case 'eje':         return 'Ahora seguimos con el eje: ' + t + '.' + fraseMediaParada(p);
             case 'tematica':    return 'La temática de hoy es: ' + t + '.';
             case 'fin':         return '¡Lo lograste! Terminamos la aventura. ¡Muy bien!';
             default:
@@ -2239,20 +2246,37 @@ import * as THREE from 'three';
         return tipoMediaParada(p) === 'video';
     }
 
+    function esImagenParada(p) {
+        return tipoMediaParada(p) === 'imagen';
+    }
+
+    function esMediaFullscreenParada(p) {
+        return esVideoParada(p) || esImagenParada(p);
+    }
+
     function datosVideoParada(p) {
         const embed = p.media_embed || 'directo';
         const embedUrl = p.embed_url || p.media_url || p.video_url || p.videoUrl || '';
         return { embed, embedUrl };
     }
 
-    function mostrarOverlayVideo() {
+    function mostrarOverlayVideo(tipoMedia) {
         const $fs = $('#rn3dVideoFs');
+        const $btn = $('#rn3dMediaFsCerrar');
+        const esImg = tipoMedia === 'imagen';
+        if ($btn.length) {
+            $btn.prop('hidden', !esImg).attr('aria-hidden', esImg ? 'false' : 'true');
+        }
         $fs.prop('hidden', false).attr('aria-hidden', 'false').addClass('rn3d-video-fs--activo');
         document.body.classList.add('rn3d-video-reproduciendo');
     }
 
     function ocultarOverlayVideo() {
         const $fs = $('#rn3dVideoFs');
+        const $btn = $('#rn3dMediaFsCerrar');
+        if ($btn.length) {
+            $btn.prop('hidden', true).attr('aria-hidden', 'true');
+        }
         $fs.prop('hidden', true).attr('aria-hidden', 'true').removeClass('rn3d-video-fs--activo');
         document.body.classList.remove('rn3d-video-reproduciendo');
     }
@@ -2327,6 +2351,26 @@ import * as THREE from 'three';
         $('#rnModalVideo').prop('hidden', true).attr('aria-hidden', 'true').empty();
     }
 
+    function reproducirImagenParada(p) {
+        if (!p || !esImagenParada(p)) return;
+
+        paradaVideoActual = p;
+        const url = p.imagen_url || p.media_url;
+        if (!url) return;
+
+        const $inner = $('#rn3dVideoFsInner');
+        $inner.empty();
+        $('#rnModalVideo').prop('hidden', true).attr('aria-hidden', 'true').empty();
+
+        const img = document.createElement('img');
+        img.className = 'rn3d-media-fs__img';
+        img.src = url;
+        img.alt = p.titulo || 'Imagen';
+        $inner[0].appendChild(img);
+
+        mostrarOverlayVideo('imagen');
+    }
+
     function reproducirVideoParada(p) {
         if (!p || !esVideoParada(p)) return;
 
@@ -2357,7 +2401,7 @@ import * as THREE from 'three';
             });
             $inner[0].appendChild(iframe);
             activarEscuchaEmbedVideo();
-            mostrarOverlayVideo();
+            mostrarOverlayVideo('video');
             return;
         }
 
@@ -2373,7 +2417,7 @@ import * as THREE from 'three';
         video.addEventListener('ended', alFinDirecto, { once: true });
         video.addEventListener('error', alFinDirecto, { once: true });
 
-        mostrarOverlayVideo();
+        mostrarOverlayVideo('video');
         video.play().catch(function () {
             finalizarVideoParada();
         });
@@ -2393,26 +2437,12 @@ import * as THREE from 'three';
         const $v = $('#rnModalVideo');
         const tipo = tipoMediaParada(p);
 
-        if (tipo === 'video') {
+        if (tipo === 'video' || tipo === 'imagen') {
             $v.prop('hidden', true).attr('aria-hidden', 'true').empty();
             return;
         }
 
-        if (tipo === 'ninguno') {
-            $v.prop('hidden', true).attr('aria-hidden', 'true').empty();
-            return;
-        }
-
-        if (tipo === 'imagen') {
-            const url = p.imagen_url || p.media_url;
-            if (!url) {
-                $v.prop('hidden', true).attr('aria-hidden', 'true').empty();
-                return;
-            }
-            $v.prop('hidden', false).attr('aria-hidden', 'false').html(
-                '<img src="' + escapar(url) + '" alt="" style="width:100%;max-height:240px;object-fit:contain;border-radius:12px;">'
-            );
-        }
+        $v.prop('hidden', true).attr('aria-hidden', 'true').empty();
     }
 
     function abrirModalParada(indice) {
@@ -2420,7 +2450,7 @@ import * as THREE from 'three';
         if (!p || indice > indiceMaximoVisitado) return;
         detenerVideoParada();
         indiceModal = indice;
-        paradaVideoActual = esVideoParada(p) ? p : null;
+        paradaVideoActual = esMediaFullscreenParada(p) ? p : null;
         $('#rnModalEtiqueta').text(p.etiqueta || '');
         $('#rnModalTitulo').text(p.titulo || '');
         const cuerpoTexto = escapar(p.texto || '').replace(/\n\n/g, '</p><p class="rn-camino-modal__texto">');
@@ -2436,6 +2466,8 @@ import * as THREE from 'three';
 
         if (esVideoParada(p)) {
             narrarParada(p, function () { reproducirVideoParada(p); });
+        } else if (esImagenParada(p)) {
+            narrarParada(p, function () { reproducirImagenParada(p); });
         } else {
             narrarParada(p);
         }
@@ -2662,6 +2694,9 @@ import * as THREE from 'three';
             + '</div>'
             + '<div class="rn3d-video-fs" id="rn3dVideoFs" hidden aria-hidden="true">'
             +   '<div class="rn3d-video-fs__inner" id="rn3dVideoFsInner"></div>'
+            +   '<button type="button" class="rn3d-media-fs__cerrar" id="rn3dMediaFsCerrar" data-accion="cerrar-media-fs" hidden aria-hidden="true">'
+            +     '<i class="fa-solid fa-check" aria-hidden="true"></i> Continuar'
+            +   '</button>'
             + '</div>';
         while (wrap.firstChild) ctx.$paso[0].appendChild(wrap.firstChild);
     }
@@ -2962,7 +2997,13 @@ import * as THREE from 'three';
         ctx.$paso.on('click.rn3d', '[data-accion="cerrar-exp"]', function (e) { e.preventDefault(); cerrarTarjetaExperiencia(); });
         ctx.$paso.on('click.rn3d', '[data-accion="rever-video"]', function (e) {
             e.preventDefault();
-            if (paradaVideoActual) reproducirVideoParada(paradaVideoActual);
+            if (!paradaVideoActual) return;
+            if (esVideoParada(paradaVideoActual)) reproducirVideoParada(paradaVideoActual);
+            else if (esImagenParada(paradaVideoActual)) reproducirImagenParada(paradaVideoActual);
+        });
+        ctx.$paso.on('click.rn3d', '[data-accion="cerrar-media-fs"]', function (e) {
+            e.preventDefault();
+            finalizarVideoParada();
         });
         ctx.$paso.on('click.rn3d', '[data-accion="iniciar-experiencia"]', function (e) { e.preventDefault(); iniciarExperiencia(); });
         ctx.$paso.on('click.rn3d', '#rnModalSalirKiosco', function (e) { e.preventDefault(); salirKiosco(); });

@@ -170,6 +170,9 @@ function mostrarErroresModal(errors) {
             case 'validation.required_if':
                 mensaje = 'Este campo es requerido';
                 break;
+            case 'validation.max.numeric':
+                mensaje = 'El valor debe tener máximo 12 caracteres';
+                break;
             default:
                 mensaje = 'Este campo es requerido';
                 break;
@@ -264,7 +267,14 @@ async function guardarEstudiante(datos) {
                         if (result.isConfirmed) {
                             cerrarModal();
                             Swal.close();
-                            window.location.href = `${URL_ESTUDIANTES}/diligenciar-piar/${res.estudiante_id_creado}`;
+                            let idEstudiante = res.estudiante_id_creado;
+                            let tipo = "nuevo";
+
+                            let url = URL_DILIGENCIAR_PIAR
+                            .replace('__ID__', idEstudiante)
+                            .replace('__TIPO__', tipo);
+
+                            window.location.href = url;
                         } else {
                             setTimeout(() => {
                                 Swal.close();

@@ -84,11 +84,11 @@ class EstudianteAdminController extends Controller
     public function guardar(Request $request)
     {
         $datos = $request->validate([
+            'identificacion' => 'required|string|max:12|unique:estudiantes,identificacion',
             'nombre' => 'required|string|max:100',
             'apellido' => 'required|string|max:100',
             'tipo_identificacion' => 'required|string|max:100',
             'otro_tipo_identificacion' => 'nullable|string|max:100',
-            'identificacion' => 'required|string|max:100|unique:estudiantes,identificacion',
             'color_avatar' => 'required|string|max:100',
             'requiere_apoyo' => 'required',
             'avatar' => 'nullable',

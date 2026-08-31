@@ -63,6 +63,7 @@
 @push('scripts')
 <script>
     const URL_ESTUDIANTES = "{{ route('admin.estudiantes') }}";
+    const URL_DILIGENCIAR_PIAR = "{{ route('admin.estudiantes.diligenciar-piar', ['idEstudiante' => '__ID__', 'tipo' => '__TIPO__']) }}";
     var tipoPost = 1; // 1: nuevo estudiante, 2: editar estudiante
     var pin = [];
     var tipoGuardaEstudiante = 1; // 1: administrador, 2: docente
