@@ -90,13 +90,9 @@
     <script src="@assetv('assets/js/kiosco-fs-core.js')"></script>
     <script src="@assetv('assets/js/jquery-4.0.0.min.js')"></script>
     <script src="@assetv('assets/js/constructor-vista-nino.js')"></script>
-    {{-- Camino 3D (Three.js). Expone window.KioscoCamino.boot(). --}}
-    <script type="importmap">
-    { "imports": {
-        "three": "@assetv('assets/vendor/three/three.module.js')"
-    } }
-    </script>
-    <script type="module" src="@assetv('assets/js/recorrido-camino-3d.js')"></script>
+    {{-- Camino 3D: bundle esbuild (Three.js + módulos incluidos, minificado).
+         Expone window.KioscoCamino.boot(). Generar con `npm run build:kiosco`. --}}
+    <script type="module" src="@assetv('assets/dist/recorrido-camino-3d.bundle.js')"></script>
     {{-- Juegos web nativos del banco (deben cargar ANTES de banco-juegos.js). --}}
     <script src="@assetv('assets/js/juego-memoria-animales.js')"></script>
     <script src="@assetv('assets/js/juego-colores-magicos.js')"></script>

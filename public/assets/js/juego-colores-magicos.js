@@ -145,6 +145,7 @@
         function comprobar() {
             const set = [...new Set(mezcla)].sort();
             const obj = objetivo();
+            if (!obj) return; // ya no hay objetivo (juego terminado): nada que comprobar
             const cald = cont.querySelector('[data-jcm-caldero]');
             if (sonIguales(set, obj.clave)) {
                 aciertos++;

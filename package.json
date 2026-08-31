@@ -2,7 +2,9 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "build:kiosco": "node build-kiosco.mjs",
+        "watch:kiosco": "node build-kiosco.mjs --watch"
     },
     "devDependencies": {
         "axios": "^1.1.2",

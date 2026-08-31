@@ -17,3 +17,6 @@ yarn-error.log
 /.idea
 /.vscode
 /graphify-out
+
+# Sourcemaps del bundle del kiosco (el .bundle.js SÍ se commitea, el .map no)
+/public/assets/dist/*.map
