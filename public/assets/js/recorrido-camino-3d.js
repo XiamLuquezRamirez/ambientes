@@ -51,6 +51,14 @@ import * as THREE from 'three';
     let pez = null, pezT = 0;     // pez que salta en el lago
     let aves = [];                 // aves que vuelan por el cielo
     let casaInicioCentro = null;   // zona de la casa del inicio (a evitar por vegetación)
+    let zonaJuegos = null;         // grupo 3D de la carpa de juegos (clicable)
+    let zonaJuegosCartel = null;   // placa/cartel que hace billboard hacia la cámara
+    let zonaJuegosCentro = null;   // zona de la carpa (a evitar por vegetación)
+    let zonaJuegosParada = null;   // Vector3 donde el personaje se detiene ante la carpa
+    let juegosAbiertos = false;    // true mientras la galería HTML está encima
+    let caminandoLibre = false;    // caminata a un punto libre (no del grafo), p.ej. carpa
+    let alLlegarLibre = null;      // callback al terminar una caminata libre
+    let posAntesDeCarpa = null;    // posición del personaje antes de ir a la carpa (para volver)
     let ultimoNow = 0; // timestamp previo del loop (para delta time)
     let colorAmbiente = new THREE.Color('#0ea5e9');
     let ambienteSlug = '';
@@ -1140,6 +1148,121 @@ import * as THREE from 'three';
         scene.add(banco);
     }
 
+    // ===================== Zona de JUEGOS (carpa clicable) =====================
+    // Carpa de feria/juegos low-poly, SIEMPRE accesible, en un rincón despejado
+    // cerca del inicio. Al tocarla se abre la galería de juegos (BancoJuegos).
+    // Guarda su grupo en `zonaJuegos` para el raycast de alTocar().
+    function construirZonaJuegos() {
+        const inicio = nodos['inicio'];
+        if (!inicio || !inicio.pos) return;
+        const g = new THREE.Group();
+        const mat = (c, r) => new THREE.MeshStandardMaterial({ color: c, roughness: r === undefined ? .85 : r, flatShading: true });
+
+        const R = 4.2;         // radio de la carpa
+        const HP = 3.4;        // alto de las paredes/columnas
+        const HT = 3.2;        // alto del toldo cónico
+
+        // Plataforma/tarima redonda
+        const tarima = new THREE.Mesh(new THREE.CylinderGeometry(R + 0.6, R + 0.9, 0.5, 16), mat('#c9b79c'));
+        tarima.position.y = 0.25; tarima.receiveShadow = true; g.add(tarima);
+
+        // Paredes bajas (cilindro) color crema
+        const pared = new THREE.Mesh(new THREE.CylinderGeometry(R, R, HP, 16, 1, true), mat('#fff3e0', .9));
+        pared.material.side = THREE.DoubleSide;
+        pared.position.y = 0.5 + HP / 2; pared.castShadow = true; g.add(pared);
+
+        // Toldo cónico a franjas: se logra alternando gajos de color con dos conos
+        // superpuestos y una textura de canvas a rayas radiales.
+        const lienzo = document.createElement('canvas'); lienzo.width = 256; lienzo.height = 64;
+        const cx2 = lienzo.getContext('2d');
+        const franjas = ['#e63946', '#ffffff', '#f4a261', '#ffffff', '#457b9d', '#ffffff', '#2a9d8f', '#ffffff'];
+        const fw = lienzo.width / franjas.length;
+        franjas.forEach((c, i) => { cx2.fillStyle = c; cx2.fillRect(i * fw, 0, fw + 1, lienzo.height); });
+        const texToldo = new THREE.CanvasTexture(lienzo);
+        texToldo.wrapS = THREE.RepeatWrapping; texToldo.repeat.set(1, 1);
+        const toldo = new THREE.Mesh(new THREE.ConeGeometry(R + 0.8, HT, 16),
+            new THREE.MeshStandardMaterial({ map: texToldo, roughness: .8, flatShading: true }));
+        toldo.position.y = 0.5 + HP + HT / 2 - 0.1; toldo.castShadow = true; g.add(toldo);
+
+        // Banderín/remate arriba
+        const mastil = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.2, 6), mat('#8a5a2b'));
+        mastil.position.y = 0.5 + HP + HT + 0.4; g.add(mastil);
+        const bandera = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.6, 3), mat('#e63946', .6));
+        bandera.rotation.z = -Math.PI / 2; bandera.position.set(0.35, 0.5 + HP + HT + 0.7, 0); g.add(bandera);
+
+        // Entrada oscura (arco) al frente (+Z, mirando hacia el personaje).
+        const arco = new THREE.Mesh(new THREE.BoxGeometry(2.4, HP * 0.8, 0.2), mat('#3a2b1a', 1));
+        arco.position.set(0, 0.5 + HP * 0.4, R - 0.05); g.add(arco);
+
+        // Cartel flotante con 🎮 y "JUEGOS" mirando a cámara (billboard).
+        const cartel = crearCartelJuegos();
+        cartel.position.set(0, 0.5 + HP + HT + 1.8, 0);
+        cartel.userData.baseY = cartel.position.y;
+        g.add(cartel);
+        zonaJuegosCartel = cartel;
+
+        // Posición: a la IZQUIERDA de la casa del inicio (X más negativo).
+        // El camino recto llega bien aunque esté más lejos.
+        const zx = inicio.pos.x - 20, zz = inicio.pos.z + 7;
+        g.position.set(zx, 0, zz);
+        // La entrada (arco) mira hacia el personaje: rotamos la carpa para que su
+        // frente (+Z local) apunte hacia el punto de inicio.
+        g.rotation.y = Math.atan2(inicio.pos.x - zx, inicio.pos.z - zz);
+        scene.add(g);
+        zonaJuegos = g;
+        zonaJuegosCentro = { x: zx, z: zz, r: R + 1.5 }; // para que la vegetación la evite
+
+        // Punto de PARADA frente a la carpa (donde se detiene el personaje al
+        // caminar hacia ella). Sobre la recta inicio→carpa, a ~R+1 de su centro.
+        const centro = new THREE.Vector3(zx, 0, zz);
+        const inicioPos = new THREE.Vector3(inicio.pos.x, 0, inicio.pos.z);
+        const dir = inicioPos.clone().sub(centro).setY(0).normalize();
+        zonaJuegosParada = centro.clone().add(dir.clone().multiplyScalar(R + 1.2));
+
+        // ---- Camino de PIEDRA RECTO desde el personaje hasta la carpa ----
+        // Línea recta (sin curva) para evitar cualquier corte: interpolamos puntos
+        // equiespaciados entre el inicio y el frente de la carpa.
+        const matLosa = new THREE.MeshStandardMaterial({ color: '#c2bcae', roughness: 1, flatShading: true });
+        const desde = new THREE.Vector3(inicio.pos.x - 1, 0, inicio.pos.z + 1.0); // junto al niño
+        const hasta = centro.clone().add(dir.clone().multiplyScalar(R - 0.4));     // sobre el borde de la tarima
+        const dist = desde.distanceTo(hasta);
+        const nLosas = Math.max(10, Math.round(dist / 1.0)); // una losa cada ~1 unidad
+        for (let i = 0; i <= nLosas; i++) {
+            const p = desde.clone().lerp(hasta, i / nLosas);
+            const losa = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.12, 6), matLosa);
+            losa.position.set(p.x, 0.06, p.z);
+            losa.rotation.y = i * 0.7; losa.scale.set(1, 1, 0.9 + (i % 2) * 0.18);
+            losa.receiveShadow = true; scene.add(losa);
+        }
+    }
+
+    // Cartel low-poly (placa con emoji + texto) generado con CanvasTexture.
+    function crearCartelJuegos() {
+        const cv = document.createElement('canvas'); cv.width = 256; cv.height = 128;
+        const c = cv.getContext('2d');
+        c.fillStyle = '#ffffff'; c.strokeStyle = '#2f8fd4'; c.lineWidth = 10;
+        roundRect(c, 8, 8, 240, 112, 20); c.fill(); c.stroke();
+        c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.font = '54px system-ui, sans-serif'; c.fillText('🎮', 128, 48);
+        c.fillStyle = '#1f6ba3'; c.font = 'bold 30px system-ui, sans-serif'; c.fillText('JUEGOS', 128, 96);
+        const tex = new THREE.CanvasTexture(cv);
+        const placa = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.7),
+            new THREE.MeshBasicMaterial({ map: tex, transparent: true }));
+        placa.userData.esZonaJuegos = true; // para el raycast
+        return placa;
+    }
+
+    // Helper: rectángulo redondeado en canvas 2D.
+    function roundRect(c, x, y, w, h, r) {
+        c.beginPath();
+        c.moveTo(x + r, y);
+        c.arcTo(x + w, y, x + w, y + h, r);
+        c.arcTo(x + w, y + h, x, y + h, r);
+        c.arcTo(x, y + h, x, y, r);
+        c.arcTo(x, y, x + w, y, r);
+        c.closePath();
+    }
+
     // Coloca un DESTINO al final de cada rama (casita) y en el fin (meta/castillo),
     // un poco más allá del medallón, para que la carretera "llegue a algo".
     function construirDestinos() {
@@ -1332,6 +1455,8 @@ import * as THREE from 'three';
             if (lagoCentro && Math.hypot(x - lagoCentro.x, z - lagoCentro.z) < lagoRadio) continue;
             // no invadir la casa del inicio (evita árboles dentro de la casa)
             if (casaInicioCentro && Math.hypot(x - casaInicioCentro.x, z - casaInicioCentro.z) < casaInicioCentro.r) continue;
+            // no invadir la carpa de la zona de juegos
+            if (zonaJuegosCentro && Math.hypot(x - zonaJuegosCentro.x, z - zonaJuegosCentro.z) < zonaJuegosCentro.r) continue;
             const y = alturaTerreno(x, z);
             const tint = tonos[(Math.random() * tonos.length) | 0];
             const r = Math.random();
@@ -1835,10 +1960,24 @@ import * as THREE from 'three';
     // ===================== Interacción =====================
     let raycaster, puntero;
     function alTocar(clientX, clientY) {
-        if (caminando || !recorridoIniciado) return;
+        if (caminando || juegosAbiertos) return;
         puntero.x = (clientX / window.innerWidth) * 2 - 1;
         puntero.y = -(clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(puntero, camera);
+
+        // 1) ¿Tocó la ZONA DE JUEGOS? El personaje CAMINA hasta la carpa y, al
+        //    llegar, se abre la galería. (Accesible aun sin iniciar el recorrido.)
+        if (zonaJuegos) {
+            const objJuegos = [];
+            zonaJuegos.traverse(o => { if (o.isMesh) objJuegos.push(o); });
+            if (raycaster.intersectObjects(objJuegos, false)[0]) {
+                caminarACarpa();
+                return;
+            }
+        }
+
+        // 2) Estaciones (solo con el recorrido ya iniciado)
+        if (!recorridoIniciado) return;
         const objetos = [];
         estaciones.forEach(e => e.grupo.traverse(o => { if (o.isMesh) { o.userData.estId = e.parada.id; objetos.push(o); } }));
         const hit = raycaster.intersectObjects(objetos, false)[0];
@@ -1851,6 +1990,52 @@ import * as THREE from 'three';
         } else if (esTocable(id)) {
             caminarA(id);
         }
+    }
+
+    // El personaje CAMINA (línea recta) desde donde esté hasta el frente de la
+    // carpa y, al llegar, abre la galería. Reutiliza el motor de caminata del loop.
+    function caminarACarpa() {
+        if (caminando || entrandoSaliendo || juegosAbiertos || !zonaJuegosParada || !personaje) return;
+        const origen = personaje.position.clone(); origen.y = 0;
+        const destino = zonaJuegosParada.clone(); destino.y = 0;
+        // Recordar dónde estaba el personaje para devolverlo al cerrar la galería,
+        // así el recorrido continúa desde donde iba.
+        posAntesDeCarpa = { pos: origen.clone(), rotY: personaje.rotation.y };
+        if (origen.distanceTo(destino) < 0.6) { abrirZonaJuegos(); return; } // ya está al lado
+        // Curva recta (2 puntos) que el loop recorre igual que las del grafo.
+        animCurva = new THREE.CatmullRomCurve3([origen, destino], false, 'catmullrom', 0.5);
+        animT0 = 0; animT1 = 1;
+        caminando = true; caminandoLibre = true;
+        alLlegarLibre = function () { abrirZonaJuegos(); };
+        personaje.visible = true; ocultarEtiqueta();
+        animDur = Math.max(1200, origen.distanceTo(destino) * 85);
+        animInicio = performance.now();
+    }
+
+    // Abre la galería de juegos (HTML) por encima del canvas 3D, reutilizando
+    // window.BancoJuegos. El 3D sigue vivo detrás; al volver, solo se cierra.
+    function abrirZonaJuegos() {
+        if (juegosAbiertos || !window.BancoJuegos) return;
+        juegosAbiertos = true;
+        // Contenedor propio para no pisar el HUD/canvas del recorrido.
+        const cont = document.createElement('div');
+        cont.className = 'rn3d-juegos-capa';
+        ctx.$paso[0].appendChild(cont);
+        const color = (camino && camino.ambiente && camino.ambiente.color_hex) || '';
+        window.BancoJuegos.abrir({
+            $paso: window.jQuery(cont),
+            color,
+            onVolver: function () {
+                juegosAbiertos = false;
+                cont.remove();
+                // Devolver el personaje a donde estaba antes de ir a la carpa.
+                if (posAntesDeCarpa && personaje) {
+                    personaje.position.copy(posAntesDeCarpa.pos);
+                    personaje.rotation.y = posAntesDeCarpa.rotY;
+                    posAntesDeCarpa = null;
+                }
+            },
+        });
     }
 
     // ===================== Avance guiado (por GRAFO) =====================
@@ -2632,7 +2817,16 @@ import * as THREE from 'three';
                 if (pieIzq) { pieIzq.position.z = 0.05; pieDer.position.z = 0.05; pieIzq.position.y = 0.24; pieDer.position.y = 0.24; }
                 if (cuerpo) { cuerpo.rotation.z = 0; cuerpo.rotation.y = 0; }
                 if (cabeza) cabeza.rotation.z = 0;
-                terminarAvance();
+                caminando = false; animCurva = null;
+                if (caminandoLibre) {
+                    // Caminata a un punto libre (carpa): ejecuta su callback, NO el
+                    // flujo del grafo (terminarAvance marca nodos/abre modales).
+                    caminandoLibre = false;
+                    const cb = alLlegarLibre; alLlegarLibre = null;
+                    if (cb) cb();
+                } else {
+                    terminarAvance();
+                }
             }
         } else {
             // idle: respiración leve + balanceo suave de brazos
@@ -2668,6 +2862,15 @@ import * as THREE from 'three';
                 e.medallon.position.y += (e.medallon.userData.baseY - e.medallon.position.y) * 0.2;
             }
         });
+        // Cartel de la zona de juegos: billboard hacia la cámara + leve flotar.
+        if (zonaJuegosCartel) {
+            const cy = zonaJuegosCartel.userData.baseY;
+            zonaJuegosCartel.position.y = cy + Math.sin(now / 600) * 0.18;
+            // lookAt con la posición MUNDIAL de la cámara pero conservando la altura
+            // del cartel (para que no se incline hacia arriba/abajo).
+            const w = new THREE.Vector3(); zonaJuegosCartel.getWorldPosition(w);
+            zonaJuegosCartel.lookAt(camera.position.x, w.y, camera.position.z);
+        }
         actualizarCamara(false); actualizarEtiquetaSiguiente(); actualizarBocadillo();
         renderer.render(scene, camera);
         rafId = requestAnimationFrame(animar);
@@ -2693,6 +2896,8 @@ import * as THREE from 'three';
         fuegos = []; fuegosActivos = false; vallas = {};
         puertasCasa = {}; entrandoSaliendo = false;
         pez = null; pezT = 0; aves = []; casaInicioCentro = null;
+        zonaJuegos = null; zonaJuegosCartel = null; zonaJuegosCentro = null; juegosAbiertos = false;
+        zonaJuegosParada = null; caminandoLibre = false; alLlegarLibre = null; posAntesDeCarpa = null;
 
         // color del ambiente desde --rn-color
         const rc = getComputedStyle(ctx.$shell[0]).getPropertyValue('--rn-color').trim() || '#0ea5e9';
@@ -2735,6 +2940,7 @@ import * as THREE from 'three';
         construirEstaciones();
         construirDestinos();
         construirCasaInicio();
+        construirZonaJuegos();
         construirVegetacion();
         construirNubes();
         construirAnimales();

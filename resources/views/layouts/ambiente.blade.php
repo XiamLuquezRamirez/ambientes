@@ -97,7 +97,12 @@
     } }
     </script>
     <script type="module" src="{{ asset('assets/js/recorrido-camino-3d.js') }}?v={{ @filemtime(public_path('assets/js/recorrido-camino-3d.js')) ?: time() }}"></script>
-    <script src="{{ asset('assets/js/recorrido-nino.js') }}"></script>
+    {{-- Juegos web nativos del banco (deben cargar ANTES de banco-juegos.js). --}}
+    <script src="{{ asset('assets/js/juego-memoria-animales.js') }}?v={{ @filemtime(public_path('assets/js/juego-memoria-animales.js')) ?: time() }}"></script>
+    <script src="{{ asset('assets/js/juego-colores-magicos.js') }}?v={{ @filemtime(public_path('assets/js/juego-colores-magicos.js')) ?: time() }}"></script>
+    {{-- Banco de juegos (prototipo). Expone window.BancoJuegos.abrir(). Antes de recorrido-nino.js. --}}
+    <script src="{{ asset('assets/js/banco-juegos.js') }}?v={{ @filemtime(public_path('assets/js/banco-juegos.js')) ?: time() }}"></script>
+    <script src="{{ asset('assets/js/recorrido-nino.js') }}?v={{ @filemtime(public_path('assets/js/recorrido-nino.js')) ?: time() }}"></script>
     <script src="{{ asset('assets/js/kiosco-bienvenida.js') }}"></script>
     <script src="{{ asset('assets/js/pin-figuras.js') }}"></script>
     <script src="{{ asset('assets/js/kiosco-navegacion.js') }}"></script>

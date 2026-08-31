@@ -1,0 +1,164 @@
+/**
+ * juego-memoria-animales.css — Juego de memoria (parejas de animales).
+ * Se monta dentro de .bj-canvas-wrap del reproductor del banco de juegos.
+ * Pensado para tablet: cartas grandes, animación de volteo 3D, alto contraste.
+ */
+
+.jma {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background:
+        radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--rn-color, #2f8fd4) 40%, transparent), transparent 60%),
+        linear-gradient(160deg, #12354d, #0b2233);
+    color: #fff;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Barra superior: intentos + parejas */
+.jma-top {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    padding: .8rem 1rem;
+    font: 800 1.05rem/1 system-ui, sans-serif;
+}
+.jma-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .22);
+    padding: .5rem .95rem;
+    border-radius: 999px;
+}
+.jma-stat b { font-variant-numeric: tabular-nums; }
+
+/* Tablero */
+.jma-tablero {
+    flex: 1 1 auto;
+    display: grid;
+    gap: clamp(.5rem, 1.6vw, 1rem);
+    padding: clamp(.6rem, 2vw, 1.4rem);
+    place-content: center;
+    align-content: center;
+    justify-items: stretch;
+}
+
+/* Cada carta: perspectiva para el volteo 3D */
+.jma-carta {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    width: 100%;
+    min-width: 74px;
+    max-width: 130px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    perspective: 700px;
+}
+.jma-carta-inner {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transition: transform .42s cubic-bezier(.4, 0, .2, 1);
+    border-radius: 16px;
+}
+.jma-carta.jma-volteada .jma-carta-inner,
+.jma-carta.jma-lograda .jma-carta-inner {
+    transform: rotateY(180deg);
+}
+
+/* Caras (dorso y frente) */
+.jma-cara {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: 0 8px 18px -8px rgba(0, 0, 0, .55);
+}
+/* Dorso: color del ambiente con signo de interrogación */
+.jma-dorso {
+    background: linear-gradient(150deg, var(--rn-color, #2f8fd4), color-mix(in srgb, var(--rn-color, #2f8fd4) 55%, #000));
+    font-size: clamp(2rem, 6vw, 3rem);
+    color: rgba(255, 255, 255, .9);
+    border: 3px solid rgba(255, 255, 255, .35);
+}
+.jma-dorso::after { content: "?"; font-weight: 900; }
+/* Frente: el animal */
+.jma-frente {
+    background: #fff;
+    transform: rotateY(180deg);
+    font-size: clamp(2.4rem, 8vw, 4rem);
+    border: 3px solid #e4dccb;
+}
+
+/* Carta ya emparejada: se atenúa y da un latido de éxito */
+.jma-carta.jma-lograda { cursor: default; }
+.jma-carta.jma-lograda .jma-frente {
+    background: #eafaf0;
+    border-color: #22c55e;
+    animation: jma-latido .5s ease;
+}
+.jma-carta.jma-lograda .jma-carta-inner { box-shadow: 0 0 0 4px rgba(34, 197, 94, .5); border-radius: 16px; }
+
+/* Bloqueo de clicks mientras se comparan dos cartas */
+.jma.jma-bloqueado .jma-carta:not(.jma-volteada):not(.jma-lograda) { pointer-events: none; }
+
+@keyframes jma-latido {
+    0% { transform: scale(1); } 40% { transform: scale(1.12); } 100% { transform: scale(1); }
+}
+
+/* Pantalla de ÉXITO */
+.jma-exito {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    text-align: center;
+    background: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, .35), rgba(0, 0, 0, .7));
+    animation: jma-fade .4s ease;
+}
+.jma-exito-emoji { font-size: clamp(4rem, 14vw, 7rem); animation: jma-brinca 1s ease-in-out infinite; }
+.jma-exito-titulo { margin: 0; font: 900 clamp(1.6rem, 5vw, 2.6rem)/1.1 system-ui, sans-serif; }
+.jma-exito-sub { margin: 0; font: 600 1.05rem/1.3 system-ui, sans-serif; opacity: .92; }
+.jma-estrellas { font-size: clamp(1.8rem, 6vw, 2.8rem); letter-spacing: .3rem; }
+.jma-estrella { display: inline-block; opacity: 0; animation: jma-pop .4s ease forwards; }
+.jma-estrella:nth-child(1) { animation-delay: .15s; }
+.jma-estrella:nth-child(2) { animation-delay: .35s; }
+.jma-estrella:nth-child(3) { animation-delay: .55s; }
+.jma-botones { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: center; }
+.jma-btn {
+    font: 800 1.05rem/1 system-ui, sans-serif;
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, .5);
+    padding: .85rem 1.5rem;
+    border-radius: 999px;
+    cursor: pointer;
+}
+.jma-btn-jugar { background: #22c55e; border-color: #16a34a; }
+.jma-btn-volver { background: rgba(255, 255, 255, .16); }
+.jma-btn:hover { filter: brightness(1.08); }
+
+@keyframes jma-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes jma-brinca { 0%,100% { transform: translateY(0); } 45% { transform: translateY(-14px); } }
+@keyframes jma-pop { 0% { opacity: 0; transform: scale(0.2) rotate(-20deg); } 70% { transform: scale(1.25); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .jma-carta-inner { transition: none; }
+    .jma-exito-emoji, .jma-estrella, .jma-carta.jma-lograda .jma-frente { animation: none; }
+    .jma-estrella { opacity: 1; }
+}
