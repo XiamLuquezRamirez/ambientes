@@ -72,16 +72,17 @@ Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('doce
 Route::post('/login', [AuthDocenteController::class, 'iniciarSesion'])->name('docente.login.post');
 Route::post('/logout', [AuthDocenteController::class, 'cerrarSesion'])->name('docente.logout');
 
-// Vista previa en tablet (token temporal, sin sesión de staff)
-// Endpoint para guardar los datos generales del Piar
-// Piar
-Route::get('estudiantes/diligenciar-piar/{idEstudiante}/{tipo}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
-Route::get('piar', [PiarController::class, 'listado'])->name('admin.piar');
-Route::get('piar/{idEstudiante}', [PiarController::class, 'verPiar'])->name('admin.piar.ver');
-Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])->name('admin.piar.guardar-piar');
-Route::get('piar/buscar-docente/{texto}', [PiarController::class, 'buscarDocente'])->name('admin.piar.buscar-docente');
-Route::get('piar/verificar-si-comenzo/{idEstudiante}', [PiarController::class, 'verificarSiComenzo'])->name('admin.piar.verificar-si-comenzo');
-Route::get('piar/exportar/{idEstudiante}', [PiarController::class, 'exportar'])->name('admin.piar.exportar');
+// ── Piar (datos de inclusión de menores) — SOLO admin autenticado ──────────
+// Se mantienen las URLs y nombres de ruta; solo se añade el middleware es.admin.
+Route::middleware(['es.admin'])->group(function () {
+    Route::get('estudiantes/diligenciar-piar/{idEstudiante}/{tipo}', [PiarController::class, 'diligenciarPiar'])->name('admin.estudiantes.diligenciar-piar');
+    Route::get('piar', [PiarController::class, 'listado'])->name('admin.piar');
+    Route::get('piar/{idEstudiante}', [PiarController::class, 'verPiar'])->name('admin.piar.ver');
+    Route::post('piar/guardar-paso/{paso}', [PiarController::class, 'guardarPiar'])->name('admin.piar.guardar-piar');
+    Route::get('piar/buscar-docente/{texto}', [PiarController::class, 'buscarDocente'])->name('admin.piar.buscar-docente');
+    Route::get('piar/verificar-si-comenzo/{idEstudiante}', [PiarController::class, 'verificarSiComenzo'])->name('admin.piar.verificar-si-comenzo');
+    Route::get('piar/exportar/{idEstudiante}', [PiarController::class, 'exportar'])->name('admin.piar.exportar');
+});
 
 // ── Info condiciones (público — todos los roles) ───────────────────────────
 Route::get('/info-condiciones', [InfoCondicionesController::class, 'index'])->name('info-condiciones.index');
@@ -537,8 +538,10 @@ Route::middleware('sesion.nino')->group(function () {
     require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
 });
 
-// === PREVIEW TABLET (TEMPORAL — quitar antes de commit) ====================
+// === PREVIEW TABLET (solo desarrollo) ======================================
 // Muestra el recorrido de una clase sin pasar por PIN. ?clase=ID (default 1).
+// Protegida tras APP_DEBUG: en producción (APP_DEBUG=false) NO se registra.
+if (config('app.debug')) {
 Route::get('/__preview-camino', function (\Illuminate\Http\Request $request) {
     $svc = app(\App\Services\RecorridoNinoService::class);
     $clase = \App\Models\Clase::find((int) $request->query('clase', 1));
@@ -564,3 +567,4 @@ Route::get('/__preview-camino', function (\Illuminate\Http\Request $request) {
         'pasoInicial' => 'camino',
     ]);
 });
+}

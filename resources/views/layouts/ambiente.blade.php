@@ -10,12 +10,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $ambiente->nombre }} — PedNia</title>
     <link rel="icon" href="{{ asset('assets/images/isotipo.png') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
+    <link rel="stylesheet" href="@assetv('assets/css/fonts.css')">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/kiosco-fullscreen.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/kiosco-auth.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/recorrido-camino.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/recorrido-camino-3d.css') }}?v={{ @filemtime(public_path('assets/css/recorrido-camino-3d.css')) ?: time() }}">
+    <link rel="stylesheet" href="@assetv('assets/css/kiosco-fullscreen.css')">
+    <link rel="stylesheet" href="@assetv('assets/css/kiosco-auth.css')">
+    <link rel="stylesheet" href="@assetv('assets/css/recorrido-camino.css')">
+    <link rel="stylesheet" href="@assetv('assets/css/recorrido-camino-3d.css')">
     <style id="kioscoLayoutStyles">
         :root {
             --color-ambiente: {{ $ambiente->color_hex }};
@@ -87,26 +87,26 @@
         @yield('content')
     </div>
     @stack('scripts')
-    <script src="{{ asset('assets/js/kiosco-fs-core.js') }}"></script>
-    <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
-    <script src="{{ asset('assets/js/constructor-vista-nino.js') }}"></script>
+    <script src="@assetv('assets/js/kiosco-fs-core.js')"></script>
+    <script src="@assetv('assets/js/jquery-4.0.0.min.js')"></script>
+    <script src="@assetv('assets/js/constructor-vista-nino.js')"></script>
     {{-- Camino 3D (Three.js). Expone window.KioscoCamino.boot(). --}}
     <script type="importmap">
     { "imports": {
-        "three": "{{ asset('assets/vendor/three/three.module.js') }}"
+        "three": "@assetv('assets/vendor/three/three.module.js')"
     } }
     </script>
-    <script type="module" src="{{ asset('assets/js/recorrido-camino-3d.js') }}?v={{ @filemtime(public_path('assets/js/recorrido-camino-3d.js')) ?: time() }}"></script>
+    <script type="module" src="@assetv('assets/js/recorrido-camino-3d.js')"></script>
     {{-- Juegos web nativos del banco (deben cargar ANTES de banco-juegos.js). --}}
-    <script src="{{ asset('assets/js/juego-memoria-animales.js') }}?v={{ @filemtime(public_path('assets/js/juego-memoria-animales.js')) ?: time() }}"></script>
-    <script src="{{ asset('assets/js/juego-colores-magicos.js') }}?v={{ @filemtime(public_path('assets/js/juego-colores-magicos.js')) ?: time() }}"></script>
+    <script src="@assetv('assets/js/juego-memoria-animales.js')"></script>
+    <script src="@assetv('assets/js/juego-colores-magicos.js')"></script>
     {{-- Banco de juegos (prototipo). Expone window.BancoJuegos.abrir(). Antes de recorrido-nino.js. --}}
-    <script src="{{ asset('assets/js/banco-juegos.js') }}?v={{ @filemtime(public_path('assets/js/banco-juegos.js')) ?: time() }}"></script>
-    <script src="{{ asset('assets/js/recorrido-nino.js') }}?v={{ @filemtime(public_path('assets/js/recorrido-nino.js')) ?: time() }}"></script>
-    <script src="{{ asset('assets/js/kiosco-bienvenida.js') }}"></script>
-    <script src="{{ asset('assets/js/pin-figuras.js') }}"></script>
-    <script src="{{ asset('assets/js/kiosco-navegacion.js') }}"></script>
-    <script src="{{ asset('assets/js/kiosco-fullscreen.js') }}"></script>
+    <script src="@assetv('assets/js/banco-juegos.js')"></script>
+    <script src="@assetv('assets/js/recorrido-nino.js')"></script>
+    <script src="@assetv('assets/js/kiosco-bienvenida.js')"></script>
+    <script src="@assetv('assets/js/pin-figuras.js')"></script>
+    <script src="@assetv('assets/js/kiosco-navegacion.js')"></script>
+    <script src="@assetv('assets/js/kiosco-fullscreen.js')"></script>
 </body>
 
 </html>
