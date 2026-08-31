@@ -13,7 +13,7 @@
             "titulo": "¿Qué es el Trastorno por Déficit de Atención e Hiperactividad (TDAH)?",
             "imagen": "assets/info-condiciones/imagenes/tdah/1.png",
             "color_numero": "#22C55E",
-            "contenido_html": "<p>El Trastorno por Déficit de Atención e Hiperactividad (TDAH) es una condición del neurodesarrollo caracterizada por un patrón persistente de desatención y/o hiperactividad-impulsividad que interfiere con el funcionamiento o el desarrollo.</p>"
+            "contenido_html": ".tdah-page #tdah-apartado-1"
         },
         {
             "id": "tipos",
@@ -21,7 +21,7 @@
             "titulo": "Tipos de TDAH",
             "imagen": "assets/info-condiciones/imagenes/tdah/2.png",
             "color_numero": "#3B82F6",
-            "contenido_html": "<ul><li><strong>Predominio desatento:</strong> dificultad para sostener la atención, organización y seguimiento de instrucciones.</li><li><strong>Predominio hiperactivo/impulsivo:</strong> inquietud motora, interrupciones y respuestas precipitadas.</li><li><strong>Combinado:</strong> presenta características de ambos subtipos.</li></ul>"
+            "contenido_html": ".tdah-page #tdah-apartado-2"
         },
         {
             "id": "senales-alerta",
@@ -29,7 +29,7 @@
             "titulo": "Señales de alerta",
             "imagen": "assets/info-condiciones/imagenes/tdah/3.png",
             "color_numero": "#8B5CF6",
-            "contenido_html": "<ul><li>Dificultad para completar tareas y mantener la atención en actividades escolares.</li><li>Olvidos frecuentes, pérdida de materiales y desorganización sostenida.</li><li>Inquietud, dificultad para permanecer sentado o esperar turnos.</li><li>Impulsividad en respuestas y conductas de riesgo en contextos sociales.</li></ul>"
+            "contenido_html": ".tdah-page #tdah-apartado-3"
         },
         {
             "id": "estrategias-pedagogicas",
@@ -38,7 +38,7 @@
             "titulo": "Estrategias pedagógicas para el aula",
             "imagen": "assets/info-condiciones/imagenes/tdah/4.png",
             "color_numero": "#F97316",
-            "contenido_html": "<ul><li>Instrucciones breves, secuenciadas y con apoyo visual.</li><li>Rutinas predecibles y avisos antes de transiciones.</li><li>Refuerzo positivo inmediato y metas alcanzables.</li><li>Ubicación estratégica y reducción de distractores.</li></ul>"
+            "contenido_html": ".tdah-page #tdah-apartado-4"
         },
         {
             "id": "ajustes-razonables",
@@ -46,7 +46,7 @@
             "titulo": "Ajustes razonables para TDAH",
             "imagen": "assets/info-condiciones/imagenes/tdah/5.png",
             "color_numero": "#EC4899",
-            "contenido_html": "<ul><li>Tiempo adicional en evaluaciones.</li><li>Fragmentación de tareas largas.</li><li>Apoyos visuales, listas de chequeo y organizadores gráficos.</li><li>Permitir movimiento regulado y pausas activas breves.</li></ul>"
+            "contenido_html": ".tdah-page #tdah-apartado-5"
         },
         {
             "id": "evitar-docente",
@@ -54,7 +54,7 @@
             "titulo": "¿Qué debe evitar el docente?",
             "imagen": "assets/info-condiciones/imagenes/tdah/6.png",
             "color_numero": "#3B82F6",
-            "contenido_html": "<ul><li>Humillación pública o comparaciones entre estudiantes.</li><li>Expectativas poco claras o cambios constantes de reglas.</li><li>Sanciones prolongadas sin estrategias de reorientación.</li><li>Exceso de estímulos visuales o auditivos no regulados.</li></ul>"
+            "contenido_html": ".tdah-page #tdah-apartado-6"
         },
         {
             "id": "mitos-realidades",
@@ -62,7 +62,7 @@
             "titulo": "Mitos y realidades",
             "imagen": "assets/info-condiciones/imagenes/tdah/7.png",
             "color_numero": "#F97316",
-            "contenido_html": "<p><strong>Mito:</strong> «Es flojera o falta de disciplina».</p><p><strong>Realidad:</strong> El TDAH es una condición neurobiológica que requiere apoyos y estrategias específicas.</p><p><strong>Mito:</strong> «Con más castigo mejora».</p><p><strong>Realidad:</strong> El refuerzo positivo y la estructura favorecen mejor el aprendizaje.</p>"
+            "contenido_html": ".tdah-page #tdah-apartado-7"
         },
         {
             "id": "sospecha",
@@ -70,7 +70,7 @@
             "titulo": "¿Qué hacer ante la sospecha de TDAH?",
             "imagen": "assets/info-condiciones/imagenes/tdah/8.png",
             "color_numero": "#EC4899",
-            "contenido_html": "<ol><li>Documentar observaciones en diferentes contextos (aula, recreo, casa).</li><li>Comunicar hallazgos al equipo directivo y familia.</li><li>Activar ruta de valoración interdisciplinar según protocolo institucional.</li><li>Implementar apoyos mientras se realiza el proceso de valoración.</li></ol>"
+            "contenido_html": ".tdah-page #tdah-apartado-8"
         },
         {
             "id": "orientacion-familia",
@@ -79,7 +79,7 @@
             "titulo": "Orientaciones para la familia",
             "imagen": "assets/info-condiciones/imagenes/tdah/9.png",
             "color_numero": "#22C55E",
-            "contenido_html": "<ul><li>Mantener rutinas claras en casa y horarios de sueño adecuados.</li><li>Reforzar logros y usar instrucciones concretas.</li><li>Coordinar con docentes estrategias consistentes entre hogar y colegio.</li><li>Buscar orientación profesional ante dudas o cambios significativos.</li></ul>"
+            "contenido_html": ".tdah-page #tdah-apartado-9"
         },
         {
             "id": "bibliografia",
@@ -87,7 +87,7 @@
             "titulo": "Bibliografía",
             "imagen": "assets/info-condiciones/imagenes/tdah/10.png",
             "color_numero": "#8B5CF6",
-            "contenido_html": "<ul><li>American Psychiatric Association. (2013). <em>DSM-5</em>.</li><li>Organización Mundial de la Salud. (2019). <em>CIE-11</em>.</li><li>Ministerio de Salud y Protección Social — Colombia. Guías de atención en salud mental infantojuvenil.</li><li>Lineamientos institucionales de inclusión educativa del establecimiento.</li></ul>"
+            "contenido_html": ".tdah-page #tdah-apartado-10"
         }
     ]
 }

@@ -11,7 +11,8 @@
            CONTENEDOR GENERAL
         ========================= */
 
-        .autismo-page {
+        .autismo-page,
+        .tdah-page {
             width: 100%;
             max-width: 1500px;
             margin: 0 auto;
@@ -189,43 +190,53 @@
            COLORES DE SECCIONES
         ========================= */
 
-        #apartado-1 .section-header {
+        #apartado-1 .section-header,
+        #tdah-apartado-1 .section-header {
             background: linear-gradient(135deg, #149b72, #087b5a);
         }
 
-        #apartado-2 .section-header {
+        #apartado-2 .section-header,
+        #tdah-apartado-2 .section-header {
             background: linear-gradient(135deg, #1677e8, #1457b7);
         }
 
-        #apartado-3 .section-header {
+        #apartado-3 .section-header,
+        #tdah-apartado-3 .section-header {
             background: linear-gradient(135deg, #6837bd, #4b2198);
         }
 
-        #apartado-4 .section-header {
+        #apartado-4 .section-header,
+        #tdah-apartado-4 .section-header {
             background: linear-gradient(135deg, #f6a313, #df7600);
         }
 
-        #apartado-5 .section-header {
+        #apartado-5 .section-header,
+        #tdah-apartado-5 .section-header {
             background: linear-gradient(135deg, #ec0873, #b70054);
         }
 
-        #apartado-6 .section-header {
+        #apartado-6 .section-header,
+        #tdah-apartado-6 .section-header {
             background: linear-gradient(135deg, #1677e8, #124fa4);
         }
 
-        #apartado-7 .section-header {
+        #apartado-7 .section-header,
+        #tdah-apartado-7 .section-header {
             background: linear-gradient(135deg, #f6a313, #d76d00);
         }
 
-        #apartado-8 .section-header {
+        #apartado-8 .section-header,
+        #tdah-apartado-8 .section-header {
             background: linear-gradient(135deg, #ec0873, #ae004f);
         }
 
-        #apartado-9 .section-header {
+        #apartado-9 .section-header,
+        #tdah-apartado-9 .section-header {
             background: linear-gradient(135deg, #149b72, #087052);
         }
 
-        #apartado-10 .section-header {
+        #apartado-10 .section-header,
+        #tdah-apartado-10 .section-header {
             background: linear-gradient(135deg, #6837bd, #43218d);
         }
 
@@ -392,7 +403,8 @@
         }
 
         @media (max-width: 700px) {
-            .autismo-page {
+            .autismo-page,
+            .tdah-page {
                 padding: 15px;
             }
 
