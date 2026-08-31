@@ -1,0 +1,170 @@
+/**
+ * juego-colores-magicos.css — Juego de mezcla de colores.
+ * El niño combina colores primarios (rojo/azul/amarillo) para lograr un color
+ * objetivo. Se monta dentro de .bj-canvas-wrap del banco de juegos.
+ * Pensado para tablet: frascos grandes, caldero central, alto contraste.
+ */
+
+.jcm {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background:
+        radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--rn-color, #8e5bd6) 42%, transparent), transparent 60%),
+        linear-gradient(160deg, #2a1c3f, #17102a);
+    color: #fff;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.jcm-top {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    padding: .8rem 1rem;
+    font: 800 1.05rem/1 system-ui, sans-serif;
+}
+.jcm-stat {
+    display: inline-flex; align-items: center; gap: .45rem;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .22);
+    padding: .5rem .95rem; border-radius: 999px;
+}
+.jcm-stat b { font-variant-numeric: tabular-nums; }
+
+/* Zona central: objetivo + caldero */
+.jcm-centro {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(.6rem, 2vh, 1.4rem);
+    padding: .5rem 1rem;
+}
+
+.jcm-objetivo {
+    display: flex; flex-direction: column; align-items: center; gap: .5rem;
+}
+.jcm-objetivo-label { font: 700 .95rem/1 system-ui, sans-serif; opacity: .85; }
+.jcm-objetivo-muestra {
+    width: clamp(70px, 16vw, 110px);
+    height: clamp(46px, 10vw, 66px);
+    border-radius: 14px;
+    border: 4px solid rgba(255, 255, 255, .85);
+    box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .6);
+}
+.jcm-objetivo-nombre { font: 900 clamp(1.2rem, 4vw, 1.8rem)/1 system-ui, sans-serif; }
+
+/* Caldero (mezcla actual) */
+.jcm-caldero-wrap { display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+.jcm-caldero {
+    position: relative;
+    width: clamp(120px, 30vw, 190px);
+    height: clamp(90px, 22vw, 140px);
+    border-radius: 0 0 46% 46% / 0 0 60% 60%;
+    background: #3a2b1a;
+    border: 6px solid #23180f;
+    overflow: hidden;
+    box-shadow: inset 0 -10px 20px rgba(0, 0, 0, .4);
+}
+.jcm-liquido {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 62%;
+    background: #6b6b6b;
+    transition: background .45s ease, height .3s ease;
+}
+.jcm-liquido::before { /* brillo del líquido */
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .25), transparent 45%);
+}
+.jcm-caldero-vacio {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font: 700 .9rem/1.2 system-ui, sans-serif; color: rgba(255,255,255,.5); text-align: center;
+    padding: 0 1rem;
+}
+.jcm-gotas { font: 700 .82rem/1 system-ui, sans-serif; opacity: .8; min-height: 1em; }
+
+/* Frascos primarios */
+.jcm-frascos {
+    flex: 0 0 auto;
+    display: flex; justify-content: center; gap: clamp(.8rem, 4vw, 2rem);
+    padding: .6rem 1rem;
+}
+.jcm-frasco {
+    display: flex; flex-direction: column; align-items: center; gap: .35rem;
+    border: none; background: transparent; cursor: pointer; padding: .3rem;
+    transition: transform .12s ease;
+}
+.jcm-frasco:active { transform: scale(.92); }
+.jcm-frasco-bote {
+    width: clamp(52px, 13vw, 78px);
+    height: clamp(62px, 15vw, 92px);
+    border-radius: 12px 12px 16px 16px;
+    border: 4px solid rgba(255, 255, 255, .85);
+    box-shadow: 0 8px 18px -8px rgba(0, 0, 0, .55), inset 0 -8px 14px rgba(0, 0, 0, .25);
+    position: relative;
+}
+.jcm-frasco-bote::before { /* tapa */
+    content: ""; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    width: 42%; height: 10px; border-radius: 4px 4px 0 0; background: rgba(255, 255, 255, .8);
+}
+.jcm-frasco-nombre { font: 700 .82rem/1 system-ui, sans-serif; }
+
+/* Botones */
+.jcm-acciones { display: flex; justify-content: center; gap: .7rem; padding: .3rem 1rem .9rem; }
+.jcm-btn {
+    font: 800 1rem/1 system-ui, sans-serif; color: #fff;
+    border: 2px solid rgba(255, 255, 255, .5);
+    padding: .7rem 1.3rem; border-radius: 999px; cursor: pointer;
+}
+.jcm-btn-limpiar { background: rgba(255, 255, 255, .14); }
+.jcm-btn:hover { filter: brightness(1.1); }
+
+/* Feedback de acierto/error */
+.jcm-caldero.jcm-acierto { animation: jcm-bien .6s ease; }
+.jcm-caldero.jcm-error { animation: jcm-mal .4s ease; }
+@keyframes jcm-bien { 0%,100% { transform: scale(1); } 40% { transform: scale(1.08); } }
+@keyframes jcm-mal { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+.jcm-mensaje {
+    min-height: 1.4em; text-align: center; font: 800 1.05rem/1.2 system-ui, sans-serif;
+    padding: 0 1rem;
+}
+.jcm-mensaje.jcm-msg-bien { color: #6ee7a0; }
+.jcm-mensaje.jcm-msg-mal { color: #ffb3a0; }
+
+/* Pantalla de ÉXITO (reusa el patrón del memoria) */
+.jcm-exito {
+    position: absolute; inset: 0; z-index: 5;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.2rem; text-align: center;
+    background: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, .35), rgba(0, 0, 0, .72));
+    animation: jcm-fade .4s ease;
+}
+.jcm-exito-emoji { font-size: clamp(4rem, 14vw, 7rem); animation: jcm-brinca 1s ease-in-out infinite; }
+.jcm-exito-titulo { margin: 0; font: 900 clamp(1.6rem, 5vw, 2.6rem)/1.1 system-ui, sans-serif; }
+.jcm-exito-sub { margin: 0; font: 600 1.05rem/1.3 system-ui, sans-serif; opacity: .92; }
+.jcm-estrellas { font-size: clamp(1.8rem, 6vw, 2.8rem); letter-spacing: .3rem; }
+.jcm-estrella { display: inline-block; opacity: 0; animation: jcm-pop .4s ease forwards; }
+.jcm-estrella:nth-child(1) { animation-delay: .15s; }
+.jcm-estrella:nth-child(2) { animation-delay: .35s; }
+.jcm-estrella:nth-child(3) { animation-delay: .55s; }
+.jcm-botones { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: center; }
+.jcm-btn-jugar { background: #22c55e; border-color: #16a34a; }
+.jcm-btn-volver { background: rgba(255, 255, 255, .16); }
+
+@keyframes jcm-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes jcm-brinca { 0%,100% { transform: translateY(0); } 45% { transform: translateY(-14px); } }
+@keyframes jcm-pop { 0% { opacity: 0; transform: scale(.2) rotate(-20deg); } 70% { transform: scale(1.25); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .jcm-liquido, .jcm-caldero { transition: none; animation: none; }
+    .jcm-exito-emoji, .jcm-estrella { animation: none; }
+    .jcm-estrella { opacity: 1; }
+}

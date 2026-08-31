@@ -3,6 +3,9 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/constructor-vista-nino.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/recorrido-nino.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/banco-juegos.css') }}?v={{ @filemtime(public_path('assets/css/banco-juegos.css')) }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/juego-memoria-animales.css') }}?v={{ @filemtime(public_path('assets/css/juego-memoria-animales.css')) }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/juego-colores-magicos.css') }}?v={{ @filemtime(public_path('assets/css/juego-colores-magicos.css')) }}">
 @endpush
 
 @section('content')
