@@ -555,10 +555,6 @@
     --vn-screen-h: 100dvh;
 }
 
-#vnDispositivo.rn-player--camino-overlay .vn-screen-top {
-    padding-top: max(10px, env(safe-area-inset-top, 0px));
-}
-
 #vnDispositivo.rn-player--camino-overlay .vn-screen-body {
     padding: 16px max(12px, env(safe-area-inset-right, 0px)) 20px max(12px, env(safe-area-inset-left, 0px));
 }

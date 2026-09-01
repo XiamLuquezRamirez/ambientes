@@ -375,6 +375,61 @@
             </div>`;
     }
 
+    const JUEGOS_OPCIONES = [
+        {
+            id: 'rompecabezas',
+            nombre: 'Rompecabezas',
+            desc: 'Armar la imagen arrastrando piezas',
+            icon: 'fa-puzzle-piece',
+            color: '#d97706',
+        },
+        {
+            id: 'memoria',
+            nombre: 'Memoria',
+            desc: 'Encontrar parejas de imágenes iguales',
+            icon: 'fa-clone',
+            color: '#0284c7',
+        },
+        {
+            id: 'colorear',
+            nombre: 'Colorear',
+            desc: 'Pintar sobre una imagen en blanco y negro',
+            icon: 'fa-palette',
+            color: '#a855f7',
+        },
+        {
+            id: 'secuencia',
+            nombre: 'Secuencia',
+            desc: 'Ordenar imágenes en el paso correcto',
+            icon: 'fa-arrow-down-wide-short',
+            color: '#0f6e56',
+        },
+    ];
+
+    function fieldJuegoPicker(name, label, value) {
+        const cards = JUEGOS_OPCIONES.map((j) => {
+            const selected = String(j.id) === String(value || '');
+            return `<button type="button" class="cx-juego-card${selected ? ' is-selected' : ''}"
+                data-juego-id="${escapar(j.id)}" aria-pressed="${selected ? 'true' : 'false'}"
+                ${puedeEditar ? '' : 'disabled'}>
+                <span class="cx-juego-card-icon" style="--cx-juego-color:${escapar(j.color)}">
+                    <i class="fa-solid ${escapar(j.icon)}" aria-hidden="true"></i>
+                </span>
+                <span class="cx-juego-card-body">
+                    <span class="cx-juego-card-name">${escapar(j.nombre)}</span>
+                    <span class="cx-juego-card-desc">${escapar(j.desc)}</span>
+                </span>
+            </button>`;
+        }).join('');
+        return `
+            <div class="cx-field">
+                <label>${escapar(label)}</label>
+                <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(value || '')}">
+                <div class="cx-juego-picker" role="radiogroup" aria-label="${escapar(label)}">${cards}</div>
+                ${!value ? '<div class="cx-help">Elige un tipo de juego para configurar sus opciones.</div>' : ''}
+            </div>`;
+    }
+
     function fieldUpload(name, label, value, accept) {
         return `
             <div class="cx-field">
@@ -649,13 +704,7 @@
                 ).join('');
         }
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldSelect('juego_id', 'Juego', id, [
-                { value: '', label: 'Seleccione…' },
-                { value: 'rompecabezas', label: 'Rompecabezas' },
-                { value: 'memoria', label: 'Memoria' },
-                { value: 'colorear', label: 'Colorear' },
-                { value: 'secuencia', label: 'Secuencia' },
-            ])
+            + fieldJuegoPicker('juego_id', 'Juego', id)
             + fieldInput('juego_nombre', 'Nombre del juego', d.juego_nombre)
             + extra;
     }
@@ -971,7 +1020,12 @@
                 icon: 'fa-comment-dots',
                 content: fieldInput('fb_ok', 'Mensaje al acertar', d.fb_ok)
                     + fieldInput('fb_err', 'Mensaje al fallar', d.fb_err)
-                    + fieldSelect('intentos', 'Intentos por paso', d.intentos || '2', ['1', '2', '3', 'Sin límite']),
+                    + fieldSelect('intentos', 'Intentos por paso', d.intentos || '2', ['1', '2', '3', 'Sin límite'])
+                    + fieldSelect('al_agotar', 'Al agotar intentos', d.al_agotar || 'Mostrar respuesta correcta', [
+                        'Mostrar respuesta correcta',
+                        'Continuar sin mostrar',
+                        'Repetir desde el inicio',
+                    ]),
             },
         ]);
     }
@@ -1333,6 +1387,13 @@
     $timeline.on('click', '.cx-btn-eliminar', function (e) {
         e.stopPropagation();
         eliminarBloque($(this).data('id'));
+    });
+
+    $configBody.on('click', '.cx-juego-card:not(:disabled)', function () {
+        const id = $(this).data('juego-id');
+        $configBody.find('.cx-juego-card').removeClass('is-selected').attr('aria-pressed', 'false');
+        $(this).addClass('is-selected').attr('aria-pressed', 'true');
+        $configBody.find('.cx-input[data-field="juego_id"]').val(id).trigger('change');
     });
 
     $configBody.on('input change', '.cx-input, .cx-check, .cx-correcta, .cx-correcta-paso', function () {

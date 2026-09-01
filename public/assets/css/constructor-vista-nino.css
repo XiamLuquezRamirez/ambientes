@@ -118,12 +118,7 @@
     flex-shrink: 0;
 }
 
-.vn-screen-top {
-    flex-shrink: 0;
-    padding: 12px 14px 6px;
-    text-align: center;
-}
-
+/* Progreso en el pie del player (entre Atrás y ¡Sigue!) */
 .vn-progress {
     display: flex;
     gap: 6px;
@@ -253,13 +248,57 @@
 .vn-screen-nav {
     flex-shrink: 0;
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 8px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: clamp(6px, 1.2vw, 10px);
     align-items: center;
-    padding: 10px 12px 14px;
+    padding: 10px 12px max(14px, env(safe-area-inset-bottom, 0px));
     background: rgba(255, 255, 255, .72);
     border-top: 1px solid rgba(15, 23, 42, .06);
     backdrop-filter: blur(8px);
+    overflow: visible;
+}
+
+.vn-nav-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    gap: 2px;
+    padding: 0 clamp(4px, 1vw, 8px);
+}
+
+.vn-screen-nav .vn-progress {
+    display: flex;
+    gap: clamp(4px, 0.7vw, 6px);
+    justify-content: center;
+    flex-wrap: nowrap;
+    margin: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.vn-screen-nav .vn-progress::-webkit-scrollbar {
+    display: none;
+}
+
+.vn-screen-nav .vn-step-label {
+    margin: 0;
+    font-size: .62rem;
+    line-height: 1.1;
+}
+
+.vn-nav-center .vn-nav-meta {
+    min-width: 0;
+    max-width: 100%;
+}
+
+body.vn-dispositivo .vn-nav-center .vn-nav-meta,
+.rn-player .vn-nav-center .vn-nav-meta {
+    display: none;
 }
 
 .vn-nav-meta {
@@ -665,7 +704,15 @@
 
 .vn-bienvenida-video-wrap {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    width: 100%;
+    position: relative;
+}
+
+.vn-bienvenida-video-wrap [hidden] {
+    display: none !important;
 }
 
 .vn-bienvenida-video {
@@ -1098,72 +1145,23 @@
     cursor: grabbing;
 }
 
-/* Reto: tipografía legible en tablet */
-.vn-card--reto .vn-title {
-    font-size: 2.15rem;
-    margin-bottom: 8px;
-}
-
-.vn-card--reto .vn-paso-badge {
-    display: inline-block;
-    margin: 0 auto 12px;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: #ecfeff;
-    color: #0e7490;
-    font-size: 1.05rem;
-    font-weight: 800;
-    text-align: center;
-    width: fit-content;
-    max-width: 100%;
-}
-
+/* Reto: badge de paso (meta superior; enunciado principal en .vn-pregunta-enunciado) */
 .vn-card--reto {
     text-align: center;
 }
 
-.vn-card--reto .vn-instruccion {
-    font-size: 1.35rem;
-    padding: 16px 20px;
-    line-height: 1.4;
-    text-align: center;
-}
-
-.vn-card--reto .vn-reto-pregunta {
+.vn-card--reto .vn-paso-badge {
+    display: inline-block;
+    margin: 0 auto;
+    padding: clamp(4px, 0.6vh, 6px) clamp(10px, 2vw, 14px);
+    border-radius: 999px;
     background: #ecfeff;
-    font-size: 1.65rem;
-}
-
-.vn-card--reto .vn-options {
-    gap: 16px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.vn-card--reto .vn-option {
-    font-size: 1.3rem;
-    min-height: 120px;
-    padding: 18px 14px;
-    border-radius: 22px;
-}
-
-.vn-card--reto .vn-option .vn-op-emoji {
-    font-size: 3rem;
-    margin-bottom: 8px;
-}
-
-.vn-card--reto .vn-option img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 14px;
-    margin: 0 auto 10px;
-    display: block;
-}
-
-.vn-card--reto .vn-feedback {
-    font-size: 1.45rem;
-    padding: 16px 18px;
-    margin-top: 16px;
+    color: #0e7490;
+    font-size: clamp(0.82rem, 1.6vh, 0.98rem);
+    font-weight: 800;
+    text-align: center;
+    width: fit-content;
+    max-width: 100%;
 }
 
 /* Audio: tipografía + botón interactivo */
@@ -1323,6 +1321,15 @@
 
 .vn-video-stage {
     margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.vn-video-stage [hidden] {
+    display: none !important;
 }
 
 .vn-video-btn {
@@ -1457,13 +1464,7 @@
 }
 
 .vn-card--historia .vn-media {
-    margin: 8px 0 14px;
-}
-
-.vn-card--historia .vn-media img {
-    max-height: 420px;
-    width: 100%;
-    object-fit: contain;
+    margin: 0;
 }
 
 .vn-card--historia .vn-historia-nav {
@@ -1507,15 +1508,53 @@
     text-align: center;
 }
 
-.vn-card--juego-rompecabezas .vn-title {
-    font-size: 2.15rem;
-    margin-bottom: 10px;
+.vn-juego-head {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 0.7vh, 8px);
+    margin-bottom: clamp(4px, 0.8vh, 10px);
+    text-align: center;
 }
 
-.vn-card--juego-rompecabezas .vn-instruccion {
-    font-size: 1.4rem;
-    padding: 16px 20px;
-    line-height: 1.4;
+.vn-juego-head .vn-title--compact {
+    margin-bottom: 0 !important;
+}
+
+.vn-juego-head .vn-instruccion {
+    font-size: clamp(0.88rem, 1.8vh, 1.05rem);
+    line-height: 1.25;
+    padding: clamp(5px, 0.9vh, 8px) clamp(10px, 2vw, 14px);
+    margin: 0;
+}
+
+.vn-juego-head .vn-puzzle-meta,
+.vn-juego-head .vn-memory-score {
+    margin: 0;
+    font-size: clamp(0.82rem, 1.6vh, 0.98rem);
+}
+
+.vn-juego-head .vn-seq-nums {
+    margin: 0;
+}
+
+.vn-juego-head--paint {
+    margin-bottom: 4px;
+}
+
+.vn-card--juego-memoria .vn-title,
+.vn-card--juego-rompecabezas .vn-title,
+.vn-card--juego-secuencia .vn-title {
+    font-size: 1.15rem;
+    margin-bottom: 0;
+}
+
+.vn-card--juego-memoria .vn-instruccion,
+.vn-card--juego-rompecabezas .vn-instruccion,
+.vn-card--juego-secuencia .vn-instruccion {
+    font-size: clamp(0.88rem, 1.8vh, 1.05rem);
+    padding: clamp(5px, 0.9vh, 8px) clamp(10px, 2vw, 14px);
+    line-height: 1.25;
 }
 
 .vn-puzzle-meta {
@@ -1536,7 +1575,7 @@
     display: grid;
     gap: 4px;
     width: min(520px, 92%);
-    aspect-ratio: 4 / 3;
+    aspect-ratio: var(--vn-puzzle-ar, 4 / 3);
     background: #cbd5e1;
     border-radius: 16px;
     padding: 6px;
@@ -1569,11 +1608,22 @@
 }
 
 .vn-puzzle-slot .vn-puzzle-piece {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
+    min-width: 0;
+    min-height: 0;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    border-width: 0;
     border-radius: 6px;
     box-shadow: none;
+    transform: none;
+    outline: none;
     cursor: default;
+    display: block;
 }
 
 .vn-puzzle-pool {
@@ -1585,7 +1635,7 @@
     max-width: 560px;
 }
 
-.vn-puzzle-piece {
+.vn-puzzle-pool .vn-puzzle-piece {
     width: 88px;
     height: 72px;
     border: 3px solid #fff;
@@ -1598,8 +1648,20 @@
     flex-shrink: 0;
 }
 
+.vn-puzzle-piece {
+    background-repeat: no-repeat;
+    padding: 0;
+}
+
 .vn-puzzle-piece.is-dragging {
     opacity: 0.35;
+}
+
+.vn-puzzle-piece.is-selected {
+    outline: 3px solid #fbbf24;
+    outline-offset: 2px;
+    transform: scale(1.04);
+    z-index: 2;
 }
 
 .vn-puzzle-piece.is-placed {
@@ -1955,7 +2017,7 @@
 
 .vn-body--paint .vn-card--dibujo .vn-paint,
 .vn-body--paint .vn-card--juego-colorear .vn-paint {
-    min-height: clamp(320px, 52vh, 600px);
+    min-height: 0;
 }
 
 .vn-body--paint .vn-paint-head {
@@ -1980,7 +2042,7 @@
 }
 
 .vn-body--paint .vn-paint-toolbar {
-    flex: 0 0 132px;
+    flex: 0 0 156px;
     align-self: stretch;
     max-height: none;
 }
@@ -2055,7 +2117,7 @@
 }
 
 .vn-paint-toolbar {
-    flex: 0 0 132px;
+    flex: 0 0 156px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -2064,9 +2126,7 @@
     border: 3px solid #fff;
     border-radius: 20px;
     box-shadow: 0 8px 0 rgba(99, 102, 241, .18), 0 14px 28px rgba(15, 23, 42, .1);
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
     max-height: 100%;
     box-sizing: border-box;
     align-self: stretch;
@@ -2432,17 +2492,6 @@
     text-align: center;
 }
 
-.vn-card--juego-memoria .vn-title {
-    font-size: 2.15rem;
-    margin-bottom: 10px;
-}
-
-.vn-card--juego-memoria .vn-instruccion {
-    font-size: 1.4rem;
-    padding: 16px 20px;
-    line-height: 1.4;
-}
-
 .vn-card--juego-memoria .vn-memory {
     grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
     gap: 14px;
@@ -2481,16 +2530,6 @@
 /* Colorear: tipografía + dibujo libre sobre imagen */
 .vn-card--juego-colorear {
     text-align: center;
-}
-
-.vn-card--juego-colorear .vn-title--compact {
-    font-size: 1.15rem;
-    margin-bottom: 4px;
-}
-
-.vn-card--juego-colorear .vn-paint-head .vn-instruccion {
-    font-size: .88rem;
-    padding: 8px 12px;
 }
 
 .vn-card--juego-colorear .vn-paint {
@@ -2602,9 +2641,11 @@
         gap: 12px;
     }
 
-    .vn-match-cols,
-    .vn-sort-board {
-        grid-template-columns: 1fr;
+    @media (orientation: portrait) {
+        .vn-match-cols,
+        .vn-sort-board {
+            grid-template-columns: 1fr;
+        }
     }
 
     .vn-paint {
@@ -2656,7 +2697,7 @@
 }
 
 .vn-body--paint .vn-paint-toolbar {
-    flex: 0 0 clamp(120px, 14vw, 148px);
+    flex: 0 0 clamp(144px, 15.5vw, 168px);
     flex-direction: column;
     flex-wrap: nowrap;
     max-height: 100%;
@@ -2664,7 +2705,7 @@
 
 .vn-nivel--prejardin .vn-body--paint .vn-paint-toolbar,
 .vn-nivel--jardin .vn-body--paint .vn-paint-toolbar {
-    flex: 0 0 clamp(132px, 15vw, 156px);
+    flex: 0 0 clamp(156px, 16.5vw, 178px);
 }
 
 .vn-evidencia-btn {
@@ -2697,17 +2738,6 @@
 /* Secuencia: tipografía + ordenar por arrastre */
 .vn-card--juego-secuencia {
     text-align: center;
-}
-
-.vn-card--juego-secuencia .vn-title {
-    font-size: 2.15rem;
-    margin-bottom: 10px;
-}
-
-.vn-card--juego-secuencia .vn-instruccion {
-    font-size: 1.4rem;
-    padding: 16px 20px;
-    line-height: 1.4;
 }
 
 .vn-card--juego-secuencia .vn-puzzle-meta {
@@ -2858,8 +2888,8 @@ body.rn-player-activo .vn-screen-body,
 body.vn-dispositivo .vn-card,
 body.rn-player-activo .vn-card,
 .rn-player .vn-card {
-    max-width: min(980px, 100%);
-    max-height: none;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 body.vn-dispositivo .vn-body--paint .vn-card,
@@ -2905,7 +2935,7 @@ body.rn-player-activo .vn-body--paint .vn-screen-body,
 body.vn-dispositivo .vn-body--paint .vn-paint-toolbar,
 body.rn-player-activo .vn-body--paint .vn-paint-toolbar,
 .rn-player .vn-body--paint .vn-paint-toolbar {
-    flex: 0 0 clamp(120px, 13vw, 140px);
+    flex: 0 0 clamp(144px, 14.5vw, 162px);
 }
 
 body.vn-dispositivo .vn-draw-canvas,
@@ -3197,6 +3227,24 @@ body.rn-player-activo .vn-colorear-canvas,
     box-shadow: 0 0 0 3px rgba(249, 115, 22, .3);
 }
 
+.vn-nivel--prejardin .vn-screen-nav .vn-dot,
+.vn-nivel--jardin .vn-screen-nav .vn-dot {
+    min-width: 24px;
+    height: 24px;
+    padding: 1px 4px;
+}
+
+.vn-nivel--prejardin .vn-screen-nav .vn-dot.is-current,
+.vn-nivel--jardin .vn-screen-nav .vn-dot.is-current {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, .28);
+}
+
+.vn-nivel--prejardin .vn-screen-nav .vn-dot .vn-dot-icon,
+.vn-nivel--jardin .vn-screen-nav .vn-dot .vn-dot-icon {
+    font-size: .75rem;
+}
+
 /* ── Bienvenida ── */
 .vn-bienvenida-hero {
     position: relative;
@@ -3344,7 +3392,109 @@ body.rn-player-activo .vn-colorear-canvas,
     margin: 4px 0 0;
 }
 
-/* ── Historia ── */
+/* ── Historia: una página con volteo ── */
+.vn-historia-libro {
+    perspective: 1400px;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0 8px;
+}
+
+.vn-historia-libro-cuerpo {
+    position: relative;
+    width: min(100%, 520px);
+    height: min(100%, 440px);
+    min-height: clamp(180px, 36vh, 400px);
+    filter: drop-shadow(0 14px 28px rgba(15, 23, 42, .18));
+}
+
+.vn-historia-pagina {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(145deg, #fffef9 0%, #fef9e8 55%, #fdf3d8 100%);
+    border: 1px solid rgba(120, 53, 15, .12);
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .6), 0 4px 12px rgba(120, 53, 15, .08);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(10px, 2vw, 16px);
+    box-sizing: border-box;
+}
+
+.vn-historia-media {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vn-historia-media img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.vn-historia-hoja {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    transform: rotateY(0deg);
+    transition: transform .7s cubic-bezier(.45, .05, .2, 1);
+    z-index: 6;
+    pointer-events: none;
+}
+
+.vn-historia-hoja.is-sin-transicion {
+    transition: none !important;
+}
+
+.vn-historia-hoja.is-volteando-adelante {
+    transform: rotateY(-180deg);
+}
+
+.vn-historia-hoja.is-volteando-atras {
+    transform: rotateY(-180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vn-historia-hoja {
+        transition: none;
+    }
+}
+
+.vn-historia-hoja-cara {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: linear-gradient(145deg, #fffef9 0%, #fef9e8 55%, #fdf3d8 100%);
+    border: 1px solid rgba(120, 53, 15, .12);
+    border-radius: 12px;
+    box-shadow: 2px 4px 16px rgba(15, 23, 42, .12);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(10px, 2vw, 16px);
+    box-sizing: border-box;
+}
+
+.vn-historia-hoja-cara--atras {
+    transform: rotateY(180deg);
+}
+
 .vn-historia-progress {
     display: flex;
     gap: 8px;
@@ -3367,22 +3517,6 @@ body.rn-player-activo .vn-colorear-canvas,
 .vn-hist-dot.is-current {
     background: #f97316;
     transform: scale(1.35);
-}
-
-.vn-historia-page--enter {
-    animation: vnPageEnter .4s cubic-bezier(.34, 1.2, .64, 1);
-}
-
-@keyframes vnPageEnter {
-    from {
-        opacity: 0;
-        transform: translateX(18px);
-    }
-
-    to {
-        opacity: 1;
-        transform: none;
-    }
 }
 
 .vn-hist-nav-btn--big {
@@ -3881,6 +4015,7 @@ body.rn-player-activo .vn-colorear-canvas,
 .vn-bienvenida-video-wrap {
     position: relative;
     text-align: center;
+    flex-direction: column;
 }
 
 .vn-bienvenida-video-wrap .vn-bienvenida-video {
@@ -3888,10 +4023,18 @@ body.rn-player-activo .vn-colorear-canvas,
     max-height: 380px;
     border-radius: 18px;
     background: #0f172a;
+    margin: 0;
+}
+
+.vn-bienvenida-video-wrap .vn-video-status {
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
 }
 
 .vn-bienvenida-play-btn {
     margin: 0 auto;
+    flex-shrink: 0;
 }
 
 /* Nivel transición */
@@ -3930,9 +4073,9 @@ body.rn-player-activo .vn-colorear-canvas,
     opacity: .35;
 }
 
-/* Puzzle piezas más grandes en prejardín */
-.vn-nivel--prejardin .vn-puzzle-piece,
-.vn-nivel--jardin .vn-puzzle-piece {
+/* Puzzle piezas más grandes en prejardín (solo en el pool) */
+.vn-nivel--prejardin .vn-puzzle-pool .vn-puzzle-piece,
+.vn-nivel--jardin .vn-puzzle-pool .vn-puzzle-piece {
     min-width: 64px;
     min-height: 64px;
 }
@@ -3990,18 +4133,12 @@ body.rn-player-activo .vn-tablet-screen {
         linear-gradient(180deg, #dff6ff 0%, #f1fbf4 48%, #fff7e8 100%);
 }
 
-.rn-player .vn-screen-top,
-body.vn-dispositivo .vn-screen-top,
-body.rn-player-activo .vn-screen-top {
-    padding: max(10px, env(safe-area-inset-top, 0px)) clamp(12px, 2.4vw, 28px) 8px;
-}
-
 .rn-player .vn-screen-body,
 body.vn-dispositivo .vn-screen-body,
 body.rn-player-activo .vn-screen-body {
     --vn-player-gap: clamp(8px, 1.4vh, 16px);
-    align-items: center;
-    justify-content: center;
+    align-items: stretch;
+    justify-content: stretch;
     padding: var(--vn-player-gap) clamp(14px, 3vw, 34px);
     overflow: hidden;
 }
@@ -4010,7 +4147,8 @@ body.rn-player-activo .vn-screen-body {
 body.vn-dispositivo .vn-block-fit,
 body.rn-player-activo .vn-block-fit {
     align-items: stretch;
-    max-width: 1120px;
+    justify-content: stretch;
+    max-width: none;
     min-height: 0;
     width: 100%;
 }
@@ -4018,11 +4156,12 @@ body.rn-player-activo .vn-block-fit {
 .rn-player .vn-card,
 body.vn-dispositivo .vn-card,
 body.rn-player-activo .vn-card {
-    align-self: center;
-    max-width: min(1080px, 100%);
+    align-self: stretch;
+    max-width: 100%;
     max-height: 100%;
-    overflow: visible;
+    overflow: hidden;
     padding: clamp(8px, 1.2vh, 14px);
+    margin: 0;
 }
 
 .rn-player .vn-title,
@@ -4069,11 +4208,11 @@ body.rn-player-activo .vn-media video {
 }
 
 .rn-player .vn-card--imagen .vn-media img,
-.rn-player .vn-card--historia .vn-media img,
+.rn-player .vn-card--historia .vn-historia-media img,
 body.vn-dispositivo .vn-card--imagen .vn-media img,
-body.vn-dispositivo .vn-card--historia .vn-media img,
+body.vn-dispositivo .vn-card--historia .vn-historia-media img,
 body.rn-player-activo .vn-card--imagen .vn-media img,
-body.rn-player-activo .vn-card--historia .vn-media img {
+body.rn-player-activo .vn-card--historia .vn-historia-media img {
     max-height: min(48dvh, 410px);
 }
 
@@ -4169,7 +4308,11 @@ body.rn-player-activo .vn-emocion-img {
 .rn-player .vn-puzzle-board,
 body.vn-dispositivo .vn-puzzle-board,
 body.rn-player-activo .vn-puzzle-board {
-    width: min(460px, 88vw, 58dvh);
+    width: auto;
+    max-width: min(62vw, 100%);
+    min-height: clamp(160px, 36vh, 360px);
+    max-height: min(46dvh, 100%);
+    aspect-ratio: var(--vn-puzzle-ar, 1);
 }
 
 .rn-player .vn-seq-card,
@@ -4225,12 +4368,6 @@ body.rn-player-activo .vn-nav-btn {
 }
 
 @media (max-height: 720px) and (min-width: 700px) {
-
-    .rn-player .vn-screen-top,
-    body.vn-dispositivo .vn-screen-top,
-    body.rn-player-activo .vn-screen-top {
-        padding-bottom: 4px;
-    }
 
     .rn-player .vn-title,
     body.vn-dispositivo .vn-title,
@@ -4310,19 +4447,19 @@ body.rn-player-activo .rn-player.vn-nivel--jardin .vn-instruccion span {
 .rn-player .vn-emocion,
 .rn-player .vn-memory-card,
 .rn-player .vn-seq-card,
-.rn-player .vn-puzzle-piece,
+.rn-player .vn-puzzle-pool .vn-puzzle-piece,
 body.vn-dispositivo .vn-option,
 body.vn-dispositivo .vn-chip,
 body.vn-dispositivo .vn-emocion,
 body.vn-dispositivo .vn-memory-card,
 body.vn-dispositivo .vn-seq-card,
-body.vn-dispositivo .vn-puzzle-piece,
+body.vn-dispositivo .vn-puzzle-pool .vn-puzzle-piece,
 body.rn-player-activo .vn-option,
 body.rn-player-activo .vn-chip,
 body.rn-player-activo .vn-emocion,
 body.rn-player-activo .vn-memory-card,
 body.rn-player-activo .vn-seq-card,
-body.rn-player-activo .vn-puzzle-piece {
+body.rn-player-activo .vn-puzzle-pool .vn-puzzle-piece {
     border-width: 4px;
     box-shadow: 0 8px 0 rgba(15, 23, 42, .10);
     transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
@@ -4333,19 +4470,19 @@ body.rn-player-activo .vn-puzzle-piece {
 .rn-player .vn-emocion:active,
 .rn-player .vn-memory-card:active,
 .rn-player .vn-seq-card:active,
-.rn-player .vn-puzzle-piece:active,
+.rn-player .vn-puzzle-pool .vn-puzzle-piece:active,
 body.vn-dispositivo .vn-option:active,
 body.vn-dispositivo .vn-chip:active,
 body.vn-dispositivo .vn-emocion:active,
 body.vn-dispositivo .vn-memory-card:active,
 body.vn-dispositivo .vn-seq-card:active,
-body.vn-dispositivo .vn-puzzle-piece:active,
+body.vn-dispositivo .vn-puzzle-pool .vn-puzzle-piece:active,
 body.rn-player-activo .vn-option:active,
 body.rn-player-activo .vn-chip:active,
 body.rn-player-activo .vn-emocion:active,
 body.rn-player-activo .vn-memory-card:active,
 body.rn-player-activo .vn-seq-card:active,
-body.rn-player-activo .vn-puzzle-piece:active {
+body.rn-player-activo .vn-puzzle-pool .vn-puzzle-piece:active {
     transform: translateY(4px) scale(.98);
     box-shadow: 0 3px 0 rgba(15, 23, 42, .12);
     filter: saturate(1.08);
@@ -4373,6 +4510,13 @@ body.rn-player-activo .rn-player.vn-nivel--jardin .vn-option {
     min-height: clamp(104px, 18vh, 138px);
 }
 
+body.vn-dispositivo .vn-card--pregunta .vn-option,
+.rn-player .vn-card--pregunta .vn-option,
+body.vn-dispositivo .vn-card--reto .vn-option,
+.rn-player .vn-card--reto .vn-option {
+    min-height: 0;
+}
+
 .rn-player.vn-nivel--prejardin .vn-option .vn-op-emoji,
 .rn-player.vn-nivel--jardin .vn-option .vn-op-emoji,
 body.vn-dispositivo .rn-player.vn-nivel--prejardin .vn-option .vn-op-emoji,
@@ -4393,11 +4537,8 @@ body.rn-player-activo .rn-player.vn-nivel--jardin .vn-option img {
 }
 
 .rn-player .vn-card--pregunta .vn-pregunta-texto,
-.rn-player .vn-card--reto .vn-reto-pregunta,
 body.vn-dispositivo .vn-card--pregunta .vn-pregunta-texto,
-body.vn-dispositivo .vn-card--reto .vn-reto-pregunta,
-body.rn-player-activo .vn-card--pregunta .vn-pregunta-texto,
-body.rn-player-activo .vn-card--reto .vn-reto-pregunta {
+body.rn-player-activo .vn-card--pregunta .vn-pregunta-texto {
     background: #fff8df;
     border-color: rgba(251, 191, 36, .55);
 }
@@ -4587,4 +4728,1131 @@ body.rn-player-activo .vn-body--paint .vn-paint-swatch {
     height: clamp(30px, 4.8vh, 38px);
     min-width: clamp(30px, 4.8vh, 38px);
     min-height: clamp(30px, 4.8vh, 38px);
+}
+
+/* Dibujo libre: barra sin scroll, herramientas completas visibles */
+.vn-body--paint .vn-paint--dibujo .vn-paint-toolbar {
+    flex: 0 0 clamp(172px, 17.5vw, 204px);
+    gap: clamp(4px, 0.7vh, 8px);
+    padding: clamp(6px, 1vh, 10px) clamp(8px, 1.1vw, 11px);
+    justify-content: flex-start;
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-group {
+    flex-shrink: 0;
+    gap: clamp(2px, 0.45vh, 5px);
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-group--colors {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-label {
+    font-size: clamp(.6rem, 1.2vh, .72rem);
+    line-height: 1.15;
+    margin-bottom: 2px;
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-tools,
+.vn-body--paint .vn-paint--dibujo .vn-paint-sizes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(4px, 0.55vh, 6px);
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-tool,
+.vn-body--paint .vn-paint--dibujo .vn-paint-size,
+.vn-body--paint .vn-paint--dibujo .vn-paint-action {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    min-width: 0;
+    min-height: 0;
+    max-height: clamp(34px, 5.8vh, 44px);
+    border-radius: 12px;
+    font-size: clamp(.84rem, 1.75vh, 1rem);
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-size-line {
+    width: min(100%, 26px);
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-colors {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    gap: clamp(2px, 0.45vh, 4px);
+    align-content: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-swatch {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    min-width: 0;
+    min-height: 0;
+    max-width: none;
+    max-height: none;
+    border-radius: 8px;
+    border-width: 2px;
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-swatch--custom {
+    max-height: none;
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-swatch-custom-icon {
+    font-size: clamp(.55rem, 1.1vh, .68rem);
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-swatch-custom-label {
+    font-size: clamp(.45rem, 0.9vh, .55rem);
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-head {
+    margin-bottom: clamp(2px, 0.5vh, 4px);
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-paint-head .vn-instruccion {
+    font-size: clamp(.78rem, 1.6vh, .86rem);
+    padding: clamp(5px, 0.8vh, 7px) clamp(8px, 1.5vw, 10px);
+    margin-bottom: clamp(2px, 0.4vh, 4px);
+}
+
+.vn-body--paint .vn-paint--dibujo .vn-title--compact {
+    font-size: clamp(.95rem, 2vh, 1.1rem) !important;
+    margin-bottom: 2px !important;
+}
+
+@media (max-height: 720px) and (orientation: landscape) {
+    .vn-body--paint .vn-paint--dibujo .vn-paint-toolbar {
+        flex-basis: clamp(160px, 16vw, 186px);
+    }
+
+    .vn-body--paint .vn-paint--dibujo .vn-paint-tool,
+    .vn-body--paint .vn-paint--dibujo .vn-paint-size,
+    .vn-body--paint .vn-paint--dibujo .vn-paint-action {
+        max-height: clamp(32px, 5.2vh, 40px);
+    }
+}
+
+/* ── Chrome 2–6 + landscape fill (kiosco y overlay) ── */
+
+.vn-chrome-simple .vn-step-label,
+.vn-nivel--prejardin .vn-step-label,
+.vn-nivel--jardin .vn-step-label {
+    display: none !important;
+}
+
+.vn-chrome-simple .vn-nav-meta,
+.vn-nivel--prejardin .vn-nav-meta,
+.vn-nivel--jardin .vn-nav-meta {
+    visibility: hidden;
+}
+
+.vn-nav-next.vn-nav-ready:not(:disabled):not(.is-blocked) {
+    animation: vnNavReady 1.15s ease-in-out infinite;
+    box-shadow: 0 6px 0 rgba(5, 150, 105, .35), 0 0 0 6px rgba(52, 211, 153, .28);
+}
+
+@keyframes vnNavReady {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+
+.vn-tablet-screen .vn-nav-btn span,
+body.vn-dispositivo .vn-nav-btn span,
+.rn-player .vn-nav-btn span {
+    display: inline !important;
+}
+
+.vn-chrome-simple .vn-nav-prev span,
+.vn-nivel--prejardin .vn-nav-prev span,
+.vn-nivel--jardin .vn-nav-prev span {
+    display: none !important;
+}
+
+.vn-chip-drag,
+.vn-puzzle-piece,
+.vn-seq-card,
+.vn-puzzle-pool {
+    touch-action: none;
+}
+
+.vn-match-line {
+    position: fixed;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #34d399, #fbbf24, #38bdf8);
+    transform-origin: 0 50%;
+    z-index: 4000;
+    pointer-events: none;
+    box-shadow: 0 0 12px rgba(52, 211, 153, .7);
+    animation: vnMatchLine .65s ease forwards;
+}
+
+@keyframes vnMatchLine {
+    0% { opacity: 0; }
+    28% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.vn-seq-nums {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 0 8px;
+}
+
+.vn-seq-num {
+    flex: 1;
+    max-width: 120px;
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.35rem;
+    color: #0369a1;
+    background: #e0f2fe;
+    border-radius: 999px;
+    padding: 4px 0;
+}
+
+.vn-emociones:has(.is-picked) .vn-pulse-hint,
+.vn-options:has(.is-ok) .vn-pulse-hint,
+[data-vn-ra-listo].is-done.vn-pulse-hint,
+[data-vn-evidencia].is-done.vn-pulse-hint {
+    animation: none;
+}
+
+body.vn-dispositivo .vn-card,
+.rn-player .vn-card,
+#vnOverlay .vn-card {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-card--imagen,
+body.vn-dispositivo .vn-card--historia,
+.rn-player .vn-card--imagen,
+.rn-player .vn-card--historia {
+    overflow: visible;
+}
+
+body.vn-dispositivo .vn-card > .vn-title,
+body.vn-dispositivo .vn-card-body > .vn-title,
+.rn-player .vn-card > .vn-title,
+.rn-player .vn-card-body > .vn-title,
+#vnOverlay .vn-card > .vn-title,
+#vnOverlay .vn-card-body > .vn-title {
+    flex-shrink: 0;
+}
+
+body.vn-dispositivo .vn-card > .vn-instruccion,
+body.vn-dispositivo .vn-card-body > .vn-instruccion,
+.rn-player .vn-card > .vn-instruccion,
+.rn-player .vn-card-body > .vn-instruccion,
+#vnOverlay .vn-card > .vn-instruccion,
+#vnOverlay .vn-card-body > .vn-instruccion {
+    flex-shrink: 0;
+}
+
+/* Narrativos: media llena el alto restante */
+body.vn-dispositivo .vn-card--video .vn-video-stage,
+body.vn-dispositivo .vn-card--imagen .vn-media,
+body.vn-dispositivo .vn-card--historia .vn-historia-libro,
+body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-media,
+.rn-player .vn-card--video .vn-video-stage,
+.rn-player .vn-card--imagen .vn-media,
+.rn-player .vn-card--historia .vn-historia-libro,
+.rn-player .vn-card--bienvenida .vn-bienvenida-media {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+body.vn-dispositivo .vn-card--imagen .vn-media img,
+body.vn-dispositivo .vn-card--historia .vn-historia-media img,
+body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-media img,
+body.vn-dispositivo .vn-video-el,
+.rn-player .vn-card--imagen .vn-media img,
+.rn-player .vn-card--historia .vn-historia-media img,
+.rn-player .vn-video-el {
+    max-height: min(52dvh, 100%);
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+body.vn-dispositivo .vn-card--audio .vn-audio-btn,
+body.vn-dispositivo .vn-card--video .vn-video-btn,
+.rn-player .vn-card--audio .vn-audio-btn,
+.rn-player .vn-card--video .vn-video-btn {
+    flex: 1 1 auto;
+    width: min(380px, 70%);
+    min-height: clamp(180px, 38vh, 280px);
+    max-height: 320px;
+}
+
+body.vn-dispositivo .vn-card--historia .vn-historia-nav,
+.rn-player .vn-card--historia .vn-historia-nav {
+    flex-shrink: 0;
+    margin-top: auto;
+}
+
+body.vn-dispositivo .vn-hist-nav-btn,
+.rn-player .vn-hist-nav-btn {
+    min-width: clamp(72px, 14vw, 160px);
+    min-height: clamp(56px, 8vh, 72px);
+}
+
+/* RA / evidencia */
+body.vn-dispositivo .vn-ra-stage,
+.rn-player .vn-ra-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+}
+
+body.vn-dispositivo .vn-ra-scanner,
+.rn-player .vn-ra-scanner {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: min(420px, 70%);
+}
+
+body.vn-dispositivo .vn-evidencia-stage,
+.rn-player .vn-evidencia-stage {
+    flex: 1 1 auto;
+    max-width: min(640px, 86%);
+    width: 100%;
+    min-height: 0;
+}
+
+body.vn-dispositivo .vn-evidencia-preview,
+.rn-player .vn-evidencia-preview {
+    max-height: min(42dvh, 360px);
+    width: 100%;
+}
+
+body.vn-dispositivo .vn-evidencia-captura-btn,
+body.vn-dispositivo .vn-ra-listo-btn,
+.rn-player .vn-evidencia-captura-btn,
+.rn-player .vn-ra-listo-btn {
+    min-height: clamp(64px, 9vh, 84px);
+    min-width: clamp(160px, 28vw, 280px);
+    font-size: 1.2rem;
+}
+
+body.vn-dispositivo .vn-evidencia-btn,
+.rn-player .vn-evidencia-btn {
+    width: clamp(128px, 20vh, 168px);
+    height: clamp(128px, 20vh, 168px);
+    min-width: 0;
+    min-height: 0;
+    font-size: 1.05rem;
+}
+
+/* Evaluativos: grids que gastan el alto */
+body.vn-dispositivo .vn-card--pregunta .vn-options,
+body.vn-dispositivo .vn-card--reto .vn-options,
+.rn-player .vn-card--pregunta .vn-options,
+.rn-player .vn-card--reto .vn-options,
+#vnOverlay .vn-card--pregunta .vn-options,
+#vnOverlay .vn-card--reto .vn-options {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-content: stretch;
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-option,
+body.vn-dispositivo .vn-card--reto .vn-option,
+.rn-player .vn-card--pregunta .vn-option,
+.rn-player .vn-card--reto .vn-option {
+    min-height: clamp(68px, min(14vh, 22%), 128px);
+    height: auto;
+    max-height: none;
+}
+
+body.vn-dispositivo .vn-card--emparejar .vn-match-cols,
+.rn-player .vn-card--emparejar .vn-match-cols,
+#vnOverlay .vn-card--emparejar .vn-match-cols {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(12px, 2.4vw, 24px);
+}
+
+body.vn-dispositivo .vn-card--emparejar .vn-chip,
+.rn-player .vn-card--emparejar .vn-chip,
+#vnOverlay .vn-card--emparejar .vn-chip {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: clamp(80px, 14vh, 140px);
+}
+
+body.vn-dispositivo .vn-card--emparejar .vn-match-col,
+.rn-player .vn-card--emparejar .vn-match-col,
+#vnOverlay .vn-card--emparejar .vn-match-col {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+}
+
+body.vn-dispositivo .vn-sort-board,
+.rn-player .vn-sort-board {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-width: none;
+    width: 100%;
+    grid-template-columns: minmax(200px, .85fr) minmax(240px, 1.15fr);
+}
+
+body.vn-dispositivo .vn-emociones,
+.rn-player .vn-emociones {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-content: stretch;
+}
+
+body.vn-dispositivo .vn-emociones[data-count="4"],
+.rn-player .vn-emociones[data-count="4"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+body.vn-dispositivo .vn-emocion,
+.rn-player .vn-emocion {
+    min-height: 0;
+    height: 100%;
+}
+
+/* Juegos */
+body.vn-dispositivo .vn-memory,
+.rn-player .vn-memory {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-width: none;
+    width: 100%;
+    display: grid;
+    align-content: stretch;
+}
+
+body.vn-dispositivo .vn-memory[data-pares="2"],
+.rn-player .vn-memory[data-pares="2"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+body.vn-dispositivo .vn-memory[data-pares="3"],
+.rn-player .vn-memory[data-pares="3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body.vn-dispositivo .vn-memory[data-pares="4"],
+body.vn-dispositivo .vn-memory[data-pares="6"],
+.rn-player .vn-memory[data-pares="4"],
+.rn-player .vn-memory[data-pares="6"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+body.vn-dispositivo .vn-memory-card,
+.rn-player .vn-memory-card {
+    min-height: 0;
+    height: 100%;
+    aspect-ratio: auto;
+    transform-style: preserve-3d;
+}
+
+body.vn-dispositivo .vn-puzzle,
+.rn-player .vn-puzzle {
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    gap: clamp(8px, 1.4vw, 14px);
+    width: 100%;
+    max-width: none;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-puzzle-board,
+.rn-player .vn-puzzle-board {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    min-height: clamp(160px, 36vh, 360px);
+    max-height: 100%;
+    height: auto;
+    align-self: center;
+}
+
+body.vn-dispositivo .vn-puzzle-pool,
+.rn-player .vn-puzzle-pool {
+    flex: 0 0 clamp(112px, 20vw, 200px);
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
+    gap: 8px;
+    min-height: 0;
+    max-height: 100%;
+    max-width: clamp(112px, 20vw, 200px);
+    width: clamp(112px, 20vw, 200px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 4px 8px;
+}
+
+body.vn-dispositivo .vn-puzzle-pool .vn-puzzle-piece,
+.rn-player .vn-puzzle-pool .vn-puzzle-piece {
+    width: clamp(64px, 9.5vw, 96px);
+    height: clamp(52px, 7.5vw, 78px);
+}
+
+body.vn-dispositivo .vn-puzzle-slot .vn-puzzle-piece,
+.rn-player .vn-puzzle-slot .vn-puzzle-piece,
+body.rn-player-activo .vn-puzzle-slot .vn-puzzle-piece,
+#vnOverlay .vn-puzzle-slot .vn-puzzle-piece {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    border-width: 0;
+    box-shadow: none;
+    transform: none;
+}
+
+body.vn-dispositivo .vn-secuencia,
+.rn-player .vn-secuencia {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+}
+
+body.vn-dispositivo .vn-seq-card,
+.rn-player .vn-seq-card {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    min-height: clamp(120px, 28vh, 240px);
+    height: auto;
+    aspect-ratio: 4 / 3;
+}
+
+@media (orientation: portrait) {
+    body.vn-dispositivo .vn-puzzle,
+    .rn-player .vn-puzzle {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    body.vn-dispositivo .vn-puzzle-board,
+    .rn-player .vn-puzzle-board {
+        flex: 0 1 auto;
+        width: min(100%, 520px);
+        max-width: 100%;
+        min-height: clamp(180px, 32vh, 320px);
+        max-height: min(38dvh, 360px);
+    }
+
+    body.vn-dispositivo .vn-puzzle-pool,
+    .rn-player .vn-puzzle-pool {
+        flex: 1 1 auto;
+        width: 100%;
+        max-width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        overflow-y: auto;
+    }
+}
+
+@media (orientation: landscape) {
+    body.vn-dispositivo .vn-sort-board,
+    .rn-player .vn-sort-board,
+    body.rn-player-activo .vn-sort-board {
+        grid-template-columns: minmax(200px, .85fr) minmax(240px, 1.15fr);
+    }
+
+    body.vn-dispositivo .vn-emociones[data-count="6"],
+    .rn-player .vn-emociones[data-count="6"],
+    body.rn-player-activo .vn-emociones[data-count="6"] {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-height: 720px) and (orientation: landscape) {
+    body.vn-dispositivo .vn-title,
+    .rn-player .vn-title {
+        font-size: clamp(1.2rem, 3.2vh, 1.7rem);
+        margin-bottom: 4px;
+    }
+
+    body.vn-dispositivo .vn-instruccion,
+    .rn-player .vn-instruccion {
+        padding-block: 8px;
+        margin-bottom: 6px;
+    }
+
+    body.vn-dispositivo .vn-hint-tap,
+    body.vn-dispositivo .vn-puzzle-meta,
+    body.vn-dispositivo .vn-hint-drag,
+    .rn-player .vn-hint-tap,
+    .rn-player .vn-puzzle-meta,
+    .rn-player .vn-hint-drag {
+        font-size: .9rem;
+        margin-bottom: 6px;
+    }
+}
+
+body.vn-dispositivo .vn-ra-scan-frame,
+.rn-player .vn-ra-scan-frame {
+    width: min(460px, 58vw);
+    height: min(260px, 44vh);
+}
+
+#vnOverlay .vn-card--pregunta .vn-options,
+#vnOverlay .vn-card--reto .vn-options {
+    flex: 1 1 auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#vnOverlay .vn-card--emparejar .vn-match-cols,
+#vnOverlay .vn-sort-board {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+#vnOverlay .vn-puzzle {
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#vnOverlay .vn-puzzle-board {
+    flex: 1 1 auto;
+    width: auto;
+    min-height: clamp(160px, 36vh, 360px);
+    aspect-ratio: var(--vn-puzzle-ar, 1);
+}
+
+#vnOverlay .vn-secuencia {
+    display: flex;
+    gap: 12px;
+}
+
+#vnOverlay .vn-block-fit {
+    align-items: stretch;
+    height: 100%;
+}
+
+/* ── Layout unificado player (kiosco + overlay) ── */
+
+body.vn-dispositivo .vn-tablet-screen,
+.rn-player .vn-tablet-screen,
+#vnOverlay .vn-tablet-screen {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-screen-body,
+.rn-player .vn-screen-body,
+#vnOverlay .vn-screen-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-block-fit,
+.rn-player .vn-block-fit,
+#vnOverlay .vn-block-fit {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+    overflow: hidden;
+    width: 100%;
+    max-width: none;
+}
+
+body.vn-dispositivo .vn-card,
+.rn-player .vn-card,
+#vnOverlay .vn-card {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    width: 100%;
+    max-width: 100%;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin: 0;
+}
+
+body.vn-dispositivo .vn-card::before,
+body.vn-dispositivo .vn-card::after,
+.rn-player .vn-card::before,
+.rn-player .vn-card::after,
+#vnOverlay .vn-card::before,
+#vnOverlay .vn-card::after {
+    display: none;
+}
+
+body.vn-dispositivo .vn-card--imagen,
+body.vn-dispositivo .vn-card--historia,
+.rn-player .vn-card--imagen,
+.rn-player .vn-card--historia {
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-card-body,
+.rn-player .vn-card-body,
+#vnOverlay .vn-card-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+}
+
+body.vn-dispositivo .vn-card-body > .vn-title,
+body.vn-dispositivo .vn-card-body > .vn-instruccion,
+body.vn-dispositivo .vn-card-body > .vn-paso-badge,
+body.vn-dispositivo .vn-card-body > .vn-hint-tap,
+body.vn-dispositivo .vn-card-body > .vn-hint-drag,
+body.vn-dispositivo .vn-card-body > .vn-puzzle-meta,
+body.vn-dispositivo .vn-card-body > .vn-seq-nums,
+body.vn-dispositivo .vn-card-body > .vn-historia-progress,
+body.vn-dispositivo .vn-card-body > .vn-hero-emoji,
+body.vn-dispositivo .vn-card-body > .vn-bienvenida-hero,
+body.vn-dispositivo .vn-card-body > .vn-pregunta-head,
+body.vn-dispositivo .vn-card-body > .vn-reto-head,
+body.vn-dispositivo .vn-card-body > .vn-juego-head,
+body.vn-dispositivo .vn-card-body > .vn-paint-head,
+body.vn-dispositivo .vn-card-body > .vn-pregunta-media,
+body.vn-dispositivo .vn-card-body > .vn-reto-pregunta,
+body.vn-dispositivo .vn-card-body > .vn-memory-score,
+.rn-player .vn-card-body > .vn-title,
+.rn-player .vn-card-body > .vn-instruccion,
+.rn-player .vn-card-body > .vn-paso-badge,
+.rn-player .vn-card-body > .vn-hint-tap,
+.rn-player .vn-card-body > .vn-hint-drag,
+.rn-player .vn-card-body > .vn-puzzle-meta,
+.rn-player .vn-card-body > .vn-seq-nums,
+.rn-player .vn-card-body > .vn-historia-progress,
+.rn-player .vn-card-body > .vn-hero-emoji,
+.rn-player .vn-card-body > .vn-bienvenida-hero,
+.rn-player .vn-card-body > .vn-pregunta-head,
+.rn-player .vn-card-body > .vn-reto-head,
+.rn-player .vn-card-body > .vn-juego-head,
+.rn-player .vn-card-body > .vn-paint-head,
+.rn-player .vn-card-body > .vn-pregunta-media,
+.rn-player .vn-card-body > .vn-reto-pregunta,
+.rn-player .vn-card-body > .vn-memory-score,
+#vnOverlay .vn-card-body > .vn-title,
+#vnOverlay .vn-card-body > .vn-instruccion,
+#vnOverlay .vn-card-body > .vn-paso-badge,
+#vnOverlay .vn-card-body > .vn-hint-tap,
+#vnOverlay .vn-card-body > .vn-hint-drag,
+#vnOverlay .vn-card-body > .vn-puzzle-meta,
+#vnOverlay .vn-card-body > .vn-seq-nums,
+#vnOverlay .vn-card-body > .vn-historia-progress,
+#vnOverlay .vn-card-body > .vn-hero-emoji,
+#vnOverlay .vn-card-body > .vn-bienvenida-hero,
+#vnOverlay .vn-card-body > .vn-pregunta-head,
+#vnOverlay .vn-card-body > .vn-reto-head,
+#vnOverlay .vn-card-body > .vn-juego-head,
+#vnOverlay .vn-card-body > .vn-paint-head,
+#vnOverlay .vn-card-body > .vn-pregunta-media,
+#vnOverlay .vn-card-body > .vn-reto-pregunta,
+#vnOverlay .vn-card-body > .vn-memory-score {
+    flex-shrink: 0;
+}
+
+body.vn-dispositivo .vn-card-body > .vn-options,
+body.vn-dispositivo .vn-card-body > .vn-match-cols,
+body.vn-dispositivo .vn-card-body > .vn-sort-board,
+body.vn-dispositivo .vn-card-body > .vn-emociones,
+body.vn-dispositivo .vn-card-body > .vn-memory,
+body.vn-dispositivo .vn-card-body > .vn-puzzle,
+body.vn-dispositivo .vn-card-body > .vn-secuencia,
+body.vn-dispositivo .vn-card-body > .vn-paint,
+body.vn-dispositivo .vn-card-body > .vn-video-stage,
+body.vn-dispositivo .vn-card-body > .vn-media,
+body.vn-dispositivo .vn-card-body > .vn-audio-btn,
+body.vn-dispositivo .vn-card-body > .vn-video-btn,
+body.vn-dispositivo .vn-card-body > .vn-ra-stage,
+body.vn-dispositivo .vn-card-body > .vn-evidencia-stage,
+body.vn-dispositivo .vn-card-body > .vn-historia-libro,
+body.vn-dispositivo .vn-card-body > .vn-bienvenida-media,
+body.vn-dispositivo .vn-card-body > .vn-reward,
+.rn-player .vn-card-body > .vn-options,
+.rn-player .vn-card-body > .vn-match-cols,
+.rn-player .vn-card-body > .vn-sort-board,
+.rn-player .vn-card-body > .vn-emociones,
+.rn-player .vn-card-body > .vn-memory,
+.rn-player .vn-card-body > .vn-puzzle,
+.rn-player .vn-card-body > .vn-secuencia,
+.rn-player .vn-card-body > .vn-paint,
+.rn-player .vn-card-body > .vn-video-stage,
+.rn-player .vn-card-body > .vn-media,
+.rn-player .vn-card-body > .vn-audio-btn,
+.rn-player .vn-card-body > .vn-video-btn,
+.rn-player .vn-card-body > .vn-ra-stage,
+.rn-player .vn-card-body > .vn-evidencia-stage,
+.rn-player .vn-card-body > .vn-historia-libro,
+.rn-player .vn-card-body > .vn-bienvenida-media,
+.rn-player .vn-card-body > .vn-reward,
+#vnOverlay .vn-card-body > .vn-options,
+#vnOverlay .vn-card-body > .vn-match-cols,
+#vnOverlay .vn-card-body > .vn-sort-board,
+#vnOverlay .vn-card-body > .vn-emociones,
+#vnOverlay .vn-card-body > .vn-memory,
+#vnOverlay .vn-card-body > .vn-puzzle,
+#vnOverlay .vn-card-body > .vn-secuencia,
+#vnOverlay .vn-card-body > .vn-paint,
+#vnOverlay .vn-card-body > .vn-video-stage,
+#vnOverlay .vn-card-body > .vn-media,
+#vnOverlay .vn-card-body > .vn-audio-btn,
+#vnOverlay .vn-card-body > .vn-video-btn,
+#vnOverlay .vn-card-body > .vn-ra-stage,
+#vnOverlay .vn-card-body > .vn-evidencia-stage,
+#vnOverlay .vn-card-body > .vn-historia-libro,
+#vnOverlay .vn-card-body > .vn-bienvenida-media,
+#vnOverlay .vn-card-body > .vn-reward {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-card-body > .vn-historia-nav,
+body.vn-dispositivo .vn-card-body > .vn-evidencia-btn,
+body.vn-dispositivo .vn-card-body > .vn-evidencia-captura-btn,
+body.vn-dispositivo .vn-card-body > .vn-ra-listo-btn,
+body.vn-dispositivo .vn-card-body > .vn-feedback,
+body.vn-dispositivo .vn-card-body > #vnFb,
+.rn-player .vn-card-body > .vn-historia-nav,
+.rn-player .vn-card-body > .vn-evidencia-btn,
+.rn-player .vn-card-body > .vn-evidencia-captura-btn,
+.rn-player .vn-card-body > .vn-ra-listo-btn,
+.rn-player .vn-card-body > .vn-feedback,
+.rn-player .vn-card-body > #vnFb,
+#vnOverlay .vn-card-body > .vn-historia-nav,
+#vnOverlay .vn-card-body > .vn-evidencia-btn,
+#vnOverlay .vn-card-body > .vn-evidencia-captura-btn,
+#vnOverlay .vn-card-body > .vn-ra-listo-btn,
+#vnOverlay .vn-card-body > .vn-feedback,
+#vnOverlay .vn-card-body > #vnFb {
+    flex-shrink: 0;
+}
+
+body.vn-dispositivo .vn-screen-nav,
+.rn-player .vn-screen-nav,
+#vnOverlay .vn-screen-nav {
+    flex-shrink: 0;
+    overflow: visible;
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+}
+
+/* Sombras 3D sin recorte en grids */
+body.vn-dispositivo .vn-options,
+body.vn-dispositivo .vn-match-cols,
+body.vn-dispositivo .vn-match-col,
+body.vn-dispositivo .vn-sort-board,
+body.vn-dispositivo .vn-emociones,
+body.vn-dispositivo .vn-memory,
+body.vn-dispositivo .vn-secuencia,
+body.vn-dispositivo .vn-puzzle-pool,
+.rn-player .vn-options,
+.rn-player .vn-match-cols,
+.rn-player .vn-match-col,
+.rn-player .vn-sort-board,
+.rn-player .vn-emociones,
+.rn-player .vn-memory,
+.rn-player .vn-secuencia,
+.rn-player .vn-puzzle-pool,
+#vnOverlay .vn-options,
+#vnOverlay .vn-match-cols,
+#vnOverlay .vn-emociones,
+#vnOverlay .vn-memory {
+    padding-bottom: 6px;
+}
+
+body.vn-dispositivo .vn-option,
+body.vn-dispositivo .vn-chip,
+body.vn-dispositivo .vn-emocion,
+body.vn-dispositivo .vn-memory-card,
+body.vn-dispositivo .vn-seq-card,
+body.vn-dispositivo .vn-puzzle-pool .vn-puzzle-piece,
+.rn-player .vn-option,
+.rn-player .vn-chip,
+.rn-player .vn-emocion,
+.rn-player .vn-memory-card,
+.rn-player .vn-seq-card,
+.rn-player .vn-puzzle-pool .vn-puzzle-piece,
+#vnOverlay .vn-option,
+#vnOverlay .vn-chip,
+#vnOverlay .vn-emocion {
+    box-shadow: 0 4px 0 rgba(15, 23, 42, .12), 0 2px 8px rgba(15, 23, 42, .06) !important;
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-options,
+body.vn-dispositivo .vn-card--reto .vn-options,
+.rn-player .vn-card--pregunta .vn-options,
+.rn-player .vn-card--reto .vn-options,
+#vnOverlay .vn-card--pregunta .vn-options,
+#vnOverlay .vn-card--reto .vn-options {
+    grid-template-rows: none;
+    align-content: stretch;
+}
+
+body.vn-dispositivo .vn-card--emparejar .vn-match-col,
+.rn-player .vn-card--emparejar .vn-match-col,
+#vnOverlay .vn-card--emparejar .vn-match-col {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.2vh, 12px);
+    min-height: 0;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-card--emparejar .vn-chip,
+.rn-player .vn-card--emparejar .vn-chip,
+#vnOverlay .vn-card--emparejar .vn-chip {
+    flex: 1 1 0;
+    min-height: clamp(64px, min(12vh, 18%), 120px);
+    max-height: none;
+}
+
+body.vn-dispositivo .vn-nav-next,
+.rn-player .vn-nav-next,
+#vnOverlay .vn-nav-next {
+    box-shadow: 0 5px 0 rgba(194, 65, 12, .55);
+}
+
+.rn-player.vn-nivel--prejardin .vn-option,
+.rn-player.vn-nivel--jardin .vn-option,
+body.vn-dispositivo .rn-player.vn-nivel--prejardin .vn-option,
+body.vn-dispositivo .rn-player.vn-nivel--jardin .vn-option,
+body.rn-player-activo .rn-player.vn-nivel--prejardin .vn-option,
+body.rn-player-activo .rn-player.vn-nivel--jardin .vn-option {
+    min-height: clamp(72px, min(16vh, 24%), 120px);
+}
+
+/* Pregunta / reto: cabecera compacta y opciones que reparten el alto */
+.vn-card--pregunta .vn-pregunta-head,
+.vn-card--reto .vn-reto-head {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 0.7vh, 8px);
+    margin-bottom: clamp(4px, 0.8vh, 10px);
+}
+
+.vn-card--pregunta .vn-pregunta-enunciado,
+.vn-card--reto .vn-reto-head .vn-pregunta-enunciado,
+body.vn-dispositivo .vn-card--pregunta .vn-pregunta-enunciado,
+body.vn-dispositivo .vn-card--reto .vn-reto-head .vn-pregunta-enunciado,
+.rn-player .vn-card--pregunta .vn-pregunta-enunciado,
+.rn-player .vn-card--reto .vn-reto-head .vn-pregunta-enunciado,
+#vnOverlay .vn-card--pregunta .vn-pregunta-enunciado,
+#vnOverlay .vn-card--reto .vn-reto-head .vn-pregunta-enunciado {
+    font-size: clamp(1.2rem, 2.7vh, 1.7rem);
+    line-height: 1.2;
+    margin: 0;
+    padding: clamp(8px, 1.3vh, 12px) clamp(12px, 2.4vw, 18px);
+    text-align: center;
+    background: linear-gradient(180deg, rgba(255, 247, 237, .98), rgba(255, 237, 213, .92));
+    border: 2px solid rgba(251, 191, 36, .3);
+    border-radius: 18px;
+    box-shadow: 0 4px 0 rgba(251, 191, 36, .1);
+}
+
+.vn-card--reto .vn-reto-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(6px, 1vh, 10px);
+}
+
+.vn-card--reto .vn-reto-nombre {
+    font-size: clamp(0.78rem, 1.5vh, 0.92rem);
+    font-weight: 700;
+    color: #0e7490;
+    line-height: 1.2;
+}
+
+.vn-card--reto .vn-reto-meta .vn-paso-badge {
+    margin: 0;
+}
+
+.vn-card--pregunta .vn-pregunta-head .vn-instruccion,
+.vn-card--reto .vn-reto-head .vn-instruccion,
+body.vn-dispositivo .vn-card--pregunta .vn-pregunta-head .vn-instruccion,
+.rn-player .vn-card--pregunta .vn-pregunta-head .vn-instruccion,
+.rn-player .vn-card--reto .vn-reto-head .vn-instruccion {
+    font-size: clamp(0.88rem, 1.8vh, 1.05rem);
+    line-height: 1.25;
+    padding: clamp(5px, 0.9vh, 8px) clamp(10px, 2vw, 14px);
+    margin: 0;
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-pregunta-media,
+.rn-player .vn-card--pregunta .vn-pregunta-media {
+    flex-shrink: 0;
+    margin: 0 0 clamp(4px, 0.7vh, 8px);
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-pregunta-media img,
+.rn-player .vn-card--pregunta .vn-pregunta-media img {
+    max-height: min(28dvh, 180px);
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-options,
+body.vn-dispositivo .vn-card--reto .vn-options,
+.rn-player .vn-card--pregunta .vn-options,
+.rn-player .vn-card--reto .vn-options,
+#vnOverlay .vn-card--pregunta .vn-options,
+#vnOverlay .vn-card--reto .vn-options {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    align-content: stretch;
+    gap: clamp(8px, 1.2vh, 12px);
+    width: 100%;
+    max-width: min(740px, 100%);
+    margin-inline: auto;
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-options[data-count="1"],
+body.vn-dispositivo .vn-card--reto .vn-options[data-count="1"],
+.rn-player .vn-card--pregunta .vn-options[data-count="1"],
+.rn-player .vn-card--reto .vn-options[data-count="1"] {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: min(380px, 72%);
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-options[data-count="2"],
+body.vn-dispositivo .vn-card--reto .vn-options[data-count="2"],
+.rn-player .vn-card--pregunta .vn-options[data-count="2"],
+.rn-player .vn-card--reto .vn-options[data-count="2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr);
+    align-self: center;
+    max-height: min(58%, 320px);
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-options[data-count="3"] .vn-option:last-child,
+body.vn-dispositivo .vn-card--reto .vn-options[data-count="3"] .vn-option:last-child,
+.rn-player .vn-card--pregunta .vn-options[data-count="3"] .vn-option:last-child,
+.rn-player .vn-card--reto .vn-options[data-count="3"] .vn-option:last-child {
+    grid-column: 1 / -1;
+    width: min(100%, 340px);
+    justify-self: center;
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-option,
+body.vn-dispositivo .vn-card--reto .vn-option,
+.rn-player .vn-card--pregunta .vn-option,
+.rn-player .vn-card--reto .vn-option,
+#vnOverlay .vn-card--pregunta .vn-option,
+#vnOverlay .vn-card--reto .vn-option {
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(6px, 1vh, 12px) clamp(8px, 1.5vw, 12px);
+    font-size: clamp(0.92rem, 1.9vh, 1.18rem);
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-option .vn-op-emoji,
+body.vn-dispositivo .vn-card--reto .vn-option .vn-op-emoji,
+.rn-player .vn-card--pregunta .vn-option .vn-op-emoji,
+.rn-player .vn-card--reto .vn-option .vn-op-emoji,
+#vnOverlay .vn-card--pregunta .vn-option .vn-op-emoji,
+#vnOverlay .vn-card--reto .vn-option .vn-op-emoji {
+    font-size: clamp(1.55rem, 3.8vh, 2.35rem);
+    margin-bottom: 2px;
+    line-height: 1;
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-option img,
+body.vn-dispositivo .vn-card--reto .vn-option img,
+.rn-player .vn-card--pregunta .vn-option img,
+.rn-player .vn-card--reto .vn-option img {
+    width: clamp(48px, 8vh, 72px);
+    height: clamp(48px, 8vh, 72px);
+    margin-bottom: 4px;
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-feedback,
+body.vn-dispositivo .vn-card--reto .vn-feedback,
+.rn-player .vn-card--pregunta .vn-feedback,
+.rn-player .vn-card--reto .vn-feedback {
+    flex-shrink: 0;
+    margin-top: clamp(4px, 0.7vh, 8px);
+    padding: clamp(8px, 1.2vh, 12px);
+    font-size: clamp(0.95rem, 2vh, 1.15rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vn-card,
+    .vn-nav-next.vn-nav-ready,
+    .vn-pulse-hint,
+    .vn-audio-btn,
+    .vn-video-btn,
+    .vn-hero-emoji,
+    .vn-reward-icon,
+    .vn-reward-rays,
+    .vn-celebrate-p,
+    .vn-match-line,
+    .vn-sort-col .vn-chip,
+    .vn-ra-scan-line {
+        animation: none !important;
+        transition: none !important;
+    }
 }

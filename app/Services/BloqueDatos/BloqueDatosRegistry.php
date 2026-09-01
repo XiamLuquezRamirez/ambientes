@@ -194,6 +194,7 @@ class BloqueDatosRegistry
                 'fb_ok' => '¡Correcto! 🎉',
                 'fb_err' => 'Casi...',
                 'intentos' => '2',
+                'al_agotar' => 'Mostrar respuesta correcta',
             ],
             BloqueExperiencia::TIPO_EMOCION => [
                 'instruccion' => '',

@@ -118,10 +118,6 @@
                 <div class="vn-tablet-bezel">
                     <div class="vn-tablet-camera" aria-hidden="true"></div>
                     <div class="vn-tablet-screen" id="vnTabletScreen">
-                        <header class="vn-screen-top">
-                            <div class="vn-progress" id="vnProgress" aria-hidden="true"></div>
-                            <p class="vn-step-label" id="vnStepLabel">Paso 1 de 1</p>
-                        </header>
                         <div class="vn-screen-body" id="vnScreenBody"></div>
                         <footer class="vn-screen-nav">
                             <button type="button" class="vn-nav-btn vn-nav-prev" id="vnBtnPrev"
@@ -129,13 +125,17 @@
                                 <i class="fa-solid fa-arrow-left"></i>
                                 <span>Atrás</span>
                             </button>
-                            <div class="vn-nav-meta">
-                                <strong id="vnTitle">Vista niño</strong>
-                                <span id="vnBlockName">Bienvenida</span>
+                            <div class="vn-nav-center" aria-label="Progreso de la experiencia">
+                                <div class="vn-progress" id="vnProgress" aria-hidden="true"></div>
+                                <p class="vn-step-label" id="vnStepLabel">Paso 1 de 1</p>
+                                <div class="vn-nav-meta">
+                                    <strong id="vnTitle">Vista niño</strong>
+                                    <span id="vnBlockName">Bienvenida</span>
+                                </div>
                             </div>
                             <button type="button" class="vn-nav-btn vn-nav-next" id="vnBtnNext"
                                 aria-label="Siguiente">
-                                <span>Siguiente</span>
+                                <span>¡Sigue!</span>
                                 <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </footer>

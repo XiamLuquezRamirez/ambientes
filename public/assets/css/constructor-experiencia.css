@@ -609,6 +609,84 @@
     font-size: 0.875rem;
 }
 
+/* Selector de juego (cards) */
+.cx-juego-picker {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.cx-juego-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 10px;
+    border: 2px solid var(--cx-border);
+    border-radius: 12px;
+    background: var(--cx-soft);
+    color: var(--cx-text);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, box-shadow .15s ease, transform .12s ease;
+}
+
+.cx-juego-card:hover:not(:disabled) {
+    border-color: #cbd5e1;
+    background: #fff;
+    transform: translateY(-1px);
+}
+
+.cx-juego-card.is-selected {
+    border-color: var(--cx-primary);
+    background: #eff6ff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+
+.cx-juego-card:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.cx-juego-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    color: var(--cx-juego-color, var(--cx-primary));
+    background: color-mix(in srgb, var(--cx-juego-color, #2563eb) 14%, #fff);
+}
+
+.cx-juego-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.cx-juego-card-name {
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--cx-text);
+}
+
+.cx-juego-card-desc {
+    font-size: 0.68rem;
+    line-height: 1.25;
+    color: var(--cx-muted);
+}
+
+@media (max-width: 520px) {
+    .cx-juego-picker {
+        grid-template-columns: 1fr;
+    }
+}
+
 .cx-help {
     font-size: 0.72rem;
     color: var(--cx-muted);
@@ -1064,7 +1142,9 @@
 }
 
 .cx-app.is-readonly .cx-cat-item,
-.cx-layout.is-readonly .cx-cat-item {
+.cx-layout.is-readonly .cx-cat-item,
+.cx-app.is-readonly .cx-juego-card,
+.cx-layout.is-readonly .cx-juego-card {
     pointer-events: none;
 }
 

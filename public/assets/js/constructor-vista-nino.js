@@ -6,7 +6,8 @@
 
     const $overlay = $('#vnOverlay');
     const enKiosco = $('#kioscoPane').length > 0;
-    if (!$overlay.length && !enKiosco) return;
+    const enPlayer = $('#vnDispositivo').length > 0;
+    if (!$overlay.length && !enKiosco && !enPlayer) return;
 
     let $root;
     let $body;
@@ -52,8 +53,11 @@
     let mediaBase = '';
     let experienciaNombre = 'Experiencia';
     let historiaPage = 0;
+    let historiaAnimando = false;
     let retoPaso = 0;
     let intentosRestantes = null;
+    let bloqueAvanceTimer = null;
+    const BLOQUE_AVANCE_MS = 3000;
     let drawCtx = null;
     let paint = null;
     let paintListeners = [];
@@ -164,11 +168,17 @@
     }
 
     function aplicarNivelEtario() {
-        if (!$root || !$root.length) return;
-        $root.removeClass('vn-nivel--prejardin vn-nivel--jardin vn-nivel--transicion vn-nivel--primaria');
-        $root.addClass(`vn-nivel--${nivelEtario}`);
+        const cls = `vn-nivel--${nivelEtario}`;
         const cfg = configNivel();
-        $root.css('--vn-touch-scale', String(cfg.touchScale));
+        const $hosts = $()
+            .add($root)
+            .add('#vnDispositivo')
+            .add('#vnOverlay')
+            .add('#vnTabletScreen');
+        $hosts.removeClass('vn-nivel--prejardin vn-nivel--jardin vn-nivel--transicion vn-nivel--primaria vn-chrome-simple');
+        $hosts.addClass(cls);
+        if (cfg.simplificar) $hosts.addClass('vn-chrome-simple');
+        $hosts.css('--vn-touch-scale', String(cfg.touchScale));
     }
 
     function tituloBloque(tipo, fallback) {
@@ -285,11 +295,15 @@
     }
 
     function wrap(html, bloque, extraClass) {
-        const warn = bloque && !bloque.completo
+        const warn = (bloque && !bloque.completo && !esModoDispositivo())
             ? '<div class="text-center"><span class="vn-badge-warn"><i class="fa-solid fa-triangle-exclamation"></i> Bloque incompleto</span></div>'
             : '';
         const cls = extraClass ? ` vn-card--${escapar(extraClass)}` : '';
-        return `<div class="vn-block-fit"><div class="vn-card${cls}">${warn}${html}</div></div>`;
+        const paintBlocks = ['dibujo', 'juego-colorear'];
+        const inner = paintBlocks.includes(extraClass)
+            ? `${warn}${html}`
+            : `<div class="vn-card-body">${warn}${html}</div>`;
+        return `<div class="vn-block-fit"><div class="vn-card${cls}">${inner}</div></div>`;
     }
 
     function instruccionHtml(texto) {
@@ -340,7 +354,7 @@
             const vidUrl = mediaUrl(d.video);
             if (vidUrl) {
                 mediaHtml = `
-                    <div class="vn-bienvenida-media vn-bienvenida-video-wrap" data-vn-bienvenida-video-wrap>
+                    <div class="vn-bienvenida-media vn-video-stage vn-bienvenida-video-wrap" data-vn-bienvenida-video-wrap>
                         <button type="button" class="vn-video-btn vn-bienvenida-play-btn vn-pulse-hint"
                             data-vn-bienvenida-play aria-label="Reproducir video de bienvenida">
                             <span class="vn-video-btn-ring" aria-hidden="true"></span>
@@ -428,7 +442,7 @@
             <h2 class="vn-title">${tituloBloque('imagen', 'Observa')}</h2>
             ${instruccionHtml(d.instruccion)}
             ${imgHtml}
-            ${img ? '<p class="vn-hint-tap">Toca la imagen para agrandarla</p>' : ''}
+            ${img ? `<p class="vn-hint-tap">${configNivel().simplificar ? '¡Toca!' : 'Toca la imagen para agrandarla'}</p>` : ''}
         `, bloque, 'imagen');
     }
 
@@ -438,37 +452,178 @@
         return Math.max(pages.length, Number(d.paginas) || 0, 1);
     }
 
-    function navegarHistoria(delta) {
+    function paginasHistoria(bloque) {
+        const d = datos(bloque);
+        return Array.isArray(d.paginas_data) ? d.paginas_data : [];
+    }
+
+    function paginaHistoriaMedia(page, num) {
+        const url = mediaUrl(page?.imagen);
+        if (!url) return '<p class="vn-empty">Sin imagen en esta página</p>';
+        return `<div class="vn-media vn-historia-media"><img src="${escapar(url)}" alt="Página ${num}"></div>`;
+    }
+
+    function renderHistoriaLibro(bloque) {
+        const pages = paginasHistoria(bloque);
+        const page = pages[historiaPage] || {};
+        const contenido = paginaHistoriaMedia(page, historiaPage + 1);
+        return `<div class="vn-historia-libro" data-vn-historia-libro>
+            <div class="vn-historia-libro-cuerpo">
+                <div class="vn-historia-pagina" data-vn-hist-pagina>${contenido}</div>
+                <div class="vn-historia-hoja" data-vn-hist-hoja hidden aria-hidden="true">
+                    <div class="vn-historia-hoja-cara vn-historia-hoja-cara--frente" data-vn-hist-hoja-frente></div>
+                    <div class="vn-historia-hoja-cara vn-historia-hoja-cara--atras" data-vn-hist-hoja-atras"></div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function dotsHistoriaHtml(total, current) {
+        return Array.from({ length: total }, (_, i) =>
+            `<span class="vn-hist-dot${i === current ? ' is-current' : ''}${i < current ? ' is-done' : ''}"></span>`
+        ).join('');
+    }
+
+    function badgeHistoriaHtml(total, current) {
+        return configNivel().simplificar
+            ? `${current + 1} / ${total}`
+            : `Página ${current + 1} de ${total}`;
+    }
+
+    function actualizarHistoriaMeta(bloque) {
+        const total = totalPaginasHistoria(bloque);
+        const puedeAnt = historiaPage > 0;
+        const puedeSig = historiaPage < total - 1;
+        const pages = paginasHistoria(bloque);
+        const page = pages[historiaPage] || {};
+        const audioUrl = mediaUrl(page.audio);
+        const d = datos(bloque);
+        const textoInstr = String(d.instruccion || '').trim();
+
+        $body.find('.vn-historia-progress').html(dotsHistoriaHtml(total, historiaPage));
+        $body.find('.vn-historia-badge').text(badgeHistoriaHtml(total, historiaPage));
+        $body.find('[data-vn-hist-prev]').prop('disabled', !puedeAnt);
+        $body.find('[data-vn-hist-next]').prop('disabled', !puedeSig);
+
+        const $instr = $body.find('.vn-instruccion');
+        if (historiaPage === 0 && textoInstr) {
+            $instr.show();
+        } else {
+            $instr.hide();
+        }
+
+        let $audio = $body.find('.vn-historia-audio');
+        if (audioUrl) {
+            if (!$audio.length) {
+                $body.find('.vn-historia-nav').before('<audio class="vn-historia-audio" preload="auto" hidden></audio>');
+                $audio = $body.find('.vn-historia-audio');
+            }
+            $audio.attr('src', audioUrl);
+        } else {
+            $audio.remove();
+        }
+    }
+
+    function finalizarVolteoHistoria(bloque, newIndex, pageNueva) {
+        historiaPage = newIndex;
+        const $pagina = $body.find('[data-vn-hist-pagina]');
+        const $hoja = $body.find('[data-vn-hist-hoja]');
+
+        $pagina.html(paginaHistoriaMedia(pageNueva, historiaPage + 1)).css('visibility', '');
+        $hoja.prop('hidden', true)
+            .removeClass('is-volteando-adelante is-volteando-atras is-sin-transicion');
+        $body.find('[data-vn-hist-hoja-frente], [data-vn-hist-hoja-atras]').empty();
+        historiaAnimando = false;
+        actualizarHistoriaMeta(bloque);
+        iniciarAudioHistoria();
+        actualizarNavBloque();
+        programarAjusteLayout();
+    }
+
+    function voltearHistoria(delta) {
         const bloque = bloques[index];
-        if (!bloque || bloque.tipo !== 'historia') return;
+        if (!bloque || bloque.tipo !== 'historia' || historiaAnimando) return;
         const total = totalPaginasHistoria(bloque);
         const next = historiaPage + delta;
         if (next < 0 || next >= total) return;
-        historiaPage = next;
-        pintar();
+
+        const pages = paginasHistoria(bloque);
+        const prevPage = historiaPage;
+        const pageActual = pages[prevPage] || {};
+        const pageNueva = pages[next] || {};
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        detenerAudioHistoria();
+        $body.find('.vn-hist-nav-btn').prop('disabled', true);
+
+        if (reduceMotion) {
+            finalizarVolteoHistoria(bloque, next, pageNueva);
+            return;
+        }
+
+        const $pagina = $body.find('[data-vn-hist-pagina]');
+        const $hoja = $body.find('[data-vn-hist-hoja]');
+        const $frente = $body.find('[data-vn-hist-hoja-frente]');
+        const $atras = $body.find('[data-vn-hist-hoja-atras]');
+        let terminado = false;
+
+        const terminar = () => {
+            if (terminado) return;
+            terminado = true;
+            $hoja.off('transitionend.vnHist');
+            clearTimeout(fallbackTimer);
+            finalizarVolteoHistoria(bloque, next, pageNueva);
+        };
+
+        const fallbackTimer = setTimeout(terminar, 900);
+
+        historiaAnimando = true;
+
+        $frente.html(delta > 0
+            ? paginaHistoriaMedia(pageActual, prevPage + 1)
+            : paginaHistoriaMedia(pageNueva, next + 1));
+        $atras.html(delta > 0
+            ? paginaHistoriaMedia(pageNueva, next + 1)
+            : paginaHistoriaMedia(pageActual, prevPage + 1));
+
+        $hoja.removeClass('is-volteando-adelante is-volteando-atras is-sin-transicion');
+        $pagina.css('visibility', 'hidden');
+        $hoja.prop('hidden', false);
+
+        if (delta > 0) {
+            void $hoja[0].offsetWidth;
+            $hoja.addClass('is-volteando-adelante');
+        } else {
+            $hoja.addClass('is-volteando-atras is-sin-transicion');
+            void $hoja[0].offsetWidth;
+            $hoja.removeClass('is-sin-transicion');
+        }
+
+        $hoja.on('transitionend.vnHist', function (e) {
+            if (e.target !== this || e.propertyName !== 'transform') return;
+            terminar();
+        });
+    }
+
+    function navegarHistoria(delta) {
+        voltearHistoria(delta);
     }
 
     function renderHistoria(bloque) {
         const d = datos(bloque);
-        const pages = Array.isArray(d.paginas_data) ? d.paginas_data : [];
         const total = totalPaginasHistoria(bloque);
         if (historiaPage >= total) historiaPage = total - 1;
         if (historiaPage < 0) historiaPage = 0;
-        const page = pages[historiaPage] || {};
+        const page = paginasHistoria(bloque)[historiaPage] || {};
         const audioUrl = mediaUrl(page.audio);
         const puedeAnt = historiaPage > 0;
         const puedeSig = historiaPage < total - 1;
-        const dots = Array.from({ length: total }, (_, i) =>
-            `<span class="vn-hist-dot${i === historiaPage ? ' is-current' : ''}${i < historiaPage ? ' is-done' : ''}"></span>`
-        ).join('');
         return wrap(`
             <h2 class="vn-title">${tituloBloque('historia', 'Cuento')}</h2>
-            <div class="vn-historia-progress" aria-hidden="true">${dots}</div>
-            <p class="vn-paso-badge vn-historia-badge">Página ${historiaPage + 1} de ${total}</p>
-            ${historiaPage === 0 ? instruccionHtml(d.instruccion) : ''}
-            <div class="vn-historia-page vn-historia-page--enter">
-                ${imgTag(page.imagen, `Página ${historiaPage + 1}`) || '<p class="vn-empty">Sin imagen en esta página</p>'}
-            </div>
+            <div class="vn-historia-progress" aria-hidden="true">${dotsHistoriaHtml(total, historiaPage)}</div>
+            <p class="vn-paso-badge vn-historia-badge">${badgeHistoriaHtml(total, historiaPage)}</p>
+            ${instruccionHtml(d.instruccion)}
+            ${renderHistoriaLibro(bloque)}
             ${audioUrl ? `<audio class="vn-historia-audio" preload="auto" src="${escapar(audioUrl)}" hidden></audio>` : ''}
             <div class="vn-historia-nav">
                 <button type="button" class="vn-hist-nav-btn vn-hist-nav-btn--big" data-vn-hist-prev ${puedeAnt ? '' : 'disabled'}>
@@ -495,10 +650,12 @@
                         <div class="vn-ra-scan-line"></div>
                     </div>
                 </div>
-                <h2 class="vn-title">${configNivel().simplificar ? '¡Mira con el celular!' : 'Realidad aumentada'}</h2>
+                <h2 class="vn-title">${configNivel().simplificar ? '¡Magia!' : 'Realidad aumentada'}</h2>
                 ${instruccionHtml(d.instruccion)}
-                <p class="vn-ra-hint">${escapar(d.contenido || 'Animación 3D')}</p>
-                <button type="button" class="vn-ra-listo-btn" data-vn-ra-listo>
+                <p class="vn-ra-hint">${configNivel().simplificar
+                    ? '¡Apunta la tablet!'
+                    : escapar(d.contenido || 'Animación 3D')}</p>
+                <button type="button" class="vn-ra-listo-btn vn-pulse-hint" data-vn-ra-listo>
                     <i class="fa-solid fa-check"></i>
                     ${configNivel().simplificar ? '¡Lo vi!' : 'Ya vi el marcador'}
                 </button>
@@ -524,14 +681,15 @@
                     <span>¡Listo!</span>
                 </div>
             </div>
-            <button type="button" class="vn-evidencia-btn" data-vn-evidencia data-vn-evidencia-tipo="${escapar(tipoKey)}">
+            <button type="button" class="vn-evidencia-btn vn-pulse-hint" data-vn-evidencia data-vn-evidencia-tipo="${escapar(tipoKey)}">
                 <i class="fa-solid ${icon}"></i>
                 <span>${escapar(label)}</span>
             </button>
-            <button type="button" class="vn-evidencia-captura-btn" data-vn-evidencia-captura hidden>
-                <i class="fa-solid fa-circle"></i> Capturar
+            <button type="button" class="vn-evidencia-captura-btn vn-pulse-hint" data-vn-evidencia-captura hidden>
+                <i class="fa-solid fa-circle"></i>
+                <span>${configNivel().simplificar ? '¡Ya!' : 'Capturar'}</span>
             </button>
-            <div id="vnEvidenciaMsg" class="vn-feedback is-ok" hidden>¡Muy bien! Tu evidencia quedó lista.</div>
+            <div id="vnEvidenciaMsg" class="vn-feedback is-ok" hidden>${configNivel().simplificar ? '¡Listo!' : '¡Muy bien! Tu evidencia quedó lista.'}</div>
         `, bloque, 'evidencia');
     }
 
@@ -572,9 +730,8 @@
                 aria-label="Pieza ${idx + 1}"></button>`;
         }).join('');
         return `
-            <p class="vn-puzzle-meta">${escapar(d.juego_piezas || '4 piezas')} · Arrastra cada pieza a su lugar</p>
             <div class="vn-puzzle" data-vn-puzzle data-cols="${cols}" data-rows="${rows}" data-total="${n}">
-                <div class="vn-puzzle-board" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr);">${slots}</div>
+                <div class="vn-puzzle-board" style="--vn-puzzle-ar:${cols} / ${rows};grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr);">${slots}</div>
                 <div class="vn-puzzle-pool">${pieces}</div>
             </div>
             <div class="vn-feedback" id="vnFb" hidden></div>
@@ -689,10 +846,35 @@
             </button>`;
         }).join('');
         return `
-            <p class="vn-puzzle-meta">Arrastra las imágenes y ordénalas</p>
             <div class="vn-secuencia" data-vn-secuencia data-total="${items.length}">${cards}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>
         `;
+    }
+
+    function juegoHeadHtml(d, id, opts) {
+        const o = opts || {};
+        const titulo = escapar(d.juego_nombre || (id === 'colorear' ? 'Colorea' : 'Juego'));
+        const paintCls = id === 'colorear' ? ' vn-juego-head--paint' : '';
+        let extra = '';
+        if (id === 'memoria' && o.paresTotal != null) {
+            const p = o.paresTotal;
+            extra = `<p class="vn-memory-score" data-vn-memory-score>${configNivel().simplificar ? `⭐ 0 / ${p}` : `0 / ${p} parejas`}</p>`;
+        } else if (id === 'rompecabezas') {
+            const tapHint = esModoDispositivo()
+                ? (configNivel().simplificar ? ' · Toca pieza y hueco' : ' · También puedes tocar la pieza y luego el hueco')
+                : '';
+            extra = `<p class="vn-puzzle-meta">${configNivel().simplificar
+                ? '¡Pon cada pieza!'
+                : `${escapar(d.juego_piezas || '4 piezas')} · Arrastra cada pieza a su lugar`}${tapHint}</p>`;
+        } else if (id === 'secuencia' && o.seqNums) {
+            extra = `<p class="vn-puzzle-meta">${configNivel().simplificar ? '¡Ordénalas!' : 'Arrastra las imágenes y ordénalas'}</p>
+                <div class="vn-seq-nums" aria-hidden="true">${o.seqNums}</div>`;
+        }
+        return `<div class="vn-juego-head${paintCls}">
+            <h2 class="vn-title vn-title--compact">${titulo}</h2>
+            ${instruccionHtml(d.instruccion)}
+            ${extra}
+        </div>`;
     }
 
     function renderJuego(bloque) {
@@ -700,14 +882,15 @@
         const id = d.juego_id || '';
         let extra = '';
         let cardClass = 'juego';
+        let headOpts = {};
         if (id === 'memoria') {
             cardClass = 'juego-memoria';
             const imgs = [1, 2, 3, 4, 5, 6].map((i) => d[`imagen_${i}`]).filter(Boolean);
             const deck = imgs.concat(imgs).map((f, i) => ({ key: i, file: f, pair: f }));
             shuffleInPlace(deck);
             const paresTotal = imgs.length;
-            extra = `<p class="vn-memory-score" data-vn-memory-score>0 / ${paresTotal} parejas</p>
-            <div class="vn-memory" data-vn-memory data-pares="${paresTotal}">${deck.map((c, i) =>
+            headOpts = { paresTotal };
+            extra = `<div class="vn-memory" data-vn-memory data-pares="${paresTotal}">${deck.map((c, i) =>
                 `<button type="button" class="vn-memory-card" data-i="${i}" data-pair="${escapar(c.pair)}" aria-label="Tarjeta">
                     <span class="vn-memory-back" aria-hidden="true">?</span>
                 </button>`
@@ -721,24 +904,19 @@
             extra = renderColorear(d);
         } else if (id === 'secuencia') {
             cardClass = 'juego-secuencia';
+            const items = [1, 2, 3, 4]
+                .map((i) => ({ orden: i - 1, file: d[`seq_${i}`] }))
+                .filter((x) => x.file);
+            if (items.length >= 3) {
+                headOpts = {
+                    seqNums: items.map((_, i) => `<span class="vn-seq-num">${i + 1}</span>`).join(''),
+                };
+            }
             extra = renderSecuencia(d);
         } else {
             extra = '<p class="vn-empty">Elige un juego en la configuración</p>';
         }
-        if (id === 'colorear') {
-            return wrap(`
-                <div class="vn-paint-head vn-paint-head--compact">
-                    <h2 class="vn-title vn-title--compact">${escapar(d.juego_nombre || 'Colorea')}</h2>
-                    ${instruccionHtml(d.instruccion)}
-                </div>
-                ${extra}
-            `, bloque, cardClass);
-        }
-        return wrap(`
-            <h2 class="vn-title">${escapar(d.juego_nombre || 'Juego')}</h2>
-            ${instruccionHtml(d.instruccion)}
-            ${extra}
-        `, bloque, cardClass);
+        return wrap(`${juegoHeadHtml(d, id, headOpts)}${extra}`, bloque, cardClass);
     }
 
     function renderDibujo(bloque) {
@@ -763,12 +941,6 @@
                     <canvas id="vnCanvas" class="vn-draw-canvas" aria-label="Lienzo de dibujo"></canvas>
                 </div>
             </div>
-            ${d.guardar_evidencia ? `<div class="vn-paint-foot">
-                <button type="button" class="vn-dibujo-guardar-btn" data-vn-dibujo-guardar>
-                    <i class="fa-solid fa-check"></i><span>${configNivel().simplificar ? '¡Listo!' : 'Guardar dibujo'}</span>
-                </button>
-                <p class="vn-evidencia-msg" id="vnEvidenciaMsg" hidden>¡Listo! Tu dibujo quedó guardado.</p>
-            </div>` : ''}
         `, bloque, 'dibujo');
     }
 
@@ -776,6 +948,9 @@
         const d = datos(bloque);
         const ops = Array.isArray(d.opciones) ? d.opciones : [];
         const tipo = d.tipo_opts || 'emoji_texto';
+        const textoPregunta = String(d.texto || '').trim();
+        const instruccion = String(d.instruccion || '').trim();
+        const mostrarInstruccion = instruccion && (!textoPregunta || instruccion !== textoPregunta);
         const optsHtml = ops.map((op, i) => {
             let inner = '';
             if (tipo !== 'solo_texto' && op.emoji) inner += `<span class="vn-op-emoji">${escapar(op.emoji)}</span>`;
@@ -790,12 +965,17 @@
         const preguntaImgHtml = preguntaImg
             ? `<div class="vn-pregunta-media"><img src="${escapar(preguntaImg)}" alt=""></div>`
             : '';
+        const tituloHtml = textoPregunta
+            ? `<h2 class="vn-title vn-pregunta-enunciado" data-vn-tts-text="${escapar(textoPregunta)}">${escapar(textoPregunta)}</h2>`
+            : `<h2 class="vn-title">${tituloBloque('pregunta', 'Pregunta')}</h2>`;
+        const instrHtml = mostrarInstruccion ? instruccionHtml(instruccion) : '';
         return wrap(`
-            <h2 class="vn-title">${tituloBloque('pregunta', 'Pregunta')}</h2>
-            ${instruccionHtml(d.instruccion)}
-            <p class="vn-instruccion vn-pregunta-texto">${escapar(d.texto || '')}</p>
+            <div class="vn-pregunta-head">
+                ${tituloHtml}
+                ${instrHtml}
+            </div>
             ${preguntaImgHtml}
-            <div class="vn-options" data-vn-pregunta data-fb-ok="${escapar(d.fb_ok || '¡Muy bien!')}"
+            <div class="vn-options" data-vn-pregunta data-count="${ops.length}" data-fb-ok="${escapar(d.fb_ok || '¡Muy bien!')}"
                 data-fb-err="${escapar(d.fb_err || 'Inténtalo de nuevo')}"
                 data-intentos="${escapar(d.intentos || '2')}"
                 data-al-agotar="${escapar(d.al_agotar || 'Mostrar respuesta correcta')}">${optsHtml}</div>
@@ -914,11 +1094,52 @@
         alCompletarActividad();
     }
 
+    function flashUnionEmparejar($izq, $der) {
+        if (!$izq || !$izq.length || !$der || !$der.length) return;
+        const a = $izq[0].getBoundingClientRect();
+        const b = $der[0].getBoundingClientRect();
+        const x1 = a.left + a.width / 2;
+        const y1 = a.top + a.height / 2;
+        const x2 = b.left + b.width / 2;
+        const y2 = b.top + b.height / 2;
+        const len = Math.hypot(x2 - x1, y2 - y1);
+        const ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+        const $line = $('<div class="vn-match-line" aria-hidden="true"></div>');
+        $line.css({
+            width: `${len}px`,
+            left: `${x1}px`,
+            top: `${y1}px`,
+            transform: `rotate(${ang}deg)`,
+        });
+        $(document.body).append($line);
+        setTimeout(() => { $line.remove(); }, 700);
+    }
+
     function renderReto(bloque) {
         const d = datos(bloque);
         const pasos = Array.isArray(d.pasos) ? d.pasos : [];
         if (retoPaso >= pasos.length) retoPaso = Math.max(0, pasos.length - 1);
         const paso = pasos[retoPaso] || { pregunta: '', opciones: [] };
+        const textoPaso = String(paso.pregunta || '').trim();
+        const nombreReto = String(d.descripcion || '').trim();
+        const instruccion = String(d.instruccion || '').trim();
+        const enunciado = textoPaso
+            || (retoPaso === 0 ? instruccion : '')
+            || nombreReto
+            || tituloBloque('reto', 'Reto');
+        const mostrarInstruccion = retoPaso === 0 && instruccion && textoPaso
+            && instruccion !== textoPaso;
+        const mostrarNombre = nombreReto && nombreReto !== enunciado;
+        const mostrarBadge = pasos.length > 1;
+        const metaHtml = (mostrarNombre || mostrarBadge)
+            ? `<div class="vn-reto-meta">${mostrarNombre
+                ? `<span class="vn-reto-nombre">${escapar(nombreReto)}</span>`
+                : ''}${mostrarBadge
+                ? `<span class="vn-paso-badge">${configNivel().simplificar
+                    ? `${retoPaso + 1} / ${pasos.length}`
+                    : `Paso ${retoPaso + 1} de ${pasos.length}`}</span>`
+                : ''}</div>`
+            : '';
         const ops = (paso.opciones || []).map((op, i) => {
             let inner = '';
             if (op.emoji) inner += `<span class="vn-op-emoji">${escapar(op.emoji)}</span>`;
@@ -930,12 +1151,14 @@
             return `<button type="button" class="vn-option" data-vn-reto-op="${i}" data-correcta="${op.correcta ? '1' : '0'}">${inner || '—'}</button>`;
         }).join('');
         return wrap(`
-            <h2 class="vn-title">${escapar(d.descripcion || 'Reto')}</h2>
-            <p class="vn-paso-badge">Paso ${retoPaso + 1} de ${pasos.length || 1}</p>
-            ${retoPaso === 0 ? instruccionHtml(d.instruccion) : ''}
-            <p class="vn-instruccion vn-reto-pregunta">${escapar(paso.pregunta || '')}</p>
-            <div class="vn-options" data-vn-reto data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
+            <div class="vn-reto-head">
+                ${metaHtml}
+                <h2 class="vn-title vn-pregunta-enunciado" data-vn-tts-text="${escapar(enunciado)}">${escapar(enunciado)}</h2>
+                ${mostrarInstruccion ? instruccionHtml(instruccion) : ''}
+            </div>
+            <div class="vn-options" data-vn-reto data-count="${(paso.opciones || []).length}" data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
                 data-fb-err="${escapar(d.fb_err || 'Casi…')}" data-intentos="${escapar(d.intentos || '2')}"
+                data-al-agotar="${escapar(d.al_agotar || 'Mostrar respuesta correcta')}"
                 data-total-pasos="${pasos.length}">${ops}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>
         `, bloque, 'reto');
@@ -955,7 +1178,7 @@
                 ${list.map((id) => {
                     const label = emocionLabel(id);
                     const imgUrl = emocionImgUrl(id);
-                    return `<button type="button" class="vn-emocion" data-id="${escapar(id)}">
+                    return `<button type="button" class="vn-emocion vn-pulse-hint" data-id="${escapar(id)}">
                         <img class="vn-emocion-img" src="${escapar(imgUrl)}" alt="${escapar(label)}">
                         <span class="vn-emocion-label">${escapar(label)}</span>
                     </button>`;
@@ -1031,7 +1254,11 @@
                 : '';
             return `<span class="${cls}" title="${escapar(b.nombre || b.tipo)}">${inner}</span>`;
         }).join(''));
-        $stepLabel.text(`Paso ${index + 1} de ${bloques.length || 1}`);
+        if (configNivel().simplificar) {
+            $stepLabel.prop('hidden', true).text('');
+        } else {
+            $stepLabel.prop('hidden', false).text(`Paso ${index + 1} de ${bloques.length || 1}`);
+        }
     }
 
     function overlayAbierto() {
@@ -1081,6 +1308,8 @@
         if (!$card.length) return;
 
         $card.css({ transform: 'none', marginTop: '', marginBottom: '' });
+
+        if (esModoDispositivo()) return;
 
         const bodyEl = $body[0];
         const cardEl = $card[0];
@@ -1196,9 +1425,12 @@
     function pintar() {
         if (typeof limpiarDragArrastrar === 'function') limpiarDragArrastrar();
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
+        limpiarSeleccionPuzzle();
         if (typeof limpiarDragSecuencia === 'function') limpiarDragSecuencia();
         if (typeof limpiarPaint === 'function') limpiarPaint();
+        cancelarAvanceAutomatico();
         detenerVoz();
+        historiaAnimando = false;
         const bloque = bloques[index];
         if (!bloque) {
             $body.html('<p class="vn-empty">No hay bloques en la secuencia.</p>');
@@ -1520,7 +1752,6 @@
             case 'arrastrar':
                 return itemsPoolCompletos($body.find('[data-vn-arrastrar-pool] [data-vn-item]'));
             case 'dibujo':
-                if (d.guardar_evidencia) return !$('#vnEvidenciaMsg').prop('hidden');
                 return !!(paint && paint.history && paint.history.length > 1);
             case 'juego': {
                 const juegoId = d.juego_id || '';
@@ -1546,37 +1777,76 @@
     }
 
     function mensajePendienteBloque(bloque) {
-        if (!bloque) return 'Termina esta actividad antes de continuar.';
+        if (!bloque) return configNivel().simplificar ? '¡Aún no!' : 'Termina esta actividad antes de continuar.';
         const d = datos(bloque);
+        const simple = configNivel().simplificar;
         switch (bloque.tipo) {
-            case 'audio': return 'Escucha el audio hasta el final.';
-            case 'video': return 'Mira el video hasta el final.';
-            case 'historia': return 'Llega a la última página del cuento.';
-            case 'pregunta': return 'Responde la pregunta.';
-            case 'reto': return 'Completa todos los pasos del reto.';
-            case 'emparejar': return 'Empareja todos los elementos.';
-            case 'clasificacion': return 'Clasifica todos los elementos.';
-            case 'arrastrar': return 'Arrastra todos los elementos a su zona.';
-            case 'emocion': return 'Elige cómo te sentiste.';
-            case 'evidencia': return 'Toca el botón para registrar tu evidencia.';
-            case 'ra': return 'Toca el botón cuando veas el marcador.';
+            case 'audio': return simple ? '¡Escucha!' : 'Escucha el audio hasta el final.';
+            case 'video': return simple ? '¡Mira el video!' : 'Mira el video hasta el final.';
+            case 'historia': return simple ? '¡Sigue el cuento!' : 'Llega a la última página del cuento.';
+            case 'pregunta': return simple ? '¡Elige una!' : 'Responde la pregunta.';
+            case 'reto': return simple ? '¡Sigue el reto!' : 'Completa todos los pasos del reto.';
+            case 'emparejar': return simple ? '¡Une todos!' : 'Empareja todos los elementos.';
+            case 'clasificacion': return simple ? '¡Ordénalos!' : 'Clasifica todos los elementos.';
+            case 'arrastrar': return simple ? '¡Llévalos!' : 'Arrastra todos los elementos a su zona.';
+            case 'emocion': return simple ? '¿Cómo estás?' : 'Elige cómo te sentiste.';
+            case 'evidencia': return simple ? '¡Toca!' : 'Toca el botón para registrar tu evidencia.';
+            case 'ra': return simple ? '¡Mira y toca!' : 'Toca el botón cuando veas el marcador.';
             case 'dibujo':
-                return d.guardar_evidencia ? 'Guarda tu dibujo.' : 'Haz un dibujo en el lienzo.';
+                return simple ? '¡Pinta!' : 'Haz un dibujo en el lienzo.';
             case 'juego': {
                 const juegoId = d.juego_id || '';
-                if (juegoId === 'memoria') return 'Encuentra todas las parejas.';
-                if (juegoId === 'rompecabezas') return 'Completa el rompecabezas.';
-                if (juegoId === 'secuencia') return 'Ordena las tarjetas correctamente.';
-                if (juegoId === 'colorear') return 'Colorea la imagen.';
-                return 'Termina el juego.';
+                if (juegoId === 'memoria') return simple ? '¡Busca las parejas!' : 'Encuentra todas las parejas.';
+                if (juegoId === 'rompecabezas') return simple ? '¡Ármalo!' : 'Completa el rompecabezas.';
+                if (juegoId === 'secuencia') return simple ? '¡Ordénalas!' : 'Ordena las tarjetas correctamente.';
+                if (juegoId === 'colorear') return simple ? '¡Colorea!' : 'Colorea la imagen.';
+                return simple ? '¡Termina!' : 'Termina el juego.';
             }
             case 'bienvenida':
                 return (d.tipo_media || '') === 'video'
-                    ? 'Mira el video de bienvenida.'
-                    : 'Escucha la bienvenida.';
+                    ? (simple ? '¡Mira el video!' : 'Mira el video de bienvenida.')
+                    : (simple ? '¡Escucha!' : 'Escucha la bienvenida.');
             default:
-                return 'Termina esta actividad antes de continuar.';
+                return simple ? '¡Aún no!' : 'Termina esta actividad antes de continuar.';
         }
+    }
+
+    function cancelarAvanceAutomatico() {
+        if (!bloqueAvanceTimer) return;
+        clearTimeout(bloqueAvanceTimer);
+        bloqueAvanceTimer = null;
+    }
+
+    function programarAvanceAutomatico() {
+        cancelarAvanceAutomatico();
+        const bloqueIdx = index;
+        bloqueAvanceTimer = setTimeout(() => {
+            bloqueAvanceTimer = null;
+            if (index !== bloqueIdx) return;
+            const bloque = bloques[index];
+            if (!bloque || !['pregunta', 'reto'].includes(bloque.tipo)) return;
+            if (!bloqueEstaCompleto(bloque)) return;
+            alClicSiguiente();
+        }, BLOQUE_AVANCE_MS);
+    }
+
+    function programarAvanceRetoPaso($box) {
+        cancelarAvanceAutomatico();
+        const bloqueIdx = index;
+        const pasoIdx = retoPaso;
+        bloqueAvanceTimer = setTimeout(() => {
+            bloqueAvanceTimer = null;
+            if (index !== bloqueIdx || retoPaso !== pasoIdx) return;
+            const total = Number($box.data('total-pasos')) || 1;
+            if (retoPaso < total - 1) {
+                retoPaso += 1;
+                pintar();
+                return;
+            }
+            $box.data('locked', true);
+            alCompletarActividad();
+            programarAvanceAutomatico();
+        }, BLOQUE_AVANCE_MS);
     }
 
     function actualizarNavBloque() {
@@ -1584,20 +1854,27 @@
         if (!bloque) return;
         const esUltimoBloque = index >= bloques.length - 1;
         const completo = bloqueEstaCompleto(bloque);
+        const simple = configNivel().simplificar;
+        const labelSeguir = simple ? '¡Listo!' : 'Seguir';
+        const labelSiguiente = simple ? '¡Sigue!' : 'Siguiente';
+
+        $btnPrev.find('span').first().text(simple ? '' : 'Atrás');
 
         if (alTerminarExperiencia && esUltimoBloque) {
-            $btnNext.find('span').first().text('Seguir');
+            $btnNext.find('span').first().text(labelSeguir);
             $btnNext.prop('disabled', false);
             $btnNext.toggleClass('is-blocked', !completo);
         } else if (esUltimoBloque) {
-            $btnNext.find('span').first().text('Siguiente');
+            $btnNext.find('span').first().text(labelSiguiente);
             $btnNext.prop('disabled', true);
             $btnNext.toggleClass('is-blocked', true);
         } else {
-            $btnNext.find('span').first().text('Siguiente');
+            $btnNext.find('span').first().text(labelSiguiente);
             $btnNext.prop('disabled', false);
             $btnNext.toggleClass('is-blocked', !completo);
         }
+        const listoParaAvanzar = completo && (!esUltimoBloque || !!alTerminarExperiencia);
+        $btnNext.toggleClass('vn-nav-ready', listoParaAvanzar);
         $btnNext.attr('aria-disabled', completo ? 'false' : 'true');
     }
 
@@ -1617,17 +1894,28 @@
         if (!$root.length) return;
         const pares = Number($root.data('pares')) || 0;
         const done = $root.find('.vn-memory-card.is-done').length / 2;
-        $body.find('[data-vn-memory-score]').text(`${done} / ${pares} parejas`);
+        $body.find('[data-vn-memory-score]').text(
+            configNivel().simplificar ? `⭐ ${done} / ${pares}` : `${done} / ${pares} parejas`
+        );
     }
 
     function aplicarAlAgotar($box) {
         const modo = String($box.data('al-agotar') || 'Mostrar respuesta correcta');
+        const esReto = $box.is('[data-vn-reto]');
         if (modo === 'Repetir desde el inicio') {
             $box.data('locked', false);
             $body.find('.vn-option').removeClass('is-ok is-bad');
             const bloque = bloques[index];
             if (bloque && bloque.tipo === 'pregunta') {
                 intentosRestantes = parseIntentos($box.data('intentos'));
+            }
+            if (bloque && bloque.tipo === 'reto') {
+                retoPaso = 0;
+                intentosRestantes = parseIntentos($box.data('intentos'));
+                const $fb = $('#vnFb');
+                if ($fb.length) $fb.prop('hidden', true).removeClass('is-ok is-bad').text('');
+                pintar();
+                return;
             }
             const $fb = $('#vnFb');
             if ($fb.length) $fb.prop('hidden', true).removeClass('is-ok is-bad').text('');
@@ -1636,8 +1924,17 @@
         if (modo !== 'Continuar sin mostrar') {
             $body.find('.vn-option[data-correcta="1"]').addClass('is-ok');
         }
+        if (esReto) {
+            const total = Number($box.data('total-pasos')) || 1;
+            if (retoPaso < total - 1) {
+                $box.data('locked', true);
+                programarAvanceRetoPaso($box);
+                return;
+            }
+        }
         $box.data('locked', true);
         alCompletarActividad();
+        programarAvanceAutomatico();
     }
 
     function revisarHistoriaVista() {
@@ -1664,7 +1961,44 @@
     }
 
     function iniciarInstruccionBloque(bloque) {
-        const texto = String(datos(bloque).instruccion || '').trim();
+        const d = datos(bloque);
+        if (bloque.tipo === 'pregunta') {
+            const pregunta = String(d.texto || '').trim();
+            const instr = String(d.instruccion || '').trim();
+            let texto = '';
+            if (pregunta && instr && instr !== pregunta) {
+                texto = `${pregunta}. ${instr}`;
+            } else {
+                texto = pregunta || instr;
+            }
+            if (texto) {
+                hablarTexto(texto, () => trasInstruccionBloque(bloque));
+            } else {
+                trasInstruccionBloque(bloque);
+            }
+            return;
+        }
+        if (bloque.tipo === 'reto') {
+            const pasos = Array.isArray(d.pasos) ? d.pasos : [];
+            const paso = pasos[retoPaso] || {};
+            const pregunta = String(paso.pregunta || '').trim();
+            const nombreReto = String(d.descripcion || '').trim();
+            const instr = retoPaso === 0 ? String(d.instruccion || '').trim() : '';
+            const enunciado = pregunta || instr || nombreReto;
+            let texto = '';
+            if (pregunta && instr && instr !== pregunta) {
+                texto = `${pregunta}. ${instr}`;
+            } else {
+                texto = enunciado;
+            }
+            if (texto) {
+                hablarTexto(texto, () => trasInstruccionBloque(bloque));
+            } else {
+                trasInstruccionBloque(bloque);
+            }
+            return;
+        }
+        const texto = String(d.instruccion || '').trim();
         if (texto) {
             hablarTexto(texto, () => trasInstruccionBloque(bloque));
         } else {
@@ -1726,6 +2060,7 @@
         paint.history.pop();
         drawCtx.putImageData(paint.history[paint.history.length - 1], 0, 0);
         paintUpdateActions();
+        actualizarNavBloque();
     }
 
     function paintDrawShape(ctx, tool, x1, y1, x2, y2, color, width) {
@@ -1925,6 +2260,7 @@
         if (bloque.tipo === 'reto') {
             const $box = $body.find('[data-vn-reto]');
             intentosRestantes = parseIntentos($box.data('intentos'));
+            if (retoPaso !== 0) $body.find('.vn-instruccion').hide();
         }
 
         // Memoria state
@@ -1949,6 +2285,7 @@
             setVideoUi('idle');
         }
         if (bloque.tipo === 'historia') {
+            if (historiaPage !== 0) $body.find('.vn-instruccion').hide();
             const texto = String(datos(bloque).instruccion || '').trim();
             if (historiaPage === 0 && texto) {
                 hablarTexto(texto, () => iniciarAudioHistoria());
@@ -2191,6 +2528,7 @@
     }
 
     function ir(delta) {
+        cancelarAvanceAutomatico();
         const next = index + delta;
         if (next < 0 || next >= bloques.length) return;
         index = next;
@@ -2200,6 +2538,7 @@
     }
 
     function alClicSiguiente() {
+        cancelarAvanceAutomatico();
         const bloque = bloques[index];
         if (!bloqueEstaCompleto(bloque)) {
             mostrarAvisoBloquePendiente();
@@ -2266,6 +2605,7 @@
     }
 
     function limpiarMediosPlayer() {
+        cancelarAvanceAutomatico();
         if (typeof limpiarDragArrastrar === 'function') limpiarDragArrastrar();
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
         if (typeof limpiarDragSecuencia === 'function') limpiarDragSecuencia();
@@ -2551,19 +2891,6 @@
         reproducirVideoBienvenida();
     });
 
-    onBody('click', '[data-vn-dibujo-guardar]', function () {
-        const $btn = $(this);
-        if ($btn.prop('disabled')) return;
-        if (!paint || !paint.history || paint.history.length <= 1) {
-            showFb(false, '', configNivel().simplificar ? '¡Pinta algo primero!' : 'Haz un dibujo antes de guardar.');
-            return;
-        }
-        $btn.prop('disabled', true).addClass('is-done');
-        $('#vnEvidenciaMsg').prop('hidden', false);
-        celebrarExito(false);
-        alCompletarActividad();
-    });
-
     onBody('click', '[data-vn-evidencia]', function () {
         const $btn = $(this);
         if ($btn.prop('disabled')) return;
@@ -2651,6 +2978,7 @@
             showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
             $box.data('locked', true);
             alCompletarActividad();
+            programarAvanceAutomatico();
             return;
         }
         $(this).addClass('is-bad vn-option--shake');
@@ -2670,36 +2998,27 @@
         const ok = String($(this).data('correcta')) === '1';
         $body.find('.vn-option').removeClass('is-ok is-bad');
         if (ok) {
-            $(this).addClass('is-ok');
+            $(this).addClass('is-ok vn-option--pop');
+            setTimeout(() => { $(this).removeClass('vn-option--pop'); }, 500);
             showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
             const total = Number($box.data('total-pasos')) || 1;
-            setTimeout(() => {
-                if (retoPaso < total - 1) {
-                    retoPaso += 1;
-                    pintar();
-                } else {
-                    $box.data('locked', true);
-                    alCompletarActividad();
-                }
-            }, 650);
+            if (retoPaso < total - 1) {
+                $box.data('locked', true);
+                programarAvanceRetoPaso($box);
+            } else {
+                $box.data('locked', true);
+                alCompletarActividad();
+                programarAvanceAutomatico();
+            }
             return;
         }
-        $(this).addClass('is-bad');
+        $(this).addClass('is-bad vn-option--shake');
+        setTimeout(() => { $(this).removeClass('vn-option--shake'); }, 450);
         showFb(false, $box.data('fb-ok'), $box.data('fb-err'));
         if (intentosRestantes !== Infinity) {
             intentosRestantes -= 1;
             if (intentosRestantes <= 0) {
-                $body.find('.vn-option[data-correcta="1"]').addClass('is-ok');
-                const total = Number($box.data('total-pasos')) || 1;
-                setTimeout(() => {
-                    if (retoPaso < total - 1) {
-                        retoPaso += 1;
-                        pintar();
-                    } else {
-                        $box.data('locked', true);
-                        alCompletarActividad();
-                    }
-                }, 800);
+                aplicarAlAgotar($box);
             }
         }
     });
@@ -2719,7 +3038,10 @@
         const $box = $body.find('[data-vn-emparejar]');
         const ok = izq === der;
         if (ok) {
-            $body.find(`[data-vn-izq="${izq}"], [data-vn-der="${der}"]`).addClass('is-matched vn-chip--matched').removeClass('is-selected');
+            const $izqBtn = $body.find(`[data-vn-izq="${izq}"]`);
+            const $derBtn = $body.find(`[data-vn-der="${der}"]`);
+            $izqBtn.add($derBtn).addClass('is-matched vn-chip--matched').removeClass('is-selected');
+            flashUnionEmparejar($izqBtn, $derBtn);
             showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
             alCompletarActividad();
         } else {
@@ -2915,10 +3237,56 @@
         $body.data('vn-puzzle-drag', null);
     }
 
-    function slotPuzzleBajoPuntero(clientX, clientY) {
+    function limpiarSeleccionPuzzle() {
+        if (!$body || !$body.length) return;
+        $body.find('.vn-puzzle-piece.is-selected').removeClass('is-selected');
+    }
+
+    function colocarPiezaPuzzle($piece, $slot) {
+        const pieceIdx = Number($piece.data('vn-puzzle-piece'));
+        const slotIdx = Number($slot.data('vn-puzzle-slot'));
+        if (pieceIdx !== slotIdx) {
+            showFb(false, '¡Ups!', configNivel().simplificar ? '¡Otra!' : 'Esa pieza no va ahí');
+            return false;
+        }
+        $piece.addClass('is-placed').removeClass('is-selected').prop('disabled', true);
+        $slot.addClass('is-filled').empty().append($piece);
+        celebrarExito(false);
+        revisarPuzzleCompleto();
+        return true;
+    }
+
+    function slotPuzzleBajoPuntero(clientX, clientY, pieceIdx) {
+        const drag = $body.data('vn-puzzle-drag');
+        if (drag && drag.ghost) {
+            const gr = drag.ghost.getBoundingClientRect();
+            clientX = gr.left + gr.width / 2;
+            clientY = gr.top + gr.height / 2;
+        }
+
         const el = document.elementFromPoint(clientX, clientY);
-        if (!el) return null;
-        return el.closest('.vn-puzzle-slot:not(.is-filled)');
+        const hit = el ? el.closest('.vn-puzzle-slot:not(.is-filled)') : null;
+        if (hit) return hit;
+        const $slots = $body.find('.vn-puzzle-slot:not(.is-filled)');
+        let best = null;
+        let bestDist = Infinity;
+        const tol = esModoDispositivo() ? 1.1 : 0.7;
+        $slots.each(function () {
+            const r = this.getBoundingClientRect();
+            if (r.width < 4 || r.height < 4) return;
+            const cx = r.left + r.width / 2;
+            const cy = r.top + r.height / 2;
+            const dist = Math.hypot(clientX - cx, clientY - cy);
+            const radio = Math.max(r.width, r.height) * tol;
+            if (dist > radio) return;
+            const idx = Number($(this).data('vn-puzzle-slot'));
+            const prefer = pieceIdx === idx ? dist * 0.4 : dist;
+            if (prefer < bestDist) {
+                bestDist = prefer;
+                best = this;
+            }
+        });
+        return best;
     }
 
     function revisarPuzzleCompleto() {
@@ -2936,6 +3304,7 @@
     onBody('pointerdown', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
         if ($(this).hasClass('is-placed')) return;
         if (e.button != null && e.button !== 0) return;
+        limpiarSeleccionPuzzle();
         e.preventDefault();
         const pieceEl = this;
         const $piece = $(pieceEl);
@@ -2950,6 +3319,7 @@
         $piece.addClass('is-dragging');
         $body.find('.vn-puzzle-slot:not(.is-filled)').addClass('is-target');
         try { pieceEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        const pieceIdx = Number($piece.data('vn-puzzle-piece'));
         const drag = {
             $piece,
             ghost,
@@ -2969,7 +3339,7 @@
             drag.ghost.style.left = `${ev.clientX - drag.offsetX}px`;
             drag.ghost.style.top = `${ev.clientY - drag.offsetY}px`;
             $body.find('.vn-puzzle-slot').removeClass('is-drop-hover');
-            const slot = slotPuzzleBajoPuntero(ev.clientX, ev.clientY);
+            const slot = slotPuzzleBajoPuntero(ev.clientX, ev.clientY, pieceIdx);
             if (slot) slot.classList.add('is-drop-hover');
         };
 
@@ -2977,24 +3347,29 @@
             if (ev.pointerId !== drag.pointerId) return;
             $(document).off('.vnPuzzleDrag');
             try { pieceEl.releasePointerCapture(ev.pointerId); } catch (err) { /* ignore */ }
-            const slot = slotPuzzleBajoPuntero(ev.clientX, ev.clientY);
+            const slot = slotPuzzleBajoPuntero(ev.clientX, ev.clientY, pieceIdx);
             const $pieceUp = drag.$piece;
-            const pieceIdx = Number($pieceUp.data('vn-puzzle-piece'));
             limpiarDragPuzzle();
-            if (!slot || !drag.moved) return;
-            const slotIdx = Number($(slot).data('vn-puzzle-slot'));
-            if (pieceIdx === slotIdx) {
-                $pieceUp.addClass('is-placed').prop('disabled', true);
-                $(slot).addClass('is-filled').empty().append($pieceUp);
-                reproducirSfx('ok');
-                revisarPuzzleCompleto();
-            } else {
-                showFb(false, '¡Bien!', 'Esa pieza no va ahí');
+            if (!drag.moved) {
+                if (esModoDispositivo()) {
+                    limpiarSeleccionPuzzle();
+                    $pieceUp.addClass('is-selected');
+                }
+                return;
             }
+            if (!slot) return;
+            colocarPiezaPuzzle($pieceUp, $(slot));
         };
 
         $(document).on('pointermove.vnPuzzleDrag', onMove);
         $(document).on('pointerup.vnPuzzleDrag pointercancel.vnPuzzleDrag', onUp);
+    });
+
+    onBody('pointerup', '.vn-puzzle-slot:not(.is-filled)', function (e) {
+        if (e.button != null && e.button !== 0) return;
+        const $sel = $body.find('.vn-puzzle-pool .vn-puzzle-piece.is-selected');
+        if (!$sel.length) return;
+        colocarPiezaPuzzle($sel, $(this));
     });
 
     function limpiarDragSecuencia() {
