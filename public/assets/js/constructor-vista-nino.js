@@ -1095,7 +1095,7 @@
         let scale = Math.min(availW / naturalW, availH / naturalH, 1);
         if (scale >= 0.999) return;
 
-        scale = Math.max(0.42, scale);
+        scale = Math.max(0.32, scale);
         const visualH = naturalH * scale;
         const padTop = Math.max(0, (availH - visualH) / 2);
 
