@@ -10,6 +10,11 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
+import { crearNubes } from './recorrido3d/nubes.js';
+import { crearAnimales } from './recorrido3d/animales.js';
+import { crearFuegos } from './recorrido3d/fuegos.js';
+import { crearVegetacion } from './recorrido3d/vegetacion.js';
+import { crearVoz } from './recorrido3d/voz.js';
 
 (function () {
     'use strict';
@@ -43,13 +48,12 @@ import * as THREE from 'three';
     let brazoIzq, brazoDer, pieIzq, pieDer, boca, cabeza, piernaIzq, piernaDer;
     let estaciones = [], progresoMesh = null;
     let lagoCentro = null, lagoRadio = 8; // zona del lago a evitar por la vegetación
-    let nubes = []; // nubes del cielo (se mueven en el loop)
-    let fuegos = [], fuegosActivos = false; // partículas de fuegos pirotécnicos (fin)
+    let ctrlNubes = null;    // controlador del módulo de nubes (recorrido3d/nubes.js)
+    let ctrlAnimales = null; // controlador del módulo de animales (pez + aves)
+    let ctrlFuegos = null;   // controlador del módulo de fuegos pirotécnicos
     let vallas = {}; // { ramaIdx: THREE.Group } cerca que bloquea ramas no habilitadas
     let puertasCasa = {}; // { nodoId: THREE.Vector3 } posición de la puerta del destino
     let entrandoSaliendo = false; // true durante la animación de entrar/salir de la casa
-    let pez = null, pezT = 0;     // pez que salta en el lago
-    let aves = [];                 // aves que vuelan por el cielo
     let casaInicioCentro = null;   // zona de la casa del inicio (a evitar por vegetación)
     let zonaJuegos = null;         // grupo 3D de la carpa de juegos (clicable)
     let zonaJuegosCartel = null;   // placa/cartel que hace billboard hacia la cámara
@@ -66,8 +70,7 @@ import * as THREE from 'three';
     let equipoModesto = false; // tablet/móvil: recorta calidad para ganar fluidez
     let onCanvasClick = null;
     let N = 0;
-    let audioNarracion = null;
-    let narrando = false;
+    let ctrlVoz = null; // controlador de voz/TTS (recorrido3d/voz.js)
     let paradaVideoActual = null;
     let escuchandoEmbedVideo = false;
 
@@ -78,63 +81,12 @@ import * as THREE from 'three';
             .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // ===================== Voz (TTS del servidor, igual que el player) =====================
-    function detenerNarracion() {
-        narrando = false;
-        if (!audioNarracion) return;
-        try {
-            audioNarracion.pause();
-            audioNarracion.currentTime = 0;
-        } catch (e) { /* noop */ }
-        audioNarracion = null;
-    }
-
+    // ===================== Voz (TTS) — delegado en recorrido3d/voz.js =========
+    // ctrlVoz se crea en boot() con la URL de TTS. El loop usa ctrlVoz.estaNarrando().
+    function detenerNarracion() { if (ctrlVoz) ctrlVoz.detener(); }
     function hablar(texto, alTerminar) {
-        if (!texto) {
-            if (alTerminar) alTerminar();
-            return;
-        }
-        const urlTts = String(ctx.$app?.data('url-tts') || '');
-        if (!urlTts || !$) {
-            if (alTerminar) alTerminar();
-            return;
-        }
-
-        detenerNarracion();
-        narrando = true;
-
-        $.ajax({
-            url: urlTts,
-            method: 'GET',
-            data: { texto },
-            dataType: 'json',
-        }).done(function (res) {
-            const audioUrl = res?.data?.url;
-            if (!audioUrl) {
-                narrando = false;
-                if (alTerminar) alTerminar();
-                return;
-            }
-            audioNarracion = new Audio(audioUrl);
-            audioNarracion.onended = function () {
-                narrando = false;
-                audioNarracion = null;
-                if (alTerminar) alTerminar();
-            };
-            audioNarracion.onerror = function () {
-                narrando = false;
-                audioNarracion = null;
-                if (alTerminar) alTerminar();
-            };
-            audioNarracion.play().catch(function () {
-                narrando = false;
-                audioNarracion = null;
-                if (alTerminar) alTerminar();
-            });
-        }).fail(function () {
-            narrando = false;
-            if (alTerminar) alTerminar();
-        });
+        if (ctrlVoz) ctrlVoz.hablar(texto, alTerminar);
+        else if (alTerminar) alTerminar();
     }
 
     // Label de una parada: "N. Nombre real" (ej. "1. Exploro mi cuerpo").
@@ -1388,365 +1340,34 @@ import * as THREE from 'three';
         }
     }
 
+    // Vegetación + montañas + lago: delegado en recorrido3d/vegetacion.js.
     function construirVegetacion() {
-        const grupo = new THREE.Group(); scene.add(grupo);
-        const tonos = ['#3f7a4b', '#4b8c57', '#356b41', '#5a9c63', '#2f6b3f'];
-        // lagoCentro ya fue definido en calcularLagoCentro() (antes del terreno).
         if (!lagoCentro) calcularLagoCentro();
-        // pino cónico (2-3 capas)
-        function pino(x, y, z, tint) {
-            const g = new THREE.Group();
-            const tronco = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.3, 1.4, 6),
-                new THREE.MeshStandardMaterial({ color: '#6b4f2a', roughness: 1, flatShading: true }));
-            tronco.position.y = 0.7; tronco.castShadow = true; g.add(tronco);
-            const capas = 2 + (Math.random() * 2 | 0);
-            for (let c = 0; c < capas; c++) {
-                const copa = new THREE.Mesh(new THREE.ConeGeometry(1.5 - c * 0.35, 1.6, 7),
-                    new THREE.MeshStandardMaterial({ color: tint, roughness: 1, flatShading: true }));
-                copa.position.y = 1.9 + c * 1.0; copa.castShadow = true; g.add(copa);
-            }
-            g.position.set(x, y, z); g.scale.setScalar(0.7 + Math.random() * 0.8); return g;
-        }
-        // árbol de copa redonda
-        function frondoso(x, y, z, tint) {
-            const g = new THREE.Group();
-            const tronco = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.28, 1.6, 6),
-                new THREE.MeshStandardMaterial({ color: '#7a5a30', roughness: 1, flatShading: true }));
-            tronco.position.y = 0.8; tronco.castShadow = true; g.add(tronco);
-            const copa = new THREE.Mesh(new THREE.IcosahedronGeometry(1.5, 1),
-                new THREE.MeshStandardMaterial({ color: tint, roughness: 1, flatShading: true }));
-            copa.position.y = 2.6; copa.castShadow = true; copa.scale.y = 0.9; g.add(copa);
-            g.position.set(x, y, z); g.scale.setScalar(0.7 + Math.random() * 0.7); return g;
-        }
-        function arbusto(x, y, z, tint) {
-            const g = new THREE.Group();
-            for (let b = 0; b < 3; b++) {
-                const bola = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5 + Math.random() * 0.3, 0),
-                    new THREE.MeshStandardMaterial({ color: tint, roughness: 1, flatShading: true }));
-                bola.position.set((Math.random() - .5) * 0.7, 0.4 + Math.random() * 0.2, (Math.random() - .5) * 0.7);
-                bola.castShadow = true; g.add(bola);
-            }
-            g.position.set(x, y, z); return g;
-        }
-        function flor(x, y, z) {
-            const g = new THREE.Group();
-            const tallo = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.5, 4),
-                new THREE.MeshStandardMaterial({ color: '#3f7a4b' }));
-            tallo.position.y = 0.25; g.add(tallo);
-            const colFlor = ['#f87171', '#fbbf24', '#f472b6', '#a78bfa', '#60a5fa'][Math.random() * 5 | 0];
-            const petalos = new THREE.Mesh(new THREE.IcosahedronGeometry(0.16, 0),
-                new THREE.MeshStandardMaterial({ color: colFlor, roughness: .7 }));
-            petalos.position.y = 0.55; g.add(petalos);
-            g.position.set(x, y, z); return g;
-        }
-        function roca(x, y, z) {
-            const m = new THREE.Mesh(new THREE.IcosahedronGeometry(0.6 + Math.random() * 0.6, 0),
-                new THREE.MeshStandardMaterial({ color: '#8a8175', roughness: 1, flatShading: true }));
-            m.position.set(x, y + 0.3, z); m.rotation.set(Math.random(), Math.random(), Math.random());
-            m.castShadow = true; m.receiveShadow = true; return m;
-        }
-        let intentos = 0, colocados = 0;
-        while (colocados < 130 && intentos < 1400) {
-            intentos++;
-            const x = (Math.random() - 0.5) * TAM * 0.92, z = (Math.random() - 0.5) * TAM * 0.92;
-            const d = distanciaAlCamino(x, z);
-            if (d < ZONA_LIMPIA) continue;
-            // no invadir el lago
-            if (lagoCentro && Math.hypot(x - lagoCentro.x, z - lagoCentro.z) < lagoRadio) continue;
-            // no invadir la casa del inicio (evita árboles dentro de la casa)
-            if (casaInicioCentro && Math.hypot(x - casaInicioCentro.x, z - casaInicioCentro.z) < casaInicioCentro.r) continue;
-            // no invadir la carpa de la zona de juegos
-            if (zonaJuegosCentro && Math.hypot(x - zonaJuegosCentro.x, z - zonaJuegosCentro.z) < zonaJuegosCentro.r) continue;
-            const y = alturaTerreno(x, z);
-            const tint = tonos[(Math.random() * tonos.length) | 0];
-            const r = Math.random();
-            let obj;
-            if (r < 0.42) obj = pino(x, y, z, tint);
-            else if (r < 0.62) obj = frondoso(x, y, z, tint);
-            else if (r < 0.78) obj = arbusto(x, y, z, tint);
-            else if (r < 0.90) obj = flor(x, y, z);      // flores pueden acercarse un poco más
-            else obj = roca(x, y, z);
-            grupo.add(obj); colocados++;
-        }
-
-        // Montañas lejanas en el horizonte (anillo de conos grandes, sin sombra)
-        const matMonte = new THREE.MeshStandardMaterial({ color: '#5b7c6a', roughness: 1, flatShading: true });
-        const matNieve = new THREE.MeshStandardMaterial({ color: '#e8eef2', roughness: 1, flatShading: true });
-        const nMontes = 14, R = TAM * 0.62;
-        for (let i = 0; i < nMontes; i++) {
-            const ang = (i / nMontes) * Math.PI * 2 + Math.random() * 0.2;
-            const mx = Math.cos(ang) * R, mz = Math.sin(ang) * R;
-            const h = 16 + Math.random() * 14;
-            const monte = new THREE.Mesh(new THREE.ConeGeometry(9 + Math.random() * 5, h, 6), matMonte);
-            monte.position.set(mx, h / 2 - 2, mz); monte.rotation.y = Math.random(); grupo.add(monte);
-            const nieve = new THREE.Mesh(new THREE.ConeGeometry(3.2, h * 0.28, 6), matNieve);
-            nieve.position.set(mx, h - h * 0.14 - 2, mz); nieve.rotation.y = monte.rotation.y; grupo.add(nieve);
-        }
-
-        construirLago(grupo);
-    }
-
-    // Lago/estanque azul decorativo, plano, junto al recorrido en una zona visible.
-    function construirLago(grupo) {
-        const centro = lagoCentro || curva.getPoint(0.5);
-        const lago = new THREE.Group();
-        lago.position.set(centro.x, 0, centro.z);
-
-        // Orilla (tierra/arena húmeda) — anillo más grande bajo el agua.
-        const orilla = new THREE.Mesh(new THREE.CircleGeometry(7.4, 40),
-            (function () { const m = new THREE.MeshStandardMaterial({ color: '#8a6a44', roughness: 1 });
-                m.polygonOffset = true; m.polygonOffsetFactor = -1; m.polygonOffsetUnits = -2; return m; })());
-        orilla.rotation.x = -Math.PI / 2; orilla.position.y = 0.05; orilla.scale.set(1, 0.72, 1);
-        orilla.receiveShadow = true; lago.add(orilla);
-
-        // Agua — dos anillos: azul claro exterior y azul más vivo interior.
-        function agua(radio, color, y, offset) {
-            const m = new THREE.MeshStandardMaterial({
-                color, roughness: 0.25, metalness: 0.0,
-                emissive: new THREE.Color(color), emissiveIntensity: 0.18 });
-            m.polygonOffset = true; m.polygonOffsetFactor = -2 - offset; m.polygonOffsetUnits = -4 - offset * 2;
-            const malla = new THREE.Mesh(new THREE.CircleGeometry(radio, 40), m);
-            malla.rotation.x = -Math.PI / 2; malla.position.y = y; malla.scale.set(1, 0.72, 1);
-            return malla;
-        }
-        lago.add(agua(6.4, '#5fb3e6', 0.08, 0));  // agua exterior (más clara)
-        lago.add(agua(4.6, '#3f9fe0', 0.10, 1));  // centro (más profundo/vivo)
-
-        // Brillo/reflejo: media luna clara en un borde.
-        const brillo = new THREE.Mesh(new THREE.CircleGeometry(2.2, 24),
-            (function () { const m = new THREE.MeshBasicMaterial({ color: 0xdff2ff, transparent: true, opacity: 0.35, depthWrite: false });
-                return m; })());
-        brillo.rotation.x = -Math.PI / 2; brillo.position.set(-2.0, 0.12, -1.4); brillo.scale.set(1, 0.5, 1);
-        lago.add(brillo);
-
-        grupo.add(lago);
+        crearVegetacion(scene, {
+            TAM, ZONA_LIMPIA, lagoRadio,
+            lagoCentro, casaInicioCentro, zonaJuegosCentro,
+            distanciaAlCamino, alturaTerreno,
+            centroFallback: curva ? curva.getPoint(0.5) : new THREE.Vector3(),
+        });
     }
 
     // Nubes low-poly (grupos de esferas blancas achatadas) flotando en el cielo.
     // Se desplazan lentamente en el loop (animarNubes) y reaparecen por el otro lado.
-    function construirNubes() {
-        nubes = [];
-        const grupo = new THREE.Group(); scene.add(grupo);
-        const matNube = new THREE.MeshStandardMaterial({
-            color: 0xffffff, roughness: 1, flatShading: true,
-            transparent: true, opacity: 0.95 });
-        const N_NUBES = 10;
-        for (let i = 0; i < N_NUBES; i++) {
-            const nube = new THREE.Group();
-            const bolas = 3 + (Math.random() * 3 | 0);
-            for (let b = 0; b < bolas; b++) {
-                const r = 1.4 + Math.random() * 1.6;   // esferas más pequeñas
-                const bola = new THREE.Mesh(new THREE.IcosahedronGeometry(r, 0), matNube);
-                bola.position.set((b - bolas / 2) * 1.9 + (Math.random() - .5) * 1.1,
-                                  (Math.random() - .5) * 0.9, (Math.random() - .5) * 1.6);
-                bola.scale.y = 0.6; // achatada
-                nube.add(bola);
-            }
-            const escala = 0.55 + Math.random() * 0.6;  // nubes pequeñas
-            nube.scale.setScalar(escala);
-            // Visibles en el cielo del FONDO (hacia el horizonte, Z negativo, donde
-            // mira la cámara) y a media altura para que se vean, pero SIEMPRE detrás
-            // del recorrido para no cruzar por delante del personaje/carretera.
-            nube.position.set((Math.random() - 0.5) * TAM * 1.0,
-                              16 + Math.random() * 12,                    // altura visible
-                              -TAM * 0.30 - Math.random() * TAM * 0.30);  // al fondo (lejos, detrás)
-            grupo.add(nube);
-            // velocidad de deriva (unidades/seg) — lenta y variada
-            nubes.push({ obj: nube, vel: 1.0 + Math.random() * 1.6 });
-        }
-    }
-    // Mueve las nubes y las hace reaparecer por el lado opuesto (bucle infinito).
-    function animarNubes(dtSeg) {
-        const limite = TAM * 0.6;
-        for (const n of nubes) {
-            n.obj.position.x += n.vel * dtSeg;
-            if (n.obj.position.x > limite) n.obj.position.x = -limite;
-        }
-    }
+    // Nubes: delegado en el módulo recorrido3d/nubes.js.
+    function construirNubes() { ctrlNubes = crearNubes(scene, TAM); }
+    function animarNubes(dtSeg) { if (ctrlNubes) ctrlNubes.animar(dtSeg); }
 
-    // ===================== Animales (pez en el lago + aves volando) =====================
-    // Pez low-poly (cuerpo + cola) que salta periódicamente en el lago.
-    function construirPez() {
-        if (!lagoCentro) return;
-        pez = new THREE.Group();
-        const matPez = new THREE.MeshStandardMaterial({ color: '#ff8c42', roughness: .5, flatShading: true });
-        const cuerpo = new THREE.Mesh(new THREE.SphereGeometry(0.45, 10, 8), matPez);
-        cuerpo.scale.set(1.5, 0.8, 0.6); pez.add(cuerpo);
-        const cola = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.5, 4), matPez);
-        cola.rotation.z = Math.PI / 2; cola.position.x = -0.85; cola.scale.set(1, 1, 0.5); pez.add(cola);
-        // ojito
-        const ojo = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6),
-            new THREE.MeshStandardMaterial({ color: '#111' }));
-        ojo.position.set(0.45, 0.12, 0.28); pez.add(ojo);
-        pez.position.copy(lagoCentro); pez.position.y = -1; // oculto bajo el agua al inicio
-        pez.visible = false;
-        scene.add(pez);
-        pezT = 0;
-    }
+    // ===================== Animales — delegado en recorrido3d/animales.js =====
+    function construirAnimales() { ctrlAnimales = crearAnimales(scene, lagoCentro, equipoModesto); }
+    function animarAnimales(now, dtSeg) { if (ctrlAnimales) ctrlAnimales.animar(now, dtSeg); }
 
-    // Gaviota blanca low-poly: cuerpo fusiforme + dos alas planas que baten desde
-    //  el hombro, formando la silueta en "V" típica de un ave a lo lejos (no un
-    //  murciélago). Vuela mirando hacia +X. Devuelve {grupo, alaIzq, alaDer}.
-    function crearAve() {
-        const g = new THREE.Group();
-        // Blanco cálido, no metálico. Emisivo leve para que resalte sobre el cielo.
-        const matAve = new THREE.MeshStandardMaterial({
-            color: '#ffffff', roughness: .85, flatShading: true,
-            emissive: new THREE.Color('#dfe9f5'), emissiveIntensity: .35,
-        });
-        // Cuerpo alargado (fuselaje) apuntando en X.
-        const cuerpo = new THREE.Mesh(new THREE.CapsuleGeometry(0.14, 0.7, 4, 8), matAve);
-        cuerpo.rotation.z = Math.PI / 2; g.add(cuerpo);
-        // Cabecita al frente.
-        const cabeza = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), matAve);
-        cabeza.position.x = 0.5; g.add(cabeza);
-        // Cola en abanico (triángulo plano) atrás.
-        const cola = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.4, 3), matAve);
-        cola.rotation.z = -Math.PI / 2; cola.position.x = -0.55; cola.scale.set(1, 1, 0.35); g.add(cola);
-        // Alas: triángulos delgados y anchos que salen a los lados (eje Z), con
-        //  pivote en el hombro para que las puntas suban/bajen al aletear.
-        const geoAla = new THREE.ConeGeometry(0.28, 1.25, 3);
-        const hacerAla = (signo) => {
-            const pivote = new THREE.Group();          // pivote en el hombro
-            const ala = new THREE.Mesh(geoAla, matAve);
-            ala.rotation.x = signo * Math.PI / 2;      // apunta la punta hacia ±Z
-            ala.scale.set(1.6, 1, 0.12);               // plana y ancha, look de pluma
-            ala.position.z = signo * 0.62;             // desplaza la punta lejos del cuerpo
-            pivote.add(ala);
-            g.add(pivote);
-            return pivote;
-        };
-        const alaIzq = hacerAla(-1);
-        const alaDer = hacerAla(1);
-        return { grupo: g, alaIzq, alaDer };
-    }
-
-    // Crea varias gaviotas blancas volando en círculos amplios por el cielo.
-    function construirAves() {
-        aves = [];
-        const N_AVES = equipoModesto ? 3 : 5; // menos aves en tablet
-        for (let i = 0; i < N_AVES; i++) {
-            const a = crearAve();
-            const radio = 22 + Math.random() * 26;
-            const cx = (Math.random() - 0.5) * 40, cz = (Math.random() - 0.5) * 40;
-            const alt = 20 + Math.random() * 12;
-            const vel = 0.15 + Math.random() * 0.2;
-            const fase = Math.random() * Math.PI * 2;
-            a.grupo.scale.setScalar(0.9 + Math.random() * 0.6);
-            scene.add(a.grupo);
-            aves.push({ ...a, radio, cx, cz, alt, vel, fase, aleteo: 2.2 + Math.random() * 1.8 });
-        }
-    }
-
-    function construirAnimales() {
-        construirPez();
-        construirAves();
-    }
-
-    // Anima el pez (salta cada ciclo describiendo un arco) y las aves (círculos + aleteo).
-    function animarAnimales(now, dtSeg) {
-        // --- Pez: ciclo de ~4.5s; salta durante ~1s, resto oculto bajo el agua ---
-        if (pez && lagoCentro) {
-            pezT += dtSeg;
-            const CICLO = 4.5, SALTO = 1.05;
-            const t = pezT % CICLO;
-            if (t < SALTO) {
-                const k = t / SALTO;               // 0..1 durante el salto
-                pez.visible = true;
-                const altura = Math.sin(k * Math.PI) * 2.2;   // arco
-                pez.position.set(lagoCentro.x, 0.2 + altura, lagoCentro.z);
-                pez.rotation.z = (k - 0.5) * 2.2;  // gira en el aire
-                pez.rotation.y = now / 400;
-            } else {
-                pez.visible = false;               // sumergido
-            }
-        }
-        // --- Aves: vuelan en círculos y aletean ---
-        for (const a of aves) {
-            a.fase += a.vel * dtSeg;
-            const x = a.cx + Math.cos(a.fase) * a.radio;
-            const z = a.cz + Math.sin(a.fase) * a.radio;
-            a.grupo.position.set(x, a.alt + Math.sin(a.fase * 2) * 1.5, z);
-            // orientar en la dirección de vuelo (el cuerpo apunta a +X)
-            a.grupo.rotation.y = -a.fase;
-            // leve alabeo al girar en círculo (como un ave inclinándose)
-            a.grupo.rotation.z = Math.sin(a.fase) * 0.12;
-            // aleteo: el pivote de cada ala sube/baja la punta desde el hombro,
-            //  formando la "V" batiente característica de una gaviota.
-            const flap = Math.sin(now / 1000 * a.aleteo * 6);
-            a.alaIzq.rotation.x = -flap * 0.9;   // punta izq (−Z) sube con flap>0
-            a.alaDer.rotation.x = flap * 0.9;    // punta der (+Z) sube con flap>0
-        }
-    }
-
-    // ===================== Fuegos pirotécnicos (fin) =====================
-    const COLORES_FUEGO = ['#ff4d4d', '#ffd24d', '#4dff88', '#4db8ff', '#e04dff', '#ff8f4d', '#ffffff'];
-    // Lanza una explosión de partículas en (x,y,z): muchas esferitas que salen
-    // radialmente, con gravedad y desvanecimiento. Se animan en animarFuegos().
-    function lanzarExplosion(x, y, z) {
-        const color = new THREE.Color(COLORES_FUEGO[(Math.random() * COLORES_FUEGO.length) | 0]);
-        const nPart = 26 + (Math.random() * 14 | 0);
-        const geo = new THREE.SphereGeometry(0.22, 6, 6);
-        const grupo = new THREE.Group();
-        grupo.position.set(x, y, z);
-        scene.add(grupo);
-        const parts = [];
-        for (let i = 0; i < nPart; i++) {
-            const mat = new THREE.MeshBasicMaterial({ color: color.clone(), transparent: true, opacity: 1, depthWrite: false });
-            const m = new THREE.Mesh(geo, mat);
-            // velocidad radial aleatoria en esfera
-            const th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
-            const spd = 6 + Math.random() * 7;
-            const v = new THREE.Vector3(
-                Math.sin(ph) * Math.cos(th), Math.cos(ph), Math.sin(ph) * Math.sin(th)
-            ).multiplyScalar(spd);
-            grupo.add(m);
-            parts.push({ m, v });
-        }
-        fuegos.push({ grupo, parts, vida: 0, dur: 1.6 });
-    }
-
-    // Programa una salva de fuegos sobre el castillo del fin durante unos segundos.
+    // ===================== Fuegos — delegado en recorrido3d/fuegos.js =========
     function iniciarFuegos() {
-        if (fuegosActivos) return;
-        fuegosActivos = true;
+        if (!ctrlFuegos) ctrlFuegos = crearFuegos(scene);
         const fin = idFin ? nodos[idFin] : null;
-        const base = fin && fin.pos ? fin.pos.clone() : new THREE.Vector3(0, 0, 0);
-        let lanzadas = 0;
-        const total = 14;
-        const salva = () => {
-            if (!fuegosActivos || lanzadas >= total) { return; }
-            lanzadas++;
-            const ex = base.x + 4 + (Math.random() - 0.5) * 18;
-            const ey = 12 + Math.random() * 8;
-            const ez = base.z + (Math.random() - 0.5) * 18;
-            lanzarExplosion(ex, ey, ez);
-            setTimeout(salva, 350 + Math.random() * 300);
-        };
-        salva();
-        // dejar de programar nuevas tras ~7s (las existentes terminan solas)
-        setTimeout(() => { fuegosActivos = false; }, 7000);
+        ctrlFuegos.iniciar(fin && fin.pos ? fin.pos : null);
     }
-
-    function animarFuegos(dtSeg) {
-        if (!fuegos.length) return;
-        const G = 9; // gravedad
-        for (let i = fuegos.length - 1; i >= 0; i--) {
-            const f = fuegos[i];
-            f.vida += dtSeg;
-            const k = f.vida / f.dur;
-            for (const p of f.parts) {
-                p.v.y -= G * dtSeg;
-                p.m.position.addScaledVector(p.v, dtSeg);
-                p.m.material.opacity = Math.max(0, 1 - k);
-            }
-            if (f.vida >= f.dur) {
-                scene.remove(f.grupo);
-                f.parts.forEach(p => p.m.material.dispose());
-                fuegos.splice(i, 1);
-            }
-        }
-    }
+    function animarFuegos(dtSeg) { if (ctrlFuegos) ctrlFuegos.animar(dtSeg); }
 
     // Niño low-poly: pelo castaño, polo azul, mochila roja, shorts rojos, tenis.
     // Conserva las refs que anima el loop (cuerpo, brazoIzq/Der, pieIzq/Der) y
@@ -2875,7 +2496,7 @@ import * as THREE from 'three';
         }
         // "Hablar": la boca se abre/cierra mientras hay voz (o durante el diálogo).
         if (boca) {
-            const hablando = narrando || mostrandoBocadillo;
+            const hablando = (ctrlVoz && ctrlVoz.estaNarrando()) || mostrandoBocadillo;
             if (hablando) {
                 const abrir = 0.5 + Math.abs(Math.sin(now / 90)) * 1.1; // boca articulando
                 boca.scale.set(1.3, abrir, 0.5);
@@ -2920,6 +2541,8 @@ import * as THREE from 'three';
     function boot(options) {
         destroy();
         ctx = options || {};
+        // Controlador de voz/TTS con la URL del endpoint (recorrido3d/voz.js).
+        ctrlVoz = crearVoz($, String(ctx.$app?.data('url-tts') || ''));
         try { camino = JSON.parse(document.getElementById('rn-camino')?.textContent || '{}'); }
         catch (e) { camino = { paradas: [], puntos: [] }; }
         if (!camino.paradas?.length) return false;
@@ -2933,9 +2556,9 @@ import * as THREE from 'three';
         nodoActual = camino.paradas[0] ? camino.paradas[0].id : null; // arranca en 'inicio'
         visitados = new Set();
         ramasCompletadas = new Set(); regresandoAlFin = false;
-        fuegos = []; fuegosActivos = false; vallas = {};
+        ctrlFuegos = null; vallas = {};
         puertasCasa = {}; entrandoSaliendo = false;
-        pez = null; pezT = 0; aves = []; casaInicioCentro = null;
+        ctrlNubes = null; ctrlAnimales = null; casaInicioCentro = null;
         zonaJuegos = null; zonaJuegosCartel = null; zonaJuegosCentro = null; juegosAbiertos = false;
         zonaJuegosParada = null; caminandoLibre = false; alLlegarLibre = null; posAntesDeCarpa = null;
 
@@ -3057,7 +2680,7 @@ import * as THREE from 'three';
         scene = null;
         camera = null;
         estaciones = [];
-        nubes = [];
+        ctrlNubes = null; ctrlAnimales = null; ctrlFuegos = null;
         caminando = false;
         recorridoIniciado = false;
         experienciaCargada = null;

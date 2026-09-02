@@ -2,6 +2,8 @@
 
 namespace App\Services\Docente;
 
+use App\Models\CargaDocente;
+
 class MonitorSesionService
 {
     public function obtenerEstudiantesConectados(CargaDocente $carga)
