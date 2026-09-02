@@ -85,6 +85,10 @@
             aria-label="Pantalla completa">
             <i class="fa-solid fa-expand"></i> Pantalla completa
         </button>
+        <button type="button" class="vn-reload-btn vn-reload-btn--player" id="vnBtnRecargar"
+            title="Recargar experiencia (provisional)" aria-label="Recargar experiencia">
+            <i class="fa-solid fa-rotate"></i> Recargar
+        </button>
         <div class="vn-tablet-screen" id="vnTabletScreen">
             <div class="vn-screen-body" id="vnScreenBody"></div>
             <footer class="vn-screen-nav">

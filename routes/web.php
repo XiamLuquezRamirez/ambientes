@@ -70,6 +70,11 @@ Route::get('/alumnos', [SesionNinoController::class, 'mostrarSeleccionAlumno'])-
 Route::get('/alumnos/{estudianteId}/pin', [SesionNinoController::class, 'mostrarPin'])->name('auth.pin');
 Route::post('/alumnos/{estudianteId}/verificar', [SesionNinoController::class, 'verificarPin'])->name('auth.verificar-pin');
 
+// Captura multimedia (cámara / micrófono / video) — iframes para public/assets/utilidades/
+Route::view('/captura/foto', 'captura.foto')->name('captura.foto');
+Route::view('/captura/audio', 'captura.audio')->name('captura.audio');
+Route::view('/captura/video', 'captura.video')->name('captura.video');
+
 // ── Auth Docente ──────────────────────────────────────────────────────────
 Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('docente.login');
 Route::post('/login', [AuthDocenteController::class, 'iniciarSesion'])->name('docente.login.post');

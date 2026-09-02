@@ -113,6 +113,10 @@
         <button type="button" class="vn-close" data-vn-close title="Cerrar vista niño" aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
         </button>
+        <button type="button" class="vn-reload-btn" id="vnBtnRecargar" title="Recargar experiencia (provisional)"
+            aria-label="Recargar experiencia">
+            <i class="fa-solid fa-rotate"></i>
+        </button>
         <div class="vn-tablet-stage" id="vnTabletStage">
             <div class="vn-tablet" id="vnTablet" data-screen-w="1280" data-screen-h="800">
                 <div class="vn-tablet-bezel">

@@ -53,6 +53,73 @@
     color: #b91c1c;
 }
 
+.vn-reload-btn {
+    position: absolute;
+    top: 0;
+    right: 52px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 999px;
+    background: #fff;
+    color: #0369a1;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+    cursor: pointer;
+    font-family: Nunito, sans-serif;
+    font-size: .82rem;
+    font-weight: 800;
+}
+
+.vn-reload-btn:hover {
+    background: #e0f2fe;
+    color: #0c4a6e;
+}
+
+.vn-reload-btn.is-loading i {
+    animation: vnReloadSpin .75s linear infinite;
+}
+
+.vn-reload-btn--player {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    right: max(12px, env(safe-area-inset-right, 0px));
+    z-index: 10050;
+    min-width: auto;
+    height: auto;
+    padding: 10px 14px;
+    background: rgba(15, 23, 42, .88);
+    color: #fff;
+    font-size: .88rem;
+    pointer-events: auto;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#vnDispositivo:not([hidden]) .vn-reload-btn--player {
+    display: inline-flex;
+}
+
+#vnDispositivo[hidden] .vn-reload-btn--player {
+    display: none !important;
+}
+
+.vn-reload-btn--player:hover {
+    background: rgba(3, 105, 161, .92);
+    color: #fff;
+}
+
+@keyframes vnReloadSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* Escenario que escala la tablet horizontal 1280×800 */
 .vn-tablet-stage {
     display: flex;
@@ -717,13 +784,35 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 
 .vn-bienvenida-video {
     width: 100%;
-    max-width: min(920px, 100%);
-    max-height: min(52vh, 420px);
+    max-width: min(1080px, 100%);
+    max-height: min(72dvh, 620px);
     object-fit: contain;
     border-radius: 18px;
     background: #000;
     box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
     display: block;
+}
+
+.vn-bienvenida-video-wrap.is-playing,
+.vn-video-stage.is-playing {
+    flex: 1 1 auto;
+    align-self: stretch;
+    width: 100%;
+    padding: 0;
+    justify-content: center;
+    background: transparent;
+    border-radius: 0;
+}
+
+.vn-bienvenida-video-wrap.is-playing .vn-bienvenida-video,
+.vn-video-stage.is-playing .vn-video-el {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: min(1080px, 100%);
+    max-height: min(72dvh, 100%);
+    height: auto;
+    min-height: 0;
+    margin: 0;
 }
 
 .vn-bienvenida-media.vn-video-stage {
@@ -1180,6 +1269,74 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     line-height: 1.4;
 }
 
+.vn-card--audio .vn-audio-stage {
+    background: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .28));
+    border-radius: 24px;
+    padding: 12px;
+}
+
+.vn-audio-stage {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+    position: relative;
+    text-align: center;
+}
+
+.vn-audio-stage [hidden] {
+    display: none !important;
+}
+
+.vn-audio-stage .vn-audio-btn {
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+.vn-card--audio .vn-audio-stage:not(.is-playing) {
+    flex: 1 1 auto;
+    min-height: 0;
+    align-self: stretch;
+}
+
+/* Audio + video: botón grande unificado (play, replay, done) */
+.vn-audio-stage .vn-audio-btn,
+.vn-video-btn--hero,
+.vn-card--video .vn-video-stage .vn-video-btn,
+.vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn {
+    width: min(360px, 80%);
+    min-height: clamp(190px, 36vh, 300px);
+    max-height: min(48vh, 320px);
+    flex: 1 1 auto;
+    margin: 0 auto;
+    padding: clamp(20px, 3.2vh, 28px) clamp(16px, 3.5vw, 28px);
+}
+
+.vn-audio-stage .vn-audio-btn-icon,
+.vn-video-btn--hero .vn-video-btn-icon,
+.vn-card--video .vn-video-stage .vn-video-btn-icon,
+.vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn-icon {
+    width: clamp(76px, 12vh, 96px);
+    height: clamp(76px, 12vh, 96px);
+    font-size: clamp(2rem, 4.2vh, 2.6rem);
+}
+
+.vn-audio-stage .vn-audio-btn-label,
+.vn-video-btn--hero .vn-video-btn-label,
+.vn-card--video .vn-video-stage .vn-video-btn-label,
+.vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn-label {
+    font-size: clamp(1.05rem, 2.2vh, 1.35rem);
+}
+
+.vn-audio-stage .vn-audio-status {
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
+}
+
 .vn-audio-btn {
     position: relative;
     display: flex;
@@ -1250,12 +1407,11 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-audio-status {
-    font-size: 2.2rem;
+    font-size: 1.35rem;
     font-weight: 800;
     color: #0369a1;
     margin: 8px 0 0;
     min-height: 1.4em;
-    margin-top: 50px;
 }
 
 .vn-audio-btn.is-playing {
@@ -1326,6 +1482,23 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     align-items: center;
     justify-content: center;
     width: 100%;
+    min-height: 0;
+}
+
+.vn-video-stage .vn-video-btn {
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+.vn-card--video .vn-video-stage:not(.is-playing),
+.vn-card--bienvenida .vn-bienvenida-video-wrap:not(.is-playing) {
+    flex: 1 1 auto;
+    min-height: 0;
+    align-self: stretch;
+}
+
+.vn-video-stage .vn-video-status {
+    display: none;
 }
 
 .vn-video-stage [hidden] {
@@ -1393,20 +1566,18 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 
 .vn-video-el {
     width: 100%;
-    max-height: 420px;
+    max-width: min(1080px, 100%);
+    max-height: min(72dvh, 620px);
     border-radius: 22px;
     background: #0f172a;
     box-shadow: 0 12px 28px rgba(15, 23, 42, .2);
     display: block;
     margin: 8px auto 0;
+    object-fit: contain;
 }
 
 .vn-video-status {
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: #be123c;
-    margin: 12px 0 0;
-    min-height: 1.4em;
+    display: none;
 }
 
 /* Imagen: tipografía legible en tablet */
@@ -1425,14 +1596,43 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     line-height: 1.4;
 }
 
-.vn-card--imagen .vn-media {
-    margin-top: 8px;
+.vn-card--imagen .vn-imagen-zoom {
+    margin-top: 4px;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    touch-action: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.vn-card--imagen .vn-media img {
-    max-height: 480px;
-    width: 100%;
+.vn-imagen-zoom-inner {
+    transform-origin: center center;
+    will-change: transform;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vn-card--imagen .vn-imagen-zoom img {
+    max-height: min(78dvh, 680px);
+    width: auto;
+    max-width: 100%;
     object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+.vn-imagen-zoom.is-zoomed {
+    cursor: grab;
+}
+
+.vn-imagen-zoom.is-zoomed:active {
+    cursor: grabbing;
 }
 
 /* Historia: tipografía + navegación Anterior/Siguiente */
@@ -1822,8 +2022,15 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 @keyframes vnEmotionFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-3px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
 }
 
 .vn-emocion-img {
@@ -2580,8 +2787,11 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     max-width: none;
 }
 
-.vn-card--dibujo .vn-evidencia-btn {
+.vn-card--dibujo .vn-evidencia-actions {
     margin: 16px auto 0;
+}
+
+.vn-card--dibujo .vn-evidencia-action {
     display: flex;
 }
 
@@ -2642,6 +2852,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     }
 
     @media (orientation: portrait) {
+
         .vn-match-cols,
         .vn-sort-board {
             grid-template-columns: 1fr;
@@ -2709,30 +2920,194 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-evidencia-btn {
+    position: relative;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 8px;
-    margin: 20px auto;
-    width: 120px;
-    height: 120px;
+    justify-content: center;
+    flex-shrink: 0;
+    width: clamp(148px, 24vh, 176px);
+    height: clamp(148px, 24vh, 176px);
+    margin: 0;
+    padding: 0;
+    border: 0;
     border-radius: 50%;
-    border: 6px solid #fff;
-    background: linear-gradient(180deg, #fb7185, #e11d48);
     color: #fff;
-    font-weight: 800;
-    font-size: .9rem;
     cursor: pointer;
-    box-shadow: 0 10px 0 #be123c, 0 16px 32px rgba(225, 29, 72, .35);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform .14s ease, box-shadow .14s ease, filter .14s ease;
+    overflow: visible;
 }
 
-.vn-evidencia-btn i {
-    font-size: 2rem;
+.vn-evidencia-btn-glow {
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    opacity: .55;
+    pointer-events: none;
+    transition: opacity .14s ease;
+}
+
+.vn-evidencia-btn-icon {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .2);
+    border: 2px solid rgba(255, 255, 255, .42);
+    box-shadow: inset 0 2px 8px rgba(255, 255, 255, .22);
+    font-size: 2.4rem;
+    line-height: 1;
+}
+
+.vn-evidencia-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(165deg, rgba(255, 255, 255, .34) 0%, rgba(255, 255, 255, 0) 48%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.vn-evidencia-btn--foto {
+    background: linear-gradient(155deg, #60a5fa 0%, #3b82f6 52%, #2563eb 100%);
+    box-shadow: 0 10px 0 #1d4ed8, 0 16px 28px rgba(37, 99, 235, .32);
+}
+
+.vn-evidencia-btn--foto .vn-evidencia-btn-glow {
+    background: radial-gradient(circle, rgba(96, 165, 250, .45) 0%, transparent 68%);
+}
+
+.vn-evidencia-btn--audio {
+    background: linear-gradient(155deg, #fb7185 0%, #f43f5e 52%, #e11d48 100%);
+    box-shadow: 0 10px 0 #be123c, 0 16px 28px rgba(225, 29, 72, .3);
+}
+
+.vn-evidencia-btn--audio .vn-evidencia-btn-glow {
+    background: radial-gradient(circle, rgba(251, 113, 133, .45) 0%, transparent 68%);
+}
+
+.vn-evidencia-btn--video {
+    background: linear-gradient(155deg, #c084fc 0%, #a855f7 52%, #9333ea 100%);
+    box-shadow: 0 10px 0 #7e22ce, 0 16px 28px rgba(147, 51, 234, .3);
+}
+
+.vn-evidencia-btn--video .vn-evidencia-btn-glow {
+    background: radial-gradient(circle, rgba(192, 132, 252, .45) 0%, transparent 68%);
+}
+
+.vn-evidencia-btn--seleccion {
+    background: linear-gradient(155deg, #4ade80 0%, #22c55e 52%, #16a34a 100%);
+    box-shadow: 0 10px 0 #15803d, 0 16px 28px rgba(22, 163, 74, .28);
+}
+
+.vn-evidencia-btn--seleccion .vn-evidencia-btn-glow {
+    background: radial-gradient(circle, rgba(74, 222, 128, .45) 0%, transparent 68%);
 }
 
 .vn-evidencia-btn:active {
-    transform: translateY(6px);
-    box-shadow: 0 4px 0 #be123c;
+    transform: translateY(5px);
+    filter: brightness(.98);
+}
+
+.vn-evidencia-btn--foto:active {
+    box-shadow: 0 4px 0 #1d4ed8, 0 8px 16px rgba(37, 99, 235, .24);
+}
+
+.vn-evidencia-btn--audio:active {
+    box-shadow: 0 4px 0 #be123c, 0 8px 16px rgba(225, 29, 72, .22);
+}
+
+.vn-evidencia-btn--video:active {
+    box-shadow: 0 4px 0 #7e22ce, 0 8px 16px rgba(147, 51, 234, .22);
+}
+
+.vn-evidencia-btn--seleccion:active {
+    box-shadow: 0 4px 0 #15803d, 0 8px 16px rgba(22, 163, 74, .2);
+}
+
+.vn-evidencia-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+}
+
+.vn-evidencia-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.vn-evidencia-action:has([data-vn-evidencia][hidden]) {
+    display: none;
+}
+
+.vn-evidencia-btn-label {
+    font-size: clamp(1.15rem, 2.4vh, 1.35rem);
+    font-weight: 800;
+    line-height: 1.2;
+    color: #334155;
+    letter-spacing: .01em;
+}
+
+.vn-evidencia-action:has(.vn-evidencia-btn--foto) .vn-evidencia-btn-label {
+    color: #1d4ed8;
+}
+
+.vn-evidencia-action:has(.vn-evidencia-btn--audio) .vn-evidencia-btn-label {
+    color: #be123c;
+}
+
+.vn-evidencia-action:has(.vn-evidencia-btn--video) .vn-evidencia-btn-label {
+    color: #7e22ce;
+}
+
+.vn-evidencia-action:has(.vn-evidencia-btn--seleccion) .vn-evidencia-btn-label {
+    color: #15803d;
+}
+
+.vn-evidencia-btn.vn-pulse-hint .vn-evidencia-btn-glow {
+    animation: vnEvidenciaGlow 1.6s ease-in-out infinite;
+}
+
+.vn-evidencia-btn.vn-pulse-hint {
+    animation: vnEvidenciaBtnPulse 1.6s ease-in-out infinite;
+}
+
+.vn-evidencia-captura-btn.vn-pulse-hint {
+    animation: vnEvidenciaCapturaPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes vnEvidenciaBtnPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+@keyframes vnEvidenciaGlow {
+    0%, 100% { opacity: .45; transform: scale(1); }
+    50% { opacity: .85; transform: scale(1.08); }
+}
+
+.vn-evidencia-btn.is-done,
+.vn-evidencia-btn:disabled {
+    opacity: .72;
+    cursor: not-allowed;
+    animation: none;
+    filter: grayscale(.15);
+}
+
+.vn-evidencia-btn.is-done .vn-evidencia-btn-glow,
+.vn-evidencia-btn:disabled .vn-evidencia-btn-glow {
+    animation: none;
+    opacity: 0;
 }
 
 /* Secuencia: tipografía + ordenar por arrastre */
@@ -3367,7 +3742,7 @@ body.rn-player-activo .vn-colorear-canvas,
     }
 }
 
-/* ── Imagen zoom ── */
+/* ── Imagen zoom (tap en bienvenida) ── */
 .vn-media-zoomable {
     cursor: zoom-in;
     transition: transform .25s ease;
@@ -3653,20 +4028,162 @@ body.rn-player-activo .vn-colorear-canvas,
 }
 
 /* ── Evidencia con cámara ── */
+.vn-card--evidencia {
+    text-align: center;
+}
+
+.vn-card--evidencia .vn-title {
+    font-size: 2.15rem;
+    margin-bottom: 8px;
+}
+
+.vn-card--evidencia .vn-instruccion {
+    font-size: 1.45rem;
+    padding: 18px 22px;
+    line-height: 1.4;
+}
+
+.vn-evidencia-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.vn-evidencia-wrap [hidden],
+.vn-evidencia-stage [hidden] {
+    display: none !important;
+}
+
 .vn-evidencia-stage {
-    margin: 0 auto 12px;
-    max-width: 360px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: min(640px, 100%);
+    flex: 1 1 auto;
+    min-height: 0;
     border-radius: 18px;
     overflow: hidden;
     background: #0f172a;
     box-shadow: 0 10px 24px rgba(15, 23, 42, .2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.vn-evidencia-preview {
+.vn-evidencia-preview,
+.vn-evidencia-result,
+.vn-evidencia-video-el {
     display: block;
     width: 100%;
-    max-height: 240px;
-    object-fit: cover;
+    max-height: min(52dvh, 420px);
+    object-fit: contain;
+    background: #020617;
+}
+
+.vn-evidencia-replay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: min(36dvh, 280px);
+    padding: 12px;
+}
+
+.vn-evidencia-replay--audio .vn-audio-btn,
+.vn-evidencia-replay--video .vn-video-btn--hero {
+    margin: 0 auto;
+}
+
+.vn-evidencia-video-stage {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.vn-evidencia-video-stage.is-playing .vn-evidencia-video-el {
+    display: block;
+    width: 100%;
+    max-height: min(52dvh, 420px);
+    border-radius: 18px;
+    object-fit: contain;
+    background: #020617;
+}
+
+.vn-evidencia-replay--video .vn-evidencia-video-el {
+    margin-top: 8px;
+}
+
+.vn-evidencia-btn,
+.vn-evidencia-captura-btn {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.vn-evidencia-recording {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    min-height: min(36dvh, 280px);
+    color: #fca5a5;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.vn-evidencia-recording i,
+.vn-evidencia-recording-icon {
+    font-size: clamp(3rem, 12vh, 4.5rem);
+    animation: vnEvidenciaRecPulse 1.1s ease-in-out infinite;
+}
+
+.vn-evidencia-contador {
+    font-size: clamp(1.75rem, 6vh, 2.25rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: #fecaca;
+    letter-spacing: 0.06em;
+}
+
+.vn-evidencia-estado {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #64748b;
+}
+
+.vn-evidencia-estado.is-grabando {
+    color: #f87171;
+}
+
+.vn-evidencia-estado.is-exito {
+    color: #34d399;
+}
+
+.vn-evidencia-estado.is-error {
+    color: #ef4444;
+}
+
+.vn-evidencia-hint {
+    margin: 0;
+    max-width: min(420px, 100%);
+    font-size: 1rem;
+    line-height: 1.35;
+    color: #64748b;
+    font-weight: 600;
+}
+
+@keyframes vnEvidenciaRecPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: .82; }
 }
 
 .vn-evidencia-preview-placeholder {
@@ -3675,32 +4192,68 @@ body.rn-player-activo .vn-colorear-canvas,
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 40px 20px;
+    width: 100%;
+    min-height: min(32dvh, 240px);
+    padding: 32px 20px;
     color: #34d399;
     font-size: 2rem;
     font-weight: 800;
 }
 
 .vn-evidencia-captura-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 0;
+    min-height: 54px;
+    padding: 0 22px 0 16px;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+    color: #b91c1c;
+    font-weight: 800;
+    font-size: 1.05rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, .25), 0 8px 20px rgba(15, 23, 42, .12);
+    transition: transform .14s ease, box-shadow .14s ease;
+}
+
+.vn-evidencia-captura-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    margin: 8px auto 0;
-    min-height: 52px;
-    padding: 0 24px;
-    border: 0;
-    border-radius: 999px;
-    background: #ef4444;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(155deg, #f87171, #ef4444 55%, #dc2626);
     color: #fff;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 5px 0 #b91c1c;
+    font-size: .85rem;
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, .25), 0 3px 0 #b91c1c;
+}
+
+.vn-evidencia-captura-label {
+    line-height: 1.1;
 }
 
 .vn-evidencia-captura-btn:active {
     transform: translateY(2px);
-    box-shadow: 0 2px 0 #b91c1c;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, .2), 0 4px 10px rgba(15, 23, 42, .1);
+}
+
+.vn-evidencia-captura-btn:active .vn-evidencia-captura-icon {
+    box-shadow: inset 0 1px 3px rgba(255, 255, 255, .2), 0 1px 0 #b91c1c;
+}
+
+@keyframes vnEvidenciaCapturaPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, .25), 0 8px 20px rgba(15, 23, 42, .12);
+    }
+    50% {
+        box-shadow: 0 0 0 7px rgba(239, 68, 68, .14), 0 8px 20px rgba(15, 23, 42, .12);
+    }
 }
 
 /* ── Recompensa ── */
@@ -3838,6 +4391,14 @@ body.rn-player-activo .vn-colorear-canvas,
         transform: scale(1.06);
         box-shadow: 0 8px 0 #0369a1, 0 0 0 12px rgba(56, 189, 248, 0);
     }
+}
+
+.vn-evidencia-btn.vn-pulse-hint {
+    animation: vnEvidenciaBtnPulse 1.6s ease-in-out infinite;
+}
+
+.vn-evidencia-captura-btn.vn-pulse-hint {
+    animation: vnEvidenciaCapturaPulse 1.4s ease-in-out infinite;
 }
 
 .vn-option--pop {
@@ -4020,21 +4581,16 @@ body.rn-player-activo .vn-colorear-canvas,
 
 .vn-bienvenida-video-wrap .vn-bienvenida-video {
     width: 100%;
-    max-height: 380px;
+    max-width: min(1080px, 100%);
+    max-height: min(72dvh, 620px);
     border-radius: 18px;
     background: #0f172a;
     margin: 0;
+    object-fit: contain;
 }
 
 .vn-bienvenida-video-wrap .vn-video-status {
-    width: 100%;
-    text-align: center;
-    margin-top: 8px;
-}
-
-.vn-bienvenida-play-btn {
-    margin: 0 auto;
-    flex-shrink: 0;
+    display: none;
 }
 
 /* Nivel transición */
@@ -4198,37 +4754,75 @@ body.rn-player-activo .vn-media {
     margin-bottom: clamp(8px, 1.4vh, 12px);
 }
 
-.rn-player .vn-media img,
+.rn-player .vn-media:not(.vn-imagen-zoom) img,
 .rn-player .vn-media video,
-body.vn-dispositivo .vn-media img,
+body.vn-dispositivo .vn-media:not(.vn-imagen-zoom) img,
 body.vn-dispositivo .vn-media video,
-body.rn-player-activo .vn-media img,
+body.rn-player-activo .vn-media:not(.vn-imagen-zoom) img,
 body.rn-player-activo .vn-media video {
     max-height: min(50dvh, 430px);
 }
 
-.rn-player .vn-card--imagen .vn-media img,
+.rn-player .vn-card--imagen .vn-imagen-zoom img,
+body.vn-dispositivo .vn-card--imagen .vn-imagen-zoom img,
+body.rn-player-activo .vn-card--imagen .vn-imagen-zoom img,
+#vnOverlay .vn-card--imagen .vn-imagen-zoom img {
+    max-height: min(78dvh, 100%);
+    width: auto;
+    max-width: 100%;
+}
+
 .rn-player .vn-card--historia .vn-historia-media img,
-body.vn-dispositivo .vn-card--imagen .vn-media img,
 body.vn-dispositivo .vn-card--historia .vn-historia-media img,
-body.rn-player-activo .vn-card--imagen .vn-media img,
 body.rn-player-activo .vn-card--historia .vn-historia-media img {
     max-height: min(48dvh, 410px);
 }
 
 .rn-player .vn-video-el,
 body.vn-dispositivo .vn-video-el,
-body.rn-player-activo .vn-video-el {
-    max-height: min(52dvh, 440px);
-    width: min(100%, 880px);
+body.rn-player-activo .vn-video-el,
+.rn-player .vn-bienvenida-video,
+body.vn-dispositivo .vn-bienvenida-video,
+body.rn-player-activo .vn-bienvenida-video {
+    max-height: min(72dvh, 100%);
+    width: min(100%, 1080px);
 }
 
 .rn-player .vn-audio-btn,
-.rn-player .vn-video-btn,
 body.vn-dispositivo .vn-audio-btn,
-body.vn-dispositivo .vn-video-btn,
-body.rn-player-activo .vn-audio-btn,
-body.rn-player-activo .vn-video-btn {
+body.rn-player-activo .vn-audio-btn {
+    width: clamp(190px, 30vw, 300px);
+    min-height: clamp(150px, 28vh, 220px);
+    margin: clamp(8px, 1.6vh, 16px) auto;
+    padding: clamp(18px, 3vh, 28px);
+}
+
+.rn-player .vn-audio-stage .vn-audio-btn,
+body.vn-dispositivo .vn-audio-stage .vn-audio-btn,
+body.rn-player-activo .vn-audio-stage .vn-audio-btn,
+#vnOverlay .vn-audio-stage .vn-audio-btn,
+.rn-player .vn-video-btn--hero,
+body.vn-dispositivo .vn-video-btn--hero,
+body.rn-player-activo .vn-video-btn--hero,
+.rn-player .vn-card--video .vn-video-stage .vn-video-btn,
+.rn-player .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn,
+body.vn-dispositivo .vn-card--video .vn-video-stage .vn-video-btn,
+body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn,
+body.rn-player-activo .vn-card--video .vn-video-stage .vn-video-btn,
+body.rn-player-activo .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn,
+#vnOverlay .vn-card--video .vn-video-stage .vn-video-btn,
+#vnOverlay .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn {
+    width: min(360px, 80%);
+    min-height: clamp(190px, 36vh, 300px);
+    max-height: min(48vh, 320px);
+    flex: 1 1 auto;
+    margin: 0 auto;
+    padding: clamp(20px, 3.2vh, 28px) clamp(16px, 3.5vw, 28px);
+}
+
+.rn-player .vn-video-btn:not(.vn-video-btn--hero),
+body.vn-dispositivo .vn-video-btn:not(.vn-video-btn--hero),
+body.rn-player-activo .vn-video-btn:not(.vn-video-btn--hero) {
     width: clamp(190px, 30vw, 300px);
     min-height: clamp(150px, 28vh, 220px);
     margin: clamp(8px, 1.6vh, 16px) auto;
@@ -4236,14 +4830,28 @@ body.rn-player-activo .vn-video-btn {
 }
 
 .rn-player .vn-audio-btn-icon,
-.rn-player .vn-video-btn-icon,
 body.vn-dispositivo .vn-audio-btn-icon,
-body.vn-dispositivo .vn-video-btn-icon,
-body.rn-player-activo .vn-audio-btn-icon,
-body.rn-player-activo .vn-video-btn-icon {
+body.rn-player-activo .vn-audio-btn-icon {
     width: clamp(66px, 9vw, 88px);
     height: clamp(66px, 9vw, 88px);
     font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+}
+
+.rn-player .vn-video-btn--hero .vn-video-btn-icon,
+body.vn-dispositivo .vn-video-btn--hero .vn-video-btn-icon,
+body.rn-player-activo .vn-video-btn--hero .vn-video-btn-icon,
+.rn-player .vn-card--video .vn-video-stage .vn-video-btn-icon,
+.rn-player .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn-icon,
+.rn-player .vn-card--audio .vn-audio-stage .vn-audio-btn-icon,
+body.vn-dispositivo .vn-card--video .vn-video-stage .vn-video-btn-icon,
+body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn-icon,
+body.vn-dispositivo .vn-card--audio .vn-audio-stage .vn-audio-btn-icon,
+body.rn-player-activo .vn-card--video .vn-video-stage .vn-video-btn-icon,
+body.rn-player-activo .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn-icon,
+body.rn-player-activo .vn-card--audio .vn-audio-stage .vn-audio-btn-icon {
+    width: clamp(76px, 12vh, 96px);
+    height: clamp(76px, 12vh, 96px);
+    font-size: clamp(2rem, 4.2vh, 2.6rem);
 }
 
 .rn-player .vn-options,
@@ -4590,18 +5198,21 @@ body.rn-player-activo .vn-zone-label {
 .rn-player .vn-card--imagen,
 .rn-player .vn-card--historia,
 .rn-player .vn-card--emocion,
+.rn-player .vn-card--evidencia,
 .rn-player .vn-card--recompensa,
 body.vn-dispositivo .vn-card--audio,
 body.vn-dispositivo .vn-card--video,
 body.vn-dispositivo .vn-card--imagen,
 body.vn-dispositivo .vn-card--historia,
 body.vn-dispositivo .vn-card--emocion,
+body.vn-dispositivo .vn-card--evidencia,
 body.vn-dispositivo .vn-card--recompensa,
 body.rn-player-activo .vn-card--audio,
 body.rn-player-activo .vn-card--video,
 body.rn-player-activo .vn-card--imagen,
 body.rn-player-activo .vn-card--historia,
 body.rn-player-activo .vn-card--emocion,
+body.rn-player-activo .vn-card--evidencia,
 body.rn-player-activo .vn-card--recompensa {
     padding-inline: clamp(12px, 3vw, 24px);
 }
@@ -4660,23 +5271,52 @@ body.rn-player-activo .rn-player.vn-nivel--jardin .vn-nav-meta span {
 
     .rn-player .vn-media img,
     .rn-player .vn-media video,
-    .rn-player .vn-video-el,
     body.vn-dispositivo .vn-media img,
     body.vn-dispositivo .vn-media video,
-    body.vn-dispositivo .vn-video-el,
     body.rn-player-activo .vn-media img,
-    body.rn-player-activo .vn-media video,
-    body.rn-player-activo .vn-video-el {
+    body.rn-player-activo .vn-media video {
         max-height: min(42dvh, 330px);
     }
 
+    .rn-player .vn-video-el,
+    .rn-player .vn-bienvenida-video,
+    body.vn-dispositivo .vn-video-el,
+    body.vn-dispositivo .vn-bienvenida-video,
+    body.rn-player-activo .vn-video-el,
+    body.rn-player-activo .vn-bienvenida-video {
+        max-height: min(58dvh, 100%);
+    }
+
+    .rn-player .vn-video-stage.is-playing .vn-video-el,
+    .rn-player .vn-bienvenida-video-wrap.is-playing .vn-bienvenida-video,
+    body.vn-dispositivo .vn-video-stage.is-playing .vn-video-el,
+    body.vn-dispositivo .vn-bienvenida-video-wrap.is-playing .vn-bienvenida-video,
+    body.rn-player-activo .vn-video-stage.is-playing .vn-video-el,
+    body.rn-player-activo .vn-bienvenida-video-wrap.is-playing .vn-bienvenida-video {
+        max-height: min(64dvh, 100%);
+    }
+
     .rn-player .vn-audio-btn,
-    .rn-player .vn-video-btn,
     body.vn-dispositivo .vn-audio-btn,
-    body.vn-dispositivo .vn-video-btn,
-    body.rn-player-activo .vn-audio-btn,
-    body.rn-player-activo .vn-video-btn {
+    body.rn-player-activo .vn-audio-btn {
         min-height: clamp(124px, 24vh, 168px);
+    }
+
+    .rn-player .vn-audio-stage .vn-audio-btn,
+    .rn-player .vn-video-btn--hero,
+    .rn-player .vn-card--video .vn-video-stage .vn-video-btn,
+    .rn-player .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn,
+    .rn-player .vn-card--audio .vn-audio-stage .vn-audio-btn,
+    body.vn-dispositivo .vn-video-btn--hero,
+    body.vn-dispositivo .vn-card--video .vn-video-stage .vn-video-btn,
+    body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn,
+    body.vn-dispositivo .vn-card--audio .vn-audio-stage .vn-audio-btn,
+    body.rn-player-activo .vn-video-btn--hero,
+    body.rn-player-activo .vn-card--video .vn-video-stage .vn-video-btn,
+    body.rn-player-activo .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn,
+    body.rn-player-activo .vn-card--audio .vn-audio-stage .vn-audio-btn {
+        min-height: clamp(170px, 34vh, 260px);
+        max-height: min(44vh, 300px);
     }
 
     .rn-player .vn-screen-nav,
@@ -4861,8 +5501,15 @@ body.rn-player-activo .vn-body--paint .vn-paint-swatch {
 }
 
 @keyframes vnNavReady {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.06); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.06);
+    }
 }
 
 .vn-tablet-screen .vn-nav-btn span,
@@ -4897,9 +5544,17 @@ body.vn-dispositivo .vn-nav-btn span,
 }
 
 @keyframes vnMatchLine {
-    0% { opacity: 0; }
-    28% { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+        opacity: 0;
+    }
+
+    28% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
 }
 
 .vn-seq-nums {
@@ -4949,33 +5604,39 @@ body.vn-dispositivo .vn-card--historia,
     overflow: visible;
 }
 
-body.vn-dispositivo .vn-card > .vn-title,
-body.vn-dispositivo .vn-card-body > .vn-title,
-.rn-player .vn-card > .vn-title,
-.rn-player .vn-card-body > .vn-title,
-#vnOverlay .vn-card > .vn-title,
-#vnOverlay .vn-card-body > .vn-title {
+body.vn-dispositivo .vn-card>.vn-title,
+body.vn-dispositivo .vn-card-body>.vn-title,
+.rn-player .vn-card>.vn-title,
+.rn-player .vn-card-body>.vn-title,
+#vnOverlay .vn-card>.vn-title,
+#vnOverlay .vn-card-body>.vn-title {
     flex-shrink: 0;
 }
 
-body.vn-dispositivo .vn-card > .vn-instruccion,
-body.vn-dispositivo .vn-card-body > .vn-instruccion,
-.rn-player .vn-card > .vn-instruccion,
-.rn-player .vn-card-body > .vn-instruccion,
-#vnOverlay .vn-card > .vn-instruccion,
-#vnOverlay .vn-card-body > .vn-instruccion {
+body.vn-dispositivo .vn-card>.vn-instruccion,
+body.vn-dispositivo .vn-card-body>.vn-instruccion,
+.rn-player .vn-card>.vn-instruccion,
+.rn-player .vn-card-body>.vn-instruccion,
+#vnOverlay .vn-card>.vn-instruccion,
+#vnOverlay .vn-card-body>.vn-instruccion {
     flex-shrink: 0;
 }
 
 /* Narrativos: media llena el alto restante */
+body.vn-dispositivo .vn-card--audio .vn-audio-stage,
 body.vn-dispositivo .vn-card--video .vn-video-stage,
-body.vn-dispositivo .vn-card--imagen .vn-media,
+body.vn-dispositivo .vn-card--imagen .vn-imagen-zoom,
 body.vn-dispositivo .vn-card--historia .vn-historia-libro,
 body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-media,
+.rn-player .vn-card--audio .vn-audio-stage,
 .rn-player .vn-card--video .vn-video-stage,
-.rn-player .vn-card--imagen .vn-media,
+.rn-player .vn-card--imagen .vn-imagen-zoom,
 .rn-player .vn-card--historia .vn-historia-libro,
-.rn-player .vn-card--bienvenida .vn-bienvenida-media {
+.rn-player .vn-card--bienvenida .vn-bienvenida-media,
+#vnOverlay .vn-card--audio .vn-audio-stage,
+#vnOverlay .vn-card--video .vn-video-stage,
+#vnOverlay .vn-card--imagen .vn-imagen-zoom,
+#vnOverlay .vn-card--bienvenida .vn-bienvenida-media {
     flex: 1 1 auto;
     min-height: 0;
     display: flex;
@@ -4984,27 +5645,49 @@ body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-media,
     justify-content: center;
 }
 
-body.vn-dispositivo .vn-card--imagen .vn-media img,
+body.vn-dispositivo .vn-card--imagen .vn-imagen-zoom img,
 body.vn-dispositivo .vn-card--historia .vn-historia-media img,
 body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-media img,
 body.vn-dispositivo .vn-video-el,
-.rn-player .vn-card--imagen .vn-media img,
+body.vn-dispositivo .vn-bienvenida-video,
+.rn-player .vn-card--imagen .vn-imagen-zoom img,
 .rn-player .vn-card--historia .vn-historia-media img,
-.rn-player .vn-video-el {
-    max-height: min(52dvh, 100%);
+.rn-player .vn-video-el,
+.rn-player .vn-bienvenida-video,
+#vnOverlay .vn-card--imagen .vn-imagen-zoom img,
+#vnOverlay .vn-video-el,
+#vnOverlay .vn-bienvenida-video {
+    max-height: min(78dvh, 100%);
     width: auto;
     max-width: 100%;
     object-fit: contain;
 }
 
-body.vn-dispositivo .vn-card--audio .vn-audio-btn,
-body.vn-dispositivo .vn-card--video .vn-video-btn,
-.rn-player .vn-card--audio .vn-audio-btn,
-.rn-player .vn-card--video .vn-video-btn {
+body.vn-dispositivo .vn-video-stage.is-playing .vn-video-el,
+body.vn-dispositivo .vn-bienvenida-video-wrap.is-playing .vn-bienvenida-video,
+.rn-player .vn-video-stage.is-playing .vn-video-el,
+.rn-player .vn-bienvenida-video-wrap.is-playing .vn-bienvenida-video,
+#vnOverlay .vn-video-stage.is-playing .vn-video-el,
+#vnOverlay .vn-bienvenida-video-wrap.is-playing .vn-bienvenida-video {
+    width: 100%;
+    max-width: min(1080px, 100%);
+    max-height: min(74dvh, 100%);
+}
+
+body.vn-dispositivo .vn-card--audio .vn-audio-stage .vn-audio-btn,
+body.vn-dispositivo .vn-card--video .vn-video-stage .vn-video-btn,
+body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn,
+.rn-player .vn-card--audio .vn-audio-stage .vn-audio-btn,
+.rn-player .vn-card--video .vn-video-stage .vn-video-btn,
+.rn-player .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn,
+#vnOverlay .vn-card--audio .vn-audio-stage .vn-audio-btn,
+#vnOverlay .vn-card--video .vn-video-stage .vn-video-btn,
+#vnOverlay .vn-card--bienvenida .vn-bienvenida-video-wrap .vn-video-btn {
     flex: 1 1 auto;
-    width: min(380px, 70%);
-    min-height: clamp(180px, 38vh, 280px);
-    max-height: 320px;
+    width: min(360px, 80%);
+    min-height: clamp(190px, 36vh, 300px);
+    max-height: min(48vh, 320px);
+    margin: 0 auto;
 }
 
 body.vn-dispositivo .vn-card--historia .vn-historia-nav,
@@ -5037,36 +5720,88 @@ body.vn-dispositivo .vn-ra-scanner,
     width: min(420px, 70%);
 }
 
-body.vn-dispositivo .vn-evidencia-stage,
-.rn-player .vn-evidencia-stage {
+body.vn-dispositivo .vn-evidencia-wrap,
+.rn-player .vn-evidencia-wrap,
+#vnOverlay .vn-evidencia-wrap {
     flex: 1 1 auto;
-    max-width: min(640px, 86%);
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+body.vn-dispositivo .vn-evidencia-stage,
+.rn-player .vn-evidencia-stage,
+#vnOverlay .vn-evidencia-stage {
+    flex: 1 1 auto;
+    max-width: min(720px, 92%);
     width: 100%;
     min-height: 0;
 }
 
 body.vn-dispositivo .vn-evidencia-preview,
-.rn-player .vn-evidencia-preview {
-    max-height: min(42dvh, 360px);
+body.vn-dispositivo .vn-evidencia-result,
+body.vn-dispositivo .vn-evidencia-video-el,
+.rn-player .vn-evidencia-preview,
+.rn-player .vn-evidencia-result,
+.rn-player .vn-evidencia-video-el,
+#vnOverlay .vn-evidencia-preview,
+#vnOverlay .vn-evidencia-result,
+#vnOverlay .vn-evidencia-video-el {
+    max-height: min(50dvh, 440px);
     width: 100%;
+}
+
+body.vn-dispositivo .vn-evidencia-recording,
+.rn-player .vn-evidencia-recording,
+#vnOverlay .vn-evidencia-recording {
+    min-height: min(40dvh, 320px);
 }
 
 body.vn-dispositivo .vn-evidencia-captura-btn,
 body.vn-dispositivo .vn-ra-listo-btn,
 .rn-player .vn-evidencia-captura-btn,
-.rn-player .vn-ra-listo-btn {
+.rn-player .vn-ra-listo-btn,
+#vnOverlay .vn-evidencia-captura-btn,
+#vnOverlay .vn-ra-listo-btn {
     min-height: clamp(64px, 9vh, 84px);
     min-width: clamp(160px, 28vw, 280px);
     font-size: 1.2rem;
 }
 
 body.vn-dispositivo .vn-evidencia-btn,
-.rn-player .vn-evidencia-btn {
-    width: clamp(128px, 20vh, 168px);
-    height: clamp(128px, 20vh, 168px);
+.rn-player .vn-evidencia-btn,
+#vnOverlay .vn-evidencia-btn {
+    width: clamp(160px, 28vh, 192px);
+    height: clamp(160px, 28vh, 192px);
     min-width: 0;
     min-height: 0;
-    font-size: 1.05rem;
+}
+
+body.vn-dispositivo .vn-evidencia-btn-icon,
+.rn-player .vn-evidencia-btn-icon,
+#vnOverlay .vn-evidencia-btn-icon {
+    width: clamp(84px, 12vh, 96px);
+    height: clamp(84px, 12vh, 96px);
+    font-size: clamp(2.2rem, 6.5vh, 2.75rem);
+}
+
+body.vn-dispositivo .vn-evidencia-btn-label,
+.rn-player .vn-evidencia-btn-label,
+#vnOverlay .vn-evidencia-btn-label {
+    font-size: clamp(1.15rem, 2.6vh, 1.35rem);
+}
+
+body.vn-dispositivo .vn-evidencia-replay .vn-audio-btn,
+body.vn-dispositivo .vn-evidencia-replay .vn-video-btn--hero,
+.rn-player .vn-evidencia-replay .vn-audio-btn,
+.rn-player .vn-evidencia-replay .vn-video-btn--hero,
+#vnOverlay .vn-evidencia-replay .vn-audio-btn,
+#vnOverlay .vn-evidencia-replay .vn-video-btn--hero {
+    width: min(320px, 78%);
+    min-height: 220px;
 }
 
 /* Evaluativos: grids que gastan el alto */
@@ -5266,6 +6001,7 @@ body.vn-dispositivo .vn-seq-card,
 }
 
 @media (orientation: portrait) {
+
     body.vn-dispositivo .vn-puzzle,
     .rn-player .vn-puzzle {
         flex-direction: column;
@@ -5295,6 +6031,7 @@ body.vn-dispositivo .vn-seq-card,
 }
 
 @media (orientation: landscape) {
+
     body.vn-dispositivo .vn-sort-board,
     .rn-player .vn-sort-board,
     body.rn-player-activo .vn-sort-board {
@@ -5309,6 +6046,7 @@ body.vn-dispositivo .vn-seq-card,
 }
 
 @media (max-height: 720px) and (orientation: landscape) {
+
     body.vn-dispositivo .vn-title,
     .rn-player .vn-title {
         font-size: clamp(1.2rem, 3.2vh, 1.7rem);
@@ -5454,134 +6192,128 @@ body.vn-dispositivo .vn-card-body,
     width: 100%;
 }
 
-body.vn-dispositivo .vn-card-body > .vn-title,
-body.vn-dispositivo .vn-card-body > .vn-instruccion,
-body.vn-dispositivo .vn-card-body > .vn-paso-badge,
-body.vn-dispositivo .vn-card-body > .vn-hint-tap,
-body.vn-dispositivo .vn-card-body > .vn-hint-drag,
-body.vn-dispositivo .vn-card-body > .vn-puzzle-meta,
-body.vn-dispositivo .vn-card-body > .vn-seq-nums,
-body.vn-dispositivo .vn-card-body > .vn-historia-progress,
-body.vn-dispositivo .vn-card-body > .vn-hero-emoji,
-body.vn-dispositivo .vn-card-body > .vn-bienvenida-hero,
-body.vn-dispositivo .vn-card-body > .vn-pregunta-head,
-body.vn-dispositivo .vn-card-body > .vn-reto-head,
-body.vn-dispositivo .vn-card-body > .vn-juego-head,
-body.vn-dispositivo .vn-card-body > .vn-paint-head,
-body.vn-dispositivo .vn-card-body > .vn-pregunta-media,
-body.vn-dispositivo .vn-card-body > .vn-reto-pregunta,
-body.vn-dispositivo .vn-card-body > .vn-memory-score,
-.rn-player .vn-card-body > .vn-title,
-.rn-player .vn-card-body > .vn-instruccion,
-.rn-player .vn-card-body > .vn-paso-badge,
-.rn-player .vn-card-body > .vn-hint-tap,
-.rn-player .vn-card-body > .vn-hint-drag,
-.rn-player .vn-card-body > .vn-puzzle-meta,
-.rn-player .vn-card-body > .vn-seq-nums,
-.rn-player .vn-card-body > .vn-historia-progress,
-.rn-player .vn-card-body > .vn-hero-emoji,
-.rn-player .vn-card-body > .vn-bienvenida-hero,
-.rn-player .vn-card-body > .vn-pregunta-head,
-.rn-player .vn-card-body > .vn-reto-head,
-.rn-player .vn-card-body > .vn-juego-head,
-.rn-player .vn-card-body > .vn-paint-head,
-.rn-player .vn-card-body > .vn-pregunta-media,
-.rn-player .vn-card-body > .vn-reto-pregunta,
-.rn-player .vn-card-body > .vn-memory-score,
-#vnOverlay .vn-card-body > .vn-title,
-#vnOverlay .vn-card-body > .vn-instruccion,
-#vnOverlay .vn-card-body > .vn-paso-badge,
-#vnOverlay .vn-card-body > .vn-hint-tap,
-#vnOverlay .vn-card-body > .vn-hint-drag,
-#vnOverlay .vn-card-body > .vn-puzzle-meta,
-#vnOverlay .vn-card-body > .vn-seq-nums,
-#vnOverlay .vn-card-body > .vn-historia-progress,
-#vnOverlay .vn-card-body > .vn-hero-emoji,
-#vnOverlay .vn-card-body > .vn-bienvenida-hero,
-#vnOverlay .vn-card-body > .vn-pregunta-head,
-#vnOverlay .vn-card-body > .vn-reto-head,
-#vnOverlay .vn-card-body > .vn-juego-head,
-#vnOverlay .vn-card-body > .vn-paint-head,
-#vnOverlay .vn-card-body > .vn-pregunta-media,
-#vnOverlay .vn-card-body > .vn-reto-pregunta,
-#vnOverlay .vn-card-body > .vn-memory-score {
+body.vn-dispositivo .vn-card-body>.vn-title,
+body.vn-dispositivo .vn-card-body>.vn-instruccion,
+body.vn-dispositivo .vn-card-body>.vn-paso-badge,
+body.vn-dispositivo .vn-card-body>.vn-hint-tap,
+body.vn-dispositivo .vn-card-body>.vn-hint-drag,
+body.vn-dispositivo .vn-card-body>.vn-puzzle-meta,
+body.vn-dispositivo .vn-card-body>.vn-seq-nums,
+body.vn-dispositivo .vn-card-body>.vn-historia-progress,
+body.vn-dispositivo .vn-card-body>.vn-hero-emoji,
+body.vn-dispositivo .vn-card-body>.vn-bienvenida-hero,
+body.vn-dispositivo .vn-card-body>.vn-pregunta-head,
+body.vn-dispositivo .vn-card-body>.vn-reto-head,
+body.vn-dispositivo .vn-card-body>.vn-juego-head,
+body.vn-dispositivo .vn-card-body>.vn-paint-head,
+body.vn-dispositivo .vn-card-body>.vn-pregunta-media,
+body.vn-dispositivo .vn-card-body>.vn-reto-pregunta,
+body.vn-dispositivo .vn-card-body>.vn-memory-score,
+.rn-player .vn-card-body>.vn-title,
+.rn-player .vn-card-body>.vn-instruccion,
+.rn-player .vn-card-body>.vn-paso-badge,
+.rn-player .vn-card-body>.vn-hint-tap,
+.rn-player .vn-card-body>.vn-hint-drag,
+.rn-player .vn-card-body>.vn-puzzle-meta,
+.rn-player .vn-card-body>.vn-seq-nums,
+.rn-player .vn-card-body>.vn-historia-progress,
+.rn-player .vn-card-body>.vn-hero-emoji,
+.rn-player .vn-card-body>.vn-bienvenida-hero,
+.rn-player .vn-card-body>.vn-pregunta-head,
+.rn-player .vn-card-body>.vn-reto-head,
+.rn-player .vn-card-body>.vn-juego-head,
+.rn-player .vn-card-body>.vn-paint-head,
+.rn-player .vn-card-body>.vn-pregunta-media,
+.rn-player .vn-card-body>.vn-reto-pregunta,
+.rn-player .vn-card-body>.vn-memory-score,
+#vnOverlay .vn-card-body>.vn-title,
+#vnOverlay .vn-card-body>.vn-instruccion,
+#vnOverlay .vn-card-body>.vn-paso-badge,
+#vnOverlay .vn-card-body>.vn-hint-tap,
+#vnOverlay .vn-card-body>.vn-hint-drag,
+#vnOverlay .vn-card-body>.vn-puzzle-meta,
+#vnOverlay .vn-card-body>.vn-seq-nums,
+#vnOverlay .vn-card-body>.vn-historia-progress,
+#vnOverlay .vn-card-body>.vn-hero-emoji,
+#vnOverlay .vn-card-body>.vn-bienvenida-hero,
+#vnOverlay .vn-card-body>.vn-pregunta-head,
+#vnOverlay .vn-card-body>.vn-reto-head,
+#vnOverlay .vn-card-body>.vn-juego-head,
+#vnOverlay .vn-card-body>.vn-paint-head,
+#vnOverlay .vn-card-body>.vn-pregunta-media,
+#vnOverlay .vn-card-body>.vn-reto-pregunta,
+#vnOverlay .vn-card-body>.vn-memory-score {
     flex-shrink: 0;
 }
 
-body.vn-dispositivo .vn-card-body > .vn-options,
-body.vn-dispositivo .vn-card-body > .vn-match-cols,
-body.vn-dispositivo .vn-card-body > .vn-sort-board,
-body.vn-dispositivo .vn-card-body > .vn-emociones,
-body.vn-dispositivo .vn-card-body > .vn-memory,
-body.vn-dispositivo .vn-card-body > .vn-puzzle,
-body.vn-dispositivo .vn-card-body > .vn-secuencia,
-body.vn-dispositivo .vn-card-body > .vn-paint,
-body.vn-dispositivo .vn-card-body > .vn-video-stage,
-body.vn-dispositivo .vn-card-body > .vn-media,
-body.vn-dispositivo .vn-card-body > .vn-audio-btn,
-body.vn-dispositivo .vn-card-body > .vn-video-btn,
-body.vn-dispositivo .vn-card-body > .vn-ra-stage,
-body.vn-dispositivo .vn-card-body > .vn-evidencia-stage,
-body.vn-dispositivo .vn-card-body > .vn-historia-libro,
-body.vn-dispositivo .vn-card-body > .vn-bienvenida-media,
-body.vn-dispositivo .vn-card-body > .vn-reward,
-.rn-player .vn-card-body > .vn-options,
-.rn-player .vn-card-body > .vn-match-cols,
-.rn-player .vn-card-body > .vn-sort-board,
-.rn-player .vn-card-body > .vn-emociones,
-.rn-player .vn-card-body > .vn-memory,
-.rn-player .vn-card-body > .vn-puzzle,
-.rn-player .vn-card-body > .vn-secuencia,
-.rn-player .vn-card-body > .vn-paint,
-.rn-player .vn-card-body > .vn-video-stage,
-.rn-player .vn-card-body > .vn-media,
-.rn-player .vn-card-body > .vn-audio-btn,
-.rn-player .vn-card-body > .vn-video-btn,
-.rn-player .vn-card-body > .vn-ra-stage,
-.rn-player .vn-card-body > .vn-evidencia-stage,
-.rn-player .vn-card-body > .vn-historia-libro,
-.rn-player .vn-card-body > .vn-bienvenida-media,
-.rn-player .vn-card-body > .vn-reward,
-#vnOverlay .vn-card-body > .vn-options,
-#vnOverlay .vn-card-body > .vn-match-cols,
-#vnOverlay .vn-card-body > .vn-sort-board,
-#vnOverlay .vn-card-body > .vn-emociones,
-#vnOverlay .vn-card-body > .vn-memory,
-#vnOverlay .vn-card-body > .vn-puzzle,
-#vnOverlay .vn-card-body > .vn-secuencia,
-#vnOverlay .vn-card-body > .vn-paint,
-#vnOverlay .vn-card-body > .vn-video-stage,
-#vnOverlay .vn-card-body > .vn-media,
-#vnOverlay .vn-card-body > .vn-audio-btn,
-#vnOverlay .vn-card-body > .vn-video-btn,
-#vnOverlay .vn-card-body > .vn-ra-stage,
-#vnOverlay .vn-card-body > .vn-evidencia-stage,
-#vnOverlay .vn-card-body > .vn-historia-libro,
-#vnOverlay .vn-card-body > .vn-bienvenida-media,
-#vnOverlay .vn-card-body > .vn-reward {
+body.vn-dispositivo .vn-card-body>.vn-options,
+body.vn-dispositivo .vn-card-body>.vn-match-cols,
+body.vn-dispositivo .vn-card-body>.vn-sort-board,
+body.vn-dispositivo .vn-card-body>.vn-emociones,
+body.vn-dispositivo .vn-card-body>.vn-memory,
+body.vn-dispositivo .vn-card-body>.vn-puzzle,
+body.vn-dispositivo .vn-card-body>.vn-secuencia,
+body.vn-dispositivo .vn-card-body>.vn-paint,
+body.vn-dispositivo .vn-card-body>.vn-video-stage,
+body.vn-dispositivo .vn-card-body>.vn-audio-stage,
+body.vn-dispositivo .vn-card-body>.vn-media,
+body.vn-dispositivo .vn-card-body>.vn-evidencia-wrap,
+body.vn-dispositivo .vn-card-body>.vn-ra-stage,
+body.vn-dispositivo .vn-card-body>.vn-historia-libro,
+body.vn-dispositivo .vn-card-body>.vn-bienvenida-media,
+body.vn-dispositivo .vn-card-body>.vn-reward,
+.rn-player .vn-card-body>.vn-options,
+.rn-player .vn-card-body>.vn-match-cols,
+.rn-player .vn-card-body>.vn-sort-board,
+.rn-player .vn-card-body>.vn-emociones,
+.rn-player .vn-card-body>.vn-memory,
+.rn-player .vn-card-body>.vn-puzzle,
+.rn-player .vn-card-body>.vn-secuencia,
+.rn-player .vn-card-body>.vn-paint,
+.rn-player .vn-card-body>.vn-video-stage,
+.rn-player .vn-card-body>.vn-audio-stage,
+.rn-player .vn-card-body>.vn-media,
+.rn-player .vn-card-body>.vn-evidencia-wrap,
+.rn-player .vn-card-body>.vn-ra-stage,
+.rn-player .vn-card-body>.vn-historia-libro,
+.rn-player .vn-card-body>.vn-bienvenida-media,
+.rn-player .vn-card-body>.vn-reward,
+#vnOverlay .vn-card-body>.vn-options,
+#vnOverlay .vn-card-body>.vn-match-cols,
+#vnOverlay .vn-card-body>.vn-sort-board,
+#vnOverlay .vn-card-body>.vn-emociones,
+#vnOverlay .vn-card-body>.vn-memory,
+#vnOverlay .vn-card-body>.vn-puzzle,
+#vnOverlay .vn-card-body>.vn-secuencia,
+#vnOverlay .vn-card-body>.vn-paint,
+#vnOverlay .vn-card-body>.vn-video-stage,
+#vnOverlay .vn-card-body>.vn-audio-stage,
+#vnOverlay .vn-card-body>.vn-media,
+#vnOverlay .vn-card-body>.vn-evidencia-wrap,
+#vnOverlay .vn-card-body>.vn-ra-stage,
+#vnOverlay .vn-card-body>.vn-historia-libro,
+#vnOverlay .vn-card-body>.vn-bienvenida-media,
+#vnOverlay .vn-card-body>.vn-reward {
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
 }
 
-body.vn-dispositivo .vn-card-body > .vn-historia-nav,
-body.vn-dispositivo .vn-card-body > .vn-evidencia-btn,
-body.vn-dispositivo .vn-card-body > .vn-evidencia-captura-btn,
-body.vn-dispositivo .vn-card-body > .vn-ra-listo-btn,
-body.vn-dispositivo .vn-card-body > .vn-feedback,
-body.vn-dispositivo .vn-card-body > #vnFb,
-.rn-player .vn-card-body > .vn-historia-nav,
-.rn-player .vn-card-body > .vn-evidencia-btn,
-.rn-player .vn-card-body > .vn-evidencia-captura-btn,
-.rn-player .vn-card-body > .vn-ra-listo-btn,
-.rn-player .vn-card-body > .vn-feedback,
-.rn-player .vn-card-body > #vnFb,
-#vnOverlay .vn-card-body > .vn-historia-nav,
-#vnOverlay .vn-card-body > .vn-evidencia-btn,
-#vnOverlay .vn-card-body > .vn-evidencia-captura-btn,
-#vnOverlay .vn-card-body > .vn-ra-listo-btn,
-#vnOverlay .vn-card-body > .vn-feedback,
-#vnOverlay .vn-card-body > #vnFb {
+body.vn-dispositivo .vn-card-body>.vn-historia-nav,
+body.vn-dispositivo .vn-card-body>.vn-evidencia-msg,
+body.vn-dispositivo .vn-card-body>.vn-ra-listo-btn,
+body.vn-dispositivo .vn-card-body>.vn-feedback,
+body.vn-dispositivo .vn-card-body>#vnFb,
+.rn-player .vn-card-body>.vn-historia-nav,
+.rn-player .vn-card-body>.vn-evidencia-msg,
+.rn-player .vn-card-body>.vn-ra-listo-btn,
+.rn-player .vn-card-body>.vn-feedback,
+.rn-player .vn-card-body>#vnFb,
+#vnOverlay .vn-card-body>.vn-historia-nav,
+#vnOverlay .vn-card-body>.vn-evidencia-msg,
+#vnOverlay .vn-card-body>.vn-ra-listo-btn,
+#vnOverlay .vn-card-body>.vn-feedback,
+#vnOverlay .vn-card-body>#vnFb {
     flex-shrink: 0;
 }
 
@@ -5840,6 +6572,7 @@ body.vn-dispositivo .vn-card--reto .vn-feedback,
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .vn-card,
     .vn-nav-next.vn-nav-ready,
     .vn-pulse-hint,

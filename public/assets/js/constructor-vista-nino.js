@@ -25,22 +25,102 @@
         return $('#vnDispositivo').length > 0;
     }
 
+    function playerEstaActivo() {
+        const $player = $('#vnDispositivo');
+        if (!$player.length) return false;
+        return !$player.prop('hidden') && String($player.attr('aria-hidden')) !== 'true';
+    }
+
+    function overlayEstaAbierto() {
+        return $overlay.length > 0 && !$overlay.prop('hidden');
+    }
+
+    function resolverUrlExperienciaTpl() {
+        if (urlExperienciaTpl) return urlExperienciaTpl;
+        const desdeApp = String($('#rnApp').data('url-experiencia') || '').trim();
+        if (desdeApp) urlExperienciaTpl = desdeApp;
+        return urlExperienciaTpl;
+    }
+
+    function resolverExperienciaIdActiva() {
+        if (experienciaIdActiva) return experienciaIdActiva;
+        const desdeRoot = $root && $root.length ? $root.data('experiencia-id') : null;
+        if (desdeRoot) {
+            experienciaIdActiva = desdeRoot;
+            return experienciaIdActiva;
+        }
+        const desdeMeta = window.CxConstructor && typeof window.CxConstructor.getMeta === 'function'
+            ? window.CxConstructor.getMeta().experienciaId
+            : null;
+        if (desdeMeta) {
+            experienciaIdActiva = desdeMeta;
+            return experienciaIdActiva;
+        }
+        return null;
+    }
+
+    function urlFetchExperiencia(id) {
+        const tpl = resolverUrlExperienciaTpl();
+        if (!tpl || !id) return '';
+        const base = String(tpl).replace('__ID__', String(id));
+        return base + (base.includes('?') ? '&' : '?') + '_=' + Date.now();
+    }
+
+    function fetchExperienciaDesdeServidor(id) {
+        const url = urlFetchExperiencia(id);
+        if (!url) {
+            return $.Deferred().reject({ message: 'No hay URL de experiencia configurada.' }).promise();
+        }
+        return $.ajax({
+            url,
+            method: 'GET',
+            dataType: 'json',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
+    }
+
     function vincularElementos() {
-        $root = esModoDispositivo() ? $('#vnDispositivo') : $('.cx-app').first();
-        $body = $('#vnScreenBody');
-        $progress = $('#vnProgress');
-        $stepLabel = $('#vnStepLabel');
-        $title = $('#vnTitle');
-        $blockName = $('#vnBlockName');
-        $btnPrev = $('#vnBtnPrev');
-        $btnNext = $('#vnBtnNext');
+        const $player = $('#vnDispositivo');
+        if ($overlay.length && overlayEstaAbierto()) {
+            $root = $overlay;
+        } else if ($player.length && playerEstaActivo()) {
+            $root = $player;
+        } else if ($player.length && String($player.data('vn-defer') || '') === '1') {
+            $root = $player;
+        } else {
+            $root = $('.cx-app').first();
+        }
+        $body = $root.find('.vn-screen-body').first();
+        if (!$body.length) {
+            $body = $('#vnDispositivo .vn-screen-body, #vnOverlay .vn-screen-body').first();
+        }
+        $progress = $root.find('#vnProgress').first();
+        if (!$progress.length) $progress = $('#vnProgress').first();
+        $stepLabel = $root.find('#vnStepLabel').first();
+        if (!$stepLabel.length) $stepLabel = $('#vnStepLabel').first();
+        $title = $root.find('#vnTitle').first();
+        if (!$title.length) $title = $('#vnTitle').first();
+        $blockName = $root.find('#vnBlockName').first();
+        if (!$blockName.length) $blockName = $('#vnBlockName').first();
+        $btnPrev = $root.find('#vnBtnPrev').first();
+        if (!$btnPrev.length) $btnPrev = $('#vnBtnPrev').first();
+        $btnNext = $root.find('#vnBtnNext').first();
+        if (!$btnNext.length) $btnNext = $('#vnBtnNext').first();
         $tablet = $('#vnTablet');
         $stage = $('#vnTabletStage');
-        $btnFullscreen = $('#vnBtnFullscreen');
+        $btnFullscreen = $root.find('#vnBtnFullscreen').first();
+        if (!$btnFullscreen.length) $btnFullscreen = $('#vnBtnFullscreen').first();
     }
 
     function onBody(events, selector, handler) {
-        $(document).on(events + '.vnBody', '#vnScreenBody ' + selector, handler);
+        $(document).on(
+            events + '.vnBody',
+            '#vnDispositivo #vnScreenBody ' + selector + ', #vnOverlay #vnScreenBody ' + selector,
+            handler
+        );
     }
 
     vincularElementos();
@@ -63,6 +143,9 @@
     let paintListeners = [];
     let resizeTimer = null;
     let alTerminarExperiencia = null;
+    let experienciaIdActiva = null;
+    let urlExperienciaTpl = '';
+    let evidenciaSesion = 0;
 
     const PAINT_SIZE_MAP = { s: 6, m: 12, l: 22 };
     const PAINT_DEFAULT_COLORS = [
@@ -337,6 +420,127 @@
 
     /* ── Renderers ───────────────────────────────────────────── */
 
+    function etiquetaVideoPlay() {
+        return configNivel().simplificar ? '¡Toca!' : 'Toca para ver';
+    }
+
+    function etiquetaVideoReplay() {
+        return configNivel().simplificar ? '¡Otra vez!' : 'Toca para ver otra vez';
+    }
+
+    function htmlBotonEvidenciaAudio(attrs) {
+        const label = configNivel().simplificar ? '¡Escucha!' : 'Toca para escuchar';
+        return `<button type="button" class="vn-audio-btn vn-evidencia-replay-btn" ${attrs}>
+            <span class="vn-audio-btn-ring" aria-hidden="true"></span>
+            <span class="vn-audio-waves" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            <span class="vn-audio-btn-icon"><i class="fa-solid fa-play"></i></span>
+            <span class="vn-audio-btn-label">${escapar(label)}</span>
+        </button>`;
+    }
+
+    function setEvidenciaAudioUi(refs, estado) {
+        const $btn = refs.$audioPlayBtn;
+        if (!$btn || !$btn.length) return;
+        const $icon = $btn.find('.vn-audio-btn-icon');
+        const $label = $btn.find('.vn-audio-btn-label');
+        $btn.removeClass('is-playing is-done');
+        if (estado === 'playing') {
+            $btn.addClass('is-playing');
+            $icon.html('<i class="fa-solid fa-volume-high"></i>');
+            $label.text(configNivel().simplificar ? 'Sonando…' : 'Escuchando…');
+            return;
+        }
+        $icon.html('<i class="fa-solid fa-play"></i>');
+        $label.text(configNivel().simplificar ? '¡Escucha!' : 'Toca para escuchar');
+    }
+
+    function detenerEvidenciaReplay(refs) {
+        if (!refs) return;
+        if (refs.$audioEl && refs.$audioEl.length) {
+            try {
+                refs.$audioEl[0].pause();
+                refs.$audioEl[0].currentTime = 0;
+                refs.$audioEl[0].onended = null;
+            } catch (e) { /* noop */ }
+        }
+        if (refs.$videoEl && refs.$videoEl.length) {
+            try {
+                refs.$videoEl[0].pause();
+                refs.$videoEl[0].currentTime = 0;
+                refs.$videoEl[0].onended = null;
+            } catch (e) { /* noop */ }
+        }
+        setEvidenciaAudioUi(refs, 'idle');
+        if (refs.$videoPlayBtn && refs.$videoPlayBtn.length) {
+            setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'idle');
+        }
+    }
+
+    function reproducirEvidenciaAudio(refs) {
+        const audio = refs.$audioEl && refs.$audioEl[0];
+        if (!audio || !refs.$audioPlayBtn || !refs.$audioPlayBtn.length) return;
+        if (refs.$audioPlayBtn.hasClass('is-playing')) {
+            audio.pause();
+            setEvidenciaAudioUi(refs, 'idle');
+            return;
+        }
+        setEvidenciaAudioUi(refs, 'playing');
+        try { audio.currentTime = 0; } catch (e) { /* noop */ }
+        audio.onended = function () { setEvidenciaAudioUi(refs, 'idle'); };
+        const p = audio.play();
+        if (p && typeof p.catch === 'function') {
+            p.catch(function () { setEvidenciaAudioUi(refs, 'idle'); });
+        }
+    }
+
+    function reproducirEvidenciaVideo(refs) {
+        const video = refs.$videoEl && refs.$videoEl[0];
+        if (!video || !refs.$videoPlayBtn || !refs.$videoPlayBtn.length) return;
+        setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'playing');
+        try { video.currentTime = 0; } catch (e) { /* noop */ }
+        video.muted = false;
+        video.onended = function () {
+            setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'done');
+        };
+        const p = video.play();
+        if (p && typeof p.catch === 'function') {
+            p.catch(function () {
+                setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'idle');
+                refs.$videoPlayBtn.addClass('vn-pulse-hint');
+            });
+        }
+    }
+
+    function htmlBotonVideo(attrs) {
+        return `<button type="button" class="vn-video-btn vn-video-btn--hero vn-pulse-hint" ${attrs}>
+            <span class="vn-video-btn-ring" aria-hidden="true"></span>
+            <span class="vn-video-btn-icon"><i class="fa-solid fa-play"></i></span>
+            <span class="vn-video-btn-label">${escapar(etiquetaVideoPlay())}</span>
+        </button>`;
+    }
+
+    function setVideoBotonEstado($btn, $wrap, $video, estado) {
+        if (!$btn || !$btn.length) return;
+        $btn.removeClass('is-playing is-done');
+        if (estado === 'playing') {
+            $btn.removeClass('vn-pulse-hint').prop('hidden', true);
+            if ($wrap && $wrap.length) $wrap.addClass('is-playing');
+            if ($video && $video.length) $video.prop('hidden', false);
+            return;
+        }
+        if ($wrap && $wrap.length) $wrap.removeClass('is-playing');
+        $btn.prop('hidden', false);
+        if (estado === 'done') {
+            $btn.addClass('is-done');
+            $btn.find('.vn-video-btn-icon').html('<i class="fa-solid fa-rotate-right"></i>');
+            $btn.find('.vn-video-btn-label').text(etiquetaVideoReplay());
+        } else {
+            $btn.find('.vn-video-btn-icon').html('<i class="fa-solid fa-play"></i>');
+            $btn.find('.vn-video-btn-label').text(etiquetaVideoPlay());
+        }
+        if ($video && $video.length) $video.prop('hidden', true);
+    }
+
     function renderBienvenida(bloque) {
         const d = datos(bloque);
         const personaje = (d.personaje || 'personaje') !== 'ninguno';
@@ -355,15 +559,9 @@
             if (vidUrl) {
                 mediaHtml = `
                     <div class="vn-bienvenida-media vn-video-stage vn-bienvenida-video-wrap" data-vn-bienvenida-video-wrap>
-                        <button type="button" class="vn-video-btn vn-bienvenida-play-btn vn-pulse-hint"
-                            data-vn-bienvenida-play aria-label="Reproducir video de bienvenida">
-                            <span class="vn-video-btn-ring" aria-hidden="true"></span>
-                            <span class="vn-video-btn-icon"><i class="fa-solid fa-play"></i></span>
-                            <span class="vn-video-btn-label">${configNivel().simplificar ? '¡Toca!' : 'Toca para ver'}</span>
-                        </button>
+                        ${htmlBotonVideo('data-vn-bienvenida-play aria-label="Reproducir video de bienvenida"')}
                         <video class="vn-video-el vn-bienvenida-video" playsinline preload="auto"
                             src="${escapar(vidUrl)}" hidden aria-label="Video de bienvenida"></video>
-                        <p class="vn-video-status" data-vn-bienvenida-status hidden>Reproduciendo…</p>
                     </div>`;
             }
         }
@@ -394,15 +592,17 @@
         return wrap(`
             <h2 class="vn-title">${tituloBloque('audio', 'Escucha')}</h2>
             ${instruccionHtml(d.instruccion)}
-            <button type="button" class="vn-audio-btn vn-pulse-hint" data-vn-audio-play
-                data-reps="${escapar(reps)}" aria-label="Reproducir audio">
-                <span class="vn-audio-btn-ring" aria-hidden="true"></span>
-                <span class="vn-audio-waves" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-                <span class="vn-audio-btn-icon"><i class="fa-solid fa-play"></i></span>
-                <span class="vn-audio-btn-label">${configNivel().simplificar ? '¡Toca!' : 'Toca para escuchar'}</span>
-            </button>
-            <p class="vn-audio-status" data-vn-audio-status hidden>Sonando…</p>
-            <audio class="vn-audio-el" preload="auto" src="${escapar(url)}" hidden></audio>
+            <div class="vn-audio-stage" data-vn-audio-stage>
+                <button type="button" class="vn-audio-btn vn-pulse-hint" data-vn-audio-play
+                    data-reps="${escapar(reps)}" aria-label="Reproducir audio">
+                    <span class="vn-audio-btn-ring" aria-hidden="true"></span>
+                    <span class="vn-audio-waves" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                    <span class="vn-audio-btn-icon"><i class="fa-solid fa-play"></i></span>
+                    <span class="vn-audio-btn-label">${configNivel().simplificar ? '¡Toca!' : 'Toca para escuchar'}</span>
+                </button>
+                <p class="vn-audio-status" data-vn-audio-status hidden>Sonando…</p>
+                <audio class="vn-audio-el" preload="auto" src="${escapar(url)}" hidden></audio>
+            </div>
         `, bloque, 'audio');
     }
 
@@ -421,28 +621,26 @@
             <h2 class="vn-title">${tituloBloque('video', 'Mira el video')}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-video-stage" data-vn-video-stage>
-                <button type="button" class="vn-video-btn vn-pulse-hint" data-vn-video-play aria-label="Reproducir video">
-                    <span class="vn-video-btn-ring" aria-hidden="true"></span>
-                    <span class="vn-video-btn-icon"><i class="fa-solid fa-play"></i></span>
-                    <span class="vn-video-btn-label">${configNivel().simplificar ? '¡Toca!' : 'Toca para ver'}</span>
-                </button>
+                ${htmlBotonVideo('data-vn-video-play aria-label="Reproducir video"')}
                 <video class="vn-video-el" playsinline preload="metadata" src="${escapar(url)}" hidden></video>
-                <p class="vn-video-status" data-vn-video-status hidden>Reproduciendo…</p>
             </div>
         `, bloque, 'video');
     }
 
     function renderImagen(bloque) {
         const d = datos(bloque);
-        const img = imgTag(d.archivo, d.descripcion || 'Imagen');
-        const imgHtml = img
-            ? img.replace('class="vn-media"', 'class="vn-media vn-media-zoomable"')
+        const url = mediaUrl(d.archivo);
+        const imgHtml = url
+            ? `<div class="vn-media vn-imagen-zoom" data-vn-imagen-zoom>
+                <div class="vn-imagen-zoom-inner">
+                    <img src="${escapar(url)}" alt="${escapar(d.descripcion || 'Imagen')}" draggable="false">
+                </div>
+            </div>`
             : '<p class="vn-empty">Sin imagen</p>';
         return wrap(`
             <h2 class="vn-title">${tituloBloque('imagen', 'Observa')}</h2>
             ${instruccionHtml(d.instruccion)}
             ${imgHtml}
-            ${img ? `<p class="vn-hint-tap">${configNivel().simplificar ? '¡Toca!' : 'Toca la imagen para agrandarla'}</p>` : ''}
         `, bloque, 'imagen');
     }
 
@@ -653,8 +851,8 @@
                 <h2 class="vn-title">${configNivel().simplificar ? '¡Magia!' : 'Realidad aumentada'}</h2>
                 ${instruccionHtml(d.instruccion)}
                 <p class="vn-ra-hint">${configNivel().simplificar
-                    ? '¡Apunta la tablet!'
-                    : escapar(d.contenido || 'Animación 3D')}</p>
+                ? '¡Apunta la tablet!'
+                : escapar(d.contenido || 'Animación 3D')}</p>
                 <button type="button" class="vn-ra-listo-btn vn-pulse-hint" data-vn-ra-listo>
                     <i class="fa-solid fa-check"></i>
                     ${configNivel().simplificar ? '¡Lo vi!' : 'Ya vi el marcador'}
@@ -663,33 +861,86 @@
         `, bloque, 'ra');
     }
 
+    function evidenciaTipoKey(tipo) {
+        const t = String(tipo || 'Foto').toLowerCase();
+        if (t.includes('audio')) return 'audio';
+        if (t.includes('video')) return 'video';
+        if (t.includes('selección') || t.includes('seleccion')) return 'seleccion';
+        return 'foto';
+    }
+
     function renderEvidencia(bloque) {
         const d = datos(bloque);
         const tipo = d.tipo || 'Foto';
-        const tipoKey = tipo.includes('Audio') ? 'audio' : (tipo.includes('Video') ? 'video' : 'foto');
-        const icon = tipoKey === 'audio' ? 'fa-microphone' : (tipoKey === 'video' ? 'fa-video' : 'fa-camera');
+        const tipoKey = evidenciaTipoKey(tipo);
+        const icon = tipoKey === 'audio' ? 'fa-microphone'
+            : (tipoKey === 'video' ? 'fa-video'
+                : (tipoKey === 'seleccion' ? 'fa-image' : 'fa-camera'));
         const label = configNivel().simplificar
-            ? (tipoKey === 'audio' ? '¡Graba!' : (tipoKey === 'video' ? '¡Graba!' : '¡Foto!'))
+            ? (tipoKey === 'seleccion' ? '¡Elige!' : (tipoKey === 'audio' ? '¡Graba!' : (tipoKey === 'video' ? '¡Graba!' : '¡Foto!')))
             : tipo;
+        const capturaLabel = configNivel().simplificar
+            ? '¡Ya!'
+            : (tipoKey === 'foto' ? 'Capturar' : 'Detener');
+        const fileAccept = tipoKey === 'video' ? 'video/*' : 'image/*';
+        const fileCapture = (tipoKey === 'video' || tipoKey === 'foto') ? 'environment' : '';
+        const hintNativo = (window.VnCaptura && window.VnCaptura.hayNativo())
+            ? (tipoKey === 'audio'
+                ? (configNivel().simplificar ? 'Toca para grabar tu voz.' : 'Se abrirá el micrófono del dispositivo.')
+                : (tipoKey === 'video'
+                    ? (configNivel().simplificar ? 'Toca para grabar.' : 'Se abrirá la cámara para grabar (máx. 45 s).')
+                    : (configNivel().simplificar ? 'Toca para tomar foto.' : 'Se abrirá la cámara del dispositivo.')))
+            : '';
         return wrap(`
             <h2 class="vn-title">${tituloBloque('evidencia', '¡Tu evidencia!')}</h2>
             ${instruccionHtml(d.instruccion)}
-            <div class="vn-evidencia-stage" data-vn-evidencia-stage hidden>
-                <video class="vn-evidencia-preview" playsinline muted hidden></video>
-                <div class="vn-evidencia-preview-placeholder" hidden>
-                    <i class="fa-solid ${icon}"></i>
-                    <span>¡Listo!</span>
+            <div class="vn-evidencia-wrap">
+                <div class="vn-evidencia-stage" data-vn-evidencia-stage hidden>
+                    <video class="vn-evidencia-preview" playsinline webkit-playsinline muted hidden></video>
+                    <img class="vn-evidencia-result" alt="" hidden>
+                    <div class="vn-evidencia-replay vn-evidencia-replay--audio" data-vn-evidencia-replay="audio" hidden>
+                        ${htmlBotonEvidenciaAudio('data-vn-evidencia-audio-play aria-label="Escuchar evidencia"')}
+                        <audio class="vn-evidencia-audio-el" playsinline hidden></audio>
+                    </div>
+                    <div class="vn-evidencia-replay vn-evidencia-replay--video" data-vn-evidencia-replay="video" hidden>
+                        <div class="vn-video-stage vn-evidencia-video-stage" data-vn-evidencia-video-stage>
+                            ${htmlBotonVideo('data-vn-evidencia-video-play aria-label="Ver evidencia"')}
+                            <video class="vn-evidencia-video-el vn-video-el" playsinline hidden></video>
+                        </div>
+                    </div>
+                    <div class="vn-evidencia-recording" hidden>
+                        <i class="fa-solid fa-microphone vn-evidencia-recording-icon"></i>
+                        <span class="vn-evidencia-recording-label">${configNivel().simplificar ? '¡Graba!' : 'Grabando…'}</span>
+                        <div class="vn-evidencia-contador" hidden aria-hidden="true">00:00</div>
+                    </div>
+                    <div class="vn-evidencia-preview-placeholder" hidden>
+                        <i class="fa-solid ${icon}"></i>
+                        <span>¡Listo!</span>
+                    </div>
                 </div>
+                <p class="vn-evidencia-estado" data-vn-evidencia-estado hidden aria-live="polite"></p>
+                <input type="file" class="vn-evidencia-file" data-vn-evidencia-file
+                    accept="${escapar(fileAccept)}"${fileCapture ? ' capture="' + fileCapture + '"' : ''} hidden>
+                <div class="vn-evidencia-actions">
+                    <div class="vn-evidencia-action">
+                        <button type="button"
+                            class="vn-evidencia-btn vn-evidencia-btn--${escapar(tipoKey)} vn-pulse-hint"
+                            data-vn-evidencia data-vn-evidencia-tipo="${escapar(tipoKey)}"
+                            aria-label="${escapar(label)}">
+                            <span class="vn-evidencia-btn-glow" aria-hidden="true"></span>
+                            <span class="vn-evidencia-btn-icon"><i class="fa-solid ${icon}" aria-hidden="true"></i></span>
+                        </button>
+                        <span class="vn-evidencia-btn-label">${escapar(label)}</span>
+                    </div>
+                    <button type="button" class="vn-evidencia-captura-btn vn-pulse-hint" data-vn-evidencia-captura hidden
+                        aria-label="${escapar(capturaLabel)}">
+                        <span class="vn-evidencia-captura-icon" aria-hidden="true"><i class="fa-solid fa-stop"></i></span>
+                        <span class="vn-evidencia-captura-label" data-vn-evidencia-captura-label>${escapar(capturaLabel)}</span>
+                    </button>
+                </div>
+                ${hintNativo ? `<p class="vn-evidencia-hint">${escapar(hintNativo)}</p>` : ''}
             </div>
-            <button type="button" class="vn-evidencia-btn vn-pulse-hint" data-vn-evidencia data-vn-evidencia-tipo="${escapar(tipoKey)}">
-                <i class="fa-solid ${icon}"></i>
-                <span>${escapar(label)}</span>
-            </button>
-            <button type="button" class="vn-evidencia-captura-btn vn-pulse-hint" data-vn-evidencia-captura hidden>
-                <i class="fa-solid fa-circle"></i>
-                <span>${configNivel().simplificar ? '¡Ya!' : 'Capturar'}</span>
-            </button>
-            <div id="vnEvidenciaMsg" class="vn-feedback is-ok" hidden>${configNivel().simplificar ? '¡Listo!' : '¡Muy bien! Tu evidencia quedó lista.'}</div>
+            <div class="vn-evidencia-msg vn-feedback is-ok" id="vnEvidenciaMsg" hidden>${configNivel().simplificar ? '¡Listo!' : '¡Muy bien! Tu evidencia quedó lista.'}</div>
         `, bloque, 'evidencia');
     }
 
@@ -1135,10 +1386,10 @@
             ? `<div class="vn-reto-meta">${mostrarNombre
                 ? `<span class="vn-reto-nombre">${escapar(nombreReto)}</span>`
                 : ''}${mostrarBadge
-                ? `<span class="vn-paso-badge">${configNivel().simplificar
-                    ? `${retoPaso + 1} / ${pasos.length}`
-                    : `Paso ${retoPaso + 1} de ${pasos.length}`}</span>`
-                : ''}</div>`
+                    ? `<span class="vn-paso-badge">${configNivel().simplificar
+                        ? `${retoPaso + 1} / ${pasos.length}`
+                        : `Paso ${retoPaso + 1} de ${pasos.length}`}</span>`
+                    : ''}</div>`
             : '';
         const ops = (paso.opciones || []).map((op, i) => {
             let inner = '';
@@ -1176,13 +1427,13 @@
             ${instruccionHtml(d.instruccion)}
             <div class="vn-emociones" data-vn-emocion data-count="${n}" data-sexo="${escapar(resolverSexoEmocion())}">
                 ${list.map((id) => {
-                    const label = emocionLabel(id);
-                    const imgUrl = emocionImgUrl(id);
-                    return `<button type="button" class="vn-emocion vn-pulse-hint" data-id="${escapar(id)}">
+            const label = emocionLabel(id);
+            const imgUrl = emocionImgUrl(id);
+            return `<button type="button" class="vn-emocion vn-pulse-hint" data-id="${escapar(id)}">
                         <img class="vn-emocion-img" src="${escapar(imgUrl)}" alt="${escapar(label)}">
                         <span class="vn-emocion-label">${escapar(label)}</span>
                     </button>`;
-                }).join('')}
+        }).join('')}
             </div>
         `, bloque, 'emocion');
     }
@@ -1262,8 +1513,8 @@
     }
 
     function overlayAbierto() {
-        if (esModoDispositivo()) return true;
-        return !$overlay.prop('hidden');
+        if (playerEstaActivo()) return true;
+        return overlayEstaAbierto();
     }
 
     function ajustarEscalaTablet() {
@@ -1423,11 +1674,13 @@
     }
 
     function pintar() {
+        vincularElementos();
         if (typeof limpiarDragArrastrar === 'function') limpiarDragArrastrar();
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
         limpiarSeleccionPuzzle();
         if (typeof limpiarDragSecuencia === 'function') limpiarDragSecuencia();
         if (typeof limpiarPaint === 'function') limpiarPaint();
+        limpiarEvidenciaRecursos();
         cancelarAvanceAutomatico();
         detenerVoz();
         historiaAnimando = false;
@@ -1731,7 +1984,9 @@
             case 'historia':
                 return historiaPage >= totalPaginasHistoria(bloque) - 1 && !!$body.data('vn-bloque-visto');
             case 'evidencia':
-                return !$('#vnEvidenciaMsg').prop('hidden');
+                return $body.find('.vn-evidencia-msg').filter(function () {
+                    return !$(this).prop('hidden');
+                }).length > 0;
             case 'pregunta':
                 return !!$body.find('[data-vn-pregunta]').data('locked');
             case 'reto': {
@@ -2284,6 +2539,9 @@
         if (bloque.tipo === 'video') {
             setVideoUi('idle');
         }
+        if (bloque.tipo === 'imagen') {
+            initImagenZoom();
+        }
         if (bloque.tipo === 'historia') {
             if (historiaPage !== 0) $body.find('.vn-instruccion').hide();
             const texto = String(datos(bloque).instruccion || '').trim();
@@ -2307,6 +2565,103 @@
             iniciarInstruccionBloque(bloque);
         }
         actualizarNavBloque();
+    }
+
+    function initImagenZoom() {
+        const viewport = $body.find('[data-vn-imagen-zoom]')[0];
+        if (!viewport) return;
+
+        const inner = viewport.querySelector('.vn-imagen-zoom-inner');
+        if (!inner) return;
+
+        const MIN_SCALE = 1;
+        const MAX_SCALE = 4;
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let pinchStartDist = 0;
+        let pinchStartScale = 1;
+        let panStartX = 0;
+        let panStartY = 0;
+        let panOriginX = 0;
+        let panOriginY = 0;
+        let isPanning = false;
+        let marcoZoom = false;
+
+        function distancia(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.hypot(dx, dy);
+        }
+
+        function aplicarTransform() {
+            inner.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+            viewport.classList.toggle('is-zoomed', scale > 1.02);
+        }
+
+        function resetZoom() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            aplicarTransform();
+        }
+
+        function marcarSiZoom() {
+            if (!marcoZoom && scale > 1.05) {
+                marcoZoom = true;
+                marcarBloqueVisto();
+            }
+        }
+
+        viewport.addEventListener('touchstart', function (e) {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                pinchStartDist = distancia(e.touches);
+                pinchStartScale = scale;
+                isPanning = false;
+            } else if (e.touches.length === 1 && scale > 1.02) {
+                isPanning = true;
+                panStartX = e.touches[0].clientX;
+                panStartY = e.touches[0].clientY;
+                panOriginX = translateX;
+                panOriginY = translateY;
+            }
+        }, { passive: false });
+
+        viewport.addEventListener('touchmove', function (e) {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                if (pinchStartDist <= 0) return;
+                scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, pinchStartScale * (distancia(e.touches) / pinchStartDist)));
+                aplicarTransform();
+                marcarSiZoom();
+            } else if (e.touches.length === 1 && isPanning && scale > 1.02) {
+                e.preventDefault();
+                translateX = panOriginX + (e.touches[0].clientX - panStartX);
+                translateY = panOriginY + (e.touches[0].clientY - panStartY);
+                aplicarTransform();
+            }
+        }, { passive: false });
+
+        viewport.addEventListener('touchend', function (e) {
+            if (e.touches.length < 2) pinchStartDist = 0;
+            if (e.touches.length === 0) {
+                isPanning = false;
+                if (scale <= 1.02) resetZoom();
+            }
+        });
+
+        viewport.addEventListener('wheel', function (e) {
+            if (!e.ctrlKey) return;
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.12 : 0.12;
+            scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale + delta));
+            if (scale <= 1.02) resetZoom();
+            else {
+                aplicarTransform();
+                marcarSiZoom();
+            }
+        }, { passive: false });
     }
 
     function detenerAudioHistoria() {
@@ -2428,6 +2783,13 @@
                 this.onended = null;
             } catch (e) { /* noop */ }
         });
+        $body.find('[data-vn-bienvenida-video-wrap]').removeClass('is-playing');
+        const $btnBien = $body.find('[data-vn-bienvenida-play]');
+        const $wrapBien = $body.find('[data-vn-bienvenida-video-wrap]');
+        const $videoBien = $body.find('.vn-bienvenida-video');
+        if ($btnBien.length) {
+            setVideoBotonEstado($btnBien, $wrapBien, $videoBien, 'idle');
+        }
         const video = $body.find('.vn-video-el').not('.vn-bienvenida-video')[0];
         if (video) {
             try {
@@ -2442,28 +2804,15 @@
     function setVideoUi(estado) {
         const $btn = $body.find('[data-vn-video-play]');
         const $video = $body.find('.vn-video-el').not('.vn-bienvenida-video');
-        const $status = $body.find('[data-vn-video-status]');
+        const $stage = $body.find('[data-vn-video-stage]');
         if (!$btn.length && !$video.length) return;
-        $btn.removeClass('is-playing is-done');
-        if (estado === 'playing') {
-            $btn.removeClass('vn-pulse-hint').prop('hidden', true);
-            $video.prop('hidden', false);
-            $status.prop('hidden', false).text('Reproduciendo…');
-        } else if (estado === 'done') {
-            $btn.prop('hidden', false).addClass('is-done');
-            $btn.find('.vn-video-btn-icon').html('<i class="fa-solid fa-rotate-right"></i>');
-            $btn.find('.vn-video-btn-label').text('Toca para ver otra vez');
-            $video.prop('hidden', true);
-            $status.prop('hidden', false).text('¡Listo!');
+        if (estado === 'done') {
+            setVideoBotonEstado($btn, $stage, $video, 'done');
             celebrarExito(false);
             alCompletarActividad();
-        } else {
-            $btn.prop('hidden', false);
-            $btn.find('.vn-video-btn-icon').html('<i class="fa-solid fa-play"></i>');
-            $btn.find('.vn-video-btn-label').text('Toca para ver');
-            $video.prop('hidden', true);
-            $status.prop('hidden', true);
+            return;
         }
+        setVideoBotonEstado($btn, $stage, $video, estado === 'playing' ? 'playing' : 'idle');
     }
 
     function pulsarBotonVideoBienvenida() {
@@ -2478,19 +2827,18 @@
     function reproducirVideoBienvenida() {
         const video = $body.find('.vn-bienvenida-video')[0];
         const $btn = $body.find('[data-vn-bienvenida-play]');
-        const $status = $body.find('[data-vn-bienvenida-status]');
+        const $wrap = $body.find('[data-vn-bienvenida-video-wrap]');
+        const $video = $body.find('.vn-bienvenida-video');
         if (!video) {
             marcarBloqueVisto();
             return;
         }
         detenerVoz();
-        $btn.removeClass('vn-pulse-hint').prop('hidden', true);
-        $status.prop('hidden', false).text('Reproduciendo…');
-        video.hidden = false;
+        setVideoBotonEstado($btn, $wrap, $video, 'playing');
         try { video.currentTime = 0; } catch (e) { /* noop */ }
         video.onended = function () {
             $body.data('vn-bienvenida-video-ok', true);
-            $status.text('¡Listo!');
+            setVideoBotonEstado($btn, $wrap, $video, 'done');
             celebrarExito(false);
             alCompletarActividad();
         };
@@ -2503,9 +2851,8 @@
                 if (!conMuted) {
                     intentar(true);
                 } else {
-                    $btn.prop('hidden', false).addClass('vn-pulse-hint');
-                    $status.prop('hidden', true);
-                    video.hidden = true;
+                    setVideoBotonEstado($btn, $wrap, $video, 'idle');
+                    $btn.addClass('vn-pulse-hint');
                 }
             });
         };
@@ -2551,6 +2898,161 @@
         ir(1);
     }
 
+    function reiniciarSecuenciaPlayer() {
+        index = 0;
+        historiaPage = 0;
+        retoPaso = 0;
+        intentosRestantes = null;
+        if ($body && $body.length) {
+            $body.removeData('vn-bloque-visto vn-bienvenida-video-ok');
+        }
+    }
+
+    function aplicarPayloadExperiencia(payload) {
+        bloques = Array.isArray(payload.bloques) ? payload.bloques : [];
+        mediaBase = payload.mediaBase || payload.media_base || mediaBase;
+        experienciaNombre = payload.experienciaNombre
+            || payload.nombre
+            || payload.experiencia?.nombre
+            || experienciaNombre;
+        if (payload.experienciaId || payload.experiencia?.id) {
+            experienciaIdActiva = payload.experienciaId || payload.experiencia.id;
+            if ($root && $root.length) {
+                $root.attr('data-experiencia-id', experienciaIdActiva);
+            }
+        }
+    }
+
+    function notificarExperienciaRecargada() {
+        $(document).trigger('vn:experiencia-recargada', [{
+            id: experienciaIdActiva,
+            bloques: bloques.map((b) => ({ ...b, datos: { ...(b.datos || {}) } })),
+            mediaBase,
+            nombre: experienciaNombre,
+        }]);
+    }
+
+    function recargarVistaNino() {
+        vincularElementos();
+        if (!overlayAbierto()) return;
+
+        const $btn = $('#vnBtnRecargar');
+        $btn.prop('disabled', true).addClass('is-loading');
+
+        const finalizar = function () {
+            $btn.prop('disabled', false).removeClass('is-loading');
+        };
+
+        const terminarRecarga = function () {
+            reiniciarSecuenciaPlayer();
+            pintar();
+            requestAnimationFrame(function () {
+                programarAjusteLayout();
+            });
+            finalizar();
+        };
+
+        limpiarMediosPlayer();
+
+        const api = window.CxConstructor;
+        const puedeUsarConstructor = overlayEstaAbierto()
+            && api
+            && typeof api.getBloques === 'function';
+
+        if (puedeUsarConstructor) {
+            aplicarPayloadExperiencia({
+                bloques: api.getBloques() || [],
+                mediaBase: api.getMeta ? api.getMeta().mediaBase : mediaBase,
+                experienciaNombre: api.getMeta ? api.getMeta().nombre : experienciaNombre,
+                experienciaId: api.getMeta ? api.getMeta().experienciaId : experienciaIdActiva,
+            });
+            if (!bloques.length) {
+                const urlListar = String($('.cx-app').data('url-listar') || '').trim();
+                if (urlListar) {
+                    $.ajax({
+                        url: urlListar + (urlListar.includes('?') ? '&' : '?') + '_=' + Date.now(),
+                        method: 'GET',
+                        dataType: 'json',
+                        headers: {
+                            Accept: 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    }).done(function (res) {
+                        const lista = res?.data?.bloques || res?.bloques || [];
+                        if (!lista.length) {
+                            const msg = 'No hay bloques para recargar.';
+                            if (window.Swal) Swal.fire({ icon: 'info', title: 'Sin bloques', text: msg });
+                            else window.alert(msg);
+                            finalizar();
+                            return;
+                        }
+                        aplicarPayloadExperiencia({
+                            bloques: lista,
+                            mediaBase: $('.cx-app').data('media-base') || mediaBase,
+                            experienciaNombre: $('.cx-app').data('experiencia-nombre') || experienciaNombre,
+                            experienciaId: $('.cx-app').data('experiencia-id') || experienciaIdActiva,
+                        });
+                        terminarRecarga();
+                    }).fail(function (xhr) {
+                        const msg = xhr?.responseJSON?.message || 'No se pudo recargar la experiencia.';
+                        if (window.Swal) Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                        else window.alert(msg);
+                        finalizar();
+                    });
+                    return;
+                }
+                const msg = 'Agrega bloques a la secuencia para previsualizar.';
+                if (window.Swal) Swal.fire({ icon: 'info', title: 'Sin bloques', text: msg });
+                else window.alert(msg);
+                finalizar();
+                return;
+            }
+            terminarRecarga();
+            return;
+        }
+
+        const expId = resolverExperienciaIdActiva();
+        if (playerEstaActivo() && expId && resolverUrlExperienciaTpl()) {
+            fetchExperienciaDesdeServidor(expId).done(function (res) {
+                if (!res?.success || !res?.data?.bloques?.length) {
+                    const msg = res?.message || 'No se pudo recargar la experiencia.';
+                    if (window.Swal) Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                    else window.alert(msg);
+                    return;
+                }
+                aplicarPayloadExperiencia({
+                    bloques: res.data.bloques,
+                    mediaBase: res.data.media_base,
+                    experiencia: res.data.experiencia,
+                    experienciaId: res.data.experiencia?.id || expId,
+                });
+                if ($root && $root.length) {
+                    $root.attr('data-experiencia-id', experienciaIdActiva);
+                }
+                terminarRecarga();
+                notificarExperienciaRecargada();
+            }).fail(function (xhr) {
+                const msg = xhr?.responseJSON?.message
+                    || xhr?.responseJSON?.mensaje
+                    || xhr?.message
+                    || 'No se pudo recargar la experiencia.';
+                if (window.Swal) Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                else window.alert(msg);
+            }).always(finalizar);
+            return;
+        }
+
+        if (bloques.length) {
+            terminarRecarga();
+            return;
+        }
+
+        const msg = 'No hay una experiencia activa para recargar.';
+        if (window.Swal) Swal.fire({ icon: 'info', title: 'Recargar', text: msg });
+        else window.alert(msg);
+        finalizar();
+    }
+
     function abrir() {
         if (esModoDispositivo()) return;
         if (window.speechSynthesis) {
@@ -2563,6 +3065,7 @@
             const meta = api.getMeta ? api.getMeta() : {};
             mediaBase = meta.mediaBase || $('.cx-app').data('media-base') || '';
             experienciaNombre = meta.nombre || 'Experiencia';
+            experienciaIdActiva = meta.experienciaId || experienciaIdActiva;
             estudianteSexo = normalizarSexoEmocion(
                 meta.estudianteSexo || $('.cx-app').data('estudiante-sexo')
             );
@@ -2604,6 +3107,105 @@
         });
     }
 
+    function detenerEvidenciaStream() {
+        const recorder = $body && $body.data('vn-evidencia-recorder');
+        if (recorder && recorder.state && recorder.state !== 'inactive') {
+            try { recorder.stop(); } catch (e) { /* noop */ }
+        }
+        if ($body && $body.length) $body.data('vn-evidencia-recorder', null);
+        const evStream = $body && $body.data('vn-evidencia-stream');
+        if (evStream && evStream.getTracks) evStream.getTracks().forEach((t) => t.stop());
+        if ($body && $body.length) $body.data('vn-evidencia-stream', null);
+    }
+
+    function limpiarEvidenciaRecursos() {
+        evidenciaSesion += 1;
+        $body.removeData('vn-evidencia-estado');
+        const objectUrl = $body && $body.data('vn-evidencia-object-url');
+        if (objectUrl) {
+            try { URL.revokeObjectURL(objectUrl); } catch (e) { /* noop */ }
+            if ($body && $body.length) $body.data('vn-evidencia-object-url', null);
+        }
+        if (window.VnCaptura) {
+            VnCaptura.detenerContador($body.find('.vn-evidencia-contador'));
+            VnCaptura.cancelar();
+        }
+        detenerEvidenciaStream();
+    }
+
+    function asegurarMediaDevices() {
+        if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+            return true;
+        }
+        const legacy = navigator.getUserMedia
+            || navigator.webkitGetUserMedia
+            || navigator.mozGetUserMedia;
+        if (!legacy) return false;
+        if (!navigator.mediaDevices) navigator.mediaDevices = {};
+        navigator.mediaDevices.getUserMedia = function (constraints) {
+            return new Promise(function (resolve, reject) {
+                legacy.call(navigator, constraints, resolve, reject);
+            });
+        };
+        return true;
+    }
+
+    function mimeGrabacionEvidencia(tipo) {
+        if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return '';
+        const opciones = tipo === 'audio'
+            ? ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus']
+            : ['video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+        return opciones.find(function (m) { return MediaRecorder.isTypeSupported(m); }) || '';
+    }
+
+    function obtenerMediaEvidencia(tipo) {
+        if (!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost') {
+            return Promise.reject(new Error('insecure'));
+        }
+        if (!asegurarMediaDevices()) {
+            return Promise.reject(new Error('unsupported'));
+        }
+        if (tipo === 'audio') {
+            return navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+        const intentosVideo = tipo === 'foto'
+            ? [
+                { video: { facingMode: { ideal: 'environment' } } },
+                { video: { facingMode: 'environment' } },
+                { video: true },
+            ]
+            : [
+                { video: { facingMode: { ideal: 'environment' } }, audio: true },
+                { video: { facingMode: 'environment' }, audio: true },
+                { video: true, audio: true },
+                { video: true, audio: false },
+            ];
+        let cadena = Promise.reject(new Error('sin intentos'));
+        intentosVideo.forEach(function (constraints) {
+            cadena = cadena.catch(function () {
+                return navigator.mediaDevices.getUserMedia(constraints);
+            });
+        });
+        return cadena;
+    }
+
+    function mensajeErrorEvidencia(err) {
+        const nombre = String((err && err.name) || '');
+        if (err && err.message === 'insecure') {
+            return 'La cámara y el micrófono necesitan una conexión segura (HTTPS).';
+        }
+        if (nombre === 'NotAllowedError' || nombre === 'PermissionDeniedError') {
+            return 'Necesitamos permiso para usar la cámara o el micrófono. Pide ayuda a tu profe.';
+        }
+        if (nombre === 'NotFoundError' || nombre === 'DevicesNotFoundError') {
+            return 'No encontramos cámara o micrófono en este dispositivo.';
+        }
+        if (nombre === 'NotReadableError' || nombre === 'TrackStartError') {
+            return 'La cámara está ocupada. Ciérrala en otra app e intenta otra vez.';
+        }
+        return 'No pudimos abrir la cámara o el micrófono. Intenta otra vez.';
+    }
+
     function limpiarMediosPlayer() {
         cancelarAvanceAutomatico();
         if (typeof limpiarDragArrastrar === 'function') limpiarDragArrastrar();
@@ -2615,9 +3217,7 @@
             clasifDrag.ghost.parentNode.removeChild(clasifDrag.ghost);
         }
         if ($body && $body.length) $body.data('vn-clasif-drag', null);
-        const evStream = $body && $body.data('vn-evidencia-stream');
-        if (evStream && evStream.getTracks) evStream.getTracks().forEach((t) => t.stop());
-        if ($body && $body.length) $body.data('vn-evidencia-stream', null);
+        limpiarEvidenciaRecursos();
         detenerAudioBloque();
         detenerVideoBloque();
         detenerAudioHistoria();
@@ -2732,6 +3332,13 @@
         alTerminarExperiencia = typeof opts.alTerminarExperiencia === 'function'
             ? opts.alTerminarExperiencia
             : null;
+        experienciaIdActiva = opts.experienciaId || experienciaIdActiva || null;
+        urlExperienciaTpl = opts.urlExperiencia
+            || urlExperienciaTpl
+            || String($('#rnApp').data('url-experiencia') || '');
+        if ($root && $root.length && experienciaIdActiva) {
+            $root.attr('data-experiencia-id', experienciaIdActiva);
+        }
         index = 0;
         historiaPage = 0;
         retoPaso = 0;
@@ -2753,10 +3360,15 @@
         $('body').removeClass('rn-player-activo');
     }
 
+    if (enPlayer) {
+        resolverUrlExperienciaTpl();
+    }
+
     window.VistaNino = {
         iniciar: iniciarDispositivoCon,
         detener: detenerDispositivo,
         vincular: vincularElementos,
+        recargar: recargarVistaNino,
     };
 
     /* ── Eventos UI ──────────────────────────────────────────── */
@@ -2765,6 +3377,11 @@
         $('#cxBtnVistaNino').on('click', abrir);
         $overlay.on('click', '[data-vn-close]', cerrar);
     }
+    $(document).on('click.vnReload', '#vnBtnRecargar', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        recargarVistaNino();
+    });
     $(document).on('click.vnNav', '#vnBtnPrev', () => ir(-1));
     $(document).on('click.vnNav', '#vnBtnNext', () => alClicSiguiente());
 
@@ -2891,58 +3508,420 @@
         reproducirVideoBienvenida();
     });
 
-    onBody('click', '[data-vn-evidencia]', function () {
-        const $btn = $(this);
-        if ($btn.prop('disabled')) return;
-        const tipo = String($btn.data('vn-evidencia-tipo') || 'foto');
-        const $stage = $body.find('[data-vn-evidencia-stage]');
-        const $preview = $stage.find('.vn-evidencia-preview');
-        const $placeholder = $stage.find('.vn-evidencia-preview-placeholder');
-        const $captura = $body.find('[data-vn-evidencia-captura]');
+    function refsEvidencia($scope) {
+        const $wrap = $scope.find('.vn-evidencia-wrap');
+        const $stage = $wrap.find('[data-vn-evidencia-stage]');
+        const $videoStage = $stage.find('[data-vn-evidencia-video-stage]');
+        return {
+            $wrap,
+            $stage,
+            $preview: $stage.find('.vn-evidencia-preview'),
+            $result: $stage.find('.vn-evidencia-result'),
+            $audioReplay: $stage.find('[data-vn-evidencia-replay="audio"]'),
+            $audioPlayBtn: $stage.find('[data-vn-evidencia-audio-play]'),
+            $audioEl: $stage.find('.vn-evidencia-audio-el'),
+            $videoReplay: $stage.find('[data-vn-evidencia-replay="video"]'),
+            $videoStage: $videoStage,
+            $videoPlayBtn: $videoStage.find('[data-vn-evidencia-video-play]'),
+            $videoEl: $stage.find('.vn-evidencia-video-el'),
+            $recording: $stage.find('.vn-evidencia-recording'),
+            $contador: $stage.find('.vn-evidencia-contador'),
+            $placeholder: $stage.find('.vn-evidencia-preview-placeholder'),
+            $estado: $wrap.find('[data-vn-evidencia-estado]'),
+            $btn: $wrap.find('[data-vn-evidencia]'),
+            $captura: $wrap.find('[data-vn-evidencia-captura]'),
+            $file: $wrap.find('[data-vn-evidencia-file]'),
+            $msg: $scope.find('.vn-evidencia-msg'),
+        };
+    }
 
-        function finalizarEvidencia() {
-            $stage.prop('hidden', false);
-            $preview.prop('hidden', true);
-            $placeholder.prop('hidden', false);
-            $captura.prop('hidden', true);
-            $btn.prop('disabled', true).addClass('is-done');
-            $('#vnEvidenciaMsg').prop('hidden', false);
-            celebrarExito(false);
-            alCompletarActividad();
+    function setEstadoEvidencia(refs, texto, modo) {
+        if (!refs.$estado.length) return;
+        refs.$estado.removeClass('is-grabando is-exito is-error');
+        if (!texto) {
+            refs.$estado.prop('hidden', true).text('');
+            return;
         }
+        if (modo) refs.$estado.addClass('is-' + modo);
+        refs.$estado.text(texto).prop('hidden', false);
+    }
 
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            $btn.css('transform', 'scale(0.92)');
-            setTimeout(() => { $btn.css('transform', ''); }, 180);
-            finalizarEvidencia();
+    function iniciarUiGrabacionEvidencia(refs, sesion, nativo) {
+        refs.$stage.prop('hidden', false);
+        refs.$btn.prop('hidden', true).prop('disabled', false);
+        refs.$captura.prop('hidden', false);
+        refs.$placeholder.prop('hidden', true);
+        refs.$preview.prop('hidden', true);
+        refs.$result.prop('hidden', true).removeAttr('src');
+        refs.$audioReplay.prop('hidden', true);
+        refs.$videoReplay.prop('hidden', true);
+        refs.$audioEl.removeAttr('src');
+        refs.$videoEl.removeAttr('src');
+        refs.$recording.prop('hidden', false);
+        setEstadoEvidencia(refs, configNivel().simplificar ? '¡Graba!' : 'Grabando…', 'grabando');
+        if (window.VnCaptura) {
+            VnCaptura.iniciarContador(refs.$contador);
+        }
+        $body.data('vn-evidencia-estado', { tipo: 'audio', sesion: sesion, nativo: !!nativo });
+    }
+
+    function evidenciaTieneCaptura(refs) {
+        if (refs.$result.attr('src')) return true;
+        if (refs.$audioEl.attr('src')) return true;
+        if (refs.$videoEl.attr('src')) return true;
+        return false;
+    }
+
+    function resetUiEvidencia(refs) {
+        refs.$stage.prop('hidden', true);
+        refs.$captura.prop('hidden', true);
+        refs.$recording.prop('hidden', true);
+        refs.$preview.prop('hidden', true);
+        refs.$result.prop('hidden', true);
+        refs.$audioReplay.prop('hidden', true);
+        refs.$videoReplay.prop('hidden', true);
+        refs.$placeholder.prop('hidden', true);
+        refs.$msg.prop('hidden', true);
+        refs.$btn.prop('hidden', false).prop('disabled', false).removeClass('is-done');
+        setEstadoEvidencia(refs, '', '');
+        detenerEvidenciaReplay(refs);
+        if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
+        if (refs.$preview.length) {
+            try { refs.$preview[0].pause(); } catch (e) { /* noop */ }
+            refs.$preview[0].srcObject = null;
+            refs.$preview.removeAttr('src');
+        }
+        refs.$result.removeAttr('src');
+        refs.$audioEl.removeAttr('src');
+        refs.$videoEl.removeAttr('src');
+    }
+
+    function mostrarErrorEvidencia(refs, mensaje) {
+        detenerEvidenciaStream();
+        $body.removeData('vn-evidencia-estado');
+        resetUiEvidencia(refs);
+        showFb(false, '', mensaje);
+    }
+
+    function aplicarBlobEvidencia(refs, tipo, blob) {
+        if (!blob || !refs) return;
+        const prevUrl = $body.data('vn-evidencia-object-url');
+        if (prevUrl) {
+            try { URL.revokeObjectURL(prevUrl); } catch (e) { /* noop */ }
+        }
+        const url = URL.createObjectURL(blob);
+        $body.data('vn-evidencia-object-url', url);
+        refs.$stage.prop('hidden', false);
+        refs.$captura.prop('hidden', true);
+        refs.$recording.prop('hidden', true);
+        refs.$placeholder.prop('hidden', true);
+        refs.$preview.prop('hidden', true).removeAttr('src');
+        refs.$result.prop('hidden', true).removeAttr('src');
+        refs.$audioReplay.prop('hidden', true);
+        refs.$videoReplay.prop('hidden', true);
+        refs.$audioEl.removeAttr('src');
+        refs.$videoEl.removeAttr('src');
+        if (refs.$preview.length) refs.$preview[0].srcObject = null;
+
+        if (tipo === 'foto') {
+            refs.$result.attr('src', url).prop('hidden', false);
+        } else if (tipo === 'audio') {
+            refs.$audioEl.attr('src', url);
+            refs.$audioReplay.prop('hidden', false);
+            setEvidenciaAudioUi(refs, 'idle');
+        } else if (tipo === 'video') {
+            refs.$videoEl.attr('src', url);
+            refs.$videoReplay.prop('hidden', false);
+            setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'idle');
+        }
+        finalizarEvidencia(refs);
+    }
+
+    function finalizarEvidencia(refs) {
+        if (!evidenciaTieneCaptura(refs)) {
+            mostrarErrorEvidencia(refs, 'No se guardó la evidencia. Intenta otra vez.');
             return;
         }
 
-        const constraints = tipo === 'audio'
-            ? { audio: true }
-            : { video: { facingMode: 'environment' }, audio: tipo === 'video' };
+        if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
+        setEstadoEvidencia(refs, '', '');
 
-        navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-            $stage.prop('hidden', false);
-            $btn.prop('hidden', true);
-            $captura.prop('hidden', false);
-            if (tipo !== 'audio' && $preview.length) {
-                $preview[0].srcObject = stream;
-                $preview.prop('hidden', false);
-                $preview[0].play().catch(function () { /* noop */ });
+        refs.$stage.prop('hidden', false);
+        refs.$recording.prop('hidden', true);
+        refs.$captura.prop('hidden', true);
+        refs.$btn.prop('hidden', true).prop('disabled', true).addClass('is-done');
+        refs.$preview.prop('hidden', true);
+
+        const tieneFoto = !!refs.$result.attr('src');
+        const tieneAudio = !!refs.$audioEl.attr('src');
+        const tieneVideo = !!refs.$videoEl.attr('src');
+
+        refs.$result.prop('hidden', true);
+        refs.$audioReplay.prop('hidden', true);
+        refs.$videoReplay.prop('hidden', true);
+        refs.$placeholder.prop('hidden', true);
+
+        if (tieneFoto) {
+            refs.$result.prop('hidden', false);
+        } else if (tieneAudio) {
+            refs.$audioReplay.prop('hidden', false);
+            setEvidenciaAudioUi(refs, 'idle');
+        } else if (tieneVideo) {
+            refs.$videoReplay.prop('hidden', false);
+            setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'idle');
+        }
+
+        refs.$msg.prop('hidden', false);
+        $body.removeData('vn-evidencia-estado');
+        celebrarExito(false);
+        alCompletarActividad();
+    }
+
+    function iniciarGrabacionEvidencia(stream, tipo, sesion) {
+        if (typeof MediaRecorder === 'undefined') return null;
+        const mime = mimeGrabacionEvidencia(tipo);
+        let recorder;
+        try {
+            recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+        } catch (e) {
+            try { recorder = new MediaRecorder(stream); } catch (err) { return null; }
+        }
+        const chunks = [];
+        recorder.ondataavailable = function (e) {
+            if (e.data && e.data.size) chunks.push(e.data);
+        };
+        recorder._vnChunks = chunks;
+        recorder._vnSesion = sesion;
+        try { recorder.start(500); } catch (e) { return null; }
+        $body.data('vn-evidencia-recorder', recorder);
+        return recorder;
+    }
+
+    function capturarFotoEvidencia($preview, $result) {
+        return new Promise(function (resolve) {
+            const video = $preview[0];
+            if (!video) {
+                resolve(false);
+                return;
             }
-            $body.data('vn-evidencia-stream', stream);
-            $captura.off('click.vnEvid').on('click.vnEvid', function () {
-                const s = $body.data('vn-evidencia-stream');
-                if (s && s.getTracks) s.getTracks().forEach((t) => t.stop());
-                $body.data('vn-evidencia-stream', null);
-                finalizarEvidencia();
-            });
-        }).catch(function () {
-            $btn.css('transform', 'scale(0.92)');
-            setTimeout(() => { $btn.css('transform', ''); }, 180);
-            finalizarEvidencia();
+            let resuelto = false;
+            const tomar = function () {
+                if (resuelto) return;
+                if (!video.videoWidth || !video.videoHeight) return;
+                resuelto = true;
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                $result.attr('src', canvas.toDataURL('image/jpeg', 0.9)).prop('hidden', false);
+                resolve(true);
+            };
+            if (video.readyState >= 2 && video.videoWidth) {
+                tomar();
+                return;
+            }
+            video.addEventListener('loadedmetadata', tomar, { once: true });
+            setTimeout(function () {
+                if (!resuelto) {
+                    resuelto = true;
+                    resolve(false);
+                }
+            }, 3500);
         });
+    }
+
+    function detenerGrabacionEvidencia(refs, tipo, sesion) {
+        const recorder = $body.data('vn-evidencia-recorder');
+        if (!recorder || !recorder._vnChunks || recorder._vnSesion !== sesion) {
+            detenerEvidenciaStream();
+            return Promise.resolve(false);
+        }
+        return new Promise(function (resolve) {
+            recorder.onstop = function () {
+                if (recorder._vnSesion !== sesion || recorder._vnSesion !== evidenciaSesion) {
+                    resolve(false);
+                    return;
+                }
+                const blob = new Blob(recorder._vnChunks, {
+                    type: recorder.mimeType || mimeGrabacionEvidencia(tipo) || (tipo === 'audio' ? 'audio/mp4' : 'video/mp4'),
+                });
+                const url = URL.createObjectURL(blob);
+                $body.data('vn-evidencia-object-url', url);
+                if (tipo === 'video' && refs.$videoEl.length) {
+                    refs.$videoEl[0].srcObject = null;
+                    refs.$videoEl.attr('src', url);
+                } else if (tipo === 'audio' && refs.$audioEl.length) {
+                    refs.$audioEl.attr('src', url);
+                }
+                $body.data('vn-evidencia-recorder', null);
+                detenerEvidenciaStream();
+                resolve(blob.size > 0);
+            };
+            try { recorder.stop(); } catch (e) {
+                detenerEvidenciaStream();
+                resolve(false);
+            }
+        });
+    }
+
+    onBody('click', '[data-vn-evidencia-audio-play]', function () {
+        vincularElementos();
+        reproducirEvidenciaAudio(refsEvidencia($body));
+    });
+
+    onBody('click', '[data-vn-evidencia-video-play]', function () {
+        vincularElementos();
+        reproducirEvidenciaVideo(refsEvidencia($body));
+    });
+
+    onBody('change', '[data-vn-evidencia-file]', function () {
+        vincularElementos();
+        const file = this.files && this.files[0];
+        const refs = refsEvidencia($body);
+        this.value = '';
+        if (!file) return;
+        const tipo = String(file.type || '').indexOf('video/') === 0 ? 'video' : 'foto';
+        aplicarBlobEvidencia(refs, tipo, file);
+    });
+
+    onBody('click', '[data-vn-evidencia]', function () {
+        vincularElementos();
+        const refs = refsEvidencia($body);
+        const $btn = $(this);
+        if ($btn.prop('disabled')) return;
+        const tipo = String($btn.data('vn-evidencia-tipo') || 'foto');
+        const sesion = evidenciaSesion + 1;
+
+        if (tipo === 'seleccion' || (tipo === 'video' && !(window.VnCaptura && VnCaptura.hayNativo()))) {
+            const input = refs.$file[0];
+            if (input) input.click();
+            else mostrarErrorEvidencia(refs, tipo === 'seleccion' ? 'No pudimos abrir la galería.' : 'No pudimos abrir la cámara.');
+            return;
+        }
+
+        $btn.prop('disabled', true);
+        $body.find('#vnFb').prop('hidden', true);
+        setEstadoEvidencia(refs, '', '');
+
+        if (window.VnCaptura && VnCaptura.hayNativo()) {
+            if (tipo === 'foto') {
+                VnCaptura.fotoNativa()
+                    .then(function (blob) { aplicarBlobEvidencia(refs, tipo, blob); })
+                    .catch(function (err) {
+                        mostrarErrorEvidencia(refs, (err && err.message) || 'No se pudo tomar la fotografía.');
+                    })
+                    .finally(function () { $btn.prop('disabled', false); });
+                return;
+            }
+            if (tipo === 'video') {
+                VnCaptura.videoNativo()
+                    .then(function (blob) { aplicarBlobEvidencia(refs, tipo, blob); })
+                    .catch(function (err) {
+                        mostrarErrorEvidencia(refs, (err && err.message) || 'No se pudo grabar el video.');
+                    })
+                    .finally(function () { $btn.prop('disabled', false); });
+                return;
+            }
+            if (tipo === 'audio') {
+                VnCaptura.audioNativo.iniciar(function () {
+                    evidenciaSesion = sesion;
+                    iniciarUiGrabacionEvidencia(refs, sesion, true);
+                }).catch(function (err) {
+                    mostrarErrorEvidencia(refs, (err && err.message) || 'No se pudo iniciar la grabación.');
+                }).finally(function () { $btn.prop('disabled', false); });
+                return;
+            }
+        }
+
+        obtenerMediaEvidencia(tipo).then(function (stream) {
+            evidenciaSesion = sesion;
+            refs.$stage.prop('hidden', false);
+            refs.$btn.prop('hidden', true).prop('disabled', false);
+            refs.$captura.prop('hidden', false);
+            refs.$placeholder.prop('hidden', true);
+            refs.$result.prop('hidden', true).removeAttr('src');
+            refs.$audioReplay.prop('hidden', true);
+            refs.$videoReplay.prop('hidden', true);
+            refs.$audioEl.removeAttr('src');
+            refs.$videoEl.removeAttr('src');
+            refs.$preview.removeAttr('src');
+            $body.data('vn-evidencia-stream', stream);
+            $body.data('vn-evidencia-estado', { tipo: tipo, sesion: sesion, nativo: false });
+
+            if (tipo === 'audio') {
+                refs.$preview.prop('hidden', true);
+                refs.$recording.prop('hidden', false);
+                setEstadoEvidencia(refs, configNivel().simplificar ? '¡Graba!' : 'Grabando…', 'grabando');
+                if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
+                iniciarGrabacionEvidencia(stream, 'audio', sesion);
+            } else {
+                refs.$recording.prop('hidden', true);
+                refs.$preview.prop('hidden', false);
+                refs.$preview[0].srcObject = stream;
+                refs.$preview[0].controls = false;
+                refs.$preview[0].muted = true;
+                refs.$preview[0].setAttribute('playsinline', '');
+                refs.$preview[0].setAttribute('webkit-playsinline', '');
+                refs.$preview[0].play().catch(function () { /* noop */ });
+                setEstadoEvidencia(refs, configNivel().simplificar ? '¡Mira!' : 'Cámara activa', 'grabando');
+            }
+        }).catch(function (err) {
+            mostrarErrorEvidencia(refs, mensajeErrorEvidencia(err));
+        }).finally(function () {
+            $btn.prop('disabled', false);
+        });
+    });
+
+    onBody('click', '[data-vn-evidencia-captura]', function () {
+        vincularElementos();
+        const estado = $body.data('vn-evidencia-estado');
+        if (!estado) return;
+        const refs = refsEvidencia($body);
+        const tipo = estado.tipo;
+        const sesion = estado.sesion;
+
+        if (estado.nativo && tipo === 'audio' && window.VnCaptura) {
+            refs.$captura.prop('disabled', true);
+            VnCaptura.audioNativo.detener()
+                .then(function (blob) {
+                    if (estado.sesion !== evidenciaSesion) return;
+                    if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
+                    setEstadoEvidencia(refs, '', '');
+                    aplicarBlobEvidencia(refs, tipo, blob);
+                })
+                .catch(function (err) {
+                    if (estado.sesion !== evidenciaSesion) return;
+                    mostrarErrorEvidencia(refs, (err && err.message) || 'No se pudo guardar la grabación.');
+                })
+                .finally(function () { refs.$captura.prop('disabled', false); });
+            return;
+        }
+
+        if (tipo === 'foto') {
+            capturarFotoEvidencia(refs.$preview, refs.$result).then(function (ok) {
+                if (estado.sesion !== evidenciaSesion) return;
+                detenerEvidenciaStream();
+                setEstadoEvidencia(refs, '', '');
+                if (!ok) {
+                    mostrarErrorEvidencia(refs, 'Espera un momentito y vuelve a tocar Capturar.');
+                    return;
+                }
+                finalizarEvidencia(refs);
+            });
+            return;
+        }
+        if (tipo === 'audio') {
+            detenerGrabacionEvidencia(refs, tipo, sesion).then(function (ok) {
+                if (estado.sesion !== evidenciaSesion) return;
+                if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
+                setEstadoEvidencia(refs, '', '');
+                if (!ok) {
+                    mostrarErrorEvidencia(refs, 'No se pudo guardar la grabación. Intenta otra vez.');
+                    return;
+                }
+                finalizarEvidencia(refs);
+            });
+        }
     });
 
     onBody('click', '[data-vn-ra-listo]', function () {

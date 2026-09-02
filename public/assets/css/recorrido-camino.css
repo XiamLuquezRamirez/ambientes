@@ -567,6 +567,10 @@
     bottom: max(88px, calc(72px + env(safe-area-inset-bottom, 0px)));
 }
 
+#vnDispositivo.rn-player--camino-overlay .vn-reload-btn--player {
+    z-index: 10050;
+}
+
 /* Evitar que el Salir del kiosco tape el botón de la experiencia */
 body.rn-player-activo .kiosco-salir-btn,
 body.rn-player-activo .kiosco-fs-btn {
