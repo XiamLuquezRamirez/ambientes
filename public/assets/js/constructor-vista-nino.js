@@ -3792,10 +3792,12 @@
         const tipo = String($btn.data('vn-evidencia-tipo') || 'foto');
         const sesion = evidenciaSesion + 1;
 
-        if (tipo === 'seleccion' || (tipo === 'video' && !(window.VnCaptura && VnCaptura.hayNativo()))) {
+        // Solo la SELECCIÓN de archivo usa el input del sistema (galería).
+        // Foto/audio/VIDEO se capturan embebidos con getUserMedia en el recuadro.
+        if (tipo === 'seleccion') {
             const input = refs.$file[0];
             if (input) input.click();
-            else mostrarErrorEvidencia(refs, tipo === 'seleccion' ? 'No pudimos abrir la galería.' : 'No pudimos abrir la cámara.');
+            else mostrarErrorEvidencia(refs, 'No pudimos abrir la galería.');
             return;
         }
 
@@ -3803,7 +3805,11 @@
         $body.find('#vnFb').prop('hidden', true);
         setEstadoEvidencia(refs, '', '');
 
-        if (window.VnCaptura && VnCaptura.hayNativo()) {
+        // === PRUEBA cámara embebida: forzamos getUserMedia (recuadro en la
+        //     plataforma) en vez de delegar a la cámara nativa del sistema.
+        //     Para volver al comportamiento anterior, cambiar USAR_NATIVA a true.
+        var USAR_NATIVA = false;
+        if (USAR_NATIVA && window.VnCaptura && VnCaptura.hayNativo()) {
             if (tipo === 'foto') {
                 VnCaptura.fotoNativa()
                     .then(function (blob) { aplicarBlobEvidencia(refs, tipo, blob); })
@@ -3863,7 +3869,15 @@
                 refs.$preview[0].setAttribute('playsinline', '');
                 refs.$preview[0].setAttribute('webkit-playsinline', '');
                 refs.$preview[0].play().catch(function () { /* noop */ });
-                setEstadoEvidencia(refs, configNivel().simplificar ? '¡Mira!' : 'Cámara activa', 'grabando');
+                if (tipo === 'video') {
+                    // Video embebido: además del preview en vivo, se graba con
+                    // MediaRecorder (mismo recuadro). Se detiene al pulsar Capturar.
+                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Grabando!' : 'Grabando video…', 'grabando');
+                    if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
+                    iniciarGrabacionEvidencia(stream, 'video', sesion);
+                } else {
+                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Mira!' : 'Cámara activa', 'grabando');
+                }
             }
         }).catch(function (err) {
             mostrarErrorEvidencia(refs, mensajeErrorEvidencia(err));
@@ -3910,7 +3924,7 @@
             });
             return;
         }
-        if (tipo === 'audio') {
+        if (tipo === 'audio' || tipo === 'video') {
             detenerGrabacionEvidencia(refs, tipo, sesion).then(function (ok) {
                 if (estado.sesion !== evidenciaSesion) return;
                 if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
