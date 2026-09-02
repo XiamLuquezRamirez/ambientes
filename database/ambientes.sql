@@ -55,6 +55,34 @@ CREATE TABLE `ajustes_temporales` (
 
 /*Data for the table `ajustes_temporales` */
 
+/*Table structure for table `ambientes` */
+
+DROP TABLE IF EXISTS `ambientes`;
+
+CREATE TABLE `ambientes` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `color_hex` varchar(9) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `icono` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `servidor_ip` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `cupo_defecto` smallint unsigned NOT NULL DEFAULT '25',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `ambientes_slug_unique` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `ambientes` */
+
+insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values
+(6,'Expresión Artística','expresion-artistica','#0F6E56','?','192.168.1.20',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(7,'Polimotor','polimotor','#534AB7','?','192.168.1.21',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(8,'Multisaberes','multisaberes','#854F0B','?','192.168.1.22',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(9,'Multisensorial','multisensorial','#185FA5','✋','192.168.1.23',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
+(10,'Tecnología','tecnologia','#993C1D','?','192.168.1.24',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25');
+
 /*Table structure for table `ambiente_grado` */
 
 DROP TABLE IF EXISTS `ambiente_grado`;
@@ -130,34 +158,6 @@ insert  into `ambiente_institucion`(`id`,`ambiente_id`,`institucion_id`,`ip`,`pu
 (4,8,1,'192.168.1.13',NULL,1,'2026-08-04 08:52:01','2026-08-15 08:50:18'),
 (7,9,1,'192.168.1.14',NULL,1,'2026-08-10 12:01:57','2026-08-15 08:50:18'),
 (8,10,1,'192.168.1.15',NULL,1,'2026-08-11 09:47:09','2026-08-15 08:50:18');
-
-/*Table structure for table `ambientes` */
-
-DROP TABLE IF EXISTS `ambientes`;
-
-CREATE TABLE `ambientes` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `color_hex` varchar(9) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `icono` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `servidor_ip` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `activo` tinyint(1) NOT NULL DEFAULT '1',
-  `cupo_defecto` smallint unsigned NOT NULL DEFAULT '25',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ambientes_slug_unique` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `ambientes` */
-
-insert  into `ambientes`(`id`,`nombre`,`slug`,`color_hex`,`icono`,`servidor_ip`,`activo`,`cupo_defecto`,`created_at`,`updated_at`) values
-(6,'Expresión Artística','expresion-artistica','#0F6E56','?','192.168.1.20',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(7,'Polimotor','polimotor','#534AB7','?','192.168.1.21',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(8,'Multisaberes','multisaberes','#854F0B','?','192.168.1.22',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(9,'Multisensorial','multisensorial','#185FA5','✋','192.168.1.23',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25'),
-(10,'Tecnología','tecnologia','#993C1D','?','192.168.1.24',1,25,'2026-08-04 08:38:25','2026-08-04 08:38:25');
 
 /*Table structure for table `areas` */
 
@@ -310,6 +310,37 @@ insert  into `catalogo_dba`(`id`,`codigo`,`area_id`,`grado_id`,`descripcion`,`es
 (2,'1',3,1,'esto es prueba',1,1,NULL,1,'2026-08-11 16:10:24','2026-08-11 16:10:24'),
 (3,'2',5,2,'asdasdasdasdasdsad',1,1,NULL,1,'2026-08-12 11:57:22','2026-08-12 11:57:22');
 
+/*Table structure for table `clases` */
+
+DROP TABLE IF EXISTS `clases`;
+
+CREATE TABLE `clases` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `carga_docente_id` bigint unsigned NOT NULL,
+  `docente_id` bigint unsigned NOT NULL,
+  `ambiente_id` bigint unsigned NOT NULL,
+  `nombre` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `fecha` date DEFAULT NULL,
+  `estado` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'borrador',
+  `anio_lectivo` smallint unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `clases_ambiente_id_foreign` (`ambiente_id`),
+  KEY `clases_carga_docente_id_anio_lectivo_index` (`carga_docente_id`,`anio_lectivo`),
+  KEY `clases_docente_id_ambiente_id_anio_lectivo_index` (`docente_id`,`ambiente_id`,`anio_lectivo`),
+  CONSTRAINT `clases_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `clases_carga_docente_id_foreign` FOREIGN KEY (`carga_docente_id`) REFERENCES `carga_docente` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `clases_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `clases` */
+
+insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values
+(1,7,2,6,'Identifica los colores',NULL,'2026-08-27','activa',2026,'2026-08-26 14:30:12','2026-08-27 14:13:34'),
+(4,8,2,6,'Identifica los colores',NULL,'2026-08-27','finalizada',2026,'2026-08-27 14:12:40','2026-08-27 14:13:18');
+
 /*Table structure for table `clase_experiencias` */
 
 DROP TABLE IF EXISTS `clase_experiencias`;
@@ -344,37 +375,6 @@ insert  into `clase_experiencias`(`id`,`clase_id`,`experiencia_id`,`modulo_id`,`
 (1,1,23,1,1,5,0,'2026-08-26 14:30:12','2026-08-27 14:13:34'),
 (2,4,23,1,1,5,0,'2026-08-27 14:12:40','2026-08-27 14:13:18');
 
-/*Table structure for table `clases` */
-
-DROP TABLE IF EXISTS `clases`;
-
-CREATE TABLE `clases` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `carga_docente_id` bigint unsigned NOT NULL,
-  `docente_id` bigint unsigned NOT NULL,
-  `ambiente_id` bigint unsigned NOT NULL,
-  `nombre` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
-  `fecha` date DEFAULT NULL,
-  `estado` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'borrador',
-  `anio_lectivo` smallint unsigned NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `clases_ambiente_id_foreign` (`ambiente_id`),
-  KEY `clases_carga_docente_id_anio_lectivo_index` (`carga_docente_id`,`anio_lectivo`),
-  KEY `clases_docente_id_ambiente_id_anio_lectivo_index` (`docente_id`,`ambiente_id`,`anio_lectivo`),
-  CONSTRAINT `clases_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `clases_carga_docente_id_foreign` FOREIGN KEY (`carga_docente_id`) REFERENCES `carga_docente` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `clases_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `clases` */
-
-insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values
-(1,7,2,6,'Identifica los colores',NULL,'2026-08-27','activa',2026,'2026-08-26 14:30:12','2026-08-27 14:13:34'),
-(4,8,2,6,'Identifica los colores',NULL,'2026-08-27','finalizada',2026,'2026-08-27 14:12:40','2026-08-27 14:13:18');
-
 /*Table structure for table `cola_sincronizacion` */
 
 DROP TABLE IF EXISTS `cola_sincronizacion`;
@@ -403,6 +403,29 @@ insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servido
 (3,'Estudiante',1,'update','multisensorial','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 (4,'Estudiante',1,'update','tecnologia','{\"nombre\":\"Valentina\",\"activo\":true}','confirmado',0,NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
 
+
+/*Table structure for table `configuraciones` */
+
+DROP TABLE IF EXISTS `configuraciones`;
+
+CREATE TABLE `configuraciones` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `clave` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valor` text COLLATE utf8mb4_unicode_ci,
+  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `configuraciones_clave_unique` (`clave`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `configuraciones` */
+
+insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values
+(1,'tiempo_sesion_minutos','60',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
+(2,'intentos_max_pin','5',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
+(3,'idioma','es',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
+(4,'zona_horaria','America/Bogota',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02');
 
 /*Table structure for table `configuracion_pins` */
 
@@ -438,29 +461,6 @@ insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_
 (14,12,'fas fa-heart','#ff0606','fas fa-fish','#0f54ff','fas fa-square','#437124',0,'2026-06-23 16:39:05','2026-06-23 16:39:05'),
 (15,38,'fas fa-circle','#f933e9','fas fa-star','#ff9019','fas fa-circle','#f933e9',0,'2026-08-21 10:58:13','2026-08-21 10:58:13'),
 (16,39,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-08-22 10:14:17','2026-08-22 10:14:17');
-
-/*Table structure for table `configuraciones` */
-
-DROP TABLE IF EXISTS `configuraciones`;
-
-CREATE TABLE `configuraciones` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `clave` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `valor` text COLLATE utf8mb4_unicode_ci,
-  `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `configuraciones_clave_unique` (`clave`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `configuraciones` */
-
-insert  into `configuraciones`(`id`,`clave`,`valor`,`descripcion`,`created_at`,`updated_at`) values
-(1,'tiempo_sesion_minutos','60',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
-(2,'intentos_max_pin','5',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
-(3,'idioma','es',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02'),
-(4,'zona_horaria','America/Bogota',NULL,'2026-06-16 00:02:02','2026-06-16 00:02:02');
 
 /*Table structure for table `departamentos` */
 
@@ -579,6 +579,80 @@ insert  into `ejes`(`id`,`modulo_id`,`institucion_id`,`creado_por`,`nombre`,`slu
 (4,1,NULL,NULL,'Explora','explora',NULL,'ninguno',NULL,NULL,NULL,NULL,3,1,1,'2026-08-07 09:17:25','2026-08-11 08:55:56'),
 (7,1,1,2,'Baile','baile',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,0,'2026-08-10 10:17:27','2026-08-10 10:17:27'),
 (8,3,1,2,'Integrales','integrales',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,0,'2026-08-10 14:26:47','2026-08-10 14:27:38');
+
+/*Table structure for table `estudiantes` */
+
+DROP TABLE IF EXISTS `estudiantes`;
+
+CREATE TABLE `estudiantes` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `apellido` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` text COLLATE utf8mb4_unicode_ci,
+  `tipo_identificacion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `identificacion` int NOT NULL,
+  `iniciales` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `grado_id` text COLLATE utf8mb4_unicode_ci,
+  `color_avatar` varchar(9) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#0F6E56',
+  `perfil_aprendizaje_id` int DEFAULT '1',
+  `perfil_aprendizaje_personalizado_id` int DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `fecha_nacimiento` text COLLATE utf8mb4_unicode_ci,
+  `acudiente` text COLLATE utf8mb4_unicode_ci,
+  `telefono_acudiente` text COLLATE utf8mb4_unicode_ci,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `requiere_apoyo` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT 'no',
+  `sexo` text COLLATE utf8mb4_unicode_ci,
+  `estado_piar` int DEFAULT '0',
+  `otro_tipo_identificacion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `lugar_nacimiento` text COLLATE utf8mb4_unicode_ci,
+  `departamento_id` int DEFAULT NULL,
+  `municipio_id` int DEFAULT NULL,
+  `barrio_vereda` text COLLATE utf8mb4_unicode_ci,
+  `direccion` text COLLATE utf8mb4_unicode_ci,
+  `telefono` text COLLATE utf8mb4_unicode_ci,
+  `email` text COLLATE utf8mb4_unicode_ci,
+  `institucion_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`,`identificacion`)
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `estudiantes` */
+
+insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`perfil_aprendizaje_id`,`perfil_aprendizaje_personalizado_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values
+(1,'Valentina',NULL,NULL,NULL,1111,'VA',NULL,'#0F6E56',1,NULL,1,'2021-01-17',NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#534AB7',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#854F0B',1,NULL,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(4,'Juan',NULL,NULL,NULL,4444,'JU',NULL,'#185FA5',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(5,'Camila',NULL,NULL,NULL,5555,'CA','2','#993c1d',1,NULL,1,'2026-06-09','fggdfg','4534','2026-06-16 00:02:01','2026-08-04 11:03:58','no','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(6,'Luna',NULL,NULL,NULL,6666,'LU',NULL,'#F59E0B',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(7,'José',NULL,NULL,NULL,134123123,'Jo','1','#0F6E56',1,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:20','2026-06-18 16:04:20','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(8,'José',NULL,NULL,NULL,134123123,'Jo','1','#0F6E56',1,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:36','2026-06-18 16:04:36','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(9,'Fabian Mendez',NULL,NULL,NULL,123123123,'FM','3','#0F6E56',1,1,1,NULL,'Juana 2','32434234','2026-06-18 16:08:25','2026-08-03 11:04:28','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(10,'Juan Lopez 3',NULL,NULL,NULL,3423423,'JL','2','#0F6E56',1,NULL,1,NULL,'Juana 5','3423423','2026-06-18 16:12:47','2026-06-18 16:12:47','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(11,'Andres','quintero',NULL,'CC',5345345,'AQ',NULL,'#dc2626',1,1,1,'2018-01-22','yyyyyyy','5345345','2026-06-18 16:19:02','2026-08-05 10:10:20','si','masculino',0,NULL,'VALLEDUPAR',20,305,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveip@gmail.com',1),
+(12,'Fabian','Mendez Quintero',NULL,'TI',342423,'FM',NULL,'#ea580c',1,NULL,1,'2019-05-16','hfghfghfgh','634634','2026-06-18 16:56:48','2026-08-03 15:45:48','si','femenino',0,NULL,'VALLEDUPAR',20,9,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveifdgdfgp@gmail.com',1),
+(13,'Andrea','Rodriguez','estudiantes/5dzmv171bioMovIFlbhyFrz20bsrGB4f6y9EXVIE.jpg','TI',5345345,'AR','1','#0891b2',2,1,1,'2023-12-10','Julian Rodriguez','45345','2026-06-18 17:15:22','2026-08-05 10:01:01','si','femenino',0,NULL,'valledupar',20,9,'Los cortijos','manzana h casa 23','3042065930','hhhh@gmail.com',1),
+(14,'Xiamir luquez',NULL,'estudiantes/23NS51sSHtdWtH2tQynzAD0EfRAd6m2WaZensqbP.webp',NULL,4353453,'XL','1','#0F6E56',1,NULL,1,'2021-06-12','yyyy','345345','2026-06-18 17:20:14','2026-06-18 17:20:14','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(15,'Juan David  Perez',NULL,NULL,NULL,6456456,'JD',NULL,'#ff8a05',1,NULL,1,'2023-06-07','tttt','345345','2026-06-19 08:00:29','2026-06-19 08:00:29','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(16,'Juana Lopera',NULL,NULL,NULL,654645,'JL',NULL,'#79fbf9',1,NULL,1,'2014-07-12','uuuu','6666','2026-06-19 08:01:32','2026-06-19 08:01:32','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(17,'Luisa Castro',NULL,NULL,NULL,525252,'LC',NULL,'#ff0000',1,NULL,1,'2020-01-12','yyyy','23423423','2026-06-19 14:17:51','2026-06-19 14:17:51','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(18,'pedro velazques',NULL,NULL,NULL,34534534,'PV',NULL,'#3d2258',1,NULL,1,'2026-06-23','ertert','334634634','2026-06-20 10:12:28','2026-06-20 10:12:28','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(19,'Julio Jaramillo',NULL,NULL,NULL,12323123,'JJ',NULL,'#ba79fb',1,NULL,1,'2017-05-23','ghdfh','345345','2026-06-20 10:16:15','2026-06-20 10:16:15','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(20,'Olimpo cardenas',NULL,NULL,NULL,324234,'OC',NULL,'#ba79fb',1,NULL,1,'2022-12-12','234234','45345','2026-06-20 10:19:58','2026-06-20 10:19:58','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(21,'Nicola Di Bari',NULL,NULL,NULL,5634545,'ND',NULL,'#ba79fb',1,NULL,1,'2000-01-22','fgfdgdfgdf','34534','2026-06-20 10:39:00','2026-06-20 10:39:00','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(26,'fghfghfg',NULL,NULL,NULL,45345,'FG','2','#ba79fb',1,NULL,1,'2024-06-17','5etrwetr','34534','2026-06-22 15:20:25','2026-06-22 15:20:25','en_proceso','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(27,'sdsdfg dsfsdf',NULL,NULL,NULL,34234,'SD','1','#ba79fb',1,NULL,1,'2026-06-03','tgerter','435345','2026-06-23 14:52:29','2026-06-23 14:52:29','null','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(28,'hdfgh',NULL,NULL,NULL,543252345,'HD','1','#ba79fb',1,NULL,1,'2026-06-07','fdghdfgh','36346','2026-06-23 15:01:31','2026-06-23 15:01:31','si','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(31,'xxx yyy',NULL,NULL,NULL,111142342,'XY','3','#ba79fb',1,1,1,'2026-06-08','dsfgsdfg','34534','2026-06-23 15:23:30','2026-08-03 14:33:38','si','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(32,'yyy bbb',NULL,NULL,NULL,534534,'YB','2','#ba79fb',1,NULL,1,'2026-06-08','fdgfdg','323423','2026-06-23 15:31:26','2026-06-23 16:03:33','si','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(33,'yyyy',NULL,NULL,NULL,43534777,'FD','1','#ba79fb',1,NULL,1,'2026-06-03','dfgsdfgsdf','345','2026-06-23 15:34:40','2026-06-23 15:34:40','si','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(34,'yyyy bbbb',NULL,NULL,NULL,1007615656,'WE','1','#ba79fb',1,NULL,1,'2026-06-08','retwert','43534','2026-06-23 15:35:48','2026-06-23 15:35:48','si','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(35,'Hugo','Chavez',NULL,NULL,777888999,'HC','1','#302839',1,NULL,1,'2025-06-01','Juana kkk','3423423','2026-06-26 11:41:33','2026-06-26 11:42:28','no','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(36,'Valentina','Madrid',NULL,'Otro',88880000,'VM','1','#ba79fb',1,NULL,1,'2016-05-26','Yo mero','3232323','2026-06-26 16:44:51','2026-06-26 16:44:51','no','femenino',0,'Pasaporte','Aguachica - Cesar',20,9,'La Nevada','Manzana B casa 43',NULL,NULL,1),
+(37,'Nuevo','Magola',NULL,'TI',777666544,'NM','1','#ba79fb',1,NULL,1,'2006-01-22','jjjhhhgfff','456456456','2026-08-01 10:20:50','2026-08-01 10:20:50','en_proceso','masculino',0,NULL,'valledupar',8,398,'Los cortijos','Carrera 51 #23-51','3042065930','grovveip@gmail.com',1),
+(38,'Juan José','Machado Rojas',NULL,'TI',123456789,'JM','2','#ba79fb',1,NULL,1,'2022-08-20','Julitza rojas vuelvas','5800123','2026-08-21 10:58:13','2026-08-21 10:58:13','si','masculino',0,NULL,'Valledupar',20,9,'Los cortijos','Calle 16b #19c-45','5600903','a_penaloza@ingeer.co',1),
+(39,'Angelito','Diaz',NULL,'RC',12345678,'AD','1','#ba79fb',1,NULL,1,'2023-08-12','yaleynis rincones','3125799611','2026-08-22 10:14:17','2026-08-22 10:14:17','si','masculino',0,NULL,'Valledupar',20,9,'Los cortijos','Calle 16b #19c-45','245567899','a_penaloza@ingeer.co',1);
 
 /*Table structure for table `estudiante_ambiente` */
 
@@ -710,99 +784,6 @@ insert  into `estudiante_perfil_aprendizaje_personalizado`(`id`,`estudiante_id`,
 (4,13,1,2,'adssadasdasdasdsadasdasdasdasdsad','2026-08-05 10:01:01',1,NULL,NULL,NULL,'2026-08-05 10:01:01','2026-08-05 10:01:01'),
 (5,11,1,2,'ewfewfdsfdsffdssdfdsfdsfds','2026-08-05 10:10:20',1,NULL,NULL,NULL,'2026-08-05 10:10:20','2026-08-05 10:10:20');
 
-/*Table structure for table `estudiantes` */
-
-DROP TABLE IF EXISTS `estudiantes`;
-
-CREATE TABLE `estudiantes` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `apellido` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `avatar` text COLLATE utf8mb4_unicode_ci,
-  `tipo_identificacion` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `identificacion` int NOT NULL,
-  `iniciales` varchar(3) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `grado_id` text COLLATE utf8mb4_unicode_ci,
-  `color_avatar` varchar(9) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#0F6E56',
-  `perfil_aprendizaje_id` int DEFAULT '1',
-  `perfil_aprendizaje_personalizado_id` int DEFAULT NULL,
-  `activo` tinyint(1) NOT NULL DEFAULT '1',
-  `fecha_nacimiento` text COLLATE utf8mb4_unicode_ci,
-  `acudiente` text COLLATE utf8mb4_unicode_ci,
-  `telefono_acudiente` text COLLATE utf8mb4_unicode_ci,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `requiere_apoyo` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT 'no',
-  `sexo` text COLLATE utf8mb4_unicode_ci,
-  `estado_piar` int DEFAULT '0',
-  `otro_tipo_identificacion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `lugar_nacimiento` text COLLATE utf8mb4_unicode_ci,
-  `departamento_id` int DEFAULT NULL,
-  `municipio_id` int DEFAULT NULL,
-  `barrio_vereda` text COLLATE utf8mb4_unicode_ci,
-  `direccion` text COLLATE utf8mb4_unicode_ci,
-  `telefono` text COLLATE utf8mb4_unicode_ci,
-  `email` text COLLATE utf8mb4_unicode_ci,
-  `institucion_id` int DEFAULT NULL,
-  PRIMARY KEY (`id`,`identificacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `estudiantes` */
-
-insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacion`,`identificacion`,`iniciales`,`grado_id`,`color_avatar`,`perfil_aprendizaje_id`,`perfil_aprendizaje_personalizado_id`,`activo`,`fecha_nacimiento`,`acudiente`,`telefono_acudiente`,`created_at`,`updated_at`,`requiere_apoyo`,`sexo`,`estado_piar`,`otro_tipo_identificacion`,`lugar_nacimiento`,`departamento_id`,`municipio_id`,`barrio_vereda`,`direccion`,`telefono`,`email`,`institucion_id`) values
-(1,'Valentina',NULL,NULL,NULL,1111,'VA',NULL,'#0F6E56',1,NULL,1,'2021-01-17',NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#534AB7',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#854F0B',1,NULL,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(4,'Juan',NULL,NULL,NULL,4444,'JU',NULL,'#185FA5',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(5,'Camila',NULL,NULL,NULL,5555,'CA','2','#993c1d',1,NULL,1,'2026-06-09','fggdfg','4534','2026-06-16 00:02:01','2026-08-04 11:03:58','no','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(6,'Luna',NULL,NULL,NULL,6666,'LU',NULL,'#F59E0B',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(7,'José',NULL,NULL,NULL,134123123,'Jo','1','#0F6E56',1,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:20','2026-06-18 16:04:20','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(8,'José',NULL,NULL,NULL,134123123,'Jo','1','#0F6E56',1,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:36','2026-06-18 16:04:36','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(9,'Fabian Mendez',NULL,NULL,NULL,123123123,'FM','3','#0F6E56',1,1,1,NULL,'Juana 2','32434234','2026-06-18 16:08:25','2026-08-03 11:04:28','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(10,'Juan Lopez 3',NULL,NULL,NULL,3423423,'JL','2','#0F6E56',1,NULL,1,NULL,'Juana 5','3423423','2026-06-18 16:12:47','2026-06-18 16:12:47','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(11,'Andres','quintero',NULL,'CC',5345345,'AQ',NULL,'#dc2626',1,1,1,'2018-01-22','yyyyyyy','5345345','2026-06-18 16:19:02','2026-08-05 10:10:20','si','masculino',0,NULL,'VALLEDUPAR',20,305,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveip@gmail.com',1),
-(12,'Fabian','Mendez Quintero',NULL,'TI',342423,'FM',NULL,'#ea580c',1,NULL,1,'2019-05-16','hfghfghfgh','634634','2026-06-18 16:56:48','2026-08-03 15:45:48','si','femenino',0,NULL,'VALLEDUPAR',20,9,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveifdgdfgp@gmail.com',1),
-(13,'Andrea','Rodriguez','estudiantes/5dzmv171bioMovIFlbhyFrz20bsrGB4f6y9EXVIE.jpg','TI',5345345,'AR','1','#0891b2',2,1,1,'2023-12-10','Julian Rodriguez','45345','2026-06-18 17:15:22','2026-08-05 10:01:01','si','femenino',0,NULL,'valledupar',20,9,'Los cortijos','manzana h casa 23','3042065930','hhhh@gmail.com',1),
-(14,'Xiamir luquez',NULL,'estudiantes/23NS51sSHtdWtH2tQynzAD0EfRAd6m2WaZensqbP.webp',NULL,4353453,'XL','1','#0F6E56',1,NULL,1,'2021-06-12','yyyy','345345','2026-06-18 17:20:14','2026-06-18 17:20:14','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(15,'Juan David  Perez',NULL,NULL,NULL,6456456,'JD',NULL,'#ff8a05',1,NULL,1,'2023-06-07','tttt','345345','2026-06-19 08:00:29','2026-06-19 08:00:29','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(16,'Juana Lopera',NULL,NULL,NULL,654645,'JL',NULL,'#79fbf9',1,NULL,1,'2014-07-12','uuuu','6666','2026-06-19 08:01:32','2026-06-19 08:01:32','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(17,'Luisa Castro',NULL,NULL,NULL,525252,'LC',NULL,'#ff0000',1,NULL,1,'2020-01-12','yyyy','23423423','2026-06-19 14:17:51','2026-06-19 14:17:51','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(18,'pedro velazques',NULL,NULL,NULL,34534534,'PV',NULL,'#3d2258',1,NULL,1,'2026-06-23','ertert','334634634','2026-06-20 10:12:28','2026-06-20 10:12:28','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(19,'Julio Jaramillo',NULL,NULL,NULL,12323123,'JJ',NULL,'#ba79fb',1,NULL,1,'2017-05-23','ghdfh','345345','2026-06-20 10:16:15','2026-06-20 10:16:15','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(20,'Olimpo cardenas',NULL,NULL,NULL,324234,'OC',NULL,'#ba79fb',1,NULL,1,'2022-12-12','234234','45345','2026-06-20 10:19:58','2026-06-20 10:19:58','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(21,'Nicola Di Bari',NULL,NULL,NULL,5634545,'ND',NULL,'#ba79fb',1,NULL,1,'2000-01-22','fgfdgdfgdf','34534','2026-06-20 10:39:00','2026-06-20 10:39:00','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(26,'fghfghfg',NULL,NULL,NULL,45345,'FG','2','#ba79fb',1,NULL,1,'2024-06-17','5etrwetr','34534','2026-06-22 15:20:25','2026-06-22 15:20:25','en_proceso','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(27,'sdsdfg dsfsdf',NULL,NULL,NULL,34234,'SD','1','#ba79fb',1,NULL,1,'2026-06-03','tgerter','435345','2026-06-23 14:52:29','2026-06-23 14:52:29','null','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(28,'hdfgh',NULL,NULL,NULL,543252345,'HD','1','#ba79fb',1,NULL,1,'2026-06-07','fdghdfgh','36346','2026-06-23 15:01:31','2026-06-23 15:01:31','si','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(31,'xxx yyy',NULL,NULL,NULL,111142342,'XY','3','#ba79fb',1,1,1,'2026-06-08','dsfgsdfg','34534','2026-06-23 15:23:30','2026-08-03 14:33:38','si','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(32,'yyy bbb',NULL,NULL,NULL,534534,'YB','2','#ba79fb',1,NULL,1,'2026-06-08','fdgfdg','323423','2026-06-23 15:31:26','2026-06-23 16:03:33','si','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(33,'yyyy',NULL,NULL,NULL,43534777,'FD','1','#ba79fb',1,NULL,1,'2026-06-03','dfgsdfgsdf','345','2026-06-23 15:34:40','2026-06-23 15:34:40','si','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(34,'yyyy bbbb',NULL,NULL,NULL,1007615656,'WE','1','#ba79fb',1,NULL,1,'2026-06-08','retwert','43534','2026-06-23 15:35:48','2026-06-23 15:35:48','si','femenino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(35,'Hugo','Chavez',NULL,NULL,777888999,'HC','1','#302839',1,NULL,1,'2025-06-01','Juana kkk','3423423','2026-06-26 11:41:33','2026-06-26 11:42:28','no','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(36,'Valentina','Madrid',NULL,'Otro',88880000,'VM','1','#ba79fb',1,NULL,1,'2016-05-26','Yo mero','3232323','2026-06-26 16:44:51','2026-06-26 16:44:51','no','femenino',0,'Pasaporte','Aguachica - Cesar',20,9,'La Nevada','Manzana B casa 43',NULL,NULL,1),
-(37,'Nuevo','Magola',NULL,'TI',777666544,'NM','1','#ba79fb',1,NULL,1,'2006-01-22','jjjhhhgfff','456456456','2026-08-01 10:20:50','2026-08-01 10:20:50','en_proceso','masculino',0,NULL,'valledupar',8,398,'Los cortijos','Carrera 51 #23-51','3042065930','grovveip@gmail.com',1),
-(38,'Juan José','Machado Rojas',NULL,'TI',123456789,'JM','2','#ba79fb',1,NULL,1,'2022-08-20','Julitza rojas vuelvas','5800123','2026-08-21 10:58:13','2026-08-21 10:58:13','si','masculino',0,NULL,'Valledupar',20,9,'Los cortijos','Calle 16b #19c-45','5600903','a_penaloza@ingeer.co',1),
-(39,'Angelito','Diaz',NULL,'RC',12345678,'AD','1','#ba79fb',1,NULL,1,'2023-08-12','yaleynis rincones','3125799611','2026-08-22 10:14:17','2026-08-22 10:14:17','si','masculino',0,NULL,'Valledupar',20,9,'Los cortijos','Calle 16b #19c-45','245567899','a_penaloza@ingeer.co',1);
-
-/*Table structure for table `experiencia_materiales` */
-
-DROP TABLE IF EXISTS `experiencia_materiales`;
-
-CREATE TABLE `experiencia_materiales` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `experiencia_id` bigint unsigned NOT NULL,
-  `nombre` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `cantidad` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `es_obligatorio` tinyint(1) NOT NULL DEFAULT '1',
-  `orden` tinyint unsigned NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`),
-  KEY `experiencia_materiales_experiencia_id_foreign` (`experiencia_id`),
-  KEY `experiencia_materiales_experiencia_orden_index` (`experiencia_id`,`orden`),
-  CONSTRAINT `experiencia_materiales_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `experiencia_materiales` */
-
 /*Table structure for table `experiencias` */
 
 DROP TABLE IF EXISTS `experiencias`;
@@ -838,6 +819,25 @@ CREATE TABLE `experiencias` (
 insert  into `experiencias`(`id`,`tematica_id`,`grado_id`,`nombre`,`objetivo`,`proposito`,`habilidades`,`duracion_minutos`,`referente_aprendizaje`,`estado`,`activo`,`creado_por`,`created_at`,`updated_at`) values
 (23,5,1,'Identifica los colores','Identifica los colores',NULL,NULL,20,NULL,'borrador',1,1,'2026-08-24 16:17:23','2026-08-24 16:17:23'),
 (24,5,2,'Identifica los colores','Identifica los colores',NULL,NULL,20,NULL,'borrador',1,1,'2026-08-24 16:17:39','2026-08-24 16:17:39');
+
+/*Table structure for table `experiencia_materiales` */
+
+DROP TABLE IF EXISTS `experiencia_materiales`;
+
+CREATE TABLE `experiencia_materiales` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `experiencia_id` bigint unsigned NOT NULL,
+  `nombre` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cantidad` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `es_obligatorio` tinyint(1) NOT NULL DEFAULT '1',
+  `orden` tinyint unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `experiencia_materiales_experiencia_id_foreign` (`experiencia_id`),
+  KEY `experiencia_materiales_experiencia_orden_index` (`experiencia_id`,`orden`),
+  CONSTRAINT `experiencia_materiales_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `experiencia_materiales` */
 
 /*Table structure for table `failed_jobs` */
 
@@ -955,6 +955,41 @@ insert  into `instituciones`(`id`,`nombre`,`municipio`,`departamento`,`codigo_da
 (1,'Preescolar EDUKIDS','Valledupar','Cesar','050010000001','instituciones/1/logo.jpg','contacto@institucion.edu.co',1,NULL,'2026-08-22 11:01:26'),
 (3,'Institución Educativa Loperena','Valledupar','Cesar','12345678','instituciones/3/logo.jpg','primeraprueba@pednia.test',1,'2026-08-05 11:52:16','2026-08-05 15:37:26');
 
+/*Table structure for table `juegos` */
+
+DROP TABLE IF EXISTS `juegos`;
+
+CREATE TABLE `juegos` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ambiente_id` bigint unsigned DEFAULT NULL,
+  `eje_id` bigint unsigned DEFAULT NULL,
+  `tematica_id` bigint unsigned DEFAULT NULL,
+  `modulo_id` bigint unsigned DEFAULT NULL,
+  `tipo` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text COLLATE utf8mb4_unicode_ci,
+  `icono` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'fa-gamepad',
+  `color` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#2563eb',
+  `orden` tinyint unsigned NOT NULL DEFAULT '0',
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `juegos_modulo_id_activo_orden_index` (`modulo_id`,`activo`,`orden`),
+  KEY `juegos_ambiente_id_activo_orden_index` (`ambiente_id`,`activo`,`orden`),
+  KEY `juegos_eje_id_activo_orden_index` (`eje_id`,`activo`,`orden`),
+  KEY `juegos_tematica_id_activo_orden_index` (`tematica_id`,`activo`,`orden`),
+  CONSTRAINT `juegos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `juegos_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `juegos_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `juegos_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `juegos` */
+
+insert  into `juegos`(`id`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values
+
+
 /*Table structure for table `matriculas` */
 
 DROP TABLE IF EXISTS `matriculas`;
@@ -997,7 +1032,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `migrations` */
 
@@ -1047,33 +1082,9 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (46,'2026_08_28_000001_create_clase_experiencias_table',16),
 (47,'2026_08_28_000002_add_media_to_modulos_and_ejes',17),
 (48,'2026_09_02_000001_create_resultados_bloque_nino_table',18),
-(49,'2026_09_02_000002_drop_tablas_huerfanas',18);
-
-/*Table structure for table `modulo_institucion` */
-
-DROP TABLE IF EXISTS `modulo_institucion`;
-
-CREATE TABLE `modulo_institucion` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `modulo_id` bigint unsigned NOT NULL,
-  `institucion_id` bigint unsigned NOT NULL,
-  `activo` tinyint(1) NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `modulo_institucion_modulo_id_institucion_id_unique` (`modulo_id`,`institucion_id`),
-  KEY `modulo_institucion_institucion_id_foreign` (`institucion_id`),
-  CONSTRAINT `modulo_institucion_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `modulo_institucion_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `modulo_institucion` */
-
-insert  into `modulo_institucion`(`id`,`modulo_id`,`institucion_id`,`activo`,`created_at`,`updated_at`) values
-(42,1,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
-(43,2,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:34'),
-(44,4,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
-(46,3,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18');
+(49,'2026_09_02_000002_drop_tablas_huerfanas',18),
+(50,'2026_09_02_000003_create_juegos_table',19),
+(51,'2026_09_02_000004_expand_juegos_curriculo_columns',19);
 
 /*Table structure for table `modulos` */
 
@@ -1110,6 +1121,32 @@ insert  into `modulos`(`id`,`ambiente_id`,`institucion_id`,`nombre`,`slug`,`desc
 (2,6,NULL,'Dibujo','dibujo',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,2,1,1,'2026-08-06 11:39:29','2026-08-11 09:09:48',1),
 (3,8,NULL,'Matematicas','matematicas',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,1,1,1,'2026-08-06 11:41:54','2026-08-06 11:41:54',1),
 (4,6,NULL,'Canto','canto',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,3,1,1,'2026-08-06 14:19:49','2026-08-06 14:42:48',1);
+
+/*Table structure for table `modulo_institucion` */
+
+DROP TABLE IF EXISTS `modulo_institucion`;
+
+CREATE TABLE `modulo_institucion` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `modulo_id` bigint unsigned NOT NULL,
+  `institucion_id` bigint unsigned NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `modulo_institucion_modulo_id_institucion_id_unique` (`modulo_id`,`institucion_id`),
+  KEY `modulo_institucion_institucion_id_foreign` (`institucion_id`),
+  CONSTRAINT `modulo_institucion_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `modulo_institucion_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `modulo_institucion` */
+
+insert  into `modulo_institucion`(`id`,`modulo_id`,`institucion_id`,`activo`,`created_at`,`updated_at`) values
+(42,1,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(43,2,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:34'),
+(44,4,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18'),
+(46,3,1,1,'2026-08-15 08:50:18','2026-08-15 08:50:18');
 
 /*Table structure for table `municipios` */
 
@@ -3112,26 +3149,6 @@ CREATE TABLE `temas` (
 
 /*Data for the table `temas` */
 
-/*Table structure for table `tematica_dba` */
-
-DROP TABLE IF EXISTS `tematica_dba`;
-
-CREATE TABLE `tematica_dba` (
-  `tematica_id` bigint unsigned NOT NULL,
-  `catalogo_dba_id` bigint unsigned NOT NULL,
-  `relacion` enum('principal','complementario') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'principal',
-  `observacion` text COLLATE utf8mb4_unicode_ci,
-  PRIMARY KEY (`tematica_id`,`catalogo_dba_id`),
-  KEY `tematica_dba_catalogo_dba_id_foreign` (`catalogo_dba_id`),
-  CONSTRAINT `tematica_dba_catalogo_dba_id_foreign` FOREIGN KEY (`catalogo_dba_id`) REFERENCES `catalogo_dba` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `tematica_dba_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-/*Data for the table `tematica_dba` */
-
-insert  into `tematica_dba`(`tematica_id`,`catalogo_dba_id`,`relacion`,`observacion`) values
-(3,2,'principal',NULL);
-
 /*Table structure for table `tematicas` */
 
 DROP TABLE IF EXISTS `tematicas`;
@@ -3169,6 +3186,26 @@ insert  into `tematicas`(`id`,`eje_id`,`nombre`,`competencia`,`referente_alterna
 (3,8,'Prueba docente',NULL,NULL,0,1,0,1,'activa',1,4,'2026-08-15 08:28:19','2026-08-18 15:12:47'),
 (5,1,'Identifica los colores',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-08-24 08:20:38','2026-08-24 08:20:38'),
 (6,2,'Identifica los colores',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-08-24 14:59:55','2026-08-24 14:59:55');
+
+/*Table structure for table `tematica_dba` */
+
+DROP TABLE IF EXISTS `tematica_dba`;
+
+CREATE TABLE `tematica_dba` (
+  `tematica_id` bigint unsigned NOT NULL,
+  `catalogo_dba_id` bigint unsigned NOT NULL,
+  `relacion` enum('principal','complementario') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'principal',
+  `observacion` text COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`tematica_id`,`catalogo_dba_id`),
+  KEY `tematica_dba_catalogo_dba_id_foreign` (`catalogo_dba_id`),
+  CONSTRAINT `tematica_dba_catalogo_dba_id_foreign` FOREIGN KEY (`catalogo_dba_id`) REFERENCES `catalogo_dba` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `tematica_dba_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `tematica_dba` */
+
+insert  into `tematica_dba`(`tematica_id`,`catalogo_dba_id`,`relacion`,`observacion`) values
+(3,2,'principal',NULL);
 
 /*Table structure for table `users` */
 
