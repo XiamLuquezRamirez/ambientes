@@ -275,6 +275,12 @@ class BloqueExperienciaService
     {
         $meta = $this->registry->metaTipo($bloque->tipo);
         $datos = $this->registry->normalizar($bloque->tipo, $bloque->datos ?? []);
+
+        if ($bloque->tipo === BloqueExperiencia::TIPO_CLASIFICACION && $datos !== ($bloque->datos ?? [])) {
+            $bloque->datos = $datos;
+            $bloque->saveQuietly();
+        }
+
         $pendientes = $this->registry->pendientes($bloque->tipo, $datos);
 
         return [

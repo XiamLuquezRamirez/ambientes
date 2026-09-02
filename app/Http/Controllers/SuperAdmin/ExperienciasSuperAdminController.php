@@ -119,6 +119,7 @@ class ExperienciasSuperAdminController extends Controller
             'publicar' => route('superadmin.catalogo.experiencias.publicar', $experiencia),
             'actualizar_template' => route('superadmin.catalogo.bloques.actualizar', ['bloque' => '__BLOQUE__']),
             'eliminar_template' => route('superadmin.catalogo.bloques.eliminar', ['bloque' => '__BLOQUE__']),
+            'juegos_catalogo' => route('superadmin.catalogo.juegos'),
         ];
 
         return view('superAdmin.catalogo.experiencias.constructor', compact(

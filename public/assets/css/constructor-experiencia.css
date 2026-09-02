@@ -701,6 +701,220 @@
     }
 }
 
+.cx-juegos-catalogo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    max-height: 48vh;
+    overflow-y: auto;
+    margin-top: 14px;
+    padding: 2px;
+}
+
+.cx-juegos-catalogo-grid .cx-juegos-empty {
+    grid-column: 1 / -1;
+}
+
+.cx-juego-catalogo-card {
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    border: 2px solid var(--stu-border, #e2e8f0);
+    padding: 0;
+    background: var(--stu-bg, #fff);
+    appearance: none;
+    font-family: inherit;
+}
+
+.cx-juego-catalogo-card:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: #93C5FD;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, .12);
+}
+
+.cx-juego-catalogo-card.is-selected {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .18);
+}
+
+.cx-juego-catalogo-card:disabled {
+    cursor: not-allowed;
+    opacity: .65;
+}
+
+.cx-juego-catalogo-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #2563EB;
+    color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: .72rem;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, .35);
+    z-index: 2;
+}
+
+.cx-juego-catalogo-card.is-selected .cx-juego-catalogo-check {
+    display: inline-flex;
+}
+
+.cx-juego-catalogo-card .student-top {
+    padding-right: 42px;
+}
+
+.cx-juego-catalogo-foot {
+    border-top: 1px solid var(--stu-border-soft, #f1f5f9);
+    padding: 10px 14px 12px;
+    background: linear-gradient(180deg, #fff 0%, #F8FBFF 100%);
+}
+
+.cx-juego-catalogo-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 700;
+    color: #2563EB;
+}
+
+.cx-juego-catalogo-card.is-selected .cx-juego-catalogo-action {
+    color: #047857;
+}
+
+.cx-juegos-modal-resumen {
+    margin-top: 14px;
+}
+
+.cx-juegos-stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.cx-juegos-stats-grid .stat-body h3 {
+    font-size: 1.05rem;
+}
+
+.cx-juegos-modal-hint {
+    font-size: .82rem;
+}
+
+/* Panel de filtros del modal (tokens --stu-* vía .cx-modal-juegos en estudiantes.css) */
+.cx-juegos-filtros-panel {
+    background: var(--stu-surface, #F8FAFC);
+    border: 1px solid var(--stu-border, #E2E8F0);
+    border-radius: var(--stu-radius, 14px);
+    box-shadow: var(--stu-shadow, 0 1px 3px rgba(15, 23, 42, .05));
+    padding: 14px;
+}
+
+.cx-juegos-filtros-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--stu-primary-dark, #1E3A8A);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.cx-juegos-filtros-head i {
+    color: var(--stu-primary, #2563EB);
+}
+
+.cx-modal-juegos .students-toolbar,
+.cx-modal-juegos .students-toolbar--compact {
+    background: var(--stu-bg, #fff);
+    border: 1px solid var(--stu-border, #E2E8F0);
+    border-radius: var(--stu-radius-sm, 10px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8);
+    margin: 0;
+}
+
+.cx-modal-juegos .students-toolbar--compact {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px;
+}
+
+.cx-modal-juegos .students-toolbar--compact .search-box {
+    min-width: 0;
+    width: 100%;
+}
+
+.cx-modal-juegos .students-toolbar--compact .search-box input {
+    background: var(--stu-bg, #fff);
+    border: 1px solid var(--stu-border, #E2E8F0);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+}
+
+.cx-modal-juegos .students-toolbar--compact .search-box input:focus {
+    border-color: #93C5FD;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+
+.cx-modal-juegos .students-toolbar--compact .toolbar-actions {
+    width: 100%;
+    gap: 10px;
+}
+
+.cx-modal-juegos .students-toolbar--compact .toolbar-select {
+    flex: 1 1 calc(33.333% - 7px);
+    min-width: 140px;
+    background: var(--stu-bg, #fff);
+    border: 1px solid var(--stu-border, #E2E8F0);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+}
+
+.cx-modal-juegos .students-toolbar--compact .toolbar-select:hover {
+    border-color: #BFDBFE;
+}
+
+.cx-modal-juegos .students-toolbar--compact .toolbar-select:focus {
+    border-color: #93C5FD;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    outline: none;
+}
+
+.cx-modal-juegos .cx-juegos-modal-resumen .stat-card {
+    background: var(--stu-bg, #fff);
+    border: 1px solid var(--stu-border, #E2E8F0);
+    box-shadow: var(--stu-shadow, 0 1px 3px rgba(15, 23, 42, .05));
+}
+
+.cx-juegos-modal-loading {
+    margin-top: 12px;
+}
+
+@media (max-width: 992px) {
+    .cx-juegos-catalogo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cx-juegos-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 576px) {
+    .cx-modal-juegos .students-toolbar--compact .toolbar-select {
+        flex: 1 1 100%;
+    }
+
+    .cx-juegos-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cx-juegos-modal-hint {
+        display: none;
+    }
+}
+
 .cx-help {
     font-size: 0.72rem;
     color: var(--cx-muted);

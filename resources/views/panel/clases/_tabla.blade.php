@@ -57,6 +57,11 @@
                                     Borrador
                                 </button>
                             @endif
+                            <a href="{{ route('panel.clases.resultados', $clase) }}"
+                                class="btn btn-sm btn-outline-secondary"
+                                title="Ver resultados del kiosco">
+                                <i class="fas fa-chart-simple"></i> Resultados
+                            </a>
                             <button type="button" class="btn btn-danger btn-sm" disabled title="Próximamente">
                                 <i class="fas fa-trash"></i>
                             </button>

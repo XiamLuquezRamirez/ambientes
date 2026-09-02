@@ -107,6 +107,7 @@ class ExperienciasPanelController extends Controller
             'publicar' => route('panel.experiencias.publicar', $experiencia),
             'actualizar_template' => route('panel.bloques.actualizar', ['bloque' => '__BLOQUE__']),
             'eliminar_template' => route('panel.bloques.eliminar', ['bloque' => '__BLOQUE__']),
+            'juegos_catalogo' => route('panel.catalogo.juegos'),
         ];
 
         return view('panel.catalogo.experiencias.constructor', compact(

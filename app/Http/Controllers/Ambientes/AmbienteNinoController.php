@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Ambientes;
 
 use App\Http\Controllers\Controller;
+use App\Models\BloqueExperiencia;
 use App\Models\Experiencia;
 use App\Services\ClaseKioscoService;
 use App\Services\RecorridoNinoService;
+use App\Services\ResultadoNinoService;
 use App\Services\SesionNinoService;
 use App\Services\TextoAVozService;
 use Illuminate\Http\Request;
@@ -18,6 +20,7 @@ class AmbienteNinoController extends Controller
         private SesionNinoService $sesionNino,
         private RecorridoNinoService $recorrido,
         private ClaseKioscoService $claseKiosco,
+        private ResultadoNinoService $resultadoNino,
     ) {}
 
     /**
@@ -177,6 +180,50 @@ class AmbienteNinoController extends Controller
         return response()->json([
             'success' => true,
             'data' => $payload,
+        ]);
+    }
+
+    public function guardarResultadoBloque(Request $request, Experiencia $experiencia, BloqueExperiencia $bloque)
+    {
+        $datos = $request->validate([
+            'correcto' => ['nullable', 'boolean'],
+            'payload' => ['required'],
+            'archivo' => ['nullable', 'file', 'max:51200'],
+        ]);
+
+        $payload = $datos['payload'];
+        if (is_string($payload)) {
+            $payload = json_decode($payload, true);
+        }
+
+        if (! is_array($payload)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El payload del resultado es inválido.',
+            ], 422);
+        }
+
+        $resultado = $this->resultadoNino->registrar(
+            $request,
+            $experiencia,
+            $bloque,
+            [
+                'correcto' => $datos['correcto'] ?? null,
+                'payload' => $payload,
+            ],
+            $request->file('archivo'),
+        );
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $resultado->id,
+                'correcto' => $resultado->correcto,
+                'tipo_registro' => $resultado->tipo_registro,
+                'archivo_url' => $resultado->archivo_path
+                    ? asset('storage/'.$resultado->archivo_path)
+                    : null,
+            ],
         ]);
     }
 

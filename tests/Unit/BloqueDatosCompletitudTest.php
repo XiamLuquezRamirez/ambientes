@@ -194,7 +194,23 @@ class BloqueDatosCompletitudTest extends TestCase
             ],
         ]);
 
-        $this->assertContains('Categoría 2: nombre', $pendientes);
+        $this->assertContains('Categorías: mínimo 2', $pendientes);
+    }
+
+    public function test_clasificacion_elimina_categorias_placeholder_cat_n(): void
+    {
+        $normalizado = $this->registry->normalizar(BloqueExperiencia::TIPO_CLASIFICACION, [
+            'instruccion' => '',
+            'categorias' => ['Cat 1', 'Cat 2', 'Frutas'],
+            'items' => [
+                ['texto' => 'A', 'imagen' => '', 'categoria' => 'Cat 1'],
+                ['texto' => 'B', 'imagen' => '', 'categoria' => 'Frutas'],
+            ],
+        ]);
+
+        $this->assertSame(['Frutas'], $normalizado['categorias']);
+        $this->assertSame('', $normalizado['items'][0]['categoria']);
+        $this->assertSame('Frutas', $normalizado['items'][1]['categoria']);
     }
 
     public function test_defaults_de_cada_tipo_tienen_pendientes(): void

@@ -2,7 +2,8 @@
     TOKENS (página estudiantes)
 ===========================*/
 .students-page,
-.ficha-page {
+.ficha-page,
+.cx-modal-juegos {
     --stu-bg: var(--color-surface, #fff);
     --stu-text: var(--color-text, #0F172A);
     --stu-text-soft: var(--color-text-soft, #334155);

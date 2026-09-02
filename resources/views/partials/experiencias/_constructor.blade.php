@@ -19,6 +19,15 @@
     } elseif (str_contains($gnPreview, 'primaria') || (int) ($experiencia->grado->edad_anos ?? 0) >= 6) {
         $nivelPreview = 'primaria';
     }
+    $urlJuegosCatalogo = $urls['juegos_catalogo'] ?? '';
+    $juegosFiltros = app(\App\Services\JuegoCatalogoService::class)->opcionesFiltro();
+    $juegosFiltros['filtros'] = [];
+    $juegosFiltros['texto_busqueda'] = '';
+    $juegosFiltros['soloActivos'] = true;
+    $juegosFiltros['mostrarVista'] = false;
+    $juegosFiltros['compacto'] = true;
+    $juegosFiltros['formId'] = 'formFiltrosJuegosConstructor';
+    $juegosFiltros['formAction'] = $urlJuegosCatalogo;
 @endphp
 
 <div class="page-header tematicas-page-header cx-page-header">
@@ -45,6 +54,7 @@
 <div class="cx-app" data-puede-editar="{{ $puedeEditar ? '1' : '0' }}"
     data-puede-publicar="{{ $puedePublicar ? '1' : '0' }}" data-experiencia-id="{{ $experiencia->id }}"
     data-experiencia-nombre="{{ $experiencia->nombre }}"
+    data-url-juegos-catalogo="{{ $urlJuegosCatalogo }}"
     data-media-base="{{ asset('storage/experiencias/' . $experiencia->id . '/bloques') }}"
     data-estudiante-sexo="masculino"
     data-nivel-etario="{{ $nivelPreview }}"
@@ -149,5 +159,50 @@
             </div>
         </div>
         <p class="vn-hint">Vista previa 1280×800 · horizontal · el niño navega bloque por bloque</p>
+    </div>
+</div>
+
+{{-- Modal: catálogo de juegos --}}
+<div class="modal fade modal-app cx-modal-juegos" id="cxModalJuegosModulo" tabindex="-1"
+    aria-labelledby="cxModalJuegosModuloLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-icon">
+                    <i class="fa-solid fa-gamepad text-white"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="modal-title mb-0" id="cxModalJuegosModuloLabel">Catálogo de juegos</h5>
+                    <p class="modal-subtitle mb-0" id="cxModalJuegosModuloSubtitle">Filtra y elige un juego para el bloque</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="cx-juegos-filtros-panel">
+                    <div class="cx-juegos-filtros-head">
+                        <i class="fa-solid fa-filter" aria-hidden="true"></i>
+                        <span>Filtrar catálogo</span>
+                    </div>
+                    @include('partials.juegos._filtros', $juegosFiltros)
+                </div>
+                <div id="cxJuegosModuloResumen" class="cx-juegos-modal-resumen" hidden></div>
+                <div id="cxJuegosModuloLoading" class="cx-juegos-modal-loading text-center py-4" hidden>
+                    <i class="fa-solid fa-spinner fa-spin fa-2x text-primary"></i>
+                    <p class="mt-2 mb-0 text-muted">Cargando juegos…</p>
+                </div>
+                <div id="cxJuegosModuloError" class="alert alert-warning mb-3" hidden></div>
+                <div id="cxJuegosModuloLista" class="students-grid cx-juegos-catalogo-grid" role="radiogroup"
+                    aria-label="Catálogo de juegos" aria-live="polite"></div>
+                <div id="cxJuegosModuloPaginacion" class="paginacion-wrapper mt-3" hidden></div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <p class="cx-juegos-modal-hint mb-0 text-muted">
+                    <i class="fa-solid fa-hand-pointer"></i> Haz clic en una tarjeta para usar el juego en el bloque
+                </p>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
     </div>
 </div>

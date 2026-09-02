@@ -162,6 +162,7 @@ class ExperienciasAdminController extends Controller
             'publicar' => route('admin.experiencias.publicar', $experiencia),
             'actualizar_template' => route('admin.bloques.actualizar', ['bloque' => '__BLOQUE__']),
             'eliminar_template' => route('admin.bloques.eliminar', ['bloque' => '__BLOQUE__']),
+            'juegos_catalogo' => route('admin.catalogo.juegos'),
         ];
 
         return view('admin.catalogo.experiencias.constructor', compact(

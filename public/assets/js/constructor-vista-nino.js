@@ -146,6 +146,9 @@
     let experienciaIdActiva = null;
     let urlExperienciaTpl = '';
     let evidenciaSesion = 0;
+    const colaResultados = [];
+    let guardandoResultado = false;
+    const TIPOS_BLOQUE_RESULTADO = ['pregunta', 'reto', 'emocion', 'evidencia', 'dibujo', 'emparejar', 'clasificacion', 'arrastrar'];
 
     const PAINT_SIZE_MAP = { s: 6, m: 12, l: 22 };
     const PAINT_DEFAULT_COLORS = [
@@ -269,6 +272,12 @@
         return map[tipo] || fallback;
     }
 
+    function tituloVisibleBloque(bloque, fallbackPorNivel) {
+        const nombre = String(bloque?.nombre || '').trim();
+        if (nombre) return nombre;
+        return tituloBloque(bloque?.tipo || '', fallbackPorNivel);
+    }
+
     function primerNombre() {
         const n = String(estudianteNombre || '').trim();
         if (!n) return configNivel().simplificar ? 'amiguito' : 'amigo';
@@ -338,6 +347,21 @@
         const s = String(file);
         if (/^https?:\/\//i.test(s) || s.startsWith('/') || s.startsWith('data:')) return s;
         return String(mediaBase || '').replace(/\/$/, '') + '/' + s.replace(/^\//, '');
+    }
+
+    function contenidoChipItem(item, fallback) {
+        const fb = fallback || '—';
+        const texto = String(item?.texto || '').trim();
+        const imagen = String(item?.imagen || '').trim();
+        const url = imagen ? mediaUrl(imagen) : '';
+        const partes = [];
+        if (url) {
+            partes.push(`<img src="${escapar(url)}" alt="${escapar(texto || 'Ítem')}">`);
+        }
+        if (texto) {
+            partes.push(`<span>${escapar(texto)}</span>`);
+        }
+        return partes.length ? partes.join('') : fb;
     }
 
     function emocionesAssetsBase() {
@@ -547,7 +571,7 @@
         const tipoMedia = d.tipo_media || 'ninguno';
         const saludo = configNivel().simplificar
             ? `¡Hola, ${escapar(primerNombre())}!`
-            : tituloBloque('bienvenida', '¡Hola!');
+            : escapar(tituloVisibleBloque(bloque, '¡Hola!'));
         let mediaHtml = '';
         if (tipoMedia === 'imagen') {
             const imgUrl = mediaUrl(d.imagen);
@@ -584,13 +608,13 @@
         if (!url) {
             return wrap(`
                 <div class="vn-hero-emoji">🔊</div>
-                <h2 class="vn-title">Escucha</h2>
+                <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Escucha'))}</h2>
                 ${instruccionHtml(d.instruccion)}
                 <p class="vn-empty">Sin audio configurado</p>
             `, bloque, 'audio');
         }
         return wrap(`
-            <h2 class="vn-title">${tituloBloque('audio', 'Escucha')}</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Escucha'))}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-audio-stage" data-vn-audio-stage>
                 <button type="button" class="vn-audio-btn vn-pulse-hint" data-vn-audio-play
@@ -612,13 +636,13 @@
         if (!url) {
             return wrap(`
                 <div class="vn-hero-emoji">🎬</div>
-                <h2 class="vn-title">Mira el video</h2>
+                <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Mira el video'))}</h2>
                 ${instruccionHtml(d.instruccion)}
                 <p class="vn-empty">Sin video configurado</p>
             `, bloque, 'video');
         }
         return wrap(`
-            <h2 class="vn-title">${tituloBloque('video', 'Mira el video')}</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Mira el video'))}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-video-stage" data-vn-video-stage>
                 ${htmlBotonVideo('data-vn-video-play aria-label="Reproducir video"')}
@@ -638,7 +662,7 @@
             </div>`
             : '<p class="vn-empty">Sin imagen</p>';
         return wrap(`
-            <h2 class="vn-title">${tituloBloque('imagen', 'Observa')}</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Observa'))}</h2>
             ${instruccionHtml(d.instruccion)}
             ${imgHtml}
         `, bloque, 'imagen');
@@ -817,7 +841,7 @@
         const puedeAnt = historiaPage > 0;
         const puedeSig = historiaPage < total - 1;
         return wrap(`
-            <h2 class="vn-title">${tituloBloque('historia', 'Cuento')}</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Cuento'))}</h2>
             <div class="vn-historia-progress" aria-hidden="true">${dotsHistoriaHtml(total, historiaPage)}</div>
             <p class="vn-paso-badge vn-historia-badge">${badgeHistoriaHtml(total, historiaPage)}</p>
             ${instruccionHtml(d.instruccion)}
@@ -848,7 +872,7 @@
                         <div class="vn-ra-scan-line"></div>
                     </div>
                 </div>
-                <h2 class="vn-title">${configNivel().simplificar ? '¡Magia!' : 'Realidad aumentada'}</h2>
+                <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Realidad aumentada'))}</h2>
                 ${instruccionHtml(d.instruccion)}
                 <p class="vn-ra-hint">${configNivel().simplificar
                 ? '¡Apunta la tablet!'
@@ -892,7 +916,7 @@
                     : (configNivel().simplificar ? 'Toca para tomar foto.' : 'Se abrirá la cámara del dispositivo.')))
             : '';
         return wrap(`
-            <h2 class="vn-title">${tituloBloque('evidencia', '¡Tu evidencia!')}</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, '¡Tu evidencia!'))}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-evidencia-wrap">
                 <div class="vn-evidencia-stage" data-vn-evidencia-stage hidden>
@@ -1102,9 +1126,9 @@
         `;
     }
 
-    function juegoHeadHtml(d, id, opts) {
+    function juegoHeadHtml(bloque, d, id, opts) {
         const o = opts || {};
-        const titulo = escapar(d.juego_nombre || (id === 'colorear' ? 'Colorea' : 'Juego'));
+        const titulo = escapar(d.juego_nombre || bloque?.nombre || (id === 'colorear' ? 'Colorea' : 'Juego'));
         const paintCls = id === 'colorear' ? ' vn-juego-head--paint' : '';
         let extra = '';
         if (id === 'memoria' && o.paresTotal != null) {
@@ -1167,7 +1191,7 @@
         } else {
             extra = '<p class="vn-empty">Elige un juego en la configuración</p>';
         }
-        return wrap(`${juegoHeadHtml(d, id, headOpts)}${extra}`, bloque, cardClass);
+        return wrap(`${juegoHeadHtml(bloque, d, id, headOpts)}${extra}`, bloque, cardClass);
     }
 
     function renderDibujo(bloque) {
@@ -1183,7 +1207,7 @@
             : '';
         return wrap(`
             <div class="vn-paint-head">
-                <h2 class="vn-title vn-title--compact">${tituloBloque('dibujo', 'Dibuja')}</h2>
+                <h2 class="vn-title vn-title--compact">${escapar(tituloVisibleBloque(bloque, 'Dibuja'))}</h2>
                 ${instruccionHtml(d.instruccion)}
             </div>
             <div class="vn-paint vn-paint--dibujo" data-vn-paint="dibujo">
@@ -1218,7 +1242,7 @@
             : '';
         const tituloHtml = textoPregunta
             ? `<h2 class="vn-title vn-pregunta-enunciado" data-vn-tts-text="${escapar(textoPregunta)}">${escapar(textoPregunta)}</h2>`
-            : `<h2 class="vn-title">${tituloBloque('pregunta', 'Pregunta')}</h2>`;
+            : `<h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Pregunta'))}</h2>`;
         const instrHtml = mostrarInstruccion ? instruccionHtml(instruccion) : '';
         return wrap(`
             <div class="vn-pregunta-head">
@@ -1254,7 +1278,7 @@
             return `<button type="button" class="vn-chip" data-vn-der="${i}">${content || '—'}</button>`;
         });
         return wrap(`
-            <h2 class="vn-title">${tituloBloque('emparejar', 'Empareja')}</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Empareja'))}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-match-cols" data-vn-emparejar data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
                 data-fb-err="${escapar(d.fb_err || 'Ese no va ahí…')}">
@@ -1272,20 +1296,17 @@
         const zonas = cats.map((c, i) =>
             `<div class="vn-zone" data-vn-cat="${escapar(c)}" style="background:${pickColor(c)}; --vn-i:${i}">
                 <span class="vn-zone-label">${escapar(c)}</span>
-                <div class="vn-zone-slots" aria-hidden="true"></div>
+                <div class="vn-zone-slots"></div>
             </div>`
         ).join('');
-        const pool = items.map((it, i) => {
-            const label = it.texto || (it.imagen ? '' : 'Ítem');
-            const img = it.imagen ? `<img src="${escapar(mediaUrl(it.imagen))}" alt="">` : '';
-            const text = label ? `<span>${escapar(label)}</span>` : '';
-            return `<button type="button" class="vn-chip vn-chip-drag" data-vn-item="${i}" data-cat="${escapar(it.categoria || '')}" aria-grabbed="false" style="--vn-i:${i}">${img}${text || '—'}</button>`;
-        }).join('');
+        const pool = items.map((it, i) =>
+            `<button type="button" class="vn-chip vn-chip-drag" data-vn-item="${i}" data-cat="${escapar(it.categoria || '')}" aria-grabbed="false" style="--vn-i:${i}">${contenidoChipItem(it)}</button>`
+        ).join('');
         return wrap(`
-            <h2 class="vn-title">${tituloBloque('clasificacion', 'Clasifica')}</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Clasifica'))}</h2>
             ${instruccionHtml(d.instruccion)}
             <p class="vn-hint-drag">${configNivel().simplificar ? '¡Arrastra cada cosa a su lugar!' : 'Arrastra cada elemento a su categoría'}</p>
-            <div class="vn-sort-board" data-vn-clasif-board>
+            <div class="vn-sort-board" data-vn-clasif-board data-vn-pool-count="${items.length}">
                 <div class="vn-sort-col vn-sort-col--pool" data-vn-clasif-pool>${pool}</div>
                 <div class="vn-sort-col vn-sort-col--zones" data-vn-clasif>${zonas}</div>
             </div>
@@ -1300,21 +1321,18 @@
         const zHtml = zonas.map((z, i) =>
             `<div class="vn-zone" data-vn-zona="${escapar(z.nombre || '')}" style="background:${escapar(z.color || '#0F6E56')}; --vn-i:${i}">
                 <span class="vn-zone-label">${escapar(z.nombre || 'Zona')}</span>
-                <div class="vn-zone-slots" aria-hidden="true"></div>
+                <div class="vn-zone-slots"></div>
             </div>`
         ).join('');
-        const pool = items.map((it, i) => {
-            const label = it.texto || (it.imagen ? '' : 'Ítem');
-            const img = it.imagen ? `<img src="${escapar(mediaUrl(it.imagen))}" alt="">` : '';
-            const text = label ? `<span>${escapar(label)}</span>` : '';
-            return `<button type="button" class="vn-chip vn-chip-drag" data-vn-item="${i}" data-zona="${escapar(it.zona || '')}"
-                aria-grabbed="false" style="--vn-i:${i}">${img}${text || '—'}</button>`;
-        }).join('');
+        const pool = items.map((it, i) =>
+            `<button type="button" class="vn-chip vn-chip-drag" data-vn-item="${i}" data-zona="${escapar(it.zona || '')}"
+                aria-grabbed="false" style="--vn-i:${i}">${contenidoChipItem(it)}</button>`
+        ).join('');
         return wrap(`
-            <h2 class="vn-title">${tituloBloque('arrastrar', 'Arrastra')}</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Arrastra'))}</h2>
             ${instruccionHtml(d.instruccion)}
             <p class="vn-hint-drag">${configNivel().simplificar ? '¡Llévalo a su lugar!' : 'Arrastra cada elemento a su zona'}</p>
-            <div class="vn-sort-board" data-vn-arrastrar-board>
+            <div class="vn-sort-board" data-vn-arrastrar-board data-vn-pool-count="${items.length}">
                 <div class="vn-sort-col vn-sort-col--pool" data-vn-arrastrar-pool>${pool}</div>
                 <div class="vn-sort-col vn-sort-col--zones" data-vn-arrastrar>${zHtml}</div>
             </div>
@@ -1330,13 +1348,12 @@
             alCompletarActividad();
             return;
         }
-        const placed = $chip[0].cloneNode(true);
-        placed.classList.remove('is-selected', 'is-dragging', 'vn-chip-drag');
+        const placed = document.createElement('span');
+        placed.className = String($chip[0].className || '');
+        placed.classList.remove('is-selected', 'is-dragging', 'vn-chip-drag', 'is-matched', 'is-leaving');
         placed.classList.add('is-placed', 'vn-chip--placed');
-        placed.removeAttribute('aria-grabbed');
+        placed.innerHTML = $chip[0].innerHTML;
         placed.style.pointerEvents = 'none';
-        placed.type = 'button';
-        placed.disabled = true;
         $slots.append(placed);
         $chip.addClass('is-matched is-leaving').removeClass('is-selected');
         setTimeout(() => { $chip.prop('hidden', true); }, 280);
@@ -1377,7 +1394,7 @@
         const enunciado = textoPaso
             || (retoPaso === 0 ? instruccion : '')
             || nombreReto
-            || tituloBloque('reto', 'Reto');
+            || tituloVisibleBloque(bloque, 'Reto');
         const mostrarInstruccion = retoPaso === 0 && instruccion && textoPaso
             && instruccion !== textoPaso;
         const mostrarNombre = nombreReto && nombreReto !== enunciado;
@@ -1419,17 +1436,15 @@
         const d = datos(bloque);
         const n = String(d.cantidad || '6') === '4' ? 4 : 6;
         const list = EMOCION_IDS[n];
-        const titulo = configNivel().simplificar
-            ? '¿Cómo estás?'
-            : tituloBloque('emocion', 'Ahora cuéntame, ¿cómo te sentiste?');
+        const titulo = escapar(tituloVisibleBloque(bloque, 'Ahora cuéntame, ¿cómo te sentiste?'));
         return wrap(`
             <h2 class="vn-title">${titulo}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-emociones" data-vn-emocion data-count="${n}" data-sexo="${escapar(resolverSexoEmocion())}">
-                ${list.map((id) => {
+                ${list.map((id, i) => {
             const label = emocionLabel(id);
             const imgUrl = emocionImgUrl(id);
-            return `<button type="button" class="vn-emocion vn-pulse-hint" data-id="${escapar(id)}">
+            return `<button type="button" class="vn-emocion vn-pulse-hint" data-id="${escapar(id)}" style="--vn-i:${i}">
                         <img class="vn-emocion-img" src="${escapar(imgUrl)}" alt="${escapar(label)}">
                         <span class="vn-emocion-label">${escapar(label)}</span>
                     </button>`;
@@ -1453,7 +1468,7 @@
             <div class="vn-reward vn-reward--celebrate">
                 <div class="vn-reward-rays" aria-hidden="true"></div>
                 <div class="vn-reward-icon vn-reward-icon--bounce">${icon}</div>
-                <h2 class="vn-title">${tituloBloque('recompensa', '¡Lo lograste!')}</h2>
+                <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, '¡Lo lograste!'))}</h2>
                 ${instruccionHtml(d.instruccion)}
                 ${insignia}
             </div>
@@ -2140,7 +2155,357 @@
         setTimeout(() => { $btnNext.removeClass('vn-nav-shake'); }, 520);
     }
 
+    function csrfTokenKiosco() {
+        return $('meta[name="csrf-token"]').attr('content') || '';
+    }
+
+    function puedeGuardarResultadoKiosco() {
+        if (!resolverUrlExperienciaTpl()) return false;
+        return String($('#rnApp').data('modo') || '') === 'sesion';
+    }
+
+    function urlResultadoBloque(expId, bloqueId) {
+        const tpl = resolverUrlExperienciaTpl();
+        if (!tpl || !expId || !bloqueId) return '';
+        return String(tpl).replace('__ID__', String(expId)) + '/bloques/' + bloqueId + '/resultado';
+    }
+
+    function intentosUsadosDelBox($box, correcta) {
+        const ini = parseIntentos($box.data('intentos'));
+        if (ini === Infinity) return null;
+        const rest = intentosRestantes;
+        if (correcta) return ini - rest + 1;
+        return ini - rest;
+    }
+
+    function guardarResultadoEnBox($box, datos) {
+        if (!$box || !$box.length || !datos || typeof datos !== 'object') return;
+        $box.data('vn-resultado', datos);
+    }
+
+    function registrarResultadoPregunta($box, $opcion, correcta) {
+        guardarResultadoEnBox($box, {
+            opcion_index: Number($opcion.data('vn-opcion')),
+            correcta: !!correcta,
+            intentos_usados: intentosUsadosDelBox($box, correcta),
+        });
+    }
+
+    function registrarResultadoReto($box, $opcion, correcta) {
+        const total = Number($box.data('total-pasos')) || 1;
+        guardarResultadoEnBox($box, {
+            paso: retoPaso,
+            opcion_index: Number($opcion.data('vn-reto-op')),
+            correcta: !!correcta,
+            total_pasos: total,
+        });
+    }
+
+    function esBloqueColorear(bloque) {
+        return !!(bloque && bloque.tipo === 'juego' && datos(bloque).juego_id === 'colorear');
+    }
+
+    function esJuegoEvaluativo(bloque) {
+        if (!bloque || bloque.tipo !== 'juego') return false;
+        const id = String(datos(bloque).juego_id || '');
+        return ['memoria', 'rompecabezas', 'secuencia', 'colorear'].indexOf(id) >= 0;
+    }
+
+    function bloqueRegistraResultado(bloque) {
+        if (!bloque) return false;
+        if (TIPOS_BLOQUE_RESULTADO.indexOf(bloque.tipo) >= 0) return true;
+        return esJuegoEvaluativo(bloque);
+    }
+
+    function bloqueGuardaSoloAlCompletar(bloque) {
+        if (!bloque) return false;
+        return ['emparejar', 'clasificacion', 'arrastrar'].indexOf(bloque.tipo) >= 0;
+    }
+
+    function debePersistirAlAvanzar(bloque) {
+        return !!(bloque && (bloque.tipo === 'dibujo' || esBloqueColorear(bloque)));
+    }
+
+    function requiereArchivoResultado(bloque) {
+        return !!(bloque && (bloque.tipo === 'evidencia' || bloque.tipo === 'dibujo' || esBloqueColorear(bloque)));
+    }
+
+    function dataUrlABlob(dataUrl) {
+        return fetch(dataUrl).then(function (res) { return res.blob(); });
+    }
+
+    function exportarCanvasComoBlobPromise() {
+        return new Promise(function (resolve) {
+            const canvas = document.getElementById('vnCanvas');
+            if (!canvas || !paint || !paint.history || paint.history.length <= 1) {
+                resolve(null);
+                return;
+            }
+            if (typeof canvas.toBlob === 'function') {
+                canvas.toBlob(function (blob) { resolve(blob || null); }, 'image/png', 0.92);
+                return;
+            }
+            try {
+                resolve(dataUrlABlob(canvas.toDataURL('image/png')));
+            } catch (e) {
+                resolve(null);
+            }
+        });
+    }
+
+    function nombreArchivoResultado(bloque, blob) {
+        const mime = String((blob && blob.type) || '').toLowerCase();
+        if (bloque.tipo === 'evidencia') {
+            const tipoMedia = String($body.data('vn-evidencia-tipo-media') || 'foto');
+            if (tipoMedia === 'audio') {
+                if (mime.indexOf('webm') >= 0) return 'evidencia.webm';
+                if (mime.indexOf('mpeg') >= 0) return 'evidencia.mp3';
+                return 'evidencia.m4a';
+            }
+            if (tipoMedia === 'video') {
+                if (mime.indexOf('webm') >= 0) return 'evidencia.webm';
+                if (mime.indexOf('quicktime') >= 0) return 'evidencia.mov';
+                return 'evidencia.mp4';
+            }
+            if (mime.indexOf('webp') >= 0) return 'evidencia.webp';
+            return 'evidencia.jpg';
+        }
+        return 'dibujo.png';
+    }
+
+    function obtenerBlobResultado(bloque) {
+        if (!bloque) return Promise.resolve(null);
+        if (bloque.tipo === 'evidencia') {
+            const blob = $body.data('vn-evidencia-blob');
+            if (blob instanceof Blob) return Promise.resolve(blob);
+            const src = $body.find('.vn-evidencia-result').attr('src');
+            if (src && String(src).indexOf('data:') === 0) return dataUrlABlob(src);
+            const audioSrc = $body.find('.vn-evidencia-audio-el').attr('src');
+            if (audioSrc && String(audioSrc).indexOf('blob:') === 0) {
+                return fetch(audioSrc).then(function (res) { return res.blob(); });
+            }
+            const videoSrc = $body.find('.vn-evidencia-video-el').attr('src');
+            if (videoSrc && String(videoSrc).indexOf('blob:') === 0) {
+                return fetch(videoSrc).then(function (res) { return res.blob(); });
+            }
+            return Promise.resolve(null);
+        }
+        if (bloque.tipo === 'dibujo' || esBloqueColorear(bloque)) {
+            return exportarCanvasComoBlobPromise();
+        }
+        return Promise.resolve(null);
+    }
+
+    function registrarResultadoAgotado($box) {
+        const esReto = $box.is('[data-vn-reto]');
+        const $lastBad = $box.find('.vn-option.is-bad').last();
+        const ini = parseIntentos($box.data('intentos'));
+        if (esReto) {
+            guardarResultadoEnBox($box, {
+                paso: retoPaso,
+                opcion_index: $lastBad.length ? Number($lastBad.data('vn-reto-op')) : 0,
+                correcta: false,
+                total_pasos: Number($box.data('total-pasos')) || 1,
+            });
+            return;
+        }
+        guardarResultadoEnBox($box, {
+            opcion_index: $lastBad.length ? Number($lastBad.data('vn-opcion')) : 0,
+            correcta: false,
+            intentos_usados: ini === Infinity ? null : ini,
+        });
+    }
+
+    function extraerPayloadBloque(bloque) {
+        if (!bloque) return null;
+        if (bloque.tipo === 'emocion') {
+            const $picked = $body.find('.vn-emocion.is-picked');
+            if (!$picked.length) return null;
+            return { emocion_id: String($picked.data('id') || '') };
+        }
+        if (bloque.tipo === 'evidencia') {
+            const d = datos(bloque);
+            const tipoMedia = String($body.data('vn-evidencia-tipo-media') || evidenciaTipoKey(d.tipo || 'Foto'));
+            return {
+                tipo_media: tipoMedia,
+                origen: String(d.tipo || 'Foto'),
+            };
+        }
+        if (bloque.tipo === 'dibujo') {
+            return {
+                modo: 'dibujo',
+                trazos: paint && paint.history ? Math.max(0, paint.history.length - 1) : 0,
+            };
+        }
+        if (esBloqueColorear(bloque)) {
+            return {
+                modo: 'colorear',
+                juego_id: 'colorear',
+                trazos: paint && paint.history ? Math.max(0, paint.history.length - 1) : 0,
+            };
+        }
+        if (bloque.tipo === 'juego') {
+            const d = datos(bloque);
+            const juegoId = String(d.juego_id || '');
+            if (juegoId === 'memoria') {
+                const total = $body.find('[data-vn-memory] .vn-memory-card').length;
+                const done = $body.find('[data-vn-memory] .vn-memory-card.is-done').length;
+                return {
+                    juego_id: 'memoria',
+                    pares_total: total / 2,
+                    pares_encontrados: done / 2,
+                    intentos_parejas: Number($body.data('vn-mem-intentos') || 0),
+                    completado: total > 0 && done >= total,
+                };
+            }
+            if (juegoId === 'rompecabezas') {
+                const $puzzle = $body.find('[data-vn-puzzle]');
+                const total = Number($puzzle.data('total')) || 0;
+                return {
+                    juego_id: 'rompecabezas',
+                    piezas_total: total,
+                    completado: $puzzle.hasClass('is-complete'),
+                };
+            }
+            if (juegoId === 'secuencia') {
+                const $root = $body.find('[data-vn-secuencia]');
+                const total = Number($root.data('total')) || $root.find('[data-vn-seq-card]').length;
+                return {
+                    juego_id: 'secuencia',
+                    items_total: total,
+                    completado: $root.hasClass('is-complete'),
+                };
+            }
+        }
+        if (bloque.tipo === 'emparejar') {
+            const total = $body.find('[data-vn-emparejar] [data-vn-izq]').length;
+            const matched = $body.find('[data-vn-emparejar] [data-vn-izq].is-matched').length;
+            return {
+                pares_total: total,
+                pares_correctos: matched,
+                intentos_fallidos: Number($body.data('vn-emp-fallos') || 0),
+                completado: total > 0 && matched >= total,
+            };
+        }
+        if (bloque.tipo === 'clasificacion') {
+            const total = $body.find('[data-vn-clasif-pool] [data-vn-item]').length;
+            const colocados = $body.find('[data-vn-clasif-pool] [data-vn-item].is-matched').length;
+            return {
+                items_total: total,
+                items_colocados: colocados,
+                completado: total > 0 && colocados >= total,
+            };
+        }
+        if (bloque.tipo === 'arrastrar') {
+            const total = $body.find('[data-vn-arrastrar-pool] [data-vn-item]').length;
+            const colocados = $body.find('[data-vn-arrastrar-pool] [data-vn-item].is-matched').length;
+            return {
+                items_total: total,
+                items_colocados: colocados,
+                completado: total > 0 && colocados >= total,
+            };
+        }
+        const selector = bloque.tipo === 'pregunta' ? '[data-vn-pregunta]' : '[data-vn-reto]';
+        const $box = $body.find(selector);
+        const guardado = $box.data('vn-resultado');
+        return guardado && typeof guardado === 'object' ? guardado : null;
+    }
+
+    function procesarColaResultados() {
+        if (guardandoResultado || !colaResultados.length) return;
+        const item = colaResultados.shift();
+        if (!item || !item.url) {
+            procesarColaResultados();
+            return;
+        }
+        guardandoResultado = true;
+        const ajaxOpts = {
+            url: item.url,
+            method: 'POST',
+            dataType: 'json',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfTokenKiosco(),
+            },
+        };
+        if (item.formData) {
+            ajaxOpts.data = item.formData;
+            ajaxOpts.processData = false;
+            ajaxOpts.contentType = false;
+        } else {
+            ajaxOpts.contentType = 'application/json';
+            ajaxOpts.data = JSON.stringify({
+                correcto: item.correcto,
+                payload: item.payload,
+            });
+        }
+        $.ajax(ajaxOpts).always(function () {
+            guardandoResultado = false;
+            procesarColaResultados();
+        });
+    }
+
+    function encolarGuardadoResultado(bloqueExplicito) {
+        const bloque = bloqueExplicito || bloques[index];
+        if (!bloque || !bloque.id) return;
+        if (!bloqueRegistraResultado(bloque)) return;
+        if (bloqueGuardaSoloAlCompletar(bloque) && !bloqueEstaCompleto(bloque)) return;
+        if (!puedeGuardarResultadoKiosco()) return;
+
+        const payload = extraerPayloadBloque(bloque);
+        if (!payload) return;
+        if (payload.completado === false) return;
+
+        const expId = resolverExperienciaIdActiva();
+        const url = urlResultadoBloque(expId, bloque.id);
+        if (!url) return;
+
+        let correcto = null;
+        const esColorear = esBloqueColorear(bloque);
+        if (bloque.tipo !== 'emocion'
+            && bloque.tipo !== 'evidencia'
+            && bloque.tipo !== 'dibujo'
+            && !esColorear
+            && !esJuegoEvaluativo(bloque)
+            && bloque.tipo !== 'emparejar'
+            && bloque.tipo !== 'clasificacion'
+            && bloque.tipo !== 'arrastrar'
+            && typeof payload.correcta === 'boolean') {
+            correcto = payload.correcta;
+        }
+
+        if (requiereArchivoResultado(bloque)) {
+            obtenerBlobResultado(bloque).then(function (blob) {
+                if (!blob) return;
+                const fd = new FormData();
+                fd.append('payload', JSON.stringify(payload));
+                if (correcto !== null && correcto !== undefined) {
+                    fd.append('correcto', correcto ? '1' : '0');
+                }
+                fd.append('archivo', blob, nombreArchivoResultado(bloque, blob));
+                colaResultados.push({ url, formData: fd });
+                procesarColaResultados();
+            });
+            return;
+        }
+
+        colaResultados.push({
+            url,
+            bloque,
+            payload,
+            correcto,
+        });
+        procesarColaResultados();
+    }
+
     function alCompletarActividad() {
+        const bloque = bloques[index];
+        if (debePersistirAlAvanzar(bloque)) {
+            actualizarNavBloque();
+            return;
+        }
+        encolarGuardadoResultado();
         actualizarNavBloque();
     }
 
@@ -2187,6 +2552,7 @@
                 return;
             }
         }
+        registrarResultadoAgotado($box);
         $box.data('locked', true);
         alCompletarActividad();
         programarAvanceAutomatico();
@@ -2307,7 +2673,7 @@
         paint.history.push(drawCtx.getImageData(0, 0, canvas.width, canvas.height));
         if (paint.history.length > 40) paint.history.shift();
         paintUpdateActions();
-        alCompletarActividad();
+        actualizarNavBloque();
     }
 
     function paintUndo() {
@@ -2473,6 +2839,7 @@
         detenerAudioBloque();
         detenerVideoBloque();
         detenerAudioHistoria();
+        $body.removeData('vn-mem-intentos vn-emp-fallos');
 
         if (bloque.tipo === 'dibujo') {
             const d = datos(bloque);
@@ -2876,6 +3243,10 @@
 
     function ir(delta) {
         cancelarAvanceAutomatico();
+        const bloque = bloques[index];
+        if (delta > 0 && debePersistirAlAvanzar(bloque)) {
+            encolarGuardadoResultado(bloque);
+        }
         const next = index + delta;
         if (next < 0 || next >= bloques.length) return;
         index = next;
@@ -2892,6 +3263,9 @@
             return;
         }
         if (alTerminarExperiencia && index >= bloques.length - 1) {
+            if (debePersistirAlAvanzar(bloque)) {
+                encolarGuardadoResultado(bloque);
+            }
             alTerminarExperiencia();
             return;
         }
@@ -3120,7 +3494,7 @@
 
     function limpiarEvidenciaRecursos() {
         evidenciaSesion += 1;
-        $body.removeData('vn-evidencia-estado');
+        $body.removeData('vn-evidencia-estado vn-evidencia-blob vn-evidencia-tipo-media');
         const objectUrl = $body && $body.data('vn-evidencia-object-url');
         if (objectUrl) {
             try { URL.revokeObjectURL(objectUrl); } catch (e) { /* noop */ }
@@ -3605,6 +3979,8 @@
 
     function aplicarBlobEvidencia(refs, tipo, blob) {
         if (!blob || !refs) return;
+        $body.data('vn-evidencia-blob', blob);
+        $body.data('vn-evidencia-tipo-media', tipo);
         const prevUrl = $body.data('vn-evidencia-object-url');
         if (prevUrl) {
             try { URL.revokeObjectURL(prevUrl); } catch (e) { /* noop */ }
@@ -3713,7 +4089,18 @@
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 canvas.getContext('2d').drawImage(video, 0, 0);
-                $result.attr('src', canvas.toDataURL('image/jpeg', 0.9)).prop('hidden', false);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                $result.attr('src', dataUrl).prop('hidden', false);
+                if (typeof canvas.toBlob === 'function') {
+                    canvas.toBlob(function (blob) {
+                        if (blob) {
+                            $body.data('vn-evidencia-blob', blob);
+                            $body.data('vn-evidencia-tipo-media', 'foto');
+                        }
+                    }, 'image/jpeg', 0.9);
+                } else {
+                    $body.data('vn-evidencia-tipo-media', 'foto');
+                }
                 resolve(true);
             };
             if (video.readyState >= 2 && video.videoWidth) {
@@ -3746,6 +4133,8 @@
                     type: recorder.mimeType || mimeGrabacionEvidencia(tipo) || (tipo === 'audio' ? 'audio/mp4' : 'video/mp4'),
                 });
                 const url = URL.createObjectURL(blob);
+                $body.data('vn-evidencia-blob', blob);
+                $body.data('vn-evidencia-tipo-media', tipo);
                 $body.data('vn-evidencia-object-url', url);
                 if (tipo === 'video' && refs.$videoEl.length) {
                     refs.$videoEl[0].srcObject = null;
@@ -3955,6 +4344,7 @@
             $(this).addClass('is-ok vn-option--pop');
             setTimeout(() => { $(this).removeClass('vn-option--pop'); }, 500);
             showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
+            registrarResultadoPregunta($box, $(this), true);
             $box.data('locked', true);
             alCompletarActividad();
             programarAvanceAutomatico();
@@ -3985,6 +4375,7 @@
                 $box.data('locked', true);
                 programarAvanceRetoPaso($box);
             } else {
+                registrarResultadoReto($box, $(this), true);
                 $box.data('locked', true);
                 alCompletarActividad();
                 programarAvanceAutomatico();
@@ -4025,6 +4416,7 @@
             alCompletarActividad();
         } else {
             showFb(false, $box.data('fb-ok'), $box.data('fb-err'));
+            $body.data('vn-emp-fallos', Number($body.data('vn-emp-fallos') || 0) + 1);
             $body.find('[data-vn-izq]').removeClass('is-selected');
         }
         $body.data('emp-izq', null);
@@ -4484,6 +4876,7 @@
                 alCompletarActividad();
             }
         } else {
+            $body.data('vn-mem-intentos', Number($body.data('vn-mem-intentos') || 0) + 1);
             setTimeout(() => {
                 a.removeClass('is-flipped').find('img, .vn-memory-front').remove();
                 b.removeClass('is-flipped').find('img, .vn-memory-front').remove();

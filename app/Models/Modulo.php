@@ -68,6 +68,16 @@ class Modulo extends Model
         return $this->hasMany(Tema::class)->orderBy('orden');
     }
 
+    public function juegos()
+    {
+        return $this->hasMany(Juego::class)->orderBy('orden');
+    }
+
+    public function juegosActivos()
+    {
+        return $this->hasMany(Juego::class)->where('activo', true)->orderBy('orden');
+    }
+
     /** Catálogo del sistema: es_oficial = true e institucion_id = NULL. */
     public function scopeOficiales(Builder $query): Builder
     {
