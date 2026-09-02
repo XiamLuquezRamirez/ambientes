@@ -18,4 +18,11 @@ return [
         'musica' => 'expresion-artistica',
         'logico' => 'multisaberes',
     ],
+
+    /*
+    | IP simulada en local cuando la tablet solo alcanza una IP del PC.
+    | Ej.: AMBIENTE_NODO_IP=192.168.1.14 → Multisensorial (según ambiente_institucion).
+    | ?nodo_ip= en la URL tiene prioridad y actualiza la sesión.
+    */
+    'nodo_ip_local' => env('AMBIENTE_NODO_IP'),
 ];

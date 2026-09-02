@@ -22,7 +22,7 @@ class SesionNinoController extends Controller
     {
         $this->sesionNino->limpiar($request);
 
-        return redirect()->route('ambiente.inicio');
+        return redirect()->route('ambiente.inicio', $request->query());
     }
 
     public function mostrarSeleccionAlumno()
@@ -145,10 +145,10 @@ class SesionNinoController extends Controller
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'ok' => true,
-                'redirect' => route('ambiente.inicio'),
+                'redirect' => route('ambiente.inicio', $request->query()),
             ]);
         }
 
-        return redirect()->route('ambiente.inicio');
+        return redirect()->route('ambiente.inicio', $request->query());
     }
 }

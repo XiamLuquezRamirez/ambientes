@@ -14,6 +14,7 @@
     let urlSalir;
     let urlContinuar;
     let portadaImg;
+    let fondoImg;
     let estudianteSexo;
 
     function escapar(str) {
@@ -29,17 +30,29 @@
         $paso.attr('data-paso', 'portada');
         const a = arbol.ambiente || {};
         const nombre = a.nombre || 'Ambiente';
+        const usaFondo = !!fondoImg;
+        const claseFondo = usaFondo ? ' rn-portada--con-fondo' : '';
+        const fondoLayer = usaFondo
+            ? `<img class="rn-portada-fondo" src="${escapar(fondoImg)}" alt="" decoding="async" aria-hidden="true">`
+            : '';
         const img = portadaImg
             ? `<img class="rn-portada-img" src="${escapar(portadaImg)}" alt="" decoding="async">`
             : `<div class="rn-portada-img rn-portada-img--fallback" aria-hidden="true"><span>${escapar(a.icono || '🎨')}</span></div>`;
+        const banner = usaFondo
+            ? ''
+            : `<header class="rn-portada-banner">
+                    <h1 class="rn-portada-titulo">${escapar(nombre)}</h1>
+                </header>`;
+        const ilustracion = usaFondo
+            ? ''
+            : `<div class="rn-portada-ilustracion" aria-hidden="true">${img}</div>`;
 
         $paso.html(`
-            <div class="rn-portada">
-                <header class="rn-portada-banner">
-                    <h1 class="rn-portada-titulo">${escapar(nombre)}</h1>
-                </header>
+            <div class="rn-portada${claseFondo}">
+                ${fondoLayer}
+                ${banner}
                 <div class="rn-portada-cuerpo">
-                    <div class="rn-portada-ilustracion" aria-hidden="true">${img}</div>
+                    ${ilustracion}
                     <div class="rn-portada-accion">
                         <div class="rn-portada-iniciar-halo">
                             <button type="button" class="rn-btn-iniciar-pill" id="rnBtnIniciarAmbiente">
@@ -343,6 +356,7 @@
         urlSalir = String($app.data('url-salir') || '');
         urlContinuar = String($app.data('url-continuar') || '');
         portadaImg = String($app.data('portada-img') || '');
+        fondoImg = String($app.data('fondo-img') || '');
         estudianteSexo = String($app.data('estudiante-sexo') || '');
 
         $shell.prop('hidden', false);

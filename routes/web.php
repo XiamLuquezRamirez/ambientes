@@ -55,9 +55,12 @@ use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\TematicasSuperAdminController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Raíz → portada del ambiente (kiosco). Docente: /login
-Route::get('/', fn () => redirect()->route('ambiente.inicio'));
+Route::get('/', function (Request $request) {
+    return redirect()->route('ambiente.inicio', $request->query());
+});
 
 // ── Autenticacion del nino (público) ───────────────────────────────────────
 Route::get('/bienvenida', [SesionNinoController::class, 'mostrarBienvenida'])->name('auth.bienvenida');
@@ -66,6 +69,11 @@ Route::get('/kiosco/diagnostico-ip', [AmbienteNinoController::class, 'diagnostic
 Route::get('/alumnos', [SesionNinoController::class, 'mostrarSeleccionAlumno'])->name('auth.alumnos');
 Route::get('/alumnos/{estudianteId}/pin', [SesionNinoController::class, 'mostrarPin'])->name('auth.pin');
 Route::post('/alumnos/{estudianteId}/verificar', [SesionNinoController::class, 'verificarPin'])->name('auth.verificar-pin');
+
+// Captura multimedia (cámara / micrófono / video) — iframes para public/assets/utilidades/
+Route::view('/captura/foto', 'captura.foto')->name('captura.foto');
+Route::view('/captura/audio', 'captura.audio')->name('captura.audio');
+Route::view('/captura/video', 'captura.video')->name('captura.video');
 
 // ── Auth Docente ──────────────────────────────────────────────────────────
 Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('docente.login');

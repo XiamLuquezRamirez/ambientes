@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Audio</title>
+  <base href="/proyecto/">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="captura.css">
+  <link rel="stylesheet" href="audio.css">
+</head>
+<body>
+<div class="contenedor">
+  <nav class="nav">
+    <a href="index.html">Inicio</a>
+    <a href="foto.html">Foto</a>
+    <a href="video.html">Video</a>
+    <a class="activo" href="audio.html">Audio</a>
+  </nav>
+  <div class="card">
+    <div class="titulo">🎙️ Grabar audio</div>
+    <div class="subtitulo">Presione iniciar para comenzar la grabación.</div>
+    <button id="btnGrabarAudio" class="btn-audio">🎙️ Iniciar grabación</button>
+    <button id="btnDetenerAudio" class="btn-detener" disabled>⏹️ Detener grabación</button>
+    <div id="contadorAudio">00:00</div>
+    <div id="estadoAudio" class="estado">Listo para grabar</div>
+  </div>
+</div>
+<div id="modalPreview" class="modal">
+  <div class="modal-contenido">
+    <div class="modal-titulo">🎙️ Vista previa</div>
+    <audio id="audioPreview" class="modal-media" controls></audio>
+    <div id="infoAudio" class="info"></div>
+    <button id="btnGuardar" class="btn-guardar">💾 Guardar audio</button>
+    <button id="btnCerrarPreview" class="btn-cancelar">🗑️ Descartar y grabar otro</button>
+  </div>
+</div>
+<script src="audio.js"></script>
+</body>
+</html>

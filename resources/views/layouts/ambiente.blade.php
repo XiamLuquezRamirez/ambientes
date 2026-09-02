@@ -89,6 +89,7 @@
     @stack('scripts')
     <script src="@assetv('assets/js/kiosco-fs-core.js')"></script>
     <script src="@assetv('assets/js/jquery-4.0.0.min.js')"></script>
+    @include('partials._captura-multimedia')
     <script src="@assetv('assets/js/constructor-vista-nino.js')"></script>
     {{-- Camino 3D: bundle esbuild (Three.js + módulos incluidos, minificado).
          Expone window.KioscoCamino.boot(). Generar con `npm run build:kiosco`. --}}

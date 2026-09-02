@@ -555,10 +555,6 @@
     --vn-screen-h: 100dvh;
 }
 
-#vnDispositivo.rn-player--camino-overlay .vn-screen-top {
-    padding-top: max(10px, env(safe-area-inset-top, 0px));
-}
-
 #vnDispositivo.rn-player--camino-overlay .vn-screen-body {
     padding: 16px max(12px, env(safe-area-inset-right, 0px)) 20px max(12px, env(safe-area-inset-left, 0px));
 }
@@ -569,6 +565,10 @@
 
 #vnDispositivo.rn-player--camino-overlay .vn-fs-btn {
     bottom: max(88px, calc(72px + env(safe-area-inset-bottom, 0px)));
+}
+
+#vnDispositivo.rn-player--camino-overlay .vn-reload-btn--player {
+    z-index: 10050;
 }
 
 /* Evitar que el Salir del kiosco tape el botón de la experiencia */

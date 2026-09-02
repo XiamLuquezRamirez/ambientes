@@ -2152,12 +2152,15 @@ import { crearVoz } from './recorrido3d/voz.js';
         }
     }
 
-    function opcionesVistaNino(bloques, mediaBase, nombre) {
+    function opcionesVistaNino(bloques, mediaBase, nombre, expId) {
         return {
             bloques,
             mediaBase: mediaBase || '',
             experienciaNombre: nombre || 'Experiencia',
+            experienciaId: expId || null,
             estudianteSexo: String($('#rnApp').data('estudiante-sexo') || ''),
+            estudianteNombre: String($('#rnApp').data('estudiante-nombre') || ''),
+            nivelEtario: String($('#rnApp').data('nivel-etario') || 'jardin'),
             alTerminarExperiencia: volverAlMapaDesdeExperiencia,
         };
     }
@@ -2215,7 +2218,8 @@ import { crearVoz } from './recorrido3d/voz.js';
                 window.VistaNino.iniciar(opcionesVistaNino(
                     experienciaCargada.bloques,
                     experienciaCargada.mediaBase,
-                    experienciaCargada.nombre
+                    experienciaCargada.nombre,
+                    experienciaCargada.id
                 ));
             }
             return;
@@ -2251,7 +2255,8 @@ import { crearVoz } from './recorrido3d/voz.js';
                 window.VistaNino.iniciar(opcionesVistaNino(
                     experienciaCargada.bloques,
                     experienciaCargada.mediaBase,
-                    experienciaCargada.nombre
+                    experienciaCargada.nombre,
+                    experienciaCargada.id
                 ));
                 return;
             }
@@ -2691,4 +2696,16 @@ import { crearVoz } from './recorrido3d/voz.js';
     }
 
     window.KioscoCamino = { boot: boot, destroy: destroy, irAFinRecorrido: irAFinRecorrido };
+
+    if (window.jQuery) {
+        window.jQuery(document).on('vn:experiencia-recargada.rn3d', function (_e, payload) {
+            if (!payload || !payload.id) return;
+            experienciaCargada = {
+                id: payload.id,
+                bloques: payload.bloques,
+                mediaBase: payload.mediaBase,
+                nombre: payload.nombre,
+            };
+        });
+    }
 })();

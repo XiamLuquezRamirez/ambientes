@@ -87,6 +87,7 @@
                     <div id="ic-contenido-html-dinamico" class="d-none"></div>
                     @php
                         $imgAutismo = 'assets/images/img_autismo';
+                        $imgTdah = 'assets/images/img_tdah';
                     @endphp
                     <div class="autismo-page ic-condicion-pagina" style="display: none;">
                         <section class="autismo-section condicion-seccion" id="apartado-1" style="display: none;">
@@ -575,6 +576,357 @@
                                 Documento encargado por la Oficina Regional de Educación para América
                                 Latina y el Caribe (OREALC/UNESCO Santiago). UNESCO 2023.
                             </p>
+                        </section>
+                    </div>
+
+                    <div class="tdah-page ic-condicion-pagina" style="display: none;">
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-1" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">1</div>
+                                <h2>¿Qué es el Trastorno por Déficit de Atención e Hiperactividad (TDAH)?</h2>
+                            </div>
+                            <div class="section-content">
+                                <p>
+                                    El Trastorno por Déficit de Atención con Hiperactividad (TDAH) es una
+                                    condición del neurodesarrollo que afecta la manera en que el estudiante
+                                    regula su atención, controla sus impulsos y organiza su comportamiento.
+                                    Sus principales características son la inatención, la hiperactividad y
+                                    la impulsividad, aunque también pueden presentarse dificultades en las
+                                    funciones ejecutivas, es decir, en los procesos mentales que permiten
+                                    planificar, organizar, recordar instrucciones, controlar las emociones y
+                                    tomar decisiones (Rusca-Jordán &amp; Cortez-Vergara, 2020).
+                                </p>
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 1.png') }}" alt="Qué es el TDAH" style="width: 100%; height: auto;">
+                                <p>
+                                    En el contexto escolar, estas dificultades pueden reflejarse en problemas
+                                    para mantener la atención durante las actividades, seguir instrucciones,
+                                    organizar materiales, finalizar tareas, esperar turnos o pensar en las
+                                    consecuencias de sus acciones antes de actuar. Asimismo, algunos
+                                    estudiantes pueden mostrar una necesidad constante de movimiento o
+                                    responder de forma impulsiva, buscando una gratificación inmediata sin
+                                    valorar los posibles resultados de su comportamiento. Estas características
+                                    pueden afectar el rendimiento académico, la convivencia con sus
+                                    compañeros y las relaciones con los adultos. Generalmente, los síntomas
+                                    aparecen durante la infancia y, en muchos casos, pueden mantenerse durante
+                                    la adolescencia e incluso en la vida adulta.
+                                </p>
+                                <p>
+                                    Por ello, es fundamental que el docente comprenda que estas conductas
+                                    hacen parte de una condición del neurodesarrollo y no corresponden a falta
+                                    de interés, desobediencia o ausencia de normas, lo que permite brindar los
+                                    apoyos y ajustes pedagógicos que favorezcan la participación y el
+                                    aprendizaje del estudiante.
+                                </p>
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 2.png') }}"     alt="TDA y TDAH" style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <p>
+                                    Esto significa que no todos los estudiantes con TDAH son hiperactivos.
+                                    Algunos presentan principalmente dificultades para concentrarse, organizar
+                                    sus tareas, seguir instrucciones o mantener la atención y suelen ser lentos
+                                    y tranquilos, mientras que otros manifiestan mayor inquietud motora e
+                                    impulsividad, o una combinación de ambas características. Por eso es
+                                    importante identificar cuál es el tipo de TDAH que presenta el niño, para
+                                    contar con mayor claridad sobre las acciones a implementar en el rol
+                                    docente.
+                                </p>
+                            </div>
+                        </section>
+
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-2" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">2</div>
+                                <h2>Tipos de TDAH</h2>
+                            </div>
+                            <div class="section-content">
+                                <p>
+                                    En el Manual de Diagnóstico y Estadístico de los Trastornos Mentales
+                                    (DSM-IV), publicado por la American Psychiatric Association, se
+                                    diferencian tres tipos de trastorno dentro del TDAH.
+                                </p>
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 3.png') }}"
+                                    alt="Tipo con predominio del déficit de atención"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 4.png') }}"
+                                    alt="Tipo con predominio hiperactivo-impulsivo"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 5.png') }}"
+                                    alt="Tipo combinado" style="width: 100%; height: auto;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 6.png') }}"
+                                    alt="Los ejemplos son orientativos"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                            </div>
+                        </section>
+
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-3" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">3</div>
+                                <h2>Señales de alerta</h2>
+                            </div>
+                            <div class="section-content">
+                                <p>
+                                    La presencia de una o varias de estas señales no significa que el
+                                    estudiante tenga TDAH. Estas conductas deben observarse de manera continua,
+                                    presentarse en diferentes contextos y generar un impacto en el aprendizaje
+                                    o la convivencia para considerar la necesidad de una evaluación
+                                    especializada.
+                                </p>
+                    
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 7.png') }}"
+                                    alt="Señales de alerta del TDAH"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 8.png') }}"
+                                    alt="Recuerda: el docente no debe emitir diagnósticos"
+                                    style="width: 100%; height: auto;">
+                            </div>
+                        </section>
+
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-4" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">4</div>
+                                <h2>Estrategias pedagógicas para el aula</h2>
+                            </div>
+                            <div class="section-content">
+                                <h3>ESTRATEGIAS PEDAGÓGICAS PARA PRIMERA INFANCIA CON TDAH</h3>
+                                <p>
+                                    Contar con normas claras y consistentes favorece la organización del aula
+                                    y ayuda al estudiante con TDAH a comprender qué comportamientos se esperan
+                                    de él. Se recomienda formular las normas en un lenguaje positivo, explicar
+                                    el motivo de cada una y establecer previamente consecuencias lógicas y
+                                    coherentes. Las instrucciones deben ser breves: máximo uno o dos pasos,
+                                    con apoyo visual y gestual si es necesario.
+                                </p>
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 9.png') }}"
+                                    alt="Normas en positivo"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 10.png') }}"
+                                    alt="Camina más despacio"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 11.png') }}"
+                                    alt="Instrucciones breves"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 12.png') }}"
+                                    alt="Movimiento intencional y pausa activa"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 13.png') }}"
+                                    alt="Refuerzo inmediato"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 14.png') }}"
+                                    alt="Extinción de la conducta: escalón 1"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 15.png') }}"
+                                    alt="Extinción de la conducta: escalón 2"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 16.png') }}"
+                                    alt="Extinción de la conducta: escalón 3"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 17.png') }}"
+                                    alt="Consecuencia lógica"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 18.png') }}"
+                                    alt="Coherencia del adulto" style="width: 100%; height: auto;">
+                            </div>
+                        </section>
+
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-5" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">5</div>
+                                <h2>Ajustes razonables para TDAH</h2>
+                            </div>
+                            <div class="section-content">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 19.png') }}"
+                                    alt="Ajustes razonables y estrategias de apoyo"
+                                    style="width: 100%; height: auto;">
+                                <div class="source">
+                                    Fuente: Elaboración propia con base en Glosario de apoyos educativos y
+                                    ajustes razonables para garantizar la participación plena de estudiantes
+                                    con discapacidad: Documento de información (UNESCO, 2023).
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-6" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">6</div>
+                                <h2>¿Qué debe evitar el docente?</h2>
+                            </div>
+                            <div class="section-content">
+                                <p>
+                                    Para favorecer la participación y el aprendizaje de los estudiantes con
+                                    TDAH, es importante que el docente evite algunas prácticas que pueden
+                                    convertirse en barreras dentro del aula.
+                                </p>
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 20.png') }}"
+                                    alt="Prácticas que debo evitar con niños con TDAH"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 21.png') }}"
+                                    alt="Las conductas asociadas al TDAH no son intencionales"
+                                    style="width: 100%; height: auto;">
+                            </div>
+                        </section>
+
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-7" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">7</div>
+                                <h2>Mitos y realidades</h2>
+                            </div>
+                            <div class="section-content">
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 22.png') }}"
+                                    alt="Mitos y realidades del TDAH" style="width: 100%; height: auto;">
+                            </div>
+                        </section>
+
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-8" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">8</div>
+                                <h2>¿Qué hacer ante la sospecha de TDAH?</h2>
+                            </div>
+                            <div class="section-content">
+                                <p>
+                                    Ante la presencia de conductas persistentes compatibles con el TDAH, el
+                                    docente debe actuar de manera objetiva y colaborativa, evitando emitir
+                                    diagnósticos o etiquetar al estudiante. Su papel consiste en identificar
+                                    señales de alerta, implementar apoyos iniciales en el aula y coordinar
+                                    acciones con la familia y los profesionales correspondientes.
+                                </p>
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 23.png') }}"
+                                    alt="Qué hacer ante la sospecha de TDAH"
+                                    style="width: 100%; height: auto;">
+                            </div>
+                        </section>
+
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-9" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">9</div>
+                                <h2>Orientaciones para la familia</h2>
+                            </div>
+                            <div class="section-content">
+                                <p>
+                                    La participación de la familia es fundamental para favorecer el desarrollo,
+                                    el aprendizaje y la autorregulación del niño con TDAH. Cuando el hogar y
+                                    la escuela trabajan de manera coordinada, se facilita la implementación de
+                                    estrategias consistentes que contribuyen al bienestar del estudiante.
+                                </p>
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 24.png') }}"
+                                    alt="Acompañamiento familiar"
+                                    style="width: 100%; height: auto; margin-bottom: 24px;">
+                                <ul>
+                                    <li>
+                                        Establezcan normas y límites claros, sencillos y acordes con la edad
+                                        y las capacidades del niño.
+                                    </li>
+                                    <li>
+                                        Mantengan rutinas estables para las actividades diarias, como
+                                        levantarse, alimentarse, realizar las tareas escolares, jugar y dormir.
+                                    </li>
+                                    <li>
+                                        Propicien un ambiente familiar tranquilo, organizado y afectuoso.
+                                    </li>
+                                    <li>
+                                        Reconozcan y refuercen el esfuerzo, incluso cuando los avances sean
+                                        pequeños.
+                                    </li>
+                                    <li>
+                                        Acompañen al niño con paciencia y firmeza, promoviendo progresivamente
+                                        su independencia.
+                                    </li>
+                                    <li>
+                                        Favorezcan el desarrollo de la autonomía y la organización de
+                                        materiales.
+                                    </li>
+                                    <li>
+                                        Mantengan una comunicación permanente con la institución educativa.
+                                    </li>
+                                    <li>
+                                        Eviten dar varias instrucciones al mismo tiempo; ofrezcan indicaciones
+                                        breves, claras y una por una.
+                                    </li>
+                                    <li>
+                                        Establezcan hábitos de estudio, con un horario fijo y un espacio con
+                                        pocos distractores.
+                                    </li>
+                                    <li>
+                                        Favorezcan las habilidades sociales y mantengan expectativas realistas.
+                                    </li>
+                                </ul>
+                                <img class="img-fluid" src="{{ asset($imgTdah . '/Mesa de trabajo 25.png') }}"
+                                    alt="Acompañamiento basado en la comprensión y el afecto"
+                                    style="width: 100%; height: auto;">
+                            </div>
+                        </section>
+
+                        <section class="autismo-section condicion-seccion" id="tdah-apartado-10" style="display: none;">
+                            <div class="section-header">
+                                <div class="section-number">10</div>
+                                <h2>Bibliografía</h2>
+                            </div>
+                            <div class="section-content">
+                                <section class="bibliografia">
+                                    <p>
+                                        Alba Chica, E. I., Arias Moreno, Y. C., Moreno Jiménez, I. G., &amp;
+                                        Rozo León, A. D. P. (2025). Estrategias pedagógicas para la atención
+                                        educativa a estudiantes de básica primaria con TDAH, en el marco de la
+                                        educación inclusiva y equitativa (Bachelor's thesis, Especialización
+                                        en Neuropsicología Escolar).
+                                        <br>
+                                        <a href="https://alejandria.poligran.edu.co/server/api/core/bitstreams/eb875c54-b82f-4def-a623-b7b467ce8cef/content"
+                                            target="_blank">
+                                            https://alejandria.poligran.edu.co/server/api/core/bitstreams/eb875c54-b82f-4def-a623-b7b467ce8cef/content
+                                        </a>
+                                    </p>
+                                    <p>
+                                        Cámara-Goienetxea, A. (2022). Cómo garantizar el desarrollo integral
+                                        del alumnado con TDAH en aulas inclusivas (Master's thesis).
+                                        <br>
+                                        <a href="https://reunir.unir.net/handle/123456789/13104"
+                                            target="_blank">
+                                            https://reunir.unir.net/handle/123456789/13104
+                                        </a>
+                                    </p>
+                                    <p>
+                                        DSM-IV-TR. Manual Diagnóstico y Estadístico de los Trastornos Mentales.
+                                        Barcelona: Masson, 2000.
+                                    </p>
+                                    <p>
+                                        Hernández Ramírez, P. (2025). Dificultades que enfrentan los alumnos
+                                        con TDAH en las aulas. Revista Neuronum, 11(1), 95-105.
+                                        <br>
+                                        <a href="https://eduneuro.com/revista/index.php/revistaneuronum/article/view/549"
+                                            target="_blank">
+                                            https://eduneuro.com/revista/index.php/revistaneuronum/article/view/549
+                                        </a>
+                                    </p>
+                                    <p>
+                                        Martínez Cuartero, M., &amp; Aceña Medina, J. Pautas de Actuación ante
+                                        la sospecha en el aula de un alumno con TDAH.
+                                        <br>
+                                        <a href="https://zaguan.unizar.es/record/47523/files/TAZ-TFG-2015-2691.pdf?version=1"
+                                            target="_blank">
+                                            https://zaguan.unizar.es/record/47523/files/TAZ-TFG-2015-2691.pdf?version=1
+                                        </a>
+                                    </p>
+                                    <p>
+                                        Ministerio de Educación Nacional. (2017). Documento de orientaciones
+                                        técnicas, administrativas y pedagógicas para la atención educativa a
+                                        estudiantes con discapacidad en el marco de la educación inclusiva.
+                                        Ministerio de Educación Nacional de Colombia.
+                                    </p>
+                                    <p>
+                                        Moreno, M., 2023, Glosario de apoyos educativos y ajustes razonables
+                                        para garantizar la participación plena de estudiantes con discapacidad.
+                                        Documento encargado por la Oficina Regional de Educación para América
+                                        Latina y el Caribe (OREALC/UNESCO Santiago). UNESCO 2023.
+                                    </p>
+                                    <p>
+                                        Rusca-Jordán, F., &amp; Cortez-Vergara, C. (2020). Trastorno por
+                                        déficit de atención con hiperactividad (TDAH) en niños y adolescentes.
+                                        Una revisión clínica. Revista de Neuro-Psiquiatría, 83(3), 148–156.
+                                        <br>
+                                        <a href="http://www.scielo.org.pe/scielo.php?script=sci_arttext&amp;pid=S0034-85972020000300148"
+                                            target="_blank">
+                                            http://www.scielo.org.pe/scielo.php?script=sci_arttext&amp;pid=S0034-85972020000300148
+                                        </a>
+                                    </p>
+                                </section>
+                            </div>
                         </section>
                     </div>
                 </div>

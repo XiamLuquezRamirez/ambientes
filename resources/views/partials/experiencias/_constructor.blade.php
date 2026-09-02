@@ -8,6 +8,17 @@
         : ($puedeEditar
             ? 'Solo el creador puede publicar o cambiar el estado de esta experiencia'
             : 'No tiene permiso para publicar');
+    $gnPreview = mb_strtolower($experiencia->grado->nombre ?? '');
+    $nivelPreview = 'jardin';
+    if (str_contains($gnPreview, 'prejardín') || str_contains($gnPreview, 'prejardin')) {
+        $nivelPreview = 'prejardin';
+    } elseif (str_contains($gnPreview, 'jardín') || str_contains($gnPreview, 'jardin')) {
+        $nivelPreview = 'jardin';
+    } elseif (str_contains($gnPreview, 'transición') || str_contains($gnPreview, 'transicion')) {
+        $nivelPreview = 'transicion';
+    } elseif (str_contains($gnPreview, 'primaria') || (int) ($experiencia->grado->edad_anos ?? 0) >= 6) {
+        $nivelPreview = 'primaria';
+    }
 @endphp
 
 <div class="page-header tematicas-page-header cx-page-header">
@@ -36,6 +47,7 @@
     data-experiencia-nombre="{{ $experiencia->nombre }}"
     data-media-base="{{ asset('storage/experiencias/' . $experiencia->id . '/bloques') }}"
     data-estudiante-sexo="masculino"
+    data-nivel-etario="{{ $nivelPreview }}"
     data-emociones-base="{{ asset('assets/images/emociones') }}"
     data-experiencia-estado="{{ $experiencia->estado }}" data-url-listar="{{ $urls['listar'] }}"
     data-url-guardar="{{ $urls['guardar'] }}" data-url-reordenar="{{ $urls['reordenar'] }}"
@@ -101,15 +113,15 @@
         <button type="button" class="vn-close" data-vn-close title="Cerrar vista niño" aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
         </button>
+        <button type="button" class="vn-reload-btn" id="vnBtnRecargar" title="Recargar experiencia (provisional)"
+            aria-label="Recargar experiencia">
+            <i class="fa-solid fa-rotate"></i>
+        </button>
         <div class="vn-tablet-stage" id="vnTabletStage">
             <div class="vn-tablet" id="vnTablet" data-screen-w="1280" data-screen-h="800">
                 <div class="vn-tablet-bezel">
                     <div class="vn-tablet-camera" aria-hidden="true"></div>
                     <div class="vn-tablet-screen" id="vnTabletScreen">
-                        <header class="vn-screen-top">
-                            <div class="vn-progress" id="vnProgress" aria-hidden="true"></div>
-                            <p class="vn-step-label" id="vnStepLabel">Paso 1 de 1</p>
-                        </header>
                         <div class="vn-screen-body" id="vnScreenBody"></div>
                         <footer class="vn-screen-nav">
                             <button type="button" class="vn-nav-btn vn-nav-prev" id="vnBtnPrev"
@@ -117,13 +129,17 @@
                                 <i class="fa-solid fa-arrow-left"></i>
                                 <span>Atrás</span>
                             </button>
-                            <div class="vn-nav-meta">
-                                <strong id="vnTitle">Vista niño</strong>
-                                <span id="vnBlockName">Bienvenida</span>
+                            <div class="vn-nav-center" aria-label="Progreso de la experiencia">
+                                <div class="vn-progress" id="vnProgress" aria-hidden="true"></div>
+                                <p class="vn-step-label" id="vnStepLabel">Paso 1 de 1</p>
+                                <div class="vn-nav-meta">
+                                    <strong id="vnTitle">Vista niño</strong>
+                                    <span id="vnBlockName">Bienvenida</span>
+                                </div>
                             </div>
                             <button type="button" class="vn-nav-btn vn-nav-next" id="vnBtnNext"
                                 aria-label="Siguiente">
-                                <span>Siguiente</span>
+                                <span>¡Sigue!</span>
                                 <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </footer>

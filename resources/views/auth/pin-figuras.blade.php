@@ -8,7 +8,9 @@
             <i class="fas {{ $sinPin ? 'fa-lock' : 'fa-ban' }}"></i>
         </span>
         <div class="pin-avatar" style="--color-av: {{ $estudiante->color_avatar }};">
-            <span class="pin-avatar__circulo">{{ $estudiante->iniciales }}</span>
+            <span class="pin-avatar__circulo">
+                @include('auth._avatar-circulo')
+            </span>
         </div>
         <p class="pin-nombre">{{ $estudiante->nombre }}</p>
         <p class="pin-bloqueado__titulo">
@@ -32,7 +34,9 @@
 >
     <div class="pin-izquierda">
         <div class="pin-avatar" style="--color-av: {{ $estudiante->color_avatar }};">
-            <span class="pin-avatar__circulo">{{ $estudiante->iniciales }}</span>
+            <span class="pin-avatar__circulo">
+                @include('auth._avatar-circulo')
+            </span>
         </div>
         <p class="pin-nombre">{{ $estudiante->nombre }}</p>
         <p class="pin-instruccion">Toca tus 3 figuras</p>

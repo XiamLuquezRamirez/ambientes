@@ -1,0 +1,5 @@
+.btn-audio{background:#dc2626;color:#fff}
+.btn-detener{background:#555;color:#fff}
+.estado{margin-top:15px;text-align:center;font-weight:700;font-size:15px}
+.estado.grabando{color:#dc2626}.estado.exito{color:#16a34a}.estado.error{color:#dc2626}
+#contadorAudio{display:none;text-align:center;font-size:28px;font-weight:700;margin-top:15px;color:#dc2626}

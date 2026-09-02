@@ -25,7 +25,9 @@
                     style="--color-av: {{ $estudiante->color_avatar }};"
                     aria-label="{{ $estudiante->nombre }}{{ $tienePin ? '' : ' (sin PIN)' }}{{ $bloqueado ? ' (PIN bloqueado)' : '' }}"
                 >
-                    <span class="avatar-circulo">{{ $estudiante->iniciales }}</span>
+                    <span class="avatar-circulo">
+                        @include('auth._avatar-circulo')
+                    </span>
                     @if (! $tienePin)
                         <span class="avatar-badge" title="Sin PIN" aria-hidden="true">
                             <i class="fas fa-lock"></i>

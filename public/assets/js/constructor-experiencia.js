@@ -38,6 +38,46 @@
     const $configHead = $('#cxConfigHead');
     const $configBody = $('#cxConfigBody');
     const $saveStatus = $('#cxSaveStatus');
+    const $secuenciaScroll = $('.cx-secuencia-scroll');
+
+    let syncScrollLock = false;
+
+    function scrollSyncHabilitado() {
+        return window.matchMedia('(min-width: 1201px)').matches;
+    }
+
+    function ratioScroll(el) {
+        const max = el.scrollHeight - el.clientHeight;
+        if (max <= 0) return 0;
+        return el.scrollTop / max;
+    }
+
+    function aplicarRatioScroll(el, ratio) {
+        const max = el.scrollHeight - el.clientHeight;
+        el.scrollTop = max > 0 ? ratio * max : 0;
+    }
+
+    function targetsScrollLaterales() {
+        const targets = [$catalogo[0]];
+        if ($configPanel.length && !$configPanel.prop('hidden') && $configBody.length) {
+            targets.push($configBody[0]);
+        }
+        return targets.filter(Boolean);
+    }
+
+    function sincronizarLateralesDesdeSecuencia() {
+        if (!scrollSyncHabilitado() || syncScrollLock) return;
+        const origen = $secuenciaScroll[0];
+        if (!origen) return;
+
+        syncScrollLock = true;
+        const ratio = ratioScroll(origen);
+        targetsScrollLaterales().forEach((el) => aplicarRatioScroll(el, ratio));
+        syncScrollLock = false;
+    }
+
+    $secuenciaScroll.on('scroll', sincronizarLateralesDesdeSecuencia);
+    window.addEventListener('resize', sincronizarLateralesDesdeSecuencia, { passive: true });
 
     function parseJsonScript(id, fallback) {
         const el = document.getElementById(id);
@@ -227,6 +267,7 @@
         actualizarResumen();
         renderCatalogo();
         initSortable();
+        requestAnimationFrame(sincronizarLateralesDesdeSecuencia);
     }
 
     function initSortable() {
@@ -316,14 +357,16 @@
 
     /* ── Formularios ────────────────────────────────────────── */
 
-    function detenerAudiosConfig() {
-        $configBody.find('.cx-audio-el').each(function () {
+    function detenerMediosConfig() {
+        $configBody.find('.cx-audio-el, .cx-video-el').each(function () {
             try {
                 this.pause();
                 this.currentTime = 0;
             } catch (e) { /* noop */ }
         });
-        $configBody.find('.cx-audio-play-btn i').removeClass('fa-pause').addClass('fa-play');
+        $configBody.find('.cx-audio-play-btn i, .cx-video-play-btn i')
+            .removeClass('fa-pause').addClass('fa-play');
+        $configBody.find('.cx-video-preview-frame').removeClass('is-playing');
         if (window.speechSynthesis) {
             try { window.speechSynthesis.cancel(); } catch (e) { /* noop */ }
         }
@@ -372,6 +415,61 @@
                 <select class="form-select cx-input" data-field="${escapar(name)}" ${puedeEditar ? '' : 'disabled'}>
                     ${opts}
                 </select>
+            </div>`;
+    }
+
+    const JUEGOS_OPCIONES = [
+        {
+            id: 'rompecabezas',
+            nombre: 'Rompecabezas',
+            desc: 'Armar la imagen arrastrando piezas',
+            icon: 'fa-puzzle-piece',
+            color: '#d97706',
+        },
+        {
+            id: 'memoria',
+            nombre: 'Memoria',
+            desc: 'Encontrar parejas de imágenes iguales',
+            icon: 'fa-clone',
+            color: '#0284c7',
+        },
+        {
+            id: 'colorear',
+            nombre: 'Colorear',
+            desc: 'Pintar sobre una imagen en blanco y negro',
+            icon: 'fa-palette',
+            color: '#a855f7',
+        },
+        {
+            id: 'secuencia',
+            nombre: 'Secuencia',
+            desc: 'Ordenar imágenes en el paso correcto',
+            icon: 'fa-arrow-down-wide-short',
+            color: '#0f6e56',
+        },
+    ];
+
+    function fieldJuegoPicker(name, label, value) {
+        const cards = JUEGOS_OPCIONES.map((j) => {
+            const selected = String(j.id) === String(value || '');
+            return `<button type="button" class="cx-juego-card${selected ? ' is-selected' : ''}"
+                data-juego-id="${escapar(j.id)}" aria-pressed="${selected ? 'true' : 'false'}"
+                ${puedeEditar ? '' : 'disabled'}>
+                <span class="cx-juego-card-icon" style="--cx-juego-color:${escapar(j.color)}">
+                    <i class="fa-solid ${escapar(j.icon)}" aria-hidden="true"></i>
+                </span>
+                <span class="cx-juego-card-body">
+                    <span class="cx-juego-card-name">${escapar(j.nombre)}</span>
+                    <span class="cx-juego-card-desc">${escapar(j.desc)}</span>
+                </span>
+            </button>`;
+        }).join('');
+        return `
+            <div class="cx-field">
+                <label>${escapar(label)}</label>
+                <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(value || '')}">
+                <div class="cx-juego-picker" role="radiogroup" aria-label="${escapar(label)}">${cards}</div>
+                ${!value ? '<div class="cx-help">Elige un tipo de juego para configurar sus opciones.</div>' : ''}
             </div>`;
     }
 
@@ -498,25 +596,34 @@
         if (target) $configBody.find(target).addClass('show active');
     }
 
+    function videoPreviewFrameHtml(url) {
+        if (!url) {
+            return '<i class="fa-solid fa-film cx-video-placeholder"></i>';
+        }
+        return `<video class="cx-video-el" preload="metadata" playsinline src="${escapar(url)}"></video>
+            <button type="button" class="cx-video-btn cx-video-play-btn" title="Reproducir video" aria-label="Reproducir video">
+                <i class="fa-solid fa-play"></i>
+            </button>`;
+    }
+
     function fieldVideoPreview(name, label, value) {
         const archivo = value || '';
         const url = mediaUrlBloque(archivo);
-        const thumb = url
-            ? `<video src="${escapar(url)}" muted preload="metadata" playsinline></video>`
-            : '<i class="fa-solid fa-film"></i>';
         return `<div class="cx-field">
             <label>${escapar(label)}</label>
-            <div class="cx-media-preview-row">
+            <div class="cx-media-preview-row cx-video-preview-row">
                 <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(archivo)}">
-                ${puedeEditar
-                    ? `<label class="cx-img-btn cx-video-preview-btn" title="Subir video">
-                        ${thumb}
-                        <input type="file" class="cx-file" data-target="${escapar(name)}" accept="video/mp4,.mp4" hidden>
-                       </label>`
-                    : `<span class="cx-img-btn cx-video-preview-btn is-readonly">${thumb}</span>`}
+                <div class="cx-video-preview-frame">${videoPreviewFrameHtml(url)}</div>
                 <div class="cx-media-preview-meta">
                     <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
-                    <div class="cx-help">Toca el recuadro para elegir o cambiar el video.</div>
+                    ${puedeEditar
+                        ? `<label class="cx-video-upload-btn">
+                            <i class="fa-solid fa-upload"></i> Elegir archivo
+                            <input type="file" class="cx-file" data-target="${escapar(name)}"
+                                accept="video/mp4,.mp4" hidden>
+                           </label>`
+                        : ''}
+                    <div class="cx-help">Toca ▶ en la vista previa para ver el video. Formato: MP4.</div>
                 </div>
             </div>
         </div>`;
@@ -649,13 +756,7 @@
                 ).join('');
         }
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldSelect('juego_id', 'Juego', id, [
-                { value: '', label: 'Seleccione…' },
-                { value: 'rompecabezas', label: 'Rompecabezas' },
-                { value: 'memoria', label: 'Memoria' },
-                { value: 'colorear', label: 'Colorear' },
-                { value: 'secuencia', label: 'Secuencia' },
-            ])
+            + fieldJuegoPicker('juego_id', 'Juego', id)
             + fieldInput('juego_nombre', 'Nombre del juego', d.juego_nombre)
             + extra;
     }
@@ -971,7 +1072,12 @@
                 icon: 'fa-comment-dots',
                 content: fieldInput('fb_ok', 'Mensaje al acertar', d.fb_ok)
                     + fieldInput('fb_err', 'Mensaje al fallar', d.fb_err)
-                    + fieldSelect('intentos', 'Intentos por paso', d.intentos || '2', ['1', '2', '3', 'Sin límite']),
+                    + fieldSelect('intentos', 'Intentos por paso', d.intentos || '2', ['1', '2', '3', 'Sin límite'])
+                    + fieldSelect('al_agotar', 'Al agotar intentos', d.al_agotar || 'Mostrar respuesta correcta', [
+                        'Mostrar respuesta correcta',
+                        'Continuar sin mostrar',
+                        'Repetir desde el inicio',
+                    ]),
             },
         ]);
     }
@@ -1021,7 +1127,7 @@
     }
 
     function renderConfig(bloque) {
-        detenerAudiosConfig();
+        detenerMediosConfig();
         const tabPrev = tabActivaId();
         const pendientes = Array.isArray(bloque.pendientes) ? bloque.pendientes : [];
         const pendHtml = bloque.completo
@@ -1047,6 +1153,7 @@
         $configBody.html(pendHtml + htmlFormulario(bloque));
         restaurarTab(tabPrev);
         $saveStatus.prop('hidden', true).removeClass('is-saving is-ok is-err');
+        requestAnimationFrame(sincronizarLateralesDesdeSecuencia);
     }
 
     function setDeep(obj, path, value) {
@@ -1291,16 +1398,20 @@
                     $btn.find('i').removeClass('fa-play fa-pause').addClass('fa-volume-high');
                 }
             }
+            const $videoRow = $(input).closest('.cx-video-preview-row');
+            if ($videoRow.length) {
+                const url = mediaUrlBloque(nombre);
+                $videoRow.find('.cx-file-name').text(nombre || 'Sin archivo');
+                $videoRow.find('.cx-video-preview-frame')
+                    .removeClass('is-playing')
+                    .html(videoPreviewFrameHtml(url));
+            }
             const $imgBtn = $(input).closest('.cx-img-btn');
             if ($imgBtn.length) {
-                $imgBtn.find('img, video, i.fa-image, i.fa-film').remove();
+                $imgBtn.find('img, i.fa-image').remove();
                 const url = mediaUrlBloque(nombre);
-                if (url && $imgBtn.hasClass('cx-video-preview-btn')) {
-                    $imgBtn.prepend(`<video src="${escapar(url)}" muted preload="metadata" playsinline></video>`);
-                } else if (url) {
+                if (url) {
                     $imgBtn.prepend(`<img src="${escapar(url)}" alt="">`);
-                } else if ($imgBtn.hasClass('cx-video-preview-btn')) {
-                    $imgBtn.prepend('<i class="fa-solid fa-film"></i>');
                 } else {
                     $imgBtn.prepend('<i class="fa-solid fa-image"></i>');
                 }
@@ -1333,6 +1444,13 @@
     $timeline.on('click', '.cx-btn-eliminar', function (e) {
         e.stopPropagation();
         eliminarBloque($(this).data('id'));
+    });
+
+    $configBody.on('click', '.cx-juego-card:not(:disabled)', function () {
+        const id = $(this).data('juego-id');
+        $configBody.find('.cx-juego-card').removeClass('is-selected').attr('aria-pressed', 'false');
+        $(this).addClass('is-selected').attr('aria-pressed', 'true');
+        $configBody.find('.cx-input[data-field="juego_id"]').val(id).trigger('change');
     });
 
     $configBody.on('input change', '.cx-input, .cx-check, .cx-correcta, .cx-correcta-paso', function () {
@@ -1400,9 +1518,17 @@
                 } catch (e) { /* noop */ }
             }
         });
+        $configBody.find('.cx-video-el').each(function () {
+            try {
+                this.pause();
+                this.currentTime = 0;
+            } catch (e) { /* noop */ }
+        });
+        $configBody.find('.cx-video-preview-frame').removeClass('is-playing');
         $configBody.find('.cx-audio-play-btn').not($btn).each(function () {
             $(this).find('i').removeClass('fa-pause').addClass('fa-play');
         });
+        $configBody.find('.cx-video-play-btn i').removeClass('fa-pause').addClass('fa-play');
         if (window.speechSynthesis) {
             try { window.speechSynthesis.cancel(); } catch (e) { /* noop */ }
         }
@@ -1422,8 +1548,51 @@
         }
     });
 
+    $configBody.on('click', '.cx-video-play-btn', function (e) {
+        e.stopPropagation();
+        const $btn = $(this);
+        const $frame = $btn.closest('.cx-video-preview-frame');
+        const video = $frame.find('.cx-video-el')[0];
+        if (!video) return;
+        $configBody.find('.cx-video-el').each(function () {
+            if (this !== video) {
+                try {
+                    this.pause();
+                    this.currentTime = 0;
+                } catch (err) { /* noop */ }
+            }
+        });
+        $configBody.find('.cx-video-preview-frame').not($frame).removeClass('is-playing');
+        $configBody.find('.cx-audio-el').each(function () {
+            try {
+                this.pause();
+                this.currentTime = 0;
+            } catch (err) { /* noop */ }
+        });
+        $configBody.find('.cx-audio-play-btn i').removeClass('fa-pause').addClass('fa-play');
+        if (window.speechSynthesis) {
+            try { window.speechSynthesis.cancel(); } catch (err) { /* noop */ }
+        }
+        video.onended = function () {
+            $frame.removeClass('is-playing');
+        };
+        $frame.addClass('is-playing');
+        const p = video.play();
+        if (p && typeof p.catch === 'function') {
+            p.catch(() => $frame.removeClass('is-playing'));
+        }
+    });
+
+    $configBody.on('click', '.cx-video-preview-frame.is-playing .cx-video-el', function () {
+        const $frame = $(this).closest('.cx-video-preview-frame');
+        try {
+            this.pause();
+        } catch (err) { /* noop */ }
+        $frame.removeClass('is-playing');
+    });
+
     $configBody.on('click', '[data-cx-tts-preview]', function () {
-        detenerAudiosConfig();
+        detenerMediosConfig();
         const texto = String($(this).closest('.cx-field').find('textarea[data-field="instruccion"]').val() || '').trim();
         if (!texto) {
             toast('info', 'Escribe la instrucción para escucharla.');

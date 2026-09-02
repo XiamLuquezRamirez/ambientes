@@ -79,6 +79,30 @@ class ClaseKioscoServiceTest extends TestCase
         $this->assertNotEmpty($servicio->ipServidor($request));
     }
 
+    public function test_ip_host_de_la_url_tiene_prioridad_sobre_lan(): void
+    {
+        $acceso = new AccesoAmbienteService;
+        $servicio = new SesionNinoService($acceso);
+        $request = Request::create('http://192.168.1.14:8000/inicio', 'GET', [], [], [], [
+            'SERVER_ADDR' => '192.168.1.12',
+        ]);
+
+        $ips = $servicio->ipsCandidatasNodo($request);
+
+        $this->assertSame('192.168.1.14', $ips[0]);
+    }
+
+    public function test_resolucion_ambiente_solo_usa_ip_de_la_url(): void
+    {
+        $acceso = new AccesoAmbienteService;
+        $servicio = new SesionNinoService($acceso);
+        $request = Request::create('http://192.168.1.14:8000/inicio', 'GET', [], [], [], [
+            'SERVER_ADDR' => '192.168.1.12',
+        ]);
+
+        $this->assertSame(['192.168.1.14'], $servicio->ipsParaResolucionAmbiente($request));
+    }
+
     public function test_diagnostico_resolucion_expone_fuente(): void
     {
         $acceso = new AccesoAmbienteService;
