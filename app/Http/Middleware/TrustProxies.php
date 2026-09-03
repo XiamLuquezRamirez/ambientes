@@ -12,7 +12,7 @@ class TrustProxies extends Middleware
      *
      * @var array<int, string>|string|null
      */
-    protected $proxies;
+    protected $proxies = '*'; // confía en el proxy TLS local (prueba cámara embebida)
 
     /**
      * The headers that should be used to detect proxies.
