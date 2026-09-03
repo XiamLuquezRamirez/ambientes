@@ -42,7 +42,7 @@
             </li>
             <li class="nav-item">
                 <a href="{{ route('superadmin.administradores.listar') }}"
-                    class="{{ request()->routeIs('superadmin.administradores.index') ? 'active nav-link' : 'nav-link' }}">
+                    class="{{ request()->routeIs('superadmin.administradores.*') ? 'active nav-link' : 'nav-link' }}">
                     <i class="fa-solid fa-users"></i> Administradores
                 </a>
             </li>

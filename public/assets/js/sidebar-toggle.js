@@ -4,6 +4,7 @@
     const MOBILE_BP = 992;
     const HOVER_CLOSE_DELAY_MS = 280;
     const EXPAND_DELAY_MS = 300;
+    const STORAGE_KEY_PINNED = 'pednia.sidebar.pinned';
     const root = document.documentElement;
 
     const toggle = document.getElementById('sidebarToggle');
@@ -88,6 +89,37 @@
         });
     }
 
+    function savePersistedState() {
+        try {
+            if (!isMobile()) {
+                localStorage.setItem(STORAGE_KEY_PINNED, isPinned() ? '1' : '0');
+            }
+        } catch (e) {}
+    }
+
+    function restoreDesktopPinnedState() {
+        try {
+            if (localStorage.getItem(STORAGE_KEY_PINNED) === '1') {
+                root.classList.add('sidebar-pinned', 'sidebar-hover');
+            }
+        } catch (e) {}
+    }
+
+    function loadPersistedState() {
+        root.classList.add('sidebar-collapsed');
+        root.classList.remove('sidebar-mobile-open', 'sidebar-hover', 'sidebar-pinned');
+
+        if (!isMobile()) {
+            restoreDesktopPinnedState();
+        }
+
+        syncToggleAria();
+        if (backdrop) {
+            backdrop.setAttribute('aria-hidden', 'true');
+        }
+        syncNavTitles();
+    }
+
     function applyMobileState(open) {
         root.classList.add('sidebar-collapsed');
         root.classList.toggle('sidebar-mobile-open', !!open);
@@ -120,6 +152,7 @@
         }
         syncToggleAria();
         syncNavTitles();
+        savePersistedState();
     }
 
     function clearHoverCloseTimer() {
@@ -177,14 +210,7 @@
         }, EXPAND_DELAY_MS);
     }
 
-    // Estado inicial: siempre colapsado; en móvil cerrado (sin overlay).
-    root.classList.add('sidebar-collapsed');
-    root.classList.remove('sidebar-mobile-open', 'sidebar-hover', 'sidebar-pinned');
-    syncToggleAria();
-    if (backdrop) {
-        backdrop.setAttribute('aria-hidden', 'true');
-    }
-    syncNavTitles();
+    loadPersistedState();
 
     requestAnimationFrame(function () {
         requestAnimationFrame(function () {
@@ -255,11 +281,12 @@
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function () {
             root.classList.add('sidebar-collapsed');
-            root.classList.remove('sidebar-hover', 'sidebar-pinned');
+            root.classList.remove('sidebar-hover', 'sidebar-pinned', 'sidebar-mobile-open');
+
             if (isMobile()) {
                 applyMobileState(false);
             } else {
-                root.classList.remove('sidebar-mobile-open');
+                restoreDesktopPinnedState();
                 syncToggleAria();
                 if (backdrop) backdrop.setAttribute('aria-hidden', 'true');
                 syncNavTitles();
