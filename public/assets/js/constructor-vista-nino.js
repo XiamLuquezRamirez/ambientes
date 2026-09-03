@@ -146,7 +146,6 @@
     let experienciaIdActiva = null;
     let urlExperienciaTpl = '';
     let evidenciaSesion = 0;
-    let evidenciaCamIndice = 0; // índice de cámara activa (se alterna al voltear)
 
     const PAINT_SIZE_MAP = { s: 6, m: 12, l: 22 };
     const PAINT_DEFAULT_COLORS = [
@@ -898,10 +897,6 @@
             <div class="vn-evidencia-wrap">
                 <div class="vn-evidencia-stage" data-vn-evidencia-stage hidden>
                     <video class="vn-evidencia-preview" playsinline webkit-playsinline muted hidden></video>
-                    <button type="button" class="vn-evidencia-flip" data-vn-evidencia-flip hidden
-                        aria-label="Cambiar de cámara">
-                        <i class="fa-solid fa-camera-rotate" aria-hidden="true"></i>
-                    </button>
                     <img class="vn-evidencia-result" alt="" hidden>
                     <div class="vn-evidencia-replay vn-evidencia-replay--audio" data-vn-evidencia-replay="audio" hidden>
                         ${htmlBotonEvidenciaAudio('data-vn-evidencia-audio-play aria-label="Escuchar evidencia"')}
@@ -3125,7 +3120,6 @@
 
     function limpiarEvidenciaRecursos() {
         evidenciaSesion += 1;
-        evidenciaCamIndice = 0; // volver a la cámara por defecto
         $body.removeData('vn-evidencia-estado');
         const objectUrl = $body && $body.data('vn-evidencia-object-url');
         if (objectUrl) {
@@ -3174,63 +3168,25 @@
         if (tipo === 'audio') {
             return navigator.mediaDevices.getUserMedia({ audio: true });
         }
-        const quiereAudio = (tipo === 'video');
-        // Estrategia por deviceId: enumeramos las cámaras físicas y alternamos por
-        // índice al voltear. Es lo más fiable (facingMode { exact } falla en
-        // muchos MediaTek, sobre todo con audio). Fallback a facingMode si no se
-        // pueden enumerar (algunos navegadores esconden los ids sin permiso).
-        return listarCamaras().then(function (camaras) {
-            if (camaras.length > 1) {
-                const idx = ((evidenciaCamIndice % camaras.length) + camaras.length) % camaras.length;
-                const dev = camaras[idx];
-                // Para video el audio es OBLIGATORIO (si no, se graba mudo). Se
-                // intenta la cámara exacta con audio; si falla, se reintenta con
-                // deviceId ideal + audio (menos estricto) MANTENIENDO el audio;
-                // solo como último recurso (foto no lo llega a usar) se va sin audio.
-                const intentos = quiereAudio
-                    ? [
-                        { video: { deviceId: { exact: dev.deviceId } }, audio: true },
-                        { video: { deviceId: { ideal: dev.deviceId } }, audio: true },
-                        { video: { deviceId: { exact: dev.deviceId } } },
-                    ]
-                    : [
-                        { video: { deviceId: { exact: dev.deviceId } } },
-                    ];
-                let cad = Promise.reject(new Error('sin intentos'));
-                intentos.forEach(function (c) {
-                    cad = cad.catch(function () { return navigator.mediaDevices.getUserMedia(c); });
-                });
-                return cad;
-            }
-            // Una sola cámara (o no enumerables): usa facingMode como antes.
-            const cam = (evidenciaCamIndice % 2 === 0) ? 'environment' : 'user';
-            const intentos = quiereAudio
-                ? [
-                    { video: { facingMode: { ideal: cam } }, audio: true },
-                    { video: true, audio: true },
-                    { video: true, audio: false },
-                ]
-                : [
-                    { video: { facingMode: { ideal: cam } } },
-                    { video: true },
-                ];
-            let cadena = Promise.reject(new Error('sin intentos'));
-            intentos.forEach(function (c) {
-                cadena = cadena.catch(function () { return navigator.mediaDevices.getUserMedia(c); });
+        const intentosVideo = tipo === 'foto'
+            ? [
+                { video: { facingMode: { ideal: 'environment' } } },
+                { video: { facingMode: 'environment' } },
+                { video: true },
+            ]
+            : [
+                { video: { facingMode: { ideal: 'environment' } }, audio: true },
+                { video: { facingMode: 'environment' }, audio: true },
+                { video: true, audio: true },
+                { video: true, audio: false },
+            ];
+        let cadena = Promise.reject(new Error('sin intentos'));
+        intentosVideo.forEach(function (constraints) {
+            cadena = cadena.catch(function () {
+                return navigator.mediaDevices.getUserMedia(constraints);
             });
-            return cadena;
         });
-    }
-
-    // Lista las cámaras de video disponibles (requiere haber concedido permiso
-    // una vez para ver los labels/ids). Devuelve [] si no se pueden enumerar.
-    function listarCamaras() {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
-            return Promise.resolve([]);
-        }
-        return navigator.mediaDevices.enumerateDevices().then(function (devs) {
-            return devs.filter(function (d) { return d.kind === 'videoinput' && d.deviceId; });
-        }).catch(function () { return []; });
+        return cadena;
     }
 
     function mensajeErrorEvidencia(err) {
@@ -3560,7 +3516,6 @@
             $wrap,
             $stage,
             $preview: $stage.find('.vn-evidencia-preview'),
-            $flip: $stage.find('[data-vn-evidencia-flip]'),
             $result: $stage.find('.vn-evidencia-result'),
             $audioReplay: $stage.find('[data-vn-evidencia-replay="audio"]'),
             $audioPlayBtn: $stage.find('[data-vn-evidencia-audio-play]'),
@@ -3589,13 +3544,6 @@
         }
         if (modo) refs.$estado.addClass('is-' + modo);
         refs.$estado.text(texto).prop('hidden', false);
-    }
-
-    // Cambia el texto y el icono del botón de captura/grabación.
-    function setCapturaLabel(refs, texto, iconoFa) {
-        refs.$captura.find('[data-vn-evidencia-captura-label]').text(texto);
-        if (iconoFa) refs.$captura.find('.vn-evidencia-captura-icon i').attr('class', 'fa-solid ' + iconoFa);
-        refs.$captura.attr('aria-label', texto);
     }
 
     function iniciarUiGrabacionEvidencia(refs, sesion, nativo) {
@@ -3836,34 +3784,6 @@
         aplicarBlobEvidencia(refs, tipo, file);
     });
 
-    // Cambiar entre cámara frontal ('user') y trasera ('environment'). Alterna la
-    // preferencia, detiene el stream actual y reabre la cámara con el mismo flujo.
-    onBody('click', '[data-vn-evidencia-flip]', function () {
-        vincularElementos();
-        const refs = refsEvidencia($body);
-        const estado = $body.data('vn-evidencia-estado');
-        if (!estado || (estado.tipo !== 'foto' && estado.tipo !== 'video')) return;
-        // No permitir cambiar mientras se graba un video (evita cortar la grabación).
-        const rec = $body.data('vn-evidencia-recorder');
-        if (rec && rec.state === 'recording') return;
-
-        evidenciaCamIndice += 1; // pasar a la siguiente cámara física
-        detenerEvidenciaStream();
-        if (refs.$flip) refs.$flip.prop('hidden', true);
-        // Redispara el botón principal de este tipo → reabre con la nueva cámara.
-        // Hay que REHABILITARLO: al abrir la cámara quedó disabled y el guard
-        // `if ($btn.prop('disabled')) return;` bloquearía el redisparo. Se espera
-        // un instante para que el dispositivo libere la cámara anterior (evita el
-        // "negro" y que getUserMedia caiga al fallback de cualquier cámara).
-        const $btnTipo = refs.$btn.filter('[data-vn-evidencia-tipo="' + estado.tipo + '"]').first();
-        if ($btnTipo.length) {
-            setTimeout(function () {
-                $btnTipo.prop('disabled', false);
-                $btnTipo.trigger('click');
-            }, 400); // margen para que el micro/cámara anterior se liberen
-        }
-    });
-
     onBody('click', '[data-vn-evidencia]', function () {
         vincularElementos();
         const refs = refsEvidencia($body);
@@ -3949,15 +3869,12 @@
                 refs.$preview[0].setAttribute('playsinline', '');
                 refs.$preview[0].setAttribute('webkit-playsinline', '');
                 refs.$preview[0].play().catch(function () { /* noop */ });
-                // Mostrar el botón de cambiar cámara (frontal/trasera).
-                if (refs.$flip) refs.$flip.prop('hidden', false);
                 if (tipo === 'video') {
-                    // Video: primero se MUESTRA la cámara (para poder voltear); la
-                    // grabación empieza al pulsar el botón, que dice "Iniciar
-                    // grabación". Ver el handler de [data-vn-evidencia-captura].
-                    $body.data('vn-evidencia-estado', { tipo: tipo, sesion: sesion, nativo: false, grabando: false });
-                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Listo para grabar!' : 'Toca para grabar', 'grabando');
-                    setCapturaLabel(refs, configNivel().simplificar ? '¡Grabar!' : 'Iniciar grabación', 'fa-circle');
+                    // Video embebido: además del preview en vivo, se graba con
+                    // MediaRecorder (mismo recuadro). Se detiene al pulsar Capturar.
+                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Grabando!' : 'Grabando video…', 'grabando');
+                    if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
+                    iniciarGrabacionEvidencia(stream, 'video', sesion);
                 } else {
                     setEstadoEvidencia(refs, configNivel().simplificar ? '¡Mira!' : 'Cámara activa', 'grabando');
                 }
@@ -3976,24 +3893,6 @@
         const refs = refsEvidencia($body);
         const tipo = estado.tipo;
         const sesion = estado.sesion;
-
-        // VIDEO en fase "listo" (aún no graba): este toque INICIA la grabación.
-        // Así el niño pudo voltear la cámara antes. Al grabar, se oculta el flip.
-        if (tipo === 'video' && estado.grabando === false) {
-            const stream = $body.data('vn-evidencia-stream');
-            if (!stream) return;
-            estado.grabando = true;
-            $body.data('vn-evidencia-estado', estado);
-            if (refs.$flip) refs.$flip.prop('hidden', true);
-            refs.$recording.prop('hidden', false);
-            setEstadoEvidencia(refs, configNivel().simplificar ? '¡Grabando!' : 'Grabando video…', 'grabando');
-            setCapturaLabel(refs, configNivel().simplificar ? '¡Ya!' : 'Detener', 'fa-stop');
-            if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
-            iniciarGrabacionEvidencia(stream, 'video', sesion);
-            return;
-        }
-
-        if (refs.$flip) refs.$flip.prop('hidden', true); // ocultar cambio de cámara al capturar
 
         if (estado.nativo && tipo === 'audio' && window.VnCaptura) {
             refs.$captura.prop('disabled', true);
