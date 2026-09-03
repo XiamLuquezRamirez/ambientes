@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\PerfilAprendizajeInclusion;
+use App\Services\ParametrosPerfilAprendizajeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 
@@ -151,6 +152,9 @@ class PerfilAprendizajeInclusionController extends Controller
         $datos['es_sistema'] = $request->boolean('es_sistema');
 
         $perfilAprendizaje = PerfilAprendizajeInclusion::create($datos);
+
+        app(ParametrosPerfilAprendizajeService::class)
+            ->inicializarDefaultsInclusion((int) $perfilAprendizaje->id);
 
         return response()->json([
             'success' => true,

@@ -9,6 +9,7 @@ use App\Models\PerfilAprendizajePersonalizadoOrden;
 use App\Models\Estudiante;
 use App\Models\EstudiantePerfilAprendizajePersonalizado;
 use App\Services\EstudiantePerfilAprendizajePersonalizadoService;
+use App\Services\ParametrosPerfilAprendizajeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -135,6 +136,12 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
 
             return $perfilAprendizajePersonalizado;
         });
+
+        app(ParametrosPerfilAprendizajeService::class)->inicializarInstitucionPersonalizado(
+            $institucionId,
+            (int) $perfilAprendizajePersonalizado->id,
+            $perfilAprendizajePersonalizado
+        );
 
         return response()->json([
             'success' => true,

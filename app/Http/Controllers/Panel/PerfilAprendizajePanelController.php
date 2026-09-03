@@ -8,6 +8,7 @@ use App\Models\PerfilAprendizajeInclusion;
 use App\Models\PerfilAprendizajeOrden;
 use App\Services\EstudiantePerfilAprendizajePersonalizadoService;
 use App\Services\EstudiantePerfilAprendizajeService;
+use App\Services\ParametrosPerfilAprendizajeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -253,6 +254,8 @@ class PerfilAprendizajePanelController extends Controller
         }
 
         PerfilAprendizajeOrden::query()->insert($filas);
+
+        app(ParametrosPerfilAprendizajeService::class)->sembrarInstitucion($institucionId);
     }
 
     private function docenteTieneAccesoAlEstudiante(int $docenteId, int $estudianteId): bool

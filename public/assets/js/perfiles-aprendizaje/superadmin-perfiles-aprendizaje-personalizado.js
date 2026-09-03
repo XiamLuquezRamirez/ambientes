@@ -12,11 +12,6 @@
         }
     });
 
-    function irATabDatosGenerales() {
-        const tab = document.querySelector('#tab-datos-generales-transitoria');
-        if (tab) bootstrap.Tab.getOrCreateInstance(tab).show();
-    }
-
     function abrirCb() {
         $cb.addClass('open');
         setTimeout(() => $('#buscar_perfil_aprendizaje').trigger('focus'), 30);
@@ -97,7 +92,6 @@
         esSistemaActual = false;
         resetFormTransitoria();
         configurarModoCrear();
-        irATabDatosGenerales();
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
     };
 
@@ -105,7 +99,6 @@
         modoEdicion = true;
         resetFormTransitoria();
         configurarModoEditar();
-        irATabDatosGenerales();
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
 
         Swal.fire({
@@ -214,7 +207,6 @@
             $input.addClass('is-invalid');
             $input.after(`<div class="invalid-feedback d-block">${traducirErrores(mensajes[0])}</div>`);
         });
-        irATabDatosGenerales();
     }
 
     function traducirErrores(mensaje) {
@@ -229,13 +221,14 @@
                 return 'El campo debe tener al menos 10 caracteres.';
             case 'validation.exists':
                 return 'El perfil de aprendizaje base no existe.';
+            default:
+                return mensaje;
         }
     }
 
     function guardar() {
         if (!$form[0].checkValidity()) {
             $form[0].reportValidity();
-            irATabDatosGenerales();
             return;
         }
 

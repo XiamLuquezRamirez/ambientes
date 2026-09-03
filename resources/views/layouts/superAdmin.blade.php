@@ -58,6 +58,7 @@
                 $perfilesAprendizaje = request()->routeIs(
                     'superadmin.perfil-aprendizaje*',
                     'superadmin.perfil-aprendizaje-personalizado*',
+                    'superadmin.parametros-perfil*',
                 );
                 $configuracion = false;
             @endphp
@@ -134,6 +135,13 @@
                                 <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i> Perfiles de
                                 Aprendizaje
                                 Personalizados Globales
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.parametros-perfil.index') }}"
+                                class="{{ request()->routeIs('superadmin.parametros-perfil*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-sliders" style="font-size:.8em"></i> Parámetros por defecto
                             </a>
                         </li>
                     </ul>

@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\GradoGrupoController;
 use App\Http\Controllers\Admin\GruposController;
 use App\Http\Controllers\Admin\MatriculaAdminController;
 use App\Http\Controllers\Admin\ModulosAdminController;
+use App\Http\Controllers\Admin\ParametrosPerfilAprendizajeController;
 use App\Http\Controllers\Admin\PerfilAprendizajeConfiguracionController;
 use App\Http\Controllers\Admin\PerfilAprendizajePersonalizadoConfiguracionController;
 use App\Http\Controllers\Admin\PiarController;
@@ -36,6 +37,7 @@ use App\Http\Controllers\Panel\EjesPanelController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\ExperienciasPanelController;
 use App\Http\Controllers\Panel\InclusionController;
+use App\Http\Controllers\Panel\ParametrosPerfilAprendizajePanelController;
 use App\Http\Controllers\Panel\PerfilAprendizajePanelController;
 use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
 use App\Http\Controllers\Panel\PlaneacionController;
@@ -50,6 +52,7 @@ use App\Http\Controllers\SuperAdmin\EjesSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ExperienciasSuperAdminController;
 use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ModulosSuperAdminController;
+use App\Http\Controllers\SuperAdmin\ParametrosPerfilAprendizajeSuperAdminController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajeInclusionController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
@@ -268,6 +271,17 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::get('configuracion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}/estudiantes', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'estudiantesAsociados'])->name('admin.configuracion.perfil-aprendizaje-personalizado.estudiantes');
     Route::post('configuracion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desasociar', [PerfilAprendizajePersonalizadoConfiguracionController::class, 'desasociarEstudiante'])->name('admin.configuracion.perfil-aprendizaje-personalizado.desasociar');
 
+    Route::get('configuracion/parametros-perfil', [ParametrosPerfilAprendizajeController::class, 'index'])->name('admin.configuracion.parametros-perfil.index');
+    Route::get('configuracion/parametros-perfil/catalogo', [ParametrosPerfilAprendizajeController::class, 'catalogo'])->name('admin.configuracion.parametros-perfil.catalogo');
+    Route::get('configuracion/parametros-perfil/perfiles-formales', [ParametrosPerfilAprendizajeController::class, 'perfilesFormales'])->name('admin.configuracion.parametros-perfil.perfiles-formales');
+    Route::get('configuracion/parametros-perfil/perfiles-personalizados', [ParametrosPerfilAprendizajeController::class, 'perfilesPersonalizados'])->name('admin.configuracion.parametros-perfil.perfiles-personalizados');
+    Route::get('configuracion/parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajeController::class, 'mostrarInclusion'])->name('admin.configuracion.parametros-perfil.inclusion.show');
+    Route::put('configuracion/parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajeController::class, 'guardarInclusion'])->name('admin.configuracion.parametros-perfil.inclusion.guardar');
+    Route::delete('configuracion/parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajeController::class, 'restablecerInclusion'])->name('admin.configuracion.parametros-perfil.inclusion.restablecer');
+    Route::get('configuracion/parametros-perfil/personalizado/{perfilAprendizajePersonalizado}', [ParametrosPerfilAprendizajeController::class, 'mostrarPersonalizado'])->name('admin.configuracion.parametros-perfil.personalizado.show');
+    Route::put('configuracion/parametros-perfil/personalizado/{perfilAprendizajePersonalizado}', [ParametrosPerfilAprendizajeController::class, 'guardarPersonalizado'])->name('admin.configuracion.parametros-perfil.personalizado.guardar');
+    Route::delete('configuracion/parametros-perfil/personalizado/{perfilAprendizajePersonalizado}', [ParametrosPerfilAprendizajeController::class, 'restablecerPersonalizado'])->name('admin.configuracion.parametros-perfil.personalizado.restablecer');
+
     // Usuario
     Route::get('perfil', [PerfilController::class, 'mostrar'])->name('admin.perfil');
     Route::get('perfil/accesos', [PerfilController::class, 'historialAccesos'])->name('admin.perfil.accesos');
@@ -366,6 +380,18 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('inclusion/perfil-aprendizaje-personalizado/opcion/{perfilAprendizajePersonalizado}/estudiantes', [PerfilAprendizajePersonalizadoPanelController::class, 'estudiantesAsociados'])->name('panel.inclusion.perfil-aprendizaje-personalizado.estudiantes');
     Route::post('inclusion/perfil-aprendizaje-personalizado/estudiantes/{estudiante}/asignar', [PerfilAprendizajePersonalizadoPanelController::class, 'asignarEstudiante'])->name('panel.inclusion.perfil-aprendizaje-personalizado.asignar-estudiante');
     Route::post('inclusion/perfil-aprendizaje-personalizado/asignaciones/{asignacion}/desactivar', [PerfilAprendizajePersonalizadoPanelController::class, 'desactivarEstudiante'])->name('panel.inclusion.perfil-aprendizaje-personalizado.desactivar-estudiante');
+
+    Route::get('inclusion/parametros-perfil', [ParametrosPerfilAprendizajePanelController::class, 'index'])->name('panel.inclusion.parametros-perfil.index');
+    Route::get('inclusion/parametros-perfil/catalogo', [ParametrosPerfilAprendizajePanelController::class, 'catalogo'])->name('panel.inclusion.parametros-perfil.catalogo');
+    Route::get('inclusion/parametros-perfil/perfiles-formales', [ParametrosPerfilAprendizajePanelController::class, 'perfilesFormales'])->name('panel.inclusion.parametros-perfil.perfiles-formales');
+    Route::get('inclusion/parametros-perfil/perfiles-personalizados', [ParametrosPerfilAprendizajePanelController::class, 'perfilesPersonalizados'])->name('panel.inclusion.parametros-perfil.perfiles-personalizados');
+    Route::get('inclusion/parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajePanelController::class, 'mostrarInclusion'])->name('panel.inclusion.parametros-perfil.inclusion.show');
+    Route::put('inclusion/parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajePanelController::class, 'guardarInclusion'])->name('panel.inclusion.parametros-perfil.inclusion.guardar');
+    Route::delete('inclusion/parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajePanelController::class, 'restablecerInclusion'])->name('panel.inclusion.parametros-perfil.inclusion.restablecer');
+    Route::get('inclusion/parametros-perfil/personalizado/{perfilAprendizajePersonalizado}', [ParametrosPerfilAprendizajePanelController::class, 'mostrarPersonalizado'])->name('panel.inclusion.parametros-perfil.personalizado.show');
+    Route::put('inclusion/parametros-perfil/personalizado/{perfilAprendizajePersonalizado}', [ParametrosPerfilAprendizajePanelController::class, 'guardarPersonalizado'])->name('panel.inclusion.parametros-perfil.personalizado.guardar');
+    Route::delete('inclusion/parametros-perfil/personalizado/{perfilAprendizajePersonalizado}', [ParametrosPerfilAprendizajePanelController::class, 'restablecerPersonalizado'])->name('panel.inclusion.parametros-perfil.personalizado.restablecer');
+
     Route::get('inclusion/{estudiante}', [InclusionController::class, 'verAjustes'])->name('panel.inclusion.ajustes');
     Route::post('inclusion/{estudiante}/ajustes', [InclusionController::class, 'actualizarAjustes'])->name('panel.inclusion.ajustes.update');
 
@@ -468,6 +494,17 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::patch('perfil-aprendizaje/{perfilAprendizajeInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'actualizarVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.actualizar');
     Route::get('perfil-aprendizaje/{perfilAprendizajeInclusion}/vista-info', [PerfilAprendizajeInclusionController::class, 'verVistaInfo'])->name('superadmin.perfil-aprendizaje.vista-info.ver');
     Route::delete('perfil-aprendizaje/{perfilAprendizajeInclusion}', [PerfilAprendizajeInclusionController::class, 'eliminar'])->name('superadmin.perfil-aprendizaje.eliminar');
+
+    Route::get('parametros-perfil', [ParametrosPerfilAprendizajeSuperAdminController::class, 'index'])->name('superadmin.parametros-perfil.index');
+    Route::get('parametros-perfil/catalogo', [ParametrosPerfilAprendizajeSuperAdminController::class, 'catalogo'])->name('superadmin.parametros-perfil.catalogo');
+    Route::get('parametros-perfil/perfiles-formales', [ParametrosPerfilAprendizajeSuperAdminController::class, 'perfilesFormales'])->name('superadmin.parametros-perfil.perfiles-formales');
+    Route::get('parametros-perfil/perfiles-personalizados', [ParametrosPerfilAprendizajeSuperAdminController::class, 'perfilesPersonalizados'])->name('superadmin.parametros-perfil.perfiles-personalizados');
+    Route::get('parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajeSuperAdminController::class, 'mostrarInclusion'])->name('superadmin.parametros-perfil.inclusion.show');
+    Route::put('parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajeSuperAdminController::class, 'guardarInclusion'])->name('superadmin.parametros-perfil.inclusion.guardar');
+    Route::delete('parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajeSuperAdminController::class, 'restablecerInclusion'])->name('superadmin.parametros-perfil.inclusion.restablecer');
+    Route::get('parametros-perfil/personalizado/{perfilAprendizajePersonalizado}', [ParametrosPerfilAprendizajeSuperAdminController::class, 'mostrarPersonalizado'])->name('superadmin.parametros-perfil.personalizado.show');
+    Route::put('parametros-perfil/personalizado/{perfilAprendizajePersonalizado}', [ParametrosPerfilAprendizajeSuperAdminController::class, 'guardarPersonalizado'])->name('superadmin.parametros-perfil.personalizado.guardar');
+    Route::delete('parametros-perfil/personalizado/{perfilAprendizajePersonalizado}', [ParametrosPerfilAprendizajeSuperAdminController::class, 'restablecerPersonalizado'])->name('superadmin.parametros-perfil.personalizado.restablecer');
 
     // Perfiles de Aprendizaje Personalizados
     Route::get('perfil-aprendizaje-personalizado', [PerfilAprendizajePersonalizadoController::class, 'index'])->name('superadmin.perfil-aprendizaje-personalizado.index');

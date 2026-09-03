@@ -13,19 +13,11 @@
         }
     });
 
-    function irATabDatosGenerales() {
-        const tab = document.querySelector('#tab-datos-generales');
-        if (tab) {
-            bootstrap.Tab.getOrCreateInstance(tab).show();
-        }
-    }
-
     window.abrirModalRegistrarPerfilAprendizaje = function() {
         modoEdicion = false;
         esSistemaActual = false;
         resetFormRegistrarPerfilAprendizaje();
         configurarModoCrear();
-        irATabDatosGenerales();
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
     };
 
@@ -33,7 +25,6 @@
         modoEdicion = true;
         resetFormRegistrarPerfilAprendizaje();
         configurarModoEditar();
-        irATabDatosGenerales();
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
 
         Swal.fire({
@@ -150,7 +141,6 @@
             );
         });
 
-        irATabDatosGenerales();
     }
 
     function traducirErrores(mensaje) {
@@ -169,7 +159,6 @@
     function guardarPerfilAprendizaje() {
         if (!$form[0].checkValidity()) {
             $form[0].reportValidity();
-            irATabDatosGenerales();
             return;
         }
 

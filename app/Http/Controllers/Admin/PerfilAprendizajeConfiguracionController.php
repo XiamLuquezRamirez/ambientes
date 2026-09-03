@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PerfilAprendizajeInclusion;
 use App\Models\PerfilAprendizajeOrden;
 use App\Models\Estudiante;
+use App\Services\ParametrosPerfilAprendizajeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -177,6 +178,8 @@ class PerfilAprendizajeConfiguracionController extends Controller
         }
 
         PerfilAprendizajeOrden::query()->insert($filas);
+
+        app(ParametrosPerfilAprendizajeService::class)->sembrarInstitucion($institucionId);
     }
 
     /**

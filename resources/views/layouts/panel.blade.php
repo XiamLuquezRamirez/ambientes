@@ -56,6 +56,7 @@
                     'panel.inclusion.perfil-aprendizaje',
                     'panel.inclusion.perfil-aprendizaje.estudiantes',
                     'panel.inclusion.perfil-aprendizaje-personalizado*',
+                    'panel.inclusion.parametros-perfil*',
                 );
             @endphp
             <li class="nav-item{{ $clsAmbiente }}">
@@ -145,6 +146,12 @@
                             <a href="{{ route('panel.inclusion.perfil-aprendizaje-personalizado') }}"
                                 class="{{ request()->routeIs('panel.inclusion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}">
                                 <i class="fa-solid fa-puzzle-piece"></i> Perfiles personalizados
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('panel.inclusion.parametros-perfil.index') }}"
+                                class="{{ request()->routeIs('panel.inclusion.parametros-perfil*') ? 'active nav-link' : 'nav-link' }}">
+                                <i class="fa-solid fa-sliders"></i> Parámetros de adaptación
                             </a>
                         </li>
                     </ul>

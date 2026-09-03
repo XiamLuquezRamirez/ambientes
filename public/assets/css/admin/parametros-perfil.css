@@ -1,0 +1,1081 @@
+/**
+ * Gestión de parámetros por condición — scoped bajo .pp-gestion
+ * (sin padding en body; compatible con layouts admin/panel/superAdmin)
+ */
+.pp-gestion {
+    --pp-s0: #F3F2EE;
+    --pp-s1: #F8F7F4;
+    --pp-s2: #FFFFFF;
+    --pp-tp: #111827;
+    --pp-ts: #6B7280;
+    --pp-tm: #9CA3AF;
+    --pp-ta: #0C447C;
+    --pp-tsu: #085041;
+    --pp-b: rgba(0, 0, 0, 0.1);
+    --pp-bs: rgba(0, 0, 0, 0.18);
+    --pp-ba: #BFDBFE;
+    --pp-bsu: #9FE1CB;
+    --pp-bga: #E6F1FB;
+    --pp-bgsu: #E1F5EE;
+    --pp-r: 8px;
+    --pp-accent: #0F6E56;
+    font-size: 13px;
+    color: var(--pp-tp);
+    line-height: 1.4;
+}
+
+.pp-gestion *,
+.pp-gestion *::before,
+.pp-gestion *::after {
+    box-sizing: border-box;
+}
+
+/* topbar (opcional) */
+.pp-gestion .pp-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.pp-gestion .pp-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: var(--pp-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-logo i {
+    font-size: 16px;
+    color: #fff;
+}
+
+.pp-gestion .pp-topbar-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--pp-tp);
+}
+
+.pp-gestion .pp-topbar-sub {
+    font-size: 11px;
+    color: var(--pp-ts);
+}
+
+/* nav tabs top */
+.pp-gestion .pp-top-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 0.5px solid var(--pp-b);
+    margin-bottom: 14px;
+}
+
+.pp-gestion .pp-top-tab {
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pp-ts);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+.pp-gestion .pp-top-tab.on {
+    color: var(--pp-tp);
+    border-bottom-color: var(--pp-tp);
+}
+
+.pp-gestion .pp-top-tab i {
+    font-size: 14px;
+}
+
+.pp-gestion .pp-view {
+    display: none;
+}
+
+.pp-gestion .pp-view.on {
+    display: block;
+}
+
+/* layout */
+.pp-gestion .pp-layout {
+    display: flex;
+    gap: 0;
+    border: 0.5px solid var(--pp-b);
+    border-radius: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: var(--pp-s2);
+    min-height: 620px;
+    min-width: 860px;
+}
+
+.pp-gestion .pp-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 320px;
+}
+
+.pp-gestion .pp-sidebar {
+    width: 210px;
+    flex-shrink: 0;
+    background: var(--pp-s1);
+    border-right: 0.5px solid var(--pp-b);
+    display: flex;
+    flex-direction: column;
+}
+
+.pp-gestion .pp-sb-hdr {
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--pp-b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.pp-gestion .pp-sb-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pp-tp);
+}
+
+.pp-gestion .pp-sb-btn {
+    padding: 3px 8px;
+    border-radius: var(--pp-r);
+    border: 0.5px solid var(--pp-b);
+    background: var(--pp-s2);
+    font-size: 11px;
+    color: var(--pp-ta);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pp-gestion .pp-sb-btn:hover {
+    background: var(--pp-bga);
+}
+
+.pp-gestion .pp-cond-list {
+    padding: 6px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    max-height: 520px;
+}
+
+.pp-gestion .pp-cond-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: var(--pp-r);
+    cursor: pointer;
+    transition: background 0.12s;
+    border: 0.5px solid transparent;
+}
+
+.pp-gestion .pp-cond-item:hover {
+    background: var(--pp-s2);
+}
+
+.pp-gestion .pp-cond-item.on {
+    background: var(--pp-s2);
+    border-color: var(--pp-b);
+}
+
+.pp-gestion .pp-cond-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-cond-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pp-tp);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pp-gestion .pp-cond-meta {
+    font-size: 10px;
+    color: var(--pp-tm);
+}
+
+.pp-gestion .pp-sep-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--pp-tm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px 10px 4px;
+}
+
+.pp-gestion .pp-badge-trans {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 20px;
+    background: #FAEEDA;
+    color: #633806;
+    border: 0.5px solid #FAC775;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* main */
+.pp-gestion .pp-main-hdr {
+    padding: 10px 14px;
+    border-bottom: 0.5px solid var(--pp-b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.pp-gestion .pp-main-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--pp-tp);
+}
+
+.pp-gestion .pp-main-sub {
+    font-size: 11px;
+    color: var(--pp-ts);
+    margin-top: 1px;
+}
+
+.pp-gestion .pp-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.pp-gestion .pp-cat-carousel-wrap {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    padding: 12px 14px 6px;
+    border-bottom: 0.5px solid var(--pp-b);
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-cat-nav {
+    width: 30px;
+    flex-shrink: 0;
+    border: 0.5px solid var(--pp-b);
+    border-radius: 8px;
+    background: var(--pp-s2);
+    color: var(--pp-ts);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.12s, opacity 0.12s;
+}
+
+.pp-gestion .pp-cat-nav:hover:not(:disabled) {
+    background: var(--pp-s0);
+    color: var(--pp-tp);
+}
+
+.pp-gestion .pp-cat-nav:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.pp-gestion .pp-cat-carousel-viewport {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.pp-gestion .pp-cat-carousel-track {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    width: 100%;
+}
+
+.pp-gestion .pp-cat-tile {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 8px 4px 10px;
+    border: 1.5px solid var(--pp-b);
+    border-radius: 10px;
+    background: var(--pp-s2);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    position: relative;
+}
+
+.pp-gestion .pp-cat-tile:hover {
+    border-color: var(--pp-bs);
+    background: var(--pp-s1);
+}
+
+.pp-gestion .pp-cat-tile.on {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: inset 0 -3px 0 #2563eb;
+}
+
+.pp-gestion .pp-cat-tile-more {
+    border-style: dashed;
+}
+
+.pp-gestion .pp-cat-tile-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--pp-s1);
+    color: var(--pp-ts);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-cat-tile-icon i {
+    font-size: 16px;
+}
+
+.pp-gestion .pp-cat-tile.on .pp-cat-tile-icon {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.pp-gestion .pp-cat-tile-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--pp-ts);
+    text-align: center;
+    line-height: 1.25;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.pp-gestion .pp-cat-tile.on .pp-cat-tile-label {
+    color: #1d4ed8;
+}
+
+.pp-gestion .pp-cat-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 0 14px 10px;
+    border-bottom: 0.5px solid var(--pp-b);
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-cat-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    border: none;
+    background: #d1d5db;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.pp-gestion .pp-cat-dot.on {
+    width: 18px;
+    border-radius: 4px;
+    background: #2563eb;
+}
+
+.pp-gestion .pp-cat-carousel-wrap.is-hidden,
+.pp-gestion .pp-cat-dots.is-hidden {
+    display: none !important;
+}
+
+.pp-gestion .pp-content-area {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.pp-gestion .pp-params-body {
+    padding: 12px 14px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.pp-gestion .pp-prev-panel {
+    width: 320px;
+    min-width: 320px;
+    flex-shrink: 0;
+    border-left: 0.5px solid var(--pp-b);
+    background: var(--pp-s1);
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    align-self: stretch;
+}
+
+.pp-gestion .pp-prev-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--pp-s2);
+    border: 0.5px solid var(--pp-b);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.pp-gestion .pp-prev-hdr {
+    padding: 10px 12px;
+    border-bottom: 0.5px solid var(--pp-b);
+    background: var(--pp-s1);
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-prev-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    min-height: 0;
+}
+
+.pp-gestion .pp-prev-scale {
+    transform: scale(1.35);
+    transform-origin: top center;
+    width: calc(100% / 1.35);
+    margin: 0 auto;
+}
+
+.pp-gestion .pp-prev-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--pp-tm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.pp-gestion .pp-prev-cat {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pp-tp);
+    margin-top: 2px;
+    min-height: 16px;
+}
+
+.pp-gestion .pp-prev-empty {
+    text-align: center;
+    padding: 32px 12px;
+    color: var(--pp-tm);
+}
+
+.pp-gestion .pp-prev-empty i {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.5;
+}
+
+.pp-gestion .pp-prev-empty p {
+    font-size: 11px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* param rows */
+.pp-gestion .pp-param-card {
+    background: var(--pp-s1);
+    border: 0.5px solid var(--pp-b);
+    border-radius: var(--pp-r);
+    overflow: hidden;
+}
+
+.pp-gestion .pp-param-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-bottom: 0.5px solid var(--pp-b);
+}
+
+.pp-gestion .pp-param-row:last-child {
+    border-bottom: none;
+}
+
+.pp-gestion .pp-param-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.pp-gestion .pp-param-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--pp-bgsu);
+    color: var(--pp-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 0.5px solid var(--pp-bsu);
+}
+
+.pp-gestion .pp-param-icon i {
+    font-size: 13px;
+}
+
+.pp-gestion .pp-param-copy {
+    flex: 1;
+    min-width: 0;
+}
+
+.pp-gestion .pp-param-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.pp-gestion .pp-param-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pp-tp);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.pp-gestion .pp-param-desc {
+    font-size: 11px;
+    color: var(--pp-ts);
+}
+
+.pp-gestion .pp-param-ctrl {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pp-gestion .pp-param-base {
+    font-size: 10px;
+    color: var(--pp-tm);
+    min-width: 46px;
+    text-align: right;
+}
+
+.pp-gestion .pp-toggle {
+    width: 34px;
+    height: 18px;
+    border-radius: 20px;
+    border: 1.5px solid var(--pp-b);
+    background: var(--pp-s0);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-toggle.on {
+    background: var(--pp-accent);
+    border-color: var(--pp-accent);
+}
+
+.pp-gestion .pp-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #fff;
+    transition: left 0.2s;
+    opacity: 0.7;
+}
+
+.pp-gestion .pp-toggle.on::after {
+    left: 20px;
+    opacity: 1;
+}
+
+.pp-gestion .pp-tlbl {
+    font-size: 11px;
+    color: var(--pp-ts);
+    min-width: 18px;
+}
+
+.pp-gestion .pp-num-wrap {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.pp-gestion .pp-nbtn {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    border: 0.5px solid var(--pp-b);
+    background: var(--pp-s2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--pp-tp);
+    user-select: none;
+    padding: 0;
+    line-height: 1;
+}
+
+.pp-gestion .pp-nbtn:hover {
+    background: var(--pp-s0);
+}
+
+.pp-gestion .pp-nval {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pp-tp);
+    min-width: 48px;
+    text-align: center;
+}
+
+.pp-gestion .pp-sel {
+    padding: 3px 7px;
+    border-radius: var(--pp-r);
+    border: 0.5px solid var(--pp-b);
+    background: var(--pp-s2);
+    font-size: 11px;
+    color: var(--pp-tp);
+    cursor: pointer;
+    max-width: 140px;
+}
+
+.pp-gestion .pp-changed-tag {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.pp-gestion .pp-inherited-tag {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 20px;
+    background: #F3F4F6;
+    color: #374151;
+}
+
+/* footer */
+.pp-gestion .pp-footer {
+    padding: 9px 14px;
+    border-top: 0.5px solid var(--pp-b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--pp-s1);
+    flex-shrink: 0;
+    gap: 8px;
+}
+
+.pp-gestion .pp-footer-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.pp-gestion .pp-toast {
+    background: var(--pp-bgsu);
+    border: 0.5px solid var(--pp-bsu);
+    color: var(--pp-tsu);
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: var(--pp-r);
+    display: none;
+    align-items: center;
+    gap: 5px;
+}
+
+.pp-gestion .pp-toast.show {
+    display: flex;
+}
+
+.pp-gestion .pp-btn {
+    padding: 5px 12px;
+    border-radius: var(--pp-r);
+    border: 0.5px solid var(--pp-bs);
+    background: var(--pp-s2);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pp-tp);
+    cursor: pointer;
+    transition: background 0.12s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pp-gestion .pp-btn:hover {
+    background: var(--pp-s0);
+}
+
+.pp-gestion .pp-btn-p {
+    background: var(--pp-bga);
+    color: var(--pp-ta);
+    border-color: var(--pp-ba);
+}
+
+.pp-gestion .pp-btn-p:hover {
+    opacity: 0.9;
+    background: var(--pp-bga);
+}
+
+.pp-gestion .pp-btn-warn {
+    background: #FAEEDA;
+    color: #633806;
+    border-color: #FAC775;
+}
+
+.pp-gestion .pp-btn-danger {
+    background: #FAECE7;
+    color: #712B13;
+    border-color: #FCA5A5;
+}
+
+.pp-gestion .pp-btn.is-hidden {
+    display: none !important;
+}
+
+/* preview device */
+.pp-gestion .pp-dev {
+    background: var(--pp-s2);
+    border: 1.5px solid var(--pp-b);
+    border-radius: 9px;
+    overflow: hidden;
+}
+
+.pp-gestion .pp-dev-bar {
+    background: var(--pp-accent);
+    padding: 6px 9px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pp-gestion .pp-dev-title {
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+    flex: 1;
+}
+
+.pp-gestion .pp-dev-av {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #E1F5EE;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 500;
+    color: #085041;
+}
+
+.pp-gestion .pp-dev-body {
+    padding: 9px;
+    background: var(--pp-s1);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pp-gestion .pp-dev-narr {
+    background: #E1F5EE;
+    border-left: 2px solid var(--pp-accent);
+    padding: 5px 7px;
+    border-radius: 0 5px 5px 0;
+    font-size: 9px;
+    color: #085041;
+    line-height: 1.4;
+}
+
+.pp-gestion .pp-dev-sec {
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--pp-ts);
+}
+
+.pp-gestion .pp-dev-opt {
+    background: var(--pp-s2);
+    border: 1.5px solid var(--pp-b);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.pp-gestion .pp-dev-opt:hover {
+    border-color: var(--pp-accent);
+}
+
+.pp-gestion .pp-dev-coop {
+    background: #E1F5EE;
+    border: 0.5px solid #9FE1CB;
+    border-radius: 5px;
+    padding: 4px 6px;
+    font-size: 9px;
+    color: #085041;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pp-gestion .pp-info-chip {
+    background: var(--pp-s2);
+    border: 0.5px solid var(--pp-b);
+    border-radius: 5px;
+    padding: 4px 8px;
+    font-size: 10px;
+    color: var(--pp-ts);
+}
+
+.pp-gestion .pp-empty {
+    text-align: center;
+    padding: 40px 16px;
+    color: var(--pp-tm);
+}
+
+.pp-gestion .pp-empty i {
+    font-size: 34px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* modal */
+.pp-gestion-modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1060;
+}
+
+.pp-gestion-modal-bg.open {
+    display: flex;
+}
+
+.pp-gestion-modal-bg .pp-modal {
+    background: var(--pp-s2, #fff);
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    width: 420px;
+    max-width: calc(100vw - 32px);
+    overflow: hidden;
+}
+
+.pp-gestion-modal-bg .pp-modal-hdr {
+    padding: 12px 16px;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pp-gestion-modal-bg .pp-modal-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+}
+
+.pp-gestion-modal-bg .pp-modal-close {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6B7280;
+    padding: 0;
+}
+
+.pp-gestion-modal-bg .pp-modal-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pp-gestion-modal-bg .pp-modal-footer {
+    padding: 10px 16px;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.pp-gestion-modal-bg .pp-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.pp-gestion-modal-bg .pp-field label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #6B7280;
+}
+
+.pp-gestion-modal-bg .pp-field input,
+.pp-gestion-modal-bg .pp-field select,
+.pp-gestion-modal-bg .pp-field textarea {
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    background: #F8F7F4;
+    font-size: 13px;
+    color: #111827;
+    width: 100%;
+}
+
+.pp-gestion-modal-bg .pp-field textarea {
+    resize: none;
+    height: 60px;
+}
+
+.pp-gestion-modal-bg .pp-base-opts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.pp-gestion-modal-bg .pp-base-opt {
+    border: 1.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.pp-gestion-modal-bg .pp-base-opt:hover {
+    border-color: rgba(0, 0, 0, 0.18);
+}
+
+.pp-gestion-modal-bg .pp-base-opt.sel {
+    border-color: #854F0B;
+    background: #FAEEDA;
+}
+
+.pp-gestion-modal-bg .pp-base-opt-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pp-gestion-modal-bg .pp-base-opt-desc {
+    font-size: 10px;
+    color: #6B7280;
+}
+
+.pp-gestion-modal-bg .pp-alert-info {
+    background: #E6F1FB;
+    border: 0.5px solid #BFDBFE;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #0C447C;
+    display: flex;
+    gap: 7px;
+    align-items: flex-start;
+    line-height: 1.5;
+}
+
+@keyframes pp-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.pp-gestion .pp-spin {
+    display: inline-block;
+    animation: pp-spin 2s linear infinite;
+}
+
+@media (max-width: 992px) {
+    .pp-gestion .pp-layout {
+        flex-direction: column;
+        min-height: auto;
+        min-width: 0;
+    }
+
+    .pp-gestion .pp-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 0.5px solid var(--pp-b);
+    }
+
+    .pp-gestion .pp-prev-panel {
+        width: 100%;
+        min-width: 0;
+        border-left: none;
+        border-top: 0.5px solid var(--pp-b);
+        order: 3;
+    }
+
+    .pp-gestion .pp-main {
+        order: 2;
+    }
+
+    .pp-gestion .pp-prev-scale {
+        transform: none;
+        width: 100%;
+    }
+}

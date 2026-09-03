@@ -160,6 +160,7 @@
                     'admin.configuracion.cargar-municipios',
                     'admin.configuracion.perfil-aprendizaje*',
                     'admin.configuracion.perfil-aprendizaje-personalizado*',
+                    'admin.configuracion.parametros-perfil*',
                 );
             @endphp
             <li class="nav-item">
@@ -192,6 +193,13 @@
                                 class="{{ request()->routeIs('admin.configuracion.perfil-aprendizaje-personalizado*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-puzzle-piece"></i> Perfiles de Aprendizaje Personalizados
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.configuracion.parametros-perfil.index') }}"
+                                class="{{ request()->routeIs('admin.configuracion.parametros-perfil*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-sliders"></i> Parámetros de adaptación
                             </a>
                         </li>
                     </ul>

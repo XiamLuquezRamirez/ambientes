@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\PerfilAprendizajeInclusion;
 use App\Models\PerfilAprendizajePersonalizado;
+use App\Services\ParametrosPerfilAprendizajeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -122,6 +123,19 @@ class PerfilAprendizajePersonalizadoController extends Controller
         $datos['usuario_crea'] = $usuario?->id;
 
         $perfilAprendizajePersonalizado = PerfilAprendizajePersonalizado::create($datos);
+
+        if ($datos['institucion_id'] === null) {
+            app(ParametrosPerfilAprendizajeService::class)->inicializarDefaultsPersonalizado(
+                (int) $perfilAprendizajePersonalizado->id,
+                (int) ($datos['perfil_aprendizaje_id'] ?? 0) ?: null
+            );
+        } else {
+            app(ParametrosPerfilAprendizajeService::class)->inicializarInstitucionPersonalizado(
+                (int) $datos['institucion_id'],
+                (int) $perfilAprendizajePersonalizado->id,
+                $perfilAprendizajePersonalizado
+            );
+        }
 
         return response()->json([
             'success' => true,

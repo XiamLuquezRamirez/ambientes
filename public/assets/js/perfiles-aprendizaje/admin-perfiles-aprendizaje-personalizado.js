@@ -19,10 +19,6 @@
         }
     });
 
-    function irATabDatosGenerales() {
-        const tab = document.querySelector('#tab-datos-generales-transitoria');
-        if (tab) bootstrap.Tab.getOrCreateInstance(tab).show();
-    }
 
     function abrirCb() {
         $cb.addClass('open');
@@ -103,7 +99,6 @@
         modoEdicion = false;
         resetFormTransitoria();
         configurarModoCrear();
-        irATabDatosGenerales();
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
     };
 
@@ -111,7 +106,6 @@
         modoEdicion = true;
         resetFormTransitoria();
         configurarModoEditar();
-        irATabDatosGenerales();
         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
 
         Swal.fire({
@@ -207,7 +201,6 @@
             $input.addClass('is-invalid');
             $input.after(`<div class="invalid-feedback d-block">${traducirErrores(mensajes[0])}</div>`);
         });
-        irATabDatosGenerales();
     }
 
     function traducirErrores(mensaje) {
@@ -230,7 +223,6 @@
     function guardar() {
         if (!$form[0].checkValidity()) {
             $form[0].reportValidity();
-            irATabDatosGenerales();
             return;
         }
 
