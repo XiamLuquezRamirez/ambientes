@@ -3175,13 +3175,17 @@
             return navigator.mediaDevices.getUserMedia({ audio: true });
         }
         const cam = evidenciaCamara; // 'environment' (trasera) o 'user' (frontal)
+        // `exact` fuerza la cámara pedida (para que el botón de voltear cambie de
+        // verdad); si no existe esa cámara, cae a `ideal` y luego a cualquiera.
         const intentosVideo = tipo === 'foto'
             ? [
+                { video: { facingMode: { exact: cam } } },
                 { video: { facingMode: { ideal: cam } } },
                 { video: { facingMode: cam } },
                 { video: true },
             ]
             : [
+                { video: { facingMode: { exact: cam } }, audio: true },
                 { video: { facingMode: { ideal: cam } }, audio: true },
                 { video: { facingMode: cam }, audio: true },
                 { video: true, audio: true },
@@ -3814,8 +3818,17 @@
         detenerEvidenciaStream();
         if (refs.$flip) refs.$flip.prop('hidden', true);
         // Redispara el botón principal de este tipo → reabre con la nueva cámara.
+        // Hay que REHABILITARLO: al abrir la cámara quedó disabled y el guard
+        // `if ($btn.prop('disabled')) return;` bloquearía el redisparo. Se espera
+        // un instante para que el dispositivo libere la cámara anterior (evita el
+        // "negro" y que getUserMedia caiga al fallback de cualquier cámara).
         const $btnTipo = refs.$btn.filter('[data-vn-evidencia-tipo="' + estado.tipo + '"]').first();
-        if ($btnTipo.length) $btnTipo.trigger('click');
+        if ($btnTipo.length) {
+            setTimeout(function () {
+                $btnTipo.prop('disabled', false);
+                $btnTipo.trigger('click');
+            }, 250);
+        }
     });
 
     onBody('click', '[data-vn-evidencia]', function () {
