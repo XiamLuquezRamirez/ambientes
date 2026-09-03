@@ -3183,12 +3183,24 @@
             if (camaras.length > 1) {
                 const idx = ((evidenciaCamIndice % camaras.length) + camaras.length) % camaras.length;
                 const dev = camaras[idx];
-                const base = { video: { deviceId: { exact: dev.deviceId } } };
-                if (quiereAudio) base.audio = true;
-                return navigator.mediaDevices.getUserMedia(base).catch(function () {
-                    // Si el audio bloquea, reintenta ese mismo deviceId sin audio.
-                    return navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: dev.deviceId } } });
+                // Para video el audio es OBLIGATORIO (si no, se graba mudo). Se
+                // intenta la cámara exacta con audio; si falla, se reintenta con
+                // deviceId ideal + audio (menos estricto) MANTENIENDO el audio;
+                // solo como último recurso (foto no lo llega a usar) se va sin audio.
+                const intentos = quiereAudio
+                    ? [
+                        { video: { deviceId: { exact: dev.deviceId } }, audio: true },
+                        { video: { deviceId: { ideal: dev.deviceId } }, audio: true },
+                        { video: { deviceId: { exact: dev.deviceId } } },
+                    ]
+                    : [
+                        { video: { deviceId: { exact: dev.deviceId } } },
+                    ];
+                let cad = Promise.reject(new Error('sin intentos'));
+                intentos.forEach(function (c) {
+                    cad = cad.catch(function () { return navigator.mediaDevices.getUserMedia(c); });
                 });
+                return cad;
             }
             // Una sola cámara (o no enumerables): usa facingMode como antes.
             const cam = (evidenciaCamIndice % 2 === 0) ? 'environment' : 'user';
@@ -3848,7 +3860,7 @@
             setTimeout(function () {
                 $btnTipo.prop('disabled', false);
                 $btnTipo.trigger('click');
-            }, 250);
+            }, 400); // margen para que el micro/cámara anterior se liberen
         }
     });
 
