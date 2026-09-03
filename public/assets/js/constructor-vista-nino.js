@@ -146,7 +146,7 @@
     let experienciaIdActiva = null;
     let urlExperienciaTpl = '';
     let evidenciaSesion = 0;
-    let evidenciaCamara = 'environment'; // cámara activa: 'environment' (trasera) | 'user' (frontal)
+    let evidenciaCamIndice = 0; // índice de cámara activa (se alterna al voltear)
 
     const PAINT_SIZE_MAP = { s: 6, m: 12, l: 22 };
     const PAINT_DEFAULT_COLORS = [
@@ -3125,7 +3125,7 @@
 
     function limpiarEvidenciaRecursos() {
         evidenciaSesion += 1;
-        evidenciaCamara = 'environment'; // volver a la trasera por defecto
+        evidenciaCamIndice = 0; // volver a la cámara por defecto
         $body.removeData('vn-evidencia-estado');
         const objectUrl = $body && $body.data('vn-evidencia-object-url');
         if (objectUrl) {
@@ -3174,30 +3174,51 @@
         if (tipo === 'audio') {
             return navigator.mediaDevices.getUserMedia({ audio: true });
         }
-        const cam = evidenciaCamara; // 'environment' (trasera) o 'user' (frontal)
-        // `exact` fuerza la cámara pedida (para que el botón de voltear cambie de
-        // verdad); si no existe esa cámara, cae a `ideal` y luego a cualquiera.
-        const intentosVideo = tipo === 'foto'
-            ? [
-                { video: { facingMode: { exact: cam } } },
-                { video: { facingMode: { ideal: cam } } },
-                { video: { facingMode: cam } },
-                { video: true },
-            ]
-            : [
-                { video: { facingMode: { exact: cam } }, audio: true },
-                { video: { facingMode: { ideal: cam } }, audio: true },
-                { video: { facingMode: cam }, audio: true },
-                { video: true, audio: true },
-                { video: true, audio: false },
-            ];
-        let cadena = Promise.reject(new Error('sin intentos'));
-        intentosVideo.forEach(function (constraints) {
-            cadena = cadena.catch(function () {
-                return navigator.mediaDevices.getUserMedia(constraints);
+        const quiereAudio = (tipo === 'video');
+        // Estrategia por deviceId: enumeramos las cámaras físicas y alternamos por
+        // índice al voltear. Es lo más fiable (facingMode { exact } falla en
+        // muchos MediaTek, sobre todo con audio). Fallback a facingMode si no se
+        // pueden enumerar (algunos navegadores esconden los ids sin permiso).
+        return listarCamaras().then(function (camaras) {
+            if (camaras.length > 1) {
+                const idx = ((evidenciaCamIndice % camaras.length) + camaras.length) % camaras.length;
+                const dev = camaras[idx];
+                const base = { video: { deviceId: { exact: dev.deviceId } } };
+                if (quiereAudio) base.audio = true;
+                return navigator.mediaDevices.getUserMedia(base).catch(function () {
+                    // Si el audio bloquea, reintenta ese mismo deviceId sin audio.
+                    return navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: dev.deviceId } } });
+                });
+            }
+            // Una sola cámara (o no enumerables): usa facingMode como antes.
+            const cam = (evidenciaCamIndice % 2 === 0) ? 'environment' : 'user';
+            const intentos = quiereAudio
+                ? [
+                    { video: { facingMode: { ideal: cam } }, audio: true },
+                    { video: true, audio: true },
+                    { video: true, audio: false },
+                ]
+                : [
+                    { video: { facingMode: { ideal: cam } } },
+                    { video: true },
+                ];
+            let cadena = Promise.reject(new Error('sin intentos'));
+            intentos.forEach(function (c) {
+                cadena = cadena.catch(function () { return navigator.mediaDevices.getUserMedia(c); });
             });
+            return cadena;
         });
-        return cadena;
+    }
+
+    // Lista las cámaras de video disponibles (requiere haber concedido permiso
+    // una vez para ver los labels/ids). Devuelve [] si no se pueden enumerar.
+    function listarCamaras() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+            return Promise.resolve([]);
+        }
+        return navigator.mediaDevices.enumerateDevices().then(function (devs) {
+            return devs.filter(function (d) { return d.kind === 'videoinput' && d.deviceId; });
+        }).catch(function () { return []; });
     }
 
     function mensajeErrorEvidencia(err) {
@@ -3814,7 +3835,7 @@
         const rec = $body.data('vn-evidencia-recorder');
         if (rec && rec.state === 'recording') return;
 
-        evidenciaCamara = (evidenciaCamara === 'environment') ? 'user' : 'environment';
+        evidenciaCamIndice += 1; // pasar a la siguiente cámara física
         detenerEvidenciaStream();
         if (refs.$flip) refs.$flip.prop('hidden', true);
         // Redispara el botón principal de este tipo → reabre con la nueva cámara.
