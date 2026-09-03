@@ -60,7 +60,7 @@ class AccesoAmbienteService
     {
         return $this->queryEstudiantesKiosco($ambiente)
             ->where('estudiantes.id', $estudianteId)
-            ->with('configuracionPin')
+            ->with(['configuracionPin', 'grado'])
             ->first();
     }
 

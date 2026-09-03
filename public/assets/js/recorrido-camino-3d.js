@@ -2531,12 +2531,15 @@ import * as THREE from 'three';
         }
     }
 
-    function opcionesVistaNino(bloques, mediaBase, nombre) {
+    function opcionesVistaNino(bloques, mediaBase, nombre, expId) {
         return {
             bloques,
             mediaBase: mediaBase || '',
             experienciaNombre: nombre || 'Experiencia',
+            experienciaId: expId || null,
             estudianteSexo: String($('#rnApp').data('estudiante-sexo') || ''),
+            estudianteNombre: String($('#rnApp').data('estudiante-nombre') || ''),
+            nivelEtario: String($('#rnApp').data('nivel-etario') || 'jardin'),
             alTerminarExperiencia: volverAlMapaDesdeExperiencia,
         };
     }
@@ -2594,7 +2597,8 @@ import * as THREE from 'three';
                 window.VistaNino.iniciar(opcionesVistaNino(
                     experienciaCargada.bloques,
                     experienciaCargada.mediaBase,
-                    experienciaCargada.nombre
+                    experienciaCargada.nombre,
+                    experienciaCargada.id
                 ));
             }
             return;
@@ -2630,7 +2634,8 @@ import * as THREE from 'three';
                 window.VistaNino.iniciar(opcionesVistaNino(
                     experienciaCargada.bloques,
                     experienciaCargada.mediaBase,
-                    experienciaCargada.nombre
+                    experienciaCargada.nombre,
+                    experienciaCargada.id
                 ));
                 return;
             }
@@ -3068,4 +3073,16 @@ import * as THREE from 'three';
     }
 
     window.KioscoCamino = { boot: boot, destroy: destroy, irAFinRecorrido: irAFinRecorrido };
+
+    if (window.jQuery) {
+        window.jQuery(document).on('vn:experiencia-recargada.rn3d', function (_e, payload) {
+            if (!payload || !payload.id) return;
+            experienciaCargada = {
+                id: payload.id,
+                bloques: payload.bloques,
+                mediaBase: payload.mediaBase,
+                nombre: payload.nombre,
+            };
+        });
+    }
 })();

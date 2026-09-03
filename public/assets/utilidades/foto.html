@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Fotografía</title>
+  <base href="/proyecto/">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="captura.css">
+  <link rel="stylesheet" href="foto.css">
+</head>
+<body>
+<div class="contenedor">
+  <nav class="nav">
+    <a href="index.html">Inicio</a>
+    <a class="activo" href="foto.html">Foto</a>
+    <a href="video.html">Video</a>
+    <a href="audio.html">Audio</a>
+  </nav>
+  <div class="card">
+    <div class="titulo">📷 Tomar fotografía</div>
+    <div class="subtitulo" id="subtituloFoto">Utilice la cámara para tomar una fotografía.</div>
+    <button id="btnAbrirCamara" class="btn-camara">📷 Abrir cámara</button>
+    <video id="video" autoplay muted playsinline webkit-playsinline></video>
+    <button id="btnTomarFoto" class="btn-foto" disabled>📸 Tomar foto</button>
+    <canvas id="canvas"></canvas>
+  </div>
+</div>
+<div id="modalPreview" class="modal">
+  <div class="modal-contenido">
+    <div class="modal-titulo">📷 Vista previa</div>
+    <img id="fotoPreview" class="modal-media" alt="Vista previa de fotografía">
+    <div id="infoFoto" class="info"></div>
+    <button id="btnGuardar" class="btn-guardar">💾 Guardar fotografía</button>
+    <button id="btnCerrarPreview" class="btn-cancelar">🔄 Tomar otra foto</button>
+  </div>
+</div>
+<script src="foto.js"></script>
+</body>
+</html>

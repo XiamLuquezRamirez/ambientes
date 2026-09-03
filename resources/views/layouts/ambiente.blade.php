@@ -89,7 +89,8 @@
     @stack('scripts')
     <script src="{{ asset('assets/js/kiosco-fs-core.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
-    <script src="{{ asset('assets/js/constructor-vista-nino.js') }}"></script>
+    @include('partials._captura-multimedia')
+    <script src="{{ asset('assets/js/constructor-vista-nino.js') }}?v={{ @filemtime(public_path('assets/js/constructor-vista-nino.js')) ?: time() }}"></script>
     {{-- Camino 3D (Three.js). Expone window.KioscoCamino.boot(). --}}
     <script type="importmap">
     { "imports": {

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Ambientes;
 
 use App\Http\Controllers\Controller;
+use App\Models\BloqueExperiencia;
 use App\Models\Experiencia;
 use App\Services\ClaseKioscoService;
 use App\Services\RecorridoNinoService;
+use App\Services\ResultadoNinoService;
 use App\Services\SesionNinoService;
 use App\Services\TextoAVozService;
 use Illuminate\Http\Request;
@@ -18,6 +20,7 @@ class AmbienteNinoController extends Controller
         private SesionNinoService $sesionNino,
         private RecorridoNinoService $recorrido,
         private ClaseKioscoService $claseKiosco,
+        private ResultadoNinoService $resultadoNino,
     ) {}
 
     /**
@@ -38,6 +41,9 @@ class AmbienteNinoController extends Controller
             ->get();
 
         return response()->json([
+            'host_solicitud' => $request->getHost(),
+            'nodo_ip_simulada' => $this->sesionNino->ipSimuladaLocal($request),
+            'ips_resolucion' => $this->sesionNino->ipsParaResolucionAmbiente($request),
             'ips_candidatas_nodo' => $this->sesionNino->ipsCandidatasNodo($request),
             'server_addr' => $request->server('SERVER_ADDR'),
             'ambiente_resuelto' => $ambiente ? [
@@ -81,6 +87,7 @@ class AmbienteNinoController extends Controller
             'urlSalir' => '',
             'urlContinuar' => '/alumnos',
             'portadaImg' => $this->urlPortada($ambiente->slug),
+            'fondoImg' => $this->urlFondo($ambiente->slug),
             'pasoInicial' => 'portada',
         ]);
     }
@@ -135,6 +142,7 @@ class AmbienteNinoController extends Controller
             'urlSalir' => '/salir',
             'urlContinuar' => '',
             'portadaImg' => $this->urlPortada($ambiente->slug),
+            'fondoImg' => $this->urlFondo($ambiente->slug),
             'pasoInicial' => 'camino',
         ]);
     }
@@ -175,6 +183,50 @@ class AmbienteNinoController extends Controller
         ]);
     }
 
+    public function guardarResultadoBloque(Request $request, Experiencia $experiencia, BloqueExperiencia $bloque)
+    {
+        $datos = $request->validate([
+            'correcto' => ['nullable', 'boolean'],
+            'payload' => ['required'],
+            'archivo' => ['nullable', 'file', 'max:51200'],
+        ]);
+
+        $payload = $datos['payload'];
+        if (is_string($payload)) {
+            $payload = json_decode($payload, true);
+        }
+
+        if (! is_array($payload)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El payload del resultado es inválido.',
+            ], 422);
+        }
+
+        $resultado = $this->resultadoNino->registrar(
+            $request,
+            $experiencia,
+            $bloque,
+            [
+                'correcto' => $datos['correcto'] ?? null,
+                'payload' => $payload,
+            ],
+            $request->file('archivo'),
+        );
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $resultado->id,
+                'correcto' => $resultado->correcto,
+                'tipo_registro' => $resultado->tipo_registro,
+                'archivo_url' => $resultado->archivo_path
+                    ? asset('storage/'.$resultado->archivo_path)
+                    : null,
+            ],
+        ]);
+    }
+
     public function tts(Request $request)
     {
         $datos = $request->validate([
@@ -199,6 +251,18 @@ class AmbienteNinoController extends Controller
     private function urlPortada(string $slug): string
     {
         $relativo = 'assets/images/ambientes/'.$slug.'-portada.png';
+        $absoluto = public_path($relativo);
+
+        if (File::exists($absoluto)) {
+            return '/'.$relativo;
+        }
+
+        return '';
+    }
+
+    private function urlFondo(string $slug): string
+    {
+        $relativo = 'assets/images/ambientes/'.$slug.'-fondo.png';
         $absoluto = public_path($relativo);
 
         if (File::exists($absoluto)) {

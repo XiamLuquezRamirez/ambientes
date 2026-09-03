@@ -1,0 +1,4 @@
+.btn-camara{background:#2563eb;color:#fff}
+.btn-foto{background:#16a34a;color:#fff}
+#video{display:block;width:100%;height:auto;min-height:180px;max-height:450px;margin-top:15px;background:#000;border-radius:10px;object-fit:cover}
+#canvas{display:none}

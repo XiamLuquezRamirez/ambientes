@@ -47,14 +47,15 @@
                 </a>
             </li>
             @php
-                $catalogo = request()->routeIs(
-                    'superadmin.catalogo',
-                    'superadmin.catalogo.*',
-                    'superadmin.modulos.*',
-                    'superadmin.ejes.*',
-                    'superadmin.catalogo.tematicas.*',
-                    'superadmin.ejes.tematicas',
-                );
+                $catalogo =
+                    request()->routeIs(
+                        'superadmin.catalogo',
+                        'superadmin.catalogo.*',
+                        'superadmin.modulos.*',
+                        'superadmin.ejes.*',
+                        'superadmin.catalogo.tematicas.*',
+                        'superadmin.ejes.tematicas',
+                    ) && !request()->routeIs('superadmin.catalogo.juegos', 'superadmin.juegos.*');
                 $perfilesAprendizaje = request()->routeIs(
                     'superadmin.perfil-aprendizaje*',
                     'superadmin.perfil-aprendizaje-personalizado*',
@@ -162,7 +163,12 @@
                 </div>
             </li>
             @include('partials.nav-link-condiciones')
-
+            <li class="nav-item">
+                <a href="{{ route('superadmin.catalogo.juegos') }}"
+                    class="{{ request()->routeIs('superadmin.catalogo.juegos', 'superadmin.juegos.*') ? 'active nav-link' : 'nav-link' }}">
+                    <i class="fa-solid fa-gamepad"></i> Juegos
+                </a>
+            </li>
         </ul>
     </aside>
     @include('partials.sidebar-toggle', ['only' => 'backdrop'])

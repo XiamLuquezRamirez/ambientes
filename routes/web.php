@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\EstudianteAdminController;
 use App\Http\Controllers\Admin\ExperienciasAdminController;
 use App\Http\Controllers\Admin\GradoGrupoController;
 use App\Http\Controllers\Admin\GruposController;
+use App\Http\Controllers\Admin\JuegosAdminController;
 use App\Http\Controllers\Admin\MatriculaAdminController;
 use App\Http\Controllers\Admin\ModulosAdminController;
 use App\Http\Controllers\Admin\ParametrosPerfilAprendizajeController;
@@ -33,11 +34,13 @@ use App\Http\Controllers\Panel\AsistenciaController;
 use App\Http\Controllers\Panel\BloquesExperienciaPanelController;
 use App\Http\Controllers\Panel\CatalogoPanelController;
 use App\Http\Controllers\Panel\ClasesPanelController;
+use App\Http\Controllers\Panel\ResultadosNinoPanelController;
 use App\Http\Controllers\Panel\EjesPanelController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\ExperienciasPanelController;
 use App\Http\Controllers\Panel\InclusionController;
 use App\Http\Controllers\Panel\ParametrosPerfilAprendizajePanelController;
+use App\Http\Controllers\Panel\JuegosPanelController;
 use App\Http\Controllers\Panel\PerfilAprendizajePanelController;
 use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
 use App\Http\Controllers\Panel\PlaneacionController;
@@ -51,6 +54,7 @@ use App\Http\Controllers\SuperAdmin\CatalogoDBASuperAdminController;
 use App\Http\Controllers\SuperAdmin\EjesSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ExperienciasSuperAdminController;
 use App\Http\Controllers\SuperAdmin\InstitucionSuperAdminController;
+use App\Http\Controllers\SuperAdmin\JuegosSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ModulosSuperAdminController;
 use App\Http\Controllers\SuperAdmin\ParametrosPerfilAprendizajeSuperAdminController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajeInclusionController;
@@ -58,9 +62,12 @@ use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\TematicasSuperAdminController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Raíz → portada del ambiente (kiosco). Docente: /login
-Route::get('/', fn () => redirect()->route('ambiente.inicio'));
+Route::get('/', function (Request $request) {
+    return redirect()->route('ambiente.inicio', $request->query());
+});
 
 // ── Autenticacion del nino (público) ───────────────────────────────────────
 Route::get('/bienvenida', [SesionNinoController::class, 'mostrarBienvenida'])->name('auth.bienvenida');
@@ -69,6 +76,11 @@ Route::get('/kiosco/diagnostico-ip', [AmbienteNinoController::class, 'diagnostic
 Route::get('/alumnos', [SesionNinoController::class, 'mostrarSeleccionAlumno'])->name('auth.alumnos');
 Route::get('/alumnos/{estudianteId}/pin', [SesionNinoController::class, 'mostrarPin'])->name('auth.pin');
 Route::post('/alumnos/{estudianteId}/verificar', [SesionNinoController::class, 'verificarPin'])->name('auth.verificar-pin');
+
+// Captura multimedia (cámara / micrófono / video) — iframes para public/assets/utilidades/
+Route::view('/captura/foto', 'captura.foto')->name('captura.foto');
+Route::view('/captura/audio', 'captura.audio')->name('captura.audio');
+Route::view('/captura/video', 'captura.video')->name('captura.video');
 
 // ── Auth Docente ──────────────────────────────────────────────────────────
 Route::get('/login', [AuthDocenteController::class, 'mostrarLogin'])->name('docente.login');
@@ -211,6 +223,8 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
     Route::patch('catalogo/ejes/{eje}/estado', [EjesAdminController::class, 'actualizarEstado'])->name('admin.ejes.estado');
     Route::patch('catalogo/ejes/{eje}/mover', [EjesAdminController::class, 'mover'])->name('admin.ejes.mover');
     Route::delete('catalogo/ejes/{eje}', [EjesAdminController::class, 'eliminar'])->name('admin.ejes.eliminar');
+
+    Route::get('catalogo/juegos', [JuegosAdminController::class, 'listar'])->name('admin.catalogo.juegos');
 
     // Catálogo · temas (dominio legacy, pendiente)
     Route::post('catalogo/temas', [CatalogoAdminController::class, 'guardarTema'])->name('admin.catalogo.tema.store');
@@ -426,6 +440,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::patch('catalogo/ejes/{eje}/mover', [EjesPanelController::class, 'mover'])->name('panel.ejes.mover');
     Route::delete('catalogo/ejes/{eje}', [EjesPanelController::class, 'eliminar'])->name('panel.ejes.eliminar');
 
+    Route::get('catalogo/juegos', [JuegosPanelController::class, 'listar'])->name('panel.catalogo.juegos');
+
     Route::get('catalogo/tematicas/dbas', [TematicasPanelController::class, 'buscarDbas'])->name('panel.tematicas.dbas');
     Route::get('catalogo/tematicas/listar', [TematicasPanelController::class, 'listar'])->name('panel.tematicas.listar');
     Route::get('catalogo/ejes/{eje}/tematicas', [TematicasPanelController::class, 'listarPorEje'])->name('panel.ejes.tematicas');
@@ -458,6 +474,9 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('clases', [ClasesPanelController::class, 'listar'])->name('panel.clases');
     Route::post('clases', [ClasesPanelController::class, 'guardar'])->name('panel.clases.guardar');
     Route::patch('clases/{clase}/estado', [ClasesPanelController::class, 'actualizarEstado'])->name('panel.clases.estado');
+    Route::get('clases/{clase}/resultados', [ResultadosNinoPanelController::class, 'verClase'])->name('panel.clases.resultados');
+    Route::get('clases/{clase}/resultados/pdf', [ResultadosNinoPanelController::class, 'exportarPdf'])->name('panel.clases.resultados.pdf');
+    Route::get('clases/{clase}/resultados/estudiantes/{estudiante}', [ResultadosNinoPanelController::class, 'verEstudiante'])->name('panel.clases.resultados.estudiante');
 });
 
 // ── Super Admin ─────────────────────────────────────────────────────────
@@ -535,6 +554,8 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::put('catalogo/ejes/{eje}', [EjesSuperAdminController::class, 'actualizar'])->name('superadmin.ejes.actualizar');
     Route::patch('catalogo/ejes/{eje}/estado', [EjesSuperAdminController::class, 'actualizarEstado'])->name('superadmin.ejes.estado');
     Route::patch('catalogo/ejes/{eje}/mover', [EjesSuperAdminController::class, 'mover'])->name('superadmin.ejes.mover');
+
+    Route::get('catalogo/juegos', [JuegosSuperAdminController::class, 'listar'])->name('superadmin.catalogo.juegos');
 
     // Temáticas / experiencias oficiales
     Route::get('catalogo/tematicas', [TematicasSuperAdminController::class, 'index'])->name('superadmin.catalogo.tematicas.index');

@@ -119,6 +119,7 @@ class BloqueDatosRegistry
             BloqueExperiencia::TIPO_JUEGO => [
                 'instruccion' => '',
                 'juego_id' => null,
+                'juego_catalogo_id' => null,
                 'juego_nombre' => '',
                 'juego_imagen' => '',
                 'juego_piezas' => '',
@@ -167,10 +168,10 @@ class BloqueDatosRegistry
             ],
             BloqueExperiencia::TIPO_CLASIFICACION => [
                 'instruccion' => '',
-                'categorias' => ['Cat 1', 'Cat 2'],
+                'categorias' => [],
                 'items' => [
-                    ['texto' => '', 'imagen' => '', 'categoria' => 'Cat 1'],
-                    ['texto' => '', 'imagen' => '', 'categoria' => 'Cat 2'],
+                    ['texto' => '', 'imagen' => '', 'categoria' => ''],
+                    ['texto' => '', 'imagen' => '', 'categoria' => ''],
                 ],
             ],
             BloqueExperiencia::TIPO_ARRASTRAR => [
@@ -194,6 +195,7 @@ class BloqueDatosRegistry
                 'fb_ok' => '¡Correcto! 🎉',
                 'fb_err' => 'Casi...',
                 'intentos' => '2',
+                'al_agotar' => 'Mostrar respuesta correcta',
             ],
             BloqueExperiencia::TIPO_EMOCION => [
                 'instruccion' => '',
@@ -227,8 +229,13 @@ class BloqueDatosRegistry
             $merged['paginas_data'] = array_slice($paginas, 0, $n);
         }
 
-        if ($tipo === BloqueExperiencia::TIPO_JUEGO && ($merged['juego_id'] === '' || $merged['juego_id'] === false)) {
-            $merged['juego_id'] = null;
+        if ($tipo === BloqueExperiencia::TIPO_JUEGO) {
+            if ($merged['juego_id'] === '' || $merged['juego_id'] === false) {
+                $merged['juego_id'] = null;
+            }
+            if ($merged['juego_catalogo_id'] === '' || $merged['juego_catalogo_id'] === false) {
+                $merged['juego_catalogo_id'] = null;
+            }
         }
 
         if ($tipo === BloqueExperiencia::TIPO_BIENVENIDA) {
@@ -245,7 +252,50 @@ class BloqueDatosRegistry
             }
         }
 
+        if ($tipo === BloqueExperiencia::TIPO_CLASIFICACION) {
+            $merged = $this->normalizarClasificacion($merged);
+        }
+
         return $merged;
+    }
+
+    /**
+     * @param  array<string, mixed>  $datos
+     * @return array<string, mixed>
+     */
+    private function normalizarClasificacion(array $datos): array
+    {
+        $cats = is_array($datos['categorias'] ?? null) ? $datos['categorias'] : [];
+        $cats = array_values(array_filter(array_map(
+            fn ($c) => trim((string) $c),
+            $cats
+        ), fn ($c) => $c !== '' && ! $this->esCategoriaPlaceholderClasificacion($c)));
+
+        $datos['categorias'] = $cats;
+
+        if (! is_array($datos['items'] ?? null)) {
+            return $datos;
+        }
+
+        $datos['items'] = array_map(function ($item) use ($cats) {
+            if (! is_array($item)) {
+                return $item;
+            }
+
+            $cat = trim((string) ($item['categoria'] ?? ''));
+            if ($this->esCategoriaPlaceholderClasificacion($cat) || ($cat !== '' && ! in_array($cat, $cats, true))) {
+                $item['categoria'] = '';
+            }
+
+            return $item;
+        }, $datos['items']);
+
+        return $datos;
+    }
+
+    private function esCategoriaPlaceholderClasificacion(string $nombre): bool
+    {
+        return preg_match('/^Cat\s*\d+$/i', trim($nombre)) === 1;
     }
 
     /**

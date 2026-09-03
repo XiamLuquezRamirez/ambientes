@@ -6,7 +6,8 @@
 
     const $overlay = $('#vnOverlay');
     const enKiosco = $('#kioscoPane').length > 0;
-    if (!$overlay.length && !enKiosco) return;
+    const enPlayer = $('#vnDispositivo').length > 0;
+    if (!$overlay.length && !enKiosco && !enPlayer) return;
 
     let $root;
     let $body;
@@ -24,22 +25,102 @@
         return $('#vnDispositivo').length > 0;
     }
 
+    function playerEstaActivo() {
+        const $player = $('#vnDispositivo');
+        if (!$player.length) return false;
+        return !$player.prop('hidden') && String($player.attr('aria-hidden')) !== 'true';
+    }
+
+    function overlayEstaAbierto() {
+        return $overlay.length > 0 && !$overlay.prop('hidden');
+    }
+
+    function resolverUrlExperienciaTpl() {
+        if (urlExperienciaTpl) return urlExperienciaTpl;
+        const desdeApp = String($('#rnApp').data('url-experiencia') || '').trim();
+        if (desdeApp) urlExperienciaTpl = desdeApp;
+        return urlExperienciaTpl;
+    }
+
+    function resolverExperienciaIdActiva() {
+        if (experienciaIdActiva) return experienciaIdActiva;
+        const desdeRoot = $root && $root.length ? $root.data('experiencia-id') : null;
+        if (desdeRoot) {
+            experienciaIdActiva = desdeRoot;
+            return experienciaIdActiva;
+        }
+        const desdeMeta = window.CxConstructor && typeof window.CxConstructor.getMeta === 'function'
+            ? window.CxConstructor.getMeta().experienciaId
+            : null;
+        if (desdeMeta) {
+            experienciaIdActiva = desdeMeta;
+            return experienciaIdActiva;
+        }
+        return null;
+    }
+
+    function urlFetchExperiencia(id) {
+        const tpl = resolverUrlExperienciaTpl();
+        if (!tpl || !id) return '';
+        const base = String(tpl).replace('__ID__', String(id));
+        return base + (base.includes('?') ? '&' : '?') + '_=' + Date.now();
+    }
+
+    function fetchExperienciaDesdeServidor(id) {
+        const url = urlFetchExperiencia(id);
+        if (!url) {
+            return $.Deferred().reject({ message: 'No hay URL de experiencia configurada.' }).promise();
+        }
+        return $.ajax({
+            url,
+            method: 'GET',
+            dataType: 'json',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
+    }
+
     function vincularElementos() {
-        $root = esModoDispositivo() ? $('#vnDispositivo') : $('.cx-app').first();
-        $body = $('#vnScreenBody');
-        $progress = $('#vnProgress');
-        $stepLabel = $('#vnStepLabel');
-        $title = $('#vnTitle');
-        $blockName = $('#vnBlockName');
-        $btnPrev = $('#vnBtnPrev');
-        $btnNext = $('#vnBtnNext');
+        const $player = $('#vnDispositivo');
+        if ($overlay.length && overlayEstaAbierto()) {
+            $root = $overlay;
+        } else if ($player.length && playerEstaActivo()) {
+            $root = $player;
+        } else if ($player.length && String($player.data('vn-defer') || '') === '1') {
+            $root = $player;
+        } else {
+            $root = $('.cx-app').first();
+        }
+        $body = $root.find('.vn-screen-body').first();
+        if (!$body.length) {
+            $body = $('#vnDispositivo .vn-screen-body, #vnOverlay .vn-screen-body').first();
+        }
+        $progress = $root.find('#vnProgress').first();
+        if (!$progress.length) $progress = $('#vnProgress').first();
+        $stepLabel = $root.find('#vnStepLabel').first();
+        if (!$stepLabel.length) $stepLabel = $('#vnStepLabel').first();
+        $title = $root.find('#vnTitle').first();
+        if (!$title.length) $title = $('#vnTitle').first();
+        $blockName = $root.find('#vnBlockName').first();
+        if (!$blockName.length) $blockName = $('#vnBlockName').first();
+        $btnPrev = $root.find('#vnBtnPrev').first();
+        if (!$btnPrev.length) $btnPrev = $('#vnBtnPrev').first();
+        $btnNext = $root.find('#vnBtnNext').first();
+        if (!$btnNext.length) $btnNext = $('#vnBtnNext').first();
         $tablet = $('#vnTablet');
         $stage = $('#vnTabletStage');
-        $btnFullscreen = $('#vnBtnFullscreen');
+        $btnFullscreen = $root.find('#vnBtnFullscreen').first();
+        if (!$btnFullscreen.length) $btnFullscreen = $('#vnBtnFullscreen').first();
     }
 
     function onBody(events, selector, handler) {
-        $(document).on(events + '.vnBody', '#vnScreenBody ' + selector, handler);
+        $(document).on(
+            events + '.vnBody',
+            '#vnDispositivo #vnScreenBody ' + selector + ', #vnOverlay #vnScreenBody ' + selector,
+            handler
+        );
     }
 
     vincularElementos();
@@ -52,13 +133,22 @@
     let mediaBase = '';
     let experienciaNombre = 'Experiencia';
     let historiaPage = 0;
+    let historiaAnimando = false;
     let retoPaso = 0;
     let intentosRestantes = null;
+    let bloqueAvanceTimer = null;
+    const BLOQUE_AVANCE_MS = 3000;
     let drawCtx = null;
     let paint = null;
     let paintListeners = [];
     let resizeTimer = null;
     let alTerminarExperiencia = null;
+    let experienciaIdActiva = null;
+    let urlExperienciaTpl = '';
+    let evidenciaSesion = 0;
+    const colaResultados = [];
+    let guardandoResultado = false;
+    const TIPOS_BLOQUE_RESULTADO = ['pregunta', 'reto', 'emocion', 'evidencia', 'dibujo', 'emparejar', 'clasificacion', 'arrastrar'];
 
     const PAINT_SIZE_MAP = { s: 6, m: 12, l: 22 };
     const PAINT_DEFAULT_COLORS = [
@@ -111,6 +201,138 @@
     };
 
     let estudianteSexo = '';
+    let nivelEtario = 'jardin';
+    let estudianteNombre = '';
+
+    const NIVEL_ETARIO = {
+        prejardin: { ttsRate: 0.82, touchScale: 1.35, simplificar: true, iconosNav: true },
+        jardin: { ttsRate: 0.88, touchScale: 1.22, simplificar: true, iconosNav: true },
+        transicion: { ttsRate: 0.94, touchScale: 1.1, simplificar: false, iconosNav: false },
+        primaria: { ttsRate: 1.0, touchScale: 1.0, simplificar: false, iconosNav: false },
+    };
+
+    const ICONOS_BLOQUE = {
+        bienvenida: '👋', audio: '🔊', video: '🎬', imagen: '🖼️', historia: '📖',
+        ra: '📱', evidencia: '📸', juego: '🎮', dibujo: '🎨', pregunta: '❓',
+        emparejar: '🔗', clasificacion: '📦', arrastrar: '✋', reto: '🏅',
+        emocion: '💛', recompensa: '🏆',
+    };
+
+    const TITULOS_POR_NIVEL = {
+        prejardin: {
+            bienvenida: '¡Hola!', audio: '¡Escucha!', video: '¡Mira!', imagen: '¡Mira!',
+            historia: 'Cuento', evidencia: '¡Tu foto!', dibujo: '¡Pinta!', pregunta: '¿Cuál?',
+            emparejar: '¡Une!', clasificacion: '¡Ordena!', arrastrar: '¡Mueve!',
+            reto: '¡Reto!', emocion: '¿Cómo estás?', recompensa: '¡Ganaste!',
+        },
+        jardin: {
+            bienvenida: '¡Hola!', audio: 'Escucha', video: 'Mira el video', imagen: 'Observa',
+            historia: 'Cuento', evidencia: '¡Tu evidencia!', dibujo: 'Dibuja', pregunta: 'Pregunta',
+            emparejar: 'Empareja', clasificacion: 'Clasifica', arrastrar: 'Arrastra',
+            reto: 'Reto', emocion: '¿Cómo te sentiste?', recompensa: '¡Lo lograste!',
+        },
+        transicion: {
+            bienvenida: '¡Bienvenido!', audio: 'Escucha con atención', video: 'Observa el video',
+            imagen: 'Mira la imagen', historia: 'Historia', evidencia: 'Registra tu evidencia',
+            dibujo: 'Dibuja aquí', pregunta: 'Responde', emparejar: 'Empareja los pares',
+            clasificacion: 'Clasifica', arrastrar: 'Arrastra a su lugar', reto: 'Supera el reto',
+            emocion: '¿Cómo te sentiste?', recompensa: '¡Excelente trabajo!',
+        },
+    };
+
+    function configNivel() {
+        return NIVEL_ETARIO[nivelEtario] || NIVEL_ETARIO.jardin;
+    }
+
+    function resolverNivelEtario(valor) {
+        const s = String(valor || '').trim().toLowerCase();
+        if (s === 'prejardin' || s === 'prejardín') return 'prejardin';
+        if (s === 'jardin' || s === 'jardín') return 'jardin';
+        if (s === 'transicion' || s === 'transición') return 'transicion';
+        if (s === 'primaria') return 'primaria';
+        return 'jardin';
+    }
+
+    function aplicarNivelEtario() {
+        const cls = `vn-nivel--${nivelEtario}`;
+        const cfg = configNivel();
+        const $hosts = $()
+            .add($root)
+            .add('#vnDispositivo')
+            .add('#vnOverlay')
+            .add('#vnTabletScreen');
+        $hosts.removeClass('vn-nivel--prejardin vn-nivel--jardin vn-nivel--transicion vn-nivel--primaria vn-chrome-simple');
+        $hosts.addClass(cls);
+        if (cfg.simplificar) $hosts.addClass('vn-chrome-simple');
+        $hosts.css('--vn-touch-scale', String(cfg.touchScale));
+    }
+
+    function tituloBloque(tipo, fallback) {
+        const map = TITULOS_POR_NIVEL[nivelEtario] || TITULOS_POR_NIVEL.jardin;
+        return map[tipo] || fallback;
+    }
+
+    function tituloVisibleBloque(bloque, fallbackPorNivel) {
+        const nombre = String(bloque?.nombre || '').trim();
+        if (nombre) return nombre;
+        return tituloBloque(bloque?.tipo || '', fallbackPorNivel);
+    }
+
+    function primerNombre() {
+        const n = String(estudianteNombre || '').trim();
+        if (!n) return configNivel().simplificar ? 'amiguito' : 'amigo';
+        return n.split(/\s+/)[0];
+    }
+
+    function celebrarExito(intenso) {
+        const host = $body[0] || $root[0];
+        if (!host) return;
+        const $burst = $('<div class="vn-celebrate" aria-hidden="true"></div>');
+        const emojis = intenso ? ['⭐', '🌟', '✨', '🎉', '💫', '🎊'] : ['⭐', '✨', '🎉'];
+        for (let i = 0; i < (intenso ? 14 : 8); i++) {
+            const $p = $('<span class="vn-celebrate-p"></span>');
+            $p.text(emojis[i % emojis.length]);
+            $p.css({
+                left: `${10 + Math.random() * 80}%`,
+                top: `${15 + Math.random() * 50}%`,
+                animationDelay: `${Math.random() * 0.35}s`,
+                fontSize: `${1.2 + Math.random() * 1.4}rem`,
+            });
+            $burst.append($p);
+        }
+        $(host).append($burst);
+        setTimeout(() => { $burst.remove(); }, 1600);
+        reproducirSfx('ok');
+    }
+
+    function reproducirSfx(tipo) {
+        try {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return;
+            const ctx = new Ctx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            if (tipo === 'ok') {
+                osc.frequency.setValueAtTime(523, ctx.currentTime);
+                osc.frequency.setValueAtTime(659, ctx.currentTime + 0.08);
+                osc.frequency.setValueAtTime(784, ctx.currentTime + 0.16);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.35);
+            } else if (tipo === 'err') {
+                osc.frequency.setValueAtTime(280, ctx.currentTime);
+                osc.frequency.setValueAtTime(220, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.25);
+            }
+            setTimeout(() => { ctx.close(); }, 500);
+        } catch (e) { /* noop */ }
+    }
 
     function escapar(str) {
         return String(str ?? '')
@@ -125,6 +347,21 @@
         const s = String(file);
         if (/^https?:\/\//i.test(s) || s.startsWith('/') || s.startsWith('data:')) return s;
         return String(mediaBase || '').replace(/\/$/, '') + '/' + s.replace(/^\//, '');
+    }
+
+    function contenidoChipItem(item, fallback) {
+        const fb = fallback || '—';
+        const texto = String(item?.texto || '').trim();
+        const imagen = String(item?.imagen || '').trim();
+        const url = imagen ? mediaUrl(imagen) : '';
+        const partes = [];
+        if (url) {
+            partes.push(`<img src="${escapar(url)}" alt="${escapar(texto || 'Ítem')}">`);
+        }
+        if (texto) {
+            partes.push(`<span>${escapar(texto)}</span>`);
+        }
+        return partes.length ? partes.join('') : fb;
     }
 
     function emocionesAssetsBase() {
@@ -165,11 +402,15 @@
     }
 
     function wrap(html, bloque, extraClass) {
-        const warn = bloque && !bloque.completo
+        const warn = (bloque && !bloque.completo && !esModoDispositivo())
             ? '<div class="text-center"><span class="vn-badge-warn"><i class="fa-solid fa-triangle-exclamation"></i> Bloque incompleto</span></div>'
             : '';
         const cls = extraClass ? ` vn-card--${escapar(extraClass)}` : '';
-        return `<div class="vn-block-fit"><div class="vn-card${cls}">${warn}${html}</div></div>`;
+        const paintBlocks = ['dibujo', 'juego-colorear'];
+        const inner = paintBlocks.includes(extraClass)
+            ? `${warn}${html}`
+            : `<div class="vn-card-body">${warn}${html}</div>`;
+        return `<div class="vn-block-fit"><div class="vn-card${cls}">${inner}</div></div>`;
     }
 
     function instruccionHtml(texto) {
@@ -203,29 +444,158 @@
 
     /* ── Renderers ───────────────────────────────────────────── */
 
+    function etiquetaVideoPlay() {
+        return configNivel().simplificar ? '¡Toca!' : 'Toca para ver';
+    }
+
+    function etiquetaVideoReplay() {
+        return configNivel().simplificar ? '¡Otra vez!' : 'Toca para ver otra vez';
+    }
+
+    function htmlBotonEvidenciaAudio(attrs) {
+        const label = configNivel().simplificar ? '¡Escucha!' : 'Toca para escuchar';
+        return `<button type="button" class="vn-audio-btn vn-evidencia-replay-btn" ${attrs}>
+            <span class="vn-audio-btn-ring" aria-hidden="true"></span>
+            <span class="vn-audio-waves" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            <span class="vn-audio-btn-icon"><i class="fa-solid fa-play"></i></span>
+            <span class="vn-audio-btn-label">${escapar(label)}</span>
+        </button>`;
+    }
+
+    function setEvidenciaAudioUi(refs, estado) {
+        const $btn = refs.$audioPlayBtn;
+        if (!$btn || !$btn.length) return;
+        const $icon = $btn.find('.vn-audio-btn-icon');
+        const $label = $btn.find('.vn-audio-btn-label');
+        $btn.removeClass('is-playing is-done');
+        if (estado === 'playing') {
+            $btn.addClass('is-playing');
+            $icon.html('<i class="fa-solid fa-volume-high"></i>');
+            $label.text(configNivel().simplificar ? 'Sonando…' : 'Escuchando…');
+            return;
+        }
+        $icon.html('<i class="fa-solid fa-play"></i>');
+        $label.text(configNivel().simplificar ? '¡Escucha!' : 'Toca para escuchar');
+    }
+
+    function detenerEvidenciaReplay(refs) {
+        if (!refs) return;
+        if (refs.$audioEl && refs.$audioEl.length) {
+            try {
+                refs.$audioEl[0].pause();
+                refs.$audioEl[0].currentTime = 0;
+                refs.$audioEl[0].onended = null;
+            } catch (e) { /* noop */ }
+        }
+        if (refs.$videoEl && refs.$videoEl.length) {
+            try {
+                refs.$videoEl[0].pause();
+                refs.$videoEl[0].currentTime = 0;
+                refs.$videoEl[0].onended = null;
+            } catch (e) { /* noop */ }
+        }
+        setEvidenciaAudioUi(refs, 'idle');
+        if (refs.$videoPlayBtn && refs.$videoPlayBtn.length) {
+            setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'idle');
+        }
+    }
+
+    function reproducirEvidenciaAudio(refs) {
+        const audio = refs.$audioEl && refs.$audioEl[0];
+        if (!audio || !refs.$audioPlayBtn || !refs.$audioPlayBtn.length) return;
+        if (refs.$audioPlayBtn.hasClass('is-playing')) {
+            audio.pause();
+            setEvidenciaAudioUi(refs, 'idle');
+            return;
+        }
+        setEvidenciaAudioUi(refs, 'playing');
+        try { audio.currentTime = 0; } catch (e) { /* noop */ }
+        audio.onended = function () { setEvidenciaAudioUi(refs, 'idle'); };
+        const p = audio.play();
+        if (p && typeof p.catch === 'function') {
+            p.catch(function () { setEvidenciaAudioUi(refs, 'idle'); });
+        }
+    }
+
+    function reproducirEvidenciaVideo(refs) {
+        const video = refs.$videoEl && refs.$videoEl[0];
+        if (!video || !refs.$videoPlayBtn || !refs.$videoPlayBtn.length) return;
+        setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'playing');
+        try { video.currentTime = 0; } catch (e) { /* noop */ }
+        video.muted = false;
+        video.onended = function () {
+            setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'done');
+        };
+        const p = video.play();
+        if (p && typeof p.catch === 'function') {
+            p.catch(function () {
+                setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'idle');
+                refs.$videoPlayBtn.addClass('vn-pulse-hint');
+            });
+        }
+    }
+
+    function htmlBotonVideo(attrs) {
+        return `<button type="button" class="vn-video-btn vn-video-btn--hero vn-pulse-hint" ${attrs}>
+            <span class="vn-video-btn-ring" aria-hidden="true"></span>
+            <span class="vn-video-btn-icon"><i class="fa-solid fa-play"></i></span>
+            <span class="vn-video-btn-label">${escapar(etiquetaVideoPlay())}</span>
+        </button>`;
+    }
+
+    function setVideoBotonEstado($btn, $wrap, $video, estado) {
+        if (!$btn || !$btn.length) return;
+        $btn.removeClass('is-playing is-done');
+        if (estado === 'playing') {
+            $btn.removeClass('vn-pulse-hint').prop('hidden', true);
+            if ($wrap && $wrap.length) $wrap.addClass('is-playing');
+            if ($video && $video.length) $video.prop('hidden', false);
+            return;
+        }
+        if ($wrap && $wrap.length) $wrap.removeClass('is-playing');
+        $btn.prop('hidden', false);
+        if (estado === 'done') {
+            $btn.addClass('is-done');
+            $btn.find('.vn-video-btn-icon').html('<i class="fa-solid fa-rotate-right"></i>');
+            $btn.find('.vn-video-btn-label').text(etiquetaVideoReplay());
+        } else {
+            $btn.find('.vn-video-btn-icon').html('<i class="fa-solid fa-play"></i>');
+            $btn.find('.vn-video-btn-label').text(etiquetaVideoPlay());
+        }
+        if ($video && $video.length) $video.prop('hidden', true);
+    }
+
     function renderBienvenida(bloque) {
         const d = datos(bloque);
         const personaje = (d.personaje || 'personaje') !== 'ninguno';
         const tipoMedia = d.tipo_media || 'ninguno';
+        const saludo = configNivel().simplificar
+            ? `¡Hola, ${escapar(primerNombre())}!`
+            : escapar(tituloVisibleBloque(bloque, '¡Hola!'));
         let mediaHtml = '';
         if (tipoMedia === 'imagen') {
             const imgUrl = mediaUrl(d.imagen);
             if (imgUrl) {
-                mediaHtml = `<div class="vn-pregunta-media vn-bienvenida-media"><img src="${escapar(imgUrl)}" alt=""></div>`;
+                mediaHtml = `<div class="vn-pregunta-media vn-bienvenida-media vn-media-zoomable"><img src="${escapar(imgUrl)}" alt=""></div>`;
             }
         } else if (tipoMedia === 'video') {
             const vidUrl = mediaUrl(d.video);
             if (vidUrl) {
                 mediaHtml = `
-                    <div class="vn-bienvenida-media vn-bienvenida-video-wrap" data-vn-bienvenida-video>
+                    <div class="vn-bienvenida-media vn-video-stage vn-bienvenida-video-wrap" data-vn-bienvenida-video-wrap>
+                        ${htmlBotonVideo('data-vn-bienvenida-play aria-label="Reproducir video de bienvenida"')}
                         <video class="vn-video-el vn-bienvenida-video" playsinline preload="auto"
-                            src="${escapar(vidUrl)}" aria-label="Video de bienvenida"></video>
+                            src="${escapar(vidUrl)}" hidden aria-label="Video de bienvenida"></video>
                     </div>`;
             }
         }
+        const emoji = personaje ? '🦊' : '👋';
         return wrap(`
-            ${personaje ? '<div class="vn-hero-emoji" aria-hidden="true">🦊</div>' : '<div class="vn-hero-emoji">👋</div>'}
-            <h2 class="vn-title">¡Hola!</h2>
+            <div class="vn-bienvenida-hero">
+                <div class="vn-hero-emoji vn-hero-emoji--wave" aria-hidden="true">${emoji}</div>
+                <div class="vn-sparkles" aria-hidden="true"><span>✨</span><span>⭐</span><span>✨</span></div>
+            </div>
+            <h2 class="vn-title">${saludo}</h2>
             ${instruccionHtml(d.instruccion)}
             ${mediaHtml}
         `, bloque, 'bienvenida');
@@ -238,22 +608,25 @@
         if (!url) {
             return wrap(`
                 <div class="vn-hero-emoji">🔊</div>
-                <h2 class="vn-title">Escucha</h2>
+                <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Escucha'))}</h2>
                 ${instruccionHtml(d.instruccion)}
                 <p class="vn-empty">Sin audio configurado</p>
             `, bloque, 'audio');
         }
         return wrap(`
-            <h2 class="vn-title">Escucha</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Escucha'))}</h2>
             ${instruccionHtml(d.instruccion)}
-            <button type="button" class="vn-audio-btn" data-vn-audio-play
-                data-reps="${escapar(reps)}" aria-label="Reproducir audio">
-                <span class="vn-audio-btn-ring" aria-hidden="true"></span>
-                <span class="vn-audio-btn-icon"><i class="fa-solid fa-play"></i></span>
-                <span class="vn-audio-btn-label">Toca para escuchar</span>
-            </button>
-            <p class="vn-audio-status" data-vn-audio-status hidden>Sonando…</p>
-            <audio class="vn-audio-el" preload="auto" src="${escapar(url)}" hidden></audio>
+            <div class="vn-audio-stage" data-vn-audio-stage>
+                <button type="button" class="vn-audio-btn vn-pulse-hint" data-vn-audio-play
+                    data-reps="${escapar(reps)}" aria-label="Reproducir audio">
+                    <span class="vn-audio-btn-ring" aria-hidden="true"></span>
+                    <span class="vn-audio-waves" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+                    <span class="vn-audio-btn-icon"><i class="fa-solid fa-play"></i></span>
+                    <span class="vn-audio-btn-label">${configNivel().simplificar ? '¡Toca!' : 'Toca para escuchar'}</span>
+                </button>
+                <p class="vn-audio-status" data-vn-audio-status hidden>Sonando…</p>
+                <audio class="vn-audio-el" preload="auto" src="${escapar(url)}" hidden></audio>
+            </div>
         `, bloque, 'audio');
     }
 
@@ -263,32 +636,35 @@
         if (!url) {
             return wrap(`
                 <div class="vn-hero-emoji">🎬</div>
-                <h2 class="vn-title">Mira el video</h2>
+                <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Mira el video'))}</h2>
                 ${instruccionHtml(d.instruccion)}
                 <p class="vn-empty">Sin video configurado</p>
             `, bloque, 'video');
         }
         return wrap(`
-            <h2 class="vn-title">Mira el video</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Mira el video'))}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-video-stage" data-vn-video-stage>
-                <button type="button" class="vn-video-btn" data-vn-video-play aria-label="Reproducir video">
-                    <span class="vn-video-btn-ring" aria-hidden="true"></span>
-                    <span class="vn-video-btn-icon"><i class="fa-solid fa-play"></i></span>
-                    <span class="vn-video-btn-label">Toca para ver</span>
-                </button>
+                ${htmlBotonVideo('data-vn-video-play aria-label="Reproducir video"')}
                 <video class="vn-video-el" playsinline preload="metadata" src="${escapar(url)}" hidden></video>
-                <p class="vn-video-status" data-vn-video-status hidden>Reproduciendo…</p>
             </div>
         `, bloque, 'video');
     }
 
     function renderImagen(bloque) {
         const d = datos(bloque);
+        const url = mediaUrl(d.archivo);
+        const imgHtml = url
+            ? `<div class="vn-media vn-imagen-zoom" data-vn-imagen-zoom>
+                <div class="vn-imagen-zoom-inner">
+                    <img src="${escapar(url)}" alt="${escapar(d.descripcion || 'Imagen')}" draggable="false">
+                </div>
+            </div>`
+            : '<p class="vn-empty">Sin imagen</p>';
         return wrap(`
-            <h2 class="vn-title">Observa</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Observa'))}</h2>
             ${instruccionHtml(d.instruccion)}
-            ${imgTag(d.archivo, d.descripcion || 'Imagen') || '<p class="vn-empty">Sin imagen</p>'}
+            ${imgHtml}
         `, bloque, 'imagen');
     }
 
@@ -298,38 +674,185 @@
         return Math.max(pages.length, Number(d.paginas) || 0, 1);
     }
 
-    function navegarHistoria(delta) {
+    function paginasHistoria(bloque) {
+        const d = datos(bloque);
+        return Array.isArray(d.paginas_data) ? d.paginas_data : [];
+    }
+
+    function paginaHistoriaMedia(page, num) {
+        const url = mediaUrl(page?.imagen);
+        if (!url) return '<p class="vn-empty">Sin imagen en esta página</p>';
+        return `<div class="vn-media vn-historia-media"><img src="${escapar(url)}" alt="Página ${num}"></div>`;
+    }
+
+    function renderHistoriaLibro(bloque) {
+        const pages = paginasHistoria(bloque);
+        const page = pages[historiaPage] || {};
+        const contenido = paginaHistoriaMedia(page, historiaPage + 1);
+        return `<div class="vn-historia-libro" data-vn-historia-libro>
+            <div class="vn-historia-libro-cuerpo">
+                <div class="vn-historia-pagina" data-vn-hist-pagina>${contenido}</div>
+                <div class="vn-historia-hoja" data-vn-hist-hoja hidden aria-hidden="true">
+                    <div class="vn-historia-hoja-cara vn-historia-hoja-cara--frente" data-vn-hist-hoja-frente></div>
+                    <div class="vn-historia-hoja-cara vn-historia-hoja-cara--atras" data-vn-hist-hoja-atras"></div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function dotsHistoriaHtml(total, current) {
+        return Array.from({ length: total }, (_, i) =>
+            `<span class="vn-hist-dot${i === current ? ' is-current' : ''}${i < current ? ' is-done' : ''}"></span>`
+        ).join('');
+    }
+
+    function badgeHistoriaHtml(total, current) {
+        return configNivel().simplificar
+            ? `${current + 1} / ${total}`
+            : `Página ${current + 1} de ${total}`;
+    }
+
+    function actualizarHistoriaMeta(bloque) {
+        const total = totalPaginasHistoria(bloque);
+        const puedeAnt = historiaPage > 0;
+        const puedeSig = historiaPage < total - 1;
+        const pages = paginasHistoria(bloque);
+        const page = pages[historiaPage] || {};
+        const audioUrl = mediaUrl(page.audio);
+        const d = datos(bloque);
+        const textoInstr = String(d.instruccion || '').trim();
+
+        $body.find('.vn-historia-progress').html(dotsHistoriaHtml(total, historiaPage));
+        $body.find('.vn-historia-badge').text(badgeHistoriaHtml(total, historiaPage));
+        $body.find('[data-vn-hist-prev]').prop('disabled', !puedeAnt);
+        $body.find('[data-vn-hist-next]').prop('disabled', !puedeSig);
+
+        const $instr = $body.find('.vn-instruccion');
+        if (historiaPage === 0 && textoInstr) {
+            $instr.show();
+        } else {
+            $instr.hide();
+        }
+
+        let $audio = $body.find('.vn-historia-audio');
+        if (audioUrl) {
+            if (!$audio.length) {
+                $body.find('.vn-historia-nav').before('<audio class="vn-historia-audio" preload="auto" hidden></audio>');
+                $audio = $body.find('.vn-historia-audio');
+            }
+            $audio.attr('src', audioUrl);
+        } else {
+            $audio.remove();
+        }
+    }
+
+    function finalizarVolteoHistoria(bloque, newIndex, pageNueva) {
+        historiaPage = newIndex;
+        const $pagina = $body.find('[data-vn-hist-pagina]');
+        const $hoja = $body.find('[data-vn-hist-hoja]');
+
+        $pagina.html(paginaHistoriaMedia(pageNueva, historiaPage + 1)).css('visibility', '');
+        $hoja.prop('hidden', true)
+            .removeClass('is-volteando-adelante is-volteando-atras is-sin-transicion');
+        $body.find('[data-vn-hist-hoja-frente], [data-vn-hist-hoja-atras]').empty();
+        historiaAnimando = false;
+        actualizarHistoriaMeta(bloque);
+        iniciarAudioHistoria();
+        actualizarNavBloque();
+        programarAjusteLayout();
+    }
+
+    function voltearHistoria(delta) {
         const bloque = bloques[index];
-        if (!bloque || bloque.tipo !== 'historia') return;
+        if (!bloque || bloque.tipo !== 'historia' || historiaAnimando) return;
         const total = totalPaginasHistoria(bloque);
         const next = historiaPage + delta;
         if (next < 0 || next >= total) return;
-        historiaPage = next;
-        pintar();
+
+        const pages = paginasHistoria(bloque);
+        const prevPage = historiaPage;
+        const pageActual = pages[prevPage] || {};
+        const pageNueva = pages[next] || {};
+        const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        detenerAudioHistoria();
+        $body.find('.vn-hist-nav-btn').prop('disabled', true);
+
+        if (reduceMotion) {
+            finalizarVolteoHistoria(bloque, next, pageNueva);
+            return;
+        }
+
+        const $pagina = $body.find('[data-vn-hist-pagina]');
+        const $hoja = $body.find('[data-vn-hist-hoja]');
+        const $frente = $body.find('[data-vn-hist-hoja-frente]');
+        const $atras = $body.find('[data-vn-hist-hoja-atras]');
+        let terminado = false;
+
+        const terminar = () => {
+            if (terminado) return;
+            terminado = true;
+            $hoja.off('transitionend.vnHist');
+            clearTimeout(fallbackTimer);
+            finalizarVolteoHistoria(bloque, next, pageNueva);
+        };
+
+        const fallbackTimer = setTimeout(terminar, 900);
+
+        historiaAnimando = true;
+
+        $frente.html(delta > 0
+            ? paginaHistoriaMedia(pageActual, prevPage + 1)
+            : paginaHistoriaMedia(pageNueva, next + 1));
+        $atras.html(delta > 0
+            ? paginaHistoriaMedia(pageNueva, next + 1)
+            : paginaHistoriaMedia(pageActual, prevPage + 1));
+
+        $hoja.removeClass('is-volteando-adelante is-volteando-atras is-sin-transicion');
+        $pagina.css('visibility', 'hidden');
+        $hoja.prop('hidden', false);
+
+        if (delta > 0) {
+            void $hoja[0].offsetWidth;
+            $hoja.addClass('is-volteando-adelante');
+        } else {
+            $hoja.addClass('is-volteando-atras is-sin-transicion');
+            void $hoja[0].offsetWidth;
+            $hoja.removeClass('is-sin-transicion');
+        }
+
+        $hoja.on('transitionend.vnHist', function (e) {
+            if (e.target !== this || e.propertyName !== 'transform') return;
+            terminar();
+        });
+    }
+
+    function navegarHistoria(delta) {
+        voltearHistoria(delta);
     }
 
     function renderHistoria(bloque) {
         const d = datos(bloque);
-        const pages = Array.isArray(d.paginas_data) ? d.paginas_data : [];
         const total = totalPaginasHistoria(bloque);
         if (historiaPage >= total) historiaPage = total - 1;
         if (historiaPage < 0) historiaPage = 0;
-        const page = pages[historiaPage] || {};
+        const page = paginasHistoria(bloque)[historiaPage] || {};
         const audioUrl = mediaUrl(page.audio);
         const puedeAnt = historiaPage > 0;
         const puedeSig = historiaPage < total - 1;
         return wrap(`
-            <h2 class="vn-title">Cuento</h2>
-            <p class="vn-paso-badge vn-historia-badge">Página ${historiaPage + 1} de ${total}</p>
-            ${historiaPage === 0 ? instruccionHtml(d.instruccion) : ''}
-            ${imgTag(page.imagen, `Página ${historiaPage + 1}`) || '<p class="vn-empty">Sin imagen en esta página</p>'}
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Cuento'))}</h2>
+            <div class="vn-historia-progress" aria-hidden="true">${dotsHistoriaHtml(total, historiaPage)}</div>
+            <p class="vn-paso-badge vn-historia-badge">${badgeHistoriaHtml(total, historiaPage)}</p>
+            ${instruccionHtml(d.instruccion)}
+            ${renderHistoriaLibro(bloque)}
             ${audioUrl ? `<audio class="vn-historia-audio" preload="auto" src="${escapar(audioUrl)}" hidden></audio>` : ''}
             <div class="vn-historia-nav">
-                <button type="button" class="vn-hist-nav-btn" data-vn-hist-prev ${puedeAnt ? '' : 'disabled'}>
-                    <i class="fa-solid fa-arrow-left"></i> Anterior
+                <button type="button" class="vn-hist-nav-btn vn-hist-nav-btn--big" data-vn-hist-prev ${puedeAnt ? '' : 'disabled'}>
+                    <i class="fa-solid fa-arrow-left"></i> ${configNivel().simplificar ? '' : 'Anterior'}
                 </button>
-                <button type="button" class="vn-hist-nav-btn" data-vn-hist-next ${puedeSig ? '' : 'disabled'}>
-                    Siguiente <i class="fa-solid fa-arrow-right"></i>
+                <button type="button" class="vn-hist-nav-btn vn-hist-nav-btn--big" data-vn-hist-next ${puedeSig ? '' : 'disabled'}>
+                    ${configNivel().simplificar ? '' : 'Siguiente'} <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
         `, bloque, 'historia');
@@ -339,28 +862,110 @@
         const d = datos(bloque);
         return wrap(`
             <div class="vn-ra-stage">
-                <div class="vn-hero-emoji">📱</div>
-                <h2 class="vn-title">Realidad aumentada</h2>
+                <div class="vn-ra-scanner" aria-hidden="true">
+                    <div class="vn-ra-scan-frame">
+                        <span class="vn-ra-corner vn-ra-corner--tl"></span>
+                        <span class="vn-ra-corner vn-ra-corner--tr"></span>
+                        <span class="vn-ra-corner vn-ra-corner--bl"></span>
+                        <span class="vn-ra-corner vn-ra-corner--br"></span>
+                        <div class="vn-ra-marker">${escapar(d.marcador || '?')}</div>
+                        <div class="vn-ra-scan-line"></div>
+                    </div>
+                </div>
+                <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Realidad aumentada'))}</h2>
                 ${instruccionHtml(d.instruccion)}
-                <div class="vn-ra-marker">${escapar(d.marcador || '?')}</div>
-                <p class="vn-empty">Apunta al marcador ${escapar(d.marcador || '')}<br><small>${escapar(d.contenido || 'Animación 3D')}</small></p>
+                <p class="vn-ra-hint">${configNivel().simplificar
+                ? '¡Apunta la tablet!'
+                : escapar(d.contenido || 'Animación 3D')}</p>
+                <button type="button" class="vn-ra-listo-btn vn-pulse-hint" data-vn-ra-listo>
+                    <i class="fa-solid fa-check"></i>
+                    ${configNivel().simplificar ? '¡Lo vi!' : 'Ya vi el marcador'}
+                </button>
             </div>
-        `, bloque);
+        `, bloque, 'ra');
+    }
+
+    function evidenciaTipoKey(tipo) {
+        const t = String(tipo || 'Foto').toLowerCase();
+        if (t.includes('audio')) return 'audio';
+        if (t.includes('video')) return 'video';
+        if (t.includes('selección') || t.includes('seleccion')) return 'seleccion';
+        return 'foto';
     }
 
     function renderEvidencia(bloque) {
         const d = datos(bloque);
         const tipo = d.tipo || 'Foto';
-        const icon = tipo.includes('Audio') ? 'fa-microphone' : (tipo.includes('Video') ? 'fa-video' : 'fa-camera');
+        const tipoKey = evidenciaTipoKey(tipo);
+        const icon = tipoKey === 'audio' ? 'fa-microphone'
+            : (tipoKey === 'video' ? 'fa-video'
+                : (tipoKey === 'seleccion' ? 'fa-image' : 'fa-camera'));
+        const label = configNivel().simplificar
+            ? (tipoKey === 'seleccion' ? '¡Elige!' : (tipoKey === 'audio' ? '¡Graba!' : (tipoKey === 'video' ? '¡Graba!' : '¡Foto!')))
+            : tipo;
+        const capturaLabel = configNivel().simplificar
+            ? '¡Ya!'
+            : (tipoKey === 'foto' ? 'Capturar' : 'Detener');
+        const fileAccept = tipoKey === 'video' ? 'video/*' : 'image/*';
+        const fileCapture = (tipoKey === 'video' || tipoKey === 'foto') ? 'environment' : '';
+        const hintNativo = (window.VnCaptura && window.VnCaptura.hayNativo())
+            ? (tipoKey === 'audio'
+                ? (configNivel().simplificar ? 'Toca para grabar tu voz.' : 'Se abrirá el micrófono del dispositivo.')
+                : (tipoKey === 'video'
+                    ? (configNivel().simplificar ? 'Toca para grabar.' : 'Se abrirá la cámara para grabar (máx. 45 s).')
+                    : (configNivel().simplificar ? 'Toca para tomar foto.' : 'Se abrirá la cámara del dispositivo.')))
+            : '';
         return wrap(`
-            <h2 class="vn-title">¡Tu evidencia!</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, '¡Tu evidencia!'))}</h2>
             ${instruccionHtml(d.instruccion)}
-            <button type="button" class="vn-evidencia-btn" data-vn-evidencia>
-                <i class="fa-solid ${icon}"></i>
-                ${escapar(tipo)}
-            </button>
-            <div id="vnEvidenciaMsg" class="vn-feedback is-ok" hidden>¡Listo! (simulación)</div>
-        `, bloque);
+            <div class="vn-evidencia-wrap">
+                <div class="vn-evidencia-stage" data-vn-evidencia-stage hidden>
+                    <video class="vn-evidencia-preview" playsinline webkit-playsinline muted hidden></video>
+                    <img class="vn-evidencia-result" alt="" hidden>
+                    <div class="vn-evidencia-replay vn-evidencia-replay--audio" data-vn-evidencia-replay="audio" hidden>
+                        ${htmlBotonEvidenciaAudio('data-vn-evidencia-audio-play aria-label="Escuchar evidencia"')}
+                        <audio class="vn-evidencia-audio-el" playsinline hidden></audio>
+                    </div>
+                    <div class="vn-evidencia-replay vn-evidencia-replay--video" data-vn-evidencia-replay="video" hidden>
+                        <div class="vn-video-stage vn-evidencia-video-stage" data-vn-evidencia-video-stage>
+                            ${htmlBotonVideo('data-vn-evidencia-video-play aria-label="Ver evidencia"')}
+                            <video class="vn-evidencia-video-el vn-video-el" playsinline hidden></video>
+                        </div>
+                    </div>
+                    <div class="vn-evidencia-recording" hidden>
+                        <i class="fa-solid fa-microphone vn-evidencia-recording-icon"></i>
+                        <span class="vn-evidencia-recording-label">${configNivel().simplificar ? '¡Graba!' : 'Grabando…'}</span>
+                        <div class="vn-evidencia-contador" hidden aria-hidden="true">00:00</div>
+                    </div>
+                    <div class="vn-evidencia-preview-placeholder" hidden>
+                        <i class="fa-solid ${icon}"></i>
+                        <span>¡Listo!</span>
+                    </div>
+                </div>
+                <p class="vn-evidencia-estado" data-vn-evidencia-estado hidden aria-live="polite"></p>
+                <input type="file" class="vn-evidencia-file" data-vn-evidencia-file
+                    accept="${escapar(fileAccept)}"${fileCapture ? ' capture="' + fileCapture + '"' : ''} hidden>
+                <div class="vn-evidencia-actions">
+                    <div class="vn-evidencia-action">
+                        <button type="button"
+                            class="vn-evidencia-btn vn-evidencia-btn--${escapar(tipoKey)} vn-pulse-hint"
+                            data-vn-evidencia data-vn-evidencia-tipo="${escapar(tipoKey)}"
+                            aria-label="${escapar(label)}">
+                            <span class="vn-evidencia-btn-glow" aria-hidden="true"></span>
+                            <span class="vn-evidencia-btn-icon"><i class="fa-solid ${icon}" aria-hidden="true"></i></span>
+                        </button>
+                        <span class="vn-evidencia-btn-label">${escapar(label)}</span>
+                    </div>
+                    <button type="button" class="vn-evidencia-captura-btn vn-pulse-hint" data-vn-evidencia-captura hidden
+                        aria-label="${escapar(capturaLabel)}">
+                        <span class="vn-evidencia-captura-icon" aria-hidden="true"><i class="fa-solid fa-stop"></i></span>
+                        <span class="vn-evidencia-captura-label" data-vn-evidencia-captura-label>${escapar(capturaLabel)}</span>
+                    </button>
+                </div>
+                ${hintNativo ? `<p class="vn-evidencia-hint">${escapar(hintNativo)}</p>` : ''}
+            </div>
+            <div class="vn-evidencia-msg vn-feedback is-ok" id="vnEvidenciaMsg" hidden>${configNivel().simplificar ? '¡Listo!' : '¡Muy bien! Tu evidencia quedó lista.'}</div>
+        `, bloque, 'evidencia');
     }
 
     function puzzleDims(piezasStr) {
@@ -400,9 +1005,8 @@
                 aria-label="Pieza ${idx + 1}"></button>`;
         }).join('');
         return `
-            <p class="vn-puzzle-meta">${escapar(d.juego_piezas || '4 piezas')} · Arrastra cada pieza a su lugar</p>
             <div class="vn-puzzle" data-vn-puzzle data-cols="${cols}" data-rows="${rows}" data-total="${n}">
-                <div class="vn-puzzle-board" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr);">${slots}</div>
+                <div class="vn-puzzle-board" style="--vn-puzzle-ar:${cols} / ${rows};grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr);">${slots}</div>
                 <div class="vn-puzzle-pool">${pieces}</div>
             </div>
             <div class="vn-feedback" id="vnFb" hidden></div>
@@ -413,9 +1017,11 @@
         const colors = options.colors || PAINT_DEFAULT_COLORS;
         const showShapes = !!options.showShapes;
         const customColor = options.fixedColors ? '' : `
-            <label class="vn-paint-picker" title="Elegir otro color">
-                <span class="vn-paint-picker-icon"><i class="fa-solid fa-eyedropper"></i></span>
-                <input type="color" class="vn-paint-color-input" value="${escapar(colors[2] || '#EF4444')}" aria-label="Elegir color">
+            <label class="vn-paint-swatch vn-paint-swatch--custom" title="Más colores" aria-label="Elegir otro color">
+                <span class="vn-paint-swatch-custom-bg" style="background:${escapar(colors[2] || '#EF4444')}"></span>
+                <span class="vn-paint-swatch-custom-icon" aria-hidden="true"><i class="fa-solid fa-plus"></i></span>
+                <span class="vn-paint-swatch-custom-label">Más</span>
+                <input type="color" class="vn-paint-color-input" value="${escapar(colors[2] || '#EF4444')}" aria-label="Elegir color personalizado">
             </label>`;
         const shapes = showShapes ? `
             <button type="button" class="vn-paint-tool" data-vn-paint-tool="line" title="Línea" aria-label="Línea">
@@ -427,7 +1033,7 @@
             <button type="button" class="vn-paint-tool" data-vn-paint-tool="triangle" title="Triángulo" aria-label="Triángulo">
                 <i class="fa-solid fa-play vn-icon-triangle"></i></button>` : '';
         const swatches = colors.map((c, i) =>
-            `<button type="button" class="vn-paint-swatch ${i === 0 ? 'is-on' : ''}"
+            `<button type="button" class="vn-paint-swatch"
                 data-vn-paint-color="${escapar(c)}" style="background:${escapar(c)}"
                 title="Color ${i + 1}" aria-label="Color ${i + 1}"></button>`
         ).join('');
@@ -486,12 +1092,11 @@
         while (colores.length < n) colores.push(defaults[colores.length] || '#22C55E');
         const toolbar = renderPaintToolbar({ colors: colores, fixedColors: true, showShapes: false });
         return `
-            <p class="vn-puzzle-meta">Elige un color y pinta con el dedo. El docente revisará tu dibujo.</p>
             <div class="vn-paint vn-paint--colorear" data-vn-paint="colorear">
                 ${toolbar}
                 <div class="vn-paint-stage vn-colorear-stage">
                     <div class="vn-colorear-bg" style="background-image:url('${escapar(url)}')"></div>
-                    <canvas id="vnCanvas" class="vn-colorear-canvas" width="1100" height="825"></canvas>
+                    <canvas id="vnCanvas" class="vn-colorear-canvas" aria-label="Lienzo para colorear"></canvas>
                 </div>
             </div>`;
     }
@@ -516,10 +1121,35 @@
             </button>`;
         }).join('');
         return `
-            <p class="vn-puzzle-meta">Arrastra las imágenes y ordénalas</p>
             <div class="vn-secuencia" data-vn-secuencia data-total="${items.length}">${cards}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>
         `;
+    }
+
+    function juegoHeadHtml(bloque, d, id, opts) {
+        const o = opts || {};
+        const titulo = escapar(d.juego_nombre || bloque?.nombre || (id === 'colorear' ? 'Colorea' : 'Juego'));
+        const paintCls = id === 'colorear' ? ' vn-juego-head--paint' : '';
+        let extra = '';
+        if (id === 'memoria' && o.paresTotal != null) {
+            const p = o.paresTotal;
+            extra = `<p class="vn-memory-score" data-vn-memory-score>${configNivel().simplificar ? `⭐ 0 / ${p}` : `0 / ${p} parejas`}</p>`;
+        } else if (id === 'rompecabezas') {
+            const tapHint = esModoDispositivo()
+                ? (configNivel().simplificar ? ' · Toca pieza y hueco' : ' · También puedes tocar la pieza y luego el hueco')
+                : '';
+            extra = `<p class="vn-puzzle-meta">${configNivel().simplificar
+                ? '¡Pon cada pieza!'
+                : `${escapar(d.juego_piezas || '4 piezas')} · Arrastra cada pieza a su lugar`}${tapHint}</p>`;
+        } else if (id === 'secuencia' && o.seqNums) {
+            extra = `<p class="vn-puzzle-meta">${configNivel().simplificar ? '¡Ordénalas!' : 'Arrastra las imágenes y ordénalas'}</p>
+                <div class="vn-seq-nums" aria-hidden="true">${o.seqNums}</div>`;
+        }
+        return `<div class="vn-juego-head${paintCls}">
+            <h2 class="vn-title vn-title--compact">${titulo}</h2>
+            ${instruccionHtml(d.instruccion)}
+            ${extra}
+        </div>`;
     }
 
     function renderJuego(bloque) {
@@ -527,13 +1157,18 @@
         const id = d.juego_id || '';
         let extra = '';
         let cardClass = 'juego';
+        let headOpts = {};
         if (id === 'memoria') {
             cardClass = 'juego-memoria';
             const imgs = [1, 2, 3, 4, 5, 6].map((i) => d[`imagen_${i}`]).filter(Boolean);
             const deck = imgs.concat(imgs).map((f, i) => ({ key: i, file: f, pair: f }));
             shuffleInPlace(deck);
-            extra = `<div class="vn-memory" data-vn-memory>${deck.map((c, i) =>
-                `<button type="button" class="vn-memory-card" data-i="${i}" data-pair="${escapar(c.pair)}">?</button>`
+            const paresTotal = imgs.length;
+            headOpts = { paresTotal };
+            extra = `<div class="vn-memory" data-vn-memory data-pares="${paresTotal}">${deck.map((c, i) =>
+                `<button type="button" class="vn-memory-card" data-i="${i}" data-pair="${escapar(c.pair)}" aria-label="Tarjeta">
+                    <span class="vn-memory-back" aria-hidden="true">?</span>
+                </button>`
             ).join('')}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>`;
         } else if (id === 'rompecabezas') {
@@ -544,15 +1179,19 @@
             extra = renderColorear(d);
         } else if (id === 'secuencia') {
             cardClass = 'juego-secuencia';
+            const items = [1, 2, 3, 4]
+                .map((i) => ({ orden: i - 1, file: d[`seq_${i}`] }))
+                .filter((x) => x.file);
+            if (items.length >= 3) {
+                headOpts = {
+                    seqNums: items.map((_, i) => `<span class="vn-seq-num">${i + 1}</span>`).join(''),
+                };
+            }
             extra = renderSecuencia(d);
         } else {
             extra = '<p class="vn-empty">Elige un juego en la configuración</p>';
         }
-        return wrap(`
-            <h2 class="vn-title">${escapar(d.juego_nombre || 'Juego')}</h2>
-            ${instruccionHtml(d.instruccion)}
-            ${extra}
-        `, bloque, cardClass);
+        return wrap(`${juegoHeadHtml(bloque, d, id, headOpts)}${extra}`, bloque, cardClass);
     }
 
     function renderDibujo(bloque) {
@@ -563,22 +1202,20 @@
             fixedColors: false,
             showShapes: true,
         });
-        const canvasBg = fondo
-            ? `background:url('${escapar(fondo)}') center/contain no-repeat #fff`
+        const stageStyle = fondo
+            ? ` style="background:url('${escapar(fondo)}') center/contain no-repeat #fff"`
             : '';
         return wrap(`
-            <h2 class="vn-title">Dibuja</h2>
-            ${instruccionHtml(d.instruccion)}
+            <div class="vn-paint-head">
+                <h2 class="vn-title vn-title--compact">${escapar(tituloVisibleBloque(bloque, 'Dibuja'))}</h2>
+                ${instruccionHtml(d.instruccion)}
+            </div>
             <div class="vn-paint vn-paint--dibujo" data-vn-paint="dibujo">
                 ${toolbar}
-                <div class="vn-paint-stage vn-draw-stage">
-                    <canvas id="vnCanvas" class="vn-draw-canvas" width="1100" height="560"
-                        style="${canvasBg}"></canvas>
+                <div class="vn-paint-stage vn-draw-stage"${stageStyle}>
+                    <canvas id="vnCanvas" class="vn-draw-canvas" aria-label="Lienzo de dibujo"></canvas>
                 </div>
             </div>
-            ${d.guardar_evidencia ? `<button type="button" class="vn-evidencia-btn" data-vn-evidencia>
-                <i class="fa-solid fa-camera"></i><span>Guardar</span></button>
-                <p class="vn-evidencia-msg" id="vnEvidenciaMsg" hidden>¡Listo! Tu dibujo quedó guardado.</p>` : ''}
         `, bloque, 'dibujo');
     }
 
@@ -586,6 +1223,9 @@
         const d = datos(bloque);
         const ops = Array.isArray(d.opciones) ? d.opciones : [];
         const tipo = d.tipo_opts || 'emoji_texto';
+        const textoPregunta = String(d.texto || '').trim();
+        const instruccion = String(d.instruccion || '').trim();
+        const mostrarInstruccion = instruccion && (!textoPregunta || instruccion !== textoPregunta);
         const optsHtml = ops.map((op, i) => {
             let inner = '';
             if (tipo !== 'solo_texto' && op.emoji) inner += `<span class="vn-op-emoji">${escapar(op.emoji)}</span>`;
@@ -600,14 +1240,20 @@
         const preguntaImgHtml = preguntaImg
             ? `<div class="vn-pregunta-media"><img src="${escapar(preguntaImg)}" alt=""></div>`
             : '';
+        const tituloHtml = textoPregunta
+            ? `<h2 class="vn-title vn-pregunta-enunciado" data-vn-tts-text="${escapar(textoPregunta)}">${escapar(textoPregunta)}</h2>`
+            : `<h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Pregunta'))}</h2>`;
+        const instrHtml = mostrarInstruccion ? instruccionHtml(instruccion) : '';
         return wrap(`
-            <h2 class="vn-title">Pregunta</h2>
-            ${instruccionHtml(d.instruccion)}
-            <p class="vn-instruccion vn-pregunta-texto">${escapar(d.texto || '')}</p>
+            <div class="vn-pregunta-head">
+                ${tituloHtml}
+                ${instrHtml}
+            </div>
             ${preguntaImgHtml}
-            <div class="vn-options" data-vn-pregunta data-fb-ok="${escapar(d.fb_ok || '¡Muy bien!')}"
+            <div class="vn-options" data-vn-pregunta data-count="${ops.length}" data-fb-ok="${escapar(d.fb_ok || '¡Muy bien!')}"
                 data-fb-err="${escapar(d.fb_err || 'Inténtalo de nuevo')}"
-                data-intentos="${escapar(d.intentos || '2')}">${optsHtml}</div>
+                data-intentos="${escapar(d.intentos || '2')}"
+                data-al-agotar="${escapar(d.al_agotar || 'Mostrar respuesta correcta')}">${optsHtml}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>
         `, bloque, 'pregunta');
     }
@@ -632,7 +1278,7 @@
             return `<button type="button" class="vn-chip" data-vn-der="${i}">${content || '—'}</button>`;
         });
         return wrap(`
-            <h2 class="vn-title">Empareja</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Empareja'))}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-match-cols" data-vn-emparejar data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
                 data-fb-err="${escapar(d.fb_err || 'Ese no va ahí…')}">
@@ -650,20 +1296,17 @@
         const zonas = cats.map((c, i) =>
             `<div class="vn-zone" data-vn-cat="${escapar(c)}" style="background:${pickColor(c)}; --vn-i:${i}">
                 <span class="vn-zone-label">${escapar(c)}</span>
-                <div class="vn-zone-slots" aria-hidden="true"></div>
+                <div class="vn-zone-slots"></div>
             </div>`
         ).join('');
-        const pool = items.map((it, i) => {
-            const label = it.texto || (it.imagen ? '' : 'Ítem');
-            const img = it.imagen ? `<img src="${escapar(mediaUrl(it.imagen))}" alt="">` : '';
-            const text = label ? `<span>${escapar(label)}</span>` : '';
-            return `<button type="button" class="vn-chip" data-vn-item="${i}" data-cat="${escapar(it.categoria || '')}" style="--vn-i:${i}">${img}${text || '—'}</button>`;
-        }).join('');
+        const pool = items.map((it, i) =>
+            `<button type="button" class="vn-chip vn-chip-drag" data-vn-item="${i}" data-cat="${escapar(it.categoria || '')}" aria-grabbed="false" style="--vn-i:${i}">${contenidoChipItem(it)}</button>`
+        ).join('');
         return wrap(`
-            <h2 class="vn-title">Clasifica</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Clasifica'))}</h2>
             ${instruccionHtml(d.instruccion)}
-            <p class="vn-hint-drag">Toca un elemento y luego su categoría</p>
-            <div class="vn-sort-board" data-vn-clasif-board>
+            <p class="vn-hint-drag">${configNivel().simplificar ? '¡Arrastra cada cosa a su lugar!' : 'Arrastra cada elemento a su categoría'}</p>
+            <div class="vn-sort-board" data-vn-clasif-board data-vn-pool-count="${items.length}">
                 <div class="vn-sort-col vn-sort-col--pool" data-vn-clasif-pool>${pool}</div>
                 <div class="vn-sort-col vn-sort-col--zones" data-vn-clasif>${zonas}</div>
             </div>
@@ -678,21 +1321,18 @@
         const zHtml = zonas.map((z, i) =>
             `<div class="vn-zone" data-vn-zona="${escapar(z.nombre || '')}" style="background:${escapar(z.color || '#0F6E56')}; --vn-i:${i}">
                 <span class="vn-zone-label">${escapar(z.nombre || 'Zona')}</span>
-                <div class="vn-zone-slots" aria-hidden="true"></div>
+                <div class="vn-zone-slots"></div>
             </div>`
         ).join('');
-        const pool = items.map((it, i) => {
-            const label = it.texto || (it.imagen ? '' : 'Ítem');
-            const img = it.imagen ? `<img src="${escapar(mediaUrl(it.imagen))}" alt="">` : '';
-            const text = label ? `<span>${escapar(label)}</span>` : '';
-            return `<button type="button" class="vn-chip vn-chip-drag" data-vn-item="${i}" data-zona="${escapar(it.zona || '')}"
-                aria-grabbed="false" style="--vn-i:${i}">${img}${text || '—'}</button>`;
-        }).join('');
+        const pool = items.map((it, i) =>
+            `<button type="button" class="vn-chip vn-chip-drag" data-vn-item="${i}" data-zona="${escapar(it.zona || '')}"
+                aria-grabbed="false" style="--vn-i:${i}">${contenidoChipItem(it)}</button>`
+        ).join('');
         return wrap(`
-            <h2 class="vn-title">Arrastra</h2>
+            <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Arrastra'))}</h2>
             ${instruccionHtml(d.instruccion)}
-            <p class="vn-hint-drag">Arrastra cada elemento a su zona</p>
-            <div class="vn-sort-board" data-vn-arrastrar-board>
+            <p class="vn-hint-drag">${configNivel().simplificar ? '¡Llévalo a su lugar!' : 'Arrastra cada elemento a su zona'}</p>
+            <div class="vn-sort-board" data-vn-arrastrar-board data-vn-pool-count="${items.length}">
                 <div class="vn-sort-col vn-sort-col--pool" data-vn-arrastrar-pool>${pool}</div>
                 <div class="vn-sort-col vn-sort-col--zones" data-vn-arrastrar>${zHtml}</div>
             </div>
@@ -705,20 +1345,42 @@
         const $slots = $(zoneEl).find('.vn-zone-slots').first();
         if (!$slots.length) {
             $chip.addClass('is-matched').removeClass('is-selected');
+            alCompletarActividad();
             return;
         }
-        const placed = $chip[0].cloneNode(true);
-        placed.classList.remove('is-selected', 'is-dragging', 'vn-chip-drag');
+        const placed = document.createElement('span');
+        placed.className = String($chip[0].className || '');
+        placed.classList.remove('is-selected', 'is-dragging', 'vn-chip-drag', 'is-matched', 'is-leaving');
         placed.classList.add('is-placed', 'vn-chip--placed');
-        placed.removeAttribute('aria-grabbed');
+        placed.innerHTML = $chip[0].innerHTML;
         placed.style.pointerEvents = 'none';
-        placed.type = 'button';
-        placed.disabled = true;
         $slots.append(placed);
         $chip.addClass('is-matched is-leaving').removeClass('is-selected');
         setTimeout(() => { $chip.prop('hidden', true); }, 280);
         zoneEl.classList.add('is-landed');
         setTimeout(() => { zoneEl.classList.remove('is-landed'); }, 450);
+        alCompletarActividad();
+    }
+
+    function flashUnionEmparejar($izq, $der) {
+        if (!$izq || !$izq.length || !$der || !$der.length) return;
+        const a = $izq[0].getBoundingClientRect();
+        const b = $der[0].getBoundingClientRect();
+        const x1 = a.left + a.width / 2;
+        const y1 = a.top + a.height / 2;
+        const x2 = b.left + b.width / 2;
+        const y2 = b.top + b.height / 2;
+        const len = Math.hypot(x2 - x1, y2 - y1);
+        const ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+        const $line = $('<div class="vn-match-line" aria-hidden="true"></div>');
+        $line.css({
+            width: `${len}px`,
+            left: `${x1}px`,
+            top: `${y1}px`,
+            transform: `rotate(${ang}deg)`,
+        });
+        $(document.body).append($line);
+        setTimeout(() => { $line.remove(); }, 700);
     }
 
     function renderReto(bloque) {
@@ -726,6 +1388,26 @@
         const pasos = Array.isArray(d.pasos) ? d.pasos : [];
         if (retoPaso >= pasos.length) retoPaso = Math.max(0, pasos.length - 1);
         const paso = pasos[retoPaso] || { pregunta: '', opciones: [] };
+        const textoPaso = String(paso.pregunta || '').trim();
+        const nombreReto = String(d.descripcion || '').trim();
+        const instruccion = String(d.instruccion || '').trim();
+        const enunciado = textoPaso
+            || (retoPaso === 0 ? instruccion : '')
+            || nombreReto
+            || tituloVisibleBloque(bloque, 'Reto');
+        const mostrarInstruccion = retoPaso === 0 && instruccion && textoPaso
+            && instruccion !== textoPaso;
+        const mostrarNombre = nombreReto && nombreReto !== enunciado;
+        const mostrarBadge = pasos.length > 1;
+        const metaHtml = (mostrarNombre || mostrarBadge)
+            ? `<div class="vn-reto-meta">${mostrarNombre
+                ? `<span class="vn-reto-nombre">${escapar(nombreReto)}</span>`
+                : ''}${mostrarBadge
+                    ? `<span class="vn-paso-badge">${configNivel().simplificar
+                        ? `${retoPaso + 1} / ${pasos.length}`
+                        : `Paso ${retoPaso + 1} de ${pasos.length}`}</span>`
+                    : ''}</div>`
+            : '';
         const ops = (paso.opciones || []).map((op, i) => {
             let inner = '';
             if (op.emoji) inner += `<span class="vn-op-emoji">${escapar(op.emoji)}</span>`;
@@ -737,12 +1419,14 @@
             return `<button type="button" class="vn-option" data-vn-reto-op="${i}" data-correcta="${op.correcta ? '1' : '0'}">${inner || '—'}</button>`;
         }).join('');
         return wrap(`
-            <h2 class="vn-title">${escapar(d.descripcion || 'Reto')}</h2>
-            <p class="vn-paso-badge">Paso ${retoPaso + 1} de ${pasos.length || 1}</p>
-            ${retoPaso === 0 ? instruccionHtml(d.instruccion) : ''}
-            <p class="vn-instruccion vn-reto-pregunta">${escapar(paso.pregunta || '')}</p>
-            <div class="vn-options" data-vn-reto data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
+            <div class="vn-reto-head">
+                ${metaHtml}
+                <h2 class="vn-title vn-pregunta-enunciado" data-vn-tts-text="${escapar(enunciado)}">${escapar(enunciado)}</h2>
+                ${mostrarInstruccion ? instruccionHtml(instruccion) : ''}
+            </div>
+            <div class="vn-options" data-vn-reto data-count="${(paso.opciones || []).length}" data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
                 data-fb-err="${escapar(d.fb_err || 'Casi…')}" data-intentos="${escapar(d.intentos || '2')}"
+                data-al-agotar="${escapar(d.al_agotar || 'Mostrar respuesta correcta')}"
                 data-total-pasos="${pasos.length}">${ops}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>
         `, bloque, 'reto');
@@ -752,18 +1436,19 @@
         const d = datos(bloque);
         const n = String(d.cantidad || '6') === '4' ? 4 : 6;
         const list = EMOCION_IDS[n];
+        const titulo = escapar(tituloVisibleBloque(bloque, 'Ahora cuéntame, ¿cómo te sentiste?'));
         return wrap(`
-            <h2 class="vn-title">Ahora cuéntame, ¿cómo te sentiste?</h2>
+            <h2 class="vn-title">${titulo}</h2>
             ${instruccionHtml(d.instruccion)}
             <div class="vn-emociones" data-vn-emocion data-count="${n}" data-sexo="${escapar(resolverSexoEmocion())}">
-                ${list.map((id) => {
-                    const label = emocionLabel(id);
-                    const imgUrl = emocionImgUrl(id);
-                    return `<button type="button" class="vn-emocion" data-id="${escapar(id)}">
+                ${list.map((id, i) => {
+            const label = emocionLabel(id);
+            const imgUrl = emocionImgUrl(id);
+            return `<button type="button" class="vn-emocion vn-pulse-hint" data-id="${escapar(id)}" style="--vn-i:${i}">
                         <img class="vn-emocion-img" src="${escapar(imgUrl)}" alt="${escapar(label)}">
                         <span class="vn-emocion-label">${escapar(label)}</span>
                     </button>`;
-                }).join('')}
+        }).join('')}
             </div>
         `, bloque, 'emocion');
     }
@@ -780,13 +1465,14 @@
         const icon = icons[tipo] || '🏆';
         const insignia = tipo === 'Insignia especial' && d.insignia ? imgTag(d.insignia, 'Insignia') : '';
         return wrap(`
-            <div class="vn-reward">
-                <div class="vn-reward-icon">${icon}</div>
-                <h2 class="vn-title">¡Lo lograste!</h2>
+            <div class="vn-reward vn-reward--celebrate">
+                <div class="vn-reward-rays" aria-hidden="true"></div>
+                <div class="vn-reward-icon vn-reward-icon--bounce">${icon}</div>
+                <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, '¡Lo lograste!'))}</h2>
                 ${instruccionHtml(d.instruccion)}
                 ${insignia}
             </div>
-        `, bloque);
+        `, bloque, 'recompensa');
     }
 
     function pickColor(seed) {
@@ -823,18 +1509,27 @@
     /* ── Chrome / navegación ─────────────────────────────────── */
 
     function renderProgress() {
-        $progress.html(bloques.map((_, i) => {
+        const usarIconos = configNivel().iconosNav && nivelEtario !== 'primaria';
+        $progress.html(bloques.map((b, i) => {
             let cls = 'vn-dot';
             if (i < index) cls += ' is-done';
             if (i === index) cls += ' is-current';
-            return `<span class="${cls}"></span>`;
+            const icon = usarIconos ? (ICONOS_BLOQUE[b.tipo] || '•') : '';
+            const inner = usarIconos
+                ? `<span class="vn-dot-icon">${icon}</span>`
+                : '';
+            return `<span class="${cls}" title="${escapar(b.nombre || b.tipo)}">${inner}</span>`;
         }).join(''));
-        $stepLabel.text(`Paso ${index + 1} de ${bloques.length || 1}`);
+        if (configNivel().simplificar) {
+            $stepLabel.prop('hidden', true).text('');
+        } else {
+            $stepLabel.prop('hidden', false).text(`Paso ${index + 1} de ${bloques.length || 1}`);
+        }
     }
 
     function overlayAbierto() {
-        if (esModoDispositivo()) return true;
-        return !$overlay.prop('hidden');
+        if (playerEstaActivo()) return true;
+        return overlayEstaAbierto();
     }
 
     function ajustarEscalaTablet() {
@@ -862,14 +1557,25 @@
         }
     }
 
+    function esBloquePintar(bloque) {
+        if (!bloque) return false;
+        if (bloque.tipo === 'dibujo') return true;
+        return bloque.tipo === 'juego' && datos(bloque).juego_id === 'colorear';
+    }
+
     function ajustarBloqueAlViewport() {
         if (!$body || !$body.length || !overlayAbierto()) return;
+
+        const bloque = bloques[index];
+        if (esBloquePintar(bloque)) return;
 
         const $fit = $body.children('.vn-block-fit').first();
         const $card = $fit.length ? $fit.children('.vn-card').first() : $body.children('.vn-card').first();
         if (!$card.length) return;
 
         $card.css({ transform: 'none', marginTop: '', marginBottom: '' });
+
+        if (esModoDispositivo()) return;
 
         const bodyEl = $body[0];
         const cardEl = $card[0];
@@ -884,7 +1590,7 @@
         let scale = Math.min(availW / naturalW, availH / naturalH, 1);
         if (scale >= 0.999) return;
 
-        scale = Math.max(0.42, scale);
+        scale = Math.max(0.32, scale);
         const visualH = naturalH * scale;
         const padTop = Math.max(0, (availH - visualH) / 2);
 
@@ -896,27 +1602,54 @@
         });
     }
 
+    function ajustarLayoutPintar() {
+        const bloque = bloques[index];
+        if (!esBloquePintar(bloque) || !$body || !$body.length) return;
+
+        const $card = $body.find('.vn-card--dibujo, .vn-card--juego-colorear').first();
+        if ($card.length) {
+            $card.css({ transform: 'none', marginTop: '', marginBottom: '' });
+        }
+
+        // Dejar que el flex CSS ocupe el espacio; limpiar tamaños inline previos.
+        $body.find('.vn-paint, .vn-paint-stage').css({
+            minHeight: '',
+            height: '',
+            maxHeight: '',
+            minWidth: '',
+            width: '',
+            flex: '',
+        });
+    }
+
     function ajustarCanvasPaint() {
         const canvas = document.getElementById('vnCanvas');
-        if (!canvas || !drawCtx || !paint) return;
+        if (!canvas) return;
         const stage = canvas.closest('.vn-paint-stage');
         if (!stage) return;
 
-        const rect = stage.getBoundingClientRect();
-        const w = Math.round(Math.max(200, rect.width));
-        const h = Math.round(Math.max(160, rect.height));
+        const w = Math.round(stage.clientWidth);
+        const h = Math.round(stage.clientHeight);
         if (w <= 0 || h <= 0) return;
-        if (canvas.width === w && canvas.height === h) return;
+
+        const needsResize = canvas.width !== w || canvas.height !== h;
+        if (!needsResize && drawCtx && paint) return;
 
         let snap = null;
-        try {
-            snap = canvas.toDataURL();
-        } catch (e) { /* noop */ }
+        if (needsResize && drawCtx && paint) {
+            try {
+                snap = canvas.toDataURL();
+            } catch (e) { /* noop */ }
+        }
 
-        canvas.width = w;
-        canvas.height = h;
+        if (needsResize) {
+            canvas.width = w;
+            canvas.height = h;
+        }
 
-        if (snap) {
+        if (!drawCtx || !paint) return;
+
+        if (snap && needsResize) {
             const img = new Image();
             img.onload = function () {
                 if (!drawCtx || !paint) return;
@@ -932,20 +1665,23 @@
             return;
         }
 
-        if (paint.mode === 'dibujo' && !paint.hasFondo) {
+        if (paint.mode === 'dibujo' && !paint.hasFondo && (!paint.history || paint.history.length <= 1)) {
             drawCtx.fillStyle = '#ffffff';
             drawCtx.fillRect(0, 0, w, h);
         }
-        paint.history = [];
-        paintSaveState();
+        if (!paint.history || !paint.history.length) {
+            paintSaveState();
+        }
     }
 
     function programarAjusteLayout() {
         requestAnimationFrame(function () {
             ajustarEscalaTablet();
+            ajustarLayoutPintar();
             ajustarBloqueAlViewport();
             ajustarCanvasPaint();
             requestAnimationFrame(function () {
+                ajustarLayoutPintar();
                 ajustarBloqueAlViewport();
                 ajustarCanvasPaint();
             });
@@ -953,11 +1689,16 @@
     }
 
     function pintar() {
+        vincularElementos();
         if (typeof limpiarDragArrastrar === 'function') limpiarDragArrastrar();
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
+        limpiarSeleccionPuzzle();
         if (typeof limpiarDragSecuencia === 'function') limpiarDragSecuencia();
         if (typeof limpiarPaint === 'function') limpiarPaint();
+        limpiarEvidenciaRecursos();
+        cancelarAvanceAutomatico();
         detenerVoz();
+        historiaAnimando = false;
         const bloque = bloques[index];
         if (!bloque) {
             $body.html('<p class="vn-empty">No hay bloques en la secuencia.</p>');
@@ -969,20 +1710,18 @@
         }
         $title.text(experienciaNombre);
         $blockName.text(bloque.nombre || bloque.tipo);
+        $body.removeData('vn-bloque-visto vn-bienvenida-video-ok');
+        $body.toggleClass('vn-body--paint', esBloquePintar(bloque));
         $body.html(renderBloque(bloque));
         $btnPrev.prop('disabled', index <= 0);
-        const esUltimoBloque = index >= bloques.length - 1;
-        if (alTerminarExperiencia && esUltimoBloque) {
-            $btnNext.prop('disabled', false);
-            $btnNext.find('span').first().text('Seguir');
-        } else {
-            $btnNext.find('span').first().text('Siguiente');
-            $btnNext.prop('disabled', esUltimoBloque);
-        }
         renderProgress();
         initInteracciones(bloque);
+        actualizarNavBloque();
         $body.scrollTop(0);
         programarAjusteLayout();
+        if (bloque.tipo === 'recompensa') {
+            setTimeout(() => { celebrarExito(true); }, 400);
+        }
     }
 
     let ttsToken = 0;
@@ -1072,7 +1811,7 @@
         const voice = vozNaturalEspanol();
         u.lang = (voice && voice.lang) ? voice.lang : 'es-MX';
         if (voice) u.voice = voice;
-        u.rate = 0.98;
+        u.rate = configNivel().ttsRate;
         u.pitch = 1;
         u.volume = 1;
         u.onend = function () {
@@ -1206,12 +1945,686 @@
     }
 
     function showFb(ok, okMsg, errMsg) {
-        const $fb = $('#vnFb');
-        if (!$fb.length) return;
+        let $fb = $('#vnFb');
+        if (!$fb.length) {
+            $fb = $('<div class="vn-feedback vn-feedback--nav" id="vnFb" hidden></div>');
+            const $card = $body.find('.vn-card').first();
+            if ($card.length) $card.append($fb);
+            else return;
+        }
         $fb.prop('hidden', false)
             .toggleClass('is-ok', !!ok)
             .toggleClass('is-bad', !ok)
             .text(ok ? okMsg : errMsg);
+        if (ok) celebrarExito(false);
+        else reproducirSfx('err');
+    }
+
+    function marcarBloqueVisto() {
+        $body.data('vn-bloque-visto', true);
+        actualizarNavBloque();
+    }
+
+    function itemsPoolCompletos($items) {
+        if (!$items.length) return true;
+        return $items.filter(':not(.is-matched)').filter(function () {
+            return !this.hidden;
+        }).length === 0;
+    }
+
+    function bloqueEstaCompleto(bloque) {
+        if (!bloque) return false;
+        const d = datos(bloque);
+        const tipo = bloque.tipo;
+
+        switch (tipo) {
+            case 'bienvenida': {
+                const tipoMedia = d.tipo_media || 'ninguno';
+                if (tipoMedia === 'video' && mediaUrl(d.video)) {
+                    return !!$body.data('vn-bienvenida-video-ok');
+                }
+                return !!$body.data('vn-bloque-visto');
+            }
+            case 'audio':
+                if (!mediaUrl(d.archivo)) return !!$body.data('vn-bloque-visto');
+                return $body.find('[data-vn-audio-play].is-done').length > 0;
+            case 'video':
+                if (!mediaUrl(d.archivo)) return !!$body.data('vn-bloque-visto');
+                return $body.find('[data-vn-video-play].is-done').length > 0;
+            case 'imagen':
+            case 'recompensa':
+                return !!$body.data('vn-bloque-visto');
+            case 'ra':
+                return $body.find('[data-vn-ra-listo].is-done').length > 0;
+            case 'historia':
+                return historiaPage >= totalPaginasHistoria(bloque) - 1 && !!$body.data('vn-bloque-visto');
+            case 'evidencia':
+                return $body.find('.vn-evidencia-msg').filter(function () {
+                    return !$(this).prop('hidden');
+                }).length > 0;
+            case 'pregunta':
+                return !!$body.find('[data-vn-pregunta]').data('locked');
+            case 'reto': {
+                const pasos = Array.isArray(d.pasos) ? d.pasos : [];
+                return pasos.length > 0
+                    && retoPaso >= pasos.length - 1
+                    && !!$body.find('[data-vn-reto]').data('locked');
+            }
+            case 'emocion':
+                return $body.find('.vn-emocion.is-picked').length > 0;
+            case 'emparejar': {
+                const total = $body.find('[data-vn-emparejar] [data-vn-izq]').length;
+                const matched = $body.find('[data-vn-emparejar] [data-vn-izq].is-matched').length;
+                return total > 0 && matched >= total;
+            }
+            case 'clasificacion':
+                return itemsPoolCompletos($body.find('[data-vn-clasif-pool] [data-vn-item]'));
+            case 'arrastrar':
+                return itemsPoolCompletos($body.find('[data-vn-arrastrar-pool] [data-vn-item]'));
+            case 'dibujo':
+                return !!(paint && paint.history && paint.history.length > 1);
+            case 'juego': {
+                const juegoId = d.juego_id || '';
+                if (juegoId === 'memoria') {
+                    const total = $body.find('[data-vn-memory] .vn-memory-card').length;
+                    const done = $body.find('[data-vn-memory] .vn-memory-card.is-done').length;
+                    return total > 0 && done >= total;
+                }
+                if (juegoId === 'rompecabezas') {
+                    return $body.find('[data-vn-puzzle].is-complete').length > 0;
+                }
+                if (juegoId === 'secuencia') {
+                    return $body.find('[data-vn-secuencia].is-complete').length > 0;
+                }
+                if (juegoId === 'colorear') {
+                    return !!(paint && paint.history && paint.history.length > 1);
+                }
+                return !!$body.data('vn-bloque-visto');
+            }
+            default:
+                return !!$body.data('vn-bloque-visto');
+        }
+    }
+
+    function mensajePendienteBloque(bloque) {
+        if (!bloque) return configNivel().simplificar ? '¡Aún no!' : 'Termina esta actividad antes de continuar.';
+        const d = datos(bloque);
+        const simple = configNivel().simplificar;
+        switch (bloque.tipo) {
+            case 'audio': return simple ? '¡Escucha!' : 'Escucha el audio hasta el final.';
+            case 'video': return simple ? '¡Mira el video!' : 'Mira el video hasta el final.';
+            case 'historia': return simple ? '¡Sigue el cuento!' : 'Llega a la última página del cuento.';
+            case 'pregunta': return simple ? '¡Elige una!' : 'Responde la pregunta.';
+            case 'reto': return simple ? '¡Sigue el reto!' : 'Completa todos los pasos del reto.';
+            case 'emparejar': return simple ? '¡Une todos!' : 'Empareja todos los elementos.';
+            case 'clasificacion': return simple ? '¡Ordénalos!' : 'Clasifica todos los elementos.';
+            case 'arrastrar': return simple ? '¡Llévalos!' : 'Arrastra todos los elementos a su zona.';
+            case 'emocion': return simple ? '¿Cómo estás?' : 'Elige cómo te sentiste.';
+            case 'evidencia': return simple ? '¡Toca!' : 'Toca el botón para registrar tu evidencia.';
+            case 'ra': return simple ? '¡Mira y toca!' : 'Toca el botón cuando veas el marcador.';
+            case 'dibujo':
+                return simple ? '¡Pinta!' : 'Haz un dibujo en el lienzo.';
+            case 'juego': {
+                const juegoId = d.juego_id || '';
+                if (juegoId === 'memoria') return simple ? '¡Busca las parejas!' : 'Encuentra todas las parejas.';
+                if (juegoId === 'rompecabezas') return simple ? '¡Ármalo!' : 'Completa el rompecabezas.';
+                if (juegoId === 'secuencia') return simple ? '¡Ordénalas!' : 'Ordena las tarjetas correctamente.';
+                if (juegoId === 'colorear') return simple ? '¡Colorea!' : 'Colorea la imagen.';
+                return simple ? '¡Termina!' : 'Termina el juego.';
+            }
+            case 'bienvenida':
+                return (d.tipo_media || '') === 'video'
+                    ? (simple ? '¡Mira el video!' : 'Mira el video de bienvenida.')
+                    : (simple ? '¡Escucha!' : 'Escucha la bienvenida.');
+            default:
+                return simple ? '¡Aún no!' : 'Termina esta actividad antes de continuar.';
+        }
+    }
+
+    function cancelarAvanceAutomatico() {
+        if (!bloqueAvanceTimer) return;
+        clearTimeout(bloqueAvanceTimer);
+        bloqueAvanceTimer = null;
+    }
+
+    function programarAvanceAutomatico() {
+        cancelarAvanceAutomatico();
+        const bloqueIdx = index;
+        bloqueAvanceTimer = setTimeout(() => {
+            bloqueAvanceTimer = null;
+            if (index !== bloqueIdx) return;
+            const bloque = bloques[index];
+            if (!bloque || !['pregunta', 'reto'].includes(bloque.tipo)) return;
+            if (!bloqueEstaCompleto(bloque)) return;
+            alClicSiguiente();
+        }, BLOQUE_AVANCE_MS);
+    }
+
+    function programarAvanceRetoPaso($box) {
+        cancelarAvanceAutomatico();
+        const bloqueIdx = index;
+        const pasoIdx = retoPaso;
+        bloqueAvanceTimer = setTimeout(() => {
+            bloqueAvanceTimer = null;
+            if (index !== bloqueIdx || retoPaso !== pasoIdx) return;
+            const total = Number($box.data('total-pasos')) || 1;
+            if (retoPaso < total - 1) {
+                retoPaso += 1;
+                pintar();
+                return;
+            }
+            $box.data('locked', true);
+            alCompletarActividad();
+            programarAvanceAutomatico();
+        }, BLOQUE_AVANCE_MS);
+    }
+
+    function actualizarNavBloque() {
+        const bloque = bloques[index];
+        if (!bloque) return;
+        const esUltimoBloque = index >= bloques.length - 1;
+        const completo = bloqueEstaCompleto(bloque);
+        const simple = configNivel().simplificar;
+        const labelSeguir = simple ? '¡Listo!' : 'Seguir';
+        const labelSiguiente = simple ? '¡Sigue!' : 'Siguiente';
+
+        $btnPrev.find('span').first().text(simple ? '' : 'Atrás');
+
+        if (alTerminarExperiencia && esUltimoBloque) {
+            $btnNext.find('span').first().text(labelSeguir);
+            $btnNext.prop('disabled', false);
+            $btnNext.toggleClass('is-blocked', !completo);
+        } else if (esUltimoBloque) {
+            $btnNext.find('span').first().text(labelSiguiente);
+            $btnNext.prop('disabled', true);
+            $btnNext.toggleClass('is-blocked', true);
+        } else {
+            $btnNext.find('span').first().text(labelSiguiente);
+            $btnNext.prop('disabled', false);
+            $btnNext.toggleClass('is-blocked', !completo);
+        }
+        const listoParaAvanzar = completo && (!esUltimoBloque || !!alTerminarExperiencia);
+        $btnNext.toggleClass('vn-nav-ready', listoParaAvanzar);
+        $btnNext.attr('aria-disabled', completo ? 'false' : 'true');
+    }
+
+    function mostrarAvisoBloquePendiente() {
+        const bloque = bloques[index];
+        showFb(false, '', mensajePendienteBloque(bloque));
+        $btnNext.addClass('vn-nav-shake');
+        setTimeout(() => { $btnNext.removeClass('vn-nav-shake'); }, 520);
+    }
+
+    function csrfTokenKiosco() {
+        return $('meta[name="csrf-token"]').attr('content') || '';
+    }
+
+    function puedeGuardarResultadoKiosco() {
+        if (!resolverUrlExperienciaTpl()) return false;
+        return String($('#rnApp').data('modo') || '') === 'sesion';
+    }
+
+    function urlResultadoBloque(expId, bloqueId) {
+        const tpl = resolverUrlExperienciaTpl();
+        if (!tpl || !expId || !bloqueId) return '';
+        return String(tpl).replace('__ID__', String(expId)) + '/bloques/' + bloqueId + '/resultado';
+    }
+
+    function intentosUsadosDelBox($box, correcta) {
+        const ini = parseIntentos($box.data('intentos'));
+        if (ini === Infinity) return null;
+        const rest = intentosRestantes;
+        if (correcta) return ini - rest + 1;
+        return ini - rest;
+    }
+
+    function guardarResultadoEnBox($box, datos) {
+        if (!$box || !$box.length || !datos || typeof datos !== 'object') return;
+        $box.data('vn-resultado', datos);
+    }
+
+    function registrarResultadoPregunta($box, $opcion, correcta) {
+        guardarResultadoEnBox($box, {
+            opcion_index: Number($opcion.data('vn-opcion')),
+            correcta: !!correcta,
+            intentos_usados: intentosUsadosDelBox($box, correcta),
+        });
+    }
+
+    function registrarResultadoReto($box, $opcion, correcta) {
+        const total = Number($box.data('total-pasos')) || 1;
+        guardarResultadoEnBox($box, {
+            paso: retoPaso,
+            opcion_index: Number($opcion.data('vn-reto-op')),
+            correcta: !!correcta,
+            total_pasos: total,
+        });
+    }
+
+    function esBloqueColorear(bloque) {
+        return !!(bloque && bloque.tipo === 'juego' && datos(bloque).juego_id === 'colorear');
+    }
+
+    function esJuegoEvaluativo(bloque) {
+        if (!bloque || bloque.tipo !== 'juego') return false;
+        const id = String(datos(bloque).juego_id || '');
+        return ['memoria', 'rompecabezas', 'secuencia', 'colorear'].indexOf(id) >= 0;
+    }
+
+    function bloqueRegistraResultado(bloque) {
+        if (!bloque) return false;
+        if (TIPOS_BLOQUE_RESULTADO.indexOf(bloque.tipo) >= 0) return true;
+        return esJuegoEvaluativo(bloque);
+    }
+
+    function bloqueGuardaSoloAlCompletar(bloque) {
+        if (!bloque) return false;
+        return ['emparejar', 'clasificacion', 'arrastrar'].indexOf(bloque.tipo) >= 0;
+    }
+
+    function debePersistirAlAvanzar(bloque) {
+        return !!(bloque && (bloque.tipo === 'dibujo' || esBloqueColorear(bloque)));
+    }
+
+    function requiereArchivoResultado(bloque) {
+        return !!(bloque && (bloque.tipo === 'evidencia' || bloque.tipo === 'dibujo' || esBloqueColorear(bloque)));
+    }
+
+    function dataUrlABlob(dataUrl) {
+        return fetch(dataUrl).then(function (res) { return res.blob(); });
+    }
+
+    function exportarCanvasComoBlobPromise() {
+        return new Promise(function (resolve) {
+            const canvas = document.getElementById('vnCanvas');
+            if (!canvas || !paint || !paint.history || paint.history.length <= 1) {
+                resolve(null);
+                return;
+            }
+            if (typeof canvas.toBlob === 'function') {
+                canvas.toBlob(function (blob) { resolve(blob || null); }, 'image/png', 0.92);
+                return;
+            }
+            try {
+                resolve(dataUrlABlob(canvas.toDataURL('image/png')));
+            } catch (e) {
+                resolve(null);
+            }
+        });
+    }
+
+    function nombreArchivoResultado(bloque, blob) {
+        const mime = String((blob && blob.type) || '').toLowerCase();
+        if (bloque.tipo === 'evidencia') {
+            const tipoMedia = String($body.data('vn-evidencia-tipo-media') || 'foto');
+            if (tipoMedia === 'audio') {
+                if (mime.indexOf('webm') >= 0) return 'evidencia.webm';
+                if (mime.indexOf('mpeg') >= 0) return 'evidencia.mp3';
+                return 'evidencia.m4a';
+            }
+            if (tipoMedia === 'video') {
+                if (mime.indexOf('webm') >= 0) return 'evidencia.webm';
+                if (mime.indexOf('quicktime') >= 0) return 'evidencia.mov';
+                return 'evidencia.mp4';
+            }
+            if (mime.indexOf('webp') >= 0) return 'evidencia.webp';
+            return 'evidencia.jpg';
+        }
+        return 'dibujo.png';
+    }
+
+    function obtenerBlobResultado(bloque) {
+        if (!bloque) return Promise.resolve(null);
+        if (bloque.tipo === 'evidencia') {
+            const blob = $body.data('vn-evidencia-blob');
+            if (blob instanceof Blob) return Promise.resolve(blob);
+            const src = $body.find('.vn-evidencia-result').attr('src');
+            if (src && String(src).indexOf('data:') === 0) return dataUrlABlob(src);
+            const audioSrc = $body.find('.vn-evidencia-audio-el').attr('src');
+            if (audioSrc && String(audioSrc).indexOf('blob:') === 0) {
+                return fetch(audioSrc).then(function (res) { return res.blob(); });
+            }
+            const videoSrc = $body.find('.vn-evidencia-video-el').attr('src');
+            if (videoSrc && String(videoSrc).indexOf('blob:') === 0) {
+                return fetch(videoSrc).then(function (res) { return res.blob(); });
+            }
+            return Promise.resolve(null);
+        }
+        if (bloque.tipo === 'dibujo' || esBloqueColorear(bloque)) {
+            return exportarCanvasComoBlobPromise();
+        }
+        return Promise.resolve(null);
+    }
+
+    function registrarResultadoAgotado($box) {
+        const esReto = $box.is('[data-vn-reto]');
+        const $lastBad = $box.find('.vn-option.is-bad').last();
+        const ini = parseIntentos($box.data('intentos'));
+        if (esReto) {
+            guardarResultadoEnBox($box, {
+                paso: retoPaso,
+                opcion_index: $lastBad.length ? Number($lastBad.data('vn-reto-op')) : 0,
+                correcta: false,
+                total_pasos: Number($box.data('total-pasos')) || 1,
+            });
+            return;
+        }
+        guardarResultadoEnBox($box, {
+            opcion_index: $lastBad.length ? Number($lastBad.data('vn-opcion')) : 0,
+            correcta: false,
+            intentos_usados: ini === Infinity ? null : ini,
+        });
+    }
+
+    function extraerPayloadBloque(bloque) {
+        if (!bloque) return null;
+        if (bloque.tipo === 'emocion') {
+            const $picked = $body.find('.vn-emocion.is-picked');
+            if (!$picked.length) return null;
+            return { emocion_id: String($picked.data('id') || '') };
+        }
+        if (bloque.tipo === 'evidencia') {
+            const d = datos(bloque);
+            const tipoMedia = String($body.data('vn-evidencia-tipo-media') || evidenciaTipoKey(d.tipo || 'Foto'));
+            return {
+                tipo_media: tipoMedia,
+                origen: String(d.tipo || 'Foto'),
+            };
+        }
+        if (bloque.tipo === 'dibujo') {
+            return {
+                modo: 'dibujo',
+                trazos: paint && paint.history ? Math.max(0, paint.history.length - 1) : 0,
+            };
+        }
+        if (esBloqueColorear(bloque)) {
+            return {
+                modo: 'colorear',
+                juego_id: 'colorear',
+                trazos: paint && paint.history ? Math.max(0, paint.history.length - 1) : 0,
+            };
+        }
+        if (bloque.tipo === 'juego') {
+            const d = datos(bloque);
+            const juegoId = String(d.juego_id || '');
+            if (juegoId === 'memoria') {
+                const total = $body.find('[data-vn-memory] .vn-memory-card').length;
+                const done = $body.find('[data-vn-memory] .vn-memory-card.is-done').length;
+                return {
+                    juego_id: 'memoria',
+                    pares_total: total / 2,
+                    pares_encontrados: done / 2,
+                    intentos_parejas: Number($body.data('vn-mem-intentos') || 0),
+                    completado: total > 0 && done >= total,
+                };
+            }
+            if (juegoId === 'rompecabezas') {
+                const $puzzle = $body.find('[data-vn-puzzle]');
+                const total = Number($puzzle.data('total')) || 0;
+                return {
+                    juego_id: 'rompecabezas',
+                    piezas_total: total,
+                    completado: $puzzle.hasClass('is-complete'),
+                };
+            }
+            if (juegoId === 'secuencia') {
+                const $root = $body.find('[data-vn-secuencia]');
+                const total = Number($root.data('total')) || $root.find('[data-vn-seq-card]').length;
+                return {
+                    juego_id: 'secuencia',
+                    items_total: total,
+                    completado: $root.hasClass('is-complete'),
+                };
+            }
+        }
+        if (bloque.tipo === 'emparejar') {
+            const total = $body.find('[data-vn-emparejar] [data-vn-izq]').length;
+            const matched = $body.find('[data-vn-emparejar] [data-vn-izq].is-matched').length;
+            return {
+                pares_total: total,
+                pares_correctos: matched,
+                intentos_fallidos: Number($body.data('vn-emp-fallos') || 0),
+                completado: total > 0 && matched >= total,
+            };
+        }
+        if (bloque.tipo === 'clasificacion') {
+            const total = $body.find('[data-vn-clasif-pool] [data-vn-item]').length;
+            const colocados = $body.find('[data-vn-clasif-pool] [data-vn-item].is-matched').length;
+            return {
+                items_total: total,
+                items_colocados: colocados,
+                completado: total > 0 && colocados >= total,
+            };
+        }
+        if (bloque.tipo === 'arrastrar') {
+            const total = $body.find('[data-vn-arrastrar-pool] [data-vn-item]').length;
+            const colocados = $body.find('[data-vn-arrastrar-pool] [data-vn-item].is-matched').length;
+            return {
+                items_total: total,
+                items_colocados: colocados,
+                completado: total > 0 && colocados >= total,
+            };
+        }
+        const selector = bloque.tipo === 'pregunta' ? '[data-vn-pregunta]' : '[data-vn-reto]';
+        const $box = $body.find(selector);
+        const guardado = $box.data('vn-resultado');
+        return guardado && typeof guardado === 'object' ? guardado : null;
+    }
+
+    function procesarColaResultados() {
+        if (guardandoResultado || !colaResultados.length) return;
+        const item = colaResultados.shift();
+        if (!item || !item.url) {
+            procesarColaResultados();
+            return;
+        }
+        guardandoResultado = true;
+        const ajaxOpts = {
+            url: item.url,
+            method: 'POST',
+            dataType: 'json',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfTokenKiosco(),
+            },
+        };
+        if (item.formData) {
+            ajaxOpts.data = item.formData;
+            ajaxOpts.processData = false;
+            ajaxOpts.contentType = false;
+        } else {
+            ajaxOpts.contentType = 'application/json';
+            ajaxOpts.data = JSON.stringify({
+                correcto: item.correcto,
+                payload: item.payload,
+            });
+        }
+        $.ajax(ajaxOpts).always(function () {
+            guardandoResultado = false;
+            procesarColaResultados();
+        });
+    }
+
+    function encolarGuardadoResultado(bloqueExplicito) {
+        const bloque = bloqueExplicito || bloques[index];
+        if (!bloque || !bloque.id) return;
+        if (!bloqueRegistraResultado(bloque)) return;
+        if (bloqueGuardaSoloAlCompletar(bloque) && !bloqueEstaCompleto(bloque)) return;
+        if (!puedeGuardarResultadoKiosco()) return;
+
+        const payload = extraerPayloadBloque(bloque);
+        if (!payload) return;
+        if (payload.completado === false) return;
+
+        const expId = resolverExperienciaIdActiva();
+        const url = urlResultadoBloque(expId, bloque.id);
+        if (!url) return;
+
+        let correcto = null;
+        const esColorear = esBloqueColorear(bloque);
+        if (bloque.tipo !== 'emocion'
+            && bloque.tipo !== 'evidencia'
+            && bloque.tipo !== 'dibujo'
+            && !esColorear
+            && !esJuegoEvaluativo(bloque)
+            && bloque.tipo !== 'emparejar'
+            && bloque.tipo !== 'clasificacion'
+            && bloque.tipo !== 'arrastrar'
+            && typeof payload.correcta === 'boolean') {
+            correcto = payload.correcta;
+        }
+
+        if (requiereArchivoResultado(bloque)) {
+            obtenerBlobResultado(bloque).then(function (blob) {
+                if (!blob) return;
+                const fd = new FormData();
+                fd.append('payload', JSON.stringify(payload));
+                if (correcto !== null && correcto !== undefined) {
+                    fd.append('correcto', correcto ? '1' : '0');
+                }
+                fd.append('archivo', blob, nombreArchivoResultado(bloque, blob));
+                colaResultados.push({ url, formData: fd });
+                procesarColaResultados();
+            });
+            return;
+        }
+
+        colaResultados.push({
+            url,
+            bloque,
+            payload,
+            correcto,
+        });
+        procesarColaResultados();
+    }
+
+    function alCompletarActividad() {
+        const bloque = bloques[index];
+        if (debePersistirAlAvanzar(bloque)) {
+            actualizarNavBloque();
+            return;
+        }
+        encolarGuardadoResultado();
+        actualizarNavBloque();
+    }
+
+    function actualizarScoreMemoria() {
+        const $root = $body.find('[data-vn-memory]');
+        if (!$root.length) return;
+        const pares = Number($root.data('pares')) || 0;
+        const done = $root.find('.vn-memory-card.is-done').length / 2;
+        $body.find('[data-vn-memory-score]').text(
+            configNivel().simplificar ? `⭐ ${done} / ${pares}` : `${done} / ${pares} parejas`
+        );
+    }
+
+    function aplicarAlAgotar($box) {
+        const modo = String($box.data('al-agotar') || 'Mostrar respuesta correcta');
+        const esReto = $box.is('[data-vn-reto]');
+        if (modo === 'Repetir desde el inicio') {
+            $box.data('locked', false);
+            $body.find('.vn-option').removeClass('is-ok is-bad');
+            const bloque = bloques[index];
+            if (bloque && bloque.tipo === 'pregunta') {
+                intentosRestantes = parseIntentos($box.data('intentos'));
+            }
+            if (bloque && bloque.tipo === 'reto') {
+                retoPaso = 0;
+                intentosRestantes = parseIntentos($box.data('intentos'));
+                const $fb = $('#vnFb');
+                if ($fb.length) $fb.prop('hidden', true).removeClass('is-ok is-bad').text('');
+                pintar();
+                return;
+            }
+            const $fb = $('#vnFb');
+            if ($fb.length) $fb.prop('hidden', true).removeClass('is-ok is-bad').text('');
+            return;
+        }
+        if (modo !== 'Continuar sin mostrar') {
+            $body.find('.vn-option[data-correcta="1"]').addClass('is-ok');
+        }
+        if (esReto) {
+            const total = Number($box.data('total-pasos')) || 1;
+            if (retoPaso < total - 1) {
+                $box.data('locked', true);
+                programarAvanceRetoPaso($box);
+                return;
+            }
+        }
+        registrarResultadoAgotado($box);
+        $box.data('locked', true);
+        alCompletarActividad();
+        programarAvanceAutomatico();
+    }
+
+    function revisarHistoriaVista() {
+        const bloque = bloques[index];
+        if (!bloque || bloque.tipo !== 'historia') return;
+        if (historiaPage < totalPaginasHistoria(bloque) - 1) return;
+        marcarBloqueVisto();
+    }
+
+    function trasInstruccionBloque(bloque) {
+        const d = datos(bloque);
+        const tipo = bloque.tipo;
+        if (tipo === 'historia') {
+            iniciarAudioHistoria();
+            return;
+        }
+        if (tipo === 'bienvenida' && (d.tipo_media || '') === 'video' && mediaUrl(d.video)) {
+            reproducirVideoBienvenida();
+            return;
+        }
+        if (['imagen', 'recompensa', 'bienvenida'].includes(tipo)) {
+            marcarBloqueVisto();
+        }
+    }
+
+    function iniciarInstruccionBloque(bloque) {
+        const d = datos(bloque);
+        if (bloque.tipo === 'pregunta') {
+            const pregunta = String(d.texto || '').trim();
+            const instr = String(d.instruccion || '').trim();
+            let texto = '';
+            if (pregunta && instr && instr !== pregunta) {
+                texto = `${pregunta}. ${instr}`;
+            } else {
+                texto = pregunta || instr;
+            }
+            if (texto) {
+                hablarTexto(texto, () => trasInstruccionBloque(bloque));
+            } else {
+                trasInstruccionBloque(bloque);
+            }
+            return;
+        }
+        if (bloque.tipo === 'reto') {
+            const pasos = Array.isArray(d.pasos) ? d.pasos : [];
+            const paso = pasos[retoPaso] || {};
+            const pregunta = String(paso.pregunta || '').trim();
+            const nombreReto = String(d.descripcion || '').trim();
+            const instr = retoPaso === 0 ? String(d.instruccion || '').trim() : '';
+            const enunciado = pregunta || instr || nombreReto;
+            let texto = '';
+            if (pregunta && instr && instr !== pregunta) {
+                texto = `${pregunta}. ${instr}`;
+            } else {
+                texto = enunciado;
+            }
+            if (texto) {
+                hablarTexto(texto, () => trasInstruccionBloque(bloque));
+            } else {
+                trasInstruccionBloque(bloque);
+            }
+            return;
+        }
+        const texto = String(d.instruccion || '').trim();
+        if (texto) {
+            hablarTexto(texto, () => trasInstruccionBloque(bloque));
+        } else {
+            trasInstruccionBloque(bloque);
+        }
     }
 
     function paintAddListener(el, type, fn, opts) {
@@ -1219,7 +2632,26 @@
         paintListeners.push({ el, type, fn, opts });
     }
 
+    let paintResizeObs = null;
+
+    function observarStagePaint() {
+        if (paintResizeObs) {
+            paintResizeObs.disconnect();
+            paintResizeObs = null;
+        }
+        const stage = $body && $body.find('.vn-paint-stage')[0];
+        if (!stage || typeof ResizeObserver === 'undefined') return;
+        paintResizeObs = new ResizeObserver(function () {
+            ajustarCanvasPaint();
+        });
+        paintResizeObs.observe(stage);
+    }
+
     function limpiarPaint() {
+        if (paintResizeObs) {
+            paintResizeObs.disconnect();
+            paintResizeObs = null;
+        }
         paintListeners.forEach(({ el, type, fn, opts }) => el.removeEventListener(type, fn, opts));
         paintListeners = [];
         paint = null;
@@ -1241,6 +2673,7 @@
         paint.history.push(drawCtx.getImageData(0, 0, canvas.width, canvas.height));
         if (paint.history.length > 40) paint.history.shift();
         paintUpdateActions();
+        actualizarNavBloque();
     }
 
     function paintUndo() {
@@ -1248,6 +2681,7 @@
         paint.history.pop();
         drawCtx.putImageData(paint.history[paint.history.length - 1], 0, 0);
         paintUpdateActions();
+        actualizarNavBloque();
     }
 
     function paintDrawShape(ctx, tool, x1, y1, x2, y2, color, width) {
@@ -1309,17 +2743,19 @@
             drawCtx.fillStyle = '#ffffff';
             drawCtx.fillRect(0, 0, canvas.width, canvas.height);
         }
-        paintSaveState();
 
         const rect = () => canvas.getBoundingClientRect();
         const pos = (e) => {
             const r = rect();
+            if (r.width <= 0 || r.height <= 0) return { x: 0, y: 0 };
+            const scaleX = canvas.width / r.width;
+            const scaleY = canvas.height / r.height;
             const t = (e.touches && e.touches[0])
                 || (e.changedTouches && e.changedTouches[0])
                 || e;
             return {
-                x: (t.clientX - r.left) * (canvas.width / r.width),
-                y: (t.clientY - r.top) * (canvas.height / r.height),
+                x: (t.clientX - r.left) * scaleX,
+                y: (t.clientY - r.top) * scaleY,
             };
         };
 
@@ -1391,6 +2827,11 @@
         paintAddListener(canvas, 'touchmove', move, { passive: false });
         paintAddListener(canvas, 'touchend', end);
         paintUpdateActions();
+        observarStagePaint();
+        requestAnimationFrame(function () {
+            ajustarLayoutPintar();
+            ajustarCanvasPaint();
+        });
     }
 
     function initInteracciones(bloque) {
@@ -1398,14 +2839,19 @@
         detenerAudioBloque();
         detenerVideoBloque();
         detenerAudioHistoria();
+        $body.removeData('vn-mem-intentos vn-emp-fallos');
 
         if (bloque.tipo === 'dibujo') {
             const d = datos(bloque);
+            const brushKey = nivelEtario === 'prejardin' ? 'l' : (nivelEtario === 'jardin' ? 'm' : 'm');
+            const colorInicial = PAINT_DEFAULT_COLORS[2];
             initPaintCanvas({
                 mode: 'dibujo',
-                color: PAINT_DEFAULT_COLORS[2],
+                color: colorInicial,
                 hasFondo: !!d.fondo,
+                lineWidth: PAINT_SIZE_MAP[brushKey],
             });
+            paintSelectColor(colorInicial);
         }
 
         if (bloque.tipo === 'juego' && datos(bloque).juego_id === 'colorear') {
@@ -1423,9 +2869,10 @@
             initPaintCanvas({
                 mode: 'colorear',
                 color: colores[0] || '#EF4444',
-                lineWidth: PAINT_SIZE_MAP.m,
+                lineWidth: nivelEtario === 'prejardin' ? PAINT_SIZE_MAP.l : PAINT_SIZE_MAP.m,
                 hasFondo: true,
             });
+            paintSelectColor(colores[0] || '#EF4444');
         }
 
         if (bloque.tipo === 'pregunta') {
@@ -1435,6 +2882,7 @@
         if (bloque.tipo === 'reto') {
             const $box = $body.find('[data-vn-reto]');
             intentosRestantes = parseIntentos($box.data('intentos'));
+            if (retoPaso !== 0) $body.find('.vn-instruccion').hide();
         }
 
         // Memoria state
@@ -1458,19 +2906,129 @@
         if (bloque.tipo === 'video') {
             setVideoUi('idle');
         }
+        if (bloque.tipo === 'imagen') {
+            initImagenZoom();
+        }
         if (bloque.tipo === 'historia') {
+            if (historiaPage !== 0) $body.find('.vn-instruccion').hide();
             const texto = String(datos(bloque).instruccion || '').trim();
             if (historiaPage === 0 && texto) {
                 hablarTexto(texto, () => iniciarAudioHistoria());
             } else {
                 iniciarAudioHistoria();
             }
+        } else if (bloque.tipo === 'audio' && !mediaUrl(datos(bloque).archivo)) {
+            iniciarInstruccionBloque(bloque);
+        } else if (bloque.tipo === 'video' && !mediaUrl(datos(bloque).archivo)) {
+            iniciarInstruccionBloque(bloque);
         } else if (bloque.tipo === 'bienvenida' && (datos(bloque).tipo_media || '') === 'video') {
-            reproducirVideoBienvenida();
-        } else {
             const texto = String(datos(bloque).instruccion || '').trim();
-            if (texto) hablarTexto(texto);
+            if (texto) {
+                hablarTexto(texto, () => pulsarBotonVideoBienvenida());
+            } else {
+                pulsarBotonVideoBienvenida();
+            }
+        } else {
+            iniciarInstruccionBloque(bloque);
         }
+        actualizarNavBloque();
+    }
+
+    function initImagenZoom() {
+        const viewport = $body.find('[data-vn-imagen-zoom]')[0];
+        if (!viewport) return;
+
+        const inner = viewport.querySelector('.vn-imagen-zoom-inner');
+        if (!inner) return;
+
+        const MIN_SCALE = 1;
+        const MAX_SCALE = 4;
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let pinchStartDist = 0;
+        let pinchStartScale = 1;
+        let panStartX = 0;
+        let panStartY = 0;
+        let panOriginX = 0;
+        let panOriginY = 0;
+        let isPanning = false;
+        let marcoZoom = false;
+
+        function distancia(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.hypot(dx, dy);
+        }
+
+        function aplicarTransform() {
+            inner.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+            viewport.classList.toggle('is-zoomed', scale > 1.02);
+        }
+
+        function resetZoom() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            aplicarTransform();
+        }
+
+        function marcarSiZoom() {
+            if (!marcoZoom && scale > 1.05) {
+                marcoZoom = true;
+                marcarBloqueVisto();
+            }
+        }
+
+        viewport.addEventListener('touchstart', function (e) {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                pinchStartDist = distancia(e.touches);
+                pinchStartScale = scale;
+                isPanning = false;
+            } else if (e.touches.length === 1 && scale > 1.02) {
+                isPanning = true;
+                panStartX = e.touches[0].clientX;
+                panStartY = e.touches[0].clientY;
+                panOriginX = translateX;
+                panOriginY = translateY;
+            }
+        }, { passive: false });
+
+        viewport.addEventListener('touchmove', function (e) {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                if (pinchStartDist <= 0) return;
+                scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, pinchStartScale * (distancia(e.touches) / pinchStartDist)));
+                aplicarTransform();
+                marcarSiZoom();
+            } else if (e.touches.length === 1 && isPanning && scale > 1.02) {
+                e.preventDefault();
+                translateX = panOriginX + (e.touches[0].clientX - panStartX);
+                translateY = panOriginY + (e.touches[0].clientY - panStartY);
+                aplicarTransform();
+            }
+        }, { passive: false });
+
+        viewport.addEventListener('touchend', function (e) {
+            if (e.touches.length < 2) pinchStartDist = 0;
+            if (e.touches.length === 0) {
+                isPanning = false;
+                if (scale <= 1.02) resetZoom();
+            }
+        });
+
+        viewport.addEventListener('wheel', function (e) {
+            if (!e.ctrlKey) return;
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.12 : 0.12;
+            scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale + delta));
+            if (scale <= 1.02) resetZoom();
+            else {
+                aplicarTransform();
+                marcarSiZoom();
+            }
+        }, { passive: false });
     }
 
     function detenerAudioHistoria() {
@@ -1484,8 +3042,14 @@
 
     function iniciarAudioHistoria() {
         const audio = $body.find('.vn-historia-audio')[0];
-        if (!audio) return;
+        if (!audio) {
+            revisarHistoriaVista();
+            return;
+        }
         try { audio.currentTime = 0; } catch (e) { /* noop */ }
+        audio.onended = function () {
+            revisarHistoriaVista();
+        };
         const p = audio.play();
         if (p && typeof p.catch === 'function') {
             p.catch(() => { /* autoplay puede fallar sin gesto; el niño ya interactuó al navegar */ });
@@ -1527,7 +3091,7 @@
         const $label = $btn.find('.vn-audio-btn-label');
         $btn.removeClass('is-playing is-done');
         if (estado === 'playing') {
-            $btn.addClass('is-playing');
+            $btn.removeClass('vn-pulse-hint').addClass('is-playing');
             $icon.html('<i class="fa-solid fa-volume-high"></i>');
             $label.text('Sonando…');
         } else if (estado === 'done') {
@@ -1535,6 +3099,8 @@
             $icon.html('<i class="fa-solid fa-rotate-right"></i>');
             $label.text('Toca para oír otra vez');
             $status.prop('hidden', false).text('¡Listo!');
+            celebrarExito(false);
+            alCompletarActividad();
         } else {
             $icon.html('<i class="fa-solid fa-play"></i>');
             $label.text('Toca para escuchar');
@@ -1584,6 +3150,13 @@
                 this.onended = null;
             } catch (e) { /* noop */ }
         });
+        $body.find('[data-vn-bienvenida-video-wrap]').removeClass('is-playing');
+        const $btnBien = $body.find('[data-vn-bienvenida-play]');
+        const $wrapBien = $body.find('[data-vn-bienvenida-video-wrap]');
+        const $videoBien = $body.find('.vn-bienvenida-video');
+        if ($btnBien.length) {
+            setVideoBotonEstado($btnBien, $wrapBien, $videoBien, 'idle');
+        }
         const video = $body.find('.vn-video-el').not('.vn-bienvenida-video')[0];
         if (video) {
             try {
@@ -1598,39 +3171,56 @@
     function setVideoUi(estado) {
         const $btn = $body.find('[data-vn-video-play]');
         const $video = $body.find('.vn-video-el').not('.vn-bienvenida-video');
-        const $status = $body.find('[data-vn-video-status]');
+        const $stage = $body.find('[data-vn-video-stage]');
         if (!$btn.length && !$video.length) return;
-        $btn.removeClass('is-playing is-done');
-        if (estado === 'playing') {
-            $btn.prop('hidden', true);
-            $video.prop('hidden', false);
-            $status.prop('hidden', false).text('Reproduciendo…');
-        } else if (estado === 'done') {
-            $btn.prop('hidden', false).addClass('is-done');
-            $btn.find('.vn-video-btn-icon').html('<i class="fa-solid fa-rotate-right"></i>');
-            $btn.find('.vn-video-btn-label').text('Toca para ver otra vez');
-            $video.prop('hidden', true);
-            $status.prop('hidden', false).text('¡Listo!');
-        } else {
-            $btn.prop('hidden', false);
-            $btn.find('.vn-video-btn-icon').html('<i class="fa-solid fa-play"></i>');
-            $btn.find('.vn-video-btn-label').text('Toca para ver');
-            $video.prop('hidden', true);
-            $status.prop('hidden', true);
+        if (estado === 'done') {
+            setVideoBotonEstado($btn, $stage, $video, 'done');
+            celebrarExito(false);
+            alCompletarActividad();
+            return;
         }
+        setVideoBotonEstado($btn, $stage, $video, estado === 'playing' ? 'playing' : 'idle');
+    }
+
+    function pulsarBotonVideoBienvenida() {
+        const $btn = $body.find('[data-vn-bienvenida-play]');
+        if ($btn.length) {
+            $btn.addClass('vn-pulse-hint');
+            return;
+        }
+        marcarBloqueVisto();
     }
 
     function reproducirVideoBienvenida() {
         const video = $body.find('.vn-bienvenida-video')[0];
-        if (!video) return;
+        const $btn = $body.find('[data-vn-bienvenida-play]');
+        const $wrap = $body.find('[data-vn-bienvenida-video-wrap]');
+        const $video = $body.find('.vn-bienvenida-video');
+        if (!video) {
+            marcarBloqueVisto();
+            return;
+        }
+        detenerVoz();
+        setVideoBotonEstado($btn, $wrap, $video, 'playing');
         try { video.currentTime = 0; } catch (e) { /* noop */ }
+        video.onended = function () {
+            $body.data('vn-bienvenida-video-ok', true);
+            setVideoBotonEstado($btn, $wrap, $video, 'done');
+            celebrarExito(false);
+            alCompletarActividad();
+        };
         video.muted = false;
         const intentar = function (conMuted) {
             video.muted = !!conMuted;
             const p = video.play();
             if (!p || typeof p.catch !== 'function') return;
             p.catch(function () {
-                if (!conMuted) intentar(true);
+                if (!conMuted) {
+                    intentar(true);
+                } else {
+                    setVideoBotonEstado($btn, $wrap, $video, 'idle');
+                    $btn.addClass('vn-pulse-hint');
+                }
             });
         };
         intentar(false);
@@ -1652,6 +3242,11 @@
     }
 
     function ir(delta) {
+        cancelarAvanceAutomatico();
+        const bloque = bloques[index];
+        if (delta > 0 && debePersistirAlAvanzar(bloque)) {
+            encolarGuardadoResultado(bloque);
+        }
         const next = index + delta;
         if (next < 0 || next >= bloques.length) return;
         index = next;
@@ -1661,11 +3256,175 @@
     }
 
     function alClicSiguiente() {
+        cancelarAvanceAutomatico();
+        const bloque = bloques[index];
+        if (!bloqueEstaCompleto(bloque)) {
+            mostrarAvisoBloquePendiente();
+            return;
+        }
         if (alTerminarExperiencia && index >= bloques.length - 1) {
+            if (debePersistirAlAvanzar(bloque)) {
+                encolarGuardadoResultado(bloque);
+            }
             alTerminarExperiencia();
             return;
         }
         ir(1);
+    }
+
+    function reiniciarSecuenciaPlayer() {
+        index = 0;
+        historiaPage = 0;
+        retoPaso = 0;
+        intentosRestantes = null;
+        if ($body && $body.length) {
+            $body.removeData('vn-bloque-visto vn-bienvenida-video-ok');
+        }
+    }
+
+    function aplicarPayloadExperiencia(payload) {
+        bloques = Array.isArray(payload.bloques) ? payload.bloques : [];
+        mediaBase = payload.mediaBase || payload.media_base || mediaBase;
+        experienciaNombre = payload.experienciaNombre
+            || payload.nombre
+            || payload.experiencia?.nombre
+            || experienciaNombre;
+        if (payload.experienciaId || payload.experiencia?.id) {
+            experienciaIdActiva = payload.experienciaId || payload.experiencia.id;
+            if ($root && $root.length) {
+                $root.attr('data-experiencia-id', experienciaIdActiva);
+            }
+        }
+    }
+
+    function notificarExperienciaRecargada() {
+        $(document).trigger('vn:experiencia-recargada', [{
+            id: experienciaIdActiva,
+            bloques: bloques.map((b) => ({ ...b, datos: { ...(b.datos || {}) } })),
+            mediaBase,
+            nombre: experienciaNombre,
+        }]);
+    }
+
+    function recargarVistaNino() {
+        vincularElementos();
+        if (!overlayAbierto()) return;
+
+        const $btn = $('#vnBtnRecargar');
+        $btn.prop('disabled', true).addClass('is-loading');
+
+        const finalizar = function () {
+            $btn.prop('disabled', false).removeClass('is-loading');
+        };
+
+        const terminarRecarga = function () {
+            reiniciarSecuenciaPlayer();
+            pintar();
+            requestAnimationFrame(function () {
+                programarAjusteLayout();
+            });
+            finalizar();
+        };
+
+        limpiarMediosPlayer();
+
+        const api = window.CxConstructor;
+        const puedeUsarConstructor = overlayEstaAbierto()
+            && api
+            && typeof api.getBloques === 'function';
+
+        if (puedeUsarConstructor) {
+            aplicarPayloadExperiencia({
+                bloques: api.getBloques() || [],
+                mediaBase: api.getMeta ? api.getMeta().mediaBase : mediaBase,
+                experienciaNombre: api.getMeta ? api.getMeta().nombre : experienciaNombre,
+                experienciaId: api.getMeta ? api.getMeta().experienciaId : experienciaIdActiva,
+            });
+            if (!bloques.length) {
+                const urlListar = String($('.cx-app').data('url-listar') || '').trim();
+                if (urlListar) {
+                    $.ajax({
+                        url: urlListar + (urlListar.includes('?') ? '&' : '?') + '_=' + Date.now(),
+                        method: 'GET',
+                        dataType: 'json',
+                        headers: {
+                            Accept: 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    }).done(function (res) {
+                        const lista = res?.data?.bloques || res?.bloques || [];
+                        if (!lista.length) {
+                            const msg = 'No hay bloques para recargar.';
+                            if (window.Swal) Swal.fire({ icon: 'info', title: 'Sin bloques', text: msg });
+                            else window.alert(msg);
+                            finalizar();
+                            return;
+                        }
+                        aplicarPayloadExperiencia({
+                            bloques: lista,
+                            mediaBase: $('.cx-app').data('media-base') || mediaBase,
+                            experienciaNombre: $('.cx-app').data('experiencia-nombre') || experienciaNombre,
+                            experienciaId: $('.cx-app').data('experiencia-id') || experienciaIdActiva,
+                        });
+                        terminarRecarga();
+                    }).fail(function (xhr) {
+                        const msg = xhr?.responseJSON?.message || 'No se pudo recargar la experiencia.';
+                        if (window.Swal) Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                        else window.alert(msg);
+                        finalizar();
+                    });
+                    return;
+                }
+                const msg = 'Agrega bloques a la secuencia para previsualizar.';
+                if (window.Swal) Swal.fire({ icon: 'info', title: 'Sin bloques', text: msg });
+                else window.alert(msg);
+                finalizar();
+                return;
+            }
+            terminarRecarga();
+            return;
+        }
+
+        const expId = resolverExperienciaIdActiva();
+        if (playerEstaActivo() && expId && resolverUrlExperienciaTpl()) {
+            fetchExperienciaDesdeServidor(expId).done(function (res) {
+                if (!res?.success || !res?.data?.bloques?.length) {
+                    const msg = res?.message || 'No se pudo recargar la experiencia.';
+                    if (window.Swal) Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                    else window.alert(msg);
+                    return;
+                }
+                aplicarPayloadExperiencia({
+                    bloques: res.data.bloques,
+                    mediaBase: res.data.media_base,
+                    experiencia: res.data.experiencia,
+                    experienciaId: res.data.experiencia?.id || expId,
+                });
+                if ($root && $root.length) {
+                    $root.attr('data-experiencia-id', experienciaIdActiva);
+                }
+                terminarRecarga();
+                notificarExperienciaRecargada();
+            }).fail(function (xhr) {
+                const msg = xhr?.responseJSON?.message
+                    || xhr?.responseJSON?.mensaje
+                    || xhr?.message
+                    || 'No se pudo recargar la experiencia.';
+                if (window.Swal) Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                else window.alert(msg);
+            }).always(finalizar);
+            return;
+        }
+
+        if (bloques.length) {
+            terminarRecarga();
+            return;
+        }
+
+        const msg = 'No hay una experiencia activa para recargar.';
+        if (window.Swal) Swal.fire({ icon: 'info', title: 'Recargar', text: msg });
+        else window.alert(msg);
+        finalizar();
     }
 
     function abrir() {
@@ -1680,9 +3439,14 @@
             const meta = api.getMeta ? api.getMeta() : {};
             mediaBase = meta.mediaBase || $('.cx-app').data('media-base') || '';
             experienciaNombre = meta.nombre || 'Experiencia';
+            experienciaIdActiva = meta.experienciaId || experienciaIdActiva;
             estudianteSexo = normalizarSexoEmocion(
                 meta.estudianteSexo || $('.cx-app').data('estudiante-sexo')
             );
+            nivelEtario = resolverNivelEtario(
+                meta.nivelEtario || $('.cx-app').data('nivel-etario')
+            );
+            estudianteNombre = meta.estudianteNombre || $('.cx-app').data('estudiante-nombre') || '';
         } else {
             try {
                 bloques = JSON.parse(document.getElementById('cx-bloques-iniciales')?.textContent || '[]');
@@ -1692,6 +3456,8 @@
             mediaBase = $('.cx-app').data('media-base') || '';
             experienciaNombre = $('.cx-app').data('experiencia-nombre') || 'Experiencia';
             estudianteSexo = normalizarSexoEmocion($('.cx-app').data('estudiante-sexo'));
+            nivelEtario = resolverNivelEtario($('.cx-app').data('nivel-etario'));
+            estudianteNombre = $('.cx-app').data('estudiante-nombre') || '';
         }
 
         if (!bloques.length) {
@@ -1706,6 +3472,7 @@
         index = 0;
         historiaPage = 0;
         retoPaso = 0;
+        aplicarNivelEtario();
         $overlay.prop('hidden', false).attr('aria-hidden', 'false');
         $('body').css('overflow', 'hidden');
         pintar();
@@ -1714,11 +3481,117 @@
         });
     }
 
+    function detenerEvidenciaStream() {
+        const recorder = $body && $body.data('vn-evidencia-recorder');
+        if (recorder && recorder.state && recorder.state !== 'inactive') {
+            try { recorder.stop(); } catch (e) { /* noop */ }
+        }
+        if ($body && $body.length) $body.data('vn-evidencia-recorder', null);
+        const evStream = $body && $body.data('vn-evidencia-stream');
+        if (evStream && evStream.getTracks) evStream.getTracks().forEach((t) => t.stop());
+        if ($body && $body.length) $body.data('vn-evidencia-stream', null);
+    }
+
+    function limpiarEvidenciaRecursos() {
+        evidenciaSesion += 1;
+        $body.removeData('vn-evidencia-estado vn-evidencia-blob vn-evidencia-tipo-media');
+        const objectUrl = $body && $body.data('vn-evidencia-object-url');
+        if (objectUrl) {
+            try { URL.revokeObjectURL(objectUrl); } catch (e) { /* noop */ }
+            if ($body && $body.length) $body.data('vn-evidencia-object-url', null);
+        }
+        if (window.VnCaptura) {
+            VnCaptura.detenerContador($body.find('.vn-evidencia-contador'));
+            VnCaptura.cancelar();
+        }
+        detenerEvidenciaStream();
+    }
+
+    function asegurarMediaDevices() {
+        if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
+            return true;
+        }
+        const legacy = navigator.getUserMedia
+            || navigator.webkitGetUserMedia
+            || navigator.mozGetUserMedia;
+        if (!legacy) return false;
+        if (!navigator.mediaDevices) navigator.mediaDevices = {};
+        navigator.mediaDevices.getUserMedia = function (constraints) {
+            return new Promise(function (resolve, reject) {
+                legacy.call(navigator, constraints, resolve, reject);
+            });
+        };
+        return true;
+    }
+
+    function mimeGrabacionEvidencia(tipo) {
+        if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return '';
+        const opciones = tipo === 'audio'
+            ? ['audio/mp4', 'audio/aac', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus']
+            : ['video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+        return opciones.find(function (m) { return MediaRecorder.isTypeSupported(m); }) || '';
+    }
+
+    function obtenerMediaEvidencia(tipo) {
+        if (!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost') {
+            return Promise.reject(new Error('insecure'));
+        }
+        if (!asegurarMediaDevices()) {
+            return Promise.reject(new Error('unsupported'));
+        }
+        if (tipo === 'audio') {
+            return navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+        const intentosVideo = tipo === 'foto'
+            ? [
+                { video: { facingMode: { ideal: 'environment' } } },
+                { video: { facingMode: 'environment' } },
+                { video: true },
+            ]
+            : [
+                { video: { facingMode: { ideal: 'environment' } }, audio: true },
+                { video: { facingMode: 'environment' }, audio: true },
+                { video: true, audio: true },
+                { video: true, audio: false },
+            ];
+        let cadena = Promise.reject(new Error('sin intentos'));
+        intentosVideo.forEach(function (constraints) {
+            cadena = cadena.catch(function () {
+                return navigator.mediaDevices.getUserMedia(constraints);
+            });
+        });
+        return cadena;
+    }
+
+    function mensajeErrorEvidencia(err) {
+        const nombre = String((err && err.name) || '');
+        if (err && err.message === 'insecure') {
+            return 'La cámara y el micrófono necesitan una conexión segura (HTTPS).';
+        }
+        if (nombre === 'NotAllowedError' || nombre === 'PermissionDeniedError') {
+            return 'Necesitamos permiso para usar la cámara o el micrófono. Pide ayuda a tu profe.';
+        }
+        if (nombre === 'NotFoundError' || nombre === 'DevicesNotFoundError') {
+            return 'No encontramos cámara o micrófono en este dispositivo.';
+        }
+        if (nombre === 'NotReadableError' || nombre === 'TrackStartError') {
+            return 'La cámara está ocupada. Ciérrala en otra app e intenta otra vez.';
+        }
+        return 'No pudimos abrir la cámara o el micrófono. Intenta otra vez.';
+    }
+
     function limpiarMediosPlayer() {
+        cancelarAvanceAutomatico();
         if (typeof limpiarDragArrastrar === 'function') limpiarDragArrastrar();
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
         if (typeof limpiarDragSecuencia === 'function') limpiarDragSecuencia();
         if (typeof limpiarPaint === 'function') limpiarPaint();
+        const clasifDrag = $body && $body.data('vn-clasif-drag');
+        if (clasifDrag && clasifDrag.ghost && clasifDrag.ghost.parentNode) {
+            clasifDrag.ghost.parentNode.removeChild(clasifDrag.ghost);
+        }
+        if ($body && $body.length) $body.data('vn-clasif-drag', null);
+        limpiarEvidenciaRecursos();
         detenerAudioBloque();
         detenerVideoBloque();
         detenerAudioHistoria();
@@ -1821,14 +3694,31 @@
             || $root.data('estudiante-sexo')
             || $('#rnApp').data('estudiante-sexo')
         );
+        nivelEtario = resolverNivelEtario(
+            opts.nivelEtario
+            || $root.data('nivel-etario')
+            || $('#rnApp').data('nivel-etario')
+        );
+        estudianteNombre = opts.estudianteNombre
+            || $root.data('estudiante-nombre')
+            || $('#rnApp').data('estudiante-nombre')
+            || '';
         alTerminarExperiencia = typeof opts.alTerminarExperiencia === 'function'
             ? opts.alTerminarExperiencia
             : null;
+        experienciaIdActiva = opts.experienciaId || experienciaIdActiva || null;
+        urlExperienciaTpl = opts.urlExperiencia
+            || urlExperienciaTpl
+            || String($('#rnApp').data('url-experiencia') || '');
+        if ($root && $root.length && experienciaIdActiva) {
+            $root.attr('data-experiencia-id', experienciaIdActiva);
+        }
         index = 0;
         historiaPage = 0;
         retoPaso = 0;
         intentosRestantes = null;
         desbloquearAudioTts();
+        aplicarNivelEtario();
         pintar();
         asegurarHandlersFullscreen();
         actualizarBtnFullscreen();
@@ -1844,10 +3734,15 @@
         $('body').removeClass('rn-player-activo');
     }
 
+    if (enPlayer) {
+        resolverUrlExperienciaTpl();
+    }
+
     window.VistaNino = {
         iniciar: iniciarDispositivoCon,
         detener: detenerDispositivo,
         vincular: vincularElementos,
+        recargar: recargarVistaNino,
     };
 
     /* ── Eventos UI ──────────────────────────────────────────── */
@@ -1856,6 +3751,11 @@
         $('#cxBtnVistaNino').on('click', abrir);
         $overlay.on('click', '[data-vn-close]', cerrar);
     }
+    $(document).on('click.vnReload', '#vnBtnRecargar', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        recargarVistaNino();
+    });
     $(document).on('click.vnNav', '#vnBtnPrev', () => ir(-1));
     $(document).on('click.vnNav', '#vnBtnNext', () => alClicSiguiente());
 
@@ -1937,22 +3837,40 @@
         paint.tool = 'brush';
         $body.find('[data-vn-paint-tool]').removeClass('is-on');
         $body.find('[data-vn-paint-tool="brush"]').addClass('is-on');
-        $body.find('[data-vn-paint-color]').removeClass('is-on');
+
+        let matchedPreset = false;
         $body.find('[data-vn-paint-color]').each(function () {
-            if (String($(this).data('vn-paint-color')).toLowerCase() === color.toLowerCase()) {
-                $(this).addClass('is-on');
-            }
+            const isMatch = String($(this).data('vn-paint-color')).toLowerCase() === color.toLowerCase();
+            $(this).toggleClass('is-on', isMatch);
+            if (isMatch) matchedPreset = true;
         });
+
+        const $custom = $body.find('.vn-paint-swatch--custom');
+        if ($custom.length) {
+            $custom.toggleClass('is-on', !matchedPreset);
+            $custom.find('.vn-paint-swatch-custom-bg').css('background', color);
+            $custom.find('.vn-paint-color-input').val(color);
+            $custom.find('.vn-paint-swatch-custom-icon').toggleClass('is-hidden', !matchedPreset);
+            $custom.find('.vn-paint-swatch-custom-label').text(matchedPreset ? 'Más' : '');
+        }
     }
 
     onBody('click', '[data-vn-paint-color]', function () {
         paintSelectColor(String($(this).data('vn-paint-color')));
     });
 
+    onBody('click', '.vn-paint-swatch--custom', function (e) {
+        if ($(e.target).hasClass('vn-paint-color-input')) return;
+        const input = $(this).find('.vn-paint-color-input')[0];
+        if (!input) return;
+        e.preventDefault();
+        try { input.showPicker(); } catch (err) { input.click(); }
+    });
+
     onBody('input change', '.vn-paint-color-input', function () {
         const color = String(this.value || '');
+        if (!color) return;
         paintSelectColor(color);
-        $body.find('[data-vn-paint-color]').removeClass('is-on');
     });
 
     onBody('click', '[data-vn-paint-undo]', function () {
@@ -1960,15 +3878,461 @@
         paintUndo();
     });
 
+    onBody('click', '[data-vn-bienvenida-play]', function () {
+        reproducirVideoBienvenida();
+    });
+
+    function refsEvidencia($scope) {
+        const $wrap = $scope.find('.vn-evidencia-wrap');
+        const $stage = $wrap.find('[data-vn-evidencia-stage]');
+        const $videoStage = $stage.find('[data-vn-evidencia-video-stage]');
+        return {
+            $wrap,
+            $stage,
+            $preview: $stage.find('.vn-evidencia-preview'),
+            $result: $stage.find('.vn-evidencia-result'),
+            $audioReplay: $stage.find('[data-vn-evidencia-replay="audio"]'),
+            $audioPlayBtn: $stage.find('[data-vn-evidencia-audio-play]'),
+            $audioEl: $stage.find('.vn-evidencia-audio-el'),
+            $videoReplay: $stage.find('[data-vn-evidencia-replay="video"]'),
+            $videoStage: $videoStage,
+            $videoPlayBtn: $videoStage.find('[data-vn-evidencia-video-play]'),
+            $videoEl: $stage.find('.vn-evidencia-video-el'),
+            $recording: $stage.find('.vn-evidencia-recording'),
+            $contador: $stage.find('.vn-evidencia-contador'),
+            $placeholder: $stage.find('.vn-evidencia-preview-placeholder'),
+            $estado: $wrap.find('[data-vn-evidencia-estado]'),
+            $btn: $wrap.find('[data-vn-evidencia]'),
+            $captura: $wrap.find('[data-vn-evidencia-captura]'),
+            $file: $wrap.find('[data-vn-evidencia-file]'),
+            $msg: $scope.find('.vn-evidencia-msg'),
+        };
+    }
+
+    function setEstadoEvidencia(refs, texto, modo) {
+        if (!refs.$estado.length) return;
+        refs.$estado.removeClass('is-grabando is-exito is-error');
+        if (!texto) {
+            refs.$estado.prop('hidden', true).text('');
+            return;
+        }
+        if (modo) refs.$estado.addClass('is-' + modo);
+        refs.$estado.text(texto).prop('hidden', false);
+    }
+
+    function iniciarUiGrabacionEvidencia(refs, sesion, nativo) {
+        refs.$stage.prop('hidden', false);
+        refs.$btn.prop('hidden', true).prop('disabled', false);
+        refs.$captura.prop('hidden', false);
+        refs.$placeholder.prop('hidden', true);
+        refs.$preview.prop('hidden', true);
+        refs.$result.prop('hidden', true).removeAttr('src');
+        refs.$audioReplay.prop('hidden', true);
+        refs.$videoReplay.prop('hidden', true);
+        refs.$audioEl.removeAttr('src');
+        refs.$videoEl.removeAttr('src');
+        refs.$recording.prop('hidden', false);
+        setEstadoEvidencia(refs, configNivel().simplificar ? '¡Graba!' : 'Grabando…', 'grabando');
+        if (window.VnCaptura) {
+            VnCaptura.iniciarContador(refs.$contador);
+        }
+        $body.data('vn-evidencia-estado', { tipo: 'audio', sesion: sesion, nativo: !!nativo });
+    }
+
+    function evidenciaTieneCaptura(refs) {
+        if (refs.$result.attr('src')) return true;
+        if (refs.$audioEl.attr('src')) return true;
+        if (refs.$videoEl.attr('src')) return true;
+        return false;
+    }
+
+    function resetUiEvidencia(refs) {
+        refs.$stage.prop('hidden', true);
+        refs.$captura.prop('hidden', true);
+        refs.$recording.prop('hidden', true);
+        refs.$preview.prop('hidden', true);
+        refs.$result.prop('hidden', true);
+        refs.$audioReplay.prop('hidden', true);
+        refs.$videoReplay.prop('hidden', true);
+        refs.$placeholder.prop('hidden', true);
+        refs.$msg.prop('hidden', true);
+        refs.$btn.prop('hidden', false).prop('disabled', false).removeClass('is-done');
+        setEstadoEvidencia(refs, '', '');
+        detenerEvidenciaReplay(refs);
+        if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
+        if (refs.$preview.length) {
+            try { refs.$preview[0].pause(); } catch (e) { /* noop */ }
+            refs.$preview[0].srcObject = null;
+            refs.$preview.removeAttr('src');
+        }
+        refs.$result.removeAttr('src');
+        refs.$audioEl.removeAttr('src');
+        refs.$videoEl.removeAttr('src');
+    }
+
+    function mostrarErrorEvidencia(refs, mensaje) {
+        detenerEvidenciaStream();
+        $body.removeData('vn-evidencia-estado');
+        resetUiEvidencia(refs);
+        showFb(false, '', mensaje);
+    }
+
+    function aplicarBlobEvidencia(refs, tipo, blob) {
+        if (!blob || !refs) return;
+        $body.data('vn-evidencia-blob', blob);
+        $body.data('vn-evidencia-tipo-media', tipo);
+        const prevUrl = $body.data('vn-evidencia-object-url');
+        if (prevUrl) {
+            try { URL.revokeObjectURL(prevUrl); } catch (e) { /* noop */ }
+        }
+        const url = URL.createObjectURL(blob);
+        $body.data('vn-evidencia-object-url', url);
+        refs.$stage.prop('hidden', false);
+        refs.$captura.prop('hidden', true);
+        refs.$recording.prop('hidden', true);
+        refs.$placeholder.prop('hidden', true);
+        refs.$preview.prop('hidden', true).removeAttr('src');
+        refs.$result.prop('hidden', true).removeAttr('src');
+        refs.$audioReplay.prop('hidden', true);
+        refs.$videoReplay.prop('hidden', true);
+        refs.$audioEl.removeAttr('src');
+        refs.$videoEl.removeAttr('src');
+        if (refs.$preview.length) refs.$preview[0].srcObject = null;
+
+        if (tipo === 'foto') {
+            refs.$result.attr('src', url).prop('hidden', false);
+        } else if (tipo === 'audio') {
+            refs.$audioEl.attr('src', url);
+            refs.$audioReplay.prop('hidden', false);
+            setEvidenciaAudioUi(refs, 'idle');
+        } else if (tipo === 'video') {
+            refs.$videoEl.attr('src', url);
+            refs.$videoReplay.prop('hidden', false);
+            setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'idle');
+        }
+        finalizarEvidencia(refs);
+    }
+
+    function finalizarEvidencia(refs) {
+        if (!evidenciaTieneCaptura(refs)) {
+            mostrarErrorEvidencia(refs, 'No se guardó la evidencia. Intenta otra vez.');
+            return;
+        }
+
+        if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
+        setEstadoEvidencia(refs, '', '');
+
+        refs.$stage.prop('hidden', false);
+        refs.$recording.prop('hidden', true);
+        refs.$captura.prop('hidden', true);
+        refs.$btn.prop('hidden', true).prop('disabled', true).addClass('is-done');
+        refs.$preview.prop('hidden', true);
+
+        const tieneFoto = !!refs.$result.attr('src');
+        const tieneAudio = !!refs.$audioEl.attr('src');
+        const tieneVideo = !!refs.$videoEl.attr('src');
+
+        refs.$result.prop('hidden', true);
+        refs.$audioReplay.prop('hidden', true);
+        refs.$videoReplay.prop('hidden', true);
+        refs.$placeholder.prop('hidden', true);
+
+        if (tieneFoto) {
+            refs.$result.prop('hidden', false);
+        } else if (tieneAudio) {
+            refs.$audioReplay.prop('hidden', false);
+            setEvidenciaAudioUi(refs, 'idle');
+        } else if (tieneVideo) {
+            refs.$videoReplay.prop('hidden', false);
+            setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'idle');
+        }
+
+        refs.$msg.prop('hidden', false);
+        $body.removeData('vn-evidencia-estado');
+        celebrarExito(false);
+        alCompletarActividad();
+    }
+
+    function iniciarGrabacionEvidencia(stream, tipo, sesion) {
+        if (typeof MediaRecorder === 'undefined') return null;
+        const mime = mimeGrabacionEvidencia(tipo);
+        let recorder;
+        try {
+            recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+        } catch (e) {
+            try { recorder = new MediaRecorder(stream); } catch (err) { return null; }
+        }
+        const chunks = [];
+        recorder.ondataavailable = function (e) {
+            if (e.data && e.data.size) chunks.push(e.data);
+        };
+        recorder._vnChunks = chunks;
+        recorder._vnSesion = sesion;
+        try { recorder.start(500); } catch (e) { return null; }
+        $body.data('vn-evidencia-recorder', recorder);
+        return recorder;
+    }
+
+    function capturarFotoEvidencia($preview, $result) {
+        return new Promise(function (resolve) {
+            const video = $preview[0];
+            if (!video) {
+                resolve(false);
+                return;
+            }
+            let resuelto = false;
+            const tomar = function () {
+                if (resuelto) return;
+                if (!video.videoWidth || !video.videoHeight) return;
+                resuelto = true;
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                $result.attr('src', dataUrl).prop('hidden', false);
+                if (typeof canvas.toBlob === 'function') {
+                    canvas.toBlob(function (blob) {
+                        if (blob) {
+                            $body.data('vn-evidencia-blob', blob);
+                            $body.data('vn-evidencia-tipo-media', 'foto');
+                        }
+                    }, 'image/jpeg', 0.9);
+                } else {
+                    $body.data('vn-evidencia-tipo-media', 'foto');
+                }
+                resolve(true);
+            };
+            if (video.readyState >= 2 && video.videoWidth) {
+                tomar();
+                return;
+            }
+            video.addEventListener('loadedmetadata', tomar, { once: true });
+            setTimeout(function () {
+                if (!resuelto) {
+                    resuelto = true;
+                    resolve(false);
+                }
+            }, 3500);
+        });
+    }
+
+    function detenerGrabacionEvidencia(refs, tipo, sesion) {
+        const recorder = $body.data('vn-evidencia-recorder');
+        if (!recorder || !recorder._vnChunks || recorder._vnSesion !== sesion) {
+            detenerEvidenciaStream();
+            return Promise.resolve(false);
+        }
+        return new Promise(function (resolve) {
+            recorder.onstop = function () {
+                if (recorder._vnSesion !== sesion || recorder._vnSesion !== evidenciaSesion) {
+                    resolve(false);
+                    return;
+                }
+                const blob = new Blob(recorder._vnChunks, {
+                    type: recorder.mimeType || mimeGrabacionEvidencia(tipo) || (tipo === 'audio' ? 'audio/mp4' : 'video/mp4'),
+                });
+                const url = URL.createObjectURL(blob);
+                $body.data('vn-evidencia-blob', blob);
+                $body.data('vn-evidencia-tipo-media', tipo);
+                $body.data('vn-evidencia-object-url', url);
+                if (tipo === 'video' && refs.$videoEl.length) {
+                    refs.$videoEl[0].srcObject = null;
+                    refs.$videoEl.attr('src', url);
+                } else if (tipo === 'audio' && refs.$audioEl.length) {
+                    refs.$audioEl.attr('src', url);
+                }
+                $body.data('vn-evidencia-recorder', null);
+                detenerEvidenciaStream();
+                resolve(blob.size > 0);
+            };
+            try { recorder.stop(); } catch (e) {
+                detenerEvidenciaStream();
+                resolve(false);
+            }
+        });
+    }
+
+    onBody('click', '[data-vn-evidencia-audio-play]', function () {
+        vincularElementos();
+        reproducirEvidenciaAudio(refsEvidencia($body));
+    });
+
+    onBody('click', '[data-vn-evidencia-video-play]', function () {
+        vincularElementos();
+        reproducirEvidenciaVideo(refsEvidencia($body));
+    });
+
+    onBody('change', '[data-vn-evidencia-file]', function () {
+        vincularElementos();
+        const file = this.files && this.files[0];
+        const refs = refsEvidencia($body);
+        this.value = '';
+        if (!file) return;
+        const tipo = String(file.type || '').indexOf('video/') === 0 ? 'video' : 'foto';
+        aplicarBlobEvidencia(refs, tipo, file);
+    });
+
     onBody('click', '[data-vn-evidencia]', function () {
-        $('#vnEvidenciaMsg').prop('hidden', false);
-        $(this).css('transform', 'scale(0.92)');
-        setTimeout(() => $(this).css('transform', ''), 180);
+        vincularElementos();
+        const refs = refsEvidencia($body);
+        const $btn = $(this);
+        if ($btn.prop('disabled')) return;
+        const tipo = String($btn.data('vn-evidencia-tipo') || 'foto');
+        const sesion = evidenciaSesion + 1;
+
+        if (tipo === 'seleccion' || (tipo === 'video' && !(window.VnCaptura && VnCaptura.hayNativo()))) {
+            const input = refs.$file[0];
+            if (input) input.click();
+            else mostrarErrorEvidencia(refs, tipo === 'seleccion' ? 'No pudimos abrir la galería.' : 'No pudimos abrir la cámara.');
+            return;
+        }
+
+        $btn.prop('disabled', true);
+        $body.find('#vnFb').prop('hidden', true);
+        setEstadoEvidencia(refs, '', '');
+
+        if (window.VnCaptura && VnCaptura.hayNativo()) {
+            if (tipo === 'foto') {
+                VnCaptura.fotoNativa()
+                    .then(function (blob) { aplicarBlobEvidencia(refs, tipo, blob); })
+                    .catch(function (err) {
+                        mostrarErrorEvidencia(refs, (err && err.message) || 'No se pudo tomar la fotografía.');
+                    })
+                    .finally(function () { $btn.prop('disabled', false); });
+                return;
+            }
+            if (tipo === 'video') {
+                VnCaptura.videoNativo()
+                    .then(function (blob) { aplicarBlobEvidencia(refs, tipo, blob); })
+                    .catch(function (err) {
+                        mostrarErrorEvidencia(refs, (err && err.message) || 'No se pudo grabar el video.');
+                    })
+                    .finally(function () { $btn.prop('disabled', false); });
+                return;
+            }
+            if (tipo === 'audio') {
+                VnCaptura.audioNativo.iniciar(function () {
+                    evidenciaSesion = sesion;
+                    iniciarUiGrabacionEvidencia(refs, sesion, true);
+                }).catch(function (err) {
+                    mostrarErrorEvidencia(refs, (err && err.message) || 'No se pudo iniciar la grabación.');
+                }).finally(function () { $btn.prop('disabled', false); });
+                return;
+            }
+        }
+
+        obtenerMediaEvidencia(tipo).then(function (stream) {
+            evidenciaSesion = sesion;
+            refs.$stage.prop('hidden', false);
+            refs.$btn.prop('hidden', true).prop('disabled', false);
+            refs.$captura.prop('hidden', false);
+            refs.$placeholder.prop('hidden', true);
+            refs.$result.prop('hidden', true).removeAttr('src');
+            refs.$audioReplay.prop('hidden', true);
+            refs.$videoReplay.prop('hidden', true);
+            refs.$audioEl.removeAttr('src');
+            refs.$videoEl.removeAttr('src');
+            refs.$preview.removeAttr('src');
+            $body.data('vn-evidencia-stream', stream);
+            $body.data('vn-evidencia-estado', { tipo: tipo, sesion: sesion, nativo: false });
+
+            if (tipo === 'audio') {
+                refs.$preview.prop('hidden', true);
+                refs.$recording.prop('hidden', false);
+                setEstadoEvidencia(refs, configNivel().simplificar ? '¡Graba!' : 'Grabando…', 'grabando');
+                if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
+                iniciarGrabacionEvidencia(stream, 'audio', sesion);
+            } else {
+                refs.$recording.prop('hidden', true);
+                refs.$preview.prop('hidden', false);
+                refs.$preview[0].srcObject = stream;
+                refs.$preview[0].controls = false;
+                refs.$preview[0].muted = true;
+                refs.$preview[0].setAttribute('playsinline', '');
+                refs.$preview[0].setAttribute('webkit-playsinline', '');
+                refs.$preview[0].play().catch(function () { /* noop */ });
+                setEstadoEvidencia(refs, configNivel().simplificar ? '¡Mira!' : 'Cámara activa', 'grabando');
+            }
+        }).catch(function (err) {
+            mostrarErrorEvidencia(refs, mensajeErrorEvidencia(err));
+        }).finally(function () {
+            $btn.prop('disabled', false);
+        });
+    });
+
+    onBody('click', '[data-vn-evidencia-captura]', function () {
+        vincularElementos();
+        const estado = $body.data('vn-evidencia-estado');
+        if (!estado) return;
+        const refs = refsEvidencia($body);
+        const tipo = estado.tipo;
+        const sesion = estado.sesion;
+
+        if (estado.nativo && tipo === 'audio' && window.VnCaptura) {
+            refs.$captura.prop('disabled', true);
+            VnCaptura.audioNativo.detener()
+                .then(function (blob) {
+                    if (estado.sesion !== evidenciaSesion) return;
+                    if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
+                    setEstadoEvidencia(refs, '', '');
+                    aplicarBlobEvidencia(refs, tipo, blob);
+                })
+                .catch(function (err) {
+                    if (estado.sesion !== evidenciaSesion) return;
+                    mostrarErrorEvidencia(refs, (err && err.message) || 'No se pudo guardar la grabación.');
+                })
+                .finally(function () { refs.$captura.prop('disabled', false); });
+            return;
+        }
+
+        if (tipo === 'foto') {
+            capturarFotoEvidencia(refs.$preview, refs.$result).then(function (ok) {
+                if (estado.sesion !== evidenciaSesion) return;
+                detenerEvidenciaStream();
+                setEstadoEvidencia(refs, '', '');
+                if (!ok) {
+                    mostrarErrorEvidencia(refs, 'Espera un momentito y vuelve a tocar Capturar.');
+                    return;
+                }
+                finalizarEvidencia(refs);
+            });
+            return;
+        }
+        if (tipo === 'audio') {
+            detenerGrabacionEvidencia(refs, tipo, sesion).then(function (ok) {
+                if (estado.sesion !== evidenciaSesion) return;
+                if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
+                setEstadoEvidencia(refs, '', '');
+                if (!ok) {
+                    mostrarErrorEvidencia(refs, 'No se pudo guardar la grabación. Intenta otra vez.');
+                    return;
+                }
+                finalizarEvidencia(refs);
+            });
+        }
+    });
+
+    onBody('click', '[data-vn-ra-listo]', function () {
+        $(this).addClass('is-done');
+        celebrarExito(false);
+        alCompletarActividad();
+    });
+
+    onBody('click', '.vn-media-zoomable img', function () {
+        const $media = $(this).closest('.vn-media');
+        $media.toggleClass('is-zoomed');
+        if ($media.hasClass('is-zoomed')) {
+            marcarBloqueVisto();
+        }
     });
 
     onBody('click', '[data-vn-emocion] .vn-emocion', function () {
         $body.find('.vn-emocion').removeClass('is-picked');
-        $(this).addClass('is-picked');
+        $(this).addClass('is-picked vn-emocion--pop');
+        setTimeout(() => { $(this).removeClass('vn-emocion--pop'); }, 450);
+        celebrarExito(false);
+        alCompletarActividad();
     });
 
     onBody('click', '[data-vn-pregunta] .vn-option', function () {
@@ -1977,18 +4341,22 @@
         const ok = String($(this).data('correcta')) === '1';
         $body.find('.vn-option').removeClass('is-ok is-bad');
         if (ok) {
-            $(this).addClass('is-ok');
+            $(this).addClass('is-ok vn-option--pop');
+            setTimeout(() => { $(this).removeClass('vn-option--pop'); }, 500);
             showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
+            registrarResultadoPregunta($box, $(this), true);
             $box.data('locked', true);
+            alCompletarActividad();
+            programarAvanceAutomatico();
             return;
         }
-        $(this).addClass('is-bad');
+        $(this).addClass('is-bad vn-option--shake');
+        setTimeout(() => { $(this).removeClass('vn-option--shake'); }, 450);
         showFb(false, $box.data('fb-ok'), $box.data('fb-err'));
         if (intentosRestantes !== Infinity) {
             intentosRestantes -= 1;
             if (intentosRestantes <= 0) {
-                $box.data('locked', true);
-                $body.find('.vn-option[data-correcta="1"]').addClass('is-ok');
+                aplicarAlAgotar($box);
             }
         }
     });
@@ -1999,32 +4367,28 @@
         const ok = String($(this).data('correcta')) === '1';
         $body.find('.vn-option').removeClass('is-ok is-bad');
         if (ok) {
-            $(this).addClass('is-ok');
+            $(this).addClass('is-ok vn-option--pop');
+            setTimeout(() => { $(this).removeClass('vn-option--pop'); }, 500);
             showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
             const total = Number($box.data('total-pasos')) || 1;
-            setTimeout(() => {
-                if (retoPaso < total - 1) {
-                    retoPaso += 1;
-                    pintar();
-                } else {
-                    $box.data('locked', true);
-                }
-            }, 650);
+            if (retoPaso < total - 1) {
+                $box.data('locked', true);
+                programarAvanceRetoPaso($box);
+            } else {
+                registrarResultadoReto($box, $(this), true);
+                $box.data('locked', true);
+                alCompletarActividad();
+                programarAvanceAutomatico();
+            }
             return;
         }
-        $(this).addClass('is-bad');
+        $(this).addClass('is-bad vn-option--shake');
+        setTimeout(() => { $(this).removeClass('vn-option--shake'); }, 450);
         showFb(false, $box.data('fb-ok'), $box.data('fb-err'));
         if (intentosRestantes !== Infinity) {
             intentosRestantes -= 1;
             if (intentosRestantes <= 0) {
-                $body.find('.vn-option[data-correcta="1"]').addClass('is-ok');
-                const total = Number($box.data('total-pasos')) || 1;
-                setTimeout(() => {
-                    if (retoPaso < total - 1) {
-                        retoPaso += 1;
-                        pintar();
-                    }
-                }, 800);
+                aplicarAlAgotar($box);
             }
         }
     });
@@ -2044,10 +4408,15 @@
         const $box = $body.find('[data-vn-emparejar]');
         const ok = izq === der;
         if (ok) {
-            $body.find(`[data-vn-izq="${izq}"], [data-vn-der="${der}"]`).addClass('is-matched').removeClass('is-selected');
+            const $izqBtn = $body.find(`[data-vn-izq="${izq}"]`);
+            const $derBtn = $body.find(`[data-vn-der="${der}"]`);
+            $izqBtn.add($derBtn).addClass('is-matched vn-chip--matched').removeClass('is-selected');
+            flashUnionEmparejar($izqBtn, $derBtn);
             showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
+            alCompletarActividad();
         } else {
             showFb(false, $box.data('fb-ok'), $box.data('fb-err'));
+            $body.data('vn-emp-fallos', Number($body.data('vn-emp-fallos') || 0) + 1);
             $body.find('[data-vn-izq]').removeClass('is-selected');
         }
         $body.data('emp-izq', null);
@@ -2064,7 +4433,7 @@
     onBody('click', '[data-vn-clasif] .vn-zone', function () {
         const $item = $body.data('pick-item');
         if (!$item || !$item.length) return;
-        const ok = String($item.data('cat')) === String($(this).data('vn-cat'));
+        const ok = String($item.attr('data-cat')) === String($(this).attr('data-vn-cat'));
         showFb(ok, '¡Muy bien!', 'Prueba otra categoría');
         if (ok) colocarChipEnZona($item, this);
         else {
@@ -2074,9 +4443,11 @@
         }
         $body.data('pick-item', null);
         $body.find('.vn-zone').removeClass('is-target');
+        alCompletarActividad();
     });
 
     function limpiarDragArrastrar() {
+        $(document).off('.vnArrDrag');
         const drag = $body.data('vn-drag');
         if (!drag) return;
         if (drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
@@ -2097,9 +4468,10 @@
         if ($(this).hasClass('is-matched')) return;
         if (e.button != null && e.button !== 0) return;
         e.preventDefault();
-        const $chip = $(this);
-        const rect = this.getBoundingClientRect();
-        const ghost = this.cloneNode(true);
+        const chipEl = this;
+        const $chip = $(chipEl);
+        const rect = chipEl.getBoundingClientRect();
+        const ghost = chipEl.cloneNode(true);
         ghost.classList.add('vn-drag-ghost');
         ghost.style.width = `${rect.width}px`;
         ghost.style.height = `${rect.height}px`;
@@ -2108,8 +4480,8 @@
         document.body.appendChild(ghost);
         $chip.addClass('is-dragging').attr('aria-grabbed', 'true');
         $body.find('[data-vn-arrastrar] .vn-zone').addClass('is-target');
-        try { this.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-        $body.data('vn-drag', {
+        try { chipEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        const drag = {
             $chip,
             ghost,
             pointerId: e.pointerId,
@@ -2118,40 +4490,116 @@
             moved: false,
             startX: e.clientX,
             startY: e.clientY,
-        });
+        };
+        $body.data('vn-drag', drag);
+
+        const onMove = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            ev.preventDefault();
+            const dx = ev.clientX - drag.startX;
+            const dy = ev.clientY - drag.startY;
+            if (Math.abs(dx) + Math.abs(dy) > 6) drag.moved = true;
+            drag.ghost.style.left = `${ev.clientX - drag.offsetX}px`;
+            drag.ghost.style.top = `${ev.clientY - drag.offsetY}px`;
+            $body.find('[data-vn-arrastrar] .vn-zone').removeClass('is-drop-hover');
+            const zone = zonaBajoPuntero(ev.clientX, ev.clientY);
+            if (zone) zone.classList.add('is-drop-hover');
+        };
+
+        const onUp = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            $(document).off('.vnArrDrag');
+            try { chipEl.releasePointerCapture(ev.pointerId); } catch (err) { /* ignore */ }
+            const zone = zonaBajoPuntero(ev.clientX, ev.clientY);
+            const $chipUp = drag.$chip;
+            limpiarDragArrastrar();
+            if (!zone || !drag.moved) return;
+            const ok = String($chipUp.attr('data-zona')) === String($(zone).attr('data-vn-zona'));
+            showFb(ok, '¡Muy bien!', 'Esa no es la zona');
+            if (ok) colocarChipEnZona($chipUp, zone);
+            else {
+                zone.classList.add('is-wrong');
+                setTimeout(() => { zone.classList.remove('is-wrong'); }, 400);
+            }
+        };
+
+        $(document).on('pointermove.vnArrDrag', onMove);
+        $(document).on('pointerup.vnArrDrag pointercancel.vnArrDrag', onUp);
     });
 
-    onBody('pointermove', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
-        const drag = $body.data('vn-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
+    function zonaClasifBajoPuntero(clientX, clientY) {
+        const el = document.elementFromPoint(clientX, clientY);
+        if (!el) return null;
+        return el.closest('[data-vn-clasif] .vn-zone');
+    }
+
+    onBody('pointerdown', '[data-vn-clasif-pool] .vn-chip-drag', function (e) {
+        if ($(this).hasClass('is-matched')) return;
+        if (e.button != null && e.button !== 0) return;
         e.preventDefault();
-        const dx = e.clientX - drag.startX;
-        const dy = e.clientY - drag.startY;
-        if (Math.abs(dx) + Math.abs(dy) > 6) drag.moved = true;
-        drag.ghost.style.left = `${e.clientX - drag.offsetX}px`;
-        drag.ghost.style.top = `${e.clientY - drag.offsetY}px`;
-        $body.find('[data-vn-arrastrar] .vn-zone').removeClass('is-drop-hover');
-        const zone = zonaBajoPuntero(e.clientX, e.clientY);
-        if (zone) zone.classList.add('is-drop-hover');
-    });
+        const chipEl = this;
+        const $chip = $(chipEl);
+        const rect = chipEl.getBoundingClientRect();
+        const ghost = chipEl.cloneNode(true);
+        ghost.classList.add('vn-drag-ghost');
+        ghost.style.width = `${rect.width}px`;
+        ghost.style.height = `${rect.height}px`;
+        ghost.style.left = `${rect.left}px`;
+        ghost.style.top = `${rect.top}px`;
+        document.body.appendChild(ghost);
+        $chip.addClass('is-dragging').attr('aria-grabbed', 'true');
+        $body.find('[data-vn-clasif] .vn-zone').addClass('is-target');
+        try { chipEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        const drag = {
+            $chip,
+            ghost,
+            pointerId: e.pointerId,
+            offsetX: e.clientX - rect.left,
+            offsetY: e.clientY - rect.top,
+            moved: false,
+            startX: e.clientX,
+            startY: e.clientY,
+        };
+        $body.data('vn-clasif-drag', drag);
 
-    onBody('pointerup pointercancel', '[data-vn-arrastrar-pool] .vn-chip-drag', function (e) {
-        const drag = $body.data('vn-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        const zone = zonaBajoPuntero(e.clientX, e.clientY);
-        const $chip = drag.$chip;
-        limpiarDragArrastrar();
-        if (!zone || !drag.moved) return;
-        const ok = String($chip.data('zona')) === String($(zone).data('vn-zona'));
-        showFb(ok, '¡Muy bien!', 'Esa no es la zona');
-        if (ok) colocarChipEnZona($chip, zone);
-        else {
-            zone.classList.add('is-wrong');
-            setTimeout(() => { zone.classList.remove('is-wrong'); }, 400);
-        }
+        const onMove = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            ev.preventDefault();
+            if (Math.abs(ev.clientX - drag.startX) + Math.abs(ev.clientY - drag.startY) > 6) drag.moved = true;
+            drag.ghost.style.left = `${ev.clientX - drag.offsetX}px`;
+            drag.ghost.style.top = `${ev.clientY - drag.offsetY}px`;
+            $body.find('[data-vn-clasif] .vn-zone').removeClass('is-drop-hover');
+            const zone = zonaClasifBajoPuntero(ev.clientX, ev.clientY);
+            if (zone) zone.classList.add('is-drop-hover');
+        };
+
+        const onUp = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            $(document).off('.vnClasifDrag');
+            try { chipEl.releasePointerCapture(ev.pointerId); } catch (err) { /* ignore */ }
+            const zone = zonaClasifBajoPuntero(ev.clientX, ev.clientY);
+            const $chipUp = drag.$chip;
+            if (drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
+            $chipUp.removeClass('is-dragging').attr('aria-grabbed', 'false');
+            $body.find('[data-vn-clasif] .vn-zone').removeClass('is-target is-drop-hover');
+            $body.data('vn-clasif-drag', null);
+            if (!zone || !drag.moved) return;
+            const ok = String($chipUp.attr('data-cat')) === String($(zone).attr('data-vn-cat'));
+            showFb(ok, '¡Muy bien!', 'Prueba otra categoría');
+            if (ok) colocarChipEnZona($chipUp, zone);
+            else {
+                zone.classList.add('is-wrong');
+                setTimeout(() => { zone.classList.remove('is-wrong'); }, 400);
+            }
+            alCompletarActividad();
+        };
+
+        $(document).on('pointermove.vnClasifDrag', onMove);
+        $(document).on('pointerup.vnClasifDrag pointercancel.vnClasifDrag', onUp);
     });
 
     function limpiarDragPuzzle() {
+        $(document).off('.vnPuzzleDrag');
         const drag = $body.data('vn-puzzle-drag');
         if (!drag) return;
         if (drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
@@ -2160,10 +4608,56 @@
         $body.data('vn-puzzle-drag', null);
     }
 
-    function slotPuzzleBajoPuntero(clientX, clientY) {
+    function limpiarSeleccionPuzzle() {
+        if (!$body || !$body.length) return;
+        $body.find('.vn-puzzle-piece.is-selected').removeClass('is-selected');
+    }
+
+    function colocarPiezaPuzzle($piece, $slot) {
+        const pieceIdx = Number($piece.data('vn-puzzle-piece'));
+        const slotIdx = Number($slot.data('vn-puzzle-slot'));
+        if (pieceIdx !== slotIdx) {
+            showFb(false, '¡Ups!', configNivel().simplificar ? '¡Otra!' : 'Esa pieza no va ahí');
+            return false;
+        }
+        $piece.addClass('is-placed').removeClass('is-selected').prop('disabled', true);
+        $slot.addClass('is-filled').empty().append($piece);
+        celebrarExito(false);
+        revisarPuzzleCompleto();
+        return true;
+    }
+
+    function slotPuzzleBajoPuntero(clientX, clientY, pieceIdx) {
+        const drag = $body.data('vn-puzzle-drag');
+        if (drag && drag.ghost) {
+            const gr = drag.ghost.getBoundingClientRect();
+            clientX = gr.left + gr.width / 2;
+            clientY = gr.top + gr.height / 2;
+        }
+
         const el = document.elementFromPoint(clientX, clientY);
-        if (!el) return null;
-        return el.closest('.vn-puzzle-slot:not(.is-filled)');
+        const hit = el ? el.closest('.vn-puzzle-slot:not(.is-filled)') : null;
+        if (hit) return hit;
+        const $slots = $body.find('.vn-puzzle-slot:not(.is-filled)');
+        let best = null;
+        let bestDist = Infinity;
+        const tol = esModoDispositivo() ? 1.1 : 0.7;
+        $slots.each(function () {
+            const r = this.getBoundingClientRect();
+            if (r.width < 4 || r.height < 4) return;
+            const cx = r.left + r.width / 2;
+            const cy = r.top + r.height / 2;
+            const dist = Math.hypot(clientX - cx, clientY - cy);
+            const radio = Math.max(r.width, r.height) * tol;
+            if (dist > radio) return;
+            const idx = Number($(this).data('vn-puzzle-slot'));
+            const prefer = pieceIdx === idx ? dist * 0.4 : dist;
+            if (prefer < bestDist) {
+                bestDist = prefer;
+                best = this;
+            }
+        });
+        return best;
     }
 
     function revisarPuzzleCompleto() {
@@ -2174,16 +4668,19 @@
         if (total > 0 && filled >= total) {
             showFb(true, '¡Rompecabezas listo!', '');
             $puzzle.addClass('is-complete');
+            alCompletarActividad();
         }
     }
 
     onBody('pointerdown', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
         if ($(this).hasClass('is-placed')) return;
         if (e.button != null && e.button !== 0) return;
+        limpiarSeleccionPuzzle();
         e.preventDefault();
-        const $piece = $(this);
-        const rect = this.getBoundingClientRect();
-        const ghost = this.cloneNode(true);
+        const pieceEl = this;
+        const $piece = $(pieceEl);
+        const rect = pieceEl.getBoundingClientRect();
+        const ghost = pieceEl.cloneNode(true);
         ghost.classList.add('vn-drag-ghost', 'vn-puzzle-ghost');
         ghost.style.width = `${rect.width}px`;
         ghost.style.height = `${rect.height}px`;
@@ -2192,8 +4689,9 @@
         document.body.appendChild(ghost);
         $piece.addClass('is-dragging');
         $body.find('.vn-puzzle-slot:not(.is-filled)').addClass('is-target');
-        try { this.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-        $body.data('vn-puzzle-drag', {
+        try { pieceEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        const pieceIdx = Number($piece.data('vn-puzzle-piece'));
+        const drag = {
             $piece,
             ghost,
             pointerId: e.pointerId,
@@ -2202,40 +4700,51 @@
             moved: false,
             startX: e.clientX,
             startY: e.clientY,
-        });
+        };
+        $body.data('vn-puzzle-drag', drag);
+
+        const onMove = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            ev.preventDefault();
+            if (Math.abs(ev.clientX - drag.startX) + Math.abs(ev.clientY - drag.startY) > 6) drag.moved = true;
+            drag.ghost.style.left = `${ev.clientX - drag.offsetX}px`;
+            drag.ghost.style.top = `${ev.clientY - drag.offsetY}px`;
+            $body.find('.vn-puzzle-slot').removeClass('is-drop-hover');
+            const slot = slotPuzzleBajoPuntero(ev.clientX, ev.clientY, pieceIdx);
+            if (slot) slot.classList.add('is-drop-hover');
+        };
+
+        const onUp = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            $(document).off('.vnPuzzleDrag');
+            try { pieceEl.releasePointerCapture(ev.pointerId); } catch (err) { /* ignore */ }
+            const slot = slotPuzzleBajoPuntero(ev.clientX, ev.clientY, pieceIdx);
+            const $pieceUp = drag.$piece;
+            limpiarDragPuzzle();
+            if (!drag.moved) {
+                if (esModoDispositivo()) {
+                    limpiarSeleccionPuzzle();
+                    $pieceUp.addClass('is-selected');
+                }
+                return;
+            }
+            if (!slot) return;
+            colocarPiezaPuzzle($pieceUp, $(slot));
+        };
+
+        $(document).on('pointermove.vnPuzzleDrag', onMove);
+        $(document).on('pointerup.vnPuzzleDrag pointercancel.vnPuzzleDrag', onUp);
     });
 
-    onBody('pointermove', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
-        const drag = $body.data('vn-puzzle-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        e.preventDefault();
-        if (Math.abs(e.clientX - drag.startX) + Math.abs(e.clientY - drag.startY) > 6) drag.moved = true;
-        drag.ghost.style.left = `${e.clientX - drag.offsetX}px`;
-        drag.ghost.style.top = `${e.clientY - drag.offsetY}px`;
-        $body.find('.vn-puzzle-slot').removeClass('is-drop-hover');
-        const slot = slotPuzzleBajoPuntero(e.clientX, e.clientY);
-        if (slot) slot.classList.add('is-drop-hover');
-    });
-
-    onBody('pointerup pointercancel', '.vn-puzzle-pool .vn-puzzle-piece', function (e) {
-        const drag = $body.data('vn-puzzle-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        const slot = slotPuzzleBajoPuntero(e.clientX, e.clientY);
-        const $piece = drag.$piece;
-        const pieceIdx = Number($piece.data('vn-puzzle-piece'));
-        limpiarDragPuzzle();
-        if (!slot || !drag.moved) return;
-        const slotIdx = Number($(slot).data('vn-puzzle-slot'));
-        if (pieceIdx === slotIdx) {
-            $piece.addClass('is-placed').prop('disabled', true);
-            $(slot).addClass('is-filled').empty().append($piece);
-            revisarPuzzleCompleto();
-        } else {
-            showFb(false, '¡Bien!', 'Esa pieza no va ahí');
-        }
+    onBody('pointerup', '.vn-puzzle-slot:not(.is-filled)', function (e) {
+        if (e.button != null && e.button !== 0) return;
+        const $sel = $body.find('.vn-puzzle-pool .vn-puzzle-piece.is-selected');
+        if (!$sel.length) return;
+        colocarPiezaPuzzle($sel, $(this));
     });
 
     function limpiarDragSecuencia() {
+        $(document).off('.vnSeqDrag');
         const drag = $body.data('vn-seq-drag');
         if (!drag) return;
         if (drag.ghost && drag.ghost.parentNode) drag.ghost.parentNode.removeChild(drag.ghost);
@@ -2263,6 +4772,7 @@
             showFb(true, '¡Orden correcto!', '');
             $root.addClass('is-complete');
             $root.find('[data-vn-seq-card]').prop('disabled', true);
+            alCompletarActividad();
         } else {
             const $fb = $('#vnFb');
             if ($fb.length) $fb.prop('hidden', true).removeClass('is-ok is-bad').text('');
@@ -2273,9 +4783,10 @@
         if ($(this).prop('disabled')) return;
         if (e.button != null && e.button !== 0) return;
         e.preventDefault();
-        const $card = $(this);
-        const rect = this.getBoundingClientRect();
-        const ghost = this.cloneNode(true);
+        const cardEl = this;
+        const $card = $(cardEl);
+        const rect = cardEl.getBoundingClientRect();
+        const ghost = cardEl.cloneNode(true);
         ghost.classList.add('vn-drag-ghost', 'vn-seq-ghost');
         ghost.style.width = `${rect.width}px`;
         ghost.style.height = `${rect.height}px`;
@@ -2283,8 +4794,8 @@
         ghost.style.top = `${rect.top}px`;
         document.body.appendChild(ghost);
         $card.addClass('is-dragging');
-        try { this.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
-        $body.data('vn-seq-drag', {
+        try { cardEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        const drag = {
             $card,
             ghost,
             pointerId: e.pointerId,
@@ -2293,37 +4804,41 @@
             moved: false,
             startX: e.clientX,
             startY: e.clientY,
-        });
-    });
+        };
+        $body.data('vn-seq-drag', drag);
 
-    onBody('pointermove', '[data-vn-seq-card]', function (e) {
-        const drag = $body.data('vn-seq-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        e.preventDefault();
-        if (Math.abs(e.clientX - drag.startX) + Math.abs(e.clientY - drag.startY) > 6) drag.moved = true;
-        drag.ghost.style.left = `${e.clientX - drag.offsetX}px`;
-        drag.ghost.style.top = `${e.clientY - drag.offsetY}px`;
-        $body.find('.vn-seq-card').removeClass('is-drop-hover');
-        const target = cardSecuenciaBajoPuntero(e.clientX, e.clientY, drag.$card[0]);
-        if (target) target.classList.add('is-drop-hover');
-    });
+        const onMove = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            ev.preventDefault();
+            if (Math.abs(ev.clientX - drag.startX) + Math.abs(ev.clientY - drag.startY) > 6) drag.moved = true;
+            drag.ghost.style.left = `${ev.clientX - drag.offsetX}px`;
+            drag.ghost.style.top = `${ev.clientY - drag.offsetY}px`;
+            $body.find('.vn-seq-card').removeClass('is-drop-hover');
+            const target = cardSecuenciaBajoPuntero(ev.clientX, ev.clientY, drag.$card[0]);
+            if (target) target.classList.add('is-drop-hover');
+        };
 
-    onBody('pointerup pointercancel', '[data-vn-seq-card]', function (e) {
-        const drag = $body.data('vn-seq-drag');
-        if (!drag || drag.pointerId !== e.pointerId) return;
-        const target = cardSecuenciaBajoPuntero(e.clientX, e.clientY, drag.$card[0]);
-        const $card = drag.$card;
-        const moved = drag.moved;
-        limpiarDragSecuencia();
-        if (!moved || !target) return;
-        const $target = $(target);
-        const rect = target.getBoundingClientRect();
-        if (e.clientX < rect.left + rect.width / 2) {
-            $target.before($card);
-        } else {
-            $target.after($card);
-        }
-        revisarSecuenciaOrden();
+        const onUp = function (ev) {
+            if (ev.pointerId !== drag.pointerId) return;
+            $(document).off('.vnSeqDrag');
+            try { cardEl.releasePointerCapture(ev.pointerId); } catch (err) { /* ignore */ }
+            const target = cardSecuenciaBajoPuntero(ev.clientX, ev.clientY, drag.$card[0]);
+            const $cardUp = drag.$card;
+            const moved = drag.moved;
+            limpiarDragSecuencia();
+            if (!moved || !target) return;
+            const $target = $(target);
+            const rectT = target.getBoundingClientRect();
+            if (ev.clientX < rectT.left + rectT.width / 2) {
+                $target.before($cardUp);
+            } else {
+                $target.after($cardUp);
+            }
+            revisarSecuenciaOrden();
+        };
+
+        $(document).on('pointermove.vnSeqDrag', onMove);
+        $(document).on('pointerup.vnSeqDrag pointercancel.vnSeqDrag', onUp);
     });
 
     onBody('click', '[data-vn-memory] .vn-memory-card', function () {
@@ -2334,7 +4849,14 @@
 
         const pair = String($card.data('pair'));
         const url = mediaUrl(pair);
-        $card.addClass('is-flipped').html(url ? `<img src="${escapar(url)}" alt="">` : '★');
+        $card.addClass('is-flipped vn-memory-card--flip');
+        setTimeout(() => { $card.removeClass('vn-memory-card--flip'); }, 380);
+        if (url) {
+            $card.find('.vn-memory-back').remove();
+            $card.append(`<img src="${escapar(url)}" alt="" class="vn-memory-front">`);
+        } else {
+            $card.find('.vn-memory-back').text('★');
+        }
         flipped.push($card);
         $body.data('mem-flipped', flipped);
 
@@ -2345,17 +4867,24 @@
             a.addClass('is-done');
             b.addClass('is-done');
             $body.data('mem-flipped', []);
+            actualizarScoreMemoria();
+            celebrarExito(false);
             const total = $body.find('[data-vn-memory] .vn-memory-card').length;
             const done = $body.find('[data-vn-memory] .vn-memory-card.is-done').length;
             if (total > 0 && done >= total) {
                 showFb(true, '¡Todas las parejas!', '');
+                alCompletarActividad();
             }
         } else {
+            $body.data('vn-mem-intentos', Number($body.data('vn-mem-intentos') || 0) + 1);
             setTimeout(() => {
-                a.removeClass('is-flipped').text('?');
-                b.removeClass('is-flipped').text('?');
+                a.removeClass('is-flipped').find('img, .vn-memory-front').remove();
+                b.removeClass('is-flipped').find('img, .vn-memory-front').remove();
+                if (!a.find('.vn-memory-back').length) a.prepend('<span class="vn-memory-back" aria-hidden="true">?</span>');
+                if (!b.find('.vn-memory-back').length) b.prepend('<span class="vn-memory-back" aria-hidden="true">?</span>');
                 $body.data('mem-flipped', []);
-            }, 700);
+                reproducirSfx('err');
+            }, 750);
         }
     });
 

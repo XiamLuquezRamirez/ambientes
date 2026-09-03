@@ -8,6 +8,26 @@
         : ($puedeEditar
             ? 'Solo el creador puede publicar o cambiar el estado de esta experiencia'
             : 'No tiene permiso para publicar');
+    $gnPreview = mb_strtolower($experiencia->grado->nombre ?? '');
+    $nivelPreview = 'jardin';
+    if (str_contains($gnPreview, 'prejardín') || str_contains($gnPreview, 'prejardin')) {
+        $nivelPreview = 'prejardin';
+    } elseif (str_contains($gnPreview, 'jardín') || str_contains($gnPreview, 'jardin')) {
+        $nivelPreview = 'jardin';
+    } elseif (str_contains($gnPreview, 'transición') || str_contains($gnPreview, 'transicion')) {
+        $nivelPreview = 'transicion';
+    } elseif (str_contains($gnPreview, 'primaria') || (int) ($experiencia->grado->edad_anos ?? 0) >= 6) {
+        $nivelPreview = 'primaria';
+    }
+    $urlJuegosCatalogo = $urls['juegos_catalogo'] ?? '';
+    $juegosFiltros = app(\App\Services\JuegoCatalogoService::class)->opcionesFiltro();
+    $juegosFiltros['filtros'] = [];
+    $juegosFiltros['texto_busqueda'] = '';
+    $juegosFiltros['soloActivos'] = true;
+    $juegosFiltros['mostrarVista'] = false;
+    $juegosFiltros['compacto'] = true;
+    $juegosFiltros['formId'] = 'formFiltrosJuegosConstructor';
+    $juegosFiltros['formAction'] = $urlJuegosCatalogo;
 @endphp
 
 <div class="page-header tematicas-page-header cx-page-header">
@@ -34,8 +54,10 @@
 <div class="cx-app" data-puede-editar="{{ $puedeEditar ? '1' : '0' }}"
     data-puede-publicar="{{ $puedePublicar ? '1' : '0' }}" data-experiencia-id="{{ $experiencia->id }}"
     data-experiencia-nombre="{{ $experiencia->nombre }}"
+    data-url-juegos-catalogo="{{ $urlJuegosCatalogo }}"
     data-media-base="{{ asset('storage/experiencias/' . $experiencia->id . '/bloques') }}"
     data-estudiante-sexo="masculino"
+    data-nivel-etario="{{ $nivelPreview }}"
     data-emociones-base="{{ asset('assets/images/emociones') }}"
     data-experiencia-estado="{{ $experiencia->estado }}" data-url-listar="{{ $urls['listar'] }}"
     data-url-guardar="{{ $urls['guardar'] }}" data-url-reordenar="{{ $urls['reordenar'] }}"
@@ -101,15 +123,15 @@
         <button type="button" class="vn-close" data-vn-close title="Cerrar vista niño" aria-label="Cerrar">
             <i class="fa-solid fa-xmark"></i>
         </button>
+        <button type="button" class="vn-reload-btn" id="vnBtnRecargar" title="Recargar experiencia (provisional)"
+            aria-label="Recargar experiencia">
+            <i class="fa-solid fa-rotate"></i>
+        </button>
         <div class="vn-tablet-stage" id="vnTabletStage">
             <div class="vn-tablet" id="vnTablet" data-screen-w="1280" data-screen-h="800">
                 <div class="vn-tablet-bezel">
                     <div class="vn-tablet-camera" aria-hidden="true"></div>
                     <div class="vn-tablet-screen" id="vnTabletScreen">
-                        <header class="vn-screen-top">
-                            <div class="vn-progress" id="vnProgress" aria-hidden="true"></div>
-                            <p class="vn-step-label" id="vnStepLabel">Paso 1 de 1</p>
-                        </header>
                         <div class="vn-screen-body" id="vnScreenBody"></div>
                         <footer class="vn-screen-nav">
                             <button type="button" class="vn-nav-btn vn-nav-prev" id="vnBtnPrev"
@@ -117,13 +139,17 @@
                                 <i class="fa-solid fa-arrow-left"></i>
                                 <span>Atrás</span>
                             </button>
-                            <div class="vn-nav-meta">
-                                <strong id="vnTitle">Vista niño</strong>
-                                <span id="vnBlockName">Bienvenida</span>
+                            <div class="vn-nav-center" aria-label="Progreso de la experiencia">
+                                <div class="vn-progress" id="vnProgress" aria-hidden="true"></div>
+                                <p class="vn-step-label" id="vnStepLabel">Paso 1 de 1</p>
+                                <div class="vn-nav-meta">
+                                    <strong id="vnTitle">Vista niño</strong>
+                                    <span id="vnBlockName">Bienvenida</span>
+                                </div>
                             </div>
                             <button type="button" class="vn-nav-btn vn-nav-next" id="vnBtnNext"
                                 aria-label="Siguiente">
-                                <span>Siguiente</span>
+                                <span>¡Sigue!</span>
                                 <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </footer>
@@ -133,5 +159,50 @@
             </div>
         </div>
         <p class="vn-hint">Vista previa 1280×800 · horizontal · el niño navega bloque por bloque</p>
+    </div>
+</div>
+
+{{-- Modal: catálogo de juegos --}}
+<div class="modal fade modal-app cx-modal-juegos" id="cxModalJuegosModulo" tabindex="-1"
+    aria-labelledby="cxModalJuegosModuloLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-icon">
+                    <i class="fa-solid fa-gamepad text-white"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="modal-title mb-0" id="cxModalJuegosModuloLabel">Catálogo de juegos</h5>
+                    <p class="modal-subtitle mb-0" id="cxModalJuegosModuloSubtitle">Filtra y elige un juego para el bloque</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="cx-juegos-filtros-panel">
+                    <div class="cx-juegos-filtros-head">
+                        <i class="fa-solid fa-filter" aria-hidden="true"></i>
+                        <span>Filtrar catálogo</span>
+                    </div>
+                    @include('partials.juegos._filtros', $juegosFiltros)
+                </div>
+                <div id="cxJuegosModuloResumen" class="cx-juegos-modal-resumen" hidden></div>
+                <div id="cxJuegosModuloLoading" class="cx-juegos-modal-loading text-center py-4" hidden>
+                    <i class="fa-solid fa-spinner fa-spin fa-2x text-primary"></i>
+                    <p class="mt-2 mb-0 text-muted">Cargando juegos…</p>
+                </div>
+                <div id="cxJuegosModuloError" class="alert alert-warning mb-3" hidden></div>
+                <div id="cxJuegosModuloLista" class="students-grid cx-juegos-catalogo-grid" role="radiogroup"
+                    aria-label="Catálogo de juegos" aria-live="polite"></div>
+                <div id="cxJuegosModuloPaginacion" class="paginacion-wrapper mt-3" hidden></div>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <p class="cx-juegos-modal-hint mb-0 text-muted">
+                    <i class="fa-solid fa-hand-pointer"></i> Haz clic en una tarjeta para usar el juego en el bloque
+                </p>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
     </div>
 </div>

@@ -197,6 +197,49 @@
     background: #fff;
 }
 
+/* Portada con imagen de fondo completa (cabecera + ilustración en un solo PNG) */
+.rn-portada--con-fondo {
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+}
+
+.rn-portada-fondo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: top center;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Pantallas medianas/grandes: llena el viewport (imágenes 1920×1080) */
+@media (min-width: 600px), (min-height: 500px) {
+    .rn-portada-fondo {
+        object-fit: cover;
+        object-position: top left;
+    }
+}
+
+.rn-portada--con-fondo .rn-portada-cuerpo {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: clamp(72px, 14vh, 120px) clamp(12px, 5vw, 72px) clamp(88px, 16vh, 172px);
+    pointer-events: none;
+}
+
+.rn-portada--con-fondo .rn-portada-accion {
+    pointer-events: auto;
+}
+
 .rn-portada-banner {
     position: relative;
     flex: 0 0 auto;
@@ -381,6 +424,18 @@
         flex-direction: column;
         justify-content: center;
         padding-bottom: 28px;
+    }
+
+    .rn-portada--con-fondo .rn-portada-cuerpo {
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        padding: clamp(72px, 12vh, 100px) clamp(16px, 5vw, 32px) clamp(100px, 18vh, 180px);
+    }
+
+    .rn-portada-fondo {
+        object-fit: contain;
+        object-position: top center;
     }
 
     .rn-portada-ilustracion {

@@ -9,6 +9,7 @@
 
     const puedeEditar = String($app.data('puede-editar')) === '1';
     const puedePublicar = String($app.data('puede-publicar')) === '1';
+    const urlJuegosCatalogo = String($app.data('url-juegos-catalogo') || '');
     const csrf = $('meta[name="csrf-token"]').attr('content');
 
     const urls = {
@@ -38,6 +39,46 @@
     const $configHead = $('#cxConfigHead');
     const $configBody = $('#cxConfigBody');
     const $saveStatus = $('#cxSaveStatus');
+    const $secuenciaScroll = $('.cx-secuencia-scroll');
+
+    let syncScrollLock = false;
+
+    function scrollSyncHabilitado() {
+        return window.matchMedia('(min-width: 1201px)').matches;
+    }
+
+    function ratioScroll(el) {
+        const max = el.scrollHeight - el.clientHeight;
+        if (max <= 0) return 0;
+        return el.scrollTop / max;
+    }
+
+    function aplicarRatioScroll(el, ratio) {
+        const max = el.scrollHeight - el.clientHeight;
+        el.scrollTop = max > 0 ? ratio * max : 0;
+    }
+
+    function targetsScrollLaterales() {
+        const targets = [$catalogo[0]];
+        if ($configPanel.length && !$configPanel.prop('hidden') && $configBody.length) {
+            targets.push($configBody[0]);
+        }
+        return targets.filter(Boolean);
+    }
+
+    function sincronizarLateralesDesdeSecuencia() {
+        if (!scrollSyncHabilitado() || syncScrollLock) return;
+        const origen = $secuenciaScroll[0];
+        if (!origen) return;
+
+        syncScrollLock = true;
+        const ratio = ratioScroll(origen);
+        targetsScrollLaterales().forEach((el) => aplicarRatioScroll(el, ratio));
+        syncScrollLock = false;
+    }
+
+    $secuenciaScroll.on('scroll', sincronizarLateralesDesdeSecuencia);
+    window.addEventListener('resize', sincronizarLateralesDesdeSecuencia, { passive: true });
 
     function parseJsonScript(id, fallback) {
         const el = document.getElementById(id);
@@ -227,6 +268,7 @@
         actualizarResumen();
         renderCatalogo();
         initSortable();
+        requestAnimationFrame(sincronizarLateralesDesdeSecuencia);
     }
 
     function initSortable() {
@@ -316,14 +358,16 @@
 
     /* ── Formularios ────────────────────────────────────────── */
 
-    function detenerAudiosConfig() {
-        $configBody.find('.cx-audio-el').each(function () {
+    function detenerMediosConfig() {
+        $configBody.find('.cx-audio-el, .cx-video-el').each(function () {
             try {
                 this.pause();
                 this.currentTime = 0;
             } catch (e) { /* noop */ }
         });
-        $configBody.find('.cx-audio-play-btn i').removeClass('fa-pause').addClass('fa-play');
+        $configBody.find('.cx-audio-play-btn i, .cx-video-play-btn i')
+            .removeClass('fa-pause').addClass('fa-play');
+        $configBody.find('.cx-video-preview-frame').removeClass('is-playing');
         if (window.speechSynthesis) {
             try { window.speechSynthesis.cancel(); } catch (e) { /* noop */ }
         }
@@ -372,6 +416,146 @@
                 <select class="form-select cx-input" data-field="${escapar(name)}" ${puedeEditar ? '' : 'disabled'}>
                     ${opts}
                 </select>
+            </div>`;
+    }
+
+    const JUEGOS_OPCIONES = [
+        {
+            id: 'rompecabezas',
+            nombre: 'Rompecabezas',
+            desc: 'Armar la imagen arrastrando piezas',
+            icon: 'fa-puzzle-piece',
+            color: '#d97706',
+        },
+        {
+            id: 'memoria',
+            nombre: 'Memoria',
+            desc: 'Encontrar parejas de imágenes iguales',
+            icon: 'fa-clone',
+            color: '#0284c7',
+        },
+        {
+            id: 'colorear',
+            nombre: 'Colorear',
+            desc: 'Pintar sobre una imagen en blanco y negro',
+            icon: 'fa-palette',
+            color: '#a855f7',
+        },
+        {
+            id: 'secuencia',
+            nombre: 'Secuencia',
+            desc: 'Ordenar imágenes en el paso correcto',
+            icon: 'fa-arrow-down-wide-short',
+            color: '#0f6e56',
+        },
+    ];
+
+    function juegoCatalogoCardHtml(j, selectedCatalogoId) {
+        const motorId = j.tipo || j.id;
+        const catalogoId = j.tipo ? j.id : null;
+        const selected = catalogoId && String(catalogoId) === String(selectedCatalogoId || '');
+        const icon = j.icon || j.icono || 'fa-gamepad';
+        const iconClass = icon.indexOf('fa-') === 0 ? icon : `fa-${icon}`;
+        const color = j.color || '#2563eb';
+        const cadena = j.cadena || {};
+        const tipoLabel = j.tipo_label || motorId;
+        const descripcion = (j.descripcion || '').trim();
+
+        const badges = [];
+        if (cadena.ambiente_nombre) {
+            badges.push(`<span class="stu-badge">${escapar(cadena.ambiente_nombre)}</span>`);
+        }
+        if (cadena.modulo_nombre) {
+            badges.push(`<span class="stu-badge stu-badge--perfil-aprendizaje">${escapar(cadena.modulo_nombre)}</span>`);
+        }
+        if (cadena.eje_nombre) {
+            badges.push(`<span class="stu-badge">${escapar(cadena.eje_nombre)}</span>`);
+        }
+        if (cadena.tematica_nombre) {
+            badges.push(`<span class="stu-badge">${escapar(cadena.tematica_nombre)}</span>`);
+        }
+        if (j.tipo) {
+            badges.push(`<span class="stu-badge stu-badge--apoyo">${escapar(tipoLabel)}</span>`);
+        }
+
+        const badgesHtml = badges.length
+            ? `<div class="student-middle">${badges.join('')}</div>`
+            : '';
+
+        return `<button type="button"
+            class="cx-juego-catalogo-card student-card${selected ? ' is-selected' : ''}"
+            data-juego-id="${escapar(motorId)}"
+            data-juego-catalogo-id="${escapar(catalogoId || '')}"
+            data-juego-nombre="${escapar(j.nombre || '')}"
+            aria-pressed="${selected ? 'true' : 'false'}"
+            ${puedeEditar ? '' : 'disabled'}>
+            <span class="cx-juego-catalogo-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+            <div class="student-top">
+                <div class="student-avatar initials d-flex align-items-center justify-content-center"
+                    style="background:${escapar(color)};color:#fff;font-size:1.25rem;">
+                    <i class="fa-solid ${escapar(iconClass)}"></i>
+                </div>
+                <div class="student-identity">
+                    <h5>${escapar(j.nombre || 'Sin nombre')}</h5>
+                    <small>${escapar(tipoLabel)}</small>
+                </div>
+            </div>
+            ${badgesHtml}
+            <div class="student-info">
+                <small class="text-muted">${escapar(descripcion || 'Sin descripción')}</small>
+            </div>
+            <div class="cx-juego-catalogo-foot">
+                <span class="cx-juego-catalogo-action">${selected ? 'Seleccionado' : 'Usar este juego'}</span>
+            </div>
+        </button>`;
+    }
+
+    function juegoCardHtml(j, selectedMotorId, selectedCatalogoId) {
+        const motorId = j.tipo || j.id;
+        const catalogoId = j.tipo ? j.id : null;
+        const selected = catalogoId
+            ? String(catalogoId) === String(selectedCatalogoId || '')
+            : (!selectedCatalogoId && String(motorId) === String(selectedMotorId || ''));
+        const icon = j.icon || j.icono || 'fa-gamepad';
+        const iconClass = icon.indexOf('fa-') === 0 ? icon : `fa-${icon}`;
+        const cadena = j.cadena || {};
+        const meta = [cadena.ambiente_nombre, cadena.modulo_nombre, cadena.eje_nombre, cadena.tematica_nombre]
+            .filter(Boolean)
+            .join(' · ');
+        const desc = j.desc || j.descripcion || meta || '';
+        return `<button type="button" class="cx-juego-card${selected ? ' is-selected' : ''}"
+            data-juego-id="${escapar(motorId)}" data-juego-catalogo-id="${escapar(catalogoId || '')}"
+            data-juego-nombre="${escapar(j.nombre || '')}" aria-pressed="${selected ? 'true' : 'false'}"
+            ${puedeEditar ? '' : 'disabled'}>
+            <span class="cx-juego-card-icon" style="--cx-juego-color:${escapar(j.color || '#2563eb')}">
+                <i class="fa-solid ${escapar(iconClass)}" aria-hidden="true"></i>
+            </span>
+            <span class="cx-juego-card-body">
+                <span class="cx-juego-card-name">${escapar(j.nombre)}</span>
+                <span class="cx-juego-card-desc">${escapar(desc)}</span>
+            </span>
+        </button>`;
+    }
+
+    function fieldJuegoPicker(name, label, datos) {
+        const value = datos?.juego_id || '';
+        const catalogoId = datos?.juego_catalogo_id || '';
+        const cards = JUEGOS_OPCIONES.map((j) => juegoCardHtml(j, value, catalogoId)).join('');
+        const btnCatalogo = (urlJuegosCatalogo && puedeEditar)
+            ? `<div class="cx-inline-actions mb-2">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="cxBtnJuegosModulo">
+                    <i class="fa-solid fa-gamepad"></i> Catálogo de juegos
+                </button>
+               </div>`
+            : '';
+        return `
+            <div class="cx-field">
+                <label>${escapar(label)}</label>
+                ${btnCatalogo}
+                <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(value || '')}">
+                <input type="hidden" class="cx-input" data-field="juego_catalogo_id" value="${escapar(catalogoId || '')}">
+                <div class="cx-juego-picker" role="radiogroup" aria-label="${escapar(label)}">${cards}</div>
+                ${!value ? '<div class="cx-help">Elige un tipo de juego o abre el catálogo para seleccionar uno importado.</div>' : ''}
             </div>`;
     }
 
@@ -435,12 +619,12 @@
                 <div class="cx-media-preview-meta">
                     <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
                     ${puedeEditar
-                        ? `<label class="cx-audio-upload-btn">
+                ? `<label class="cx-audio-upload-btn">
                             <i class="fa-solid fa-upload"></i> Elegir archivo
                             <input type="file" class="cx-file" data-target="${escapar(name)}"
                                 accept="audio/mpeg,.mp3,audio/wav,.wav" hidden>
                            </label>`
-                        : ''}
+                : ''}
                     <div class="cx-help">Toca ▶ para escuchar el audio. Formatos: MP3, WAV.</div>
                 </div>
             </div>
@@ -498,25 +682,34 @@
         if (target) $configBody.find(target).addClass('show active');
     }
 
+    function videoPreviewFrameHtml(url) {
+        if (!url) {
+            return '<i class="fa-solid fa-film cx-video-placeholder"></i>';
+        }
+        return `<video class="cx-video-el" preload="metadata" playsinline src="${escapar(url)}"></video>
+            <button type="button" class="cx-video-btn cx-video-play-btn" title="Reproducir video" aria-label="Reproducir video">
+                <i class="fa-solid fa-play"></i>
+            </button>`;
+    }
+
     function fieldVideoPreview(name, label, value) {
         const archivo = value || '';
         const url = mediaUrlBloque(archivo);
-        const thumb = url
-            ? `<video src="${escapar(url)}" muted preload="metadata" playsinline></video>`
-            : '<i class="fa-solid fa-film"></i>';
         return `<div class="cx-field">
             <label>${escapar(label)}</label>
-            <div class="cx-media-preview-row">
+            <div class="cx-media-preview-row cx-video-preview-row">
                 <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(archivo)}">
-                ${puedeEditar
-                    ? `<label class="cx-img-btn cx-video-preview-btn" title="Subir video">
-                        ${thumb}
-                        <input type="file" class="cx-file" data-target="${escapar(name)}" accept="video/mp4,.mp4" hidden>
-                       </label>`
-                    : `<span class="cx-img-btn cx-video-preview-btn is-readonly">${thumb}</span>`}
+                <div class="cx-video-preview-frame">${videoPreviewFrameHtml(url)}</div>
                 <div class="cx-media-preview-meta">
                     <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
-                    <div class="cx-help">Toca el recuadro para elegir o cambiar el video.</div>
+                    ${puedeEditar
+                ? `<label class="cx-video-upload-btn">
+                            <i class="fa-solid fa-upload"></i> Elegir archivo
+                            <input type="file" class="cx-file" data-target="${escapar(name)}"
+                                accept="video/mp4,.mp4" hidden>
+                           </label>`
+                : ''}
+                    <div class="cx-help">Toca ▶ en la vista previa para ver el video. Formato: MP4.</div>
                 </div>
             </div>
         </div>`;
@@ -649,13 +842,7 @@
                 ).join('');
         }
         return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
-            + fieldSelect('juego_id', 'Juego', id, [
-                { value: '', label: 'Seleccione…' },
-                { value: 'rompecabezas', label: 'Rompecabezas' },
-                { value: 'memoria', label: 'Memoria' },
-                { value: 'colorear', label: 'Colorear' },
-                { value: 'secuencia', label: 'Secuencia' },
-            ])
+            + fieldJuegoPicker('juego_id', 'Juego', d)
             + fieldInput('juego_nombre', 'Nombre del juego', d.juego_nombre)
             + extra;
     }
@@ -771,26 +958,45 @@
         ]);
     }
 
+    function esCategoriaPlaceholderClasificacion(nombre) {
+        return /^Cat\s*\d+$/i.test(String(nombre || '').trim());
+    }
+
+    function categoriasClasificacion(d) {
+        const raw = Array.isArray(d?.categorias) ? d.categorias : [];
+        return raw
+            .map((c) => String(c || '').trim())
+            .filter((c) => c !== '' && !esCategoriaPlaceholderClasificacion(c));
+    }
+
+    function categoriaItemClasificacion(valor, cats) {
+        const cat = String(valor || '').trim();
+        if (!cat || esCategoriaPlaceholderClasificacion(cat)) return '';
+        return cats.includes(cat) ? cat : '';
+    }
+
     function formClasificacion(d) {
-        const cats = Array.isArray(d.categorias) ? d.categorias.filter((c) => String(c || '').trim() !== '') : [];
+        const cats = categoriasClasificacion(d);
         const items = Array.isArray(d.items) ? d.items : [];
-        const catOpts = cats.length ? cats : ['Cat 1', 'Cat 2'];
+        const catOpts = cats.length
+            ? cats
+            : [{ value: '', label: 'Crea categorías en la pestaña Categorías' }];
 
         const chipsHtml = cats.map((c, i) => `
             <span class="cx-cat-chip" data-cat-index="${i}">
                 <span class="cx-cat-chip-label">${escapar(c)}</span>
                 ${puedeEditar && cats.length > 2
-                    ? `<button type="button" class="cx-cat-chip-rm" data-index="${i}" title="Quitar categoría" aria-label="Quitar">
+                ? `<button type="button" class="cx-cat-chip-rm" data-index="${i}" title="Quitar categoría" aria-label="Quitar">
                         <i class="fa-solid fa-xmark"></i>
                     </button>`
-                    : ''}
+                : ''}
             </span>`).join('');
 
         const categoriasHtml = `
             <div class="cx-field">
                 <label>Grupos / categorías</label>
-                <div class="cx-cat-chips" id="cxCatChips">${chipsHtml || '<span class="cx-help">Sin categorías aún</span>'}</div>
-                <div class="cx-help">Mínimo 2. Cada chip es un grupo donde el niño clasificará.</div>
+                <div class="cx-cat-chips" id="cxCatChips">${chipsHtml || '<span class="cx-help">Aún no hay categorías. Usa el campo de abajo para crearlas.</span>'}</div>
+                <div class="cx-help">Crea al menos 2 categorías (ej.: Frutas, Verduras). Cada una será un grupo destino en la actividad.</div>
             </div>
             ${puedeEditar ? `
             <div class="cx-cat-add">
@@ -812,7 +1018,12 @@
                     ${fieldInput(`items.${i}.texto`, 'Texto (o imagen)', item.texto)}
                 </div>
                 <div class="cx-item-cat">
-                    ${fieldSelect(`items.${i}.categoria`, 'Categoría destino', item.categoria, catOpts)}
+                    ${fieldSelect(
+                `items.${i}.categoria`,
+                'Categoría destino',
+                categoriaItemClasificacion(item.categoria, cats),
+                catOpts
+            )}
                 </div>
                 ${puedeEditar && items.length > 2
                     ? `<button type="button" class="btn btn-sm btn-outline-danger cx-rm-item-at" data-index="${i}" title="Quitar">
@@ -971,7 +1182,12 @@
                 icon: 'fa-comment-dots',
                 content: fieldInput('fb_ok', 'Mensaje al acertar', d.fb_ok)
                     + fieldInput('fb_err', 'Mensaje al fallar', d.fb_err)
-                    + fieldSelect('intentos', 'Intentos por paso', d.intentos || '2', ['1', '2', '3', 'Sin límite']),
+                    + fieldSelect('intentos', 'Intentos por paso', d.intentos || '2', ['1', '2', '3', 'Sin límite'])
+                    + fieldSelect('al_agotar', 'Al agotar intentos', d.al_agotar || 'Mostrar respuesta correcta', [
+                        'Mostrar respuesta correcta',
+                        'Continuar sin mostrar',
+                        'Repetir desde el inicio',
+                    ]),
             },
         ]);
     }
@@ -982,7 +1198,7 @@
                 { value: '4', label: '4 (feliz, emocionado, tranquilo, confundido)' },
                 { value: '6', label: '6 (+ cansado, nervioso)' },
             ])
-            + '<p class="text-muted small mt-2 mb-0">En el kiosco cada niño verá ilustraciones y textos de niño o niña según su sexo registrado. La previsualización del constructor usa la forma masculina.</p>';
+            + '<p class="text-muted small mt-2 mb-0">En la experiencia cada niño verá ilustraciones y textos de niño o niña según su sexo registrado. La previsualización del constructor usa la forma masculina.</p>';
     }
 
     function formRecompensa(d) {
@@ -1021,7 +1237,7 @@
     }
 
     function renderConfig(bloque) {
-        detenerAudiosConfig();
+        detenerMediosConfig();
         const tabPrev = tabActivaId();
         const pendientes = Array.isArray(bloque.pendientes) ? bloque.pendientes : [];
         const pendHtml = bloque.completo
@@ -1047,6 +1263,7 @@
         $configBody.html(pendHtml + htmlFormulario(bloque));
         restaurarTab(tabPrev);
         $saveStatus.prop('hidden', true).removeClass('is-saving is-ok is-err');
+        requestAnimationFrame(sincronizarLateralesDesdeSecuencia);
     }
 
     function setDeep(obj, path, value) {
@@ -1079,6 +1296,7 @@
             if (!field) return;
             let val = $el.val();
             if (field === 'juego_id' && val === '') val = null;
+            if (field === 'juego_catalogo_id' && val === '') val = null;
             if (field.includes('.')) setDeep(datos, field, val);
             else datos[field] = val;
         });
@@ -1110,6 +1328,16 @@
             };
             if (datos.juego_id && !datos.juego_nombre) {
                 datos.juego_nombre = mapNombres[datos.juego_id] || '';
+            }
+        }
+
+        if (bloque.tipo === 'clasificacion') {
+            datos.categorias = categoriasClasificacion(datos);
+            if (Array.isArray(datos.items)) {
+                datos.items = datos.items.map((it) => ({
+                    ...it,
+                    categoria: categoriaItemClasificacion(it.categoria, datos.categorias),
+                }));
             }
         }
 
@@ -1291,16 +1519,20 @@
                     $btn.find('i').removeClass('fa-play fa-pause').addClass('fa-volume-high');
                 }
             }
+            const $videoRow = $(input).closest('.cx-video-preview-row');
+            if ($videoRow.length) {
+                const url = mediaUrlBloque(nombre);
+                $videoRow.find('.cx-file-name').text(nombre || 'Sin archivo');
+                $videoRow.find('.cx-video-preview-frame')
+                    .removeClass('is-playing')
+                    .html(videoPreviewFrameHtml(url));
+            }
             const $imgBtn = $(input).closest('.cx-img-btn');
             if ($imgBtn.length) {
-                $imgBtn.find('img, video, i.fa-image, i.fa-film').remove();
+                $imgBtn.find('img, i.fa-image').remove();
                 const url = mediaUrlBloque(nombre);
-                if (url && $imgBtn.hasClass('cx-video-preview-btn')) {
-                    $imgBtn.prepend(`<video src="${escapar(url)}" muted preload="metadata" playsinline></video>`);
-                } else if (url) {
+                if (url) {
                     $imgBtn.prepend(`<img src="${escapar(url)}" alt="">`);
-                } else if ($imgBtn.hasClass('cx-video-preview-btn')) {
-                    $imgBtn.prepend('<i class="fa-solid fa-film"></i>');
                 } else {
                     $imgBtn.prepend('<i class="fa-solid fa-image"></i>');
                 }
@@ -1335,6 +1567,222 @@
         eliminarBloque($(this).data('id'));
     });
 
+    $configBody.on('click', '.cx-juego-card:not(:disabled)', function () {
+        const id = $(this).data('juego-id');
+        const nombre = $(this).data('juego-nombre') || '';
+        $configBody.find('.cx-juego-card').removeClass('is-selected').attr('aria-pressed', 'false');
+        $(this).addClass('is-selected').attr('aria-pressed', 'true');
+        $configBody.find('.cx-input[data-field="juego_id"]').val(id).trigger('change');
+        $configBody.find('.cx-input[data-field="juego_catalogo_id"]').val('');
+        if (nombre) {
+            $configBody.find('.cx-input[data-field="juego_nombre"]').val(nombre);
+        }
+    });
+
+    const $modalJuegosModulo = $('#cxModalJuegosModulo');
+    const $juegosModuloLista = $('#cxJuegosModuloLista');
+    const $juegosModuloLoading = $('#cxJuegosModuloLoading');
+    const $juegosModuloError = $('#cxJuegosModuloError');
+    const $juegosModuloPaginacion = $('#cxJuegosModuloPaginacion');
+    const $juegosModuloResumen = $('#cxJuegosModuloResumen');
+    let juegosCatalogoPagina = 1;
+
+    function modalJuegosModulo() {
+        if (!$modalJuegosModulo.length) return null;
+        return bootstrap.Modal.getOrCreateInstance($modalJuegosModulo[0]);
+    }
+
+    function urlJuegosCatalogoConFiltros(pagina) {
+        const form = document.getElementById('formFiltrosJuegosConstructor');
+        if (!form || !urlJuegosCatalogo) return '';
+        const params = window.JuegosFiltrosUi
+            ? window.JuegosFiltrosUi.paramsDesdeForm(form)
+            : new URLSearchParams(new FormData(form));
+        params.set('json', '1');
+        params.set('per_page', '12');
+        if (pagina) params.set('page', String(pagina));
+        return `${urlJuegosCatalogo}?${params.toString()}`;
+    }
+
+    function renderPaginacionJuegos(pagination) {
+        if (!$juegosModuloPaginacion.length || !pagination) return;
+        if (pagination.last_page <= 1) {
+            $juegosModuloPaginacion.prop('hidden', true).empty();
+            return;
+        }
+        const prev = pagination.current_page > 1 ? pagination.current_page - 1 : null;
+        const next = pagination.current_page < pagination.last_page ? pagination.current_page + 1 : null;
+        let html = '<div class="paginacion-controles">';
+        if (prev) {
+            html += `<button type="button" class="pag-btn" data-juego-page="${prev}">&#8592; Anterior</button>`;
+        }
+        html += `<span class="pag-btn pag-btn-activo">${pagination.current_page} / ${pagination.last_page}</span>`;
+        if (next) {
+            html += `<button type="button" class="pag-btn" data-juego-page="${next}">Siguiente &#8594;</button>`;
+        }
+        html += '</div>';
+        $juegosModuloPaginacion.html(html).prop('hidden', false);
+    }
+
+    function actualizarResumenModalJuegos(estadisticas, pagination) {
+        if (!$juegosModuloResumen.length) return;
+        if (!estadisticas || !pagination || pagination.total === 0) {
+            $juegosModuloResumen.prop('hidden', true).empty();
+            return;
+        }
+        const paginaTxt = pagination.last_page > 1
+            ? `Página ${pagination.current_page} de ${pagination.last_page}`
+            : 'Resultados del filtro';
+        $juegosModuloResumen.html(`
+            <div class="stats-grid cx-juegos-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--blue"><i class="fa-solid fa-gamepad"></i></div>
+                    <div class="stat-body">
+                        <h3>${pagination.total}</h3>
+                        <p>Juegos encontrados</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--green"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="stat-body">
+                        <h3>${estadisticas.activos ?? pagination.total}</h3>
+                        <p>Activos en catálogo</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--yellow"><i class="fa-solid fa-cube"></i></div>
+                    <div class="stat-body">
+                        <h3>${estadisticas.modulos ?? 0}</h3>
+                        <p>Módulos representados</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--blue"><i class="fa-solid fa-layer-group"></i></div>
+                    <div class="stat-body">
+                        <h3>${pagination.per_page}</h3>
+                        <p>${escapar(paginaTxt)}</p>
+                    </div>
+                </div>
+            </div>
+        `).prop('hidden', false);
+    }
+
+    function actualizarSubtituloModalJuegos(pagination) {
+        const $sub = $('#cxModalJuegosModuloSubtitle');
+        if (!$sub.length) return;
+        if (!pagination || pagination.total === 0) {
+            $sub.text('No hay juegos que coincidan con los filtros.');
+            return;
+        }
+        const etiqueta = pagination.total === 1 ? 'juego disponible' : 'juegos disponibles';
+        $sub.text(`${pagination.total} ${etiqueta}`);
+    }
+
+    function renderJuegosCatalogoModal(juegos, selectedCatalogoId) {
+        if (!juegos.length) {
+            $juegosModuloLista.html(`
+                <div class="students-empty students-empty--filters cx-juegos-empty">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <h3>Sin resultados</h3>
+                    <p>No hay juegos que coincidan con los filtros aplicados.</p>
+                </div>
+            `);
+            return;
+        }
+        $juegosModuloLista.html(juegos.map((j) => juegoCatalogoCardHtml(j, selectedCatalogoId)).join(''));
+    }
+
+    async function cargarJuegosCatalogo(pagina) {
+        const bloque = bloquePorId(seleccionadoId);
+        if (!bloque || bloque.tipo !== 'juego') return;
+        const url = urlJuegosCatalogoConFiltros(pagina || 1);
+        if (!url) return;
+
+        $juegosModuloError.prop('hidden', true).text('');
+        $juegosModuloLista.prop('hidden', true).attr('aria-busy', 'true');
+        $juegosModuloLoading.prop('hidden', false);
+
+        try {
+            const res = await fetch(url, {
+                headers: {
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': csrf,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+            const json = await res.json();
+            if (!res.ok || !json.success) {
+                throw new Error(json.message || 'No se pudieron cargar los juegos.');
+            }
+            const juegos = json.data?.juegos || [];
+            juegosCatalogoPagina = json.data?.pagination?.current_page || 1;
+            renderJuegosCatalogoModal(juegos, bloque.datos?.juego_catalogo_id || '');
+            renderPaginacionJuegos(json.data?.pagination);
+            actualizarResumenModalJuegos(json.data?.estadisticas, json.data?.pagination);
+            actualizarSubtituloModalJuegos(json.data?.pagination);
+            $juegosModuloLista[0]?.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (err) {
+            $juegosModuloError.text(err.message || 'Error al cargar juegos.').prop('hidden', false);
+            $juegosModuloLista.empty();
+            $juegosModuloPaginacion.prop('hidden', true).empty();
+            $juegosModuloResumen.prop('hidden', true).empty();
+            $('#cxModalJuegosModuloSubtitle').text('Error al cargar el catálogo');
+        } finally {
+            $juegosModuloLoading.prop('hidden', true);
+            $juegosModuloLista.prop('hidden', false).attr('aria-busy', 'false');
+        }
+    }
+
+    function abrirModalJuegosModulo() {
+        const bloque = bloquePorId(seleccionadoId);
+        if (!urlJuegosCatalogo || !bloque || bloque.tipo !== 'juego') return;
+
+        $juegosModuloError.prop('hidden', true).text('');
+        $juegosModuloLista.empty().prop('hidden', true);
+        $juegosModuloPaginacion.prop('hidden', true).empty();
+        $juegosModuloResumen.prop('hidden', true).empty();
+        $juegosModuloLoading.prop('hidden', false);
+        $('#cxModalJuegosModuloSubtitle').text('Filtra y elige un juego para el bloque');
+        modalJuegosModulo()?.show();
+
+        const form = document.getElementById('formFiltrosJuegosConstructor');
+        if (form && window.JuegosFiltrosUi) {
+            form.dataset.juegosFiltrosBound = '';
+            window.JuegosFiltrosUi.enlazar(form, () => cargarJuegosCatalogo(1));
+        }
+        cargarJuegosCatalogo(1);
+    }
+
+    function aplicarJuegoCatalogo(tipo, nombre, catalogoId) {
+        const bloque = bloquePorId(seleccionadoId);
+        if (!bloque) return;
+        const datos = leerDatosDesdeForm(bloque);
+        datos.juego_id = tipo;
+        datos.juego_nombre = nombre || datos.juego_nombre || '';
+        datos.juego_catalogo_id = catalogoId || null;
+        bloque.datos = datos;
+        renderConfig(bloque);
+        scheduleSave();
+        modalJuegosModulo()?.hide();
+    }
+
+    $configBody.on('click', '#cxBtnJuegosModulo', function (e) {
+        e.preventDefault();
+        abrirModalJuegosModulo();
+    });
+
+    $juegosModuloPaginacion.on('click', '[data-juego-page]', function () {
+        const pagina = Number($(this).data('juego-page'));
+        if (pagina > 0) cargarJuegosCatalogo(pagina);
+    });
+
+    $juegosModuloLista.on('click', '.cx-juego-catalogo-card:not(:disabled)', function () {
+        const tipo = $(this).attr('data-juego-id');
+        const catalogoId = $(this).attr('data-juego-catalogo-id') || null;
+        const nombre = $(this).attr('data-juego-nombre') || '';
+        aplicarJuegoCatalogo(tipo, nombre, catalogoId);
+    });
+
     $configBody.on('input change', '.cx-input, .cx-check, .cx-correcta, .cx-correcta-paso', function () {
         const field = $(this).data('field');
         if (typeof field === 'string' && field.indexOf('colores_zonas.') === 0) {
@@ -1363,7 +1811,9 @@
                 const mapNombres = {
                     rompecabezas: 'Rompecabezas', memoria: 'Memoria', colorear: 'Colorear', secuencia: 'Secuencia',
                 };
-                datos.juego_nombre = mapNombres[datos.juego_id] || '';
+                if (!datos.juego_nombre) {
+                    datos.juego_nombre = mapNombres[datos.juego_id] || '';
+                }
             }
             if (field === 'juego_piezas' && datos.juego_id === 'colorear') {
                 const s = String(datos.juego_piezas || '');
@@ -1400,9 +1850,17 @@
                 } catch (e) { /* noop */ }
             }
         });
+        $configBody.find('.cx-video-el').each(function () {
+            try {
+                this.pause();
+                this.currentTime = 0;
+            } catch (e) { /* noop */ }
+        });
+        $configBody.find('.cx-video-preview-frame').removeClass('is-playing');
         $configBody.find('.cx-audio-play-btn').not($btn).each(function () {
             $(this).find('i').removeClass('fa-pause').addClass('fa-play');
         });
+        $configBody.find('.cx-video-play-btn i').removeClass('fa-pause').addClass('fa-play');
         if (window.speechSynthesis) {
             try { window.speechSynthesis.cancel(); } catch (e) { /* noop */ }
         }
@@ -1422,8 +1880,51 @@
         }
     });
 
+    $configBody.on('click', '.cx-video-play-btn', function (e) {
+        e.stopPropagation();
+        const $btn = $(this);
+        const $frame = $btn.closest('.cx-video-preview-frame');
+        const video = $frame.find('.cx-video-el')[0];
+        if (!video) return;
+        $configBody.find('.cx-video-el').each(function () {
+            if (this !== video) {
+                try {
+                    this.pause();
+                    this.currentTime = 0;
+                } catch (err) { /* noop */ }
+            }
+        });
+        $configBody.find('.cx-video-preview-frame').not($frame).removeClass('is-playing');
+        $configBody.find('.cx-audio-el').each(function () {
+            try {
+                this.pause();
+                this.currentTime = 0;
+            } catch (err) { /* noop */ }
+        });
+        $configBody.find('.cx-audio-play-btn i').removeClass('fa-pause').addClass('fa-play');
+        if (window.speechSynthesis) {
+            try { window.speechSynthesis.cancel(); } catch (err) { /* noop */ }
+        }
+        video.onended = function () {
+            $frame.removeClass('is-playing');
+        };
+        $frame.addClass('is-playing');
+        const p = video.play();
+        if (p && typeof p.catch === 'function') {
+            p.catch(() => $frame.removeClass('is-playing'));
+        }
+    });
+
+    $configBody.on('click', '.cx-video-preview-frame.is-playing .cx-video-el', function () {
+        const $frame = $(this).closest('.cx-video-preview-frame');
+        try {
+            this.pause();
+        } catch (err) { /* noop */ }
+        $frame.removeClass('is-playing');
+    });
+
     $configBody.on('click', '[data-cx-tts-preview]', function () {
-        detenerAudiosConfig();
+        detenerMediosConfig();
         const texto = String($(this).closest('.cx-field').find('textarea[data-field="instruccion"]').val() || '').trim();
         if (!texto) {
             toast('info', 'Escribe la instrucción para escucharla.');
@@ -1465,8 +1966,10 @@
     $configBody.on('click', '.cx-add-item', function () {
         mutarDatosLocales((d) => {
             if (!Array.isArray(d.items)) d.items = [];
-            const cat = (d.categorias && d.categorias[0]) || 'Cat 1';
-            d.items.push({ texto: '', imagen: '', categoria: cat });
+            const cats = Array.isArray(d.categorias)
+                ? d.categorias.map((c) => String(c || '').trim()).filter(Boolean)
+                : [];
+            d.items.push({ texto: '', imagen: '', categoria: cats[0] || '' });
         });
     });
     $configBody.on('click', '.cx-rm-item', function () {
@@ -1499,6 +2002,7 @@
             if (!Array.isArray(d.categorias)) d.categorias = [];
             d.categorias.push(nombre);
         });
+        $('#cxCatNueva').val('');
     });
     $configBody.on('keydown', '#cxCatNueva', function (e) {
         if (e.key === 'Enter') {
