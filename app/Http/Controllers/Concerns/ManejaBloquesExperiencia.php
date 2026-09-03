@@ -68,9 +68,17 @@ trait ManejaBloquesExperiencia
 
         $payload = $request->validate([
             'datos' => ['required', 'array'],
+            'instrucciones_audio' => ['nullable', 'array', 'max:8'],
+            'instrucciones_audio.*.texto' => ['nullable', 'string', 'max:800'],
+            'instrucciones_audio.*.instruccion' => ['nullable', 'string', 'max:800'],
+            'instrucciones_audio.*.personaje' => ['nullable', 'string', 'in:zoe,zeus'],
         ]);
 
-        $bloque = $this->servicioBloques()->actualizarDatos($bloque, $payload['datos']);
+        $bloque = $this->servicioBloques()->actualizarDatos(
+            $bloque,
+            $payload['datos'],
+            $request->exists('instrucciones_audio') ? ($payload['instrucciones_audio'] ?? []) : null
+        );
 
         return response()->json([
             'success' => true,
@@ -186,10 +194,14 @@ trait ManejaBloquesExperiencia
 
         $datos = $request->validate([
             'texto' => ['required', 'string', 'max:800'],
+            'personaje' => ['nullable', 'string', 'in:zoe,zeus'],
         ]);
 
         try {
-            $url = app(\App\Services\TextoAVozService::class)->urlPublica($datos['texto']);
+            $url = app(\App\Services\TextoAVozService::class)->urlPublica(
+                $datos['texto'],
+                $datos['personaje'] ?? null
+            );
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,

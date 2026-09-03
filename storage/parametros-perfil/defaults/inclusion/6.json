@@ -2,9 +2,9 @@
     "tipo": "inclusion",
     "perfil_id": 6,
     "valores": {
-        "btn_size": 76,
+        "btn_size": 120,
         "btn_spacing": 12,
-        "font_size": 22,
+        "font_size": 16,
         "lectura_facil": false,
         "subtitulos": true,
         "audio_instruc": "desactivado",
@@ -26,7 +26,7 @@
         "contraste": "alto",
         "modo_color": "normal",
         "fondo_pantalla": "blanco",
-        "elementos_flotantes": true,
+        "elementos_flotantes": false,
         "cursor_grande": false,
         "refuerzo_visual": true,
         "refuerzo_sonido": false,
@@ -49,9 +49,9 @@
         "memoria_pares_max": 6,
         "secuencia_pasos_max": 4,
         "juego_bordes": false,
-        "login_tipo": "pin_4",
+        "login_tipo": "avatar",
         "teclado_grande": false,
         "modo_aula_automatico": false
     },
-    "actualizado_en": "2026-09-02T11:12:03-05:00"
+    "actualizado_en": "2026-09-03T17:04:08-05:00"
 }

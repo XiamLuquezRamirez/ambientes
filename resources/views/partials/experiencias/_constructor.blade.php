@@ -53,17 +53,14 @@
 
 <div class="cx-app" data-puede-editar="{{ $puedeEditar ? '1' : '0' }}"
     data-puede-publicar="{{ $puedePublicar ? '1' : '0' }}" data-experiencia-id="{{ $experiencia->id }}"
-    data-experiencia-nombre="{{ $experiencia->nombre }}"
-    data-url-juegos-catalogo="{{ $urlJuegosCatalogo }}"
+    data-experiencia-nombre="{{ $experiencia->nombre }}" data-url-juegos-catalogo="{{ $urlJuegosCatalogo }}"
     data-media-base="{{ asset('storage/experiencias/' . $experiencia->id . '/bloques') }}"
-    data-estudiante-sexo="masculino"
-    data-nivel-etario="{{ $nivelPreview }}"
-    data-emociones-base="{{ asset('assets/images/emociones') }}"
-    data-experiencia-estado="{{ $experiencia->estado }}" data-url-listar="{{ $urls['listar'] }}"
-    data-url-guardar="{{ $urls['guardar'] }}" data-url-reordenar="{{ $urls['reordenar'] }}"
-    data-url-limpiar="{{ $urls['limpiar'] }}" data-url-upload="{{ $urls['upload'] }}"
-    data-url-tts="{{ $urls['tts'] ?? '' }}" data-url-publicar="{{ $urls['publicar'] }}"
-    data-url-actualizar-template="{{ $urls['actualizar_template'] }}"
+    data-estudiante-sexo="masculino" data-nivel-etario="{{ $nivelPreview }}"
+    data-emociones-base="{{ asset('assets/images/emociones') }}" data-experiencia-estado="{{ $experiencia->estado }}"
+    data-url-listar="{{ $urls['listar'] }}" data-url-guardar="{{ $urls['guardar'] }}"
+    data-url-reordenar="{{ $urls['reordenar'] }}" data-url-limpiar="{{ $urls['limpiar'] }}"
+    data-url-upload="{{ $urls['upload'] }}" data-url-tts="{{ $urls['tts'] ?? '' }}"
+    data-url-publicar="{{ $urls['publicar'] }}" data-url-actualizar-template="{{ $urls['actualizar_template'] }}"
     data-url-eliminar-template="{{ $urls['eliminar_template'] }}">
 
     <script type="application/json" id="cx-bloques-iniciales">@json($bloquesJson)</script>
@@ -162,7 +159,7 @@
     </div>
 </div>
 
-{{-- Modal: catálogo de juegos --}}
+{{-- Modal: catálogo del modulo de juegos --}}
 <div class="modal fade modal-app cx-modal-juegos" id="cxModalJuegosModulo" tabindex="-1"
     aria-labelledby="cxModalJuegosModuloLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -172,16 +169,22 @@
                     <i class="fa-solid fa-gamepad text-white"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <h5 class="modal-title mb-0" id="cxModalJuegosModuloLabel">Catálogo de juegos</h5>
-                    <p class="modal-subtitle mb-0" id="cxModalJuegosModuloSubtitle">Filtra y elige un juego para el bloque</p>
+                    <h5 class="modal-title mb-0" id="cxModalJuegosModuloLabel">Catálogo del modulo de juegos</h5>
+                    <p class="modal-subtitle mb-0" id="cxModalJuegosModuloSubtitle">Filtra y elige un juego para el
+                        bloque</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body p-4">
-                <div class="cx-juegos-filtros-panel">
+                <div class="cx-juegos-filtros-panel" id="cxJuegosFiltrosPanel">
                     <div class="cx-juegos-filtros-head">
                         <i class="fa-solid fa-filter" aria-hidden="true"></i>
-                        <span>Filtrar catálogo</span>
+                        <span>Filtrar catálogo del modulo de juegos</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary cx-juegos-filtros-toggle"
+                            id="cxBtnToggleFiltrosJuegos" aria-expanded="false" aria-controls="formFiltrosJuegosConstructor">
+                            <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                            <span class="cx-juegos-filtros-toggle-label">Más filtros</span>
+                        </button>
                     </div>
                     @include('partials.juegos._filtros', $juegosFiltros)
                 </div>
@@ -192,7 +195,7 @@
                 </div>
                 <div id="cxJuegosModuloError" class="alert alert-warning mb-3" hidden></div>
                 <div id="cxJuegosModuloLista" class="students-grid cx-juegos-catalogo-grid" role="radiogroup"
-                    aria-label="Catálogo de juegos" aria-live="polite"></div>
+                    aria-label="Catálogo del modulo de juegos" aria-live="polite"></div>
                 <div id="cxJuegosModuloPaginacion" class="paginacion-wrapper mt-3" hidden></div>
             </div>
             <div class="modal-footer justify-content-between">

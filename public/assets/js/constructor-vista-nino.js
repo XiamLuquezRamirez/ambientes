@@ -148,6 +148,9 @@
     let evidenciaSesion = 0;
     const colaResultados = [];
     let guardandoResultado = false;
+    /** Estado local por bloque durante la sesión (permite volver y editar). */
+    const estadoSesionBloques = Object.create(null);
+    let restaurandoSesion = false;
     const TIPOS_BLOQUE_RESULTADO = ['pregunta', 'reto', 'emocion', 'evidencia', 'dibujo', 'emparejar', 'clasificacion', 'arrastrar'];
 
     const PAINT_SIZE_MAP = { s: 6, m: 12, l: 22 };
@@ -413,15 +416,32 @@
         return `<div class="vn-block-fit"><div class="vn-card${cls}">${inner}</div></div>`;
     }
 
-    function instruccionHtml(texto) {
-        const t = String(texto || '').trim();
-        if (!t) return '';
-        return `<p class="vn-instruccion" data-vn-tts-text="${escapar(t)}">
+    function lineasAudioBloque(bloque) {
+        const raw = Array.isArray(bloque?.instrucciones_audio) ? bloque.instrucciones_audio : [];
+        const lineas = raw
+            .map((fila) => ({
+                texto: String(fila?.texto ?? fila?.instruccion ?? '').replace(/\s+/g, ' ').trim(),
+                personaje: String(fila?.personaje || 'zoe').toLowerCase() === 'zeus' ? 'zeus' : 'zoe',
+            }))
+            .filter((l) => l.texto);
+        if (lineas.length) return lineas;
+        const legacy = String(datos(bloque).instruccion || '').replace(/\s+/g, ' ').trim();
+        return legacy ? [{ texto: legacy, personaje: 'zoe' }] : [];
+    }
+
+    function instruccionHtmlBloque(bloque) {
+        const lineas = lineasAudioBloque(bloque);
+        if (!lineas.length) return '';
+        const payload = escapar(JSON.stringify(lineas));
+        return `<div class="vn-instrucciones" data-vn-tts-seq="${payload}">
             <button type="button" class="vn-tts-replay" data-vn-tts-replay title="Escuchar de nuevo" aria-label="Escuchar de nuevo">
                 <i class="fa-solid fa-volume-high"></i>
             </button>
-            <span>${escapar(t)}</span>
-        </p>`;
+        </div>`;
+    }
+
+    function instruccionHtml(texto) {
+        return instruccionHtmlBloque({ datos: { instruccion: texto }, instrucciones_audio: [] });
     }
 
     function imgTag(file, alt) {
@@ -596,7 +616,7 @@
                 <div class="vn-sparkles" aria-hidden="true"><span>✨</span><span>⭐</span><span>✨</span></div>
             </div>
             <h2 class="vn-title">${saludo}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             ${mediaHtml}
         `, bloque, 'bienvenida');
     }
@@ -609,13 +629,13 @@
             return wrap(`
                 <div class="vn-hero-emoji">🔊</div>
                 <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Escucha'))}</h2>
-                ${instruccionHtml(d.instruccion)}
+                ${instruccionHtmlBloque(bloque)}
                 <p class="vn-empty">Sin audio configurado</p>
             `, bloque, 'audio');
         }
         return wrap(`
             <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Escucha'))}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             <div class="vn-audio-stage" data-vn-audio-stage>
                 <button type="button" class="vn-audio-btn vn-pulse-hint" data-vn-audio-play
                     data-reps="${escapar(reps)}" aria-label="Reproducir audio">
@@ -637,13 +657,13 @@
             return wrap(`
                 <div class="vn-hero-emoji">🎬</div>
                 <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Mira el video'))}</h2>
-                ${instruccionHtml(d.instruccion)}
+                ${instruccionHtmlBloque(bloque)}
                 <p class="vn-empty">Sin video configurado</p>
             `, bloque, 'video');
         }
         return wrap(`
             <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Mira el video'))}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             <div class="vn-video-stage" data-vn-video-stage>
                 ${htmlBotonVideo('data-vn-video-play aria-label="Reproducir video"')}
                 <video class="vn-video-el" playsinline preload="metadata" src="${escapar(url)}" hidden></video>
@@ -663,7 +683,7 @@
             : '<p class="vn-empty">Sin imagen</p>';
         return wrap(`
             <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Observa'))}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             ${imgHtml}
         `, bloque, 'imagen');
     }
@@ -719,15 +739,13 @@
         const pages = paginasHistoria(bloque);
         const page = pages[historiaPage] || {};
         const audioUrl = mediaUrl(page.audio);
-        const d = datos(bloque);
-        const textoInstr = String(d.instruccion || '').trim();
-
+        const textoInstr = lineasAudioBloque(bloque).length > 0;
         $body.find('.vn-historia-progress').html(dotsHistoriaHtml(total, historiaPage));
         $body.find('.vn-historia-badge').text(badgeHistoriaHtml(total, historiaPage));
         $body.find('[data-vn-hist-prev]').prop('disabled', !puedeAnt);
         $body.find('[data-vn-hist-next]').prop('disabled', !puedeSig);
 
-        const $instr = $body.find('.vn-instruccion');
+        const $instr = $body.find('.vn-instrucciones, .vn-instruccion');
         if (historiaPage === 0 && textoInstr) {
             $instr.show();
         } else {
@@ -844,7 +862,7 @@
             <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Cuento'))}</h2>
             <div class="vn-historia-progress" aria-hidden="true">${dotsHistoriaHtml(total, historiaPage)}</div>
             <p class="vn-paso-badge vn-historia-badge">${badgeHistoriaHtml(total, historiaPage)}</p>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             ${renderHistoriaLibro(bloque)}
             ${audioUrl ? `<audio class="vn-historia-audio" preload="auto" src="${escapar(audioUrl)}" hidden></audio>` : ''}
             <div class="vn-historia-nav">
@@ -873,7 +891,7 @@
                     </div>
                 </div>
                 <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Realidad aumentada'))}</h2>
-                ${instruccionHtml(d.instruccion)}
+                ${instruccionHtmlBloque(bloque)}
                 <p class="vn-ra-hint">${configNivel().simplificar
                 ? '¡Apunta la tablet!'
                 : escapar(d.contenido || 'Animación 3D')}</p>
@@ -917,7 +935,7 @@
             : '';
         return wrap(`
             <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, '¡Tu evidencia!'))}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             <div class="vn-evidencia-wrap">
                 <div class="vn-evidencia-stage" data-vn-evidencia-stage hidden>
                     <video class="vn-evidencia-preview" playsinline webkit-playsinline muted hidden></video>
@@ -960,6 +978,11 @@
                         aria-label="${escapar(capturaLabel)}">
                         <span class="vn-evidencia-captura-icon" aria-hidden="true"><i class="fa-solid fa-stop"></i></span>
                         <span class="vn-evidencia-captura-label" data-vn-evidencia-captura-label>${escapar(capturaLabel)}</span>
+                    </button>
+                    <button type="button" class="vn-evidencia-repetir-btn" data-vn-evidencia-repetir hidden
+                        aria-label="${configNivel().simplificar ? '¡Otra vez!' : 'Repetir evidencia'}">
+                        <span class="vn-evidencia-repetir-icon" aria-hidden="true"><i class="fa-solid fa-rotate-right"></i></span>
+                        <span class="vn-evidencia-repetir-label">${configNivel().simplificar ? '¡Otra vez!' : 'Repetir'}</span>
                     </button>
                 </div>
                 ${hintNativo ? `<p class="vn-evidencia-hint">${escapar(hintNativo)}</p>` : ''}
@@ -1147,7 +1170,7 @@
         }
         return `<div class="vn-juego-head${paintCls}">
             <h2 class="vn-title vn-title--compact">${titulo}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             ${extra}
         </div>`;
     }
@@ -1208,7 +1231,7 @@
         return wrap(`
             <div class="vn-paint-head">
                 <h2 class="vn-title vn-title--compact">${escapar(tituloVisibleBloque(bloque, 'Dibuja'))}</h2>
-                ${instruccionHtml(d.instruccion)}
+                ${instruccionHtmlBloque(bloque)}
             </div>
             <div class="vn-paint vn-paint--dibujo" data-vn-paint="dibujo">
                 ${toolbar}
@@ -1224,7 +1247,7 @@
         const ops = Array.isArray(d.opciones) ? d.opciones : [];
         const tipo = d.tipo_opts || 'emoji_texto';
         const textoPregunta = String(d.texto || '').trim();
-        const instruccion = String(d.instruccion || '').trim();
+        const instruccion = lineasAudioBloque(bloque).map((l) => l.texto).join(' ');
         const mostrarInstruccion = instruccion && (!textoPregunta || instruccion !== textoPregunta);
         const optsHtml = ops.map((op, i) => {
             let inner = '';
@@ -1243,7 +1266,7 @@
         const tituloHtml = textoPregunta
             ? `<h2 class="vn-title vn-pregunta-enunciado" data-vn-tts-text="${escapar(textoPregunta)}">${escapar(textoPregunta)}</h2>`
             : `<h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Pregunta'))}</h2>`;
-        const instrHtml = mostrarInstruccion ? instruccionHtml(instruccion) : '';
+        const instrHtml = mostrarInstruccion ? instruccionHtmlBloque(bloque) : '';
         return wrap(`
             <div class="vn-pregunta-head">
                 ${tituloHtml}
@@ -1279,7 +1302,7 @@
         });
         return wrap(`
             <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Empareja'))}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             <div class="vn-match-cols" data-vn-emparejar data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
                 data-fb-err="${escapar(d.fb_err || 'Ese no va ahí…')}">
                 <div class="vn-match-col">${izq.join('')}</div>
@@ -1304,7 +1327,7 @@
         ).join('');
         return wrap(`
             <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Clasifica'))}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             <p class="vn-hint-drag">${configNivel().simplificar ? '¡Arrastra cada cosa a su lugar!' : 'Arrastra cada elemento a su categoría'}</p>
             <div class="vn-sort-board" data-vn-clasif-board data-vn-pool-count="${items.length}">
                 <div class="vn-sort-col vn-sort-col--pool" data-vn-clasif-pool>${pool}</div>
@@ -1330,7 +1353,7 @@
         ).join('');
         return wrap(`
             <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Arrastra'))}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             <p class="vn-hint-drag">${configNivel().simplificar ? '¡Llévalo a su lugar!' : 'Arrastra cada elemento a su zona'}</p>
             <div class="vn-sort-board" data-vn-arrastrar-board data-vn-pool-count="${items.length}">
                 <div class="vn-sort-col vn-sort-col--pool" data-vn-arrastrar-pool>${pool}</div>
@@ -1370,17 +1393,75 @@
         const y1 = a.top + a.height / 2;
         const x2 = b.left + b.width / 2;
         const y2 = b.top + b.height / 2;
-        const len = Math.hypot(x2 - x1, y2 - y1);
+        const $line = $('<div class="vn-match-line vn-match-line--ok" aria-hidden="true"></div>');
+        actualizarGeometriaLineaEmparejar($line, x1, y1, x2, y2);
+        $(document.body).append($line);
+        setTimeout(() => { $line.remove(); }, 700);
+    }
+
+    function actualizarGeometriaLineaEmparejar($line, x1, y1, x2, y2) {
+        if (!$line || !$line.length) return;
+        const len = Math.max(4, Math.hypot(x2 - x1, y2 - y1));
         const ang = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-        const $line = $('<div class="vn-match-line" aria-hidden="true"></div>');
         $line.css({
             width: `${len}px`,
             left: `${x1}px`,
             top: `${y1}px`,
             transform: `rotate(${ang}deg)`,
         });
+    }
+
+    function crearLineaEmparejarLive() {
+        const $line = $('<div class="vn-match-line vn-match-line--live" aria-hidden="true"></div>');
         $(document.body).append($line);
-        setTimeout(() => { $line.remove(); }, 700);
+        return $line;
+    }
+
+    function limpiarDragEmparejar() {
+        const drag = $body && $body.data('vn-emp-drag');
+        if (!drag) return;
+        if (drag.$line && drag.$line.length) drag.$line.remove();
+        if (drag.$izq && drag.$izq.length && drag.pointerId != null) {
+            try { drag.$izq[0].releasePointerCapture(drag.pointerId); } catch (e) { /* noop */ }
+        }
+        if ($body && $body.length) {
+            $body.find('[data-vn-der]').removeClass('is-drop-hover');
+            $body.data('vn-emp-drag', null);
+        }
+        $(window).off('.vnEmpDrag');
+    }
+
+    function centroChipEmparejar(el) {
+        const r = el.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function chipDerBajoPunto(clientX, clientY) {
+        const el = document.elementFromPoint(clientX, clientY);
+        if (!el) return null;
+        const chip = el.closest('[data-vn-der]');
+        if (!chip || chip.classList.contains('is-matched')) return null;
+        return chip;
+    }
+
+    function resolverEmparejar(izq, $izqBtn, $derBtn) {
+        const der = Number($derBtn.data('vn-der'));
+        const $box = $body.find('[data-vn-emparejar]');
+        const ok = Number(izq) === der;
+        if (ok) {
+            $izqBtn.add($derBtn).addClass('is-matched vn-chip--matched').removeClass('is-selected is-drop-hover');
+            flashUnionEmparejar($izqBtn, $derBtn);
+            showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
+            alCompletarActividad();
+        } else {
+            showFb(false, $box.data('fb-ok'), $box.data('fb-err'));
+            $body.data('vn-emp-fallos', Number($body.data('vn-emp-fallos') || 0) + 1);
+            $izqBtn.removeClass('is-selected');
+            $derBtn.addClass('vn-chip--miss');
+            setTimeout(() => { $derBtn.removeClass('vn-chip--miss'); }, 380);
+        }
+        $body.data('emp-izq', null);
+        return ok;
     }
 
     function renderReto(bloque) {
@@ -1390,7 +1471,7 @@
         const paso = pasos[retoPaso] || { pregunta: '', opciones: [] };
         const textoPaso = String(paso.pregunta || '').trim();
         const nombreReto = String(d.descripcion || '').trim();
-        const instruccion = String(d.instruccion || '').trim();
+        const instruccion = lineasAudioBloque(bloque).map((l) => l.texto).join(' ');
         const enunciado = textoPaso
             || (retoPaso === 0 ? instruccion : '')
             || nombreReto
@@ -1422,7 +1503,7 @@
             <div class="vn-reto-head">
                 ${metaHtml}
                 <h2 class="vn-title vn-pregunta-enunciado" data-vn-tts-text="${escapar(enunciado)}">${escapar(enunciado)}</h2>
-                ${mostrarInstruccion ? instruccionHtml(instruccion) : ''}
+                ${mostrarInstruccion ? instruccionHtmlBloque(bloque) : ''}
             </div>
             <div class="vn-options" data-vn-reto data-count="${(paso.opciones || []).length}" data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
                 data-fb-err="${escapar(d.fb_err || 'Casi…')}" data-intentos="${escapar(d.intentos || '2')}"
@@ -1439,12 +1520,12 @@
         const titulo = escapar(tituloVisibleBloque(bloque, 'Ahora cuéntame, ¿cómo te sentiste?'));
         return wrap(`
             <h2 class="vn-title">${titulo}</h2>
-            ${instruccionHtml(d.instruccion)}
+            ${instruccionHtmlBloque(bloque)}
             <div class="vn-emociones" data-vn-emocion data-count="${n}" data-sexo="${escapar(resolverSexoEmocion())}">
                 ${list.map((id, i) => {
             const label = emocionLabel(id);
             const imgUrl = emocionImgUrl(id);
-            return `<button type="button" class="vn-emocion vn-pulse-hint" data-id="${escapar(id)}" style="--vn-i:${i}">
+            return `<button type="button" class="vn-emocion" data-id="${escapar(id)}" style="--vn-i:${i}">
                         <img class="vn-emocion-img" src="${escapar(imgUrl)}" alt="${escapar(label)}">
                         <span class="vn-emocion-label">${escapar(label)}</span>
                     </button>`;
@@ -1469,7 +1550,7 @@
                 <div class="vn-reward-rays" aria-hidden="true"></div>
                 <div class="vn-reward-icon vn-reward-icon--bounce">${icon}</div>
                 <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, '¡Lo lograste!'))}</h2>
-                ${instruccionHtml(d.instruccion)}
+                ${instruccionHtmlBloque(bloque)}
                 ${insignia}
             </div>
         `, bloque, 'recompensa');
@@ -1674,7 +1755,7 @@
         }
     }
 
-    function programarAjusteLayout() {
+    function programarAjusteLayout(alTerminar) {
         requestAnimationFrame(function () {
             ajustarEscalaTablet();
             ajustarLayoutPintar();
@@ -1684,6 +1765,7 @@
                 ajustarLayoutPintar();
                 ajustarBloqueAlViewport();
                 ajustarCanvasPaint();
+                if (typeof alTerminar === 'function') alTerminar();
             });
         });
     }
@@ -1694,6 +1776,7 @@
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
         limpiarSeleccionPuzzle();
         if (typeof limpiarDragSecuencia === 'function') limpiarDragSecuencia();
+        if (typeof limpiarDragEmparejar === 'function') limpiarDragEmparejar();
         if (typeof limpiarPaint === 'function') limpiarPaint();
         limpiarEvidenciaRecursos();
         cancelarAvanceAutomatico();
@@ -1710,7 +1793,9 @@
         }
         $title.text(experienciaNombre);
         $blockName.text(bloque.nombre || bloque.tipo);
-        $body.removeData('vn-bloque-visto vn-bienvenida-video-ok');
+        clearTimeout(fbHideTimer);
+        fbHideTimer = null;
+        $body.removeData('vn-bloque-visto vn-bienvenida-video-ok vn-evidencia-ok');
         $body.toggleClass('vn-body--paint', esBloquePintar(bloque));
         $body.html(renderBloque(bloque));
         $btnPrev.prop('disabled', index <= 0);
@@ -1718,7 +1803,9 @@
         initInteracciones(bloque);
         actualizarNavBloque();
         $body.scrollTop(0);
-        programarAjusteLayout();
+        programarAjusteLayout(function () {
+            restaurarEstadoSesion(bloque);
+        });
         if (bloque.tipo === 'recompensa') {
             setTimeout(() => { celebrarExito(true); }, 400);
         }
@@ -1727,6 +1814,8 @@
     let ttsToken = 0;
     let ttsKeepAlive = null;
     let ttsPlayer = null;
+    let fbHideTimer = null;
+    const FB_HIDE_MS = 3000;
 
     if (window.speechSynthesis) {
         try { window.speechSynthesis.getVoices(); } catch (e) { /* noop */ }
@@ -1798,7 +1887,7 @@
         $body.find('.vn-tts-replay').removeClass('is-speaking');
     }
 
-    function hablarConNavegador(t, myToken, onEnd) {
+    function hablarConNavegador(t, myToken, onEnd, personaje) {
         if (!window.speechSynthesis) {
             if (typeof onEnd === 'function') onEnd();
             return;
@@ -1812,7 +1901,7 @@
         u.lang = (voice && voice.lang) ? voice.lang : 'es-MX';
         if (voice) u.voice = voice;
         u.rate = configNivel().ttsRate;
-        u.pitch = 1;
+        u.pitch = personaje === 'zeus' ? 0.75 : 1.15;
         u.volume = 1;
         u.onend = function () {
             if (myToken !== ttsToken) return;
@@ -1847,19 +1936,23 @@
         }, 250);
     }
 
-    function hablarTexto(texto, onEnd) {
+    function hablarTexto(texto, onEnd, personaje, opts) {
         const t = String(texto || '').replace(/\s+/g, ' ').trim();
         if (!t) {
             if (typeof onEnd === 'function') onEnd();
             return;
         }
-        ttsToken += 1;
+        const encadenar = !!(opts && opts.encadenar);
+        const pj = String(personaje || 'zoe').toLowerCase() === 'zeus' ? 'zeus' : 'zoe';
+        if (!encadenar) {
+            ttsToken += 1;
+        }
         const myToken = ttsToken;
-        if (ttsKeepAlive) {
+        if (!encadenar && ttsKeepAlive) {
             clearInterval(ttsKeepAlive);
             ttsKeepAlive = null;
         }
-        if (window.speechSynthesis) {
+        if (!encadenar && window.speechSynthesis) {
             try { window.speechSynthesis.cancel(); } catch (e) { /* noop */ }
         }
         if (ttsPlayer) {
@@ -1883,7 +1976,7 @@
         };
 
         if (!ttsUrl) {
-            hablarConNavegador(t, myToken, onEnd);
+            hablarConNavegador(t, myToken, onEnd, pj);
             return;
         }
 
@@ -1891,13 +1984,13 @@
             ? {
                 url: ttsUrl,
                 method: 'GET',
-                data: { texto: t },
+                data: { texto: t, personaje: pj },
                 headers: { Accept: 'application/json' },
             }
             : {
                 url: ttsUrl,
                 method: 'POST',
-                data: JSON.stringify({ texto: t }),
+                data: JSON.stringify({ texto: t, personaje: pj }),
                 contentType: 'application/json',
                 headers: { 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
             };
@@ -1906,7 +1999,7 @@
             if (myToken !== ttsToken) return;
             const src = res && res.data && res.data.url;
             if (!src) {
-                hablarConNavegador(t, myToken, onEnd);
+                hablarConNavegador(t, myToken, onEnd, pj);
                 return;
             }
             const player = asegurarTtsPlayer();
@@ -1929,19 +2022,42 @@
                     }
                 }).catch(function () {
                     if (myToken !== ttsToken) return;
-                    hablarConNavegador(t, myToken, onEnd);
+                    hablarConNavegador(t, myToken, onEnd, pj);
                 });
             }
         }).fail(function () {
             if (myToken !== ttsToken) return;
-            hablarConNavegador(t, myToken, onEnd);
+            hablarConNavegador(t, myToken, onEnd, pj);
         });
+    }
+
+    function hablarSecuencia(lineas, onEnd, idx) {
+        const lista = Array.isArray(lineas) ? lineas.filter((l) => String(l?.texto || '').trim()) : [];
+        const i = idx || 0;
+        if (!lista.length || i >= lista.length) {
+            if (typeof onEnd === 'function') onEnd();
+            return;
+        }
+        const linea = lista[i];
+        hablarTexto(linea.texto, function () {
+            hablarSecuencia(lista, onEnd, i + 1);
+        }, linea.personaje, { encadenar: i > 0 });
     }
 
     function parseIntentos(val) {
         if (val === 'Sin límite') return Infinity;
         const n = Number(val);
         return Number.isFinite(n) && n > 0 ? n : 2;
+    }
+
+    function programarOcultarFeedback($el) {
+        clearTimeout(fbHideTimer);
+        const $target = $el && $el.length ? $el : $();
+        fbHideTimer = setTimeout(function () {
+            if ($target.length) {
+                $target.prop('hidden', true);
+            }
+        }, FB_HIDE_MS);
     }
 
     function showFb(ok, okMsg, errMsg) {
@@ -1958,6 +2074,7 @@
             .text(ok ? okMsg : errMsg);
         if (ok) celebrarExito(false);
         else reproducirSfx('err');
+        programarOcultarFeedback($fb);
     }
 
     function marcarBloqueVisto() {
@@ -1999,9 +2116,7 @@
             case 'historia':
                 return historiaPage >= totalPaginasHistoria(bloque) - 1 && !!$body.data('vn-bloque-visto');
             case 'evidencia':
-                return $body.find('.vn-evidencia-msg').filter(function () {
-                    return !$(this).prop('hidden');
-                }).length > 0;
+                return !!$body.data('vn-evidencia-ok');
             case 'pregunta':
                 return !!$body.find('[data-vn-pregunta]').data('locked');
             case 'reto': {
@@ -2022,7 +2137,10 @@
             case 'arrastrar':
                 return itemsPoolCompletos($body.find('[data-vn-arrastrar-pool] [data-vn-item]'));
             case 'dibujo':
-                return !!(paint && paint.history && paint.history.length > 1);
+                return !!(paint && (
+                    (paint.history && paint.history.length > 1)
+                    || paint.restauradoConContenido
+                ));
             case 'juego': {
                 const juegoId = d.juego_id || '';
                 if (juegoId === 'memoria') {
@@ -2037,7 +2155,10 @@
                     return $body.find('[data-vn-secuencia].is-complete').length > 0;
                 }
                 if (juegoId === 'colorear') {
-                    return !!(paint && paint.history && paint.history.length > 1);
+                    return !!(paint && (
+                        (paint.history && paint.history.length > 1)
+                        || paint.restauradoConContenido
+                    ));
                 }
                 return !!$body.data('vn-bloque-visto');
             }
@@ -2155,6 +2276,301 @@
         setTimeout(() => { $btnNext.removeClass('vn-nav-shake'); }, 520);
     }
 
+    function claveSesionBloque(bloque) {
+        if (!bloque || bloque.id == null || bloque.id === '') return '';
+        return String(bloque.id);
+    }
+
+    function limpiarEstadoSesionBloques() {
+        Object.keys(estadoSesionBloques).forEach((k) => { delete estadoSesionBloques[k]; });
+    }
+
+    function capturarEstadoSesion(bloque) {
+        if (!bloque || !$body || !$body.length) return;
+        const key = claveSesionBloque(bloque);
+        if (!key) return;
+
+        const estado = {
+            tipo: bloque.tipo,
+            visto: !!$body.data('vn-bloque-visto'),
+            bienvenidaVideoOk: !!$body.data('vn-bienvenida-video-ok'),
+        };
+
+        if (bloque.tipo === 'dibujo' || esBloqueColorear(bloque)) {
+            const canvas = document.getElementById('vnCanvas');
+            if (canvas && paint && paint.history && paint.history.length > 1) {
+                try {
+                    estado.canvasDataUrl = canvas.toDataURL('image/png');
+                    estado.trazos = Math.max(0, paint.history.length - 1);
+                } catch (e) { /* noop */ }
+            }
+        }
+
+        if (bloque.tipo === 'historia') {
+            estado.historiaPage = historiaPage;
+        }
+
+        if (bloque.tipo === 'reto') {
+            estado.retoPaso = retoPaso;
+            const $box = $body.find('[data-vn-reto]');
+            if ($box.length) {
+                estado.locked = !!$box.data('locked');
+                estado.resultado = $box.data('vn-resultado') || null;
+            }
+        }
+
+        if (bloque.tipo === 'pregunta') {
+            const $box = $body.find('[data-vn-pregunta]');
+            if ($box.length) {
+                estado.locked = !!$box.data('locked');
+                estado.resultado = $box.data('vn-resultado') || null;
+                estado.intentosRestantes = intentosRestantes;
+            }
+        }
+
+        if (bloque.tipo === 'emocion') {
+            const $picked = $body.find('.vn-emocion.is-picked');
+            if ($picked.length) estado.emocionId = String($picked.data('id') || '');
+        }
+
+        if (bloque.tipo === 'evidencia') {
+            const blob = $body.data('vn-evidencia-blob');
+            if (blob instanceof Blob) {
+                estado.evidenciaBlob = blob;
+                estado.evidenciaTipo = String($body.data('vn-evidencia-tipo-media') || 'foto');
+                estado.evidenciaOk = !!$body.data('vn-evidencia-ok');
+            }
+        }
+
+        if (bloque.tipo === 'audio') {
+            estado.audioDone = $body.find('[data-vn-audio-play].is-done').length > 0;
+        }
+        if (bloque.tipo === 'video') {
+            estado.videoDone = $body.find('[data-vn-video-play].is-done').length > 0;
+        }
+        if (bloque.tipo === 'ra') {
+            estado.raDone = $body.find('[data-vn-ra-listo].is-done').length > 0;
+        }
+
+        if (bloque.tipo === 'emparejar') {
+            estado.matchedIzq = [];
+            $body.find('[data-vn-emparejar] [data-vn-izq].is-matched').each(function () {
+                estado.matchedIzq.push(Number($(this).data('vn-izq')));
+            });
+            estado.empFallos = Number($body.data('vn-emp-fallos') || 0);
+        }
+
+        if (bloque.tipo === 'clasificacion' || bloque.tipo === 'arrastrar') {
+            const poolSel = bloque.tipo === 'clasificacion'
+                ? '[data-vn-clasif-pool] [data-vn-item].is-matched'
+                : '[data-vn-arrastrar-pool] [data-vn-item].is-matched';
+            estado.placements = [];
+            $body.find(poolSel).each(function () {
+                estado.placements.push({
+                    index: Number($(this).data('vn-item')),
+                    cat: String($(this).data('cat') || ''),
+                    zona: String($(this).data('zona') || ''),
+                });
+            });
+        }
+
+        if (bloque.tipo === 'juego') {
+            const juegoId = String(datos(bloque).juego_id || '');
+            estado.juegoId = juegoId;
+            if (juegoId === 'memoria') {
+                estado.memoryDone = [];
+                $body.find('[data-vn-memory] .vn-memory-card.is-done').each(function () {
+                    estado.memoryDone.push({
+                        i: Number($(this).data('i')),
+                        pair: String($(this).data('pair') || ''),
+                    });
+                });
+                estado.memIntentos = Number($body.data('vn-mem-intentos') || 0);
+            }
+            if (juegoId === 'rompecabezas') {
+                estado.puzzleComplete = $body.find('[data-vn-puzzle].is-complete').length > 0;
+                estado.puzzleFilled = [];
+                $body.find('[data-vn-puzzle-slot].is-filled').each(function () {
+                    estado.puzzleFilled.push({
+                        slot: Number($(this).data('vn-puzzle-slot')),
+                        piece: Number($(this).attr('data-filled-piece')),
+                    });
+                });
+            }
+            if (juegoId === 'secuencia') {
+                estado.seqOrder = [];
+                $body.find('[data-vn-seq-card]').each(function () {
+                    estado.seqOrder.push(Number($(this).data('orden')));
+                });
+                estado.seqComplete = $body.find('[data-vn-secuencia].is-complete').length > 0;
+            }
+        }
+
+        estadoSesionBloques[key] = estado;
+    }
+
+    function aplicarCanvasDesdeDataUrl(dataUrl) {
+        const canvas = document.getElementById('vnCanvas');
+        if (!canvas || !drawCtx || !paint || !dataUrl) return;
+        const img = new Image();
+        img.onload = function () {
+            if (!drawCtx || !paint) return;
+            if (paint.mode === 'dibujo' && !paint.hasFondo) {
+                drawCtx.fillStyle = '#ffffff';
+                drawCtx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                drawCtx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            drawCtx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            paint.history = [];
+            paint.restauradoConContenido = true;
+            // Dos estados iguales: length > 1 para "completo" y deshacer no borra todo de golpe.
+            paintSaveState();
+            paintSaveState();
+            actualizarNavBloque();
+        };
+        img.src = dataUrl;
+    }
+
+    function restaurarEstadoSesion(bloque) {
+        if (!bloque || !$body || !$body.length) return;
+        const key = claveSesionBloque(bloque);
+        if (!key) return;
+        const estado = estadoSesionBloques[key];
+        if (!estado) return;
+
+        restaurandoSesion = true;
+        try {
+            if (estado.visto) $body.data('vn-bloque-visto', true);
+            if (estado.bienvenidaVideoOk) $body.data('vn-bienvenida-video-ok', true);
+
+            if ((bloque.tipo === 'dibujo' || esBloqueColorear(bloque)) && estado.canvasDataUrl) {
+                aplicarCanvasDesdeDataUrl(estado.canvasDataUrl);
+            }
+
+            if (bloque.tipo === 'emocion' && estado.emocionId) {
+                const $btn = $body.find(`.vn-emocion[data-id="${escapar(estado.emocionId)}"]`);
+                if ($btn.length) {
+                    $body.find('.vn-emocion').removeClass('is-picked');
+                    $btn.addClass('is-picked');
+                }
+            }
+
+            if (bloque.tipo === 'evidencia' && estado.evidenciaBlob instanceof Blob) {
+                const refs = refsEvidencia($body);
+                if (refs && refs.$stage.length) {
+                    aplicarBlobEvidencia(refs, estado.evidenciaTipo || 'foto', estado.evidenciaBlob, { silencioso: true });
+                }
+            }
+
+            if (bloque.tipo === 'audio' && estado.audioDone) {
+                setAudioUi('done');
+            }
+            if (bloque.tipo === 'video' && estado.videoDone) {
+                setVideoUi('done');
+            }
+            if (bloque.tipo === 'ra' && estado.raDone) {
+                $body.find('[data-vn-ra-listo]').addClass('is-done').prop('disabled', true);
+            }
+
+            if (bloque.tipo === 'pregunta') {
+                const $box = $body.find('[data-vn-pregunta]');
+                if ($box.length && estado.resultado) {
+                    guardarResultadoEnBox($box, estado.resultado);
+                    const idx = Number(estado.resultado.opcion_index);
+                    const $op = $box.find(`[data-vn-opcion="${idx}"]`);
+                    if ($op.length) {
+                        $op.addClass(estado.resultado.correcta ? 'is-ok' : 'is-bad');
+                        if (estado.resultado.correcta) {
+                            $box.find('.vn-option').not($op).prop('disabled', true);
+                        }
+                    }
+                    if (estado.locked) $box.data('locked', true);
+                    if (estado.intentosRestantes != null) intentosRestantes = estado.intentosRestantes;
+                }
+            }
+
+            if (bloque.tipo === 'reto') {
+                const $box = $body.find('[data-vn-reto]');
+                if ($box.length && estado.resultado) {
+                    guardarResultadoEnBox($box, estado.resultado);
+                    if (estado.locked) $box.data('locked', true);
+                }
+            }
+
+            if (bloque.tipo === 'emparejar' && Array.isArray(estado.matchedIzq)) {
+                estado.matchedIzq.forEach((i) => {
+                    $body.find(`[data-vn-izq="${i}"]`).addClass('is-matched');
+                    $body.find(`[data-vn-der="${i}"]`).addClass('is-matched');
+                });
+                if (estado.empFallos) $body.data('vn-emp-fallos', estado.empFallos);
+            }
+
+            if ((bloque.tipo === 'clasificacion' || bloque.tipo === 'arrastrar')
+                && Array.isArray(estado.placements)) {
+                estado.placements.forEach((p) => {
+                    const $chip = $body.find(`[data-vn-item="${p.index}"]`).filter('.vn-chip-drag').first();
+                    if (!$chip.length) return;
+                    let zoneEl = null;
+                    if (bloque.tipo === 'clasificacion' && p.cat) {
+                        zoneEl = $body.find(`[data-vn-cat="${CSS.escape ? CSS.escape(p.cat) : p.cat}"]`)[0];
+                        if (!zoneEl) {
+                            $body.find('[data-vn-cat]').each(function () {
+                                if (String($(this).data('vn-cat')) === p.cat) zoneEl = this;
+                            });
+                        }
+                    } else if (p.zona) {
+                        zoneEl = $body.find(`[data-vn-zona]`).filter(function () {
+                            return String($(this).data('vn-zona')) === p.zona;
+                        })[0];
+                    }
+                    if (zoneEl) colocarChipEnZona($chip, zoneEl);
+                });
+            }
+
+            if (bloque.tipo === 'juego' && estado.juegoId === 'memoria' && Array.isArray(estado.memoryDone)) {
+                estado.memoryDone.forEach((card) => {
+                    const $card = $body.find(`.vn-memory-card[data-i="${card.i}"]`);
+                    if (!$card.length) return;
+                    const url = mediaUrl(card.pair);
+                    $card.addClass('is-flipped is-done');
+                    $card.find('.vn-memory-back').prop('hidden', true);
+                    if (url && !$card.find('img').length) {
+                        $card.append(`<img src="${escapar(url)}" alt="" class="vn-memory-front">`);
+                    }
+                });
+                if (estado.memIntentos) $body.data('vn-mem-intentos', estado.memIntentos);
+                actualizarScoreMemoria();
+                if (estado.memoryDone.length
+                    && estado.memoryDone.length >= $body.find('[data-vn-memory] .vn-memory-card').length) {
+                    $body.find('[data-vn-memory]').addClass('is-complete');
+                }
+            }
+
+            if (bloque.tipo === 'juego' && estado.juegoId === 'secuencia' && Array.isArray(estado.seqOrder) && estado.seqOrder.length) {
+                const $root = $body.find('[data-vn-secuencia]');
+                const $cards = $root.find('[data-vn-seq-card]').toArray();
+                const byOrden = {};
+                $cards.forEach((el) => {
+                    byOrden[Number($(el).data('orden'))] = el;
+                });
+                estado.seqOrder.forEach((orden) => {
+                    if (byOrden[orden]) $root.append(byOrden[orden]);
+                });
+                if (estado.seqComplete) $root.addClass('is-complete');
+            }
+        } finally {
+            restaurandoSesion = false;
+            actualizarNavBloque();
+        }
+    }
+
+    function programarRestaurarEstadoSesion(bloque) {
+        programarAjusteLayout(function () {
+            restaurarEstadoSesion(bloque);
+        });
+    }
+
     function csrfTokenKiosco() {
         return $('meta[name="csrf-token"]').attr('content') || '';
     }
@@ -2234,22 +2650,108 @@
         return fetch(dataUrl).then(function (res) { return res.blob(); });
     }
 
+    function dibujarImagenContain(ctx, img, canvasW, canvasH) {
+        const iw = img.naturalWidth || img.width || 0;
+        const ih = img.naturalHeight || img.height || 0;
+        if (!iw || !ih || !canvasW || !canvasH) return;
+        const scale = Math.min(canvasW / iw, canvasH / ih);
+        const dw = iw * scale;
+        const dh = ih * scale;
+        const dx = (canvasW - dw) / 2;
+        const dy = (canvasH - dh) / 2;
+        ctx.drawImage(img, dx, dy, dw, dh);
+    }
+
+    function urlFondoPaintActual() {
+        if (paint && paint.fondoUrl) return String(paint.fondoUrl);
+        const $bg = $body && $body.find('.vn-colorear-bg').first();
+        if ($bg && $bg.length) {
+            const bg = String($bg.css('background-image') || '');
+            const m = bg.match(/url\(["']?(.*?)["']?\)/i);
+            if (m && m[1] && m[1] !== 'none') return m[1];
+        }
+        const stage = $body && $body.find('.vn-draw-stage')[0];
+        if (stage) {
+            const bg = String(window.getComputedStyle(stage).backgroundImage || '');
+            const m = bg.match(/url\(["']?(.*?)["']?\)/i);
+            if (m && m[1] && m[1] !== 'none') return m[1];
+        }
+        return '';
+    }
+
+    function canvasTieneContenidoExportable() {
+        if (!paint) return false;
+        if (paint.restauradoConContenido) return true;
+        return !!(paint.history && paint.history.length > 1);
+    }
+
     function exportarCanvasComoBlobPromise() {
         return new Promise(function (resolve) {
             const canvas = document.getElementById('vnCanvas');
-            if (!canvas || !paint || !paint.history || paint.history.length <= 1) {
+            if (!canvas || !canvasTieneContenidoExportable()) {
                 resolve(null);
                 return;
             }
-            if (typeof canvas.toBlob === 'function') {
-                canvas.toBlob(function (blob) { resolve(blob || null); }, 'image/png', 0.92);
+
+            const out = document.createElement('canvas');
+            out.width = canvas.width;
+            out.height = canvas.height;
+            const ctx = out.getContext('2d');
+            if (!ctx) {
+                resolve(null);
                 return;
             }
-            try {
-                resolve(dataUrlABlob(canvas.toDataURL('image/png')));
-            } catch (e) {
-                resolve(null);
+
+            const terminar = function () {
+                try {
+                    ctx.drawImage(canvas, 0, 0);
+                } catch (e) {
+                    resolve(null);
+                    return;
+                }
+                if (typeof out.toBlob === 'function') {
+                    out.toBlob(function (blob) { resolve(blob || null); }, 'image/png', 0.92);
+                    return;
+                }
+                try {
+                    resolve(dataUrlABlob(out.toDataURL('image/png')));
+                } catch (e) {
+                    resolve(null);
+                }
+            };
+
+            // Base blanca (igual que el escenario visible).
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, out.width, out.height);
+
+            const fondoUrl = urlFondoPaintActual();
+            if (!fondoUrl) {
+                terminar();
+                return;
             }
+
+            const img = new Image();
+            // Mismo origen: no forzar crossOrigin (evita canvas "tainted").
+            if (/^https?:\/\//i.test(fondoUrl) && fondoUrl.indexOf(window.location.origin) !== 0) {
+                img.crossOrigin = 'anonymous';
+            }
+            img.onload = function () {
+                try {
+                    if (paint && paint.mode === 'colorear') {
+                        ctx.filter = 'grayscale(1)';
+                    }
+                    dibujarImagenContain(ctx, img, out.width, out.height);
+                    ctx.filter = 'none';
+                } catch (e) {
+                    ctx.filter = 'none';
+                }
+                terminar();
+            };
+            img.onerror = function () {
+                // Si el fondo falla, al menos guarda los trazos sobre blanco.
+                terminar();
+            };
+            img.src = fondoUrl;
         });
     }
 
@@ -2500,6 +3002,10 @@
     }
 
     function alCompletarActividad() {
+        if (restaurandoSesion) {
+            actualizarNavBloque();
+            return;
+        }
         const bloque = bloques[index];
         if (debePersistirAlAvanzar(bloque)) {
             actualizarNavBloque();
@@ -2583,20 +3089,18 @@
 
     function iniciarInstruccionBloque(bloque) {
         const d = datos(bloque);
+        const lineas = lineasAudioBloque(bloque);
+        const alTerminar = () => trasInstruccionBloque(bloque);
+
         if (bloque.tipo === 'pregunta') {
             const pregunta = String(d.texto || '').trim();
-            const instr = String(d.instruccion || '').trim();
-            let texto = '';
-            if (pregunta && instr && instr !== pregunta) {
-                texto = `${pregunta}. ${instr}`;
-            } else {
-                texto = pregunta || instr;
+            const seq = lineas.slice();
+            if (pregunta && !seq.some((l) => l.texto === pregunta)) {
+                const pj = (seq[seq.length - 1] && seq[seq.length - 1].personaje) || 'zoe';
+                seq.push({ texto: pregunta, personaje: pj });
             }
-            if (texto) {
-                hablarTexto(texto, () => trasInstruccionBloque(bloque));
-            } else {
-                trasInstruccionBloque(bloque);
-            }
+            if (seq.length) hablarSecuencia(seq, alTerminar);
+            else alTerminar();
             return;
         }
         if (bloque.tipo === 'reto') {
@@ -2604,27 +3108,18 @@
             const paso = pasos[retoPaso] || {};
             const pregunta = String(paso.pregunta || '').trim();
             const nombreReto = String(d.descripcion || '').trim();
-            const instr = retoPaso === 0 ? String(d.instruccion || '').trim() : '';
-            const enunciado = pregunta || instr || nombreReto;
-            let texto = '';
-            if (pregunta && instr && instr !== pregunta) {
-                texto = `${pregunta}. ${instr}`;
-            } else {
-                texto = enunciado;
+            const seq = retoPaso === 0 ? lineas.slice() : [];
+            const extra = pregunta || (retoPaso === 0 ? '' : nombreReto);
+            if (extra && !seq.some((l) => l.texto === extra)) {
+                const pj = (seq[seq.length - 1] && seq[seq.length - 1].personaje) || 'zoe';
+                seq.push({ texto: extra, personaje: pj });
             }
-            if (texto) {
-                hablarTexto(texto, () => trasInstruccionBloque(bloque));
-            } else {
-                trasInstruccionBloque(bloque);
-            }
+            if (seq.length) hablarSecuencia(seq, alTerminar);
+            else alTerminar();
             return;
         }
-        const texto = String(d.instruccion || '').trim();
-        if (texto) {
-            hablarTexto(texto, () => trasInstruccionBloque(bloque));
-        } else {
-            trasInstruccionBloque(bloque);
-        }
+        if (lineas.length) hablarSecuencia(lineas, alTerminar);
+        else alTerminar();
     }
 
     function paintAddListener(el, type, fn, opts) {
@@ -2737,6 +3232,7 @@
             shapeStart: null,
             snapshot: null,
             hasFondo: !!opts.hasFondo,
+            fondoUrl: opts.fondoUrl ? String(opts.fondoUrl) : '',
             strokeStarted: false,
         };
         if (paint.mode === 'dibujo' && !paint.hasFondo) {
@@ -2849,6 +3345,7 @@
                 mode: 'dibujo',
                 color: colorInicial,
                 hasFondo: !!d.fondo,
+                fondoUrl: mediaUrl(d.fondo) || '',
                 lineWidth: PAINT_SIZE_MAP[brushKey],
             });
             paintSelectColor(colorInicial);
@@ -2871,6 +3368,7 @@
                 color: colores[0] || '#EF4444',
                 lineWidth: nivelEtario === 'prejardin' ? PAINT_SIZE_MAP.l : PAINT_SIZE_MAP.m,
                 hasFondo: true,
+                fondoUrl: mediaUrl(d.juego_imagen) || '',
             });
             paintSelectColor(colores[0] || '#EF4444');
         }
@@ -2882,7 +3380,7 @@
         if (bloque.tipo === 'reto') {
             const $box = $body.find('[data-vn-reto]');
             intentosRestantes = parseIntentos($box.data('intentos'));
-            if (retoPaso !== 0) $body.find('.vn-instruccion').hide();
+            if (retoPaso !== 0) $body.find('.vn-instrucciones, .vn-instruccion').hide();
         }
 
         // Memoria state
@@ -2910,10 +3408,10 @@
             initImagenZoom();
         }
         if (bloque.tipo === 'historia') {
-            if (historiaPage !== 0) $body.find('.vn-instruccion').hide();
-            const texto = String(datos(bloque).instruccion || '').trim();
-            if (historiaPage === 0 && texto) {
-                hablarTexto(texto, () => iniciarAudioHistoria());
+            if (historiaPage !== 0) $body.find('.vn-instrucciones, .vn-instruccion').hide();
+            const lineas = lineasAudioBloque(bloque);
+            if (historiaPage === 0 && lineas.length) {
+                hablarSecuencia(lineas, () => iniciarAudioHistoria());
             } else {
                 iniciarAudioHistoria();
             }
@@ -2922,9 +3420,9 @@
         } else if (bloque.tipo === 'video' && !mediaUrl(datos(bloque).archivo)) {
             iniciarInstruccionBloque(bloque);
         } else if (bloque.tipo === 'bienvenida' && (datos(bloque).tipo_media || '') === 'video') {
-            const texto = String(datos(bloque).instruccion || '').trim();
-            if (texto) {
-                hablarTexto(texto, () => pulsarBotonVideoBienvenida());
+            const lineasBien = lineasAudioBloque(bloque);
+            if (lineasBien.length) {
+                hablarSecuencia(lineasBien, () => pulsarBotonVideoBienvenida());
             } else {
                 pulsarBotonVideoBienvenida();
             }
@@ -3244,6 +3742,7 @@
     function ir(delta) {
         cancelarAvanceAutomatico();
         const bloque = bloques[index];
+        capturarEstadoSesion(bloque);
         if (delta > 0 && debePersistirAlAvanzar(bloque)) {
             encolarGuardadoResultado(bloque);
         }
@@ -3252,6 +3751,12 @@
         index = next;
         historiaPage = 0;
         retoPaso = 0;
+        const siguiente = bloques[index];
+        const est = siguiente ? estadoSesionBloques[claveSesionBloque(siguiente)] : null;
+        if (est) {
+            if (typeof est.historiaPage === 'number') historiaPage = est.historiaPage;
+            if (typeof est.retoPaso === 'number') retoPaso = est.retoPaso;
+        }
         pintar();
     }
 
@@ -3277,8 +3782,9 @@
         historiaPage = 0;
         retoPaso = 0;
         intentosRestantes = null;
+        limpiarEstadoSesionBloques();
         if ($body && $body.length) {
-            $body.removeData('vn-bloque-visto vn-bienvenida-video-ok');
+            $body.removeData('vn-bloque-visto vn-bienvenida-video-ok vn-evidencia-ok');
         }
     }
 
@@ -3472,6 +3978,7 @@
         index = 0;
         historiaPage = 0;
         retoPaso = 0;
+        limpiarEstadoSesionBloques();
         aplicarNivelEtario();
         $overlay.prop('hidden', false).attr('aria-hidden', 'false');
         $('body').css('overflow', 'hidden');
@@ -3585,6 +4092,7 @@
         if (typeof limpiarDragArrastrar === 'function') limpiarDragArrastrar();
         if (typeof limpiarDragPuzzle === 'function') limpiarDragPuzzle();
         if (typeof limpiarDragSecuencia === 'function') limpiarDragSecuencia();
+        if (typeof limpiarDragEmparejar === 'function') limpiarDragEmparejar();
         if (typeof limpiarPaint === 'function') limpiarPaint();
         const clasifDrag = $body && $body.data('vn-clasif-drag');
         if (clasifDrag && clasifDrag.ghost && clasifDrag.ghost.parentNode) {
@@ -3717,6 +4225,7 @@
         historiaPage = 0;
         retoPaso = 0;
         intentosRestantes = null;
+        limpiarEstadoSesionBloques();
         desbloquearAudioTts();
         aplicarNivelEtario();
         pintar();
@@ -3729,6 +4238,7 @@
         limpiarMediosPlayer();
         bloques = [];
         index = 0;
+        limpiarEstadoSesionBloques();
         alTerminarExperiencia = null;
         if ($body && $body.length) $body.empty();
         $('body').removeClass('rn-player-activo');
@@ -3792,6 +4302,14 @@
 
     onBody('click', '[data-vn-tts-replay]', function (e) {
         e.stopPropagation();
+        const $seq = $(this).closest('[data-vn-tts-seq]');
+        if ($seq.length) {
+            try {
+                const lineas = JSON.parse($seq.attr('data-vn-tts-seq') || '[]');
+                hablarSecuencia(lineas);
+                return;
+            } catch (err) { /* fallback texto */ }
+        }
         const texto = $(this).closest('[data-vn-tts-text]').attr('data-vn-tts-text')
             || $(this).closest('.vn-instruccion').text();
         hablarTexto(texto);
@@ -3904,6 +4422,7 @@
             $estado: $wrap.find('[data-vn-evidencia-estado]'),
             $btn: $wrap.find('[data-vn-evidencia]'),
             $captura: $wrap.find('[data-vn-evidencia-captura]'),
+            $repetir: $wrap.find('[data-vn-evidencia-repetir]'),
             $file: $wrap.find('[data-vn-evidencia-file]'),
             $msg: $scope.find('.vn-evidencia-msg'),
         };
@@ -3924,6 +4443,7 @@
         refs.$stage.prop('hidden', false);
         refs.$btn.prop('hidden', true).prop('disabled', false);
         refs.$captura.prop('hidden', false);
+        if (refs.$repetir && refs.$repetir.length) refs.$repetir.prop('hidden', true);
         refs.$placeholder.prop('hidden', true);
         refs.$preview.prop('hidden', true);
         refs.$result.prop('hidden', true).removeAttr('src');
@@ -3949,6 +4469,7 @@
     function resetUiEvidencia(refs) {
         refs.$stage.prop('hidden', true);
         refs.$captura.prop('hidden', true);
+        if (refs.$repetir && refs.$repetir.length) refs.$repetir.prop('hidden', true);
         refs.$recording.prop('hidden', true);
         refs.$preview.prop('hidden', true);
         refs.$result.prop('hidden', true);
@@ -3970,6 +4491,40 @@
         refs.$videoEl.removeAttr('src');
     }
 
+    function mostrarBotonRepetirEvidencia(refs) {
+        if (!refs || !refs.$repetir || !refs.$repetir.length) return;
+        refs.$captura.prop('hidden', true);
+        refs.$repetir.prop('hidden', false);
+    }
+
+    function reiniciarEvidenciaParaRepetir() {
+        vincularElementos();
+        const refs = refsEvidencia($body);
+        if (!refs || !refs.$wrap.length) return;
+
+        detenerEvidenciaStream();
+        detenerEvidenciaReplay(refs);
+
+        const objectUrl = $body.data('vn-evidencia-object-url');
+        if (objectUrl) {
+            try { URL.revokeObjectURL(objectUrl); } catch (e) { /* noop */ }
+        }
+        $body.removeData('vn-evidencia-ok vn-evidencia-blob vn-evidencia-tipo-media vn-evidencia-object-url vn-evidencia-estado');
+        evidenciaSesion += 1;
+
+        const bloque = bloques[index];
+        const key = claveSesionBloque(bloque);
+        if (key && estadoSesionBloques[key]) {
+            delete estadoSesionBloques[key].evidenciaBlob;
+            delete estadoSesionBloques[key].evidenciaTipo;
+            delete estadoSesionBloques[key].evidenciaOk;
+        }
+
+        resetUiEvidencia(refs);
+        refs.$btn.addClass('vn-pulse-hint');
+        actualizarNavBloque();
+    }
+
     function mostrarErrorEvidencia(refs, mensaje) {
         detenerEvidenciaStream();
         $body.removeData('vn-evidencia-estado');
@@ -3977,8 +4532,9 @@
         showFb(false, '', mensaje);
     }
 
-    function aplicarBlobEvidencia(refs, tipo, blob) {
+    function aplicarBlobEvidencia(refs, tipo, blob, opts) {
         if (!blob || !refs) return;
+        opts = opts || {};
         $body.data('vn-evidencia-blob', blob);
         $body.data('vn-evidencia-tipo-media', tipo);
         const prevUrl = $body.data('vn-evidencia-object-url');
@@ -4009,6 +4565,15 @@
             refs.$videoEl.attr('src', url);
             refs.$videoReplay.prop('hidden', false);
             setVideoBotonEstado(refs.$videoPlayBtn, refs.$videoStage, refs.$videoEl, 'idle');
+        }
+        if (opts.silencioso) {
+            refs.$btn.prop('hidden', true).prop('disabled', true).addClass('is-done');
+            refs.$msg.prop('hidden', false);
+            $body.data('vn-evidencia-ok', true);
+            $body.removeData('vn-evidencia-estado');
+            mostrarBotonRepetirEvidencia(refs);
+            actualizarNavBloque();
+            return;
         }
         finalizarEvidencia(refs);
     }
@@ -4048,9 +4613,12 @@
         }
 
         refs.$msg.prop('hidden', false);
+        $body.data('vn-evidencia-ok', true);
         $body.removeData('vn-evidencia-estado');
+        mostrarBotonRepetirEvidencia(refs);
         celebrarExito(false);
         alCompletarActividad();
+        programarOcultarFeedback(refs.$msg);
     }
 
     function iniciarGrabacionEvidencia(stream, tipo, sesion) {
@@ -4161,6 +4729,12 @@
     onBody('click', '[data-vn-evidencia-video-play]', function () {
         vincularElementos();
         reproducirEvidenciaVideo(refsEvidencia($body));
+    });
+
+    onBody('click', '[data-vn-evidencia-repetir]', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        reiniciarEvidenciaParaRepetir();
     });
 
     onBody('change', '[data-vn-evidencia-file]', function () {
@@ -4395,31 +4969,100 @@
 
     onBody('click', '[data-vn-emparejar] [data-vn-izq]', function () {
         if ($(this).hasClass('is-matched')) return;
+        if ($body.data('vn-emp-drag')) return;
         $body.find('[data-vn-izq]').removeClass('is-selected');
         $(this).addClass('is-selected');
         $body.data('emp-izq', Number($(this).data('vn-izq')));
     });
 
-    onBody('click', '[data-vn-emparejar] [data-vn-der]', function () {
+    onBody('click', '[data-vn-emparejar] [data-vn-der]', function (e) {
         if ($(this).hasClass('is-matched')) return;
+        if ($body.data('vn-emp-skip-click')) {
+            $body.data('vn-emp-skip-click', false);
+            return;
+        }
         const izq = $body.data('emp-izq');
         if (izq === null || izq === undefined) return;
-        const der = Number($(this).data('vn-der'));
-        const $box = $body.find('[data-vn-emparejar]');
-        const ok = izq === der;
-        if (ok) {
-            const $izqBtn = $body.find(`[data-vn-izq="${izq}"]`);
-            const $derBtn = $body.find(`[data-vn-der="${der}"]`);
-            $izqBtn.add($derBtn).addClass('is-matched vn-chip--matched').removeClass('is-selected');
-            flashUnionEmparejar($izqBtn, $derBtn);
-            showFb(true, $box.data('fb-ok'), $box.data('fb-err'));
-            alCompletarActividad();
-        } else {
-            showFb(false, $box.data('fb-ok'), $box.data('fb-err'));
-            $body.data('vn-emp-fallos', Number($body.data('vn-emp-fallos') || 0) + 1);
-            $body.find('[data-vn-izq]').removeClass('is-selected');
-        }
-        $body.data('emp-izq', null);
+        const $izqBtn = $body.find(`[data-vn-izq="${izq}"]`);
+        resolverEmparejar(izq, $izqBtn, $(this));
+    });
+
+    onBody('pointerdown', '[data-vn-emparejar] [data-vn-izq]', function (e) {
+        if ($(this).hasClass('is-matched')) return;
+        if (e.originalEvent && e.originalEvent.button != null && e.originalEvent.button !== 0) return;
+        limpiarDragEmparejar();
+        const oe = e.originalEvent || e;
+        const centro = centroChipEmparejar(this);
+        const $izq = $(this);
+        $body.find('[data-vn-izq]').removeClass('is-selected');
+        $izq.addClass('is-selected');
+        const izq = Number($izq.data('vn-izq'));
+        $body.data('emp-izq', izq);
+        const $line = crearLineaEmparejarLive();
+        actualizarGeometriaLineaEmparejar($line, centro.x, centro.y, oe.clientX, oe.clientY);
+        const drag = {
+            izq,
+            $izq,
+            x1: centro.x,
+            y1: centro.y,
+            $line,
+            pointerId: oe.pointerId,
+            moved: false,
+            startX: oe.clientX,
+            startY: oe.clientY,
+        };
+        $body.data('vn-emp-drag', drag);
+        try { this.setPointerCapture(oe.pointerId); } catch (err) { /* noop */ }
+        e.preventDefault();
+
+        const onMove = function (ev) {
+            const d = $body.data('vn-emp-drag');
+            if (!d) return;
+            const p = ev.originalEvent || ev;
+            if (d.pointerId != null && p.pointerId != null && p.pointerId !== d.pointerId) return;
+            const dx = p.clientX - d.startX;
+            const dy = p.clientY - d.startY;
+            if (!d.moved && (Math.abs(dx) + Math.abs(dy) > 8)) d.moved = true;
+            // Recalcular origen por si hubo scroll/layout.
+            if (d.$izq && d.$izq[0]) {
+                const c = centroChipEmparejar(d.$izq[0]);
+                d.x1 = c.x;
+                d.y1 = c.y;
+            }
+            actualizarGeometriaLineaEmparejar(d.$line, d.x1, d.y1, p.clientX, p.clientY);
+            $body.find('[data-vn-der]').removeClass('is-drop-hover');
+            const target = chipDerBajoPunto(p.clientX, p.clientY);
+            if (target) $(target).addClass('is-drop-hover');
+            ev.preventDefault();
+        };
+
+        const onUp = function (ev) {
+            const d = $body.data('vn-emp-drag');
+            $(window).off('.vnEmpDrag');
+            if (!d) return;
+            const p = ev.originalEvent || ev;
+            if (d.pointerId != null && p.pointerId != null && p.pointerId !== d.pointerId) return;
+
+            const target = chipDerBajoPunto(p.clientX, p.clientY);
+            const movio = !!d.moved;
+            const $izqBtn = d.$izq;
+            const izqIdx = d.izq;
+            limpiarDragEmparejar();
+
+            if (target) {
+                $body.data('vn-emp-skip-click', true);
+                resolverEmparejar(izqIdx, $izqBtn, $(target));
+                return;
+            }
+            // Tap sin arrastre: deja seleccionado para el segundo toque.
+            if (!movio && $izqBtn && $izqBtn.length) {
+                $izqBtn.addClass('is-selected');
+                $body.data('emp-izq', izqIdx);
+            }
+        };
+
+        $(window).on('pointermove.vnEmpDrag', onMove);
+        $(window).on('pointerup.vnEmpDrag pointercancel.vnEmpDrag', onUp);
     });
 
     onBody('click', '[data-vn-clasif-pool] [data-vn-item]', function () {

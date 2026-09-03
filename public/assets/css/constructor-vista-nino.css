@@ -517,6 +517,26 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     letter-spacing: .01em;
 }
 
+.vn-instrucciones {
+    position: absolute;
+    top: clamp(10px, 1.6vw, 16px);
+    left: clamp(10px, 1.6vw, 16px);
+    z-index: 30;
+    margin: 0;
+    display: block;
+    pointer-events: none;
+}
+
+.vn-instrucciones .vn-tts-replay {
+    margin: 0;
+    pointer-events: auto;
+}
+
+.vn-instrucciones-list,
+.vn-instruccion-pj {
+    display: none !important;
+}
+
 .vn-instruccion {
     background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(239, 246, 255, .82));
     border: 2px solid rgba(125, 211, 252, .42);
@@ -591,15 +611,33 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     background: #fff;
     box-shadow: 0 10px 24px rgba(15, 23, 42, .1);
     margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    position: relative;
+}
+
+.vn-media:has(> img) {
+    min-height: clamp(180px, 36vh, 480px);
 }
 
 .vn-media img,
 .vn-media video {
     display: block;
     width: 100%;
-    max-height: 420px;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
     background: #f8fafc;
+}
+
+.vn-media:has(> img) > img {
+    position: absolute;
+    inset: 0;
+    max-width: none;
+    max-height: none;
 }
 
 .vn-media audio {
@@ -660,6 +698,10 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     color: #0f172a;
     -webkit-tap-highlight-color: transparent;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .vn-option::before {
@@ -695,12 +737,18 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-option img {
-    width: 56px;
-    height: 56px;
-    object-fit: cover;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    max-height: min(28vh, 200px);
+    object-fit: contain;
     border-radius: 12px;
     margin: 0 auto 6px;
     display: block;
+    background: #f8fafc;
+    flex: 1 1 auto;
+    min-height: 96px;
 }
 
 .vn-option.is-ok {
@@ -753,16 +801,29 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 .vn-pregunta-media {
     display: flex;
     justify-content: center;
+    align-items: center;
     margin: 0 0 16px;
+    width: 100%;
+    min-height: clamp(140px, 22vh, 280px);
+    max-height: 36vh;
+    overflow: hidden;
+    position: relative;
+    border-radius: 18px;
+    background: #f8fafc;
 }
 
 .vn-pregunta-media img {
-    max-width: min(360px, 90%);
-    max-height: 220px;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     object-fit: contain;
     border-radius: 18px;
     background: #fff;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, .12);
+    box-shadow: none;
+    margin: 0;
 }
 
 .vn-bienvenida-media {
@@ -847,10 +908,15 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-card--pregunta .vn-option img {
-    width: 80px;
-    height: 80px;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    max-height: min(32vh, 220px);
+    min-height: 110px;
     border-radius: 14px;
     margin-bottom: 10px;
+    object-fit: contain;
 }
 
 .vn-card--pregunta .vn-feedback {
@@ -896,9 +962,14 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-card--emparejar .vn-chip img {
-    width: 64px;
-    height: 64px;
+    width: 100%;
+    max-width: 160px;
+    height: auto;
+    aspect-ratio: 1;
+    max-height: 160px;
     border-radius: 12px;
+    object-fit: contain;
+    background: #f8fafc;
 }
 
 .vn-card--emparejar .vn-feedback {
@@ -1032,8 +1103,12 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-zone-slots .vn-chip img {
-    width: 36px;
-    height: 36px;
+    width: 100%;
+    max-width: 64px;
+    height: auto;
+    aspect-ratio: 1;
+    max-height: 64px;
+    object-fit: contain;
 }
 
 .vn-zone.is-target {
@@ -1157,10 +1232,14 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-card--clasificacion .vn-chip img {
-    width: 56px;
-    height: 56px;
+    width: 100%;
+    max-width: 140px;
+    height: auto;
+    aspect-ratio: 1;
+    max-height: 140px;
     border-radius: 12px;
-    object-fit: cover;
+    object-fit: contain;
+    background: #f8fafc;
 }
 
 .vn-card--clasificacion .vn-zone-slots .vn-chip {
@@ -1173,19 +1252,25 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-card--clasificacion .vn-zone-slots .vn-chip img {
-    width: 36px;
-    height: 36px;
+    width: 100%;
+    max-width: 72px;
+    height: auto;
+    aspect-ratio: 1;
+    max-height: 72px;
+    object-fit: contain;
 }
 
 .vn-card--clasificacion .vn-sort-col--pool .vn-chip {
-    min-height: 64px;
+    min-height: 120px;
     font-size: 1.05rem;
     padding: 10px 8px;
+    flex-direction: column;
 }
 
 .vn-card--clasificacion .vn-sort-col--pool .vn-chip img {
-    width: 44px;
-    height: 44px;
+    width: 100%;
+    max-width: 160px;
+    max-height: 160px;
 }
 
 .vn-card--clasificacion .vn-feedback {
@@ -1235,10 +1320,14 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-card--arrastrar .vn-chip img {
-    width: 56px;
-    height: 56px;
+    width: 100%;
+    max-width: 140px;
+    height: auto;
+    aspect-ratio: 1;
+    max-height: 140px;
     border-radius: 12px;
-    object-fit: cover;
+    object-fit: contain;
+    background: #f8fafc;
 }
 
 .vn-card--arrastrar .vn-zone-slots .vn-chip {
@@ -1251,19 +1340,25 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-card--arrastrar .vn-zone-slots .vn-chip img {
-    width: 36px;
-    height: 36px;
+    width: 100%;
+    max-width: 72px;
+    height: auto;
+    aspect-ratio: 1;
+    max-height: 72px;
+    object-fit: contain;
 }
 
 .vn-card--arrastrar .vn-sort-col--pool .vn-chip {
-    min-height: 64px;
+    min-height: 120px;
     font-size: 1.05rem;
     padding: 10px 8px;
+    flex-direction: column;
 }
 
 .vn-card--arrastrar .vn-sort-col--pool .vn-chip img {
-    width: 44px;
-    height: 44px;
+    width: 100%;
+    max-width: 160px;
+    max-height: 160px;
 }
 
 .vn-card--arrastrar .vn-chip.is-dragging {
@@ -1670,7 +1765,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 .vn-card--imagen .vn-imagen-zoom {
     margin-top: 4px;
     flex: 1 1 auto;
-    min-height: 0;
+    min-height: clamp(220px, 42vh, 520px);
     width: 100%;
     max-width: 100%;
     overflow: hidden;
@@ -1678,20 +1773,26 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 .vn-imagen-zoom-inner {
+    position: absolute;
+    inset: 0;
     transform-origin: center center;
     will-change: transform;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 
 .vn-card--imagen .vn-imagen-zoom img {
-    max-height: min(78dvh, 680px);
-    width: auto;
-    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
     object-fit: contain;
     user-select: none;
     -webkit-user-drag: none;
@@ -2003,7 +2104,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 
 .vn-emociones {
     display: grid;
-    gap: clamp(8px, 1.2vh, 14px);
+    gap: clamp(10px, 1.6vh, 16px);
     width: 100%;
     max-width: min(980px, 100%);
     margin: 8px auto 0;
@@ -2025,7 +2126,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(2, minmax(0, 1fr));
     max-width: min(980px, 100%);
-    gap: clamp(6px, 1vh, 12px);
+    gap: clamp(10px, 1.4vh, 14px);
 }
 
 .vn-card--emocion:has(.vn-emociones[data-count="6"]) {
@@ -2073,10 +2174,11 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     align-items: center;
     justify-content: stretch;
     gap: clamp(2px, 0.5vh, 6px);
-    transition: transform .15s ease, background .15s ease, box-shadow .15s ease, filter .15s ease;
-    animation: vnEmotionFloat 2.4s ease-in-out infinite;
-    animation-delay: calc(var(--vn-i, 0) * 140ms);
+    transition: background .15s ease, box-shadow .15s ease, filter .15s ease;
+    /* La card NO se mueve/escala: evita que se solapen en el grid */
+    transform: none;
     overflow: hidden;
+    isolation: isolate;
 }
 
 .vn-emocion::before {
@@ -2088,19 +2190,32 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     border-radius: 50%;
     background: rgba(255, 255, 255, .35);
     filter: blur(10px);
-}
-
-.vn-emocion:nth-child(odd) {
-    --vn-i: 1;
-}
-
-.vn-emocion:nth-child(even) {
-    --vn-i: 2;
+    pointer-events: none;
 }
 
 .vn-emocion:active {
-    transform: translateY(4px);
     box-shadow: 0 4px 0 rgba(15, 23, 42, .08);
+    filter: brightness(0.98);
+}
+
+/* Float solo en la ilustración: la celda del grid se queda fija */
+.vn-emocion-img {
+    flex: 1 1 0;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    transform-origin: center bottom;
+    animation: vnEmotionFloat 2.4s ease-in-out infinite;
+    animation-delay: calc(var(--vn-i, 0) * 160ms);
+    will-change: transform;
 }
 
 @keyframes vnEmotionFloat {
@@ -2111,23 +2226,8 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     }
 
     50% {
-        transform: translateY(-3px);
+        transform: translateY(-5px);
     }
-}
-
-.vn-emocion-img {
-    flex: 1 1 0;
-    width: 100%;
-    min-width: 0;
-    min-height: 0;
-    max-width: 100%;
-    max-height: 100%;
-    height: auto;
-    object-fit: contain;
-    object-position: center bottom;
-    display: block;
-    pointer-events: none;
-    user-select: none;
 }
 
 .vn-emocion-label {
@@ -2149,8 +2249,14 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 
 .vn-emocion.is-picked {
     background: linear-gradient(180deg, #fef3c7, #fde68a);
-    transform: scale(1.05);
+    transform: none;
     box-shadow: 0 10px 0 rgba(202, 138, 4, .25);
+    outline: 3px solid rgba(245, 158, 11, .55);
+    outline-offset: 2px;
+}
+
+.vn-emocion.is-picked .vn-emocion-img {
+    animation-play-state: paused;
 }
 
 .vn-ra-stage {
@@ -2222,10 +2328,15 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-chip img {
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
+    width: 100%;
+    max-width: 140px;
+    height: auto;
+    aspect-ratio: 1;
+    max-height: 140px;
+    object-fit: contain;
     border-radius: 8px;
+    background: #f8fafc;
+    flex: 0 1 auto;
 }
 
 .vn-chip.is-selected {
@@ -2750,6 +2861,28 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 .vn-reward {
     text-align: center;
     padding: 20px 8px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    flex: 1 1 auto;
+}
+
+.vn-reward .vn-media {
+    width: min(100%, 360px);
+    min-height: clamp(160px, 28vh, 300px);
+    margin: 12px auto 0;
+    position: relative;
+}
+
+.vn-reward .vn-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .vn-reward-icon {
@@ -2775,6 +2908,9 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     font-weight: 800;
     cursor: pointer;
     box-shadow: 0 4px 0 #0369a1;
+    overflow: hidden;
+    position: relative;
+    padding: 0;
 }
 
 .vn-memory-card.is-flipped,
@@ -2787,8 +2923,10 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 .vn-memory-card img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 10px;
+    display: block;
+    background: #f8fafc;
 }
 
 /* Memoria: tipografía y cartas grandes (tablet) */
@@ -3136,6 +3274,48 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     width: 100%;
 }
 
+.vn-evidencia-repetir-btn {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: clamp(160px, 28vw, 220px);
+    min-height: clamp(56px, 8vh, 68px);
+    padding: 10px 18px;
+    border: 3px solid rgba(255, 255, 255, .92);
+    border-radius: 18px;
+    background: linear-gradient(180deg, #fff7ed, #ffedd5);
+    color: #9a3412;
+    font-weight: 800;
+    font-size: clamp(1.05rem, 2.4vh, 1.25rem);
+    box-shadow: 0 8px 0 rgba(154, 52, 18, .16), 0 14px 22px rgba(249, 115, 22, .1);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.vn-evidencia-repetir-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 4px 0 rgba(154, 52, 18, .16);
+}
+
+.vn-evidencia-repetir-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(249, 115, 22, .16);
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+.vn-evidencia-repetir-label {
+    line-height: 1.1;
+}
+
 .vn-evidencia-action {
     display: flex;
     flex-direction: column;
@@ -3184,13 +3364,29 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 @keyframes vnEvidenciaBtnPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.04); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.04);
+    }
 }
 
 @keyframes vnEvidenciaGlow {
-    0%, 100% { opacity: .45; transform: scale(1); }
-    50% { opacity: .85; transform: scale(1.08); }
+
+    0%,
+    100% {
+        opacity: .45;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: .85;
+        transform: scale(1.08);
+    }
 }
 
 .vn-evidencia-btn.is-done,
@@ -3251,9 +3447,10 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 .vn-seq-card img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
     pointer-events: none;
+    background: #f8fafc;
 }
 
 .vn-seq-card.is-dragging {
@@ -3908,8 +4105,8 @@ body.rn-player-activo .vn-colorear-canvas,
 .vn-historia-media img {
     max-width: 100%;
     max-height: 100%;
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     border-radius: 4px;
 }
@@ -4276,8 +4473,17 @@ body.rn-player-activo .vn-colorear-canvas,
 }
 
 @keyframes vnEvidenciaRecPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.08); opacity: .82; }
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: .82;
+    }
 }
 
 .vn-evidencia-preview-placeholder {
@@ -4342,9 +4548,12 @@ body.rn-player-activo .vn-colorear-canvas,
 }
 
 @keyframes vnEvidenciaCapturaPulse {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 0 3px rgba(239, 68, 68, .25), 0 8px 20px rgba(15, 23, 42, .12);
     }
+
     50% {
         box-shadow: 0 0 0 7px rgba(239, 68, 68, .14), 0 8px 20px rgba(15, 23, 42, .12);
     }
@@ -4401,15 +4610,16 @@ body.rn-player-activo .vn-colorear-canvas,
 
 @keyframes vnEmocionPop {
     0% {
-        transform: scale(1);
+        filter: brightness(1);
     }
 
     50% {
-        transform: scale(1.18);
+        filter: brightness(1.08);
+        box-shadow: 0 12px 0 rgba(202, 138, 4, .3);
     }
 
     100% {
-        transform: scale(1);
+        filter: brightness(1);
     }
 }
 
@@ -4858,22 +5068,32 @@ body.vn-dispositivo .vn-media:not(.vn-imagen-zoom) img,
 body.vn-dispositivo .vn-media video,
 body.rn-player-activo .vn-media:not(.vn-imagen-zoom) img,
 body.rn-player-activo .vn-media video {
-    max-height: min(50dvh, 430px);
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .rn-player .vn-card--imagen .vn-imagen-zoom img,
 body.vn-dispositivo .vn-card--imagen .vn-imagen-zoom img,
 body.rn-player-activo .vn-card--imagen .vn-imagen-zoom img,
 #vnOverlay .vn-card--imagen .vn-imagen-zoom img {
-    max-height: min(78dvh, 100%);
-    width: auto;
+    width: 100%;
+    height: 100%;
     max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .rn-player .vn-card--historia .vn-historia-media img,
 body.vn-dispositivo .vn-card--historia .vn-historia-media img,
 body.rn-player-activo .vn-card--historia .vn-historia-media img {
-    max-height: min(48dvh, 410px);
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 .rn-player .vn-video-el,
@@ -5223,25 +5443,31 @@ body.rn-player-activo .vn-puzzle-pool .vn-puzzle-piece {
 
 .rn-player .vn-option:active,
 .rn-player .vn-chip:active,
-.rn-player .vn-emocion:active,
 .rn-player .vn-memory-card:active,
 .rn-player .vn-seq-card:active,
 .rn-player .vn-puzzle-pool .vn-puzzle-piece:active,
 body.vn-dispositivo .vn-option:active,
 body.vn-dispositivo .vn-chip:active,
-body.vn-dispositivo .vn-emocion:active,
 body.vn-dispositivo .vn-memory-card:active,
 body.vn-dispositivo .vn-seq-card:active,
 body.vn-dispositivo .vn-puzzle-pool .vn-puzzle-piece:active,
 body.rn-player-activo .vn-option:active,
 body.rn-player-activo .vn-chip:active,
-body.rn-player-activo .vn-emocion:active,
 body.rn-player-activo .vn-memory-card:active,
 body.rn-player-activo .vn-seq-card:active,
 body.rn-player-activo .vn-puzzle-pool .vn-puzzle-piece:active {
     transform: translateY(4px) scale(.98);
     box-shadow: 0 3px 0 rgba(15, 23, 42, .12);
     filter: saturate(1.08);
+}
+
+.rn-player .vn-emocion:active,
+body.vn-dispositivo .vn-emocion:active,
+body.rn-player-activo .vn-emocion:active,
+#vnOverlay .vn-emocion:active {
+    transform: none;
+    box-shadow: 0 4px 0 rgba(15, 23, 42, .12);
+    filter: brightness(0.98);
 }
 
 .rn-player.vn-nivel--prejardin .vn-options,
@@ -5288,8 +5514,13 @@ body.vn-dispositivo .rn-player.vn-nivel--prejardin .vn-option img,
 body.vn-dispositivo .rn-player.vn-nivel--jardin .vn-option img,
 body.rn-player-activo .rn-player.vn-nivel--prejardin .vn-option img,
 body.rn-player-activo .rn-player.vn-nivel--jardin .vn-option img {
-    width: clamp(64px, 10vw, 86px);
-    height: clamp(64px, 10vw, 86px);
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    min-height: 96px;
+    max-height: min(36vh, 200px);
+    object-fit: contain;
 }
 
 .rn-player .vn-card--pregunta .vn-pregunta-texto,
@@ -5423,7 +5654,11 @@ body.rn-player-activo .rn-player.vn-nivel--jardin .vn-nav-meta span {
     body.vn-dispositivo .vn-media video,
     body.rn-player-activo .vn-media img,
     body.rn-player-activo .vn-media video {
-        max-height: min(42dvh, 330px);
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
     }
 
     .rn-player .vn-video-el,
@@ -5683,12 +5918,23 @@ body.vn-dispositivo .vn-nav-btn span,
     position: fixed;
     height: 8px;
     border-radius: 999px;
-    background: linear-gradient(90deg, #34d399, #fbbf24, #38bdf8);
+    background: linear-gradient(90deg, #34d399, #fbbf24, #38bdf8, #a78bfa, #34d399);
+    background-size: 200% 100%;
     transform-origin: 0 50%;
     z-index: 4000;
     pointer-events: none;
     box-shadow: 0 0 12px rgba(52, 211, 153, .7);
+}
+
+.vn-match-line--ok {
     animation: vnMatchLine .65s ease forwards;
+}
+
+.vn-match-line--live {
+    height: 10px;
+    opacity: 1;
+    animation: vnMatchLineFlow .9s linear infinite;
+    filter: saturate(1.15);
 }
 
 @keyframes vnMatchLine {
@@ -5703,6 +5949,32 @@ body.vn-dispositivo .vn-nav-btn span,
     100% {
         opacity: 0;
     }
+}
+
+@keyframes vnMatchLineFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 200% 50%;
+    }
+}
+
+.vn-card--emparejar [data-vn-izq],
+.vn-card--emparejar [data-vn-der] {
+    touch-action: none;
+}
+
+.vn-card--emparejar [data-vn-der].is-drop-hover {
+    outline: 3px solid #38bdf8;
+    outline-offset: 2px;
+    background: linear-gradient(180deg, #e0f2fe, #dbeafe);
+    transform: scale(1.03);
+}
+
+.vn-card--emparejar .vn-chip.vn-chip--miss {
+    animation: vnShake .35s ease;
 }
 
 .vn-seq-nums {
@@ -5784,6 +6056,7 @@ body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-media,
 #vnOverlay .vn-card--audio .vn-audio-stage,
 #vnOverlay .vn-card--video .vn-video-stage,
 #vnOverlay .vn-card--imagen .vn-imagen-zoom,
+#vnOverlay .vn-card--historia .vn-historia-libro,
 #vnOverlay .vn-card--bienvenida .vn-bienvenida-media {
     flex: 1 1 auto;
     min-height: 0;
@@ -5796,18 +6069,15 @@ body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-media,
 body.vn-dispositivo .vn-card--imagen .vn-imagen-zoom img,
 body.vn-dispositivo .vn-card--historia .vn-historia-media img,
 body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-media img,
-body.vn-dispositivo .vn-video-el,
-body.vn-dispositivo .vn-bienvenida-video,
+body.vn-dispositivo .vn-pregunta-media img,
 .rn-player .vn-card--imagen .vn-imagen-zoom img,
 .rn-player .vn-card--historia .vn-historia-media img,
-.rn-player .vn-video-el,
-.rn-player .vn-bienvenida-video,
-#vnOverlay .vn-card--imagen .vn-imagen-zoom img,
-#vnOverlay .vn-video-el,
-#vnOverlay .vn-bienvenida-video {
-    max-height: min(78dvh, 100%);
-    width: auto;
+.rn-player .vn-pregunta-media img,
+#vnOverlay .vn-card--imagen .vn-imagen-zoom img {
+    width: 100%;
+    height: 100%;
     max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
 }
 
@@ -6445,6 +6715,7 @@ body.vn-dispositivo .vn-card-body>.vn-paint,
 body.vn-dispositivo .vn-card-body>.vn-video-stage,
 body.vn-dispositivo .vn-card-body>.vn-audio-stage,
 body.vn-dispositivo .vn-card-body>.vn-media,
+body.vn-dispositivo .vn-card-body>.vn-pregunta-media,
 body.vn-dispositivo .vn-card-body>.vn-evidencia-wrap,
 body.vn-dispositivo .vn-card-body>.vn-ra-stage,
 body.vn-dispositivo .vn-card-body>.vn-historia-libro,
@@ -6461,6 +6732,7 @@ body.vn-dispositivo .vn-card-body>.vn-reward,
 .rn-player .vn-card-body>.vn-video-stage,
 .rn-player .vn-card-body>.vn-audio-stage,
 .rn-player .vn-card-body>.vn-media,
+.rn-player .vn-card-body>.vn-pregunta-media,
 .rn-player .vn-card-body>.vn-evidencia-wrap,
 .rn-player .vn-card-body>.vn-ra-stage,
 .rn-player .vn-card-body>.vn-historia-libro,
@@ -6477,6 +6749,7 @@ body.vn-dispositivo .vn-card-body>.vn-reward,
 #vnOverlay .vn-card-body>.vn-video-stage,
 #vnOverlay .vn-card-body>.vn-audio-stage,
 #vnOverlay .vn-card-body>.vn-media,
+#vnOverlay .vn-card-body>.vn-pregunta-media,
 #vnOverlay .vn-card-body>.vn-evidencia-wrap,
 #vnOverlay .vn-card-body>.vn-ra-stage,
 #vnOverlay .vn-card-body>.vn-historia-libro,
@@ -6500,10 +6773,10 @@ body.vn-dispositivo .vn-card--arrastrar .vn-sort-board,
     overscroll-behavior: contain;
 }
 
-body.vn-dispositivo .vn-card--emocion .vn-card-body > .vn-emociones,
-.rn-player .vn-card--emocion .vn-card-body > .vn-emociones,
-body.rn-player-activo .vn-card--emocion .vn-card-body > .vn-emociones,
-#vnOverlay .vn-card--emocion .vn-card-body > .vn-emociones {
+body.vn-dispositivo .vn-card--emocion .vn-card-body>.vn-emociones,
+.rn-player .vn-card--emocion .vn-card-body>.vn-emociones,
+body.rn-player-activo .vn-card--emocion .vn-card-body>.vn-emociones,
+#vnOverlay .vn-card--emocion .vn-card-body>.vn-emociones {
     overflow: hidden;
     align-content: stretch;
     justify-content: stretch;
@@ -6682,13 +6955,18 @@ body.vn-dispositivo .vn-card--pregunta .vn-pregunta-head .vn-instruccion,
 
 body.vn-dispositivo .vn-card--pregunta .vn-pregunta-media,
 .rn-player .vn-card--pregunta .vn-pregunta-media {
-    flex-shrink: 0;
+    flex: 1 1 auto;
+    min-height: 0;
     margin: 0 0 clamp(4px, 0.7vh, 8px);
 }
 
 body.vn-dispositivo .vn-card--pregunta .vn-pregunta-media img,
 .rn-player .vn-card--pregunta .vn-pregunta-media img {
-    max-height: min(28dvh, 180px);
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
 body.vn-dispositivo .vn-card--pregunta .vn-options,
@@ -6767,9 +7045,14 @@ body.vn-dispositivo .vn-card--pregunta .vn-option img,
 body.vn-dispositivo .vn-card--reto .vn-option img,
 .rn-player .vn-card--pregunta .vn-option img,
 .rn-player .vn-card--reto .vn-option img {
-    width: clamp(48px, 8vh, 72px);
-    height: clamp(48px, 8vh, 72px);
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    min-height: clamp(110px, 18vh, 160px);
+    max-height: min(36vh, 220px);
     margin-bottom: 4px;
+    object-fit: contain;
 }
 
 body.vn-dispositivo .vn-card--pregunta .vn-feedback,
@@ -6794,9 +7077,136 @@ body.vn-dispositivo .vn-card--reto .vn-feedback,
     .vn-reward-rays,
     .vn-celebrate-p,
     .vn-match-line,
+    .vn-match-line--live,
     .vn-sort-col .vn-chip,
-    .vn-ra-scan-line {
+    .vn-ra-scan-line,
+    .vn-emocion-img {
         animation: none !important;
         transition: none !important;
     }
+}
+
+/* ── Imágenes por bloque: llenan su contenedor sin desbordar ── */
+
+/* Bienvenida / Imagen / Historia / Pregunta (media principal) */
+body.vn-dispositivo .vn-card--imagen .vn-card-body > .vn-media,
+.rn-player .vn-card--imagen .vn-card-body > .vn-media,
+#vnOverlay .vn-card--imagen .vn-card-body > .vn-media,
+body.vn-dispositivo .vn-card--imagen .vn-imagen-zoom,
+.rn-player .vn-card--imagen .vn-imagen-zoom,
+#vnOverlay .vn-card--imagen .vn-imagen-zoom,
+body.vn-dispositivo .vn-card--bienvenida .vn-bienvenida-media,
+.rn-player .vn-card--bienvenida .vn-bienvenida-media,
+#vnOverlay .vn-card--bienvenida .vn-bienvenida-media {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: clamp(220px, 42vh, 520px);
+    width: 100%;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-card--historia .vn-historia-media,
+.rn-player .vn-card--historia .vn-historia-media,
+#vnOverlay .vn-card--historia .vn-historia-media {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-card-body > .vn-pregunta-media,
+.rn-player .vn-card-body > .vn-pregunta-media,
+#vnOverlay .vn-card-body > .vn-pregunta-media,
+body.vn-dispositivo .vn-card--bienvenida .vn-pregunta-media,
+.rn-player .vn-card--bienvenida .vn-pregunta-media,
+#vnOverlay .vn-card--bienvenida .vn-pregunta-media {
+    position: relative;
+    overflow: hidden;
+}
+
+body.vn-dispositivo .vn-imagen-zoom-inner,
+.rn-player .vn-imagen-zoom-inner,
+#vnOverlay .vn-imagen-zoom-inner {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body.vn-dispositivo .vn-media:has(> img) > img,
+.rn-player .vn-media:has(> img) > img,
+#vnOverlay .vn-media:has(> img) > img,
+body.vn-dispositivo .vn-pregunta-media img,
+.rn-player .vn-pregunta-media img,
+#vnOverlay .vn-pregunta-media img,
+body.vn-dispositivo .vn-card--imagen .vn-imagen-zoom img,
+.rn-player .vn-card--imagen .vn-imagen-zoom img,
+#vnOverlay .vn-card--imagen .vn-imagen-zoom img,
+body.vn-dispositivo .vn-historia-media img,
+.rn-player .vn-historia-media img,
+#vnOverlay .vn-historia-media img,
+body.vn-dispositivo .vn-bienvenida-media img,
+.rn-player .vn-bienvenida-media img,
+#vnOverlay .vn-bienvenida-media img,
+body.vn-dispositivo .vn-reward .vn-media img,
+.rn-player .vn-reward .vn-media img,
+#vnOverlay .vn-reward .vn-media img {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: contain !important;
+    object-position: center;
+    margin: 0 !important;
+}
+
+/* Pregunta / Reto / Emparejar / Clasificar / Arrastrar: img dentro del botón */
+body.vn-dispositivo .vn-option img,
+.rn-player .vn-option img,
+#vnOverlay .vn-option img,
+body.vn-dispositivo .vn-chip img,
+.rn-player .vn-chip img,
+#vnOverlay .vn-chip img {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    aspect-ratio: 1;
+    object-fit: contain !important;
+}
+
+body.vn-dispositivo .vn-sort-col--pool .vn-chip img,
+.rn-player .vn-sort-col--pool .vn-chip img,
+#vnOverlay .vn-sort-col--pool .vn-chip img {
+    max-height: 160px !important;
+}
+
+body.vn-dispositivo .vn-zone-slots .vn-chip img,
+.rn-player .vn-zone-slots .vn-chip img,
+#vnOverlay .vn-zone-slots .vn-chip img {
+    max-width: 72px !important;
+    max-height: 72px !important;
+}
+
+/* Juegos: memoria / secuencia ya usan 100% del card */
+body.vn-dispositivo .vn-memory-card img,
+.rn-player .vn-memory-card img,
+#vnOverlay .vn-memory-card img,
+body.vn-dispositivo .vn-seq-card img,
+.rn-player .vn-seq-card img,
+#vnOverlay .vn-seq-card img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+}
+
+/* Emoción: llena el alto del botón menos la etiqueta */
+body.vn-dispositivo .vn-emocion-img,
+.rn-player .vn-emocion-img,
+#vnOverlay .vn-emocion-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
 }

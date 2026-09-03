@@ -83,6 +83,11 @@ class BloqueExperiencia extends Model
         return $this->belongsTo(Experiencia::class);
     }
 
+    public function instruccionesAudio()
+    {
+        return $this->hasMany(InstruccionAudio::class, 'bloque_experiencia_id')->orderBy('orden');
+    }
+
     public function esObligatorio(): bool
     {
         return in_array($this->tipo, self::TIPOS_OBLIGATORIOS, true);

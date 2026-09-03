@@ -19,6 +19,7 @@
         limpiar: $app.data('url-limpiar') || '',
         upload: $app.data('url-upload') || '',
         publicar: $app.data('url-publicar') || '',
+        tts: $app.data('url-tts') || '',
         actualizarTpl: $app.data('url-actualizar-template') || '',
         eliminarTpl: $app.data('url-eliminar-template') || '',
     };
@@ -27,6 +28,7 @@
     let catalogo = [];
     let seleccionadoId = null;
     let sortable = null;
+    let sortableInstrucciones = null;
     let saveTimer = null;
     let saving = false;
 
@@ -218,9 +220,7 @@
 
     function htmlCardBloque(bloque) {
         const seleccionado = Number(seleccionadoId) === Number(bloque.id);
-        const status = bloque.completo
-            ? '<span class="cx-block-status"><span class="cx-dot is-ok"></span> Completo</span>'
-            : '<span class="cx-block-status"><span class="cx-dot"></span> Campos pendientes</span>';
+        const status = htmlStatusBloque(bloque);
 
         const tags = [];
         if (bloque.obligatorio) tags.push('<span>Obligatorio</span>');
@@ -271,6 +271,30 @@
         requestAnimationFrame(sincronizarLateralesDesdeSecuencia);
     }
 
+    function htmlStatusBloque(bloque) {
+        return bloque.completo
+            ? '<span class="cx-block-status"><span class="cx-dot is-ok"></span> Completo</span>'
+            : '<span class="cx-block-status"><span class="cx-dot"></span> Campos pendientes</span>';
+    }
+
+    /**
+     * Tras autosave: actualiza solo estado/resumen/banner.
+     * No reescribe la timeline (evita perder foco y saltar el scroll del panel).
+     */
+    function actualizarEstadoTrasGuardar(bloque) {
+        if (!bloque) return;
+        const $row = $timeline.find(`.cx-block-row[data-id="${bloque.id}"]`);
+        if ($row.length) {
+            const $status = $row.find('.cx-block-status');
+            if ($status.length) $status.replaceWith(htmlStatusBloque(bloque));
+            else $row.find('.cx-block-body').append(htmlStatusBloque(bloque));
+            $row.find('.cx-block-card').addClass('is-selected').attr('aria-selected', 'true');
+            $row.addClass('is-active');
+        }
+        actualizarResumen();
+        actualizarBannerPendientes(bloque);
+    }
+
     function initSortable() {
         if (sortable) {
             sortable.destroy();
@@ -318,6 +342,45 @@
         });
     }
 
+    function destroySortableInstrucciones() {
+        if (sortableInstrucciones) {
+            sortableInstrucciones.destroy();
+            sortableInstrucciones = null;
+        }
+    }
+
+    function numerarTurnosAudio() {
+        $configBody.find('.cx-audio-linea').each(function (i) {
+            $(this).attr('data-index', i);
+            $(this).find('.cx-audio-linea-n').text(`Turno ${i + 1}`);
+            $(this).find('.cx-audio-linea-rm').attr('data-index', i);
+        });
+    }
+
+    function initSortableInstrucciones() {
+        destroySortableInstrucciones();
+        if (!puedeEditar || typeof Sortable === 'undefined') return;
+        const el = $configBody.find('.cx-audio-lineas')[0];
+        if (!el || el.querySelectorAll('.cx-audio-linea').length < 2) return;
+
+        sortableInstrucciones = Sortable.create(el, {
+            animation: 160,
+            handle: '.cx-audio-linea-handle',
+            draggable: '.cx-audio-linea',
+            ghostClass: 'sortable-ghost',
+            dragClass: 'cx-audio-linea-drag',
+            filter: 'textarea, button:not(.cx-audio-linea-handle), input',
+            preventOnFilter: false,
+            onEnd() {
+                numerarTurnosAudio();
+                const bloque = bloquePorId(seleccionadoId);
+                if (!bloque) return;
+                bloque.instrucciones_audio = leerInstruccionesDesdeForm();
+                scheduleSave();
+            },
+        });
+    }
+
     function bloquePorId(id) {
         return bloques.find((b) => Number(b.id) === Number(id)) || null;
     }
@@ -358,7 +421,19 @@
 
     /* ── Formularios ────────────────────────────────────────── */
 
+    let ttsPreviewToken = 0;
+    let ttsPreviewPlayer = null;
+
     function detenerMediosConfig() {
+        ttsPreviewToken += 1;
+        if (ttsPreviewPlayer) {
+            try {
+                ttsPreviewPlayer.onended = null;
+                ttsPreviewPlayer.onerror = null;
+                ttsPreviewPlayer.pause();
+                ttsPreviewPlayer.removeAttribute('src');
+            } catch (e) { /* noop */ }
+        }
         $configBody.find('.cx-audio-el, .cx-video-el').each(function () {
             try {
                 this.pause();
@@ -373,15 +448,71 @@
         }
     }
 
+    function hablarNavegadorConstructor(texto, personaje, token, onEnd) {
+        if (!window.speechSynthesis) {
+            if (typeof onEnd === 'function') onEnd();
+            return;
+        }
+        const u = new SpeechSynthesisUtterance(texto);
+        u.lang = 'es-CO';
+        u.rate = 0.92;
+        u.pitch = personaje === 'zeus' ? 0.75 : 1.15;
+        u.onend = function () {
+            if (token === ttsPreviewToken && typeof onEnd === 'function') onEnd();
+        };
+        u.onerror = function () {
+            if (token === ttsPreviewToken && typeof onEnd === 'function') onEnd();
+        };
+        window.speechSynthesis.speak(u);
+    }
+
+    function reproducirSecuenciaConstructor(lineas, idx) {
+        if (idx >= lineas.length) return;
+        const token = ttsPreviewToken;
+        const linea = lineas[idx];
+        const siguiente = function () {
+            if (token !== ttsPreviewToken) return;
+            reproducirSecuenciaConstructor(lineas, idx + 1);
+        };
+        if (!urls.tts) {
+            hablarNavegadorConstructor(linea.texto, linea.personaje, token, siguiente);
+            return;
+        }
+        $.ajax({
+            url: urls.tts,
+            method: 'POST',
+            data: JSON.stringify({ texto: linea.texto, personaje: linea.personaje }),
+            contentType: 'application/json',
+            headers: { 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
+        }).done(function (res) {
+            if (token !== ttsPreviewToken) return;
+            const src = res && res.data && res.data.url;
+            if (!src) {
+                hablarNavegadorConstructor(linea.texto, linea.personaje, token, siguiente);
+                return;
+            }
+            if (!ttsPreviewPlayer) ttsPreviewPlayer = new Audio();
+            ttsPreviewPlayer.onended = siguiente;
+            ttsPreviewPlayer.onerror = function () {
+                hablarNavegadorConstructor(linea.texto, linea.personaje, token, siguiente);
+            };
+            ttsPreviewPlayer.src = src;
+            const p = ttsPreviewPlayer.play();
+            if (p && typeof p.catch === 'function') {
+                p.catch(function () {
+                    if (token !== ttsPreviewToken) return;
+                    hablarNavegadorConstructor(linea.texto, linea.personaje, token, siguiente);
+                });
+            }
+        }).fail(function () {
+            if (token !== ttsPreviewToken) return;
+            hablarNavegadorConstructor(linea.texto, linea.personaje, token, siguiente);
+        });
+    }
+
     function fieldTextarea(name, label, value, help) {
-        const helpText = help || (name === 'instruccion'
-            ? 'Este texto se lee en voz alta al entrar al bloque. Usa frases cortas y claras para niños de 4 años.'
-            : '');
-        const ttsBtn = name === 'instruccion'
-            ? `<button type="button" class="cx-tts-preview-btn" data-cx-tts-preview title="Escuchar instrucción">
-                <i class="fa-solid fa-volume-high"></i> Escuchar
-               </button>`
-            : '';
+        const helpText = help || '';
+        const ttsBtn = '';
         return `
             <div class="cx-field">
                 <div class="cx-field-label-row">
@@ -391,6 +522,84 @@
                 <textarea class="form-control cx-input" data-field="${escapar(name)}" rows="3"
                     ${puedeEditar ? '' : 'readonly'}>${escapar(value || '')}</textarea>
                 ${helpText ? `<div class="cx-help">${escapar(helpText)}</div>` : ''}
+            </div>`;
+    }
+
+    function instruccionesDelBloque(bloque) {
+        const raw = Array.isArray(bloque?.instrucciones_audio) ? bloque.instrucciones_audio : [];
+        const lineas = raw.map((fila, i) => ({
+            texto: String(fila?.texto ?? fila?.instruccion ?? '').trim(),
+            personaje: String(fila?.personaje || 'zoe').toLowerCase() === 'zeus' ? 'zeus' : 'zoe',
+            orden: i + 1,
+        }));
+        if (lineas.length) return lineas;
+        const legacy = String(bloque?.datos?.instruccion || '').trim();
+        return [{ texto: legacy, personaje: 'zoe', orden: 1 }];
+    }
+
+    function leerInstruccionesDesdeForm() {
+        const lineas = [];
+        $configBody.find('.cx-audio-linea').each(function () {
+            const $row = $(this);
+            const pj = String($row.find('.cx-audio-linea-pj.is-on').data('personaje') || 'zoe');
+            lineas.push({
+                texto: String($row.find('.cx-audio-linea-texto').val() || ''),
+                personaje: pj === 'zeus' ? 'zeus' : 'zoe',
+            });
+        });
+        if (!lineas.length) {
+            return [{ texto: '', personaje: 'zoe', orden: 1 }];
+        }
+        return lineas.map((l, i) => ({ ...l, orden: i + 1 }));
+    }
+
+    function fieldInstruccionesAudio() {
+        const bloque = bloquePorId(seleccionadoId) || {};
+        const lineas = instruccionesDelBloque(bloque);
+        const filas = lineas.map((linea, i) => {
+            const zoeOn = linea.personaje !== 'zeus';
+            return `
+            <div class="cx-audio-linea" data-index="${i}">
+                <div class="cx-audio-linea-head">
+                    ${puedeEditar && lineas.length > 1
+                    ? `<button type="button" class="cx-audio-linea-handle" title="Arrastrar para reordenar" aria-label="Reordenar">
+                            <i class="fa-solid fa-grip-vertical"></i>
+                           </button>`
+                    : ''}
+                    <span class="cx-audio-linea-n">Turno ${i + 1}</span>
+                    <div class="cx-audio-pj" role="group" aria-label="Personaje">
+                        <button type="button" class="cx-audio-linea-pj ${zoeOn ? 'is-on' : ''}" data-personaje="zoe"
+                            ${puedeEditar ? '' : 'disabled'}>Zoe</button>
+                        <button type="button" class="cx-audio-linea-pj ${zoeOn ? '' : 'is-on'}" data-personaje="zeus"
+                            ${puedeEditar ? '' : 'disabled'}>Zeus</button>
+                    </div>
+                    ${puedeEditar && lineas.length > 1
+                    ? `<button type="button" class="btn btn-sm btn-outline-danger cx-audio-linea-rm" data-index="${i}" title="Quitar turno">
+                            <i class="fa-solid fa-trash"></i>
+                           </button>`
+                    : ''}
+                </div>
+                <textarea class="form-control cx-audio-linea-texto" rows="2" maxlength="800"
+                    ${puedeEditar ? '' : 'readonly'}
+                    placeholder="Lo que dice este personaje">${escapar(linea.texto || '')}</textarea>
+            </div>`;
+        }).join('');
+
+        return `
+            <div class="cx-field cx-audio-seq">
+                <div class="cx-field-label-row">
+                    <label>Instrucciones de audio</label>
+                    <button type="button" class="cx-tts-preview-btn" data-cx-tts-preview title="Escuchar secuencia">
+                        <i class="fa-solid fa-volume-high"></i> Escuchar
+                    </button>
+                </div>
+                <div class="cx-audio-lineas">${filas}</div>
+                ${puedeEditar && lineas.length < 8
+                ? `<div class="cx-inline-actions">
+                        <button type="button" class="btn btn-sm btn-outline-primary cx-audio-linea-add">+ Turno</button>
+                       </div>`
+                : ''}
+                <div class="cx-help">Se leen en orden al entrar al bloque. Arrastra el asa para reordenar (como los bloques de la secuencia).</div>
             </div>`;
     }
 
@@ -544,7 +753,7 @@
         const btnCatalogo = (urlJuegosCatalogo && puedeEditar)
             ? `<div class="cx-inline-actions mb-2">
                 <button type="button" class="btn btn-outline-primary btn-sm" id="cxBtnJuegosModulo">
-                    <i class="fa-solid fa-gamepad"></i> Catálogo de juegos
+                    <i class="fa-solid fa-gamepad"></i> Catálogo del modulo de juegos
                 </button>
                </div>`
             : '';
@@ -571,7 +780,7 @@
             </div>`;
     }
 
-    /** Thumb clicable con preview (mismo patrón que Elementos en Clasificación). */
+    /** Thumb clicable; el hidden va dentro del wrap para no desfasar el layout. */
     function imageThumbBtn(name, value, title, large) {
         const archivo = value || '';
         const url = mediaUrlBloque(archivo);
@@ -579,26 +788,37 @@
             ? `<img src="${escapar(url)}" alt="">`
             : '<i class="fa-solid fa-image"></i>';
         const sizeClass = large ? ' cx-image-preview-btn' : '';
-        return `
-            <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(archivo)}">
-            ${puedeEditar
-                ? `<label class="cx-img-btn${sizeClass}" title="${escapar(title || 'Subir imagen')}">
+        const btn = puedeEditar
+            ? `<label class="cx-img-btn${sizeClass}" title="${escapar(title || 'Subir imagen')}">
                     ${thumb}
                     <input type="file" class="cx-file" data-target="${escapar(name)}" accept="image/*" hidden>
-                   </label>`
-                : `<span class="cx-img-btn${sizeClass} is-readonly">${thumb}</span>`}`;
+               </label>`
+            : `<span class="cx-img-btn${sizeClass} is-readonly">${thumb}</span>`;
+        return `<span class="cx-img-wrap">
+            <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(archivo)}">
+            ${btn}
+        </span>`;
     }
 
-    function fieldImagePreview(name, label, value) {
+    /**
+     * Preview de imagen (patrón único del constructor).
+     * opts.compact: marco chico junto a inputs (elementos, opciones de reto).
+     */
+    function fieldImagePreview(name, label, value, opts) {
         const archivo = value || '';
-        return `<div class="cx-field">
+        const compact = !!(opts && opts.compact);
+        const frameCls = compact ? 'cx-image-frame cx-image-frame--sm' : 'cx-image-frame';
+        const fieldCls = compact ? 'cx-field cx-field--img-compact' : 'cx-field';
+        return `<div class="${fieldCls}">
             <label>${escapar(label)}</label>
-            <div class="cx-media-preview-row">
-                ${imageThumbBtn(name, archivo, 'Subir imagen', true)}
-                <div class="cx-media-preview-meta">
-                    <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
-                    <div class="cx-help">Toca el recuadro para elegir o cambiar la imagen.</div>
-                </div>
+            <div class="${frameCls}">
+                ${imageThumbBtn(name, archivo, 'Subir imagen', !compact)}
+            </div>
+            <div class="cx-media-preview-meta">
+                <span class="cx-file-name">${escapar(archivo || 'Sin archivo')}</span>
+                ${compact
+            ? ''
+            : '<div class="cx-help">Toca el recuadro para elegir o cambiar la imagen.</div>'}
             </div>
         </div>`;
     }
@@ -727,8 +947,7 @@
         } else if (tipoMedia === 'video') {
             mediaHtml += fieldVideoPreview('video', 'Video de bienvenida (opcional)', d.video);
         }
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion,
-            'Este texto se leerá en audio. Usa frases cortas y amigables.')
+        return fieldInstruccionesAudio()
             + fieldSelect('personaje', 'Personaje narrador', d.personaje || 'personaje', [
                 { value: 'personaje', label: 'Personaje del ambiente' },
                 { value: 'ninguno', label: 'Ninguno' },
@@ -738,20 +957,20 @@
     }
 
     function formAudio(d) {
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+        return fieldInstruccionesAudio()
             + fieldAudioPreview('archivo', 'Archivo de audio (.mp3)', d.archivo)
             + fieldSelect('repeticiones', 'Repeticiones', d.repeticiones || '1 vez', ['1 vez', '2 veces', '3 veces', 'Sin límite'])
             + fieldTextarea('descripcion_accesible', 'Descripción accesible', d.descripcion_accesible);
     }
 
     function formVideo(d) {
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+        return fieldInstruccionesAudio()
             + fieldVideoPreview('archivo', 'Archivo de video (.mp4)', d.archivo)
             + fieldTextarea('descripcion_accesible', 'Descripción accesible', d.descripcion_accesible);
     }
 
     function formImagen(d) {
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+        return fieldInstruccionesAudio()
             + fieldImagePreview('archivo', 'Archivo de imagen', d.archivo)
             + fieldTextarea('descripcion', 'Descripción accesible', d.descripcion);
     }
@@ -760,7 +979,7 @@
         const n = Number(d.paginas || 3);
         const pages = Array.isArray(d.paginas_data) ? d.paginas_data : [];
         const badgeColors = ['#2563eb', '#0f6e56', '#d97706', '#7c3aed', '#dc2626'];
-        let html = fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+        let html = fieldInstruccionesAudio()
             + fieldSelect('paginas', 'Número de páginas', String(n), ['2', '3', '4', '5']);
         for (let i = 0; i < n; i++) {
             const p = pages[i] || { imagen: '', audio: '' };
@@ -777,7 +996,7 @@
     }
 
     function formRa(d) {
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+        return fieldInstruccionesAudio()
             + fieldInput('marcador', 'Marcador (número de cartilla)', d.marcador)
             + fieldSelect('contenido', 'Contenido RA', d.contenido || 'Animación 3D', [
                 'Animación 3D', 'Audio narrado', 'Video LSC', 'Animación + narración',
@@ -785,7 +1004,7 @@
     }
 
     function formEvidencia(d) {
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+        return fieldInstruccionesAudio()
             + fieldSelect('tipo', 'Tipo de evidencia', d.tipo || 'Foto', [
                 'Foto', 'Audio grabado', 'Video corto', 'Selección de imagen',
             ]);
@@ -841,14 +1060,14 @@
                     fieldImagePreview(`seq_${i}`, `Paso ${i}${i <= 3 ? '' : ' (opcional)'}`, d[`seq_${i}`])
                 ).join('');
         }
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+        return fieldInstruccionesAudio()
             + fieldJuegoPicker('juego_id', 'Juego', d)
             + fieldInput('juego_nombre', 'Nombre del juego', d.juego_nombre)
             + extra;
     }
 
     function formDibujo(d) {
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+        return fieldInstruccionesAudio()
             + fieldImagePreview('fondo', 'Imagen de fondo (opcional)', d.fondo)
             + `<div class="cx-help mb-2">El niño elige colores y herramientas libremente (pincel, goma, figuras, grosor y deshacer).</div>`
             + fieldCheckbox('guardar_evidencia', 'Guardar dibujo como evidencia', !!d.guardar_evidencia)
@@ -862,15 +1081,24 @@
         const showImagen = tipo === 'imagen_texto';
         let opcionesHtml = '';
         ops.forEach((op, i) => {
+            const mediaYTexto = showImagen
+                ? `<div class="cx-item-row cx-item-row--pair">
+                    <div class="cx-item-media">
+                        ${fieldImagePreview(`opciones.${i}.imagen`, 'Imagen', op.imagen, { compact: true })}
+                    </div>
+                    <div class="cx-item-fields">
+                        ${fieldInput(`opciones.${i}.texto`, 'Texto', op.texto)}
+                    </div>
+                   </div>`
+                : `${fieldInput(`opciones.${i}.texto`, 'Texto', op.texto)}
+                   ${showEmoji ? fieldInput(`opciones.${i}.emoji`, 'Emoji', op.emoji) : ''}`;
             opcionesHtml += `<div class="cx-subcard" data-opcion="${i}">
                 <div class="cx-subcard-head">
                     <span>Opción ${i + 1}</span>
                     <label class="mb-0"><input type="radio" name="cx_correcta_pregunta" class="cx-correcta" data-index="${i}"
                         ${op.correcta ? 'checked' : ''} ${puedeEditar ? '' : 'disabled'}> Correcta</label>
                 </div>
-                ${fieldInput(`opciones.${i}.texto`, 'Texto', op.texto)}
-                ${showEmoji ? fieldInput(`opciones.${i}.emoji`, 'Emoji', op.emoji) : ''}
-                ${showImagen ? fieldImagePreview(`opciones.${i}.imagen`, 'Imagen', op.imagen) : ''}
+                ${mediaYTexto}
             </div>`;
         });
         opcionesHtml += `<div class="cx-inline-actions">
@@ -883,7 +1111,7 @@
                 id: 'pregunta',
                 label: 'Pregunta',
                 icon: 'fa-circle-question',
-                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+                content: fieldInstruccionesAudio()
                     + fieldTextarea('texto', 'Texto de la pregunta', d.texto)
                     + fieldImagePreview('imagen', 'Imagen de la pregunta (opcional)', d.imagen)
                     + fieldSelect('tipo_opts', 'Tipo de opciones', tipo, [
@@ -917,11 +1145,32 @@
         const modo = d.modo || 'texto';
         let paresHtml = '';
         pares.forEach((par, i) => {
+            let cuerpo = '';
+            if (modo === 'imagen') {
+                cuerpo = `<div class="cx-item-row cx-item-row--pair">
+                    <div class="cx-item-media">
+                        ${fieldImagePreview(`pares.${i}.izqImg`, 'Izquierda', par.izqImg, { compact: true })}
+                    </div>
+                    <div class="cx-item-media">
+                        ${fieldImagePreview(`pares.${i}.derImg`, 'Derecha', par.derImg, { compact: true })}
+                    </div>
+                </div>`;
+            } else if (modo === 'imagen_texto') {
+                cuerpo = `<div class="cx-item-row cx-item-row--pair">
+                    <div class="cx-item-media">
+                        ${fieldImagePreview(`pares.${i}.izqImg`, 'Imagen', par.izqImg, { compact: true })}
+                    </div>
+                    <div class="cx-item-fields">
+                        ${fieldInput(`pares.${i}.der`, 'Texto derecha', par.der)}
+                    </div>
+                </div>`;
+            } else {
+                cuerpo = fieldInput(`pares.${i}.izq`, 'Texto izquierda', par.izq)
+                    + fieldInput(`pares.${i}.der`, 'Texto derecha', par.der);
+            }
             paresHtml += `<div class="cx-subcard" data-par="${i}">
                 <div class="cx-subcard-head">Par ${i + 1}</div>
-                ${modo === 'imagen' || modo === 'imagen_texto' ? fieldImagePreview(`pares.${i}.izqImg`, 'Imagen izquierda', par.izqImg) : ''}
-                ${modo !== 'imagen' ? fieldInput(`pares.${i}.izq`, 'Texto izquierda', par.izq) : ''}
-                ${modo === 'imagen' ? fieldImagePreview(`pares.${i}.derImg`, 'Imagen derecha', par.derImg) : fieldInput(`pares.${i}.der`, 'Texto derecha', par.der)}
+                ${cuerpo}
             </div>`;
         });
         paresHtml += `<div class="cx-inline-actions">
@@ -934,7 +1183,7 @@
                 id: 'actividad',
                 label: 'Actividad',
                 icon: 'fa-sliders',
-                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+                content: fieldInstruccionesAudio()
                     + fieldSelect('modo', 'Modo de emparejamiento', modo, [
                         { value: 'texto', label: 'Texto ↔ texto' },
                         { value: 'imagen_texto', label: 'Imagen ↔ texto' },
@@ -983,9 +1232,9 @@
             : [{ value: '', label: 'Crea categorías en la pestaña Categorías' }];
 
         const chipsHtml = cats.map((c, i) => `
-            <span class="cx-cat-chip" data-cat-index="${i}">
+            <span class="cx-cat-chip" data-cat-index="${i}" ${puedeEditar ? 'role="button" tabindex="0" title="Editar categoría"' : ''}>
                 <span class="cx-cat-chip-label">${escapar(c)}</span>
-                ${puedeEditar && cats.length > 2
+                ${puedeEditar
                 ? `<button type="button" class="cx-cat-chip-rm" data-index="${i}" title="Quitar categoría" aria-label="Quitar">
                         <i class="fa-solid fa-xmark"></i>
                     </button>`
@@ -1011,13 +1260,11 @@
         items.forEach((item, i) => {
             itemsHtml += `
             <div class="cx-item-row" data-item="${i}">
-                <div class="cx-item-img">
-                    ${imageThumbBtn(`items.${i}.imagen`, item.imagen, 'Imagen opcional')}
+                <div class="cx-item-media">
+                    ${fieldImagePreview(`items.${i}.imagen`, 'Imagen', item.imagen, { compact: true })}
                 </div>
-                <div class="cx-item-texto">
+                <div class="cx-item-fields">
                     ${fieldInput(`items.${i}.texto`, 'Texto (o imagen)', item.texto)}
-                </div>
-                <div class="cx-item-cat">
                     ${fieldSelect(
                 `items.${i}.categoria`,
                 'Categoría destino',
@@ -1042,7 +1289,7 @@
                 id: 'actividad',
                 label: 'Actividad',
                 icon: 'fa-sliders',
-                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion),
+                content: fieldInstruccionesAudio(),
             },
             {
                 id: 'categorias',
@@ -1081,13 +1328,11 @@
         items.forEach((item, i) => {
             itemsHtml += `
             <div class="cx-item-row" data-item="${i}">
-                <div class="cx-item-img">
-                    ${imageThumbBtn(`items.${i}.imagen`, item.imagen, 'Imagen opcional')}
+                <div class="cx-item-media">
+                    ${fieldImagePreview(`items.${i}.imagen`, 'Imagen', item.imagen, { compact: true })}
                 </div>
-                <div class="cx-item-texto">
+                <div class="cx-item-fields">
                     ${fieldInput(`items.${i}.texto`, 'Texto (o imagen)', item.texto)}
-                </div>
-                <div class="cx-item-cat">
                     ${fieldSelect(`items.${i}.zona`, 'Zona destino', item.zona, zonaOpts)}
                 </div>
                 ${puedeEditar && items.length > 2
@@ -1107,7 +1352,7 @@
                 id: 'actividad',
                 label: 'Actividad',
                 icon: 'fa-sliders',
-                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion),
+                content: fieldInstruccionesAudio(),
             },
             {
                 id: 'zonas',
@@ -1145,8 +1390,8 @@
                             data-paso="${i}" data-index="${j}" ${op.correcta ? 'checked' : ''} ${puedeEditar ? '' : 'disabled'}> Correcta</label>
                     </div>
                     <div class="cx-paso-opcion-body">
-                        <div class="cx-item-img">
-                            ${imageThumbBtn(`pasos.${i}.opciones.${j}.imagen`, op.imagen, 'Imagen opcional')}
+                        <div class="cx-item-media">
+                            ${fieldImagePreview(`pasos.${i}.opciones.${j}.imagen`, 'Imagen', op.imagen, { compact: true })}
                         </div>
                         <div class="cx-paso-opcion-fields">
                             ${fieldInput(`pasos.${i}.opciones.${j}.emoji`, 'Emoji', op.emoji)}
@@ -1167,7 +1412,7 @@
                 id: 'reto',
                 label: 'Reto',
                 icon: 'fa-flag',
-                content: fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+                content: fieldInstruccionesAudio()
                     + fieldInput('descripcion', 'Nombre del reto', d.descripcion),
             },
             {
@@ -1193,7 +1438,7 @@
     }
 
     function formEmocion(d) {
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion)
+        return fieldInstruccionesAudio()
             + fieldSelect('cantidad', 'Cantidad de emociones', d.cantidad || '6', [
                 { value: '4', label: '4 (feliz, emocionado, tranquilo, confundido)' },
                 { value: '6', label: '6 (+ cansado, nervioso)' },
@@ -1203,8 +1448,7 @@
 
     function formRecompensa(d) {
         const tipo = d.tipo || 'Trofeo';
-        return fieldTextarea('instruccion', 'Instrucción de audio para el niño', d.instruccion,
-            'Este texto se leerá en audio. Usa frases cortas y amigables para niños de 4 años.')
+        return fieldInstruccionesAudio()
             + fieldSelect('tipo', 'Tipo de recompensa', tipo, [
                 'Trofeo', 'Medalla', 'Estrella dorada', 'Insignia especial',
             ])
@@ -1236,22 +1480,39 @@
         }
     }
 
-    function renderConfig(bloque) {
-        detenerMediosConfig();
-        const tabPrev = tabActivaId();
+    function htmlBannerPendientes(bloque) {
         const pendientes = Array.isArray(bloque.pendientes) ? bloque.pendientes : [];
-        const pendHtml = bloque.completo
-            ? `<div class="cx-pendientes-banner cx-pendientes-banner--ok">
+        if (bloque.completo) {
+            return `<div class="cx-pendientes-banner cx-pendientes-banner--ok" data-cx-pendientes-banner>
                 <i class="fa-solid fa-circle-check"></i> Bloque completo
-               </div>`
-            : (pendientes.length
-                ? `<div class="cx-pendientes-banner cx-pendientes-banner--warn">
+               </div>`;
+        }
+        if (pendientes.length) {
+            return `<div class="cx-pendientes-banner cx-pendientes-banner--warn" data-cx-pendientes-banner>
                     <strong>Campos pendientes</strong>
                     <ul class="cx-pendientes-items">${pendientes.map((p) => `<li>${escapar(p)}</li>`).join('')}</ul>
-                   </div>`
-                : `<div class="cx-pendientes-banner cx-pendientes-banner--warn">
+                   </div>`;
+        }
+        return `<div class="cx-pendientes-banner cx-pendientes-banner--warn" data-cx-pendientes-banner>
                     <i class="fa-solid fa-triangle-exclamation"></i> Campos pendientes
-                   </div>`);
+                   </div>`;
+    }
+
+    function actualizarBannerPendientes(bloque) {
+        if (!bloque || Number(seleccionadoId) !== Number(bloque.id)) return;
+        const html = htmlBannerPendientes(bloque);
+        const $banner = $configBody.children('[data-cx-pendientes-banner]').first();
+        if ($banner.length) {
+            $banner.replaceWith(html);
+        } else {
+            $configBody.prepend(html);
+        }
+    }
+
+    function renderConfig(bloque) {
+        destroySortableInstrucciones();
+        detenerMediosConfig();
+        const tabPrev = tabActivaId();
         $configHead.html(`
             <div class="cx-config-head-icon"><i class="fa-solid ${escapar(bloque.icono || 'fa-cube')}"></i></div>
             <div>
@@ -1260,8 +1521,9 @@
                 <p>${escapar(bloque.categoria_label || '')}${bloque.obligatorio ? ' · Obligatorio' : ''}</p>
             </div>
         `);
-        $configBody.html(pendHtml + htmlFormulario(bloque));
+        $configBody.html(htmlBannerPendientes(bloque) + htmlFormulario(bloque));
         restaurarTab(tabPrev);
+        initSortableInstrucciones();
         $saveStatus.prop('hidden', true).removeClass('is-saving is-ok is-err');
         requestAnimationFrame(sincronizarLateralesDesdeSecuencia);
     }
@@ -1341,6 +1603,9 @@
             }
         }
 
+        const lineas = leerInstruccionesDesdeForm();
+        datos.instruccion = lineas.map((l) => String(l.texto || '').trim()).filter(Boolean).join(' ');
+
         return datos;
     }
 
@@ -1355,17 +1620,19 @@
         const bloque = bloquePorId(seleccionadoId);
         if (!bloque || !puedeEditar) return;
         const datos = leerDatosDesdeForm(bloque);
+        const instruccionesAudio = leerInstruccionesDesdeForm();
         saving = true;
         const url = tpl(urls.actualizarTpl, { __BLOQUE__: bloque.id });
-        api(url, 'PUT', { datos })
+        api(url, 'PUT', { datos, instrucciones_audio: instruccionesAudio })
             .done((res) => {
                 const actualizado = res?.data;
                 if (actualizado) {
                     bloques = bloques.map((b) => (Number(b.id) === Number(actualizado.id) ? actualizado : b));
-                    renderSecuencia();
-                    if (reRenderForm) renderConfig(actualizado);
-                    else {
-                        $timeline.find(`.cx-block-card[data-id="${actualizado.id}"]`).addClass('is-selected');
+                    if (reRenderForm) {
+                        renderSecuencia();
+                        renderConfig(actualizado);
+                    } else {
+                        actualizarEstadoTrasGuardar(actualizado);
                     }
                 }
                 $saveStatus.removeClass('is-saving is-err').addClass('is-ok').text('Guardado');
@@ -1381,10 +1648,28 @@
         const bloque = bloquePorId(seleccionadoId);
         if (!bloque) return;
         const datos = leerDatosDesdeForm(bloque);
+        const instrucciones = leerInstruccionesDesdeForm();
         mutator(datos);
         bloque.datos = datos;
+        bloque.instrucciones_audio = instrucciones;
         renderConfig(bloque);
         if (andSave !== false) scheduleSave();
+    }
+
+    function mutarInstruccionesLocales(mutator) {
+        const bloque = bloquePorId(seleccionadoId);
+        if (!bloque) return;
+        const datos = leerDatosDesdeForm(bloque);
+        const instrucciones = leerInstruccionesDesdeForm();
+        mutator(instrucciones);
+        bloque.datos = datos;
+        bloque.instrucciones_audio = instrucciones.map((l, i) => ({
+            texto: String(l.texto || ''),
+            personaje: l.personaje === 'zeus' ? 'zeus' : 'zoe',
+            orden: i + 1,
+        }));
+        renderConfig(bloque);
+        scheduleSave();
     }
 
     /* ── Acciones ───────────────────────────────────────────── */
@@ -1536,7 +1821,8 @@
                 } else {
                     $imgBtn.prepend('<i class="fa-solid fa-image"></i>');
                 }
-                $imgBtn.closest('.cx-media-preview-row').find('.cx-file-name').text(nombre || 'Sin archivo');
+                $imgBtn.closest('.cx-field, .cx-media-preview-row, .cx-item-row')
+                    .find('.cx-file-name').first().text(nombre || 'Sin archivo');
             }
             scheduleSave();
         }).fail((xhr) => {
@@ -1743,6 +2029,7 @@
         $juegosModuloResumen.prop('hidden', true).empty();
         $juegosModuloLoading.prop('hidden', false);
         $('#cxModalJuegosModuloSubtitle').text('Filtra y elige un juego para el bloque');
+        setFiltrosJuegosAbiertos(false);
         modalJuegosModulo()?.show();
 
         const form = document.getElementById('formFiltrosJuegosConstructor');
@@ -1766,6 +2053,19 @@
         modalJuegosModulo()?.hide();
     }
 
+    function setFiltrosJuegosAbiertos(abierto) {
+        const $panel = $('#cxJuegosFiltrosPanel');
+        const $btn = $('#cxBtnToggleFiltrosJuegos');
+        $panel.toggleClass('is-open', !!abierto);
+        $btn.attr('aria-expanded', abierto ? 'true' : 'false');
+        $btn.find('.cx-juegos-filtros-toggle-label').text(abierto ? 'Ocultar filtros' : 'Más filtros');
+        $btn.find('i').toggleClass('fa-sliders', !abierto).toggleClass('fa-chevron-up', !!abierto);
+    }
+
+    $('#cxBtnToggleFiltrosJuegos').on('click', function () {
+        setFiltrosJuegosAbiertos(!$('#cxJuegosFiltrosPanel').hasClass('is-open'));
+    });
+
     $configBody.on('click', '#cxBtnJuegosModulo', function (e) {
         e.preventDefault();
         abrirModalJuegosModulo();
@@ -1783,7 +2083,7 @@
         aplicarJuegoCatalogo(tipo, nombre, catalogoId);
     });
 
-    $configBody.on('input change', '.cx-input, .cx-check, .cx-correcta, .cx-correcta-paso', function () {
+    $configBody.on('input change', '.cx-input, .cx-check, .cx-correcta, .cx-correcta-paso, .cx-audio-linea-texto', function () {
         const field = $(this).data('field');
         if (typeof field === 'string' && field.indexOf('colores_zonas.') === 0) {
             $(this).closest('.cx-zona-color-row').find('.cx-zona-color-badge').css('background', $(this).val());
@@ -1925,19 +2225,37 @@
 
     $configBody.on('click', '[data-cx-tts-preview]', function () {
         detenerMediosConfig();
-        const texto = String($(this).closest('.cx-field').find('textarea[data-field="instruccion"]').val() || '').trim();
-        if (!texto) {
-            toast('info', 'Escribe la instrucción para escucharla.');
+        const lineas = leerInstruccionesDesdeForm()
+            .map((l) => ({ texto: String(l.texto || '').trim(), personaje: l.personaje }))
+            .filter((l) => l.texto);
+        if (!lineas.length) {
+            toast('info', 'Escribe al menos una instrucción para escucharla.');
             return;
         }
-        if (!window.speechSynthesis) {
-            toast('info', 'Tu navegador no soporta vista previa de voz.');
-            return;
-        }
-        const u = new SpeechSynthesisUtterance(texto);
-        u.lang = 'es-CO';
-        u.rate = 0.92;
-        window.speechSynthesis.speak(u);
+        reproducirSecuenciaConstructor(lineas, 0);
+    });
+    $configBody.on('click', '.cx-audio-linea-pj', function () {
+        if (!puedeEditar) return;
+        const $btn = $(this);
+        $btn.closest('.cx-audio-pj').find('.cx-audio-linea-pj').removeClass('is-on');
+        $btn.addClass('is-on');
+        scheduleSave();
+    });
+    $configBody.on('click', '.cx-audio-linea-add', function () {
+        mutarInstruccionesLocales((list) => {
+            if (list.length >= 8) return;
+            const ultimo = list[list.length - 1];
+            const siguiente = ultimo && ultimo.personaje === 'zeus' ? 'zoe' : 'zeus';
+            list.push({ texto: '', personaje: siguiente });
+        });
+    });
+    $configBody.on('click', '.cx-audio-linea-rm', function () {
+        const idx = $(this).closest('.cx-audio-linea').index();
+        mutarInstruccionesLocales((list) => {
+            if (list.length <= 1) return;
+            if (Number.isNaN(idx) || idx < 0 || idx >= list.length) return;
+            list.splice(idx, 1);
+        });
     });
 
     $configBody.on('click', '.cx-add-opcion', function () {
@@ -1985,6 +2303,20 @@
             d.items.splice(idx, 1);
         });
     });
+    function indiceEdicionCategoria() {
+        const raw = $('#cxCatNueva').attr('data-edit-index');
+        if (raw === undefined || raw === '') return null;
+        const idx = Number(raw);
+        return Number.isInteger(idx) && idx >= 0 ? idx : null;
+    }
+
+    function activarEdicionCategoria(idx, nombre) {
+        $('#cxCatNueva').val(nombre).attr('data-edit-index', String(idx)).trigger('focus');
+        $('#cxCatAdd').html('<i class="fa-solid fa-check"></i> Guardar');
+        $configBody.find('.cx-cat-chip').removeClass('is-editing');
+        $configBody.find(`.cx-cat-chip[data-cat-index="${idx}"]`).addClass('is-editing');
+    }
+
     $configBody.on('click', '#cxCatAdd', function () {
         const nombre = String($('#cxCatNueva').val() || '').trim();
         if (!nombre) {
@@ -1994,26 +2326,62 @@
         const bloque = bloquePorId(seleccionadoId);
         if (!bloque) return;
         const cats = Array.isArray(bloque.datos?.categorias) ? bloque.datos.categorias : [];
-        if (cats.some((c) => String(c).toLowerCase() === nombre.toLowerCase())) {
+        const editIdx = indiceEdicionCategoria();
+        const duplicada = cats.some((c, i) => i !== editIdx && String(c).toLowerCase() === nombre.toLowerCase());
+        if (duplicada) {
             toast('warning', 'Esa categoría ya existe.');
             return;
         }
         mutarDatosLocales((d) => {
             if (!Array.isArray(d.categorias)) d.categorias = [];
+            if (editIdx !== null && editIdx >= 0 && editIdx < d.categorias.length) {
+                const viejo = d.categorias[editIdx];
+                d.categorias[editIdx] = nombre;
+                if (Array.isArray(d.items)) {
+                    d.items = d.items.map((it) => ({
+                        ...it,
+                        categoria: it.categoria === viejo ? nombre : it.categoria,
+                    }));
+                }
+                return;
+            }
             d.categorias.push(nombre);
         });
-        $('#cxCatNueva').val('');
     });
     $configBody.on('keydown', '#cxCatNueva', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             $('#cxCatAdd').trigger('click');
         }
+        if (e.key === 'Escape' && indiceEdicionCategoria() !== null) {
+            e.preventDefault();
+            $('#cxCatNueva').val('').removeAttr('data-edit-index');
+            $('#cxCatAdd').html('<i class="fa-solid fa-plus"></i> Agregar');
+            $configBody.find('.cx-cat-chip').removeClass('is-editing');
+        }
     });
-    $configBody.on('click', '.cx-cat-chip-rm', function () {
+    $configBody.on('click', '.cx-cat-chip', function (e) {
+        if (!puedeEditar) return;
+        if ($(e.target).closest('.cx-cat-chip-rm').length) return;
+        const idx = Number($(this).data('cat-index'));
+        const bloque = bloquePorId(seleccionadoId);
+        if (!bloque) return;
+        const cats = categoriasClasificacion(bloque.datos);
+        if (Number.isNaN(idx) || idx < 0 || idx >= cats.length) return;
+        activarEdicionCategoria(idx, cats[idx] || '');
+    });
+    $configBody.on('keydown', '.cx-cat-chip', function (e) {
+        if (!puedeEditar) return;
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if ($(e.target).closest('.cx-cat-chip-rm').length) return;
+        e.preventDefault();
+        $(this).trigger('click');
+    });
+    $configBody.on('click', '.cx-cat-chip-rm', function (e) {
+        e.stopPropagation();
         const idx = Number($(this).data('index'));
         mutarDatosLocales((d) => {
-            if (!Array.isArray(d.categorias) || d.categorias.length <= 2) return;
+            if (!Array.isArray(d.categorias)) return;
             if (Number.isNaN(idx) || idx < 0 || idx >= d.categorias.length) return;
             const removida = d.categorias[idx];
             d.categorias.splice(idx, 1);

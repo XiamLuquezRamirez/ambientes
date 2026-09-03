@@ -15,6 +15,7 @@ class BloqueExperienciaService
 {
     public function __construct(
         private BloqueDatosRegistry $registry,
+        private InstruccionAudioService $instruccionesAudio,
     ) {}
 
     public function asegurarObligatorios(Experiencia $experiencia): Collection
@@ -54,6 +55,7 @@ class BloqueExperienciaService
     public function listar(Experiencia $experiencia): Collection
     {
         return $experiencia->bloques()
+            ->with('instruccionesAudio')
             ->orderBy('orden')
             ->get()
             ->map(fn (BloqueExperiencia $b) => $this->serializarBloque($b));
@@ -110,14 +112,28 @@ class BloqueExperienciaService
 
     /**
      * @param  array<string, mixed>  $datos
+     * @param  list<array<string, mixed>>|null  $instrucciones
      */
-    public function actualizarDatos(BloqueExperiencia $bloque, array $datos): BloqueExperiencia
+    public function actualizarDatos(BloqueExperiencia $bloque, array $datos, ?array $instrucciones = null): BloqueExperiencia
     {
+        if ($instrucciones !== null) {
+            $filas = $this->instruccionesAudio->sincronizar($bloque, $instrucciones);
+            $datos['instruccion'] = $this->instruccionesAudio->textoLegacy($filas);
+        } else {
+            $filas = $this->instruccionesAudio->asegurarDesdeLegacy(
+                $bloque,
+                (string) ($datos['instruccion'] ?? '')
+            );
+            if ($filas !== []) {
+                $datos['instruccion'] = $this->instruccionesAudio->textoLegacy($filas);
+            }
+        }
+
         $normalizados = $this->registry->normalizar($bloque->tipo, $datos);
         $bloque->datos = $normalizados;
         $bloque->save();
 
-        return $bloque->fresh();
+        return $bloque->fresh(['instruccionesAudio']);
     }
 
     public function eliminar(BloqueExperiencia $bloque): void
@@ -213,7 +229,11 @@ class BloqueExperienciaService
      */
     public function bloquesIncompletos(Experiencia $experiencia): array
     {
-        $bloques = $experiencia->bloques()->where('activo', true)->orderBy('orden')->get();
+        $bloques = $experiencia->bloques()
+            ->with('instruccionesAudio')
+            ->where('activo', true)
+            ->orderBy('orden')
+            ->get();
         $pendientesDetalle = [];
 
         foreach ($bloques as $bloque) {
@@ -281,6 +301,14 @@ class BloqueExperienciaService
             $bloque->saveQuietly();
         }
 
+        $instrucciones = $this->instruccionesAudio->serializar($bloque);
+        $textoInstruccion = $this->instruccionesAudio->textoLegacy(
+            array_values(array_filter(
+                $instrucciones,
+                fn (array $fila) => trim((string) ($fila['texto'] ?? '')) !== ''
+            ))
+        );
+        $datos['instruccion'] = $textoInstruccion;
         $pendientes = $this->registry->pendientes($bloque->tipo, $datos);
 
         return [
@@ -289,6 +317,7 @@ class BloqueExperienciaService
             'tipo' => $bloque->tipo,
             'orden' => (int) $bloque->orden,
             'datos' => $datos,
+            'instrucciones_audio' => $instrucciones,
             'activo' => (bool) $bloque->activo,
             'nombre' => $meta['nombre'],
             'descripcion' => $meta['descripcion'],
