@@ -3554,6 +3554,13 @@
         refs.$estado.text(texto).prop('hidden', false);
     }
 
+    // Cambia el texto y el icono del botón de captura/grabación.
+    function setCapturaLabel(refs, texto, iconoFa) {
+        refs.$captura.find('[data-vn-evidencia-captura-label]').text(texto);
+        if (iconoFa) refs.$captura.find('.vn-evidencia-captura-icon i').attr('class', 'fa-solid ' + iconoFa);
+        refs.$captura.attr('aria-label', texto);
+    }
+
     function iniciarUiGrabacionEvidencia(refs, sesion, nativo) {
         refs.$stage.prop('hidden', false);
         refs.$btn.prop('hidden', true).prop('disabled', false);
@@ -3899,11 +3906,12 @@
                 // Mostrar el botón de cambiar cámara (frontal/trasera).
                 if (refs.$flip) refs.$flip.prop('hidden', false);
                 if (tipo === 'video') {
-                    // Video embebido: además del preview en vivo, se graba con
-                    // MediaRecorder (mismo recuadro). Se detiene al pulsar Capturar.
-                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Grabando!' : 'Grabando video…', 'grabando');
-                    if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
-                    iniciarGrabacionEvidencia(stream, 'video', sesion);
+                    // Video: primero se MUESTRA la cámara (para poder voltear); la
+                    // grabación empieza al pulsar el botón, que dice "Iniciar
+                    // grabación". Ver el handler de [data-vn-evidencia-captura].
+                    $body.data('vn-evidencia-estado', { tipo: tipo, sesion: sesion, nativo: false, grabando: false });
+                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Listo para grabar!' : 'Toca para grabar', 'grabando');
+                    setCapturaLabel(refs, configNivel().simplificar ? '¡Grabar!' : 'Iniciar grabación', 'fa-circle');
                 } else {
                     setEstadoEvidencia(refs, configNivel().simplificar ? '¡Mira!' : 'Cámara activa', 'grabando');
                 }
@@ -3922,6 +3930,23 @@
         const refs = refsEvidencia($body);
         const tipo = estado.tipo;
         const sesion = estado.sesion;
+
+        // VIDEO en fase "listo" (aún no graba): este toque INICIA la grabación.
+        // Así el niño pudo voltear la cámara antes. Al grabar, se oculta el flip.
+        if (tipo === 'video' && estado.grabando === false) {
+            const stream = $body.data('vn-evidencia-stream');
+            if (!stream) return;
+            estado.grabando = true;
+            $body.data('vn-evidencia-estado', estado);
+            if (refs.$flip) refs.$flip.prop('hidden', true);
+            refs.$recording.prop('hidden', false);
+            setEstadoEvidencia(refs, configNivel().simplificar ? '¡Grabando!' : 'Grabando video…', 'grabando');
+            setCapturaLabel(refs, configNivel().simplificar ? '¡Ya!' : 'Detener', 'fa-stop');
+            if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
+            iniciarGrabacionEvidencia(stream, 'video', sesion);
+            return;
+        }
+
         if (refs.$flip) refs.$flip.prop('hidden', true); // ocultar cambio de cámara al capturar
 
         if (estado.nativo && tipo === 'audio' && window.VnCaptura) {
