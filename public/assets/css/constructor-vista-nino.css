@@ -4060,6 +4060,7 @@ body.rn-player-activo .vn-colorear-canvas,
 }
 
 .vn-evidencia-stage {
+    position: relative;
     margin: 0 auto;
     width: 100%;
     max-width: min(640px, 100%);
@@ -4073,6 +4074,34 @@ body.rn-player-activo .vn-colorear-canvas,
     align-items: center;
     justify-content: center;
 }
+
+/* Botón para cambiar entre cámara frontal y trasera (esquina del preview). */
+.vn-evidencia-flip {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+    width: 52px;
+    height: 52px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, .62);
+    color: #fff;
+    font-size: 1.35rem;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .35);
+    transition: transform .18s ease, background .2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.vn-evidencia-flip:hover,
+.vn-evidencia-flip:focus-visible {
+    background: rgba(15, 23, 42, .82);
+    outline: none;
+}
+.vn-evidencia-flip:active { transform: scale(.9) rotate(180deg); }
 
 .vn-evidencia-preview,
 .vn-evidencia-result,

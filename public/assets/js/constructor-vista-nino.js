@@ -146,6 +146,7 @@
     let experienciaIdActiva = null;
     let urlExperienciaTpl = '';
     let evidenciaSesion = 0;
+    let evidenciaCamara = 'environment'; // cámara activa: 'environment' (trasera) | 'user' (frontal)
 
     const PAINT_SIZE_MAP = { s: 6, m: 12, l: 22 };
     const PAINT_DEFAULT_COLORS = [
@@ -897,6 +898,10 @@
             <div class="vn-evidencia-wrap">
                 <div class="vn-evidencia-stage" data-vn-evidencia-stage hidden>
                     <video class="vn-evidencia-preview" playsinline webkit-playsinline muted hidden></video>
+                    <button type="button" class="vn-evidencia-flip" data-vn-evidencia-flip hidden
+                        aria-label="Cambiar de cámara">
+                        <i class="fa-solid fa-camera-rotate" aria-hidden="true"></i>
+                    </button>
                     <img class="vn-evidencia-result" alt="" hidden>
                     <div class="vn-evidencia-replay vn-evidencia-replay--audio" data-vn-evidencia-replay="audio" hidden>
                         ${htmlBotonEvidenciaAudio('data-vn-evidencia-audio-play aria-label="Escuchar evidencia"')}
@@ -3120,6 +3125,7 @@
 
     function limpiarEvidenciaRecursos() {
         evidenciaSesion += 1;
+        evidenciaCamara = 'environment'; // volver a la trasera por defecto
         $body.removeData('vn-evidencia-estado');
         const objectUrl = $body && $body.data('vn-evidencia-object-url');
         if (objectUrl) {
@@ -3168,15 +3174,16 @@
         if (tipo === 'audio') {
             return navigator.mediaDevices.getUserMedia({ audio: true });
         }
+        const cam = evidenciaCamara; // 'environment' (trasera) o 'user' (frontal)
         const intentosVideo = tipo === 'foto'
             ? [
-                { video: { facingMode: { ideal: 'environment' } } },
-                { video: { facingMode: 'environment' } },
+                { video: { facingMode: { ideal: cam } } },
+                { video: { facingMode: cam } },
                 { video: true },
             ]
             : [
-                { video: { facingMode: { ideal: 'environment' } }, audio: true },
-                { video: { facingMode: 'environment' }, audio: true },
+                { video: { facingMode: { ideal: cam } }, audio: true },
+                { video: { facingMode: cam }, audio: true },
                 { video: true, audio: true },
                 { video: true, audio: false },
             ];
@@ -3516,6 +3523,7 @@
             $wrap,
             $stage,
             $preview: $stage.find('.vn-evidencia-preview'),
+            $flip: $stage.find('[data-vn-evidencia-flip]'),
             $result: $stage.find('.vn-evidencia-result'),
             $audioReplay: $stage.find('[data-vn-evidencia-replay="audio"]'),
             $audioPlayBtn: $stage.find('[data-vn-evidencia-audio-play]'),
@@ -3784,6 +3792,25 @@
         aplicarBlobEvidencia(refs, tipo, file);
     });
 
+    // Cambiar entre cámara frontal ('user') y trasera ('environment'). Alterna la
+    // preferencia, detiene el stream actual y reabre la cámara con el mismo flujo.
+    onBody('click', '[data-vn-evidencia-flip]', function () {
+        vincularElementos();
+        const refs = refsEvidencia($body);
+        const estado = $body.data('vn-evidencia-estado');
+        if (!estado || (estado.tipo !== 'foto' && estado.tipo !== 'video')) return;
+        // No permitir cambiar mientras se graba un video (evita cortar la grabación).
+        const rec = $body.data('vn-evidencia-recorder');
+        if (rec && rec.state === 'recording') return;
+
+        evidenciaCamara = (evidenciaCamara === 'environment') ? 'user' : 'environment';
+        detenerEvidenciaStream();
+        if (refs.$flip) refs.$flip.prop('hidden', true);
+        // Redispara el botón principal de este tipo → reabre con la nueva cámara.
+        const $btnTipo = refs.$btn.filter('[data-vn-evidencia-tipo="' + estado.tipo + '"]').first();
+        if ($btnTipo.length) $btnTipo.trigger('click');
+    });
+
     onBody('click', '[data-vn-evidencia]', function () {
         vincularElementos();
         const refs = refsEvidencia($body);
@@ -3869,6 +3896,8 @@
                 refs.$preview[0].setAttribute('playsinline', '');
                 refs.$preview[0].setAttribute('webkit-playsinline', '');
                 refs.$preview[0].play().catch(function () { /* noop */ });
+                // Mostrar el botón de cambiar cámara (frontal/trasera).
+                if (refs.$flip) refs.$flip.prop('hidden', false);
                 if (tipo === 'video') {
                     // Video embebido: además del preview en vivo, se graba con
                     // MediaRecorder (mismo recuadro). Se detiene al pulsar Capturar.
@@ -3893,6 +3922,7 @@
         const refs = refsEvidencia($body);
         const tipo = estado.tipo;
         const sesion = estado.sesion;
+        if (refs.$flip) refs.$flip.prop('hidden', true); // ocultar cambio de cámara al capturar
 
         if (estado.nativo && tipo === 'audio' && window.VnCaptura) {
             refs.$captura.prop('disabled', true);
