@@ -992,8 +992,8 @@
 
         #contenedor-cargando {
             display: flex;
-            width: calc(100% - 240px);
-            left: 240px;
+            width: calc(100% - var(--sidebar-width));
+            left: var(--sidebar-width);
             opacity: 1;
             transition: opacity 0.3s ease-in-out;
         }
