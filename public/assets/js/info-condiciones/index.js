@@ -10,7 +10,13 @@
     const modalContenido = bootstrap.Modal.getOrCreateInstance(modalContenidoEl);
     const tituloContenido = document.getElementById('modalInfoCondicionContenidoTitulo');
     const htmlDinamico = document.getElementById('ic-contenido-html-dinamico');
+    const dialogCondicion = modalCondicionEl.querySelector('.ic-dialog-condicion');
+    const dialogContenido = modalContenidoEl.querySelector('.ic-dialog-contenido');
     const mapa = window.INFO_CONDICIONES_MAP || {};
+
+    let condicionActualSlug = null;
+    let maximizado = false;
+    let suprimirResetAlOcultarCondicion = false;
 
     function abrirPrincipal() {
         modalPrincipal.show();
@@ -19,6 +25,8 @@
     function abrirCondicion(slug) {
         const panel = document.getElementById('ic-condicion-' + slug);
         if (!panel) return;
+
+        condicionActualSlug = slug;
 
         modalCondicionEl.querySelectorAll('.ic-condicion-panel').forEach(function(p) {
             p.classList.add('d-none');
@@ -68,10 +76,50 @@
         htmlDinamico.classList.remove('d-none');
     }
 
+    function botonesMaximizarVisibles() {
+        return modalCondicionEl.querySelectorAll('.ic-btn-maximizar-condicion');
+    }
+
+    function actualizarBotonMaximizar() {
+        botonesMaximizarVisibles().forEach(function(btn) {
+            const icono = btn.querySelector('i');
+            const etiqueta = maximizado ? 'Restaurar' : 'Maximizar';
+
+            if (icono) {
+                icono.classList.toggle('fa-expand', !maximizado);
+                icono.classList.toggle('fa-compress', maximizado);
+            }
+
+            btn.setAttribute('title', etiqueta);
+            btn.setAttribute('aria-label', etiqueta);
+        });
+    }
+
+    function aplicarEstadoMaximizado() {
+        dialogCondicion?.classList.toggle('modal-fullscreen', maximizado);
+        modalCondicionEl.classList.toggle('ic-modal-maximizado', maximizado);
+        dialogContenido?.classList.toggle('modal-fullscreen', maximizado);
+        modalContenidoEl.classList.toggle('ic-modal-maximizado', maximizado);
+        actualizarBotonMaximizar();
+    }
+
+    function restaurarMaximizado() {
+        if (!maximizado) return;
+
+        maximizado = false;
+        aplicarEstadoMaximizado();
+    }
+
+    function toggleMaximizar() {
+        maximizado = !maximizado;
+        aplicarEstadoMaximizado();
+    }
+
     function abrirContenidoBoton(condicionSlug, botonId) {
         const info = (mapa[condicionSlug] || {})[botonId];
         if (!info) return;
 
+        condicionActualSlug = condicionSlug;
         ocultarTodoContenido();
 
         const contenido = (info.contenido_html || '').trim();
@@ -94,9 +142,11 @@
 
         function mostrarModalContenido() {
             modalContenido.show();
+            aplicarEstadoMaximizado();
         }
 
         if (modalCondicionEl.classList.contains('show')) {
+            suprimirResetAlOcultarCondicion = true;
             modalCondicionEl.addEventListener('hidden.bs.modal', function onCondicionOculta() {
                 modalCondicionEl.removeEventListener('hidden.bs.modal', onCondicionOculta);
                 mostrarModalContenido();
@@ -107,16 +157,30 @@
         }
     }
 
-    const btnVolverExterior = modalCondicionEl.querySelector('.ic-btn-volver-exterior');
+    modalCondicionEl.addEventListener('hidden.bs.modal', function() {
+        if (suprimirResetAlOcultarCondicion) {
+            suprimirResetAlOcultarCondicion = false;
+            return;
+        }
 
-    function ocultarVolverExterior(ocultar) {
-        if (!btnVolverExterior) return;
-        btnVolverExterior.classList.toggle('is-hidden', ocultar);
-    }
+        restaurarMaximizado();
+        condicionActualSlug = null;
+    });
+
+    modalCondicionEl.addEventListener('shown.bs.modal', function() {
+        aplicarEstadoMaximizado();
+    });
 
     modalContenidoEl.addEventListener('hidden.bs.modal', function() {
-        ocultarVolverExterior(false);
         modalCondicion.show();
+    });
+
+    modalContenidoEl.addEventListener('shown.bs.modal', function() {
+        aplicarEstadoMaximizado();
+    });
+
+    modalCondicionEl.querySelectorAll('.ic-btn-maximizar-condicion').forEach(function(btn) {
+        btn.addEventListener('click', toggleMaximizar);
     });
 
     document.querySelectorAll('[data-abrir-modal-condiciones]').forEach(function(btn) {

@@ -34,7 +34,7 @@
     --font-display: 'Fredoka One', cursive;
     --focus-ring: 0 0 0 3px rgba(37, 99, 235, .12);
     --ease: .15s ease;
-    --sidebar-width: 265px;
+    --sidebar-width: 275px;
     --sidebar-width-mini: 72px;
     --sidebar-current-width: var(--sidebar-width);
     --header-height: 60px;
@@ -291,7 +291,7 @@ html.sidebar-collapsed:is(.sidebar-hover, .sidebar-pinned):not(.sidebar-mobile-o
 .sidebar .collapsing > .nav {
     flex: none !important;
     padding: 4px 0 8px !important;
-    margin: 0 0px 6px 20px;    
+    margin: 0 0px 6px 25px;    
     gap: 0;
 }
 
@@ -310,6 +310,7 @@ html.sidebar-collapsed:is(.sidebar-hover, .sidebar-pinned):not(.sidebar-mobile-o
     min-height: 0 !important;
     white-space: normal;
     background: transparent;
+    width: 240px;
 }
 
 .sidebar .collapse > .nav > .nav-item > .nav-link:hover,
