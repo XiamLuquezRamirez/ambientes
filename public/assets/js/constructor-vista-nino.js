@@ -917,6 +917,10 @@
                         <i class="fa-solid ${icon}"></i>
                         <span>¡Listo!</span>
                     </div>
+                    <button type="button" class="vn-evidencia-flip" data-vn-evidencia-voltear hidden
+                        aria-label="Cambiar de cámara">
+                        <i class="fa-solid fa-camera-rotate" aria-hidden="true"></i>
+                    </button>
                 </div>
                 <p class="vn-evidencia-estado" data-vn-evidencia-estado hidden aria-live="polite"></p>
                 <input type="file" class="vn-evidencia-file" data-vn-evidencia-file
@@ -932,6 +936,11 @@
                         </button>
                         <span class="vn-evidencia-btn-label">${escapar(label)}</span>
                     </div>
+                    <button type="button" class="vn-evidencia-iniciar-btn vn-pulse-hint" data-vn-evidencia-iniciar-video hidden
+                        aria-label="Iniciar grabación">
+                        <span class="vn-evidencia-captura-icon" aria-hidden="true"><i class="fa-solid fa-circle"></i></span>
+                        <span class="vn-evidencia-captura-label">${configNivel().simplificar ? '¡Grabar!' : 'Iniciar grabación'}</span>
+                    </button>
                     <button type="button" class="vn-evidencia-captura-btn vn-pulse-hint" data-vn-evidencia-captura hidden
                         aria-label="${escapar(capturaLabel)}">
                         <span class="vn-evidencia-captura-icon" aria-hidden="true"><i class="fa-solid fa-stop"></i></span>
@@ -3158,7 +3167,7 @@
         return opciones.find(function (m) { return MediaRecorder.isTypeSupported(m); }) || '';
     }
 
-    function obtenerMediaEvidencia(tipo) {
+    function obtenerMediaEvidencia(tipo, facing) {
         if (!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost') {
             return Promise.reject(new Error('insecure'));
         }
@@ -3168,15 +3177,17 @@
         if (tipo === 'audio') {
             return navigator.mediaDevices.getUserMedia({ audio: true });
         }
+        // Cámara a usar: 'environment' (trasera, por defecto) o 'user' (frontal).
+        const cam = facing === 'user' ? 'user' : 'environment';
         const intentosVideo = tipo === 'foto'
             ? [
-                { video: { facingMode: { ideal: 'environment' } } },
-                { video: { facingMode: 'environment' } },
+                { video: { facingMode: { ideal: cam } } },
+                { video: { facingMode: cam } },
                 { video: true },
             ]
             : [
-                { video: { facingMode: { ideal: 'environment' } }, audio: true },
-                { video: { facingMode: 'environment' }, audio: true },
+                { video: { facingMode: { ideal: cam } }, audio: true },
+                { video: { facingMode: cam }, audio: true },
                 { video: true, audio: true },
                 { video: true, audio: false },
             ];
@@ -3530,6 +3541,8 @@
             $estado: $wrap.find('[data-vn-evidencia-estado]'),
             $btn: $wrap.find('[data-vn-evidencia]'),
             $captura: $wrap.find('[data-vn-evidencia-captura]'),
+            $iniciarVideo: $wrap.find('[data-vn-evidencia-iniciar-video]'),
+            $voltear: $stage.find('[data-vn-evidencia-voltear]'),
             $file: $wrap.find('[data-vn-evidencia-file]'),
             $msg: $scope.find('.vn-evidencia-msg'),
         };
@@ -3575,6 +3588,8 @@
     function resetUiEvidencia(refs) {
         refs.$stage.prop('hidden', true);
         refs.$captura.prop('hidden', true);
+        if (refs.$iniciarVideo) refs.$iniciarVideo.prop('hidden', true);
+        if (refs.$voltear) refs.$voltear.prop('hidden', true).prop('disabled', false);
         refs.$recording.prop('hidden', true);
         refs.$preview.prop('hidden', true);
         refs.$result.prop('hidden', true);
@@ -3649,6 +3664,8 @@
         refs.$stage.prop('hidden', false);
         refs.$recording.prop('hidden', true);
         refs.$captura.prop('hidden', true);
+        if (refs.$iniciarVideo) refs.$iniciarVideo.prop('hidden', true);
+        if (refs.$voltear) refs.$voltear.prop('hidden', true);
         refs.$btn.prop('hidden', true).prop('disabled', true).addClass('is-done');
         refs.$preview.prop('hidden', true);
 
@@ -3839,11 +3856,12 @@
             }
         }
 
-        obtenerMediaEvidencia(tipo).then(function (stream) {
+        // facing inicial: trasera (environment). El botón voltear alterna.
+        const facingInicial = 'environment';
+        obtenerMediaEvidencia(tipo, facingInicial).then(function (stream) {
             evidenciaSesion = sesion;
             refs.$stage.prop('hidden', false);
             refs.$btn.prop('hidden', true).prop('disabled', false);
-            refs.$captura.prop('hidden', false);
             refs.$placeholder.prop('hidden', true);
             refs.$result.prop('hidden', true).removeAttr('src');
             refs.$audioReplay.prop('hidden', true);
@@ -3852,9 +3870,12 @@
             refs.$videoEl.removeAttr('src');
             refs.$preview.removeAttr('src');
             $body.data('vn-evidencia-stream', stream);
-            $body.data('vn-evidencia-estado', { tipo: tipo, sesion: sesion, nativo: false });
+            $body.data('vn-evidencia-estado', { tipo: tipo, sesion: sesion, nativo: false, facing: facingInicial, grabando: false });
 
             if (tipo === 'audio') {
+                refs.$captura.prop('hidden', false);
+                refs.$iniciarVideo.prop('hidden', true);
+                refs.$voltear.prop('hidden', true);
                 refs.$preview.prop('hidden', true);
                 refs.$recording.prop('hidden', false);
                 setEstadoEvidencia(refs, configNivel().simplificar ? '¡Graba!' : 'Grabando…', 'grabando');
@@ -3869,13 +3890,18 @@
                 refs.$preview[0].setAttribute('playsinline', '');
                 refs.$preview[0].setAttribute('webkit-playsinline', '');
                 refs.$preview[0].play().catch(function () { /* noop */ });
+                // La cámara (foto y video) permite voltear mientras hay preview.
+                refs.$voltear.prop('hidden', false);
                 if (tipo === 'video') {
-                    // Video embebido: además del preview en vivo, se graba con
-                    // MediaRecorder (mismo recuadro). Se detiene al pulsar Capturar.
-                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Grabando!' : 'Grabando video…', 'grabando');
-                    if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
-                    iniciarGrabacionEvidencia(stream, 'video', sesion);
+                    // Video: NO grabar aún. Mostrar "Iniciar grabación" para que
+                    // el niño pueda voltear la cámara antes de empezar. La
+                    // grabación (con audio) arranca al pulsar ese botón.
+                    refs.$captura.prop('hidden', true);
+                    refs.$iniciarVideo.prop('hidden', false);
+                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Prepárate!' : 'Cámara lista', 'grabando');
                 } else {
+                    refs.$captura.prop('hidden', false);
+                    refs.$iniciarVideo.prop('hidden', true);
                     setEstadoEvidencia(refs, configNivel().simplificar ? '¡Mira!' : 'Cámara activa', 'grabando');
                 }
             }
@@ -3883,6 +3909,64 @@
             mostrarErrorEvidencia(refs, mensajeErrorEvidencia(err));
         }).finally(function () {
             $btn.prop('disabled', false);
+        });
+    });
+
+    // Iniciar la grabación de VIDEO (tras poder voltear la cámara). Arranca el
+    // MediaRecorder con el stream actual (que YA incluye audio) y cambia la UI
+    // al modo "grabando" con el botón Detener.
+    onBody('click', '[data-vn-evidencia-iniciar-video]', function () {
+        vincularElementos();
+        const estado = $body.data('vn-evidencia-estado');
+        if (!estado || estado.tipo !== 'video' || estado.grabando) return;
+        const refs = refsEvidencia($body);
+        const stream = $body.data('vn-evidencia-stream');
+        if (!stream) { mostrarErrorEvidencia(refs, 'No se pudo iniciar la grabación. Intenta otra vez.'); return; }
+
+        estado.grabando = true;
+        $body.data('vn-evidencia-estado', estado);
+        refs.$iniciarVideo.prop('hidden', true);
+        refs.$voltear.prop('hidden', true); // no voltear durante la grabación
+        refs.$captura.prop('hidden', false);
+        setEstadoEvidencia(refs, configNivel().simplificar ? '¡Grabando!' : 'Grabando video…', 'grabando');
+        if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
+        iniciarGrabacionEvidencia(stream, 'video', estado.sesion);
+    });
+
+    // Voltear cámara (frontal/trasera). Solo con preview activo (foto, o video
+    // ANTES de iniciar la grabación, para no cortar el recorder/audio).
+    onBody('click', '[data-vn-evidencia-voltear]', function () {
+        vincularElementos();
+        const estado = $body.data('vn-evidencia-estado');
+        if (!estado || estado.nativo) return;
+        if (estado.tipo !== 'foto' && estado.tipo !== 'video') return;
+        if (estado.tipo === 'video' && estado.grabando) return;
+        const refs = refsEvidencia($body);
+        const $v = $(this);
+        if ($v.prop('disabled')) return;
+        $v.prop('disabled', true);
+
+        const nuevoFacing = estado.facing === 'user' ? 'environment' : 'user';
+        // Soltar el stream actual antes de pedir el nuevo (evita cámara ocupada).
+        const streamViejo = $body.data('vn-evidencia-stream');
+        if (streamViejo && streamViejo.getTracks) streamViejo.getTracks().forEach((t) => t.stop());
+        if (refs.$preview.length) refs.$preview[0].srcObject = null;
+
+        obtenerMediaEvidencia(estado.tipo, nuevoFacing).then(function (stream) {
+            if (estado.sesion !== evidenciaSesion) {
+                if (stream && stream.getTracks) stream.getTracks().forEach((t) => t.stop());
+                return;
+            }
+            $body.data('vn-evidencia-stream', stream);
+            estado.facing = nuevoFacing;
+            $body.data('vn-evidencia-estado', estado);
+            refs.$preview[0].srcObject = stream;
+            refs.$preview[0].muted = true;
+            refs.$preview[0].play().catch(function () { /* noop */ });
+        }).catch(function (err) {
+            mostrarErrorEvidencia(refs, mensajeErrorEvidencia(err));
+        }).finally(function () {
+            $v.prop('disabled', false);
         });
     });
 
