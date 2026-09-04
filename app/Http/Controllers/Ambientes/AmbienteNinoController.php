@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BloqueExperiencia;
 use App\Models\Experiencia;
 use App\Services\ClaseKioscoService;
+use App\Services\AdaptacionKioscoService;
 use App\Services\RecorridoNinoService;
 use App\Services\ResultadoNinoService;
 use App\Services\SesionNinoService;
@@ -234,10 +235,17 @@ class AmbienteNinoController extends Controller
             'personaje' => ['nullable', 'string', 'in:zoe,zeus'],
         ]);
 
+        $personaje = $datos['personaje'] ?? null;
+        if ($personaje === null) {
+            $perfil = app(AdaptacionKioscoService::class)->obtenerDeSesion($request);
+            $voz = is_array($perfil) ? ($perfil['valores']['voz_narradora'] ?? null) : null;
+            $personaje = $voz === 'infantil_masculina' ? 'zeus' : 'zoe';
+        }
+
         try {
             $url = app(TextoAVozService::class)->urlPublica(
                 $datos['texto'],
-                $datos['personaje'] ?? null
+                $personaje
             );
         } catch (\Throwable $e) {
             return response()->json([

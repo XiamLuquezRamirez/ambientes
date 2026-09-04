@@ -66,6 +66,7 @@ class ClaseKioscoServiceTest extends TestCase
 
         $this->assertNull($request->session()->get(SesionNinoService::SESSION_ESTUDIANTE_ID));
         $this->assertNull($request->session()->get(SesionNinoService::SESSION_CLASE_ID));
+        $this->assertNull($request->session()->get(\App\Services\AdaptacionKioscoService::SESSION_KEY));
     }
 
     public function test_ip_servidor_incluye_lan_cuando_server_addr_es_cero(): void

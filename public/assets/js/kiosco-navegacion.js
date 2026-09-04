@@ -63,6 +63,17 @@
         });
     }
 
+    function sincronizarPerfil(doc) {
+        const src = doc.getElementById('kiosco-perfil-params');
+        const dest = document.getElementById('kiosco-perfil-params');
+        if (src && dest) {
+            dest.textContent = src.textContent;
+        }
+        if (window.PedniaPerfil && typeof window.PedniaPerfil.recargar === 'function') {
+            window.PedniaPerfil.recargar();
+        }
+    }
+
     function actualizarBtnSalir() {
         const btn = document.getElementById('kioscoBtnSalir');
         if (!btn) return;
@@ -99,6 +110,7 @@
         }
 
         sincronizarEstilos(doc);
+        sincronizarPerfil(doc);
         pane.innerHTML = nuevoPane.innerHTML;
         document.title = doc.title || document.title;
 

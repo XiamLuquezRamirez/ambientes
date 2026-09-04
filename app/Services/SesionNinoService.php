@@ -19,6 +19,7 @@ class SesionNinoService
 
     public function __construct(
         private AccesoAmbienteService $accesoAmbiente,
+        private ?AdaptacionKioscoService $adaptacionKiosco = null,
     ) {}
 
     public function slugAmbienteBd(): string
@@ -118,7 +119,9 @@ class SesionNinoService
             self::SESSION_ESTUDIANTE_ID,
             self::SESSION_ESTADO_AMBIENTE,
             self::SESSION_CLASE_ID,
+            AdaptacionKioscoService::SESSION_KEY,
         ]);
+        $this->adaptacion()->olvidar($request);
     }
 
     /**
@@ -152,6 +155,13 @@ class SesionNinoService
         } else {
             $request->session()->forget(self::SESSION_CLASE_ID);
         }
+
+        $this->adaptacion()->guardarEnSesion($request, $estudiante);
+    }
+
+    private function adaptacion(): AdaptacionKioscoService
+    {
+        return $this->adaptacionKiosco ??= app(AdaptacionKioscoService::class);
     }
 
     public function claseIdEnSesion(Request $request): ?int

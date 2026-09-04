@@ -1,5 +1,10 @@
+@php
+    $kioscoPerfil = $kioscoPerfil ?? ['activo' => false, 'clases' => [], 'css_vars' => [], 'valores' => [], 'noop' => []];
+    $kioscoPerfilActivo = ! empty($kioscoPerfil['activo']);
+    $kioscoPerfilClases = implode(' ', $kioscoPerfil['clases'] ?? []);
+@endphp
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="{{ $kioscoPerfilClases }}" data-kiosco-perfil="{{ $kioscoPerfilActivo ? '1' : '0' }}">
 
 <head>
     <meta charset="UTF-8">
@@ -16,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/kiosco-auth.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/recorrido-camino.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/recorrido-camino-3d.css') }}?v={{ @filemtime(public_path('assets/css/recorrido-camino-3d.css')) ?: time() }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/kiosco-perfil.css') }}?v={{ @filemtime(public_path('assets/css/kiosco-perfil.css')) ?: time() }}">
     <style id="kioscoLayoutStyles">
         :root {
             --color-ambiente: {{ $ambiente->color_hex }};
@@ -51,6 +57,16 @@
             font-family: 'Fredoka One', cursive;
         }
     </style>
+    @if ($kioscoPerfilActivo && ! empty($kioscoPerfil['css_vars']))
+        <style id="kioscoPerfilVars">
+            .rn-player,
+            #vnDispositivo {
+                @foreach ($kioscoPerfil['css_vars'] as $kioscoVar => $kioscoVal)
+                    {{ $kioscoVar }}: {{ $kioscoVal }};
+                @endforeach
+            }
+        </style>
+    @endif
     @stack('styles')
 </head>
 
@@ -90,6 +106,8 @@
     <script src="{{ asset('assets/js/kiosco-fs-core.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
     @include('partials._captura-multimedia')
+    <script type="application/json" id="kiosco-perfil-params">@json($kioscoPerfil)</script>
+    <script src="{{ asset('assets/js/kiosco-perfil.js') }}?v={{ @filemtime(public_path('assets/js/kiosco-perfil.js')) ?: time() }}"></script>
     <script src="{{ asset('assets/js/constructor-vista-nino.js') }}?v={{ @filemtime(public_path('assets/js/constructor-vista-nino.js')) ?: time() }}"></script>
     {{-- Camino 3D (Three.js). Expone window.KioscoCamino.boot(). --}}
     <script type="importmap">
