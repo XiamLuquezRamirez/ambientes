@@ -62,11 +62,6 @@
                 Salir
             </button>
         @endif
-        @unless ($enKioscoShell)
-            <button type="button" class="rn-fs-btn" id="rnBtnFullscreen" title="Pantalla completa">
-                <i class="fa-solid fa-expand"></i>
-            </button>
-        @endunless
         @unless ($esCaminoLineal)
             <button type="button" class="rn-back" id="rnBtnBack" hidden>
                 <i class="fa-solid fa-arrow-left"></i>
@@ -81,10 +76,6 @@
         data-estudiante-sexo="{{ $sexoEstudiante }}" data-estudiante-grado="{{ $gradoNombre }}"
         data-nivel-etario="{{ $nivelEtario }}" data-estudiante-nombre="{{ $nombreEstudiante }}"
         data-emociones-base="{{ $emocionesBase }}" data-version="">
-        <button type="button" class="vn-fs-btn" id="vnBtnFullscreen" title="Pantalla completa"
-            aria-label="Pantalla completa">
-            <i class="fa-solid fa-expand"></i> Pantalla completa
-        </button>
         <button type="button" class="vn-reload-btn vn-reload-btn--player" id="vnBtnRecargar"
             title="Recargar experiencia (provisional)" aria-label="Recargar experiencia">
             <i class="fa-solid fa-rotate"></i> Recargar
