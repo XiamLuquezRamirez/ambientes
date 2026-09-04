@@ -1,0 +1,242 @@
+/**
+ * Adaptación visual del player del kiosco según perfil de aprendizaje.
+ * El chrome (camino 3D, shell oscuro) no hereda fondo_pantalla ni filtros de color.
+ */
+html.kiosco-perfil--activo .rn-player .vn-option,
+html.kiosco-perfil--activo .rn-player .vn-nav-btn,
+html.kiosco-perfil--activo .rn-player .vn-chip,
+html.kiosco-perfil--activo .rn-player .vn-hist-nav-btn {
+    min-width: var(--kiosco-btn-size, 72px);
+    min-height: var(--kiosco-btn-size, 72px);
+    transition-duration: var(--kiosco-trans-ms, 300ms);
+}
+
+html.kiosco-perfil--activo .rn-player .vn-options,
+html.kiosco-perfil--activo .rn-player .vn-paint-colors,
+html.kiosco-perfil--activo .rn-player .vn-paint-tools {
+    gap: var(--kiosco-btn-spacing, 12px);
+}
+
+html.kiosco-perfil--activo .rn-player .vn-title,
+html.kiosco-perfil--activo .rn-player .vn-instrucciones,
+html.kiosco-perfil--activo .rn-player .vn-instruccion,
+html.kiosco-perfil--activo .rn-player .vn-feedback {
+    font-size: var(--kiosco-font-size, 16pt);
+}
+
+html.kiosco-perfil--fondo-crema .rn-player .vn-tablet-screen,
+html.kiosco-perfil--fondo-crema #vnDispositivo .vn-tablet-screen {
+    background: var(--kiosco-player-bg, #FBF3E4);
+    --vn-sky: #FBF3E4;
+}
+
+html.kiosco-perfil--fondo-gris_suave .rn-player .vn-tablet-screen,
+html.kiosco-perfil--fondo-gris_suave #vnDispositivo .vn-tablet-screen {
+    background: var(--kiosco-player-bg, #E8EAED);
+    --vn-sky: #E8EAED;
+}
+
+html.kiosco-perfil--contraste-alto .rn-player {
+    --vn-ink: #111827;
+}
+
+html.kiosco-perfil--contraste-alto .rn-player .vn-option,
+html.kiosco-perfil--contraste-alto .rn-player .vn-chip,
+html.kiosco-perfil--contraste-alto .rn-player .vn-memory-card,
+html.kiosco-perfil--contraste-alto .rn-player .vn-puzzle-piece {
+    border: 2px solid #374151;
+    color: #111827;
+}
+
+html.kiosco-perfil--contraste-maximo .rn-player {
+    --vn-ink: #000000;
+}
+
+html.kiosco-perfil--contraste-maximo .rn-player .vn-option,
+html.kiosco-perfil--contraste-maximo .rn-player .vn-chip,
+html.kiosco-perfil--contraste-maximo .rn-player .vn-memory-card,
+html.kiosco-perfil--contraste-maximo .rn-player .vn-puzzle-piece,
+html.kiosco-perfil--contraste-maximo .rn-player .jma-carta {
+    border: 3px solid #000;
+    color: #000;
+    background: #fff;
+}
+
+html.kiosco-perfil--modo-grises .rn-player,
+html.kiosco-perfil--modo-grises #vnDispositivo {
+    filter: grayscale(1);
+}
+
+html.kiosco-perfil--modo-protanopia .rn-player,
+html.kiosco-perfil--modo-protanopia #vnDispositivo {
+    filter: url("#kiosco-filtro-protanopia");
+}
+
+html.kiosco-perfil--modo-deuteranopia .rn-player,
+html.kiosco-perfil--modo-deuteranopia #vnDispositivo {
+    filter: url("#kiosco-filtro-deuteranopia");
+}
+
+html.kiosco-perfil--sin-flotantes .rn-player .vn-chip--matched,
+html.kiosco-perfil--sin-anim-decorativas .rn-player .vn-chip--matched {
+    animation: none;
+}
+
+html.kiosco-perfil--sin-anim-decorativas .rn-player .vn-pulse-hint,
+html.kiosco-perfil--sin-anim-decorativas .rn-player .vn-celebrate,
+html.kiosco-perfil--sin-flotantes .rn-player .vn-celebrate {
+    animation: none;
+}
+
+html.kiosco-perfil--sin-anim-decorativas .rn-player .vn-celebrate,
+html.kiosco-perfil--sin-flotantes .rn-player .vn-celebrate {
+    display: none;
+}
+
+html.kiosco-perfil--sin-anim-decorativas .rn-player .vn-pulse-hint {
+    animation: none !important;
+}
+
+html.kiosco-perfil--cursor-grande .rn-player button:hover,
+html.kiosco-perfil--cursor-grande .rn-player button:focus-visible {
+    box-shadow: 0 0 0 6px rgba(15, 23, 42, 0.35);
+}
+
+.kiosco-perfil-cursor {
+    position: fixed;
+    width: 48px;
+    height: 48px;
+    margin: -24px 0 0 -24px;
+    border: 4px solid #111827;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.35);
+    display: none;
+}
+
+html.kiosco-perfil--cursor-grande .kiosco-perfil-cursor {
+    display: block;
+}
+
+html.kiosco-perfil--juego-bordes .rn-player .vn-memory-card,
+html.kiosco-perfil--juego-bordes .rn-player .vn-puzzle-piece,
+html.kiosco-perfil--juego-bordes .rn-player .vn-seq-card,
+html.kiosco-perfil--juego-bordes .jma-carta {
+    border: 4px solid #111827;
+}
+
+html.kiosco-perfil--lienzo-cuadriculado .rn-player .vn-paint-stage,
+html.kiosco-perfil--lienzo-cuadriculado .rn-player .vn-draw-stage {
+    background-image: linear-gradient(rgba(15, 23, 42, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.12) 1px, transparent 1px);
+    background-size: 24px 24px;
+}
+
+html.kiosco-perfil--progreso-barra .rn-player .vn-progress,
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-progress {
+    display: flex;
+    height: 6px;
+    border-radius: 99px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.12);
+    gap: 0;
+}
+
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-progress {
+    height: 10px;
+}
+
+html.kiosco-perfil--progreso-barra .rn-player .vn-dot,
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-dot {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border-radius: 0;
+    margin: 0;
+    background: rgba(15, 23, 42, 0.12);
+}
+
+html.kiosco-perfil--progreso-barra .rn-player .vn-dot.is-done,
+html.kiosco-perfil--progreso-barra .rn-player .vn-dot.is-current,
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-dot.is-done,
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-dot.is-current {
+    background: #0F6E56;
+}
+
+html.kiosco-perfil--progreso-pasos .rn-player .vn-step-label {
+    display: block !important;
+}
+
+html.kiosco-perfil--lectura-facil .rn-player .vn-title {
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.kiosco-perfil-pausa {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(251, 243, 228, 0.94);
+    color: #111827;
+    font-family: Nunito, sans-serif;
+    text-align: center;
+    padding: 24px;
+}
+
+.kiosco-perfil-pausa[hidden] {
+    display: none;
+}
+
+.kiosco-perfil-pausa strong {
+    font-family: "Fredoka One", cursive;
+    font-size: 1.6rem;
+}
+
+.kiosco-perfil-timer {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 30;
+    min-width: 48px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.85);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.kiosco-perfil-timer[hidden] {
+    display: none;
+}
+
+.kiosco-perfil-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #0F6E56;
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+html.kiosco-perfil--activo .rn-player .vn-video-captions {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.82);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+}

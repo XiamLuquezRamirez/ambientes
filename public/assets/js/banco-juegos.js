@@ -134,6 +134,14 @@
         return null;
     }
 
+    function parejasPerfil(juego) {
+        if (juego.id !== 'memoria-animales') return undefined;
+        const p = window.PedniaPerfil;
+        if (!p || !p.activo || typeof p.v !== 'function') return 6;
+        const max = Number(p.v('memoria_pares_max', 6));
+        return Math.min(6, Math.max(2, max || 6));
+    }
+
     function mostrarListo($player, juego) {
         const $canvas = $player.find('[data-bj-canvas]');
         const motor = (juego.motor === 'web') ? motorWeb(juego) : null;
@@ -141,6 +149,7 @@
             // Juego web REAL: se monta en el lienzo. Al ganar o volver, cierra.
             $canvas.empty();
             juegoActivo = motor.montar($canvas[0], {
+                parejas: parejasPerfil(juego),
                 onSalir: cerrarJuego,
                 onGanar: function (datos) {
                     // Gancho para futura integración (evidencias/logros).

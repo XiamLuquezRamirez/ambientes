@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Models\Estudiante;
+use App\Models\EstudiantePerfilAprendizajePersonalizado;
 use App\Models\PerfilAprendizajePersonalizado;
 use App\Services\ParametrosPerfilAprendizajeService;
 use InvalidArgumentException;
@@ -117,5 +119,57 @@ class ParametrosPerfilAprendizajeServiceTest extends TestCase
     public function test_catalogo_expone_cincuenta_parametros(): void
     {
         $this->assertCount(50, $this->servicio->listarParametrosDef());
+    }
+
+    public function test_valores_para_estudiante_sin_perfil_usa_estandar(): void
+    {
+        $estudiante = new Estudiante([
+            'institucion_id' => 1,
+            'perfil_aprendizaje_id' => 0,
+        ]);
+        $estudiante->id = 42;
+        $estudiante->setRelation('perfilAprendizajePersonalizadoActiva', null);
+
+        $valores = $this->servicio->valoresParaEstudiante($estudiante);
+
+        $this->assertSame($this->servicio->valoresEstandar(), $valores);
+        $this->assertCount(50, $valores);
+    }
+
+    public function test_valores_para_estudiante_personalizado_gana_sobre_inclusion(): void
+    {
+        $mapa = config('parametros_perfil.mapa_perfiles', []);
+        $teaId = array_search('tea', $mapa, true);
+
+        if ($teaId === false) {
+            $this->markTestSkipped('No hay perfil TEA en mapa_perfiles.');
+        }
+
+        $institucionId = 99996;
+        $perfil = new PerfilAprendizajePersonalizado([
+            'id' => 88883,
+            'perfil_aprendizaje_id' => (int) $teaId,
+        ]);
+        $perfil->id = 88883;
+        $this->servicio->inicializarInstitucionPersonalizado($institucionId, 88883, $perfil);
+
+        $asignacion = new EstudiantePerfilAprendizajePersonalizado;
+        $asignacion->setRelation('perfilAprendizajePersonalizado', $perfil);
+
+        $estudiante = new Estudiante([
+            'institucion_id' => $institucionId,
+            'perfil_aprendizaje_id' => 1,
+        ]);
+        $estudiante->id = 43;
+        $estudiante->setRelation('perfilAprendizajePersonalizadoActiva', $asignacion);
+
+        $valores = $this->servicio->valoresParaEstudiante($estudiante);
+        $this->assertSame(80, $valores['btn_size']);
+        $this->assertSame('manual', $valores['audio_instruc']);
+
+        $ruta = storage_path('parametros-perfil/'.$institucionId.'/personalizado/88883.json');
+        if (file_exists($ruta)) {
+            unlink($ruta);
+        }
     }
 }

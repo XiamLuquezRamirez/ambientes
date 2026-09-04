@@ -24,7 +24,7 @@
         "ra_velocidad": 100,
         "ra_contenido": "animación",
         "contraste": "estándar",
-        "modo_color": "normal",
+        "modo_color": "escala_grises",
         "fondo_pantalla": "crema",
         "elementos_flotantes": false,
         "cursor_grande": false,
@@ -53,5 +53,5 @@
         "teclado_grande": false,
         "modo_aula_automatico": false
     },
-    "actualizado_en": "2026-09-02T09:39:08-05:00"
+    "actualizado_en": "2026-09-04T10:34:49-05:00"
 }

@@ -133,6 +133,8 @@
     let mediaBase = '';
     let experienciaNombre = 'Experiencia';
     let historiaPage = 0;
+    let refuerzosOk = 0;
+    let bloqueTimerId = null;
     let historiaAnimando = false;
     let retoPaso = 0;
     let intentosRestantes = null;
@@ -159,6 +161,7 @@
         '#22C55E', '#14B8A6', '#06B6D4', '#3B82F6', '#6366F1', '#A855F7',
         '#EC4899', '#78716C', '#94A3B8', '#64748B',
     ];
+    const PAINT_PALETA_REDUCIDA = ['#EF4444', '#F59E0B', '#22C55E', '#3B82F6'];
 
     const EMOCION_IDS = {
         4: ['feliz', 'emocionado', 'tranquilo', 'confundido'],
@@ -247,6 +250,64 @@
         return NIVEL_ETARIO[nivelEtario] || NIVEL_ETARIO.jardin;
     }
 
+    function perfilActivo() {
+        return !!(window.PedniaPerfil && window.PedniaPerfil.activo);
+    }
+
+    function perfilV(clave, fallback) {
+        if (!window.PedniaPerfil || typeof window.PedniaPerfil.v !== 'function') return fallback;
+        return window.PedniaPerfil.v(clave, fallback);
+    }
+
+    function perfilHonra(clave) {
+        return !!(window.PedniaPerfil && typeof window.PedniaPerfil.honra === 'function'
+            && window.PedniaPerfil.honra(clave));
+    }
+
+    function ttsRatePerfil() {
+        let rate = configNivel().ttsRate;
+        if (perfilHonra('velocidad_voz')) {
+            const vel = Number(perfilV('velocidad_voz', 100));
+            if (Number.isFinite(vel) && vel > 0) rate = vel / 100;
+        }
+        const voz = String(perfilV('voz_narradora', '') || '');
+        if (voz === 'lenta') rate = Math.min(rate, 0.85);
+        if (voz === 'muy_lenta') rate = Math.min(rate, 0.7);
+        return Math.max(0.5, Math.min(1.4, rate));
+    }
+
+    function personajePerfil(fallback) {
+        const v = perfilHonra('voz_narradora') ? String(perfilV('voz_narradora', '') || '') : '';
+        if (v === 'infantil_masculina') return 'zeus';
+        if (v === 'infantil_femenina') return 'zoe';
+        return String(fallback || 'zoe').toLowerCase() === 'zeus' ? 'zeus' : 'zoe';
+    }
+
+    function recortarOpcionesPerfil(ops) {
+        if (!Array.isArray(ops) || !ops.length) return ops;
+        if (!perfilHonra('opciones_max')) return ops;
+        const max = Number(perfilV('opciones_max', 0));
+        if (!max || ops.length <= max) return ops;
+        const correctas = [];
+        const otras = [];
+        ops.forEach((op) => {
+            if (op && op.correcta) correctas.push(op);
+            else otras.push(op);
+        });
+        if (correctas.length >= max) return correctas.slice(0, max);
+        const copia = otras.slice();
+        shuffleInPlace(copia);
+        const mixed = correctas.concat(copia.slice(0, max - correctas.length));
+        shuffleInPlace(mixed);
+        return mixed;
+    }
+
+    function intentosPerfil(dataIntentos) {
+        if (!perfilHonra('intentos_max')) return parseIntentos(dataIntentos);
+        const max = Number(perfilV('intentos_max', 3));
+        return max > 0 ? max : parseIntentos(dataIntentos);
+    }
+
     function resolverNivelEtario(valor) {
         const s = String(valor || '').trim().toLowerCase();
         if (s === 'prejardin' || s === 'prejardín') return 'prejardin';
@@ -267,7 +328,12 @@
         $hosts.removeClass('vn-nivel--prejardin vn-nivel--jardin vn-nivel--transicion vn-nivel--primaria vn-chrome-simple');
         $hosts.addClass(cls);
         if (cfg.simplificar) $hosts.addClass('vn-chrome-simple');
-        $hosts.css('--vn-touch-scale', String(cfg.touchScale));
+        if (perfilHonra('btn_size')) {
+            const btn = Number(perfilV('btn_size', 72));
+            $hosts.css('--vn-touch-scale', String(btn > 0 ? btn / 72 : cfg.touchScale));
+        } else {
+            $hosts.css('--vn-touch-scale', String(cfg.touchScale));
+        }
     }
 
     function tituloBloque(tipo, fallback) {
@@ -276,6 +342,9 @@
     }
 
     function tituloVisibleBloque(bloque, fallbackPorNivel) {
+        if (perfilHonra('lectura_facil') && perfilV('lectura_facil', false)) {
+            return tituloBloque(bloque?.tipo || '', fallbackPorNivel);
+        }
         const nombre = String(bloque?.nombre || '').trim();
         if (nombre) return nombre;
         return tituloBloque(bloque?.tipo || '', fallbackPorNivel);
@@ -290,22 +359,45 @@
     function celebrarExito(intenso) {
         const host = $body[0] || $root[0];
         if (!host) return;
-        const $burst = $('<div class="vn-celebrate" aria-hidden="true"></div>');
-        const emojis = intenso ? ['⭐', '🌟', '✨', '🎉', '💫', '🎊'] : ['⭐', '✨', '🎉'];
-        for (let i = 0; i < (intenso ? 14 : 8); i++) {
-            const $p = $('<span class="vn-celebrate-p"></span>');
-            $p.text(emojis[i % emojis.length]);
-            $p.css({
-                left: `${10 + Math.random() * 80}%`,
-                top: `${15 + Math.random() * 50}%`,
-                animationDelay: `${Math.random() * 0.35}s`,
-                fontSize: `${1.2 + Math.random() * 1.4}rem`,
-            });
-            $burst.append($p);
+        if (!intenso && perfilActivo()) {
+            const freq = String(perfilV('refuerzo', 'al completar'));
+            if (freq === 'al completar') return;
+            if (freq === 'cada 2 pasos') {
+                refuerzosOk += 1;
+                if (refuerzosOk % 2 !== 0) return;
+            }
         }
-        $(host).append($burst);
-        setTimeout(() => { $burst.remove(); }, 1600);
-        reproducirSfx('ok');
+        const tipo = perfilActivo() ? String(perfilV('refuerzo_tipo', 'animación')) : 'animación';
+        const visual = !perfilActivo() || perfilV('refuerzo_visual', true);
+        const sonido = !perfilActivo() || perfilV('refuerzo_sonido', true);
+        if (visual) {
+            if (tipo === 'badge') {
+                const $b = $('<div class="kiosco-perfil-badge">¡Bien!</div>');
+                $(host).append($b);
+                setTimeout(() => { $b.remove(); }, 1400);
+            } else if (tipo === 'trofeo_estático') {
+                const $t = $('<div class="kiosco-perfil-trofeo" aria-hidden="true">🏆</div>');
+                $(host).append($t);
+                setTimeout(() => { $t.remove(); }, 1600);
+            } else if (tipo !== 'solo_texto') {
+                const $burst = $('<div class="vn-celebrate" aria-hidden="true"></div>');
+                const emojis = intenso ? ['⭐', '🌟', '✨', '🎉', '💫', '🎊'] : ['⭐', '✨', '🎉'];
+                for (let i = 0; i < (intenso ? 14 : 8); i++) {
+                    const $p = $('<span class="vn-celebrate-p"></span>');
+                    $p.text(emojis[i % emojis.length]);
+                    $p.css({
+                        left: `${10 + Math.random() * 80}%`,
+                        top: `${15 + Math.random() * 50}%`,
+                        animationDelay: `${Math.random() * 0.35}s`,
+                        fontSize: `${1.2 + Math.random() * 1.4}rem`,
+                    });
+                    $burst.append($p);
+                }
+                $(host).append($burst);
+                setTimeout(() => { $burst.remove(); }, 1600);
+            }
+        }
+        if (sonido) reproducirSfx('ok');
     }
 
     function reproducirSfx(tipo) {
@@ -661,12 +753,18 @@
                 <p class="vn-empty">Sin video configurado</p>
             `, bloque, 'video');
         }
+        const capTexto = lineasAudioBloque(bloque).map((l) => l.texto).join(' ')
+            || String(d.descripcion || '').trim();
+        const capHtml = (perfilHonra('subtitulos') && perfilV('subtitulos', false) && capTexto)
+            ? `<div class="vn-video-captions">${escapar(capTexto)}</div>`
+            : '';
         return wrap(`
             <h2 class="vn-title">${escapar(tituloVisibleBloque(bloque, 'Mira el video'))}</h2>
             ${instruccionHtmlBloque(bloque)}
             <div class="vn-video-stage" data-vn-video-stage>
                 ${htmlBotonVideo('data-vn-video-play aria-label="Reproducir video"')}
                 <video class="vn-video-el" playsinline preload="metadata" src="${escapar(url)}" hidden></video>
+                ${capHtml}
             </div>
         `, bloque, 'video');
     }
@@ -959,6 +1057,10 @@
                         <i class="fa-solid ${icon}"></i>
                         <span>¡Listo!</span>
                     </div>
+                    <button type="button" class="vn-evidencia-flip" data-vn-evidencia-voltear hidden
+                        aria-label="Cambiar de cámara">
+                        <i class="fa-solid fa-camera-rotate" aria-hidden="true"></i>
+                    </button>
                 </div>
                 <p class="vn-evidencia-estado" data-vn-evidencia-estado hidden aria-live="polite"></p>
                 <input type="file" class="vn-evidencia-file" data-vn-evidencia-file
@@ -974,6 +1076,11 @@
                         </button>
                         <span class="vn-evidencia-btn-label">${escapar(label)}</span>
                     </div>
+                    <button type="button" class="vn-evidencia-iniciar-btn vn-pulse-hint" data-vn-evidencia-iniciar-video hidden
+                        aria-label="Iniciar grabación">
+                        <span class="vn-evidencia-captura-icon" aria-hidden="true"><i class="fa-solid fa-circle"></i></span>
+                        <span class="vn-evidencia-captura-label">${configNivel().simplificar ? '¡Grabar!' : 'Iniciar grabación'}</span>
+                    </button>
                     <button type="button" class="vn-evidencia-captura-btn vn-pulse-hint" data-vn-evidencia-captura hidden
                         aria-label="${escapar(capturaLabel)}">
                         <span class="vn-evidencia-captura-icon" aria-hidden="true"><i class="fa-solid fa-stop"></i></span>
@@ -993,9 +1100,18 @@
 
     function puzzleDims(piezasStr) {
         const s = String(piezasStr || '');
-        if (s.includes('9')) return { cols: 3, rows: 3, n: 9 };
-        if (s.includes('6')) return { cols: 3, rows: 2, n: 6 };
-        return { cols: 2, rows: 2, n: 4 };
+        let dims = { cols: 2, rows: 2, n: 4 };
+        if (s.includes('9')) dims = { cols: 3, rows: 3, n: 9 };
+        else if (s.includes('6')) dims = { cols: 3, rows: 2, n: 6 };
+        if (perfilHonra('rompecabezas_piezas_max')) {
+            const max = Number(perfilV('rompecabezas_piezas_max', 9));
+            if (max > 0 && dims.n > max) {
+                if (max <= 4) return { cols: 2, rows: 2, n: 4 };
+                if (max <= 6) return { cols: 3, rows: 2, n: 6 };
+                return { cols: 3, rows: 3, n: 9 };
+            }
+        }
+        return dims;
     }
 
     function shuffleInPlace(arr) {
@@ -1060,6 +1176,18 @@
                 data-vn-paint-color="${escapar(c)}" style="background:${escapar(c)}"
                 title="Color ${i + 1}" aria-label="Color ${i + 1}"></button>`
         ).join('');
+        const undoHtml = (!perfilHonra('deshacer') || perfilV('deshacer', true))
+            ? `<button type="button" class="vn-paint-action" data-vn-paint-undo title="Deshacer" aria-label="Deshacer">
+                            <i class="fa-solid fa-rotate-left"></i></button>`
+            : '';
+        const acciones = undoHtml
+            ? `<div class="vn-paint-group">
+                    <span class="vn-paint-label">Acciones</span>
+                    <div class="vn-paint-actions">
+                        ${undoHtml}
+                    </div>
+                </div>`
+            : '';
         return `
             <aside class="vn-paint-toolbar" aria-label="Herramientas de dibujo">
                 <div class="vn-paint-group">
@@ -1087,13 +1215,7 @@
                     <span class="vn-paint-label">Colores</span>
                     <div class="vn-paint-colors">${swatches}${customColor}</div>
                 </div>
-                <div class="vn-paint-group">
-                    <span class="vn-paint-label">Acciones</span>
-                    <div class="vn-paint-actions">
-                        <button type="button" class="vn-paint-action" data-vn-paint-undo title="Deshacer" aria-label="Deshacer">
-                            <i class="fa-solid fa-rotate-left"></i></button>
-                    </div>
-                </div>
+                ${acciones}
             </aside>`;
     }
 
@@ -1125,10 +1247,14 @@
     }
 
     function renderSecuencia(d) {
-        const items = [1, 2, 3, 4]
+        let items = [1, 2, 3, 4]
             .map((i) => ({ orden: i - 1, file: d[`seq_${i}`] }))
             .filter((x) => x.file);
-        if (items.length < 3) {
+        if (perfilHonra('secuencia_pasos_max')) {
+            const maxSeq = Number(perfilV('secuencia_pasos_max', 4));
+            if (maxSeq > 0) items = items.slice(0, maxSeq).map((x, i) => ({ ...x, orden: i }));
+        }
+        if (items.length < 2) {
             return '<p class="vn-empty">Sube 3 o 4 imágenes en orden en la configuración</p>';
         }
         const deck = items.slice();
@@ -1183,7 +1309,11 @@
         let headOpts = {};
         if (id === 'memoria') {
             cardClass = 'juego-memoria';
-            const imgs = [1, 2, 3, 4, 5, 6].map((i) => d[`imagen_${i}`]).filter(Boolean);
+            const imgsAll = [1, 2, 3, 4, 5, 6].map((i) => d[`imagen_${i}`]).filter(Boolean);
+            const maxPares = perfilHonra('memoria_pares_max')
+                ? Number(perfilV('memoria_pares_max', 6))
+                : imgsAll.length;
+            const imgs = maxPares > 0 ? imgsAll.slice(0, maxPares) : imgsAll;
             const deck = imgs.concat(imgs).map((f, i) => ({ key: i, file: f, pair: f }));
             shuffleInPlace(deck);
             const paresTotal = imgs.length;
@@ -1202,9 +1332,13 @@
             extra = renderColorear(d);
         } else if (id === 'secuencia') {
             cardClass = 'juego-secuencia';
-            const items = [1, 2, 3, 4]
+            const itemsAll = [1, 2, 3, 4]
                 .map((i) => ({ orden: i - 1, file: d[`seq_${i}`] }))
                 .filter((x) => x.file);
+            const maxSeq = perfilHonra('secuencia_pasos_max')
+                ? Number(perfilV('secuencia_pasos_max', 4))
+                : itemsAll.length;
+            const items = maxSeq > 0 ? itemsAll.slice(0, maxSeq).map((x, i) => ({ ...x, orden: i })) : itemsAll;
             if (items.length >= 3) {
                 headOpts = {
                     seqNums: items.map((_, i) => `<span class="vn-seq-num">${i + 1}</span>`).join(''),
@@ -1220,9 +1354,10 @@
     function renderDibujo(bloque) {
         const d = datos(bloque);
         const fondo = mediaUrl(d.fondo);
+        const paletaReducida = perfilHonra('paleta_reducida') && perfilV('paleta_reducida', false);
         const toolbar = renderPaintToolbar({
-            colors: PAINT_DEFAULT_COLORS,
-            fixedColors: false,
+            colors: paletaReducida ? PAINT_PALETA_REDUCIDA : PAINT_DEFAULT_COLORS,
+            fixedColors: paletaReducida,
             showShapes: true,
         });
         const stageStyle = fondo
@@ -1244,11 +1379,14 @@
 
     function renderPregunta(bloque) {
         const d = datos(bloque);
-        const ops = Array.isArray(d.opciones) ? d.opciones : [];
+        const ops = recortarOpcionesPerfil(Array.isArray(d.opciones) ? d.opciones : []);
         const tipo = d.tipo_opts || 'emoji_texto';
         const textoPregunta = String(d.texto || '').trim();
         const instruccion = lineasAudioBloque(bloque).map((l) => l.texto).join(' ');
         const mostrarInstruccion = instruccion && (!textoPregunta || instruccion !== textoPregunta);
+        const intentosAttr = perfilHonra('intentos_max')
+            ? String(intentosPerfil(d.intentos || '2'))
+            : escapar(d.intentos || '2');
         const optsHtml = ops.map((op, i) => {
             let inner = '';
             if (tipo !== 'solo_texto' && op.emoji) inner += `<span class="vn-op-emoji">${escapar(op.emoji)}</span>`;
@@ -1275,7 +1413,7 @@
             ${preguntaImgHtml}
             <div class="vn-options" data-vn-pregunta data-count="${ops.length}" data-fb-ok="${escapar(d.fb_ok || '¡Muy bien!')}"
                 data-fb-err="${escapar(d.fb_err || 'Inténtalo de nuevo')}"
-                data-intentos="${escapar(d.intentos || '2')}"
+                data-intentos="${intentosAttr}"
                 data-al-agotar="${escapar(d.al_agotar || 'Mostrar respuesta correcta')}">${optsHtml}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>
         `, bloque, 'pregunta');
@@ -1489,7 +1627,11 @@
                         : `Paso ${retoPaso + 1} de ${pasos.length}`}</span>`
                     : ''}</div>`
             : '';
-        const ops = (paso.opciones || []).map((op, i) => {
+        const opsSrc = recortarOpcionesPerfil(paso.opciones || []);
+        const intentosAttr = perfilHonra('intentos_max')
+            ? String(intentosPerfil(d.intentos || '2'))
+            : escapar(d.intentos || '2');
+        const ops = opsSrc.map((op, i) => {
             let inner = '';
             if (op.emoji) inner += `<span class="vn-op-emoji">${escapar(op.emoji)}</span>`;
             if (op.imagen) {
@@ -1505,8 +1647,8 @@
                 <h2 class="vn-title vn-pregunta-enunciado" data-vn-tts-text="${escapar(enunciado)}">${escapar(enunciado)}</h2>
                 ${mostrarInstruccion ? instruccionHtmlBloque(bloque) : ''}
             </div>
-            <div class="vn-options" data-vn-reto data-count="${(paso.opciones || []).length}" data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
-                data-fb-err="${escapar(d.fb_err || 'Casi…')}" data-intentos="${escapar(d.intentos || '2')}"
+            <div class="vn-options" data-vn-reto data-count="${opsSrc.length}" data-fb-ok="${escapar(d.fb_ok || '¡Correcto!')}"
+                data-fb-err="${escapar(d.fb_err || 'Casi…')}" data-intentos="${intentosAttr}"
                 data-al-agotar="${escapar(d.al_agotar || 'Mostrar respuesta correcta')}"
                 data-total-pasos="${pasos.length}">${ops}</div>
             <div class="vn-feedback" id="vnFb" hidden></div>
@@ -1601,7 +1743,7 @@
                 : '';
             return `<span class="${cls}" title="${escapar(b.nombre || b.tipo)}">${inner}</span>`;
         }).join(''));
-        if (configNivel().simplificar) {
+        if (configNivel().simplificar && !(perfilHonra('progreso') && perfilV('progreso', '') === 'pasos')) {
             $stepLabel.prop('hidden', true).text('');
         } else {
             $stepLabel.prop('hidden', false).text(`Paso ${index + 1} de ${bloques.length || 1}`);
@@ -1782,6 +1924,7 @@
         cancelarAvanceAutomatico();
         detenerVoz();
         historiaAnimando = false;
+        limpiarTimerBloque();
         const bloque = bloques[index];
         if (!bloque) {
             $body.html('<p class="vn-empty">No hay bloques en la secuencia.</p>');
@@ -1809,6 +1952,34 @@
         if (bloque.tipo === 'recompensa') {
             setTimeout(() => { celebrarExito(true); }, 400);
         }
+        iniciarTimerBloque();
+    }
+
+    function limpiarTimerBloque() {
+        if (bloqueTimerId) {
+            clearInterval(bloqueTimerId);
+            bloqueTimerId = null;
+        }
+        if ($body && $body.length) $body.find('.kiosco-perfil-timer').remove();
+    }
+
+    function iniciarTimerBloque() {
+        limpiarTimerBloque();
+        if (!perfilHonra('tiempo_max_bloque')) return;
+        const max = Number(perfilV('tiempo_max_bloque', 0));
+        if (!max || max <= 0) return;
+        let resto = max;
+        const $t = $(`<div class="kiosco-perfil-timer" aria-live="polite">${resto}s</div>`);
+        $body.append($t);
+        bloqueTimerId = setInterval(function () {
+            resto -= 1;
+            $t.text(resto + 's');
+            if (resto <= 0) {
+                limpiarTimerBloque();
+                marcarBloqueVisto();
+                actualizarNavBloque();
+            }
+        }, 1000);
     }
 
     let ttsToken = 0;
@@ -1900,7 +2071,7 @@
         const voice = vozNaturalEspanol();
         u.lang = (voice && voice.lang) ? voice.lang : 'es-MX';
         if (voice) u.voice = voice;
-        u.rate = configNivel().ttsRate;
+        u.rate = ttsRatePerfil();
         u.pitch = personaje === 'zeus' ? 0.75 : 1.15;
         u.volume = 1;
         u.onend = function () {
@@ -1943,7 +2114,7 @@
             return;
         }
         const encadenar = !!(opts && opts.encadenar);
-        const pj = String(personaje || 'zoe').toLowerCase() === 'zeus' ? 'zeus' : 'zoe';
+        const pj = personajePerfil(personaje);
         if (!encadenar) {
             ttsToken += 1;
         }
@@ -2011,6 +2182,7 @@
 
             // Solo una reproducción neuronal; no mezclar con voz del navegador.
             player.src = src;
+            try { player.playbackRate = ttsRatePerfil(); } catch (e) { /* noop */ }
             player.onended = terminar;
             player.onerror = terminar;
             const p = player.play();
@@ -2068,13 +2240,22 @@
             if ($card.length) $card.append($fb);
             else return;
         }
-        $fb.prop('hidden', false)
-            .toggleClass('is-ok', !!ok)
-            .toggleClass('is-bad', !ok)
-            .text(ok ? okMsg : errMsg);
-        if (ok) celebrarExito(false);
-        else reproducirSfx('err');
-        programarOcultarFeedback($fb);
+        const demora = perfilHonra('feedback_demora_ms') ? Number(perfilV('feedback_demora_ms', 400)) : 0;
+        const mostrar = function () {
+            if (!ok && perfilHonra('error_visible') && !perfilV('error_visible', true)) {
+                if (!perfilActivo() || perfilV('refuerzo_sonido', true)) reproducirSfx('err');
+                return;
+            }
+            $fb.prop('hidden', false)
+                .toggleClass('is-ok', !!ok)
+                .toggleClass('is-bad', !ok)
+                .text(ok ? okMsg : errMsg);
+            if (ok) celebrarExito(false);
+            else reproducirSfx('err');
+            programarOcultarFeedback($fb);
+        };
+        if (demora > 0) setTimeout(mostrar, demora);
+        else mostrar();
     }
 
     function marcarBloqueVisto() {
@@ -2215,7 +2396,8 @@
             bloqueAvanceTimer = null;
             if (index !== bloqueIdx) return;
             const bloque = bloques[index];
-            if (!bloque || !['pregunta', 'reto'].includes(bloque.tipo)) return;
+            const extra = perfilHonra('auto_avance') && perfilV('auto_avance', false);
+            if (!bloque || (!extra && !['pregunta', 'reto'].includes(bloque.tipo))) return;
             if (!bloqueEstaCompleto(bloque)) return;
             alClicSiguiente();
         }, BLOQUE_AVANCE_MS);
@@ -3013,6 +3195,9 @@
         }
         encolarGuardadoResultado();
         actualizarNavBloque();
+        if (perfilHonra('auto_avance') && perfilV('auto_avance', false)) {
+            programarAvanceAutomatico();
+        }
     }
 
     function actualizarScoreMemoria() {
@@ -3087,6 +3272,19 @@
         }
     }
 
+    function hablarSecuenciaPerfil(lineas, onEnd) {
+        const modo = perfilHonra('audio_instruc') ? String(perfilV('audio_instruc', 'opcional')) : '';
+        if (modo === 'desactivado' || modo === 'manual') {
+            if (typeof onEnd === 'function') onEnd();
+            return;
+        }
+        const repetir = perfilHonra('repeticion_audio') && perfilV('repeticion_audio', false);
+        hablarSecuencia(lineas, function () {
+            if (repetir) hablarSecuencia(lineas, onEnd);
+            else if (typeof onEnd === 'function') onEnd();
+        });
+    }
+
     function iniciarInstruccionBloque(bloque) {
         const d = datos(bloque);
         const lineas = lineasAudioBloque(bloque);
@@ -3099,7 +3297,7 @@
                 const pj = (seq[seq.length - 1] && seq[seq.length - 1].personaje) || 'zoe';
                 seq.push({ texto: pregunta, personaje: pj });
             }
-            if (seq.length) hablarSecuencia(seq, alTerminar);
+            if (seq.length) hablarSecuenciaPerfil(seq, alTerminar);
             else alTerminar();
             return;
         }
@@ -3114,11 +3312,11 @@
                 const pj = (seq[seq.length - 1] && seq[seq.length - 1].personaje) || 'zoe';
                 seq.push({ texto: extra, personaje: pj });
             }
-            if (seq.length) hablarSecuencia(seq, alTerminar);
+            if (seq.length) hablarSecuenciaPerfil(seq, alTerminar);
             else alTerminar();
             return;
         }
-        if (lineas.length) hablarSecuencia(lineas, alTerminar);
+        if (lineas.length) hablarSecuenciaPerfil(lineas, alTerminar);
         else alTerminar();
     }
 
@@ -3226,7 +3424,9 @@
             mode: opts.mode || 'dibujo',
             tool: 'brush',
             color: opts.color || PAINT_DEFAULT_COLORS[0],
-            lineWidth: opts.lineWidth || PAINT_SIZE_MAP.m,
+            lineWidth: (perfilHonra('grosor_pincel') && opts.mode === 'dibujo')
+                ? Number(perfilV('grosor_pincel', PAINT_SIZE_MAP.m)) || PAINT_SIZE_MAP.m
+                : (opts.lineWidth || PAINT_SIZE_MAP.m),
             history: [],
             drawing: false,
             shapeStart: null,
@@ -3411,7 +3611,7 @@
             if (historiaPage !== 0) $body.find('.vn-instrucciones, .vn-instruccion').hide();
             const lineas = lineasAudioBloque(bloque);
             if (historiaPage === 0 && lineas.length) {
-                hablarSecuencia(lineas, () => iniciarAudioHistoria());
+                hablarSecuenciaPerfil(lineas, () => iniciarAudioHistoria());
             } else {
                 iniciarAudioHistoria();
             }
@@ -3422,7 +3622,7 @@
         } else if (bloque.tipo === 'bienvenida' && (datos(bloque).tipo_media || '') === 'video') {
             const lineasBien = lineasAudioBloque(bloque);
             if (lineasBien.length) {
-                hablarSecuencia(lineasBien, () => pulsarBotonVideoBienvenida());
+                hablarSecuenciaPerfil(lineasBien, () => pulsarBotonVideoBienvenida());
             } else {
                 pulsarBotonVideoBienvenida();
             }
@@ -3435,6 +3635,7 @@
     function initImagenZoom() {
         const viewport = $body.find('[data-vn-imagen-zoom]')[0];
         if (!viewport) return;
+        if (perfilHonra('gestos') && perfilV('gestos', '') === 'solo toque') return;
 
         const inner = viewport.querySelector('.vn-imagen-zoom-inner');
         if (!inner) return;
@@ -3739,6 +3940,28 @@
         }
     }
 
+    function mostrarPausaLuego(continuar) {
+        if (!perfilHonra('pausa_entre_bloques') || !perfilV('pausa_entre_bloques', false)) {
+            continuar();
+            return;
+        }
+        const segs = Math.max(3, Number(perfilV('duracion_pausa_seg', 5)) || 5);
+        const $screen = $('#vnTabletScreen');
+        $screen.find('.kiosco-perfil-pausa').remove();
+        const $p = $(`<div class="kiosco-perfil-pausa" role="status"><strong>Respira</strong><p>Siguiente en <span data-kiosco-pausa-n>${segs}</span>…</p></div>`);
+        $screen.append($p);
+        let n = segs;
+        const t = setInterval(function () {
+            n -= 1;
+            $p.find('[data-kiosco-pausa-n]').text(String(Math.max(0, n)));
+            if (n <= 0) {
+                clearInterval(t);
+                $p.remove();
+                continuar();
+            }
+        }, 1000);
+    }
+
     function ir(delta) {
         cancelarAvanceAutomatico();
         const bloque = bloques[index];
@@ -3748,16 +3971,20 @@
         }
         const next = index + delta;
         if (next < 0 || next >= bloques.length) return;
-        index = next;
-        historiaPage = 0;
-        retoPaso = 0;
-        const siguiente = bloques[index];
-        const est = siguiente ? estadoSesionBloques[claveSesionBloque(siguiente)] : null;
-        if (est) {
-            if (typeof est.historiaPage === 'number') historiaPage = est.historiaPage;
-            if (typeof est.retoPaso === 'number') retoPaso = est.retoPaso;
-        }
-        pintar();
+        const avanzar = function () {
+            index = next;
+            historiaPage = 0;
+            retoPaso = 0;
+            const siguiente = bloques[index];
+            const est = siguiente ? estadoSesionBloques[claveSesionBloque(siguiente)] : null;
+            if (est) {
+                if (typeof est.historiaPage === 'number') historiaPage = est.historiaPage;
+                if (typeof est.retoPaso === 'number') retoPaso = est.retoPaso;
+            }
+            pintar();
+        };
+        if (delta > 0) mostrarPausaLuego(avanzar);
+        else avanzar();
     }
 
     function alClicSiguiente() {
@@ -4039,7 +4266,7 @@
         return opciones.find(function (m) { return MediaRecorder.isTypeSupported(m); }) || '';
     }
 
-    function obtenerMediaEvidencia(tipo) {
+    function obtenerMediaEvidencia(tipo, facing) {
         if (!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost') {
             return Promise.reject(new Error('insecure'));
         }
@@ -4049,15 +4276,17 @@
         if (tipo === 'audio') {
             return navigator.mediaDevices.getUserMedia({ audio: true });
         }
+        // Cámara a usar: 'environment' (trasera, por defecto) o 'user' (frontal).
+        const cam = facing === 'user' ? 'user' : 'environment';
         const intentosVideo = tipo === 'foto'
             ? [
-                { video: { facingMode: { ideal: 'environment' } } },
-                { video: { facingMode: 'environment' } },
+                { video: { facingMode: { ideal: cam } } },
+                { video: { facingMode: cam } },
                 { video: true },
             ]
             : [
-                { video: { facingMode: { ideal: 'environment' } }, audio: true },
-                { video: { facingMode: 'environment' }, audio: true },
+                { video: { facingMode: { ideal: cam } }, audio: true },
+                { video: { facingMode: cam }, audio: true },
                 { video: true, audio: true },
                 { video: true, audio: false },
             ];
@@ -4423,6 +4652,8 @@
             $btn: $wrap.find('[data-vn-evidencia]'),
             $captura: $wrap.find('[data-vn-evidencia-captura]'),
             $repetir: $wrap.find('[data-vn-evidencia-repetir]'),
+            $iniciarVideo: $wrap.find('[data-vn-evidencia-iniciar-video]'),
+            $voltear: $stage.find('[data-vn-evidencia-voltear]'),
             $file: $wrap.find('[data-vn-evidencia-file]'),
             $msg: $scope.find('.vn-evidencia-msg'),
         };
@@ -4470,6 +4701,8 @@
         refs.$stage.prop('hidden', true);
         refs.$captura.prop('hidden', true);
         if (refs.$repetir && refs.$repetir.length) refs.$repetir.prop('hidden', true);
+        if (refs.$iniciarVideo) refs.$iniciarVideo.prop('hidden', true);
+        if (refs.$voltear) refs.$voltear.prop('hidden', true).prop('disabled', false);
         refs.$recording.prop('hidden', true);
         refs.$preview.prop('hidden', true);
         refs.$result.prop('hidden', true);
@@ -4590,6 +4823,8 @@
         refs.$stage.prop('hidden', false);
         refs.$recording.prop('hidden', true);
         refs.$captura.prop('hidden', true);
+        if (refs.$iniciarVideo) refs.$iniciarVideo.prop('hidden', true);
+        if (refs.$voltear) refs.$voltear.prop('hidden', true);
         refs.$btn.prop('hidden', true).prop('disabled', true).addClass('is-done');
         refs.$preview.prop('hidden', true);
 
@@ -4755,10 +4990,12 @@
         const tipo = String($btn.data('vn-evidencia-tipo') || 'foto');
         const sesion = evidenciaSesion + 1;
 
-        if (tipo === 'seleccion' || (tipo === 'video' && !(window.VnCaptura && VnCaptura.hayNativo()))) {
+        // Solo la SELECCIÓN de archivo usa el input del sistema (galería).
+        // Foto/audio/VIDEO se capturan embebidos con getUserMedia en el recuadro.
+        if (tipo === 'seleccion') {
             const input = refs.$file[0];
             if (input) input.click();
-            else mostrarErrorEvidencia(refs, tipo === 'seleccion' ? 'No pudimos abrir la galería.' : 'No pudimos abrir la cámara.');
+            else mostrarErrorEvidencia(refs, 'No pudimos abrir la galería.');
             return;
         }
 
@@ -4766,7 +5003,11 @@
         $body.find('#vnFb').prop('hidden', true);
         setEstadoEvidencia(refs, '', '');
 
-        if (window.VnCaptura && VnCaptura.hayNativo()) {
+        // === PRUEBA cámara embebida: forzamos getUserMedia (recuadro en la
+        //     plataforma) en vez de delegar a la cámara nativa del sistema.
+        //     Para volver al comportamiento anterior, cambiar USAR_NATIVA a true.
+        var USAR_NATIVA = false;
+        if (USAR_NATIVA && window.VnCaptura && VnCaptura.hayNativo()) {
             if (tipo === 'foto') {
                 VnCaptura.fotoNativa()
                     .then(function (blob) { aplicarBlobEvidencia(refs, tipo, blob); })
@@ -4796,11 +5037,12 @@
             }
         }
 
-        obtenerMediaEvidencia(tipo).then(function (stream) {
+        // facing inicial: trasera (environment). El botón voltear alterna.
+        const facingInicial = 'environment';
+        obtenerMediaEvidencia(tipo, facingInicial).then(function (stream) {
             evidenciaSesion = sesion;
             refs.$stage.prop('hidden', false);
             refs.$btn.prop('hidden', true).prop('disabled', false);
-            refs.$captura.prop('hidden', false);
             refs.$placeholder.prop('hidden', true);
             refs.$result.prop('hidden', true).removeAttr('src');
             refs.$audioReplay.prop('hidden', true);
@@ -4809,9 +5051,12 @@
             refs.$videoEl.removeAttr('src');
             refs.$preview.removeAttr('src');
             $body.data('vn-evidencia-stream', stream);
-            $body.data('vn-evidencia-estado', { tipo: tipo, sesion: sesion, nativo: false });
+            $body.data('vn-evidencia-estado', { tipo: tipo, sesion: sesion, nativo: false, facing: facingInicial, grabando: false });
 
             if (tipo === 'audio') {
+                refs.$captura.prop('hidden', false);
+                refs.$iniciarVideo.prop('hidden', true);
+                refs.$voltear.prop('hidden', true);
                 refs.$preview.prop('hidden', true);
                 refs.$recording.prop('hidden', false);
                 setEstadoEvidencia(refs, configNivel().simplificar ? '¡Graba!' : 'Grabando…', 'grabando');
@@ -4826,12 +5071,83 @@
                 refs.$preview[0].setAttribute('playsinline', '');
                 refs.$preview[0].setAttribute('webkit-playsinline', '');
                 refs.$preview[0].play().catch(function () { /* noop */ });
-                setEstadoEvidencia(refs, configNivel().simplificar ? '¡Mira!' : 'Cámara activa', 'grabando');
+                // La cámara (foto y video) permite voltear mientras hay preview.
+                refs.$voltear.prop('hidden', false);
+                if (tipo === 'video') {
+                    // Video: NO grabar aún. Mostrar "Iniciar grabación" para que
+                    // el niño pueda voltear la cámara antes de empezar. La
+                    // grabación (con audio) arranca al pulsar ese botón.
+                    refs.$captura.prop('hidden', true);
+                    refs.$iniciarVideo.prop('hidden', false);
+                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Prepárate!' : 'Cámara lista', 'grabando');
+                } else {
+                    refs.$captura.prop('hidden', false);
+                    refs.$iniciarVideo.prop('hidden', true);
+                    setEstadoEvidencia(refs, configNivel().simplificar ? '¡Mira!' : 'Cámara activa', 'grabando');
+                }
             }
         }).catch(function (err) {
             mostrarErrorEvidencia(refs, mensajeErrorEvidencia(err));
         }).finally(function () {
             $btn.prop('disabled', false);
+        });
+    });
+
+    // Iniciar la grabación de VIDEO (tras poder voltear la cámara). Arranca el
+    // MediaRecorder con el stream actual (que YA incluye audio) y cambia la UI
+    // al modo "grabando" con el botón Detener.
+    onBody('click', '[data-vn-evidencia-iniciar-video]', function () {
+        vincularElementos();
+        const estado = $body.data('vn-evidencia-estado');
+        if (!estado || estado.tipo !== 'video' || estado.grabando) return;
+        const refs = refsEvidencia($body);
+        const stream = $body.data('vn-evidencia-stream');
+        if (!stream) { mostrarErrorEvidencia(refs, 'No se pudo iniciar la grabación. Intenta otra vez.'); return; }
+
+        estado.grabando = true;
+        $body.data('vn-evidencia-estado', estado);
+        refs.$iniciarVideo.prop('hidden', true);
+        refs.$voltear.prop('hidden', true); // no voltear durante la grabación
+        refs.$captura.prop('hidden', false);
+        setEstadoEvidencia(refs, configNivel().simplificar ? '¡Grabando!' : 'Grabando video…', 'grabando');
+        if (window.VnCaptura) VnCaptura.iniciarContador(refs.$contador);
+        iniciarGrabacionEvidencia(stream, 'video', estado.sesion);
+    });
+
+    // Voltear cámara (frontal/trasera). Solo con preview activo (foto, o video
+    // ANTES de iniciar la grabación, para no cortar el recorder/audio).
+    onBody('click', '[data-vn-evidencia-voltear]', function () {
+        vincularElementos();
+        const estado = $body.data('vn-evidencia-estado');
+        if (!estado || estado.nativo) return;
+        if (estado.tipo !== 'foto' && estado.tipo !== 'video') return;
+        if (estado.tipo === 'video' && estado.grabando) return;
+        const refs = refsEvidencia($body);
+        const $v = $(this);
+        if ($v.prop('disabled')) return;
+        $v.prop('disabled', true);
+
+        const nuevoFacing = estado.facing === 'user' ? 'environment' : 'user';
+        // Soltar el stream actual antes de pedir el nuevo (evita cámara ocupada).
+        const streamViejo = $body.data('vn-evidencia-stream');
+        if (streamViejo && streamViejo.getTracks) streamViejo.getTracks().forEach((t) => t.stop());
+        if (refs.$preview.length) refs.$preview[0].srcObject = null;
+
+        obtenerMediaEvidencia(estado.tipo, nuevoFacing).then(function (stream) {
+            if (estado.sesion !== evidenciaSesion) {
+                if (stream && stream.getTracks) stream.getTracks().forEach((t) => t.stop());
+                return;
+            }
+            $body.data('vn-evidencia-stream', stream);
+            estado.facing = nuevoFacing;
+            $body.data('vn-evidencia-estado', estado);
+            refs.$preview[0].srcObject = stream;
+            refs.$preview[0].muted = true;
+            refs.$preview[0].play().catch(function () { /* noop */ });
+        }).catch(function (err) {
+            mostrarErrorEvidencia(refs, mensajeErrorEvidencia(err));
+        }).finally(function () {
+            $v.prop('disabled', false);
         });
     });
 
@@ -4873,7 +5189,7 @@
             });
             return;
         }
-        if (tipo === 'audio') {
+        if (tipo === 'audio' || tipo === 'video') {
             detenerGrabacionEvidencia(refs, tipo, sesion).then(function (ok) {
                 if (estado.sesion !== evidenciaSesion) return;
                 if (window.VnCaptura) VnCaptura.detenerContador(refs.$contador);
