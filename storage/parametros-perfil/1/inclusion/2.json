@@ -2,7 +2,7 @@
     "tipo": "inclusion",
     "perfil_id": 2,
     "valores": {
-        "btn_size": 72,
+        "btn_size": 100,
         "btn_spacing": 12,
         "font_size": 16,
         "lectura_facil": false,
@@ -14,9 +14,9 @@
         "anim_speed": 100,
         "anim_decorativas": true,
         "gestos": "toque y swipe",
-        "auto_avance": false,
+        "auto_avance": true,
         "cooperativo": false,
-        "opciones_max": 4,
+        "opciones_max": 2,
         "intentos_max": 5,
         "refuerzo": "cada 2 pasos",
         "progreso": "barra prominente",
@@ -24,7 +24,7 @@
         "ra_velocidad": 100,
         "ra_contenido": "animación",
         "contraste": "estándar",
-        "modo_color": "normal",
+        "modo_color": "escala_grises",
         "fondo_pantalla": "crema",
         "elementos_flotantes": false,
         "cursor_grande": false,
@@ -53,6 +53,6 @@
         "teclado_grande": false,
         "modo_aula_automatico": false
     },
-    "actualizado_en": "2026-09-02T10:39:02-05:00",
+    "actualizado_en": "2026-09-04T10:35:32-05:00",
     "institucion_id": 1
 }
