@@ -1,5 +1,5 @@
 /**
- * Cascada de filtros del catálogo de juegos (ambiente → módulo → eje → temática).
+ * Cascada de filtros del catálogo del modulo de juegos (ambiente → módulo → eje → temática).
  */
 window.JuegosFiltrosUi = (function () {
     function filtrarOpciones(select, attr, valorPadre) {

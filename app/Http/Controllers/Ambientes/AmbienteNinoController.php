@@ -231,10 +231,14 @@ class AmbienteNinoController extends Controller
     {
         $datos = $request->validate([
             'texto' => ['required', 'string', 'max:800'],
+            'personaje' => ['nullable', 'string', 'in:zoe,zeus'],
         ]);
 
         try {
-            $url = app(TextoAVozService::class)->urlPublica($datos['texto']);
+            $url = app(TextoAVozService::class)->urlPublica(
+                $datos['texto'],
+                $datos['personaje'] ?? null
+            );
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
