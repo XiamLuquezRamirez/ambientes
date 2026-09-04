@@ -34,7 +34,7 @@
     --font-display: 'Fredoka One', cursive;
     --focus-ring: 0 0 0 3px rgba(37, 99, 235, .12);
     --ease: .15s ease;
-    --sidebar-width: 240px;
+    --sidebar-width: 265px;
     --sidebar-width-mini: 72px;
     --sidebar-current-width: var(--sidebar-width);
     --header-height: 60px;
@@ -84,7 +84,6 @@ html:not(.sidebar-ready) .sidebar-backdrop {
     width: var(--sidebar-current-width);
     height: calc(100vh - var(--header-height));
     background: var(--color-primary-dark);
-    border-right: 1px solid #1E40AF;
     display: flex;
     flex-direction: column;
     z-index: 100;
@@ -120,7 +119,7 @@ html.sidebar-mobile-open .sidebar {
 /* Navegación del sidebar (scoped: no afectar .nav-tabs del contenido) */
 .sidebar > .nav {
     flex: 1;
-    padding: 10px 8px;
+    padding: 10px 0px 8px 10px;
     gap: 0;
 }
 
@@ -162,10 +161,11 @@ html.sidebar-mobile-open .sidebar {
 .sidebar .nav a.active,
 .sidebar .nav-pills .nav-link.active,
 .sidebar .nav-pills .show > .nav-link {
-    color: #FFFFFF;
-    border-left-color: #FFFFFF;
-    background: rgba(255, 255, 255, .15);
+    color: #1e3a8a;
+    border-left-color: #ff7300;
+    background: #eff6ff;
     font-weight: 700;
+    border-radius: 10px 0px 0px 10px !important;
 }
 
 .sidebar .nav-link > i:not(.chevron),
@@ -223,7 +223,12 @@ html.sidebar-collapsed:not(.sidebar-mobile-open):not(:is(.sidebar-hover, .sideba
 
 html.sidebar-collapsed:not(.sidebar-mobile-open):not(:is(.sidebar-hover, .sidebar-pinned)) .sidebar > .nav > .nav-item > .nav-link.active,
 html.sidebar-collapsed:not(.sidebar-mobile-open):not(:is(.sidebar-hover, .sidebar-pinned)) .sidebar > .nav > .nav-item > a.active {
-    background: rgba(255, 255, 255, .18);
+    color: #1e3a8a;
+    border-left-color: #ff7300;
+    border-radius: 10px 0px 0px 10px !important;
+    border-left-width: 3px;
+    background: #eff6ff;
+    font-weight: 700;
 }
 
 /* Desktop: expansión al hover o pin */
@@ -286,8 +291,7 @@ html.sidebar-collapsed:is(.sidebar-hover, .sidebar-pinned):not(.sidebar-mobile-o
 .sidebar .collapsing > .nav {
     flex: none !important;
     padding: 4px 0 8px !important;
-    margin: 0 8px 6px 16px;
-    border-left: 2px solid rgba(255, 255, 255, .16);
+    margin: 0 0px 6px 20px;    
     gap: 0;
 }
 
@@ -320,10 +324,12 @@ html.sidebar-collapsed:is(.sidebar-hover, .sidebar-pinned):not(.sidebar-mobile-o
 .sidebar .collapse > .nav > .nav-item > a.active,
 .sidebar .collapsing > .nav > .nav-item > .nav-link.active,
 .sidebar .collapsing > .nav > .nav-item > a.active {
-    color: #fff;
-    background: rgba(255, 255, 255, .16);
+    color: #1e3a8a;
+    border-left-color: #ff7300 !important;
+    border-radius: 10px 0px 0px 10px !important;
+    background: #eff6ff;
     font-weight: 700 !important;
-    border-left-color: transparent;
+    border-left-width: 3px !important;
 }
 
 .sidebar .collapse > .nav > .nav-item > .nav-link > i:not(.chevron),
