@@ -3,7 +3,6 @@
 
 @section('content')
     <div class="page-header" style="margin-bottom:16px">
-        <h1>{{ $tituloPagina ?? 'Parámetros de adaptación' }}</h1>
         <p>Parámetros de adaptación por perfil de aprendizaje para los estudiantes de su carga</p>
     </div>
 
