@@ -1,82 +1,8 @@
 @extends('layouts.superAdmin')
 @section('title', 'Instituciones')
 @push('styles')
+    <link rel="stylesheet" href="{{ asset('assets/css/superAdmin/instituciones.css') }}">
     <style>
-        .instituciones-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-            gap: 28px;
-            margin-top: 24px;
-        }
-
-        .instituciones-card {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 16px;
-            overflow: visible;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .instituciones-card:hover {
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
-            border-color: #93C5FD;
-        }
-
-        .instituciones-card--suspendida {
-            opacity: 0.78;
-            border-color: #FECACA;
-            background: #FFFBFB;
-        }
-
-        .instituciones-card--suspendida:hover {
-            border-color: #FCA5A5;
-        }
-
-        .badge-estado-institucion {
-            display: inline-flex;
-            align-items: center;
-            margin-top: 8px;
-            padding: 3px 8px;
-            border-radius: 999px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-        }
-
-        .badge-estado-institucion--activa {
-            background: #DCFCE7;
-            color: #166534;
-        }
-
-        .badge-estado-institucion--suspendida {
-            background: #FEE2E2;
-            color: #991B1B;
-        }
-
-        .card-nombre-row {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .card-nombre-texto {
-            flex: 1;
-            min-width: 0;
-            word-break: break-word;
-        }
-
-        .switch-activo-institucion {
-            flex-shrink: 0;
-            margin: 0;
-            padding-top: 2px;
-        }
-
         .panel-estadisticas {
             margin-top: 24px;
             padding: 20px 22px;
@@ -472,60 +398,6 @@
             font-size: 1rem;
         }
 
-        .card-franja {
-            height: 6px;
-            border-radius: 14px 14px 0 0;
-        }
-
-        /* Cabecera */
-        .card-head {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            padding: 18px 18px 0;
-        }
-
-        .card-icono {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .card-logo-wrap {
-            overflow: hidden;
-            background: #EFF6FF;
-            color: #1D4ED8;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 0;
-        }
-
-        .card-logo-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .card-logo-fallback {
-            line-height: 1;
-        }
-
-        .card-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .card-nombre {
-            font-weight: 700;
-            font-size: .98rem;
-            color: #1E293B;
-        }
-
         .card-ip {
             font-family: monospace;
             font-size: .77rem;
@@ -641,68 +513,7 @@
             margin: 4px 0;
         }
 
-        /* Badges estadísticas */
-        .card-stats {
-            display: flex;
-            flex-wrap: wrap;
-            /* Evita que los badges salten de línea */
-            gap: 10px;
-            /* Espacio horizontal entre los dos badges */
-            padding: 12px 18px 16px;
-            /* Ajustamos el padding inferior */
-            align-items: center;
-        }
-
-        .badge-stat {
-            white-space: nowrap;
-            /* Evita que el texto interno se rompa en dos renglones */
-            flex: 1;
-            /* Hace que ambos compartan el espacio de forma equitativa (opcional) */
-            text-align: center;
-        }
-
-        .bs-azul {
-            background: #EFF6FF;
-            color: #1D4ED8;
-        }
-
-        .bs-verde {
-            background: #F0FDF4;
-            color: #166534;
-        }
-
-        .bs-morado {
-            background: #F5F3FF;
-            color: #5B21B6;
-        }
-
-        .bs-slate {
-            background: #F8FAFC;
-            color: #475569;
-            border: 1px solid #E2E8F0;
-        }
-
-        /* Info secundaria */
-        .card-meta {
-            padding: 0 18px 10px;
-            font-size: .78rem;
-            color: #64748B;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-        }
-
-        .card-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .card-meta i {
-            font-size: .72rem;
-        }
-
-        /* Footer */
+        /* Footer legacy (otras vistas del mismo CSS) */
         .card-footer-amb {
             padding: 12px 18px 16px;
             border-top: 1px solid #F1F5F9;
@@ -1094,6 +905,7 @@
 @endpush
 
 @section('content')
+    <div class="instituciones-page">
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
         <div>
             <h1>Instituciones</h1>
@@ -1137,7 +949,7 @@
     @include('superAdmin.instituciones.modalAgregarInstitucion')
     @include('superAdmin.instituciones.modalLogoInstitucion')
     @include('admin.usuarios.ver_contra_gen')
-
+    </div>
 @endsection
 
 @push('scripts')
@@ -1203,13 +1015,13 @@
             const badge = document.getElementById(`badge-estado-${id}`);
 
             if (tarjeta) {
-                tarjeta.classList.toggle('instituciones-card--suspendida', !activo);
+                tarjeta.classList.toggle('institucion-card--suspendida', !activo);
             }
 
             if (badge) {
                 badge.textContent = activo ? 'Activa' : 'Suspendida';
-                badge.classList.toggle('badge-estado-institucion--activa', activo);
-                badge.classList.toggle('badge-estado-institucion--suspendida', !activo);
+                badge.classList.toggle('badge-estado--activa', activo);
+                badge.classList.toggle('badge-estado--suspendida', !activo);
             }
 
             checkbox.attr('title', activo ? 'Suspender institución' : 'Activar institución');

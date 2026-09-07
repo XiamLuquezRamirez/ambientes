@@ -2,7 +2,7 @@
 
 ## Resumen
 
-El layout `resources/views/layouts/panel.blade.php` muestra en el header la institución del docente autenticado (logo + nombre). Se corrigió la resolución de datos, el fallback visual y el diseño CSS.
+El layout `resources/views/layouts/panel.blade.php` incluye el header staff (`partials/staff/_header`) que muestra la institución del docente autenticado (logo + nombre). Se corrigió la resolución de datos, el fallback visual y el diseño CSS.
 
 ## Comportamiento
 
@@ -36,6 +36,7 @@ Estilos en `public/assets/css/index.css` (clases `header-institucion*`). Se mant
 
 ## Archivos tocados
 
-- `resources/views/layouts/panel.blade.php` — markup y lógica PHP
+- `resources/views/partials/staff/_header.blade.php` — markup y lógica PHP del header (institución + perfil)
+- `resources/views/layouts/panel.blade.php` — incluye el partial staff del header
 - `public/assets/css/index.css` — estilos del bloque institución
 - `docs/panel-header-institucion.md` — esta nota

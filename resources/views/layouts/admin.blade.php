@@ -2,26 +2,7 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin') — PedNia</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap/css/bootstrap.min.css') }}">
-    <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
-    <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
-    <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
-    @include('partials.sidebar-init')
-    <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/estilosModals.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/docente/index.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/helpers.css') }}">
-    @stack('styles')
-    @stack('head')
-    <link rel="stylesheet" href="{{ asset('assets/css/info-condiciones/index.css') }}">
+    @include('partials.staff._head', ['titleDefault' => 'Admin'])
 </head>
 
 <body>
@@ -215,237 +196,21 @@
         </ul>
     </aside>
     @include('partials.sidebar-toggle', ['only' => 'backdrop'])
-    @php
-        use App\Models\User;
-        use App\Models\Institucion;
-        $usuarioAuth = Auth::guard('docente')->user();
-        $partesNombre = array_values(array_filter(explode(' ', $usuarioAuth->nombre)));
-        $inicialesAuth = mb_strtoupper(
-            mb_substr($partesNombre[0] ?? '', 0, 1) . mb_substr($partesNombre[1] ?? '', 0, 1),
-        );
-        $rolAuthLabel = ['admin' => 'Administrador', 'docente' => 'Docente'][$usuarioAuth->rol] ?? $usuarioAuth->rol;
-        $avatarColor = '#' . substr(md5($usuarioAuth->nombre . '|' . $usuarioAuth->apellido), 0, 6);
-        $logoService = app(\App\Services\InstitucionLogoService::class);
-        if ($usuarioAuth instanceof User) {
-            $usuarioAuth->loadMissing('docente');
-        }
-        $institucionId = session('institucion_id') ?? $usuarioAuth?->institucion_id;
-        $institucion = $institucionId ? Institucion::find($institucionId) : null;
-        $logoUrl = $institucion ? $logoService->urlPublica($institucion->logo) : null;
-        $inicialesInstitucion = $institucion ? $logoService->iniciales($institucion) : null;
-        $lugarInstitucion = $institucion
-            ? trim(
-                collect([$institucion->municipio, $institucion->departamento])
-                    ->filter()
-                    ->implode(', '),
-            )
-            : '';
-    @endphp
-    <header class="header">
-        @include('partials.header-start')
-        <div class="header-institucion-container">
-            @if ($institucion)
-                <div class="header-institucion" title="{{ $institucion->nombre }}"
-                    onclick="window.location.href='{{ route('admin.configuracion') }}'" style="cursor: pointer;">
-                    <div class="header-institucion-logo" aria-hidden="true">
-                        <img src="{{ $logoUrl ?? '' }}" alt=""
-                            class="header-institucion-img {{ $logoUrl ? '' : 'd-none' }}"
-                            onerror="this.classList.add('d-none');var f=this.nextElementSibling;if(f)f.classList.remove('d-none');">
-                        <span class="header-institucion-fallback {{ $logoUrl ? 'd-none' : '' }}">
-                            {{ $inicialesInstitucion }}
-                        </span>
-                    </div>
-                    <div class="header-institucion-meta">
-                        <span class="header-institucion-nombre">{{ $institucion->nombre }}</span>
-                        @if ($lugarInstitucion !== '')
-                            <span class="header-institucion-lugar">{{ $lugarInstitucion }}</span>
-                        @endif
-                    </div>
-                </div>
-            @endif
-            <div class="header-perfil" id="headerPerfil">
-                {{-- Chip visible siempre --}}
-                <div class="avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}</div>
-                <div class="header-user-info">
-                    <span class="header-user-nombre">{{ $usuarioAuth->nombre }}</span>
-                    <span class="header-user-rol">{{ $rolAuthLabel }}</span>
-                </div>
-                <span class="header-chevron">▾</span>
-                {{-- Dropdown --}}
-                <div class="header-dropdown">
-                    <div class="dropdown-user-card" onclick="window.location.href='{{ route('admin.perfil') }}'">
-                        <div class="dropdown-avatar" style="background: {{ $avatarColor }};">{{ $inicialesAuth }}
-                        </div>
-                        <div>
-                            <div class="dropdown-nombre">{{ $usuarioAuth->nombre }}</div>
-                            <div class="dropdown-email">{{ $usuarioAuth->email }}</div>
-                            <span class="dropdown-rol">{{ $rolAuthLabel }}</span>
-                        </div>
-                    </div>
-                    <div class="dropdown-section">
-                        <a href="{{ route('admin.perfil') }}" class="dropdown-item">
-                            <i class="fa-solid fa-user"></i>
-                            Mi Perfil
-                        </a>
-                        <a href="#" class="dropdown-item"
-                            onclick="abrirModalCambiarContrasena(); return false;">
-                            <i class="fa-solid fa-key"></i>
-                            Cambiar contraseña
-                        </a>
-                    </div>
-                    <div class="dropdown-divider"></div>
-                    <div class="dropdown-section">
-                        <form id="formCerrarSesion" method="POST" action="{{ route('docente.logout') }}">
-                            @csrf
-                            <button type="submit" class="dropdown-item dropdown-item-danger">
-                                <span class="dropdown-item-icon">
-                                    <i class="fa-solid fa-right-from-bracket"></i>
-                                </span>
-                                Cerrar Sesión
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
+    @include('partials.staff._header', [
+        'conInstitucion' => true,
+        'clickUrlInstitucion' => route('admin.configuracion'),
+        'usarFotoPerfil' => false,
+        'conApellidoEnNombre' => false,
+        'rutaPerfil' => route('admin.perfil'),
+        'mostrarCambiarContrasena' => true,
+    ])
     @include('perfil.cambiar_contrasena', ['rutaContrasena' => route('admin.perfil.contrasena')])
     <main class="main">
         <div class="content">
             @yield('content')
         </div>
     </main>
-    @include('partials.info-condiciones.embed')
-    <script src="{{ asset('assets/css/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/js/sidebar-toggle.js') }}"></script>
-    <script src="{{ asset('assets/js/info-condiciones/index.js') }}"></script>
-    <script src="{{ asset('assets/js/sweetalert.js') }}"></script>
-    <script>
-        /* ── Cerrar sesión ────────────────────────────────────── */
-        document.getElementById('formCerrarSesion').addEventListener('submit', function(e) {
-            e.preventDefault();
-            Swal.fire({
-                title: '¿Deseas cerrar tu sesión?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Cerrar sesión',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#DC2626',
-                cancelButtonColor: '#6B7280',
-                reverseButtons: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.submit();
-                }
-            });
-        });
-        /* ── Utilidades globales AJAX ────────────────────────────── */
-        async function ajaxRequest(url, method = 'GET', data = null) {
-            try {
-                const options = {
-                    method,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                };
-                if (data !== null) {
-                    options.headers['Content-Type'] = 'application/json';
-                    options.body = JSON.stringify(data);
-                }
-                const response = await fetch(url, options);
-                const json = await response.json();
-                if (!response.ok) {
-                    return {
-                        ...json,
-                        success: false,
-                        errors: json.errors ?? {},
-                        message: json.message ?? 'Error en la petición',
-                    };
-                }
-                return json;
-            } catch (err) {
-                console.error(err);
-                return {
-                    success: false,
-                    message: 'Error de conexión'
-                };
-            }
-        }
-        /* ── Chevron sidebar group ───────────────────────────────── */
-        document.addEventListener('DOMContentLoaded', function() {
-            const collapseEl = document.getElementById('navAcademico');
-            const chevron = document.getElementById('chevronAcad');
-            if (collapseEl && chevron) {
-                collapseEl.addEventListener('show.bs.collapse', () => chevron.style.transform = 'rotate(180deg)');
-                collapseEl.addEventListener('hide.bs.collapse', () => chevron.style.transform = 'rotate(0deg)');
-            }
-        });
-        /* ── Dropdown de perfil ──────────────────────────────────── */
-        document.addEventListener('DOMContentLoaded', function() {
-            const perfil = document.getElementById('headerPerfil');
-            if (!perfil) return;
-            perfil.addEventListener('click', function(e) {
-                e.stopPropagation();
-                this.classList.toggle('open');
-            });
-            document.addEventListener('click', function() {
-                perfil.classList.remove('open');
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') perfil.classList.remove('open');
-            });
-        });
-
-        function mostrarToast(tipo, mensaje) {
-            const paleta = {
-                success: {
-                    bg: '#ECFDF5',
-                    color: '#065F46',
-                    icon: '#059669'
-                },
-                error: {
-                    bg: '#FEF2F2',
-                    color: '#991B1B',
-                    icon: '#DC2626'
-                },
-                info: {
-                    bg: '#EFF6FF',
-                    color: '#1E40AF',
-                    icon: '#2563EB'
-                },
-            };
-            const c = paleta[tipo] ?? paleta.info;
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: tipo,
-                title: mensaje,
-                showConfirmButton: false,
-                timer: 3500,
-                timerProgressBar: true,
-                background: c.bg,
-                color: c.color,
-                iconColor: c.icon
-            });
-        }
-    </script>
-    @if (session('success'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => mostrarToast('success', @json(session('success'))));
-        </script>
-    @endif
-    @if (session('error'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => mostrarToast('error', @json(session('error'))));
-        </script>
-    @endif
-    @if (session('info'))
-        <script>
-            document.addEventListener('DOMContentLoaded', () => mostrarToast('info', @json(session('info'))));
-        </script>
-    @endif
-    @stack('scripts')
+    @include('partials.staff._scripts')
 </body>
 
 </html>

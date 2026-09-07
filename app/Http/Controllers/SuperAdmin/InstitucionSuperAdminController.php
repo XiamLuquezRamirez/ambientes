@@ -53,7 +53,15 @@ class InstitucionSuperAdminController extends Controller
             ->ordenadas()
             ->get();
 
-        $consulta = Institucion::query()->with('ambientes');
+        $consulta = Institucion::query()
+            ->withCount([
+                'ambientes as ambientes_count',
+                'ambientes as ambientes_activos_count' => fn ($q) => $q->where('ambiente_institucion.activo', true),
+                'modulos as modulos_count',
+                'modulos as modulos_activos_count' => fn ($q) => $q->where('modulo_institucion.activo', true),
+                'perfilesAprendizajeOrden as perfiles_activos_count' => fn ($q) => $q->where('activa', true),
+                'perfilesAprendizajePersonalizadoOrden as perfiles_personalizados_activos_count' => fn ($q) => $q->where('activa', true),
+            ]);
 
         if ($request->filled('buscar')) {
             $termino = $request->buscar;

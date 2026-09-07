@@ -1,0 +1,202 @@
+/*==========================================================
+  SuperAdmin — Instituciones
+  Mismo lenguaje visual que admin/ambientes.css
+==========================================================*/
+
+.instituciones-page .instituciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+    align-items: stretch;
+    font-family: var(--font-sans, 'Nunito', sans-serif);
+}
+
+.instituciones-page .institucion-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-surface, #FFFFFF);
+    border: 1px solid var(--color-border, #E2E8F0);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .03), 0 6px 16px -6px rgba(16, 24, 40, .07);
+    transition: box-shadow .2s, transform .15s, border-color .15s;
+    position: relative;
+    cursor: pointer;
+}
+
+.instituciones-page .institucion-card:hover {
+    box-shadow: 0 3px 6px rgba(16, 24, 40, .05), 0 14px 28px -8px rgba(16, 24, 40, .11);
+    transform: translateY(-2px);
+    border-color: #BFDBFE;
+}
+
+.instituciones-page .institucion-card--suspendida {
+    border-color: #FECACA;
+    background: #FFFCFC;
+}
+
+.instituciones-page .institucion-card--suspendida:hover {
+    border-color: #FCA5A5;
+}
+
+.instituciones-page .card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 0 0 auto;
+    min-height: 48px;
+}
+
+.instituciones-page .card-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #EFF6FF;
+    color: #1D4ED8;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border: 1px solid #DBEAFE;
+}
+
+.instituciones-page .card-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #FFFFFF;
+}
+
+.instituciones-page .card-info {
+    flex: 1;
+    min-width: 0;
+    padding-right: 4px;
+}
+
+.instituciones-page .card-nombre {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-text, #1E293B);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.instituciones-page .card-sub {
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.instituciones-page .card-lugar {
+    min-width: 0;
+    font-size: 0.78rem;
+    color: var(--color-muted, #64748B);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.instituciones-page .badge-estado {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+}
+
+.instituciones-page .badge-estado--activa {
+    background: #DCFCE7;
+    border-color: #BBF7D0;
+    color: #15803D;
+}
+
+.instituciones-page .badge-estado--suspendida {
+    background: #FEE2E2;
+    border-color: #FECACA;
+    color: #B91C1C;
+}
+
+.instituciones-page .switch-activo-institucion {
+    flex-shrink: 0;
+    margin: 0;
+    padding-top: 2px;
+}
+
+.instituciones-page .switch-activo-institucion .form-check-input {
+    cursor: pointer;
+    width: 2.25em;
+    height: 1.2em;
+}
+
+.instituciones-page .card-meta {
+    flex: 0 0 auto;
+    margin-top: 12px;
+    min-height: 1.25rem;
+    font-size: 0.78rem;
+    color: #64748B;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.instituciones-page .card-meta i {
+    margin-right: 4px;
+    color: #94A3B8;
+    font-size: 0.7rem;
+}
+
+.instituciones-page .card-stats {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 14px;
+    flex: 0 0 auto;
+}
+
+.instituciones-page .stat-cell {
+    flex: 1;
+    min-width: 0;
+    background: #F8FAFC;
+    border: 1px solid #F1F5F9;
+    border-radius: 10px;
+    padding: 10px 4px;
+    text-align: center;
+}
+
+.instituciones-page .institucion-card--suspendida .stat-cell {
+    background: #FFF7F7;
+    border-color: #FEE2E2;
+}
+
+.instituciones-page .stat-n {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1E293B;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+
+.instituciones-page .stat-l {
+    font-size: 0.64rem;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
