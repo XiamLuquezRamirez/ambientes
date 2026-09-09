@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -49,25 +49,37 @@
 
 	<div id="principal">
 		<div class="hud-top">
-			<div class="hud-acciones"></div>
-			<div class="hud-centro">
-				<h1 class="borde" id="enunciado"></h1>
-			</div>
 			<div class="hud-nav">
 				<div id="progreso" class="hud-progreso" hidden></div>
 				<button onclick="location.reload()" class="btn btn-warning btn-round"><i class="fa-solid fa-rotate"></i></button>
 				<button onclick="history.back()" class="btn btn-danger btn-round"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</div>
-		<div id="panel-acc" class="panel-acc"></div>
 
-		<div class="escenario" id="escenario">
+		<div class="enunciado-wrap">
+			<h1 class="borde" id="enunciado"></h1>
+		</div>
+
+		<div class="escenario" id="escenario" style="padding-top: 15px;">
 			<div class="lienzo-wrap">
 				<div id="lienzo">
 					<img id="img-completo" alt="Figura del cuerpo" draggable="false">
 					<div id="zonas"></div>
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<div id="menu-acc" class="menu-acc">
+		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
+			<i class="fa-solid fa-universal-access"></i>
+		</button>
+		<div id="menu-acc-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab">
+				<strong>Accesibilidad</strong>
+				<button type="button" id="btn-cerrar-acc" class="menu-acc-cerrar" aria-label="Cerrar">×</button>
+			</div>
+			<div id="menu-acc-ops" class="menu-acc-ops"></div>
 		</div>
 	</div>
 

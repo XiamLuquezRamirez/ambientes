@@ -1,0 +1,130 @@
+{
+  "mostrarFeedBack": true,
+  "fallosParaPista": 2,
+  "feedback": {
+    "duracion": 1800,
+    "acierto": {
+      "texto": "¡Muy bien! Encontraste la parte del cuerpo.",
+      "gif": "../../images/correcto.gif"
+    },
+    "error": {
+      "texto": "¡Inténtalo otra vez! Observa muy bien la figura.",
+      "gif": "../../images/incorrecto.gif"
+    }
+  },
+  "accesibilidad": {
+    "altoContraste": false,
+    "mostrarZonas": false,
+    "resaltarObjetivo": false,
+    "pistaPorFallos": true,
+    "mostrarProgreso": true,
+    "hitboxExtra": 0
+  },
+  "textos": {
+    "eligeCuerpo": "¿Qué cuerpo quieres explorar?",
+    "eligeNivel": "Elige tu edad",
+    "cierre": "¡Excelente! Reconociste las partes del cuerpo."
+  },
+  "audios": {
+    "acierto": "",
+    "error": "",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "cuerpos": {
+    "nina": {
+      "nombre": "Niña",
+      "carpeta": "img/nina",
+      "completo": "completo.png",
+      "lienzo": { "w": 644, "h": 1081 },
+      "zonas": {
+        "cabeza":      { "x": 17, "y": 5,  "w": 66, "h": 40 },
+        "hombro_izq":  { "x": 28, "y": 46, "w": 14, "h": 7 },
+        "hombro_der":  { "x": 58, "y": 46, "w": 14, "h": 7 },
+        "brazo_izq":   { "x": 12, "y": 46, "w": 18, "h": 8 },
+        "brazo_der":   { "x": 70, "y": 46, "w": 18, "h": 8 },
+        "codo_izq":    { "x": 8,  "y": 50, "w": 16, "h": 6 },
+        "codo_der":    { "x": 76, "y": 50, "w": 16, "h": 6 },
+        "mano_izq":    { "x": 2,  "y": 52, "w": 18, "h": 8 },
+        "mano_der":    { "x": 80, "y": 52, "w": 18, "h": 8 },
+        "barriga":     { "x": 34, "y": 52, "w": 32, "h": 15 },
+        "pierna_izq":  { "x": 29, "y": 68, "w": 20, "h": 10 },
+        "pierna_der":  { "x": 51, "y": 68, "w": 20, "h": 10 },
+        "rodilla_izq": { "x": 30, "y": 74, "w": 17, "h": 8 },
+        "rodilla_der": { "x": 53, "y": 74, "w": 17, "h": 8 },
+        "tobillo_izq": { "x": 33, "y": 84, "w": 10, "h": 6 },
+        "tobillo_der": { "x": 57, "y": 84, "w": 10, "h": 6 },
+        "pie_izq":     { "x": 23, "y": 89, "w": 19, "h": 7 },
+        "pie_der":     { "x": 58, "y": 89, "w": 19, "h": 7 }
+      }
+    },
+    "nino": {
+      "nombre": "Niño",
+      "carpeta": "img/nino",
+      "completo": "completo.png",
+      "lienzo": { "w": 645, "h": 1081 },
+      "zonas": {
+        "cabeza":      { "x": 24, "y": 2,  "w": 52, "h": 22 },
+        "hombro_izq":  { "x": 24, "y": 24, "w": 14, "h": 8 },
+        "hombro_der":  { "x": 62, "y": 24, "w": 14, "h": 8 },
+        "brazo_izq":   { "x": 12, "y": 30, "w": 18, "h": 20 },
+        "brazo_der":   { "x": 70, "y": 30, "w": 18, "h": 20 },
+        "codo_izq":    { "x": 12, "y": 42, "w": 14, "h": 10 },
+        "codo_der":    { "x": 74, "y": 42, "w": 14, "h": 10 },
+        "mano_izq":    { "x": 3,  "y": 51, "w": 18, "h": 10 },
+        "mano_der":    { "x": 79, "y": 51, "w": 18, "h": 10 },
+        "barriga":     { "x": 36, "y": 34, "w": 28, "h": 20 },
+        "pierna_izq":  { "x": 29, "y": 60, "w": 19, "h": 22 },
+        "pierna_der":  { "x": 52, "y": 60, "w": 19, "h": 22 },
+        "rodilla_izq": { "x": 29, "y": 74, "w": 18, "h": 9 },
+        "rodilla_der": { "x": 53, "y": 74, "w": 18, "h": 9 },
+        "tobillo_izq": { "x": 32, "y": 84, "w": 12, "h": 8 },
+        "tobillo_der": { "x": 56, "y": 84, "w": 12, "h": 8 },
+        "pie_izq":     { "x": 22, "y": 91, "w": 20, "h": 8 },
+        "pie_der":     { "x": 58, "y": 91, "w": 20, "h": 8 }
+      }
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3 años",
+      "titulo": "4 partes",
+      "preguntas": [
+        { "texto": "Toca la cabeza.", "targets": ["cabeza"] },
+        { "texto": "Toca las manos.", "targets": ["mano_izq", "mano_der"] },
+        { "texto": "Toca los pies.", "targets": ["pie_izq", "pie_der"] },
+        { "texto": "Toca la barriga.", "targets": ["barriga"] }
+      ]
+    },
+    {
+      "id": "4",
+      "edad": "4 años",
+      "titulo": "6 partes",
+      "preguntas": [
+        { "texto": "Toca la cabeza.", "targets": ["cabeza"] },
+        { "texto": "Toca las manos.", "targets": ["mano_izq", "mano_der"] },
+        { "texto": "Toca los pies.", "targets": ["pie_izq", "pie_der"] },
+        { "texto": "Toca los brazos.", "targets": ["brazo_izq", "brazo_der", "codo_izq", "codo_der"] },
+        { "texto": "Toca las piernas.", "targets": ["pierna_izq", "pierna_der", "rodilla_izq", "rodilla_der"] },
+        { "texto": "Toca los hombros.", "targets": ["hombro_izq", "hombro_der"] }
+      ]
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "9 partes",
+      "preguntas": [
+        { "texto": "Toca la cabeza.", "targets": ["cabeza"] },
+        { "texto": "Toca las manos.", "targets": ["mano_izq", "mano_der"] },
+        { "texto": "Toca los pies.", "targets": ["pie_izq", "pie_der"] },
+        { "texto": "Toca los brazos.", "targets": ["brazo_izq", "brazo_der", "codo_izq", "codo_der"] },
+        { "texto": "Toca las piernas.", "targets": ["pierna_izq", "pierna_der", "rodilla_izq", "rodilla_der"] },
+        { "texto": "Toca los hombros.", "targets": ["hombro_izq", "hombro_der"] },
+        { "texto": "Toca las rodillas.", "targets": ["rodilla_izq", "rodilla_der"] },
+        { "texto": "Toca los codos.", "targets": ["codo_izq", "codo_der"] },
+        { "texto": "Toca los tobillos.", "targets": ["tobillo_izq", "tobillo_der"] }
+      ]
+    }
+  ]
+}
