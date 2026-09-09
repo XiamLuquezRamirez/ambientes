@@ -49,10 +49,10 @@
         "memoria_pares_max": 2,
         "secuencia_pasos_max": 2,
         "juego_bordes": false,
-        "login_tipo": "avatar",
+        "login_tipo": "pin_3",
         "teclado_grande": false,
         "modo_aula_automatico": false
     },
-    "actualizado_en": "2026-09-02T10:39:02-05:00",
+    "actualizado_en": "2026-09-08T09:04:13-05:00",
     "institucion_id": 1
 }

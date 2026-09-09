@@ -3230,6 +3230,63 @@ CREATE TABLE `versiones_tematica` (
   CONSTRAINT `versiones_tematica_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `sesiones_juego_elementos`;
+DROP TABLE IF EXISTS `sesiones_juego`;
+
+CREATE TABLE `sesiones_juego` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `juego_id` bigint unsigned NOT NULL,
+  `nivel_edad` enum('3','4','5-6') NOT NULL,
+  `perfil_aprendizaje_id` int DEFAULT NULL,
+  `completado` tinyint(1) NOT NULL DEFAULT '0',
+  `puntaje` tinyint unsigned DEFAULT NULL,
+  `tiempo_seg` smallint unsigned DEFAULT NULL,
+  `inicio_at` datetime NOT NULL,
+  `fin_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sesiones_juego_estudiante_id_juego_id_index` (`estudiante_id`,`juego_id`),
+  KEY `sesiones_juego_estudiante_id_inicio_at_index` (`estudiante_id`,`inicio_at`),
+  KEY `sesiones_juego_juego_id_completado_index` (`juego_id`,`completado`),
+  KEY `sesiones_juego_completado_puntaje_index` (`completado`,`puntaje`),
+  KEY `sesiones_juego_perfil_aprendizaje_id_foreign` (`perfil_aprendizaje_id`),
+  CONSTRAINT `sesiones_juego_estudiante_id_foreign`
+    FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `sesiones_juego_juego_id_foreign`
+    FOREIGN KEY (`juego_id`) REFERENCES `juegos` (`id`),
+  CONSTRAINT `sesiones_juego_perfil_aprendizaje_id_foreign`
+    FOREIGN KEY (`perfil_aprendizaje_id`) REFERENCES `perfil_aprendizaje` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `sesiones_juego_elementos` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `sesion_id` bigint unsigned NOT NULL,
+  `estudiante_id` bigint unsigned NOT NULL,
+  `elemento_id` varchar(60) NOT NULL,
+  `tipo_elemento` enum(
+    'pieza_cuerpo',
+    'pieza_robot',
+    'parte_cuerpo',
+    'lateralidad',
+    'memoria_ronda',
+    'laberinto',
+    'recorrido_pelota',
+    'objeto_semantico',
+    'recorrido_precision'
+  ) NOT NULL,
+  `correcto` tinyint(1) NOT NULL,
+  `intentos` tinyint unsigned NOT NULL DEFAULT '1',
+  `usa_ayuda` tinyint(1) NOT NULL DEFAULT '0',
+  `creado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `sesiones_juego_elementos_estudiante_tipo_correcto_index` (`estudiante_id`,`tipo_elemento`,`correcto`),
+  KEY `sesiones_juego_elementos_estudiante_elemento_index` (`estudiante_id`,`elemento_id`),
+  CONSTRAINT `sesiones_juego_elementos_sesion_id_foreign`
+    FOREIGN KEY (`sesion_id`) REFERENCES `sesiones_juego` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `sesiones_juego_elementos_estudiante_id_foreign`
+    FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 /*Data for the table `versiones_tematica` */
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

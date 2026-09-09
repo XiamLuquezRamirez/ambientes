@@ -14,30 +14,28 @@ class JuegoCatalogoServiceTest extends TestCase
 {
     public function test_serializar_tarjeta_incluye_cadena_curricular(): void
     {
-        $ambiente = new Ambiente(['id' => 1, 'nombre' => 'Multisensorial']);
-        $modulo = new Modulo(['id' => 2, 'nombre' => 'Módulo A', 'ambiente_id' => 1]);
-        $modulo->setRelation('ambiente', $ambiente);
-
+        $ambiente = new Ambiente(['id' => 1, 'nombre' => 'Polimotor']);
         $juego = new Juego([
-            'tipo' => Juego::TIPO_MEMORIA,
-            'nombre' => 'Memoria de animales',
-            'descripcion' => 'Parejas',
-            'icono' => 'fa-clone',
-            'color' => '#0284c7',
+            'tipo' => 'rompecabezas_cuerpo',
+            'ruta' => 'catalogo_juegos/Polimotor/Rompecabezas',
+            'nombre' => 'Rompecabezas del cuerpo',
+            'descripcion' => 'Armar piezas',
+            'icono' => 'fa-puzzle-piece',
+            'color' => '#ffd54f',
             'orden' => 1,
             'activo' => true,
-            'modulo_id' => 2,
+            'ambiente_id' => 1,
         ]);
         $juego->id = 10;
-        $juego->setRelation('modulo', $modulo);
+        $juego->setRelation('ambiente', $ambiente);
 
         $tarjeta = (new JuegoCatalogoService)->serializarTarjeta($juego);
 
         $this->assertSame(10, $tarjeta['id']);
-        $this->assertSame('memoria', $tarjeta['tipo']);
-        $this->assertSame('Memoria de animales', $tarjeta['nombre']);
-        $this->assertSame('Multisensorial', $tarjeta['cadena']['ambiente_nombre']);
-        $this->assertSame('Módulo A', $tarjeta['cadena']['modulo_nombre']);
+        $this->assertSame('rompecabezas_cuerpo', $tarjeta['tipo']);
+        $this->assertSame('Rompecabezas del cuerpo', $tarjeta['nombre']);
+        $this->assertSame('catalogo_juegos/Polimotor/Rompecabezas', $tarjeta['ruta']);
+        $this->assertSame('Polimotor', $tarjeta['cadena']['ambiente_nombre']);
     }
 
     public function test_cadena_curricular_resuelve_desde_tematica(): void

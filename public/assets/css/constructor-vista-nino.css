@@ -908,14 +908,14 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
 }
 
 .vn-card--pregunta .vn-option img {
-    width: 100%;
+    width: auto;
     max-width: 100%;
     height: auto;
     aspect-ratio: 1;
-    max-height: min(32vh, 220px);
-    min-height: 110px;
+    max-height: min(28vh, 180px);
+    min-height: 0;
     border-radius: 14px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     object-fit: contain;
 }
 
@@ -5574,12 +5574,12 @@ body.vn-dispositivo .rn-player.vn-nivel--prejardin .vn-option img,
 body.vn-dispositivo .rn-player.vn-nivel--jardin .vn-option img,
 body.rn-player-activo .rn-player.vn-nivel--prejardin .vn-option img,
 body.rn-player-activo .rn-player.vn-nivel--jardin .vn-option img {
-    width: 100%;
+    width: auto;
     max-width: 100%;
     height: auto;
     aspect-ratio: 1;
-    min-height: 96px;
-    max-height: min(36vh, 200px);
+    min-height: 0;
+    max-height: min(22vh, 140px);
     object-fit: contain;
 }
 
@@ -7016,7 +7016,9 @@ body.vn-dispositivo .vn-card--pregunta .vn-pregunta-head .vn-instruccion,
 body.vn-dispositivo .vn-card--pregunta .vn-pregunta-media,
 .rn-player .vn-card--pregunta .vn-pregunta-media {
     flex: 1 1 auto;
-    min-height: 0;
+    /* No usar 0: con opciones/títulos grandes la imagen desaparece */
+    min-height: clamp(160px, 26dvh, 320px);
+    max-height: 48dvh;
     margin: 0 0 clamp(4px, 0.7vh, 8px);
 }
 
@@ -7062,7 +7064,14 @@ body.vn-dispositivo .vn-card--reto .vn-options[data-count="2"],
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: minmax(0, 1fr);
     align-self: center;
-    max-height: min(58%, 320px);
+    max-height: min(48%, 340px);
+}
+
+body.vn-dispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-options,
+.rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-options {
+    flex: 1 1 auto;
+    max-height: none;
+    min-height: clamp(150px, 30dvh, 320px);
 }
 
 body.vn-dispositivo .vn-card--pregunta .vn-options[data-count="3"] .vn-option:last-child,
@@ -7101,18 +7110,48 @@ body.vn-dispositivo .vn-card--reto .vn-option .vn-op-emoji,
     line-height: 1;
 }
 
+/* Sin imagen de enunciado hay más alto libre: el emoji debe llenar el botón */
+body.vn-dispositivo .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option .vn-op-emoji,
+.rn-player .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option .vn-op-emoji,
+#vnOverlay .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option .vn-op-emoji {
+    font-size: clamp(2.4rem, 8.5vh, 4.2rem);
+    margin-bottom: 4px;
+}
+
+body.vn-dispositivo .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option,
+.rn-player .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option,
+#vnOverlay .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option {
+    padding: clamp(12px, 2vh, 20px) clamp(10px, 1.8vw, 16px);
+    font-size: clamp(1.05rem, 2.4vh, 1.35rem);
+    gap: clamp(6px, 1.2vh, 12px);
+}
+
 body.vn-dispositivo .vn-card--pregunta .vn-option img,
 body.vn-dispositivo .vn-card--reto .vn-option img,
 .rn-player .vn-card--pregunta .vn-option img,
 .rn-player .vn-card--reto .vn-option img {
-    width: 100%;
+    width: auto;
     max-width: 100%;
     height: auto;
     aspect-ratio: 1;
-    min-height: clamp(110px, 18vh, 160px);
-    max-height: min(36vh, 220px);
+    min-height: 0;
+    max-height: min(18vh, 140px);
     margin-bottom: 4px;
     object-fit: contain;
+    flex: 1 1 auto;
+}
+
+body.vn-dispositivo .vn-card--pregunta .vn-option > span,
+body.vn-dispositivo .vn-card--reto .vn-option > span,
+.rn-player .vn-card--pregunta .vn-option > span,
+.rn-player .vn-card--reto .vn-option > span {
+    flex: 0 0 auto;
+    max-width: 100%;
+    line-height: 1.15;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
 body.vn-dispositivo .vn-card--pregunta .vn-feedback,
@@ -7230,9 +7269,11 @@ body.vn-dispositivo .vn-option img,
 body.vn-dispositivo .vn-chip img,
 .rn-player .vn-chip img,
 #vnOverlay .vn-chip img {
-    width: 100% !important;
-    height: auto !important;
+    width: auto !important;
     max-width: 100% !important;
+    height: auto !important;
+    max-height: min(18vh, 140px) !important;
+    min-height: 0 !important;
     aspect-ratio: 1;
     object-fit: contain !important;
 }

@@ -40,7 +40,8 @@
             var pin = [];
             var tipoGuardaEstudiante = 2; // 1: administrador, 2: docente
             var ambientesSeleccionados = [];
-            var idContainerPin = 'configuracion_pin_docente';
+            // Por defecto el modal "Nuevo"; el modal de PIN docente cambia esto al abrirse.
+            var idContainerPin = 'configuracion_pin';
             var idEstudianteConfigurarPin = 0;
 
             function abrirModalAgregarEstudiante() {

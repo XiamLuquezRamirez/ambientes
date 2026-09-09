@@ -1732,7 +1732,31 @@
     /* ── Chrome / navegación ─────────────────────────────────── */
 
     function renderProgress() {
-        const usarIconos = configNivel().iconosNav && nivelEtario !== 'primaria';
+        const total = bloques.length || 1;
+        const modo = perfilHonra('progreso') ? String(perfilV('progreso', 'barra') || 'barra') : '';
+        const esBarra = modo === 'barra' || modo === 'barra prominente';
+        const esPasos = modo === 'pasos';
+        const esCirculos = modo === 'círculos' || modo === 'circulos';
+
+        if (esBarra) {
+            // Una sola pista legible (12 “segmentos” flex se vuelven ilegibles).
+            const pct = Math.max(6, Math.round(((index + 1) / total) * 100));
+            $progress
+                .attr('data-vn-progress-mode', modo === 'barra prominente' ? 'barra-prominente' : 'barra')
+                .html(
+                    `<span class="vn-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Progreso">`
+                    + `<span class="vn-progress-fill" style="width:${pct}%"></span>`
+                    + `</span>`
+                );
+            $stepLabel.prop('hidden', false).text(`${index + 1} / ${total}`);
+            return;
+        }
+
+        $progress.removeAttr('data-vn-progress-mode');
+        const usarIconos = !esCirculos && !esPasos
+            && configNivel().iconosNav
+            && nivelEtario !== 'primaria'
+            && total <= 8;
         $progress.html(bloques.map((b, i) => {
             let cls = 'vn-dot';
             if (i < index) cls += ' is-done';
@@ -1743,10 +1767,19 @@
                 : '';
             return `<span class="${cls}" title="${escapar(b.nombre || b.tipo)}">${inner}</span>`;
         }).join(''));
+
+        if (esPasos) {
+            $stepLabel.prop('hidden', false).text(`Paso ${index + 1} de ${total}`);
+            return;
+        }
+        if (esCirculos) {
+            $stepLabel.prop('hidden', true).text('');
+            return;
+        }
         if (configNivel().simplificar && !(perfilHonra('progreso') && perfilV('progreso', '') === 'pasos')) {
             $stepLabel.prop('hidden', true).text('');
         } else {
-            $stepLabel.prop('hidden', false).text(`Paso ${index + 1} de ${bloques.length || 1}`);
+            $stepLabel.prop('hidden', false).text(`Paso ${index + 1} de ${total}`);
         }
     }
 

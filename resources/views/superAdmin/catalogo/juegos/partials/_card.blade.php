@@ -3,7 +3,8 @@
     $icono = $juego->icono ?: 'fa-gamepad';
     $iconClass = str_starts_with($icono, 'fa-') ? $icono : 'fa-'.$icono;
     $color = $juego->color ?: '#2563eb';
-    $tipoLabel = $tiposJuego[$juego->tipo] ?? $juego->tipo;
+    $tipoLabel = $juego->tipoLabel();
+    $urlPreview = $juego->urlPaquete() ? route('superadmin.catalogo.juegos.preview', $juego) : null;
 @endphp
 
 <div class="student-card" data-juego-id="{{ $juego->id }}">
@@ -44,4 +45,12 @@
             <small class="text-muted">Sin descripción</small>
         @endif
     </div>
+
+    @if ($urlPreview)
+        <div class="student-actions mt-2">
+            <a href="{{ $urlPreview }}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener">
+                <i class="fa-solid fa-play"></i> Vista previa
+            </a>
+        </div>
+    @endif
 </div>

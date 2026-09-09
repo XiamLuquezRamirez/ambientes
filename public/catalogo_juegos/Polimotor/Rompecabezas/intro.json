@@ -1,0 +1,38 @@
+{
+  "personajes": [
+    {
+      "nombre": "Zoe",
+      "gif_idle": "../../images/normal1.gif",
+      "gif_hablando": "../../images/normal2.gif"
+    },
+    {
+      "nombre": "Zeus",
+      "gif_idle": "../../images/ciencia/normal1.gif",
+      "gif_hablando": "../../images/ciencia/normal2.gif"
+    }
+  ],
+  "conversacion": [
+    {
+      "personaje": 0,
+      "texto": "Hola, soy Zoe. <br> Hoy vamos a armar el rompecabezas del cuerpo humano."
+    },
+    {
+      "personaje": 1,
+      "texto": "¡Yo soy Zeus! <br> Primero eliges si armas el cuerpo de una niña o de un niño."
+    },
+    {
+      "personaje": 0,
+      "texto": "Luego observas muy bien la figura. <br> Arrastra cada pieza hasta el lugar donde corresponde."
+    },
+    {
+      "personaje": 1,
+      "texto": "¡Tú puedes! <br> Vamos a jugar."
+    }
+  ],
+  "configuracion": {
+    "intervalo": 50,
+    "pausaEntreLineas": 1800,
+    "pausaFinal": 2500,
+    "duracionCambioNube": 350
+  }
+}

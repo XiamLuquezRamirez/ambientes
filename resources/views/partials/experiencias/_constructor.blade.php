@@ -159,7 +159,7 @@
     </div>
 </div>
 
-{{-- Modal: catálogo del modulo de juegos --}}
+{{-- Modal: catálogo SuperAdmin de paquetes (opcional, distinto de los motores embebidos) --}}
 <div class="modal fade modal-app cx-modal-juegos" id="cxModalJuegosModulo" tabindex="-1"
     aria-labelledby="cxModalJuegosModuloLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -170,8 +170,7 @@
                 </div>
                 <div class="flex-grow-1">
                     <h5 class="modal-title mb-0" id="cxModalJuegosModuloLabel">Catálogo del modulo de juegos</h5>
-                    <p class="modal-subtitle mb-0" id="cxModalJuegosModuloSubtitle">Filtra y elige un juego para el
-                        bloque</p>
+                    <p class="modal-subtitle mb-0" id="cxModalJuegosModuloSubtitle">Filtra y relaciona un juego del catálogo con este bloque</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -179,7 +178,7 @@
                 <div class="cx-juegos-filtros-panel" id="cxJuegosFiltrosPanel">
                     <div class="cx-juegos-filtros-head">
                         <i class="fa-solid fa-filter" aria-hidden="true"></i>
-                        <span>Filtrar catálogo del modulo de juegos</span>
+                        <span>Filtrar catálogo</span>
                         <button type="button" class="btn btn-sm btn-outline-primary cx-juegos-filtros-toggle"
                             id="cxBtnToggleFiltrosJuegos" aria-expanded="false" aria-controls="formFiltrosJuegosConstructor">
                             <i class="fa-solid fa-sliders" aria-hidden="true"></i>
@@ -200,7 +199,7 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <p class="cx-juegos-modal-hint mb-0 text-muted">
-                    <i class="fa-solid fa-hand-pointer"></i> Haz clic en una tarjeta para usar el juego en el bloque
+                    <i class="fa-solid fa-hand-pointer"></i> Haz clic en una tarjeta para relacionar el juego del catálogo
                 </p>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fa-solid fa-times"></i> Cerrar

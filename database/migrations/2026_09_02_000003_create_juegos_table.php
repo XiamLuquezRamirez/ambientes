@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -27,62 +26,9 @@ return new class extends Migration
             $table->index(['modulo_id', 'activo', 'orden']);
         });
 
-        $defaults = [
-            [
-                'tipo' => 'rompecabezas',
-                'nombre' => 'Rompecabezas',
-                'descripcion' => 'Armar la imagen arrastrando piezas',
-                'icono' => 'fa-puzzle-piece',
-                'color' => '#d97706',
-                'orden' => 1,
-            ],
-            [
-                'tipo' => 'memoria',
-                'nombre' => 'Memoria',
-                'descripcion' => 'Encontrar parejas de imágenes iguales',
-                'icono' => 'fa-clone',
-                'color' => '#0284c7',
-                'orden' => 2,
-            ],
-            [
-                'tipo' => 'colorear',
-                'nombre' => 'Colorear',
-                'descripcion' => 'Pintar sobre una imagen en blanco y negro',
-                'icono' => 'fa-palette',
-                'color' => '#a855f7',
-                'orden' => 3,
-            ],
-            [
-                'tipo' => 'secuencia',
-                'nombre' => 'Secuencia',
-                'descripcion' => 'Ordenar imágenes en el paso correcto',
-                'icono' => 'fa-arrow-down-wide-short',
-                'color' => '#0f6e56',
-                'orden' => 4,
-            ],
-        ];
-
-        $moduloIds = DB::table('modulos')
-            ->where('es_oficial', true)
-            ->whereNull('institucion_id')
-            ->pluck('id');
-
-        $now = now();
-        $rows = [];
-        foreach ($moduloIds as $moduloId) {
-            foreach ($defaults as $juego) {
-                $rows[] = array_merge($juego, [
-                    'modulo_id' => $moduloId,
-                    'activo' => true,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
-            }
-        }
-
-        if ($rows !== []) {
-            DB::table('juegos')->insert($rows);
-        }
+        // Los motores del constructor de experiencias (rompecabezas/memoria/colorear/secuencia)
+        // son fijos en frontend. Esta tabla solo almacena paquetes del catálogo SuperAdmin
+        // (sembrados en migraciones posteriores con `ruta`).
     }
 
     /**

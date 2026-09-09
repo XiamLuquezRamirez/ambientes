@@ -9,6 +9,12 @@ $modal.on('hidden.bs.modal', function () {
     limpiarModal();
 });
 
+function activarContenedorPinRegistro() {
+    if (typeof idContainerPin !== 'undefined') {
+        idContainerPin = 'configuracion_pin';
+    }
+}
+
 function abrirModal() {
     $('#modalRegistroLabel').text('Nuevo Estudiante');
     $('#modalRegistroSubtitle').text('Completa los datos para crear el estudiante');
@@ -18,7 +24,11 @@ function abrirModal() {
     $('#tab-pin').show();
     tipoPost = 1;
 
-    
+    activarContenedorPinRegistro();
+    if (typeof reiniciarPin === 'function') {
+        reiniciarPin();
+    }
+
     if(tipoGuardaEstudiante === 2) {
         $("#ambiente-grado-grupo-container-docente").show();
     }
@@ -31,7 +41,12 @@ function cerrarModal() {
     setTimeout(() => {
         requiereApoyo = null;
         limpiarModal();
-        vaciarPin();
+        activarContenedorPinRegistro();
+        if (typeof reiniciarPin === 'function') {
+            reiniciarPin();
+        } else {
+            vaciarPin();
+        }
     }, 1000);
 }
 
@@ -52,8 +67,13 @@ function limpiarModal() {
     $('#previewAvatar').attr('src', '/assets/images/avatar.png');
     $('#color_avatar').val('#ba79fb');
 
-    //resetear el valor de la configuracion de pin
-    pin = []
+    //resetear el valor de la configuracion de pin (solo el contenedor del modal Nuevo/Editar)
+    activarContenedorPinRegistro();
+    if (typeof reiniciarPin === 'function') {
+        reiniciarPin();
+    } else {
+        pin = [];
+    }
 
     bootstrap.Tab.getOrCreateInstance(
         $('a[href="#datos-personales"]')[0]
@@ -429,7 +449,9 @@ async function mapearDatosEstudiante(datos) {
         $('#previewAvatar').attr('src', `/storage/${datos.avatar}`);
     } 
 
-    if (datos.configuracion_pin) {
+    // En panel docente el PIN se gestiona en modal aparte; no pintar en el modal de registro.
+    if (datos.configuracion_pin && tipoGuardaEstudiante !== 2) {
+        activarContenedorPinRegistro();
         mapearDatosPin(datos.configuracion_pin);
     }
 

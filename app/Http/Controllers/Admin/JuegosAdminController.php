@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class JuegosAdminController extends Controller
 {
     use RespondeCatalogoJuegos;
+
     public function __construct(
         private JuegoCatalogoService $catalogo,
     ) {}

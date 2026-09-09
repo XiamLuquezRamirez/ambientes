@@ -1,0 +1,38 @@
+{
+  "personajes": [
+    {
+      "nombre": "Zoe",
+      "gif_idle": "../../images/normal1.gif",
+      "gif_hablando": "../../images/normal2.gif"
+    },
+    {
+      "nombre": "Zeus",
+      "gif_idle": "../../images/ciencia/normal1.gif",
+      "gif_hablando": "../../images/ciencia/normal2.gif"
+    }
+  ],
+  "conversacion": [
+    {
+      "personaje": 0,
+      "texto": "Hola, soy Zoe. <br> Hoy vamos a reconocer las partes del cuerpo."
+    },
+    {
+      "personaje": 1,
+      "texto": "¡Yo soy Zeus! <br> Verás una figura completa. Las partes se pueden tocar."
+    },
+    {
+      "personaje": 0,
+      "texto": "¡Vamos a jugar! Escucha la indicación, observa el cuerpo y toca la parte que te voy a pedir."
+    },
+    {
+      "personaje": 1,
+      "texto": "¡Tú puedes! <br> Primero eliges niña o niño y tu edad."
+    }
+  ],
+  "configuracion": {
+    "intervalo": 50,
+    "pausaEntreLineas": 1800,
+    "pausaFinal": 2500,
+    "duracionCambioNube": 350
+  }
+}

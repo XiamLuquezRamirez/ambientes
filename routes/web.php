@@ -556,6 +556,7 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::patch('catalogo/ejes/{eje}/mover', [EjesSuperAdminController::class, 'mover'])->name('superadmin.ejes.mover');
 
     Route::get('catalogo/juegos', [JuegosSuperAdminController::class, 'listar'])->name('superadmin.catalogo.juegos');
+    Route::get('catalogo/juegos/{juego}/preview', [JuegosSuperAdminController::class, 'preview'])->name('superadmin.catalogo.juegos.preview');
 
     // Temáticas / experiencias oficiales
     Route::get('catalogo/tematicas', [TematicasSuperAdminController::class, 'index'])->name('superadmin.catalogo.tematicas.index');

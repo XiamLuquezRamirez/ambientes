@@ -11,6 +11,176 @@ html.kiosco-perfil--activo .rn-player .vn-hist-nav-btn {
     transition-duration: var(--kiosco-trans-ms, 300ms);
 }
 
+/*
+ * Pregunta CON imagen de enunciado: equilibrar media vs opciones (imagen+texto).
+ * Pregunta SIN imagen: opciones pueden ser altas, pero emoji/texto deben crecer.
+ */
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-pregunta-media,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-pregunta-media {
+    flex: 0 1 38%;
+    min-height: clamp(140px, 24dvh, 280px);
+    max-height: 36dvh;
+    margin-bottom: clamp(4px, 0.8vh, 10px);
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-options,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-options {
+    flex: 1 1 52%;
+    max-height: none;
+    min-height: clamp(168px, 32dvh, 360px);
+    align-content: stretch;
+    overflow: visible;
+    grid-auto-rows: minmax(0, 1fr);
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option {
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+    justify-content: center;
+    gap: 4px;
+    padding: clamp(6px, 1vh, 10px) clamp(6px, 1.2vw, 10px);
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option:has(img),
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option:has(img) {
+    justify-content: flex-start;
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option img,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option img {
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    width: auto !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: min(14dvh, 112px) !important;
+    aspect-ratio: 1;
+    object-fit: contain !important;
+    margin: 0 0 2px !important;
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option > span,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option > span {
+    flex: 0 0 auto;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 2px;
+    font-size: clamp(0.82rem, 1.7vh, 1.05rem);
+    line-height: 1.15;
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-break: break-word;
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-pregunta-enunciado,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-pregunta-enunciado {
+    font-size: max(1.05rem, calc(var(--kiosco-font-size, 16pt) * 0.82));
+    line-height: 1.2;
+    margin: 0;
+}
+
+/* Sin imagen de enunciado: contenedor alto OK, pero el interior debe llenarlo */
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-options,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-options {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    align-content: stretch;
+    grid-auto-rows: minmax(0, 1fr);
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option {
+    min-height: max(72px, var(--kiosco-btn-size, 72px));
+    height: 100%;
+    justify-content: center;
+    gap: clamp(6px, 1.4vh, 14px);
+    padding: clamp(12px, 2.2vh, 22px) clamp(10px, 2vw, 16px);
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option .vn-op-emoji,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option .vn-op-emoji {
+    font-size: clamp(2.6rem, 9vh, 4.5rem);
+    line-height: 1;
+    margin: 0;
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option > span,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option > span {
+    flex: 0 0 auto;
+    font-size: clamp(1.1rem, 2.8vh, 1.55rem);
+    line-height: 1.2;
+    font-weight: 800;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option img,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option img {
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    max-height: min(26dvh, 200px) !important;
+    width: auto !important;
+    max-width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+    margin: 0 !important;
+}
+
+/* Reto: mismo criterio que pregunta sin media de enunciado */
+html.kiosco-perfil--activo .rn-player .vn-card--reto .vn-option,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--reto .vn-option {
+    min-height: max(72px, var(--kiosco-btn-size, 72px));
+    height: 100%;
+    justify-content: center;
+    gap: clamp(6px, 1.4vh, 14px);
+    padding: clamp(12px, 2.2vh, 22px) clamp(10px, 2vw, 16px);
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--reto .vn-option .vn-op-emoji,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--reto .vn-option .vn-op-emoji {
+    font-size: clamp(2.4rem, 8vh, 4rem);
+    line-height: 1;
+    margin: 0;
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--reto .vn-option > span,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--reto .vn-option > span {
+    font-size: clamp(1.05rem, 2.6vh, 1.4rem);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+html.kiosco-perfil--activo .rn-player .vn-card--reto .vn-option img,
+html.kiosco-perfil--activo #vnDispositivo .vn-card--reto .vn-option img {
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    max-height: min(22dvh, 160px) !important;
+    width: auto !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+}
+
+/* Baja visión: enunciado grande, pero sin ahogar las opciones */
+html.kiosco-perfil--contraste-maximo .rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-pregunta-media,
+html.kiosco-perfil--contraste-maximo #vnDispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-pregunta-media {
+    min-height: clamp(160px, 28dvh, 320px);
+    max-height: 40dvh;
+}
+
+html.kiosco-perfil--contraste-maximo .rn-player .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option img,
+html.kiosco-perfil--contraste-maximo #vnDispositivo .vn-card--pregunta:has(> .vn-card-body > .vn-pregunta-media) .vn-option img {
+    max-height: min(16dvh, 128px) !important;
+}
+
 html.kiosco-perfil--activo .rn-player .vn-options,
 html.kiosco-perfil--activo .rn-player .vn-paint-colors,
 html.kiosco-perfil--activo .rn-player .vn-paint-tools {
@@ -133,39 +303,129 @@ html.kiosco-perfil--lienzo-cuadriculado .rn-player .vn-draw-stage {
     background-size: 24px 24px;
 }
 
+/* ── Progreso por perfil (pie del player) ─────────────────────────
+ * No convertir N puntos en N segmentos flex: con 8–12 bloques queda ilegible.
+ * Barra = pista + fill. Círculos = dots compactos. Pasos = label visible.
+ */
+html.kiosco-perfil--activo .rn-player .vn-screen-nav {
+    grid-template-columns: auto minmax(120px, 1fr) auto;
+    gap: clamp(8px, 1.5vw, 14px);
+    align-items: center;
+}
+
+/* Botones de nav: tocables, pero no aplastan el centro */
+html.kiosco-perfil--activo .rn-player .vn-screen-nav .vn-nav-btn {
+    min-width: min(var(--kiosco-btn-size, 72px), 92px);
+    min-height: min(var(--kiosco-btn-size, 72px), 72px);
+    max-width: 42vw;
+    padding-inline: 12px;
+    flex-shrink: 0;
+}
+
+html.kiosco-perfil--activo .rn-player .vn-nav-center {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    gap: 4px;
+}
+
 html.kiosco-perfil--progreso-barra .rn-player .vn-progress,
 html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-progress {
     display: flex;
-    height: 6px;
-    border-radius: 99px;
-    overflow: hidden;
-    background: rgba(15, 23, 42, 0.12);
-    gap: 0;
-}
-
-html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-progress {
-    height: 10px;
-}
-
-html.kiosco-perfil--progreso-barra .rn-player .vn-dot,
-html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-dot {
-    flex: 1;
-    min-width: 0;
-    height: 100%;
-    border-radius: 0;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: min(480px, 100%);
+    height: auto;
     margin: 0;
-    background: rgba(15, 23, 42, 0.12);
+    padding: 0;
+    gap: 0;
+    overflow: visible;
+    background: transparent;
+    border-radius: 0;
 }
 
-html.kiosco-perfil--progreso-barra .rn-player .vn-dot.is-done,
-html.kiosco-perfil--progreso-barra .rn-player .vn-dot.is-current,
-html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-dot.is-done,
-html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-dot.is-current {
-    background: #0F6E56;
+html.kiosco-perfil--progreso-barra .rn-player .vn-progress-track,
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-progress-track {
+    display: block;
+    width: 100%;
+    height: 8px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.14);
 }
 
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-progress-track {
+    height: 12px;
+}
+
+html.kiosco-perfil--progreso-barra .rn-player .vn-progress-fill,
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-progress-fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #0F6E56, #34d399);
+    transition: width 0.25s ease;
+}
+
+html.kiosco-perfil--progreso-barra .rn-player .vn-step-label,
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-step-label,
 html.kiosco-perfil--progreso-pasos .rn-player .vn-step-label {
     display: block !important;
+    margin: 0;
+    font-size: clamp(0.72rem, 1.6vh, 0.9rem);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #334155;
+    text-transform: none;
+    white-space: nowrap;
+}
+
+/* En dispositivo el meta suele ir oculto: forzar label de pasos */
+html.kiosco-perfil--progreso-pasos .rn-player .vn-nav-center .vn-nav-meta,
+html.kiosco-perfil--progreso-barra .rn-player .vn-nav-center .vn-nav-meta,
+html.kiosco-perfil--progreso-barra-prominente .rn-player .vn-nav-center .vn-nav-meta {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+
+html.kiosco-perfil--progreso-pasos .rn-player .vn-progress {
+    gap: 5px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+html.kiosco-perfil--progreso-pasos .rn-player .vn-dot,
+html.kiosco-perfil--progreso-circulos .rn-player .vn-dot {
+    flex: 0 0 auto;
+    width: 11px;
+    height: 11px;
+    min-width: 11px;
+    padding: 0;
+    border-radius: 50%;
+    transform: none;
+    box-shadow: none;
+}
+
+html.kiosco-perfil--progreso-pasos .rn-player .vn-dot .vn-dot-icon,
+html.kiosco-perfil--progreso-circulos .rn-player .vn-dot .vn-dot-icon {
+    display: none !important;
+}
+
+html.kiosco-perfil--progreso-pasos .rn-player .vn-dot.is-current,
+html.kiosco-perfil--progreso-circulos .rn-player .vn-dot.is-current {
+    transform: scale(1.25);
+    background: linear-gradient(180deg, #fbbf24, #f97316);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25);
+}
+
+html.kiosco-perfil--progreso-pasos .rn-player .vn-dot.is-done,
+html.kiosco-perfil--progreso-circulos .rn-player .vn-dot.is-done {
+    background: linear-gradient(180deg, #34d399, #10b981);
+    box-shadow: none;
 }
 
 html.kiosco-perfil--lectura-facil .rn-player .vn-title {

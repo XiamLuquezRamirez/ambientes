@@ -1,34 +1,61 @@
 /*==========================================================
   SuperAdmin — Instituciones
   Mismo lenguaje visual que admin/ambientes.css
+
+  El grid responde al ancho útil del contenido (container queries),
+  no al viewport: al abrir/cerrar el sidebar las cards se adaptan.
 ==========================================================*/
+
+.instituciones-page {
+    container-type: inline-size;
+    container-name: instituciones;
+}
 
 .instituciones-page .instituciones-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
     margin-top: 24px;
     align-items: stretch;
     font-family: var(--font-sans, 'Nunito', sans-serif);
+}
+
+@container instituciones (min-width: 640px) {
+    .instituciones-page .instituciones-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@container instituciones (min-width: 960px) {
+    .instituciones-page .instituciones-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@container instituciones (min-width: 1280px) {
+    .instituciones-page .instituciones-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
 }
 
 .instituciones-page .institucion-card {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-width: 0;
     background: var(--color-surface, #FFFFFF);
     border: 1px solid var(--color-border, #E2E8F0);
     border-radius: 16px;
     padding: 18px;
     box-shadow: 0 1px 2px rgba(16, 24, 40, .03), 0 6px 16px -6px rgba(16, 24, 40, .07);
-    transition: box-shadow .2s, transform .15s, border-color .15s;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .15s ease;
     position: relative;
     cursor: pointer;
 }
 
 .instituciones-page .institucion-card:hover {
-    box-shadow: 0 3px 6px rgba(16, 24, 40, .05), 0 14px 28px -8px rgba(16, 24, 40, .11);
     transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(16, 24, 40, .05), 0 14px 28px -8px rgba(16, 24, 40, .11);
     border-color: #BFDBFE;
 }
 

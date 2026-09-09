@@ -10,7 +10,7 @@
         <div class="page-header students-header">
             <div>
                 <h1 class="mb-1">Juegos</h1>
-                <p class="students-subtitle mb-0">Catálogo oficial de juegos interactivos para el constructor</p>
+                <p class="students-subtitle mb-0">Catálogo de paquetes de juegos (solo lectura / preview). Independiente de los motores del constructor de experiencias.</p>
             </div>
         </div>
 

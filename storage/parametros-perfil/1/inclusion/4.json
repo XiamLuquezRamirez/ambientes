@@ -7,7 +7,7 @@
         "font_size": 18,
         "lectura_facil": true,
         "subtitulos": false,
-        "audio_instruc": "opcional",
+        "audio_instruc": "automático",
         "audio_fondo": true,
         "audio_btn": true,
         "trans_ms": 400,
@@ -17,7 +17,7 @@
         "auto_avance": false,
         "cooperativo": true,
         "opciones_max": 2,
-        "intentos_max": 3,
+        "intentos_max": 5,
         "refuerzo": "cada paso",
         "progreso": "círculos",
         "ra_inicio": "manual",
@@ -53,6 +53,6 @@
         "teclado_grande": false,
         "modo_aula_automatico": false
     },
-    "actualizado_en": "2026-09-02T10:39:02-05:00",
+    "actualizado_en": "2026-09-08T09:04:13-05:00",
     "institucion_id": 1
 }

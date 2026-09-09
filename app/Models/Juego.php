@@ -12,26 +12,13 @@ class Juego extends Model
     use HasFactory;
     use Sincronizable;
 
-    public const TIPO_ROMPECABEZAS = 'rompecabezas';
-
-    public const TIPO_MEMORIA = 'memoria';
-
-    public const TIPO_COLOREAR = 'colorear';
-
-    public const TIPO_SECUENCIA = 'secuencia';
-
-    public const TIPOS = [
-        self::TIPO_ROMPECABEZAS,
-        self::TIPO_MEMORIA,
-        self::TIPO_COLOREAR,
-        self::TIPO_SECUENCIA,
-    ];
-
+    /**
+     * Tipos de paquete del catálogo SuperAdmin (no confundir con motores
+     * del constructor de experiencias: rompecabezas/memoria/colorear/secuencia).
+     */
     public const TIPOS_LABELS = [
-        self::TIPO_ROMPECABEZAS => 'Rompecabezas',
-        self::TIPO_MEMORIA => 'Memoria',
-        self::TIPO_COLOREAR => 'Colorear',
-        self::TIPO_SECUENCIA => 'Secuencia',
+        'rompecabezas_cuerpo' => 'Rompecabezas del cuerpo',
+        'reconocimiento_partes' => 'Reconocimiento de partes',
     ];
 
     protected $fillable = [
@@ -40,6 +27,7 @@ class Juego extends Model
         'eje_id',
         'tematica_id',
         'tipo',
+        'ruta',
         'nombre',
         'descripcion',
         'icono',
@@ -51,6 +39,20 @@ class Juego extends Model
     protected $casts = [
         'activo' => 'boolean',
     ];
+
+    public function urlPaquete(): ?string
+    {
+        if (! filled($this->ruta)) {
+            return null;
+        }
+
+        return asset(trim((string) $this->ruta, '/').'/index.html');
+    }
+
+    public function tipoLabel(): string
+    {
+        return self::TIPOS_LABELS[$this->tipo] ?? $this->tipo;
+    }
 
     public function ambiente()
     {

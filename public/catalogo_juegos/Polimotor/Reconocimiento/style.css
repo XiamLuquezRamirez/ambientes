@@ -1,0 +1,463 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+html.swal2-shown,
+html.swal2-height-auto,
+body.swal2-shown,
+body.swal2-height-auto {
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+body {
+  overflow: hidden;
+  background: #f7fbff;
+  background-image:
+    radial-gradient(circle at 8% 12%, #f8d7e8 0 80px, transparent 81px),
+    radial-gradient(circle at 92% 10%, #d6e8ff 0 90px, transparent 91px),
+    radial-gradient(circle at 90% 88%, #ffe3c4 0 100px, transparent 101px);
+  color: #262626;
+  font-family: Nunito, Arial, sans-serif;
+  touch-action: manipulation;
+}
+
+.borde {
+  text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
+    1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+  color: #fff;
+}
+
+.borde2 {
+  text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
+    1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+  font-weight: bold;
+  color: #fff !important;
+  font-size: 19px;
+}
+
+#principal {
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 16px 12px;
+  box-sizing: border-box;
+}
+
+.hud-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 86px;
+}
+
+.hud-acciones {
+  min-width: 80px;
+}
+
+.hud-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 160px;
+}
+
+.hud-centro {
+  flex: 1;
+  text-align: center;
+}
+
+.hud-centro h1 {
+  font-size: 26px;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.btn-round {
+  width: 70px;
+  height: 70px;
+  font-size: 31px;
+  border-radius: 50%;
+  border: 4px solid white;
+}
+
+.hud-progreso {
+  min-width: 64px;
+  text-align: center;
+  font-size: 18px;
+  color: #1565c0;
+  background: #fff;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  padding: 6px 10px;
+}
+
+.hud-progreso[hidden] {
+  display: none !important;
+}
+
+.panel-acc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+}
+
+.panel-acc button {
+  font-size: 12px;
+  font-weight: bold;
+  min-height: 34px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  border: 2px solid #fff;
+  background: #cfd8dc;
+  color: #222;
+  cursor: pointer;
+}
+
+.panel-acc button.activo {
+  background: #66bb6a;
+  color: #fff;
+}
+
+.escenario {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+}
+
+.lienzo-wrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  max-width: 520px;
+}
+
+#lienzo {
+  position: relative;
+  width: auto;
+  height: 100%;
+  max-width: min(480px, 92vw);
+  aspect-ratio: 645 / 1081;
+  background: rgba(0, 0, 0, 0.08);
+  border: 4px solid #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+
+#img-completo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 1;
+  background: #000;
+}
+
+#zonas,
+#resalte-capas {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.zona-toque {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: transparent;
+  pointer-events: none;
+  transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+body.mostrar-zonas .zona-toque {
+  border-color: rgba(229, 57, 53, 0.55);
+  background: rgba(229, 57, 53, 0.08);
+}
+
+.zona-toque.objetivo {
+  border-color: rgba(255, 193, 7, 0.9);
+  background: rgba(255, 213, 79, 0.28);
+  box-shadow: 0 0 16px rgba(255, 213, 79, 0.65);
+}
+
+.zona-toque.pista {
+  border-color: rgba(102, 187, 106, 0.95);
+  background: rgba(102, 187, 106, 0.3);
+  animation: pistaGlow 1s ease-in-out infinite;
+}
+
+.zona-toque.acierto {
+  border: 3px solid #00e5ff;
+  background: rgba(0, 229, 255, 0.55);
+  box-shadow: 0 0 0 4px rgba(255, 235, 59, 0.85), 0 0 28px rgba(0, 229, 255, 1);
+  animation: iluminar 0.7s ease;
+  z-index: 6;
+}
+
+@keyframes iluminar {
+  0% { transform: scale(0.92); filter: brightness(1.6); }
+  100% { transform: scale(1); filter: none; }
+}
+
+@keyframes pistaGlow {
+  0%, 100% { box-shadow: 0 0 10px #ffeb3b; }
+  50% { box-shadow: 0 0 24px #ff9800; }
+}
+
+.overlay {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  z-index: 1000;
+  position: fixed;
+}
+
+.overlay::before {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  content: url("../../images/normal1.gif") url("../../images/normal2.gif") url("../../images/ciencia/normal1.gif") url("../../images/ciencia/normal2.gif");
+}
+
+.preload-gifs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+}
+
+#personajes-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.personaje-char {
+  position: absolute;
+  bottom: 0;
+  top: auto;
+  height: 73%;
+  max-height: 480px;
+  background-size: 142% 120%;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+  opacity: 0;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+
+.personaje-char.uno {
+  width: 100%;
+  left: 0;
+}
+
+.personaje-char.izquierda {
+  width: 50%;
+  left: 5%;
+}
+
+.personaje-char.derecha {
+  width: 50%;
+  right: 5%;
+  left: auto;
+}
+
+.personaje-char.activo {
+  opacity: 1;
+  filter: none;
+  z-index: 2;
+}
+
+.personaje-char.inactivo {
+  opacity: 0.55;
+  filter: brightness(0.75);
+  z-index: 1;
+}
+
+@keyframes entradaIzquierda {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes entradaDerecha {
+  from { transform: translateX(100%) scaleX(-1); opacity: 0; }
+  to { transform: translateX(0) scaleX(-1); opacity: 1; }
+}
+
+@keyframes salidaIzquierda {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-100%); opacity: 0; }
+}
+
+@keyframes salidaDerecha {
+  from { transform: translateX(0) scaleX(-1); opacity: 1; }
+  to { transform: translateX(100%) scaleX(-1); opacity: 0; }
+}
+
+#bienvenida {
+  width: 100%;
+  padding: 0 6px;
+  font-size: 16px !important;
+  line-height: 1.45;
+  text-align: center;
+  margin: 0;
+  word-break: break-word;
+}
+
+.nube {
+  background-image: url(../../images/nube.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  width: min(510px);
+  height: min(489px);
+  min-height: 240px;
+  position: absolute;
+  z-index: 1003;
+  bottom: -460px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  animation-duration: 2.2s;
+  animation-fill-mode: forwards;
+  padding: 36px 32px 72px;
+  box-sizing: border-box;
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
+.nube-contenido {
+  width: 92%;
+  max-height: 78%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.nube-centro {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nube-izquierda {
+  left: 8%;
+  right: auto;
+  transform: none;
+}
+
+.nube-derecha {
+  left: 50%;
+  right: auto;
+  transform: scaleX(-1);
+}
+
+.nube-derecha .nube-contenido {
+  transform: scaleX(-1);
+}
+
+@keyframes moverArriba {
+  from { bottom: -360px; }
+  to { bottom: 38%; }
+}
+
+@keyframes moverabajo {
+  from { bottom: 38%; }
+  to { bottom: -360px; }
+}
+
+.final {
+  background-size: 45%;
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-position-y: top;
+  position: fixed;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.904);
+}
+
+.swal2-html-container {
+  overflow: hidden;
+}
+
+.swal2-popup {
+  width: min(640px, 92vw) !important;
+}
+
+.swal2-modal {
+  width: min(640px, 92vw) !important;
+}
+
+.swal2-popup.modal-feedback {
+  width: 420px !important;
+  padding: 22px 24px 28px;
+}
+
+.btn-eleccion {
+  width: 90%;
+  min-height: 90px;
+  font-size: 24px;
+  border-radius: 18px;
+  margin: 8px 0;
+}
+
+body.alto-contraste {
+  background: #111;
+}
+
+body.alto-contraste #lienzo {
+  background: #000;
+  border-color: #fff;
+}
+
+body.alto-contraste .hud-centro h1 {
+  color: #fff !important;
+  text-shadow: none;
+}
+
+body.alto-contraste .zona-toque {
+  border-width: 3px;
+}
+
+body.bloqueado #lienzo {
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .hud-centro h1 {
+    font-size: 20px;
+  }
+
+  .btn-round {
+    width: 56px;
+    height: 56px;
+    font-size: 24px;
+  }
+}

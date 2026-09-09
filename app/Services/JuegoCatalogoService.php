@@ -92,7 +92,9 @@ class JuegoCatalogoService
         return [
             'id' => $juego->id,
             'tipo' => $juego->tipo,
-            'tipo_label' => Juego::TIPOS_LABELS[$juego->tipo] ?? $juego->tipo,
+            'tipo_label' => $juego->tipoLabel(),
+            'ruta' => $juego->ruta,
+            'url_paquete' => $juego->urlPaquete(),
             'nombre' => $juego->nombre,
             'descripcion' => $juego->descripcion ?? '',
             'icono' => $juego->icono ?: 'fa-gamepad',

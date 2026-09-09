@@ -660,14 +660,13 @@
     ];
 
     function juegoCatalogoCardHtml(j, selectedCatalogoId) {
-        const motorId = j.tipo || j.id;
-        const catalogoId = j.tipo ? j.id : null;
+        const catalogoId = j.id;
         const selected = catalogoId && String(catalogoId) === String(selectedCatalogoId || '');
-        const icon = j.icon || j.icono || 'fa-gamepad';
+        const icon = j.icono || 'fa-gamepad';
         const iconClass = icon.indexOf('fa-') === 0 ? icon : `fa-${icon}`;
         const color = j.color || '#2563eb';
         const cadena = j.cadena || {};
-        const tipoLabel = j.tipo_label || motorId;
+        const tipoLabel = j.tipo_label || j.tipo || '';
         const descripcion = (j.descripcion || '').trim();
 
         const badges = [];
@@ -683,7 +682,7 @@
         if (cadena.tematica_nombre) {
             badges.push(`<span class="stu-badge">${escapar(cadena.tematica_nombre)}</span>`);
         }
-        if (j.tipo) {
+        if (tipoLabel) {
             badges.push(`<span class="stu-badge stu-badge--apoyo">${escapar(tipoLabel)}</span>`);
         }
 
@@ -693,7 +692,6 @@
 
         return `<button type="button"
             class="cx-juego-catalogo-card student-card${selected ? ' is-selected' : ''}"
-            data-juego-id="${escapar(motorId)}"
             data-juego-catalogo-id="${escapar(catalogoId || '')}"
             data-juego-nombre="${escapar(j.nombre || '')}"
             aria-pressed="${selected ? 'true' : 'false'}"
@@ -714,26 +712,19 @@
                 <small class="text-muted">${escapar(descripcion || 'Sin descripción')}</small>
             </div>
             <div class="cx-juego-catalogo-foot">
-                <span class="cx-juego-catalogo-action">${selected ? 'Seleccionado' : 'Usar este juego'}</span>
+                <span class="cx-juego-catalogo-action">${selected ? 'Seleccionado' : 'Relacionar este juego'}</span>
             </div>
         </button>`;
     }
 
-    function juegoCardHtml(j, selectedMotorId, selectedCatalogoId) {
-        const motorId = j.tipo || j.id;
-        const catalogoId = j.tipo ? j.id : null;
-        const selected = catalogoId
-            ? String(catalogoId) === String(selectedCatalogoId || '')
-            : (!selectedCatalogoId && String(motorId) === String(selectedMotorId || ''));
-        const icon = j.icon || j.icono || 'fa-gamepad';
+    function juegoCardHtml(j, selectedMotorId) {
+        const motorId = j.id;
+        const selected = String(motorId) === String(selectedMotorId || '');
+        const icon = j.icon || 'fa-gamepad';
         const iconClass = icon.indexOf('fa-') === 0 ? icon : `fa-${icon}`;
-        const cadena = j.cadena || {};
-        const meta = [cadena.ambiente_nombre, cadena.modulo_nombre, cadena.eje_nombre, cadena.tematica_nombre]
-            .filter(Boolean)
-            .join(' · ');
-        const desc = j.desc || j.descripcion || meta || '';
+        const desc = j.desc || '';
         return `<button type="button" class="cx-juego-card${selected ? ' is-selected' : ''}"
-            data-juego-id="${escapar(motorId)}" data-juego-catalogo-id="${escapar(catalogoId || '')}"
+            data-juego-id="${escapar(motorId)}"
             data-juego-nombre="${escapar(j.nombre || '')}" aria-pressed="${selected ? 'true' : 'false'}"
             ${puedeEditar ? '' : 'disabled'}>
             <span class="cx-juego-card-icon" style="--cx-juego-color:${escapar(j.color || '#2563eb')}">
@@ -749,13 +740,17 @@
     function fieldJuegoPicker(name, label, datos) {
         const value = datos?.juego_id || '';
         const catalogoId = datos?.juego_catalogo_id || '';
-        const cards = JUEGOS_OPCIONES.map((j) => juegoCardHtml(j, value, catalogoId)).join('');
+        const catalogoNombre = datos?.juego_nombre || '';
+        const cards = JUEGOS_OPCIONES.map((j) => juegoCardHtml(j, value)).join('');
         const btnCatalogo = (urlJuegosCatalogo && puedeEditar)
             ? `<div class="cx-inline-actions mb-2">
                 <button type="button" class="btn btn-outline-primary btn-sm" id="cxBtnJuegosModulo">
                     <i class="fa-solid fa-gamepad"></i> Catálogo del modulo de juegos
                 </button>
                </div>`
+            : '';
+        const resumenCatalogo = catalogoId
+            ? `<div class="cx-help mt-1">Relacionado al catálogo: <strong>${escapar(catalogoNombre || ('#' + catalogoId))}</strong> (id ${escapar(String(catalogoId))})</div>`
             : '';
         return `
             <div class="cx-field">
@@ -764,7 +759,8 @@
                 <input type="hidden" class="cx-input" data-field="${escapar(name)}" value="${escapar(value || '')}">
                 <input type="hidden" class="cx-input" data-field="juego_catalogo_id" value="${escapar(catalogoId || '')}">
                 <div class="cx-juego-picker" role="radiogroup" aria-label="${escapar(label)}">${cards}</div>
-                ${!value ? '<div class="cx-help">Elige un tipo de juego o abre el catálogo para seleccionar uno importado.</div>' : ''}
+                ${!value && !catalogoId ? '<div class="cx-help">Elige un motor embebido o relaciona un juego del catálogo.</div>' : ''}
+                ${resumenCatalogo}
             </div>`;
     }
 
@@ -2028,7 +2024,7 @@
         $juegosModuloPaginacion.prop('hidden', true).empty();
         $juegosModuloResumen.prop('hidden', true).empty();
         $juegosModuloLoading.prop('hidden', false);
-        $('#cxModalJuegosModuloSubtitle').text('Filtra y elige un juego para el bloque');
+        $('#cxModalJuegosModuloSubtitle').text('Filtra y relaciona un juego del catálogo con este bloque');
         setFiltrosJuegosAbiertos(false);
         modalJuegosModulo()?.show();
 
@@ -2040,13 +2036,18 @@
         cargarJuegosCatalogo(1);
     }
 
-    function aplicarJuegoCatalogo(tipo, nombre, catalogoId) {
+    /**
+     * Relaciona un paquete del catálogo SuperAdmin al bloque.
+     * No pisa juego_id con el tipo del paquete (eso son motores embebidos distintos).
+     */
+    function aplicarJuegoCatalogo(catalogoId, nombre) {
         const bloque = bloquePorId(seleccionadoId);
         if (!bloque) return;
         const datos = leerDatosDesdeForm(bloque);
-        datos.juego_id = tipo;
-        datos.juego_nombre = nombre || datos.juego_nombre || '';
         datos.juego_catalogo_id = catalogoId || null;
+        if (nombre) {
+            datos.juego_nombre = nombre;
+        }
         bloque.datos = datos;
         renderConfig(bloque);
         scheduleSave();
@@ -2077,10 +2078,9 @@
     });
 
     $juegosModuloLista.on('click', '.cx-juego-catalogo-card:not(:disabled)', function () {
-        const tipo = $(this).attr('data-juego-id');
         const catalogoId = $(this).attr('data-juego-catalogo-id') || null;
         const nombre = $(this).attr('data-juego-nombre') || '';
-        aplicarJuegoCatalogo(tipo, nombre, catalogoId);
+        aplicarJuegoCatalogo(catalogoId, nombre);
     });
 
     $configBody.on('input change', '.cx-input, .cx-check, .cx-correcta, .cx-correcta-paso, .cx-audio-linea-texto', function () {

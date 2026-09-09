@@ -6,6 +6,7 @@
  * Valores guardados por perfil → storage/app/parametros-perfil/{tipo}/{id}.json
  */
 return [
+    // IDs alineados a perfil_aprendizaje en BD (no inventar 7/8: físico=10, intelectual=9).
     'mapa_perfiles' => [
         1 => 'estandar',
         2 => 'tdah',
@@ -13,8 +14,8 @@ return [
         4 => 'down',
         5 => 'disc_visual',
         6 => 'disc_auditiva',
-        7 => 'disc_motriz',
-        8 => 'disc_intelectual',
+        9 => 'disc_intelectual',
+        10 => 'disc_motriz',
     ],
 
     'principios' => [
