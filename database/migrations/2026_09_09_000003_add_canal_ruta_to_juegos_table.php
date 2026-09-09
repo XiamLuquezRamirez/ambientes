@@ -56,6 +56,22 @@ return new class extends Migration
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
+            [
+                'ambiente_id' => $ambientePolimotorId,
+                'modulo_id' => null,
+                'eje_id' => null,
+                'tematica_id' => null,
+                'tipo' => 'lateralidad',
+                'ruta' => 'catalogo_juegos/Polimotor/Lateralidad',
+                'nombre' => 'Lateralidad (derecha/izquierda)',
+                'descripcion' => 'Discriminar derecha e izquierda tocando la parte del cuerpo indicada.',
+                'icono' => 'fa-arrows-left-right',
+                'color' => '#a5d6a7',
+                'orden' => 3,
+                'activo' => true,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
         ];
 
         foreach ($paquetes as $paquete) {

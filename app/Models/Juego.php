@@ -19,6 +19,7 @@ class Juego extends Model
     public const TIPOS_LABELS = [
         'rompecabezas_cuerpo' => 'Rompecabezas del cuerpo',
         'reconocimiento_partes' => 'Reconocimiento de partes',
+        'lateralidad' => 'Lateralidad (derecha/izquierda)',
     ];
 
     protected $fillable = [

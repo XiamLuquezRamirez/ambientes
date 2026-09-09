@@ -1,0 +1,126 @@
+/* Extiende Reconocimiento/style.css — solo capas de lateralidad */
+
+#lateralidad-lados {
+  position: absolute;
+  inset: 0;
+  display: none;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.lateralidad-lado {
+  position: absolute;
+  top: 8%;
+  bottom: 8%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 10%;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.lateralidad-lado span {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: rgba(26, 35, 126, 0.88);
+}
+
+.lateralidad-lado small {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.95;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+/* Mitad visual: izquierda de pantalla = DERECHA de la figura (frente) */
+.lateralidad-lado.fig-derecha {
+  left: 0;
+  right: 50%;
+  background: rgba(233, 30, 99, 0.22);
+  border-right: 3px dashed rgba(233, 30, 99, 0.55);
+}
+
+.lateralidad-lado.fig-izquierda {
+  left: 50%;
+  right: 0;
+  background: rgba(25, 118, 210, 0.22);
+  border-left: 3px dashed rgba(25, 118, 210, 0.55);
+}
+
+#lateralidad-hint {
+  position: absolute;
+  z-index: 8;
+  display: none;
+  pointer-events: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 14px 6px;
+  border-radius: 14px;
+  background: #1a237e;
+  color: #fff;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transform: translate(-50%, -115%);
+  outline: 3px solid rgba(255, 255, 255, 0.95);
+}
+
+#lateralidad-hint .hint-punta {
+  font-size: 14px;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+#lateralidad-hint.lado-derecha {
+  background: #c2185b;
+}
+
+#lateralidad-hint.lado-izquierda {
+  background: #1565c0;
+}
+
+#lateralidad-banda {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 6;
+  display: none;
+  pointer-events: none;
+  border: 0;
+}
+
+#lateralidad-banda.lado-derecha {
+  left: 0;
+  background: rgba(233, 30, 99, 0.28);
+  border-right: 3px solid rgba(233, 30, 99, 0.85);
+}
+
+#lateralidad-banda.lado-izquierda {
+  left: 50%;
+  background: rgba(25, 118, 210, 0.28);
+  border-left: 3px solid rgba(25, 118, 210, 0.85);
+}
+
+body.alto-contraste #lateralidad-hint {
+  background: #000;
+  color: #fff;
+  box-shadow: 0 0 0 3px #fff;
+}
+
+body.alto-contraste #lateralidad-banda.lado-derecha,
+body.alto-contraste #lateralidad-banda.lado-izquierda {
+  background: rgba(255, 255, 0, 0.22);
+  border-color: #ff0;
+}

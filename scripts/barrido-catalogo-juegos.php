@@ -67,6 +67,7 @@ foreach (['Index.html', 'inicio.html', 'styleJuego.css'] as $f) {
 $paquetes = [
     'Polimotor/Rompecabezas',
     'Polimotor/Reconocimiento',
+    'Polimotor/Lateralidad',
 ];
 foreach ($paquetes as $rel) {
     $idx = $base.'/'.$rel.'/index.html';
@@ -180,6 +181,7 @@ foreach ([
     '2026_09_09_000002_create_sesiones_juego_elementos_table',
     '2026_09_09_000003_add_canal_ruta_to_juegos_table',
     '2026_09_09_000004_juegos_solo_catalogo_paquetes',
+    '2026_09_09_000005_seed_juego_lateralidad',
 ] as $m) {
     $ok = DB::table('migrations')->where('migration', $m)->exists();
     if ($ok) {
@@ -331,8 +333,10 @@ if (str_contains($juegoSrc, 'CANAL_') || str_contains($juegoSrc, 'TIPO_ROMPECABE
     ok('Modelo Juego limpio (solo catálogo)');
 }
 
-if (str_contains($juegoSrc, 'rompecabezas_cuerpo')) {
-    ok('TIPOS_LABELS de paquetes presentes');
+if (str_contains($juegoSrc, 'rompecabezas_cuerpo') && str_contains($juegoSrc, 'lateralidad')) {
+    ok('TIPOS_LABELS de paquetes presentes (incl. lateralidad)');
+} elseif (str_contains($juegoSrc, 'rompecabezas_cuerpo')) {
+    fail('TIPOS_LABELS sin lateralidad');
 }
 
 echo "\n========== RESUMEN ==========\n";

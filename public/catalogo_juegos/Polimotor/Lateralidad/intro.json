@@ -1,0 +1,39 @@
+{
+  "personajes": [
+    {
+      "nombre": "Zoe",
+      "gif_idle": "../../images/normal1.gif",
+      "gif_hablando": "../../images/normal2.gif"
+    },
+    {
+      "nombre": "Zeus",
+      "gif_idle": "../../images/ciencia/normal1.gif",
+      "gif_hablando": "../../images/ciencia/normal2.gif"
+    }
+  ],
+  "conversacion": [
+    {
+      "personaje": 0,
+      "texto": "¡Vamos a jugar! Escucha con atención y toca el lado del cuerpo que te voy a indicar."
+    },
+    {
+      "personaje": 1,
+      "texto": "¡Yo soy Zeus! <br> Verás una figura completa de frente. Las partes se pueden tocar."
+    },
+    {
+      "personaje": 0,
+      "texto": "La figura está de frente: su derecha queda a tu izquierda."
+    },
+    {
+      "personaje": 1,
+      "texto": "¡Tú puedes! <br> Primero eliges niña o niño y tu edad."
+    }
+  ],
+  "configuracion": {
+    "intervalo": 50,
+    "pausaEntreLineas": 1800,
+    "pausaFinal": 2500,
+    "duracionCambioNube": 350
+  }
+}
+
