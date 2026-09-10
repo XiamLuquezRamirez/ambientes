@@ -41,7 +41,8 @@
   border-radius: 8px;
 }
 
-/* Mitad visual: izquierda de pantalla = DERECHA de la figura (frente) */
+/* Perspectiva anatómica de la figura de frente (espejo en pantalla):
+   derecha de la figura = izquierda visual; izquierda = derecha visual. */
 .lateralidad-lado.fig-derecha {
   left: 0;
   right: 50%;

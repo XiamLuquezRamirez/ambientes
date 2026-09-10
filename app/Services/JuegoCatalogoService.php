@@ -24,7 +24,6 @@ class JuegoCatalogoService
             'modulos' => Modulo::query()->oficiales()->orderBy('nombre')->get(['id', 'nombre', 'ambiente_id']),
             'ejes' => Eje::query()->oficiales()->orderBy('nombre')->get(['id', 'nombre', 'modulo_id']),
             'tematicas' => Tematica::query()->oficiales()->orderBy('nombre')->get(['id', 'nombre', 'eje_id']),
-            'tiposJuego' => Juego::TIPOS_LABELS,
         ];
     }
 
@@ -60,7 +59,7 @@ class JuegoCatalogoService
             ->paginate($perPage)
             ->withQueryString();
 
-        $filtros = $request->only(['q', 'ambiente_id', 'modulo_id', 'eje_id', 'tematica_id', 'tipo', 'estado']);
+        $filtros = $request->only(['q', 'ambiente_id', 'modulo_id', 'eje_id', 'tematica_id', 'estado']);
 
         return array_merge($this->opcionesFiltro(), [
             'juegos' => $juegos,
@@ -131,7 +130,8 @@ class JuegoCatalogoService
     public function serializarColeccionJson(Collection $juegos): array
     {
         return $juegos
-            ->map(fn (Juego $juego) => $this->serializarTarjeta($juego))            ->values()
+            ->map(fn (Juego $juego) => $this->serializarTarjeta($juego))
+            ->values()
             ->all();
     }
 
@@ -183,10 +183,6 @@ class JuegoCatalogoService
                 $q->where('nombre', 'like', $texto)
                     ->orWhere('descripcion', 'like', $texto);
             });
-        }
-
-        if ($request->filled('tipo')) {
-            $consulta->where('tipo', (string) $request->tipo);
         }
 
         if ($request->has('estado') && $request->input('estado') !== null && $request->input('estado') !== '') {

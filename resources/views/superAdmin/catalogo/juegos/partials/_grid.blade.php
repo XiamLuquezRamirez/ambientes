@@ -1,12 +1,12 @@
 @php
     $esLista = ($vista ?? 'grid') === 'list';
-    $hayFiltros = filled($filtros['q'] ?? null)
-        || filled($filtros['ambiente_id'] ?? null)
-        || filled($filtros['modulo_id'] ?? null)
-        || filled($filtros['eje_id'] ?? null)
-        || filled($filtros['tematica_id'] ?? null)
-        || filled($filtros['tipo'] ?? null)
-        || ($filtros['estado'] ?? '') !== '';
+    $hayFiltros =
+        filled($filtros['q'] ?? null) ||
+        filled($filtros['ambiente_id'] ?? null) ||
+        filled($filtros['modulo_id'] ?? null) ||
+        filled($filtros['eje_id'] ?? null) ||
+        filled($filtros['tematica_id'] ?? null) ||
+        ($filtros['estado'] ?? '') !== '';
 @endphp
 
 @include('partials.juegos._filtros', [
@@ -18,7 +18,6 @@
     'modulos' => $modulos,
     'ejes' => $ejes,
     'tematicas' => $tematicas,
-    'tiposJuego' => $tiposJuego,
     'formId' => 'formFiltrosJuegos',
 ])
 
@@ -31,11 +30,10 @@
         @foreach ($juegos as $juego)
             @include('superAdmin.catalogo.juegos.partials._card', [
                 'juego' => $juego,
-                'tiposJuego' => $tiposJuego,
             ])
         @endforeach
     </div>
-@elseif (! $hayFiltros)
+@elseif (!$hayFiltros)
     @include('superAdmin.catalogo.juegos.partials._empty')
 @else
     <div class="students-empty students-empty--filters">

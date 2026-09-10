@@ -18,11 +18,11 @@
     },
     {
       "personaje": 1,
-      "texto": "¡Yo soy Zeus! <br> Verás una figura completa de frente. Las partes se pueden tocar."
+      "texto": "¡Yo soy Zeus! <br> Verás una figura de frente. Toca la parte del cuerpo del lado que te digamos."
     },
     {
       "personaje": 0,
-      "texto": "La figura está de frente: su derecha queda a tu izquierda."
+      "texto": "La derecha y la izquierda son de la figura: su derecha queda a tu izquierda en la pantalla."
     },
     {
       "personaje": 1,
@@ -36,4 +36,3 @@
     "duracionCambioNube": 350
   }
 }
-
