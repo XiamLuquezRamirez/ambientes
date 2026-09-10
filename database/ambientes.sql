@@ -227,18 +227,18 @@ CREATE TABLE `bloques_experiencia` (
 /*Data for the table `bloques_experiencia` */
 
 insert  into `bloques_experiencia`(`id`,`experiencia_id`,`tipo`,`orden`,`datos`,`activo`,`created_at`,`updated_at`) values 
-(310,26,'bienvenida',1,'{\"video\": \"\", \"imagen\": \"buen_trabajo_6a958737241c6.jpg\", \"personaje\": \"personaje\", \"tipo_media\": \"imagen\", \"instruccion\": \"¡Hola! Hoy vamos a jugar con los colores. Escucha y mira con atención.\", \"descripcion_accesible\": \"Niño feliz con los pulgares arriba\"}',1,'2026-09-03 17:44:51','2026-09-09 17:25:30'),
-(311,26,'recompensa',12,'{\"tipo\": \"Trofeo\", \"insignia\": null, \"instruccion\": \"¡Excelente trabajo! Completaste la actividad de colores.\"}',1,'2026-09-03 17:44:51','2026-09-09 17:25:30'),
-(323,26,'imagen',3,'{\"archivo\": \"images_1__6a9f12d69e283.jpg\", \"descripcion\": \"Círculos de muchos colores\", \"instruccion\": \"Mira estos colores. ¿Reconoces alguno? Puedes acercar la imagen si quieres.\"}',1,'2026-09-08 09:04:13','2026-09-09 17:25:30'),
-(324,26,'pregunta',4,'{\"fb_ok\": \"¡Muy bien! El camión es rojo.\", \"texto\": \"¿Qué pintamos de este color?\", \"fb_err\": \"Mira otra vez. Busca algo de color rojo.\", \"imagen\": \"paint-splash-red-abstract-blot-burgundy-cartoon-paint-splatter-vector_6a9f13f23c935.jpg\", \"intentos\": \"3\", \"opciones\": [{\"emoji\": \"\", \"texto\": \"Plátano\", \"imagen\": \"images_2__6a9f142d784e3.jpg\", \"correcta\": false}, {\"emoji\": \"\", \"texto\": \"Limón\", \"imagen\": \"Dibujo-Basico-Limon_6a9f14066a866.jpg\", \"correcta\": false}, {\"emoji\": \"\", \"texto\": \"Camión\", \"imagen\": \"fire-truck-coloring-page-isolated-for-kids-free-vector_6a9f143342f12.jpg\", \"correcta\": true}, {\"emoji\": \"\", \"texto\": \"Uvas\", \"imagen\": \"icon-bunch-of-grapes-with-a-leaf-contour-drawing-of-fruit-illustration-vector_6a9ae101d714b.jpg\", \"correcta\": false}], \"al_agotar\": \"Mostrar respuesta correcta\", \"tipo_opts\": \"imagen_texto\", \"instruccion\": \"¿Qué pintamos de color rojo? Toca la imagen correcta.\"}',1,'2026-09-08 09:04:13','2026-09-09 17:25:30'),
-(325,26,'pregunta',5,'{\"fb_ok\": \"¡Sí! El sol es amarillo.\", \"texto\": \"¿De qué color es el sol?\", \"fb_err\": \"Piensa otra vez. ¿Qué color brilla en el cielo de día?\", \"imagen\": \"\", \"intentos\": \"3\", \"opciones\": [{\"emoji\": \"?\", \"texto\": \"Azul\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"texto\": \"Amarillo\", \"imagen\": \"\", \"correcta\": true}, {\"emoji\": \"?\", \"texto\": \"Verde\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"texto\": \"Rojo\", \"imagen\": \"\", \"correcta\": false}], \"al_agotar\": \"Mostrar respuesta correcta\", \"tipo_opts\": \"emoji_texto\", \"instruccion\": \"¿De qué color es el sol? Elige una opción.\"}',1,'2026-09-08 09:04:13','2026-09-09 17:25:30'),
-(326,26,'reto',6,'{\"fb_ok\": \"¡Paso logrado!\", \"pasos\": [{\"opciones\": [{\"emoji\": \"?\", \"label\": \"Azul\", \"imagen\": \"\", \"correcta\": true}, {\"emoji\": \"?\", \"label\": \"Rojo\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Amarillo\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Verde\", \"imagen\": \"\", \"correcta\": false}], \"pregunta\": \"¿Qué color tiene el mar?\"}, {\"opciones\": [{\"emoji\": \"?\", \"label\": \"Verde\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Azul\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Rojo\", \"imagen\": \"\", \"correcta\": true}, {\"emoji\": \"?\", \"label\": \"Amarillo\", \"imagen\": \"\", \"correcta\": false}], \"pregunta\": \"¿Qué color tiene la fresa?\"}], \"fb_err\": \"Inténtalo otra vez.\", \"intentos\": \"3\", \"al_agotar\": \"Mostrar respuesta correcta\", \"descripcion\": \"Reto de colores\", \"instruccion\": \"Completa los dos pasos del reto de colores.\"}',1,'2026-09-08 09:04:13','2026-09-09 17:25:30'),
-(327,26,'dibujo',7,'{\"fondo\": \"Fondo_prueba_6a9741b1d7c8e.png\", \"instruccion\": \"Dibuja tu color favorito en el lienzo.\", \"nota_evidencia\": \"Dibujo de prueba perfiles\", \"guardar_evidencia\": true}',1,'2026-09-08 09:04:13','2026-09-09 17:25:30'),
-(328,26,'juego',8,'{\"seq_1\": \"\", \"seq_2\": \"\", \"seq_3\": \"\", \"seq_4\": \"\", \"imagen_1\": \"Dibujo-Basico-Limon_6a9f14066a866.jpg\", \"imagen_2\": \"Fresa-Facil_6a9f148ab4bed.jpg\", \"imagen_3\": \"girasol_6a9f1490bea1a.jpg\", \"imagen_4\": \"mar_6a9f14856adf3.jpg\", \"imagen_5\": \"fire-truck-coloring-page-isolated-for-kids-free-vector_6a9f143342f12.jpg\", \"imagen_6\": \"icon-bunch-of-grapes-with-a-leaf-contour-drawing-of-fruit-illustration-vector_6a9ae101d714b.jpg\", \"juego_id\": \"memoria\", \"instruccion\": \"Encuentra las parejas iguales. Toca dos cartas.\", \"juego_imagen\": \"\", \"juego_nombre\": \"Memoria de colores\", \"juego_piezas\": \"\", \"colores_zonas\": [], \"juego_catalogo_id\": null}',1,'2026-09-08 09:04:13','2026-09-09 17:25:30'),
-(329,26,'juego',9,'{\"seq_1\": null, \"seq_2\": null, \"seq_3\": null, \"seq_4\": null, \"imagen_1\": null, \"imagen_2\": null, \"imagen_3\": null, \"imagen_4\": null, \"imagen_5\": null, \"imagen_6\": null, \"juego_id\": \"rompecabezas\", \"instruccion\": \"Arma el rompecabezas. Coloca cada pieza en su lugar.\", \"juego_imagen\": \"images_1__6a9f12d69e283.jpg\", \"juego_nombre\": \"Rompecabezas del cuerpo\", \"juego_piezas\": null, \"colores_zonas\": [], \"juego_catalogo_id\": \"21\"}',1,'2026-09-08 09:04:13','2026-09-09 17:25:59'),
-(330,26,'juego',10,'{\"seq_1\": \"paint-splash-red-abstract-blot-burgundy-cartoon-paint-splatter-vector_6a9f13f23c935.jpg\", \"seq_2\": \"Dibujo-Basico-Limon_6a9f14066a866.jpg\", \"seq_3\": \"mar_6a9f14856adf3.jpg\", \"seq_4\": \"girasol_6a9f1490bea1a.jpg\", \"imagen_1\": \"\", \"imagen_2\": \"\", \"imagen_3\": \"\", \"imagen_4\": \"\", \"imagen_5\": \"\", \"imagen_6\": \"\", \"juego_id\": \"secuencia\", \"instruccion\": \"Ordena las imágenes del uno al cuatro.\", \"juego_imagen\": \"\", \"juego_nombre\": \"Ordena los colores\", \"juego_piezas\": \"\", \"colores_zonas\": [], \"juego_catalogo_id\": null}',1,'2026-09-08 09:04:13','2026-09-09 17:25:30'),
-(331,26,'emocion',11,'{\"cantidad\": \"4\", \"instruccion\": \"¿Cómo te sentiste con esta actividad? Toca una cara.\"}',1,'2026-09-08 09:04:13','2026-09-09 17:25:30'),
-(332,26,'video',2,'{\"archivo\": \"Hola_bienvenidos_como_estan_amigos_karol_sevilla_6aa017fe4f6a7.mp4\", \"instruccion\": \"Observa\", \"descripcion_accesible\": null}',1,'2026-09-08 09:12:58','2026-09-09 17:25:30');
+(310,26,'bienvenida',1,'{\"video\": \"\", \"imagen\": \"buen_trabajo_6a958737241c6.jpg\", \"personaje\": \"personaje\", \"tipo_media\": \"imagen\", \"instruccion\": \"¡Hola! Hoy vamos a jugar con los colores. Escucha y mira con atención.\", \"descripcion_accesible\": \"Niño feliz con los pulgares arriba\"}',1,'2026-09-03 17:44:51','2026-09-10 09:16:03'),
+(311,26,'recompensa',12,'{\"tipo\": \"Trofeo\", \"insignia\": null, \"instruccion\": \"¡Excelente trabajo! Completaste la actividad de colores.\"}',1,'2026-09-03 17:44:51','2026-09-10 09:16:03'),
+(323,26,'imagen',3,'{\"archivo\": \"images_1__6a9f12d69e283.jpg\", \"descripcion\": \"Círculos de muchos colores\", \"instruccion\": \"Mira estos colores. ¿Reconoces alguno? Puedes acercar la imagen si quieres.\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(324,26,'pregunta',4,'{\"fb_ok\": \"¡Muy bien! El camión es rojo.\", \"texto\": \"¿Qué pintamos de este color?\", \"fb_err\": \"Mira otra vez. Busca algo de color rojo.\", \"imagen\": \"paint-splash-red-abstract-blot-burgundy-cartoon-paint-splatter-vector_6a9f13f23c935.jpg\", \"intentos\": \"3\", \"opciones\": [{\"emoji\": \"\", \"texto\": \"Plátano\", \"imagen\": \"images_2__6a9f142d784e3.jpg\", \"correcta\": false}, {\"emoji\": \"\", \"texto\": \"Limón\", \"imagen\": \"Dibujo-Basico-Limon_6a9f14066a866.jpg\", \"correcta\": false}, {\"emoji\": \"\", \"texto\": \"Camión\", \"imagen\": \"fire-truck-coloring-page-isolated-for-kids-free-vector_6a9f143342f12.jpg\", \"correcta\": true}, {\"emoji\": \"\", \"texto\": \"Uvas\", \"imagen\": \"icon-bunch-of-grapes-with-a-leaf-contour-drawing-of-fruit-illustration-vector_6a9ae101d714b.jpg\", \"correcta\": false}], \"al_agotar\": \"Mostrar respuesta correcta\", \"tipo_opts\": \"imagen_texto\", \"instruccion\": \"¿Qué pintamos de color rojo? Toca la imagen correcta.\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(325,26,'pregunta',5,'{\"fb_ok\": \"¡Sí! El sol es amarillo.\", \"texto\": \"¿De qué color es el sol?\", \"fb_err\": \"Piensa otra vez. ¿Qué color brilla en el cielo de día?\", \"imagen\": \"\", \"intentos\": \"3\", \"opciones\": [{\"emoji\": \"?\", \"texto\": \"Azul\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"texto\": \"Amarillo\", \"imagen\": \"\", \"correcta\": true}, {\"emoji\": \"?\", \"texto\": \"Verde\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"texto\": \"Rojo\", \"imagen\": \"\", \"correcta\": false}], \"al_agotar\": \"Mostrar respuesta correcta\", \"tipo_opts\": \"emoji_texto\", \"instruccion\": \"¿De qué color es el sol? Elige una opción.\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(326,26,'reto',6,'{\"fb_ok\": \"¡Paso logrado!\", \"pasos\": [{\"opciones\": [{\"emoji\": \"?\", \"label\": \"Azul\", \"imagen\": \"\", \"correcta\": true}, {\"emoji\": \"?\", \"label\": \"Rojo\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Amarillo\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Verde\", \"imagen\": \"\", \"correcta\": false}], \"pregunta\": \"¿Qué color tiene el mar?\"}, {\"opciones\": [{\"emoji\": \"?\", \"label\": \"Verde\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Azul\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Rojo\", \"imagen\": \"\", \"correcta\": true}, {\"emoji\": \"?\", \"label\": \"Amarillo\", \"imagen\": \"\", \"correcta\": false}], \"pregunta\": \"¿Qué color tiene la fresa?\"}], \"fb_err\": \"Inténtalo otra vez.\", \"intentos\": \"3\", \"al_agotar\": \"Mostrar respuesta correcta\", \"descripcion\": \"Reto de colores\", \"instruccion\": \"Completa los dos pasos del reto de colores.\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(327,26,'dibujo',7,'{\"fondo\": \"Fondo_prueba_6a9741b1d7c8e.png\", \"instruccion\": \"Dibuja tu color favorito en el lienzo.\", \"nota_evidencia\": \"Dibujo de prueba perfiles\", \"guardar_evidencia\": true}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(328,26,'juego',8,'{\"seq_1\": \"\", \"seq_2\": \"\", \"seq_3\": \"\", \"seq_4\": \"\", \"imagen_1\": \"Dibujo-Basico-Limon_6a9f14066a866.jpg\", \"imagen_2\": \"Fresa-Facil_6a9f148ab4bed.jpg\", \"imagen_3\": \"girasol_6a9f1490bea1a.jpg\", \"imagen_4\": \"mar_6a9f14856adf3.jpg\", \"imagen_5\": \"fire-truck-coloring-page-isolated-for-kids-free-vector_6a9f143342f12.jpg\", \"imagen_6\": \"icon-bunch-of-grapes-with-a-leaf-contour-drawing-of-fruit-illustration-vector_6a9ae101d714b.jpg\", \"juego_id\": \"memoria\", \"instruccion\": \"Encuentra las parejas iguales. Toca dos cartas.\", \"juego_imagen\": \"\", \"juego_nombre\": \"Memoria de colores\", \"juego_piezas\": \"\", \"colores_zonas\": [], \"juego_catalogo_id\": null}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(329,26,'juego',9,'{\"seq_1\": null, \"seq_2\": null, \"seq_3\": null, \"seq_4\": null, \"imagen_1\": null, \"imagen_2\": null, \"imagen_3\": null, \"imagen_4\": null, \"imagen_5\": null, \"imagen_6\": null, \"juego_id\": \"rompecabezas\", \"instruccion\": \"Arma el rompecabezas. Coloca cada pieza en su lugar.\", \"juego_imagen\": \"images_1__6a9f12d69e283.jpg\", \"juego_nombre\": \"Rompecabezas del cuerpo\", \"juego_piezas\": null, \"colores_zonas\": [], \"juego_catalogo_id\": \"21\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(330,26,'juego',10,'{\"seq_1\": \"paint-splash-red-abstract-blot-burgundy-cartoon-paint-splatter-vector_6a9f13f23c935.jpg\", \"seq_2\": \"Dibujo-Basico-Limon_6a9f14066a866.jpg\", \"seq_3\": \"mar_6a9f14856adf3.jpg\", \"seq_4\": \"girasol_6a9f1490bea1a.jpg\", \"imagen_1\": \"\", \"imagen_2\": \"\", \"imagen_3\": \"\", \"imagen_4\": \"\", \"imagen_5\": \"\", \"imagen_6\": \"\", \"juego_id\": \"secuencia\", \"instruccion\": \"Ordena las imágenes del uno al cuatro.\", \"juego_imagen\": \"\", \"juego_nombre\": \"Ordena los colores\", \"juego_piezas\": \"\", \"colores_zonas\": [], \"juego_catalogo_id\": null}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(331,26,'emocion',11,'{\"cantidad\": \"4\", \"instruccion\": \"¿Cómo te sentiste con esta actividad? Toca una cara.\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(332,26,'video',2,'{\"archivo\": \"Hola_bienvenidos_como_estan_amigos_karol_sevilla_6aa017fe4f6a7.mp4\", \"instruccion\": \"Observa\", \"descripcion_accesible\": null}',1,'2026-09-08 09:12:58','2026-09-10 09:16:03');
 
 /*Table structure for table `carga_docente` */
 
@@ -374,7 +374,7 @@ CREATE TABLE `clases` (
 /*Data for the table `clases` */
 
 insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values 
-(12,6,2,9,'Identifica los colores',NULL,'2026-09-08','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09');
+(12,6,2,9,'Identifica los colores',NULL,'2026-09-10','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09');
 
 /*Table structure for table `cola_sincronizacion` */
 
@@ -632,7 +632,7 @@ CREATE TABLE `ejes` (
   CONSTRAINT `ejes_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `docentes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `ejes_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL,
   CONSTRAINT `ejes_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `ejes` */
 
@@ -643,7 +643,8 @@ insert  into `ejes`(`id`,`modulo_id`,`institucion_id`,`creado_por`,`nombre`,`slu
 (4,1,NULL,NULL,'Explora','explora',NULL,'ninguno',NULL,NULL,NULL,NULL,3,1,1,'2026-08-07 09:17:25','2026-08-11 08:55:56'),
 (7,1,1,2,'Baile','baile',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,0,'2026-08-10 10:17:27','2026-08-10 10:17:27'),
 (8,3,1,2,'Integrales','integrales',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,0,'2026-08-10 14:26:47','2026-08-10 14:27:38'),
-(10,8,NULL,NULL,'La Vista','la-vista',NULL,'imagen','local','aa8c8f3b-2247-44c1-b732-2579ad7e0469.png',NULL,'directo',1,1,1,'2026-08-28 15:30:48','2026-08-29 09:14:38');
+(10,8,NULL,NULL,'La Vista','la-vista',NULL,'imagen','local','aa8c8f3b-2247-44c1-b732-2579ad7e0469.png',NULL,'directo',1,1,1,'2026-08-28 15:30:48','2026-08-29 09:14:38'),
+(11,9,NULL,NULL,'Conocimiento y control corporal','conocimiento-y-control-corporal',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,1,'2026-09-10 09:10:37','2026-09-10 09:10:37');
 
 /*Table structure for table `estudiante_ambiente` */
 
@@ -1069,13 +1070,14 @@ CREATE TABLE `juegos` (
   CONSTRAINT `juegos_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `juegos` */
 
 insert  into `juegos`(`id`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo`,`ruta`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
 (21,7,NULL,NULL,NULL,'rompecabezas_cuerpo','catalogo_juegos/Polimotor/Rompecabezas','Rompecabezas del cuerpo','Armar el cuerpo humano arrastrando piezas según el nivel de edad.','fa-puzzle-piece','#ffd54f',1,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
-(22,7,NULL,NULL,NULL,'reconocimiento_partes','catalogo_juegos/Polimotor/Reconocimiento','Reconocimiento de partes del cuerpo','Tocar las partes del cuerpo indicadas según el nivel de edad.','fa-hand-pointer','#81d4fa',2,1,'2026-09-09 16:58:39','2026-09-09 16:58:39');
+(22,7,NULL,NULL,NULL,'reconocimiento_partes','catalogo_juegos/Polimotor/Reconocimiento','Reconocimiento de partes del cuerpo','Tocar las partes del cuerpo indicadas según el nivel de edad.','fa-hand-pointer','#81d4fa',2,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
+(23,7,NULL,NULL,NULL,'lateralidad','catalogo_juegos/Polimotor/Lateralidad','Lateralidad (derecha/izquierda)','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','fa-arrows-left-right','#a5d6a7',3,1,'2026-09-09 17:47:30','2026-09-09 17:47:30');
 
 /*Table structure for table `matriculas` */
 
@@ -1144,7 +1146,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `migrations` */
 
@@ -1201,7 +1203,8 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (53,'2026_09_09_000003_add_canal_ruta_to_juegos_table',23),
 (54,'2026_09_09_000001_create_sesiones_juego_table',24),
 (55,'2026_09_09_000002_create_sesiones_juego_elementos_table',24),
-(56,'2026_09_09_000004_juegos_solo_catalogo_paquetes',25);
+(56,'2026_09_09_000004_juegos_solo_catalogo_paquetes',25),
+(57,'2026_09_09_000005_seed_juego_lateralidad',26);
 
 /*Table structure for table `modulo_institucion` */
 
@@ -1219,7 +1222,7 @@ CREATE TABLE `modulo_institucion` (
   KEY `modulo_institucion_institucion_id_foreign` (`institucion_id`),
   CONSTRAINT `modulo_institucion_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE CASCADE,
   CONSTRAINT `modulo_institucion_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `modulo_institucion` */
 
@@ -1228,7 +1231,8 @@ insert  into `modulo_institucion`(`id`,`modulo_id`,`institucion_id`,`activo`,`cr
 (49,2,1,1,'2026-09-04 15:11:24','2026-09-04 15:11:24'),
 (50,4,1,1,'2026-09-04 15:11:24','2026-09-04 15:11:24'),
 (51,3,1,1,'2026-09-04 15:11:24','2026-09-04 15:11:24'),
-(52,8,1,1,'2026-09-04 15:11:24','2026-09-04 15:11:24');
+(52,8,1,1,'2026-09-04 15:11:24','2026-09-04 15:11:24'),
+(53,9,1,1,'2026-09-10 09:09:11','2026-09-10 09:09:11');
 
 /*Table structure for table `modulos` */
 
@@ -1256,7 +1260,7 @@ CREATE TABLE `modulos` (
   PRIMARY KEY (`id`),
   KEY `modulos_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `modulos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `modulos` */
 
@@ -1265,7 +1269,8 @@ insert  into `modulos`(`id`,`ambiente_id`,`institucion_id`,`nombre`,`slug`,`desc
 (2,6,NULL,'Dibujo','dibujo',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,2,1,1,'2026-08-06 11:39:29','2026-08-11 09:09:48',1),
 (3,8,NULL,'Matematicas','matematicas',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,1,1,1,'2026-08-06 11:41:54','2026-08-06 11:41:54',1),
 (4,6,NULL,'Canto','canto',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,3,1,1,'2026-08-06 14:19:49','2026-08-06 14:42:48',1),
-(8,9,NULL,'Explorando los sentidos','explorando-los-sentidos',NULL,'video','local','df666626-2e4a-4ed2-9f15-8c475d02d67b.mp4',NULL,'directo',NULL,1,1,1,'2026-08-28 15:17:03','2026-08-29 08:17:20',1);
+(8,9,NULL,'Explorando los sentidos','explorando-los-sentidos',NULL,'video','local','df666626-2e4a-4ed2-9f15-8c475d02d67b.mp4',NULL,'directo',NULL,1,1,1,'2026-08-28 15:17:03','2026-08-29 08:17:20',1),
+(9,7,NULL,'Juegos de aprendizaje','juegos-de-aprendizaje',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,1,1,1,'2026-09-10 09:09:11','2026-09-10 09:09:11',1);
 
 /*Table structure for table `municipios` */
 
@@ -3164,7 +3169,7 @@ CREATE TABLE `registros_acceso` (
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=471 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=472 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `registros_acceso` */
 
@@ -3603,7 +3608,8 @@ insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) v
 (467,16,'127.0.0.1','multisensorial','2026-09-08 14:21:28','inicio_sesion'),
 (468,4,'127.0.0.1','multisensorial','2026-09-08 14:21:43','inicio_sesion'),
 (469,16,'127.0.0.1','multisensorial','2026-09-08 14:36:42','inicio_sesion'),
-(470,1,'127.0.0.1','multisensorial','2026-09-09 16:56:36','inicio_sesion');
+(470,1,'127.0.0.1','multisensorial','2026-09-09 16:56:36','inicio_sesion'),
+(471,1,'127.0.0.1','multisensorial','2026-09-10 08:16:03','inicio_sesion');
 
 /*Table structure for table `resultados_bloque_nino` */
 
@@ -3714,7 +3720,7 @@ CREATE TABLE `seguridad_logs` (
   KEY `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
   CONSTRAINT `seguridad_logs_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `seguridad_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=447 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=448 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `seguridad_logs` */
 
@@ -4162,7 +4168,8 @@ insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripci
 (443,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-08 14:21:28','2026-09-08 14:21:28'),
 (444,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-08 14:21:43','2026-09-08 14:21:43'),
 (445,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-08 14:36:42','2026-09-08 14:36:42'),
-(446,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-09 16:56:36','2026-09-09 16:56:36');
+(446,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-09 16:56:36','2026-09-09 16:56:36'),
+(447,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-10 08:16:03','2026-09-10 08:16:03');
 
 /*Table structure for table `sesiones_juego` */
 
@@ -4292,14 +4299,15 @@ CREATE TABLE `tematicas` (
   CONSTRAINT `tematicas_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `tematicas_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `tematicas_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `tematicas` */
 
 insert  into `tematicas`(`id`,`eje_id`,`nombre`,`competencia`,`referente_alternativo`,`requiere_ra`,`requiere_acompanamiento`,`es_oficial`,`institucion_id`,`estado`,`activo`,`creado_por`,`created_at`,`updated_at`) values 
 (1,8,'Primera Prueba',NULL,NULL,1,0,0,1,'activa',1,16,'2026-08-14 16:27:43','2026-08-14 16:28:49'),
 (3,8,'Prueba docente',NULL,NULL,0,1,0,1,'activa',1,4,'2026-08-15 08:28:19','2026-08-18 15:12:47'),
-(7,10,'Identifica los colores',NULL,NULL,0,0,1,NULL,'activa',1,1,'2026-08-28 15:31:20','2026-08-29 09:31:01');
+(7,10,'Identifica los colores',NULL,NULL,0,0,1,NULL,'activa',1,1,'2026-08-28 15:31:20','2026-08-29 09:31:01'),
+(8,11,'Rompecabezas del cuerpo humano',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-09-10 09:11:10','2026-09-10 09:11:10');
 
 /*Table structure for table `users` */
 
