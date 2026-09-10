@@ -72,13 +72,66 @@ class JuegoCatalogoService
     }
 
     /**
+     * Paquetes activos del ambiente (catálogo kiosco / recorrido niño).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function listarActivosPorAmbiente(int $ambienteId): array
+    {
+        $consulta = Juego::query()
+            ->activos()
+            ->whereNotNull('ruta')
+            ->where('ruta', '!=', '');
+
+        $this->aplicarFiltroAmbiente($consulta, $ambienteId);
+
+        $juegos = $consulta
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get();
+
+        return $this->serializarColeccionJson($juegos);
+    }
+
+    /**
+     * @param  iterable<int, int|string>  $ids
+     * @return array<int, array{url:?string, nombre:?string, icono:?string, color:?string}>
+     */
+    public function mapaPaquetesPorIds(iterable $ids): array
+    {
+        $ids = collect($ids)
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn (int $id) => $id > 0)
+            ->unique()
+            ->values();
+
+        if ($ids->isEmpty()) {
+            return [];
+        }
+
+        return Juego::query()
+            ->whereIn('id', $ids)
+            ->get(['id', 'nombre', 'ruta', 'icono', 'color', 'activo'])
+            ->mapWithKeys(function (Juego $juego) {
+                return [
+                    (int) $juego->id => [
+                        'url' => $juego->activo ? $juego->urlPaquete() : null,
+                        'nombre' => $juego->nombre,
+                        'icono' => $juego->icono ?: 'fa-gamepad',
+                        'color' => $juego->color ?: '#2563eb',
+                    ],
+                ];
+            })
+            ->all();
+    }
+
+    /**
      * @return list<array<string, mixed>>
      */
     public function serializarColeccionJson(Collection $juegos): array
     {
         return $juegos
-            ->map(fn (Juego $juego) => $this->serializarTarjeta($juego))
-            ->values()
+            ->map(fn (Juego $juego) => $this->serializarTarjeta($juego))            ->values()
             ->all();
     }
 

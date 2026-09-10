@@ -339,6 +339,43 @@ if (str_contains($juegoSrc, 'rompecabezas_cuerpo') && str_contains($juegoSrc, 'l
     fail('TIPOS_LABELS sin lateralidad');
 }
 
+$banco = file_get_contents(public_path('assets/js/banco-juegos.js'));
+if (str_contains($banco, 'JUEGOS_MOCK') || str_contains($banco, 'memoria-animales')) {
+    fail('banco-juegos.js aún usa juegos mock/genéricos');
+} else {
+    ok('banco-juegos.js usa catálogo PedNia');
+}
+if (! str_contains($banco, 'url_paquete') || ! str_contains($banco, 'bj-iframe')) {
+    fail('banco-juegos.js no abre paquetes en iframe');
+} else {
+    ok('banco-juegos.js abre paquetes en iframe');
+}
+
+$vn = file_get_contents(public_path('assets/js/constructor-vista-nino.js'));
+if (! str_contains($vn, 'juego_catalogo_url') || ! str_contains($vn, 'vn-catalogo-iframe')) {
+    fail('Vista Niño no renderiza paquetes del catálogo');
+} else {
+    ok('Vista Niño soporta juego_catalogo_url');
+}
+
+if (str_contains(file_get_contents(resource_path('views/superAdmin/catalogo/juegos/partials/_card.blade.php')), 'target="_blank"')) {
+    fail('Vista previa SuperAdmin aún abre en pestaña nueva');
+} else {
+    ok('Vista previa SuperAdmin usa overlay (sin target=_blank)');
+}
+if (! str_contains(file_get_contents(resource_path('views/superAdmin/catalogo/juegos/index.blade.php')), 'cjPreviewOverlay')) {
+    fail('Falta overlay cjPreviewOverlay en index de juegos SuperAdmin');
+} else {
+    ok('Overlay tablet de preview presente en SuperAdmin juegos');
+}
+
+try {
+    $urlCat = route('ambiente.juegos-catalogo');
+    ok('Ruta ambiente.juegos-catalogo → '.$urlCat);
+} catch (Throwable $e) {
+    fail('Ruta ambiente.juegos-catalogo: '.$e->getMessage());
+}
+
 echo "\n========== RESUMEN ==========\n";
 echo 'OK: '.count($oks)."\n";
 echo 'WARN: '.count($avisos)."\n";

@@ -1277,7 +1277,11 @@
 
     function juegoHeadHtml(bloque, d, id, opts) {
         const o = opts || {};
-        const titulo = escapar(d.juego_nombre || bloque?.nombre || (id === 'colorear' ? 'Colorea' : 'Juego'));
+        const titulo = escapar(
+            (id === 'catalogo' && o.catalogoNombre)
+                ? o.catalogoNombre
+                : (d.juego_nombre || bloque?.nombre || (id === 'colorear' ? 'Colorea' : 'Juego'))
+        );
         const paintCls = id === 'colorear' ? ' vn-juego-head--paint' : '';
         let extra = '';
         if (id === 'memoria' && o.paresTotal != null) {
@@ -1304,9 +1308,11 @@
     function renderJuego(bloque) {
         const d = datos(bloque);
         const id = d.juego_id || '';
+        const catalogoUrl = d.juego_catalogo_url || '';
         let extra = '';
         let cardClass = 'juego';
         let headOpts = {};
+
         if (id === 'memoria') {
             cardClass = 'juego-memoria';
             const imgsAll = [1, 2, 3, 4, 5, 6].map((i) => d[`imagen_${i}`]).filter(Boolean);
@@ -1345,6 +1351,19 @@
                 };
             }
             extra = renderSecuencia(d);
+        } else if (catalogoUrl) {
+            const nombre = d.juego_catalogo_nombre || d.juego_nombre || 'Juego';
+            cardClass = 'juego juego-catalogo';
+            headOpts = { catalogoNombre: nombre };
+            extra = `
+                <div class="vn-catalogo-wrap" data-vn-catalogo-juego>
+                    <iframe class="vn-catalogo-iframe"
+                        title="${escapar(nombre)}"
+                        src="${escapar(catalogoUrl)}"
+                        allow="autoplay; fullscreen"
+                        referrerpolicy="same-origin"></iframe>
+                </div>`;
+            return wrap(`${juegoHeadHtml(bloque, d, 'catalogo', headOpts)}${extra}`, bloque, cardClass);
         } else {
             extra = '<p class="vn-empty">Elige un juego en la configuración</p>';
         }
@@ -1972,11 +1991,13 @@
         clearTimeout(fbHideTimer);
         fbHideTimer = null;
         $body.removeData('vn-bloque-visto vn-bienvenida-video-ok vn-evidencia-ok');
+        $body.find('.vn-catalogo-iframe').attr('src', 'about:blank');
         $body.toggleClass('vn-body--paint', esBloquePintar(bloque));
         $body.html(renderBloque(bloque));
         $btnPrev.prop('disabled', index <= 0);
         renderProgress();
         initInteracciones(bloque);
+        enlazarCatalogoJuego(bloque);
         actualizarNavBloque();
         $body.scrollTop(0);
         programarAjusteLayout(function () {
@@ -2296,6 +2317,39 @@
         actualizarNavBloque();
     }
 
+    function perfilPayloadKiosco() {
+        try {
+            const el = document.getElementById('kiosco-perfil-params');
+            if (!el) return window.__PEDNIA_PERFIL__ || null;
+            return JSON.parse(el.textContent || 'null');
+        } catch (e) {
+            return window.__PEDNIA_PERFIL__ || null;
+        }
+    }
+
+    function inyectarPerfilEnFrame(frame) {
+        const perfil = perfilPayloadKiosco();
+        if (!perfil || !frame || !frame.contentWindow) return;
+        try {
+            frame.contentWindow.__PEDNIA_PERFIL__ = perfil;
+            frame.contentWindow.postMessage({
+                type: 'pednia:perfil',
+                perfil: perfil,
+            }, window.location.origin);
+        } catch (e) { /* noop */ }
+    }
+
+    function enlazarCatalogoJuego(bloque) {
+        const $frame = $body.find('[data-vn-catalogo-juego] iframe');
+        if (!$frame.length) return;
+        $frame.off('load.vnCatalogo').on('load.vnCatalogo', function () {
+            inyectarPerfilEnFrame(this);
+            if (bloque && bloque.tipo === 'juego' && !datos(bloque).juego_id) {
+                marcarBloqueVisto();
+            }
+        });
+    }
+
     function itemsPoolCompletos($items) {
         if (!$items.length) return true;
         return $items.filter(':not(.is-matched)').filter(function () {
@@ -2373,6 +2427,9 @@
                         (paint.history && paint.history.length > 1)
                         || paint.restauradoConContenido
                     ));
+                }
+                if (d.juego_catalogo_url || $body.find('[data-vn-catalogo-juego]').length) {
+                    return !!$body.data('vn-bloque-visto');
                 }
                 return !!$body.data('vn-bloque-visto');
             }

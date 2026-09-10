@@ -16,6 +16,7 @@ class BloqueExperienciaService
     public function __construct(
         private BloqueDatosRegistry $registry,
         private InstruccionAudioService $instruccionesAudio,
+        private JuegoCatalogoService $catalogoJuegos,
     ) {}
 
     public function asegurarObligatorios(Experiencia $experiencia): Collection
@@ -54,11 +55,13 @@ class BloqueExperienciaService
 
     public function listar(Experiencia $experiencia): Collection
     {
-        return $experiencia->bloques()
+        $bloques = $experiencia->bloques()
             ->with('instruccionesAudio')
             ->orderBy('orden')
             ->get()
-            ->map(fn (BloqueExperiencia $b) => $this->serializarBloque($b));
+            ->map(fn (BloqueExperiencia $b) => $this->serializarBloqueSinCatalogo($b));
+
+        return $this->enriquecerCatalogoJuegos($bloques);
     }
 
     public function agregar(Experiencia $experiencia, string $tipo): BloqueExperiencia
@@ -293,6 +296,16 @@ class BloqueExperienciaService
      */
     public function serializarBloque(BloqueExperiencia $bloque): array
     {
+        return $this->enriquecerCatalogoJuegos(
+            collect([$this->serializarBloqueSinCatalogo($bloque)])
+        )->first();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function serializarBloqueSinCatalogo(BloqueExperiencia $bloque): array
+    {
         $meta = $this->registry->metaTipo($bloque->tipo);
         $datos = $this->registry->normalizar($bloque->tipo, $bloque->datos ?? []);
 
@@ -330,6 +343,35 @@ class BloqueExperienciaService
             'puede_eliminar' => $bloque->puedeEliminar(),
             'puede_mover' => $bloque->puedeMover(),
         ];
+    }
+
+    /**
+     * @param  Collection<int, array<string, mixed>>  $bloques
+     * @return Collection<int, array<string, mixed>>
+     */
+    private function enriquecerCatalogoJuegos(Collection $bloques): Collection
+    {
+        $ids = $bloques
+            ->map(fn (array $b) => $b['datos']['juego_catalogo_id'] ?? null)
+            ->filter()
+            ->values();
+
+        $mapa = $this->catalogoJuegos->mapaPaquetesPorIds($ids);
+        if ($mapa === []) {
+            return $bloques;
+        }
+
+        return $bloques->map(function (array $bloque) use ($mapa) {
+            $id = (int) ($bloque['datos']['juego_catalogo_id'] ?? 0);
+            if ($id > 0 && isset($mapa[$id])) {
+                $bloque['datos']['juego_catalogo_url'] = $mapa[$id]['url'];
+                $bloque['datos']['juego_catalogo_nombre'] = $mapa[$id]['nombre'];
+                $bloque['datos']['juego_catalogo_icono'] = $mapa[$id]['icono'];
+                $bloque['datos']['juego_catalogo_color'] = $mapa[$id]['color'];
+            }
+
+            return $bloque;
+        });
     }
 
     public function registry(): BloqueDatosRegistry

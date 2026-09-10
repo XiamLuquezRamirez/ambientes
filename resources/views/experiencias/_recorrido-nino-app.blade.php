@@ -49,7 +49,9 @@
     data-estudiante-grado="{{ $gradoNombre }}" data-nivel-etario="{{ $nivelEtario }}"
     data-emociones-base="{{ $emocionesBase }}" data-url-experiencia="{{ $urlExperienciaTemplate }}"
     data-url-tts="{{ $urlTts }}" data-url-salir="{{ $urlSalir ?? '' }}"
-    data-url-continuar="{{ $urlContinuar ?? '' }}" data-portada-img="{{ $portadaImg }}"
+    data-url-continuar="{{ $urlContinuar ?? '' }}"
+    data-url-juegos-catalogo="{{ $urlJuegosCatalogo ?? url('/juegos-catalogo') }}"
+    data-portada-img="{{ $portadaImg }}"
     data-fondo-img="{{ $fondoImg }}">
     <script type="application/json" id="rn-arbol">@json($arbol)</script>
     @if (!empty($camino))

@@ -367,9 +367,11 @@ class BloqueDatosRegistry
 
             case BloqueExperiencia::TIPO_JUEGO:
                 $req('instruccion', 'Instrucción de audio');
-                if ($this->vacio($datos['juego_id'] ?? null)) {
+                $tieneMotor = ! $this->vacio($datos['juego_id'] ?? null);
+                $tieneCatalogo = ! $this->vacio($datos['juego_catalogo_id'] ?? null);
+                if (! $tieneMotor && ! $tieneCatalogo) {
                     $pendientes[] = 'Juego';
-                } else {
+                } elseif ($tieneMotor) {
                     $pendientes = array_merge($pendientes, $this->pendientesJuego($datos));
                 }
                 break;

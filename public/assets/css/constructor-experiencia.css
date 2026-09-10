@@ -987,6 +987,20 @@
     outline: none;
 }
 
+.cx-modal-juegos .students-toolbar .btn-limpiar-filtros {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+    white-space: nowrap;
+}
+
+.cx-modal-juegos .students-toolbar .btn-limpiar-filtros[hidden] {
+    display: none !important;
+}
+
 .cx-modal-juegos .cx-juegos-modal-resumen .stat-card {
     background: var(--stu-bg, #fff);
     border: 1px solid var(--stu-border, #E2E8F0);

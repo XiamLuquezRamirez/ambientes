@@ -3,6 +3,36 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/constructor-vista-nino.css') }}?v={{ @filemtime(public_path('assets/css/constructor-vista-nino.css')) }}">
+    <style>
+        /* Preview catálogo: tablet sin nav de bloques, iframe a pantalla completa */
+        #cjPreviewOverlay .vn-screen-nav { display: none !important; }
+        #cjPreviewOverlay .vn-tablet-screen {
+            position: relative;
+        }
+        #cjPreviewOverlay .vn-screen-body {
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #0b1220;
+            display: block;
+        }
+        #cjPreviewOverlay .vn-screen-body::before {
+            display: none;
+        }
+        #cjPreviewFrame {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #fff;
+            display: block;
+        }
+        #cjPreviewOverlay .vn-reload-btn {
+            right: 56px;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -18,9 +48,42 @@
             @include('superAdmin.catalogo.juegos.partials._grid')
         </div>
     </div>
+
+    <script type="application/json" id="cj-perfil-payload">@json($perfilPayload ?? ['perfil_clave' => 'estandar', 'valores' => []])</script>
+
+    {{-- Overlay tablet (mismo chrome que Vista Niño) --}}
+    <div class="vn-overlay" id="cjPreviewOverlay" hidden aria-hidden="true">
+        <div class="vn-backdrop" data-cj-close></div>
+        <div class="vn-shell" role="dialog" aria-modal="true" aria-labelledby="cjPreviewTitle">
+            <button type="button" class="vn-close" data-cj-close title="Cerrar vista previa" aria-label="Cerrar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <button type="button" class="vn-reload-btn" id="cjPreviewReload" title="Recargar juego"
+                aria-label="Recargar juego">
+                <i class="fa-solid fa-rotate"></i>
+            </button>
+            <div class="vn-tablet-stage" id="cjTabletStage">
+                <div class="vn-tablet" id="cjTablet" data-screen-w="1280" data-screen-h="800">
+                    <div class="vn-tablet-bezel">
+                        <div class="vn-tablet-camera" aria-hidden="true"></div>
+                        <div class="vn-tablet-screen" id="cjTabletScreen">
+                            <div class="vn-screen-body" id="cjPreviewBody">
+                                <iframe id="cjPreviewFrame" title="Vista previa del juego" allow="autoplay; fullscreen" referrerpolicy="same-origin"></iframe>
+                            </div>
+                            <footer class="vn-screen-nav" hidden aria-hidden="true"></footer>
+                        </div>
+                        <div class="vn-tablet-home" aria-hidden="true"></div>
+                    </div>
+                </div>
+            </div>
+            <p class="vn-hint">
+                Vista previa 1280×800 · <strong id="cjPreviewTitle">Juego</strong>
+            </p>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
     <script src="{{ asset('assets/js/juegos/filtros-ui.js') }}"></script>
-    <script src="{{ asset('assets/js/superAdmin/catalogo-juegos.js') }}"></script>
+    <script src="{{ asset('assets/js/superAdmin/catalogo-juegos.js') }}?v={{ @filemtime(public_path('assets/js/superAdmin/catalogo-juegos.js')) }}"></script>
 @endpush

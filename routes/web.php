@@ -72,6 +72,7 @@ Route::get('/', function (Request $request) {
 // ── Autenticacion del nino (público) ───────────────────────────────────────
 Route::get('/bienvenida', [SesionNinoController::class, 'mostrarBienvenida'])->name('auth.bienvenida');
 Route::get('/inicio', [AmbienteNinoController::class, 'inicio'])->name('ambiente.inicio');
+Route::get('/juegos-catalogo', [AmbienteNinoController::class, 'juegosCatalogo'])->name('ambiente.juegos-catalogo');
 Route::get('/kiosco/diagnostico-ip', [AmbienteNinoController::class, 'diagnosticoIp'])->name('ambiente.diagnostico-ip');
 Route::get('/alumnos', [SesionNinoController::class, 'mostrarSeleccionAlumno'])->name('auth.alumnos');
 Route::get('/alumnos/{estudianteId}/pin', [SesionNinoController::class, 'mostrarPin'])->name('auth.pin');

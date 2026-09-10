@@ -223,6 +223,20 @@
     box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
 }
 
+.students-toolbar .btn-limpiar-filtros {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+    white-space: nowrap;
+}
+
+.students-toolbar .btn-limpiar-filtros[hidden] {
+    display: none !important;
+}
+
 .view-toggle {
     display: inline-flex;
     gap: 4px;

@@ -54,15 +54,6 @@
             @endforeach
         </select>
 
-        <select name="tipo" class="toolbar-select js-juego-filtro-tipo">
-            <option value="">Todos los tipos</option>
-            @foreach ($tiposJuego as $valor => $etiqueta)
-                <option value="{{ $valor }}" {{ ($filtros['tipo'] ?? '') === $valor ? 'selected' : '' }}>
-                    {{ $etiqueta }}
-                </option>
-            @endforeach
-        </select>
-
         @if (! ($soloActivos ?? false))
             <select name="estado" class="toolbar-select js-juego-filtro-estado">
                 <option value="">Todos los estados</option>
@@ -73,6 +64,10 @@
             <input type="hidden" name="estado" value="1">
         @endif
 
+        <button type="button" class="btn btn-sm btn-limpiar-filtros js-juego-limpiar-filtros" hidden>
+            <i class="fas fa-broom"></i> Limpiar
+        </button>
+
         @if ($mostrarVista)
             <input type="hidden" name="vista" class="js-juego-vista" value="{{ $vista ?? 'grid' }}">
             <div class="view-toggle" role="group" aria-label="Vista">
@@ -80,7 +75,7 @@
                     data-vista="grid" title="Vista cuadrícula">
                     <i class="fa-solid fa-grip"></i>
                 </button>
-                <button type="button" class="view-btn js-juego-view-btn {{ ($vista ?? 'grid') === 'list' ? 'active' : '' }}"
+                <button type="button" class="view-btn js-juego-view-btn {{ ($vista ?? 'list') === 'list' ? 'active' : '' }}"
                     data-vista="list" title="Vista lista">
                     <i class="fa-solid fa-list"></i>
                 </button>

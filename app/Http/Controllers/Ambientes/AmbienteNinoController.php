@@ -7,6 +7,7 @@ use App\Models\BloqueExperiencia;
 use App\Models\Experiencia;
 use App\Services\ClaseKioscoService;
 use App\Services\AdaptacionKioscoService;
+use App\Services\JuegoCatalogoService;
 use App\Services\RecorridoNinoService;
 use App\Services\ResultadoNinoService;
 use App\Services\SesionNinoService;
@@ -22,6 +23,7 @@ class AmbienteNinoController extends Controller
         private RecorridoNinoService $recorrido,
         private ClaseKioscoService $claseKiosco,
         private ResultadoNinoService $resultadoNino,
+        private JuegoCatalogoService $catalogoJuegos,
     ) {}
 
     /**
@@ -87,6 +89,7 @@ class AmbienteNinoController extends Controller
             'urlTts' => '',
             'urlSalir' => '',
             'urlContinuar' => '/alumnos',
+            'urlJuegosCatalogo' => route('ambiente.juegos-catalogo'),
             'portadaImg' => $this->urlPortada($ambiente->slug),
             'fondoImg' => $this->urlFondo($ambiente->slug),
             'pasoInicial' => 'portada',
@@ -142,9 +145,32 @@ class AmbienteNinoController extends Controller
             'urlTts' => '/tts',
             'urlSalir' => '/salir',
             'urlContinuar' => '',
+            'urlJuegosCatalogo' => route('ambiente.juegos-catalogo'),
             'portadaImg' => $this->urlPortada($ambiente->slug),
             'fondoImg' => $this->urlFondo($ambiente->slug),
             'pasoInicial' => 'camino',
+        ]);
+    }
+
+    /**
+     * Catálogo de paquetes del ambiente actual (kiosco: portada + recorrido).
+     */
+    public function juegosCatalogo(Request $request)
+    {
+        $ambiente = $this->sesionNino->obtenerAmbiente($request);
+        $juegos = $this->catalogoJuegos->listarActivosPorAmbiente((int) $ambiente->id);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'ambiente' => [
+                    'id' => $ambiente->id,
+                    'slug' => $ambiente->slug,
+                    'nombre' => $ambiente->nombre,
+                    'color_hex' => $ambiente->color_hex ?? null,
+                ],
+                'juegos' => $juegos,
+            ],
         ]);
     }
 

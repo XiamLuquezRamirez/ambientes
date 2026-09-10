@@ -33,7 +33,14 @@ class JuegosSuperAdminController extends Controller
             ]);
         }
 
-        return view('superAdmin.catalogo.juegos.index', $datos);
+        return view('superAdmin.catalogo.juegos.index', array_merge($datos, [
+            'perfilPayload' => [
+                'perfil_id' => 1,
+                'perfil_clave' => 'estandar',
+                'fuente' => 'preview_superadmin',
+                'valores' => $this->parametrosPerfil->valoresEstandar(),
+            ],
+        ]));
     }
 
     public function preview(Juego $juego)
