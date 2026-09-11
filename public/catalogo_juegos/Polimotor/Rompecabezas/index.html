@@ -13,7 +13,19 @@
 	<script src="/assets/js/sweetalert.js"></script>
 	<link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="esperando-inicio">
+	<div id="pantalla-inicio" class="pantalla-inicio">
+		<div class="inicio-mancha" aria-hidden="true"></div>
+		<div class="inicio-contenido">
+			<p class="inicio-kicker">Rompecabezas del cuerpo</p>
+			<button type="button" id="btn-empecemos" class="btn-empecemos">
+				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
+				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
+				<span class="btn-empecemos-texto">¡Empecemos!</span>
+			</button>
+			<p class="inicio-ayuda">Toca para escuchar a Zoe y Zeus</p>
+		</div>
+	</div>
 	<div style="display: none" class="overlay">
 		<div id="personajes-container"></div>
 		<div class="nube nube-centro">
@@ -87,6 +99,7 @@
 		</div>
 	</div>
 
+	<script src="../../texto_voz.js"></script>
 	<script src="script.js"></script>
 </body>
 </html>

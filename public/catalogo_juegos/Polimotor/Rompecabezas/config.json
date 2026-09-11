@@ -10,11 +10,11 @@
     "feedback": {
       "duracion": 2000,
       "acierto": {
-        "texto": "¡Muy bien! Esa parte va ahí.",
+        "texto": "¡Muy bien!.",
         "gif": "../../images/correcto.gif"
       },
       "error": {
-        "texto": "¡Inténtalo otra vez! Observa dónde puede ir.",
+        "texto": "¡Inténtalo otra vez! Observa con atención dónde puede ir.",
         "gif": "../../images/incorrecto.gif"
       }
     },
