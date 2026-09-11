@@ -185,7 +185,7 @@
         </svg>`;
     }
 
-    // Abre el banco de juegos (prototipo). Al volver, re-renderiza la portada.
+    // Abre el banco de juegos (paquetes del catálogo). Al volver, re-renderiza la portada.
     function abrirJuegos() {
         if (!window.BancoJuegos) return;
         const color = (arbol && arbol.ambiente && arbol.ambiente.color_hex) || '';

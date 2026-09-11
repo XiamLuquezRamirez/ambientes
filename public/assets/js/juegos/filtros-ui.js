@@ -142,7 +142,6 @@ window.JuegosFiltrosUi = (function () {
 
     function paramsDesdeForm(form) {
         const params = new URLSearchParams(new FormData(form));
-        params.delete('tipo');
         for (const [k, v] of [...params.entries()]) {
             if (!v) params.delete(k);
         }

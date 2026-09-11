@@ -5,6 +5,22 @@
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/constructor-vista-nino.css') }}?v={{ @filemtime(public_path('assets/css/constructor-vista-nino.css')) }}">
     <style>
+        /* Botón play anclado a la esquina (mismo hueco que student-options) */
+        #juegosPage .cj-preview-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            line-height: 1;
+        }
+        #juegosPage .cj-preview-btn .fa-play {
+            font-size: .75rem;
+            margin-left: 1px;
+        }
+
         /* Preview catálogo: tablet sin nav de bloques, iframe a pantalla completa */
         #cjPreviewOverlay .vn-screen-nav { display: none !important; }
         #cjPreviewOverlay .vn-tablet-screen {

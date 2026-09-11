@@ -1,7 +1,11 @@
 /**
  * Capa de Lateralidad sobre el motor de Reconocimiento.
- * Convención: L/R = anatómico de la figura de frente
- * (mitad izquierda de pantalla = DERECHA de la figura).
+ *
+ * Convención L/R (Latelaridad.md): figura infantil de frente.
+ * Derecha/izquierda = anatomía de la figura (espejo en pantalla):
+ *   derecha de la figura → mitad izquierda de la pantalla
+ *   izquierda de la figura → mitad derecha de la pantalla
+ * IDs config: *_der / *_izq siguen esa anatomía.
  */
 (function () {
     const HINT_MS = 3200;
@@ -26,6 +30,8 @@
             lados = document.createElement("div");
             lados.id = "lateralidad-lados";
             lados.setAttribute("aria-hidden", "true");
+            // Anatomía de la figura de frente (espejo):
+            // derecha de la figura = izquierda visual; izquierda = derecha visual.
             lados.innerHTML =
                 '<div class="lateralidad-lado fig-derecha">' +
                 "<span>DERECHA</span><small>de la figura</small></div>" +
@@ -103,8 +109,8 @@
         if (t.indexOf("derecha") !== -1 || t.indexOf("derecho") !== -1) return "derecha";
         if (t.indexOf("izquierda") !== -1 || t.indexOf("izquierdo") !== -1) return "izquierda";
         const target = (pregunta.targets && pregunta.targets[0]) || "";
-        if (/_izq$/.test(target)) return "derecha";
-        if (/_der$/.test(target)) return "izquierda";
+        if (target.indexOf("_der") !== -1) return "derecha";
+        if (target.indexOf("_izq") !== -1) return "izquierda";
         return null;
     }
 
@@ -135,8 +141,6 @@
 
         ui.hint.classList.remove("lado-derecha", "lado-izquierda");
         ui.hint.classList.add(lado === "derecha" ? "lado-derecha" : "lado-izquierda");
-        // Sin flecha izquierda/derecha: confundía (◀ + "DERECHA").
-        // Solo etiqueta + puntero hacia la parte.
         ui.hint.innerHTML =
             "<span>" + (lado === "derecha" ? "DERECHA" : "IZQUIERDA") + "</span>" +
             '<span class="hint-punta" aria-hidden="true">▼</span>';
@@ -145,6 +149,7 @@
             ui.hint.style.left = centro.x + "%";
             ui.hint.style.top = Math.max(10, centro.y - 4) + "%";
         } else {
+            // Anatomía espejo: derecha de la figura ≈ 25% (izquierda visual)
             ui.hint.style.left = lado === "derecha" ? "25%" : "75%";
             ui.hint.style.top = "42%";
         }

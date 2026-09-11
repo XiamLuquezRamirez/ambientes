@@ -1,7 +1,7 @@
 @php
     $cadena = $juego->cadenaCurricularResuelta();
     $icono = $juego->icono ?: 'fa-gamepad';
-    $iconClass = str_starts_with($icono, 'fa-') ? $icono : 'fa-'.$icono;
+    $iconClass = str_starts_with($icono, 'fa-') ? $icono : 'fa-' . $icono;
     $color = $juego->color ?: '#2563eb';
     $tipoLabel = $juego->tipoLabel();
     $urlPaquete = $juego->urlPaquete();
@@ -47,13 +47,11 @@
     </div>
 
     @if ($urlPaquete)
-        <div class="student-actions mt-2">
-            <button type="button"
-                class="btn btn-sm btn-outline-primary"
-                data-cj-preview
-                data-url-paquete="{{ $urlPaquete }}"
-                data-juego-nombre="{{ $juego->nombre }}">
-                <i class="fa-solid fa-play"></i> Vista previa
+        <div class="student-options">
+            <button type="button" class="btn btn-sm btn-outline-primary cj-preview-btn" data-cj-preview
+                data-url-paquete="{{ $urlPaquete }}" data-juego-nombre="{{ $juego->nombre }}"
+                title="Vista previa" aria-label="Vista previa de {{ $juego->nombre }}">
+                <i class="fa-solid fa-play" aria-hidden="true"></i>
             </button>
         </div>
     @endif

@@ -18,7 +18,8 @@
         <select name="ambiente_id" class="toolbar-select js-juego-filtro-ambiente">
             <option value="">Todos los ambientes</option>
             @foreach ($ambientes as $ambiente)
-                <option value="{{ $ambiente->id }}" {{ (string) ($filtros['ambiente_id'] ?? '') === (string) $ambiente->id ? 'selected' : '' }}>
+                <option value="{{ $ambiente->id }}"
+                    {{ (string) ($filtros['ambiente_id'] ?? '') === (string) $ambiente->id ? 'selected' : '' }}>
                     {{ $ambiente->nombre }}
                 </option>
             @endforeach
@@ -54,7 +55,7 @@
             @endforeach
         </select>
 
-        @if (! ($soloActivos ?? false))
+        @if (!($soloActivos ?? false))
             <select name="estado" class="toolbar-select js-juego-filtro-estado">
                 <option value="">Todos los estados</option>
                 <option value="1" {{ ($filtros['estado'] ?? '') === '1' ? 'selected' : '' }}>Activos</option>
@@ -64,22 +65,23 @@
             <input type="hidden" name="estado" value="1">
         @endif
 
-        <button type="button" class="btn btn-sm btn-limpiar-filtros js-juego-limpiar-filtros" hidden>
-            <i class="fas fa-broom"></i> Limpiar
-        </button>
-
         @if ($mostrarVista)
             <input type="hidden" name="vista" class="js-juego-vista" value="{{ $vista ?? 'grid' }}">
             <div class="view-toggle" role="group" aria-label="Vista">
-                <button type="button" class="view-btn js-juego-view-btn {{ ($vista ?? 'grid') === 'grid' ? 'active' : '' }}"
+                <button type="button"
+                    class="view-btn js-juego-view-btn {{ ($vista ?? 'grid') === 'grid' ? 'active' : '' }}"
                     data-vista="grid" title="Vista cuadrícula">
                     <i class="fa-solid fa-grip"></i>
                 </button>
-                <button type="button" class="view-btn js-juego-view-btn {{ ($vista ?? 'list') === 'list' ? 'active' : '' }}"
+                <button type="button"
+                    class="view-btn js-juego-view-btn {{ ($vista ?? 'list') === 'list' ? 'active' : '' }}"
                     data-vista="list" title="Vista lista">
                     <i class="fa-solid fa-list"></i>
                 </button>
             </div>
         @endif
+        <button type="button" class="btn btn-sm btn-limpiar-filtros js-juego-limpiar-filtros" hidden>
+            <i class="fas fa-broom"></i> Limpiar
+        </button>
     </div>
 </form>

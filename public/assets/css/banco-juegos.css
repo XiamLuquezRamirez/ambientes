@@ -1,7 +1,7 @@
 /**
- * banco-juegos.css — Banco de juegos del niño (prototipo visual).
- *   - Galería de juegos accesible desde la portada del ambiente.
- *   - Reproductor con el hueco donde irá el canvas de Unity WebGL.
+ * banco-juegos.css — Banco de juegos del niño (kiosco).
+ *   - Galería de paquetes del catálogo PedNia.
+ *   - Reproductor fullscreen con iframe del paquete.
  * Pensado para tablet: botones grandes, alto contraste, zonas táctiles amplias.
  * Reusa --rn-color (color del ambiente) inyectado en .rn-kiosco-shell.
  */
@@ -239,7 +239,7 @@
     border-radius: 6px;
 }
 
-/* ====== Reproductor mock (hueco del canvas Unity) ====== */
+/* ====== Reproductor (iframe del paquete) ====== */
 .bj-player {
     position: absolute;
     inset: 0;
@@ -280,7 +280,6 @@
 }
 .bj-salir-juego:hover { background: #d84a3b; }
 
-/* Aquí irá el <canvas> de Unity. Por ahora un lienzo con la carga simulada. */
 .bj-canvas-wrap {
     flex: 1 1 auto;
     position: relative;
@@ -310,45 +309,6 @@
 
 .bj-card-emoji .fa-solid {
     font-size: inherit;
-}
-
-.bj-unity-placeholder {
-    text-align: center;
-    max-width: 420px;
-    padding: 1.5rem;
-}
-.bj-unity-emoji { font-size: 4.5rem; }
-.bj-unity-texto {
-    margin: .8rem 0 1.4rem;
-    font: 600 1.05rem/1.4 system-ui, sans-serif;
-    opacity: .9;
-}
-.bj-unity-nota {
-    margin-top: 1.2rem;
-    font: 600 .78rem/1.4 ui-monospace, monospace;
-    color: #9fd0f0;
-    opacity: .8;
-}
-
-/* Barra de carga simulada */
-.bj-loader {
-    width: 260px;
-    height: 12px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .16);
-    overflow: hidden;
-    margin: 0 auto;
-}
-.bj-loader-fill {
-    height: 100%;
-    width: 0%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, var(--rn-color, #2f8fd4), #7ee0ff);
-    transition: width .2s linear;
-}
-.bj-loader-pct {
-    margin-top: .6rem;
-    font: 700 .9rem/1 ui-monospace, monospace;
 }
 
 @media (max-width: 640px) {
