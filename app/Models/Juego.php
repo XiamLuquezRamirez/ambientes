@@ -22,6 +22,14 @@ class Juego extends Model
         'lateralidad' => 'Lateralidad (derecha/izquierda)',
     ];
 
+    /**
+     * @return list<string>
+     */
+    public static function tiposPermitidos(): array
+    {
+        return array_keys(self::TIPOS_LABELS);
+    }
+
     protected $fillable = [
         'ambiente_id',
         'modulo_id',

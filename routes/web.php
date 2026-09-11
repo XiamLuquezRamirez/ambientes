@@ -558,7 +558,11 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::patch('catalogo/ejes/{eje}/mover', [EjesSuperAdminController::class, 'mover'])->name('superadmin.ejes.mover');
 
     Route::get('catalogo/juegos', [JuegosSuperAdminController::class, 'listar'])->name('superadmin.catalogo.juegos');
+    Route::post('catalogo/juegos', [JuegosSuperAdminController::class, 'guardar'])->name('superadmin.catalogo.juegos.guardar');
     Route::get('catalogo/juegos/{juego}/preview', [JuegosSuperAdminController::class, 'preview'])->name('superadmin.catalogo.juegos.preview');
+    Route::get('catalogo/juegos/{juego}', [JuegosSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo.juegos.mostrar');
+    Route::put('catalogo/juegos/{juego}', [JuegosSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.juegos.actualizar');
+    Route::patch('catalogo/juegos/{juego}/estado', [JuegosSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo.juegos.estado');
 
     // Temáticas / experiencias oficiales
     Route::get('catalogo/tematicas', [TematicasSuperAdminController::class, 'index'])->name('superadmin.catalogo.tematicas.index');

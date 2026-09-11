@@ -1,11 +1,16 @@
 /**
- * Catálogo SuperAdmin de juegos: filtros AJAX + preview en overlay tablet.
+ * Catálogo SuperAdmin de juegos: filtros AJAX, CRUD modal, preview overlay.
  */
 document.addEventListener('DOMContentLoaded', function () {
     const page = document.getElementById('juegosPage');
     if (!page) return;
 
     const urlBase = page.dataset.urlBase || '';
+    const urlGuardar = page.dataset.urlGuardar || '';
+    const urlMostrarTpl = page.dataset.urlMostrarTemplate || '';
+    const urlActualizarTpl = page.dataset.urlActualizarTemplate || '';
+    const urlEstadoTpl = page.dataset.urlEstadoTemplate || '';
+
     const overlay = document.getElementById('cjPreviewOverlay');
     const frame = document.getElementById('cjPreviewFrame');
     const tablet = document.getElementById('cjTablet');
@@ -13,10 +18,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const titleEl = document.getElementById('cjPreviewTitle');
     const btnReload = document.getElementById('cjPreviewReload');
 
+    const modalEl = document.getElementById('modalJuegoCatalogo');
+    const form = document.getElementById('formJuegoCatalogo');
+    const btnGuardar = document.getElementById('btnGuardarJuegoCatalogo');
+    const labelEl = document.getElementById('modalJuegoCatalogoLabel');
+    const subtitleEl = document.getElementById('modalJuegoCatalogoSubtitle');
+    const iconEl = document.getElementById('modalJuegoCatalogoIcon');
+
     const SCREEN_W = 1280;
     const SCREEN_H = 800;
 
     let urlActual = '';
+    let modoEdicion = false;
+    let juegoEditandoId = null;
+    let nombreOriginalEdicion = '';
+    let ambienteOriginalEdicion = '';
+    let rutaOriginalEdicion = '';
+
+    function csrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    }
+
+    function toast(tipo, msg) {
+        if (typeof mostrarToast === 'function') mostrarToast(tipo, msg);
+        else alert(msg);
+    }
+
+    function urlConId(tpl, id) {
+        return String(tpl || '').replace('__ID__', String(id));
+    }
 
     function perfilPayload() {
         try {
@@ -102,13 +132,329 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function getModal() {
+        if (!modalEl || typeof bootstrap === 'undefined') return null;
+        return bootstrap.Modal.getOrCreateInstance(modalEl);
+    }
+
+    function filtrarOpcionesForm(select, attr, valorPadre) {
+        if (!select) return;
+        select.querySelectorAll('option[' + attr + ']').forEach(function (opt) {
+            const visible = !valorPadre || opt.getAttribute(attr) === String(valorPadre);
+            opt.hidden = !visible;
+            if (!visible && opt.selected) {
+                select.value = '';
+            }
+        });
+    }
+
+    function aplicarCascadaForm() {
+        if (!form) return;
+        const ambienteId = form.querySelector('.js-juego-form-ambiente')?.value || '';
+        const moduloId = form.querySelector('.js-juego-form-modulo')?.value || '';
+        const ejeId = form.querySelector('.js-juego-form-eje')?.value || '';
+
+        filtrarOpcionesForm(form.querySelector('.js-juego-form-modulo'), 'data-ambiente-id', ambienteId);
+        filtrarOpcionesForm(form.querySelector('.js-juego-form-eje'), 'data-modulo-id', moduloId);
+        filtrarOpcionesForm(form.querySelector('.js-juego-form-tematica'), 'data-eje-id', ejeId);
+    }
+
+    function resetForm() {
+        if (!form) return;
+        form.reset();
+        form.querySelector('#juego_id').value = '';
+        form.querySelector('#juego_color').value = '#2563eb';
+        form.querySelector('#juego_activo').checked = true;
+        form.querySelectorAll('select option[hidden]').forEach(function (opt) {
+            opt.hidden = false;
+        });
+        aplicarCascadaForm();
+    }
+
+    function setModoCrear() {
+        modoEdicion = false;
+        juegoEditandoId = null;
+        resetForm();
+        if (labelEl) labelEl.textContent = 'Nuevo juego';
+        if (subtitleEl) {
+            subtitleEl.textContent = 'Crea el registro y el stub del paquete bajo public/catalogo_juegos.';
+        }
+        if (iconEl) iconEl.className = 'fas fa-plus text-white';
+        if (btnGuardar) {
+            btnGuardar.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Crear juego';
+        }
+        actualizarRutaPreview();
+    }
+
+    function setModoEditar() {
+        modoEdicion = true;
+        if (labelEl) labelEl.textContent = 'Editar juego';
+        if (subtitleEl) {
+            subtitleEl.textContent = 'Si cambias nombre o ambiente, se renombra la carpeta del paquete.';
+        }
+        if (iconEl) iconEl.className = 'fas fa-pen-to-square text-white';
+        if (btnGuardar) {
+            btnGuardar.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios';
+        }
+    }
+
+    /** StudlyCase aproximado al PHP (Str::ascii + studly), suficiente para la vista previa. */
+    function segmentoCarpeta(texto) {
+        const mapa = {
+            á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u', ñ: 'n',
+            Á: 'a', É: 'e', Í: 'i', Ó: 'o', Ú: 'u', Ü: 'u', Ñ: 'n',
+        };
+        const ascii = String(texto || '')
+            .replace(/[áéíóúüñÁÉÍÓÚÜÑ]/g, (c) => mapa[c] || c)
+            .replace(/[^A-Za-z0-9]+/g, ' ')
+            .trim()
+            .toLowerCase();
+        if (!ascii) return '';
+        return ascii
+            .split(/\s+/)
+            .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+            .join('');
+    }
+
+    function actualizarRutaPreview() {
+        if (!form) return;
+        const inputRuta = form.querySelector('#juego_ruta');
+        if (!inputRuta) return;
+
+        const nombre = (form.querySelector('#juego_nombre')?.value || '').trim();
+        const ambSelect = form.querySelector('#juego_ambiente_id');
+        const opt = ambSelect?.selectedOptions?.[0];
+        const ambRaw = (opt?.getAttribute('data-slug') || opt?.getAttribute('data-nombre') || '').trim();
+
+        const ambSeg = segmentoCarpeta(ambRaw);
+        const juegoSeg = segmentoCarpeta(nombre);
+
+        if (ambSeg && juegoSeg) {
+            inputRuta.value = 'catalogo_juegos/' + ambSeg + '/' + juegoSeg;
+        } else if (!modoEdicion) {
+            inputRuta.value = '';
+            inputRuta.placeholder = 'Se completa al elegir ambiente y nombre';
+        }
+    }
+
+    function rellenarForm(data) {
+        if (!form || !data) return;
+        form.querySelector('#juego_id').value = data.id || '';
+        form.querySelector('#juego_nombre').value = data.nombre || '';
+        form.querySelector('#juego_tipo').value = data.tipo || '';
+        form.querySelector('#juego_ruta').value = data.ruta || '';
+        form.querySelector('#juego_descripcion').value = data.descripcion || '';
+        form.querySelector('#juego_icono').value = data.icono || '';
+        form.querySelector('#juego_color').value = data.color || '#2563eb';
+        form.querySelector('#juego_activo').checked = !!data.activo;
+
+        const cadena = data.cadena || {};
+        form.querySelector('#juego_ambiente_id').value = cadena.ambiente_id || data.ambiente_id || '';
+        aplicarCascadaForm();
+        form.querySelector('#juego_modulo_id').value = cadena.modulo_id || '';
+        aplicarCascadaForm();
+        form.querySelector('#juego_eje_id').value = cadena.eje_id || '';
+        aplicarCascadaForm();
+        form.querySelector('#juego_tematica_id').value = cadena.tematica_id || '';
+
+        // En edición mostramos la ruta real; al cambiar nombre/ambiente se recalcula la preview.
+        nombreOriginalEdicion = String(data.nombre || '').trim();
+        ambienteOriginalEdicion = String(cadena.ambiente_id || data.ambiente_id || '');
+        rutaOriginalEdicion = String(data.ruta || '');
+    }
+
+    function sincronizarRutaSegunIdentidad() {
+        if (!modoEdicion) {
+            actualizarRutaPreview();
+            return;
+        }
+        const nombre = (form.querySelector('#juego_nombre')?.value || '').trim();
+        const ambienteId = form.querySelector('#juego_ambiente_id')?.value || '';
+        if (nombre === nombreOriginalEdicion && ambienteId === ambienteOriginalEdicion) {
+            form.querySelector('#juego_ruta').value = rutaOriginalEdicion;
+            return;
+        }
+        actualizarRutaPreview();
+    }
+
+    function abrirCrear() {
+        setModoCrear();
+        getModal()?.show();
+    }
+
+    async function abrirEditar(id) {
+        setModoEditar();
+        juegoEditandoId = id;
+        try {
+            const res = await fetch(urlConId(urlMostrarTpl, id), {
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+            const json = await res.json();
+            if (!res.ok || !json.success) {
+                throw new Error(json.message || 'No se pudo cargar el juego.');
+            }
+            rellenarForm(json.data);
+            getModal()?.show();
+        } catch (err) {
+            toast('error', err.message || 'No se pudo cargar el juego.');
+        }
+    }
+
+    function payloadDesdeForm() {
+        const fd = new FormData(form);
+        const activo = form.querySelector('#juego_activo').checked;
+
+        return {
+            nombre: String(fd.get('nombre') || '').trim(),
+            tipo: String(fd.get('tipo') || '').trim(),
+            descripcion: String(fd.get('descripcion') || '').trim() || null,
+            icono: String(fd.get('icono') || '').trim() || null,
+            color: String(fd.get('color') || '').trim() || null,
+            ambiente_id: Number(fd.get('ambiente_id') || 0) || null,
+            modulo_id: Number(fd.get('modulo_id') || 0) || null,
+            eje_id: Number(fd.get('eje_id') || 0) || null,
+            tematica_id: Number(fd.get('tematica_id') || 0) || null,
+            activo: activo,
+        };
+    }
+
+    function mensajeValidacion(json) {
+        if (json?.errors) {
+            const first = Object.values(json.errors)[0];
+            if (Array.isArray(first) && first[0]) return first[0];
+        }
+        return json?.message || 'Verifica los datos ingresados.';
+    }
+
+    async function guardarJuego(e) {
+        e.preventDefault();
+        if (!form) return;
+
+        const payload = payloadDesdeForm();
+        const url = modoEdicion
+            ? urlConId(urlActualizarTpl, juegoEditandoId)
+            : urlGuardar;
+        const method = modoEdicion ? 'PUT' : 'POST';
+
+        if (btnGuardar) btnGuardar.disabled = true;
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken(),
+                },
+                body: JSON.stringify(payload),
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || !json.success) {
+                throw new Error(mensajeValidacion(json));
+            }
+
+            getModal()?.hide();
+            toast('success', json.message || 'Juego guardado.');
+            await cargarGrid(window.location.href);
+        } catch (err) {
+            toast('error', err.message || 'No se pudo guardar el juego.');
+        } finally {
+            if (btnGuardar) btnGuardar.disabled = false;
+        }
+    }
+
+    async function toggleEstadoDesdeSwitch(checkbox) {
+        const id = checkbox.getAttribute('data-juego-id');
+        const nombre = checkbox.getAttribute('data-nombre') || 'este juego';
+        const quiereActivar = checkbox.checked;
+        // El change ya movió el check; si cancela, se revierte.
+        const estadoPrevio = !quiereActivar;
+
+        if (!quiereActivar) {
+            const confirmado = await Swal.fire({
+                title: `¿Desactivar ${nombre}?`,
+                text: 'Dejará de aparecer en el kiosco y listados de activos.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Desactivar',
+                cancelButtonText: 'Cancelar',
+            }).then((r) => r.isConfirmed);
+
+            if (!confirmado) {
+                checkbox.checked = estadoPrevio;
+                return;
+            }
+        }
+
+        try {
+            const res = await fetch(urlConId(urlEstadoTpl, id), {
+                method: 'PATCH',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken(),
+                },
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || !json.success) {
+                throw new Error(json.message || 'No se pudo cambiar el estado.');
+            }
+            toast('success', json.message || 'Estado actualizado.');
+            await cargarGrid(window.location.href);
+        } catch (err) {
+            checkbox.checked = estadoPrevio;
+            toast('error', err.message || 'No se pudo cambiar el estado.');
+        }
+    }
+
     // Delegación: sobrevive al re-render AJAX del grid
     page.addEventListener('click', function (e) {
-        const btn = e.target.closest('[data-cj-preview]');
-        if (!btn || !page.contains(btn)) return;
-        e.preventDefault();
-        abrirPreview(btn.getAttribute('data-url-paquete'), btn.getAttribute('data-juego-nombre'));
+        const btnPreview = e.target.closest('[data-cj-preview]');
+        if (btnPreview && page.contains(btnPreview)) {
+            e.preventDefault();
+            abrirPreview(
+                btnPreview.getAttribute('data-url-paquete'),
+                btnPreview.getAttribute('data-juego-nombre')
+            );
+            return;
+        }
+
+        const btnEditar = e.target.closest('[data-cj-editar]');
+        if (btnEditar && page.contains(btnEditar)) {
+            e.preventDefault();
+            abrirEditar(btnEditar.getAttribute('data-juego-id'));
+            return;
+        }
+
+        if (e.target.closest('#btnNuevoJuegoCatalogoEmpty')) {
+            e.preventDefault();
+            abrirCrear();
+        }
     });
+
+    page.addEventListener('change', function (e) {
+        const toggle = e.target.closest('.toggle-activo-juego');
+        if (!toggle || !page.contains(toggle)) return;
+        toggleEstadoDesdeSwitch(toggle);
+    });
+
+    document.getElementById('btnNuevoJuegoCatalogo')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        abrirCrear();
+    });
+
+    form?.addEventListener('submit', guardarJuego);
+    form?.querySelector('.js-juego-form-ambiente')?.addEventListener('change', function () {
+        aplicarCascadaForm();
+        sincronizarRutaSegunIdentidad();
+    });
+    form?.querySelector('.js-juego-form-modulo')?.addEventListener('change', aplicarCascadaForm);
+    form?.querySelector('.js-juego-form-eje')?.addEventListener('change', aplicarCascadaForm);
+    form?.querySelector('#juego_nombre')?.addEventListener('input', sincronizarRutaSegunIdentidad);
 
     if (overlay) {
         overlay.addEventListener('click', function (e) {
@@ -157,24 +503,23 @@ document.addEventListener('DOMContentLoaded', function () {
             enlazarFiltros();
         } catch (err) {
             const msg = err.message || 'No se pudo cargar el listado de juegos.';
-            if (typeof mostrarToast === 'function') mostrarToast('error', msg);
-            else alert(msg);
+            toast('error', msg);
         } finally {
             contenedor.style.opacity = '1';
         }
     }
 
     function aplicarFiltros() {
-        const form = document.getElementById('formFiltrosJuegos');
-        if (!form) return;
-        const params = window.JuegosFiltrosUi.paramsDesdeForm(form);
+        const formFiltros = document.getElementById('formFiltrosJuegos');
+        if (!formFiltros) return;
+        const params = window.JuegosFiltrosUi.paramsDesdeForm(formFiltros);
         const url = params.toString() ? `${urlBase}?${params.toString()}` : urlBase;
         cargarGrid(url);
     }
 
     function enlazarFiltros() {
-        const form = document.getElementById('formFiltrosJuegos');
-        window.JuegosFiltrosUi.enlazar(form, aplicarFiltros);
+        const formFiltros = document.getElementById('formFiltrosJuegos');
+        window.JuegosFiltrosUi.enlazar(formFiltros, aplicarFiltros);
 
         document.querySelectorAll('.pag-btn[href]').forEach((link) => {
             link.addEventListener('click', (e) => {

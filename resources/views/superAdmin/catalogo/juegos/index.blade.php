@@ -5,7 +5,18 @@
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/constructor-vista-nino.css') }}?v={{ @filemtime(public_path('assets/css/constructor-vista-nino.css')) }}">
     <style>
-        /* Botón play anclado a la esquina (mismo hueco que student-options) */
+        /* Hueco del header: play (36) + gap + menú (36) ≈ 80px */
+        #juegosPage .student-top {
+            padding-right: 88px;
+        }
+        #juegosPage .student-identity {
+            padding-right: 0;
+        }
+        #juegosPage .student-options {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
         #juegosPage .cj-preview-btn {
             width: 36px;
             height: 36px;
@@ -15,10 +26,46 @@
             justify-content: center;
             border-radius: 8px;
             line-height: 1;
+            flex-shrink: 0;
         }
         #juegosPage .cj-preview-btn .fa-play {
             font-size: .75rem;
             margin-left: 1px;
+        }
+
+        #juegosPage .student-info {
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px 8px;
+        }
+        #juegosPage .cj-card-desc {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.35;
+            flex: 1 1 100%;
+        }
+        #juegosPage .cj-card-ruta {
+            display: block;
+            max-width: 100%;
+            font-size: .68rem;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        #juegosPage .cj-switch-activo {
+            margin-left: auto;
+            padding-left: 2.2em;
+            flex: 0 0 auto;
+        }
+        #juegosPage .students-grid--list .student-options {
+            flex-direction: row;
         }
 
         /* Preview catálogo: tablet sin nav de bloques, iframe a pantalla completa */
@@ -52,18 +99,30 @@
 @endpush
 
 @section('content')
-    <div class="students-page" id="juegosPage" data-url-base="{{ route('superadmin.catalogo.juegos') }}">
-        <div class="page-header students-header">
+    <div class="students-page" id="juegosPage"
+        data-url-base="{{ route('superadmin.catalogo.juegos') }}"
+        data-url-guardar="{{ route('superadmin.catalogo.juegos.guardar') }}"
+        data-url-mostrar-template="{{ url('superadmin/catalogo/juegos/__ID__') }}"
+        data-url-actualizar-template="{{ url('superadmin/catalogo/juegos/__ID__') }}"
+        data-url-estado-template="{{ url('superadmin/catalogo/juegos/__ID__/estado') }}">
+        <div class="page-header students-header d-flex justify-content-between align-items-start flex-wrap gap-2">
             <div>
                 <h1 class="mb-1">Juegos</h1>
-                <p class="students-subtitle mb-0">Catálogo de paquetes de juegos (solo lectura / preview). Independiente de los motores del constructor de experiencias.</p>
+                <p class="students-subtitle mb-0">
+                    Catálogo de paquetes de juegos. Independiente de los motores del constructor de experiencias.
+                </p>
             </div>
+            <button type="button" class="btn btn-primary" id="btnNuevoJuegoCatalogo">
+                <i class="fa-solid fa-plus"></i> Nuevo juego
+            </button>
         </div>
 
         <div id="container-grid">
             @include('superAdmin.catalogo.juegos.partials._grid')
         </div>
     </div>
+
+    @include('superAdmin.catalogo.juegos.modalJuego')
 
     <script type="application/json" id="cj-perfil-payload">@json($perfilPayload ?? ['perfil_clave' => 'estandar', 'valores' => []])</script>
 

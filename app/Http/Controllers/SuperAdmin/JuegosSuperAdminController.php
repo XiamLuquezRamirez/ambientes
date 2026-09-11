@@ -8,6 +8,7 @@ use App\Models\Juego;
 use App\Services\JuegoCatalogoService;
 use App\Services\ParametrosPerfilAprendizajeService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class JuegosSuperAdminController extends Controller
 {
@@ -34,6 +35,7 @@ class JuegosSuperAdminController extends Controller
         }
 
         return view('superAdmin.catalogo.juegos.index', array_merge($datos, [
+            'tiposJuego' => Juego::TIPOS_LABELS,
             'perfilPayload' => [
                 'perfil_id' => 1,
                 'perfil_clave' => 'estandar',
@@ -41,6 +43,71 @@ class JuegosSuperAdminController extends Controller
                 'valores' => $this->parametrosPerfil->valoresEstandar(),
             ],
         ]));
+    }
+
+    public function mostrar(Juego $juego)
+    {
+        $juego->loadMissing([
+            'ambiente:id,nombre',
+            'modulo:id,nombre,ambiente_id',
+            'eje:id,nombre,modulo_id',
+            'tematica:id,nombre,eje_id',
+        ]);
+
+        $cadena = $juego->cadenaCurricularResuelta();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $juego->id,
+                'tipo' => $juego->tipo,
+                'ruta' => $juego->ruta,
+                'nombre' => $juego->nombre,
+                'descripcion' => $juego->descripcion ?? '',
+                'icono' => $juego->icono ?? '',
+                'color' => $juego->color ?: '#2563eb',
+                'activo' => (bool) $juego->activo,
+                'ambiente_id' => $juego->ambiente_id,
+                'cadena' => $cadena,
+            ],
+        ]);
+    }
+
+    public function guardar(Request $request)
+    {
+        $datos = $this->validarEscritura($request);
+        $juego = $this->catalogo->crear($datos);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Juego creado correctamente. Se generó el stub del paquete en disco.',
+            'data' => $this->catalogo->serializarTarjeta($juego->fresh() ?? $juego),
+        ], 201);
+    }
+
+    public function actualizar(Request $request, Juego $juego)
+    {
+        $datos = $this->validarEscritura($request, $juego);
+        $juego = $this->catalogo->actualizar($juego, $datos);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Juego actualizado correctamente.',
+            'data' => $this->catalogo->serializarTarjeta($juego),
+        ]);
+    }
+
+    public function actualizarEstado(Juego $juego)
+    {
+        $juego = $this->catalogo->alternarActivo($juego);
+
+        return response()->json([
+            'success' => true,
+            'activo' => (bool) $juego->activo,
+            'message' => $juego->activo
+                ? 'Juego activado correctamente.'
+                : 'Juego desactivado correctamente.',
+        ]);
     }
 
     public function preview(Juego $juego)
@@ -65,6 +132,29 @@ class JuegosSuperAdminController extends Controller
                 'fuente' => 'preview_superadmin',
                 'valores' => $valores,
             ],
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function validarEscritura(Request $request, ?Juego $juego = null): array
+    {
+        return $request->validate([
+            'nombre' => ['required', 'string', 'max:150'],
+            'tipo' => ['required', 'string', Rule::in(Juego::tiposPermitidos())],
+            'descripcion' => ['nullable', 'string', 'max:2000'],
+            'icono' => ['nullable', 'string', 'max:80'],
+            'color' => ['nullable', 'string', 'max:20', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'ambiente_id' => ['required', 'integer', 'exists:ambientes,id'],
+            'modulo_id' => ['nullable', 'integer', 'exists:modulos,id'],
+            'eje_id' => ['nullable', 'integer', 'exists:ejes,id'],
+            'tematica_id' => ['nullable', 'integer', 'exists:tematicas,id'],
+            'activo' => ['sometimes', 'boolean'],
+        ], [
+            'color.regex' => 'El color debe ser un hexadecimal válido (ej. #2563eb).',
+            'tipo.in' => 'El tipo de juego no es válido.',
+            'ambiente_id.required' => 'El ambiente es obligatorio.',
         ]);
     }
 }
