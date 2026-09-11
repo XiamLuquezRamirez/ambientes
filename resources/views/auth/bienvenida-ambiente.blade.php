@@ -1,7 +1,7 @@
 @extends('layouts.ambiente')
 
 @section('content')
-<main class="bienambiente-wrap" data-kiosco-sesion="1" data-redirect-inicio="/recorrido">
+<main class="bienambiente-wrap" data-kiosco-sesion="1" data-redirect-inicio="{{ $redirectInicio ?? '/recorrido' }}">
     <div class="bienambiente-card">
         <div class="estudiante-avatar" style="--color-av: {{ $estudiante->color_avatar }};">
             <span class="estudiante-avatar__circulo">

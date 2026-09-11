@@ -14,6 +14,13 @@ class SesionNinoService
 
     public const SESSION_CLASE_ID = 'clase_id';
 
+    /** Tras PIN: recorrido curricular o banco de juegos. */
+    public const SESSION_DESTINO_POST_PIN = 'nino_destino_post_pin';
+
+    public const DESTINO_RECORRIDO = 'recorrido';
+
+    public const DESTINO_JUEGOS = 'juegos';
+
     /** Solo local: simula la IP del nodo (?nodo_ip=) sin tocar la red. */
     public const SESSION_NODO_IP = 'nodo_ip_prueba';
 
@@ -119,9 +126,47 @@ class SesionNinoService
             self::SESSION_ESTUDIANTE_ID,
             self::SESSION_ESTADO_AMBIENTE,
             self::SESSION_CLASE_ID,
+            self::SESSION_DESTINO_POST_PIN,
             AdaptacionKioscoService::SESSION_KEY,
         ]);
         $this->adaptacion()->olvidar($request);
+    }
+
+    public function normalizarDestinoPostPin(?string $destino): string
+    {
+        return $destino === self::DESTINO_JUEGOS
+            ? self::DESTINO_JUEGOS
+            : self::DESTINO_RECORRIDO;
+    }
+
+    public function recordarDestinoPostPin(Request $request, ?string $destino): void
+    {
+        $request->session()->put(
+            self::SESSION_DESTINO_POST_PIN,
+            $this->normalizarDestinoPostPin($destino)
+        );
+    }
+
+    public function destinoPostPin(Request $request): string
+    {
+        return $this->normalizarDestinoPostPin(
+            $request->session()->get(self::SESSION_DESTINO_POST_PIN)
+        );
+    }
+
+    public function consumirDestinoPostPin(Request $request): string
+    {
+        $destino = $this->destinoPostPin($request);
+        $request->session()->forget(self::SESSION_DESTINO_POST_PIN);
+
+        return $destino;
+    }
+
+    public function urlTrasPin(Request $request): string
+    {
+        return $this->destinoPostPin($request) === self::DESTINO_JUEGOS
+            ? url('/recorrido?abrir=juegos')
+            : url('/recorrido');
     }
 
     /**

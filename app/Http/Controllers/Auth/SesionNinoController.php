@@ -25,9 +25,11 @@ class SesionNinoController extends Controller
         return redirect()->route('ambiente.inicio', $request->query());
     }
 
-    public function mostrarSeleccionAlumno()
+    public function mostrarSeleccionAlumno(Request $request)
     {
         $ambiente = $this->sesionNino->obtenerAmbiente();
+        $this->sesionNino->recordarDestinoPostPin($request, $request->query('destino'));
+
         $resuelto = $this->claseKiosco->resolverClaseKiosco($ambiente);
         $clase = $resuelto['clase'];
         $motivo = $resuelto['motivo'];
@@ -37,17 +39,26 @@ class SesionNinoController extends Controller
         }
 
         $estudiantes = $this->claseKiosco->estudiantesDeClase($clase);
+        $destino = $this->sesionNino->destinoPostPin($request);
 
-        return view('auth.seleccionar-alumno', compact('ambiente', 'estudiantes', 'clase'));
+        return view('auth.seleccionar-alumno', compact('ambiente', 'estudiantes', 'clase', 'destino'));
     }
 
-    public function mostrarPin(int $estudianteId)
+    public function mostrarPin(Request $request, int $estudianteId)
     {
         $ambiente = $this->sesionNino->obtenerAmbiente();
+        if ($request->filled('destino')) {
+            $this->sesionNino->recordarDestinoPostPin($request, $request->query('destino'));
+        }
+
         $clase = $this->claseKiosco->claseActivaHoy($ambiente);
 
         if (! $clase) {
-            return redirect()->route('auth.alumnos');
+            return redirect()->route('auth.alumnos', array_filter([
+                'destino' => $this->sesionNino->destinoPostPin($request) === SesionNinoService::DESTINO_JUEGOS
+                    ? SesionNinoService::DESTINO_JUEGOS
+                    : null,
+            ]));
         }
 
         $estudiante = $this->claseKiosco->obtenerParaKioscoDeClase($clase, $estudianteId);
@@ -59,13 +70,15 @@ class SesionNinoController extends Controller
         $figuras = FigurasModel::getFiguras();
         $sinPin = $estudiante->configuracionPin === null;
         $pinBloqueado = $estudiante->configuracionPin?->estaBloqueado() ?? false;
+        $destino = $this->sesionNino->destinoPostPin($request);
 
         return view('auth.pin-figuras', compact(
             'ambiente',
             'estudiante',
             'figuras',
             'sinPin',
-            'pinBloqueado'
+            'pinBloqueado',
+            'destino'
         ));
     }
 
@@ -135,7 +148,11 @@ class SesionNinoController extends Controller
         $estudiante = $request->attributes->get('estudiante_nino')
             ?? $this->sesionNino->estudianteSesionValido((int) session(SesionNinoService::SESSION_ESTUDIANTE_ID));
 
-        return view('auth.bienvenida-ambiente', compact('ambiente', 'estudiante'));
+        $redirectInicio = $this->sesionNino->urlTrasPin($request);
+        // Consumir al renderizar /listo para no reabrir juegos en reloads posteriores.
+        $this->sesionNino->consumirDestinoPostPin($request);
+
+        return view('auth.bienvenida-ambiente', compact('ambiente', 'estudiante', 'redirectInicio'));
     }
 
     public function cerrarSesion(Request $request)

@@ -3018,6 +3018,21 @@ import * as THREE from 'three';
 
         refrescarEstaciones(); actualizarHud(false);
         rafId = requestAnimationFrame(animar);
+
+        // Tras PIN con destino=juegos: abrir banco autenticado encima del camino.
+        try {
+            const params = new URLSearchParams(window.location.search || '');
+            if (params.get('abrir') === 'juegos') {
+                setTimeout(function () {
+                    abrirZonaJuegos();
+                    // Limpiar query para que F5 no reabra la galería.
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState({}, '', window.location.pathname);
+                    }
+                }, 700);
+            }
+        } catch (e) { /* noop */ }
+
         return true;
     }
 

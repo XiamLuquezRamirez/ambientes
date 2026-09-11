@@ -11,10 +11,17 @@
     $colorEstudiante = $esSesion ? $estudiante->color_avatar ?? '#2563EB' : '#2563EB';
     $slugPortada =
         $arbol['ambiente']['slug'] ?? config('ambiente.slugs_bd.' . config('ambiente.slug'), config('ambiente.slug'));
+    $slugPortada = config('ambiente.slugs_bd.' . $slugPortada, $slugPortada);
     $portadaImg = $portadaImg ?? '/assets/images/ambientes/' . $slugPortada . '-portada.png';
+    if ($portadaImg !== '' && ! file_exists(public_path(ltrim(parse_url($portadaImg, PHP_URL_PATH) ?: $portadaImg, '/')))) {
+        $portadaImg = '';
+    }
     $fondoImg = $fondoImg ?? '';
-    if ($fondoImg === '' && file_exists(public_path('assets/images/ambientes/' . $slugPortada . '-fondo.png'))) {
-        $fondoImg = '/assets/images/ambientes/' . $slugPortada . '-fondo.png';
+    if ($fondoImg === '') {
+        $fondoRel = 'assets/images/fondos_Ambientes/' . $slugPortada . '.png';
+        if (file_exists(public_path($fondoRel))) {
+            $fondoImg = '/' . $fondoRel . '?v=' . @filemtime(public_path($fondoRel));
+        }
     }
     $shellClase = match ($pasoInicial) {
         'camino' => 'rn-shell--camino',

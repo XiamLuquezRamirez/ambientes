@@ -1,6 +1,13 @@
-@extends('layouts.ambiente')
+﻿@extends('layouts.ambiente')
 
 @section('content')
+@php
+    $destino = $destino ?? \App\Services\SesionNinoService::DESTINO_RECORRIDO;
+    $urlAlumnos = route(
+        'auth.alumnos',
+        $destino === \App\Services\SesionNinoService::DESTINO_JUEGOS ? ['destino' => 'juegos'] : []
+    );
+@endphp
 @if ($sinPin || $pinBloqueado)
 <main class="pin-wrap">
     <div class="pin-bloqueado" role="alert">
@@ -21,7 +28,7 @@
                 ? 'Pide a tu profe que configure tu PIN de 3 figuras para poder entrar.'
                 : 'Hubo demasiados intentos. Pide a tu profe que restablezca tu PIN.' }}
         </p>
-        <a href="{{ route('auth.alumnos') }}" class="link-volver">← Elegir otro alumno</a>
+        <a href="{{ $urlAlumnos }}" class="link-volver">← Elegir otro alumno</a>
     </div>
 </main>
 @else
@@ -50,7 +57,7 @@
         <p class="pin-mensaje" id="pinMensaje" role="alert" aria-live="assertive"></p>
 
         <button type="button" class="btn-borrar" id="btnBorrarPin">← Borrar</button>
-        <a href="{{ route('auth.alumnos') }}" class="link-volver">← Volver</a>
+        <a href="{{ $urlAlumnos }}" class="link-volver">← Volver</a>
     </div>
 
     <div class="pin-figuras-grid" role="group" aria-label="Figuras del PIN">

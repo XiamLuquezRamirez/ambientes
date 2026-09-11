@@ -1,6 +1,12 @@
 @extends('layouts.ambiente')
 
 @section('content')
+@php
+    $destino = $destino ?? \App\Services\SesionNinoService::DESTINO_RECORRIDO;
+    $qsDestino = $destino === \App\Services\SesionNinoService::DESTINO_JUEGOS
+        ? ['destino' => \App\Services\SesionNinoService::DESTINO_JUEGOS]
+        : [];
+@endphp
 <main class="selector-wrap">
     <h2 class="selector-titulo">¿Quién eres tú?</h2>
 
@@ -20,7 +26,7 @@
                     $bloqueado = $estudiante->estado_pin === 'bloqueado';
                 @endphp
                 <a
-                    href="{{ route('auth.pin', $estudiante->id) }}"
+                    href="{{ route('auth.pin', array_merge(['estudianteId' => $estudiante->id], $qsDestino)) }}"
                     class="avatar-btn {{ $tienePin ? '' : 'avatar-btn--sin-pin' }}"
                     style="--color-av: {{ $estudiante->color_avatar }};"
                     aria-label="{{ $estudiante->nombre }}{{ $tienePin ? '' : ' (sin PIN)' }}{{ $bloqueado ? ' (PIN bloqueado)' : '' }}"

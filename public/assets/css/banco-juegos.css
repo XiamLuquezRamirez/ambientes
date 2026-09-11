@@ -9,27 +9,31 @@
 /* ====== Escena inferior: niño jugando (acceso a la zona de juegos) ====== */
 /* Franja clicable anclada al fondo de la portada. */
 .bj-escena {
+    --bj-escena-h: 172px;
+    --bj-suelo-h: 64px;
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 172px;
+    height: var(--bj-escena-h);
     width: 100%;
     border: none;
-    background: transparent;
+    background:
+        radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--rn-color, #2f8fd4) 18%, transparent), transparent 70%),
+        linear-gradient(180deg, #8fcd6f 0%, #6bb35a 55%, #5aa34c 100%);
     cursor: pointer;
     padding: 0;
     display: block;
     z-index: 4;
     -webkit-tap-highlight-color: transparent;
 }
-/* Suelo/césped bajo el niño */
+/* Suelo/césped bajo el niño — la línea punteada es el límite del pie del PNG */
 .bj-escena-suelo {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 64px;
+    height: var(--bj-suelo-h);
     background:
         radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--rn-color, #2f8fd4) 22%, transparent), transparent 70%),
         linear-gradient(180deg, color-mix(in srgb, #7cc26a 70%, #fff), #6bb35a);

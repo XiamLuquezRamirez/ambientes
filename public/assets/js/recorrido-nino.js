@@ -33,7 +33,7 @@
         const usaFondo = !!fondoImg;
         const claseFondo = usaFondo ? ' rn-portada--con-fondo' : '';
         const fondoLayer = usaFondo
-            ? `<img class="rn-portada-fondo" src="${escapar(fondoImg)}" alt="" decoding="async" aria-hidden="true">`
+            ? `<div class="rn-portada-fondo" style="background-image:url('${escapar(fondoImg)}')" aria-hidden="true"></div>`
             : '';
         const img = portadaImg
             ? `<img class="rn-portada-img" src="${escapar(portadaImg)}" alt="" decoding="async">`
@@ -47,26 +47,37 @@
             ? ''
             : `<div class="rn-portada-ilustracion" aria-hidden="true">${img}</div>`;
 
-        $paso.html(`
-            <div class="rn-portada${claseFondo}">
-                ${fondoLayer}
-                ${banner}
-                <div class="rn-portada-cuerpo">
-                    ${ilustracion}
-                    <div class="rn-portada-accion">
-                        <div class="rn-portada-iniciar-halo">
-                            <button type="button" class="rn-btn-iniciar-pill" id="rnBtnIniciarAmbiente">
-                                <span>Iniciar</span>
-                                <span class="rn-btn-iniciar-flecha" aria-hidden="true">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </span>
-                            </button>
+        const escena = escenaJuegosHTML();
+        const cuerpo = `
+                <div class="rn-portada-main">
+                    ${banner}
+                    <div class="rn-portada-cuerpo">
+                        ${ilustracion}
+                        <div class="rn-portada-accion">
+                            <div class="rn-portada-iniciar-halo">
+                                <button type="button" class="rn-btn-iniciar-pill" id="rnBtnIniciarAmbiente">
+                                    <span>Iniciar</span>
+                                    <span class="rn-btn-iniciar-flecha" aria-hidden="true">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-                ${escenaJuegosHTML()}
-            </div>
-        `);
+                ${escena}`;
+        /* Con PNG 16:9: stage fijo para el mismo encuadre en ventana y fullscreen */
+        $paso.html(usaFondo
+            ? `<div class="rn-portada${claseFondo}">
+                <div class="rn-portada-stage">
+                    ${fondoLayer}
+                    ${cuerpo}
+                </div>
+            </div>`
+            : `<div class="rn-portada">
+                ${cuerpo}
+            </div>`
+        );
     }
 
     // Escena inferior DERECHA, clicable: la figura y el texto se relacionan con
@@ -185,18 +196,14 @@
         </svg>`;
     }
 
-    // Abre el banco de juegos (paquetes del catálogo). Al volver, re-renderiza la portada.
+    // Abre el banco vía identidad (misma puerta que Iniciar: alumnos + PIN).
     function abrirJuegos() {
-        if (!window.BancoJuegos) return;
-        const color = (arbol && arbol.ambiente && arbol.ambiente.color_hex) || '';
-        window.BancoJuegos.abrir({
-            $paso,
-            color,
-            onVolver: function () {
-                renderPortada();
-                enlazarEventosPortada();
-            },
-        });
+        const url = '/alumnos?destino=juegos';
+        if (window.KioscoNav && window.KioscoNav.esRutaKiosco('/alumnos')) {
+            window.KioscoNav.ir(url);
+            return;
+        }
+        window.location.href = url;
     }
 
     function renderErrorCamino() {

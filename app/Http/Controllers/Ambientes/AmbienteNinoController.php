@@ -288,6 +288,7 @@ class AmbienteNinoController extends Controller
 
     private function urlPortada(string $slug): string
     {
+        $slug = $this->slugImagenAmbiente($slug);
         $relativo = 'assets/images/ambientes/'.$slug.'-portada.png';
         $absoluto = public_path($relativo);
 
@@ -298,15 +299,28 @@ class AmbienteNinoController extends Controller
         return '';
     }
 
+    /**
+     * Fondo de portada kiosco (encima del footer «Vamos a jugar»).
+     * Convención: public/assets/images/fondos_Ambientes/{slug}.png
+     */
     private function urlFondo(string $slug): string
     {
-        $relativo = 'assets/images/ambientes/'.$slug.'-fondo.png';
+        $slug = $this->slugImagenAmbiente($slug);
+        $relativo = 'assets/images/fondos_Ambientes/'.$slug.'.png';
         $absoluto = public_path($relativo);
 
         if (File::exists($absoluto)) {
-            return '/'.$relativo;
+            return '/'.$relativo.'?v='.@filemtime($absoluto);
         }
 
         return '';
+    }
+
+    /** Alias legacy del nodo (musica/logico) → slug de archivo/BD. */
+    private function slugImagenAmbiente(string $slug): string
+    {
+        $slug = strtolower(trim($slug));
+
+        return (string) (config("ambiente.slugs_bd.{$slug}") ?: $slug);
     }
 }

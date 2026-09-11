@@ -2,7 +2,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/constructor-vista-nino.css') }}?v={{ @filemtime(public_path('assets/css/constructor-vista-nino.css')) }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/recorrido-nino.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/recorrido-nino.css') }}?v={{ @filemtime(public_path('assets/css/recorrido-nino.css')) }}">
     <link rel="stylesheet" href="{{ asset('assets/css/banco-juegos.css') }}?v={{ @filemtime(public_path('assets/css/banco-juegos.css')) }}">
 @endpush
 

@@ -187,42 +187,89 @@
     max-width: 36rem;
 }
 
-/* ââ Portada estilo Multisensorial / ExpresiÃ³n ArtÃ­stica ââ */
+/* ── Portada estilo Multisensorial / Expresión Artística ── */
 .rn-portada {
     --rn-header: color-mix(in srgb, var(--rn-color, #0F6E56) 55%, #38bdf8);
+    --bj-escena-h: 172px;
+    --bj-suelo-h: 64px;
+    position: relative;
     height: 100%;
     min-height: 100%;
     display: flex;
     flex-direction: column;
     background: #fff;
-}
-
-/* Portada con imagen de fondo completa (cabecera + ilustración en un solo PNG) */
-.rn-portada--con-fondo {
-    position: relative;
     overflow: hidden;
-    background: #fff;
 }
 
-.rn-portada-fondo {
+.rn-portada-main {
+    position: relative;
+    z-index: 2;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+}
+
+/* Sin fondo de arte: el main se comporta como la portada clásica */
+.rn-portada:not(.rn-portada--con-fondo) .rn-portada-main {
+    display: flex;
+    flex-direction: column;
+}
+
+/*
+ * Portada con PNG de ambiente — llena CUALQUIER viewport.
+ * Proporciones de diseño: arte 1920×1080 + césped 64 → total 1144.
+ * El stage ocupa 100%×100%; el PNG se estira al área sobre el césped.
+ * Sin letterbox: se adapta a tablet, ventana y fullscreen.
+ * (No-crop + no-barras + no-distorsión a la vez es imposible; priorizamos llenar.)
+ */
+.rn-portada--con-fondo {
+    --rn-art-h: 1080;
+    --rn-suelo-design: 64;
+    --rn-escena-design: 172;
+    --rn-stage-h: calc(var(--rn-art-h) + var(--rn-suelo-design)); /* 1144 */
+    --bj-suelo-h: calc(100% * var(--rn-suelo-design) / var(--rn-stage-h));
+    --bj-escena-h: calc(100% * var(--rn-escena-design) / var(--rn-stage-h));
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #5aa34c;
+}
+
+.rn-portada--con-fondo > .rn-portada-stage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    container-type: size;
+}
+
+/* Pie del PNG = línea punteada del césped */
+.rn-portada--con-fondo .rn-portada-fondo {
     position: absolute;
     top: 0;
     left: 0;
+    right: 0;
+    bottom: var(--bj-suelo-h);
     z-index: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: top center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: center center;
     pointer-events: none;
-    user-select: none;
 }
 
-/* Pantallas medianas/grandes: llena el viewport (imágenes 1920×1080) */
-@media (min-width: 600px), (min-height: 500px) {
-    .rn-portada-fondo {
-        object-fit: cover;
-        object-position: top left;
-    }
+.rn-portada--con-fondo .rn-portada-main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: var(--bj-suelo-h);
+    z-index: 2;
+    flex: none;
+    width: auto;
+    height: auto;
+    min-height: 0;
 }
 
 .rn-portada--con-fondo .rn-portada-cuerpo {
@@ -232,12 +279,51 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: clamp(72px, 14vh, 120px) clamp(12px, 5vw, 72px) clamp(88px, 16vh, 172px);
+    padding: clamp(40px, 10cqh, 120px) clamp(12px, 5cqw, 72px) clamp(12px, 4cqh, 40px);
     pointer-events: none;
 }
 
 .rn-portada--con-fondo .rn-portada-accion {
     pointer-events: auto;
+}
+
+.rn-portada--con-fondo .bj-escena {
+    --bj-escena-h: calc(100% * var(--rn-escena-design) / var(--rn-stage-h));
+    --bj-suelo-h: calc(100% * var(--rn-suelo-design) / var(--rn-escena-design));
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    flex: none;
+    height: var(--bj-escena-h);
+    width: 100%;
+    z-index: 4;
+    background: transparent;
+}
+
+.rn-portada--con-fondo .bj-escena-suelo {
+    height: var(--bj-suelo-h);
+    background: linear-gradient(180deg, #8fcd6f 0%, #6bb35a 55%, #5aa34c 100%);
+}
+
+.rn-portada--con-fondo .bj-nino {
+    width: clamp(100px, 22cqw, 280px);
+    right: clamp(0.75rem, 6cqw, 5rem);
+    bottom: 2%;
+}
+
+.rn-portada--con-fondo .bj-escena-etiqueta {
+    right: clamp(5.5rem, 18cqw, 14rem);
+    bottom: calc(100% * 110 / 172);
+    font-size: clamp(0.8rem, 2.2cqw, 1.1rem);
+    padding: clamp(0.4rem, 1.2cqh, 0.75rem) clamp(0.7rem, 1.8cqw, 1.3rem);
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.rn-portada--con-fondo .rn-btn-iniciar-pill {
+    font-size: clamp(1.1rem, 3.2cqw, 1.85rem);
+    padding: clamp(0.65rem, 1.8cqh, 1.1rem) clamp(1.1rem, 3cqw, 1.8rem);
 }
 
 .rn-portada-banner {
@@ -430,12 +516,12 @@
         flex-direction: column;
         justify-content: flex-end;
         align-items: center;
-        padding: clamp(72px, 12vh, 100px) clamp(16px, 5vw, 32px) clamp(100px, 18vh, 180px);
+        padding: clamp(72px, 12vh, 100px) clamp(16px, 5vw, 32px) clamp(24px, 4vh, 48px);
     }
 
-    .rn-portada-fondo {
-        object-fit: contain;
-        object-position: top center;
+    .rn-portada--con-fondo .rn-portada-fondo {
+        background-size: 100% 100%;
+        background-position: center center;
     }
 
     .rn-portada-ilustracion {

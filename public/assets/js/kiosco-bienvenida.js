@@ -14,10 +14,19 @@
         var url = wrap.getAttribute('data-redirect-inicio');
         if (!url) return;
 
-        var path = url.startsWith('http') ? new URL(url).pathname : url;
+        // Conservar query (?abrir=juegos) al navegar sin recargar.
+        var pathConQuery;
+        if (url.startsWith('http')) {
+            var parsed = new URL(url);
+            pathConQuery = parsed.pathname + parsed.search;
+        } else {
+            pathConQuery = url;
+        }
 
-        if (window.KioscoNav && window.KioscoNav.esRutaKiosco(path)) {
-            window.KioscoNav.ir(path);
+        var pathname = pathConQuery.split('?')[0];
+
+        if (window.KioscoNav && window.KioscoNav.esRutaKiosco(pathname)) {
+            window.KioscoNav.ir(pathConQuery);
             return;
         }
 
