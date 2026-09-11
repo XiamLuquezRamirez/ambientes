@@ -31,4 +31,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    /*
+    | Servidor local de Edge TTS (python server.py de voces_infantiles).
+    | POST {text, voice, pitch, rate} → MP3.
+    */
+    'edge_tts' => [
+        'url' => env('EDGE_TTS_URL', 'http://127.0.0.1:9000'),
+        'timeout' => (int) env('EDGE_TTS_TIMEOUT', 30),
+    ],
+
 ];
