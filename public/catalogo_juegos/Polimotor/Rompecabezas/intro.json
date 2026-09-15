@@ -14,11 +14,11 @@
   "conversacion": [
     {
       "personaje": 0,
-      "texto": "Hola, soy Zoe. <br> Hoy vamos a armar el rompecabezas del cuerpo humano."
+      "texto": "Hola, soy Zeus. <br> Hoy vamos a armar el rompecabezas del cuerpo humano."
     },
     {
       "personaje": 1,
-      "texto": "¡Yo soy Zeus! <br> Arrastra cada pieza hasta el lugar donde corresponde."
+      "texto": "¡Yo soy Zoe! <br> Arrastra cada pieza hasta el lugar donde corresponde."
     },
     {
       "personaje": 0,

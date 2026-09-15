@@ -655,7 +655,7 @@ CREATE TABLE `emociones_sesion` (
   `sesion_id` bigint unsigned NOT NULL,
   `bloque_id` bigint unsigned NOT NULL,
   `estudiante_id` bigint unsigned NOT NULL,
-  `emocion` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `emocion` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `emociones_sesion_sesion_id_unique` (`sesion_id`),
@@ -1073,7 +1073,7 @@ CREATE TABLE `juegos` (
   `eje_id` bigint unsigned DEFAULT NULL,
   `tematica_id` bigint unsigned DEFAULT NULL,
   `modulo_id` bigint unsigned DEFAULT NULL,
-  `tipo` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo_juego_id` bigint unsigned DEFAULT NULL,
   `ruta` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
@@ -1088,22 +1088,23 @@ CREATE TABLE `juegos` (
   KEY `juegos_ambiente_id_activo_orden_index` (`ambiente_id`,`activo`,`orden`),
   KEY `juegos_eje_id_activo_orden_index` (`eje_id`,`activo`,`orden`),
   KEY `juegos_tematica_id_activo_orden_index` (`tematica_id`,`activo`,`orden`),
+  KEY `juegos_tipo_juego_id_activo_orden_index` (`tipo_juego_id`,`activo`,`orden`),
   CONSTRAINT `juegos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `juegos_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL
+  CONSTRAINT `juegos_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `juegos_tipo_juego_id_foreign` FOREIGN KEY (`tipo_juego_id`) REFERENCES `tipos_juegos` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `juegos` */
 
-insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo`,`ruta`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
-('rompecabezas-del-cuerpo',7,NULL,NULL,NULL,'rompecabezas_cuerpo','catalogo_juegos/Polimotor/Rompecabezas','Rompecabezas del cuerpo','Armar el cuerpo humano arrastrando piezas según el nivel de edad.','fa-puzzle-piece','#ffd54f',1,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
-('reconocimiento-de-partes-del-cuerpo',7,NULL,NULL,NULL,'reconocimiento_partes','catalogo_juegos/Polimotor/Reconocimiento','Reconocimiento de partes del cuerpo','Tocar las partes del cuerpo indicadas según el nivel de edad.','fa-hand-pointer','#81d4fa',2,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
-('lateralidad',7,NULL,NULL,NULL,'lateralidad','catalogo_juegos/Polimotor/Lateralidad','Lateralidad (derecha/izquierda)','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','fa-arrows-left-right','#a5d6a7',3,1,'2026-09-09 17:47:30','2026-09-09 17:47:30'),
-('memoria-corporal',7,NULL,NULL,NULL,'reconocimiento_partes','catalogo_juegos/Polimotor/MemoriaCorporal','Memoria Corporal',NULL,'fa-puzzle-piece','#2563eb',4,1,'2026-09-14 15:48:10','2026-09-14 15:48:10'),
-('laberintos-de-coordinacion',7,NULL,NULL,NULL,'laberinto','catalogo_juegos/Polimotor/LaberintosDeCoordinacion','Laberintos de coordinacion',NULL,'fa-chess-knight','#2563eb',5,1,'2026-09-12 08:48:03','2026-09-14 09:17:38'),
-('secuencia-de-movimiento',7,NULL,NULL,NULL,'secuencia_movimiento','catalogo_juegos/Polimotor/SecuenciaDeMovimiento','Secuencia de movimiento',NULL,'fa-timeline','#24eb3b',6,1,'2026-09-14 09:20:46','2026-09-14 16:05:43');
-
+insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo_juego_id`,`ruta`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
+('laberintos-de-coordinacion',7,NULL,NULL,NULL,5,'catalogo_juegos/Polimotor/LaberintosDeCoordinacion','Laberintos de coordinacion',NULL,'fa-chess-knight','#2563eb',5,1,'2026-09-12 08:48:03','2026-09-14 09:17:38'),
+('lateralidad',7,NULL,NULL,NULL,3,'catalogo_juegos/Polimotor/Lateralidad','Lateralidad (derecha/izquierda)','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','fa-arrows-left-right','#a5d6a7',3,1,'2026-09-09 17:47:30','2026-09-09 17:47:30'),
+('memoria-corporal',7,NULL,NULL,NULL,4,'catalogo_juegos/Polimotor/MemoriaCorporal','Memoria Corporal',NULL,'fa-puzzle-piece','#2563eb',4,1,'2026-09-14 15:48:10','2026-09-14 15:48:10'),
+('reconocimiento-de-partes-del-cuerpo',7,NULL,NULL,NULL,2,'catalogo_juegos/Polimotor/Reconocimiento','Reconocimiento de partes del cuerpo','Tocar las partes del cuerpo indicadas según el nivel de edad.','fa-hand-pointer','#81d4fa',2,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
+('rompecabezas-del-cuerpo',7,NULL,NULL,NULL,1,'catalogo_juegos/Polimotor/Rompecabezas','Rompecabezas del cuerpo','Armar el cuerpo humano arrastrando piezas según el nivel de edad.','fa-puzzle-piece','#ffd54f',1,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
+('secuencia-de-movimiento',7,NULL,NULL,NULL,6,'catalogo_juegos/Polimotor/SecuenciaDeMovimiento','Secuencia de movimiento',NULL,'fa-timeline','#24eb3b',6,1,'2026-09-14 09:20:46','2026-09-14 16:05:43');
 
 /*Table structure for table `matriculas` */
 
@@ -2487,8 +2488,8 @@ CREATE TABLE `participaciones_bloque` (
   `sesion_id` bigint unsigned NOT NULL,
   `bloque_id` bigint unsigned NOT NULL,
   `estudiante_id` bigint unsigned NOT NULL,
-  `tipo` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `archivo_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `tipo` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `archivo_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `participaciones_bloque_bloque_estudiante_index` (`bloque_id`,`estudiante_id`),
@@ -4407,6 +4408,32 @@ insert  into `tematicas`(`id`,`eje_id`,`nombre`,`competencia`,`referente_alterna
 (3,8,'Prueba docente',NULL,NULL,0,1,0,1,'activa',1,4,'2026-08-15 08:28:19','2026-08-18 15:12:47'),
 (7,10,'Identifica los colores',NULL,NULL,0,0,1,NULL,'activa',1,1,'2026-08-28 15:31:20','2026-08-29 09:31:01'),
 (8,11,'Rompecabezas del cuerpo humano',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-09-10 09:11:10','2026-09-10 09:11:10');
+
+/*Table structure for table `tipos_juegos` */
+
+DROP TABLE IF EXISTS `tipos_juegos`;
+
+CREATE TABLE `tipos_juegos` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `activo` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tipos_juegos_slug_unique` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+/*Data for the table `tipos_juegos` */
+
+insert  into `tipos_juegos`(`id`,`slug`,`nombre`,`descripcion`,`activo`,`created_at`,`updated_at`) values 
+(1,'rompecabezas','Rompecabezas','Juego para armar el cuerpo humano mediante piezas.',1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
+(2,'reconocimiento','Reconocimiento','Juego para reconocer e identificar las diferentes partes del cuerpo.',1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
+(3,'lateralidad','Lateralidad','Juego para trabajar la identificación de derecha e izquierda.',1,'2026-09-09 17:47:30','2026-09-09 17:47:30'),
+(4,'memoria','Memoria','Juego de memoria relacionado con las partes del cuerpo.',1,'2026-09-14 15:48:10','2026-09-14 15:48:10'),
+(5,'laberinto','Laberinto','Juego de recorrido mediante laberintos para trabajar la coordinación.',1,'2026-09-12 08:48:03','2026-09-12 08:48:03'),
+(6,'secuencia_movimiento','Secuencia de movimiento','Juego para ordenar y reconocer secuencias de movimientos.',1,'2026-09-14 09:20:46','2026-09-14 09:20:46');
 
 /*Table structure for table `users` */
 
