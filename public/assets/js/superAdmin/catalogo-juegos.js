@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function rellenarForm(data) {
         if (!form || !data) return;
         limpiarErroresForm();
-        form.querySelector('#juego_id').value = data.id || '';
+        form.querySelector('#juego_id').value = data.slug || '';
         form.querySelector('#juego_nombre').value = data.nombre || '';
 
         const selTipo = form.querySelector('#juego_tipo');

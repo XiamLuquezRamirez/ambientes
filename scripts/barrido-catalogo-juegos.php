@@ -164,13 +164,13 @@ if ($sinRuta > 0) {
     warn("Hay {$sinRuta} juegos sin ruta (catálogo incompleto)");
 }
 
-$paquetesDb = DB::table('juegos')->whereNotNull('ruta')->where('ruta', '!=', '')->get(['id', 'tipo', 'ruta', 'activo', 'nombre']);
+$paquetesDb = DB::table('juegos')->whereNotNull('ruta')->where('ruta', '!=', '')->get(['slug', 'tipo', 'ruta', 'activo', 'nombre']);
 foreach ($paquetesDb as $j) {
     $idx = public_path(trim($j->ruta, '/').'/index.html');
     if (! is_file($idx)) {
-        fail("BD id={$j->id} ruta={$j->ruta} sin index.html en disco");
+        fail("BD slug={$j->slug} ruta={$j->ruta} sin index.html en disco");
     } else {
-        ok("BD id={$j->id} {$j->nombre} → disco OK");
+        ok("BD slug={$j->slug} {$j->nombre} → disco OK");
     }
 }
 
@@ -223,7 +223,7 @@ try {
 
         $svc = new App\Services\JuegoCatalogoService;
         $tarjeta = $svc->serializarTarjeta($juego);
-        foreach (['id', 'tipo', 'ruta', 'url_paquete', 'nombre', 'cadena'] as $k) {
+        foreach (['slug', 'tipo', 'ruta', 'url_paquete', 'nombre', 'cadena'] as $k) {
             if (! array_key_exists($k, $tarjeta)) {
                 fail("serializarTarjeta sin clave {$k}");
             }
@@ -251,7 +251,7 @@ $routeNames = [
 foreach ($routeNames as $name) {
     try {
         $url = route($name, $name === 'superadmin.catalogo.juegos.preview' && isset($juego)
-            ? ['juego' => $juego->id]
+            ? ['juego' => $juego->slug]
             : []);
         ok("Ruta {$name} → {$url}");
     } catch (Throwable $e) {

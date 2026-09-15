@@ -235,7 +235,7 @@ insert  into `bloques_experiencia`(`id`,`experiencia_id`,`tipo`,`orden`,`datos`,
 (326,26,'reto',6,'{\"fb_ok\": \"¡Paso logrado!\", \"pasos\": [{\"opciones\": [{\"emoji\": \"?\", \"label\": \"Azul\", \"imagen\": \"\", \"correcta\": true}, {\"emoji\": \"?\", \"label\": \"Rojo\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Amarillo\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Verde\", \"imagen\": \"\", \"correcta\": false}], \"pregunta\": \"¿Qué color tiene el mar?\"}, {\"opciones\": [{\"emoji\": \"?\", \"label\": \"Verde\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Azul\", \"imagen\": \"\", \"correcta\": false}, {\"emoji\": \"?\", \"label\": \"Rojo\", \"imagen\": \"\", \"correcta\": true}, {\"emoji\": \"?\", \"label\": \"Amarillo\", \"imagen\": \"\", \"correcta\": false}], \"pregunta\": \"¿Qué color tiene la fresa?\"}], \"fb_err\": \"Inténtalo otra vez.\", \"intentos\": \"3\", \"al_agotar\": \"Mostrar respuesta correcta\", \"descripcion\": \"Reto de colores\", \"instruccion\": \"Completa los dos pasos del reto de colores.\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
 (327,26,'dibujo',7,'{\"fondo\": \"Fondo_prueba_6a9741b1d7c8e.png\", \"instruccion\": \"Dibuja tu color favorito en el lienzo.\", \"nota_evidencia\": \"Dibujo de prueba perfiles\", \"guardar_evidencia\": true}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
 (328,26,'juego',8,'{\"seq_1\": \"\", \"seq_2\": \"\", \"seq_3\": \"\", \"seq_4\": \"\", \"imagen_1\": \"Dibujo-Basico-Limon_6a9f14066a866.jpg\", \"imagen_2\": \"Fresa-Facil_6a9f148ab4bed.jpg\", \"imagen_3\": \"girasol_6a9f1490bea1a.jpg\", \"imagen_4\": \"mar_6a9f14856adf3.jpg\", \"imagen_5\": \"fire-truck-coloring-page-isolated-for-kids-free-vector_6a9f143342f12.jpg\", \"imagen_6\": \"icon-bunch-of-grapes-with-a-leaf-contour-drawing-of-fruit-illustration-vector_6a9ae101d714b.jpg\", \"juego_id\": \"memoria\", \"instruccion\": \"Encuentra las parejas iguales. Toca dos cartas.\", \"juego_imagen\": \"\", \"juego_nombre\": \"Memoria de colores\", \"juego_piezas\": \"\", \"colores_zonas\": [], \"juego_catalogo_id\": null}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
-(329,26,'juego',9,'{\"seq_1\": null, \"seq_2\": null, \"seq_3\": null, \"seq_4\": null, \"imagen_1\": null, \"imagen_2\": null, \"imagen_3\": null, \"imagen_4\": null, \"imagen_5\": null, \"imagen_6\": null, \"juego_id\": \"rompecabezas\", \"instruccion\": \"Arma el rompecabezas. Coloca cada pieza en su lugar.\", \"juego_imagen\": \"images_1__6a9f12d69e283.jpg\", \"juego_nombre\": \"Rompecabezas del cuerpo\", \"juego_piezas\": null, \"colores_zonas\": [], \"juego_catalogo_id\": \"21\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
+(329,26,'juego',9,'{\"seq_1\": null, \"seq_2\": null, \"seq_3\": null, \"seq_4\": null, \"imagen_1\": null, \"imagen_2\": null, \"imagen_3\": null, \"imagen_4\": null, \"imagen_5\": null, \"imagen_6\": null, \"juego_id\": \"rompecabezas\", \"instruccion\": \"Arma el rompecabezas. Coloca cada pieza en su lugar.\", \"juego_imagen\": \"images_1__6a9f12d69e283.jpg\", \"juego_nombre\": \"Rompecabezas del cuerpo\", \"juego_piezas\": null, \"colores_zonas\": [], \"juego_catalogo_id\": \"rompecabezas-del-cuerpo\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
 (330,26,'juego',10,'{\"seq_1\": \"paint-splash-red-abstract-blot-burgundy-cartoon-paint-splatter-vector_6a9f13f23c935.jpg\", \"seq_2\": \"Dibujo-Basico-Limon_6a9f14066a866.jpg\", \"seq_3\": \"mar_6a9f14856adf3.jpg\", \"seq_4\": \"girasol_6a9f1490bea1a.jpg\", \"imagen_1\": \"\", \"imagen_2\": \"\", \"imagen_3\": \"\", \"imagen_4\": \"\", \"imagen_5\": \"\", \"imagen_6\": \"\", \"juego_id\": \"secuencia\", \"instruccion\": \"Ordena las imágenes del uno al cuatro.\", \"juego_imagen\": \"\", \"juego_nombre\": \"Ordena los colores\", \"juego_piezas\": \"\", \"colores_zonas\": [], \"juego_catalogo_id\": null}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
 (331,26,'emocion',11,'{\"cantidad\": \"4\", \"instruccion\": \"¿Cómo te sentiste con esta actividad? Toca una cara.\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
 (332,26,'video',2,'{\"archivo\": \"Hola_bienvenidos_como_estan_amigos_karol_sevilla_6aa017fe4f6a7.mp4\", \"instruccion\": \"Observa\", \"descripcion_accesible\": null}',1,'2026-09-08 09:12:58','2026-09-10 09:16:03');
@@ -1068,7 +1068,7 @@ insert  into `instrucciones_audio`(`id`,`bloque_experiencia_id`,`instruccion`,`p
 DROP TABLE IF EXISTS `juegos`;
 
 CREATE TABLE `juegos` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `ambiente_id` bigint unsigned DEFAULT NULL,
   `eje_id` bigint unsigned DEFAULT NULL,
   `tematica_id` bigint unsigned DEFAULT NULL,
@@ -1083,7 +1083,7 @@ CREATE TABLE `juegos` (
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`slug`),
   KEY `juegos_modulo_id_activo_orden_index` (`modulo_id`,`activo`,`orden`),
   KEY `juegos_ambiente_id_activo_orden_index` (`ambiente_id`,`activo`,`orden`),
   KEY `juegos_eje_id_activo_orden_index` (`eje_id`,`activo`,`orden`),
@@ -1092,15 +1092,18 @@ CREATE TABLE `juegos` (
   CONSTRAINT `juegos_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `juegos` */
 
-insert  into `juegos`(`id`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo`,`ruta`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
-(21,7,NULL,NULL,NULL,'rompecabezas_cuerpo','catalogo_juegos/Polimotor/Rompecabezas','Rompecabezas del cuerpo','Armar el cuerpo humano arrastrando piezas según el nivel de edad.','fa-puzzle-piece','#ffd54f',1,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
-(22,7,NULL,NULL,NULL,'reconocimiento_partes','catalogo_juegos/Polimotor/Reconocimiento','Reconocimiento de partes del cuerpo','Tocar las partes del cuerpo indicadas según el nivel de edad.','fa-hand-pointer','#81d4fa',2,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
-(23,7,NULL,NULL,NULL,'lateralidad','catalogo_juegos/Polimotor/Lateralidad','Lateralidad (derecha/izquierda)','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','fa-arrows-left-right','#a5d6a7',3,1,'2026-09-09 17:47:30','2026-09-09 17:47:30'),
-(24,7,NULL,NULL,NULL,'reconocimiento_partes','catalogo_juegos/Polimotor/MemoriaCorporal','Memoria Corporal',NULL,'fa-puzzle-piece','#2563eb',4,1,'2026-09-14 15:48:10','2026-09-14 15:48:10');
+insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo`,`ruta`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
+('rompecabezas-del-cuerpo',7,NULL,NULL,NULL,'rompecabezas_cuerpo','catalogo_juegos/Polimotor/Rompecabezas','Rompecabezas del cuerpo','Armar el cuerpo humano arrastrando piezas según el nivel de edad.','fa-puzzle-piece','#ffd54f',1,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
+('reconocimiento-de-partes-del-cuerpo',7,NULL,NULL,NULL,'reconocimiento_partes','catalogo_juegos/Polimotor/Reconocimiento','Reconocimiento de partes del cuerpo','Tocar las partes del cuerpo indicadas según el nivel de edad.','fa-hand-pointer','#81d4fa',2,1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
+('lateralidad',7,NULL,NULL,NULL,'lateralidad','catalogo_juegos/Polimotor/Lateralidad','Lateralidad (derecha/izquierda)','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','fa-arrows-left-right','#a5d6a7',3,1,'2026-09-09 17:47:30','2026-09-09 17:47:30'),
+('memoria-corporal',7,NULL,NULL,NULL,'reconocimiento_partes','catalogo_juegos/Polimotor/MemoriaCorporal','Memoria Corporal',NULL,'fa-puzzle-piece','#2563eb',4,1,'2026-09-14 15:48:10','2026-09-14 15:48:10'),
+('laberintos-de-coordinacion',7,NULL,NULL,NULL,'laberinto','catalogo_juegos/Polimotor/LaberintosDeCoordinacion','Laberintos de coordinacion',NULL,'fa-chess-knight','#2563eb',5,1,'2026-09-12 08:48:03','2026-09-14 09:17:38'),
+('secuencia-de-movimiento',7,NULL,NULL,NULL,'secuencia_movimiento','catalogo_juegos/Polimotor/SecuenciaDeMovimiento','Secuencia de movimiento',NULL,'fa-timeline','#24eb3b',6,1,'2026-09-14 09:20:46','2026-09-14 16:05:43');
+
 
 /*Table structure for table `matriculas` */
 
@@ -1169,7 +1172,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `migrations` */
 
@@ -1227,7 +1230,9 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (54,'2026_09_09_000001_create_sesiones_juego_table',24),
 (55,'2026_09_09_000002_create_sesiones_juego_elementos_table',24),
 (56,'2026_09_09_000004_juegos_solo_catalogo_paquetes',25),
-(57,'2026_09_09_000005_seed_juego_lateralidad',26);
+(57,'2026_09_09_000005_seed_juego_lateralidad',26),
+(58,'2026_09_15_000001_juegos_slug_como_pk',27),
+(59,'2026_09_15_000002_seed_juegos_laberintos_y_secuencia',28);
 
 /*Table structure for table `modulo_institucion` */
 
@@ -4272,7 +4277,7 @@ DROP TABLE IF EXISTS `sesiones_juego`;
 CREATE TABLE `sesiones_juego` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `estudiante_id` bigint unsigned NOT NULL,
-  `juego_id` bigint unsigned NOT NULL,
+  `juego_id` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `nivel_edad` enum('3','4','5-6') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `perfil_aprendizaje_id` int DEFAULT NULL,
   `completado` tinyint(1) NOT NULL DEFAULT '0',
@@ -4287,7 +4292,7 @@ CREATE TABLE `sesiones_juego` (
   KEY `sesiones_juego_completado_puntaje_index` (`completado`,`puntaje`),
   KEY `sesiones_juego_perfil_aprendizaje_id_foreign` (`perfil_aprendizaje_id`),
   CONSTRAINT `sesiones_juego_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `sesiones_juego_juego_id_foreign` FOREIGN KEY (`juego_id`) REFERENCES `juegos` (`id`),
+  CONSTRAINT `sesiones_juego_juego_id_foreign` FOREIGN KEY (`juego_id`) REFERENCES `juegos` (`slug`),
   CONSTRAINT `sesiones_juego_perfil_aprendizaje_id_foreign` FOREIGN KEY (`perfil_aprendizaje_id`) REFERENCES `perfil_aprendizaje` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

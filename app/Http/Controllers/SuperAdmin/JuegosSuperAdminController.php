@@ -59,7 +59,7 @@ class JuegosSuperAdminController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'id' => $juego->id,
+                'slug' => $juego->slug,
                 'tipo' => $juego->tipo,
                 'ruta' => $juego->ruta,
                 'nombre' => $juego->nombre,

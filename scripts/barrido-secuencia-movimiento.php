@@ -243,7 +243,7 @@ if (Schema::hasTable('juegos')) {
         if ($fila->tipo !== 'secuencia_movimiento') {
             fail("BD tipo={$fila->tipo}, esperado secuencia_movimiento");
         } else {
-            ok("BD id={$fila->id} activo=".((int) $fila->activo)." tipo={$fila->tipo}");
+            ok("BD slug={$fila->slug} activo=".((int) $fila->activo)." tipo={$fila->tipo}");
         }
         $idx = public_path(trim($fila->ruta, '/').'/index.html');
         if (! is_file($idx)) {

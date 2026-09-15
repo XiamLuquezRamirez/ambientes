@@ -17,6 +17,7 @@ class JuegoCatalogoServiceTest extends TestCase
     {
         $ambiente = new Ambiente(['id' => 1, 'nombre' => 'Polimotor']);
         $juego = new Juego([
+            'slug' => 'rompecabezas-del-cuerpo',
             'tipo' => 'rompecabezas_cuerpo',
             'ruta' => 'catalogo_juegos/Polimotor/Rompecabezas',
             'nombre' => 'Rompecabezas del cuerpo',
@@ -27,12 +28,11 @@ class JuegoCatalogoServiceTest extends TestCase
             'activo' => true,
             'ambiente_id' => 1,
         ]);
-        $juego->id = 10;
         $juego->setRelation('ambiente', $ambiente);
 
         $tarjeta = (new JuegoCatalogoService)->serializarTarjeta($juego);
 
-        $this->assertSame(10, $tarjeta['id']);
+        $this->assertSame('rompecabezas-del-cuerpo', $tarjeta['slug']);
         $this->assertSame('rompecabezas_cuerpo', $tarjeta['tipo']);
         $this->assertSame('Rompecabezas del cuerpo', $tarjeta['nombre']);
         $this->assertSame('catalogo_juegos/Polimotor/Rompecabezas', $tarjeta['ruta']);
@@ -149,5 +149,14 @@ class JuegoCatalogoServiceTest extends TestCase
         $this->assertFalse(Juego::tipoEsValido(Juego::TIPO_NUEVO));
         $this->assertFalse(Juego::tipoEsValido('Memoria Visual'));
         $this->assertFalse(Juego::tipoEsValido('1invalido'));
+    }
+
+    public function test_slug_es_valido_kebab_case(): void
+    {
+        $this->assertTrue(Juego::slugEsValido('rompecabezas-del-cuerpo'));
+        $this->assertTrue(Juego::slugEsValido('lateralidad'));
+        $this->assertFalse(Juego::slugEsValido(''));
+        $this->assertFalse(Juego::slugEsValido('Rompecabezas'));
+        $this->assertFalse(Juego::slugEsValido('con_guion_bajo'));
     }
 }

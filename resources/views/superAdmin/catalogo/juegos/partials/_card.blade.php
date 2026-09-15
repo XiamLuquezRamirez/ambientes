@@ -7,7 +7,7 @@
     $urlPaquete = $juego->urlPaquete();
 @endphp
 
-<div class="student-card" data-juego-id="{{ $juego->id }}">
+<div class="student-card" data-juego-id="{{ $juego->slug }}">
     <div class="student-top">
         <div class="student-avatar initials d-flex align-items-center justify-content-center"
             style="background: {{ $color }}; color: #fff; font-size: 1.25rem;">
@@ -50,7 +50,7 @@
 
         <div class="form-check form-switch cj-switch-activo mb-0" onclick="event.stopPropagation()">
             <input class="form-check-input toggle-activo-juego" style="cursor: pointer;" type="checkbox"
-                id="juego_activo_{{ $juego->id }}" data-juego-id="{{ $juego->id }}"
+                id="juego_activo_{{ $juego->slug }}" data-juego-id="{{ $juego->slug }}"
                 data-nombre="{{ $juego->nombre }}" title="{{ $juego->activo ? 'Desactivar juego' : 'Activar juego' }}"
                 @checked($juego->activo)>
         </div>
@@ -73,7 +73,7 @@
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-acciones">
                 <li>
                     <button type="button" class="btn-accion btn-editar" data-cj-editar
-                        data-juego-id="{{ $juego->id }}">
+                        data-juego-id="{{ $juego->slug }}">
                         <i class="fa-solid fa-pen"></i>
                         Editar
                     </button>

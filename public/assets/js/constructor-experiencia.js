@@ -660,7 +660,7 @@
     ];
 
     function juegoCatalogoCardHtml(j, selectedCatalogoId) {
-        const catalogoId = j.id;
+        const catalogoId = j.slug;
         const selected = catalogoId && String(catalogoId) === String(selectedCatalogoId || '');
         const icon = j.icono || 'fa-gamepad';
         const iconClass = icon.indexOf('fa-') === 0 ? icon : `fa-${icon}`;
@@ -750,7 +750,7 @@
                </div>`
             : '';
         const resumenCatalogo = catalogoId
-            ? `<div class="cx-help mt-1">Relacionado al catálogo: <strong>${escapar(catalogoNombre || ('#' + catalogoId))}</strong> (id ${escapar(String(catalogoId))})</div>`
+            ? `<div class="cx-help mt-1">Relacionado al catálogo: <strong>${escapar(catalogoNombre || catalogoId)}</strong> (${escapar(String(catalogoId))})</div>`
             : '';
         return `
             <div class="cx-field">

@@ -21,9 +21,16 @@ class Juego extends Model
         'reconocimiento_partes' => 'Reconocimiento de partes',
         'lateralidad' => 'Lateralidad (derecha/izquierda)',
         'secuencia_movimiento' => 'Secuencia de movimiento',
+        'laberinto' => 'Laberintos de coordinación',
     ];
 
     public const TIPO_NUEVO = '__nuevo__';
+
+    protected $primaryKey = 'slug';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
 
     /**
      * @return list<string>
@@ -73,7 +80,20 @@ class Juego extends Model
         return (bool) preg_match('/^[a-z][a-z0-9_]{1,78}$/', $tipo);
     }
 
+    /**
+     * ¿Slug de juego válido? (kebab-case).
+     */
+    public static function slugEsValido(string $slug): bool
+    {
+        if ($slug === '') {
+            return false;
+        }
+
+        return (bool) preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug);
+    }
+
     protected $fillable = [
+        'slug',
         'ambiente_id',
         'modulo_id',
         'eje_id',

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('juegos', function (Blueprint $table) {
-            $table->id();
+            $table->string('slug', 120)->primary();
             $table->foreignId('modulo_id')->constrained('modulos')->cascadeOnDelete();
             $table->string('tipo', 40);
             $table->string('nombre', 100);

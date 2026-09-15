@@ -14,27 +14,27 @@ return new class extends Migration
         });
 
         Schema::table('juegos', function (Blueprint $table) {
-            $table->foreignId('ambiente_id')->nullable()->after('id')->constrained('ambientes')->nullOnDelete();
+            $table->foreignId('ambiente_id')->nullable()->after('slug')->constrained('ambientes')->nullOnDelete();
             $table->foreignId('eje_id')->nullable()->after('ambiente_id')->constrained('ejes')->nullOnDelete();
             $table->foreignId('tematica_id')->nullable()->after('eje_id')->constrained('tematicas')->nullOnDelete();
             $table->unsignedBigInteger('modulo_id')->nullable()->change();
             $table->foreign('modulo_id')->references('id')->on('modulos')->nullOnDelete();
         });
 
-        DB::table('juegos')
+        $filas = DB::table('juegos')
             ->whereNotNull('modulo_id')
-            ->orderBy('id')
-            ->chunkById(100, function ($filas) {
-                foreach ($filas as $fila) {
-                    $modulo = DB::table('modulos')->where('id', $fila->modulo_id)->first(['ambiente_id']);
-                    if (! $modulo) {
-                        continue;
-                    }
-                    DB::table('juegos')->where('id', $fila->id)->update([
-                        'ambiente_id' => $modulo->ambiente_id,
-                    ]);
-                }
-            });
+            ->orderBy('slug')
+            ->get(['slug', 'modulo_id']);
+
+        foreach ($filas as $fila) {
+            $modulo = DB::table('modulos')->where('id', $fila->modulo_id)->first(['ambiente_id']);
+            if (! $modulo) {
+                continue;
+            }
+            DB::table('juegos')->where('slug', $fila->slug)->update([
+                'ambiente_id' => $modulo->ambiente_id,
+            ]);
+        }
 
         Schema::table('juegos', function (Blueprint $table) {
             $table->index(['ambiente_id', 'activo', 'orden']);

@@ -58,7 +58,7 @@ class JuegoCatalogoService
         /** @var LengthAwarePaginator $juegos */
         $juegos = $consulta
             ->orderBy('orden')
-            ->orderBy('id')
+            ->orderBy('slug')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -89,34 +89,34 @@ class JuegoCatalogoService
 
         $juegos = $consulta
             ->orderBy('orden')
-            ->orderBy('id')
+            ->orderBy('slug')
             ->get();
 
         return $this->serializarColeccionJson($juegos);
     }
 
     /**
-     * @param  iterable<int, int|string>  $ids
-     * @return array<int, array{url:?string, nombre:?string, icono:?string, color:?string}>
+     * @param  iterable<int, string>  $slugs
+     * @return array<string, array{url:?string, nombre:?string, icono:?string, color:?string}>
      */
-    public function mapaPaquetesPorIds(iterable $ids): array
+    public function mapaPaquetesPorSlugs(iterable $slugs): array
     {
-        $ids = collect($ids)
-            ->map(fn ($id) => (int) $id)
-            ->filter(fn (int $id) => $id > 0)
+        $slugs = collect($slugs)
+            ->map(fn ($slug) => trim((string) $slug))
+            ->filter(fn (string $slug) => $slug !== '')
             ->unique()
             ->values();
 
-        if ($ids->isEmpty()) {
+        if ($slugs->isEmpty()) {
             return [];
         }
 
         return Juego::query()
-            ->whereIn('id', $ids)
-            ->get(['id', 'nombre', 'ruta', 'icono', 'color', 'activo'])
+            ->whereIn('slug', $slugs)
+            ->get(['slug', 'nombre', 'ruta', 'icono', 'color', 'activo'])
             ->mapWithKeys(function (Juego $juego) {
                 return [
-                    (int) $juego->id => [
+                    (string) $juego->slug => [
                         'url' => $juego->activo ? $juego->urlPaquete() : null,
                         'nombre' => $juego->nombre,
                         'icono' => $juego->icono ?: 'fa-gamepad',
@@ -125,6 +125,16 @@ class JuegoCatalogoService
                 ];
             })
             ->all();
+    }
+
+    /**
+     * @deprecated Usar mapaPaquetesPorSlugs.
+     * @param  iterable<int, int|string>  $ids
+     * @return array<string, array{url:?string, nombre:?string, icono:?string, color:?string}>
+     */
+    public function mapaPaquetesPorIds(iterable $ids): array
+    {
+        return $this->mapaPaquetesPorSlugs($ids);
     }
 
     /**
@@ -146,7 +156,7 @@ class JuegoCatalogoService
         $cadena = $juego->cadenaCurricularResuelta();
 
         return [
-            'id' => $juego->id,
+            'slug' => $juego->slug,
             'tipo' => $juego->tipo,
             'tipo_label' => $juego->tipoLabel(),
             'ruta' => $juego->ruta,
@@ -252,12 +262,14 @@ class JuegoCatalogoService
         $ambiente = Ambiente::query()->findOrFail($cadena['ambiente_id']);
         $nombre = trim((string) $datos['nombre']);
         $ruta = $this->construirRutaPaquete($ambiente, $nombre);
+        $slug = $this->generarSlugUnico($nombre);
 
         $this->assertRutaUnica($ruta);
         $this->assertCarpetaPaqueteLibre($ruta);
         $this->crearStubPaquete($ruta, $nombre);
 
         $payload = $this->payloadMetadatos($datos, $cadena, $ruta);
+        $payload['slug'] = $slug;
         $payload['orden'] = ((int) Juego::query()->max('orden')) + 1;
         $payload['activo'] = array_key_exists('activo', $datos)
             ? (bool) $datos['activo']
@@ -289,7 +301,7 @@ class JuegoCatalogoService
             : $this->construirRutaPaquete($ambiente, $nombre);
 
         if ($rutaNueva !== $rutaAnterior) {
-            $this->assertRutaUnica($rutaNueva, $juego->id);
+            $this->assertRutaUnica($rutaNueva, $juego->slug);
             $this->moverOCrearPaquete($rutaAnterior, $rutaNueva, $nombre);
         }
 
@@ -450,11 +462,11 @@ class JuegoCatalogoService
      *
      * @throws ValidationException
      */
-    public function normalizarYValidarRuta(string $ruta, ?int $ignorarJuegoId = null): string
+    public function normalizarYValidarRuta(string $ruta, ?string $ignorarJuegoSlug = null): string
     {
         $ruta = $this->normalizarRuta($ruta);
         $this->assertPaqueteIndexExiste($ruta);
-        $this->assertRutaUnica($ruta, $ignorarJuegoId);
+        $this->assertRutaUnica($ruta, $ignorarJuegoSlug);
 
         return $ruta;
     }
@@ -497,11 +509,11 @@ class JuegoCatalogoService
     /**
      * @throws ValidationException
      */
-    public function assertRutaUnica(string $ruta, ?int $ignorarJuegoId = null): void
+    public function assertRutaUnica(string $ruta, ?string $ignorarJuegoSlug = null): void
     {
         $existeOtra = Juego::query()
             ->where('ruta', $ruta)
-            ->when($ignorarJuegoId, fn (Builder $q) => $q->where('id', '!=', $ignorarJuegoId))
+            ->when($ignorarJuegoSlug, fn (Builder $q) => $q->where('slug', '!=', $ignorarJuegoSlug))
             ->exists();
 
         if ($existeOtra) {
@@ -509,6 +521,32 @@ class JuegoCatalogoService
                 'ruta' => 'Ya existe un juego registrado con esta ruta.',
             ]);
         }
+    }
+
+    /**
+     * Genera slug kebab-case único a partir del nombre (estable como PK).
+     */
+    public function generarSlugUnico(string $nombre, ?string $ignorarSlug = null): string
+    {
+        $base = Str::slug($nombre) ?: 'juego';
+        if (! Juego::slugEsValido($base)) {
+            $base = 'juego';
+        }
+
+        $slug = $base;
+        $i = 2;
+
+        while (
+            Juego::query()
+                ->where('slug', $slug)
+                ->when($ignorarSlug, fn (Builder $q) => $q->where('slug', '!=', $ignorarSlug))
+                ->exists()
+        ) {
+            $slug = $base.'-'.$i;
+            $i++;
+        }
+
+        return $slug;
     }
 
     /**

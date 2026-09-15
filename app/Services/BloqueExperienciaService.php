@@ -351,23 +351,23 @@ class BloqueExperienciaService
      */
     private function enriquecerCatalogoJuegos(Collection $bloques): Collection
     {
-        $ids = $bloques
+        $slugs = $bloques
             ->map(fn (array $b) => $b['datos']['juego_catalogo_id'] ?? null)
             ->filter()
             ->values();
 
-        $mapa = $this->catalogoJuegos->mapaPaquetesPorIds($ids);
+        $mapa = $this->catalogoJuegos->mapaPaquetesPorSlugs($slugs);
         if ($mapa === []) {
             return $bloques;
         }
 
         return $bloques->map(function (array $bloque) use ($mapa) {
-            $id = (int) ($bloque['datos']['juego_catalogo_id'] ?? 0);
-            if ($id > 0 && isset($mapa[$id])) {
-                $bloque['datos']['juego_catalogo_url'] = $mapa[$id]['url'];
-                $bloque['datos']['juego_catalogo_nombre'] = $mapa[$id]['nombre'];
-                $bloque['datos']['juego_catalogo_icono'] = $mapa[$id]['icono'];
-                $bloque['datos']['juego_catalogo_color'] = $mapa[$id]['color'];
+            $slug = trim((string) ($bloque['datos']['juego_catalogo_id'] ?? ''));
+            if ($slug !== '' && isset($mapa[$slug])) {
+                $bloque['datos']['juego_catalogo_url'] = $mapa[$slug]['url'];
+                $bloque['datos']['juego_catalogo_nombre'] = $mapa[$slug]['nombre'];
+                $bloque['datos']['juego_catalogo_icono'] = $mapa[$slug]['icono'];
+                $bloque['datos']['juego_catalogo_color'] = $mapa[$slug]['color'];
             }
 
             return $bloque;

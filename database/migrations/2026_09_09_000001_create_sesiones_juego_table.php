@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('sesiones_juego', function (Blueprint $table) {
             $table->id();
             $table->foreignId('estudiante_id')->constrained('estudiantes')->cascadeOnDelete();
-            $table->foreignId('juego_id')->constrained('juegos')->restrictOnDelete();
+            $table->string('juego_id', 120);
             $table->enum('nivel_edad', ['3', '4', '5-6']);
             $table->integer('perfil_aprendizaje_id')->nullable();
             $table->boolean('completado')->default(false);
@@ -19,6 +19,11 @@ return new class extends Migration
             $table->unsignedSmallInteger('tiempo_seg')->nullable();
             $table->dateTime('inicio_at');
             $table->dateTime('fin_at')->nullable();
+
+            $table->foreign('juego_id')
+                ->references('slug')
+                ->on('juegos')
+                ->restrictOnDelete();
 
             $table->foreign('perfil_aprendizaje_id')
                 ->references('id')

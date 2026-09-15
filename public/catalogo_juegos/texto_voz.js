@@ -197,6 +197,24 @@
         });
     }
 
+    function encolarFrases(lista) {
+        if (!lista || !lista.length) return;
+        lista.forEach(function (f) {
+            if (!f) return;
+            if (typeof f === "string") encolarTts(f, "zoe");
+            else if (f.texto) encolarTts(f.texto, f.personaje || "zoe");
+            var fb = accesibilidad().feedback || {};
+            var textos = (config && config.textos) || {};
+            ["zoe", "zeus"].forEach(function (pj) {
+                Object.keys(textos).forEach(function (k) {
+                    if (textos[k]) encolarTts(textos[k], pj);
+                });
+                if (fb.acierto && fb.acierto.texto) encolarTts(fb.acierto.texto, pj);
+                if (fb.error && fb.error.texto) encolarTts(fb.error.texto, pj);
+            });
+        });
+    }
+
     function vozNavegadorEspanol() {
         if (!global.speechSynthesis) return null;
         var voices = global.speechSynthesis.getVoices() || [];

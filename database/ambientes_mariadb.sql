@@ -958,7 +958,7 @@ insert  into `instituciones`(`id`,`nombre`,`municipio`,`departamento`,`codigo_da
 DROP TABLE IF EXISTS `juegos`;
 
 CREATE TABLE `juegos` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
   `ambiente_id` bigint unsigned DEFAULT NULL,
   `eje_id` bigint unsigned DEFAULT NULL,
   `tematica_id` bigint unsigned DEFAULT NULL,
@@ -972,7 +972,7 @@ CREATE TABLE `juegos` (
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`slug`),
   KEY `juegos_modulo_id_activo_orden_index` (`modulo_id`,`activo`,`orden`),
   KEY `juegos_ambiente_id_activo_orden_index` (`ambiente_id`,`activo`,`orden`),
   KEY `juegos_eje_id_activo_orden_index` (`eje_id`,`activo`,`orden`),
@@ -981,8 +981,7 @@ CREATE TABLE `juegos` (
   CONSTRAINT `juegos_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*Data for the table `juegos` */
 
 

@@ -88,14 +88,14 @@ function generarBloqueJuegos(string $contenidoSql, array $defaultsJuegos): strin
     }
 
     $filasInsert = [];
-    $id = 1;
     $timestamp = '2026-09-02 17:00:00';
 
     foreach ($modulosOficiales as $moduloId => $ambienteId) {
         foreach ($defaultsJuegos as $juego) {
+            $slug = str_replace('_', '-', $juego['tipo']);
             $filasInsert[] = sprintf(
-                '(%d,%d,NULL,NULL,%d,%s,%s,%s,%s,%s,%d,1,%s,%s)',
-                $id,
+                '(%s,%d,NULL,NULL,%d,%s,%s,%s,%s,%s,%d,1,%s,%s)',
+                escaparSql($slug),
                 $ambienteId,
                 $moduloId,
                 escaparSql($juego['tipo']),
@@ -107,12 +107,10 @@ function generarBloqueJuegos(string $contenidoSql, array $defaultsJuegos): strin
                 escaparSql($timestamp),
                 escaparSql($timestamp)
             );
-            $id++;
         }
     }
 
     $insert = implode(",\n", $filasInsert);
-    $autoIncrement = max($id, 2);
 
     return <<<SQL
 /*Table structure for table `juegos` */
@@ -120,7 +118,7 @@ function generarBloqueJuegos(string $contenidoSql, array $defaultsJuegos): strin
 DROP TABLE IF EXISTS `juegos`;
 
 CREATE TABLE `juegos` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(120) COLLATE utf8mb4_unicode_ci NOT NULL,
   `ambiente_id` bigint unsigned DEFAULT NULL,
   `eje_id` bigint unsigned DEFAULT NULL,
   `tematica_id` bigint unsigned DEFAULT NULL,
@@ -134,7 +132,7 @@ CREATE TABLE `juegos` (
   `activo` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`slug`),
   KEY `juegos_modulo_id_activo_orden_index` (`modulo_id`,`activo`,`orden`),
   KEY `juegos_ambiente_id_activo_orden_index` (`ambiente_id`,`activo`,`orden`),
   KEY `juegos_eje_id_activo_orden_index` (`eje_id`,`activo`,`orden`),
@@ -143,11 +141,11 @@ CREATE TABLE `juegos` (
   CONSTRAINT `juegos_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT={$autoIncrement} DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `juegos` */
 
-insert  into `juegos`(`id`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values
+insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values
 {$insert};
 
 SQL;
