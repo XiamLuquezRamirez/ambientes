@@ -14,25 +14,21 @@
   "conversacion": [
     {
       "personaje": 0,
-      "texto": "¡Vamos a jugar! Escucha con atención y toca el lado del cuerpo que te voy a indicar."
+      "texto": "¡Vamos a jugar! Hoy practicamos izquierda y derecha de la pantalla."
     },
     {
       "personaje": 1,
-      "texto": "¡Yo soy Zeus! <br> Verás una figura de frente. Toca la parte del cuerpo del lado que te digamos."
+      "texto": "¡Yo soy Zeus! Mira bien los lados: izquierda, centro y derecha."
     },
     {
       "personaje": 0,
-      "texto": "La derecha y la izquierda son de la figura: su derecha queda a tu izquierda en la pantalla."
-    },
-    {
-      "personaje": 1,
-      "texto": "¡Tú puedes! <br> Primero eliges niña o niño y tu edad."
+      "texto": "Escucha la consigna y toca el lado o el amigo correcto. ¡Tú puedes!"
     }
   ],
   "configuracion": {
     "intervalo": 50,
     "pausaEntreLineas": 1800,
-    "pausaFinal": 2500,
+    "pausaFinal": 2000,
     "duracionCambioNube": 350
   }
 }

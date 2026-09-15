@@ -35,7 +35,7 @@ class JuegosSuperAdminController extends Controller
         }
 
         return view('superAdmin.catalogo.juegos.index', array_merge($datos, [
-            'tiposJuego' => Juego::TIPOS_LABELS,
+            'tiposJuego' => Juego::tiposCatalogo(),
             'perfilPayload' => [
                 'perfil_id' => 1,
                 'perfil_clave' => 'estandar',
@@ -140,9 +140,15 @@ class JuegosSuperAdminController extends Controller
      */
     private function validarEscritura(Request $request, ?Juego $juego = null): array
     {
-        return $request->validate([
+        $datos = $request->validate([
             'nombre' => ['required', 'string', 'max:150'],
-            'tipo' => ['required', 'string', Rule::in(Juego::tiposPermitidos())],
+            'tipo' => [
+                'required',
+                'string',
+                'max:80',
+                'regex:/^[a-z][a-z0-9_]*$/',
+                Rule::notIn([Juego::TIPO_NUEVO]),
+            ],
             'descripcion' => ['nullable', 'string', 'max:2000'],
             'icono' => ['nullable', 'string', 'max:80'],
             'color' => ['nullable', 'string', 'max:20', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
@@ -152,9 +158,28 @@ class JuegosSuperAdminController extends Controller
             'tematica_id' => ['nullable', 'integer', 'exists:tematicas,id'],
             'activo' => ['sometimes', 'boolean'],
         ], [
+            'nombre.required' => 'Este campo es requerido.',
+            'nombre.max' => 'El nombre no puede superar 150 caracteres.',
+            'tipo.required' => 'Este campo es requerido.',
+            'tipo.regex' => 'El tipo debe estar en snake_case (ej. memoria_visual).',
+            'tipo.not_in' => 'Selecciona o crea un tipo válido.',
+            'tipo.max' => 'El tipo no puede superar 80 caracteres.',
+            'descripcion.max' => 'La descripción no puede superar 2000 caracteres.',
+            'icono.max' => 'El icono no puede superar 80 caracteres.',
             'color.regex' => 'El color debe ser un hexadecimal válido (ej. #2563eb).',
-            'tipo.in' => 'El tipo de juego no es válido.',
-            'ambiente_id.required' => 'El ambiente es obligatorio.',
+            'ambiente_id.required' => 'Este campo es requerido.',
+            'ambiente_id.exists' => 'El ambiente seleccionado no es válido.',
+            'modulo_id.exists' => 'El módulo seleccionado no es válido.',
+            'eje_id.exists' => 'El eje seleccionado no es válido.',
+            'tematica_id.exists' => 'La temática seleccionada no es válida.',
         ]);
+
+        if (! Juego::tipoEsValido((string) $datos['tipo'])) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'tipo' => 'El tipo debe estar en snake_case (ej. memoria_visual).',
+            ]);
+        }
+
+        return $datos;
     }
 }

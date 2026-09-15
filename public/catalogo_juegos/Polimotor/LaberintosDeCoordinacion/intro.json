@@ -1,0 +1,34 @@
+{
+  "personajes": [
+    {
+      "nombre": "Zoe",
+      "gif_idle": "../../images/normal1.gif",
+      "gif_hablando": "../../images/normal2.gif"
+    },
+    {
+      "nombre": "Zeus",
+      "gif_idle": "../../images/ciencia/normal1.gif",
+      "gif_hablando": "../../images/ciencia/normal2.gif"
+    }
+  ],
+  "conversacion": [
+    {
+      "personaje": 0,
+      "texto": "¡Vamos a jugar! Lleva al niño hasta la pelota siguiendo el camino sin salirte."
+    },
+    {
+      "personaje": 1,
+      "texto": "¡Yo soy Zeus! Mantén el dedo sobre el niño y deslízalo por el camino."
+    },
+    {
+      "personaje": 0,
+      "texto": "Si te sales, vuelve a intentar. ¡Tú puedes!"
+    }
+  ],
+  "configuracion": {
+    "intervalo": 50,
+    "pausaEntreLineas": 1800,
+    "pausaFinal": 2000,
+    "duracionCambioNube": 350
+  }
+}

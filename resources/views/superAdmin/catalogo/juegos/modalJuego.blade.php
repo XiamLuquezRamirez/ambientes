@@ -34,7 +34,15 @@
                                     @foreach ($tiposJuego as $valor => $etiqueta)
                                         <option value="{{ $valor }}">{{ $etiqueta }}</option>
                                     @endforeach
+                                    <option value="__nuevo__">+ Agregar nuevo</option>
                                 </select>
+                                <div id="juego_tipo_nuevo_wrap" class="mt-2" hidden>
+                                    <input type="text" id="juego_tipo_nuevo" name="tipo_nuevo" class="form-control"
+                                        maxlength="80" placeholder="Ej. Memoria visual" autocomplete="off">
+                                    <small class="text-muted">
+                                        Se guardará como clave en snake_case (ej. memoria_visual).
+                                    </small>
+                                </div>
                             </div>
                         </div>
 

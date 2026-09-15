@@ -1,0 +1,179 @@
+{
+  "nombre": "Secuencia de movimiento",
+  "mostrarFeedBack": true,
+  "feedback": {
+    "duracion": 1200,
+    "acierto": {
+      "texto": "¡Muy bien! ¡Lo hiciste!",
+      "gif": "../../images/correcto.gif"
+    },
+    "error": {
+      "texto": "Mira otra vez. ¡Vamos a intentarlo!",
+      "gif": "../../images/incorrecto.gif"
+    }
+  },
+  "feedbackPorEdad": {
+    "3": {
+      "acierto": "¡Muy bien! ¡Lo hiciste!",
+      "error": "Mira otra vez. ¡Vamos a intentarlo!",
+      "cierre": "¡Excelente! ¡Jugaste y completaste los movimientos!"
+    },
+    "4": {
+      "acierto": "¡Muy bien! ¡Descubriste qué movimiento seguía!",
+      "error": "Miremos otra vez. ¿Qué movimiento se repite?",
+      "cierre": "¡Excelente! ¡Descubriste los movimientos que seguían!"
+    },
+    "5": {
+      "acierto": "¡Muy bien! ¡Descubriste el patrón!",
+      "error": "Observa con atención. ¿Qué movimiento se repite?",
+      "cierre": "¡Excelente! ¡Descubriste los patrones y completaste las secuencias!"
+    }
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "enunciado": "Observa la secuencia y elige qué sigue",
+    "pregunta": "¿Qué movimiento sigue?",
+    "cierre": "¡Excelente! ¡Completaste las secuencias!"
+  },
+  "timings": {
+    "pasoMs": 650,
+    "pasoLentoMs": 950,
+    "pausaEntrePasosMs": 100
+  },
+  "audios": {
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "movimientos": {
+    "manos_arriba": { "nombre": "Manos arriba", "img": "img/manos_arriba.svg" },
+    "manos_abajo": { "nombre": "Manos abajo", "img": "img/manos_abajo.svg" },
+    "brazos_abiertos": { "nombre": "Brazos abiertos", "img": "img/brazos_abiertos.svg" },
+    "brazos_cerrados": { "nombre": "Brazos juntos", "img": "img/brazos_cerrados.svg" },
+    "manos_cabeza": { "nombre": "Manos en la cabeza", "img": "img/manos_cabeza.svg" },
+    "manos_barriga": { "nombre": "Manos en la barriga", "img": "img/manos_barriga.svg" },
+    "tocar_hombros": { "nombre": "Tocar los hombros", "img": "img/tocar_hombros.svg" },
+    "manos_rodillas": { "nombre": "Manos en las rodillas", "img": "img/manos_rodillas.svg" },
+    "manos_frente": { "nombre": "Manos al frente", "img": "img/manos_frente.svg" },
+    "tocar_cabeza": { "nombre": "Tocar la cabeza", "img": "img/tocar_cabeza.svg" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3 años",
+      "titulo": "3 retos",
+      "retos": [
+        {
+          "id": "a3-r1",
+          "titulo": "Arriba y abajo",
+          "prefijo": ["manos_arriba"],
+          "correcta": "manos_abajo",
+          "distractores": ["brazos_abiertos", "tocar_cabeza"],
+          "demoNarracion": [
+            { "quien": "zoe", "texto": "Mira: manos arriba." },
+            { "quien": "zeus", "texto": "¡Ahora mira qué hago yo!" }
+          ],
+          "preguntaQuien": "zeus",
+          "pregunta": "¿Qué movimiento sigue?"
+        },
+        {
+          "id": "a3-r2",
+          "titulo": "Cabeza y barriga",
+          "prefijo": ["manos_cabeza"],
+          "correcta": "manos_barriga",
+          "distractores": ["manos_arriba", "brazos_abiertos"],
+          "demoNarracion": [
+            { "quien": "zoe", "texto": "Mira: manos en la cabeza." },
+            { "quien": "zeus", "texto": "Manos en la barriga." }
+          ],
+          "preguntaQuien": "zeus",
+          "pregunta": "¿Qué movimiento sigue?"
+        },
+        {
+          "id": "a3-r3",
+          "titulo": "Abierto y cerrado",
+          "prefijo": ["brazos_abiertos"],
+          "correcta": "brazos_cerrados",
+          "distractores": ["manos_cabeza", "manos_abajo"],
+          "demoNarracion": [
+            { "quien": "zoe", "texto": "Mira mis brazos, abre los brazos." },
+            { "quien": "zeus", "texto": "Brazos juntos." }
+          ],
+          "preguntaQuien": "zeus",
+          "pregunta": "¿Qué movimiento sigue?"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "edad": "4 años",
+      "titulo": "3 retos",
+      "retos": [
+        {
+          "id": "a4-r1",
+          "titulo": "Arriba y abajo",
+          "prefijo": ["manos_arriba", "manos_abajo", "manos_arriba"],
+          "correcta": "manos_abajo",
+          "distractores": ["tocar_cabeza", "brazos_abiertos"],
+          "pregunta": "¿Qué sigue?"
+        },
+        {
+          "id": "a4-r2",
+          "titulo": "Abierto y cerrado",
+          "prefijo": ["brazos_abiertos", "brazos_cerrados", "brazos_abiertos"],
+          "correcta": "brazos_cerrados",
+          "distractores": ["manos_arriba", "tocar_hombros", "manos_rodillas"],
+          "pregunta": "¿Qué sigue?"
+        },
+        {
+          "id": "a4-r3",
+          "titulo": "Cabeza y rodillas",
+          "prefijo": ["manos_cabeza", "manos_rodillas", "manos_cabeza"],
+          "correcta": "manos_rodillas",
+          "distractores": ["manos_arriba", "brazos_abiertos", "manos_frente"],
+          "pregunta": "¿Qué sigue?"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "4 retos",
+      "retos": [
+        {
+          "id": "a5-r1",
+          "titulo": "Patrón de tres",
+          "prefijo": ["manos_cabeza", "tocar_hombros", "manos_rodillas", "manos_cabeza", "tocar_hombros"],
+          "correcta": "manos_rodillas",
+          "distractores": ["tocar_hombros", "manos_abajo", "brazos_abiertos"],
+          "pregunta": "¿Qué sigue?"
+        },
+        {
+          "id": "a5-r2",
+          "titulo": "Alternancia",
+          "prefijo": ["manos_frente", "manos_arriba", "manos_frente"],
+          "correcta": "manos_arriba",
+          "distractores": ["manos_abajo", "tocar_hombros", "manos_frente"],
+          "pregunta": "¿Qué sigue?"
+        },
+        {
+          "id": "a5-r3",
+          "titulo": "Patrón de tres",
+          "prefijo": ["tocar_hombros", "manos_rodillas", "brazos_abiertos", "tocar_hombros"],
+          "correcta": "manos_rodillas",
+          "distractores": ["manos_arriba", "brazos_abiertos", "manos_frente"],
+          "pregunta": "¿Qué sigue?"
+        },
+        {
+          "id": "a5-r4",
+          "titulo": "Mayor desafío",
+          "prefijo": ["manos_abajo", "brazos_abiertos", "manos_cabeza", "manos_abajo"],
+          "correcta": "brazos_abiertos",
+          "distractores": ["manos_arriba", "manos_rodillas", "brazos_cerrados", "manos_frente"],
+          "pregunta": "¿Qué sigue?"
+        }
+      ]
+    }
+  ]
+}

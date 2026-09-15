@@ -1,440 +1,177 @@
 {
-    "mostrarFeedBack": true,
-    "fallosParaPista": 2,
-    "feedback": {
-        "duracion": 1800,
-        "acierto": {
-            "texto": "¡Muy bien! Seguiste la indicación correctamente.",
-            "gif": "../../images/correcto.gif"
+  "nombre": "Lateralidad",
+  "mostrarFeedBack": true,
+  "feedback": {
+    "duracion": 1200,
+    "acierto": {
+      "texto": "¡Muy bien!",
+      "gif": "../../images/correcto.gif"
+    },
+    "error": {
+      "texto": "Inténtalo otra vez. ¡Tú puedes!",
+      "gif": "../../images/incorrecto.gif"
+    }
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "enunciado": "Observa y toca el lado correcto",
+    "cierre": "¡Excelente! Practicaste izquierda y derecha."
+  },
+  "audios": {
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "timings": {
+    "pasoMovMs": 850,
+    "pasoSenalMs": 900,
+    "introLadoMs": 500
+  },
+  "objetos": {
+    "oso": { "nombre": "oso", "img": "img/Oso.png" },
+    "perro": { "nombre": "perrito", "img": "img/Perro.png" },
+    "gato": { "nombre": "gato", "img": "img/Gato.png" },
+    "dino": { "nombre": "dinosaurio", "img": "img/Dinosaurio.png" },
+    "celular": { "nombre": "celular", "img": "img/Celular.png" },
+    "manzana": { "nombre": "manzana", "img": "img/Manzana.png" },
+    "mariposa": { "nombre": "mariposa", "img": "img/Mariposa.png" },
+    "mariposa_movimiento": { "nombre": "mariposa", "img": "img/Mariposa.gif" },
+    "conejo": { "nombre": "conejo", "img": "img/Conejo.png" }
+  },
+  "coloresZona": {
+    "izquierda": "#ffd43b",
+    "centro": "#4dabf7",
+    "derecha": "#51cf66"
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3 años",
+      "titulo": "3 retos",
+      "zonas": ["izquierda", "derecha"],
+      "retos": [
+        {
+          "id": "a3-r1",
+          "tipo": "estatico",
+          "titulo": "¿Dónde está mi amigo?",
+          "modoRespuesta": "zona",
+          "consignaPlantilla": "¿Dónde está el {objetivo}? ¿A la izquierda o a la derecha?",
+          "pool": ["oso", "perro"],
+          "objetivoPool": ["perro", "oso"]
         },
-        "error": {
-            "texto": "¡Inténtalo otra vez! Escucha el lado y observa la parte del cuerpo.",
-            "gif": "../../images/incorrecto.gif"
+        {
+          "id": "a3-r2",
+          "tipo": "dinamico",
+          "titulo": "¿Hacia dónde se fue?",
+          "modoRespuesta": "zona",
+          "consignaPlantilla": "Mira a la mariposa... ¿Hacia dónde voló, izquierda o derecha?",
+          "actor": "mariposa_movimiento",
+          "trayectoria": ["centro", "destino"],
+          "destinoPool": ["izquierda", "derecha"],
+          "salirEscena": true
+        },
+        {
+          "id": "a3-r3",
+          "tipo": "imitacion",
+          "titulo": "Sigue a Zeus",
+          "modoRespuesta": "zona",
+          "consignaPlantilla": "Zeus te está señalando un lado... ¡Toca hacia donde señala!",
+          "mascota": "zeus",
+          "senales": ["destino"],
+          "destinoPool": ["izquierda", "derecha"]
         }
+      ]
     },
-    "accesibilidad": {
-        "altoContraste": false,
-        "mostrarZonas": false,
-        "resaltarObjetivo": false,
-        "pistaPorFallos": true,
-        "mostrarProgreso": true,
-        "hitboxExtra": 0
+    {
+      "id": "4",
+      "edad": "4 años",
+      "titulo": "3 retos",
+      "zonas": ["izquierda", "centro", "derecha"],
+      "retos": [
+        {
+          "id": "a4-r1",
+          "tipo": "estatico",
+          "titulo": "¿Dónde está mi amigo?",
+          "modoRespuesta": "zona",
+          "consignaPlantilla": "¿Dónde está el {objetivo}? ¿Izquierda, centro o derecha?",
+          "pool": ["gato", "dino", "celular"],
+          "objetivoPool": ["gato", "dino", "celular"]
+        },
+        {
+          "id": "a4-r2",
+          "tipo": "dinamico",
+          "titulo": "¿Hacia dónde se fue?",
+          "modoRespuesta": "zona",
+          "consignaPlantilla": "Mira bien a la mariposa... se movió dos veces. ¿En qué lado quedó al final?",
+          "actor": "mariposa_movimiento",
+          "trayectoria": ["centro", "paso1", "destino"],
+          "pasoPool": ["izquierda", "centro", "derecha"],
+          "destinoPool": ["izquierda", "centro", "derecha"],
+          "salirEscena": false
+        },
+        {
+          "id": "a4-r3",
+          "tipo": "imitacion",
+          "titulo": "Sigue a Zoe",
+          "modoRespuesta": "zona",
+          "consignaPlantilla": "Mira bien hacia dónde camina Zoe al final. ¡Toca ese lugar!",
+          "mascota": "zoe",
+          "senales": ["paso1", "destino"],
+          "pasoPool": ["izquierda", "centro", "derecha"],
+          "destinoPool": ["izquierda", "centro", "derecha"],
+          "caminaAlFinal": true
+        }
+      ]
     },
-    "textos": {
-        "eligeCuerpo": "¿Qué cuerpo quieres explorar?",
-        "eligeNivel": "Elige tu edad",
-        "cierre": "¡Excelente! Reconociste la derecha y la izquierda."
-    },
-    "audios": {
-        "acierto": "",
-        "error": "",
-        "cierre": "../../sounds/victory.mp3",
-        "fondo": "../../sounds/fondo.mp3"
-    },
-    "cuerpos": {
-        "nina": {
-            "nombre": "Niña",
-            "carpeta": "../Reconocimiento/img/nina",
-            "completo": "completo.png",
-            "lienzo": {
-                "w": 645,
-                "h": 1081
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "3 retos",
+      "zonas": ["izquierda", "centro", "derecha"],
+      "retos": [
+        {
+          "id": "a5-r1",
+          "tipo": "estatico",
+          "titulo": "¿Dónde está mi amigo?",
+          "modoRespuesta": "objeto",
+          "pasos": [
+            {
+              "consignaPlantilla": "¿Qué está a la derecha {ancla}?",
+              "relacion": "derecha_de",
+              "anclaPool": ["gato", "dino", "manzana", "celular"]
             },
-            "zonas": {
-                "cabeza": {
-                    "x": 17,
-                    "y": 5,
-                    "w": 66,
-                    "h": 30
-                },
-                "hombro_izq": {
-                    "x": 28,
-                    "y": 35,
-                    "w": 14,
-                    "h": 7
-                },
-                "hombro_der": {
-                    "x": 58,
-                    "y": 35,
-                    "w": 14,
-                    "h": 7
-                },
-                "brazo_izq": {
-                    "x": 70,
-                    "y": 44,
-                    "w": 20,
-                    "h": 8
-                },
-                "brazo_der": {
-                    "x": 12,
-                    "y": 44,
-                    "w": 20,
-                    "h": 8
-                },
-                "codo_izq": {
-                    "x": 68,
-                    "y": 44,
-                    "w": 16,
-                    "h": 6
-                },
-                "codo_der": {
-                    "x": 14,
-                    "y": 44,
-                    "w": 16,
-                    "h": 6
-                },
-                "mano_izq": {
-                    "x": 2,
-                    "y": 52,
-                    "w": 18,
-                    "h": 8
-                },
-                "mano_der": {
-                    "x": 80,
-                    "y": 52,
-                    "w": 18,
-                    "h": 8
-                },
-                "barriga": {
-                    "x": 34,
-                    "y": 52,
-                    "w": 32,
-                    "h": 15
-                },
-                "pierna_izq": {
-                    "x": 29,
-                    "y": 68,
-                    "w": 20,
-                    "h": 10
-                },
-                "pierna_der": {
-                    "x": 51,
-                    "y": 68,
-                    "w": 20,
-                    "h": 10
-                },
-                "rodilla_izq": {
-                    "x": 30,
-                    "y": 74,
-                    "w": 17,
-                    "h": 8
-                },
-                "rodilla_der": {
-                    "x": 53,
-                    "y": 74,
-                    "w": 17,
-                    "h": 8
-                },
-                "tobillo_izq": {
-                    "x": 33,
-                    "y": 84,
-                    "w": 10,
-                    "h": 6
-                },
-                "tobillo_der": {
-                    "x": 57,
-                    "y": 84,
-                    "w": 10,
-                    "h": 6
-                },
-                "pie_izq": {
-                    "x": 23,
-                    "y": 89,
-                    "w": 19,
-                    "h": 7
-                },
-                "pie_der": {
-                    "x": 58,
-                    "y": 89,
-                    "w": 19,
-                    "h": 7
-                }
+            {
+              "consignaPlantilla": "¿Qué está a la izquierda {ancla}?",
+              "relacion": "izquierda_de",
+              "anclaPool": ["gato", "dino", "manzana", "celular"]
             }
+          ],
+          "pool": ["gato", "dino", "celular", "manzana"]
         },
-        "nino": {
-            "nombre": "Niño",
-            "carpeta": "../Reconocimiento/img/nino",
-            "completo": "completo.png",
-            "lienzo": {
-                "w": 645,
-                "h": 1081
-            },
-            "zonas": {
-                "cabeza": {
-                    "x": 22.8,
-                    "y": 1.0,
-                    "w": 56.7,
-                    "h": 31.5
-                },
-                "hombro_der": {
-                    "x": 26.7,
-                    "y": 29.4,
-                    "w": 22.9,
-                    "h": 11.1
-                },
-                "hombro_izq": {
-                    "x": 50.2,
-                    "y": 29.4,
-                    "w": 25.3,
-                    "h": 11.1
-                },
-                "brazo_der": {
-                    "x": 21.2,
-                    "y": 42.6,
-                    "w": 7.6,
-                    "h": 5.8
-                },
-                "brazo_izq": {
-                    "x": 71.0,
-                    "y": 42.6,
-                    "w": 7.6,
-                    "h": 5.9
-                },
-                "codo_der": {
-                    "x": 16.1,
-                    "y": 43.6,
-                    "w": 10.7,
-                    "h": 8.0
-                },
-                "codo_izq": {
-                    "x": 73.0,
-                    "y": 43.6,
-                    "w": 10.7,
-                    "h": 8.0
-                },
-                "mano_der": {
-                    "x": 3.7,
-                    "y": 49.4,
-                    "w": 23.1,
-                    "h": 10.9
-                },
-                "mano_izq": {
-                    "x": 73.0,
-                    "y": 49.4,
-                    "w": 23.1,
-                    "h": 10.8
-                },
-                "barriga": {
-                    "x": 31.0,
-                    "y": 41.4,
-                    "w": 37.8,
-                    "h": 19.1
-                },
-                "pierna_der": {
-                    "x": 27.1,
-                    "y": 61.4,
-                    "w": 22.2,
-                    "h": 15.1
-                },
-                "pierna_izq": {
-                    "x": 50.5,
-                    "y": 61.4,
-                    "w": 22.3,
-                    "h": 15.1
-                },
-                "rodilla_der": {
-                    "x": 26.7,
-                    "y": 73.4,
-                    "w": 22.3,
-                    "h": 9.2
-                },
-                "rodilla_izq": {
-                    "x": 50.9,
-                    "y": 73.4,
-                    "w": 22.5,
-                    "h": 9.2
-                },
-                "tobillo_der": {
-                    "x": 32.7,
-                    "y": 80.4,
-                    "w": 11.5,
-                    "h": 7.1
-                },
-                "tobillo_izq": {
-                    "x": 55.7,
-                    "y": 80.4,
-                    "w": 11.5,
-                    "h": 7.1
-                },
-                "pie_der": {
-                    "x": 21.6,
-                    "y": 86.4,
-                    "w": 20.9,
-                    "h": 12.5
-                },
-                "pie_izq": {
-                    "x": 57.4,
-                    "y": 86.4,
-                    "w": 20.9,
-                    "h": 12.5
-                }
-            }
+        {
+          "id": "a5-r2",
+          "tipo": "dinamico",
+          "titulo": "¿Hacia dónde se fue?",
+          "modoRespuesta": "objeto",
+          "consignaPlantilla": "El conejo y la mariposa se movieron. ¿Quién quedó a la derecha del conejo?",
+          "actores": [
+            { "id": "conejo", "destinoPool": ["izquierda", "derecha"] },
+            { "id": "mariposa_movimiento", "destinoPool": ["izquierda", "derecha"] }
+          ],
+          "pregunta": { "relacion": "derecha_de", "ancla": "conejo" }
+        },
+        {
+          "id": "a5-r3",
+          "tipo": "imitacion",
+          "titulo": "Zeus se acomoda",
+          "modoRespuesta": "botones",
+          "consignaPlantilla": "Mira bien. Zeus se puso a un lado del conejo. ¿Zeus está a la izquierda o a la derecha del conejo?",
+          "fijo": "conejo",
+          "movil": "zeus",
+          "ladoPool": ["izquierda", "derecha"]
         }
-    },
-    "niveles": [
-        {
-            "id": "3",
-            "edad": "3 años",
-            "titulo": "4 partes",
-            "preguntas": [
-                {
-                    "texto": "Toca la mano derecha.",
-                    "lado": "derecha",
-                    "targets": [
-                        "mano_der"
-                    ],
-                    "flecha": true
-                },
-                {
-                    "texto": "Toca la mano izquierda.",
-                    "lado": "izquierda",
-                    "targets": [
-                        "mano_izq"
-                    ],
-                    "flecha": true
-                },
-                {
-                    "texto": "Toca el pie derecho.",
-                    "lado": "derecha",
-                    "targets": [
-                        "pie_der"
-                    ],
-                    "flecha": true
-                },
-                {
-                    "texto": "Toca el pie izquierdo.",
-                    "lado": "izquierda",
-                    "targets": [
-                        "pie_izq"
-                    ],
-                    "flecha": true
-                }
-            ]
-        },
-        {
-            "id": "4",
-            "edad": "4 años",
-            "titulo": "6 partes",
-            "preguntas": [
-                {
-                    "texto": "Toca la mano derecha.",
-                    "lado": "derecha",
-                    "targets": [
-                        "mano_der"
-                    ]
-                },
-                {
-                    "texto": "Toca la mano izquierda.",
-                    "lado": "izquierda",
-                    "targets": [
-                        "mano_izq"
-                    ]
-                },
-                {
-                    "texto": "Toca el pie derecho.",
-                    "lado": "derecha",
-                    "targets": [
-                        "pie_der"
-                    ]
-                },
-                {
-                    "texto": "Toca el pie izquierdo.",
-                    "lado": "izquierda",
-                    "targets": [
-                        "pie_izq"
-                    ]
-                },
-                {
-                    "texto": "Toca el brazo derecho.",
-                    "lado": "derecha",
-                    "targets": [
-                        "brazo_der",
-                        "codo_der"
-                    ]
-                },
-                {
-                    "texto": "Toca la pierna izquierda.",
-                    "lado": "izquierda",
-                    "targets": [
-                        "pierna_izq",
-                        "rodilla_izq",
-                        "tobillo_izq"
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "5",
-            "edad": "5-6 años",
-            "titulo": "9 partes",
-            "preguntas": [
-                {
-                    "texto": "Toca la mano derecha.",
-                    "lado": "derecha",
-                    "targets": [
-                        "mano_der"
-                    ]
-                },
-                {
-                    "texto": "Toca la mano izquierda.",
-                    "lado": "izquierda",
-                    "targets": [
-                        "mano_izq"
-                    ]
-                },
-                {
-                    "texto": "Toca el pie derecho.",
-                    "lado": "derecha",
-                    "targets": [
-                        "pie_der"
-                    ]
-                },
-                {
-                    "texto": "Toca el pie izquierdo.",
-                    "lado": "izquierda",
-                    "targets": [
-                        "pie_izq"
-                    ]
-                },
-                {
-                    "texto": "Toca el brazo derecho.",
-                    "lado": "derecha",
-                    "targets": [
-                        "brazo_der",
-                        "codo_der"
-                    ]
-                },
-                {
-                    "texto": "Toca la pierna izquierda.",
-                    "lado": "izquierda",
-                    "targets": [
-                        "pierna_izq",
-                        "rodilla_izq",
-                        "tobillo_izq"
-                    ]
-                },
-                {
-                    "texto": "Toca el hombro derecho.",
-                    "lado": "derecha",
-                    "targets": [
-                        "hombro_der"
-                    ]
-                },
-                {
-                    "texto": "Toca la rodilla izquierda.",
-                    "lado": "izquierda",
-                    "targets": [
-                        "rodilla_izq"
-                    ]
-                },
-                {
-                    "texto": "Toca el codo derecho.",
-                    "lado": "derecha",
-                    "targets": [
-                        "codo_der"
-                    ]
-                }
-            ]
-        }
-    ]
+      ]
+    }
+  ]
 }

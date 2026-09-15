@@ -141,11 +141,13 @@ class JuegoCatalogoServiceTest extends TestCase
         }
     }
 
-    public function test_tipos_permitidos_coinciden_con_labels(): void
+    public function test_tipo_es_valido_snake_case(): void
     {
-        $this->assertSame(
-            array_keys(Juego::TIPOS_LABELS),
-            Juego::tiposPermitidos()
-        );
+        $this->assertTrue(Juego::tipoEsValido('memoria_visual'));
+        $this->assertTrue(Juego::tipoEsValido('lateralidad'));
+        $this->assertFalse(Juego::tipoEsValido(''));
+        $this->assertFalse(Juego::tipoEsValido(Juego::TIPO_NUEVO));
+        $this->assertFalse(Juego::tipoEsValido('Memoria Visual'));
+        $this->assertFalse(Juego::tipoEsValido('1invalido'));
     }
 }

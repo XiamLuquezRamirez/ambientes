@@ -20,14 +20,57 @@ class Juego extends Model
         'rompecabezas_cuerpo' => 'Rompecabezas del cuerpo',
         'reconocimiento_partes' => 'Reconocimiento de partes',
         'lateralidad' => 'Lateralidad (derecha/izquierda)',
+        'secuencia_movimiento' => 'Secuencia de movimiento',
     ];
+
+    public const TIPO_NUEVO = '__nuevo__';
 
     /**
      * @return list<string>
      */
     public static function tiposPermitidos(): array
     {
-        return array_keys(self::TIPOS_LABELS);
+        return array_keys(self::tiposCatalogo());
+    }
+
+    /**
+     * Tipos conocidos + los ya usados en BD (para el select del CRUD).
+     *
+     * @return array<string, string> clave => etiqueta
+     */
+    public static function tiposCatalogo(): array
+    {
+        $labels = self::TIPOS_LABELS;
+
+        $desdeDb = static::query()
+            ->whereNotNull('tipo')
+            ->where('tipo', '!=', '')
+            ->where('tipo', '!=', self::TIPO_NUEVO)
+            ->distinct()
+            ->orderBy('tipo')
+            ->pluck('tipo');
+
+        foreach ($desdeDb as $tipo) {
+            $clave = (string) $tipo;
+            if ($clave === '' || isset($labels[$clave])) {
+                continue;
+            }
+            $labels[$clave] = str_replace('_', ' ', ucwords($clave, '_'));
+        }
+
+        return $labels;
+    }
+
+    /**
+     * ¿Clave de tipo válida? (snake_case, sin reservados).
+     */
+    public static function tipoEsValido(string $tipo): bool
+    {
+        if ($tipo === '' || $tipo === self::TIPO_NUEVO) {
+            return false;
+        }
+
+        return (bool) preg_match('/^[a-z][a-z0-9_]{1,78}$/', $tipo);
     }
 
     protected $fillable = [

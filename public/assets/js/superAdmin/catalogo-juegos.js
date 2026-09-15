@@ -161,14 +161,125 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function resetForm() {
         if (!form) return;
+        limpiarErroresForm();
         form.reset();
         form.querySelector('#juego_id').value = '';
         form.querySelector('#juego_color').value = '#2563eb';
         form.querySelector('#juego_activo').checked = true;
+        form.querySelector('#juego_tipo_nuevo').value = '';
         form.querySelectorAll('select option[hidden]').forEach(function (opt) {
             opt.hidden = false;
         });
         aplicarCascadaForm();
+        sincronizarTipoNuevo();
+    }
+
+    function limpiarErroresForm() {
+        if (!form) return;
+        form.querySelectorAll('.campo-error').forEach((el) => el.remove());
+        form.querySelectorAll('.is-invalid').forEach((el) => el.classList.remove('is-invalid'));
+    }
+
+    function mensajeValidacionJuego(codigo) {
+        switch (codigo) {
+            case 'validation.unique':
+                return 'Este valor ya está registrado.';
+            case 'validation.exists':
+                return 'El valor seleccionado no es válido.';
+            case 'validation.required':
+                return 'Este campo es requerido.';
+            case 'validation.max.string':
+                return 'El texto supera la longitud permitida.';
+            case 'validation.integer':
+            case 'validation.numeric':
+                return 'El valor debe ser un número.';
+            case 'validation.boolean':
+                return 'Seleccione una opción válida.';
+            case 'validation.regex':
+                return 'El formato no es válido.';
+            case 'validation.not_in':
+                return 'Selecciona o crea un tipo válido.';
+            default:
+                return (codigo && !String(codigo).startsWith('validation.'))
+                    ? codigo
+                    : 'Revise este campo.';
+        }
+    }
+
+    function mostrarErroresForm(errors) {
+        limpiarErroresForm();
+        if (!errors || !form) return;
+
+        let primerInput = null;
+
+        Object.entries(errors).forEach(([campo, mensajes]) => {
+            let input = form.querySelector(`[name="${campo}"]`);
+
+            // Si falla tipo y estamos en "Agregar nuevo", marcar el input custom.
+            if (campo === 'tipo') {
+                const sel = form.querySelector('#juego_tipo');
+                if (sel && sel.value === '__nuevo__') {
+                    input = form.querySelector('#juego_tipo_nuevo') || input;
+                }
+            }
+
+            if (!input) return;
+
+            input.classList.add('is-invalid');
+            const div = document.createElement('div');
+            div.className = 'campo-error invalid-feedback d-block';
+            div.textContent = mensajeValidacionJuego(
+                Array.isArray(mensajes) ? mensajes[0] : String(mensajes || '')
+            );
+
+            const wrapNuevo = input.id === 'juego_tipo_nuevo'
+                ? input.closest('#juego_tipo_nuevo_wrap')
+                : null;
+            if (wrapNuevo) {
+                wrapNuevo.appendChild(div);
+            } else {
+                input.insertAdjacentElement('afterend', div);
+            }
+
+            if (!primerInput) primerInput = input;
+        });
+
+        if (primerInput) primerInput.focus();
+    }
+
+    function slugifyTipo(texto) {
+        return String(texto || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '')
+            .replace(/_+/g, '_');
+    }
+
+    function sincronizarTipoNuevo() {
+        if (!form) return;
+        const sel = form.querySelector('#juego_tipo');
+        const wrap = form.querySelector('#juego_tipo_nuevo_wrap');
+        const input = form.querySelector('#juego_tipo_nuevo');
+        if (!sel || !wrap || !input) return;
+
+        const esNuevo = sel.value === '__nuevo__';
+        wrap.hidden = !esNuevo;
+        input.required = esNuevo;
+        if (!esNuevo) {
+            input.value = '';
+        }
+    }
+
+    function resolverTipoPayload() {
+        const sel = form.querySelector('#juego_tipo');
+        const valor = sel ? String(sel.value || '').trim() : '';
+        if (valor === '__nuevo__') {
+            return slugifyTipo(form.querySelector('#juego_tipo_nuevo')?.value || '');
+        }
+        return valor;
     }
 
     function setModoCrear() {
@@ -239,9 +350,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function rellenarForm(data) {
         if (!form || !data) return;
+        limpiarErroresForm();
         form.querySelector('#juego_id').value = data.id || '';
         form.querySelector('#juego_nombre').value = data.nombre || '';
-        form.querySelector('#juego_tipo').value = data.tipo || '';
+
+        const selTipo = form.querySelector('#juego_tipo');
+        const tipo = String(data.tipo || '');
+        if (selTipo) {
+            const existe = Array.from(selTipo.options).some((o) => o.value === tipo);
+            if (tipo && !existe) {
+                const opt = document.createElement('option');
+                opt.value = tipo;
+                opt.textContent = tipo.replace(/_/g, ' ');
+                selTipo.insertBefore(opt, selTipo.querySelector('option[value="__nuevo__"]'));
+            }
+            selTipo.value = tipo || '';
+        }
+        form.querySelector('#juego_tipo_nuevo').value = '';
+        sincronizarTipoNuevo();
+
         form.querySelector('#juego_ruta').value = data.ruta || '';
         form.querySelector('#juego_descripcion').value = data.descripcion || '';
         form.querySelector('#juego_icono').value = data.icono || '';
@@ -306,10 +433,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function payloadDesdeForm() {
         const fd = new FormData(form);
         const activo = form.querySelector('#juego_activo').checked;
+        const tipo = resolverTipoPayload();
 
         return {
             nombre: String(fd.get('nombre') || '').trim(),
-            tipo: String(fd.get('tipo') || '').trim(),
+            tipo: tipo,
             descripcion: String(fd.get('descripcion') || '').trim() || null,
             icono: String(fd.get('icono') || '').trim() || null,
             color: String(fd.get('color') || '').trim() || null,
@@ -321,12 +449,32 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    function mensajeValidacion(json) {
-        if (json?.errors) {
-            const first = Object.values(json.errors)[0];
-            if (Array.isArray(first) && first[0]) return first[0];
+    function validarClienteAntesDeEnviar(payload) {
+        limpiarErroresForm();
+        const errors = {};
+
+        if (!payload.nombre) {
+            errors.nombre = ['Este campo es requerido.'];
         }
-        return json?.message || 'Verifica los datos ingresados.';
+
+        const selTipo = form.querySelector('#juego_tipo')?.value || '';
+        if (!selTipo) {
+            errors.tipo = ['Este campo es requerido.'];
+        } else if (selTipo === '__nuevo__' && !payload.tipo) {
+            errors.tipo = ['Indica el nombre del nuevo tipo.'];
+        } else if (payload.tipo && !/^[a-z][a-z0-9_]*$/.test(payload.tipo)) {
+            errors.tipo = ['El tipo debe estar en snake_case (ej. memoria_visual).'];
+        }
+
+        if (!payload.ambiente_id) {
+            errors.ambiente_id = ['Este campo es requerido.'];
+        }
+
+        if (Object.keys(errors).length) {
+            mostrarErroresForm(errors);
+            return false;
+        }
+        return true;
     }
 
     async function guardarJuego(e) {
@@ -334,6 +482,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!form) return;
 
         const payload = payloadDesdeForm();
+        if (!validarClienteAntesDeEnviar(payload)) {
+            return;
+        }
+
         const url = modoEdicion
             ? urlConId(urlActualizarTpl, juegoEditandoId)
             : urlGuardar;
@@ -354,7 +506,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             const json = await res.json().catch(() => ({}));
             if (!res.ok || !json.success) {
-                throw new Error(mensajeValidacion(json));
+                if (json.errors) {
+                    mostrarErroresForm(json.errors);
+                    toast('error', 'Verifique los datos ingresados');
+                    return;
+                }
+                throw new Error(json.message || 'No se pudo guardar el juego.');
             }
 
             getModal()?.hide();
@@ -448,6 +605,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     form?.addEventListener('submit', guardarJuego);
+    form?.querySelector('#juego_tipo')?.addEventListener('change', sincronizarTipoNuevo);
     form?.querySelector('.js-juego-form-ambiente')?.addEventListener('change', function () {
         aplicarCascadaForm();
         sincronizarRutaSegunIdentidad();

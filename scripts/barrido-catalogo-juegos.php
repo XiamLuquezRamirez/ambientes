@@ -68,6 +68,8 @@ $paquetes = [
     'Polimotor/Rompecabezas',
     'Polimotor/Reconocimiento',
     'Polimotor/Lateralidad',
+    'Polimotor/LaberintosDeCoordinacion',
+    'Polimotor/SecuenciaDeMovimiento',
 ];
 foreach ($paquetes as $rel) {
     $idx = $base.'/'.$rel.'/index.html';

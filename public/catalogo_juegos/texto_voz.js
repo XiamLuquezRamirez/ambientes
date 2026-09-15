@@ -72,14 +72,15 @@
     }
 
     function detenerReproduccionTts() {
+        // No revocar blobs aquí: la precarga sirve precisamente para reusar
+        // la misma frase (feedback, consignas) sin volver a pegarle a /juegos/tts.
         if (ttsPlayer) {
             try {
-                var src = ttsPlayer.getAttribute("src") || ttsPlayer.src;
                 ttsPlayer.onended = null;
                 ttsPlayer.onerror = null;
                 ttsPlayer.pause();
                 ttsPlayer.removeAttribute("src");
-                olvidarTts(src);
+                try { ttsPlayer.load(); } catch (e2) { /* noop */ }
             } catch (e) { /* noop */ }
         }
         if (global.speechSynthesis) {
@@ -185,11 +186,27 @@
                 encolarTts(linea.texto, personajeDeIndice(linea.personaje));
             });
         }
-        var fb = accesibilidad().feedback || {};
+        var fb = (accesibilidad().feedback) || (config && config.feedback) || {};
         if (fb.acierto && fb.acierto.texto) encolarTts(fb.acierto.texto, "zoe");
-        if (fb.error && fb.error.texto) encolarTts(fb.error.texto, "zeus");
+        if (fb.error && fb.error.texto) encolarTts(fb.error.texto, "zoe");
         var cierre = config && config.textos && config.textos.cierre;
         if (cierre) encolarTts(cierre, "zoe");
+        if (opciones && Array.isArray(opciones.frasesExtra)) {
+            opciones.frasesExtra.forEach(function (f) {
+                if (!f) return;
+                if (typeof f === "string") encolarTts(f, "zoe");
+                else if (f.texto) encolarTts(f.texto, f.personaje || "zoe");
+            });
+        }
+    }
+
+    function encolarFrases(lista) {
+        if (!lista || !lista.length) return;
+        lista.forEach(function (f) {
+            if (!f) return;
+            if (typeof f === "string") encolarTts(f, "zoe");
+            else if (f.texto) encolarTts(f.texto, f.personaje || "zoe");
+        });
     }
 
     function vozNavegadorEspanol() {
@@ -241,11 +258,12 @@
     function reproducirUrlTts(src, texto, personaje, token, onEnd) {
         if (!ttsPlayer) ttsPlayer = new Audio();
         ttsPlayer.onended = function () {
-            olvidarTts(src);
             if (typeof onEnd === "function") onEnd();
         };
         ttsPlayer.onerror = function () {
+            // Blob inválido / revocado: invalidar caché y caer a voz del navegador.
             olvidarTts(src);
+            if (token !== ttsToken) return;
             hablarNavegador(texto, personaje, token, onEnd);
         };
         ttsPlayer.src = src;
@@ -253,7 +271,6 @@
         var p = ttsPlayer.play();
         if (p && typeof p.catch === "function") {
             p.catch(function () {
-                olvidarTts(src);
                 if (token !== ttsToken) return;
                 hablarNavegador(texto, personaje, token, onEnd);
             });
@@ -327,6 +344,7 @@
     var api = {
         iniciar: iniciar,
         precargar: precargarVocesConocidas,
+        encolarFrases: encolarFrases,
         hablar: hablar,
         detener: detenerVoz,
         desbloquear: desbloquearAudioTts,
