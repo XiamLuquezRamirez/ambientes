@@ -29,11 +29,11 @@
     "mostrarProgreso": true
   },
   "textos": {
-    "eligeCuerpo": "¿Qué cuerpo quieres armar?",
-    "eligeNivel": "Elige el rompecabezas",
     "instruccion": "¡Vamos a jugar! Observa muy bien el cuerpo y arrastra cada pieza hasta el lugar donde corresponde.",
     "cierre": "¡Excelente! Completaste el rompecabezas del cuerpo humano."
   },
+  "cuerpo": "nina",
+  "edad": 4,
   "audios": {
     "acierto": "../../sounds/ok.mp3",
     "error": "../../sounds/over.mp3",

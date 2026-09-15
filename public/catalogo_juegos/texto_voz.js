@@ -186,10 +186,14 @@
             });
         }
         var fb = accesibilidad().feedback || {};
-        if (fb.acierto && fb.acierto.texto) encolarTts(fb.acierto.texto, "zoe");
-        if (fb.error && fb.error.texto) encolarTts(fb.error.texto, "zeus");
-        var cierre = config && config.textos && config.textos.cierre;
-        if (cierre) encolarTts(cierre, "zoe");
+        var textos = (config && config.textos) || {};
+        ["zoe", "zeus"].forEach(function (pj) {
+            Object.keys(textos).forEach(function (k) {
+                if (textos[k]) encolarTts(textos[k], pj);
+            });
+            if (fb.acierto && fb.acierto.texto) encolarTts(fb.acierto.texto, pj);
+            if (fb.error && fb.error.texto) encolarTts(fb.error.texto, pj);
+        });
     }
 
     function vozNavegadorEspanol() {

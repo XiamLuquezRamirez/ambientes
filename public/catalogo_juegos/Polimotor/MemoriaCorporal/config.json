@@ -1,0 +1,101 @@
+{
+  "accesibilidad": {
+    "mostrarFeedBack": true,
+    "feedback": {
+      "duracion": 2000,
+      "acierto": {
+        "texto": "¡Muy bien! Recordaste la secuencia de movimientos.",
+        "gif": "../../images/correcto.gif"
+      },
+      "error": {
+        "texto": "¡Inténtalo otra vez! Recuerda el orden de los movimientos, si no lo recuerdas, haz clic en el botón de pista.",
+        "gif": "../../images/incorrecto.gif"
+      }
+    },
+    "altoContraste": false,
+    "verBotonVerDeNuevo": true,
+    "zoomLongPress": false,
+    "mostrarProgreso": true,
+    "cuentaRegresiva": true,
+    "respuestasMaximasAntesDeAtenuar": 2,
+    "tamanoImagen": 120,
+    "tamanoImagenPista": 124,
+    "tamanoLetraBotones": 16,
+    "espaciadoOpciones": 24,
+    "anchoOpcion": 220,
+    "altoOpcion": 200
+  },
+  "textos": {
+    "instruccion": "Observa la secuencia, recuérdala y toca el movimiento que falta.",
+    "memoriza": "¡Memoriza esta secuencia!",
+    "seOcultan": "Se ocultarán en...",
+    "queFalta": "¿Qué movimiento falta?",
+    "cierre": "¡Excelente! Usaste muy bien tu memoria corporal."
+  },
+  "cuerpo": "nina",
+  "edad": 3,
+  "audios": {
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "cuerpos": {
+    "nina": { "nombre": "Niña", "carpeta": "img/nina" },
+    "nino": { "nombre": "Niño", "carpeta": "img/nino" }
+  },
+  "movimientos": {
+    "manos_arriba": { "nombre": "Manos arriba", "archivo": "manos_arriba.png" },
+    "manos_abajo": { "nombre": "Manos abajo", "archivo": "manos_abajo.png" },
+    "tocar_cabeza": { "nombre": "Manos en cabeza", "archivo": "tocar_cabeza.png" },
+    "tocar_barriga": { "nombre": "Tocar barriga", "archivo": "tocar_barriga.png" },
+    "tocar_hombros": { "nombre": "Manos en hombros", "archivo": "tocar_hombros.png" },
+    "tocar_rodillas": { "nombre": "Tocar rodillas", "archivo": "tocar_rodillas.png" },
+    "abrir_brazos": { "nombre": "Brazos abiertos", "archivo": "abrir_brazos.png" },
+    "cerrar_brazos": { "nombre": "Brazos cerrados", "archivo": "cerrar_brazos.png" },
+    "manos_al_frente": { "nombre": "Manos al frente", "archivo": "manos_al_frente.png" },
+    "gira": { "nombre": "Gira", "archivo": "gira.png" },
+    "salta": { "nombre": "Salta", "archivo": "salta.png" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3 años",
+      "titulo": "2 movimientos",
+      "modo": "falta",
+      "opciones": 3,
+      "rondas": [
+        ["manos_arriba", "manos_abajo"],
+        ["tocar_cabeza", "tocar_barriga"],
+        ["tocar_hombros", "tocar_rodillas"]
+      ]
+    },
+    {
+      "id": "4",
+      "edad": "4 años",
+      "titulo": "3 movimientos",
+      "modo": "falta",
+      "opciones": 4,
+      "rondas": [
+        ["manos_abajo", "tocar_hombros", "cerrar_brazos"],
+        ["manos_arriba", "tocar_cabeza", "manos_abajo"],
+        ["tocar_hombros", "abrir_brazos", "tocar_rodillas"],
+        ["manos_abajo", "tocar_cabeza", "tocar_barriga"]
+      ]
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "4 movimientos",
+      "modo": "falta",
+      "opciones": 5,
+      "rondas": [
+        ["manos_arriba", "tocar_cabeza", "tocar_hombros", "manos_abajo"],
+        ["abrir_brazos", "tocar_rodillas", "manos_arriba", "cerrar_brazos"],
+        ["tocar_cabeza", "manos_al_frente", "tocar_hombros", "tocar_rodillas"],
+        ["manos_abajo", "abrir_brazos", "tocar_cabeza", "manos_arriba"],
+        ["tocar_hombros", "tocar_rodillas", "abrir_brazos", "manos_al_frente"]
+      ]
+    }
+  ]
+}

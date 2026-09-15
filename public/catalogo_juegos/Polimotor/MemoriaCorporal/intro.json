@@ -14,19 +14,19 @@
   "conversacion": [
     {
       "personaje": 0,
-      "texto": "Hola, soy Zoe. <br> Hoy vamos a armar el rompecabezas del cuerpo humano."
+      "texto": "¡Hola, soy Zeus, vamos a jugar! <br> Observa los movimientos, recuérdalos y di cuál falta."
     },
     {
       "personaje": 1,
-      "texto": "¡Yo soy Zeus! <br> Arrastra cada pieza hasta el lugar donde corresponde."
+      "texto": "¡Yo soy Zoe! <br> Verás tarjetas con una figura haciendo movimientos. Se muestran una sola vez."
     },
     {
       "personaje": 0,
-      "texto": "Luego observas muy bien la figura. <br> Arrastra cada pieza hasta el lugar donde corresponde."
+      "texto": "Luego desaparecen y aparece un hueco. <br> Toca el movimiento que falta."
     },
     {
       "personaje": 1,
-      "texto": "¡Tú puedes! <br> Vamos a jugar."
+      "texto": "¡Tú puedes! <br> Si se te olvida, toca el botón de pista para ver la secuencia otra vez o haz clic en el botón de pista."
     }
   ],
   "configuracion": {
