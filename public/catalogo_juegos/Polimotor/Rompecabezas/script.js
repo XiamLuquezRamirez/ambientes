@@ -56,7 +56,7 @@ function renderPersonajes(personajes) {
 
     personajes.forEach(function (personaje, index) {
         const div = document.createElement("div");
-        div.className = "personaje-char " + posiciones[index];
+        div.className = "personaje-char personaje-char-" + posiciones[index];
         div.style.backgroundImage = "url(" + personaje.gif_idle + ")";
         div.dataset.index = index;
         container.appendChild(div);
@@ -243,7 +243,6 @@ function mostrarNubeYConversacion() {
     const indiceInicial = primeraLinea && primeraLinea.personaje != null ? primeraLinea.personaje : 0;
     let conversacionLista = false;
 
-    setPersonajesVisual(indiceInicial);
     aplicarClaseNube(indiceInicial);
     nubePersonajeActual = indiceInicial;
 
@@ -396,7 +395,7 @@ function cerrar_anuncio() {
         salirPersonajes(function () {
             document.querySelector(".overlay").style.display = "none";
             $("#principal").css("display", "flex").hide().fadeIn(1000);
-            elegirCuerpo();
+            iniciarPartida();
         });
     }, 2000);
 }
@@ -707,59 +706,39 @@ function aplicarAccesibilidadInicial() {
     if (tableroListo) sizePiezasAHuecos();
 }
 
-function elegirCuerpo() {
-    const textos = gameConfig.textos;
-    const cuerpos = gameConfig.cuerpos;
-    Swal.fire({
-        title: textos.eligeCuerpo,
-        html:
-            '<hr><div class="row">' +
-            '<div class="col-6 text-center"><button class="btn btn-warning btn-eleccion" onclick="confirmarCuerpo(\'nina\')">' + cuerpos.nina.nombre + '</button></div>' +
-            '<div class="col-6 text-center"><button class="btn btn-info btn-eleccion" onclick="confirmarCuerpo(\'nino\')">' + cuerpos.nino.nombre + '</button></div>' +
-            "</div><hr>",
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        heightAuto: false,
-        scrollbarPadding: false
-    });
-}
-
-function confirmarCuerpo(tipo) {
-    cuerpoElegido = tipo;
-    Swal.close();
-    elegirNivel();
-}
-window.confirmarCuerpo = confirmarCuerpo;
-
-function elegirNivel() {
-    const textos = gameConfig.textos;
-    let botones = "";
-    gameConfig.niveles.forEach(function (nivel, i) {
-        const color = i === 0 ? "success" : i === 1 ? "warning" : "primary";
-        botones +=
-            '<div class="col-4 text-center">' +
-            '<button class="btn btn-' + color + ' btn-eleccion" onclick="confirmarNivel(\'' + nivel.id + '\')">' +
-            nivel.titulo + "<br><small>" + nivel.edad + "</small></button></div>";
-    });
-
-    Swal.fire({
-        title: textos.eligeNivel,
-        html: '<hr><div class="row">' + botones + "</div><hr>",
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        heightAuto: false,
-        scrollbarPadding: false
-    });
-}
-
-function confirmarNivel(id) {
-    nivelElegido = gameConfig.niveles.find(function (n) { return n.id === id; });
-    Swal.close();
+function iniciarPartida() {
+    const pedido = String(gameConfig.cuerpo || "nina").toLowerCase();
+    cuerpoElegido = pedido === "nino" || pedido === "niño" ? "nino" : "nina";
+    document.body.dataset.cuerpo = cuerpoElegido;
+    nivelElegido = resolverNivel(gameConfig.edad);
+    juegoTerminado = false;
     iniciarEscenario();
 }
-window.confirmarNivel = confirmarNivel;
+
+function resolverNivel(edad) {
+    const niveles = (gameConfig && gameConfig.niveles) || [];
+    if (!niveles.length) return null;
+    const raw = edad == null ? "" : String(edad).trim().toLowerCase();
+    if (!raw) return niveles[0];
+
+    const porEtiqueta = niveles.find(function (n) {
+        return String(n.edad || "").toLowerCase() === raw;
+    });
+    if (porEtiqueta) return porEtiqueta;
+
+    const num = parseInt(raw, 10);
+    if (isFinite(num)) {
+        const porEdad = niveles.find(function (n) {
+            const e = String(n.edad || "").toLowerCase();
+            if (num <= 3) return e.indexOf("3") === 0;
+            if (num === 4) return e.indexOf("4") === 0;
+            return e.indexOf("5") === 0 || e.indexOf("6") !== -1;
+        });
+        if (porEdad) return porEdad;
+    }
+
+    return niveles.find(function (n) { return String(n.id) === raw; }) || niveles[0];
+}
 
 function iniciarEscenario() {
     tableroListo = false;

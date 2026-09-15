@@ -186,26 +186,14 @@
                 encolarTts(linea.texto, personajeDeIndice(linea.personaje));
             });
         }
-        var fb = (accesibilidad().feedback) || (config && config.feedback) || {};
-        if (fb.acierto && fb.acierto.texto) encolarTts(fb.acierto.texto, "zoe");
-        if (fb.error && fb.error.texto) encolarTts(fb.error.texto, "zoe");
-        var cierre = config && config.textos && config.textos.cierre;
-        if (cierre) encolarTts(cierre, "zoe");
-        if (opciones && Array.isArray(opciones.frasesExtra)) {
-            opciones.frasesExtra.forEach(function (f) {
-                if (!f) return;
-                if (typeof f === "string") encolarTts(f, "zoe");
-                else if (f.texto) encolarTts(f.texto, f.personaje || "zoe");
+        var fb = accesibilidad().feedback || {};
+        var textos = (config && config.textos) || {};
+        ["zoe", "zeus"].forEach(function (pj) {
+            Object.keys(textos).forEach(function (k) {
+                if (textos[k]) encolarTts(textos[k], pj);
             });
-        }
-    }
-
-    function encolarFrases(lista) {
-        if (!lista || !lista.length) return;
-        lista.forEach(function (f) {
-            if (!f) return;
-            if (typeof f === "string") encolarTts(f, "zoe");
-            else if (f.texto) encolarTts(f.texto, f.personaje || "zoe");
+            if (fb.acierto && fb.acierto.texto) encolarTts(fb.acierto.texto, pj);
+            if (fb.error && fb.error.texto) encolarTts(fb.error.texto, pj);
         });
     }
 
