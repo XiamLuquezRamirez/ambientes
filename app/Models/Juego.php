@@ -6,6 +6,7 @@ use App\Traits\Sincronizable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TiposJuego;
 
 class Juego extends Model
 {
@@ -16,13 +17,6 @@ class Juego extends Model
      * Tipos de paquete del catálogo SuperAdmin (no confundir con motores
      * del constructor de experiencias: rompecabezas/memoria/colorear/secuencia).
      */
-    public const TIPOS_LABELS = [
-        'rompecabezas_cuerpo' => 'Rompecabezas del cuerpo',
-        'reconocimiento_partes' => 'Reconocimiento de partes',
-        'lateralidad' => 'Lateralidad (derecha/izquierda)',
-        'secuencia_movimiento' => 'Secuencia de movimiento',
-        'laberinto' => 'Laberintos de coordinación',
-    ];
 
     public const TIPO_NUEVO = '__nuevo__';
 
@@ -47,23 +41,11 @@ class Juego extends Model
      */
     public static function tiposCatalogo(): array
     {
-        $labels = self::TIPOS_LABELS;
-
-        $desdeDb = static::query()
-            ->whereNotNull('tipo')
-            ->where('tipo', '!=', '')
-            ->where('tipo', '!=', self::TIPO_NUEVO)
-            ->distinct()
-            ->orderBy('tipo')
-            ->pluck('tipo');
-
-        foreach ($desdeDb as $tipo) {
-            $clave = (string) $tipo;
-            if ($clave === '' || isset($labels[$clave])) {
-                continue;
-            }
-            $labels[$clave] = str_replace('_', ' ', ucwords($clave, '_'));
-        }
+        $labels = TiposJuego::query()
+        ->where('activo', true)
+        ->orderBy('nombre')
+        ->pluck('nombre', 'slug')
+        ->toArray();
 
         return $labels;
     }
@@ -98,7 +80,7 @@ class Juego extends Model
         'modulo_id',
         'eje_id',
         'tematica_id',
-        'tipo',
+        'tipo_juego_id',
         'ruta',
         'nombre',
         'descripcion',
@@ -123,7 +105,12 @@ class Juego extends Model
 
     public function tipoLabel(): string
     {
-        return self::TIPOS_LABELS[$this->tipo] ?? $this->tipo;
+        $tipo = TiposJuego::query()
+        ->where('id', $this->tipo_juego_id)
+        ->where('activo', true)
+        ->first();
+
+        return $tipo->nombre;
     }
 
     public function ambiente()
