@@ -25,26 +25,26 @@ use App\Http\Controllers\Admin\ReportesController;
 use App\Http\Controllers\Admin\SyncLogController;
 use App\Http\Controllers\Admin\TematicasAdminController;
 use App\Http\Controllers\Admin\UsuarioAdminController;
+use App\Http\Controllers\Ambientes\AmbienteNinoController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
-use App\Http\Controllers\Ambientes\AmbienteNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
 use App\Http\Controllers\InfoCondicionesController;
 use App\Http\Controllers\Panel\AsistenciaController;
 use App\Http\Controllers\Panel\BloquesExperienciaPanelController;
 use App\Http\Controllers\Panel\CatalogoPanelController;
 use App\Http\Controllers\Panel\ClasesPanelController;
-use App\Http\Controllers\Panel\ResultadosNinoPanelController;
 use App\Http\Controllers\Panel\EjesPanelController;
 use App\Http\Controllers\Panel\EstudiantePanelController;
 use App\Http\Controllers\Panel\ExperienciasPanelController;
 use App\Http\Controllers\Panel\InclusionController;
-use App\Http\Controllers\Panel\ParametrosPerfilAprendizajePanelController;
 use App\Http\Controllers\Panel\JuegosPanelController;
+use App\Http\Controllers\Panel\ParametrosPerfilAprendizajePanelController;
 use App\Http\Controllers\Panel\PerfilAprendizajePanelController;
 use App\Http\Controllers\Panel\PerfilAprendizajePersonalizadoPanelController;
 use App\Http\Controllers\Panel\PlaneacionController;
 use App\Http\Controllers\Panel\PortafolioController;
+use App\Http\Controllers\Panel\ResultadosNinoPanelController;
 use App\Http\Controllers\Panel\SesionController;
 use App\Http\Controllers\Panel\TematicasPanelController;
 use App\Http\Controllers\PerfilController;
@@ -61,8 +61,12 @@ use App\Http\Controllers\SuperAdmin\PerfilAprendizajeInclusionController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\TematicasSuperAdminController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SuperAdmin\TiposJuegosSuperAdminController;
+use App\Models\Ambiente;
+use App\Models\Clase;
+use App\Services\RecorridoNinoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 // Raíz → portada del ambiente (kiosco). Docente: /login
 Route::get('/', function (Request $request) {
@@ -557,13 +561,6 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::patch('catalogo/ejes/{eje}/estado', [EjesSuperAdminController::class, 'actualizarEstado'])->name('superadmin.ejes.estado');
     Route::patch('catalogo/ejes/{eje}/mover', [EjesSuperAdminController::class, 'mover'])->name('superadmin.ejes.mover');
 
-    Route::get('catalogo/juegos', [JuegosSuperAdminController::class, 'listar'])->name('superadmin.catalogo.juegos');
-    Route::post('catalogo/juegos', [JuegosSuperAdminController::class, 'guardar'])->name('superadmin.catalogo.juegos.guardar');
-    Route::get('catalogo/juegos/{juego}/preview', [JuegosSuperAdminController::class, 'preview'])->name('superadmin.catalogo.juegos.preview');
-    Route::get('catalogo/juegos/{juego}', [JuegosSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo.juegos.mostrar');
-    Route::put('catalogo/juegos/{juego}', [JuegosSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo.juegos.actualizar');
-    Route::patch('catalogo/juegos/{juego}/estado', [JuegosSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo.juegos.estado');
-
     // Temáticas / experiencias oficiales
     Route::get('catalogo/tematicas', [TematicasSuperAdminController::class, 'index'])->name('superadmin.catalogo.tematicas.index');
     Route::get('catalogo/tematicas/listar', [TematicasSuperAdminController::class, 'listar'])->name('superadmin.catalogo.tematicas.listar');
@@ -593,6 +590,21 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     // Vista catálogo experiencias
     Route::get('catalogo/experiencias', [ExperienciasSuperAdminController::class, 'index'])->name('superadmin.catalogo.experiencias.index');
 
+    // Catálogo de Juegos
+    Route::get('catalogo_juegos/juegos', [JuegosSuperAdminController::class, 'listar'])->name('superadmin.catalogo_juegos.index');
+    Route::post('catalogo_juegos/juegos', [JuegosSuperAdminController::class, 'guardar'])->name('superadmin.catalogo_juegos.guardar');
+    Route::get('catalogo_juegos/juegos/{juego}/preview', [JuegosSuperAdminController::class, 'preview'])->name('superadmin.catalogo_juegos.preview');
+    Route::get('catalogo_juegos/juegos/{juego}', [JuegosSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo_juegos.mostrar');
+    Route::put('catalogo_juegos/juegos/{juego}', [JuegosSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo_juegos.actualizar');
+    Route::patch('catalogo_juegos/juegos/{juego}/estado', [JuegosSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo_juegos.estado');
+
+    // Catálogo de Tipos de Juegos
+    Route::get('catalogo_juegos/tipos', [TiposJuegosSuperAdminController::class, 'listar'])->name('superadmin.catalogo_juegos.tipos.index');
+    Route::post('catalogo_juegos/tipos', [TiposJuegosSuperAdminController::class, 'guardar'])->name('superadmin.catalogo_juegos.tipos.guardar');
+    Route::get('catalogo_juegos/tipos/{tipoJuego}', [TiposJuegosSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo_juegos.tipos.mostrar');
+    Route::put('catalogo_juegos/tipos/{tipoJuego}', [TiposJuegosSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo_juegos.tipos.actualizar');
+    Route::patch('catalogo_juegos/tipos/{tipoJuego}/estado', [TiposJuegosSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo_juegos.tipos.estado');
+
 });
 
 // ── Sesión del niño + contenido del ambiente ──────────────────────────────
@@ -604,11 +616,11 @@ Route::middleware('sesion.nino')->group(function () {
 
 // === PREVIEW TABLET (TEMPORAL — quitar antes de commit) ====================
 // Muestra el recorrido de una clase sin pasar por PIN. ?clase=ID (default 1).
-Route::get('/__preview-camino', function (\Illuminate\Http\Request $request) {
-    $svc = app(\App\Services\RecorridoNinoService::class);
-    $clase = \App\Models\Clase::find((int) $request->query('clase', 1));
+Route::get('/__preview-camino', function (Request $request) {
+    $svc = app(RecorridoNinoService::class);
+    $clase = Clase::find((int) $request->query('clase', 1));
     abort_unless($clase, 404, 'Clase no encontrada');
-    $ambiente = \App\Models\Ambiente::find($clase->ambiente_id);
+    $ambiente = Ambiente::find($clase->ambiente_id);
     $arbol = $svc->armarArbol($ambiente, null, $clase);
     $camino = $svc->armarCaminoLineal($arbol, $clase, null);
     abort_unless($camino, 422, 'No se pudo armar el camino');

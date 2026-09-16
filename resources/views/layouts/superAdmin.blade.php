@@ -44,6 +44,7 @@
                     'superadmin.perfil-aprendizaje-personalizado*',
                     'superadmin.parametros-perfil*',
                 );
+                $juegos = request()->routeIs('superadmin.catalogo_juegos.*');
             @endphp
             <li class="nav-item">
                 <a href="#navCatalogo" data-bs-toggle="collapse" aria-expanded="{{ $catalogo ? 'true' : 'false' }}"
@@ -132,10 +133,32 @@
             </li>
             @include('partials.nav-link-condiciones')
             <li class="nav-item">
-                <a href="{{ route('superadmin.catalogo.juegos') }}"
-                    class="{{ request()->routeIs('superadmin.catalogo.juegos', 'superadmin.juegos.*') ? 'active nav-link' : 'nav-link' }}">
-                    <i class="fa-solid fa-gamepad"></i> Juegos
+                <a href="#navJuegos" data-bs-toggle="collapse" aria-expanded="{{ $juegos ? 'true' : 'false' }}"
+                    class="nav-link d-flex align-items-center gap-2 {{ $juegos ? '' : 'collapsed' }}">
+                    <i class="fa-solid fa-gamepad"></i>
+                    <span>Catálogo de Juegos</span>
+                    <i class="fa-solid fa-chevron-down ms-auto chevron"></i>
                 </a>
+                <div class="collapse {{ $juegos ? 'show' : '' }}" id="navJuegos">
+                    <ul class="nav flex-column" style="padding:2px 0 4px 0">
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.catalogo_juegos.index') }}"
+                                class="{{ request()->routeIs('superadmin.catalogo_juegos.*') && !request()->routeIs('superadmin.catalogo_juegos.tipos.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i>
+                                Juegos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('superadmin.catalogo_juegos.tipos.index') }}"
+                                class="{{ request()->routeIs('superadmin.catalogo_juegos.tipos.*') ? 'active nav-link' : 'nav-link' }}"
+                                style="padding-left:42px;font-size:.85rem">
+                                <i class="fa-solid fa-gamepad" style="font-size:.8em"></i>
+                                Tipos de Juegos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </aside>

@@ -9,6 +9,7 @@ use App\Services\JuegoCatalogoService;
 use App\Services\ParametrosPerfilAprendizajeService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class JuegosSuperAdminController extends Controller
 {
@@ -30,11 +31,11 @@ class JuegosSuperAdminController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'html' => view('superAdmin.catalogo.juegos.partials._grid', $datos)->render(),
+                'html' => view('superAdmin.catalogo_juegos.juegos.partials._grid', $datos)->render(),
             ]);
         }
 
-        return view('superAdmin.catalogo.juegos.index', array_merge($datos, [
+        return view('superAdmin.catalogo_juegos.juegos.index', array_merge($datos, [
             'tiposJuego' => Juego::tiposCatalogo(),
             'perfilPayload' => [
                 'perfil_id' => 1,
@@ -123,7 +124,7 @@ class JuegosSuperAdminController extends Controller
 
         $valores = $this->parametrosPerfil->valoresEstandar();
 
-        return view('superAdmin.catalogo.juegos.preview', [
+        return view('superAdmin.catalogo_juegos.juegos.preview', [
             'juego' => $juego,
             'urlPaquete' => $juego->urlPaquete(),
             'perfilPayload' => [
@@ -175,7 +176,7 @@ class JuegosSuperAdminController extends Controller
         ]);
 
         if (! Juego::tipoEsValido((string) $datos['tipo'])) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'tipo' => 'El tipo debe estar en snake_case (ej. memoria_visual).',
             ]);
         }

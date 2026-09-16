@@ -3,20 +3,24 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/constructor-vista-nino.css') }}?v={{ @filemtime(public_path('assets/css/constructor-vista-nino.css')) }}">
+    <link rel="stylesheet"
+        href="{{ asset('assets/css/constructor-vista-nino.css') }}?v={{ @filemtime(public_path('assets/css/constructor-vista-nino.css')) }}">
     <style>
         /* Hueco del header: play (36) + gap + menú (36) ≈ 80px */
         #juegosPage .student-top {
             padding-right: 88px;
         }
+
         #juegosPage .student-identity {
             padding-right: 0;
         }
+
         #juegosPage .student-options {
             display: inline-flex;
             align-items: center;
             gap: 4px;
         }
+
         #juegosPage .cj-preview-btn {
             width: 36px;
             height: 36px;
@@ -28,6 +32,7 @@
             line-height: 1;
             flex-shrink: 0;
         }
+
         #juegosPage .cj-preview-btn .fa-play {
             font-size: .75rem;
             margin-left: 1px;
@@ -40,6 +45,7 @@
             justify-content: space-between;
             gap: 6px 8px;
         }
+
         #juegosPage .cj-card-desc {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -48,6 +54,7 @@
             line-height: 1.35;
             flex: 1 1 100%;
         }
+
         #juegosPage .cj-card-ruta {
             display: block;
             max-width: 100%;
@@ -59,20 +66,26 @@
             flex: 1 1 auto;
             min-width: 0;
         }
+
         #juegosPage .cj-switch-activo {
             margin-left: auto;
             padding-left: 2.2em;
             flex: 0 0 auto;
         }
+
         #juegosPage .students-grid--list .student-options {
             flex-direction: row;
         }
 
         /* Preview catálogo: tablet sin nav de bloques, iframe a pantalla completa */
-        #cjPreviewOverlay .vn-screen-nav { display: none !important; }
+        #cjPreviewOverlay .vn-screen-nav {
+            display: none !important;
+        }
+
         #cjPreviewOverlay .vn-tablet-screen {
             position: relative;
         }
+
         #cjPreviewOverlay .vn-screen-body {
             position: relative;
             flex: 1 1 auto;
@@ -82,9 +95,11 @@
             background: #0b1220;
             display: block;
         }
+
         #cjPreviewOverlay .vn-screen-body::before {
             display: none;
         }
+
         #cjPreviewFrame {
             width: 100%;
             height: 100%;
@@ -92,6 +107,7 @@
             background: #fff;
             display: block;
         }
+
         #cjPreviewOverlay .vn-reload-btn {
             right: 56px;
         }
@@ -99,12 +115,11 @@
 @endpush
 
 @section('content')
-    <div class="students-page" id="juegosPage"
-        data-url-base="{{ route('superadmin.catalogo.juegos') }}"
-        data-url-guardar="{{ route('superadmin.catalogo.juegos.guardar') }}"
-        data-url-mostrar-template="{{ url('superadmin/catalogo/juegos/__ID__') }}"
-        data-url-actualizar-template="{{ url('superadmin/catalogo/juegos/__ID__') }}"
-        data-url-estado-template="{{ url('superadmin/catalogo/juegos/__ID__/estado') }}">
+    <div class="students-page" id="juegosPage" data-url-base="{{ route('superadmin.catalogo_juegos.index') }}"
+        data-url-guardar="{{ route('superadmin.catalogo_juegos.guardar') }}"
+        data-url-mostrar-template="{{ url('superadmin/catalogo_juegos/juegos/__ID__') }}"
+        data-url-actualizar-template="{{ url('superadmin/catalogo_juegos/juegos/__ID__') }}"
+        data-url-estado-template="{{ url('superadmin/catalogo_juegos/juegos/__ID__/estado') }}">
         <div class="page-header students-header d-flex justify-content-between align-items-start flex-wrap gap-2">
             <div>
                 <h1 class="mb-1">Juegos</h1>
@@ -118,11 +133,11 @@
         </div>
 
         <div id="container-grid">
-            @include('superAdmin.catalogo.juegos.partials._grid')
+            @include('superAdmin.catalogo_juegos.juegos.partials._grid')
         </div>
     </div>
 
-    @include('superAdmin.catalogo.juegos.modalJuego')
+    @include('superAdmin.catalogo_juegos.juegos.modalJuego')
 
     <script type="application/json" id="cj-perfil-payload">@json($perfilPayload ?? ['perfil_clave' => 'estandar', 'valores' => []])</script>
 
@@ -143,7 +158,8 @@
                         <div class="vn-tablet-camera" aria-hidden="true"></div>
                         <div class="vn-tablet-screen" id="cjTabletScreen">
                             <div class="vn-screen-body" id="cjPreviewBody">
-                                <iframe id="cjPreviewFrame" title="Vista previa del juego" allow="autoplay; fullscreen" referrerpolicy="same-origin"></iframe>
+                                <iframe id="cjPreviewFrame" title="Vista previa del juego" allow="autoplay; fullscreen"
+                                    referrerpolicy="same-origin"></iframe>
                             </div>
                             <footer class="vn-screen-nav" hidden aria-hidden="true"></footer>
                         </div>
@@ -160,5 +176,7 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/juegos/filtros-ui.js') }}"></script>
-    <script src="{{ asset('assets/js/superAdmin/catalogo-juegos.js') }}?v={{ @filemtime(public_path('assets/js/superAdmin/catalogo-juegos.js')) }}"></script>
+    <script
+        src="{{ asset('assets/js/superAdmin/catalogo-juegos.js') }}?v={{ @filemtime(public_path('assets/js/superAdmin/catalogo-juegos.js')) }}">
+    </script>
 @endpush

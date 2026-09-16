@@ -23,4 +23,9 @@ class TiposJuego extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function juegos()
+    {
+        return $this->hasMany(Juego::class, 'tipo_juego_id');
+    }
 }

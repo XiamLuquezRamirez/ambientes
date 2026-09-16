@@ -1,6 +1,6 @@
 @php
     $formId = $formId ?? 'formFiltrosJuegos';
-    $formAction = $formAction ?? route('superadmin.catalogo.juegos');
+    $formAction = $formAction ?? route('superadmin.catalogo_juegos.index');
     $mostrarVista = $mostrarVista ?? true;
     $compacto = $compacto ?? false;
 @endphp
