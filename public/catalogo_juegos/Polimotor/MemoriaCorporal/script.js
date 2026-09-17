@@ -414,76 +414,70 @@ function mostrarFeedback(tipo) {
     return Promise.all([Swal.fire(opts), vozP]);
 }
 
-const ACC_OPCIONES = [
-    { key: "mostrarFeedBack", label: "Mostrar feedback" },
-    { key: "altoContraste", label: "Alto contraste" },
-    { key: "verBotonVerDeNuevo", label: "Botón ver de nuevo" },
-    { key: "cuentaRegresiva", label: "Cuenta 3-2-1" },
-    { key: "animaciones_opciones", label: "Animar opciones" },
-    { key: "mostrarProgreso", label: "Mostrar progreso" }
-];
+function volumenFondoPct() {
+    const n = Number(acc().volumenFondo);
+    if (!isFinite(n)) return 20;
+    return Math.max(0, Math.min(100, n));
+}
 
-function setMenuAcc(abierto) {
-    const panel = document.getElementById("menu-acc-panel");
-    const btn = document.getElementById("btn-menu-acc");
+function aplicarVolumenCalibrado(pct) {
+    const n = Math.max(0, Math.min(100, Number(pct) || 0));
+    if (!gameConfig.accesibilidad) gameConfig.accesibilidad = {};
+    gameConfig.accesibilidad.volumenFondo = n;
+    const vol = n / 100;
+    if (typeof TextoVoz !== "undefined" && typeof TextoVoz.definirVolumenFondo === "function") {
+        TextoVoz.definirVolumenFondo(vol);
+    } else if (audioFondo) {
+        audioFondo.volume = vol;
+    }
+    const icono = document.querySelector("#btn-menu-vol i");
+    if (icono) {
+        icono.className = n <= 0 ? "fa-solid fa-volume-xmark" : (n < 40 ? "fa-solid fa-volume-low" : "fa-solid fa-volume-high");
+    }
+}
+
+function setMenuVol(abierto) {
+    const panel = document.getElementById("menu-vol-panel");
+    const btn = document.getElementById("btn-menu-vol");
     if (!panel || !btn) return;
     panel.hidden = !abierto;
     btn.setAttribute("aria-expanded", abierto ? "true" : "false");
 }
 
-function pintarMenuAcc() {
-    const ops = document.getElementById("menu-acc-ops");
-    if (!ops) return;
-    ops.innerHTML = "";
-    ACC_OPCIONES.forEach(function (op) {
-        const lab = document.createElement("label");
-        lab.className = "menu-acc-op";
-        lab.innerHTML = '<input type="checkbox"> ' + op.label;
-        const input = lab.querySelector("input");
-        input.checked = !!acc()[op.key];
-        input.addEventListener("change", function () {
-            gameConfig.accesibilidad[op.key] = input.checked;
-            aplicarAccesibilidadInicial();
-        });
-        ops.appendChild(lab);
-    });
-    const rango = document.createElement("label");
-    rango.className = "menu-acc-op menu-acc-rango";
-    const actual = Number(acc().letterSpacing);
-    const valor = isFinite(actual) && actual >= 0 ? actual : 2;
-    rango.innerHTML = "<span>Espaciado de letras <strong>" + valor + "</strong></span>";
-    const slider = document.createElement("input");
-    slider.type = "range";
-    slider.min = "0";
-    slider.max = "10";
-    slider.step = "1";
-    slider.value = String(valor);
-    slider.addEventListener("input", function () {
-        const n = Number(slider.value);
-        gameConfig.accesibilidad.letterSpacing = n;
-        rango.querySelector("strong").textContent = String(n);
-        aplicarVisual();
-    });
-    rango.appendChild(slider);
-    ops.appendChild(rango);
+function pintarMenuVol() {
+    const pct = volumenFondoPct();
+    const slider = document.getElementById("rango-volumen");
+    const val = document.getElementById("vol-val");
+    if (slider) slider.value = String(pct);
+    if (val) val.textContent = String(pct);
+    aplicarVolumenCalibrado(pct);
 }
 
-function enlazarMenuAcc() {
-    const btn = document.getElementById("btn-menu-acc");
-    const cerrar = document.getElementById("btn-cerrar-acc");
+function enlazarMenuVol() {
+    const btn = document.getElementById("btn-menu-vol");
+    const cerrar = document.getElementById("btn-cerrar-vol");
+    const slider = document.getElementById("rango-volumen");
     if (btn) {
         btn.addEventListener("click", function (ev) {
             ev.stopPropagation();
-            const panel = document.getElementById("menu-acc-panel");
-            setMenuAcc(panel && panel.hidden);
+            const panel = document.getElementById("menu-vol-panel");
+            setMenuVol(panel && panel.hidden);
         });
     }
-    if (cerrar) cerrar.addEventListener("click", function () { setMenuAcc(false); });
+    if (cerrar) cerrar.addEventListener("click", function () { setMenuVol(false); });
+    if (slider) {
+        slider.addEventListener("input", function () {
+            const n = Number(slider.value);
+            const val = document.getElementById("vol-val");
+            if (val) val.textContent = String(n);
+            aplicarVolumenCalibrado(n);
+        });
+    }
     document.addEventListener("pointerdown", function (ev) {
-        const menu = document.getElementById("menu-acc");
-        if (menu && !menu.contains(ev.target)) setMenuAcc(false);
+        const menu = document.getElementById("menu-vol");
+        if (menu && !menu.contains(ev.target)) setMenuVol(false);
     });
-    pintarMenuAcc();
+    pintarMenuVol();
 }
 
 function aplicarAccesibilidadInicial() {
@@ -493,7 +487,6 @@ function aplicarAccesibilidadInicial() {
     if (btnVer) btnVer.hidden = !a.verBotonVerDeNuevo;
     aplicarVisual();
     actualizarProgreso();
-    pintarMenuAcc();
 }
 
 function actualizarProgreso() {
@@ -925,16 +918,17 @@ $(document).ready(function () {
     introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
     aplicarVisual();
     aplicarAccesibilidadInicial();
-    enlazarMenuAcc();
+    TextoVoz.iniciar(gameConfig, introConfig, {
+        obtenerAudioFondo: function () { return audioFondo; },
+        volumenFondo: volumenFondoPct() / 100
+    });
+    enlazarMenuVol();
     if (window.speechSynthesis) {
         try { window.speechSynthesis.getVoices(); } catch (e) { /* noop */ }
         window.speechSynthesis.addEventListener("voiceschanged", function () {
             window.speechSynthesis.getVoices();
         });
     }
-    TextoVoz.iniciar(gameConfig, introConfig, {
-        obtenerAudioFondo: function () { return audioFondo; }
-    });
     window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
     const btnEmpecemos = document.getElementById("btn-empecemos");
     if (btnEmpecemos) btnEmpecemos.addEventListener("click", empecemosJuego);

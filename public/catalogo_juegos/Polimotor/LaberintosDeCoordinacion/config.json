@@ -4,11 +4,9 @@
   "feedback": {
     "duracion": 1100,
     "acierto": {
-      "texto": "¡Muy bien! Llegaste hasta el cohete.",
       "gif": "../../images/correcto.gif"
     },
     "error": {
-      "texto": "¡Te saliste del laberinto! Vuelve al pasillo.",
       "gif": "../../images/incorrecto.gif"
     }
   },
@@ -17,7 +15,28 @@
     "enunciadoNino": "Encuentra el camino hasta el cohete",
     "enunciadoNina": "Encuentra el camino hasta el cohete",
     "enunciado": "Encuentra el camino hasta el cohete",
-    "cierre": "¡Excelente! Completaste los laberintos."
+    "cierre": "¡Excelente! Completaste los laberintos.",
+    "acierto": "¡Muy bien! Llegaste hasta el cohete.",
+    "error": "¡Te saliste del laberinto! Vuelve al pasillo.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "Hola, soy Zoe. ¡Vamos a jugar! Encuentra el camino del laberinto hasta el cohete. ¡Cuidado con los callejones sin salida!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Mantén el dedo sobre la carita y deslízala por los pasillos sin tocarte las paredes."
+      },
+      {
+        "personaje": 1,
+        "texto": "Si entras a un callejón, regresa y prueba otro camino. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
   },
   "audios": {
     "acierto": "../../sounds/ok.mp3",

@@ -4,18 +4,37 @@
   "feedback": {
     "duracion": 1200,
     "acierto": {
-      "texto": "¡Muy bien!",
       "gif": "../../images/correcto.gif"
     },
     "error": {
-      "texto": "Inténtalo otra vez. ¡Tú puedes!",
       "gif": "../../images/incorrecto.gif"
     }
   },
   "textos": {
     "eligeNivel": "Elige tu edad",
     "enunciado": "Observa y toca el lado correcto",
-    "cierre": "¡Excelente! Practicaste izquierda y derecha."
+    "cierre": "¡Excelente, aprendiste a reconocer la izquierda y la derecha!",
+    "acierto": "¡Muy bien, lo hiciste genial!",
+    "error": "Ya casi lo tienes, mira con atención y vuelve a intentarlo. ¡Tú puedes!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "Hola, soy Zoe. ¡Vamos a jugar! Hoy vamos a aprender a reconocer la izquierda y la derecha."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Mira bien la pantalla. Hay un lado izquierdo, un lado central y un lado derecho."
+      },
+      {
+        "personaje": 1,
+        "texto": "Escucha con atención y toca el lado correcto. ¡Concéntrate y demuestra lo que sabes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
   },
   "audios": {
     "acierto": "../../sounds/ok.mp3",

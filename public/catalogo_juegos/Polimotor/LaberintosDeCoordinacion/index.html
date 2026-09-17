@@ -34,6 +34,7 @@
     <div style="display: none" class="overlay">
         <div id="personajes-container"></div>
         <div class="nube nube-centro">
+            <img src="../../images/nube.png" id="nube_img" class="nube_img" alt="">
             <div class="nube-contenido">
                 <p class="borde2" id="bienvenida"></p>
             </div>
@@ -88,6 +89,22 @@
             <div class="lienzo-wrap">
                 <canvas id="lienzo" width="1280" height="854" aria-label="Laberinto"></canvas>
             </div>
+        </div>
+    </div>
+
+    <div id="menu-vol" class="menu-acc">
+        <button type="button" id="btn-menu-vol" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-vol-panel" title="Volumen de fondo">
+            <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <div id="menu-vol-panel" class="menu-acc-panel" hidden>
+            <div class="menu-acc-cab">
+                <strong>Volumen de fondo</strong>
+                <button type="button" id="btn-cerrar-vol" class="menu-acc-cerrar" aria-label="Cerrar">×</button>
+            </div>
+            <label class="menu-acc-op menu-acc-rango">
+                <span>Volumen <strong id="vol-val">20</strong></span>
+                <input type="range" id="rango-volumen" min="0" max="100" step="1" value="20">
+            </label>
         </div>
     </div>
 

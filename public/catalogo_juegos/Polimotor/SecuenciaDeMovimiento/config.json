@@ -4,36 +4,55 @@
   "feedback": {
     "duracion": 1200,
     "acierto": {
-      "texto": "¡Muy bien! ¡Lo hiciste!",
       "gif": "../../images/correcto.gif"
     },
     "error": {
-      "texto": "Mira otra vez. ¡Vamos a intentarlo!",
       "gif": "../../images/incorrecto.gif"
     }
   },
   "feedbackPorEdad": {
     "3": {
-      "acierto": "¡Muy bien! ¡Lo hiciste!",
+      "acierto": "¡Muy bien, lo hiciste!",
       "error": "Mira otra vez. ¡Vamos a intentarlo!",
-      "cierre": "¡Excelente! ¡Jugaste y completaste los movimientos!"
+      "cierre": "¡Excelente, jugaste y completaste los movimientos!"
     },
     "4": {
-      "acierto": "¡Muy bien! ¡Descubriste qué movimiento seguía!",
+      "acierto": "¡Muy bien, descubriste qué movimiento seguía!",
       "error": "Miremos otra vez. ¿Qué movimiento se repite?",
-      "cierre": "¡Excelente! ¡Descubriste los movimientos que seguían!"
+      "cierre": "¡Excelente, descubriste los movimientos que seguían!"
     },
     "5": {
-      "acierto": "¡Muy bien! ¡Descubriste el patrón!",
+      "acierto": "¡Muy bien, descubriste el patrón!",
       "error": "Observa con atención. ¿Qué movimiento se repite?",
-      "cierre": "¡Excelente! ¡Descubriste los patrones y completaste las secuencias!"
+      "cierre": "¡Excelente, descubriste los patrones y completaste las secuencias!"
     }
   },
   "textos": {
     "eligeNivel": "Elige tu edad",
     "enunciado": "Observa la secuencia y elige qué sigue",
     "pregunta": "¿Qué movimiento sigue?",
-    "cierre": "¡Excelente! ¡Completaste las secuencias!"
+    "cierre": "¡Excelente, completaste las secuencias!",
+    "acierto": "¡Muy bien, lo hiciste!",
+    "error": "Mira otra vez. ¡Vamos a intentarlo!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "Hola, soy Zoe. ¡Vamos a movernos! Mira lo que hago y descubre qué movimiento sigue."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Observa con atención la secuencia. ¡Yo también me muevo!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Cuando se detenga, elige la tarjeta que completa el patrón. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
   },
   "timings": {
     "pasoMs": 650,

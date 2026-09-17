@@ -1,8 +1,8 @@
 {
   "accesibilidad": {
     "piezasVisibles": 3,
-    "tiempoMostrarCompleto": 2000,
-    "tiempoVerDeNuevo": 2000,
+    "tiempoMostrarCompleto": 3000,
+    "tiempoVerDeNuevo": 3000,
     "porcentajeAcierto": 60,
     "fallosPista1": 2,
     "fallosPista2": 3,
@@ -10,11 +10,9 @@
     "feedback": {
       "duracion": 2000,
       "acierto": {
-        "texto": "¡Muy bien, sigue así!.",
         "gif": "../../images/correcto.gif"
       },
       "error": {
-        "texto": "¡Inténtalo otra vez! Observa con atención dónde puede ir esa parte del cuerpo.",
         "gif": "../../images/incorrecto.gif"
       }
     },
@@ -26,12 +24,41 @@
     "resaltarDestino": false,
     "verBotonVerDeNuevo": true,
     "pistaPorFallos": true,
-    "mostrarProgreso": true
+    "mostrarProgreso": true,
+    "cuentaRegresiva": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
   },
   "textos": {
-    "instruccion": "¡Vamos a jugar! Observa muy bien el cuerpo y arrastra cada pieza hasta el lugar donde corresponde.",
-    "cierre": "¡Excelente! Completaste el rompecabezas del cuerpo humano."
-  },
+    "instruccion": "Hola, soy Zoe. ¡Vamos a jugar! Observa el cuerpo y arrastra cada pieza hasta el lugar donde corresponde.",
+    "seOcultan": "La figura se esconderá en...",
+    "cierre": "¡Excelente, Completaste el rompecabezas del cuerpo humano!",
+    "acierto": "¡Muy bien, lo hiciste genial!",
+    "error": "Ya casi lo tienes, mira con atención y prueba otro lugar para esa pieza.",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola! Soy Zeus.<br>Hoy vamos a armar un rompecabezas del cuerpo humano."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Yo soy Zoe!<br>Encontrarás varias piezas del cuerpo. ¡Tendrás que colocarlas en el lugar correcto!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Mira con mucha atención la figura.<br>Después, arrastra cada pieza hasta el lugar donde creas que corresponde."
+      },
+      {
+        "personaje": 1,
+        "texto": "Hazlo con calma y observa cada pieza.<br>¡Tú puedes completar el rompecabezas!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Si quieres una pista, puedes tocar el boton pista, ubicado en la parte superior derecha de la pantalla el cual tiene un icono de un ojo."
+      }
+    ]
+  }, 
   "cuerpo": "nina",
   "edad": 4,
   "audios": {

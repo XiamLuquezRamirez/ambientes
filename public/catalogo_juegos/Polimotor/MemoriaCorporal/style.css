@@ -232,7 +232,7 @@ body {
 }
 
 body.esperando-inicio #principal,
-body.esperando-inicio #menu-acc {
+body.esperando-inicio #menu-vol {
   visibility: hidden;
 }
 
@@ -675,7 +675,7 @@ body.viendo-completo #piezas-colocadas {
     #f7fbff;
 }
 
-.overlay::before {
+.overlay::after {
   position: absolute;
   width: 0;
   height: 0;
@@ -683,7 +683,7 @@ body.viendo-completo #piezas-colocadas {
   z-index: -1;
   pointer-events: none;
   opacity: 0;
-  content: url("../../images/normal1.gif") url("../../images/normal2.gif") url("../../images/ciencia/normal1.gif") url("../../images/ciencia/normal2.gif");
+  content: url("../../images/zeus_normal.gif") url("../../images/zeus_hablando.gif") url("../../images/zoe_normal.gif") url("../../images/zoe_hablando.gif");
 }
 
 .preload-gifs {
@@ -791,7 +791,6 @@ body.viendo-completo #piezas-colocadas {
   box-sizing: border-box;
   opacity: 1;
   transition: opacity 0.35s ease;
-  border: 3px dashed #c0c892;
   z-index: -1;
 }
 

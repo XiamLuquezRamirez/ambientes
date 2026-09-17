@@ -16,6 +16,7 @@ let juegoTerminado = false;
 let audioFondo = null;
 let tableroListo = false;
 let verDeNuevoTimer = null;
+let cuentaToken = 0;
 let siluetaOcultaAntes = false;
 let pistaPiezaId = null;
 
@@ -190,7 +191,7 @@ function fijarNubeEnPosicion() {
     if (cerrardo || conversacionCancelada) return;
     const nube = document.querySelector(".nube");
     nube.style.animationName = "none";
-    nube.style.bottom = "38%";
+    nube.style.bottom = "57%";
 }
 
 function cambiarNubeAPersonaje(index) {
@@ -590,77 +591,80 @@ function acc() {
     return gameConfig.accesibilidad || {};
 }
 
-const ACC_OPCIONES = [
-    { key: "mostrarFeedBack", label: "Mostrar feedback" },
-    { key: "altoContraste", label: "Alto contraste" },
-    { key: "modoTap", label: "Tocar en vez de arrastrar" },
-    { key: "zoomLongPress", label: "Ampliar pieza al mantener" },
-    { key: "huecosPunteados", label: "Borde punteado" },
-    { key: "grillaFija", label: "Piezas en grilla" },
-    { key: "resaltarDestino", label: "Resaltar destino" },
-    { key: "verBotonVerDeNuevo", label: "Botón ver de nuevo" },
-    { key: "pistaPorFallos", label: "Pistas por errores" },
-    { key: "mostrarProgreso", label: "Mostrar progreso" }
-];
+function volumenFondoPct() {
+    const n = Number(acc().volumenFondo);
+    if (!isFinite(n)) return 20;
+    return Math.max(0, Math.min(100, n));
+}
 
-function setMenuAcc(abierto) {
-    const wrap = document.getElementById("menu-acc");
-    const panel = document.getElementById("menu-acc-panel");
-    const btn = document.getElementById("btn-menu-acc");
-    if (!wrap || !panel || !btn) return;
+function aplicarVolumenCalibrado(pct) {
+    const n = Math.max(0, Math.min(100, Number(pct) || 0));
+    if (!gameConfig.accesibilidad) gameConfig.accesibilidad = {};
+    gameConfig.accesibilidad.volumenFondo = n;
+    const vol = n / 100;
+    if (typeof TextoVoz !== "undefined" && typeof TextoVoz.definirVolumenFondo === "function") {
+        TextoVoz.definirVolumenFondo(vol);
+    } else if (audioFondo) {
+        audioFondo.volume = vol;
+    }
+    const icono = document.querySelector("#btn-menu-vol i");
+    if (icono) {
+        icono.className = n <= 0 ? "fa-solid fa-volume-xmark" : (n < 40 ? "fa-solid fa-volume-low" : "fa-solid fa-volume-high");
+    }
+}
+
+function setMenuVol(abierto) {
+    const panel = document.getElementById("menu-vol-panel");
+    const btn = document.getElementById("btn-menu-vol");
+    if (!panel || !btn) return;
     panel.hidden = !abierto;
     btn.setAttribute("aria-expanded", abierto ? "true" : "false");
-    wrap.classList.toggle("abierto", abierto);
 }
 
-function pintarMenuAcc() {
-    const caja = document.getElementById("menu-acc-ops");
-    if (!caja) return;
-    if (!caja.dataset.listo) {
-        ACC_OPCIONES.forEach(function (item) {
-            const lab = document.createElement("label");
-            lab.className = "menu-acc-op";
-            const inp = document.createElement("input");
-            inp.type = "checkbox";
-            inp.dataset.acc = item.key;
-            inp.addEventListener("change", function () {
-                if (!gameConfig.accesibilidad) gameConfig.accesibilidad = {};
-                gameConfig.accesibilidad[item.key] = inp.checked;
-                aplicarAccesibilidadInicial();
-            });
-            const texto = document.createElement("span");
-            texto.textContent = item.label;
-            lab.appendChild(inp);
-            lab.appendChild(texto);
-            caja.appendChild(lab);
-        });
-        caja.dataset.listo = "1";
-    }
-    caja.querySelectorAll("input[data-acc]").forEach(function (inp) {
-        inp.checked = !!acc()[inp.dataset.acc];
-    });
+function pintarMenuVol() {
+    const pct = volumenFondoPct();
+    const slider = document.getElementById("rango-volumen");
+    const val = document.getElementById("vol-val");
+    if (slider) slider.value = String(pct);
+    if (val) val.textContent = String(pct);
+    aplicarVolumenCalibrado(pct);
 }
 
-function enlazarMenuAcc() {
-    const btn = document.getElementById("btn-menu-acc");
-    const cerrar = document.getElementById("btn-cerrar-acc");
+function enlazarMenuVol() {
+    const btn = document.getElementById("btn-menu-vol");
+    const cerrar = document.getElementById("btn-cerrar-vol");
+    const slider = document.getElementById("rango-volumen");
     if (btn) {
         btn.addEventListener("click", function (ev) {
             ev.stopPropagation();
-            const panel = document.getElementById("menu-acc-panel");
-            setMenuAcc(panel && panel.hidden);
+            const panel = document.getElementById("menu-vol-panel");
+            setMenuVol(panel && panel.hidden);
         });
     }
-    if (cerrar) {
-        cerrar.addEventListener("click", function () {
-            setMenuAcc(false);
+    if (cerrar) cerrar.addEventListener("click", function () { setMenuVol(false); });
+    if (slider) {
+        slider.addEventListener("input", function () {
+            const n = Number(slider.value);
+            const val = document.getElementById("vol-val");
+            if (val) val.textContent = String(n);
+            aplicarVolumenCalibrado(n);
         });
     }
     document.addEventListener("pointerdown", function (ev) {
-        const menu = document.getElementById("menu-acc");
-        if (menu && !menu.contains(ev.target)) setMenuAcc(false);
+        const menu = document.getElementById("menu-vol");
+        if (menu && !menu.contains(ev.target)) setMenuVol(false);
     });
-    pintarMenuAcc();
+    pintarMenuVol();
+}
+
+function pxCero(valor, fallback) {
+    const n = Number(valor);
+    if (!isFinite(n) || n < 0) return fallback;
+    return n + "px";
+}
+
+function aplicarLetterSpacing() {
+    document.documentElement.style.setProperty("--mc-letter-spacing", pxCero(acc().letterSpacing, "2px"));
 }
 
 function aplicarGrillaBandeja() {
@@ -702,7 +706,7 @@ function aplicarAccesibilidadInicial() {
     aplicarGrillaBandeja();
     actualizarProgreso();
     mostrarReferenciaAyuda();
-    pintarMenuAcc();
+    aplicarLetterSpacing();
     if (tableroListo) sizePiezasAHuecos();
 }
 
@@ -787,7 +791,7 @@ function iniciarEscenario() {
 
     document.getElementById("zonas").innerHTML = "";
     document.getElementById("piezas-colocadas").innerHTML = "";
-    document.getElementById("bandeja").innerHTML = "";
+    vaciarPiezasBandeja();
     document.getElementById("escenario").style.visibility = "hidden";
 
     mostrarFiguraCompleta();
@@ -808,9 +812,68 @@ function restaurarSombraSvg() {
 async function mostrarFiguraCompleta() {
     document.getElementById("escenario").style.visibility = "visible";
     if (modoSvgActivo()) mostrarColorSvg();
-    await sleep(acc().tiempoMostrarCompleto || 2000);
+    const ok = await correrCuentaRegresiva(acc().tiempoMostrarCompleto || 3000);
+    if (!ok || juegoTerminado) return;
     if (modoSvgActivo()) restaurarSombraSvg();
     armarTablero();
+}
+
+function segundosDeTiempo(ms) {
+    const n = Number(ms);
+    if (!isFinite(n) || n <= 0) return 3;
+    return Math.max(1, Math.round(n / 1000));
+}
+
+function ocultarCuenta() {
+    const cuenta = document.getElementById("cuenta");
+    if (!cuenta) return;
+    cuenta.hidden = true;
+    cuenta.innerHTML = "";
+}
+
+function cancelarCuentaRegresiva() {
+    cuentaToken += 1;
+    clearTimeout(verDeNuevoTimer);
+    verDeNuevoTimer = null;
+    ocultarCuenta();
+    if (typeof TextoVoz !== "undefined") TextoVoz.detener();
+}
+
+async function correrCuentaRegresiva(duracionMs) {
+    const token = ++cuentaToken;
+    const ms = Number(duracionMs);
+    const espera = isFinite(ms) && ms > 0 ? ms : 3000;
+
+    if (acc().cuentaRegresiva === false) {
+        await sleep(espera);
+        return token === cuentaToken && !juegoTerminado;
+    }
+
+    const cuenta = document.getElementById("cuenta");
+    const textos = (gameConfig && gameConfig.textos) || {};
+    const etiqueta = textos.seOcultan || "La figura se esconderá en...";
+    const segundos = segundosDeTiempo(espera);
+    const voz = Math.random() < 0.5 ? "zoe" : "zeus";
+
+    if (!cuenta) {
+        await sleep(espera);
+        return token === cuentaToken && !juegoTerminado;
+    }
+
+    cuenta.hidden = false;
+    cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span>";
+    if (typeof TextoVoz !== "undefined") await TextoVoz.hablar(etiqueta, voz);
+    if (token !== cuentaToken || juegoTerminado) return false;
+
+    for (let n = segundos; n >= 1; n--) {
+        cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span><strong>" + n + "</strong>";
+        if (typeof TextoVoz !== "undefined") await TextoVoz.hablar(String(n), voz);
+        if (token !== cuentaToken || juegoTerminado) return false;
+    }
+
+    ocultarCuenta();
+    await sleep(1000);
+    return token === cuentaToken && !juegoTerminado;
 }
 
 function piezasVisiblesConfig() {
@@ -903,11 +966,14 @@ function verificarSiguienteLote() {
     agregarPiezasABandeja(Math.min(piezasVisiblesConfig(), pendientes.length));
 }
 
+function vaciarPiezasBandeja() {
+    document.querySelectorAll("#bandeja .pieza").forEach(function (p) { p.remove(); });
+}
+
 function armarTablero() {
     const zonas = document.getElementById("zonas");
-    const bandeja = document.getElementById("bandeja");
     zonas.innerHTML = "";
-    bandeja.innerHTML = "";
+    vaciarPiezasBandeja();
     const svg = modoSvgActivo();
 
     piezasEstado.forEach(function (pieza) {
@@ -944,13 +1010,14 @@ function feedbackActivo() {
 function cfgFeedback(tipo) {
     const fb = acc().feedback || {};
     const item = fb[tipo] || {};
+    const t = (gameConfig && gameConfig.textos) || {};
     const defaults = {
         acierto: { texto: "¡Muy bien! Esa parte va ahí.", gif: "../../images/correcto.gif" },
         error: { texto: "¡Inténtalo otra vez! Observa dónde puede ir.", gif: "../../images/incorrecto.gif" }
     };
     const def = defaults[tipo] || {};
     return {
-        texto: item.texto || def.texto || "",
+        texto: t[tipo] || item.texto || def.texto || "",
         gif: item.gif || def.gif || "",
         duracion: fb.duracion || 2000
     };
@@ -1454,25 +1521,35 @@ function mostrarReferenciaAyuda() {
     if (caja) caja.hidden = true;
 }
 
-function verDeNuevo() {
+async function verDeNuevo() {
     if (!tableroListo || !nivelElegido || !cuerpoElegido || juegoTerminado) return;
+    if (document.body.classList.contains("viendo-completo")) return;
     if (modoSvgActivo()) {
         mostrarColorSvg();
-        document.body.classList.add("viendo-completo");
-        clearTimeout(verDeNuevoTimer);
-        verDeNuevoTimer = setTimeout(ocultarVistaCompleta, acc().tiempoVerDeNuevo || 2000);
+    } else {
+        const silueta = document.getElementById("img-silueta");
+        if (silueta) silueta.hidden = true;
+    }
+    document.body.classList.add("viendo-completo");
+    const ok = await correrCuentaRegresiva(acc().tiempoVerDeNuevo || 3000);
+    if (!ok) {
+        if (!juegoTerminado) {
+            if (modoSvgActivo()) restaurarSombraSvg();
+            const silueta = document.getElementById("img-silueta");
+            if (silueta && !modoSvgActivo()) silueta.hidden = siluetaOcultaAntes;
+            document.body.classList.remove("viendo-completo");
+            ocultarCuenta();
+        }
         return;
     }
+    if (modoSvgActivo()) restaurarSombraSvg();
     const silueta = document.getElementById("img-silueta");
-    if (silueta) silueta.hidden = true;
-    document.body.classList.add("viendo-completo");
-    clearTimeout(verDeNuevoTimer);
-    verDeNuevoTimer = setTimeout(ocultarVistaCompleta, acc().tiempoVerDeNuevo || 2000);
+    if (silueta && !modoSvgActivo()) silueta.hidden = siluetaOcultaAntes;
+    document.body.classList.remove("viendo-completo");
 }
 
 function ocultarVistaCompleta() {
-    clearTimeout(verDeNuevoTimer);
-    verDeNuevoTimer = null;
+    cancelarCuentaRegresiva();
     if (modoSvgActivo()) restaurarSombraSvg();
     const silueta = document.getElementById("img-silueta");
     if (silueta && !modoSvgActivo()) silueta.hidden = siluetaOcultaAntes;
@@ -1501,10 +1578,10 @@ function terminarJuego() {
 }
 
 $(document).ready(function () {
-    introConfig = JSON.parse(readText("intro.json"));
     gameConfig = JSON.parse(readText("config.json"));
+    introConfig = JSON.parse(readText("../../intro.json"));
+    introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
     aplicarAccesibilidadInicial();
-    enlazarMenuAcc();
     if (window.speechSynthesis) {
         try { window.speechSynthesis.getVoices(); } catch (e) { /* noop */ }
         window.speechSynthesis.addEventListener("voiceschanged", function () {
@@ -1512,8 +1589,10 @@ $(document).ready(function () {
         });
     }
     TextoVoz.iniciar(gameConfig, introConfig, {
-        obtenerAudioFondo: function () { return audioFondo; }
+        obtenerAudioFondo: function () { return audioFondo; },
+        volumenFondo: volumenFondoPct() / 100
     });
+    enlazarMenuVol();
     window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
     const btnEmpecemos = document.getElementById("btn-empecemos");
     if (btnEmpecemos) {

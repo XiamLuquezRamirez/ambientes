@@ -14,12 +14,14 @@ class JuegoTtsController extends Controller
         $datos = $request->validate([
             'texto' => ['required', 'string', 'max:800'],
             'personaje' => ['nullable', 'string', 'in:zoe,zeus'],
+            'rate' => ['nullable'],
         ]);
 
         try {
             $binario = app(TextoAVozService::class)->binario(
                 $datos['texto'],
-                $datos['personaje'] ?? 'zoe'
+                $datos['personaje'] ?? 'zoe',
+                $datos['rate'] ?? null
             );
         } catch (\Throwable $e) {
             Log::warning('juegos.tts falló', ['error' => $e->getMessage()]);

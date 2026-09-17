@@ -4,11 +4,9 @@
     "feedback": {
         "duracion": 1800,
         "acierto": {
-            "texto": "¡Muy bien! Encontraste la parte del cuerpo.",
             "gif": "../../images/correcto.gif"
         },
         "error": {
-            "texto": "¡Inténtalo otra vez! Observa muy bien la figura.",
             "gif": "../../images/incorrecto.gif"
         }
     },
@@ -18,12 +16,35 @@
         "resaltarObjetivo": false,
         "pistaPorFallos": true,
         "mostrarProgreso": true,
-        "hitboxExtra": 0
+        "hitboxExtra": 0,
+        "letterSpacing": 2,
+        "volumenFondo": 20,
+        "rate": 5
     },
     "textos": {
         "eligeCuerpo": "¿Qué cuerpo quieres explorar?",
         "eligeNivel": "Elige tu edad",
-        "cierre": "¡Excelente! Reconociste las partes del cuerpo."
+        "cierre": "¡Excelente! Reconociste las partes del cuerpo.",
+        "acierto": "¡Muy bien! Encontraste la parte del cuerpo.",
+        "error": "Ya casi lo tienes, mira con atención y vuelve a intentarlo. ¡Tú puedes!",
+        "conversacion": [
+            {
+                "personaje": 1,
+                "texto": "Hola, soy Zoe. <br> Hoy vamos a reconocer las partes del cuerpo."
+            },
+            {
+                "personaje": 0,
+                "texto": "¡Yo soy Zeus! <br> Verás una figura completa. y podrás tocar sus diferentes partes."
+            },
+            {
+                "personaje": 1,
+                "texto": "¡Vamos a jugar! Escucha la indicación, observa el cuerpo y toca la parte que te indiquemos."
+            },
+            {
+                "personaje": 0,
+                "texto": "¡Tú puedes! <br> Primero eliges niña o niño y tu edad. ¡Concéntrate y demuestra lo que sabes!"
+            }
+        ]
     },
     "audios": {
         "acierto": "",

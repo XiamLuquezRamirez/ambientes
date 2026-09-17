@@ -47,6 +47,14 @@
         try { audio.volume = vol; } catch (e) { /* noop */ }
     }
 
+    function definirVolumenFondo(vol) {
+        var n = Number(vol);
+        if (!isFinite(n)) return VOLUMEN_FONDO;
+        VOLUMEN_FONDO = Math.max(0, Math.min(1, n));
+        aplicarVolumenFondo(VOLUMEN_FONDO);
+        return VOLUMEN_FONDO;
+    }
+
     function esBlobTts(src) {
         return typeof src === "string" && src.indexOf("blob:") === 0;
     }
@@ -95,27 +103,14 @@
         notificarTtsFin();
     }
 
-    function perfilCatalogo() {
-        try {
-            if (global.__PEDNIA_PERFIL__) return global.__PEDNIA_PERFIL__;
-            if (global.parent && global.parent !== global && global.parent.__PEDNIA_PERFIL__) {
-                return global.parent.__PEDNIA_PERFIL__;
-            }
-        } catch (e) { /* iframe cruzado */ }
-        return null;
+    function ttsRatePct() {
+        var n = Number(accesibilidad().rate);
+        if (!isFinite(n)) n = 5;
+        return Math.max(-50, Math.min(100, n));
     }
 
     function ttsRate() {
-        var rate = 0.92;
-        var perfil = perfilCatalogo();
-        var vals = perfil && (perfil.valores || perfil);
-        if (!vals || typeof vals !== "object") return rate;
-        var vel = Number(vals.velocidad_voz);
-        if (vel > 0) rate = vel / 100;
-        var voz = String(vals.voz_narradora || "");
-        if (voz === "lenta") rate = Math.min(rate, 0.85);
-        if (voz === "muy_lenta") rate = Math.min(rate, 0.7);
-        return Math.max(0.5, Math.min(1.4, rate));
+        return Math.max(0.5, Math.min(1.5, 1 + ttsRatePct() / 100));
     }
 
     function personajeDeIndice(index) {
@@ -125,7 +120,7 @@
 
     function claveTts(texto, personaje) {
         var pj = String(personaje || "zoe").toLowerCase() === "zeus" ? "zeus" : "zoe";
-        return pj + "\n" + textoPlano(texto);
+        return pj + "\n" + ttsRatePct() + "\n" + textoPlano(texto);
     }
 
     function obtenerUrlTts(texto, personaje) {
@@ -140,7 +135,8 @@
 
         ttsPendientes[key] = fetch(URL_TTS + "?" + new URLSearchParams({
             texto: t,
-            personaje: pj
+            personaje: pj,
+            rate: String(ttsRatePct())
         }), {
             headers: { Accept: "audio/mpeg" }
         }).then(function (res) {
@@ -276,7 +272,7 @@
             hablarNavegador(texto, personaje, token, onEnd);
         };
         ttsPlayer.src = src;
-        try { ttsPlayer.playbackRate = ttsRate(); } catch (e) { /* noop */ }
+        try { ttsPlayer.playbackRate = 1; } catch (e) { /* noop */ }
         var p = ttsPlayer.play();
         if (p && typeof p.catch === "function") {
             p.catch(function () {
@@ -312,7 +308,7 @@
                 notificarTtsFin();
             };
             safety = setTimeout(done, 15000);
-            aplicarVolumenFondo(VOLUMEN_DUCK);
+            aplicarVolumenFondo(Math.min(VOLUMEN_DUCK, VOLUMEN_FONDO));
 
             var cached = ttsCache[claveTts(t, pj)];
             if (cached) {
@@ -359,7 +355,8 @@
         desbloquear: desbloquearAudioTts,
         vaciar: vaciarCacheTts,
         personajeDeIndice: personajeDeIndice,
-        volumenFondo: aplicarVolumenFondo
+        volumenFondo: aplicarVolumenFondo,
+        definirVolumenFondo: definirVolumenFondo
     };
 
     Object.defineProperty(api, "VOLUMEN_FONDO", {

@@ -38,6 +38,87 @@
         return (gameConfig && gameConfig.textos) || {};
     }
 
+    function acc() {
+        return (gameConfig && gameConfig.accesibilidad) || {};
+    }
+
+    function volumenFondoPct() {
+        const n = Number(acc().volumenFondo);
+        if (!isFinite(n)) return 20;
+        return Math.max(0, Math.min(100, n));
+    }
+    
+    function aplicarVolumenCalibrado(pct) {
+        const n = Math.max(0, Math.min(100, Number(pct) || 0));
+        if (!gameConfig.accesibilidad) gameConfig.accesibilidad = {};
+        gameConfig.accesibilidad.volumenFondo = n;
+        const vol = n / 100;
+        if (typeof TextoVoz !== "undefined" && typeof TextoVoz.definirVolumenFondo === "function") {
+            TextoVoz.definirVolumenFondo(vol);
+        } else if (audioFondo) {
+            audioFondo.volume = vol;
+        }
+        const icono = document.querySelector("#btn-menu-vol i");
+        if (icono) {
+            icono.className = n <= 0 ? "fa-solid fa-volume-xmark" : (n < 40 ? "fa-solid fa-volume-low" : "fa-solid fa-volume-high");
+        }
+    }
+    
+    function setMenuVol(abierto) {
+        const panel = document.getElementById("menu-vol-panel");
+        const btn = document.getElementById("btn-menu-vol");
+        if (!panel || !btn) return;
+        panel.hidden = !abierto;
+        btn.setAttribute("aria-expanded", abierto ? "true" : "false");
+    }
+    
+    function pintarMenuVol() {
+        const pct = volumenFondoPct();
+        const slider = document.getElementById("rango-volumen");
+        const val = document.getElementById("vol-val");
+        if (slider) slider.value = String(pct);
+        if (val) val.textContent = String(pct);
+        aplicarVolumenCalibrado(pct);
+    }
+    
+    function enlazarMenuVol() {
+        const btn = document.getElementById("btn-menu-vol");
+        const cerrar = document.getElementById("btn-cerrar-vol");
+        const slider = document.getElementById("rango-volumen");
+        if (btn) {
+            btn.addEventListener("click", function (ev) {
+                ev.stopPropagation();
+                const panel = document.getElementById("menu-vol-panel");
+                setMenuVol(panel && panel.hidden);
+            });
+        }
+        if (cerrar) cerrar.addEventListener("click", function () { setMenuVol(false); });
+        if (slider) {
+            slider.addEventListener("input", function () {
+                const n = Number(slider.value);
+                const val = document.getElementById("vol-val");
+                if (val) val.textContent = String(n);
+                aplicarVolumenCalibrado(n);
+            });
+        }
+        document.addEventListener("pointerdown", function (ev) {
+            const menu = document.getElementById("menu-vol");
+            if (menu && !menu.contains(ev.target)) setMenuVol(false);
+        });
+        pintarMenuVol();
+    }
+    
+    function pxCero(valor, fallback) {
+        const n = Number(valor);
+        if (!isFinite(n) || n < 0) return fallback;
+        return n + "px";
+    }
+    
+    function aplicarLetterSpacing() {
+        document.documentElement.style.setProperty("--mc-letter-spacing", pxCero(acc().letterSpacing, "2px"));
+    }
+
+
     function feedbackEdad() {
         const id = nivelElegido && nivelElegido.id;
         const map = (gameConfig && gameConfig.feedbackPorEdad) || {};
@@ -166,11 +247,7 @@
             "../../images/correcto.gif",
             "../../images/incorrecto.gif",
             "../../images/victoria.gif",
-            "../../images/nube.png",
-            "../../images/normal1.gif",
-            "../../images/normal2.gif",
-            "../../images/ciencia/normal1.gif",
-            "../../images/ciencia/normal2.gif"
+            "../../images/nube.png"
         ];
         const audios = [
             gameConfig.audios && gameConfig.audios.acierto,
@@ -213,13 +290,12 @@
     }
 
     function frasesFijasTts() {
-        const fb = (gameConfig && gameConfig.feedback) || {};
         const porEdad = (gameConfig && gameConfig.feedbackPorEdad) || {};
         const extra = [
             { texto: textos().pregunta || "¿Qué movimiento sigue?", personaje: "zeus" },
             { texto: "¿Qué sigue?", personaje: "zoe" },
-            fb.acierto && fb.acierto.texto,
-            fb.error && fb.error.texto,
+            textos().acierto,
+            textos().error,
             textos().cierre
         ];
         Object.keys(porEdad).forEach(function (k) {
@@ -247,20 +323,44 @@
         const posiciones = personajes.length === 1 ? ["uno"] : ["izquierda", "derecha"];
         personajes.forEach(function (personajeCfg, index) {
             const div = document.createElement("div");
-            div.className = "personaje-char " + posiciones[index];
+            div.className = "personaje-char personaje-char-" + posiciones[index];
             div.style.backgroundImage = "url(" + personajeCfg.gif_idle + ")";
             div.dataset.index = index;
             container.appendChild(div);
         });
     }
 
-    function preloadGifs(personajes) {
+    function urlsGifsPersonajes(personajes) {
         const urls = [];
-        personajes.forEach(function (p) {
+        (personajes || []).forEach(function (p) {
             [p.gif_idle, p.gif_hablando].forEach(function (gif) {
                 if (gif && urls.indexOf(gif) === -1) urls.push(gif);
             });
         });
+        return urls;
+    }
+
+    function preloadGifsEnCSS(personajes) {
+        const urls = urlsGifsPersonajes(personajes);
+        const content = urls.map(function (gif) {
+            return 'url("' + gif + '")';
+        }).join(" ");
+        let style = document.getElementById("preload-gifs-style");
+        if (!style) {
+            style = document.createElement("style");
+            style.id = "preload-gifs-style";
+            document.head.appendChild(style);
+        }
+        style.textContent =
+            "#personajes-container::after {" +
+            "position:absolute;width:0;height:0;overflow:hidden;z-index:-1;opacity:0;pointer-events:none;" +
+            "content:" + content + ";" +
+            "}";
+    }
+
+    function preloadGifs(personajes) {
+        const urls = urlsGifsPersonajes(personajes);
+        preloadGifsEnCSS(personajes);
         return Promise.all(urls.map(function (gif) {
             return new Promise(function (resolve) {
                 const img = new Image();
@@ -305,7 +405,7 @@
         if (cerrardo || conversacionCancelada) return;
         const nube = document.querySelector(".nube");
         nube.style.animationName = "none";
-        nube.style.bottom = "38%";
+        nube.style.bottom = "57%";
     }
 
     function cambiarNubeAPersonaje(index) {
@@ -714,7 +814,7 @@
         esperandoFeedback = true;
         const fe = feedbackEdad();
         const fb = (gameConfig.feedback && gameConfig.feedback.error) || {};
-        const texto = fe.error || fb.texto || "Mira otra vez. ¡Vamos a intentarlo!";
+        const texto = fe.error || textos().error || fb.texto || "Mira otra vez. ¡Vamos a intentarlo!";
         if (btnEl) {
             btnEl.classList.add("rechazo");
             setTimeout(function () { btnEl.classList.remove("rechazo"); }, 600);
@@ -749,7 +849,7 @@
         esperandoFeedback = true;
         const fe = feedbackEdad();
         const fb = (gameConfig.feedback && gameConfig.feedback.acierto) || {};
-        const texto = fe.acierto || fb.texto || "¡Muy bien!";
+        const texto = fe.acierto || textos().acierto || fb.texto || "¡Muy bien!";
 
         // Incorporar al riel
         const completa = (retoActual.prefijo || []).concat([valor]);
@@ -794,13 +894,17 @@
     /* ── Boot ─────────────────────────────────────────────────── */
 
     $(document).ready(function () {
-        introConfig = JSON.parse(readText("intro.json"));
         gameConfig = JSON.parse(readText("config.json"));
+        introConfig = JSON.parse(readText("../../intro.json"));
+        introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
+        aplicarLetterSpacing();
 
         TextoVoz.iniciar(gameConfig, introConfig, {
             obtenerAudioFondo: function () { return audioFondo; },
+            volumenFondo: volumenFondoPct() / 100,
             frasesExtra: frasesFijasTts()
         });
+        enlazarMenuVol();
         window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
         imagenesPromise = precargarImagenesCriticas();
         precargarMediaSecundaria(); // no bloquea el riel

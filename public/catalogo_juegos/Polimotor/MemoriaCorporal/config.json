@@ -21,34 +21,36 @@
     "tamanoImagenPista": 124,
     "tamanoLetraBotones": 26,
     "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
     "espaciadoOpciones": 24,
     "anchoOpcion": 220,
     "altoOpcion": 200
   },
   "textos": {
-    "instruccion": "Observa la secuencia, recuérdala y selecciona el movimiento que falta.",
-    "memoriza": "¡Memoriza esta secuencia!",
-    "seOcultan": "Se ocultarán en...",
-    "queFalta": "¿Qué movimiento falta?",
-    "cierre": "¡Excelente! Usaste muy bien tu memoria corporal.",
-    "acierto": "¡Muy bien! Recordaste la secuencia de movimientos.",
-    "error": "¡Inténtalo otra vez! Recuerda el orden de los movimientos, si no lo recuerdas, haz clic en el botón de pista.",
+    "instruccion": "¡Mira con atención! Memoriza los movimientos y descubre cuál falta.",
+    "memoriza": "¡A memorizar! Mira muy bien los movimientos.",
+    "seOcultan": "Los movimientos se esconderán en...",
+    "queFalta": "¿Cuál movimiento falta?",
+    "cierre": "¡Excelente, tienes muy buena memoria corporal!",
+    "acierto": "¡Muy bien, recordaste los movimientos!",
+    "error": "Ya casi lo tienes, mira con atención y vuelve a intentarlo. ¡Tú puedes!",
     "conversacion": [
       {
         "personaje": 0,
-        "texto": "¡Hola, soy Zeus, vamos a jugar! <br> Observa los movimientos, recuérdalos y di cuál falta."
+        "texto": "¡Hola! Soy Zeus. ¡Vamos a jugar!<br>Mira los movimientos, memorízalos y descubre cuál falta."
       },
       {
         "personaje": 1,
-        "texto": "¡Yo soy Zoe! <br> Verás tarjetas con una figura haciendo movimientos. Se muestran una sola vez."
+        "texto": "¡Hola! Yo soy Zoe.<br>Verás unas tarjetas con diferentes movimientos. ¡Míralos con mucha atención porque aparecerán una sola vez!"
       },
       {
         "personaje": 0,
-        "texto": "Luego desaparecen y aparece un hueco. <br> Toca el movimiento que falta."
+        "texto": "Después, los movimientos desaparecerán y quedará un espacio vacío.<br>¡Tu misión es encontrar el movimiento que falta!"
       },
       {
         "personaje": 1,
-        "texto": "¡Tú puedes! <br> Si se te olvida, toca el botón de pista para ver la secuencia otra vez o haz clic en el botón de pista."
+        "texto": "¡Tú puedes hacerlo!<br>Si no recuerdas los movimientos, no te preocupes. Pulsa el botón de pista y te ayudaremos."
       }
     ]
   },

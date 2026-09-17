@@ -46,7 +46,7 @@ if (! is_dir($dir)) {
     goto resumen;
 }
 
-foreach (['index.html', 'style.css', 'script.js', 'config.json', 'intro.json', 'laberintos-fijos.json'] as $f) {
+foreach (['index.html', 'style.css', 'script.js', 'config.json', 'laberintos-fijos.json'] as $f) {
     if (! is_file($dir.'/'.$f)) {
         fail("Falta {$rel}/{$f}");
     } else {
@@ -197,13 +197,13 @@ foreach ($media as $m) {
     }
 }
 
-// Intro debe apuntar a GIFs existentes (no a normal1.gif legacy).
-$introCheck = json_decode(file_get_contents($dir.'/intro.json'), true);
+// Intro compartida: GIFs de Zeus/Zoe (no normal1.gif legacy).
+$introCheck = json_decode(file_get_contents(public_path('catalogo_juegos/intro.json')), true);
 foreach (($introCheck['personajes'] ?? []) as $i => $pj) {
     foreach (['gif_idle', 'gif_hablando'] as $clave) {
-        $relGif = $pj[$clave] ?? '';
-        $fsGif = realpath($dir.'/'.$relGif);
-        if (! $fsGif || ! is_file($fsGif)) {
+        $relGif = ltrim((string) ($pj[$clave] ?? ''), '/');
+        $fsGif = public_path($relGif);
+        if (! is_file($fsGif)) {
             fail("intro personajes[{$i}].{$clave} no existe: {$relGif}");
         } else {
             ok("intro GIF OK: {$relGif}");
@@ -399,14 +399,20 @@ foreach (array_keys($esperados) as $idEsp) {
     }
 }
 
-echo "\n=== LABERINTOS: intro.json ===\n";
+echo "\n=== LABERINTOS: intro compartida ===\n";
 
-$intro = json_decode(file_get_contents($dir.'/intro.json'), true);
-if (! is_array($intro) || empty($intro['personajes']) || empty($intro['conversacion'])) {
-    fail('intro.json incompleto');
+$intro = json_decode(file_get_contents(public_path('catalogo_juegos/intro.json')), true);
+if (! is_array($intro) || empty($intro['personajes'])) {
+    fail('intro.json compartido incompleto');
 } else {
-    ok('intro.json con personajes y conversación ('.count($intro['conversacion']).' líneas)');
-    $textoIntro = implode(' ', array_map(static fn ($l) => (string) ($l['texto'] ?? ''), $intro['conversacion']));
+    ok('intro.json compartido ('.count($intro['personajes']).' personajes)');
+}
+$conv = $config['textos']['conversacion'] ?? [];
+if (! is_array($conv) || count($conv) < 1) {
+    fail('config.textos.conversacion vacío');
+} else {
+    ok('conversación en config ('.count($conv).' líneas)');
+    $textoIntro = implode(' ', array_map(static fn ($l) => (string) ($l['texto'] ?? ''), $conv));
     if (stripos($textoIntro, 'pelota') !== false) {
         fail('intro aún menciona pelota');
     } else {

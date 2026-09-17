@@ -45,7 +45,7 @@ if (! is_dir($dir)) {
     goto resumen;
 }
 
-foreach (['index.html', 'style.css', 'script.js', 'config.json', 'intro.json'] as $f) {
+foreach (['index.html', 'style.css', 'script.js', 'config.json'] as $f) {
     if (! is_file($dir.'/'.$f)) {
         fail("Falta {$rel}/{$f}");
     } else {
@@ -123,8 +123,10 @@ foreach ([
     'images/incorrecto.gif',
     'images/victoria.gif',
     'images/nube.png',
-    'images/normal1.gif',
-    'images/ciencia/normal1.gif',
+    'images/zeus_normal.gif',
+    'images/zeus_hablando.gif',
+    'images/zoe_normal.gif',
+    'images/zoe_hablando.gif',
     'sounds/ok.mp3',
     'sounds/over.mp3',
     'sounds/victory.mp3',
@@ -217,11 +219,17 @@ foreach (array_keys($esperados) as $idEsp) {
     }
 }
 
-$intro = json_decode(file_get_contents($dir.'/intro.json'), true);
-if (! is_array($intro) || empty($intro['personajes']) || empty($intro['conversacion'])) {
-    fail('intro.json incompleto');
+$intro = json_decode(file_get_contents(public_path('catalogo_juegos/intro.json')), true);
+if (! is_array($intro) || empty($intro['personajes']) || count($intro['personajes']) < 2) {
+    fail('intro.json compartido incompleto');
 } else {
-    ok('intro.json OK ('.count($intro['conversacion']).' líneas)');
+    ok('intro.json compartido ('.count($intro['personajes']).' personajes)');
+}
+$conv = $config['textos']['conversacion'] ?? [];
+if (! is_array($conv) || count($conv) < 1) {
+    fail('config.textos.conversacion vacío');
+} else {
+    ok('conversación en config ('.count($conv).' líneas)');
 }
 
 $juegoSrc = file_get_contents(app_path('Models/Juego.php'));

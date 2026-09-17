@@ -101,8 +101,10 @@ $media = [
     'images/incorrecto.gif',
     'images/victoria.gif',
     'images/nube.png',
-    'images/normal1.gif',
-    'images/ciencia/normal1.gif',
+    'images/zeus_normal.gif',
+    'images/zeus_hablando.gif',
+    'images/zoe_normal.gif',
+    'images/zoe_hablando.gif',
     'sounds/ok.mp3',
     'sounds/fondo.mp3',
 ];

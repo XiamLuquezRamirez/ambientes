@@ -13,28 +13,30 @@ class TextoAVozService
 
     public const PERSONAJE_ZEUS = 'zeus';
 
+    /** Porcentaje Edge TTS si el cliente no envía `rate` (`accesibilidad.rate`). */
+    public const RATE_DEFECTO = 5;
+
     /**
-     * Edge TTS: Lorena (Zoe) y Jorge (Zeus).
+     * Edge TTS: Lorena (Zoe) y Jorge (Zeus). El rate no va por personaje:
+     * llega del cliente (`accesibilidad.rate`) o usa RATE_DEFECTO.
      *
-     * @var array<string, array{voz: string, rate: string, pitch: string}>
+     * @var array<string, array{voz: string, pitch: string}>
      */
     private const VOCES = [
         self::PERSONAJE_ZOE => [
             'voz' => 'es-SV-LorenaNeural',
-            'rate' => '+5%',
             'pitch' => '+30Hz',
         ],
         self::PERSONAJE_ZEUS => [
             'voz' => 'es-MX-JorgeNeural',
-            'rate' => '+5%',
             'pitch' => '+45Hz',
         ],
     ];
 
-    public function urlPublica(string $texto, ?string $personaje = null): string
+    public function urlPublica(string $texto, ?string $personaje = null, mixed $rate = null): string
     {
         $texto = $this->normalizarTexto($texto);
-        $params = $this->parametrosDePersonaje($personaje);
+        $params = $this->parametrosDePersonaje($personaje, $rate);
         $relativo = 'tts/'.$this->hashDe($texto, $params).'.mp3';
 
         if (! Storage::disk('public')->exists($relativo)) {
@@ -45,10 +47,10 @@ class TextoAVozService
         return $this->urlArchivoPublico($relativo);
     }
 
-    public function binario(string $texto, ?string $personaje = null): string
+    public function binario(string $texto, ?string $personaje = null, mixed $rate = null): string
     {
         $texto = $this->normalizarTexto($texto);
-        $params = $this->parametrosDePersonaje($personaje);
+        $params = $this->parametrosDePersonaje($personaje, $rate);
 
         return $this->solicitarMp3($texto, $params);
     }
@@ -61,11 +63,35 @@ class TextoAVozService
     /**
      * @return array{voz: string, rate: string, pitch: string}
      */
-    public function parametrosDePersonaje(?string $personaje): array
+    public function parametrosDePersonaje(?string $personaje, mixed $rate = null): array
     {
         $clave = strtolower(trim((string) $personaje));
+        $base = self::VOCES[$clave] ?? self::VOCES[self::PERSONAJE_ZOE];
+        $base['rate'] = $this->formatearRate($rate);
 
-        return self::VOCES[$clave] ?? self::VOCES[self::PERSONAJE_ZOE];
+        return $base;
+    }
+
+    /**
+     * Un solo rate para Zoe y Zeus. `5` → `+5%`.
+     */
+    public function formatearRate(mixed $rate): string
+    {
+        $n = self::RATE_DEFECTO;
+        if (is_string($rate)) {
+            $rate = trim($rate);
+            if (preg_match('/^([+-]?)(\d+(?:\.\d+)?)%?$/', $rate, $m)) {
+                $n = (int) round((float) $m[2]);
+                if ($m[1] === '-') {
+                    $n = -$n;
+                }
+            }
+        } elseif (is_numeric($rate)) {
+            $n = (int) round((float) $rate);
+        }
+        $n = max(-50, min(100, $n));
+
+        return ($n >= 0 ? '+' : '').$n.'%';
     }
 
     private function urlArchivoPublico(string $rutaRelativa): string
