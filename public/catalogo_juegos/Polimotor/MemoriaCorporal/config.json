@@ -4,11 +4,9 @@
     "feedback": {
       "duracion": 2000,
       "acierto": {
-        "texto": "¡Muy bien! Recordaste la secuencia de movimientos.",
         "gif": "../../images/correcto.gif"
       },
       "error": {
-        "texto": "¡Inténtalo otra vez! Recuerda el orden de los movimientos, si no lo recuerdas, haz clic en el botón de pista.",
         "gif": "../../images/incorrecto.gif"
       }
     },
@@ -28,11 +26,31 @@
     "altoOpcion": 200
   },
   "textos": {
-    "instruccion": "Observa la secuencia, recuérdala y toca el movimiento que falta.",
+    "instruccion": "Observa la secuencia, recuérdala y selecciona el movimiento que falta.",
     "memoriza": "¡Memoriza esta secuencia!",
     "seOcultan": "Se ocultarán en...",
     "queFalta": "¿Qué movimiento falta?",
-    "cierre": "¡Excelente! Usaste muy bien tu memoria corporal."
+    "cierre": "¡Excelente! Usaste muy bien tu memoria corporal.",
+    "acierto": "¡Muy bien! Recordaste la secuencia de movimientos.",
+    "error": "¡Inténtalo otra vez! Recuerda el orden de los movimientos, si no lo recuerdas, haz clic en el botón de pista.",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola, soy Zeus, vamos a jugar! <br> Observa los movimientos, recuérdalos y di cuál falta."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Yo soy Zoe! <br> Verás tarjetas con una figura haciendo movimientos. Se muestran una sola vez."
+      },
+      {
+        "personaje": 0,
+        "texto": "Luego desaparecen y aparece un hueco. <br> Toca el movimiento que falta."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Tú puedes! <br> Si se te olvida, toca el botón de pista para ver la secuencia otra vez o haz clic en el botón de pista."
+      }
+    ]
   },
   "cuerpo": "nina",
   "edad": 3,

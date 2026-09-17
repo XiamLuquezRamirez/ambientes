@@ -181,16 +181,19 @@
     }
 
     function precargarVocesConocidas() {
-        if (intro && Array.isArray(intro.conversacion)) {
-            intro.conversacion.forEach(function (linea) {
+        var textos = (config && config.textos) || {};
+        var lineasIntro = (textos.conversacion && textos.conversacion.length)
+            ? textos.conversacion
+            : ((intro && intro.conversacion) || (config && config.conversacion) || []);
+        if (Array.isArray(lineasIntro)) {
+            lineasIntro.forEach(function (linea) {
                 encolarTts(linea.texto, personajeDeIndice(linea.personaje));
             });
         }
         var fb = accesibilidad().feedback || {};
-        var textos = (config && config.textos) || {};
         ["zoe", "zeus"].forEach(function (pj) {
             Object.keys(textos).forEach(function (k) {
-                if (textos[k]) encolarTts(textos[k], pj);
+                if (typeof textos[k] === "string" && textos[k]) encolarTts(textos[k], pj);
             });
             if (fb.acierto && fb.acierto.texto) encolarTts(fb.acierto.texto, pj);
             if (fb.error && fb.error.texto) encolarTts(fb.error.texto, pj);
@@ -207,7 +210,7 @@
             var textos = (config && config.textos) || {};
             ["zoe", "zeus"].forEach(function (pj) {
                 Object.keys(textos).forEach(function (k) {
-                    if (textos[k]) encolarTts(textos[k], pj);
+                    if (typeof textos[k] === "string" && textos[k]) encolarTts(textos[k], pj);
                 });
                 if (fb.acierto && fb.acierto.texto) encolarTts(fb.acierto.texto, pj);
                 if (fb.error && fb.error.texto) encolarTts(fb.error.texto, pj);

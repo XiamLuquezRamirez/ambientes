@@ -1,21 +1,41 @@
 @font-face {
-  font-family: 'Juego';
-  src: url('../../fonts/BoldenVan.ttf') format('truetype');
-  font-weight: normal;
+  font-family: 'Fredoka';
+  src: url('../../fonts/Fredoka-SemiBold.ttf') format('truetype');
+  font-weight: 600;
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../../fonts/Fredoka-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 html,
 body {
   height: 100%;
   margin: 0;
-  font-family: 'Juego', sans-serif;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
   letter-spacing: var(--mc-letter-spacing, 2px) !important;
 }
 
-button {
-  font-family: 'Juego', sans-serif;
+button,
+.btn {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
   letter-spacing: var(--mc-letter-spacing, 2px) !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+.inicio-kicker,
+.enunciado,
+.cuenta,
+.meta-item h5 {
+  font-weight: 700;
 }
 
 
@@ -42,7 +62,7 @@ body {
 }
 
 .borde2 {
-  font-weight: bold;
+  font-weight: 600;
   color: #313131 !important;
   font-size: 19px;
 }
@@ -81,14 +101,14 @@ body {
 .inicio-kicker {
   margin: 0;
   font-size: clamp(18px, 3.2vw, 28px);
-  font-weight: 800;
+  font-weight: 700;
   color: #1e3a5f;
 }
 
 .inicio-ayuda {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  margin: 30px;
+  font-size: 26px;
+  font-weight: 600;
   color: #5b6b7c;
 }
 
@@ -102,8 +122,8 @@ body {
   border-radius: 999px;
   background: linear-gradient(180deg, #ffe27a 0%, #ffb300 55%, #ff9800 100%);
   color: #3d2500;
-  font-size: clamp(28px, 5vw, 40px);
-  font-weight: 800;
+  font-size: clamp(28px, 5vw, 50px);
+  font-weight: 600;
   line-height: 1;
   cursor: pointer;
   box-shadow:
@@ -1093,7 +1113,7 @@ body.modo-tap .pieza {
   align-items: center;
   gap: 10px;
   font-size: 15px;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
   padding: 6px 4px;
   border-radius: 8px;
@@ -1169,7 +1189,7 @@ body.alto-contraste .menu-acc-cerrar {
 
 .enunciado {
   margin: 0;
-  font-size: clamp(24px, 3.4vw, 34px);
+  font-size: clamp(24px, 3.4vw, 54px);
   text-align: center;
   line-height: 1.2;
 }
@@ -1180,7 +1200,7 @@ body.alto-contraste .menu-acc-cerrar {
   align-items: center;
   gap: 2px;
   font-size: 64px;
-  font-weight: 800;
+  font-weight: 700;
   color: #1565c0;
   text-shadow: 3px 3px 0 #fff;
   min-height: 0;
@@ -1188,7 +1208,7 @@ body.alto-contraste .menu-acc-cerrar {
 
 .cuenta-label {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   color: #5b6b7c;
   text-shadow: none;
 }
@@ -1240,7 +1260,7 @@ body.alto-contraste .menu-acc-cerrar {
   background: #f5f7e9;
   border: 3px dashed #c0c892;
   box-shadow: 0 10px 22px rgba(30, 58, 95, 0.12);
-  font-weight: 800;
+  font-weight: 600;
   font-size: var(--mc-letra);
   text-align: center;
   color: #1e3a5f;
@@ -1273,7 +1293,7 @@ body.alto-contraste .menu-acc-cerrar {
 
 .paso-hueco-marca {
   font-size: calc(var(--mc-img-pista) * 0.55);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -1344,7 +1364,7 @@ body.alto-contraste .menu-acc-cerrar {
 
 .opcion-nombre {
   font-size: var(--mc-letra);
-  font-weight: 800;
+  font-weight: 600;
   color: #1e3a5f;
   line-height: 1.15;
   text-align: center;

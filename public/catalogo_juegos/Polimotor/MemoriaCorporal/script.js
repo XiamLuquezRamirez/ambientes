@@ -370,13 +370,14 @@ function feedbackActivo() {
 function cfgFeedback(tipo) {
     const fb = acc().feedback || {};
     const item = fb[tipo] || {};
+    const t = textos();
     const defaults = {
         acierto: { texto: "¡Muy bien! Recordaste la secuencia de movimientos.", gif: "../../images/correcto.gif" },
         error: { texto: "¡Inténtalo otra vez! Recuerda el orden de los movimientos.", gif: "../../images/incorrecto.gif" }
     };
     const def = defaults[tipo] || {};
     return {
-        texto: item.texto || def.texto || "",
+        texto: t[tipo] || item.texto || def.texto || "",
         gif: item.gif || def.gif || "",
         duracion: fb.duracion || 2000
     };
@@ -559,8 +560,12 @@ function vozAleatoria() {
 }
 
 function hablarTexto(texto) {
+    return hablarConVoz(texto, vozAleatoria());
+}
+
+function hablarConVoz(texto, personaje) {
     if (!texto || typeof TextoVoz === "undefined") return Promise.resolve();
-    return TextoVoz.hablar(texto, vozAleatoria());
+    return TextoVoz.hablar(texto, personaje);
 }
 
 function umbralAtenuar() {
@@ -685,14 +690,19 @@ async function mostrarSecuenciaObjetivo() {
     if (acc().cuentaRegresiva !== false) {
         cuenta.hidden = false;
         const etiqueta = textos().seOcultan || "Se ocultarán en...";
-        hablarTexto(etiqueta);
+        const vozConteo = vozAleatoria();
+        cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span>";
+        await hablarConVoz(etiqueta, vozConteo);
+        if (juegoTerminado) return;
         for (let n = 3; n >= 1; n--) {
             cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span><strong>" + n + "</strong>";
-            await sleep(900);
+            await hablarConVoz(String(n), vozConteo);
             if (juegoTerminado) return;
         }
         cuenta.hidden = true;
         cuenta.innerHTML = "";
+        await sleep(1000);
+        if (juegoTerminado) return;
     } else {
         cuenta.hidden = true;
         await sleep(2500);
@@ -910,8 +920,9 @@ function terminarJuego() {
 }
 
 $(document).ready(function () {
-    introConfig = JSON.parse(readText("intro.json"));
     gameConfig = JSON.parse(readText("config.json"));
+    introConfig = JSON.parse(readText("../../intro.json"));
+    introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
     aplicarVisual();
     aplicarAccesibilidadInicial();
     enlazarMenuAcc();

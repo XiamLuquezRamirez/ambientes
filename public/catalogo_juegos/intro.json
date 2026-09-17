@@ -1,0 +1,20 @@
+{
+  "personajes": [
+    {
+      "nombre": "Zeus",
+      "gif_idle": "/catalogo_juegos/images/zeus_normal.gif",
+      "gif_hablando": "/catalogo_juegos/images/zeus_hablando.gif"
+    },
+    {
+      "nombre": "Zoe",
+      "gif_idle": "/catalogo_juegos/images/zoe_normal.gif",
+      "gif_hablando": "/catalogo_juegos/images/zoe_hablando.gif"
+    }
+  ],
+  "configuracion": {
+    "intervalo": 50,
+    "pausaEntreLineas": 1800,
+    "pausaFinal": 2500,
+    "duracionCambioNube": 350
+  }
+}
