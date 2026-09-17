@@ -237,7 +237,7 @@ body.esperando-inicio #principal {
   text-align: center;
   font-size: 29px;
   color: #ececec;
-  background: #4500ae;
+  background: #5b21b6;
   border: 3px solid #fff;
   border-radius: 12px;
   padding: 6px 10px;
@@ -284,8 +284,8 @@ body.esperando-inicio #principal {
   width: min(96vw, 1100px);
   height: auto;
   max-height: calc(100dvh - 160px);
-  aspect-ratio: 16 / 10;
-  background: #1b4332;
+  aspect-ratio: 4763 / 3176;
+  background: #5c33d6;
   border: 5px solid #fff;
   border-radius: 24px;
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.2);
@@ -318,7 +318,7 @@ body.esperando-inicio #principal {
   z-index: -1;
   pointer-events: none;
   opacity: 0;
-  content: url("../../images/normal1.gif") url("../../images/normal2.gif") url("../../images/ciencia/normal1.gif") url("../../images/ciencia/normal2.gif");
+  content: url("../../images/zoe_normal.gif") url("../../images/zoe_hablando.gif") url("../../images/zeus_normal.gif") url("../../images/zeus_hablando.gif");
 }
 
 .preload-gifs {

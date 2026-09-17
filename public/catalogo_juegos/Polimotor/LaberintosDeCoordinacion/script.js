@@ -4,6 +4,7 @@
 
     let introConfig = null;
     let gameConfig = null;
+    let laberintosFijos = null;
     let conversacionCancelada = false;
     let cerrardo = false;
     let introTimers = [];
@@ -22,8 +23,14 @@
     let labCapaId = null;
     let redrawPendiente = false;
     let avatarImg = null;
+    let avatarVictoriaImg = null;
+    let escenarioImg = null;
+    let coheteImg = null;
+    let generoElegido = "nino";
+    let modoVictoria = false;
     let pelotaAnim = 0;
     let pelotaVictoria = false;
+    let coheteVuelo = null;
     let audioCache = Object.create(null);
     let imagenesPromise = null;
 
@@ -52,6 +59,97 @@
 
     function textos() {
         return (gameConfig && gameConfig.textos) || {};
+    }
+
+    function assetUrl(ruta) {
+        if (!ruta) return "";
+        return String(ruta).split("/").map(function (seg) {
+            return encodeURIComponent(seg);
+        }).join("/");
+    }
+
+    function normalizarGenero(valor) {
+        const s = String(valor || "").trim().toLowerCase();
+        if (s === "femenino" || s === "f" || s === "niña" || s === "nina" ||
+            s === "mujer" || s === "girl" || s === "female") {
+            return "nina";
+        }
+        return "nino";
+    }
+
+    function leerSexoDesdeHost() {
+        try {
+            const perfil = window.__PEDNIA_PERFIL__;
+            if (perfil) {
+                if (perfil.sexo) return perfil.sexo;
+                if (perfil.estudiante_sexo) return perfil.estudiante_sexo;
+                if (perfil.genero) return perfil.genero;
+                if (perfil.valores) {
+                    if (perfil.valores.sexo) return perfil.valores.sexo;
+                    if (perfil.valores.estudiante_sexo) return perfil.valores.estudiante_sexo;
+                }
+            }
+        } catch (e) { /* noop */ }
+
+        try {
+            if (window.parent && window.parent !== window) {
+                const doc = window.parent.document;
+                const el = doc.querySelector("[data-estudiante-sexo]");
+                if (el) {
+                    return el.getAttribute("data-estudiante-sexo") ||
+                        (el.dataset && el.dataset.estudianteSexo) || null;
+                }
+            }
+        } catch (e) { /* iframe cruzado */ }
+
+        try {
+            const params = new URLSearchParams(window.location.search || "");
+            if (params.get("sexo")) return params.get("sexo");
+            if (params.get("genero")) return params.get("genero");
+        } catch (e) { /* noop */ }
+
+        return null;
+    }
+
+    function resolverGenero() {
+        const desdeConfig = gameConfig && (gameConfig.cuerpo || gameConfig.sexo || gameConfig.genero);
+        return normalizarGenero(leerSexoDesdeHost() || desdeConfig || "nino");
+    }
+
+    function assetsPersonaje(genero) {
+        const mapa = (gameConfig && gameConfig.personajes) || {};
+        const cfg = mapa[genero] || mapa.nino || {};
+        return {
+            comienzo: cfg.comienzo || (genero === "nina" ? "img/NIÑA_COMIENZO.png" : "img/NIÑO_COMIENZO.png"),
+            victoria: cfg.victoria || (genero === "nina" ? "img/NIÑA_VICTORIA_META.png" : "img/NIÑO_VICTORIA_META.png")
+        };
+    }
+
+    function enunciadoActual() {
+        const t = textos();
+        if (generoElegido === "nina") {
+            return t.enunciadoNina || t.enunciado || "Lleva a la niña hasta el cohete";
+        }
+        return t.enunciadoNino || t.enunciado || "Lleva al niño hasta el cohete";
+    }
+
+    function zonaJuego() {
+        const z = (gameConfig && gameConfig.escenario && gameConfig.escenario.zona) || {};
+        return {
+            x: Number(z.x != null ? z.x : 8),
+            y: Number(z.y != null ? z.y : 15),
+            w: Number(z.w != null ? z.w : 84),
+            h: Number(z.h != null ? z.h : 70)
+        };
+    }
+
+    function coloresCamino() {
+        const c = (gameConfig && gameConfig.coloresCamino) || {};
+        return {
+            pasillo: c.pasillo || c.principal || "#e0e7ff",
+            pared: c.pared || c.guia || "#312e81",
+            borde: c.borde || "#1e1b4b"
+        };
     }
 
     /* ── Intro personajes (mismo flujo que Rompecabezas) ─────── */
@@ -440,38 +538,75 @@
         });
     }
 
-    function cargarAvatar() {
+    function cargarImagen(ruta) {
         return new Promise(function (resolve) {
-            const src = (gameConfig && gameConfig.avatar) || "../Reconocimiento/img/nino/7/cabeza.png";
-            if (avatarImg && avatarImg.src && avatarImg.complete && avatarImg.naturalWidth) {
-                resolve(avatarImg);
+            if (!ruta) {
+                resolve(null);
                 return;
             }
-            avatarImg = new Image();
-            avatarImg.onload = function () {
-                if (nivelElegido) redibujar();
-                resolve(avatarImg);
-            };
-            avatarImg.onerror = function () { resolve(null); };
-            avatarImg.src = src;
+            const img = new Image();
+            img.onload = function () { resolve(img); };
+            img.onerror = function () { resolve(null); };
+            img.src = assetUrl(ruta);
+            setTimeout(function () {
+                if (img.complete) resolve(img);
+            }, 800);
+        });
+    }
+
+    function cargarAvatar() {
+        const assets = assetsPersonaje(generoElegido);
+        return Promise.all([
+            cargarImagen(assets.comienzo),
+            cargarImagen(assets.victoria)
+        ]).then(function (imgs) {
+            avatarImg = imgs[0];
+            avatarVictoriaImg = imgs[1];
+            if (nivelElegido) redibujar();
+            return avatarImg;
         });
     }
 
     function precargarImagenesCriticas() {
-        const avatar = (gameConfig && gameConfig.avatar) || "../Reconocimiento/img/nino/7/cabeza.png";
-        return Promise.all([cargarAvatar(), preloadUrl(avatar)]);
+        generoElegido = resolverGenero();
+        const assets = assetsPersonaje(generoElegido);
+        const fondo = (gameConfig && gameConfig.escenario && gameConfig.escenario.fondo) || "img/ESCENARIO.png";
+        const meta = (gameConfig && gameConfig.meta && gameConfig.meta.imagen) || "img/COHETE_SIN-SOMBRA.png";
+        return Promise.all([
+            cargarAvatar(),
+            cargarImagen(fondo).then(function (img) {
+                escenarioImg = img;
+                labCapaId = null;
+                if (nivelElegido) redibujar();
+                return img;
+            }),
+            cargarImagen(meta).then(function (img) {
+                coheteImg = img;
+                if (nivelElegido) redibujar();
+                return img;
+            }),
+            preloadUrl(assetUrl(assets.comienzo)),
+            preloadUrl(assetUrl(fondo)),
+            preloadUrl(assetUrl(meta))
+        ]);
     }
 
     function precargarMediaSecundaria() {
+        const assetsNino = assetsPersonaje("nino");
+        const assetsNina = assetsPersonaje("nina");
         const urls = [
             "../../images/correcto.gif",
             "../../images/incorrecto.gif",
             "../../images/victoria.gif",
             "../../images/nube.png",
-            "../../images/normal1.gif",
-            "../../images/normal2.gif",
-            "../../images/ciencia/normal1.gif",
-            "../../images/ciencia/normal2.gif"
+            "../../images/zoe_normal.gif",
+            "../../images/zoe_hablando.gif",
+            "../../images/zeus_normal.gif",
+            "../../images/zeus_hablando.gif",
+            assetUrl(assetsNino.comienzo),
+            assetUrl(assetsNino.victoria),
+            assetUrl(assetsNina.comienzo),
+            assetUrl(assetsNina.victoria)
         ];
         const fb = (gameConfig && gameConfig.feedback) || {};
         if (fb.acierto && fb.acierto.gif) urls.push(fb.acierto.gif);
@@ -530,320 +665,71 @@
         nivelElegido = gameConfig.niveles.find(function (n) { return n.id === id; });
         Swal.close();
         if (!nivelElegido) return;
+        generoElegido = resolverGenero();
+        cargarAvatar();
         laberintos = generarLaberintosNivel(nivelElegido);
         window.__laberintosActuales = laberintos;
         indiceLaberinto = 0;
         juegoTerminado = false;
-        document.getElementById("enunciado").textContent =
-            textos().enunciado || "Lleva al niño hasta la pelota";
+        document.getElementById("enunciado").textContent = enunciadoActual();
         const arrancar = function () {
             iniciarLaberintoActual();
         };
         esperarImagenesOTimeout(400).then(arrancar).catch(arrancar);
     };
 
-    /* ── Generación aleatoria (dificultad por edad) ───────────── */
+    /* ── Laberintos fijos (selección aleatoria sin repetir) ───── */
 
     function randInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function randChoice(arr) {
-        return arr[randInt(0, arr.length - 1)];
-    }
-
-    function clamp(v, lo, hi) {
-        return Math.max(lo, Math.min(hi, v));
-    }
-
-    function snap(v) {
-        return Math.round(v);
-    }
-
-    function contarGirosPath(path) {
-        if (!path || path.length < 3) return 0;
-        let giros = 0;
-        for (let i = 1; i < path.length - 1; i++) {
-            const ax = path[i][0] - path[i - 1][0];
-            const ay = path[i][1] - path[i - 1][1];
-            const bx = path[i + 1][0] - path[i][0];
-            const by = path[i + 1][1] - path[i][1];
-            if (Math.abs(ax * by - ay * bx) > 0.01) giros++;
-        }
-        return giros;
-    }
-
-    function colapsarColineales(path) {
-        if (!path || path.length < 3) return path ? path.slice() : [];
-        const out = [path[0]];
-        for (let i = 1; i < path.length - 1; i++) {
-            const a = out[out.length - 1];
-            const b = path[i];
-            const c = path[i + 1];
-            const ax = b[0] - a[0];
-            const ay = b[1] - a[1];
-            const bx = c[0] - b[0];
-            const by = c[1] - b[1];
-            if (Math.abs(ax * by - ay * bx) > 0.01) out.push(b);
-        }
-        out.push(path[path.length - 1]);
-        return out;
-    }
-
-    function segmentoCruza(a1, a2, b1, b2) {
-        // Solo segmentos ortogonales; cruza si se intersectan en un tramo (no solo extremo compartido).
-        const aH = a1[1] === a2[1];
-        const bH = b1[1] === b2[1];
-        if (aH === bH) {
-            if (aH) {
-                if (a1[1] !== b1[1]) return false;
-                const a0 = Math.min(a1[0], a2[0]);
-                const a1x = Math.max(a1[0], a2[0]);
-                const b0 = Math.min(b1[0], b2[0]);
-                const b1x = Math.max(b1[0], b2[0]);
-                return Math.min(a1x, b1x) - Math.max(a0, b0) > 1;
-            }
-            if (a1[0] !== b1[0]) return false;
-            const a0 = Math.min(a1[1], a2[1]);
-            const a1y = Math.max(a1[1], a2[1]);
-            const b0 = Math.min(b1[1], b2[1]);
-            const b1y = Math.max(b1[1], b2[1]);
-            return Math.min(a1y, b1y) - Math.max(a0, b0) > 1;
-        }
-        const h = aH ? [a1, a2] : [b1, b2];
-        const v = aH ? [b1, b2] : [a1, a2];
-        const y = h[0][1];
-        const x = v[0][0];
-        const h0 = Math.min(h[0][0], h[1][0]);
-        const h1 = Math.max(h[0][0], h[1][0]);
-        const v0 = Math.min(v[0][1], v[1][1]);
-        const v1 = Math.max(v[0][1], v[1][1]);
-        if (x <= h0 + 0.5 || x >= h1 - 0.5) return false;
-        if (y <= v0 + 0.5 || y >= v1 - 0.5) return false;
-        return true;
-    }
-
-    function pathSeCruza(path) {
-        for (let i = 0; i < path.length - 1; i++) {
-            for (let j = i + 2; j < path.length - 1; j++) {
-                if (i === 0 && j === path.length - 2) continue;
-                if (segmentoCruza(path[i], path[i + 1], path[j], path[j + 1])) return true;
-            }
-        }
-        return false;
-    }
-
-    function generarCaminoOrtogonal(gen) {
-        const margen = Number(gen.margen != null ? gen.margen : 10);
-        const segMin = Number(gen.segMin != null ? gen.segMin : 14);
-        const segMax = Number(gen.segMax != null ? gen.segMax : 36);
-        const girosObjetivo = randInt(Number(gen.girosMin || 2), Number(gen.girosMax || 4));
-
-        const start = [margen, snap(randInt(margen + 5, 100 - margen - 5))];
-        const end = [100 - margen, snap(randInt(margen + 5, 100 - margen - 5))];
-        // Evitar inicio y meta demasiado alineados en Y (laberinto trivial).
-        if (Math.abs(start[1] - end[1]) < segMin) {
-            end[1] = snap(clamp(start[1] + (Math.random() < 0.5 ? segMin : -segMin) * randInt(1, 2), margen + 5, 100 - margen - 5));
-        }
-
-        const path = [start.slice()];
-        let x = start[0];
-        let y = start[1];
-        // Alternar H/V; priorizar avance en X hacia la meta.
-        let horizontal = true;
-        let turnsLeft = girosObjetivo;
-
-        while (turnsLeft > 0) {
-            if (horizontal) {
-                const room = end[0] - x;
-                const maxStep = Math.max(segMin, Math.min(segMax, room - turnsLeft * (segMin * 0.35)));
-                let nx;
-                if (room > segMin * 1.2 && Math.random() < 0.75) {
-                    nx = snap(x + randInt(segMin, Math.max(segMin, Math.floor(maxStep))));
-                } else {
-                    // ocasional retroceso leve para variedad (solo si hay espacio)
-                    const back = Math.min(segMin, x - margen - 4);
-                    nx = back > 8 && Math.random() < 0.25
-                        ? snap(x - randInt(8, back))
-                        : snap(x + randInt(segMin, Math.max(segMin, Math.min(segMax, room))));
-                }
-                nx = snap(clamp(nx, margen, end[0] - 4));
-                if (Math.abs(nx - x) < 6) nx = snap(clamp(x + segMin, margen, 100 - margen));
-                x = nx;
-                path.push([x, y]);
-            } else {
-                const toward = end[1] >= y ? 1 : -1;
-                const alt = Math.random() < 0.35 ? -toward : toward;
-                let ny = snap(y + alt * randInt(segMin, segMax));
-                ny = snap(clamp(ny, margen, 100 - margen));
-                if (Math.abs(ny - y) < 6) {
-                    ny = snap(clamp(y + toward * segMin, margen, 100 - margen));
-                }
-                y = ny;
-                path.push([x, y]);
-            }
-            horizontal = !horizontal;
-            turnsLeft -= 1;
-        }
-
-        // Cierre a la meta con 1–2 segmentos ortogonales.
-        if (x !== end[0] && y !== end[1]) {
-            if (Math.random() < 0.5) {
-                path.push([end[0], y]);
-                path.push(end.slice());
-            } else {
-                path.push([x, end[1]]);
-                path.push(end.slice());
-            }
-        } else if (x !== end[0] || y !== end[1]) {
-            path.push(end.slice());
-        }
-
-        return colapsarColineales(path);
-    }
-
-    function puntoEnCaminoVertices(path, p) {
-        return path.some(function (q) {
-            return Math.abs(q[0] - p[0]) < 0.01 && Math.abs(q[1] - p[1]) < 0.01;
-        });
-    }
-
-    function generarDistractores(path, gen) {
-        const minD = Number(gen.distractoresMin || 0);
-        const maxD = Number(gen.distractoresMax || 0);
-        if (maxD <= 0) return [];
-        const cantidad = randInt(minD, maxD);
-        if (cantidad <= 0 || path.length < 4) return [];
-
-        const margen = Number(gen.margen != null ? gen.margen : 10);
-        const segMin = Math.max(10, Math.floor(Number(gen.segMin || 14) * 0.7));
-        const candidatos = [];
-        for (let i = 1; i < path.length - 1; i++) candidatos.push(i);
-        // Mezclar
-        for (let i = candidatos.length - 1; i > 0; i--) {
+    function barajar(lista) {
+        const out = (lista || []).slice();
+        for (let i = out.length - 1; i > 0; i--) {
             const j = randInt(0, i);
-            const tmp = candidatos[i];
-            candidatos[i] = candidatos[j];
-            candidatos[j] = tmp;
-        }
-
-        const out = [];
-        for (let c = 0; c < candidatos.length && out.length < cantidad; c++) {
-            const idx = candidatos[c];
-            const ancla = path[idx];
-            const prev = path[idx - 1];
-            const next = path[idx + 1];
-            const alongH = Math.abs(next[0] - prev[0]) >= Math.abs(next[1] - prev[1]);
-            // Rama perpendicular al tramo local
-            const dirs = alongH
-                ? [[0, 1], [0, -1]]
-                : [[1, 0], [-1, 0]];
-            const dir = randChoice(dirs);
-            const len1 = randInt(segMin, segMin + 14);
-            const p1 = [
-                snap(clamp(ancla[0] + dir[0] * len1, margen, 100 - margen)),
-                snap(clamp(ancla[1] + dir[1] * len1, margen, 100 - margen))
-            ];
-            if (Math.abs(p1[0] - ancla[0]) + Math.abs(p1[1] - ancla[1]) < 8) continue;
-            // Segundo tramo en ángulo (callejón sin salida)
-            const dir2 = dir[0] === 0 ? randChoice([[1, 0], [-1, 0]]) : randChoice([[0, 1], [0, -1]]);
-            const len2 = randInt(segMin, segMin + 12);
-            const p2 = [
-                snap(clamp(p1[0] + dir2[0] * len2, margen, 100 - margen)),
-                snap(clamp(p1[1] + dir2[1] * len2, margen, 100 - margen))
-            ];
-            const rama = colapsarColineales([ancla.slice(), p1, p2]);
-            if (rama.length < 2) continue;
-            // No terminar encima de un vértice del camino principal
-            const punta = rama[rama.length - 1];
-            if (puntoEnCaminoVertices(path, punta)) continue;
-            out.push(rama);
+            const tmp = out[i];
+            out[i] = out[j];
+            out[j] = tmp;
         }
         return out;
     }
 
-    function caminoValido(path, gen) {
-        if (!path || path.length < 3) return false;
-        const margen = Number(gen.margen != null ? gen.margen : 8);
-        for (let i = 0; i < path.length; i++) {
-            const p = path[i];
-            if (p[0] < 0 || p[0] > 100 || p[1] < 0 || p[1] > 100) return false;
-        }
-        if (path[0][0] > margen + 6) return false;
-        if (path[path.length - 1][0] < 100 - margen - 6) return false;
-        if (Math.abs(path[0][0] - path[path.length - 1][0]) < 30) return false;
-        const giros = contarGirosPath(path);
-        if (giros < Number(gen.girosMin || 1)) return false;
-        if (giros > Number(gen.girosMax || 12) + 2) return false; // cierre puede sumar 1–2
-        if (pathSeCruza(path)) return false;
-        // Segmentos mínimos
-        for (let i = 0; i < path.length - 1; i++) {
-            const dx = Math.abs(path[i + 1][0] - path[i][0]);
-            const dy = Math.abs(path[i + 1][1] - path[i][1]);
-            if (dx + dy < 8) return false;
-            if (dx > 0.01 && dy > 0.01) return false; // no diagonal
-        }
-        return true;
-    }
-
-    function generarUnLaberinto(nivel, indice) {
-        const gen = Object.assign({
-            girosMin: 2,
-            girosMax: 4,
-            distractoresMin: 0,
-            distractoresMax: 0,
-            margen: 10,
-            segMin: 14,
-            segMax: 36
-        }, nivel.generacion || {});
-
-        let path = null;
-        for (let intento = 0; intento < 40; intento++) {
-            const candidato = generarCaminoOrtogonal(gen);
-            if (caminoValido(candidato, gen)) {
-                path = candidato;
-                break;
-            }
-        }
-        if (!path) {
-            // Respaldo seguro (siempre jugable)
-            path = [[12, 50], [40, 50], [40, 28], [70, 28], [70, 65], [88, 65]];
-        }
-
-        let distractores = [];
-        for (let intento = 0; intento < 20; intento++) {
-            distractores = generarDistractores(path, gen);
-            if (distractores.length >= Number(gen.distractoresMin || 0) &&
-                distractores.length <= Number(gen.distractoresMax || 0)) {
-                break;
-            }
-            if (Number(gen.distractoresMax || 0) === 0) {
-                distractores = [];
-                break;
-            }
-        }
-        if (distractores.length > Number(gen.distractoresMax || 0)) {
-            distractores = distractores.slice(0, Number(gen.distractoresMax || 0));
-        }
-
+    function clonarLaberinto(lab, indice) {
         return {
-            id: "n" + nivel.id + "-" + (indice + 1) + "-" + Date.now().toString(36).slice(-4),
-            path: path,
-            distractores: distractores
+            id: (lab && lab.id) ? String(lab.id) : ("lab-" + (indice + 1)),
+            path: (lab.path || []).map(function (p) { return [Number(p[0]), Number(p[1])]; }),
+            distractores: (lab.distractores || []).map(function (rama) {
+                return (rama || []).map(function (p) { return [Number(p[0]), Number(p[1])]; });
+            })
         };
     }
 
+    function poolLaberintosNivel(nivel) {
+        if (nivel && Array.isArray(nivel.laberintos) && nivel.laberintos.length) {
+            return nivel.laberintos;
+        }
+        const id = String((nivel && nivel.id) || "");
+        if (laberintosFijos && Array.isArray(laberintosFijos[id])) {
+            return laberintosFijos[id];
+        }
+        return [];
+    }
+
+    /** Elige N laberintos al azar del pool fijo de la edad, sin repetir. */
     function generarLaberintosNivel(nivel) {
         const cantidad = Number(
             nivel.cantidad != null
                 ? nivel.cantidad
-                : (nivel.laberintos && nivel.laberintos.length) || 3
+                : 3
         );
-        const lista = [];
-        for (let i = 0; i < cantidad; i++) {
-            lista.push(generarUnLaberinto(nivel, i));
+        const pool = poolLaberintosNivel(nivel);
+        if (!pool.length) {
+            console.warn("[Laberintos] Sin pool fijo para edad", nivel && nivel.id);
+            return [];
         }
-        return lista;
+        const elegidos = barajar(pool).slice(0, Math.min(cantidad, pool.length));
+        return elegidos.map(clonarLaberinto);
     }
 
     /* ── Geometría del camino ─────────────────────────────────── */
@@ -859,7 +745,9 @@
     }
 
     function metaRadio() {
-        return Number(gameConfig.metaRadio != null ? gameConfig.metaRadio : 6);
+        const metaCfg = (gameConfig && gameConfig.meta) || {};
+        if (metaCfg.radio != null) return Number(metaCfg.radio);
+        return Number(gameConfig.metaRadio != null ? gameConfig.metaRadio : 7);
     }
 
     function puntosPath(path) {
@@ -902,6 +790,28 @@
         return proy.dist <= radio;
     }
 
+    function redDePasillos(lab) {
+        const red = [puntosPath(lab && lab.path)];
+        (lab && lab.distractores || []).forEach(function (d) {
+            red.push(puntosPath(d));
+        });
+        return red;
+    }
+
+    function proyectarEnRed(p, red) {
+        let mejor = null;
+        for (let i = 0; i < red.length; i++) {
+            const r = proyectarEnPath(p, red[i]);
+            if (r && (!mejor || r.dist < mejor.dist)) mejor = r;
+        }
+        return mejor;
+    }
+
+    function dentroDeRed(p, red, radio) {
+        const proy = proyectarEnRed(p, red);
+        return !!(proy && proy.dist <= radio);
+    }
+
     function inicioMeta(lab) {
         const pts = puntosPath(lab && lab.path);
         if (pts.length < 2) {
@@ -926,17 +836,21 @@
 
     function aPixel(punto) {
         const s = tamañoLogico();
+        const z = zonaJuego();
         return {
-            x: (punto.x / 100) * s.w,
-            y: (punto.y / 100) * s.h
+            x: ((z.x + (punto.x / 100) * z.w) / 100) * s.w,
+            y: ((z.y + (punto.y / 100) * z.h) / 100) * s.h
         };
     }
 
     function aNorm(clientX, clientY) {
         const rect = canvas.getBoundingClientRect();
+        const z = zonaJuego();
+        const xCanvas = ((clientX - rect.left) / rect.width) * 100;
+        const yCanvas = ((clientY - rect.top) / rect.height) * 100;
         return {
-            x: ((clientX - rect.left) / rect.width) * 100,
-            y: ((clientY - rect.top) / rect.height) * 100
+            x: ((xCanvas - z.x) / z.w) * 100,
+            y: ((yCanvas - z.y) / z.h) * 100
         };
     }
 
@@ -974,54 +888,93 @@
         capaEstatica.height = s.h;
         labCapaId = id;
 
-        const bg = capaCtx.createLinearGradient(0, 0, 0, s.h);
-        bg.addColorStop(0, "#2d6a4f");
-        bg.addColorStop(1, "#1b4332");
-        capaCtx.fillStyle = bg;
-        capaCtx.fillRect(0, 0, s.w, s.h);
-
-        capaCtx.fillStyle = "rgba(255,255,255,0.04)";
-        for (let i = 0; i < 12; i++) {
-            capaCtx.beginPath();
-            capaCtx.arc((i * 97) % s.w, (i * 53) % s.h, 40 + (i % 5) * 8, 0, Math.PI * 2);
-            capaCtx.fill();
+        if (escenarioImg && escenarioImg.complete && escenarioImg.naturalWidth) {
+            capaCtx.drawImage(escenarioImg, 0, 0, s.w, s.h);
+        } else {
+            const bg = capaCtx.createLinearGradient(0, 0, 0, s.h);
+            bg.addColorStop(0, "#6d28d9");
+            bg.addColorStop(0.45, "#5b6ff7");
+            bg.addColorStop(1, "#4c1d95");
+            capaCtx.fillStyle = bg;
+            capaCtx.fillRect(0, 0, s.w, s.h);
         }
 
-        const anchoPx = (anchoCamino() / 100) * s.w;
+        const colores = coloresCamino();
+        const z = zonaJuego();
+        const anchoPx = (anchoCamino() / 100) * ((z.w / 100) * s.w);
         const geo = inicioMeta(lab);
-        (lab.distractores || []).forEach(function (d) {
-            dibujarPolilineaEn(capaCtx, puntosPath(d), "#95d5b2", anchoPx, false);
+        const red = [geo.pts].concat((lab.distractores || []).map(puntosPath));
+
+        // Mismo estilo en todas las ramas. Primero paredes, luego pasillos (cruces limpios).
+        red.forEach(function (pts) {
+            dibujarPolilineaEn(capaCtx, pts, colores.borde, anchoPx * 1.42, false);
         });
-        dibujarPolilineaEn(capaCtx, geo.pts, "#d8f3dc", anchoPx, false);
-        dibujarPolilineaEn(capaCtx, geo.pts, "#52b788", Math.max(4, anchoPx * 0.18), true);
+        red.forEach(function (pts) {
+            dibujarPolilineaEn(capaCtx, pts, colores.pared, anchoPx * 1.18, false);
+        });
+        red.forEach(function (pts) {
+            dibujarPolilineaEn(capaCtx, pts, colores.pasillo, anchoPx, false);
+        });
     }
 
-    function dibujarPelota(meta, anim) {
-        const p = aPixel(meta);
-        const r = (metaRadio() / 100) * tamañoLogico().w * 0.55;
-        const bounce = pelotaVictoria ? Math.sin(anim * 0.25) * 10 : 0;
+    function dibujarEstelaCohete(p, size, t) {
+        ctx.save();
+        for (let i = 0; i < 5; i++) {
+            const f = (i + 1) / 5;
+            const yy = p.y + size * (0.35 + f * 0.55) + Math.sin(t * 0.4 + i) * 2;
+            const rr = size * (0.12 + (1 - f) * 0.1);
+            const g = ctx.createRadialGradient(p.x, yy, 0, p.x, yy, rr);
+            g.addColorStop(0, "rgba(255, 220, 120, " + (0.75 * (1 - f * 0.5)) + ")");
+            g.addColorStop(0.55, "rgba(255, 120, 40, " + (0.45 * (1 - f)) + ")");
+            g.addColorStop(1, "rgba(255, 80, 20, 0)");
+            ctx.beginPath();
+            ctx.arc(p.x + Math.sin(t * 0.5 + i) * 3, yy, rr, 0, Math.PI * 2);
+            ctx.fillStyle = g;
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function dibujarCohete(meta, anim) {
+        const metaCfg = (gameConfig && gameConfig.meta) || {};
+        const escala = Number(metaCfg.escala != null ? metaCfg.escala : 1.35);
+        let size = (metaRadio() / 100) * tamañoLogico().w * escala;
+        let p;
+        let rot = 0;
+
+        if (coheteVuelo && coheteVuelo.activo) {
+            p = { x: coheteVuelo.x, y: coheteVuelo.y };
+            size *= coheteVuelo.escala;
+            rot = coheteVuelo.rot || 0;
+            dibujarEstelaCohete(p, size, coheteVuelo.t);
+        } else {
+            p = aPixel(meta);
+            const bounce = pelotaVictoria ? Math.sin(anim * 0.25) * 8 : 0;
+            p = { x: p.x, y: p.y - bounce };
+        }
 
         ctx.save();
-        ctx.translate(p.x, p.y - bounce);
-        ctx.beginPath();
-        ctx.ellipse(0, r * 0.85, r * 0.7, r * 0.25, 0, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(0,0,0,0.25)";
-        ctx.fill();
-        const g = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
-        g.addColorStop(0, "#ffe082");
-        g.addColorStop(0.55, "#ff9800");
-        g.addColorStop(1, "#e65100");
-        ctx.beginPath();
-        ctx.arc(0, 0, r, 0, Math.PI * 2);
-        ctx.fillStyle = g;
-        ctx.fill();
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "#fff";
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(-r * 0.35, -r * 0.35, r * 0.22, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.7)";
-        ctx.fill();
+        ctx.translate(p.x, p.y);
+        if (rot) ctx.rotate(rot);
+        if (coheteImg && coheteImg.complete && coheteImg.naturalWidth) {
+            const ratio = coheteImg.naturalHeight / coheteImg.naturalWidth;
+            const w = size;
+            const h = size * ratio;
+            ctx.drawImage(coheteImg, -w / 2, -h / 2, w, h);
+        } else {
+            const r = size * 0.35;
+            ctx.beginPath();
+            ctx.moveTo(0, -r * 1.4);
+            ctx.quadraticCurveTo(r * 0.7, -r * 0.2, r * 0.55, r);
+            ctx.lineTo(-r * 0.55, r);
+            ctx.quadraticCurveTo(-r * 0.7, -r * 0.2, 0, -r * 1.4);
+            ctx.fillStyle = "#f8fafc";
+            ctx.fill();
+            ctx.fillStyle = "#f97316";
+            ctx.beginPath();
+            ctx.arc(0, -r * 0.15, r * 0.28, 0, Math.PI * 2);
+            ctx.fill();
+        }
         ctx.restore();
     }
 
@@ -1029,7 +982,7 @@
         const r = size / 2;
         ctx.beginPath();
         ctx.ellipse(p.x, p.y + r * 0.55, r * 0.55, r * 0.45, 0, 0, Math.PI * 2);
-        ctx.fillStyle = "#42a5f5";
+        ctx.fillStyle = "#7c3aed";
         ctx.fill();
         ctx.beginPath();
         ctx.arc(p.x, p.y - r * 0.15, r * 0.55, 0, Math.PI * 2);
@@ -1045,16 +998,20 @@
         ctx.fill();
         ctx.beginPath();
         ctx.arc(p.x, p.y - r * 0.05, r * 0.22, 0.15 * Math.PI, 0.85 * Math.PI);
-        ctx.strokeStyle = "#e65100";
+        ctx.strokeStyle = "#7c3aed";
         ctx.lineWidth = 2;
         ctx.stroke();
     }
 
     function dibujarNino() {
         const p = aPixel(personaje);
-        const size = (anchoCamino() / 100) * tamañoLogico().w * 1.35;
-        if (avatarImg && avatarImg.complete && avatarImg.naturalWidth) {
-            ctx.drawImage(avatarImg, p.x - size / 2, p.y - size / 2, size, size);
+        const z = zonaJuego();
+        const size = (anchoCamino() / 100) * ((z.w / 100) * tamañoLogico().w) * 1.55;
+        const sprite = (modoVictoria && avatarVictoriaImg && avatarVictoriaImg.complete && avatarVictoriaImg.naturalWidth)
+            ? avatarVictoriaImg
+            : avatarImg;
+        if (sprite && sprite.complete && sprite.naturalWidth) {
+            ctx.drawImage(sprite, p.x - size / 2, p.y - size / 2, size, size);
         } else {
             dibujarNinoFallback(p, size);
         }
@@ -1071,12 +1028,82 @@
         ctx.drawImage(capaEstatica, 0, 0);
 
         const geo = inicioMeta(lab);
-        dibujarPelota(geo.meta, pelotaAnim);
         dibujarNino();
+        dibujarCohete(geo.meta, pelotaAnim);
 
-        if (pelotaVictoria) {
+        if (coheteVuelo && coheteVuelo.activo) {
+            avanzarVueloCohete();
+            rafId = requestAnimationFrame(redibujar);
+        } else if (pelotaVictoria) {
             pelotaAnim += 1;
             rafId = requestAnimationFrame(redibujar);
+        }
+    }
+
+    function avanzarVueloCohete() {
+        if (!coheteVuelo || !coheteVuelo.activo) return;
+        coheteVuelo.t += 1;
+
+        // Fase corta de “carga” (vibra / se prepara) antes de subir.
+        if (coheteVuelo.t < coheteVuelo.prepFrames) {
+            coheteVuelo.x = coheteVuelo.origenX + Math.sin(coheteVuelo.t * 0.9) * 2.2;
+            coheteVuelo.y = coheteVuelo.origenY + Math.cos(coheteVuelo.t * 1.1) * 1.4;
+            return;
+        }
+
+        const vuelo = coheteVuelo.t - coheteVuelo.prepFrames;
+        // Aceleración suave al inicio; más tarde sube más rápido.
+        const accel = 0.12 + Math.min(0.35, vuelo * 0.004);
+        coheteVuelo.vy -= accel;
+        coheteVuelo.x += coheteVuelo.vx + Math.sin(vuelo * 0.05) * 0.25;
+        coheteVuelo.y += coheteVuelo.vy;
+        coheteVuelo.escala = Math.max(0.2, 1 - vuelo * 0.0035);
+        coheteVuelo.rot = Math.sin(vuelo * 0.035) * 0.1;
+
+        const fuera = coheteVuelo.y < -160 || vuelo > coheteVuelo.maxFrames;
+        if (fuera) {
+            finalizarVueloCohete();
+        }
+    }
+
+    function iniciarVueloCohete(meta) {
+        const p = aPixel(meta);
+        coheteVuelo = {
+            activo: true,
+            origenX: p.x,
+            origenY: p.y,
+            x: p.x,
+            y: p.y,
+            vx: (Math.random() < 0.5 ? -1 : 1) * 0.18,
+            vy: -0.6,
+            escala: 1,
+            rot: 0,
+            t: 0,
+            prepFrames: 28,
+            maxFrames: 130
+        };
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+        rafId = requestAnimationFrame(redibujar);
+    }
+
+    function finalizarVueloCohete() {
+        coheteVuelo = null;
+        pelotaVictoria = false;
+        modoVictoria = false;
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+        TextoVoz.detener();
+        indiceLaberinto += 1;
+        esperandoFeedback = false;
+        if (indiceLaberinto >= laberintos.length) {
+            mostrarCierre();
+        } else {
+            iniciarLaberintoActual();
         }
     }
 
@@ -1103,6 +1130,8 @@
             return;
         }
         pelotaVictoria = false;
+        modoVictoria = false;
+        coheteVuelo = null;
         pelotaAnim = 0;
         labCapaId = null;
         if (rafId) {
@@ -1145,7 +1174,7 @@
         redibujar();
 
         const fb = (gameConfig.feedback && gameConfig.feedback.error) || {};
-        const texto = mensaje || fb.texto || "¡Inténtalo otra vez! Sigue el camino con cuidado.";
+        const texto = mensaje || fb.texto || "¡Te saliste del laberinto! Vuelve al pasillo.";
         reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
         TextoVoz.hablar(texto, "zoe");
 
@@ -1175,37 +1204,18 @@
         pointerId = null;
         canvas.classList.remove("arrastrando");
         pelotaVictoria = true;
-        redibujar();
+        modoVictoria = true;
 
-        const fb = (gameConfig.feedback && gameConfig.feedback.acierto) || {};
-        const texto = fb.texto || "¡Muy bien! Llegaste hasta la pelota.";
+        const lab = laberintoActual();
+        const geo = inicioMeta(lab);
+        // Cara de victoria a la izquierda mientras el cohete despega.
+        personaje = {
+            x: Math.max(4, geo.meta.x - Math.max(metaRadio() * 1.6, 10)),
+            y: geo.meta.y
+        };
+
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
-        TextoVoz.hablar(texto, "zoe");
-
-        const dur = (gameConfig.feedback && gameConfig.feedback.duracion) || 1100;
-        Swal.fire({
-            title: texto,
-            imageUrl: fb.gif || "../../images/correcto.gif",
-            imageHeight: 160,
-            timer: dur,
-            showConfirmButton: false,
-            heightAuto: false,
-            scrollbarPadding: false
-        }).then(function () {
-            TextoVoz.detener();
-            pelotaVictoria = false;
-            if (rafId) {
-                cancelAnimationFrame(rafId);
-                rafId = null;
-            }
-            indiceLaberinto += 1;
-            esperandoFeedback = false;
-            if (indiceLaberinto >= laberintos.length) {
-                mostrarCierre();
-            } else {
-                iniciarLaberintoActual();
-            }
-        });
+        iniciarVueloCohete(geo.meta);
     }
 
     function mostrarCierre() {
@@ -1238,15 +1248,16 @@
 
         const p = aNorm(ev.clientX, ev.clientY);
         const geo = inicioMeta(lab);
+        const red = redDePasillos(lab);
         // Ligera holgura extra para saltos entre eventos en pantallas táctiles.
         const radio = (anchoCamino() / 2) * 1.15;
 
-        if (!dentroDelCamino(p, geo.pts, radio)) {
+        if (!dentroDeRed(p, red, radio)) {
             falloCamino();
             return;
         }
 
-        const proy = proyectarEnPath(p, geo.pts);
+        const proy = proyectarEnRed(p, red);
         personaje = { x: proy.punto.x, y: proy.punto.y };
         ultimoValido = { x: personaje.x, y: personaje.y };
         programarRedibujo();
@@ -1299,8 +1310,29 @@
     $(document).ready(function () {
         introConfig = JSON.parse(readText("intro.json"));
         gameConfig = JSON.parse(readText("config.json"));
+        try {
+            laberintosFijos = JSON.parse(readText("laberintos-fijos.json"));
+        } catch (e) {
+            laberintosFijos = null;
+        }
 
         enlazarCanvas();
+
+        window.addEventListener("message", function (ev) {
+            if (ev.origin !== window.location.origin) return;
+            if (ev.data && ev.data.type === "pednia:perfil") {
+                window.__PEDNIA_PERFIL__ = ev.data.perfil;
+                const nuevo = resolverGenero();
+                if (nuevo !== generoElegido) {
+                    generoElegido = nuevo;
+                    cargarAvatar();
+                    const enunciado = document.getElementById("enunciado");
+                    if (enunciado && nivelElegido) enunciado.textContent = enunciadoActual();
+                }
+            }
+        });
+
+        generoElegido = resolverGenero();
         imagenesPromise = precargarImagenesCriticas();
         precargarMediaSecundaria();
 
@@ -1315,7 +1347,9 @@
                 fb.acierto && fb.acierto.texto,
                 fb.error && fb.error.texto,
                 textos().cierre,
-                textos().enunciado
+                textos().enunciado,
+                textos().enunciadoNino,
+                textos().enunciadoNina
             ].filter(Boolean)
         });
         window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
@@ -1329,13 +1363,6 @@
                 cerrar_anuncio({ rapido: true });
             });
         }
-
-        window.addEventListener("message", function (ev) {
-            if (ev.origin !== window.location.origin) return;
-            if (ev.data && ev.data.type === "pednia:perfil") {
-                window.__PEDNIA_PERFIL__ = ev.data.perfil;
-            }
-        });
 
         preloadGifs(introConfig.personajes).then(function () {
             renderPersonajes(introConfig.personajes);

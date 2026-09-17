@@ -2,27 +2,27 @@
   "personajes": [
     {
       "nombre": "Zoe",
-      "gif_idle": "../../images/normal1.gif",
-      "gif_hablando": "../../images/normal2.gif"
+      "gif_idle": "../../images/zoe_normal.gif",
+      "gif_hablando": "../../images/zoe_hablando.gif"
     },
     {
       "nombre": "Zeus",
-      "gif_idle": "../../images/ciencia/normal1.gif",
-      "gif_hablando": "../../images/ciencia/normal2.gif"
+      "gif_idle": "../../images/zeus_normal.gif",
+      "gif_hablando": "../../images/zeus_hablando.gif"
     }
   ],
   "conversacion": [
     {
       "personaje": 0,
-      "texto": "¡Vamos a jugar! Lleva al niño hasta la pelota siguiendo el camino sin salirte."
+      "texto": "¡Vamos a jugar! Encuentra el camino del laberinto hasta el cohete. ¡Cuidado con los callejones sin salida!"
     },
     {
       "personaje": 1,
-      "texto": "¡Yo soy Zeus! Mantén el dedo sobre el niño y deslízalo por el camino."
+      "texto": "¡Yo soy Zeus! Mantén el dedo sobre la carita y deslízala por los pasillos sin tocarte las paredes."
     },
     {
       "personaje": 0,
-      "texto": "Si te sales, vuelve a intentar. ¡Tú puedes!"
+      "texto": "Si entras a un callejón, regresa y prueba otra rama. ¡Tú puedes!"
     }
   ],
   "configuracion": {

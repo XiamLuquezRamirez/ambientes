@@ -4,17 +4,19 @@
   "feedback": {
     "duracion": 1100,
     "acierto": {
-      "texto": "¡Muy bien! Llegaste hasta la pelota.",
+      "texto": "¡Muy bien! Llegaste hasta el cohete.",
       "gif": "../../images/correcto.gif"
     },
     "error": {
-      "texto": "¡Inténtalo otra vez! Sigue el camino con cuidado.",
+      "texto": "¡Te saliste del laberinto! Vuelve al pasillo.",
       "gif": "../../images/incorrecto.gif"
     }
   },
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "enunciado": "Lleva al niño hasta la pelota",
+    "enunciadoNino": "Encuentra el camino hasta el cohete",
+    "enunciadoNina": "Encuentra el camino hasta el cohete",
+    "enunciado": "Encuentra el camino hasta el cohete",
     "cierre": "¡Excelente! Completaste los laberintos."
   },
   "audios": {
@@ -23,59 +25,56 @@
     "cierre": "../../sounds/victory.mp3",
     "fondo": "../../sounds/fondo.mp3"
   },
-  "avatar": "../Reconocimiento/img/nino/7/cabeza.png",
-  "metaRadio": 6,
+  "escenario": {
+    "fondo": "img/ESCENARIO.png",
+    "zona": { "x": 8, "y": 15, "w": 84, "h": 70 }
+  },
+  "meta": {
+    "imagen": "img/COHETE_SIN-SOMBRA.png",
+    "radio": 7,
+    "escala": 1.35
+  },
+  "personajes": {
+    "nino": {
+      "comienzo": "img/NIÑO_COMIENZO.png",
+      "victoria": "img/NIÑO_VICTORIA_META.png"
+    },
+    "nina": {
+      "comienzo": "img/NIÑA_COMIENZO.png",
+      "victoria": "img/NIÑA_VICTORIA_META.png"
+    }
+  },
+  "coloresCamino": {
+    "pasillo": "#eef2ff",
+    "pared": "#312e81",
+    "borde": "#1e1b4b"
+  },
+  "metaRadio": 7,
+  "laberintosFijos": "laberintos-fijos.json",
   "niveles": [
     {
       "id": "3",
       "edad": "3 años",
       "titulo": "3 laberintos",
       "cantidad": 3,
-      "anchoCamino": 10,
-      "soltarEsFallo": false,
-      "generacion": {
-        "girosMin": 2,
-        "girosMax": 4,
-        "distractoresMin": 0,
-        "distractoresMax": 0,
-        "margen": 12,
-        "segMin": 18,
-        "segMax": 42
-      }
+      "anchoCamino": 7,
+      "soltarEsFallo": false
     },
     {
       "id": "4",
       "edad": "4 años",
       "titulo": "4 laberintos",
       "cantidad": 4,
-      "anchoCamino": 7,
-      "soltarEsFallo": false,
-      "generacion": {
-        "girosMin": 4,
-        "girosMax": 6,
-        "distractoresMin": 1,
-        "distractoresMax": 1,
-        "margen": 10,
-        "segMin": 14,
-        "segMax": 36
-      }
+      "anchoCamino": 5.5,
+      "soltarEsFallo": false
     },
     {
       "id": "5",
       "edad": "5-6 años",
       "titulo": "5 laberintos",
       "cantidad": 5,
-      "anchoCamino": 4.5,
-      "soltarEsFallo": true,
-      "generacion": {
-        "girosMin": 6,
-        "girosMax": 10,
-        "distractoresMin": 2,
-        "distractoresMax": 3,
-        "margen": 8,
-        "segMin": 12,
-        "segMax": 30
-      }
+      "anchoCamino": 4,
+      "soltarEsFallo": true
     }
   ]
 }

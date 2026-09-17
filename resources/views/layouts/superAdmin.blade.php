@@ -57,7 +57,15 @@
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
                             <a href="{{ route('superadmin.catalogo') }}"
-                                class="{{ request()->routeIs('superadmin.catalogo', 'superadmin.catalogo.guardar', 'superadmin.catalogo.datos', 'superadmin.catalogo.actualizar', 'superadmin.catalogo.toggleActivo') ? 'active nav-link' : 'nav-link' }}"
+                                class="{{ request()->routeIs(
+                                    'superadmin.catalogo',
+                                    'superadmin.catalogo.guardar',
+                                    'superadmin.catalogo.datos',
+                                    'superadmin.catalogo.actualizar',
+                                    'superadmin.catalogo.toggleActivo',
+                                )
+                                    ? 'active nav-link'
+                                    : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-book-open"></i> DBA
                             </a>
