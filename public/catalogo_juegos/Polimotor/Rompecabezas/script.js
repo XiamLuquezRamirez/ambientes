@@ -865,11 +865,36 @@ async function correrCuentaRegresiva(duracionMs) {
     if (typeof TextoVoz !== "undefined") await TextoVoz.hablar(etiqueta, voz);
     if (token !== cuentaToken || juegoTerminado) return false;
 
+    const fraseConteo = (typeof TextoVoz !== "undefined" && TextoVoz.textoConteo)
+        ? TextoVoz.textoConteo(segundos)
+        : String(segundos);
+    const pasoMs = Math.max(500, Math.round(espera / segundos));
+    let resolverInicio = null;
+    const audioInicio = new Promise(function (resolve) { resolverInicio = resolve; });
+    const pVoz = (typeof TextoVoz !== "undefined")
+        ? TextoVoz.hablar(fraseConteo, voz, {
+            duracionMs: espera,
+            onInicio: function () { if (resolverInicio) resolverInicio(); }
+        })
+        : (resolverInicio(), Promise.resolve());
+
+    await audioInicio;
+    if (token !== cuentaToken || juegoTerminado) {
+        if (typeof TextoVoz !== "undefined") TextoVoz.detener();
+        return false;
+    }
+
     for (let n = segundos; n >= 1; n--) {
         cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span><strong>" + n + "</strong>";
-        if (typeof TextoVoz !== "undefined") await TextoVoz.hablar(String(n), voz);
-        if (token !== cuentaToken || juegoTerminado) return false;
+        await sleep(pasoMs);
+        if (token !== cuentaToken || juegoTerminado) {
+            if (typeof TextoVoz !== "undefined") TextoVoz.detener();
+            return false;
+        }
     }
+
+    await pVoz;
+    if (token !== cuentaToken || juegoTerminado) return false;
 
     ocultarCuenta();
     await sleep(1000);

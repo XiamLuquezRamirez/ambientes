@@ -1194,15 +1194,34 @@ body.alto-contraste .menu-acc-cerrar {
 }
 
 .cuenta {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
   font-size: 64px;
   font-weight: 700;
   color: #1565c0;
   text-shadow: 3px 3px 0 #fff;
-  min-height: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 118px;
+  min-height: 118px;
+  flex-shrink: 0;
+}
+
+.cuenta:not([hidden]) {
+  display: flex;
+}
+
+/* Solo en memorización: mantiene el hueco para que no salten las tarjetas. */
+.memoria-bloque.fase-memoria .cuenta {
+  display: flex !important;
+}
+
+.memoria-bloque.fase-memoria .cuenta[hidden] {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .cuenta-label {
@@ -1210,6 +1229,7 @@ body.alto-contraste .menu-acc-cerrar {
   font-weight: 600;
   color: #5b6b7c;
   text-shadow: none;
+  line-height: 1.2;
 }
 
 .secuencia {

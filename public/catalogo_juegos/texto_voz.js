@@ -235,8 +235,9 @@
         return best;
     }
 
-    function hablarNavegador(texto, personaje, token, onEnd) {
+    function hablarNavegador(texto, personaje, token, onEnd, onInicio) {
         if (!global.speechSynthesis) {
+            if (typeof onInicio === "function") onInicio();
             if (typeof onEnd === "function") onEnd();
             return;
         }
@@ -246,22 +247,64 @@
         if (voice) u.voice = voice;
         u.rate = ttsRate();
         u.pitch = personaje === "zeus" ? 0.75 : 1.15;
+        u.onstart = function () {
+            if (token === ttsToken && typeof onInicio === "function") onInicio();
+        };
         u.onend = function () {
             if (token === ttsToken && typeof onEnd === "function") onEnd();
         };
         u.onerror = function () {
+            if (token === ttsToken && typeof onInicio === "function") onInicio();
             if (token === ttsToken && typeof onEnd === "function") onEnd();
         };
         try {
             global.speechSynthesis.speak(u);
             if (global.speechSynthesis.paused) global.speechSynthesis.resume();
+            // Algunos navegadores no disparan onstart: avisar al encolar.
+            setTimeout(function () {
+                if (token === ttsToken && typeof onInicio === "function") onInicio();
+            }, 0);
         } catch (e) {
+            if (typeof onInicio === "function") onInicio();
             if (typeof onEnd === "function") onEnd();
         }
     }
 
-    function reproducirUrlTts(src, texto, personaje, token, onEnd) {
+    function aplicarDuracionObjetivo(player, duracionMs) {
+        if (!player) return;
+        var objetivo = Number(duracionMs);
+        if (!isFinite(objetivo) || objetivo <= 0) {
+            try { player.playbackRate = 1; } catch (e) { /* noop */ }
+            return;
+        }
+        var aplicar = function () {
+            if (!(player.duration > 0)) return;
+            var rate = (player.duration * 1000) / objetivo;
+            try { player.playbackRate = Math.max(0.7, Math.min(1.25, rate)); } catch (e2) { /* noop */ }
+        };
+        if (player.readyState >= 1 && player.duration > 0) aplicar();
+        else {
+            player.addEventListener("loadedmetadata", aplicar, { once: true });
+        }
+    }
+
+    function textoConteo(segundos) {
+        var mapa = { 1: "uno", 2: "dos", 3: "tres", 4: "cuatro", 5: "cinco" };
+        var n = Math.max(1, Math.min(5, Math.floor(Number(segundos) || 3)));
+        var partes = [];
+        var i;
+        for (i = n; i >= 1; i--) partes.push(mapa[i] || String(i));
+        return partes.join(". ") + ".";
+    }
+
+    function reproducirUrlTts(src, texto, personaje, token, onEnd, duracionMs, onInicio) {
         if (!ttsPlayer) ttsPlayer = new Audio();
+        var inicioAvisado = false;
+        var avisarInicio = function () {
+            if (inicioAvisado || token !== ttsToken) return;
+            inicioAvisado = true;
+            if (typeof onInicio === "function") onInicio();
+        };
         ttsPlayer.onended = function () {
             if (typeof onEnd === "function") onEnd();
         };
@@ -269,26 +312,40 @@
             // Blob inválido / revocado: invalidar caché y caer a voz del navegador.
             olvidarTts(src);
             if (token !== ttsToken) return;
-            hablarNavegador(texto, personaje, token, onEnd);
+            hablarNavegador(texto, personaje, token, onEnd, onInicio);
         };
         ttsPlayer.src = src;
-        try { ttsPlayer.playbackRate = 1; } catch (e) { /* noop */ }
+        aplicarDuracionObjetivo(ttsPlayer, duracionMs);
         var p = ttsPlayer.play();
-        if (p && typeof p.catch === "function") {
-            p.catch(function () {
+        if (p && typeof p.then === "function") {
+            p.then(avisarInicio).catch(function () {
                 if (token !== ttsToken) return;
-                hablarNavegador(texto, personaje, token, onEnd);
+                hablarNavegador(texto, personaje, token, onEnd, onInicio);
             });
+        } else {
+            avisarInicio();
         }
     }
 
-    function hablar(texto, personaje) {
+    function hablar(texto, personaje, opts) {
         return new Promise(function (resolve) {
             var t = textoPlano(texto);
+            opts = opts || {};
+            var onInicio = typeof opts.onInicio === "function" ? opts.onInicio : null;
+            var inicioHecho = false;
+            var avisarInicio = function () {
+                if (inicioHecho) return;
+                inicioHecho = true;
+                if (onInicio) onInicio();
+            };
+
             if (!t) {
+                avisarInicio();
                 resolve();
                 return;
             }
+
+            var duracionMs = opts.duracionMs != null ? Number(opts.duracionMs) : null;
 
             ttsToken += 1;
             var myToken = ttsToken;
@@ -304,22 +361,23 @@
                     clearTimeout(safety);
                     safety = null;
                 }
+                avisarInicio();
                 detenerReproduccionTts();
                 notificarTtsFin();
             };
-            safety = setTimeout(done, 15000);
+            safety = setTimeout(done, Math.max(15000, (isFinite(duracionMs) ? duracionMs : 0) + 4000));
             aplicarVolumenFondo(Math.min(VOLUMEN_DUCK, VOLUMEN_FONDO));
 
             var cached = ttsCache[claveTts(t, pj)];
             if (cached) {
-                reproducirUrlTts(cached, t, pj, myToken, done);
+                reproducirUrlTts(cached, t, pj, myToken, done, duracionMs, avisarInicio);
                 return;
             }
 
             obtenerUrlTts(t, pj).then(function (src) {
                 if (myToken !== ttsToken) return;
-                if (src) reproducirUrlTts(src, t, pj, myToken, done);
-                else hablarNavegador(t, pj, myToken, done);
+                if (src) reproducirUrlTts(src, t, pj, myToken, done, duracionMs, avisarInicio);
+                else hablarNavegador(t, pj, myToken, done, avisarInicio);
             });
         });
     }
@@ -351,6 +409,7 @@
         precargar: precargarVocesConocidas,
         encolarFrases: encolarFrases,
         hablar: hablar,
+        textoConteo: textoConteo,
         detener: detenerVoz,
         desbloquear: desbloquearAudioTts,
         vaciar: vaciarCacheTts,

@@ -637,6 +637,25 @@ function setEnunciado(texto) {
     if (el) el.innerHTML = texto || "";
 }
 
+function bloqueMemoria() {
+    return document.querySelector(".memoria-bloque");
+}
+
+function iniciarFaseMemoria() {
+    const bloque = bloqueMemoria();
+    if (bloque) bloque.classList.add("fase-memoria");
+}
+
+function terminarFaseMemoria() {
+    const bloque = bloqueMemoria();
+    if (bloque) bloque.classList.remove("fase-memoria");
+    const cuenta = document.getElementById("cuenta");
+    if (cuenta) {
+        cuenta.hidden = true;
+        cuenta.innerHTML = "";
+    }
+}
+
 async function iniciarRonda() {
     if (!nivelElegido || juegoTerminado) return;
     const rondas = nivelElegido.rondas || [];
@@ -653,7 +672,7 @@ async function iniciarRonda() {
     actualizarProgreso();
     document.getElementById("opciones").innerHTML = "";
     document.getElementById("secuencia").hidden = true;
-    document.getElementById("cuenta").hidden = true;
+    terminarFaseMemoria();
     aplicarAccesibilidadInicial();
 
     if (!instruccionDicha) {
@@ -673,6 +692,7 @@ async function mostrarSecuenciaObjetivo() {
     const cuenta = document.getElementById("cuenta");
     mostrandoMemoria = true;
     esperandoRespuesta = false;
+    iniciarFaseMemoria();
     document.getElementById("opciones").hidden = true;
     setEnunciado(textos().memoriza || "¡Memoriza esta secuencia!");
     caja.hidden = false;
@@ -687,11 +707,33 @@ async function mostrarSecuenciaObjetivo() {
         cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span>";
         await hablarConVoz(etiqueta, vozConteo);
         if (juegoTerminado) return;
-        for (let n = 3; n >= 1; n--) {
-            cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span><strong>" + n + "</strong>";
-            await hablarConVoz(String(n), vozConteo);
-            if (juegoTerminado) return;
+        const segundos = 3;
+        const espera = 3000;
+        const fraseConteo = (typeof TextoVoz !== "undefined" && TextoVoz.textoConteo)
+            ? TextoVoz.textoConteo(segundos)
+            : "tres. dos. uno.";
+        let resolverInicio = null;
+        const audioInicio = new Promise(function (resolve) { resolverInicio = resolve; });
+        const pVoz = (typeof TextoVoz !== "undefined")
+            ? TextoVoz.hablar(fraseConteo, vozConteo, {
+                duracionMs: espera,
+                onInicio: function () { if (resolverInicio) resolverInicio(); }
+            })
+            : (resolverInicio(), Promise.resolve());
+        await audioInicio;
+        if (juegoTerminado) {
+            if (typeof TextoVoz !== "undefined") TextoVoz.detener();
+            return;
         }
+        for (let n = segundos; n >= 1; n--) {
+            cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span><strong>" + n + "</strong>";
+            await sleep(Math.round(espera / segundos));
+            if (juegoTerminado) {
+                if (typeof TextoVoz !== "undefined") TextoVoz.detener();
+                return;
+            }
+        }
+        await pVoz;
         cuenta.hidden = true;
         cuenta.innerHTML = "";
         await sleep(1000);
@@ -704,6 +746,7 @@ async function mostrarSecuenciaObjetivo() {
     caja.classList.remove("secuencia-viva");
     caja.hidden = true;
     caja.innerHTML = "";
+    terminarFaseMemoria();
     document.getElementById("opciones").hidden = false;
     mostrandoMemoria = false;
 }
