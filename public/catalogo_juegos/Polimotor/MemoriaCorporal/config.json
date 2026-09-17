@@ -17,10 +17,12 @@
     "zoomLongPress": false,
     "mostrarProgreso": true,
     "cuentaRegresiva": true,
+    "animaciones_opciones": true,
     "respuestasMaximasAntesDeAtenuar": 2,
     "tamanoImagen": 120,
     "tamanoImagenPista": 124,
-    "tamanoLetraBotones": 16,
+    "tamanoLetraBotones": 26,
+    "letterSpacing": 2,
     "espaciadoOpciones": 24,
     "anchoOpcion": 220,
     "altoOpcion": 200
@@ -52,10 +54,7 @@
     "tocar_hombros": { "nombre": "Manos en hombros", "archivo": "tocar_hombros.png" },
     "tocar_rodillas": { "nombre": "Tocar rodillas", "archivo": "tocar_rodillas.png" },
     "abrir_brazos": { "nombre": "Brazos abiertos", "archivo": "abrir_brazos.png" },
-    "cerrar_brazos": { "nombre": "Brazos cerrados", "archivo": "cerrar_brazos.png" },
-    "manos_al_frente": { "nombre": "Manos al frente", "archivo": "manos_al_frente.png" },
-    "gira": { "nombre": "Gira", "archivo": "gira.png" },
-    "salta": { "nombre": "Salta", "archivo": "salta.png" }
+    "manos_al_frente": { "nombre": "Manos al frente", "archivo": "manos_al_frente.png" }
   },
   "niveles": [
     {

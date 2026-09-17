@@ -17,6 +17,7 @@ let mostrandoMemoria = false;
 let marcandoRespuesta = false;
 let fallosRonda = 0;
 let instruccionDicha = false;
+let timerEntradaOpciones = null;
 
 function readText(ruta_local) {
     var texto = null;
@@ -139,7 +140,7 @@ function fijarNubeEnPosicion() {
     if (cerrardo || conversacionCancelada) return;
     const nube = document.querySelector(".nube");
     nube.style.animationName = "none";
-    nube.style.bottom = "38%";
+    nube.style.bottom = "57%";
 }
 
 function cambiarNubeAPersonaje(index) {
@@ -417,6 +418,7 @@ const ACC_OPCIONES = [
     { key: "altoContraste", label: "Alto contraste" },
     { key: "verBotonVerDeNuevo", label: "Botón ver de nuevo" },
     { key: "cuentaRegresiva", label: "Cuenta 3-2-1" },
+    { key: "animaciones_opciones", label: "Animar opciones" },
     { key: "mostrarProgreso", label: "Mostrar progreso" }
 ];
 
@@ -444,6 +446,25 @@ function pintarMenuAcc() {
         });
         ops.appendChild(lab);
     });
+    const rango = document.createElement("label");
+    rango.className = "menu-acc-op menu-acc-rango";
+    const actual = Number(acc().letterSpacing);
+    const valor = isFinite(actual) && actual >= 0 ? actual : 2;
+    rango.innerHTML = "<span>Espaciado de letras <strong>" + valor + "</strong></span>";
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = "10";
+    slider.step = "1";
+    slider.value = String(valor);
+    slider.addEventListener("input", function () {
+        const n = Number(slider.value);
+        gameConfig.accesibilidad.letterSpacing = n;
+        rango.querySelector("strong").textContent = String(n);
+        aplicarVisual();
+    });
+    rango.appendChild(slider);
+    ops.appendChild(rango);
 }
 
 function enlazarMenuAcc() {
@@ -488,12 +509,19 @@ function px(valor, fallback) {
     return n + "px";
 }
 
+function pxCero(valor, fallback) {
+    const n = Number(valor);
+    if (!isFinite(n) || n < 0) return fallback;
+    return n + "px";
+}
+
 function aplicarVisual() {
     const v = acc();
     const root = document.documentElement;
     root.style.setProperty("--mc-img", px(v.tamanoImagen, "120px"));
     root.style.setProperty("--mc-img-pista", px(v.tamanoImagenPista, "64px"));
     root.style.setProperty("--mc-letra", px(v.tamanoLetraBotones, "16px"));
+    root.style.setProperty("--mc-letter-spacing", pxCero(v.letterSpacing, "2px"));
     root.style.setProperty("--mc-gap", px(v.espaciadoOpciones, "24px"));
     root.style.setProperty("--mc-opcion-w", px(v.anchoOpcion, "220px"));
     root.style.setProperty("--mc-opcion-h", px(v.altoOpcion, "200px"));
@@ -688,7 +716,6 @@ function mostrarOpcionesFalta() {
     opcionesRonda = barajar([{ id: correcto, ok: true }].concat(
         dist.map(function (id) { return { id: id, ok: false }; })
     ));
-    esperandoRespuesta = true;
     setEnunciado(textos().queFalta || "¿Qué movimiento falta?");
     hablarTexto(textos().queFalta);
     const pista = document.getElementById("secuencia");
@@ -702,10 +729,15 @@ function mostrarOpcionesFalta() {
 function pintarOpcionesFalta(lista) {
     const caja = document.getElementById("opciones");
     const cols = lista.length === 4 ? 2 : (lista.length <= 3 ? Math.max(lista.length, 1) : 3);
+    const animar = !!acc().animaciones_opciones;
+    if (timerEntradaOpciones) {
+        clearTimeout(timerEntradaOpciones);
+        timerEntradaOpciones = null;
+    }
     caja.className = "opciones opciones-falta";
     caja.style.setProperty("--mc-cols", String(cols));
     caja.innerHTML = "";
-    lista.forEach(function (op) {
+    lista.forEach(function (op, i) {
         const m = datoMovimiento(op.id);
         const btn = document.createElement("button");
         btn.type = "button";
@@ -715,8 +747,21 @@ function pintarOpcionesFalta(lista) {
         btn.addEventListener("click", function () {
             elegirOpcion(op, btn);
         });
+        if (animar) {
+            btn.classList.add("opcion-entra");
+            btn.style.animationDelay = (i * 140) + "ms";
+        }
         caja.appendChild(btn);
     });
+    if (animar) {
+        esperandoRespuesta = false;
+        timerEntradaOpciones = setTimeout(function () {
+            timerEntradaOpciones = null;
+            if (!juegoTerminado && !mostrandoMemoria) esperandoRespuesta = true;
+        }, lista.length * 140 + 420);
+    } else {
+        esperandoRespuesta = true;
+    }
 }
 
 function mostrarMarca(btn, tipo) {
@@ -811,6 +856,46 @@ function restaurarPista() {
     pista.innerHTML = htmlSecuenciaConHueco(secuenciaObjetivo, huecoIndex);
 }
 
+function generarConfetis() {
+    var caja = document.getElementById("confetis");
+    if (!caja) return;
+    caja.innerHTML = "";
+    var colores = ["#e53935", "#ffeb3b", "#43a047", "#1e88e5", "#fb8c00", "#8e24aa", "#ec407a", "#00acc1"];
+    var total = 72;
+    var i;
+    for (i = 0; i < total; i++) {
+        var pieza = document.createElement("span");
+        var ancho = 6 + Math.floor(Math.random() * 8);
+        var alto = 8 + Math.floor(Math.random() * 14);
+        var esCirculo = Math.random() < 0.28;
+        pieza.className = "confeti" + (esCirculo ? " es-circulo" : "");
+        pieza.style.left = (Math.random() * 100) + "%";
+        pieza.style.backgroundColor = colores[i % colores.length];
+        pieza.style.width = ancho + "px";
+        pieza.style.height = (esCirculo ? ancho : alto) + "px";
+        var caidas = ["caer-confeti", "caer-confeti-izq", "caer-confeti-der"];
+        pieza.style.animationName = caidas[i % 3];
+        pieza.style.animationDuration = (2.4 + Math.random() * 2.8) + "s";
+        pieza.style.animationDelay = (Math.random() * 1.6) + "s";
+        caja.appendChild(pieza);
+    }
+}
+
+function pintar_exito() {
+    var el = document.getElementById("final");
+    el.style.display = "flex";
+    void el.offsetWidth;
+    generarConfetis();
+    setTimeout(function () {
+        document.getElementById("meta-item").style.bottom = "0px";
+        setTimeout(function () {
+            document.getElementById("trompeta-img").style.left = "0px";
+            document.getElementById("trompeta-img2").style.right = "0px";
+            document.getElementById("meta-item-nivel").classList.add("clase_scale");
+        }, 400);
+    }, 200);
+}
+
 function terminarJuego() {
     if (juegoTerminado) return;
     juegoTerminado = true;
@@ -818,13 +903,9 @@ function terminarJuego() {
     reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
     const cierre = (gameConfig.textos && gameConfig.textos.cierre) || "";
     hablarTexto(cierre);
+    document.getElementById("texto_final").innerText = cierre;
     setTimeout(function () {
-        $("#principal").fadeOut(500);
-        setTimeout(function () {
-            document.getElementById("final").style.backgroundImage = "url(../../images/victoria.gif)";
-            document.getElementById("texto_final").innerText = cierre;
-            $("#final").fadeToggle(1000);
-        }, 500);
+        pintar_exito();
     }, 400);
 }
 
