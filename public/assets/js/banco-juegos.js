@@ -63,15 +63,16 @@
     function renderGaleria() {
         const cards = juegos.map((j) => {
             const color = j.color || '#2563eb';
-            const desc = j.descripcion || j.tipo_label || '';
+            const desc = j.descripcion || '';
+            const badge = j.tipo_label || 'Juego';
             return `
-            <button type="button" class="bj-card" data-juego-id="${escapar(j.id)}"
+            <button type="button" class="bj-card" data-juego-slug="${escapar(j.slug)}"
                     data-url-paquete="${escapar(j.url_paquete || '')}"
                     style="--c:${escapar(color)}">
-                <span class="bj-card-badge">Juego</span>
+                <span class="bj-card-badge">${escapar(badge)}</span>
                 <span class="bj-card-emoji" aria-hidden="true">${iconoHtml(j)}</span>
                 <h3 class="bj-card-titulo">${escapar(j.nombre)}</h3>
-                <p class="bj-card-desc">${escapar(desc)}</p>
+                ${desc ? `<p class="bj-card-desc">${escapar(desc)}</p>` : ''}
             </button>`;
         }).join('');
 
@@ -151,9 +152,10 @@
         $player.remove();
     }
 
-    function juegoPorId(id) {
-        const n = Number(id);
-        return juegos.find((j) => Number(j.id) === n) || null;
+    function juegoPorSlug(slug) {
+        const clave = String(slug || '').trim();
+        if (!clave) return null;
+        return juegos.find((j) => String(j.slug || '') === clave) || null;
     }
 
     function enlazar() {
@@ -163,8 +165,18 @@
             if (ctx.onVolver) ctx.onVolver();
         });
         ctx.$paso.on('click.bj', '.bj-card', function () {
-            const juego = juegoPorId($(this).data('juego-id'));
-            if (juego && juego.url_paquete) montarJuego(juego);
+            const $card = $(this);
+            let juego = juegoPorSlug($card.attr('data-juego-slug'));
+            if (!juego) {
+                const url = String($card.attr('data-url-paquete') || '').trim();
+                if (!url) return;
+                juego = {
+                    nombre: $card.find('.bj-card-titulo').text() || 'Juego',
+                    url_paquete: url,
+                    icono: 'fa-gamepad',
+                };
+            }
+            if (juego.url_paquete) montarJuego(juego);
         });
         ctx.$paso.on('click.bj', '[data-bj-salir-juego]', cerrarJuego);
     }
@@ -181,7 +193,9 @@
                 if (!json || !json.success) {
                     throw new Error((json && json.message) || 'No se pudo cargar el catálogo');
                 }
-                juegos = Array.isArray(json.data?.juegos) ? json.data.juegos.filter((j) => j.url_paquete) : [];
+                juegos = Array.isArray(json.data?.juegos)
+                    ? json.data.juegos.filter((j) => j.slug && j.url_paquete)
+                    : [];
                 renderGaleria();
                 enlazar();
             })

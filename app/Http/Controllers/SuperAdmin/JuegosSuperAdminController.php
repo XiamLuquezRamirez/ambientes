@@ -49,6 +49,7 @@ class JuegosSuperAdminController extends Controller
     public function mostrar(Juego $juego)
     {
         $juego->loadMissing([
+            'tipoJuego:id,slug,nombre,activo',
             'ambiente:id,nombre',
             'modulo:id,nombre,ambiente_id',
             'eje:id,nombre,modulo_id',

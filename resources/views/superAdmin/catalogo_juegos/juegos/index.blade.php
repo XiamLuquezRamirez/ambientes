@@ -124,7 +124,7 @@
             <div>
                 <h1 class="mb-1">Juegos</h1>
                 <p class="students-subtitle mb-0">
-                    Catálogo de paquetes de juegos. Independiente de los motores del constructor de experiencias.
+                    Catálogo de paquetes de juegos.
                 </p>
             </div>
             <button type="button" class="btn btn-primary" id="btnNuevoJuegoCatalogo">

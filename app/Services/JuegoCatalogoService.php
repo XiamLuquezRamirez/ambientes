@@ -7,6 +7,7 @@ use App\Models\Eje;
 use App\Models\Juego;
 use App\Models\Modulo;
 use App\Models\Tematica;
+use App\Models\TiposJuego;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -154,6 +155,7 @@ class JuegoCatalogoService
     public function serializarTarjeta(Juego $juego): array
     {
         $cadena = $juego->cadenaCurricularResuelta();
+        $juego->loadMissing('tipoJuego');
 
         return [
             'slug' => $juego->slug,
@@ -174,6 +176,7 @@ class JuegoCatalogoService
     public function consultaFiltrada(Request $request, bool $soloActivos = false): Builder
     {
         $consulta = Juego::query()->with([
+            'tipoJuego:id,slug,nombre,activo',
             'ambiente:id,nombre',
             'modulo:id,nombre,ambiente_id',
             'modulo.ambiente:id,nombre',
@@ -561,7 +564,7 @@ class JuegoCatalogoService
             'modulo_id' => $cadena['modulo_id'],
             'eje_id' => $cadena['eje_id'],
             'tematica_id' => $cadena['tematica_id'],
-            'tipo' => (string) $datos['tipo'],
+            'tipo_juego_id' => $this->resolverTipoJuegoId((string) $datos['tipo']),
             'ruta' => $ruta,
             'nombre' => trim((string) $datos['nombre']),
             'descripcion' => filled($datos['descripcion'] ?? null)
@@ -574,6 +577,31 @@ class JuegoCatalogoService
                 ? trim((string) $datos['color'])
                 : null,
         ];
+    }
+
+    private function resolverTipoJuegoId(string $slug): int
+    {
+        $slug = trim($slug);
+
+        if ($slug === '' || ! Juego::tipoEsValido($slug)) {
+            throw ValidationException::withMessages([
+                'tipo' => 'El tipo debe estar en snake_case (ej. memoria_visual).',
+            ]);
+        }
+
+        $tipo = TiposJuego::query()->where('slug', $slug)->first();
+
+        if ($tipo) {
+            return (int) $tipo->id;
+        }
+
+        $tipo = TiposJuego::query()->create([
+            'slug' => $slug,
+            'nombre' => Str::of($slug)->replace('_', ' ')->title(),
+            'activo' => true,
+        ]);
+
+        return (int) $tipo->id;
     }
 
     private function eliminarCarpetaPaqueteSiStub(string $ruta): void

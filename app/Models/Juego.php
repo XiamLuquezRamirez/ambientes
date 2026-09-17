@@ -103,14 +103,26 @@ class Juego extends Model
         return asset(trim((string) $this->ruta, '/').'/index.html');
     }
 
+    public function tipoJuego()
+    {
+        return $this->belongsTo(TiposJuego::class, 'tipo_juego_id');
+    }
+
+    /**
+     * Slug del tipo (el JS del catálogo de juegos envía y espera `tipo`).
+     */
+    public function getTipoAttribute(): ?string
+    {
+        $this->loadMissing('tipoJuego');
+
+        return $this->tipoJuego?->slug;
+    }
+
     public function tipoLabel(): string
     {
-        $tipo = TiposJuego::query()
-        ->where('id', $this->tipo_juego_id)
-        ->where('activo', true)
-        ->first();
+        $this->loadMissing('tipoJuego');
 
-        return $tipo->nombre;
+        return $this->tipoJuego?->nombre ?? 'Sin tipo';
     }
 
     public function ambiente()
