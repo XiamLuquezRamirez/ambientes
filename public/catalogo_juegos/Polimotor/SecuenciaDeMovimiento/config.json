@@ -65,17 +65,20 @@
     "cierre": "../../sounds/victory.mp3",
     "fondo": "../../sounds/fondo.mp3"
   },
+  "cuerpo": "nina",
+  "cuerpos": {
+    "nina": { "nombre": "Niña", "carpeta": "../MemoriaCorporal/img/nina" },
+    "nino": { "nombre": "Niño", "carpeta": "../MemoriaCorporal/img/nino" }
+  },
   "movimientos": {
-    "manos_arriba": { "nombre": "Manos arriba", "img": "img/manos_arriba.svg" },
-    "manos_abajo": { "nombre": "Manos abajo", "img": "img/manos_abajo.svg" },
-    "brazos_abiertos": { "nombre": "Brazos abiertos", "img": "img/brazos_abiertos.svg" },
-    "brazos_cerrados": { "nombre": "Brazos juntos", "img": "img/brazos_cerrados.svg" },
-    "manos_cabeza": { "nombre": "Manos en la cabeza", "img": "img/manos_cabeza.svg" },
-    "manos_barriga": { "nombre": "Manos en la barriga", "img": "img/manos_barriga.svg" },
-    "tocar_hombros": { "nombre": "Tocar los hombros", "img": "img/tocar_hombros.svg" },
-    "manos_rodillas": { "nombre": "Manos en las rodillas", "img": "img/manos_rodillas.svg" },
-    "manos_frente": { "nombre": "Manos al frente", "img": "img/manos_frente.svg" },
-    "tocar_cabeza": { "nombre": "Tocar la cabeza", "img": "img/tocar_cabeza.svg" }
+    "manos_arriba": { "nombre": "Manos arriba", "archivo": "manos_arriba.png" },
+    "manos_abajo": { "nombre": "Manos abajo", "archivo": "manos_abajo.png" },
+    "tocar_cabeza": { "nombre": "Manos en cabeza", "archivo": "tocar_cabeza.png" },
+    "tocar_barriga": { "nombre": "Tocar barriga", "archivo": "tocar_barriga.png" },
+    "tocar_hombros": { "nombre": "Manos en hombros", "archivo": "tocar_hombros.png" },
+    "tocar_rodillas": { "nombre": "Tocar rodillas", "archivo": "tocar_rodillas.png" },
+    "abrir_brazos": { "nombre": "Brazos abiertos", "archivo": "abrir_brazos.png" },
+    "manos_al_frente": { "nombre": "Manos al frente", "archivo": "manos_al_frente.png" }
   },
   "niveles": [
     {
@@ -88,7 +91,7 @@
           "titulo": "Arriba y abajo",
           "prefijo": ["manos_arriba"],
           "correcta": "manos_abajo",
-          "distractores": ["brazos_abiertos", "tocar_cabeza"],
+          "distractores": ["abrir_brazos", "tocar_cabeza"],
           "demoNarracion": [
             { "quien": "zoe", "texto": "Mira: manos arriba." },
             { "quien": "zeus", "texto": "¡Ahora mira qué hago yo!" }
@@ -99,9 +102,9 @@
         {
           "id": "a3-r2",
           "titulo": "Cabeza y barriga",
-          "prefijo": ["manos_cabeza"],
-          "correcta": "manos_barriga",
-          "distractores": ["manos_arriba", "brazos_abiertos"],
+          "prefijo": ["tocar_cabeza"],
+          "correcta": "tocar_barriga",
+          "distractores": ["manos_arriba", "abrir_brazos"],
           "demoNarracion": [
             { "quien": "zoe", "texto": "Mira: manos en la cabeza." },
             { "quien": "zeus", "texto": "Manos en la barriga." }
@@ -111,13 +114,13 @@
         },
         {
           "id": "a3-r3",
-          "titulo": "Abierto y cerrado",
-          "prefijo": ["brazos_abiertos"],
-          "correcta": "brazos_cerrados",
-          "distractores": ["manos_cabeza", "manos_abajo"],
+          "titulo": "Hombros y rodillas",
+          "prefijo": ["tocar_hombros"],
+          "correcta": "tocar_rodillas",
+          "distractores": ["tocar_cabeza", "manos_abajo"],
           "demoNarracion": [
-            { "quien": "zoe", "texto": "Mira mis brazos, abre los brazos." },
-            { "quien": "zeus", "texto": "Brazos juntos." }
+            { "quien": "zoe", "texto": "Mira: manos en los hombros." },
+            { "quien": "zeus", "texto": "Ahora toca las rodillas." }
           ],
           "preguntaQuien": "zeus",
           "pregunta": "¿Qué movimiento sigue?"
@@ -134,23 +137,23 @@
           "titulo": "Arriba y abajo",
           "prefijo": ["manos_arriba", "manos_abajo", "manos_arriba"],
           "correcta": "manos_abajo",
-          "distractores": ["tocar_cabeza", "brazos_abiertos"],
+          "distractores": ["tocar_cabeza", "abrir_brazos"],
           "pregunta": "¿Qué sigue?"
         },
         {
           "id": "a4-r2",
-          "titulo": "Abierto y cerrado",
-          "prefijo": ["brazos_abiertos", "brazos_cerrados", "brazos_abiertos"],
-          "correcta": "brazos_cerrados",
-          "distractores": ["manos_arriba", "tocar_hombros", "manos_rodillas"],
+          "titulo": "Brazos y hombros",
+          "prefijo": ["abrir_brazos", "tocar_hombros", "abrir_brazos"],
+          "correcta": "tocar_hombros",
+          "distractores": ["manos_arriba", "tocar_rodillas", "manos_abajo"],
           "pregunta": "¿Qué sigue?"
         },
         {
           "id": "a4-r3",
           "titulo": "Cabeza y rodillas",
-          "prefijo": ["manos_cabeza", "manos_rodillas", "manos_cabeza"],
-          "correcta": "manos_rodillas",
-          "distractores": ["manos_arriba", "brazos_abiertos", "manos_frente"],
+          "prefijo": ["tocar_cabeza", "tocar_rodillas", "tocar_cabeza"],
+          "correcta": "tocar_rodillas",
+          "distractores": ["manos_arriba", "abrir_brazos", "manos_al_frente"],
           "pregunta": "¿Qué sigue?"
         }
       ]
@@ -163,33 +166,33 @@
         {
           "id": "a5-r1",
           "titulo": "Patrón de tres",
-          "prefijo": ["manos_cabeza", "tocar_hombros", "manos_rodillas", "manos_cabeza", "tocar_hombros"],
-          "correcta": "manos_rodillas",
-          "distractores": ["tocar_hombros", "manos_abajo", "brazos_abiertos"],
+          "prefijo": ["tocar_cabeza", "tocar_hombros", "tocar_rodillas", "tocar_cabeza", "tocar_hombros"],
+          "correcta": "tocar_rodillas",
+          "distractores": ["tocar_hombros", "manos_abajo", "abrir_brazos"],
           "pregunta": "¿Qué sigue?"
         },
         {
           "id": "a5-r2",
           "titulo": "Alternancia",
-          "prefijo": ["manos_frente", "manos_arriba", "manos_frente"],
+          "prefijo": ["manos_al_frente", "manos_arriba", "manos_al_frente"],
           "correcta": "manos_arriba",
-          "distractores": ["manos_abajo", "tocar_hombros", "manos_frente"],
+          "distractores": ["manos_abajo", "tocar_hombros", "manos_al_frente"],
           "pregunta": "¿Qué sigue?"
         },
         {
           "id": "a5-r3",
           "titulo": "Patrón de tres",
-          "prefijo": ["tocar_hombros", "manos_rodillas", "brazos_abiertos", "tocar_hombros"],
-          "correcta": "manos_rodillas",
-          "distractores": ["manos_arriba", "brazos_abiertos", "manos_frente"],
+          "prefijo": ["tocar_hombros", "tocar_rodillas", "abrir_brazos", "tocar_hombros"],
+          "correcta": "tocar_rodillas",
+          "distractores": ["manos_arriba", "abrir_brazos", "manos_al_frente"],
           "pregunta": "¿Qué sigue?"
         },
         {
           "id": "a5-r4",
           "titulo": "Mayor desafío",
-          "prefijo": ["manos_abajo", "brazos_abiertos", "manos_cabeza", "manos_abajo"],
-          "correcta": "brazos_abiertos",
-          "distractores": ["manos_arriba", "manos_rodillas", "brazos_cerrados", "manos_frente"],
+          "prefijo": ["manos_abajo", "abrir_brazos", "tocar_cabeza", "manos_abajo"],
+          "correcta": "abrir_brazos",
+          "distractores": ["manos_arriba", "tocar_rodillas", "tocar_barriga", "manos_al_frente"],
           "pregunta": "¿Qué sigue?"
         }
       ]

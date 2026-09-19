@@ -1093,14 +1093,19 @@
             TextoVoz.hablar("Mira cómo se mueven.", "zoe");
             await sleep(400);
             if (gen !== retoGen) return;
-            Object.keys(rt.finales).forEach(function (id) {
+            Object.keys(els).forEach(function (id) {
+                els[id].classList.add("caminando");
                 els[id].style.left = pctParaZona(rt.finales[id]) + "%";
             });
-            await sleep(movMs);
+            await sleep(Math.max(movMs, 950));
+            Object.keys(els).forEach(function (id) {
+                els[id].classList.remove("caminando");
+            });
             if (gen !== retoGen) return;
             setEnunciado(rt.consigna);
             TextoVoz.hablar(rt.consigna, "zoe");
             Object.keys(els).forEach(function (id) {
+                els[id].classList.add("is-clickable");
                 els[id].style.pointerEvents = "auto";
                 els[id].style.cursor = "pointer";
                 els[id].addEventListener("click", function () {
@@ -1123,17 +1128,19 @@
         TextoVoz.hablar("Mira con atención.", "zoe");
         await sleep(350);
         if (gen !== retoGen) return;
+        el.classList.add("caminando");
         for (let i = 0; i < rt.ruta.length; i++) {
             if (gen !== retoGen) return;
             const z = rt.ruta[i];
             el.style.left = pctParaZona(z) + "%";
-            await sleep(i === 0 ? 280 : movMs);
+            await sleep(i === 0 ? 320 : Math.max(movMs, 900));
         }
         if (rt.salirEscena) {
             const destino = rt.ruta[rt.ruta.length - 1];
             el.style.left = pctFuera(destino) + "%";
-            await sleep(movMs);
+            await sleep(Math.max(movMs, 900));
         }
+        el.classList.remove("caminando");
         if (gen !== retoGen) return;
         setEnunciado(rt.consigna);
         TextoVoz.hablar(rt.consigna, "zoe");
@@ -1178,46 +1185,55 @@
             return;
         }
 
-        actorArea.hidden = true;
+        // Imitación con zonas: mascota grande en actor-area, zonas siempre en fila L–C–R.
+        actorArea.hidden = false;
         actorArea.innerHTML = "";
         renderZonasVacias(rt.zonasUi || ["izquierda", "derecha"]);
-
         tablero.classList.add("modo-imitacion");
+
         const mascota = document.createElement("div");
         mascota.className = "mascota-panel";
         const gif = gifPersonaje(rt.mascota === "zoe" ? "zoe" : "zeus");
         mascota.style.backgroundImage = "url(" + gif + ")";
-        tablero.appendChild(mascota);
+        mascota.style.left = "50%";
+        actorArea.appendChild(mascota);
 
         const voz = rt.mascota === "zoe" ? "zoe" : "zeus";
+        const caminarMs = Math.max(pasoMovMs(), 900);
         TextoVoz.hablar("Mira con atención.", voz);
+
         for (let i = 0; i < rt.senales.length; i++) {
             if (gen !== retoGen) return;
             const lado = rt.senales[i];
             mascota.classList.remove("señala-izquierda", "señala-derecha", "señala-centro", "caminando");
-            mascota.classList.add("señala-" + lado);
+            // Se acerca al lado para que se entienda la dirección.
+            mascota.style.left = pctParaZona(lado) + "%";
+            mascota.classList.add("señala-" + lado, "caminando");
             const slot = tablero.querySelector('.zona-slot[data-zona="' + lado + '"]');
-            if (slot) {
-                slot.classList.add("resaltada");
-                await sleep(senalMs);
-                slot.classList.remove("resaltada");
-            } else {
-                await sleep(senalMs);
+            if (slot) slot.classList.add("resaltada");
+            await sleep(Math.max(senalMs, caminarMs));
+            if (slot) slot.classList.remove("resaltada");
+            mascota.classList.remove("caminando");
+            if (!rt.caminaAlFinal || i < rt.senales.length - 1) {
+                mascota.classList.remove("señala-izquierda", "señala-derecha", "señala-centro");
+                if (i < rt.senales.length - 1) {
+                    mascota.style.left = "50%";
+                    await sleep(280);
+                }
             }
         }
         if (gen !== retoGen) return;
 
-        // Zoe camina al lado final (respuesta = última zona).
+        // Queda en el lado final (ya caminó ahí en la última señal).
         if (rt.caminaAlFinal) {
             const destino = rt.senales[rt.senales.length - 1];
-            const slotDest = tablero.querySelector('.zona-slot[data-zona="' + destino + '"]');
             mascota.classList.remove("señala-izquierda", "señala-derecha", "señala-centro");
             mascota.classList.add("caminando");
-            if (slotDest) {
-                slotDest.appendChild(mascota);
-                slotDest.classList.add("resaltada");
-            }
-            await sleep(senalMs);
+            mascota.style.left = pctParaZona(destino) + "%";
+            const slotDest = tablero.querySelector('.zona-slot[data-zona="' + destino + '"]');
+            if (slotDest) slotDest.classList.add("resaltada");
+            await sleep(caminarMs);
+            mascota.classList.remove("caminando");
             if (slotDest) slotDest.classList.remove("resaltada");
         }
 
@@ -1249,6 +1265,70 @@
         else resolverError(gen);
     }
 
+    function feedbackDuracionMs() {
+        const n = Number(gameConfig && gameConfig.feedback && gameConfig.feedback.duracion);
+        return isFinite(n) && n > 0 ? n : 1200;
+    }
+
+    function limpiarSwalResidual() {
+        try {
+            if (typeof Swal !== "undefined") Swal.close();
+        } catch (e) { /* noop */ }
+        try {
+            document.querySelectorAll(".swal2-container").forEach(function (el) {
+                el.remove();
+            });
+            document.documentElement.classList.remove("swal2-shown", "swal2-height-auto");
+            document.body.classList.remove("swal2-shown", "swal2-height-auto");
+        } catch (e2) { /* noop */ }
+    }
+
+    /** Modal + voz: cierra siempre y limpia overlay; tope si el TTS cuelga. */
+    function feedbackConVoz(texto, opts) {
+        opts = opts || {};
+        const personaje = opts.personaje || "zoe";
+        const gif = opts.gif || "";
+        const minMs = opts.minMs != null ? opts.minMs : feedbackDuracionMs();
+        const imageHeight = opts.imageHeight || 140;
+        const topeMs = Math.max(minMs + 2500, 6000);
+
+        if (gameConfig && gameConfig.mostrarFeedBack === false) {
+            if (texto && typeof TextoVoz !== "undefined") {
+                return Promise.race([
+                    TextoVoz.hablar(texto, personaje).catch(function () {}),
+                    sleep(topeMs)
+                ]);
+            }
+            return Promise.resolve();
+        }
+
+        limpiarSwalResidual();
+        const pVoz = (texto && typeof TextoVoz !== "undefined")
+            ? TextoVoz.hablar(texto, personaje)
+            : Promise.resolve();
+        const swalOpts = {
+            title: texto || "",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            heightAuto: false,
+            scrollbarPadding: false
+        };
+        if (gif) {
+            swalOpts.imageUrl = gif;
+            swalOpts.imageHeight = imageHeight;
+        }
+        Swal.fire(swalOpts);
+        return Promise.race([
+            Promise.all([pVoz.catch(function () {}), sleep(minMs)]),
+            sleep(topeMs)
+        ]).then(function () {
+            limpiarSwalResidual();
+        }, function () {
+            limpiarSwalResidual();
+        });
+    }
+
     function consignActual() {
         if (!retoRuntime) return "";
         if (retoRuntime.pasos) {
@@ -1264,22 +1344,18 @@
         const fb = (gameConfig.feedback && gameConfig.feedback.error) || {};
         const texto = textos().error || fb.texto || "Inténtalo otra vez. ¡Tú puedes!";
         reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
-        TextoVoz.hablar(texto, "zoe");
-        Swal.fire({
-            title: texto,
-            imageUrl: fb.gif || "../../images/incorrecto.gif",
-            imageHeight: 140,
-            timer: (gameConfig.feedback && gameConfig.feedback.duracion) || 1200,
-            showConfirmButton: false,
-            heightAuto: false,
-            scrollbarPadding: false
+        feedbackConVoz(texto, {
+            personaje: "zoe",
+            gif: fb.gif || "../../images/incorrecto.gif"
         }).then(function () {
-            if (gen !== retoGen) return;
             esperandoFeedback = false;
-            TextoVoz.detener();
+            if (gen !== retoGen) return;
             aceptaRespuesta = true;
             const c = consignActual();
             if (c) TextoVoz.hablar(c, "zoe");
+        }).catch(function () {
+            esperandoFeedback = false;
+            aceptaRespuesta = true;
         });
     }
 
@@ -1290,44 +1366,37 @@
         const fb = (gameConfig.feedback && gameConfig.feedback.acierto) || {};
         const texto = textos().acierto || fb.texto || "¡Muy bien!";
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
-        TextoVoz.hablar(texto, "zoe");
 
         if (retoRuntime.pasos && retoRuntime.pasoIdx < retoRuntime.pasos.length - 1) {
-            Swal.fire({
-                title: texto,
-                imageUrl: fb.gif || "../../images/correcto.gif",
-                imageHeight: 140,
-                timer: (gameConfig.feedback && gameConfig.feedback.duracion) || 1100,
-                showConfirmButton: false,
-                heightAuto: false,
-                scrollbarPadding: false
+            feedbackConVoz(texto, {
+                personaje: "zoe",
+                gif: fb.gif || "../../images/correcto.gif"
             }).then(function () {
+                esperandoFeedback = false;
                 if (gen !== retoGen) return;
-                TextoVoz.detener();
                 retoRuntime.pasoIdx += 1;
                 const paso = retoRuntime.pasos[retoRuntime.pasoIdx];
                 setEnunciado(paso.consigna);
-                esperandoFeedback = false;
                 aceptaRespuesta = true;
                 TextoVoz.hablar(paso.consigna, "zoe");
+            }).catch(function () {
+                esperandoFeedback = false;
+                aceptaRespuesta = true;
             });
             return;
         }
 
-        Swal.fire({
-            title: texto,
-            imageUrl: fb.gif || "../../images/correcto.gif",
-            imageHeight: 140,
-            timer: (gameConfig.feedback && gameConfig.feedback.duracion) || 1100,
-            showConfirmButton: false,
-            heightAuto: false,
-            scrollbarPadding: false
+        feedbackConVoz(texto, {
+            personaje: "zoe",
+            gif: fb.gif || "../../images/correcto.gif"
         }).then(function () {
-            if (gen !== retoGen) return;
-            TextoVoz.detener();
             esperandoFeedback = false;
+            if (gen !== retoGen) return;
             indiceReto += 1;
             iniciarRetoActual(gen);
+        }).catch(function () {
+            esperandoFeedback = false;
+            aceptaRespuesta = true;
         });
     }
 

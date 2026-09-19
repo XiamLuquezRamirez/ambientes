@@ -342,7 +342,7 @@ if (Schema::hasTable('juegos')) {
     if (! $fila) {
         warn('No hay fila en juegos para Lateralidad');
     } else {
-        ok("BD slug={$fila->slug} activo=".((int) $fila->activo)." tipo={$fila->tipo}");
+        ok("BD slug={$fila->slug} activo=".((int) $fila->activo)." tipo_juego_id=".($fila->tipo_juego_id ?? 'null'));
         $idx = public_path(trim($fila->ruta, '/').'/index.html');
         if (! is_file($idx)) {
             fail('BD apunta a ruta sin index.html');

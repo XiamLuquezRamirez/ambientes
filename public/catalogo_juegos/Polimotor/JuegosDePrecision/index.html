@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<title>Secuencia de movimiento</title>
+	<title>Juegos de precisión</title>
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<link rel="stylesheet" href="/assets/css/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css">
@@ -12,20 +12,18 @@
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
 	<link rel="stylesheet" href="style.css">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/manos_arriba.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/manos_abajo.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/tocar_cabeza.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/tocar_barriga.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/tocar_hombros.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/tocar_rodillas.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/abrir_brazos.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/manos_al_frente.png">
+	<link rel="preload" as="image" href="Img/FONDO.png">
+	<link rel="preload" as="image" href="Img/COHETE.png">
+	<link rel="preload" as="image" href="Img/ESTRELLA.png">
+	<link rel="preload" as="image" href="Img/PLANETA_1.png">
+	<link rel="preload" as="image" href="Img/PLANETA_2.png">
+	<link rel="preload" as="image" href="Img/PLANETA_3.png">
 </head>
 <body class="esperando-inicio">
 	<div id="pantalla-inicio" class="pantalla-inicio">
 		<div class="inicio-mancha" aria-hidden="true"></div>
 		<div class="inicio-contenido">
-			<p class="inicio-kicker">Secuencia de movimiento</p>
+			<p class="inicio-kicker">Juegos de precisión</p>
 			<button type="button" id="btn-empecemos" class="btn-empecemos">
 				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
 				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
@@ -85,13 +83,16 @@
 		</div>
 
 		<div class="enunciado-wrap">
-			<h1 class="borde" id="enunciado">Observa la secuencia y elige qué sigue</h1>
+			<h1 class="borde" id="enunciado">Lleva el cohete por cada aro hasta la estrella</h1>
 		</div>
 
 		<div class="escenario" id="escenario">
-			<div class="escena-wrap" id="escena-wrap">
-				<div id="riel" class="riel" aria-live="polite"></div>
-				<div id="opciones" class="opciones" hidden></div>
+			<div class="escena-wrap escena-precision" id="escena-wrap">
+				<div id="capa-fondo" class="capa-fondo" aria-hidden="true"></div>
+				<div id="capa-decoro" class="capa-decoro" aria-hidden="true"></div>
+				<div id="capa-aros" class="capa-aros"></div>
+				<div id="capa-cohete" class="capa-cohete"></div>
+				<div id="capa-meta" class="capa-meta"></div>
 			</div>
 		</div>
 	</div>

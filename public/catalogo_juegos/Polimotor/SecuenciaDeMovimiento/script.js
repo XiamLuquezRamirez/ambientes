@@ -20,6 +20,7 @@
     let audioCache = Object.create(null);
     let imgCache = Object.create(null);
     let imagenesPromise = null;
+    let cuerpoElegido = "nina";
 
     function readText(ruta) {
         const xhr = new XMLHttpRequest();
@@ -144,12 +145,27 @@
         return a;
     }
 
+    function resolverCuerpo() {
+        const pedido = String((gameConfig && gameConfig.cuerpo) || "nina").toLowerCase();
+        cuerpoElegido = (pedido === "nino" || pedido === "niño") ? "nino" : "nina";
+        if (document.body) document.body.dataset.cuerpo = cuerpoElegido;
+    }
+
+    function carpetaCuerpo() {
+        const cuerpo = ((gameConfig && gameConfig.cuerpos) || {})[cuerpoElegido] || {};
+        return String(cuerpo.carpeta || ("../MemoriaCorporal/img/" + cuerpoElegido)).replace(/\/$/, "");
+    }
+
     function movMeta(id) {
-        return (gameConfig.movimientos && gameConfig.movimientos[id]) || { nombre: id, img: "" };
+        return (gameConfig.movimientos && gameConfig.movimientos[id])
+            || { nombre: id, archivo: id + ".png" };
     }
 
     function imgUrl(id) {
-        return movMeta(id).img || "";
+        const m = movMeta(id);
+        if (m.img) return m.img;
+        const archivo = m.archivo || (id + ".png");
+        return carpetaCuerpo() + "/" + archivo;
     }
 
     function nombreMov(id) {
@@ -233,7 +249,8 @@
         const urls = [];
         const movs = (gameConfig && gameConfig.movimientos) || {};
         Object.keys(movs).forEach(function (id) {
-            if (movs[id].img) urls.push(movs[id].img);
+            const url = imgUrl(id);
+            if (url) urls.push(url);
         });
         return urls;
     }
@@ -809,6 +826,55 @@
         else await resolverError(btnEl, gen);
     }
 
+    function feedbackDuracionMs() {
+        const n = Number(gameConfig && gameConfig.feedback && gameConfig.feedback.duracion);
+        return isFinite(n) && n > 0 ? n : 1200;
+    }
+
+    function feedbackConVoz(texto, opts) {
+        opts = opts || {};
+        const personaje = opts.personaje || "zoe";
+        const gif = opts.gif || "";
+        const minMs = opts.minMs != null ? opts.minMs : feedbackDuracionMs();
+        const imageHeight = opts.imageHeight || 140;
+
+        if (gameConfig && gameConfig.mostrarFeedBack === false) {
+            if (texto && typeof TextoVoz !== "undefined") {
+                return Promise.race([
+                    TextoVoz.hablar(texto, personaje).catch(function () {}),
+                    sleep(Math.max(minMs + 2500, 6000))
+                ]);
+            }
+            return Promise.resolve();
+        }
+
+        const pVoz = (texto && typeof TextoVoz !== "undefined")
+            ? TextoVoz.hablar(texto, personaje)
+            : Promise.resolve();
+        const swalOpts = {
+            title: texto || "",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            heightAuto: false,
+            scrollbarPadding: false
+        };
+        if (gif) {
+            swalOpts.imageUrl = gif;
+            swalOpts.imageHeight = imageHeight;
+        }
+        Swal.fire(swalOpts);
+        const topeMs = Math.max(minMs + 2500, 6000);
+        return Promise.race([
+            Promise.all([pVoz.catch(function () {}), sleep(minMs)]),
+            sleep(topeMs)
+        ]).then(function () {
+            try { Swal.close(); } catch (e) { /* noop */ }
+        }, function () {
+            try { Swal.close(); } catch (e) { /* noop */ }
+        });
+    }
+
     async function resolverError(btnEl, gen) {
         if (gen !== retoGen) return;
         esperandoFeedback = true;
@@ -820,18 +886,13 @@
             setTimeout(function () { btnEl.classList.remove("rechazo"); }, 600);
         }
         reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
-        TextoVoz.hablar(texto, "zeus");
-        await Swal.fire({
-            title: texto,
-            imageUrl: fb.gif || "../../images/incorrecto.gif",
-            imageHeight: 140,
-            timer: (gameConfig.feedback && gameConfig.feedback.duracion) || 1200,
-            showConfirmButton: false,
-            heightAuto: false,
-            scrollbarPadding: false
-        });
+        try {
+            await feedbackConVoz(texto, {
+                personaje: "zeus",
+                gif: fb.gif || "../../images/incorrecto.gif"
+            });
+        } catch (e) { /* noop */ }
         if (gen !== retoGen) return;
-        TextoVoz.detener();
         document.getElementById("opciones").hidden = true;
         await reproducirSecuencia(retoActual.prefijo || [], gen, true);
         if (gen !== retoGen) return;
@@ -864,18 +925,13 @@
         if (gen !== retoGen) return;
 
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
-        TextoVoz.hablar(texto, "zoe");
-        await Swal.fire({
-            title: texto,
-            imageUrl: fb.gif || "../../images/correcto.gif",
-            imageHeight: 140,
-            timer: (gameConfig.feedback && gameConfig.feedback.duracion) || 1200,
-            showConfirmButton: false,
-            heightAuto: false,
-            scrollbarPadding: false
-        });
+        try {
+            await feedbackConVoz(texto, {
+                personaje: "zoe",
+                gif: fb.gif || "../../images/correcto.gif"
+            });
+        } catch (e) { /* noop */ }
         if (gen !== retoGen) return;
-        TextoVoz.detener();
         esperandoFeedback = false;
         indiceReto += 1;
         iniciarRetoActual(gen);
@@ -897,6 +953,7 @@
         gameConfig = JSON.parse(readText("config.json"));
         introConfig = JSON.parse(readText("../../intro.json"));
         introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
+        resolverCuerpo();
         aplicarLetterSpacing();
 
         TextoVoz.iniciar(gameConfig, introConfig, {

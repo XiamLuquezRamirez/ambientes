@@ -1,0 +1,95 @@
+{
+  "nombre": "Arrastrar y soltar objetos",
+  "mostrarFeedBack": true,
+  "feedback": {
+    "duracion": 1300,
+    "acierto": {
+      "gif": "../../images/correcto.gif"
+    },
+    "error": {
+      "gif": "../../images/incorrecto.gif"
+    }
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "enunciado": "Arrastra cada objeto hasta el lugar donde corresponde",
+    "cierre": "¡Excelente! Ubicaste todos los objetos correctamente.",
+    "acierto": "¡Muy bien! Colocaste el objeto en su lugar.",
+    "error": "¡Inténtalo otra vez! Observa dónde corresponde.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Arrastra cada objeto hasta el lugar donde corresponde."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Mira la manzana, el taladro y el patito. Cada uno tiene su caja."
+      },
+      {
+        "personaje": 1,
+        "texto": "Toca un objeto, arrástralo y suéltalo en su lugar. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "fondo": "img/FONDO.png",
+  "pares": {
+    "manzana": "caja_manzana",
+    "taladro": "caja_herramientas",
+    "pato": "caja_juguetes"
+  },
+  "objetos": {
+    "manzana": { "nombre": "Manzana", "img": "img/MANZANA.png" },
+    "taladro": { "nombre": "Taladro", "img": "img/TALADRO.png" },
+    "pato": { "nombre": "Pato", "img": "img/PATO.png" }
+  },
+  "destinos": {
+    "caja_manzana": { "nombre": "Caja de manzanas", "img": "img/CAJA_MANZANA.png" },
+    "caja_herramientas": { "nombre": "Caja de herramientas", "img": "img/CAJA_HERRAMIENTAS.png" },
+    "caja_juguetes": { "nombre": "Caja de juguetes", "img": "img/CAJA_JUGUETES.png" },
+    "caja_ropa": { "nombre": "Caja de ropa", "img": "img/CAJA_ROPA.png" },
+    "caja_alimentos": { "nombre": "Caja de alimentos", "img": "img/CAJA_ALIMENTOS.png" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3 años",
+      "titulo": "1 ronda · 3 lugares",
+      "rondas": 1,
+      "objetos": ["manzana", "taladro", "pato"],
+      "destinos": ["caja_manzana", "caja_herramientas", "caja_juguetes"],
+      "barajarDestinos": false,
+      "barajarObjetos": false
+    },
+    {
+      "id": "4",
+      "edad": "4 años",
+      "titulo": "2 rondas · 4 lugares",
+      "rondas": 2,
+      "objetos": ["manzana", "taladro", "pato"],
+      "destinos": ["caja_manzana", "caja_herramientas", "caja_juguetes", "caja_ropa"],
+      "barajarDestinos": true,
+      "barajarObjetos": false
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "3 rondas · 5 lugares",
+      "rondas": 3,
+      "objetos": ["manzana", "taladro", "pato"],
+      "destinos": ["caja_manzana", "caja_herramientas", "caja_juguetes", "caja_ropa", "caja_alimentos"],
+      "barajarDestinos": true,
+      "barajarObjetos": true
+    }
+  ]
+}
