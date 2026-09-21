@@ -14,24 +14,24 @@
     "3": {
       "acierto": "¡Muy bien, lo hiciste!",
       "error": "Mira otra vez. ¡Vamos a intentarlo!",
-      "cierre": "¡Excelente, jugaste y completaste los movimientos!"
+      "cierre": "¡Lograste completar los movimientos!"
     },
     "4": {
       "acierto": "¡Muy bien, descubriste qué movimiento seguía!",
       "error": "Miremos otra vez. ¿Qué movimiento se repite?",
-      "cierre": "¡Excelente, descubriste los movimientos que seguían!"
+      "cierre": "¡Lograste descubrir los movimientos que seguían!"
     },
     "5": {
       "acierto": "¡Muy bien, descubriste el patrón!",
       "error": "Observa con atención. ¿Qué movimiento se repite?",
-      "cierre": "¡Excelente, descubriste los patrones y completaste las secuencias!"
+      "cierre": "¡Lograste descubrir los patrones y completar las secuencias!"
     }
   },
   "textos": {
     "eligeNivel": "Elige tu edad",
     "enunciado": "Observa la secuencia y elige qué sigue",
     "pregunta": "¿Qué movimiento sigue?",
-    "cierre": "¡Excelente, completaste las secuencias!",
+    "cierre": "¡Lograste completar las secuencias!",
     "acierto": "¡Muy bien, lo hiciste!",
     "error": "Mira otra vez. ¡Vamos a intentarlo!",
     "conversacion": [

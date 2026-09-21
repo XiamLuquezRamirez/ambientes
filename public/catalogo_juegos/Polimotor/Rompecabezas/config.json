@@ -1,6 +1,6 @@
 {
   "accesibilidad": {
-    "piezasVisibles": 3,
+    "piezasVisibles": 4,
     "tiempoMostrarCompleto": 3000,
     "tiempoVerDeNuevo": 3000,
     "porcentajeAcierto": 60,
@@ -33,7 +33,7 @@
   "textos": {
     "instruccion": "Hola, soy Zoe. ¡Vamos a jugar! Observa el cuerpo y arrastra cada pieza hasta el lugar donde corresponde.",
     "seOcultan": "La figura se esconderá en...",
-    "cierre": "¡Excelente, Completaste el rompecabezas del cuerpo humano!",
+    "cierre": "¡Lograste completar el rompecabezas del cuerpo humano!",
     "acierto": "¡Muy bien, lo hiciste genial!",
     "error": "Ya casi lo tienes, mira con atención y prueba otro lugar para esa pieza.",
     "conversacion": [
@@ -60,7 +60,7 @@
     ]
   }, 
   "cuerpo": "nina",
-  "edad": 4,
+  "edad": 3,
   "audios": {
     "acierto": "../../sounds/ok.mp3",
     "error": "../../sounds/over.mp3",

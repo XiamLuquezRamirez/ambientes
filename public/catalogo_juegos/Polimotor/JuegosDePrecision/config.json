@@ -15,7 +15,7 @@
     "textos": {
         "eligeNivel": "Elige tu edad",
         "enunciado": "Lleva el cohete por cada aro hasta la estrella",
-        "cierre": "¡Excelente! Completaste el recorrido de precisión.",
+        "cierre": "Completaste el recorrido de precisión.",
         "aciertoAro": "¡Muy bien! Sigue avanzando.",
         "aciertoRecorrido": "¡Genial! Completaste este recorrido.",
         "error": "¡Inténtalo otra vez! Mueve el cohete con cuidado.",

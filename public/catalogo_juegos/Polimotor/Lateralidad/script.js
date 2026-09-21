@@ -1480,7 +1480,7 @@
 
     function mostrarCierre() {
         juegoTerminado = true;
-        const cierre = textos().cierre || "¡Excelente! Practicaste izquierda y derecha.";
+        const cierre = textos().cierre || "Practicaste izquierda y derecha.";
         document.getElementById("texto_final").textContent = cierre;
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
         TextoVoz.hablar(cierre, "zoe");

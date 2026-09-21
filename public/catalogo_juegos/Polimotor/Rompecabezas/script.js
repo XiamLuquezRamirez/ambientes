@@ -1668,16 +1668,22 @@ function terminarJuego() {
     ocultarVistaCompleta();
     reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
     const cierre = (gameConfig.textos && gameConfig.textos.cierre) || "";
+    const voz = Math.random() < 0.5 ? "zoe" : "zeus";
     if (feedbackActivo()) {
-        TextoVoz.hablar(cierre, "zoe");
+        TextoVoz.hablar(cierre, voz);
     }
 
     setTimeout(function () {
         $("#principal").fadeOut(500);
         setTimeout(function () {
-            document.getElementById("final").style.backgroundImage = "url(../../images/victoria.gif)";
-            document.getElementById("texto_final").innerText = cierre;
-            $("#final").fadeToggle(1000);
+            const caja = document.getElementById("final");
+            const texto = document.getElementById("texto_final");
+            if (texto) texto.textContent = cierre;
+            if (caja) {
+                caja.hidden = false;
+                caja.style.display = "block";
+            }
+            if (typeof iniciarVictoria === "function") iniciarVictoria();
         }, 500);
     }, 400);
 }
