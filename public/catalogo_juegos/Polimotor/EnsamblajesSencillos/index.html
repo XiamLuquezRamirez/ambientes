@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Ensamblajes sencillos</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="/assets/css/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="/assets/css/fonts.css">
+	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
+	<script src="/assets/js/jquery-4.0.0.min.js"></script>
+	<script src="/assets/js/sweetalert.js"></script>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body class="esperando-inicio">
+	<div id="pantalla-inicio" class="pantalla-inicio">
+		<div class="inicio-mancha" aria-hidden="true"></div>
+		<div class="inicio-contenido">
+			<p class="inicio-kicker">Ensamblajes sencillos</p>
+			<button type="button" id="btn-empecemos" class="btn-empecemos">
+				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
+				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
+				<span class="btn-empecemos-texto">¡Empecemos!</span>
+			</button>
+			<p class="inicio-ayuda">Toca para escuchar a Zoe y Zeus</p>
+		</div>
+	</div>
+	<div style="display: none" class="overlay">
+		<div id="personajes-container"></div>
+		<div class="nube nube-centro">
+			<img src="../../images/nube.png" id="nube_img" class="nube_img" alt="">
+			<div class="nube-contenido">
+				<p class="borde2" id="bienvenida"></p>
+			</div>
+		</div>
+		<div style="z-index: 1003;position: absolute;top: 20pt;left: 20pt;">
+			<button onclick="cerrar_anuncio()" id="btnomitir" class="btn btn-warning" style="width: auto; padding: 4pt; border-radius: 8pt; font-size: 30px; color: black;">Omitir <i style="color: black" class="fa fa-forward" aria-hidden="true"></i></button>
+		</div>
+	</div>
+
+	<div style="display: none; background-color: rgba(255, 255, 255, 0.664); width: 100%; height: 100%; position: fixed; z-index: 100;" id="fondo_blanco"></div>
+
+	<div style="display: none; text-align: center;" id="final" class="final">
+		<h1 style="font-size: 25pt; padding-top: 326pt; padding-bottom: 0px;" class="borde2" id="texto_final"></h1>
+		<hr>
+		<div class="row">
+			<div class="col-12" style="padding-bottom: 0pt; margin-top: 0px;">
+				<h1 style="font-size: 25pt; padding: 12px;" class="borde2">¿Quieres jugar nuevamente?</h1>
+			</div>
+			<div class="col-3"></div>
+			<div class="col-3 text-center">
+				<button style="width: 80%; height: 50px !important; border-radius: 20pt; font-size: 23px;" onclick="window.location.reload(1)" class="btn btn-success">Si, jugar</button>
+			</div>
+			<div class="col-3 text-center">
+				<button style="width: 80%; height: 50px !important; border-radius: 20pt; font-size: 23px;" onclick="history.back()" class="btn btn-danger">No, salir</button>
+			</div>
+			<div class="col-3"></div>
+		</div>
+	</div>
+
+	<div id="principal">
+		<div class="hud-top">
+			<div class="hud-nav">
+				<div id="progreso" class="hud-progreso" hidden></div>
+				<button type="button" id="btn-ver" class="btn btn-success btn-round" title="Pista" hidden><i class="fa-solid fa-eye"></i></button>
+				<button onclick="location.reload()" class="btn btn-warning btn-round"><i class="fa-solid fa-rotate"></i></button>
+				<button onclick="history.back()" class="btn btn-danger btn-round"><i class="fa-solid fa-arrow-left"></i></button>
+			</div>
+		</div>
+
+		<div class="escenario" id="escenario" style="padding-top: 15px;">
+			<div class="lienzo-wrap">
+				<div id="lienzo">
+					<img id="img-silueta" alt="Silueta guía" hidden>
+					<img id="img-completo" alt="Figura completa" hidden>
+					<div id="zonas"></div>
+					<div id="piezas-colocadas"></div>
+				</div>
+			</div>
+			<div id="bandeja" class="bandeja">
+				<div id="cuenta" class="cuenta" hidden></div>
+			</div>
+			<div id="referencia-completa" class="referencia-completa" hidden>
+				<img id="referencia-img" alt="Figura de ayuda">
+			</div>
+		</div>
+	</div>
+
+	<div id="zoom-pieza" class="zoom-pieza" hidden></div>
+
+	<div id="menu-vol" class="menu-acc">
+		<button type="button" id="btn-menu-vol" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-vol-panel" title="Volumen de fondo">
+			<i class="fa-solid fa-volume-high"></i>
+		</button>
+		<div id="menu-vol-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab">
+				<strong>Volumen de fondo</strong>
+				<button type="button" id="btn-cerrar-vol" class="menu-acc-cerrar" aria-label="Cerrar">×</button>
+			</div>
+			<label class="menu-acc-op menu-acc-rango">
+				<span>Volumen <strong id="vol-val">20</strong></span>
+				<input type="range" id="rango-volumen" min="0" max="100" step="1" value="20">
+			</label>
+		</div>
+	</div>
+
+	<script src="../../texto_voz.js"></script>
+	<script src="script.js"></script>
+</body>
+</html>

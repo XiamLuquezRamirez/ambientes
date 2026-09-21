@@ -1,0 +1,115 @@
+{
+  "accesibilidad": {
+    "piezasVisibles": 3,
+    "tiempoMostrarCompleto": 3000,
+    "tiempoVerDeNuevo": 3000,
+    "porcentajeAcierto": 60,
+    "fallosPista1": 2,
+    "fallosPista2": 3,
+    "mostrarFeedBack": true,
+    "feedback": {
+      "duracion": 2000,
+      "acierto": { "gif": "../../images/correcto.gif" },
+      "error": { "gif": "../../images/incorrecto.gif" }
+    },
+    "altoContraste": false,
+    "modoTap": false,
+    "zoomLongPress": false,
+    "huecosPunteados": false,
+    "grillaFija": true,
+    "resaltarDestino": false,
+    "verBotonVerDeNuevo": true,
+    "pistaPorFallos": true,
+    "mostrarProgreso": true,
+    "cuentaRegresiva": true,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "textos": {
+    "instruccion": "Hola, soy Zoe. ¡Vamos a armar el robot! Observa las piezas y colócalas en su lugar.",
+    "seOcultan": "El robot se esconderá en...",
+    "cierre": "¡Excelente! Completaste el ensamblaje del robot.",
+    "acierto": "¡Muy bien, esa pieza va ahí!",
+    "error": "Ya casi. Mira con atención y prueba otro lugar.",
+    "conversacion": [
+      {
+        "personaje": 0,
+        "texto": "¡Hola! Soy Zeus.<br>Hoy vamos a ensamblar un robot con piezas sencillas."
+      },
+      {
+        "personaje": 1,
+        "texto": "¡Yo soy Zoe!<br>Verás la figura completa y luego tendrás que colocar cada parte."
+      },
+      {
+        "personaje": 0,
+        "texto": "Mira muy bien el robot.<br>Después arrastra cada pieza hasta el lugar correcto."
+      },
+      {
+        "personaje": 1,
+        "texto": "Ve con calma y observa cada forma.<br>¡Tú puedes armarlo!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Si necesitas una pista, toca el botón del ojo en la parte superior."
+      }
+    ]
+  },
+  "cuerpo": "robot",
+  "edad": 3,
+  "audios": {
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "cuerpos": {
+    "robot": {
+      "nombre": "Robot",
+      "carpeta": "img/robot",
+      "svg": {
+        "4": {
+          "lienzo": { "w": 1570.14, "h": 1186.51 },
+          "escala": 122,
+          "piezas": [
+            { "id": "piernas", "archivo": "piernas.svg", "nombre": "Piernas", "x": -4, "y": 49.5 },
+            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 3.6, "y": 16 },
+            { "id": "brazos", "archivo": "brazos.svg", "nombre": "Brazos", "x": 1.35, "y": 23 },
+            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": 6.9, "y": -35 }
+          ]
+        },
+        "6": {
+          "lienzo": { "w": 1391.57, "h": 1186.51 },
+          "escala": 92,
+          "piezas": [
+            { "id": "pierna_1", "archivo": "pierna_1.svg", "nombre": "Pierna", "x": 11.2, "y": 0 },
+            { "id": "pierna_2", "archivo": "pierna_2.svg", "nombre": "Pierna", "x": 11.2, "y": 0 },
+            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 0, "y": 0 },
+            { "id": "brazo_1", "archivo": "brazo_1.svg", "nombre": "Brazo", "x": 11.2, "y": 0 },
+            { "id": "brazo_2", "archivo": "brazo_2.svg", "nombre": "Brazo", "x": 11.2, "y": 0 },
+            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": 0, "y": 0 }
+          ]
+        },
+        "8": {
+          "lienzo": { "w": 1378.11, "h": 1186.51 },
+          "escala": 92,
+          "piezas": [
+            { "id": "pierna_1", "archivo": "pierna_1.svg", "nombre": "Pierna", "x": 9.6, "y": 0 },
+            { "id": "pierna_2", "archivo": "pierna_2.svg", "nombre": "Pierna", "x": 9.6, "y": 0 },
+            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 0, "y": 0 },
+            { "id": "brazo_1", "archivo": "brazo_1.svg", "nombre": "Brazo", "x": 9.6, "y": 0 },
+            { "id": "brazo_2", "archivo": "brazo_2.svg", "nombre": "Brazo", "x": 9.6, "y": 0 },
+            { "id": "mano_1", "archivo": "mano_1.svg", "nombre": "Mano", "x": 9.6, "y": 0 },
+            { "id": "mano_2", "archivo": "mano_2.svg", "nombre": "Mano", "x": 9.6, "y": 0 },
+            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": 0, "y": 0 }
+          ]
+        }
+      }
+    }
+  },
+  "niveles": [
+    { "id": "4", "edad": "3 años", "titulo": "4 piezas" },
+    { "id": "6", "edad": "4 años", "titulo": "6 piezas" },
+    { "id": "8", "edad": "5-6 años", "titulo": "8 piezas" }
+  ]
+}
