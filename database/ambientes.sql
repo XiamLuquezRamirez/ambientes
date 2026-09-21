@@ -1099,6 +1099,8 @@ CREATE TABLE `juegos` (
 /*Data for the table `juegos` */
 
 insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo_juego_id`,`ruta`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
+('coordinacion-visual',7,NULL,NULL,NULL,7,'catalogo_juegos/Polimotor/CoordinacionVisual','Coordinación visual','Guiar el cohete por los aros con precisión según el nivel de edad.','fa-bullseye','#42a5f5',7,1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
+('ensamblajes-sencillos',7,NULL,NULL,NULL,8,'catalogo_juegos/Polimotor/EnsamblajesSencillos','Ensamblajes sencillos','Armar el robot arrastrando piezas según el nivel de edad.','fa-robot','#ffab91',8,1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
 ('laberintos-de-coordinacion',7,NULL,NULL,NULL,5,'catalogo_juegos/Polimotor/LaberintosDeCoordinacion','Laberintos de coordinacion',NULL,'fa-chess-knight','#2563eb',5,1,'2026-09-12 08:48:03','2026-09-14 09:17:38'),
 ('lateralidad',7,NULL,NULL,NULL,3,'catalogo_juegos/Polimotor/Lateralidad','Lateralidad (derecha/izquierda)','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','fa-arrows-left-right','#a5d6a7',3,1,'2026-09-09 17:47:30','2026-09-09 17:47:30'),
 ('memoria-corporal',7,NULL,NULL,NULL,4,'catalogo_juegos/Polimotor/MemoriaCorporal','Memoria Corporal',NULL,'fa-puzzle-piece','#2563eb',4,1,'2026-09-14 15:48:10','2026-09-14 15:48:10'),
@@ -4423,7 +4425,7 @@ CREATE TABLE `tipos_juegos` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `tipos_juegos_slug_unique` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `tipos_juegos` */
 
@@ -4433,7 +4435,9 @@ insert  into `tipos_juegos`(`id`,`slug`,`nombre`,`descripcion`,`activo`,`created
 (3,'lateralidad','Lateralidad','Juego para trabajar la identificación de derecha e izquierda.',1,'2026-09-09 17:47:30','2026-09-09 17:47:30'),
 (4,'memoria','Memoria','Juego de memoria relacionado con las partes del cuerpo.',1,'2026-09-14 15:48:10','2026-09-14 15:48:10'),
 (5,'laberinto','Laberinto','Juego de recorrido mediante laberintos para trabajar la coordinación.',1,'2026-09-12 08:48:03','2026-09-12 08:48:03'),
-(6,'secuencia_movimiento','Secuencia de movimiento','Juego para ordenar y reconocer secuencias de movimientos.',1,'2026-09-14 09:20:46','2026-09-14 09:20:46');
+(6,'secuencia_movimiento','Secuencia de movimiento','Juego para ordenar y reconocer secuencias de movimientos.',1,'2026-09-14 09:20:46','2026-09-14 09:20:46'),
+(7,'precision','Precisión','Juego de coordinación visual y precisión de movimiento.',1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
+(8,'ensamblaje','Ensamblaje','Juego para armar un robot mediante piezas sencillas.',1,'2026-09-21 14:30:00','2026-09-21 14:30:00');
 
 /*Table structure for table `users` */
 
