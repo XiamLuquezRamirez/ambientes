@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<title>Secuencia de movimiento</title>
+	<title>Arrastrar y soltar objetos</title>
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<link rel="stylesheet" href="/assets/css/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css">
@@ -12,20 +12,21 @@
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
 	<link rel="stylesheet" href="style.css">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/manos_arriba.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/manos_abajo.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/tocar_cabeza.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/tocar_barriga.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/tocar_hombros.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/tocar_rodillas.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/abrir_brazos.png">
-	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/manos_al_frente.png">
+	<link rel="preload" as="image" href="img/FONDO.png">
+	<link rel="preload" as="image" href="img/MANZANA.png">
+	<link rel="preload" as="image" href="img/TALADRO.png">
+	<link rel="preload" as="image" href="img/PATO.png">
+	<link rel="preload" as="image" href="img/CAJA_MANZANA.png">
+	<link rel="preload" as="image" href="img/CAJA_HERRAMIENTAS.png">
+	<link rel="preload" as="image" href="img/CAJA_JUGUETES.png">
+	<link rel="preload" as="image" href="img/CAJA_ROPA.png">
+	<link rel="preload" as="image" href="img/CAJA_ALIMENTOS.png">
 </head>
 <body class="esperando-inicio">
 	<div id="pantalla-inicio" class="pantalla-inicio">
 		<div class="inicio-mancha" aria-hidden="true"></div>
 		<div class="inicio-contenido">
-			<p class="inicio-kicker">Secuencia de movimiento</p>
+			<p class="inicio-kicker">Arrastrar y soltar objetos</p>
 			<button type="button" id="btn-empecemos" class="btn-empecemos">
 				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
 				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
@@ -85,13 +86,13 @@
 		</div>
 
 		<div class="enunciado-wrap">
-			<h1 class="borde" id="enunciado">Observa la secuencia y elige qué sigue</h1>
+			<h1 class="borde" id="enunciado">Arrastra cada objeto hasta su lugar</h1>
 		</div>
 
 		<div class="escenario" id="escenario">
-			<div class="escena-wrap" id="escena-wrap">
-				<div id="riel" class="riel" aria-live="polite"></div>
-				<div id="opciones" class="opciones" hidden></div>
+			<div class="escena-wrap escena-arrastre" id="escena-wrap">
+				<div id="zona-destinos" class="zona-destinos" aria-label="Lugares"></div>
+				<div id="zona-objetos" class="zona-objetos" aria-label="Objetos"></div>
 			</div>
 		</div>
 	</div>

@@ -837,14 +837,25 @@ function cfgFeedback(tipo) {
     };
 }
 
+/** Swal + TTS: espera la voz (con tope) y cierra el modal sin quedar colgado. */
 function mostrarFeedback(tipo) {
-    if (!feedbackActivo()) return Promise.resolve();
+    if (!feedbackActivo()) {
+        const cfgSilent = cfgFeedback(tipo);
+        if (cfgSilent.texto && typeof TextoVoz !== "undefined") {
+            return TextoVoz.hablar(cfgSilent.texto, tipo === "error" ? "zeus" : "zoe").catch(function () {});
+        }
+        return Promise.resolve();
+    }
     const cfg = cfgFeedback(tipo);
+    const pj = tipo === "error" ? "zeus" : "zoe";
+    const minMs = cfg.duracion || 1800;
+    const pVoz = (cfg.texto && typeof TextoVoz !== "undefined")
+        ? TextoVoz.hablar(cfg.texto, pj)
+        : Promise.resolve();
     const opts = {
         position: "center",
         title: cfg.texto,
         showConfirmButton: false,
-        timer: cfg.duracion,
         allowOutsideClick: false,
         allowEscapeKey: false,
         heightAuto: false,
@@ -857,7 +868,16 @@ function mostrarFeedback(tipo) {
         opts.imageWidth = 250;
         opts.imageHeight = 250;
     }
-    return Swal.fire(opts);
+    Swal.fire(opts);
+    const topeMs = Math.max(minMs + 2500, 6000);
+    return Promise.race([
+        Promise.all([pVoz.catch(function () {}), sleep(minMs)]),
+        sleep(topeMs)
+    ]).then(function () {
+        try { Swal.close(); } catch (e) { /* noop */ }
+    }, function () {
+        try { Swal.close(); } catch (e) { /* noop */ }
+    });
 }
 
 function iluminarZonas(ids) {
@@ -902,11 +922,15 @@ function resolverAcierto(idsTocadas) {
     mostrarFeedback("acierto").then(function () {
         indicePregunta += 1;
         esperandoFeedback = false;
+        document.body.classList.remove("bloqueado");
         if (indicePregunta >= preguntas.length) {
             terminarJuego();
             return;
         }
         mostrarPreguntaActual();
+    }).catch(function () {
+        esperandoFeedback = false;
+        document.body.classList.remove("bloqueado");
     });
 }
 
@@ -920,6 +944,9 @@ function resolverError() {
         esperandoFeedback = false;
         document.body.classList.remove("bloqueado");
         actualizarAyudasVisuales();
+    }).catch(function () {
+        esperandoFeedback = false;
+        document.body.classList.remove("bloqueado");
     });
 }
 

@@ -1170,14 +1170,23 @@
             cancelAnimationFrame(rafId);
             rafId = null;
         }
-        TextoVoz.detener();
-        indiceLaberinto += 1;
-        esperandoFeedback = false;
-        if (indiceLaberinto >= laberintos.length) {
-            mostrarCierre();
-        } else {
+        const fb = (gameConfig.feedback && gameConfig.feedback.acierto) || {};
+        const texto = textos().acierto || fb.texto || "¡Muy bien! Llegaste hasta el cohete.";
+        feedbackConVoz(texto, {
+            personaje: "zoe",
+            gif: fb.gif || "../../images/correcto.gif"
+        }).then(function () {
+            indiceLaberinto += 1;
+            esperandoFeedback = false;
+            if (indiceLaberinto >= laberintos.length) {
+                mostrarCierre();
+            } else {
+                iniciarLaberintoActual();
+            }
+        }).catch(function () {
+            esperandoFeedback = false;
             iniciarLaberintoActual();
-        }
+        });
     }
 
     function programarRedibujo() {
@@ -1229,6 +1238,55 @@
         return dist(p, personaje) <= radio;
     }
 
+    function feedbackDuracionMs() {
+        const n = Number(gameConfig && gameConfig.feedback && gameConfig.feedback.duracion);
+        return isFinite(n) && n > 0 ? n : 1200;
+    }
+
+    function feedbackConVoz(texto, opts) {
+        opts = opts || {};
+        const personaje = opts.personaje || "zoe";
+        const gif = opts.gif || "";
+        const minMs = opts.minMs != null ? opts.minMs : feedbackDuracionMs();
+        const imageHeight = opts.imageHeight || 160;
+
+        if (gameConfig && gameConfig.mostrarFeedBack === false) {
+            if (texto && typeof TextoVoz !== "undefined") {
+                return Promise.race([
+                    TextoVoz.hablar(texto, personaje).catch(function () {}),
+                    sleep(Math.max(minMs + 2500, 6000))
+                ]);
+            }
+            return Promise.resolve();
+        }
+
+        const pVoz = (texto && typeof TextoVoz !== "undefined")
+            ? TextoVoz.hablar(texto, personaje)
+            : Promise.resolve();
+        const swalOpts = {
+            title: texto || "",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            heightAuto: false,
+            scrollbarPadding: false
+        };
+        if (gif) {
+            swalOpts.imageUrl = gif;
+            swalOpts.imageHeight = imageHeight;
+        }
+        Swal.fire(swalOpts);
+        const topeMs = Math.max(minMs + 2500, 6000);
+        return Promise.race([
+            Promise.all([pVoz.catch(function () {}), sleep(minMs)]),
+            sleep(topeMs)
+        ]).then(function () {
+            try { Swal.close(); } catch (e) { /* noop */ }
+        }, function () {
+            try { Swal.close(); } catch (e) { /* noop */ }
+        });
+    }
+
     function falloCamino(mensaje) {
         if (esperandoFeedback || juegoTerminado) return;
         esperandoFeedback = true;
@@ -1249,24 +1307,14 @@
         const fb = (gameConfig.feedback && gameConfig.feedback.error) || {};
         const texto = mensaje || textos().error || fb.texto || "¡Te saliste del laberinto! Vuelve al pasillo.";
         reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
-        TextoVoz.hablar(texto, "zoe");
 
-        if (gameConfig.mostrarFeedBack === false) {
-            esperandoFeedback = false;
-            return;
-        }
-
-        Swal.fire({
-            title: texto,
-            imageUrl: fb.gif || "../../images/incorrecto.gif",
-            imageHeight: 160,
-            timer: (gameConfig.feedback && gameConfig.feedback.duracion) || 1100,
-            showConfirmButton: false,
-            heightAuto: false,
-            scrollbarPadding: false
+        feedbackConVoz(texto, {
+            personaje: "zoe",
+            gif: fb.gif || "../../images/incorrecto.gif"
         }).then(function () {
             esperandoFeedback = false;
-            TextoVoz.detener();
+        }).catch(function () {
+            esperandoFeedback = false;
         });
     }
 

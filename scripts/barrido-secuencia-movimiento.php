@@ -102,19 +102,31 @@ foreach (['.riel', '.slot-pose', '.tarjeta-opcion', 'entradaIzquierda'] as $need
     }
 }
 
-echo "\n=== SECUENCIA MOVIMIENTO: media ===\n";
+echo "\n=== SECUENCIA MOVIMIENTO: media (reusa Memoria Corporal) ===\n";
 
-$svgs = [
-    'manos_arriba', 'manos_abajo', 'brazos_abiertos', 'brazos_cerrados',
-    'manos_cabeza', 'manos_barriga', 'tocar_hombros', 'manos_rodillas',
-    'manos_frente', 'tocar_cabeza',
+$movIds = [
+    'manos_arriba', 'manos_abajo', 'tocar_cabeza', 'tocar_barriga',
+    'tocar_hombros', 'tocar_rodillas', 'abrir_brazos', 'manos_al_frente',
 ];
-foreach ($svgs as $s) {
-    $p = $dir.'/img/'.$s.'.svg';
-    if (! is_file($p)) {
-        fail("Falta img/{$s}.svg");
+$memBase = public_path('catalogo_juegos/Polimotor/MemoriaCorporal/img');
+foreach (['nina', 'nino'] as $cuerpo) {
+    foreach ($movIds as $s) {
+        $p = $memBase.'/'.$cuerpo.'/'.$s.'.png';
+        if (! is_file($p)) {
+            fail("Falta MemoriaCorporal/img/{$cuerpo}/{$s}.png");
+        } else {
+            ok("PNG Memoria {$cuerpo}/{$s}");
+        }
+    }
+}
+
+$svgDir = $dir.'/img';
+if (is_dir($svgDir)) {
+    $svgsRestantes = glob($svgDir.'/*.svg') ?: [];
+    if ($svgsRestantes) {
+        warn('Quedan SVG locales en img/ ('.count($svgsRestantes).'); el juego ya no los usa');
     } else {
-        ok("SVG {$s}");
+        ok('Sin SVG locales propios (reusa Memoria)');
     }
 }
 
@@ -155,12 +167,22 @@ if (! empty($config['stub'])) {
 }
 
 $movs = $config['movimientos'] ?? [];
-foreach ($svgs as $s) {
-    if (empty($movs[$s]['img'])) {
-        fail("movimientos.{$s} sin img");
+foreach ($movIds as $s) {
+    if (empty($movs[$s]['archivo']) && empty($movs[$s]['img'])) {
+        fail("movimientos.{$s} sin archivo/img");
     }
 }
-ok('Catálogo de movimientos completo ('.count($svgs).')');
+ok('Catálogo de movimientos completo ('.count($movIds).')');
+
+$cuerpos = $config['cuerpos'] ?? [];
+foreach (['nina', 'nino'] as $cuerpo) {
+    $carpeta = (string) ($cuerpos[$cuerpo]['carpeta'] ?? '');
+    if ($carpeta === '' || ! str_contains($carpeta, 'MemoriaCorporal')) {
+        fail("cuerpos.{$cuerpo}.carpeta debe apuntar a MemoriaCorporal");
+    } else {
+        ok("cuerpos.{$cuerpo} → {$carpeta}");
+    }
+}
 
 $esperados = [
     '3' => 3,
@@ -232,26 +254,30 @@ if (! is_array($conv) || count($conv) < 1) {
     ok('conversación en config ('.count($conv).' líneas)');
 }
 
-$juegoSrc = file_get_contents(app_path('Models/Juego.php'));
-if (str_contains($juegoSrc, "'secuencia_movimiento'")) {
-    ok('TIPOS_LABELS incluye secuencia_movimiento');
+$tipos = \App\Models\Juego::tiposCatalogo();
+if (isset($tipos['secuencia_movimiento'])) {
+    ok('tipos_juegos incluye secuencia_movimiento');
 } else {
-    fail('TIPOS_LABELS sin secuencia_movimiento');
+    fail('tipos_juegos sin secuencia_movimiento');
 }
 
 echo "\n=== SECUENCIA MOVIMIENTO: BD ===\n";
 
-if (Schema::hasTable('juegos')) {
-    $fila = DB::table('juegos')
+if (\Illuminate\Support\Facades\Schema::hasTable('juegos')) {
+    $fila = \Illuminate\Support\Facades\DB::table('juegos')
         ->where('ruta', 'like', '%SecuenciaDeMovimiento%')
         ->first();
     if (! $fila) {
         warn('No hay fila en juegos para SecuenciaDeMovimiento');
     } else {
-        if ($fila->tipo !== 'secuencia_movimiento') {
-            fail("BD tipo={$fila->tipo}, esperado secuencia_movimiento");
+        $tipoSlug = null;
+        if (! empty($fila->tipo_juego_id) && \Illuminate\Support\Facades\Schema::hasTable('tipos_juegos')) {
+            $tipoSlug = \App\Models\TiposJuego::query()->whereKey($fila->tipo_juego_id)->value('slug');
+        }
+        if ($tipoSlug !== 'secuencia_movimiento') {
+            fail('BD tipo='.($tipoSlug ?: 'null').', esperado secuencia_movimiento');
         } else {
-            ok("BD slug={$fila->slug} activo=".((int) $fila->activo)." tipo={$fila->tipo}");
+            ok("BD slug={$fila->slug} activo=".((int) $fila->activo)." tipo={$tipoSlug}");
         }
         $idx = public_path(trim($fila->ruta, '/').'/index.html');
         if (! is_file($idx)) {

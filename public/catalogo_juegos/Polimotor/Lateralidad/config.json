@@ -4,10 +4,12 @@
   "feedback": {
     "duracion": 1200,
     "acierto": {
-      "gif": "../../images/correcto.gif"
+      "gif": "../../images/correcto.gif",
+      "texto": "¡Muy bien, lo hiciste genial!"
     },
     "error": {
-      "gif": "../../images/incorrecto.gif"
+      "gif": "../../images/incorrecto.gif",
+      "texto": "Inténtalo otra vez. ¡Tú puedes!"
     }
   },
   "textos": {
@@ -43,9 +45,9 @@
     "fondo": "../../sounds/fondo.mp3"
   },
   "timings": {
-    "pasoMovMs": 850,
-    "pasoSenalMs": 900,
-    "introLadoMs": 500
+    "pasoMovMs": 1000,
+    "pasoSenalMs": 1100,
+    "introLadoMs": 550
   },
   "objetos": {
     "oso": { "nombre": "oso", "img": "img/Oso.png" },
@@ -55,7 +57,7 @@
     "celular": { "nombre": "celular", "img": "img/Celular.png" },
     "manzana": { "nombre": "manzana", "img": "img/Manzana.png" },
     "mariposa": { "nombre": "mariposa", "img": "img/Mariposa.png" },
-    "mariposa_movimiento": { "nombre": "mariposa", "img": "img/Mariposa.gif" },
+    "mariposa_movimiento": { "nombre": "mariposa", "img": "img/Mariposa.png" },
     "conejo": { "nombre": "conejo", "img": "img/Conejo.png" }
   },
   "coloresZona": {
