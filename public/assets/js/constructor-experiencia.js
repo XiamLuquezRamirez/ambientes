@@ -664,7 +664,7 @@
         const selected = catalogoId && String(catalogoId) === String(selectedCatalogoId || '');
         const icon = j.icono || 'fa-gamepad';
         const iconClass = icon.indexOf('fa-') === 0 ? icon : `fa-${icon}`;
-        const color = j.color || '#2563eb';
+        const color = j.color || '#64748b';
         const cadena = j.cadena || {};
         const tipoLabel = j.tipo_label || j.tipo || '';
         const descripcion = (j.descripcion || '').trim();
@@ -727,7 +727,7 @@
             data-juego-id="${escapar(motorId)}"
             data-juego-nombre="${escapar(j.nombre || '')}" aria-pressed="${selected ? 'true' : 'false'}"
             ${puedeEditar ? '' : 'disabled'}>
-            <span class="cx-juego-card-icon" style="--cx-juego-color:${escapar(j.color || '#2563eb')}">
+            <span class="cx-juego-card-icon" style="--cx-juego-color:${escapar(j.color || '#64748b')}">
                 <i class="fa-solid ${escapar(iconClass)}" aria-hidden="true"></i>
             </span>
             <span class="cx-juego-card-body">

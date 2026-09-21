@@ -1019,7 +1019,9 @@
             p = { x: coheteVuelo.x, y: coheteVuelo.y };
             size *= coheteVuelo.escala;
             rot = coheteVuelo.rot || 0;
-            dibujarEstelaCohete(p, size, coheteVuelo.t);
+            if (coheteVuelo.fase !== "bajada") {
+                dibujarEstelaCohete(p, size, coheteVuelo.t);
+            }
         } else {
             p = aPixel(meta);
             const bounce = pelotaVictoria ? Math.sin(anim * 0.25) * 8 : 0;
@@ -1093,16 +1095,20 @@
     function redibujar() {
         if (!ctx || !nivelElegido) return;
         const lab = laberintoActual();
-        if (!lab) return;
+        if (!lab && !(coheteVuelo && coheteVuelo.activo)) return;
 
-        asegurarCapaEstatica(lab);
-        const s = tamañoLogico();
-        ctx.clearRect(0, 0, s.w, s.h);
-        ctx.drawImage(capaEstatica, 0, 0);
+        if (lab) {
+            asegurarCapaEstatica(lab);
+            const s = tamañoLogico();
+            ctx.clearRect(0, 0, s.w, s.h);
+            ctx.drawImage(capaEstatica, 0, 0);
 
-        const geo = inicioMeta(lab);
-        dibujarNino();
-        dibujarCohete(geo.meta, pelotaAnim);
+            const geo = inicioMeta(lab);
+            if (!(coheteVuelo && coheteVuelo.activo && coheteVuelo.fase === "subida" && coheteVuelo.ocultarNino)) {
+                dibujarNino();
+            }
+            dibujarCohete(geo.meta, pelotaAnim);
+        }
 
         if (coheteVuelo && coheteVuelo.activo) {
             avanzarVueloCohete();
@@ -1113,47 +1119,122 @@
         }
     }
 
+    function prepararLaberintoTrasVuelo() {
+        const lab = laberintoActual();
+        if (!lab) return null;
+        pelotaVictoria = false;
+        modoVictoria = false;
+        pelotaAnim = 0;
+        labCapaId = null;
+        const geo = inicioMeta(lab);
+        personaje = { x: geo.inicio.x, y: geo.inicio.y };
+        ultimoValido = { x: geo.inicio.x, y: geo.inicio.y };
+        arrastrando = false;
+        pointerId = null;
+        canvas.classList.remove("arrastrando");
+        actualizarProgreso();
+        return geo;
+    }
+
     function avanzarVueloCohete() {
         if (!coheteVuelo || !coheteVuelo.activo) return;
         coheteVuelo.t += 1;
 
-        // Fase corta de “carga” (vibra / se prepara) antes de subir.
-        if (coheteVuelo.t < coheteVuelo.prepFrames) {
+        if (coheteVuelo.fase === "prep") {
             coheteVuelo.x = coheteVuelo.origenX + Math.sin(coheteVuelo.t * 0.9) * 2.2;
             coheteVuelo.y = coheteVuelo.origenY + Math.cos(coheteVuelo.t * 1.1) * 1.4;
+            if (coheteVuelo.t >= coheteVuelo.prepFrames) {
+                coheteVuelo.fase = "subida";
+                coheteVuelo.tVuelo = 0;
+            }
             return;
         }
 
-        const vuelo = coheteVuelo.t - coheteVuelo.prepFrames;
-        // Aceleración suave al inicio; más tarde sube más rápido.
-        const accel = 0.12 + Math.min(0.35, vuelo * 0.004);
-        coheteVuelo.vy -= accel;
-        coheteVuelo.x += coheteVuelo.vx + Math.sin(vuelo * 0.05) * 0.25;
-        coheteVuelo.y += coheteVuelo.vy;
-        coheteVuelo.escala = Math.max(0.2, 1 - vuelo * 0.0035);
-        coheteVuelo.rot = Math.sin(vuelo * 0.035) * 0.1;
+        if (coheteVuelo.fase === "subida") {
+            coheteVuelo.tVuelo += 1;
+            const vuelo = coheteVuelo.tVuelo;
+            const accel = 0.12 + Math.min(0.35, vuelo * 0.004);
+            coheteVuelo.vy -= accel;
+            coheteVuelo.x += coheteVuelo.vx + Math.sin(vuelo * 0.05) * 0.25;
+            coheteVuelo.y += coheteVuelo.vy;
+            coheteVuelo.escala = Math.max(0.35, 1 - vuelo * 0.003);
+            coheteVuelo.rot = Math.sin(vuelo * 0.035) * 0.1;
+            coheteVuelo.ocultarNino = vuelo > 18;
 
-        const fuera = coheteVuelo.y < -160 || vuelo > coheteVuelo.maxFrames;
-        if (fuera) {
-            finalizarVueloCohete();
+            if (coheteVuelo.y < -140 || vuelo > coheteVuelo.maxSubida) {
+                if (!coheteVuelo.haySiguiente) {
+                    finalizarVueloCohete({ cierre: true });
+                    return;
+                }
+                // Trae el siguiente laberinto: cambia el escenario y baja a la nueva meta.
+                indiceLaberinto += 1;
+                const geo = prepararLaberintoTrasVuelo();
+                if (!geo) {
+                    finalizarVueloCohete({ cierre: true });
+                    return;
+                }
+                const destino = aPixel(geo.meta);
+                coheteVuelo.fase = "bajada";
+                coheteVuelo.tVuelo = 0;
+                coheteVuelo.x = destino.x + (Math.random() < 0.5 ? -40 : 40);
+                coheteVuelo.y = -120;
+                coheteVuelo.destinoX = destino.x;
+                coheteVuelo.destinoY = destino.y;
+                coheteVuelo.vx = 0;
+                coheteVuelo.vy = 3.2;
+                coheteVuelo.escala = 0.45;
+                coheteVuelo.rot = 0;
+                coheteVuelo.ocultarNino = false;
+            }
+            return;
+        }
+
+        if (coheteVuelo.fase === "bajada") {
+            coheteVuelo.tVuelo += 1;
+            const destX = coheteVuelo.destinoX;
+            const destY = coheteVuelo.destinoY;
+            const dx = destX - coheteVuelo.x;
+            const dy = destY - coheteVuelo.y;
+            const distRest = Math.sqrt(dx * dx + dy * dy) || 1;
+            // Suaviza al acercarse.
+            const paso = Math.min(6.5, Math.max(2.2, distRest * 0.08));
+            coheteVuelo.x += (dx / distRest) * paso;
+            coheteVuelo.y += (dy / distRest) * paso;
+            coheteVuelo.escala = Math.min(1, coheteVuelo.escala + 0.012);
+            coheteVuelo.rot = Math.sin(coheteVuelo.tVuelo * 0.05) * 0.06;
+
+            if (distRest < 8 || coheteVuelo.tVuelo > coheteVuelo.maxBajada) {
+                coheteVuelo.x = destX;
+                coheteVuelo.y = destY;
+                coheteVuelo.escala = 1;
+                finalizarVueloCohete({ cierre: false });
+            }
         }
     }
 
     function iniciarVueloCohete(meta) {
         const p = aPixel(meta);
+        const haySiguiente = (indiceLaberinto + 1) < laberintos.length;
         coheteVuelo = {
             activo: true,
+            fase: "prep",
             origenX: p.x,
             origenY: p.y,
             x: p.x,
             y: p.y,
+            destinoX: p.x,
+            destinoY: p.y,
             vx: (Math.random() < 0.5 ? -1 : 1) * 0.18,
             vy: -0.6,
             escala: 1,
             rot: 0,
             t: 0,
+            tVuelo: 0,
             prepFrames: 28,
-            maxFrames: 130
+            maxSubida: 130,
+            maxBajada: 160,
+            haySiguiente: haySiguiente,
+            ocultarNino: false
         };
         if (rafId) {
             cancelAnimationFrame(rafId);
@@ -1162,7 +1243,8 @@
         rafId = requestAnimationFrame(redibujar);
     }
 
-    function finalizarVueloCohete() {
+    function finalizarVueloCohete(opts) {
+        opts = opts || {};
         coheteVuelo = null;
         pelotaVictoria = false;
         modoVictoria = false;
@@ -1170,23 +1252,17 @@
             cancelAnimationFrame(rafId);
             rafId = null;
         }
-        const fb = (gameConfig.feedback && gameConfig.feedback.acierto) || {};
-        const texto = textos().acierto || fb.texto || "¡Muy bien! Llegaste hasta el cohete.";
-        feedbackConVoz(texto, {
-            personaje: "zoe",
-            gif: fb.gif || "../../images/correcto.gif"
-        }).then(function () {
-            indiceLaberinto += 1;
+
+        if (opts.cierre) {
+            indiceLaberinto = laberintos.length;
             esperandoFeedback = false;
-            if (indiceLaberinto >= laberintos.length) {
-                mostrarCierre();
-            } else {
-                iniciarLaberintoActual();
-            }
-        }).catch(function () {
-            esperandoFeedback = false;
-            iniciarLaberintoActual();
-        });
+            mostrarCierre();
+            return;
+        }
+
+        // Siguiente laberinto ya preparado: listo para jugar, sin feedback intermedio.
+        esperandoFeedback = false;
+        redibujar();
     }
 
     function programarRedibujo() {

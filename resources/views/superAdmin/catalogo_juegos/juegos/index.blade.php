@@ -5,6 +5,8 @@
     <link rel="stylesheet" href="{{ asset('assets/css/panel/estudiantes.css') }}">
     <link rel="stylesheet"
         href="{{ asset('assets/css/constructor-vista-nino.css') }}?v={{ @filemtime(public_path('assets/css/constructor-vista-nino.css')) }}">
+    <link rel="stylesheet"
+        href="{{ asset('assets/css/superAdmin/catalogo-juegos.css') }}?v={{ @filemtime(public_path('assets/css/superAdmin/catalogo-juegos.css')) }}">
     <style>
         /* Hueco del header: play (36) + gap + menú (36) ≈ 80px */
         #juegosPage .student-top {

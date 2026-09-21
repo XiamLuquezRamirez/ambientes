@@ -67,19 +67,68 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label fw-bold" for="juego_icono">Icono Font Awesome</label>
-                                <input type="text" id="juego_icono" name="icono" class="form-control" maxlength="80"
-                                    placeholder="fa-puzzle-piece">
+                                <label class="form-label fw-bold" for="juego_icono_trigger">
+                                    Icono <span class="text-danger">*</span>
+                                </label>
+                                <input type="hidden" id="juego_icono" name="icono" value="" required>
+                                <button type="button" class="cj-icon-trigger" id="juego_icono_trigger"
+                                    aria-expanded="false" aria-controls="juego_icono_panel">
+                                    <span class="cj-icon-trigger-chip" id="juego_icono_trigger_chip" aria-hidden="true">
+                                        <i class="fa-solid fa-icons"></i>
+                                    </span>
+                                    <span class="cj-icon-trigger-text">
+                                        <strong id="juego_icono_trigger_title">Elegir icono</strong>
+                                        <small id="juego_icono_trigger_sub" class="text-muted">
+                                            Biblioteca Font Awesome
+                                        </small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-down cj-icon-trigger-caret" aria-hidden="true"></i>
+                                </button>
+                                <div class="collapse mt-2" id="juego_icono_panel">
+                                    <div class="cj-icon-picker" id="juego_icono_picker" role="listbox"
+                                        aria-label="Biblioteca de iconos Font Awesome"></div>
+                                </div>
+                                <small class="text-muted d-block mt-1">
+                                    Abre la biblioteca y selecciona un icono.
+                                </small>
+                                <script type="application/json" id="cj-iconos-catalogo">@json(\App\Models\Juego::ICONOS_CATALOGO)</script>
                             </div>
                         </div>
-                        <div class="col-md-4">
+
+                        <div class="col-md-8">
                             <div class="mb-3">
-                                <label class="form-label fw-bold" for="juego_color">Color</label>
-                                <input type="color" id="juego_color" name="color"
-                                    class="form-control form-control-color w-100" value="#2563eb"
-                                    title="Color de la tarjeta">
+                                <label class="form-label fw-bold" for="juego_color">
+                                    Color <span class="text-danger">*</span>
+                                </label>
+                                <input type="hidden" id="juego_color" name="color" value="" required>
+                                <div class="cj-color-picker" id="juego_color_picker" role="listbox"
+                                    aria-label="Paleta de colores">
+                                    @foreach (\App\Models\Juego::COLORES_PALETA as $hex)
+                                        <button type="button" class="cj-color-option" data-color="{{ $hex }}"
+                                            role="option" aria-selected="false" title="{{ $hex }}"
+                                            style="--cj-swatch: {{ $hex }}"></button>
+                                    @endforeach
+                                </div>
+                                <div class="cj-color-custom mt-2">
+                                    <label class="form-label small mb-1" for="juego_color_custom">
+                                        Otro color
+                                    </label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="color" id="juego_color_custom"
+                                            class="form-control form-control-color" value="#888888"
+                                            title="Color personalizado" disabled>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            id="juego_color_custom_btn">
+                                            Elegir personalizado
+                                        </button>
+                                        <small class="text-muted" id="juego_color_preview_label">Sin color</small>
+                                    </div>
+                                </div>
+                                <small class="text-muted d-block mt-1">
+                                    No hay color por defecto: debes elegir uno.
+                                </small>
                             </div>
                         </div>
                         <div class="col-md-4">

@@ -121,7 +121,7 @@ class JuegoCatalogoService
                         'url' => $juego->activo ? $juego->urlPaquete() : null,
                         'nombre' => $juego->nombre,
                         'icono' => $juego->icono ?: 'fa-gamepad',
-                        'color' => $juego->color ?: '#2563eb',
+                        'color' => $juego->color ?: '#64748b',
                     ],
                 ];
             })
@@ -166,7 +166,7 @@ class JuegoCatalogoService
             'nombre' => $juego->nombre,
             'descripcion' => $juego->descripcion ?? '',
             'icono' => $juego->icono ?: 'fa-gamepad',
-            'color' => $juego->color ?: '#2563eb',
+            'color' => $juego->color ?: '#64748b',
             'orden' => $juego->orden,
             'activo' => (bool) $juego->activo,
             'cadena' => $cadena,
