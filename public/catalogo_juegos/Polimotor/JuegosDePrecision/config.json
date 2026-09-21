@@ -35,6 +35,7 @@
         ]
     },
     "accesibilidad": {
+    "altoContraste": false,
         "letterSpacing": 2,
         "volumenFondo": 20,
         "rate": 5

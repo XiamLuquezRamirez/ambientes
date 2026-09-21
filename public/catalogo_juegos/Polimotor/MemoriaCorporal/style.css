@@ -232,7 +232,8 @@ body {
 }
 
 body.esperando-inicio #principal,
-body.esperando-inicio #menu-vol {
+body.esperando-inicio #menu-vol,
+body.esperando-inicio #menu-acc {
   visibility: hidden;
 }
 
@@ -1040,6 +1041,11 @@ body.modo-tap .zona-drop {
 
 body.modo-tap .pieza {
   cursor: pointer;
+}
+
+
+#menu-acc {
+  right: 92px;
 }
 
 .menu-acc {

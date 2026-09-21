@@ -453,6 +453,80 @@ function pintarMenuVol() {
     aplicarVolumenCalibrado(pct);
 }
 
+const ACC_OPCIONES = [
+    { key: "mostrarFeedBack", label: "Mostrar feedback" },
+    { key: "altoContraste", label: "Alto contraste" },
+    { key: "verBotonVerDeNuevo", label: "Botón ver de nuevo" },
+    { key: "cuentaRegresiva", label: "Cuenta 3-2-1" },
+    { key: "animaciones_opciones", label: "Animar opciones" },
+    { key: "mostrarProgreso", label: "Mostrar progreso" },
+];
+
+function setMenuAcc(abierto) {
+    const panel = document.getElementById("menu-acc-panel");
+    const btn = document.getElementById("btn-menu-acc");
+    if (!panel || !btn) return;
+    panel.hidden = !abierto;
+    btn.setAttribute("aria-expanded", abierto ? "true" : "false");
+    if (abierto && typeof setMenuVol === "function") setMenuVol(false);
+}
+
+function pintarMenuAcc() {
+    const ops = document.getElementById("menu-acc-ops");
+    if (!ops) return;
+    if (!gameConfig.accesibilidad) gameConfig.accesibilidad = {};
+    ops.innerHTML = "";
+    ACC_OPCIONES.forEach(function (op) {
+        const lab = document.createElement("label");
+        lab.className = "menu-acc-op";
+        lab.innerHTML = '<input type="checkbox"> ' + op.label;
+        const input = lab.querySelector("input");
+        input.checked = !!acc()[op.key];
+        input.addEventListener("change", function () {
+            gameConfig.accesibilidad[op.key] = input.checked;
+            aplicarAccesibilidadInicial();
+        });
+        ops.appendChild(lab);
+    });
+    const rango = document.createElement("label");
+    rango.className = "menu-acc-op menu-acc-rango";
+    const actual = Number(acc().letterSpacing);
+    const valor = isFinite(actual) && actual >= 0 ? actual : 2;
+    rango.innerHTML = "<span>Espaciado de letras <strong>" + valor + "</strong></span>";
+    const slider = document.createElement("input");
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = "10";
+    slider.step = "1";
+    slider.value = String(valor);
+    slider.addEventListener("input", function () {
+        const n = Number(slider.value);
+        gameConfig.accesibilidad.letterSpacing = n;
+        rango.querySelector("strong").textContent = String(n);
+        aplicarVisual();
+    });
+    rango.appendChild(slider);
+    ops.appendChild(rango);
+}
+
+function enlazarMenuAcc() {
+    const btn = document.getElementById("btn-menu-acc");
+    const cerrar = document.getElementById("btn-cerrar-acc");
+    if (btn) {
+        btn.addEventListener("click", function (ev) {
+            ev.stopPropagation();
+            const panel = document.getElementById("menu-acc-panel");
+            setMenuAcc(panel && panel.hidden);
+        });
+    }
+    if (cerrar) cerrar.addEventListener("click", function () { setMenuAcc(false); });
+    document.addEventListener("pointerdown", function (ev) {
+        const menu = document.getElementById("menu-acc");
+        if (menu && !menu.contains(ev.target)) setMenuAcc(false);
+    });
+    pintarMenuAcc();
+}
+
 function enlazarMenuVol() {
     const btn = document.getElementById("btn-menu-vol");
     const cerrar = document.getElementById("btn-cerrar-vol");
@@ -461,7 +535,9 @@ function enlazarMenuVol() {
         btn.addEventListener("click", function (ev) {
             ev.stopPropagation();
             const panel = document.getElementById("menu-vol-panel");
-            setMenuVol(panel && panel.hidden);
+            const open = panel && panel.hidden;
+            setMenuVol(open);
+            if (open && typeof setMenuAcc === "function") setMenuAcc(false);
         });
     }
     if (cerrar) cerrar.addEventListener("click", function () { setMenuVol(false); });
@@ -966,6 +1042,7 @@ $(document).ready(function () {
         volumenFondo: volumenFondoPct() / 100
     });
     enlazarMenuVol();
+    enlazarMenuAcc();
     if (window.speechSynthesis) {
         try { window.speechSynthesis.getVoices(); } catch (e) { /* noop */ }
         window.speechSynthesis.addEventListener("voiceschanged", function () {

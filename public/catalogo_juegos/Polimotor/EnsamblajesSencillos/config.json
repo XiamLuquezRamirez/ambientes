@@ -1,6 +1,6 @@
 {
   "accesibilidad": {
-    "piezasVisibles": 3,
+    "piezasVisibles": 8,
     "tiempoMostrarCompleto": 3000,
     "tiempoVerDeNuevo": 3000,
     "porcentajeAcierto": 60,
@@ -55,8 +55,7 @@
       }
     ]
   },
-  "cuerpo": "robot",
-  "edad": 3,
+  "edad": 4,
   "audios": {
     "acierto": "../../sounds/ok.mp3",
     "error": "../../sounds/over.mp3",
@@ -64,13 +63,13 @@
     "fondo": "../../sounds/fondo.mp3"
   },
   "cuerpos": {
-    "robot": {
-      "nombre": "Robot",
-      "carpeta": "img/robot",
+    "nina": {
+      "nombre": "Niña",
+      "carpeta": "img/nina",
       "svg": {
         "4": {
           "lienzo": { "w": 1570.14, "h": 1186.51 },
-          "escala": 122,
+          "escala": 100,
           "piezas": [
             { "id": "piernas", "archivo": "piernas.svg", "nombre": "Piernas", "x": -4, "y": 49.5 },
             { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 3.6, "y": 16 },
@@ -80,28 +79,70 @@
         },
         "6": {
           "lienzo": { "w": 1391.57, "h": 1186.51 },
-          "escala": 92,
+          "escala": 90,
           "piezas": [
-            { "id": "pierna_1", "archivo": "pierna_1.svg", "nombre": "Pierna", "x": 11.2, "y": 0 },
-            { "id": "pierna_2", "archivo": "pierna_2.svg", "nombre": "Pierna", "x": 11.2, "y": 0 },
-            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 0, "y": 0 },
-            { "id": "brazo_1", "archivo": "brazo_1.svg", "nombre": "Brazo", "x": 11.2, "y": 0 },
-            { "id": "brazo_2", "archivo": "brazo_2.svg", "nombre": "Brazo", "x": 11.2, "y": 0 },
-            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": 0, "y": 0 }
+            { "id": "pierna_1", "archivo": "pierna_1.svg", "nombre": "Pierna", "x": -2.8, "y": 49.5 },
+            { "id": "pierna_2", "archivo": "pierna_2.svg", "nombre": "Pierna", "x": 20.2, "y": 50 },
+            { "id": "brazo_1", "archivo": "brazo_1.svg", "nombre": "Brazo", "x": -9.8, "y": 18 },
+            { "id": "brazo_2", "archivo": "brazo_2.svg", "nombre": "Brazo", "x": 42, "y": 18 },
+            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 1, "y": 12 },
+            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": -3.1, "y": -46 }
           ]
         },
         "8": {
           "lienzo": { "w": 1378.11, "h": 1186.51 },
-          "escala": 92,
+          "escala": 90,
           "piezas": [
-            { "id": "pierna_1", "archivo": "pierna_1.svg", "nombre": "Pierna", "x": 9.6, "y": 0 },
-            { "id": "pierna_2", "archivo": "pierna_2.svg", "nombre": "Pierna", "x": 9.6, "y": 0 },
-            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 0, "y": 0 },
-            { "id": "brazo_1", "archivo": "brazo_1.svg", "nombre": "Brazo", "x": 9.6, "y": 0 },
-            { "id": "brazo_2", "archivo": "brazo_2.svg", "nombre": "Brazo", "x": 9.6, "y": 0 },
-            { "id": "mano_1", "archivo": "mano_1.svg", "nombre": "Mano", "x": 9.6, "y": 0 },
-            { "id": "mano_2", "archivo": "mano_2.svg", "nombre": "Mano", "x": 9.6, "y": 0 },
-            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": 0, "y": 0 }
+            { "id": "pierna_1", "archivo": "pierna_1.svg", "nombre": "Pierna", "x": -2.4, "y": 57.5 },
+            { "id": "pierna_2", "archivo": "pierna_2.svg", "nombre": "Pierna", "x": 22.6, "y": 58 },
+            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": -1, "y": 16 },
+            { "id": "brazo_1", "archivo": "brazo_1.svg", "nombre": "Brazo", "x": -19.4, "y": 12 },
+            { "id": "brazo_2", "archivo": "brazo_2.svg", "nombre": "Brazo", "x": 39.6, "y": 13 },
+            { "id": "mano_1", "archivo": "mano_1.svg", "nombre": "Mano", "x": -22.4, "y": 37 },
+            { "id": "mano_2", "archivo": "mano_2.svg", "nombre": "Mano", "x": 36.6, "y": 37 },
+            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": -1, "y": -42 }
+          ]
+        }
+      }
+    },
+    "nino": {
+      "nombre": "Niño",
+      "carpeta": "img/nino",
+      "svg": {
+        "4": {
+          "lienzo": { "w": 1570.14, "h": 1186.51 },
+          "escala": 100,
+          "piezas": [
+            { "id": "piernas", "archivo": "piernas.svg", "nombre": "Piernas", "x": 12, "y": 47.5 },
+            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 8.6, "y": 16 },
+            { "id": "brazos", "archivo": "brazos.svg", "nombre": "Brazos", "x": -7.75, "y": 23 },
+            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": 10.9, "y": -38 }
+          ]
+        },
+        "6": {
+          "lienzo": { "w": 1391.57, "h": 1186.51 },
+          "escala": 90,
+          "piezas": [
+            { "id": "pierna_1", "archivo": "pierna_1.svg", "nombre": "Pierna", "x": -0.8, "y": 51 },
+            { "id": "pierna_2", "archivo": "pierna_2.svg", "nombre": "Pierna", "x": 20.2, "y": 55 },
+            { "id": "brazo_1", "archivo": "brazo_1.svg", "nombre": "Brazo", "x": -26.8, "y": 29 },
+            { "id": "brazo_2", "archivo": "brazo_2.svg", "nombre": "Brazo", "x": 41, "y": 29 },
+            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 6, "y": 20 },
+            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": 7.9 , "y": -36 }
+          ]
+        },
+        "8": {
+          "lienzo": { "w": 1378.11, "h": 1186.51 },
+          "escala": 85,
+          "piezas": [
+            { "id": "pierna_1", "archivo": "pierna_1.svg", "nombre": "Pierna", "x": 0.6, "y": 50.5 },
+            { "id": "pierna_2", "archivo": "pierna_2.svg", "nombre": "Pierna", "x": 24.6, "y": 54 },
+            { "id": "cuerpo", "archivo": "cuerpo.svg", "nombre": "Cuerpo", "x": 3, "y": 19 },
+            { "id": "brazo_1", "archivo": "brazo_1.svg", "nombre": "Brazo", "x": -24.4, "y": 22 },
+            { "id": "brazo_2", "archivo": "brazo_2.svg", "nombre": "Brazo", "x": 43.6, "y": 22 },
+            { "id": "mano_1", "archivo": "mano_1.svg", "nombre": "Mano", "x": -28.4, "y": 25 },
+            { "id": "mano_2", "archivo": "mano_2.svg", "nombre": "Mano", "x": 38.6, "y": 25 },
+            { "id": "cabeza", "archivo": "cabeza.svg", "nombre": "Cabeza", "x": 5, "y": -37 }
           ]
         }
       }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="FONDO" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1098.67">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #384eae;
+      }
+
+      .cls-2 {
+        fill: #6880ee;
+      }
+    </style>
+  </defs>
+  <polygon class="cls-1" points="608.82 408.53 608.18 473.22 607.42 549.18 514.36 548.27 515.12 472.31 515.76 407.44 608.82 408.53"/>
+  <polygon class="cls-2" points="487.12 548 638.63 549.49 636.67 750.37 410.25 748.15 467.84 691.68 487.12 548"/>
+</svg>

@@ -57,7 +57,8 @@ body {
 }
 
 body.esperando-inicio #principal,
-body.esperando-inicio #menu-vol {
+body.esperando-inicio #menu-vol,
+body.esperando-inicio #menu-acc {
   visibility: hidden;
 }
 
@@ -567,6 +568,11 @@ body.esperando-inicio #menu-vol {
   .pantalla-inicio.is-out {
     opacity: 0;
   }
+}
+
+
+#menu-acc {
+  right: 92px;
 }
 
 .menu-acc {

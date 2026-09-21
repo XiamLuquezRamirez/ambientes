@@ -232,7 +232,8 @@ body {
 }
 
 body.esperando-inicio #principal,
-body.esperando-inicio #menu-vol {
+body.esperando-inicio #menu-vol,
+body.esperando-inicio #menu-acc {
   visibility: hidden;
 }
 
@@ -374,7 +375,7 @@ body.esperando-inicio #menu-vol {
 }
 
 .lienzo-wrap {
-  width: 40%;
+  width: 44%;
   display: flex;
   justify-content: center;
   align-items: stretch;
@@ -394,7 +395,7 @@ body.modo-svg #lienzo {
   width: auto;
   height: 100%;
   aspect-ratio: 389 / 522;
-  max-width: min(420px, 42vw);
+  max-width: 45vw;
 }
 
 #figura-svg {
@@ -963,6 +964,11 @@ body.modo-tap .zona-drop {
 
 body.modo-tap .pieza {
   cursor: pointer;
+}
+
+
+#menu-acc {
+  right: 92px;
 }
 
 .menu-acc {

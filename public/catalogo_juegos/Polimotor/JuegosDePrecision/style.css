@@ -58,7 +58,8 @@ body {
 }
 
 body.esperando-inicio #principal,
-body.esperando-inicio #menu-vol {
+body.esperando-inicio #menu-vol,
+body.esperando-inicio #menu-acc {
     visibility: hidden;
 }
 
@@ -774,6 +775,11 @@ body.esperando-inicio #menu-vol {
     overflow: hidden;
 }
 
+
+#menu-acc {
+  right: 92px;
+}
+
 .menu-acc {
     position: fixed;
     right: 16px;
@@ -823,6 +829,30 @@ body.esperando-inicio #menu-vol {
     line-height: 1;
     cursor: pointer;
     color: #334155;
+}
+
+.menu-acc-ops {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.menu-acc-op {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 6px 4px;
+    border-radius: 8px;
+}
+
+.menu-acc-op input {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    accent-color: #1565c0;
 }
 
 .menu-acc-rango {

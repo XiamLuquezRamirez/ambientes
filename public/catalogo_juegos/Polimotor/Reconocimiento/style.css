@@ -232,7 +232,8 @@ body {
 }
 
 body.esperando-inicio #principal,
-body.esperando-inicio #menu-vol {
+body.esperando-inicio #menu-vol,
+body.esperando-inicio #menu-acc {
   visibility: hidden;
 }
 
@@ -405,6 +406,11 @@ body.mostrar-zonas .zona-toque {
 @keyframes pistaGlow {
   0%, 100% { box-shadow: 0 0 10px #ffeb3b; }
   50% { box-shadow: 0 0 24px #ff9800; }
+}
+
+
+#menu-acc {
+  right: 92px;
 }
 
 .menu-acc {
