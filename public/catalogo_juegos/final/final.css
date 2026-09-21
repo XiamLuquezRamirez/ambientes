@@ -1,0 +1,327 @@
+#victoria {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #173f6d;
+}
+
+.fondo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.cortina {
+    position: absolute;
+    top: 0;
+    width: 80vw;
+    height: 100%;
+    z-index: 20;
+    transition: transform 2.4s cubic-bezier(.65, 0, .35, 1);
+}
+
+.cortina-izq {
+    left: 0;
+    transform-origin: left center;
+}
+
+.cortina-der {
+    right: 0;
+    transform-origin: right center;
+}
+
+.victoria-abierta .cortina-izq {
+    transform: translateX(-58%);
+}
+
+.victoria-abierta .cortina-der {
+    transform: translateX(58%);
+}
+
+.contenido {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.excelente {
+    position: absolute;
+    width: 40vw;
+    left: 29%;
+    top: -40%;
+    opacity: 0;
+    z-index: 12;
+    transition: top 2s ease;
+}
+
+.mostrar-excelente .excelente {
+    opacity: 1;
+    top: 0%;
+}
+
+.trofeo {
+    position: absolute;
+    width: 13vw;
+    left: 50%;
+    bottom: 8%;
+    transform: translate(-50%, 420px) scale(.5);
+    opacity: 0;
+    z-index: 11;
+    transition: transform 1s cubic-bezier(.17, .89, .32, 1.35), opacity .4s ease;
+}
+
+.mostrar-trofeo .trofeo {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    animation:  reboteTrofeo 1s ease .15s both, flotarTrofeo 2.5s ease-in-out 1.2s infinite;
+}
+
+@keyframes reboteTrofeo {
+    0% {
+        transform: translate(-50%, 420px) scale(.5);
+    }
+    60% {
+        transform: translate(-50%, -25px) scale(1.08);
+    }
+    80% {
+        transform: translate(-50%, 10px) scale(.97);
+    }
+    100% {
+        transform: translate(-50%, 0) scale(1);
+    }
+}
+
+@keyframes flotarTrofeo {
+    0%, 100% {
+        margin-top: 0;
+    }
+    50% {
+        margin-top: -10px;
+    }
+}
+
+.personaje {
+    position: absolute;
+    width: 35VW;
+    bottom: -5%;
+    z-index: 9;
+    opacity: 0;
+}
+
+.zeus {
+    left: 3%;
+    transform: translateX(-500px) scale(.8);
+}
+
+.mostrar-personajes .zeus {
+    opacity: 1;
+    animation: entradaZeus 1.2s cubic-bezier(.17, .89, .32, 1.2) forwards,  celebrarZeus 2s ease-in-out 2s infinite;
+}
+
+@keyframes entradaZeus {
+    from {
+        transform: translateX(-500px) scale(.8);
+    }
+    70% {
+        transform: translateX(30px) scale(1.03);
+    }
+    to {
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes celebrarZeus {
+    0%,100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(-2deg);
+    }
+}
+
+.zoe {
+    right: 3%;
+    transform: translateX(500px) scale(.8);
+}
+
+.mostrar-personajes .zoe {
+    opacity: 1;
+    animation:  entradaZoe 1.2s cubic-bezier(.17, .89, .32, 1.2) forwards,  celebrarZoe 2s ease-in-out 2.2s infinite;
+}
+
+@keyframes entradaZoe {
+    from {
+        transform: translateX(500px) scale(.8);
+    }
+    70% {
+        transform: translateX(-30px) scale(1.03);
+    }
+    to {
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes celebrarZoe {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(2deg);
+    }
+}
+
+.confeti {
+    position: absolute;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.confeti span {
+    position: absolute;
+    top: -30px;
+    width: 10px;
+    height: 20px;
+    opacity: 0;
+    animation: caerConfeti linear forwards;
+}
+
+.confeti span:nth-child(3n) {
+    width: 7px;
+    height: 14px;
+}
+
+.confeti span:nth-child(4n) {
+    width: 13px;
+    height: 8px;
+}
+
+@keyframes caerConfeti {
+    0% {
+        transform: translateY(-40px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(115vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.destello {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    z-index: 13;
+    opacity: 0;
+}
+
+.destello::before,
+.destello::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background: white;
+    transform: translate(-50%, -50%);
+}
+
+.destello::before {
+    width: 5px;
+    height: 35px;
+}
+
+.destello::after {
+    width: 35px;
+    height: 5px;
+}
+
+.destello-1 {
+    left: 26%;
+    top: 20%;
+}
+
+.destello-2 {
+    right: 27%;
+    top: 28%;
+}
+
+.destello-3 {
+    left: 40%;
+    top: 48%;
+}
+
+.mostrar-destellos .destello {
+    animation: aparecerDestello 1.2s ease-in-out infinite;
+}
+
+
+@keyframes aparecerDestello {
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(.3) rotate(0);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2) rotate(45deg);
+    }
+}
+
+#btnVictoria {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 30px;
+    background: #f7b718;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+}
+
+#btnVictoria:hover {
+    transform: translateX(-50%) scale(1.05);
+}
+
+
+@media (max-width: 800px) {
+    .excelente {
+        width: 65vw;
+        top: 8%;
+    }
+    .personaje {
+        width: 38vw;
+        bottom: 4%;
+    }
+    .trofeo {
+        width: 28vw;
+        bottom: 9%;
+    }
+    .cortina {
+        width: 70vw;
+    }
+}
+
+
+@media (max-height: 600px) {
+    .personaje {
+        width: 27vh;
+    }
+    .trofeo {
+        width: 20vh;
+    }
+    .excelente {
+        width: 45vw;
+    }
+}
