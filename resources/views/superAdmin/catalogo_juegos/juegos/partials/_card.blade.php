@@ -2,7 +2,7 @@
     $cadena = $juego->cadenaCurricularResuelta();
     $icono = $juego->icono ?: 'fa-gamepad';
     $iconClass = str_starts_with($icono, 'fa-') ? $icono : 'fa-' . $icono;
-    $color = $juego->color ?: '#2563eb';
+    $color = $juego->color ?: '#64748b';
     $tipoLabel = $juego->tipoLabel();
     $urlPaquete = $juego->urlPaquete();
 @endphp

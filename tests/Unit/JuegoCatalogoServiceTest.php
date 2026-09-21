@@ -7,6 +7,7 @@ use App\Models\Eje;
 use App\Models\Juego;
 use App\Models\Modulo;
 use App\Models\Tematica;
+use App\Models\TiposJuego;
 use App\Services\JuegoCatalogoService;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
@@ -16,9 +17,12 @@ class JuegoCatalogoServiceTest extends TestCase
     public function test_serializar_tarjeta_incluye_cadena_curricular(): void
     {
         $ambiente = new Ambiente(['id' => 1, 'nombre' => 'Polimotor']);
+        $tipo = new TiposJuego([
+            'slug' => 'rompecabezas_cuerpo',
+            'nombre' => 'Rompecabezas del cuerpo',
+        ]);
         $juego = new Juego([
             'slug' => 'rompecabezas-del-cuerpo',
-            'tipo' => 'rompecabezas_cuerpo',
             'ruta' => 'catalogo_juegos/Polimotor/Rompecabezas',
             'nombre' => 'Rompecabezas del cuerpo',
             'descripcion' => 'Armar piezas',
@@ -29,6 +33,7 @@ class JuegoCatalogoServiceTest extends TestCase
             'ambiente_id' => 1,
         ]);
         $juego->setRelation('ambiente', $ambiente);
+        $juego->setRelation('tipoJuego', $tipo);
 
         $tarjeta = (new JuegoCatalogoService)->serializarTarjeta($juego);
 
@@ -158,5 +163,23 @@ class JuegoCatalogoServiceTest extends TestCase
         $this->assertFalse(Juego::slugEsValido(''));
         $this->assertFalse(Juego::slugEsValido('Rompecabezas'));
         $this->assertFalse(Juego::slugEsValido('con_guion_bajo'));
+    }
+
+    public function test_icono_es_valido_solo_catalogo(): void
+    {
+        $this->assertTrue(Juego::iconoEsValido('fa-gamepad'));
+        $this->assertTrue(Juego::iconoEsValido('fa-puzzle-piece'));
+        $this->assertFalse(Juego::iconoEsValido(''));
+        $this->assertFalse(Juego::iconoEsValido('gamepad'));
+        $this->assertFalse(Juego::iconoEsValido('fa-no-existe'));
+    }
+
+    public function test_color_es_valido_hex(): void
+    {
+        $this->assertTrue(Juego::colorEsValido('#2563eb'));
+        $this->assertTrue(Juego::colorEsValido('#fff'));
+        $this->assertFalse(Juego::colorEsValido(''));
+        $this->assertFalse(Juego::colorEsValido('2563eb'));
+        $this->assertFalse(Juego::colorEsValido('azul'));
     }
 }

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('tipo', 40);
             $table->string('nombre', 100);
             $table->text('descripcion')->nullable();
-            $table->string('icono', 80)->default('fa-gamepad');
-            $table->string('color', 20)->default('#2563eb');
+            $table->string('icono', 80)->nullable();
+            $table->string('color', 20)->nullable();
             $table->unsignedTinyInteger('orden')->default(0);
             $table->boolean('activo')->default(true);
             $table->timestamps();
