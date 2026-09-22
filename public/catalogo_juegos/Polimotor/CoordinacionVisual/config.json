@@ -86,16 +86,16 @@
     "rightPct": 0.2,
     "rimFracX": 0.5,
     "rimFracY": 0.2,
-    "metaX": 89,
+    "metaX": 83,
     "metaY": 38,
     "radioMeta": 6.5,
     "msEnceste": 1800
   },
   "coloresCamino": {
-    "linea": "#87CEEB",
-    "borde": "#0284C7",
+    "linea": "#ffffff",
+    "borde": "#64748b",
     "alerta": "#e53935",
-    "distractores": "#94a3b8"
+    "distractores": "#e2e8f0"
   },
   "rutasFijas": "rutas-fijas.json",
   "niveles": [
