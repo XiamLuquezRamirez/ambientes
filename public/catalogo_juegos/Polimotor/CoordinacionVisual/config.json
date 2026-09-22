@@ -10,15 +10,17 @@
     }
   },
   "textos": {
-    "instruccion": "Arrastra la pelota hasta la canasta siguiendo la línea.",
+    "instruccion": "Arrastra la pelota hasta la canasta siguiendo el camino.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: la pelota sigue el camino hasta la canasta.",
+    "demostracionFin": "¡Ahora te toca a ti! Sigue el camino hasta la canasta.",
     "cierre": "¡Excelente! Completaste los recorridos.",
     "acierto": "¡Muy bien! Llevaste la pelota hasta la canasta.",
-    "error": "¡Inténtalo otra vez! Sigue la línea con cuidado.",
-    "saliendo": "Ten cuidado, te estás saliendo de la línea.",
+    "error": "¡Inténtalo otra vez! Sigue el camino con cuidado.",
+    "saliendo": "Te estas saliendo del camino.",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Arrastra la pelota hasta la canasta siguiendo la línea."
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Arrastra la pelota hasta la canasta siguiendo el camino."
       },
       {
         "personaje": 0,
@@ -26,7 +28,7 @@
       },
       {
         "personaje": 1,
-        "texto": "Si te sales, la pelota vuelve al último punto bueno. ¡Tú puedes!"
+        "texto": "Si te sales, la pelota vuelve al último punto donde estabas, antes de salirte. ¡Tú puedes!"
       }
     ]
   },
@@ -43,6 +45,7 @@
       "bordeArco": "#E5FF00"
     },
     "modoTap": false,
+    "mostrarIntro": true,
     "mostrarFeedBack": true,
     "rutasFalsas": true,
     "rutasFalsasCantidad": 2,
@@ -54,7 +57,7 @@
     "volumenFondo": 20,
     "rate": 5
   },
-  "edad": 5,
+  "edad": 4,
   "audios": {
     "acierto": "../../sounds/ok.mp3",
     "error": "../../sounds/over.mp3",
@@ -89,8 +92,8 @@
     "msEnceste": 1800
   },
   "coloresCamino": {
-    "linea": "#f4c430",
-    "borde": "#c98812",
+    "linea": "#87CEEB",
+    "borde": "#0284C7",
     "alerta": "#e53935",
     "distractores": "#94a3b8"
   },

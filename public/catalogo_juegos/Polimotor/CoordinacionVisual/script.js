@@ -39,7 +39,10 @@
     let pelotaVisible = true;
     let encestando = false;
     let avisoSaliendoActivo = false;
-    let avisoSaliendoHablado = false;
+    let demoActiva = false;
+    let demoRafId = null;
+    let introOmitida = false;
+    let tutorialAnunciadoEnIntro = false;
 
     function readText(ruta) {
         const xhr = new XMLHttpRequest();
@@ -63,25 +66,37 @@
     function mostrarInstruccionBase() {
         const enunciado = document.getElementById("enunciado");
         if (!enunciado) return;
-        enunciado.textContent = textos().instruccion ||
-            "Arrastra la pelota hasta la canasta siguiendo la línea.";
+        if (esRecorridoDemo()) {
+            enunciado.textContent = textos().demostracion ||
+                "¡Vamos a un tutorial! Mira cómo se hace: la pelota sigue la línea hasta la canasta.";
+        } else {
+            enunciado.textContent = textos().instruccion ||
+                "Arrastra la pelota hasta la canasta siguiendo la línea.";
+        }
         enunciado.classList.remove("aviso-saliendo");
         avisoSaliendoActivo = false;
+    }
+
+    function ritmoFondoAlerta(activo) {
+        if (!audioFondo) return;
+        try {
+            audioFondo.playbackRate = activo ? 1.35 : 1;
+        } catch (e) { /* noop */ }
     }
 
     function avisarSaliendo() {
         const enunciado = document.getElementById("enunciado");
         const msg = mensajeSaliendo();
+        const primeraVez = !avisoSaliendoActivo;
         if (enunciado) {
             enunciado.textContent = msg;
             enunciado.classList.add("aviso-saliendo");
         }
-        if (!avisoSaliendoActivo) {
-            avisoSaliendoActivo = true;
-            if (!avisoSaliendoHablado && typeof TextoVoz !== "undefined" && feedbackActivo()) {
-                avisoSaliendoHablado = true;
-                TextoVoz.hablar(msg, "zoe");
-            }
+        avisoSaliendoActivo = true;
+        ritmoFondoAlerta(true);
+        // Suena cada vez que entra al aviso (al cambiar el texto).
+        if (primeraVez && typeof TextoVoz !== "undefined" && feedbackActivo()) {
+            TextoVoz.hablar(msg, "zoe");
         }
     }
 
@@ -90,6 +105,7 @@
             alertaDesvio = 0;
             return;
         }
+        ritmoFondoAlerta(false);
         mostrarInstruccionBase();
     }
 
@@ -233,6 +249,7 @@
     const ACC_OPCIONES = [
         { key: "altoContraste", label: "Alto contraste" },
         { key: "modoTap", label: "Modo toque (sin arrastrar)" },
+        { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
         { key: "mostrarFeedBack", label: "Mostrar feedback al anotar" },
         { key: "rutasFalsas", label: "Rutas falsas / sin salida" }
     ];
@@ -262,6 +279,9 @@
                 gameConfig.accesibilidad[op.key] = input.checked;
                 if (op.key === "rutasFalsas") {
                     regenerarDistractoresActuales();
+                }
+                if (op.key === "mostrarIntro") {
+                    sincronizarDialogoIntro3d();
                 }
                 aplicarAccesibilidadInicial();
             });
@@ -342,6 +362,7 @@
             audioFondo.loop = true;
         }
         audioFondo.volume = volumenFondoPct() / 100;
+        try { audioFondo.playbackRate = 1; } catch (e) { /* noop */ }
         const p = audioFondo.play();
         if (p && typeof p.catch === "function") p.catch(function () { /* noop */ });
     }
@@ -363,19 +384,21 @@
         } catch (e) { /* noop */ }
     }
 
-    function mostrarFeedback(tipo, mensaje) {
+    function mostrarFeedback(tipo, mensaje, opts) {
+        opts = opts || {};
         return new Promise(function (resolve) {
             const fb = gameConfig.feedback || {};
             const dur = Number(fb.duracion) || 1400;
             const nodo = fb[tipo] || {};
+            const hablar = !opts.silencio && mensaje && typeof TextoVoz !== "undefined";
             if (typeof Swal === "undefined" || !feedbackActivo()) {
-                if (mensaje && typeof TextoVoz !== "undefined") {
+                if (hablar) {
                     TextoVoz.hablar(mensaje, tipo === "acierto" ? "zoe" : "zeus");
                 }
                 setTimeout(resolve, dur);
                 return;
             }
-            if (mensaje && typeof TextoVoz !== "undefined") {
+            if (hablar) {
                 TextoVoz.hablar(mensaje, tipo === "acierto" ? "zoe" : "zeus");
             }
             // Diferir: en modo toque el mismo click que falló cerraba el Swal al soltar.
@@ -413,7 +436,7 @@
             return String(tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ").trim();
         }
 
-        window.INTRO_CONFIG.dialogo.lineas = conversacion.map(function (linea) {
+        const lineas = conversacion.map(function (linea) {
             const indice = Number(linea.personaje);
             const def = personajesCfg[isFinite(indice) ? indice : 0] || personajesCfg[0] || {};
             const id = def.id || (indice === 1 ? "zoe" : "zeus");
@@ -427,6 +450,32 @@
                 texto: textoPlano(linea.texto)
             };
         });
+
+        // mostrarIntro: Zoe anuncia el tutorial en la intro 3D (nube + voz).
+        if (mostrarIntroActiva()) {
+            const demoTxt = textoPlano(
+                (gameConfig.textos && gameConfig.textos.demostracion) ||
+                "¡Vamos a un tutorial! Mira cómo se hace: la pelota sigue la línea hasta la canasta."
+            );
+            lineas.push({
+                personaje: "zoe",
+                nombre: "Zoe",
+                color: colores.zoe || "#8ec5ff",
+                texto: demoTxt
+            });
+            tutorialAnunciadoEnIntro = true;
+            if (!window.INTRO_CONFIG.victoria) window.INTRO_CONFIG.victoria = {};
+            window.INTRO_CONFIG.victoria.titulo = "¡Tutorial!";
+            window.INTRO_CONFIG.victoria.subtitulo = "Toca para ver la demostración";
+            const card = document.querySelector("#intro3d-continuar h2");
+            const sub = document.querySelector("#intro3d-continuar p");
+            if (card) card.textContent = "¡Tutorial!";
+            if (sub) sub.textContent = "Toca para ver la demostración";
+        } else {
+            tutorialAnunciadoEnIntro = false;
+        }
+
+        window.INTRO_CONFIG.dialogo.lineas = lineas;
     }
 
     function mostrarIntro3d() {
@@ -457,6 +506,7 @@
 
     function omitirIntro3d() {
         if (cerrardo) return;
+        introOmitida = true;
         const root = document.getElementById("intro3d-root");
         if (!root || root.hidden) {
             empezarJuegoTrasIntro();
@@ -624,6 +674,191 @@
         return ramas.slice(0, Math.max(0, Math.floor(maxRamas)));
     }
 
+    function mostrarIntroActiva() {
+        return !!acc().mostrarIntro;
+    }
+
+    function rutaDemoNivel(nivel) {
+        const id = String((nivel && nivel.id) || "");
+        if (rutasFijas && rutasFijas.demo && rutasFijas.demo[id]) {
+            return rutasFijas.demo[id];
+        }
+        return null;
+    }
+
+    function esRecorridoDemo(lab) {
+        const r = lab || recorridoActual();
+        return !!(r && r.esDemo);
+    }
+
+    function mostrarZoeTutorial() {
+        const el = document.getElementById("tutorial-zoe");
+        if (!el) return;
+        el.hidden = false;
+        el.setAttribute("aria-hidden", "false");
+        void el.offsetWidth;
+        el.classList.add("is-visible");
+    }
+
+    function ocultarZoeTutorial() {
+        const el = document.getElementById("tutorial-zoe");
+        if (!el) return;
+        el.classList.remove("is-visible");
+        setTimeout(function () {
+            if (!demoActiva) {
+                el.hidden = true;
+                el.setAttribute("aria-hidden", "true");
+            }
+        }, 650);
+    }
+
+    function detenerDemostracion() {
+        demoActiva = false;
+        if (demoRafId != null) {
+            cancelAnimationFrame(demoRafId);
+            demoRafId = null;
+        }
+        document.body.classList.remove("demo-activa");
+        ocultarZoeTutorial();
+    }
+
+    function densificarPathOrtogonal(pathPts, paso) {
+        const pts = [];
+        const step = Math.max(0.4, Number(paso) || 1.2);
+        if (!pathPts || pathPts.length < 2) return pts;
+        pts.push({ x: pathPts[0].x, y: pathPts[0].y });
+        for (let i = 1; i < pathPts.length; i++) {
+            const a = pathPts[i - 1];
+            const b = pathPts[i];
+            const len = dist(a, b);
+            if (len < 0.001) continue;
+            const n = Math.max(1, Math.ceil(len / step));
+            for (let s = 1; s <= n; s++) {
+                const t = s / n;
+                pts.push({
+                    x: a.x + (b.x - a.x) * t,
+                    y: a.y + (b.y - a.y) * t
+                });
+            }
+        }
+        return pts;
+    }
+
+    function longitudPath(pathPts) {
+        let L = 0;
+        for (let i = 1; i < pathPts.length; i++) {
+            L += dist(pathPts[i - 1], pathPts[i]);
+        }
+        return L;
+    }
+
+    function hablarPromesa(texto, quien) {
+        if (!texto || typeof TextoVoz === "undefined" || typeof TextoVoz.hablar !== "function") {
+            return Promise.resolve();
+        }
+        try {
+            const p = TextoVoz.hablar(String(texto), quien || "zoe");
+            return (p && typeof p.then === "function") ? p : Promise.resolve();
+        } catch (e) {
+            return Promise.resolve();
+        }
+    }
+
+    function completarDemostracion() {
+        if (esperandoFeedback || juegoTerminado) return;
+        esperandoFeedback = true;
+        detenerDemostracion();
+
+        const lab = recorridoActual();
+        const geo = inicioMeta(lab);
+        pelota = { x: geo.meta.x, y: geo.meta.y };
+        if (pelotaDentroDelAro(pelota)) pelotaVisible = false;
+        programarRedibujo();
+
+        const mensaje = textos().demostracionFin ||
+            "¡Ahora te toca a ti! Sigue la línea hasta la canasta.";
+
+        mostrarAroEnceste().then(function () {
+            pelotaVisible = false;
+            posicionarPelotaDom();
+            return mostrarFeedback("acierto", mensaje);
+        }).then(function () {
+            esperandoFeedback = false;
+            avanzarRecorrido();
+        });
+    }
+
+    function iniciarAnimacionDemo(muestras) {
+        if (!demoActiva || juegoTerminado || !muestras || muestras.length < 2) {
+            if (demoActiva) completarDemostracion();
+            return;
+        }
+
+        const largo = longitudPath(muestras);
+        // Un poco más lento para que el niño pueda seguir el recorrido.
+        const durMs = clamp(largo * 78, 6200, 12000);
+        const t0 = performance.now();
+        let idx = 0;
+
+        function frame(now) {
+            if (!demoActiva || juegoTerminado) return;
+            const u = clamp((now - t0) / durMs, 0, 1);
+            const target = Math.min(muestras.length - 1, Math.floor(u * (muestras.length - 1)));
+            while (idx < target) idx += 1;
+            const p = muestras[idx];
+            pelota = { x: p.x, y: p.y };
+            ultimoValido = { x: p.x, y: p.y };
+            progresoCamino = u;
+            posicionarPelotaDom();
+
+            if (u >= 1 || idx >= muestras.length - 1) {
+                completarDemostracion();
+                return;
+            }
+            demoRafId = requestAnimationFrame(frame);
+        }
+
+        demoRafId = requestAnimationFrame(frame);
+    }
+
+    function iniciarDemostracion() {
+        const lab = recorridoActual();
+        if (!esRecorridoDemo(lab) || demoActiva || juegoTerminado) return;
+
+        detenerDemostracion();
+        demoActiva = true;
+        document.body.classList.add("demo-activa");
+        mostrarZoeTutorial();
+
+        const msg = textos().demostracion ||
+            "¡Vamos a un tutorial! Mira cómo se hace: la pelota sigue la línea hasta la canasta.";
+        const enunciado = document.getElementById("enunciado");
+        if (enunciado) {
+            enunciado.textContent = msg;
+            enunciado.classList.remove("aviso-saliendo");
+        }
+
+        const geo = inicioMeta(lab);
+        const muestras = densificarPathOrtogonal(geo.pts, 1.1);
+        if (muestras.length >= 2) {
+            pelota = { x: muestras[0].x, y: muestras[0].y };
+            ultimoValido = { x: muestras[0].x, y: muestras[0].y };
+            pelotaVisible = true;
+            programarRedibujo();
+        }
+
+        // Habla en paralelo: 1 s después de empezar, arranca la demo (más lenta).
+        hablarPromesa(msg, "zoe");
+        setTimeout(function () {
+            if (!demoActiva || juegoTerminado || !esRecorridoDemo()) return;
+            if (muestras.length < 2) {
+                completarDemostracion();
+                return;
+            }
+            iniciarAnimacionDemo(muestras);
+        }, 1000);
+    }
+
     function generarRecorridosNivel(nivel) {
         const cantidad = Number(nivel.cantidad != null ? nivel.cantidad : 3);
         const pool = poolRutasNivel(nivel);
@@ -633,14 +868,30 @@
         }
         const elegidos = barajar(pool).slice(0, Math.min(cantidad, pool.length));
         const nDist = cantidadRutasFalsas(nivel);
-        return elegidos.map(function (lab, i) {
+        const lista = elegidos.map(function (lab, i) {
             const clon = clonarRuta(lab, i);
             clon.path = anclarExtremosOrtogonales(clon.path);
             clon.distractores = nDist > 0
                 ? ajustarDistractoresAPath(clon.path, clon.distractores, nDist)
                 : [];
+            clon.esDemo = false;
             return clon;
         });
+
+        if (mostrarIntroActiva()) {
+            const demoSrc = rutaDemoNivel(nivel);
+            if (demoSrc) {
+                const demo = clonarRuta(demoSrc, 0);
+                demo.id = String(demoSrc.id || ("demo-" + nivel.id));
+                demo.path = anclarExtremosOrtogonales(demo.path);
+                demo.distractores = nDist > 0
+                    ? ajustarDistractoresAPath(demo.path, demo.distractores, nDist)
+                    : [];
+                demo.esDemo = true;
+                lista.unshift(demo);
+            }
+        }
+        return lista;
     }
 
     function regenerarDistractoresActuales() {
@@ -732,13 +983,13 @@
                 bordeDistractores: hc.bordeDistractores || borde
             };
         }
-        const amarillo = c.linea || "#f4c430";
+        const blanco = c.linea || "#ffffff";
         const rojo = c.alerta || "#e53935";
-        const bordeBase = c.borde || "#c98812";
+        const bordeBase = c.borde || "#94a3b8";
         return {
-            linea: lerpColor(amarillo, rojo, alertaDesvio),
+            linea: lerpColor(blanco, rojo, alertaDesvio),
             borde: lerpColor(bordeBase, "#7f1d1d", alertaDesvio * 0.85),
-            distractores: amarillo,
+            distractores: blanco,
             bordeDistractores: bordeBase
         };
     }
@@ -1067,7 +1318,7 @@
         aplicarEstiloAro();
         sincronizarRutasConAro();
         const lab = recorridoActual();
-        if (lab && !arrastrando && !esperandoFeedback && !encestando) {
+        if (lab && !arrastrando && !esperandoFeedback && !encestando && !demoActiva) {
             const geo = inicioMeta(lab);
             pelota = { x: geo.inicio.x, y: geo.inicio.y };
             ultimoValido = { x: geo.inicio.x, y: geo.inicio.y };
@@ -1090,13 +1341,21 @@
         const el = document.getElementById("progreso");
         if (!el || !recorridos.length) return;
         el.hidden = false;
+        if (esRecorridoDemo()) {
+            el.innerHTML = '<i class="fa-solid fa-eye"></i> Demo';
+            return;
+        }
+        const reales = recorridos.filter(function (r) { return !r.esDemo; });
+        const idxReal = reales.indexOf(recorridoActual());
+        const n = idxReal >= 0 ? idxReal + 1 : 1;
         el.innerHTML = '<i class="fa-solid fa-circle"></i> ' +
-            (indiceRecorrido + 1) + " / " + recorridos.length;
+            n + " / " + reales.length;
     }
 
     function resetPelotaEnInicio() {
         const lab = recorridoActual();
         if (!lab) return;
+        detenerDemostracion();
         lab.path = anclarExtremosOrtogonales(lab.path);
         const geo = inicioMeta(lab);
         // Pelota exactamente en el primer punto de la línea.
@@ -1105,10 +1364,10 @@
         progresoCamino = 0;
         alertaDesvio = 0;
         pelotaVisible = true;
-        avisoSaliendoHablado = false;
         arrastrando = false;
         pointerId = null;
         if (canvas) canvas.classList.remove("arrastrando");
+        ritmoFondoAlerta(false);
         mostrarAroNormal();
         mostrarInstruccionBase();
         programarRedibujo();
@@ -1118,10 +1377,16 @@
         esperandoFeedback = false;
         resetPelotaEnInicio();
         actualizarProgreso();
+        if (esRecorridoDemo()) {
+            // Espera un frame de layout antes de animar.
+            requestAnimationFrame(function () {
+                iniciarDemostracion();
+            });
+        }
     }
 
-    function falloCamino(msg) {
-        if (esperandoFeedback || juegoTerminado) return;
+    function falloCamino(msg, opts) {
+        if (esperandoFeedback || juegoTerminado || demoActiva || esRecorridoDemo()) return;
         esperandoFeedback = true;
         arrastrando = false;
         pointerId = null;
@@ -1136,9 +1401,11 @@
         reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
 
         const mensaje = msg || textos().error || "¡Inténtalo otra vez! Sigue la línea con cuidado.";
-        mostrarFeedback("error", mensaje).then(function () {
+        // Si ya habló el aviso de salida, no repetir TTS en el feedback.
+        mostrarFeedback("error", mensaje, { silencio: !!(opts && opts.silencio) }).then(function () {
             esperandoFeedback = false;
             alertaDesvio = 0;
+            ritmoFondoAlerta(false);
             programarRedibujo();
         });
     }
@@ -1154,6 +1421,7 @@
 
     function exitoMeta() {
         if (esperandoFeedback || juegoTerminado) return;
+        if (esRecorridoDemo() || demoActiva) return;
         esperandoFeedback = true;
         arrastrando = false;
         pointerId = null;
@@ -1185,6 +1453,7 @@
     function terminarJuego() {
         if (juegoTerminado) return;
         juegoTerminado = true;
+        detenerDemostracion();
         if (typeof Swal !== "undefined") Swal.close();
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
         const cierre = textos().cierre || "¡Excelente! Completaste los recorridos.";
@@ -1227,19 +1496,26 @@
         if (!proy) return;
 
         const desvio = proy.dist;
-        // Aviso visual solo cuando ya está rozando el límite.
-        alertaDesvio = desvio >= limite * 0.85
-            ? clamp((desvio - limite * 0.85) / Math.max(0.001, limite * 0.15), 0, 1)
-            : 0;
+        // Empieza a salir = borde del balón cruza el borde de la pista.
+        const empiezaASalir = desvio > limite;
 
-        if (alertaDesvio > 0.2) {
+        // Color + texto + voz de aviso lo antes posible.
+        const avisoVisual = Math.max(0.05, limite * 0.55);
+        alertaDesvio = empiezaASalir
+            ? 1
+            : (desvio >= avisoVisual
+                ? clamp((desvio - avisoVisual) / Math.max(0.001, limite - avisoVisual), 0, 1)
+                : 0);
+
+        if (alertaDesvio > 0) {
             avisarSaliendo();
         } else {
             limpiarAvisoSaliendo();
         }
 
-        if (desvio > limite) {
-            falloCamino();
+        if (empiezaASalir) {
+            // Ya sonó en avisarSaliendo(); no repetir TTS del feedback.
+            falloCamino(mensajeSaliendo(), { silencio: true });
             return;
         }
 
@@ -1256,7 +1532,7 @@
     }
 
     function onPointerDown(ev) {
-        if (esperandoFeedback || juegoTerminado) return;
+        if (esperandoFeedback || juegoTerminado || demoActiva || esRecorridoDemo()) return;
         const lab = recorridoActual();
         if (!lab) return;
         const p = aNorm(ev.clientX, ev.clientY);
@@ -1276,7 +1552,7 @@
     }
 
     function onPointerMove(ev) {
-        if (acc().modoTap) return;
+        if (acc().modoTap || demoActiva || esRecorridoDemo()) return;
         if (!arrastrando || ev.pointerId !== pointerId) return;
         if (esperandoFeedback || juegoTerminado) return;
         moverPelotaA(aNorm(ev.clientX, ev.clientY));
@@ -1284,7 +1560,7 @@
     }
 
     function onPointerUp(ev) {
-        if (acc().modoTap) return;
+        if (acc().modoTap || demoActiva || esRecorridoDemo()) return;
         if (ev.pointerId !== pointerId) return;
         const estaba = arrastrando;
         arrastrando = false;
