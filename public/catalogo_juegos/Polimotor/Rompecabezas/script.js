@@ -1674,17 +1674,19 @@ function terminarJuego() {
     }
 
     setTimeout(function () {
-        $("#principal").fadeOut(500);
-        setTimeout(function () {
-            const caja = document.getElementById("final");
-            const texto = document.getElementById("texto_final");
-            if (texto) texto.textContent = cierre;
-            if (caja) {
-                caja.hidden = false;
-                caja.style.display = "block";
-            }
-            if (typeof iniciarVictoria === "function") iniciarVictoria();
-        }, 500);
+        const caja = document.getElementById("final");
+        const texto = document.getElementById("texto_final");
+        if (texto) texto.textContent = cierre;
+        if (caja) {
+            caja.hidden = false;
+            caja.style.display = "block";
+        }
+        // Cierra cortinas sobre el juego; al terminar abre la victoria
+        if (typeof iniciarSecuenciaVictoria === "function") {
+            iniciarSecuenciaVictoria();
+        } else if (typeof iniciarVictoria === "function") {
+            iniciarVictoria();
+        }
     }, 400);
 }
 
