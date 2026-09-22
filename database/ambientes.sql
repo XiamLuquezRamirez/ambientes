@@ -1,5 +1,5 @@
 /*
-SQLyog Community v13.3.0 (64 bit)
+SQLyog Community v13.3.1 (64 bit)
 MySQL - 8.0.41 : Database - ambientes
 *********************************************************************
 */
@@ -12,7 +12,7 @@ MySQL - 8.0.41 : Database - ambientes
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-CREATE DATABASE /*!32312 IF NOT EXISTS*/`ambientes` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`ambientes` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 
 USE `ambientes`;
 
@@ -264,7 +264,7 @@ CREATE TABLE `carga_docente` (
   CONSTRAINT `carga_docente_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `carga_docente_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`),
   CONSTRAINT `carga_docente_grupo_id_foreign` FOREIGN KEY (`grupo_id`) REFERENCES `grupos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `carga_docente` */
 
@@ -276,7 +276,8 @@ insert  into `carga_docente`(`id`,`docente_id`,`ambiente_id`,`grado_id`,`grupo_i
 (6,2,9,1,1,2026,1,'2026-08-04 09:03:15','2026-08-04 09:03:15'),
 (7,2,6,1,1,2026,1,'2026-08-10 14:57:09','2026-08-10 14:57:09'),
 (8,2,6,1,28,2026,1,'2026-08-26 14:57:46','2026-08-26 14:59:51'),
-(9,2,6,2,3,2026,0,'2026-08-26 14:58:00','2026-08-26 14:58:05');
+(9,2,6,2,3,2026,0,'2026-08-26 14:58:00','2026-08-26 14:58:05'),
+(10,2,7,1,1,2026,1,'2026-09-22 10:24:18','2026-09-22 10:24:18');
 
 /*Table structure for table `catalogo_dba` */
 
@@ -339,12 +340,13 @@ CREATE TABLE `clase_experiencias` (
   CONSTRAINT `clase_experiencias_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clase_experiencias_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clase_experiencias_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `clase_experiencias` */
 
 insert  into `clase_experiencias`(`id`,`clase_id`,`experiencia_id`,`modulo_id`,`eje_id`,`tematica_id`,`orden`,`created_at`,`updated_at`) values 
-(14,12,26,8,10,7,1,'2026-08-29 10:56:06','2026-08-29 10:56:06');
+(14,12,26,8,10,7,1,'2026-08-29 10:56:06','2026-08-29 10:56:06'),
+(16,13,28,9,11,8,1,'2026-09-22 10:26:20','2026-09-22 10:26:20');
 
 /*Table structure for table `clases` */
 
@@ -369,12 +371,13 @@ CREATE TABLE `clases` (
   CONSTRAINT `clases_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clases_carga_docente_id_foreign` FOREIGN KEY (`carga_docente_id`) REFERENCES `carga_docente` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clases_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `clases` */
 
 insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values 
-(12,6,2,9,'Identifica los colores',NULL,'2026-09-10','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09');
+(12,6,2,9,'Identifica los colores',NULL,'2026-09-22','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09'),
+(13,10,2,7,'Rompecabezas del cuerpo humano',NULL,'2026-09-22','activa',2026,'2026-09-22 10:26:20','2026-09-22 10:26:22');
 
 /*Table structure for table `cola_sincronizacion` */
 
@@ -394,7 +397,7 @@ CREATE TABLE `cola_sincronizacion` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `cola_sincronizacion_chk_1` CHECK (json_valid(`payload`))
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `cola_sincronizacion` */
 
@@ -462,7 +465,12 @@ insert  into `cola_sincronizacion`(`id`,`entidad`,`entidad_id`,`accion`,`servido
 (61,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"polimotor\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51'),
 (62,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"logico\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51'),
 (63,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51'),
-(64,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51');
+(64,'CargaDocente',8,'create','musica','{\"id\":8,\"docente_id\":2,\"ambiente_id\":6,\"grado_id\":1,\"grupo_id\":28,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-08-26T19:57:46.000000Z\",\"updated_at\":\"2026-08-26T19:59:51.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-08-26 14:59:51','2026-08-26 14:59:51'),
+(65,'CargaDocente',10,'create','multisensorial','{\"id\":10,\"docente_id\":2,\"ambiente_id\":7,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-09-22T15:24:18.000000Z\",\"updated_at\":\"2026-09-22T15:24:18.000000Z\",\"servidor_destino\":\"musica\"}','pendiente',0,NULL,'2026-09-22 10:24:18','2026-09-22 10:24:18'),
+(66,'CargaDocente',10,'create','multisensorial','{\"id\":10,\"docente_id\":2,\"ambiente_id\":7,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-09-22T15:24:18.000000Z\",\"updated_at\":\"2026-09-22T15:24:18.000000Z\",\"servidor_destino\":\"polimotor\"}','pendiente',0,NULL,'2026-09-22 10:24:18','2026-09-22 10:24:18'),
+(67,'CargaDocente',10,'create','multisensorial','{\"id\":10,\"docente_id\":2,\"ambiente_id\":7,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-09-22T15:24:18.000000Z\",\"updated_at\":\"2026-09-22T15:24:18.000000Z\",\"servidor_destino\":\"logico\"}','pendiente',0,NULL,'2026-09-22 10:24:18','2026-09-22 10:24:18'),
+(68,'CargaDocente',10,'create','multisensorial','{\"id\":10,\"docente_id\":2,\"ambiente_id\":7,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-09-22T15:24:18.000000Z\",\"updated_at\":\"2026-09-22T15:24:18.000000Z\",\"servidor_destino\":\"multisensorial\"}','pendiente',0,NULL,'2026-09-22 10:24:18','2026-09-22 10:24:18'),
+(69,'CargaDocente',10,'create','multisensorial','{\"id\":10,\"docente_id\":2,\"ambiente_id\":7,\"grado_id\":1,\"grupo_id\":1,\"anio_lectivo\":2026,\"activo\":1,\"created_at\":\"2026-09-22T15:24:18.000000Z\",\"updated_at\":\"2026-09-22T15:24:18.000000Z\",\"servidor_destino\":\"tecnologia\"}','pendiente',0,NULL,'2026-09-22 10:24:18','2026-09-22 10:24:18');
 
 /*Table structure for table `configuracion_pins` */
 
@@ -687,7 +695,7 @@ CREATE TABLE `estudiante_ambiente` (
   KEY `estudiante_ambiente_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `estudiante_ambiente_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `estudiante_ambiente_estudiante_id_foreign` FOREIGN KEY (`estudiante_id`) REFERENCES `estudiantes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=86 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `estudiante_ambiente` */
 
@@ -750,7 +758,17 @@ insert  into `estudiante_ambiente`(`id`,`estudiante_id`,`ambiente_id`,`anio_lect
 (72,28,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
 (73,35,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
 (74,8,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
-(75,7,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37');
+(75,7,6,2026,'activo',NULL,1,'2026-08-26 14:58:37','2026-08-26 14:58:37'),
+(76,13,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45'),
+(77,11,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45'),
+(78,5,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45'),
+(79,12,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45'),
+(80,9,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45'),
+(81,35,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45'),
+(82,7,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45'),
+(83,8,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45'),
+(84,4,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45'),
+(85,15,7,2026,'activo',NULL,1,'2026-09-22 10:24:45','2026-09-22 10:24:45');
 
 /*Table structure for table `estudiante_perfil_aprendizaje_personalizado` */
 
@@ -907,12 +925,13 @@ CREATE TABLE `experiencias` (
   CONSTRAINT `experiencias_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `experiencias_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `experiencias_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `experiencias` */
 
 insert  into `experiencias`(`id`,`tematica_id`,`grado_id`,`nombre`,`objetivo`,`proposito`,`habilidades`,`duracion_minutos`,`referente_aprendizaje`,`estado`,`activo`,`creado_por`,`created_at`,`updated_at`) values 
-(26,7,1,'Colores — prueba de perfiles','Recorrido de prueba para validar adaptaciones del kiosco según perfil de aprendizaje (visual, audio, opciones, juegos, dibujo, timer, pausas).',NULL,NULL,30,NULL,'activa',1,1,'2026-08-28 15:37:38','2026-09-08 09:04:13');
+(26,7,1,'Colores — prueba de perfiles','Recorrido de prueba para validar adaptaciones del kiosco según perfil de aprendizaje (visual, audio, opciones, juegos, dibujo, timer, pausas).',NULL,NULL,30,NULL,'activa',1,1,'2026-08-28 15:37:38','2026-09-08 09:04:13'),
+(28,8,1,'Clase 1','Clase',NULL,NULL,20,NULL,'borrador',1,1,'2026-09-22 10:25:59','2026-09-22 10:25:59');
 
 /*Table structure for table `failed_jobs` */
 
@@ -1099,8 +1118,12 @@ CREATE TABLE `juegos` (
 /*Data for the table `juegos` */
 
 insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo_juego_id`,`ruta`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
+('arrastrar-y-soltar-objetos',7,NULL,NULL,NULL,9,'catalogo_juegos/Polimotor/ArrastrarYSoltarObjetos','Arrastrar y soltar objetos',NULL,'fa-up-down-left-right','#24eb8e',7,1,'2026-09-18 10:30:49','2026-09-21 16:57:55'),
+('busca-la-sombra',9,NULL,NULL,NULL,11,'catalogo_juegos/Multisensorial/BuscaLaSombra','Busca la sombra',NULL,'fa-clone','#14b8a6',10,1,'2026-09-22 15:27:38','2026-09-22 15:38:20'),
 ('coordinacion-visual',7,NULL,NULL,NULL,7,'catalogo_juegos/Polimotor/CoordinacionVisual','Coordinación visual','Guiar el cohete por los aros con precisión según el nivel de edad.','fa-bullseye','#42a5f5',7,1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
+('encuentra-el-color',9,NULL,NULL,NULL,10,'catalogo_juegos/Multisensorial/EncuentraElColor','Encuentra el Color',NULL,'fa-palette','#f97316',9,1,'2026-09-21 09:34:08','2026-09-22 14:44:26'),
 ('ensamblajes-sencillos',7,NULL,NULL,NULL,8,'catalogo_juegos/Polimotor/EnsamblajesSencillos','Ensamblajes sencillos','Armar el robot arrastrando piezas según el nivel de edad.','fa-robot','#ffab91',8,1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
+('juegos-de-precision',7,NULL,NULL,NULL,7,'catalogo_juegos/Polimotor/JuegosDePrecision','Juegos de precision',NULL,'fa-crosshairs','#eb2442',8,1,'2026-09-18 15:42:23','2026-09-21 16:57:38'),
 ('laberintos-de-coordinacion',7,NULL,NULL,NULL,5,'catalogo_juegos/Polimotor/LaberintosDeCoordinacion','Laberintos de coordinacion',NULL,'fa-chess-knight','#2563eb',5,1,'2026-09-12 08:48:03','2026-09-14 09:17:38'),
 ('lateralidad',7,NULL,NULL,NULL,3,'catalogo_juegos/Polimotor/Lateralidad','Lateralidad (derecha/izquierda)','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','fa-arrows-left-right','#a5d6a7',3,1,'2026-09-09 17:47:30','2026-09-09 17:47:30'),
 ('memoria-corporal',7,NULL,NULL,NULL,4,'catalogo_juegos/Polimotor/MemoriaCorporal','Memoria Corporal',NULL,'fa-puzzle-piece','#2563eb',4,1,'2026-09-14 15:48:10','2026-09-14 15:48:10'),
@@ -3223,7 +3246,7 @@ CREATE TABLE `registros_acceso` (
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=472 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=485 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `registros_acceso` */
 
@@ -3663,7 +3686,20 @@ insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) v
 (468,4,'127.0.0.1','multisensorial','2026-09-08 14:21:43','inicio_sesion'),
 (469,16,'127.0.0.1','multisensorial','2026-09-08 14:36:42','inicio_sesion'),
 (470,1,'127.0.0.1','multisensorial','2026-09-09 16:56:36','inicio_sesion'),
-(471,1,'127.0.0.1','multisensorial','2026-09-10 08:16:03','inicio_sesion');
+(471,1,'127.0.0.1','multisensorial','2026-09-10 08:16:03','inicio_sesion'),
+(472,1,'127.0.0.1','multisensorial','2026-09-22 08:22:56','inicio_sesion'),
+(473,4,'127.0.0.1','multisensorial','2026-09-22 10:23:03','inicio_sesion'),
+(474,1,'127.0.0.1','multisensorial','2026-09-22 10:23:19','inicio_sesion'),
+(475,16,'127.0.0.1','multisensorial','2026-09-22 10:23:48','inicio_sesion'),
+(476,1,'127.0.0.1','multisensorial','2026-09-22 10:25:02','inicio_sesion'),
+(477,4,'127.0.0.1','multisensorial','2026-09-22 10:25:10','inicio_sesion'),
+(478,1,'127.0.0.1','multisensorial','2026-09-22 10:25:36','inicio_sesion'),
+(479,4,'127.0.0.1','multisensorial','2026-09-22 10:26:08','inicio_sesion'),
+(480,1,'127.0.0.1','multisensorial','2026-09-22 10:52:16','inicio_sesion'),
+(481,1,'127.0.0.1','multisensorial','2026-09-22 11:44:40','inicio_sesion'),
+(482,1,'127.0.0.1','multisensorial','2026-09-22 14:24:11','inicio_sesion'),
+(483,1,'127.0.0.1','multisensorial','2026-09-22 15:38:24','inicio_sesion'),
+(484,4,'127.0.0.1','multisensorial','2026-09-22 15:38:57','inicio_sesion');
 
 /*Table structure for table `resultados_bloque` */
 
@@ -3799,7 +3835,7 @@ CREATE TABLE `seguridad_logs` (
   KEY `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
   CONSTRAINT `seguridad_logs_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `seguridad_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=448 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=461 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `seguridad_logs` */
 
@@ -4248,7 +4284,20 @@ insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripci
 (444,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-08 14:21:43','2026-09-08 14:21:43'),
 (445,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-08 14:36:42','2026-09-08 14:36:42'),
 (446,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-09 16:56:36','2026-09-09 16:56:36'),
-(447,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-10 08:16:03','2026-09-10 08:16:03');
+(447,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-09-10 08:16:03','2026-09-10 08:16:03'),
+(448,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 08:22:56','2026-09-22 08:22:56'),
+(449,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 10:23:03','2026-09-22 10:23:03'),
+(450,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 10:23:19','2026-09-22 10:23:19'),
+(451,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 10:23:48','2026-09-22 10:23:48'),
+(452,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 10:25:02','2026-09-22 10:25:02'),
+(453,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 10:25:10','2026-09-22 10:25:10'),
+(454,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 10:25:36','2026-09-22 10:25:36'),
+(455,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 10:26:08','2026-09-22 10:26:08'),
+(456,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 10:52:16','2026-09-22 10:52:16'),
+(457,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 11:44:40','2026-09-22 11:44:40'),
+(458,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 14:24:11','2026-09-22 14:24:11'),
+(459,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 15:38:24','2026-09-22 15:38:24'),
+(460,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 15:38:57','2026-09-22 15:38:57');
 
 /*Table structure for table `sesiones_experiencia` */
 
@@ -4425,7 +4474,7 @@ CREATE TABLE `tipos_juegos` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `tipos_juegos_slug_unique` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `tipos_juegos` */
 
@@ -4437,7 +4486,10 @@ insert  into `tipos_juegos`(`id`,`slug`,`nombre`,`descripcion`,`activo`,`created
 (5,'laberinto','Laberinto','Juego de recorrido mediante laberintos para trabajar la coordinación.',1,'2026-09-12 08:48:03','2026-09-12 08:48:03'),
 (6,'secuencia_movimiento','Secuencia de movimiento','Juego para ordenar y reconocer secuencias de movimientos.',1,'2026-09-14 09:20:46','2026-09-14 09:20:46'),
 (7,'precision','Precisión','Juego de coordinación visual y precisión de movimiento.',1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
-(8,'ensamblaje','Ensamblaje','Juego para armar un robot mediante piezas sencillas.',1,'2026-09-21 14:30:00','2026-09-21 14:30:00');
+(8,'ensamblaje','Ensamblaje','Juego para armar un robot mediante piezas sencillas.',1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
+(9,'arrastrar','Arrastrar',NULL,1,'2026-09-21 16:57:55','2026-09-21 16:57:55'),
+(10,'encuentra_color','Encuentra el color','Juego para reconocer e identificar colores en objetos.',1,'2026-09-22 14:44:26','2026-09-22 14:44:26'),
+(11,'busca_sombra','Busca la sombra','Juego para relacionar un objeto con su sombra por la forma.',1,'2026-09-22 15:38:20','2026-09-22 15:38:20');
 
 /*Table structure for table `users` */
 

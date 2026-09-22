@@ -90,39 +90,27 @@
         {
           "id": "a3-r1",
           "titulo": "Arriba y abajo",
-          "prefijo": ["manos_arriba"],
-          "correcta": "manos_abajo",
+          "prefijo": ["manos_arriba", "manos_abajo"],
+          "correcta": "manos_arriba",
           "distractores": ["abrir_brazos", "tocar_cabeza"],
-          "demoNarracion": [
-            { "quien": "zoe", "texto": "Mira: manos arriba." },
-            { "quien": "zeus", "texto": "¡Ahora mira qué hago yo!" }
-          ],
           "preguntaQuien": "zeus",
           "pregunta": "¿Qué movimiento sigue?"
         },
         {
           "id": "a3-r2",
           "titulo": "Cabeza y barriga",
-          "prefijo": ["tocar_cabeza"],
-          "correcta": "tocar_barriga",
+          "prefijo": ["tocar_cabeza", "tocar_barriga"],
+          "correcta": "tocar_cabeza",
           "distractores": ["manos_arriba", "abrir_brazos"],
-          "demoNarracion": [
-            { "quien": "zoe", "texto": "Mira: manos en la cabeza." },
-            { "quien": "zeus", "texto": "Manos en la barriga." }
-          ],
           "preguntaQuien": "zeus",
           "pregunta": "¿Qué movimiento sigue?"
         },
         {
           "id": "a3-r3",
           "titulo": "Hombros y rodillas",
-          "prefijo": ["tocar_hombros"],
-          "correcta": "tocar_rodillas",
+          "prefijo": ["tocar_hombros", "tocar_rodillas"],
+          "correcta": "tocar_hombros",
           "distractores": ["tocar_cabeza", "manos_abajo"],
-          "demoNarracion": [
-            { "quien": "zoe", "texto": "Mira: manos en los hombros." },
-            { "quien": "zeus", "texto": "Ahora toca las rodillas." }
-          ],
           "preguntaQuien": "zeus",
           "pregunta": "¿Qué movimiento sigue?"
         }

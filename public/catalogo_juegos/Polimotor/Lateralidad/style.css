@@ -553,11 +553,22 @@ body.esperando-inicio #menu-acc {
   gap: 4px;
 }
 
-.btn-mano i { font-size: 36px; }
+.btn-mano i { font-size: 36px; line-height: 1; }
+/* fa-hand es mano derecha: espejamos la izquierda para que se lean como izq / der. */
+.btn-mano.izquierda i.mano-izq {
+  transform: scaleX(-1);
+  display: inline-block;
+}
+.btn-mano.centro i.mano-centro {
+  font-size: 40px;
+}
 .btn-mano.izquierda { background: #ffd43b; }
 .btn-mano.centro { background: #4dabf7; color: #fff; }
 .btn-mano.derecha { background: #51cf66; color: #fff; }
 .btn-mano:active { transform: translateY(3px); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12); }
+.btn-mano.izquierda:active i.mano-izq {
+  transform: scaleX(-1);
+}
 .btn-mano:disabled { opacity: 0.45; cursor: default; }
 
 .intro-lados {

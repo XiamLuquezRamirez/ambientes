@@ -1,0 +1,109 @@
+{
+  "nombre": "Busca la sombra",
+  "mostrarFeedBack": true,
+  "feedback": {
+    "duracion": 1400,
+    "acierto": {
+      "gif": "../../images/correcto.gif"
+    },
+    "error": {
+      "gif": "../../images/incorrecto.gif"
+    }
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "enunciado": "Observa el objeto y encuentra su sombra",
+    "cierre": "¡Excelente! Encontraste todas las sombras.",
+    "aciertoPlantilla": "¡Muy bien! Encontraste la sombra de {objeto}.",
+    "aciertoPlantillaAvanzada": "¡Excelente! Encontraste la sombra de {objeto}.",
+    "error": "¡Inténtalo otra vez! Observa muy bien su forma.",
+    "errorAvanzado": "¡Inténtalo otra vez! Observa con atención su forma y sus detalles.",
+    "consignaPlantilla": "Encuentra la sombra de {objeto}.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Observa muy bien el objeto y encuentra su sombra."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Cada objeto tiene una sombra con su misma forma. ¡Toca la correcta!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Mira con atención la forma y elige. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "audios": {
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "objetos": {
+    "manzana": { "nombre": "la manzana", "etiqueta": "Manzana", "img": "img/objetos/manzana.svg", "sombra": "img/sombras/manzana.svg" },
+    "carro": { "nombre": "el carro", "etiqueta": "Carro", "img": "img/objetos/carro.svg", "sombra": "img/sombras/carro.svg" },
+    "estrella": { "nombre": "la estrella", "etiqueta": "Estrella", "img": "img/objetos/estrella.svg", "sombra": "img/sombras/estrella.svg" },
+    "pez": { "nombre": "el pez", "etiqueta": "Pez", "img": "img/objetos/pez.svg", "sombra": "img/sombras/pez.svg" },
+    "arbol": { "nombre": "el árbol", "etiqueta": "Árbol", "img": "img/objetos/arbol.svg", "sombra": "img/sombras/arbol.svg" },
+    "mariposa": { "nombre": "la mariposa", "etiqueta": "Mariposa", "img": "img/objetos/mariposa.svg", "sombra": "img/sombras/mariposa.svg" },
+    "conejo": { "nombre": "el conejo", "etiqueta": "Conejo", "img": "img/objetos/conejo.svg", "sombra": "img/sombras/conejo.svg" },
+    "flor": { "nombre": "la flor", "etiqueta": "Flor", "img": "img/objetos/flor.svg", "sombra": "img/sombras/flor.svg" },
+    "pera": { "nombre": "la pera", "etiqueta": "Pera", "img": "img/objetos/pera.svg", "sombra": "img/sombras/pera.svg" },
+    "pajaro": { "nombre": "el pájaro", "etiqueta": "Pájaro", "img": "img/objetos/pajaro.svg", "sombra": "img/sombras/pajaro.svg" },
+    "tortuga": { "nombre": "la tortuga", "etiqueta": "Tortuga", "img": "img/objetos/tortuga.svg", "sombra": "img/sombras/tortuga.svg" },
+    "girasol": { "nombre": "el girasol", "etiqueta": "Girasol", "img": "img/objetos/girasol.svg", "sombra": "img/sombras/girasol.svg" },
+    "hoja": { "nombre": "la hoja", "etiqueta": "Hoja", "img": "img/objetos/hoja.svg", "sombra": "img/sombras/hoja.svg" },
+    "mosca": { "nombre": "la mosca", "etiqueta": "Mosca", "img": "img/objetos/mosca.svg", "sombra": "img/sombras/mosca.svg" },
+    "abeja": { "nombre": "la abeja", "etiqueta": "Abeja", "img": "img/objetos/abeja.svg", "sombra": "img/sombras/abeja.svg" },
+    "gato": { "nombre": "el gato", "etiqueta": "Gato", "img": "img/objetos/gato.svg", "sombra": "img/sombras/gato.svg" },
+    "perro": { "nombre": "el perro", "etiqueta": "Perro", "img": "img/objetos/perro.svg", "sombra": "img/sombras/perro.svg" },
+    "ardilla": { "nombre": "la ardilla", "etiqueta": "Ardilla", "img": "img/objetos/ardilla.svg", "sombra": "img/sombras/ardilla.svg" },
+    "zorro": { "nombre": "el zorro", "etiqueta": "Zorro", "img": "img/objetos/zorro.svg", "sombra": "img/sombras/zorro.svg" },
+    "avion": { "nombre": "el avión", "etiqueta": "Avión", "img": "img/objetos/avion.svg", "sombra": "img/sombras/avion.svg" },
+    "helicoptero": { "nombre": "el helicóptero", "etiqueta": "Helicóptero", "img": "img/objetos/helicoptero.svg", "sombra": "img/sombras/helicoptero.svg" },
+    "cohete": { "nombre": "el cohete", "etiqueta": "Cohete", "img": "img/objetos/cohete.svg", "sombra": "img/sombras/cohete.svg" },
+    "avioneta": { "nombre": "la avioneta", "etiqueta": "Avioneta", "img": "img/objetos/avioneta.svg", "sombra": "img/sombras/avioneta.svg" },
+    "aguila": { "nombre": "el águila", "etiqueta": "Águila", "img": "img/objetos/aguila.svg", "sombra": "img/sombras/aguila.svg" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3 años",
+      "titulo": "3 sombras",
+      "avanzado": false,
+      "retos": [
+        { "objeto": "manzana", "sombras": ["manzana", "carro", "estrella"] },
+        { "objeto": "carro", "sombras": ["pez", "carro", "arbol"] },
+        { "objeto": "mariposa", "sombras": ["mariposa", "conejo", "flor"] }
+      ]
+    },
+    {
+      "id": "4",
+      "edad": "4 años",
+      "titulo": "4 sombras",
+      "avanzado": false,
+      "retos": [
+        { "objeto": "manzana", "sombras": ["manzana", "pera", "estrella", "carro"] },
+        { "objeto": "pez", "sombras": ["pez", "pajaro", "mariposa", "tortuga"] },
+        { "objeto": "flor", "sombras": ["flor", "girasol", "arbol", "hoja"] }
+      ]
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "5 sombras · detalle",
+      "avanzado": true,
+      "retos": [
+        { "objeto": "mariposa", "sombras": ["mariposa", "mosca", "abeja", "pajaro", "flor"] },
+        { "objeto": "conejo", "sombras": ["conejo", "gato", "perro", "ardilla", "zorro"] },
+        { "objeto": "avion", "sombras": ["avion", "helicoptero", "cohete", "avioneta", "aguila"] }
+      ]
+    }
+  ]
+}

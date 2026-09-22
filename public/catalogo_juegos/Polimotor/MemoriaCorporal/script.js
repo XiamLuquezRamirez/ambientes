@@ -384,12 +384,14 @@ function cfgFeedback(tipo) {
 }
 
 function hablarFeedback(tipo) {
+    if (tipo === "acierto") return Promise.resolve();
     if (!feedbackActivo()) return Promise.resolve();
     const cfg = cfgFeedback(tipo);
     return hablarTexto(cfg.texto);
 }
 
 function mostrarFeedback(tipo) {
+    if (tipo === "acierto") return Promise.resolve();
     if (!feedbackActivo()) return Promise.resolve();
     const cfg = cfgFeedback(tipo);
     const pj = tipo === "error" ? "zeus" : "zoe";

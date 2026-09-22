@@ -785,30 +785,11 @@
     async function feedbackAcierto() {
         esperandoFeedback = true;
         aceptaArrastre = false;
-        const texto = textos().acierto || "¡Muy bien! Colocaste el objeto en su lugar.";
-        const gif = (gameConfig.feedback && gameConfig.feedback.acierto && gameConfig.feedback.acierto.gif)
-            || "../../images/correcto.gif";
-        const minMs = Number(gameConfig.feedback && gameConfig.feedback.duracion) || 1300;
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
-        const pVoz = TextoVoz.hablar(texto, "zoe");
-        Swal.fire({
-            title: texto,
-            imageUrl: gif,
-            imageHeight: 140,
-            showConfirmButton: false,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            heightAuto: false,
-            scrollbarPadding: false
-        });
-        const topeMs = Math.max(minMs + 2500, 6000);
+        // Sin modal/TTS por acierto: solo sonido (evita carga en cada colocación).
         try {
-            await Promise.race([
-                Promise.all([pVoz.catch(function () {}), sleep(minMs)]),
-                sleep(topeMs)
-            ]);
+            await sleep(350);
         } finally {
-            try { Swal.close(); } catch (e) { /* noop */ }
             esperandoFeedback = false;
             aceptaArrastre = !juegoTerminado;
         }
