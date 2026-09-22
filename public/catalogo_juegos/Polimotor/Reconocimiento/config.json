@@ -24,7 +24,7 @@
     "textos": {
         "eligeCuerpo": "¿Qué cuerpo quieres explorar?",
         "eligeNivel": "Elige tu edad",
-        "cierre": "¡Excelente! Reconociste las partes del cuerpo.",
+        "cierre": "Reconociste las partes del cuerpo.",
         "acierto": "¡Muy bien! Encontraste la parte del cuerpo.",
         "error": "Ya casi lo tienes, mira con atención y vuelve a intentarlo. ¡Tú puedes!",
         "conversacion": [

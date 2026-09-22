@@ -308,7 +308,7 @@
             t.acierto, t.error, t.cierre, t.enunciado, t.eligeNivel,
             "¡Muy bien! Colocaste el objeto en su lugar.",
             "¡Inténtalo otra vez! Observa dónde corresponde.",
-            "¡Excelente! Ubicaste todos los objetos correctamente."
+            "Ubicaste todos los objetos correctamente."
         ].filter(Boolean);
     }
 
@@ -830,7 +830,7 @@
     function mostrarCierre() {
         juegoTerminado = true;
         aceptaArrastre = false;
-        const cierre = textos().cierre || "¡Excelente! Ubicaste todos los objetos correctamente.";
+        const cierre = textos().cierre || "Ubicaste todos los objetos correctamente.";
         document.getElementById("texto_final").textContent = cierre;
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
         TextoVoz.hablar(cierre, "zoe");

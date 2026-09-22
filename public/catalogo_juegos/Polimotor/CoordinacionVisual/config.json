@@ -1,5 +1,142 @@
 {
-    "nombre": "Coordinación Visual",
-    "stub": true,
-    "creado_en": "2026-09-21T14:34:09-05:00"
+  "nombre": "Coordinación Visual",
+  "feedback": {
+    "duracion": 1400,
+    "acierto": {
+      "gif": "../../images/correcto.gif"
+    },
+    "error": {
+      "gif": "../../images/incorrecto.gif"
+    }
+  },
+  "textos": {
+    "instruccion": "Arrastra la pelota hasta la canasta siguiendo el camino.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: la pelota sigue el camino hasta la canasta.",
+    "demostracionFin": "¡Ahora te toca a ti! Sigue el camino hasta la canasta.",
+    "cierre": "¡Excelente! Completaste los recorridos.",
+    "acierto": "¡Muy bien! Llevaste la pelota hasta la canasta.",
+    "error": "¡Inténtalo otra vez! Sigue el camino con cuidado.",
+    "saliendo": "Te estas saliendo del camino.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Arrastra la pelota hasta la canasta siguiendo el camino."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Mantén el dedo sobre la pelota y síguela por el camino sin salirte."
+      },
+      {
+        "personaje": 1,
+        "texto": "Si te sales, la pelota vuelve al último punto donde estabas, antes de salirte. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "altoContraste": false,
+    "altoContrasteEstilo": {
+      "fondo": "rgba(0,0,0,0.82)",
+      "linea": "#000000",
+      "borde": "#E5FF00",
+      "alerta": "#e53935",
+      "distractores": "#000000",
+      "bordeDistractores": "#E5FF00",
+      "bordePelota": "#E5FF00",
+      "bordeArco": "#E5FF00"
+    },
+    "modoTap": false,
+    "mostrarIntro": true,
+    "mostrarFeedBack": true,
+    "rutasFalsas": true,
+    "rutasFalsasCantidad": 2,
+    "anchoCaminoExtra": 0,
+    "anchoCaminoExtraMin": -6,
+    "anchoCaminoExtraMax": 10,
+    "umbralEnceste": 0.5,
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5
+  },
+  "edad": 4,
+  "audios": {
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "escenario": {
+    "fondo": "images/fondo.png"
+  },
+  "pelota": {
+    "imagen": "images/balon.png",
+    "radio": 2.75
+  },
+  "inicioLinea": {
+    "x": 10,
+    "y": 78
+  },
+  "aro": {
+    "imagen": "images/aro.gif",
+    "imagenEnceste": "images/aro2.gif",
+    "base": "images/base.png",
+    "anchoNatural": 500,
+    "altoNatural": 1200,
+    "alturaConjuntoPct": 78,
+    "topPct": 8,
+    "rightPct": 0.2,
+    "rimFracX": 0.5,
+    "rimFracY": 0.2,
+    "metaX": 89,
+    "metaY": 38,
+    "radioMeta": 6.5,
+    "msEnceste": 1800
+  },
+  "coloresCamino": {
+    "linea": "#87CEEB",
+    "borde": "#0284C7",
+    "alerta": "#e53935",
+    "distractores": "#94a3b8"
+  },
+  "rutasFijas": "rutas-fijas.json",
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3 años",
+      "titulo": "3 recorridos",
+      "cantidad": 3,
+      "anchoCamino": 12,
+      "anchoPelota": 5,
+      "curvasMin": 2,
+      "curvasMax": 2,
+      "largo": "corto",
+      "distractores": 0,
+      "soltarEsFallo": false
+    },
+    {
+      "id": "4",
+      "edad": "4 años",
+      "titulo": "4 recorridos",
+      "cantidad": 4,
+      "anchoCamino": 8,
+      "anchoPelota": 3.9,
+      "curvasMin": 4,
+      "curvasMax": 4,
+      "largo": "medio",
+      "distractores": 0,
+      "soltarEsFallo": false
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "5 recorridos",
+      "cantidad": 5,
+      "anchoCamino": 6,
+      "anchoPelota": 2.9,
+      "curvasMin": 6,
+      "curvasMax": 6,
+      "largo": "largo",
+      "distractores": 3,
+      "soltarEsFallo": true
+    }
+  ]
 }

@@ -13,7 +13,7 @@
   "textos": {
     "eligeNivel": "Elige tu edad",
     "enunciado": "Arrastra cada objeto hasta el lugar donde corresponde",
-    "cierre": "¡Excelente! Ubicaste todos los objetos correctamente.",
+    "cierre": "Ubicaste todos los objetos correctamente.",
     "acierto": "¡Muy bien! Colocaste el objeto en su lugar.",
     "error": "¡Inténtalo otra vez! Observa dónde corresponde.",
     "conversacion": [

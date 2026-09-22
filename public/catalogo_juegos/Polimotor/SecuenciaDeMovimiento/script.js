@@ -1015,7 +1015,7 @@
     function mostrarCierre() {
         juegoTerminado = true;
         const fe = feedbackEdad();
-        const cierre = fe.cierre || textos().cierre || "¡Excelente! ¡Completaste las secuencias!";
+        const cierre = fe.cierre || textos().cierre || "¡Lograste completar las secuencias!";
         document.getElementById("texto_final").textContent = cierre;
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
         TextoVoz.hablar(cierre, "zoe");

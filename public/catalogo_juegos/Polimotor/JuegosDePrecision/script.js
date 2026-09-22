@@ -290,7 +290,7 @@
             t.aciertoAro, t.aciertoRecorrido, t.error, t.cierre, t.enunciado, t.eligeNivel,
             "¡Muy bien! Sigue avanzando.",
             "¡Inténtalo otra vez! Mueve el cohete con cuidado.",
-            "¡Excelente! Completaste el recorrido de precisión."
+            "Completaste el recorrido de precisión."
         ].filter(Boolean);
     }
 
@@ -979,7 +979,7 @@
     function mostrarCierre() {
         juegoTerminado = true;
         aceptaArrastre = false;
-        const cierre = textos().cierre || "¡Excelente! Completaste el recorrido de precisión.";
+        const cierre = textos().cierre || "Completaste el recorrido de precisión.";
         document.getElementById("texto_final").textContent = cierre;
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
         TextoVoz.hablar(cierre, "zoe");

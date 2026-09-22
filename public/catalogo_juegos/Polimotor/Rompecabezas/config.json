@@ -1,6 +1,6 @@
 {
   "accesibilidad": {
-    "piezasVisibles": 3,
+    "piezasVisibles": 4,
     "tiempoMostrarCompleto": 3000,
     "tiempoVerDeNuevo": 3000,
     "porcentajeAcierto": 60,
@@ -33,34 +33,34 @@
   "textos": {
     "instruccion": "Hola, soy Zoe. ¡Vamos a jugar! Observa el cuerpo y arrastra cada pieza hasta el lugar donde corresponde.",
     "seOcultan": "La figura se esconderá en...",
-    "cierre": "¡Excelente, Completaste el rompecabezas del cuerpo humano!",
+    "cierre": "¡Lograste completar el rompecabezas del cuerpo humano!",
     "acierto": "¡Muy bien, lo hiciste genial!",
     "error": "Ya casi lo tienes, mira con atención y prueba otro lugar para esa pieza.",
     "conversacion": [
       {
         "personaje": 0,
-        "texto": "¡Hola! Soy Zeus.<br>Hoy vamos a armar un rompecabezas del cuerpo humano."
+        "texto": "¡Hola! Soy Zeus. Hoy vamos a armar un rompecabezas del cuerpo humano."
       },
       {
         "personaje": 1,
-        "texto": "¡Yo soy Zoe!<br>Encontrarás varias piezas del cuerpo. ¡Tendrás que colocarlas en el lugar correcto!"
+        "texto": "¡Yo soy Zoe! Verás varias piezas del cuerpo. Colócalas en el lugar correcto."
       },
       {
         "personaje": 0,
-        "texto": "Mira con mucha atención la figura.<br>Después, arrastra cada pieza hasta el lugar donde creas que corresponde."
+        "texto": "Mira bien la figura completa. Después arrastra cada pieza hasta donde creas que va."
       },
       {
         "personaje": 1,
-        "texto": "Hazlo con calma y observa cada pieza.<br>¡Tú puedes completar el rompecabezas!"
+        "texto": "Hazlo con calma y observa cada pieza. ¡Tú puedes completar el rompecabezas!"
       },
       {
         "personaje": 0,
-        "texto": "Si quieres una pista, puedes tocar el boton pista, ubicado en la parte superior derecha de la pantalla el cual tiene un icono de un ojo."
+        "texto": "Si necesitas ayuda, toca el botón de pista arriba a la derecha, el del ojito."
       }
     ]
   }, 
   "cuerpo": "nina",
-  "edad": 4,
+  "edad": 3,
   "audios": {
     "acierto": "../../sounds/ok.mp3",
     "error": "../../sounds/over.mp3",

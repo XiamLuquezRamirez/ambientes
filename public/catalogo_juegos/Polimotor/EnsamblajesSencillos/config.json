@@ -29,7 +29,7 @@
   "textos": {
     "instruccion": "Hola, soy Zoe. ¡Vamos a armar el robot! Observa las piezas y colócalas en su lugar.",
     "seOcultan": "El robot se esconderá en...",
-    "cierre": "¡Excelente! Completaste el ensamblaje del robot.",
+    "cierre": "Completaste el ensamblaje del robot.",
     "acierto": "¡Muy bien, esa pieza va ahí!",
     "error": "Ya casi. Mira con atención y prueba otro lugar.",
     "conversacion": [

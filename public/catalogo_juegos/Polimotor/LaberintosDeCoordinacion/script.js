@@ -1497,7 +1497,7 @@
 
     function mostrarCierre() {
         juegoTerminado = true;
-        const cierre = textos().cierre || "¡Excelente! Completaste los laberintos.";
+        const cierre = textos().cierre || "Lograste pasar todos los laberintos.";
         document.getElementById("texto_final").textContent = cierre;
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
         TextoVoz.hablar(cierre, "zoe");
