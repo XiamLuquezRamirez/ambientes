@@ -233,7 +233,10 @@ body {
 
 body.esperando-inicio #principal,
 body.esperando-inicio #menu-vol,
-body.esperando-inicio #menu-acc {
+body.esperando-inicio #menu-acc,
+body.intro3d-activa #principal,
+body.intro3d-activa #menu-vol,
+body.intro3d-activa #menu-acc {
   visibility: hidden;
 }
 

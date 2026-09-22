@@ -13,6 +13,7 @@
 	<script src="/assets/js/sweetalert.js"></script>
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="../../final/final.css">
+	<link rel="stylesheet" href="../intro3d/css/intro.css">
 </head>
 <body class="esperando-inicio">
 	<div id="pantalla-inicio" class="pantalla-inicio">
@@ -24,19 +25,40 @@
 				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
 				<span class="btn-empecemos-texto">¡Empecemos!</span>
 			</button>
-			<p class="inicio-ayuda">Toca para escuchar a Zoe y Zeus</p>
+			<p class="inicio-ayuda">Toca para comenzar la intro</p>
 		</div>
 	</div>
-	<div style="display: none" class="overlay">
-		<div id="personajes-container"></div>
-		<div class="nube nube-centro">
-			<img src="../../images/nube.png" id="nube_img" class="nube_img" alt="">
-			<div class="nube-contenido">
-				<p class="borde2" id="bienvenida"></p>
+
+	<div id="intro3d-root" hidden>
+		<div id="three-container"></div>
+		<div id="phaser-container"></div>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;">
+			Omitir <i class="fa fa-forward" aria-hidden="true"></i>
+		</button>
+		<div id="intro3d-continuar" hidden>
+			<div class="intro3d-continuar-card">
+				<div class="intro3d-titulo-wrap">
+					<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>
+					<h2>¡Listo!</h2>
+					<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>
+				</div>
+				<p>Toca el botón para empezar el juego</p>
+				<div class="intro3d-btn-wrap">
+					<span class="intro3d-ray intro3d-ray-bl1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-bl2" aria-hidden="true"></span>
+					<button type="button" id="btn-continuar-intro3d">
+						<span class="intro3d-btn-shine" aria-hidden="true"></span>
+						<span class="intro3d-play" aria-hidden="true"></span>
+						<span>CONTINUAR</span>
+					</button>
+					<span class="intro3d-ray intro3d-ray-br1" aria-hidden="true"></span>
+					<span class="intro3d-ray intro3d-ray-br2" aria-hidden="true"></span>
+				</div>
 			</div>
-		</div>
-		<div style="z-index: 1003;position: absolute;top: 20pt;left: 20pt;">
-			<button onclick="cerrar_anuncio()" id="btnomitir" class="btn btn-warning" style="width: auto; padding: 4pt; border-radius: 8pt; font-size: 30px; color: black;">Omitir <i style="color: black" class="fa fa-forward" aria-hidden="true"></i></button>
 		</div>
 	</div>
 
@@ -129,6 +151,18 @@
 
 	<script src="../../texto_voz.js"></script>
 	<script src="../../final/final.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+	<script src="../intro3d/js/config.js"></script>
+	<script type="importmap">
+	{
+	  "imports": {
+	    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+	    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+	  }
+	}
+	</script>
+	<script type="module" src="../intro3d/js/three-scene.js"></script>
+	<script src="../intro3d/js/intro.js"></script>
 	<script src="script.js"></script>
 </body>
 </html>

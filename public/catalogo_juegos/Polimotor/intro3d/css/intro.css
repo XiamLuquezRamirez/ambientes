@@ -1,0 +1,203 @@
+#intro3d-root,
+#intro3d-root #three-container,
+#intro3d-root #phaser-container {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#intro3d-root {
+    z-index: 3500;
+    background: #0b1a33;
+}
+
+#intro3d-root[hidden] {
+    display: none !important;
+}
+
+#intro3d-root #three-container {
+    z-index: 1;
+}
+
+#intro3d-root #phaser-container {
+    z-index: 2;
+    pointer-events: none;
+}
+
+#intro3d-root #phaser-container canvas {
+    pointer-events: auto;
+    display: block;
+}
+
+#intro3d-root.is-closing {
+    opacity: 0;
+    transition: opacity 0.45s ease;
+}
+
+#intro3d-continuar {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(40, 90, 140, 0.18);
+    pointer-events: auto;
+}
+
+#intro3d-continuar[hidden] {
+    display: none !important;
+}
+
+.intro3d-continuar-card {
+    position: relative;
+    width: min(92vw, 520px);
+    padding: 38px 34px 32px;
+    border-radius: 48px;
+    text-align: center;
+    background: linear-gradient(180deg, #fffef8 0%, #fff1c8 55%, #ffe8a8 100%);
+    border: 10px solid #ffce2a;
+    box-shadow:
+        0 10px 0 #e0a500,
+        0 22px 40px rgba(0, 0, 0, 0.28),
+        inset 0 4px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -8px 0 rgba(255, 186, 40, 0.28);
+    animation: intro3dCardIn 0.45s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+}
+
+.intro3d-titulo-wrap,
+.intro3d-btn-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+
+.intro3d-continuar-card h2 {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font-family: Fredoka, Arial, sans-serif;
+    font-size: clamp(48px, 7vw, 68px);
+    font-weight: 700;
+    color: #2f7dff;
+    -webkit-text-stroke: 7px #ffffff;
+    paint-order: stroke fill;
+    text-shadow:
+        0 5px 0 #1a4fbf,
+        0 9px 0 rgba(20, 60, 140, 0.25);
+    letter-spacing: 0.5px;
+}
+
+.intro3d-continuar-card p {
+    margin: 14px 0 28px;
+    font-family: Fredoka, Arial, sans-serif;
+    font-size: clamp(18px, 2.5vw, 24px);
+    font-weight: 600;
+    color: #2457b8;
+    line-height: 1.25;
+}
+
+.intro3d-ray {
+    position: absolute;
+    width: 14px;
+    height: 28px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: linear-gradient(180deg, #ffe566 0%, #ffb400 100%);
+    box-shadow: 0 2px 0 rgba(200, 130, 0, 0.35);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.intro3d-ray-l1 { left: -34px; top: 8px; transform: rotate(-55deg); }
+.intro3d-ray-l2 { left: -42px; top: 34px; transform: rotate(-90deg) scale(0.85); }
+.intro3d-ray-l3 { left: -28px; top: 56px; transform: rotate(-122deg) scale(0.75); }
+.intro3d-ray-r1 { right: -34px; top: 8px; transform: rotate(55deg); }
+.intro3d-ray-r2 { right: -42px; top: 34px; transform: rotate(90deg) scale(0.85); }
+.intro3d-ray-r3 { right: -28px; top: 56px; transform: rotate(122deg) scale(0.75); }
+
+.intro3d-ray-bl1 { left: -28px; top: 18px; transform: rotate(-70deg) scale(0.8); }
+.intro3d-ray-bl2 { left: -34px; top: 42px; transform: rotate(-105deg) scale(0.7); }
+.intro3d-ray-br1 { right: -28px; top: 18px; transform: rotate(70deg) scale(0.8); }
+.intro3d-ray-br2 { right: -34px; top: 42px; transform: rotate(105deg) scale(0.7); }
+
+#btn-continuar-intro3d {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-width: 270px;
+    padding: 18px 34px;
+    border: 5px solid #ffffff;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #7be06a 0%, #3dbd45 48%, #249a34 100%);
+    color: #fff;
+    font-family: Fredoka, Arial, sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow:
+        0 8px 0 #1a7a28,
+        0 14px 22px rgba(0, 0, 0, 0.22),
+        inset 0 2px 0 rgba(255, 255, 255, 0.55);
+    animation: intro3dBtnPulse 1.25s ease-in-out infinite;
+}
+
+.intro3d-btn-shine {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 6px;
+    height: 38%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+    pointer-events: none;
+}
+
+.intro3d-play {
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 16px solid #fff;
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.15));
+}
+
+#btn-continuar-intro3d:hover {
+    filter: brightness(1.06);
+}
+
+#btn-continuar-intro3d:active {
+    transform: translateY(4px);
+    box-shadow:
+        0 4px 0 #1a7a28,
+        0 8px 14px rgba(0, 0, 0, 0.2),
+        inset 0 2px 0 rgba(255, 255, 255, 0.55);
+}
+
+@keyframes intro3dCardIn {
+    from {
+        opacity: 0;
+        transform: scale(0.86) translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes intro3dBtnPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
