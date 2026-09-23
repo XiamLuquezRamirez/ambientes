@@ -908,6 +908,7 @@ $(document).ready(function () {
     gameConfig = JSON.parse(readText("config.json"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
+    sincronizarDialogoIntro3d();
     aplicarVisual();
     aplicarAccesibilidadInicial();
     TextoVoz.iniciar(gameConfig, introConfig, {
@@ -925,6 +926,16 @@ $(document).ready(function () {
     window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
     const btnEmpecemos = document.getElementById("btn-empecemos");
     if (btnEmpecemos) btnEmpecemos.addEventListener("click", empecemosJuego);
+    const btnOmitirIntro = document.getElementById("btn-omitir-intro3d");
+    if (btnOmitirIntro) btnOmitirIntro.addEventListener("click", omitirIntro3d);
+    const btnContinuarIntro = document.getElementById("btn-continuar-intro3d");
+    if (btnContinuarIntro) {
+        btnContinuarIntro.addEventListener("click", function (ev) {
+            ev.preventDefault();
+            empezarJuegoTrasIntro();
+        });
+    }
+    window.addEventListener("victory-continue", empezarJuegoTrasIntro);
     window.addEventListener("message", function (ev) {
         if (ev.origin !== window.location.origin) return;
         if (ev.data && ev.data.type === "pednia:perfil") {
@@ -938,17 +949,4 @@ $(document).ready(function () {
             verDeNuevo();
         });
     }
-    sincronizarDialogoIntro3d();
-    const btnOmitirIntro = document.getElementById("btn-omitir-intro3d");
-    if (btnOmitirIntro) {
-        btnOmitirIntro.addEventListener("click", omitirIntro3d);
-    }
-    const btnContinuarIntro = document.getElementById("btn-continuar-intro3d");
-    if (btnContinuarIntro) {
-        btnContinuarIntro.addEventListener("click", function (ev) {
-            ev.preventDefault();
-            empezarJuegoTrasIntro();
-        });
-    }
-    window.addEventListener("victory-continue", empezarJuegoTrasIntro);
 });

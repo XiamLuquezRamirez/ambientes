@@ -339,7 +339,7 @@ body.demo-activa #progreso {
   color: #0f766e;
 }
 
-/* Tutorial: oscurece el escenario y Zoe saluda a la derecha */
+/* Tutorial: oscurece el escenario y personaje 3D a la derecha */
 body.demo-activa .lienzo-wrap::before {
   content: "";
   position: absolute;
@@ -353,36 +353,6 @@ body.demo-activa #lienzo,
 body.demo-activa .aro-conjunto,
 body.demo-activa .pelota-img {
   z-index: 5;
-}
-
-.tutorial-zoe {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  z-index: 40;
-  width: min(38vw, 320px);
-  height: min(70vh, 500px);
-  background: url("../../images/zoe_hablando.gif") no-repeat bottom center / contain;
-  transform: translateX(110%);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.65s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.4s ease;
-}
-
-.tutorial-zoe.is-visible {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-.tutorial-zoe[hidden] {
-  display: none !important;
-}
-
-@media (max-width: 720px) {
-  .tutorial-zoe {
-    width: min(48vw, 220px);
-    height: min(55vh, 340px);
-  }
 }
 
 /* Posición del aro: ajústala aquí (top / right / height). */
@@ -588,8 +558,7 @@ body::after {
     url("images/aro.gif")
     url("images/aro2.gif")
     url("../../images/correcto.gif")
-    url("../../images/incorrecto.gif")
-    url("../../images/zoe_hablando.gif");
+    url("../../images/incorrecto.gif");
   position: absolute;
   width: 0;
   height: 0;

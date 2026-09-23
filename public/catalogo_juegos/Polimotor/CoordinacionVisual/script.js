@@ -41,8 +41,7 @@
     let avisoSaliendoActivo = false;
     let demoActiva = false;
     let demoRafId = null;
-    let introOmitida = false;
-    let tutorialAnunciadoEnIntro = false;
+    let demoVozPromise = null;
 
     function readText(ruta) {
         const xhr = new XMLHttpRequest();
@@ -451,30 +450,6 @@
             };
         });
 
-        // mostrarIntro: Zoe anuncia el tutorial en la intro 3D (nube + voz).
-        if (mostrarIntroActiva()) {
-            const demoTxt = textoPlano(
-                (gameConfig.textos && gameConfig.textos.demostracion) ||
-                "¡Vamos a un tutorial! Mira cómo se hace: la pelota sigue la línea hasta la canasta."
-            );
-            lineas.push({
-                personaje: "zoe",
-                nombre: "Zoe",
-                color: colores.zoe || "#8ec5ff",
-                texto: demoTxt
-            });
-            tutorialAnunciadoEnIntro = true;
-            if (!window.INTRO_CONFIG.victoria) window.INTRO_CONFIG.victoria = {};
-            window.INTRO_CONFIG.victoria.titulo = "¡Tutorial!";
-            window.INTRO_CONFIG.victoria.subtitulo = "Toca para ver la demostración";
-            const card = document.querySelector("#intro3d-continuar h2");
-            const sub = document.querySelector("#intro3d-continuar p");
-            if (card) card.textContent = "¡Tutorial!";
-            if (sub) sub.textContent = "Toca para ver la demostración";
-        } else {
-            tutorialAnunciadoEnIntro = false;
-        }
-
         window.INTRO_CONFIG.dialogo.lineas = lineas;
     }
 
@@ -506,7 +481,6 @@
 
     function omitirIntro3d() {
         if (cerrardo) return;
-        introOmitida = true;
         const root = document.getElementById("intro3d-root");
         if (!root || root.hidden) {
             empezarJuegoTrasIntro();
@@ -691,35 +665,47 @@
         return !!(r && r.esDemo);
     }
 
-    function mostrarZoeTutorial() {
-        const el = document.getElementById("tutorial-zoe");
-        if (!el) return;
-        el.hidden = false;
-        el.setAttribute("aria-hidden", "false");
-        void el.offsetWidth;
-        el.classList.add("is-visible");
+    function mostrarPersonajeTutorial3d() {
+        if (!window.Tutorial3d || typeof window.Tutorial3d.start !== "function") {
+            return Promise.resolve("zoe");
+        }
+        return Promise.resolve(window.Tutorial3d.start()).catch(function () {
+            return "zoe";
+        });
     }
 
-    function ocultarZoeTutorial() {
-        const el = document.getElementById("tutorial-zoe");
-        if (!el) return;
-        el.classList.remove("is-visible");
-        setTimeout(function () {
-            if (!demoActiva) {
-                el.hidden = true;
-                el.setAttribute("aria-hidden", "true");
-            }
-        }, 650);
+    function ocultarPersonajeTutorial3d() {
+        if (window.Tutorial3d && typeof window.Tutorial3d.stop === "function") {
+            window.Tutorial3d.stop();
+        }
+    }
+
+    function despedirPersonajeTutorial3d() {
+        if (window.Tutorial3d && typeof window.Tutorial3d.despedir === "function") {
+            return Promise.resolve(window.Tutorial3d.despedir()).catch(function () {});
+        }
+        ocultarPersonajeTutorial3d();
+        return Promise.resolve();
     }
 
     function detenerDemostracion() {
+        demoActiva = false;
+        demoVozPromise = null;
+        if (demoRafId != null) {
+            cancelAnimationFrame(demoRafId);
+            demoRafId = null;
+        }
+        document.body.classList.remove("demo-activa");
+        ocultarPersonajeTutorial3d();
+    }
+
+    function pausarAnimacionDemo() {
         demoActiva = false;
         if (demoRafId != null) {
             cancelAnimationFrame(demoRafId);
             demoRafId = null;
         }
         document.body.classList.remove("demo-activa");
-        ocultarZoeTutorial();
     }
 
     function densificarPathOrtogonal(pathPts, paso) {
@@ -767,7 +753,8 @@
     function completarDemostracion() {
         if (esperandoFeedback || juegoTerminado) return;
         esperandoFeedback = true;
-        detenerDemostracion();
+        // Para la pelota, pero el personaje se queda hasta el final y luego se va.
+        pausarAnimacionDemo();
 
         const lab = recorridoActual();
         const geo = inicioMeta(lab);
@@ -777,14 +764,22 @@
 
         const mensaje = textos().demostracionFin ||
             "¡Ahora te toca a ti! Sigue la línea hasta la canasta.";
+        const vozPendiente = demoVozPromise || Promise.resolve();
+        demoVozPromise = null;
 
-        mostrarAroEnceste().then(function () {
-            pelotaVisible = false;
-            posicionarPelotaDom();
-            return mostrarFeedback("acierto", mensaje);
+        Promise.resolve(vozPendiente).catch(function () {}).then(function () {
+            if (juegoTerminado) return Promise.resolve();
+            return despedirPersonajeTutorial3d();
         }).then(function () {
-            esperandoFeedback = false;
-            avanzarRecorrido();
+            if (juegoTerminado) return;
+            return mostrarAroEnceste().then(function () {
+                pelotaVisible = false;
+                posicionarPelotaDom();
+                return mostrarFeedback("acierto", mensaje);
+            }).then(function () {
+                esperandoFeedback = false;
+                avanzarRecorrido();
+            });
         });
     }
 
@@ -825,10 +820,12 @@
         const lab = recorridoActual();
         if (!esRecorridoDemo(lab) || demoActiva || juegoTerminado) return;
 
-        detenerDemostracion();
+        if (demoRafId != null) {
+            cancelAnimationFrame(demoRafId);
+            demoRafId = null;
+        }
         demoActiva = true;
         document.body.classList.add("demo-activa");
-        mostrarZoeTutorial();
 
         const msg = textos().demostracion ||
             "¡Vamos a un tutorial! Mira cómo se hace: la pelota sigue la línea hasta la canasta.";
@@ -847,16 +844,19 @@
             programarRedibujo();
         }
 
-        // Habla en paralelo: 1 s después de empezar, arranca la demo (más lenta).
-        hablarPromesa(msg, "zoe");
-        setTimeout(function () {
+        // Entra → habla → pelota recorre → al final del tutorial se va.
+        mostrarPersonajeTutorial3d().then(function (quien) {
             if (!demoActiva || juegoTerminado || !esRecorridoDemo()) return;
-            if (muestras.length < 2) {
-                completarDemostracion();
-                return;
-            }
-            iniciarAnimacionDemo(muestras);
-        }, 1000);
+            demoVozPromise = hablarPromesa(msg, quien || "zoe");
+            setTimeout(function () {
+                if (!demoActiva || juegoTerminado || !esRecorridoDemo()) return;
+                if (muestras.length < 2) {
+                    completarDemostracion();
+                    return;
+                }
+                iniciarAnimacionDemo(muestras);
+            }, 1000);
+        });
     }
 
     function generarRecorridosNivel(nivel) {
