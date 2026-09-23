@@ -60,7 +60,6 @@
     ]
   }, 
   "cuerpo": "nina",
-  "edad": 3,
   "audios": {
     "acierto": "../../sounds/ok.mp3",
     "error": "../../sounds/over.mp3",

@@ -256,6 +256,8 @@ if (empty($config['textos']['consignaPlantilla']) || empty($config['textos']['ac
     ok('plantillas consigna/acierto presentes');
 }
 
+require __DIR__.'/barrido-multisensorial-shell.php';
+
 echo "\n=== ENCUENTRA EL COLOR: BD ===\n";
 
 $tipo = null;

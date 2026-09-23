@@ -849,35 +849,51 @@ function iniciarPartida() {
     const pedido = String(gameConfig.cuerpo || "nina").toLowerCase();
     cuerpoElegido = pedido === "nino" || pedido === "niño" ? "nino" : "nina";
     document.body.dataset.cuerpo = cuerpoElegido;
-    nivelElegido = resolverNivel(gameConfig.edad);
+    PedniaEdad.iniciarNivel({
+        niveles: (gameConfig && gameConfig.niveles) || [],
+        elegirManual: elegirNivel,
+        onElegido: function (nivel) {
+            nivelElegido = nivel;
+            juegoTerminado = false;
+            iniciarEscenario();
+        }
+    });
+}
+
+function elegirNivel() {
+    const t = (gameConfig && gameConfig.textos) || {};
+    let botones = "";
+    (gameConfig.niveles || []).forEach(function (nivel, i) {
+        const color = i === 0 ? "success" : i === 1 ? "warning" : "primary";
+        botones +=
+            '<div class="col-12 text-center mb-2">' +
+            '<button type="button" class="btn btn-' + color + ' btn-eleccion" onclick="confirmarNivel(\'' + nivel.id + '\')">' +
+            "<strong>" + nivel.edad + "</strong><br><small>" + nivel.titulo + "</small></button></div>";
+    });
+    const titulo = t.eligeNivel || "Elige tu edad";
+    TextoVoz.hablar(titulo, "zoe");
+    Swal.fire({
+        title: titulo,
+        html: '<hr><div class="row justify-content-center">' + botones + "</div><hr>",
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        heightAuto: false,
+        scrollbarPadding: false,
+        width: 420
+    });
+}
+
+function confirmarNivel(id) {
+    nivelElegido = (gameConfig.niveles || []).find(function (n) {
+        return String(n.id) === String(id);
+    });
+    Swal.close();
+    if (!nivelElegido) return;
     juegoTerminado = false;
     iniciarEscenario();
 }
-
-function resolverNivel(edad) {
-    const niveles = (gameConfig && gameConfig.niveles) || [];
-    if (!niveles.length) return null;
-    const raw = edad == null ? "" : String(edad).trim().toLowerCase();
-    if (!raw) return niveles[0];
-
-    const porEtiqueta = niveles.find(function (n) {
-        return String(n.edad || "").toLowerCase() === raw;
-    });
-    if (porEtiqueta) return porEtiqueta;
-
-    const num = parseInt(raw, 10);
-    if (isFinite(num)) {
-        const porEdad = niveles.find(function (n) {
-            const e = String(n.edad || "").toLowerCase();
-            if (num <= 3) return e.indexOf("3") === 0;
-            if (num === 4) return e.indexOf("4") === 0;
-            return e.indexOf("5") === 0 || e.indexOf("6") !== -1;
-        });
-        if (porEdad) return porEdad;
-    }
-
-    return niveles.find(function (n) { return String(n.id) === raw; }) || niveles[0];
-}
+window.confirmarNivel = confirmarNivel;
 
 function iniciarEscenario() {
     tableroListo = false;

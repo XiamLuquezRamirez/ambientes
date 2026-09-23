@@ -1,0 +1,132 @@
+{
+  "nombre": "Completa La Figura",
+  "mostrarFeedBack": true,
+  "feedback": {
+    "duracion": 1400,
+    "acierto": {
+      "gif": "../../images/correcto.gif"
+    },
+    "error": {
+      "gif": "../../images/incorrecto.gif"
+    }
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "enunciado": "Observa la figura y encuentra la parte que le falta",
+    "cierre": "¡Excelente! Completaste todas las figuras.",
+    "aciertoPlantilla": "¡Muy bien! Completaste {figura}.",
+    "error": "¡Inténtalo otra vez! Observa qué parte le falta.",
+    "errorAvanzado": "¡Inténtalo otra vez! Observa muy bien la forma y el tamaño de la pieza.",
+    "consignaPlantilla": "Completa {figura}.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: observa la figura y toca la pieza que le falta.",
+    "demostracionFin": "¡Ahora te toca a ti! Completa cada figura.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Observa muy bien la figura y encuentra la parte que le falta."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Mira el hueco y toca la pieza que encaja. ¡Tú puedes!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Observa la forma y el tamaño. Cuando aciertes, la figura quedará completa."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "figuras": {
+    "mariposa": {
+      "nombre": "la mariposa",
+      "etiqueta": "Mariposa",
+      "base": "img/figuras/mariposa_base.svg",
+      "completa": "img/figuras/mariposa_completa.svg",
+      "piezaCorrecta": "ala_mariposa"
+    },
+    "carro": {
+      "nombre": "el carro",
+      "etiqueta": "Carro",
+      "base": "img/figuras/carro_base.svg",
+      "completa": "img/figuras/carro_completa.svg",
+      "piezaCorrecta": "rueda"
+    },
+    "casa": {
+      "nombre": "la casa",
+      "etiqueta": "Casa",
+      "base": "img/figuras/casa_base.svg",
+      "completa": "img/figuras/casa_completa.svg",
+      "piezaCorrecta": "techo"
+    }
+  },
+  "piezas": {
+    "ala_mariposa": { "nombre": "Ala de mariposa", "img": "img/piezas/ala_mariposa.svg" },
+    "ala_forma_diff": { "nombre": "Ala de otra forma", "img": "img/piezas/ala_forma_diff.svg" },
+    "ala_tamano_diff": { "nombre": "Ala de otro tamaño", "img": "img/piezas/ala_tamano_diff.svg" },
+    "ala_insecto": { "nombre": "Ala de otro insecto", "img": "img/piezas/ala_insecto.svg" },
+    "oreja_conejo": { "nombre": "Oreja de conejo", "img": "img/piezas/oreja_conejo.svg" },
+    "hoja": { "nombre": "Hoja", "img": "img/piezas/hoja.svg" },
+    "rueda": { "nombre": "Rueda", "img": "img/piezas/rueda.svg" },
+    "rueda_grande": { "nombre": "Rueda grande", "img": "img/piezas/rueda_grande.svg" },
+    "rueda_pequena": { "nombre": "Rueda pequeña", "img": "img/piezas/rueda_pequena.svg" },
+    "estrella": { "nombre": "Estrella", "img": "img/piezas/estrella.svg" },
+    "flor": { "nombre": "Flor", "img": "img/piezas/flor.svg" },
+    "pelota": { "nombre": "Pelota", "img": "img/piezas/pelota.svg" },
+    "circulo": { "nombre": "Círculo", "img": "img/piezas/circulo.svg" },
+    "techo": { "nombre": "Techo", "img": "img/piezas/techo.svg" },
+    "techo_forma_diff": { "nombre": "Techo de otra forma", "img": "img/piezas/techo_forma_diff.svg" },
+    "techo_ancho": { "nombre": "Techo ancho", "img": "img/piezas/techo_ancho.svg" },
+    "techo_pequeno": { "nombre": "Techo pequeño", "img": "img/piezas/techo_pequeno.svg" },
+    "sol": { "nombre": "Sol", "img": "img/piezas/sol.svg" },
+    "arbol": { "nombre": "Árbol", "img": "img/piezas/arbol.svg" },
+    "copa_arbol": { "nombre": "Copa de árbol", "img": "img/piezas/copa_arbol.svg" },
+    "nube": { "nombre": "Nube", "img": "img/piezas/nube.svg" },
+    "triangulo": { "nombre": "Triángulo", "img": "img/piezas/triangulo.svg" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3 años",
+      "titulo": "3 piezas",
+      "avanzado": false,
+      "retos": [
+        { "figura": "mariposa", "opciones": ["ala_mariposa", "oreja_conejo", "hoja"] },
+        { "figura": "carro", "opciones": ["rueda", "estrella", "flor"] },
+        { "figura": "casa", "opciones": ["techo", "sol", "arbol"] }
+      ]
+    },
+    {
+      "id": "4",
+      "edad": "4 años",
+      "titulo": "4 piezas",
+      "avanzado": false,
+      "retos": [
+        { "figura": "mariposa", "opciones": ["ala_mariposa", "ala_forma_diff", "hoja", "oreja_conejo"] },
+        { "figura": "carro", "opciones": ["rueda", "rueda_grande", "pelota", "flor"] },
+        { "figura": "casa", "opciones": ["techo", "techo_forma_diff", "copa_arbol", "nube"] }
+      ]
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "5 piezas · detalle",
+      "avanzado": true,
+      "retos": [
+        { "figura": "mariposa", "opciones": ["ala_mariposa", "ala_forma_diff", "ala_tamano_diff", "hoja", "ala_insecto"] },
+        { "figura": "carro", "opciones": ["rueda", "rueda_grande", "rueda_pequena", "pelota", "circulo"] },
+        { "figura": "casa", "opciones": ["techo", "techo_ancho", "techo_pequeno", "triangulo", "techo_forma_diff"] }
+      ]
+    }
+  ]
+}

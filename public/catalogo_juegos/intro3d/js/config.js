@@ -2,7 +2,7 @@ window.INTRO_CONFIG = {
     personajes: [
         {
             id: "zeus",
-            modelo: "../intro3d/models/nino.glb",
+            modelo: "../../intro3d/models/nino.glb",
             escala: 0.85,
             posicionY: -1,
             inicioX: -10.2,
@@ -19,7 +19,7 @@ window.INTRO_CONFIG = {
         },
         {
             id: "zoe",
-            modelo: "../intro3d/models/nina.glb",
+            modelo: "../../intro3d/models/nina.glb",
             escala: 0.85,
             posicionY: -1,
             inicioX: 10.2,

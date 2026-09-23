@@ -52,6 +52,7 @@ class AdaptacionKioscoService
             'estudiante_id' => 0,
             'tipo' => null,
             'perfil_id' => 0,
+            'edad' => null,
             'actualizado_en' => null,
             'valores' => [],
             'css_vars' => [],
@@ -67,12 +68,14 @@ class AdaptacionKioscoService
     {
         $valores = $this->parametros->valoresParaEstudiante($estudiante);
         $identidad = $this->identidadPerfil($estudiante);
+        $edad = $estudiante->edad;
 
         return [
             'activo' => true,
             'estudiante_id' => (int) $estudiante->id,
             'tipo' => $identidad['tipo'],
             'perfil_id' => $identidad['perfil_id'],
+            'edad' => $edad === null ? null : (int) $edad,
             'actualizado_en' => $this->actualizadoEn($estudiante, $identidad),
             'valores' => $valores,
             'css_vars' => $this->cssVars($valores),
@@ -115,7 +118,18 @@ class AdaptacionKioscoService
     {
         $cache = $this->obtenerDeSesion($request);
 
-        if ($cache !== null && $this->fingerprintCoincide($cache, $estudiante)) {
+        if ($cache !== null
+            && array_key_exists('edad', $cache)
+            && $this->fingerprintCoincide($cache, $estudiante)
+        ) {
+            // La edad cambia con el calendario; siempre refrescarla desde el estudiante.
+            $edad = $estudiante->edad;
+            $edadInt = $edad === null ? null : (int) $edad;
+            if (($cache['edad'] ?? null) !== $edadInt) {
+                $cache['edad'] = $edadInt;
+                $request->session()->put(self::SESSION_KEY, $cache);
+            }
+
             return $cache;
         }
 

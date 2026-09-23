@@ -1,0 +1,88 @@
+/* Tutorial / demostración — compartido Multisensorial (y reutilizable) */
+body.demo-activa #zona-objetos,
+body.demo-activa #zona-sombras,
+body.demo-activa #zona-piezas,
+body.demo-activa #figura-escena,
+body.demo-activa #objeto-objetivo,
+body.demo-activa #escenario,
+body.demo-activa .escena-wrap {
+    pointer-events: none;
+}
+
+body.demo-activa::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    /* Overlay suave: las sombras negras deben seguir leyéndose */
+    background: rgba(0, 0, 0, 0.38);
+    pointer-events: none;
+}
+
+body.demo-activa #principal,
+body.demo-activa #enunciado,
+body.demo-activa .enunciado-wrap,
+body.demo-activa #zona-objetos,
+body.demo-activa #zona-sombras,
+body.demo-activa #zona-piezas,
+body.demo-activa #figura-escena,
+body.demo-activa #objeto-objetivo,
+body.demo-activa #escenario,
+body.demo-activa .muestra-color {
+    position: relative;
+    z-index: 35;
+}
+
+body.demo-activa #progreso {
+    color: #0f766e;
+}
+
+.tutorial-zoe {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    width: min(38vw, 320px);
+    height: min(70vh, 500px);
+    background: url("../images/zoe_hablando.gif") no-repeat bottom center / contain;
+    transform: translateX(110%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.65s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.4s ease;
+}
+
+.tutorial-zoe.is-visible {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.tutorial-zoe[hidden] {
+    display: none !important;
+}
+
+.is-demo-target {
+    outline: 4px solid #ffeb3b !important;
+    outline-offset: 4px;
+    box-shadow: 0 0 0 6px rgba(255, 235, 59, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+    animation: pedniaDemoPulse 1.4s ease-in-out infinite;
+    z-index: 36 !important;
+    position: relative;
+}
+
+@keyframes pedniaDemoPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+
+@media (max-width: 720px) {
+    .tutorial-zoe {
+        width: min(48vw, 220px);
+        height: min(55vh, 340px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .is-demo-target {
+        animation: none;
+    }
+}

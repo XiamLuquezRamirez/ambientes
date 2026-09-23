@@ -19,6 +19,8 @@
     "error": "¡Inténtalo otra vez! Observa muy bien su forma.",
     "errorAvanzado": "¡Inténtalo otra vez! Observa con atención su forma y sus detalles.",
     "consignaPlantilla": "Encuentra la sombra de {objeto}.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: observa el objeto y toca su sombra.",
+    "demostracionFin": "¡Ahora te toca a ti! Encuentra la sombra correcta.",
     "conversacion": [
       {
         "personaje": 1,
@@ -37,7 +39,8 @@
   "accesibilidad": {
     "letterSpacing": 2,
     "volumenFondo": 20,
-    "rate": 5
+    "rate": 5,
+    "mostrarIntro": true
   },
   "audios": {
     "acierto": "../../sounds/ok.mp3",

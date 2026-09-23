@@ -17,6 +17,8 @@
         "aciertoPlantilla": "¡Muy bien! Encontraste el color {color}.",
         "error": "¡Inténtalo otra vez! Observa muy bien.",
         "consignaPlantilla": "Encuentra el objeto de color {color}.",
+        "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el objeto de color {color}.",
+        "demostracionFin": "¡Ahora te toca a ti! Encuentra el color que te digamos.",
         "conversacion": [
             {
                 "personaje": 1,
@@ -35,7 +37,8 @@
     "accesibilidad": {
         "letterSpacing": 2,
         "volumenFondo": 20,
-        "rate": 5
+        "rate": 5,
+        "mostrarIntro": true
     },
     "audios": {
         "acierto": "../../sounds/ok.mp3",

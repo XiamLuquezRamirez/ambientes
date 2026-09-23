@@ -58,7 +58,10 @@ body {
 
 body.esperando-inicio #principal,
 body.esperando-inicio #menu-vol,
-body.esperando-inicio #menu-acc {
+body.esperando-inicio #menu-acc,
+body.intro3d-activa #principal,
+body.intro3d-activa #menu-vol,
+body.intro3d-activa #menu-acc {
   visibility: hidden;
 }
 
@@ -524,16 +527,16 @@ body.esperando-inicio #menu-acc {
 }
 
 .final {
-  background-size: 45%;
-  background-repeat: no-repeat;
-  background-position-x: center;
-  background-position-y: top;
   position: fixed;
-  z-index: 100;
+  inset: 0;
+  z-index: 2000;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.904);
-  background-image: url("../../images/victoria.gif");
+  background: #173f6d;
+}
+
+.final[hidden] {
+  display: none !important;
 }
 
 .btn-eleccion {

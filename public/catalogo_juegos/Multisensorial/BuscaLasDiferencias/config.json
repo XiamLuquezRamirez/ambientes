@@ -1,0 +1,118 @@
+{
+  "nombre": "Busca las diferencias",
+  "mostrarFeedBack": true,
+  "feedback": {
+    "duracion": 1200,
+    "acierto": {
+      "gif": "../../images/correcto.gif"
+    },
+    "error": {
+      "gif": "../../images/incorrecto.gif"
+    }
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "enunciado": "Observa muy bien las dos imágenes y encuentra las diferencias",
+    "cierre": "¡Excelente! Encontraste todas las diferencias.",
+    "acierto": "¡Muy bien! Encontraste una diferencia.",
+    "error": "¡Inténtalo otra vez! Observa muy bien las dos imágenes.",
+    "errorAvanzado": "¡Inténtalo otra vez! Observa con mucha atención las dos imágenes.",
+    "consigna": "Toca las diferencias en la imagen de la derecha.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: compara las dos imágenes y toca una diferencia.",
+    "demostracionFin": "¡Ahora te toca a ti! Encuentra todas las diferencias.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Observa muy bien las dos imágenes y encuentra las diferencias."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Parecen iguales, pero algo cambió. ¡Toca cada diferencia!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Compara con calma. Cuando encuentres todas, ¡habrás ganado!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "acierto": "../../sounds/ok.mp3",
+    "error": "../../sounds/over.mp3",
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "escena": {
+    "izquierda": "img/parque_a.svg",
+    "etiquetaIzq": "Imagen A",
+    "etiquetaDer": "Imagen B"
+  },
+  "diferencias": {
+    "sol": {
+      "nombre": "Sol",
+      "x": 76,
+      "y": 4,
+      "w": 18,
+      "h": 22
+    },
+    "flor": {
+      "nombre": "Flor",
+      "x": 40,
+      "y": 68,
+      "w": 14,
+      "h": 18
+    },
+    "pelota": {
+      "nombre": "Pelota",
+      "x": 72,
+      "y": 74,
+      "w": 16,
+      "h": 18
+    },
+    "hoja": {
+      "nombre": "Hoja del árbol",
+      "x": 18,
+      "y": 28,
+      "w": 12,
+      "h": 12
+    },
+    "cuerda": {
+      "nombre": "Cuerda del columpio",
+      "x": 53,
+      "y": 32,
+      "w": 10,
+      "h": 28
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3 años",
+      "titulo": "3 diferencias",
+      "avanzado": false,
+      "derecha": "img/parque_b_3.svg",
+      "diferencias": ["sol", "flor", "pelota"]
+    },
+    {
+      "id": "4",
+      "edad": "4 años",
+      "titulo": "4 diferencias",
+      "avanzado": false,
+      "derecha": "img/parque_b_4.svg",
+      "diferencias": ["sol", "flor", "pelota", "hoja"]
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "5 diferencias",
+      "avanzado": true,
+      "derecha": "img/parque_b_5.svg",
+      "diferencias": ["sol", "flor", "pelota", "hoja", "cuerda"]
+    }
+  ]
+}

@@ -101,6 +101,23 @@
         }
     }
 
+    /** Añade ?edad=N al paquete para que el juego no dependa solo del postMessage. */
+    function urlPaqueteConEdad(url, perfil) {
+        if (!url) return url;
+        const edad = perfil && perfil.edad != null && perfil.edad !== ''
+            ? parseInt(String(perfil.edad), 10)
+            : NaN;
+        if (!isFinite(edad)) return url;
+        try {
+            const u = new URL(url, window.location.origin);
+            u.searchParams.set('edad', String(edad));
+            return u.pathname + u.search + u.hash;
+        } catch (e) {
+            const sep = url.indexOf('?') >= 0 ? '&' : '?';
+            return url + sep + 'edad=' + encodeURIComponent(String(edad));
+        }
+    }
+
     function inyectarPerfil(frame) {
         const perfil = perfilPayload();
         if (!perfil || !frame || !frame.contentWindow) return;
@@ -114,7 +131,8 @@
     }
 
     function montarJuego(juego) {
-        const url = juego.url_paquete;
+        const perfil = perfilPayload();
+        const url = urlPaqueteConEdad(juego.url_paquete, perfil);
         if (!url) return;
 
         const $g = ctx.$paso.find('.bj-galeria');

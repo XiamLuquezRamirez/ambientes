@@ -55,7 +55,6 @@
       }
     ]
   },
-  "edad": 4,
   "audios": {
     "acierto": "../../sounds/ok.mp3",
     "error": "../../sounds/over.mp3",

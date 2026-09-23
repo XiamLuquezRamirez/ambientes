@@ -38,6 +38,62 @@ class AdaptacionKioscoServiceTest extends TestCase
         $this->assertNotContains('kiosco-perfil--fondo-crema', $payload['clases']);
         $this->assertContains('audio_fondo', $payload['noop']);
         $this->assertContains('login_tipo', $payload['noop']);
+        $this->assertArrayHasKey('edad', $payload);
+        $this->assertNull($payload['edad']);
+    }
+
+    public function test_payload_incluye_edad_desde_fecha_nacimiento(): void
+    {
+        $estudiante = new Estudiante([
+            'institucion_id' => 1,
+            'perfil_aprendizaje_id' => 0,
+            'fecha_nacimiento' => now()->subYears(4)->format('Y-m-d'),
+        ]);
+        $estudiante->id = 54;
+        $estudiante->setRelation('perfilAprendizajePersonalizadoActiva', null);
+
+        $payload = $this->servicio->payloadParaEstudiante($estudiante);
+
+        $this->assertSame(4, $payload['edad']);
+    }
+
+    /**
+     * @dataProvider proveedorEdadesMatricula
+     */
+    public function test_payload_edad_por_anios_de_nacimiento(int $anios, int $edadEsperada): void
+    {
+        $estudiante = new Estudiante([
+            'institucion_id' => 1,
+            'perfil_aprendizaje_id' => 0,
+            'fecha_nacimiento' => now()->subYears($anios)->subDays(10)->format('Y-m-d'),
+        ]);
+        $estudiante->id = 100 + $anios;
+        $estudiante->setRelation('perfilAprendizajePersonalizadoActiva', null);
+
+        $payload = $this->servicio->payloadParaEstudiante($estudiante);
+
+        $this->assertSame($edadEsperada, $payload['edad']);
+    }
+
+    /**
+     * @return list<array{0: int, 1: int}>
+     */
+    public static function proveedorEdadesMatricula(): array
+    {
+        return [
+            [3, 3],
+            [4, 4],
+            [5, 5],
+            [6, 6],
+        ];
+    }
+
+    public function test_payload_inactivo_incluye_edad_null(): void
+    {
+        $payload = $this->servicio->payloadInactivo();
+
+        $this->assertArrayHasKey('edad', $payload);
+        $this->assertNull($payload['edad']);
     }
 
     public function test_css_vars_mapean_tamanos(): void

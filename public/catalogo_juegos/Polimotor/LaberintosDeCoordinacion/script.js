@@ -317,128 +317,6 @@
         return id;
     }
 
-    function renderPersonajes(personajes) {
-        const container = document.getElementById("personajes-container");
-        container.innerHTML = "";
-        const posiciones = personajes.length === 1 ? ["uno"] : ["izquierda", "derecha"];
-        personajes.forEach(function (personajeCfg, index) {
-            const div = document.createElement("div");
-            div.className = "personaje-char personaje-char-" + posiciones[index];
-            div.style.backgroundImage = "url(" + personajeCfg.gif_idle + ")";
-            div.dataset.index = index;
-            container.appendChild(div);
-        });
-    }
-
-    function preloadGifsEnCSS(personajes) {
-        const urls = [];
-        personajes.forEach(function (p) {
-            [p.gif_idle, p.gif_hablando].forEach(function (gif) {
-                if (gif && urls.indexOf(gif) === -1) urls.push(gif);
-            });
-        });
-        let style = document.getElementById("preload-personajes-style");
-        if (!style) {
-            style = document.createElement("style");
-            style.id = "preload-personajes-style";
-            document.head.appendChild(style);
-        }
-        style.textContent = "#personajes-container::after{content:" +
-            urls.map(function (u) { return 'url("' + u + '")'; }).join(" ") +
-            ";position:absolute;width:0;height:0;overflow:hidden;opacity:0;}";
-    }
-
-    function preloadGifs(personajes) {
-        preloadGifsEnCSS(personajes);
-        const urls = [];
-        personajes.forEach(function (p) {
-            [p.gif_idle, p.gif_hablando].forEach(function (gif) {
-                if (gif && urls.indexOf(gif) === -1) urls.push(gif);
-            });
-        });
-        return Promise.all(urls.map(function (gif) {
-            return new Promise(function (resolve) {
-                const img = new Image();
-                img.onload = resolve;
-                img.onerror = resolve;
-                img.src = gif;
-            });
-        }));
-    }
-
-    function setPersonajesVisual(index) {
-        const personajes = introConfig.personajes;
-        document.querySelectorAll(".personaje-char").forEach(function (el, i) {
-            if (i === index) {
-                el.style.backgroundImage = "url(" + personajes[i].gif_hablando + ")";
-                el.classList.add("activo");
-                el.classList.remove("inactivo");
-            } else {
-                el.style.backgroundImage = "url(" + personajes[i].gif_idle + ")";
-                el.classList.add("inactivo");
-                el.classList.remove("activo");
-            }
-        });
-    }
-
-    function resetPersonajesIdle() {
-        const personajes = introConfig.personajes;
-        document.querySelectorAll(".personaje-char").forEach(function (el, i) {
-            el.style.backgroundImage = "url(" + personajes[i].gif_idle + ")";
-            el.classList.remove("activo", "inactivo");
-        });
-    }
-
-    function aplicarClaseNube(index) {
-        const nube = document.querySelector(".nube");
-        const n = introConfig.personajes.length;
-        nube.classList.remove("nube-centro", "nube-izquierda", "nube-derecha");
-        if (n === 1) nube.classList.add("nube-centro");
-        else if (index === 0) nube.classList.add("nube-izquierda");
-        else nube.classList.add("nube-derecha");
-    }
-
-    function fijarNubeEnPosicion() {
-        if (cerrardo || conversacionCancelada) return;
-        const nube = document.querySelector(".nube");
-        nube.style.animationName = "none";
-        nube.style.bottom = "57%";
-    }
-
-    function cambiarNubeAPersonaje(index) {
-        if (cerrardo || conversacionCancelada) return;
-        setPersonajesVisual(index);
-        aplicarClaseNube(index);
-        nubePersonajeActual = index;
-        fijarNubeEnPosicion();
-        const nube = document.querySelector(".nube");
-        if (nube) nube.style.opacity = "1";
-    }
-
-    function maquina2(contenedor, texto, intervalo, callback) {
-        if (!texto) {
-            if (callback) callback();
-            return;
-        }
-        let i = 1;
-        $("#" + contenedor).html(texto.substr(0, 1) + "_");
-        const timer = setInterval(function () {
-            if (conversacionCancelada || cerrardo) {
-                clearInterval(timer);
-                if (callback) callback();
-                return;
-            }
-            if (i < texto.length) {
-                $("#" + contenedor).html(texto.substr(0, i++) + "_");
-            } else {
-                clearInterval(timer);
-                $("#" + contenedor).html(texto);
-                if (callback) callback();
-            }
-        }, intervalo);
-        introTimers.push(timer);
-    }
-
     function cancelarIntroPendiente() {
         introTimers.forEach(function (id) {
             clearTimeout(id);
@@ -447,120 +325,94 @@
         introTimers = [];
     }
 
-    function salirPersonajes(callback, ms) {
-        const chars = document.querySelectorAll(".personaje-char");
-        const espera = ms != null ? ms : 2000;
-        if (!chars.length) {
-            callback();
-            return;
-        }
-        chars.forEach(function (el) {
-            if (espera < 1600) el.style.animationDuration = (espera / 1000) + "s";
-        });
-        if (chars.length === 1) {
-            chars[0].style.animationName = "salidaIzquierda";
-            setTimeout(callback, espera);
-            return;
-        }
-        chars[0].style.animationName = "salidaIzquierda";
-        chars[1].style.animationName = "salidaDerecha";
-        setTimeout(callback, espera);
-    }
-
-    function mostrarNubeYConversacion() {
-        if (cerrardo || conversacionCancelada) return;
-        const primeraLinea = introConfig.conversacion[0];
-        const indiceInicial = primeraLinea && primeraLinea.personaje != null ? primeraLinea.personaje : 0;
-        let conversacionLista = false;
-
-        setPersonajesVisual(indiceInicial);
-        aplicarClaseNube(indiceInicial);
-        nubePersonajeActual = indiceInicial;
-
-        const nube = document.querySelector(".nube");
-        nube.style.animationName = "moverArriba";
-        nube.style.animationDirection = "normal";
-        nube.style.display = "block";
-
-        function iniciarConversacion() {
-            if (conversacionLista || cerrardo || conversacionCancelada) return;
-            conversacionLista = true;
-            fijarNubeEnPosicion();
-            if (cerrardo || conversacionCancelada) return;
-            document.querySelector(".nube").style.opacity = "1";
-            reproducirConversacion();
-        }
-
-        nube.addEventListener("animationend", function (e) {
-            if (cerrardo || conversacionCancelada) return;
-            if (e.animationName === "moverArriba") iniciarConversacion();
-        });
-
-        agendarIntro(iniciarConversacion, 2300);
-    }
-
-    function iniciarAnimacionIntro() {
-        if (cerrardo || conversacionCancelada) return;
-        const overlay = document.querySelector(".overlay");
-        const chars = document.querySelectorAll(".personaje-char");
-        const cantidad = introConfig.personajes.length;
-
-        overlay.style.display = "block";
-
-        if (cantidad === 1) {
-            chars[0].style.animationName = "entradaIzquierda";
-            agendarIntro(mostrarNubeYConversacion, 2800);
-            return;
-        }
-
-        chars[0].style.animationName = "entradaIzquierda";
-        agendarIntro(function () {
-            if (cerrardo || conversacionCancelada) return;
-            chars[1].style.animationName = "entradaDerecha";
-        }, 1000);
-        agendarIntro(mostrarNubeYConversacion, 3600);
-    }
-
-    async function reproducirConversacion() {
-        const cfg = introConfig.configuracion || {};
-        const intervalo = cfg.intervalo || 50;
-        const pausaFinal = cfg.pausaFinal || 2000;
-        const lineas = introConfig.conversacion || [];
-
-        for (let i = 0; i < lineas.length; i++) {
-            if (conversacionCancelada || cerrardo) return;
-            const linea = lineas[i];
-            const idx = linea.personaje != null ? linea.personaje : 0;
-            $("#bienvenida").html("");
-            cambiarNubeAPersonaje(idx);
-            const pVoz = TextoVoz.hablar(linea.texto, TextoVoz.personajeDeIndice(idx));
-            await new Promise(function (resolve) {
-                maquina2("bienvenida", linea.texto, intervalo, resolve);
-            });
-            if (conversacionCancelada || cerrardo) {
-                TextoVoz.detener();
-                return;
-            }
-            await pVoz;
-            if (conversacionCancelada || cerrardo) return;
-        }
-
-        if (!cerrardo && !conversacionCancelada) {
-            const omitir = document.getElementById("btnomitir");
-            if (omitir) omitir.style.display = "none";
-            await sleep(pausaFinal);
-            cerrar_anuncio();
-        }
-    }
-
-    let introGifsListos = false;
-    let zoomInicioListo = false;
     let introDesdeEmpecemos = false;
 
-    function intentarLanzarIntro() {
-        if (!zoomInicioListo || !introGifsListos || introDesdeEmpecemos) return;
-        introDesdeEmpecemos = true;
-        iniciarAnimacionIntro();
+    function sincronizarDialogoIntro3d() {
+        if (!window.INTRO_CONFIG) return;
+        if (!window.INTRO_CONFIG.dialogo) window.INTRO_CONFIG.dialogo = {};
+
+        const conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
+        const personajesCfg = window.INTRO_CONFIG.personajes || [];
+        const colores = (window.INTRO_CONFIG.dialogo.colores) || {};
+
+        function textoPlano(html) {
+            if (!html) return "";
+            const tmp = document.createElement("div");
+            tmp.innerHTML = String(html).replace(/<br\s*\/?>/gi, " ");
+            return String(tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ").trim();
+        }
+
+        window.INTRO_CONFIG.dialogo.lineas = conversacion.map(function (linea) {
+            const indice = Number(linea.personaje);
+            const def = personajesCfg[isFinite(indice) ? indice : 0] || personajesCfg[0] || {};
+            const id = def.id || (indice === 1 ? "zoe" : "zeus");
+            const nombre = (introConfig && introConfig.personajes && introConfig.personajes[indice] && introConfig.personajes[indice].nombre)
+                || (id === "zoe" ? "Zoe" : "Zeus");
+
+            return {
+                personaje: id,
+                nombre: nombre,
+                color: colores[id] || (id === "zoe" ? "#8ec5ff" : "#f0c14d"),
+                texto: textoPlano(linea.texto)
+            };
+        });
+    }
+
+    function mostrarIntro3d() {
+        const root = document.getElementById("intro3d-root");
+        if (root) root.hidden = false;
+        document.body.classList.add("intro3d-activa");
+        window.dispatchEvent(new CustomEvent("intro3d-start"));
+    }
+
+    function destruirIntro3d() {
+        document.body.classList.remove("intro3d-activa");
+        const root = document.getElementById("intro3d-root");
+        if (root) {
+            root.classList.add("is-closing");
+            setTimeout(function () {
+                root.hidden = true;
+                if (window.__introPhaser) {
+                    try { window.__introPhaser.destroy(true); } catch (e) { /* noop */ }
+                    window.__introPhaser = null;
+                }
+                if (typeof window.__intro3dDispose === "function") {
+                    window.__intro3dDispose();
+                }
+                root.remove();
+            }, 450);
+        }
+    }
+
+    function omitirIntro3d() {
+        if (cerrardo) return;
+        const root = document.getElementById("intro3d-root");
+        if (!root || root.hidden) {
+            empezarJuegoTrasIntro();
+            return;
+        }
+        window.dispatchEvent(new CustomEvent("intro3d-omitir"));
+    }
+
+    function empezarJuegoTrasIntro() {
+        if (cerrardo) return;
+        cerrardo = true;
+        conversacionCancelada = true;
+        cancelarIntroPendiente();
+        TextoVoz.detener();
+        asegurarAudioFondo();
+        TextoVoz.volumenFondo(TextoVoz.VOLUMEN_FONDO);
+        $("#fondo_blanco").stop(true, true).hide();
+        destruirIntro3d();
+        document.body.classList.remove("esperando-inicio");
+        $("#principal").css("display", "flex").hide().fadeIn(800);
+        PedniaEdad.iniciarNivel({
+            niveles: (gameConfig && gameConfig.niveles) || [],
+            elegirManual: elegirNivel,
+            onElegido: function (nivel) {
+                if (nivel) window.confirmarNivel(nivel.id);
+            }
+        });
     }
 
     function empecemosJuego() {
@@ -570,53 +422,32 @@
         if (btn) btn.disabled = true;
         TextoVoz.desbloquear();
         asegurarAudioFondo();
+        sincronizarDialogoIntro3d();
         TextoVoz.precargar();
-        zoomInicioListo = true;
         pantalla.classList.add("is-out");
-        intentarLanzarIntro();
+        introDesdeEmpecemos = true;
+        mostrarIntro3d();
 
         let oculto = false;
-        const ocultar = function () {
+        const ocultarPantalla = function () {
             if (oculto) return;
             oculto = true;
             pantalla.hidden = true;
-            // No quitar esperando-inicio aquí: el canvas oscuro no debe verse bajo la intro.
+            document.body.classList.remove("esperando-inicio");
         };
         pantalla.addEventListener("animationend", function (ev) {
-            if (ev.animationName === "inicioDisuelve") ocultar();
+            if (ev.animationName === "inicioDisuelve") ocultarPantalla();
         });
-        setTimeout(ocultar, 1250);
+        setTimeout(ocultarPantalla, 1250);
     }
 
-    /** Omitir: salida corta. Fin natural: salida completa (como hermanos). */
-    window.cerrar_anuncio = function cerrar_anuncio(opts) {
-        if (cerrardo) return;
-        const rapido = !!(opts && opts.rapido);
-        conversacionCancelada = true;
-        cerrardo = true;
-        cancelarIntroPendiente();
-        TextoVoz.detener();
-        asegurarAudioFondo();
-        TextoVoz.volumenFondo(TextoVoz.VOLUMEN_FONDO);
-
-        const nube = document.querySelector(".nube");
-        nube.style.animationName = "moverabajo";
-        resetPersonajesIdle();
-        $("#fondo_blanco").stop(true, true).hide();
-
-        const esperaNube = rapido ? 400 : 1400;
-        const salidaChars = rapido ? 750 : 2000;
-        const fadeMs = rapido ? 350 : 700;
-        setTimeout(function () {
-            nube.style.display = "none";
-            salirPersonajes(function () {
-                document.querySelector(".overlay").style.display = "none";
-                document.body.classList.remove("esperando-inicio");
-                $("#principal").css("display", "flex").hide().fadeIn(fadeMs);
-                elegirNivel();
-            }, salidaChars);
-        }, esperaNube);
+    function cerrar_anuncio() {
+        empezarJuegoTrasIntro();
+    }
+    window.cerrar_anuncio = function cerrar_anuncio() {
+        empezarJuegoTrasIntro();
     };
+
 
     function reproducirAudio(ruta, volumen, loop) {
         if (!ruta) return null;
@@ -813,7 +644,7 @@
     }
 
     window.confirmarNivel = function confirmarNivel(id) {
-        nivelElegido = gameConfig.niveles.find(function (n) { return n.id === id; });
+        nivelElegido = gameConfig.niveles.find(function (n) { return String(n.id) === String(id); });
         Swal.close();
         if (!nivelElegido) return;
         generoElegido = resolverGenero();
@@ -1497,11 +1328,25 @@
 
     function mostrarCierre() {
         juegoTerminado = true;
-        const cierre = textos().cierre || "Lograste pasar todos los laberintos.";
-        document.getElementById("texto_final").textContent = cierre;
+        if (typeof aceptaArrastre !== "undefined") aceptaArrastre = false;
+        if (typeof aceptaToque !== "undefined") aceptaToque = false;
+        const cierre = (typeof textos === "function" ? textos().cierre : null) || "¡Excelente!";
+        const texto = document.getElementById("texto_final");
+        if (texto) texto.textContent = cierre;
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
         TextoVoz.hablar(cierre, "zoe");
-        $("#final").fadeIn(400);
+        setTimeout(function () {
+            const caja = document.getElementById("final");
+            if (caja) {
+                caja.hidden = false;
+                caja.style.display = "block";
+            }
+            if (typeof iniciarSecuenciaVictoria === "function") {
+                iniciarSecuenciaVictoria();
+            } else if (typeof iniciarVictoria === "function") {
+                iniciarVictoria();
+            }
+        }, 400);
     }
 
     function onPointerDown(ev) {
@@ -1636,19 +1481,18 @@
         enlazarMenuAcc();
 
         document.getElementById("btn-empecemos").addEventListener("click", empecemosJuego);
-
-        const btnOmitir = document.getElementById("btnomitir");
-        if (btnOmitir) {
-            btnOmitir.removeAttribute("onclick");
-            btnOmitir.addEventListener("click", function () {
-                cerrar_anuncio({ rapido: true });
+        sincronizarDialogoIntro3d();
+        const btnOmitirIntro = document.getElementById("btn-omitir-intro3d");
+        if (btnOmitirIntro) {
+            btnOmitirIntro.addEventListener("click", omitirIntro3d);
+        }
+        const btnContinuarIntro = document.getElementById("btn-continuar-intro3d");
+        if (btnContinuarIntro) {
+            btnContinuarIntro.addEventListener("click", function (ev) {
+                ev.preventDefault();
+                empezarJuegoTrasIntro();
             });
         }
-
-        preloadGifs(introConfig.personajes).then(function () {
-            renderPersonajes(introConfig.personajes);
-            introGifsListos = true;
-            intentarLanzarIntro();
-        });
+        window.addEventListener("victory-continue", empezarJuegoTrasIntro);
     });
 })();

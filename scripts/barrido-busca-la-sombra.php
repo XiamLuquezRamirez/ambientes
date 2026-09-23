@@ -214,6 +214,8 @@ if (! is_array($conv) || count($conv) < 1) {
     ok('conversación en config ('.count($conv).' líneas)');
 }
 
+require __DIR__.'/barrido-multisensorial-shell.php';
+
 echo "\n=== BUSCA LA SOMBRA: BD ===\n";
 
 $tipo = null;

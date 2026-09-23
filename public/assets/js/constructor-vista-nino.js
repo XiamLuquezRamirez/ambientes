@@ -1353,13 +1353,14 @@
             extra = renderSecuencia(d);
         } else if (catalogoUrl) {
             const nombre = d.juego_catalogo_nombre || d.juego_nombre || 'Juego';
+            const urlConEdad = urlCatalogoConEdad(catalogoUrl, perfilPayloadKiosco());
             cardClass = 'juego juego-catalogo';
             headOpts = { catalogoNombre: nombre };
             extra = `
                 <div class="vn-catalogo-wrap" data-vn-catalogo-juego>
                     <iframe class="vn-catalogo-iframe"
                         title="${escapar(nombre)}"
-                        src="${escapar(catalogoUrl)}"
+                        src="${escapar(urlConEdad)}"
                         allow="autoplay; fullscreen"
                         referrerpolicy="same-origin"></iframe>
                 </div>`;
@@ -2324,6 +2325,22 @@
             return JSON.parse(el.textContent || 'null');
         } catch (e) {
             return window.__PEDNIA_PERFIL__ || null;
+        }
+    }
+
+    function urlCatalogoConEdad(url, perfil) {
+        if (!url) return url;
+        const edad = perfil && perfil.edad != null && perfil.edad !== ''
+            ? parseInt(String(perfil.edad), 10)
+            : NaN;
+        if (!isFinite(edad)) return url;
+        try {
+            const u = new URL(url, window.location.origin);
+            u.searchParams.set('edad', String(edad));
+            return u.pathname + u.search + u.hash;
+        } catch (e) {
+            const sep = String(url).indexOf('?') >= 0 ? '&' : '?';
+            return url + sep + 'edad=' + encodeURIComponent(String(edad));
         }
     }
 
