@@ -393,6 +393,14 @@
             textos().error,
             textos().cierre
         ];
+        const movs = (gameConfig && gameConfig.movimientos) || {};
+        Object.keys(movs).forEach(function (id) {
+            const nom = movs[id] && movs[id].nombre;
+            if (nom) {
+                extra.push({ texto: nom, personaje: "zoe" });
+                extra.push({ texto: nom, personaje: "zeus" });
+            }
+        });
         Object.keys(porEdad).forEach(function (k) {
             const p = porEdad[k];
             if (p.acierto) extra.push({ texto: p.acierto, personaje: "zoe" });
@@ -735,9 +743,13 @@
 
         const frases = [];
         retos.forEach(function (rt) {
-            if (rt.pregunta) frases.push({ texto: rt.pregunta, personaje: rt.preguntaQuien || "zoe" });
-            (rt.demoNarracion || []).forEach(function (n) {
-                if (n.texto) frases.push({ texto: n.texto, personaje: n.quien || "zoe" });
+            if (rt.pregunta) frases.push({ texto: rt.pregunta, personaje: rt.preguntaQuien || "zeus" });
+            (rt.prefijo || []).concat([rt.correcta]).concat(rt.distractores || []).forEach(function (id) {
+                const nom = nombreMov(id);
+                if (nom) {
+                    frases.push({ texto: nom, personaje: "zoe" });
+                    frases.push({ texto: nom, personaje: "zeus" });
+                }
             });
         });
         const fe = feedbackEdad();
@@ -800,13 +812,14 @@
     async function reproducirSecuencia(secuencia, gen, lento) {
         const riel = document.getElementById("riel");
         riel.innerHTML = "";
-        const pasoMs = lento
+        const pausa = timings().pausaEntrePasosMs != null ? timings().pausaEntrePasosMs : 100;
+        const minPaso = lento
             ? (timings().pasoLentoMs || 950)
             : (timings().pasoMs || 650);
-        const pausa = timings().pausaEntrePasosMs != null ? timings().pausaEntrePasosMs : 100;
         const slots = [];
+        const quien = "zoe";
 
-        // Todas las poses visibles de inmediato; el ritmo es solo highlight.
+        // Todas las poses visibles de inmediato; ritmo = highlight + narración.
         secuencia.forEach(function (id) {
             const s = crearSlotPose(id, { visible: true });
             riel.appendChild(s);
@@ -816,32 +829,20 @@
         for (let i = 0; i < secuencia.length; i++) {
             if (gen !== retoGen) return;
             slots[i].classList.add("activa");
-            await sleep(pasoMs);
+            const nombre = nombreMov(secuencia[i]);
+            const t0 = Date.now();
+            if (nombre) {
+                try {
+                    await TextoVoz.hablar(nombre, quien);
+                } catch (e) { /* noop */ }
+            }
+            if (gen !== retoGen) return;
+            const restante = minPaso - (Date.now() - t0);
+            if (restante > 40) await sleep(restante);
             if (gen !== retoGen) return;
             slots[i].classList.remove("activa");
             await sleep(pausa);
         }
-    }
-
-    async function narrarDemo(reto, gen) {
-        const narracion = reto.demoNarracion || [];
-        if (!narracion.length) return;
-        const demoFull = (reto.prefijo || []).concat([reto.correcta]);
-        const pasoMs = timings().pasoMs || 650;
-        // Toda la demo visible ya; solo se resalta el paso narrado.
-        renderRielEstatico(demoFull, false);
-        const slots = document.querySelectorAll("#riel .slot-pose");
-        for (let i = 0; i < narracion.length; i++) {
-            if (gen !== retoGen) return;
-            const n = narracion[i];
-            if (n.texto) TextoVoz.hablar(n.texto, n.quien || "zoe");
-            if (slots[i]) slots[i].classList.add("activa");
-            await sleep(pasoMs);
-            if (slots[i]) slots[i].classList.remove("activa");
-        }
-        await sleep(150);
-        if (gen !== retoGen) return;
-        renderRielEstatico(reto.prefijo || [], true);
     }
 
     function renderOpciones(reto, gen) {
@@ -879,18 +880,18 @@
         window.__secuenciaReto = retoActual;
         setEnunciado(retoActual.titulo || textos().enunciado);
 
-        if (retoActual.demoNarracion && retoActual.demoNarracion.length) {
-            await narrarDemo(retoActual, gen);
-        } else {
-            await reproducirSecuencia(retoActual.prefijo || [], gen, false);
-            if (gen !== retoGen) return;
-            renderRielEstatico(retoActual.prefijo || [], true);
-        }
+        // Narración completa: cada pose del prefijo + pregunta (sin adelantar la correcta).
+        await reproducirSecuencia(retoActual.prefijo || [], gen, true);
+        if (gen !== retoGen) return;
+        renderRielEstatico(retoActual.prefijo || [], true);
         if (gen !== retoGen) return;
 
         const pregunta = retoActual.pregunta || textos().pregunta || "¿Qué movimiento sigue?";
         setEnunciado(pregunta);
-        TextoVoz.hablar(pregunta, retoActual.preguntaQuien || "zoe");
+        try {
+            await TextoVoz.hablar(pregunta, retoActual.preguntaQuien || "zeus");
+        } catch (e) { /* noop */ }
+        if (gen !== retoGen) return;
         renderOpciones(retoActual, gen);
         aceptaRespuesta = true;
     }
@@ -977,7 +978,10 @@
         renderRielEstatico(retoActual.prefijo || [], true);
         const pregunta = retoActual.pregunta || textos().pregunta || "¿Qué movimiento sigue?";
         setEnunciado(pregunta);
-        TextoVoz.hablar(pregunta, retoActual.preguntaQuien || "zeus");
+        try {
+            await TextoVoz.hablar(pregunta, retoActual.preguntaQuien || "zeus");
+        } catch (e) { /* noop */ }
+        if (gen !== retoGen) return;
         renderOpciones(retoActual, gen);
         esperandoFeedback = false;
         aceptaRespuesta = true;
@@ -986,9 +990,6 @@
     async function resolverAcierto(valor, gen) {
         if (gen !== retoGen) return;
         esperandoFeedback = true;
-        const fe = feedbackEdad();
-        const fb = (gameConfig.feedback && gameConfig.feedback.acierto) || {};
-        const texto = fe.acierto || textos().acierto || fb.texto || "¡Muy bien!";
 
         // Incorporar al riel
         const completa = (retoActual.prefijo || []).concat([valor]);
@@ -1003,12 +1004,8 @@
         if (gen !== retoGen) return;
 
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
-        try {
-            await feedbackConVoz(texto, {
-                personaje: "zoe",
-                gif: fb.gif || "../../images/correcto.gif"
-            });
-        } catch (e) { /* noop */ }
+        // Sin modal/TTS por acierto: solo sonido.
+        await sleep(350);
         if (gen !== retoGen) return;
         esperandoFeedback = false;
         indiceReto += 1;

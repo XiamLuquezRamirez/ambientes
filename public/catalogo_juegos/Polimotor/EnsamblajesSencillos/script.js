@@ -1240,6 +1240,8 @@ function cfgFeedback(tipo) {
 }
 
 function mostrarFeedback(tipo) {
+    // Acierto: solo sonido (se reproduce en el caller). Evita cargar Swal/GIF/TTS en cada pieza.
+    if (tipo === "acierto") return Promise.resolve();
     if (!feedbackActivo()) return Promise.resolve();
     const cfg = cfgFeedback(tipo);
     const pj = tipo === "error" ? "zeus" : "zoe";

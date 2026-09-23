@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<rect width="200" height="200" fill="none"/>
+<path d="M100 25 L130 90 L130 150 L70 150 L70 90 Z" fill="#fa5252"/>
+<circle cx="100" cy="95" r="16" fill="#a5d8ff"/>
+<polygon points="70,130 45,165 70,150" fill="#fd7e14"/>
+<polygon points="130,130 155,165 130,150" fill="#fd7e14"/>
+<polygon points="80,150 100,185 120,150" fill="#fcc419"/>
+</svg>

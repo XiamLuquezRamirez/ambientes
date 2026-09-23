@@ -1,5 +1,172 @@
 {
     "nombre": "Encuentra el Color",
-    "stub": true,
-    "creado_en": "2026-09-21T09:34:08-05:00"
+    "mostrarFeedBack": true,
+    "feedback": {
+        "duracion": 1400,
+        "acierto": {
+            "gif": "../../images/correcto.gif"
+        },
+        "error": {
+            "gif": "../../images/incorrecto.gif"
+        }
+    },
+    "textos": {
+        "eligeNivel": "Elige tu edad",
+        "enunciado": "Observa muy bien y encuentra el color que te indico",
+        "cierre": "¡Excelente! Encontraste todos los colores.",
+        "aciertoPlantilla": "¡Muy bien! Encontraste el color {color}.",
+        "error": "¡Inténtalo otra vez! Observa muy bien.",
+        "consignaPlantilla": "Encuentra el objeto de color {color}.",
+        "conversacion": [
+            {
+                "personaje": 1,
+                "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Observa muy bien los objetos y encuentra el color que te voy a indicar."
+            },
+            {
+                "personaje": 0,
+                "texto": "¡Yo soy Zeus! Mira los colores: toca el objeto del color que te digamos."
+            },
+            {
+                "personaje": 1,
+                "texto": "Escucha con atención, observa y toca. ¡Tú puedes!"
+            }
+        ]
+    },
+    "accesibilidad": {
+        "letterSpacing": 2,
+        "volumenFondo": 20,
+        "rate": 5
+    },
+    "audios": {
+        "acierto": "../../sounds/ok.mp3",
+        "error": "../../sounds/over.mp3",
+        "cierre": "../../sounds/victory.mp3",
+        "fondo": "../../sounds/fondo.mp3"
+    },
+    "colores": {
+        "rojo": {
+            "nombre": "rojo",
+            "hex": "#e03131"
+        },
+        "amarillo": {
+            "nombre": "amarillo",
+            "hex": "#ffef00"
+        },
+        "azul": {
+            "nombre": "azul",
+            "hex": "#1c7ed6"
+        },
+        "verde": {
+            "nombre": "verde",
+            "hex": "#2f9e44"
+        },
+        "naranja": {
+            "nombre": "naranja",
+            "hex": "#fd7e14"
+        },
+        "morado": {
+            "nombre": "morado",
+            "hex": "#9c36b5"
+        },
+        "rosado": {
+            "nombre": "rosado",
+            "hex": "#f06595"
+        }
+    },
+    "objetos": {
+        "manzana": {
+            "nombre": "Manzana",
+            "img": "img/Manzana.png",
+            "color": "rojo"
+        },
+        "sol": {
+            "nombre": "Sol",
+            "img": "img/Sol.png",
+            "color": "amarillo"
+        },
+        "carro": {
+            "nombre": "Carro",
+            "img": "img/Carro.png",
+            "color": "azul"
+        },
+        "rana": {
+            "nombre": "Rana",
+            "img": "img/Rana.png",
+            "color": "verde"
+        },
+        "zanahoria": {
+            "nombre": "Zanahoria",
+            "img": "img/Zanahoria.png",
+            "color": "naranja"
+        },
+        "uvas": {
+            "nombre": "Uvas",
+            "img": "img/Uvas.png",
+            "color": "morado"
+        },
+        "flor": {
+            "nombre": "Flor",
+            "img": "img/Flor.png",
+            "color": "rosado"
+        }
+    },
+    "niveles": [
+        {
+            "id": "3",
+            "edad": "3 años",
+            "titulo": "3 colores · rojo, amarillo y azul",
+            "objetos": [
+                "manzana",
+                "sol",
+                "carro"
+            ],
+            "colores": [
+                "rojo",
+                "amarillo",
+                "azul"
+            ]
+        },
+        {
+            "id": "4",
+            "edad": "4 años",
+            "titulo": "5 colores",
+            "objetos": [
+                "manzana",
+                "sol",
+                "carro",
+                "rana",
+                "zanahoria"
+            ],
+            "colores": [
+                "rojo",
+                "amarillo",
+                "azul",
+                "verde",
+                "naranja"
+            ]
+        },
+        {
+            "id": "5",
+            "edad": "5-6 años",
+            "titulo": "7 colores",
+            "objetos": [
+                "manzana",
+                "sol",
+                "carro",
+                "rana",
+                "zanahoria",
+                "uvas",
+                "flor"
+            ],
+            "colores": [
+                "rojo",
+                "amarillo",
+                "azul",
+                "verde",
+                "naranja",
+                "morado",
+                "rosado"
+            ]
+        }
+    ]
 }

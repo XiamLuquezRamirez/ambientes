@@ -882,7 +882,6 @@
                 arosPasados += 1;
                 actualizarEstilosAros();
                 reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.7, false);
-                TextoVoz.hablar(textos().aciertoAro || "¡Muy bien! Sigue avanzando.", "zoe");
             }
         }
 
@@ -936,33 +935,12 @@
     }
 
     async function feedbackAciertoRecorrido() {
-        const texto = textos().aciertoRecorrido || "¡Genial! Completaste este recorrido.";
-        const gif = (gameConfig.feedback && gameConfig.feedback.acierto && gameConfig.feedback.acierto.gif)
-            || "../../images/correcto.gif";
-        const minMs = Number(gameConfig.feedback && gameConfig.feedback.duracion) || 1200;
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
         limpiarSwalResidual();
-        const pVoz = TextoVoz.hablar(texto, "zoe");
-        if (gameConfig.mostrarFeedBack !== false) {
-            Swal.fire({
-                title: texto,
-                imageUrl: gif,
-                imageHeight: 140,
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                heightAuto: false,
-                scrollbarPadding: false
-            });
-        }
-        const topeMs = Math.max(minMs + 2500, 6000);
+        // Sin modal/TTS por acierto de recorrido: solo sonido.
         try {
-            await Promise.race([
-                Promise.all([pVoz.catch(function () {}), sleep(minMs)]),
-                sleep(topeMs)
-            ]);
+            await sleep(400);
         } finally {
-            limpiarSwalResidual();
             esperandoFeedback = false;
         }
     }

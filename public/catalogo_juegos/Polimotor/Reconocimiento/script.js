@@ -912,8 +912,9 @@ function cfgFeedback(tipo) {
     };
 }
 
-/** Swal + TTS: espera la voz (con tope) y cierra el modal sin quedar colgado. */
+/** Swal + TTS en errores. Acierto: solo sonido (caller). */
 function mostrarFeedback(tipo) {
+    if (tipo === "acierto") return Promise.resolve();
     if (!feedbackActivo()) {
         const cfgSilent = cfgFeedback(tipo);
         if (cfgSilent.texto && typeof TextoVoz !== "undefined") {

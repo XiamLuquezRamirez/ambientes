@@ -838,6 +838,17 @@
         return btn;
     }
 
+    function iconoZona(zona) {
+        if (zona === "izquierda") {
+            return '<i class="fa-solid fa-hand mano-izq" aria-hidden="true"></i>';
+        }
+        if (zona === "centro") {
+            return '<i class="fa-solid fa-hand-point-up mano-centro" aria-hidden="true"></i>';
+        }
+        // derecha: mano natural de Font Awesome (derecha)
+        return '<i class="fa-solid fa-hand mano-der" aria-hidden="true"></i>';
+    }
+
     function renderZonasRespuesta(zonas, onPick) {
         const resp = document.getElementById("respuestas");
         resp.hidden = false;
@@ -847,7 +858,8 @@
             b.type = "button";
             b.className = "btn-mano " + z;
             b.dataset.zona = z;
-            b.innerHTML = '<i class="fa-solid fa-hand"></i><span>' + (ZONA_LABEL[z] || z) + "</span>";
+            b.setAttribute("aria-label", ZONA_LABEL[z] || z);
+            b.innerHTML = iconoZona(z) + "<span>" + (ZONA_LABEL[z] || z) + "</span>";
             b.addEventListener("click", function () {
                 if (!aceptaRespuesta || esperandoFeedback) return;
                 onPick(z);
@@ -1441,35 +1453,20 @@
         if (gen !== retoGen) return;
         esperandoFeedback = true;
         aceptaRespuesta = false;
-        const fb = (gameConfig.feedback && gameConfig.feedback.acierto) || {};
-        const texto = textos().acierto || fb.texto || "¡Muy bien!";
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
 
-        if (retoRuntime.pasos && retoRuntime.pasoIdx < retoRuntime.pasos.length - 1) {
-            feedbackConVoz(texto, {
-                personaje: "zoe",
-                gif: fb.gif || "../../images/correcto.gif"
-            }).then(function () {
-                esperandoFeedback = false;
-                if (gen !== retoGen) return;
+        // Sin modal/TTS por acierto: solo sonido y breve pausa visual.
+        sleep(350).then(function () {
+            esperandoFeedback = false;
+            if (gen !== retoGen) return;
+            if (retoRuntime.pasos && retoRuntime.pasoIdx < retoRuntime.pasos.length - 1) {
                 retoRuntime.pasoIdx += 1;
                 const paso = retoRuntime.pasos[retoRuntime.pasoIdx];
                 setEnunciado(paso.consigna);
                 aceptaRespuesta = true;
                 TextoVoz.hablar(paso.consigna, "zoe");
-            }).catch(function () {
-                esperandoFeedback = false;
-                aceptaRespuesta = true;
-            });
-            return;
-        }
-
-        feedbackConVoz(texto, {
-            personaje: "zoe",
-            gif: fb.gif || "../../images/correcto.gif"
-        }).then(function () {
-            esperandoFeedback = false;
-            if (gen !== retoGen) return;
+                return;
+            }
             indiceReto += 1;
             iniciarRetoActual(gen);
         }).catch(function () {

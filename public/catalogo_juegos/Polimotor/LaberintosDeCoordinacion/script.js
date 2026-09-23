@@ -62,7 +62,7 @@
         if (!isFinite(n)) return 20;
         return Math.max(0, Math.min(100, n));
     }
-    
+
     function aplicarVolumenCalibrado(pct) {
         const n = Math.max(0, Math.min(100, Number(pct) || 0));
         if (!gameConfig.accesibilidad) gameConfig.accesibilidad = {};
@@ -78,7 +78,7 @@
             icono.className = n <= 0 ? "fa-solid fa-volume-xmark" : (n < 40 ? "fa-solid fa-volume-low" : "fa-solid fa-volume-high");
         }
     }
-    
+
     function setMenuVol(abierto) {
         const panel = document.getElementById("menu-vol-panel");
         const btn = document.getElementById("btn-menu-vol");
@@ -86,7 +86,7 @@
         panel.hidden = !abierto;
         btn.setAttribute("aria-expanded", abierto ? "true" : "false");
     }
-    
+
     function pintarMenuVol() {
         const pct = volumenFondoPct();
         const slider = document.getElementById("rango-volumen");
@@ -95,15 +95,15 @@
         if (val) val.textContent = String(pct);
         aplicarVolumenCalibrado(pct);
     }
-    
-    
+
+
     function aplicarAccesibilidadInicial() {
         const a = acc();
         document.body.classList.toggle("alto-contraste", !!a.altoContraste);
         aplicarLetterSpacing();
     }
 
-        const ACC_OPCIONES = [
+    const ACC_OPCIONES = [
         { key: "altoContraste", label: "Alto contraste" },
     ];
 
@@ -200,13 +200,13 @@
         });
         pintarMenuVol();
     }
-    
+
     function pxCero(valor, fallback) {
         const n = Number(valor);
         if (!isFinite(n) || n < 0) return fallback;
         return n + "px";
     }
-    
+
     function aplicarLetterSpacing() {
         document.documentElement.style.setProperty("--mc-letter-spacing", pxCero(acc().letterSpacing, "2px"));
     }
@@ -633,7 +633,7 @@
                 try { audio.currentTime = 0; } catch (e) { /* noop */ }
             }
             const p = audio.play();
-            if (p && p.catch) p.catch(function () {});
+            if (p && p.catch) p.catch(function () { });
             if (loop) audioFondo = audio;
             return audio;
         } catch (e) {
@@ -1159,7 +1159,9 @@
     function dibujarNino() {
         const p = aPixel(personaje);
         const z = zonaJuego();
-        const size = (anchoCamino() / 100) * ((z.w / 100) * tamañoLogico().w) * 1.55;
+        // Más pequeña que el ancho del pasillo para que no “se salga” visualmente
+        // y el niño no sienta que falla por el tamaño de la carita.
+        const size = (anchoCamino() / 100) * ((z.w / 100) * tamañoLogico().w) * 1.0;
         const sprite = (modoVictoria && avatarVictoriaImg && avatarVictoriaImg.complete && avatarVictoriaImg.naturalWidth)
             ? avatarVictoriaImg
             : avatarImg;
@@ -1407,7 +1409,7 @@
         if (gameConfig && gameConfig.mostrarFeedBack === false) {
             if (texto && typeof TextoVoz !== "undefined") {
                 return Promise.race([
-                    TextoVoz.hablar(texto, personaje).catch(function () {}),
+                    TextoVoz.hablar(texto, personaje).catch(function () { }),
                     sleep(Math.max(minMs + 2500, 6000))
                 ]);
             }
@@ -1432,7 +1434,7 @@
         Swal.fire(swalOpts);
         const topeMs = Math.max(minMs + 2500, 6000);
         return Promise.race([
-            Promise.all([pVoz.catch(function () {}), sleep(minMs)]),
+            Promise.all([pVoz.catch(function () { }), sleep(minMs)]),
             sleep(topeMs)
         ]).then(function () {
             try { Swal.close(); } catch (e) { /* noop */ }
