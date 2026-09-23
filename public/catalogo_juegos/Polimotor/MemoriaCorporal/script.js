@@ -280,14 +280,87 @@ async function reproducirConversacion() {
     }
 }
 
-let introGifsListos = false;
-let zoomInicioListo = false;
 let introDesdeEmpecemos = false;
 
-function intentarLanzarIntro() {
-    if (!zoomInicioListo || !introGifsListos || introDesdeEmpecemos) return;
-    introDesdeEmpecemos = true;
-    iniciarAnimacionIntro();
+function sincronizarDialogoIntro3d() {
+    if (!window.INTRO_CONFIG) return;
+    if (!window.INTRO_CONFIG.dialogo) window.INTRO_CONFIG.dialogo = {};
+
+    const conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
+    const personajesCfg = window.INTRO_CONFIG.personajes || [];
+    const colores = (window.INTRO_CONFIG.dialogo.colores) || {};
+
+    function textoPlano(html) {
+        if (!html) return "";
+        const tmp = document.createElement("div");
+        tmp.innerHTML = String(html).replace(/<br\s*\/?>/gi, " ");
+        return String(tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ").trim();
+    }
+
+    window.INTRO_CONFIG.dialogo.lineas = conversacion.map(function (linea) {
+        const indice = Number(linea.personaje);
+        const def = personajesCfg[isFinite(indice) ? indice : 0] || personajesCfg[0] || {};
+        const id = def.id || (indice === 1 ? "zoe" : "zeus");
+        const nombre = (introConfig && introConfig.personajes && introConfig.personajes[indice] && introConfig.personajes[indice].nombre)
+            || (id === "zoe" ? "Zoe" : "Zeus");
+
+        return {
+            personaje: id,
+            nombre: nombre,
+            color: colores[id] || (id === "zoe" ? "#8ec5ff" : "#f0c14d"),
+            texto: textoPlano(linea.texto)
+        };
+    });
+}
+
+function mostrarIntro3d() {
+    const root = document.getElementById("intro3d-root");
+    if (root) root.hidden = false;
+    document.body.classList.add("intro3d-activa");
+    window.dispatchEvent(new CustomEvent("intro3d-start"));
+}
+
+function destruirIntro3d() {
+    document.body.classList.remove("intro3d-activa");
+    const root = document.getElementById("intro3d-root");
+    if (root) {
+        root.classList.add("is-closing");
+        setTimeout(function () {
+            root.hidden = true;
+            if (window.__introPhaser) {
+                try { window.__introPhaser.destroy(true); } catch (e) { /* noop */ }
+                window.__introPhaser = null;
+            }
+            if (typeof window.__intro3dDispose === "function") {
+                window.__intro3dDispose();
+            }
+            root.remove();
+        }, 450);
+    }
+}
+
+function omitirIntro3d() {
+    if (cerrardo) return;
+    const root = document.getElementById("intro3d-root");
+    if (!root || root.hidden) {
+        empezarJuegoTrasIntro();
+        return;
+    }
+    window.dispatchEvent(new CustomEvent("intro3d-omitir"));
+}
+
+function empezarJuegoTrasIntro() {
+    if (cerrardo) return;
+    cerrardo = true;
+    conversacionCancelada = true;
+    cancelarIntroPendiente();
+    TextoVoz.detener();
+    asegurarAudioFondo();
+    TextoVoz.volumenFondo(TextoVoz.VOLUMEN_FONDO);
+    $("#fondo_blanco").stop(true, true).hide();
+    destruirIntro3d();
+    $("#principal").css("display", "flex").hide().fadeIn(800);
+    iniciarPartida();
 }
 
 function empecemosJuego() {
@@ -297,10 +370,11 @@ function empecemosJuego() {
     if (btn) btn.disabled = true;
     TextoVoz.desbloquear();
     asegurarAudioFondo();
+    sincronizarDialogoIntro3d();
     TextoVoz.precargar();
-    zoomInicioListo = true;
     pantalla.classList.add("is-out");
-    intentarLanzarIntro();
+    introDesdeEmpecemos = true;
+    mostrarIntro3d();
 
     let oculto = false;
     const ocultarPantalla = function () {
@@ -316,26 +390,7 @@ function empecemosJuego() {
 }
 
 function cerrar_anuncio() {
-    if (cerrardo) return;
-    conversacionCancelada = true;
-    cerrardo = true;
-    cancelarIntroPendiente();
-    TextoVoz.detener();
-    asegurarAudioFondo();
-    TextoVoz.volumenFondo(TextoVoz.VOLUMEN_FONDO);
-
-    const nube = document.querySelector(".nube");
-    nube.style.animationName = "moverabajo";
-    resetPersonajesIdle();
-    $("#fondo_blanco").stop(true, true).hide();
-    setTimeout(function () {
-        nube.style.display = "none";
-        salirPersonajes(function () {
-            document.querySelector(".overlay").style.display = "none";
-            $("#principal").css("display", "flex").hide().fadeIn(1000);
-            iniciarPartida();
-        });
-    }, 2000);
+    empezarJuegoTrasIntro();
 }
 window.cerrar_anuncio = cerrar_anuncio;
 
@@ -1027,9 +1082,20 @@ function terminarJuego() {
     reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
     const cierre = (gameConfig.textos && gameConfig.textos.cierre) || "";
     hablarTexto(cierre);
-    document.getElementById("texto_final").innerText = cierre;
+
     setTimeout(function () {
-        pintar_exito();
+        const caja = document.getElementById("final");
+        const texto = document.getElementById("texto_final");
+        if (texto) texto.textContent = cierre;
+        if (caja) {
+            caja.hidden = false;
+            caja.style.display = "block";
+        }
+        if (typeof iniciarSecuenciaVictoria === "function") {
+            iniciarSecuenciaVictoria();
+        } else if (typeof iniciarVictoria === "function") {
+            iniciarVictoria();
+        }
     }, 400);
 }
 
@@ -1037,6 +1103,7 @@ $(document).ready(function () {
     gameConfig = JSON.parse(readText("config.json"));
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
+    sincronizarDialogoIntro3d();
     aplicarVisual();
     aplicarAccesibilidadInicial();
     TextoVoz.iniciar(gameConfig, introConfig, {
@@ -1054,6 +1121,16 @@ $(document).ready(function () {
     window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
     const btnEmpecemos = document.getElementById("btn-empecemos");
     if (btnEmpecemos) btnEmpecemos.addEventListener("click", empecemosJuego);
+    const btnOmitirIntro = document.getElementById("btn-omitir-intro3d");
+    if (btnOmitirIntro) btnOmitirIntro.addEventListener("click", omitirIntro3d);
+    const btnContinuarIntro = document.getElementById("btn-continuar-intro3d");
+    if (btnContinuarIntro) {
+        btnContinuarIntro.addEventListener("click", function (ev) {
+            ev.preventDefault();
+            empezarJuegoTrasIntro();
+        });
+    }
+    window.addEventListener("victory-continue", empezarJuegoTrasIntro);
     window.addEventListener("message", function (ev) {
         if (ev.origin !== window.location.origin) return;
         if (ev.data && ev.data.type === "pednia:perfil") {
@@ -1067,9 +1144,4 @@ $(document).ready(function () {
             verDeNuevo();
         });
     }
-    preloadGifs(introConfig.personajes).then(function () {
-        renderPersonajes(introConfig.personajes);
-        introGifsListos = true;
-        intentarLanzarIntro();
-    });
 });

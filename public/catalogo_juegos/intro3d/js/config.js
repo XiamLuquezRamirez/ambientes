@@ -2,7 +2,7 @@ window.INTRO_CONFIG = {
     personajes: [
         {
             id: "zeus",
-            modelo: "../intro3d/models/nino.glb",
+            modelo: "models/nino.glb",
             escala: 0.85,
             posicionY: -1,
             inicioX: -10.2,
@@ -13,13 +13,13 @@ window.INTRO_CONFIG = {
             retraso: 0.15,
             mirarAlHablar: 0.42,
             mirarAlEscuchar: 1.12,
-            gestos: ["Wave", "Yes"],
+            gestos: ["talk", "Yes"],
             caminar: ["Walk", "Walking", "Run"],
             idle: ["Idle", "Standing"]
         },
         {
             id: "zoe",
-            modelo: "../intro3d/models/nina.glb",
+            modelo: "models/nina.glb",
             escala: 0.85,
             posicionY: -1,
             inicioX: 10.2,
@@ -29,9 +29,9 @@ window.INTRO_CONFIG = {
             velocidad: 2.05,
             retraso: 0.28,
             mirarAlHablar: -0.42,
-            mirarAlEscuchar: -0.42,
-            gestos: ["Wave", "Yes"],
-            caminar: ["Walk", "Walking", "Run"],
+            mirarAlEscuchar: -1.12,
+            gestos: ["talk", "Yes"],
+            caminar: ["Walk", "talk", "Run"],
             idle: ["Idle", "Standing"]
         }
     ],

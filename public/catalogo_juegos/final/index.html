@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="final.css">
 </head>
 <body data-final-demo="1" style="margin: 0; padding: 0;">
+<div id="final" class="final" style="display:block;">
 <div id="victoria">
     <img src="../img/fondo.png" class="fondo" alt="">
     <div class="contenido">
@@ -23,6 +24,23 @@
     <img src="../img/cortina_der.png" class="cortina cortina-der" alt="">
     <div class="confeti" id="confeti"></div>
 </div>
+<div class="final-acciones" id="final-acciones">
+    <p class="final-pregunta">¿Quieres jugar nuevamente?</p>
+    <div class="final-botones">
+        <button type="button" class="btn btn-success">Sí</button>
+        <button type="button" class="btn btn-danger">No</button>
+    </div>
+</div>
+</div>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="../intro3d/js/final-scene.js"></script>
 <script src="final.js"></script>
 </body>
 </html>

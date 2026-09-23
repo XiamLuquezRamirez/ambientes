@@ -4,6 +4,17 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const CONFIG = window.INTRO_CONFIG || {};
 const container = document.getElementById('three-container');
 
+/** Resuelve assets de intro3d relativos a esta carpeta (sirve en cualquier ambiente/juego). */
+function resolverAsset(ruta) {
+    if (!ruta) return ruta;
+    if (/^(https?:)?\/\//i.test(ruta) || ruta.startsWith('data:') || ruta.startsWith('/')) {
+        return ruta;
+    }
+    // Rutas antiguas relativas a la página (../intro3d/... o ../../intro3d/...)
+    if (ruta.indexOf('intro3d/') >= 0) return ruta;
+    return new URL('../' + String(ruta).replace(/^\.\//, ''), import.meta.url).href;
+}
+
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0x7eb6ff, 14, 38);
 
@@ -267,7 +278,7 @@ function crearActor(def) {
     actores.push(actor);
 
     loader.load(
-        def.modelo,
+        resolverAsset(def.modelo),
         (gltf) => {
             const mesh = gltf.scene;
             mesh.traverse((obj) => {

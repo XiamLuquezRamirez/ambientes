@@ -7,6 +7,10 @@ const DURACION_CIERRE_CORTINAS_MS = 1500;
 let confetiTimer = null;
 let secuenciaTimer = null;
 
+function usaFinal3d() {
+    return !!(window.Final3d && typeof window.Final3d.ensure === "function");
+}
+
 function coloresConfeti() {
     return [
         "#F44336",
@@ -98,6 +102,17 @@ function limpiarClasesVictoria() {
     if (cajaFinal) cajaFinal.classList.remove("final-cerrando");
 }
 
+function revelarTrasCierre() {
+    if (cajaFinal) cajaFinal.classList.remove("final-cerrando");
+    const principal = document.getElementById("principal");
+    if (principal) principal.style.display = "none";
+    if (pantalla) {
+        pantalla.classList.remove("victoria-cerrando", "victoria-fuera");
+        void pantalla.offsetWidth;
+    }
+    iniciarVictoria();
+}
+
 /**
  * Cierra las cortinas sobre el juego y, al terminar, abre la victoria.
  * El contenedor #final debe estar visible antes de llamar esto.
@@ -114,12 +129,32 @@ function iniciarSecuenciaVictoria() {
     ocultarAccionesFinal();
     limpiarClasesVictoria();
 
-    // Fuera de pantalla (invisible), escena oculta: se ve el juego
+    if (cajaFinal) cajaFinal.classList.add("final-cerrando");
+
+    if (usaFinal3d()) {
+        document.body.classList.add("final-3d-activa");
+        if (typeof window.__intro3dDispose === "function") {
+            try { window.__intro3dDispose(); } catch (e) { /* noop */ }
+        }
+        // Precarga personajes 3D; cortinas y fondo siguen siendo 2D.
+        window.Final3d.ensure().catch(function (e) {
+            console.warn("[final] Final3d falló, personajes 2D", e);
+            document.body.classList.remove("final-3d-activa");
+        });
+        iniciarSecuenciaVictoria2d();
+        return;
+    }
+
+    iniciarSecuenciaVictoria2d();
+}
+
+function iniciarSecuenciaVictoria2d() {
+    if (!pantalla) return;
+
     if (cajaFinal) cajaFinal.classList.add("final-cerrando");
     pantalla.classList.add("victoria-cerrando", "victoria-sin-transicion", "victoria-fuera");
     void pantalla.offsetWidth;
 
-    // Entrar desde los lados y cerrar sobre el juego
     requestAnimationFrame(function () {
         pantalla.classList.remove("victoria-sin-transicion");
         void pantalla.offsetWidth;
@@ -128,13 +163,7 @@ function iniciarSecuenciaVictoria() {
 
     secuenciaTimer = setTimeout(function () {
         secuenciaTimer = null;
-        // Ya cerradas: revelar fondo de victoria detrás
-        pantalla.classList.remove("victoria-cerrando", "victoria-fuera");
-        if (cajaFinal) cajaFinal.classList.remove("final-cerrando");
-        const principal = document.getElementById("principal");
-        if (principal) principal.style.display = "none";
-        void pantalla.offsetWidth;
-        iniciarVictoria();
+        revelarTrasCierre();
     }, DURACION_CIERRE_CORTINAS_MS);
 }
 
@@ -145,6 +174,43 @@ function iniciarVictoria() {
     if (cajaFinal) cajaFinal.classList.remove("final-cerrando");
 
     iniciarConfetiContinuo();
+
+    if (usaFinal3d()) {
+        const lanzarPersonajes3d = function () {
+            window.Final3d.abrirVictoria().catch(function () { /* noop */ });
+        };
+        if (window.Final3d.listo()) {
+            lanzarPersonajes3d();
+        } else {
+            window.Final3d.ensure().then(lanzarPersonajes3d).catch(function (e) {
+                console.warn("[final] Final3d no listo", e);
+                document.body.classList.remove("final-3d-activa");
+                pantalla.classList.add("mostrar-personajes");
+            });
+        }
+
+        setTimeout(function () {
+            pantalla.classList.add("victoria-abierta");
+        }, 60);
+
+        setTimeout(function () {
+            pantalla.classList.add("mostrar-excelente");
+            pantalla.classList.add("mostrar-destellos");
+        }, 1500);
+
+        setTimeout(function () {
+            pantalla.classList.add("mostrar-trofeo");
+        }, 3000);
+
+        setTimeout(function () {
+            pantalla.classList.add("mostrar-texto");
+        }, 3400);
+
+        setTimeout(function () {
+            mostrarAccionesFinal();
+        }, 3700);
+        return;
+    }
 
     setTimeout(function () {
         pantalla.classList.add("victoria-abierta");

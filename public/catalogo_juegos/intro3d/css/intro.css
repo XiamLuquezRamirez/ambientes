@@ -201,3 +201,40 @@
     }
 }
 
+/* Tutorial 3D (personaje en esquina; el juego solo pone #tutorial-3d en el HTML) */
+.tutorial-3d {
+    position: fixed;
+    right: 4px;
+    bottom: 64px;
+    z-index: 40;
+    width: min(34vw, 300px);
+    height: min(72vh, 560px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    overflow: visible;
+}
+
+.tutorial-3d.is-visible {
+    opacity: 1;
+}
+
+.tutorial-3d[hidden] {
+    display: none !important;
+}
+
+.tutorial-3d-canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+@media (max-width: 720px) {
+    .tutorial-3d {
+        right: 2px;
+        bottom: 62px;
+        width: min(42vw, 220px);
+        height: min(68vh, 460px);
+    }
+}
+
