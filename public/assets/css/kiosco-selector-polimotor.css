@@ -21,7 +21,7 @@
     background-image: url("../images/vista_nino/fondo.png");
     background-repeat: no-repeat;
     background-position: center center;
-    background-size: cover;
+    background-size: 100% 100%;
 }
 
 .selector-wrap--polimotor .selector-titulo {
@@ -42,6 +42,7 @@
     -webkit-text-stroke: 0.20em #ffffff;
     paint-order: stroke fill;
     text-shadow: 0 3px 0 rgba(140, 8, 70, 0.28);
+    margin-top: 5vh;
 }
 
 .selector-wrap--polimotor .avatares-grid {
@@ -56,6 +57,9 @@
     justify-content: center;
     align-content: start;
     justify-items: center;
+    margin-top: 5vh;
+    height: 50vh;
+    overflow-y: auto;
 }
 
 .selector-wrap--polimotor .avatar-btn {
@@ -85,14 +89,6 @@
     gap: 0;
     padding: 14% 10% 12%;
     border-radius: 50%;
-    background:
-        radial-gradient(circle at 35% 28%, #2a8a4e 0%, transparent 42%),
-        linear-gradient(165deg, #248a4a 0%, var(--sel-verde) 48%, #14532d 100%);
-    border: none;
-    box-shadow:
-        0 10px 0 var(--sel-verde-sombra),
-        0 14px 22px rgba(0, 0, 0, 0.28);
-    overflow: hidden;
 }
 
 .selector-wrap--polimotor .avatar-card__relieve {
@@ -110,18 +106,16 @@
     position: relative;
     z-index: 1;
     flex: 0 0 auto;
-    width: 58%;
+    width: 94%;
     height: auto;
     aspect-ratio: 1;
-    border-radius: 22%;
+    border-radius: 50%;
     background: var(--color-av);
-    box-shadow:
-        0 2px 0 rgba(0, 0, 0, 0.18),
-        inset 0 0 0 2px rgba(255, 255, 255, 0.2);
     overflow: hidden;
     font-family: "Fredoka One", cursive;
     font-size: clamp(1.15rem, 2.4vw, 1.85rem);
     color: #fff;
+    border: 7px solid var(--color-av)
 }
 
 .selector-wrap--polimotor .avatar-circulo__contenido {
@@ -144,7 +138,8 @@
     position: relative;
     z-index: 2;
     margin-top: 8%;
-    max-width: 92%;
+    width: 102%;
+    height: 55px !important;
     padding: 0 2px;
     font-family: "Nunito", sans-serif;
     font-size: clamp(0.72rem, 1.35vw, 0.95rem);
@@ -154,6 +149,13 @@
     text-align: center;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     word-break: break-word;
+    top: -26px;
+    background-color: var(--color-av);
+    border-radius: 50px;
+    padding: 7px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .selector-wrap--polimotor .avatar-meta {
@@ -167,8 +169,8 @@
 }
 
 .selector-wrap--polimotor .avatar-badge {
-    top: 4%;
-    right: 4%;
+    top: 8%;
+    right: 16%;
     z-index: 4;
     width: 30px;
     height: 30px;

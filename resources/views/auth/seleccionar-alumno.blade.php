@@ -45,12 +45,6 @@
                 >
                     @if ($esPolimotor)
                         <span class="avatar-card">
-                            <img
-                                class="avatar-card__relieve"
-                                src="{{ asset('assets/images/vista_nino/avatar_fondo.svg') }}"
-                                alt=""
-                                aria-hidden="true"
-                            >
                             <span class="avatar-circulo">
                                 <span class="avatar-circulo__contenido">
                                     @include('auth._avatar-circulo')
