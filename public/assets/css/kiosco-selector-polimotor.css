@@ -1,0 +1,301 @@
+/* Selector de alumnos — Polimotor (alineado al mockup) */
+
+.selector-wrap--polimotor {
+    --sel-verde: #1b6b3c;
+    --sel-verde-sombra: #0d3d22;
+    --sel-titulo-contorno: #e0167a;
+    --sel-nombre: #ffffff;
+    --sel-meta: rgba(255, 255, 255, 0.82);
+    --sel-card: clamp(118px, 15.5vw, 158px);
+
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0;
+    padding: 0 12px 16px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #e8d7b8;
+    background-image: url("../images/vista_nino/fondo.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
+
+.selector-wrap--polimotor .selector-titulo {
+    flex: 0 0 auto;
+    width: 100%;
+    min-height: clamp(70px, 11.5vh, 104px);
+    margin: 0;
+    padding: clamp(8px, 1.8vh, 18px) 52px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Fredoka One", cursive;
+    font-size: clamp(1.85rem, 4.8vw, 3.1rem);
+    line-height: 1.05;
+    color: var(--sel-titulo-contorno);
+    letter-spacing: 0.5px;
+    text-align: center;
+    -webkit-text-stroke: 0.20em #ffffff;
+    paint-order: stroke fill;
+    text-shadow: 0 3px 0 rgba(140, 8, 70, 0.28);
+}
+
+.selector-wrap--polimotor .avatares-grid {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: min(980px, 94vw);
+    margin: 0 auto;
+    padding: clamp(6px, 1.5vh, 18px) 4px 20px;
+    display: grid;
+    grid-template-columns: repeat(5, var(--sel-card));
+    gap: clamp(18px, 3.2vh, 36px) clamp(14px, 2.4vw, 32px);
+    justify-content: center;
+    align-content: start;
+    justify-items: center;
+}
+
+.selector-wrap--polimotor .avatar-btn {
+    position: relative;
+    width: var(--sel-card);
+    min-width: var(--sel-card);
+    max-width: var(--sel-card);
+    gap: 0;
+}
+
+.selector-wrap--polimotor .avatar-btn:hover {
+    transform: scale(1.06);
+}
+
+.selector-wrap--polimotor .avatar-btn:active {
+    transform: scale(0.97);
+}
+
+.selector-wrap--polimotor .avatar-card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1.08;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 14% 10% 12%;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 28%, #2a8a4e 0%, transparent 42%),
+        linear-gradient(165deg, #248a4a 0%, var(--sel-verde) 48%, #14532d 100%);
+    border: none;
+    box-shadow:
+        0 10px 0 var(--sel-verde-sombra),
+        0 14px 22px rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+}
+
+.selector-wrap--polimotor .avatar-card__relieve {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.9;
+}
+
+.selector-wrap--polimotor .avatar-circulo {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    width: 58%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 22%;
+    background: var(--color-av);
+    box-shadow:
+        0 2px 0 rgba(0, 0, 0, 0.18),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    font-family: "Fredoka One", cursive;
+    font-size: clamp(1.15rem, 2.4vw, 1.85rem);
+    color: #fff;
+}
+
+.selector-wrap--polimotor .avatar-circulo__contenido {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.selector-wrap--polimotor .kiosco-avatar-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 22%;
+}
+
+.selector-wrap--polimotor .avatar-nombre {
+    position: relative;
+    z-index: 2;
+    margin-top: 8%;
+    max-width: 92%;
+    padding: 0 2px;
+    font-family: "Nunito", sans-serif;
+    font-size: clamp(0.72rem, 1.35vw, 0.95rem);
+    font-weight: 800;
+    line-height: 1.12;
+    color: var(--sel-nombre);
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    word-break: break-word;
+}
+
+.selector-wrap--polimotor .avatar-meta {
+    position: relative;
+    z-index: 2;
+    margin-top: 2px;
+    font-size: clamp(0.58rem, 1.1vw, 0.72rem);
+    font-weight: 700;
+    color: var(--sel-meta);
+    text-align: center;
+}
+
+.selector-wrap--polimotor .avatar-badge {
+    top: 4%;
+    right: 4%;
+    z-index: 4;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #fff;
+    background: #111827;
+    color: #fbbf24;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.selector-wrap--polimotor .avatar-btn--sin-pin .avatar-card {
+    filter: saturate(0.92) brightness(0.96);
+}
+
+.selector-wrap--polimotor .selector-vacio {
+    margin: 28px auto;
+    background: rgba(27, 107, 60, 0.88);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.selector-wrap--polimotor .selector-vacio__titulo,
+.selector-wrap--polimotor .selector-vacio__texto,
+.selector-wrap--polimotor .selector-vacio__icono {
+    color: #fff;
+}
+
+.selector-wrap--polimotor .selector-vacio__texto {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.selector-wrap--polimotor .selector-volver {
+    position: sticky;
+    bottom: max(10px, env(safe-area-inset-bottom, 0px));
+    z-index: 6;
+    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-width: min(280px, 72vw);
+    width: min(300px, 78vw);
+    height: 64px;
+    padding: 0 28px;
+    border: 0;
+    border-radius: 999px;
+    text-decoration: none;
+    color: #fff !important;
+    background-color: transparent;
+    background-image: url("../images/vista_nino/boton.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.28));
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s;
+}
+
+.selector-wrap--polimotor .selector-volver:hover,
+.selector-wrap--polimotor .selector-volver:focus {
+    transform: scale(1.04);
+    color: #fff !important;
+}
+
+.selector-wrap--polimotor .selector-volver:active {
+    transform: translateY(2px) scale(0.98);
+}
+
+.selector-wrap--polimotor .selector-volver__texto {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Nunito", sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.4px;
+    text-shadow: 0 1px 0 rgba(120, 50, 0, 0.35);
+}
+
+.selector-wrap--polimotor .selector-volver__texto i {
+    font-size: 1.15rem;
+    color: #fff;
+}
+
+@media (max-width: 920px) {
+    .selector-wrap--polimotor {
+        --sel-card: clamp(104px, 18vw, 140px);
+    }
+
+    .selector-wrap--polimotor .avatares-grid {
+        grid-template-columns: repeat(4, var(--sel-card));
+    }
+}
+
+@media (max-width: 700px) {
+    .selector-wrap--polimotor {
+        --sel-card: clamp(100px, 26vw, 128px);
+    }
+
+    .selector-wrap--polimotor .avatares-grid {
+        grid-template-columns: repeat(3, var(--sel-card));
+        gap: 16px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .selector-wrap--polimotor {
+        --sel-card: clamp(96px, 38vw, 120px);
+    }
+
+    .selector-wrap--polimotor .avatares-grid {
+        grid-template-columns: repeat(2, var(--sel-card));
+    }
+
+    .selector-wrap--polimotor .selector-titulo {
+        padding-left: 10px;
+        padding-right: 48px;
+        font-size: clamp(1.55rem, 7vw, 2.05rem);
+    }
+
+    .selector-wrap--polimotor .selector-volver {
+        height: 52px;
+        min-width: min(220px, 78vw);
+    }
+
+    .selector-wrap--polimotor .selector-volver__texto {
+        font-size: 1.2rem;
+    }
+}

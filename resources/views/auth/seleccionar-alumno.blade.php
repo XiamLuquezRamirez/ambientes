@@ -1,13 +1,22 @@
 @extends('layouts.ambiente')
 
-@section('content')
 @php
     $destino = $destino ?? \App\Services\SesionNinoService::DESTINO_RECORRIDO;
     $qsDestino = $destino === \App\Services\SesionNinoService::DESTINO_JUEGOS
         ? ['destino' => \App\Services\SesionNinoService::DESTINO_JUEGOS]
         : [];
+    $esPolimotor = ($ambiente->slug ?? '') === 'polimotor';
 @endphp
-<main class="selector-wrap">
+
+@if ($esPolimotor)
+    @push('styles')
+        <link rel="stylesheet"
+            href="{{ asset('assets/css/kiosco-selector-polimotor.css') }}?v={{ @filemtime(public_path('assets/css/kiosco-selector-polimotor.css')) ?: time() }}">
+    @endpush
+@endif
+
+@section('content')
+<main class="selector-wrap{{ $esPolimotor ? ' selector-wrap--polimotor' : '' }}">
     <h2 class="selector-titulo">¿Quién eres tú?</h2>
 
     @if ($estudiantes->isEmpty())
@@ -24,36 +33,79 @@
                 @php
                     $tienePin = $estudiante->tiene_pin;
                     $bloqueado = $estudiante->estado_pin === 'bloqueado';
+                    $primerNombre = explode(' ', trim((string) $estudiante->nombre))[0] ?? '';
+                    $primerApellido = explode(' ', trim((string) ($estudiante->apellido ?? '')))[0] ?? '';
+                    $nombreVisible = trim($primerNombre . ' ' . $primerApellido);
                 @endphp
                 <a
                     href="{{ route('auth.pin', array_merge(['estudianteId' => $estudiante->id], $qsDestino)) }}"
                     class="avatar-btn {{ $tienePin ? '' : 'avatar-btn--sin-pin' }}"
                     style="--color-av: {{ $estudiante->color_avatar }};"
-                    aria-label="{{ $estudiante->nombre }}{{ $tienePin ? '' : ' (sin PIN)' }}{{ $bloqueado ? ' (PIN bloqueado)' : '' }}"
+                    aria-label="{{ $nombreVisible }}{{ $tienePin ? '' : ' (sin PIN)' }}{{ $bloqueado ? ' (PIN bloqueado)' : '' }}"
                 >
-                    <span class="avatar-circulo">
-                        @include('auth._avatar-circulo')
-                    </span>
-                    @if (! $tienePin)
-                        <span class="avatar-badge" title="Sin PIN" aria-hidden="true">
-                            <i class="fas fa-lock"></i>
+                    @if ($esPolimotor)
+                        <span class="avatar-card">
+                            <img
+                                class="avatar-card__relieve"
+                                src="{{ asset('assets/images/vista_nino/avatar_fondo.svg') }}"
+                                alt=""
+                                aria-hidden="true"
+                            >
+                            <span class="avatar-circulo">
+                                <span class="avatar-circulo__contenido">
+                                    @include('auth._avatar-circulo')
+                                </span>
+                            </span>
+                            <span class="avatar-nombre">{{ $nombreVisible }}</span>
+                            @if (! $tienePin)
+                                <span class="avatar-meta">Sin PIN</span>
+                            @elseif ($bloqueado)
+                                <span class="avatar-meta">Bloqueado</span>
+                            @endif
                         </span>
-                        <span class="avatar-nombre">{{ $estudiante->nombre }}</span>
-                        <span class="avatar-meta">Sin PIN</span>
-                    @elseif ($bloqueado)
-                        <span class="avatar-badge" title="PIN bloqueado" aria-hidden="true">
-                            <i class="fas fa-ban"></i>
-                        </span>
-                        <span class="avatar-nombre">{{ $estudiante->nombre }}</span>
-                        <span class="avatar-meta">Bloqueado</span>
+                        @if (! $tienePin)
+                            <span class="avatar-badge" title="Sin PIN" aria-hidden="true">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                        @elseif ($bloqueado)
+                            <span class="avatar-badge" title="PIN bloqueado" aria-hidden="true">
+                                <i class="fas fa-ban"></i>
+                            </span>
+                        @endif
                     @else
-                        <span class="avatar-nombre">{{ $estudiante->nombre }}</span>
+                        <span class="avatar-circulo">
+                            @include('auth._avatar-circulo')
+                        </span>
+                        @if (! $tienePin)
+                            <span class="avatar-badge" title="Sin PIN" aria-hidden="true">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <span class="avatar-nombre">{{ $nombreVisible }}</span>
+                            <span class="avatar-meta">Sin PIN</span>
+                        @elseif ($bloqueado)
+                            <span class="avatar-badge" title="PIN bloqueado" aria-hidden="true">
+                                <i class="fas fa-ban"></i>
+                            </span>
+                            <span class="avatar-nombre">{{ $nombreVisible }}</span>
+                            <span class="avatar-meta">Bloqueado</span>
+                        @else
+                            <span class="avatar-nombre">{{ $nombreVisible }}</span>
+                        @endif
                     @endif
                 </a>
             @endforeach
         </div>
     @endif
 
-    <a href="{{ route('ambiente.inicio') }}" class="link-volver">← Volver</a>
+    @if ($esPolimotor)
+        <a href="{{ route('ambiente.inicio') }}" class="selector-volver" aria-label="Volver">
+            <span class="selector-volver__texto">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                Volver
+            </span>
+        </a>
+    @else
+        <a href="{{ route('ambiente.inicio') }}" class="link-volver">← Volver</a>
+    @endif
 </main>
 @endsection
