@@ -376,8 +376,8 @@ CREATE TABLE `clases` (
 /*Data for the table `clases` */
 
 insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values 
-(12,6,2,9,'Identifica los colores',NULL,'2026-09-22','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09'),
-(13,10,2,7,'Rompecabezas del cuerpo humano',NULL,'2026-09-22','activa',2026,'2026-09-22 10:26:20','2026-09-22 10:26:22');
+(12,6,2,9,'Identifica los colores',NULL,'2026-09-24','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09'),
+(13,10,2,7,'Rompecabezas del cuerpo humano',NULL,'2026-09-24','activa',2026,'2026-09-22 10:26:20','2026-09-22 10:26:22');
 
 /*Table structure for table `cola_sincronizacion` */
 
@@ -500,7 +500,7 @@ insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_
 (8,32,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-06-23 15:31:26','2026-06-23 16:03:33'),
 (9,33,'fas fa-star','#ff9019','fas fa-heart','#ff0606','fas fa-fish','#0f54ff',0,'2026-06-23 15:34:40','2026-06-23 15:34:40'),
 (10,34,'fas fa-fish','#0f54ff','fas fa-heart','#ff0606','fas fa-circle','#f933e9',0,'2026-06-23 15:35:48','2026-06-23 15:35:48'),
-(11,13,'fas fa-fish','#0f54ff','fas fa-fish','#0f54ff','fas fa-fish','#0f54ff',0,'2026-06-23 16:14:31','2026-08-28 15:35:14'),
+(11,13,'fas fa-fish','#0f54ff','fas fa-fish','#0f54ff','fas fa-fish','#0f54ff',0,'2026-06-23 16:14:31','2026-09-24 09:53:35'),
 (12,11,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:15:42','2026-08-28 14:21:43'),
 (13,5,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:16:06','2026-09-08 09:26:41'),
 (15,38,'fas fa-circle','#f933e9','fas fa-star','#ff9019','fas fa-circle','#f933e9',0,'2026-08-21 10:58:13','2026-08-21 10:58:13'),
@@ -848,15 +848,15 @@ insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacio
 (2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#534AB7',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#854F0B',1,NULL,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (4,'Juan',NULL,NULL,NULL,4444,'JU',NULL,'#185FA5',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(5,'Camila',NULL,NULL,NULL,5555,'CA','2','#993c1d',1,NULL,1,'2026-06-09','fggdfg','4534','2026-06-16 00:02:01','2026-08-04 11:03:58','no','masculino',0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
+(5,'Camila','Perez',NULL,'TI',5555,'CP','2','#0891b2',1,NULL,1,'2021-05-23','fggdfg','4534','2026-06-16 00:02:01','2026-09-23 15:59:45','no','masculino',0,NULL,'Valledupar',13,217,'asdasd','sadasdasdasdasd',NULL,NULL,1),
 (6,'Luna',NULL,NULL,NULL,6666,'LU',NULL,'#F59E0B',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (7,'José',NULL,NULL,NULL,134123123,'Jo','1','#0F6E56',9,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:20','2026-09-07 14:37:45','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (8,'José',NULL,NULL,NULL,134123123,'Jo','1','#0F6E56',10,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:36','2026-09-07 14:37:45','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (9,'Fabian Mendez',NULL,NULL,NULL,123123123,'FM','3','#0F6E56',5,1,1,NULL,'Juana 2','32434234','2026-06-18 16:08:25','2026-09-07 14:37:45','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (10,'Juan Lopez 3',NULL,NULL,NULL,3423423,'JL','2','#0F6E56',1,NULL,1,NULL,'Juana 5','3423423','2026-06-18 16:12:47','2026-06-18 16:12:47','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(11,'Andres','quintero',NULL,'CC',5345345,'AQ',NULL,'#dc2626',3,NULL,1,'2018-01-22','yyyyyyy','5345345','2026-06-18 16:19:02','2026-09-07 14:37:45','si','masculino',0,NULL,'VALLEDUPAR',20,305,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveip@gmail.com',1),
+(11,'Andres','quintero',NULL,'CC',5345345,'AQ',NULL,'#dc2626',3,NULL,1,'2022-05-22','yyyyyyy','5345345','2026-06-18 16:19:02','2026-09-23 15:58:30','si','masculino',0,NULL,'VALLEDUPAR',20,305,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveip@gmail.com',1),
 (12,'Fabian','Mendez Quintero',NULL,'TI',342423,'FM',NULL,'#ea580c',4,NULL,1,'2019-05-16','hfghfghfgh','634634','2026-06-18 16:56:48','2026-09-07 15:12:04','si','femenino',0,NULL,'VALLEDUPAR',20,9,'Los cortijos','Mz H Casa 7 Urbanizacion Don Jose','2065930','grovveifdgdfgp@gmail.com',1),
-(13,'Andrea','Rodriguez','estudiantes/5dzmv171bioMovIFlbhyFrz20bsrGB4f6y9EXVIE.jpg','TI',5345345,'AR','1','#0891b2',2,NULL,1,'2023-12-10','Julian Rodriguez','45345','2026-06-18 17:15:22','2026-08-05 10:01:01','si','femenino',0,NULL,'valledupar',20,9,'Los cortijos','manzana h casa 23','3042065930','hhhh@gmail.com',1),
+(13,'Andrea','Rodriguez','estudiantes/5dzmv171bioMovIFlbhyFrz20bsrGB4f6y9EXVIE.jpg','TI',5345345,'AR','1','#0891b2',2,NULL,1,'2023-05-23','Julian Rodriguez','45345','2026-06-18 17:15:22','2026-09-23 15:53:11','si','femenino',0,NULL,'valledupar',20,9,'Los cortijos','manzana h casa 23','3042065930','hhhh@gmail.com',1),
 (14,'Xiamir luquez',NULL,'estudiantes/23NS51sSHtdWtH2tQynzAD0EfRAd6m2WaZensqbP.webp',NULL,4353453,'XL','1','#0F6E56',1,NULL,1,'2021-06-12','yyyy','345345','2026-06-18 17:20:14','2026-06-18 17:20:14','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (15,'Juan David  Perez',NULL,NULL,NULL,6456456,'JD',NULL,'#ff8a05',1,NULL,1,'2023-06-07','tttt','345345','2026-06-19 08:00:29','2026-06-19 08:00:29','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (16,'Juana Lopera',NULL,NULL,NULL,654645,'JL',NULL,'#79fbf9',1,NULL,1,'2014-07-12','uuuu','6666','2026-06-19 08:01:32','2026-06-19 08:01:32','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
@@ -1119,11 +1119,11 @@ CREATE TABLE `juegos` (
 
 insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo_juego_id`,`ruta`,`nombre`,`descripcion`,`icono`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
 ('arrastrar-y-soltar-objetos',7,NULL,NULL,NULL,9,'catalogo_juegos/Polimotor/ArrastrarYSoltarObjetos','Arrastrar y soltar objetos',NULL,'fa-up-down-left-right','#24eb8e',7,1,'2026-09-18 10:30:49','2026-09-21 16:57:55'),
-('busca-la-sombra',9,NULL,NULL,NULL,11,'catalogo_juegos/Multisensorial/BuscaLaSombra','Busca la sombra',NULL,'fa-clone','#14b8a6',10,1,'2026-09-22 15:27:38','2026-09-22 15:38:20'),
-('busca-las-diferencias',9,NULL,NULL,NULL,2,'catalogo_juegos/Multisensorial/BuscaLasDiferencias','Busca las diferencias','Comparar dos imágenes del parque y tocar las diferencias según el nivel de edad.','fa-eye','#0ea5e9',12,1,'2026-09-23 10:22:02','2026-09-23 10:22:02'),
-('completa-la-figura',9,NULL,NULL,NULL,2,'catalogo_juegos/Multisensorial/CompletaLaFigura','Completa La Figura','Tocar la pieza que completa la figura según el nivel de edad.','fa-puzzle-piece','#f59f00',11,1,'2026-09-23 08:48:41','2026-09-23 08:48:41'),
+('busca-la-sombra',9,NULL,NULL,NULL,11,'catalogo_juegos/Multisensorial/BuscaLaSombra','Busca la sombra',NULL,'fa-clone','#14b8a6',10,1,'2026-09-22 15:27:38','2026-09-23 15:07:44'),
+('busca-las-diferencias',9,NULL,NULL,NULL,2,'catalogo_juegos/Multisensorial/BuscaLasDiferencias','Busca las diferencias',NULL,'fa-eye','#84cc16',12,1,'2026-09-23 10:22:02','2026-09-23 10:22:10'),
+('completa-la-figura',9,NULL,NULL,NULL,2,'catalogo_juegos/Multisensorial/CompletaLaFigura','Completa La Figura',NULL,'fa-shapes','#a855f7',11,1,'2026-09-23 08:48:41','2026-09-23 08:48:41'),
 ('coordinacion-visual',7,NULL,NULL,NULL,7,'catalogo_juegos/Polimotor/CoordinacionVisual','Coordinación visual','Guiar el cohete por los aros con precisión según el nivel de edad.','fa-bullseye','#42a5f5',7,1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
-('encuentra-el-color',9,NULL,NULL,NULL,10,'catalogo_juegos/Multisensorial/EncuentraElColor','Encuentra el Color',NULL,'fa-palette','#f97316',9,1,'2026-09-21 09:34:08','2026-09-22 14:44:26'),
+('encuentra-el-color',9,NULL,NULL,NULL,10,'catalogo_juegos/Multisensorial/EncuentraElColor','Encuentra el Color',NULL,'fa-palette','#f97316',9,1,'2026-09-21 09:34:08','2026-09-23 15:07:43'),
 ('ensamblajes-sencillos',7,NULL,NULL,NULL,8,'catalogo_juegos/Polimotor/EnsamblajesSencillos','Ensamblajes sencillos','Armar el robot arrastrando piezas según el nivel de edad.','fa-robot','#ffab91',8,1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
 ('juegos-de-precision',7,NULL,NULL,NULL,7,'catalogo_juegos/Polimotor/JuegosDePrecision','Juegos de precision',NULL,'fa-crosshairs','#eb2442',8,1,'2026-09-18 15:42:23','2026-09-21 16:57:38'),
 ('laberintos-de-coordinacion',7,NULL,NULL,NULL,5,'catalogo_juegos/Polimotor/LaberintosDeCoordinacion','Laberintos de coordinacion',NULL,'fa-chess-knight','#2563eb',5,1,'2026-09-12 08:48:03','2026-09-14 09:17:38'),
@@ -3248,7 +3248,7 @@ CREATE TABLE `registros_acceso` (
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=485 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=493 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `registros_acceso` */
 
@@ -3701,7 +3701,15 @@ insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) v
 (481,1,'127.0.0.1','multisensorial','2026-09-22 11:44:40','inicio_sesion'),
 (482,1,'127.0.0.1','multisensorial','2026-09-22 14:24:11','inicio_sesion'),
 (483,1,'127.0.0.1','multisensorial','2026-09-22 15:38:24','inicio_sesion'),
-(484,4,'127.0.0.1','multisensorial','2026-09-22 15:38:57','inicio_sesion');
+(484,4,'127.0.0.1','multisensorial','2026-09-22 15:38:57','inicio_sesion'),
+(485,1,'127.0.0.1','multisensorial','2026-09-22 17:09:48','inicio_sesion'),
+(486,1,'127.0.0.1','multisensorial','2026-09-23 08:16:24','inicio_sesion'),
+(487,1,'127.0.0.1','multisensorial','2026-09-23 14:19:16','inicio_sesion'),
+(488,4,'127.0.0.1','multisensorial','2026-09-23 15:14:14','inicio_sesion'),
+(489,1,'127.0.0.1','multisensorial','2026-09-23 15:34:26','inicio_sesion'),
+(490,16,'127.0.0.1','multisensorial','2026-09-23 15:51:55','inicio_sesion'),
+(491,1,'127.0.0.1','multisensorial','2026-09-23 16:26:39','inicio_sesion'),
+(492,1,'127.0.0.1','multisensorial','2026-09-24 08:16:24','inicio_sesion');
 
 /*Table structure for table `resultados_bloque` */
 
@@ -3837,7 +3845,7 @@ CREATE TABLE `seguridad_logs` (
   KEY `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
   CONSTRAINT `seguridad_logs_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `seguridad_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=461 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=469 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*Data for the table `seguridad_logs` */
 
@@ -4299,7 +4307,15 @@ insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripci
 (457,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 11:44:40','2026-09-22 11:44:40'),
 (458,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 14:24:11','2026-09-22 14:24:11'),
 (459,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 15:38:24','2026-09-22 15:38:24'),
-(460,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 15:38:57','2026-09-22 15:38:57');
+(460,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 15:38:57','2026-09-22 15:38:57'),
+(461,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-22 17:09:48','2026-09-22 17:09:48'),
+(462,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-23 08:16:24','2026-09-23 08:16:24'),
+(463,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-23 14:19:16','2026-09-23 14:19:16'),
+(464,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-23 15:14:14','2026-09-23 15:14:14'),
+(465,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-23 15:34:26','2026-09-23 15:34:26'),
+(466,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-23 15:51:55','2026-09-23 15:51:55'),
+(467,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-23 16:26:39','2026-09-23 16:26:39'),
+(468,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36','2026-09-24 08:16:24','2026-09-24 08:16:24');
 
 /*Table structure for table `sesiones_experiencia` */
 
