@@ -279,19 +279,28 @@
         return prom.finally(actualizarBtnFullscreen);
     }
 
+    function pedirFullscreenPortada() {
+        if (!window.KioscoFsCore || window.KioscoFsCore.estaEnFullscreen()) {
+            return Promise.resolve();
+        }
+        return window.KioscoFsCore.entrarFullscreen(true).catch(function () { /* iOS / permiso */ });
+    }
+
     function enlazarEventosPortada() {
         $paso.off('click.rn').on('click.rn', '#rnBtnIniciarAmbiente', function () {
             if (!urlContinuar) return;
-            if (window.KioscoNav && window.KioscoNav.esRutaKiosco(urlContinuar)) {
-                window.KioscoNav.ir(urlContinuar);
-                return;
-            }
-            window.location.href = urlContinuar;
+            pedirFullscreenPortada().finally(function () {
+                if (window.KioscoNav && window.KioscoNav.esRutaKiosco(urlContinuar)) {
+                    window.KioscoNav.ir(urlContinuar);
+                    return;
+                }
+                window.location.href = urlContinuar;
+            });
         });
 
         $paso.on('click.rn', '#rnZonaJuegos', function (e) {
             e.preventDefault();
-            abrirJuegos();
+            pedirFullscreenPortada().finally(abrirJuegos);
         });
 
         if ($btnFs.length) {

@@ -80,29 +80,6 @@
 </head>
 
 <body>
-    <button type="button" class="kiosco-fs-btn" id="kioscoBtnFullscreen" title="Pantalla completa"
-        aria-label="Pantalla completa">
-        <svg class="kiosco-fs-icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" aria-hidden="true">
-            <path d="M8 3H3v5M16 3h5v5M16 21h5v-5M8 21H3v-5" />
-        </svg>
-        <svg class="kiosco-fs-icon-compress" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" aria-hidden="true" hidden>
-            <path d="M9 3H3v6M15 3h6v6M21 15v6h-6M9 21H3v-6" />
-        </svg>
-    </button>
-
-    <button type="button" class="kiosco-salir-btn" id="kioscoBtnSalir" title="Salir" aria-label="Salir"
-        data-salir-url="{{ route('auth.salir') }}" hidden>Salir
-    </button>
-
-    <div class="kiosco-fs-hint" id="kioscoFsHint" hidden>
-        <p class="kiosco-fs-hint__texto" id="kioscoFsHintTexto">
-            Toca el botón de expandir (esquina superior derecha) para ver PedNia a pantalla completa.
-        </p>
-        <button type="button" class="kiosco-fs-hint__cerrar" id="kioscoFsHintCerrar">Entendido</button>
-    </div>
-
     <div id="kioscoPane">
         @yield('content')
     </div>
