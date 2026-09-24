@@ -1078,7 +1078,7 @@ body.alto-contraste .menu-acc-cerrar {
   align-items: center;
   justify-content: center;
   gap: 22px;
-  width: min(760px, 100%);
+  width: 100%;
 }
 
 .enunciado {
@@ -1129,15 +1129,17 @@ body.alto-contraste .menu-acc-cerrar {
 
 .secuencia {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
   gap: 12px;
   min-height: 0;
   width: 100%;
+  max-width: 100%;
   padding: 0;
   background: transparent;
   border: 0;
+  overflow-x: auto;
 }
 
 .secuencia-pista {
@@ -1230,7 +1232,6 @@ body.alto-contraste .menu-acc-cerrar {
 
 .opciones.opciones-falta {
   width: calc(var(--mc-cols) * var(--mc-opcion-w) + (var(--mc-cols) - 1) * var(--mc-gap));
-  max-width: 100%;
 }
 
 .opcion-seq {
@@ -1301,8 +1302,11 @@ body.alto-contraste .menu-acc-cerrar {
 }
 
 .opcion-tenue {
-  opacity: 0.35;
-  pointer-events: none;
+  opacity: 0.4;
+  filter: grayscale(1);
+  background: #e8e8e8;
+  border-color: #b0b0b0;
+  color: #888;
 }
 
 .opcion-marca {

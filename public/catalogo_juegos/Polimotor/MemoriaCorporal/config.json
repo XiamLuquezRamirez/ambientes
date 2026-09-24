@@ -112,20 +112,9 @@
             "titulo": "2 movimientos",
             "modo": "falta",
             "opciones": 3,
-            "rondas": [
-                [
-                    "manos_arriba",
-                    "manos_abajo"
-                ],
-                [
-                    "tocar_cabeza",
-                    "tocar_barriga"
-                ],
-                [
-                    "tocar_hombros",
-                    "tocar_rodillas"
-                ]
-            ]
+            "largo": 2,
+            "cantidadRondas": 3,
+            "rondas": []
         },
         {
             "id": "4",
@@ -133,28 +122,9 @@
             "titulo": "3 movimientos",
             "modo": "falta",
             "opciones": 4,
-            "rondas": [
-                [
-                    "manos_abajo",
-                    "tocar_hombros",
-                    "manos_abajo"
-                ],
-                [
-                    "manos_arriba",
-                    "tocar_cabeza",
-                    "manos_abajo"
-                ],
-                [
-                    "tocar_hombros",
-                    "abrir_brazos",
-                    "tocar_rodillas"
-                ],
-                [
-                    "manos_abajo",
-                    "tocar_cabeza",
-                    "tocar_barriga"
-                ]
-            ]
+            "largo": 3,
+            "cantidadRondas": 4,
+            "rondas": []
         },
         {
             "id": "5",
@@ -162,38 +132,9 @@
             "titulo": "4 movimientos",
             "modo": "falta",
             "opciones": 5,
-            "rondas": [
-                [
-                    "manos_arriba",
-                    "tocar_cabeza",
-                    "tocar_hombros",
-                    "manos_abajo"
-                ],
-                [
-                    "abrir_brazos",
-                    "tocar_rodillas",
-                    "manos_arriba",
-                    "tocar_hombros"
-                ],
-                [
-                    "tocar_cabeza",
-                    "manos_al_frente",
-                    "tocar_hombros",
-                    "tocar_rodillas"
-                ],
-                [
-                    "manos_abajo",
-                    "abrir_brazos",
-                    "tocar_cabeza",
-                    "manos_arriba"
-                ],
-                [
-                    "tocar_hombros",
-                    "tocar_rodillas",
-                    "abrir_brazos",
-                    "manos_al_frente"
-                ]
-            ]
+            "largo": 4,
+            "cantidadRondas": 5,
+            "rondas": []
         }
     ]
 }
