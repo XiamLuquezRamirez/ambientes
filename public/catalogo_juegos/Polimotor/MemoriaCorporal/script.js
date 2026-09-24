@@ -13,6 +13,7 @@ let juegoTerminado = false;
 let esperandoRespuesta = false;
 let secuenciaObjetivo = [];
 let opcionesRonda = [];
+let rondasSesion = [];
 let huecoIndex = 0;
 let mostrandoMemoria = false;
 let marcandoRespuesta = false;
@@ -396,7 +397,7 @@ function aplicarAccesibilidadInicial() {
 function actualizarProgreso() {
     const el = document.getElementById("progreso");
     if (!el) return;
-    const total = nivelElegido && nivelElegido.rondas ? nivelElegido.rondas.length : 0;
+    const total = rondasSesion.length || (nivelElegido && nivelElegido.rondas ? nivelElegido.rondas.length : 0);
     el.hidden = !acc().mostrarProgreso || !total || juegoTerminado;
     el.innerHTML = '<i class="fa-solid fa-brain"></i> ' + Math.min(rondaActual + 1, total) + " / " + total;
 }
@@ -438,6 +439,7 @@ function iniciarPartida() {
             juegoTerminado = false;
             instruccionDicha = false;
             fallosRonda = 0;
+            rondasSesion = generarRondasSesion(nivel);
             aplicarVisual();
             iniciarRonda();
         }
@@ -478,6 +480,7 @@ function confirmarNivel(id) {
     juegoTerminado = false;
     instruccionDicha = false;
     fallosRonda = 0;
+    rondasSesion = generarRondasSesion(nivelElegido);
     aplicarVisual();
     iniciarRonda();
 }
@@ -564,9 +567,50 @@ function barajar(arr) {
     return a;
 }
 
-function distractoresMovimiento(correctoId, cantidad) {
-    const catalogo = Object.keys(gameConfig.movimientos || {}).filter(function (id) {
-        return id !== correctoId;
+function idsMovimientos() {
+    return Object.keys((gameConfig && gameConfig.movimientos) || {});
+}
+
+function largoSecuenciaNivel(nivel) {
+    if (!nivel) return 2;
+    const n = Number(nivel.largo);
+    if (isFinite(n) && n > 0) return n;
+    const r0 = (nivel.rondas && nivel.rondas[0]) || [];
+    return r0.length || 2;
+}
+
+function cantidadRondasNivel(nivel) {
+    if (!nivel) return 3;
+    const n = Number(nivel.cantidadRondas);
+    if (isFinite(n) && n > 0) return n;
+    return (nivel.rondas && nivel.rondas.length) || 3;
+}
+
+/** Secuencia aleatoria sin movimientos repetidos. */
+function generarSecuenciaAleatoria(largo) {
+    const ids = idsMovimientos();
+    const n = Math.min(Math.max(1, largo || 2), ids.length);
+    return barajar(ids).slice(0, n);
+}
+
+function generarRondasSesion(nivel) {
+    const total = cantidadRondasNivel(nivel);
+    const largo = largoSecuenciaNivel(nivel);
+    const out = [];
+    for (let i = 0; i < total; i++) {
+        out.push(generarSecuenciaAleatoria(largo));
+    }
+    return out;
+}
+
+function distractoresMovimiento(correctoId, cantidad, excluir) {
+    const prohibidos = {};
+    prohibidos[correctoId] = true;
+    (excluir || []).forEach(function (id) {
+        prohibidos[id] = true;
+    });
+    const catalogo = idsMovimientos().filter(function (id) {
+        return !prohibidos[id];
     });
     return barajar(catalogo).slice(0, cantidad);
 }
@@ -597,8 +641,8 @@ function terminarFaseMemoria() {
 
 async function iniciarRonda() {
     if (!nivelElegido || juegoTerminado) return;
-    const rondas = nivelElegido.rondas || [];
-    if (rondaActual >= rondas.length) {
+    if (!rondasSesion.length) rondasSesion = generarRondasSesion(nivelElegido);
+    if (rondaActual >= rondasSesion.length) {
         terminarJuego();
         return;
     }
@@ -606,7 +650,7 @@ async function iniciarRonda() {
     mostrandoMemoria = false;
     marcandoRespuesta = false;
     fallosRonda = 0;
-    secuenciaObjetivo = rondas[rondaActual].slice();
+    secuenciaObjetivo = rondasSesion[rondaActual].slice();
     huecoIndex = secuenciaObjetivo.length - 1;
     actualizarProgreso();
     document.getElementById("opciones").innerHTML = "";
@@ -697,7 +741,7 @@ function mostrarOpciones() {
 function mostrarOpcionesFalta() {
     const correcto = secuenciaObjetivo[huecoIndex];
     const n = nivelElegido.opciones || 4;
-    const dist = distractoresMovimiento(correcto, n - 1);
+    const dist = distractoresMovimiento(correcto, n - 1, secuenciaObjetivo);
     opcionesRonda = barajar([{ id: correcto, ok: true }].concat(
         dist.map(function (id) { return { id: id, ok: false }; })
     ));
@@ -713,7 +757,7 @@ function mostrarOpcionesFalta() {
 
 function pintarOpcionesFalta(lista) {
     const caja = document.getElementById("opciones");
-    const cols = lista.length === 4 ? 2 : (lista.length <= 3 ? Math.max(lista.length, 1) : 3);
+    const cols = lista.length === 4 ? 2 : (lista.length <= 3 ? Math.max(lista.length, 1) : 5);
     const animar = !!acc().animaciones_opciones;
     if (timerEntradaOpciones) {
         clearTimeout(timerEntradaOpciones);
@@ -795,7 +839,10 @@ function elegirOpcion(op, btn) {
         mostrarMarca(btn, "error");
         reproducirAudio(gameConfig.audios && gameConfig.audios.error);
         fallosRonda += 1;
-        if (fallosRonda >= umbralAtenuar()) atenuarOpcionLejana(btn);
+        const umbral = umbralAtenuar();
+        if (umbral > 0 && fallosRonda % umbral === 0) {
+            atenuarOpcionFallida(btn);
+        }
         hablarFeedback("error");
         sleep(900).then(function () {
             if (juegoTerminado) return;
@@ -807,16 +854,10 @@ function elegirOpcion(op, btn) {
     }
 }
 
-function atenuarOpcionLejana(btnErr) {
-    const botones = Array.prototype.slice.call(document.querySelectorAll(".opcion-seq"));
-    const otros = botones.filter(function (b) {
-        return b !== btnErr
-            && b.dataset.ok !== "1"
-            && !b.classList.contains("opcion-ok")
-            && !b.classList.contains("opcion-tenue");
-    });
-    if (!otros.length) return;
-    otros[otros.length - 1].classList.add("opcion-tenue");
+/** Cada N fallos: atenúa la opción en la que acaba de equivocarse (sigue clicable). */
+function atenuarOpcionFallida(btnErr) {
+    if (!btnErr || btnErr.dataset.ok === "1") return;
+    btnErr.classList.add("opcion-tenue");
 }
 
 function verDeNuevo() {

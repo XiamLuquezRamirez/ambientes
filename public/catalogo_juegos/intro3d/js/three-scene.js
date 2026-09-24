@@ -99,9 +99,12 @@ function crearNube(x, y, z, escala) {
 }
 
 crearCielo();
-crearNube(-6.5, 4.2, -8, 1.5);
-crearNube(5.8, 3.6, -10, 1.8);
-crearNube(0.5, 4.8, -12, 1.2);
+const nubes = [
+    { mesh: crearNube(-6.5, 4.2, -8, 1.5), baseX: -6.5, fase: 0, amp: 0.48, vel: 0.75 },
+    { mesh: crearNube(5.8, 3.6, -10, 1.8), baseX: 5.8, fase: 2.1, amp: 0.42, vel: 0.58 },
+    { mesh: crearNube(0.5, 4.8, -12, 1.2), baseX: 0.5, fase: 4.0, amp: 0.52, vel: 0.62 }
+];
+let tiempoNubes = 0;
 
 scene.add(new THREE.HemisphereLight(0xfff2dd, 0x4d6b3a, 1.35));
 
@@ -160,19 +163,290 @@ ring.rotation.x = -Math.PI / 2;
 ring.position.y = -0.99;
 scene.add(ring);
 
-[-7.5, -3.2, 2.8, 7.1].forEach((x, i) => {
+// 3 colinas: 2 adelante + 1 atrás — [x, z, rx, ry, rz, color, y]
+[
+    // Atrás (más oscura, más grande)
+    [0.0, -16.0, 7.5, 3.9, 3.2, 0x355f2e, 0],
+    // Adelante
+    [-6.5, -12.0, 6.8, 2.1, -1.8, 0x6eab58, -0.4],
+    [6.5, -12.0, 8.8, 3.1, 3.8, 0x5f9a4d, 0]
+].forEach(([x, z, rx, ry, rz, color, y]) => {
     const colina = new THREE.Mesh(
-        new THREE.SphereGeometry(2.4 + (i % 2) * 0.6, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2),
-        new THREE.MeshStandardMaterial({
-            color: i % 2 ? 0x5f9a4d : 0x6eab58,
-            roughness: 1
-        })
+        new THREE.SphereGeometry(1, 28, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+        new THREE.MeshStandardMaterial({ color: color, roughness: 1 })
     );
-    colina.position.set(x, -1.05, -7.5 - (i % 3));
-    colina.scale.set(1.4, 0.55, 1.1);
+    colina.position.set(x, -1.05 + (y != null ? y : 0), z);
+    colina.scale.set(rx, ry, rz);
     colina.receiveShadow = true;
     scene.add(colina);
 });
+
+const Y_SUELO = -1.02;
+const matTronco = new THREE.MeshStandardMaterial({ color: 0x8a5a2b, roughness: 0.9 });
+const matHojaA = new THREE.MeshStandardMaterial({ color: 0x3f9e48, roughness: 0.82 });
+const matHojaB = new THREE.MeshStandardMaterial({ color: 0x58b560, roughness: 0.82 });
+const matHojaC = new THREE.MeshStandardMaterial({ color: 0x2f8640, roughness: 0.85 });
+const matMadera = new THREE.MeshStandardMaterial({ color: 0x9c6b3c, roughness: 0.88 });
+const matRoca = new THREE.MeshStandardMaterial({ color: 0x9aa3ab, roughness: 0.95 });
+
+function crearArbolRedondo(x, z, escala) {
+    const s = escala != null ? escala : 1;
+    const grupo = new THREE.Group();
+    const tronco = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.22 * s, 0.32 * s, 1.7 * s, 8),
+        matTronco
+    );
+    tronco.position.y = Y_SUELO + 0.85 * s;
+    tronco.castShadow = true;
+    grupo.add(tronco);
+    [
+        [0, 2.35, 0, 1.05],
+        [0.55, 2.15, 0.2, 0.72],
+        [-0.5, 2.2, -0.15, 0.7],
+        [0.15, 2.85, 0.05, 0.62]
+    ].forEach(([px, py, pz, r], i) => {
+        const hoja = new THREE.Mesh(
+            new THREE.SphereGeometry(r * s, 14, 12),
+            i % 2 ? matHojaB : matHojaA
+        );
+        hoja.position.set(px * s, Y_SUELO + py * s, pz * s);
+        hoja.castShadow = true;
+        grupo.add(hoja);
+    });
+    grupo.position.set(x, 0, z);
+    scene.add(grupo);
+    return grupo;
+}
+
+function crearPino(x, z, escala, y) {
+    const s = escala != null ? escala : 1;
+    const offsetY = y != null ? y : 0;
+    const grupo = new THREE.Group();
+    const tronco = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.12 * s, 0.18 * s, 0.9 * s, 7),
+        matTronco
+    );
+    tronco.position.y = Y_SUELO + 0.45 * s;
+    tronco.castShadow = true;
+    grupo.add(tronco);
+    [
+        [1.15, 1.0],
+        [0.9, 1.55],
+        [0.62, 2.05]
+    ].forEach(([radio, py], i) => {
+        const piso = new THREE.Mesh(
+            new THREE.ConeGeometry(radio * s, 0.95 * s, 10),
+            i === 1 ? matHojaB : matHojaC
+        );
+        piso.position.y = Y_SUELO + py * s;
+        piso.castShadow = true;
+        grupo.add(piso);
+    });
+    grupo.position.set(x, offsetY, z);
+    scene.add(grupo);
+    return grupo;
+}
+
+function crearArbusto(x, z, escala) {
+    const s = escala != null ? escala : 1;
+    const grupo = new THREE.Group();
+    [
+        [0, 0.35, 0, 0.48],
+        [0.35, 0.28, 0.12, 0.38],
+        [-0.32, 0.26, -0.1, 0.36],
+        [0.05, 0.5, -0.08, 0.3]
+    ].forEach(([px, py, pz, r], i) => {
+        const m = new THREE.Mesh(
+            new THREE.SphereGeometry(r * s, 10, 8),
+            i % 2 ? matHojaB : matHojaC
+        );
+        m.position.set(px * s, Y_SUELO + py * s, pz * s);
+        m.castShadow = true;
+        grupo.add(m);
+    });
+    grupo.position.set(x, 0, z);
+    scene.add(grupo);
+    return grupo;
+}
+
+function crearFlor(x, z, escala, colorIdx) {
+    const s = escala != null ? escala : 1;
+    const grupo = new THREE.Group();
+    const tallo = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.03 * s, 0.04 * s, 0.38 * s, 5),
+        matHojaC
+    );
+    tallo.position.y = Y_SUELO + 0.19 * s;
+    grupo.add(tallo);
+
+    const coloresFlor = [0xff6b8a, 0xffd166, 0xc77dff, 0xffffff, 0xff9f43];
+    const color = coloresFlor[(colorIdx || 0) % coloresFlor.length];
+    const petaloMat = new THREE.MeshStandardMaterial({
+        color: color,
+        roughness: 0.65,
+        emissive: color,
+        emissiveIntensity: 0.06
+    });
+    for (let i = 0; i < 5; i++) {
+        const ang = (i / 5) * Math.PI * 2;
+        const petalo = new THREE.Mesh(new THREE.SphereGeometry(0.1 * s, 8, 6), petaloMat);
+        petalo.position.set(
+            Math.cos(ang) * 0.12 * s,
+            Y_SUELO + 0.4 * s,
+            Math.sin(ang) * 0.12 * s
+        );
+        grupo.add(petalo);
+    }
+    const centro = new THREE.Mesh(
+        new THREE.SphereGeometry(0.075 * s, 8, 6),
+        new THREE.MeshStandardMaterial({ color: 0xffe566, roughness: 0.55 })
+    );
+    centro.position.y = Y_SUELO + 0.4 * s;
+    grupo.add(centro);
+
+    grupo.position.set(x, 0, z);
+    scene.add(grupo);
+    return grupo;
+}
+
+function crearRoca(x, z, escala) {
+    const s = escala != null ? escala : 1;
+    const grupo = new THREE.Group();
+    const a = new THREE.Mesh(new THREE.SphereGeometry(0.28 * s, 10, 8), matRoca);
+    a.scale.set(1.3, 0.7, 1.1);
+    a.position.y = Y_SUELO + 0.16 * s;
+    a.castShadow = true;
+    a.receiveShadow = true;
+    grupo.add(a);
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.16 * s, 8, 6), matRoca);
+    b.scale.set(1.2, 0.65, 1);
+    b.position.set(0.22 * s, Y_SUELO + 0.1 * s, 0.08 * s);
+    grupo.add(b);
+    grupo.position.set(x, 0, z);
+    scene.add(grupo);
+    return grupo;
+}
+
+function crearCerca(x, z, largo, yaw, numeroPosts) {
+    const grupo = new THREE.Group();
+    const posts = numeroPosts;
+    const span = largo / (posts - 1);
+    for (let i = 0; i < posts; i++) {
+        const poste = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.06, 0.07, 0.7, 6),
+            matMadera
+        );
+        poste.position.set(-largo / 2 + i * span, Y_SUELO + 0.35, 0);
+        poste.castShadow = true;
+        grupo.add(poste);
+    }
+    [0.28, 0.48].forEach((py) => {
+        const liston = new THREE.Mesh(
+            new THREE.BoxGeometry(largo + 0.1, 0.08, 0.06),
+            matMadera
+        );
+        liston.position.set(0, Y_SUELO + py, 0);
+        liston.castShadow = true;
+        grupo.add(liston);
+    });
+    grupo.position.set(x, 0, z);
+    grupo.rotation.y = yaw || 0;
+    scene.add(grupo);
+    return grupo;
+}
+
+function crearArcoiris() {
+    const grupo = new THREE.Group();
+    const colores = [
+        0xff3b3b,
+        0xff8c1a,
+        0xffe14a,
+        0x3dcf5a,
+        0x3aa0ff,
+        0x6b5cff,
+        0xc45cff
+    ];
+    const radioBase = 8.6;
+    const grosor = 0.2;
+    const sep = 0.26;
+
+    colores.forEach((color, i) => {
+        const radio = radioBase - i * sep;
+        // Torus en plano XY = arco de pie (sin rotation.x que lo acostaba)
+        const tubo = new THREE.Mesh(
+            new THREE.TorusGeometry(radio, grosor, 12, 72, Math.PI),
+            new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.4,
+                metalness: 0.04,
+                emissive: color,
+                emissiveIntensity: 0.22,
+                transparent: true,
+                opacity: 0.9,
+                side: THREE.DoubleSide
+            })
+        );
+        grupo.add(tubo);
+    });
+
+    // Base en el suelo, curva hacia arriba, detrás de los personajes
+    grupo.position.set(0, -0.4, -14.5);
+    scene.add(grupo);
+    return grupo;
+}
+
+[
+    [-7.6, -3.2, 1.85],
+    [-8.8, -6.0, 1.45],
+    [7.6, -3.2, 1.85],
+    [8.8, -6.0, 1.45]
+].forEach(([x, z, escala]) => crearArbolRedondo(x, z, escala));
+
+[
+    // [x, z, escala, y]
+    [-4.4, -4.8, 1.2, 0],
+    [-1.8, -7.0, 1.0, 0],
+    [5.4, -4.8, 1.2, 0],
+    [2.8, -7.0, 0.8, 0],
+    [5.0, -11.0, 0.4, 3],
+    [-5.0, -11.0, 0.4, 1.2]
+].forEach(([x, z, escala, y]) => crearPino(x, z, escala, y));
+
+crearCerca(-4.9, -2.0, 6.4, 0.12, 8);
+crearCerca(4.9, -2.0, 6.4, -0.12, 8);
+crearCerca(0, -2.4, 3.4, 0, 4);
+
+crearRoca(-5.0, -1.2, 1.1);
+crearRoca(5.0, 1, 1);
+crearRoca(-3.2, 2.8, 0.9);
+crearRoca(3.2, -2.8, 0.3);
+crearRoca(3.2, 2.8, 0.9);
+
+crearRoca(0.4, -5.8, 0.8);
+
+[
+    [-5.2, 3.4, 1.55],
+    [-3.6, 4.4, 1.25],
+    [5.2, 3.4, 1.55],
+    [3.6, 4.4, 1.25],
+    [-6.4, 2.2, 1.2],
+    [6.4, 2.2, 1.2],
+    [-5.8, -3.0, 0.95],
+    [3.8, -4.0, 0.55]
+].forEach(([x, z, escala]) => crearArbusto(x, z, escala));
+
+[
+    [-4.4, 2.6, 1.05, 0], [-3.6, 3.2, 0.95, 1], [-5.4, 3.8, 0.9, 2],
+    [-2.8, 3.8, 0.85, 3], [-4.0, 4.8, 0.85, 4],
+    [4.4, 2.6, 1.05, 1], [3.6, 3.2, 0.95, 2], [5.4, 3.8, 0.9, 3],
+    [2.8, 3.8, 0.85, 4], [4.0, 4.8, 0.85, 0],
+    [-5.6, -1.0, 0.85, 0], [-4.2, -0.6, 0.8, 1],
+    [5.6, -1.0, 0.85, 2], [4.2, -0.4, 0.8, 3],
+    [4.6, -0.6, 0.8, 1], [4.5, -0.3, 0.8, 2],
+    [0.7, -5.8, 0.8, 0], [0.1, -5.8, 0.8, 1]
+].forEach(([x, z, escala, ci]) => crearFlor(x, z, escala, ci));
+
+crearArcoiris();
 
 const loader = new GLTFLoader();
 const clock = new THREE.Clock();
@@ -494,7 +768,12 @@ function animate() {
         pendiente -= delta;
         actores.forEach((actor) => actualizarActor(actor, delta));
         ring.rotation.z += delta * 0.55;
+        tiempoNubes += delta;
     }
+
+    nubes.forEach((n) => {
+        n.mesh.position.x = n.baseX + Math.sin(tiempoNubes * n.vel + n.fase) * n.amp;
+    });
 
     renderer.render(scene, camera);
 }
