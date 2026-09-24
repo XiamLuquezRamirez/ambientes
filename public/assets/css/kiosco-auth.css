@@ -96,6 +96,57 @@
     max-width: 960px;
 }
 
+.avatares-panel {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+}
+
+.avatares-panel .avatares-grid {
+    max-width: none;
+}
+
+.avatares-scroll {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+    z-index: 2;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+}
+
+.avatares-scroll__btn {
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    color: #fff;
+    background: color-mix(in srgb, var(--color-ambiente, #1b6b3c) 88%, #000);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+    transition: transform 0.15s, opacity 0.15s, background 0.15s;
+}
+
+.avatares-scroll__btn:hover:not(:disabled) {
+    transform: scale(1.08);
+}
+
+.avatares-scroll__btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.avatares-scroll__btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
 .avatar-btn {
     position: relative;
     display: flex;

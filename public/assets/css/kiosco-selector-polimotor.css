@@ -45,11 +45,20 @@
     margin-top: 5vh;
 }
 
-.selector-wrap--polimotor .avatares-grid {
+.selector-wrap--polimotor .avatares-panel {
+    position: relative;
     flex: 1 1 auto;
     width: 100%;
     max-width: min(980px, 94vw);
-    margin: 0 auto;
+    margin: 5vh auto 0;
+    height: 50vh;
+    display: block;
+}
+
+.selector-wrap--polimotor .avatares-grid {
+    width: 100%;
+    max-width: none;
+    margin: 0;
     padding: clamp(6px, 1.5vh, 18px) 4px 20px;
     display: grid;
     grid-template-columns: repeat(5, var(--sel-card));
@@ -57,9 +66,48 @@
     justify-content: center;
     align-content: start;
     justify-items: center;
-    margin-top: 5vh;
-    height: 50vh;
+    height: 100%;
+    overflow-x: hidden;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    touch-action: none;
+}
+
+.selector-wrap--polimotor .avatares-grid::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.selector-wrap--polimotor .avatares-scroll {
+    display: flex;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+    z-index: 2;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.selector-wrap--polimotor .avatares-scroll__btn {
+    pointer-events: auto;
+    width: 52px;
+    height: 52px;
+    color: #fff;
+    background: linear-gradient(180deg, #2f9a55 0%, var(--sel-verde) 55%, var(--sel-verde-sombra) 100%);
+    border: 3px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 4px 0 var(--sel-verde-sombra), 0 8px 18px rgba(0, 0, 0, 0.2);
+    font-size: 1.25rem;
+}
+
+.selector-wrap--polimotor .avatares-scroll__btn:disabled {
+    opacity: 0.4;
+    box-shadow: 0 2px 0 var(--sel-verde-sombra);
 }
 
 .selector-wrap--polimotor .avatar-btn {
