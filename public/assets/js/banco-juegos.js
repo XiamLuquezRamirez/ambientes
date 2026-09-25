@@ -34,9 +34,7 @@
         ctx.$paso.attr('data-paso', 'juegos').html(`
             <div class="bj-galeria">
                 <div class="bj-galeria-top">
-                    <button type="button" class="bj-volver" data-bj-volver>
-                        <i class="fa-solid fa-arrow-left"></i><span>Volver</span>
-                    </button>
+
                     <h2 class="bj-galeria-titulo">
                         <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
                     </h2>
@@ -49,9 +47,7 @@
     function renderVacio(mensaje) {
         ctx.$paso.find('.bj-galeria').html(`
             <div class="bj-galeria-top">
-                <button type="button" class="bj-volver" data-bj-volver>
-                    <i class="fa-solid fa-arrow-left"></i><span>Volver</span>
-                </button>
+
                 <h2 class="bj-galeria-titulo">
                     <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
                 </h2>
@@ -79,9 +75,6 @@
         ctx.$paso.attr('data-paso', 'juegos').html(`
             <div class="bj-galeria">
                 <div class="bj-galeria-top">
-                    <button type="button" class="bj-volver" data-bj-volver>
-                        <i class="fa-solid fa-arrow-left"></i><span>Volver</span>
-                    </button>
                     <h2 class="bj-galeria-titulo">
                         <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
                     </h2>
@@ -138,15 +131,6 @@
         const $g = ctx.$paso.find('.bj-galeria');
         const $player = $(`
             <div class="bj-player" data-bj-player>
-                <div class="bj-player-top">
-                    <h3 class="bj-player-titulo">
-                        <span aria-hidden="true">${iconoHtml(juego)}</span>
-                        ${escapar(juego.nombre)}
-                    </h3>
-                    <button type="button" class="bj-salir-juego" data-bj-salir-juego>
-                        <i class="fa-solid fa-xmark"></i><span>Salir</span>
-                    </button>
-                </div>
                 <div class="bj-canvas-wrap" data-bj-canvas>
                     <iframe class="bj-iframe"
                         title="${escapar(juego.nombre)}"
@@ -196,7 +180,6 @@
             }
             if (juego.url_paquete) montarJuego(juego);
         });
-        ctx.$paso.on('click.bj', '[data-bj-salir-juego]', cerrarJuego);
     }
 
     function cargarYRender() {

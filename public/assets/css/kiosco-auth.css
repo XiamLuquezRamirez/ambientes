@@ -8,7 +8,7 @@
     align-items: center;
     justify-content: center;
     background: radial-gradient(ellipse at 60% 40%, color-mix(in srgb, var(--color-ambiente) 25%, transparent), transparent 70%),
-                var(--fondo);
+        var(--fondo);
 }
 
 .bienvenida-card {
@@ -79,7 +79,7 @@
     gap: 40px;
     padding: 32px 20px;
     background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--color-ambiente) 20%, transparent), transparent 65%),
-                var(--fondo);
+        var(--fondo);
 }
 
 .selector-titulo {
@@ -280,8 +280,10 @@
     justify-content: center;
     gap: 80px;
     padding: 40px 24px;
-    background: radial-gradient(ellipse at 30% 50%, color-mix(in srgb, var(--color-ambiente) 18%, transparent), transparent 60%),
-                var(--fondo);
+    background-image: url("../images/vista_nino/fondo_pin.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 100% 100%;
 }
 
 .pin-izquierda {
@@ -313,7 +315,8 @@
 
 .pin-instruccion {
     font-size: 1rem;
-    color: rgba(240, 250, 244, 0.6);
+    color: #f3e8cc;
+    font-family: 'Fredoka One';
 }
 
 .pin-mensaje {
@@ -322,7 +325,7 @@
     text-align: center;
     font-size: 0.95rem;
     font-weight: 700;
-    color: #fca5a5;
+    color: #f3e8cc;
     opacity: 0;
     transition: opacity 0.2s;
 }
@@ -345,7 +348,7 @@
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    border: 3px solid rgba(240, 250, 244, 0.3);
+    border: 3px solid #f3e8cc;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -395,12 +398,13 @@
     background: rgba(240, 250, 244, 0.05);
     font-size: 2.2rem;
     cursor: pointer;
-    color: var(--texto);
+    color: #f3e8cc;
     transition: transform 0.15s, background 0.15s, border-color 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
     -webkit-tap-highlight-color: transparent;
+    background-color: #f3e8cc;
 }
 
 .figura-btn i {
@@ -490,7 +494,7 @@
     align-items: center;
     justify-content: center;
     background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--color-ambiente) 30%, transparent), transparent 70%),
-                var(--fondo);
+        var(--fondo);
 }
 
 .bienambiente-card {
@@ -569,7 +573,8 @@
 }
 
 /* ── Responsive PIN ─────────────────────────────────────────── */
-@media (orientation: portrait), (max-width: 900px) {
+@media (orientation: portrait),
+(max-width: 900px) {
     .pin-wrap {
         flex-direction: column;
         gap: 36px;
@@ -614,15 +619,25 @@
 
 /* ── Animaciones ────────────────────────────────────────────── */
 @keyframes kiosco-flotar {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-14px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-14px);
+    }
 }
 
 @keyframes kiosco-pulso {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-ambiente) 60%, transparent);
         transform: scale(1);
     }
+
     50% {
         box-shadow: 0 0 0 20px transparent;
         transform: scale(1.04);
@@ -630,21 +645,51 @@
 }
 
 @keyframes kiosco-aparecer {
-    from { opacity: 0; transform: scale(0.85) translateY(12px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+    from {
+        opacity: 0;
+        transform: scale(0.85) translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 @keyframes kiosco-estrella {
-    from { opacity: 0; transform: scale(0) rotate(-30deg); }
-    to { opacity: 1; transform: scale(1) rotate(0deg); }
+    from {
+        opacity: 0;
+        transform: scale(0) rotate(-30deg);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
 }
 
 @keyframes kiosco-shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-10px); }
-    40% { transform: translateX(10px); }
-    60% { transform: translateX(-8px); }
-    80% { transform: translateX(8px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-10px);
+    }
+
+    40% {
+        transform: translateX(10px);
+    }
+
+    60% {
+        transform: translateX(-8px);
+    }
+
+    80% {
+        transform: translateX(8px);
+    }
 }
 
 .shake {
