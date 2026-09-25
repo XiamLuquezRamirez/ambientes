@@ -556,99 +556,64 @@ class RecorridoNinoService
             ];
         }
 
-        // ¿Qué comparten TODAS las experiencias? Eso define dónde bifurca:
-        //  - ejes distintos           → bifurca en el MÓDULO
-        //  - mismo eje, temáticas ≠   → bifurca en el EJE
-        //  - misma temática, exps ≠   → bifurca en la TEMÁTICA
-        $ejeComun = $this->todasIguales($ramasData, fn ($d) => (int) $d['eje']['id']);
-        $temComun = $ejeComun && $this->todasIguales($ramasData, fn ($d) => (int) $d['tematica']['id']);
-
-        $inicio = $this->paradaInicio($arbol['ambiente'] ?? [], $estudiante?->nombre ?? 'Amigo');
-        $inicio['rama'] = 0;
-        $paradaModulo = $this->paradaModulo($modulo);
-        $paradaModulo['rama'] = 0;
-
-        // Tronco común: inicio → modulo → [eje] → [tematica] (según lo compartido).
-        $tronco = ['modulo'];               // ids del tronco, en orden (tras 'inicio')
-        $paradas = [$inicio, $paradaModulo];
+        // Con 2 o más experiencias el camino se abre SIEMPRE en el paso 3
+        // (la temática): n desvíos, uno por experiencia, y el sendero principal
+        // sigue de largo hasta el fin. El eje y la temática del tronco son los
+        // de la primera experiencia. Si otra experiencia trae otro eje o otra
+        // temática, ese texto no tiene parada propia.
         $primerEje = $ramasData[0]['eje'];
         $primeraTematica = $ramasData[0]['tematica'];
 
-        if ($ejeComun) {
-            $pEje = $this->paradaEje($primerEje);
-            $pEje['id'] = 'eje';
-            $pEje['rama'] = 0;
-            $paradas[] = $pEje;
-            $tronco[] = 'eje';
-        }
-        if ($temComun) {
-            $pTem = $this->paradaTematica($primeraTematica);
-            $pTem['id'] = 'tematica';
-            $pTem['rama'] = 0;
-            $paradas[] = $pTem;
-            $tronco[] = 'tematica';
-        }
+        $inicio = $this->paradaInicio($arbol['ambiente'] ?? [], $estudiante?->nombre ?? 'Amigo');
+        $inicio['rama'] = 0;
+        $inicio['siguientes'] = ['modulo'];
+
+        $paradaModulo = $this->paradaModulo($modulo);
+        $paradaModulo['rama'] = 0;
+        $paradaModulo['siguientes'] = ['eje'];
+
+        $pEje = $this->paradaEje($primerEje);
+        $pEje['id'] = 'eje';
+        $pEje['rama'] = 0;
+        $pEje['siguientes'] = ['tematica'];
+
+        $pTem = $this->paradaTematica($primeraTematica);
+        $pTem['id'] = 'tematica';
+        $pTem['rama'] = 0;
 
         $fin = $this->paradaFin();
         $fin['rama'] = 0;
         $fin['siguientes'] = [];
 
-        $idsRamaInicial = []; // primer nodo de cada rama → hijos del nodo de bifurcación
+        $paradas = [$inicio, $paradaModulo, $pEje, $pTem];
+        $idsExperiencia = [];
         $ultimaExperienciaId = null;
-
         $r = 0;
+
         foreach ($ramasData as $d) {
             $r++;
-            $sufijo = '-'.$d['expId'];
-            $nodosRama = []; // ids en orden dentro de la rama
-
-            // Cada rama incluye SOLO lo que NO es común (lo que la distingue).
-            if (! $ejeComun) {
-                $pEje = $this->paradaEje($d['eje']);
-                $pEje['id'] = 'eje'.$sufijo; $pEje['rama'] = $r;
-                $paradas[] = $pEje; $nodosRama[] = $pEje['id'];
-            }
-            if (! $temComun) {
-                $pTem = $this->paradaTematica($d['tematica']);
-                $pTem['id'] = 'tematica'.$sufijo; $pTem['rama'] = $r;
-                $paradas[] = $pTem; $nodosRama[] = $pTem['id'];
-            }
             $pExp = $this->paradaExperiencia(
                 $d['expId'],
                 $d['exp']['experiencia_nombre'] ?? 'Experiencia',
                 $d['exp']['experiencia_objetivo'] ?? '¡Es hora de vivir la experiencia!',
-                'experiencia'.$sufijo
+                'experiencia-'.$d['expId']
             );
             $pExp['rama'] = $r;
-            $paradas[] = $pExp; $nodosRama[] = $pExp['id'];
-
-            // Encadenar los nodos de la rama en orden y el último → fin.
-            for ($k = 0; $k < count($nodosRama); $k++) {
-                $idNodo = $nodosRama[$k];
-                $sig = ($k < count($nodosRama) - 1) ? [$nodosRama[$k + 1]] : ['fin'];
-                // localizar la parada por id y setear 'siguientes'
-                foreach ($paradas as &$par) {
-                    if ($par['id'] === $idNodo) { $par['siguientes'] = $sig; break; }
-                }
-                unset($par);
-            }
-
-            $idsRamaInicial[] = $nodosRama[0];
+            // Al terminar se vuelve al paso 3; el fin se toma por el sendero
+            // que sigue de largo, no cruzando el pasto desde la casa.
+            $pExp['siguientes'] = ['tematica'];
+            $paradas[] = $pExp;
+            $idsExperiencia[] = $pExp['id'];
             $ultimaExperienciaId = $d['expId'];
         }
 
-        // Encadenar el tronco: inicio → modulo → ... → [nodo de bifurcación].
-        $paradas[0]['siguientes'] = ['modulo'];
-        for ($t = 0; $t < count($tronco); $t++) {
-            $idNodo = $tronco[$t];
-            $esUltimoTronco = ($t === count($tronco) - 1);
-            $sig = $esUltimoTronco ? $idsRamaInicial : [$tronco[$t + 1]];
-            foreach ($paradas as &$par) {
-                if ($par['id'] === $idNodo) { $par['siguientes'] = $sig; break; }
+        foreach ($paradas as &$par) {
+            if ($par['id'] === 'tematica') {
+                $par['siguientes'] = $idsExperiencia;
+                break;
             }
-            unset($par);
         }
-
+        unset($par);
         $paradas[] = $fin;
 
         return [
@@ -656,7 +621,7 @@ class RecorridoNinoService
             'puntos' => [],
             'ramificado' => true,
             'ramas' => $r,
-            'bifurca_en' => end($tronco) ?: 'modulo', // dónde se abre el camino
+            'bifurca_en' => 'tematica',
             'experiencia_id' => $ultimaExperienciaId,
             'tematica' => $primeraTematica,
             'modulo' => ['id' => $modulo['id'], 'nombre' => $modulo['nombre']],

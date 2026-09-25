@@ -31,7 +31,7 @@
             <strong>{{ $juego->nombre }}</strong>
             <small> · perfil {{ $perfilPayload['perfil_clave'] ?? 'estandar' }} (inyectado; el paquete aún puede ignorarlo)</small>
         </div>
-        <a href="{{ route('superadmin.catalogo.juegos') }}">Volver al catálogo</a>
+        <a href="{{ route('superadmin.catalogo_juegos.index') }}">Volver al catálogo</a>
     </div>
 
     <iframe

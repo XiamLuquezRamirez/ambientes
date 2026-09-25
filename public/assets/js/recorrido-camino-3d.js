@@ -10,6 +10,7 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
+import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './mapa-mundo.js?v=20260925f';
 
 (function () {
     'use strict';
@@ -33,6 +34,9 @@ import * as THREE from 'three';
     // `curvasRama[ramaIdx]`. Cada nodo lleva su posición 3D en `nodos[id].pos`.
     let curvaTronco = null;
     let curvasRama = {};          // { ramaIdx: THREE.Curve }
+    let curvaExtra = null;        // tramo dibujado más allá del GLB, hacia el castillo
+    let grupoRamas = null;        // cintas de tierra de los desvíos
+    let grupoCasas = null;        // casa1 / casa2 al final de cada experiencia
     let caminando = false;
     let recorridoIniciado = false;
     let experienciaCargada = null;
@@ -64,6 +68,13 @@ import * as THREE from 'three';
     let ambienteSlug = '';
     let rafId = null;
     let equipoModesto = false; // tablet/móvil: recorta calidad para ganar fluidez
+    let usaMapaGlb = false;
+    let mundo = null;
+    let cargaId = 0;
+    let mixer = null;
+    let accionesPersonaje = null;
+    let clipActual = '';
+    let clipMovimiento = 'Walk';
     let onCanvasClick = null;
     let N = 0;
     let audioNarracion = null;
@@ -293,9 +304,10 @@ import * as THREE from 'three';
         }
         // - En una experiencia completada: se puede VOLVER al módulo (si quedan
         //   ramas) o ir al fin (si era la última).
+        // Al terminar una experiencia se vuelve al paso 3. El fin no se cruza
+        // desde la casa: se toma el sendero que sigue de largo, ya de vuelta.
         if (enExperienciaCompletada()) {
-            if (ramasPendientes().length > 0) return idModulo ? [idModulo] : [];
-            return idFin ? [idFin] : [];
+            return idModulo ? [idModulo] : [];
         }
         // - En medio de una rama: el siguiente nodo de la rama no visitado.
         const n = nodos[nodoActual];
@@ -673,6 +685,7 @@ import * as THREE from 'three';
     // Pinta el progreso (dorado) sobre los tramos ya recorridos. Funciona tanto
     // en lineal (una curva) como en ramificado (tronco + ramas + tramo-fin).
     function actualizarProgreso() {
+        if (!progresoMesh) return;
         const mat = progresoMesh.userData.mat;
         // Limpiar hijos previos del grupo de progreso.
         while (progresoMesh.children.length) {
@@ -742,13 +755,25 @@ import * as THREE from 'three';
         const matMadera = new THREE.MeshStandardMaterial({ color: '#8a5a2b', roughness: .9, flatShading: true });
         camino.paradas.forEach((par, i) => {
             const nodo = nodos[par.id];
-            const p = (nodo && nodo.pos) ? nodo.pos : curva.getPoint(i / (N - 1));
-            const g = new THREE.Group(); g.position.set(p.x, 0, p.z);
+            const cNodo = (nodo && nodo.curvaLocal) ? nodo.curvaLocal : curva;
+            const t = (nodo && typeof nodo.tLocal === 'number') ? nodo.tLocal
+                : ((nodo && typeof nodo.t === 'number') ? nodo.t : (N > 1 ? i / (N - 1) : 0));
+            const p = cNodo.getPoint(t);
+            // Siempre al mismo lado del sendero (izquierda del sentido de avance),
+            // fuera de la calzada. El niño sigue caminando por el centro.
+            const tang = cNodo.getTangent(t);
+            const lado = new THREE.Vector3(-tang.z, 0, tang.x);
+            if (lado.lengthSq() < 1e-6) lado.set(0, 0, 1);
+            // La casa de la experiencia ocupa el final del sendero (~9 m).
+            // El marcador se aparta para no quedar dentro del muro.
+            lado.normalize().multiplyScalar(esParadaExperiencia(par) ? 7.2 : 3.8);
+            const g = new THREE.Group();
+            g.position.set(p.x + lado.x, p.y || 0, p.z + lado.z);
 
             // poste de madera (cilindro liso). Sin base cónica (causaba artefactos
             // de líneas en la estación activa por las aristas rasantes al suelo).
-            const poste = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 3, 12), matMadera);
-            poste.position.y = 1.5; poste.castShadow = true; g.add(poste);
+            const poste = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 4.4, 12), matMadera);
+            poste.position.y = 2.2; poste.castShadow = true; g.add(poste);
 
             const colorMed = par.id === 'inicio' ? '#facc15' : (par.id === 'fin' ? '#ec4899' : '#f59e0b');
             const colorBorde = par.id === 'inicio' ? '#a16207' : (par.id === 'fin' ? '#9d174d' : '#b45309');
@@ -757,14 +782,14 @@ import * as THREE from 'three';
             const texCartel = texturaCartel(numeroParada(par, i), colorMed, colorBorde);
             const matCartel = new THREE.MeshBasicMaterial({ map: texCartel, transparent: true, depthWrite: true });
             const medallon = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 2.3), matCartel);
-            medallon.position.y = 3.4; medallon.userData.baseY = 3.4;
+            medallon.position.y = 4.8; medallon.userData.baseY = 4.8;
             medallon.castShadow = false; medallon.receiveShadow = false;
             g.add(medallon);
 
             // aro luminoso para la estación siguiente
             const aro = new THREE.Mesh(new THREE.TorusGeometry(1.55, 0.13, 12, 32),
                 new THREE.MeshBasicMaterial({ color: '#fde047' }));
-            aro.position.y = 3.4; aro.visible = false; g.add(aro);
+            aro.position.y = 4.8; aro.visible = false; g.add(aro);
 
             // En la parada de INICIO el niño está de pie ahí mismo: ocultamos su
             // poste y medallón para que no le tapen la cara.
@@ -1879,7 +1904,25 @@ import * as THREE from 'three';
             else p = curva.getPoint(idOrIdx / (N - 1));
         }
         if (!p) p = curva.getPoint(0);
-        personaje.position.set(p.x, 0, p.z);
+        personaje.position.set(p.x, p.y || 0, p.z);
+    }
+
+    function ponerClip(nombre) {
+        if (!mixer || !accionesPersonaje || !nombre || clipActual === nombre) return;
+        const siguiente = accionesPersonaje[nombre];
+        if (!siguiente) return;
+        const previa = accionesPersonaje[clipActual];
+        if (previa) previa.fadeOut(0.2);
+        siguiente.reset().fadeIn(0.2).play();
+        clipActual = nombre;
+    }
+
+    function duracionCaminata(dist) {
+        if (!usaMapaGlb) return Math.max(1400, dist * 85);
+        const corriendo = dist > 14;
+        clipMovimiento = corriendo ? 'Run' : 'Walk';
+        const vel = corriendo ? 6.5 : 3.0;
+        return Math.max(800, (dist / vel) * 1000);
     }
 
     function construirLuces() {
@@ -1930,8 +1973,12 @@ import * as THREE from 'three';
             if (est) foco = p.clone().lerp(est.grupo.position, 0.42);
         }
         // Cámara 3/4 MÁS alejada: se ve más camino y el mapa en general.
-        const deseadaPos = new THREE.Vector3(foco.x - 9, 34, foco.z + 48);
-        const deseadaTgt = new THREE.Vector3(foco.x + 2, 2, foco.z - 6);
+        const deseadaPos = usaMapaGlb
+            ? new THREE.Vector3(foco.x - 16, foco.y + 18, foco.z + 22)
+            : new THREE.Vector3(foco.x - 9, 34, foco.z + 48);
+        const deseadaTgt = usaMapaGlb
+            ? new THREE.Vector3(foco.x + 6, foco.y + 1.6, foco.z - 4)
+            : new THREE.Vector3(foco.x + 2, 2, foco.z - 6);
         const k = inmediato ? 1 : 0.05;
         camPos.lerp(deseadaPos, k); camTarget.lerp(deseadaTgt, k);
         camera.position.copy(camPos); camera.lookAt(camTarget);
@@ -1943,11 +1990,13 @@ import * as THREE from 'three';
         estaciones.forEach((e, i) => {
             const id = e.parada.id;
             const esSiguiente = tocables.indexOf(id) >= 0;
-            const visitada = visitados.has(id) && id !== 'inicio' && id !== 'fin' && id !== nodoActual;
+            // Verde solo cuando ya llegó y siguió de largo. Mientras está parado ahí, el pin se queda.
+            const visitada = visitados.has(id) && id !== 'inicio' && id !== 'fin'
+                && (id !== nodoActual || caminando);
             e.aro.visible = esSiguiente;
             const cara = e.medallon.material;
             let fondo = e.colorBase, borde = e.colorBorde, texto = numeroParada(e.parada, i);
-            if (visitada) { fondo = '#22c55e'; borde = '#15803d'; texto = '✓'; }
+            if (visitada) { fondo = '#22c55e'; borde = '#15803d'; }
             else if (esSiguiente) { fondo = '#fde047'; borde = '#ca8a04'; }
             if (cara.map) cara.map.dispose();
             cara.map = texturaCartel(texto, fondo, borde);
@@ -1996,8 +2045,12 @@ import * as THREE from 'three';
     // carpa y, al llegar, abre la galería. Reutiliza el motor de caminata del loop.
     function caminarACarpa() {
         if (caminando || entrandoSaliendo || juegosAbiertos || !zonaJuegosParada || !personaje) return;
-        const origen = personaje.position.clone(); origen.y = 0;
-        const destino = zonaJuegosParada.clone(); destino.y = 0;
+        const origen = personaje.position.clone();
+        const destino = zonaJuegosParada.clone();
+        if (mundo) {
+            origen.y = mundo.altura(origen.x, origen.z);
+            destino.y = mundo.altura(destino.x, destino.z);
+        }
         // Recordar dónde estaba el personaje para devolverlo al cerrar la galería,
         // así el recorrido continúa desde donde iba.
         posAntesDeCarpa = { pos: origen.clone(), rotY: personaje.rotation.y };
@@ -2008,7 +2061,7 @@ import * as THREE from 'three';
         caminando = true; caminandoLibre = true;
         alLlegarLibre = function () { abrirZonaJuegos(); };
         personaje.visible = true; ocultarEtiqueta();
-        animDur = Math.max(1200, origen.distanceTo(destino) * 85);
+        animDur = duracionCaminata(origen.distanceTo(destino));
         animInicio = performance.now();
     }
 
@@ -2048,6 +2101,19 @@ import * as THREE from 'three';
     function tramoEntre(origenId, destinoId) {
         const o = nodos[origenId], d = nodos[destinoId];
         if (!o || !d) return null;
+        if (usaMapaGlb) {
+            const spur = (o.spur && d.spur && o.spur === d.spur) ? o.spur
+                : (d.spur && origenId === idModulo) ? d.spur
+                : (o.spur && destinoId === idModulo) ? o.spur
+                : null;
+            if (spur) {
+                const t0 = (o.spur === spur) ? o.tLocal : 0;
+                const t1 = (d.spur === spur) ? d.tLocal : 0;
+                return { curva: spur, t0, t1 };
+            }
+            if (o.spur || d.spur) return null;
+            return { curva, t0: o.t || 0, t1: d.t || 0 };
+        }
         const ro = o.rama, rd = d.rama;
 
         if (esRamificado && curvaTronco) {
@@ -2082,11 +2148,12 @@ import * as THREE from 'three';
 
         cerrarModal();
         caminando = true; ocultarEtiqueta();
+        refrescarEstaciones();
         animCurva = tramo.curva; animT0 = tramo.t0; animT1 = tramo.t1;
         animDestinoId = destinoId; alLlegarCb = alLlegar || null;
 
         const p0 = animCurva.getPoint(animT0), p1 = animCurva.getPoint(animT1);
-        animDur = Math.max(1400, p0.distanceTo(p1) * 85);
+        animDur = duracionCaminata(p0.distanceTo(p1));
         animInicio = performance.now();
         const est = estacionPorId(destinoId);
         if (est) indiceActual = est.indice;
@@ -2182,6 +2249,8 @@ import * as THREE from 'three';
 
     function terminarAvance() {
         caminando = false;
+        // Volver a un cruce ya visto no reabre su ficha.
+        const destinoYaVisitado = !!(animDestinoId && visitados.has(animDestinoId));
         // El personaje llegó al nodo destino.
         nodoActual = animDestinoId || nodoActual;
         visitados.add(nodoActual);
@@ -2197,6 +2266,16 @@ import * as THREE from 'three';
 
         actualizarProgreso(); refrescarEstaciones(); actualizarHud(false);
         const cb = alLlegarCb; alLlegarCb = null;
+
+        if (destinoYaVisitado && p && !esParadaExperiencia(p)) {
+            if (cb) cb();
+            // Última experiencia ya hecha: al pisar la temática sigue solo hasta el fin.
+            if (nodoActual === idModulo && ramasPendientes().length === 0
+                && idFin && !visitados.has(idFin) && !regresandoAlFin) {
+                setTimeout(irAlFinAutomatico, 400);
+            }
+            return;
+        }
 
         // AUTOMÁTICO al llegar: en experiencia → ENTRA a la casa y luego abre el
         // modal; en otras paradas, abre su modal directo.
@@ -2523,11 +2602,20 @@ import * as THREE from 'three';
 
     function volverAlMapaDesdeExperiencia() {
         cerrarPlayer();
-        // El personaje SALE de la casa (si estaba dentro).
+        // Sale de la casa y camina solo hasta la temática. Si ya no queda ninguna
+        // experiencia, desde ahí sigue solo hasta el final: el marcador queda
+        // detrás y no se puede tocar.
+        const alSalir = () => {
+            refrescarEstaciones();
+            actualizarHud(false);
+            if (esRamificado && idModulo && nodoActual !== idModulo && enExperienciaCompletada()) {
+                caminarAForzado(idModulo);
+            }
+        };
         if (!personaje.visible || puertasCasa[nodoActual]) {
-            salirDeCasa(() => { refrescarEstaciones(); actualizarHud(false); });
+            salirDeCasa(alSalir);
         } else {
-            refrescarEstaciones(); actualizarHud(false);
+            alSalir();
         }
     }
 
@@ -2665,15 +2753,16 @@ import * as THREE from 'three';
     }
     function ocultarEtiqueta() { if (elEtiqueta) elEtiqueta.style.display = 'none'; }
     function actualizarEtiquetaSiguiente() {
-        const idx = indiceActual + 1;
-        if (!recorridoIniciado || caminando || idx >= N) { ocultarEtiqueta(); return; }
-        const e = estaciones[idx]; if (!e) { ocultarEtiqueta(); return; }
+        if (!recorridoIniciado || caminando) { ocultarEtiqueta(); return; }
+        const idSig = (nodosTocables()[0]) || null;
+        const e = idSig ? estacionPorId(idSig) : null;
+        if (!e || e.parada.id === 'inicio') { ocultarEtiqueta(); return; }
         const v = new THREE.Vector3(); e.medallon.getWorldPosition(v); v.y += 1.4; v.project(camera);
         if (v.z > 1) { ocultarEtiqueta(); return; }
         elEtiqueta.style.display = 'block';
         elEtiqueta.style.left = ((v.x * 0.5 + 0.5) * window.innerWidth) + 'px';
         elEtiqueta.style.top = ((-v.y * 0.5 + 0.5) * window.innerHeight) + 'px';
-        elEtiqueta.textContent = etiquetaParada(e.parada, idx);
+        elEtiqueta.textContent = etiquetaParada(e.parada, e.indice);
     }
 
     // Inyecta la estructura de modales del kiosco (antes la generaba el JS 2D).
@@ -2746,7 +2835,7 @@ import * as THREE from 'three';
             + '</div>'
             // Botón "Iniciar" ABAJO: es lo ÚNICO visible al arrancar. Su toque es el
             // gesto del niño que desbloquea el audio en la tablet.
-            + '<button class="rn3d-comenzar" id="rn3dIniciar"><span>¡Iniciar!</span><span class="rn3d-flecha">▶</span></button>'
+            + '<button class="rn3d-comenzar rn3d-oculto" id="rn3dIniciar"><span>¡Iniciar!</span><span class="rn3d-flecha">▶</span></button>'
             + '<div class="rn3d-etiqueta" id="rn3dEtiqueta"></div>';
         ctx.$paso[0].appendChild(raiz);
         elFill = raiz.querySelector('#rn3dFill');
@@ -2755,6 +2844,7 @@ import * as THREE from 'three';
         elEtiqueta = raiz.querySelector('#rn3dEtiqueta');
         elBocadillo = raiz.querySelector('#rn3dBocadillo');
         const btnIniciar = raiz.querySelector('#rn3dIniciar');
+        elIniciar = btnIniciar;
 
         const saludo = '¡Hola! Bienvenido a esta aventura. Yo te voy a acompañar. ¡Vamos juntos!';
 
@@ -2803,7 +2893,7 @@ import * as THREE from 'three';
         if (!mostrandoBocadillo) { elBocadillo.style.display = 'none'; return; }
         // Punto de anclaje BIEN por encima de la cabeza (el niño mide ~3.6 con la
         // escala actual), así la nube queda arriba y no sobre el personaje.
-        const v = new THREE.Vector3(); personaje.getWorldPosition(v); v.y += 5.4; v.project(camera);
+        const v = new THREE.Vector3(); personaje.getWorldPosition(v); v.y += (usaMapaGlb ? 3.6 : 5.4); v.project(camera);
         if (v.z > 1) { elBocadillo.style.display = 'none'; return; }
         elBocadillo.style.display = 'block';
         elBocadillo.style.left = ((v.x * 0.5 + 0.5) * window.innerWidth) + 'px';
@@ -2814,53 +2904,31 @@ import * as THREE from 'three';
     function animar(now) {
         const dt = ultimoNow ? Math.min(0.1, (now - ultimoNow) / 1000) : 0.016;
         ultimoNow = now;
-        animarNubes(dt);
+        if (mundo) mundo.actualizar(dt, now / 1000);
         animarFuegos(dt);
-        animarAnimales(now, dt);
         animarEntradaSalida(now);
-        if (caminando && animCurva) {
+        let poseCamino = null;
+        if (caminando && animCurva && personaje) {
             const k = Math.min(1, (now - animInicio) / animDur);
             const ease = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
             const u = animT0 + (animT1 - animT0) * ease;
             const p = animCurva.getPoint(u);
             let tang = animCurva.getTangent(u).normalize();
-            if (animT1 < animT0) tang.multiplyScalar(-1); // caminando en reversa (volver)
-            personaje.position.set(p.x, 0, p.z);
-            personaje.rotation.y = Math.atan2(tang.x, tang.z);
-            // ---- Animación de CAMINAR más natural ----
-            const ciclo = now / 95;                    // velocidad del ciclo de paso
-            const paso = Math.sin(ciclo);              // fase del paso (contrafase piernas)
-            const rebote = Math.abs(Math.sin(ciclo));  // sube en cada apoyo
-            personaje.position.y = rebote * 0.16;      // saltito rítmico
-            // piernas pivotan desde la cadera, zancada amplia
-            if (piernaIzq) { piernaIzq.rotation.x = paso * 0.95; piernaDer.rotation.x = -paso * 0.95; }
-            // los tenis acompañan con avance/retroceso y un leve levantar
-            if (pieIzq) {
-                pieIzq.position.z = 0.05 + paso * 0.4;
-                pieDer.position.z = 0.05 - paso * 0.4;
-                pieIzq.position.y = 0.24 + Math.max(0, -paso) * 0.18;
-                pieDer.position.y = 0.24 + Math.max(0, paso) * 0.18;
-            }
-            // brazos en oposición a las piernas + leve flexión al balancear
-            if (brazoIzq) {
-                brazoIzq.rotation.x = -paso * 0.85; brazoDer.rotation.x = paso * 0.85;
-                brazoIzq.rotation.z = 0.12; brazoDer.rotation.z = -0.12;
-            }
-            // balanceo del cuerpo: leve inclinación lateral + torsión al ritmo del paso
-            if (cuerpo) { cuerpo.rotation.z = paso * 0.06; cuerpo.rotation.y = paso * 0.08; cuerpo.scale.y = 1; }
-            if (cabeza) { cabeza.rotation.z = -paso * 0.04; }
-            personaje.rotation.z = Math.sin(ciclo * 2) * 0.02; // micro-vaivén
-            if (k >= 1) {
-                personaje.position.y = 0; personaje.rotation.z = 0;
-                if (piernaIzq) { piernaIzq.rotation.x = 0; piernaDer.rotation.x = 0; }
-                if (brazoIzq) { brazoIzq.rotation.x = 0; brazoDer.rotation.x = 0; brazoIzq.rotation.z = 0; brazoDer.rotation.z = 0; }
-                if (pieIzq) { pieIzq.position.z = 0.05; pieDer.position.z = 0.05; pieIzq.position.y = 0.24; pieDer.position.y = 0.24; }
-                if (cuerpo) { cuerpo.rotation.z = 0; cuerpo.rotation.y = 0; }
-                if (cabeza) cabeza.rotation.z = 0;
+            if (animT1 < animT0) tang.multiplyScalar(-1);
+            poseCamino = { x: p.x, y: p.y, z: p.z, rot: Math.atan2(tang.x, tang.z), fin: k >= 1 };
+        }
+        if (mixer) {
+            const hablando = narrando || mostrandoBocadillo;
+            const clip = caminando ? clipMovimiento : (hablando ? (mostrandoBocadillo ? 'Wave' : 'Yes') : 'Idle');
+            ponerClip(clip);
+            mixer.update(dt);
+        }
+        if (poseCamino && personaje) {
+            personaje.position.set(poseCamino.x, poseCamino.y, poseCamino.z);
+            personaje.rotation.y = poseCamino.rot;
+            if (poseCamino.fin) {
                 caminando = false; animCurva = null;
                 if (caminandoLibre) {
-                    // Caminata a un punto libre (carpa): ejecuta su callback, NO el
-                    // flujo del grafo (terminarAvance marca nodos/abre modales).
                     caminandoLibre = false;
                     const cb = alLlegarLibre; alLlegarLibre = null;
                     if (cb) cb();
@@ -2868,10 +2936,6 @@ import * as THREE from 'three';
                     terminarAvance();
                 }
             }
-        } else {
-            // idle: respiración leve + balanceo suave de brazos
-            if (cuerpo) cuerpo.scale.y = 1 + Math.sin(now / 500) * 0.03;
-            if (brazoIzq) { const b = Math.sin(now / 600) * 0.1; brazoIzq.rotation.z = b; brazoDer.rotation.z = -b; }
         }
         // "Hablar": la boca se abre/cierra mientras hay voz (o durante el diálogo).
         if (boca) {
@@ -2888,10 +2952,7 @@ import * as THREE from 'three';
         const tocablesLoop = (!caminando && recorridoIniciado) ? nodosTocables() : [];
         estaciones.forEach((e, i) => {
             const esSig = tocablesLoop.indexOf(e.parada.id) >= 0;
-            // Ocultar el número de la estación donde el personaje está parado ahora
-            // (no caminando), para que el medallón no se sobreponga al niño.
-            const esActual = recorridoIniciado && e.parada.id === nodoActual && !caminando;
-            e.medallon.visible = !esActual && e.parada.id !== 'inicio';
+            e.medallon.visible = e.parada.id !== 'inicio';
             // el cartel siempre mira a la cámara (billboard completo)
             e.medallon.lookAt(camera.position);
             if (esSig) {
@@ -2970,24 +3031,7 @@ import * as THREE from 'three';
         ctx.$paso[0].appendChild(renderer.domElement);
 
         scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 400);
-
-        construirCurva();
-        calcularLagoCentro();   // antes del terreno, para aplanar la zona del lago
-        aplicarColorAmbiente();
-        construirTerreno();
-        construirCarretera();
-        construirEstaciones();
-        construirDestinos();
-        construirCasaInicio();
-        construirZonaJuegos();
-        construirVegetacion();
-        construirNubes();
-        construirAnimales();
-        construirPersonaje();
-        construirLuces();
-
-        camPos.set(-54, 34, 48); camTarget.set(-43, 2, -6); actualizarCamara(true);
+        camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.5, 1500);
 
         raycaster = new THREE.Raycaster(); puntero = new THREE.Vector2();
         onCanvasClick = function (e) { alTocar(e.clientX, e.clientY); };
@@ -2995,6 +3039,7 @@ import * as THREE from 'three';
 
         construirModales();
         construirOverlay();
+        mostrarCarga('Cargando mapa…');
 
         // Eventos de los modales (delegados en $paso, como el 2D)
         ctx.$paso.off('click.rn3d');
@@ -3016,24 +3061,371 @@ import * as THREE from 'three';
         window.removeEventListener('resize', onResize);
         window.addEventListener('resize', onResize);
 
-        refrescarEstaciones(); actualizarHud(false);
-        rafId = requestAnimationFrame(animar);
-
-        // Tras PIN con destino=juegos: abrir banco autenticado encima del camino.
-        try {
-            const params = new URLSearchParams(window.location.search || '');
-            if (params.get('abrir') === 'juegos') {
-                setTimeout(function () {
+        const token = ++cargaId;
+        armarMundo(scene, { modesto: equipoModesto, ambiente: ambienteSlug }).then(function (listo) {
+            if (token !== cargaId || !scene) {
+                listo.destruir();
+                return null;
+            }
+            mundo = listo;
+            usaMapaGlb = true;
+            if (!mundo.curva) throw new Error('El camino del mapa no tiene eje.');
+            curva = mundo.curva;
+            asignarPosicionesSobreCamino();
+            construirCaminosLaterales();
+            construirEstaciones();
+            colocarProxyCarpa();
+            return Promise.all([cargarPersonaje(scene), colocarCasasExperiencia()]);
+        }).then(function (par) {
+            const pj = par && par[0];
+            if (!pj || token !== cargaId || !scene) {
+                if (pj && pj.objeto) scene && scene.remove(pj.objeto);
+                return;
+            }
+            personaje = pj.objeto;
+            mixer = pj.mixer;
+            accionesPersonaje = pj.acciones;
+            clipActual = accionesPersonaje.Idle ? 'Idle' : '';
+            colocarPersonajeEn(nodoActual || 'inicio');
+            camPos.copy(personaje.position).add(new THREE.Vector3(-16, 18, 22));
+            camTarget.copy(personaje.position);
+            actualizarCamara(true);
+            quitarCarga();
+            if (elIniciar) elIniciar.classList.remove('rn3d-oculto');
+            refrescarEstaciones();
+            actualizarHud(false);
+            rafId = requestAnimationFrame(animar);
+            try {
+                const params = new URLSearchParams(window.location.search || '');
+                if (params.get('abrir') === 'juegos') {
                     abrirZonaJuegos();
-                    // Limpiar query para que F5 no reabra la galería.
                     if (window.history && window.history.replaceState) {
                         window.history.replaceState({}, '', window.location.pathname);
                     }
-                }, 700);
-            }
-        } catch (e) { /* noop */ }
+                }
+            } catch (e) { /* noop */ }
+        }).catch(function (err) {
+            if (token !== cargaId) return;
+            console.error(err);
+            mostrarCarga('No se pudo armar el mapa.');
+        });
 
         return true;
+    }
+
+    function mostrarCarga(texto) {
+        quitarCarga();
+        if (!ctx.$paso || !ctx.$paso[0]) return;
+        const el = document.createElement('div');
+        el.id = 'rn3dCarga';
+        el.className = 'rn3d-carga';
+        el.textContent = texto;
+        ctx.$paso[0].appendChild(el);
+    }
+
+    function quitarCarga() {
+        const el = document.getElementById('rn3dCarga');
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+    }
+
+    // Reparte las paradas de la clase a lo largo del sendero ya modelado.
+    // Tronco, luego cada rama, y el fin al final: así un tramo del grafo
+    // es un tramo del mismo camino. El fin se alarga para dejar sitio al castillo.
+    const METROS_EXTRA_FIN = 42;
+    function tMasCercano(pos) {
+        let mejor = 0;
+        let dMin = Infinity;
+        for (let i = 0; i <= 96; i++) {
+            const p = curva.getPoint(i / 96);
+            const d = (p.x - pos.x) ** 2 + (p.z - pos.z) ** 2;
+            if (d < dMin) { dMin = d; mejor = i / 96; }
+        }
+        return mejor;
+    }
+    function prolongarFinal() {
+        if (!curva || !mundo || !mundo.altura) return null;
+        const vieja = curva;
+        const pts = [];
+        for (let i = 0; i <= 32; i++) pts.push(vieja.getPoint(i / 32).clone());
+        const tang = vieja.getTangent(1);
+        tang.y = 0;
+        if (tang.lengthSq() < 1e-6) tang.set(1, 0, 0);
+        tang.normalize();
+        const cola = pts[pts.length - 1].clone();
+        const extra = [];
+        const solape = cola.clone().addScaledVector(tang, -2.5);
+        solape.y = cola.y;
+        extra.push(solape, cola.clone());
+        const pasos = 6;
+        for (let i = 1; i <= pasos; i++) {
+            const p = cola.clone().addScaledVector(tang, METROS_EXTRA_FIN * i / pasos);
+            p.y = mundo.altura(p.x, p.z) + 0.22;
+            pts.push(p.clone());
+            extra.push(p);
+        }
+        curva = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.1);
+        curvaExtra = new THREE.CatmullRomCurve3(extra, false, 'catmullrom', 0.1);
+        return vieja;
+    }
+    function asignarPosicionesSobreCamino() {
+        curvasRama = {};
+        curvaExtra = null;
+        const vieja = prolongarFinal();
+        const base = vieja || curva;
+        const tronco = esRamificado
+            ? nodosDeTronco().map((n) => n.parada.id)
+            : (camino.paradas || []).map((p) => p.id);
+        const n = tronco.length;
+        tronco.forEach((id, i) => {
+            if (!nodos[id]) return;
+            const esFin = id === idFin;
+            let pos;
+            let t;
+            if (esFin && vieja) {
+                t = 1;
+                pos = curva.getPoint(1).clone();
+            } else {
+                const tViejo = n <= 1 ? 0.5 : 0.04 + (0.92 * i / (n - 1));
+                pos = base.getPoint(tViejo).clone();
+                t = vieja ? tMasCercano(pos) : tViejo;
+            }
+            nodos[id].t = t;
+            nodos[id].tLocal = t;
+            nodos[id].curvaLocal = curva;
+            nodos[id].spur = null;
+            nodos[id].pos = pos;
+        });
+        if (esRamificado && idModulo && nodos[idModulo]) construirDesvios();
+        if (mundo && typeof mundo.despejarArboles === 'function') {
+            const curvas = [curva];
+            Object.keys(curvasRama).forEach((k) => { if (curvasRama[k]) curvas.push(curvasRama[k]); });
+            mundo.despejarArboles(curvas, 13);
+        }
+    }
+
+    // Ángulos que salen del cruce sin pisar el sendero que sigue de largo
+    // ni meter la casa dentro de un pino.
+    function direccionesDesvio(origen, tang, ejeY, total) {
+        const tFork = (nodos[idModulo] && nodos[idModulo].t) || 0;
+        const choca = (x, z) => {
+            const obs = (mundo && mundo.obstaculos) || [];
+            for (let i = 0; i < obs.length; i++) {
+                const ox = obs[i][0], oz = obs[i][1], r = obs[i][2];
+                if (Math.hypot(x - ox, z - oz) < Math.max(3.4, r * 5)) return true;
+            }
+            return false;
+        };
+        const lejosDelTronco = (x, z) => {
+            let mejor = Infinity;
+            for (let s = 1; s <= 12; s++) {
+                const p = curva.getPoint(Math.min(0.995, tFork + s * 0.02));
+                mejor = Math.min(mejor, Math.hypot(x - p.x, z - p.z));
+            }
+            return mejor;
+        };
+        const validos = [];
+        [1, -1].forEach((signo) => {
+            [0.62, 1.0, 1.38, 1.75].forEach((ang) => {
+                const dir = tang.clone().applyAxisAngle(ejeY, signo * ang).normalize();
+                if (dir.dot(tang) < 0.25) return;
+                const fin = origen.clone().addScaledVector(dir, 34);
+                const medio = origen.clone().addScaledVector(dir, 16);
+                if (choca(fin.x, fin.z) || choca(medio.x, medio.z)) return;
+                const sep = lejosDelTronco(fin.x, fin.z);
+                if (sep < 8) return;
+                validos.push({ dir, sep, ang: signo * ang });
+            });
+        });
+        validos.sort((a, b) => b.sep - a.sep);
+        const elegidos = [];
+        validos.forEach((v) => {
+            if (elegidos.length >= total) return;
+            if (elegidos.some((e) => Math.abs(e.ang - v.ang) < 0.34)) return;
+            elegidos.push(v);
+        });
+        while (elegidos.length < total) {
+            const i = elegidos.length;
+            const signo = (i % 2 === 0) ? 1 : -1;
+            const fila = Math.floor(i / 2);
+            const ang = signo * (0.78 + fila * 0.42);
+            elegidos.push({ dir: tang.clone().applyAxisAngle(ejeY, ang).normalize(), ang });
+        }
+        return elegidos.slice(0, total).map((e) => e.dir);
+    }
+
+    // Desde el paso 3 salen n cintas, una por experiencia. El GLB del camino
+    // sigue de largo hasta el fin: ese es el camino n+1.
+    function construirDesvios() {
+        const origen = nodos[idModulo].pos.clone();
+        const tang = curva.getTangent(nodos[idModulo].t);
+        tang.y = 0;
+        if (tang.lengthSq() < 1e-6) tang.set(1, 0, 0);
+        tang.normalize();
+        const ejeY = new THREE.Vector3(0, 1, 0);
+        const ramas = [];
+        for (let r = 1; r <= ramasTotales; r++) {
+            const nodosR = nodosDeRama(r);
+            if (nodosR.length) ramas.push({ r, nodosR });
+        }
+        const total = ramas.length;
+        const dirs = direccionesDesvio(origen, tang, ejeY, total);
+        ramas.forEach((rama, i) => {
+            const dir = dirs[i];
+            const largo = 34;
+            const crudo = [
+                origen.clone(),
+                origen.clone().addScaledVector(tang, 8).addScaledVector(dir, 5),
+                origen.clone().addScaledVector(dir, largo * 0.62),
+                origen.clone().addScaledVector(dir, largo),
+            ];
+            const pts = crudo.map((p) => {
+                const ySuelo = mundo ? mundo.altura(p.x, p.z) : origen.y;
+                // Por encima del césped: si queda al ras, la cinta desaparece bajo el terreno.
+                return new THREE.Vector3(p.x, Math.max(origen.y, ySuelo) + 0.22, p.z);
+            });
+            const spur = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.35);
+            curvasRama[rama.r] = spur;
+            rama.nodosR.forEach((nodo, k) => {
+                const t = rama.nodosR.length === 1 ? 1 : 0.45 + 0.55 * (k / (rama.nodosR.length - 1));
+                nodo.spur = spur;
+                nodo.tLocal = t;
+                nodo.t = t;
+                nodo.curvaLocal = spur;
+                nodo.pos = spur.getPoint(t).clone();
+            });
+        });
+        if (total === 0) return;
+    }
+
+    function construirCaminosLaterales() {
+        if (grupoRamas && grupoRamas.parent) grupoRamas.parent.remove(grupoRamas);
+        grupoRamas = new THREE.Group();
+        grupoRamas.name = 'desvios';
+        scene.add(grupoRamas);
+        const ids = Object.keys(curvasRama);
+        if (!ids.length && !curvaExtra) return;
+        const base = mundo && mundo.materialCamino;
+        const mat = base
+            ? base.clone()
+            : new THREE.MeshStandardMaterial({ color: 0xa85225, roughness: 0.85, metalness: 0 });
+        mat.side = THREE.DoubleSide;
+        mat.polygonOffset = true;
+        mat.polygonOffsetFactor = -2;
+        mat.polygonOffsetUnits = -2;
+        ids.forEach((key) => {
+            const geo = mallaCinta(curvasRama[key], 4.2, 28);
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.receiveShadow = true;
+            mesh.castShadow = false;
+            grupoRamas.add(mesh);
+        });
+        if (curvaExtra) {
+            const geo = mallaCinta(curvaExtra, 4.2, 24);
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.receiveShadow = true;
+            mesh.castShadow = false;
+            grupoRamas.add(mesh);
+        }
+    }
+
+    function mallaCinta(spur, ancho, pasos) {
+        const medio = ancho / 2;
+        const pos = [];
+        const uvs = [];
+        const idx = [];
+        for (let i = 0; i <= pasos; i++) {
+            const t = i / pasos;
+            const p = spur.getPoint(t);
+            const tan = spur.getTangent(t);
+            tan.y = 0;
+            if (tan.lengthSq() < 1e-6) tan.set(1, 0, 0);
+            tan.normalize();
+            const lat = new THREE.Vector3(-tan.z, 0, tan.x);
+            const y = p.y + 0.05;
+            pos.push(p.x + lat.x * medio, y, p.z + lat.z * medio);
+            pos.push(p.x - lat.x * medio, y, p.z - lat.z * medio);
+            uvs.push(0, t * 4, 1, t * 4);
+            if (i < pasos) {
+                const a = i * 2;
+                idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+            }
+        }
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        geo.setIndex(idx);
+        geo.computeVertexNormals();
+        return geo;
+    }
+
+    async function colocarCasasExperiencia() {
+        if (grupoCasas && grupoCasas.parent) grupoCasas.parent.remove(grupoCasas);
+        grupoCasas = new THREE.Group();
+        grupoCasas.name = 'casas-experiencia';
+        if (scene) scene.add(grupoCasas);
+        if (!esRamificado) return;
+        // Giro manual, en grados, alrededor de la vertical.
+        // 0 = el frente del GLB (su eje +Z, donde está la puerta) mira al camino.
+        // [0] = casa1.glb, [1] = casa2.glb. Suma o resta 90 si la puerta queda de lado.
+        const GIRO_CASA_GRADOS = [0, 0];
+        // Metros en vertical. Negativo baja la casa. Mismos índices que el giro.
+        const ALTURA_CASA = [-0.7, -1.7];
+        // 1 = el tamaño base (~9 m de lado). Mayor crece, menor encoge.
+        // [0] = casa1.glb, [1] = casa2.glb.
+        const ESCALA_CASA = [1.5, 1.2];
+        const tareas = [];
+        Object.values(nodos).forEach((nodo) => {
+            if (!nodo.spur || !esParadaExperiencia(nodo.parada)) return;
+            const idExp = nodo.parada.experiencia_id || nodo.parada.id;
+            const indice = indiceCasaEstable(idExp);
+            tareas.push(clonarCasa(indice).then((casa) => {
+                if (!grupoCasas || !scene) return;
+                const fin = nodo.spur.getPoint(1);
+                const tang = nodo.spur.getTangent(1);
+                tang.y = 0;
+                if (tang.lengthSq() < 1e-6) tang.set(0, 0, 1);
+                tang.normalize();
+                const escala = Number.isFinite(ESCALA_CASA[indice % 2]) ? ESCALA_CASA[indice % 2] : 1;
+                casa.scale.setScalar(escala);
+                const frente = Number(casa.userData.frente);
+                // El nodo de la puerta queda hundido respecto a los escalones.
+                // Se acerca la casa para que la tierra llegue al umbral.
+                const avanceBase = (Number.isFinite(frente) && frente > 1) ? Math.max(1.6, frente - 1.45) : 2.4;
+                const avance = avanceBase * escala;
+                const puesto = fin.clone().addScaledVector(tang, avance);
+                puesto.y = (mundo ? mundo.altura(puesto.x, puesto.z) : fin.y) + (ALTURA_CASA[indice % 2] || 0);
+                casa.position.copy(puesto);
+                const extra = (GIRO_CASA_GRADOS[indice % 2] || 0) * Math.PI / 180;
+                casa.rotation.y = Math.atan2(-tang.x, -tang.z) + extra;
+                puertasCasa[nodo.parada.id] = fin.clone();
+                grupoCasas.add(casa);
+            }).catch((err) => { console.error(err); }));
+        });
+        await Promise.all(tareas);
+    }
+
+    function colocarProxyCarpa() {
+        if (!mundo || !mundo.carpa) return;
+        const c = mundo.carpa;
+        const proxy = new THREE.Mesh(
+            new THREE.BoxGeometry(6.2, 5.2, 6.4),
+            new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+        );
+        proxy.position.set(c.x, c.y + 2.4, c.z);
+        scene.add(proxy);
+        zonaJuegos = proxy;
+        let cerca = curva.getPoint(0);
+        let mejor = Infinity;
+        for (let i = 0; i <= 48; i++) {
+            const p = curva.getPoint(i / 48);
+            const d = (p.x - c.x) ** 2 + (p.z - c.z) ** 2;
+            if (d < mejor) { mejor = d; cerca = p; }
+        }
+        const dir = new THREE.Vector3(cerca.x - c.x, 0, cerca.z - c.z);
+        if (dir.lengthSq() < 0.01) dir.set(1, 0, 0);
+        dir.normalize();
+        zonaJuegosParada = new THREE.Vector3(c.x, c.y, c.z).addScaledVector(dir, 5.4);
+        zonaJuegosParada.y = mundo.altura(zonaJuegosParada.x, zonaJuegosParada.z);
     }
 
     function onResize() {
@@ -3044,14 +3436,45 @@ import * as THREE from 'three';
     }
 
     function destroy() {
+        cargaId++;
+        usaMapaGlb = false;
         detenerNarracion();
         detenerVideoParada();
         cerrarPlayer();
         cerrarModal();
+        quitarCarga();
 
         if (rafId) {
             cancelAnimationFrame(rafId);
             rafId = null;
+        }
+        if (mixer) {
+            mixer.stopAllAction();
+            mixer = null;
+        }
+        accionesPersonaje = null;
+        clipActual = '';
+        if (mundo) {
+            mundo.destruir();
+            mundo = null;
+        }
+        if (personaje && personaje.parent) personaje.parent.remove(personaje);
+        personaje = null;
+        if (zonaJuegos && zonaJuegos.parent) zonaJuegos.parent.remove(zonaJuegos);
+        zonaJuegos = null;
+        if (grupoRamas) {
+            const mats = new Set();
+            grupoRamas.traverse((o) => {
+                if (o.geometry) o.geometry.dispose();
+                if (o.material) mats.add(o.material);
+            });
+            mats.forEach((m) => m.dispose());
+            if (grupoRamas.parent) grupoRamas.parent.remove(grupoRamas);
+            grupoRamas = null;
+        }
+        if (grupoCasas) {
+            if (grupoCasas.parent) grupoCasas.parent.remove(grupoCasas);
+            grupoCasas = null;
         }
 
         if (renderer) {

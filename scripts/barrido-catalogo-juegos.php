@@ -245,7 +245,7 @@ try {
 }
 
 $routeNames = [
-    'superadmin.catalogo.juegos',
+    'superadmin.catalogo_juegos.index',
     'superadmin.catalogo.juegos.preview',
     'admin.catalogo.juegos',
     'panel.catalogo.juegos',

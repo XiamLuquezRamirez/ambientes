@@ -2,6 +2,18 @@
    El canvas ocupa toda la pantalla; encima van HUD, botón Iniciar, etiqueta y
    (reusados del kiosco) los modales #rnCaminoModal / player. */
 
+.rn3d-carga {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: grid;
+    place-items: center;
+    background: #cfeaf9;
+    color: #1d2330;
+    font-family: 'Fredoka One', system-ui, sans-serif;
+    font-size: 1.6rem;
+}
+
 .rn-shell--3d .rn3d-canvas {
     position: absolute;
     inset: 0;

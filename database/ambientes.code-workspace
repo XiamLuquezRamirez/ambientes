@@ -8,6 +8,12 @@
 		},
 		{
 			"path": "../../corrector"
+		},
+		{
+			"path": "../../files"
+		},
+		{
+			"path": "C:/Users/PC/Downloads/proyecto_mapa"
 		}
 	],
 	"settings": {}
