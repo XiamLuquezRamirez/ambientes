@@ -120,7 +120,8 @@
     {{-- Camino 3D (Three.js). Expone window.KioscoCamino.boot(). --}}
     <script type="importmap">
     { "imports": {
-        "three": "{{ asset('assets/vendor/three/three.module.js') }}"
+        "three": "{{ asset('assets/vendor/three/three.module.js') }}",
+        "three/addons/": "{{ asset('assets/vendor/three/addons') }}/"
     } }
     </script>
     <script type="module"

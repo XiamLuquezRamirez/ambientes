@@ -38,7 +38,7 @@
                         'superadmin.ejes.*',
                         'superadmin.catalogo.tematicas.*',
                         'superadmin.ejes.tematicas',
-                    ) && !request()->routeIs('superadmin.catalogo.juegos', 'superadmin.juegos.*');
+                    ) && !request()->routeIs('superadmin.catalogo_juegos.index', 'superadmin.juegos.*');
                 $perfilesAprendizaje = request()->routeIs(
                     'superadmin.perfil-aprendizaje*',
                     'superadmin.perfil-aprendizaje-personalizado*',

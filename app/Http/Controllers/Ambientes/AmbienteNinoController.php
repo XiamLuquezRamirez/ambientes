@@ -133,6 +133,7 @@ class AmbienteNinoController extends Controller
             ]);
         }
 
+
         return view('ambientes.kiosco-recorrido', [
             'ambiente' => $ambiente,
             'modo' => 'sesion',

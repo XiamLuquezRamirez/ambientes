@@ -1,0 +1,1201 @@
+[
+  {
+    "archivo": "01_relieve/montana_nevada_v1.glb",
+    "categoria": "relieve",
+    "nombre": "montana_nevada_v1",
+    "medidas_m": {
+      "ancho": 39.38,
+      "fondo": 38.82,
+      "alto": 29.48
+    },
+    "triangulos": 172,
+    "materiales": [
+      "nieve",
+      "montana_azul",
+      "montana",
+      "pasto",
+      "montana_claro",
+      "roca_oscura",
+      "roca"
+    ]
+  },
+  {
+    "archivo": "01_relieve/montana_nevada_v2.glb",
+    "categoria": "relieve",
+    "nombre": "montana_nevada_v2",
+    "medidas_m": {
+      "ancho": 34.72,
+      "fondo": 34.37,
+      "alto": 30.96
+    },
+    "triangulos": 172,
+    "materiales": [
+      "nieve",
+      "montana",
+      "montana_claro",
+      "roca_oscura",
+      "pasto",
+      "montana_azul",
+      "roca"
+    ]
+  },
+  {
+    "archivo": "01_relieve/montana_nevada_v3.glb",
+    "categoria": "relieve",
+    "nombre": "montana_nevada_v3",
+    "medidas_m": {
+      "ancho": 36.52,
+      "fondo": 37.03,
+      "alto": 26
+    },
+    "triangulos": 172,
+    "materiales": [
+      "nieve",
+      "montana",
+      "montana_claro",
+      "montana_azul",
+      "pasto",
+      "roca_oscura",
+      "roca"
+    ]
+  },
+  {
+    "archivo": "01_relieve/cordillera.glb",
+    "categoria": "relieve",
+    "nombre": "cordillera",
+    "medidas_m": {
+      "ancho": 83.37,
+      "fondo": 56.52,
+      "alto": 33.18
+    },
+    "triangulos": 688,
+    "materiales": [
+      "nieve",
+      "montana",
+      "montana_claro",
+      "pasto",
+      "roca_oscura",
+      "montana_azul",
+      "roca"
+    ]
+  },
+  {
+    "archivo": "01_relieve/colinas_v1.glb",
+    "categoria": "relieve",
+    "nombre": "colinas_v1",
+    "medidas_m": {
+      "ancho": 29.91,
+      "fondo": 19.23,
+      "alto": 3.3
+    },
+    "triangulos": 189,
+    "materiales": [
+      "pasto_oscuro",
+      "pasto",
+      "pasto_claro"
+    ]
+  },
+  {
+    "archivo": "01_relieve/colinas_v2.glb",
+    "categoria": "relieve",
+    "nombre": "colinas_v2",
+    "medidas_m": {
+      "ancho": 30.15,
+      "fondo": 18.62,
+      "alto": 3.25
+    },
+    "triangulos": 189,
+    "materiales": [
+      "pasto",
+      "pasto_claro",
+      "pasto_oscuro"
+    ]
+  },
+  {
+    "archivo": "01_relieve/terreno_tile_20m_v1.glb",
+    "categoria": "relieve",
+    "nombre": "terreno_tile_20m_v1",
+    "medidas_m": {
+      "ancho": 20,
+      "fondo": 20,
+      "alto": 0.35
+    },
+    "triangulos": 200,
+    "materiales": [
+      "pasto_claro",
+      "pasto",
+      "pasto_oscuro"
+    ]
+  },
+  {
+    "archivo": "01_relieve/terreno_tile_20m_v2.glb",
+    "categoria": "relieve",
+    "nombre": "terreno_tile_20m_v2",
+    "medidas_m": {
+      "ancho": 20,
+      "fondo": 20,
+      "alto": 0.35
+    },
+    "triangulos": 200,
+    "materiales": [
+      "pasto_oscuro",
+      "pasto_claro",
+      "pasto"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/pino_v1.glb",
+    "categoria": "vegetacion",
+    "nombre": "pino_v1",
+    "medidas_m": {
+      "ancho": 5.88,
+      "fondo": 5.86,
+      "alto": 6.7
+    },
+    "triangulos": 88,
+    "materiales": [
+      "tronco",
+      "pino",
+      "pino_oscuro"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/pino_v2.glb",
+    "categoria": "vegetacion",
+    "nombre": "pino_v2",
+    "medidas_m": {
+      "ancho": 5.2,
+      "fondo": 5.17,
+      "alto": 6.6
+    },
+    "triangulos": 88,
+    "materiales": [
+      "tronco",
+      "pino",
+      "pino_oscuro"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/pino_v3.glb",
+    "categoria": "vegetacion",
+    "nombre": "pino_v3",
+    "medidas_m": {
+      "ancho": 5.86,
+      "fondo": 5.9,
+      "alto": 6.71
+    },
+    "triangulos": 88,
+    "materiales": [
+      "tronco",
+      "pino",
+      "pino_oscuro"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/pino_alto_v1.glb",
+    "categoria": "vegetacion",
+    "nombre": "pino_alto_v1",
+    "medidas_m": {
+      "ancho": 4.84,
+      "fondo": 4.82,
+      "alto": 7.38
+    },
+    "triangulos": 104,
+    "materiales": [
+      "tronco",
+      "pino",
+      "pino_oscuro"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/pino_alto_v2.glb",
+    "categoria": "vegetacion",
+    "nombre": "pino_alto_v2",
+    "medidas_m": {
+      "ancho": 3.58,
+      "fondo": 3.7,
+      "alto": 7.38
+    },
+    "triangulos": 104,
+    "materiales": [
+      "tronco",
+      "pino",
+      "pino_oscuro"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/pino_alto_v3.glb",
+    "categoria": "vegetacion",
+    "nombre": "pino_alto_v3",
+    "medidas_m": {
+      "ancho": 3.91,
+      "fondo": 4.03,
+      "alto": 7.46
+    },
+    "triangulos": 104,
+    "materiales": [
+      "tronco",
+      "pino",
+      "pino_oscuro"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/arbol_redondo_v1.glb",
+    "categoria": "vegetacion",
+    "nombre": "arbol_redondo_v1",
+    "medidas_m": {
+      "ancho": 4.05,
+      "fondo": 3.87,
+      "alto": 5.5
+    },
+    "triangulos": 444,
+    "materiales": [
+      "tronco",
+      "hoja",
+      "hoja_oscura",
+      "hoja_clara"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/arbol_redondo_v2.glb",
+    "categoria": "vegetacion",
+    "nombre": "arbol_redondo_v2",
+    "medidas_m": {
+      "ancho": 4.11,
+      "fondo": 3.66,
+      "alto": 5.5
+    },
+    "triangulos": 444,
+    "materiales": [
+      "tronco",
+      "hoja",
+      "hoja_oscura",
+      "hoja_clara"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/arbol_redondo_v3.glb",
+    "categoria": "vegetacion",
+    "nombre": "arbol_redondo_v3",
+    "medidas_m": {
+      "ancho": 4.36,
+      "fondo": 3.83,
+      "alto": 5.5
+    },
+    "triangulos": 444,
+    "materiales": [
+      "tronco",
+      "hoja",
+      "hoja_oscura",
+      "hoja_clara"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/arbusto_v1.glb",
+    "categoria": "vegetacion",
+    "nombre": "arbusto_v1",
+    "medidas_m": {
+      "ancho": 2.1,
+      "fondo": 1.4,
+      "alto": 1.19
+    },
+    "triangulos": 240,
+    "materiales": [
+      "arbusto",
+      "hoja"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/arbusto_v2.glb",
+    "categoria": "vegetacion",
+    "nombre": "arbusto_v2",
+    "medidas_m": {
+      "ancho": 2.1,
+      "fondo": 1.4,
+      "alto": 1.19
+    },
+    "triangulos": 240,
+    "materiales": [
+      "arbusto",
+      "hoja"
+    ]
+  },
+  {
+    "archivo": "02_vegetacion/arbusto_v3.glb",
+    "categoria": "vegetacion",
+    "nombre": "arbusto_v3",
+    "medidas_m": {
+      "ancho": 2.1,
+      "fondo": 1.4,
+      "alto": 1.19
+    },
+    "triangulos": 240,
+    "materiales": [
+      "arbusto",
+      "hoja"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/margarita.glb",
+    "categoria": "flores_suelo",
+    "nombre": "margarita",
+    "medidas_m": {
+      "ancho": 0.36,
+      "fondo": 0.26,
+      "alto": 0.48
+    },
+    "triangulos": 240,
+    "materiales": [
+      "tallo",
+      "centro",
+      "petalo_blanco"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/tulipan_v1.glb",
+    "categoria": "flores_suelo",
+    "nombre": "tulipan_v1",
+    "medidas_m": {
+      "ancho": 0.36,
+      "fondo": 0.18,
+      "alto": 0.78
+    },
+    "triangulos": 108,
+    "materiales": [
+      "tallo",
+      "petalo_rojo"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/tulipan_v2.glb",
+    "categoria": "flores_suelo",
+    "nombre": "tulipan_v2",
+    "medidas_m": {
+      "ancho": 0.36,
+      "fondo": 0.18,
+      "alto": 0.78
+    },
+    "triangulos": 108,
+    "materiales": [
+      "tallo",
+      "petalo_rojo"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/tulipan_v3.glb",
+    "categoria": "flores_suelo",
+    "nombre": "tulipan_v3",
+    "medidas_m": {
+      "ancho": 0.36,
+      "fondo": 0.18,
+      "alto": 0.78
+    },
+    "triangulos": 108,
+    "materiales": [
+      "tallo",
+      "petalo_amarillo"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/girasol.glb",
+    "categoria": "flores_suelo",
+    "nombre": "girasol",
+    "medidas_m": {
+      "ancho": 0.78,
+      "fondo": 0.46,
+      "alto": 1.84
+    },
+    "triangulos": 360,
+    "materiales": [
+      "tallo",
+      "centro_oscuro",
+      "petalo_amarillo"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/campanula.glb",
+    "categoria": "flores_suelo",
+    "nombre": "campanula",
+    "medidas_m": {
+      "ancho": 0.36,
+      "fondo": 0.22,
+      "alto": 0.57
+    },
+    "triangulos": 132,
+    "materiales": [
+      "tallo",
+      "petalo_morado"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/flor_silvestre_v1.glb",
+    "categoria": "flores_suelo",
+    "nombre": "flor_silvestre_v1",
+    "medidas_m": {
+      "ancho": 0.36,
+      "fondo": 0.27,
+      "alto": 0.47
+    },
+    "triangulos": 240,
+    "materiales": [
+      "tallo",
+      "centro",
+      "petalo_blanco"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/flor_silvestre_v2.glb",
+    "categoria": "flores_suelo",
+    "nombre": "flor_silvestre_v2",
+    "medidas_m": {
+      "ancho": 0.36,
+      "fondo": 0.27,
+      "alto": 0.45
+    },
+    "triangulos": 240,
+    "materiales": [
+      "tallo",
+      "centro",
+      "petalo_amarillo"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/flor_silvestre_v3.glb",
+    "categoria": "flores_suelo",
+    "nombre": "flor_silvestre_v3",
+    "medidas_m": {
+      "ancho": 0.36,
+      "fondo": 0.26,
+      "alto": 0.47
+    },
+    "triangulos": 240,
+    "materiales": [
+      "tallo",
+      "centro",
+      "petalo_blanco"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/macizo_flores_v1.glb",
+    "categoria": "flores_suelo",
+    "nombre": "macizo_flores_v1",
+    "medidas_m": {
+      "ancho": 2.03,
+      "fondo": 1.73,
+      "alto": 1.3
+    },
+    "triangulos": 2400,
+    "materiales": [
+      "arbusto",
+      "hoja",
+      "tallo",
+      "centro",
+      "petalo_blanco",
+      "petalo_rosa",
+      "petalo_rojo",
+      "petalo_morado"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/macizo_flores_v2.glb",
+    "categoria": "flores_suelo",
+    "nombre": "macizo_flores_v2",
+    "medidas_m": {
+      "ancho": 2.07,
+      "fondo": 2,
+      "alto": 1.34
+    },
+    "triangulos": 2400,
+    "materiales": [
+      "arbusto",
+      "hoja",
+      "tallo",
+      "centro",
+      "petalo_blanco",
+      "petalo_amarillo",
+      "petalo_morado"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/hongos.glb",
+    "categoria": "flores_suelo",
+    "nombre": "hongos",
+    "medidas_m": {
+      "ancho": 0.73,
+      "fondo": 0.51,
+      "alto": 0.41
+    },
+    "triangulos": 540,
+    "materiales": [
+      "hongo_pie",
+      "hongo_rojo",
+      "lana"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/tronco_caido.glb",
+    "categoria": "flores_suelo",
+    "nombre": "tronco_caido",
+    "medidas_m": {
+      "ancho": 3.27,
+      "fondo": 0.86,
+      "alto": 0.83
+    },
+    "triangulos": 104,
+    "materiales": [
+      "tronco",
+      "crema",
+      "musgo"
+    ]
+  },
+  {
+    "archivo": "03_flores_suelo/tocon.glb",
+    "categoria": "flores_suelo",
+    "nombre": "tocon",
+    "medidas_m": {
+      "ancho": 1.16,
+      "fondo": 1.25,
+      "alto": 0.58
+    },
+    "triangulos": 84,
+    "materiales": [
+      "tronco",
+      "crema",
+      "musgo"
+    ]
+  },
+  {
+    "archivo": "04_animales/conejo_v1.glb",
+    "categoria": "animales",
+    "nombre": "conejo_v1",
+    "medidas_m": {
+      "ancho": 0.44,
+      "fondo": 0.75,
+      "alto": 0.73
+    },
+    "triangulos": 380,
+    "materiales": [
+      "pelaje_gris",
+      "lana",
+      "negro",
+      "rosa"
+    ]
+  },
+  {
+    "archivo": "04_animales/conejo_v2.glb",
+    "categoria": "animales",
+    "nombre": "conejo_v2",
+    "medidas_m": {
+      "ancho": 0.44,
+      "fondo": 0.75,
+      "alto": 0.73
+    },
+    "triangulos": 380,
+    "materiales": [
+      "pelaje_claro",
+      "lana",
+      "negro",
+      "rosa"
+    ]
+  },
+  {
+    "archivo": "04_animales/ciervo.glb",
+    "categoria": "animales",
+    "nombre": "ciervo",
+    "medidas_m": {
+      "ancho": 0.64,
+      "fondo": 1.67,
+      "alto": 2.03
+    },
+    "triangulos": 592,
+    "materiales": [
+      "pelaje_marron",
+      "pelaje_claro",
+      "lana",
+      "negro",
+      "cuerno"
+    ]
+  },
+  {
+    "archivo": "04_animales/zorro.glb",
+    "categoria": "animales",
+    "nombre": "zorro",
+    "medidas_m": {
+      "ancho": 0.36,
+      "fondo": 1.45,
+      "alto": 0.74
+    },
+    "triangulos": 566,
+    "materiales": [
+      "zorro",
+      "lana",
+      "negro"
+    ]
+  },
+  {
+    "archivo": "04_animales/oveja.glb",
+    "categoria": "animales",
+    "nombre": "oveja",
+    "medidas_m": {
+      "ancho": 0.84,
+      "fondo": 1.02,
+      "alto": 1.04
+    },
+    "triangulos": 800,
+    "materiales": [
+      "lana",
+      "negro"
+    ]
+  },
+  {
+    "archivo": "04_animales/pato.glb",
+    "categoria": "animales",
+    "nombre": "pato",
+    "medidas_m": {
+      "ancho": 0.51,
+      "fondo": 0.85,
+      "alto": 0.57
+    },
+    "triangulos": 408,
+    "materiales": [
+      "pato",
+      "pato_verde",
+      "pico",
+      "negro",
+      "pelaje_gris"
+    ]
+  },
+  {
+    "archivo": "05_aves_insectos/ave_azul.glb",
+    "categoria": "aves_insectos",
+    "nombre": "ave_azul",
+    "medidas_m": {
+      "ancho": 0.79,
+      "fondo": 0.59,
+      "alto": 0.39
+    },
+    "triangulos": 372,
+    "materiales": [
+      "ave_azul",
+      "lana",
+      "pico",
+      "negro"
+    ]
+  },
+  {
+    "archivo": "05_aves_insectos/ave_roja.glb",
+    "categoria": "aves_insectos",
+    "nombre": "ave_roja",
+    "medidas_m": {
+      "ancho": 0.79,
+      "fondo": 0.59,
+      "alto": 0.39
+    },
+    "triangulos": 372,
+    "materiales": [
+      "ave_roja",
+      "lana",
+      "pico",
+      "negro"
+    ]
+  },
+  {
+    "archivo": "05_aves_insectos/ave_amarilla.glb",
+    "categoria": "aves_insectos",
+    "nombre": "ave_amarilla",
+    "medidas_m": {
+      "ancho": 0.79,
+      "fondo": 0.59,
+      "alto": 0.39
+    },
+    "triangulos": 372,
+    "materiales": [
+      "ave_amarilla",
+      "lana",
+      "pico",
+      "negro"
+    ]
+  },
+  {
+    "archivo": "05_aves_insectos/mariposa_v1.glb",
+    "categoria": "aves_insectos",
+    "nombre": "mariposa_v1",
+    "medidas_m": {
+      "ancho": 0.31,
+      "fondo": 0.19,
+      "alto": 0.02
+    },
+    "triangulos": 100,
+    "materiales": [
+      "negro",
+      "petalo_naranja"
+    ]
+  },
+  {
+    "archivo": "05_aves_insectos/mariposa_v2.glb",
+    "categoria": "aves_insectos",
+    "nombre": "mariposa_v2",
+    "medidas_m": {
+      "ancho": 0.31,
+      "fondo": 0.19,
+      "alto": 0.02
+    },
+    "triangulos": 100,
+    "materiales": [
+      "negro",
+      "petalo_rosa"
+    ]
+  },
+  {
+    "archivo": "05_aves_insectos/mariposa_v3.glb",
+    "categoria": "aves_insectos",
+    "nombre": "mariposa_v3",
+    "medidas_m": {
+      "ancho": 0.31,
+      "fondo": 0.19,
+      "alto": 0.02
+    },
+    "triangulos": 100,
+    "materiales": [
+      "negro",
+      "ave_azul"
+    ]
+  },
+  {
+    "archivo": "06_rocas_cielo/roca_v1.glb",
+    "categoria": "rocas_cielo",
+    "nombre": "roca_v1",
+    "medidas_m": {
+      "ancho": 2.67,
+      "fondo": 1.79,
+      "alto": 1.72
+    },
+    "triangulos": 36,
+    "materiales": [
+      "roca",
+      "musgo",
+      "roca_claro"
+    ]
+  },
+  {
+    "archivo": "06_rocas_cielo/roca_v2.glb",
+    "categoria": "rocas_cielo",
+    "nombre": "roca_v2",
+    "medidas_m": {
+      "ancho": 2.45,
+      "fondo": 2.12,
+      "alto": 1.7
+    },
+    "triangulos": 36,
+    "materiales": [
+      "musgo",
+      "roca",
+      "roca_claro"
+    ]
+  },
+  {
+    "archivo": "06_rocas_cielo/roca_v3.glb",
+    "categoria": "rocas_cielo",
+    "nombre": "roca_v3",
+    "medidas_m": {
+      "ancho": 2.7,
+      "fondo": 2.08,
+      "alto": 1.44
+    },
+    "triangulos": 36,
+    "materiales": [
+      "musgo",
+      "roca_claro",
+      "roca"
+    ]
+  },
+  {
+    "archivo": "06_rocas_cielo/roca_v4.glb",
+    "categoria": "rocas_cielo",
+    "nombre": "roca_v4",
+    "medidas_m": {
+      "ancho": 2.85,
+      "fondo": 1.93,
+      "alto": 1.71
+    },
+    "triangulos": 36,
+    "materiales": [
+      "roca",
+      "roca_claro",
+      "musgo"
+    ]
+  },
+  {
+    "archivo": "06_rocas_cielo/nube_v1.glb",
+    "categoria": "rocas_cielo",
+    "nombre": "nube_v1",
+    "medidas_m": {
+      "ancho": 5.9,
+      "fondo": 2.52,
+      "alto": 2.4
+    },
+    "triangulos": 400,
+    "materiales": [
+      "nube"
+    ]
+  },
+  {
+    "archivo": "06_rocas_cielo/nube_v2.glb",
+    "categoria": "rocas_cielo",
+    "nombre": "nube_v2",
+    "medidas_m": {
+      "ancho": 5.9,
+      "fondo": 2.52,
+      "alto": 2.4
+    },
+    "triangulos": 400,
+    "materiales": [
+      "nube"
+    ]
+  },
+  {
+    "archivo": "07_casas_tematicas/casa_polimotor.glb",
+    "categoria": "casas_tematicas",
+    "nombre": "casa_polimotor",
+    "medidas_m": {
+      "ancho": 9.31,
+      "fondo": 10.03,
+      "alto": 4.81
+    },
+    "triangulos": 2094,
+    "materiales": [
+      "piedra",
+      "crema",
+      "naranja",
+      "madera_oscura",
+      "oro",
+      "vidrio",
+      "amarillo",
+      "blanco",
+      "letrero_polimotor",
+      "lima",
+      "morado",
+      "turquesa",
+      "magenta",
+      "madera"
+    ]
+  },
+  {
+    "archivo": "07_casas_tematicas/casa_expresion_artistica.glb",
+    "categoria": "casas_tematicas",
+    "nombre": "casa_expresion_artistica",
+    "medidas_m": {
+      "ancho": 7.82,
+      "fondo": 7.59,
+      "alto": 6.37
+    },
+    "triangulos": 1590,
+    "materiales": [
+      "piedra",
+      "blanco",
+      "morado",
+      "madera_oscura",
+      "oro",
+      "vidrio",
+      "magenta",
+      "letrero_expresion_artistica",
+      "amarillo",
+      "turquesa",
+      "naranja",
+      "lima",
+      "celeste",
+      "crema",
+      "negro",
+      "gris_claro",
+      "madera",
+      "ave_roja",
+      "",
+      "petalo_rosa",
+      "hoja",
+      "petalo_naranja",
+      "petalo_rojo",
+      "petalo_morado"
+    ]
+  },
+  {
+    "archivo": "07_casas_tematicas/casa_multisaberes.glb",
+    "categoria": "casas_tematicas",
+    "nombre": "casa_multisaberes",
+    "medidas_m": {
+      "ancho": 8.45,
+      "fondo": 9.1,
+      "alto": 7.32
+    },
+    "triangulos": 1516,
+    "materiales": [
+      "piedra",
+      "crema",
+      "turquesa",
+      "madera_oscura",
+      "oro",
+      "vidrio",
+      "blanco",
+      "letrero_multisaberes",
+      "gris_claro",
+      "gris_tec",
+      "ave_roja",
+      "amarillo",
+      "morado",
+      "ave_azul",
+      "madera",
+      "celeste",
+      "lima"
+    ]
+  },
+  {
+    "archivo": "07_casas_tematicas/casa_multisensorial.glb",
+    "categoria": "casas_tematicas",
+    "nombre": "casa_multisensorial",
+    "medidas_m": {
+      "ancho": 10.43,
+      "fondo": 9.65,
+      "alto": 3.9
+    },
+    "triangulos": 2190,
+    "materiales": [
+      "piedra",
+      "durazno",
+      "menta",
+      "crema",
+      "celeste",
+      "lavanda",
+      "vidrio",
+      "blanco",
+      "morado",
+      "madera_oscura",
+      "oro",
+      "letrero_multisensorial",
+      "arena",
+      "musgo",
+      "madera",
+      "lana",
+      "gris_tec",
+      "gris_claro",
+      "agua",
+      "",
+      "petalo_rosa",
+      "hoja",
+      "petalo_naranja",
+      "petalo_rojo",
+      "petalo_morado"
+    ]
+  },
+  {
+    "archivo": "07_casas_tematicas/casa_tecnologia.glb",
+    "categoria": "casas_tematicas",
+    "nombre": "casa_tecnologia",
+    "medidas_m": {
+      "ancho": 8.58,
+      "fondo": 7.26,
+      "alto": 6.5
+    },
+    "triangulos": 746,
+    "materiales": [
+      "gris_tec",
+      "gris_claro",
+      "vidrio",
+      "neon",
+      "blanco",
+      "panel_solar",
+      "metal",
+      "pantalla",
+      "letrero_tecnologia",
+      "negro"
+    ]
+  },
+  {
+    "archivo": "08_edificios/casa_refugio.glb",
+    "categoria": "edificios",
+    "nombre": "casa_refugio",
+    "medidas_m": {
+      "ancho": 6.2,
+      "fondo": 5.3,
+      "alto": 5.04
+    },
+    "triangulos": 670,
+    "materiales": [
+      "piedra",
+      "pared",
+      "madera",
+      "madera_oscura",
+      "techo",
+      "ladrillo",
+      "vidrio",
+      "",
+      "petalo_rosa",
+      "hoja",
+      "petalo_naranja",
+      "petalo_rojo",
+      "petalo_morado",
+      "blanco"
+    ]
+  },
+  {
+    "archivo": "08_edificios/carpa.glb",
+    "categoria": "edificios",
+    "nombre": "carpa",
+    "medidas_m": {
+      "ancho": 5.6,
+      "fondo": 5.83,
+      "alto": 4.68
+    },
+    "triangulos": 198,
+    "materiales": [
+      "lona_pared",
+      "lona_blanca",
+      "lona_roja",
+      "lona_verde",
+      "madera_oscura",
+      "madera",
+      "blanco",
+      "techo"
+    ]
+  },
+  {
+    "archivo": "09_camino_agua/camino_recto_8m.glb",
+    "categoria": "camino_agua",
+    "nombre": "camino_recto_8m",
+    "medidas_m": {
+      "ancho": 3.72,
+      "fondo": 8.08,
+      "alto": 0.2
+    },
+    "triangulos": 612,
+    "materiales": [
+      "camino",
+      "roca_oscura",
+      "roca"
+    ]
+  },
+  {
+    "archivo": "09_camino_agua/camino_curvo_90.glb",
+    "categoria": "camino_agua",
+    "nombre": "camino_curvo_90",
+    "medidas_m": {
+      "ancho": 8.34,
+      "fondo": 8.29,
+      "alto": 0.2
+    },
+    "triangulos": 1064,
+    "materiales": [
+      "camino",
+      "roca",
+      "roca_oscura"
+    ]
+  },
+  {
+    "archivo": "09_camino_agua/lago_v1.glb",
+    "categoria": "camino_agua",
+    "nombre": "lago_v1",
+    "medidas_m": {
+      "ancho": 13.94,
+      "fondo": 11.63,
+      "alto": 0.1
+    },
+    "triangulos": 80,
+    "materiales": [
+      "arena",
+      "agua"
+    ]
+  },
+  {
+    "archivo": "09_camino_agua/lago_v2.glb",
+    "categoria": "camino_agua",
+    "nombre": "lago_v2",
+    "medidas_m": {
+      "ancho": 14.16,
+      "fondo": 9.98,
+      "alto": 0.1
+    },
+    "triangulos": 80,
+    "materiales": [
+      "arena",
+      "agua"
+    ]
+  },
+  {
+    "archivo": "10_props/marcador_nivel.glb",
+    "categoria": "props",
+    "nombre": "marcador_nivel",
+    "medidas_m": {
+      "ancho": 1,
+      "fondo": 0.18,
+      "alto": 2.55
+    },
+    "triangulos": 152,
+    "materiales": [
+      "madera_oscura",
+      "oro",
+      "oro_claro"
+    ]
+  },
+  {
+    "archivo": "10_props/banca.glb",
+    "categoria": "props",
+    "nombre": "banca",
+    "medidas_m": {
+      "ancho": 1.7,
+      "fondo": 0.53,
+      "alto": 1
+    },
+    "triangulos": 108,
+    "materiales": [
+      "madera",
+      "madera_oscura"
+    ]
+  },
+  {
+    "archivo": "10_props/farola.glb",
+    "categoria": "props",
+    "nombre": "farola",
+    "medidas_m": {
+      "ancho": 0.48,
+      "fondo": 0.48,
+      "alto": 1.98
+    },
+    "triangulos": 152,
+    "materiales": [
+      "metal",
+      "luz"
+    ]
+  },
+  {
+    "archivo": "10_props/valla_3m.glb",
+    "categoria": "props",
+    "nombre": "valla_3m",
+    "medidas_m": {
+      "ancho": 3.3,
+      "fondo": 0.19,
+      "alto": 1.05
+    },
+    "triangulos": 60,
+    "materiales": [
+      "madera"
+    ]
+  },
+  {
+    "archivo": "10_props/jardinera.glb",
+    "categoria": "props",
+    "nombre": "jardinera",
+    "medidas_m": {
+      "ancho": 1.2,
+      "fondo": 0.28,
+      "alto": 0.32
+    },
+    "triangulos": 164,
+    "materiales": [
+      "madera",
+      "",
+      "petalo_rosa",
+      "hoja",
+      "petalo_naranja",
+      "petalo_rojo",
+      "petalo_morado"
+    ]
+  }
+]
