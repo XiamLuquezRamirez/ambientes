@@ -37,27 +37,16 @@
                         $primerNombre = explode(' ', trim((string) $estudiante->nombre))[0] ?? '';
                         $primerApellido = explode(' ', trim((string) ($estudiante->apellido ?? '')))[0] ?? '';
                         $nombreVisible = trim($primerNombre . ' ' . $primerApellido);
+                        $metaFicha = ! $tienePin ? 'Sin PIN' : ($bloqueado ? 'Bloqueado' : null);
                     @endphp
                     <a
                         href="{{ route('auth.pin', array_merge(['estudianteId' => $estudiante->id], $qsDestino)) }}"
-                        class="avatar-btn {{ $tienePin ? '' : 'avatar-btn--sin-pin' }}"
+                        class="avatar-btn {{ $tienePin ? '' : 'avatar-btn--sin-pin' }}{{ $esPolimotor ? ' kiosco-ficha-alumno' : '' }}"
                         style="--color-av: {{ $estudiante->color_avatar }};"
                         aria-label="{{ $nombreVisible }}{{ $tienePin ? '' : ' (sin PIN)' }}{{ $bloqueado ? ' (PIN bloqueado)' : '' }}"
                     >
                         @if ($esPolimotor)
-                            <span class="avatar-card">
-                                <span class="avatar-circulo">
-                                    <span class="avatar-circulo__contenido">
-                                        @include('auth._avatar-circulo')
-                                    </span>
-                                </span>
-                                <span class="avatar-nombre">{{ $nombreVisible }}</span>
-                                @if (! $tienePin)
-                                    <span class="avatar-meta">Sin PIN</span>
-                                @elseif ($bloqueado)
-                                    <span class="avatar-meta">Bloqueado</span>
-                                @endif
-                            </span>
+                            @include('auth._avatar-ficha', ['nombreFicha' => $nombreVisible, 'metaFicha' => $metaFicha])
                             @if (! $tienePin)
                                 <span class="avatar-badge" title="Sin PIN" aria-hidden="true">
                                     <i class="fas fa-lock"></i>

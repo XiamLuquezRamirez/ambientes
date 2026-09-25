@@ -441,9 +441,6 @@
         setTimeout(ocultarPantalla, 1250);
     }
 
-    function cerrar_anuncio() {
-        empezarJuegoTrasIntro();
-    }
     window.cerrar_anuncio = function cerrar_anuncio() {
         empezarJuegoTrasIntro();
     };

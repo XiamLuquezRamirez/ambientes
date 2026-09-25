@@ -47,7 +47,7 @@
   },
   "escenario": {
     "fondo": "img/ESCENARIO.png",
-    "zona": { "x": 8, "y": 15, "w": 84, "h": 70 }
+    "zona": { "x": 14.5, "y": 18, "w": 74.5, "h": 65 }
   },
   "meta": {
     "imagen": "img/COHETE_SIN-SOMBRA.png",
