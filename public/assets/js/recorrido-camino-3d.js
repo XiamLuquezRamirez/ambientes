@@ -3369,7 +3369,10 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         // [0] = casa1.glb, [1] = casa2.glb. Suma o resta 90 si la puerta queda de lado.
         const GIRO_CASA_GRADOS = [0, 0];
         // Metros en vertical. Negativo baja la casa. Mismos índices que el giro.
-        const ALTURA_CASA = [0, 0];
+        const ALTURA_CASA = [-0.7, -1.7];
+        // 1 = el tamaño base (~9 m de lado). Mayor crece, menor encoge.
+        // [0] = casa1.glb, [1] = casa2.glb.
+        const ESCALA_CASA = [1.5, 1.2];
         const tareas = [];
         Object.values(nodos).forEach((nodo) => {
             if (!nodo.spur || !esParadaExperiencia(nodo.parada)) return;
@@ -3382,11 +3385,13 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
                 tang.y = 0;
                 if (tang.lengthSq() < 1e-6) tang.set(0, 0, 1);
                 tang.normalize();
-                casa.updateMatrixWorld(true);
+                const escala = Number.isFinite(ESCALA_CASA[indice % 2]) ? ESCALA_CASA[indice % 2] : 1;
+                casa.scale.setScalar(escala);
                 const frente = Number(casa.userData.frente);
                 // El nodo de la puerta queda hundido respecto a los escalones.
                 // Se acerca la casa para que la tierra llegue al umbral.
-                const avance = (Number.isFinite(frente) && frente > 1) ? Math.max(1.6, frente - 1.45) : 2.4;
+                const avanceBase = (Number.isFinite(frente) && frente > 1) ? Math.max(1.6, frente - 1.45) : 2.4;
+                const avance = avanceBase * escala;
                 const puesto = fin.clone().addScaledVector(tang, avance);
                 puesto.y = (mundo ? mundo.altura(puesto.x, puesto.z) : fin.y) + (ALTURA_CASA[indice % 2] || 0);
                 casa.position.copy(puesto);
