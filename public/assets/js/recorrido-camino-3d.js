@@ -775,8 +775,9 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
 
             // poste de madera (cilindro liso). Sin base cónica (causaba artefactos
             // de líneas en la estación activa por las aristas rasantes al suelo).
-            const poste = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 4.4, 12), matMadera);
-            poste.position.y = 2.2; poste.castShadow = true; g.add(poste);
+            // Poste hasta casi el borde inferior del medallón (centro 5.35, radio 1.15).
+            const poste = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 4.05, 12), matMadera);
+            poste.position.y = 2.025; poste.castShadow = true; g.add(poste);
 
             const colorMed = par.id === 'inicio' ? '#facc15' : (par.id === 'fin' ? '#ec4899' : '#f59e0b');
             const colorBorde = par.id === 'inicio' ? '#a16207' : (par.id === 'fin' ? '#9d174d' : '#b45309');
@@ -785,14 +786,14 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
             const texCartel = texturaCartel(numeroParada(par, i), colorMed, colorBorde);
             const matCartel = new THREE.MeshBasicMaterial({ map: texCartel, transparent: true, depthWrite: true });
             const medallon = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 2.3), matCartel);
-            medallon.position.y = 4.8; medallon.userData.baseY = 4.8;
+            medallon.position.y = 5.35; medallon.userData.baseY = 5.35;
             medallon.castShadow = false; medallon.receiveShadow = false;
             g.add(medallon);
 
             // aro luminoso para la estación siguiente
             const aro = new THREE.Mesh(new THREE.TorusGeometry(1.55, 0.13, 12, 32),
                 new THREE.MeshBasicMaterial({ color: '#fde047' }));
-            aro.position.y = 4.8; aro.visible = false; g.add(aro);
+            aro.position.y = 5.35; aro.visible = false; g.add(aro);
 
             // En la parada de INICIO el niño está de pie ahí mismo: ocultamos su
             // poste y medallón para que no le tapen la cara.
@@ -1971,8 +1972,10 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
     const VELOCIDAD_CAMARA_HABLA = 0.052;
     function actualizarCamara(inmediato) {
         const p = personaje.position;
-        const hablando = narrando || mostrandoBocadillo;
-        mezclaHabla += ((hablando ? 1 : 0) - mezclaHabla) * (inmediato ? 1 : VELOCIDAD_CAMARA_HABLA);
+        const paradaActual = nodoActual && nodos[nodoActual] ? nodos[nodoActual].parada : null;
+        const enExperiencia = !!(paradaActual && esParadaExperiencia(paradaActual));
+        const acercarHabla = (narrando || mostrandoBocadillo) && !enExperiencia;
+        mezclaHabla += ((acercarHabla ? 1 : 0) - mezclaHabla) * (inmediato ? 1 : VELOCIDAD_CAMARA_HABLA);
         if (mezclaHabla < 0.001) mezclaHabla = 0;
         if (mezclaHabla > 0.999) mezclaHabla = 1;
 
