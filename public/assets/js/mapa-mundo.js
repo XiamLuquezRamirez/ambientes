@@ -49,7 +49,7 @@ function cargarModelo(ruta) {
                     local: o.matrixWorld.clone(),
                 });
             });
-            return { ruta, partes, root };
+            return { ruta, partes, root, animations: gltf.animations || [] };
         }));
     }
     return cache.get(ruta);
@@ -454,6 +454,10 @@ export async function armarMundo(scene, { modesto = false, ambiente = '' } = {})
         despejarArboles: (curvas, radio) => {
             const muestras = [];
             (curvas || []).forEach((c) => {
+                if (Array.isArray(c) && c.length >= 2 && typeof c[0] === 'number') {
+                    muestras.push(c);
+                    return;
+                }
                 if (!c || typeof c.getPoint !== 'function') return;
                 for (let s = 0; s <= 56; s++) {
                     const p = c.getPoint(s / 56);
@@ -536,6 +540,54 @@ export async function clonarCasa(indice) {
         if (p.z > 0.8) frente = p.z;
     }
     grupo.userData.frente = frente;
+    const clips = modelo.animations || [];
+    if (clips.length) {
+        const mixer = new THREE.AnimationMixer(root);
+        clips.forEach((clip) => {
+            const accion = mixer.clipAction(clip);
+            accion.setLoop(THREE.LoopRepeat, Infinity);
+            accion.play();
+        });
+        grupo.userData.mixer = mixer;
+        grupo.traverse((o) => {
+            if (o.isMesh) o.frustumCulled = false;
+        });
+    }
+    return grupo;
+}
+
+/** Castillo del final. El GLB trae el castillo y dos piezas sueltas a ~200 m; esas no se usan. */
+export async function clonarCastillo() {
+    const modelo = await cargarModelo('07_casas_tematicas/castillo');
+    const root = modelo.root.clone(true);
+    const sobra = [];
+    root.children.forEach((hijo) => {
+        let esCastillo = false;
+        hijo.traverse((o) => {
+            if (o.name && o.name.indexOf('castle_uv') !== -1) esCastillo = true;
+        });
+        if (!esCastillo) sobra.push(hijo);
+    });
+    sobra.forEach((o) => root.remove(o));
+    root.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(root);
+    const size = box.getSize(new THREE.Vector3());
+    const s = 16 / Math.max(size.x, size.z, 0.001);
+    const grupo = new THREE.Group();
+    root.scale.setScalar(s);
+    root.updateMatrixWorld(true);
+    const box2 = new THREE.Box3().setFromObject(root);
+    const c = box2.getCenter(new THREE.Vector3());
+    root.position.set(-c.x, -box2.min.y, -c.z);
+    grupo.add(root);
+    grupo.traverse((o) => {
+        if (!o.isMesh) return;
+        o.castShadow = true;
+        o.receiveShadow = true;
+        o.frustumCulled = false;
+    });
+    grupo.updateMatrixWorld(true);
+    grupo.userData.frente = new THREE.Box3().setFromObject(grupo).getSize(new THREE.Vector3()).z * 0.5;
     return grupo;
 }
 

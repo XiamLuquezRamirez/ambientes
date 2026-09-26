@@ -10,7 +10,7 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
-import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './mapa-mundo.js?v=20260925f';
+import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEstable } from './mapa-mundo.js?v=20260925h';
 
 (function () {
     'use strict';
@@ -2009,7 +2009,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
     // ===================== Interacción =====================
     let raycaster, puntero;
     function alTocar(clientX, clientY) {
-        if (caminando || juegosAbiertos) return;
+        if (caminando || juegosAbiertos || mostrandoBocadillo || entrandoSaliendo) return;
         puntero.x = (clientX / window.innerWidth) * 2 - 1;
         puntero.y = -(clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(puntero, camera);
@@ -2033,9 +2033,13 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         if (!hit) return;
         const id = hit.object.userData.estId;
         if (id === nodoActual && visitados.has(id)) {
-            // reabrir el modal de la estación actual
             const est = estacionPorId(id);
-            if (est) abrirModalParada(est.indice);
+            if (!est || est.parada.id === 'inicio') return;
+            if (esParadaExperiencia(est.parada)) {
+                entrarYHablarExperiencia(est.parada);
+            } else if (est.parada.id !== 'fin') {
+                decirAlLlegar(est.parada);
+            }
         } else if (esTocable(id)) {
             caminarA(id);
         }
@@ -2191,60 +2195,129 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
     // o reaparece en la puerta y crece caminando de vuelta (sale). onFin al terminar.
     let animCasa = null; // { modo:'entrar'|'salir', ini, dur, desde, puerta, base, onFin }
     function animarEntradaSalida(now) {
-        if (!animCasa) return;
+        if (!animCasa || !personaje) return;
         const a = animCasa;
         const k = Math.min(1, (now - a.ini) / a.dur);
         const ease = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-        if (a.modo === 'entrar') {
-            personaje.position.lerpVectors(a.desde, a.puerta, ease);
-            const s = 1 - ease;                       // se encoge al entrar
-            personaje.scale.setScalar(a.base * Math.max(0.001, s));
-            personaje.visible = ease < 0.98;
-            // pasitos rápidos mientras entra
-            const paso = Math.sin(now / 80);
-            if (piernaIzq) { piernaIzq.rotation.x = paso * 0.7; piernaDer.rotation.x = -paso * 0.7; }
-        } else { // salir
-            personaje.visible = true;
-            personaje.position.lerpVectors(a.puerta, a.desde, ease);
-            const s = ease;                           // crece al salir
-            personaje.scale.setScalar(a.base * Math.max(0.001, s));
-            const paso = Math.sin(now / 80);
-            if (piernaIzq) { piernaIzq.rotation.x = paso * 0.7; piernaDer.rotation.x = -paso * 0.7; }
+        personaje.visible = true;
+        personaje.scale.setScalar(a.base);
+        if (a.modo === 'girar') {
+            // Giro en el sitio, adentro: no se desplaza ni se sale del muro.
+            personaje.position.copy(a.ancla);
+            if (mundo) personaje.position.y = mundo.altura(a.ancla.x, a.ancla.z);
+            let delta = a.rot1 - a.rot0;
+            while (delta > Math.PI) delta -= Math.PI * 2;
+            while (delta < -Math.PI) delta += Math.PI * 2;
+            personaje.rotation.y = a.rot0 + delta * ease;
+        } else {
+            const desde = a.modo === 'entrar' ? a.desde : a.puerta;
+            const hacia = a.modo === 'entrar' ? a.puerta : a.desde;
+            personaje.position.lerpVectors(desde, hacia, ease);
+            if (mundo) personaje.position.y = mundo.altura(personaje.position.x, personaje.position.z);
+            const dx = hacia.x - desde.x;
+            const dz = hacia.z - desde.z;
+            if (dx * dx + dz * dz > 0.04) personaje.rotation.y = Math.atan2(dx, dz);
         }
         if (k >= 1) {
+            if (a.modo === 'girar') {
+                personaje.position.copy(a.ancla);
+                if (mundo) personaje.position.y = mundo.altura(a.ancla.x, a.ancla.z);
+                personaje.rotation.y = a.rot1;
+            } else {
+                const hacia = a.modo === 'entrar' ? a.puerta : a.desde;
+                personaje.position.copy(hacia);
+                if (mundo) personaje.position.y = mundo.altura(hacia.x, hacia.z);
+            }
             personaje.scale.setScalar(a.base);
-            if (piernaIzq) { piernaIzq.rotation.x = 0; piernaDer.rotation.x = 0; }
-            if (a.modo === 'entrar') personaje.visible = false;
-            else personaje.visible = true;
-            const fin = a.onFin; animCasa = null; entrandoSaliendo = false;
+            personaje.visible = true;
+            const fin = a.onFin;
+            animCasa = null;
+            entrandoSaliendo = false;
             if (fin) fin();
         }
     }
 
     function entrarACasa(onFin) {
         const puerta = puertasCasa[nodoActual];
-        if (!puerta) { if (onFin) onFin(); return; }   // sin casa (no debería pasar en exp)
+        if (!puerta || !personaje) { if (onFin) onFin(); return; }
         entrandoSaliendo = true;
+        const desde = personaje.position.clone();
+        const dist = Math.hypot(puerta.x - desde.x, puerta.z - desde.z);
         animCasa = {
-            modo: 'entrar', ini: performance.now(), dur: 900,
-            desde: personaje.position.clone(),
-            puerta: new THREE.Vector3(puerta.x, 0, puerta.z),
-            base: personaje.scale.x, onFin: onFin || null,
+            modo: 'entrar',
+            ini: performance.now(),
+            dur: Math.max(1800, (dist / 1.6) * 1000),
+            desde: desde,
+            puerta: puerta.clone(),
+            base: personaje.scale.x || 1,
+            onFin: onFin || null,
         };
     }
+    // Posición del punto 3 (temática / cruce). Ahí vuelve al salir de la casa.
+    function posPunto3() {
+        if (idModulo && nodos[idModulo] && nodos[idModulo].pos) return nodos[idModulo].pos.clone();
+        const est = estacionPorId(nodoActual);
+        return est && est.grupo ? est.grupo.position.clone() : null;
+    }
+
     function salirDeCasa(onFin) {
         const puerta = puertasCasa[nodoActual];
-        if (!puerta) { personaje.visible = true; if (onFin) onFin(); return; }
+        if (!puerta || !personaje) { if (personaje) personaje.visible = true; if (onFin) onFin(); return; }
         entrandoSaliendo = true;
-        // el destino de salida es la estación de la experiencia (donde estaba)
-        const est = estacionPorId(nodoActual);
-        const destino = est ? est.grupo.position.clone() : personaje.position.clone();
-        animCasa = {
-            modo: 'salir', ini: performance.now(), dur: 900,
-            desde: new THREE.Vector3(destino.x, 0, destino.z),
-            puerta: new THREE.Vector3(puerta.x, 0, puerta.z),
-            base: personaje.scale.x, onFin: onFin || null,
+        const ancla = puerta.clone();
+        if (mundo) ancla.y = mundo.altura(ancla.x, ancla.z);
+        personaje.position.copy(ancla);
+        const mira = posPunto3() || ancla;
+        const rot0 = personaje.rotation.y;
+        let rot1 = Math.atan2(mira.x - ancla.x, mira.z - ancla.z);
+        let delta = rot1 - rot0;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        rot1 = rot0 + delta;
+        const base = personaje.scale.x || 1;
+        // Sale por la puerta, al centro del sendero, no hacia el marcador de al lado.
+        const camino = (nodos[nodoActual] && nodos[nodoActual].pos)
+            ? nodos[nodoActual].pos.clone()
+            : ancla.clone();
+        if (mundo) camino.y = mundo.altura(camino.x, camino.z);
+        const caminarDeVuelta = function () {
+            const dist = Math.hypot(camino.x - ancla.x, camino.z - ancla.z);
+            if (dist < 0.35) { if (onFin) onFin(); return; }
+            entrandoSaliendo = true;
+            animCasa = {
+                modo: 'salir',
+                ini: performance.now(),
+                dur: Math.max(900, (dist / 2.2) * 1000),
+                desde: camino,
+                puerta: ancla.clone(),
+                base: base,
+                onFin: onFin || null,
+            };
         };
+        if (Math.abs(delta) < 0.12) {
+            caminarDeVuelta();
+            return;
+        }
+        animCasa = {
+            modo: 'girar',
+            ini: performance.now(),
+            dur: Math.max(450, Math.abs(delta) / Math.PI * 700),
+            ancla: ancla,
+            rot0: rot0,
+            rot1: rot1,
+            base: base,
+            onFin: caminarDeVuelta,
+        };
+    }
+
+    function entrarYHablarExperiencia(p) {
+        entrarACasa(function () {
+            hablaSinVoltear = true;
+            decirAlLlegar(p, function () {
+                hablaSinVoltear = false;
+                iniciarExperiencia();
+            });
+        });
     }
 
     function terminarAvance() {
@@ -2277,16 +2350,16 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
             return;
         }
 
-        // AUTOMÁTICO al llegar: en experiencia → ENTRA a la casa y luego abre el
-        // modal; en otras paradas, abre su modal directo.
+        // En la experiencia voltea hacia la casa, camina unos pasos y se queda
+        // adentro. La frase suena ya dentro; después empieza la actividad.
         if (p && esParadaExperiencia(p)) {
-            entrarACasa(() => abrirExperiencia());
+            entrarYHablarExperiencia(p);
         } else if (p && p.id !== 'inicio' && p.id !== 'fin') {
-            abrirModalParada(indiceActual);
+            decirAlLlegar(p);
         } else if (p && p.id === 'fin') {
-            narrarParada(p);
-            iniciarFuegos();          // ¡fuegos pirotécnicos sobre el castillo!
-            mostrarCelebracionFin();  // overlay de celebración (confeti + mensaje)
+            decirAlLlegar(p);
+            iniciarFuegos();
+            mostrarCelebracionFin();
         }
         if (cb) cb();
     }
@@ -2315,6 +2388,121 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         }
     }
     function narrarParada(p, alTerminar) { hablar(fraseParada(p), alTerminar); }
+
+    // Misma nube del saludo: el texto que se lee es el que se escucha.
+    // Se queda un mínimo para poder leerla si la voz falla, y no corta una frase corta.
+    let dialogoToken = 0;
+    let alCerrarVideo = null;
+    let preguntandoVideo = false;
+
+    function pintarOpcionesDialogo(opciones, alElegir) {
+        const caja = elBocadillo.querySelector('.rn3d-bocadillo__opciones');
+        if (!caja) return;
+        caja.innerHTML = '';
+        if (!opciones || !opciones.length) {
+            caja.hidden = true;
+            return;
+        }
+        caja.hidden = false;
+        opciones.forEach(function (op) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'rn3d-bocadillo__op rn3d-bocadillo__op--' + (op.tono || 'no');
+            b.textContent = op.texto;
+            b.addEventListener('click', function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                detenerNarracion();
+                if (alElegir) alElegir(op);
+            });
+            caja.appendChild(b);
+        });
+    }
+
+    function mostrarDialogo(texto, alTerminar, opciones) {
+        if (!elBocadillo) {
+            if (alTerminar) alTerminar();
+            return;
+        }
+        const textoEl = elBocadillo.querySelector('.rn3d-bocadillo__texto');
+        if (textoEl) textoEl.textContent = texto || '';
+        mostrandoBocadillo = true;
+        elBocadillo.classList.remove('rn3d-oculto');
+        const token = ++dialogoToken;
+        const tIni = performance.now();
+        const durMin = 4800;
+        const esperaRespuesta = !!(opciones && opciones.length);
+        let cerrado = false;
+        const cerrar = function () {
+            if (cerrado || token !== dialogoToken) return;
+            cerrado = true;
+            mostrandoBocadillo = false;
+            elBocadillo.classList.add('rn3d-oculto');
+            pintarOpcionesDialogo(null);
+            if (alTerminar) alTerminar();
+        };
+        if (esperaRespuesta) {
+            pintarOpcionesDialogo(opciones, function (op) {
+                if (cerrado || token !== dialogoToken) return;
+                cerrado = true;
+                mostrandoBocadillo = false;
+                elBocadillo.classList.add('rn3d-oculto');
+                pintarOpcionesDialogo(null);
+                if (op && op.accion) op.accion();
+            });
+            hablar(texto);
+            return;
+        }
+        pintarOpcionesDialogo(null);
+        hablar(texto, function () {
+            const falta = durMin - (performance.now() - tIni);
+            if (falta > 0) setTimeout(cerrar, falta);
+            else cerrar();
+        });
+        setTimeout(cerrar, 14000);
+    }
+
+    function soltarTrasVideo() {
+        paradaVideoActual = null;
+        preguntandoVideo = false;
+        const cb = alCerrarVideo;
+        alCerrarVideo = null;
+        if (cb) cb();
+    }
+
+    function preguntarSiReverVideo() {
+        if (preguntandoVideo || !paradaVideoActual) return;
+        preguntandoVideo = true;
+        const p = paradaVideoActual;
+        mostrarDialogo('¿Lo quieres ver de nuevo?', null, [
+            {
+                texto: 'Sí',
+                tono: 'si',
+                accion: function () {
+                    preguntandoVideo = false;
+                    reproducirVideoParada(p);
+                },
+            },
+            {
+                texto: 'No',
+                tono: 'no',
+                accion: function () { soltarTrasVideo(); },
+            },
+        ]);
+    }
+
+    function decirAlLlegar(p, alTerminar) {
+        mostrarDialogo(fraseParada(p), function () {
+            if (esVideoParada(p)) {
+                alCerrarVideo = alTerminar || null;
+                const empezo = reproducirVideoParada(p);
+                if (!empezo) soltarTrasVideo();
+                return;
+            }
+            if (esImagenParada(p)) reproducirImagenParada(p);
+            if (alTerminar) alTerminar();
+        });
+    }
 
     function tipoMediaParada(p) {
         if (!p) return 'ninguno';
@@ -2375,14 +2563,14 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
                 const d = JSON.parse(e.data);
                 const finYoutube = (d.event === 'infoDelivery' && d.info && d.info.playerState === 0)
                     || (d.event === 'onStateChange' && d.info === 0);
-                if (finYoutube) finalizarVideoParada();
+                if (finYoutube) finalizarVideoParada(true);
             } catch (err) { /* noop */ }
         }
 
         if (embed === 'vimeo' && String(e.origin || '').includes('vimeo.com')) {
             try {
                 const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-                if (d && d.event === 'finish') finalizarVideoParada();
+                if (d && d.event === 'finish') finalizarVideoParada(true);
             } catch (err) { /* noop */ }
         }
     }
@@ -2403,7 +2591,10 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         );
     }
 
-    function finalizarVideoParada() {
+    let generacionVideo = 0;
+
+    function finalizarVideoParada(preguntar) {
+        generacionVideo++;
         const $fs = $('#rn3dVideoFs');
         const vid = $fs.find('video')[0];
         if (vid) {
@@ -2413,7 +2604,9 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         $('#rn3dVideoFsInner').empty();
         ocultarOverlayVideo();
         desactivarEscuchaEmbedVideo();
-        if (paradaVideoActual) mostrarVolverAVerVideo();
+        if (preguntar && paradaVideoActual && esVideoParada(paradaVideoActual)) {
+            preguntarSiReverVideo();
+        }
     }
 
     function detenerVideoParada() {
@@ -2427,6 +2620,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         $('#rn3dVideoFsInner').empty();
         ocultarOverlayVideo();
         desactivarEscuchaEmbedVideo();
+        preguntandoVideo = false;
         $('#rnModalVideo').prop('hidden', true).attr('aria-hidden', 'true').empty();
     }
 
@@ -2451,12 +2645,13 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
     }
 
     function reproducirVideoParada(p) {
-        if (!p || !esVideoParada(p)) return;
+        if (!p || !esVideoParada(p)) return false;
 
         paradaVideoActual = p;
         const { embed, embedUrl } = datosVideoParada(p);
-        if (!embedUrl) return;
+        if (!embedUrl) return false;
 
+        const gen = ++generacionVideo;
         const $fs = $('#rn3dVideoFs');
         const $inner = $('#rn3dVideoFsInner');
         $inner.empty();
@@ -2481,7 +2676,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
             $inner[0].appendChild(iframe);
             activarEscuchaEmbedVideo();
             mostrarOverlayVideo('video');
-            return;
+            return true;
         }
 
         const video = document.createElement('video');
@@ -2492,14 +2687,27 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         video.setAttribute('webkit-playsinline', 'true');
         $inner[0].appendChild(video);
 
-        const alFinDirecto = function () { finalizarVideoParada(); };
+        const alFinDirecto = function () {
+            if (gen !== generacionVideo) return;
+            finalizarVideoParada(true);
+        };
         video.addEventListener('ended', alFinDirecto, { once: true });
-        video.addEventListener('error', alFinDirecto, { once: true });
+        video.addEventListener('error', function () {
+            if (gen !== generacionVideo) return;
+            finalizarVideoParada(false);
+            soltarTrasVideo();
+        }, { once: true });
 
         mostrarOverlayVideo('video');
-        video.play().catch(function () {
-            finalizarVideoParada();
-        });
+        const juego = video.play();
+        if (juego && typeof juego.catch === 'function') {
+            juego.catch(function () {
+                if (gen !== generacionVideo) return;
+                finalizarVideoParada(false);
+                soltarTrasVideo();
+            });
+        }
+        return true;
     }
 
     // ===================== MODALES — reusa el DOM del kiosco =====================
@@ -2740,7 +2948,8 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
 
     // ===================== HUD + etiqueta (overlay 2D sobre el canvas) =====================
     let elFill, elPaso, elHint, elEtiqueta, elIniciar, elBocadillo;
-    let mostrandoBocadillo = false; // true solo mientras el personaje "habla" al inicio
+    let mostrandoBocadillo = false; // true solo mientras el personaje "habla"
+    let hablaSinVoltear = false;    // en la casa no se gira hacia la cámara
     function actualizarHud(enMov) {
         if (!elFill) return;
         const pct = Math.round((indiceMaximoVisitado / (N - 1)) * 100);
@@ -2830,6 +3039,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
             + '<div class="rn3d-bocadillo rn3d-oculto" id="rn3dBocadillo">'
             +   '<div class="rn3d-bocadillo__nube">'
             +     '<p class="rn3d-bocadillo__texto">¡Hola! 👋<br>Bienvenido a esta aventura. Yo te voy a acompañar. ¡Vamos juntos!</p>'
+            +     '<div class="rn3d-bocadillo__opciones" hidden></div>'
             +     '<span class="rn3d-bocadillo__pico"></span>'
             +   '</div>'
             + '</div>'
@@ -2905,6 +3115,12 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         const dt = ultimoNow ? Math.min(0.1, (now - ultimoNow) / 1000) : 0.016;
         ultimoNow = now;
         if (mundo) mundo.actualizar(dt, now / 1000);
+        if (grupoCasas) {
+            for (let i = 0; i < grupoCasas.children.length; i++) {
+                const mx = grupoCasas.children[i].userData.mixer;
+                if (mx) mx.update(dt);
+            }
+        }
         animarFuegos(dt);
         animarEntradaSalida(now);
         let poseCamino = null;
@@ -2919,7 +3135,10 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         }
         if (mixer) {
             const hablando = narrando || mostrandoBocadillo;
-            const clip = caminando ? clipMovimiento : (hablando ? (mostrandoBocadillo ? 'Wave' : 'Yes') : 'Idle');
+            const entrandoAndando = entrandoSaliendo && animCasa && animCasa.modo !== 'girar';
+            const clip = (caminando || entrandoAndando)
+                ? (entrandoAndando ? 'Walk' : clipMovimiento)
+                : (hablando ? ((mostrandoBocadillo && !hablaSinVoltear) ? 'Wave' : 'Yes') : 'Idle');
             ponerClip(clip);
             mixer.update(dt);
         }
@@ -3363,17 +3582,17 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
         grupoCasas = new THREE.Group();
         grupoCasas.name = 'casas-experiencia';
         if (scene) scene.add(grupoCasas);
-        if (!esRamificado) return;
+        const tareas = [];
+        if (esRamificado) {
         // Giro manual, en grados, alrededor de la vertical.
         // 0 = el frente del GLB (su eje +Z, donde está la puerta) mira al camino.
         // [0] = casa1.glb, [1] = casa2.glb. Suma o resta 90 si la puerta queda de lado.
         const GIRO_CASA_GRADOS = [0, 0];
         // Metros en vertical. Negativo baja la casa. Mismos índices que el giro.
-        const ALTURA_CASA = [-0.7, -1.7];
+        const ALTURA_CASA = [-1.5, -1.7];
         // 1 = el tamaño base (~9 m de lado). Mayor crece, menor encoge.
         // [0] = casa1.glb, [1] = casa2.glb.
-        const ESCALA_CASA = [1.5, 1.2];
-        const tareas = [];
+        const ESCALA_CASA = [1, 1];
         Object.values(nodos).forEach((nodo) => {
             if (!nodo.spur || !esParadaExperiencia(nodo.parada)) return;
             const idExp = nodo.parada.experiencia_id || nodo.parada.id;
@@ -3397,11 +3616,59 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
                 casa.position.copy(puesto);
                 const extra = (GIRO_CASA_GRADOS[indice % 2] || 0) * Math.PI / 180;
                 casa.rotation.y = Math.atan2(-tang.x, -tang.z) + extra;
-                puertasCasa[nodo.parada.id] = fin.clone();
+                const hastaDentro = Math.max(2.8, Math.min(avance * 0.8, 5.5));
+                const dentro = fin.clone().addScaledVector(tang, hastaDentro);
+                dentro.y = mundo ? mundo.altura(dentro.x, dentro.z) : fin.y;
+                puertasCasa[nodo.parada.id] = dentro;
                 grupoCasas.add(casa);
             }).catch((err) => { console.error(err); }));
         });
+        }
+        tareas.push(colocarCastillo());
         await Promise.all(tareas);
+    }
+
+    async function colocarCastillo() {
+        if (!grupoCasas || !curva) return;
+        // 0 = el frente del modelo (su +Z) mira hacia el camino. Suma o resta 90 si queda de lado.
+        const GIRO_CASTILLO_GRADOS = 0;
+        // Metros en vertical. Negativo baja el castillo.
+        const ALTURA_CASTILLO = 0;
+        // 1 = el tamaño base (~16 m de ancho).
+        const ESCALA_CASTILLO = 1;
+        let castillo;
+        try {
+            castillo = await clonarCastillo();
+        } catch (err) {
+            console.error(err);
+            return;
+        }
+        if (!grupoCasas || !scene) return;
+        const fin = curva.getPoint(1);
+        const tang = curva.getTangent(1);
+        tang.y = 0;
+        if (tang.lengthSq() < 1e-6) tang.set(1, 0, 0);
+        tang.normalize();
+        const escala = Number.isFinite(ESCALA_CASTILLO) ? ESCALA_CASTILLO : 1;
+        castillo.scale.setScalar(escala);
+        const frente = Number(castillo.userData.frente);
+        const alcance = (Number.isFinite(frente) && frente > 1) ? frente : 6;
+        const puesto = fin.clone().addScaledVector(tang, alcance * escala);
+        puesto.y = (mundo ? mundo.altura(puesto.x, puesto.z) : fin.y) + (ALTURA_CASTILLO || 0);
+        castillo.position.copy(puesto);
+        castillo.rotation.y = Math.atan2(-tang.x, -tang.z) + (GIRO_CASTILLO_GRADOS || 0) * Math.PI / 180;
+        grupoCasas.add(castillo);
+        if (mundo && typeof mundo.despejarArboles === 'function') {
+            const lado = new THREE.Vector3(-tang.z, 0, tang.x);
+            const r = alcance * escala;
+            mundo.despejarArboles([
+                [puesto.x, puesto.z],
+                [puesto.x + tang.x * r, puesto.z + tang.z * r],
+                [puesto.x - tang.x * r, puesto.z - tang.z * r],
+                [puesto.x + lado.x * r, puesto.z + lado.z * r],
+                [puesto.x - lado.x * r, puesto.z - lado.z * r],
+            ], 11);
+        }
     }
 
     function colocarProxyCarpa() {
@@ -3473,6 +3740,12 @@ import { armarMundo, cargarPersonaje, clonarCasa, indiceCasaEstable } from './ma
             grupoRamas = null;
         }
         if (grupoCasas) {
+            grupoCasas.children.forEach((casa) => {
+                const mx = casa.userData && casa.userData.mixer;
+                if (!mx) return;
+                mx.stopAllAction();
+                casa.userData.mixer = null;
+            });
             if (grupoCasas.parent) grupoCasas.parent.remove(grupoCasas);
             grupoCasas = null;
         }
