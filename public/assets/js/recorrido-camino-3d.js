@@ -10,7 +10,7 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
-import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEstable } from './mapa-mundo.js?v=20260925h';
+import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEstable } from './mapa-mundo.js?v=20260926a';
 
 (function () {
     'use strict';
@@ -75,6 +75,9 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
     let accionesPersonaje = null;
     let clipActual = '';
     let clipMovimiento = 'Walk';
+    let personajeCual = 'nino';
+    let cambiandoPersonaje = false;
+    let zoomCam = 1;
     let onCanvasClick = null;
     let N = 0;
     let audioNarracion = null;
@@ -1973,15 +1976,125 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
             if (est) foco = p.clone().lerp(est.grupo.position, 0.42);
         }
         // Cámara 3/4 MÁS alejada: se ve más camino y el mapa en general.
+        const z = zoomCam;
         const deseadaPos = usaMapaGlb
-            ? new THREE.Vector3(foco.x - 16, foco.y + 18, foco.z + 22)
-            : new THREE.Vector3(foco.x - 9, 34, foco.z + 48);
+            ? new THREE.Vector3(foco.x - 16 * z, foco.y + 18 * z, foco.z + 22 * z)
+            : new THREE.Vector3(foco.x - 9 * z, 34 * z, foco.z + 48 * z);
         const deseadaTgt = usaMapaGlb
             ? new THREE.Vector3(foco.x + 6, foco.y + 1.6, foco.z - 4)
             : new THREE.Vector3(foco.x + 2, 2, foco.z - 6);
         const k = inmediato ? 1 : 0.05;
         camPos.lerp(deseadaPos, k); camTarget.lerp(deseadaTgt, k);
         camera.position.copy(camPos); camera.lookAt(camTarget);
+    }
+
+    const ZOOM_MIN = 0.55;
+    const ZOOM_MAX = 1.75;
+    const ZOOM_PASO = 0.18;
+
+    function ajustarZoom(delta) {
+        zoomCam = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoomCam + delta));
+        const btnCerca = document.getElementById('rn3dMenuAcercar');
+        const btnLejos = document.getElementById('rn3dMenuAlejar');
+        if (btnCerca) btnCerca.disabled = zoomCam <= ZOOM_MIN + 0.001;
+        if (btnLejos) btnLejos.disabled = zoomCam >= ZOOM_MAX - 0.001;
+    }
+
+    async function cambiarPersonaje() {
+        if (cambiandoPersonaje || !scene || !personaje) return;
+        cambiandoPersonaje = true;
+        const btn = document.getElementById('rn3dMenuPersonaje');
+        if (btn) btn.disabled = true;
+        const otro = personajeCual === 'nina' ? 'nino' : 'nina';
+        try {
+            const pj = await cargarPersonaje(scene, otro);
+            const pos = personaje.position.clone();
+            const rotY = personaje.rotation.y;
+            const visible = personaje.visible;
+            if (mixer) mixer.stopAllAction();
+            scene.remove(personaje);
+            personaje = pj.objeto;
+            mixer = pj.mixer;
+            accionesPersonaje = pj.acciones;
+            clipActual = '';
+            personajeCual = pj.cual;
+            personaje.position.copy(pos);
+            personaje.rotation.y = rotY;
+            personaje.visible = visible;
+            ponerClip('Idle');
+        } catch (err) {
+            console.error(err);
+        }
+        cambiandoPersonaje = false;
+        if (btn) btn.disabled = false;
+    }
+
+    function volverAlInicio() {
+        detenerNarracion();
+        if (window.KioscoNav && typeof window.KioscoNav.ir === 'function') {
+            window.KioscoNav.ir('/inicio', true);
+            return;
+        }
+        window.location.href = '/inicio';
+    }
+
+    function construirMenuLateral(raiz) {
+        const menu = document.createElement('aside');
+        menu.className = 'rn3d-menu is-cerrado';
+        menu.id = 'rn3dMenu';
+        menu.innerHTML = ''
+            + '<button type="button" class="rn3d-menu__toggle" id="rn3dMenuToggle" aria-expanded="false" aria-controls="rn3dMenuPanel" aria-label="Abrir menú">'
+            +   '<i class="fa-solid fa-bars" aria-hidden="true"></i>'
+            + '</button>'
+            + '<div class="rn3d-menu__panel" id="rn3dMenuPanel">'
+            +   '<button type="button" class="rn3d-menu__btn" id="rn3dMenuPersonaje">'
+            +     '<i class="fa-solid fa-user" aria-hidden="true"></i><span>Cambiar personaje</span>'
+            +   '</button>'
+            +   '<button type="button" class="rn3d-menu__btn" id="rn3dMenuInicio">'
+            +     '<i class="fa-solid fa-house" aria-hidden="true"></i><span>Volver al inicio</span>'
+            +   '</button>'
+            +   '<div class="rn3d-menu__zoom">'
+            +     '<button type="button" class="rn3d-menu__btn rn3d-menu__btn--icono" id="rn3dMenuAcercar" aria-label="Acercar cámara">'
+            +       '<i class="fa-solid fa-plus" aria-hidden="true"></i>'
+            +     '</button>'
+            +     '<span class="rn3d-menu__zoom-txt">Cámara</span>'
+            +     '<button type="button" class="rn3d-menu__btn rn3d-menu__btn--icono" id="rn3dMenuAlejar" aria-label="Alejar cámara">'
+            +       '<i class="fa-solid fa-minus" aria-hidden="true"></i>'
+            +     '</button>'
+            +   '</div>'
+            + '</div>';
+        raiz.appendChild(menu);
+
+        const toggle = menu.querySelector('#rn3dMenuToggle');
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const abierto = menu.classList.toggle('is-cerrado') === false;
+            toggle.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+            toggle.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú');
+            const ico = toggle.querySelector('i');
+            if (ico) ico.className = abierto ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+        });
+        menu.querySelector('#rn3dMenuPersonaje').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            cambiarPersonaje();
+        });
+        menu.querySelector('#rn3dMenuInicio').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            volverAlInicio();
+        });
+        menu.querySelector('#rn3dMenuAcercar').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            ajustarZoom(-ZOOM_PASO);
+        });
+        menu.querySelector('#rn3dMenuAlejar').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            ajustarZoom(ZOOM_PASO);
+        });
     }
 
     // ===================== Estados de estaciones =====================
@@ -3048,6 +3161,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
             + '<button class="rn3d-comenzar rn3d-oculto" id="rn3dIniciar"><span>¡Iniciar!</span><span class="rn3d-flecha">▶</span></button>'
             + '<div class="rn3d-etiqueta" id="rn3dEtiqueta"></div>';
         ctx.$paso[0].appendChild(raiz);
+        construirMenuLateral(raiz);
         elFill = raiz.querySelector('#rn3dFill');
         elPaso = raiz.querySelector('#rn3dPaso');
         elHint = raiz.querySelector('#rn3dHint');
@@ -3304,6 +3418,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
             personaje = pj.objeto;
             mixer = pj.mixer;
             accionesPersonaje = pj.acciones;
+            personajeCual = pj.cual || 'nino';
             clipActual = accionesPersonaje.Idle ? 'Idle' : '';
             colocarPersonajeEn(nodoActual || 'inicio');
             camPos.copy(personaje.position).add(new THREE.Vector3(-16, 18, 22));

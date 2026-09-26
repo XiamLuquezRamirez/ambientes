@@ -591,9 +591,11 @@ export async function clonarCastillo() {
     return grupo;
 }
 
-/** Niño o niña al azar. Los GLB ya traen Idle, Walk, Run, Wave y Yes. */
-export async function cargarPersonaje(scene) {
-    const cual = Math.random() < 0.5 ? 'nino' : 'nina';
+/** Niño o niña. Sin `cualPedido` elige al azar. Los GLB ya traen Idle, Walk, Run, Wave y Yes. */
+export async function cargarPersonaje(scene, cualPedido) {
+    const cual = cualPedido === 'nino' || cualPedido === 'nina'
+        ? cualPedido
+        : (Math.random() < 0.5 ? 'nino' : 'nina');
     const url = new URL(`${cual}.glb`, baseModelos()).href;
     const gltf = await loader.loadAsync(url);
     const objeto = gltf.scene;

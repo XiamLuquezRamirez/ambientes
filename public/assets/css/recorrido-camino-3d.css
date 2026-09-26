@@ -27,6 +27,82 @@
 .rn3d-overlay { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .rn3d-overlay button { pointer-events: auto; }
 
+.rn3d-menu {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    pointer-events: none;
+}
+.rn3d-menu.is-cerrado .rn3d-menu__panel {
+    display: none;
+}
+.rn3d-menu__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: min(240px, 70vw);
+    padding: 14px 12px;
+    border-radius: 18px;
+    background: rgba(18, 32, 28, .92);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
+}
+.rn3d-menu__btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 14px;
+    cursor: pointer;
+    color: #143024;
+    background: #f4f7ef;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: left;
+}
+.rn3d-menu__btn:active:not(:disabled) { transform: scale(.97); }
+.rn3d-menu__btn:disabled { opacity: .45; cursor: default; }
+.rn3d-menu__btn--icono {
+    width: 48px;
+    min-height: 48px;
+    padding: 0;
+    justify-content: center;
+    font-size: 1.15rem;
+}
+.rn3d-menu__zoom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.rn3d-menu__zoom-txt {
+    flex: 1;
+    text-align: center;
+    color: #fff;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-weight: 800;
+    font-size: .95rem;
+}
+.rn3d-menu__toggle {
+    width: 58px;
+    height: 58px;
+    border: 3px solid rgba(255, 255, 255, .9);
+    border-radius: 50%;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(180deg, #4ed4c4 0%, #1a9b8e 55%, #14796f 100%);
+    box-shadow: 0 5px 0 #0e635b, 0 10px 18px rgba(12, 70, 64, .35);
+    font-size: 1.35rem;
+}
+.rn3d-menu__toggle:active { transform: translateY(2px); box-shadow: 0 3px 0 #0e635b; }
+
 /* HUD superior */
 .rn3d-hud {
     position: absolute; top: 16px; left: 50%; transform: translateX(-50%);

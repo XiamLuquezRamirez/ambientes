@@ -30,14 +30,19 @@
         return `<i class="fa-solid fa-${escapar(fa)}" aria-hidden="true"></i>`;
     }
 
+    function botonCerrarVista() {
+        return '<button type="button" class="bj-cerrar" data-bj-volver aria-label="Cerrar">'
+            + '<i class="fa-solid fa-xmark" aria-hidden="true"></i> Cerrar</button>';
+    }
+
     function renderCargando() {
         ctx.$paso.attr('data-paso', 'juegos').html(`
             <div class="bj-galeria">
                 <div class="bj-galeria-top">
-
                     <h2 class="bj-galeria-titulo">
                         <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
                     </h2>
+                    ${botonCerrarVista()}
                 </div>
                 <p class="bj-vacio">Cargando juegos del ambiente…</p>
             </div>
@@ -47,10 +52,10 @@
     function renderVacio(mensaje) {
         ctx.$paso.find('.bj-galeria').html(`
             <div class="bj-galeria-top">
-
                 <h2 class="bj-galeria-titulo">
                     <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
                 </h2>
+                ${botonCerrarVista()}
             </div>
             <p class="bj-vacio">${escapar(mensaje)}</p>
         `);
@@ -78,6 +83,7 @@
                     <h2 class="bj-galeria-titulo">
                         <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
                     </h2>
+                    ${botonCerrarVista()}
                 </div>
                 <div class="bj-grid">${cards || '<p class="bj-vacio">Aún no hay juegos en este ambiente.</p>'}</div>
             </div>
@@ -131,6 +137,10 @@
         const $g = ctx.$paso.find('.bj-galeria');
         const $player = $(`
             <div class="bj-player" data-bj-player>
+                <div class="bj-player-top">
+                    <h3 class="bj-player-titulo">${iconoHtml(juego)} ${escapar(juego.nombre)}</h3>
+                    <button type="button" class="bj-salir-juego" data-bj-cerrar-juego>Cerrar</button>
+                </div>
                 <div class="bj-canvas-wrap" data-bj-canvas>
                     <iframe class="bj-iframe"
                         title="${escapar(juego.nombre)}"
@@ -165,6 +175,9 @@
         ctx.$paso.on('click.bj', '[data-bj-volver]', function () {
             cerrarJuego();
             if (ctx.onVolver) ctx.onVolver();
+        });
+        ctx.$paso.on('click.bj', '[data-bj-cerrar-juego]', function () {
+            cerrarJuego();
         });
         ctx.$paso.on('click.bj', '.bj-card', function () {
             const $card = $(this);
