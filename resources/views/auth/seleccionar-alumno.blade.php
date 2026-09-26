@@ -34,6 +34,67 @@
         <button type="button" class="selector-aula__nav selector-aula__nav--atras" id="aulaAtras" aria-label="Seis alumnos anteriores">
             <img src="{{ asset('assets/images/selector-aula/atras.png') }}" alt="">
         </button>
+        <div class="avatares-panel">
+            <div class="avatares-grid" id="avatares-grid">
+                @foreach ($estudiantes as $estudiante)
+                    @php
+                        $tienePin = $estudiante->tiene_pin;
+                        $bloqueado = $estudiante->estado_pin === 'bloqueado';
+                        $primerNombre = explode(' ', trim((string) $estudiante->nombre))[0] ?? '';
+                        $primerApellido = explode(' ', trim((string) ($estudiante->apellido ?? '')))[0] ?? '';
+                        $nombreVisible = trim($primerNombre . ' ' . $primerApellido);
+                        $metaFicha = ! $tienePin ? 'Sin PIN' : ($bloqueado ? 'Bloqueado' : null);
+                    @endphp
+                    <a
+                        href="{{ route('auth.pin', array_merge(['estudianteId' => $estudiante->id], $qsDestino)) }}"
+                        class="avatar-btn {{ $tienePin ? '' : 'avatar-btn--sin-pin' }}{{ $esPolimotor ? ' kiosco-ficha-alumno' : '' }}"
+                        style="--color-av: {{ $estudiante->color_avatar }};"
+                        aria-label="{{ $nombreVisible }}{{ $tienePin ? '' : ' (sin PIN)' }}{{ $bloqueado ? ' (PIN bloqueado)' : '' }}"
+                    >
+                        @if ($esPolimotor)
+                            @include('auth._avatar-ficha', ['nombreFicha' => $nombreVisible, 'metaFicha' => $metaFicha])
+                            @if (! $tienePin)
+                                <span class="avatar-badge" title="Sin PIN" aria-hidden="true">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                            @elseif ($bloqueado)
+                                <span class="avatar-badge" title="PIN bloqueado" aria-hidden="true">
+                                    <i class="fas fa-ban"></i>
+                                </span>
+                            @endif
+                        @else
+                            <span class="avatar-circulo">
+                                @include('auth._avatar-circulo')
+                            </span>
+                            @if (! $tienePin)
+                                <span class="avatar-badge" title="Sin PIN" aria-hidden="true">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <span class="avatar-nombre">{{ $nombreVisible }}</span>
+                                <span class="avatar-meta">Sin PIN</span>
+                            @elseif ($bloqueado)
+                                <span class="avatar-badge" title="PIN bloqueado" aria-hidden="true">
+                                    <i class="fas fa-ban"></i>
+                                </span>
+                                <span class="avatar-nombre">{{ $nombreVisible }}</span>
+                                <span class="avatar-meta">Bloqueado</span>
+                            @else
+                                <span class="avatar-nombre">{{ $nombreVisible }}</span>
+                            @endif
+                        @endif
+                    </a>
+                @endforeach
+            </div>
+            <div class="avatares-scroll" role="group" aria-label="Desplazar avatares">
+                <button type="button" class="avatares-scroll__btn" id="avatares-scroll-up" aria-label="Subir">
+                    <i class="fas fa-chevron-up" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="avatares-scroll__btn" id="avatares-scroll-down" aria-label="Bajar">
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    @endif
 
         <div class="selector-aula__pupitres" id="aulaPupitres">
             @foreach ($estudiantes as $estudiante)
