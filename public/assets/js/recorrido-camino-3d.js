@@ -1965,24 +1965,40 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
 
     // ===================== Cámara =====================
     const camTarget = new THREE.Vector3(), camPos = new THREE.Vector3();
+    let mezclaHabla = 0;
+    // Qué tan rápido se acerca y se aleja la cámara al hablar.
+    // Más alto = más rápido. 0.012 es lento; 0.05 es brusco.
+    const VELOCIDAD_CAMARA_HABLA = 0.052;
     function actualizarCamara(inmediato) {
         const p = personaje.position;
-        // Encuadra al personaje Y la próxima estación: el foco es un punto
-        // intermedio, así el niño siempre ve a dónde debe ir.
+        const hablando = narrando || mostrandoBocadillo;
+        mezclaHabla += ((hablando ? 1 : 0) - mezclaHabla) * (inmediato ? 1 : VELOCIDAD_CAMARA_HABLA);
+        if (mezclaHabla < 0.001) mezclaHabla = 0;
+        if (mezclaHabla > 0.999) mezclaHabla = 1;
+
         let foco = p.clone();
-        if (recorridoIniciado) {
+        if (recorridoIniciado && mezclaHabla < 1) {
             const tocables = nodosTocables();
             const est = tocables.length ? estacionPorId(tocables[0]) : null;
             if (est) foco = p.clone().lerp(est.grupo.position, 0.42);
         }
-        // Cámara 3/4 MÁS alejada: se ve más camino y el mapa en general.
         const z = zoomCam;
-        const deseadaPos = usaMapaGlb
+        const posLejos = usaMapaGlb
             ? new THREE.Vector3(foco.x - 16 * z, foco.y + 18 * z, foco.z + 22 * z)
             : new THREE.Vector3(foco.x - 9 * z, 34 * z, foco.z + 48 * z);
-        const deseadaTgt = usaMapaGlb
+        const tgtLejos = usaMapaGlb
             ? new THREE.Vector3(foco.x + 6, foco.y + 1.6, foco.z - 4)
             : new THREE.Vector3(foco.x + 2, 2, foco.z - 6);
+
+        const yaw = personaje.rotation.y;
+        const frente = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
+        const dist = usaMapaGlb ? 14 : 18;
+        const posCerca = p.clone().addScaledVector(frente, dist);
+        posCerca.y = p.y + (usaMapaGlb ? 5.5 : 8);
+        const tgtCerca = new THREE.Vector3(p.x, p.y + (usaMapaGlb ? 1.45 : 2.4), p.z);
+
+        const deseadaPos = posLejos.lerp(posCerca, mezclaHabla);
+        const deseadaTgt = tgtLejos.lerp(tgtCerca, mezclaHabla);
         const k = inmediato ? 1 : 0.05;
         camPos.lerp(deseadaPos, k); camTarget.lerp(deseadaTgt, k);
         camera.position.copy(camPos); camera.lookAt(camTarget);
