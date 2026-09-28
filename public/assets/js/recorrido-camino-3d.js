@@ -1966,44 +1966,346 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
 
     // ===================== Cámara =====================
     const camTarget = new THREE.Vector3(), camPos = new THREE.Vector3();
+    const _frenteCam = new THREE.Vector3();
+    const _posCand = new THREE.Vector3();
+    const _lookCand = new THREE.Vector3();
+    const _cabezaCam = new THREE.Vector3();
+    const _miraSig = new THREE.Vector3();
+    const _deseadaPos = new THREE.Vector3();
+    const _deseadaTgt = new THREE.Vector3();
+    const _puntoSig = new THREE.Vector3();
+    const _ndcCam = new THREE.Vector3();
+    const camProbe = new THREE.PerspectiveCamera(48, 1, 0.5, 1500);
     let mezclaHabla = 0;
+    let seguimientoActivo = false;
+    let rumboCamino = 0;
+    let orbitaAplicada = 0;
+    let distLejosAplicada = 0;
+    let acopleDetras = 0;
+    let yawObjetivo = null;
+    let angLadeo = 0;
+    let signoLadeo = 1;
+    let yawCamSuave = null;
+    const offsetAcople = new THREE.Vector3();
+    const posAcoplePrev = new THREE.Vector3();
+    const _ejeCasa = new THREE.Vector3();
+    // Metros caminados para pasar del plano actual al de detrás. Más alto = giro más lento.
+    const ACOPLAR_METROS = 46;
     // Qué tan rápido se acerca y se aleja la cámara al hablar.
     // Más alto = más rápido. 0.012 es lento; 0.05 es brusco.
     const VELOCIDAD_CAMARA_HABLA = 0.052;
+
+    function puntoSiguienteVisible() {
+        if (caminando && caminandoLibre) return zonaJuegosParada || null;
+        let id = null;
+        if (caminando && animDestinoId) id = animDestinoId;
+        else if (!caminando && recorridoIniciado) {
+            const toc = nodosTocables();
+            if (toc.length) id = toc[0];
+        }
+        if (!id) return null;
+        const est = estacionPorId(id);
+        if (est && est.medallon) return est.medallon.getWorldPosition(_puntoSig);
+        if (est && est.grupo) return est.grupo.position;
+        if (nodos[id] && nodos[id].pos) return nodos[id].pos;
+        return null;
+    }
+
+    function cabeEnVista(camPosicion, look, punto, margen) {
+        camProbe.fov = camera.fov;
+        camProbe.aspect = camera.aspect || 1;
+        camProbe.near = camera.near;
+        camProbe.far = camera.far;
+        camProbe.position.copy(camPosicion);
+        camProbe.up.set(0, 1, 0);
+        camProbe.lookAt(look);
+        camProbe.updateMatrixWorld(true);
+        camProbe.updateProjectionMatrix();
+        _ndcCam.copy(punto).project(camProbe);
+        if (_ndcCam.z < -1 || _ndcCam.z > 1) return false;
+        const m = margen == null ? 0.08 : margen;
+        return Math.abs(_ndcCam.x) <= 1 - m && Math.abs(_ndcCam.y) <= 1 - m;
+    }
+
+    function posicionDetras(origen, frente, angulo, dist, alt) {
+        const detrasX = -frente.x;
+        const detrasZ = -frente.z;
+        const c = Math.cos(angulo);
+        const s = Math.sin(angulo);
+        _posCand.set(
+            origen.x + (detrasX * c - detrasZ * s) * dist,
+            origen.y + alt,
+            origen.z + (detrasX * s + detrasZ * c) * dist
+        );
+        return _posCand;
+    }
+
+    function miraSeguimiento(origen, ojoY, siguiente, peso) {
+        _lookCand.set(origen.x, origen.y + ojoY, origen.z);
+        if (siguiente && peso > 0) {
+            _miraSig.set(siguiente.x, siguiente.y, siguiente.z);
+            _lookCand.lerp(_miraSig, peso);
+        }
+        return _lookCand;
+    }
+
+    // Elige el menor giro y el menor alejamiento que dejen al personaje y al
+    // punto siguiente dentro del encuadre. El giro se queda detrás: no da la vuelta.
+    function encuadrarSiguiente(origen, frente, distBase, alt, ojoY, siguiente, pesosForzados) {
+        if (!siguiente) return { ang: 0, dist: distBase, peso: 0 };
+        const angulos = [0, 0.16, 0.34, 0.55, 0.8, 1.05];
+        const dists = [distBase, distBase * 1.2, distBase * 1.45, distBase * 1.75];
+        const pesos = pesosForzados || [0.16, 0.32];
+        _cabezaCam.set(origen.x, origen.y + ojoY, origen.z);
+        for (let ai = 0; ai < angulos.length; ai++) {
+            const signos = angulos[ai] === 0 ? [1] : [1, -1];
+            for (let si = 0; si < signos.length; si++) {
+                const ang = angulos[ai] * signos[si];
+                for (let di = 0; di < dists.length; di++) {
+                    const dist = dists[di];
+                    const altD = alt * (dist / distBase);
+                    for (let pi = 0; pi < pesos.length; pi++) {
+                        const look = miraSeguimiento(origen, ojoY, siguiente, pesos[pi]);
+                        const pos = posicionDetras(origen, frente, ang, dist, altD);
+                        if (cabeEnVista(pos, look, _cabezaCam, 0.2) && cabeEnVista(pos, look, siguiente, 0.05)) {
+                            return { ang: ang, dist: dist, peso: pesos[pi] };
+                        }
+                    }
+                }
+            }
+        }
+        const dx = siguiente.x - origen.x;
+        const dz = siguiente.z - origen.z;
+        const cruz = frente.x * dz - frente.z * dx;
+        const punto = frente.x * dx + frente.z * dz;
+        let ang = Math.atan2(cruz, punto);
+        const angMax = 1.05;
+        ang = Math.max(-angMax, Math.min(angMax, -ang));
+        return { ang: ang, dist: distBase * 1.75, peso: 0.34 };
+    }
+
+    function reengancharCamara() {
+        acopleDetras = 0;
+        angLadeo = 0;
+        if (!personaje) return;
+        offsetAcople.copy(camPos).sub(personaje.position);
+        if (offsetAcople.lengthSq() < 1) offsetAcople.set(0, usaMapaGlb ? 8 : 12, usaMapaGlb ? 16 : 22);
+        posAcoplePrev.copy(personaje.position);
+        yawCamSuave = Math.atan2(offsetAcople.x, offsetAcople.z);
+    }
+
+    // Tras el diálogo en la casa: la cámara se corre al lado hacia el que dobla
+    // el regreso al punto 3, para no tener que girar de golpe al salir.
+    function prepararLadeoSalida() {
+        signoLadeo = 1;
+        const puerta = nodoActual && puertasCasa[nodoActual];
+        const mid = nodoActual && nodos[nodoActual] && nodos[nodoActual].pos;
+        const meta = (typeof posPunto3 === 'function') ? posPunto3() : null;
+        if (puerta && mid && meta) {
+            const s1x = mid.x - puerta.x;
+            const s1z = mid.z - puerta.z;
+            const s2x = meta.x - mid.x;
+            const s2z = meta.z - mid.z;
+            const giro = s1x * s2z - s1z * s2x;
+            if (Math.abs(giro) > 0.4) signoLadeo = giro > 0 ? 1 : -1;
+        }
+        angLadeo = 0;
+    }
+
+    function avanzarAcople(pos) {
+        const moviendo = caminando || (entrandoSaliendo && animCasa && animCasa.modo === 'salir');
+        if (moviendo && acopleDetras < 1) {
+            const paso = Math.hypot(pos.x - posAcoplePrev.x, pos.z - posAcoplePrev.z);
+            if (paso < 2.5) acopleDetras = Math.min(1, acopleDetras + paso / ACOPLAR_METROS);
+        }
+        posAcoplePrev.copy(pos);
+    }
+
+    // No deja la cámara del otro lado de la puerta: al salir se quedaría detrás de la casa.
+    function frenarDetrasDeCasa(pos, origen) {
+        const ids = Object.keys(puertasCasa);
+        for (let i = 0; i < ids.length; i++) {
+            const puerta = puertasCasa[ids[i]];
+            if (!puerta) continue;
+            _ejeCasa.set(puerta.x - origen.x, 0, puerta.z - origen.z);
+            const distP = _ejeCasa.length();
+            if (distP < 0.8 || distP > 36) continue;
+            _ejeCasa.multiplyScalar(1 / distP);
+            const pesoCasa = distP <= 10 ? 1 : Math.max(0, 1 - (distP - 10) / 24);
+            const t = (pos.x - origen.x) * _ejeCasa.x + (pos.z - origen.z) * _ejeCasa.z;
+            const limite = distP - 2.2;
+            if (t > limite && pesoCasa > 0) {
+                const exceso = (t - limite) * pesoCasa;
+                pos.x -= _ejeCasa.x * exceso;
+                pos.z -= _ejeCasa.z * exceso;
+            }
+        }
+        return pos;
+    }
+
+    function orientarAlSiguiente() {
+        if (!idModulo || nodoActual !== idModulo || !personaje) return;
+        const toc = nodosTocables();
+        if (!toc.length) { yawObjetivo = null; return; }
+        const est = estacionPorId(toc[0]);
+        const dest = (est && est.grupo) ? est.grupo.position : (nodos[toc[0]] && nodos[toc[0]].pos);
+        if (!dest) { yawObjetivo = null; return; }
+        yawObjetivo = Math.atan2(dest.x - personaje.position.x, dest.z - personaje.position.z);
+    }
+
+    function aplicarMiradaSiguiente() {
+        if (yawObjetivo == null || !personaje || caminando || entrandoSaliendo) return;
+        if (!idModulo || nodoActual !== idModulo) { yawObjetivo = null; return; }
+        let delta = yawObjetivo - personaje.rotation.y;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        personaje.rotation.y += delta * 0.08;
+    }
+
+    function voltearHaciaCamara(deseadaPos) {
+        if (!personaje) return;
+        const dx = deseadaPos.x - personaje.position.x;
+        const dz = deseadaPos.z - personaje.position.z;
+        if (dx * dx + dz * dz < 0.25) return;
+        const meta = Math.atan2(dx, dz);
+        let delta = meta - personaje.rotation.y;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        personaje.rotation.y += delta * 0.12;
+    }
+
     function actualizarCamara(inmediato) {
         const p = personaje.position;
-        const paradaActual = nodoActual && nodos[nodoActual] ? nodos[nodoActual].parada : null;
-        const enExperiencia = !!(paradaActual && esParadaExperiencia(paradaActual));
-        const acercarHabla = (narrando || mostrandoBocadillo) && !enExperiencia;
-        mezclaHabla += ((acercarHabla ? 1 : 0) - mezclaHabla) * (inmediato ? 1 : VELOCIDAD_CAMARA_HABLA);
+        if ((caminando || entrandoSaliendo) && !seguimientoActivo) {
+            seguimientoActivo = true;
+            reengancharCamara();
+        }
+
+        if (!seguimientoActivo) {
+            const paradaActual = nodoActual && nodos[nodoActual] ? nodos[nodoActual].parada : null;
+            const enExperiencia = !!(paradaActual && esParadaExperiencia(paradaActual));
+            const acercarHabla = (narrando || mostrandoBocadillo) && !enExperiencia;
+            mezclaHabla += ((acercarHabla ? 1 : 0) - mezclaHabla) * (inmediato ? 1 : VELOCIDAD_CAMARA_HABLA);
+            if (mezclaHabla < 0.001) mezclaHabla = 0;
+            if (mezclaHabla > 0.999) mezclaHabla = 1;
+
+            let foco = p.clone();
+            if (recorridoIniciado && mezclaHabla < 1) {
+                const tocables = nodosTocables();
+                const est = tocables.length ? estacionPorId(tocables[0]) : null;
+                if (est) foco = p.clone().lerp(est.grupo.position, 0.42);
+            }
+            const z0 = zoomCam;
+            const posLejos = usaMapaGlb
+                ? new THREE.Vector3(foco.x - 16 * z0, foco.y + 18 * z0, foco.z + 22 * z0)
+                : new THREE.Vector3(foco.x - 9 * z0, 34 * z0, foco.z + 48 * z0);
+            const tgtLejos = usaMapaGlb
+                ? new THREE.Vector3(foco.x + 6, foco.y + 1.6, foco.z - 4)
+                : new THREE.Vector3(foco.x + 2, 2, foco.z - 6);
+
+            const yaw = personaje.rotation.y;
+            const frente0 = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
+            const dist0 = usaMapaGlb ? 14 : 18;
+            const posCerca = p.clone().addScaledVector(frente0, dist0);
+            posCerca.y = p.y + (usaMapaGlb ? 5.5 : 8);
+            const tgtCerca = new THREE.Vector3(p.x, p.y + (usaMapaGlb ? 1.45 : 2.4), p.z);
+
+            const deseadaPos0 = posLejos.lerp(posCerca, mezclaHabla);
+            const deseadaTgt0 = tgtLejos.lerp(tgtCerca, mezclaHabla);
+            const k0 = inmediato ? 1 : 0.05;
+            camPos.lerp(deseadaPos0, k0); camTarget.lerp(deseadaTgt0, k0);
+            camera.position.copy(camPos); camera.lookAt(camTarget);
+            return;
+        }
+
+        if (caminando || (entrandoSaliendo && (!animCasa || animCasa.modo !== 'girar'))) {
+            rumboCamino = personaje.rotation.y;
+        }
+        const hablandoAhora = narrando || mostrandoBocadillo;
+        const paradaAqui = nodoActual && nodos[nodoActual] ? nodos[nodoActual].parada : null;
+        const enExperiencia = !!(paradaAqui && esParadaExperiencia(paradaAqui));
+        const enCruce = !!(idModulo && nodoActual === idModulo && !caminando && !entrandoSaliendo);
+        const enfocarSiguiente = enCruce && !hablandoAhora && yawObjetivo != null;
+        if (enfocarSiguiente) {
+            let dRumbo = personaje.rotation.y - rumboCamino;
+            while (dRumbo > Math.PI) dRumbo -= Math.PI * 2;
+            while (dRumbo < -Math.PI) dRumbo += Math.PI * 2;
+            rumboCamino += dRumbo * 0.016;
+        }
+        avanzarAcople(p);
+
+        const quiereCerca = !enfocarSiguiente && !enExperiencia && !caminando && !entrandoSaliendo
+            && !hablaSinVoltear && hablandoAhora;
+        mezclaHabla += ((quiereCerca ? 1 : 0) - mezclaHabla) * (inmediato ? 1 : VELOCIDAD_CAMARA_HABLA);
         if (mezclaHabla < 0.001) mezclaHabla = 0;
         if (mezclaHabla > 0.999) mezclaHabla = 1;
 
-        let foco = p.clone();
-        if (recorridoIniciado && mezclaHabla < 1) {
-            const tocables = nodosTocables();
-            const est = tocables.length ? estacionPorId(tocables[0]) : null;
-            if (est) foco = p.clone().lerp(est.grupo.position, 0.42);
-        }
         const z = zoomCam;
-        const posLejos = usaMapaGlb
-            ? new THREE.Vector3(foco.x - 16 * z, foco.y + 18 * z, foco.z + 22 * z)
-            : new THREE.Vector3(foco.x - 9 * z, 34 * z, foco.z + 48 * z);
-        const tgtLejos = usaMapaGlb
-            ? new THREE.Vector3(foco.x + 6, foco.y + 1.6, foco.z - 4)
-            : new THREE.Vector3(foco.x + 2, 2, foco.z - 6);
+        const distBase = (usaMapaGlb ? 22 : 28) * z;
+        const altBase = (usaMapaGlb ? 8 : 11) * z;
+        const distCerca = (usaMapaGlb ? 12 : 15) * z;
+        const altCerca = (usaMapaGlb ? 4.2 : 5.6) * z;
+        const ojo = usaMapaGlb ? 1.55 : 2.35;
+        const ojoMirada = (enExperiencia && hablandoAhora) ? ojo + 1.35 : (ojo + mezclaHabla * 0.15);
+        _frenteCam.set(Math.sin(rumboCamino), 0, Math.cos(rumboCamino));
+        const siguiente = (enExperiencia || hablandoAhora)
+            ? null
+            : ((mezclaHabla < 0.85 || enfocarSiguiente) ? puntoSiguienteVisible() : null);
+        const enc = encuadrarSiguiente(
+            p, _frenteCam, distBase, altBase, ojo, siguiente,
+            enfocarSiguiente ? [0.46, 0.62] : null
+        );
+        const angMeta = enc.ang * (1 - mezclaHabla);
+        const distLejosMeta = enc.dist;
+        const kEnc = inmediato ? 1 : 0.025;
+        orbitaAplicada += (angMeta - orbitaAplicada) * kEnc;
+        distLejosAplicada += (distLejosMeta - distLejosAplicada) * kEnc;
+        const altLejos = altBase * (distLejosAplicada / distBase);
+        const peso = (enfocarSiguiente ? Math.max(enc.peso, 0.46) : enc.peso) * (1 - mezclaHabla);
+        posicionDetras(p, _frenteCam, orbitaAplicada, distLejosAplicada, altLejos);
+        const dxD = _posCand.x - p.x;
+        const dzD = _posCand.z - p.z;
+        const yawDetras = Math.atan2(dxD, dzD);
+        const yawDesde = Math.atan2(offsetAcople.x, offsetAcople.z);
+        let dYaw = yawDetras - yawDesde;
+        while (dYaw > Math.PI) dYaw -= Math.PI * 2;
+        while (dYaw < -Math.PI) dYaw += Math.PI * 2;
+        const ladeoQuieto = enExperiencia && !caminando && !entrandoSaliendo && !hablandoAhora;
+        const ladeoMeta = ladeoQuieto ? signoLadeo * 0.48 : 0;
+        angLadeo += (ladeoMeta - angLadeo) * (inmediato ? 1 : 0.035);
+        let yawCam = yawDesde + dYaw * acopleDetras + angLadeo;
+        const volviendo = acopleDetras < 0.995 && (caminando || (entrandoSaliendo && animCasa && animCasa.modo === 'salir'));
+        if (yawCamSuave == null || inmediato) yawCamSuave = yawCam;
+        else {
+            let pasoYaw = yawCam - yawCamSuave;
+            while (pasoYaw > Math.PI) pasoYaw -= Math.PI * 2;
+            while (pasoYaw < -Math.PI) pasoYaw += Math.PI * 2;
+            const tope = volviendo ? 0.01 : 0.035;
+            if (pasoYaw > tope) pasoYaw = tope;
+            else if (pasoYaw < -tope) pasoYaw = -tope;
+            yawCamSuave += pasoYaw;
+        }
+        yawCam = yawCamSuave;
+        const distDesde = Math.max(0.5, Math.hypot(offsetAcople.x, offsetAcople.z));
+        const distDetras = Math.max(0.5, Math.hypot(dxD, dzD));
+        let distCam = THREE.MathUtils.lerp(distDesde, distDetras, acopleDetras);
+        let altCam = THREE.MathUtils.lerp(offsetAcople.y, _posCand.y - p.y, acopleDetras);
+        if (mezclaHabla > 0) {
+            distCam = THREE.MathUtils.lerp(distCam, distCerca, mezclaHabla);
+            altCam = THREE.MathUtils.lerp(altCam, altCerca, mezclaHabla);
+        }
+        const deseadaPos = frenarDetrasDeCasa(
+            _deseadaPos.set(p.x + Math.sin(yawCam) * distCam, p.y + altCam, p.z + Math.cos(yawCam) * distCam),
+            p
+        );
+        const deseadaTgt = _deseadaTgt.copy(miraSeguimiento(p, ojoMirada, siguiente, peso));
+        if (quiereCerca) voltearHaciaCamara(deseadaPos);
 
-        const yaw = personaje.rotation.y;
-        const frente = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
-        const dist = usaMapaGlb ? 14 : 18;
-        const posCerca = p.clone().addScaledVector(frente, dist);
-        posCerca.y = p.y + (usaMapaGlb ? 5.5 : 8);
-        const tgtCerca = new THREE.Vector3(p.x, p.y + (usaMapaGlb ? 1.45 : 2.4), p.z);
-
-        const deseadaPos = posLejos.lerp(posCerca, mezclaHabla);
-        const deseadaTgt = tgtLejos.lerp(tgtCerca, mezclaHabla);
-        const k = inmediato ? 1 : 0.05;
-        camPos.lerp(deseadaPos, k); camTarget.lerp(deseadaTgt, k);
+        let k = inmediato ? 1 : 0.04;
+        if (!inmediato && enfocarSiguiente) k = 0.028;
+        else if (!inmediato && caminando && acopleDetras > 0.98) k = 0.12;
+        const kMirada = (!inmediato && enExperiencia && hablandoAhora) ? 0.07 : k;
+        camPos.lerp(deseadaPos, k); camTarget.lerp(deseadaTgt, kMirada);
         camera.position.copy(camPos); camera.lookAt(camTarget);
     }
 
@@ -2194,7 +2496,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
         // Curva recta (2 puntos) que el loop recorre igual que las del grafo.
         animCurva = new THREE.CatmullRomCurve3([origen, destino], false, 'catmullrom', 0.5);
         animT0 = 0; animT1 = 1;
-        caminando = true; caminandoLibre = true;
+        caminando = true; caminandoLibre = true; yawObjetivo = null;
         alLlegarLibre = function () { abrirZonaJuegos(); };
         personaje.visible = true; ocultarEtiqueta();
         animDur = duracionCaminata(origen.distanceTo(destino));
@@ -2283,6 +2585,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
         personaje.visible = true; // por si venía de estar dentro de una casa
 
         cerrarModal();
+        yawObjetivo = null;
         caminando = true; ocultarEtiqueta();
         refrescarEstaciones();
         animCurva = tramo.curva; animT0 = tramo.t0; animT1 = tramo.t1;
@@ -2309,18 +2612,54 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
     // Retorno AUTOMÁTICO al fin tras la última experiencia: camina de vuelta al
     // módulo y luego por el tramo hasta el castillo, sin saltarse ningún tramo.
     let regresandoAlFin = false;
+    let esperarParaFin = false;
+    let esperaFinDesde = 0;
     function irAlFinAutomatico() {
-        if (regresandoAlFin || !idFin) return;
+        if (regresandoAlFin || esperarParaFin || !idFin) return;
+        if (!esRamificado || nodoActual === idModulo) {
+            pedirSalidaAlFin();
+            return;
+        }
         regresandoAlFin = true;
-        const pasoAlModulo = () => {
-            // si ya estamos en el módulo (o no es ramificado), ir directo al fin
-            if (!esRamificado || nodoActual === idModulo) { pasoAlFin(); return; }
-            caminarAForzado(idModulo, () => setTimeout(pasoAlFin, 300));
-        };
-        const pasoAlFin = () => {
-            caminarAForzado(idFin, () => { regresandoAlFin = false; });
-        };
-        pasoAlModulo();
+        caminarAForzado(idModulo, function () {
+            regresandoAlFin = false;
+            pedirSalidaAlFin();
+        });
+    }
+    function pedirSalidaAlFin() {
+        if (esperarParaFin || regresandoAlFin || !idFin || visitados.has(idFin)) return;
+        esperarParaFin = true;
+        esperaFinDesde = performance.now();
+        if (nodoActual === idModulo) orientarAlSiguiente();
+    }
+    function camaraMirandoAlSiguiente() {
+        if (!personaje || yawObjetivo == null) return false;
+        let d = yawObjetivo - personaje.rotation.y;
+        while (d > Math.PI) d -= Math.PI * 2;
+        while (d < -Math.PI) d += Math.PI * 2;
+        if (Math.abs(d) > 0.45) return false;
+        const toc = nodosTocables();
+        const id = toc.length ? toc[0] : idFin;
+        const est = id ? estacionPorId(id) : null;
+        const dest = (est && est.grupo) ? est.grupo.position : (id && nodos[id] ? nodos[id].pos : null);
+        if (!dest) return true;
+        const ang = Math.atan2(dest.x - camPos.x, dest.z - camPos.z);
+        const angC = Math.atan2(camTarget.x - camPos.x, camTarget.z - camPos.z);
+        let diff = ang - angC;
+        while (diff > Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        return Math.abs(diff) < 0.5;
+    }
+    function pulsarSalidaAlFin(now) {
+        if (!esperarParaFin || caminando || entrandoSaliendo || regresandoAlFin) return;
+        if (idModulo && nodoActual !== idModulo) return;
+        if (nodoActual === idModulo) orientarAlSiguiente();
+        if (now - esperaFinDesde < 1200) return;
+        if (!camaraMirandoAlSiguiente() && now - esperaFinDesde < 5200) return;
+        esperarParaFin = false;
+        if (!idFin || visitados.has(idFin)) return;
+        regresandoAlFin = true;
+        caminarAForzado(idFin, function () { regresandoAlFin = false; });
     }
     // ---- Entrar / salir de la casa (animación en el loop) ----
     // Anima al personaje: camina un poco hacia la puerta y se encoge/hunde (entra),
@@ -2348,7 +2687,10 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
             if (mundo) personaje.position.y = mundo.altura(personaje.position.x, personaje.position.z);
             const dx = hacia.x - desde.x;
             const dz = hacia.z - desde.z;
-            if (dx * dx + dz * dz > 0.04) personaje.rotation.y = Math.atan2(dx, dz);
+            if (dx * dx + dz * dz > 0.04) {
+                personaje.rotation.y = Math.atan2(dx, dz);
+                rumboCamino = personaje.rotation.y;
+            }
         }
         if (k >= 1) {
             if (a.modo === 'girar') {
@@ -2399,6 +2741,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
         const ancla = puerta.clone();
         if (mundo) ancla.y = mundo.altura(ancla.x, ancla.z);
         personaje.position.copy(ancla);
+        reengancharCamara();
         const mira = posPunto3() || ancla;
         const rot0 = personaje.rotation.y;
         let rot1 = Math.atan2(mira.x - ancla.x, mira.z - ancla.z);
@@ -2447,6 +2790,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
             hablaSinVoltear = true;
             decirAlLlegar(p, function () {
                 hablaSinVoltear = false;
+                prepararLadeoSalida();
                 iniciarExperiencia();
             });
         });
@@ -2470,21 +2814,24 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
         }
 
         actualizarProgreso(); refrescarEstaciones(); actualizarHud(false);
+        if (idModulo && nodoActual === idModulo && destinoYaVisitado) orientarAlSiguiente();
         const cb = alLlegarCb; alLlegarCb = null;
 
         if (destinoYaVisitado && p && !esParadaExperiencia(p)) {
             if (cb) cb();
-            // Última experiencia ya hecha: al pisar la temática sigue solo hasta el fin.
+            // Última experiencia ya hecha: primero gira la cámara al final y después camina.
             if (nodoActual === idModulo && ramasPendientes().length === 0
                 && idFin && !visitados.has(idFin) && !regresandoAlFin) {
-                setTimeout(irAlFinAutomatico, 400);
+                pedirSalidaAlFin();
             }
             return;
         }
 
         // En la experiencia voltea hacia la casa, camina unos pasos y se queda
         // adentro. La frase suena ya dentro; después empieza la actividad.
-        if (p && esParadaExperiencia(p)) {
+        if (idModulo && nodoActual === idModulo) {
+            decirAlLlegar(p, function () { orientarAlSiguiente(); });
+        } else if (p && esParadaExperiencia(p)) {
             entrarYHablarExperiencia(p);
         } else if (p && p.id !== 'inicio' && p.id !== 'fin') {
             decirAlLlegar(p);
@@ -3239,8 +3586,15 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
         const v = new THREE.Vector3(); personaje.getWorldPosition(v); v.y += (usaMapaGlb ? 3.6 : 5.4); v.project(camera);
         if (v.z > 1) { elBocadillo.style.display = 'none'; return; }
         elBocadillo.style.display = 'block';
-        elBocadillo.style.left = ((v.x * 0.5 + 0.5) * window.innerWidth) + 'px';
-        elBocadillo.style.top = ((-v.y * 0.5 + 0.5) * window.innerHeight) + 'px';
+        const mx = 36;
+        const ancho = elBocadillo.offsetWidth || 320;
+        const alto = elBocadillo.offsetHeight || 140;
+        let left = (v.x * 0.5 + 0.5) * window.innerWidth;
+        let top = (-v.y * 0.5 + 0.5) * window.innerHeight;
+        left = Math.max(mx + ancho * 0.5, Math.min(window.innerWidth - mx - ancho * 0.5, left));
+        top = Math.max(mx + alto, Math.min(window.innerHeight - 48, top));
+        elBocadillo.style.left = left + 'px';
+        elBocadillo.style.top = top + 'px';
     }
 
     // ===================== Loop =====================
@@ -3278,6 +3632,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
         if (poseCamino && personaje) {
             personaje.position.set(poseCamino.x, poseCamino.y, poseCamino.z);
             personaje.rotation.y = poseCamino.rot;
+            rumboCamino = poseCamino.rot;
             if (poseCamino.fin) {
                 caminando = false; animCurva = null;
                 if (caminandoLibre) {
@@ -3289,6 +3644,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
                 }
             }
         }
+        aplicarMiradaSiguiente();
         // "Hablar": la boca se abre/cierra mientras hay voz (o durante el diálogo).
         if (boca) {
             const hablando = narrando || mostrandoBocadillo;
@@ -3325,6 +3681,7 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
             zonaJuegosCartel.lookAt(camera.position.x, w.y, camera.position.z);
         }
         actualizarCamara(false); actualizarEtiquetaSiguiente(); actualizarBocadillo();
+        pulsarSalidaAlFin(now);
         renderer.render(scene, camera);
         rafId = requestAnimationFrame(animar);
     }
@@ -3341,11 +3698,14 @@ import { armarMundo, cargarPersonaje, clonarCasa, clonarCastillo, indiceCasaEsta
         ambienteSlug = (camino.ambiente && camino.ambiente.slug) ? String(camino.ambiente.slug) : '';
         indiceActual = 0; indiceMaximoVisitado = 0; caminando = false; recorridoIniciado = false; experienciaCargada = null;
         lagoCentro = null; ultimoNow = 0; mostrandoBocadillo = false;
+        seguimientoActivo = false; mezclaHabla = 0; rumboCamino = 0;
+        orbitaAplicada = 0; distLejosAplicada = 0; acopleDetras = 0; yawObjetivo = null;
+        angLadeo = 0; yawCamSuave = null; signoLadeo = 1;
         // Estado de grafo
         construirGrafo();
         nodoActual = camino.paradas[0] ? camino.paradas[0].id : null; // arranca en 'inicio'
         visitados = new Set();
-        ramasCompletadas = new Set(); regresandoAlFin = false;
+        ramasCompletadas = new Set(); regresandoAlFin = false; esperarParaFin = false; esperaFinDesde = 0;
         fuegos = []; fuegosActivos = false; vallas = {};
         puertasCasa = {}; entrandoSaliendo = false;
         pez = null; pezT = 0; aves = []; casaInicioCentro = null;
