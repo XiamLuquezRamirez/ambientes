@@ -64,6 +64,7 @@ class Constructor {
         this.scene = scene;
         this.lotes = new Map();
         this.arboles = [];
+        this.flores = [];
     }
 
     reservar(modelo, n) {
@@ -89,18 +90,21 @@ class Constructor {
         lote.partes.forEach((pt, j) => {
             lote.meshes[j].setMatrixAt(i, _t.multiplyMatrices(_m, pt.local));
         });
+        if (String(modelo.ruta).includes('03_flores')) {
+            this.flores.push({ ruta: modelo.ruta, i, x: p[0], z: p[2] });
+        }
         return i;
     }
 
-    // Quita pinos y árboles cuyo tronco cae a menos de `radio` metros del eje.
-    despejarArboles(muestras, radio) {
+    despejarLista(lista, muestras, radio) {
         const cero = new THREE.Matrix4().makeScale(0, 0, 0);
+        const r2 = radio * radio;
         const tocados = new Set();
-        this.arboles.forEach((a) => {
+        lista.forEach((a) => {
             for (let k = 0; k < muestras.length; k++) {
                 const dx = a.x - muestras[k][0];
                 const dz = a.z - muestras[k][1];
-                if (dx * dx + dz * dz >= radio * radio) continue;
+                if (dx * dx + dz * dz >= r2) continue;
                 const lote = this.lotes.get(a.ruta);
                 if (!lote) return;
                 lote.meshes.forEach((m) => m.setMatrixAt(a.i, cero));
@@ -113,6 +117,14 @@ class Constructor {
             if (!lote) return;
             lote.meshes.forEach((m) => { m.instanceMatrix.needsUpdate = true; });
         });
+    }
+
+    despejarArboles(muestras, radio) {
+        this.despejarLista(this.arboles, muestras, radio);
+    }
+
+    despejarFlores(muestras, radio) {
+        this.despejarLista(this.flores, muestras, radio);
     }
 
     cerrar() {
@@ -148,7 +160,7 @@ class Fauna {
                     this.lagos.push({ x: e.p[0], z: e.p[2], y: e.p[1], r: 5 * e.s });
                     this.obstaculos.push([e.p[0], e.p[2], 5.4 * e.s]);
                 } else if (e.m.includes('casa') || e.m.includes('carpa')) {
-                    this.obstaculos.push([e.p[0], e.p[2], 4.8]);
+                    this.obstaculos.push([e.p[0], e.p[2], 4.8 * (e.s || 1)]);
                 } else if (/pino|arbol|roca|tronco|tocon|banca|farola|marcador/.test(e.m)) {
                     this.obstaculos.push([e.p[0], e.p[2], 0.6 * e.s]);
                 }
@@ -326,6 +338,170 @@ function curvaDesdeCamino(modelo) {
     return new THREE.CatmullRomCurve3(puntos, false, 'catmullrom', 0.2);
 }
 
+const RADIO_CAMINO = 14;
+const RADIO_CASA = 18;
+const MEZCLA_RELIEVE = 14;
+
+function muestrasDeCurva(c) {
+    const out = [];
+    if (!c || typeof c.getPoint !== 'function') return out;
+    for (let i = 0; i <= 72; i++) {
+        const p = c.getPoint(i / 72);
+        out.push([p.x, p.z]);
+    }
+    return out;
+}
+
+// La franja del camino y el solar de cada casa quedan a Y=0. Más afuera el
+// relieve original vuelve con una mezcla, para no dejar un escalón.
+function crearAplanador(scene, mapa, curva) {
+    const h = mapa.alturas;
+    const original = h && h.datos ? h.datos.slice() : null;
+    const camino = muestrasDeCurva(curva);
+    const casas = [];
+    const lagos = [];
+    (mapa.pasos || []).forEach((p) => (p.elementos || []).forEach((e) => {
+        const m = String(e.m || '');
+        if (m.includes('casa') || m.includes('carpa')) casas.push([e.p[0], e.p[2]]);
+        else if (m.includes('lago')) lagos.push({ x: e.p[0], z: e.p[2], r: 5 * (e.s || 1) });
+    }));
+    const terrenos = [];
+    scene.traverse((o) => {
+        if (!o.isInstancedMesh || !String(o.name).startsWith('00_mapa/terreno_mapa')) return;
+        const attr = o.geometry && o.geometry.attributes.position;
+        if (!attr) return;
+        const mat = new THREE.Matrix4();
+        o.getMatrixAt(0, mat);
+        const inv = mat.clone().invert();
+        const v = new THREE.Vector3();
+        const n = attr.count;
+        const x = new Float32Array(n);
+        const y = new Float32Array(n);
+        const z = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+            v.set(attr.getX(i), attr.getY(i), attr.getZ(i)).applyMatrix4(mat);
+            x[i] = v.x; y[i] = v.y; z[i] = v.z;
+        }
+        terrenos.push({ mesh: o, inv, x, y, z });
+    });
+    const anclas = [];
+    const q0 = new THREE.Quaternion();
+    const s0 = new THREE.Vector3();
+    const p0 = new THREE.Vector3();
+    const mat0 = new THREE.Matrix4();
+    scene.traverse((o) => {
+        if (!o.isInstancedMesh || String(o.name).startsWith('00_mapa/terreno_mapa')) return;
+        if (String(o.name).startsWith('00_mapa/camino_mapa')) return;
+        for (let i = 0; i < o.count; i++) {
+            o.getMatrixAt(i, mat0);
+            mat0.decompose(p0, q0, s0);
+            anclas.push({
+                mesh: o,
+                i,
+                x: p0.x,
+                y: p0.y,
+                z: p0.z,
+                h0: alturaOriginal(p0.x, p0.z),
+                qx: q0.x, qy: q0.y, qz: q0.z, qw: q0.w,
+                sx: s0.x, sy: s0.y, sz: s0.z,
+            });
+        }
+    });
+
+    function alturaOriginal(x, z) {
+        if (!original || !h) return 0;
+        const { min, paso, n } = h;
+        const fx = Math.min(n - 1.001, Math.max(0, (x - min) / paso));
+        const fz = Math.min(n - 1.001, Math.max(0, (z - min) / paso));
+        const ix = Math.floor(fx);
+        const iz = Math.floor(fz);
+        const u = fx - ix;
+        const v = fz - iz;
+        const d = (a, b) => original[b * n + a];
+        return (d(ix, iz) * (1 - u) + d(ix + 1, iz) * u) * (1 - v)
+            + (d(ix, iz + 1) * (1 - u) + d(ix + 1, iz + 1) * u) * v;
+    }
+
+    function distMin(pts, x, z, tope) {
+        let m = Infinity;
+        const limite = tope * tope;
+        for (let i = 0; i < pts.length; i++) {
+            const dx = x - pts[i][0];
+            const dz = z - pts[i][1];
+            const d2 = dx * dx + dz * dz;
+            if (d2 < limite && d2 < m) m = d2;
+        }
+        return m === Infinity ? Infinity : Math.sqrt(m);
+    }
+
+    function factor(x, z) {
+        const dc = distMin(camino, x, z, RADIO_CAMINO + MEZCLA_RELIEVE);
+        const dh = casas.length ? distMin(casas, x, z, RADIO_CASA + MEZCLA_RELIEVE) : Infinity;
+        for (let i = 0; i < lagos.length; i++) {
+            if (Math.hypot(x - lagos[i].x, z - lagos[i].z) < lagos[i].r && dc > 6) return 1;
+        }
+        const fuera = Math.min(dc - RADIO_CAMINO, dh - RADIO_CASA);
+        if (fuera <= 0) return 0;
+        if (fuera >= MEZCLA_RELIEVE) return 1;
+        const t = fuera / MEZCLA_RELIEVE;
+        return t * t * (3 - 2 * t);
+    }
+
+    function aplicar() {
+        if (original && h) {
+            const { min, paso, n } = h;
+            for (let j = 0; j < n; j++) {
+                const z = min + j * paso;
+                for (let i = 0; i < n; i++) {
+                    const idx = j * n + i;
+                    const f = factor(min + i * paso, z);
+                    h.datos[idx] = original[idx] * f;
+                }
+            }
+        }
+        const v = new THREE.Vector3();
+        terrenos.forEach((t) => {
+            const attr = t.mesh.geometry.attributes.position;
+            for (let i = 0; i < t.x.length; i++) {
+                const f = factor(t.x[i], t.z[i]);
+                v.set(t.x[i], t.y[i] * f, t.z[i]).applyMatrix4(t.inv);
+                attr.setXYZ(i, v.x, v.y, v.z);
+            }
+            attr.needsUpdate = true;
+            t.mesh.geometry.computeVertexNormals();
+            t.mesh.geometry.computeBoundingSphere();
+        });
+        const pos = new THREE.Vector3();
+        const quat = new THREE.Quaternion();
+        const scl = new THREE.Vector3();
+        const mat = new THREE.Matrix4();
+        const tocados = new Set();
+        anclas.forEach((a) => {
+            const f = factor(a.x, a.z);
+            pos.set(a.x, a.y - a.h0 * (1 - f), a.z);
+            quat.set(a.qx, a.qy, a.qz, a.qw);
+            scl.set(a.sx, a.sy, a.sz);
+            a.mesh.setMatrixAt(a.i, mat.compose(pos, quat, scl));
+            tocados.add(a.mesh);
+        });
+        tocados.forEach((m) => { m.instanceMatrix.needsUpdate = true; });
+    }
+
+    return {
+        aplicar,
+        sumar(curvas, puntos) {
+            (curvas || []).forEach((c) => {
+                muestrasDeCurva(c).forEach((p) => camino.push(p));
+            });
+            (puntos || []).forEach((p) => {
+                if (!p) return;
+                casas.push([p.x, p.z]);
+            });
+            aplicar();
+        },
+    };
+}
+
 function cieloDegradado() {
     const c = document.createElement('canvas');
     c.width = 2;
@@ -376,8 +552,11 @@ function casaDelAmbiente(slug) {
  * Quita las 5 casas temáticas y los marcadores de nivel del plano.
  * En el puesto del refugio (inicio del camino) queda solo la casa del ambiente actual.
  */
-function planoDelAmbiente(mapa, ambiente) {
+function planoDelAmbiente(mapa, ambiente, escalaInicio = 1, posXInicio = 0, posYInicio = 0) {
     const ruta = casaDelAmbiente(ambiente);
+    const escala = Number.isFinite(escalaInicio) && escalaInicio > 0 ? escalaInicio : 1;
+    const dx = Number.isFinite(posXInicio) ? posXInicio : 0;
+    const dz = Number.isFinite(posYInicio) ? posYInicio : 0;
     let puestoInicio = null;
     const pasos = mapa.pasos.map((p) => ({
         ...p,
@@ -392,14 +571,20 @@ function planoDelAmbiente(mapa, ambiente) {
         }),
     }));
     if (puestoInicio && ruta) {
+        const p = puestoInicio.p.slice();
+        p[0] += dx;
+        p[2] += dz;
         pasos[0].elementos.push({
             m: ruta,
-            p: puestoInicio.p.slice(),
+            p,
             r: puestoInicio.r,
-            s: puestoInicio.s || 1,
+            s: (puestoInicio.s || 1) * escala,
         });
     } else if (puestoInicio) {
-        pasos[0].elementos.push(puestoInicio);
+        const p = puestoInicio.p.slice();
+        p[0] += dx;
+        p[2] += dz;
+        pasos[0].elementos.push({ ...puestoInicio, p, s: (puestoInicio.s || 1) * escala });
     }
     return { ...mapa, pasos };
 }
@@ -408,10 +593,14 @@ function planoDelAmbiente(mapa, ambiente) {
  * Arma el valle completo. No anima la aparición: el kiosco lo necesita ya puesto.
  * @returns {Promise<{curva: THREE.Curve, altura: Function, carpa: object|null, actualizar: Function, destruir: Function}>}
  */
-export async function armarMundo(scene, { modesto = false, ambiente = '' } = {}) {
-    const mapa = planoDelAmbiente(await (await fetch(new URL('mapa.json', baseModelos()))).json(), ambiente);
+export async function armarMundo(scene, { modesto = false, ambiente = '', escalaCasaInicio = 1, posXCasaInicio = 0, posYCasaInicio = 0 } = {}) {
+    const mapa = planoDelAmbiente(await (await fetch(new URL('mapa.json', baseModelos()))).json(), ambiente, escalaCasaInicio, posXCasaInicio, posYCasaInicio);
+    const esCarpa = (m) => /(^|\/)carpa$/.test(String(m || ''));
     const usos = new Map();
-    mapa.pasos.forEach((p) => p.elementos.forEach((e) => usos.set(e.m, (usos.get(e.m) || 0) + 1)));
+    mapa.pasos.forEach((p) => p.elementos.forEach((e) => {
+        if (esCarpa(e.m)) return;
+        usos.set(e.m, (usos.get(e.m) || 0) + 1);
+    }));
 
     const modelos = {};
     await Promise.all([...usos.keys()].map(async (ruta) => {
@@ -425,15 +614,21 @@ export async function armarMundo(scene, { modesto = false, ambiente = '' } = {})
     });
 
     let carpa = null;
+    let casaInicio = null;
+    const rutaInicio = casaDelAmbiente(ambiente);
     const esArbol = (ruta) => ruta.includes('02_vegetacion/pino') || ruta.includes('02_vegetacion/arbol');
     mapa.pasos.forEach((p) => p.elementos.forEach((e) => {
+        if (esCarpa(e.m)) {
+            carpa = { x: e.p[0], y: e.p[1], z: e.p[2], r: e.r || 0 };
+            return;
+        }
         if (esVivo(e.m)) fauna.agregar(modelos[e.m], e);
         else {
             const i = obra.colocar(modelos[e.m], e);
+            if (rutaInicio && e.m === rutaInicio) {
+                casaInicio = { ruta: e.m, i, x: e.p[0], y: e.p[1], z: e.p[2], r: e.r || 0 };
+            }
             if (esArbol(e.m)) obra.arboles.push({ ruta: e.m, i, x: e.p[0], z: e.p[2] });
-        }
-        if (e.m.endsWith('/carpa') || e.m.endsWith('carpa')) {
-            carpa = { x: e.p[0], y: e.p[1], z: e.p[2] };
         }
     }));
     obra.cerrar();
@@ -441,16 +636,48 @@ export async function armarMundo(scene, { modesto = false, ambiente = '' } = {})
     const modeloCamino = modelos['00_mapa/camino_mapa'];
     const suelo = modeloCamino && modeloCamino.root.getObjectByName('suelo');
     const curva = curvaDesdeCamino(modeloCamino);
+    const aplanar = crearAplanador(scene, mapa, curva);
+    aplanar.aplicar();
     scene.background = cieloDegradado();
     scene.fog = new THREE.Fog(0xcfeaf9, 160, 520);
     ponerLuces(scene, modesto);
+
+    let mostradaX = Number.isFinite(posXCasaInicio) ? posXCasaInicio : 0;
+    let mostradaZ = Number.isFinite(posYCasaInicio) ? posYCasaInicio : 0;
+    const moverCasaInicio = (x, z) => {
+        if (!casaInicio) return;
+        const lote = obra.lotes.get(casaInicio.ruta);
+        if (!lote) return;
+        const ddx = x - mostradaX;
+        const ddz = z - mostradaZ;
+        if (Math.abs(ddx) < 1e-6 && Math.abs(ddz) < 1e-6) return;
+        mostradaX = x;
+        mostradaZ = z;
+        casaInicio.x += ddx;
+        casaInicio.z += ddz;
+        const cur = new THREE.Matrix4();
+        const mov = new THREE.Matrix4();
+        lote.meshes.forEach((mesh) => {
+            mesh.getMatrixAt(casaInicio.i, cur);
+            mov.makeTranslation(ddx, 0, ddz);
+            mesh.setMatrixAt(casaInicio.i, mov.multiply(cur));
+            mesh.instanceMatrix.needsUpdate = true;
+        });
+    };
 
     return {
         curva,
         materialCamino: suelo ? suelo.material : null,
         altura: (x, z) => fauna.altura(x, z),
+        aplanarAlrededor: (curvas, puntos) => aplanar.sumar(curvas, puntos),
         obstaculos: fauna.obstaculos,
         carpa,
+        casaInicio: casaInicio ? {
+            fijar: moverCasaInicio,
+            punto: () => new THREE.Vector3(casaInicio.x, casaInicio.y + 2, casaInicio.z),
+            frente: () => new THREE.Vector3(Math.sin(casaInicio.r), 0, Math.cos(casaInicio.r)),
+            leer: () => ({ x: mostradaX, y: mostradaZ }),
+        } : null,
         despejarArboles: (curvas, radio) => {
             const muestras = [];
             (curvas || []).forEach((c) => {
@@ -466,6 +693,9 @@ export async function armarMundo(scene, { modesto = false, ambiente = '' } = {})
             });
             obra.despejarArboles(muestras, radio);
         },
+        despejarFlores: (puntos, radio) => {
+            obra.despejarFlores(puntos || [], radio);
+        },
         actualizar: (dt, t) => fauna.update(dt, t),
         destruir: () => {
             obra.destruir();
@@ -474,121 +704,129 @@ export async function armarMundo(scene, { modesto = false, ambiente = '' } = {})
     };
 }
 
+const CARPETA_ESTACION = {
+    'expresion-artistica': 'artistica',
+    expresion_artistica: 'artistica',
+    musica: 'artistica',
+    polimotor: 'polimotor',
+    multisaberes: 'multisaberes',
+    logico: 'multisaberes',
+    multisensorial: 'multisensorial',
+    tecnologia: 'tecnologia',
+};
+
+export function carpetaEstacion(slug) {
+    return CARPETA_ESTACION[String(slug || '').toLowerCase()] || null;
+}
+
 /**
- * Casa de una experiencia. casa2.glb viene en otra escala (cientos de metros):
- * se normaliza a ~9 m de ancho y con la base en y=0.
- * El índice es estable por id de experiencia: recargar no le cambia la casa.
+ * Clon con la base en y=0 y el centro en XZ. No cambia el tamaño del GLB.
+ * Deja mixer con puerta_abrir, puerta_cerrar y las animacion_loop sin reproducir.
  */
-export function indiceCasaEstable(id) {
-    let h = 2166136261;
-    const s = String(id);
-    for (let i = 0; i < s.length; i++) {
-        h ^= s.charCodeAt(i);
-        h = Math.imul(h, 16777619);
-    }
-    return (h >>> 0) % 2;
-}
-
-function reatarEsqueleto(clon) {
-    const huesos = new Map();
-    clon.traverse((o) => { if (o.isBone) huesos.set(o.name, o); });
-    clon.traverse((o) => {
-        if (!o.isSkinnedMesh || !o.skeleton) return;
-        const bones = o.skeleton.bones.map((b) => huesos.get(b.name));
-        if (bones.some((b) => !b)) return;
-        // El clone de Three comparte el esqueleto original. Sin esto la casa
-        // se dibuja donde se cargó el GLB (el inicio) y no donde la ponemos.
-        o.bind(new THREE.Skeleton(bones, o.skeleton.boneInverses), o.bindMatrix);
-        o.frustumCulled = false;
-    });
-}
-
-export async function clonarCasa(indice) {
-    const ruta = indice % 2 === 0
-        ? '07_casas_tematicas/casa1'
-        : '07_casas_tematicas/casa2';
-    const modelo = await cargarModelo(ruta);
+function clonarConPuerta(modelo) {
     const root = modelo.root.clone(true);
-    reatarEsqueleto(root);
     root.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(root);
-    const size = box.getSize(new THREE.Vector3());
-    const s = 9 / Math.max(size.x, size.z, 0.001);
+    const c = box.getCenter(new THREE.Vector3());
+    root.position.set(-c.x, -box.min.y, -c.z);
     const grupo = new THREE.Group();
-    root.scale.setScalar(s);
-    root.updateMatrixWorld(true);
-    const box2 = new THREE.Box3().setFromObject(root);
-    const c = box2.getCenter(new THREE.Vector3());
-    root.position.set(-c.x, -box2.min.y, -c.z);
     grupo.add(root);
     grupo.traverse((o) => {
         if (!o.isMesh) return;
         o.castShadow = true;
         o.receiveShadow = true;
-        if (o.isSkinnedMesh) o.frustumCulled = false;
+        o.frustumCulled = false;
     });
     grupo.updateMatrixWorld(true);
-    let frente = new THREE.Box3().setFromObject(grupo).getSize(new THREE.Vector3()).z * 0.5;
-    let puerta = null;
-    grupo.traverse((o) => {
-        if (puerta || !o.name) return;
-        if (/door/i.test(o.name) && !/handler|base/i.test(o.name)) puerta = o;
-    });
+    const medida = new THREE.Box3().setFromObject(grupo).getSize(new THREE.Vector3());
+    grupo.userData.ancho = Math.max(medida.x, medida.z, 0.001);
+    const puerta = grupo.getObjectByName('puerta');
+    let frente = medida.z * 0.5;
     if (puerta) {
         const p = new THREE.Vector3();
         puerta.getWorldPosition(p);
-        if (p.z > 0.8) frente = p.z;
+        if (p.z > 0.4) frente = p.z;
     }
     grupo.userData.frente = frente;
-    const clips = modelo.animations || [];
-    if (clips.length) {
-        const mixer = new THREE.AnimationMixer(root);
-        clips.forEach((clip) => {
-            const accion = mixer.clipAction(clip);
-            accion.setLoop(THREE.LoopRepeat, Infinity);
-            accion.play();
-        });
-        grupo.userData.mixer = mixer;
-        grupo.traverse((o) => {
-            if (o.isMesh) o.frustumCulled = false;
-        });
-    }
+    const mixer = new THREE.AnimationMixer(grupo);
+    const acciones = { loops: [] };
+    (modelo.animations || []).forEach((clip) => {
+        const acc = mixer.clipAction(clip);
+        if (clip.name === 'animacion_loop') {
+            acc.setLoop(THREE.LoopRepeat, Infinity);
+            acciones.loops.push(acc);
+        } else if (clip.name === 'puerta_abrir' || clip.name === 'puerta_cerrar') {
+            acc.setLoop(THREE.LoopOnce, 1);
+            acc.clampWhenFinished = true;
+            acciones[clip.name] = acc;
+        }
+    });
+    grupo.userData.mixer = mixer;
+    grupo.userData.acciones = acciones;
     return grupo;
 }
 
-/** Castillo del final. El GLB trae el castillo y dos piezas sueltas a ~200 m; esas no se usan. */
+export async function clonarEstacion(slug, numero) {
+    const carpeta = carpetaEstacion(slug);
+    if (!carpeta) throw new Error('Ambiente sin modelos de estación');
+    const n = numero === 2 || numero === 3 ? numero : 1;
+    const modelo = await cargarModelo(`11_estaciones/${carpeta}/estacion${n}`);
+    return clonarConPuerta(modelo);
+}
+
+/** Meta del final. Las animacion_loop se arrancan al llegar, no al colocar. */
 export async function clonarCastillo() {
-    const modelo = await cargarModelo('07_casas_tematicas/castillo');
-    const root = modelo.root.clone(true);
-    const sobra = [];
-    root.children.forEach((hijo) => {
-        let esCastillo = false;
-        hijo.traverse((o) => {
-            if (o.name && o.name.indexOf('castle_uv') !== -1) esCastillo = true;
-        });
-        if (!esCastillo) sobra.push(hijo);
-    });
-    sobra.forEach((o) => root.remove(o));
-    root.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(root);
-    const size = box.getSize(new THREE.Vector3());
-    const s = 16 / Math.max(size.x, size.z, 0.001);
-    const grupo = new THREE.Group();
-    root.scale.setScalar(s);
-    root.updateMatrixWorld(true);
-    const box2 = new THREE.Box3().setFromObject(root);
-    const c = box2.getCenter(new THREE.Vector3());
-    root.position.set(-c.x, -box2.min.y, -c.z);
-    grupo.add(root);
-    grupo.traverse((o) => {
-        if (!o.isMesh) return;
-        o.castShadow = true;
-        o.receiveShadow = true;
-        o.frustumCulled = false;
-    });
-    grupo.updateMatrixWorld(true);
-    grupo.userData.frente = new THREE.Box3().setFromObject(grupo).getSize(new THREE.Vector3()).z * 0.5;
+    const modelo = await cargarModelo('11_estaciones/meta_final');
+    return clonarConPuerta(modelo);
+}
+
+/** Parque de juegos. animacion_loop va desde que aparece. */
+export async function clonarParque() {
+    const modelo = await cargarModelo('11_estaciones/parque_juegos');
+    const grupo = clonarConPuerta(modelo);
+    iniciarLoops(grupo);
     return grupo;
+}
+
+export function iniciarLoops(grupo) {
+    const lista = grupo && grupo.userData.acciones && grupo.userData.acciones.loops;
+    if (!lista) return;
+    lista.forEach((acc) => {
+        if (acc.isRunning()) return;
+        acc.reset().play();
+    });
+}
+
+/** Abre o cierra la puerta una vez y espera a que termine. Resuelve igual si no hay clip. */
+export function animarPuerta(grupo, abrir) {
+    const acciones = grupo && grupo.userData && grupo.userData.acciones;
+    const acc = acciones && acciones[abrir ? 'puerta_abrir' : 'puerta_cerrar'];
+    if (!acc) return Promise.resolve();
+    ['puerta_abrir', 'puerta_cerrar'].forEach((nombre) => {
+        const otra = acciones[nombre];
+        if (!otra) return;
+        otra.stop();
+        otra.enabled = false;
+    });
+    acc.enabled = true;
+    acc.reset();
+    acc.setLoop(THREE.LoopOnce, 1);
+    acc.clampWhenFinished = true;
+    acc.play();
+    const mixer = grupo.userData.mixer;
+    const ms = ((acc.getClip().duration || 1) * 1000) + 300;
+    return new Promise((resolve) => {
+        let listo = false;
+        const soltar = () => {
+            if (listo) return;
+            listo = true;
+            if (mixer) mixer.removeEventListener('finished', alFin);
+            resolve();
+        };
+        const alFin = (e) => { if (e.action === acc) soltar(); };
+        if (mixer) mixer.addEventListener('finished', alFin);
+        setTimeout(soltar, ms);
+    });
 }
 
 /** Niño o niña. Sin `cualPedido` elige al azar. Los GLB ya traen Idle, Walk, Run, Wave y Yes. */
