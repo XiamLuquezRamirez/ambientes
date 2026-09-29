@@ -211,10 +211,11 @@ function cfgFeedback(tipo) {
 }
 
 function hablarFeedback(tipo) {
-    if (tipo === "acierto") return Promise.resolve();
     if (!feedbackActivo()) return Promise.resolve();
     const cfg = cfgFeedback(tipo);
-    return hablarTexto(cfg.texto);
+    if (!cfg.texto) return Promise.resolve();
+    if (tipo === "acierto") return hablarConVoz(cfg.texto, "zoe");
+    return hablarConVoz(cfg.texto, "zeus");
 }
 
 function mostrarFeedback(tipo) {
@@ -427,10 +428,31 @@ function aplicarVisual() {
     root.style.setProperty("--mc-opcion-h", px(v.altoOpcion, "200px"));
 }
 
-function iniciarPartida() {
-    const pedido = String(gameConfig.cuerpo || "nina").toLowerCase();
-    cuerpoElegido = pedido === "nino" || pedido === "niño" ? "nino" : "nina";
+function normalizarCuerpo(valor) {
+    const s = String(valor || "").toLowerCase();
+    if (s === "nino" || s === "niño" || s === "m" || s === "masculino") return "nino";
+    if (s === "nina" || s === "niña" || s === "f" || s === "femenino") return "nina";
+    return "";
+}
+
+function cuerpoDesdePerfil() {
+    const perfil = window.__PEDNIA_PERFIL__;
+    if (!perfil) return "";
+    const valores = perfil.valores || {};
+    return normalizarCuerpo(perfil.sexo || perfil.estudiante_sexo || perfil.genero || valores.estudiante_sexo || valores.sexo);
+}
+
+function resolverCuerpo() {
+    return cuerpoDesdePerfil() || normalizarCuerpo(gameConfig && gameConfig.cuerpo) || "nina";
+}
+
+function aplicarCuerpo() {
+    cuerpoElegido = resolverCuerpo();
     document.body.dataset.cuerpo = cuerpoElegido;
+}
+
+function iniciarPartida() {
+    aplicarCuerpo();
     PedniaEdad.iniciarNivel({
         niveles: (gameConfig && gameConfig.niveles) || [],
         elegirManual: elegirNivel,
@@ -639,6 +661,58 @@ function terminarFaseMemoria() {
     }
 }
 
+function svgDedo() {
+    return '<svg viewBox="0 0 120 170" aria-hidden="true">' +
+        '<rect x="46" y="2" width="26" height="86" rx="13" fill="#ffd2b0" stroke="#d9976e" stroke-width="3"/>' +
+        '<ellipse cx="59" cy="14" rx="8" ry="6" fill="#fff6ee"/>' +
+        '<rect x="74" y="52" width="18" height="40" rx="9" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
+        '<rect x="90" y="60" width="16" height="34" rx="8" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
+        '<rect x="28" y="56" width="16" height="32" rx="8" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
+        '<path d="M24 84h74c14 0 22 12 22 26v18c0 22-18 36-40 36H46c-22 0-36-14-36-34v-22c0-14 6-24 14-24z" fill="#ffd2b0" stroke="#d9976e" stroke-width="3"/>' +
+        "</svg>";
+}
+
+function animarDedoEnOpcion(boton) {
+    if (!boton || !window.PedniaTutorial) return Promise.resolve();
+    document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
+    const reducir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dormir = PedniaTutorial.sleep;
+    const dedo = document.createElement("div");
+    dedo.className = "demo-dedo";
+    dedo.setAttribute("aria-hidden", "true");
+    dedo.innerHTML = svgDedo();
+    document.body.appendChild(dedo);
+
+    function punta() {
+        const r = boton.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.bottom - 10 };
+    }
+
+    function ponerDedo(x, y) {
+        dedo.style.left = x + "px";
+        dedo.style.top = y + "px";
+    }
+
+    const inicio = punta();
+    ponerDedo(reducir ? inicio.x : inicio.x + 120, reducir ? inicio.y : inicio.y + 150);
+
+    function soltar() {
+        dedo.classList.remove("is-pressed");
+        if (dedo.parentNode) dedo.remove();
+    }
+
+    return dormir(reducir ? 20 : 40).then(function () {
+        ponerDedo(inicio.x, inicio.y);
+        return dormir(reducir ? 160 : 1000);
+    }).then(function () {
+        dedo.classList.add("is-pressed");
+        boton.classList.add("opcion-ok");
+        return dormir(reducir ? 180 : 1200);
+    }).then(soltar, function () {
+        soltar();
+    });
+}
+
 async function correrDemoMemoria() {
     const ids = (function () {
         const candidatos = [
@@ -656,35 +730,51 @@ async function correrDemoMemoria() {
     if (prog) prog.hidden = true;
     const caja = document.getElementById("secuencia");
     const ops = document.getElementById("opciones");
+    caja.hidden = false;
+    caja.classList.add("secuencia-viva");
+    caja.innerHTML = htmlSecuencia(ids);
+    setEnunciado(textos().demostracion);
     await PedniaTutorial.correr({
         texto: textos().demostracion,
         textoFin: textos().demostracionFin,
         cancelado: function () { return !!juegoTerminado; },
         onTexto: setEnunciado,
         jugar: async function () {
-            caja.hidden = false;
-            caja.classList.add("secuencia-viva");
-            caja.innerHTML = htmlSecuencia(ids);
-            await PedniaTutorial.sleep(1400);
+            const dormir = PedniaTutorial.sleep;
+            await dormir(2600);
+            if (juegoTerminado) return;
             caja.classList.remove("secuencia-viva");
             caja.classList.add("secuencia-pista");
             caja.innerHTML = htmlSecuenciaConHueco(ids, ids.length - 1);
+            await dormir(1800);
+            if (juegoTerminado) return;
             const correcto = ids[ids.length - 1];
-            const m = datoMovimiento(correcto);
+            const lista = barajar([correcto].concat(distractoresMovimiento(correcto, 2, ids)));
+            let btnCorrecto = null;
             ops.hidden = false;
             ops.className = "opciones opciones-falta";
+            ops.style.setProperty("--mc-cols", "3");
             ops.innerHTML = "";
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "opcion-seq opcion-mov is-demo-target";
-            btn.innerHTML = htmlFigura(correcto) + '<span class="opcion-nombre">' + attrEsc(m.nombre) + "</span>";
-            ops.appendChild(btn);
-            await PedniaTutorial.sleep(1400);
+            lista.forEach(function (id) {
+                const m = datoMovimiento(id);
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "opcion-seq opcion-mov";
+                btn.disabled = true;
+                btn.innerHTML = htmlFigura(id) + '<span class="opcion-nombre">' + attrEsc(m.nombre) + "</span>";
+                if (id === correcto) btnCorrecto = btn;
+                ops.appendChild(btn);
+            });
+            await dormir(900);
+            if (juegoTerminado) return;
+            await animarDedoEnOpcion(btnCorrecto);
+            await dormir(800);
+            document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
             ops.innerHTML = "";
             ops.hidden = true;
             caja.innerHTML = "";
             caja.hidden = true;
-            caja.classList.remove("secuencia-pista");
+            caja.classList.remove("secuencia-pista", "secuencia-viva");
         }
     });
     instruccionDicha = true;
@@ -1030,9 +1120,10 @@ $(document).ready(function () {
     window.addEventListener("victory-continue", empezarJuegoTrasIntro);
     window.addEventListener("message", function (ev) {
         if (ev.origin !== window.location.origin) return;
-        if (ev.data && ev.data.type === "pednia:perfil") {
-            window.__PEDNIA_PERFIL__ = ev.data.perfil;
-        }
+            if (ev.data && ev.data.type === "pednia:perfil") {
+                window.__PEDNIA_PERFIL__ = ev.data.perfil;
+                aplicarCuerpo();
+            }
     });
     const btnVer = document.getElementById("btn-ver");
     if (btnVer) {

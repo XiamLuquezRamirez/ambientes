@@ -919,7 +919,7 @@
         ctx.restore();
     }
 
-    function dibujarCohete(meta, anim) {
+    function poseCohete(meta, anim) {
         const metaCfg = (gameConfig && gameConfig.meta) || {};
         const escala = Number(metaCfg.escala != null ? metaCfg.escala : 1.35);
         let size = (metaRadio() / 100) * tamañoLogico().w * escala;
@@ -930,23 +930,47 @@
             p = { x: coheteVuelo.x, y: coheteVuelo.y };
             size *= coheteVuelo.escala;
             rot = coheteVuelo.rot || 0;
-            if (coheteVuelo.fase !== "bajada") {
-                dibujarEstelaCohete(p, size, coheteVuelo.t);
-            }
         } else {
             p = aPixel(meta);
-            const bounce = pelotaVictoria ? Math.sin(anim * 0.25) * 8 : 0;
+            const bounce = pelotaVictoria ? Math.sin((anim || 0) * 0.25) * 8 : 0;
             p = { x: p.x, y: p.y - bounce };
+        }
+
+        let ratio = 1288 / 1080;
+        if (coheteImg && coheteImg.naturalWidth) {
+            ratio = coheteImg.naturalHeight / coheteImg.naturalWidth;
+        }
+        return { p: p, rot: rot, w: size, h: size * ratio };
+    }
+
+    /** Centro de la ventana turquesa, medido sobre COHETE_SIN-SOMBRA.png. */
+    function ventanaCohete(pose) {
+        const lx = 0.0353 * pose.w;
+        const ly = -0.1475 * pose.h;
+        const c = Math.cos(pose.rot);
+        const s = Math.sin(pose.rot);
+        return {
+            x: pose.p.x + c * lx - s * ly,
+            y: pose.p.y + s * lx + c * ly,
+            radio: 0.09 * pose.w
+        };
+    }
+
+    function dibujarCohete(meta, anim) {
+        const pose = poseCohete(meta, anim);
+        const p = pose.p;
+        const size = pose.w;
+        const rot = pose.rot;
+
+        if (coheteVuelo && coheteVuelo.activo && (coheteVuelo.fase === "prep" || coheteVuelo.fase === "subida")) {
+            dibujarEstelaCohete(p, size, coheteVuelo.t);
         }
 
         ctx.save();
         ctx.translate(p.x, p.y);
         if (rot) ctx.rotate(rot);
         if (coheteImg && coheteImg.complete && coheteImg.naturalWidth) {
-            const ratio = coheteImg.naturalHeight / coheteImg.naturalWidth;
-            const w = size;
-            const h = size * ratio;
-            ctx.drawImage(coheteImg, -w / 2, -h / 2, w, h);
+            ctx.drawImage(coheteImg, -pose.w / 2, -pose.h / 2, pose.w, pose.h);
         } else {
             const r = size * 0.35;
             ctx.beginPath();
@@ -989,12 +1013,14 @@
         ctx.stroke();
     }
 
-    function dibujarNino() {
-        const p = aPixel(personaje);
+    function tamanoCara() {
         const z = zonaJuego();
         // Más pequeña que el ancho del pasillo para que no “se salga” visualmente
         // y el niño no sienta que falla por el tamaño de la carita.
-        const size = (anchoCamino() / 100) * ((z.w / 100) * tamañoLogico().w) * 1.0;
+        return (anchoCamino() / 100) * ((z.w / 100) * tamañoLogico().w);
+    }
+
+    function dibujarNinoEn(p, size) {
         const sprite = (modoVictoria && avatarVictoriaImg && avatarVictoriaImg.complete && avatarVictoriaImg.naturalWidth)
             ? avatarVictoriaImg
             : avatarImg;
@@ -1003,6 +1029,37 @@
         } else {
             dibujarNinoFallback(p, size);
         }
+    }
+
+    function dibujarNino() {
+        dibujarNinoEn(aPixel(personaje), tamanoCara());
+    }
+
+    function suaveEntrada(t) {
+        const u = Math.max(0, Math.min(1, t));
+        return 1 - Math.pow(1 - u, 3);
+    }
+
+    /** La carita va hacia la ventana y, ya dentro, viaja con el cohete. */
+    function dibujarCaraEnVuelo(meta) {
+        if (!coheteVuelo || !coheteVuelo.activo || coheteVuelo.fase === "bajada") return;
+        const ventana = ventanaCohete(poseCohete(meta, pelotaAnim));
+        const desde = aPixel(coheteVuelo.caraOrigen);
+        const u = coheteVuelo.fase === "entrada"
+            ? suaveEntrada(coheteVuelo.t / coheteVuelo.entradaFrames)
+            : 1;
+        const x = desde.x + (ventana.x - desde.x) * u;
+        const y = desde.y + (ventana.y - desde.y) * u;
+        const sizeDentro = ventana.radio * 2.35;
+        const size = tamanoCara() + (sizeDentro - tamanoCara()) * u;
+        ctx.save();
+        if (u > 0.72) {
+            ctx.beginPath();
+            ctx.arc(ventana.x, ventana.y, ventana.radio * 0.94, 0, Math.PI * 2);
+            ctx.clip();
+        }
+        dibujarNinoEn({ x: x, y: y }, size);
+        ctx.restore();
     }
 
     function redibujar() {
@@ -1017,10 +1074,10 @@
             ctx.drawImage(capaEstatica, 0, 0);
 
             const geo = inicioMeta(lab);
-            if (!(coheteVuelo && coheteVuelo.activo && coheteVuelo.fase === "subida" && coheteVuelo.ocultarNino)) {
-                dibujarNino();
-            }
+            const caraEnCohete = coheteVuelo && coheteVuelo.activo && coheteVuelo.fase !== "bajada";
+            if (!caraEnCohete) dibujarNino();
             dibujarCohete(geo.meta, pelotaAnim);
+            if (caraEnCohete) dibujarCaraEnVuelo(geo.meta);
         }
 
         if (coheteVuelo && coheteVuelo.activo) {
@@ -1053,6 +1110,14 @@
         if (!coheteVuelo || !coheteVuelo.activo) return;
         coheteVuelo.t += 1;
 
+        if (coheteVuelo.fase === "entrada") {
+            if (coheteVuelo.t >= coheteVuelo.entradaFrames) {
+                coheteVuelo.fase = "prep";
+                coheteVuelo.t = 0;
+            }
+            return;
+        }
+
         if (coheteVuelo.fase === "prep") {
             coheteVuelo.x = coheteVuelo.origenX + Math.sin(coheteVuelo.t * 0.9) * 2.2;
             coheteVuelo.y = coheteVuelo.origenY + Math.cos(coheteVuelo.t * 1.1) * 1.4;
@@ -1072,7 +1137,6 @@
             coheteVuelo.y += coheteVuelo.vy;
             coheteVuelo.escala = Math.max(0.35, 1 - vuelo * 0.003);
             coheteVuelo.rot = Math.sin(vuelo * 0.035) * 0.1;
-            coheteVuelo.ocultarNino = vuelo > 18;
 
             if (coheteVuelo.y < -140 || vuelo > coheteVuelo.maxSubida) {
                 if (!coheteVuelo.haySiguiente) {
@@ -1097,7 +1161,6 @@
                 coheteVuelo.vy = 3.2;
                 coheteVuelo.escala = 0.45;
                 coheteVuelo.rot = 0;
-                coheteVuelo.ocultarNino = false;
             }
             return;
         }
@@ -1130,7 +1193,7 @@
         const haySiguiente = (indiceLaberinto + 1) < laberintos.length;
         coheteVuelo = {
             activo: true,
-            fase: "prep",
+            fase: "entrada",
             origenX: p.x,
             origenY: p.y,
             x: p.x,
@@ -1143,11 +1206,12 @@
             rot: 0,
             t: 0,
             tVuelo: 0,
+            entradaFrames: 52,
             prepFrames: 28,
             maxSubida: 130,
             maxBajada: 160,
             haySiguiente: haySiguiente,
-            ocultarNino: false
+            caraOrigen: { x: personaje.x, y: personaje.y }
         };
         if (rafId) {
             cancelAnimationFrame(rafId);
@@ -1220,6 +1284,7 @@
         laberintos = [demo];
         indiceLaberinto = 0;
         const prog = document.getElementById("progreso");
+        iniciarLaberintoActual();
         if (prog) prog.hidden = true;
         await PedniaTutorial.correr({
             texto: textos().demostracion,
@@ -1230,16 +1295,16 @@
                 if (en && t) en.textContent = t;
             },
             jugar: async function () {
-                iniciarLaberintoActual();
                 if (prog) prog.hidden = true;
+                await PedniaTutorial.sleep(1400);
                 const geo = inicioMeta(demo);
                 const muestras = muestrasLinea(geo.pts);
-                for (let i = 0; i < muestras.length; i++) {
+                for (let i = 1; i < muestras.length; i++) {
                     if (juegoTerminado) return;
                     personaje = muestras[i];
                     ultimoValido = { x: personaje.x, y: personaje.y };
                     redibujar();
-                    await PedniaTutorial.sleep(32);
+                    await PedniaTutorial.sleep(100);
                 }
             }
         });
@@ -1375,12 +1440,6 @@
 
         const lab = laberintoActual();
         const geo = inicioMeta(lab);
-        // Cara de victoria a la izquierda mientras el cohete despega.
-        personaje = {
-            x: Math.max(4, geo.meta.x - Math.max(metaRadio() * 1.6, 10)),
-            y: geo.meta.y
-        };
-
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
         iniciarVueloCohete(geo.meta);
     }

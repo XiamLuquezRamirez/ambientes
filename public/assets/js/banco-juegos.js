@@ -129,6 +129,47 @@
         } catch (e) { /* noop */ }
     }
 
+    /**
+     * El paquete sale con history.back() / onclick. Dentro del banco eso
+     * cierra el iframe y vuelve a la galería, no a la página del kiosco.
+     */
+    function engancharSalida(frame) {
+        let win;
+        let doc;
+        try {
+            win = frame.contentWindow;
+            doc = frame.contentDocument;
+        } catch (e) {
+            return;
+        }
+        if (!win || !doc || win.__pedniaSalidaEnganchada) return;
+        win.__pedniaSalidaEnganchada = true;
+
+        const salir = function (ev) {
+            if (ev) {
+                ev.preventDefault();
+                ev.stopImmediatePropagation();
+            }
+            if (frame.isConnected) cerrarJuego();
+        };
+
+        doc.querySelectorAll('[onclick*="history.back"]').forEach(function (btn) {
+            btn.removeAttribute('onclick');
+            btn.addEventListener('click', salir);
+        });
+
+        try {
+            const atras = win.history.back.bind(win.history);
+            win.history.back = function () {
+                if (frame.isConnected) {
+                    cerrarJuego();
+                    return;
+                }
+                atras();
+            };
+        } catch (e) { /* noop */ }
+    }
+
     function montarJuego(juego) {
         const perfil = perfilPayload();
         const url = urlPaqueteConEdad(juego.url_paquete, perfil);
@@ -137,10 +178,6 @@
         const $g = ctx.$paso.find('.bj-galeria');
         const $player = $(`
             <div class="bj-player" data-bj-player>
-                <div class="bj-player-top">
-                    <h3 class="bj-player-titulo">${iconoHtml(juego)} ${escapar(juego.nombre)}</h3>
-                    <button type="button" class="bj-salir-juego" data-bj-cerrar-juego>Cerrar</button>
-                </div>
                 <div class="bj-canvas-wrap" data-bj-canvas>
                     <iframe class="bj-iframe"
                         title="${escapar(juego.nombre)}"
@@ -154,6 +191,7 @@
         const frame = $player.find('iframe')[0];
         $(frame).on('load', function () {
             inyectarPerfil(frame);
+            engancharSalida(frame);
         });
     }
 
@@ -175,9 +213,6 @@
         ctx.$paso.on('click.bj', '[data-bj-volver]', function () {
             cerrarJuego();
             if (ctx.onVolver) ctx.onVolver();
-        });
-        ctx.$paso.on('click.bj', '[data-bj-cerrar-juego]', function () {
-            cerrarJuego();
         });
         ctx.$paso.on('click.bj', '.bj-card', function () {
             const $card = $(this);

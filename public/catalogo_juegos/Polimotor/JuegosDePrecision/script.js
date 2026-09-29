@@ -714,10 +714,14 @@
         refrescarStageRect();
         try { coheteEl.setPointerCapture(ev.pointerId); } catch (e) { /* noop */ }
         const frac = clientToFrac(ev.clientX, ev.clientY);
-        dragState = { pointerId: ev.pointerId };
-        lastPointer = frac;
+        const fx = Number(coheteEl.dataset.fx);
+        const fy = Number(coheteEl.dataset.fy);
+        const x0 = isFinite(fx) ? fx : frac.x;
+        const y0 = isFinite(fy) ? fy : frac.y;
+        // El dedo sujeta el punto que tocó. El cohete no salta al centro.
+        dragState = { pointerId: ev.pointerId, ox: frac.x - x0, oy: frac.y - y0 };
+        lastPointer = { x: x0, y: y0 };
         coheteEl.classList.add("is-dragging");
-        colocarCohete(frac.x, frac.y, 0);
         coheteEl.addEventListener("pointermove", onPointerMove);
         coheteEl.addEventListener("pointerup", onPointerUp);
         coheteEl.addEventListener("pointercancel", onPointerUp);
@@ -727,25 +731,36 @@
         if (!dragState || ev.pointerId !== dragState.pointerId) return;
         if (!aceptaArrastre || esperandoFeedback) return;
         ev.preventDefault();
-        const frac = clientToFrac(ev.clientX, ev.clientY);
-        const ang = anguloDesdeMovimiento(lastPointer, frac);
-        colocarCohete(frac.x, frac.y, ang != null ? ang : Number(coheteEl.dataset.ang) || 90);
-        lastPointer = frac;
-        evaluarPaso(frac.x, frac.y);
+        const pos = posicionArrastre(clientToFrac(ev.clientX, ev.clientY));
+        const ang = anguloDesdeMovimiento(lastPointer, pos);
+        colocarCohete(pos.x, pos.y, ang != null ? ang : Number(coheteEl.dataset.ang) || 90);
+        lastPointer = pos;
+        evaluarPaso(pos.x, pos.y);
     }
 
     function onPointerUp(ev) {
         if (!dragState || ev.pointerId !== dragState.pointerId) return;
         ev.preventDefault();
-        const frac = clientToFrac(ev.clientX, ev.clientY);
-        colocarCohete(frac.x, frac.y, Number(coheteEl.dataset.ang) || 90);
+        const fx = Number(coheteEl.dataset.fx);
+        const fy = Number(coheteEl.dataset.fy);
         limpiarListenersDrag();
         dragState = null;
         if (coheteEl) coheteEl.classList.remove("is-dragging");
         // Si soltó sobre la estrella sin completar aros → error.
-        if (arosPasados < aroNodes.length && tocaMeta(frac.x, frac.y)) {
+        if (arosPasados < aroNodes.length && tocaMeta(fx, fy)) {
             fallarYReiniciar();
         }
+    }
+
+    function limitarFrac(x, y) {
+        return {
+            x: Math.max(0.03, Math.min(0.97, x)),
+            y: Math.max(0.05, Math.min(0.95, y))
+        };
+    }
+
+    function posicionArrastre(frac) {
+        return limitarFrac(frac.x - dragState.ox, frac.y - dragState.oy);
     }
 
     function limpiarListenersDrag() {
@@ -966,10 +981,15 @@
         const prog = document.getElementById("progreso");
         if (prog) prog.hidden = true;
         const demo = {
-            inicio: [0.14, 0.78],
-            meta: [0.78, 0.78],
-            aros: [[0.46, 0.78]]
+            inicio: [0.2, 0.5],
+            meta: [0.72, 0.5],
+            aros: [[0.46, 0.5]]
         };
+        // El tablero del ejemplo ya está puesto cuando el personaje entra.
+        aceptaArrastre = false;
+        pintarRuta(demo);
+        const enun = document.getElementById("enunciado");
+        if (enun) enun.textContent = textos().demostracion || "";
         await PedniaTutorial.correr({
             texto: textos().demostracion,
             textoFin: textos().demostracionFin,
@@ -979,9 +999,10 @@
                 if (en && t) en.textContent = t;
             },
             jugar: async function () {
-                pintarRuta(demo);
                 aceptaArrastre = false;
-                const puntos = [demo.inicio].concat(demo.aros).concat([demo.meta]);
+                const meta = metaRuntime || demo.meta;
+                const puntos = [demo.inicio].concat(demo.aros).concat([meta]);
+                let aroMarcado = false;
                 for (let i = 0; i < puntos.length - 1; i++) {
                     const a = puntos[i];
                     const b = puntos[i + 1];
@@ -989,10 +1010,22 @@
                     for (let k = 0; k <= n; k++) {
                         if (juegoTerminado) return;
                         const t = k / n;
-                        colocarCohete(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 90);
-                        await PedniaTutorial.sleep(36);
+                        const x = a[0] + (b[0] - a[0]) * t;
+                        const y = a[1] + (b[1] - a[1]) * t;
+                        colocarCohete(x, y, 90);
+                        if (!aroMarcado && arosPasados < aroNodes.length) {
+                            const next = aroNodes[arosPasados];
+                            if (distanciaPx(x, y, next.x, next.y) <= radioHit(next)) {
+                                arosPasados += 1;
+                                actualizarEstilosAros();
+                                reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.7, false);
+                                aroMarcado = true;
+                            }
+                        }
+                        await PedniaTutorial.sleep(100);
                     }
                 }
+                await PedniaTutorial.sleep(800);
                 limpiarEscena();
             }
         });
