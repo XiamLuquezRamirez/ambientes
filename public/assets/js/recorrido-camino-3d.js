@@ -58,6 +58,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     let juegosAbiertos = false;    // true mientras la galería HTML está encima
     let caminandoLibre = false;    // caminata a un punto libre (no del grafo), p.ej. carpa
     let alLlegarLibre = null;      // callback al terminar una caminata libre
+    let alLlegarPuente = null;     // tramo intermedio que no cambia de parada
     let posAntesDeCarpa = null;    // posición del personaje antes de ir a la carpa (para volver)
     let ultimoNow = 0; // timestamp previo del loop (para delta time)
     let ambienteSlug = '';
@@ -73,8 +74,12 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     let personajeCual = 'nino';
     let cambiandoPersonaje = false;
     let zoomCam = 1;
+    let grupoCaminoParque = null;
+    let cancelarArranque = 0;
+    let focoManual = null;
     let posXCasa = [0, 0, 0];
     let posYCasa = [0, 0, 0];
+    const PASO_AJUSTE = 0.3;
     let onCanvasClick = null;
     let N = 0;
     let audioNarracion = null;
@@ -704,6 +709,22 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     }
 
     function actualizarCamara(inmediato) {
+        if (focoManual && !caminando && !entrandoSaliendo) {
+            const vista = vistaDelFoco();
+            if (!vista) { focoManual = null; }
+            else {
+                const mira = vista.mira.clone();
+                mira.y += 1.5;
+                const deseada = vista.mira.clone().addScaledVector(vista.frente, 14);
+                deseada.y = vista.mira.y + 4.5;
+                const kF = inmediato ? 1 : 0.12;
+                camPos.lerp(deseada, kF);
+                camTarget.lerp(mira, kF);
+                camera.position.copy(camPos);
+                camera.lookAt(camTarget);
+                return;
+            }
+        }
         const p = personaje.position;
         if ((caminando || entrandoSaliendo) && !seguimientoActivo) {
             seguimientoActivo = true;
@@ -725,12 +746,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 if (est) foco = p.clone().lerp(est.grupo.position, 0.42);
             }
             const z0 = zoomCam;
-            const posLejos = usaMapaGlb
-                ? new THREE.Vector3(foco.x - 16 * z0, foco.y + 18 * z0, foco.z + 22 * z0)
-                : new THREE.Vector3(foco.x - 9 * z0, 34 * z0, foco.z + 48 * z0);
-            const tgtLejos = usaMapaGlb
-                ? new THREE.Vector3(foco.x + 6, foco.y + 1.6, foco.z - 4)
-                : new THREE.Vector3(foco.x + 2, 2, foco.z - 6);
+            const plano = encuadreArranque(foco, z0);
+            const posLejos = plano.pos;
+            const tgtLejos = plano.mira;
 
             const yaw = personaje.rotation.y;
             const frente0 = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
@@ -840,7 +858,39 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
     const ZOOM_MIN = 0.55;
     const ZOOM_MAX = 1.75;
-    const ZOOM_PASO = 0.18;
+    const ZOOM_PASO = 0.38;
+    // Plano de arranque, antes de caminar y al pulsar Volver al inicio.
+    // 1 es la distancia base. Más alto aleja la cámara; más bajo la acerca.
+    const ZOOM_INICIAL = 1.35;
+    zoomCam = ZOOM_INICIAL;
+
+    function encuadreArranque(foco, z) {
+        const parque = parqueGrupo && parqueGrupo.position
+            ? parqueGrupo.position
+            : zonaJuegosParada;
+        if (!usaMapaGlb || !parque) {
+            return {
+                pos: usaMapaGlb
+                    ? new THREE.Vector3(foco.x - 16 * z, foco.y + 18 * z, foco.z + 22 * z)
+                    : new THREE.Vector3(foco.x - 9 * z, 34 * z, foco.z + 48 * z),
+                mira: usaMapaGlb
+                    ? new THREE.Vector3(foco.x + 6, foco.y + 1.6, foco.z - 4)
+                    : new THREE.Vector3(foco.x + 2, 2, foco.z - 6),
+            };
+        }
+        const medio = foco.clone().lerp(parque, 0.42);
+        medio.y = foco.y;
+        const dx = parque.x - foco.x;
+        const dz = parque.z - foco.z;
+        const largo = Math.max(1, Math.hypot(dx, dz));
+        const lado = new THREE.Vector3(-dz / largo, 0, dx / largo);
+        if (lado.dot(new THREE.Vector3(-1, 0, 1)) < 0) lado.negate();
+        const dist = Math.max(26, largo * 0.78) * z;
+        const alt = Math.max(16, largo * 0.42) * z;
+        const pos = medio.clone().addScaledVector(lado, dist);
+        pos.y = medio.y + alt;
+        return { pos, mira: new THREE.Vector3(medio.x, medio.y + 1.6, medio.z) };
+    }
 
     function ajustarZoom(delta) {
         zoomCam = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoomCam + delta));
@@ -888,6 +938,54 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         window.location.href = '/inicio';
     }
 
+    function volverPersonajeAlInicio() {
+        cancelarArranque++;
+        dialogoToken++;
+        const fiesta = document.getElementById('rn3dCelebracion');
+        if (fiesta) fiesta.remove();
+        detenerNarracion();
+        cerrarModal();
+        soltarFoco();
+        const capa = document.querySelector('.rn3d-juegos-capa');
+        if (capa) capa.remove();
+        juegosAbiertos = false;
+        posAntesDeCarpa = null;
+        caminando = false;
+        caminandoLibre = false;
+        entrandoSaliendo = false;
+        animCasa = null;
+        animCurva = null;
+        alLlegarCb = null;
+        alLlegarLibre = null;
+        alLlegarPuente = null;
+        mostrandoBocadillo = false;
+        narrando = false;
+        if (elBocadillo) elBocadillo.classList.add('rn3d-oculto');
+        pintarOpcionesDialogo(null);
+        if (personaje) {
+            personaje.visible = true;
+            colocarPersonajeEn('inicio');
+            ponerClip('Idle');
+        }
+        nodoActual = (camino && camino.paradas[0] && camino.paradas[0].id) || 'inicio';
+        seguimientoActivo = false;
+        mezclaHabla = 0;
+        yawCamSuave = null;
+        zoomCam = ZOOM_INICIAL;
+        ajustarZoom(0);
+        actualizarCamara(true);
+        if (!recorridoIniciado && elIniciar) elIniciar.classList.remove('rn3d-oculto');
+        refrescarEstaciones();
+        actualizarHud(false);
+    }
+
+    function pedirSalir() {
+        mostrarDialogo('¿Quieres salir?', null, [
+            { texto: 'Sí', tono: 'si', accion: function () { volverAlInicio(); } },
+            { texto: 'No', tono: 'no', accion: function () {} },
+        ]);
+    }
+
     function construirMenuLateral(raiz) {
         const menu = document.createElement('aside');
         menu.className = 'rn3d-menu is-cerrado';
@@ -902,6 +1000,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             +   '</button>'
             +   '<button type="button" class="rn3d-menu__btn" id="rn3dMenuInicio">'
             +     '<i class="fa-solid fa-house" aria-hidden="true"></i><span>Volver al inicio</span>'
+            +   '</button>'
+            +   '<button type="button" class="rn3d-menu__btn" id="rn3dMenuSalir">'
+            +     '<i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>Salir</span>'
             +   '</button>'
             +   '<div class="rn3d-menu__zoom">'
             +     '<button type="button" class="rn3d-menu__btn rn3d-menu__btn--icono" id="rn3dMenuAcercar" aria-label="Acercar cámara">'
@@ -933,7 +1034,12 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         menu.querySelector('#rn3dMenuInicio').addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            volverAlInicio();
+            volverPersonajeAlInicio();
+        });
+        menu.querySelector('#rn3dMenuSalir').addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            pedirSalir();
         });
         menu.querySelector('#rn3dMenuAcercar').addEventListener('click', function (e) {
             e.preventDefault();
@@ -979,6 +1085,147 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             [punto.x + frente.x * 2.4, punto.z + frente.z * 2.4],
             [punto.x + frente.x * 4.2, punto.z + frente.z * 4.2],
         ], 2.6);
+    }
+
+    function vistaFrenteEstacion(casa) {
+        casa.updateMatrixWorld(true);
+        const mira = new THREE.Vector3();
+        const puerta = casa.getObjectByName('puerta');
+        if (puerta) puerta.getWorldPosition(mira);
+        else casa.getWorldPosition(mira);
+        const frente = new THREE.Vector3(0, 0, 1).applyQuaternion(casa.quaternion);
+        frente.y = 0;
+        if (frente.lengthSq() < 1e-6) frente.set(0, 0, 1);
+        frente.normalize();
+        return { mira, frente };
+    }
+
+    function vistaDelFoco() {
+        if (!focoManual) return null;
+        if (focoManual.inicio && mundo && mundo.casaInicio && mundo.casaInicio.frente) {
+            const frente = mundo.casaInicio.frente();
+            if (frente.lengthSq() < 1e-6) frente.set(0, 0, 1);
+            frente.normalize();
+            return { mira: mundo.casaInicio.punto(), frente };
+        }
+        if (focoManual.casa && focoManual.casa.parent) return vistaFrenteEstacion(focoManual.casa);
+        return null;
+    }
+
+    function soltarFoco() {
+        focoManual = null;
+        document.querySelectorAll('#rn3dMenuEstaciones .is-activo').forEach((b) => b.classList.remove('is-activo'));
+        const panel = document.getElementById('rn3dMenuAjuste');
+        if (panel) panel.hidden = true;
+    }
+
+    function pintarAjuste(titulo, leer, fijar) {
+        let panel = document.getElementById('rn3dMenuAjuste');
+        const caja = document.getElementById('rn3dMenuEstaciones');
+        if (!caja) return;
+        if (!panel) {
+            panel = document.createElement('div');
+            panel.id = 'rn3dMenuAjuste';
+            panel.className = 'rn3d-menu__ajuste';
+            caja.appendChild(panel);
+        }
+        panel.hidden = false;
+        const v = leer();
+        panel.innerHTML = ''
+            + '<p class="rn3d-menu__titulo">' + titulo + '</p>'
+            + filaAjuste('X', v.x)
+            + filaAjuste('Y', v.y)
+            + '<button type="button" class="rn3d-menu__btn" data-accion="soltar-foco">Listo</button>';
+        panel.querySelectorAll('[data-eje]').forEach((btn) => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const eje = btn.getAttribute('data-eje');
+                const dir = Number(btn.getAttribute('data-dir'));
+                const actual = leer();
+                const sig = {
+                    x: eje === 'x' ? Math.round((actual.x + dir * PASO_AJUSTE) * 10) / 10 : actual.x,
+                    y: eje === 'y' ? Math.round((actual.y + dir * PASO_AJUSTE) * 10) / 10 : actual.y,
+                };
+                fijar(sig);
+                pintarAjuste(titulo, leer, fijar);
+            });
+        });
+        const soltar = panel.querySelector('[data-accion="soltar-foco"]');
+        if (soltar) {
+            soltar.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                soltarFoco();
+            });
+        }
+    }
+
+    function filaAjuste(nombre, valor) {
+        const t = (Number(valor) || 0).toFixed(1);
+        return ''
+            + '<div class="rn3d-menu__fila">'
+            +   '<button type="button" class="rn3d-menu__btn rn3d-menu__btn--mini" data-eje="' + nombre.toLowerCase() + '" data-dir="-1" aria-label="Menos ' + nombre + '">−</button>'
+            +   '<span>' + nombre + ' ' + t + '</span>'
+            +   '<button type="button" class="rn3d-menu__btn rn3d-menu__btn--mini" data-eje="' + nombre.toLowerCase() + '" data-dir="1" aria-label="Más ' + nombre + '">+</button>'
+            + '</div>';
+    }
+
+    function enfocarCasa(destino, boton, titulo, leer, fijar) {
+        if (!destino) return;
+        focoManual = destino;
+        document.querySelectorAll('#rn3dMenuEstaciones .rn3d-menu__btn').forEach((b) => b.classList.remove('is-activo'));
+        if (boton) boton.classList.add('is-activo');
+        pintarAjuste(titulo, leer, fijar);
+        actualizarCamara(true);
+    }
+
+    function llenarMenuEstaciones() {
+        const caja = document.getElementById('rn3dMenuEstaciones');
+        if (!caja) return;
+        caja.innerHTML = '<p class="rn3d-menu__titulo">Enfocar para ajustar</p>';
+        if (mundo && mundo.casaInicio) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'rn3d-menu__btn';
+            b.innerHTML = '<i class="fa-solid fa-house" aria-hidden="true"></i><span>Casa de inicio</span>';
+            b.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                enfocarCasa(
+                    { inicio: true },
+                    b,
+                    'Casa de inicio',
+                    mundo.casaInicio.leer,
+                    function (sig) { mundo.casaInicio.fijar(sig.x, sig.y); }
+                );
+            });
+            caja.appendChild(b);
+        }
+        const casas = Object.keys(casasPorId).map((id) => casasPorId[id]).filter(Boolean);
+        casas.sort((a, b) => (a.userData.indice || 0) - (b.userData.indice || 0));
+        casas.forEach((casa) => {
+            const idx = (casa.userData.modelo || 1) - 1;
+            const num = casa.userData.numeroLabel || String(casa.userData.modelo);
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'rn3d-menu__btn';
+            b.innerHTML = '<i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>Estación ' + num + '</span>';
+            b.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const leer = () => ({ x: posXCasa[idx] || 0, y: posYCasa[idx] || 0 });
+                const fijar = (sig) => {
+                    posXCasa[idx] = sig.x;
+                    posYCasa[idx] = sig.y;
+                    casas.forEach((otra) => {
+                        if ((otra.userData.modelo || 1) - 1 === idx) aplicarPoseEstacion(otra);
+                    });
+                };
+                enfocarCasa({ casa }, b, 'Estación ' + num + ' · modelo ' + casa.userData.modelo, leer, fijar);
+            });
+            caja.appendChild(b);
+        });
     }
 
     // ===================== Estados de estaciones =====================
@@ -1060,6 +1307,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         animCurva = new THREE.CatmullRomCurve3([origen, destino], false, 'catmullrom', 0.5);
         animT0 = 0; animT1 = 1;
         caminando = true; caminandoLibre = true; yawObjetivo = null;
+        soltarFoco();
         alLlegarLibre = function () { abrirZonaJuegos(); };
         personaje.visible = true; ocultarEtiqueta();
         animDur = duracionCaminata(origen.distanceTo(destino));
@@ -1104,8 +1352,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (!o || !d) return null;
         if (usaMapaGlb) {
             const spur = (o.spur && d.spur && o.spur === d.spur) ? o.spur
-                : (d.spur && origenId === idModulo) ? d.spur
-                : (o.spur && destinoId === idModulo) ? o.spur
+                : (d.spur && (origenId === idModulo || origenId === d.boca)) ? d.spur
+                : (o.spur && (destinoId === idModulo || destinoId === o.boca)) ? o.spur
                 : null;
             if (spur) {
                 const t0 = (o.spur === spur) ? o.tLocal : 0;
@@ -1140,26 +1388,71 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         return { curva: curva, t0: o.t || 0, t1: d.t || 0 };
     }
 
-    // Mueve al personaje al nodo `destinoId` SIN validar (uso interno / automático).
-    function caminarAForzado(destinoId, alLlegar) {
-        if (caminando || entrandoSaliendo || !destinoId || destinoId === nodoActual) { if (alLlegar) alLlegar(); return; }
-        const tramo = tramoEntre(nodoActual, destinoId);
-        if (!tramo) { if (alLlegar) alLlegar(); return; }
-        personaje.visible = true; // por si venía de estar dentro de una casa
-
+    function caminarPuente(curvaP, t0, t1, alLlegar) {
+        if (!personaje || !curvaP) { if (alLlegar) alLlegar(); return; }
+        const p0 = curvaP.getPoint(t0);
+        const p1 = curvaP.getPoint(t1);
+        if (p0.distanceTo(p1) < 0.8) { if (alLlegar) alLlegar(); return; }
+        personaje.visible = true;
         cerrarModal();
         yawObjetivo = null;
+        soltarFoco();
+        caminando = true;
+        ocultarEtiqueta();
+        animCurva = curvaP;
+        animT0 = t0;
+        animT1 = t1;
+        animDestinoId = nodoActual;
+        alLlegarPuente = alLlegar || null;
+        animDur = duracionCaminata(p0.distanceTo(p1));
+        animInicio = performance.now();
+    }
+
+    function empezarTramo(destinoId, alLlegar) {
+        const tramo = tramoEntre(nodoActual, destinoId);
+        if (!tramo) { if (alLlegar) alLlegar(); return; }
+        personaje.visible = true;
+        cerrarModal();
+        yawObjetivo = null;
+        soltarFoco();
         caminando = true; ocultarEtiqueta();
         refrescarEstaciones();
         animCurva = tramo.curva; animT0 = tramo.t0; animT1 = tramo.t1;
         animDestinoId = destinoId; alLlegarCb = alLlegar || null;
-
         const p0 = animCurva.getPoint(animT0), p1 = animCurva.getPoint(animT1);
         animDur = duracionCaminata(p0.distanceTo(p1));
         animInicio = performance.now();
         const est = estacionPorId(destinoId);
         if (est) indiceActual = est.indice;
         actualizarHud(true);
+    }
+
+    // Mueve al personaje al nodo `destinoId` SIN validar (uso interno / automático).
+    function caminarAForzado(destinoId, alLlegar) {
+        if (caminando || entrandoSaliendo || !destinoId || destinoId === nodoActual) { if (alLlegar) alLlegar(); return; }
+        const aqui = nodos[nodoActual];
+        const dest = nodos[destinoId];
+        // Del paso 3 a la experiencia: primero el sendero hasta la Y, después el desvío.
+        if (dest && dest.spur && dest.boca === nodoActual && typeof dest.tUnion === 'number') {
+            caminarPuente(curva, aqui.t || 0, dest.tUnion, function () {
+                empezarTramo(destinoId, alLlegar);
+            });
+            return;
+        }
+        // Al salir de esa experiencia: desvío hasta la Y y luego el sendero, sin saltar al paso 3.
+        if (aqui && aqui.spur && aqui.boca && destinoId !== aqui.boca && typeof aqui.tUnion === 'number') {
+            const union = aqui.tUnion;
+            const tDest = dest && !dest.spur ? (dest.t || 0) : union;
+            caminarPuente(aqui.spur, aqui.tLocal != null ? aqui.tLocal : 1, 0, function () {
+                caminarPuente(curva, union, tDest, function () {
+                    animDestinoId = destinoId;
+                    alLlegarCb = alLlegar || null;
+                    terminarAvance();
+                });
+            });
+            return;
+        }
+        empezarTramo(destinoId, alLlegar);
     }
 
     // Camina hacia el nodo `destinoId` (string) si es TOCABLE. `alLlegar` opcional.
@@ -1177,9 +1470,28 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     let regresandoAlFin = false;
     let esperarParaFin = false;
     let esperaFinDesde = 0;
+    function irAlFinPasandoPorTres() {
+        if (regresandoAlFin || !idFin || visitados.has(idFin)) return;
+        regresandoAlFin = true;
+        const aqui = nodos[nodoActual];
+        const boca = aqui && aqui.boca;
+        const alFin = function () {
+            caminarAForzado(idFin, function () { regresandoAlFin = false; });
+        };
+        if (boca && nodoActual !== boca) {
+            caminarAForzado(boca, alFin);
+            return;
+        }
+        alFin();
+    }
+
     function irAlFinAutomatico() {
-        if (regresandoAlFin || esperarParaFin || !idFin) return;
-        if (!esRamificado || nodoActual === idModulo) {
+        if (regresandoAlFin || esperarParaFin || !idFin || visitados.has(idFin)) return;
+        if (!esRamificado) {
+            irAlFinPasandoPorTres();
+            return;
+        }
+        if (nodoActual === idModulo) {
             pedirSalidaAlFin();
             return;
         }
@@ -1433,7 +1745,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             decirAlLlegar(p);
         } else if (p && p.id === 'fin') {
             if (castilloGrupo) iniciarLoops(castilloGrupo);
-            decirAlLlegar(p);
+            hablar(fraseParada(p));
             iniciarFuegos();
             mostrarCelebracionFin();
         }
@@ -1599,15 +1911,53 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         return { embed, embedUrl };
     }
 
-    function mostrarOverlayVideo(tipoMedia) {
+    function mostrarOverlayVideo(tipoMedia, medio) {
         const $fs = $('#rn3dVideoFs');
         const $btn = $('#rn3dMediaFsCerrar');
         const esImg = tipoMedia === 'imagen';
         if ($btn.length) {
             $btn.prop('hidden', !esImg).attr('aria-hidden', esImg ? 'false' : 'true');
         }
+        ticketSalida++;
+        saliendoNube = false;
+        $fs.removeClass('rn3d-video-fs--sale');
         $fs.prop('hidden', false).attr('aria-hidden', 'false').addClass('rn3d-video-fs--activo');
         document.body.classList.add('rn3d-video-reproduciendo');
+        prepararEntradaMedia(medio || null);
+    }
+
+    function prepararEntradaMedia(medio) {
+        const inner = document.getElementById('rn3dVideoFsInner');
+        if (!inner) return;
+        inner.classList.remove('rn3d-media-entra', 'rn3d-media-sale');
+        let ya = false;
+        const arrancar = function () {
+            if (ya || !inner.isConnected) return;
+            ya = true;
+            inner.classList.add('rn3d-media-entra');
+        };
+        if (!medio) {
+            requestAnimationFrame(arrancar);
+            return;
+        }
+        if (medio.tagName === 'IMG') {
+            if (medio.complete) arrancar();
+            else {
+                medio.addEventListener('load', arrancar, { once: true });
+                medio.addEventListener('error', arrancar, { once: true });
+            }
+            return;
+        }
+        if (medio.tagName === 'VIDEO') {
+            if (medio.readyState >= 2) arrancar();
+            else {
+                medio.addEventListener('loadeddata', arrancar, { once: true });
+                medio.addEventListener('error', arrancar, { once: true });
+            }
+            return;
+        }
+        medio.addEventListener('load', arrancar, { once: true });
+        window.setTimeout(arrancar, 280);
     }
 
     function ocultarOverlayVideo() {
@@ -1616,7 +1966,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if ($btn.length) {
             $btn.prop('hidden', true).attr('aria-hidden', 'true');
         }
-        $fs.prop('hidden', true).attr('aria-hidden', 'true').removeClass('rn3d-video-fs--activo');
+        const inner = document.getElementById('rn3dVideoFsInner');
+        if (inner) inner.classList.remove('rn3d-media-entra', 'rn3d-media-sale');
+        $fs.prop('hidden', true).attr('aria-hidden', 'true').removeClass('rn3d-video-fs--activo rn3d-video-fs--sale');
         document.body.classList.remove('rn3d-video-reproduciendo');
     }
 
@@ -1655,24 +2007,64 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
 
     let generacionVideo = 0;
+    let saliendoNube = false;
+    let ticketSalida = 0;
+
+    function salirNube(alTerminar) {
+        const fs = document.getElementById('rn3dVideoFs');
+        const inner = document.getElementById('rn3dVideoFsInner');
+        const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const visible = fs && !fs.hidden && inner && inner.childElementCount;
+        if (!visible || reduce) {
+            saliendoNube = false;
+            ocultarOverlayVideo();
+            if (alTerminar) alTerminar();
+            return;
+        }
+        saliendoNube = true;
+        const ticket = ++ticketSalida;
+        fs.classList.add('rn3d-video-fs--sale');
+        let listo = false;
+        const fin = function () {
+            if (listo || ticket !== ticketSalida) return;
+            listo = true;
+            saliendoNube = false;
+            ocultarOverlayVideo();
+            if (alTerminar) alTerminar();
+        };
+        inner.addEventListener('animationend', function onEnd(ev) {
+            if (ev.animationName !== 'rn3d-media-sale') return;
+            inner.removeEventListener('animationend', onEnd);
+            fin();
+        });
+        window.setTimeout(fin, 1100);
+    }
 
     function finalizarVideoParada(preguntar) {
+        if (saliendoNube) return;
         generacionVideo++;
         const $fs = $('#rn3dVideoFs');
         const vid = $fs.find('video')[0];
         if (vid) {
             try { vid.pause(); } catch (e) { /* noop */ }
         }
-        $fs.find('iframe').each(function () { this.src = ''; });
-        $('#rn3dVideoFsInner').empty();
-        ocultarOverlayVideo();
-        desactivarEscuchaEmbedVideo();
-        if (preguntar && paradaVideoActual && esVideoParada(paradaVideoActual)) {
-            preguntarSiReverVideo();
-        }
+        $fs.find('iframe').each(function () {
+            try {
+                this.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }), '*');
+            } catch (err) { /* noop */ }
+        });
+        const preguntarAlSalir = !!(preguntar && paradaVideoActual && esVideoParada(paradaVideoActual));
+        salirNube(function () {
+            $fs.find('iframe').each(function () { this.src = ''; });
+            $('#rn3dVideoFsInner').empty();
+            desactivarEscuchaEmbedVideo();
+            if (preguntarAlSalir) preguntarSiReverVideo();
+        });
     }
 
     function detenerVideoParada() {
+        ticketSalida++;
+        saliendoNube = false;
         paradaVideoActual = null;
         const $fs = $('#rn3dVideoFs');
         const vid = $fs.find('video')[0];
@@ -1704,7 +2096,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         img.alt = p.titulo || 'Imagen';
         $inner[0].appendChild(img);
 
-        mostrarOverlayVideo('imagen');
+        mostrarOverlayVideo('imagen', img);
     }
 
     function reproducirVideoParada(p) {
@@ -1738,7 +2130,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             });
             $inner[0].appendChild(iframe);
             activarEscuchaEmbedVideo();
-            mostrarOverlayVideo('video');
+            mostrarOverlayVideo('video', iframe);
             return true;
         }
 
@@ -1761,7 +2153,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             soltarTrasVideo();
         }, { once: true });
 
-        mostrarOverlayVideo('video');
+        mostrarOverlayVideo('video', video);
         const juego = video.play();
         if (juego && typeof juego.catch === 'function') {
             juego.catch(function () {
@@ -1834,6 +2226,10 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             actualizarHud(false);
             if (esRamificado && idModulo && nodoActual !== idModulo && enExperienciaCompletada()) {
                 caminarAForzado(idModulo);
+                return;
+            }
+            if (!esRamificado && idFin && nodoActual !== idFin && !visitados.has(idFin) && !regresandoAlFin) {
+                irAlFinPasandoPorTres();
             }
         };
         if (!personaje.visible || puertasCasa[nodoActual]) {
@@ -2014,11 +2410,20 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 ';animation-delay:' + delay + 's;animation-duration:' + dur + 's;transform:rotate(' + rot + 'deg)"></span>';
         }
         cont.innerHTML = '<div class="rn3d-celebracion__confeti">' + confeti + '</div>'
-            + '<div class="rn3d-celebracion__msg">🎉 ¡Lo lograste! 🎉<br><small>Completaste toda la aventura</small></div>';
+            + '<div class="rn3d-celebracion__tarjeta">'
+            +   '<p class="rn3d-celebracion__titulo">¡Lo lograste!</p>'
+            +   '<p class="rn3d-celebracion__sub">Completaste toda la aventura</p>'
+            +   '<button type="button" class="rn3d-celebracion__btn" id="rn3dFinInicio">Volver al inicio</button>'
+            + '</div>';
         ctx.$paso[0].appendChild(cont);
-        // Desvanecer y quitar tras ~8s.
-        setTimeout(() => { cont.classList.add('rn3d-cel-ocultar'); }, 7500);
-        setTimeout(() => { if (cont.parentNode) cont.parentNode.removeChild(cont); }, 8200);
+        const btn = cont.querySelector('#rn3dFinInicio');
+        if (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                volverPersonajeAlInicio();
+            });
+        }
     }
 
     function construirOverlay() {
@@ -2056,8 +2461,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         let dialogoEnCurso = false;
 
         // Al terminar el diálogo: cierra la nube (suave) y arranca a caminar.
+        let genArranque = 0;
         const terminarDialogo = () => {
-            if (!dialogoEnCurso) return;
+            if (!dialogoEnCurso || genArranque !== cancelarArranque) return;
             dialogoEnCurso = false;
             mostrandoBocadillo = false;               // deja de anclarse al personaje
             elBocadillo.classList.add('rn3d-oculto');  // se cierra con transición
@@ -2070,6 +2476,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const DUR_MIN_DIALOGO = 4800;
 
         btnIniciar.addEventListener('click', () => {
+            const gen = genArranque = ++cancelarArranque;
             // 1) desaparece el botón Iniciar (transición suave)
             btnIniciar.classList.add('rn3d-oculto');
             // 2) aparece la nube con el personaje "hablando"
@@ -2077,15 +2484,20 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             elBocadillo.classList.remove('rn3d-oculto');
             dialogoEnCurso = true;
             const tIni = performance.now();
+            const seguir = () => {
+                if (gen !== cancelarArranque) return;
+                terminarDialogo();
+            };
             // 3) habla; al terminar la voz (o al cumplirse el mínimo) → caminar
             const alFin = () => {
+                if (gen !== cancelarArranque) return;
                 const falta = DUR_MIN_DIALOGO - (performance.now() - tIni);
-                if (falta > 0) setTimeout(terminarDialogo, falta);
-                else terminarDialogo();
+                if (falta > 0) setTimeout(seguir, falta);
+                else seguir();
             };
             hablar(saludo, alFin);         // el gesto del botón desbloquea el audio
             // respaldo por si la voz no notifica nunca
-            setTimeout(() => { if (dialogoEnCurso) terminarDialogo(); }, 9000);
+            setTimeout(() => { if (gen === cancelarArranque && dialogoEnCurso) seguir(); }, 9000);
         });
     }
 
@@ -2148,7 +2560,10 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             rumboCamino = poseCamino.rot;
             if (poseCamino.fin) {
                 caminando = false; animCurva = null;
-                if (caminandoLibre) {
+                if (alLlegarPuente) {
+                    const cb = alLlegarPuente; alLlegarPuente = null;
+                    if (cb) cb();
+                } else if (caminandoLibre) {
                     caminandoLibre = false;
                     const cb = alLlegarLibre; alLlegarLibre = null;
                     if (cb) cb();
@@ -2201,6 +2616,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         ultimoNow = 0; mostrandoBocadillo = false;
         seguimientoActivo = false; mezclaHabla = 0; rumboCamino = 0;
         orbitaAplicada = 0; distLejosAplicada = 0; acopleDetras = 0; yawObjetivo = null;
+        focoManual = null;
         angLadeo = 0; yawCamSuave = null; signoLadeo = 1;
         // Estado de grafo
         construirGrafo();
@@ -2213,7 +2629,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         parqueGrupo = null;
         puertasCasa = {}; entrandoSaliendo = false;
         zonaJuegos = null; zonaJuegosCartel = null; zonaJuegosCentro = null; juegosAbiertos = false;
-        zonaJuegosParada = null; caminandoLibre = false; alLlegarLibre = null; posAntesDeCarpa = null;
+        zonaJuegosParada = null; caminandoLibre = false; alLlegarLibre = null; alLlegarPuente = null; posAntesDeCarpa = null;
 
         ctx.$shell.addClass('rn-shell--camino rn-shell--3d');
         ctx.$paso.attr('data-paso', 'camino').empty();
@@ -2305,6 +2721,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             personajeCual = pj.cual || 'nino';
             clipActual = accionesPersonaje.Idle ? 'Idle' : '';
             colocarPersonajeEn(nodoActual || 'inicio');
+            construirCaminoAlParque();
+            zoomCam = ZOOM_INICIAL;
             camPos.copy(personaje.position).add(new THREE.Vector3(-16, 18, 22));
             camTarget.copy(personaje.position);
             actualizarCamara(true);
@@ -2392,7 +2810,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const base = vieja || curva;
         const tronco = esRamificado
             ? nodosDeTronco().map((n) => n.parada.id)
-            : (camino.paradas || []).map((p) => p.id);
+            : (camino.paradas || [])
+                .filter((p) => !esParadaExperiencia(p))
+                .map((p) => p.id);
         const n = tronco.length;
         tronco.forEach((id, i) => {
             if (!nodos[id]) return;
@@ -2414,6 +2834,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             nodos[id].pos = pos;
         });
         if (esRamificado && idModulo && nodos[idModulo]) construirDesvios();
+        else espolonesLineales();
         if (mundo && typeof mundo.aplanarAlrededor === 'function') {
             const curvasPlanas = [];
             Object.keys(curvasRama).forEach((k) => { if (curvasRama[k]) curvasPlanas.push(curvasRama[k]); });
@@ -2492,6 +2913,46 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             elegidos.push({ dir: tang.clone().applyAxisAngle(ejeY, ang).normalize(), ang });
         }
         return elegidos.slice(0, total).map((e) => e.dir);
+    }
+
+    // Con una sola experiencia el grafo es una línea y esa parada no tenía
+    // desvío: solo el marcador. Se le abre el mismo espolón que a las demás.
+    function espolonesLineales() {
+        const paradas = (camino && camino.paradas) || [];
+        const ejeY = new THREE.Vector3(0, 1, 0);
+        paradas.forEach((par, i) => {
+            if (!esParadaExperiencia(par) || !nodos[par.id] || nodos[par.id].spur) return;
+            const nodo = nodos[par.id];
+            const boca = i > 0 ? paradas[i - 1].id : null;
+            const ancla = boca && nodos[boca] && nodos[boca].pos ? nodos[boca] : null;
+            if (!ancla) return;
+            const origen = ancla.pos.clone();
+            const tang = curva.getTangent(ancla.t || 0);
+            tang.y = 0;
+            if (tang.lengthSq() < 1e-6) tang.set(1, 0, 0);
+            tang.normalize();
+            const dir = direccionesDesvio(origen, tang, ejeY, 1)[0];
+            const largo = 34;
+            const crudo = [
+                origen.clone(),
+                origen.clone().addScaledVector(tang, 8).addScaledVector(dir, 5),
+                origen.clone().addScaledVector(dir, largo * 0.62),
+                origen.clone().addScaledVector(dir, largo),
+            ];
+            const pts = crudo.map((p) => {
+                const ySuelo = mundo ? mundo.altura(p.x, p.z) : origen.y;
+                return new THREE.Vector3(p.x, Math.max(origen.y, ySuelo) + 0.22, p.z);
+            });
+            const spur = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.35);
+            curvasRama['lineal-' + par.id] = spur;
+            nodo.spur = spur;
+            nodo.tUnion = ancla.t || 0;
+            nodo.tLocal = 1;
+            nodo.t = 1;
+            nodo.curvaLocal = spur;
+            nodo.pos = spur.getPoint(1).clone();
+            nodo.boca = boca;
+        });
     }
 
     // Desde el paso 3 salen n cintas, una por experiencia. El GLB del camino
@@ -2607,24 +3068,6 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     // El otro eje del suelo (Z en la escena). Positivo corre hacia +Z.
     const POS_Y_CASA_INICIO = 0;
 
-    function barajarEstaciones(semilla) {
-        const arr = [1, 2, 3];
-        let h = 2166136261;
-        const s = String(semilla);
-        for (let i = 0; i < s.length; i++) {
-            h ^= s.charCodeAt(i);
-            h = Math.imul(h, 16777619);
-        }
-        for (let i = arr.length - 1; i > 0; i--) {
-            h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0;
-            const j = h % (i + 1);
-            const tmp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = tmp;
-        }
-        return arr;
-    }
-
     async function colocarCasasExperiencia() {
         if (grupoCasas && grupoCasas.parent) grupoCasas.parent.remove(grupoCasas);
         grupoCasas = new THREE.Group();
@@ -2632,7 +3075,6 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         casasPorId = {};
         if (scene) scene.add(grupoCasas);
         const tareas = [];
-        if (esRamificado) {
         // 0 = el frente del GLB (su +Z, donde está la puerta) mira al camino.
         // [0] = estacion1, [1] = estacion2, [2] = estacion3.
         const GIRO_CASA_GRADOS = [0, 0, 0];
@@ -2640,11 +3082,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const ALTURA_CASA = [-0.3, -0.3, -0.3];
         // Metros en el eje X del mundo. Positivo corre la estación hacia +X.
         // [0] = estacion1, [1] = estacion2, [2] = estacion3.
-        const POS_X_CASA = [-0.9, 2.8, 2.5];
-        // El otro eje del suelo (Z en la escena). Positivo corre hacia +Z.
-        // La altura sigue siendo ALTURA_CASA.
-        // [0] = estacion1, [1] = estacion2, [2] = estacion3.
-        const POS_Y_CASA = [2.3, 0.0, 1.2];
+        const POS_X_CASA = [2.4, -0.8, 2.8];
+        const POS_Y_CASA = [1.1, 3.0, 0.3];
         posXCasa = POS_X_CASA.slice();
         posYCasa = POS_Y_CASA.slice();
         // 1 = el tamaño del archivo. Mayor crece, menor encoge.
@@ -2652,10 +3091,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const exps = Object.values(nodos)
             .filter((n) => n.spur && esParadaExperiencia(n.parada))
             .sort((a, b) => a.indice - b.indice);
-        const semilla = exps.map((n) => n.parada.experiencia_id || n.parada.id).join('|');
-        const orden = barajarEstaciones(semilla);
         exps.forEach((nodo, iExp) => {
-            const numero = orden[iExp % 3];
+            const numero = (iExp % 3) + 1;
             tareas.push(clonarEstacion(ambienteSlug, numero).then((casa) => {
                 if (!grupoCasas || !scene) return;
                 const fin = nodo.spur.getPoint(1);
@@ -2687,7 +3124,6 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 grupoCasas.add(casa);
             }).catch((err) => { console.error(err); }));
         });
-        }
         tareas.push(colocarCastillo());
         tareas.push(colocarParque());
         await Promise.all(tareas);
@@ -2748,10 +3184,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
     async function colocarParque() {
         if (!grupoCasas || !mundo || !mundo.carpa) return;
-        // 1 deja el parque en unos 8 m, el hueco donde estaba la carpa.
-        // El GLB mide ~23 m: para verlo a tamaño de archivo sube esto a 2.9.
+        // Tamaño en metros. El GLB mide ~23 m; más de eso empieza a tapar el inicio.
         const ESCALA_PARQUE = 1;
-        const META = 8;
+        const META = 18;
         let parque;
         try {
             parque = await clonarParque();
@@ -2764,10 +3199,56 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const base = parque.userData.ancho || META;
         const escala = (META / base) * (Number.isFinite(ESCALA_PARQUE) ? ESCALA_PARQUE : 1);
         parque.scale.setScalar(escala);
+        parque.userData.radioMundo = (base * escala) / 2;
         parque.position.set(c.x, mundo.altura(c.x, c.z), c.z);
-        parque.rotation.y = c.r || 0;
         parqueGrupo = parque;
         grupoCasas.add(parque);
+        construirCaminoAlParque();
+    }
+
+    function construirCaminoAlParque() {
+        if (!scene || !mundo || !parqueGrupo || !curva) return;
+        const ini = (nodos.inicio && nodos.inicio.pos)
+            ? nodos.inicio.pos.clone()
+            : curva.getPoint(0).clone();
+        const centro = parqueGrupo.position.clone();
+        const hacia = ini.clone().sub(centro);
+        hacia.y = 0;
+        if (hacia.lengthSq() < 1) hacia.set(0, 0, 1);
+        hacia.normalize();
+        // El arco del modelo está en su +Z. Girarlo para que mire al inicio.
+        parqueGrupo.rotation.y = Math.atan2(hacia.x, hacia.z);
+        parqueGrupo.updateMatrixWorld(true);
+        const alcance = (parqueGrupo.userData.frente || 9) * (parqueGrupo.scale.x || 1);
+        const boca = centro.clone().addScaledVector(hacia, alcance * 0.92);
+        const afuera = centro.clone().addScaledVector(hacia, alcance + 7);
+        boca.y = mundo.altura(boca.x, boca.z);
+        afuera.y = mundo.altura(afuera.x, afuera.z);
+        zonaJuegosParada = boca.clone();
+        const puntos = [ini, afuera, boca].map(function (p) {
+            const y = mundo.altura(p.x, p.z);
+            return new THREE.Vector3(p.x, Math.max(ini.y, y) + 0.22, p.z);
+        });
+        const spur = new THREE.CatmullRomCurve3(puntos, false, 'catmullrom', 0.2);
+        if (grupoCaminoParque && grupoCaminoParque.parent) grupoCaminoParque.parent.remove(grupoCaminoParque);
+        grupoCaminoParque = new THREE.Group();
+        grupoCaminoParque.name = 'caminoParque';
+        const base = mundo.materialCamino;
+        const mat = base
+            ? base.clone()
+            : new THREE.MeshStandardMaterial({ color: 0xa85225, roughness: 0.85, metalness: 0 });
+        mat.side = THREE.DoubleSide;
+        mat.polygonOffset = true;
+        mat.polygonOffsetFactor = -2;
+        mat.polygonOffsetUnits = -2;
+        const mesh = new THREE.Mesh(mallaCinta(spur, 4.2, 28), mat);
+        mesh.receiveShadow = true;
+        mesh.castShadow = false;
+        grupoCaminoParque.add(mesh);
+        scene.add(grupoCaminoParque);
+        if (typeof mundo.despejarArboles === 'function') {
+            mundo.despejarArboles([spur], 7);
+        }
     }
 
     function colocarProxyCarpa() {
@@ -2803,6 +3284,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
     function destroy() {
         cargaId++;
+        focoManual = null;
         usaMapaGlb = false;
         detenerNarracion();
         detenerVideoParada();
@@ -2828,6 +3310,16 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         personaje = null;
         if (zonaJuegos && zonaJuegos.parent) zonaJuegos.parent.remove(zonaJuegos);
         zonaJuegos = null;
+        if (grupoCaminoParque) {
+            const matsP = new Set();
+            grupoCaminoParque.traverse((o) => {
+                if (o.geometry) o.geometry.dispose();
+                if (o.material) matsP.add(o.material);
+            });
+            matsP.forEach((m) => m.dispose());
+            if (grupoCaminoParque.parent) grupoCaminoParque.parent.remove(grupoCaminoParque);
+            grupoCaminoParque = null;
+        }
         if (grupoRamas) {
             const mats = new Set();
             grupoRamas.traverse((o) => {
