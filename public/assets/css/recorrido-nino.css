@@ -245,13 +245,13 @@
     container-type: size;
 }
 
-/* Pie del PNG = línea punteada del césped */
+/* El PNG llena el stage: ya no hay franja inferior de juegos. */
 .rn-portada--con-fondo .rn-portada-fondo {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: var(--bj-suelo-h);
+    bottom: 0;
     z-index: 0;
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -264,7 +264,7 @@
     top: 0;
     left: 0;
     right: 0;
-    bottom: var(--bj-suelo-h);
+    bottom: 0;
     z-index: 2;
     flex: none;
     width: auto;
@@ -465,6 +465,210 @@
     box-shadow: inset 0 0 0 1px rgba(14, 165, 233, .15);
 }
 
+.rn-elegir {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transition: opacity .22s ease;
+}
+
+.rn-elegir[hidden] {
+    display: none !important;
+}
+
+.rn-elegir.is-abierto {
+    opacity: 1;
+}
+
+.rn-elegir-fondo {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    background: rgba(15, 23, 42, .28);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.rn-elegir-panel {
+    position: relative;
+    z-index: 1;
+    width: min(980px, 96vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(18px, 4vh, 36px);
+}
+
+.rn-elegir-titulo {
+    margin: 0;
+    font-family: 'Fredoka One', cursive;
+    font-weight: 400;
+    font-size: clamp(2rem, 5.2vw, 3.25rem);
+    line-height: 1.05;
+    text-align: center;
+    color: #fff;
+    text-shadow:
+        0 3px 0 rgba(15, 23, 42, .22),
+        0 10px 24px rgba(15, 23, 42, .35);
+    opacity: 0;
+    transform: translateY(16px);
+}
+
+.rn-elegir.is-abierto .rn-elegir-titulo {
+    animation: rn-elegir-pop 1s cubic-bezier(.22, 1, .36, 1) forwards;
+}
+
+.rn-elegir-opciones {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: clamp(20px, 4vw, 40px);
+    width: 100%;
+}
+
+.rn-elegir-btn {
+    appearance: none;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: clamp(250px, 46vh, 360px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(12px, 2.4vh, 22px);
+    padding: clamp(18px, 3vh, 28px) clamp(16px, 2vw, 24px) clamp(20px, 3vh, 32px);
+    border: 6px solid #fff;
+    border-radius: 36px;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Fredoka One', cursive;
+    letter-spacing: .01em;
+    text-align: center;
+    box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, .4),
+        0 14px 0 rgba(0, 0, 0, .12),
+        0 22px 32px rgba(15, 23, 42, .22);
+    opacity: 0;
+    transform: translateY(28px) scale(.84);
+}
+
+.rn-elegir.is-abierto .rn-elegir-btn {
+    animation: rn-elegir-pop 1.25s cubic-bezier(.22, 1, .36, 1) forwards;
+}
+
+.rn-elegir.is-abierto .rn-elegir-btn--jugar {
+    animation-delay: .28s;
+}
+
+.rn-elegir-btn:active {
+    transform: translateY(4px) scale(.98);
+}
+
+.rn-elegir.is-saliendo {
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.rn-elegir.is-saliendo .rn-elegir-titulo,
+.rn-elegir.is-saliendo .rn-elegir-btn:not(.is-elegida) {
+    animation: none;
+    transition: opacity .45s ease;
+}
+
+.rn-elegir.is-saliendo:has(.is-ampliada) .rn-elegir-titulo,
+.rn-elegir.is-saliendo:has(.is-ampliada) .rn-elegir-btn:not(.is-elegida) {
+    opacity: 0;
+}
+
+.rn-elegir.is-saliendo .rn-elegir-btn.is-elegida,
+.rn-elegir.is-saliendo .rn-elegir-btn.is-elegida:active {
+    animation: none;
+    position: relative;
+    z-index: 3;
+    opacity: 1;
+    transform-origin: center center;
+    transform: scale(1);
+    transition: transform 1.05s cubic-bezier(.4, 0, .15, 1);
+}
+
+.rn-elegir.is-saliendo .rn-elegir-btn.is-elegida.is-ampliada,
+.rn-elegir.is-saliendo .rn-elegir-btn.is-elegida.is-ampliada:active {
+    transform: scale(8);
+}
+
+.rn-elegir.is-saliendo .rn-elegir-btn.is-elegida .rn-elegir-icono,
+.rn-elegir.is-saliendo .rn-elegir-btn.is-elegida .rn-elegir-texto {
+    opacity: 0;
+    transition: opacity .35s ease .55s;
+}
+
+.rn-elegir-btn:focus-visible {
+    outline: 4px solid #fde68a;
+    outline-offset: 4px;
+}
+
+.rn-elegir-btn--clase {
+    background: linear-gradient(180deg, #4eb0ff 0%, #1c86ea 100%);
+}
+
+.rn-elegir-btn--jugar {
+    background: linear-gradient(180deg, #8d6bff 0%, #6842f3 100%);
+}
+
+.rn-elegir-icono {
+    position: relative;
+    flex: 0 0 auto;
+    width: clamp(120px, 18vw, 168px);
+    height: clamp(120px, 18vw, 168px);
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .22);
+    box-shadow: inset 0 0 0 4px rgba(255, 255, 255, .45);
+}
+
+.rn-elegir-icono--mando {
+    width: clamp(120px, 18vw, 168px);
+}
+
+.rn-elegir-rayos {
+    position: absolute;
+    inset: 8%;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .55) 0 42%, transparent 44%),
+        repeating-conic-gradient(from 8deg, #ffe566 0 9deg, transparent 9deg 22deg);
+    -webkit-mask: radial-gradient(circle, transparent 34%, #000 36%, #000 70%, transparent 74%);
+    mask: radial-gradient(circle, transparent 34%, #000 36%, #000 70%, transparent 74%);
+    opacity: .9;
+    pointer-events: none;
+}
+
+.rn-elegir-profe,
+.rn-elegir-mando {
+    position: relative;
+    z-index: 1;
+    width: 78%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 4px 0 rgba(0, 0, 0, .08));
+}
+
+.rn-elegir-texto {
+    font-size: clamp(1.7rem, 3.6vw, 2.4rem);
+    line-height: 1;
+}
+
+@keyframes rn-elegir-pop {
+    from { opacity: 0; transform: translateY(28px) scale(.84); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 @keyframes rn-banner-in {
     from { transform: translateY(-100%); opacity: .6; }
     to { transform: translateY(0); opacity: 1; }
@@ -496,12 +700,20 @@
     .rn-portada-ilustracion,
     .rn-portada-accion,
     .rn-portada-iniciar-halo,
+    .rn-elegir-btn,
+    .rn-elegir-titulo,
     .rn-nube,
     .rn-nube-colgante,
     .rn-eje-nube,
     .rn-estacion,
     .rn-paso[data-paso="info"] {
         animation: none !important;
+    }
+
+    .rn-elegir.is-abierto .rn-elegir-btn,
+    .rn-elegir.is-abierto .rn-elegir-titulo {
+        opacity: 1;
+        transform: none;
     }
 }
 
