@@ -469,41 +469,6 @@
     display: none;
 }
 
-.bj-player-top {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: .9rem 1.3rem;
-    background: rgba(0, 0, 0, .35);
-}
-
-.bj-player-titulo {
-    margin: 0;
-    font: 800 1.2rem/1 system-ui, sans-serif;
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-}
-
-.bj-salir-juego {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    font: 700 1rem/1 system-ui, sans-serif;
-    color: #fff;
-    background: #c0392b;
-    border: none;
-    padding: .7rem 1.2rem;
-    border-radius: 999px;
-    cursor: pointer;
-}
-
-.bj-salir-juego:hover {
-    background: #d84a3b;
-}
-
 .bj-canvas-wrap {
     flex: 1 1 auto;
     position: relative;

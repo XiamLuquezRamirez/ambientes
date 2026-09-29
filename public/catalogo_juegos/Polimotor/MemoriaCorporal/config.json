@@ -45,15 +45,15 @@
             },
             {
                 "personaje": 1,
-                "texto": "¡Hola! Yo soy Zoe.<br>Verás unas tarjetas con diferentes movimientos. ¡Míralos con mucha atención porque aparecerán una sola vez!"
+                "texto": "¡Hola! Yo soy Zoe.<br>Verás unas tarjetas con diferentes movimientos. Míralas con mucha atención: al final se esconde el último."
             },
             {
                 "personaje": 0,
-                "texto": "Después, los movimientos desaparecerán y quedará un espacio vacío.<br>¡Tu misión es encontrar el movimiento que falta!"
+                "texto": "Después se esconde el último movimiento y queda un espacio vacío.<br>¡Elige cuál era entre las opciones!"
             },
             {
                 "personaje": 1,
-                "texto": "¡Tú puedes hacerlo!<br>Si no recuerdas los movimientos, no te preocupes. Pulsa el botón de pista y te ayudaremos."
+                "texto": "¡Tú puedes hacerlo!<br>Si no recuerdas los movimientos, pulsa el botón del ojo y te los volvemos a mostrar."
             }
         ]
     },
