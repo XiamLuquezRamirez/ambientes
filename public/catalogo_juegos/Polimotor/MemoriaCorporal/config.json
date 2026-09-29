@@ -11,6 +11,7 @@
             }
         },
         "altoContraste": false,
+        "mostrarIntro": true,
         "verBotonVerDeNuevo": true,
         "zoomLongPress": false,
         "mostrarProgreso": true,
@@ -33,6 +34,8 @@
         "seOcultan": "Los movimientos se esconderán en...",
         "queFalta": "¿Cuál movimiento falta?",
         "cierre": "¡Excelente! Has memorizado los movimientos correctamente.",
+        "demostracion": "¡Vamos con un ejemplo! Mira los movimientos y cuál falta.",
+        "demostracionFin": "¡Ahora te toca a ti! Memoriza la secuencia y elige cuál falta.",
         "acierto": "¡Muy bien, recordaste los movimientos!",
         "error": "Ya casi lo tienes, mira con atención y vuelve a intentarlo. ¡Tú puedes!",
         "conversacion": [

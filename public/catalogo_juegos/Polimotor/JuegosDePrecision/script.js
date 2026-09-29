@@ -91,6 +91,7 @@
 
         const ACC_OPCIONES = [
         { key: "altoContraste", label: "Alto contraste" },
+        { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
     ];
 
     function setMenuAcc(abierto) {
@@ -946,6 +947,10 @@
         totalRutas = (nivelElegido.rutas || []).length;
         document.getElementById("enunciado").textContent = textos().enunciado || "Lleva el cohete por cada aro hasta la estrella";
         Promise.resolve(imagenesPromise).then(function () {
+            if (acc().mostrarIntro && window.PedniaTutorial) {
+                correrDemoPrecision();
+                return;
+            }
             iniciarRuta(rutaGen);
         });
     };
@@ -955,6 +960,45 @@
         if (!el) return;
         el.hidden = false;
         el.textContent = (indiceRuta + 1) + "/" + totalRutas;
+    }
+
+    async function correrDemoPrecision() {
+        const prog = document.getElementById("progreso");
+        if (prog) prog.hidden = true;
+        const demo = {
+            inicio: [0.14, 0.78],
+            meta: [0.78, 0.78],
+            aros: [[0.46, 0.78]]
+        };
+        await PedniaTutorial.correr({
+            texto: textos().demostracion,
+            textoFin: textos().demostracionFin,
+            cancelado: function () { return !!juegoTerminado; },
+            onTexto: function (t) {
+                const en = document.getElementById("enunciado");
+                if (en && t) en.textContent = t;
+            },
+            jugar: async function () {
+                pintarRuta(demo);
+                aceptaArrastre = false;
+                const puntos = [demo.inicio].concat(demo.aros).concat([demo.meta]);
+                for (let i = 0; i < puntos.length - 1; i++) {
+                    const a = puntos[i];
+                    const b = puntos[i + 1];
+                    const n = 16;
+                    for (let k = 0; k <= n; k++) {
+                        if (juegoTerminado) return;
+                        const t = k / n;
+                        colocarCohete(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, 90);
+                        await PedniaTutorial.sleep(36);
+                    }
+                }
+                limpiarEscena();
+            }
+        });
+        if (juegoTerminado) return;
+        document.getElementById("enunciado").textContent = textos().enunciado || "Lleva el cohete por cada aro hasta la estrella";
+        iniciarRuta(rutaGen);
     }
 
     function iniciarRuta(gen) {

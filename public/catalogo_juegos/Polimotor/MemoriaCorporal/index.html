@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css">
 </head>
 <body class="esperando-inicio">
 	<div id="pantalla-inicio" class="pantalla-inicio">
@@ -100,7 +101,7 @@
 			</div>
 		</div>
 
-		<div class="escenario escenario-memoria" id="escenario">
+		<div class="escenario escenario-memoria demo-lock" id="escenario">
 			<div class="memoria-bloque">
 				<p class="enunciado borde" id="enunciado"></p>
 				<div id="cuenta" class="cuenta" hidden></div>
@@ -109,6 +110,8 @@
 			</div>
 		</div>
 	</div>
+
+	<div id="tutorial-3d" class="tutorial-3d" hidden aria-hidden="true"></div>
 
 	<div id="menu-acc" class="menu-acc">
 		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
@@ -152,6 +155,8 @@
 	</script>
 	<script type="module" src="../../intro3d/js/three-scene.js"></script>
 	<script type="module" src="../../intro3d/js/final-scene.js"></script>
+		<script src="../../tutorial/tutorial.js"></script>
+	<script type="module" src="../../intro3d/js/tutorial-3d.js"></script>
 	<script src="../../intro3d/js/intro.js"></script>
 	<script src="../../final/final.js"></script>
 	<script src="script.js"></script>

@@ -29,6 +29,11 @@
         derecha: "Derecha"
     };
 
+    function gifPersonaje(id) {
+        if (id === "zoe") return "../../images/zoe_normal.gif";
+        return "../../images/zeus_normal.gif";
+    }
+
     const ORDEN_ZONA = { izquierda: 0, centro: 1, derecha: 2 };
 
     /** Orden visual fijo: izquierda → centro → derecha. Nunca barajar lados. */
@@ -109,6 +114,7 @@
 
         const ACC_OPCIONES = [
         { key: "altoContraste", label: "Alto contraste" },
+        { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
     ];
 
     function setMenuAcc(abierto) {
@@ -609,43 +615,104 @@
             textos().enunciado || "Observa y toca el lado correcto";
         const arrancar = function () {
             if (gen !== retoGen) return;
-            mostrarIntroLados(gen).then(function () {
-                if (gen !== retoGen) return;
-                iniciarRetoActual(gen);
-            });
+            if (acc().mostrarIntro && window.PedniaTutorial) {
+                const prog = document.getElementById("progreso");
+                if (prog) prog.hidden = true;
+                PedniaTutorial.correr({
+                    texto: textos().demostracion,
+                    textoFin: textos().demostracionFin,
+                    cancelado: function () { return gen !== retoGen; },
+                    onTexto: function (t) {
+                        const en = document.getElementById("enunciado");
+                        if (en && t) en.textContent = t;
+                    },
+                    jugar: function () { return correrPaseTutorial(gen); }
+                }).then(function () {
+                    if (gen !== retoGen) return;
+                    iniciarRetoActual(gen);
+                });
+                return;
+            }
+            iniciarRetoActual(gen);
         };
         esperarImagenesOTimeout(350).then(arrancar).catch(arrancar);
     };
 
-    async function mostrarIntroLados(gen) {
-        const wrap = document.getElementById("intro-lados");
+    function ladoContrarioAlReto(respuesta) {
+        if (respuesta === "izquierda") return "derecha";
+        if (respuesta === "derecha") return "izquierda";
+        return "izquierda";
+    }
+
+    function limpiarTableroTutorial() {
         const tablero = document.getElementById("tablero");
         const actor = document.getElementById("actor-area");
         const resp = document.getElementById("respuestas");
-        tablero.innerHTML = "";
-        actor.hidden = true;
-        actor.innerHTML = "";
-        resp.hidden = true;
-        resp.innerHTML = "";
+        if (tablero) tablero.innerHTML = "";
+        if (actor) {
+            actor.hidden = true;
+            actor.innerHTML = "";
+        }
+        if (resp) {
+            resp.hidden = true;
+            resp.innerHTML = "";
+        }
+    }
 
-        // Req: siempre izquierda, centro y derecha antes de los retos.
-        const orden = ["izquierda", "centro", "derecha"];
+    function apagarZonasDemo() {
+        document.querySelectorAll("#intro-lados .zona-demo").forEach(function (el) {
+            el.classList.remove("activa", "is-demo-target");
+        });
+    }
+
+    async function decirLado(gen, lado) {
+        if (gen !== retoGen) return;
+        const en = document.getElementById("enunciado");
+        if (en) en.textContent = ZONA_LABEL[lado] || lado;
+        const t0 = Date.now();
+        if (typeof TextoVoz !== "undefined" && TextoVoz.hablar) {
+            try { await TextoVoz.hablar(lado, "zoe"); } catch (e) { /* noop */ }
+        }
+        if (gen !== retoGen) return;
+        const minimo = 1400;
+        const resta = minimo - (Date.now() - t0);
+        if (resta > 40) await sleep(resta);
+    }
+
+    async function correrPaseTutorial(gen) {
+        const wrap = document.getElementById("intro-lados");
+        limpiarTableroTutorial();
         wrap.hidden = false;
         wrap.querySelectorAll(".zona-demo").forEach(function (el) {
             el.hidden = false;
-            el.classList.remove("activa");
+            el.classList.remove("activa", "is-demo-target");
         });
 
-        TextoVoz.hablar("Mira los lados de la pantalla.", "zoe");
-        const ms = (gameConfig.timings && gameConfig.timings.introLadoMs) || 500;
+        const orden = ["izquierda", "centro", "derecha"];
         for (let i = 0; i < orden.length; i++) {
-            if (gen !== retoGen) return;
+            if (gen !== retoGen) break;
+            apagarZonasDemo();
             const el = wrap.querySelector('.zona-demo[data-lado="' + orden[i] + '"]');
             if (el) el.classList.add("activa");
-            await sleep(ms);
+            await decirLado(gen, orden[i]);
+            if (gen !== retoGen) break;
             if (el) el.classList.remove("activa");
+            await sleep(280);
         }
-        if (gen !== retoGen) return;
+
+        if (gen !== retoGen) {
+            wrap.hidden = true;
+            apagarZonasDemo();
+            return;
+        }
+
+        const ejemplo = ladoContrarioAlReto((retosRuntime[0] && retosRuntime[0].respuesta) || "");
+        apagarZonasDemo();
+        const elegido = wrap.querySelector('.zona-demo[data-lado="' + ejemplo + '"]');
+        if (elegido) elegido.classList.add("activa", "is-demo-target");
+        await decirLado(gen, ejemplo);
+        if (gen === retoGen) await sleep(700);
+        apagarZonasDemo();
         wrap.hidden = true;
     }
 

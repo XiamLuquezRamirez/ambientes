@@ -16,6 +16,8 @@
     "eligeNivel": "Elige tu edad",
     "enunciado": "Observa y toca el lado correcto",
     "cierre": "Aprendiste a reconocer la izquierda y la derecha!",
+    "demostracion": "¡Vamos con un ejemplo! Mira los lados.",
+    "demostracionFin": "¡Ahora te toca a ti! Escucha y toca el lado correcto.",
     "acierto": "¡Muy bien, lo hiciste genial!",
     "error": "Ya casi lo tienes, mira con atención y vuelve a intentarlo. ¡Tú puedes!",
     "conversacion": [
@@ -35,6 +37,7 @@
   },
   "accesibilidad": {
     "altoContraste": false,
+    "mostrarIntro": true,
     "letterSpacing": 2,
     "volumenFondo": 20,
     "rate": 5

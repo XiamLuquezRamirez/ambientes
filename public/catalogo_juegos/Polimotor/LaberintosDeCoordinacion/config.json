@@ -16,6 +16,8 @@
     "enunciadoNina": "Encuentra el camino hasta el cohete",
     "enunciado": "Encuentra el camino hasta el cohete",
     "cierre": "Lograste pasar todos los laberintos.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: la carita sigue el camino hasta el cohete.",
+    "demostracionFin": "¡Ahora te toca a ti! Encuentra el camino hasta el cohete.",
     "acierto": "¡Muy bien! Llegaste hasta el cohete.",
     "error": "¡Te saliste del laberinto! Vuelve al pasillo.",
     "conversacion": [
@@ -35,6 +37,7 @@
   },
   "accesibilidad": {
     "altoContraste": false,
+    "mostrarIntro": true,
     "letterSpacing": 2,
     "volumenFondo": 20,
     "rate": 5

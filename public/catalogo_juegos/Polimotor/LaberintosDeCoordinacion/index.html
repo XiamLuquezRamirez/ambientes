@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../../final/final.css">
     <link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css">
     <link rel="preload" as="image" href="img/ESCENARIO.png">
     <link rel="preload" as="image" href="img/COHETE_SIN-SOMBRA.png">
 </head>
@@ -113,14 +114,16 @@
             <h1 class="borde" id="enunciado">Encuentra el camino hasta el cohete</h1>
         </div>
 
-        <div class="escenario" id="escenario">
+        <div class="escenario demo-lock" id="escenario">
             <div class="lienzo-wrap">
                 <canvas id="lienzo" width="1280" height="854" aria-label="Laberinto"></canvas>
             </div>
         </div>
     </div>
 
-    <div id="menu-acc" class="menu-acc">
+    <div id="tutorial-3d" class="tutorial-3d" hidden aria-hidden="true"></div>
+
+	<div id="menu-acc" class="menu-acc">
         <button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false"
             aria-controls="menu-acc-panel" title="Accesibilidad">
             <i class="fa-solid fa-universal-access"></i>
@@ -164,7 +167,9 @@
 	}
 	</script>
     <script type="module" src="../../intro3d/js/three-scene.js"></script>
-    <script src="../../intro3d/js/intro.js"></script>
+    	<script src="../../tutorial/tutorial.js"></script>
+	<script type="module" src="../../intro3d/js/tutorial-3d.js"></script>
+	<script src="../../intro3d/js/intro.js"></script>
     <script src="script.js"></script>
 </body>
 

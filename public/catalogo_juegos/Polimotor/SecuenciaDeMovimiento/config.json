@@ -32,6 +32,7 @@
     "enunciado": "Observa la secuencia y elige qué sigue",
     "pregunta": "¿Qué movimiento sigue?",
     "cierre": "¡Lograste completar las secuencias!",
+    "videoPresentacion": "img/SECUENCIA DE MOVIMIENTO.mp4",
     "acierto": "¡Muy bien, lo hiciste!",
     "error": "Mira otra vez. ¡Vamos a intentarlo!",
     "conversacion": [
@@ -51,6 +52,7 @@
   },
   "accesibilidad": {
     "altoContraste": false,
+    "mostrarIntro": true,
     "letterSpacing": 2,
     "volumenFondo": 20,
     "rate": 5

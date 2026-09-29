@@ -91,6 +91,7 @@
 
         const ACC_OPCIONES = [
         { key: "altoContraste", label: "Alto contraste" },
+        { key: "mostrarIntro", label: "Mostrar video de presentación" },
     ];
 
     function setMenuAcc(abierto) {
@@ -620,11 +621,103 @@
 
         const arrancar = function () {
             if (gen !== retoGen) return;
+            const video = textos().videoPresentacion;
+            if (acc().mostrarIntro && video) {
+                mostrarPresentacion(gen, video).then(function () {
+                    if (gen !== retoGen) return;
+                    iniciarRetoActual(gen);
+                });
+                return;
+            }
             iniciarRetoActual(gen);
         };
         // Solo esperar SVGs de poses (máx ~350ms). Audio/GIF van en segundo plano.
         esperarImagenesOTimeout(350).then(arrancar).catch(arrancar);
     };
+
+    function mostrarPresentacion(gen, ruta) {
+        return new Promise(function (resolve) {
+            const capa = document.getElementById("presentacion");
+            const stage = document.getElementById("presentacion-stage");
+            const video = document.getElementById("video-presentacion");
+            const btn = document.getElementById("btn-presentacion");
+            if (!capa || !stage || !video || !btn) {
+                resolve();
+                return;
+            }
+
+            let cerrado = false;
+            function cerrar() {
+                if (cerrado) return;
+                cerrado = true;
+                try {
+                    video.pause();
+                } catch (e) { /* noop */ }
+                video.onended = null;
+                video.onerror = null;
+                video.removeAttribute("src");
+                video.load();
+                video.hidden = true;
+                stage.classList.remove("is-playing");
+                btn.hidden = false;
+                capa.hidden = true;
+                document.body.classList.remove("presentacion-activa");
+                if (audioFondo) {
+                    const p = audioFondo.play();
+                    if (p && p.catch) p.catch(function () {});
+                }
+                resolve();
+            }
+
+            if (gen !== retoGen || juegoTerminado) {
+                resolve();
+                return;
+            }
+
+            TextoVoz.detener();
+            if (audioFondo) {
+                try { audioFondo.pause(); } catch (e) { /* noop */ }
+            }
+            const prog = document.getElementById("progreso");
+            if (prog) prog.hidden = true;
+
+            video.controls = false;
+            video.playsInline = true;
+            video.setAttribute("playsinline", "");
+            video.setAttribute("webkit-playsinline", "");
+            video.hidden = true;
+            video.src = ruta;
+            stage.classList.remove("is-playing");
+            btn.hidden = false;
+            capa.hidden = false;
+            document.body.classList.add("presentacion-activa");
+
+            btn.onclick = function () {
+                if (cerrado || gen !== retoGen) return;
+                stage.classList.add("is-playing");
+                btn.hidden = true;
+                video.hidden = false;
+                try { video.currentTime = 0; } catch (e) { /* noop */ }
+                video.onended = function () {
+                    if (gen !== retoGen) return;
+                    cerrar();
+                };
+                video.onerror = function () {
+                    if (gen !== retoGen) return;
+                    cerrar();
+                };
+                const p = video.play();
+                if (p && p.catch) {
+                    p.catch(function () {
+                        if (cerrado) return;
+                        stage.classList.remove("is-playing");
+                        btn.hidden = false;
+                        video.hidden = true;
+                    });
+                }
+            };
+        });
+    }
 
     function actualizarProgreso() {
         const el = document.getElementById("progreso");

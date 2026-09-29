@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css">
 </head>
 
 <body class="esperando-inicio">
@@ -108,7 +109,7 @@
             <h1 class="borde" id="enunciado">Observa y toca el lado correcto</h1>
         </div>
 
-        <div class="escenario" id="escenario">
+        <div class="escenario demo-lock" id="escenario">
             <div class="escena-wrap" id="escena-wrap">
                 <div id="intro-lados" class="intro-lados" hidden aria-hidden="true">
                     <div class="zona-demo zona-izquierda" data-lado="izquierda"><span>Izquierda</span></div>
@@ -124,7 +125,9 @@
         </div>
     </div>
 
-    	<div id="menu-acc" class="menu-acc">
+    	<div id="tutorial-3d" class="tutorial-3d" hidden aria-hidden="true"></div>
+
+	<div id="menu-acc" class="menu-acc">
 		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
 			<i class="fa-solid fa-universal-access"></i>
 		</button>
@@ -166,6 +169,8 @@
 	}
 	</script>
 	<script type="module" src="../../intro3d/js/three-scene.js"></script>
+		<script src="../../tutorial/tutorial.js"></script>
+	<script type="module" src="../../intro3d/js/tutorial-3d.js"></script>
 	<script src="../../intro3d/js/intro.js"></script>
 	<script src="script.js"></script>
 </body>

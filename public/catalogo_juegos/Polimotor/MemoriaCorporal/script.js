@@ -285,6 +285,7 @@ function pintarMenuVol() {
 const ACC_OPCIONES = [
     { key: "mostrarFeedBack", label: "Mostrar feedback" },
     { key: "altoContraste", label: "Alto contraste" },
+    { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
     { key: "verBotonVerDeNuevo", label: "Botón ver de nuevo" },
     { key: "cuentaRegresiva", label: "Cuenta 3-2-1" },
     { key: "animaciones_opciones", label: "Animar opciones" },
@@ -434,14 +435,7 @@ function iniciarPartida() {
         niveles: (gameConfig && gameConfig.niveles) || [],
         elegirManual: elegirNivel,
         onElegido: function (nivel) {
-            nivelElegido = nivel;
-            rondaActual = 0;
-            juegoTerminado = false;
-            instruccionDicha = false;
-            fallosRonda = 0;
-            rondasSesion = generarRondasSesion(nivel);
-            aplicarVisual();
-            iniciarRonda();
+            if (nivel) window.confirmarNivel(nivel.id);
         }
     });
 }
@@ -482,6 +476,12 @@ function confirmarNivel(id) {
     fallosRonda = 0;
     rondasSesion = generarRondasSesion(nivelElegido);
     aplicarVisual();
+    if (acc().mostrarIntro && window.PedniaTutorial) {
+        correrDemoMemoria().then(function () {
+            if (!juegoTerminado) iniciarRonda();
+        });
+        return;
+    }
     iniciarRonda();
 }
 window.confirmarNivel = confirmarNivel;
@@ -637,6 +637,57 @@ function terminarFaseMemoria() {
         cuenta.hidden = true;
         cuenta.innerHTML = "";
     }
+}
+
+async function correrDemoMemoria() {
+    const ids = (function () {
+        const candidatos = [
+            ["manos_arriba", "manos_abajo"],
+            ["tocar_cabeza", "tocar_hombros"],
+            ["abrir_brazos", "manos_al_frente"]
+        ];
+        const base = (rondasSesion[0] || []).join(",");
+        for (let i = 0; i < candidatos.length; i++) {
+            if (base.indexOf(candidatos[i].join(",")) !== 0) return candidatos[i];
+        }
+        return candidatos[0];
+    })();
+    const prog = document.getElementById("progreso");
+    if (prog) prog.hidden = true;
+    const caja = document.getElementById("secuencia");
+    const ops = document.getElementById("opciones");
+    await PedniaTutorial.correr({
+        texto: textos().demostracion,
+        textoFin: textos().demostracionFin,
+        cancelado: function () { return !!juegoTerminado; },
+        onTexto: setEnunciado,
+        jugar: async function () {
+            caja.hidden = false;
+            caja.classList.add("secuencia-viva");
+            caja.innerHTML = htmlSecuencia(ids);
+            await PedniaTutorial.sleep(1400);
+            caja.classList.remove("secuencia-viva");
+            caja.classList.add("secuencia-pista");
+            caja.innerHTML = htmlSecuenciaConHueco(ids, ids.length - 1);
+            const correcto = ids[ids.length - 1];
+            const m = datoMovimiento(correcto);
+            ops.hidden = false;
+            ops.className = "opciones opciones-falta";
+            ops.innerHTML = "";
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "opcion-seq opcion-mov is-demo-target";
+            btn.innerHTML = htmlFigura(correcto) + '<span class="opcion-nombre">' + attrEsc(m.nombre) + "</span>";
+            ops.appendChild(btn);
+            await PedniaTutorial.sleep(1400);
+            ops.innerHTML = "";
+            ops.hidden = true;
+            caja.innerHTML = "";
+            caja.hidden = true;
+            caja.classList.remove("secuencia-pista");
+        }
+    });
+    instruccionDicha = true;
 }
 
 async function iniciarRonda() {

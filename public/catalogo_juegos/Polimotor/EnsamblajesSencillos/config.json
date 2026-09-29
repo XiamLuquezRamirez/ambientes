@@ -13,6 +13,7 @@
       "error": { "gif": "../../images/incorrecto.gif" }
     },
     "altoContraste": false,
+    "mostrarIntro": true,
     "modoTap": false,
     "zoomLongPress": false,
     "huecosPunteados": false,
@@ -30,6 +31,8 @@
     "instruccion": "Hola, soy Zoe. ¡Vamos a armar el robot! Observa las piezas y colócalas en su lugar.",
     "seOcultan": "El robot se esconderá en...",
     "cierre": "Completaste el ensamblaje del robot.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: una pieza se encaja sola.",
+    "demostracionFin": "¡Ahora te toca a ti! Arma la figura tú.",
     "acierto": "¡Muy bien, esa pieza va ahí!",
     "error": "Ya casi. Mira con atención y prueba otro lugar.",
     "conversacion": [

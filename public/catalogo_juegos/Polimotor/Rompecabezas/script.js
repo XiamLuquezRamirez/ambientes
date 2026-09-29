@@ -688,6 +688,7 @@ function pintarMenuVol() {
 const ACC_OPCIONES = [
     { key: "mostrarFeedBack", label: "Mostrar feedback" },
     { key: "altoContraste", label: "Alto contraste" },
+    { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
     { key: "modoTap", label: "Tocar en vez de arrastrar" },
     { key: "zoomLongPress", label: "Ampliar pieza al mantener" },
     { key: "huecosPunteados", label: "Borde punteado" },
@@ -1146,6 +1147,105 @@ function vaciarPiezasBandeja() {
     document.querySelectorAll("#bandeja .pieza").forEach(function (p) { p.remove(); });
 }
 
+function svgDedo() {
+    return '<svg viewBox="0 0 120 170" aria-hidden="true">' +
+        '<rect x="46" y="2" width="26" height="86" rx="13" fill="#ffd2b0" stroke="#d9976e" stroke-width="3"/>' +
+        '<ellipse cx="59" cy="14" rx="8" ry="6" fill="#fff6ee"/>' +
+        '<rect x="74" y="52" width="18" height="40" rx="9" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
+        '<rect x="90" y="60" width="16" height="34" rx="8" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
+        '<rect x="28" y="56" width="16" height="32" rx="8" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
+        '<path d="M24 84h74c14 0 22 12 22 26v18c0 22-18 36-40 36H46c-22 0-36-14-36-34v-22c0-14 6-24 14-24z" fill="#ffd2b0" stroke="#d9976e" stroke-width="3"/>' +
+        "</svg>";
+}
+
+function animarDedoEnCabeza() {
+    const ficha = document.querySelector('#bandeja .pieza[data-id="cabeza"]')
+        || document.querySelector("#bandeja .pieza");
+    if (!ficha || !window.PedniaTutorial) return Promise.resolve();
+
+    document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
+    const reducir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dormir = PedniaTutorial.sleep;
+    const dx = 22;
+    const dy = -26;
+
+    const dedo = document.createElement("div");
+    dedo.className = "demo-dedo";
+    dedo.setAttribute("aria-hidden", "true");
+    dedo.innerHTML = svgDedo();
+    document.body.appendChild(dedo);
+
+    function punta() {
+        const r = ficha.getBoundingClientRect();
+        return {
+            x: r.left + r.width / 2,
+            y: r.bottom - 8
+        };
+    }
+
+    function ponerDedo(x, y) {
+        dedo.style.left = x + "px";
+        dedo.style.top = y + "px";
+    }
+
+    const inicio = punta();
+    ponerDedo(reducir ? inicio.x : inicio.x + 110, reducir ? inicio.y : inicio.y + 160);
+
+    function soltar() {
+        ficha.classList.remove("is-demo-agarrada");
+        ficha.style.transition = "";
+        ficha.style.transform = "";
+        if (dedo.parentNode) dedo.remove();
+    }
+
+    return dormir(reducir ? 20 : 40).then(function () {
+        ponerDedo(inicio.x, inicio.y);
+        return dormir(reducir ? 160 : 850);
+    }).then(function () {
+        dedo.classList.add("is-pressed");
+        ficha.classList.add("is-demo-agarrada");
+        return dormir(reducir ? 120 : 360);
+    }).then(function () {
+        ficha.style.transition = reducir ? "none" : "transform 0.7s ease";
+        ficha.style.transform = "translate(" + dx + "px," + dy + "px)";
+        dedo.style.transition = reducir
+            ? "none"
+            : "left 0.7s ease, top 0.7s ease, transform 0.16s ease";
+        ponerDedo(inicio.x + dx, inicio.y + dy);
+        return dormir(reducir ? 180 : 1200);
+    }).then(function () {
+        dedo.classList.remove("is-pressed");
+        ficha.style.transform = "";
+        ponerDedo(inicio.x, inicio.y);
+        return dormir(reducir ? 120 : 700);
+    }).then(soltar, function () {
+        soltar();
+    });
+}
+
+function lanzarTutorialPieza() {
+    if (!acc().mostrarIntro || !window.PedniaTutorial) return;
+    const t = (gameConfig && gameConfig.textos) || {};
+    const prog = document.getElementById("progreso");
+    if (prog) prog.hidden = true;
+    PedniaTutorial.correr({
+        texto: t.demostracion,
+        textoFin: t.demostracionFin,
+        cancelado: function () { return !!juegoTerminado; },
+        onTexto: function (txt) {
+            const en = document.getElementById("enunciado");
+            if (en && txt) en.textContent = txt;
+        },
+        jugar: function () {
+            return PedniaTutorial.sleep(450).then(function () {
+                return animarDedoEnCabeza();
+            });
+        }
+    }).then(function () {
+        actualizarProgreso();
+    });
+}
+
 function armarTablero() {
     const zonas = document.getElementById("zonas");
     zonas.innerHTML = "";
@@ -1177,6 +1277,7 @@ function armarTablero() {
     mostrarReferenciaAyuda();
     tableroListo = true;
     actualizarProgreso();
+    lanzarTutorialPieza();
 }
 
 function feedbackActivo() {

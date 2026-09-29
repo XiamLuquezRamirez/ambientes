@@ -509,6 +509,7 @@ function pintarMenuVol() {
 const ACC_OPCIONES = [
     { key: "mostrarFeedBack", label: "Mostrar feedback" },
     { key: "altoContraste", label: "Alto contraste" },
+    { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
     { key: "modoTap", label: "Tocar en vez de arrastrar" },
     { key: "zoomLongPress", label: "Ampliar pieza al mantener" },
     { key: "huecosPunteados", label: "Borde punteado" },
@@ -975,6 +976,37 @@ function vaciarPiezasBandeja() {
     document.querySelectorAll("#bandeja .pieza").forEach(function (p) { p.remove(); });
 }
 
+function lanzarTutorialPieza() {
+    if (!acc().mostrarIntro || !window.PedniaTutorial) return;
+    const t = (gameConfig && gameConfig.textos) || {};
+    const prog = document.getElementById("progreso");
+    if (prog) prog.hidden = true;
+    PedniaTutorial.correr({
+        texto: t.demostracion,
+        textoFin: t.demostracionFin,
+        cancelado: function () { return !!juegoTerminado; },
+        onTexto: function (txt) {
+            const en = document.getElementById("enunciado");
+            if (en && txt) en.textContent = txt;
+        },
+        jugar: function () {
+            return PedniaTutorial.sleep(450).then(function () {
+                const ficha = document.querySelector("#bandeja .pieza");
+                if (!ficha) return;
+                const id = ficha.dataset.id;
+                const dest = document.querySelector('#figura-svg .svg-parte[data-id="' + id + '"]')
+                    || document.querySelector('.zona-drop[data-id="' + id + '"]');
+                if (dest) dest.classList.add("is-demo-target");
+                return PedniaTutorial.moverHacia(ficha, dest).then(function () {
+                    if (dest) dest.classList.remove("is-demo-target");
+                });
+            });
+        }
+    }).then(function () {
+        actualizarProgreso();
+    });
+}
+
 function armarTablero() {
     const zonas = document.getElementById("zonas");
     zonas.innerHTML = "";
@@ -1006,6 +1038,7 @@ function armarTablero() {
     mostrarReferenciaAyuda();
     tableroListo = true;
     actualizarProgreso();
+    lanzarTutorialPieza();
 }
 
 function feedbackActivo() {

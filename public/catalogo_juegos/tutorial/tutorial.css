@@ -29,12 +29,28 @@ body.demo-activa #figura-escena,
 body.demo-activa #objeto-objetivo,
 body.demo-activa #escenario,
 body.demo-activa .muestra-color {
-    position: relative;
     z-index: 35;
+}
+
+/* Solo levanta lo que aún está en flujo normal. No pisa position:absolute. */
+body.demo-activa #principal,
+body.demo-activa #enunciado,
+body.demo-activa #zona-objetos,
+body.demo-activa #zona-sombras,
+body.demo-activa #zona-piezas,
+body.demo-activa #figura-escena,
+body.demo-activa #objeto-objetivo,
+body.demo-activa .muestra-color {
+    position: relative;
 }
 
 body.demo-activa #progreso {
     color: #0f766e;
+}
+
+body.demo-activa .demo-lock {
+    pointer-events: none;
+    z-index: 35;
 }
 
 .tutorial-zoe {
@@ -66,7 +82,6 @@ body.demo-activa #progreso {
     box-shadow: 0 0 0 6px rgba(255, 235, 59, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25) !important;
     animation: pedniaDemoPulse 1.4s ease-in-out infinite;
     z-index: 36 !important;
-    position: relative;
 }
 
 @keyframes pedniaDemoPulse {

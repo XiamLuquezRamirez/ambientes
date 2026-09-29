@@ -114,6 +114,18 @@
 		</div>
 
 		<div class="escenario" id="escenario">
+			<div id="presentacion" class="presentacion" hidden>
+				<div class="presentacion-stage" id="presentacion-stage">
+					<video id="video-presentacion" class="presentacion-video" playsinline webkit-playsinline preload="auto" hidden></video>
+					<button type="button" id="btn-presentacion" class="presentacion-play">
+						<span class="presentacion-play-icono">
+							<span class="presentacion-play-anillo" aria-hidden="true"></span>
+							<i class="fa-solid fa-play" aria-hidden="true"></i>
+						</span>
+						<span class="presentacion-play-texto">Toca para ver</span>
+					</button>
+				</div>
+			</div>
 			<div class="escena-wrap" id="escena-wrap">
 				<div id="riel" class="riel" aria-live="polite"></div>
 				<div id="opciones" class="opciones" hidden></div>
@@ -121,7 +133,7 @@
 		</div>
 	</div>
 
-		<div id="menu-acc" class="menu-acc">
+	<div id="menu-acc" class="menu-acc">
 		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
 			<i class="fa-solid fa-universal-access"></i>
 		</button>

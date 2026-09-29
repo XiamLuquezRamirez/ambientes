@@ -12,6 +12,7 @@
     },
     "accesibilidad": {
         "altoContraste": false,
+        "mostrarIntro": true,
         "mostrarZonas": false,
         "resaltarObjetivo": false,
         "pistaPorFallos": true,
@@ -25,6 +26,8 @@
         "eligeCuerpo": "¿Qué cuerpo quieres explorar?",
         "eligeNivel": "Elige tu edad",
         "cierre": "Reconociste las partes del cuerpo.",
+        "demostracion": "¡Vamos con un ejemplo! Mira: el dedo presiona la barriga.",
+        "demostracionFin": "¡Ahora te toca a ti! Escucha y toca la parte del cuerpo.",
         "acierto": "¡Muy bien! Encontraste la parte del cuerpo.",
         "error": "Ya casi lo tienes, mira con atención y vuelve a intentarlo. ¡Tú puedes!",
         "conversacion": [
