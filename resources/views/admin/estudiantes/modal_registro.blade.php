@@ -89,6 +89,53 @@
         .content-ambientes-disponibles.is-invalid {
             border: 1px solid #dc3545 !important;
         }
+
+        .avatar-color-picker {
+            --silla-azul: #0494FC;
+            --silla-verde: #18BC54;
+            --silla-naranja: #FCB400;
+            --silla-morado: #4C007C;
+            --silla-rosa: #F8349C;
+            --silla-cian: #1CC8FC;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            min-height: 42px;
+            margin: 0;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            justify-content: space-between;
+        }
+
+        .avatar-color-option {
+            width: 64px;
+            height: 30px;
+            border-radius: 11px;
+            border: 2px solid #fff;
+            background: var(--avatar-swatch, #cbd5e1);
+            box-shadow: 0 0 0 1px #cbd5e1;
+            cursor: pointer;
+            padding: 0;
+            transition: transform .12s ease, box-shadow .12s ease;
+        }
+
+        .avatar-color-option:hover {
+            transform: scale(1.08);
+        }
+
+        .avatar-color-option.is-selected,
+        .avatar-color-option[aria-checked="true"] {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1e293b;
+            transform: scale(1.08);
+        }
+
+        .form-group:has(#color_avatar.is-invalid) .avatar-color-picker {
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, .2);
+            border-radius: 8px;
+            padding: 4px;
+        }
     </style>
 @endpush
 <div class="modal fade modal-app" id="modalRegistro" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
@@ -223,21 +270,14 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label for="edad">Color de avatar</label>
-                                        <input type="color" value="#ba79fb" style="height: 44px;"
-                                            name="color_avatar" id="color_avatar" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                                         <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
                                             class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     <div class="form-group">
                                         <label for="lugar_nacimiento">Lugar de Nacimiento</label>
                                         <input type="text" name="lugar_nacimiento" id="lugar_nacimiento"
@@ -271,7 +311,36 @@
                                             class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label id="color_avatar_label">Color de avatar</label>
+                                        @php
+                                            $coloresAvatar = [
+                                                ['nombre' => 'Azul', 'var' => '--silla-azul', 'hex' => '#0494FC'],
+                                                ['nombre' => 'Verde', 'var' => '--silla-verde', 'hex' => '#18BC54'],
+                                                ['nombre' => 'Naranja', 'var' => '--silla-naranja', 'hex' => '#FCB400'],
+                                                ['nombre' => 'Morado', 'var' => '--silla-morado', 'hex' => '#4C007C'],
+                                                ['nombre' => 'Rosa', 'var' => '--silla-rosa', 'hex' => '#F8349C'],
+                                                ['nombre' => 'Cian', 'var' => '--silla-cian', 'hex' => '#1CC8FC'],
+                                            ];
+                                        @endphp
+                                        <div class="avatar-color-picker" id="avatar_color_picker" role="radiogroup"
+                                            aria-labelledby="color_avatar_label">
+                                            @foreach ($coloresAvatar as $colorAvatar)
+                                                <button type="button"
+                                                    class="avatar-color-option {{ $loop->first ? 'is-selected' : '' }}"
+                                                    data-color="{{ $colorAvatar['hex'] }}"
+                                                    style="--avatar-swatch: var({{ $colorAvatar['var'] }})"
+                                                    role="radio"
+                                                    aria-checked="{{ $loop->first ? 'true' : 'false' }}"
+                                                    aria-label="{{ $colorAvatar['nombre'] }}"
+                                                    title="{{ $colorAvatar['nombre'] }}"></button>
+                                            @endforeach
+                                        </div>
+                                        <input type="hidden" name="color_avatar" id="color_avatar" value="#0494FC">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="direccion">Dirección</label>
                                         <input type="text" name="direccion" id="direccion" class="form-control">

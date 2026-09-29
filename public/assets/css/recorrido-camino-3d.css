@@ -27,6 +27,76 @@
 .rn3d-overlay { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 .rn3d-overlay button { pointer-events: auto; }
 
+.rn3d-elige {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    pointer-events: none;
+}
+.rn3d-elige__marco {
+    position: absolute;
+    left: max(16px, 3vw);
+    right: max(16px, 3vw);
+    top: max(16px, 3vh);
+    bottom: max(16px, 3vh);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 28px;
+    box-shadow: 0 0 0 100vmax #cfeaf9;
+    pointer-events: none;
+}
+.rn3d-elige__titulo {
+    margin: 22px 16px 0;
+    padding: 12px 28px;
+    border-radius: 999px;
+    text-align: center;
+    color: #143024;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 8px 20px rgba(16, 40, 30, .28);
+    font-family: 'Fredoka One', system-ui, sans-serif;
+    font-size: clamp(1.8rem, 4.2vw, 2.8rem);
+    line-height: 1.15;
+    pointer-events: none;
+}
+.rn3d-elige__escena {
+    flex: 1;
+    display: flex;
+    width: 100%;
+    min-height: 0;
+    pointer-events: auto;
+}
+.rn3d-elige__btn {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 16px 28px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+.rn3d-elige__btn span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 190px;
+    min-height: 78px;
+    padding: 14px 32px;
+    border-radius: 999px;
+    color: #143024;
+    background: #fff;
+    box-shadow: 0 10px 22px rgba(16, 50, 40, .28);
+    font-family: 'Fredoka One', system-ui, sans-serif;
+    font-size: clamp(1.8rem, 4.4vw, 2.6rem);
+}
+.rn3d-elige__btn:active span { transform: scale(.96); }
+.rn3d-elige--habla .rn3d-elige__titulo,
+.rn3d-elige--habla .rn3d-elige__btn { opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+.rn3d-elige--habla .rn3d-elige__marco { box-shadow: 0 0 0 100vmax transparent; transition: box-shadow .5s ease; }
+.rn3d-elige--cortina { background: #cfeaf9; }
+.rn3d-overlay.is-sobre-elige { z-index: 9; }
+
 .rn3d-menu {
     position: absolute;
     top: 16px;

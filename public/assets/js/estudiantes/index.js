@@ -3,6 +3,22 @@ const $modal = $('#modalRegistro');
 const modalBS = new bootstrap.Modal($modal[0]);
 var requiereApoyo = null;
 var idEstudianteEditar = null;
+const COLOR_AVATAR_DEFECTO = '#0494FC';
+
+function aplicarColorAvatar(hex) {
+    const color = (hex || COLOR_AVATAR_DEFECTO).toString().trim();
+    const normalizado = color.toUpperCase();
+    $('#color_avatar').val(color);
+    $('#avatar_color_picker .avatar-color-option').each(function () {
+        const coincide = String($(this).data('color') || '').toUpperCase() === normalizado;
+        $(this).toggleClass('is-selected', coincide).attr('aria-checked', coincide ? 'true' : 'false');
+    });
+}
+
+$modal.on('click', '.avatar-color-option', function () {
+    aplicarColorAvatar($(this).data('color'));
+    $('#color_avatar').removeClass('is-invalid');
+});
 
 $modal.on('hidden.bs.modal', function () {
     limpiarErroresModal();
@@ -65,7 +81,7 @@ function limpiarModal() {
     //resetear el preview del avatar
     $('#avatar').val('');
     $('#previewAvatar').attr('src', '/assets/images/avatar.png');
-    $('#color_avatar').val('#ba79fb');
+    aplicarColorAvatar(COLOR_AVATAR_DEFECTO);
 
     //resetear el valor de la configuracion de pin (solo el contenedor del modal Nuevo/Editar)
     activarContenedorPinRegistro();
@@ -427,7 +443,7 @@ async function mapearDatosEstudiante(datos) {
     $('#nombre').val(datos.nombre);
     $('#apellido').val(datos.apellido);
     $('#grado_id_nuevo').val(datos.grado_id);
-    $('#color_avatar').val(datos.color_avatar);
+    aplicarColorAvatar(datos.color_avatar);
     $('#fecha_nacimiento').val(datos.fecha_nacimiento);
     $('#sexo').val(datos.sexo);
     $('#acudiente').val(datos.acudiente);

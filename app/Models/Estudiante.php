@@ -36,27 +36,6 @@ class Estudiante extends Model
         );
     }
 
-    protected function colorAvatar(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-
-                $colors = [
-                    '#2563EB',
-                    '#7C3AED',
-                    '#059669',
-                    '#DC2626',
-                    '#EA580C',
-                    '#0891B2',
-                    '#DB2777',
-                    '#4338CA',
-                ];
-
-                return $colors[$this->id % count($colors)];
-            }
-        );
-    }
-
     protected function avatarUrl(): Attribute
     {
         return Attribute::make(

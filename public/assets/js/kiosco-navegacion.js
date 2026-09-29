@@ -92,6 +92,9 @@
         if (window.KioscoRecorrido && typeof window.KioscoRecorrido.boot === 'function') {
             window.KioscoRecorrido.boot();
         }
+        if (window.KioscoSelectorAula && typeof window.KioscoSelectorAula.init === 'function') {
+            window.KioscoSelectorAula.init();
+        }
         actualizarBtnSalir();
     }
 
