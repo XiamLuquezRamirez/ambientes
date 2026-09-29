@@ -1,6 +1,8 @@
 (function () {
+    function init() {
     var raiz = document.querySelector('.selector-aula');
-    if (!raiz) return;
+    if (!raiz || raiz.dataset.aulaLista === '1') return;
+    raiz.dataset.aulaLista = '1';
 
     var lista = raiz.querySelector('.selector-aula__pupitres');
     var atras = document.getElementById('aulaAtras');
@@ -146,12 +148,27 @@
     if (voz && window.speechSynthesis) {
         voz.addEventListener('click', function () {
             window.speechSynthesis.cancel();
-            var frase = new SpeechSynthesisUtterance('¿Quién eres? Busca tu foto y tócala.');
+            var frase = new SpeechSynthesisUtterance('¿Quién eres tú? Busca tu foto y tócala.');
             frase.lang = 'es-CO';
             frase.rate = 0.95;
             window.speechSynthesis.speak(frase);
         });
     }
 
-    pintar();
+    var salir = document.getElementById('aulaSalir');
+    if (salir) {
+        salir.addEventListener('click', function () {
+            if (window.KioscoNav && typeof window.KioscoNav.salir === 'function') {
+                window.KioscoNav.salir();
+                return;
+            }
+            window.location.href = '/inicio';
+        });
+    }
+
+    if (lista) pintar();
+    }
+
+    window.KioscoSelectorAula = { init: init };
+    init();
 })();

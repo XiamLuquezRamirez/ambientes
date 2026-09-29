@@ -246,7 +246,7 @@ class EstudianteAdminController extends Controller
             'fecha_nacimiento' => 'required|date',
             'sexo' => 'required|in:masculino,femenino',
             'grado_id_nuevo' => 'nullable',
-            'configuracion_pin' => 'required|array|min:3',
+            'configuracion_pin' => 'required_if:tipo_guarda,1|array|min:3',
             'lugar_nacimiento' => 'required|string|max:100',
             'departamento_id' => 'required|string|max:100',
             'municipio_id' => 'required|string|max:100',
@@ -292,16 +292,18 @@ class EstudianteAdminController extends Controller
         $exitoso = Estudiante::where('id', $idEstudiante)->update($datosActualizar);
 
         if ($exitoso) {
-            ConfiguracionPin::updateOrCreate([
-                'estudiante_id' => $idEstudiante,
-            ], [
-                'figura_1' => $datos['configuracion_pin'][0]['icon'],
-                'color_figura_1' => $datos['configuracion_pin'][0]['color'],
-                'figura_2' => $datos['configuracion_pin'][1]['icon'],
-                'color_figura_2' => $datos['configuracion_pin'][1]['color'],
-                'figura_3' => $datos['configuracion_pin'][2]['icon'],
-                'color_figura_3' => $datos['configuracion_pin'][2]['color'],
-            ]);
+            if ($request->filled('configuracion_pin')) {
+                ConfiguracionPin::updateOrCreate([
+                    'estudiante_id' => $idEstudiante,
+                ], [
+                    'figura_1' => $datos['configuracion_pin'][0]['icon'],
+                    'color_figura_1' => $datos['configuracion_pin'][0]['color'],
+                    'figura_2' => $datos['configuracion_pin'][1]['icon'],
+                    'color_figura_2' => $datos['configuracion_pin'][1]['color'],
+                    'figura_3' => $datos['configuracion_pin'][2]['icon'],
+                    'color_figura_3' => $datos['configuracion_pin'][2]['color'],
+                ]);
+            }
 
             return response()->json([
                 'success' => true,

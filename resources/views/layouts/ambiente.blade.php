@@ -114,6 +114,7 @@
     <script src="{{ asset('assets/js/kiosco-bienvenida.js') }}"></script>
     <script src="{{ asset('assets/js/pin-figuras.js') }}"></script>
     <script src="{{ asset('assets/js/kiosco-navegacion.js') }}"></script>
+    <script src="{{ asset('assets/js/kiosco-selector-aula.js') }}?v={{ @filemtime(public_path('assets/js/kiosco-selector-aula.js')) ?: time() }}"></script>
     <script src="{{ asset('assets/js/kiosco-fullscreen.js') }}"></script>
 </body>
 

@@ -65,6 +65,7 @@ class Constructor {
         this.lotes = new Map();
         this.arboles = [];
         this.flores = [];
+        this.farolas = [];
     }
 
     reservar(modelo, n) {
@@ -629,6 +630,11 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
                 casaInicio = { ruta: e.m, i, x: e.p[0], y: e.p[1], z: e.p[2], r: e.r || 0 };
             }
             if (esArbol(e.m)) obra.arboles.push({ ruta: e.m, i, x: e.p[0], z: e.p[2] });
+            if (String(e.m).includes('farola')) {
+                obra.farolas.push({
+                    ruta: e.m, i, x: e.p[0], y: e.p[1], z: e.p[2], r: e.r || 0, s: e.s || 1,
+                });
+            }
         }
     }));
     obra.cerrar();
@@ -695,6 +701,20 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
         },
         despejarFlores: (puntos, radio) => {
             obra.despejarFlores(puntos || [], radio);
+        },
+        farolas: obra.farolas,
+        colocarProp: (item, x, z) => {
+            const lote = obra.lotes.get(item.ruta);
+            if (!lote) return;
+            const pos = new THREE.Vector3(x, item.y, z);
+            const quat = new THREE.Quaternion().setFromAxisAngle(Y, item.r || 0);
+            _m.compose(pos, quat, _s.setScalar(item.s || 1));
+            lote.partes.forEach((pt, j) => {
+                lote.meshes[j].setMatrixAt(item.i, _t.multiplyMatrices(_m, pt.local));
+                lote.meshes[j].instanceMatrix.needsUpdate = true;
+            });
+            item.x = x;
+            item.z = z;
         },
         actualizar: (dt, t) => fauna.update(dt, t),
         destruir: () => {
