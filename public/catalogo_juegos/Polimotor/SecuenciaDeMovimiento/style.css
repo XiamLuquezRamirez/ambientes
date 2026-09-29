@@ -278,6 +278,103 @@ body.intro3d-activa #menu-acc {
   padding-bottom: 8px;
 }
 
+body.presentacion-activa .enunciado-wrap {
+  visibility: hidden;
+}
+
+body.presentacion-activa #escena-wrap {
+  display: none;
+}
+
+.presentacion {
+  position: relative;
+  z-index: 5;
+  width: min(96vw, 1100px);
+  align-self: stretch;
+  display: flex;
+  min-height: 0;
+}
+
+.presentacion[hidden] {
+  display: none !important;
+}
+
+.presentacion-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #111827;
+  border: 5px solid #fff;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.presentacion-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #111827;
+  pointer-events: none;
+}
+
+.presentacion-play {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.presentacion-stage.is-playing .presentacion-play {
+  display: none;
+}
+
+.presentacion-play-icono {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  box-shadow: 0 8px 0 #1e40af;
+}
+
+.presentacion-play-anillo {
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.75);
+  animation: presentacionPulso 1.4s ease-out infinite;
+}
+
+.presentacion-play-texto {
+  font-size: clamp(22px, 3vw, 30px);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes presentacionPulso {
+  0% { transform: scale(0.92); opacity: 0.9; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presentacion-play-anillo { animation: none; }
+}
+
 .escena-wrap {
   position: relative;
   width: min(96vw, 1100px);

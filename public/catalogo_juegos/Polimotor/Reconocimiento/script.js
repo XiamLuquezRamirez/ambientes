@@ -224,6 +224,7 @@ function pintarMenuVol() {
 
 const ACC_OPCIONES = [
     { key: "altoContraste", label: "Alto contraste" },
+    { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
     { key: "mostrarZonas", label: "Mostrar zonas" },
     { key: "resaltarObjetivo", label: "Resaltar objetivo" },
     { key: "pistaPorFallos", label: "Pistas por errores" },
@@ -450,7 +451,6 @@ function iniciarEscenario() {
     document.getElementById("escenario").style.visibility = "visible";
     tableroListo = true;
     aplicarAccesibilidadInicial();
-    mostrarPreguntaActual();
     cargarMascaraFigura(src);
 
     const wrap = document.querySelector(".lienzo-wrap");
@@ -459,6 +459,26 @@ function iniciarEscenario() {
             if (tableroListo) sizeLienzo();
         });
         wrap._obsLienzo.observe(wrap);
+    }
+
+    if (acc().mostrarIntro && window.PedniaTutorial) {
+        const prog = document.getElementById("progreso");
+        if (prog) prog.hidden = true;
+        PedniaTutorial.correr({
+            texto: (gameConfig.textos && gameConfig.textos.demostracion) || "",
+            textoFin: (gameConfig.textos && gameConfig.textos.demostracionFin) || "",
+            onTexto: function (t) {
+                const en = document.getElementById("enunciado");
+                if (en && t) en.textContent = t;
+            },
+            jugar: function () {
+                return animarDedoEnBarriga();
+            }
+        }).then(function () {
+            mostrarPreguntaActual();
+        });
+    } else {
+        mostrarPreguntaActual();
     }
 }
 
@@ -480,6 +500,66 @@ function sizeLienzo() {
     lienzo.style.width = Math.floor(w) + "px";
     lienzo.style.height = Math.floor(h) + "px";
     lienzo.style.aspectRatio = "";
+}
+
+function zonaEjemplo() {
+    const mapa = (cuerpoActual() && cuerpoActual().zonas) || {};
+    const primera = (preguntas[0] && preguntas[0].targets) || [];
+    if (mapa.barriga && primera.indexOf("barriga") < 0) return "barriga";
+    const ids = Object.keys(mapa);
+    return ids.find(function (id) { return primera.indexOf(id) < 0; }) || ids[0];
+}
+
+function svgDedo() {
+    return '<svg viewBox="0 0 120 170" aria-hidden="true">' +
+        '<rect x="46" y="2" width="26" height="86" rx="13" fill="#ffd2b0" stroke="#d9976e" stroke-width="3"/>' +
+        '<ellipse cx="59" cy="14" rx="8" ry="6" fill="#fff6ee"/>' +
+        '<rect x="74" y="52" width="18" height="40" rx="9" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
+        '<rect x="90" y="60" width="16" height="34" rx="8" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
+        '<rect x="28" y="56" width="16" height="32" rx="8" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
+        '<path d="M24 84h74c14 0 22 12 22 26v18c0 22-18 36-40 36H46c-22 0-36-14-36-34v-22c0-14 6-24 14-24z" fill="#ffd2b0" stroke="#d9976e" stroke-width="3"/>' +
+        "</svg>";
+}
+
+function animarDedoEnBarriga() {
+    const zonaId = zonaEjemplo();
+    const mapa = (cuerpoActual() && cuerpoActual().zonas) || {};
+    const z = mapa[zonaId];
+    const el = zonaId ? document.querySelector('.zona-toque[data-id="' + zonaId + '"]') : null;
+    const lienzo = document.getElementById("lienzo");
+    if (!el || !z || !lienzo || !window.PedniaTutorial) return Promise.resolve();
+
+    document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
+    const cx = z.x + z.w / 2;
+    const cy = z.y + z.h * 0.42;
+    const reducir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dedo = document.createElement("div");
+    dedo.className = "demo-dedo";
+    dedo.setAttribute("aria-hidden", "true");
+    dedo.innerHTML = svgDedo();
+    dedo.style.left = (reducir ? cx : 70) + "%";
+    dedo.style.top = (reducir ? cy : 112) + "%";
+    lienzo.appendChild(dedo);
+
+    const dormir = PedniaTutorial.sleep;
+    return dormir(30).then(function () {
+        dedo.style.left = cx + "%";
+        dedo.style.top = cy + "%";
+        return dormir(reducir ? 180 : 900);
+    }).then(function () {
+        el.classList.add("objetivo");
+        dedo.classList.add("is-pressed");
+        return dormir(720);
+    }).then(function () {
+        dedo.classList.remove("is-pressed");
+        return dormir(280);
+    }).then(function () {
+        el.classList.remove("objetivo");
+        dedo.remove();
+    }, function () {
+        el.classList.remove("objetivo");
+        dedo.remove();
+    });
 }
 
 function armarZonas() {

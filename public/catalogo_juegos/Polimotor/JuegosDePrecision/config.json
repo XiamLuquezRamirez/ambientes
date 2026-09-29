@@ -16,6 +16,8 @@
         "eligeNivel": "Elige tu edad",
         "enunciado": "Lleva el cohete por cada aro hasta la estrella",
         "cierre": "Completaste el recorrido de precisión.",
+        "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: el cohete pasa por el aro hasta la estrella.",
+        "demostracionFin": "¡Ahora te toca a ti! Lleva el cohete por cada aro.",
         "aciertoAro": "¡Muy bien! Sigue avanzando.",
         "aciertoRecorrido": "¡Genial! Completaste este recorrido.",
         "error": "¡Inténtalo otra vez! Mueve el cohete con cuidado.",
@@ -35,7 +37,8 @@
         ]
     },
     "accesibilidad": {
-    "altoContraste": false,
+        "altoContraste": false,
+        "mostrarIntro": true,
         "letterSpacing": 2,
         "volumenFondo": 20,
         "rate": 5

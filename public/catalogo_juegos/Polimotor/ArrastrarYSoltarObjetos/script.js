@@ -86,6 +86,7 @@
 
         const ACC_OPCIONES = [
         { key: "altoContraste", label: "Alto contraste" },
+        { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
     ];
 
     function setMenuAcc(abierto) {
@@ -495,6 +496,29 @@
         totalRondas = Math.max(1, Number(nivelElegido.rondas) || 1);
         document.getElementById("enunciado").textContent = textos().enunciado || "Arrastra cada objeto hasta su lugar";
         Promise.resolve(imagenesPromise).then(function () {
+            if (acc().mostrarIntro && window.PedniaTutorial) {
+                const prog = document.getElementById("progreso");
+                if (prog) prog.hidden = true;
+                pintarTablero(["manzana"], ["caja_manzana"]);
+                aceptaArrastre = false;
+                return PedniaTutorial.correr({
+                    texto: textos().demostracion,
+                    textoFin: textos().demostracionFin,
+                    cancelado: function () { return juegoTerminado; },
+                    onTexto: function (t) {
+                        const en = document.getElementById("enunciado");
+                        if (en && t) en.textContent = t;
+                    },
+                    jugar: function () {
+                        const obj = document.querySelector("#zona-objetos .objeto");
+                        const dest = document.querySelector('#zona-destinos .destino[data-destino="caja_manzana"]');
+                        if (dest) dest.classList.add("is-demo-target");
+                        return llevarYDejar(obj, dest, "manzana");
+                    }
+                }).then(function () {
+                    iniciarRonda(rondaGen);
+                });
+            }
             iniciarRonda(rondaGen);
         });
     };
@@ -516,8 +540,44 @@
         const destinosRonda = nivelElegido.barajarDestinos ? shuffle(dests) : dests;
         actualizarProgreso();
         pintarTablero(objetosPendientes, destinosRonda);
+        const en = document.getElementById("enunciado");
+        if (en) en.textContent = textos().enunciado || "Arrastra cada objeto hasta su lugar";
         aceptaArrastre = true;
         TextoVoz.hablar(textos().enunciado || "Arrastra cada objeto hasta su lugar", "zoe");
+    }
+
+    function llevarYDejar(obj, dest, objetoId) {
+        return new Promise(function (resolve) {
+            if (!obj || !dest) {
+                resolve();
+                return;
+            }
+            const a = obj.getBoundingClientRect();
+            const b = dest.getBoundingClientRect();
+            const dx = (b.left + b.width / 2) - (a.left + a.width / 2);
+            const dy = (b.top + b.height / 2) - (a.top + a.height / 2);
+            obj.style.zIndex = "40";
+            obj.style.transition = "transform 1100ms ease";
+            obj.style.transform = "translate(" + dx + "px," + dy + "px)";
+            setTimeout(function () {
+                dest.classList.remove("is-demo-target");
+                colocarEnDestino(objetoId, obj, dest);
+                obj.style.transition = "";
+                obj.style.transform = "";
+                obj.style.zIndex = "";
+                resolve();
+            }, 1140);
+        });
+    }
+
+    function colocarEnDestino(objetoId, elObjeto, elDestino) {
+        if (elObjeto) elObjeto.classList.add("is-colocado");
+        elDestino.classList.add("is-lleno");
+        const img = document.createElement("img");
+        img.className = "objeto-colocado";
+        img.src = metaObj(objetoId).img || "";
+        img.alt = metaObj(objetoId).nombre || "";
+        elDestino.appendChild(img);
     }
 
     function pintarTablero(objetos, destinos) {
@@ -671,13 +731,7 @@
         if (colocados[objetoId]) return;
 
         colocados[objetoId] = destinoId;
-        elObjeto.classList.add("is-colocado");
-        elDestino.classList.add("is-lleno");
-        const img = document.createElement("img");
-        img.className = "objeto-colocado";
-        img.src = metaObj(objetoId).img || "";
-        img.alt = metaObj(objetoId).nombre || "";
-        elDestino.appendChild(img);
+        colocarEnDestino(objetoId, elObjeto, elDestino);
 
         await feedbackAcierto();
 

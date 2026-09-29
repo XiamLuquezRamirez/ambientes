@@ -17,6 +17,7 @@
       }
     },
     "altoContraste": false,
+    "mostrarIntro": true,
     "modoTap": false,
     "zoomLongPress": false,
     "huecosPunteados": false,
@@ -34,6 +35,8 @@
     "instruccion": "Hola, soy Zoe. ¡Vamos a jugar! Observa el cuerpo y arrastra cada pieza hasta el lugar donde corresponde.",
     "seOcultan": "La figura se esconderá en...",
     "cierre": "¡Lograste completar el rompecabezas del cuerpo humano!",
+    "demostracion": "¡Vamos con un ejemplo! Mira: el dedo toma la cabeza y la mueve un poco.",
+    "demostracionFin": "¡Ahora te toca a ti! Coloca cada pieza en su lugar.",
     "acierto": "¡Muy bien, lo hiciste genial!",
     "error": "Ya casi lo tienes, mira con atención y prueba otro lugar para esa pieza.",
     "conversacion": [

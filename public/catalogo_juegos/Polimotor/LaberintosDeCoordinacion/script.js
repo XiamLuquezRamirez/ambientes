@@ -105,6 +105,7 @@
 
     const ACC_OPCIONES = [
         { key: "altoContraste", label: "Alto contraste" },
+        { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
     ];
 
     function setMenuAcc(abierto) {
@@ -652,6 +653,10 @@
         juegoTerminado = false;
         document.getElementById("enunciado").textContent = enunciadoActual();
         const arrancar = function () {
+            if (acc().mostrarIntro && window.PedniaTutorial) {
+                correrDemoLaberinto();
+                return;
+            }
             iniciarLaberintoActual();
         };
         esperarImagenesOTimeout(400).then(arrancar).catch(arrancar);
@@ -1187,6 +1192,63 @@
         if (!el || !laberintos.length) return;
         el.hidden = false;
         el.textContent = (indiceLaberinto + 1) + "/" + laberintos.length;
+    }
+
+    function muestrasLinea(pts) {
+        const out = [];
+        if (!pts || pts.length < 2) return out;
+        for (let i = 1; i < pts.length; i++) {
+            const a = pts[i - 1];
+            const b = pts[i];
+            const n = 14;
+            for (let k = 0; k <= n; k++) {
+                const t = k / n;
+                out.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+            }
+        }
+        return out;
+    }
+
+    async function correrDemoLaberinto() {
+        const reales = laberintos.slice();
+        const demo = {
+            id: "demo-fijo",
+            esDemo: true,
+            path: [[15, 72], [48, 72], [48, 36], [82, 36]],
+            distractores: [[[48, 72], [48, 88]]]
+        };
+        laberintos = [demo];
+        indiceLaberinto = 0;
+        const prog = document.getElementById("progreso");
+        if (prog) prog.hidden = true;
+        await PedniaTutorial.correr({
+            texto: textos().demostracion,
+            textoFin: textos().demostracionFin,
+            cancelado: function () { return !!juegoTerminado; },
+            onTexto: function (t) {
+                const en = document.getElementById("enunciado");
+                if (en && t) en.textContent = t;
+            },
+            jugar: async function () {
+                iniciarLaberintoActual();
+                if (prog) prog.hidden = true;
+                const geo = inicioMeta(demo);
+                const muestras = muestrasLinea(geo.pts);
+                for (let i = 0; i < muestras.length; i++) {
+                    if (juegoTerminado) return;
+                    personaje = muestras[i];
+                    ultimoValido = { x: personaje.x, y: personaje.y };
+                    redibujar();
+                    await PedniaTutorial.sleep(32);
+                }
+            }
+        });
+        if (juegoTerminado) return;
+        laberintos = reales;
+        indiceLaberinto = 0;
+        labCapaId = null;
+        document.getElementById("enunciado").textContent = enunciadoActual();
+        iniciarLaberintoActual();
     }
 
     function iniciarLaberintoActual() {

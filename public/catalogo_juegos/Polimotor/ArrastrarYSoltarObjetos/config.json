@@ -14,6 +14,8 @@
     "eligeNivel": "Elige tu edad",
     "enunciado": "Arrastra cada objeto hasta el lugar donde corresponde",
     "cierre": "Ubicaste todos los objetos correctamente.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: la manzana va a su caja.",
+    "demostracionFin": "¡Ahora te toca a ti! Arrastra cada objeto hasta su lugar.",
     "acierto": "¡Muy bien! Colocaste el objeto en su lugar.",
     "error": "¡Inténtalo otra vez! Observa dónde corresponde.",
     "conversacion": [
@@ -33,6 +35,7 @@
   },
   "accesibilidad": {
     "altoContraste": false,
+    "mostrarIntro": true,
     "letterSpacing": 2,
     "volumenFondo": 20,
     "rate": 5
