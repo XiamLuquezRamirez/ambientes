@@ -520,7 +520,7 @@
 }
 
 .rn-elegir.is-abierto .rn-elegir-titulo {
-    animation: rn-elegir-pop 1s cubic-bezier(.22, 1, .36, 1) forwards;
+    animation: rn-elegir-titulo-in .7s cubic-bezier(.34, 1.56, .64, 1) forwards;
 }
 
 .rn-elegir-opciones {
@@ -557,16 +557,30 @@
     transform: translateY(28px) scale(.84);
 }
 
+/* Entrada: rebote juguetón desde abajo + leve giro; luego queda flotando. */
 .rn-elegir.is-abierto .rn-elegir-btn {
-    animation: rn-elegir-pop 1.25s cubic-bezier(.22, 1, .36, 1) forwards;
+    animation:
+        rn-elegir-entra .8s cubic-bezier(.34, 1.56, .64, 1) forwards,
+        rn-elegir-flota 3.4s ease-in-out 1s infinite;
+}
+.rn-elegir.is-abierto .rn-elegir-btn--clase { animation-delay: .1s, 1s; }
+.rn-elegir.is-abierto .rn-elegir-btn--jugar { animation-delay: .28s, 1.3s; }
+
+/* El ícono se balancea suave dentro de la tarjeta. */
+.rn-elegir.is-abierto .rn-elegir-btn .rn-elegir-icono {
+    animation: rn-elegir-icono-bailar 3s ease-in-out 1.1s infinite;
+}
+/* Los rayos giran despacio para dar vida. */
+.rn-elegir.is-abierto .rn-elegir-rayos {
+    animation: rn-elegir-rayos-girar 9s linear infinite;
 }
 
-.rn-elegir.is-abierto .rn-elegir-btn--jugar {
-    animation-delay: .28s;
+.rn-elegir-btn:hover {
+    filter: brightness(1.06);
 }
-
 .rn-elegir-btn:active {
-    transform: translateY(4px) scale(.98);
+    transform: translateY(4px) scale(.97);
+    animation-play-state: paused;
 }
 
 .rn-elegir.is-saliendo {
@@ -580,31 +594,130 @@
     transition: opacity .45s ease;
 }
 
+/* En cuanto la elegida empieza a transformarse (formas o expansión), el título
+   y la otra tarjeta se desvanecen para dar todo el protagonismo. */
+.rn-elegir.is-saliendo:has(.is-formando) .rn-elegir-titulo,
+.rn-elegir.is-saliendo:has(.is-formando) .rn-elegir-btn:not(.is-elegida),
 .rn-elegir.is-saliendo:has(.is-ampliada) .rn-elegir-titulo,
 .rn-elegir.is-saliendo:has(.is-ampliada) .rn-elegir-btn:not(.is-elegida) {
     opacity: 0;
 }
 
+/* Puerta mágica: la tarjeta elegida da un saltito, y luego se expande
+   llenando la pantalla. Un destello y estrellas acompañan la entrada. */
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida,
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida:active {
-    animation: none;
+    animation: rn-elegir-saltito .32s cubic-bezier(.34, 1.56, .64, 1);
     position: relative;
     z-index: 3;
     opacity: 1;
     transform-origin: center center;
     transform: scale(1);
-    transition: transform 1.05s cubic-bezier(.4, 0, .15, 1);
+    transition: transform .85s cubic-bezier(.5, 0, .1, 1), border-radius .85s ease, clip-path .18s ease;
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, .0), 0 22px 32px rgba(15, 23, 42, .22);
+}
+
+/* Fase de ciclo de formas: la tarjeta cambia de clip-path y late en cada una;
+   el ícono y el texto se ocultan para que se vea limpia la silueta.
+   El borde blanco se logra con drop-shadow apilado (sigue el clip-path). */
+.rn-elegir .rn-elegir-btn.is-formando {
+    animation: none;
+    border: 0;                 /* el borde recto no encaja con las siluetas */
+    box-shadow: none;
+    transition: clip-path .2s cubic-bezier(.34, 1.56, .64, 1);
+    filter: drop-shadow(0 14px 12px rgba(15, 23, 42, .32));
+    isolation: isolate;
+}
+/* Durante el ciclo de formas el fondo propio del botón se apaga: el relleno de
+   color lo pinta ::after y el borde blanco lo pinta ::before (más grande). */
+.rn-elegir .rn-elegir-btn.is-formando {
+    background: transparent !important;
+    -webkit-clip-path: none !important;   /* recorta ::before/::after, no el botón */
+    clip-path: none !important;
+    overflow: visible;
+}
+/* Borde blanco: silueta blanca un poco más grande, detrás del relleno. */
+.rn-elegir .rn-elegir-btn.is-formando::before,
+.rn-elegir .rn-elegir-btn.is-formando::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    -webkit-clip-path: var(--forma, inset(0));
+    clip-path: var(--forma, inset(0));
+    transition: -webkit-clip-path .2s cubic-bezier(.34, 1.56, .64, 1),
+                clip-path .2s cubic-bezier(.34, 1.56, .64, 1);
+}
+.rn-elegir .rn-elegir-btn.is-formando::before {
+    inset: -7px;               /* grosor del borde */
+    background: #fff;
+    z-index: 0;
+    filter: drop-shadow(0 12px 12px rgba(15, 23, 42, .32));
+}
+/* Relleno de color (mismo gradiente que la tarjeta), encima del borde. */
+.rn-elegir .rn-elegir-btn--clase.is-formando::after {
+    inset: 0;
+    background: linear-gradient(180deg, #4eb0ff 0%, #1c86ea 100%);
+    z-index: 1;
+}
+.rn-elegir .rn-elegir-btn--jugar.is-formando::after {
+    inset: 0;
+    background: linear-gradient(180deg, #8d6bff 0%, #6842f3 100%);
+    z-index: 1;
+}
+/* El clip-path recortado del botón ya no aplica; movemos el clip a los pseudos.
+   El JS sigue seteando --forma; el clip directo del botón queda neutralizado. */
+.rn-elegir .rn-elegir-btn.is-formando .rn-elegir-icono,
+.rn-elegir .rn-elegir-btn.is-formando .rn-elegir-texto {
+    opacity: 0;
+    transition: opacity .15s ease;
+}
+.rn-elegir .rn-elegir-btn.rn-late {
+    animation: rn-elegir-late .26s ease;
 }
 
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida.is-ampliada,
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida.is-ampliada:active {
-    transform: scale(8);
+    animation: none;
+    transform: scale(11);
+    border-radius: 0;
+    box-shadow: 0 0 120px 60px rgba(255, 255, 255, .55), inset 0 0 0 0 rgba(255, 255, 255, 0);
 }
 
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida .rn-elegir-icono,
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida .rn-elegir-texto {
     opacity: 0;
-    transition: opacity .35s ease .55s;
+    transition: opacity .3s ease .35s;
+}
+
+/* Destello blanco que crece desde el centro de la tarjeta elegida. */
+.rn-elegir-flash {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 40px; height: 40px;
+    margin: -20px 0 0 -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, rgba(255,255,255,.85) 40%, rgba(255,255,255,0) 72%);
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0);
+}
+.rn-elegir.is-saliendo .rn-elegir-flash.is-on {
+    animation: rn-elegir-flash .9s ease-out forwards;
+}
+
+/* Estrellas que salen disparadas al elegir. */
+.rn-elegir-estrella {
+    position: absolute;
+    left: 50%; top: 50%;
+    font-size: 28px;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+.rn-elegir.is-saliendo .rn-elegir-estrella.is-on {
+    animation: rn-elegir-estrella .8s ease-out forwards;
 }
 
 .rn-elegir-btn:focus-visible {
@@ -669,6 +782,192 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* Título: aparece con rebote alegre. */
+@keyframes rn-elegir-titulo-in {
+    0% { opacity: 0; transform: translateY(-24px) scale(.7); }
+    60% { opacity: 1; transform: translateY(4px) scale(1.06); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Tarjeta: entra desde abajo con rebote y un giro leve. */
+@keyframes rn-elegir-entra {
+    0% { opacity: 0; transform: translateY(70px) scale(.6) rotate(-6deg); }
+    55% { opacity: 1; transform: translateY(-10px) scale(1.05) rotate(2deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+/* Idle: flota suave arriba/abajo con un latido mínimo. */
+@keyframes rn-elegir-flota {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.015); }
+}
+
+/* Ícono: se balancea de lado a lado. */
+@keyframes rn-elegir-icono-bailar {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* Rayos detrás del ícono girando. */
+@keyframes rn-elegir-rayos-girar {
+    to { transform: rotate(360deg); }
+}
+
+/* Saltito de alegría antes de expandirse. */
+@keyframes rn-elegir-saltito {
+    0% { transform: scale(1) translateY(0); }
+    45% { transform: scale(1.12) translateY(-14px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+/* Latido en cada cambio de forma. */
+@keyframes rn-elegir-late {
+    0% { transform: scale(.86) rotate(-4deg); }
+    55% { transform: scale(1.1) rotate(3deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
+/* Destello: crece y se desvanece. */
+@keyframes rn-elegir-flash {
+    0% { opacity: 0; transform: scale(0); }
+    30% { opacity: .95; }
+    100% { opacity: 0; transform: scale(30); }
+}
+
+/* ============================================================
+   VARIANTE B — tarjetas tipo póster (ilustración grande) + flip 3D
+   ============================================================ */
+.rn-elegir--v2 .rn-elegir-opciones {
+    perspective: 1400px;                 /* profundidad para el flip */
+    gap: clamp(24px, 5vw, 56px);
+}
+
+/* La tarjeta v2 es solo el marco 3D; el estilo va en las caras. */
+.rn-elegir--v2 .rn-elegir-btn {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    min-height: clamp(280px, 52vh, 420px);
+    max-width: clamp(300px, 40vw, 440px);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+.rn-elegir--v2.is-abierto .rn-elegir-btn {
+    animation: rn-elegir-entra .8s cubic-bezier(.34, 1.56, .64, 1) forwards,
+               rn-v2-flota 3.6s ease-in-out 1s infinite;
+}
+.rn-elegir--v2.is-abierto .rn-elegir-btn--clase { animation-delay: .1s, 1s; }
+.rn-elegir--v2.is-abierto .rn-elegir-btn--jugar { animation-delay: .28s, 1.3s; }
+
+.rn-card3d {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    transform-style: preserve-3d;
+    transition: transform .55s cubic-bezier(.4, 0, .2, 1);
+}
+.rn-card3d-cara {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    border-radius: 32px;
+    border: 6px solid #fff;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: inset 0 3px 0 rgba(255, 255, 255, .35),
+                0 16px 0 rgba(0, 0, 0, .10),
+                0 26px 36px rgba(15, 23, 42, .28);
+}
+/* Frente: ilustración grande + cinta con el texto. */
+.rn-elegir-btn--clase .rn-card3d-frente { background: linear-gradient(180deg, #7fd3ff 0%, #3f9fe6 100%); }
+.rn-elegir-btn--jugar .rn-card3d-frente { background: linear-gradient(180deg, #b49bff 0%, #7a54f0 100%); }
+
+.rn-poster-ilustra {
+    flex: 1 1 auto;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: clamp(14px, 3vh, 26px) clamp(10px, 2vw, 20px) 0;
+}
+.rn-poster-ilustra svg {
+    width: 82%;
+    height: auto;
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .18));
+}
+.rn-poster-cinta {
+    width: 100%;
+    padding: clamp(10px, 1.8vh, 16px);
+    background: rgba(255, 255, 255, .18);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+}
+.rn-poster-cinta span {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    color: #fff;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, .18);
+    line-height: 1;
+    text-align: center;
+}
+/* Reverso: cara sólida con un emoji grande (se ve al voltear). */
+.rn-card3d-reverso {
+    transform: rotateY(180deg);
+    justify-content: center;
+    color: #fff;
+}
+.rn-elegir-btn--clase .rn-card3d-reverso { background: linear-gradient(180deg, #4eb0ff, #1c86ea); }
+.rn-elegir-btn--jugar .rn-card3d-reverso { background: linear-gradient(180deg, #8d6bff, #6842f3); }
+.rn-poster-emoji { font-size: clamp(4rem, 11vw, 7rem); }
+
+.rn-elegir--v2 .rn-elegir-btn:active .rn-card3d { transform: scale(.97); }
+
+/* --- Salida variante B: flip 3D + zoom hacia la cámara --- */
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida {
+    animation: none;
+    position: relative;
+    z-index: 3;
+    transform-origin: center center;
+    transition: transform .8s cubic-bezier(.5, 0, .1, 1);
+}
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-flip .rn-card3d {
+    transform: rotateY(180deg) scale(1.06);
+}
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-zoom {
+    transform: scale(9);
+}
+/* Las demás y el título se van al elegir. */
+.rn-elegir--v2.is-saliendo .rn-elegir-titulo,
+.rn-elegir--v2.is-saliendo .rn-elegir-btn:not(.is-elegida) {
+    animation: none;
+    opacity: 0;
+    transition: opacity .4s ease;
+}
+
+@keyframes rn-v2-flota {
+    0%, 100% { transform: translateY(0) rotateZ(-.6deg); }
+    50% { transform: translateY(-12px) rotateZ(.6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rn-elegir--v2.is-abierto .rn-elegir-btn { animation: none; opacity: 1; transform: none; }
+    .rn-card3d, .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida { transition: none !important; }
+}
+
+/* Estrella: sale disparada, gira y se apaga (usa --dx/--dy/--rot). */
+@keyframes rn-elegir-estrella {
+    0% { opacity: 0; transform: translate(0, 0) scale(.4) rotate(0); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(var(--rot)); }
+}
+
 @keyframes rn-banner-in {
     from { transform: translateY(-100%); opacity: .6; }
     to { transform: translateY(0); opacity: 1; }
@@ -702,6 +1001,10 @@
     .rn-portada-iniciar-halo,
     .rn-elegir-btn,
     .rn-elegir-titulo,
+    .rn-elegir-icono,
+    .rn-elegir-rayos,
+    .rn-elegir-flash,
+    .rn-elegir-estrella,
     .rn-nube,
     .rn-nube-colgante,
     .rn-eje-nube,
@@ -715,6 +1018,8 @@
         opacity: 1;
         transform: none;
     }
+    .rn-elegir-flash,
+    .rn-elegir-estrella { display: none !important; }
 }
 
 @media (max-width: 900px) {
