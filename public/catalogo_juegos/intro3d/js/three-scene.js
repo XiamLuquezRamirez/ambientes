@@ -43,7 +43,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.92;
+renderer.toneMappingExposure = 1.0;
 container.appendChild(renderer.domElement);
 
 // ========================================================================
@@ -87,18 +87,20 @@ const M_MAD_CLARA = mat(0xe0b06a, 0.75);
 const M_BLANCO = mat(0xffffff, 0.85);
 const M_METAL = new THREE.MeshStandardMaterial({ color: 0xb8c0c8, roughness: 0.5, metalness: 0.4 });
 
-// ---- Iluminación (interior cálido y parejo) ----
-scene.add(new THREE.HemisphereLight(0xfff6e8, 0xcfd8c8, 0.85));
-const key = new THREE.DirectionalLight(0xfff2d8, 1.1);
+// ---- Iluminación (interior cálido, parejo y luminoso) ----
+scene.add(new THREE.HemisphereLight(0xfff6e8, 0xdfe6d8, 1.05));
+const key = new THREE.DirectionalLight(0xfff2d8, 1.3);
 key.position.set(4, 9, 7); key.castShadow = true;
 key.shadow.camera.near = 0.5; key.shadow.camera.far = 34;
 key.shadow.camera.left = -14; key.shadow.camera.right = 14;
 key.shadow.camera.top = 14; key.shadow.camera.bottom = -14;
 key.shadow.mapSize.set(2048, 2048);
 scene.add(key);
-const fill = new THREE.DirectionalLight(0xdfeaff, 0.45);
+const fill = new THREE.DirectionalLight(0xdfeaff, 0.6);
 fill.position.set(-6, 4, 5);
 scene.add(fill);
+// Luz ambiental suave extra para levantar las sombras del aula.
+scene.add(new THREE.AmbientLight(0xffffff, 0.25));
 
 // ====================== ESTRUCTURA DEL AULA ======================
 
@@ -373,6 +375,225 @@ alfBorde.rotation.x = -Math.PI / 2; alfBorde.position.set(0, Y + 0.03, 0.4); sce
 const ring = new THREE.Mesh(new THREE.RingGeometry(1.15, 1.24, 64),
     new THREE.MeshBasicMaterial({ color: numColor(TEMA.acentoRGB), transparent: true, opacity: 0.8, side: THREE.DoubleSide }));
 ring.rotation.x = -Math.PI / 2; ring.position.set(0, Y + 0.05, 0.4); scene.add(ring);
+
+// ========================================================================
+//  LÁMPARAS DE TECHO TEMÁTICAS POR AMBIENTE
+//  Cada lámpara: forma temática con material emisivo (brilla) + un PointLight
+//  suave que ilumina de verdad la escena. Se cuelgan del techo (Y+AULA_H).
+// ========================================================================
+const Y_TECHO = Y + AULA_H - 0.05;
+
+// Foco/luz puntual reutilizable colgado en (x,z) con color e intensidad.
+function luzTecho(x, z, color, intensidad, distancia) {
+    const l = new THREE.PointLight(color, intensidad != null ? intensidad : 0.6, distancia || 16, 1.6);
+    l.position.set(x, Y_TECHO - 0.6, z);
+    scene.add(l);
+    return l;
+}
+
+// Disco emisivo (bombillo) que brilla en el centro de una lámpara.
+function bombillo(g, x, y, z, r, color) {
+    const foco = new THREE.Mesh(new THREE.CircleGeometry(r, 20),
+        new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: color || 0xffffff, emissiveIntensity: 1.1 }));
+    foco.rotation.x = Math.PI / 2; foco.position.set(x, y, z); g.add(foco);
+    return foco;
+}
+
+// Spot redondo de color (como los focos de colores de las referencias).
+function crearSpotTecho(x, z, color) {
+    const g = new THREE.Group();
+    const cuerpo = cil(0.42, 0.42, 0.28, mat(color, 0.6), 20); cuerpo.position.y = Y_TECHO - 0.14; g.add(cuerpo);
+    const aro = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.05, 10, 24), mat(color, 0.5)); aro.rotation.x = Math.PI / 2; aro.position.y = Y_TECHO - 0.28; g.add(aro);
+    bombillo(g, x, Y_TECHO - 0.29, z, 0.26, 0xffffff);
+    // reposicionar el cuerpo/aro al punto (x,z)
+    cuerpo.position.x = x; cuerpo.position.z = z; aro.position.x = x; aro.position.z = z;
+    scene.add(g);
+    luzTecho(x, z, 0xffffff, 0.5, 14);
+    return g;
+}
+
+// --- Lámpara con forma (clip de polígono) extruida + bombillo + luz ---
+function lamparaForma(x, z, escala, color, tipo) {
+    const g = new THREE.Group();
+    let geo;
+    const s = escala;
+    if (tipo === 'circulo') geo = new THREE.CylinderGeometry(s, s, 0.28, 28);
+    else if (tipo === 'pentagono') geo = new THREE.CylinderGeometry(s, s, 0.3, 5);
+    else if (tipo === 'hexagono') geo = new THREE.CylinderGeometry(s, s, 0.3, 6);
+    else if (tipo === 'rombo') geo = new THREE.CylinderGeometry(s, s, 0.3, 4);
+    else if (tipo === 'triangulo') geo = new THREE.CylinderGeometry(s, s, 0.3, 3);
+    else geo = new THREE.CylinderGeometry(s, s, 0.3, 28);
+    const cuerpo = new THREE.Mesh(geo, mat(color, 0.55));
+    cuerpo.position.y = Y_TECHO - 0.15; cuerpo.rotation.y = Math.random() * 1.2; g.add(cuerpo);
+    bombillo(g, 0, Y_TECHO - 0.31, 0, s * 0.42, 0xffffff);
+    g.position.set(x, 0, z); scene.add(g);
+    luzTecho(x, z, 0xffffff, 0.45, 13);
+    return g;
+}
+
+// --- Anillo (dona) de color con luz interior ---
+function lamparaAnillo(x, z, escala, color) {
+    const g = new THREE.Group();
+    const anillo = new THREE.Mesh(new THREE.TorusGeometry(escala, escala * 0.28, 14, 32), mat(color, 0.5));
+    anillo.rotation.x = Math.PI / 2; anillo.position.y = Y_TECHO - 0.18; g.add(anillo);
+    bombillo(g, 0, Y_TECHO - 0.22, 0, escala * 0.5, 0xffffff);
+    g.position.set(x, 0, z); scene.add(g);
+    luzTecho(x, z, 0xffffff, 0.45, 13);
+    return g;
+}
+
+// --- Nota musical (corchea) con luz (Expresión Artística) ---
+function lamparaNota(x, z, escala, color) {
+    const g = new THREE.Group();
+    const s = escala;
+    const M = mat(color, 0.5, { emissive: color, emissiveIntensity: 0.15 });
+    // cabeza (elipse)
+    const cabeza = new THREE.Mesh(new THREE.CylinderGeometry(0.34 * s, 0.34 * s, 0.28, 20), M);
+    cabeza.position.set(0, Y_TECHO - 0.15, 0.2 * s); cabeza.scale.z = 0.7; g.add(cabeza);
+    // plica (barra vertical)
+    const plica = box(0.09 * s, 0.28, 1.3 * s, M); plica.position.set(0.3 * s, Y_TECHO - 0.15, -0.4 * s); g.add(plica);
+    // corchete
+    const corch = box(0.09 * s, 0.28, 0.5 * s, M); corch.position.set(0.5 * s, Y_TECHO - 0.15, -1.0 * s); corch.rotation.y = -0.5; g.add(corch);
+    bombillo(g, 0, Y_TECHO - 0.31, 0.2 * s, 0.2 * s, 0xffffff);
+    g.position.set(x, 0, z); g.rotation.y = (Math.random() - 0.5) * 0.6; scene.add(g);
+    luzTecho(x, z, color, 0.5, 13);
+    return g;
+}
+
+// --- Flor/nube de pétalos con varias luces (Polimotor) ---
+function lamparaFlor(x, z, escala, color) {
+    const g = new THREE.Group();
+    const s = escala;
+    const M = mat(color, 0.5);
+    const petalos = [[0, 0, 1.0], [0.85, 0.2, 0.75], [-0.8, 0.25, 0.72], [0.3, -0.7, 0.7], [-0.35, -0.65, 0.68]];
+    petalos.forEach(([px, pz, r]) => {
+        const p = new THREE.Mesh(new THREE.CylinderGeometry(r * s * 0.6, r * s * 0.6, 0.3, 20), M);
+        p.position.set(px * s, Y_TECHO - 0.15, pz * s); g.add(p);
+        // borde blanco (halo)
+        const halo = new THREE.Mesh(new THREE.TorusGeometry(r * s * 0.6, 0.04, 8, 24),
+            new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.5 }));
+        halo.rotation.x = Math.PI / 2; halo.position.set(px * s, Y_TECHO - 0.30, pz * s); g.add(halo);
+        bombillo(g, px * s, Y_TECHO - 0.31, pz * s, r * s * 0.28, 0xffffff);
+    });
+    g.position.set(x, 0, z); scene.add(g);
+    luzTecho(x, z, 0xffffff, 0.6, 16);
+    return g;
+}
+
+// --- Bola de disco de puntos de colores (Polimotor) ---
+function lamparaDisco(x, z, escala) {
+    const g = new THREE.Group();
+    const bola = esf(escala, new THREE.MeshStandardMaterial({ color: 0xcfd8e0, roughness: 0.2, metalness: 0.6 }), 16);
+    bola.position.y = Y_TECHO - escala - 0.3; g.add(bola);
+    const cs = [0xff5252, 0x3aa0ff, 0x3dcf5a, 0xffd24a, 0x8b5cf6, 0xf06fae, 0xff8c42];
+    for (let i = 0; i < 40; i++) {
+        const a = Math.random() * 6.28, b = Math.acos(2 * Math.random() - 1);
+        const px = Math.sin(b) * Math.cos(a), py = Math.cos(b), pz = Math.sin(b) * Math.sin(a);
+        const punto = esf(escala * 0.12, new THREE.MeshStandardMaterial({ color: cs[i % cs.length], emissive: cs[i % cs.length], emissiveIntensity: 0.5 }), 6);
+        punto.position.set(px * escala, Y_TECHO - escala - 0.3 + py * escala, pz * escala); g.add(punto);
+    }
+    const cuerda = cil(0.02, 0.02, 0.3, mat(0x888888)); cuerda.position.y = Y_TECHO - 0.15; g.add(cuerda);
+    g.position.set(x, 0, z); scene.add(g);
+    elementosAnimados.push({ mesh: g, giroY: 0.4 });
+    luzTecho(x, z, 0xffffff, 0.4, 12);
+    return g;
+}
+
+// --- Engranaje de color con luz central (Tecnología) ---
+function lamparaEngranaje(x, z, escala, color) {
+    const g = new THREE.Group();
+    const s = escala, dientes = 8;
+    const centro = new THREE.Mesh(new THREE.CylinderGeometry(s, s, 0.32, 24), mat(color, 0.5)); centro.position.y = Y_TECHO - 0.16; g.add(centro);
+    for (let i = 0; i < dientes; i++) { const a = (i / dientes) * 6.28; const d = box(0.28 * s, 0.32, 0.34 * s, mat(color, 0.5)); d.position.set(Math.cos(a) * s * 1.05, Y_TECHO - 0.16, Math.sin(a) * s * 1.05); d.rotation.y = a; g.add(d); }
+    // agujero luminoso central
+    bombillo(g, 0, Y_TECHO - 0.32, 0, s * 0.55, 0xffffff);
+    g.position.set(x, 0, z); scene.add(g);
+    elementosAnimados.push({ mesh: g, giroY: 0.15 * (Math.random() > 0.5 ? 1 : -1) });
+    luzTecho(x, z, 0xffffff, 0.55, 15);
+    return g;
+}
+
+// --- Pieza de rompecabezas de color con luz (Tecnología) ---
+function lamparaPuzzle(x, z, escala, color) {
+    const g = new THREE.Group();
+    const s = escala;
+    const base = box(1.4 * s, 0.3, 1.4 * s, mat(color, 0.5)); base.position.y = Y_TECHO - 0.15; g.add(base);
+    // botones (salientes) en dos lados
+    const nub1 = cil(0.28 * s, 0.28 * s, 0.3, mat(color, 0.5), 16); nub1.position.set(0, Y_TECHO - 0.15, 0.85 * s); g.add(nub1);
+    const nub2 = cil(0.28 * s, 0.28 * s, 0.3, mat(color, 0.5), 16); nub2.position.set(0.85 * s, Y_TECHO - 0.15, 0); g.add(nub2);
+    bombillo(g, 0, Y_TECHO - 0.31, 0, 0.4 * s, 0xffffff);
+    g.position.set(x, 0, z); g.rotation.y = Math.random() * 1.5; scene.add(g);
+    luzTecho(x, z, 0xffffff, 0.5, 14);
+    return g;
+}
+
+// --- Panel hexagonal tech con bordes luminosos (Tecnología) ---
+function lamparaPanelHex(x, z, escala, color) {
+    const g = new THREE.Group();
+    const s = escala;
+    const cuerpo = new THREE.Mesh(new THREE.CylinderGeometry(s, s, 0.28, 6), mat(color, 0.5)); cuerpo.position.y = Y_TECHO - 0.14; cuerpo.rotation.y = Math.PI / 6; g.add(cuerpo);
+    // bordes luminosos: tubos en cada lado del hexágono
+    for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * 6.28 + Math.PI / 6;
+        const tubo = box(s * 0.9, 0.06, 0.1, new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.8 }));
+        tubo.position.set(Math.cos(a) * s * 0.86, Y_TECHO - 0.29, Math.sin(a) * s * 0.86);
+        tubo.rotation.y = a + Math.PI / 2; g.add(tubo);
+    }
+    g.position.set(x, 0, z); scene.add(g);
+    luzTecho(x, z, 0xffffff, 0.5, 15);
+    return g;
+}
+
+// ======================= MONTAJE POR AMBIENTE =======================
+(function lamparasTecho() {
+    const slug = TEMA.slug;
+    // Spots de colores (comunes, dispersos) en todas las aulas para dar luz.
+    const spotsCol = [0xff8c42, 0x2f9be0, 0x000000 + 0x222222, 0xf06fae];
+    [[-8, -4], [8, -3], [-6, 3], [7, 4], [0, -6]].forEach(([x, z], i) => {
+        // spots oscuros/negros como en las referencias, con foco blanco
+        crearSpotTecho(x, z, i % 2 ? 0x2a2a2a : 0xff8c42);
+    });
+
+    if (slug === 'expresion-artistica') {
+        lamparaNota(-5, -2, 1.1, 0x8b5cf6);
+        lamparaNota(4.5, 2, 1.0, 0x6842f3);
+        lamparaNota(0, 3, 0.9, 0x8b5cf6);
+        lamparaForma(6, -4, 0.9, 0xff8c42, 'circulo');
+        lamparaForma(-7, 4, 0.8, 0x2f9be0, 'circulo');
+    } else if (slug === 'multisensorial') {
+        lamparaForma(-5, -3, 1.1, 0x8b5cf6, 'pentagono');
+        lamparaForma(3, -1, 1.0, 0xd9772e, 'circulo');
+        lamparaForma(6, 3, 0.9, 0xf5b301, 'hexagono');
+        lamparaForma(-6, 4, 0.9, 0x2f9be0, 'rombo');
+        lamparaAnillo(0, 2, 1.0, 0xf06fae);
+        lamparaAnillo(5, -4, 0.9, 0xe0574f);
+        lamparaForma(-2, -5, 0.8, 0x3dcf5a, 'hexagono');
+    } else if (slug === 'polimotor') {
+        lamparaFlor(-4, -2, 1.0, 0x8b5cf6);
+        lamparaFlor(5, 2, 1.1, 0x3dcf5a);
+        lamparaFlor(-6, 4, 0.9, 0xe0574f);
+        lamparaFlor(2, -4, 0.85, 0x2f80ff);
+        lamparaDisco(0, 1, 0.5);
+        lamparaForma(7, -3, 0.7, 0xffd24a, 'circulo');
+    } else if (slug === 'tecnologia') {
+        lamparaEngranaje(-5, -3, 0.9, 0x2f80ff);
+        lamparaEngranaje(-3.4, -1.6, 0.7, 0xffd24a);
+        lamparaEngranaje(-4.6, -0.4, 0.6, 0x3dcf5a);
+        lamparaEngranaje(-2.6, -0.2, 0.55, 0xe0574f);
+        lamparaPuzzle(3.5, -2, 0.8, 0x2f80ff);
+        lamparaPuzzle(5.4, -1.2, 0.8, 0xe0574f);
+        lamparaPanelHex(0, 3, 1.1, 0x8a8f98);
+        lamparaPanelHex(6, 3.5, 0.8, 0x2f5d6e);
+    } else if (slug === 'multisaberes') {
+        // letras/números iluminados: usamos formas + spots de colores
+        lamparaForma(-5, -3, 1.0, 0xff5252, 'circulo');
+        lamparaForma(4, -1, 0.95, 0x3aa0ff, 'pentagono');
+        lamparaForma(6, 3, 0.9, 0xffd166, 'hexagono');
+        lamparaForma(-6, 4, 0.9, 0x3dcf5a, 'rombo');
+        lamparaForma(0, 2.5, 0.9, 0x8b5cf6, 'triangulo');
+        lamparaAnillo(2, -5, 0.85, 0xf06fae);
+    }
+})();
 
 // ========================================================================
 //  PROPS DE SUELO POR AMBIENTE — variados, detallados, en laterales/fondo.
