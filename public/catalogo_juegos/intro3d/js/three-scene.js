@@ -1250,6 +1250,13 @@ function marcarSalida() {
     window.dispatchEvent(new CustomEvent('characters-exited'));
 }
 
+function salioDelEncuadre(mesh) {
+    const punto = mesh.position.clone();
+    punto.y += 0.9;
+    punto.project(camera);
+    return Math.abs(punto.x) > 1.15 || Math.abs(punto.y) > 1.15;
+}
+
 function crearActor(def) {
     const actor = {
         id: def.id,
@@ -1433,6 +1440,14 @@ function actualizarActor(actor, delta) {
         const dx = actor.destinoX - actor.mesh.position.x;
         const dz = actor.destinoZ - actor.mesh.position.z;
         const distancia = Math.hypot(dx, dz);
+
+        if (actor.estado === 'saliendo' && salioDelEncuadre(actor.mesh)) {
+            actor.estado = 'fuera';
+            if (actor.activo) actor.activo.fadeOut(0.15);
+            actor.mesh.visible = false;
+            marcarSalida();
+            return;
+        }
 
         if (distancia > 0.045) {
             const paso = Math.min(distancia, actor.velocidad * delta);
