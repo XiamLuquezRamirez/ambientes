@@ -242,23 +242,73 @@ function plantaMaceta(x, y, z, s) {
 (function pizarra() {
     const g = new THREE.Group();
     const marco = box(5.4, 3.0, 0.2, M_MAD); marco.castShadow = true; g.add(marco);
-    const dibujoTex = texturaCanvas(360, 200, (ctx, w, h) => {
-        ctx.fillStyle = '#eef3d8'; ctx.fillRect(0, 0, w, h);
-        // rejilla suave
-        ctx.strokeStyle = 'rgba(120,150,90,0.25)'; ctx.lineWidth = 1;
-        for (let i = 0; i < w; i += 14) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke(); }
-        for (let i = 0; i < h; i += 14) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke(); }
-        // sol
-        ctx.strokeStyle = '#e0a020'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(w * 0.42, 40, 16, 0, 6.3); ctx.stroke();
-        // nubes
-        ctx.strokeStyle = '#6a8fd0'; [[70, 34], [150, 30], [270, 36]].forEach(([x, y]) => { ctx.beginPath(); ctx.arc(x, y, 12, 0, 6.3); ctx.stroke(); });
-        // casa
-        ctx.strokeStyle = '#c05a3a'; ctx.strokeRect(150, 100, 60, 45);
-        ctx.beginPath(); ctx.moveTo(146, 100); ctx.lineTo(180, 74); ctx.lineTo(214, 100); ctx.stroke();
-        // árboles
-        ctx.strokeStyle = '#4a8a3a'; [90, 250, 300].forEach((x) => { ctx.beginPath(); ctx.arc(x, 110, 14, 0, 6.3); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, 124); ctx.lineTo(x, 145); ctx.stroke(); });
-        // suelo
-        ctx.strokeStyle = '#5a8a3a'; ctx.beginPath(); ctx.moveTo(0, 150); ctx.lineTo(w, 150); ctx.stroke();
+    const dibujoTex = texturaCanvas(720, 400, (ctx, w, h) => {
+        // Papel cuadriculado claro
+        ctx.fillStyle = '#f4f7e6'; ctx.fillRect(0, 0, w, h);
+        ctx.strokeStyle = 'rgba(120,150,90,0.16)'; ctx.lineWidth = 1;
+        for (let i = 0; i <= w; i += 24) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke(); }
+        for (let i = 0; i <= h; i += 24) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke(); }
+
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        const suelo = h - 70;
+
+        // --- Cielo: pasto en la base ---
+        ctx.fillStyle = '#8fce62'; ctx.fillRect(0, suelo, w, h - suelo);
+        ctx.strokeStyle = '#5a9e3a'; ctx.lineWidth = 3;
+        for (let x = 12; x < w; x += 26) { ctx.beginPath(); ctx.moveTo(x, suelo); ctx.lineTo(x - 5, suelo - 12); ctx.moveTo(x, suelo); ctx.lineTo(x + 5, suelo - 12); ctx.stroke(); }
+
+        // --- Sol con rayos (arriba izquierda) ---
+        const sx = 90, sy = 70;
+        ctx.strokeStyle = '#f4b400'; ctx.lineWidth = 4;
+        for (let i = 0; i < 8; i++) { const a = (i / 8) * 6.28; ctx.beginPath(); ctx.moveTo(sx + Math.cos(a) * 34, sy + Math.sin(a) * 34); ctx.lineTo(sx + Math.cos(a) * 48, sy + Math.sin(a) * 48); ctx.stroke(); }
+        ctx.fillStyle = '#ffd21e'; ctx.beginPath(); ctx.arc(sx, sy, 28, 0, 6.3); ctx.fill();
+        ctx.strokeStyle = '#f4b400'; ctx.beginPath(); ctx.arc(sx, sy, 28, 0, 6.3); ctx.stroke();
+
+        // --- Nubes (relleno blanco con contorno) ---
+        function nube(cx, cy, s) {
+            ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#9db8e0'; ctx.lineWidth = 3;
+            [[0, 0, 22], [26, 4, 16], [-24, 4, 15], [10, -10, 14]].forEach(([dx, dy, r]) => { ctx.beginPath(); ctx.arc(cx + dx * s, cy + dy * s, r * s, 0, 6.3); ctx.fill(); ctx.stroke(); });
+        }
+        nube(300, 60, 1.0); nube(560, 90, 0.8);
+
+        // --- Pájaro (una "M" suave) ---
+        ctx.strokeStyle = '#5a6b7a'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(430, 70); ctx.quadraticCurveTo(445, 58, 458, 70); ctx.quadraticCurveTo(471, 58, 486, 70); ctx.stroke();
+
+        // --- Casa (cuerpo + techo + puerta + ventana) ---
+        const hx = 250, hy = suelo - 130, hw = 150, hh = 130;
+        ctx.fillStyle = '#ffe0b3'; ctx.fillRect(hx, hy, hw, hh);
+        ctx.strokeStyle = '#c8794a'; ctx.lineWidth = 4; ctx.strokeRect(hx, hy, hw, hh);
+        // techo
+        ctx.fillStyle = '#e07a4a'; ctx.beginPath(); ctx.moveTo(hx - 14, hy); ctx.lineTo(hx + hw / 2, hy - 64); ctx.lineTo(hx + hw + 14, hy); ctx.closePath(); ctx.fill(); ctx.strokeStyle = '#b5563a'; ctx.stroke();
+        // puerta
+        ctx.fillStyle = '#a9713d'; ctx.fillRect(hx + 58, hy + hh - 54, 34, 54);
+        ctx.strokeStyle = '#7a4a24'; ctx.strokeRect(hx + 58, hy + hh - 54, 34, 54);
+        ctx.fillStyle = '#ffd21e'; ctx.beginPath(); ctx.arc(hx + 86, hy + hh - 28, 3, 0, 6.3); ctx.fill();
+        // ventana
+        ctx.fillStyle = '#bfe3ff'; ctx.fillRect(hx + 22, hy + 30, 34, 34);
+        ctx.strokeStyle = '#4a90d0'; ctx.strokeRect(hx + 22, hy + 30, 34, 34);
+        ctx.beginPath(); ctx.moveTo(hx + 39, hy + 30); ctx.lineTo(hx + 39, hy + 64); ctx.moveTo(hx + 22, hy + 47); ctx.lineTo(hx + 56, hy + 47); ctx.stroke();
+
+        // --- Árboles (copa + tronco) ---
+        function arbol(x, s) {
+            ctx.fillStyle = '#7a4a24'; ctx.fillRect(x - 6 * s, suelo - 46 * s, 12 * s, 46 * s);
+            ctx.fillStyle = '#4f9e46'; ctx.beginPath(); ctx.arc(x, suelo - 60 * s, 30 * s, 0, 6.3); ctx.fill();
+            ctx.strokeStyle = '#3a7a34'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(x, suelo - 60 * s, 30 * s, 0, 6.3); ctx.stroke();
+        }
+        arbol(70, 1.0); arbol(470, 1.15);
+
+        // --- Carrito ---
+        const cx2 = 560, cy2 = suelo - 26;
+        ctx.fillStyle = '#e0574f'; ctx.fillRect(cx2 - 40, cy2 - 16, 80, 22);
+        ctx.beginPath(); ctx.moveTo(cx2 - 26, cy2 - 16); ctx.lineTo(cx2 - 14, cy2 - 32); ctx.lineTo(cx2 + 14, cy2 - 32); ctx.lineTo(cx2 + 26, cy2 - 16); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#333'; ctx.beginPath(); ctx.arc(cx2 - 24, cy2 + 8, 10, 0, 6.3); ctx.fill(); ctx.beginPath(); ctx.arc(cx2 + 24, cy2 + 8, 10, 0, 6.3); ctx.fill();
+
+        // --- Flores en el pasto ---
+        [[150, '#ff6b8a'], [640, '#c77dff'], [360, '#ffd166']].forEach(([fx, c]) => {
+            ctx.fillStyle = c; for (let i = 0; i < 5; i++) { const a = (i / 5) * 6.28; ctx.beginPath(); ctx.arc(fx + Math.cos(a) * 8, suelo + 24 + Math.sin(a) * 8, 5, 0, 6.3); ctx.fill(); }
+            ctx.fillStyle = '#ffe14a'; ctx.beginPath(); ctx.arc(fx, suelo + 24, 5, 0, 6.3); ctx.fill();
+        });
     });
     const dibujo = new THREE.Mesh(new THREE.PlaneGeometry(4.9, 2.6), new THREE.MeshStandardMaterial({ map: dibujoTex, roughness: 0.9 }));
     dibujo.position.z = 0.11; g.add(dibujo);
