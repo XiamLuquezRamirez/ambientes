@@ -1377,22 +1377,15 @@ window.addEventListener('characters-exit', () => {
             return;
         }
 
-        // Cancela espera/entrada y manda de vuelta al origen.
+        // Cancela espera/entrada y camina COMPLETAMENTE fuera de la escena
+        // (mucho más lejos que inicioX, para que no se queden en el borde).
         actor.espera = 0;
-        actor.destinoX = actor.inicioX;
+        const lado = actor.inicioX < 0 ? -1 : 1;      // por el lado por el que entró
+        actor.destinoX = lado * 22;                    // bien fuera del encuadre
         actor.destinoZ = actor.inicioZ;
 
         const dx = actor.destinoX - actor.mesh.position.x;
         const dz = actor.destinoZ - actor.mesh.position.z;
-        const distancia = Math.hypot(dx, dz);
-
-        if (distancia < 0.08) {
-            actor.mesh.position.x = actor.inicioX;
-            actor.mesh.position.z = actor.inicioZ;
-            actor.estado = 'fuera';
-            if (actor.activo) actor.activo.fadeOut(0.15);
-            return;
-        }
 
         actor.yawObjetivo = Math.atan2(dx, dz);
         actor.estado = 'saliendo';
@@ -1453,6 +1446,7 @@ function actualizarActor(actor, delta) {
             if (actor.estado === 'saliendo') {
                 actor.estado = 'fuera';
                 if (actor.activo) actor.activo.fadeOut(0.2);
+                actor.mesh.visible = false;  // fuera del todo: ocultar
                 marcarSalida();
                 return;
             }
