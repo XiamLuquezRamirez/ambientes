@@ -27,6 +27,7 @@
         'camino' => 'rn-shell--camino',
         'portada' => 'rn-shell--portada',
         'modulos' => 'rn-shell--modulos',
+        'juegos' => 'rn-shell--juegos',
         default => 'rn-shell--pin',
     };
     $sexoEstudiante = '';

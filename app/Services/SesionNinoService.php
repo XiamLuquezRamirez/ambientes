@@ -165,7 +165,7 @@ class SesionNinoService
     public function urlTrasPin(Request $request): string
     {
         return $this->destinoPostPin($request) === self::DESTINO_JUEGOS
-            ? url('/recorrido?abrir=juegos')
+            ? url('/juegos')
             : url('/recorrido');
     }
 

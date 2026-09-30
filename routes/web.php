@@ -611,6 +611,7 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
 Route::middleware('sesion.nino')->group(function () {
     Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
     Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
+    Route::get('/juegos', [AmbienteNinoController::class, 'juegos'])->name('ambiente.juegos');
     require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
 });
 

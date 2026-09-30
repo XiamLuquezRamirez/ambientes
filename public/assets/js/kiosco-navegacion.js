@@ -13,7 +13,7 @@
     }
 
     function esRutaKiosco(pathname) {
-        return /^\/(inicio|recorrido|bienvenida|alumnos(\/\d+\/pin)?|listo)$/.test(pathname);
+        return /^\/(inicio|recorrido|juegos|bienvenida|alumnos(\/\d+\/pin)?|listo)$/.test(pathname);
     }
 
     function esEnlaceInterno(link) {

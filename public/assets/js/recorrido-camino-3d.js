@@ -3093,15 +3093,6 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             refrescarEstaciones();
             actualizarHud(false);
             if (!rafId) rafId = requestAnimationFrame(animar);
-            try {
-                const params = new URLSearchParams(window.location.search || '');
-                if (params.get('abrir') === 'juegos') {
-                    abrirZonaJuegos();
-                    if (window.history && window.history.replaceState) {
-                        window.history.replaceState({}, '', window.location.pathname);
-                    }
-                }
-            } catch (e) { /* noop */ }
         }).catch(function (err) {
             if (token !== cargaId) return;
             console.error(err);
