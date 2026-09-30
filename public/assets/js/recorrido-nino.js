@@ -186,6 +186,27 @@
         }
     }
 
+    // Repertorio de formas (clip-path) reconocibles para el niño. Cada una con
+    // su nombre por si se quiere mostrar. El cuadrado es el "reposo".
+    // clip-path en % (escalan con el tamaño de la tarjeta). Evitamos path()
+    // porque usa coordenadas en px y no se ajusta al tamaño del elemento.
+    const RN_FORMAS = [
+        { nombre: 'círculo', clip: 'circle(50% at 50% 50%)' },
+        { nombre: 'estrella', clip: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' },
+        { nombre: 'corazón', clip: 'polygon(50% 96%, 20% 66%, 6% 45%, 6% 27%, 20% 16%, 36% 18%, 50% 32%, 64% 18%, 80% 16%, 94% 27%, 94% 45%, 80% 66%)' },
+        { nombre: 'flor', clip: 'polygon(50% 0%, 63% 12%, 80% 8%, 82% 26%, 98% 34%, 88% 50%, 98% 66%, 82% 74%, 80% 92%, 63% 88%, 50% 100%, 37% 88%, 20% 92%, 18% 74%, 2% 66%, 12% 50%, 2% 34%, 18% 26%, 20% 8%, 37% 12%)' },
+        { nombre: 'triángulo', clip: 'polygon(50% 4%, 96% 92%, 4% 92%)' },
+        { nombre: 'luna', clip: 'polygon(50% 2%, 24% 12%, 8% 38%, 8% 62%, 24% 88%, 50% 98%, 34% 84%, 26% 62%, 26% 38%, 34% 16%)' },
+        { nombre: 'rombo', clip: 'polygon(50% 2%, 98% 50%, 50% 98%, 2% 50%)' },
+        { nombre: 'hexágono', clip: 'polygon(25% 5%, 75% 5%, 98% 50%, 75% 95%, 25% 95%, 2% 50%)' },
+    ];
+
+    function barajar(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+        return a;
+    }
+
     function ampliarTarjeta(btn, despues) {
         if (saliendoTarjeta) return;
         saliendoTarjeta = true;
@@ -204,13 +225,36 @@
         btn.appendChild(flash);
         lanzarEstrellas(btn);
 
-        void btn.offsetWidth;
-        // Saltito primero; tras el rebote, se expande y entra a la vista.
-        window.setTimeout(function () {
-            btn.classList.add('is-ampliada');
-            flash.classList.add('is-on');
-        }, 300);
-        window.setTimeout(despues, 1250);
+        // Ciclo de formas: la tarjeta va tomando varias formas reconocibles
+        // (círculo, estrella, corazón, …) con un latido en cada cambio, y al
+        // final se expande a pantalla completa para entrar a la vista.
+        btn.classList.add('is-formando');
+        const secuencia = barajar(RN_FORMAS).slice(0, 5); // 5 formas al azar
+        const pasoMs = 260;
+        let i = 0;
+        const timer = window.setInterval(function () {
+            if (i >= secuencia.length) {
+                window.clearInterval(timer);
+                // Última fase: volver a "cuadro" y expandir como puerta mágica.
+                btn.classList.remove('is-formando');
+                btn.style.clipPath = '';
+                btn.style.webkitClipPath = '';
+                btn.classList.add('is-ampliada');
+                flash.classList.add('is-on');
+                return;
+            }
+            const f = secuencia[i];
+            btn.style.clipPath = f.clip;
+            btn.style.webkitClipPath = f.clip;
+            // reinicia el latido en cada forma
+            btn.classList.remove('rn-late');
+            void btn.offsetWidth;
+            btn.classList.add('rn-late');
+            i += 1;
+        }, pasoMs);
+
+        // Tiempo total: ciclo de formas + expansión.
+        window.setTimeout(despues, secuencia.length * pasoMs + 950);
     }
 
     function irAClase() {

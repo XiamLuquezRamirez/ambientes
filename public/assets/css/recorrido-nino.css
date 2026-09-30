@@ -594,6 +594,10 @@
     transition: opacity .45s ease;
 }
 
+/* En cuanto la elegida empieza a transformarse (formas o expansión), el título
+   y la otra tarjeta se desvanecen para dar todo el protagonismo. */
+.rn-elegir.is-saliendo:has(.is-formando) .rn-elegir-titulo,
+.rn-elegir.is-saliendo:has(.is-formando) .rn-elegir-btn:not(.is-elegida),
 .rn-elegir.is-saliendo:has(.is-ampliada) .rn-elegir-titulo,
 .rn-elegir.is-saliendo:has(.is-ampliada) .rn-elegir-btn:not(.is-elegida) {
     opacity: 0;
@@ -609,8 +613,25 @@
     opacity: 1;
     transform-origin: center center;
     transform: scale(1);
-    transition: transform .85s cubic-bezier(.5, 0, .1, 1), border-radius .85s ease;
+    transition: transform .85s cubic-bezier(.5, 0, .1, 1), border-radius .85s ease, clip-path .18s ease;
     box-shadow: 0 0 0 0 rgba(255, 255, 255, .0), 0 22px 32px rgba(15, 23, 42, .22);
+}
+
+/* Fase de ciclo de formas: la tarjeta cambia de clip-path y late en cada una;
+   el ícono y el texto se ocultan para que se vea limpia la silueta. */
+.rn-elegir .rn-elegir-btn.is-formando {
+    animation: none;
+    border: 0;                 /* el borde recto no encaja con las siluetas */
+    transition: clip-path .2s cubic-bezier(.34, 1.56, .64, 1);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, .28);
+}
+.rn-elegir .rn-elegir-btn.is-formando .rn-elegir-icono,
+.rn-elegir .rn-elegir-btn.is-formando .rn-elegir-texto {
+    opacity: 0;
+    transition: opacity .15s ease;
+}
+.rn-elegir .rn-elegir-btn.rn-late {
+    animation: rn-elegir-late .26s ease;
 }
 
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida.is-ampliada,
@@ -756,6 +777,13 @@
     0% { transform: scale(1) translateY(0); }
     45% { transform: scale(1.12) translateY(-14px); }
     100% { transform: scale(1) translateY(0); }
+}
+
+/* Latido en cada cambio de forma. */
+@keyframes rn-elegir-late {
+    0% { transform: scale(.86) rotate(-4deg); }
+    55% { transform: scale(1.1) rotate(3deg); }
+    100% { transform: scale(1) rotate(0); }
 }
 
 /* Destello: crece y se desvanece. */
