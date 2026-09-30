@@ -501,6 +501,22 @@
         });
     }
 
+    function montarBancoDirecto() {
+        $paso.attr('data-paso', 'juegos');
+        $player.prop('hidden', true);
+        const color = (arbol.ambiente && arbol.ambiente.color_hex) || '';
+        if (!window.BancoJuegos || !$paso.length) {
+            renderErrorCamino();
+            return;
+        }
+        window.BancoJuegos.abrir({
+            $paso: $paso,
+            color: color,
+            urlCatalogo: String($app.data('url-juegos-catalogo') || ''),
+            onVolver: salirSesion,
+        });
+    }
+
     function montarCamino3D() {
         const ctxCamino = {
             $app,
@@ -563,6 +579,11 @@
 
         if (String($app.data('ui') || '') === 'camino-lineal') {
             montarCamino3D();
+            return;
+        }
+
+        if (String($app.data('ui') || '') === 'banco-juegos') {
+            montarBancoDirecto();
             return;
         }
 

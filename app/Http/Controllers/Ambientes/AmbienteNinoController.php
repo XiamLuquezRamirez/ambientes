@@ -101,6 +101,10 @@ class AmbienteNinoController extends Controller
      */
     public function recorrido(Request $request)
     {
+        if ($request->query('abrir') === 'juegos') {
+            return redirect('/juegos');
+        }
+
         $ambiente = $this->sesionNino->obtenerAmbiente($request);
         $estudiante = $request->attributes->get('estudiante_nino');
         $clase = $this->claseKiosco->obtenerClaseSesion($this->sesionNino->claseIdEnSesion($request));
@@ -150,6 +154,42 @@ class AmbienteNinoController extends Controller
             'portadaImg' => $this->urlPortada($ambiente->slug),
             'fondoImg' => $this->urlFondo($ambiente->slug),
             'pasoInicial' => 'camino',
+        ]);
+    }
+
+    /**
+     * Catálogo de juegos del niño, sin el mapa de la clase.
+     */
+    public function juegos(Request $request)
+    {
+        $ambiente = $this->sesionNino->obtenerAmbiente($request);
+        $estudiante = $request->attributes->get('estudiante_nino');
+
+        return view('ambientes.kiosco-recorrido', [
+            'ambiente' => $ambiente,
+            'modo' => 'sesion',
+            'ui' => 'banco-juegos',
+            'token' => null,
+            'arbol' => [
+                'ambiente' => [
+                    'id' => $ambiente->id,
+                    'slug' => $ambiente->slug,
+                    'nombre' => $ambiente->nombre,
+                    'icono' => $ambiente->icono,
+                    'color_hex' => $ambiente->color_hex ?: '#0F6E56',
+                ],
+                'modulos' => [],
+            ],
+            'camino' => null,
+            'estudiante' => $estudiante,
+            'urlExperienciaTemplate' => '',
+            'urlTts' => route('ambiente.tts'),
+            'urlSalir' => '/salir',
+            'urlContinuar' => '',
+            'urlJuegosCatalogo' => route('ambiente.juegos-catalogo'),
+            'portadaImg' => '',
+            'fondoImg' => '',
+            'pasoInicial' => 'juegos',
         ]);
     }
 

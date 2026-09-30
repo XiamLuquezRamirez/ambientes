@@ -36,6 +36,11 @@
     background: #ffffff;
 }
 
+.rn-shell--juegos .rn-paso {
+    position: relative;
+    overflow: hidden;
+}
+
 .rn-shell--modulos,
 .rn-shell--ejes,
 .rn-shell--info {
