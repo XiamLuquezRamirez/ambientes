@@ -165,6 +165,27 @@
         if (iniciar) iniciar.focus();
     }
 
+    function lanzarEstrellas(btn) {
+        // Estrellas que salen disparadas desde el centro de la tarjeta elegida.
+        const iconos = ['⭐', '✨', '🌟', '💫'];
+        const n = 10;
+        for (let i = 0; i < n; i++) {
+            const s = document.createElement('span');
+            s.className = 'rn-elegir-estrella';
+            s.textContent = iconos[i % iconos.length];
+            const ang = (i / n) * Math.PI * 2 + Math.random() * 0.4;
+            const dist = 140 + Math.random() * 120;
+            s.style.setProperty('--dx', (Math.cos(ang) * dist).toFixed(0) + 'px');
+            s.style.setProperty('--dy', (Math.sin(ang) * dist).toFixed(0) + 'px');
+            s.style.setProperty('--rot', (Math.random() * 540 - 270).toFixed(0) + 'deg');
+            s.style.fontSize = (20 + Math.random() * 18).toFixed(0) + 'px';
+            s.style.animationDelay = (Math.random() * 0.12).toFixed(2) + 's';
+            btn.appendChild(s);
+            void s.offsetWidth;
+            s.classList.add('is-on');
+        }
+    }
+
     function ampliarTarjeta(btn, despues) {
         if (saliendoTarjeta) return;
         saliendoTarjeta = true;
@@ -176,9 +197,20 @@
         }
         btn.classList.add('is-elegida');
         el.classList.add('is-saliendo');
+
+        // Destello y estrellas al elegir (puerta mágica).
+        const flash = document.createElement('span');
+        flash.className = 'rn-elegir-flash';
+        btn.appendChild(flash);
+        lanzarEstrellas(btn);
+
         void btn.offsetWidth;
-        btn.classList.add('is-ampliada');
-        window.setTimeout(despues, 1100);
+        // Saltito primero; tras el rebote, se expande y entra a la vista.
+        window.setTimeout(function () {
+            btn.classList.add('is-ampliada');
+            flash.classList.add('is-on');
+        }, 300);
+        window.setTimeout(despues, 1250);
     }
 
     function irAClase() {

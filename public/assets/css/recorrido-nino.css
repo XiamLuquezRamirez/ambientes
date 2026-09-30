@@ -520,7 +520,7 @@
 }
 
 .rn-elegir.is-abierto .rn-elegir-titulo {
-    animation: rn-elegir-pop 1s cubic-bezier(.22, 1, .36, 1) forwards;
+    animation: rn-elegir-titulo-in .7s cubic-bezier(.34, 1.56, .64, 1) forwards;
 }
 
 .rn-elegir-opciones {
@@ -557,16 +557,30 @@
     transform: translateY(28px) scale(.84);
 }
 
+/* Entrada: rebote juguetón desde abajo + leve giro; luego queda flotando. */
 .rn-elegir.is-abierto .rn-elegir-btn {
-    animation: rn-elegir-pop 1.25s cubic-bezier(.22, 1, .36, 1) forwards;
+    animation:
+        rn-elegir-entra .8s cubic-bezier(.34, 1.56, .64, 1) forwards,
+        rn-elegir-flota 3.4s ease-in-out 1s infinite;
+}
+.rn-elegir.is-abierto .rn-elegir-btn--clase { animation-delay: .1s, 1s; }
+.rn-elegir.is-abierto .rn-elegir-btn--jugar { animation-delay: .28s, 1.3s; }
+
+/* El ícono se balancea suave dentro de la tarjeta. */
+.rn-elegir.is-abierto .rn-elegir-btn .rn-elegir-icono {
+    animation: rn-elegir-icono-bailar 3s ease-in-out 1.1s infinite;
+}
+/* Los rayos giran despacio para dar vida. */
+.rn-elegir.is-abierto .rn-elegir-rayos {
+    animation: rn-elegir-rayos-girar 9s linear infinite;
 }
 
-.rn-elegir.is-abierto .rn-elegir-btn--jugar {
-    animation-delay: .28s;
+.rn-elegir-btn:hover {
+    filter: brightness(1.06);
 }
-
 .rn-elegir-btn:active {
-    transform: translateY(4px) scale(.98);
+    transform: translateY(4px) scale(.97);
+    animation-play-state: paused;
 }
 
 .rn-elegir.is-saliendo {
@@ -585,26 +599,63 @@
     opacity: 0;
 }
 
+/* Puerta mágica: la tarjeta elegida da un saltito, y luego se expande
+   llenando la pantalla. Un destello y estrellas acompañan la entrada. */
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida,
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida:active {
-    animation: none;
+    animation: rn-elegir-saltito .32s cubic-bezier(.34, 1.56, .64, 1);
     position: relative;
     z-index: 3;
     opacity: 1;
     transform-origin: center center;
     transform: scale(1);
-    transition: transform 1.05s cubic-bezier(.4, 0, .15, 1);
+    transition: transform .85s cubic-bezier(.5, 0, .1, 1), border-radius .85s ease;
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, .0), 0 22px 32px rgba(15, 23, 42, .22);
 }
 
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida.is-ampliada,
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida.is-ampliada:active {
-    transform: scale(8);
+    animation: none;
+    transform: scale(11);
+    border-radius: 0;
+    box-shadow: 0 0 120px 60px rgba(255, 255, 255, .55), inset 0 0 0 0 rgba(255, 255, 255, 0);
 }
 
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida .rn-elegir-icono,
 .rn-elegir.is-saliendo .rn-elegir-btn.is-elegida .rn-elegir-texto {
     opacity: 0;
-    transition: opacity .35s ease .55s;
+    transition: opacity .3s ease .35s;
+}
+
+/* Destello blanco que crece desde el centro de la tarjeta elegida. */
+.rn-elegir-flash {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 40px; height: 40px;
+    margin: -20px 0 0 -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, rgba(255,255,255,.85) 40%, rgba(255,255,255,0) 72%);
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0);
+}
+.rn-elegir.is-saliendo .rn-elegir-flash.is-on {
+    animation: rn-elegir-flash .9s ease-out forwards;
+}
+
+/* Estrellas que salen disparadas al elegir. */
+.rn-elegir-estrella {
+    position: absolute;
+    left: 50%; top: 50%;
+    font-size: 28px;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+.rn-elegir.is-saliendo .rn-elegir-estrella.is-on {
+    animation: rn-elegir-estrella .8s ease-out forwards;
 }
 
 .rn-elegir-btn:focus-visible {
@@ -669,6 +720,58 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* Título: aparece con rebote alegre. */
+@keyframes rn-elegir-titulo-in {
+    0% { opacity: 0; transform: translateY(-24px) scale(.7); }
+    60% { opacity: 1; transform: translateY(4px) scale(1.06); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Tarjeta: entra desde abajo con rebote y un giro leve. */
+@keyframes rn-elegir-entra {
+    0% { opacity: 0; transform: translateY(70px) scale(.6) rotate(-6deg); }
+    55% { opacity: 1; transform: translateY(-10px) scale(1.05) rotate(2deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+/* Idle: flota suave arriba/abajo con un latido mínimo. */
+@keyframes rn-elegir-flota {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-10px) scale(1.015); }
+}
+
+/* Ícono: se balancea de lado a lado. */
+@keyframes rn-elegir-icono-bailar {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* Rayos detrás del ícono girando. */
+@keyframes rn-elegir-rayos-girar {
+    to { transform: rotate(360deg); }
+}
+
+/* Saltito de alegría antes de expandirse. */
+@keyframes rn-elegir-saltito {
+    0% { transform: scale(1) translateY(0); }
+    45% { transform: scale(1.12) translateY(-14px); }
+    100% { transform: scale(1) translateY(0); }
+}
+
+/* Destello: crece y se desvanece. */
+@keyframes rn-elegir-flash {
+    0% { opacity: 0; transform: scale(0); }
+    30% { opacity: .95; }
+    100% { opacity: 0; transform: scale(30); }
+}
+
+/* Estrella: sale disparada, gira y se apaga (usa --dx/--dy/--rot). */
+@keyframes rn-elegir-estrella {
+    0% { opacity: 0; transform: translate(0, 0) scale(.4) rotate(0); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(var(--rot)); }
+}
+
 @keyframes rn-banner-in {
     from { transform: translateY(-100%); opacity: .6; }
     to { transform: translateY(0); opacity: 1; }
@@ -702,6 +805,10 @@
     .rn-portada-iniciar-halo,
     .rn-elegir-btn,
     .rn-elegir-titulo,
+    .rn-elegir-icono,
+    .rn-elegir-rayos,
+    .rn-elegir-flash,
+    .rn-elegir-estrella,
     .rn-nube,
     .rn-nube-colgante,
     .rn-eje-nube,
@@ -715,6 +822,8 @@
         opacity: 1;
         transform: none;
     }
+    .rn-elegir-flash,
+    .rn-elegir-estrella { display: none !important; }
 }
 
 @media (max-width: 900px) {
