@@ -14,6 +14,150 @@
     font-size: 1.6rem;
 }
 
+.rn3d-carga--obra {
+    background:
+        radial-gradient(circle at 82% 16%, rgba(255, 236, 160, .85) 0, transparent 22%),
+        linear-gradient(#e9f8ff 0%, #cfeaf9 70%, #d4f0c2 100%);
+}
+
+.rn3d-obra {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(96vw, 1040px);
+}
+
+.rn3d-obra__escena {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.rn3d-obra__sol circle:first-child { fill: #ffd56a; }
+.rn3d-obra__sol {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: rn3d-sol 3s ease forwards;
+}
+
+.rn3d-obra__nube { fill: #fff; }
+.rn3d-obra__nube--a { transform: translate(78px, 48px); animation: rn3d-nube 3.6s ease-in-out infinite alternate; }
+.rn3d-obra__nube--b { transform: translate(210px, 78px); animation: rn3d-nube 4.4s ease-in-out infinite alternate-reverse; }
+
+.rn3d-obra__cesped { fill: #67c85d; }
+.rn3d-obra__cesped-frente { fill: #4eae4b; }
+.rn3d-obra__cesped,
+.rn3d-obra__cesped-frente {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: rn3d-suelo 3s ease forwards;
+}
+
+.rn3d-obra__sendero {
+    fill: none;
+    stroke: #f0d39a;
+    stroke-width: 18;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: rn3d-trazo 3s ease forwards;
+}
+
+.rn3d-obra__arbol rect { fill: #8a5a32; }
+.rn3d-obra__arbol circle,
+.rn3d-obra__arbol polygon { fill: #2f9a4a; }
+.rn3d-obra__arbol {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: rn3d-aparece 3s ease forwards;
+}
+.rn3d-obra__arbol--1 { animation-delay: .15s; }
+.rn3d-obra__arbol--2 { animation-delay: .35s; }
+.rn3d-obra__arbol--3 { animation-delay: .55s; }
+
+.rn3d-obra__casa-cuerpo rect:first-child { fill: #ffe08a; }
+.rn3d-obra__casa-cuerpo rect:nth-child(2) { fill: #6b4423; }
+.rn3d-obra__casa-cuerpo rect:nth-child(3) { fill: #7ec8e3; }
+.rn3d-obra__casa-techo { fill: #e85d4c; }
+.rn3d-obra__casa-cuerpo,
+.rn3d-obra__casa-techo {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+}
+.rn3d-obra__casa-cuerpo { animation: rn3d-sube 3s ease forwards; }
+.rn3d-obra__casa-techo { animation: rn3d-baja 3s ease forwards; }
+
+.rn3d-obra__texto {
+    margin: 0;
+    color: #143024;
+    font-family: 'Fredoka One', system-ui, sans-serif;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    letter-spacing: .01em;
+}
+
+.rn3d-obra__puntos i {
+    display: inline-block;
+    width: .28em;
+    height: .28em;
+    margin-left: .22em;
+    border-radius: 50%;
+    background: #143024;
+    vertical-align: .15em;
+    animation: rn3d-punto 1.1s ease infinite;
+}
+.rn3d-obra__puntos i:nth-child(2) { animation-delay: .18s; }
+.rn3d-obra__puntos i:nth-child(3) { animation-delay: .36s; }
+
+@keyframes rn3d-sol {
+    0% { opacity: 0; transform: scale(.4); }
+    18%, 100% { opacity: 1; transform: scale(1); }
+}
+@keyframes rn3d-nube {
+    from { translate: 0 0; }
+    to { translate: 16px 0; }
+}
+@keyframes rn3d-suelo {
+    0% { opacity: 0; transform: scale(.72, .15); }
+    22%, 100% { opacity: 1; transform: scale(1, 1); }
+}
+@keyframes rn3d-trazo {
+    0%, 12% { stroke-dashoffset: 100; }
+    48%, 100% { stroke-dashoffset: 0; }
+}
+@keyframes rn3d-aparece {
+    0%, 8% { opacity: 0; transform: scale(.15); }
+    28%, 100% { opacity: 1; transform: scale(1); }
+}
+@keyframes rn3d-sube {
+    0%, 28% { opacity: 0; transform: translateY(22px); }
+    52%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes rn3d-baja {
+    0%, 48% { opacity: 0; transform: translateY(-26px); }
+    72%, 100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes rn3d-punto {
+    0%, 100% { opacity: .2; transform: translateY(0); }
+    40% { opacity: 1; transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rn3d-obra__sol,
+    .rn3d-obra__nube,
+    .rn3d-obra__cesped,
+    .rn3d-obra__cesped-frente,
+    .rn3d-obra__sendero,
+    .rn3d-obra__arbol,
+    .rn3d-obra__casa-cuerpo,
+    .rn3d-obra__casa-techo,
+    .rn3d-obra__puntos i {
+        animation: none;
+        opacity: 1;
+        transform: none;
+        stroke-dashoffset: 0;
+    }
+}
+
 .rn-shell--3d .rn3d-canvas {
     position: absolute;
     inset: 0;

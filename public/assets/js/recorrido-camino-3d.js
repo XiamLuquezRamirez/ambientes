@@ -2821,6 +2821,13 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             const hud = document.querySelector('.rn3d-hud');
             if (menu) menu.style.visibility = 'hidden';
             if (hud) hud.style.visibility = 'hidden';
+            return esperarObraMinima().then(function () {
+            if (gen !== cargaId || !scene) {
+                (candidatosPersonaje || []).forEach(soltarCandidato);
+                candidatosPersonaje = null;
+                eligiendoPersonaje = false;
+                return null;
+            }
             const capa = document.createElement('div');
             capa.id = 'rn3dElige';
             capa.className = 'rn3d-elige';
@@ -2949,6 +2956,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                     });
                 });
             });
+            });
         });
     }
 
@@ -3016,7 +3024,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
         construirModales();
         construirOverlay();
-        mostrarCarga('Cargando mapa…');
+        mostrarConstruccion();
 
         // Eventos de los modales (delegados en $paso, como el 2D)
         ctx.$paso.off('click.rn3d');
@@ -3101,6 +3109,47 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         });
 
         return true;
+    }
+
+    const OBRA_MIN_MS = 3000;
+    let obraDesde = 0;
+
+    function esperarObraMinima() {
+        const falta = OBRA_MIN_MS - (performance.now() - (obraDesde || performance.now()));
+        if (falta <= 16) return Promise.resolve();
+        return new Promise(function (resolve) { window.setTimeout(resolve, falta); });
+    }
+
+    function mostrarConstruccion() {
+        obraDesde = performance.now();
+        quitarCarga();
+        if (!ctx.$paso || !ctx.$paso[0]) return;
+        const el = document.createElement('div');
+        el.id = 'rn3dCarga';
+        el.className = 'rn3d-carga rn3d-carga--obra';
+        el.setAttribute('role', 'status');
+        el.setAttribute('aria-live', 'polite');
+        el.setAttribute('aria-label', 'Construyendo el mapa');
+        el.innerHTML = ''
+            + '<div class="rn3d-obra" aria-hidden="true">'
+            + '<svg class="rn3d-obra__escena" viewBox="0 36 560 274" focusable="false">'
+            + '<g class="rn3d-obra__sol"><circle cx="478" cy="62" r="26"/><circle cx="478" cy="62" r="36" fill="none" stroke="#ffe08a" stroke-width="6" opacity=".55"/></g>'
+            + '<g class="rn3d-obra__nube rn3d-obra__nube--a"><ellipse cx="0" cy="8" rx="22" ry="14"/><ellipse cx="24" cy="4" rx="18" ry="12"/><ellipse cx="44" cy="10" rx="16" ry="10"/></g>'
+            + '<g class="rn3d-obra__nube rn3d-obra__nube--b"><ellipse cx="0" cy="6" rx="16" ry="10"/><ellipse cx="18" cy="2" rx="14" ry="9"/><ellipse cx="34" cy="8" rx="12" ry="8"/></g>'
+            + '<ellipse class="rn3d-obra__cesped" cx="280" cy="248" rx="236" ry="62"/>'
+            + '<ellipse class="rn3d-obra__cesped-frente" cx="280" cy="268" rx="196" ry="34"/>'
+            + '<path class="rn3d-obra__sendero" pathLength="100" d="M48 286 C 130 250, 168 236, 230 252 S 340 292, 430 246"/>'
+            + '<g class="rn3d-obra__arbol rn3d-obra__arbol--1"><rect x="108" y="196" width="12" height="36" rx="3"/><circle cx="114" cy="176" r="26"/><circle cx="96" cy="190" r="16"/><circle cx="132" cy="188" r="15"/></g>'
+            + '<g class="rn3d-obra__arbol rn3d-obra__arbol--2"><rect x="196" y="168" width="10" height="30" rx="3"/><polygon points="201,118 176,184 226,184"/></g>'
+            + '<g class="rn3d-obra__arbol rn3d-obra__arbol--3"><rect x="318" y="176" width="10" height="28" rx="3"/><polygon points="323,128 300,190 346,190"/></g>'
+            + '<g class="rn3d-obra__casa">'
+            + '<g class="rn3d-obra__casa-cuerpo"><rect x="392" y="168" width="78" height="62" rx="6"/><rect x="418" y="196" width="22" height="34" rx="3"/><rect x="404" y="180" width="16" height="14" rx="2"/></g>'
+            + '<polygon class="rn3d-obra__casa-techo" points="380,176 431,128 484,176"/>'
+            + '</g>'
+            + '</svg>'
+            + '<p class="rn3d-obra__texto">Construyendo el mapa<span class="rn3d-obra__puntos"><i></i><i></i><i></i></span></p>'
+            + '</div>';
+        ctx.$paso[0].appendChild(el);
     }
 
     function mostrarCarga(texto) {
