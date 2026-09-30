@@ -9,6 +9,12 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 const MODELOS_BASE = new URL("../models/", import.meta.url);
 const WALK_SPEED = 3.8;
+// 1 = el GLB tal cual. Mayor crece, menor encoge.
+const ESCALA_NINO = 0.72;
+const ESCALA_NINA = 0.72;
+const CLIP_CAMINAR = ["WALK"];
+const CLIP_QUIETO = ["IDLE"];
+const CLIP_SALUDAR = ["HELLO"];
 
 let root = null;
 let renderer = null;
@@ -198,9 +204,9 @@ function cargarPersonaje(def) {
                     gltf.animations.forEach(function (clip) {
                         actions[clip.name] = actor.mixer.clipAction(clip);
                     });
-                    actor.walk = tomarClip(actions, ["Walk", "Walking", "Run"]);
-                    actor.wave = tomarClip(actions, def.gestos || ["Wave", "Yes", "talk"]);
-                    actor.idle = tomarClip(actions, ["Idle", "Standing", "talk"]);
+                    actor.walk = tomarClip(actions, def.caminar || CLIP_CAMINAR);
+                    actor.wave = tomarClip(actions, def.gestos || CLIP_SALUDAR);
+                    actor.idle = tomarClip(actions, def.quieto || CLIP_QUIETO);
                     if (actor.walk) actor.walk.setLoop(THREE.LoopRepeat, Infinity);
                     if (actor.wave) actor.wave.setLoop(THREE.LoopRepeat, Infinity);
                     if (actor.idle) actor.idle.setLoop(THREE.LoopRepeat, Infinity);
@@ -243,7 +249,7 @@ async function montarEscena() {
         cargarPersonaje({
             id: "zeus",
             archivo: "nino.glb",
-            escala: 0.72,
+            escala: ESCALA_NINO,
             y: -2.05,
             inicioX: -9.5,
             inicioZ: 0.15,
@@ -251,13 +257,12 @@ async function montarEscena() {
             finZ: 0.15,
             velocidad: WALK_SPEED,
             retraso: 0.05,
-            yawFrente: 0,
-            gestos: ["Wave", "Yes"]
+            yawFrente: 0
         }),
         cargarPersonaje({
             id: "zoe",
             archivo: "nina.glb",
-            escala: 0.72,
+            escala: ESCALA_NINA,
             y: -2.05,
             inicioX: 9.5,
             inicioZ: 0.2,
@@ -265,8 +270,7 @@ async function montarEscena() {
             finZ: 0.2,
             velocidad: WALK_SPEED * 0.98,
             retraso: 0.12,
-            yawFrente: -0.25,
-            gestos: ["Wave", "Yes", "talk"]
+            yawFrente: -0.25
         })
     ]);
 

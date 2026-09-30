@@ -142,6 +142,10 @@ function iniciarIntro() {
             const mitad = burbujaAncho / 2;
             x = Phaser.Math.Clamp(x, margen + mitad, width - margen - mitad);
             y = Phaser.Math.Clamp(y, burbujaAlto + 44, height * 0.36);
+            const mapaBajar = (CONFIG && CONFIG.nubeBajar) || {};
+            const bajar = Number(mapaBajar[burbujaPersonaje]);
+            if (Number.isFinite(bajar)) y += bajar;
+            y = Phaser.Math.Clamp(y, burbujaAlto + 44, height - 24);
 
             burbuja.setPosition(x, y);
         }

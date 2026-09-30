@@ -1,9 +1,24 @@
 window.INTRO_CONFIG = {
+    // Píxeles hacia abajo. Mayor baja la nube de ese personaje. 0 la deja donde está.
+    nubeBajar: {
+        zeus: 55,
+        zoe: 55
+    },
+
+    // Nombres de los tracks NLA del GLB nuevo. Cambia el string si quieres otro gesto.
+    clips: {
+        caminar: ["WALK"],
+        quieto: ["IDLE"],
+        hablar: ["TALK"],
+        saludar: ["HELLO"]
+    },
+
     personajes: [
         {
             id: "zeus",
             modelo: "models/nino.glb",
-            escala: 0.85,
+            // 1 = el GLB tal cual. Mayor crece, menor encoge.
+            escala: 2.65,
             posicionY: -1,
             inicioX: -10.2,
             inicioZ: 0.15,
@@ -12,15 +27,12 @@ window.INTRO_CONFIG = {
             velocidad: 2.15,
             retraso: 0.15,
             mirarAlHablar: 0.42,
-            mirarAlEscuchar: 1.12,
-            gestos: ["talk", "Yes"],
-            caminar: ["Walk", "Walking", "Run"],
-            idle: ["Idle", "Standing"]
+            mirarAlEscuchar: 1.12
         },
         {
             id: "zoe",
             modelo: "models/nina.glb",
-            escala: 0.85,
+            escala: 2.65,
             posicionY: -1,
             inicioX: 10.2,
             inicioZ: 0.4,
@@ -29,10 +41,7 @@ window.INTRO_CONFIG = {
             velocidad: 2.05,
             retraso: 0.28,
             mirarAlHablar: -0.42,
-            mirarAlEscuchar: -1.12,
-            gestos: ["talk", "Yes"],
-            caminar: ["Walk", "talk", "Run"],
-            idle: ["Idle", "Standing"]
+            mirarAlEscuchar: -1.12
         }
     ],
 

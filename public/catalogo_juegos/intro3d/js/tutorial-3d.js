@@ -6,9 +6,15 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 const MODELOS_BASE = new URL("../models/", import.meta.url);
+// 1 = el GLB tal cual. Mayor crece, menor encoge.
+const ESCALA_NINO = 0.42;
+const ESCALA_NINA = 0.42;
+const CLIP_CAMINAR = ["WALK"];
+const CLIP_QUIETO = ["IDLE"];
+const CLIP_HABLAR = ["TALK"];
 const MODELOS = {
-    zeus: { url: new URL("nino.glb", MODELOS_BASE).href, escala: 0.42 },
-    zoe: { url: new URL("nina.glb", MODELOS_BASE).href, escala: 0.42 }
+    zeus: { url: new URL("nino.glb", MODELOS_BASE).href, escala: ESCALA_NINO },
+    zoe: { url: new URL("nina.glb", MODELOS_BASE).href, escala: ESCALA_NINA }
 };
 
 // Panel esquina inferior derecha: entra desde fuera (derecha) → centro del panel → se va.
@@ -30,6 +36,7 @@ let mixer = null;
 let mesh = null;
 let walkAction = null;
 let idleAction = null;
+let talkAction = null;
 let activoAction = null;
 let clock = null;
 let rafId = null;
@@ -86,6 +93,7 @@ function disposeInterno() {
     }
     walkAction = null;
     idleAction = null;
+    talkAction = null;
     activoAction = null;
     if (mesh && scene) {
         scene.remove(mesh);
@@ -184,6 +192,7 @@ function cargarPersonaje(id) {
                 mixer = null;
                 walkAction = null;
                 idleAction = null;
+                talkAction = null;
                 activoAction = null;
 
                 if (gltf.animations && gltf.animations.length) {
@@ -192,8 +201,10 @@ function cargarPersonaje(id) {
                     gltf.animations.forEach(function (clip) {
                         actions[clip.name] = mixer.clipAction(clip);
                     });
-                    walkAction = tomarClip(actions, ["Walk", "Walking", "Run"]);
-                    idleAction = tomarClip(actions, ["Idle", "Standing"]);
+                    walkAction = tomarClip(actions, CLIP_CAMINAR);
+                    idleAction = tomarClip(actions, CLIP_QUIETO);
+                    talkAction = tomarClip(actions, CLIP_HABLAR);
+                    if (talkAction) talkAction.setLoop(THREE.LoopRepeat, Infinity);
                     if (walkAction) {
                         walkAction.setLoop(THREE.LoopRepeat, Infinity);
                         cruzar(walkAction, 0.01);
@@ -215,7 +226,7 @@ function llegarAHablar() {
     destinoX = DEST_X;
     yawObjetivo = YAW_CAMARA;
     if (mesh) mesh.position.x = DEST_X;
-    cruzar(idleAction || walkAction, 0.25);
+    cruzar(talkAction || idleAction || walkAction, 0.25);
     if (readyResolve) {
         const r = readyResolve;
         readyResolve = null;

@@ -849,7 +849,90 @@ export function animarPuerta(grupo, abrir) {
     });
 }
 
-/** Niño o niña. Sin `cualPedido` elige al azar. Los GLB ya traen Idle, Walk, Run, Wave y Yes. */
+// Tamaño en el mapa. 1 = el GLB tal cual. Mayor crece, menor encoge.
+export const ESCALA_NINO = 2.55;
+export const ESCALA_NINA = 2.55;
+
+// Tracks NLA de nino.glb y nina.glb. El string es el nombre del clip.
+export const ANIMACIONES_PERSONAJE = [
+    'FROG_JUMP',
+    'LOOK_AROUND',
+    'HIP_DANCE',
+    'FIST_PUMP',
+    'STRETCH',
+    'SHY',
+    'RAISE_HAND',
+    'SPIN',
+    'AIRPLANE',
+    'HOPSCOTCH',
+    'SKIP',
+    'JUMPING_JACKS',
+    'CHEER_POMPOMS',
+    'PARTY',
+    'CHEER',
+    'YES',
+    'SURPRISE',
+    'SAD',
+    'THINK',
+    'POINT_UP',
+    'POINT_R',
+    'POINT_L',
+    'DANCE',
+    'CROUCH',
+    'SIT',
+    'JUMP',
+    'RUN',
+    'WALK',
+    'CLAP',
+    'HAPPY',
+    'HELLO',
+    'TALK',
+    'IDLE',
+];
+
+// Poses de prueba del mismo archivo. El recorrido no las pone solas.
+export const ANIMACIONES_PRUEBA = [
+    'TEST_21_BAILAR',
+    'TEST_20_SALUDAR',
+    'TEST_19_SALTAR',
+    'TEST_18_CORRER',
+    'TEST_17_CAMINAR',
+    'TEST_16_CABEZA_INCLINADA',
+    'TEST_15_CABEZA_DER',
+    'TEST_14_CABEZA_IZQ',
+    'TEST_13_AGACHADO',
+    'TEST_12_SENTADO',
+    'TEST_11_RODILLAS',
+    'TEST_10_PIERNA_DER',
+    'TEST_09_PIERNA_IZQ',
+    'TEST_08_BRAZO_DER_DOBLADO',
+    'TEST_07_BRAZO_IZQ_DOBLADO',
+    'TEST_06_AMBOS_BRAZOS',
+    'TEST_05_BRAZO_DER_ARRIBA',
+    'TEST_04_BRAZO_IZQ_ARRIBA',
+    'TEST_03_BRAZOS_ABAJO',
+    'TEST_02_A_POSE',
+    'TEST_01_T_POSE',
+];
+
+// Qué clip de ANIMACIONES_PERSONAJE usa cada momento del mapa.
+export const CLIP_QUIETO = 'IDLE';
+export const CLIP_CAMINAR = 'WALK';
+export const CLIP_CORRER = 'RUN';
+export const CLIP_SALUDAR = 'HELLO';
+export const CLIP_HABLAR = 'TALK';
+export const CLIP_AFIRMAR = 'YES';
+
+function guardarClip(gltf, mixer, acciones, nombre) {
+    if (!nombre || acciones[nombre]) return;
+    const clip = THREE.AnimationClip.findByName(gltf.animations, nombre);
+    if (!clip) return;
+    const accion = mixer.clipAction(clip);
+    accion.loop = THREE.LoopRepeat;
+    acciones[nombre] = accion;
+}
+
+/** Niño o niña. Sin `cualPedido` elige al azar. */
 export async function cargarPersonaje(scene, cualPedido) {
     const cual = cualPedido === 'nino' || cualPedido === 'nina'
         ? cualPedido
@@ -862,16 +945,13 @@ export async function cargarPersonaje(scene, cualPedido) {
         c.castShadow = true;
         c.frustumCulled = false;
     });
+    const escala = cual === 'nina' ? ESCALA_NINA : ESCALA_NINO;
+    if (Number.isFinite(escala) && escala > 0) objeto.scale.setScalar(escala);
     scene.add(objeto);
     const mixer = new THREE.AnimationMixer(objeto);
     const acciones = {};
-    ['Idle', 'Walk', 'Run', 'Wave', 'Yes'].forEach((nombre) => {
-        const clip = THREE.AnimationClip.findByName(gltf.animations, nombre);
-        if (!clip) return;
-        const accion = mixer.clipAction(clip);
-        accion.loop = THREE.LoopRepeat;
-        acciones[nombre] = accion;
-    });
-    if (acciones.Idle) acciones.Idle.play();
+    ANIMACIONES_PERSONAJE.forEach((nombre) => guardarClip(gltf, mixer, acciones, nombre));
+    ANIMACIONES_PRUEBA.forEach((nombre) => guardarClip(gltf, mixer, acciones, nombre));
+    if (acciones[CLIP_QUIETO]) acciones[CLIP_QUIETO].play();
     return { objeto, mixer, acciones, cual };
 }

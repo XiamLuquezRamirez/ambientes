@@ -1223,8 +1223,8 @@ function reproducirGesto(actor) {
 
     const clip = actor.gestos[actor.gestoIndice % actor.gestos.length];
     actor.gestoIndice += 1;
-    clip.setLoop(THREE.LoopOnce, 1);
-    clip.clampWhenFinished = true;
+    clip.setLoop(THREE.LoopRepeat, Infinity);
+    clip.clampWhenFinished = false;
 
     if (actor.activo && actor.activo !== clip) {
         actor.activo.fadeOut(0.2);
@@ -1318,12 +1318,13 @@ function crearActor(def) {
                 });
 
                 actor.mixer = mixer;
-                actor.caminar = tomarClip(actions, def.caminar);
-                actor.idle = tomarClip(actions, def.idle);
+                const clips = CONFIG.clips || {};
+                actor.caminar = tomarClip(actions, def.caminar || clips.caminar || ["WALK"]);
+                actor.idle = tomarClip(actions, def.idle || clips.quieto || ["IDLE"]);
 
-                (def.gestos || []).forEach((nombre) => {
+                (def.gestos || clips.hablar || ["TALK"]).forEach((nombre) => {
                     const gesto = tomarClip(actions, [nombre]);
-                    if (gesto) actor.gestos.push(gesto);
+                    if (gesto && actor.gestos.indexOf(gesto) < 0) actor.gestos.push(gesto);
                 });
 
                 mixer.addEventListener('finished', (evento) => {
@@ -1412,6 +1413,7 @@ window.addEventListener('dialogue-line', (evento) => {
             ? actor.mirarAlHablar
             : actor.mirarAlEscuchar;
         if (habla) reproducirGesto(actor);
+        else if (actor.estado === "listo" || actor.estado === "girando") cruzar(actor, actor.idle, 0.2);
     });
 });
 

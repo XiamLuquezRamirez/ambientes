@@ -10,7 +10,7 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
-import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops } from './mapa-mundo.js?v=20260929a';
+import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR } from './mapa-mundo.js?v=20260930b';
 
 (function () {
     'use strict';
@@ -70,7 +70,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     let mixer = null;
     let accionesPersonaje = null;
     let clipActual = '';
-    let clipMovimiento = 'Walk';
+    let clipMovimiento = CLIP_CAMINAR;
     let personajeCual = 'nino';
     let eligiendoPersonaje = false;
     let enHablaEleccion = false;
@@ -501,7 +501,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     function duracionCaminata(dist) {
         if (!usaMapaGlb) return Math.max(1400, dist * 85);
         const corriendo = dist > 14;
-        clipMovimiento = corriendo ? 'Run' : 'Walk';
+        clipMovimiento = corriendo ? CLIP_CORRER : CLIP_CAMINAR;
         const vel = corriendo ? 6.5 : 3.0;
         return Math.max(800, (dist / vel) * 1000);
     }
@@ -951,7 +951,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             personaje.position.copy(pos);
             personaje.rotation.y = rotY;
             personaje.visible = visible;
-            ponerClip('Idle');
+            ponerClip(CLIP_QUIETO);
         } catch (err) {
             console.error(err);
         }
@@ -996,7 +996,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (personaje) {
             personaje.visible = true;
             colocarPersonajeEn('inicio');
-            ponerClip('Idle');
+            ponerClip(CLIP_QUIETO);
         }
         nodoActual = (camino && camino.paradas[0] && camino.paradas[0].id) || 'inicio';
         seguimientoActivo = false;
@@ -2539,14 +2539,18 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         });
     }
 
+    // Metros que se restan a la altura de la nube. Mayor la baja. 0 la deja donde está.
+    const NUBE_BAJAR_NINO = 0;
+    const NUBE_BAJAR_NINA = 0;
+
     // Ancla el bocadillo sobre la cabeza del personaje (proyección 3D→2D), solo
     // mientras dura el diálogo de bienvenida (mostrandoBocadillo).
     function actualizarBocadillo() {
         if (!elBocadillo) return;
         if (!mostrandoBocadillo) { elBocadillo.style.display = 'none'; return; }
-        // Punto de anclaje BIEN por encima de la cabeza (el niño mide ~3.6 con la
-        // escala actual), así la nube queda arriba y no sobre el personaje.
-        const v = new THREE.Vector3(); personaje.getWorldPosition(v); v.y += (usaMapaGlb ? 3.6 : 5.4); v.project(camera);
+        const bajarNube = personajeCual === 'nina' ? NUBE_BAJAR_NINA : NUBE_BAJAR_NINO;
+        const sobrePies = (usaMapaGlb ? 3.6 : 5.4) - (Number.isFinite(bajarNube) ? bajarNube : 0);
+        const v = new THREE.Vector3(); personaje.getWorldPosition(v); v.y += sobrePies; v.project(camera);
         if (v.z > 1) { elBocadillo.style.display = 'none'; return; }
         elBocadillo.style.display = 'block';
         const mx = 36;
@@ -2625,8 +2629,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             const hablando = narrando || mostrandoBocadillo;
             const entrandoAndando = entrandoSaliendo && animCasa && animCasa.modo !== 'girar';
             const clip = (caminando || entrandoAndando)
-                ? (entrandoAndando ? 'Walk' : clipMovimiento)
-                : (hablando ? ((mostrandoBocadillo && !hablaSinVoltear) ? 'Wave' : 'Yes') : 'Idle');
+                ? (entrandoAndando ? CLIP_CAMINAR : clipMovimiento)
+                : (hablando ? CLIP_HABLAR : CLIP_QUIETO);
             ponerClip(clip);
             mixer.update(dt);
         }
@@ -2758,9 +2762,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (rel.dot(lado) < 0) dir.negate();
         const hasta = pj.objeto.position.clone().addScaledVector(dir, 16);
         if (mundo) hasta.y = mundo.altura(hasta.x, hasta.z);
-        if (pj.acciones.Wave) pj.acciones.Wave.stop();
-        if (pj.acciones.Idle) pj.acciones.Idle.stop();
-        if (pj.acciones.Walk) pj.acciones.Walk.reset().play();
+        if (pj.acciones[CLIP_SALUDAR]) pj.acciones[CLIP_SALUDAR].stop();
+        if (pj.acciones[CLIP_QUIETO]) pj.acciones[CLIP_QUIETO].stop();
+        if (pj.acciones[CLIP_CAMINAR]) pj.acciones[CLIP_CAMINAR].reset().play();
         salidaPersonaje = {
             pj: pj,
             desde: pj.objeto.position.clone(),
@@ -2812,8 +2816,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 const caja = new THREE.Box3().setFromObject(pj.objeto);
                 const pies = caja.min.y - pj.objeto.position.y;
                 const alto = Math.max(1.2, caja.max.y - caja.min.y);
-                if (pj.acciones.Idle) pj.acciones.Idle.stop();
-                if (pj.acciones.Wave) pj.acciones.Wave.reset().play();
+                if (pj.acciones[CLIP_QUIETO]) pj.acciones[CLIP_QUIETO].stop();
+                if (pj.acciones[CLIP_SALUDAR]) pj.acciones[CLIP_SALUDAR].reset().play();
                 return { ...pj, pies, alto };
             });
             plantarCandidatos();
@@ -2860,8 +2864,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                         enHablaEleccion = true;
                         capa.classList.add('rn3d-elige--habla');
                         personaje = elegido.objeto;
-                        if (elegido.acciones.Wave) elegido.acciones.Wave.fadeOut(0.2);
-                        if (elegido.acciones.Yes) elegido.acciones.Yes.reset().fadeIn(0.2).play();
+                        if (elegido.acciones[CLIP_SALUDAR]) elegido.acciones[CLIP_SALUDAR].fadeOut(0.2);
+                        if (elegido.acciones[CLIP_HABLAR]) elegido.acciones[CLIP_HABLAR].reset().fadeIn(0.2).play();
                         const texto = elBocadillo && elBocadillo.querySelector('.rn3d-bocadillo__texto');
                         if (texto) texto.textContent = saludo;
                         const overlay = document.querySelector('.rn3d-overlay');
@@ -2902,7 +2906,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                                 personajeCual = elegido.cual || 'nino';
                                 clipActual = '';
                                 if (mixer) mixer.stopAllAction();
-                                ponerClip('Idle');
+                                ponerClip(CLIP_QUIETO);
                                 personaje.position.copy(hasta);
                                 personaje.rotation.y = puesto.yaw;
                                 rumboCamino = puesto.yaw;
@@ -2931,10 +2935,10 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                                 arrancarViaje();
                                 return;
                             }
-                            if (elegido.acciones.Yes) elegido.acciones.Yes.fadeOut(0.15);
-                            if (elegido.acciones.Wave) elegido.acciones.Wave.stop();
-                            if (elegido.acciones.Idle) elegido.acciones.Idle.stop();
-                            if (elegido.acciones.Walk) elegido.acciones.Walk.reset().fadeIn(0.15).play();
+                            if (elegido.acciones[CLIP_HABLAR]) elegido.acciones[CLIP_HABLAR].fadeOut(0.15);
+                            if (elegido.acciones[CLIP_SALUDAR]) elegido.acciones[CLIP_SALUDAR].stop();
+                            if (elegido.acciones[CLIP_QUIETO]) elegido.acciones[CLIP_QUIETO].stop();
+                            if (elegido.acciones[CLIP_CAMINAR]) elegido.acciones[CLIP_CAMINAR].reset().fadeIn(0.15).play();
                             pasoAlCentro = {
                                 pj: elegido,
                                 desde: desde,
@@ -3079,7 +3083,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             mixer = pj.mixer;
             accionesPersonaje = pj.acciones;
             personajeCual = pj.cual || 'nino';
-            clipActual = accionesPersonaje.Idle ? 'Idle' : '';
+            clipActual = accionesPersonaje[CLIP_QUIETO] ? CLIP_QUIETO : '';
             colocarPersonajeEn(nodoActual || 'inicio');
             construirCaminoAlParque();
             zoomCam = ZOOM_INICIAL;
