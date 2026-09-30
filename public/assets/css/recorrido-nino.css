@@ -834,6 +834,133 @@
     100% { opacity: 0; transform: scale(30); }
 }
 
+/* ============================================================
+   VARIANTE B — tarjetas tipo póster (ilustración grande) + flip 3D
+   ============================================================ */
+.rn-elegir--v2 .rn-elegir-opciones {
+    perspective: 1400px;                 /* profundidad para el flip */
+    gap: clamp(24px, 5vw, 56px);
+}
+
+/* La tarjeta v2 es solo el marco 3D; el estilo va en las caras. */
+.rn-elegir--v2 .rn-elegir-btn {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    min-height: clamp(280px, 52vh, 420px);
+    max-width: clamp(300px, 40vw, 440px);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+.rn-elegir--v2.is-abierto .rn-elegir-btn {
+    animation: rn-elegir-entra .8s cubic-bezier(.34, 1.56, .64, 1) forwards,
+               rn-v2-flota 3.6s ease-in-out 1s infinite;
+}
+.rn-elegir--v2.is-abierto .rn-elegir-btn--clase { animation-delay: .1s, 1s; }
+.rn-elegir--v2.is-abierto .rn-elegir-btn--jugar { animation-delay: .28s, 1.3s; }
+
+.rn-card3d {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    transform-style: preserve-3d;
+    transition: transform .55s cubic-bezier(.4, 0, .2, 1);
+}
+.rn-card3d-cara {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    border-radius: 32px;
+    border: 6px solid #fff;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: inset 0 3px 0 rgba(255, 255, 255, .35),
+                0 16px 0 rgba(0, 0, 0, .10),
+                0 26px 36px rgba(15, 23, 42, .28);
+}
+/* Frente: ilustración grande + cinta con el texto. */
+.rn-elegir-btn--clase .rn-card3d-frente { background: linear-gradient(180deg, #7fd3ff 0%, #3f9fe6 100%); }
+.rn-elegir-btn--jugar .rn-card3d-frente { background: linear-gradient(180deg, #b49bff 0%, #7a54f0 100%); }
+
+.rn-poster-ilustra {
+    flex: 1 1 auto;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    padding: clamp(14px, 3vh, 26px) clamp(10px, 2vw, 20px) 0;
+}
+.rn-poster-ilustra svg {
+    width: 82%;
+    height: auto;
+    filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .18));
+}
+.rn-poster-cinta {
+    width: 100%;
+    padding: clamp(10px, 1.8vh, 16px);
+    background: rgba(255, 255, 255, .18);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+}
+.rn-poster-cinta span {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    color: #fff;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, .18);
+    line-height: 1;
+    text-align: center;
+}
+/* Reverso: cara sólida con un emoji grande (se ve al voltear). */
+.rn-card3d-reverso {
+    transform: rotateY(180deg);
+    justify-content: center;
+    color: #fff;
+}
+.rn-elegir-btn--clase .rn-card3d-reverso { background: linear-gradient(180deg, #4eb0ff, #1c86ea); }
+.rn-elegir-btn--jugar .rn-card3d-reverso { background: linear-gradient(180deg, #8d6bff, #6842f3); }
+.rn-poster-emoji { font-size: clamp(4rem, 11vw, 7rem); }
+
+.rn-elegir--v2 .rn-elegir-btn:active .rn-card3d { transform: scale(.97); }
+
+/* --- Salida variante B: flip 3D + zoom hacia la cámara --- */
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida {
+    animation: none;
+    position: relative;
+    z-index: 3;
+    transform-origin: center center;
+    transition: transform .8s cubic-bezier(.5, 0, .1, 1);
+}
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-flip .rn-card3d {
+    transform: rotateY(180deg) scale(1.06);
+}
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-zoom {
+    transform: scale(9);
+}
+/* Las demás y el título se van al elegir. */
+.rn-elegir--v2.is-saliendo .rn-elegir-titulo,
+.rn-elegir--v2.is-saliendo .rn-elegir-btn:not(.is-elegida) {
+    animation: none;
+    opacity: 0;
+    transition: opacity .4s ease;
+}
+
+@keyframes rn-v2-flota {
+    0%, 100% { transform: translateY(0) rotateZ(-.6deg); }
+    50% { transform: translateY(-12px) rotateZ(.6deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rn-elegir--v2.is-abierto .rn-elegir-btn { animation: none; opacity: 1; transform: none; }
+    .rn-card3d, .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida { transition: none !important; }
+}
+
 /* Estrella: sale disparada, gira y se apaga (usa --dx/--dy/--rot). */
 @keyframes rn-elegir-estrella {
     0% { opacity: 0; transform: translate(0, 0) scale(.4) rotate(0); }

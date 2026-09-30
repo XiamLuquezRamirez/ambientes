@@ -80,7 +80,16 @@
         $shell.append(htmlElegir());
     }
 
+    // Variante del modal de elección:
+    //   'A' = tarjetas con ícono en círculo + ciclo de formas al elegir (original).
+    //   'B' = tarjetas tipo póster (ilustración grande) + flip 3D con zoom.
+    const RN_ELEGIR_VARIANTE = 'B';
+
     function htmlElegir() {
+        return RN_ELEGIR_VARIANTE === 'B' ? htmlElegirB() : htmlElegirA();
+    }
+
+    function htmlElegirA() {
         return `
         <div class="rn-elegir" id="rnElegir" hidden>
             <button type="button" class="rn-elegir-fondo" id="rnElegirFondo" aria-label="Volver"></button>
@@ -104,6 +113,87 @@
                 </div>
             </div>
         </div>`;
+    }
+
+    // Variante B: tarjetas tipo póster con ilustración grande protagonista.
+    // Cada tarjeta tiene dos caras (frente/reverso) para el flip 3D.
+    function htmlElegirB() {
+        return `
+        <div class="rn-elegir rn-elegir--v2" id="rnElegir" hidden>
+            <button type="button" class="rn-elegir-fondo" id="rnElegirFondo" aria-label="Volver"></button>
+            <div class="rn-elegir-panel" role="dialog" aria-modal="true" aria-labelledby="rnElegirTitulo">
+                <h2 id="rnElegirTitulo" class="rn-elegir-titulo">¿Qué haremos hoy?</h2>
+                <div class="rn-elegir-opciones">
+                    <button type="button" class="rn-elegir-btn rn-elegir-btn--clase" id="rnBtnClase" aria-label="Iniciar clase">
+                        <span class="rn-card3d">
+                            <span class="rn-card3d-cara rn-card3d-frente">
+                                <span class="rn-poster-ilustra" aria-hidden="true">${svgEscenaClase()}</span>
+                                <span class="rn-poster-cinta"><span>Iniciar clase</span></span>
+                            </span>
+                            <span class="rn-card3d-cara rn-card3d-reverso" aria-hidden="true"><span class="rn-poster-emoji">📚</span></span>
+                        </span>
+                    </button>
+                    <button type="button" class="rn-elegir-btn rn-elegir-btn--jugar" id="rnBtnJugar" aria-label="Jugar">
+                        <span class="rn-card3d">
+                            <span class="rn-card3d-cara rn-card3d-frente">
+                                <span class="rn-poster-ilustra" aria-hidden="true">${svgEscenaJuego()}</span>
+                                <span class="rn-poster-cinta"><span>Jugar</span></span>
+                            </span>
+                            <span class="rn-card3d-cara rn-card3d-reverso" aria-hidden="true"><span class="rn-poster-emoji">🎮</span></span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    // Escena "Clase": profe + tablero + libros (póster grande).
+    function svgEscenaClase() {
+        return `
+        <svg viewBox="0 0 200 150" aria-hidden="true" focusable="false">
+            <rect x="0" y="0" width="200" height="150" fill="none"/>
+            <!-- tablero -->
+            <rect x="26" y="18" width="120" height="66" rx="6" fill="#2f6d43"/>
+            <rect x="32" y="24" width="108" height="54" rx="3" fill="#3a8a54"/>
+            <path d="M44 40 h60 M44 52 h44 M44 64 h52" stroke="#dff3e6" stroke-width="3" stroke-linecap="round"/>
+            <!-- sol dibujado -->
+            <circle cx="120" cy="40" r="9" fill="none" stroke="#ffe066" stroke-width="2.5"/>
+            <!-- profe -->
+            <circle cx="150" cy="96" r="24" fill="#f3c2a0"/>
+            <path d="M126 92c2-16 12-26 26-23 10 2 16 10 16 20-13 2-27 3-42 3z" fill="#6b3a22"/>
+            <circle cx="144" cy="94" r="2.6" fill="#3a2b1a"/><circle cx="157" cy="94" r="2.6" fill="#3a2b1a"/>
+            <path d="M145 104 q6 5 13 0" stroke="#c0392b" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+            <rect x="130" y="118" width="40" height="30" rx="8" fill="#4eb0ff"/>
+            <!-- libros -->
+            <g>
+                <rect x="150" y="126" width="46" height="9" rx="2" fill="#e0574f"/>
+                <rect x="154" y="117" width="42" height="9" rx="2" fill="#3dcf5a"/>
+                <rect x="150" y="108" width="46" height="9" rx="2" fill="#ffd166"/>
+            </g>
+        </svg>`;
+    }
+
+    // Escena "Jugar": mando + pelota + bloques (póster grande).
+    function svgEscenaJuego() {
+        return `
+        <svg viewBox="0 0 200 150" aria-hidden="true" focusable="false">
+            <!-- pelota -->
+            <circle cx="44" cy="104" r="26" fill="#ff6b4a"/>
+            <path d="M44 78 a26 26 0 0 1 0 52" fill="#ffd24d"/>
+            <circle cx="44" cy="104" r="26" fill="none" stroke="#c0392b" stroke-width="2.5"/>
+            <!-- bloques -->
+            <rect x="12" y="120" width="22" height="22" rx="3" fill="#4aa3ff"/>
+            <rect x="36" y="120" width="22" height="22" rx="3" fill="#3ecf8e"/>
+            <rect x="24" y="98" width="22" height="22" rx="3" fill="#8b5cf6"/>
+            <!-- mando grande -->
+            <g transform="translate(96 26)">
+                <path d="M18 28c0-14 10-22 24-22h28c14 0 24 8 24 22 0 18-8 36-20 36-8 0-11-5-16-5s-8 5-16 5C26 64 18 46 18 28z" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
+                <circle cx="42" cy="30" r="4" fill="#5b6cff"/>
+                <path d="M42 20 v20 M32 30 h20" stroke="#5b6cff" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="74" cy="22" r="4.4" fill="#ff5a7a"/><circle cx="84" cy="32" r="4.4" fill="#3ecf8e"/>
+                <circle cx="74" cy="42" r="4.4" fill="#ffd24d"/><circle cx="64" cy="32" r="4.4" fill="#4aa3ff"/>
+            </g>
+        </svg>`;
     }
 
     function svgProfe() {
@@ -218,6 +308,19 @@
         }
         btn.classList.add('is-elegida');
         el.classList.add('is-saliendo');
+
+        // Variante B: flip 3D + zoom (la tarjeta se voltea y crece hacia la
+        // cámara, como si el niño "entrara" en ella).
+        if (el.classList.contains('rn-elegir--v2')) {
+            lanzarEstrellas(btn);
+            void btn.offsetWidth;
+            btn.classList.add('is-flip');           // gira 180° mostrando el reverso
+            window.setTimeout(function () {
+                btn.classList.add('is-zoom');        // luego crece llenando la pantalla
+            }, 520);
+            window.setTimeout(despues, 1250);
+            return;
+        }
 
         // Destello y estrellas al elegir (puerta mágica).
         const flash = document.createElement('span');
