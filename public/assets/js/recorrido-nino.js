@@ -239,6 +239,7 @@
                 btn.classList.remove('is-formando');
                 btn.style.clipPath = '';
                 btn.style.webkitClipPath = '';
+                btn.style.removeProperty('--forma');
                 btn.classList.add('is-ampliada');
                 flash.classList.add('is-on');
                 return;
@@ -246,6 +247,7 @@
             const f = secuencia[i];
             btn.style.clipPath = f.clip;
             btn.style.webkitClipPath = f.clip;
+            btn.style.setProperty('--forma', f.clip); // para el borde (::before)
             // reinicia el latido en cada forma
             btn.classList.remove('rn-late');
             void btn.offsetWidth;
