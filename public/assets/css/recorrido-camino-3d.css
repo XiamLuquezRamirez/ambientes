@@ -215,7 +215,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    padding: 0 16px 28px;
+    padding: 0 16px 36px;
     border: 0;
     background: transparent;
     cursor: pointer;
@@ -224,15 +224,31 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 190px;
-    min-height: 78px;
-    padding: 14px 32px;
+    min-width: min(420px, 42vw);
+    min-height: 120px;
+    padding: 22px 56px;
     border-radius: 999px;
     color: #143024;
     background: #fff;
-    box-shadow: 0 10px 22px rgba(16, 50, 40, .28);
+    box-shadow: 0 14px 28px rgba(16, 50, 40, .32);
     font-family: 'Fredoka One', system-ui, sans-serif;
-    font-size: clamp(1.8rem, 4.4vw, 2.6rem);
+    font-size: clamp(3.4rem, 8vw, 5.6rem);
+    letter-spacing: .04em;
+    line-height: 1;
+}
+.rn3d-elige__nombre b {
+    font-weight: inherit;
+    color: #fff;
+}
+.rn3d-elige__btn span.rn3d-elige__nombre--zeus {
+    color: #fff;
+    background: #3dce4a;
+    border: 10px solid #14633a;
+}
+.rn3d-elige__btn span.rn3d-elige__nombre--zoe {
+    color: #fff;
+    background: #ff6eaa;
+    border: 10px solid #3aa4e8;
 }
 .rn3d-elige__btn:active span { transform: scale(.96); }
 .rn3d-elige--habla .rn3d-elige__titulo,

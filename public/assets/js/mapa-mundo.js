@@ -17,9 +17,13 @@ const angDiff = (a, b) => ((b - a + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (M
 
 const TIPOS = {
     conejo: { vel: 2.6, radio: 9, espera: [1, 4], salto: 0.35 },
-    ciervo: { vel: 1.5, radio: 12, espera: [3, 8], pasta: true },
     zorro: { vel: 2.4, radio: 14, espera: [1, 4] },
     oveja: { vel: 0.8, radio: 5, espera: [3, 7], pasta: true },
+    vaca_cebu: { vel: 0.55, radio: 6, espera: [4, 9], pasta: true },
+    burro: { vel: 0.85, radio: 7, espera: [2, 6], pasta: true },
+    gallina: { vel: 1.3, radio: 4, espera: [1, 3] },
+    iguana: { vel: 0.4, radio: 3, espera: [2, 6] },
+    garza: { vel: 0.45, radio: 4, espera: [2, 5] },
 };
 
 function baseModelos() {
@@ -59,6 +63,18 @@ const _m = new THREE.Matrix4();
 const _t = new THREE.Matrix4();
 const _s = new THREE.Vector3();
 
+function esEstructuraCamino(nombre) {
+    return nombre === 'suelo' || nombre === 'borde' || nombre === 'adoquines';
+}
+
+function esAdornoSuelto(ruta) {
+    return !/terreno_tile|camino_recto|camino_curvo|07_casas_tematicas|10_edificios|\/lago|\/nube/.test(String(ruta || ''));
+}
+
+function esEstorboEntrada(ruta) {
+    return /03_flores|\/arbusto|\/roca/.test(String(ruta || ''));
+}
+
 class Constructor {
     constructor(scene) {
         this.scene = scene;
@@ -66,6 +82,9 @@ class Constructor {
         this.arboles = [];
         this.flores = [];
         this.farolas = [];
+        this.sueltos = [];
+        this.estorbos = [];
+        this.adornosCamino = [];
     }
 
     reservar(modelo, n) {
@@ -82,17 +101,25 @@ class Constructor {
         this.lotes.set(modelo.ruta, { partes: modelo.partes, meshes, count: 0 });
     }
 
-    colocar(modelo, { p, r = 0, s = 1 }) {
+    colocar(modelo, { p, r = 0, s = 1, sx, sy, sz }) {
         const lote = this.lotes.get(modelo.ruta);
         const pos = new THREE.Vector3(p[0], p[1], p[2]);
         const quat = new THREE.Quaternion().setFromAxisAngle(Y, r);
-        _m.compose(pos, quat, _s.setScalar(s));
+        _m.compose(pos, quat, _s.set(sx ?? s, sy ?? s, sz ?? s));
         const i = lote.count++;
         lote.partes.forEach((pt, j) => {
             lote.meshes[j].setMatrixAt(i, _t.multiplyMatrices(_m, pt.local));
         });
         if (String(modelo.ruta).includes('03_flores')) {
             this.flores.push({ ruta: modelo.ruta, i, x: p[0], z: p[2] });
+        }
+        if (/camino_recto|camino_curvo/.test(modelo.ruta)) {
+            const mundo = new THREE.Vector3();
+            lote.partes.forEach((pt, j) => {
+                if (esEstructuraCamino(pt.nombre)) return;
+                mundo.setFromMatrixPosition(pt.local).applyMatrix4(_m);
+                this.adornosCamino.push({ mesh: lote.meshes[j], i, x: mundo.x, z: mundo.z });
+            });
         }
         return i;
     }
@@ -128,6 +155,69 @@ class Constructor {
         this.despejarLista(this.flores, muestras, radio);
     }
 
+    /** Flores, arbustos y cualquier otro modelo suelto, más las flores del propio GLB del camino. */
+    despejarEntrada(muestras, radio) {
+        this.despejarLista(this.sueltos, muestras, radio);
+        this.despejarLista(this.arboles, muestras, radio);
+        const r2 = radio * radio;
+        const meshes = new Set();
+        const cero = new THREE.Matrix4().makeScale(0, 0, 0);
+        this.adornosCamino.forEach((a) => {
+            if (a.oculto) return;
+            for (let k = 0; k < muestras.length; k++) {
+                const dx = a.x - muestras[k][0];
+                const dz = a.z - muestras[k][1];
+                if (dx * dx + dz * dz >= r2) continue;
+                if (a.mesh) {
+                    a.mesh.setMatrixAt(a.i, cero);
+                    meshes.add(a.mesh);
+                } else if (a.o) a.o.visible = false;
+                a.oculto = true;
+                return;
+            }
+        });
+        meshes.forEach((m) => { m.instanceMatrix.needsUpdate = true; });
+    }
+
+    /**
+     * Solo flores, arbustos y piedras. Las flores y arbustos del GLB del camino
+     * entran también: no son el suelo ni el borde.
+     */
+    quitarEstorbos(muestras, radio) {
+        this.despejarLista(this.estorbos, muestras, radio);
+        const r2 = radio * radio;
+        const meshes = new Set();
+        const cero = new THREE.Matrix4().makeScale(0, 0, 0);
+        const centroFlor = new THREE.Vector3();
+        const cajaFlor = new THREE.Box3();
+        this.adornosCamino.forEach((a) => {
+            if (a.oculto) return;
+            if (a.o && a.o.geometry) {
+                a.o.geometry.boundingBox = null;
+                a.o.geometry.computeBoundingBox();
+                a.o.updateWorldMatrix(true, false);
+                cajaFlor.setFromObject(a.o);
+                if (!cajaFlor.isEmpty()) {
+                    cajaFlor.getCenter(centroFlor);
+                    a.x = centroFlor.x;
+                    a.z = centroFlor.z;
+                }
+            }
+            for (let k = 0; k < muestras.length; k++) {
+                const dx = a.x - muestras[k][0];
+                const dz = a.z - muestras[k][1];
+                if (dx * dx + dz * dz >= r2) continue;
+                if (a.mesh) {
+                    a.mesh.setMatrixAt(a.i, cero);
+                    meshes.add(a.mesh);
+                } else if (a.o) a.o.visible = false;
+                a.oculto = true;
+                return;
+            }
+        });
+        meshes.forEach((m) => { m.instanceMatrix.needsUpdate = true; });
+    }
+
     cerrar() {
         this.lotes.forEach((l) => {
             l.meshes.forEach((m) => {
@@ -160,9 +250,9 @@ class Fauna {
                 if (e.m.includes('lago')) {
                     this.lagos.push({ x: e.p[0], z: e.p[2], y: e.p[1], r: 5 * e.s });
                     this.obstaculos.push([e.p[0], e.p[2], 5.4 * e.s]);
-                } else if (e.m.includes('casa') || e.m.includes('carpa')) {
-                    this.obstaculos.push([e.p[0], e.p[2], 4.8 * (e.s || 1)]);
-                } else if (/pino|arbol|roca|tronco|tocon|banca|farola|marcador/.test(e.m)) {
+                } else if (/07_casas_tematicas|10_edificios|casa|carpa/.test(e.m)) {
+                    this.obstaculos.push([e.p[0], e.p[2], 5.2 * (e.s || 1)]);
+                } else if (/canaguate|mango|ceiba|palma_coco|platanera|cardon|roca|tronco|tocon|banca|farola|marcador|valla/.test(e.m)) {
                     this.obstaculos.push([e.p[0], e.p[2], 0.6 * e.s]);
                 }
             }
@@ -205,7 +295,7 @@ class Fauna {
             alaI: o.getObjectByName('ala_izq'),
             alaD: o.getObjectByName('ala_der'),
         };
-        if (nombre.startsWith('ave_')) {
+        if (nombre.startsWith('ave_') || nombre === 'guacamaya') {
             const k = `${e.m}|${e.r}`;
             if (!this.bandadas.has(k)) {
                 this.bandadas.set(k, {
@@ -229,12 +319,28 @@ class Fauna {
         this.lista.push(a);
     }
 
+    ocultarEn(muestras, radio) {
+        const r2 = radio * radio;
+        this.lista.forEach((a) => {
+            if (a.fijo) return;
+            for (let k = 0; k < muestras.length; k++) {
+                const dx = a.x - muestras[k][0];
+                const dz = a.z - muestras[k][1];
+                if (dx * dx + dz * dz >= r2) continue;
+                a.o.visible = false;
+                a.fijo = true;
+                return;
+            }
+        });
+    }
+
     update(dt, t) {
         for (const a of this.lista) {
+            if (a.fijo) continue;
             const T = TIPOS[a.nombre];
             if (T) this.caminar(a, T, dt);
             else if (a.bandada) this.volar(a, t);
-            else if (a.nombre === 'pato' && a.lago) this.nadar(a, dt, t);
+            else if ((a.nombre === 'pato' || a.nombre.startsWith('pez_')) && a.lago) this.nadar(a, dt, t);
             else if (a.nombre === 'mariposa') this.revolotear(a, t);
         }
     }
@@ -288,7 +394,8 @@ class Fauna {
         a.ang += dt * 0.35 / Math.max(1.5, a.radio);
         const x = a.lago.x + Math.cos(a.ang) * a.radio;
         const z = a.lago.z + Math.sin(a.ang) * a.radio;
-        a.o.position.set(x, a.lago.y + 0.08 + Math.sin(t * 2 + a.fase) * 0.03, z);
+        const superficie = a.nombre.startsWith('pez_') ? a.lago.y - 0.02 : a.lago.y + 0.08;
+        a.o.position.set(x, superficie + Math.sin(t * 2 + a.fase) * 0.03, z);
         a.o.rotation.y = Math.atan2(-Math.sin(a.ang), Math.cos(a.ang));
         a.o.rotation.z = Math.sin(t * 1.7 + a.fase) * 0.06;
     }
@@ -314,29 +421,276 @@ class Fauna {
     }
 }
 
-/** Eje del sendero a partir del mesh `suelo` (pares de vértices a lo ancho). */
-function curvaDesdeCamino(modelo) {
-    const suelo = modelo.root.getObjectByName('suelo');
-    const attr = suelo && suelo.geometry && suelo.geometry.attributes.position;
-    if (!attr || attr.count < 4) return null;
-    const puntos = [];
-    const paso = 10;
-    for (let i = 0; i + 1 < attr.count; i += 2 * paso) {
-        puntos.push(new THREE.Vector3(
-            (attr.getX(i) + attr.getX(i + 1)) / 2,
-            (attr.getY(i) + attr.getY(i + 1)) / 2,
-            (attr.getZ(i) + attr.getZ(i + 1)) / 2,
-        ));
+/** Eje del sendero guardado en mapa.json (el GLB único del camino ya no está en el kit). */
+function curvaDesdePuntos(puntos) {
+    if (!Array.isArray(puntos) || puntos.length < 2) return null;
+    const verts = puntos.map((p) => new THREE.Vector3(p[0], p[1], p[2]));
+    return new THREE.CatmullRomCurve3(verts, false, 'catmullrom', 0.2);
+}
+
+function materialNombrado(modelo, nombre) {
+    let hallado = null;
+    modelo.root.traverse((o) => {
+        if (hallado || !o.isMesh || !o.material) return;
+        if (o.material.name === nombre) hallado = o.material;
+    });
+    return hallado;
+}
+
+function tablaArco(curva) {
+    const n = 500;
+    const tabla = [];
+    let prev = curva.getPoint(0);
+    let acc = 0;
+    tabla.push({ d: 0, p: prev.clone() });
+    for (let i = 1; i <= n; i++) {
+        const p = curva.getPoint(i / n);
+        acc += p.distanceTo(prev);
+        tabla.push({ d: acc, p: p.clone() });
+        prev = p;
     }
-    const ult = attr.count - (attr.count % 2) - 2;
-    if (ult > 0) {
-        puntos.push(new THREE.Vector3(
-            (attr.getX(ult) + attr.getX(ult + 1)) / 2,
-            (attr.getY(ult) + attr.getY(ult + 1)) / 2,
-            (attr.getZ(ult) + attr.getZ(ult + 1)) / 2,
-        ));
+    return tabla;
+}
+
+function muestraEn(tabla, dist) {
+    const ultimo = tabla[tabla.length - 1];
+    if (dist <= 0) {
+        return { p: tabla[0].p.clone(), tan: tabla[1].p.clone().sub(tabla[0].p) };
     }
-    return new THREE.CatmullRomCurve3(puntos, false, 'catmullrom', 0.2);
+    if (dist >= ultimo.d) {
+        const a = tabla[tabla.length - 2];
+        return { p: ultimo.p.clone(), tan: ultimo.p.clone().sub(a.p) };
+    }
+    let lo = 0;
+    let hi = tabla.length - 1;
+    while (lo + 1 < hi) {
+        const mid = (lo + hi) >> 1;
+        if (tabla[mid].d < dist) lo = mid;
+        else hi = mid;
+    }
+    const a = tabla[lo];
+    const b = tabla[hi];
+    const t = (dist - a.d) / Math.max(1e-6, b.d - a.d);
+    return { p: a.p.clone().lerp(b.p, t), tan: b.p.clone().sub(a.p) };
+}
+
+/**
+ * Cinta continua bajo los tramos. camino_recto mide 10 m (de -5 a +5)
+ * y en un giro el borde exterior no llega a juntarse: la cinta tapa ese hueco.
+ */
+function armarCintaCamino(scene, modelo, curva) {
+    const tabla = tablaArco(curva);
+    const largoCurva = tabla[tabla.length - 1].d;
+    const grupo = new THREE.Group();
+    grupo.name = 'camino';
+    const material = materialNombrado(modelo, 'camino');
+    const medio = 2.7;
+    const ySuelo = 0.16;
+    const pasos = Math.max(32, Math.ceil(largoCurva / 0.7));
+    const pos = [];
+    const idx = [];
+    for (let i = 0; i <= pasos; i++) {
+        const m = muestraEn(tabla, (largoCurva * i) / pasos);
+        const tan = m.tan.clone();
+        tan.y = 0;
+        if (tan.lengthSq() < 1e-8) tan.set(0, 0, 1);
+        tan.normalize();
+        const der = new THREE.Vector3(tan.z, 0, -tan.x);
+        pos.push(m.p.x + der.x * medio, ySuelo, m.p.z + der.z * medio);
+        pos.push(m.p.x - der.x * medio, ySuelo, m.p.z - der.z * medio);
+        if (i < pasos) {
+            const a = i * 2;
+            idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+        }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+    const suelo = new THREE.Mesh(geo, material);
+    suelo.receiveShadow = true;
+    suelo.castShadow = false;
+    suelo.frustumCulled = false;
+    suelo.userData.propio = true;
+    grupo.add(suelo);
+    scene.add(grupo);
+    return { material, grupo };
+}
+
+function diffAng(a, b) {
+    return Math.atan2(Math.sin(b - a), Math.cos(b - a));
+}
+
+// camino_curvo es un cuarto de círculo a la izquierda: centro (-3.6, -3.6),
+// radio 7.2, entra por +Z en (3.6, -3.6) y sale hacia -X en (-3.6, 3.6).
+const CENTRO_CURVA_X = -3.6;
+const CENTRO_CURVA_Z = -3.6;
+const RADIO_PIEZA = 7.2;
+const ARCO_PIEZA = (Math.PI / 2) * RADIO_PIEZA;
+const GIRO_MIN = 12 * Math.PI / 180;
+
+function headingEn(tabla, total, dist) {
+    const a = muestraEn(tabla, Math.max(0, dist - 0.4));
+    const b = muestraEn(tabla, Math.min(total, dist + 0.4));
+    return Math.atan2(b.p.x - a.p.x, b.p.z - a.p.z);
+}
+
+/**
+ * Círculo que pasa por los dos extremos del tramo, con la tangente de entrada.
+ * El GLB se deforma a ese radio y a ese ángulo: el de catálogo es 90° y 7.2 m,
+ * y este recorrido no tiene ninguna esquina así.
+ */
+function encajeCurva(tabla, total, d0, d1) {
+    const arc = d1 - d0;
+    if (arc < 6) return null;
+    const h = headingEn(tabla, total, d0);
+    const th = diffAng(h, headingEn(tabla, total, d1));
+    if (Math.abs(th) < GIRO_MIN) return null;
+    const P = muestraEn(tabla, d0).p;
+    const Q = muestraEn(tabla, d1).p;
+    const izquierda = th < 0;
+    const nx = izquierda ? -Math.cos(h) : Math.cos(h);
+    const nz = izquierda ? Math.sin(h) : -Math.sin(h);
+    const vx = Q.x - P.x;
+    const vz = Q.z - P.z;
+    const den = 2 * (vx * nx + vz * nz);
+    if (den <= 0.5) return null;
+    const radio = (vx * vx + vz * vz) / den;
+    if (radio < 5 || radio > 60) return null;
+    const cx = P.x + nx * radio;
+    const cz = P.z + nz * radio;
+    const sweep = diffAng(Math.atan2(P.z - cz, P.x - cx), Math.atan2(Q.z - cz, Q.x - cx));
+    if (izquierda ? sweep <= 0.05 : sweep >= -0.05) return null;
+    if (Math.abs(sweep) > Math.PI * 0.85) return null;
+    return { d0, d1, h, radio, angulo: Math.abs(sweep), izquierda, p: P };
+}
+
+/** Curvas donde el tramo gira; rectas de hasta 10 m en el resto. */
+function piezasDeCurva(curva) {
+    const tabla = tablaArco(curva);
+    const total = tabla[tabla.length - 1].d;
+    const curvas = [];
+    const rectos = [];
+    let d = 0;
+    while (d < total - 0.35) {
+        const encaje = encajeCurva(tabla, total, d, Math.min(d + ARCO_PIEZA, total));
+        if (encaje) {
+            curvas.push(encaje);
+            d = encaje.d1;
+            continue;
+        }
+        let fin = Math.min(d + 10, total);
+        for (let s = d + 2; s < fin - 5; s += 1) {
+            const s1 = Math.min(s + ARCO_PIEZA, total);
+            if (s1 - s < 6) break;
+            if (encajeCurva(tabla, total, s, s1)) {
+                fin = s;
+                break;
+            }
+        }
+        if (fin - d < 0.35) {
+            d = Math.min(total, d + 0.5);
+            continue;
+        }
+        const a = muestraEn(tabla, d).p;
+        const b = muestraEn(tabla, fin).p;
+        const dx = b.x - a.x;
+        const dz = b.z - a.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist >= 0.2) {
+            rectos.push({
+                p: [(a.x + b.x) / 2, 0.14, (a.z + b.z) / 2],
+                r: Math.atan2(dx, dz),
+                sx: 1,
+                sy: 1,
+                sz: dist / 10,
+            });
+        }
+        d = fin;
+    }
+    return { curvas, rectos };
+}
+
+/** Mueve los vértices al arco del tramo. El ancho se conserva; el giro a la derecha espeja en X. */
+function doblarCurva(modelo, pieza) {
+    const root = modelo.root.clone(true);
+    root.position.set(0, 0, 0);
+    root.rotation.set(0, 0, 0);
+    root.scale.set(1, 1, 1);
+    root.updateMatrixWorld(true);
+    const v = new THREE.Vector3();
+    const inv = new THREE.Matrix4();
+    root.traverse((o) => {
+        if (!o.isMesh || !o.geometry || !o.geometry.attributes.position) return;
+        const geo = o.geometry.clone();
+        o.geometry = geo;
+        o.userData.propio = true;
+        const pos = geo.attributes.position;
+        inv.copy(o.matrixWorld).invert();
+        for (let i = 0; i < pos.count; i++) {
+            v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+            const dx = v.x - CENTRO_CURVA_X;
+            const dz = v.z - CENTRO_CURVA_Z;
+            const rad = Math.hypot(dx, dz);
+            const ang = Math.atan2(dz, dx);
+            const t = ang / (Math.PI / 2);
+            const ang2 = t * pieza.angulo;
+            const rad2 = pieza.radio + (rad - RADIO_PIEZA);
+            v.x = CENTRO_CURVA_X + Math.cos(ang2) * rad2;
+            v.z = CENTRO_CURVA_Z + Math.sin(ang2) * rad2;
+            if (!pieza.izquierda) v.x = -v.x;
+            v.applyMatrix4(inv);
+            pos.setXYZ(i, v.x, v.y, v.z);
+        }
+        pos.needsUpdate = true;
+        if (!pieza.izquierda && geo.index) {
+            const idx = geo.index;
+            for (let i = 0; i < idx.count; i += 3) {
+                const b = idx.getX(i + 1);
+                idx.setX(i + 1, idx.getX(i + 2));
+                idx.setX(i + 2, b);
+            }
+            idx.needsUpdate = true;
+        }
+        geo.computeVertexNormals();
+        geo.computeBoundingSphere();
+        o.castShadow = true;
+        o.receiveShadow = true;
+        o.frustumCulled = false;
+    });
+    const lx = pieza.izquierda ? (CENTRO_CURVA_X + pieza.radio) : -(CENTRO_CURVA_X + pieza.radio);
+    const lz = CENTRO_CURVA_Z;
+    const h = pieza.h;
+    const ox = lx * Math.cos(h) + lz * Math.sin(h);
+    const oz = -lx * Math.sin(h) + lz * Math.cos(h);
+    root.position.set(pieza.p.x - ox, 0.14, pieza.p.z - oz);
+    root.rotation.y = h;
+    return root;
+}
+
+/** Baldosas de 20 m, el terreno del catálogo. */
+function celdasTerreno(mapa) {
+    let minX = -140;
+    let maxX = 140;
+    let minZ = -140;
+    let maxZ = 140;
+    (mapa.pasos || []).forEach((p) => (p.elementos || []).forEach((e) => {
+        if (!e.p) return;
+        minX = Math.min(minX, e.p[0]);
+        maxX = Math.max(maxX, e.p[0]);
+        minZ = Math.min(minZ, e.p[2]);
+        maxZ = Math.max(maxZ, e.p[2]);
+    }));
+    const margen = 30;
+    const x0 = Math.floor((minX - margen) / 20) * 20;
+    const x1 = Math.ceil((maxX + margen) / 20) * 20;
+    const z0 = Math.floor((minZ - margen) / 20) * 20;
+    const z1 = Math.ceil((maxZ + margen) / 20) * 20;
+    const celdas = [];
+    for (let x = x0; x <= x1; x += 20) {
+        for (let z = z0; z <= z1; z += 20) celdas.push({ p: [x, 0, z], r: 0, s: 1 });
+    }
+    return celdas;
 }
 
 const RADIO_CAMINO = 14;
@@ -355,7 +709,7 @@ function muestrasDeCurva(c) {
 
 // La franja del camino y el solar de cada casa quedan a Y=0. Más afuera el
 // relieve original vuelve con una mezcla, para no dejar un escalón.
-function crearAplanador(scene, mapa, curva) {
+function crearAplanador(scene, mapa, curva, terrenoMesh) {
     const h = mapa.alturas;
     const original = h && h.datos ? h.datos.slice() : null;
     const camino = muestrasDeCurva(curva);
@@ -363,7 +717,7 @@ function crearAplanador(scene, mapa, curva) {
     const lagos = [];
     (mapa.pasos || []).forEach((p) => (p.elementos || []).forEach((e) => {
         const m = String(e.m || '');
-        if (m.includes('casa') || m.includes('carpa')) casas.push([e.p[0], e.p[2]]);
+        if (/07_casas_tematicas|10_edificios|casa|carpa/.test(m)) casas.push([e.p[0], e.p[2]]);
         else if (m.includes('lago')) lagos.push({ x: e.p[0], z: e.p[2], r: 5 * (e.s || 1) });
     }));
     const terrenos = [];
@@ -385,6 +739,20 @@ function crearAplanador(scene, mapa, curva) {
         }
         terrenos.push({ mesh: o, inv, x, y, z });
     });
+    if (terrenoMesh && terrenoMesh.geometry && terrenoMesh.geometry.attributes.position) {
+        const attr = terrenoMesh.geometry.attributes.position;
+        const inv = new THREE.Matrix4();
+        const n = attr.count;
+        const x = new Float32Array(n);
+        const y = new Float32Array(n);
+        const z = new Float32Array(n);
+        for (let i = 0; i < n; i++) {
+            x[i] = attr.getX(i);
+            y[i] = attr.getY(i);
+            z[i] = attr.getZ(i);
+        }
+        terrenos.push({ mesh: terrenoMesh, inv, x, y, z });
+    }
     const anclas = [];
     const q0 = new THREE.Quaternion();
     const s0 = new THREE.Vector3();
@@ -392,7 +760,8 @@ function crearAplanador(scene, mapa, curva) {
     const mat0 = new THREE.Matrix4();
     scene.traverse((o) => {
         if (!o.isInstancedMesh || String(o.name).startsWith('00_mapa/terreno_mapa')) return;
-        if (String(o.name).startsWith('00_mapa/camino_mapa')) return;
+        const nombre = String(o.name);
+        if (nombre.includes('/camino') || nombre.includes('lago') || nombre.includes('nube') || nombre.includes('terreno')) return;
         for (let i = 0; i < o.count; i++) {
             o.getMatrixAt(i, mat0);
             mat0.decompose(p0, q0, s0);
@@ -435,17 +804,10 @@ function crearAplanador(scene, mapa, curva) {
         return m === Infinity ? Infinity : Math.sqrt(m);
     }
 
-    function factor(x, z) {
-        const dc = distMin(camino, x, z, RADIO_CAMINO + MEZCLA_RELIEVE);
-        const dh = casas.length ? distMin(casas, x, z, RADIO_CASA + MEZCLA_RELIEVE) : Infinity;
-        for (let i = 0; i < lagos.length; i++) {
-            if (Math.hypot(x - lagos[i].x, z - lagos[i].z) < lagos[i].r && dc > 6) return 1;
-        }
-        const fuera = Math.min(dc - RADIO_CAMINO, dh - RADIO_CASA);
-        if (fuera <= 0) return 0;
-        if (fuera >= MEZCLA_RELIEVE) return 1;
-        const t = fuera / MEZCLA_RELIEVE;
-        return t * t * (3 - 2 * t);
+    // El suelo visible es la baldosa, plana. El relieve del kit son los cerros,
+    // no una malla de alturas. Todo el valle queda a Y=0 para que nada flote.
+    function factor() {
+        return 0;
     }
 
     function aplicar() {
@@ -535,14 +897,14 @@ function ponerLuces(scene, modesto) {
 }
 
 const CASAS_AMBIENTE = {
-    'expresion-artistica': '07_casas_tematicas/casa_expresion_artistica',
-    'expresion_artistica': '07_casas_tematicas/casa_expresion_artistica',
-    musica: '07_casas_tematicas/casa_expresion_artistica',
-    polimotor: '07_casas_tematicas/casa_polimotor',
-    multisaberes: '07_casas_tematicas/casa_multisaberes',
-    logico: '07_casas_tematicas/casa_multisaberes',
-    multisensorial: '07_casas_tematicas/casa_multisensorial',
-    tecnologia: '07_casas_tematicas/casa_tecnologia',
+    'expresion-artistica': '07_casas_tematicas/expresion_artistica',
+    'expresion_artistica': '07_casas_tematicas/expresion_artistica',
+    musica: '07_casas_tematicas/expresion_artistica',
+    polimotor: '07_casas_tematicas/polimotor',
+    multisaberes: '07_casas_tematicas/multisaberes',
+    logico: '07_casas_tematicas/multisaberes',
+    multisensorial: '07_casas_tematicas/multisensorial',
+    tecnologia: '07_casas_tematicas/tecnologia',
 };
 
 function casaDelAmbiente(slug) {
@@ -617,7 +979,7 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
     let carpa = null;
     let casaInicio = null;
     const rutaInicio = casaDelAmbiente(ambiente);
-    const esArbol = (ruta) => ruta.includes('02_vegetacion/pino') || ruta.includes('02_vegetacion/arbol');
+    const esArbol = (ruta) => /02_vegetacion\/(canaguate|mango|ceiba|palma_coco|platanera|cardon_cactus)/.test(ruta);
     mapa.pasos.forEach((p) => p.elementos.forEach((e) => {
         if (esCarpa(e.m)) {
             carpa = { x: e.p[0], y: e.p[1], z: e.p[2], r: e.r || 0 };
@@ -630,6 +992,11 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
                 casaInicio = { ruta: e.m, i, x: e.p[0], y: e.p[1], z: e.p[2], r: e.r || 0 };
             }
             if (esArbol(e.m)) obra.arboles.push({ ruta: e.m, i, x: e.p[0], z: e.p[2] });
+            if (esAdornoSuelto(e.m)) {
+                const suelto = { ruta: e.m, i, x: e.p[0], z: e.p[2] };
+                obra.sueltos.push(suelto);
+                if (esEstorboEntrada(e.m)) obra.estorbos.push(suelto);
+            }
             if (String(e.m).includes('farola')) {
                 obra.farolas.push({
                     ruta: e.m, i, x: e.p[0], y: e.p[1], z: e.p[2], r: e.r || 0, s: e.s || 1,
@@ -639,11 +1006,48 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
     }));
     obra.cerrar();
 
-    const modeloCamino = modelos['00_mapa/camino_mapa'];
-    const suelo = modeloCamino && modeloCamino.root.getObjectByName('suelo');
-    const curva = curvaDesdeCamino(modeloCamino);
-    const aplanar = crearAplanador(scene, mapa, curva);
+    const curva = curvaDesdePuntos(mapa.curva);
+    const aplanar = crearAplanador(scene, mapa, curva, null);
     aplanar.aplicar();
+
+    const terreno = await cargarModelo('01_relieve/terreno_tile_20m');
+    const celdas = celdasTerreno(mapa);
+    obra.reservar(terreno, celdas.length);
+    celdas.forEach((c) => obra.colocar(terreno, c));
+
+    obra.cerrar();
+
+    let materialCamino = null;
+    let grupoCamino = null;
+    if (curva) {
+        const modeloRecto = await cargarModelo('11_camino_y_agua/camino_recto');
+        const modeloCurvo = await cargarModelo('11_camino_y_agua/camino_curvo');
+        const cinta = armarCintaCamino(scene, modeloRecto, curva);
+        materialCamino = cinta.material;
+        grupoCamino = cinta.grupo;
+        const piezas = piezasDeCurva(curva);
+        if (piezas.rectos.length) {
+            obra.reservar(modeloRecto, piezas.rectos.length);
+            piezas.rectos.forEach((t) => obra.colocar(modeloRecto, t));
+        }
+        piezas.curvas.forEach((pieza) => {
+            const root = doblarCurva(modeloCurvo, pieza);
+            grupoCamino.add(root);
+            root.updateMatrixWorld(true);
+            const caja = new THREE.Box3();
+            const centro = new THREE.Vector3();
+            root.traverse((o) => {
+                if (!o.isMesh || esEstructuraCamino(o.name) || !o.geometry) return;
+                o.geometry.boundingBox = null;
+                o.geometry.computeBoundingBox();
+                caja.setFromObject(o);
+                if (caja.isEmpty()) return;
+                caja.getCenter(centro);
+                obra.adornosCamino.push({ o, x: centro.x, z: centro.z });
+            });
+        });
+        obra.cerrar();
+    }
     scene.background = cieloDegradado();
     scene.fog = new THREE.Fog(0xcfeaf9, 160, 520);
     ponerLuces(scene, modesto);
@@ -673,7 +1077,7 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
 
     return {
         curva,
-        materialCamino: suelo ? suelo.material : null,
+        materialCamino,
         altura: (x, z) => fauna.altura(x, z),
         aplanarAlrededor: (curvas, puntos) => aplanar.sumar(curvas, puntos),
         obstaculos: fauna.obstaculos,
@@ -702,6 +1106,31 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
         despejarFlores: (puntos, radio) => {
             obra.despejarFlores(puntos || [], radio);
         },
+        despejarEntrada: (puntos, radio) => {
+            const muestras = [];
+            (puntos || []).forEach((c) => {
+                if (Array.isArray(c) && typeof c[0] === 'number') {
+                    muestras.push(c);
+                    return;
+                }
+                if (!c || typeof c.getPoint !== 'function') return;
+                for (let s = 0; s <= 48; s++) {
+                    const p = c.getPoint(s / 48);
+                    muestras.push([p.x, p.z]);
+                }
+            });
+            const r = radio || 5;
+            obra.despejarEntrada(muestras, r);
+            fauna.ocultarEn(muestras, r);
+        },
+        quitarEstorbos: (puntos, radio) => {
+            const muestras = [];
+            (puntos || []).forEach((c) => {
+                if (Array.isArray(c) && typeof c[0] === 'number') muestras.push(c);
+            });
+            if (!muestras.length) return;
+            obra.quitarEstorbos(muestras, radio || 5.5);
+        },
         farolas: obra.farolas,
         colocarProp: (item, x, z) => {
             const lote = obra.lotes.get(item.ruta);
@@ -715,11 +1144,21 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
             });
             item.x = x;
             item.z = z;
+            const suelto = obra.sueltos.find((a) => a.ruta === item.ruta && a.i === item.i);
+            if (suelto) {
+                suelto.x = x;
+                suelto.z = z;
+            }
         },
         actualizar: (dt, t) => fauna.update(dt, t),
         destruir: () => {
             obra.destruir();
             fauna.destruir();
+            if (!grupoCamino) return;
+            scene.remove(grupoCamino);
+            grupoCamino.traverse((o) => {
+                if (o.userData && o.userData.propio && o.geometry) o.geometry.dispose();
+            });
         },
     };
 }
@@ -733,6 +1172,34 @@ const CARPETA_ESTACION = {
     logico: 'multisaberes',
     multisensorial: 'multisensorial',
     tecnologia: 'tecnologia',
+};
+
+const ESTACIONES_POR_CARPETA = {
+    polimotor: [
+        'estacion_polimotor_saltos',
+        'estacion_polimotor_equilibrio',
+        'estacion_polimotor_punteria',
+    ],
+    artistica: [
+        'estacion_artistica_pintura',
+        'estacion_artistica_musica',
+        'estacion_artistica_teatro',
+    ],
+    multisaberes: [
+        'estacion_multisaberes_biblioteca',
+        'estacion_multisaberes_laboratorio',
+        'estacion_multisaberes_huerta',
+    ],
+    multisensorial: [
+        'estacion_multisensorial_texturas',
+        'estacion_multisensorial_sonidos',
+        'estacion_multisensorial_luz',
+    ],
+    tecnologia: [
+        'estacion_tecnologia_robotica',
+        'estacion_tecnologia_programacion',
+        'estacion_tecnologia_energia',
+    ],
 };
 
 export function carpetaEstacion(slug) {
@@ -788,21 +1255,24 @@ function clonarConPuerta(modelo) {
 
 export async function clonarEstacion(slug, numero) {
     const carpeta = carpetaEstacion(slug);
-    if (!carpeta) throw new Error('Ambiente sin modelos de estación');
-    const n = numero === 2 || numero === 3 ? numero : 1;
-    const modelo = await cargarModelo(`11_estaciones/${carpeta}/estacion${n}`);
+    const lista = carpeta && ESTACIONES_POR_CARPETA[carpeta];
+    if (!lista) throw new Error('Ambiente sin modelos de estación');
+    const idx = numero === 2 || numero === 3 ? numero - 1 : 0;
+    const modelo = await cargarModelo(`08_estaciones/${carpeta}/${lista[idx]}`);
     return clonarConPuerta(modelo);
 }
 
 /** Meta del final. Las animacion_loop se arrancan al llegar, no al colocar. */
 export async function clonarCastillo() {
-    const modelo = await cargarModelo('11_estaciones/meta_final');
+    const modelo = await cargarModelo('10_edificios/meta_final');
     return clonarConPuerta(modelo);
 }
 
-/** Parque de juegos. animacion_loop va desde que aparece. */
-export async function clonarParque() {
-    const modelo = await cargarModelo('11_estaciones/parque_juegos');
+/** Zona de juegos del ambiente. animacion_loop va desde que aparece. */
+export async function clonarParque(slug) {
+    const carpeta = carpetaEstacion(slug);
+    if (!carpeta) throw new Error('Ambiente sin zona de juegos');
+    const modelo = await cargarModelo(`09_zonas_de_juegos/zona_juegos_${carpeta}`);
     const grupo = clonarConPuerta(modelo);
     iniciarLoops(grupo);
     return grupo;
