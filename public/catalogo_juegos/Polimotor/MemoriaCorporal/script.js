@@ -661,55 +661,17 @@ function terminarFaseMemoria() {
     }
 }
 
-function svgDedo() {
-    return '<svg viewBox="0 0 120 170" aria-hidden="true">' +
-        '<rect x="46" y="2" width="26" height="86" rx="13" fill="#ffd2b0" stroke="#d9976e" stroke-width="3"/>' +
-        '<ellipse cx="59" cy="14" rx="8" ry="6" fill="#fff6ee"/>' +
-        '<rect x="74" y="52" width="18" height="40" rx="9" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
-        '<rect x="90" y="60" width="16" height="34" rx="8" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
-        '<rect x="28" y="56" width="16" height="32" rx="8" fill="#f3bc94" stroke="#d9976e" stroke-width="3"/>' +
-        '<path d="M24 84h74c14 0 22 12 22 26v18c0 22-18 36-40 36H46c-22 0-36-14-36-34v-22c0-14 6-24 14-24z" fill="#ffd2b0" stroke="#d9976e" stroke-width="3"/>' +
-        "</svg>";
-}
-
 function animarDedoEnOpcion(boton) {
     if (!boton || !window.PedniaTutorial) return Promise.resolve();
-    document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
-    const reducir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const dormir = PedniaTutorial.sleep;
-    const dedo = document.createElement("div");
-    dedo.className = "demo-dedo";
-    dedo.setAttribute("aria-hidden", "true");
-    dedo.innerHTML = svgDedo();
-    document.body.appendChild(dedo);
-
-    function punta() {
-        const r = boton.getBoundingClientRect();
-        return { x: r.left + r.width / 2, y: r.bottom - 10 };
-    }
-
-    function ponerDedo(x, y) {
-        dedo.style.left = x + "px";
-        dedo.style.top = y + "px";
-    }
-
-    const inicio = punta();
-    ponerDedo(reducir ? inicio.x : inicio.x + 120, reducir ? inicio.y : inicio.y + 150);
-
-    function soltar() {
-        dedo.classList.remove("is-pressed");
-        if (dedo.parentNode) dedo.remove();
-    }
-
-    return dormir(reducir ? 20 : 40).then(function () {
-        ponerDedo(inicio.x, inicio.y);
-        return dormir(reducir ? 160 : 1000);
-    }).then(function () {
-        dedo.classList.add("is-pressed");
-        boton.classList.add("opcion-ok");
-        return dormir(reducir ? 180 : 1200);
-    }).then(soltar, function () {
-        soltar();
+    return PedniaTutorial.animarMano({
+        punto: function () {
+            const r = boton.getBoundingClientRect();
+            return { x: r.left + r.width / 2, y: r.top + r.height * 0.55 };
+        },
+        holdMs: 1200,
+        onPresionar: function () {
+            boton.classList.add("opcion-ok");
+        }
     });
 }
 

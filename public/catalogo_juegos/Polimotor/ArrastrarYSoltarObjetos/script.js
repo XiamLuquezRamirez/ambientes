@@ -513,7 +513,7 @@
                         const obj = document.querySelector("#zona-objetos .objeto");
                         const dest = document.querySelector('#zona-destinos .destino[data-destino="caja_manzana"]');
                         if (dest) dest.classList.add("is-demo-target");
-                        return llevarYDejar(obj, dest, "manzana");
+                        return llevarYDejarConMano(obj, dest, "manzana");
                     }
                 }).then(function () {
                     iniciarRonda(rondaGen);
@@ -567,6 +567,42 @@
                 obj.style.zIndex = "";
                 resolve();
             }, 1140);
+        });
+    }
+
+    function llevarYDejarConMano(obj, dest, objetoId) {
+        if (!obj || !dest || !window.PedniaTutorial || typeof PedniaTutorial.animarMano !== "function") {
+            return llevarYDejar(obj, dest, objetoId);
+        }
+        const reducir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const a = obj.getBoundingClientRect();
+        const b = dest.getBoundingClientRect();
+        const dx = (b.left + b.width / 2) - (a.left + a.width / 2);
+        const dy = (b.top + b.height / 2) - (a.top + a.height / 2);
+        const dur = reducir ? 220 : 1100;
+
+        return PedniaTutorial.animarMano({
+            punto: function () {
+                const r = obj.getBoundingClientRect();
+                return { x: r.left + r.width / 2, y: r.top + r.height * 0.45 };
+            },
+            holdMs: 280,
+            viajeMs: reducir ? 40 : 800,
+            arrastre: { dx: dx, dy: dy, durMs: dur },
+            onPresionar: function () {
+                obj.style.zIndex = "40";
+            },
+            onDuranteArrastre: function () {
+                obj.style.transition = reducir ? "none" : ("transform " + dur + "ms ease");
+                obj.style.transform = "translate(" + dx + "px," + dy + "px)";
+            },
+            onSoltar: function () {
+                dest.classList.remove("is-demo-target");
+                colocarEnDestino(objetoId, obj, dest);
+                obj.style.transition = "";
+                obj.style.transform = "";
+                obj.style.zIndex = "";
+            }
         });
     }
 

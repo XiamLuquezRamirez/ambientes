@@ -91,7 +91,7 @@
 
         const ACC_OPCIONES = [
         { key: "altoContraste", label: "Alto contraste" },
-        { key: "mostrarIntro", label: "Mostrar video de presentación" },
+        { key: "mostrarIntro", label: "Mostrar intro (demostración)" },
     ];
 
     function setMenuAcc(abierto) {
@@ -388,6 +388,8 @@
     function frasesFijasTts() {
         const porEdad = (gameConfig && gameConfig.feedbackPorEdad) || {};
         const extra = [
+            { texto: textos().demostracion || "", personaje: "zoe" },
+            { texto: textos().demostracionFin || "", personaje: "zoe" },
             { texto: textos().pregunta || "¿Qué movimiento sigue?", personaje: "zeus" },
             { texto: "¿Qué sigue?", personaje: "zoe" },
             textos().acierto,
@@ -621,14 +623,23 @@
 
         const arrancar = function () {
             if (gen !== retoGen) return;
-            const video = textos().videoPresentacion;
-            if (acc().mostrarIntro && video) {
-                mostrarPresentacion(gen, video).then(function () {
-                    if (gen !== retoGen) return;
+            mostrarBotonVideo(false);
+            if (acc().mostrarIntro && window.PedniaTutorial) {
+                Promise.resolve(correrDemo(gen)).then(function () {
+                    if (gen !== retoGen || juegoTerminado) return;
+                    mostrarBotonVideo(true);
+                    iniciarRetoActual(gen);
+                }, function () {
+                    if (gen !== retoGen || juegoTerminado) return;
+                    document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
+                    if (window.PedniaTutorial && PedniaTutorial.detenerDemo) PedniaTutorial.detenerDemo();
+                    if (window.Tutorial3d && Tutorial3d.stop) Tutorial3d.stop();
+                    mostrarBotonVideo(true);
                     iniciarRetoActual(gen);
                 });
                 return;
             }
+            mostrarBotonVideo(true);
             iniciarRetoActual(gen);
         };
         // Solo esperar SVGs de poses (máx ~350ms). Audio/GIF van en segundo plano.
@@ -641,7 +652,8 @@
             const stage = document.getElementById("presentacion-stage");
             const video = document.getElementById("video-presentacion");
             const btn = document.getElementById("btn-presentacion");
-            if (!capa || !stage || !video || !btn) {
+            const cerrarBtn = document.getElementById("btn-cerrar-presentacion");
+            if (!capa || !stage || !video || !btn || !cerrarBtn) {
                 resolve();
                 return;
             }
@@ -659,7 +671,7 @@
                 video.load();
                 video.hidden = true;
                 stage.classList.remove("is-playing");
-                btn.hidden = false;
+                btn.hidden = true;
                 capa.hidden = true;
                 document.body.classList.remove("presentacion-activa");
                 if (audioFondo) {
@@ -685,14 +697,14 @@
             video.playsInline = true;
             video.setAttribute("playsinline", "");
             video.setAttribute("webkit-playsinline", "");
-            video.hidden = true;
+            video.hidden = false;
             video.src = ruta;
-            stage.classList.remove("is-playing");
-            btn.hidden = false;
+            stage.classList.add("is-playing");
+            btn.hidden = true;
             capa.hidden = false;
             document.body.classList.add("presentacion-activa");
 
-            btn.onclick = function () {
+            function reproducir() {
                 if (cerrado || gen !== retoGen) return;
                 stage.classList.add("is-playing");
                 btn.hidden = true;
@@ -715,8 +727,99 @@
                         video.hidden = true;
                     });
                 }
+            }
+
+            cerrarBtn.onclick = function () {
+                if (cerrado || gen !== retoGen) return;
+                cerrar();
             };
+            btn.onclick = reproducir;
+            reproducir();
         });
+    }
+
+    function mostrarBotonVideo(ver) {
+        const btn = document.getElementById("btn-ver-video");
+        if (!btn) return;
+        btn.hidden = !ver;
+    }
+
+    function ejemploDistintoDelPrimerReto() {
+        const primero = retos[0] || {};
+        const base = (primero.prefijo || []).concat(primero.correcta ? [primero.correcta] : []).join(",");
+        const candidatos = [
+            { prefijo: ["abrir_brazos", "manos_al_frente"], correcta: "abrir_brazos", distractores: ["manos_arriba", "tocar_cabeza"] },
+            { prefijo: ["tocar_cabeza", "tocar_hombros"], correcta: "tocar_cabeza", distractores: ["manos_abajo", "manos_al_frente"] },
+            { prefijo: ["manos_al_frente", "tocar_rodillas"], correcta: "manos_al_frente", distractores: ["tocar_barriga", "abrir_brazos"] }
+        ];
+        for (let i = 0; i < candidatos.length; i++) {
+            const clave = candidatos[i].prefijo.concat(candidatos[i].correcta).join(",");
+            if (base.indexOf(candidatos[i].prefijo.join(",")) !== 0 && base !== clave) return candidatos[i];
+        }
+        return candidatos[0];
+    }
+
+    function animarDedoEnOpcion(boton) {
+        if (!boton || !window.PedniaTutorial) return Promise.resolve();
+        boton.classList.add("is-demo-target");
+        return PedniaTutorial.animarMano({
+            punto: function () {
+                const r = boton.getBoundingClientRect();
+                return { x: r.left + r.width / 2, y: r.top + r.height * 0.55 };
+            },
+            holdMs: 900,
+            onSoltar: function () {
+                boton.classList.remove("is-demo-target");
+            }
+        }).then(function () {
+            boton.classList.remove("is-demo-target");
+        }, function () {
+            boton.classList.remove("is-demo-target");
+        });
+    }
+
+    async function correrDemo(gen) {
+        const ejemplo = ejemploDistintoDelPrimerReto();
+        const prog = document.getElementById("progreso");
+        if (prog) prog.hidden = true;
+        limpiarEscena();
+        aceptaRespuesta = false;
+        await PedniaTutorial.correr({
+            texto: textos().demostracion,
+            textoFin: textos().demostracionFin,
+            cancelado: function () { return gen !== retoGen || juegoTerminado; },
+            onTexto: setEnunciado,
+            jugar: async function () {
+                const dormir = PedniaTutorial.sleep;
+                await reproducirSecuencia(ejemplo.prefijo, gen, true);
+                if (gen !== retoGen || juegoTerminado) return;
+                renderRielEstatico(ejemplo.prefijo, true);
+                const pregunta = textos().pregunta || "¿Qué movimiento sigue?";
+                setEnunciado(pregunta);
+                try {
+                    await Promise.race([
+                        TextoVoz.hablar(pregunta, "zeus").catch(function () {}),
+                        dormir(4000)
+                    ]);
+                } catch (e) { /* noop */ }
+                if (gen !== retoGen || juegoTerminado) return;
+                const previo = retoActual;
+                retoActual = ejemplo;
+                renderOpciones(ejemplo, gen);
+                retoActual = previo;
+                aceptaRespuesta = false;
+                await dormir(700);
+                if (gen !== retoGen || juegoTerminado) return;
+                const btn = document.querySelector('.tarjeta-opcion[data-mov="' + ejemplo.correcta + '"]');
+                await animarDedoEnOpcion(btn);
+                if (gen !== retoGen || juegoTerminado) return;
+                await dormir(400);
+                document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
+                limpiarEscena();
+            }
+        });
+        document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
+        if (gen === retoGen) limpiarEscena();
     }
 
     function actualizarProgreso() {
@@ -786,7 +889,10 @@
             const t0 = Date.now();
             if (nombre) {
                 try {
-                    await TextoVoz.hablar(nombre, quien);
+                    await Promise.race([
+                        TextoVoz.hablar(nombre, quien).catch(function () {}),
+                        sleep(Math.max(minPaso + 1800, 3200))
+                    ]);
                 } catch (e) { /* noop */ }
             }
             if (gen !== retoGen) return;
@@ -967,6 +1073,7 @@
 
     function mostrarCierre() {
         juegoTerminado = true;
+        mostrarBotonVideo(false);
         if (typeof aceptaArrastre !== "undefined") aceptaArrastre = false;
         if (typeof aceptaToque !== "undefined") aceptaToque = false;
         const cierre = (typeof textos === "function" ? textos().cierre : null) || "¡Excelente!";
@@ -1010,6 +1117,26 @@
 
         sincronizarDialogoIntro3d();
         document.getElementById("btn-empecemos").addEventListener("click", empecemosJuego);
+        const btnVideo = document.getElementById("btn-ver-video");
+        if (btnVideo) {
+            btnVideo.addEventListener("click", function () {
+                const ruta = textos().videoPresentacion;
+                if (!ruta || juegoTerminado || btnVideo.hidden) return;
+                if (document.body.classList.contains("presentacion-activa")) return;
+                if (document.body.classList.contains("demo-activa")) return;
+                retoGen += 1;
+                const gen = retoGen;
+                aceptaRespuesta = false;
+                esperandoFeedback = false;
+                TextoVoz.detener();
+                mostrarBotonVideo(false);
+                mostrarPresentacion(gen, ruta).then(function () {
+                    if (gen !== retoGen || juegoTerminado) return;
+                    mostrarBotonVideo(true);
+                    iniciarRetoActual(gen);
+                });
+            });
+        }
         const btnOmitirIntro = document.getElementById("btn-omitir-intro3d");
         if (btnOmitirIntro) {
             btnOmitirIntro.addEventListener("click", omitirIntro3d);
