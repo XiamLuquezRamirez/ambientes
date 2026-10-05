@@ -33,6 +33,8 @@
     "pregunta": "¿Qué movimiento sigue?",
     "cierre": "¡Lograste completar las secuencias!",
     "videoPresentacion": "img/SECUENCIA DE MOVIMIENTO.mp4",
+    "demostracion": "¡Vamos con un ejemplo! Mira los movimientos y cuál sigue.",
+    "demostracionFin": "¡Ahora te toca a ti! Observa la secuencia y elige qué sigue.",
     "acierto": "¡Muy bien, lo hiciste!",
     "error": "Mira otra vez. ¡Vamos a intentarlo!",
     "conversacion": [

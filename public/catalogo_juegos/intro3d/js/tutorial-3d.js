@@ -1,14 +1,14 @@
 /**
  * Tutorial 3D: entra por la derecha → esquina inferior derecha → habla → se va.
- * window.Tutorial3d = { start, despedir, stop, personaje }
+ * window.Tutorial3d = { start, despedir, stop, preload, personaje }
  */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 const MODELOS_BASE = new URL("../models/", import.meta.url);
-// 1 = el GLB tal cual. Mayor crece, menor encoge.
-const ESCALA_NINO = 0.42;
-const ESCALA_NINA = 0.42;
+// El GLB nuevo mide ~1,25 m. 1,35 / 1,40 los deja a la misma altura en el panel.
+const ESCALA_NINO = 1.35;
+const ESCALA_NINA = 1.40;
 const CLIP_CAMINAR = ["WALK"];
 const CLIP_QUIETO = ["IDLE"];
 const CLIP_HABLAR = ["TALK"];
@@ -17,13 +17,13 @@ const MODELOS = {
     zoe: { url: new URL("nina.glb", MODELOS_BASE).href, escala: ESCALA_NINA }
 };
 
-// Panel esquina inferior derecha: entra desde fuera (derecha) → centro del panel → se va.
-const START_X = 2.6;
+// Entrada corta: aparece cerca y camina poco (el GLB ya no se vuelve a bajar).
+const START_X = 1.35;
 const DEST_X = 0.05;
-const EXIT_X = 2.75;
+const EXIT_X = 2.2;
 const POS_Y = -0.15;
 const POS_Z = 0;
-const WALK_SPEED = 1.55;
+const WALK_SPEED = 2.8;
 const YAW_RIGHT = Math.PI / 2;
 const YAW_LEFT = -Math.PI / 2;
 const YAW_CAMARA = 0.12;
@@ -48,6 +48,10 @@ let yawObjetivo = YAW_RIGHT;
 let stopToken = 0;
 let readyResolve = null;
 let goneResolve = null;
+
+/** Cache de GLTF por URL: evita re-descargar ~4–5 MB en cada tutorial. */
+const gltfCache = Object.create(null);
+const loader = new GLTFLoader();
 
 function tomarClip(actions, nombres) {
     const claves = Object.keys(actions);
@@ -80,13 +84,16 @@ function lerpAngle(a, b, t) {
     return a + d * t;
 }
 
-function disposeInterno() {
-    activo = false;
-    fase = "fuera";
-    if (rafId != null) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
+function cargarGltf(url) {
+    if (!gltfCache[url]) {
+        gltfCache[url] = new Promise(function (resolve, reject) {
+            loader.load(url, resolve, undefined, reject);
+        });
     }
+    return gltfCache[url];
+}
+
+function quitarMeshActual() {
     if (mixer) {
         try { mixer.stopAllAction(); } catch (e) { /* noop */ }
         mixer = null;
@@ -97,30 +104,20 @@ function disposeInterno() {
     activoAction = null;
     if (mesh && scene) {
         scene.remove(mesh);
-        mesh.traverse(function (obj) {
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) {
-                const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-                mats.forEach(function (m) {
-                    if (m.map) m.map.dispose();
-                    m.dispose();
-                });
-            }
-        });
+        // No dispose: la geometría vive en el cache del GLTF.
         mesh = null;
     }
-    if (renderer) {
-        try {
-            renderer.dispose();
-            if (renderer.domElement && renderer.domElement.parentNode) {
-                renderer.domElement.parentNode.removeChild(renderer.domElement);
-            }
-        } catch (e2) { /* noop */ }
-        renderer = null;
+}
+
+/** Soft reset: mantiene renderer/escena; solo saca al personaje. */
+function resetSuave() {
+    activo = false;
+    fase = "fuera";
+    if (rafId != null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
     }
-    scene = null;
-    camera = null;
-    clock = null;
+    quitarMeshActual();
     if (root) {
         root.hidden = true;
         root.classList.remove("is-visible");
@@ -135,6 +132,22 @@ function disposeInterno() {
         goneResolve = null;
         g();
     }
+}
+
+function disposeInterno() {
+    resetSuave();
+    if (renderer) {
+        try {
+            renderer.dispose();
+            if (renderer.domElement && renderer.domElement.parentNode) {
+                renderer.domElement.parentNode.removeChild(renderer.domElement);
+            }
+        } catch (e2) { /* noop */ }
+        renderer = null;
+    }
+    scene = null;
+    camera = null;
+    clock = null;
     personajeActual = null;
 }
 
@@ -153,7 +166,6 @@ function asegurarEscena() {
 
     if (!renderer) {
         scene = new THREE.Scene();
-        // Cámara vertical amplia para ver al personaje de pies a cabeza.
         camera = new THREE.PerspectiveCamera(28, 1, 0.1, 40);
         camera.position.set(0.05, 1.15, 4.6);
         camera.lookAt(0.05, 0.85, 0);
@@ -174,49 +186,47 @@ function asegurarEscena() {
     return true;
 }
 
+function montarPersonaje(gltf, id) {
+    const def = MODELOS[id] || MODELOS.zoe;
+    quitarMeshActual();
+
+    // Reusar la scene del GLTF cacheado (un solo personaje a la vez).
+    mesh = gltf.scene;
+    mesh.scale.setScalar(def.escala);
+    mesh.position.set(START_X, POS_Y, POS_Z);
+    mesh.rotation.y = YAW_LEFT;
+    scene.add(mesh);
+
+    mixer = null;
+    walkAction = null;
+    idleAction = null;
+    talkAction = null;
+    activoAction = null;
+
+    if (gltf.animations && gltf.animations.length) {
+        mixer = new THREE.AnimationMixer(mesh);
+        const actions = {};
+        gltf.animations.forEach(function (clip) {
+            actions[clip.name] = mixer.clipAction(clip);
+        });
+        walkAction = tomarClip(actions, CLIP_CAMINAR);
+        idleAction = tomarClip(actions, CLIP_QUIETO);
+        talkAction = tomarClip(actions, CLIP_HABLAR);
+        if (talkAction) talkAction.setLoop(THREE.LoopRepeat, Infinity);
+        if (walkAction) {
+            walkAction.setLoop(THREE.LoopRepeat, Infinity);
+            cruzar(walkAction, 0.01);
+        } else if (idleAction) {
+            cruzar(idleAction, 0.01);
+        }
+    }
+}
+
 function cargarPersonaje(id) {
     const def = MODELOS[id] || MODELOS.zoe;
-    const loader = new GLTFLoader();
-
-    return new Promise(function (resolve, reject) {
-        loader.load(
-            def.url,
-            function (gltf) {
-                if (mesh && scene) scene.remove(mesh);
-                mesh = gltf.scene;
-                mesh.scale.setScalar(def.escala);
-                mesh.position.set(START_X, POS_Y, POS_Z);
-                mesh.rotation.y = YAW_LEFT;
-                scene.add(mesh);
-
-                mixer = null;
-                walkAction = null;
-                idleAction = null;
-                talkAction = null;
-                activoAction = null;
-
-                if (gltf.animations && gltf.animations.length) {
-                    mixer = new THREE.AnimationMixer(mesh);
-                    const actions = {};
-                    gltf.animations.forEach(function (clip) {
-                        actions[clip.name] = mixer.clipAction(clip);
-                    });
-                    walkAction = tomarClip(actions, CLIP_CAMINAR);
-                    idleAction = tomarClip(actions, CLIP_QUIETO);
-                    talkAction = tomarClip(actions, CLIP_HABLAR);
-                    if (talkAction) talkAction.setLoop(THREE.LoopRepeat, Infinity);
-                    if (walkAction) {
-                        walkAction.setLoop(THREE.LoopRepeat, Infinity);
-                        cruzar(walkAction, 0.01);
-                    } else if (idleAction) {
-                        cruzar(idleAction, 0.01);
-                    }
-                }
-                resolve(id);
-            },
-            undefined,
-            reject
-        );
+    return cargarGltf(def.url).then(function (gltf) {
+        montarPersonaje(gltf, id);
+        return id;
     });
 }
 
@@ -246,7 +256,7 @@ function terminarSalida() {
     const token = stopToken;
     setTimeout(function () {
         if (token !== stopToken) return;
-        disposeInterno();
+        resetSuave();
     }, 280);
 }
 
@@ -277,20 +287,29 @@ function animar() {
     renderer.render(scene, camera);
 }
 
+function preload() {
+    return Promise.all(
+        Object.keys(MODELOS).map(function (id) {
+            return cargarGltf(MODELOS[id].url).catch(function () { return null; });
+        })
+    );
+}
+
 /**
- * Entra por la derecha hasta la esquina inferior derecha. Resuelve al estar listo para hablar.
+ * Entra por la derecha. Resuelve solo cuando el personaje ya está en sitio (listo para hablar).
  * @returns {Promise<string>} id del personaje (zeus|zoe)
  */
 async function start() {
     stopToken += 1;
     const token = stopToken;
-    disposeInterno();
+    resetSuave();
     stopToken = token;
 
     if (!asegurarEscena()) return Promise.resolve("zoe");
 
     const id = Math.random() < 0.5 ? "zeus" : "zoe";
     personajeActual = id;
+    // Mostrar el panel de inmediato (aunque el GLB aún cargue la 1.ª vez).
     root.hidden = false;
     void root.offsetWidth;
     root.classList.add("is-visible");
@@ -314,10 +333,16 @@ async function start() {
     }
 
     if (!activo || token !== stopToken) return personajeActual || "zoe";
+    if (clock) clock.getDelta();
     animar();
 
     return new Promise(function (resolve) {
         readyResolve = resolve;
+        // Si el walk se atrasa, teletransporta y libera el habla (personaje ya visible).
+        setTimeout(function () {
+            if (token !== stopToken) return;
+            if (fase === "entrando") llegarAHablar();
+        }, 1600);
     });
 }
 
@@ -338,6 +363,9 @@ function despedir() {
     cruzar(walkAction || idleAction, 0.2);
     return new Promise(function (resolve) {
         goneResolve = resolve;
+        setTimeout(function () {
+            if (fase === "saliendo") terminarSalida();
+        }, 2200);
     });
 }
 
@@ -347,7 +375,7 @@ function stop() {
     const token = stopToken;
     setTimeout(function () {
         if (token !== stopToken) return;
-        disposeInterno();
+        resetSuave();
     }, 200);
 }
 
@@ -355,8 +383,12 @@ window.Tutorial3d = {
     start: start,
     despedir: despedir,
     stop: stop,
+    preload: preload,
     personaje: function () { return personajeActual; }
 };
+
+// Precarga en cuanto el módulo carga (antes de elegir edad).
+preload();
 
 window.addEventListener("resize", function () {
     if (activo) redimensionar();

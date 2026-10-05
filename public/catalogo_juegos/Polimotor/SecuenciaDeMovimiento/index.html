@@ -12,6 +12,7 @@
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
 	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261003c">
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
 	<link rel="preload" as="image" href="../MemoriaCorporal/img/nina/manos_arriba.png">
@@ -101,6 +102,10 @@
 <div id="principal">
 		<div class="hud-top">
 			<div class="hud-nav">
+				<button type="button" id="btn-ver-video" class="btn btn-primary btn-video" hidden>
+					<i class="fa-solid fa-circle-question" aria-hidden="true"></i>
+					<span>Ayuda</span>
+				</button>
 				<div id="progreso" class="hud-progreso" hidden></div>
 				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round"
 					title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
@@ -113,11 +118,14 @@
 			<h1 class="borde" id="enunciado">Observa la secuencia y elige qué sigue</h1>
 		</div>
 
-		<div class="escenario" id="escenario">
+		<div class="escenario demo-lock" id="escenario">
 			<div id="presentacion" class="presentacion" hidden>
 				<div class="presentacion-stage" id="presentacion-stage">
 					<video id="video-presentacion" class="presentacion-video" playsinline webkit-playsinline preload="auto" hidden></video>
-					<button type="button" id="btn-presentacion" class="presentacion-play">
+					<button type="button" id="btn-cerrar-presentacion" class="btn btn-danger btn-round presentacion-cerrar" aria-label="Cerrar">
+						<i class="fa-solid fa-xmark" aria-hidden="true"></i>
+					</button>
+					<button type="button" id="btn-presentacion" class="presentacion-play" hidden>
 						<span class="presentacion-play-icono">
 							<span class="presentacion-play-anillo" aria-hidden="true"></span>
 							<i class="fa-solid fa-play" aria-hidden="true"></i>
@@ -132,6 +140,8 @@
 			</div>
 		</div>
 	</div>
+
+	<div id="tutorial-3d" class="tutorial-3d" hidden aria-hidden="true"></div>
 
 	<div id="menu-acc" class="menu-acc">
 		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
@@ -176,6 +186,8 @@
 	}
 	</script>
 	<script type="module" src="../../intro3d/js/three-scene.js?v=20260930f"></script>
+	<script src="../../tutorial/tutorial.js?v=20261003c"></script>
+	<script type="module" src="../../intro3d/js/tutorial-3d.js?v=20261003c"></script>
 	<script src="../../intro3d/js/intro.js?v=20260930g"></script>
 	<script src="script.js"></script>
 </body>
