@@ -1,1201 +1,5607 @@
-[
-  {
-    "archivo": "01_relieve/montana_nevada_v1.glb",
-    "categoria": "relieve",
-    "nombre": "montana_nevada_v1",
-    "medidas_m": {
-      "ancho": 39.38,
-      "fondo": 38.82,
-      "alto": 29.48
-    },
-    "triangulos": 172,
-    "materiales": [
-      "nieve",
-      "montana_azul",
-      "montana",
-      "pasto",
-      "montana_claro",
-      "roca_oscura",
-      "roca"
-    ]
-  },
-  {
-    "archivo": "01_relieve/montana_nevada_v2.glb",
-    "categoria": "relieve",
-    "nombre": "montana_nevada_v2",
-    "medidas_m": {
-      "ancho": 34.72,
-      "fondo": 34.37,
-      "alto": 30.96
-    },
-    "triangulos": 172,
-    "materiales": [
-      "nieve",
-      "montana",
-      "montana_claro",
-      "roca_oscura",
-      "pasto",
-      "montana_azul",
-      "roca"
-    ]
-  },
-  {
-    "archivo": "01_relieve/montana_nevada_v3.glb",
-    "categoria": "relieve",
-    "nombre": "montana_nevada_v3",
-    "medidas_m": {
-      "ancho": 36.52,
-      "fondo": 37.03,
-      "alto": 26
-    },
-    "triangulos": 172,
-    "materiales": [
-      "nieve",
-      "montana",
-      "montana_claro",
-      "montana_azul",
-      "pasto",
-      "roca_oscura",
-      "roca"
-    ]
-  },
-  {
-    "archivo": "01_relieve/cordillera.glb",
-    "categoria": "relieve",
-    "nombre": "cordillera",
-    "medidas_m": {
-      "ancho": 83.37,
-      "fondo": 56.52,
-      "alto": 33.18
-    },
-    "triangulos": 688,
-    "materiales": [
-      "nieve",
-      "montana",
-      "montana_claro",
-      "pasto",
-      "roca_oscura",
-      "montana_azul",
-      "roca"
-    ]
-  },
-  {
-    "archivo": "01_relieve/colinas_v1.glb",
-    "categoria": "relieve",
-    "nombre": "colinas_v1",
-    "medidas_m": {
-      "ancho": 29.91,
-      "fondo": 19.23,
-      "alto": 3.3
-    },
-    "triangulos": 189,
-    "materiales": [
-      "pasto_oscuro",
-      "pasto",
-      "pasto_claro"
-    ]
-  },
-  {
-    "archivo": "01_relieve/colinas_v2.glb",
-    "categoria": "relieve",
-    "nombre": "colinas_v2",
-    "medidas_m": {
-      "ancho": 30.15,
-      "fondo": 18.62,
-      "alto": 3.25
-    },
-    "triangulos": 189,
-    "materiales": [
-      "pasto",
-      "pasto_claro",
-      "pasto_oscuro"
-    ]
-  },
-  {
-    "archivo": "01_relieve/terreno_tile_20m_v1.glb",
-    "categoria": "relieve",
-    "nombre": "terreno_tile_20m_v1",
-    "medidas_m": {
-      "ancho": 20,
-      "fondo": 20,
-      "alto": 0.35
-    },
-    "triangulos": 200,
-    "materiales": [
-      "pasto_claro",
-      "pasto",
-      "pasto_oscuro"
-    ]
-  },
-  {
-    "archivo": "01_relieve/terreno_tile_20m_v2.glb",
-    "categoria": "relieve",
-    "nombre": "terreno_tile_20m_v2",
-    "medidas_m": {
-      "ancho": 20,
-      "fondo": 20,
-      "alto": 0.35
-    },
-    "triangulos": 200,
-    "materiales": [
-      "pasto_oscuro",
-      "pasto_claro",
-      "pasto"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/pino_v1.glb",
-    "categoria": "vegetacion",
-    "nombre": "pino_v1",
-    "medidas_m": {
-      "ancho": 5.88,
-      "fondo": 5.86,
-      "alto": 6.7
-    },
-    "triangulos": 88,
-    "materiales": [
-      "tronco",
-      "pino",
-      "pino_oscuro"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/pino_v2.glb",
-    "categoria": "vegetacion",
-    "nombre": "pino_v2",
-    "medidas_m": {
-      "ancho": 5.2,
-      "fondo": 5.17,
-      "alto": 6.6
-    },
-    "triangulos": 88,
-    "materiales": [
-      "tronco",
-      "pino",
-      "pino_oscuro"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/pino_v3.glb",
-    "categoria": "vegetacion",
-    "nombre": "pino_v3",
-    "medidas_m": {
-      "ancho": 5.86,
-      "fondo": 5.9,
-      "alto": 6.71
-    },
-    "triangulos": 88,
-    "materiales": [
-      "tronco",
-      "pino",
-      "pino_oscuro"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/pino_alto_v1.glb",
-    "categoria": "vegetacion",
-    "nombre": "pino_alto_v1",
-    "medidas_m": {
-      "ancho": 4.84,
-      "fondo": 4.82,
-      "alto": 7.38
-    },
-    "triangulos": 104,
-    "materiales": [
-      "tronco",
-      "pino",
-      "pino_oscuro"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/pino_alto_v2.glb",
-    "categoria": "vegetacion",
-    "nombre": "pino_alto_v2",
-    "medidas_m": {
-      "ancho": 3.58,
-      "fondo": 3.7,
-      "alto": 7.38
-    },
-    "triangulos": 104,
-    "materiales": [
-      "tronco",
-      "pino",
-      "pino_oscuro"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/pino_alto_v3.glb",
-    "categoria": "vegetacion",
-    "nombre": "pino_alto_v3",
-    "medidas_m": {
-      "ancho": 3.91,
-      "fondo": 4.03,
-      "alto": 7.46
-    },
-    "triangulos": 104,
-    "materiales": [
-      "tronco",
-      "pino",
-      "pino_oscuro"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/arbol_redondo_v1.glb",
-    "categoria": "vegetacion",
-    "nombre": "arbol_redondo_v1",
-    "medidas_m": {
-      "ancho": 4.05,
-      "fondo": 3.87,
-      "alto": 5.5
-    },
-    "triangulos": 444,
-    "materiales": [
-      "tronco",
-      "hoja",
-      "hoja_oscura",
-      "hoja_clara"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/arbol_redondo_v2.glb",
-    "categoria": "vegetacion",
-    "nombre": "arbol_redondo_v2",
-    "medidas_m": {
-      "ancho": 4.11,
-      "fondo": 3.66,
-      "alto": 5.5
-    },
-    "triangulos": 444,
-    "materiales": [
-      "tronco",
-      "hoja",
-      "hoja_oscura",
-      "hoja_clara"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/arbol_redondo_v3.glb",
-    "categoria": "vegetacion",
-    "nombre": "arbol_redondo_v3",
-    "medidas_m": {
-      "ancho": 4.36,
-      "fondo": 3.83,
-      "alto": 5.5
-    },
-    "triangulos": 444,
-    "materiales": [
-      "tronco",
-      "hoja",
-      "hoja_oscura",
-      "hoja_clara"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/arbusto_v1.glb",
-    "categoria": "vegetacion",
-    "nombre": "arbusto_v1",
-    "medidas_m": {
-      "ancho": 2.1,
-      "fondo": 1.4,
-      "alto": 1.19
-    },
-    "triangulos": 240,
-    "materiales": [
-      "arbusto",
-      "hoja"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/arbusto_v2.glb",
-    "categoria": "vegetacion",
-    "nombre": "arbusto_v2",
-    "medidas_m": {
-      "ancho": 2.1,
-      "fondo": 1.4,
-      "alto": 1.19
-    },
-    "triangulos": 240,
-    "materiales": [
-      "arbusto",
-      "hoja"
-    ]
-  },
-  {
-    "archivo": "02_vegetacion/arbusto_v3.glb",
-    "categoria": "vegetacion",
-    "nombre": "arbusto_v3",
-    "medidas_m": {
-      "ancho": 2.1,
-      "fondo": 1.4,
-      "alto": 1.19
-    },
-    "triangulos": 240,
-    "materiales": [
-      "arbusto",
-      "hoja"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/margarita.glb",
-    "categoria": "flores_suelo",
-    "nombre": "margarita",
-    "medidas_m": {
-      "ancho": 0.36,
-      "fondo": 0.26,
-      "alto": 0.48
-    },
-    "triangulos": 240,
-    "materiales": [
-      "tallo",
-      "centro",
-      "petalo_blanco"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/tulipan_v1.glb",
-    "categoria": "flores_suelo",
-    "nombre": "tulipan_v1",
-    "medidas_m": {
-      "ancho": 0.36,
-      "fondo": 0.18,
-      "alto": 0.78
-    },
-    "triangulos": 108,
-    "materiales": [
-      "tallo",
-      "petalo_rojo"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/tulipan_v2.glb",
-    "categoria": "flores_suelo",
-    "nombre": "tulipan_v2",
-    "medidas_m": {
-      "ancho": 0.36,
-      "fondo": 0.18,
-      "alto": 0.78
-    },
-    "triangulos": 108,
-    "materiales": [
-      "tallo",
-      "petalo_rojo"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/tulipan_v3.glb",
-    "categoria": "flores_suelo",
-    "nombre": "tulipan_v3",
-    "medidas_m": {
-      "ancho": 0.36,
-      "fondo": 0.18,
-      "alto": 0.78
-    },
-    "triangulos": 108,
-    "materiales": [
-      "tallo",
-      "petalo_amarillo"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/girasol.glb",
-    "categoria": "flores_suelo",
-    "nombre": "girasol",
-    "medidas_m": {
-      "ancho": 0.78,
-      "fondo": 0.46,
-      "alto": 1.84
-    },
-    "triangulos": 360,
-    "materiales": [
-      "tallo",
-      "centro_oscuro",
-      "petalo_amarillo"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/campanula.glb",
-    "categoria": "flores_suelo",
-    "nombre": "campanula",
-    "medidas_m": {
-      "ancho": 0.36,
-      "fondo": 0.22,
-      "alto": 0.57
-    },
-    "triangulos": 132,
-    "materiales": [
-      "tallo",
-      "petalo_morado"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/flor_silvestre_v1.glb",
-    "categoria": "flores_suelo",
-    "nombre": "flor_silvestre_v1",
-    "medidas_m": {
-      "ancho": 0.36,
-      "fondo": 0.27,
-      "alto": 0.47
-    },
-    "triangulos": 240,
-    "materiales": [
-      "tallo",
-      "centro",
-      "petalo_blanco"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/flor_silvestre_v2.glb",
-    "categoria": "flores_suelo",
-    "nombre": "flor_silvestre_v2",
-    "medidas_m": {
-      "ancho": 0.36,
-      "fondo": 0.27,
-      "alto": 0.45
-    },
-    "triangulos": 240,
-    "materiales": [
-      "tallo",
-      "centro",
-      "petalo_amarillo"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/flor_silvestre_v3.glb",
-    "categoria": "flores_suelo",
-    "nombre": "flor_silvestre_v3",
-    "medidas_m": {
-      "ancho": 0.36,
-      "fondo": 0.26,
-      "alto": 0.47
-    },
-    "triangulos": 240,
-    "materiales": [
-      "tallo",
-      "centro",
-      "petalo_blanco"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/macizo_flores_v1.glb",
-    "categoria": "flores_suelo",
-    "nombre": "macizo_flores_v1",
-    "medidas_m": {
-      "ancho": 2.03,
-      "fondo": 1.73,
-      "alto": 1.3
-    },
-    "triangulos": 2400,
-    "materiales": [
-      "arbusto",
-      "hoja",
-      "tallo",
-      "centro",
-      "petalo_blanco",
-      "petalo_rosa",
-      "petalo_rojo",
-      "petalo_morado"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/macizo_flores_v2.glb",
-    "categoria": "flores_suelo",
-    "nombre": "macizo_flores_v2",
-    "medidas_m": {
-      "ancho": 2.07,
-      "fondo": 2,
-      "alto": 1.34
-    },
-    "triangulos": 2400,
-    "materiales": [
-      "arbusto",
-      "hoja",
-      "tallo",
-      "centro",
-      "petalo_blanco",
-      "petalo_amarillo",
-      "petalo_morado"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/hongos.glb",
-    "categoria": "flores_suelo",
-    "nombre": "hongos",
-    "medidas_m": {
-      "ancho": 0.73,
-      "fondo": 0.51,
-      "alto": 0.41
-    },
-    "triangulos": 540,
-    "materiales": [
-      "hongo_pie",
-      "hongo_rojo",
-      "lana"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/tronco_caido.glb",
-    "categoria": "flores_suelo",
-    "nombre": "tronco_caido",
-    "medidas_m": {
-      "ancho": 3.27,
-      "fondo": 0.86,
-      "alto": 0.83
-    },
-    "triangulos": 104,
-    "materiales": [
-      "tronco",
-      "crema",
-      "musgo"
-    ]
-  },
-  {
-    "archivo": "03_flores_suelo/tocon.glb",
-    "categoria": "flores_suelo",
-    "nombre": "tocon",
-    "medidas_m": {
-      "ancho": 1.16,
-      "fondo": 1.25,
-      "alto": 0.58
-    },
-    "triangulos": 84,
-    "materiales": [
-      "tronco",
-      "crema",
-      "musgo"
-    ]
-  },
-  {
-    "archivo": "04_animales/conejo_v1.glb",
-    "categoria": "animales",
-    "nombre": "conejo_v1",
-    "medidas_m": {
-      "ancho": 0.44,
-      "fondo": 0.75,
-      "alto": 0.73
-    },
-    "triangulos": 380,
-    "materiales": [
-      "pelaje_gris",
-      "lana",
-      "negro",
-      "rosa"
-    ]
-  },
-  {
-    "archivo": "04_animales/conejo_v2.glb",
-    "categoria": "animales",
-    "nombre": "conejo_v2",
-    "medidas_m": {
-      "ancho": 0.44,
-      "fondo": 0.75,
-      "alto": 0.73
-    },
-    "triangulos": 380,
-    "materiales": [
-      "pelaje_claro",
-      "lana",
-      "negro",
-      "rosa"
-    ]
-  },
-  {
-    "archivo": "04_animales/ciervo.glb",
-    "categoria": "animales",
-    "nombre": "ciervo",
-    "medidas_m": {
-      "ancho": 0.64,
-      "fondo": 1.67,
-      "alto": 2.03
-    },
-    "triangulos": 592,
-    "materiales": [
-      "pelaje_marron",
-      "pelaje_claro",
-      "lana",
-      "negro",
-      "cuerno"
-    ]
-  },
-  {
-    "archivo": "04_animales/zorro.glb",
-    "categoria": "animales",
-    "nombre": "zorro",
-    "medidas_m": {
-      "ancho": 0.36,
-      "fondo": 1.45,
-      "alto": 0.74
-    },
-    "triangulos": 566,
-    "materiales": [
-      "zorro",
-      "lana",
-      "negro"
-    ]
-  },
-  {
-    "archivo": "04_animales/oveja.glb",
-    "categoria": "animales",
-    "nombre": "oveja",
-    "medidas_m": {
-      "ancho": 0.84,
-      "fondo": 1.02,
-      "alto": 1.04
-    },
-    "triangulos": 800,
-    "materiales": [
-      "lana",
-      "negro"
-    ]
-  },
-  {
-    "archivo": "04_animales/pato.glb",
-    "categoria": "animales",
-    "nombre": "pato",
-    "medidas_m": {
-      "ancho": 0.51,
-      "fondo": 0.85,
-      "alto": 0.57
-    },
-    "triangulos": 408,
-    "materiales": [
-      "pato",
-      "pato_verde",
-      "pico",
-      "negro",
-      "pelaje_gris"
-    ]
-  },
-  {
-    "archivo": "05_aves_insectos/ave_azul.glb",
-    "categoria": "aves_insectos",
-    "nombre": "ave_azul",
-    "medidas_m": {
-      "ancho": 0.79,
-      "fondo": 0.59,
-      "alto": 0.39
-    },
-    "triangulos": 372,
-    "materiales": [
-      "ave_azul",
-      "lana",
-      "pico",
-      "negro"
-    ]
-  },
-  {
-    "archivo": "05_aves_insectos/ave_roja.glb",
-    "categoria": "aves_insectos",
-    "nombre": "ave_roja",
-    "medidas_m": {
-      "ancho": 0.79,
-      "fondo": 0.59,
-      "alto": 0.39
-    },
-    "triangulos": 372,
-    "materiales": [
-      "ave_roja",
-      "lana",
-      "pico",
-      "negro"
-    ]
-  },
-  {
-    "archivo": "05_aves_insectos/ave_amarilla.glb",
-    "categoria": "aves_insectos",
-    "nombre": "ave_amarilla",
-    "medidas_m": {
-      "ancho": 0.79,
-      "fondo": 0.59,
-      "alto": 0.39
-    },
-    "triangulos": 372,
-    "materiales": [
-      "ave_amarilla",
-      "lana",
-      "pico",
-      "negro"
-    ]
-  },
-  {
-    "archivo": "05_aves_insectos/mariposa_v1.glb",
-    "categoria": "aves_insectos",
-    "nombre": "mariposa_v1",
-    "medidas_m": {
-      "ancho": 0.31,
-      "fondo": 0.19,
-      "alto": 0.02
-    },
-    "triangulos": 100,
-    "materiales": [
-      "negro",
-      "petalo_naranja"
-    ]
-  },
-  {
-    "archivo": "05_aves_insectos/mariposa_v2.glb",
-    "categoria": "aves_insectos",
-    "nombre": "mariposa_v2",
-    "medidas_m": {
-      "ancho": 0.31,
-      "fondo": 0.19,
-      "alto": 0.02
-    },
-    "triangulos": 100,
-    "materiales": [
-      "negro",
-      "petalo_rosa"
-    ]
-  },
-  {
-    "archivo": "05_aves_insectos/mariposa_v3.glb",
-    "categoria": "aves_insectos",
-    "nombre": "mariposa_v3",
-    "medidas_m": {
-      "ancho": 0.31,
-      "fondo": 0.19,
-      "alto": 0.02
-    },
-    "triangulos": 100,
-    "materiales": [
-      "negro",
-      "ave_azul"
-    ]
-  },
-  {
-    "archivo": "06_rocas_cielo/roca_v1.glb",
-    "categoria": "rocas_cielo",
-    "nombre": "roca_v1",
-    "medidas_m": {
-      "ancho": 2.67,
-      "fondo": 1.79,
-      "alto": 1.72
-    },
-    "triangulos": 36,
-    "materiales": [
-      "roca",
-      "musgo",
-      "roca_claro"
-    ]
-  },
-  {
-    "archivo": "06_rocas_cielo/roca_v2.glb",
-    "categoria": "rocas_cielo",
-    "nombre": "roca_v2",
-    "medidas_m": {
-      "ancho": 2.45,
-      "fondo": 2.12,
-      "alto": 1.7
-    },
-    "triangulos": 36,
-    "materiales": [
-      "musgo",
-      "roca",
-      "roca_claro"
-    ]
-  },
-  {
-    "archivo": "06_rocas_cielo/roca_v3.glb",
-    "categoria": "rocas_cielo",
-    "nombre": "roca_v3",
-    "medidas_m": {
-      "ancho": 2.7,
-      "fondo": 2.08,
-      "alto": 1.44
-    },
-    "triangulos": 36,
-    "materiales": [
-      "musgo",
-      "roca_claro",
-      "roca"
-    ]
-  },
-  {
-    "archivo": "06_rocas_cielo/roca_v4.glb",
-    "categoria": "rocas_cielo",
-    "nombre": "roca_v4",
-    "medidas_m": {
-      "ancho": 2.85,
-      "fondo": 1.93,
-      "alto": 1.71
-    },
-    "triangulos": 36,
-    "materiales": [
-      "roca",
-      "roca_claro",
-      "musgo"
-    ]
-  },
-  {
-    "archivo": "06_rocas_cielo/nube_v1.glb",
-    "categoria": "rocas_cielo",
-    "nombre": "nube_v1",
-    "medidas_m": {
-      "ancho": 5.9,
-      "fondo": 2.52,
-      "alto": 2.4
-    },
-    "triangulos": 400,
-    "materiales": [
-      "nube"
-    ]
-  },
-  {
-    "archivo": "06_rocas_cielo/nube_v2.glb",
-    "categoria": "rocas_cielo",
-    "nombre": "nube_v2",
-    "medidas_m": {
-      "ancho": 5.9,
-      "fondo": 2.52,
-      "alto": 2.4
-    },
-    "triangulos": 400,
-    "materiales": [
-      "nube"
-    ]
-  },
-  {
-    "archivo": "07_casas_tematicas/casa_polimotor.glb",
-    "categoria": "casas_tematicas",
-    "nombre": "casa_polimotor",
-    "medidas_m": {
-      "ancho": 9.31,
-      "fondo": 10.03,
-      "alto": 4.81
-    },
-    "triangulos": 2094,
-    "materiales": [
-      "piedra",
-      "crema",
-      "naranja",
-      "madera_oscura",
-      "oro",
-      "vidrio",
-      "amarillo",
-      "blanco",
-      "letrero_polimotor",
-      "lima",
-      "morado",
-      "turquesa",
-      "magenta",
-      "madera"
-    ]
-  },
-  {
-    "archivo": "07_casas_tematicas/casa_expresion_artistica.glb",
-    "categoria": "casas_tematicas",
-    "nombre": "casa_expresion_artistica",
-    "medidas_m": {
-      "ancho": 7.82,
-      "fondo": 7.59,
-      "alto": 6.37
-    },
-    "triangulos": 1590,
-    "materiales": [
-      "piedra",
-      "blanco",
-      "morado",
-      "madera_oscura",
-      "oro",
-      "vidrio",
-      "magenta",
-      "letrero_expresion_artistica",
-      "amarillo",
-      "turquesa",
-      "naranja",
-      "lima",
-      "celeste",
-      "crema",
-      "negro",
-      "gris_claro",
-      "madera",
-      "ave_roja",
-      "",
-      "petalo_rosa",
-      "hoja",
-      "petalo_naranja",
-      "petalo_rojo",
-      "petalo_morado"
-    ]
-  },
-  {
-    "archivo": "07_casas_tematicas/casa_multisaberes.glb",
-    "categoria": "casas_tematicas",
-    "nombre": "casa_multisaberes",
-    "medidas_m": {
-      "ancho": 8.45,
-      "fondo": 9.1,
-      "alto": 7.32
-    },
-    "triangulos": 1516,
-    "materiales": [
-      "piedra",
-      "crema",
-      "turquesa",
-      "madera_oscura",
-      "oro",
-      "vidrio",
-      "blanco",
-      "letrero_multisaberes",
-      "gris_claro",
-      "gris_tec",
-      "ave_roja",
-      "amarillo",
-      "morado",
-      "ave_azul",
-      "madera",
-      "celeste",
-      "lima"
-    ]
-  },
-  {
-    "archivo": "07_casas_tematicas/casa_multisensorial.glb",
-    "categoria": "casas_tematicas",
-    "nombre": "casa_multisensorial",
-    "medidas_m": {
-      "ancho": 10.43,
-      "fondo": 9.65,
-      "alto": 3.9
-    },
-    "triangulos": 2190,
-    "materiales": [
-      "piedra",
-      "durazno",
-      "menta",
-      "crema",
-      "celeste",
-      "lavanda",
-      "vidrio",
-      "blanco",
-      "morado",
-      "madera_oscura",
-      "oro",
-      "letrero_multisensorial",
-      "arena",
-      "musgo",
-      "madera",
-      "lana",
-      "gris_tec",
-      "gris_claro",
-      "agua",
-      "",
-      "petalo_rosa",
-      "hoja",
-      "petalo_naranja",
-      "petalo_rojo",
-      "petalo_morado"
-    ]
-  },
-  {
-    "archivo": "07_casas_tematicas/casa_tecnologia.glb",
-    "categoria": "casas_tematicas",
-    "nombre": "casa_tecnologia",
-    "medidas_m": {
-      "ancho": 8.58,
-      "fondo": 7.26,
-      "alto": 6.5
-    },
-    "triangulos": 746,
-    "materiales": [
-      "gris_tec",
-      "gris_claro",
-      "vidrio",
-      "neon",
-      "blanco",
-      "panel_solar",
-      "metal",
-      "pantalla",
-      "letrero_tecnologia",
-      "negro"
-    ]
-  },
-  {
-    "archivo": "08_edificios/casa_refugio.glb",
-    "categoria": "edificios",
-    "nombre": "casa_refugio",
-    "medidas_m": {
-      "ancho": 6.2,
-      "fondo": 5.3,
-      "alto": 5.04
-    },
-    "triangulos": 670,
-    "materiales": [
-      "piedra",
-      "pared",
-      "madera",
-      "madera_oscura",
-      "techo",
-      "ladrillo",
-      "vidrio",
-      "",
-      "petalo_rosa",
-      "hoja",
-      "petalo_naranja",
-      "petalo_rojo",
-      "petalo_morado",
-      "blanco"
-    ]
-  },
-  {
-    "archivo": "08_edificios/carpa.glb",
-    "categoria": "edificios",
-    "nombre": "carpa",
-    "medidas_m": {
-      "ancho": 5.6,
-      "fondo": 5.83,
-      "alto": 4.68
-    },
-    "triangulos": 198,
-    "materiales": [
-      "lona_pared",
-      "lona_blanca",
-      "lona_roja",
-      "lona_verde",
-      "madera_oscura",
-      "madera",
-      "blanco",
-      "techo"
-    ]
-  },
-  {
-    "archivo": "09_camino_agua/camino_recto_8m.glb",
-    "categoria": "camino_agua",
-    "nombre": "camino_recto_8m",
-    "medidas_m": {
-      "ancho": 3.72,
-      "fondo": 8.08,
-      "alto": 0.2
-    },
-    "triangulos": 612,
-    "materiales": [
-      "camino",
-      "roca_oscura",
-      "roca"
-    ]
-  },
-  {
-    "archivo": "09_camino_agua/camino_curvo_90.glb",
-    "categoria": "camino_agua",
-    "nombre": "camino_curvo_90",
-    "medidas_m": {
-      "ancho": 8.34,
-      "fondo": 8.29,
-      "alto": 0.2
-    },
-    "triangulos": 1064,
-    "materiales": [
-      "camino",
-      "roca",
-      "roca_oscura"
-    ]
-  },
-  {
-    "archivo": "09_camino_agua/lago_v1.glb",
-    "categoria": "camino_agua",
-    "nombre": "lago_v1",
-    "medidas_m": {
-      "ancho": 13.94,
-      "fondo": 11.63,
-      "alto": 0.1
-    },
-    "triangulos": 80,
-    "materiales": [
-      "arena",
-      "agua"
-    ]
-  },
-  {
-    "archivo": "09_camino_agua/lago_v2.glb",
-    "categoria": "camino_agua",
-    "nombre": "lago_v2",
-    "medidas_m": {
-      "ancho": 14.16,
-      "fondo": 9.98,
-      "alto": 0.1
-    },
-    "triangulos": 80,
-    "materiales": [
-      "arena",
-      "agua"
-    ]
-  },
-  {
-    "archivo": "10_props/marcador_nivel.glb",
-    "categoria": "props",
-    "nombre": "marcador_nivel",
-    "medidas_m": {
-      "ancho": 1,
-      "fondo": 0.18,
-      "alto": 2.55
-    },
-    "triangulos": 152,
-    "materiales": [
-      "madera_oscura",
-      "oro",
-      "oro_claro"
-    ]
-  },
-  {
-    "archivo": "10_props/banca.glb",
-    "categoria": "props",
-    "nombre": "banca",
-    "medidas_m": {
-      "ancho": 1.7,
-      "fondo": 0.53,
-      "alto": 1
-    },
-    "triangulos": 108,
-    "materiales": [
-      "madera",
-      "madera_oscura"
-    ]
-  },
-  {
-    "archivo": "10_props/farola.glb",
-    "categoria": "props",
-    "nombre": "farola",
-    "medidas_m": {
-      "ancho": 0.48,
-      "fondo": 0.48,
-      "alto": 1.98
-    },
-    "triangulos": 152,
-    "materiales": [
-      "metal",
-      "luz"
-    ]
-  },
-  {
-    "archivo": "10_props/valla_3m.glb",
-    "categoria": "props",
-    "nombre": "valla_3m",
-    "medidas_m": {
-      "ancho": 3.3,
-      "fondo": 0.19,
-      "alto": 1.05
-    },
-    "triangulos": 60,
-    "materiales": [
-      "madera"
-    ]
-  },
-  {
-    "archivo": "10_props/jardinera.glb",
-    "categoria": "props",
-    "nombre": "jardinera",
-    "medidas_m": {
-      "ancho": 1.2,
-      "fondo": 0.28,
-      "alto": 0.32
-    },
-    "triangulos": 164,
-    "materiales": [
-      "madera",
-      "",
-      "petalo_rosa",
-      "hoja",
-      "petalo_naranja",
-      "petalo_rojo",
-      "petalo_morado"
-    ]
-  }
-]
+{
+  "nombre": "Kit low-poly Valledupar",
+  "version": "2.1",
+  "generado": "2026-10-02T16:02:59.717Z",
+  "unidades": "metros",
+  "eje_arriba": "+Y",
+  "frente": "+Z",
+  "formato": "glb",
+  "total": 77,
+  "categorias": [
+    {
+      "nombre": "Relieve",
+      "cantidad": 4
+    },
+    {
+      "nombre": "Vegetación",
+      "cantidad": 7
+    },
+    {
+      "nombre": "Flores y suelo",
+      "cantidad": 9
+    },
+    {
+      "nombre": "Animales",
+      "cantidad": 9
+    },
+    {
+      "nombre": "Aves, insectos y peces",
+      "cantidad": 9
+    },
+    {
+      "nombre": "Rocas y cielo",
+      "cantidad": 2
+    },
+    {
+      "nombre": "Casas temáticas",
+      "cantidad": 5
+    },
+    {
+      "nombre": "Estaciones",
+      "cantidad": 15
+    },
+    {
+      "nombre": "Zonas de juegos",
+      "cantidad": 5
+    },
+    {
+      "nombre": "Edificios",
+      "cantidad": 2
+    },
+    {
+      "nombre": "Camino y agua",
+      "cantidad": 5
+    },
+    {
+      "nombre": "Props",
+      "cantidad": 5
+    }
+  ],
+  "mundo": {
+    "nota": "El mapa completo, el terreno y los caminos tal como están en el Escenario se descargan con el botón \"Exportar mundo\" de Escenario.html: mundo_completo.glb, terreno.glb y caminos_y_plazas.glb."
+  },
+  "modelos": [
+    {
+      "id": "cerro_serrania",
+      "nombre": "Cerro serrania",
+      "categoria": "Relieve",
+      "archivo": "01_relieve/cerro_serrania.glb",
+      "tamano_m": {
+        "ancho": 48.89,
+        "alto": 16.075,
+        "fondo": 49.243
+      },
+      "bbox_min": [
+        -24.55,
+        0,
+        -24.44
+      ],
+      "bbox_max": [
+        24.34,
+        16.075,
+        24.803
+      ],
+      "triangulos": 1230,
+      "mallas": 21,
+      "materiales": [
+        "hoja_oscura",
+        "mango_hoja",
+        "montana",
+        "montana_azul",
+        "montana_claro",
+        "pasto",
+        "roca"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "cordillera",
+      "nombre": "Cordillera",
+      "categoria": "Relieve",
+      "archivo": "01_relieve/cordillera.glb",
+      "tamano_m": {
+        "ancho": 86.7,
+        "alto": 18.107,
+        "fondo": 62.728
+      },
+      "bbox_min": [
+        -45.34,
+        0,
+        -35.257
+      ],
+      "bbox_max": [
+        41.36,
+        18.107,
+        27.471
+      ],
+      "triangulos": 4920,
+      "mallas": 84,
+      "materiales": [
+        "hoja_oscura",
+        "mango_hoja",
+        "montana",
+        "montana_azul",
+        "montana_claro",
+        "pasto",
+        "roca"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "colinas",
+      "nombre": "Colinas",
+      "categoria": "Relieve",
+      "archivo": "01_relieve/colinas.glb",
+      "tamano_m": {
+        "ancho": 29.785,
+        "alto": 3.291,
+        "fondo": 18.877
+      },
+      "bbox_min": [
+        -15.11,
+        0,
+        -9.63
+      ],
+      "bbox_max": [
+        14.675,
+        3.291,
+        9.247
+      ],
+      "triangulos": 189,
+      "mallas": 9,
+      "materiales": [
+        "pasto",
+        "pasto_claro",
+        "pasto_oscuro"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "terreno_tile_20m",
+      "nombre": "Terreno tile 20m",
+      "categoria": "Relieve",
+      "archivo": "01_relieve/terreno_tile_20m.glb",
+      "tamano_m": {
+        "ancho": 20,
+        "alto": 0.602,
+        "fondo": 20
+      },
+      "bbox_min": [
+        -10,
+        -0.143,
+        -10
+      ],
+      "bbox_max": [
+        10,
+        0.459,
+        10
+      ],
+      "triangulos": 2094,
+      "mallas": 5,
+      "materiales": [
+        "cesped",
+        "pasto_mata",
+        "petalo_amarillo",
+        "petalo_blanco",
+        "petalo_rosa"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "canaguate",
+      "nombre": "Canaguate",
+      "categoria": "Vegetación",
+      "archivo": "02_vegetacion/canaguate.glb",
+      "tamano_m": {
+        "ancho": 4.4,
+        "alto": 5.563,
+        "fondo": 3.9
+      },
+      "bbox_min": [
+        -2.2,
+        0,
+        -1.95
+      ],
+      "bbox_max": [
+        2.2,
+        5.563,
+        1.95
+      ],
+      "triangulos": 704,
+      "mallas": 11,
+      "materiales": [
+        "flor_canaguate",
+        "flor_canaguate_clara",
+        "hoja",
+        "tronco"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "mango",
+      "nombre": "Mango",
+      "categoria": "Vegetación",
+      "archivo": "02_vegetacion/mango.glb",
+      "tamano_m": {
+        "ancho": 5.45,
+        "alto": 5.06,
+        "fondo": 5.15
+      },
+      "bbox_min": [
+        -2.75,
+        0,
+        -2.6
+      ],
+      "bbox_max": [
+        2.7,
+        5.06,
+        2.55
+      ],
+      "triangulos": 1068,
+      "mallas": 14,
+      "materiales": [
+        "mango_fruta",
+        "mango_hoja",
+        "mango_hoja_oscura",
+        "tronco"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "ceiba",
+      "nombre": "Ceiba",
+      "categoria": "Vegetación",
+      "archivo": "02_vegetacion/ceiba.glb",
+      "tamano_m": {
+        "ancho": 7.3,
+        "alto": 7.708,
+        "fondo": 7.1
+      },
+      "bbox_min": [
+        -3.7,
+        0,
+        -3.6
+      ],
+      "bbox_max": [
+        3.6,
+        7.708,
+        3.5
+      ],
+      "triangulos": 552,
+      "mallas": 15,
+      "materiales": [
+        "ceiba_tronco",
+        "hoja",
+        "hoja_oscura"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "palma_coco",
+      "nombre": "Palma coco",
+      "categoria": "Vegetación",
+      "archivo": "02_vegetacion/palma_coco.glb",
+      "tamano_m": {
+        "ancho": 3.484,
+        "alto": 5.88,
+        "fondo": 3.941
+      },
+      "bbox_min": [
+        -0.869,
+        -0.03,
+        -1.961
+      ],
+      "bbox_max": [
+        2.614,
+        5.85,
+        1.98
+      ],
+      "triangulos": 676,
+      "mallas": 19,
+      "materiales": [
+        "coco",
+        "palma_hoja",
+        "palma_tronco",
+        "tronco"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "platanera",
+      "nombre": "Platanera",
+      "categoria": "Vegetación",
+      "archivo": "02_vegetacion/platanera.glb",
+      "tamano_m": {
+        "ancho": 3.514,
+        "alto": 2.399,
+        "fondo": 3.423
+      },
+      "bbox_min": [
+        -1.773,
+        0,
+        -1.704
+      ],
+      "bbox_max": [
+        1.741,
+        2.399,
+        1.719
+      ],
+      "triangulos": 472,
+      "mallas": 25,
+      "materiales": [
+        "petalo_morado",
+        "platano_fruta",
+        "platano_hoja",
+        "platano_tallo"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "cardon_cactus",
+      "nombre": "Cardon cactus",
+      "categoria": "Vegetación",
+      "archivo": "02_vegetacion/cardon_cactus.glb",
+      "tamano_m": {
+        "ancho": 1.472,
+        "alto": 2.48,
+        "fondo": 0.6
+      },
+      "bbox_min": [
+        -0.736,
+        0,
+        -0.305
+      ],
+      "bbox_max": [
+        0.736,
+        2.48,
+        0.295
+      ],
+      "triangulos": 464,
+      "mallas": 9,
+      "materiales": [
+        "cactus",
+        "cactus_flor"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "arbusto",
+      "nombre": "Arbusto",
+      "categoria": "Vegetación",
+      "archivo": "02_vegetacion/arbusto.glb",
+      "tamano_m": {
+        "ancho": 2.1,
+        "alto": 1.19,
+        "fondo": 1.4
+      },
+      "bbox_min": [
+        -1,
+        -0.095,
+        -0.7
+      ],
+      "bbox_max": [
+        1.1,
+        1.095,
+        0.7
+      ],
+      "triangulos": 240,
+      "mallas": 3,
+      "materiales": [
+        "arbusto",
+        "hoja"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "margarita",
+      "nombre": "Margarita",
+      "categoria": "Flores y suelo",
+      "archivo": "03_flores_y_suelo/margarita.glb",
+      "tamano_m": {
+        "ancho": 0.365,
+        "alto": 0.452,
+        "fondo": 0.274
+      },
+      "bbox_min": [
+        -0.175,
+        0,
+        -0.137
+      ],
+      "bbox_max": [
+        0.19,
+        0.452,
+        0.137
+      ],
+      "triangulos": 240,
+      "mallas": 11,
+      "materiales": [
+        "centro",
+        "petalo_blanco",
+        "tallo"
+      ],
+      "animaciones": [],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.42,
+          0
+        ]
+      }
+    },
+    {
+      "id": "tulipan",
+      "nombre": "Tulipan",
+      "categoria": "Flores y suelo",
+      "archivo": "03_flores_y_suelo/tulipan.glb",
+      "tamano_m": {
+        "ancho": 0.365,
+        "alto": 0.775,
+        "fondo": 0.184
+      },
+      "bbox_min": [
+        -0.175,
+        0,
+        -0.092
+      ],
+      "bbox_max": [
+        0.19,
+        0.775,
+        0.092
+      ],
+      "triangulos": 108,
+      "mallas": 7,
+      "materiales": [
+        "petalo_rosa",
+        "tallo"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "girasol",
+      "nombre": "Girasol",
+      "categoria": "Flores y suelo",
+      "archivo": "03_flores_y_suelo/girasol.glb",
+      "tamano_m": {
+        "ancho": 0.781,
+        "alto": 1.84,
+        "fondo": 0.456
+      },
+      "bbox_min": [
+        -0.39,
+        0,
+        -0.228
+      ],
+      "bbox_max": [
+        0.39,
+        1.84,
+        0.228
+      ],
+      "triangulos": 360,
+      "mallas": 17,
+      "materiales": [
+        "centro_oscuro",
+        "petalo_amarillo",
+        "tallo"
+      ],
+      "animaciones": [],
+      "nodos": {
+        "cabeza": [
+          0,
+          1.5,
+          0
+        ]
+      }
+    },
+    {
+      "id": "campanula",
+      "nombre": "Campanula",
+      "categoria": "Flores y suelo",
+      "archivo": "03_flores_y_suelo/campanula.glb",
+      "tamano_m": {
+        "ancho": 0.365,
+        "alto": 0.57,
+        "fondo": 0.22
+      },
+      "bbox_min": [
+        -0.175,
+        0,
+        -0.1
+      ],
+      "bbox_max": [
+        0.19,
+        0.57,
+        0.12
+      ],
+      "triangulos": 132,
+      "mallas": 6,
+      "materiales": [
+        "petalo_morado",
+        "tallo"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "silvestre",
+      "nombre": "Silvestre",
+      "categoria": "Flores y suelo",
+      "archivo": "03_flores_y_suelo/silvestre.glb",
+      "tamano_m": {
+        "ancho": 0.365,
+        "alto": 0.473,
+        "fondo": 0.265
+      },
+      "bbox_min": [
+        -0.175,
+        0,
+        -0.132
+      ],
+      "bbox_max": [
+        0.19,
+        0.473,
+        0.132
+      ],
+      "triangulos": 240,
+      "mallas": 11,
+      "materiales": [
+        "centro",
+        "petalo_naranja",
+        "tallo"
+      ],
+      "animaciones": [],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.42,
+          0
+        ]
+      }
+    },
+    {
+      "id": "macizo_flores",
+      "nombre": "Macizo flores",
+      "categoria": "Flores y suelo",
+      "archivo": "03_flores_y_suelo/macizo_flores.glb",
+      "tamano_m": {
+        "ancho": 2.025,
+        "alto": 1.121,
+        "fondo": 1.353
+      },
+      "bbox_min": [
+        -1.145,
+        -0.125,
+        -0.673
+      ],
+      "bbox_max": [
+        0.88,
+        0.996,
+        0.68
+      ],
+      "triangulos": 2400,
+      "mallas": 108,
+      "materiales": [
+        "arbusto",
+        "centro",
+        "hoja",
+        "petalo_amarillo",
+        "petalo_blanco",
+        "petalo_morado",
+        "petalo_naranja",
+        "petalo_rojo",
+        "petalo_rosa",
+        "tallo"
+      ],
+      "animaciones": [],
+      "nodos": {
+        "cabeza": [
+          -0.788,
+          0.592,
+          0.047
+        ]
+      }
+    },
+    {
+      "id": "hongos",
+      "nombre": "Hongos",
+      "categoria": "Flores y suelo",
+      "archivo": "03_flores_y_suelo/hongos.glb",
+      "tamano_m": {
+        "ancho": 0.733,
+        "alto": 0.415,
+        "fondo": 0.51
+      },
+      "bbox_min": [
+        -0.31,
+        0,
+        -0.22
+      ],
+      "bbox_max": [
+        0.423,
+        0.415,
+        0.29
+      ],
+      "triangulos": 540,
+      "mallas": 21,
+      "materiales": [
+        "hongo_pie",
+        "hongo_rojo",
+        "lana"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "tronco_caido",
+      "nombre": "Tronco caido",
+      "categoria": "Flores y suelo",
+      "archivo": "03_flores_y_suelo/tronco_caido.glb",
+      "tamano_m": {
+        "ancho": 3.251,
+        "alto": 0.816,
+        "fondo": 0.763
+      },
+      "bbox_min": [
+        -1.612,
+        -0.026,
+        -0.38
+      ],
+      "bbox_max": [
+        1.639,
+        0.789,
+        0.383
+      ],
+      "triangulos": 104,
+      "mallas": 4,
+      "materiales": [
+        "crema",
+        "musgo",
+        "tronco"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "tocon",
+      "nombre": "Tocon",
+      "categoria": "Flores y suelo",
+      "archivo": "03_flores_y_suelo/tocon.glb",
+      "tamano_m": {
+        "ancho": 1.201,
+        "alto": 0.588,
+        "fondo": 1.152
+      },
+      "bbox_min": [
+        -0.575,
+        0,
+        -0.566
+      ],
+      "bbox_max": [
+        0.626,
+        0.588,
+        0.587
+      ],
+      "triangulos": 84,
+      "mallas": 3,
+      "materiales": [
+        "crema",
+        "musgo",
+        "tronco"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "vaca_cebu",
+      "nombre": "Vaca cebu",
+      "categoria": "Animales",
+      "archivo": "04_animales/vaca_cebu.glb",
+      "tamano_m": {
+        "ancho": 0.902,
+        "alto": 1.627,
+        "fondo": 2.407
+      },
+      "bbox_min": [
+        -0.451,
+        0,
+        -1
+      ],
+      "bbox_max": [
+        0.451,
+        1.627,
+        1.407
+      ],
+      "triangulos": 3664,
+      "mallas": 37,
+      "materiales": [
+        "cuerno",
+        "negro",
+        "vaca_blanca",
+        "vaca_hocico"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 5
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 5
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          1.36,
+          0.98
+        ],
+        "cola_pivote": [
+          0,
+          1.12,
+          -0.74
+        ]
+      }
+    },
+    {
+      "id": "burro",
+      "nombre": "Burro",
+      "categoria": "Animales",
+      "archivo": "04_animales/burro.glb",
+      "tamano_m": {
+        "ancho": 0.655,
+        "alto": 1.702,
+        "fondo": 1.908
+      },
+      "bbox_min": [
+        -0.328,
+        -0.01,
+        -0.76
+      ],
+      "bbox_max": [
+        0.328,
+        1.692,
+        1.148
+      ],
+      "triangulos": 4200,
+      "mallas": 42,
+      "materiales": [
+        "burro_claro",
+        "burro_gris",
+        "negro"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 5
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 5
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          1.3,
+          0.74
+        ],
+        "cola_pivote": [
+          0,
+          0.96,
+          -0.55
+        ]
+      }
+    },
+    {
+      "id": "gallina",
+      "nombre": "Gallina",
+      "categoria": "Animales",
+      "archivo": "04_animales/gallina.glb",
+      "tamano_m": {
+        "ancho": 0.402,
+        "alto": 0.76,
+        "fondo": 0.711
+      },
+      "bbox_min": [
+        -0.201,
+        0.004,
+        -0.376
+      ],
+      "bbox_max": [
+        0.201,
+        0.764,
+        0.335
+      ],
+      "triangulos": 2432,
+      "mallas": 25,
+      "materiales": [
+        "cresta",
+        "gallina_criolla",
+        "negro",
+        "pico"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "picotear",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.6,
+          0.17
+        ],
+        "cola_pivote": [
+          0,
+          0.52,
+          -0.2
+        ]
+      }
+    },
+    {
+      "id": "iguana",
+      "nombre": "Iguana",
+      "categoria": "Animales",
+      "archivo": "04_animales/iguana.glb",
+      "tamano_m": {
+        "ancho": 0.556,
+        "alto": 0.276,
+        "fondo": 2.175
+      },
+      "bbox_min": [
+        -0.278,
+        -0.016,
+        -1.6
+      ],
+      "bbox_max": [
+        0.278,
+        0.26,
+        0.575
+      ],
+      "triangulos": 5500,
+      "mallas": 54,
+      "materiales": [
+        "iguana",
+        "iguana_oscura",
+        "iguana_papada",
+        "negro"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 8
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 6
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.17,
+          0.4
+        ],
+        "cola_pivote": [
+          0,
+          0.11,
+          -0.24
+        ]
+      }
+    },
+    {
+      "id": "garza",
+      "nombre": "Garza",
+      "categoria": "Animales",
+      "archivo": "04_animales/garza.glb",
+      "tamano_m": {
+        "ancho": 0.329,
+        "alto": 1.547,
+        "fondo": 1.032
+      },
+      "bbox_min": [
+        -0.165,
+        0.007,
+        -0.462
+      ],
+      "bbox_max": [
+        0.165,
+        1.554,
+        0.57
+      ],
+      "triangulos": 2572,
+      "mallas": 26,
+      "materiales": [
+        "garza",
+        "negro",
+        "pata_garza",
+        "pico"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          1.5,
+          0.27
+        ],
+        "cola_pivote": [
+          0,
+          0.95,
+          -0.3
+        ]
+      }
+    },
+    {
+      "id": "conejo",
+      "nombre": "Conejo",
+      "categoria": "Animales",
+      "archivo": "04_animales/conejo.glb",
+      "tamano_m": {
+        "ancho": 0.44,
+        "alto": 0.64,
+        "fondo": 0.676
+      },
+      "bbox_min": [
+        -0.22,
+        0.007,
+        -0.288
+      ],
+      "bbox_max": [
+        0.22,
+        0.647,
+        0.389
+      ],
+      "triangulos": 380,
+      "mallas": 10,
+      "materiales": [
+        "negro",
+        "pelaje_gris",
+        "rosa"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 5
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.4,
+          0.22
+        ],
+        "cola_pivote": [
+          0,
+          0.258,
+          -0.217
+        ]
+      }
+    },
+    {
+      "id": "zorro",
+      "nombre": "Zorro",
+      "categoria": "Animales",
+      "archivo": "04_animales/zorro.glb",
+      "tamano_m": {
+        "ancho": 0.36,
+        "alto": 0.744,
+        "fondo": 1.444
+      },
+      "bbox_min": [
+        -0.18,
+        -0.004,
+        -0.819
+      ],
+      "bbox_max": [
+        0.18,
+        0.74,
+        0.625
+      ],
+      "triangulos": 3512,
+      "mallas": 34,
+      "materiales": [
+        "lana",
+        "negro",
+        "zorro"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 5
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 5
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.53,
+          0.35
+        ],
+        "cola_pivote": [
+          0,
+          0.42,
+          -0.28
+        ]
+      }
+    },
+    {
+      "id": "oveja",
+      "nombre": "Oveja",
+      "categoria": "Animales",
+      "archivo": "04_animales/oveja.glb",
+      "tamano_m": {
+        "ancho": 0.833,
+        "alto": 1.023,
+        "fondo": 1.035
+      },
+      "bbox_min": [
+        -0.43,
+        0,
+        -0.466
+      ],
+      "bbox_max": [
+        0.403,
+        1.023,
+        0.569
+      ],
+      "triangulos": 800,
+      "mallas": 16,
+      "materiales": [
+        "lana",
+        "negro"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 4
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.66,
+          0.4
+        ]
+      }
+    },
+    {
+      "id": "pato",
+      "nombre": "Pato",
+      "categoria": "Animales",
+      "archivo": "04_animales/pato.glb",
+      "tamano_m": {
+        "ancho": 0.456,
+        "alto": 0.573,
+        "fondo": 0.8
+      },
+      "bbox_min": [
+        -0.228,
+        0.005,
+        -0.35
+      ],
+      "bbox_max": [
+        0.228,
+        0.578,
+        0.45
+      ],
+      "triangulos": 408,
+      "mallas": 9,
+      "materiales": [
+        "negro",
+        "pato",
+        "pato_verde",
+        "pelaje_gris",
+        "pico"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 1
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "volar",
+          "duracion_s": 0.5,
+          "loop": true,
+          "pistas": 2
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.47,
+          0.24
+        ],
+        "cola_pivote": [
+          0,
+          0.255,
+          -0.24
+        ]
+      }
+    },
+    {
+      "id": "guacamaya",
+      "nombre": "Guacamaya",
+      "categoria": "Aves, insectos y peces",
+      "archivo": "05_aves_insectos_peces/guacamaya.glb",
+      "tamano_m": {
+        "ancho": 0.927,
+        "alto": 0.312,
+        "fondo": 0.85
+      },
+      "bbox_min": [
+        -0.464,
+        0.078,
+        -0.535
+      ],
+      "bbox_max": [
+        0.464,
+        0.39,
+        0.315
+      ],
+      "triangulos": 392,
+      "mallas": 12,
+      "materiales": [
+        "blanco",
+        "guaca_amarilla",
+        "guaca_azul",
+        "guaca_roja",
+        "negro"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 1
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "volar",
+          "duracion_s": 0.5,
+          "loop": true,
+          "pistas": 2
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.3,
+          0.15
+        ],
+        "cola_pivote": [
+          0,
+          0.165,
+          -0.255
+        ]
+      }
+    },
+    {
+      "id": "ave_azul",
+      "nombre": "Ave azul",
+      "categoria": "Aves, insectos y peces",
+      "archivo": "05_aves_insectos_peces/ave_azul.glb",
+      "tamano_m": {
+        "ancho": 0.786,
+        "alto": 0.385,
+        "fondo": 0.539
+      },
+      "bbox_min": [
+        -0.393,
+        0,
+        -0.244
+      ],
+      "bbox_max": [
+        0.393,
+        0.385,
+        0.295
+      ],
+      "triangulos": 372,
+      "mallas": 11,
+      "materiales": [
+        "ave_azul",
+        "lana",
+        "negro",
+        "pico"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "volar",
+          "duracion_s": 0.5,
+          "loop": true,
+          "pistas": 2
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.3,
+          0.14
+        ],
+        "cola_pivote": [
+          0,
+          0.195,
+          -0.165
+        ]
+      }
+    },
+    {
+      "id": "ave_roja",
+      "nombre": "Ave roja",
+      "categoria": "Aves, insectos y peces",
+      "archivo": "05_aves_insectos_peces/ave_roja.glb",
+      "tamano_m": {
+        "ancho": 0.786,
+        "alto": 0.385,
+        "fondo": 0.539
+      },
+      "bbox_min": [
+        -0.393,
+        0,
+        -0.244
+      ],
+      "bbox_max": [
+        0.393,
+        0.385,
+        0.295
+      ],
+      "triangulos": 372,
+      "mallas": 11,
+      "materiales": [
+        "ave_roja",
+        "lana",
+        "negro",
+        "pico"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "volar",
+          "duracion_s": 0.5,
+          "loop": true,
+          "pistas": 2
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.3,
+          0.14
+        ],
+        "cola_pivote": [
+          0,
+          0.195,
+          -0.165
+        ]
+      }
+    },
+    {
+      "id": "ave_amarilla",
+      "nombre": "Ave amarilla",
+      "categoria": "Aves, insectos y peces",
+      "archivo": "05_aves_insectos_peces/ave_amarilla.glb",
+      "tamano_m": {
+        "ancho": 0.786,
+        "alto": 0.385,
+        "fondo": 0.539
+      },
+      "bbox_min": [
+        -0.393,
+        0,
+        -0.244
+      ],
+      "bbox_max": [
+        0.393,
+        0.385,
+        0.295
+      ],
+      "triangulos": 372,
+      "mallas": 11,
+      "materiales": [
+        "ave_amarilla",
+        "lana",
+        "negro",
+        "pico"
+      ],
+      "animaciones": [
+        {
+          "nombre": "caminar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 3
+        },
+        {
+          "nombre": "pastar",
+          "duracion_s": 3,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "volar",
+          "duracion_s": 0.5,
+          "loop": true,
+          "pistas": 2
+        }
+      ],
+      "nodos": {
+        "cabeza": [
+          0,
+          0.3,
+          0.14
+        ],
+        "cola_pivote": [
+          0,
+          0.195,
+          -0.165
+        ]
+      }
+    },
+    {
+      "id": "mariposa",
+      "nombre": "Mariposa",
+      "categoria": "Aves, insectos y peces",
+      "archivo": "05_aves_insectos_peces/mariposa.glb",
+      "tamano_m": {
+        "ancho": 0.315,
+        "alto": 0.022,
+        "fondo": 0.188
+      },
+      "bbox_min": [
+        -0.157,
+        0.048,
+        -0.093
+      ],
+      "bbox_max": [
+        0.157,
+        0.07,
+        0.096
+      ],
+      "triangulos": 100,
+      "mallas": 5,
+      "materiales": [
+        "negro",
+        "petalo_amarillo"
+      ],
+      "animaciones": [
+        {
+          "nombre": "reposo",
+          "duracion_s": 4,
+          "loop": true,
+          "pistas": 1
+        },
+        {
+          "nombre": "volar",
+          "duracion_s": 0.5,
+          "loop": true,
+          "pistas": 2
+        }
+      ],
+      "nodos": {}
+    },
+    {
+      "id": "pez_naranja",
+      "nombre": "Pez naranja",
+      "categoria": "Aves, insectos y peces",
+      "archivo": "05_aves_insectos_peces/pez_naranja.glb",
+      "tamano_m": {
+        "ancho": 0.32,
+        "alto": 0.497,
+        "fondo": 0.861
+      },
+      "bbox_min": [
+        -0.16,
+        -0.18,
+        -0.53
+      ],
+      "bbox_max": [
+        0.16,
+        0.317,
+        0.331
+      ],
+      "triangulos": 596,
+      "mallas": 6,
+      "materiales": [
+        "negro",
+        "pez_aleta",
+        "pez_cuerpo",
+        "pez_vientre"
+      ],
+      "animaciones": [
+        {
+          "nombre": "saltar",
+          "duracion_s": 1.2,
+          "loop": false,
+          "pistas": 3
+        },
+        {
+          "nombre": "nadar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 1
+        }
+      ],
+      "nodos": {}
+    },
+    {
+      "id": "pez_amarillo",
+      "nombre": "Pez amarillo",
+      "categoria": "Aves, insectos y peces",
+      "archivo": "05_aves_insectos_peces/pez_amarillo.glb",
+      "tamano_m": {
+        "ancho": 0.32,
+        "alto": 0.497,
+        "fondo": 0.861
+      },
+      "bbox_min": [
+        -0.16,
+        -0.18,
+        -0.53
+      ],
+      "bbox_max": [
+        0.16,
+        0.317,
+        0.331
+      ],
+      "triangulos": 596,
+      "mallas": 6,
+      "materiales": [
+        "negro",
+        "pez_aleta",
+        "pez_cuerpo",
+        "pez_vientre"
+      ],
+      "animaciones": [
+        {
+          "nombre": "saltar",
+          "duracion_s": 1.2,
+          "loop": false,
+          "pistas": 3
+        },
+        {
+          "nombre": "nadar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 1
+        }
+      ],
+      "nodos": {}
+    },
+    {
+      "id": "pez_azul",
+      "nombre": "Pez azul",
+      "categoria": "Aves, insectos y peces",
+      "archivo": "05_aves_insectos_peces/pez_azul.glb",
+      "tamano_m": {
+        "ancho": 0.32,
+        "alto": 0.497,
+        "fondo": 0.861
+      },
+      "bbox_min": [
+        -0.16,
+        -0.18,
+        -0.53
+      ],
+      "bbox_max": [
+        0.16,
+        0.317,
+        0.331
+      ],
+      "triangulos": 596,
+      "mallas": 6,
+      "materiales": [
+        "negro",
+        "pez_aleta",
+        "pez_cuerpo",
+        "pez_vientre"
+      ],
+      "animaciones": [
+        {
+          "nombre": "saltar",
+          "duracion_s": 1.2,
+          "loop": false,
+          "pistas": 3
+        },
+        {
+          "nombre": "nadar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 1
+        }
+      ],
+      "nodos": {}
+    },
+    {
+      "id": "pez_rosado",
+      "nombre": "Pez rosado",
+      "categoria": "Aves, insectos y peces",
+      "archivo": "05_aves_insectos_peces/pez_rosado.glb",
+      "tamano_m": {
+        "ancho": 0.32,
+        "alto": 0.497,
+        "fondo": 0.861
+      },
+      "bbox_min": [
+        -0.16,
+        -0.18,
+        -0.53
+      ],
+      "bbox_max": [
+        0.16,
+        0.317,
+        0.331
+      ],
+      "triangulos": 596,
+      "mallas": 6,
+      "materiales": [
+        "negro",
+        "pez_aleta",
+        "pez_cuerpo",
+        "pez_vientre"
+      ],
+      "animaciones": [
+        {
+          "nombre": "saltar",
+          "duracion_s": 1.2,
+          "loop": false,
+          "pistas": 3
+        },
+        {
+          "nombre": "nadar",
+          "duracion_s": 1,
+          "loop": true,
+          "pistas": 1
+        }
+      ],
+      "nodos": {}
+    },
+    {
+      "id": "roca",
+      "nombre": "Roca",
+      "categoria": "Rocas y cielo",
+      "archivo": "06_rocas_y_cielo/roca.glb",
+      "tamano_m": {
+        "ancho": 2.51,
+        "alto": 1.726,
+        "fondo": 1.888
+      },
+      "bbox_min": [
+        -1.239,
+        -0.08,
+        -0.911
+      ],
+      "bbox_max": [
+        1.271,
+        1.646,
+        0.977
+      ],
+      "triangulos": 36,
+      "mallas": 3,
+      "materiales": [
+        "musgo",
+        "roca",
+        "roca_claro"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "nube",
+      "nombre": "Nube",
+      "categoria": "Rocas y cielo",
+      "archivo": "06_rocas_y_cielo/nube.glb",
+      "tamano_m": {
+        "ancho": 5.9,
+        "alto": 2.4,
+        "fondo": 2.52
+      },
+      "bbox_min": [
+        -3.3,
+        -0.15,
+        -1.26
+      ],
+      "bbox_max": [
+        2.6,
+        2.25,
+        1.26
+      ],
+      "triangulos": 400,
+      "mallas": 5,
+      "materiales": [
+        "nube"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "polimotor",
+      "nombre": "Polimotor",
+      "categoria": "Casas temáticas",
+      "archivo": "07_casas_tematicas/polimotor.glb",
+      "tamano_m": {
+        "ancho": 10.8,
+        "alto": 6.018,
+        "fondo": 9.51
+      },
+      "bbox_min": [
+        -6.2,
+        0,
+        -3.15
+      ],
+      "bbox_max": [
+        4.6,
+        6.018,
+        6.36
+      ],
+      "triangulos": 7666,
+      "mallas": 123,
+      "materiales": [
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_limon_suave",
+        "k_menta",
+        "k_naranja",
+        "k_rosa",
+        "k_uva",
+        "k_verde",
+        "letrero_polimotor",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.34
+        ]
+      }
+    },
+    {
+      "id": "expresion_artistica",
+      "nombre": "Expresion artistica",
+      "categoria": "Casas temáticas",
+      "archivo": "07_casas_tematicas/expresion_artistica.glb",
+      "tamano_m": {
+        "ancho": 11.17,
+        "alto": 7.735,
+        "fondo": 8.751
+      },
+      "bbox_min": [
+        -5.35,
+        -0.1,
+        -3.618
+      ],
+      "bbox_max": [
+        5.82,
+        7.635,
+        5.133
+      ],
+      "triangulos": 6044,
+      "mallas": 125,
+      "materiales": [
+        "amarillo",
+        "ave_azul",
+        "ave_roja",
+        "blanco",
+        "celeste",
+        "gris_claro",
+        "k_azul",
+        "k_blanco",
+        "k_cielo",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_menta",
+        "k_naranja",
+        "k_rosa",
+        "k_rosa_suave",
+        "k_uva",
+        "k_verde",
+        "letrero_expresion_artistica",
+        "lima",
+        "madera",
+        "magenta",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.84
+        ]
+      }
+    },
+    {
+      "id": "multisaberes",
+      "nombre": "Multisaberes",
+      "categoria": "Casas temáticas",
+      "archivo": "07_casas_tematicas/multisaberes.glb",
+      "tamano_m": {
+        "ancho": 9.515,
+        "alto": 6.931,
+        "fondo": 9.554
+      },
+      "bbox_min": [
+        -5.265,
+        0,
+        -3.05
+      ],
+      "bbox_max": [
+        4.25,
+        6.931,
+        6.504
+      ],
+      "triangulos": 7728,
+      "mallas": 135,
+      "materiales": [
+        "k_azul",
+        "k_blanco",
+        "k_cielo",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_menta",
+        "k_menta_suave",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_multisaberes",
+        "madera",
+        "madera_oscura",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.24
+        ]
+      }
+    },
+    {
+      "id": "multisensorial",
+      "nombre": "Multisensorial",
+      "categoria": "Casas temáticas",
+      "archivo": "07_casas_tematicas/multisensorial.glb",
+      "tamano_m": {
+        "ancho": 10.742,
+        "alto": 6.904,
+        "fondo": 8.75
+      },
+      "bbox_min": [
+        -5.371,
+        -0.02,
+        -2.75
+      ],
+      "bbox_max": [
+        5.371,
+        6.884,
+        6
+      ],
+      "triangulos": 6798,
+      "mallas": 78,
+      "materiales": [
+        "agua",
+        "arena",
+        "gris_tec",
+        "k_azul",
+        "k_blanco",
+        "k_cielo",
+        "k_crema",
+        "k_fresa",
+        "k_lila",
+        "k_limon",
+        "k_menta",
+        "k_naranja",
+        "k_rosa",
+        "k_uva",
+        "k_verde",
+        "lana",
+        "letrero_multisensorial",
+        "musgo",
+        "piedra",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.34
+        ]
+      }
+    },
+    {
+      "id": "tecnologia",
+      "nombre": "Tecnologia",
+      "categoria": "Casas temáticas",
+      "archivo": "07_casas_tematicas/tecnologia.glb",
+      "tamano_m": {
+        "ancho": 11.743,
+        "alto": 6.704,
+        "fondo": 6.37
+      },
+      "bbox_min": [
+        -5.543,
+        -0.02,
+        -2.75
+      ],
+      "bbox_max": [
+        6.2,
+        6.684,
+        3.62
+      ],
+      "triangulos": 6186,
+      "mallas": 83,
+      "materiales": [
+        "amarillo",
+        "blanco",
+        "gris_claro",
+        "gris_tec",
+        "k_azul",
+        "k_blanco",
+        "k_cielo_suave",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_verde",
+        "letrero_tecnologia",
+        "metal",
+        "naranja",
+        "negro",
+        "neon",
+        "panel_solar",
+        "pantalla",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.34
+        ],
+        "cabeza": [
+          4.7,
+          1.545,
+          1.4
+        ]
+      }
+    },
+    {
+      "id": "estacion_polimotor_saltos",
+      "nombre": "Estacion polimotor saltos",
+      "categoria": "Estaciones",
+      "subcategoria": "polimotor",
+      "archivo": "08_estaciones/polimotor/estacion_polimotor_saltos.glb",
+      "tamano_m": {
+        "ancho": 9.378,
+        "alto": 5.808,
+        "fondo": 6.6
+      },
+      "bbox_min": [
+        -3.178,
+        0,
+        -2.85
+      ],
+      "bbox_max": [
+        6.2,
+        5.808,
+        3.75
+      ],
+      "triangulos": 6170,
+      "mallas": 88,
+      "materiales": [
+        "amarillo",
+        "blanco",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_limon_suave",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_circuito_de_saltos",
+        "madera",
+        "magenta",
+        "naranja",
+        "turquesa",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.04
+        ],
+        "entrada": [
+          0,
+          0,
+          4.1
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Polimotor",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_polimotor_equilibrio",
+      "nombre": "Estacion polimotor equilibrio",
+      "categoria": "Estaciones",
+      "subcategoria": "polimotor",
+      "archivo": "08_estaciones/polimotor/estacion_polimotor_equilibrio.glb",
+      "tamano_m": {
+        "ancho": 9.415,
+        "alto": 7.635,
+        "fondo": 7.368
+      },
+      "bbox_min": [
+        -3.205,
+        0,
+        -3.218
+      ],
+      "bbox_max": [
+        6.21,
+        7.635,
+        4.15
+      ],
+      "triangulos": 4948,
+      "mallas": 82,
+      "materiales": [
+        "blanco",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_limon_suave",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_equilibrio",
+        "lima",
+        "madera_oscura",
+        "naranja",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.44
+        ],
+        "entrada": [
+          0,
+          0,
+          4.5
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Polimotor",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_polimotor_punteria",
+      "nombre": "Estacion polimotor punteria",
+      "categoria": "Estaciones",
+      "subcategoria": "polimotor",
+      "archivo": "08_estaciones/polimotor/estacion_polimotor_punteria.glb",
+      "tamano_m": {
+        "ancho": 9.435,
+        "alto": 6.807,
+        "fondo": 6.4
+      },
+      "bbox_min": [
+        -3.25,
+        -0.023,
+        -2.55
+      ],
+      "bbox_max": [
+        6.185,
+        6.784,
+        3.85
+      ],
+      "triangulos": 6422,
+      "mallas": 64,
+      "materiales": [
+        "amarillo",
+        "ave_roja",
+        "blanco",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_limon_suave",
+        "k_naranja",
+        "k_verde",
+        "letrero_lanzamiento_y_punteria",
+        "madera",
+        "magenta",
+        "naranja",
+        "turquesa",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.14
+        ],
+        "entrada": [
+          0,
+          0,
+          4.2
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Polimotor",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_artistica_pintura",
+      "nombre": "Estacion artistica pintura",
+      "categoria": "Estaciones",
+      "subcategoria": "artistica",
+      "archivo": "08_estaciones/artistica/estacion_artistica_pintura.glb",
+      "tamano_m": {
+        "ancho": 8.898,
+        "alto": 5.824,
+        "fondo": 6.6
+      },
+      "bbox_min": [
+        -3.178,
+        -0.016,
+        -2.85
+      ],
+      "bbox_max": [
+        5.72,
+        5.808,
+        3.75
+      ],
+      "triangulos": 5654,
+      "mallas": 90,
+      "materiales": [
+        "amarillo",
+        "ave_azul",
+        "ave_roja",
+        "blanco",
+        "celeste",
+        "gris_claro",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_rosa",
+        "k_rosa_suave",
+        "k_uva",
+        "k_verde",
+        "letrero_taller_de_pintura",
+        "lima",
+        "madera",
+        "magenta",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.04
+        ],
+        "entrada": [
+          0,
+          0,
+          4.1
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Expresión artística",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_artistica_musica",
+      "nombre": "Estacion artistica musica",
+      "categoria": "Estaciones",
+      "subcategoria": "artistica",
+      "archivo": "08_estaciones/artistica/estacion_artistica_musica.glb",
+      "tamano_m": {
+        "ancho": 9.865,
+        "alto": 7.635,
+        "fondo": 7.368
+      },
+      "bbox_min": [
+        -3.205,
+        0,
+        -3.218
+      ],
+      "bbox_max": [
+        6.66,
+        7.635,
+        4.15
+      ],
+      "triangulos": 4948,
+      "mallas": 88,
+      "materiales": [
+        "amarillo",
+        "ave_azul",
+        "ave_roja",
+        "crema",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_rosa",
+        "k_rosa_suave",
+        "k_uva",
+        "k_verde",
+        "letrero_musica_y_ritmo",
+        "lima",
+        "madera",
+        "madera_oscura",
+        "morado",
+        "naranja",
+        "turquesa",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.44
+        ],
+        "entrada": [
+          0,
+          0,
+          4.5
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Expresión artística",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_artistica_teatro",
+      "nombre": "Estacion artistica teatro",
+      "categoria": "Estaciones",
+      "subcategoria": "artistica",
+      "archivo": "08_estaciones/artistica/estacion_artistica_teatro.glb",
+      "tamano_m": {
+        "ancho": 9.1,
+        "alto": 6.804,
+        "fondo": 6.4
+      },
+      "bbox_min": [
+        -3.25,
+        -0.02,
+        -2.55
+      ],
+      "bbox_max": [
+        5.85,
+        6.784,
+        3.85
+      ],
+      "triangulos": 5938,
+      "mallas": 63,
+      "materiales": [
+        "amarillo",
+        "ave_roja",
+        "durazno",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_rosa",
+        "k_rosa_suave",
+        "k_uva",
+        "k_verde",
+        "letrero_teatro_y_titeres",
+        "madera",
+        "magenta",
+        "morado",
+        "naranja",
+        "turquesa",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.14
+        ],
+        "entrada": [
+          0,
+          0,
+          4.2
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Expresión artística",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_multisaberes_biblioteca",
+      "nombre": "Estacion multisaberes biblioteca",
+      "categoria": "Estaciones",
+      "subcategoria": "multisaberes",
+      "archivo": "08_estaciones/multisaberes/estacion_multisaberes_biblioteca.glb",
+      "tamano_m": {
+        "ancho": 8.628,
+        "alto": 5.808,
+        "fondo": 6.6
+      },
+      "bbox_min": [
+        -3.178,
+        0,
+        -2.85
+      ],
+      "bbox_max": [
+        5.45,
+        5.808,
+        3.75
+      ],
+      "triangulos": 5694,
+      "mallas": 114,
+      "materiales": [
+        "amarillo",
+        "ave_azul",
+        "ave_roja",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_menta",
+        "k_menta_suave",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_biblioteca",
+        "lima",
+        "madera",
+        "madera_oscura",
+        "morado",
+        "naranja",
+        "turquesa",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.04
+        ],
+        "entrada": [
+          0,
+          0,
+          4.1
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Multisaberes",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_multisaberes_laboratorio",
+      "nombre": "Estacion multisaberes laboratorio",
+      "categoria": "Estaciones",
+      "subcategoria": "multisaberes",
+      "archivo": "08_estaciones/multisaberes/estacion_multisaberes_laboratorio.glb",
+      "tamano_m": {
+        "ancho": 9.255,
+        "alto": 7.635,
+        "fondo": 7.368
+      },
+      "bbox_min": [
+        -3.205,
+        0,
+        -3.218
+      ],
+      "bbox_max": [
+        6.05,
+        7.635,
+        4.15
+      ],
+      "triangulos": 4992,
+      "mallas": 92,
+      "materiales": [
+        "amarillo",
+        "ave_azul",
+        "ave_roja",
+        "blanco",
+        "gris_tec",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_menta",
+        "k_menta_suave",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_laboratorio_de_ciencias",
+        "lima",
+        "madera",
+        "menta",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.44
+        ],
+        "entrada": [
+          0,
+          0,
+          4.5
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Multisaberes",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_multisaberes_huerta",
+      "nombre": "Estacion multisaberes huerta",
+      "categoria": "Estaciones",
+      "subcategoria": "multisaberes",
+      "archivo": "08_estaciones/multisaberes/estacion_multisaberes_huerta.glb",
+      "tamano_m": {
+        "ancho": 9.877,
+        "alto": 6.804,
+        "fondo": 6.4
+      },
+      "bbox_min": [
+        -3.25,
+        -0.02,
+        -2.55
+      ],
+      "bbox_max": [
+        6.627,
+        6.784,
+        3.85
+      ],
+      "triangulos": 6250,
+      "mallas": 75,
+      "materiales": [
+        "celeste",
+        "hoja",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_menta",
+        "k_menta_suave",
+        "k_naranja",
+        "k_verde",
+        "letrero_huerta_y_naturaleza",
+        "lima",
+        "madera",
+        "naranja",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.14
+        ],
+        "entrada": [
+          0,
+          0,
+          4.2
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Multisaberes",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_multisensorial_texturas",
+      "nombre": "Estacion multisensorial texturas",
+      "categoria": "Estaciones",
+      "subcategoria": "multisensorial",
+      "archivo": "08_estaciones/multisensorial/estacion_multisensorial_texturas.glb",
+      "tamano_m": {
+        "ancho": 9.378,
+        "alto": 5.808,
+        "fondo": 6.6
+      },
+      "bbox_min": [
+        -3.178,
+        0,
+        -2.85
+      ],
+      "bbox_max": [
+        6.2,
+        5.808,
+        3.75
+      ],
+      "triangulos": 5962,
+      "mallas": 87,
+      "materiales": [
+        "arena",
+        "blanco",
+        "celeste",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_lila",
+        "k_limon",
+        "k_menta",
+        "k_naranja",
+        "k_rosa",
+        "k_uva",
+        "k_verde",
+        "lana",
+        "letrero_sala_de_texturas",
+        "madera",
+        "musgo",
+        "piedra",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.04
+        ],
+        "entrada": [
+          0,
+          0,
+          4.1
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Multisensorial",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_multisensorial_sonidos",
+      "nombre": "Estacion multisensorial sonidos",
+      "categoria": "Estaciones",
+      "subcategoria": "multisensorial",
+      "archivo": "08_estaciones/multisensorial/estacion_multisensorial_sonidos.glb",
+      "tamano_m": {
+        "ancho": 10.025,
+        "alto": 7.635,
+        "fondo": 7.368
+      },
+      "bbox_min": [
+        -3.205,
+        0,
+        -3.218
+      ],
+      "bbox_max": [
+        6.82,
+        7.635,
+        4.15
+      ],
+      "triangulos": 5280,
+      "mallas": 87,
+      "materiales": [
+        "gris_claro",
+        "gris_tec",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_lila",
+        "k_limon",
+        "k_menta",
+        "k_naranja",
+        "k_rosa",
+        "k_uva",
+        "k_verde",
+        "letrero_sonidos_y_silencio",
+        "madera",
+        "oro",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.44
+        ],
+        "entrada": [
+          0,
+          0,
+          4.5
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Multisensorial",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_multisensorial_luz",
+      "nombre": "Estacion multisensorial luz",
+      "categoria": "Estaciones",
+      "subcategoria": "multisensorial",
+      "archivo": "08_estaciones/multisensorial/estacion_multisensorial_luz.glb",
+      "tamano_m": {
+        "ancho": 9.45,
+        "alto": 6.804,
+        "fondo": 6.4
+      },
+      "bbox_min": [
+        -3.25,
+        -0.02,
+        -2.55
+      ],
+      "bbox_max": [
+        6.2,
+        6.784,
+        3.85
+      ],
+      "triangulos": 6246,
+      "mallas": 62,
+      "materiales": [
+        "amarillo",
+        "ave_azul",
+        "ave_roja",
+        "celeste",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_lila",
+        "k_limon",
+        "k_menta",
+        "k_naranja",
+        "k_rosa",
+        "k_uva",
+        "k_verde",
+        "letrero_luz_y_color",
+        "lima",
+        "luz",
+        "metal",
+        "petalo_rosa",
+        "piedra",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.14
+        ],
+        "entrada": [
+          0,
+          0,
+          4.2
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Multisensorial",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_tecnologia_robotica",
+      "nombre": "Estacion tecnologia robotica",
+      "categoria": "Estaciones",
+      "subcategoria": "tecnologia",
+      "archivo": "08_estaciones/tecnologia/estacion_tecnologia_robotica.glb",
+      "tamano_m": {
+        "ancho": 9.378,
+        "alto": 5.808,
+        "fondo": 6.6
+      },
+      "bbox_min": [
+        -3.178,
+        0,
+        -2.85
+      ],
+      "bbox_max": [
+        6.2,
+        5.808,
+        3.75
+      ],
+      "triangulos": 5682,
+      "mallas": 97,
+      "materiales": [
+        "amarillo",
+        "blanco",
+        "gris_claro",
+        "gris_tec",
+        "k_azul",
+        "k_blanco",
+        "k_cielo_suave",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_robotica",
+        "metal",
+        "naranja",
+        "negro",
+        "neon",
+        "pantalla",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.04
+        ],
+        "cabeza": [
+          4.7,
+          1.545,
+          0.6
+        ],
+        "entrada": [
+          0,
+          0,
+          4.1
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Tecnología",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_tecnologia_programacion",
+      "nombre": "Estacion tecnologia programacion",
+      "categoria": "Estaciones",
+      "subcategoria": "tecnologia",
+      "archivo": "08_estaciones/tecnologia/estacion_tecnologia_programacion.glb",
+      "tamano_m": {
+        "ancho": 9.855,
+        "alto": 7.635,
+        "fondo": 7.368
+      },
+      "bbox_min": [
+        -3.205,
+        0,
+        -3.218
+      ],
+      "bbox_max": [
+        6.65,
+        7.635,
+        4.15
+      ],
+      "triangulos": 4788,
+      "mallas": 86,
+      "materiales": [
+        "amarillo",
+        "gris_tec",
+        "k_azul",
+        "k_blanco",
+        "k_cielo_suave",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_programacion",
+        "lima",
+        "magenta",
+        "pantalla",
+        "turquesa",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.44
+        ],
+        "entrada": [
+          0,
+          0,
+          4.5
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Tecnología",
+      "tipo": "estacion"
+    },
+    {
+      "id": "estacion_tecnologia_energia",
+      "nombre": "Estacion tecnologia energia",
+      "categoria": "Estaciones",
+      "subcategoria": "tecnologia",
+      "archivo": "08_estaciones/tecnologia/estacion_tecnologia_energia.glb",
+      "tamano_m": {
+        "ancho": 10,
+        "alto": 6.804,
+        "fondo": 6.4
+      },
+      "bbox_min": [
+        -3.25,
+        -0.02,
+        -2.55
+      ],
+      "bbox_max": [
+        6.75,
+        6.784,
+        3.85
+      ],
+      "triangulos": 5774,
+      "mallas": 62,
+      "materiales": [
+        "blanco",
+        "gris_claro",
+        "gris_tec",
+        "k_azul",
+        "k_blanco",
+        "k_cielo_suave",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_verde",
+        "letrero_energia_solar",
+        "panel_solar",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "animacion_loop",
+          "duracion_s": 12,
+          "loop": true,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.14
+        ],
+        "entrada": [
+          0,
+          0,
+          4.2
+        ],
+        "interior": [
+          0,
+          0.34,
+          -0.3
+        ]
+      },
+      "ambiente": "Tecnología",
+      "tipo": "estacion"
+    },
+    {
+      "id": "zona_juegos_polimotor",
+      "nombre": "Circuito motor",
+      "categoria": "Zonas de juegos",
+      "archivo": "09_zonas_de_juegos/zona_juegos_polimotor.glb",
+      "tamano_m": {
+        "ancho": 11.5,
+        "alto": 4.927,
+        "fondo": 10.758
+      },
+      "bbox_min": [
+        -5.75,
+        0,
+        -5.25
+      ],
+      "bbox_max": [
+        5.75,
+        4.927,
+        5.508
+      ],
+      "triangulos": 9364,
+      "mallas": 85,
+      "materiales": [
+        "caucho",
+        "k_azul",
+        "k_blanco",
+        "k_fresa",
+        "k_limon",
+        "k_limon_suave",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_circuito_motor"
+      ],
+      "animaciones": [
+        {
+          "nombre": "animacion_loop",
+          "duracion_s": 12,
+          "loop": true,
+          "pistas": 9
+        },
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -1.25,
+          0.1,
+          5
+        ],
+        "entrada": [
+          0,
+          0,
+          6.6
+        ],
+        "interior": [
+          0,
+          0.13,
+          3
+        ]
+      },
+      "ambiente": "Polimotor",
+      "tipo": "zona_juegos",
+      "colision": [
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -4.53,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -3.56,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -2.59,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -1.62,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -0.65,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 0.32,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 1.29,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 2.26,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 3.24,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 4.21,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.18,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -4.58,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -3.65,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -2.73,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.81,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 1.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 2.42,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 3.35,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 4.27,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 5.19,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": 1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": -0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": 0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": -3.8,
+          "z": -3.2,
+          "r": 0.9
+        },
+        {
+          "x": -2.6,
+          "z": -3.2,
+          "r": 0.9
+        },
+        {
+          "x": -1.4,
+          "z": -3.2,
+          "r": 0.9
+        },
+        {
+          "x": 2.9,
+          "z": -2.6,
+          "r": 1.7
+        },
+        {
+          "x": -0.8,
+          "z": -1.4,
+          "r": 0.4
+        },
+        {
+          "x": 0.5,
+          "z": -2.3,
+          "r": 0.4
+        },
+        {
+          "x": 1.2,
+          "z": -0.6,
+          "r": 0.4
+        }
+      ]
+    },
+    {
+      "id": "zona_juegos_artistica",
+      "nombre": "Tarima vallenata",
+      "categoria": "Zonas de juegos",
+      "archivo": "09_zonas_de_juegos/zona_juegos_artistica.glb",
+      "tamano_m": {
+        "ancho": 11.5,
+        "alto": 4.937,
+        "fondo": 10.659
+      },
+      "bbox_min": [
+        -5.75,
+        0,
+        -5.25
+      ],
+      "bbox_max": [
+        5.75,
+        4.937,
+        5.409
+      ],
+      "triangulos": 7978,
+      "mallas": 120,
+      "materiales": [
+        "gris_claro",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_rosa",
+        "k_rosa_suave",
+        "k_uva",
+        "k_verde",
+        "letrero_festival_vallenato",
+        "letrero_tarima_vallenata",
+        "madera",
+        "madera_oscura",
+        "metal",
+        "negro"
+      ],
+      "animaciones": [
+        {
+          "nombre": "animacion_loop",
+          "duracion_s": 12,
+          "loop": true,
+          "pistas": 15
+        },
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -1.25,
+          0.1,
+          5
+        ],
+        "entrada": [
+          0,
+          0,
+          6.6
+        ],
+        "interior": [
+          0,
+          0.13,
+          3
+        ]
+      },
+      "ambiente": "Expresión artística",
+      "tipo": "zona_juegos",
+      "colision": [
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -4.53,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -3.56,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -2.59,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -1.62,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -0.65,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 0.32,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 1.29,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 2.26,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 3.24,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 4.21,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.18,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -4.58,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -3.65,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -2.73,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.81,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 1.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 2.42,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 3.35,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 4.27,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 5.19,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": 1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": -0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": 0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": 0,
+          "z": -3.4,
+          "r": 2.1
+        },
+        {
+          "x": -1.7,
+          "z": -3.4,
+          "r": 1.3
+        },
+        {
+          "x": 1.7,
+          "z": -3.4,
+          "r": 1.3
+        },
+        {
+          "x": 3.8,
+          "z": 1.4,
+          "r": 0.7
+        },
+        {
+          "x": 3.8,
+          "z": 0.5,
+          "r": 0.7
+        },
+        {
+          "x": 3.8,
+          "z": -0.4,
+          "r": 0.7
+        }
+      ]
+    },
+    {
+      "id": "zona_juegos_multisaberes",
+      "nombre": "Rincón del saber",
+      "categoria": "Zonas de juegos",
+      "archivo": "09_zonas_de_juegos/zona_juegos_multisaberes.glb",
+      "tamano_m": {
+        "ancho": 11.5,
+        "alto": 5.012,
+        "fondo": 10.767
+      },
+      "bbox_min": [
+        -5.75,
+        0,
+        -5.25
+      ],
+      "bbox_max": [
+        5.75,
+        5.012,
+        5.517
+      ],
+      "triangulos": 9172,
+      "mallas": 112,
+      "materiales": [
+        "arena",
+        "k_azul",
+        "k_blanco",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_menta",
+        "k_menta_suave",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_a",
+        "letrero_b",
+        "letrero_c",
+        "letrero_rincon_del_saber",
+        "madera",
+        "metal",
+        "negro"
+      ],
+      "animaciones": [
+        {
+          "nombre": "animacion_loop",
+          "duracion_s": 12,
+          "loop": true,
+          "pistas": 14
+        },
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -1.25,
+          0.1,
+          5
+        ],
+        "entrada": [
+          0,
+          0,
+          6.6
+        ],
+        "interior": [
+          0,
+          0.13,
+          3
+        ]
+      },
+      "ambiente": "Multisaberes",
+      "tipo": "zona_juegos",
+      "colision": [
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -4.53,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -3.56,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -2.59,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -1.62,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -0.65,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 0.32,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 1.29,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 2.26,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 3.24,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 4.21,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.18,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -4.58,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -3.65,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -2.73,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.81,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 1.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 2.42,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 3.35,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 4.27,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 5.19,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": 1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": -0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": 0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": 0,
+          "z": -2.7,
+          "r": 0.8
+        },
+        {
+          "x": -3.7,
+          "z": -0.5,
+          "r": 1.2
+        },
+        {
+          "x": -3.7,
+          "z": 0.6,
+          "r": 0.6
+        },
+        {
+          "x": -3.7,
+          "z": -1.6,
+          "r": 0.6
+        },
+        {
+          "x": 3.35,
+          "z": 1.35,
+          "r": 1.1
+        },
+        {
+          "x": 3.1,
+          "z": -2.9,
+          "r": 1.6
+        }
+      ]
+    },
+    {
+      "id": "zona_juegos_multisensorial",
+      "nombre": "Jardín de los sentidos",
+      "categoria": "Zonas de juegos",
+      "archivo": "09_zonas_de_juegos/zona_juegos_multisensorial.glb",
+      "tamano_m": {
+        "ancho": 11.5,
+        "alto": 5.01,
+        "fondo": 10.757
+      },
+      "bbox_min": [
+        -5.75,
+        0,
+        -5.25
+      ],
+      "bbox_max": [
+        5.75,
+        5.01,
+        5.507
+      ],
+      "triangulos": 8308,
+      "mallas": 119,
+      "materiales": [
+        "agua",
+        "arena",
+        "k_azul",
+        "k_blanco",
+        "k_cielo",
+        "k_fresa",
+        "k_lila",
+        "k_limon",
+        "k_menta",
+        "k_naranja",
+        "k_rosa",
+        "k_uva",
+        "k_verde",
+        "lana",
+        "letrero_jardin_de_los_sentidos",
+        "madera",
+        "metal",
+        "musgo",
+        "oro",
+        "piedra",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "animacion_loop",
+          "duracion_s": 12,
+          "loop": true,
+          "pistas": 25
+        },
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -1.25,
+          0.1,
+          5
+        ],
+        "entrada": [
+          0,
+          0,
+          6.6
+        ],
+        "interior": [
+          0,
+          0.13,
+          3
+        ]
+      },
+      "ambiente": "Multisensorial",
+      "tipo": "zona_juegos",
+      "colision": [
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -4.53,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -3.56,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -2.59,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -1.62,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -0.65,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 0.32,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 1.29,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 2.26,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 3.24,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 4.21,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.18,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -4.58,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -3.65,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -2.73,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.81,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 1.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 2.42,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 3.35,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 4.27,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 5.19,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": 1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": -0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": 0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": 0.4,
+          "z": -2.6,
+          "r": 1.3
+        },
+        {
+          "x": 4.4,
+          "z": 2.4,
+          "r": 0.3
+        },
+        {
+          "x": 4.4,
+          "z": 1.4,
+          "r": 0.3
+        },
+        {
+          "x": 4.4,
+          "z": 0.4,
+          "r": 0.3
+        },
+        {
+          "x": 4.4,
+          "z": -0.6,
+          "r": 0.3
+        },
+        {
+          "x": 4.4,
+          "z": -1.6,
+          "r": 0.3
+        },
+        {
+          "x": -3.3,
+          "z": -3.7,
+          "r": 1.3
+        },
+        {
+          "x": 2.9,
+          "z": -3.9,
+          "r": 1.2
+        }
+      ]
+    },
+    {
+      "id": "zona_juegos_tecnologia",
+      "nombre": "Taller de inventos",
+      "categoria": "Zonas de juegos",
+      "archivo": "09_zonas_de_juegos/zona_juegos_tecnologia.glb",
+      "tamano_m": {
+        "ancho": 11.5,
+        "alto": 4.966,
+        "fondo": 10.803
+      },
+      "bbox_min": [
+        -5.75,
+        0,
+        -5.25
+      ],
+      "bbox_max": [
+        5.75,
+        4.966,
+        5.553
+      ],
+      "triangulos": 8168,
+      "mallas": 123,
+      "materiales": [
+        "caucho",
+        "gris_tec",
+        "k_azul",
+        "k_blanco",
+        "k_cielo",
+        "k_cielo_suave",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_taller_de_inventos",
+        "metal",
+        "negro",
+        "neon",
+        "panel_solar",
+        "pantalla",
+        "pasto_claro",
+        "pizarra",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "animacion_loop",
+          "duracion_s": 12,
+          "loop": true,
+          "pistas": 13
+        },
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -1.25,
+          0.1,
+          5
+        ],
+        "entrada": [
+          0,
+          0,
+          6.6
+        ],
+        "interior": [
+          0,
+          0.13,
+          3
+        ],
+        "cabeza": [
+          3.3,
+          1.33,
+          1.2
+        ]
+      },
+      "ambiente": "Tecnología",
+      "tipo": "zona_juegos",
+      "colision": [
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -4.53,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -3.56,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -2.59,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -1.62,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -0.65,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 0.32,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 1.29,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 2.26,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 3.24,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 4.21,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.18,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -5,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -4.03,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -3.06,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -2.1,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -1.13,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": -0.16,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 0.81,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 1.77,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 2.74,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 3.71,
+          "r": 0.5
+        },
+        {
+          "x": 5.5,
+          "z": 4.68,
+          "r": 0.5
+        },
+        {
+          "x": -5.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -4.58,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -3.65,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -2.73,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.81,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 1.5,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 2.42,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 3.35,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 4.27,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": 5.19,
+          "z": 5,
+          "r": 0.5
+        },
+        {
+          "x": -1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": 1.35,
+          "z": 5,
+          "r": 0.4
+        },
+        {
+          "x": -0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": 0.6,
+          "z": 5,
+          "r": 0.7
+        },
+        {
+          "x": 1.3,
+          "z": -1.4,
+          "r": 0.3
+        },
+        {
+          "x": 2.6,
+          "z": -4.3,
+          "r": 1.7
+        },
+        {
+          "x": 3.3,
+          "z": 1.2,
+          "r": 0.8
+        },
+        {
+          "x": -4,
+          "z": -3.9,
+          "r": 0.4
+        },
+        {
+          "x": -2.4,
+          "z": -4.1,
+          "r": 0.8
+        }
+      ]
+    },
+    {
+      "id": "casa_refugio",
+      "nombre": "Casa refugio",
+      "categoria": "Edificios",
+      "archivo": "10_edificios/casa_refugio.glb",
+      "tamano_m": {
+        "ancho": 6.552,
+        "alto": 5.808,
+        "fondo": 5.7
+      },
+      "bbox_min": [
+        -3.276,
+        0,
+        -2.85
+      ],
+      "bbox_max": [
+        3.276,
+        5.808,
+        2.85
+      ],
+      "triangulos": 5526,
+      "mallas": 90,
+      "materiales": [
+        "hoja",
+        "k_azul",
+        "k_blanco",
+        "k_cielo_suave",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_uva",
+        "k_verde",
+        "letrero_inicio",
+        "madera",
+        "petalo_morado",
+        "petalo_naranja",
+        "petalo_rojo",
+        "petalo_rosa",
+        "vidrio"
+      ],
+      "animaciones": [
+        {
+          "nombre": "puerta_abrir",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        },
+        {
+          "nombre": "puerta_cerrar",
+          "duracion_s": 1,
+          "loop": false,
+          "pistas": 1
+        }
+      ],
+      "nodos": {
+        "puerta": [
+          -0.68,
+          0.31,
+          2.04
+        ]
+      }
+    },
+    {
+      "id": "meta_final",
+      "nombre": "Meta",
+      "categoria": "Edificios",
+      "archivo": "10_edificios/meta_final.glb",
+      "tamano_m": {
+        "ancho": 16,
+        "alto": 6.922,
+        "fondo": 16
+      },
+      "bbox_min": [
+        -8,
+        0,
+        -8
+      ],
+      "bbox_max": [
+        8,
+        6.922,
+        8
+      ],
+      "triangulos": 6470,
+      "mallas": 196,
+      "materiales": [
+        "k_azul",
+        "k_blanco",
+        "k_cielo",
+        "k_crema",
+        "k_fresa",
+        "k_limon",
+        "k_naranja",
+        "k_rosa",
+        "k_uva",
+        "k_verde",
+        "letrero_1",
+        "letrero_2",
+        "letrero_3",
+        "letrero__meta_",
+        "negro",
+        "oro"
+      ],
+      "animaciones": [
+        {
+          "nombre": "animacion_loop",
+          "duracion_s": 12,
+          "loop": true,
+          "pistas": 17
+        }
+      ],
+      "nodos": {
+        "podio_punto": [
+          0,
+          1.32,
+          0
+        ],
+        "podio_frente": [
+          0,
+          0,
+          2.3
+        ],
+        "canon_izq_boca": [
+          -3.413,
+          1.716,
+          -0.6
+        ],
+        "canon_der_boca": [
+          3.413,
+          1.716,
+          -0.6
+        ]
+      },
+      "tipo": "meta",
+      "colision": [
+        {
+          "x": -2.6,
+          "z": 6.5,
+          "r": 0.6
+        },
+        {
+          "x": 2.6,
+          "z": 6.5,
+          "r": 0.6
+        },
+        {
+          "x": 0,
+          "z": 0,
+          "r": 1.7
+        },
+        {
+          "x": -2.3,
+          "z": 0,
+          "r": 1.3
+        },
+        {
+          "x": 2.3,
+          "z": 0,
+          "r": 1.3
+        },
+        {
+          "x": 0,
+          "z": -2.7,
+          "r": 1.1
+        },
+        {
+          "x": 4.93,
+          "z": -3.92,
+          "r": 0.4
+        },
+        {
+          "x": 2.74,
+          "z": -5.67,
+          "r": 0.4
+        },
+        {
+          "x": 0,
+          "z": -6.3,
+          "r": 0.4
+        },
+        {
+          "x": -2.74,
+          "z": -5.67,
+          "r": 0.4
+        },
+        {
+          "x": -4.93,
+          "z": -3.92,
+          "r": 0.4
+        },
+        {
+          "x": -4,
+          "z": -0.6,
+          "r": 0.8
+        },
+        {
+          "x": 4,
+          "z": -0.6,
+          "r": 0.8
+        }
+      ]
+    },
+    {
+      "id": "plaza_cuadrada",
+      "nombre": "Plaza cuadrada",
+      "categoria": "Camino y agua",
+      "archivo": "11_camino_y_agua/plaza_cuadrada.glb",
+      "tamano_m": {
+        "ancho": 21,
+        "alto": 0.095,
+        "fondo": 21
+      },
+      "bbox_min": [
+        -10.5,
+        0,
+        -10.5
+      ],
+      "bbox_max": [
+        10.5,
+        0.095,
+        10.5
+      ],
+      "triangulos": 1820,
+      "mallas": 6,
+      "materiales": [
+        "camino",
+        "camino_borde",
+        "pasto_claro"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "plaza_cuadrada_sin_brazos",
+      "nombre": "Plaza cuadrada sin brazos",
+      "categoria": "Camino y agua",
+      "archivo": "11_camino_y_agua/plaza_cuadrada_sin_brazos.glb",
+      "tamano_m": {
+        "ancho": 15,
+        "alto": 0.095,
+        "fondo": 15
+      },
+      "bbox_min": [
+        -7.5,
+        0,
+        -7.5
+      ],
+      "bbox_max": [
+        7.5,
+        0.095,
+        7.5
+      ],
+      "triangulos": 1436,
+      "mallas": 4,
+      "materiales": [
+        "camino",
+        "camino_borde",
+        "pasto_claro"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "camino_recto",
+      "nombre": "Camino recto",
+      "categoria": "Camino y agua",
+      "archivo": "11_camino_y_agua/camino_recto.glb",
+      "tamano_m": {
+        "ancho": 7.841,
+        "alto": 3.73,
+        "fondo": 10.345
+      },
+      "bbox_min": [
+        -3.918,
+        -0.111,
+        -5.224
+      ],
+      "bbox_max": [
+        3.923,
+        3.619,
+        5.121
+      ],
+      "triangulos": 5344,
+      "mallas": 179,
+      "materiales": [
+        "arbusto",
+        "camino",
+        "camino_borde",
+        "centro",
+        "centro_oscuro",
+        "hoja",
+        "petalo_amarillo",
+        "petalo_blanco",
+        "petalo_morado",
+        "petalo_rojo",
+        "petalo_rosa",
+        "tallo"
+      ],
+      "animaciones": [],
+      "nodos": {
+        "cabeza": [
+          -3.203,
+          0.789,
+          4.576
+        ]
+      }
+    },
+    {
+      "id": "camino_curvo",
+      "nombre": "Camino curvo",
+      "categoria": "Camino y agua",
+      "archivo": "11_camino_y_agua/camino_curvo.glb",
+      "tamano_m": {
+        "ancho": 10.467,
+        "alto": 3.651,
+        "fondo": 10.785
+      },
+      "bbox_min": [
+        -3.73,
+        -0.106,
+        -3.84
+      ],
+      "bbox_max": [
+        6.737,
+        3.546,
+        6.945
+      ],
+      "triangulos": 4624,
+      "mallas": 178,
+      "materiales": [
+        "arbusto",
+        "camino",
+        "camino_borde",
+        "centro",
+        "centro_oscuro",
+        "hoja",
+        "petalo_amarillo",
+        "petalo_blanco",
+        "petalo_morado",
+        "petalo_rojo",
+        "petalo_rosa",
+        "tallo"
+      ],
+      "animaciones": [],
+      "nodos": {
+        "cabeza": [
+          -2.227,
+          0.811,
+          0.006
+        ]
+      }
+    },
+    {
+      "id": "lago",
+      "nombre": "Lago",
+      "categoria": "Camino y agua",
+      "archivo": "11_camino_y_agua/lago.glb",
+      "tamano_m": {
+        "ancho": 14.004,
+        "alto": 0.101,
+        "fondo": 10.743
+      },
+      "bbox_min": [
+        -7.586,
+        0,
+        -5.521
+      ],
+      "bbox_max": [
+        6.418,
+        0.101,
+        5.222
+      ],
+      "triangulos": 80,
+      "mallas": 2,
+      "materiales": [
+        "agua",
+        "arena"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "marcador_nivel",
+      "nombre": "Marcador nivel",
+      "categoria": "Props",
+      "archivo": "12_props/marcador_nivel.glb",
+      "tamano_m": {
+        "ancho": 1,
+        "alto": 2.55,
+        "fondo": 0.18
+      },
+      "bbox_min": [
+        -0.5,
+        0,
+        -0.09
+      ],
+      "bbox_max": [
+        0.5,
+        2.55,
+        0.09
+      ],
+      "triangulos": 152,
+      "mallas": 3,
+      "materiales": [
+        "madera_oscura",
+        "oro",
+        "oro_claro"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "banca",
+      "nombre": "Banca",
+      "categoria": "Props",
+      "archivo": "12_props/banca.glb",
+      "tamano_m": {
+        "ancho": 1.7,
+        "alto": 0.995,
+        "fondo": 0.534
+      },
+      "bbox_min": [
+        -0.85,
+        0,
+        -0.304
+      ],
+      "bbox_max": [
+        0.85,
+        0.995,
+        0.23
+      ],
+      "triangulos": 108,
+      "mallas": 9,
+      "materiales": [
+        "madera",
+        "madera_oscura"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "farola",
+      "nombre": "Farola",
+      "categoria": "Props",
+      "archivo": "12_props/farola.glb",
+      "tamano_m": {
+        "ancho": 0.48,
+        "alto": 1.98,
+        "fondo": 0.48
+      },
+      "bbox_min": [
+        -0.24,
+        0,
+        -0.24
+      ],
+      "bbox_max": [
+        0.24,
+        1.98,
+        0.24
+      ],
+      "triangulos": 152,
+      "mallas": 4,
+      "materiales": [
+        "luz",
+        "metal"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "valla",
+      "nombre": "Valla",
+      "categoria": "Props",
+      "archivo": "12_props/valla.glb",
+      "tamano_m": {
+        "ancho": 3.301,
+        "alto": 1.054,
+        "fondo": 0.19
+      },
+      "bbox_min": [
+        -1.651,
+        -0.002,
+        -0.07
+      ],
+      "bbox_max": [
+        1.651,
+        1.052,
+        0.12
+      ],
+      "triangulos": 60,
+      "mallas": 5,
+      "materiales": [
+        "madera"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    },
+    {
+      "id": "senal_juegos",
+      "nombre": "Senal juegos",
+      "categoria": "Props",
+      "archivo": "12_props/senal_juegos.glb",
+      "tamano_m": {
+        "ancho": 2.55,
+        "alto": 3.455,
+        "fondo": 0.252
+      },
+      "bbox_min": [
+        -1.1,
+        0,
+        -0.126
+      ],
+      "bbox_max": [
+        1.45,
+        3.455,
+        0.126
+      ],
+      "triangulos": 360,
+      "mallas": 7,
+      "materiales": [
+        "k_blanco",
+        "k_fresa",
+        "k_limon",
+        "letrero_juegos"
+      ],
+      "animaciones": [],
+      "nodos": {}
+    }
+  ]
+}

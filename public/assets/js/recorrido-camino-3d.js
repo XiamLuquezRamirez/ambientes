@@ -10,7 +10,7 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
-import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR } from './mapa-mundo.js?v=20260930b';
+import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR } from './mapa-mundo.js?v=20261002m';
 
 (function () {
     'use strict';
@@ -84,6 +84,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     let cambiandoPersonaje = false;
     let zoomCam = 1;
     let grupoCaminoParque = null;
+    let entradaParque = null;
     let cancelarArranque = 0;
     let focoManual = null;
     let posXCasa = [0, 0, 0];
@@ -1101,21 +1102,78 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const dentro = umbral.clone().addScaledVector(tang || new THREE.Vector3(0, 0, 1), 1.6 * (casa.scale.x || 1));
         dentro.y = mundo ? mundo.altura(dentro.x, dentro.z) : umbral.y;
         if (casa.userData.paradaId) puertasCasa[casa.userData.paradaId] = dentro;
-        despejarFloresEntrada(umbral, casa);
+    }
+
+    function muestrasColaDesde(curva, metros) {
+        if (!curva || typeof curva.getPoint !== 'function') return [];
+        const n = 36;
+        const pts = [];
+        for (let s = 0; s <= n; s++) pts.push(curva.getPoint(s / n));
+        const muestras = [[pts[0].x, pts[0].z]];
+        let acc = 0;
+        for (let i = 0; i < n; i++) {
+            acc += pts[i].distanceTo(pts[i + 1]);
+            muestras.push([pts[i + 1].x, pts[i + 1].z]);
+            if (acc >= metros) break;
+        }
+        return muestras;
+    }
+
+    function muestrasCola(curva, metros) {
+        if (!curva || typeof curva.getPoint !== 'function') return [];
+        const n = 36;
+        const pts = [];
+        for (let s = 0; s <= n; s++) pts.push(curva.getPoint(s / n));
+        const muestras = [[pts[n].x, pts[n].z]];
+        let acc = 0;
+        for (let i = n; i > 0; i--) {
+            acc += pts[i].distanceTo(pts[i - 1]);
+            muestras.push([pts[i - 1].x, pts[i - 1].z]);
+            if (acc >= metros) break;
+        }
+        return muestras;
     }
 
     function despejarFloresEntrada(punto, casa) {
-        if (!mundo || typeof mundo.despejarFlores !== 'function' || !punto) return;
+        if (!mundo || typeof mundo.despejarEntrada !== 'function' || !punto) return;
         const frente = new THREE.Vector3(0, 0, 1);
         if (casa) frente.applyQuaternion(casa.quaternion);
         frente.y = 0;
         if (frente.lengthSq() < 1e-6) frente.set(0, 0, 1);
         frente.normalize();
-        mundo.despejarFlores([
-            [punto.x, punto.z],
-            [punto.x + frente.x * 2.4, punto.z + frente.z * 2.4],
-            [punto.x + frente.x * 4.2, punto.z + frente.z * 4.2],
-        ], 2.6);
+        const muestras = [];
+        for (let d = 0; d <= 16; d += 1.4) {
+            muestras.push([punto.x + frente.x * d, punto.z + frente.z * d]);
+        }
+        mundo.despejarEntrada(muestras, 12);
+    }
+
+    /**
+     * Solo la boca de cada camino de experiencia y del parque.
+     * El resto del sendero, incluido después del cruce, conserva sus flores.
+     */
+    function despejarEntradasCaminos() {
+        if (!mundo || typeof mundo.quitarEstorbos !== 'function') return;
+        const muestras = [];
+        const bocaDe = (curva, metros) => {
+            if (!curva || typeof curva.getPoint !== 'function') return;
+            const n = 24;
+            const pts = [];
+            for (let s = 0; s <= n; s++) pts.push(curva.getPoint(s / n));
+            muestras.push([pts[0].x, pts[0].z]);
+            let acc = 0;
+            for (let i = 0; i < n; i++) {
+                acc += pts[i].distanceTo(pts[i + 1]);
+                muestras.push([pts[i + 1].x, pts[i + 1].z]);
+                if (acc >= metros) break;
+            }
+        };
+        Object.values(nodos).forEach((n) => {
+            if (!n || !n.spur || !esParadaExperiencia(n.parada)) return;
+            bocaDe(n.spur, 7);
+        });
+        if (entradaParque && entradaParque.spur) bocaDe(entradaParque.spur, 7);
+        mundo.quitarEstorbos(muestras, 3.4);
     }
 
     function vistaFrenteEstacion(casa) {
@@ -2839,8 +2897,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 + '<div class="rn3d-elige__marco">'
                 +   '<h2 class="rn3d-elige__titulo">¿Con quién quieres ir?</h2>'
                 +   '<div class="rn3d-elige__escena">'
-                +     '<button type="button" class="rn3d-elige__btn" data-cual="nino"><span>Niño</span></button>'
-                +     '<button type="button" class="rn3d-elige__btn" data-cual="nina"><span>Niña</span></button>'
+                +     '<button type="button" class="rn3d-elige__btn" data-cual="nino"><span class="rn3d-elige__nombre rn3d-elige__nombre--zeus"><b>Zeus</b></span></button>'
+                +     '<button type="button" class="rn3d-elige__btn" data-cual="nina"><span class="rn3d-elige__nombre rn3d-elige__nombre--zoe"><b>Zoe</b></span></button>'
                 +   '</div>'
                 + '</div>';
             ctx.$paso[0].appendChild(capa);
@@ -3086,6 +3144,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             clipActual = accionesPersonaje[CLIP_QUIETO] ? CLIP_QUIETO : '';
             colocarPersonajeEn(nodoActual || 'inicio');
             construirCaminoAlParque();
+            despejarEntradasCaminos();
             zoomCam = ZOOM_INICIAL;
             if (!pj.entradaLista) {
                 camPos.copy(personaje.position).add(new THREE.Vector3(-16, 18, 22));
@@ -3525,15 +3584,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         tareas.push(colocarCastillo());
         tareas.push(colocarParque());
         await Promise.all(tareas);
-        if (mundo && mundo.casaInicio && mundo.casaInicio.frente && typeof mundo.despejarFlores === 'function') {
-            const p = mundo.casaInicio.punto();
-            const f = mundo.casaInicio.frente();
-            if (f.lengthSq() > 1e-6) f.normalize();
-            mundo.despejarFlores([
-                [p.x + f.x * 2.2, p.z + f.z * 2.2],
-                [p.x + f.x * 4.2, p.z + f.z * 4.2],
-            ], 2.6);
-        }
+        despejarEntradasCaminos();
     }
 
     async function colocarCastillo() {
@@ -3587,7 +3638,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const META = 18;
         let parque;
         try {
-            parque = await clonarParque();
+            parque = await clonarParque(ambienteSlug);
         } catch (err) {
             console.error(err);
             return;
@@ -3737,6 +3788,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (typeof mundo.despejarArboles === 'function') {
             mundo.despejarArboles([spur], 7);
         }
+        entradaParque = { spur, boca: boca.clone() };
     }
 
     function colocarProxyCarpa() {
