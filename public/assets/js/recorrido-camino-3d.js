@@ -1320,6 +1320,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         dialogoToken++;
         const fiesta = document.getElementById('rn3dCelebracion');
         if (fiesta) fiesta.remove();
+        quitarBotonesMeta();
         detenerNarracion();
         cerrarModal();
         soltarFoco();
@@ -1743,7 +1744,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const ay = sticks.mover.y;
         const gira = Math.abs(ax) >= 0.16;
         const anda = Math.abs(ay) >= 0.16;
-        if ((!gira && !anda) || !personaje || !personaje.visible || caminando || entrandoSaliendo
+        if (grupoMeta || (!gira && !anda) || !personaje || !personaje.visible || caminando || entrandoSaliendo
             || eligiendoPersonaje || mostrandoBocadillo || juegosAbiertos || !recorridoIniciado || viajeDetras) {
             moviendoStick = false;
             return;
@@ -1787,14 +1788,35 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (pos && Math.hypot(personaje.position.x - pos.x, personaje.position.z - pos.z) <= 3.4) cerca = true;
         if (!cerca && puerta && Math.hypot(personaje.position.x - puerta.x, personaje.position.z - puerta.z) <= 5.5) cerca = true;
         if (!cerca) return;
-        if (pos && (!puerta || Math.hypot(personaje.position.x - pos.x, personaje.position.z - pos.z) <= 3.4)) {
-            personaje.position.x = pos.x;
-            personaje.position.z = pos.z;
-            if (mundo) personaje.position.y = mundo.altura(pos.x, pos.z);
-        }
         moviendoStick = false;
+        const enElPunto = pos && Math.hypot(personaje.position.x - pos.x, personaje.position.z - pos.z) <= 3.4;
+        if (enElPunto && Math.hypot(personaje.position.x - pos.x, personaje.position.z - pos.z) > 0.45) {
+            caminarRectoHasta(id, pos);
+            return;
+        }
         animDestinoId = id;
         terminarAvance();
+    }
+
+    function caminarRectoHasta(id, pos) {
+        if (!personaje) return;
+        const desde = personaje.position.clone();
+        const hacia = pos.clone();
+        if (mundo) hacia.y = mundo.altura(hacia.x, hacia.z);
+        const dist = Math.hypot(hacia.x - desde.x, hacia.z - desde.z);
+        entrandoSaliendo = true;
+        animCasa = {
+            modo: 'salir',
+            ini: performance.now(),
+            dur: Math.max(450, (dist / 2.2) * 1000),
+            desde: hacia,
+            puerta: desde,
+            base: personaje.scale.x || 1,
+            onFin: function () {
+                animDestinoId = id;
+                terminarAvance();
+            },
+        };
     }
 
     const pulsos = { mover: new Set() };
@@ -1889,6 +1911,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     }
 
     function alTocar(clientX, clientY) {
+        if (grupoMeta) return;
         if (eligiendoPersonaje || caminando || juegosAbiertos || mostrandoBocadillo || entrandoSaliendo) return;
         if (modoNav === 'botones') return;
         puntero.x = (clientX / window.innerWidth) * 2 - 1;
@@ -2506,7 +2529,69 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             };
         }
         ponerCamaraLejos(usaMapaGlb ? 22 : 26, usaMapaGlb ? 9 : 11);
-        mostrarDialogo(fraseParada(p));
+        mostrarDialogo(fraseParada(p), function () { mostrarBotonesMeta(); });
+    }
+
+    let grupoMeta = null;
+
+    function quitarBotonesMeta() {
+        if (grupoMeta && grupoMeta.parentNode) grupoMeta.parentNode.removeChild(grupoMeta);
+        grupoMeta = null;
+    }
+
+    function mostrarBotonesMeta() {
+        if (grupoMeta || !ctx.$paso || !ctx.$paso[0]) return;
+        const panel = document.createElement('div');
+        panel.id = 'rn3dMeta';
+        panel.className = 'rn3d-meta';
+        panel.innerHTML = ''
+            + '<div class="rn3d-meta__card">'
+            +   '<div class="rn3d-meta__titulo">'
+            +     '<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>'
+            +     '<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>'
+            +     '<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>'
+            +     '<h2>¡Lo lograste!</h2>'
+            +     '<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>'
+            +     '<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>'
+            +     '<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>'
+            +   '</div>'
+            +   '<p>Terminamos la aventura. ¡Muy bien!</p>'
+            +   '<div class="rn3d-meta__botones">'
+            +     '<button type="button" class="rn3d-meta__btn" data-accion="jugar">'
+            +       '<span class="intro3d-btn-shine" aria-hidden="true"></span>'
+            +       '<span class="intro3d-play" aria-hidden="true"></span>'
+            +       '<span>Jugar de nuevo</span>'
+            +     '</button>'
+            +     '<button type="button" class="rn3d-meta__btn rn3d-meta__btn--salir" data-accion="salir">'
+            +       '<span class="intro3d-btn-shine" aria-hidden="true"></span>'
+            +       '<span>Salir</span>'
+            +     '</button>'
+            +   '</div>'
+            + '</div>';
+        panel.addEventListener('click', function (ev) {
+            const btn = ev.target.closest('button');
+            if (!btn) return;
+            ev.preventDefault();
+            ev.stopPropagation();
+            if (btn.getAttribute('data-accion') === 'jugar') reiniciarRecorrido();
+            else pedirSalir();
+        });
+        ctx.$paso[0].appendChild(panel);
+        grupoMeta = panel;
+    }
+
+    function reiniciarRecorrido() {
+        quitarBotonesMeta();
+        enMeta = false;
+        visitados = new Set();
+        ramasCompletadas = new Set();
+        indiceActual = 0;
+        indiceMaximoVisitado = 0;
+        recorridoIniciado = false;
+        regresandoAlFin = false;
+        esperarParaFin = false;
+        experienciaCargada = null;
+        volverPersonajeAlInicio();
     }
 
     // Misma nube del saludo: el texto que se lee es el que se escucha.
