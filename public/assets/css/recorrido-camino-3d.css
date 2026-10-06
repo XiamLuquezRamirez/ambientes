@@ -830,6 +830,150 @@ body.rn3d-video-reproduciendo .kiosco-fs-btn {
     .rn3d-confeti { opacity: .8; }
 }
 
+/* Mensaje de la meta: misma tarjeta del Continuar de los juegos, entra desde abajo. */
+.rn3d-meta {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 12;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 0 16px max(22px, env(safe-area-inset-bottom, 0px));
+    pointer-events: none;
+}
+.rn3d-meta__card {
+    position: relative;
+    pointer-events: auto;
+    width: min(78vw, 400px);
+    padding: 12px 16px 12px;
+    border-radius: 28px;
+    text-align: center;
+    background: linear-gradient(180deg, #fffef8 0%, #fff1c8 55%, #ffe8a8 100%);
+    border: 6px solid #ffce2a;
+    box-shadow:
+        0 6px 0 #e0a500,
+        0 14px 24px rgba(0, 0, 0, 0.28),
+        inset 0 3px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -5px 0 rgba(255, 186, 40, 0.28);
+    animation: rn3d-meta-sube 1.05s cubic-bezier(.16, .84, .22, 1) both;
+}
+.rn3d-meta__titulo {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.rn3d-meta__card h2 {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font-family: Fredoka, 'Fredoka One', Arial, sans-serif;
+    font-size: clamp(26px, 3.4vw, 34px);
+    font-weight: 700;
+    color: #2f7dff;
+    -webkit-text-stroke: 4px #ffffff;
+    paint-order: stroke fill;
+    text-shadow: 0 3px 0 #1a4fbf, 0 5px 0 rgba(20, 60, 140, 0.25);
+    letter-spacing: 0.5px;
+}
+.rn3d-meta__card p {
+    margin: 4px 0 10px;
+    font-family: Fredoka, 'Fredoka One', Arial, sans-serif;
+    font-size: clamp(14px, 1.8vw, 17px);
+    font-weight: 600;
+    color: #2457b8;
+    line-height: 1.25;
+}
+.rn3d-meta__botones {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    justify-content: center;
+}
+.rn3d-meta__btn {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1 1 0;
+    padding: 8px 12px;
+    border: 4px solid #ffffff;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #7be06a 0%, #3dbd45 48%, #249a34 100%);
+    color: #fff;
+    font-family: Fredoka, 'Fredoka One', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow:
+        0 8px 0 #1a7a28,
+        0 14px 22px rgba(0, 0, 0, 0.22),
+        inset 0 2px 0 rgba(255, 255, 255, 0.55);
+}
+.rn3d-meta__btn--salir {
+    background: linear-gradient(180deg, #ff8a7a 0%, #ef4444 48%, #dc2626 100%);
+    box-shadow:
+        0 8px 0 #991b1b,
+        0 14px 22px rgba(0, 0, 0, 0.22),
+        inset 0 2px 0 rgba(255, 255, 255, 0.55);
+}
+.rn3d-meta__btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 #1a7a28, 0 8px 14px rgba(0, 0, 0, 0.2), inset 0 2px 0 rgba(255, 255, 255, 0.55);
+}
+.rn3d-meta__btn--salir:active {
+    box-shadow: 0 4px 0 #991b1b, 0 8px 14px rgba(0, 0, 0, 0.2), inset 0 2px 0 rgba(255, 255, 255, 0.55);
+}
+.rn3d-meta .intro3d-ray {
+    position: absolute;
+    width: 14px;
+    height: 28px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: linear-gradient(180deg, #ffe566 0%, #ffb400 100%);
+    box-shadow: 0 2px 0 rgba(200, 130, 0, 0.35);
+    z-index: 0;
+    pointer-events: none;
+}
+.rn3d-meta .intro3d-ray { width: 10px; height: 18px; }
+.rn3d-meta .intro3d-ray-l1 { left: -22px; top: 2px; transform: rotate(-55deg); }
+.rn3d-meta .intro3d-ray-l2 { left: -28px; top: 18px; transform: rotate(-90deg) scale(0.85); }
+.rn3d-meta .intro3d-ray-l3 { left: -18px; top: 32px; transform: rotate(-122deg) scale(0.75); }
+.rn3d-meta .intro3d-ray-r1 { right: -22px; top: 2px; transform: rotate(55deg); }
+.rn3d-meta .intro3d-ray-r2 { right: -28px; top: 18px; transform: rotate(90deg) scale(0.85); }
+.rn3d-meta .intro3d-ray-r3 { right: -18px; top: 32px; transform: rotate(122deg) scale(0.75); }
+.rn3d-meta .intro3d-btn-shine {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 6px;
+    height: 38%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+    pointer-events: none;
+}
+.rn3d-meta .intro3d-play {
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-left: 11px solid #fff;
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.15));
+}
+@keyframes rn3d-meta-sube {
+    from { opacity: 0; transform: translateY(110vh); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .rn3d-meta__card { animation: none; }
+}
+
 /* ===== Celebración al llegar al fin (confeti + mensaje) ===== */
 .rn3d-celebracion {
     position: absolute; inset: 0; z-index: 9; pointer-events: none; overflow: hidden;
@@ -890,3 +1034,58 @@ body.rn3d-video-reproduciendo .kiosco-fs-btn {
 @keyframes rn3d-cel-pop { 0% { opacity: 0; transform: translateX(-50%) translateY(16px); } 100% { opacity: 1; transform: translateX(-50%) translateY(0); } }
 @keyframes rn3d-cel-fade { 0%,80% { opacity: 1; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .rn3d-confeti-p { animation: none !important; } }
+
+.rn3d-controles {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+}
+.rn3d-pad {
+    position: absolute;
+    bottom: max(18px, 3vh);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+.rn3d-pad--izq { left: max(16px, 2vw); }
+.rn3d-pad--der { right: max(16px, 2vw); }
+.rn3d-pad__titulo {
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .92);
+    color: #143024;
+    font-family: 'Fredoka One', system-ui, sans-serif;
+    font-size: 1.15rem;
+    letter-spacing: .03em;
+}
+.rn3d-pad__cruz {
+    display: grid;
+    grid-template-columns: 86px 86px 86px;
+    grid-template-rows: 86px 86px 86px;
+    gap: 10px;
+    pointer-events: none;
+}
+.rn3d-pad__btn {
+    pointer-events: auto;
+    touch-action: none;
+    border: 4px solid #ffffffd7;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.445);
+    color: #ffffffe8;
+    font-size: 2rem;
+    box-shadow: 0 8px 0 rgba(20, 99, 58, .35);
+    cursor: pointer;
+}
+.rn3d-pad__btn:nth-child(1) { grid-column: 2; grid-row: 1; }
+.rn3d-pad__btn:nth-child(2) { grid-column: 1; grid-row: 2; }
+.rn3d-pad__btn:nth-child(3) { grid-column: 3; grid-row: 2; }
+.rn3d-pad__btn:nth-child(4) { grid-column: 2; grid-row: 3; }
+.rn3d-pad__btn.is-pulsado {
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 rgba(20, 99, 58, .35);
+    background: #3dce4a;
+    color: #fff;
+}

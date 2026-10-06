@@ -41,6 +41,12 @@
         html.setAttribute('data-kiosco-perfil', '0');
     }
 
+    function edadDe(datos) {
+        if (!datos || datos.edad === null || datos.edad === undefined || datos.edad === '') return null;
+        const n = Number(datos.edad);
+        return Number.isFinite(n) ? Math.trunc(n) : null;
+    }
+
     function aplicarPayload(payload) {
         const datos = payload && typeof payload === 'object' ? payload : {};
         const vals = datos.valores && typeof datos.valores === 'object' ? datos.valores : {};
@@ -57,6 +63,7 @@
         window.PedniaPerfil.valores = vals;
         window.PedniaPerfil.tipo = datos.tipo || null;
         window.PedniaPerfil.perfilId = datos.perfil_id || 0;
+        window.PedniaPerfil.edad = edadDe(datos);
         window.PedniaPerfil.noop = listaNoop;
     }
 
@@ -75,6 +82,7 @@
         valores: valores,
         tipo: data.tipo || null,
         perfilId: data.perfil_id || 0,
+        edad: edadDe(data),
         noop: noop,
         v: function (clave, fallback) {
             if (!this.activo || !Object.prototype.hasOwnProperty.call(this.valores, clave)) {

@@ -72,6 +72,15 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     let clipActual = '';
     let clipMovimiento = CLIP_CAMINAR;
     let personajeCual = 'nino';
+    // auto: <=3 años. puntos: 4 y 5 (toque en la parada). botones: 6 o más.
+    // null = sin fecha de nacimiento en la sesión: se queda en puntos.
+    let modoNav = 'puntos';
+    let moviendoStick = false;
+    let orbitaStick = 0;
+    let alturaStick = 0;
+    let autoToken = 0;
+    let limitesMapa = null;
+    const sticks = { mover: { x: 0, y: 0 }, camara: { x: 0, y: 0 } };
     let eligiendoPersonaje = false;
     let enHablaEleccion = false;
     let candidatosPersonaje = null;
@@ -79,6 +88,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     let pasoAlCentro = null;
     let sueloEleccion = null;
     let viajeEntrada = null;
+    let viajeDetras = null;
     let saludoYaDicho = false;
     let timersEleccion = [];
     let cambiandoPersonaje = false;
@@ -307,11 +317,18 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             const cab = cabeceraDeRama(pend[0]); // solo la primera pendiente
             return cab ? [cab] : [];
         }
-        // - En una experiencia completada: se puede VOLVER al módulo (si quedan
-        //   ramas) o ir al fin (si era la última).
-        // Al terminar una experiencia se vuelve al paso 3. El fin no se cruza
-        // desde la casa: se toma el sendero que sigue de largo, ya de vuelta.
+        // - En una experiencia completada. Casos 1 y 2 vuelven al punto 3.
+        //   Caso 3 no se detiene en el cruce: si queda otra casa, esa es el
+        //   punto; si ya terminó todas, el punto es la meta.
         if (enExperienciaCompletada()) {
+            if (modoNav === 'botones') {
+                const pend = ramasPendientes();
+                if (pend.length) {
+                    const cab = cabeceraDeRama(pend[0]);
+                    if (cab) return [cab];
+                }
+                if (idFin && !visitados.has(idFin)) return [idFin];
+            }
             return idModulo ? [idModulo] : [];
         }
         // - En medio de una rama: el siguiente nodo de la rama no visitado.
@@ -499,12 +516,19 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         clipActual = nombre;
     }
 
+    // Velocidad del personaje. 1 es la de ahora.
+    // Más alto camina más rápido; más bajo, más lento.
+    // Vale para las flechas y para cuando el sistema lo lleva.
+    const VELOCIDAD_PERSONAJE = 2.5;
+
     function duracionCaminata(dist) {
-        if (!usaMapaGlb) return Math.max(1400, dist * 85);
-        const corriendo = dist > 14;
+        const factor = VELOCIDAD_PERSONAJE > 0 ? VELOCIDAD_PERSONAJE : 1;
+        if (!usaMapaGlb) return Math.max(1400, dist * 85 / factor);
+        const pequeno = modoNav === 'auto' || modoNav === 'puntos';
+        const corriendo = !pequeno && dist > 14;
         clipMovimiento = corriendo ? CLIP_CORRER : CLIP_CAMINAR;
-        const vel = corriendo ? 6.5 : 3.0;
-        return Math.max(800, (dist / vel) * 1000);
+        const vel = (corriendo ? 6.5 : (pequeno ? 1.8 : 3.0)) * factor;
+        return Math.max(pequeno ? 1400 : 800, (dist / vel) * 1000);
     }
 
 
@@ -530,6 +554,16 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     let angLadeo = 0;
     let signoLadeo = 1;
     let yawCamSuave = null;
+    // 'cruce': va al punto 3 mirando al niño. 'detras': ya llegó, se pone a su espalda.
+    let regresoCruce = null;
+    let salidaMando = false;
+    let camaraSalidaLejos = false;
+    let metaSalida = null;
+    let puestoSalida = null;
+    let faseSalida = null;
+    let enMeta = false;
+    let distCruceInicio = 12;
+    const _ejeCruce = new THREE.Vector2(0, 1);
     const offsetAcople = new THREE.Vector3();
     const posAcoplePrev = new THREE.Vector3();
     const _ejeCasa = new THREE.Vector3();
@@ -628,6 +662,187 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         return { ang: ang, dist: distBase * 1.75, peso: 0.34 };
     }
 
+    function poseDetras(yawExtra, lejosCasa) {
+        const dist = lejosCasa ? (usaMapaGlb ? 15 : 18) : (usaMapaGlb ? 9 : 12);
+        const alt = usaMapaGlb ? 5.6 : 7.2;
+        const yaw = personaje.rotation.y + (yawExtra || 0);
+        let x = personaje.position.x - Math.sin(yaw) * dist;
+        let z = personaje.position.z - Math.cos(yaw) * dist;
+        const casas = [];
+        if (mundo && mundo.casaInicio && typeof mundo.casaInicio.punto === 'function') {
+            const c = mundo.casaInicio.punto();
+            if (c && Number.isFinite(c.x) && Number.isFinite(c.z)) casas.push(c);
+        }
+        Object.keys(puertasCasa).forEach((id) => {
+            const c = puertasCasa[id];
+            if (c && Number.isFinite(c.x) && Number.isFinite(c.z)) casas.push(c);
+        });
+        casas.forEach((c) => {
+            // Al entrar o al ponerse detrás en la salida, no correrla de lado.
+            if (lejosCasa || faseSalida === 'detras') return;
+            // Si el niño ya salió de la casa, no correr la cámara de lado: la mete en el muro.
+            if (Math.hypot(personaje.position.x - c.x, personaje.position.z - c.z) > 11) return;
+            const d = Math.hypot(x - c.x, z - c.z);
+            if (d >= 8) return;
+            const empuje = 11 - d;
+            x += -Math.cos(yaw) * empuje;
+            z += Math.sin(yaw) * empuje;
+        });
+        const dx = x - personaje.position.x;
+        const dz = z - personaje.position.z;
+        const len = Math.hypot(dx, dz);
+        if (len < dist && len > 0.001) {
+            x = personaje.position.x + (dx / len) * dist;
+            z = personaje.position.z + (dz / len) * dist;
+        }
+        const fx = Math.sin(yaw);
+        const fz = Math.cos(yaw);
+        const vx = x - personaje.position.x;
+        const vz = z - personaje.position.z;
+        if (vx * fx + vz * fz > 0) {
+            x = personaje.position.x - vx;
+            z = personaje.position.z - vz;
+        }
+        const ojo = usaMapaGlb ? 1.5 : 2.1;
+        return {
+            pos: new THREE.Vector3(x, personaje.position.y + alt, z),
+            mira: new THREE.Vector3(personaje.position.x, personaje.position.y + ojo, personaje.position.z),
+        };
+    }
+
+    let yawSigue = null;
+
+    function seguirDetrasManual(inmediato, lejosCasa) {
+        const meta = personaje.rotation.y;
+        if (yawSigue == null || inmediato) yawSigue = meta;
+        else {
+            let d = meta - yawSigue;
+            while (d > Math.PI) d -= Math.PI * 2;
+            while (d < -Math.PI) d += Math.PI * 2;
+            const tope = 0.045;
+            if (d > tope) d = tope;
+            else if (d < -tope) d = -tope;
+            yawSigue += d;
+        }
+        const pose = poseDetras(yawSigue - personaje.rotation.y, lejosCasa);
+        const k = inmediato ? 1 : 0.16;
+        camPos.lerp(pose.pos, k);
+        camTarget.lerp(pose.mira, k);
+        camera.position.copy(camPos);
+        camera.lookAt(camTarget);
+    }
+
+    function colocarDetrasTrasVoltear() {
+        if (enMeta) return;
+        if (modoNav !== 'botones' || !giroFrente) {
+            irDetrasDelPersonaje();
+            return;
+        }
+        const esperar = function () {
+            if (giroFrente) {
+                requestAnimationFrame(esperar);
+                return;
+            }
+            irDetrasDelPersonaje();
+        };
+        requestAnimationFrame(esperar);
+    }
+
+    function puntoAlCostado(destino, desde) {
+        let fx = destino.x - desde.x;
+        let fz = destino.z - desde.z;
+        const fl = Math.hypot(fx, fz) || 1;
+        fx /= fl;
+        fz /= fl;
+        const lado = usaMapaGlb ? 8 : 10;
+        const alt = usaMapaGlb ? 5.2 : 6.4;
+        const x = destino.x - fz * lado;
+        const z = destino.z + fx * lado;
+        const y = (mundo ? mundo.altura(x, z) : destino.y) + alt;
+        return new THREE.Vector3(x, y, z);
+    }
+
+    function pasoAlrededor(meta, k) {
+        const px = personaje.position.x;
+        const pz = personaje.position.z;
+        const ax = camPos.x - px;
+        const az = camPos.z - pz;
+        const bx = meta.x - px;
+        const bz = meta.z - pz;
+        const aLen = Math.hypot(ax, az) || 1;
+        const bLen = Math.hypot(bx, bz) || 1;
+        let aAng = Math.atan2(ax, az);
+        let bAng = Math.atan2(bx, bz);
+        let d = bAng - aAng;
+        while (d > Math.PI) d -= Math.PI * 2;
+        while (d < -Math.PI) d += Math.PI * 2;
+        const ang = aAng + d * k;
+        const dist = aLen + (bLen - aLen) * k;
+        const y = camPos.y + (meta.y - camPos.y) * k;
+        return new THREE.Vector3(px + Math.sin(ang) * dist, y, pz + Math.cos(ang) * dist);
+    }
+
+    function aplicarCamaraSalida(inmediato) {
+        if (!metaSalida || !personaje || !camera) { faseSalida = null; return; }
+        const saliendo = animCasa && animCasa.modo === 'salir';
+        const kCamino = saliendo ? Math.min(1, (performance.now() - animCasa.ini) / animCasa.dur) : 0;
+        if (faseSalida === 'punto' && saliendo && kCamino >= 0.96) faseSalida = 'detras';
+        const ojo = usaMapaGlb ? 1.6 : 2.2;
+        const mira = new THREE.Vector3(personaje.position.x, personaje.position.y + ojo, personaje.position.z);
+        const k = inmediato ? 1 : (faseSalida === 'detras' ? 0.16 : 0.18);
+        const metaCam = faseSalida === 'detras'
+            ? poseDetras(0).pos
+            : (puestoSalida || metaSalida);
+        camPos.copy(pasoAlrededor(metaCam, k));
+        camTarget.lerp(mira, k);
+        camera.position.copy(camPos);
+        camera.lookAt(camTarget);
+    }
+
+    function ponerCamaraLejos(dist, alt) {
+        if (!personaje || !camera) return;
+        const origen = personaje.position;
+        let ux = camPos.x - origen.x;
+        let uz = camPos.z - origen.z;
+        let largo = Math.hypot(ux, uz);
+        if (largo < 0.4) {
+            const casa = nodoActual && casasPorId[nodoActual];
+            const tang = casa && casa.userData.tang;
+            ux = tang ? -tang.x : -Math.sin(personaje.rotation.y);
+            uz = tang ? -tang.z : -Math.cos(personaje.rotation.y);
+            largo = Math.hypot(ux, uz) || 1;
+        }
+        ux /= largo;
+        uz /= largo;
+        const d = dist || (usaMapaGlb ? 20 : 24);
+        const h = alt || (usaMapaGlb ? 8.4 : 10);
+        const ojo = usaMapaGlb ? 1.6 : 2.2;
+        viajeDetras = {
+            t0: performance.now(),
+            dur: 1400,
+            desde: camera.position.clone(),
+            hasta: new THREE.Vector3(origen.x + ux * d, origen.y + h, origen.z + uz * d),
+            miraDesde: camTarget.clone(),
+            miraHasta: new THREE.Vector3(origen.x, origen.y + ojo, origen.z),
+        };
+    }
+
+    function irDetrasDelPersonaje() {
+        if (modoNav !== 'botones' || !personaje || !personaje.visible || !camera || entrandoSaliendo) return;
+        orbitaStick = 0;
+        alturaStick = 0;
+        yawSigue = personaje.rotation.y;
+        const pose = poseDetras(0);
+        viajeDetras = {
+            t0: performance.now(),
+            dur: 1100,
+            desde: camera.position.clone(),
+            hasta: pose.pos,
+            miraDesde: camTarget.clone(),
+            miraHasta: pose.mira,
+        };
+    }
+
     function reengancharCamara() {
         acopleDetras = 0;
         angLadeo = 0;
@@ -657,10 +872,13 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     }
 
     function avanzarAcople(pos) {
-        const moviendo = caminando || (entrandoSaliendo && animCasa && animCasa.modo === 'salir');
+        const moviendo = caminando || moviendoStick || (entrandoSaliendo && animCasa && animCasa.modo === 'salir');
         if (moviendo && acopleDetras < 1) {
             const paso = Math.hypot(pos.x - posAcoplePrev.x, pos.z - posAcoplePrev.z);
-            if (paso < 2.5) acopleDetras = Math.min(1, acopleDetras + paso / ACOPLAR_METROS);
+            if (paso < 2.5) {
+                const metros = moviendoStick ? Math.max(paso, 1.1) : paso;
+                acopleDetras = Math.min(1, acopleDetras + metros / ACOPLAR_METROS);
+            }
         }
         posAcoplePrev.copy(pos);
     }
@@ -698,6 +916,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     }
 
     function aplicarMiradaSiguiente() {
+        // Con las flechas el niño elige hacia dónde mira. Si se le impone el
+        // siguiente punto, no puede girar para entrar a la casa.
+        if (modoNav === 'botones') return;
         if (yawObjetivo == null || !personaje || caminando || entrandoSaliendo) return;
         if (!idModulo || nodoActual !== idModulo) { yawObjetivo = null; return; }
         let delta = yawObjetivo - personaje.rotation.y;
@@ -718,6 +939,90 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         personaje.rotation.y += delta * 0.12;
     }
 
+    const _posCruce = new THREE.Vector3();
+    const _miraCruce = new THREE.Vector3();
+
+    function iniciarCamaraCruce() {
+        if (regresoCruce === 'detras') return;
+        if (!idModulo || !nodos[idModulo] || !nodos[idModulo].pos) return;
+        if (regresoCruce !== 'cruce') {
+            const c = nodos[idModulo].pos;
+            const p = personaje ? personaje.position : c;
+            distCruceInicio = Math.max(10, Math.hypot(p.x - c.x, p.z - c.z));
+            regresoCruce = 'cruce';
+        }
+    }
+
+    function puntoDestinoTrasCruce() {
+        const toc = nodosTocables();
+        const id = toc.length ? toc[0] : (idFin || null);
+        if (!id || id === nodoActual) return null;
+        const est = estacionPorId(id);
+        if (est && est.grupo) return est.grupo.position;
+        if (nodos[id] && nodos[id].pos) return nodos[id].pos;
+        return null;
+    }
+
+    // Distancia y altura del plano de seguimiento, con el zoom que la cámara tiene ahora.
+    function planoPorDefecto() {
+        const z = zoomCam || 1;
+        return {
+            dist: (usaMapaGlb ? 22 : 28) * z,
+            alt: (usaMapaGlb ? 8 : 11) * z,
+        };
+    }
+
+    // Sale de la experiencia: la cámara espera en el cruce y mira al niño.
+    // A medida que él se acerca, la cámara se aleja hasta el zoom por defecto.
+    // Al llegar al punto 3, pasa detrás y mira el siguiente destino.
+    function aplicarCamaraRegreso(inmediato) {
+        const p = personaje.position;
+        const cruce = posPunto3();
+        if (!cruce) { regresoCruce = null; return; }
+        const ojo = usaMapaGlb ? 1.5 : 2.1;
+        const plano = planoPorDefecto();
+        const dx = cruce.x - p.x;
+        const dz = cruce.z - p.z;
+        const distNino = Math.hypot(dx, dz);
+        if (distNino > 0.8) _ejeCruce.set(dx / distNino, dz / distNino);
+        if (regresoCruce === 'detras') {
+            const dest = puntoDestinoTrasCruce();
+            let ux = Math.sin(personaje.rotation.y);
+            let uz = Math.cos(personaje.rotation.y);
+            if (dest) {
+                ux = dest.x - p.x;
+                uz = dest.z - p.z;
+                const l = Math.hypot(ux, uz) || 1;
+                ux /= l; uz /= l;
+            }
+            _posCruce.set(p.x - ux * plano.dist, p.y + plano.alt, p.z - uz * plano.dist);
+            if (dest) _miraCruce.set(dest.x, (dest.y || 0) + 1.4, dest.z);
+            else _miraCruce.set(p.x + ux * 8, p.y + ojo, p.z + uz * 8);
+        } else {
+            const acerca = 1 - Math.min(1, distNino / distCruceInicio);
+            const distCerca = Math.max(distNino, 3.5);
+            const distCam = THREE.MathUtils.lerp(distCerca, plano.dist, acerca);
+            const altCam = THREE.MathUtils.lerp(usaMapaGlb ? 6.2 : 8, plano.alt, acerca);
+            _posCruce.set(
+                p.x + _ejeCruce.x * distCam,
+                p.y + altCam,
+                p.z + _ejeCruce.y * distCam
+            );
+            _miraCruce.set(p.x, p.y + ojo, p.z);
+        }
+        const kPos = inmediato ? 1 : (regresoCruce === 'detras' ? 0.04 : 0.08);
+        const kMir = inmediato ? 1 : (regresoCruce === 'detras' ? 0.016 : 0.08);
+        camPos.lerp(_posCruce, kPos);
+        camTarget.lerp(_miraCruce, kMir);
+        camera.position.copy(camPos);
+        camera.lookAt(camTarget);
+        if (regresoCruce === 'detras' && caminando && camPos.distanceTo(_posCruce) < 1.2) {
+            regresoCruce = null;
+            seguimientoActivo = true;
+            reengancharCamara();
+        }
+    }
+
     function actualizarCamara(inmediato) {
         if (pasoAlCentro) return;
         if (viajeEntrada) {
@@ -735,11 +1040,40 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             }
             return;
         }
+        if (viajeDetras) {
+            const k = Math.min(1, (performance.now() - viajeDetras.t0) / viajeDetras.dur);
+            const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+            camera.position.lerpVectors(viajeDetras.desde, viajeDetras.hasta, e);
+            const mira = viajeDetras.miraDesde.clone().lerp(viajeDetras.miraHasta, e);
+            camera.lookAt(mira);
+            camPos.copy(camera.position);
+            camTarget.copy(mira);
+            if (k >= 1) {
+                viajeDetras = null;
+                if (!enMeta && !camaraSalidaLejos) {
+                    seguimientoActivo = true;
+                    reengancharCamara();
+                }
+            }
+            return;
+        }
         if (eligiendoPersonaje) {
             encuadrarCandidatos();
             return;
         }
         if (!personaje) return;
+        if (faseSalida) {
+            aplicarCamaraSalida(inmediato);
+            return;
+        }
+        if (giroFrente) return;
+        if (enMeta) return;
+        if (camaraSalidaLejos && !moviendoStick) return;
+        if (salidaMando) return;
+        if (regresoCruce) {
+            aplicarCamaraRegreso(inmediato);
+            return;
+        }
         if (focoManual && !caminando && !entrandoSaliendo) {
             const vista = vistaDelFoco();
             if (!vista) { focoManual = null; }
@@ -757,6 +1091,15 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             }
         }
         const p = personaje.position;
+        if (modoNav === 'botones' && seguimientoActivo && !caminando && !eligiendoPersonaje) {
+            const paradaAquiCam = nodoActual && nodos[nodoActual] ? nodos[nodoActual].parada : null;
+            const entrandoCasa = !!(paradaAquiCam && esParadaExperiencia(paradaAquiCam)
+                && (entrandoSaliendo || hablaSinVoltear || narrando || mostrandoBocadillo));
+            if (entrandoCasa || (!mostrandoBocadillo && !narrando && !entrandoSaliendo)) {
+                seguirDetrasManual(inmediato, entrandoCasa);
+                return;
+            }
+        }
         if ((caminando || entrandoSaliendo) && !seguimientoActivo) {
             seguimientoActivo = true;
             reengancharCamara();
@@ -796,7 +1139,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             return;
         }
 
-        if (caminando || (entrandoSaliendo && (!animCasa || animCasa.modo !== 'girar'))) {
+        if (caminando || moviendoStick || (entrandoSaliendo && (!animCasa || animCasa.modo !== 'girar'))) {
             rumboCamino = personaje.rotation.y;
         }
         const hablandoAhora = narrando || mostrandoBocadillo;
@@ -812,8 +1155,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         }
         avanzarAcople(p);
 
-        const quiereCerca = !enfocarSiguiente && !enExperiencia && !caminando && !entrandoSaliendo
+        const hablaEnPunto = !enfocarSiguiente && !enExperiencia && !caminando && !entrandoSaliendo
             && !hablaSinVoltear && hablandoAhora;
+        const quiereCerca = hablaEnPunto && modoNav !== 'botones';
         mezclaHabla += ((quiereCerca ? 1 : 0) - mezclaHabla) * (inmediato ? 1 : VELOCIDAD_CAMARA_HABLA);
         if (mezclaHabla < 0.001) mezclaHabla = 0;
         if (mezclaHabla > 0.999) mezclaHabla = 1;
@@ -878,6 +1222,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         );
         const deseadaTgt = _deseadaTgt.copy(miraSeguimiento(p, ojoMirada, siguiente, peso));
         if (quiereCerca) voltearHaciaCamara(deseadaPos);
+        else if (hablaEnPunto && modoNav === 'botones') voltearHaciaCamara(camPos);
 
         let k = inmediato ? 1 : 0.04;
         if (!inmediato && enfocarSiguiente) k = 0.028;
@@ -975,6 +1320,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         dialogoToken++;
         const fiesta = document.getElementById('rn3dCelebracion');
         if (fiesta) fiesta.remove();
+        quitarBotonesMeta();
         detenerNarracion();
         cerrarModal();
         soltarFoco();
@@ -1149,31 +1495,36 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     }
 
     /**
-     * Solo la boca de cada camino de experiencia y del parque.
-     * El resto del sendero, incluido después del cruce, conserva sus flores.
+     * El ramal completo de cada experiencia queda sin flores, arbustos ni piedras.
+     * El sendero principal las conserva. Del parque solo se limpia la boca.
      */
     function despejarEntradasCaminos() {
         if (!mundo || typeof mundo.quitarEstorbos !== 'function') return;
-        const muestras = [];
-        const bocaDe = (curva, metros) => {
-            if (!curva || typeof curva.getPoint !== 'function') return;
-            const n = 24;
+        const delRamal = [];
+        const deLaBoca = [];
+        const vistos = new Set();
+        const muestrear = (curva, destino, metros) => {
+            if (!curva || typeof curva.getPoint !== 'function' || vistos.has(curva)) return;
+            vistos.add(curva);
+            const n = 48;
             const pts = [];
             for (let s = 0; s <= n; s++) pts.push(curva.getPoint(s / n));
-            muestras.push([pts[0].x, pts[0].z]);
+            destino.push([pts[0].x, pts[0].z]);
             let acc = 0;
             for (let i = 0; i < n; i++) {
                 acc += pts[i].distanceTo(pts[i + 1]);
-                muestras.push([pts[i + 1].x, pts[i + 1].z]);
-                if (acc >= metros) break;
+                destino.push([pts[i + 1].x, pts[i + 1].z]);
+                if (metros != null && acc >= metros) break;
             }
         };
         Object.values(nodos).forEach((n) => {
             if (!n || !n.spur || !esParadaExperiencia(n.parada)) return;
-            bocaDe(n.spur, 7);
+            muestrear(n.spur, delRamal, null);
         });
-        if (entradaParque && entradaParque.spur) bocaDe(entradaParque.spur, 7);
-        mundo.quitarEstorbos(muestras, 3.4);
+        if (delRamal.length) mundo.quitarEstorbos(delRamal, 5.6);
+        vistos.clear();
+        if (entradaParque && entradaParque.spur) muestrear(entradaParque.spur, deLaBoca, 7);
+        if (deLaBoca.length) mundo.quitarEstorbos(deLaBoca, 3.4);
     }
 
     function vistaFrenteEstacion(casa) {
@@ -1340,8 +1691,229 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
     // ===================== Interacción =====================
     let raycaster, puntero;
+    function edadNino() {
+        if (location.pathname.indexOf('__preview-camino') >= 0) {
+            const q = new URLSearchParams(location.search).get('edad');
+            if (q !== null && q !== '' && Number.isFinite(Number(q))) return Math.trunc(Number(q));
+        }
+        const perfil = window.PedniaPerfil;
+        if (!perfil || perfil.edad === null || perfil.edad === undefined || perfil.edad === '') return null;
+        const n = Number(perfil.edad);
+        return Number.isFinite(n) ? Math.trunc(n) : null;
+    }
+
+    function fijarModoNavegacion() {
+        const edad = edadNino();
+        if (edad === null) modoNav = 'puntos';
+        else if (edad <= 3) modoNav = 'auto';
+        else if (edad <= 5) modoNav = 'puntos';
+        else modoNav = 'botones';
+    }
+
+    function cajaDelMapa() {
+        if (limitesMapa) return limitesMapa;
+        let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+        const toma = (x, z) => {
+            if (!Number.isFinite(x) || !Number.isFinite(z)) return;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (z < minZ) minZ = z;
+            if (z > maxZ) maxZ = z;
+        };
+        Object.keys(nodos).forEach((id) => {
+            const p = nodos[id] && nodos[id].pos;
+            if (p) toma(p.x, p.z);
+        });
+        if (curva && typeof curva.getPoint === 'function') {
+            for (let i = 0; i <= 24; i++) {
+                const p = curva.getPoint(i / 24);
+                toma(p.x, p.z);
+            }
+        }
+        if (!Number.isFinite(minX)) {
+            limitesMapa = { minX: -40, maxX: 120, minZ: -40, maxZ: 80 };
+            return limitesMapa;
+        }
+        const margen = 16;
+        limitesMapa = { minX: minX - margen, maxX: maxX + margen, minZ: minZ - margen, maxZ: maxZ + margen };
+        return limitesMapa;
+    }
+
+    function moverConStick(dt) {
+        const ax = sticks.mover.x;
+        const ay = sticks.mover.y;
+        const gira = Math.abs(ax) >= 0.16;
+        const anda = Math.abs(ay) >= 0.16;
+        if (grupoMeta || (!gira && !anda) || !personaje || !personaje.visible || caminando || entrandoSaliendo
+            || eligiendoPersonaje || mostrandoBocadillo || juegosAbiertos || !recorridoIniciado || viajeDetras) {
+            moviendoStick = false;
+            return;
+        }
+        if (gira || anda) giroFrente = null;
+        if (anda) camaraSalidaLejos = false;
+        if (gira) personaje.rotation.y += ax * 2.1 * dt;
+        rumboCamino = personaje.rotation.y;
+        moviendoStick = anda;
+        if (!anda) return;
+        const fx = Math.sin(personaje.rotation.y);
+        const fz = Math.cos(personaje.rotation.y);
+        const vel = 3.4 * ay * (VELOCIDAD_PERSONAJE > 0 ? VELOCIDAD_PERSONAJE : 1);
+        const caja = cajaDelMapa();
+        let nx = personaje.position.x + fx * vel * dt;
+        let nz = personaje.position.z + fz * vel * dt;
+        nx = Math.max(caja.minX, Math.min(caja.maxX, nx));
+        nz = Math.max(caja.minZ, Math.min(caja.maxZ, nz));
+        personaje.position.x = nx;
+        personaje.position.z = nz;
+        if (mundo) personaje.position.y = mundo.altura(nx, nz);
+        if (!seguimientoActivo) {
+            seguimientoActivo = true;
+            reengancharCamara();
+        }
+        llegarSiCerca();
+    }
+
+    function llegarSiCerca() {
+        if (!personaje || caminando || entrandoSaliendo || juegosAbiertos) return;
+        if (zonaJuegosParada) {
+            const dj = Math.hypot(personaje.position.x - zonaJuegosParada.x, personaje.position.z - zonaJuegosParada.z);
+            if (dj < 3.4) { abrirZonaJuegos(); return; }
+        }
+        const toc = nodosTocables();
+        if (!toc.length) return;
+        const id = toc[0];
+        const pos = nodos[id] && nodos[id].pos;
+        const puerta = puertasCasa[id];
+        let cerca = false;
+        if (pos && Math.hypot(personaje.position.x - pos.x, personaje.position.z - pos.z) <= 3.4) cerca = true;
+        if (!cerca && puerta && Math.hypot(personaje.position.x - puerta.x, personaje.position.z - puerta.z) <= 5.5) cerca = true;
+        if (!cerca) return;
+        moviendoStick = false;
+        const enElPunto = pos && Math.hypot(personaje.position.x - pos.x, personaje.position.z - pos.z) <= 3.4;
+        if (enElPunto && Math.hypot(personaje.position.x - pos.x, personaje.position.z - pos.z) > 0.45) {
+            caminarRectoHasta(id, pos);
+            return;
+        }
+        animDestinoId = id;
+        terminarAvance();
+    }
+
+    function caminarRectoHasta(id, pos) {
+        if (!personaje) return;
+        const desde = personaje.position.clone();
+        const hacia = pos.clone();
+        if (mundo) hacia.y = mundo.altura(hacia.x, hacia.z);
+        const dist = Math.hypot(hacia.x - desde.x, hacia.z - desde.z);
+        entrandoSaliendo = true;
+        animCasa = {
+            modo: 'salir',
+            ini: performance.now(),
+            dur: Math.max(450, (dist / 2.2) * 1000),
+            desde: hacia,
+            puerta: desde,
+            base: personaje.scale.x || 1,
+            onFin: function () {
+                animDestinoId = id;
+                terminarAvance();
+            },
+        };
+    }
+
+    const pulsos = { mover: new Set() };
+
+    function recomponerControles() {
+        let x = 0;
+        let y = 0;
+        pulsos.mover.forEach((b) => {
+            x += Number(b.getAttribute('data-x')) || 0;
+            y += Number(b.getAttribute('data-y')) || 0;
+        });
+        sticks.mover.x = Math.max(-1, Math.min(1, x));
+        sticks.mover.y = Math.max(-1, Math.min(1, y));
+    }
+
+    function soltarControles() {
+        pulsos.mover.forEach((b) => b.classList.remove('is-pulsado'));
+        pulsos.mover.clear();
+        recomponerControles();
+        sticks.camara.x = 0;
+        sticks.camara.y = 0;
+    }
+
+    function sincronizarControles() {
+        const capa = document.getElementById('rn3dControles');
+        if (!capa) return;
+        const on = modoNav === 'botones' && recorridoIniciado && !eligiendoPersonaje && !juegosAbiertos
+            && !document.body.classList.contains('rn-player-activo');
+        if (capa.hidden === !on) return;
+        capa.hidden = !on;
+        if (!on) soltarControles();
+    }
+
+    function montarControles() {
+        if (!ctx.$paso || !ctx.$paso[0] || document.getElementById('rn3dControles')) return;
+        const flecha = (eje, x, y, icono, nombre) => ''
+            + '<button type="button" class="rn3d-pad__btn" data-eje="' + eje + '" data-x="' + x + '" data-y="' + y + '" aria-label="' + nombre + '">'
+            +   '<i class="fa-solid ' + icono + '" aria-hidden="true"></i>'
+            + '</button>';
+        const capa = document.createElement('div');
+        capa.id = 'rn3dControles';
+        capa.className = 'rn3d-controles';
+        capa.hidden = true;
+        capa.innerHTML = ''
+            + '<div class="rn3d-pad rn3d-pad--izq">'
+            +   '<span class="rn3d-pad__titulo">Caminar</span>'
+            +   '<div class="rn3d-pad__cruz">'
+            +     flecha('mover', 0, 1, 'fa-arrow-up', 'Adelante')
+            +     flecha('mover', 1, 0, 'fa-arrow-left', 'Izquierda')
+            +     flecha('mover', -1, 0, 'fa-arrow-right', 'Derecha')
+            +     flecha('mover', 0, -1, 'fa-arrow-down', 'Atrás')
+            +   '</div>'
+            + '</div>';
+        ctx.$paso[0].appendChild(capa);
+        capa.querySelectorAll('.rn3d-pad__btn').forEach(function (btn) {
+            let pid = null;
+            const soltar = function (e) {
+                if (e && e.pointerId !== pid) return;
+                pid = null;
+                pulsos.mover.delete(btn);
+                btn.classList.remove('is-pulsado');
+                recomponerControles();
+            };
+            btn.addEventListener('pointerdown', function (e) {
+                if (pid !== null) return;
+                pid = e.pointerId;
+                try { btn.setPointerCapture(e.pointerId); } catch (err) { /* noop */ }
+                pulsos.mover.add(btn);
+                btn.classList.add('is-pulsado');
+                recomponerControles();
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            btn.addEventListener('pointerup', soltar);
+            btn.addEventListener('pointercancel', soltar);
+        });
+    }
+
+    function programarAuto() {
+        if (modoNav !== 'auto') return;
+        const token = ++autoToken;
+        setTimeout(function () {
+            if (token !== autoToken || modoNav !== 'auto') return;
+            if (caminando || entrandoSaliendo || regresandoAlFin || esperarParaFin) return;
+            if (!recorridoIniciado || mostrandoBocadillo || juegosAbiertos) return;
+            if (document.body.classList.contains('rn-player-activo')) return;
+            if (document.body.classList.contains('rn3d-video-reproduciendo')) return;
+            const toc = nodosTocables();
+            if (!toc.length || toc[0] === nodoActual) return;
+            caminarA(toc[0]);
+        }, 700);
+    }
+
     function alTocar(clientX, clientY) {
+        if (grupoMeta) return;
         if (eligiendoPersonaje || caminando || juegosAbiertos || mostrandoBocadillo || entrandoSaliendo) return;
+        if (modoNav === 'botones') return;
         puntero.x = (clientX / window.innerWidth) * 2 - 1;
         puntero.y = -(clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(puntero, camera);
@@ -1358,8 +1930,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             }
         }
 
-        // 2) Estaciones (solo con el recorrido ya iniciado)
-        if (!recorridoIniciado) return;
+        // 2) Estaciones (solo con el recorrido ya iniciado). En automático no se tocan.
+        if (!recorridoIniciado || modoNav === 'auto') return;
         const objetos = [];
         estaciones.forEach(e => e.grupo.traverse(o => { if (o.isMesh) { o.userData.estId = e.parada.id; objetos.push(o); } }));
         const hit = raycaster.intersectObjects(objetos, false)[0];
@@ -1521,6 +2093,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (caminando || entrandoSaliendo || !destinoId || destinoId === nodoActual) { if (alLlegar) alLlegar(); return; }
         const aqui = nodos[nodoActual];
         const dest = nodos[destinoId];
+        if (destinoId === idModulo && aqui && aqui.parada && esParadaExperiencia(aqui.parada)) iniciarCamaraCruce();
         // Del paso 3 a la experiencia: primero el sendero hasta la Y, después el desvío.
         if (dest && dest.spur && dest.boca === nodoActual && typeof dest.tUnion === 'number') {
             caminarPuente(curva, aqui.t || 0, dest.tUnion, function () {
@@ -1530,6 +2103,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         }
         // Al salir de esa experiencia: desvío hasta la Y y luego el sendero, sin saltar al paso 3.
         if (aqui && aqui.spur && aqui.boca && destinoId !== aqui.boca && typeof aqui.tUnion === 'number') {
+            iniciarCamaraCruce();
             const union = aqui.tUnion;
             const tDest = dest && !dest.spur ? (dest.t || 0) : union;
             caminarPuente(aqui.spur, aqui.tLocal != null ? aqui.tLocal : 1, 0, function () {
@@ -1715,6 +2289,29 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         return est && est.grupo ? est.grupo.position.clone() : null;
     }
 
+    // Caso 3, mayor de 5 años: sale la mitad del tramo anterior.
+    // El tramo se mide desde la puerta, por el sendero, no desde el centro de la casa.
+    function puntoSalidaMando(ancla, respaldo) {
+        const metros = 15;
+        const nodo = nodos[nodoActual];
+        const spur = nodo && nodo.spur;
+        if (spur && typeof spur.getPoint === 'function') {
+            for (let s = 40; s >= 0; s--) {
+                const p = spur.getPoint(s / 40);
+                if (Math.hypot(p.x - ancla.x, p.z - ancla.z) >= metros) return p.clone();
+            }
+        }
+        const meta = posPunto3() || respaldo || ancla;
+        const dx = meta.x - ancla.x;
+        const dz = meta.z - ancla.z;
+        const len = Math.hypot(dx, dz) || 1;
+        const pasos = Math.min(metros, Math.max(4, len * 0.5));
+        const p = ancla.clone();
+        p.x += (dx / len) * pasos;
+        p.z += (dz / len) * pasos;
+        return p;
+    }
+
     function salirDeCasa(onFin) {
         const puerta = puertasCasa[nodoActual];
         const casa = casasPorId[nodoActual];
@@ -1734,11 +2331,14 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             while (delta < -Math.PI) delta += Math.PI * 2;
             rot1 = rot0 + delta;
             const base = personaje.scale.x || 1;
-            const camino = (nodos[nodoActual] && nodos[nodoActual].pos)
-                ? nodos[nodoActual].pos.clone()
-                : ancla.clone();
+            let camino = metaSalida
+                ? metaSalida.clone()
+                : ((nodos[nodoActual] && nodos[nodoActual].pos)
+                    ? nodos[nodoActual].pos.clone()
+                    : ancla.clone());
             if (mundo) camino.y = mundo.altura(camino.x, camino.z);
             const caminarDeVuelta = function () {
+                if (modoNav !== 'botones') iniciarCamaraCruce();
                 const dist = Math.hypot(camino.x - ancla.x, camino.z - ancla.z);
                 if (dist < 0.35) { if (alAfuera) alAfuera(); return; }
                 entrandoSaliendo = true;
@@ -1772,14 +2372,42 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             const dest = casasPorId[nodoActual];
             const luego = () => {
                 entrandoSaliendo = false;
+                salidaMando = false;
                 if (onFin) onFin();
             };
             if (dest) animarPuerta(dest, false).then(luego);
             else luego();
         };
         entrandoSaliendo = true;
+        if (modoNav === 'botones') {
+            const ancla0 = puerta.clone();
+            let dest = (nodos[nodoActual] && nodos[nodoActual].pos)
+                ? nodos[nodoActual].pos.clone()
+                : ancla0.clone();
+            dest = puntoSalidaMando(ancla0, dest);
+            if (mundo) dest.y = mundo.altura(dest.x, dest.z);
+            metaSalida = dest;
+            puestoSalida = puntoAlCostado(dest, ancla0);
+            faseSalida = 'punto';
+            salidaMando = true;
+            camaraSalidaLejos = false;
+        }
         if (casa) animarPuerta(casa, true).then(() => irse(alAfuera));
-        else irse(onFin);
+        else irse(alAfuera);
+    }
+
+    function entregarMando() {
+        salidaMando = false;
+        faseSalida = null;
+        metaSalida = null;
+        puestoSalida = null;
+        camaraSalidaLejos = false;
+        regresoCruce = null;
+        seguimientoActivo = true;
+        if (personaje) yawSigue = personaje.rotation.y;
+        reengancharCamara();
+        refrescarEstaciones();
+        actualizarHud(false);
     }
 
     function entrarYHablarExperiencia(p) {
@@ -1797,8 +2425,12 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         caminando = false;
         // Volver a un cruce ya visto no reabre su ficha.
         const destinoYaVisitado = !!(animDestinoId && visitados.has(animDestinoId));
-        // El personaje llegó al nodo destino.
+        // El personaje llegó al nodo destino. Con las flechas no pasa por
+        // empezarTramo, así que el índice se queda en el cruce y la actividad
+        // no arranca aunque la frase sí sea la de la casa.
         nodoActual = animDestinoId || nodoActual;
+        const llegada = nodos[nodoActual];
+        if (llegada && typeof llegada.indice === 'number') indiceActual = llegada.indice;
         visitados.add(nodoActual);
         indiceMaximoVisitado = Math.max(indiceMaximoVisitado, indiceActual);
 
@@ -1811,15 +2443,18 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         }
 
         refrescarEstaciones(); actualizarHud(false);
+        if (regresoCruce === 'cruce' && idModulo && nodoActual === idModulo) regresoCruce = 'detras';
         if (idModulo && nodoActual === idModulo && destinoYaVisitado) orientarAlSiguiente();
         const cb = alLlegarCb; alLlegarCb = null;
 
         if (destinoYaVisitado && p && !esParadaExperiencia(p)) {
             if (cb) cb();
             // Última experiencia ya hecha: primero gira la cámara al final y después camina.
-            if (nodoActual === idModulo && ramasPendientes().length === 0
+            if (modoNav !== 'botones' && nodoActual === idModulo && ramasPendientes().length === 0
                 && idFin && !visitados.has(idFin) && !regresandoAlFin) {
                 pedirSalidaAlFin();
+            } else if (!cb) {
+                programarAuto();
             }
             return;
         }
@@ -1834,9 +2469,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             decirAlLlegar(p);
         } else if (p && p.id === 'fin') {
             if (castilloGrupo) iniciarLoops(castilloGrupo);
-            hablar(fraseParada(p));
-            iniciarFuegos();
-            mostrarCelebracionFin();
+            celebrarEnMeta(p);
         }
         if (cb) cb();
     }
@@ -1863,6 +2496,102 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 }
                 return t;
         }
+    }
+
+    // En la meta, en todos los casos: voltea hacia la cámara, dice la frase
+    // y la cámara se aleja. Nada más.
+    function celebrarEnMeta(p) {
+        if (!personaje) {
+            mostrarDialogo(fraseParada(p));
+            return;
+        }
+        enMeta = true;
+        camaraSalidaLejos = false;
+        const origen = personaje.position;
+        let ux = camPos.x - origen.x;
+        let uz = camPos.z - origen.z;
+        if (Math.hypot(ux, uz) < 0.4) {
+            ux = -Math.sin(personaje.rotation.y);
+            uz = -Math.cos(personaje.rotation.y);
+        }
+        const rot0 = personaje.rotation.y;
+        let rot1 = Math.atan2(ux, uz);
+        let delta = rot1 - rot0;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        rot1 = rot0 + delta;
+        if (Math.abs(delta) >= 0.08) {
+            giroFrente = {
+                t0: performance.now(),
+                dur: Math.max(800, Math.abs(delta) / Math.PI * 1100),
+                rot0: rot0,
+                rot1: rot1,
+            };
+        }
+        ponerCamaraLejos(usaMapaGlb ? 22 : 26, usaMapaGlb ? 9 : 11);
+        mostrarDialogo(fraseParada(p), function () { mostrarBotonesMeta(); });
+    }
+
+    let grupoMeta = null;
+
+    function quitarBotonesMeta() {
+        if (grupoMeta && grupoMeta.parentNode) grupoMeta.parentNode.removeChild(grupoMeta);
+        grupoMeta = null;
+    }
+
+    function mostrarBotonesMeta() {
+        if (grupoMeta || !ctx.$paso || !ctx.$paso[0]) return;
+        const panel = document.createElement('div');
+        panel.id = 'rn3dMeta';
+        panel.className = 'rn3d-meta';
+        panel.innerHTML = ''
+            + '<div class="rn3d-meta__card">'
+            +   '<div class="rn3d-meta__titulo">'
+            +     '<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>'
+            +     '<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>'
+            +     '<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>'
+            +     '<h2>¡Lo lograste!</h2>'
+            +     '<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>'
+            +     '<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>'
+            +     '<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>'
+            +   '</div>'
+            +   '<p>Terminamos la aventura. ¡Muy bien!</p>'
+            +   '<div class="rn3d-meta__botones">'
+            +     '<button type="button" class="rn3d-meta__btn" data-accion="jugar">'
+            +       '<span class="intro3d-btn-shine" aria-hidden="true"></span>'
+            +       '<span class="intro3d-play" aria-hidden="true"></span>'
+            +       '<span>Jugar de nuevo</span>'
+            +     '</button>'
+            +     '<button type="button" class="rn3d-meta__btn rn3d-meta__btn--salir" data-accion="salir">'
+            +       '<span class="intro3d-btn-shine" aria-hidden="true"></span>'
+            +       '<span>Salir</span>'
+            +     '</button>'
+            +   '</div>'
+            + '</div>';
+        panel.addEventListener('click', function (ev) {
+            const btn = ev.target.closest('button');
+            if (!btn) return;
+            ev.preventDefault();
+            ev.stopPropagation();
+            if (btn.getAttribute('data-accion') === 'jugar') reiniciarRecorrido();
+            else pedirSalir();
+        });
+        ctx.$paso[0].appendChild(panel);
+        grupoMeta = panel;
+    }
+
+    function reiniciarRecorrido() {
+        quitarBotonesMeta();
+        enMeta = false;
+        visitados = new Set();
+        ramasCompletadas = new Set();
+        indiceActual = 0;
+        indiceMaximoVisitado = 0;
+        recorridoIniciado = false;
+        regresandoAlFin = false;
+        esperarParaFin = false;
+        experienciaCargada = null;
+        volverPersonajeAlInicio();
     }
 
     // Misma nube del saludo: el texto que se lee es el que se escucha.
@@ -1895,6 +2624,33 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         });
     }
 
+    let giroFrente = null;
+
+    function mirarAlFrente() {
+        if (!personaje || hablaSinVoltear || enMeta) return;
+        let delta = rumboCamino - personaje.rotation.y;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        if (Math.abs(delta) < 0.08) return;
+        giroFrente = {
+            t0: performance.now(),
+            dur: Math.max(900, Math.abs(delta) / Math.PI * 1600),
+            rot0: personaje.rotation.y,
+            rot1: personaje.rotation.y + delta,
+        };
+    }
+
+    function aplicarGiroFrente(now) {
+        if (!giroFrente || !personaje || caminando) {
+            if (caminando) giroFrente = null;
+            return;
+        }
+        const k = Math.min(1, (now - giroFrente.t0) / giroFrente.dur);
+        const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        personaje.rotation.y = giroFrente.rot0 + (giroFrente.rot1 - giroFrente.rot0) * e;
+        if (k >= 1) giroFrente = null;
+    }
+
     function mostrarDialogo(texto, alTerminar, opciones) {
         if (!elBocadillo) {
             if (alTerminar) alTerminar();
@@ -1915,7 +2671,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             mostrandoBocadillo = false;
             elBocadillo.classList.add('rn3d-oculto');
             pintarOpcionesDialogo(null);
+            mirarAlFrente();
             if (alTerminar) alTerminar();
+            colocarDetrasTrasVoltear();
         };
         if (esperaRespuesta) {
             pintarOpcionesDialogo(opciones, function (op) {
@@ -1924,7 +2682,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 mostrandoBocadillo = false;
                 elBocadillo.classList.add('rn3d-oculto');
                 pintarOpcionesDialogo(null);
+                mirarAlFrente();
                 if (op && op.accion) op.accion();
+                colocarDetrasTrasVoltear();
             });
             hablar(texto);
             return;
@@ -1968,15 +2728,29 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     }
 
     function decirAlLlegar(p, alTerminar) {
+        const fin = function () {
+            if (alTerminar) alTerminar();
+            programarAuto();
+        };
         mostrarDialogo(fraseParada(p), function () {
             if (esVideoParada(p)) {
-                alCerrarVideo = alTerminar || null;
+                alCerrarVideo = fin;
                 const empezo = reproducirVideoParada(p);
                 if (!empezo) soltarTrasVideo();
                 return;
             }
-            if (esImagenParada(p)) reproducirImagenParada(p);
-            if (alTerminar) alTerminar();
+            if (esImagenParada(p)) {
+                reproducirImagenParada(p);
+                if (modoNav === 'auto') {
+                    alCerrarVideo = fin;
+                    setTimeout(function () {
+                        if (paradaVideoActual !== p) return;
+                        finalizarVideoParada(false);
+                    }, 7000);
+                    return;
+                }
+            }
+            fin();
         });
     }
 
@@ -2142,12 +2916,13 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 this.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }), '*');
             } catch (err) { /* noop */ }
         });
-        const preguntarAlSalir = !!(preguntar && paradaVideoActual && esVideoParada(paradaVideoActual));
+        const preguntarAlSalir = !!(preguntar && modoNav !== 'auto' && paradaVideoActual && esVideoParada(paradaVideoActual));
         salirNube(function () {
             $fs.find('iframe').each(function () { this.src = ''; });
             $('#rn3dVideoFsInner').empty();
             desactivarEscuchaEmbedVideo();
             if (preguntarAlSalir) preguntarSiReverVideo();
+            else if (modoNav === 'auto' && alCerrarVideo) soltarTrasVideo();
         });
     }
 
@@ -2273,6 +3048,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const dentroDeCasa = esExp && !personaje.visible && !caminando && !entrandoSaliendo;
 
         const trasCerrar = () => {
+            if (modoNav === 'botones') return;
             if (esExp && !caminando && !regresandoAlFin
                 && ramasPendientes().length === 0 && nodoActual !== idFin
                 && !visitados.has(idFin)) {
@@ -2281,7 +3057,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         };
 
         if (dentroDeCasa) {
-            salirDeCasa(() => { refrescarEstaciones(); actualizarHud(false); trasCerrar(); });
+            salirDeCasa(modoNav === 'botones'
+                ? entregarMando
+                : () => { refrescarEstaciones(); actualizarHud(false); trasCerrar(); });
         } else {
             trasCerrar();
         }
@@ -2307,10 +3085,13 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
     function volverAlMapaDesdeExperiencia() {
         cerrarPlayer();
-        // Sale de la casa y camina solo hasta la temática. Si ya no queda ninguna
-        // experiencia, desde ahí sigue solo hasta el final: el marcador queda
-        // detrás y no se puede tocar.
+        // Casos 1 y 2: sale y camina solo hasta el punto 3. Caso 3: solo sale
+        // unos metros, la cámara queda detrás y el niño sigue con las flechas.
         const alSalir = () => {
+            if (modoNav === 'botones') {
+                entregarMando();
+                return;
+            }
             refrescarEstaciones();
             actualizarHud(false);
             if (esRamificado && idModulo && nodoActual !== idModulo && enExperienciaCompletada()) {
@@ -2343,8 +3124,10 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
     function iniciarExperiencia() {
         cerrarModal();
-        const idxExp = indiceModal !== null ? indiceModal : indiceActual;
-        const p = camino.paradas[idxExp];
+        const nodo = nodos[nodoActual];
+        const p = (nodo && esParadaExperiencia(nodo.parada))
+            ? nodo.parada
+            : camino.paradas[indiceModal !== null ? indiceModal : indiceActual];
         if (!esParadaExperiencia(p)) return;
         const expId = p?.experiencia_id || camino.experiencia_id;
         if (!expId) return;
@@ -2435,7 +3218,10 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         elPaso.textContent = p ? etiquetaParada(p, indiceActual) : ('Paso ' + (indiceActual + 1));
         elHint.textContent = enMov ? 'Caminando…'
             : (!recorridoIniciado ? 'Toca ¡Iniciar! para empezar la aventura'
-                : (indiceActual < N - 1 ? 'Toca la siguiente parada que brilla' : '¡Completaste el recorrido!'));
+                : (indiceActual >= N - 1 ? '¡Completaste el recorrido!'
+                    : (modoNav === 'auto' ? 'Yo te llevo a la siguiente parada'
+                        : (modoNav === 'botones' ? 'Camina con las flechas de la izquierda'
+                            : 'Toca la siguiente parada que brilla'))));
     }
     function ocultarEtiqueta() { if (elEtiqueta) elEtiqueta.style.display = 'none'; }
     function actualizarEtiquetaSiguiente() {
@@ -2534,6 +3320,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             + '<button class="rn3d-comenzar rn3d-oculto" id="rn3dIniciar"><span>¡Iniciar!</span><span class="rn3d-flecha">▶</span></button>'
             + '<div class="rn3d-etiqueta" id="rn3dEtiqueta"></div>';
         ctx.$paso[0].appendChild(raiz);
+        montarControles();
         construirMenuLateral(raiz);
         elFill = raiz.querySelector('#rn3dFill');
         elPaso = raiz.querySelector('#rn3dPaso');
@@ -2557,7 +3344,18 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             mostrandoBocadillo = false;               // deja de anclarse al personaje
             elBocadillo.classList.add('rn3d-oculto');  // se cierra con transición
             recorridoIniciado = true; refrescarEstaciones();
-            setTimeout(() => caminarA(1), 350);        // arranca tras el cierre de la nube
+            soltarAlCamino(350);
+        };
+        const soltarAlCamino = (espera) => {
+            setTimeout(() => {
+                if (modoNav === 'botones') {
+                    sincronizarControles();
+                    actualizarHud(false);
+                    irDetrasDelPersonaje();
+                    return;
+                }
+                caminarA(1);
+            }, espera);
         };
 
         // Tiempo mínimo de lectura, por si en la tablet no hay voz o el audio falla:
@@ -2570,7 +3368,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 btnIniciar.classList.add('rn3d-oculto');
                 recorridoIniciado = true;
                 refrescarEstaciones();
-                setTimeout(() => { if (gen === cancelarArranque) caminarA(1); }, 280);
+                if (gen === cancelarArranque) soltarAlCamino(280);
                 return;
             }
             // 1) desaparece el botón Iniciar (transición suave)
@@ -2686,13 +3484,14 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (mixer) {
             const hablando = narrando || mostrandoBocadillo;
             const entrandoAndando = entrandoSaliendo && animCasa && animCasa.modo !== 'girar';
-            const clip = (caminando || entrandoAndando)
+            const clip = (caminando || entrandoAndando || moviendoStick)
                 ? (entrandoAndando ? CLIP_CAMINAR : clipMovimiento)
                 : (hablando ? CLIP_HABLAR : CLIP_QUIETO);
             ponerClip(clip);
             mixer.update(dt);
         }
         if (poseCamino && personaje) {
+            giroFrente = null;
             personaje.position.set(poseCamino.x, poseCamino.y, poseCamino.z);
             personaje.rotation.y = poseCamino.rot;
             rumboCamino = poseCamino.rot;
@@ -2710,6 +3509,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 }
             }
         }
+        aplicarGiroFrente(now);
         aplicarMiradaSiguiente();
         const tocablesLoop = (!caminando && recorridoIniciado) ? nodosTocables() : [];
         estaciones.forEach((e, i) => {
@@ -2734,6 +3534,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             const w = new THREE.Vector3(); zonaJuegosCartel.getWorldPosition(w);
             zonaJuegosCartel.lookAt(camera.position.x, w.y, camera.position.z);
         }
+        if (modoNav === 'botones') moverConStick(dt);
+        sincronizarControles();
         actualizarCamara(false); actualizarEtiquetaSiguiente(); actualizarBocadillo();
         pulsarSalidaAlFin(now);
         renderer.render(scene, camera);
@@ -3033,11 +3835,14 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         N = camino.paradas.length;
         ambienteSlug = (camino.ambiente && camino.ambiente.slug) ? String(camino.ambiente.slug) : '';
         indiceActual = 0; indiceMaximoVisitado = 0; caminando = false; recorridoIniciado = false; experienciaCargada = null;
+        fijarModoNavegacion();
+        moviendoStick = false; orbitaStick = 0; alturaStick = 0; yawSigue = null; autoToken++; limitesMapa = null;
+        sticks.mover.x = 0; sticks.mover.y = 0; sticks.camara.x = 0; sticks.camara.y = 0;
         ultimoNow = 0; mostrandoBocadillo = false;
         seguimientoActivo = false; mezclaHabla = 0; rumboCamino = 0;
-        orbitaAplicada = 0; distLejosAplicada = 0; acopleDetras = 0; yawObjetivo = null;
+        orbitaAplicada = 0; distLejosAplicada = 0; acopleDetras = 0; yawObjetivo = null; giroFrente = null;
         focoManual = null;
-        angLadeo = 0; yawCamSuave = null; signoLadeo = 1;
+        angLadeo = 0; yawCamSuave = null; signoLadeo = 1; regresoCruce = null; salidaMando = false; camaraSalidaLejos = false; metaSalida = null; puestoSalida = null; faseSalida = null; enMeta = false; distCruceInicio = 12;
         // Estado de grafo
         construirGrafo();
         nodoActual = camino.paradas[0] ? camino.paradas[0].id : null; // arranca en 'inicio'
@@ -3910,6 +4715,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             renderer = null;
         }
         onCanvasClick = null;
+        const controlesViejos = document.getElementById('rn3dControles');
+        if (controlesViejos) controlesViejos.remove();
 
         window.removeEventListener('resize', onResize);
         if (ctx.$paso && ctx.$paso.length) ctx.$paso.off('click.rn3d');
