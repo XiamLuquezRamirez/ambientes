@@ -588,7 +588,7 @@
             },
             holdMs: 280,
             viajeMs: reducir ? 40 : 800,
-            arrastre: { dx: dx, dy: dy, durMs: dur },
+            arrastre: { dx: dx, dy: dy, durMs: dur, soltarEnDestino: true },
             onPresionar: function () {
                 obj.style.zIndex = "40";
             },

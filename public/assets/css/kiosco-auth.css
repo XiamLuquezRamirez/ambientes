@@ -509,6 +509,52 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+/*
+ * Volver del kiosco: mismo botón de "¿Quién eres tú?" (selector-aula/volver.png, 835×417).
+ * La imagen trae texto, borde y sombra; la píldora ocupa ~75 % de su alto.
+ */
+.kiosco-volver {
+    display: inline-block;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    line-height: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s;
+}
+
+.kiosco-volver img {
+    display: block;
+    height: clamp(46px, 9.2vh, 86px);
+    width: auto;
+    pointer-events: none;
+}
+
+.kiosco-volver:active {
+    transform: translateY(2px);
+}
+
+.kiosco-volver:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+    border-radius: 999px;
+}
+
+/*
+ * PIN: Volver (píldora = 72 % del alto de volver.png) y Borrar (68 % de borrar.png, 501×191)
+ * quedan con la misma píldora de ~58 px. borrar.png trae ~18 % de margen transparente a cada
+ * lado: el margen negativo lo recorta del layout para que la separación sea la del gap.
+ */
+.pin-acciones .kiosco-volver img {
+    height: 100px;
+}
+
+.pin-acciones .kiosco-borrar img {
+    height: 106px;
+    margin: 0 -45px;
+}
+
 .pin-figuras-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -612,25 +658,7 @@
     color: var(--dorado);
 }
 
-/* ── Saludo post-login ──────────────────────────────────────── */
-.bienambiente-wrap {
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(ellipse at 50% 40%, color-mix(in srgb, var(--color-ambiente) 30%, transparent), transparent 70%),
-        var(--fondo);
-}
-
-.bienambiente-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 28px;
-    padding: 24px;
-}
-
+/* ── Saludo post-login: estilos en kiosco-bienvenida.css ────── */
 .estudiante-avatar__circulo {
     display: flex;
     align-items: center;

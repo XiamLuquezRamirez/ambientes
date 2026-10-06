@@ -25,7 +25,8 @@
     <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fontawesome/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/kiosco-fullscreen.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/kiosco-auth.css') }}">
+    <link rel="stylesheet"
+        href="{{ asset('assets/css/kiosco-auth.css') }}?v={{ @filemtime(public_path('assets/css/kiosco-auth.css')) ?: time() }}">
     <link rel="stylesheet" href="{{ asset('assets/css/recorrido-camino.css') }}">
     <link rel="stylesheet"
         href="{{ asset('assets/css/recorrido-camino-3d.css') }}?v={{ @filemtime(public_path('assets/css/recorrido-camino-3d.css')) ?: time() }}">
@@ -111,7 +112,7 @@
     <script
         src="{{ asset('assets/js/recorrido-nino.js') }}?v={{ @filemtime(public_path('assets/js/recorrido-nino.js')) ?: time() }}">
     </script>
-    <script src="{{ asset('assets/js/kiosco-bienvenida.js') }}"></script>
+    <script src="{{ asset('assets/js/kiosco-bienvenida.js') }}?v={{ @filemtime(public_path('assets/js/kiosco-bienvenida.js')) ?: time() }}"></script>
     <script src="{{ asset('assets/js/pin-figuras.js') }}"></script>
     <script src="{{ asset('assets/js/kiosco-navegacion.js') }}"></script>
     <script src="{{ asset('assets/js/kiosco-selector-aula.js') }}?v={{ @filemtime(public_path('assets/js/kiosco-selector-aula.js')) ?: time() }}"></script>

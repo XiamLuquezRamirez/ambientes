@@ -21,7 +21,8 @@ body:has(.selector-aula) {
     right: 0;
     height: 18%;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    /* Laterales iguales: el título queda centrado en la pantalla aunque solo haya Volver. */
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     gap: 0.6rem;
     padding: 0.4% 1.1% 0;
@@ -29,7 +30,6 @@ body:has(.selector-aula) {
 }
 
 .selector-aula__volver,
-.selector-aula__salir,
 .selector-aula__voz {
     pointer-events: auto;
     display: block;
@@ -40,8 +40,11 @@ body:has(.selector-aula) {
     -webkit-tap-highlight-color: transparent;
 }
 
-.selector-aula__volver img,
-.selector-aula__salir img {
+.selector-aula__volver {
+    justify-self: start;
+}
+
+.selector-aula__volver img {
     display: block;
     height: clamp(46px, 9.2vh, 86px);
     width: auto;
@@ -75,7 +78,6 @@ body:has(.selector-aula) {
 }
 
 .selector-aula__volver:active,
-.selector-aula__salir:active,
 .selector-aula__voz:active {
     transform: translateY(2px);
 }

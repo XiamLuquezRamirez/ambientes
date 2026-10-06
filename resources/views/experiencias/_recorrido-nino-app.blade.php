@@ -73,9 +73,8 @@
             </button>
         @endif
         @unless ($esCaminoLineal)
-            <button type="button" class="rn-back" id="rnBtnBack" hidden>
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>Volver</span>
+            <button type="button" class="rn-back kiosco-volver" id="rnBtnBack" hidden>
+                <img src="{{ asset('assets/images/selector-aula/volver.png') }}" alt="Volver">
             </button>
         @endunless
         <div id="rnPaso" class="rn-paso" data-paso="{{ $pasoInicial }}" aria-live="polite"></div>

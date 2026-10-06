@@ -151,8 +151,9 @@ class SesionNinoController extends Controller
         $redirectInicio = $this->sesionNino->urlTrasPin($request);
         // Consumir al renderizar /listo para no reabrir juegos en reloads posteriores.
         $this->sesionNino->consumirDestinoPostPin($request);
+        $fondoBienvenida = $this->sesionNino->urlFondoBienvenida($ambiente);
 
-        return view('auth.bienvenida-ambiente', compact('ambiente', 'estudiante', 'redirectInicio'));
+        return view('auth.bienvenida-ambiente', compact('ambiente', 'estudiante', 'redirectInicio', 'fondoBienvenida'));
     }
 
     public function cerrarSesion(Request $request)

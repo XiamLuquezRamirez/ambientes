@@ -1,0 +1,154 @@
+/*
+ * Saludo post-PIN (/listo). El fondo (bienvenida_nino.png, 1281×721) trae el tablero dibujado:
+ * la escena conserva esa proporción y cubre la pantalla, y el contenido se ubica en % de la
+ * imagen (cqw) para quedar siempre dentro del tablero (x 13–87 %, y 17–84 %).
+ */
+@font-face {
+    font-family: 'Fredoka Bienvenida';
+    src: url('../../catalogo_juegos/fonts/Fredoka-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+.bienambiente-wrap {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    background: #a9cff9;
+}
+
+.bienambiente-escena {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100vw, calc(100dvh * 1281 / 721));
+    aspect-ratio: 1281 / 721;
+    translate: -50% -50%;
+    container-type: inline-size;
+    background: var(--bienambiente-fondo, none) center / 100% 100% no-repeat;
+    color: #fff;
+    font-family: 'Fredoka Bienvenida', 'Fredoka One', sans-serif;
+}
+
+.bienambiente-nino,
+.bienambiente-mensaje {
+    position: absolute;
+    top: 51%;
+    translate: -50% -50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bienambiente-nino {
+    left: 33.7%;
+    gap: 1.3cqw;
+}
+
+.bienambiente-mensaje {
+    left: 62.6%;
+    gap: 2.6cqw;
+}
+
+.bienambiente-hola {
+    margin: 0;
+    font-size: 3.4cqw;
+    font-weight: 700;
+    line-height: 1;
+    color: #fbc531;
+    animation: kiosco-aparecer .5s ease both;
+}
+
+.bienambiente-ficha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .9cqw;
+    padding: 1.5cqw 1.4cqw 1.6cqw;
+    border: max(2px, .2cqw) dashed color-mix(in srgb, var(--color-av) 70%, #fff);
+    border-radius: 4.2cqw;
+    animation: kiosco-aparecer .5s ease .1s both;
+}
+
+.bienambiente-ficha__foto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 13cqw;
+    aspect-ratio: 1;
+    border-radius: 22%;
+    background: var(--color-av);
+    overflow: hidden;
+    box-shadow: inset 0 -.35cqw 0 rgba(0, 0, 0, .12);
+    font-size: 4.6cqw;
+    color: #fff;
+}
+
+.bienambiente-ficha__foto .kiosco-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+}
+
+.bienambiente-ficha__nombre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 12.8cqw;
+    min-height: calc(2.2em + 1.2cqw);
+    padding: .55cqw .8cqw .65cqw;
+    border-radius: 999px;
+    background: var(--color-av);
+    box-shadow: inset 0 -.3cqw 0 rgba(0, 0, 0, .12);
+    font-size: 1.55cqw;
+    font-weight: 700;
+    line-height: 1.1;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+}
+
+.bienambiente-ficha__nombre span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bienambiente-texto {
+    max-width: 26cqw;
+    margin: 0;
+    font-family: inherit;
+    font-size: 3.1cqw;
+    font-weight: 700;
+    line-height: 1.08;
+    text-align: center;
+    text-wrap: balance;
+    color: #fff;
+    animation: kiosco-aparecer .5s ease .2s both;
+}
+
+.bienambiente-estrellas {
+    display: flex;
+    gap: 1.9cqw;
+    font-size: 4cqw;
+    color: #fbc531;
+}
+
+.bienambiente-estrellas i {
+    opacity: 0;
+    animation: kiosco-estrella .5s ease var(--delay, 0s) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bienambiente-hola,
+    .bienambiente-ficha,
+    .bienambiente-texto,
+    .bienambiente-estrellas i {
+        opacity: 1;
+        animation: none;
+    }
+}

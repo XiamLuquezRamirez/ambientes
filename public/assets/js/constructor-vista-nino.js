@@ -1353,7 +1353,10 @@
             extra = renderSecuencia(d);
         } else if (catalogoUrl) {
             const nombre = d.juego_catalogo_nombre || d.juego_nombre || 'Juego';
-            const urlConEdad = urlCatalogoConEdad(catalogoUrl, perfilPayloadKiosco());
+            const urlConEdad = urlCatalogoConEdad(
+                urlCatalogoConColor(catalogoUrl, d.juego_catalogo_color),
+                perfilPayloadKiosco()
+            );
             cardClass = 'juego juego-catalogo';
             headOpts = { catalogoNombre: nombre };
             extra = `
@@ -2325,6 +2328,18 @@
             return JSON.parse(el.textContent || 'null');
         } catch (e) {
             return window.__PEDNIA_PERFIL__ || null;
+        }
+    }
+
+    function urlCatalogoConColor(url, color) {
+        if (!url || !color) return url;
+        try {
+            const u = new URL(url, window.location.origin);
+            u.searchParams.set('color', String(color));
+            return u.pathname + u.search + u.hash;
+        } catch (e) {
+            const sep = String(url).indexOf('?') >= 0 ? '&' : '?';
+            return url + sep + 'color=' + encodeURIComponent(String(color));
         }
     }
 

@@ -1499,8 +1499,12 @@ function actualizarActor(actor, delta) {
     ) * Math.min(1, delta * 4);
 }
 
+let rafIntro = null;
+let introLiberada = false;
+
 function animate() {
-    requestAnimationFrame(animate);
+    if (introLiberada) return;
+    rafIntro = requestAnimationFrame(animate);
 
     let pendiente = Math.min(clock.getDelta(), 0.5);
     while (pendiente > 0.0001) {
@@ -1533,6 +1537,7 @@ function animate() {
 }
 
 window.addEventListener('resize', () => {
+    if (introLiberada) return;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1557,6 +1562,12 @@ window.__intro3dHeadScreen = (personajeId) => {
 };
 
 window.__intro3dDispose = () => {
+    // Sin esto el loop sigue renderizando la escena fuera del DOM durante todo el juego.
+    introLiberada = true;
+    if (rafIntro != null) {
+        cancelAnimationFrame(rafIntro);
+        rafIntro = null;
+    }
     try {
         renderer.dispose();
         if (renderer.domElement && renderer.domElement.parentNode) {

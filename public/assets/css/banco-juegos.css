@@ -500,6 +500,156 @@
     font-size: inherit;
 }
 
+/*
+ * Galería Polimotor (mockup "Juegos"): fondo_catalogo.png es 16:9 (1281×721) con la
+ * franja verde hasta y≈151. Con cover anclado arriba, esa franja mide
+ * max(151/721 del alto, 151/1281 del ancho) → la cabecera usa esa misma altura.
+ */
+@font-face {
+    font-family: 'Fredoka Juegos';
+    src: url("../../catalogo_juegos/fonts/Fredoka-Bold.ttf") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+.bj-galeria--polimotor {
+    container-type: size;
+    background: #f7e2bd url("../../catalogo_juegos/Polimotor/img/fondo_catalogo.png") top center / cover no-repeat;
+    color: #fff;
+}
+
+.bj-galeria--polimotor .bj-galeria-top {
+    position: relative;
+    height: max(20.94cqh, 11.79cqw);
+    padding: 0 6.4cqw;
+    justify-content: flex-start;
+}
+
+.bj-galeria--polimotor .bj-galeria-titulo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    gap: .35em;
+    font-family: 'Fredoka One', cursive;
+    font-weight: 400;
+    font-size: min(5.2cqw, 9.2cqh);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.bj-galeria--polimotor .bj-galeria-mando {
+    display: inline-block;
+    width: 1.3em;
+    height: 1.3em;
+    background: url("../../catalogo_juegos/Polimotor/img/mando.png") center / contain no-repeat;
+}
+
+.bj-galeria--polimotor .bj-grid {
+    --card-w: min(14.3cqw, 25.3cqh);
+    grid-template-columns: repeat(5, var(--card-w));
+    justify-content: center;
+    gap: 5.7cqh 1.95cqw;
+    margin-top: 7cqh;
+    padding: 0 0 4cqh;
+}
+
+.bj-galeria--polimotor .bj-vacio {
+    color: #6b4a22;
+}
+
+/*
+ * Tarjeta Polimotor: card_juego.png es solo relieve + brillo (cuerpo transparente).
+ * La forma ocupa x 48–453, y 21–480 del PNG de 501×501; el color va debajo.
+ */
+.bj-card--polimotor {
+    width: 100%;
+    aspect-ratio: 405 / 459;
+    min-height: 0;
+    padding: 15% 5% 0;
+    align-items: center;
+    justify-content: flex-start;
+    gap: calc(var(--card-w, 160px) * .06);
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    overflow: visible;
+    filter: drop-shadow(0 6px 8px rgba(80, 50, 10, .25));
+}
+
+.bj-card--polimotor:hover,
+.bj-card--polimotor:focus-visible {
+    box-shadow: none;
+    filter: drop-shadow(0 10px 12px rgba(80, 50, 10, .32));
+}
+
+.bj-card--polimotor::before {
+    z-index: 0;
+    background: var(--c, #3a6ea5);
+    border-radius: 13.8% / 12.2%;
+}
+
+.bj-card--polimotor::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: url("../../catalogo_juegos/Polimotor/img/card_juego.png") 50% 50% / 123.7% 109.2% no-repeat;
+}
+
+.bj-card--polimotor > * {
+    z-index: 2;
+}
+
+/* Alto fijo para que el icono quede a la misma altura con títulos de 1 o 2 líneas. */
+.bj-card--polimotor .bj-card-emoji {
+    position: relative;
+    top: auto;
+    right: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    height: calc(var(--card-w, 160px) * .44);
+    font-size: calc(var(--card-w, 160px) * .4);
+    line-height: 1;
+    filter: none;
+}
+
+.bj-card--polimotor .bj-card-icono-img {
+    display: block;
+    height: 100%;
+    width: auto;
+    max-width: calc(var(--card-w, 160px) * .8);
+    object-fit: contain;
+}
+
+.bj-card--polimotor .bj-card-titulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 2.3em;
+    font: 700 calc(var(--card-w, 160px) * .106)/1.12 'Fredoka Juegos', 'Fredoka One', sans-serif;
+    letter-spacing: .01em;
+    text-align: center;
+    text-wrap: balance;
+    text-shadow: none;
+}
+
+.bj-card--polimotor .bj-card-titulo::after {
+    content: "";
+    display: block;
+    width: 18%;
+    height: max(2px, calc(var(--card-w, 160px) * .009));
+    margin-top: .55em;
+    border-radius: 999px;
+    background: #fff;
+}
+
 @media (max-width: 640px) {
     .bj-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));

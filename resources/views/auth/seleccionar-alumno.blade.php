@@ -32,9 +32,6 @@
                 <img src="{{ asset('assets/images/selector-aula/sonido.png') }}" alt="">
             </button>
         </div>
-        <button type="button" class="selector-aula__salir" id="aulaSalir">
-            <img src="{{ asset('assets/images/selector-aula/salir.png') }}" alt="Salir">
-        </button>
     </header>
 
     @if ($estudiantes->isEmpty())

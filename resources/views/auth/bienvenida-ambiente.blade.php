@@ -1,21 +1,42 @@
 @extends('layouts.ambiente')
 
+@php
+    $primerNombre = explode(' ', trim((string) $estudiante->nombre))[0] ?? '';
+    $primerApellido = explode(' ', trim((string) ($estudiante->apellido ?? '')))[0] ?? '';
+@endphp
+
+@push('styles')
+    <link rel="stylesheet"
+        href="{{ asset('assets/css/kiosco-bienvenida.css') }}?v={{ @filemtime(public_path('assets/css/kiosco-bienvenida.css')) ?: time() }}">
+@endpush
+
 @section('content')
-<main class="bienambiente-wrap" data-kiosco-sesion="1" data-redirect-inicio="{{ $redirectInicio ?? '/recorrido' }}">
-    <div class="bienambiente-card">
-        <div class="estudiante-avatar" style="--color-av: {{ $estudiante->color_avatar }};">
-            <span class="estudiante-avatar__circulo">
-                @include('auth._avatar-circulo')
-            </span>
+<main class="bienambiente-wrap" data-kiosco-sesion="1" data-redirect-inicio="{{ $redirectInicio ?? '/recorrido' }}"
+    data-voz="¡Hola, {{ $primerNombre }}! Acompáñame al ambiente {{ $ambiente->nombre }}.">
+    <div class="bienambiente-escena"
+        @if ($fondoBienvenida) style="--bienambiente-fondo: url('{{ $fondoBienvenida }}');" @endif>
+        <div class="bienambiente-nino">
+            <p class="bienambiente-hola">¡Hola!</p>
+            <div class="bienambiente-ficha" style="--color-av: {{ $estudiante->color_avatar ?: '#7cc242' }};">
+                <span class="bienambiente-ficha__foto">
+                    @include('auth._avatar-circulo')
+                </span>
+                <span class="bienambiente-ficha__nombre">
+                    <span>{{ $primerNombre }}</span>
+                    @if ($primerApellido !== '')
+                        <span>{{ $primerApellido }}</span>
+                    @endif
+                </span>
+            </div>
         </div>
 
-        <h1 class="saludo">¡Hola, {{ $estudiante->nombre }}!</h1>
-        <p class="ambiente-label">Ambiente {{ $ambiente->nombre }} te espera {{ $ambiente->icono }}</p>
-
-        <div class="estrellas" aria-hidden="true">
-            <span class="estrella" style="--delay: 0s">⭐</span>
-            <span class="estrella" style="--delay: 0.2s">⭐</span>
-            <span class="estrella" style="--delay: 0.4s">⭐</span>
+        <div class="bienambiente-mensaje">
+            <h1 class="bienambiente-texto">¡Acompáñame al ambiente {{ $ambiente->nombre }}!</h1>
+            <div class="bienambiente-estrellas" aria-hidden="true">
+                <i class="fa-solid fa-star" style="--delay: .35s"></i>
+                <i class="fa-solid fa-star" style="--delay: .5s"></i>
+                <i class="fa-solid fa-star" style="--delay: .65s"></i>
+            </div>
         </div>
     </div>
 </main>

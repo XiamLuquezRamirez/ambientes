@@ -1,0 +1,126 @@
+{
+    "nombre": "Memoria visual",
+    "creado_en": "2026-10-05T10:16:39-05:00",
+    "accesibilidad": {
+        "mostrarFeedBack": true,
+        "altoContraste": false,
+        "mostrarIntro": true,
+        "verBotonVerDeNuevo": true,
+        "mostrarProgreso": true,
+        "cuentaRegresiva": true,
+        "animaciones_opciones": true,
+        "mostrarNombres": true,
+        "respuestasMaximasAntesDeAtenuar": 2,
+        "tamanoImagen": 130,
+        "tamanoImagenOpcion": 110,
+        "tamanoLetraBotones": 22,
+        "letterSpacing": 2,
+        "volumenFondo": 20,
+        "rate": 5,
+        "espaciadoOpciones": 22
+    },
+    "textos": {
+        "eligeNivel": "Elige tu edad",
+        "observa": "¡Vamos a jugar! Observa muy bien los objetos y trata de recordarlos.",
+        "memoriza": "Observa muy bien los objetos.",
+        "seOcultan": "Los objetos se esconderán en...",
+        "preguntaNuevo": "¿Cuál objeto no estaba antes?",
+        "preguntaFalta": "¿Cuál objeto falta?",
+        "preguntaCambio": "Observa muy bien. ¿Qué objetos cambiaron de lugar?",
+        "aciertoNuevo": "¡Muy bien! Recordaste los objetos.",
+        "aciertoFalta": "¡Excelente! Recordaste cuál objeto faltaba.",
+        "aciertoCambio": "¡Excelente! Recordaste dónde estaban los objetos.",
+        "errorObjetos": "¡Inténtalo otra vez! Recuerda los objetos que viste.",
+        "errorCambio": "¡Inténtalo otra vez! Recuerda dónde estaba cada objeto.",
+        "cierre": "¡Excelente! Recordaste todos los objetos.",
+        "demostracion": "¡Mira cómo se juega! Primero observa los objetos.",
+        "demostracionFin": "¡Ahora te toca a ti! Observa muy bien los objetos.",
+        "conversacion": [
+            {
+                "personaje": 0,
+                "texto": "¡Hola! Soy Zeus. ¡Hoy vamos a jugar con nuestra memoria!"
+            },
+            {
+                "personaje": 1,
+                "texto": "¡Hola! Yo soy Zoe.<br>Te mostraremos unos objetos durante unos segundos. Míralos con mucha atención."
+            },
+            {
+                "personaje": 0,
+                "texto": "Después los objetos se esconderán.<br>Cuando vuelvan a aparecer, te haremos una pregunta."
+            },
+            {
+                "personaje": 1,
+                "texto": "¡Tú puedes hacerlo!<br>Si no recuerdas los objetos, pulsa el botón del ojo y te los volvemos a mostrar."
+            }
+        ]
+    },
+    "audios": {
+        "acierto": "../../sounds/ok.mp3",
+        "error": "../../sounds/over.mp3",
+        "cierre": "../../sounds/victory.mp3",
+        "fondo": "../../sounds/fondo.mp3"
+    },
+    "objetos": {
+        "manzana": { "nombre": "Manzana", "img": "img/manzana.png" },
+        "pelota": { "nombre": "Pelota", "img": "img/pelota.svg" },
+        "carro": { "nombre": "Carro", "img": "img/carro.png" },
+        "oso": { "nombre": "Oso de peluche", "img": "img/oso.png" },
+        "estrella": { "nombre": "Estrella", "img": "img/estrella.png" },
+        "pez": { "nombre": "Pez", "img": "img/pez.png" },
+        "flor": { "nombre": "Flor", "img": "img/flor.png" },
+        "sol": { "nombre": "Sol", "img": "img/sol.png" }
+    },
+    "niveles": [
+        {
+            "id": "3",
+            "edad": "3 años",
+            "titulo": "3 objetos",
+            "tiempoMemoria": 5000,
+            "pausaOculto": 1500,
+            "demo": { "objetos": ["sol", "flor"], "nuevo": "estrella" },
+            "rondas": [
+                { "tipo": "nuevo", "objetos": ["manzana", "pelota", "carro"], "nuevo": "oso" }
+            ]
+        },
+        {
+            "id": "4",
+            "edad": "4 años",
+            "titulo": "4 objetos",
+            "tiempoMemoria": 5000,
+            "pausaOculto": 1500,
+            "demo": { "objetos": ["sol", "flor"], "nuevo": "pez" },
+            "rondas": [
+                { "tipo": "nuevo", "objetos": ["manzana", "pelota", "carro", "oso"], "nuevo": "estrella" }
+            ]
+        },
+        {
+            "id": "5",
+            "edad": "5-6 años",
+            "titulo": "5 objetos",
+            "tiempoMemoria": 6000,
+            "pausaOculto": 2000,
+            "textos": {
+                "observa": "¡Vamos a jugar! Observa con mucha atención los objetos y trata de recordarlos."
+            },
+            "demo": { "objetos": ["sol", "flor"], "nuevo": "manzana" },
+            "rondas": [
+                {
+                    "tipo": "nuevo",
+                    "objetos": ["manzana", "pelota", "carro", "oso", "estrella"],
+                    "nuevo": "pez"
+                },
+                {
+                    "tipo": "falta",
+                    "objetos": ["manzana", "pelota", "carro", "oso", "estrella"],
+                    "falta": "carro",
+                    "opciones": ["carro", "pez", "flor", "sol"]
+                },
+                {
+                    "tipo": "cambio",
+                    "objetos": ["manzana", "pelota", "carro", "oso", "estrella"],
+                    "intercambio": ["carro", "oso"]
+                }
+            ]
+        }
+    ]
+}

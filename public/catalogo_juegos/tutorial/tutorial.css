@@ -90,16 +90,20 @@ body.demo-activa .demo-lock {
 }
 
 /* Mano tutorial: viaja (Mano.png) → llega (movimiento) → presiona (bolita) */
+/* Se mueve con transform (compositor): left/top se recalculan en el hilo principal,
+   que durante la demo comparte con el render WebGL del personaje y se entrecorta. */
 .demo-dedo {
     position: fixed;
+    left: 0;
+    top: 0;
     width: 168px;
     height: 168px;
     z-index: 60;
     pointer-events: none;
-    /* La duración la pone JS para igualar viajeMs; aquí solo el easing por defecto */
-    transition: left 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform: translate3d(-9999px, -9999px, 0);
     filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.4));
-    will-change: left, top;
+    will-change: transform;
+    backface-visibility: hidden;
 }
 
 .demo-dedo img {

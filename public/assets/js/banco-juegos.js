@@ -25,7 +25,32 @@
         return fromDom || '/juegos-catalogo';
     }
 
+    /** Carpeta del paquete → archivo en catalogo_juegos/Polimotor/img/. */
+    const ICONOS_POLIMOTOR = {
+        arrastrarysoltarobjetos: 'arrastrar.png',
+        coordinacionvisual: 'cordinacion.png',
+        ensamblajessencillos: 'ensamblaje.png',
+        juegosdeprecision: 'precision.png',
+        laberintosdecoordinacion: 'laberinto.png',
+        lateralidad: 'lateralidad.png',
+        memoriacorporal: 'memoria.png',
+        reconocimientodelcuerpo: 'reconocimiento.png',
+        rompecabezas: 'rompecabeza.png',
+        secuenciademovimiento: 'secuencia.png',
+    };
+
+    function urlIconoPolimotor(urlPaquete) {
+        const m = String(urlPaquete || '').match(/^(.*\/catalogo_juegos\/Polimotor\/)([^/]+)\//i);
+        if (!m) return '';
+        const archivo = ICONOS_POLIMOTOR[m[2].toLowerCase()];
+        return archivo ? m[1] + 'img/' + archivo : '';
+    }
+
     function iconoHtml(juego) {
+        const img = urlIconoPolimotor(juego.url_paquete);
+        if (img) {
+            return `<img class="bj-card-icono-img" src="${escapar(img)}" alt="" decoding="async">`;
+        }
         const fa = (juego.icono || 'fa-gamepad').replace(/^fa-/, '');
         return `<i class="fa-solid fa-${escapar(fa)}" aria-hidden="true"></i>`;
     }
@@ -35,15 +60,48 @@
             + '<i class="fa-solid fa-xmark" aria-hidden="true"></i> Cerrar</button>';
     }
 
+    function esPaquetePolimotor(url) {
+        return /\/catalogo_juegos\/Polimotor\//i.test(String(url || ''));
+    }
+
+    function esAmbientePolimotor() {
+        try {
+            const arbol = JSON.parse(document.getElementById('rn-arbol')?.textContent || '{}');
+            return /polimotor/i.test(String(arbol?.ambiente?.slug || ''));
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function claseGaleria() {
+        return ctx.polimotor ? 'bj-galeria bj-galeria--polimotor' : 'bj-galeria';
+    }
+
+    function cabeceraGaleria() {
+        if (ctx.polimotor) {
+            return `
+                <div class="bj-galeria-top">
+                    <button type="button" class="kiosco-volver bj-volver" data-bj-volver>
+                        <img src="/assets/images/selector-aula/volver.png" alt="Volver">
+                    </button>
+                    <h2 class="bj-galeria-titulo">
+                        <span class="bj-galeria-mando" aria-hidden="true"></span> Juegos
+                    </h2>
+                </div>`;
+        }
+        return `
+            <div class="bj-galeria-top">
+                <h2 class="bj-galeria-titulo">
+                    <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
+                </h2>
+                ${botonCerrarVista()}
+            </div>`;
+    }
+
     function renderCargando() {
         ctx.$paso.attr('data-paso', 'juegos').html(`
-            <div class="bj-galeria">
-                <div class="bj-galeria-top">
-                    <h2 class="bj-galeria-titulo">
-                        <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
-                    </h2>
-                    ${botonCerrarVista()}
-                </div>
+            <div class="${claseGaleria()}">
+                ${cabeceraGaleria()}
                 <p class="bj-vacio">Cargando juegos del ambiente…</p>
             </div>
         `);
@@ -51,26 +109,25 @@
 
     function renderVacio(mensaje) {
         ctx.$paso.find('.bj-galeria').html(`
-            <div class="bj-galeria-top">
-                <h2 class="bj-galeria-titulo">
-                    <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
-                </h2>
-                ${botonCerrarVista()}
-            </div>
+            ${cabeceraGaleria()}
             <p class="bj-vacio">${escapar(mensaje)}</p>
         `);
     }
 
     function renderGaleria() {
+        if (!ctx.polimotor && juegos.some((j) => esPaquetePolimotor(j.url_paquete))) {
+            ctx.polimotor = true;
+        }
         const cards = juegos.map((j) => {
             const color = j.color || '#2563eb';
-            const desc = j.descripcion || '';
-            const badge = j.tipo_label || 'Juego';
+            const polimotor = esPaquetePolimotor(j.url_paquete);
+            const desc = polimotor ? '' : (j.descripcion || '');
+            const badge = polimotor ? '' : (j.tipo_label || 'Juego');
             return `
-            <button type="button" class="bj-card" data-juego-slug="${escapar(j.slug)}"
+            <button type="button" class="bj-card${polimotor ? ' bj-card--polimotor' : ''}" data-juego-slug="${escapar(j.slug)}"
                     data-url-paquete="${escapar(j.url_paquete || '')}"
                     style="--c:${escapar(color)}">
-                <span class="bj-card-badge">${escapar(badge)}</span>
+                ${badge ? `<span class="bj-card-badge">${escapar(badge)}</span>` : ''}
                 <span class="bj-card-emoji" aria-hidden="true">${iconoHtml(j)}</span>
                 <h3 class="bj-card-titulo">${escapar(j.nombre)}</h3>
                 ${desc ? `<p class="bj-card-desc">${escapar(desc)}</p>` : ''}
@@ -78,13 +135,8 @@
         }).join('');
 
         ctx.$paso.attr('data-paso', 'juegos').html(`
-            <div class="bj-galeria">
-                <div class="bj-galeria-top">
-                    <h2 class="bj-galeria-titulo">
-                        <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
-                    </h2>
-                    ${botonCerrarVista()}
-                </div>
+            <div class="${claseGaleria()}">
+                ${cabeceraGaleria()}
                 <div class="bj-grid">${cards || '<p class="bj-vacio">Aún no hay juegos en este ambiente.</p>'}</div>
             </div>
         `);
@@ -115,6 +167,31 @@
             const sep = url.indexOf('?') >= 0 ? '&' : '?';
             return url + sep + 'edad=' + encodeURIComponent(String(edad));
         }
+    }
+
+    function urlPaqueteConParam(url, clave, valor) {
+        if (!url || valor == null || valor === '') return url;
+        try {
+            const u = new URL(url, window.location.origin);
+            u.searchParams.set(clave, String(valor));
+            return u.pathname + u.search + u.hash;
+        } catch (e) {
+            const sep = url.indexOf('?') >= 0 ? '&' : '?';
+            return url + sep + clave + '=' + encodeURIComponent(String(valor));
+        }
+    }
+
+    /** ?color=#hex: el paquete pinta su pantalla de inicio con el color del juego en BD. */
+    function urlPaqueteConColor(url, color) {
+        return urlPaqueteConParam(url, 'color', color);
+    }
+
+    /**
+     * ?volver=1: el paquete muestra su botón "Volver" de la pantalla de inicio, que avisa
+     * con postMessage 'pednia:salir-juego' (ver escucharSalidaJuego).
+     */
+    function urlPaqueteConVolver(url) {
+        return urlPaqueteConParam(url, 'volver', '1');
     }
 
     function inyectarPerfil(frame) {
@@ -172,7 +249,10 @@
 
     function montarJuego(juego) {
         const perfil = perfilPayload();
-        const url = urlPaqueteConEdad(juego.url_paquete, perfil);
+        const url = urlPaqueteConEdad(
+            urlPaqueteConVolver(urlPaqueteConColor(juego.url_paquete, juego.color)),
+            perfil
+        );
         if (!url) return;
 
         const $g = ctx.$paso.find('.bj-galeria');
@@ -200,6 +280,21 @@
         const frame = $player.find('iframe')[0];
         if (frame) frame.src = 'about:blank';
         $player.remove();
+    }
+
+    /**
+     * A diferencia de engancharSalida (que espera al load del iframe), el mensaje funciona
+     * desde que se pinta la pantalla de inicio del paquete.
+     */
+    function escucharSalidaJuego() {
+        if (window.__bjSalidaJuegoEscuchada) return;
+        window.__bjSalidaJuegoEscuchada = true;
+        window.addEventListener('message', function (ev) {
+            if (ev.origin !== window.location.origin) return;
+            if (!ev.data || ev.data.type !== 'pednia:salir-juego' || !ctx) return;
+            const frame = ctx.$paso.find('[data-bj-player] iframe')[0];
+            if (frame && ev.source === frame.contentWindow) cerrarJuego();
+        });
     }
 
     function juegoPorSlug(slug) {
@@ -260,8 +355,10 @@
             color: opciones.color || '',
             onVolver: opciones.onVolver || null,
             urlCatalogo: opciones.urlCatalogo || null,
+            polimotor: esAmbientePolimotor(),
         };
         if (ctx.color) ctx.$paso.css('--rn-color', ctx.color);
+        escucharSalidaJuego();
         juegos = [];
         cargarYRender();
     }

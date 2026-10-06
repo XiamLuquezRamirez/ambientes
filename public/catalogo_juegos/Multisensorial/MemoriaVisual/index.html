@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<title>Reconocimiento de partes del cuerpo</title>
+	<title>Memoria visual</title>
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<link rel="stylesheet" href="/assets/css/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css">
@@ -14,13 +14,13 @@
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
-	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261003c">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261005a">
 </head>
 <body class="esperando-inicio">
 	<div id="pantalla-inicio" class="pantalla-inicio">
 		<div class="inicio-mancha" aria-hidden="true"></div>
 		<div class="inicio-contenido">
-			<p class="inicio-kicker">Reconocimiento del cuerpo</p>
+			<p class="inicio-kicker">Memoria visual</p>
 			<button type="button" id="btn-empecemos" class="btn-empecemos">
 				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
 				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
@@ -63,9 +63,9 @@
 		</div>
 	</div>
 
-<div style="display: none; background-color: rgba(255, 255, 255, 0.664); width: 100%; height: 100%; position: fixed; z-index: 100;" id="fondo_blanco"></div>
+	<div style="display: none; background-color: rgba(255, 255, 255, 0.664); width: 100%; height: 100%; position: fixed; z-index: 100;" id="fondo_blanco"></div>
 
-		<div id="final" class="final" hidden>
+	<div id="final" class="final" hidden>
 		<div id="victoria">
 			<img src="../../img/fondo.png" class="fondo" alt="">
 			<div class="contenido">
@@ -91,30 +91,27 @@
 		</div>
 	</div>
 
-<div id="principal">
+	<div id="principal">
 		<div class="hud-top">
 			<div class="hud-nav">
 				<div id="progreso" class="hud-progreso" hidden></div>
+				<button type="button" id="btn-ver" class="btn btn-success btn-round" title="Ver de nuevo" hidden><i class="fa-solid fa-eye"></i></button>
 				<button onclick="location.reload()" class="btn btn-warning btn-round"><i class="fa-solid fa-rotate"></i></button>
 				<button onclick="history.back()" class="btn btn-danger btn-round"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</div>
 
-		<div class="enunciado-wrap">
-			<h1 class="borde" id="enunciado"></h1>
-		</div>
-
-		<div class="escenario demo-lock" id="escenario" style="padding-top: 15px;">
-			<div class="lienzo-wrap">
-				<div id="lienzo">
-					<img id="img-completo" alt="Figura del cuerpo" draggable="false">
-					<div id="zonas"></div>
-				</div>
+		<div class="escenario escenario-memoria demo-lock" id="escenario">
+			<div class="memoria-bloque">
+				<p class="enunciado borde" id="enunciado"></p>
+				<div id="cuenta" class="cuenta" hidden></div>
+				<div id="tablero" class="tablero" aria-live="polite"></div>
+				<div id="opciones" class="opciones" hidden></div>
 			</div>
 		</div>
 	</div>
 
-		<div id="tutorial-3d" class="tutorial-3d" hidden aria-hidden="true"></div>
+	<div id="tutorial-3d" class="tutorial-3d" hidden aria-hidden="true"></div>
 
 	<div id="menu-acc" class="menu-acc">
 		<button type="button" id="btn-menu-acc" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-acc-panel" title="Accesibilidad">
@@ -129,7 +126,7 @@
 		</div>
 	</div>
 
-<div id="menu-vol" class="menu-acc">
+	<div id="menu-vol" class="menu-acc">
 		<button type="button" id="btn-menu-vol" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-vol-panel" title="Volumen de fondo">
 			<i class="fa-solid fa-volume-high"></i>
 		</button>
@@ -146,7 +143,6 @@
 	</div>
 	<script src="../../texto_voz.js"></script>
 	<script src="../../shared/edad-nivel.js"></script>
-	<script src="../../final/final.js"></script>
 	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
 	<script src="../../intro3d/js/config.js?v=20260930g"></script>
 	<script src="../../intro3d/js/ambientes-tema.js?v=20260930d"></script>
@@ -158,10 +154,12 @@
 	  }
 	}
 	</script>
-	<script type="module" src="../../intro3d/js/three-scene.js?v=20260930f"></script>
-		<script src="../../tutorial/tutorial.js?v=20261003c"></script>
+	<script type="module" src="../../intro3d/js/three-scene.js?v=20261005a"></script>
+	<script type="module" src="../../intro3d/js/final-scene.js?v=20260930f"></script>
+	<script src="../../tutorial/tutorial.js?v=20261005a"></script>
 	<script type="module" src="../../intro3d/js/tutorial-3d.js?v=20261003c"></script>
 	<script src="../../intro3d/js/intro.js?v=20260930g"></script>
+	<script src="../../final/final.js"></script>
 	<script src="script.js"></script>
 </body>
 </html>

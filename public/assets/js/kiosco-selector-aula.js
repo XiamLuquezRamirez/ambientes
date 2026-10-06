@@ -155,17 +155,6 @@
         });
     }
 
-    var salir = document.getElementById('aulaSalir');
-    if (salir) {
-        salir.addEventListener('click', function () {
-            if (window.KioscoNav && typeof window.KioscoNav.salir === 'function') {
-                window.KioscoNav.salir();
-                return;
-            }
-            window.location.href = '/inicio';
-        });
-    }
-
     if (lista) pintar();
     }
 

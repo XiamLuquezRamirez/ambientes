@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Ambiente;
 use App\Models\Estudiante;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class SesionNinoService
 {
@@ -23,6 +24,8 @@ class SesionNinoService
 
     /** Solo local: simula la IP del nodo (?nodo_ip=) sin tocar la red. */
     public const SESSION_NODO_IP = 'nodo_ip_prueba';
+
+    public const ARCHIVO_FONDO_BIENVENIDA = 'bienvenida_nino.png';
 
     public function __construct(
         private AccesoAmbienteService $accesoAmbiente,
@@ -167,6 +170,30 @@ class SesionNinoService
         return $this->destinoPostPin($request) === self::DESTINO_JUEGOS
             ? url('/juegos')
             : url('/recorrido');
+    }
+
+    /**
+     * Fondo de /listo: catalogo_juegos/{Ambiente}/img/bienvenida_nino.png (misma carpeta que
+     * JuegoCatalogoService::construirRutaPaquete). Mientras un ambiente no tenga el suyo, usa el de Polimotor.
+     */
+    public function urlFondoBienvenida(Ambiente $ambiente): ?string
+    {
+        $carpetas = [];
+        try {
+            $carpetas[] = app(JuegoCatalogoService::class)
+                ->segmentoCarpeta((string) ($ambiente->slug ?: $ambiente->nombre));
+        } catch (ValidationException) {
+        }
+        $carpetas[] = 'Polimotor';
+
+        foreach (array_unique($carpetas) as $carpeta) {
+            $ruta = "catalogo_juegos/{$carpeta}/img/".self::ARCHIVO_FONDO_BIENVENIDA;
+            if (is_file(public_path($ruta))) {
+                return asset($ruta);
+            }
+        }
+
+        return null;
     }
 
     /**

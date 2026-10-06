@@ -59,7 +59,7 @@
     <div class="student-options">
         @if ($urlPaquete)
             <button type="button" class="btn btn-sm btn-outline-primary cj-preview-btn" data-cj-preview
-                data-url-paquete="{{ $urlPaquete }}" data-juego-nombre="{{ $juego->nombre }}" title="Vista previa"
+                data-url-paquete="{{ $urlPaquete }}?color={{ urlencode($color) }}" data-juego-nombre="{{ $juego->nombre }}" title="Vista previa"
                 aria-label="Vista previa de {{ $juego->nombre }}">
                 <i class="fa-solid fa-play" aria-hidden="true"></i>
             </button>

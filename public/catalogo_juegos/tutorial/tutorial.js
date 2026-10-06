@@ -189,6 +189,8 @@
         el._manoImg = img;
         el._manoFase = "viajar";
         document.body.appendChild(el);
+        el._manoW = el.offsetWidth || 160;
+        el._manoH = el.offsetHeight || 160;
         return el;
     }
 
@@ -205,10 +207,15 @@
 
     function puntaManoEn(el, x, y) {
         if (!el) return;
-        const w = el.offsetWidth || 160;
-        const h = el.offsetHeight || 160;
-        el.style.left = (x - w * MANO_TIP_X) + "px";
-        el.style.top = (y - h * MANO_TIP_Y) + "px";
+        const w = el._manoW || el.offsetWidth || 160;
+        const h = el._manoH || el.offsetHeight || 160;
+        const tx = Math.round(x - w * MANO_TIP_X);
+        const ty = Math.round(y - h * MANO_TIP_Y);
+        el.style.transform = "translate3d(" + tx + "px," + ty + "px,0)";
+    }
+
+    function transicionMano(el, ms, easing) {
+        el.style.transition = ms > 0 ? "transform " + ms + "ms " + easing : "none";
     }
 
     function centroDe(el) {
@@ -248,8 +255,8 @@
         const viajeMs = opts.viajeMs != null ? opts.viajeMs : (reducir ? 40 : 900);
 
         faseMano(el, "viajar");
-        // Sin transición en el punto de partida (si no, el primer frame ya anima desde 0,0).
-        el.style.transition = "none";
+        // Sin transición en el punto de partida (si no, el primer frame ya anima desde fuera de pantalla).
+        transicionMano(el, 0);
         puntaManoEn(el, reducir ? destino.x : destino.x + ox, reducir ? destino.y : destino.y + oy);
         void el.offsetWidth;
 
@@ -258,9 +265,9 @@
             return;
         }
 
-        if (!reducir) {
-            el.style.transition = "left " + viajeMs + "ms cubic-bezier(0.2, 0.8, 0.2, 1), top " + viajeMs + "ms cubic-bezier(0.2, 0.8, 0.2, 1)";
-        }
+        // Curva sin cola larga: con (0.2,0.8,0.2,1) la mano llegaba al 45% del tiempo
+        // y quedaba casi quieta el resto, que se percibía como un tirón al presionar.
+        if (!reducir) transicionMano(el, viajeMs, "cubic-bezier(0.4, 0, 0.2, 1)");
         puntaManoEn(el, destino.x, destino.y);
         await sleep(viajeMs);
         if (cancelado()) {
@@ -284,29 +291,42 @@
         const arrastre = opts.arrastre;
         if (arrastre && (arrastre.dx || arrastre.dy)) {
             const dur = arrastre.durMs != null ? arrastre.durMs : (reducir ? 180 : 700);
-            el.style.transition = reducir
-                ? "none"
-                : "left " + dur + "ms ease, top " + dur + "ms ease";
+            // Mismo easing que la pieza en onDuranteArrastre ("transform … ease") para que vayan pegadas.
+            transicionMano(el, reducir ? 0 : dur, "ease");
             puntaManoEn(el, destino.x + (arrastre.dx || 0), destino.y + (arrastre.dy || 0));
             if (typeof opts.onDuranteArrastre === "function") {
                 try { opts.onDuranteArrastre(el, arrastre); } catch (e2) { /* noop */ }
             }
-            await sleep(reducir ? 200 : Math.max(holdMs, dur + 400));
+            await sleep(reducir ? 200 : dur + Math.min(holdMs, 300));
             if (cancelado()) {
                 quitarManos();
                 return;
             }
-            el.style.transition = reducir
-                ? "none"
-                : "left 0.55s ease, top 0.55s ease";
-            puntaManoEn(el, destino.x, destino.y);
-            await sleep(reducir ? 120 : 700);
+            if (!arrastre.soltarEnDestino) {
+                // La pieza regresa con la mano (no queda desplazada mientras la mano vuelve sola).
+                const volverMs = reducir ? 0 : 550;
+                transicionMano(el, volverMs, "ease");
+                puntaManoEn(el, destino.x, destino.y);
+                if (typeof opts.onVolver === "function") {
+                    try { opts.onVolver(el, volverMs); } catch (e4) { /* noop */ }
+                }
+                await sleep(reducir ? 120 : volverMs + 80);
+                if (cancelado()) {
+                    quitarManos();
+                    return;
+                }
+            }
         } else {
             await sleep(holdMs);
         }
 
         if (typeof opts.onSoltar === "function") {
             try { opts.onSoltar(el); } catch (e3) { /* noop */ }
+        }
+        if (!reducir && arrastre && (arrastre.dx || arrastre.dy)) {
+            // Mano abierta un instante: se ve que suelta.
+            faseMano(el, "viajar");
+            await sleep(220);
         }
         quitarManos();
     }

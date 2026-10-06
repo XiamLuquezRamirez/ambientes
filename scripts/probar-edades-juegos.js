@@ -14,6 +14,7 @@ const juegos = [
   "Multisensorial/BuscaLaSombra",
   "Multisensorial/CompletaLaFigura",
   "Multisensorial/BuscaLasDiferencias",
+  "Multisensorial/MemoriaVisual",
   "Polimotor/Lateralidad",
   "Polimotor/ArrastrarYSoltarObjetos",
   "Polimotor/JuegosDePrecision",

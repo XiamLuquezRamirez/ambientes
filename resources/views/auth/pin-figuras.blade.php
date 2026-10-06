@@ -55,13 +55,11 @@
                 <p class="pin-mensaje" id="pinMensaje" role="alert" aria-live="assertive"></p>
 
                 <div class="pin-acciones">
-                    <a href="{{ $urlAlumnos }}" class="pin-btn">
-                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                        <span>Volver</span>
+                    <a href="{{ $urlAlumnos }}" class="kiosco-volver">
+                        <img src="{{ asset('assets/images/selector-aula/volver.png') }}" alt="Volver">
                     </a>
-                    <button type="button" class="pin-btn" id="btnBorrarPin">
-                        <i class="fas fa-trash-can" aria-hidden="true"></i>
-                        <span>Borrar</span>
+                    <button type="button" class="kiosco-volver kiosco-borrar" id="btnBorrarPin">
+                        <img src="{{ asset('assets/images/selector-aula/borrar.png') }}?v={{ @filemtime(public_path('assets/images/selector-aula/borrar.png')) }}" alt="Borrar">
                     </button>
                 </div>
             </div>

@@ -1170,6 +1170,10 @@ function animarDedoEnCabeza() {
             ficha.style.transition = reducir ? "none" : "transform 0.7s ease";
             ficha.style.transform = "translate(" + dx + "px," + dy + "px)";
         },
+        onVolver: function (el, ms) {
+            ficha.style.transition = ms > 0 ? "transform " + ms + "ms ease" : "none";
+            ficha.style.transform = "translate(0px,0px)";
+        },
         onSoltar: function () {
             ficha.classList.remove("is-demo-agarrada");
             ficha.style.transition = "";

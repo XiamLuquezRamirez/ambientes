@@ -37,7 +37,7 @@
     <iframe
         id="juegoFrame"
         title="{{ $juego->nombre }}"
-        src="{{ $urlPaquete }}"
+        src="{{ $urlPaquete }}?color={{ urlencode($juego->color ?: '#64748b') }}"
         allow="autoplay; fullscreen"
     ></iframe>
 

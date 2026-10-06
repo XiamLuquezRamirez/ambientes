@@ -28,8 +28,8 @@
                 Pide ayuda a tu profe.
             </p>
         @endif
-        <a href="{{ route('ambiente.inicio') }}" class="btn-entrar" style="margin-top:8px;min-width:180px;min-height:56px;font-size:1.3rem;">
-            Volver
+        <a href="{{ route('ambiente.inicio') }}" class="kiosco-volver" style="margin-top:8px;">
+            <img src="{{ asset('assets/images/selector-aula/volver.png') }}" alt="Volver">
         </a>
     </div>
 </main>

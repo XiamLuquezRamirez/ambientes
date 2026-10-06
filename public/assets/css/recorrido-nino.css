@@ -172,6 +172,16 @@
     display: none !important;
 }
 
+/* La imagen de .kiosco-volver ya trae fondo, borde y sombra. */
+.rn-back.kiosco-volver {
+    display: inline-block;
+    min-height: 0;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
 .rn-back--player {
     top: 10px;
     left: 10px;
