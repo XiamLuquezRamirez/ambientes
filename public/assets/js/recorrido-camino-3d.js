@@ -10,7 +10,7 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
-import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR } from './mapa-mundo.js?v=20261002m';
+import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR } from './mapa-mundo.js?v=20261006b';
 
 (function () {
     'use strict';
@@ -516,6 +516,26 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         clipActual = nombre;
     }
 
+    // El ciclo de pies sigue los metros que avanza. Si no, se ve que se desliza.
+    function ritmoDelPaso(vel) {
+        if (!accionesPersonaje || !personaje) return;
+        const nombre = clipMovimiento || CLIP_CAMINAR;
+        const acc = accionesPersonaje[nombre];
+        if (!acc || !acc.getClip) return;
+        const ciclo = acc.getClip().duration || 1;
+        const zancada = (nombre === CLIP_CORRER ? 2.2 : 1.35) * (personaje.scale.x || 1);
+        const escala = (Math.max(0, vel) * ciclo) / Math.max(0.5, zancada);
+        acc.timeScale = Math.max(0.85, Math.min(2.15, escala));
+    }
+
+    function ritmoQuieto() {
+        if (!accionesPersonaje) return;
+        [CLIP_CAMINAR, CLIP_CORRER].forEach(function (nombre) {
+            const acc = accionesPersonaje[nombre];
+            if (acc) acc.timeScale = 1;
+        });
+    }
+
     // Velocidad del personaje. 1 es la de ahora.
     // Más alto camina más rápido; más bajo, más lento.
     // Vale para las flechas y para cuando el sistema lo lleva.
@@ -664,7 +684,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
     function poseDetras(yawExtra, lejosCasa) {
         const dist = lejosCasa ? (usaMapaGlb ? 15 : 18) : (usaMapaGlb ? 9 : 12);
-        const alt = usaMapaGlb ? 5.6 : 7.2;
+        let alt = usaMapaGlb ? 5.6 : 7.2;
+        if (modoNav === 'botones' && !lejosCasa) alt -= usaMapaGlb ? 1.4 : 1.7;
         const yaw = personaje.rotation.y + (yawExtra || 0);
         let x = personaje.position.x - Math.sin(yaw) * dist;
         let z = personaje.position.z - Math.cos(yaw) * dist;
@@ -1330,6 +1351,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         posAntesDeCarpa = null;
         caminando = false;
         caminandoLibre = false;
+        pasoArco = null;
         entrandoSaliendo = false;
         animCasa = null;
         animCurva = null;
@@ -1863,11 +1885,16 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         capa.innerHTML = ''
             + '<div class="rn3d-pad rn3d-pad--izq">'
             +   '<span class="rn3d-pad__titulo">Caminar</span>'
-            +   '<div class="rn3d-pad__cruz">'
+            +   '<div class="rn3d-pad__eje">'
             +     flecha('mover', 0, 1, 'fa-arrow-up', 'Adelante')
+            +     flecha('mover', 0, -1, 'fa-arrow-down', 'Atrás')
+            +   '</div>'
+            + '</div>'
+            + '<div class="rn3d-pad rn3d-pad--der">'
+            +   '<span class="rn3d-pad__titulo">Girar</span>'
+            +   '<div class="rn3d-pad__eje rn3d-pad__eje--lado">'
             +     flecha('mover', 1, 0, 'fa-arrow-left', 'Izquierda')
             +     flecha('mover', -1, 0, 'fa-arrow-right', 'Derecha')
-            +     flecha('mover', 0, -1, 'fa-arrow-down', 'Atrás')
             +   '</div>'
             + '</div>';
         ctx.$paso[0].appendChild(capa);
@@ -1971,8 +1998,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         soltarFoco();
         alLlegarLibre = function () { abrirZonaJuegos(); };
         personaje.visible = true; ocultarEtiqueta();
-        animDur = duracionCaminata(origen.distanceTo(destino));
-        animInicio = performance.now();
+        arrancarPaso();
     }
 
     // Abre la galería de juegos (HTML) por encima del canvas 3D, reutilizando
@@ -2005,6 +2031,59 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     // La animación recorre una curva concreta entre t0 y t1 (puede ser reversa).
     let animInicio = 0, animDur = 0, alLlegarCb = null;
     let animCurva = null, animT0 = 0, animT1 = 1, animDestinoId = null;
+    let pasoArco = null;
+
+    // Recorre la curva por metros, no por el parámetro. En una curva el
+    // parámetro se aprieta y el personaje se acelera o se frena sin caminar.
+    function prepararPaso(curvaP, t0, t1) {
+        const n = 36;
+        const muestras = [];
+        let s = 0;
+        let prev = null;
+        for (let i = 0; i <= n; i++) {
+            const t = t0 + (t1 - t0) * (i / n);
+            const p = curvaP.getPoint(t);
+            if (prev) s += Math.hypot(p.x - prev.x, p.z - prev.z);
+            muestras.push({ s: s, x: p.x, y: p.y, z: p.z });
+            prev = p;
+        }
+        pasoArco = { muestras: muestras, largo: Math.max(s, 0.001), recorrido: 0, vel: 1 };
+        return s;
+    }
+
+    function puntoEnArco(frac) {
+        const dist = pasoArco.largo * Math.max(0, Math.min(1, frac));
+        const m = pasoArco.muestras;
+        let i = 1;
+        while (i < m.length - 1 && m[i].s < dist) i++;
+        const a = m[i - 1];
+        const b = m[i];
+        const span = (b.s - a.s) || 1;
+        const u = Math.max(0, Math.min(1, (dist - a.s) / span));
+        return {
+            x: a.x + (b.x - a.x) * u,
+            y: a.y + (b.y - a.y) * u,
+            z: a.z + (b.z - a.z) * u,
+        };
+    }
+
+    function arrancarPaso() {
+        const largo = prepararPaso(animCurva, animT0, animT1);
+        animDur = duracionCaminata(largo);
+        if (pasoArco) pasoArco.vel = largo / Math.max(0.3, animDur / 1000);
+        animInicio = performance.now();
+        return largo;
+    }
+
+    function girarHacia(dx, dz, dt) {
+        if (!personaje || dx * dx + dz * dz < 1e-4) return personaje ? personaje.rotation.y : 0;
+        let objetivo = Math.atan2(dx, dz);
+        let delta = objetivo - personaje.rotation.y;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        const sigue = 1 - Math.exp(-12 * Math.max(dt, 0.001));
+        return personaje.rotation.y + delta * sigue;
+    }
 
     // Devuelve { curva, t0, t1 } para animar del nodo `origen` al nodo `destino`.
     // Ambos deben ser adyacentes en el layout (tronco, misma rama, o módulo↔fin).
@@ -2051,9 +2130,8 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
 
     function caminarPuente(curvaP, t0, t1, alLlegar) {
         if (!personaje || !curvaP) { if (alLlegar) alLlegar(); return; }
-        const p0 = curvaP.getPoint(t0);
-        const p1 = curvaP.getPoint(t1);
-        if (p0.distanceTo(p1) < 0.8) { if (alLlegar) alLlegar(); return; }
+        const largo = prepararPaso(curvaP, t0, t1);
+        if (largo < 0.8) { pasoArco = null; if (alLlegar) alLlegar(); return; }
         personaje.visible = true;
         cerrarModal();
         yawObjetivo = null;
@@ -2065,8 +2143,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         animT1 = t1;
         animDestinoId = nodoActual;
         alLlegarPuente = alLlegar || null;
-        animDur = duracionCaminata(p0.distanceTo(p1));
-        animInicio = performance.now();
+        arrancarPaso();
     }
 
     function empezarTramo(destinoId, alLlegar) {
@@ -2080,9 +2157,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         refrescarEstaciones();
         animCurva = tramo.curva; animT0 = tramo.t0; animT1 = tramo.t1;
         animDestinoId = destinoId; alLlegarCb = alLlegar || null;
-        const p0 = animCurva.getPoint(animT0), p1 = animCurva.getPoint(animT1);
-        animDur = duracionCaminata(p0.distanceTo(p1));
-        animInicio = performance.now();
+        arrancarPaso();
         const est = estacionPorId(destinoId);
         if (est) indiceActual = est.indice;
         actualizarHud(true);
@@ -3220,7 +3295,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             : (!recorridoIniciado ? 'Toca ¡Iniciar! para empezar la aventura'
                 : (indiceActual >= N - 1 ? '¡Completaste el recorrido!'
                     : (modoNav === 'auto' ? 'Yo te llevo a la siguiente parada'
-                        : (modoNav === 'botones' ? 'Camina con las flechas de la izquierda'
+                        : (modoNav === 'botones' ? 'Camina con la izquierda y gira con la derecha'
                             : 'Toca la siguiente parada que brilla'))));
     }
     function ocultarEtiqueta() { if (elEtiqueta) elEtiqueta.style.display = 'none'; }
@@ -3434,14 +3509,13 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         animarFuegos(dt);
         animarEntradaSalida(now);
         let poseCamino = null;
-        if (caminando && animCurva && personaje) {
-            const k = Math.min(1, (now - animInicio) / animDur);
-            const ease = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-            const u = animT0 + (animT1 - animT0) * ease;
-            const p = animCurva.getPoint(u);
-            let tang = animCurva.getTangent(u).normalize();
-            if (animT1 < animT0) tang.multiplyScalar(-1);
-            poseCamino = { x: p.x, y: p.y, z: p.z, rot: Math.atan2(tang.x, tang.z), fin: k >= 1 };
+        if (caminando && pasoArco && personaje) {
+            pasoArco.recorrido = Math.min(pasoArco.largo, pasoArco.recorrido + pasoArco.vel * dt);
+            const frac = pasoArco.recorrido / pasoArco.largo;
+            const p = puntoEnArco(frac);
+            const mira = puntoEnArco(Math.min(1, (pasoArco.recorrido + 2.4) / pasoArco.largo));
+            const rot = girarHacia(mira.x - p.x, mira.z - p.z, dt);
+            poseCamino = { x: p.x, y: p.y, z: p.z, rot: rot, fin: pasoArco.recorrido >= pasoArco.largo - 0.02 };
         }
         if (eligiendoPersonaje && candidatosPersonaje && !pasoAlCentro) {
             candidatosPersonaje.forEach((c) => { if (c.mixer) c.mixer.update(dt); });
@@ -3488,6 +3562,19 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 ? (entrandoAndando ? CLIP_CAMINAR : clipMovimiento)
                 : (hablando ? CLIP_HABLAR : CLIP_QUIETO);
             ponerClip(clip);
+            if (caminando && pasoArco) ritmoDelPaso(pasoArco.vel);
+            else if (entrandoAndando && animCasa && animCasa.modo !== 'girar') {
+                const a = animCasa;
+                const desde = a.modo === 'entrar' ? a.desde : a.puerta;
+                const hacia = a.modo === 'entrar' ? a.puerta : a.desde;
+                const dist = Math.hypot(hacia.x - desde.x, hacia.z - desde.z);
+                const kCasa = Math.min(1, (now - a.ini) / a.dur);
+                const deriv = kCasa < 0.5 ? 4 * kCasa : 4 * (1 - kCasa);
+                ritmoDelPaso(dist * deriv / Math.max(0.3, a.dur / 1000));
+            } else if (moviendoStick) {
+                const ayStick = sticks.mover.y;
+                ritmoDelPaso(Math.abs(3.4 * ayStick * (VELOCIDAD_PERSONAJE > 0 ? VELOCIDAD_PERSONAJE : 1)));
+            } else ritmoQuieto();
             mixer.update(dt);
         }
         if (poseCamino && personaje) {
@@ -3496,7 +3583,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             personaje.rotation.y = poseCamino.rot;
             rumboCamino = poseCamino.rot;
             if (poseCamino.fin) {
-                caminando = false; animCurva = null;
+                caminando = false; animCurva = null; pasoArco = null;
                 if (alLlegarPuente) {
                     const cb = alLlegarPuente; alLlegarPuente = null;
                     if (cb) cb();
