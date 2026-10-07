@@ -8,11 +8,6 @@
     );
 @endphp
 
-@push('styles')
-    <link rel="stylesheet"
-        href="{{ asset('assets/css/kiosco-selector-polimotor.css') }}?v={{ @filemtime(public_path('assets/css/kiosco-selector-polimotor.css')) ?: time() }}">
-@endpush
-
 @section('content')
     @if ($sinPin || $pinBloqueado)
         <main class="pin-wrap">
@@ -20,9 +15,7 @@
                 <span class="pin-bloqueado__icono" aria-hidden="true">
                     <i class="fas {{ $sinPin ? 'fa-lock' : 'fa-ban' }}"></i>
                 </span>
-                <div class="kiosco-ficha-alumno" style="--color-av: {{ $estudiante->color_avatar }};">
-                    @include('auth._avatar-ficha')
-                </div>
+                @include('auth._ficha-aula')
                 <p class="pin-bloqueado__titulo">
                     {{ $sinPin ? 'Sin PIN configurado' : 'PIN bloqueado' }}
                 </p>
@@ -41,9 +34,7 @@
         <main class="pin-wrap" id="kioscoPinApp" data-verificar="{{ route('auth.verificar-pin', $estudiante->id) }}"
             data-csrf="{{ csrf_token() }}" data-catalogo='@json(collect($figuras)->keyBy('icon'))'>
             <div class="pin-izquierda">
-                <div class="kiosco-ficha-alumno" style="--color-av: {{ $estudiante->color_avatar }};">
-                    @include('auth._avatar-ficha')
-                </div>
+                @include('auth._ficha-aula')
                 <p class="pin-instruccion">Toca tus 3 figuras</p>
 
                 <div class="indicadores" id="indicadores" aria-live="polite">
@@ -73,12 +64,5 @@
                 @endforeach
             </div>
         </main>
-
-        <div id="overlay-exito" class="overlay" style="display:none;" aria-live="polite">
-            <div class="overlay-contenido">
-                <span class="overlay-icono" aria-hidden="true">✓</span>
-                <p>¡Muy bien!</p>
-            </div>
-        </div>
     @endif
 @endsection

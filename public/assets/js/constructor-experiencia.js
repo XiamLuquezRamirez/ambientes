@@ -662,8 +662,7 @@
     function juegoCatalogoCardHtml(j, selectedCatalogoId) {
         const catalogoId = j.slug;
         const selected = catalogoId && String(catalogoId) === String(selectedCatalogoId || '');
-        const icon = j.icono || 'fa-gamepad';
-        const iconClass = icon.indexOf('fa-') === 0 ? icon : `fa-${icon}`;
+        const imagenUrl = j.imagen_url || '';
         const color = j.color || '#64748b';
         const cadena = j.cadena || {};
         const tipoLabel = j.tipo_label || j.tipo || '';
@@ -699,8 +698,10 @@
             <span class="cx-juego-catalogo-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
             <div class="student-top">
                 <div class="student-avatar initials d-flex align-items-center justify-content-center"
-                    style="background:${escapar(color)};color:#fff;font-size:1.25rem;">
-                    <i class="fa-solid ${escapar(iconClass)}"></i>
+                    style="background:${escapar(color)};color:#fff;font-size:1.25rem;overflow:hidden;">
+                    ${imagenUrl
+                        ? `<img src="${escapar(imagenUrl)}" alt="" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;padding:.35rem;">`
+                        : '<i class="fa-solid fa-gamepad"></i>'}
                 </div>
                 <div class="student-identity">
                     <h5>${escapar(j.nombre || 'Sin nombre')}</h5>

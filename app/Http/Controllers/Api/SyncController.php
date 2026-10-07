@@ -20,7 +20,7 @@ class SyncController extends Controller
     {
         $data = $request->validate([
             'entidad'         => 'required|string',
-            'entidad_id'      => 'required|integer',
+            'entidad_id'      => ['required', 'regex:/^[A-Za-z0-9_-]{1,120}$/'],
             'accion'          => 'required|in:create,update,delete,transfer',
             'servidor_origen' => 'required|string',
             'payload'         => 'required|array',

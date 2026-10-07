@@ -21,100 +21,6 @@ class Juego extends Model
     public const TIPO_NUEVO = '__nuevo__';
 
     /**
-     * Iconos Font Awesome (solid) curados para el catálogo de juegos.
-     *
-     * @var list<string>
-     */
-    public const ICONOS_CATALOGO = [
-        'fa-gamepad',
-        'fa-puzzle-piece',
-        'fa-dice',
-        'fa-dice-five',
-        'fa-chess',
-        'fa-chess-knight',
-        'fa-chess-board',
-        'fa-trophy',
-        'fa-medal',
-        'fa-star',
-        'fa-heart',
-        'fa-hand',
-        'fa-hand-pointer',
-        'fa-hands',
-        'fa-child',
-        'fa-children',
-        'fa-person-running',
-        'fa-person-walking',
-        'fa-shoe-prints',
-        'fa-brain',
-        'fa-lightbulb',
-        'fa-eye',
-        'fa-ear-listen',
-        'fa-music',
-        'fa-palette',
-        'fa-paintbrush',
-        'fa-shapes',
-        'fa-cube',
-        'fa-cubes',
-        'fa-robot',
-        'fa-rocket',
-        'fa-car-side',
-        'fa-bicycle',
-        'fa-football',
-        'fa-basketball',
-        'fa-volleyball',
-        'fa-table-tennis-paddle-ball',
-        'fa-spa',
-        'fa-leaf',
-        'fa-sun',
-        'fa-moon',
-        'fa-cloud-sun',
-        'fa-bolt',
-        'fa-fire',
-        'fa-snowflake',
-        'fa-tree',
-        'fa-water',
-        'fa-mountain',
-        'fa-map',
-        'fa-compass',
-        'fa-flag',
-        'fa-bell',
-        'fa-comments',
-        'fa-face-smile',
-        'fa-clock',
-        'fa-stopwatch',
-        'fa-hourglass-half',
-        'fa-arrows-left-right',
-        'fa-arrows-up-down',
-        'fa-shuffle',
-        'fa-rotate',
-        'fa-layer-group',
-        'fa-clone',
-        'fa-images',
-        'fa-camera',
-        'fa-video',
-        'fa-microphone',
-        'fa-headphones',
-        'fa-book-open',
-        'fa-graduation-cap',
-        'fa-apple-whole',
-        'fa-fish',
-        'fa-cat',
-        'fa-dog',
-        'fa-dove',
-        'fa-dragon',
-        'fa-ghost',
-        'fa-hat-wizard',
-        'fa-wand-magic-sparkles',
-        'fa-gem',
-        'fa-key',
-        'fa-gift',
-        'fa-candy-cane',
-        'fa-cookie-bite',
-        'fa-ice-cream',
-        'fa-timeline',
-    ];
-
-    /**
      * Paleta sugerida (sin color preseleccionado en el formulario).
      *
      * @var list<string>
@@ -195,14 +101,6 @@ class Juego extends Model
     }
 
     /**
-     * ¿Icono permitido en el catálogo del CRUD?
-     */
-    public static function iconoEsValido(string $icono): bool
-    {
-        return in_array($icono, self::ICONOS_CATALOGO, true);
-    }
-
-    /**
      * ¿Color hexadecimal válido (#RGB o #RRGGBB)?
      */
     public static function colorEsValido(string $color): bool
@@ -220,7 +118,7 @@ class Juego extends Model
         'ruta',
         'nombre',
         'descripcion',
-        'icono',
+        'imagen',
         'color',
         'orden',
         'activo',
@@ -237,6 +135,20 @@ class Juego extends Model
         }
 
         return asset(trim((string) $this->ruta, '/').'/index.html');
+    }
+
+    /**
+     * La imagen vive dentro de la carpeta del paquete; `?v=` evita caché al reemplazarla con el mismo nombre.
+     */
+    public function urlImagen(): ?string
+    {
+        if (! filled($this->ruta) || ! filled($this->imagen)) {
+            return null;
+        }
+
+        $url = asset(trim((string) $this->ruta, '/').'/'.basename((string) $this->imagen));
+
+        return $this->updated_at ? $url.'?v='.$this->updated_at->timestamp : $url;
     }
 
     public function tipoJuego()

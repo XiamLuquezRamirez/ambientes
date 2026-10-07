@@ -1,7 +1,6 @@
 @php
     $cadena = $juego->cadenaCurricularResuelta();
-    $icono = $juego->icono ?: 'fa-gamepad';
-    $iconClass = str_starts_with($icono, 'fa-') ? $icono : 'fa-' . $icono;
+    $imagenUrl = $juego->urlImagen();
     $color = $juego->color ?: '#64748b';
     $tipoLabel = $juego->tipoLabel();
     $urlPaquete = $juego->urlPaquete();
@@ -9,10 +8,15 @@
 
 <div class="student-card" data-juego-id="{{ $juego->slug }}">
     <div class="student-top">
-        <div class="student-avatar initials d-flex align-items-center justify-content-center"
-            style="background: {{ $color }}; color: #fff; font-size: 1.25rem;">
-            <i class="fa-solid {{ $iconClass }}" aria-hidden="true"></i>
-        </div>
+        @if ($imagenUrl)
+            <div class="student-avatar cj-card-imagen" style="--cj-card-color: {{ $color }};">
+                <img src="{{ $imagenUrl }}" alt="" loading="lazy" decoding="async">
+            </div>
+        @else
+            <div class="student-avatar cj-card-imagen cj-card-imagen--vacia" title="Este juego no tiene imagen">
+                <i class="fa-regular fa-image" aria-hidden="true"></i>
+            </div>
+        @endif
 
         <div class="student-identity">
             <h5>{{ $juego->nombre }}</h5>

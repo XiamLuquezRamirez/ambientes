@@ -296,6 +296,70 @@
     max-width: min(340px, 42vw);
 }
 
+/* Ficha del alumno en el PIN: mismo diseño que .pupitre__foto / .pupitre__nombre (kiosco-selector-aula.css). */
+.ficha-aula {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: clamp(180px, 22vw, 250px);
+    flex: 0 0 auto;
+}
+
+.ficha-aula__foto {
+    width: 77%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14%;
+    border: 7px solid var(--marco, #0494FC);
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.ficha-aula__foto .kiosco-avatar-img {
+    border-radius: 0;
+}
+
+.ficha-aula__iniciales {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.2rem, 4.4vw, 3.2rem);
+    color: var(--tinta, var(--marco, #0494FC));
+}
+
+.ficha-aula__nombre {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 59px;
+    margin-top: -18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.05em;
+    padding: 0.4em 0.6em 0.45em;
+    border-radius: 0.55em;
+    border: 4px solid var(--marco, #0494FC);
+    background: #fff;
+    color: var(--tinta, var(--marco, #0494FC));
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    line-height: 1.05;
+    text-align: center;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.ficha-aula__nombre span {
+    display: block;
+    max-width: 100%;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* Badge PIN: silueta (círculo + base) + borde punteado */
 .pin-badge {
     position: relative;
@@ -430,10 +494,12 @@
 }
 
 .pin-acciones {
+    --pin-accion-ancho: 181px;
+    --pin-accion-alto: 77px;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 16px;
+    gap: 29px;
     margin-top: 8px;
 }
 
@@ -542,17 +608,27 @@
 }
 
 /*
- * PIN: Volver (píldora = 72 % del alto de volver.png) y Borrar (68 % de borrar.png, 501×191)
- * quedan con la misma píldora de ~58 px. borrar.png trae ~18 % de margen transparente a cada
- * lado: el margen negativo lo recorta del layout para que la separación sea la del gap.
+ * PIN: Volver y Borrar miden exactamente --pin-accion-ancho × --pin-accion-alto.
+ * Cada PNG se escala para que su píldora opaca llene el botón, y su margen transparente
+ * queda fuera con márgenes negativos. Recalcular si se reemplaza alguna imagen:
+ * volver.png 835×417, píldora 754×321 desde (40, 48); borrar.png 501×191, píldora 327×140 desde (87, 25).
  */
+.pin-acciones .kiosco-volver {
+    width: var(--pin-accion-ancho);
+    height: var(--pin-accion-alto);
+}
+
 .pin-acciones .kiosco-volver img {
-    height: 100px;
+    max-width: none;
+    width: calc(var(--pin-accion-ancho) * 835 / 754);
+    height: calc(var(--pin-accion-alto) * 417 / 321);
+    margin: calc(var(--pin-accion-alto) * -48 / 321) 0 0 calc(var(--pin-accion-ancho) * -40 / 754);
 }
 
 .pin-acciones .kiosco-borrar img {
-    height: 106px;
-    margin: 0 -45px;
+    width: calc(var(--pin-accion-ancho) * 501 / 327);
+    height: calc(var(--pin-accion-alto) * 191 / 140);
+    margin: calc(var(--pin-accion-alto) * -25 / 140) 0 0 calc(var(--pin-accion-ancho) * -87 / 327);
 }
 
 .pin-figuras-grid {
@@ -626,36 +702,6 @@
     font-size: 1.05rem;
     line-height: 1.45;
     color: rgba(255, 255, 255, 0.85);
-}
-
-/* ── Overlays ───────────────────────────────────────────────── */
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(6, 12, 10, 0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-.overlay-contenido {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-}
-
-.overlay-icono {
-    font-size: 6rem;
-    color: var(--color-ambiente);
-    animation: kiosco-aparecer 0.4s ease;
-}
-
-.overlay-contenido p {
-    font-family: 'Fredoka One', cursive;
-    font-size: 2.5rem;
-    color: var(--dorado);
 }
 
 /* ── Saludo post-login: estilos en kiosco-bienvenida.css ────── */

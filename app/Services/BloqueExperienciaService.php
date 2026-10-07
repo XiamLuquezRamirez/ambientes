@@ -366,7 +366,7 @@ class BloqueExperienciaService
             if ($slug !== '' && isset($mapa[$slug])) {
                 $bloque['datos']['juego_catalogo_url'] = $mapa[$slug]['url'];
                 $bloque['datos']['juego_catalogo_nombre'] = $mapa[$slug]['nombre'];
-                $bloque['datos']['juego_catalogo_icono'] = $mapa[$slug]['icono'];
+                $bloque['datos']['juego_catalogo_imagen'] = $mapa[$slug]['imagen_url'];
                 $bloque['datos']['juego_catalogo_color'] = $mapa[$slug]['color'];
             }
 

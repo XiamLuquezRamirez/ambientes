@@ -11,8 +11,10 @@
 @endpush
 
 @section('content')
-<main class="bienambiente-wrap" data-kiosco-sesion="1" data-redirect-inicio="{{ $redirectInicio ?? '/recorrido' }}"
-    data-voz="¡Hola, {{ $primerNombre }}! Acompáñame al ambiente {{ $ambiente->nombre }}.">
+<main class="bienambiente-wrap{{ $fondoBienvenida ? ' is-armando' : '' }}" data-kiosco-sesion="1" data-kiosco-superponible
+    data-redirect-inicio="{{ $redirectInicio ?? '/recorrido' }}"
+    data-voz="¡Hola, {{ $primerNombre }}! Acompáñame al ambiente {{ $ambiente->nombre }}."
+    @if ($fondoBienvenida) data-fondo="{{ $fondoBienvenida }}" @endif>
     <div class="bienambiente-escena"
         @if ($fondoBienvenida) style="--bienambiente-fondo: url('{{ $fondoBienvenida }}');" @endif>
         <div class="bienambiente-nino">

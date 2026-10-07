@@ -8,6 +8,7 @@ use App\Models\Experiencia;
 use App\Services\AccesoAmbienteService;
 use App\Services\BloqueExperienciaService;
 use App\Services\ClaseKioscoService;
+use App\Services\CurriculoMediaService;
 use App\Services\RecorridoNinoService;
 use App\Services\SesionNinoService;
 use Illuminate\Http\Request;
@@ -30,10 +31,17 @@ class ClaseKioscoServiceTest extends TestCase
         $this->assertContains(Clase::ESTADO_FINALIZADA, Clase::ESTADOS);
     }
 
+    private function crearRecorrido(): RecorridoNinoService
+    {
+        return new RecorridoNinoService(
+            $this->createMock(BloqueExperienciaService::class),
+            $this->createMock(CurriculoMediaService::class),
+        );
+    }
+
     public function test_experiencia_permitida_exige_id_de_clase_cuando_viene_en_sesion(): void
     {
-        $bloques = $this->createMock(BloqueExperienciaService::class);
-        $service = new RecorridoNinoService($bloques);
+        $service = $this->crearRecorrido();
 
         $experiencia = new Experiencia;
         $experiencia->id = 55;
@@ -117,8 +125,7 @@ class ClaseKioscoServiceTest extends TestCase
 
     public function test_arbol_lineal_exige_una_sola_ruta(): void
     {
-        $bloques = $this->createMock(BloqueExperienciaService::class);
-        $service = new RecorridoNinoService($bloques);
+        $service = $this->crearRecorrido();
 
         $clase = new Clase;
         $item = new ClaseExperiencia;

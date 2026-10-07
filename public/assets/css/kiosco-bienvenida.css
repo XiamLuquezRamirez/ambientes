@@ -143,7 +143,123 @@
     animation: kiosco-estrella .5s ease var(--delay, 0s) forwards;
 }
 
+/* ── Armado en rompecabezas (piezas creadas por kiosco-bienvenida.js) ── */
+.bienambiente-wrap.is-armando {
+    background: radial-gradient(circle at 50% 45%, #b7d7fb 0%, #6f9fde 100%);
+}
+
+.is-armando .bienambiente-escena {
+    background-image: none;
+}
+
+/*
+ * Mientras convive con otra página (KioscoNav superponer/debajo) la bienvenida va fija encima:
+ * se arma sobre el PIN y se desarma sobre la página siguiente. El z-index supera las capas del recorrido.
+ */
+[data-kiosco-superponiendo] > .bienambiente-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: 10100;
+}
+
+[data-kiosco-superponiendo] > .bienambiente-wrap.is-armando,
+.bienambiente-wrap.is-desarmando {
+    background: transparent;
+}
+
+.is-desarmando .bienambiente-escena {
+    background-image: none;
+}
+
+/* Al desarmar, el niño y el mensaje viajan como copias dentro de las piezas (.bpz-lienzo). */
+.is-desarmando .bienambiente-escena > .bienambiente-nino,
+.is-desarmando .bienambiente-escena > .bienambiente-mensaje {
+    visibility: hidden;
+}
+
+/* display:none (no visibility) para que las animaciones de entrada arranquen al revelar. */
+.is-armando .bienambiente-nino,
+.is-armando .bienambiente-mensaje {
+    display: none;
+}
+
+.bpz {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.bpz-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.bpz-pieza {
+    position: absolute;
+    opacity: 0;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 .5cqw .7cqw rgba(16, 40, 80, .35));
+    transition: filter .25s ease;
+}
+
+.bpz-pieza__img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+}
+
+.bpz-lienzo {
+    position: absolute;
+}
+
+/* Las copias ya terminaron de aparecer: sin animaciones de entrada (todas acaban en opacidad 1 y sin transform). */
+.bpz-lienzo * {
+    animation: none !important;
+}
+
+.bpz-lienzo .bienambiente-estrellas i {
+    opacity: 1;
+}
+
+.bpz.is-encajado .bpz-pieza {
+    filter: drop-shadow(0 0 0 rgba(16, 40, 80, 0));
+}
+
+.bpz-brillo {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .55) 50%, transparent 70%);
+    opacity: 0;
+}
+
+.bpz.is-encajado .bpz-brillo {
+    animation: bpz-brillo .65s ease-out forwards;
+}
+
+/* Al desarmar, el mismo brillo en reversa; sigue aunque is-encajado se quite a mitad. */
+.bpz.is-desencajando .bpz-brillo {
+    animation: bpz-brillo .65s ease-out reverse forwards;
+}
+
+@keyframes bpz-brillo {
+    from { opacity: 1; translate: -100% 0; }
+    to { opacity: 1; translate: 100% 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+    .is-armando .bienambiente-escena {
+        background-image: var(--bienambiente-fondo, none);
+    }
+
+    .is-armando .bienambiente-nino,
+    .is-armando .bienambiente-mensaje {
+        display: flex;
+    }
+
+
     .bienambiente-hola,
     .bienambiente-ficha,
     .bienambiente-texto,

@@ -70,8 +70,15 @@
 }
 
 @keyframes rn-paso-in {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .rn-fs-btn,
@@ -241,7 +248,8 @@
     --rn-art-h: 1080;
     --rn-suelo-design: 64;
     --rn-escena-design: 172;
-    --rn-stage-h: calc(var(--rn-art-h) + var(--rn-suelo-design)); /* 1144 */
+    --rn-stage-h: calc(var(--rn-art-h) + var(--rn-suelo-design));
+    /* 1144 */
     --bj-suelo-h: calc(100% * var(--rn-suelo-design) / var(--rn-stage-h));
     --bj-escena-h: calc(100% * var(--rn-escena-design) / var(--rn-stage-h));
     position: relative;
@@ -251,7 +259,7 @@
     background: #5aa34c;
 }
 
-.rn-portada--con-fondo > .rn-portada-stage {
+.rn-portada--con-fondo>.rn-portada-stage {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -336,9 +344,8 @@
     overflow: visible;
 }
 
-.rn-portada--con-fondo .rn-btn-iniciar-pill {
-    font-size: clamp(1.1rem, 3.2cqw, 1.85rem);
-    padding: clamp(0.65rem, 1.8cqh, 1.1rem) clamp(1.1rem, 3cqw, 1.8rem);
+.rn-portada--con-fondo .rn-portada-iniciar-halo {
+    --rn-iniciar-w: clamp(200px, 24cqw, 360px);
 }
 
 .rn-portada-banner {
@@ -414,10 +421,17 @@
     animation: rn-accion-in .55s cubic-bezier(.22, 1, .36, 1) .38s both;
 }
 
+/*
+ * Botón Iniciar compuesto con vista_nino/boton_iniciar.png (337×198) + play.png, teñido por el
+ * filtro #rnIniciarTinte (recorrido-nino.js). El halo coincide con el marco punteado del PNG
+ * (x 15–321, y 27–169) para que el pulso quede alineado con él; todo escala con --rn-iniciar-w.
+ */
 .rn-portada-iniciar-halo {
-    padding: 14px 18px;
-    border: 3px dashed color-mix(in srgb, var(--rn-header) 75%, #0ea5e9);
-    border-radius: 28px;
+    --rn-iniciar-w: clamp(230px, 26vw, 330px);
+    position: relative;
+    width: var(--rn-iniciar-w);
+    aspect-ratio: 307 / 143;
+    border-radius: calc(var(--rn-iniciar-w) * 10 / 307);
     animation: rn-halo-pulse 2.2s ease-in-out .8s infinite;
 }
 
@@ -440,22 +454,25 @@
     font-size: 5rem;
 }
 
+/* Ocupa todo el halo (marco incluido); el padding deja el contenido sobre la píldora (x 29–308, y 39–158). */
 .rn-btn-iniciar-pill {
     appearance: none;
+    position: absolute;
+    inset: 0;
     border: 0;
+    border-radius: inherit;
     cursor: pointer;
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 14px;
-    min-height: 64px;
-    padding: 0 18px 0 28px;
-    border-radius: 999px;
-    background: var(--rn-header);
+    justify-content: center;
+    gap: calc(var(--rn-iniciar-w) * .03);
+    padding: 3.909% 4.235% 3.583% 4.56%;
+    background: none;
     color: #fff;
     font-family: 'Fredoka One', cursive;
-    font-size: clamp(1.35rem, 2.6vw, 1.85rem);
-    letter-spacing: .02em;
-    box-shadow: 0 10px 28px color-mix(in srgb, var(--rn-header) 45%, transparent);
+    font-size: calc(var(--rn-iniciar-w) * .13);
+    line-height: 1;
+    letter-spacing: .01em;
     transition: transform .15s ease, filter .15s ease;
 }
 
@@ -467,17 +484,46 @@
     transform: scale(.97);
 }
 
-.rn-btn-iniciar-flecha {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: #fff;
-    color: var(--rn-header);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.05rem;
-    box-shadow: inset 0 0 0 1px rgba(14, 165, 233, .15);
+.rn-btn-iniciar-arte {
+    position: absolute;
+    left: -4.886%;
+    top: -18.881%;
+    width: 109.772%;
+    height: 138.462%;
+    background: url('../images/vista_nino/boton_iniciar.png') center / 100% 100% no-repeat;
+    pointer-events: none;
+}
+
+.rn-btn-iniciar-texto,
+.rn-btn-iniciar-play {
+    position: relative;
+}
+
+.rn-btn-iniciar-texto {
+    text-shadow: 0 .06em 0 rgba(0, 0, 0, .18);
+}
+
+.rn-btn-iniciar-play {
+    flex: none;
+    width: calc(var(--rn-iniciar-w) * .14);
+    aspect-ratio: 183 / 191;
+    background: url('../images/vista_nino/play.png') center / 100% 100% no-repeat;
+}
+
+.rn-btn-iniciar-filtros {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+/* Color propio del ambiente: --rn-header (mezclado con celeste) vuelve grises a Multisaberes y Tecnología. */
+.rn-btn-iniciar-tono {
+    flood-color: var(--rn-color, #0F6E56);
+}
+
+.rn-btn-iniciar-tono-oscuro {
+    flood-color: var(--rn-color);
 }
 
 .rn-elegir {
@@ -578,13 +624,20 @@
         rn-elegir-entra .8s cubic-bezier(.34, 1.56, .64, 1) forwards,
         rn-elegir-flota 3.4s ease-in-out 1s infinite;
 }
-.rn-elegir.is-abierto .rn-elegir-btn--clase { animation-delay: .1s, 1s; }
-.rn-elegir.is-abierto .rn-elegir-btn--jugar { animation-delay: .28s, 1.3s; }
+
+.rn-elegir.is-abierto .rn-elegir-btn--clase {
+    animation-delay: .1s, 1s;
+}
+
+.rn-elegir.is-abierto .rn-elegir-btn--jugar {
+    animation-delay: .28s, 1.3s;
+}
 
 /* El ícono se balancea suave dentro de la tarjeta. */
 .rn-elegir.is-abierto .rn-elegir-btn .rn-elegir-icono {
     animation: rn-elegir-icono-bailar 3s ease-in-out 1.1s infinite;
 }
+
 /* Los rayos giran despacio para dar vida. */
 .rn-elegir.is-abierto .rn-elegir-rayos {
     animation: rn-elegir-rayos-girar 9s linear infinite;
@@ -593,6 +646,7 @@
 .rn-elegir-btn:hover {
     filter: brightness(1.06);
 }
+
 .rn-elegir-btn:active {
     transform: translateY(4px) scale(.97);
     animation-play-state: paused;
@@ -637,20 +691,24 @@
    El borde blanco se logra con drop-shadow apilado (sigue el clip-path). */
 .rn-elegir .rn-elegir-btn.is-formando {
     animation: none;
-    border: 0;                 /* el borde recto no encaja con las siluetas */
+    border: 0;
+    /* el borde recto no encaja con las siluetas */
     box-shadow: none;
     transition: clip-path .2s cubic-bezier(.34, 1.56, .64, 1);
     filter: drop-shadow(0 14px 12px rgba(15, 23, 42, .32));
     isolation: isolate;
 }
+
 /* Durante el ciclo de formas el fondo propio del botón se apaga: el relleno de
    color lo pinta ::after y el borde blanco lo pinta ::before (más grande). */
 .rn-elegir .rn-elegir-btn.is-formando {
     background: transparent !important;
-    -webkit-clip-path: none !important;   /* recorta ::before/::after, no el botón */
+    -webkit-clip-path: none !important;
+    /* recorta ::before/::after, no el botón */
     clip-path: none !important;
     overflow: visible;
 }
+
 /* Borde blanco: silueta blanca un poco más grande, detrás del relleno. */
 .rn-elegir .rn-elegir-btn.is-formando::before,
 .rn-elegir .rn-elegir-btn.is-formando::after {
@@ -660,25 +718,30 @@
     -webkit-clip-path: var(--forma, inset(0));
     clip-path: var(--forma, inset(0));
     transition: -webkit-clip-path .2s cubic-bezier(.34, 1.56, .64, 1),
-                clip-path .2s cubic-bezier(.34, 1.56, .64, 1);
+        clip-path .2s cubic-bezier(.34, 1.56, .64, 1);
 }
+
 .rn-elegir .rn-elegir-btn.is-formando::before {
-    inset: -7px;               /* grosor del borde */
+    inset: -7px;
+    /* grosor del borde */
     background: #fff;
     z-index: 0;
     filter: drop-shadow(0 12px 12px rgba(15, 23, 42, .32));
 }
+
 /* Relleno de color (mismo gradiente que la tarjeta), encima del borde. */
 .rn-elegir .rn-elegir-btn--clase.is-formando::after {
     inset: 0;
     background: linear-gradient(180deg, #4eb0ff 0%, #1c86ea 100%);
     z-index: 1;
 }
+
 .rn-elegir .rn-elegir-btn--jugar.is-formando::after {
     inset: 0;
     background: linear-gradient(180deg, #8d6bff 0%, #6842f3 100%);
     z-index: 1;
 }
+
 /* El clip-path recortado del botón ya no aplica; movemos el clip a los pseudos.
    El JS sigue seteando --forma; el clip directo del botón queda neutralizado. */
 .rn-elegir .rn-elegir-btn.is-formando .rn-elegir-icono,
@@ -686,6 +749,7 @@
     opacity: 0;
     transition: opacity .15s ease;
 }
+
 .rn-elegir .rn-elegir-btn.rn-late {
     animation: rn-elegir-late .26s ease;
 }
@@ -707,16 +771,19 @@
 /* Destello blanco que crece desde el centro de la tarjeta elegida. */
 .rn-elegir-flash {
     position: absolute;
-    left: 50%; top: 50%;
-    width: 40px; height: 40px;
+    left: 50%;
+    top: 50%;
+    width: 40px;
+    height: 40px;
     margin: -20px 0 0 -20px;
     border-radius: 50%;
-    background: radial-gradient(circle, #fff 0%, rgba(255,255,255,.85) 40%, rgba(255,255,255,0) 72%);
+    background: radial-gradient(circle, #fff 0%, rgba(255, 255, 255, .85) 40%, rgba(255, 255, 255, 0) 72%);
     z-index: 4;
     pointer-events: none;
     opacity: 0;
     transform: scale(0);
 }
+
 .rn-elegir.is-saliendo .rn-elegir-flash.is-on {
     animation: rn-elegir-flash .9s ease-out forwards;
 }
@@ -724,13 +791,15 @@
 /* Estrellas que salen disparadas al elegir. */
 .rn-elegir-estrella {
     position: absolute;
-    left: 50%; top: 50%;
+    left: 50%;
+    top: 50%;
     font-size: 28px;
     z-index: 5;
     pointer-events: none;
     opacity: 0;
     will-change: transform, opacity;
 }
+
 .rn-elegir.is-saliendo .rn-elegir-estrella.is-on {
     animation: rn-elegir-estrella .8s ease-out forwards;
 }
@@ -793,67 +862,139 @@
 }
 
 @keyframes rn-elegir-pop {
-    from { opacity: 0; transform: translateY(28px) scale(.84); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(28px) scale(.84);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 /* Título: aparece con rebote alegre. */
 @keyframes rn-elegir-titulo-in {
-    0% { opacity: 0; transform: translateY(-24px) scale(.7); }
-    60% { opacity: 1; transform: translateY(4px) scale(1.06); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+    0% {
+        opacity: 0;
+        transform: translateY(-24px) scale(.7);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateY(4px) scale(1.06);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 /* Tarjeta: entra desde abajo con rebote y un giro leve. */
 @keyframes rn-elegir-entra {
-    0% { opacity: 0; transform: translateY(70px) scale(.6) rotate(-6deg); }
-    55% { opacity: 1; transform: translateY(-10px) scale(1.05) rotate(2deg); }
-    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+    0% {
+        opacity: 0;
+        transform: translateY(70px) scale(.6) rotate(-6deg);
+    }
+
+    55% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1.05) rotate(2deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0);
+    }
 }
 
 /* Idle: flota suave arriba/abajo con un latido mínimo. */
 @keyframes rn-elegir-flota {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-10px) scale(1.015); }
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-10px) scale(1.015);
+    }
 }
 
 /* Ícono: se balancea de lado a lado. */
 @keyframes rn-elegir-icono-bailar {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
+
+    0%,
+    100% {
+        transform: rotate(-5deg);
+    }
+
+    50% {
+        transform: rotate(5deg);
+    }
 }
 
 /* Rayos detrás del ícono girando. */
 @keyframes rn-elegir-rayos-girar {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Saltito de alegría antes de expandirse. */
 @keyframes rn-elegir-saltito {
-    0% { transform: scale(1) translateY(0); }
-    45% { transform: scale(1.12) translateY(-14px); }
-    100% { transform: scale(1) translateY(0); }
+    0% {
+        transform: scale(1) translateY(0);
+    }
+
+    45% {
+        transform: scale(1.12) translateY(-14px);
+    }
+
+    100% {
+        transform: scale(1) translateY(0);
+    }
 }
 
 /* Latido en cada cambio de forma. */
 @keyframes rn-elegir-late {
-    0% { transform: scale(.86) rotate(-4deg); }
-    55% { transform: scale(1.1) rotate(3deg); }
-    100% { transform: scale(1) rotate(0); }
+    0% {
+        transform: scale(.86) rotate(-4deg);
+    }
+
+    55% {
+        transform: scale(1.1) rotate(3deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+    }
 }
 
 /* Destello: crece y se desvanece. */
 @keyframes rn-elegir-flash {
-    0% { opacity: 0; transform: scale(0); }
-    30% { opacity: .95; }
-    100% { opacity: 0; transform: scale(30); }
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    30% {
+        opacity: .95;
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(30);
+    }
 }
 
 /* ============================================================
    VARIANTE B — tarjetas tipo póster (ilustración grande) + flip 3D
    ============================================================ */
 .rn-elegir--v2 .rn-elegir-opciones {
-    perspective: 1400px;                 /* profundidad para el flip */
+    perspective: 1400px;
+    /* profundidad para el flip */
     gap: clamp(24px, 5vw, 56px);
 }
 
@@ -868,12 +1009,19 @@
     transform-style: preserve-3d;
     perspective: 1000px;
 }
+
 .rn-elegir--v2.is-abierto .rn-elegir-btn {
     animation: rn-elegir-entra .8s cubic-bezier(.34, 1.56, .64, 1) forwards,
-               rn-v2-flota 3.6s ease-in-out 1s infinite;
+        rn-v2-flota 3.6s ease-in-out 1s infinite;
 }
-.rn-elegir--v2.is-abierto .rn-elegir-btn--clase { animation-delay: .1s, 1s; }
-.rn-elegir--v2.is-abierto .rn-elegir-btn--jugar { animation-delay: .28s, 1.3s; }
+
+.rn-elegir--v2.is-abierto .rn-elegir-btn--clase {
+    animation-delay: .1s, 1s;
+}
+
+.rn-elegir--v2.is-abierto .rn-elegir-btn--jugar {
+    animation-delay: .28s, 1.3s;
+}
 
 .rn-card3d {
     position: relative;
@@ -884,6 +1032,7 @@
     transform-style: preserve-3d;
     transition: transform .55s cubic-bezier(.4, 0, .2, 1);
 }
+
 .rn-card3d-cara {
     position: absolute;
     inset: 0;
@@ -897,12 +1046,18 @@
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     box-shadow: inset 0 3px 0 rgba(255, 255, 255, .35),
-                0 16px 0 rgba(0, 0, 0, .10),
-                0 26px 36px rgba(15, 23, 42, .28);
+        0 16px 0 rgba(0, 0, 0, .10),
+        0 26px 36px rgba(15, 23, 42, .28);
 }
+
 /* Frente: ilustración grande + cinta con el texto. */
-.rn-elegir-btn--clase .rn-card3d-frente { background: linear-gradient(180deg, #7fd3ff 0%, #3f9fe6 100%); }
-.rn-elegir-btn--jugar .rn-card3d-frente { background: linear-gradient(180deg, #b49bff 0%, #7a54f0 100%); }
+.rn-elegir-btn--clase .rn-card3d-frente {
+    background: linear-gradient(180deg, #7fd3ff 0%, #3f9fe6 100%);
+}
+
+.rn-elegir-btn--jugar .rn-card3d-frente {
+    background: linear-gradient(180deg, #b49bff 0%, #7a54f0 100%);
+}
 
 .rn-poster-ilustra {
     flex: 1 1 auto;
@@ -911,11 +1066,13 @@
     place-items: center;
     padding: clamp(14px, 3vh, 26px) clamp(10px, 2vw, 20px) 0;
 }
+
 .rn-poster-ilustra svg {
     width: 82%;
     height: auto;
     filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .18));
 }
+
 .rn-poster-cinta {
     width: 100%;
     padding: clamp(10px, 1.8vh, 16px);
@@ -924,6 +1081,7 @@
     display: flex;
     justify-content: center;
 }
+
 .rn-poster-cinta span {
     font-family: 'Fredoka One', cursive;
     font-size: clamp(1.5rem, 3vw, 2.2rem);
@@ -932,17 +1090,29 @@
     line-height: 1;
     text-align: center;
 }
+
 /* Reverso: cara sólida con un emoji grande (se ve al voltear). */
 .rn-card3d-reverso {
     transform: rotateY(180deg);
     justify-content: center;
     color: #fff;
 }
-.rn-elegir-btn--clase .rn-card3d-reverso { background: linear-gradient(180deg, #4eb0ff, #1c86ea); }
-.rn-elegir-btn--jugar .rn-card3d-reverso { background: linear-gradient(180deg, #8d6bff, #6842f3); }
-.rn-poster-emoji { font-size: clamp(4rem, 11vw, 7rem); }
 
-.rn-elegir--v2 .rn-elegir-btn:active .rn-card3d { transform: scale(.97); }
+.rn-elegir-btn--clase .rn-card3d-reverso {
+    background: linear-gradient(180deg, #4eb0ff, #1c86ea);
+}
+
+.rn-elegir-btn--jugar .rn-card3d-reverso {
+    background: linear-gradient(180deg, #8d6bff, #6842f3);
+}
+
+.rn-poster-emoji {
+    font-size: clamp(4rem, 11vw, 7rem);
+}
+
+.rn-elegir--v2 .rn-elegir-btn:active .rn-card3d {
+    transform: scale(.97);
+}
 
 /* --- Salida variante B: flip 3D + zoom hacia la cámara --- */
 .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida {
@@ -952,12 +1122,15 @@
     transform-origin: center center;
     transition: transform .8s cubic-bezier(.5, 0, .1, 1);
 }
+
 .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-flip .rn-card3d {
     transform: rotateY(180deg) scale(1.06);
 }
+
 .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-zoom {
     transform: scale(9);
 }
+
 /* Las demás y el título se van al elegir. */
 .rn-elegir--v2.is-saliendo .rn-elegir-titulo,
 .rn-elegir--v2.is-saliendo .rn-elegir-btn:not(.is-elegida) {
@@ -967,48 +1140,111 @@
 }
 
 @keyframes rn-v2-flota {
-    0%, 100% { transform: translateY(0) rotateZ(-.6deg); }
-    50% { transform: translateY(-12px) rotateZ(.6deg); }
+
+    0%,
+    100% {
+        transform: translateY(0) rotateZ(-.6deg);
+    }
+
+    50% {
+        transform: translateY(-12px) rotateZ(.6deg);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .rn-elegir--v2.is-abierto .rn-elegir-btn { animation: none; opacity: 1; transform: none; }
-    .rn-card3d, .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida { transition: none !important; }
+    .rn-elegir--v2.is-abierto .rn-elegir-btn {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .rn-card3d,
+    .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida {
+        transition: none !important;
+    }
 }
 
 /* Estrella: sale disparada, gira y se apaga (usa --dx/--dy/--rot). */
 @keyframes rn-elegir-estrella {
-    0% { opacity: 0; transform: translate(0, 0) scale(.4) rotate(0); }
-    20% { opacity: 1; }
-    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(var(--rot)); }
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(.4) rotate(0);
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(var(--rot));
+    }
 }
 
 @keyframes rn-banner-in {
-    from { transform: translateY(-100%); opacity: .6; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(-100%);
+        opacity: .6;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 @keyframes rn-titulo-in {
-    from { opacity: 0; transform: translateY(8px) scale(.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 @keyframes rn-ilustracion-in {
-    from { opacity: 0; transform: translateX(-28px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(-28px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 @keyframes rn-accion-in {
-    from { opacity: 0; transform: translateX(24px) scale(.92); }
-    to { opacity: 1; transform: translateX(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateX(24px) scale(.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
 }
 
 @keyframes rn-halo-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--rn-header) 0%, transparent); transform: scale(1); }
-    50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--rn-header) 18%, transparent); transform: scale(1.02); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--rn-header) 0%, transparent);
+        transform: scale(1);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px color-mix(in srgb, var(--rn-header) 18%, transparent);
+        transform: scale(1.02);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .rn-portada-banner,
     .rn-portada-titulo,
     .rn-portada-ilustracion,
@@ -1033,8 +1269,11 @@
         opacity: 1;
         transform: none;
     }
+
     .rn-elegir-flash,
-    .rn-elegir-estrella { display: none !important; }
+    .rn-elegir-estrella {
+        display: none !important;
+    }
 }
 
 @media (max-width: 900px) {
@@ -1340,13 +1579,27 @@
 }
 
 @keyframes rn-nube-drop {
-    from { opacity: 0; transform: translateY(-48px) scale(.92); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(-48px) scale(.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 @keyframes rn-nube-sway {
-    0%, 100% { transform: rotate(-1.4deg); }
-    50% { transform: rotate(1.4deg); }
+
+    0%,
+    100% {
+        transform: rotate(-1.4deg);
+    }
+
+    50% {
+        transform: rotate(1.4deg);
+    }
 }
 
 @media (max-width: 720px) {
@@ -1385,11 +1638,9 @@
     bottom: 40px;
     width: 6px;
     border-radius: 999px;
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--rn-color, #0ea5e9) 80%, white),
-        color-mix(in srgb, var(--rn-color, #0ea5e9) 30%, #fbbf24)
-    );
+    background: linear-gradient(180deg,
+            color-mix(in srgb, var(--rn-color, #0ea5e9) 80%, white),
+            color-mix(in srgb, var(--rn-color, #0ea5e9) 30%, #fbbf24));
 }
 
 .rn-nodo {
@@ -1614,11 +1865,11 @@
     min-height: 0;
     position: relative;
     background:
-        radial-gradient(circle at 12% 30%, rgba(255,255,255,.12) 0 8px, transparent 9px),
-        radial-gradient(circle at 28% 70%, rgba(255,255,255,.1) 0 6px, transparent 7px),
-        radial-gradient(circle at 55% 40%, rgba(255,255,255,.11) 0 9px, transparent 10px),
-        radial-gradient(circle at 78% 65%, rgba(255,255,255,.1) 0 7px, transparent 8px),
-        radial-gradient(circle at 90% 25%, rgba(255,255,255,.12) 0 6px, transparent 7px),
+        radial-gradient(circle at 12% 30%, rgba(255, 255, 255, .12) 0 8px, transparent 9px),
+        radial-gradient(circle at 28% 70%, rgba(255, 255, 255, .1) 0 6px, transparent 7px),
+        radial-gradient(circle at 55% 40%, rgba(255, 255, 255, .11) 0 9px, transparent 10px),
+        radial-gradient(circle at 78% 65%, rgba(255, 255, 255, .1) 0 7px, transparent 8px),
+        radial-gradient(circle at 90% 25%, rgba(255, 255, 255, .12) 0 6px, transparent 7px),
         linear-gradient(180deg, #3B82F6 0%, #2563EB 55%, #1D4ED8 100%);
     overflow: hidden;
 }
@@ -1645,8 +1896,15 @@
     align-items: center;
 }
 
-.rn-mapa-flag--start { left: 2%; top: 42%; }
-.rn-mapa-flag--fin { right: 2%; top: 38%; }
+.rn-mapa-flag--start {
+    left: 2%;
+    top: 42%;
+}
+
+.rn-mapa-flag--fin {
+    right: 2%;
+    top: 38%;
+}
 
 .rn-mapa-mast {
     width: 4px;
@@ -1668,10 +1926,20 @@
     box-shadow: 0 4px 10px rgba(15, 23, 42, .2);
 }
 
-.rn-mapa-bandera--start { background: #FACC15; }
-.rn-mapa-bandera--fin { background: #F9A8D4; }
+.rn-mapa-bandera--start {
+    background: #FACC15;
+}
 
-.rn-mapa-decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.rn-mapa-bandera--fin {
+    background: #F9A8D4;
+}
+
+.rn-mapa-decor {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
 
 .rn-mapa-arbol {
     position: absolute;
@@ -1682,6 +1950,7 @@
     border-bottom: 36px solid #16A34A;
     filter: drop-shadow(0 2px 0 #15803D);
 }
+
 .rn-mapa-arbol::after {
     content: '';
     position: absolute;
@@ -1691,9 +1960,23 @@
     height: 12px;
     background: #854D0E;
 }
-.rn-mapa-arbol--a { left: 8%; bottom: 14%; }
-.rn-mapa-arbol--b { left: 48%; bottom: 10%; transform: scale(.85); }
-.rn-mapa-arbol--c { right: 12%; bottom: 16%; transform: scale(1.1); }
+
+.rn-mapa-arbol--a {
+    left: 8%;
+    bottom: 14%;
+}
+
+.rn-mapa-arbol--b {
+    left: 48%;
+    bottom: 10%;
+    transform: scale(.85);
+}
+
+.rn-mapa-arbol--c {
+    right: 12%;
+    bottom: 16%;
+    transform: scale(1.1);
+}
 
 .rn-mapa-bush {
     position: absolute;
@@ -1703,10 +1986,23 @@
     border-radius: 50% 50% 40% 40%;
     opacity: .9;
 }
-.rn-mapa-bush--a { left: 22%; bottom: 12%; }
-.rn-mapa-bush--b { right: 28%; bottom: 11%; background: #4ADE80; }
 
-.rn-estaciones { position: absolute; inset: 0; z-index: 3; }
+.rn-mapa-bush--a {
+    left: 22%;
+    bottom: 12%;
+}
+
+.rn-mapa-bush--b {
+    right: 28%;
+    bottom: 11%;
+    background: #4ADE80;
+}
+
+.rn-estaciones {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+}
 
 .rn-estacion {
     --est-color: #EAB308;
@@ -1765,9 +2061,17 @@
     filter: drop-shadow(0 2px 0 rgba(15, 23, 42, .15));
 }
 
-.rn-estacion:active .rn-estacion-card { transform: scale(.97); }
-.rn-estacion.es-origen .rn-estacion-num { background: #F59E0B; }
-.rn-estacion.sin-experiencia .rn-estacion-card { opacity: .8; }
+.rn-estacion:active .rn-estacion-card {
+    transform: scale(.97);
+}
+
+.rn-estacion.es-origen .rn-estacion-num {
+    background: #F59E0B;
+}
+
+.rn-estacion.sin-experiencia .rn-estacion-card {
+    opacity: .8;
+}
 
 .rn-mapa-vacio {
     height: 100%;
@@ -1782,13 +2086,27 @@
 }
 
 @keyframes rn-mapa-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes rn-estacion-in {
-    from { opacity: 0; transform: translate(-50%, -120%) scale(.9); }
-    to { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+    from {
+        opacity: 0;
+        transform: translate(-50%, -120%) scale(.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -100%) scale(1);
+    }
 }
 
 @media (max-width: 900px) {
@@ -1796,8 +2114,15 @@
         width: min(40vw, 170px);
         min-width: 120px;
     }
-    .rn-estacion { width: min(120px, 28vw); }
-    .rn-estacion-card { min-height: 48px; font-size: .72rem; }
+
+    .rn-estacion {
+        width: min(120px, 28vw);
+    }
+
+    .rn-estacion-card {
+        min-height: 48px;
+        font-size: .72rem;
+    }
 }
 
 /* -- Descripciï¿½n de experiencia -- */
@@ -1873,9 +2198,20 @@
     transition: filter .15s ease, transform .15s ease;
 }
 
-.rn-desc-tab[data-rn-tab='tema'] { background: #F97316; color: #fff; }
-.rn-desc-tab[data-rn-tab='objetivo'] { background: #22C55E; color: #fff; }
-.rn-desc-tab[data-rn-tab='dba'] { background: #EAB308; color: #422006; }
+.rn-desc-tab[data-rn-tab='tema'] {
+    background: #F97316;
+    color: #fff;
+}
+
+.rn-desc-tab[data-rn-tab='objetivo'] {
+    background: #22C55E;
+    color: #fff;
+}
+
+.rn-desc-tab[data-rn-tab='dba'] {
+    background: #EAB308;
+    color: #422006;
+}
 
 .rn-desc-tab.is-activo {
     filter: brightness(1.08);
@@ -1895,8 +2231,8 @@
     min-height: 0;
     padding: clamp(16px, 3vh, 28px) clamp(16px, 4vw, 40px) clamp(20px, 3vh, 32px);
     background:
-        radial-gradient(circle at 14% 28%, rgba(255,255,255,.14) 0 8px, transparent 9px),
-        radial-gradient(circle at 70% 60%, rgba(255,255,255,.1) 0 7px, transparent 8px),
+        radial-gradient(circle at 14% 28%, rgba(255, 255, 255, .14) 0 8px, transparent 9px),
+        radial-gradient(circle at 70% 60%, rgba(255, 255, 255, .1) 0 7px, transparent 8px),
         linear-gradient(180deg, #3B82F6 0%, #2563EB 100%);
     overflow: auto;
     animation: rn-mapa-in .4s ease both;
@@ -2057,9 +2393,11 @@
     .rn-desc-actividad {
         grid-template-columns: 1fr;
     }
+
     .rn-desc-actividad-media {
         align-items: center;
     }
+
     .rn-desc-ilustracion {
         min-height: 140px;
     }
@@ -2269,48 +2607,117 @@
 }
 
 @keyframes rn-bienvenida-pop {
-    from { opacity: 0; transform: scale(.82); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(.82);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @keyframes rn-bienvenida-icono-bounce {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-8px) scale(1.05); }
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-8px) scale(1.05);
+    }
 }
 
 @keyframes rn-pin-avatar-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.04); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.04);
+    }
 }
 
 @keyframes rn-pin-instruccion-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: .55; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .55;
+    }
 }
 
 @keyframes rn-pin-ind-pop {
-    0% { transform: scale(.6); opacity: .4; }
-    70% { transform: scale(1.12); }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+        transform: scale(.6);
+        opacity: .4;
+    }
+
+    70% {
+        transform: scale(1.12);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 @keyframes rn-pin-figura-idle {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    25% { transform: translateY(-7px) rotate(-2.5deg); }
-    50% { transform: translateY(-2px) rotate(1.5deg); }
-    75% { transform: translateY(-9px) rotate(2deg); }
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    25% {
+        transform: translateY(-7px) rotate(-2.5deg);
+    }
+
+    50% {
+        transform: translateY(-2px) rotate(1.5deg);
+    }
+
+    75% {
+        transform: translateY(-9px) rotate(2deg);
+    }
 }
 
 @keyframes rn-pin-figura-hover {
-    0%, 100% { transform: scale(1.1) rotate(-3deg); }
-    50% { transform: scale(1.14) rotate(3deg); }
+
+    0%,
+    100% {
+        transform: scale(1.1) rotate(-3deg);
+    }
+
+    50% {
+        transform: scale(1.14) rotate(3deg);
+    }
 }
 
 @keyframes rn-pin-figura-tap {
-    0% { transform: scale(1); }
-    35% { transform: scale(.86) rotate(-4deg); }
-    70% { transform: scale(1.12) rotate(3deg); }
-    100% { transform: scale(1) rotate(0deg); }
+    0% {
+        transform: scale(1);
+    }
+
+    35% {
+        transform: scale(.86) rotate(-4deg);
+    }
+
+    70% {
+        transform: scale(1.12) rotate(3deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
 }
 
 @media (max-width: 720px) {
@@ -2318,10 +2725,12 @@
         gap: 28px;
         padding-top: 56px;
     }
+
     .rn-pin-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 12px;
     }
+
     .rn-pin-figura {
         width: clamp(72px, 18vw, 96px);
         height: clamp(72px, 18vw, 96px);
@@ -2331,6 +2740,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .rn-pin-avatar,
     .rn-pin-instruccion,
     .rn-pin-figura,

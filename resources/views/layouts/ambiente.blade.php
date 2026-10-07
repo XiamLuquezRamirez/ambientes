@@ -113,8 +113,8 @@
         src="{{ asset('assets/js/recorrido-nino.js') }}?v={{ @filemtime(public_path('assets/js/recorrido-nino.js')) ?: time() }}">
     </script>
     <script src="{{ asset('assets/js/kiosco-bienvenida.js') }}?v={{ @filemtime(public_path('assets/js/kiosco-bienvenida.js')) ?: time() }}"></script>
-    <script src="{{ asset('assets/js/pin-figuras.js') }}"></script>
-    <script src="{{ asset('assets/js/kiosco-navegacion.js') }}"></script>
+    <script src="{{ asset('assets/js/pin-figuras.js') }}?v={{ @filemtime(public_path('assets/js/pin-figuras.js')) ?: time() }}"></script>
+    <script src="{{ asset('assets/js/kiosco-navegacion.js') }}?v={{ @filemtime(public_path('assets/js/kiosco-navegacion.js')) ?: time() }}"></script>
     <script src="{{ asset('assets/js/kiosco-selector-aula.js') }}?v={{ @filemtime(public_path('assets/js/kiosco-selector-aula.js')) ?: time() }}"></script>
     <script src="{{ asset('assets/js/kiosco-fullscreen.js') }}"></script>
 </body>

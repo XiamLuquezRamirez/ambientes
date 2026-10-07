@@ -69,31 +69,28 @@
 
                         <div class="col-12">
                             <div class="mb-3">
-                                <label class="form-label fw-bold" for="juego_icono_trigger">
-                                    Icono <span class="text-danger">*</span>
-                                </label>
-                                <input type="hidden" id="juego_icono" name="icono" value="" required>
-                                <button type="button" class="cj-icon-trigger" id="juego_icono_trigger"
-                                    aria-expanded="false" aria-controls="juego_icono_panel">
-                                    <span class="cj-icon-trigger-chip" id="juego_icono_trigger_chip" aria-hidden="true">
-                                        <i class="fa-solid fa-icons"></i>
-                                    </span>
-                                    <span class="cj-icon-trigger-text">
-                                        <strong id="juego_icono_trigger_title">Elegir icono</strong>
-                                        <small id="juego_icono_trigger_sub" class="text-muted">
-                                            Biblioteca Font Awesome
+                                <label class="form-label fw-bold" for="juego_imagen">Imagen</label>
+                                <div class="cj-imagen">
+                                    <div class="cj-imagen-preview" id="juego_imagen_preview">
+                                        <img id="juego_imagen_preview_img" src="" alt="Vista previa de la imagen" hidden>
+                                        <span class="cj-imagen-vacia" id="juego_imagen_vacia">
+                                            <i class="fa-regular fa-image" aria-hidden="true"></i>
+                                            Sin imagen
+                                        </span>
+                                    </div>
+                                    <div class="cj-imagen-acciones">
+                                        <input type="file" id="juego_imagen" name="imagen" class="form-control"
+                                            accept="image/png,image/jpeg,image/webp">
+                                        <button type="button" class="btn btn-sm btn-outline-danger mt-2"
+                                            id="juego_imagen_quitar" hidden>
+                                            <i class="fa-solid fa-trash-can" aria-hidden="true"></i> Quitar imagen
+                                        </button>
+                                        <small class="text-muted d-block mt-1">
+                                            PNG, JPG o WEBP, máximo 2 MB. Se guarda en la carpeta del paquete con
+                                            el nombre del archivo; al reemplazarla conserva el nombre actual.
                                         </small>
-                                    </span>
-                                    <i class="fa-solid fa-chevron-down cj-icon-trigger-caret" aria-hidden="true"></i>
-                                </button>
-                                <div class="collapse mt-2" id="juego_icono_panel">
-                                    <div class="cj-icon-picker" id="juego_icono_picker" role="listbox"
-                                        aria-label="Biblioteca de iconos Font Awesome"></div>
+                                    </div>
                                 </div>
-                                <small class="text-muted d-block mt-1">
-                                    Abre la biblioteca y selecciona un icono.
-                                </small>
-                                <script type="application/json" id="cj-iconos-catalogo">@json(\App\Models\Juego::ICONOS_CATALOGO)</script>
                             </div>
                         </div>
 

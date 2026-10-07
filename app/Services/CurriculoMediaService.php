@@ -319,7 +319,7 @@ class CurriculoMediaService
         SyncQueue::create([
             'entidad' => 'CurriculoMediaArchivo',
             'entidad_id' => (int) $entidad->getKey(),
-            'accion' => 'updated',
+            'accion' => 'update',
             'servidor_origen' => $servidor,
             'payload' => [
                 'tipo_entidad' => $tipoEntidad,

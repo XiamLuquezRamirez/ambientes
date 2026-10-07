@@ -25,34 +25,11 @@
         return fromDom || '/juegos-catalogo';
     }
 
-    /** Carpeta del paquete → archivo en catalogo_juegos/Polimotor/img/. */
-    const ICONOS_POLIMOTOR = {
-        arrastrarysoltarobjetos: 'arrastrar.png',
-        coordinacionvisual: 'cordinacion.png',
-        ensamblajessencillos: 'ensamblaje.png',
-        juegosdeprecision: 'precision.png',
-        laberintosdecoordinacion: 'laberinto.png',
-        lateralidad: 'lateralidad.png',
-        memoriacorporal: 'memoria.png',
-        reconocimientodelcuerpo: 'reconocimiento.png',
-        rompecabezas: 'rompecabeza.png',
-        secuenciademovimiento: 'secuencia.png',
-    };
-
-    function urlIconoPolimotor(urlPaquete) {
-        const m = String(urlPaquete || '').match(/^(.*\/catalogo_juegos\/Polimotor\/)([^/]+)\//i);
-        if (!m) return '';
-        const archivo = ICONOS_POLIMOTOR[m[2].toLowerCase()];
-        return archivo ? m[1] + 'img/' + archivo : '';
-    }
-
     function iconoHtml(juego) {
-        const img = urlIconoPolimotor(juego.url_paquete);
-        if (img) {
-            return `<img class="bj-card-icono-img" src="${escapar(img)}" alt="" decoding="async">`;
+        if (juego.imagen_url) {
+            return `<img class="bj-card-icono-img" src="${escapar(juego.imagen_url)}" alt="" decoding="async">`;
         }
-        const fa = (juego.icono || 'fa-gamepad').replace(/^fa-/, '');
-        return `<i class="fa-solid fa-${escapar(fa)}" aria-hidden="true"></i>`;
+        return '<i class="fa-solid fa-gamepad" aria-hidden="true"></i>';
     }
 
     function botonCerrarVista() {
@@ -318,7 +295,6 @@
                 juego = {
                     nombre: $card.find('.bj-card-titulo').text() || 'Juego',
                     url_paquete: url,
-                    icono: 'fa-gamepad',
                 };
             }
             if (juego.url_paquete) montarJuego(juego);
@@ -346,6 +322,10 @@
             .catch(function () {
                 renderVacio('No pudimos cargar los juegos. Intenta de nuevo.');
                 enlazar();
+            })
+            .then(function () {
+                // La bienvenida espera este aviso para desarmarse sobre la galería ya pintada.
+                document.dispatchEvent(new CustomEvent('kiosco:vista-lista'));
             });
     }
 

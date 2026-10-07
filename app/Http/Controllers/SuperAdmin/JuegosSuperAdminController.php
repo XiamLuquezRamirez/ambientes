@@ -66,8 +66,8 @@ class JuegosSuperAdminController extends Controller
                 'ruta' => $juego->ruta,
                 'nombre' => $juego->nombre,
                 'descripcion' => $juego->descripcion ?? '',
-                'icono' => $juego->icono ?? '',
-                'color' => $juego->color ?: '#2563eb',
+                'imagen_url' => $juego->urlImagen(),
+                'color' => $juego->color ?? '',
                 'activo' => (bool) $juego->activo,
                 'ambiente_id' => $juego->ambiente_id,
                 'cadena' => $cadena,
@@ -89,7 +89,7 @@ class JuegosSuperAdminController extends Controller
 
     public function actualizar(Request $request, Juego $juego)
     {
-        $datos = $this->validarEscritura($request, $juego);
+        $datos = $this->validarEscritura($request);
         $juego = $this->catalogo->actualizar($juego, $datos);
 
         return response()->json([
@@ -140,7 +140,7 @@ class JuegosSuperAdminController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function validarEscritura(Request $request, ?Juego $juego = null): array
+    private function validarEscritura(Request $request): array
     {
         $datos = $request->validate([
             'nombre' => ['required', 'string', 'max:150'],
@@ -152,15 +152,8 @@ class JuegosSuperAdminController extends Controller
                 Rule::notIn([Juego::TIPO_NUEVO]),
             ],
             'descripcion' => ['nullable', 'string', 'max:2000'],
-            'icono' => [
-                'required',
-                'string',
-                'max:80',
-                Rule::in(array_values(array_unique(array_merge(
-                    Juego::ICONOS_CATALOGO,
-                    ($juego && filled($juego->icono)) ? [(string) $juego->icono] : []
-                )))),
-            ],
+            'imagen' => ['nullable', 'file', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
+            'quitar_imagen' => ['sometimes', 'boolean'],
             'color' => ['required', 'string', 'max:20', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
             'ambiente_id' => ['required', 'integer', 'exists:ambientes,id'],
             'modulo_id' => ['nullable', 'integer', 'exists:modulos,id'],
@@ -175,9 +168,10 @@ class JuegosSuperAdminController extends Controller
             'tipo.not_in' => 'Selecciona o crea un tipo válido.',
             'tipo.max' => 'El tipo no puede superar 80 caracteres.',
             'descripcion.max' => 'La descripción no puede superar 2000 caracteres.',
-            'icono.required' => 'Selecciona un icono.',
-            'icono.in' => 'El icono seleccionado no es válido.',
-            'icono.max' => 'El icono no puede superar 80 caracteres.',
+            'imagen.file' => 'Sube un archivo de imagen.',
+            'imagen.mimes' => 'La imagen debe ser PNG, JPG o WEBP.',
+            'imagen.max' => 'La imagen no puede superar 2 MB.',
+            'imagen.uploaded' => 'No se pudo subir la imagen (revisa el tamaño máximo del servidor).',
             'color.required' => 'Selecciona un color.',
             'color.regex' => 'El color debe ser un hexadecimal válido (ej. #2563eb).',
             'ambiente_id.required' => 'Este campo es requerido.',

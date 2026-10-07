@@ -11,6 +11,7 @@ use App\Models\TiposJuego;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -18,6 +19,9 @@ use Illuminate\Validation\ValidationException;
 
 class JuegoCatalogoService
 {
+    /** @var list<string> */
+    public const EXTENSIONES_IMAGEN = ['png', 'jpg', 'webp'];
+
     /**
      * @return array<string, mixed>
      */
@@ -98,7 +102,7 @@ class JuegoCatalogoService
 
     /**
      * @param  iterable<int, string>  $slugs
-     * @return array<string, array{url:?string, nombre:?string, icono:?string, color:?string}>
+     * @return array<string, array{url:?string, nombre:?string, imagen_url:?string, color:?string}>
      */
     public function mapaPaquetesPorSlugs(iterable $slugs): array
     {
@@ -114,13 +118,13 @@ class JuegoCatalogoService
 
         return Juego::query()
             ->whereIn('slug', $slugs)
-            ->get(['slug', 'nombre', 'ruta', 'icono', 'color', 'activo'])
+            ->get(['slug', 'nombre', 'ruta', 'imagen', 'color', 'activo', 'updated_at'])
             ->mapWithKeys(function (Juego $juego) {
                 return [
                     (string) $juego->slug => [
                         'url' => $juego->activo ? $juego->urlPaquete() : null,
                         'nombre' => $juego->nombre,
-                        'icono' => $juego->icono ?: 'fa-gamepad',
+                        'imagen_url' => $juego->urlImagen(),
                         'color' => $juego->color ?: '#64748b',
                     ],
                 ];
@@ -131,7 +135,7 @@ class JuegoCatalogoService
     /**
      * @deprecated Usar mapaPaquetesPorSlugs.
      * @param  iterable<int, int|string>  $ids
-     * @return array<string, array{url:?string, nombre:?string, icono:?string, color:?string}>
+     * @return array<string, array{url:?string, nombre:?string, imagen_url:?string, color:?string}>
      */
     public function mapaPaquetesPorIds(iterable $ids): array
     {
@@ -165,7 +169,7 @@ class JuegoCatalogoService
             'url_paquete' => $juego->urlPaquete(),
             'nombre' => $juego->nombre,
             'descripcion' => $juego->descripcion ?? '',
-            'icono' => $juego->icono ?: 'fa-gamepad',
+            'imagen_url' => $juego->urlImagen(),
             'color' => $juego->color ?: '#64748b',
             'orden' => $juego->orden,
             'activo' => (bool) $juego->activo,
@@ -279,6 +283,10 @@ class JuegoCatalogoService
             : true;
 
         try {
+            if (($datos['imagen'] ?? null) instanceof UploadedFile) {
+                $payload['imagen'] = $this->guardarImagenEnPaquete($ruta, $datos['imagen']);
+            }
+
             return Juego::query()->create($payload);
         } catch (\Throwable $e) {
             $this->eliminarCarpetaPaqueteSiStub($ruta);
@@ -314,7 +322,25 @@ class JuegoCatalogoService
             $payload['activo'] = (bool) $datos['activo'];
         }
 
-        $juego->update($payload);
+        $imagenReemplazada = false;
+        if (($datos['imagen'] ?? null) instanceof UploadedFile) {
+            $nueva = $this->guardarImagenEnPaquete($rutaNueva, $datos['imagen'], $juego->imagen);
+            if (filled($juego->imagen) && basename((string) $juego->imagen) !== $nueva) {
+                $this->eliminarImagenDePaquete($rutaNueva, $juego->imagen);
+            }
+            $payload['imagen'] = $nueva;
+            $imagenReemplazada = true;
+        } elseif (! empty($datos['quitar_imagen'])) {
+            $this->eliminarImagenDePaquete($rutaNueva, $juego->imagen);
+            $payload['imagen'] = null;
+        }
+
+        $juego->fill($payload);
+        if ($imagenReemplazada && ! $juego->isDirty()) {
+            // Mismo nombre de archivo: forzar updated_at para invalidar la caché de urlImagen().
+            $juego->updated_at = $juego->freshTimestamp();
+        }
+        $juego->save();
 
         return $juego->fresh([
             'ambiente:id,nombre',
@@ -570,9 +596,6 @@ class JuegoCatalogoService
             'descripcion' => filled($datos['descripcion'] ?? null)
                 ? trim((string) $datos['descripcion'])
                 : null,
-            'icono' => filled($datos['icono'] ?? null)
-                ? trim((string) $datos['icono'])
-                : null,
             'color' => filled($datos['color'] ?? null)
                 ? trim((string) $datos['color'])
                 : null,
@@ -602,6 +625,109 @@ class JuegoCatalogoService
         ]);
 
         return (int) $tipo->id;
+    }
+
+    /**
+     * Reemplazo con la misma extensión conserva el nombre actual (el index.html del paquete puede
+     * referenciarlo). Si no, usa el nombre del archivo subido sin pisar otros recursos del paquete.
+     *
+     * @throws ValidationException
+     */
+    private function guardarImagenEnPaquete(string $ruta, UploadedFile $archivo, ?string $imagenActual = null): string
+    {
+        $ext = $this->normalizarExtension((string) ($archivo->extension() ?: $archivo->getClientOriginalExtension()));
+
+        if (! in_array($ext, self::EXTENSIONES_IMAGEN, true)) {
+            throw ValidationException::withMessages([
+                'imagen' => 'La imagen debe ser PNG, JPG o WEBP.',
+            ]);
+        }
+
+        $carpeta = public_path($this->normalizarRuta($ruta));
+        $actual = filled($imagenActual) ? basename((string) $imagenActual) : null;
+
+        $nombre = ($actual && $this->normalizarExtension(pathinfo($actual, PATHINFO_EXTENSION)) === $ext)
+            ? $actual
+            : $this->nombreLibreEnPaquete($carpeta, $this->nombreBaseImagen($archivo), $ext);
+
+        try {
+            $archivo->move($carpeta, $nombre);
+        } catch (\Throwable $e) {
+            throw ValidationException::withMessages([
+                'imagen' => 'No se pudo guardar la imagen en public/'.$ruta.'.',
+            ]);
+        }
+
+        return $nombre;
+    }
+
+    private function normalizarExtension(string $ext): string
+    {
+        $ext = strtolower(trim($ext));
+
+        return $ext === 'jpeg' ? 'jpg' : $ext;
+    }
+
+    private function nombreBaseImagen(UploadedFile $archivo): string
+    {
+        $base = Str::of(pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME))
+            ->ascii()
+            ->lower()
+            ->replaceMatches('/[^a-z0-9_-]+/', '-')
+            ->trim('-_')
+            ->limit(80, '')
+            ->toString();
+
+        return $base !== '' ? $base : 'imagen';
+    }
+
+    private function nombreLibreEnPaquete(string $carpeta, string $base, string $ext): string
+    {
+        $nombre = $base.'.'.$ext;
+        $i = 2;
+
+        while (file_exists($carpeta.DIRECTORY_SEPARATOR.$nombre)) {
+            $nombre = $base.'-'.$i.'.'.$ext;
+            $i++;
+        }
+
+        return $nombre;
+    }
+
+    /**
+     * No borra el archivo si el código del paquete lo sigue usando (p. ej. pantalla de inicio).
+     */
+    private function eliminarImagenDePaquete(string $ruta, ?string $imagen): void
+    {
+        if (! filled($imagen)) {
+            return;
+        }
+
+        $carpeta = public_path($this->normalizarRuta($ruta));
+        $nombre = basename((string) $imagen);
+        $absoluta = $carpeta.DIRECTORY_SEPARATOR.$nombre;
+
+        if (is_file($absoluta) && ! $this->archivoReferenciadoEnPaquete($carpeta, $nombre)) {
+            File::delete($absoluta);
+        }
+    }
+
+    private function archivoReferenciadoEnPaquete(string $carpeta, string $nombre): bool
+    {
+        if (! is_dir($carpeta)) {
+            return false;
+        }
+
+        foreach (File::allFiles($carpeta) as $archivo) {
+            if (! in_array(strtolower($archivo->getExtension()), ['html', 'htm', 'js', 'css', 'json'], true)) {
+                continue;
+            }
+            if (str_contains((string) file_get_contents($archivo->getPathname()), $nombre)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function eliminarCarpetaPaqueteSiStub(string $ruta): void

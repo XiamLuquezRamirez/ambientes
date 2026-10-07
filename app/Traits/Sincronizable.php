@@ -13,12 +13,15 @@ trait Sincronizable
             return;
         }
 
-        foreach (['created', 'updated', 'deleted'] as $evento) {
-            static::$evento(function ($modelo) use ($evento, $servidor) {
+        // `cola_sincronizacion.accion` es enum('create','update','delete','transfer').
+        $acciones = ['created' => 'create', 'updated' => 'update', 'deleted' => 'delete'];
+
+        foreach ($acciones as $evento => $accion) {
+            static::$evento(function ($modelo) use ($evento, $accion, $servidor) {
                 SyncQueue::create([
                     'entidad'         => class_basename($modelo),
-                    'entidad_id'      => $modelo->getKey(),
-                    'accion'          => $evento,
+                    'entidad_id'      => (string) $modelo->getKey(),
+                    'accion'          => $accion,
                     'servidor_origen' => $servidor,
                     'payload'         => $evento !== 'deleted' ? $modelo->toArray() : [],
                     'estado'          => 'pendiente',

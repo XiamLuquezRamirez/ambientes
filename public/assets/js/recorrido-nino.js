@@ -55,11 +55,11 @@
                         <div class="rn-portada-accion">
                             <div class="rn-portada-iniciar-halo">
                                 <button type="button" class="rn-btn-iniciar-pill" id="rnBtnIniciarAmbiente">
-                                    <span>Iniciar</span>
-                                    <span class="rn-btn-iniciar-flecha" aria-hidden="true">
-                                        <i class="fa-solid fa-chevron-right"></i>
-                                    </span>
+                                    <span class="rn-btn-iniciar-arte" style="filter:url(#rnIniciarTinte)" aria-hidden="true"></span>
+                                    <span class="rn-btn-iniciar-texto">Iniciar</span>
+                                    <span class="rn-btn-iniciar-play" aria-hidden="true"></span>
                                 </button>
+                                ${svgTinteIniciar()}
                             </div>
                         </div>
                     </div>
@@ -145,6 +145,46 @@
                 </div>
             </div>
         </div>`;
+    }
+
+    /*
+     * boton_iniciar.png es negro semitransparente por zonas (contorno .20, marco punteado .30,
+     * aro .36–.39, cuerpo .49) con el reflejo en gris. El filtro usa esas opacidades como mapa:
+     * marco en el color del ambiente (engrosado: en el PNG mide 3 px), píldora (región x 22–315,
+     * y 31–166 del PNG) con aro en tono
+     * oscuro y cuerpo desde .45 en el color, y el gris del reflejo como brillo blanco.
+     * Los colores salen de CSS (flood-color con --rn-color), por eso el SVG va dentro de .rn-portada.
+     */
+    function svgTinteIniciar() {
+        return `
+        <svg class="rn-btn-iniciar-filtros" width="0" height="0" aria-hidden="true" focusable="false">
+            <filter id="rnIniciarTinte" x="0" y="0" width="1" height="1" primitiveUnits="objectBoundingBox"
+                color-interpolation-filters="sRGB">
+                <feComponentTransfer in="SourceAlpha" result="silueta">
+                    <feFuncA type="linear" slope="5"/>
+                </feComponentTransfer>
+                <feFlood x=".0653" y=".1566" width=".8694" height=".6818" result="zonaPildora"/>
+                <feMorphology in="silueta" operator="dilate" radius=".0045 .0076"/>
+                <feComposite in2="zonaPildora" operator="out" result="trazoMarco"/>
+                <feFlood class="rn-btn-iniciar-tono"/>
+                <feComposite in2="trazoMarco" operator="in" result="marco"/>
+                <feFlood class="rn-btn-iniciar-tono-oscuro" x=".0653" y=".1566" width=".8694" height=".6818"/>
+                <feComposite in2="silueta" operator="in" result="aro"/>
+                <feComponentTransfer in="SourceAlpha" result="zonaCuerpo">
+                    <feFuncA type="linear" slope="10" intercept="-4"/>
+                </feComponentTransfer>
+                <feFlood class="rn-btn-iniciar-tono"/>
+                <feComposite in2="zonaCuerpo" operator="in" result="cuerpo"/>
+                <feColorMatrix in="SourceGraphic" type="matrix"
+                    values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  .9 0 0 0 0" result="brillo"/>
+                <feMerge>
+                    <feMergeNode in="marco"/>
+                    <feMergeNode in="aro"/>
+                    <feMergeNode in="cuerpo"/>
+                    <feMergeNode in="brillo"/>
+                </feMerge>
+            </filter>
+        </svg>`;
     }
 
     // Escena "Clase": profe + tablero + libros (póster grande).

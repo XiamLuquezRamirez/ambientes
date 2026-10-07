@@ -34,6 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
     let nombreOriginalEdicion = '';
     let ambienteOriginalEdicion = '';
     let rutaOriginalEdicion = '';
+    let imagenUrlActual = '';
+    let quitarImagen = false;
+    let imagenObjectUrl = '';
+
+    const IMAGEN_TIPOS = ['image/png', 'image/jpeg', 'image/webp'];
+    const IMAGEN_MAX_BYTES = 2 * 1024 * 1024;
 
     function csrfToken() {
         return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -171,9 +177,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         aplicarCascadaForm();
         sincronizarTipoNuevo();
-        seleccionarIcono('');
         seleccionarColor('');
-        cerrarBibliotecaIconos();
+        establecerImagenActual('');
     }
 
     function limpiarErroresForm() {
@@ -227,12 +232,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!input) return;
 
-            // Icono/color son hidden: marcar el trigger/paleta, no el input invisible.
-            if (campo === 'icono' || campo === 'color') {
+            // Color es hidden: marcar la paleta, no el input invisible.
+            if (campo === 'color') {
                 const bloque = input.closest('.mb-3') || input.parentElement;
-                const marcador = campo === 'icono'
-                    ? form.querySelector('#juego_icono_trigger')
-                    : form.querySelector('#juego_color_picker');
+                const marcador = form.querySelector('#juego_color_picker');
                 marcador?.classList.add('is-invalid');
                 const div = document.createElement('div');
                 div.className = 'campo-error invalid-feedback d-block';
@@ -390,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         form.querySelector('#juego_ruta').value = data.ruta || '';
         form.querySelector('#juego_descripcion').value = data.descripcion || '';
-        seleccionarIcono(data.icono || '');
+        establecerImagenActual(data.imagen_url || '');
         seleccionarColor(data.color || '');
         form.querySelector('#juego_activo').checked = !!data.activo;
 
@@ -458,7 +461,6 @@ document.addEventListener('DOMContentLoaded', function () {
             nombre: String(fd.get('nombre') || '').trim(),
             tipo: tipo,
             descripcion: String(fd.get('descripcion') || '').trim() || null,
-            icono: String(fd.get('icono') || '').trim() || null,
             color: String(fd.get('color') || '').trim() || null,
             ambiente_id: Number(fd.get('ambiente_id') || 0) || null,
             modulo_id: Number(fd.get('modulo_id') || 0) || null,
@@ -489,14 +491,15 @@ document.addEventListener('DOMContentLoaded', function () {
             errors.ambiente_id = ['Este campo es requerido.'];
         }
 
-        if (!payload.icono) {
-            errors.icono = ['Selecciona un icono.'];
-        }
-
         if (!payload.color) {
             errors.color = ['Selecciona un color.'];
         } else if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(payload.color)) {
             errors.color = ['El color debe ser un hexadecimal válido (ej. #2563eb).'];
+        }
+
+        const errorImagen = validarArchivoImagen(archivoImagenSeleccionado());
+        if (errorImagen) {
+            errors.imagen = [errorImagen];
         }
 
         if (Object.keys(errors).length) {
@@ -518,20 +521,37 @@ document.addEventListener('DOMContentLoaded', function () {
         const url = modoEdicion
             ? urlConId(urlActualizarTpl, juegoEditandoId)
             : urlGuardar;
-        const method = modoEdicion ? 'PUT' : 'POST';
+
+        // PHP no parsea multipart en PUT: se envía POST con _method.
+        const body = new FormData();
+        Object.entries(payload).forEach(([clave, valor]) => {
+            if (typeof valor === 'boolean') {
+                body.append(clave, valor ? '1' : '0');
+            } else {
+                body.append(clave, valor === null || valor === undefined ? '' : String(valor));
+            }
+        });
+        const archivo = archivoImagenSeleccionado();
+        if (archivo) {
+            body.append('imagen', archivo);
+        } else if (modoEdicion && quitarImagen) {
+            body.append('quitar_imagen', '1');
+        }
+        if (modoEdicion) {
+            body.append('_method', 'PUT');
+        }
 
         if (btnGuardar) btnGuardar.disabled = true;
 
         try {
             const res = await fetch(url, {
-                method: method,
+                method: 'POST',
                 headers: {
                     Accept: 'application/json',
-                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': csrfToken(),
                 },
-                body: JSON.stringify(payload),
+                body: body,
             });
             const json = await res.json().catch(() => ({}));
             if (!res.ok || !json.success) {
@@ -633,112 +653,52 @@ document.addEventListener('DOMContentLoaded', function () {
         abrirCrear();
     });
 
-    function normalizarIcono(icono) {
-        const raw = String(icono || '').trim();
-        if (!raw) return '';
-        if (raw.indexOf('fa-') === 0) return raw;
-        return 'fa-' + raw.replace(/^fa-/, '');
+    function archivoImagenSeleccionado() {
+        return form?.querySelector('#juego_imagen')?.files?.[0] || null;
     }
 
-    function catalogoIconos() {
-        const el = document.getElementById('cj-iconos-catalogo');
-        if (!el) return [];
-        try {
-            const data = JSON.parse(el.textContent || '[]');
-            return Array.isArray(data) ? data : [];
-        } catch (err) {
-            return [];
+    function validarArchivoImagen(archivo) {
+        if (!archivo) return '';
+        if (!IMAGEN_TIPOS.includes(archivo.type)) return 'La imagen debe ser PNG, JPG o WEBP.';
+        if (archivo.size > IMAGEN_MAX_BYTES) return 'La imagen no puede superar 2 MB.';
+        return '';
+    }
+
+    function liberarObjectUrlImagen() {
+        if (imagenObjectUrl) {
+            URL.revokeObjectURL(imagenObjectUrl);
+            imagenObjectUrl = '';
         }
     }
 
-    function asegurarBibliotecaIconos() {
-        const picker = form?.querySelector('#juego_icono_picker');
-        if (!picker || picker.dataset.ready === '1') return picker;
-
-        const frag = document.createDocumentFragment();
-        catalogoIconos().forEach(function (iconoFa) {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'cj-icon-option';
-            btn.setAttribute('data-icono', iconoFa);
-            btn.setAttribute('role', 'option');
-            btn.setAttribute('aria-selected', 'false');
-            btn.title = iconoFa;
-            btn.innerHTML = `<i class="fa-solid ${iconoFa}" aria-hidden="true"></i>`;
-            frag.appendChild(btn);
-        });
-        picker.appendChild(frag);
-        picker.dataset.ready = '1';
-        return picker;
-    }
-
-    function panelIconosEl() {
-        return document.getElementById('juego_icono_panel');
-    }
-
-    function abrirBibliotecaIconos() {
-        const panel = panelIconosEl();
-        const trigger = form?.querySelector('#juego_icono_trigger');
-        if (!panel || !trigger) return;
-
-        asegurarBibliotecaIconos();
-        marcarSeleccionIconoEnPicker(form.querySelector('#juego_icono')?.value || '');
-
-        if (window.bootstrap?.Collapse) {
-            bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false }).show();
-        } else {
-            panel.classList.add('show');
+    function pintarPreviewImagen(url) {
+        const img = form?.querySelector('#juego_imagen_preview_img');
+        const vacia = form?.querySelector('#juego_imagen_vacia');
+        const btnQuitar = form?.querySelector('#juego_imagen_quitar');
+        if (img) {
+            img.hidden = !url;
+            if (url) img.src = url;
+            else img.removeAttribute('src');
         }
-        trigger.setAttribute('aria-expanded', 'true');
+        form?.querySelector('#juego_imagen_preview')?.classList.toggle('has-imagen', !!url);
+        if (vacia) vacia.hidden = !!url;
+        if (btnQuitar) btnQuitar.hidden = !url;
     }
 
-    function cerrarBibliotecaIconos() {
-        const panel = panelIconosEl();
-        const trigger = form?.querySelector('#juego_icono_trigger');
-        if (!panel) return;
-
-        if (window.bootstrap?.Collapse) {
-            bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false }).hide();
-        } else {
-            panel.classList.remove('show');
-        }
-        trigger?.setAttribute('aria-expanded', 'false');
+    function limpiarErrorImagen() {
+        const input = form?.querySelector('#juego_imagen');
+        input?.classList.remove('is-invalid');
+        input?.closest('.mb-3')?.querySelectorAll('.campo-error').forEach((el) => el.remove());
     }
 
-    function toggleBibliotecaIconos() {
-        const panel = panelIconosEl();
-        const abierta = panel?.classList.contains('show');
-        if (abierta) cerrarBibliotecaIconos();
-        else abrirBibliotecaIconos();
-    }
-
-    function marcarSeleccionIconoEnPicker(valor) {
-        form?.querySelector('#juego_icono_picker')?.querySelectorAll('.cj-icon-option').forEach(function (btn) {
-            const selected = btn.getAttribute('data-icono') === valor;
-            btn.classList.toggle('is-selected', selected);
-            btn.setAttribute('aria-selected', selected ? 'true' : 'false');
-        });
-    }
-
-    function seleccionarIcono(icono) {
-        const valor = normalizarIcono(icono);
-        const input = form?.querySelector('#juego_icono');
-        const trigger = form?.querySelector('#juego_icono_trigger');
-        const chip = form?.querySelector('#juego_icono_trigger_chip');
-        const title = form?.querySelector('#juego_icono_trigger_title');
-        const sub = form?.querySelector('#juego_icono_trigger_sub');
-
-        if (input) input.value = valor;
-        marcarSeleccionIconoEnPicker(valor);
-
-        if (chip) {
-            chip.innerHTML = valor
-                ? `<i class="fa-solid ${valor}" aria-hidden="true"></i>`
-                : '<i class="fa-solid fa-icons" aria-hidden="true"></i>';
-        }
-        if (title) title.textContent = valor || 'Elegir icono';
-        if (sub) sub.textContent = valor ? 'Icono seleccionado' : 'Biblioteca Font Awesome';
-        trigger?.classList.toggle('has-value', !!valor);
+    function establecerImagenActual(url) {
+        liberarObjectUrlImagen();
+        imagenUrlActual = String(url || '');
+        quitarImagen = false;
+        const input = form?.querySelector('#juego_imagen');
+        if (input) input.value = '';
+        limpiarErrorImagen();
+        pintarPreviewImagen(imagenUrlActual);
     }
 
     function seleccionarColor(color) {
@@ -747,7 +707,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const picker = form?.querySelector('#juego_color_picker');
         const custom = form?.querySelector('#juego_color_custom');
         const label = form?.querySelector('#juego_color_preview_label');
-        const triggerChip = form?.querySelector('#juego_icono_trigger_chip');
 
         if (input) input.value = valor;
 
@@ -775,25 +734,44 @@ document.addEventListener('DOMContentLoaded', function () {
             label.textContent = valor || 'Sin color';
         }
 
-        if (triggerChip) {
-            triggerChip.style.background = valor || '#64748b';
+        const preview = form?.querySelector('#juego_imagen_preview');
+        if (preview) {
+            if (valor) preview.style.setProperty('--cj-preview-color', valor);
+            else preview.style.removeProperty('--cj-preview-color');
         }
     }
 
-    form?.querySelector('#juego_icono_trigger')?.addEventListener('click', function (e) {
-        e.preventDefault();
-        toggleBibliotecaIconos();
+    form?.querySelector('#juego_imagen')?.addEventListener('change', function () {
+        limpiarErrorImagen();
+        liberarObjectUrlImagen();
+        const archivo = this.files?.[0] || null;
+        if (!archivo) {
+            pintarPreviewImagen(quitarImagen ? '' : imagenUrlActual);
+            return;
+        }
+        const error = validarArchivoImagen(archivo);
+        if (error) {
+            this.value = '';
+            pintarPreviewImagen(quitarImagen ? '' : imagenUrlActual);
+            this.classList.add('is-invalid');
+            const div = document.createElement('div');
+            div.className = 'campo-error invalid-feedback d-block';
+            div.textContent = error;
+            this.insertAdjacentElement('afterend', div);
+            return;
+        }
+        imagenObjectUrl = URL.createObjectURL(archivo);
+        pintarPreviewImagen(imagenObjectUrl);
     });
 
-    form?.querySelector('#juego_icono_picker')?.addEventListener('click', function (e) {
-        const btn = e.target.closest('.cj-icon-option');
-        if (!btn || !form.contains(btn)) return;
+    form?.querySelector('#juego_imagen_quitar')?.addEventListener('click', function (e) {
         e.preventDefault();
-        seleccionarIcono(btn.getAttribute('data-icono') || '');
-        form.querySelector('#juego_icono_trigger')?.classList.remove('is-invalid');
-        const err = form.querySelector('#juego_icono')?.closest('.mb-3')?.querySelector('.campo-error');
-        if (err) err.remove();
-        cerrarBibliotecaIconos();
+        const input = form.querySelector('#juego_imagen');
+        if (input) input.value = '';
+        liberarObjectUrlImagen();
+        limpiarErrorImagen();
+        quitarImagen = !!imagenUrlActual;
+        pintarPreviewImagen('');
     });
 
     form?.querySelector('#juego_color_picker')?.addEventListener('click', function (e) {
@@ -824,16 +802,6 @@ document.addEventListener('DOMContentLoaded', function () {
     form?.querySelector('#juego_color_custom')?.addEventListener('change', function () {
         seleccionarColor(this.value || '');
     });
-
-    const panelIconos = panelIconosEl();
-    if (panelIconos) {
-        panelIconos.addEventListener('shown.bs.collapse', function () {
-            form?.querySelector('#juego_icono_trigger')?.setAttribute('aria-expanded', 'true');
-        });
-        panelIconos.addEventListener('hidden.bs.collapse', function () {
-            form?.querySelector('#juego_icono_trigger')?.setAttribute('aria-expanded', 'false');
-        });
-    }
 
     form?.addEventListener('submit', guardarJuego);
     form?.querySelector('#juego_tipo')?.addEventListener('change', sincronizarTipoNuevo);

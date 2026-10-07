@@ -9,6 +9,7 @@ use App\Models\Modulo;
 use App\Models\Tematica;
 use App\Models\TiposJuego;
 use App\Services\JuegoCatalogoService;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
@@ -26,7 +27,6 @@ class JuegoCatalogoServiceTest extends TestCase
             'ruta' => 'catalogo_juegos/Polimotor/Rompecabezas',
             'nombre' => 'Rompecabezas del cuerpo',
             'descripcion' => 'Armar piezas',
-            'icono' => 'fa-puzzle-piece',
             'color' => '#ffd54f',
             'orden' => 1,
             'activo' => true,
@@ -42,6 +42,92 @@ class JuegoCatalogoServiceTest extends TestCase
         $this->assertSame('Rompecabezas del cuerpo', $tarjeta['nombre']);
         $this->assertSame('catalogo_juegos/Polimotor/Rompecabezas', $tarjeta['ruta']);
         $this->assertSame('Polimotor', $tarjeta['cadena']['ambiente_nombre']);
+        $this->assertNull($tarjeta['imagen_url']);
+        $this->assertArrayNotHasKey('icono', $tarjeta);
+    }
+
+    public function test_url_imagen_dentro_del_paquete(): void
+    {
+        $juego = new Juego(['ruta' => 'catalogo_juegos/Polimotor/Rompecabezas/']);
+        $this->assertNull($juego->urlImagen());
+
+        $juego->imagen = '../../otro/rompecabeza.png';
+        $this->assertStringEndsWith('catalogo_juegos/Polimotor/Rompecabezas/rompecabeza.png', $juego->urlImagen());
+
+        $juego->updated_at = now()->setTimestamp(1700000000);
+        $this->assertStringEndsWith('/rompecabeza.png?v=1700000000', $juego->urlImagen());
+    }
+
+    public function test_imagen_conserva_nombre_del_archivo_sin_pisar_recursos(): void
+    {
+        [$svc, $relativa, $dir, $guardar] = $this->paqueteTemporalConImagen();
+
+        try {
+            file_put_contents($dir.DIRECTORY_SEPARATOR.'fondo.png', 'recurso del juego');
+
+            $nombre = $guardar->invoke($svc, $relativa, UploadedFile::fake()->create('Mi Laberíntó_2.PNG', 5, 'image/png'));
+            $this->assertSame('mi-laberinto_2.png', $nombre);
+
+            $nombre = $guardar->invoke($svc, $relativa, UploadedFile::fake()->create('fondo.png', 5, 'image/png'));
+            $this->assertSame('fondo-2.png', $nombre);
+            $this->assertSame('recurso del juego', file_get_contents($dir.DIRECTORY_SEPARATOR.'fondo.png'));
+
+            $nombre = $guardar->invoke($svc, $relativa, UploadedFile::fake()->create('otra.png', 5, 'image/png'), 'laberinto.png');
+            $this->assertSame('laberinto.png', $nombre, 'Reemplazo con misma extensión conserva el nombre actual.');
+
+            $nombre = $guardar->invoke($svc, $relativa, UploadedFile::fake()->create('otra.webp', 5, 'image/webp'), 'laberinto.png');
+            $this->assertSame('otra.webp', $nombre);
+
+            $this->expectException(ValidationException::class);
+            $guardar->invoke($svc, $relativa, UploadedFile::fake()->create('script.svg', 1, 'image/svg+xml'));
+        } finally {
+            $this->borrarPaqueteTemporal($dir);
+        }
+    }
+
+    public function test_no_elimina_imagen_referenciada_por_el_paquete(): void
+    {
+        [$svc, $relativa, $dir] = $this->paqueteTemporalConImagen();
+        $eliminar = new \ReflectionMethod($svc, 'eliminarImagenDePaquete');
+        $eliminar->setAccessible(true);
+
+        try {
+            file_put_contents($dir.DIRECTORY_SEPARATOR.'index.html', '<img class="inicio-icono" src="laberinto.png">');
+            file_put_contents($dir.DIRECTORY_SEPARATOR.'laberinto.png', 'x');
+            file_put_contents($dir.DIRECTORY_SEPARATOR.'suelta.png', 'x');
+
+            $eliminar->invoke($svc, $relativa, 'laberinto.png');
+            $eliminar->invoke($svc, $relativa, 'suelta.png');
+
+            $this->assertFileExists($dir.DIRECTORY_SEPARATOR.'laberinto.png');
+            $this->assertFileDoesNotExist($dir.DIRECTORY_SEPARATOR.'suelta.png');
+        } finally {
+            $this->borrarPaqueteTemporal($dir);
+        }
+    }
+
+    /**
+     * @return array{0: JuegoCatalogoService, 1: string, 2: string, 3: \ReflectionMethod}
+     */
+    private function paqueteTemporalConImagen(): array
+    {
+        $svc = new JuegoCatalogoService;
+        $relativa = 'catalogo_juegos/_TmpTestImagen'.uniqid();
+        $dir = public_path($relativa);
+        mkdir($dir, 0777, true);
+
+        $guardar = new \ReflectionMethod($svc, 'guardarImagenEnPaquete');
+        $guardar->setAccessible(true);
+
+        return [$svc, $relativa, $dir, $guardar];
+    }
+
+    private function borrarPaqueteTemporal(string $dir): void
+    {
+        foreach (glob($dir.DIRECTORY_SEPARATOR.'*') ?: [] as $f) {
+            @unlink($f);
+        }
+        @rmdir($dir);
     }
 
     public function test_cadena_curricular_resuelve_desde_tematica(): void
@@ -163,15 +249,6 @@ class JuegoCatalogoServiceTest extends TestCase
         $this->assertFalse(Juego::slugEsValido(''));
         $this->assertFalse(Juego::slugEsValido('Rompecabezas'));
         $this->assertFalse(Juego::slugEsValido('con_guion_bajo'));
-    }
-
-    public function test_icono_es_valido_solo_catalogo(): void
-    {
-        $this->assertTrue(Juego::iconoEsValido('fa-gamepad'));
-        $this->assertTrue(Juego::iconoEsValido('fa-puzzle-piece'));
-        $this->assertFalse(Juego::iconoEsValido(''));
-        $this->assertFalse(Juego::iconoEsValido('gamepad'));
-        $this->assertFalse(Juego::iconoEsValido('fa-no-existe'));
     }
 
     public function test_color_es_valido_hex(): void

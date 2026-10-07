@@ -2,18 +2,14 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_raiz_redirige_al_inicio_del_kiosco_conservando_query(): void
     {
-        $response = $this->get('/');
+        $this->get('/')->assertRedirect(route('ambiente.inicio'));
 
-        $response->assertStatus(200);
+        $this->get('/?ip=192.168.1.21')->assertRedirect(route('ambiente.inicio', ['ip' => '192.168.1.21']));
     }
 }

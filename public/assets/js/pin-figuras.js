@@ -65,6 +65,7 @@
     async function enviarPin() {
         if (!app || enviando) return;
         enviando = true;
+        let exito = false;
         limpiarMensaje();
 
         const body = {
@@ -94,20 +95,17 @@
             }
 
             if (data.ok) {
-                const overlay = document.getElementById('overlay-exito');
-                if (overlay) overlay.style.display = 'flex';
-
-                setTimeout(function () {
-                    if (window.KioscoNav && typeof window.KioscoNav.ir === 'function') {
-                        const redirect = data.redirect || '/listo';
-                        const path = redirect.startsWith('http')
-                            ? new URL(redirect).pathname
-                            : redirect;
-                        window.KioscoNav.ir(path);
-                    } else {
-                        window.location.href = data.redirect;
-                    }
-                }, 1000);
+                exito = true;
+                if (window.KioscoNav && typeof window.KioscoNav.ir === 'function') {
+                    const redirect = data.redirect || '/listo';
+                    const path = redirect.startsWith('http')
+                        ? new URL(redirect).pathname
+                        : redirect;
+                    // La bienvenida se arma encima del PIN, que sigue visible hasta que termina.
+                    window.KioscoNav.ir(path, false, { superponer: true });
+                } else {
+                    window.location.href = data.redirect;
+                }
                 return;
             }
 
@@ -115,7 +113,8 @@
         } catch (err) {
             mostrarError('No hay conexión. Inténtalo de nuevo.');
         } finally {
-            enviando = false;
+            // Tras un PIN correcto se mantiene bloqueado hasta navegar: Borrar no debe deshacer la tercera figura.
+            if (!exito) enviando = false;
         }
     }
 
@@ -154,6 +153,10 @@
 
     function init() {
         app = document.getElementById('kioscoPinApp');
+        if (app && app.closest('[data-kiosco-saliente]')) {
+            app = null;
+            return;
+        }
         seleccion.length = 0;
         enviando = false;
         limpiarMensaje();
