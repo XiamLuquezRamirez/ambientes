@@ -425,13 +425,19 @@
  * Botón Iniciar: boton_iniciar.svg inline (viewBox 297.29×133.17) + play.png.
  * Cuerpo y marco usan --rn-color; el aro es el mismo color oscurecido y opaco.
  */
+/*
+ * Animación con un mismo ciclo (--rn-iniciar-ciclo): respiración y borde punteado en marcha desde
+ * el inicio; el empujón del play entra dos ciclos después para insistir si el niño no ha tocado.
+ * Sin box-shadow en el halo: su caja es rectangular y no sigue la silueta de la píldora.
+ */
 .rn-portada-iniciar-halo {
     --rn-iniciar-w: clamp(230px, 26vw, 330px);
+    --rn-iniciar-ciclo: 1.6s;
     position: relative;
     width: var(--rn-iniciar-w);
     aspect-ratio: 297.29 / 133.17;
-    border-radius: calc(var(--rn-iniciar-w) * 10 / 297.29);
-    animation: rn-halo-pulse 2.2s ease-in-out .8s infinite;
+    border-radius: 999px;
+    animation: rn-iniciar-respira var(--rn-iniciar-ciclo) ease-in-out .8s infinite;
 }
 
 .rn-portada-img {
@@ -497,8 +503,9 @@
     fill: none;
     stroke: var(--rn-color, #0F6E56);
     stroke-linecap: round;
-    stroke-width: 2;
+    stroke-width: 5;
     stroke-dasharray: 9.95 9.95;
+    animation: rn-iniciar-marcha var(--rn-iniciar-ciclo, 1.6s) linear infinite;
 }
 
 .rn-btn-iniciar-aro {
@@ -528,6 +535,48 @@
     width: calc(var(--rn-iniciar-w) * .14);
     aspect-ratio: 183 / 191;
     background: url('../images/vista_nino/play.png') center / 100% 100% no-repeat;
+    animation: rn-iniciar-play var(--rn-iniciar-ciclo, 1.6s) ease-in-out calc(.8s + 2 * var(--rn-iniciar-ciclo, 1.6s)) infinite;
+}
+
+@keyframes rn-iniciar-respira {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes rn-iniciar-marcha {
+    to {
+        stroke-dashoffset: -19.9;
+    }
+}
+
+/* Dos toques hacia la derecha en la parte alta de la respiración: "por aquí se avanza". */
+@keyframes rn-iniciar-play {
+
+    0%,
+    35%,
+    65%,
+    100% {
+        transform: translateX(0);
+    }
+
+    45% {
+        transform: translateX(22%);
+    }
+
+    55% {
+        transform: translateX(8%);
+    }
+
+    60% {
+        transform: translateX(18%);
+    }
 }
 
 .rn-elegir {
@@ -1254,6 +1303,8 @@
     .rn-portada-ilustracion,
     .rn-portada-accion,
     .rn-portada-iniciar-halo,
+    .rn-btn-iniciar-marco,
+    .rn-btn-iniciar-play,
     .rn-elegir-btn,
     .rn-elegir-titulo,
     .rn-elegir-icono,
