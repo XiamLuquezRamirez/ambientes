@@ -62,6 +62,7 @@
     data-portada-img="{{ $portadaImg }}"
     data-fondo-img="{{ $fondoImg }}">
     <script type="application/json" id="rn-arbol">@json($arbol)</script>
+    <template id="rnBotonIniciar">{!! file_get_contents(public_path('assets/images/vista_nino/boton_iniciar.svg')) !!}</template>
     @if (!empty($camino))
         <script type="application/json" id="rn-camino">@json($camino)</script>
     @endif
