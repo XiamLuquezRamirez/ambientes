@@ -14,12 +14,6 @@
     font-size: 1.6rem;
 }
 
-.rn3d-carga--obra {
-    background:
-        radial-gradient(circle at 82% 16%, rgba(255, 236, 160, .85) 0, transparent 22%),
-        linear-gradient(#e9f8ff 0%, #cfeaf9 70%, #d4f0c2 100%);
-}
-
 .rn3d-obra {
     display: flex;
     flex-direction: column;
@@ -32,64 +26,119 @@
     height: auto;
     overflow: visible;
 }
+/* ===== Pantalla de carga "el aula se arma y se desarma" (low-poly, por ambiente) =====
+   El acento del ambiente llega en --rn3d-acc (inline desde el JS).
+   Ciclo completo en bucle (CICLO = 6s): arma -> se mantiene -> desarma -> espera -> repite,
+   para que acompañe cargas largas. */
 
-.rn3d-obra__sol circle:first-child { fill: #ffd56a; }
+/* Tinte del fondo con el acento del ambiente */
+.rn3d-carga--obra {
+    --rn3d-acc: #8e5bd6;
+    --rn3d-ciclo: 4.5s;
+    background:
+        radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--rn3d-acc) 26%, #ffffff) 0, transparent 46%),
+        linear-gradient(#f3f8fe 0%, #e4eef8 70%, color-mix(in srgb, var(--rn3d-acc) 14%, #e4eef8) 100%);
+}
+
+/* ---- Paisaje de fondo (mapa anterior, discreto) ---- */
 .rn3d-obra__sol {
+    fill: #ffd56a;
+    transform-box: fill-box; transform-origin: center;
+    animation: rn3d-pop .9s ease both;
+}
+.rn3d-obra__nube { fill: #ffffff; opacity: .9; }
+.rn3d-obra__nube--a { animation: rn3d-nube 6s ease-in-out infinite alternate; }
+.rn3d-obra__nube--b { animation: rn3d-nube 7.4s ease-in-out infinite alternate-reverse; }
+.rn3d-obra__cesped {
+    fill: color-mix(in srgb, var(--rn3d-acc) 14%, #9ad36e);
+    transform-box: fill-box; transform-origin: center bottom;
+    animation: rn3d-suelo .8s ease both;
+}
+.rn3d-obra__sendero {
+    fill: none; stroke: #f0d7a2; stroke-width: 14; stroke-linecap: round;
+    stroke-dasharray: 100; stroke-dashoffset: 100;
+    opacity: .85;
+    animation: rn3d-trazo 1s ease .2s forwards;
+}
+.rn3d-obra__arbolito rect { fill: #a9803f; }
+.rn3d-obra__arbolito circle,
+.rn3d-obra__arbolito polygon { fill: #5fb35b; }
+.rn3d-obra__arbolito {
+    transform-box: fill-box; transform-origin: center bottom;
+    animation: rn3d-pop .7s ease both;
+}
+.rn3d-obra__arbolito--i { animation-delay: .25s; }
+.rn3d-obra__arbolito--d { animation-delay: .4s; }
+
+/* Sombra/base del objeto: aparece al armar y se queda */
+.rn3d-obra__sombra {
+    fill: rgba(20, 30, 50, .14);
     transform-box: fill-box;
     transform-origin: center;
-    animation: rn3d-sol 3s ease forwards;
+    opacity: 0;
+    animation: rn3d-base 1s ease both;
 }
 
-.rn3d-obra__nube { fill: #fff; }
-.rn3d-obra__nube--a { transform: translate(78px, 48px); animation: rn3d-nube 3.6s ease-in-out infinite alternate; }
-.rn3d-obra__nube--b { transform: translate(210px, 78px); animation: rn3d-nube 4.4s ease-in-out infinite alternate-reverse; }
+/* Conjunto (sombra + objeto) reducido junto, para que la sombra concuerde con el objeto.
+   transform-box: view-box → el transform-origin usa coordenadas del SVG (no el bbox),
+   así el scale se centra en el punto (280,250) del mapa y el objeto queda en el medio. */
+.rn3d-obra__conjunto {
+    transform-box: view-box;
+    transform-origin: 280px 250px;
+    transform: translateY(-6px) scale(.56);
+}
 
-.rn3d-obra__cesped { fill: #67c85d; }
-.rn3d-obra__cesped-frente { fill: #4eae4b; }
-.rn3d-obra__cesped,
-.rn3d-obra__cesped-frente {
+/* Objeto: solo levita (el tamaño lo da el conjunto). La sombra queda quieta.
+   La levitación arranca a 1.7s, cuando la última pieza (delay .9s + .7s) ya encajó,
+   para que no haya salto de posición al terminar de armarse. */
+.rn3d-obra__objeto {
+    transform-box: view-box;
+    transform-origin: 280px 250px;
+    animation: rn3d-levita 3.2s ease-in-out 1.7s infinite;
+}
+
+/* Cada pieza cae y encaja UNA vez, y se queda armada (sin desarmar) */
+.rn3d-pz {
     transform-box: fill-box;
     transform-origin: center bottom;
-    animation: rn3d-suelo 3s ease forwards;
+    opacity: 0;
+    animation: rn3d-encaja .7s cubic-bezier(.22, 1.4, .4, 1) both;
 }
+.rn3d-pz--1 { animation-delay: .10s; }
+.rn3d-pz--2 { animation-delay: .30s; }
+.rn3d-pz--3 { animation-delay: .50s; }
+.rn3d-pz--4 { animation-delay: .70s; }
+.rn3d-pz--5 { animation-delay: .90s; }
 
-.rn3d-obra__sendero {
-    fill: none;
-    stroke: #f0d39a;
-    stroke-width: 18;
-    stroke-linecap: round;
-    stroke-dasharray: 100;
-    stroke-dashoffset: 100;
-    animation: rn3d-trazo 3s ease forwards;
-}
+/* Caras claras low-poly: un poco de brillo compartido */
+.rn3d-obra__objeto polygon[opacity],
+.rn3d-obra__objeto rect[opacity] { mix-blend-mode: screen; }
 
-.rn3d-obra__arbol rect { fill: #8a5a32; }
-.rn3d-obra__arbol circle,
-.rn3d-obra__arbol polygon { fill: #2f9a4a; }
-.rn3d-obra__arbol {
+/* Destello de rayos cuando el objeto termina de armarse (una sola vez) */
+.rn3d-obra__destello {
+    fill: color-mix(in srgb, var(--rn3d-acc) 60%, #fff);
     transform-box: fill-box;
-    transform-origin: center bottom;
-    animation: rn3d-aparece 3s ease forwards;
+    transform-origin: 280px 186px;
+    opacity: 0;
+    animation: rn3d-destello 1.4s ease 1.1s both;
 }
-.rn3d-obra__arbol--1 { animation-delay: .15s; }
-.rn3d-obra__arbol--2 { animation-delay: .35s; }
-.rn3d-obra__arbol--3 { animation-delay: .55s; }
 
-.rn3d-obra__casa-cuerpo rect:first-child { fill: #ffe08a; }
-.rn3d-obra__casa-cuerpo rect:nth-child(2) { fill: #6b4423; }
-.rn3d-obra__casa-cuerpo rect:nth-child(3) { fill: #7ec8e3; }
-.rn3d-obra__casa-techo { fill: #e85d4c; }
-.rn3d-obra__casa-cuerpo,
-.rn3d-obra__casa-techo {
+/* Chispas del color del ambiente que suben al armarse (una vez) */
+.rn3d-chispa {
+    fill: var(--rn3d-acc);
     transform-box: fill-box;
-    transform-origin: center bottom;
+    transform-origin: center;
+    opacity: 0;
+    animation: rn3d-chispa 1.3s ease both;
 }
-.rn3d-obra__casa-cuerpo { animation: rn3d-sube 3s ease forwards; }
-.rn3d-obra__casa-techo { animation: rn3d-baja 3s ease forwards; }
+.rn3d-chispa--a { animation-delay: 1.05s; }
+.rn3d-chispa--b { animation-delay: 1.30s; }
+.rn3d-chispa--c { animation-delay: 1.55s; }
+.rn3d-chispa--d { animation-delay: 1.18s; }
 
 .rn3d-obra__texto {
-    margin: 0;
-    color: #143024;
+    margin: 14px 0 0;
+    color: color-mix(in srgb, var(--rn3d-acc) 55%, #1a2230);
     font-family: 'Fredoka One', system-ui, sans-serif;
     font-size: clamp(1.35rem, 3vw, 2rem);
     letter-spacing: .01em;
@@ -101,40 +150,55 @@
     height: .28em;
     margin-left: .22em;
     border-radius: 50%;
-    background: #143024;
+    background: var(--rn3d-acc);
     vertical-align: .15em;
     animation: rn3d-punto 1.1s ease infinite;
 }
 .rn3d-obra__puntos i:nth-child(2) { animation-delay: .18s; }
 .rn3d-obra__puntos i:nth-child(3) { animation-delay: .36s; }
 
-@keyframes rn3d-sol {
-    0% { opacity: 0; transform: scale(.4); }
-    18%, 100% { opacity: 1; transform: scale(1); }
+/* Cada pieza cae y encaja UNA vez, y se queda (sin desarmar) */
+@keyframes rn3d-encaja {
+    0%   { opacity: 0; transform: translateY(-120px) scale(.86); }
+    60%  { opacity: 1; }
+    80%  { transform: translateY(0) scale(1.06, .94); }   /* aplasta al aterrizar */
+    100% { opacity: 1; transform: translateY(0) scale(1, 1); }
+}
+@keyframes rn3d-base {
+    0%   { opacity: 0; transform: scale(.4, .5); }
+    100% { opacity: 1; transform: scale(1, 1); }
+}
+/* Levitación permanente del objeto ya armado */
+@keyframes rn3d-levita {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+}
+@keyframes rn3d-destello {
+    0%   { opacity: 0; transform: scale(.3) rotate(0deg); }
+    30%  { opacity: .8; }
+    100% { opacity: 0; transform: scale(1.35) rotate(28deg); }
+}
+@keyframes rn3d-chispa {
+    0%   { opacity: 0; transform: translateY(6px) scale(.6); }
+    30%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-46px) scale(1.1); }
+}
+/* Paisaje de fondo */
+@keyframes rn3d-pop {
+    0%   { opacity: 0; transform: scale(.2); }
+    70%  { opacity: 1; transform: scale(1.08); }
+    100% { opacity: 1; transform: scale(1); }
 }
 @keyframes rn3d-nube {
-    from { translate: 0 0; }
-    to { translate: 16px 0; }
+    from { transform: translateX(0); }
+    to   { transform: translateX(10px); }
 }
 @keyframes rn3d-suelo {
-    0% { opacity: 0; transform: scale(.72, .15); }
-    22%, 100% { opacity: 1; transform: scale(1, 1); }
+    0%   { opacity: 0; transform: scale(.7, .2); }
+    100% { opacity: 1; transform: scale(1, 1); }
 }
 @keyframes rn3d-trazo {
-    0%, 12% { stroke-dashoffset: 100; }
-    48%, 100% { stroke-dashoffset: 0; }
-}
-@keyframes rn3d-aparece {
-    0%, 8% { opacity: 0; transform: scale(.15); }
-    28%, 100% { opacity: 1; transform: scale(1); }
-}
-@keyframes rn3d-sube {
-    0%, 28% { opacity: 0; transform: translateY(22px); }
-    52%, 100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes rn3d-baja {
-    0%, 48% { opacity: 0; transform: translateY(-26px); }
-    72%, 100% { opacity: 1; transform: translateY(0); }
+    to { stroke-dashoffset: 0; }
 }
 @keyframes rn3d-punto {
     0%, 100% { opacity: .2; transform: translateY(0); }
@@ -142,20 +206,23 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .rn3d-obra__sombra,
+    .rn3d-obra__objeto,
+    .rn3d-pz,
+    .rn3d-obra__destello,
+    .rn3d-chispa,
+    .rn3d-obra__puntos i,
     .rn3d-obra__sol,
     .rn3d-obra__nube,
     .rn3d-obra__cesped,
-    .rn3d-obra__cesped-frente,
     .rn3d-obra__sendero,
-    .rn3d-obra__arbol,
-    .rn3d-obra__casa-cuerpo,
-    .rn3d-obra__casa-techo,
-    .rn3d-obra__puntos i {
+    .rn3d-obra__arbolito {
         animation: none;
         opacity: 1;
         transform: none;
-        stroke-dashoffset: 0;
     }
+    .rn3d-obra__sendero { stroke-dashoffset: 0; }
+    .rn3d-obra__destello { opacity: .25; }
 }
 
 .rn-shell--3d .rn3d-canvas {
@@ -513,12 +580,10 @@
     font-family: 'Fredoka One', system-ui, sans-serif;
     font-size: clamp(1.2rem, 3.2vw, 1.7rem); color: #fff;
     padding: 15px 40px; border-radius: 999px;
-    background: linear-gradient(180deg,
-        color-mix(in srgb, var(--rn-color, #22c55e) 82%, #fff) 0%,
-        var(--rn-color, #22c55e) 58%,
-        color-mix(in srgb, var(--rn-color, #22c55e) 74%, #000) 100%);
-    box-shadow: 0 7px 0 color-mix(in srgb, var(--rn-color, #22c55e) 65%, #000),
-                0 16px 28px -6px color-mix(in srgb, var(--rn-color, #22c55e) 70%, transparent),
+    /* Morado fijo: no sigue --rn-color del ambiente. */
+    background: linear-gradient(180deg, #d4c4ff 0%, #8d6bff 58%, #6842f3 100%);
+    box-shadow: 0 7px 0 #4c2db8,
+                0 16px 28px -6px rgba(104, 66, 243, .55),
                 inset 0 2px 0 rgba(255,255,255,.4);
     text-shadow: 0 2px 0 rgba(0,0,0,.18);
     animation: rn3d-comenzar-entra .45s cubic-bezier(.34,1.56,.64,1) both,

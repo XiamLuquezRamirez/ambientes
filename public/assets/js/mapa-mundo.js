@@ -1464,73 +1464,37 @@ export const ESCALA_NINA = 2.55;
 
 // Tracks NLA de nino.glb y nina.glb. El string es el nombre del clip.
 export const ANIMACIONES_PERSONAJE = [
-    'FROG_JUMP',
-    'LOOK_AROUND',
-    'HIP_DANCE',
-    'FIST_PUMP',
-    'STRETCH',
-    'SHY',
-    'RAISE_HAND',
-    'SPIN',
-    'AIRPLANE',
-    'HOPSCOTCH',
-    'SKIP',
-    'JUMPING_JACKS',
-    'CHEER_POMPOMS',
-    'PARTY',
-    'CHEER',
-    'YES',
-    'SURPRISE',
-    'SAD',
-    'THINK',
-    'POINT_UP',
-    'POINT_R',
-    'POINT_L',
-    'DANCE',
-    'CROUCH',
-    'SIT',
-    'JUMP',
-    'RUN',
-    'WALK',
-    'CLAP',
-    'HAPPY',
-    'HELLO',
-    'TALK',
-    'IDLE',
-];
-
-// Poses de prueba del mismo archivo. El recorrido no las pone solas.
-export const ANIMACIONES_PRUEBA = [
-    'TEST_21_BAILAR',
-    'TEST_20_SALUDAR',
-    'TEST_19_SALTAR',
-    'TEST_18_CORRER',
-    'TEST_17_CAMINAR',
-    'TEST_16_CABEZA_INCLINADA',
-    'TEST_15_CABEZA_DER',
-    'TEST_14_CABEZA_IZQ',
-    'TEST_13_AGACHADO',
-    'TEST_12_SENTADO',
-    'TEST_11_RODILLAS',
-    'TEST_10_PIERNA_DER',
-    'TEST_09_PIERNA_IZQ',
-    'TEST_08_BRAZO_DER_DOBLADO',
-    'TEST_07_BRAZO_IZQ_DOBLADO',
-    'TEST_06_AMBOS_BRAZOS',
-    'TEST_05_BRAZO_DER_ARRIBA',
-    'TEST_04_BRAZO_IZQ_ARRIBA',
-    'TEST_03_BRAZOS_ABAJO',
-    'TEST_02_A_POSE',
-    'TEST_01_T_POSE',
+    'Porra_con_pompones',
+    'Enojado',
+    'Asustado',
+    'Timido',
+    'Reir',
+    'Senalar',
+    'Saludar',
+    'Triste',
+    'Decir_no',
+    'Decir_si',
+    'Mirar_alrededor',
+    'Estirarse',
+    'Pensar',
+    'Bailar',
+    'Aplaudir',
+    'Saltar',
+    'Celebrar',
+    'Caminar_y_hablar',
+    'Hablar',
+    'Correr',
+    'Caminar',
+    'Quieto',
 ];
 
 // Qué clip de ANIMACIONES_PERSONAJE usa cada momento del mapa.
-export const CLIP_QUIETO = 'IDLE';
-export const CLIP_CAMINAR = 'WALK';
-export const CLIP_CORRER = 'RUN';
-export const CLIP_SALUDAR = 'HELLO';
-export const CLIP_HABLAR = 'TALK';
-export const CLIP_AFIRMAR = 'YES';
+export const CLIP_QUIETO = 'Quieto';
+export const CLIP_CAMINAR = 'Caminar';
+export const CLIP_CORRER = 'Correr';
+export const CLIP_SALUDAR = 'Saludar';
+export const CLIP_HABLAR = 'Hablar';
+export const CLIP_AFIRMAR = 'Decir_si';
 
 function guardarClip(gltf, mixer, acciones, nombre) {
     if (!nombre || acciones[nombre]) return;
@@ -1560,7 +1524,6 @@ export async function cargarPersonaje(scene, cualPedido) {
     const mixer = new THREE.AnimationMixer(objeto);
     const acciones = {};
     ANIMACIONES_PERSONAJE.forEach((nombre) => guardarClip(gltf, mixer, acciones, nombre));
-    ANIMACIONES_PRUEBA.forEach((nombre) => guardarClip(gltf, mixer, acciones, nombre));
     if (acciones[CLIP_QUIETO]) acciones[CLIP_QUIETO].play();
     return { objeto, mixer, acciones, cual };
 }

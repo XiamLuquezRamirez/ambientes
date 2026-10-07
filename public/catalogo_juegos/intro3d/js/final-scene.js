@@ -12,9 +12,9 @@ const WALK_SPEED = 3.8;
 // 1 = el GLB tal cual. Mayor crece, menor encoge.
 const ESCALA_NINO = 0.72;
 const ESCALA_NINA = 0.72;
-const CLIP_CAMINAR = ["WALK"];
-const CLIP_QUIETO = ["IDLE"];
-const CLIP_SALUDAR = ["HELLO"];
+const CLIP_CAMINAR = ["Caminar"];
+const CLIP_QUIETO = ["Quieto"];
+const CLIP_SALUDAR = ["Saludar"];
 
 let root = null;
 let renderer = null;

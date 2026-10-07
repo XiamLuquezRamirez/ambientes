@@ -9,9 +9,9 @@ const MODELOS_BASE = new URL("../models/", import.meta.url);
 // El GLB nuevo mide ~1,25 m. 1,35 / 1,40 los deja a la misma altura en el panel.
 const ESCALA_NINO = 1.35;
 const ESCALA_NINA = 1.40;
-const CLIP_CAMINAR = ["WALK"];
-const CLIP_QUIETO = ["IDLE"];
-const CLIP_HABLAR = ["TALK"];
+const CLIP_CAMINAR = ["Caminar"];
+const CLIP_QUIETO = ["Quieto"];
+const CLIP_HABLAR = ["Hablar"];
 const MODELOS = {
     zeus: { url: new URL("nino.glb", MODELOS_BASE).href, escala: ESCALA_NINO },
     zoe: { url: new URL("nina.glb", MODELOS_BASE).href, escala: ESCALA_NINA }

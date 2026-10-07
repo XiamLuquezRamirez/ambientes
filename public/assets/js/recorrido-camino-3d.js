@@ -10,7 +10,7 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
-import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR } from './mapa-mundo.js?v=20261006b';
+import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR } from './mapa-mundo.js?v=20261007a';
 
 (function () {
     'use strict';
@@ -1258,7 +1258,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
     const ZOOM_PASO = 0.38;
     // Plano de arranque, antes de caminar y al pulsar Volver al inicio.
     // 1 es la distancia base. Más alto aleja la cámara; más bajo la acerca.
-    const ZOOM_INICIAL = 1.35;
+    const ZOOM_INICIAL = 1;
     zoomCam = ZOOM_INICIAL;
 
     function encuadreArranque(foco, z) {
@@ -3911,6 +3911,292 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         });
     }
 
+    const ESCENAS_CARGA = {
+        // ---------------- EXPRESIÓN ARTÍSTICA: caballete con lienzo pintado ----------------
+        artistica: {
+            titulo: 'Preparando tu aula de arte',
+            acento: '#8e5bd6',
+            svg: ''
+                // 1) Caballete: trípode robusto con travesaño y bandeja de pinturas
+                + '<g class="rn3d-pz rn3d-pz--1">'
+                +   '<polygon points="272,210 292,300 302,300 282,210" fill="#8a6230"/>'             // pata trasera (sombra)
+                +   '<polygon points="220,302 236,198 246,198 232,302" fill="#b5884a"/>'             // pata izq (cara)
+                +   '<polygon points="232,302 246,198 250,198 238,302" fill="#9a7038"/>'             // pata izq (sombra)
+                +   '<polygon points="340,302 324,198 328,198 352,302" fill="#9a7038"/>'             // pata der (sombra)
+                +   '<polygon points="328,198 332,198 348,302 340,302" fill="#b5884a"/>'             // pata der (cara)
+                +   '<rect x="232" y="256" width="116" height="12" rx="2" fill="#c79a56"/>'          // bandeja
+                +   '<rect x="232" y="256" width="116" height="4" fill="#ffffff" opacity=".4"/>'
+                +   '<rect x="240" y="212" width="100" height="9" rx="2" fill="#b88a45"/>'           // travesaño superior
+                +   '<circle cx="250" cy="262" r="4" fill="#e8563f"/><circle cx="266" cy="262" r="4" fill="#4f9ae8"/><circle cx="314" cy="262" r="4" fill="#5ac46a"/><circle cx="330" cy="262" r="4" fill="#ffd34d"/>' // tubos de pintura
+                + '</g>'
+                // 2) Lienzo con marco biselado
+                + '<g class="rn3d-pz rn3d-pz--2">'
+                +   '<polygon points="224,108 336,108 342,216 218,216" fill="#b5844f"/>'             // marco (sombra)
+                +   '<polygon points="224,108 336,108 338,120 226,122" fill="#d8b483"/>'             // marco (luz sup)
+                +   '<polygon points="236,120 324,120 328,206 232,206" fill="#f6f0e4"/>'             // tela
+                +   '<polygon points="236,120 324,120 326,144 234,146" fill="#ffffff" opacity=".6"/>'// luz tela
+                +   '<polygon points="232,206 328,206 324,216 236,216" fill="#000000" opacity=".12"/>'
+                + '</g>'
+                // 3) Pintura dentro del lienzo: cielo, colina, sol, árbol y brochazos
+                + '<g class="rn3d-pz rn3d-pz--3">'
+                +   '<polygon points="236,120 324,120 326,172 236,172" fill="#bfe4f2"/>'              // cielo
+                +   '<circle cx="312" cy="140" r="11" fill="#ffd34d"/>'                              // sol
+                +   '<polygon points="236,206 326,206 326,170 288,152 236,180" fill="#7fc98a"/>'      // colina
+                +   '<polygon points="236,206 300,206 300,190 268,176 236,194" fill="#5bb06a"/>'      // colina 2
+                +   '<rect x="256" y="176" width="5" height="20" fill="#8a6230"/><circle cx="258" cy="172" r="11" fill="#4f9e57"/>' // arbolito pintado
+                +   '<polygon points="270,198 292,188 300,202 274,208" fill="var(--rn3d-acc)"/>'      // brochazo acento
+                +   '<polygon points="296,156 314,164 310,176 298,170" fill="#ff8ab0"/>'              // brochazo rosa
+                + '</g>'
+                // 4) Paleta de pintor con pincel (derecha)
+                + '<g class="rn3d-pz rn3d-pz--4">'
+                +   '<ellipse cx="392" cy="252" rx="36" ry="25" fill="#c79a56"/>'                    // canto
+                +   '<ellipse cx="392" cy="248" rx="34" ry="23" fill="#e9cfa3"/>'                    // cara
+                +   '<ellipse cx="392" cy="243" rx="26" ry="12" fill="#ffffff" opacity=".35"/>'      // brillo
+                +   '<ellipse cx="404" cy="262" rx="7" ry="5" fill="#9ad36e"/>'                      // hueco pulgar (muestra césped detrás)
+                +   '<circle cx="378" cy="242" r="5.5" fill="var(--rn3d-acc)"/>'
+                +   '<circle cx="396" cy="236" r="5.5" fill="#ff8ab0"/>'
+                +   '<circle cx="410" cy="246" r="5.5" fill="#4f9ae8"/>'
+                +   '<circle cx="382" cy="256" r="5.5" fill="#ffd34d"/>'
+                +   '<circle cx="400" cy="256" r="5.5" fill="#5ac46a"/>'
+                +   '<rect x="366" y="214" width="6" height="34" rx="3" fill="#a9803f" transform="rotate(26 369 231)"/>' // pincel mango
+                +   '<polygon points="376,206 384,210 378,220" fill="#2b3442" transform="rotate(26 380 213)"/>'        // pincel punta
+                + '</g>'
+                // 5) Notas musicales (izquierda, equilibran la paleta)
+                + '<g class="rn3d-pz rn3d-pz--5">'
+                +   '<circle cx="158" cy="216" r="11" fill="var(--rn3d-acc)"/><circle cx="154" cy="212" r="4" fill="#fff" opacity=".5"/>'
+                +   '<rect x="167" y="172" width="6" height="46" fill="var(--rn3d-acc)"/>'
+                +   '<polygon points="173,172 194,180 173,190" fill="var(--rn3d-acc)"/>'
+                +   '<circle cx="192" cy="150" r="8" fill="#ffd34d"/>'
+                +   '<rect x="198" y="120" width="5" height="32" fill="#ffd34d"/>'
+                +   '<polygon points="203,120 218,126 203,134" fill="#ffd34d"/>'
+                + '</g>'
+        },
+        // ---------------- MULTISABERES: torre de bloques + accesorios de números ----------------
+        multisaberes: {
+            titulo: 'Preparando tu aula de saberes',
+            acento: '#f2b807',
+            svg: ''
+                // 1) Bloque base "1" (cara frontal + top claro + lado sombra) — cubo isométrico
+                + '<g class="rn3d-pz rn3d-pz--1">'
+                +   '<polygon points="246,300 314,300 314,258 246,258" fill="var(--rn3d-acc)"/>'       // frente
+                +   '<polygon points="246,258 314,258 330,246 262,246" fill="#ffe47a"/>'               // top
+                +   '<polygon points="314,258 330,246 330,288 314,300" fill="#caa000"/>'               // lado
+                +   '<text x="280" y="290" font-size="30" font-family="Fredoka One,sans-serif" fill="#7a4e00" text-anchor="middle">1</text>'
+                + '</g>'
+                // 2) Bloque "2" azul
+                + '<g class="rn3d-pz rn3d-pz--2">'
+                +   '<polygon points="250,246 310,246 310,208 250,208" fill="#4f9ae8"/>'
+                +   '<polygon points="250,208 310,208 324,198 264,198" fill="#8cc1f3"/>'
+                +   '<polygon points="310,208 324,198 324,236 310,246" fill="#2f74bd"/>'
+                +   '<text x="280" y="238" font-size="26" font-family="Fredoka One,sans-serif" fill="#ffffff" text-anchor="middle">2</text>'
+                + '</g>'
+                // 3) Bloque "3" rojo
+                + '<g class="rn3d-pz rn3d-pz--3">'
+                +   '<polygon points="254,196 306,196 306,162 254,162" fill="#e8563f"/>'
+                +   '<polygon points="254,162 306,162 318,154 266,154" fill="#f2897a"/>'
+                +   '<polygon points="306,162 318,154 318,188 306,196" fill="#bd3c28"/>'
+                +   '<text x="280" y="190" font-size="22" font-family="Fredoka One,sans-serif" fill="#ffffff" text-anchor="middle">3</text>'
+                + '</g>'
+                // 4) Ábaco (derecha): marco con grosor + 3 barras con cuentas
+                + '<g class="rn3d-pz rn3d-pz--4">'
+                +   '<rect x="342" y="230" width="78" height="62" rx="7" fill="#8a6230"/>'            // marco (sombra)
+                +   '<rect x="342" y="230" width="78" height="56" rx="7" fill="#a9803f"/>'            // marco (cara)
+                +   '<rect x="350" y="238" width="62" height="42" rx="4" fill="#e3c488"/>'            // interior
+                +   '<rect x="352" y="248" width="58" height="3" fill="#b88a45"/>'                    // barra 1
+                +   '<rect x="352" y="262" width="58" height="3" fill="#b88a45"/>'                    // barra 2
+                +   '<rect x="352" y="276" width="58" height="3" fill="#b88a45"/>'                    // barra 3
+                +   '<circle cx="361" cy="249" r="6" fill="#e8563f"/><circle cx="377" cy="249" r="6" fill="#4f9ae8"/><circle cx="393" cy="249" r="6" fill="#ffd34d"/><circle cx="403" cy="249" r="6" fill="#5ac46a"/>'
+                +   '<circle cx="361" cy="263" r="6" fill="#9b5bd6"/><circle cx="377" cy="263" r="6" fill="#ff8ab0"/><circle cx="399" cy="263" r="6" fill="#e8563f"/>'
+                +   '<circle cx="367" cy="277" r="6" fill="#4f9ae8"/><circle cx="383" cy="277" r="6" fill="#ffd34d"/><circle cx="399" cy="277" r="6" fill="#5ac46a"/>'
+                + '</g>'
+                // 5) Estrella + lápiz (izquierda, equilibrando al ábaco)
+                + '<g class="rn3d-pz rn3d-pz--5">'
+                +   '<polygon points="190,194 199,219 227,219 205,236 213,263 190,247 167,263 175,236 153,219 181,219" fill="#f2b807"/>'   // estrella (sombra)
+                +   '<polygon points="190,196 199,220 225,220 204,236 212,262 190,247 168,262 176,236 155,220 181,220" fill="#ffd34d"/>'   // cara
+                +   '<polygon points="190,214 204,236 190,247 176,236" fill="#ffffff" opacity=".5"/>'                                     // brillo centro
+                +   '<rect x="154" y="260" width="54" height="12" rx="3" fill="#f2b807" transform="rotate(-18 181 266)"/>'                  // lápiz cuerpo
+                +   '<rect x="154" y="260" width="54" height="4" rx="2" fill="#ffe47a" transform="rotate(-18 181 266)"/>'                   // lápiz luz
+                +   '<polygon points="200,254 214,261 196,272" fill="#e3b06a" transform="rotate(-18 205 263)"/>'                           // punta madera
+                +   '<polygon points="208,257 214,261 205,267" fill="#2b3442" transform="rotate(-18 209 262)"/>'                           // mina
+                + '</g>'
+        },
+        // ---------------- MULTISENSORIAL: mesa de luz + texturas + tubo de burbujas ----------------
+        multisensorial: {
+            titulo: 'Preparando tu aula sensorial',
+            acento: '#3aa0d8',
+            svg: ''
+                // 1) Mesa sensorial (bandeja con profundidad y patas)
+                + '<g class="rn3d-pz rn3d-pz--1">'
+                +   '<rect x="224" y="296" width="9" height="12" fill="#2f7fa8"/><rect x="327" y="296" width="9" height="12" fill="#2f7fa8"/>' // patas
+                +   '<polygon points="214,298 346,298 362,266 198,266" fill="var(--rn3d-acc)"/>'       // pared frontal
+                +   '<polygon points="214,298 346,298 346,302 214,302" fill="#2f7fa8"/>'               // canto
+                +   '<polygon points="198,266 362,266 344,252 216,252" fill="#dff4fb"/>'               // interior claro
+                +   '<polygon points="216,252 344,252 338,256 222,256" fill="#9cd6ec"/>'               // borde interior
+                + '</g>'
+                // 2) Elementos de textura dentro (bolas con brillo + estrella)
+                + '<g class="rn3d-pz rn3d-pz--2">'
+                +   '<circle cx="242" cy="276" r="13" fill="#ffd34d"/><circle cx="238" cy="271" r="5" fill="#fff" opacity=".55"/>'
+                +   '<circle cx="272" cy="282" r="11" fill="#e8563f"/><circle cx="269" cy="278" r="4" fill="#fff" opacity=".5"/>'
+                +   '<circle cx="300" cy="278" r="9" fill="#4f9ae8"/><circle cx="298" cy="275" r="3" fill="#fff" opacity=".5"/>'
+                +   '<polygon points="326,262 331,274 344,274 334,282 338,295 326,287 314,295 318,282 308,274 321,274" fill="#5ac46a"/>'
+                + '</g>'
+                // 3) Tubo de burbujas (derecha) con líquido de color y burbujas
+                + '<g class="rn3d-pz rn3d-pz--3">'
+                +   '<rect x="376" y="250" width="44" height="12" rx="4" fill="#5a6775"/>'              // base (sombra)
+                +   '<rect x="376" y="250" width="44" height="6" rx="3" fill="#7c8a9a"/>'               // base (luz)
+                +   '<rect x="384" y="150" width="28" height="104" rx="14" fill="#9fd8ef"/>'            // líquido
+                +   '<rect x="384" y="150" width="28" height="30" rx="14" fill="#c9ecf9"/>'             // líquido claro arriba
+                +   '<rect x="387" y="156" width="8" height="94" rx="4" fill="#ffffff" opacity=".55"/>' // brillo
+                +   '<rect x="382" y="142" width="32" height="12" rx="4" fill="#5a6775"/>'              // tapa
+                +   '<rect x="382" y="142" width="32" height="5" rx="3" fill="#7c8a9a"/>'
+                +   '<circle cx="398" cy="238" r="6" fill="#fff" opacity=".9"/><circle cx="394" cy="216" r="4" fill="#fff" opacity=".9"/><circle cx="402" cy="198" r="7" fill="#fff" opacity=".9"/><circle cx="396" cy="178" r="4" fill="#fff" opacity=".9"/><circle cx="401" cy="164" r="5" fill="#fff" opacity=".9"/>'
+                + '</g>'
+                // 4) Panel de texturas (izquierda) con marco y celdas táctiles
+                + '<g class="rn3d-pz rn3d-pz--4">'
+                +   '<rect x="144" y="164" width="62" height="84" rx="9" fill="#9cc7d6"/>'             // marco
+                +   '<rect x="149" y="169" width="52" height="74" rx="6" fill="#eaf6fb"/>'             // interior
+                +   '<rect x="149" y="169" width="52" height="20" rx="6" fill="#ffffff" opacity=".6"/>'// brillo sup
+                +   '<rect x="154" y="196" width="20" height="20" rx="5" fill="#ff8ab0"/><rect x="154" y="196" width="20" height="7" rx="4" fill="#ffb3cd"/>'
+                +   '<rect x="178" y="196" width="20" height="20" rx="5" fill="#ffd34d"/><circle cx="188" cy="206" r="4" fill="#e8a600"/>'
+                +   '<rect x="154" y="220" width="20" height="18" rx="5" fill="#5ac46a"/><path d="M157 229 h14 M157 233 h14" stroke="#3f9e50" stroke-width="2"/>'
+                +   '<rect x="178" y="220" width="20" height="18" rx="5" fill="#4f9ae8"/><circle cx="184" cy="226" r="2.5" fill="#fff"/><circle cx="192" cy="232" r="2.5" fill="#fff"/>'
+                + '</g>'
+                // 5) Campana (centro, sobre la mesa, bien integrada)
+                + '<g class="rn3d-pz rn3d-pz--5">'
+                +   '<polygon points="262,166 298,166 309,212 251,212" fill="#e8a600"/>'               // campana (sombra)
+                +   '<polygon points="262,166 298,166 306,210 254,210" fill="#ffd34d"/>'               // cara
+                +   '<polygon points="264,168 294,168 288,188 270,188" fill="#ffffff" opacity=".5"/>'  // brillo
+                +   '<rect x="275" y="152" width="10" height="16" rx="2" fill="#c7a200"/>'              // asa
+                +   '<circle cx="280" cy="150" r="6" fill="#e8a600"/>'
+                +   '<circle cx="280" cy="216" r="8" fill="#c7a200"/><circle cx="280" cy="216" r="4" fill="#8a6f00"/>'  // badajo
+                + '</g>'
+        },
+        // ---------------- POLIMOTOR: colchoneta + torre de aros + pelota + cono ----------------
+        polimotor: {
+            titulo: 'Preparando tu aula de movimiento',
+            acento: '#46b85a',
+            svg: ''
+                // 1) Colchoneta con grosor (cara superior clara + lado)
+                + '<g class="rn3d-pz rn3d-pz--1">'
+                +   '<polygon points="196,292 364,292 346,268 214,268" fill="#6fd27f"/>'               // top
+                +   '<polygon points="196,292 364,292 364,306 196,306" fill="var(--rn3d-acc)"/>'       // frente
+                +   '<polygon points="214,268 346,268 340,260 220,260" fill="#ffffff" opacity=".35"/>'
+                +   '<line x1="280" y1="268" x2="280" y2="292" stroke="#2f8f42" stroke-width="2"/>'
+                + '</g>'
+                // 2) Base con grosor (el poste va en la pieza 3, DESPUÉS de los aros,
+                //    para que el palito se vea pasando por el centro de cada aro)
+                + '<g class="rn3d-pz rn3d-pz--2">'
+                +   '<ellipse cx="280" cy="276" rx="46" ry="13" fill="#7a5428"/>'                        // canto inferior (sombra)
+                +   '<rect x="234" y="266" width="92" height="12" fill="#7a5428"/>'
+                +   '<ellipse cx="280" cy="266" rx="46" ry="13" fill="#a9803f"/>'                        // cara superior base
+                +   '<ellipse cx="280" cy="266" rx="46" ry="13" fill="#c79a56" opacity=".55"/>'
+                +   '<rect x="275" y="176" width="10" height="92" fill="#8a6230"/>'                      // tramo del poste detrás de los aros
+                + '</g>'
+                // 3) Aros apilados (cuatro toros) + poste al frente por el centro + tope
+                + '<g class="rn3d-pz rn3d-pz--3">'
+                //   aro rojo (base, el mayor)
+                +   '<ellipse cx="280" cy="258" rx="52" ry="18" fill="none" stroke="#bd3c28" stroke-width="16"/>'      // sombra/grosor
+                +   '<ellipse cx="280" cy="255" rx="52" ry="18" fill="none" stroke="#e8563f" stroke-width="15"/>'      // cara
+                +   '<path d="M233 249 A52 18 0 0 1 327 249" fill="none" stroke="#ff8a74" stroke-width="5" opacity=".8"/>' // brillo arriba
+                //   aro azul
+                +   '<ellipse cx="280" cy="236" rx="43" ry="15" fill="none" stroke="#2f74bd" stroke-width="15"/>'
+                +   '<ellipse cx="280" cy="233" rx="43" ry="15" fill="none" stroke="#4f9ae8" stroke-width="14"/>'
+                +   '<path d="M241 228 A43 15 0 0 1 319 228" fill="none" stroke="#a7d0f5" stroke-width="5" opacity=".8"/>'
+                //   aro verde
+                +   '<ellipse cx="280" cy="216" rx="35" ry="12" fill="none" stroke="#2f8f42" stroke-width="14"/>'
+                +   '<ellipse cx="280" cy="213" rx="35" ry="12" fill="none" stroke="#5ac46a" stroke-width="13"/>'
+                +   '<path d="M248 209 A35 12 0 0 1 312 209" fill="none" stroke="#a9e8b4" stroke-width="4" opacity=".8"/>'
+                //   aro amarillo (el menor, arriba)
+                +   '<ellipse cx="280" cy="198" rx="27" ry="10" fill="none" stroke="#caa000" stroke-width="13"/>'
+                +   '<ellipse cx="280" cy="195" rx="27" ry="10" fill="none" stroke="#ffd34d" stroke-width="12"/>'
+                +   '<path d="M256 192 A27 10 0 0 1 304 192" fill="none" stroke="#ffe79a" stroke-width="4" opacity=".8"/>'
+                //   POSTE al frente: se ve pasando por el centro de los aros (de arriba del aro amarillo hacia arriba)
+                +   '<rect x="274" y="166" width="12" height="36" fill="#b5884a"/>'                      // tramo visible sobre el aro superior
+                +   '<rect x="274" y="166" width="5" height="36" fill="#d6ad6b"/>'                       // luz
+                +   '<rect x="283" y="166" width="3" height="36" fill="#8a6230"/>'                       // sombra
+                //   tope redondeado + bolita
+                +   '<ellipse cx="280" cy="166" rx="10" ry="4" fill="#d6ad6b"/>'
+                +   '<circle cx="280" cy="160" r="9" fill="#e8563f"/><circle cx="277" cy="157" r="3" fill="#fff" opacity=".6"/>'
+                + '</g>'
+                // 4) Pelota (derecha) con gajos
+                + '<g class="rn3d-pz rn3d-pz--4">'
+                +   '<circle cx="392" cy="256" r="30" fill="#ffd34d"/>'
+                +   '<path d="M392 226 Q374 256 392 286 Q410 256 392 226" fill="#e8a600"/>'
+                +   '<path d="M362 256 H422" stroke="#e8a600" stroke-width="4"/>'
+                +   '<circle cx="382" cy="246" r="7" fill="#fff" opacity=".5"/>'
+                + '</g>'
+                // 5) Cono de entrenamiento (izquierda, separado de los aros)
+                + '<g class="rn3d-pz rn3d-pz--5">'
+                +   '<polygon points="150,262 170,190 190,262" fill="#e8563f"/>'
+                +   '<polygon points="160,262 170,190 170,262" fill="#bd3c28"/>'
+                +   '<rect x="162" y="224" width="16" height="7" fill="#fff" opacity=".6"/>'
+                +   '<rect x="140" y="258" width="60" height="11" rx="4" fill="#c7442f"/>'
+                + '</g>'
+        },
+        // ---------------- TECNOLOGÍA: robot + tablet + engranaje ----------------
+        tecnologia: {
+            titulo: 'Preparando tu aula de tecnología',
+            acento: '#ff8a3c',
+            svg: ''
+                // 1) Cuerpo del robot (tronco con panel, remaches y ruedas)
+                + '<g class="rn3d-pz rn3d-pz--1">'
+                +   '<polygon points="244,296 316,296 324,222 236,222" fill="#e07a2f"/>'               // cuerpo (sombra)
+                +   '<polygon points="244,296 310,296 318,222 236,222" fill="var(--rn3d-acc)"/>'       // cuerpo (cara)
+                +   '<polygon points="236,222 324,222 318,232 242,232" fill="#ffffff" opacity=".35"/>' // luz sup
+                +   '<rect x="258" y="242" width="44" height="30" rx="5" fill="#2b3442"/>'             // pantalla panel
+                +   '<rect x="262" y="246" width="36" height="12" rx="2" fill="#1f8a6b"/>'             // barra verde
+                +   '<circle cx="268" cy="265" r="4" fill="#9be8ff"/><circle cx="282" cy="265" r="4" fill="#ffd34d"/><circle cx="296" cy="265" r="4" fill="#ff6b6b"/>'
+                +   '<circle cx="246" cy="230" r="2.5" fill="#c7641f"/><circle cx="314" cy="230" r="2.5" fill="#c7641f"/><circle cx="246" cy="288" r="2.5" fill="#c7641f"/><circle cx="314" cy="288" r="2.5" fill="#c7641f"/>' // remaches
+                +   '<circle cx="256" cy="300" r="10" fill="#2b3442"/><circle cx="256" cy="300" r="4" fill="#5f6d7c"/>'
+                +   '<circle cx="304" cy="300" r="10" fill="#2b3442"/><circle cx="304" cy="300" r="4" fill="#5f6d7c"/>'
+                + '</g>'
+                // 2) Cabeza del robot (casco + orejas + antena + ojos)
+                + '<g class="rn3d-pz rn3d-pz--2">'
+                +   '<rect x="266" y="210" width="28" height="12" fill="#5f6d7c"/>'                    // cuello
+                +   '<rect x="248" y="166" width="64" height="52" rx="13" fill="#6c7a8a"/>'            // casco (sombra)
+                +   '<rect x="248" y="166" width="64" height="52" rx="13" fill="#7c8a9a"/>'
+                +   '<rect x="248" y="166" width="64" height="18" rx="11" fill="#9aa8b6"/>'            // luz casco
+                +   '<rect x="238" y="182" width="12" height="22" rx="5" fill="#5f6d7c"/><rect x="310" y="182" width="12" height="22" rx="5" fill="#5f6d7c"/>' // orejas
+                +   '<rect x="258" y="186" width="44" height="20" rx="9" fill="#1f2630"/>'            // visor
+                +   '<circle cx="271" cy="196" r="6" fill="#9be8ff"/><circle cx="269" cy="194" r="2" fill="#fff"/>'
+                +   '<circle cx="289" cy="196" r="6" fill="#9be8ff"/><circle cx="287" cy="194" r="2" fill="#fff"/>'
+                +   '<rect x="276" y="146" width="8" height="20" fill="#7c8a9a"/><circle cx="280" cy="142" r="7" fill="#ffd34d"/><circle cx="280" cy="142" r="3" fill="#fff" opacity=".6"/>' // antena
+                + '</g>'
+                // 3) Brazos articulados con pinzas
+                + '<g class="rn3d-pz rn3d-pz--3">'
+                +   '<rect x="210" y="234" width="30" height="12" rx="6" fill="#7c8a9a"/><circle cx="240" cy="240" r="6" fill="#5f6d7c"/>'
+                +   '<path d="M210 234 q-10 0 -10 7 M210 246 q-10 0 -10 -7" stroke="#5f6d7c" stroke-width="5" fill="none" stroke-linecap="round"/>' // pinza izq
+                +   '<rect x="320" y="234" width="30" height="12" rx="6" fill="#7c8a9a"/><circle cx="320" cy="240" r="6" fill="#5f6d7c"/>'
+                +   '<path d="M350 234 q10 0 10 7 M350 246 q10 0 10 -7" stroke="#5f6d7c" stroke-width="5" fill="none" stroke-linecap="round"/>' // pinza der
+                + '</g>'
+                // 4) Tablet (derecha) con app de código
+                + '<g class="rn3d-pz rn3d-pz--4">'
+                +   '<rect x="374" y="194" width="60" height="82" rx="10" fill="#1f2630"/>'            // carcasa
+                +   '<rect x="374" y="194" width="60" height="82" rx="10" fill="#2b3442"/>'
+                +   '<rect x="381" y="202" width="46" height="60" rx="4" fill="#d9f2fb"/>'            // pantalla
+                +   '<rect x="386" y="208" width="26" height="4" rx="2" fill="#ff8a3c"/>'             // líneas de código
+                +   '<rect x="386" y="216" width="18" height="4" rx="2" fill="#4f9ae8"/>'
+                +   '<rect x="392" y="224" width="22" height="4" rx="2" fill="#5ac46a"/>'
+                +   '<rect x="386" y="232" width="14" height="4" rx="2" fill="#9b5bd6"/>'
+                +   '<polygon points="392,244 406,251 392,258" fill="var(--rn3d-acc)"/>'               // botón play
+                +   '<circle cx="404" cy="269" r="3" fill="#5f6d7c"/>'                                 // botón home
+                + '</g>'
+                // 5) Engranaje (izquierda) con dientes trapezoidales
+                + '<g class="rn3d-pz rn3d-pz--5">'
+                +   '<g fill="#e8a600">'
+                +     '<polygon points="155,150 171,150 168,162 158,162"/><polygon points="155,206 171,206 168,218 158,218"/>'
+                +     '<polygon points="125,176 125,192 137,189 137,179"/><polygon points="201,176 201,192 189,189 189,179"/>'
+                +     '<polygon points="134,156 145,145 153,153 142,164"/><polygon points="188,204 199,193 191,185 180,196"/>'
+                +     '<polygon points="180,153 191,164 199,153 188,142"/><polygon points="142,204 153,215 145,223 134,212"/>'
+                +   '</g>'
+                +   '<circle cx="163" cy="184" r="26" fill="#ffd34d"/><circle cx="163" cy="184" r="25" fill="#ffd34d"/>'
+                +   '<circle cx="163" cy="184" r="15" fill="#ff8a3c"/>'
+                +   '<circle cx="163" cy="184" r="7" fill="#2b3442"/>'
+                +   '<circle cx="154" cy="175" r="5" fill="#fff" opacity=".5"/>'
+                + '</g>'
+        }
+    };
+
     // ===================== boot(ctx) — misma firma que el 2D =====================
     function boot(options) {
         destroy();
@@ -4076,24 +4362,48 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         el.setAttribute('role', 'status');
         el.setAttribute('aria-live', 'polite');
         el.setAttribute('aria-label', 'Construyendo el mapa');
+        const claveEscena = ({
+            'expresion-artistica': 'artistica',
+            expresion_artistica: 'artistica',
+            musica: 'artistica',
+            logico: 'multisaberes',
+        })[ambienteSlug] || ambienteSlug;
+        const escena = ESCENAS_CARGA[claveEscena] || ESCENAS_CARGA.polimotor;
+        el.style.setProperty('--rn3d-acc', escena.acento);
         el.innerHTML = ''
             + '<div class="rn3d-obra" aria-hidden="true">'
-            + '<svg class="rn3d-obra__escena" viewBox="0 36 560 274" focusable="false">'
-            + '<g class="rn3d-obra__sol"><circle cx="478" cy="62" r="26"/><circle cx="478" cy="62" r="36" fill="none" stroke="#ffe08a" stroke-width="6" opacity=".55"/></g>'
-            + '<g class="rn3d-obra__nube rn3d-obra__nube--a"><ellipse cx="0" cy="8" rx="22" ry="14"/><ellipse cx="24" cy="4" rx="18" ry="12"/><ellipse cx="44" cy="10" rx="16" ry="10"/></g>'
-            + '<g class="rn3d-obra__nube rn3d-obra__nube--b"><ellipse cx="0" cy="6" rx="16" ry="10"/><ellipse cx="18" cy="2" rx="14" ry="9"/><ellipse cx="34" cy="8" rx="12" ry="8"/></g>'
-            + '<ellipse class="rn3d-obra__cesped" cx="280" cy="248" rx="236" ry="62"/>'
-            + '<ellipse class="rn3d-obra__cesped-frente" cx="280" cy="268" rx="196" ry="34"/>'
-            + '<path class="rn3d-obra__sendero" pathLength="100" d="M48 286 C 130 250, 168 236, 230 252 S 340 292, 430 246"/>'
-            + '<g class="rn3d-obra__arbol rn3d-obra__arbol--1"><rect x="108" y="196" width="12" height="36" rx="3"/><circle cx="114" cy="176" r="26"/><circle cx="96" cy="190" r="16"/><circle cx="132" cy="188" r="15"/></g>'
-            + '<g class="rn3d-obra__arbol rn3d-obra__arbol--2"><rect x="196" y="168" width="10" height="30" rx="3"/><polygon points="201,118 176,184 226,184"/></g>'
-            + '<g class="rn3d-obra__arbol rn3d-obra__arbol--3"><rect x="318" y="176" width="10" height="28" rx="3"/><polygon points="323,128 300,190 346,190"/></g>'
-            + '<g class="rn3d-obra__casa">'
-            + '<g class="rn3d-obra__casa-cuerpo"><rect x="392" y="168" width="78" height="62" rx="6"/><rect x="418" y="196" width="22" height="34" rx="3"/><rect x="404" y="180" width="16" height="14" rx="2"/></g>'
-            + '<polygon class="rn3d-obra__casa-techo" points="380,176 431,128 484,176"/>'
+            + '<svg class="rn3d-obra__escena" viewBox="108 76 344 272" focusable="false">'
+            // ---- Paisaje de fondo (reinterpreta el mapa anterior, discreto para no cargar) ----
+            + '<g class="rn3d-obra__paisaje">'
+            +   '<circle class="rn3d-obra__sol" cx="416" cy="118" r="20"/>'
+            +   '<g class="rn3d-obra__nube rn3d-obra__nube--a"><ellipse cx="162" cy="120" rx="20" ry="12"/><ellipse cx="182" cy="116" rx="16" ry="11"/><ellipse cx="198" cy="121" rx="13" ry="9"/></g>'
+            +   '<g class="rn3d-obra__nube rn3d-obra__nube--b"><ellipse cx="330" cy="150" rx="15" ry="9"/><ellipse cx="344" cy="147" rx="12" ry="8"/></g>'
+            +   '<ellipse class="rn3d-obra__cesped" cx="280" cy="286" rx="190" ry="46"/>'
+            +   '<path class="rn3d-obra__sendero" pathLength="100" d="M150 290 C 210 260, 250 256, 280 262 S 360 278, 420 256"/>'
+            +   '<g class="rn3d-obra__arbolito rn3d-obra__arbolito--i"><rect x="150" y="238" width="7" height="22" rx="2"/><circle cx="153" cy="230" r="15"/><circle cx="142" cy="238" r="10"/><circle cx="164" cy="236" r="9"/></g>'
+            +   '<g class="rn3d-obra__arbolito rn3d-obra__arbolito--d"><rect x="406" y="240" width="7" height="22" rx="2"/><polygon points="409,208 392,252 426,252"/></g>'
+            + '</g>'
+            // destello final (rayos) detrás del objeto
+            + '<g class="rn3d-obra__destello">'
+            + '<polygon points="280,186 292,120 268,120" /><polygon points="280,186 346,174 346,198" />'
+            + '<polygon points="280,186 214,174 214,198" /><polygon points="280,186 330,138 314,128" />'
+            + '<polygon points="280,186 230,138 246,128" /><polygon points="280,186 330,234 314,244" />'
+            + '<polygon points="280,186 230,234 246,244" />'
+            + '</g>'
+            // conjunto (sombra + objeto) escalado junto para que la sombra concuerde
+            + '<g class="rn3d-obra__conjunto">'
+            +   '<ellipse class="rn3d-obra__sombra" cx="280" cy="302" rx="132" ry="22"/>'
+            +   '<g class="rn3d-obra__objeto">' + escena.svg + '</g>'
+            + '</g>'
+            // chispas del color del ambiente
+            + '<g class="rn3d-obra__chispas">'
+            + '<circle class="rn3d-chispa rn3d-chispa--a" cx="210" cy="150" r="6"/>'
+            + '<circle class="rn3d-chispa rn3d-chispa--b" cx="360" cy="140" r="5"/>'
+            + '<circle class="rn3d-chispa rn3d-chispa--c" cx="330" cy="100" r="4"/>'
+            + '<circle class="rn3d-chispa rn3d-chispa--d" cx="236" cy="104" r="5"/>'
             + '</g>'
             + '</svg>'
-            + '<p class="rn3d-obra__texto">Construyendo el mapa<span class="rn3d-obra__puntos"><i></i><i></i><i></i></span></p>'
+            + '<p class="rn3d-obra__texto">' + escena.titulo + '<span class="rn3d-obra__puntos"><i></i><i></i><i></i></span></p>'
             + '</div>';
         ctx.$paso[0].appendChild(el);
     }

@@ -7,10 +7,10 @@ window.INTRO_CONFIG = {
 
     // Nombres de los tracks NLA del GLB nuevo. Cambia el string si quieres otro gesto.
     clips: {
-        caminar: ["WALK"],
-        quieto: ["IDLE"],
-        hablar: ["TALK"],
-        saludar: ["HELLO"]
+        caminar: ["Caminar"],
+        quieto: ["Quieto"],
+        hablar: ["Hablar"],
+        saludar: ["Saludar"]
     },
 
     personajes: [

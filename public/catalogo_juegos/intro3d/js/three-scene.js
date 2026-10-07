@@ -1319,10 +1319,10 @@ function crearActor(def) {
 
                 actor.mixer = mixer;
                 const clips = CONFIG.clips || {};
-                actor.caminar = tomarClip(actions, def.caminar || clips.caminar || ["WALK"]);
-                actor.idle = tomarClip(actions, def.idle || clips.quieto || ["IDLE"]);
+                actor.caminar = tomarClip(actions, def.caminar || clips.caminar || ["Caminar"]);
+                actor.idle = tomarClip(actions, def.idle || clips.quieto || ["Quieto"]);
 
-                (def.gestos || clips.hablar || ["TALK"]).forEach((nombre) => {
+                (def.gestos || clips.hablar || ["Hablar"]).forEach((nombre) => {
                     const gesto = tomarClip(actions, [nombre]);
                     if (gesto && actor.gestos.indexOf(gesto) < 0) actor.gestos.push(gesto);
                 });

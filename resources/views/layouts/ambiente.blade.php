@@ -78,6 +78,9 @@
         </style>
     @endif
     @stack('styles')
+    @if (request()->routeIs('ambiente.inicio'))
+        <link rel="preload" as="image" href="{{ asset('assets/images/selector-aula/fondo.png') }}">
+    @endif
 </head>
 
 <body>
