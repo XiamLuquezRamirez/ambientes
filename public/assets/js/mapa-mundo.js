@@ -242,6 +242,8 @@ class Fauna {
         this.scene = scene;
         this.lista = [];
         this.bandadas = new Map();
+        this.ondas = [];
+        this.esperaSalto = rnd(2.5, 6);
         this.h = mapa.alturas;
         this.obstaculos = [];
         this.lagos = [];
@@ -308,13 +310,40 @@ class Fauna {
             a.bandada = this.bandadas.get(k);
             a.off = new THREE.Vector3(x - a.bandada.cx, y - a.bandada.y, z - a.bandada.cz);
         }
-        if (nombre === 'pato' && this.lagos.length) {
+        if ((nombre === 'pato' || nombre.startsWith('pez_')) && this.lagos.length) {
             const lago = this.lagos.reduce((b, l) => (
                 !b || Math.hypot(l.x - x, l.z - z) < Math.hypot(b.x - x, b.z - z) ? l : b
             ), null);
-            a.lago = lago;
-            a.radio = Math.hypot(x - lago.x, z - lago.z);
-            a.ang = Math.atan2(z - lago.z, x - lago.x);
+            const dist = Math.hypot(x - lago.x, z - lago.z);
+            if (nombre === 'pato' || dist <= lago.r + 1) {
+                a.lago = lago;
+                a.radio = Math.max(0.6, dist);
+                a.ang = Math.atan2(z - lago.z, x - lago.x);
+            }
+        }
+        if (nombre.startsWith('pez_')) {
+            const clips = modelo.animations || [];
+            const nadarClip = clips.find((c) => c.name === 'nadar');
+            const saltoClip = clips.find((c) => c.name === 'saltar');
+            if (nadarClip || saltoClip) {
+                const mixer = new THREE.AnimationMixer(o);
+                if (nadarClip) {
+                    const acc = mixer.clipAction(nadarClip);
+                    acc.setLoop(THREE.LoopRepeat, Infinity);
+                    acc.play();
+                    a.accNadar = acc;
+                }
+                if (saltoClip) {
+                    const acc = mixer.clipAction(saltoClip);
+                    acc.setLoop(THREE.LoopOnce, 1);
+                    acc.clampWhenFinished = true;
+                    a.accSalto = acc;
+                    a.durSalto = saltoClip.duration || 1.2;
+                }
+                a.mixer = mixer;
+                a.nodoPez = o.getObjectByName('pez');
+                a.saltando = false;
+            }
         }
         this.lista.push(a);
     }
@@ -335,13 +364,114 @@ class Fauna {
     }
 
     update(dt, t) {
+        this.actualizarOndas(dt);
+        let haySalto = false;
         for (const a of this.lista) {
             if (a.fijo) continue;
+            if (a.mixer) a.mixer.update(dt);
+            if (a.saltando && a.accSalto && a.accSalto.time >= a.durSalto - 0.04) this.caerPez(a);
+            if (a.saltando) haySalto = true;
             const T = TIPOS[a.nombre];
             if (T) this.caminar(a, T, dt);
             else if (a.bandada) this.volar(a, t);
             else if ((a.nombre === 'pato' || a.nombre.startsWith('pez_')) && a.lago) this.nadar(a, dt, t);
             else if (a.nombre === 'mariposa') this.revolotear(a, t);
+        }
+        if (!haySalto) {
+            this.esperaSalto -= dt;
+            if (this.esperaSalto <= 0) this.lanzarSalto();
+        }
+    }
+
+    lanzarSalto() {
+        const peces = this.lista.filter((a) => a.accSalto && a.lago && !a.fijo && !a.saltando && a.o.visible);
+        if (!peces.length) {
+            this.esperaSalto = rnd(2, 4);
+            return;
+        }
+        const a = peces[(Math.random() * peces.length) | 0];
+        if (a.accNadar) a.accNadar.fadeOut(0.1);
+        a.accSalto.reset().fadeIn(0.06).play();
+        a.saltando = true;
+        this.esperaSalto = rnd(3.5, 8);
+    }
+
+    caerPez(a) {
+        if (!a.saltando) return;
+        a.saltando = false;
+        const pos = new THREE.Vector3();
+        if (a.nodoPez) a.nodoPez.getWorldPosition(pos);
+        else a.o.getWorldPosition(pos);
+        const yAgua = a.lago ? a.lago.y + 0.101 * (a.lago.r / 5) + 0.05 : pos.y;
+        this.ondaAgua(pos.x, yAgua, pos.z);
+        if (a.accSalto) a.accSalto.stop();
+        if (a.nodoPez) {
+            a.nodoPez.position.set(0, 0, 0);
+            a.nodoPez.quaternion.identity();
+            a.nodoPez.updateMatrix();
+        }
+        if (a.lago) {
+            const dx = pos.x - a.lago.x;
+            const dz = pos.z - a.lago.z;
+            a.radio = Math.min(Math.max(0.8, Math.hypot(dx, dz)), a.lago.r * 0.85);
+            a.ang = Math.atan2(dz, dx);
+        }
+        if (a.accNadar) a.accNadar.reset().fadeIn(0.15).play();
+    }
+
+    ondaAgua(x, y, z) {
+        const grupo = new THREE.Group();
+        grupo.position.set(x, y, z);
+        grupo.rotation.x = -Math.PI / 2;
+        const anillos = [];
+        for (let i = 0; i < 3; i++) {
+            const geo = new THREE.RingGeometry(0.28, 0.4, 24);
+            const mat = new THREE.MeshBasicMaterial({
+                color: i === 0 ? 0xf7fbff : 0x8fd4ea,
+                transparent: true,
+                opacity: 0,
+                side: THREE.DoubleSide,
+                depthWrite: false,
+            });
+            const m = new THREE.Mesh(geo, mat);
+            m.renderOrder = 2;
+            grupo.add(m);
+            anillos.push({ m, mat, retraso: i * 0.14 });
+        }
+        this.scene.add(grupo);
+        this.ondas.push({ grupo, anillos, vida: 0, dur: 1.05 });
+    }
+
+    actualizarOndas(dt) {
+        for (let i = this.ondas.length - 1; i >= 0; i--) {
+            const onda = this.ondas[i];
+            onda.vida += dt;
+            let viva = false;
+            for (const anillo of onda.anillos) {
+                const k = (onda.vida - anillo.retraso) / onda.dur;
+                if (k <= 0) {
+                    anillo.m.visible = false;
+                    viva = true;
+                    continue;
+                }
+                if (k >= 1) {
+                    anillo.m.visible = false;
+                    continue;
+                }
+                viva = true;
+                anillo.m.visible = true;
+                const s = 0.35 + k * 3.1;
+                anillo.m.scale.setScalar(s);
+                anillo.mat.opacity = (1 - k) * (1 - k) * 0.72;
+            }
+            if (!viva) {
+                this.scene.remove(onda.grupo);
+                onda.anillos.forEach((anillo) => {
+                    anillo.m.geometry.dispose();
+                    anillo.mat.dispose();
+                });
+                this.ondas.splice(i, 1);
+            }
         }
     }
 
@@ -391,6 +521,7 @@ class Fauna {
     }
 
     nadar(a, dt, t) {
+        if (a.saltando) return;
         a.ang += dt * 0.35 / Math.max(1.5, a.radio);
         const x = a.lago.x + Math.cos(a.ang) * a.radio;
         const z = a.lago.z + Math.sin(a.ang) * a.radio;
@@ -416,6 +547,14 @@ class Fauna {
 
     destruir() {
         this.lista.forEach((a) => this.scene.remove(a.o));
+        this.ondas.forEach((onda) => {
+            this.scene.remove(onda.grupo);
+            onda.anillos.forEach((anillo) => {
+                anillo.m.geometry.dispose();
+                anillo.mat.dispose();
+            });
+        });
+        this.ondas = [];
         this.lista = [];
         this.bandadas.clear();
     }

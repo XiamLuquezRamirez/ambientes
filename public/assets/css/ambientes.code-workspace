@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../../../../files"
+		},
+		{
+			"path": "../../../../control_acceso"
 		}
 	],
 	"settings": {}
