@@ -35,9 +35,9 @@
         <div class="bienambiente-mensaje">
             <h1 class="bienambiente-texto">¡Acompáñame al ambiente {{ $ambiente->nombre }}!</h1>
             <div class="bienambiente-estrellas" aria-hidden="true">
-                <i class="fa-solid fa-star" style="--delay: .35s"></i>
-                <i class="fa-solid fa-star" style="--delay: .5s"></i>
-                <i class="fa-solid fa-star" style="--delay: .65s"></i>
+                <span class="bienambiente-estrella bienambiente-estrella--izq" style="--delay: .35s"></span>
+                <span class="bienambiente-estrella bienambiente-estrella--centro" style="--delay: .5s"></span>
+                <span class="bienambiente-estrella bienambiente-estrella--der" style="--delay: .65s"></span>
             </div>
         </div>
     </div>

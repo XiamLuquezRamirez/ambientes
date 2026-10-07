@@ -131,16 +131,41 @@
     animation: kiosco-aparecer .5s ease .2s both;
 }
 
+/*
+ * estrellas.png (1063×501) trae las tres estrellas juntas; la caja es la zona visible (x 128–934,
+ * y 36–464) y cada capa es la imagen completa recortada con clip-path a una estrella, para que
+ * aparezcan por separado. Los cortes siguen los huecos medidos entre estrellas.
+ */
 .bienambiente-estrellas {
-    display: flex;
-    gap: 1.9cqw;
-    font-size: 4cqw;
-    color: #fbc531;
+    position: relative;
+    width: 15cqw;
+    aspect-ratio: 806 / 428;
 }
 
-.bienambiente-estrellas i {
+.bienambiente-estrella {
+    position: absolute;
+    left: -15.881%;
+    top: -8.411%;
+    width: 131.886%;
+    height: 117.056%;
+    background: url("../images/vista_nino/estrellas.png") center / 100% 100% no-repeat;
     opacity: 0;
     animation: kiosco-estrella .5s ease var(--delay, 0s) forwards;
+}
+
+.bienambiente-estrella--izq {
+    transform-origin: 23% 64%;
+    clip-path: polygon(0 0, 31.99% 0, 31.99% 40.92%, 33.87% 40.92%, 38.48% 100%, 0 100%);
+}
+
+.bienambiente-estrella--centro {
+    transform-origin: 47.7% 39%;
+    clip-path: polygon(31.99% 0, 66.98% 0, 66.98% 44.91%, 66.6% 44.91%, 58.8% 100%, 38.48% 100%, 33.87% 40.92%, 31.99% 40.92%);
+}
+
+.bienambiente-estrella--der {
+    transform-origin: 75.9% 64%;
+    clip-path: polygon(66.98% 0, 100% 0, 100% 100%, 58.8% 100%, 66.6% 44.91%, 66.98% 44.91%);
 }
 
 /* ── Armado en rompecabezas (piezas creadas por kiosco-bienvenida.js) ── */
@@ -220,7 +245,7 @@
     animation: none !important;
 }
 
-.bpz-lienzo .bienambiente-estrellas i {
+.bpz-lienzo .bienambiente-estrella {
     opacity: 1;
 }
 
@@ -263,7 +288,7 @@
     .bienambiente-hola,
     .bienambiente-ficha,
     .bienambiente-texto,
-    .bienambiente-estrellas i {
+    .bienambiente-estrella {
         opacity: 1;
         animation: none;
     }
