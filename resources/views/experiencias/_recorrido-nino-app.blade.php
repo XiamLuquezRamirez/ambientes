@@ -60,7 +60,12 @@
     data-url-continuar="{{ $urlContinuar ?? '' }}"
     data-url-juegos-catalogo="{{ $urlJuegosCatalogo ?? url('/juegos-catalogo') }}"
     data-portada-img="{{ $portadaImg }}"
-    data-fondo-img="{{ $fondoImg }}">
+    data-fondo-img="{{ $fondoImg }}"
+    data-fondo-elegir-img="{{ $fondoElegirImg ?? '' }}"
+    data-tarjeta-explorar="{{ $tarjetaExplorarImg ?? '' }}"
+    data-tarjeta-jugar="{{ $tarjetaJugarImg ?? '' }}"
+    data-tarjeta-explorar-reverso="{{ $tarjetaExplorarReversoImg ?? '' }}"
+    data-tarjeta-jugar-reverso="{{ $tarjetaJugarReversoImg ?? '' }}">
     <script type="application/json" id="rn-arbol">@json($arbol)</script>
     <template id="rnBotonIniciar">{!! file_get_contents(public_path('assets/images/vista_nino/boton_iniciar.svg')) !!}</template>
     @if (!empty($camino))

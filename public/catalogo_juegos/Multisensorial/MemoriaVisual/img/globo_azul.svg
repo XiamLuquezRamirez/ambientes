@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" role="img" aria-label="Globo azul con estrellas">
+  <defs>
+    <pattern id="p-azul" width="44" height="44" patternUnits="userSpaceOnUse">
+      <polygon points="12,2 15,9 22,9 16.5,14 18.5,21 12,17 5.5,21 7.5,14 2,9 9,9" fill="#fff" opacity="0.65"/>
+      <polygon points="34,24 37,31 44,31 38.5,36 40.5,43 34,39 27.5,43 29.5,36 24,31 31,31" fill="#fff" opacity="0.65"/>
+    </pattern>
+  </defs>
+  <path d="M100 214 C88 230 112 242 100 258" fill="none" stroke="#6d6d6d" stroke-width="3" stroke-linecap="round"/>
+  <path d="M92 214 L100 202 L108 214 Z" fill="#0d47a1"/>
+  <path d="M100 10 C150 10 180 50 180 100 C180 160 130 200 100 205 C70 200 20 160 20 100 C20 50 50 10 100 10 Z" fill="#1e88e5"/>
+  <path d="M100 10 C150 10 180 50 180 100 C180 160 130 200 100 205 C70 200 20 160 20 100 C20 50 50 10 100 10 Z" fill="url(#p-azul)"/>
+  <ellipse cx="65" cy="60" rx="16" ry="28" fill="#fff" opacity="0.4" transform="rotate(25 65 60)"/>
+</svg>

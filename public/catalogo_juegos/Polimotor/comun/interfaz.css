@@ -40,7 +40,9 @@
   background-image: url("../img/repetir.png");
 }
 
-.hud-nav .btn-round.btn[onclick*="history.back"]::before {
+/* El kiosco (banco-juegos.js) quita el onclick y deja data-salir. */
+.hud-nav .btn-round.btn[onclick*="history.back"]::before,
+.hud-nav .btn-round.btn[data-salir]::before {
   background-image: url("../img/volver.png");
 }
 

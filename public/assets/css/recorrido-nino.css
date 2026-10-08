@@ -1192,6 +1192,98 @@
     transition: opacity .4s ease;
 }
 
+/* --- Fondo ilustrado del paso ({slug}2.png): mismo encuadre que la portada.
+   El título ya viene pintado en la franja superior del PNG (~22% del alto). --- */
+.rn-elegir--con-fondo {
+    grid-template-rows: 22% minmax(0, 1fr);
+}
+
+.rn-elegir--con-fondo .rn-elegir-fondo {
+    background-color: #f6dfb8;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: center;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    cursor: default;
+}
+
+.rn-elegir--con-fondo .rn-elegir-panel {
+    grid-row: 2;
+    align-self: center;
+}
+
+.rn-elegir--con-fondo .rn-elegir-titulo {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* --- Tarjetas sticker (explorar.png / jugar.png, 1:1 con fondo transparente) --- */
+.rn-elegir--stickers .rn-elegir-opciones {
+    gap: clamp(16px, 6vw, 96px);
+}
+
+.rn-elegir--stickers .rn-elegir-btn {
+    flex: 0 0 auto;
+    width: min(42vw, 64vh, 500px);
+    max-width: none;
+    min-height: 0;
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
+.rn-elegir--stickers .rn-card3d {
+    min-height: 0;
+}
+
+.rn-elegir--stickers .rn-card3d-frente {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    justify-content: center;
+}
+
+.rn-sticker-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 14px 18px rgba(15, 23, 42, .22));
+}
+
+/* Reverso: el círculo del sticker (≈60% centrado algo arriba) en su color. */
+.rn-elegir--stickers .rn-card3d-reverso {
+    inset: 16% 20% 24%;
+    border-radius: 50%;
+    border-width: 8px;
+}
+
+.rn-elegir--stickers .rn-elegir-btn--clase .rn-card3d-reverso {
+    background: radial-gradient(circle at 50% 40%, #5aa9e6, #1d6fb8);
+}
+
+.rn-elegir--stickers .rn-elegir-btn--jugar .rn-card3d-reverso {
+    background: radial-gradient(circle at 50% 40%, #a35bc4, #66237f);
+}
+
+/* Reverso ilustrado ({nombre}-reverso.png): el círculo ocupa el 85% del PNG,
+   así que la caja (69.5%) hace coincidir su círculo con el del frente. */
+.rn-elegir--stickers .rn-elegir-btn .rn-card3d-reverso.rn-card3d-reverso--img {
+    inset: 8.7% 15.3% 21.8%;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    overflow: visible;
+}
+
 @keyframes rn-v2-flota {
 
     0%,

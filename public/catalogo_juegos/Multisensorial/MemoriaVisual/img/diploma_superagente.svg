@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" role="img" aria-label="Diploma Superagente de la Memoria Visual">
+  <rect x="6" y="6" width="408" height="288" rx="18" fill="#fff8e1" stroke="#6a1b9a" stroke-width="10"/>
+  <rect x="24" y="24" width="372" height="252" rx="10" fill="none" stroke="#ffb300" stroke-width="4" stroke-dasharray="12 6"/>
+  <text x="210" y="70" text-anchor="middle" font-family="Fredoka, Arial, sans-serif" font-weight="700" font-size="26" fill="#6a1b9a">DIPLOMA DE AGENTE</text>
+  <text x="210" y="112" text-anchor="middle" font-family="Fredoka, Arial, sans-serif" font-weight="600" font-size="16" fill="#5d4037">Museo M&#225;gico certifica que eres</text>
+  <text x="210" y="160" text-anchor="middle" font-family="Fredoka, Arial, sans-serif" font-weight="700" font-size="28" fill="#1565c0">SUPERAGENTE</text>
+  <text x="210" y="192" text-anchor="middle" font-family="Fredoka, Arial, sans-serif" font-weight="700" font-size="20" fill="#1565c0">DE LA MEMORIA VISUAL</text>
+  <circle cx="330" cy="236" r="34" fill="#ffb300"/>
+  <polygon points="330,212 337,229 355,229 341,240 346,258 330,247 314,258 319,240 305,229 323,229" fill="#fff"/>
+  <path d="M310 266 L300 296 L318 286 L326 300 L330 270 Z" fill="#e53935"/>
+  <path d="M60 246 L190 246" stroke="#5d4037" stroke-width="2"/>
+  <text x="125" y="266" text-anchor="middle" font-family="Fredoka, Arial, sans-serif" font-size="13" fill="#5d4037">Zoe y Zeus</text>
+</svg>

@@ -5,12 +5,13 @@
         "mostrarFeedBack": true,
         "altoContraste": false,
         "mostrarIntro": true,
-        "verBotonVerDeNuevo": true,
-        "mostrarProgreso": true,
-        "cuentaRegresiva": true,
+        "verBotonRepetir": true,
+        "barraTiempo": true,
         "animaciones_opciones": true,
         "mostrarNombres": true,
-        "respuestasMaximasAntesDeAtenuar": 2,
+        "mostrarProgreso": true,
+        "efectosSonido": true,
+        "erroresAntesDePista": 2,
         "tamanoImagen": 130,
         "tamanoImagenOpcion": 110,
         "tamanoLetraBotones": 22,
@@ -21,38 +22,30 @@
     },
     "textos": {
         "eligeNivel": "Elige tu edad",
-        "observa": "¡Vamos a jugar! Observa muy bien los objetos y trata de recordarlos.",
-        "memoriza": "Observa muy bien los objetos.",
-        "seOcultan": "Los objetos se esconderán en...",
-        "preguntaNuevo": "¿Cuál objeto no estaba antes?",
-        "preguntaFalta": "¿Cuál objeto falta?",
-        "preguntaCambio": "Observa muy bien. ¿Qué objetos cambiaron de lugar?",
-        "aciertoNuevo": "¡Muy bien! Recordaste los objetos.",
-        "aciertoFalta": "¡Excelente! Recordaste cuál objeto faltaba.",
-        "aciertoCambio": "¡Excelente! Recordaste dónde estaban los objetos.",
-        "errorObjetos": "¡Inténtalo otra vez! Recuerda los objetos que viste.",
-        "errorCambio": "¡Inténtalo otra vez! Recuerda dónde estaba cada objeto.",
-        "cierre": "¡Excelente! Recordaste todos los objetos.",
         "demostracion": "¡Mira cómo se juega! Primero observa los objetos.",
-        "demostracionFin": "¡Ahora te toca a ti! Observa muy bien los objetos.",
+        "preguntaDemo": "¿Cuál objeto no estaba antes?",
+        "demostracionFin": "¡Ahora te toca a ti! Observa muy bien.",
         "conversacion": [
             {
                 "personaje": 0,
-                "texto": "¡Hola! Soy Zeus. ¡Hoy vamos a jugar con nuestra memoria!"
+                "texto": "¡Hola! Soy Zeus. ¡Hoy seremos detectives de la memoria!"
             },
             {
                 "personaje": 1,
-                "texto": "¡Hola! Yo soy Zoe.<br>Te mostraremos unos objetos durante unos segundos. Míralos con mucha atención."
+                "texto": "¡Hola! Yo soy Zoe.<br>Te mostraremos unos objetos por unos segundos. Míralos con mucha atención."
             },
             {
                 "personaje": 0,
-                "texto": "Después los objetos se esconderán.<br>Cuando vuelvan a aparecer, te haremos una pregunta."
+                "texto": "Después algo va a cambiar.<br>¡Tendrás que descubrir qué pasó!"
             },
             {
                 "personaje": 1,
-                "texto": "¡Tú puedes hacerlo!<br>Si no recuerdas los objetos, pulsa el botón del ojo y te los volvemos a mostrar."
+                "texto": "¡Tú puedes hacerlo!<br>Si quieres escuchar otra vez la pregunta, toca el botón de la oreja."
             }
-        ]
+        ],
+        "retoDefecto": {
+            "pista": { "texto": "¡Te ayudo! Mira el que brilla.", "personaje": "zoe" }
+        }
     },
     "audios": {
         "acierto": "../../sounds/ok.mp3",
@@ -60,66 +53,250 @@
         "cierre": "../../sounds/victory.mp3",
         "fondo": "../../sounds/fondo.mp3"
     },
+    "guias": {
+        "zoe": "../../img/zoe_normal.gif",
+        "zeus": "../../img/zeus_normal.gif"
+    },
     "objetos": {
-        "manzana": { "nombre": "Manzana", "img": "img/manzana.png" },
-        "pelota": { "nombre": "Pelota", "img": "img/pelota.svg" },
-        "carro": { "nombre": "Carro", "img": "img/carro.png" },
-        "oso": { "nombre": "Oso de peluche", "img": "img/oso.png" },
-        "estrella": { "nombre": "Estrella", "img": "img/estrella.png" },
-        "pez": { "nombre": "Pez", "img": "img/pez.png" },
-        "flor": { "nombre": "Flor", "img": "img/flor.png" },
-        "sol": { "nombre": "Sol", "img": "img/sol.png" }
+        "manzana": { "nombre": "Manzana", "genero": "f", "img": "img/manzana.png" },
+        "pelota": { "nombre": "Pelota", "genero": "f", "img": "img/pelota.svg" },
+        "carro": { "nombre": "Carro", "genero": "m", "img": "img/carro.png" },
+        "oso": { "nombre": "Oso de peluche", "hablado": "oso", "genero": "m", "img": "img/oso.png" },
+        "estrella": { "nombre": "Estrella", "genero": "f", "img": "img/estrella.png" },
+        "pez": { "nombre": "Pez", "genero": "m", "img": "img/pez.png" },
+        "flor": { "nombre": "Flor", "genero": "f", "img": "img/flor.png" },
+        "sol": { "nombre": "Sol", "genero": "m", "img": "img/sol.png" },
+        "pato": { "nombre": "Pato", "genero": "m", "img": "img/pato.png" },
+        "dinosaurio": { "nombre": "Dino", "hablado": "dinosaurio", "genero": "m", "img": "img/dinosaurio.png" },
+        "tambor": { "nombre": "Tambor", "genero": "m", "img": "img/tambor.svg" },
+        "conejo": { "nombre": "Conejo", "genero": "m", "img": "img/conejo.png" },
+        "gato": { "nombre": "Gato", "genero": "m", "img": "img/gato.png" },
+        "perro": { "nombre": "Perro", "genero": "m", "img": "img/perro.png" },
+        "tortuga": { "nombre": "Tortuga", "genero": "f", "img": "img/tortuga.png" },
+        "zanahoria": { "nombre": "Zanahoria", "genero": "f", "img": "img/zanahoria.png" },
+        "rana": { "nombre": "Rana", "genero": "f", "img": "img/rana.png" },
+        "globo_rojo": { "nombre": "Globo rojo", "genero": "m", "color": "rojo", "img": "img/globo_rojo.svg" },
+        "globo_amarillo": { "nombre": "Globo amarillo", "genero": "m", "color": "amarillo", "img": "img/globo_amarillo.svg" },
+        "globo_azul": { "nombre": "Globo azul", "genero": "m", "color": "azul", "img": "img/globo_azul.svg" },
+        "globo_verde": { "nombre": "Globo verde", "genero": "m", "color": "verde", "img": "img/globo_verde.svg" },
+        "globo_morado": { "nombre": "Globo morado", "genero": "m", "color": "morado", "img": "img/globo_morado.svg" }
+    },
+    "grupos": {
+        "cosas": ["manzana", "pelota", "carro", "oso", "estrella", "pez", "flor", "sol"],
+        "juguetes": ["pato", "dinosaurio", "tambor", "pelota", "oso", "carro"],
+        "extras": ["conejo", "gato", "perro", "tortuga", "zanahoria", "rana"],
+        "globos": ["globo_rojo", "globo_amarillo", "globo_azul", "globo_verde", "globo_morado"],
+        "baldosas": ["flor", "estrella", "manzana", "sol", "pez", "pelota"],
+        "tesoros": ["manzana", "pelota", "carro", "oso", "estrella", "pez", "flor", "sol", "pato", "dinosaurio", "tambor"]
+    },
+    "retos": {
+        "mochila": {
+            "mecanica": "intruso",
+            "titulo": "¡El intruso en la mochila!",
+            "escena": "picnic",
+            "grupo": "cosas",
+            "entrada": "nombrando",
+            "sonidoEntrada": "pop",
+            "observacionMs": 7000,
+            "ocultamiento": "mochila",
+            "ocultamientoMs": 3000,
+            "efectoAcierto": "globo",
+            "efectoError": "vibrar",
+            "sonidoError": "neutro",
+            "celebranGuias": true,
+            "reaccion": { "personaje": "zoe", "clip": ["Saltar", "Celebrar"] },
+            "textos": {
+                "intro": { "texto": "¡Hola! Vamos a guardar nuestras cosas en la mochila. ¡Mira bien!", "personaje": "zoe" },
+                "observacion": { "texto": "Guardamos {lista}", "personaje": "zoe" },
+                "nombrarPrimero": { "texto": "Guardamos {objeto}...", "personaje": "zoe" },
+                "nombrarSiguiente": { "texto": "{objeto}...", "personaje": "zoe" },
+                "nombrarUltimo": { "texto": "¡y {objeto}!", "personaje": "zoe" },
+                "pregunta": { "texto": "¡Oh no! Un intruso se metió en la mochila. ¿Cuál de estos objetos no habíamos guardado?", "personaje": "zoe" },
+                "acierto": { "texto": "¡Fantástico! {Objeto} no estaba en la mochila.", "personaje": "zoe" },
+                "error": { "texto": "Mmm, {objeto} sí {lo} guardamos. ¡Busca el objeto nuevo!", "personaje": "zoe" }
+            }
+        },
+        "hoja": {
+            "mecanica": "oculto",
+            "titulo": "¿Quién se escondió?",
+            "escena": "arbol",
+            "grupo": "juguetes",
+            "grupoOpciones": ["juguetes", "extras"],
+            "cubrirCon": "hoja",
+            "llamarAtencion": true,
+            "observacionMs": 7000,
+            "ocultamiento": "ninguno",
+            "ocultamientoMs": 1600,
+            "sonidoOcultamiento": "hoja",
+            "efectoAcierto": "hojaVuela",
+            "efectoError": "hojaSacude",
+            "sonidoError": "neutro",
+            "textos": {
+                "observacion": { "texto": "¡Mira a nuestros amigos juguetes! Míralos muy bien.", "personaje": "zeus" },
+                "pregunta": { "texto": "¡Uy! Una hoja tapó a un amigo. ¿Quién se escondió debajo de la hoja?", "personaje": "zoe" },
+                "acierto": { "texto": "¡Lo encontraste! Era {objeto}.", "personaje": "zoe" },
+                "error": { "texto": "¡Ese no es! Recuerda quién estaba jugando ahí.", "personaje": "zoe" }
+            }
+        },
+        "globos": {
+            "mecanica": "transformacion",
+            "titulo": "El toque mágico",
+            "escena": "globos",
+            "grupo": "globos",
+            "sinMarco": true,
+            "zeusSostiene": true,
+            "observacionMs": 7000,
+            "ocultamiento": "nube",
+            "ocultamientoMs": 2000,
+            "sonidoOcultamiento": "puff",
+            "efectoAcierto": "confeti",
+            "efectoError": "estirar",
+            "sonidoError": "goma",
+            "reaccion": { "personaje": "zeus", "clip": ["Reir", "Celebrar"] },
+            "textos": {
+                "observacion": { "texto": "¡Mira los globos de Zeus! {Colores}.", "personaje": "zoe" },
+                "pregunta": { "texto": "¡Rayos de sol! La nube mágica cambió un globo de color. ¿Cuál es el globo que cambió?", "personaje": "zeus" },
+                "acierto": { "texto": "¡Sí! Ese globo era {antes} y cambió a {despues}.", "personaje": "zeus" },
+                "error": { "texto": "Ese globo no cambió, sigue siendo {color}. ¡Busca el color nuevo!", "personaje": "zoe" }
+            }
+        },
+        "caminito": {
+            "mecanica": "secuencia",
+            "titulo": "El caminito de las estrellas",
+            "escena": "caminito",
+            "grupo": "baldosas",
+            "zeusCamina": true,
+            "encendidoMs": 1000,
+            "ocultamiento": "ninguno",
+            "ocultamientoMs": 800,
+            "efectoError": "vibrar",
+            "sonidoError": "neutro",
+            "textos": {
+                "intro": { "texto": "¡Zeus quiere llegar al picnic! Mira qué piedras se encienden y recuerda el orden.", "personaje": "zoe" },
+                "pregunta": { "texto": "¡Para ayudar a Zeus, toca las piedras en el mismo orden!", "personaje": "zoe" },
+                "acierto": { "texto": "¡Lo lograste! Zeus llegó al picnic.", "personaje": "zeus" },
+                "error": { "texto": "¡Esa no era! Recuerda qué piedra se encendió.", "personaje": "zoe" },
+                "pista": { "texto": "¡Te ayudo! Mira la piedra que brilla.", "personaje": "zoe" }
+            }
+        },
+        "vitrina": {
+            "mecanica": "intruso",
+            "titulo": "¡El intruso en la vitrina del museo!",
+            "escena": "museo",
+            "conjunto": "tesoros",
+            "grupoIntruso": "tesoros",
+            "conservarOrden": true,
+            "entrada": "destello",
+            "recorrido": true,
+            "tictac": true,
+            "observacionMs": 6000,
+            "ocultamiento": "cortina",
+            "ocultamientoMs": 2500,
+            "sonidoOcultamiento": "puff",
+            "efectoAcierto": "burbuja",
+            "efectoError": "marco",
+            "sonidoError": "neutro",
+            "textos": {
+                "intro": { "texto": "¡Bienvenido al Museo Mágico, Agente! Tu primera misión es memorizar los {n} tesoros de la vitrina.", "personaje": "zoe" },
+                "pregunta": { "texto": "¡Alerta de seguridad! Un objeto misterioso se coló en la vitrina. Toca el objeto intruso que no estaba antes.", "personaje": "zeus" },
+                "acierto": { "texto": "¡Atrapaste al intruso, Agente! ¡Excelente memoria!", "personaje": "zoe" },
+                "error": { "texto": "Ese tesoro sí estaba en la vitrina. ¡Observa con atención y busca el objeto nuevo!", "personaje": "zoe" }
+            }
+        },
+        "desaparecido": {
+            "mecanica": "oculto",
+            "titulo": "El misterio del tesoro desaparecido",
+            "escena": "museo",
+            "conjunto": "tesoros",
+            "grupoOpciones": "tesoros",
+            "cubrirCon": "humo",
+            "entrada": "destello",
+            "opciones": 4,
+            "observacionMs": 5000,
+            "ocultamiento": "apagon",
+            "ocultamientoMs": 3000,
+            "efectoAcierto": "aparece",
+            "efectoError": "vibrar",
+            "sonidoError": "neutro",
+            "textos": {
+                "intro": { "texto": "¡Cuidado! Un ladrón de sombras ronda por aquí. Memoriza los {n} tesoros otra vez.", "personaje": "zeus" },
+                "pregunta": { "texto": "¡Oh no, se llevaron un tesoro! Revisa tu cinturón de herramientas y toca el objeto que falta en la vitrina.", "personaje": "zoe" },
+                "acierto": { "texto": "¡Rescataste {objeto}! ¡Eres un detective experto!", "personaje": "zoe" },
+                "error": { "texto": "Ese objeto no estaba antes en la vitrina. ¡Piensa qué tesoro nos falta!", "personaje": "zeus" }
+            }
+        },
+        "posiciones": {
+            "mecanica": "intercambio",
+            "titulo": "Las posiciones cambiadas",
+            "escena": "museo",
+            "conjunto": "tesoros",
+            "numerar": true,
+            "recorrido": true,
+            "observacionMs": 6000,
+            "ocultamiento": "humo",
+            "ocultamientoMs": 3000,
+            "sonidoOcultamiento": "arrastre",
+            "efectoAcierto": "intercambiar",
+            "efectoError": "vibrar",
+            "sonidoError": "no",
+            "textos": {
+                "intro": { "texto": "¡El último reto! Esta vez debes recordar dónde está colocado cada objeto. ¡Mira el orden de izquierda a derecha!", "personaje": "zoe" },
+                "pregunta": { "texto": "¡El viento mágico movió las cosas! Dos objetos cambiaron de posición. Toca los dos objetos que se movieron de su lugar.", "personaje": "zeus" },
+                "acierto": { "texto": "¡Increíble! Descubriste los dos objetos movidos.", "personaje": "zoe" },
+                "error": { "texto": "{Objeto} sigue en su lugar. ¡Busca los dos que intercambiaron posiciones!", "personaje": "zoe" },
+                "pista": { "texto": "¡Te ayudo! Mira los que brillan.", "personaje": "zoe" }
+            }
+        }
     },
     "niveles": [
         {
             "id": "3",
             "edad": "3 años",
-            "titulo": "3 objetos",
-            "tiempoMemoria": 5000,
-            "pausaOculto": 1500,
+            "titulo": "4 retos · 3 objetos",
+            "progreso": { "icono": "fa-medal" },
+            "pista": "automatica",
+            "cierre": "¡Eres un Superdetective de la Memoria!",
+            "premio": { "tipo": "medalla", "img": "img/medalla_superdetective.svg" },
             "demo": { "objetos": ["sol", "flor"], "nuevo": "estrella" },
-            "rondas": [
-                { "tipo": "nuevo", "objetos": ["manzana", "pelota", "carro"], "nuevo": "oso" }
+            "retos": [
+                { "ref": "mochila", "cantidad": 3 },
+                { "ref": "hoja", "cantidad": 3, "opciones": 3 },
+                { "ref": "globos", "cantidad": 3 },
+                { "ref": "caminito", "cantidad": 3, "largo": 2 }
             ]
         },
         {
             "id": "4",
             "edad": "4 años",
-            "titulo": "4 objetos",
-            "tiempoMemoria": 5000,
-            "pausaOculto": 1500,
-            "demo": { "objetos": ["sol", "flor"], "nuevo": "pez" },
-            "rondas": [
-                { "tipo": "nuevo", "objetos": ["manzana", "pelota", "carro", "oso"], "nuevo": "estrella" }
+            "titulo": "4 retos · 4 objetos",
+            "progreso": { "icono": "fa-medal" },
+            "pista": "automatica",
+            "cierre": "¡Eres un Superdetective de la Memoria!",
+            "premio": { "tipo": "medalla", "img": "img/medalla_superdetective.svg" },
+            "demo": { "objetos": ["sol", "flor"], "nuevo": "estrella" },
+            "retos": [
+                { "ref": "mochila", "cantidad": 4, "observacionMs": 7000 },
+                { "ref": "hoja", "cantidad": 4, "opciones": 4, "observacionMs": 6000 },
+                { "ref": "globos", "cantidad": 4, "observacionMs": 6000 },
+                { "ref": "caminito", "cantidad": 4, "largo": 3 }
             ]
         },
         {
             "id": "5",
             "edad": "5-6 años",
-            "titulo": "5 objetos",
-            "tiempoMemoria": 6000,
-            "pausaOculto": 2000,
-            "textos": {
-                "observa": "¡Vamos a jugar! Observa con mucha atención los objetos y trata de recordarlos."
+            "titulo": "3 misiones · 5 tesoros",
+            "progreso": { "icono": "fa-star" },
+            "pista": "lupa",
+            "cierre": "¡Eres un Superagente de la Memoria Visual!",
+            "premio": { "tipo": "diploma", "img": "img/diploma_superagente.svg" },
+            "demo": { "objetos": ["sol", "flor", "pez"], "nuevo": "estrella" },
+            "conjuntos": {
+                "tesoros": { "grupo": "tesoros", "cantidad": 5 }
             },
-            "demo": { "objetos": ["sol", "flor"], "nuevo": "manzana" },
-            "rondas": [
-                {
-                    "tipo": "nuevo",
-                    "objetos": ["manzana", "pelota", "carro", "oso", "estrella"],
-                    "nuevo": "pez"
-                },
-                {
-                    "tipo": "falta",
-                    "objetos": ["manzana", "pelota", "carro", "oso", "estrella"],
-                    "falta": "carro",
-                    "opciones": ["carro", "pez", "flor", "sol"]
-                },
-                {
-                    "tipo": "cambio",
-                    "objetos": ["manzana", "pelota", "carro", "oso", "estrella"],
-                    "intercambio": ["carro", "oso"]
-                }
+            "retos": [
+                { "ref": "vitrina" },
+                { "ref": "desaparecido" },
+                { "ref": "posiciones" }
             ]
         }
     ]

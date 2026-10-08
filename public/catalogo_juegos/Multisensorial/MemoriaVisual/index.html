@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="style.css?v=20261008g">
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
 	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261005a">
@@ -26,7 +26,6 @@
 				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
 				<span class="btn-empecemos-texto">¡Empecemos!</span>
 			</button>
-			<p class="inicio-ayuda">Toca para comenzar la intro</p>
 		</div>
 	</div>
 
@@ -92,22 +91,38 @@
 	</div>
 
 	<div id="principal">
+		<div id="escena" class="escena" aria-hidden="true"></div>
 		<div class="hud-top">
+			<div class="hud-guias" aria-hidden="true">
+				<img id="guia-zeus" class="guia" src="../../img/zeus_normal.gif" alt="">
+				<img id="guia-zoe" class="guia" src="../../img/zoe_normal.gif" alt="">
+			</div>
+			<div id="insignias" class="hud-insignias" hidden></div>
 			<div class="hud-nav">
-				<div id="progreso" class="hud-progreso" hidden></div>
-				<button type="button" id="btn-ver" class="btn btn-success btn-round" title="Ver de nuevo" hidden><i class="fa-solid fa-eye"></i></button>
-				<button onclick="location.reload()" class="btn btn-warning btn-round"><i class="fa-solid fa-rotate"></i></button>
-				<button onclick="history.back()" class="btn btn-danger btn-round"><i class="fa-solid fa-arrow-left"></i></button>
+				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar" aria-label="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Volver" aria-label="Volver"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</div>
 
 		<div class="escenario escenario-memoria demo-lock" id="escenario">
 			<div class="memoria-bloque">
-				<p class="enunciado borde" id="enunciado"></p>
-				<div id="cuenta" class="cuenta" hidden></div>
-				<div id="tablero" class="tablero" aria-live="polite"></div>
-				<div id="opciones" class="opciones" hidden></div>
+				<p class="reto-titulo" id="reto-titulo"></p>
+				<p class="enunciado borde" id="enunciado" aria-live="polite"></p>
+				<div id="barra-tiempo" class="barra-tiempo" aria-hidden="true"><span></span></div>
+				<div class="tablero-wrap" id="tablero-wrap">
+					<div id="tablero" class="tablero"></div>
+					<div id="utileria" class="utileria"></div>
+					<div id="cubierta" class="cubierta" hidden aria-hidden="true"></div>
+				</div>
 			</div>
+		</div>
+
+		<div id="zona-inferior" class="zona-inferior">
+			<div class="zona-botones">
+				<button type="button" id="btn-repetir" class="btn btn-info btn-round" title="Escuchar otra vez" disabled hidden><i class="fa-solid fa-ear-listen"></i></button>
+				<button type="button" id="btn-lupa" class="btn btn-round btn-lupa" title="Lupa de pista" disabled hidden><i class="fa-solid fa-magnifying-glass"></i></button>
+			</div>
+			<div id="opciones" class="opciones" hidden></div>
 		</div>
 	</div>
 
@@ -157,9 +172,11 @@
 	<script type="module" src="../../intro3d/js/three-scene.js?v=20261007a"></script>
 	<script type="module" src="../../intro3d/js/final-scene.js?v=20261007a"></script>
 	<script src="../../tutorial/tutorial.js?v=20261005a"></script>
-	<script type="module" src="../../intro3d/js/tutorial-3d.js?v=20261007a"></script>
-	<script src="../../intro3d/js/intro.js?v=20260930g"></script>
+	<script type="module" src="../../intro3d/js/tutorial-3d.js?v=20261008a"></script>
+	<script src="../../intro3d/js/intro.js?v=20261008a"></script>
 	<script src="../../final/final.js"></script>
-	<script src="script.js"></script>
+	<script src="retos.js?v=20261008c"></script>
+	<script src="sfx.js?v=20261008b"></script>
+	<script src="script.js?v=20261008d"></script>
 </body>
 </html>
