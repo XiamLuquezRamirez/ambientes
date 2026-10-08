@@ -104,13 +104,6 @@ body {
   color: #1e3a5f;
 }
 
-.inicio-ayuda {
-  margin: 30px;
-  font-size: 26px;
-  font-weight: 600;
-  color: #5b6b7c;
-}
-
 .btn-empecemos {
   position: relative;
   isolation: isolate;

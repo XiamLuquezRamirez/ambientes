@@ -1,6 +1,6 @@
 /**
  * Tutorial 3D: entra por la derecha → esquina inferior derecha → habla → se va.
- * window.Tutorial3d = { start, despedir, stop, preload, personaje }
+ * window.Tutorial3d = { start, despedir, stop, reaccionar, preload, personaje }
  */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
@@ -38,6 +38,7 @@ let walkAction = null;
 let idleAction = null;
 let talkAction = null;
 let activoAction = null;
+let accionesActuales = {};
 let clock = null;
 let rafId = null;
 let activo = false;
@@ -102,6 +103,7 @@ function quitarMeshActual() {
     idleAction = null;
     talkAction = null;
     activoAction = null;
+    accionesActuales = {};
     if (mesh && scene) {
         scene.remove(mesh);
         // No dispose: la geometría vive en el cache del GLTF.
@@ -209,6 +211,7 @@ function montarPersonaje(gltf, id) {
         gltf.animations.forEach(function (clip) {
             actions[clip.name] = mixer.clipAction(clip);
         });
+        accionesActuales = actions;
         walkAction = tomarClip(actions, CLIP_CAMINAR);
         idleAction = tomarClip(actions, CLIP_QUIETO);
         talkAction = tomarClip(actions, CLIP_HABLAR);
@@ -369,6 +372,55 @@ function despedir() {
     });
 }
 
+/**
+ * Reacción corta en sitio (sin caminar): aparece, reproduce un clip una vez y se oculta.
+ * @param {string} id zeus|zoe
+ * @param {string[]} clips nombres en orden de preferencia (p. ej. ["Saltar", "Celebrar"])
+ * @param {{maxMs?: number}} [opts]
+ */
+async function reaccionar(id, clips, opts) {
+    const o = opts || {};
+    stopToken += 1;
+    const token = stopToken;
+    resetSuave();
+    stopToken = token;
+    if (!asegurarEscena()) return;
+
+    const pj = MODELOS[id] ? id : "zoe";
+    personajeActual = pj;
+    try {
+        await cargarPersonaje(pj);
+    } catch (e) {
+        console.warn("[Tutorial3d] reaccionar: no cargó", pj, e);
+        return;
+    }
+    if (token !== stopToken || !mesh) return;
+
+    mesh.position.x = DEST_X;
+    mesh.rotation.y = YAW_CAMARA;
+    yawObjetivo = YAW_CAMARA;
+    fase = "reaccion";
+    const accion = tomarClip(accionesActuales, clips || ["Celebrar"]);
+    if (accion) {
+        accion.setLoop(THREE.LoopOnce, 1);
+        accion.clampWhenFinished = true;
+        cruzar(accion, 0.12);
+    }
+    root.hidden = false;
+    void root.offsetWidth;
+    root.classList.add("is-visible");
+    activo = true;
+    if (clock) clock.getDelta();
+    animar();
+
+    const durClip = accion ? accion.getClip().duration * 1000 : 1500;
+    await new Promise(function (resolve) {
+        setTimeout(resolve, Math.min(durClip, o.maxMs || 3200));
+    });
+    if (token !== stopToken) return;
+    stop();
+}
+
 function stop() {
     stopToken += 1;
     if (root) root.classList.remove("is-visible");
@@ -383,6 +435,7 @@ window.Tutorial3d = {
     start: start,
     despedir: despedir,
     stop: stop,
+    reaccionar: reaccionar,
     preload: preload,
     personaje: function () { return personajeActual; }
 };

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Tambor">
+  <ellipse cx="120" cy="214" rx="86" ry="12" fill="#000" opacity="0.12"/>
+  <path d="M40 90 L40 180 C40 200 200 200 200 180 L200 90 Z" fill="#e53935"/>
+  <path d="M40 90 L80 192 M80 92 L120 197 M120 92 L160 196 M160 92 L200 186 M200 90 L160 196 M160 92 L120 197 M120 92 L80 192 M80 92 L40 180" fill="none" stroke="#fdd835" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M38 172 C38 196 202 196 202 172 L202 184 C202 208 38 208 38 184 Z" fill="#1e88e5"/>
+  <ellipse cx="120" cy="90" rx="82" ry="24" fill="#fff8e1"/>
+  <ellipse cx="120" cy="90" rx="82" ry="24" fill="none" stroke="#1e88e5" stroke-width="10"/>
+  <rect x="150" y="18" width="10" height="72" rx="5" fill="#8d6e63" transform="rotate(28 155 54)"/>
+  <circle cx="176" cy="26" r="11" fill="#ffb300"/>
+  <rect x="78" y="18" width="10" height="72" rx="5" fill="#8d6e63" transform="rotate(-28 83 54)"/>
+  <circle cx="62" cy="26" r="11" fill="#ffb300"/>
+</svg>

@@ -156,13 +156,6 @@
   display: none;
 }
 
-.pantalla-inicio .inicio-ayuda {
-  font-size: clamp(16px, 2.2vw, 22px);
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
 @keyframes inicioIconoFlota {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }

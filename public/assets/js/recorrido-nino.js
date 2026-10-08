@@ -15,6 +15,11 @@
     let urlContinuar;
     let portadaImg;
     let fondoImg;
+    let fondoElegirImg;
+    let tarjetaExplorarImg;
+    let tarjetaJugarImg;
+    let tarjetaExplorarReversoImg;
+    let tarjetaJugarReversoImg;
     let estudianteSexo;
 
     function escapar(str) {
@@ -77,6 +82,7 @@
         );
         $shell.find('#rnElegir').remove();
         $shell.append(htmlElegir());
+        precargarElegir();
     }
 
     // Variante del modal de elección:
@@ -116,34 +122,64 @@
 
     // Variante B: tarjetas tipo póster con ilustración grande protagonista.
     // Cada tarjeta tiene dos caras (frente/reverso) para el flip 3D.
+    // Con explorar.png + jugar.png las tarjetas son esas ilustraciones (sticker);
+    // con {slug}2.png el fondo del paso es esa imagen en vez del desenfoque.
     function htmlElegirB() {
+        const conStickers = !!(tarjetaExplorarImg && tarjetaJugarImg);
+        const clases = 'rn-elegir rn-elegir--v2'
+            + (conStickers ? ' rn-elegir--stickers' : '')
+            + (fondoElegirImg ? ' rn-elegir--con-fondo' : '');
+        const estiloFondo = fondoElegirImg
+            ? ` style="background-image:url('${escapar(fondoElegirImg)}')"`
+            : '';
+        const frente = function (img, svg, texto) {
+            return conStickers
+                ? `<img class="rn-sticker-img" src="${escapar(img)}" alt="" decoding="async" draggable="false">`
+                : `<span class="rn-poster-ilustra" aria-hidden="true">${svg}</span>
+                                <span class="rn-poster-cinta"><span>${texto}</span></span>`;
+        };
+        const reverso = function (img, emoji) {
+            return conStickers && img
+                ? `<span class="rn-card3d-cara rn-card3d-reverso rn-card3d-reverso--img" aria-hidden="true"><img class="rn-sticker-img" src="${escapar(img)}" alt="" decoding="async" draggable="false"></span>`
+                : `<span class="rn-card3d-cara rn-card3d-reverso" aria-hidden="true"><span class="rn-poster-emoji">${emoji}</span></span>`;
+        };
+        const textoClase = conStickers ? 'Explorar' : 'Iniciar clase';
         return `
-        <div class="rn-elegir rn-elegir--v2" id="rnElegir" hidden>
-            <button type="button" class="rn-elegir-fondo" id="rnElegirFondo" aria-label="Volver"></button>
+        <div class="${clases}" id="rnElegir" hidden>
+            <button type="button" class="rn-elegir-fondo" id="rnElegirFondo" aria-label="Volver"${estiloFondo}></button>
             <div class="rn-elegir-panel" role="dialog" aria-modal="true" aria-labelledby="rnElegirTitulo">
                 <h2 id="rnElegirTitulo" class="rn-elegir-titulo">¿Qué haremos hoy?</h2>
                 <div class="rn-elegir-opciones">
-                    <button type="button" class="rn-elegir-btn rn-elegir-btn--clase" id="rnBtnClase" aria-label="Iniciar clase">
+                    <button type="button" class="rn-elegir-btn rn-elegir-btn--clase" id="rnBtnClase" aria-label="${textoClase}">
                         <span class="rn-card3d">
                             <span class="rn-card3d-cara rn-card3d-frente">
-                                <span class="rn-poster-ilustra" aria-hidden="true">${svgEscenaClase()}</span>
-                                <span class="rn-poster-cinta"><span>Iniciar clase</span></span>
+                                ${frente(tarjetaExplorarImg, svgEscenaClase(), textoClase)}
                             </span>
-                            <span class="rn-card3d-cara rn-card3d-reverso" aria-hidden="true"><span class="rn-poster-emoji">📚</span></span>
+                            ${reverso(tarjetaExplorarReversoImg, conStickers ? '🧭' : '📚')}
                         </span>
                     </button>
                     <button type="button" class="rn-elegir-btn rn-elegir-btn--jugar" id="rnBtnJugar" aria-label="Jugar">
                         <span class="rn-card3d">
                             <span class="rn-card3d-cara rn-card3d-frente">
-                                <span class="rn-poster-ilustra" aria-hidden="true">${svgEscenaJuego()}</span>
-                                <span class="rn-poster-cinta"><span>Jugar</span></span>
+                                ${frente(tarjetaJugarImg, svgEscenaJuego(), 'Jugar')}
                             </span>
-                            <span class="rn-card3d-cara rn-card3d-reverso" aria-hidden="true"><span class="rn-poster-emoji">🎮</span></span>
+                            ${reverso(tarjetaJugarReversoImg, '🎮')}
                         </span>
                     </button>
                 </div>
             </div>
         </div>`;
+    }
+
+    // El fondo del paso es background-image: sin precarga aparece en blanco
+    // la primera vez que se abre.
+    function precargarElegir() {
+        [fondoElegirImg, tarjetaExplorarImg, tarjetaJugarImg, tarjetaExplorarReversoImg, tarjetaJugarReversoImg].forEach(function (src) {
+            if (!src) return;
+            const img = new Image();
+            img.decoding = 'async';
+            img.src = src;
+        });
     }
 
     /* El trazado vive en boton_iniciar.svg (plantilla #rnBotonIniciar). */
@@ -583,6 +619,11 @@
         urlContinuar = String($app.data('url-continuar') || '');
         portadaImg = String($app.data('portada-img') || '');
         fondoImg = String($app.data('fondo-img') || '');
+        fondoElegirImg = String($app.data('fondo-elegir-img') || '');
+        tarjetaExplorarImg = String($app.data('tarjeta-explorar') || '');
+        tarjetaJugarImg = String($app.data('tarjeta-jugar') || '');
+        tarjetaExplorarReversoImg = String($app.data('tarjeta-explorar-reverso') || '');
+        tarjetaJugarReversoImg = String($app.data('tarjeta-jugar-reverso') || '');
         estudianteSexo = String($app.data('estudiante-sexo') || '');
 
         $shell.prop('hidden', false);

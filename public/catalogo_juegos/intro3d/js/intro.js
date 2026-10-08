@@ -505,3 +505,41 @@ function iniciarIntro() {
         }
     });
 }
+
+/*
+ * Bienvenida: tocar el ícono, el título o alrededor del botón cuenta como "¡Empecemos!"
+ * (los niños no apuntan solo al botón). Lo comparten todos los juegos que cargan este archivo.
+ */
+(function () {
+    const MARGEN_PX = 40;
+
+    document.addEventListener('click', function (ev) {
+        const pantalla = document.getElementById('pantalla-inicio');
+        const btn = document.getElementById('btn-empecemos');
+        if (!pantalla || !btn || pantalla.hidden || pantalla.classList.contains('is-out') || btn.disabled) return;
+        if (!(ev.target instanceof Element) || !pantalla.contains(ev.target)) return;
+        if (ev.target.closest('button, a, [role="button"]')) return;
+
+        // Caja de lo visible (ícono, título, botón): .inicio-contenido y el <p> del título
+        // ocupan casi todo el ancho, así que del texto se mide solo lo escrito.
+        const piezas = pantalla.querySelectorAll('.inicio-contenido > *');
+        let izq = Infinity, arr = Infinity, der = -Infinity, aba = -Infinity;
+        Array.prototype.forEach.call(piezas.length ? piezas : [btn], function (el) {
+            let r = el.getBoundingClientRect();
+            if (el.tagName === 'P') {
+                const rango = document.createRange();
+                rango.selectNodeContents(el);
+                r = rango.getBoundingClientRect();
+            }
+            if (!r.width || !r.height) return;
+            izq = Math.min(izq, r.left);
+            arr = Math.min(arr, r.top);
+            der = Math.max(der, r.right);
+            aba = Math.max(aba, r.bottom);
+        });
+        if (ev.clientX < izq - MARGEN_PX || ev.clientX > der + MARGEN_PX
+            || ev.clientY < arr - MARGEN_PX || ev.clientY > aba + MARGEN_PX) return;
+
+        btn.click();
+    });
+})();

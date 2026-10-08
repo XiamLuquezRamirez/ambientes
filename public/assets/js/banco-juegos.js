@@ -208,6 +208,8 @@
         };
 
         doc.querySelectorAll('[onclick*="history.back"]').forEach(function (btn) {
+            // Polimotor/comun/interfaz.css pinta el ícono por este selector; sin la marca queda invisible.
+            btn.setAttribute('data-salir', '1');
             btn.removeAttribute('onclick');
             btn.addEventListener('click', salir);
         });

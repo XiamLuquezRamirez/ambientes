@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" role="img" aria-label="Mochila cerrada">
+  <ellipse cx="100" cy="210" rx="74" ry="8" fill="#000" opacity="0.12"/>
+  <path d="M62 44 C62 16 138 16 138 44" fill="none" stroke="#8e3b16" stroke-width="10" stroke-linecap="round"/>
+  <path d="M40 60 C40 46 52 40 66 40 L134 40 C148 40 160 46 160 60 L160 190 C160 202 150 206 140 206 L60 206 C50 206 40 202 40 190 Z" fill="#ef6c00"/>
+  <path d="M40 60 C40 46 52 40 66 40 L134 40 C148 40 160 46 160 60 L160 104 C130 116 70 116 40 104 Z" fill="#ff8f00"/>
+  <path d="M48 104 C76 114 124 114 152 104" fill="none" stroke="#5d4037" stroke-width="5" stroke-dasharray="3 3"/>
+  <rect x="146" y="98" width="10" height="20" rx="3" fill="#fdd835"/>
+  <rect x="62" y="128" width="76" height="54" rx="14" fill="#ffa726"/>
+  <path d="M66 136 L134 136" stroke="#8e3b16" stroke-width="4" stroke-dasharray="4 4"/>
+  <circle cx="100" cy="158" r="7" fill="#fdd835"/>
+  <rect x="38" y="90" width="10" height="90" rx="5" fill="#d84315"/>
+  <rect x="152" y="90" width="10" height="90" rx="5" fill="#d84315"/>
+</svg>

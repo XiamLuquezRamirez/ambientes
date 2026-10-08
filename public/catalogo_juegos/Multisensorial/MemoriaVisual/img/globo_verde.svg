@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 260" role="img" aria-label="Globo verde a cuadros">
+  <defs>
+    <pattern id="p-verde" width="32" height="32" patternUnits="userSpaceOnUse">
+      <rect width="16" height="16" fill="#fff" opacity="0.5"/>
+      <rect x="16" y="16" width="16" height="16" fill="#fff" opacity="0.5"/>
+    </pattern>
+  </defs>
+  <path d="M100 214 C88 230 112 242 100 258" fill="none" stroke="#6d6d6d" stroke-width="3" stroke-linecap="round"/>
+  <path d="M92 214 L100 202 L108 214 Z" fill="#1b5e20"/>
+  <path d="M100 10 C150 10 180 50 180 100 C180 160 130 200 100 205 C70 200 20 160 20 100 C20 50 50 10 100 10 Z" fill="#43a047"/>
+  <path d="M100 10 C150 10 180 50 180 100 C180 160 130 200 100 205 C70 200 20 160 20 100 C20 50 50 10 100 10 Z" fill="url(#p-verde)"/>
+  <ellipse cx="65" cy="60" rx="16" ry="28" fill="#fff" opacity="0.4" transform="rotate(25 65 60)"/>
+</svg>

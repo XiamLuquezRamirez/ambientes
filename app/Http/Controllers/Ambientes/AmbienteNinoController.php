@@ -92,6 +92,11 @@ class AmbienteNinoController extends Controller
             'urlJuegosCatalogo' => route('ambiente.juegos-catalogo'),
             'portadaImg' => $this->urlPortada($ambiente->slug),
             'fondoImg' => $this->urlFondo($ambiente->slug),
+            'fondoElegirImg' => $this->urlFondoElegir($ambiente->slug),
+            'tarjetaExplorarImg' => $this->urlImagenFondos('explorar'),
+            'tarjetaJugarImg' => $this->urlImagenFondos('jugar'),
+            'tarjetaExplorarReversoImg' => $this->urlImagenFondos('explorar-reverso'),
+            'tarjetaJugarReversoImg' => $this->urlImagenFondos('jugar-reverso'),
             'pasoInicial' => 'portada',
         ]);
     }
@@ -346,8 +351,21 @@ class AmbienteNinoController extends Controller
      */
     private function urlFondo(string $slug): string
     {
-        $slug = $this->slugImagenAmbiente($slug);
-        $relativo = 'assets/images/fondos_Ambientes/'.$slug.'.png';
+        return $this->urlImagenFondos($this->slugImagenAmbiente($slug));
+    }
+
+    /**
+     * Fondo del paso «¿Qué haremos hoy?» tras pulsar Iniciar.
+     * Convención: public/assets/images/fondos_Ambientes/{slug}2.png
+     */
+    private function urlFondoElegir(string $slug): string
+    {
+        return $this->urlImagenFondos($this->slugImagenAmbiente($slug).'2');
+    }
+
+    private function urlImagenFondos(string $nombre): string
+    {
+        $relativo = 'assets/images/fondos_Ambientes/'.$nombre.'.png';
         $absoluto = public_path($relativo);
 
         if (File::exists($absoluto)) {

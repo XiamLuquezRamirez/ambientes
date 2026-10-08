@@ -169,11 +169,11 @@
   /*
    * No esperar a DOMContentLoaded: los juegos cargan scripts pesados al final del <body>
    * (Three.js, intro, juego) y eso retrasa el evento ~0.5 s. Se curva en cuanto el parser
-   * deja atrás el título (ya existe .inicio-ayuda, que va después).
+   * deja atrás el título (ya existe #btn-empecemos, que va después).
    */
   if (document.readyState === 'loading' && window.MutationObserver) {
     var observador = new MutationObserver(function () {
-      if (document.querySelector('.pantalla-inicio .inicio-ayuda')) {
+      if (document.querySelector('.pantalla-inicio #btn-empecemos')) {
         observador.disconnect();
         prepararPantallaInicio();
       }
