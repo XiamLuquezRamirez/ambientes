@@ -1495,6 +1495,7 @@ export const CLIP_CORRER = 'Correr';
 export const CLIP_SALUDAR = 'Saludar';
 export const CLIP_HABLAR = 'Hablar';
 export const CLIP_AFIRMAR = 'Decir_si';
+export const CLIP_CELEBRAR = 'Celebrar';
 
 function guardarClip(gltf, mixer, acciones, nombre) {
     if (!nombre || acciones[nombre]) return;

@@ -10,7 +10,11 @@
  * como <script type="module">.
  */
 import * as THREE from 'three';
-import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR } from './mapa-mundo.js?v=20261007a';
+import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParque, animarPuerta, iniciarLoops, CLIP_QUIETO, CLIP_CAMINAR, CLIP_CORRER, CLIP_SALUDAR, CLIP_HABLAR, CLIP_CELEBRAR } from './mapa-mundo.js?v=20261008a';
+
+// Altura del suelo. El terreno queda en 0; este número es donde pisa el personaje.
+// Súbelo si se hunde en la arena. Bájalo si flota. La malla del sendero no se mueve con esto.
+const ALTURA_SUELO = 0.2;
 
 (function () {
     'use strict';
@@ -1787,7 +1791,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         nz = Math.max(caja.minZ, Math.min(caja.maxZ, nz));
         personaje.position.x = nx;
         personaje.position.z = nz;
-        if (mundo) personaje.position.y = mundo.altura(nx, nz);
+        if (mundo) personaje.position.y = mundo.altura(nx, nz) + ALTURA_SUELO;
         if (!seguimientoActivo) {
             seguimientoActivo = true;
             reengancharCamara();
@@ -1824,7 +1828,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (!personaje) return;
         const desde = personaje.position.clone();
         const hacia = pos.clone();
-        if (mundo) hacia.y = mundo.altura(hacia.x, hacia.z);
+        if (mundo) hacia.y = mundo.altura(hacia.x, hacia.z) + ALTURA_SUELO;
         const dist = Math.hypot(hacia.x - desde.x, hacia.z - desde.z);
         entrandoSaliendo = true;
         animCasa = {
@@ -2288,7 +2292,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (a.modo === 'girar') {
             // Giro en el sitio, adentro: no se desplaza ni se sale del muro.
             personaje.position.copy(a.ancla);
-            if (mundo) personaje.position.y = mundo.altura(a.ancla.x, a.ancla.z);
+            if (mundo) personaje.position.y = mundo.altura(a.ancla.x, a.ancla.z) + ALTURA_SUELO;
             let delta = a.rot1 - a.rot0;
             while (delta > Math.PI) delta -= Math.PI * 2;
             while (delta < -Math.PI) delta += Math.PI * 2;
@@ -2297,7 +2301,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             const desde = a.modo === 'entrar' ? a.desde : a.puerta;
             const hacia = a.modo === 'entrar' ? a.puerta : a.desde;
             personaje.position.lerpVectors(desde, hacia, ease);
-            if (mundo) personaje.position.y = mundo.altura(personaje.position.x, personaje.position.z);
+            if (mundo) personaje.position.y = mundo.altura(personaje.position.x, personaje.position.z) + ALTURA_SUELO;
             const dx = hacia.x - desde.x;
             const dz = hacia.z - desde.z;
             if (dx * dx + dz * dz > 0.04) {
@@ -2308,12 +2312,12 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (k >= 1) {
             if (a.modo === 'girar') {
                 personaje.position.copy(a.ancla);
-                if (mundo) personaje.position.y = mundo.altura(a.ancla.x, a.ancla.z);
+                if (mundo) personaje.position.y = mundo.altura(a.ancla.x, a.ancla.z) + ALTURA_SUELO;
                 personaje.rotation.y = a.rot1;
             } else {
                 const hacia = a.modo === 'entrar' ? a.puerta : a.desde;
                 personaje.position.copy(hacia);
-                if (mundo) personaje.position.y = mundo.altura(hacia.x, hacia.z);
+                if (mundo) personaje.position.y = mundo.altura(hacia.x, hacia.z) + ALTURA_SUELO;
             }
             personaje.scale.setScalar(a.base);
             personaje.visible = true;
@@ -2411,7 +2415,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 : ((nodos[nodoActual] && nodos[nodoActual].pos)
                     ? nodos[nodoActual].pos.clone()
                     : ancla.clone());
-            if (mundo) camino.y = mundo.altura(camino.x, camino.z);
+            if (mundo) camino.y = mundo.altura(camino.x, camino.z) + ALTURA_SUELO;
             const caminarDeVuelta = function () {
                 if (modoNav !== 'botones') iniciarCamaraCruce();
                 const dist = Math.hypot(camino.x - ancla.x, camino.z - ancla.z);
@@ -2460,7 +2464,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 ? nodos[nodoActual].pos.clone()
                 : ancla0.clone();
             dest = puntoSalidaMando(ancla0, dest);
-            if (mundo) dest.y = mundo.altura(dest.x, dest.z);
+            if (mundo) dest.y = mundo.altura(dest.x, dest.z) + ALTURA_SUELO;
             metaSalida = dest;
             puestoSalida = puntoAlCostado(dest, ancla0);
             faseSalida = 'punto';
@@ -2573,8 +2577,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         }
     }
 
-    // En la meta, en todos los casos: voltea hacia la cámara, dice la frase
-    // y la cámara se aleja. Nada más.
+    // En la meta: voltea hacia la cámara, celebra y dice la frase.
     function celebrarEnMeta(p) {
         if (!personaje) {
             mostrarDialogo(fraseParada(p));
@@ -2604,6 +2607,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
             };
         }
         ponerCamaraLejos(usaMapaGlb ? 22 : 26, usaMapaGlb ? 9 : 11);
+        ponerClip(CLIP_CELEBRAR);
         mostrarDialogo(fraseParada(p), function () { mostrarBotonesMeta(); });
     }
 
@@ -3558,7 +3562,9 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         if (mixer) {
             const hablando = narrando || mostrandoBocadillo;
             const entrandoAndando = entrandoSaliendo && animCasa && animCasa.modo !== 'girar';
-            const clip = (caminando || entrandoAndando || moviendoStick)
+            const clip = enMeta
+                ? CLIP_CELEBRAR
+                : (caminando || entrandoAndando || moviendoStick)
                 ? (entrandoAndando ? CLIP_CAMINAR : clipMovimiento)
                 : (hablando ? CLIP_HABLAR : CLIP_QUIETO);
             ponerClip(clip);
@@ -3693,7 +3699,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 const desfase = i === 0 ? 1.7 : -1.7;
                 const x = inicio.x + lado.x * desfase;
                 const z = inicio.z + lado.z * desfase;
-                const ySuelo = mundo ? mundo.altura(x, z) : inicio.y;
+                const ySuelo = mundo ? mundo.altura(x, z) + ALTURA_SUELO : inicio.y;
                 c.objeto.position.set(x, ySuelo, z);
             }
             c.objeto.rotation.y = yaw;
@@ -3708,7 +3714,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const dir = lado.clone();
         if (rel.dot(lado) < 0) dir.negate();
         const hasta = pj.objeto.position.clone().addScaledVector(dir, 16);
-        if (mundo) hasta.y = mundo.altura(hasta.x, hasta.z);
+        if (mundo) hasta.y = mundo.altura(hasta.x, hasta.z) + ALTURA_SUELO;
         if (pj.acciones[CLIP_SALUDAR]) pj.acciones[CLIP_SALUDAR].stop();
         if (pj.acciones[CLIP_QUIETO]) pj.acciones[CLIP_QUIETO].stop();
         if (pj.acciones[CLIP_CAMINAR]) pj.acciones[CLIP_CAMINAR].reset().play();
@@ -3839,7 +3845,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                             const puesto = apoyoEleccion();
                             const desde = personaje.position.clone();
                             const hasta = puesto.inicio.clone();
-                            if (mundo) hasta.y = mundo.altura(hasta.x, hasta.z);
+                            if (mundo) hasta.y = mundo.altura(hasta.x, hasta.z) + ALTURA_SUELO;
                             const dx = hasta.x - desde.x;
                             const dz = hasta.z - desde.z;
                             const dist = Math.hypot(dx, dz);
@@ -4454,7 +4460,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
         const pasos = 6;
         for (let i = 1; i <= pasos; i++) {
             const p = cola.clone().addScaledVector(tang, METROS_EXTRA_FIN * i / pasos);
-            p.y = mundo.altura(p.x, p.z) + 0.22;
+            p.y = mundo.altura(p.x, p.z) + ALTURA_SUELO;
             pts.push(p.clone());
             extra.push(p);
         }
@@ -4504,7 +4510,7 @@ import { armarMundo, cargarPersonaje, clonarEstacion, clonarCastillo, clonarParq
                 if (esParadaExperiencia(n.parada) || n.parada.id === 'fin') soles.push(n.pos);
             });
             mundo.aplanarAlrededor(curvasPlanas, soles);
-            const yCamino = 0.22;
+            const yCamino = ALTURA_SUELO;
             const tender = (c) => {
                 if (!c || !c.points) return;
                 c.points.forEach((p) => { p.y = yCamino; });
