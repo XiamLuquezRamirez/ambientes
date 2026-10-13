@@ -4,17 +4,19 @@ namespace App\Services;
 
 use App\Models\Estudiante;
 use App\Models\PerfilAprendizajePersonalizado;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 /**
- * Lectura y escritura de los 50 parámetros de adaptación por perfil de aprendizaje.
+ * Lectura y escritura de los parámetros de adaptación por perfil de aprendizaje.
  *
  * Capas de almacenamiento (storage/parametros-perfil/):
  * - defaults/{tipo}/{id}.json — valores por defecto editables por SuperAdmin
  * - {institucion_id}/{tipo}/{id}.json — valores por colegio (admin/docente)
  *
- * Cada JSON almacena siempre los 50 parámetros completos en la clave "valores".
+ * Cada JSON almacena siempre el catálogo completo en la clave "valores".
  */
 class ParametrosPerfilAprendizajeService
 {
@@ -62,7 +64,7 @@ class ParametrosPerfilAprendizajeService
     }
 
     /**
-     * Valores estándar del sistema (config base, 50 parámetros).
+     * Valores estándar del sistema (config base, catálogo completo).
      *
      * @return array<string, mixed>
      */
@@ -507,7 +509,7 @@ class ParametrosPerfilAprendizajeService
         }
 
         if (isset($datos['valores']) && is_array($datos['valores'])) {
-            return $this->completarValores($datos['valores']);
+            return $this->completarValores($this->aplanarValores($datos['valores']));
         }
 
         if (isset($datos['overrides']) && is_array($datos['overrides'])) {
@@ -599,6 +601,10 @@ class ParametrosPerfilAprendizajeService
             if ($def['type'] === 'select' && ! in_array($valor, $def['opts'], true)) {
                 throw new InvalidArgumentException("Valor inválido para {$clave}.");
             }
+
+            if ($def['type'] === 'objeto' && ! is_array($valor)) {
+                throw new InvalidArgumentException("{$clave} debe ser un objeto.");
+            }
         }
     }
 
@@ -616,6 +622,16 @@ class ParametrosPerfilAprendizajeService
 
         if ($def['type'] === 'num') {
             return (int) $valor;
+        }
+
+        if ($def['type'] === 'objeto') {
+            if (is_string($valor)) {
+                $decodificado = json_decode($valor, true);
+
+                return is_array($decodificado) ? $decodificado : [];
+            }
+
+            return is_array($valor) ? $valor : [];
         }
 
         return is_string($valor) ? trim($valor) : $valor;
@@ -639,7 +655,7 @@ class ParametrosPerfilAprendizajeService
         $payload = [
             'tipo' => $tipo,
             'perfil_id' => $id,
-            'valores' => $valores,
+            'valores' => $this->anidarJuegos($valores),
             'actualizado_en' => now()->toIso8601String(),
         ];
 
@@ -656,6 +672,104 @@ class ParametrosPerfilAprendizajeService
             'valores' => $valores,
             'actualizado_en' => $payload['actualizado_en'],
         ];
+    }
+
+    /**
+     * El archivo guarda los parámetros de juegos bajo valores.juegos.{grupo}.
+     * En memoria siguen siendo claves planas.
+     *
+     * @param  array<string, mixed>  $valores
+     * @return array<string, mixed>
+     */
+    private function aplanarValores(array $valores): array
+    {
+        $juegos = $valores['juegos'] ?? null;
+        unset($valores['juegos']);
+
+        if (! is_array($juegos)) {
+            return $valores;
+        }
+
+        foreach ($juegos as $grupo) {
+            if (! is_array($grupo)) {
+                continue;
+            }
+
+            foreach ($grupo as $clave => $valor) {
+                if (is_string($clave)) {
+                    $valores[$clave] = $valor;
+                }
+            }
+        }
+
+        return $valores;
+    }
+
+    /**
+     * @param  array<string, mixed>  $valores
+     * @return array<string, mixed>
+     */
+    private function anidarJuegos(array $valores): array
+    {
+        $mapa = $this->mapaGruposJuegos();
+        $orden = ['visual', 'texto', 'tamano', 'audio', 'apoyo', 'interaccion', 'tiempo', 'dificultad'];
+        $juegos = array_fill_keys($orden, []);
+
+        foreach ($mapa as $clave => $grupo) {
+            if (! array_key_exists($clave, $valores)) {
+                continue;
+            }
+
+            $juegos[$grupo][$clave] = $valores[$clave];
+            unset($valores[$clave]);
+        }
+
+        $anidados = [];
+
+        foreach ($orden as $grupo) {
+            if ($juegos[$grupo] !== []) {
+                $anidados[$grupo] = $juegos[$grupo];
+            }
+        }
+
+        $valores['juegos'] = $anidados;
+
+        return $valores;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function mapaGruposJuegos(): array
+    {
+        $mapa = [];
+
+        foreach (config('parametros_perfil.categorias', []) as $cat) {
+            if (($cat['k'] ?? '') !== 'juegos') {
+                continue;
+            }
+
+            foreach ($cat['params'] ?? [] as $p) {
+                $mapa[$p['k']] = $this->slugGrupo((string) ($p['grupo'] ?? ''));
+            }
+        }
+
+        return $mapa;
+    }
+
+    private function slugGrupo(string $grupo): string
+    {
+        return match ($grupo) {
+            'Visual' => 'visual',
+            'Texto' => 'texto',
+            'Tamaño' => 'tamano',
+            'Audio' => 'audio',
+            'Apoyo' => 'apoyo',
+            'Interacción' => 'interaccion',
+            'Tiempo' => 'tiempo',
+            'Dificultad' => 'dificultad',
+            default => 'otros',
+        };
     }
 
     private function rutaArchivo(string $tipo, int $id, ?int $institucionId = null): string
@@ -676,5 +790,93 @@ class ParametrosPerfilAprendizajeService
         if (! in_array($tipo, self::TIPOS_VALIDOS, true)) {
             throw new InvalidArgumentException('Tipo de perfil inválido.');
         }
+    }
+
+    /**
+     * Imágenes compartidas por los juegos. La ruta guardada es relativa al paquete
+     * (`../../images/archivo.gif`), que es como la leen los config.json.
+     *
+     * @return array<int, array{nombre: string, ruta: string, url: string}>
+     */
+    public function listarImagenesJuegos(): array
+    {
+        $dir = public_path('catalogo_juegos/images');
+
+        if (! is_dir($dir)) {
+            return [];
+        }
+
+        $permitidas = ['gif', 'png', 'jpg', 'jpeg', 'webp'];
+        $imagenes = [];
+
+        foreach (File::files($dir) as $archivo) {
+            $ext = strtolower($archivo->getExtension());
+
+            if (! in_array($ext, $permitidas, true)) {
+                continue;
+            }
+
+            $nombre = $archivo->getFilename();
+            $imagenes[] = $this->fichaImagenJuego($nombre);
+        }
+
+        usort($imagenes, fn (array $a, array $b) => strnatcasecmp($a['nombre'], $b['nombre']));
+
+        return $imagenes;
+    }
+
+    /**
+     * @return array{nombre: string, ruta: string, url: string}
+     */
+    public function guardarImagenJuego(UploadedFile $archivo): array
+    {
+        $mapa = ['gif' => 'gif', 'png' => 'png', 'jpg' => 'jpg', 'jpeg' => 'jpg', 'webp' => 'webp'];
+        $ext = strtolower($archivo->getClientOriginalExtension() ?: '');
+
+        if (! isset($mapa[$ext])) {
+            throw new InvalidArgumentException('Formato no permitido. Usa gif, png, jpg o webp.');
+        }
+
+        $mime = (string) $archivo->getMimeType();
+
+        if (! in_array($mime, ['image/gif', 'image/png', 'image/jpeg', 'image/webp'], true)) {
+            throw new InvalidArgumentException('El archivo no es una imagen válida.');
+        }
+
+        $dir = public_path('catalogo_juegos/images');
+
+        if (! is_dir($dir)) {
+            throw new InvalidArgumentException('No existe la carpeta de imágenes de los juegos.');
+        }
+
+        $base = Str::slug(pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME), '-');
+
+        if ($base === '') {
+            $base = 'imagen';
+        }
+
+        $nombre = $base.'.'.$mapa[$ext];
+        $n = 2;
+
+        while (is_file($dir.DIRECTORY_SEPARATOR.$nombre)) {
+            $nombre = $base.'-'.$n.'.'.$mapa[$ext];
+            $n++;
+        }
+
+        $archivo->move($dir, $nombre);
+
+        return $this->fichaImagenJuego($nombre);
+    }
+
+    /**
+     * @return array{nombre: string, ruta: string, url: string}
+     */
+    private function fichaImagenJuego(string $nombre): array
+    {
+        return [
+            'nombre' => $nombre,
+            'ruta' => '../../images/'.$nombre,
+            'url' => '/catalogo_juegos/images/'.rawurlencode($nombre),
+        ];
     }
 }

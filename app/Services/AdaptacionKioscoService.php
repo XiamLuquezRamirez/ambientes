@@ -6,7 +6,7 @@ use App\Models\Estudiante;
 use Illuminate\Http\Request;
 
 /**
- * Resuelve y cachea en sesión los 50 parámetros de perfil para el kiosco.
+ * Resuelve y cachea en sesión los parámetros de perfil para el kiosco.
  * No reimplementa la resolución: delega en ParametrosPerfilAprendizajeService.
  */
 class AdaptacionKioscoService

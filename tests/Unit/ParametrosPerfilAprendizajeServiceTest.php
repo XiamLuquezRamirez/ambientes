@@ -6,6 +6,7 @@ use App\Models\Estudiante;
 use App\Models\EstudiantePerfilAprendizajePersonalizado;
 use App\Models\PerfilAprendizajePersonalizado;
 use App\Services\ParametrosPerfilAprendizajeService;
+use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 use Tests\TestCase;
 
@@ -33,10 +34,10 @@ class ParametrosPerfilAprendizajeServiceTest extends TestCase
         $this->assertSame(80, $valores['btn_size']);
         $this->assertSame('manual', $valores['audio_instruc']);
         $this->assertSame(72, config('parametros_perfil.base.btn_size'));
-        $this->assertCount(50, $valores);
+        $this->assertCount($this->totalParametros(), $valores);
     }
 
-    public function test_guardar_institucion_persiste_los_cincuenta_parametros(): void
+    public function test_guardar_institucion_persiste_todos_los_parametros(): void
     {
         $mapa = config('parametros_perfil.mapa_perfiles', []);
         $estandarId = array_search('estandar', $mapa, true) ?: 1;
@@ -48,13 +49,19 @@ class ParametrosPerfilAprendizajeServiceTest extends TestCase
         $this->servicio->guardarInstitucion($institucionId, 'inclusion', (int) $estandarId, $valores);
 
         $archivo = $this->servicio->leerArchivoInstitucion($institucionId, 'inclusion', (int) $estandarId);
-        $this->assertCount(50, $archivo['valores']);
+        $this->assertCount($this->totalParametros(), $archivo['valores']);
+
+        $ruta = storage_path('parametros-perfil/'.$institucionId.'/inclusion/'.$estandarId.'.json');
+        $disco = json_decode((string) file_get_contents($ruta), true);
+        $this->assertIsArray($disco['valores']['juegos']['visual'] ?? null);
+        $this->assertArrayNotHasKey('modoTap', $disco['valores']);
+        $this->assertSame(96, $disco['valores']['btn_size']);
         $this->assertSame(96, $archivo['valores']['btn_size']);
         $this->assertSame(['btn_size' => 96], $archivo['overrides']);
 
         $resueltos = $this->servicio->valoresResueltosInstitucion($institucionId, 'inclusion', (int) $estandarId);
         $this->assertSame(96, $resueltos['btn_size']);
-        $this->assertCount(50, $resueltos);
+        $this->assertCount($this->totalParametros(), $resueltos);
 
         $this->servicio->restablecerInstitucion($institucionId, 'inclusion', (int) $estandarId);
     }
@@ -77,7 +84,7 @@ class ParametrosPerfilAprendizajeServiceTest extends TestCase
         $this->servicio->inicializarInstitucionPersonalizado($institucionId, 88881, $perfil);
 
         $valores = $this->servicio->valoresResueltosInstitucion($institucionId, 'personalizado', 88881, $perfil);
-        $this->assertCount(50, $valores);
+        $this->assertCount($this->totalParametros(), $valores);
         $this->assertSame(80, $valores['btn_size']);
 
         $ruta = storage_path('parametros-perfil/'.$institucionId.'/personalizado/88881.json');
@@ -116,9 +123,13 @@ class ParametrosPerfilAprendizajeServiceTest extends TestCase
         ]);
     }
 
-    public function test_catalogo_expone_cincuenta_parametros(): void
+    public function test_catalogo_expone_todos_los_parametros(): void
     {
-        $this->assertCount(50, $this->servicio->listarParametrosDef());
+        $defs = $this->servicio->listarParametrosDef();
+
+        $this->assertCount($this->totalParametros(), $defs);
+        $this->assertArrayHasKey('modoTap', $defs);
+        $this->assertArrayHasKey('rompecabezas_piezas_max', $defs);
     }
 
     public function test_valores_para_estudiante_sin_perfil_usa_estandar(): void
@@ -133,7 +144,7 @@ class ParametrosPerfilAprendizajeServiceTest extends TestCase
         $valores = $this->servicio->valoresParaEstudiante($estudiante);
 
         $this->assertSame($this->servicio->valoresEstandar(), $valores);
-        $this->assertCount(50, $valores);
+        $this->assertCount($this->totalParametros(), $valores);
     }
 
     public function test_valores_para_estudiante_personalizado_gana_sobre_inclusion(): void
@@ -171,5 +182,34 @@ class ParametrosPerfilAprendizajeServiceTest extends TestCase
         if (file_exists($ruta)) {
             unlink($ruta);
         }
+    }
+
+    public function test_listar_imagenes_juegos_incluye_el_gif_compartido(): void
+    {
+        $acierto = null;
+
+        foreach ($this->servicio->listarImagenesJuegos() as $imagen) {
+            if ($imagen['nombre'] === 'correcto.gif') {
+                $acierto = $imagen;
+            }
+        }
+
+        $this->assertNotNull($acierto);
+        $this->assertSame('../../images/correcto.gif', $acierto['ruta']);
+        $this->assertSame('/catalogo_juegos/images/correcto.gif', $acierto['url']);
+    }
+
+    public function test_guardar_imagen_juego_rechaza_un_archivo_que_no_es_imagen(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->servicio->guardarImagenJuego(
+            UploadedFile::fake()->create('nota.txt', 10, 'text/plain')
+        );
+    }
+
+    private function totalParametros(): int
+    {
+        return count($this->servicio->listarParametrosDef());
     }
 }

@@ -12,7 +12,7 @@ class SembrarDefaultsParametrosPerfil extends Command
 {
     protected $signature = 'parametros-perfil:sembrar-defaults {--force : Sobrescribe JSON existentes}';
 
-    protected $description = 'Genera los JSON de valores por defecto (SuperAdmin) con los 50 parámetros completos';
+    protected $description = 'Genera los JSON de valores por defecto (SuperAdmin) con el catálogo completo';
 
     public function handle(ParametrosPerfilAprendizajeService $servicio): int
     {

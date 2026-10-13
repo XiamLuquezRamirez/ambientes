@@ -4,7 +4,7 @@
     @param bool $mostrarTopbar Mostrar cabecera interna (opcional)
 --}}
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('assets/css/admin/parametros-perfil.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/admin/parametros-perfil.css') }}?v={{ @filemtime(public_path('assets/css/admin/parametros-perfil.css')) }}">
 @endpush
 
 <div class="pp-gestion" id="ppGestion">
@@ -13,7 +13,7 @@
             <div class="pp-logo"><i class="fa-solid fa-school"></i></div>
             <div>
                 <div class="pp-topbar-title">PedNia — Parámetros de adaptación</div>
-                <div class="pp-topbar-sub">50 parámetros por perfil de aprendizaje</div>
+                <div class="pp-topbar-sub">Parámetros por perfil de aprendizaje</div>
             </div>
         </div>
     @endif
@@ -57,6 +57,9 @@
                 </div>
                 <div class="pp-cat-dots is-hidden" id="pp-fCatDots"></div>
                 <div class="pp-content-area">
+                    <div class="pp-opciones-filtro is-hidden" id="pp-fFiltroWrap">
+                        <input type="search" class="pp-opciones-input" id="pp-fFiltro" data-ctx="f" placeholder="Filtrar opciones" autocomplete="off">
+                    </div>
                     <div class="pp-params-body" id="pp-fParams">
                         <div class="pp-empty">
                             <i class="fa-solid fa-universal-access"></i>
@@ -130,6 +133,9 @@
                 </div>
                 <div class="pp-cat-dots is-hidden" id="pp-tCatDots"></div>
                 <div class="pp-content-area">
+                    <div class="pp-opciones-filtro is-hidden" id="pp-tFiltroWrap">
+                        <input type="search" class="pp-opciones-input" id="pp-tFiltro" data-ctx="t" placeholder="Filtrar opciones" autocomplete="off">
+                    </div>
                     <div class="pp-params-body" id="pp-tParams">
                         <div class="pp-empty">
                             <i class="fa-solid fa-puzzle-piece"></i>
@@ -170,6 +176,16 @@
     </div>
 </div>
 
+<div class="pp-img-modal" id="ppImgModal" hidden>
+    <div class="pp-img-dialog" role="dialog" aria-modal="true" aria-labelledby="ppImgTitulo">
+        <div class="pp-img-dialog-hdr">
+            <div id="ppImgTitulo">Imágenes de los juegos</div>
+            <button type="button" class="pp-btn" id="ppImgCerrar">Cerrar</button>
+        </div>
+        <div class="pp-img-grid" id="ppImgGrid"></div>
+    </div>
+</div>
+
 @push('scripts')
-    <script src="{{ asset('assets/js/parametros-perfil/gestion.js') }}"></script>
+    <script src="{{ asset('assets/js/parametros-perfil/gestion.js') }}?v={{ @filemtime(public_path('assets/js/parametros-perfil/gestion.js')) }}"></script>
 @endpush
