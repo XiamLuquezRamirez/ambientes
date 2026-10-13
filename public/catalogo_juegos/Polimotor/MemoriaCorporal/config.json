@@ -1,15 +1,15 @@
 {
-    "accesibilidad": {
-        "mostrarFeedBack": true,
-        "feedback": {
-            "duracion": 2000,
-            "acierto": {
-                "gif": "../../images/correcto.gif"
-            },
-            "error": {
-                "gif": "../../images/incorrecto.gif"
-            }
+    "mostrarFeedBack": true,
+    "feedback": {
+        "duracion": 2000,
+        "acierto": {
+            "gif": "../../images/correcto.gif"
         },
+        "error": {
+            "gif": "../../images/incorrecto.gif"
+        }
+    },
+    "accesibilidad": {
         "altoContraste": false,
         "mostrarIntro": true,
         "verBotonVerDeNuevo": true,

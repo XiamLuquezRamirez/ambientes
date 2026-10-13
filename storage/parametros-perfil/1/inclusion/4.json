@@ -50,7 +50,7 @@
         "modo_aula_automatico": false,
         "juegos": {
             "visual": {
-                "altoContraste": false,
+                "altoContraste": true,
                 "altoContrasteEstilo": {
                     "fondo": "rgba(0,0,0,0.82)",
                     "linea": "#000000",
@@ -64,9 +64,9 @@
                 "animaciones_opciones": true,
                 "mostrarNombres": true,
                 "mostrarZonas": false,
-                "resaltarDestino": false,
-                "resaltarObjetivo": false,
-                "huecosPunteados": false,
+                "resaltarDestino": true,
+                "resaltarObjetivo": true,
+                "huecosPunteados": true,
                 "grillaFija": true,
                 "juego_bordes": false
             },
@@ -127,13 +127,13 @@
                 "rompecabezas_piezas_max": 4,
                 "memoria_pares_max": 2,
                 "secuencia_pasos_max": 2,
-                "piezasVisibles": 4,
+                "piezasVisibles": 2,
                 "porcentajeAcierto": 60,
                 "rutasFalsas": true,
                 "rutasFalsasCantidad": 2
             }
         }
     },
-    "actualizado_en": "2026-09-08T09:04:13-05:00",
+    "actualizado_en": "2026-10-13T17:54:27-05:00",
     "institucion_id": 1
 }

@@ -56,6 +56,62 @@ class ParametrosPerfilAprendizajeService
         return $params;
     }
 
+    /**
+     * Claves de accesibilidad de los juegos. El resto del catálogo no se escribe en el config.
+     *
+     * @return list<string>
+     */
+    public function clavesJuegos(): array
+    {
+        $claves = [];
+
+        foreach (config('parametros_perfil.categorias', []) as $cat) {
+            if (($cat['k'] ?? '') !== 'juegos') {
+                continue;
+            }
+
+            foreach ($cat['params'] ?? [] as $p) {
+                if (! empty($p['k'])) {
+                    $claves[] = (string) $p['k'];
+                }
+            }
+        }
+
+        return $claves;
+    }
+
+    /**
+     * Asegura el JSON del perfil en storage/parametros-perfil/{institucion}/{tipo}/{id}.json.
+     * La carpeta de la institución es la carpeta principal. No pisa un archivo que ya existe.
+     *
+     * @return array{institucion_id: int, tipo: string, perfil_id: int, carpeta: string, archivo: string, json: array<string, mixed>|null}
+     */
+    public function asegurarDocumentoInstitucion(
+        int $institucionId,
+        string $tipo,
+        int $id,
+        ?PerfilAprendizajePersonalizado $perfil = null
+    ): array {
+        $this->sembrarPerfilInstitucion($institucionId, $tipo, $id);
+
+        $ruta = $this->rutaArchivo($tipo, $id, $institucionId);
+        $json = null;
+
+        if (File::exists($ruta)) {
+            $decodificado = json_decode((string) File::get($ruta), true);
+            $json = is_array($decodificado) ? $decodificado : null;
+        }
+
+        return [
+            'institucion_id' => $institucionId,
+            'tipo' => $tipo,
+            'perfil_id' => $id,
+            'carpeta' => $institucionId.'/'.$tipo,
+            'archivo' => $institucionId.'/'.$tipo.'/'.$id.'.json',
+            'json' => $json,
+        ];
+    }
+
     public function clavePerfilInclusion(int $id): ?string
     {
         $mapa = config('parametros_perfil.mapa_perfiles', []);

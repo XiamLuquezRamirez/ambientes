@@ -127,7 +127,7 @@
                 "rompecabezas_piezas_max": 9,
                 "memoria_pares_max": 6,
                 "secuencia_pasos_max": 4,
-                "piezasVisibles": 4,
+                "piezasVisibles": 2,
                 "porcentajeAcierto": 60,
                 "rutasFalsas": true,
                 "rutasFalsasCantidad": 2

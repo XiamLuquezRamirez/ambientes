@@ -1,4 +1,10 @@
 {
+  "mostrarFeedBack": true,
+  "feedback": {
+    "duracion": 2000,
+    "acierto": { "gif": "../../images/correcto.gif" },
+    "error": { "gif": "../../images/incorrecto.gif" }
+  },
   "accesibilidad": {
     "piezasVisibles": 8,
     "tiempoMostrarCompleto": 3000,
@@ -6,12 +12,6 @@
     "porcentajeAcierto": 60,
     "fallosPista1": 2,
     "fallosPista2": 3,
-    "mostrarFeedBack": true,
-    "feedback": {
-      "duracion": 2000,
-      "acierto": { "gif": "../../images/correcto.gif" },
-      "error": { "gif": "../../images/incorrecto.gif" }
-    },
     "altoContraste": false,
     "mostrarIntro": true,
     "modoTap": false,

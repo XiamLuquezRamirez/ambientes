@@ -178,6 +178,12 @@ class ParametrosPerfilAprendizajeServiceTest extends TestCase
         $this->assertSame(80, $valores['btn_size']);
         $this->assertSame('manual', $valores['audio_instruc']);
 
+        $documento = $this->servicio->asegurarDocumentoInstitucion($institucionId, 'personalizado', 88883, $perfil);
+        $this->assertSame('99996/personalizado', $documento['carpeta']);
+        $this->assertSame('99996/personalizado/88883.json', $documento['archivo']);
+        $this->assertIsArray($documento['json']);
+        $this->assertArrayHasKey('juegos', $documento['json']['valores']);
+
         $ruta = storage_path('parametros-perfil/'.$institucionId.'/personalizado/88883.json');
         if (file_exists($ruta)) {
             unlink($ruta);
