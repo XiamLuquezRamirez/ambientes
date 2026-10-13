@@ -60,7 +60,75 @@
         src.stop(t0 + dur + 0.05);
     }
 
+    /** Oscilador filtrado con trémolo opcional (graznidos, rugidos). */
+    function timbre(o) {
+        const c = contexto();
+        if (!c) return;
+        const t0 = c.currentTime + (o.retraso || 0);
+        const dur = o.dur;
+        const filtro = c.createBiquadFilter();
+        filtro.type = o.filtro || "lowpass";
+        filtro.frequency.setValueAtTime(o.corte, t0);
+        filtro.Q.setValueAtTime(o.q || 1, t0);
+        const gain = c.createGain();
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(o.vol, t0 + (o.ataque || 0.02));
+        gain.gain.setValueAtTime(o.vol, t0 + dur * 0.6);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        if (o.tremolo) {
+            const lfo = c.createOscillator();
+            const prof = c.createGain();
+            lfo.frequency.setValueAtTime(o.tremolo, t0);
+            prof.gain.setValueAtTime(o.vol * 0.5, t0);
+            lfo.connect(prof).connect(gain.gain);
+            lfo.start(t0);
+            lfo.stop(t0 + dur + 0.05);
+        }
+        (o.desafinar || [0]).forEach(function (cents) {
+            const osc = c.createOscillator();
+            osc.type = o.tipo || "sawtooth";
+            osc.detune.setValueAtTime(cents, t0);
+            osc.frequency.setValueAtTime(o.desde, t0);
+            if (o.hasta) osc.frequency.exponentialRampToValueAtTime(o.hasta, t0 + dur);
+            osc.connect(filtro);
+            osc.start(t0);
+            osc.stop(t0 + dur + 0.05);
+        });
+        filtro.connect(gain).connect(c.destination);
+    }
+
     const EFECTOS = {
+        /** Pato: «cuac, cuac». */
+        cuac: function () {
+            [0, 0.26].forEach(function (r) {
+                timbre({ retraso: r, dur: 0.2, desde: 620, hasta: 430, corte: 1300, filtro: "bandpass", q: 3, vol: 0.35, desafinar: [-12, 12] });
+            });
+        },
+        /** Dino de juguete: rugido suave, sin asustar. */
+        rugido: function () {
+            timbre({ dur: 0.95, desde: 130, hasta: 78, corte: 700, vol: 0.3, ataque: 0.12, tremolo: 22, desafinar: [-18, 0, 18] });
+            ruido({ dur: 0.8, desde: 500, hasta: 180, vol: 0.08 });
+        },
+        /** Trompetas festivas: ta-ta-ta-táaa. */
+        fanfarria: function () {
+            [[392, 0, 0.14], [392, 0.16, 0.14], [392, 0.32, 0.14], [523.25, 0.5, 0.7]].forEach(function (n) {
+                timbre({ retraso: n[1], dur: n[2], desde: n[0], corte: 2400, vol: 0.22, ataque: 0.02, desafinar: [-6, 6] });
+                timbre({ retraso: n[1], dur: n[2], desde: n[0] * 1.5, corte: 2400, vol: 0.1, ataque: 0.02 });
+            });
+        },
+        /** Risa de Zeus: «ja, ja, ja, ja». */
+        risa: function () {
+            [0, 0.17, 0.34, 0.51].forEach(function (r, k) {
+                timbre({ retraso: r, dur: 0.13, desde: 340 - k * 20, hasta: 290 - k * 20, corte: 1000, filtro: "bandpass", q: 2, vol: 0.3, ataque: 0.01, desafinar: [-8, 8] });
+            });
+        },
+        /** Tambor: «pum, pum». */
+        tambor: function () {
+            [0, 0.22].forEach(function (r, k) {
+                tono(k ? 150 : 170, { tipo: "sine", dur: 0.32, hasta: 55, vol: 0.5, retraso: r });
+                ruido({ retraso: r, dur: 0.06, filtro: "highpass", desde: 2000, vol: 0.12 });
+            });
+        },
         /** Entrada de un objeto (índice → tono distinto). */
         pop: function (i) {
             const f = NOTAS[(i || 0) % NOTAS.length];

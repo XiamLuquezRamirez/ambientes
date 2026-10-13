@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="style.css?v=20261013d">
 	<link rel="stylesheet" href="../../tutorial/tutorial.css">
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
@@ -93,22 +93,67 @@
 	<div id="principal">
 		<div class="hud-top">
 			<div class="hud-nav">
-				<div id="progreso" class="hud-progreso" hidden></div>
 				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
 				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</div>
 
-		<div class="enunciado-wrap">
-			<h1 class="borde" id="enunciado">Observa y completa la figura</h1>
-		</div>
+		<div id="escena" class="escena">
+			<div class="barra-superior">
+				<div id="estante" class="estante" hidden>
+					<div class="estante-tabla">
+						<div class="estante-hueco"></div>
+						<div class="estante-hueco"></div>
+						<div class="estante-hueco"></div>
+					</div>
+					<div class="barra-herramientas" aria-hidden="true">
+						<i class="fa-solid fa-hammer"></i>
+						<div class="barra"><div id="barra-relleno" class="barra-relleno"></div></div>
+						<i class="fa-solid fa-screwdriver-wrench"></i>
+					</div>
+				</div>
+				<div id="medidor" class="medidor" hidden aria-hidden="true">
+					<i class="fa-solid fa-gauge-high"></i>
+					<div class="medidor-barra"><span></span><span></span><span></span></div>
+				</div>
+			</div>
 
-		<div id="figura-escena" class="figura-escena" aria-live="polite">
-			<img id="figura-img" src="" alt="">
-			<span id="figura-nombre" class="figura-nombre"></span>
+			<div id="dialogo" class="dialogo" aria-live="polite">
+				<img id="dialogo-avatar" class="dialogo-avatar" src="../../images/zoe_normal.gif" alt="Zoe">
+				<p id="enunciado" class="enunciado"></p>
+			</div>
+
+			<div id="zona-escenario" class="zona-escenario">
+				<div id="escenario" class="escenario">
+					<div id="figura" class="figura"></div>
+					<div id="extras" class="extras"></div>
+				</div>
+				<div id="controles" class="controles">
+					<button type="button" id="btn-bomba" class="btn-accion btn-bomba" hidden aria-label="Bomba de aire">
+						<span class="bomba-dibujo" aria-hidden="true"><span class="bomba-mango"></span><span class="bomba-cuerpo"></span><span class="bomba-manguera"></span></span>
+					</button>
+					<button type="button" id="btn-grua" class="btn-accion btn-grua" hidden aria-label="Bajar la grúa">
+						<i class="fa-solid fa-arrow-down"></i><span>Grúa</span>
+					</button>
+					<button type="button" id="btn-clima" class="btn-accion btn-clima" hidden aria-label="Prueba de clima">
+						<i class="fa-solid fa-cloud-rain"></i><span>Clima</span>
+					</button>
+				</div>
+			</div>
+
+			<div id="mesa" class="mesa">
+				<div id="zona-piezas" class="zona-piezas" aria-label="Piezas para completar"></div>
+				<canvas id="lodo" class="lodo" hidden></canvas>
+			</div>
 		</div>
-		<div id="zona-piezas" class="zona-piezas" aria-label="Piezas para completar"></div>
 	</div>
+
+	<div id="capa-efectos" class="capa-efectos" aria-hidden="true"></div>
+	<div id="alerta" class="alerta" hidden role="alert">
+		<i class="fa-solid fa-triangle-exclamation"></i>
+		<span id="alerta-texto"></span>
+	</div>
+	<div id="gran-final" class="gran-final" hidden></div>
 
 		<div id="tutorial-zoe" class="tutorial-zoe" hidden aria-hidden="true"></div>
 <div id="menu-vol" class="menu-acc">
@@ -144,6 +189,8 @@
 	</script>
 	<script type="module" src="../../intro3d/js/three-scene.js?v=20261007a"></script>
 	<script src="../../intro3d/js/intro.js?v=20261008a"></script>
-	<script src="script.js"></script>
+	<script src="logica.js?v=20261013a"></script>
+	<script src="sfx.js?v=20261013a"></script>
+	<script src="script.js?v=20261013d"></script>
 </body>
 </html>

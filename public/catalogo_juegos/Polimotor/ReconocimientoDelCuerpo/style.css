@@ -394,6 +394,39 @@ body.mostrar-zonas .zona-toque {
   z-index: 6;
 }
 
+.zona-toque.error {
+  border: 3px solid #ef5350;
+  background: rgba(239, 83, 80, 0.35);
+  animation: zonaError 0.45s ease 2;
+  z-index: 6;
+}
+
+@keyframes zonaError {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+#enunciado {
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+#enunciado.es-acierto {
+  color: #2e7d32;
+  animation: enunciadoPop 0.4s ease;
+}
+
+#enunciado.es-error {
+  color: #e65100;
+  animation: enunciadoPop 0.4s ease;
+}
+
+@keyframes enunciadoPop {
+  0% { transform: scale(0.9); }
+  60% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
 @keyframes iluminar {
   0% { transform: scale(0.92); filter: brightness(1.6); }
   100% { transform: scale(1); filter: none; }

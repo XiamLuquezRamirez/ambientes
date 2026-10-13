@@ -93,43 +93,44 @@
 	<div id="principal">
 		<div class="hud-top">
 			<div class="hud-nav">
-				<div id="progreso" class="hud-progreso" hidden></div>
 				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
 				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</div>
 
-		<div class="enunciado-wrap">
-			<h1 class="borde" id="enunciado">Observa y encuentra las diferencias</h1>
+		<div class="cabecera">
+			<div id="dialogo" class="dialogo" aria-live="polite">
+				<img id="dialogo-avatar" class="dialogo-avatar" src="../../images/zoe_normal.gif" alt="Zoe">
+				<p id="enunciado" class="enunciado"></p>
+			</div>
 		</div>
 
 		<div class="escenario" id="escenario">
 			<div class="escena-wrap" id="escena-wrap">
-				<div class="par-imagenes">
-					<div class="panel-img panel-izq">
-						<span class="panel-etiqueta" id="etiq-izq">A</span>
-						<div class="panel-frame">
-							<div class="img-stack">
-								<img id="img-izq" src="" alt="Imagen de referencia">
-							</div>
+				<div class="par-imagenes" id="par-imagenes">
+					<div class="panel-img panel-izq" id="panel-A">
+						<span class="panel-etiqueta" id="etiq-A">A</span>
+						<div class="panel-frame" id="frame-A" data-lado="A">
+							<div class="img-stack" id="escena-A" aria-label="Imagen modelo"></div>
 						</div>
 					</div>
-					<div class="panel-img panel-der">
-						<span class="panel-etiqueta" id="etiq-der">B</span>
-						<div class="panel-frame" id="frame-der">
-							<div class="img-stack">
-								<img id="img-der" src="" alt="Imagen con diferencias">
-								<div id="zona-hotspots" class="zona-hotspots" aria-label="Diferencias"></div>
-							</div>
+					<div class="panel-img panel-der" id="panel-B">
+						<span class="panel-etiqueta" id="etiq-B">B</span>
+						<div class="panel-frame" id="frame-B" data-lado="B">
+							<div class="img-stack" id="escena-B" aria-label="Imagen con diferencias"></div>
 						</div>
 					</div>
 				</div>
+				<aside id="hallazgos" class="hallazgos" hidden aria-label="Contador de hallazgos"></aside>
 			</div>
 		</div>
 	</div>
 
-		<div id="tutorial-zoe" class="tutorial-zoe" hidden aria-hidden="true"></div>
-<div id="menu-vol" class="menu-acc">
+	<div id="capa-efectos" class="capa-efectos" aria-hidden="true"></div>
+
+	<div id="tutorial-zoe" class="tutorial-zoe" hidden aria-hidden="true"></div>
+
+	<div id="menu-vol" class="menu-acc">
 		<button type="button" id="btn-menu-vol" class="menu-acc-fab" aria-expanded="false" aria-controls="menu-vol-panel" title="Volumen de fondo">
 			<i class="fa-solid fa-volume-high"></i>
 		</button>
@@ -149,6 +150,8 @@
 	<script src="../../shared/edad-nivel.js"></script>
 	<script src="../../tutorial/tutorial.js"></script>
 	<script src="../../final/final.js"></script>
+	<script src="logica.js"></script>
+	<script src="sfx.js"></script>
 	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
 	<script src="../../intro3d/js/config.js?v=20261007a"></script>
 	<script src="../../intro3d/js/ambientes-tema.js?v=20260930d"></script>

@@ -99,13 +99,18 @@
         return elegir(poolDe(config, def.grupo), def.cantidad, rng, { evitar: sesion.usados });
     }
 
+    /**
+     * `def.fijo` fija el contenido del documento y tiene prioridad sobre los grupos al azar.
+     * Lo que el documento no fija (dónde cae el intruso, orden de las opciones) sigue al azar.
+     */
     function prepararReto(config, nivel, def, sesion, rng) {
         const r = rng || Math.random;
         const ctx = { mecanica: def.mecanica };
+        const f = def.fijo || null;
 
         if (def.mecanica === "intruso") {
-            const base = baseDelReto(config, nivel, def, sesion, r);
-            const intruso = elegir(poolDe(config, def.grupoIntruso || def.grupo), 1, r, { prohibidos: base, evitar: sesion.usados })[0];
+            const base = f ? f.mostrar.slice() : baseDelReto(config, nivel, def, sesion, r);
+            const intruso = f ? f.intruso : elegir(poolDe(config, def.grupoIntruso || def.grupo), 1, r, { prohibidos: base, evitar: sesion.usados })[0];
             ctx.mostrar = base;
             if (def.conservarOrden) {
                 // Cada tesoro sigue en su pedestal; el intruso ocupa uno adicional.
@@ -117,10 +122,10 @@
             ctx.correcto = [intruso];
             marcar(sesion, base.concat([intruso]));
         } else if (def.mecanica === "oculto") {
-            const base = baseDelReto(config, nivel, def, sesion, r);
-            const indice = Math.floor(r() * base.length);
+            const base = f ? f.mostrar.slice() : baseDelReto(config, nivel, def, sesion, r);
+            const indice = f ? base.indexOf(f.oculto) : Math.floor(r() * base.length);
             const oculto = base[indice];
-            const distractores = elegir(poolDe(config, def.grupoOpciones || def.grupo), Math.max(1, (def.opciones || 3) - 1), r, {
+            const distractores = f ? f.distractores.slice() : elegir(poolDe(config, def.grupoOpciones || def.grupo), Math.max(1, (def.opciones || 3) - 1), r, {
                 prohibidos: base,
                 evitar: sesion.usados
             });
@@ -131,9 +136,9 @@
             ctx.correcto = [oculto];
             marcar(sesion, base.concat(distractores));
         } else if (def.mecanica === "transformacion") {
-            const base = elegir(poolDe(config, def.grupo), def.cantidad, r, {});
-            const indice = Math.floor(r() * base.length);
-            const nuevo = elegir(poolDe(config, def.grupo), 1, r, { prohibidos: base })[0];
+            const base = f ? f.mostrar.slice() : elegir(poolDe(config, def.grupo), def.cantidad, r, {});
+            const indice = f ? base.indexOf(f.original) : Math.floor(r() * base.length);
+            const nuevo = f ? f.nuevo : elegir(poolDe(config, def.grupo), 1, r, { prohibidos: base })[0];
             ctx.mostrar = base;
             ctx.desafio = base.slice();
             ctx.desafio[indice] = nuevo;
@@ -141,18 +146,25 @@
             ctx.original = base[indice];
             ctx.correcto = [nuevo];
         } else if (def.mecanica === "secuencia") {
-            const baldosas = baseDelReto(config, nivel, def, sesion, r);
+            const baldosas = f ? f.mostrar.slice() : baseDelReto(config, nivel, def, sesion, r);
             const largo = Math.min(Math.max(2, def.largo || 2), baldosas.length);
             ctx.mostrar = baldosas;
             ctx.desafio = baldosas.slice();
-            ctx.orden = barajar(baldosas, r).slice(0, largo);
+            ctx.orden = f ? f.orden.slice() : barajar(baldosas, r).slice(0, largo);
             ctx.correcto = ctx.orden.slice();
             marcar(sesion, baldosas);
         } else if (def.mecanica === "intercambio") {
-            const base = baseDelReto(config, nivel, def, sesion, r);
-            const i = Math.floor(r() * base.length);
-            let j = Math.floor(r() * (base.length - 1));
-            if (j >= i) j += 1;
+            const base = f ? f.mostrar.slice() : baseDelReto(config, nivel, def, sesion, r);
+            let i;
+            let j;
+            if (f) {
+                i = base.indexOf(f.intercambiar[0]);
+                j = base.indexOf(f.intercambiar[1]);
+            } else {
+                i = Math.floor(r() * base.length);
+                j = Math.floor(r() * (base.length - 1));
+                if (j >= i) j += 1;
+            }
             ctx.mostrar = base;
             ctx.desafio = base.slice();
             ctx.desafio[i] = base[j];
@@ -238,6 +250,27 @@
         return { texto: valor.texto || "", personaje: valor.personaje || personajeDefecto || "zoe" };
     }
 
+    function validarFijo(def, objetos) {
+        const f = def.fijo;
+        const errores = [];
+        const mostrar = Array.isArray(f.mostrar) ? f.mostrar : [];
+        const esta = function (id) { return mostrar.indexOf(id) !== -1; };
+        if (!mostrar.length) return ["fijo sin mostrar"];
+        [].concat(mostrar, f.intruso || [], f.oculto || [], f.distractores || [], f.original || [], f.nuevo || [], f.orden || [], f.intercambiar || [])
+            .forEach(function (id) { if (!objetos[id]) errores.push("fijo: objeto inexistente " + id); });
+        if (def.mecanica === "intruso" && (!f.intruso || esta(f.intruso))) errores.push("fijo: intruso inválido");
+        if (def.mecanica === "oculto") {
+            if (!esta(f.oculto)) errores.push("fijo: oculto no está en mostrar");
+            if (!Array.isArray(f.distractores) || f.distractores.some(esta)) errores.push("fijo: distractores inválidos");
+        }
+        if (def.mecanica === "transformacion" && (!esta(f.original) || !f.nuevo || esta(f.nuevo))) errores.push("fijo: transformación inválida");
+        if (def.mecanica === "secuencia" && (!Array.isArray(f.orden) || f.orden.length < 2 || !f.orden.every(esta))) errores.push("fijo: orden inválido");
+        if (def.mecanica === "intercambio" && (!Array.isArray(f.intercambiar) || f.intercambiar.length !== 2 || !f.intercambiar.every(esta) || f.intercambiar[0] === f.intercambiar[1])) {
+            errores.push("fijo: intercambio inválido");
+        }
+        return errores;
+    }
+
     function validarConfig(config) {
         const errores = [];
         const objetos = config.objetos || {};
@@ -259,6 +292,7 @@
                 [].concat(def.grupo || [], def.grupoOpciones || [], def.grupoIntruso || []).forEach(function (g) {
                     if (!grupos[g]) errores.push(donde + ": grupo inexistente " + g);
                 });
+                if (def.fijo) validarFijo(def, objetos).forEach(function (e) { errores.push(donde + ": " + e); });
             });
         });
         return errores;

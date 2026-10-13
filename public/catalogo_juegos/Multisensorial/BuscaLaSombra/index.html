@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="style.css?v=20261010d">
 	<link rel="stylesheet" href="../../tutorial/tutorial.css">
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
@@ -91,19 +91,30 @@
 	</div>
 
 	<div id="principal">
+		<div class="escena-decorado" aria-hidden="true"></div>
+		<div id="progreso-escena" class="progreso-escena" hidden></div>
 		<div class="hud-top">
 			<div class="hud-nav">
-				<div id="progreso" class="hud-progreso" hidden></div>
 				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
 				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</div>
 		<div class="enunciado-wrap">
-			<h1 class="borde" id="enunciado">Observa y encuentra su sombra</h1>
+			<h1 class="borde" id="enunciado" aria-live="polite">Observa y encuentra su sombra</h1>
 		</div>
-		<div id="objeto-objetivo" class="objeto-objetivo" aria-live="polite"></div>
+		<div class="escenario-objeto">
+			<img id="guia-zoe" class="guia guia-zoe" src="../../images/zoe_normal.gif" alt="">
+			<div id="objeto-objetivo" class="objeto-objetivo"></div>
+			<img id="guia-zeus" class="guia guia-zeus" src="../../images/zeus_normal.gif" alt="">
+		</div>
 		<div id="zona-sombras" class="zona-sombras" aria-label="Sombras para elegir"></div>
 	</div>
+
+	<div id="recorrido" class="recorrido" hidden></div>
+	<div id="gran-final" class="gran-final" hidden></div>
+	<div id="capa-efectos" class="capa-efectos" aria-hidden="true"></div>
+	<div id="linterna-luz" class="linterna-luz" hidden aria-hidden="true"></div>
+	<div id="lupa" class="lupa" hidden aria-hidden="true"><img src="" alt=""></div>
 
 		<div id="tutorial-zoe" class="tutorial-zoe" hidden aria-hidden="true"></div>
 <div id="menu-vol" class="menu-acc">
@@ -139,6 +150,7 @@
 	</script>
 	<script type="module" src="../../intro3d/js/three-scene.js?v=20261007a"></script>
 	<script src="../../intro3d/js/intro.js?v=20261008a"></script>
-	<script src="script.js"></script>
+	<script src="logica.js?v=20261010b"></script>
+	<script src="script.js?v=20261010c"></script>
 </body>
 </html>

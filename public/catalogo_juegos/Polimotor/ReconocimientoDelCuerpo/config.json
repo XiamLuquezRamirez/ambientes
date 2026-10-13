@@ -1,14 +1,7 @@
 {
-    "mostrarFeedBack": true,
     "fallosParaPista": 2,
     "feedback": {
-        "duracion": 1800,
-        "acierto": {
-            "gif": "../../images/correcto.gif"
-        },
-        "error": {
-            "gif": "../../images/incorrecto.gif"
-        }
+        "duracion": 1800
     },
     "accesibilidad": {
         "altoContraste": false,
@@ -28,7 +21,7 @@
         "cierre": "Reconociste las partes del cuerpo.",
         "demostracion": "¡Vamos con un ejemplo! Mira: el dedo presiona la barriga.",
         "demostracionFin": "¡Ahora te toca a ti! Escucha y toca la parte del cuerpo.",
-        "acierto": "¡Muy bien! Encontraste la parte del cuerpo.",
+        "acierto": "¡Muy bien!",
         "error": "Ya casi lo tienes, mira con atención y vuelve a intentarlo. ¡Tú puedes!",
         "conversacion": [
             {

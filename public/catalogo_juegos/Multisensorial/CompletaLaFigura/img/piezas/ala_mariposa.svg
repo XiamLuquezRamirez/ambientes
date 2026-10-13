@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="120" height="140">
-<rect width="120" height="140" fill="none"/>
-<ellipse cx="60" cy="50" rx="38" ry="48" fill="#da77f2"/><ellipse cx="55" cy="100" rx="28" ry="32" fill="#be4bdb"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="152 45 80 139" width="80" height="139">
+<g transform="matrix(-1 0 0 1 300 0)"><ellipse cx="108" cy="95" rx="40" ry="50" fill="#da77f2" stroke="#9c36b5" stroke-width="3"/><ellipse cx="115" cy="150" rx="30" ry="34" fill="#be4bdb" stroke="#9c36b5" stroke-width="3"/><circle cx="100" cy="85" r="10" fill="#fff3bf"/><circle cx="120" cy="113" r="6" fill="#fff3bf"/><circle cx="92" cy="110" r="4" fill="#862e9c"/><circle cx="112" cy="152" r="8" fill="#ffe066"/></g>
 </svg>

@@ -1,37 +1,22 @@
 {
   "nombre": "Completa La Figura",
-  "mostrarFeedBack": true,
-  "feedback": {
-    "duracion": 1400,
-    "acierto": {
-      "gif": "../../images/correcto.gif"
-    },
-    "error": {
-      "gif": "../../images/incorrecto.gif"
-    }
-  },
   "textos": {
     "eligeNivel": "Elige tu edad",
-    "enunciado": "Observa la figura y encuentra la parte que le falta",
-    "cierre": "¡Excelente! Completaste todas las figuras.",
-    "aciertoPlantilla": "¡Muy bien! Completaste {figura}.",
-    "error": "¡Inténtalo otra vez! Observa qué parte le falta.",
-    "errorAvanzado": "¡Inténtalo otra vez! Observa muy bien la forma y el tamaño de la pieza.",
-    "consignaPlantilla": "Completa {figura}.",
-    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: observa la figura y toca la pieza que le falta.",
-    "demostracionFin": "¡Ahora te toca a ti! Completa cada figura.",
+    "demostracion": "¡Vamos con un ejemplo! A esta taza le falta una pieza. Mira: toco la pieza que encaja en el hueco.",
+    "demostracionAcierto": "¡Así! La pieza encajó y la taza quedó completa.",
+    "demostracionFin": "¡Ahora te toca a ti!",
     "conversacion": [
       {
         "personaje": 1,
-        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Observa muy bien la figura y encuentra la parte que le falta."
+        "texto": "¡Hola! Soy Zoe. Bienvenido a nuestro taller mágico."
       },
       {
         "personaje": 0,
-        "texto": "¡Yo soy Zeus! Mira el hueco y toca la pieza que encaja. ¡Tú puedes!"
+        "texto": "¡Yo soy Zeus! A algunos juguetes e inventos les falta una pieza importante."
       },
       {
         "personaje": 1,
-        "texto": "Observa la forma y el tamaño. Cuando aciertes, la figura quedará completa."
+        "texto": "Observa la forma y el tamaño, y encuentra la pieza que encaja. ¡Tú puedes!"
       }
     ]
   },
@@ -42,91 +27,274 @@
     "mostrarIntro": true
   },
   "audios": {
-    "acierto": "../../sounds/ok.mp3",
-    "error": "../../sounds/over.mp3",
     "cierre": "../../sounds/victory.mp3",
-    "fondo": "../../sounds/fondo.mp3"
-  },
-  "figuras": {
-    "mariposa": {
-      "nombre": "la mariposa",
-      "etiqueta": "Mariposa",
-      "base": "img/figuras/mariposa_base.svg",
-      "completa": "img/figuras/mariposa_completa.svg",
-      "piezaCorrecta": "ala_mariposa"
-    },
-    "carro": {
-      "nombre": "el carro",
-      "etiqueta": "Carro",
-      "base": "img/figuras/carro_base.svg",
-      "completa": "img/figuras/carro_completa.svg",
-      "piezaCorrecta": "rueda"
-    },
-    "casa": {
-      "nombre": "la casa",
-      "etiqueta": "Casa",
-      "base": "img/figuras/casa_base.svg",
-      "completa": "img/figuras/casa_completa.svg",
-      "piezaCorrecta": "techo"
+    "fondo": "../../sounds/fondo.mp3",
+    "efectos": {
+      "dingaling": "",
+      "boing": "",
+      "splash": "",
+      "ronquido": "",
+      "swoosh": "",
+      "clack": "",
+      "puff": "",
+      "vroom": "",
+      "clic": "",
+      "golpe": "",
+      "escaner": "",
+      "clackding": "",
+      "alerta": "",
+      "zzzpop": "",
+      "grua": "",
+      "pumclack": "",
+      "lluvia": "",
+      "viento": "",
+      "fanfarria": "",
+      "magia": ""
     }
   },
   "piezas": {
-    "ala_mariposa": { "nombre": "Ala de mariposa", "img": "img/piezas/ala_mariposa.svg" },
-    "ala_forma_diff": { "nombre": "Ala de otra forma", "img": "img/piezas/ala_forma_diff.svg" },
-    "ala_tamano_diff": { "nombre": "Ala de otro tamaño", "img": "img/piezas/ala_tamano_diff.svg" },
-    "ala_insecto": { "nombre": "Ala de otro insecto", "img": "img/piezas/ala_insecto.svg" },
-    "oreja_conejo": { "nombre": "Oreja de conejo", "img": "img/piezas/oreja_conejo.svg" },
-    "hoja": { "nombre": "Hoja", "img": "img/piezas/hoja.svg" },
-    "rueda": { "nombre": "Rueda", "img": "img/piezas/rueda.svg" },
-    "rueda_grande": { "nombre": "Rueda grande", "img": "img/piezas/rueda_grande.svg" },
-    "rueda_pequena": { "nombre": "Rueda pequeña", "img": "img/piezas/rueda_pequena.svg" },
-    "estrella": { "nombre": "Estrella", "img": "img/piezas/estrella.svg" },
-    "flor": { "nombre": "Flor", "img": "img/piezas/flor.svg" },
-    "pelota": { "nombre": "Pelota", "img": "img/piezas/pelota.svg" },
-    "circulo": { "nombre": "Círculo", "img": "img/piezas/circulo.svg" },
-    "techo": { "nombre": "Techo", "img": "img/piezas/techo.svg" },
-    "techo_forma_diff": { "nombre": "Techo de otra forma", "img": "img/piezas/techo_forma_diff.svg" },
-    "techo_ancho": { "nombre": "Techo ancho", "img": "img/piezas/techo_ancho.svg" },
-    "techo_pequeno": { "nombre": "Techo pequeño", "img": "img/piezas/techo_pequeno.svg" },
-    "sol": { "nombre": "Sol", "img": "img/piezas/sol.svg" },
-    "arbol": { "nombre": "Árbol", "img": "img/piezas/arbol.svg" },
-    "copa_arbol": { "nombre": "Copa de árbol", "img": "img/piezas/copa_arbol.svg" },
-    "nube": { "nombre": "Nube", "img": "img/piezas/nube.svg" },
-    "triangulo": { "nombre": "Triángulo", "img": "img/piezas/triangulo.svg" }
+    "ala_mariposa": { "nombre": "Ala de mariposa", "img": "img/piezas/ala_mariposa.svg", "w": 80, "h": 139 },
+    "oreja_conejo": { "nombre": "Oreja de conejo", "img": "img/piezas/oreja_conejo.svg", "w": 40, "h": 110 },
+    "hoja": { "nombre": "Hoja de árbol", "img": "img/piezas/hoja.svg", "w": 70, "h": 89 },
+    "rueda": { "nombre": "Rueda", "img": "img/piezas/rueda.svg", "w": 48, "h": 48 },
+    "estrella": { "nombre": "Estrella", "img": "img/piezas/estrella.svg", "w": 52, "h": 52 },
+    "flor": { "nombre": "Flor", "img": "img/piezas/flor.svg", "w": 52, "h": 52 },
+    "techo": { "nombre": "Techo triangular rojo", "img": "img/piezas/techo.svg", "w": 180, "h": 80 },
+    "sol": { "nombre": "Sol sonriente", "img": "img/piezas/sol.svg", "w": 70, "h": 70 },
+    "arbol": { "nombre": "Árbol verde", "img": "img/piezas/arbol.svg", "w": 70, "h": 89 },
+    "ala_mec": { "nombre": "Ala mecánica", "img": "img/piezas/ala_mec.svg", "w": 80, "h": 139 },
+    "ala_mec_ondulada": { "nombre": "Ala de bordes ondulados", "img": "img/piezas/ala_mec_ondulada.svg", "w": 80, "h": 139 },
+    "ala_mec_pequena": { "nombre": "Ala más pequeña", "img": "img/piezas/ala_mec.svg", "w": 60, "h": 104 },
+    "hoja_ala": { "nombre": "Hoja verde", "img": "img/piezas/hoja_ala.svg", "w": 80, "h": 139 },
+    "ala_abeja": { "nombre": "Ala de abeja", "img": "img/piezas/ala_abeja.svg", "w": 80, "h": 139 },
+    "rueda_44": { "nombre": "Rueda", "img": "img/piezas/rueda.svg", "w": 44, "h": 44 },
+    "rueda_60": { "nombre": "Rueda más grande", "img": "img/piezas/rueda.svg", "w": 60, "h": 60 },
+    "rueda_32": { "nombre": "Rueda más pequeña", "img": "img/piezas/rueda.svg", "w": 32, "h": 32 },
+    "pelota": { "nombre": "Pelota", "img": "img/piezas/pelota.svg", "w": 44, "h": 44 },
+    "circulo_plano": { "nombre": "Círculo plano", "img": "img/piezas/circulo_plano.svg", "w": 44, "h": 44 },
+    "techo_mod": { "nombre": "Techo", "img": "img/piezas/techo_mod.svg", "w": 170, "h": 64 },
+    "techo_mod_ancho": { "nombre": "Techo más ancho", "img": "img/piezas/techo_mod.svg", "w": 230, "h": 64 },
+    "techo_mod_pequeno": { "nombre": "Techo más pequeño", "img": "img/piezas/techo_mod.svg", "w": 120, "h": 45 },
+    "techo_agudo": { "nombre": "Triángulo puntiagudo", "img": "img/piezas/techo_agudo.svg", "w": 170, "h": 130 },
+    "techo_trapecio": { "nombre": "Techo trapezoidal", "img": "img/piezas/techo_trapecio.svg", "w": 170, "h": 50, "forma": "trapecio" },
+    "asa": { "nombre": "Asa de taza", "img": "img/piezas/asa.svg", "w": 46, "h": 66 }
+  },
+  "demo": {
+    "figura": "taza",
+    "capas": [{ "img": "img/figuras/taza_cuerpo.svg", "clase": "cuerpo" }],
+    "hueco": { "x": 186, "y": 108, "w": 46, "h": 66, "img": "img/figuras/taza_hueco.svg" },
+    "opciones": ["asa", "estrella", "flor"],
+    "correcta": "asa"
   },
   "niveles": [
     {
       "id": "3",
-      "edad": "3 años",
-      "titulo": "3 piezas",
-      "avanzado": false,
+      "edad": "3-4 años",
+      "titulo": "El Taller de Juguetes Mágicos",
+      "tema": "taller",
       "retos": [
-        { "figura": "mariposa", "opciones": ["ala_mariposa", "oreja_conejo", "hoja"] },
-        { "figura": "carro", "opciones": ["rueda", "estrella", "flor"] },
-        { "figura": "casa", "opciones": ["techo", "sol", "arbol"] }
-      ]
-    },
-    {
-      "id": "4",
-      "edad": "4 años",
-      "titulo": "4 piezas",
-      "avanzado": false,
-      "retos": [
-        { "figura": "mariposa", "opciones": ["ala_mariposa", "ala_forma_diff", "hoja", "oreja_conejo"] },
-        { "figura": "carro", "opciones": ["rueda", "rueda_grande", "pelota", "flor"] },
-        { "figura": "casa", "opciones": ["techo", "techo_forma_diff", "copa_arbol", "nube"] }
-      ]
+        {
+          "figura": "mariposa",
+          "nombre": "Mariposa",
+          "mecanica": "encaje",
+          "arrastre": true,
+          "capas": [
+            { "img": "img/figuras/mariposa_ala_izq.svg", "clase": "ala ala-izq" },
+            { "img": "img/figuras/mariposa_cuerpo.svg", "clase": "cuerpo" }
+          ],
+          "hueco": { "x": 152, "y": 45, "w": 80, "h": 139, "img": "img/figuras/mariposa_hueco.svg" },
+          "colocada": "ala ala-der",
+          "opciones": ["ala_mariposa", "oreja_conejo", "hoja"],
+          "correcta": "ala_mariposa",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Oh no! Nuestra mariposa no puede volar porque le falta una de sus alas. ¿Cuál es la pieza que encaja aquí?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Wooow! ¡Completaste la mariposa y ya puede volar!",
+            "efecto": "dingaling",
+            "celebracion": "mariposaVuela"
+          },
+          "errores": {
+            "oreja_conejo": { "voz": "zoe", "texto": "Mmm, ¡esa es una orejita! Busca la pieza que es igual a la otra ala.", "reaccion": "rebote" },
+            "hoja": { "voz": "zoe", "texto": "Mmm, ¡esa es una hoja! Busca la pieza que es igual a la otra ala.", "reaccion": "rebote" }
+          }
+        },
+        {
+          "figura": "carro",
+          "nombre": "Carro de carreras",
+          "mecanica": "lodo",
+          "arrastre": true,
+          "iman": true,
+          "capas": [
+            { "img": "img/figuras/carro_cuerpo.svg", "clase": "cuerpo" },
+            { "img": "img/piezas/rueda.svg", "clase": "rueda rueda-delantera", "x": 191, "y": 148, "w": 48, "h": 48 },
+            { "img": "img/piezas/rueda.svg", "clase": "rueda rueda-perdida", "x": 61, "y": 148, "w": 48, "h": 48 }
+          ],
+          "hueco": { "x": 61, "y": 148, "w": 48, "h": 48, "forma": "circulo" },
+          "colocada": "rueda",
+          "escape": { "x": 12, "y": 160 },
+          "charco": { "x": 28, "y": 188, "w": 120, "h": 22 },
+          "opciones": ["rueda", "estrella", "flor"],
+          "correcta": "rueda",
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Cuidado, coche en apuros! El lodo tapó las herramientas del taller. ¡Ayúdame a limpiar para encontrar la rueda!"
+          },
+          "lodo": { "limpiezaMinima": 0.6, "ayudaMs": 12000, "ayuda": { "voz": "zeus", "texto": "¡Te ayudo a limpiar!" } },
+          "descubierta": { "voz": "zoe", "texto": "¡Ahí está la rueda! Tómala y conéctala en el eje del carro." },
+          "inflar": { "voz": "zeus", "texto": "¡La llanta quedó desinflada! Toca la bomba de aire para inflarla.", "bombazos": 3 },
+          "acierto": { "efecto": "clack", "celebracion": "carroArranca" },
+          "errores": {
+            "estrella": { "voz": "zoe", "texto": "Mmm, ¡esa es una estrella! Busca la rueda.", "reaccion": "rebote" },
+            "flor": { "voz": "zoe", "texto": "Mmm, ¡esa es una flor! Busca la rueda.", "reaccion": "rebote" }
+          }
+        },
+        {
+          "figura": "casa",
+          "nombre": "Casita del parque",
+          "mecanica": "encaje",
+          "arrastre": true,
+          "capas": [{ "img": "img/figuras/casa_paredes.svg", "clase": "cuerpo" }],
+          "hueco": { "x": 60, "y": 42, "w": 180, "h": 80, "img": "img/figuras/casa_hueco.svg" },
+          "colocada": "techo",
+          "luces": [{ "x": 153, "y": 141, "w": 48, "h": 42 }],
+          "ventana": { "x": 153, "y": 141, "w": 48, "h": 42 },
+          "humo": { "x": 190, "y": 46 },
+          "opciones": ["techo", "sol", "arbol"],
+          "correcta": "techo",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Mira esta casita! Si empieza a llover se va a mojar por dentro porque no tiene techo. ¿Con qué pieza la cubrimos?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Increíble! Le pusiste el techo a la casa y quedó hermosa.",
+            "efecto": "clic",
+            "celebracion": "casaIlumina"
+          },
+          "errores": {
+            "sol": { "voz": "zoe", "texto": "El sol va afuera en el jardín. ¡Busca la pieza que protege la casa por arriba!", "reaccion": "caeLado" },
+            "arbol": { "voz": "zoe", "texto": "El árbol va afuera en el jardín. ¡Busca la pieza que protege la casa por arriba!", "reaccion": "caeLado" }
+          }
+        }
+      ],
+      "final": { "tipo": "taller", "titulo": "Gran Constructor del Taller", "autoMs": 7000 },
+      "premio": { "tipo": "trofeo", "nombre": "Gran Constructor del Taller", "img": "" },
+      "cierre": "¡Recibiste el trofeo del Gran Constructor del Taller!"
     },
     {
       "id": "5",
       "edad": "5-6 años",
-      "titulo": "5 piezas · detalle",
-      "avanzado": true,
+      "titulo": "El Taller de Ingeniería y Calibración Mágica",
+      "tema": "ingenieria",
+      "reglas": { "reglaTrasErrores": 2 },
       "retos": [
-        { "figura": "mariposa", "opciones": ["ala_mariposa", "ala_forma_diff", "ala_tamano_diff", "hoja", "ala_insecto"] },
-        { "figura": "carro", "opciones": ["rueda", "rueda_grande", "rueda_pequena", "pelota", "circulo"] },
-        { "figura": "casa", "opciones": ["techo", "techo_ancho", "techo_pequeno", "triangulo", "techo_forma_diff"] }
-      ]
+        {
+          "figura": "mariposa",
+          "nombre": "Mariposa mecánica",
+          "mecanica": "simetria",
+          "mesa": "cinta",
+          "medida": "alto",
+          "capas": [
+            { "img": "img/figuras/mariposa_mec_ala_izq.svg", "clase": "ala ala-izq" },
+            { "img": "img/figuras/mariposa_mec_cuerpo.svg", "clase": "cuerpo" }
+          ],
+          "hueco": { "x": 152, "y": 45, "w": 80, "h": 139, "img": "img/figuras/mariposa_mec_hueco.svg" },
+          "fantasma": "img/figuras/mariposa_mec_fantasma.svg",
+          "ejeX": 150,
+          "colocada": "ala ala-der",
+          "opciones": ["ala_mec", "ala_mec_ondulada", "ala_mec_pequena", "hoja_ala", "ala_abeja"],
+          "correcta": "ala_mec",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Bienvenido al Taller de Ingeniería, Ingeniero! Esta mariposa necesita un ala exacta. Si la forma, el patrón o el tamaño fallan, perderá el equilibrio al volar. ¡Analiza los detalles!"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Precisión perfecta! Mediste la forma y el tamaño exactos.",
+            "efecto": "clackding",
+            "celebracion": "acrobacias"
+          },
+          "errores": {
+            "ala_mec_ondulada": { "voz": "zoe", "texto": "¡Alerta de Desequilibrio! La forma no coincide.", "reaccion": "inclinaVuelo", "tipo": "forma", "alerta": true },
+            "ala_mec_pequena": { "voz": "zoe", "texto": "¡Alerta de Desequilibrio! El ala es demasiado pequeña.", "reaccion": "inclinaVuelo", "tipo": "tamano", "alerta": true },
+            "hoja_ala": { "voz": "zoe", "texto": "¡Alerta de Desequilibrio! La forma no coincide.", "reaccion": "inclinaVuelo", "tipo": "forma", "alerta": true },
+            "ala_abeja": { "voz": "zoe", "texto": "¡Alerta de Desequilibrio! El patrón de manchas no coincide.", "reaccion": "inclinaVuelo", "tipo": "forma", "alerta": true }
+          }
+        },
+        {
+          "figura": "carro",
+          "nombre": "Carro de pruebas",
+          "mecanica": "calibrador",
+          "mesa": "banco",
+          "arrastre": true,
+          "medida": "diametro",
+          "capas": [
+            { "img": "img/figuras/carro_mec_cuerpo.svg", "clase": "cuerpo" },
+            { "img": "img/piezas/rueda.svg", "clase": "rueda rueda-trasera", "x": 63, "y": 150, "w": 44, "h": 44 }
+          ],
+          "hueco": { "x": 193, "y": 150, "w": 44, "h": 44, "forma": "circulo" },
+          "rampa": { "grados": 7 },
+          "nivel": { "x": 125, "y": 64, "w": 52, "h": 12 },
+          "colocada": "rueda",
+          "opciones": ["rueda_44", "rueda_60", "rueda_32", "pelota", "circulo_plano"],
+          "correcta": "rueda_44",
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Atención, Jefe de Mecánicos! El carro necesita una rueda con el diámetro exacto. Si ponemos una rueda más grande o más pequeña, el carro volcará en la rampa."
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Increíble calibración! El diámetro es perfecto y el carro está nivelado.",
+            "efecto": "zzzpop",
+            "celebracion": "pruebaAceleracion"
+          },
+          "errores": {
+            "rueda_60": { "voz": "zeus", "texto": "¡Cuidado! Mira la inclinación del carro. Esa rueda es muy grande para el eje.", "reaccion": "inclinaRampa", "tipo": "tamano" },
+            "rueda_32": { "voz": "zeus", "texto": "¡Cuidado! Mira la inclinación del carro. Esa rueda es muy pequeña para el eje.", "reaccion": "inclinaRampa", "tipo": "tamano" },
+            "pelota": { "voz": "zeus", "texto": "¡Cuidado! La forma no coincide.", "reaccion": "rebote", "tipo": "forma" },
+            "circulo_plano": { "voz": "zeus", "texto": "¡Cuidado! La forma no coincide.", "reaccion": "rebote", "tipo": "forma" }
+          }
+        },
+        {
+          "figura": "casa",
+          "nombre": "Casa modular",
+          "mecanica": "clima",
+          "mesa": "cinta",
+          "medida": "ancho",
+          "capas": [{ "img": "img/figuras/casa_mod_paredes.svg", "clase": "cuerpo" }],
+          "hueco": { "x": 65, "y": 58, "w": 170, "h": 64, "img": "img/figuras/casa_mod_hueco.svg" },
+          "paredes": { "x": 85, "y": 122, "w": 130, "h": 83 },
+          "luces": [{ "x": 97, "y": 137, "w": 24, "h": 22 }, { "x": 179, "y": 137, "w": 24, "h": 22 }],
+          "grua": { "elevacion": 50 },
+          "colocada": "techo",
+          "opciones": ["techo_mod", "techo_mod_ancho", "techo_mod_pequeno", "techo_agudo", "techo_trapecio"],
+          "correcta": "techo_mod",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Último prototipo! Debes seleccionar el techo que encaje exactamente en el ancho de las paredes. Si sobresale mucho o queda corto, entrará la lluvia."
+          },
+          "instruccionGrua": { "voz": "zeus", "texto": "Usa la grúa para bajar el techo sobre las paredes." },
+          "instruccionClima": { "voz": "zoe", "texto": "¡Ahora presiona la Prueba de Clima!" },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Ingeniería perfecta! El ancho y los ángulos encajaron sin dejar filtraciones.",
+            "efecto": "pumclack",
+            "celebracion": "lluviaPerfecta"
+          },
+          "errores": {
+            "techo_mod_ancho": { "voz": "zoe", "texto": "¡Hay una falla en las medidas! Observa los bordes de las paredes: el techo es muy ancho.", "reaccion": "viento", "tipo": "tamano" },
+            "techo_mod_pequeno": { "voz": "zoe", "texto": "¡Hay una falla en las medidas! Observa los bordes de las paredes: el techo es muy angosto.", "reaccion": "lluvia", "tipo": "tamano" },
+            "techo_agudo": { "voz": "zoe", "texto": "¡Hay una falla! La forma no coincide.", "reaccion": "viento", "tipo": "forma" },
+            "techo_trapecio": { "voz": "zoe", "texto": "¡Hay una falla! La forma no coincide.", "reaccion": "filtra", "tipo": "forma" }
+          }
+        }
+      ],
+      "final": { "tipo": "ingenieria", "titulo": "Panel de Control Final", "autoMs": 9000 },
+      "premio": { "tipo": "carnet", "nombre": "Carnet de Ingeniero de Control de Calidad", "img": "" },
+      "cierre": "¡Recibiste el Carnet de Ingeniero de Control de Calidad!"
     }
   ]
 }

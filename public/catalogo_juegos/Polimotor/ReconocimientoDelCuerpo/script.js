@@ -436,6 +436,9 @@ function iniciarEscenario() {
     preguntas = (nivelElegido && Array.isArray(nivelElegido.preguntas))
         ? nivelElegido.preguntas.slice()
         : [];
+    if (typeof TextoVoz !== "undefined" && typeof TextoVoz.encolarFrases === "function") {
+        TextoVoz.encolarFrases(preguntas.map(function (p) { return { texto: p.texto, personaje: "zoe" }; }));
+    }
 
     const cuerpo = cuerpoActual();
     const src = rutaCompleto();
@@ -559,7 +562,7 @@ function armarZonas() {
 
 function limpiarEstadosZona() {
     document.querySelectorAll(".zona-toque").forEach(function (z) {
-        z.classList.remove("objetivo", "pista", "acierto");
+        z.classList.remove("objetivo", "pista", "acierto", "error");
     });
 }
 
@@ -585,19 +588,85 @@ function actualizarAyudasVisuales() {
     }
 }
 
+function mostrarEnunciado(texto, estado) {
+    const en = document.getElementById("enunciado");
+    if (!en) return;
+    en.textContent = texto || "";
+    en.classList.remove("es-acierto", "es-error");
+    if (estado) en.classList.add("es-" + estado);
+}
+
+/** El texto cambia cuando la voz arranca (no cuando se pide), para que lectura y audio coincidan. */
+function decir(texto, personaje, estado, minMs) {
+    let mostrado = false;
+    const mostrar = function () {
+        if (mostrado) return;
+        mostrado = true;
+        mostrarEnunciado(texto, estado);
+    };
+    const respaldo = setTimeout(mostrar, 6000);
+    const voz = (typeof TextoVoz !== "undefined" && texto)
+        ? TextoVoz.hablar(texto, personaje, { onInicio: mostrar }).catch(function () {})
+        : Promise.resolve();
+    const fin = voz.then(function () {
+        clearTimeout(respaldo);
+        mostrar();
+    });
+    return Promise.race([Promise.all([fin, sleep(minMs || 0)]), sleep(16000)]).then(function () {
+        clearTimeout(respaldo);
+        mostrar();
+    });
+}
+
+function apagarAudio(audio, ms) {
+    if (!audio || audio.paused) return;
+    const inicial = audio.volume;
+    const pasos = 8;
+    let i = 0;
+    const timer = setInterval(function () {
+        i += 1;
+        audio.volume = Math.max(0, inicial * (1 - i / pasos));
+        if (i >= pasos) {
+            clearInterval(timer);
+            audio.pause();
+        }
+    }, ms / pasos);
+}
+
+/** ok.mp3 y over.mp3 duran 4-5 s: se corta la cola para que no se encime con la voz. */
+function sonar(ruta, topeMs) {
+    const audio = reproducirAudio(ruta);
+    if (!audio) return Promise.resolve();
+    return Promise.race([
+        new Promise(function (resolve) {
+            audio.addEventListener("ended", resolve);
+            audio.addEventListener("error", resolve);
+        }),
+        sleep(topeMs || 1500)
+    ]).then(function () {
+        apagarAudio(audio, 300);
+    });
+}
+
+function bloquearToques(si) {
+    esperandoFeedback = si;
+    document.body.classList.toggle("bloqueado", si);
+}
+
+/** Los toques se aceptan solo cuando la indicación ya se escuchó completa. */
 function mostrarPreguntaActual() {
     const pregunta = preguntaActual();
-    const enunciado = document.getElementById("enunciado");
     if (!pregunta) {
-        if (enunciado) enunciado.textContent = "";
-        return;
+        mostrarEnunciado("");
+        return Promise.resolve();
     }
-    if (enunciado) enunciado.textContent = pregunta.texto;
-    TextoVoz.hablar(pregunta.texto, "zoe");
+    bloquearToques(true);
     fallosPregunta = 0;
     actualizarProgreso();
     actualizarAyudasVisuales();
-    document.body.classList.remove("bloqueado");
+    return decir(pregunta.texto, "zoe", null, 0).then(function () {
+        if (!juegoTerminado) bloquearToques(false);
+    });
 }
 
 let mascaraFigura = null;
@@ -691,67 +760,25 @@ function zonasBajoPunto(clientX, clientY) {
     });
 }
 
-function feedbackActivo() {
-    return !gameConfig || gameConfig.mostrarFeedBack !== false;
-}
-
 function cfgFeedback(tipo) {
     const fb = (gameConfig && gameConfig.feedback) || {};
-    const item = fb[tipo] || {};
     const ttxt = (gameConfig && gameConfig.textos) || {};
     const defaults = {
-        acierto: { texto: "¡Muy bien! Encontraste la parte del cuerpo.", gif: "../../images/correcto.gif" },
-        error: { texto: "¡Inténtalo otra vez! Observa muy bien la figura.", gif: "../../images/incorrecto.gif" }
+        acierto: "¡Muy bien!",
+        error: "¡Inténtalo otra vez! Observa muy bien la figura."
     };
-    const def = defaults[tipo] || {};
     return {
-        texto: ttxt[tipo] || item.texto || def.texto || "",
-        gif: item.gif || def.gif || "",
+        texto: ttxt[tipo] || defaults[tipo] || "",
         duracion: fb.duracion || 1800
     };
 }
 
-/** Swal + TTS en errores. Acierto: solo sonido (caller). */
-function mostrarFeedback(tipo) {
-    if (tipo === "acierto") return Promise.resolve();
-    if (!feedbackActivo()) {
-        const cfgSilent = cfgFeedback(tipo);
-        if (cfgSilent.texto && typeof TextoVoz !== "undefined") {
-            return TextoVoz.hablar(cfgSilent.texto, tipo === "error" ? "zeus" : "zoe").catch(function () {});
-        }
-        return Promise.resolve();
-    }
+/** Confirmación en el mismo lugar donde el niño mira: la figura queda visible y el texto sale con la voz. */
+function confirmar(tipo) {
     const cfg = cfgFeedback(tipo);
-    const pj = tipo === "error" ? "zeus" : "zoe";
-    const minMs = cfg.duracion || 1800;
-    const pVoz = (cfg.texto && typeof TextoVoz !== "undefined")
-        ? TextoVoz.hablar(cfg.texto, pj)
-        : Promise.resolve();
-    const opts = {
-        position: "center",
-        title: cfg.texto,
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        heightAuto: false,
-        scrollbarPadding: false,
-        width: 420,
-        customClass: { popup: "modal-feedback" }
-    };
-    if (cfg.gif) {
-        opts.imageUrl = cfg.gif.split("?")[0] + "?t=" + Date.now();
-        opts.imageWidth = 250;
-        opts.imageHeight = 250;
-    }
-    Swal.fire(opts);
-    const topeMs = Math.max(minMs + 2500, 6000);
-    return Promise.race([
-        Promise.all([pVoz.catch(function () {}), sleep(minMs)]),
-        sleep(topeMs)
-    ]).then(function () {
-        try { Swal.close(); } catch (e) { /* noop */ }
-    }, function () {
-        try { Swal.close(); } catch (e) { /* noop */ }
+    const ruta = gameConfig.audios && gameConfig.audios[tipo];
+    return sonar(ruta).then(function () {
+        return decir(cfg.texto, tipo === "error" ? "zeus" : "zoe", tipo, cfg.duracion);
     });
 }
 
@@ -785,43 +812,40 @@ function onToqueFigura(ev) {
     if (acertadas.length) {
         resolverAcierto([acertadas[0]]);
     } else {
-        resolverError();
+        resolverError(ids[0]);
     }
 }
 
 function resolverAcierto(idsTocadas) {
-    esperandoFeedback = true;
-    document.body.classList.add("bloqueado");
+    bloquearToques(true);
+    limpiarEstadosZona();
     iluminarZonas(idsTocadas);
-    reproducirAudio(gameConfig.audios && gameConfig.audios.acierto);
-    mostrarFeedback("acierto").then(function () {
+    confirmar("acierto").then(function () {
         indicePregunta += 1;
-        esperandoFeedback = false;
-        document.body.classList.remove("bloqueado");
         if (indicePregunta >= preguntas.length) {
             terminarJuego();
             return;
         }
-        mostrarPreguntaActual();
+        return mostrarPreguntaActual();
     }).catch(function () {
-        esperandoFeedback = false;
-        document.body.classList.remove("bloqueado");
+        bloquearToques(false);
     });
 }
 
-function resolverError() {
+function resolverError(idTocada) {
+    bloquearToques(true);
     fallosPregunta += 1;
-    actualizarAyudasVisuales();
-    reproducirAudio(gameConfig.audios && gameConfig.audios.error);
-    esperandoFeedback = true;
-    document.body.classList.add("bloqueado");
-    mostrarFeedback("error").then(function () {
-        esperandoFeedback = false;
-        document.body.classList.remove("bloqueado");
+    const zona = idTocada ? document.querySelector('.zona-toque[data-id="' + idTocada + '"]') : null;
+    if (zona) zona.classList.add("error");
+    confirmar("error").then(function () {
+        if (zona) zona.classList.remove("error");
         actualizarAyudasVisuales();
+        const pregunta = preguntaActual();
+        return decir(pregunta ? pregunta.texto : "", "zoe", null, 0);
+    }).then(function () {
+        if (!juegoTerminado) bloquearToques(false);
     }).catch(function () {
-        esperandoFeedback = false;
-        document.body.classList.remove("bloqueado");
+        bloquearToques(false);
     });
 }
 

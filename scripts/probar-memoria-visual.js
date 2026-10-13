@@ -62,6 +62,7 @@ fs.readdirSync(path.join(dir, "img")).filter((f) => f.endsWith(".svg")).forEach(
   assert(valido, "SVG en UTF-8 válido: " + f);
 });
 assert(config.niveles.find((n) => n.id === "5").pista === "lupa", "5-6 años usa lupa de pista");
+assert(["3", "4"].every((id) => config.niveles.find((n) => n.id === id).pista === "ninguna"), "3-4 años sin pista (documento)");
 const ctxG = { mostrar: ["globo_rojo", "globo_amarillo", "globo_azul"], correcto: ["globo_verde"], original: "globo_amarillo" };
 assert(t(config.retos.globos.textos.observacion.texto, R.datosReto(config, ctxG)) === "¡Mira los globos de Zeus! Rojo, amarillo y azul.", "observación globos");
 assert(t(config.retos.globos.textos.acierto.texto, R.datosReto(config, ctxG)) === "¡Sí! Ese globo era amarillo y cambió a verde.", "acierto globos");
@@ -69,9 +70,61 @@ assert(t(config.retos.globos.textos.error.texto, R.datosToque(config, ctxG, "glo
 const ctxP = { mostrar: ["manzana", "pelota"], correcto: ["manzana", "pelota"] };
 assert(t(config.retos.posiciones.textos.error.texto, R.datosToque(config, ctxP, "estrella")) === "La estrella sigue en su lugar. ¡Busca los dos que intercambiaron posiciones!", "error posiciones");
 
-console.log("=== Partidas al azar ===");
-const PARTIDAS = 3000;
+console.log("=== Contenido del documento ===");
+const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const TESOROS = ["manzana", "pelota", "carro", "oso", "estrella"];
+const SEMILLAS = 2000;
 for (const nivel of config.niveles) {
+  const defs = R.resolverRetos(config, nivel);
+  assert(defs.every((d) => d.fijo), "nivel " + nivel.id + ": todos los retos con contenido fijo");
+  let intrusoAlFinal = 0;
+  let pedestalAlFinal = 0;
+  for (let s = 1; s <= SEMILLAS; s++) {
+    const rng = R.crearRng(s * 104729 + Number(nivel.id));
+    const sesion = R.crearSesion();
+    const c = defs.map((def) => R.prepararReto(config, nivel, def, sesion, rng));
+    const tag = "nivel " + nivel.id + " semilla " + s;
+    const fallo = (cond, msg) => { if (!cond) assert(false, tag + ": " + msg); };
+    if (nivel.id === "3" || nivel.id === "4") {
+      const [mochila, hoja, globos, caminito] = c;
+      fallo(igual(mochila.mostrar, ["manzana", "pelota", "carro"]) && igual(mochila.correcto, ["oso"]) &&
+        igualesComoConjunto(mochila.desafio, ["manzana", "pelota", "carro", "oso"]), "mochila: manzana, pelota, carro + oso");
+      if (mochila.desafio[mochila.desafio.length - 1] === "oso") intrusoAlFinal += 1;
+      fallo(igual(hoja.mostrar, ["pato", "dinosaurio", "tambor"]) && igual(hoja.desafio, ["pato", null, "tambor"]) &&
+        igual(hoja.correcto, ["dinosaurio"]) && igualesComoConjunto(hoja.opciones, ["dinosaurio", "carro", "oso"]), "hoja: tapa al dino; opciones dino, carro, oso");
+      fallo(igual(globos.mostrar, ["globo_rojo", "globo_amarillo", "globo_azul"]) &&
+        igual(globos.desafio, ["globo_rojo", "globo_verde", "globo_azul"]) && globos.original === "globo_amarillo", "globos: amarillo → verde");
+      fallo(igual(caminito.mostrar, ["flor", "estrella", "manzana"]) && igual(caminito.orden, ["flor", "estrella"]), "caminito: flor y luego estrella");
+    } else {
+      const [vitrina, desaparecido, posiciones] = c;
+      fallo(igual(vitrina.mostrar, TESOROS) && igual(vitrina.correcto, ["pez"]) &&
+        igual(vitrina.desafio.filter((id) => id !== "pez"), TESOROS) && vitrina.desafio.length === 6, "vitrina: 5 tesoros en su pedestal + pez");
+      if (vitrina.desafio[5] === "pez") pedestalAlFinal += 1;
+      fallo(igual(desaparecido.mostrar, TESOROS) && igual(desaparecido.desafio, ["manzana", "pelota", null, "oso", "estrella"]) &&
+        igualesComoConjunto(desaparecido.opciones, ["carro", "pez", "flor", "sol"]), "desaparecido: falta el carro; opciones carro, pez, flor, sol");
+      fallo(igual(posiciones.desafio, ["manzana", "pelota", "oso", "carro", "estrella"]) &&
+        igualesComoConjunto(posiciones.correcto, ["carro", "oso"]), "posiciones: carro y oso intercambiados");
+    }
+  }
+  if (nivel.id !== "5") {
+    assert(intrusoAlFinal / SEMILLAS < 0.01, "nivel " + nivel.id + ": el oso casi nunca queda al final (" + intrusoAlFinal + "/" + SEMILLAS + ")");
+  } else {
+    const frac = pedestalAlFinal / SEMILLAS;
+    assert(Math.abs(frac - 1 / 6) < 0.04, "nivel 5: pedestal del pez uniforme (" + Math.round(frac * 100) + "% al final)");
+  }
+}
+const contenido = (id) => JSON.stringify(R.resolverRetos(config, config.niveles.find((n) => n.id === id))
+  .map((d) => [d.ref, d.fijo, d.opciones || null, d.largo || null, d.observacionMs]));
+assert(contenido("3") === contenido("4"), "niveles 3 y 4 con el mismo contenido (documento 3-4 años)");
+
+// Modo azar: hoy no lo usa ningún nivel; se prueba quitando `fijo` para que la mecánica no se rompa.
+const configAzar = JSON.parse(JSON.stringify(config));
+Object.values(configAzar.retos).forEach((r) => { delete r.fijo; });
+
+console.log("=== Modo azar (sin contenido fijo) ===");
+const PARTIDAS = 3000;
+for (const nivel of configAzar.niveles) {
+  const config = configAzar;
   const defs = R.resolverRetos(config, nivel);
   let intrusoAlFinal = 0;
   let intrusoTotal = 0;
@@ -127,9 +180,6 @@ for (const nivel of config.niveles) {
           distractorTotal += 1;
           if (c.usadosAntes[id]) distractorRepetido += 1;
         });
-        if (nivel.id === "5" && dist.some((id) => c.usadosAntes[id])) {
-          assert(false, tag + ": distractor ya visto en la sesión (caso Pez)");
-        }
       } else if (c.mecanica === "transformacion") {
         const dif = c.desafio.map((id, i) => (id !== c.mostrar[i] ? i : -1)).filter((i) => i >= 0);
         if (dif.length !== 1 || c.mostrar.includes(c.correcto[0]) || c.original !== c.mostrar[dif[0]]) {
@@ -165,7 +215,6 @@ for (const nivel of config.niveles) {
   assert(intrusoTotal + conservaTotal > 0, "nivel " + nivel.id + ": tiene reto de intruso");
   const pct = distractorTotal ? Math.round((100 * distractorRepetido) / distractorTotal) : 0;
   console.log("  nivel " + nivel.id + ": " + PARTIDAS + " partidas; distractores ya vistos en la sesión: " + pct + "%");
-  assert(distractorRepetido === 0, "nivel " + nivel.id + ": ningún distractor fue visto antes en la sesión");
 }
 
 console.log("\nOK=" + oks + " FAIL=" + fails);

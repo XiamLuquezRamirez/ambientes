@@ -610,14 +610,63 @@ function montarUtileria(reto) {
     const def = reto.def;
     if (!u) return;
     if (def.ocultamiento === "mochila") {
-        u.innerHTML = '<img class="mochila" id="mochila" src="img/mochila_abierta.svg" alt="Mochila" draggable="false">';
+        u.innerHTML = '<span class="mochila-ancla">' +
+            '<img class="zoe-mochila" id="zoe-mochila" src="' + attrEsc(guiaImg("zoe")) + '" alt="Zoe" draggable="false">' +
+            '<img class="mochila" id="mochila" src="img/mochila_abierta.svg" alt="Mochila" draggable="false">' +
+            "</span>";
     } else if (def.zeusSostiene) {
-        u.innerHTML = '<img class="zeus-globos" src="' + attrEsc(guiaImg("zeus")) + '" alt="Zeus" draggable="false">';
+        u.innerHTML = '<svg class="hilos-globos" aria-hidden="true"></svg>' +
+            '<img class="zeus-globos" id="zeus-globos" src="' + attrEsc(guiaImg("zeus")) + '" alt="Zeus" draggable="false">';
+        dibujarHilos(u.querySelector(".hilos-globos"));
     } else if (def.zeusCamina) {
         u.className = "utileria utileria-caminito";
         u.innerHTML = '<img class="zeus-camino" id="zeus-camino" src="' + attrEsc(guiaImg("zeus")) + '" alt="Zeus" draggable="false" style="visibility:hidden">' +
-            '<span class="meta-picnic" aria-hidden="true"></span>';
+            '<span class="meta-picnic doblado" aria-hidden="true">' +
+            '<span class="mantel-meta"></span>' +
+            '<img class="zoe-meta" id="zoe-meta" src="' + attrEsc(guiaImg("zoe")) + '" alt="" draggable="false">' +
+            "</span>";
     }
+}
+
+/** Mano levantada de Zeus, en fracciones de su imagen. */
+const MANO_ZEUS = { x: 0.72, y: 0.27 };
+
+/** Hilos de cada globo a la mano de Zeus; se redibujan cada cuadro porque los globos flotan. */
+function dibujarHilos(svg) {
+    if (!svg || !svg.isConnected) return;
+    const zeus = document.getElementById("zeus-globos");
+    if (zeus) {
+        const base = svg.getBoundingClientRect();
+        const rz = zeus.getBoundingClientRect();
+        const mx = rz.left + rz.width * MANO_ZEUS.x - base.left;
+        const my = rz.top + rz.height * MANO_ZEUS.y - base.top;
+        let d = "";
+        document.querySelectorAll("#tablero .objeto-img").forEach(function (img) {
+            if (img.style.visibility === "hidden") return;
+            const r = img.getBoundingClientRect();
+            const x = r.left + r.width / 2 - base.left;
+            const y = r.bottom - base.top;
+            d += "M" + x.toFixed(1) + " " + y.toFixed(1) +
+                " Q" + ((x + mx) / 2).toFixed(1) + " " + ((y + my) / 2 + 8).toFixed(1) +
+                " " + mx.toFixed(1) + " " + my.toFixed(1) + " ";
+        });
+        svg.innerHTML = d ? '<path d="' + d + '"/>' : "";
+    }
+    requestAnimationFrame(function () { dibujarHilos(svg); });
+}
+
+/** Llegada al picnic: Zoe espera, entre los dos abren el mantel y suenan trompetas. */
+async function abrirMantel() {
+    const meta = document.querySelector(".meta-picnic");
+    if (!meta) return;
+    meta.classList.add("con-zoe");
+    await sleep(450);
+    meta.classList.remove("doblado");
+    sfx("magia");
+    await sleep(650);
+    sfx("fanfarria");
+    pulso(document.getElementById("zeus-camino"), "salta", 600);
+    pulso(document.getElementById("zoe-meta"), "salta", 1400);
 }
 
 let destinoZeus = null;
@@ -641,7 +690,7 @@ function moverZeus(destino, saltar, instantaneo) {
         const meta = wrap.querySelector(".meta-picnic");
         if (!meta) return;
         const rm = meta.getBoundingClientRect();
-        x = rm.left - rw.left + rm.width / 2 - zw / 2;
+        x = rm.left - rw.left + rm.width * 0.3 - zw / 2;
         y = rm.top - rw.top - zh * 0.55;
     } else {
         const rb = destino.getBoundingClientRect();
@@ -699,14 +748,14 @@ function crearObjeto(id, opciones) {
 }
 
 /** Lo tapado por la hoja gigante, o el pedestal vacío con humo que deja el ladrón de sombras. */
-function crearHueco(cubrirCon, indice, numero) {
+function crearHueco(cubrirCon, indice, numero, hojaCaida) {
     const el = document.createElement("div");
     const hoja = cubrirCon === "hoja";
     el.className = "objeto objeto-hueco objeto-hueco-" + (hoja ? "hoja" : "humo");
     el.dataset.idx = String(indice);
     el.innerHTML = '<span class="hueco-espacio" aria-hidden="true"></span>' +
         (hoja
-            ? '<img class="hoja-gigante" src="img/hoja.svg" alt="Hoja" draggable="false">'
+            ? '<img class="hoja-gigante' + (hojaCaida ? " caida" : "") + '" src="img/hoja.svg" alt="Hoja" draggable="false">'
             : '<span class="hueco-humo" aria-hidden="true"></span>') +
         '<span class="objeto-nombre">?</span>' + htmlNumero(numero);
     const img = el.querySelector(".hoja-gigante");
@@ -746,7 +795,7 @@ function pintarTablero(lista, opciones) {
         const numero = op.numerar ? i + 1 : null;
         tablero.appendChild(id
             ? crearObjeto(id, { indice: i, numero: numero, clase: op.claseObjeto })
-            : crearHueco(op.cubrirCon, i, numero));
+            : crearHueco(op.cubrirCon, i, numero, op.hojaCaida));
     });
     return op.sinAnimar ? 0 : animarEntrada(tablero);
 }
@@ -1114,13 +1163,27 @@ async function efectoAcierto(reto, el) {
 
     if (ctx.mecanica === "secuencia") {
         ctx.orden.forEach(function (id) { celebrar(tarjetaDe(id)); });
+        if (tipo === "abrirMantel") {
+            await abrirMantel();
+            return;
+        }
         sfx("magia");
         return;
     }
 
     if (tipo === "globo" && el) {
         celebrar(el);
-        await sleep(650);
+        el.classList.remove("objeto-acierto");
+        const img = el.querySelector(".objeto-img");
+        sfx("magia");
+        await Promise.all([
+            animarWaapi(img, [
+                { transform: "rotate(0) scale(1)" },
+                { transform: "rotate(180deg) scale(1.2)", offset: 0.5 },
+                { transform: "rotate(360deg) scale(1)" }
+            ], { duration: 750, easing: "ease-in-out" }),
+            sleep(650)
+        ]);
         const globito = document.createElement("span");
         globito.className = "globito";
         el.appendChild(globito);
@@ -1169,7 +1232,8 @@ async function efectoAcierto(reto, el) {
         const nuevo = reponerEnHueco(reto, ctx.correcto[0]);
         if (nuevo) {
             celebrar(nuevo);
-            sfx("magia");
+            sfx(sonidoObjeto(ctx.correcto[0]) || "magia");
+            await sleep(900);
         }
         return;
     }
@@ -1198,8 +1262,12 @@ async function efectoAcierto(reto, el) {
 }
 
 function celebrarGuias(reto) {
+    if (reto.def.zeusRie) {
+        pulso(document.getElementById("zeus-globos"), "salta", 1400);
+        sfx("risa");
+    }
     if (!reto.def.celebranGuias) return;
-    ["guia-zoe", "guia-zeus"].forEach(function (id) {
+    ["guia-zoe", "guia-zeus", "zoe-mochila"].forEach(function (id) {
         pulso(document.getElementById(id), "salta", 1400);
     });
 }
@@ -1312,10 +1380,15 @@ function encender(el, indice, ms) {
     setTimeout(function () { el.classList.remove("encendida"); }, ms);
 }
 
-/** Mochila: Zoe nombra cada objeto mientras aparece («Guardamos la manzana... la pelota... ¡y el carro!»). */
+/**
+ * Mochila: cada objeto aparece, Zoe lo nombra («Guardamos la manzana... la pelota... ¡y el carro!»)
+ * y vuela a la mochila; al entrar suena.
+ */
 async function entradaNombrando(reto, ms, token) {
     const def = reto.def;
     const ctx = reto.ctx;
+    const mochila = document.getElementById("mochila");
+    reto.guardadosEnMochila = false;
     pintarTablero(ctx.mostrar, { clase: claseTablero(reto, "observacion"), sinAnimar: true });
     const lista = tarjetas();
     lista.forEach(function (el) { el.style.visibility = "hidden"; });
@@ -1327,17 +1400,24 @@ async function entradaNombrando(reto, ms, token) {
         const el = lista[i];
         el.style.visibility = "";
         if (animacionesActivas()) pulso(el, "objeto-entra", 450);
-        sfx(def.sonidoEntrada || "pop", i);
+        if (!mochila) sfx(def.sonidoEntrada || "pop", i);
         const clave = i === 0 ? "nombrarPrimero" : (i === lista.length - 1 ? "nombrarUltimo" : "nombrarSiguiente");
         const l = lineaReto(reto, clave, R.datosObjeto(gameConfig, el.dataset.id));
         if (l) {
             dicho = dicho ? dicho + " " + l.texto : l.texto;
             setEnunciado(dicho);
-            await Promise.all([hablarLinea(l, false), sleep(700)]);
+            await Promise.all([hablarLinea(l, false), sleep(mochila ? 900 : 700)]);
         } else {
             await sleep(900);
         }
+        if (mochila && !cancelado(token)) {
+            await volarHacia(el, mochila, 0);
+            el.style.visibility = "hidden";
+            sfx(def.sonidoEntrada || "pop", i);
+            if (animacionesActivas()) pulso(mochila, "recibe", 320);
+        }
     }
+    reto.guardadosEnMochila = !!mochila;
     const resto = ms - (Date.now() - inicio);
     if (resto > 0) await sleep(resto);
     ocultarBarra();
@@ -1369,15 +1449,32 @@ async function faseObservacion(reto, token) {
     if (def.recorrido) correrRecorrido(ms);
     if (def.tictac) iniciarTictac(ms);
     if (def.llamarAtencion) {
-        tarjetas().forEach(function (el, i) {
-            programar(function () {
-                pulso(el, "objeto-llama", 750);
-                sfx("pop", i);
-            }, 300 + i * 900);
-        });
+        await llamarAtencion(reto, ms, token);
+        ocultarBarra();
+        return;
     }
     await Promise.all([sleep(ms), hablarLinea(lineaReto(reto, "observacion"))]);
     ocultarBarra();
+}
+
+function sonidoObjeto(id) {
+    const o = gameConfig.objetos[id];
+    return (o && o.sonido) || null;
+}
+
+/** Cada juguete suena después de la voz, uno a uno, para no tapar la instrucción. */
+async function llamarAtencion(reto, ms, token) {
+    const inicio = Date.now();
+    await hablarLinea(lineaReto(reto, "observacion"));
+    const lista = tarjetas();
+    for (let i = 0; i < lista.length; i++) {
+        if (cancelado(token)) return;
+        pulso(lista[i], "objeto-llama", 750);
+        sfx(sonidoObjeto(lista[i].dataset.id) || "pop", i);
+        await sleep(1000);
+    }
+    const resto = ms - (Date.now() - inicio);
+    if (resto > 0) await sleep(resto);
 }
 
 function volarHacia(el, destino, retraso) {
@@ -1408,7 +1505,7 @@ function saltarDesde(el, origen, retraso) {
 /** Mochila: los objetos entran, se cierra (cremallera), da dos saltitos y se abre con el intruso. */
 async function ocultarEnMochila(reto, desafio, ms, token) {
     const mochila = document.getElementById("mochila");
-    if (mochila) {
+    if (mochila && !reto.guardadosEnMochila) {
         await Promise.all(tarjetas().map(function (el, i) { return volarHacia(el, mochila, i * 140); }));
     }
     if (cancelado(token)) return;
@@ -1431,6 +1528,25 @@ async function ocultarEnMochila(reto, desafio, ms, token) {
 
 const SONIDO_OCULTAR = { mochila: "cremallera", nube: "puff", cortina: "puff", humo: "arrastre", apagon: "apagon" };
 
+/** La hoja cae sobre el juguete aún visible; solo cuando ya lo tapa se cambia por el hueco. */
+async function taparConHoja(reto, desafio, ms, token) {
+    const el = document.querySelector('#tablero .objeto[data-idx="' + reto.ctx.indice + '"]');
+    const caida = el && animacionesActivas() ? 1400 : 0;
+    if (caida) {
+        const img = document.createElement("img");
+        img.className = "hoja-gigante";
+        img.src = "img/hoja.svg";
+        img.alt = "Hoja";
+        img.draggable = false;
+        el.appendChild(img);
+        el.classList.add("tapandose");
+        await sleep(caida);
+        if (cancelado(token)) return;
+    }
+    pintarTablero(reto.ctx.desafio, Object.assign({}, desafio, { hojaCaida: true }));
+    await sleep(Math.max(0, ms - caida));
+}
+
 async function faseOcultamiento(reto, token) {
     const def = reto.def;
     const ctx = reto.ctx;
@@ -1449,6 +1565,10 @@ async function faseOcultamiento(reto, token) {
     }
     const sonido = def.sonidoOcultamiento || SONIDO_OCULTAR[tipo];
     if (sonido) sfx(sonido);
+    if (tipo === "ninguno" && def.cubrirCon === "hoja") {
+        await Promise.all([taparConHoja(reto, desafio, ms, token), voz]);
+        return;
+    }
     if (tipo === "ninguno") {
         pintarTablero(ctx.desafio, desafio);
         await Promise.all([sleep(ms), voz]);
@@ -1645,7 +1765,7 @@ function terminarJuego() {
 }
 
 function precargarImagenes() {
-    const rutas = ["img/hoja.svg", "img/mochila_abierta.svg", "img/mochila_cerrada.svg"];
+    const rutas = ["img/hoja.svg", "img/mochila_abierta.svg", "img/mochila_cerrada.svg", "img/escena_parque.svg", "img/escena_arbol.svg", "img/escena_globos.svg", "img/escena_caminito.svg", "img/canasta_picnic.svg"];
     const objetos = (gameConfig && gameConfig.objetos) || {};
     Object.keys(objetos).forEach(function (id) { rutas.push(objetos[id].img); });
     ((gameConfig && gameConfig.niveles) || []).forEach(function (n) {

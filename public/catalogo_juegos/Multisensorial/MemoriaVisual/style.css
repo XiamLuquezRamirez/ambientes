@@ -433,63 +433,64 @@ body.intro3d-activa #menu-acc {
   pointer-events: none;
 }
 
-#principal.escena-picnic .escena,
-#principal.escena-arbol .escena,
+/* Parque de 3-4 años. La decoración no usa objetos del juego (ni fruta, ni pelotas, ni sol, ni flores).
+   Los SVG deben quedar en ASCII: un acento mal codificado hace que el navegador descarte la imagen. */
+#principal.escena-picnic .escena {
+  background: #9bd96f url('img/escena_parque.svg') center bottom / cover no-repeat;
+}
+
+/* Sin banca: chocaría con el final del camino y el mantel de meta. */
 #principal.escena-caminito .escena {
-  background: linear-gradient(180deg, #c9ecff 0%, #e8f7ff 40%, #a5dc80 40%, #7cc35a 100%);
+  background: #9bd96f url('img/escena_caminito.svg') center bottom / cover no-repeat;
+}
+
+#principal.escena-arbol .escena {
+  background: #9bd96f url('img/escena_arbol.svg') center bottom / cover no-repeat;
+}
+
+#principal.escena-globos .escena {
+  background: #9bd96f url('img/escena_globos.svg') center bottom / cover no-repeat;
 }
 
 #principal.escena-picnic .escena::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: 10%;
-  width: min(72vw, 940px);
-  height: 36%;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: repeating-conic-gradient(#ef5350 0 25%, #fff 0 50%) 0 0 / 60px 60px;
-  box-shadow: 0 12px 0 rgba(0, 0, 0, 0.08);
-  opacity: 0.92;
+  bottom: 11%;
+  width: min(66vw, 940px);
+  height: 84%;
+  transform: translateX(-50%) perspective(1200px) rotateX(56deg);
+  transform-origin: 50% 100%;
+  border-radius: 22px;
+  background: repeating-conic-gradient(#e53935 0 25%, #fff 0 50%) 0 0 / 76px 76px;
+  box-shadow: inset 0 0 0 14px rgba(255, 255, 255, 0.92), 0 26px 0 rgba(46, 94, 30, 0.22);
 }
 
-#principal.escena-arbol .escena::before {
+/* El fondo ilustrado compite con el texto: panel claro detrás del enunciado. */
+#principal.escena-picnic .enunciado,
+#principal.escena-arbol .enunciado,
+#principal.escena-globos .enunciado,
+#principal.escena-caminito .enunciado {
+  padding: 6px 24px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+#principal .enunciado:empty {
+  background: none;
+  box-shadow: none;
+}
+
+#principal.escena-picnic .escena::before {
   content: "";
   position: absolute;
-  left: 7%;
-  bottom: 22%;
-  width: 64px;
-  height: 46%;
-  border-radius: 14px;
-  background: linear-gradient(90deg, #6d4c41, #8d6e63 60%, #6d4c41);
-}
-
-#principal.escena-arbol .escena::after {
-  content: "";
-  position: absolute;
-  left: -3%;
-  top: 4%;
-  width: 380px;
-  height: 330px;
-  background:
-    radial-gradient(circle at 30% 42%, #43a047 0 29%, transparent 30%),
-    radial-gradient(circle at 62% 30%, #66bb6a 0 31%, transparent 32%),
-    radial-gradient(circle at 58% 66%, #388e3c 0 29%, transparent 30%),
-    radial-gradient(circle at 26% 70%, #4caf50 0 25%, transparent 26%);
-}
-
-#principal.escena-globos .escena {
-  background: linear-gradient(180deg, #8fd3ff 0%, #d4efff 72%, #a5dc80 72%, #7cc35a 100%);
-}
-
-#principal.escena-globos .escena::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 120px 40px at 16% 22%, #fff 60%, transparent 62%),
-    radial-gradient(ellipse 170px 52px at 80% 15%, #fff 60%, transparent 62%),
-    radial-gradient(ellipse 100px 34px at 58% 34%, rgba(255, 255, 255, 0.85) 60%, transparent 62%);
+  z-index: 1;
+  left: calc(50% + min(21vw, 300px));
+  bottom: 20%;
+  width: min(13vw, 190px);
+  aspect-ratio: 240 / 200;
+  background: url('img/canasta_picnic.svg') center / contain no-repeat;
 }
 
 #principal.escena-museo .escena {
@@ -659,23 +660,78 @@ body.intro3d-activa #menu-acc {
   animation: mochilaSalta 0.5s ease 2;
 }
 
+/* Zoe al lado de la mochila: posicionada aparte para que la mochila siga centrada. */
+.mochila-ancla {
+  position: relative;
+  display: inline-block;
+}
+
+.zoe-mochila {
+  position: absolute;
+  right: 100%;
+  bottom: 0;
+  margin-right: -6px;
+  margin-bottom: -10px;
+  height: min(280px, 38vh);
+  width: auto;
+  pointer-events: none;
+}
+
+.zoe-mochila.salta {
+  animation: guiaSalta 0.45s ease 3;
+}
+
+.mochila.recibe {
+  animation: mochilaRecibe 0.32s ease;
+}
+
+@keyframes mochilaRecibe {
+  0%, 100% { transform: scale(1, 1); }
+  45% { transform: scale(1.12, 0.9); }
+}
+
+/* Posicionado para pintarse sobre los hilos: así entran en la mano y no cruzan la cabeza. */
 .zeus-globos {
-  width: 150px;
-  margin-top: -24px;
+  position: relative;
+  width: min(260px, 26vh);
+  margin-top: -40px;
+}
+
+.zeus-globos.salta {
+  animation: guiaSalta 0.45s ease 3;
+}
+
+/* Hilos de los globos hasta la mano de Zeus (por debajo del tablero). */
+.hilos-globos {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hilos-globos path {
+  fill: none;
+  stroke: #6d6d6d;
+  stroke-width: 2.5;
+  stroke-linecap: round;
 }
 
 /* Caminito: Zeus a un lado y el mantel de picnic al otro. */
 .utileria-caminito {
   position: absolute;
   inset: 0;
+  z-index: 2;
   pointer-events: none;
+  --guia-camino: min(190px, 19vh);
 }
 
 .zeus-camino {
   position: absolute;
   left: 0;
   top: 0;
-  width: 120px;
+  width: var(--guia-camino);
   z-index: 3;
   transition: left 0.55s ease, top 0.55s ease;
 }
@@ -684,19 +740,71 @@ body.intro3d-activa #menu-acc {
   animation: zeusSalta 0.55s ease;
 }
 
+/* Meta: mantel de picnic doblado que Zoe y Zeus abren al llegar. */
 .meta-picnic {
   position: absolute;
-  right: 8px;
+  right: 1.5%;
   top: 50%;
-  width: 100px;
-  height: 70px;
-  transform: translateY(-50%);
-  border-radius: 50%;
-  background: repeating-conic-gradient(#ef5350 0 25%, #fff 0 50%) 0 0 / 22px 22px;
-  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.12);
+  width: min(240px, 17vw);
+  aspect-ratio: 2 / 1.2;
+  transform: translateY(-20%);
 }
 
+.mantel-meta {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: repeating-conic-gradient(#e53935 0 25%, #fff 0 50%) 0 0 / 30px 30px;
+  box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.92), 0 10px 0 rgba(46, 94, 30, 0.22);
+  transform: perspective(500px) rotateX(52deg);
+  transform-origin: 50% 100%;
+  clip-path: inset(0 round 12px);
+  transition: clip-path 0.6s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+
+.meta-picnic.doblado .mantel-meta {
+  clip-path: inset(0 64% 0 0 round 8px);
+}
+
+.meta-picnic::after {
+  content: "";
+  position: absolute;
+  right: 26%;
+  bottom: 30%;
+  width: 34%;
+  aspect-ratio: 240 / 200;
+  background: url('img/canasta_picnic.svg') center / contain no-repeat;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.45s;
+}
+
+.meta-picnic:not(.doblado)::after {
+  opacity: 1;
+}
+
+.zoe-meta {
+  position: absolute;
+  right: -40%;
+  bottom: 18%;
+  width: var(--guia-camino);
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.meta-picnic.con-zoe .zoe-meta {
+  opacity: 1;
+  transform: none;
+}
+
+.zoe-meta.salta {
+  animation: guiaSalta 0.45s ease 3;
+}
+
+/* Por encima de la utilería: Zoe (junto a la mochila) no debe tapar las tarjetas. */
 .tablero {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
@@ -825,6 +933,19 @@ body.sin-nombres .objeto-nombre {
 
 .hoja-gigante.caida {
   animation: none;
+}
+
+/* La hoja es más angosta que la tarjeta: al posarse, la tarjeta se funde para que el cambio al hueco no salte. */
+.objeto.tapandose {
+  transition: background-color 0.4s ease 1s, border-color 0.4s ease 1s, box-shadow 0.4s ease 1s;
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.objeto.tapandose > :not(.hoja-gigante) {
+  transition: opacity 0.4s ease 1s;
+  opacity: 0;
 }
 
 .hoja-gigante.hoja-sacude {
@@ -1047,17 +1168,34 @@ body.sin-nombres .objeto-nombre {
 }
 /* ---------- Caminito: baldosas que se encienden ---------- */
 
+/* Camino de tierra sobre el pasto con piedras grandes encima. */
 .tablero-caminito {
-  padding: 18px 120px 18px 96px;
+  padding: 18px max(120px, 19vw) 18px max(96px, 12vw);
   box-sizing: border-box;
-  border-radius: 40px;
-  background: repeating-linear-gradient(90deg, #d7ccc8 0 22px, #cfc3be 22px 44px);
+  gap: clamp(36px, 5vw, 96px);
+}
+
+.tablero-caminito::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 4%;
+  right: 4%;
+  top: 38%;
+  bottom: 14%;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 12% 60%, rgba(140, 104, 66, 0.35) 0 5px, transparent 6px) 0 0 / 90px 40px,
+    linear-gradient(180deg, #e2c595, #cfa975);
+  box-shadow: inset 0 6px 10px rgba(0, 0, 0, 0.12);
+  opacity: 0.85;
 }
 
 .objeto.baldosa {
-  border-radius: 50% / 42%;
-  border-color: #a1887f;
-  background: #efebe9;
+  border-radius: 46% 54% 50% 50% / 56% 50% 50% 44%;
+  border: 5px solid #8d8173;
+  background: radial-gradient(circle at 35% 30%, #f4f1ec 0 22%, #d9d2c7 62%, #bfb5a6 100%);
+  box-shadow: 0 10px 0 rgba(60, 50, 40, 0.25), inset 0 -8px 0 rgba(0, 0, 0, 0.08);
 }
 
 .objeto.baldosa.encendida {
@@ -1340,7 +1478,12 @@ body.sin-nombres .objeto-nombre {
   .objeto-llama .objeto-img,
   .objeto-destello .objeto-img,
   .guia.salta,
+  .zoe-mochila.salta,
+  .zeus-globos.salta,
+  .zoe-meta.salta,
+  #final .mostrar-trofeo .trofeo.premio-medalla,
   .mochila.salta,
+  .mochila.recibe,
   .btn-lupa.lista,
   #btn-repetir:not(:disabled) {
     animation: none;
@@ -1502,6 +1645,11 @@ body.alto-contraste .reto-titulo {
   color: #fff;
 }
 
+body.alto-contraste #principal .enunciado {
+  background: none;
+  box-shadow: none;
+}
+
 body.alto-contraste .objeto {
   background: #000;
   color: #fff;
@@ -1541,6 +1689,19 @@ body.alto-contraste .escena {
 
 #final .trofeo.premio-diploma {
   height: 17vh;
+}
+
+/* La medalla aparece gigante en el centro y luego baja a su sitio. */
+#final .mostrar-trofeo .trofeo.premio-medalla {
+  z-index: 20;
+  animation: medallaGigante 2.6s cubic-bezier(0.3, 1.2, 0.5, 1) both, flotarTrofeo 2.5s ease-in-out 2.8s infinite;
+}
+
+@keyframes medallaGigante {
+  0% { transform: translate(-50%, 40vh) scale(0.4); }
+  25% { transform: translate(-50%, -4vh) scale(2.6); }
+  65% { transform: translate(-50%, -4vh) scale(2.6); }
+  100% { transform: translate(-50%, 0) scale(1); }
 }
 
 body.alto-contraste .barra-tiempo {

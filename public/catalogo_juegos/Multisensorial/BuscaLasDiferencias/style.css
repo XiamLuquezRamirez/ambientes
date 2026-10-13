@@ -264,8 +264,7 @@ body.intro3d-activa #menu-acc {
     gap: 8px;
 }
 
-.hud-top button,
-.hud-top .hud-progreso {
+.hud-top button {
     pointer-events: auto;
 }
 
@@ -277,37 +276,64 @@ body.intro3d-activa #menu-acc {
     border: 4px solid white;
 }
 
-.hud-progreso {
-    min-width: 64px;
-    text-align: center;
-    font-size: 29px;
-    color: #ececec;
-    background: #4500ae;
-    border: 3px solid #fff;
-    border-radius: 12px;
-    padding: 6px 10px;
-}
+/* ── Diálogo con el personaje que habla ─────────────────────── */
 
-.hud-progreso[hidden] {
-    display: none !important;
-}
-
-.enunciado-wrap {
+.cabecera {
     position: relative;
     z-index: 15;
-    text-align: center;
-    padding: 88px 12px 8px;
-    pointer-events: none;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    justify-content: center;
+    padding: 10px 170px 8px 0;
 }
 
-.enunciado-wrap h1 {
+.dialogo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 900px;
+    min-height: 92px;
+    padding: 6px 18px 6px 6px;
+    box-sizing: border-box;
+    background: #fff;
+    border: 4px solid #ffb3d1;
+    border-radius: 22px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.dialogo[data-voz="zeus"] {
+    border-color: #ffd43b;
+}
+
+.dialogo.es-acierto {
+    border-color: #40c057;
+    background: #ebfbee;
+}
+
+.dialogo.es-error {
+    border-color: #fd7e14;
+    background: #fff4e6;
+}
+
+.dialogo.pop {
+    animation: dialogoPop 0.35s ease;
+}
+
+.dialogo-avatar {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 auto;
+    object-fit: contain;
+    border-radius: 50%;
+    background: #f1f3f5;
+}
+
+.enunciado {
     margin: 0;
-    font-size: clamp(20px, 2.8vw, 28px);
+    min-height: 1.3em;
+    font-size: clamp(16px, 1.6vw, 20px);
     line-height: 1.25;
+    color: #262626;
 }
 
 .escenario {
@@ -323,7 +349,6 @@ body.intro3d-activa #menu-acc {
     position: relative;
     width: min(98vw, 1180px);
     flex: 1;
-    max-height: calc(100dvh - 150px);
     background:
         radial-gradient(circle at 12% 18%, rgba(186, 230, 253, 0.5) 0 70px, transparent 71px),
         radial-gradient(circle at 88% 80%, rgba(185, 237, 180, 0.45) 0 90px, transparent 91px),
@@ -333,13 +358,13 @@ body.intro3d-activa #menu-acc {
     box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
     overflow: hidden;
     display: flex;
-    flex-direction: column;
     padding: 14px;
-    gap: 10px;
+    gap: 14px;
 }
 
 .par-imagenes {
     flex: 1;
+    min-width: 0;
     min-height: 0;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -378,70 +403,415 @@ body.intro3d-activa #menu-acc {
     align-items: center;
     justify-content: center;
     padding: 8px;
+    touch-action: none;
 }
+
+.panel-img.desliza {
+    z-index: 8;
+}
+
+/* ── Escena por capas (400 × 300 unidades, posiciones en %) ─── */
 
 .img-stack {
     position: relative;
     width: 100%;
     max-height: 100%;
     aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 12px;
 }
 
-.img-stack img {
+.capa {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    display: block;
     object-fit: fill;
     pointer-events: none;
     user-select: none;
+    -webkit-user-drag: none;
 }
 
-.zona-hotspots {
+.capa-fondo {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.capa.anim-brilla {
+    animation: solBrilla 2.4s ease-in-out infinite;
+}
+
+.capa.anim-mece {
+    transform-origin: 50% 100%;
+    animation: florMece 2.8s ease-in-out infinite;
+}
+
+.capa.anim-mece:nth-of-type(odd) {
+    animation-delay: -1.4s;
+}
+
+.capa.guina {
+    animation: solGuina 0.9s ease;
+}
+
+/* ── Lupa Dúo / Lupa Doble ──────────────────────────────────── */
+
+.lupa {
     position: absolute;
-    inset: 0;
-    z-index: 2;
-}
-
-.hotspot {
-    position: absolute;
-    border: 3px solid transparent;
-    border-radius: 50%;
-    background: transparent;
-    cursor: pointer;
-    touch-action: manipulation;
-    padding: 0;
-    appearance: none;
-    -webkit-appearance: none;
-}
-
-.hotspot:focus {
-    outline: none;
-}
-
-.hotspot.is-encontrada {
-    border-color: #22c55e;
-    background: rgba(34, 197, 94, 0.18);
-    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.28), inset 0 0 0 2px rgba(255, 255, 255, 0.6);
-    animation: diffMarca 0.45s ease;
+    z-index: 6;
+    transform: translate(-50%, -50%);
     pointer-events: none;
 }
 
-@keyframes diffMarca {
-    0% { transform: scale(0.7); opacity: 0.4; }
-    60% { transform: scale(1.12); opacity: 1; }
+.lupa[hidden] {
+    display: none;
+}
+
+.lupa-lente {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #fff;
+    border: 5px solid #1e3a5f;
+    box-shadow: 0 0 0 3px #fff, 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+.lupa-vista {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.lupa-mango {
+    position: absolute;
+    left: 86%;
+    top: 86%;
+    width: 16%;
+    height: 42%;
+    border-radius: 8px;
+    background: #8d5a3b;
+    border: 3px solid #fff;
+    transform: rotate(-45deg);
+    transform-origin: 50% 0;
+}
+
+.lupa.visor .lupa-lente {
+    border-color: #0ca678;
+    box-shadow: 0 0 0 3px #fff, 0 0 18px rgba(12, 166, 120, 0.65);
+}
+
+.lupa.visor .lupa-mango {
+    display: none;
+}
+
+.lupa-reticula {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.lupa-reticula::before,
+.lupa-reticula::after {
+    content: "";
+    position: absolute;
+    background: rgba(12, 166, 120, 0.7);
+}
+
+.lupa-reticula::before {
+    left: 50%;
+    top: 12%;
+    bottom: 12%;
+    width: 2px;
+    margin-left: -1px;
+}
+
+.lupa-reticula::after {
+    top: 50%;
+    left: 12%;
+    right: 12%;
+    height: 2px;
+    margin-top: -1px;
+}
+
+.lupa-etiqueta {
+    position: absolute;
+    left: 50%;
+    bottom: 10%;
+    transform: translateX(-50%);
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #0ca678;
+    color: #fff;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.lupa-etiqueta[hidden] {
+    display: none;
+}
+
+/* ── Marcas sobre la escena (círculo mágico, objetivo, análisis) */
+
+.marca {
+    position: absolute;
+    z-index: 7;
+    pointer-events: none;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.marca-circulo {
+    border: 5px dashed #f59f00;
+    box-shadow: 0 0 0 4px rgba(255, 212, 59, 0.45), 0 0 18px #ffd43b;
+    animation: marcaGira 1.6s linear infinite;
+}
+
+.marca-target {
+    border: 4px solid #e03131;
+    box-shadow: inset 0 0 0 10px rgba(255, 255, 255, 0.5), inset 0 0 0 14px #e03131;
+    animation: marcaPulso 0.5s ease-in-out infinite alternate;
+}
+
+.marca-target::before,
+.marca-target::after {
+    content: "";
+    position: absolute;
+    background: #e03131;
+}
+
+.marca-target::before {
+    left: 50%;
+    top: -14%;
+    bottom: -14%;
+    width: 3px;
+    margin-left: -1.5px;
+}
+
+.marca-target::after {
+    top: 50%;
+    left: -14%;
+    right: -14%;
+    height: 3px;
+    margin-top: -1.5px;
+}
+
+.marca-analisis {
+    background: conic-gradient(from 0deg, #fa5252, #fcc419, #40c057, #228be6, #be4bdb, #fa5252);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 7px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 7px));
+    animation: marcaGira 0.9s linear infinite;
+}
+
+.marca-texto {
+    position: absolute;
+    z-index: 7;
+    transform: translate(-50%, 0);
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: #0ca678;
+    color: #fff;
+    font-size: 16px;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Contador de hallazgos (5-6) ────────────────────────────── */
+
+.hallazgos {
+    flex: 0 0 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 10px 0;
+    border-radius: 18px;
+    background: #1e3a5f;
+}
+
+.hallazgos[hidden] {
+    display: none;
+}
+
+.ranura {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 3px solid #4dabf7;
+    background: #16304f;
+    color: #4d6a8a;
+    font-size: 22px;
+}
+
+.ranura.activa {
+    border-color: #fff;
+    background: radial-gradient(circle, #fff3bf 0%, #fab005 70%);
+    color: #7a4b00;
+    box-shadow: 0 0 16px #ffd43b;
+    animation: ranuraEnciende 0.6s ease;
+}
+
+/* ── Efectos ────────────────────────────────────────────────── */
+
+.capa-efectos {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    pointer-events: none;
+}
+
+.vuelo {
+    position: fixed;
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 0 10px #ffd43b) drop-shadow(0 6px 8px rgba(0, 0, 0, 0.25));
+}
+
+.particula {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+}
+
+.p-estrella {
+    width: 16px;
+    height: 16px;
+    background: #ffd43b;
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.p-verde {
+    width: 14px;
+    height: 14px;
+    background: #51cf66;
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    filter: drop-shadow(0 0 4px #b2f2bb);
+}
+
+.p-polen {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ffe066;
+    box-shadow: 0 0 6px #fcc419;
+}
+
+.p-viento {
+    width: 26px;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 6px #96f2d7;
+}
+
+.rayo {
+    position: fixed;
+    height: 10px;
+    margin-top: -5px;
+    transform-origin: 0 50%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(255, 243, 191, 0.2), #fff3bf 30%, #ffd43b);
+    box-shadow: 0 0 14px #ffd43b, 0 0 28px #fff3bf;
+    pointer-events: none;
+}
+
+.brillo-guino {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, rgba(255, 243, 191, 0.85) 35%, rgba(255, 212, 59, 0) 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+/* ── Premio final (placa / insignia) ────────────────────────── */
+
+.trofeo.premio {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(30vw, 360px);
+    padding: 10px 16px;
+    box-sizing: border-box;
+    border: 5px solid #fff;
+    border-radius: 20px;
+    color: #3d2500;
+    text-align: left;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.premio-textos {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.trofeo.premio.placa {
+    background: linear-gradient(160deg, #fff3bf 0%, #fcc419 60%, #f59f00 100%);
+}
+
+.trofeo.premio.insignia {
+    background: linear-gradient(160deg, #c3fae8 0%, #38d9a9 60%, #0ca678 100%);
+    color: #063b2c;
+}
+
+.premio-icono {
+    flex: 0 0 auto;
+    font-size: clamp(30px, 3.4vw, 44px);
+}
+
+.premio-titulo {
+    font-size: clamp(14px, 1.5vw, 18px);
+}
+
+.premio-nombre {
+    font-size: clamp(16px, 1.8vw, 22px);
+    line-height: 1.2;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+
+@keyframes dialogoPop {
+    0% { transform: scale(0.97); }
+    60% { transform: scale(1.02); }
     100% { transform: scale(1); }
 }
 
-@media (max-width: 800px) {
-    .par-imagenes {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
+@keyframes solBrilla {
+    0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 212, 59, 0.4)); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 12px rgba(255, 212, 59, 0.95)); transform: scale(1.05); }
+}
 
-    .panel-frame {
-        min-height: 160px;
-    }
+@keyframes florMece {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+@keyframes solGuina {
+    0%, 100% { transform: scale(1) rotate(0); }
+    30% { transform: scale(1.15, 0.85) rotate(-8deg); }
+    60% { transform: scale(0.95, 1.1) rotate(6deg); }
+}
+
+@keyframes marcaGira {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes marcaPulso {
+    from { transform: translate(-50%, -50%) scale(0.92); }
+    to { transform: translate(-50%, -50%) scale(1.06); }
+}
+
+@keyframes ranuraEnciende {
+    0% { transform: scale(0.6); }
+    60% { transform: scale(1.25); }
+    100% { transform: scale(1); }
 }
 
 
@@ -478,8 +848,11 @@ body.intro3d-activa #menu-acc {
     .btn-empecemos,
     .btn-empecemos-anillo,
     .btn-empecemos-anillo-2,
-    .hotspot {
-        animation: none;
+    .capa,
+    .marca,
+    .ranura,
+    .dialogo {
+        animation: none !important;
         transition: none;
     }
 

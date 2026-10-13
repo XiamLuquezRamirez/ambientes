@@ -1,26 +1,13 @@
 {
   "nombre": "Busca la sombra",
-  "mostrarFeedBack": true,
-  "feedback": {
-    "duracion": 1400,
-    "acierto": {
-      "gif": "../../images/correcto.gif"
-    },
-    "error": {
-      "gif": "../../images/incorrecto.gif"
-    }
-  },
   "textos": {
     "eligeNivel": "Elige tu edad",
     "enunciado": "Observa el objeto y encuentra su sombra",
     "cierre": "¡Excelente! Encontraste todas las sombras.",
-    "aciertoPlantilla": "¡Muy bien! Encontraste la sombra de {objeto}.",
-    "aciertoPlantillaAvanzada": "¡Excelente! Encontraste la sombra de {objeto}.",
-    "error": "¡Inténtalo otra vez! Observa muy bien su forma.",
-    "errorAvanzado": "¡Inténtalo otra vez! Observa con atención su forma y sus detalles.",
-    "consignaPlantilla": "Encuentra la sombra de {objeto}.",
+    "errorGenerico": "¡Inténtalo otra vez! Observa muy bien su forma.",
     "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: observa el objeto y toca su sombra.",
     "demostracionFin": "¡Ahora te toca a ti! Encuentra la sombra correcta.",
+    "ayudaRecorrido": "¡Te ayudo! Vamos juntos.",
     "conversacion": [
       {
         "personaje": 1,
@@ -46,7 +33,28 @@
     "acierto": "../../sounds/ok.mp3",
     "error": "../../sounds/over.mp3",
     "cierre": "../../sounds/victory.mp3",
-    "fondo": "../../sounds/fondo.mp3"
+    "fondo": "../../sounds/fondo.mp3",
+    "efectos": {
+      "boing": "",
+      "chispas": "",
+      "foco": "",
+      "vroom": "",
+      "burbujas": "",
+      "hojas": "",
+      "laser": "",
+      "escanerPausa": "",
+      "holograma": "",
+      "energia": "",
+      "salto": "",
+      "whoosh": "",
+      "nube": "",
+      "linterna": "",
+      "proyectar": ""
+    }
+  },
+  "escenas": {
+    "teatro": { "fondo": "" },
+    "laboratorio": { "fondo": "" }
   },
   "objetos": {
     "manzana": { "nombre": "la manzana", "etiqueta": "Manzana", "img": "img/objetos/manzana.svg", "sombra": "img/sombras/manzana.svg" },
@@ -71,42 +79,160 @@
     "avion": { "nombre": "el avión", "etiqueta": "Avión", "img": "img/objetos/avion.svg", "sombra": "img/sombras/avion.svg" },
     "helicoptero": { "nombre": "el helicóptero", "etiqueta": "Helicóptero", "img": "img/objetos/helicoptero.svg", "sombra": "img/sombras/helicoptero.svg" },
     "cohete": { "nombre": "el cohete", "etiqueta": "Cohete", "img": "img/objetos/cohete.svg", "sombra": "img/sombras/cohete.svg" },
-    "avioneta": { "nombre": "la avioneta", "etiqueta": "Avioneta", "img": "img/objetos/avioneta.svg", "sombra": "img/sombras/avioneta.svg" },
-    "aguila": { "nombre": "el águila", "etiqueta": "Águila", "img": "img/objetos/aguila.svg", "sombra": "img/sombras/aguila.svg" }
+    "avioneta": { "nombre": "la avioneta", "etiqueta": "Avioneta", "img": "img/objetos/avioneta.svg", "sombra": "img/sombras/avioneta.svg" }
   },
   "niveles": [
     {
       "id": "3",
-      "edad": "3 años",
-      "titulo": "3 sombras",
+      "edad": "3-4 años",
+      "titulo": "El Teatro Mágico de Sombras",
       "avanzado": false,
+      "tema": "teatro",
+      "progreso": "focos",
+      "linterna": true,
+      "lupa": false,
+      "pista": { "modo": "contorno", "inactividadMs": 6000, "errores": 2 },
+      "demo": { "objeto": "hoja", "sombras": ["hoja", "pera", "girasol"] },
       "retos": [
-        { "objeto": "manzana", "sombras": ["manzana", "carro", "estrella"] },
-        { "objeto": "carro", "sombras": ["pez", "carro", "arbol"] },
-        { "objeto": "mariposa", "sombras": ["mariposa", "conejo", "flor"] }
-      ]
-    },
-    {
-      "id": "4",
-      "edad": "4 años",
-      "titulo": "4 sombras",
-      "avanzado": false,
-      "retos": [
-        { "objeto": "manzana", "sombras": ["manzana", "pera", "estrella", "carro"] },
-        { "objeto": "pez", "sombras": ["pez", "pajaro", "mariposa", "tortuga"] },
-        { "objeto": "flor", "sombras": ["flor", "girasol", "arbol", "hoja"] }
-      ]
+        {
+          "objeto": "manzana",
+          "sombras": ["manzana", "carro", "estrella"],
+          "presentacion": { "voz": "zoe", "texto": "¡Bienvenidos al Teatro de Sombras! Mira esta manzana roja. ¡Todas las cosas tienen una sombra igual a ellas! ¿Dónde está la suya?" },
+          "acierto": { "voz": "zoe", "texto": "¡Wooow! ¡Encontraste la sombra de la manzana!", "efecto": "chispas" },
+          "errores": {
+            "carro": { "voz": "zoe", "texto": "Mmm, ¡esa sombra tiene ruedas! Observa la forma redondita de la manzana.", "reaccion": "sacudir" },
+            "estrella": { "voz": "zoe", "texto": "Mmm, ¡esa sombra tiene picos! Observa la forma redondita de la manzana.", "reaccion": "sacudir" }
+          },
+          "pista": { "voz": "zoe", "texto": "¡Mira! La manzana es redondita. Busca la sombra redondita." }
+        },
+        {
+          "objeto": "carro",
+          "sombras": ["pez", "carro", "arbol"],
+          "animacionSombras": { "pez": "nadar", "carro": "ruedas", "arbol": "mecer" },
+          "presentacion": { "voz": "zeus", "texto": "¡Rumm, rumm! ¡Ahí viene un carro rápido! Ayúdame a encontrar su sombra antes de que arranque." },
+          "acierto": { "voz": "zoe", "texto": "¡Genial! ¡Esa es la sombra del carro!", "efecto": "faros", "recompensa": { "tipo": "vuelta" } },
+          "errores": {
+            "pez": { "voz": "zeus", "texto": "¡Cuidado! Esa sombra no tiene ruedas, ¡tiene aletas! Mira bien el carro.", "reaccion": "burbujas" },
+            "arbol": { "voz": "zeus", "texto": "¡Cuidado! Esa sombra no tiene ruedas, ¡tiene hojas! Mira bien el carro.", "reaccion": "hojas" }
+          },
+          "pista": { "voz": "zeus", "texto": "¡Mira las ruedas del carro! Busca la sombra con ruedas." }
+        },
+        {
+          "objeto": "mariposa",
+          "sombras": ["mariposa", "conejo", "flor"],
+          "animacionObjeto": "aletear",
+          "presentacion": { "voz": "zoe", "texto": "¡Aww, qué linda mariposa! Sus alas tienen una forma muy especial. ¿Cuál es su sombra?" },
+          "acierto": { "voz": "zoe", "texto": "¡Increíble! Es la sombra de la mariposa.", "efecto": "chispas", "recompensa": { "tipo": "vuelo" } },
+          "errores": {
+            "conejo": { "voz": "zoe", "texto": "Esa sombra tiene orejitas. ¡Busca la que tiene alas abiertas!", "reaccion": "orejas" },
+            "flor": { "voz": "zoe", "texto": "Esa sombra tiene pétalos. ¡Busca la que tiene alas abiertas!", "reaccion": "temblar" }
+          },
+          "pista": { "voz": "zoe", "texto": "¡Mira sus alas abiertas! Busca la sombra con alas." }
+        }
+      ],
+      "final": {
+        "baile": { "voz": "zoe", "texto": "¡Bravo! Todas las sombras están bailando en el teatro." },
+        "premio": { "voz": "zeus", "texto": "¡Mira! Es la Linterna Mágica. ¡Tócala para encender el teatro!" },
+        "premioGanado": { "voz": "zoe", "texto": "¡La Linterna Mágica encendió todo el teatro!" },
+        "autoMs": 12000
+      },
+      "premio": { "tipo": "linterna", "nombre": "Linterna Mágica", "img": "" },
+      "cierre": "¡Recibiste la Linterna Mágica de Zoe y Zeus!"
     },
     {
       "id": "5",
       "edad": "5-6 años",
-      "titulo": "5 sombras · detalle",
+      "titulo": "El Laboratorio de Sombras",
       "avanzado": true,
+      "tema": "laboratorio",
+      "progreso": "energia",
+      "linterna": false,
+      "lupa": true,
+      "pista": { "modo": "detalle", "errores": 2 },
+      "demo": { "objeto": "tortuga", "sombras": ["tortuga", "pez", "pera", "hoja", "girasol"] },
       "retos": [
-        { "objeto": "mariposa", "sombras": ["mariposa", "mosca", "abeja", "pajaro", "flor"] },
-        { "objeto": "conejo", "sombras": ["conejo", "gato", "perro", "ardilla", "zorro"] },
-        { "objeto": "avion", "sombras": ["avion", "helicoptero", "cohete", "avioneta", "aguila"] }
-      ]
+        {
+          "objeto": "mariposa",
+          "sombras": ["mosca", "mariposa", "abeja", "pajaro", "flor"],
+          "animacionObjeto": "aletear",
+          "presentacion": { "voz": "zoe", "texto": "¡Bienvenido al Laboratorio de Sombras, Científico! Para analizar a esta mariposa, debemos encontrar su sombra exacta entre siluetas de insectos muy parecidos. ¡Atento a las alas!" },
+          "acierto": { "voz": "zoe", "texto": "¡Escaneo perfecto! Las alas simétricas revelan que es la mariposa.", "efecto": "laser" },
+          "errores": {
+            "mosca": { "voz": "zeus", "texto": "¡Atención a los detalles! Esa sombra tiene alas más pequeñas. ¡Compara las alas anchas de la mariposa!", "reaccion": "alerta" },
+            "abeja": { "voz": "zeus", "texto": "¡Atención a los detalles! Esa sombra tiene alas más pequeñas. ¡Compara las alas anchas de la mariposa!", "reaccion": "alerta" },
+            "pajaro": { "voz": "zeus", "texto": "¡Atención a los detalles! Esa sombra tiene pico. ¡Compara las alas anchas de la mariposa!", "reaccion": "alerta" },
+            "flor": { "voz": "zeus", "texto": "¡Atención a los detalles! Esa sombra tiene pétalos, no alas. ¡Compara las alas anchas de la mariposa!", "reaccion": "alerta" }
+          },
+          "pista": { "voz": "zeus", "texto": "¡Mira las alas! La mariposa tiene cuatro alas grandes y anchas.", "zona": { "x": 50, "y": 52, "w": 96, "h": 78 } }
+        },
+        {
+          "objeto": "conejo",
+          "sombras": ["gato", "perro", "conejo", "ardilla", "zorro"],
+          "presentacion": { "voz": "zeus", "texto": "¡Genial! Ahora analicemos a nuestro amigo el conejo. Hay muchos animales de cuatro patas en la lista, ¡no te confundas!" },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Excelente observación! Sus orejas largas no fallan.",
+            "efecto": "holograma",
+            "recompensa": {
+              "tipo": "riel",
+              "voz": "zeus",
+              "texto": "¡Ahora lleva al conejo a su madriguera! Pasa por debajo de la rama y salta por el aro.",
+              "ruta": [[10, 78], [34, 76], [60, 56], [86, 66]],
+              "obstaculos": [
+                { "tipo": "rama", "en": 0.3 },
+                { "tipo": "aro", "en": 0.64 }
+              ],
+              "meta": { "tipo": "madriguera" },
+              "llegada": { "voz": "zoe", "texto": "¡Llegó a su madriguera! ¡Muy bien!" },
+              "autoMs": 10000
+            }
+          },
+          "errores": {
+            "gato": { "voz": "zoe", "texto": "Mmm, observa las orejas. ¡Las del gato son cortitas y en triángulo!", "reaccion": "zoom" },
+            "perro": { "voz": "zoe", "texto": "Mmm, observa las orejas. ¡Las del perro están caídas!", "reaccion": "zoom" },
+            "ardilla": { "voz": "zoe", "texto": "Mmm, observa la cola. ¡La de la ardilla es gigante!", "reaccion": "zoom" },
+            "zorro": { "voz": "zoe", "texto": "Mmm, observa la cola. ¡La del zorro es ancha y larga!", "reaccion": "zoom" }
+          },
+          "pista": { "voz": "zeus", "texto": "¡Mira las orejas! El conejo tiene orejas muy largas y paradas.", "zona": { "x": 50, "y": 22, "w": 70, "h": 44 } }
+        },
+        {
+          "objeto": "avion",
+          "sombras": ["helicoptero", "cohete", "avioneta", "avion"],
+          "presentacion": { "voz": "zoe", "texto": "¡Última prueba del laboratorio! Un avión de pasajeros. Busca su silueta exacta entre las naves del cielo." },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Increíble, Científico! Descifraste la sombra del avión.",
+            "efecto": "turbinas",
+            "recompensa": {
+              "tipo": "libre",
+              "voz": "zoe",
+              "texto": "¡Ahora ayúdalo a volar a su destino! Esquiva las nubes.",
+              "inicio": [12, 72],
+              "meta": { "tipo": "bandera", "x": 86, "y": 34 },
+              "obstaculos": [
+                { "tipo": "nube", "x": 36, "y": 50 },
+                { "tipo": "nube", "x": 58, "y": 32 },
+                { "tipo": "nube", "x": 62, "y": 70 }
+              ],
+              "llegada": { "voz": "zoe", "texto": "¡Llegó a su destino! ¡Buen vuelo, Científico!" },
+              "autoMs": 10000
+            }
+          },
+          "errores": {
+            "avioneta": { "voz": "zeus", "texto": "¡Esa nave es una avioneta! Mira la forma de las alas principales del avión grande.", "reaccion": "holograma", "zona": { "x": 88, "y": 50, "w": 24, "h": 60 } },
+            "helicoptero": { "voz": "zeus", "texto": "¡Esa nave es un helicóptero! Mira la forma de las alas principales del avión grande.", "reaccion": "holograma", "zona": { "x": 50, "y": 22, "w": 90, "h": 26 } },
+            "cohete": { "voz": "zeus", "texto": "¡Esa nave es un cohete! Mira la forma de las alas principales del avión grande.", "reaccion": "holograma", "zona": { "x": 50, "y": 84, "w": 80, "h": 30 } }
+          },
+          "pista": { "voz": "zeus", "texto": "¡Mira las alas! El avión tiene alas grandes en forma de V.", "zona": { "x": 50, "y": 50, "w": 60, "h": 92 } }
+        }
+      ],
+      "final": {
+        "creador": { "voz": "zoe", "texto": "¡El medidor está lleno! Se encendió el Creador de Sombras Mágicas. Toca cada figura para proyectar su sombra." },
+        "creadorFin": { "voz": "zeus", "texto": "¡Qué gran experimento, Científico!" },
+        "autoMs": 20000
+      },
+      "premio": { "tipo": "medalla", "nombre": "Medalla de Científico Visionario", "img": "" },
+      "cierre": "¡Te ganaste la Medalla de Científico Visionario!"
     }
   ]
 }

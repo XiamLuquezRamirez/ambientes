@@ -80,10 +80,15 @@ foreach ([
     'btn-empecemos',
     'pantalla-inicio',
     'texto_voz.js',
-    'id="zona-hotspots"',
-    'id="img-izq"',
-    'id="img-der"',
     'sweetalert',
+    'id="escena-A"',
+    'id="escena-B"',
+    'id="frame-A"',
+    'id="frame-B"',
+    'id="hallazgos"',
+    'id="capa-efectos"',
+    'logica.js',
+    'sfx.js',
 ] as $needle) {
     if (! str_contains($html, $needle)) {
         fail("index.html sin '{$needle}'");
@@ -95,9 +100,11 @@ foreach ([
 foreach ([
     'TextoVoz',
     'confirmarNivel',
-    'iniciarPartida',
-    'resolverDiff',
-    'pintarHotspots',
+    'iniciarReto',
+    'responder',
+    'moverLupa',
+    'deslizarBsobreA',
+    'gameConfig.demo',
     'pednia:perfil',
 ] as $needle) {
     if (! str_contains($js, $needle)) {
@@ -107,7 +114,7 @@ foreach ([
     }
 }
 
-foreach (['.par-imagenes', '.hotspot', '.zona-hotspots', '.hotspot.is-encontrada', '.escena-wrap'] as $needle) {
+foreach (['.par-imagenes', '.escena-wrap', '.lupa', '.marca', '.ranura'] as $needle) {
     if (! str_contains($css, $needle)) {
         fail("style.css sin '{$needle}'");
     } else {
@@ -115,7 +122,7 @@ foreach (['.par-imagenes', '.hotspot', '.zona-hotspots', '.hotspot.is-encontrada
     }
 }
 
-echo "\n=== BUSCA LAS DIFERENCIAS: media ===\n";
+echo "\n=== BUSCA LAS DIFERENCIAS: config.json y media ===\n";
 
 $config = json_decode(file_get_contents($dir.'/config.json'), true);
 if (! is_array($config)) {
@@ -123,62 +130,43 @@ if (! is_array($config)) {
     goto resumen;
 }
 
-$escena = $config['escena'] ?? [];
-$izq = $escena['izquierda'] ?? '';
-if ($izq === '' || ! is_file($dir.'/'.ltrim($izq, '/'))) {
-    fail("Falta escena izquierda: {$izq}");
-} else {
-    ok("Escena izquierda OK");
-}
-
-$diffs = $config['diferencias'] ?? [];
-foreach ($diffs as $id => $meta) {
-    foreach (['x', 'y', 'w', 'h'] as $k) {
-        if (! isset($meta[$k]) || ! is_numeric($meta[$k])) {
-            fail("Diferencia {$id} sin {$k} numérico");
+$imagenes = [];
+foreach ($config['escenas'] ?? [] as $nombre => $esc) {
+    $imagenes[] = $esc['fondo'] ?? '';
+    foreach ($esc['elementos'] ?? [] as $idEl => $el) {
+        $imagenes[] = $el['img'] ?? '';
+        foreach (['x', 'y', 'w', 'h'] as $k) {
+            if (! isset($el[$k]) || ! is_numeric($el[$k])) {
+                fail("Escena {$nombre}: {$idEl} sin {$k} numérico");
+            }
         }
     }
-    ok("Hotspot {$id}");
 }
 
-echo "\n=== BUSCA LAS DIFERENCIAS: config.json ===\n";
-
-if (! empty($config['stub'])) {
-    fail('config aún con stub=true');
-} else {
-    ok('config sin stub');
-}
-
-$esperados = [
-    '3' => 3,
-    '4' => 4,
-    '5' => 5,
-];
-
+$esperados = ['3' => 3, '5' => 4];
 $ids = [];
 foreach ($config['niveles'] ?? [] as $nivel) {
     $id = (string) ($nivel['id'] ?? '');
     $ids[] = $id;
     $esp = $esperados[$id] ?? null;
     if ($esp === null) {
-        warn("Nivel id={$id} fuera de 3/4/5");
+        fail("Nivel id={$id} fuera de 3 (3-4 años) / 5 (5-6 años)");
         continue;
     }
-    $lista = $nivel['diferencias'] ?? [];
-    if (count($lista) !== $esp) {
-        fail("Nivel {$id}: ".count($lista)." diferencias, esperado {$esp}");
+    $retos = $nivel['retos'] ?? [];
+    if (count($retos) !== $esp) {
+        fail("Nivel {$id}: ".count($retos)." retos, esperado {$esp}");
     } else {
-        ok("Nivel {$id}: {$esp} diferencias");
+        ok("Nivel {$id}: {$esp} retos");
     }
-    $der = $nivel['derecha'] ?? '';
-    if ($der === '' || ! is_file($dir.'/'.ltrim($der, '/'))) {
-        fail("Nivel {$id}: falta imagen derecha {$der}");
-    } else {
-        ok("Nivel {$id} derecha OK");
+    if (! isset($config['escenas'][$nivel['escena'] ?? ''])) {
+        fail("Nivel {$id}: escena inexistente");
     }
-    foreach ($lista as $d) {
-        if (! isset($diffs[$d])) {
-            fail("Nivel {$id}: diferencia desconocida {$d}");
+    foreach ($retos as $r) {
+        foreach ($r['cambiosB'] ?? [] as $img) {
+            if ($img) {
+                $imagenes[] = $img;
+            }
         }
     }
 }
@@ -189,6 +177,24 @@ foreach (array_keys($esperados) as $idEsp) {
     }
 }
 
+foreach (array_unique(array_filter($imagenes)) as $img) {
+    if (! is_file($dir.'/'.ltrim($img, '/'))) {
+        fail("Falta imagen {$img}");
+    } else {
+        ok("Imagen {$img}");
+    }
+}
+
+$demoEscena = $config['demo']['escena'] ?? '';
+$escenasNiveles = array_map(fn ($n) => $n['escena'] ?? '', $config['niveles'] ?? []);
+if ($demoEscena === '' || ! isset($config['escenas'][$demoEscena])) {
+    fail('Demo sin escena propia');
+} elseif (in_array($demoEscena, $escenasNiveles, true)) {
+    fail('La demo usa la escena de un nivel (revelaría una respuesta)');
+} else {
+    ok("Demo con escena propia ({$demoEscena})");
+}
+
 $conv = $config['textos']['conversacion'] ?? [];
 if (! is_array($conv) || count($conv) < 1) {
     fail('conversacion vacía');
@@ -197,6 +203,16 @@ if (! is_array($conv) || count($conv) < 1) {
 }
 
 require __DIR__.'/barrido-multisensorial-shell.php';
+
+echo "\n=== BUSCA LAS DIFERENCIAS: reglas (node) ===\n";
+
+exec('node '.escapeshellarg(__DIR__.'/probar-busca-diferencias.js').' 2>&1', $salidaNode, $codigoNode);
+$ultimaNode = trim((string) end($salidaNode));
+if ($codigoNode !== 0) {
+    fail("probar-busca-diferencias.js: {$ultimaNode}");
+} else {
+    ok("probar-busca-diferencias.js: {$ultimaNode}");
+}
 
 echo "\n=== BUSCA LAS DIFERENCIAS: BD (sin cambiar tipo) ===\n";
 
