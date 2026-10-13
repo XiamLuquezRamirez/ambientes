@@ -21,6 +21,7 @@
     let tarjetaExplorarReversoImg;
     let tarjetaJugarReversoImg;
     let estudianteSexo;
+    let montajeAlumnos = null;
 
     function escapar(str) {
         return String(str ?? '')
@@ -279,9 +280,18 @@
         const el = document.getElementById('rnElegir');
         if (!el) return;
         saliendoTarjeta = false;
+        montajeAlumnos = null;
         el.classList.remove('is-saliendo');
-        el.querySelectorAll('.is-elegida, .is-ampliada').forEach(function (nodo) {
-            nodo.classList.remove('is-elegida', 'is-ampliada');
+        el.querySelectorAll('.is-elegida, .is-ampliada, .is-flip, .is-zoom, .is-al-centro').forEach(function (nodo) {
+            nodo.classList.remove('is-elegida', 'is-ampliada', 'is-flip', 'is-zoom', 'is-al-centro');
+        });
+        el.querySelectorAll('.rn-elegir-bloom, .rn-elegir-frase').forEach(function (nodo) { nodo.remove(); });
+        el.querySelectorAll('.rn-elegir-btn').forEach(function (nodo) {
+            nodo.style.transform = '';
+            nodo.style.transition = '';
+            nodo.style.animation = '';
+            nodo.style.removeProperty('--rn-dx');
+            nodo.style.removeProperty('--rn-dy');
         });
         el.hidden = false;
         void el.offsetWidth;
@@ -344,6 +354,60 @@
         return a;
     }
 
+    function medirIconoAlCentro(btn) {
+        const icono = btn.querySelector('.rn-card3d-reverso') || btn;
+        btn.style.transition = 'none';
+        btn.style.animation = 'none';
+        btn.style.transform = 'none';
+        void btn.offsetWidth;
+        const rect = icono.getBoundingClientRect();
+        const ancho = rect.width > 20 ? rect.width : btn.getBoundingClientRect().width;
+        const alto = rect.height > 20 ? rect.height : btn.getBoundingClientRect().height;
+        const cx = rect.width > 20 ? rect.left + rect.width / 2 : btn.getBoundingClientRect().left + btn.getBoundingClientRect().width / 2;
+        const cy = rect.height > 20 ? rect.top + rect.height / 2 : btn.getBoundingClientRect().top + btn.getBoundingClientRect().height / 2;
+        btn.style.setProperty('--rn-dx', ((window.innerWidth / 2) - cx).toFixed(1) + 'px');
+        btn.style.setProperty('--rn-dy', ((window.innerHeight / 2) - cy).toFixed(1) + 'px');
+        btn.style.transform = '';
+        btn.style.transition = '';
+        const elegir = document.getElementById('rnElegir');
+        if (!elegir) return;
+        const jugar = btn.classList.contains('rn-elegir-btn--jugar');
+        elegir.style.setProperty('--rn-color-boton', jugar ? '#602080' : '#2070c0');
+        elegir.style.setProperty('--rn-icono', Math.round(Math.max(ancho, alto)) + 'px');
+    }
+
+    function soltarColorBoton(btn) {
+        const elegir = document.getElementById('rnElegir');
+        if (!elegir || elegir.querySelector('.rn-elegir-bloom')) return;
+        const bloom = document.createElement('span');
+        bloom.className = 'rn-elegir-bloom';
+        bloom.setAttribute('aria-hidden', 'true');
+        elegir.appendChild(bloom);
+        void bloom.offsetWidth;
+        bloom.classList.add('is-on');
+        mostrarLetras(btn);
+    }
+
+    function mostrarLetras(btn) {
+        const elegir = document.getElementById('rnElegir');
+        if (!elegir || elegir.querySelector('.rn-elegir-frase')) return;
+        const jugar = btn.classList.contains('rn-elegir-btn--jugar');
+        const texto = jugar ? 'vamos a jugar' : 'vamos a explorar';
+        const frase = document.createElement('p');
+        frase.className = 'rn-elegir-frase';
+        frase.setAttribute('aria-hidden', 'true');
+        texto.split('').forEach(function (ch, i) {
+            const letra = document.createElement('span');
+            letra.className = 'rn-elegir-letra' + (ch === ' ' ? ' rn-elegir-letra--espacio' : '');
+            letra.textContent = ch === ' ' ? '' : ch;
+            letra.style.animationDelay = (i * 70) + 'ms';
+            frase.appendChild(letra);
+        });
+        elegir.appendChild(frase);
+        void frase.offsetWidth;
+        frase.classList.add('is-on');
+    }
+
     function ampliarTarjeta(btn, despues) {
         if (saliendoTarjeta) return;
         saliendoTarjeta = true;
@@ -359,13 +423,20 @@
         // Variante B: flip 3D + zoom (la tarjeta se voltea y crece hacia la
         // cámara, como si el niño "entrara" en ella).
         if (el.classList.contains('rn-elegir--v2')) {
+            medirIconoAlCentro(btn);
             lanzarEstrellas(btn);
+            const card = btn.querySelector('.rn-card3d');
+            const reverso = btn.querySelector('.rn-card3d-reverso');
+            if (card) card.style.transition = 'none';
+            if (reverso) reverso.style.transition = 'none';
             void btn.offsetWidth;
-            btn.classList.add('is-flip');           // gira 180° mostrando el reverso
+            btn.classList.add('is-flip');
+            asegurarAlumnos(btn.id === 'rnBtnJugar' ? '/alumnos?destino=juegos' : (urlContinuar || '/alumnos'));
             window.setTimeout(function () {
-                btn.classList.add('is-zoom');        // luego crece llenando la pantalla
-            }, 520);
-            window.setTimeout(despues, 1250);
+                btn.classList.add('is-al-centro');
+            }, 480);
+            window.setTimeout(function () { soltarColorBoton(btn); }, 980);
+            window.setTimeout(despues, 2750);
             return;
         }
 
@@ -409,22 +480,47 @@
         window.setTimeout(despues, secuencia.length * pasoMs + 950);
     }
 
-    function irAClase() {
-        if (!urlContinuar) return;
-        if (window.KioscoNav && window.KioscoNav.esRutaKiosco(urlContinuar)) {
-            window.KioscoNav.ir(urlContinuar);
+    // Solo se pide la URL elegida: GET /alumnos guarda en sesión el destino
+    // tras el PIN, así que precargar ambas deja el de la última en responder.
+    function asegurarAlumnos(url) {
+        if (montajeAlumnos) return montajeAlumnos;
+        const path = url.split('?')[0];
+        if (!window.KioscoNav || !window.KioscoNav.esRutaKiosco(path)) {
+            montajeAlumnos = Promise.reject();
+            return montajeAlumnos;
+        }
+        montajeAlumnos = window.KioscoNav.ir(url, false, { debajo: true });
+        return montajeAlumnos;
+    }
+
+    function irConDesvanecido(url) {
+        const path = url.split('?')[0];
+        if (!window.KioscoNav || !window.KioscoNav.esRutaKiosco(path)) {
+            window.location.href = url;
             return;
         }
-        window.location.href = urlContinuar;
+        asegurarAlumnos(url).then(function () {
+            document.querySelectorAll('#kioscoPane > [data-kiosco-saliente]').forEach(function (el) {
+                el.classList.add('is-desvaneciendo');
+            });
+            window.setTimeout(function () {
+                window.KioscoNav.terminarSuperposicion();
+            }, 620);
+        }).catch(function () {
+            if (window.KioscoNav && window.KioscoNav.terminarSuperposicion) {
+                window.KioscoNav.terminarSuperposicion();
+            }
+            window.location.href = url;
+        });
+    }
+
+    function irAClase() {
+        if (!urlContinuar) return;
+        irConDesvanecido(urlContinuar);
     }
 
     function abrirJuegos() {
-        const url = '/alumnos?destino=juegos';
-        if (window.KioscoNav && window.KioscoNav.esRutaKiosco('/alumnos')) {
-            window.KioscoNav.ir(url);
-            return;
-        }
-        window.location.href = url;
+        irConDesvanecido('/alumnos?destino=juegos');
     }
 
     function renderErrorCamino() {
@@ -593,6 +689,9 @@
     }
 
     function boot() {
+        const nodoApp = document.getElementById('rnApp');
+        if (!nodoApp || nodoApp.closest('[data-kiosco-saliente]')) return;
+
         if (window.VistaNino && typeof window.VistaNino.vincular === 'function') {
             window.VistaNino.vincular();
         }

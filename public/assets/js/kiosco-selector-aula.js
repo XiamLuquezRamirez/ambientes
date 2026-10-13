@@ -4,14 +4,14 @@
     if (!raiz || raiz.dataset.aulaLista === '1') return;
     raiz.dataset.aulaLista = '1';
 
-    var lista = raiz.querySelector('.selector-aula__pupitres');
+    var lista = raiz.querySelector('.selector-aula__lista');
     var atras = document.getElementById('aulaAtras');
     var adelante = document.getElementById('aulaAdelante');
     var anuncio = document.getElementById('aulaPagina');
     var voz = document.getElementById('aulaVoz');
-    var porPagina = 6;
+    var porPagina = 8;
     var pagina = 0;
-    var items = lista ? Array.prototype.slice.call(lista.querySelectorAll('.pupitre')) : [];
+    var items = lista ? Array.prototype.slice.call(lista.querySelectorAll('.marco-nino')) : [];
     var paginas = Math.max(1, Math.ceil(items.length / porPagina));
 
     var animando = false;
@@ -59,7 +59,7 @@
     }
 
     function ordenHorizontal(els, desdeLaDerecha) {
-        var cols = 3;
+        var cols = 4;
         var orden = [];
         var i;
         var fila;
@@ -145,15 +145,170 @@
         });
     }
 
-    if (voz && window.speechSynthesis) {
+    function hablar(texto) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        var frase = new SpeechSynthesisUtterance(texto);
+        frase.lang = 'es-CO';
+        frase.rate = 0.95;
+        window.speechSynthesis.speak(frase);
+    }
+
+    function callar() {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+
+    if (voz) {
         voz.addEventListener('click', function () {
-            window.speechSynthesis.cancel();
-            var frase = new SpeechSynthesisUtterance('¿Quién eres tú? Busca tu foto y tócala.');
-            frase.lang = 'es-CO';
-            frase.rate = 0.95;
-            window.speechSynthesis.speak(frase);
+            hablar('¿Quién eres tú? Busca tu foto y tócala.');
         });
     }
+
+    var confirma = document.getElementById('aulaConfirma');
+    var confirmaNo = document.getElementById('aulaConfirmaNo');
+    var confirmaOk = document.getElementById('aulaConfirmaOk');
+    var confirmaVoz = document.getElementById('aulaConfirmaVoz');
+    var confirmaVelo = document.getElementById('aulaConfirmaVelo');
+    var confirmaFoto = document.getElementById('aulaConfirmaFoto');
+    var confirmaNombre = document.getElementById('aulaConfirmaNombre');
+    var preguntaActual = '';
+    var fichaOrigen = null;
+    var pinUrl = '';
+    var precargaPin = null;
+    var yendoAlPin = false;
+
+    function abrirConfirma(card) {
+        if (!confirma || !card) return;
+        var nombre = card.getAttribute('data-nombre') || '';
+        var foto = card.querySelector('.marco-nino__foto');
+        var img = foto ? foto.querySelector('img') : null;
+        var iniciales = foto ? foto.querySelector('.marco-nino__iniciales') : null;
+        fichaOrigen = card;
+        var color = card.style.getPropertyValue('--marco') || '#ee6747';
+        var caja = confirma ? confirma.querySelector('.aula-confirma__caja') : null;
+        if (caja) caja.style.setProperty('--marco', color);
+        if (confirmaFoto) {
+            confirmaFoto.innerHTML = '';
+            if (img) confirmaFoto.appendChild(img.cloneNode(true));
+            else if (iniciales) confirmaFoto.appendChild(iniciales.cloneNode(true));
+        }
+        if (confirmaNombre) confirmaNombre.textContent = nombre;
+        pinUrl = card.getAttribute('data-pin') || '';
+        precargaPin = (pinUrl && window.KioscoNav && typeof window.KioscoNav.precargar === 'function')
+            ? window.KioscoNav.precargar(pinUrl)
+            : null;
+        preguntaActual = nombre ? ('¿Eres ' + nombre + '?') : '¿Eres tú?';
+        if (alTerminarCierre) alTerminarCierre();
+        cerrando = false;
+        confirma.classList.remove('aula-confirma--sale');
+        raiz.classList.add('selector-aula--confirma');
+        confirma.hidden = false;
+        if (caja) {
+            caja.style.animation = 'none';
+            void caja.offsetWidth;
+            caja.style.animation = '';
+        }
+        hablar(preguntaActual);
+        if (confirmaNo) confirmaNo.focus();
+    }
+
+    var cerrando = false;
+    var alTerminarCierre = null;
+
+    function cerrarConfirma() {
+        if (!confirma || confirma.hidden || cerrando || yendoAlPin) return;
+        callar();
+        var caja = confirma.querySelector('.aula-confirma__caja');
+        var reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!caja || reducir) {
+            confirma.hidden = true;
+            confirma.classList.remove('aula-confirma--sale');
+            raiz.classList.remove('selector-aula--confirma');
+            if (fichaOrigen) fichaOrigen.focus();
+            return;
+        }
+        cerrando = true;
+        confirma.classList.add('aula-confirma--sale');
+        raiz.classList.remove('selector-aula--confirma');
+        var listo = false;
+        var timer = 0;
+        function terminar(ev) {
+            if (ev && ev.target !== caja) return;
+            if (listo || !cerrando) return;
+            listo = true;
+            clearTimeout(timer);
+            caja.removeEventListener('animationend', terminar);
+            alTerminarCierre = null;
+            cerrando = false;
+            confirma.hidden = true;
+            confirma.classList.remove('aula-confirma--sale');
+            if (fichaOrigen) fichaOrigen.focus();
+        }
+        alTerminarCierre = function () {
+            listo = true;
+            clearTimeout(timer);
+            caja.removeEventListener('animationend', terminar);
+            alTerminarCierre = null;
+        };
+        caja.addEventListener('animationend', terminar);
+        timer = setTimeout(terminar, 420);
+    }
+
+    if (lista) {
+        lista.addEventListener('click', function (ev) {
+            var card = ev.target.closest('.marco-nino');
+            if (!card || card.hidden) return;
+            ev.preventDefault();
+            abrirConfirma(card);
+        });
+    }
+    if (confirmaNo) {
+        confirmaNo.addEventListener('click', cerrarConfirma);
+    }
+    if (confirmaVelo) {
+        confirmaVelo.addEventListener('click', cerrarConfirma);
+    }
+    if (confirmaVoz) {
+        confirmaVoz.addEventListener('click', function () {
+            hablar(preguntaActual);
+        });
+    }
+    function irAlPin() {
+        if (yendoAlPin || !pinUrl || pinUrl === '#') return;
+        yendoAlPin = true;
+        callar();
+        confirma.classList.add('aula-confirma--yendo');
+        if (confirmaOk) confirmaOk.disabled = true;
+        if (confirmaNo) confirmaNo.disabled = true;
+
+        var sinMovimiento = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var navegar = (window.KioscoNav && typeof window.KioscoNav.ir === 'function')
+            ? window.KioscoNav.ir(pinUrl, false, { debajo: true, precarga: precargaPin })
+            : Promise.reject();
+
+        navegar.then(function () {
+            var saliente = document.querySelector('#kioscoPane > .selector-aula[data-kiosco-saliente]');
+            if (!saliente || sinMovimiento) {
+                if (window.KioscoNav && typeof window.KioscoNav.terminarSuperposicion === 'function') {
+                    window.KioscoNav.terminarSuperposicion();
+                }
+                return;
+            }
+            saliente.classList.add('is-desvaneciendo');
+            window.setTimeout(function () {
+                window.KioscoNav.terminarSuperposicion();
+            }, 560);
+        }).catch(function () {
+            window.location.href = pinUrl;
+        });
+    }
+
+    if (confirmaOk) {
+        confirmaOk.addEventListener('click', irAlPin);
+    }
+    document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && confirma && !confirma.hidden) cerrarConfirma();
+    });
 
     if (lista) pintar();
     }
