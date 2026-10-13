@@ -6,7 +6,7 @@ use App\Models\Estudiante;
 use Illuminate\Http\Request;
 
 /**
- * Resuelve y cachea en sesión los 50 parámetros de perfil para el kiosco.
+ * Resuelve y cachea en sesión los parámetros de perfil para el kiosco.
  * No reimplementa la resolución: delega en ParametrosPerfilAprendizajeService.
  */
 class AdaptacionKioscoService
@@ -58,6 +58,9 @@ class AdaptacionKioscoService
             'css_vars' => [],
             'clases' => [],
             'noop' => self::NOOP,
+            'origen' => null,
+            'json' => null,
+            'claves_juego' => [],
         ];
     }
 
@@ -69,6 +72,7 @@ class AdaptacionKioscoService
         $valores = $this->parametros->valoresParaEstudiante($estudiante);
         $identidad = $this->identidadPerfil($estudiante);
         $edad = $estudiante->edad;
+        $documento = $this->documentoPerfil($estudiante, $identidad);
 
         return [
             'activo' => true,
@@ -81,6 +85,9 @@ class AdaptacionKioscoService
             'css_vars' => $this->cssVars($valores),
             'clases' => $this->clasesHtml($valores),
             'noop' => self::NOOP,
+            'origen' => $documento['origen'],
+            'json' => $documento['json'],
+            'claves_juego' => $this->parametros->clavesJuegos(),
         ];
     }
 
@@ -120,6 +127,7 @@ class AdaptacionKioscoService
 
         if ($cache !== null
             && array_key_exists('edad', $cache)
+            && array_key_exists('claves_juego', $cache)
             && $this->fingerprintCoincide($cache, $estudiante)
         ) {
             // La edad cambia con el calendario; siempre refrescarla desde el estudiante.
@@ -232,6 +240,46 @@ class AdaptacionKioscoService
         }
 
         return $clases;
+    }
+
+    /**
+     * El personalizado solo entra si la asignación está activa.
+     * La tabla es estudiante_perfil_aprendizaje_personalizado.activa, no un flag suelto en el estudiante.
+     *
+     * @param  array{tipo: string, perfil_id: int}  $identidad
+     * @return array{origen: array<string, mixed>|null, json: array<string, mixed>|null}
+     */
+    private function documentoPerfil(Estudiante $estudiante, array $identidad): array
+    {
+        if ($identidad['tipo'] !== 'inclusion' && $identidad['tipo'] !== 'personalizado') {
+            return ['origen' => null, 'json' => null];
+        }
+
+        if ($identidad['perfil_id'] <= 0) {
+            return ['origen' => null, 'json' => null];
+        }
+
+        $perfil = $identidad['tipo'] === 'personalizado'
+            ? $estudiante->perfilAprendizajePersonalizadoActiva?->perfilAprendizajePersonalizado
+            : null;
+
+        $documento = $this->parametros->asegurarDocumentoInstitucion(
+            (int) $estudiante->institucion_id,
+            $identidad['tipo'],
+            $identidad['perfil_id'],
+            $perfil
+        );
+
+        return [
+            'origen' => [
+                'institucion_id' => $documento['institucion_id'],
+                'tipo' => $documento['tipo'],
+                'perfil_id' => $documento['perfil_id'],
+                'carpeta' => $documento['carpeta'],
+                'archivo' => $documento['archivo'],
+            ],
+            'json' => $documento['json'],
+        ];
     }
 
     /**

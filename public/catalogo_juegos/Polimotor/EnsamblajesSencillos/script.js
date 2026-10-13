@@ -539,9 +539,10 @@ function pintarMenuAcc() {
         lab.className = "menu-acc-op";
         lab.innerHTML = '<input type="checkbox"> ' + op.label;
         const input = lab.querySelector("input");
-        input.checked = !!acc()[op.key];
+        input.checked = op.key === "mostrarFeedBack" ? gameConfig.mostrarFeedBack !== false : !!acc()[op.key];
         input.addEventListener("change", function () {
-            gameConfig.accesibilidad[op.key] = input.checked;
+            if (op.key === "mostrarFeedBack") gameConfig.mostrarFeedBack = input.checked;
+            else gameConfig.accesibilidad[op.key] = input.checked;
             aplicarAccesibilidadInicial();
         });
         ops.appendChild(lab);
@@ -1074,11 +1075,11 @@ function armarTablero() {
 }
 
 function feedbackActivo() {
-    return acc().mostrarFeedBack !== false;
+    return gameConfig.mostrarFeedBack !== false;
 }
 
 function cfgFeedback(tipo) {
-    const fb = acc().feedback || {};
+    const fb = (gameConfig && gameConfig.feedback) || {};
     const item = fb[tipo] || {};
     const t = (gameConfig && gameConfig.textos) || {};
     const defaults = {

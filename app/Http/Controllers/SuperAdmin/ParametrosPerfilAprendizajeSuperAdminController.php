@@ -35,6 +35,35 @@ class ParametrosPerfilAprendizajeSuperAdminController extends Controller
         ]);
     }
 
+    public function imagenes(): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'imagenes' => $this->servicio->listarImagenesJuegos(),
+        ]);
+    }
+
+    public function subirImagen(Request $request): JsonResponse
+    {
+        $request->validate([
+            'imagen' => 'required|file|max:8192',
+        ], [
+            'imagen.required' => 'Elige una imagen.',
+            'imagen.max' => 'La imagen supera 8 MB.',
+        ]);
+
+        try {
+            $imagen = $this->servicio->guardarImagenJuego($request->file('imagen'));
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'imagen' => $imagen,
+        ]);
+    }
+
     public function perfilesFormales(): JsonResponse
     {
         $perfiles = PerfilAprendizajeInclusion::query()

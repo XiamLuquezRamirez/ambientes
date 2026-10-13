@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1663" height="920" viewBox="0 0 1663 920">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fffdf0"/>
+      <stop offset="0.52" stop-color="#fffbea"/>
+      <stop offset="1" stop-color="#fff8df"/>
+    </linearGradient>
+    <linearGradient id="warmShape" x1="0" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#ffe9ac" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ffe7a0" stop-opacity="0.32"/>
+    </linearGradient>
+    <linearGradient id="bottomWave" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffedbb" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#ffe7a0" stop-opacity="0.62"/>
+    </linearGradient>
+  </defs>
+  <rect width="1663" height="920" fill="url(#base)"/>
+  <path d="M0 155 C65 118 111 86 178 94 C247 102 290 150 287 195 C283 264 218 327 147 369 C96 399 46 415 0 424 Z" fill="url(#warmShape)"/>
+  <path d="M1552 0 L1663 0 L1663 300 C1607 303 1550 285 1503 250 C1451 211 1421 164 1424 128 C1427 78 1482 31 1552 0 Z" fill="url(#warmShape)"/>
+  <path d="M0 773 C117 713 231 690 354 696 C506 703 641 740 786 751 C922 761 1050 723 1179 703 C1347 676 1507 711 1663 765 L1663 920 L0 920 Z" fill="url(#bottomWave)"/>
+</svg>

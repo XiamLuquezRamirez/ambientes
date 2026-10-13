@@ -40,6 +40,10 @@ class AdaptacionKioscoServiceTest extends TestCase
         $this->assertContains('login_tipo', $payload['noop']);
         $this->assertArrayHasKey('edad', $payload);
         $this->assertNull($payload['edad']);
+        $this->assertNull($payload['origen']);
+        $this->assertNull($payload['json']);
+        $this->assertContains('modoTap', $payload['claves_juego']);
+        $this->assertNotContains('btn_size', $payload['claves_juego']);
     }
 
     public function test_payload_incluye_edad_desde_fecha_nacimiento(): void

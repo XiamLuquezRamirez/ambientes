@@ -293,6 +293,8 @@ Route::prefix('admin')->middleware(['es.admin'])->group(function () {
 
     Route::get('configuracion/parametros-perfil', [ParametrosPerfilAprendizajeController::class, 'index'])->name('admin.configuracion.parametros-perfil.index');
     Route::get('configuracion/parametros-perfil/catalogo', [ParametrosPerfilAprendizajeController::class, 'catalogo'])->name('admin.configuracion.parametros-perfil.catalogo');
+    Route::get('configuracion/parametros-perfil/imagenes', [ParametrosPerfilAprendizajeController::class, 'imagenes'])->name('admin.configuracion.parametros-perfil.imagenes');
+    Route::post('configuracion/parametros-perfil/imagenes', [ParametrosPerfilAprendizajeController::class, 'subirImagen'])->name('admin.configuracion.parametros-perfil.imagenes.subir');
     Route::get('configuracion/parametros-perfil/perfiles-formales', [ParametrosPerfilAprendizajeController::class, 'perfilesFormales'])->name('admin.configuracion.parametros-perfil.perfiles-formales');
     Route::get('configuracion/parametros-perfil/perfiles-personalizados', [ParametrosPerfilAprendizajeController::class, 'perfilesPersonalizados'])->name('admin.configuracion.parametros-perfil.perfiles-personalizados');
     Route::get('configuracion/parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajeController::class, 'mostrarInclusion'])->name('admin.configuracion.parametros-perfil.inclusion.show');
@@ -403,6 +405,8 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
 
     Route::get('inclusion/parametros-perfil', [ParametrosPerfilAprendizajePanelController::class, 'index'])->name('panel.inclusion.parametros-perfil.index');
     Route::get('inclusion/parametros-perfil/catalogo', [ParametrosPerfilAprendizajePanelController::class, 'catalogo'])->name('panel.inclusion.parametros-perfil.catalogo');
+    Route::get('inclusion/parametros-perfil/imagenes', [ParametrosPerfilAprendizajePanelController::class, 'imagenes'])->name('panel.inclusion.parametros-perfil.imagenes');
+    Route::post('inclusion/parametros-perfil/imagenes', [ParametrosPerfilAprendizajePanelController::class, 'subirImagen'])->name('panel.inclusion.parametros-perfil.imagenes.subir');
     Route::get('inclusion/parametros-perfil/perfiles-formales', [ParametrosPerfilAprendizajePanelController::class, 'perfilesFormales'])->name('panel.inclusion.parametros-perfil.perfiles-formales');
     Route::get('inclusion/parametros-perfil/perfiles-personalizados', [ParametrosPerfilAprendizajePanelController::class, 'perfilesPersonalizados'])->name('panel.inclusion.parametros-perfil.perfiles-personalizados');
     Route::get('inclusion/parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajePanelController::class, 'mostrarInclusion'])->name('panel.inclusion.parametros-perfil.inclusion.show');
@@ -522,6 +526,8 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
 
     Route::get('parametros-perfil', [ParametrosPerfilAprendizajeSuperAdminController::class, 'index'])->name('superadmin.parametros-perfil.index');
     Route::get('parametros-perfil/catalogo', [ParametrosPerfilAprendizajeSuperAdminController::class, 'catalogo'])->name('superadmin.parametros-perfil.catalogo');
+    Route::get('parametros-perfil/imagenes', [ParametrosPerfilAprendizajeSuperAdminController::class, 'imagenes'])->name('superadmin.parametros-perfil.imagenes');
+    Route::post('parametros-perfil/imagenes', [ParametrosPerfilAprendizajeSuperAdminController::class, 'subirImagen'])->name('superadmin.parametros-perfil.imagenes.subir');
     Route::get('parametros-perfil/perfiles-formales', [ParametrosPerfilAprendizajeSuperAdminController::class, 'perfilesFormales'])->name('superadmin.parametros-perfil.perfiles-formales');
     Route::get('parametros-perfil/perfiles-personalizados', [ParametrosPerfilAprendizajeSuperAdminController::class, 'perfilesPersonalizados'])->name('superadmin.parametros-perfil.perfiles-personalizados');
     Route::get('parametros-perfil/inclusion/{perfilAprendizajeInclusion}', [ParametrosPerfilAprendizajeSuperAdminController::class, 'mostrarInclusion'])->name('superadmin.parametros-perfil.inclusion.show');

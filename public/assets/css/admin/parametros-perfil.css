@@ -421,9 +421,29 @@
 
 .pp-gestion .pp-content-area {
     display: flex;
+    flex-direction: column;
     flex: 1;
     overflow: hidden;
     min-height: 0;
+}
+
+.pp-gestion .pp-opciones-filtro {
+    padding: 10px 14px 0;
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-opciones-filtro.is-hidden {
+    display: none;
+}
+
+.pp-gestion .pp-opciones-input {
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: var(--pp-r);
+    border: 0.5px solid var(--pp-b);
+    background: var(--pp-s2);
+    font-size: 13px;
+    color: var(--pp-tp);
 }
 
 .pp-gestion .pp-params-body {
@@ -512,6 +532,196 @@
     font-size: 11px;
     margin: 0;
     line-height: 1.4;
+}
+
+.pp-gestion .pp-param-grupo {
+    margin: 14px 2px 0;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--pp-tm);
+}
+
+.pp-gestion .pp-param-grupo:first-child {
+    margin-top: 2px;
+}
+
+.pp-gestion .pp-param-card--subs > .pp-param-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: 0;
+}
+
+.pp-gestion .pp-subitems {
+    display: flex;
+    flex-direction: column;
+}
+
+.pp-gestion .pp-subitem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px 8px 52px;
+    border-top: 0.5px solid var(--pp-b);
+}
+
+.pp-gestion .pp-subitem-copy {
+    flex: 1;
+    min-width: 0;
+}
+
+.pp-gestion .pp-subitem-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pp-tp);
+}
+
+.pp-gestion .pp-color {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pp-gestion .pp-color-muestra {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 0.5px solid var(--pp-b);
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-sub,
+.pp-gestion .pp-sub-text {
+    width: 180px;
+    max-width: 42vw;
+    padding: 4px 8px;
+    border-radius: var(--pp-r);
+    border: 0.5px solid var(--pp-b);
+    background: var(--pp-s2);
+    font-size: 12px;
+    color: var(--pp-tp);
+}
+
+.pp-gestion .pp-sub-text {
+    width: 240px;
+}
+
+.pp-gestion .pp-btn-xs {
+    padding: 3px 8px;
+    font-size: 11px;
+}
+
+.pp-gestion .pp-img-campo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pp-gestion .pp-img-prev {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    border-radius: 6px;
+    border: 0.5px solid var(--pp-b);
+    background: var(--pp-s0);
+    flex-shrink: 0;
+}
+
+.pp-gestion .pp-img-prev--vacia {
+    display: inline-block;
+}
+
+.pp-gestion .pp-img-nombre {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    color: var(--pp-ts);
+}
+
+.pp-img-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(17, 24, 39, 0.45);
+    padding: 24px;
+}
+
+.pp-img-modal[hidden] {
+    display: none;
+}
+
+.pp-img-dialog {
+    width: min(640px, 100%);
+    max-height: min(80vh, 720px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 16px 40px rgba(17, 24, 39, 0.18);
+}
+
+.pp-img-dialog-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-weight: 600;
+}
+
+.pp-img-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+    overflow: auto;
+    min-height: 120px;
+}
+
+.pp-img-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 0.5px solid #E5E7EB;
+    background: #fff;
+    cursor: pointer;
+}
+
+.pp-img-item:hover {
+    background: #F3F4F6;
+}
+
+.pp-img-item img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
+
+.pp-img-item span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+}
+
+.pp-img-vacio {
+    grid-column: 1 / -1;
+    padding: 24px 8px;
+    text-align: center;
+    color: #6B7280;
+    font-size: 13px;
 }
 
 /* param rows */

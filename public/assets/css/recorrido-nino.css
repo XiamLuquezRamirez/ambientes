@@ -1163,25 +1163,146 @@
     font-size: clamp(4rem, 11vw, 7rem);
 }
 
-.rn-elegir--v2 .rn-elegir-btn:active .rn-card3d {
-    transform: scale(.97);
+/* El filtro del hover aplasta el sticker y, al pulsar, suelta la sombra. */
+.rn-elegir--v2 .rn-elegir-btn:hover,
+.rn-elegir--v2 .rn-elegir-btn:active {
+    filter: none;
+    transform: none;
 }
 
-/* --- Salida variante B: flip 3D + zoom hacia la cámara --- */
+.rn-elegir--v2 .rn-elegir-btn:active .rn-card3d {
+    transform: none;
+}
+
+.rn-elegir--stickers .rn-elegir-btn:active .rn-sticker-img,
+.rn-elegir--stickers .rn-elegir-btn:active .rn-card3d-cara {
+    filter: none;
+    box-shadow: none;
+}
+
+/* --- Salida variante B: gira, queda solo el icono y corre al centro.
+   El color del botón sale desde ese centro hacia afuera. --- */
 .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida {
     animation: none;
     position: relative;
-    z-index: 3;
+    z-index: 4;
     transform-origin: center center;
-    transition: transform .8s cubic-bezier(.5, 0, .1, 1);
+    transition: transform .42s cubic-bezier(.4, 0, .15, 1);
 }
 
-.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-flip .rn-card3d {
-    transform: rotateY(180deg) scale(1.06);
+/* Sin volteo 3D: la cara de atrás del sticker se pinta negra y tapa el botón. */
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida .rn-card3d {
+    transform: none;
+    transform-style: flat;
+    transition: none;
 }
 
-.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-zoom {
-    transform: scale(9);
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida .rn-card3d-frente {
+    visibility: hidden;
+}
+
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-flip .rn-card3d-reverso {
+    transform: none;
+    animation: rn-circulo-gira .62s cubic-bezier(.22, .8, .2, 1) both;
+}
+
+@keyframes rn-circulo-gira {
+    from {
+        transform: rotate(-200deg) scale(.9);
+    }
+
+    to {
+        transform: rotate(0deg) scale(1);
+    }
+}
+
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida.is-al-centro {
+    transform: translate(var(--rn-dx, 0px), var(--rn-dy, 0px));
+}
+
+/* Al elegir, sin la sombra del sticker ni la cara negra del giro 3D. */
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida,
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida .rn-card3d,
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida .rn-card3d-cara,
+.rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida .rn-sticker-img {
+    filter: none;
+    box-shadow: none;
+}
+
+[data-kiosco-superponiendo="debajo"] > [data-kiosco-saliente] {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+}
+
+[data-kiosco-superponiendo="debajo"] > [data-kiosco-saliente].is-desvaneciendo {
+    opacity: 0;
+    transition: opacity .6s ease;
+}
+
+.rn-elegir-bloom {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 0;
+    width: var(--rn-icono, 280px);
+    height: var(--rn-icono, 280px);
+    border-radius: 50%;
+    background: var(--rn-color-boton, #2070c0);
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.rn-elegir-bloom.is-on {
+    animation: rn-elegir-bloom 1.2s cubic-bezier(.33, .12, .2, 1) forwards;
+}
+
+@keyframes rn-elegir-bloom {
+    from {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    to {
+        transform: translate(-50%, -50%) scale(18);
+    }
+}
+
+.rn-elegir-frase {
+    position: absolute;
+    left: 50%;
+    top: calc(50% + (var(--rn-icono, 280px) / 2) + 36px);
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    transform: translateX(-50%);
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 4.6vw, 3.2rem);
+    line-height: 1;
+    color: #fff;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.rn-elegir-letra {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(16px);
+}
+
+.rn-elegir-letra--espacio {
+    width: .35em;
+}
+
+.rn-elegir-frase.is-on .rn-elegir-letra {
+    animation: rn-letra-entra .38s cubic-bezier(.34, 1.4, .64, 1) forwards;
+}
+
+@keyframes rn-letra-entra {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Las demás y el título se van al elegir. */
@@ -1304,8 +1425,16 @@
     }
 
     .rn-card3d,
-    .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida {
+    .rn-elegir--v2.is-saliendo .rn-elegir-btn.is-elegida,
+    .rn-elegir-bloom.is-on,
+    .rn-elegir-frase.is-on .rn-elegir-letra {
         transition: none !important;
+        animation: none !important;
+    }
+
+    .rn-elegir-letra {
+        opacity: 1;
+        transform: none;
     }
 }
 

@@ -45,13 +45,94 @@
         "paleta_reducida": false,
         "deshacer": true,
         "lienzo_cuadriculado": false,
-        "rompecabezas_piezas_max": 9,
-        "memoria_pares_max": 6,
-        "secuencia_pasos_max": 4,
-        "juego_bordes": false,
         "login_tipo": "pin_4",
         "teclado_grande": false,
-        "modo_aula_automatico": false
+        "modo_aula_automatico": false,
+        "juegos": {
+            "visual": {
+                "altoContraste": false,
+                "altoContrasteEstilo": {
+                    "fondo": "rgba(0,0,0,0.82)",
+                    "linea": "#000000",
+                    "borde": "#E5FF00",
+                    "alerta": "#e53935",
+                    "distractores": "#000000",
+                    "bordeDistractores": "#E5FF00",
+                    "bordePelota": "#E5FF00",
+                    "bordeArco": "#E5FF00"
+                },
+                "animaciones_opciones": true,
+                "mostrarNombres": true,
+                "mostrarZonas": false,
+                "resaltarDestino": false,
+                "resaltarObjetivo": false,
+                "huecosPunteados": false,
+                "grillaFija": true,
+                "juego_bordes": false
+            },
+            "texto": {
+                "letterSpacing": 2,
+                "tamanoLetraBotones": 22
+            },
+            "tamano": {
+                "tamanoImagen": 120,
+                "tamanoImagenOpcion": 110,
+                "tamanoImagenPista": 124,
+                "espaciadoOpciones": 22,
+                "anchoOpcion": 220,
+                "altoOpcion": 200,
+                "hitboxExtra": 0,
+                "anchoCaminoExtra": 0,
+                "anchoCaminoExtraMin": -6,
+                "anchoCaminoExtraMax": 10,
+                "umbralEnceste": 50
+            },
+            "audio": {
+                "volumenFondo": 20,
+                "efectosSonido": true,
+                "rate": 5
+            },
+            "apoyo": {
+                "mostrarIntro": true,
+                "mostrarFeedBack": true,
+                "feedback": {
+                    "duracion": 2000,
+                    "acierto": {
+                        "gif": "../../images/correcto.gif"
+                    },
+                    "error": {
+                        "gif": "../../images/incorrecto.gif"
+                    }
+                },
+                "mostrarProgreso": true,
+                "verBotonRepetir": true,
+                "verBotonVerDeNuevo": true,
+                "pistaPorFallos": true,
+                "erroresAntesDePista": 2,
+                "fallosPista1": 2,
+                "fallosPista2": 3,
+                "respuestasMaximasAntesDeAtenuar": 2
+            },
+            "interaccion": {
+                "modoTap": false,
+                "zoomLongPress": false
+            },
+            "tiempo": {
+                "barraTiempo": true,
+                "cuentaRegresiva": true,
+                "tiempoMostrarCompleto": 3000,
+                "tiempoVerDeNuevo": 3000
+            },
+            "dificultad": {
+                "rompecabezas_piezas_max": 9,
+                "memoria_pares_max": 6,
+                "secuencia_pasos_max": 4,
+                "piezasVisibles": 2,
+                "porcentajeAcierto": 60,
+                "rutasFalsas": true,
+                "rutasFalsasCantidad": 2
+            }
+        }
     },
     "actualizado_en": "2026-09-02T09:39:08-05:00"
 }

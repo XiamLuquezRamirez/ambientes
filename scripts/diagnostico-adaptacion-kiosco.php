@@ -117,7 +117,7 @@ $sesion->iniciarSesion($reqLogin, $candidato, (int) $clase->id);
 $cache = $adaptacion->obtenerDeSesion($reqLogin);
 assertTrue(is_array($cache) && ($cache['activo'] ?? false), 'sesión kiosco_perfil activa');
 assertTrue((int) ($cache['estudiante_id'] ?? 0) === (int) $candidato->id, 'estudiante_id en cache');
-assertTrue(count($cache['valores'] ?? []) === 50, '50 parámetros en cache');
+assertTrue(count($cache['valores'] ?? []) === count($parametros->listarParametrosDef()), 'parámetros en cache');
 assertTrue(isset($cache['css_vars']['--kiosco-btn-size']), 'css_vars btn_size');
 assertTrue(in_array('login_tipo', $cache['noop'] ?? [], true), 'noop incluye login_tipo');
 assertTrue(in_array('ra_inicio', $cache['noop'] ?? [], true), 'noop incluye ra_*');

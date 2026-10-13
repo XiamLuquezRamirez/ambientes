@@ -223,6 +223,10 @@
         const root = $('ppGestion');
         root?.addEventListener('click', onRootClick);
         root?.addEventListener('change', onRootChange);
+        root?.addEventListener('input', onRootInput);
+
+        $('ppImgModal')?.addEventListener('click', onImgModalClick);
+        $('ppImgCerrar')?.addEventListener('click', cerrarBuscadorImagen);
     }
 
     function onRootClick(e) {
@@ -254,9 +258,28 @@
             return;
         }
 
+        const subBtn = e.target.closest('.pp-sub-nbtn');
+        if (subBtn) {
+            const actual = Number(subBtn.dataset.actual);
+            const step = parseInt(subBtn.dataset.step, 10);
+            const min = Number(subBtn.dataset.min);
+            const max = Number(subBtn.dataset.max);
+            const siguiente = Math.max(min, Math.min(max, (isFinite(actual) ? actual : 0) + step));
+            escribirSub(subBtn.dataset.ctx, subBtn.dataset.key, subBtn.dataset.path, siguiente);
+            if (subBtn.dataset.ctx === 'f') renderFParams();
+            else renderTParams();
+            return;
+        }
+
         const nbtn = e.target.closest('.pp-nbtn');
         if (nbtn) {
             cn(nbtn.dataset.ctx, nbtn.dataset.key, parseInt(nbtn.dataset.step, 10));
+            return;
+        }
+
+        const buscar = e.target.closest('.pp-img-buscar');
+        if (buscar) {
+            abrirBuscadorImagen(buscar.dataset.ctx, buscar.dataset.key, buscar.dataset.path);
         }
     }
 
@@ -264,7 +287,140 @@
         const sel = e.target.closest('.pp-sel');
         if (sel) {
             ss(sel.dataset.ctx, sel.dataset.key, sel.value);
+            return;
         }
+
+        const file = e.target.closest('.pp-img-file');
+        if (file) {
+            subirImagenCampo(file);
+        }
+    }
+
+    function onRootInput(e) {
+        if (e.target.classList.contains('pp-opciones-input')) {
+            if (e.target.dataset.ctx === 'f') renderFParams();
+            else renderTParams();
+            return;
+        }
+
+        const input = e.target.closest('.pp-sub');
+        if (!input) return;
+        escribirSub(input.dataset.ctx, input.dataset.key, input.dataset.path, input.value);
+        const muestra = input.parentElement && input.parentElement.querySelector('.pp-color-muestra');
+        if (muestra) muestra.style.background = input.value;
+    }
+
+    function leerRuta(obj, ruta) {
+        return String(ruta || '').split('.').reduce(function (acc, k) {
+            if (acc == null || typeof acc !== 'object') return '';
+            return acc[k];
+        }, obj);
+    }
+
+    function escribirSub(ctx, key, ruta, valor) {
+        const bolsa = ctx === 'f' ? fVals : tVals;
+        const copia = JSON.parse(JSON.stringify(bolsa[key] && typeof bolsa[key] === 'object' ? bolsa[key] : {}));
+        const partes = String(ruta).split('.');
+        let cur = copia;
+        for (let i = 0; i < partes.length - 1; i++) {
+            if (!cur[partes[i]] || typeof cur[partes[i]] !== 'object') cur[partes[i]] = {};
+            cur = cur[partes[i]];
+        }
+        const hoja = partes[partes.length - 1];
+        cur[hoja] = valor;
+        bolsa[key] = copia;
+    }
+
+    let imagenesCache = null;
+    let imagenDestino = null;
+
+    function urlDeImagenJuego(ruta) {
+        const nombre = String(ruta || '').split('/').pop();
+        if (!nombre || nombre.includes('..') || nombre.includes('\\')) return '';
+        return '/catalogo_juegos/images/' + encodeURIComponent(nombre);
+    }
+
+    function abrirBuscadorImagen(ctx, key, path) {
+        imagenDestino = { ctx: ctx, key: key, path: path };
+        const modal = $('ppImgModal');
+        if (!modal) return;
+        modal.hidden = false;
+        cargarImagenes();
+    }
+
+    function cerrarBuscadorImagen() {
+        const modal = $('ppImgModal');
+        if (modal) modal.hidden = true;
+        imagenDestino = null;
+    }
+
+    function onImgModalClick(e) {
+        if (e.target.id === 'ppImgModal') {
+            cerrarBuscadorImagen();
+            return;
+        }
+        const item = e.target.closest('.pp-img-item');
+        if (!item || !imagenDestino) return;
+        escribirSub(imagenDestino.ctx, imagenDestino.key, imagenDestino.path, item.dataset.ruta);
+        const ctx = imagenDestino.ctx;
+        cerrarBuscadorImagen();
+        if (ctx === 'f') renderFParams();
+        else renderTParams();
+    }
+
+    async function cargarImagenes() {
+        const grid = $('ppImgGrid');
+        if (!grid) return;
+        if (!imagenesCache) {
+            grid.innerHTML = '<div class="pp-img-vacio">Cargando…</div>';
+            try {
+                const data = await apiFetch(URLS.imagenes);
+                imagenesCache = data.imagenes || [];
+            } catch (err) {
+                grid.innerHTML = '<div class="pp-img-vacio">' + escapeHtml(err.message || 'No se pudieron cargar las imágenes') + '</div>';
+                return;
+            }
+        }
+        pintarImagenes();
+    }
+
+    function pintarImagenes() {
+        const grid = $('ppImgGrid');
+        if (!grid) return;
+        const lista = imagenesCache || [];
+        if (!lista.length) {
+            grid.innerHTML = '<div class="pp-img-vacio">No hay imágenes.</div>';
+            return;
+        }
+        grid.innerHTML = lista
+            .map(function (img) {
+                return (
+                    `<button type="button" class="pp-img-item" data-ruta="${escapeHtml(img.ruta)}">` +
+                    `<img src="${escapeHtml(img.url)}" alt="">` +
+                    `<span>${escapeHtml(img.nombre)}</span>` +
+                    `</button>`
+                );
+            })
+            .join('');
+    }
+
+    async function subirImagenCampo(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const ctx = input.dataset.ctx;
+        const fd = new FormData();
+        fd.append('imagen', file);
+        try {
+            const data = await apiFetch(URLS.imagenSubir, { method: 'POST', body: fd });
+            escribirSub(ctx, input.dataset.key, input.dataset.path, data.imagen.ruta);
+            imagenesCache = null;
+            if (ctx === 'f') renderFParams();
+            else renderTParams();
+            showToast(ctx === 'f' ? 'pp-fToast' : 'pp-tToast', 'Imagen subida');
+        } catch (err) {
+            showToast(ctx === 'f' ? 'pp-fToast' : 'pp-tToast', escapeHtml(err.message || 'No se pudo subir'));
+        }
+        input.value = '';
     }
 
     // ── Navegación ──────────────────────────────────────────
@@ -499,6 +655,7 @@
 
         toggleHidden($('pp-fCatCarousel'), true);
         toggleHidden($('pp-fCatDots'), true);
+        toggleHidden($('pp-fFiltroWrap'), true);
         toggleHidden($('pp-fBtnReset'), true);
         toggleHidden($('pp-fBtnGuardar'), true);
 
@@ -541,6 +698,7 @@
         toggleHidden($('pp-tBadgeTrans'), true);
         toggleHidden($('pp-tCatCarousel'), true);
         toggleHidden($('pp-tCatDots'), true);
+        toggleHidden($('pp-tFiltroWrap'), true);
         toggleHidden($('pp-tBtnReset'), true);
         toggleHidden($('pp-tBtnGuardar'), true);
         toggleHidden($('pp-tBtnElim'), !t.es_sistema && !t.predefinida && !!URLS.personalizadoDestroy);
@@ -557,6 +715,7 @@
     function fmtBase(p, base) {
         const v = base[p.k];
         if (typeof v === 'boolean') return v ? 'Sí' : 'No';
+        if (v && typeof v === 'object') return 'objeto';
         if (p.unit) return v + ' ' + p.unit;
         return v;
     }
@@ -586,8 +745,65 @@
         return '';
     }
 
+    function renderSubCtrl(p, campo, valor, ctx) {
+        const v = valor == null ? '' : valor;
+        if (campo.type === 'num') {
+            return (
+                `<div class="pp-num-wrap">` +
+                `<button type="button" class="pp-nbtn pp-sub-nbtn" data-ctx="${ctx}" data-key="${p.k}" data-path="${campo.k}" data-actual="${escapeHtml(String(v))}" data-step="-${campo.step}" data-min="${campo.min}" data-max="${campo.max}">−</button>` +
+                `<div class="pp-nval">${escapeHtml(String(v))} ${campo.unit || ''}</div>` +
+                `<button type="button" class="pp-nbtn pp-sub-nbtn" data-ctx="${ctx}" data-key="${p.k}" data-path="${campo.k}" data-actual="${escapeHtml(String(v))}" data-step="${campo.step}" data-min="${campo.min}" data-max="${campo.max}">+</button>` +
+                `</div>`
+            );
+        }
+        if (campo.type === 'color') {
+            return (
+                `<label class="pp-color">` +
+                `<span class="pp-color-muestra" style="background:${escapeHtml(String(v))}"></span>` +
+                `<input class="pp-sub" type="text" data-ctx="${ctx}" data-key="${p.k}" data-path="${campo.k}" value="${escapeHtml(String(v))}">` +
+                `</label>`
+            );
+        }
+        if (campo.type === 'imagen') {
+            const url = urlDeImagenJuego(v);
+            const nombre = String(v || '').split('/').pop() || 'Sin imagen';
+            return (
+                `<div class="pp-img-campo">` +
+                (url
+                    ? `<img class="pp-img-prev" src="${escapeHtml(url)}" alt="">`
+                    : `<span class="pp-img-prev pp-img-prev--vacia"></span>`) +
+                `<span class="pp-img-nombre">${escapeHtml(nombre)}</span>` +
+                `<button type="button" class="pp-btn pp-btn-xs pp-img-buscar" data-ctx="${ctx}" data-key="${p.k}" data-path="${campo.k}">Buscar</button>` +
+                `<label class="pp-btn pp-btn-xs">Subir<input class="pp-img-file" type="file" accept="image/gif,image/png,image/jpeg,image/webp" data-ctx="${ctx}" data-key="${p.k}" data-path="${campo.k}" hidden></label>` +
+                `</div>`
+            );
+        }
+        return `<input class="pp-sub pp-sub-text" type="text" data-ctx="${ctx}" data-key="${p.k}" data-path="${campo.k}" value="${escapeHtml(String(v))}">`;
+    }
+
+    function renderSubitems(p, valor, baseObj, ctx) {
+        return (p.campos || [])
+            .map(function (campo) {
+                const actual = leerRuta(valor, campo.k);
+                const base = leerRuta(baseObj, campo.k);
+                return (
+                    `<div class="pp-subitem">` +
+                    `<div class="pp-subitem-copy">` +
+                    `<div class="pp-subitem-label">${escapeHtml(campo.label)}</div>` +
+                    `</div>` +
+                    `<div class="pp-param-ctrl">` +
+                    `<div class="pp-param-base">Base: ${escapeHtml(String(base ?? ''))}</div>` +
+                    renderSubCtrl(p, campo, actual, ctx) +
+                    `</div></div>`
+                );
+            })
+            .join('');
+    }
+
     function renderParams(params, vals, baseDisplay, perfil, ctx, preset) {
         const sistemaBase = catalogo?.base || {};
+
+        let grupoActual = '';
 
         return params
             .map((p) => {
@@ -611,8 +827,21 @@
                     tags += `<span class="pp-inherited-tag">Heredado de base</span>`;
                 }
 
+                const grupo = p.grupo || '';
+                const encabezado =
+                    grupo && grupo !== grupoActual
+                        ? `<h3 class="pp-param-grupo">${escapeHtml(grupo)}</h3>`
+                        : '';
+                if (grupo) grupoActual = grupo;
+
+                const conSubitems = p.type === 'objeto' && (p.campos || []).length;
+                const cuerpo = conSubitems
+                    ? `<div class="pp-subitems">${renderSubitems(p, v, baseDisplay[p.k] || {}, ctx)}</div>`
+                    : `<div class="pp-param-ctrl"><div class="pp-param-base">Base: ${escapeHtml(String(fmtBase(p, baseDisplay)))}</div>${renderCtrl(p, v, ctx)}</div>`;
+
                 return (
-                    `<div class="pp-param-card"><div class="pp-param-row">` +
+                    encabezado +
+                    `<div class="pp-param-card${conSubitems ? ' pp-param-card--subs' : ''}"><div class="pp-param-row">` +
                     `<div class="pp-param-info">` +
                     `<div class="pp-param-head">` +
                     renderParamIcon(p.icon) +
@@ -620,23 +849,58 @@
                     `<div class="pp-param-label">${escapeHtml(p.label)} ${tags}</div>` +
                     `<div class="pp-param-desc">${escapeHtml(p.desc)}</div>` +
                     `</div></div></div>` +
-                    `<div class="pp-param-ctrl"><div class="pp-param-base">Base: ${escapeHtml(String(fmtBase(p, baseDisplay)))}</div>${renderCtrl(p, v, ctx)}</div>` +
+                    cuerpo +
                     `</div></div>`
                 );
             })
             .join('');
     }
 
+    function textoFiltro(ctx) {
+        const el = $(ctx === 'f' ? 'pp-fFiltro' : 'pp-tFiltro');
+        return String((el && el.value) || '').trim().toLowerCase();
+    }
+
+    function paramCoincide(p, q) {
+        const partes = [p.label, p.desc, p.grupo, p.k];
+        (p.campos || []).forEach(function (campo) {
+            partes.push(campo.label);
+        });
+        return partes.join(' ').toLowerCase().indexOf(q) !== -1;
+    }
+
+    function paramsFiltrados(ctx, q) {
+        const cat = ctx === 'f' ? fCat : tCat;
+        if (!q) return CATS[cat] || [];
+
+        const lista = [];
+        categoriasOrden.forEach(function (c) {
+            (CATS[c.k] || []).forEach(function (p) {
+                if (!paramCoincide(p, q)) return;
+                const grupo = p.grupo ? c.label + ' · ' + p.grupo : c.label;
+                lista.push(Object.assign({}, p, { grupo: grupo }));
+            });
+        });
+        return lista;
+    }
+
+    function htmlParams(params, vals, baseDisplay, perfil, ctx, preset) {
+        if (!params.length && textoFiltro(ctx)) {
+            return '<div class="pp-empty"><p>Ninguna opción coincide.</p></div>';
+        }
+        return renderParams(params, vals, baseDisplay, perfil, ctx, preset);
+    }
+
     function renderFParams() {
         if (!fCond) return;
-        const params = CATS[fCat] || [];
-        $('pp-fParams').innerHTML = renderParams(params, fVals, fBaseDisplay, fCond, 'f', fPreset);
+        const params = paramsFiltrados('f', textoFiltro('f'));
+        $('pp-fParams').innerHTML = htmlParams(params, fVals, fBaseDisplay, fCond, 'f', fPreset);
     }
 
     function renderTParams() {
         if (!tCond) return;
-        const params = CATS[tCat] || [];
-        $('pp-tParams').innerHTML = renderParams(params, tVals, tBaseDisplay, tCond, 't', null);
+        const params = paramsFiltrados('t', textoFiltro('t'));
+        $('pp-tParams').innerHTML = htmlParams(params, tVals, tBaseDisplay, tCond, 't', null);
     }
 
     function labelCategoria(catKey) {

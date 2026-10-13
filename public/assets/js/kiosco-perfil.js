@@ -65,6 +65,28 @@
         window.PedniaPerfil.perfilId = datos.perfil_id || 0;
         window.PedniaPerfil.edad = edadDe(datos);
         window.PedniaPerfil.noop = listaNoop;
+        guardarEnLocal(datos, on);
+    }
+
+    function guardarEnLocal(datos, on) {
+        var clave = 'pednia.perfilJuego';
+        try {
+            if (!on) {
+                localStorage.removeItem(clave);
+                return;
+            }
+            localStorage.setItem(clave, JSON.stringify({
+                estudiante_id: datos.estudiante_id || 0,
+                tipo: datos.tipo || null,
+                perfil_id: datos.perfil_id || 0,
+                origen: datos.origen || null,
+                claves_juego: Array.isArray(datos.claves_juego) ? datos.claves_juego : [],
+                valores: datos.valores || {},
+                json: datos.json || null,
+            }));
+        } catch (e) {
+            /* el kiosco sigue con la sesión aunque el navegador bloquee storage */
+        }
     }
 
     function recargarDesdeDom() {

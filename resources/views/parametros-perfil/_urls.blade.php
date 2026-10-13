@@ -2,6 +2,8 @@
     $rutasPorPrefijo = [
         'admin' => [
             'catalogo' => route('admin.configuracion.parametros-perfil.catalogo'),
+            'imagenes' => route('admin.configuracion.parametros-perfil.imagenes'),
+            'imagenSubir' => route('admin.configuracion.parametros-perfil.imagenes.subir'),
             'perfilesFormales' => route('admin.configuracion.parametros-perfil.perfiles-formales'),
             'perfilesPersonalizados' => route('admin.configuracion.parametros-perfil.perfiles-personalizados'),
             'inclusionShow' => route('admin.configuracion.parametros-perfil.inclusion.show', ['perfilAprendizajeInclusion' => '__ID__']),
@@ -15,6 +17,8 @@
         ],
         'panel' => [
             'catalogo' => route('panel.inclusion.parametros-perfil.catalogo'),
+            'imagenes' => route('panel.inclusion.parametros-perfil.imagenes'),
+            'imagenSubir' => route('panel.inclusion.parametros-perfil.imagenes.subir'),
             'perfilesFormales' => route('panel.inclusion.parametros-perfil.perfiles-formales'),
             'perfilesPersonalizados' => route('panel.inclusion.parametros-perfil.perfiles-personalizados'),
             'inclusionShow' => route('panel.inclusion.parametros-perfil.inclusion.show', ['perfilAprendizajeInclusion' => '__ID__']),
@@ -28,6 +32,8 @@
         ],
         'superadmin' => [
             'catalogo' => route('superadmin.parametros-perfil.catalogo'),
+            'imagenes' => route('superadmin.parametros-perfil.imagenes'),
+            'imagenSubir' => route('superadmin.parametros-perfil.imagenes.subir'),
             'perfilesFormales' => route('superadmin.parametros-perfil.perfiles-formales'),
             'perfilesPersonalizados' => route('superadmin.parametros-perfil.perfiles-personalizados'),
             'inclusionShow' => route('superadmin.parametros-perfil.inclusion.show', ['perfilAprendizajeInclusion' => '__ID__']),

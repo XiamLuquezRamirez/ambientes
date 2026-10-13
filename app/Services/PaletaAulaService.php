@@ -3,8 +3,8 @@
 namespace App\Services;
 
 /**
- * Colores del kiosco "¿Quién eres tú?": cada alumno se pinta con la silla cuyo color
- * se parece más a su `color_avatar` (lista de alumnos y ficha del PIN).
+ * Colores de la ficha del PIN. Cada alumno se pinta con la silla cuyo color
+ * se parece más a su `color_avatar`. El marco de "¿Quién eres tú?" no usa esta paleta.
  */
 class PaletaAulaService
 {
