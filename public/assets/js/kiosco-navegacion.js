@@ -11,6 +11,7 @@
     const SUPERPOSICION_MAX_MS = 10000;
 
     let superposicion = null;
+    let desvaneciendo = false;
 
     function csrfToken() {
         const meta = document.querySelector('meta[name="csrf-token"]');
@@ -273,6 +274,39 @@
             });
     }
 
+    function pinVisible() {
+        return !!document.querySelector('#kioscoPane > .pin-wrap:not([data-kiosco-saliente])');
+    }
+
+    function aulaVisible() {
+        return !!document.querySelector('#kioscoPane > .selector-aula:not([data-kiosco-saliente])');
+    }
+
+    /* Monta el destino debajo y desvanece la página de encima (PIN → aula, aula → inicio). */
+    function desvanecerHacia(url, reemplazar, selectorSaliente) {
+        if (desvaneciendo) return Promise.resolve();
+        desvaneciendo = true;
+
+        const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        return ir(url, !!reemplazar, { debajo: true }).then(function () {
+            const saliente = document.querySelector(selectorSaliente);
+
+            function cerrar() {
+                desvaneciendo = false;
+                terminarSuperposicion();
+            }
+
+            if (!saliente || sinMovimiento) {
+                cerrar();
+                return;
+            }
+
+            saliente.classList.add('is-desvaneciendo');
+            setTimeout(cerrar, 560);
+        });
+    }
+
     function salir() {
         const btn = document.getElementById('kioscoBtnSalir');
         const url = (btn && btn.dataset.salirUrl) || '/salir';
@@ -323,12 +357,30 @@
 
         e.preventDefault();
         const url = new URL(link.href, window.location.origin);
-        ir(url.pathname + url.search);
+        const destino = url.pathname + url.search;
+        if (pinVisible() && pathDe(destino) === '/alumnos') {
+            desvanecerHacia(destino, false, '#kioscoPane > .pin-wrap[data-kiosco-saliente]');
+            return;
+        }
+        if (aulaVisible() && pathDe(destino) === '/inicio') {
+            desvanecerHacia(destino, false, '#kioscoPane > .selector-aula[data-kiosco-saliente]');
+            return;
+        }
+        ir(destino);
     }, true);
 
     window.addEventListener('popstate', function () {
         if (!esRutaKiosco(window.location.pathname)) return;
-        ir(window.location.pathname + window.location.search, true);
+        const destino = window.location.pathname + window.location.search;
+        if (pinVisible() && pathDe(destino) === '/alumnos') {
+            desvanecerHacia(destino, true, '#kioscoPane > .pin-wrap[data-kiosco-saliente]');
+            return;
+        }
+        if (aulaVisible() && pathDe(destino) === '/inicio') {
+            desvanecerHacia(destino, true, '#kioscoPane > .selector-aula[data-kiosco-saliente]');
+            return;
+        }
+        ir(destino, true);
     });
 
     actualizarBtnSalir();

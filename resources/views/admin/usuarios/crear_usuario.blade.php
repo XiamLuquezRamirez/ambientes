@@ -103,6 +103,15 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="mb-3">
+                                                <strong class="form-label">PIN de accesibilidad</strong>
+                                                <input type="text" id="pin_accesibilidad" name="pin_accesibilidad"
+                                                    class="form-control" inputmode="numeric" maxlength="4"
+                                                    pattern="\d{4}" placeholder="Se asigna al guardar"
+                                                    autocomplete="off" value="{{ old('pin_accesibilidad') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
                                                 <strong class="form-label">Fecha de ingreso</strong>
                                                 <input type="date" id="fecha_ingreso" name="fecha_ingreso"
                                                     class="form-control" placeholder="Fecha de ingreso del docente"

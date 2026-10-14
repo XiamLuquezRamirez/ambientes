@@ -41,6 +41,18 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6" id="filaPinAccesibilidad" hidden>
+                        <div class="mb-3">
+                            <strong>PIN de accesibilidad</strong>
+                            <div class="input-group">
+                                <input type="text" id="pinAccesibilidadGenerado" class="form-control" readonly>
+                                <button type="button" class="btn btn-outline-secondary btn-copiar"
+                                    data-target="pinAccesibilidadGenerado" title="Copiar PIN">
+                                    <i class="fa-solid fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

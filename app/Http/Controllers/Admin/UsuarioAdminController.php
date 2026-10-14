@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Ambiente;
 use App\Models\Docente;
 use App\Models\User;
+use App\Services\PinAccesibilidadDocenteService;
 use App\Services\ResumenActividadDocenteService;
 use App\Services\SeguridadService;
+use Illuminate\Validation\ValidationException;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -115,6 +117,7 @@ class UsuarioAdminController extends Controller
                 'especialidad' => 'required|string|max:150',
                 'fecha_ingreso' => 'required|date',
                 'firma_url' => 'nullable|image|max:2048',
+                'pin_accesibilidad' => 'nullable|digits:4',
             ]);
         }
 
@@ -128,6 +131,7 @@ class UsuarioAdminController extends Controller
                 'password' => Hash::make($datos['password']),
                 'rol' => $datos['rol'],
                 'estado' => 'activo',
+                'institucion_id' => session('institucion_id'),
             ]);
 
             if ($datos['rol'] === 'docente') {
@@ -155,6 +159,7 @@ class UsuarioAdminController extends Controller
             'message' => 'Usuario creado correctamente.',
             // Se devuelve para mostrarla una sola vez en el modal de credenciales.
             'password_generada' => $datos['password'],
+            'pin_accesibilidad' => $usuario->docente?->pin_accesibilidad,
             'usuario' => [
                 'id' => $usuario->id,
                 'nombre' => $datos['nombre'],
@@ -182,6 +187,19 @@ class UsuarioAdminController extends Controller
         if ($request->hasFile('firma_url')) {
             $perfil['firma_url'] = $request->file('firma_url')
                 ->store('docentes', 'public');
+        }
+
+        $pin = $datosDocente['pin_accesibilidad'] ?? null;
+        $institucionId = (int) ($usuario->institucion_id ?: session('institucion_id'));
+
+        if ($pin) {
+            if (! app(PinAccesibilidadDocenteService::class)->estaLibre($institucionId, $pin)) {
+                throw ValidationException::withMessages([
+                    'pin_accesibilidad' => 'Ese PIN ya lo tiene otro docente.',
+                ]);
+            }
+
+            $perfil['pin_accesibilidad'] = $pin;
         }
 
         $usuario->docente()->create($perfil);
@@ -244,6 +262,7 @@ class UsuarioAdminController extends Controller
                     'especialidad' => 'nullable|string|max:150',
                     'fecha_ingreso' => 'nullable|date',
                     'firma_url' => 'nullable|image|max:2048',
+                    'pin_accesibilidad' => 'nullable|digits:4',
                 ]);
 
                 $perfilDocente = [
@@ -257,6 +276,20 @@ class UsuarioAdminController extends Controller
                 if ($request->hasFile('firma_url')) {
                     $perfilDocente['firma_url'] = $request->file('firma_url')
                         ->store('docentes', 'public');
+                }
+
+                $pin = $datosDocente['pin_accesibilidad'] ?? null;
+                $institucionId = (int) ($usuario->institucion_id ?: session('institucion_id'));
+                $docenteId = $usuario->docente?->id;
+
+                if ($pin) {
+                    if (! app(PinAccesibilidadDocenteService::class)->estaLibre($institucionId, $pin, $docenteId)) {
+                        throw ValidationException::withMessages([
+                            'pin_accesibilidad' => 'Ese PIN ya lo tiene otro docente.',
+                        ]);
+                    }
+
+                    $perfilDocente['pin_accesibilidad'] = $pin;
                 }
 
                 $usuario->docente()->updateOrCreate(
@@ -365,6 +398,7 @@ class UsuarioAdminController extends Controller
         $usuario->telefono = $docente?->telefono;
         $usuario->direccion = $docente?->direccion;
         $usuario->especialidad = $docente?->especialidad;
+        $usuario->pin_accesibilidad = $docente?->pin_accesibilidad;
         $usuario->fecha_ingreso = $docente?->fecha_ingreso
             ? Carbon::parse($docente->fecha_ingreso)->format('Y-m-d')
             : null;
