@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Pato">
+  <ellipse cx="124" cy="222" rx="82" ry="9" fill="#000" opacity="0.1"/>
+  <g stroke="#ef6c00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="#ff9800">
+    <path d="M110 192 V210 L96 216 H124 Z"/>
+    <path d="M146 192 V210 L132 216 H160 Z"/>
+  </g>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M60 140 C60 104 100 100 130 112 L196 104 C206 104 210 116 202 124 L190 136 C206 176 170 200 124 200 C84 200 60 176 60 140 Z" fill="#fafafa"/>
+    <path d="M100 136 C120 126 156 132 166 152 C150 170 116 168 100 136 Z" fill="#e0e0e0"/>
+    <circle cx="86" cy="74" r="40" fill="#fafafa"/>
+    <path d="M44 74 C26 70 12 76 12 86 C14 96 32 98 48 92 Z" fill="#ff9800"/>
+    <path d="M14 86 C26 84 38 86 48 88" fill="none"/>
+  </g>
+  <circle cx="74" cy="64" r="7" fill="#263238"/>
+  <circle cx="76" cy="62" r="2.5" fill="#fff"/>
+  <path d="M74 32 C78 20 92 20 90 34" fill="none" stroke="#37474f" stroke-width="4" stroke-linecap="round"/>
+</svg>

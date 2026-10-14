@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Licuadora">
+  <ellipse cx="120" cy="224" rx="70" ry="7" fill="#000" opacity="0.1"/>
+  <path d="M168 54 C200 54 200 124 162 124" fill="none" stroke="#37474f" stroke-width="12" stroke-linecap="round"/>
+  <path d="M168 54 C200 54 200 124 162 124" fill="none" stroke="#b0bec5" stroke-width="6" stroke-linecap="round"/>
+  <path d="M84 104 H166 L158 152 H92 Z" fill="#ffb74d"/>
+  <path d="M78 34 H172 L158 152 H92 Z" fill="#e1f5fe" fill-opacity="0.55" stroke="#37474f" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M110 144 L130 136 M110 136 L130 144" stroke="#37474f" stroke-width="4" stroke-linecap="round"/>
+  <rect x="72" y="22" width="106" height="16" rx="6" fill="#37474f"/>
+  <rect x="112" y="12" width="26" height="12" rx="4" fill="#37474f"/>
+  <path d="M84 152 H166 L182 216 H68 Z" fill="#546e7a" stroke="#37474f" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="104" cy="188" r="8" fill="#e53935" stroke="#37474f" stroke-width="3"/>
+  <circle cx="126" cy="188" r="8" fill="#fdd835" stroke="#37474f" stroke-width="3"/>
+  <circle cx="148" cy="188" r="8" fill="#43a047" stroke="#37474f" stroke-width="3"/>
+</svg>

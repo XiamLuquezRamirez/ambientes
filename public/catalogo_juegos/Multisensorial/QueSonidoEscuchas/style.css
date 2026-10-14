@@ -1,38 +1,970 @@
-html, body {
-	margin: 0;
-	min-height: 100%;
-	font-family: "Nunito", system-ui, sans-serif;
-	background: #0f172a;
-	color: #e2e8f0;
+@font-face {
+    font-family: 'Fredoka';
+    src: url('../../fonts/Fredoka-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
 }
 
-.stub-wrap {
-	min-height: 100vh;
-	display: grid;
-	place-content: center;
-	gap: 0.5rem;
-	padding: 2rem;
-	text-align: center;
+@font-face {
+    font-family: 'Fredoka';
+    src: url('../../fonts/Fredoka-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 
-.stub-kicker {
-	margin: 0;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	font-size: 0.75rem;
-	color: #94a3b8;
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    letter-spacing: var(--mc-letter-spacing, 2px) !important;
 }
 
-.stub-titulo {
-	margin: 0;
-	font-size: 1.75rem;
+button,
+.btn {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    letter-spacing: var(--mc-letter-spacing, 2px) !important;
 }
 
-.stub-ayuda {
-	margin: 0;
-	color: #cbd5e1;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.enunciado {
+    font-weight: 700;
 }
 
-.stub-ayuda code {
-	color: #93c5fd;
+html.swal2-shown,
+html.swal2-height-auto,
+body.swal2-shown,
+body.swal2-height-auto {
+    height: 100% !important;
+    min-height: 100% !important;
+}
+
+body {
+    overflow: hidden;
+    background: #eef6ff;
+    background-image:
+        radial-gradient(circle at 8% 12%, #d0ebff 0 80px, transparent 81px),
+        radial-gradient(circle at 92% 10%, #e5dbff 0 90px, transparent 91px),
+        radial-gradient(circle at 90% 88%, #d3f9d8 0 100px, transparent 101px);
+    color: #262626;
+    font-family: 'Fredoka', sans-serif;
+    touch-action: manipulation;
+}
+
+body.esperando-inicio #principal,
+body.esperando-inicio #menu-vol,
+body.intro3d-activa #principal,
+body.intro3d-activa #menu-vol {
+    visibility: hidden;
+}
+
+/* ── Pantalla de inicio: escenario sonoro, Zoe y Zeus, oreja central ── */
+
+.pantalla-inicio {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 50% 40%, #fff9db 0 170px, transparent 171px),
+        radial-gradient(circle at 12% 18%, #d0ebff 0 90px, transparent 91px),
+        radial-gradient(circle at 88% 14%, #e5dbff 0 110px, transparent 111px),
+        linear-gradient(180deg, #e7f5ff 0%, #f3f0ff 100%);
+}
+
+.pantalla-inicio[hidden] {
+    display: none !important;
+}
+
+.inicio-escena {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.inicio-nota {
+    position: absolute;
+    font-size: 42px;
+    opacity: 0.75;
+    animation: notaFlota 4s ease-in-out infinite;
+}
+
+.inicio-nota.n1 { left: 22%; top: 16%; color: #7048e8; }
+.inicio-nota.n2 { left: 72%; top: 22%; color: #f76707; font-size: 34px; animation-delay: -1.2s; }
+.inicio-nota.n3 { left: 30%; top: 64%; color: #1c7ed6; font-size: 30px; animation-delay: -2.1s; }
+.inicio-nota.n4 { left: 66%; top: 62%; color: #e64980; animation-delay: -0.6s; }
+.inicio-nota.n5 { left: 48%; top: 8%; color: #2f9e44; font-size: 28px; animation-delay: -3s; }
+
+.inicio-pj {
+    position: absolute;
+    bottom: 0;
+    height: min(62vh, 440px);
+    width: auto;
+    user-select: none;
+}
+
+.inicio-zoe { left: 4%; }
+.inicio-zeus { right: 4%; }
+
+.inicio-contenido {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 34px;
+    padding: 24px;
+}
+
+.inicio-oreja {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(220px, 32vh);
+    height: min(220px, 32vh);
+    border-radius: 50%;
+    background: linear-gradient(160deg, #ffe8cc, #ffc078);
+    border: 8px solid #fff;
+    box-shadow: 0 14px 30px rgba(232, 89, 12, 0.25);
+    color: #d9480f;
+    font-size: min(110px, 16vh);
+}
+
+.inicio-oreja .onda,
+.btn-escuchar .onda {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 5px solid rgba(116, 143, 252, 0.55);
+    pointer-events: none;
+    animation: ondaSale 2.4s ease-out infinite;
+}
+
+.inicio-oreja .o2,
+.btn-escuchar .o2 { animation-delay: 0.8s; }
+
+.inicio-oreja .o3,
+.btn-escuchar .o3 { animation-delay: 1.6s; }
+
+.btn-empecemos {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 132px;
+    height: 132px;
+    padding: 0;
+    border: 6px solid #fff;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #8ce99a 0%, #40c057 55%, #2f9e44 100%);
+    color: #fff;
+    font-size: 58px;
+    cursor: pointer;
+    box-shadow: 0 8px 0 #2b8a3e, 0 18px 28px rgba(43, 138, 62, 0.3);
+    animation: empecemosPulso 1.5s ease-in-out infinite;
+}
+
+.btn-empecemos-icono {
+    position: relative;
+    z-index: 1;
+    margin-left: 8px;
+}
+
+.btn-empecemos-anillo,
+.btn-empecemos-anillo-2 {
+    position: absolute;
+    inset: -14px;
+    border: 4px solid rgba(64, 192, 87, 0.55);
+    border-radius: 50%;
+    animation: empecemosAnillo 1.8s ease-out infinite;
+    pointer-events: none;
+}
+
+.btn-empecemos-anillo-2 {
+    animation-delay: 0.7s;
+}
+
+.inicio-mancha {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: #74c0fc;
+    clip-path: circle(0px at 50% 50%);
+}
+
+.pantalla-inicio.is-out {
+    pointer-events: none;
+    animation: inicioDisuelve 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.pantalla-inicio.is-out .inicio-contenido,
+.pantalla-inicio.is-out .inicio-escena {
+    animation: inicioContenidoSalida 0.28s linear forwards;
+}
+
+.pantalla-inicio.is-out .btn-empecemos {
+    animation: none;
+    opacity: 0;
+}
+
+.pantalla-inicio.is-out .inicio-mancha {
+    animation: pinturaExpande 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+/* ── Estructura ─────────────────────────────────────────────── */
+
+#principal {
+    position: relative;
+    height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px 12px;
+    box-sizing: border-box;
+}
+
+.hud-top {
+    position: absolute;
+    top: 10px;
+    left: 16px;
+    right: 16px;
+    z-index: 20;
+    display: flex;
+    justify-content: flex-end;
+    pointer-events: none;
+}
+
+.hud-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hud-top button {
+    pointer-events: auto;
+}
+
+.btn-round {
+    width: 70px;
+    height: 70px;
+    font-size: 31px;
+    border-radius: 50%;
+    border: 4px solid white;
+}
+
+/* ── Diálogo con el personaje que habla ─────────────────────── */
+
+.cabecera {
+    position: relative;
+    z-index: 15;
+    display: flex;
+    justify-content: center;
+    padding: 10px 170px 8px 0;
+}
+
+.dialogo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 900px;
+    min-height: 92px;
+    padding: 6px 18px 6px 6px;
+    box-sizing: border-box;
+    background: #fff;
+    border: 4px solid #ffb3d1;
+    border-radius: 22px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.dialogo[data-voz="zeus"] {
+    border-color: #ffd43b;
+}
+
+.dialogo.es-acierto {
+    border-color: #40c057;
+    background: #ebfbee;
+}
+
+.dialogo.pop {
+    animation: dialogoPop 0.35s ease;
+}
+
+.dialogo-avatar {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 auto;
+    object-fit: contain;
+    border-radius: 50%;
+    background: #f1f3f5;
+}
+
+.enunciado {
+    margin: 0;
+    min-height: 1.3em;
+    font-size: clamp(16px, 1.6vw, 20px);
+    line-height: 1.25;
+    color: #262626;
+}
+
+/* ── Escenario ──────────────────────────────────────────────── */
+
+.escenario {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    gap: 10px;
+    padding-bottom: 6px;
+    grid-template-columns: 180px minmax(0, 1fr) 180px;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: "zoe centro zeus";
+}
+
+.pj-zoe { grid-area: zoe; }
+.pj-zeus { grid-area: zeus; }
+.centro { grid-area: centro; }
+
+.centro {
+    position: relative;
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(14px, 3vh, 26px);
+    min-height: 0;
+}
+
+.capa-efectos {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* ── Zoe y Zeus ─────────────────────────────────────────────── */
+
+.pj {
+    position: relative;
+    z-index: 6;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 0;
+    --pj-alto: min(52vh, 360px);
+}
+
+.pj-img {
+    flex: 0 0 auto;
+    height: var(--pj-alto);
+    width: auto;
+    max-width: none;
+    object-fit: contain;
+    transform-origin: 50% 100%;
+    user-select: none;
+    pointer-events: none;
+}
+
+.pj.celebra .pj-img {
+    animation: pjCelebra 0.7s ease-in-out infinite;
+}
+
+.pj-zeus.celebra .pj-img {
+    animation-delay: 0.35s;
+}
+
+/* ── Progreso de los 5 retos (sin texto) ─────────────────────── */
+
+.progreso {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.progreso-punto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #d0bfff;
+    color: #d0bfff;
+    font-size: 13px;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.progreso-punto.actual {
+    border-color: #7048e8;
+    color: #7048e8;
+    transform: scale(1.2);
+}
+
+.progreso-punto.hecho {
+    background: #ffd43b;
+    border-color: #f59f00;
+    color: #fff;
+}
+
+/* ── Botón grande de escuchar ───────────────────────────────── */
+
+.zona-escucha {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 34px;
+    margin-top: 26px;
+}
+
+.btn-escuchar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(150px, 22vh);
+    height: min(150px, 22vh);
+    padding: 0;
+    border: 7px solid #fff;
+    border-radius: 50%;
+    background: linear-gradient(160deg, #9775fa, #5f3dc4);
+    color: #fff;
+    font-size: min(68px, 10vh);
+    cursor: pointer;
+    box-shadow: 0 8px 0 #4c2fa8, 0 14px 26px rgba(76, 47, 168, 0.35);
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-escuchar .onda {
+    opacity: 0;
+    animation-play-state: paused;
+}
+
+.btn-escuchar.sonando .onda {
+    opacity: 1;
+    animation-play-state: running;
+}
+
+.btn-escuchar.sonando i {
+    animation: orejaEscucha 0.6s ease-in-out infinite;
+}
+
+.btn-escuchar.invita {
+    animation: invitaEscuchar 1.2s ease-in-out infinite;
+}
+
+.btn-escuchar.pulsa {
+    animation: altavozSuena 0.5s ease;
+}
+
+.btn-escuchar.bloqueado {
+    filter: grayscale(0.85);
+    opacity: 0.55;
+    cursor: default;
+}
+
+/* Secuencia de 3 sonidos (5-6, ¿qué sonido falta?) */
+.secuencia {
+    display: flex;
+    gap: 16px;
+}
+
+.secuencia[hidden] {
+    display: none;
+}
+
+.slot {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(96px, 14vh);
+    height: min(96px, 14vh);
+    border-radius: 22px;
+    border: 5px solid #fff;
+    background: #e5dbff;
+    color: #9775fa;
+    font-size: 34px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.slot-falta {
+    display: none;
+}
+
+.slot.suena {
+    background: #7048e8;
+    color: #fff;
+    transform: scale(1.12);
+}
+
+.slot.silencio {
+    background: #fff3bf;
+    color: #f59f00;
+    animation: silencioPulso 0.55s ease-in-out infinite;
+}
+
+.slot.silencio .slot-icono {
+    display: none;
+}
+
+.slot.silencio .slot-falta {
+    display: block;
+}
+
+.slot.revelado {
+    background: #fff;
+}
+
+.slot.revelado .slot-icono {
+    display: none;
+}
+
+.slot-img {
+    width: 82%;
+    height: 82%;
+    object-fit: contain;
+}
+
+.slot.hallado {
+    border-color: #fcc419;
+    box-shadow: 0 0 0 6px rgba(252, 196, 25, 0.5), 0 0 28px 10px rgba(255, 224, 102, 0.85);
+    transform: scale(1.15);
+}
+
+/* ── Tres imágenes grandes (sin nombre escrito) ─────────────── */
+
+.opciones {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(24px, 4vw, 54px);
+    min-height: min(222px, 32vh);
+}
+
+.opcion {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(206px, 30vh);
+    height: min(206px, 30vh);
+    padding: 12px;
+    border: 6px solid #fff;
+    border-radius: 30px;
+    background: radial-gradient(circle at 30% 25%, #fff 0 35%, #f1f3f5 100%);
+    box-shadow: 0 8px 0 #ced4da, 0 14px 24px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.opcion-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+
+.opcion.toca {
+    animation: tocaOpcion 0.45s ease;
+}
+
+.opcion.correcta {
+    border-color: #69db7c;
+    box-shadow: 0 8px 0 #2f9e44, 0 0 0 6px rgba(105, 219, 124, 0.45), 0 14px 30px rgba(47, 158, 68, 0.35);
+}
+
+.opcion.apagada {
+    opacity: 0.35;
+    filter: grayscale(0.7);
+}
+
+.opcion.pista {
+    animation: pistaPulso 1.2s ease-in-out infinite;
+}
+
+.opcion.tiembla {
+    animation: tiembla 0.5s ease;
+}
+
+.opcion.salta {
+    animation: salta 1s ease;
+}
+
+.opcion.estira .opcion-img {
+    transform-origin: 50% 100%;
+    animation: gatoEstira 1.4s ease-in-out;
+}
+
+.opcion.llueve {
+    background: radial-gradient(circle at 30% 25%, #e7f5ff 0 35%, #a5d8ff 100%);
+}
+
+.opcion.balancea .opcion-img {
+    transform-origin: 50% 8%;
+    animation: campanaBalancea 1.1s ease-in-out infinite;
+}
+
+.opcion.especial {
+    z-index: 3;
+    animation: especial 1.6s ease;
+}
+
+/* ── Partículas ─────────────────────────────────────────────── */
+
+.particula {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+}
+
+.p-estrella {
+    width: 16px;
+    height: 16px;
+    background: #ffd43b;
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.p-corazon {
+    width: 18px;
+    height: 16px;
+    background: #ff6b6b;
+    clip-path: path("M9 16 L1.5 8.5 C-1 6 0.5 1 4.5 1 C6.5 1 8 2.5 9 4 C10 2.5 11.5 1 13.5 1 C17.5 1 19 6 16.5 8.5 Z");
+}
+
+.p-confeti {
+    width: 10px;
+    height: 16px;
+    border-radius: 2px;
+}
+
+.gota {
+    position: fixed;
+    width: 8px;
+    height: 22px;
+    border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+    background: linear-gradient(180deg, rgba(165, 216, 255, 0.4), #339af0);
+    pointer-events: none;
+}
+
+/* ── Final: insignia visual sin texto ───────────────────────── */
+
+.trofeo.insignia {
+    /* Más grande choca con los botones de "¿Quieres jugar nuevamente?" en 1280×720. */
+    width: min(10vw, 128px);
+    cursor: pointer;
+    pointer-events: auto;
+    filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
+}
+
+/* Tras el primer toque la insignia ya no repite el rebote de entrada al quitar el giro. */
+.mostrar-trofeo .trofeo.insignia.quieta {
+    animation: flotarTrofeo 2.5s ease-in-out infinite;
+}
+
+.mostrar-trofeo .trofeo.insignia.gira {
+    animation: giraInsignia 1s ease-in-out;
+}
+
+.final {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    width: 100%;
+    height: 100%;
+    background: #173f6d;
+}
+
+.final[hidden] {
+    display: none !important;
+}
+
+.btn-eleccion {
+    width: 100%;
+    max-width: 320px;
+    min-height: 72px;
+    font-size: 22px;
+    font-weight: 700;
+    border-radius: 16px;
+    border: 4px solid #fff;
+    line-height: 1.25;
+}
+
+.swal2-html-container {
+    overflow: hidden;
+}
+
+/* ── Menú de volumen ────────────────────────────────────────── */
+
+.menu-acc {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 1500;
+}
+
+.menu-acc-fab {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    background: #1565c0;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.menu-acc-fab:focus {
+    outline: 3px solid #ffd54f;
+    outline-offset: 2px;
+}
+
+.menu-acc-panel {
+    position: absolute;
+    right: 0;
+    bottom: 76px;
+    width: min(320px, calc(100vw - 32px));
+    max-height: min(70vh, 480px);
+    overflow: auto;
+    background: #fff;
+    color: #222;
+    border: 3px solid #1565c0;
+    border-radius: 16px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    padding: 10px 12px 12px;
+}
+
+.menu-acc-cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.menu-acc-cerrar {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    color: #222;
+}
+
+.menu-acc-op {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 4px;
+    border-radius: 8px;
+}
+
+.menu-acc-rango {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    cursor: default;
+}
+
+.menu-acc-rango span {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.menu-acc-rango input[type="range"] {
+    width: 100%;
+    height: 22px;
+}
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+
+@keyframes empecemosPulso {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+@keyframes empecemosAnillo {
+    0% { transform: scale(0.92); opacity: 0.7; }
+    100% { transform: scale(1.35); opacity: 0; }
+}
+
+@keyframes inicioContenidoSalida {
+    to { opacity: 0; }
+}
+
+@keyframes pinturaExpande {
+    from { clip-path: circle(0px at 50% 50%); }
+    to { clip-path: circle(150vmax at 50% 50%); }
+}
+
+@keyframes inicioDisuelve {
+    0%, 58% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes notaFlota {
+    0%, 100% { transform: translateY(0) rotate(-8deg); }
+    50% { transform: translateY(-18px) rotate(8deg); }
+}
+
+@keyframes ondaSale {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.55); opacity: 0; }
+}
+
+@keyframes dialogoPop {
+    0% { transform: scale(0.97); }
+    60% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+@keyframes altavozSuena {
+    0%, 100% { transform: scale(1); }
+    40% { transform: scale(1.14); }
+}
+
+@keyframes orejaEscucha {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-10deg) scale(1.06); }
+}
+
+@keyframes invitaEscuchar {
+    0%, 100% { box-shadow: 0 8px 0 #4c2fa8, 0 0 0 0 rgba(151, 117, 250, 0.7); }
+    50% { box-shadow: 0 8px 0 #4c2fa8, 0 0 0 18px rgba(151, 117, 250, 0); }
+}
+
+@keyframes silencioPulso {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+@keyframes tocaOpcion {
+    0% { transform: none; }
+    35% { transform: scale(0.92); }
+    100% { transform: none; }
+}
+
+@keyframes pistaPulso {
+    0%, 100% { box-shadow: 0 8px 0 #ced4da, 0 0 0 0 rgba(255, 212, 59, 0.9); }
+    50% { box-shadow: 0 8px 0 #ced4da, 0 0 0 14px rgba(255, 212, 59, 0); }
+}
+
+@keyframes tiembla {
+    0%, 100% { transform: none; }
+    20% { transform: translateX(-8px) rotate(-2deg); }
+    40% { transform: translateX(8px) rotate(2deg); }
+    60% { transform: translateX(-5px) rotate(-1deg); }
+    80% { transform: translateX(5px) rotate(1deg); }
+}
+
+@keyframes salta {
+    0%, 100% { transform: none; }
+    25% { transform: translateY(-34px) scale(1.08); }
+    45% { transform: translateY(0) scale(1.06, 0.94); }
+    65% { transform: translateY(-14px) scale(1.04); }
+    85% { transform: none; }
+}
+
+@keyframes gatoEstira {
+    0%, 100% { transform: none; }
+    25% { transform: scale(1.1, 0.88); }
+    50% { transform: translateY(-26px) scale(0.94, 1.12) rotate(-4deg); }
+    75% { transform: translateY(-6px) rotate(3deg); }
+}
+
+@keyframes campanaBalancea {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(18deg); }
+    75% { transform: rotate(-18deg); }
+}
+
+@keyframes especial {
+    0% { transform: none; }
+    30% { transform: scale(1.28) rotate(-4deg); }
+    50% { transform: scale(1.22) rotate(4deg); }
+    70% { transform: scale(1.26) rotate(-2deg); }
+    100% { transform: scale(1.12); }
+}
+
+@keyframes pjCelebra {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-24px) rotate(-3deg); }
+}
+
+@keyframes giraInsignia {
+    0% { transform: translate(-50%, 0) perspective(300px) rotateY(0deg); }
+    100% { transform: translate(-50%, 0) perspective(300px) rotateY(720deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-empecemos,
+    .btn-empecemos-anillo,
+    .btn-empecemos-anillo-2,
+    .inicio-nota,
+    .inicio-oreja .onda,
+    .btn-escuchar .onda,
+    .btn-escuchar.sonando i,
+    .btn-escuchar.invita,
+    .opcion.balancea .opcion-img,
+    .pj.celebra .pj-img,
+    .dialogo {
+        animation: none !important;
+        transition: none;
+    }
+
+    .pantalla-inicio.is-out {
+        opacity: 0;
+        animation: none;
+    }
+}
+
+body.alto-contraste .menu-acc-fab {
+    background: #000;
+    border-color: #ffeb3b;
+    color: #ffeb3b;
+}
+
+body.alto-contraste .menu-acc-panel {
+    background: #111;
+    color: #fff;
+    border-color: #ffeb3b;
+}
+
+body.alto-contraste .menu-acc-cerrar {
+    color: #fff;
 }
