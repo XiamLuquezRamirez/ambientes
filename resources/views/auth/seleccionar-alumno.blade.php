@@ -116,12 +116,12 @@
                 </svg>
             </div>
             <span class="aula-confirma__rayos" aria-hidden="true">
-                <i style="--x: -102px; --y: -20px; --w: 30px; --h: 13px; --r: 36deg"></i>
-                <i style="--x: -114px; --y: 15px; --w: 50px; --h: 13px; --r: -2deg"></i>
-                <i style="--x: -94px; --y: 49px; --w: 30px; --h: 13px; --r: -34deg"></i>
-                <i style="--x: 102px; --y: -20px; --w: 30px; --h: 13px; --r: -36deg"></i>
-                <i style="--x: 114px; --y: 15px; --w: 50px; --h: 13px; --r: 2deg"></i>
-                <i style="--x: 94px; --y: 49px; --w: 30px; --h: 13px; --r: 34deg"></i>
+                <i style="--x: -116px; --y: -20px; --w: 30px; --h: 13px; --r: 36deg"></i>
+                <i style="--x: -128px; --y: 15px; --w: 50px; --h: 13px; --r: -2deg"></i>
+                <i style="--x: -108px; --y: 49px; --w: 30px; --h: 13px; --r: -34deg"></i>
+                <i style="--x: 116px; --y: -20px; --w: 30px; --h: 13px; --r: -36deg"></i>
+                <i style="--x: 128px; --y: 15px; --w: 50px; --h: 13px; --r: 2deg"></i>
+                <i style="--x: 108px; --y: 49px; --w: 30px; --h: 13px; --r: 34deg"></i>
             </span>
             <span class="aula-confirma__foto" id="aulaConfirmaFoto"></span>
             <p class="aula-confirma__nombre" id="aulaConfirmaNombre"></p>

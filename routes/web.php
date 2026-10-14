@@ -334,6 +334,7 @@ Route::prefix('panel')->middleware(['es.docente'])->group(function () {
     Route::get('perfil/accesos', [PerfilController::class, 'historialAccesos'])->name('panel.perfil.accesos');
     Route::get('perfil/validar-datos', [PerfilController::class, 'validarDatos'])->name('panel.perfil.validarDatos');
     Route::put('perfil/contrasena', [PerfilController::class, 'cambiarContrasena'])->name('panel.perfil.contrasena');
+    Route::put('perfil/pin-accesibilidad', [PerfilController::class, 'actualizarPinAccesibilidad'])->name('panel.perfil.pin-accesibilidad');
     Route::put('perfil', [PerfilController::class, 'actualizar'])->name('panel.perfil.update');
     Route::put('perfil/informacion-personal', [PerfilController::class, 'actualizarInformacionPersonal'])->name('panel.perfil.informacion-personal');
     Route::post('perfil/foto', [PerfilController::class, 'subirFoto'])->name('panel.perfil.foto');
@@ -610,6 +611,7 @@ Route::middleware('sesion.nino')->group(function () {
     Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
     Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
     Route::get('/juegos', [AmbienteNinoController::class, 'juegos'])->name('ambiente.juegos');
+    Route::post('/juegos/pin-accesibilidad', [\App\Http\Controllers\Ambientes\PinAccesibilidadJuegoController::class, 'verificar'])->name('ambiente.juegos.pin-accesibilidad');
     require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
 });
 

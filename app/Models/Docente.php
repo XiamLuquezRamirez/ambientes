@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\PinAccesibilidadDocenteService;
 use App\Traits\Sincronizable;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,7 @@ class Docente extends Model
 
     // Perfil profesional del docente. La asignación ambiente/grado/grupo va en carga_docente.
     protected $fillable = [
-        'user_id', 'telefono', 'direccion', 'especialidad', 'fecha_ingreso', 'descripcion', 'estado', 'firma_url', 'foto_url',
+        'user_id', 'telefono', 'direccion', 'especialidad', 'fecha_ingreso', 'descripcion', 'estado', 'firma_url', 'foto_url', 'pin_accesibilidad',
     ];
 
     protected $with = ['user'];
@@ -19,6 +20,18 @@ class Docente extends Model
     protected $casts = [
         'fecha_ingreso' => 'date',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Docente $docente) {
+            if ($docente->pin_accesibilidad) {
+                return;
+            }
+
+            $institucionId = (int) (User::query()->whereKey($docente->user_id)->value('institucion_id') ?? 0);
+            $docente->pin_accesibilidad = app(PinAccesibilidadDocenteService::class)->generar($institucionId);
+        });
+    }
 
     public function user()
     {

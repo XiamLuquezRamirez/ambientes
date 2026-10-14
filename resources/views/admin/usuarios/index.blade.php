@@ -318,6 +318,12 @@
                         if (res.success) {
                             document.getElementById('passwordGenerada').value =
                                 res.password_generada;
+                            const filaPin = document.getElementById('filaPinAccesibilidad');
+                            const pinGenerado = document.getElementById('pinAccesibilidadGenerado');
+                            if (filaPin && pinGenerado) {
+                                pinGenerado.value = res.pin_accesibilidad || '';
+                                filaPin.hidden = !res.pin_accesibilidad;
+                            }
                             document.getElementById('asignar_email').value = datos.email ?? '';
                             modalBSUsuario.hide();
                             const btnPdf = document.getElementById('btnDescargarPdf');
@@ -610,6 +616,7 @@ Se cerrará cualquier sesión activa de este usuario.
             $('#telefono').val(data.telefono ?? '');
             $('#direccion').val(data.direccion ?? '');
             $('#especialidad').val(data.especialidad ?? '');
+            $('#pin_accesibilidad').val(data.pin_accesibilidad ?? '');
             $('#fecha_ingreso').val(data.fecha_ingreso ?? '');
             $('#imgPreviewFirma').attr('src', data.firma_url ?? FIRMA_PLACEHOLDER);
             id_editar = data.id;

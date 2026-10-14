@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\HistorialAccesosService;
 use App\Services\PerfilFotoService;
 use App\Services\PerfilService;
+use App\Services\PinAccesibilidadDocenteService;
 use App\Services\SeguridadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -337,6 +338,82 @@ class PerfilController extends Controller
                 'fecha' => $fechaCambio->format('d/m/Y H:i'),
                 'fecha_relativa' => $fechaCambio->diffForHumans(),
             ],
+        ]);
+    }
+
+    /**
+     * El docente autenticado ve y cambia su PIN de accesibilidad.
+     * Admin y superAdmin no tienen esta ruta: el grupo es es.docente.
+     */
+    public function actualizarPinAccesibilidad(Request $request, PinAccesibilidadDocenteService $pins): JsonResponse
+    {
+        $authUser = Auth::guard('docente')->user();
+
+        if (! $authUser instanceof User || ! $authUser->esDocente()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No tienes permiso para editar este PIN.',
+            ], 403);
+        }
+
+        $docente = $authUser->docente;
+
+        if (! $docente) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No hay un perfil de docente para este usuario.',
+            ], 422);
+        }
+
+        $datos = $request->validate([
+            'pin_accesibilidad' => 'required|digits:4',
+            'password_actual' => 'required|string',
+        ], [
+            'pin_accesibilidad.required' => 'Ingresa los 4 dígitos.',
+            'pin_accesibilidad.digits' => 'El PIN tiene 4 dígitos.',
+            'password_actual.required' => 'Ingresa tu contraseña actual.',
+        ]);
+
+        if (! Hash::check($datos['password_actual'], $authUser->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Contraseña actual incorrecta',
+                'errors' => [
+                    'password_actual' => ['Contraseña actual incorrecta'],
+                ],
+            ], 422);
+        }
+
+        $pin = $datos['pin_accesibilidad'];
+
+        if (! $pins->estaLibre((int) $authUser->institucion_id, $pin, $docente->id)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ese PIN ya lo tiene otro docente.',
+                'errors' => [
+                    'pin_accesibilidad' => ['Ese PIN ya lo tiene otro docente.'],
+                ],
+            ], 422);
+        }
+
+        if ($docente->pin_accesibilidad !== $pin) {
+            $docente->pin_accesibilidad = $pin;
+            $docente->save();
+
+            SeguridadService::registrar(
+                $authUser->id,
+                $authUser->id,
+                SeguridadAccion::PROFILE_UPDATED,
+                'PIN de accesibilidad actualizado.',
+                $request,
+                trim($authUser->nombre.' '.$authUser->apellido),
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'PIN de accesibilidad actualizado.',
+            'pin_accesibilidad' => $docente->pin_accesibilidad,
         ]);
     }
 

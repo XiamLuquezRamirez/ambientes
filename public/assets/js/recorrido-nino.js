@@ -372,7 +372,7 @@
         const elegir = document.getElementById('rnElegir');
         if (!elegir) return;
         const jugar = btn.classList.contains('rn-elegir-btn--jugar');
-        elegir.style.setProperty('--rn-color-boton', jugar ? '#602080' : '#2070c0');
+        elegir.style.setProperty('--rn-color-boton', jugar ? '#25aba6' : '#fc583a');
         elegir.style.setProperty('--rn-icono', Math.round(Math.max(ancho, alto)) + 'px');
     }
 
@@ -392,7 +392,7 @@
         const elegir = document.getElementById('rnElegir');
         if (!elegir || elegir.querySelector('.rn-elegir-frase')) return;
         const jugar = btn.classList.contains('rn-elegir-btn--jugar');
-        const texto = jugar ? 'vamos a jugar' : 'vamos a explorar';
+        const texto = jugar ? '¡Vamos a jugar!' : '¡Vamos a explorar!';
         const frase = document.createElement('p');
         frase.className = 'rn-elegir-frase';
         frase.setAttribute('aria-hidden', 'true');
