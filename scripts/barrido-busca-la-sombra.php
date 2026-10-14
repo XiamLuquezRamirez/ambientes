@@ -10,7 +10,6 @@ $app = require __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\TiposJuego;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -92,7 +91,7 @@ foreach ([
     'TextoVoz',
     'confirmarNivel',
     'iniciarConsigna',
-    'resolverToque',
+    'responder',
     'pintarSombras',
     'pednia:perfil',
 ] as $needle) {
@@ -103,7 +102,7 @@ foreach ([
     }
 }
 
-foreach (['.zona-sombras', '.sombra', '.objeto-objetivo', '.sombra.is-acierto'] as $needle) {
+foreach (['.zona-sombras', '.sombra', '.objeto-objetivo'] as $needle) {
     if (! str_contains($css, $needle)) {
         fail("style.css sin '{$needle}'");
     } else {
@@ -158,10 +157,10 @@ if (! empty($config['stub'])) {
     ok('config sin stub');
 }
 
+// Documento: dos grupos (3-4 y 5-6 años). En 5-6 el avión tiene 4 sombras (sin águila).
 $esperados = [
-    '3' => ['retos' => 3, 'sombras' => 3],
-    '4' => ['retos' => 3, 'sombras' => 4],
-    '5' => ['retos' => 3, 'sombras' => 5],
+    '3' => ['retos' => 3, 'sombras' => [3]],
+    '5' => ['retos' => 3, 'sombras' => [4, 5]],
 ];
 
 $ids = [];
@@ -170,7 +169,7 @@ foreach ($config['niveles'] ?? [] as $nivel) {
     $ids[] = $id;
     $esp = $esperados[$id] ?? null;
     if ($esp === null) {
-        warn("Nivel id={$id} fuera de 3/4/5");
+        fail("Nivel id={$id} fuera de 3 (3-4 años) / 5 (5-6 años)");
         continue;
     }
     $retos = $nivel['retos'] ?? [];
@@ -186,8 +185,8 @@ foreach ($config['niveles'] ?? [] as $nivel) {
             fail("Nivel {$id} reto {$ri}: objeto desconocido {$obj}");
             continue;
         }
-        if (count($soms) !== $esp['sombras']) {
-            fail("Nivel {$id} reto {$obj}: ".count($soms)." sombras, esperado {$esp['sombras']}");
+        if (! in_array(count($soms), $esp['sombras'], true)) {
+            fail("Nivel {$id} reto {$obj}: ".count($soms).' sombras, esperado '.implode(' o ', $esp['sombras']));
         }
         if (! in_array($obj, $soms, true)) {
             fail("Nivel {$id} reto {$obj}: la sombra correcta no está entre las opciones");
@@ -216,86 +215,47 @@ if (! is_array($conv) || count($conv) < 1) {
 
 require __DIR__.'/barrido-multisensorial-shell.php';
 
-echo "\n=== BUSCA LA SOMBRA: BD ===\n";
+echo "\n=== BUSCA LA SOMBRA: reglas (node) ===\n";
 
-$tipo = null;
-if (Schema::hasTable('tipos_juegos')) {
-    $tipo = TiposJuego::query()->firstOrCreate(
-        ['slug' => 'busca_sombra'],
-        [
-            'nombre' => 'Busca la sombra',
-            'descripcion' => 'Juego para relacionar un objeto con su sombra por la forma.',
-            'activo' => true,
-        ]
-    );
-    if ($tipo->wasRecentlyCreated) {
-        ok('Creado tipo_juego busca_sombra');
-    } else {
-        ok('tipo_juego busca_sombra presente');
-    }
+exec('node '.escapeshellarg(__DIR__.'/probar-busca-sombra.js').' 2>&1', $salidaNode, $codigoNode);
+$ultimaNode = trim((string) end($salidaNode));
+if ($codigoNode !== 0) {
+    fail("probar-busca-sombra.js: {$ultimaNode}");
 } else {
-    fail('Tabla tipos_juegos no existe');
+    ok("probar-busca-sombra.js: {$ultimaNode}");
 }
 
-if (Schema::hasTable('juegos')) {
-    $fila = DB::table('juegos')->where('slug', 'busca-la-sombra')->first();
-    if (! $fila) {
-        $fila = DB::table('juegos')->where('ruta', 'like', '%BuscaLaSombra%')->first();
-    }
-    if (! $fila) {
-        DB::table('juegos')->insert([
-            'slug' => 'busca-la-sombra',
-            'ambiente_id' => 9,
-            'eje_id' => null,
-            'tematica_id' => null,
-            'modulo_id' => null,
-            'tipo_juego_id' => $tipo ? $tipo->id : null,
-            'ruta' => 'catalogo_juegos/Multisensorial/BuscaLaSombra',
-            'nombre' => 'Busca la sombra',
-            'descripcion' => 'Tocar la sombra que corresponde al objeto según el nivel de edad.',
-            'icono' => 'fa-cloud',
-            'color' => '#64748b',
-            'orden' => 10,
-            'activo' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        ok('Creada fila juegos busca-la-sombra');
-        $fila = DB::table('juegos')->where('slug', 'busca-la-sombra')->first();
-    }
+echo "\n=== BUSCA LA SOMBRA: BD (solo lectura) ===\n";
 
-    if ($fila) {
-        $updates = [];
-        if ($tipo && (int) $fila->tipo_juego_id !== (int) $tipo->id) {
-            $updates['tipo_juego_id'] = $tipo->id;
-        }
-        if (trim((string) $fila->ruta, '/') !== 'catalogo_juegos/Multisensorial/BuscaLaSombra') {
-            $updates['ruta'] = 'catalogo_juegos/Multisensorial/BuscaLaSombra';
-        }
-        if ($updates) {
-            $updates['updated_at'] = now();
-            DB::table('juegos')->where('slug', $fila->slug)->update($updates);
-            ok('BD actualizada ('.implode(', ', array_keys($updates)).')');
-        } else {
-            ok("BD slug={$fila->slug} activo=".((int) $fila->activo).' tipo=busca_sombra');
-        }
-        $idx = public_path(trim($fila->ruta, '/').'/index.html');
-        // Re-read ruta after possible update
-        $ruta = $updates['ruta'] ?? $fila->ruta;
-        $idx = public_path(trim($ruta, '/').'/index.html');
-        if (! is_file($idx)) {
-            fail('BD apunta a ruta sin index.html');
-        } else {
-            ok('BD ruta ↔ disco OK');
-        }
-        if ((int) $fila->ambiente_id !== 9) {
-            warn('ambiente_id='.$fila->ambiente_id.' (esperado 9 Multisensorial)');
-        } else {
-            ok('ambiente_id Multisensorial');
-        }
-    }
-} else {
+if (! Schema::hasTable('juegos')) {
     fail('Tabla juegos no existe');
+    goto resumen;
+}
+
+$fila = DB::table('juegos')->where('slug', 'busca-la-sombra')->first();
+if (! $fila) {
+    $fila = DB::table('juegos')->where('ruta', 'like', '%BuscaLaSombra%')->first();
+}
+
+if (! $fila) {
+    fail('No hay fila en juegos para BuscaLaSombra (no se crea desde el barrido)');
+    goto resumen;
+}
+
+ok("BD slug={$fila->slug} activo=".((int) $fila->activo));
+
+if (trim((string) $fila->ruta, '/') !== 'catalogo_juegos/Multisensorial/BuscaLaSombra') {
+    fail("BD ruta={$fila->ruta}, esperada catalogo_juegos/Multisensorial/BuscaLaSombra (no se modifica)");
+} elseif (! is_file(public_path(trim($fila->ruta, '/').'/index.html'))) {
+    fail('BD apunta a ruta sin index.html');
+} else {
+    ok('BD ruta ↔ disco OK');
+}
+
+if ((int) $fila->ambiente_id !== 9) {
+    warn('ambiente_id='.$fila->ambiente_id.' (esperado 9 Multisensorial)');
+} else {
+    ok('ambiente_id Multisensorial');
 }
 
 resumen:

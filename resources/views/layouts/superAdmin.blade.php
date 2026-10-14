@@ -151,18 +151,10 @@
                     <ul class="nav flex-column" style="padding:2px 0 4px 0">
                         <li class="nav-item">
                             <a href="{{ route('superadmin.catalogo_juegos.index') }}"
-                                class="{{ request()->routeIs('superadmin.catalogo_juegos.*') && !request()->routeIs('superadmin.catalogo_juegos.tipos.*') ? 'active nav-link' : 'nav-link' }}"
+                                class="{{ request()->routeIs('superadmin.catalogo_juegos.*') ? 'active nav-link' : 'nav-link' }}"
                                 style="padding-left:42px;font-size:.85rem">
                                 <i class="fa-solid fa-puzzle-piece" style="font-size:.8em"></i>
                                 Juegos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('superadmin.catalogo_juegos.tipos.index') }}"
-                                class="{{ request()->routeIs('superadmin.catalogo_juegos.tipos.*') ? 'active nav-link' : 'nav-link' }}"
-                                style="padding-left:42px;font-size:.85rem">
-                                <i class="fa-solid fa-gamepad" style="font-size:.8em"></i>
-                                Tipos de Juegos
                             </a>
                         </li>
                     </ul>

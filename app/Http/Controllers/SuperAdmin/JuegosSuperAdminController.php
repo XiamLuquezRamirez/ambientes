@@ -8,8 +8,6 @@ use App\Models\Juego;
 use App\Services\JuegoCatalogoService;
 use App\Services\ParametrosPerfilAprendizajeService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 
 class JuegosSuperAdminController extends Controller
 {
@@ -36,7 +34,6 @@ class JuegosSuperAdminController extends Controller
         }
 
         return view('superAdmin.catalogo_juegos.juegos.index', array_merge($datos, [
-            'tiposJuego' => Juego::tiposCatalogo(),
             'perfilPayload' => [
                 'perfil_id' => 1,
                 'perfil_clave' => 'estandar',
@@ -49,7 +46,6 @@ class JuegosSuperAdminController extends Controller
     public function mostrar(Juego $juego)
     {
         $juego->loadMissing([
-            'tipoJuego:id,slug,nombre,activo',
             'ambiente:id,nombre',
             'modulo:id,nombre,ambiente_id',
             'eje:id,nombre,modulo_id',
@@ -62,7 +58,6 @@ class JuegosSuperAdminController extends Controller
             'success' => true,
             'data' => [
                 'slug' => $juego->slug,
-                'tipo' => $juego->tipo,
                 'ruta' => $juego->ruta,
                 'nombre' => $juego->nombre,
                 'descripcion' => $juego->descripcion ?? '',
@@ -144,13 +139,6 @@ class JuegosSuperAdminController extends Controller
     {
         $datos = $request->validate([
             'nombre' => ['required', 'string', 'max:150'],
-            'tipo' => [
-                'required',
-                'string',
-                'max:80',
-                'regex:/^[a-z][a-z0-9_]*$/',
-                Rule::notIn([Juego::TIPO_NUEVO]),
-            ],
             'descripcion' => ['nullable', 'string', 'max:2000'],
             'imagen' => ['nullable', 'file', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
             'quitar_imagen' => ['sometimes', 'boolean'],
@@ -163,10 +151,6 @@ class JuegosSuperAdminController extends Controller
         ], [
             'nombre.required' => 'Este campo es requerido.',
             'nombre.max' => 'El nombre no puede superar 150 caracteres.',
-            'tipo.required' => 'Este campo es requerido.',
-            'tipo.regex' => 'El tipo debe estar en snake_case (ej. memoria_visual).',
-            'tipo.not_in' => 'Selecciona o crea un tipo válido.',
-            'tipo.max' => 'El tipo no puede superar 80 caracteres.',
             'descripcion.max' => 'La descripción no puede superar 2000 caracteres.',
             'imagen.file' => 'Sube un archivo de imagen.',
             'imagen.mimes' => 'La imagen debe ser PNG, JPG o WEBP.',
@@ -180,12 +164,6 @@ class JuegosSuperAdminController extends Controller
             'eje_id.exists' => 'El eje seleccionado no es válido.',
             'tematica_id.exists' => 'La temática seleccionada no es válida.',
         ]);
-
-        if (! Juego::tipoEsValido((string) $datos['tipo'])) {
-            throw ValidationException::withMessages([
-                'tipo' => 'El tipo debe estar en snake_case (ej. memoria_visual).',
-            ]);
-        }
 
         return $datos;
     }

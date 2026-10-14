@@ -171,12 +171,10 @@ document.addEventListener('DOMContentLoaded', function () {
         form.reset();
         form.querySelector('#juego_id').value = '';
         form.querySelector('#juego_activo').checked = true;
-        form.querySelector('#juego_tipo_nuevo').value = '';
         form.querySelectorAll('select option[hidden]').forEach(function (opt) {
             opt.hidden = false;
         });
         aplicarCascadaForm();
-        sincronizarTipoNuevo();
         seleccionarColor('');
         establecerImagenActual('');
     }
@@ -204,8 +202,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 return 'Seleccione una opción válida.';
             case 'validation.regex':
                 return 'El formato no es válido.';
-            case 'validation.not_in':
-                return 'Selecciona o crea un tipo válido.';
             default:
                 return (codigo && !String(codigo).startsWith('validation.'))
                     ? codigo
@@ -220,16 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let primerInput = null;
 
         Object.entries(errors).forEach(([campo, mensajes]) => {
-            let input = form.querySelector(`[name="${campo}"]`);
-
-            // Si falla tipo y estamos en "Agregar nuevo", marcar el input custom.
-            if (campo === 'tipo') {
-                const sel = form.querySelector('#juego_tipo');
-                if (sel && sel.value === '__nuevo__') {
-                    input = form.querySelector('#juego_tipo_nuevo') || input;
-                }
-            }
-
+            const input = form.querySelector(`[name="${campo}"]`);
             if (!input) return;
 
             // Color es hidden: marcar la paleta, no el input invisible.
@@ -253,55 +240,12 @@ document.addEventListener('DOMContentLoaded', function () {
             div.textContent = mensajeValidacionJuego(
                 Array.isArray(mensajes) ? mensajes[0] : String(mensajes || '')
             );
-
-            const wrapNuevo = input.id === 'juego_tipo_nuevo'
-                ? input.closest('#juego_tipo_nuevo_wrap')
-                : null;
-            if (wrapNuevo) {
-                wrapNuevo.appendChild(div);
-            } else {
-                input.insertAdjacentElement('afterend', div);
-            }
+            input.insertAdjacentElement('afterend', div);
 
             if (!primerInput) primerInput = input;
         });
 
         if (primerInput) primerInput.focus();
-    }
-
-    function slugifyTipo(texto) {
-        return String(texto || '')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, '_')
-            .replace(/^_+|_+$/g, '')
-            .replace(/_+/g, '_');
-    }
-
-    function sincronizarTipoNuevo() {
-        if (!form) return;
-        const sel = form.querySelector('#juego_tipo');
-        const wrap = form.querySelector('#juego_tipo_nuevo_wrap');
-        const input = form.querySelector('#juego_tipo_nuevo');
-        if (!sel || !wrap || !input) return;
-
-        const esNuevo = sel.value === '__nuevo__';
-        wrap.hidden = !esNuevo;
-        input.required = esNuevo;
-        if (!esNuevo) {
-            input.value = '';
-        }
-    }
-
-    function resolverTipoPayload() {
-        const sel = form.querySelector('#juego_tipo');
-        const valor = sel ? String(sel.value || '').trim() : '';
-        if (valor === '__nuevo__') {
-            return slugifyTipo(form.querySelector('#juego_tipo_nuevo')?.value || '');
-        }
-        return valor;
     }
 
     function setModoCrear() {
@@ -375,22 +319,6 @@ document.addEventListener('DOMContentLoaded', function () {
         limpiarErroresForm();
         form.querySelector('#juego_id').value = data.slug || '';
         form.querySelector('#juego_nombre').value = data.nombre || '';
-
-        const selTipo = form.querySelector('#juego_tipo');
-        const tipo = String(data.tipo || '');
-        if (selTipo) {
-            const existe = Array.from(selTipo.options).some((o) => o.value === tipo);
-            if (tipo && !existe) {
-                const opt = document.createElement('option');
-                opt.value = tipo;
-                opt.textContent = tipo.replace(/_/g, ' ');
-                selTipo.insertBefore(opt, selTipo.querySelector('option[value="__nuevo__"]'));
-            }
-            selTipo.value = tipo || '';
-        }
-        form.querySelector('#juego_tipo_nuevo').value = '';
-        sincronizarTipoNuevo();
-
         form.querySelector('#juego_ruta').value = data.ruta || '';
         form.querySelector('#juego_descripcion').value = data.descripcion || '';
         establecerImagenActual(data.imagen_url || '');
@@ -455,11 +383,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function payloadDesdeForm() {
         const fd = new FormData(form);
         const activo = form.querySelector('#juego_activo').checked;
-        const tipo = resolverTipoPayload();
 
         return {
             nombre: String(fd.get('nombre') || '').trim(),
-            tipo: tipo,
             descripcion: String(fd.get('descripcion') || '').trim() || null,
             color: String(fd.get('color') || '').trim() || null,
             ambiente_id: Number(fd.get('ambiente_id') || 0) || null,
@@ -476,15 +402,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!payload.nombre) {
             errors.nombre = ['Este campo es requerido.'];
-        }
-
-        const selTipo = form.querySelector('#juego_tipo')?.value || '';
-        if (!selTipo) {
-            errors.tipo = ['Este campo es requerido.'];
-        } else if (selTipo === '__nuevo__' && !payload.tipo) {
-            errors.tipo = ['Indica el nombre del nuevo tipo.'];
-        } else if (payload.tipo && !/^[a-z][a-z0-9_]*$/.test(payload.tipo)) {
-            errors.tipo = ['El tipo debe estar en snake_case (ej. memoria_visual).'];
         }
 
         if (!payload.ambiente_id) {
@@ -804,7 +721,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     form?.addEventListener('submit', guardarJuego);
-    form?.querySelector('#juego_tipo')?.addEventListener('change', sincronizarTipoNuevo);
     form?.querySelector('.js-juego-form-ambiente')?.addEventListener('change', function () {
         aplicarCascadaForm();
         sincronizarRutaSegunIdentidad();

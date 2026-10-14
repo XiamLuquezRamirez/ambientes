@@ -6,19 +6,11 @@ use App\Traits\Sincronizable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\TiposJuego;
 
 class Juego extends Model
 {
     use HasFactory;
     use Sincronizable;
-
-    /**
-     * Tipos de paquete del catálogo SuperAdmin (no confundir con motores
-     * del constructor de experiencias: rompecabezas/memoria/colorear/secuencia).
-     */
-
-    public const TIPO_NUEVO = '__nuevo__';
 
     /**
      * Paleta sugerida (sin color preseleccionado en el formulario).
@@ -53,42 +45,6 @@ class Juego extends Model
     protected $keyType = 'string';
 
     /**
-     * @return list<string>
-     */
-    public static function tiposPermitidos(): array
-    {
-        return array_keys(self::tiposCatalogo());
-    }
-
-    /**
-     * Tipos conocidos + los ya usados en BD (para el select del CRUD).
-     *
-     * @return array<string, string> clave => etiqueta
-     */
-    public static function tiposCatalogo(): array
-    {
-        $labels = TiposJuego::query()
-        ->where('activo', true)
-        ->orderBy('nombre')
-        ->pluck('nombre', 'slug')
-        ->toArray();
-
-        return $labels;
-    }
-
-    /**
-     * ¿Clave de tipo válida? (snake_case, sin reservados).
-     */
-    public static function tipoEsValido(string $tipo): bool
-    {
-        if ($tipo === '' || $tipo === self::TIPO_NUEVO) {
-            return false;
-        }
-
-        return (bool) preg_match('/^[a-z][a-z0-9_]{1,78}$/', $tipo);
-    }
-
-    /**
      * ¿Slug de juego válido? (kebab-case).
      */
     public static function slugEsValido(string $slug): bool
@@ -114,7 +70,6 @@ class Juego extends Model
         'modulo_id',
         'eje_id',
         'tematica_id',
-        'tipo_juego_id',
         'ruta',
         'nombre',
         'descripcion',
@@ -149,28 +104,6 @@ class Juego extends Model
         $url = asset(trim((string) $this->ruta, '/').'/'.basename((string) $this->imagen));
 
         return $this->updated_at ? $url.'?v='.$this->updated_at->timestamp : $url;
-    }
-
-    public function tipoJuego()
-    {
-        return $this->belongsTo(TiposJuego::class, 'tipo_juego_id');
-    }
-
-    /**
-     * Slug del tipo (el JS del catálogo de juegos envía y espera `tipo`).
-     */
-    public function getTipoAttribute(): ?string
-    {
-        $this->loadMissing('tipoJuego');
-
-        return $this->tipoJuego?->slug;
-    }
-
-    public function tipoLabel(): string
-    {
-        $this->loadMissing('tipoJuego');
-
-        return $this->tipoJuego?->nombre ?? 'Sin tipo';
     }
 
     public function ambiente()

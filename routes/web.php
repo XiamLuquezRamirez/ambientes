@@ -61,7 +61,6 @@ use App\Http\Controllers\SuperAdmin\PerfilAprendizajeInclusionController;
 use App\Http\Controllers\SuperAdmin\PerfilAprendizajePersonalizadoController;
 use App\Http\Controllers\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\SuperAdmin\TematicasSuperAdminController;
-use App\Http\Controllers\SuperAdmin\TiposJuegosSuperAdminController;
 use App\Models\Ambiente;
 use App\Models\Clase;
 use App\Services\RecorridoNinoService;
@@ -603,13 +602,6 @@ Route::prefix('superadmin')->middleware(['es.superAdmin'])->group(function () {
     Route::get('catalogo_juegos/juegos/{juego}', [JuegosSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo_juegos.mostrar');
     Route::put('catalogo_juegos/juegos/{juego}', [JuegosSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo_juegos.actualizar');
     Route::patch('catalogo_juegos/juegos/{juego}/estado', [JuegosSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo_juegos.estado');
-
-    // Catálogo de Tipos de Juegos
-    Route::get('catalogo_juegos/tipos', [TiposJuegosSuperAdminController::class, 'listar'])->name('superadmin.catalogo_juegos.tipos.index');
-    Route::post('catalogo_juegos/tipos', [TiposJuegosSuperAdminController::class, 'guardar'])->name('superadmin.catalogo_juegos.tipos.guardar');
-    Route::get('catalogo_juegos/tipos/{tipoJuego}', [TiposJuegosSuperAdminController::class, 'mostrar'])->name('superadmin.catalogo_juegos.tipos.mostrar');
-    Route::put('catalogo_juegos/tipos/{tipoJuego}', [TiposJuegosSuperAdminController::class, 'actualizar'])->name('superadmin.catalogo_juegos.tipos.actualizar');
-    Route::patch('catalogo_juegos/tipos/{tipoJuego}/estado', [TiposJuegosSuperAdminController::class, 'actualizarEstado'])->name('superadmin.catalogo_juegos.tipos.estado');
 
 });
 

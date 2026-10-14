@@ -3,8 +3,6 @@
 /**
  * Barrido: Busca las diferencias (Multisensorial).
  * Uso: php scripts/barrido-busca-las-diferencias.php
- *
- * No modifica tipo_juego_id (debe permanecer reconocimiento).
  */
 
 require __DIR__.'/../vendor/autoload.php';
@@ -12,7 +10,6 @@ $app = require __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\TiposJuego;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -43,8 +40,6 @@ function warn(string $msg): void
 
 $rel = 'Multisensorial/BuscaLasDiferencias';
 $dir = public_path('catalogo_juegos/'.$rel);
-$tipoEsperado = 'reconocimiento';
-
 echo "=== BUSCA LAS DIFERENCIAS: filesystem ===\n";
 
 if (! is_dir($dir)) {
@@ -229,17 +224,6 @@ if (! $fila) {
 if (! $fila) {
     fail('No hay fila en juegos para BuscaLasDiferencias (no se crea desde el barrido)');
     goto resumen;
-}
-
-$tipoSlug = null;
-if (! empty($fila->tipo_juego_id) && Schema::hasTable('tipos_juegos')) {
-    $tipoSlug = TiposJuego::query()->whereKey($fila->tipo_juego_id)->value('slug');
-}
-
-if ($tipoSlug !== $tipoEsperado) {
-    fail('BD tipo='.($tipoSlug ?: 'null').", esperado {$tipoEsperado} (no se modifica)");
-} else {
-    ok("BD tipo={$tipoSlug} intacto (id={$fila->tipo_juego_id})");
 }
 
 ok("BD slug={$fila->slug} activo=".((int) $fila->activo));

@@ -10,7 +10,6 @@ $app = require __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\TiposJuego;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -260,25 +259,6 @@ require __DIR__.'/barrido-multisensorial-shell.php';
 
 echo "\n=== ENCUENTRA EL COLOR: BD ===\n";
 
-$tipo = null;
-if (Schema::hasTable('tipos_juegos')) {
-    $tipo = TiposJuego::query()->firstOrCreate(
-        ['slug' => 'encuentra_color'],
-        [
-            'nombre' => 'Encuentra el color',
-            'descripcion' => 'Juego para reconocer e identificar colores en objetos.',
-            'activo' => true,
-        ]
-    );
-    if ($tipo->wasRecentlyCreated) {
-        ok('Creado tipo_juego encuentra_color');
-    } else {
-        ok('tipo_juego encuentra_color presente');
-    }
-} else {
-    fail('Tabla tipos_juegos no existe');
-}
-
 if (Schema::hasTable('juegos')) {
     $fila = DB::table('juegos')->where('slug', 'encuentra-el-color')->first();
     if (! $fila) {
@@ -287,15 +267,7 @@ if (Schema::hasTable('juegos')) {
     if (! $fila) {
         fail('No hay fila en juegos para EncuentraElColor');
     } else {
-        if ($tipo && (int) $fila->tipo_juego_id !== (int) $tipo->id) {
-            DB::table('juegos')->where('slug', $fila->slug)->update([
-                'tipo_juego_id' => $tipo->id,
-                'updated_at' => now(),
-            ]);
-            ok('BD tipo_juego_id actualizado a encuentra_color');
-        } else {
-            ok("BD slug={$fila->slug} activo=".((int) $fila->activo).' tipo=encuentra_color');
-        }
+        ok("BD slug={$fila->slug} activo=".((int) $fila->activo));
         $idx = public_path(trim($fila->ruta, '/').'/index.html');
         if (! is_file($idx)) {
             fail('BD apunta a ruta sin index.html');

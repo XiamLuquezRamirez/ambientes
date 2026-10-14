@@ -66,7 +66,7 @@ foreach (['Index.html', 'inicio.html', 'styleJuego.css'] as $f) {
 
 $paquetes = [
     'Polimotor/Rompecabezas',
-    'Polimotor/Reconocimiento',
+    'Polimotor/ReconocimientoDelCuerpo',
     'Polimotor/Lateralidad',
     'Polimotor/LaberintosDeCoordinacion',
     'Polimotor/SecuenciaDeMovimiento',
@@ -150,23 +150,30 @@ if (! Schema::hasColumn('juegos', 'ruta')) {
     ok('Columna ruta presente');
 }
 
+foreach (['tipo', 'tipo_juego_id'] as $col) {
+    if (Schema::hasColumn('juegos', $col)) {
+        fail("Columna juegos.{$col} aún existe (el tipo de juego se eliminó)");
+    } else {
+        ok("Sin columna juegos.{$col}");
+    }
+}
+
+if (Schema::hasTable('tipos_juegos')) {
+    fail('Tabla tipos_juegos aún existe (el tipo de juego se eliminó)');
+} else {
+    ok('Sin tabla tipos_juegos');
+}
+
 $total = DB::table('juegos')->count();
 $sinRuta = DB::table('juegos')->whereNull('ruta')->orWhere('ruta', '')->count();
-$motores = DB::table('juegos')->whereIn('tipo', ['rompecabezas', 'memoria', 'colorear', 'secuencia'])->count();
 
-echo "juegos total={$total} sin_ruta={$sinRuta} tipos_motor_legacy={$motores}\n";
-
-if ($motores > 0) {
-    fail("Hay {$motores} filas con tipos de motor (no deben estar en juegos)");
-} else {
-    ok('Sin filas de motores embebidos en juegos');
-}
+echo "juegos total={$total} sin_ruta={$sinRuta}\n";
 
 if ($sinRuta > 0) {
     warn("Hay {$sinRuta} juegos sin ruta (catálogo incompleto)");
 }
 
-$paquetesDb = DB::table('juegos')->whereNotNull('ruta')->where('ruta', '!=', '')->get(['slug', 'tipo', 'ruta', 'activo', 'nombre']);
+$paquetesDb = DB::table('juegos')->whereNotNull('ruta')->where('ruta', '!=', '')->get(['slug', 'ruta', 'activo', 'nombre']);
 foreach ($paquetesDb as $j) {
     $idx = public_path(trim($j->ruta, '/').'/index.html');
     if (! is_file($idx)) {
@@ -220,14 +227,17 @@ try {
         } else {
             ok('urlPaquete()='.$url);
         }
-        $label = $juego->tipoLabel();
-        ok('tipoLabel()='.$label);
 
         $svc = new App\Services\JuegoCatalogoService;
         $tarjeta = $svc->serializarTarjeta($juego);
-        foreach (['slug', 'tipo', 'ruta', 'url_paquete', 'nombre', 'cadena'] as $k) {
+        foreach (['slug', 'ruta', 'url_paquete', 'nombre', 'cadena'] as $k) {
             if (! array_key_exists($k, $tarjeta)) {
                 fail("serializarTarjeta sin clave {$k}");
+            }
+        }
+        foreach (['tipo', 'tipo_label'] as $k) {
+            if (array_key_exists($k, $tarjeta)) {
+                fail("serializarTarjeta aún expone {$k}");
             }
         }
         if (array_key_exists('canal', $tarjeta)) {
@@ -244,15 +254,39 @@ try {
     fail('Excepción modelo/servicio: '.$e->getMessage());
 }
 
+try {
+    $superAdmin = App\Models\User::query()->where('rol', 'superAdmin')->first();
+    if (! $superAdmin) {
+        warn('Sin usuario superAdmin: no se renderiza el index del catálogo');
+    } else {
+        auth('docente')->login($superAdmin);
+        $reqIndex = Illuminate\Http\Request::create('/superadmin/catalogo_juegos/juegos', 'GET');
+        app()->instance('request', $reqIndex);
+        $html = app(App\Http\Controllers\SuperAdmin\JuegosSuperAdminController::class)->listar($reqIndex)->render();
+        ok('index SuperAdmin renderiza ('.strlen($html).' bytes)');
+        foreach (['juego_tipo', 'Tipos de Juegos', 'catalogo_juegos/tipos'] as $resto) {
+            if (str_contains($html, $resto)) {
+                fail("index SuperAdmin aún contiene «{$resto}»");
+            }
+        }
+        if (! str_contains($html, 'id="juego_nombre"')) {
+            fail('index SuperAdmin sin campo juego_nombre en el modal');
+        }
+        auth('docente')->logout();
+    }
+} catch (Throwable $e) {
+    fail('Excepción al renderizar index SuperAdmin: '.$e->getMessage());
+}
+
 $routeNames = [
     'superadmin.catalogo_juegos.index',
-    'superadmin.catalogo.juegos.preview',
+    'superadmin.catalogo_juegos.preview',
     'admin.catalogo.juegos',
     'panel.catalogo.juegos',
 ];
 foreach ($routeNames as $name) {
     try {
-        $url = route($name, $name === 'superadmin.catalogo.juegos.preview' && isset($juego)
+        $url = route($name, $name === 'superadmin.catalogo_juegos.preview' && isset($juego)
             ? ['juego' => $juego->slug]
             : []);
         ok("Ruta {$name} → {$url}");
@@ -265,7 +299,7 @@ if (isset($juego)) {
     try {
         $ctrl = app(App\Http\Controllers\SuperAdmin\JuegosSuperAdminController::class);
         $view = $ctrl->preview($juego);
-        if ($view->name() !== 'superAdmin.catalogo.juegos.preview') {
+        if ($view->name() !== 'superAdmin.catalogo_juegos.juegos.preview') {
             fail('preview() vista inesperada: '.$view->name());
         } else {
             $data = $view->getData();
@@ -362,12 +396,12 @@ if (! str_contains($vn, 'juego_catalogo_url') || ! str_contains($vn, 'vn-catalog
     ok('Vista Niño soporta juego_catalogo_url');
 }
 
-if (str_contains(file_get_contents(resource_path('views/superAdmin/catalogo/juegos/partials/_card.blade.php')), 'target="_blank"')) {
+if (str_contains(file_get_contents(resource_path('views/superAdmin/catalogo_juegos/juegos/partials/_card.blade.php')), 'target="_blank"')) {
     fail('Vista previa SuperAdmin aún abre en pestaña nueva');
 } else {
     ok('Vista previa SuperAdmin usa overlay (sin target=_blank)');
 }
-if (! str_contains(file_get_contents(resource_path('views/superAdmin/catalogo/juegos/index.blade.php')), 'cjPreviewOverlay')) {
+if (! str_contains(file_get_contents(resource_path('views/superAdmin/catalogo_juegos/juegos/index.blade.php')), 'cjPreviewOverlay')) {
     fail('Falta overlay cjPreviewOverlay en index de juegos SuperAdmin');
 } else {
     ok('Overlay tablet de preview presente en SuperAdmin juegos');

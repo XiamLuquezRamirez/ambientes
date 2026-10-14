@@ -10,7 +10,6 @@ $app = require __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\TiposJuego;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -241,21 +240,6 @@ if (! is_array($conv) || count($conv) < 1) {
 
 echo "\n=== PRECISIÓN: BD ===\n";
 
-if (Schema::hasTable('tipos_juegos')) {
-    $tipo = TiposJuego::query()->firstOrCreate(
-        ['slug' => 'precision'],
-        ['nombre' => 'Precisión', 'activo' => true]
-    );
-    if ($tipo->wasRecentlyCreated) {
-        ok('Creado tipo_juego precision');
-    } else {
-        ok('tipo_juego precision presente');
-    }
-} else {
-    fail('Tabla tipos_juegos no existe');
-    $tipo = null;
-}
-
 if (Schema::hasTable('juegos')) {
     $fila = DB::table('juegos')->where('slug', 'juegos-de-precision')->first();
     if (! $fila) {
@@ -264,15 +248,7 @@ if (Schema::hasTable('juegos')) {
     if (! $fila) {
         fail('No hay fila en juegos para JuegosDePrecision');
     } else {
-        if ($tipo && (int) $fila->tipo_juego_id !== (int) $tipo->id) {
-            DB::table('juegos')->where('slug', $fila->slug)->update([
-                'tipo_juego_id' => $tipo->id,
-                'updated_at' => now(),
-            ]);
-            ok('BD tipo_juego_id actualizado a precision');
-        } else {
-            ok("BD slug={$fila->slug} activo=".((int) $fila->activo));
-        }
+        ok("BD slug={$fila->slug} activo=".((int) $fila->activo));
         $idx = public_path(trim($fila->ruta, '/').'/index.html');
         if (! is_file($idx)) {
             fail('BD apunta a ruta sin index.html');

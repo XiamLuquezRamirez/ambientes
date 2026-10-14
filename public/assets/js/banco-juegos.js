@@ -99,12 +99,10 @@
             const color = j.color || '#2563eb';
             const polimotor = esPaquetePolimotor(j.url_paquete);
             const desc = polimotor ? '' : (j.descripcion || '');
-            const badge = polimotor ? '' : (j.tipo_label || 'Juego');
             return `
             <button type="button" class="bj-card${polimotor ? ' bj-card--polimotor' : ''}" data-juego-slug="${escapar(j.slug)}"
                     data-url-paquete="${escapar(j.url_paquete || '')}"
                     style="--c:${escapar(color)}">
-                ${badge ? `<span class="bj-card-badge">${escapar(badge)}</span>` : ''}
                 <span class="bj-card-emoji" aria-hidden="true">${iconoHtml(j)}</span>
                 <h3 class="bj-card-titulo">${escapar(j.nombre)}</h3>
                 ${desc ? `<p class="bj-card-desc">${escapar(desc)}</p>` : ''}

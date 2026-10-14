@@ -19,30 +19,11 @@
                     <input type="hidden" name="juego_id" id="juego_id" value="">
 
                     <div class="row">
-                        <div class="col-md-8">
+                        <div class="col-md-12">
                             <div class="mb-3">
                                 <label class="form-label fw-bold" for="juego_nombre">Nombre <span class="text-danger">*</span></label>
                                 <input type="text" id="juego_nombre" name="nombre" class="form-control" maxlength="150"
                                     placeholder="Nombre visible en el catálogo" required>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold" for="juego_tipo">Tipo <span class="text-danger">*</span></label>
-                                <select id="juego_tipo" name="tipo" class="form-control" required style="cursor:pointer;">
-                                    <option value="">Selecciona un tipo</option>
-                                    @foreach ($tiposJuego as $valor => $etiqueta)
-                                        <option value="{{ $valor }}">{{ $etiqueta }}</option>
-                                    @endforeach
-                                    <option value="__nuevo__">+ Agregar nuevo</option>
-                                </select>
-                                <div id="juego_tipo_nuevo_wrap" class="mt-2" hidden>
-                                    <input type="text" id="juego_tipo_nuevo" name="tipo_nuevo" class="form-control"
-                                        maxlength="80" placeholder="Ej. Memoria visual" autocomplete="off">
-                                    <small class="text-muted">
-                                        Se guardará como clave en snake_case (ej. memoria_visual).
-                                    </small>
-                                </div>
                             </div>
                         </div>
 

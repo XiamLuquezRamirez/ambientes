@@ -254,13 +254,6 @@ if (! is_array($conv) || count($conv) < 1) {
     ok('conversación en config ('.count($conv).' líneas)');
 }
 
-$tipos = \App\Models\Juego::tiposCatalogo();
-if (isset($tipos['secuencia_movimiento'])) {
-    ok('tipos_juegos incluye secuencia_movimiento');
-} else {
-    fail('tipos_juegos sin secuencia_movimiento');
-}
-
 echo "\n=== SECUENCIA MOVIMIENTO: BD ===\n";
 
 if (\Illuminate\Support\Facades\Schema::hasTable('juegos')) {
@@ -270,15 +263,7 @@ if (\Illuminate\Support\Facades\Schema::hasTable('juegos')) {
     if (! $fila) {
         warn('No hay fila en juegos para SecuenciaDeMovimiento');
     } else {
-        $tipoSlug = null;
-        if (! empty($fila->tipo_juego_id) && \Illuminate\Support\Facades\Schema::hasTable('tipos_juegos')) {
-            $tipoSlug = \App\Models\TiposJuego::query()->whereKey($fila->tipo_juego_id)->value('slug');
-        }
-        if ($tipoSlug !== 'secuencia_movimiento') {
-            fail('BD tipo='.($tipoSlug ?: 'null').', esperado secuencia_movimiento');
-        } else {
-            ok("BD slug={$fila->slug} activo=".((int) $fila->activo)." tipo={$tipoSlug}");
-        }
+        ok("BD slug={$fila->slug} activo=".((int) $fila->activo));
         $idx = public_path(trim($fila->ruta, '/').'/index.html');
         if (! is_file($idx)) {
             fail('BD apunta a ruta sin index.html');

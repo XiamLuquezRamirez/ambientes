@@ -7,7 +7,6 @@ use App\Models\Eje;
 use App\Models\Juego;
 use App\Models\Modulo;
 use App\Models\Tematica;
-use App\Models\TiposJuego;
 use App\Services\JuegoCatalogoService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
@@ -18,10 +17,6 @@ class JuegoCatalogoServiceTest extends TestCase
     public function test_serializar_tarjeta_incluye_cadena_curricular(): void
     {
         $ambiente = new Ambiente(['id' => 1, 'nombre' => 'Polimotor']);
-        $tipo = new TiposJuego([
-            'slug' => 'rompecabezas_cuerpo',
-            'nombre' => 'Rompecabezas del cuerpo',
-        ]);
         $juego = new Juego([
             'slug' => 'rompecabezas-del-cuerpo',
             'ruta' => 'catalogo_juegos/Polimotor/Rompecabezas',
@@ -33,12 +28,12 @@ class JuegoCatalogoServiceTest extends TestCase
             'ambiente_id' => 1,
         ]);
         $juego->setRelation('ambiente', $ambiente);
-        $juego->setRelation('tipoJuego', $tipo);
 
         $tarjeta = (new JuegoCatalogoService)->serializarTarjeta($juego);
 
         $this->assertSame('rompecabezas-del-cuerpo', $tarjeta['slug']);
-        $this->assertSame('rompecabezas_cuerpo', $tarjeta['tipo']);
+        $this->assertArrayNotHasKey('tipo', $tarjeta);
+        $this->assertArrayNotHasKey('tipo_label', $tarjeta);
         $this->assertSame('Rompecabezas del cuerpo', $tarjeta['nombre']);
         $this->assertSame('catalogo_juegos/Polimotor/Rompecabezas', $tarjeta['ruta']);
         $this->assertSame('Polimotor', $tarjeta['cadena']['ambiente_nombre']);
@@ -230,16 +225,6 @@ class JuegoCatalogoServiceTest extends TestCase
                 @rmdir($dir);
             }
         }
-    }
-
-    public function test_tipo_es_valido_snake_case(): void
-    {
-        $this->assertTrue(Juego::tipoEsValido('memoria_visual'));
-        $this->assertTrue(Juego::tipoEsValido('lateralidad'));
-        $this->assertFalse(Juego::tipoEsValido(''));
-        $this->assertFalse(Juego::tipoEsValido(Juego::TIPO_NUEVO));
-        $this->assertFalse(Juego::tipoEsValido('Memoria Visual'));
-        $this->assertFalse(Juego::tipoEsValido('1invalido'));
     }
 
     public function test_slug_es_valido_kebab_case(): void

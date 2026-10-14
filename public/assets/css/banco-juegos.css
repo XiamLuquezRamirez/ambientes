@@ -442,18 +442,6 @@
     opacity: .92;
 }
 
-.bj-card-badge {
-    position: absolute;
-    top: .55rem;
-    left: .6rem;
-    font: 700 .62rem/1 system-ui, sans-serif;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    background: rgba(0, 0, 0, .35);
-    padding: .28rem .5rem;
-    border-radius: 6px;
-}
-
 /* ====== Reproductor (iframe del paquete) ====== */
 .bj-player {
     position: absolute;

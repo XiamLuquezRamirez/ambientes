@@ -2,7 +2,6 @@
     $cadena = $juego->cadenaCurricularResuelta();
     $imagenUrl = $juego->urlImagen();
     $color = $juego->color ?: '#64748b';
-    $tipoLabel = $juego->tipoLabel();
     $urlPaquete = $juego->urlPaquete();
 @endphp
 
@@ -20,7 +19,6 @@
 
         <div class="student-identity">
             <h5>{{ $juego->nombre }}</h5>
-            <small>{{ $tipoLabel }}</small>
         </div>
     </div>
 

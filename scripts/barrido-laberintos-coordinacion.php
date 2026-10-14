@@ -434,9 +434,7 @@ if (Schema::hasTable('juegos')) {
     if (! $fila) {
         warn('No hay fila en juegos para LaberintosDeCoordinacion (¿solo stub local?)');
     } else {
-        ok('BD slug='.($fila->slug ?? '?').' activo='.((int) ($fila->activo ?? 0)).
-            (isset($fila->tipo) ? " tipo={$fila->tipo}" : '').
-            (isset($fila->tipo_juego_id) ? " tipo_juego_id={$fila->tipo_juego_id}" : ''));
+        ok('BD slug='.($fila->slug ?? '?').' activo='.((int) ($fila->activo ?? 0)));
         $idx = public_path(trim($fila->ruta, '/').'/index.html');
         if (! is_file($idx)) {
             fail('BD apunta a ruta sin index.html');

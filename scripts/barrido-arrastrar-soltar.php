@@ -210,13 +210,6 @@ foreach (array_keys($esperados) as $idEsp) {
     }
 }
 
-$tipos = \App\Models\Juego::tiposCatalogo();
-if (isset($tipos['arrastrar'])) {
-    ok('tipos_juegos incluye arrastrar');
-} else {
-    fail('tipos_juegos sin arrastrar');
-}
-
 echo "\n=== ARRASTRAR Y SOLTAR: BD ===\n";
 
 if (\Illuminate\Support\Facades\Schema::hasTable('juegos')) {
@@ -226,15 +219,7 @@ if (\Illuminate\Support\Facades\Schema::hasTable('juegos')) {
     if (! $fila) {
         fail('No hay fila en juegos para ArrastrarYSoltarObjetos');
     } else {
-        $tipoSlug = null;
-        if (! empty($fila->tipo_juego_id) && \Illuminate\Support\Facades\Schema::hasTable('tipos_juegos')) {
-            $tipoSlug = \App\Models\TiposJuego::query()->whereKey($fila->tipo_juego_id)->value('slug');
-        }
-        if ($tipoSlug !== 'arrastrar') {
-            fail('BD tipo='.($tipoSlug ?: 'null').', esperado arrastrar');
-        } else {
-            ok("BD slug={$fila->slug} activo=".((int) $fila->activo)." tipo={$tipoSlug}");
-        }
+        ok("BD slug={$fila->slug} activo=".((int) $fila->activo));
         $idx = public_path(trim($fila->ruta, '/').'/index.html');
         if (! is_file($idx)) {
             fail('BD apunta a ruta sin index.html');

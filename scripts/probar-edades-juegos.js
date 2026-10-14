@@ -15,12 +15,13 @@ const juegos = [
   "Multisensorial/CompletaLaFigura",
   "Multisensorial/BuscaLasDiferencias",
   "Multisensorial/MemoriaVisual",
+  "Multisensorial/EncuentraLaTextura",
   "Polimotor/Lateralidad",
   "Polimotor/ArrastrarYSoltarObjetos",
   "Polimotor/JuegosDePrecision",
   "Polimotor/LaberintosDeCoordinacion",
   "Polimotor/SecuenciaDeMovimiento",
-  "Polimotor/Reconocimiento",
+  "Polimotor/ReconocimientoDelCuerpo",
   "Polimotor/Rompecabezas",
   "Polimotor/CoordinacionVisual",
   "Polimotor/MemoriaCorporal",
@@ -35,6 +36,17 @@ const casosEdad = [
   { edad: 6, etiqueta: "5" },
   { edad: 8, etiqueta: "5" },
   { edad: null, etiqueta: "3" },
+];
+
+// Juegos cuyo documento define solo dos grupos: 3-4 y 5-6 años.
+const casosDosGrupos = [
+  { edad: 2, etiqueta: "3-4 años" },
+  { edad: 3, etiqueta: "3-4 años" },
+  { edad: 4, etiqueta: "3-4 años" },
+  { edad: 5, etiqueta: "5-6 años" },
+  { edad: 6, etiqueta: "5-6 años" },
+  { edad: 8, etiqueta: "5-6 años" },
+  { edad: null, etiqueta: "3-4 años" },
 ];
 
 let fails = 0;
@@ -138,15 +150,27 @@ for (const rel of juegos) {
   }
   const cfg = JSON.parse(fs.readFileSync(cfgPath, "utf8"));
   assert(!Object.prototype.hasOwnProperty.call(cfg, "edad"), "sin clave raíz edad");
-  assert(Array.isArray(cfg.niveles) && cfg.niveles.length >= 3, "tiene ≥3 niveles");
 
-  const buckets = new Set(cfg.niveles.map(function (n) { return etiquetaBucket(n.edad); }));
-  assert(buckets.has("3") && buckets.has("4") && buckets.has("5"), "cubre etiquetas 3/4/5-6");
+  const etiquetas = (cfg.niveles || []).map(function (n) { return String(n.edad || "").trim(); });
+  if (etiquetas.join("|") === "3-4 años|5-6 años") {
+    for (const c of casosDosGrupos) {
+      for (const orden of [cfg.niveles, cfg.niveles.slice().reverse()]) {
+        const nivel = PedniaEdad.resolverNivel(orden, c.edad == null ? 3 : c.edad);
+        const got = nivel ? nivel.edad : "null";
+        assert(got === c.etiqueta, "edad " + c.edad + " → " + c.etiqueta + (orden === cfg.niveles ? "" : " (niveles al revés)") + " (got " + got + ")");
+      }
+    }
+  } else {
+    assert(Array.isArray(cfg.niveles) && cfg.niveles.length >= 3, "tiene ≥3 niveles");
 
-  for (const c of casosEdad) {
-    const nivel = PedniaEdad.resolverNivel(cfg.niveles, c.edad == null ? 3 : c.edad);
-    const got = nivel ? etiquetaBucket(nivel.edad) : "null";
-    assert(got === c.etiqueta, "edad " + c.edad + " → bucket " + c.etiqueta + " (got " + got + ", id=" + (nivel && nivel.id) + ")");
+    const buckets = new Set(cfg.niveles.map(function (n) { return etiquetaBucket(n.edad); }));
+    assert(buckets.has("3") && buckets.has("4") && buckets.has("5"), "cubre etiquetas 3/4/5-6");
+
+    for (const c of casosEdad) {
+      const nivel = PedniaEdad.resolverNivel(cfg.niveles, c.edad == null ? 3 : c.edad);
+      const got = nivel ? etiquetaBucket(nivel.edad) : "null";
+      assert(got === c.etiqueta, "edad " + c.edad + " → bucket " + c.etiqueta + " (got " + got + ", id=" + (nivel && nivel.id) + ")");
+    }
   }
 
   if (fs.existsSync(htmlPath)) {

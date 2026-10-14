@@ -222,7 +222,7 @@ CREATE TABLE `bloques_experiencia` (
   KEY `bloques_experiencia_experiencia_id_index` (`experiencia_id`),
   KEY `bloques_experiencia_tipo_index` (`tipo`),
   CONSTRAINT `bloques_experiencia_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=334 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=339 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `bloques_experiencia` */
 
@@ -238,7 +238,12 @@ insert  into `bloques_experiencia`(`id`,`experiencia_id`,`tipo`,`orden`,`datos`,
 (329,26,'juego',9,'{\"seq_1\": null, \"seq_2\": null, \"seq_3\": null, \"seq_4\": null, \"imagen_1\": null, \"imagen_2\": null, \"imagen_3\": null, \"imagen_4\": null, \"imagen_5\": null, \"imagen_6\": null, \"juego_id\": \"rompecabezas\", \"instruccion\": \"Arma el rompecabezas. Coloca cada pieza en su lugar.\", \"juego_imagen\": \"images_1__6a9f12d69e283.jpg\", \"juego_nombre\": \"Rompecabezas del cuerpo\", \"juego_piezas\": null, \"colores_zonas\": [], \"juego_catalogo_id\": \"rompecabezas-del-cuerpo\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
 (330,26,'juego',10,'{\"seq_1\": \"paint-splash-red-abstract-blot-burgundy-cartoon-paint-splatter-vector_6a9f13f23c935.jpg\", \"seq_2\": \"Dibujo-Basico-Limon_6a9f14066a866.jpg\", \"seq_3\": \"mar_6a9f14856adf3.jpg\", \"seq_4\": \"girasol_6a9f1490bea1a.jpg\", \"imagen_1\": \"\", \"imagen_2\": \"\", \"imagen_3\": \"\", \"imagen_4\": \"\", \"imagen_5\": \"\", \"imagen_6\": \"\", \"juego_id\": \"secuencia\", \"instruccion\": \"Ordena las imágenes del uno al cuatro.\", \"juego_imagen\": \"\", \"juego_nombre\": \"Ordena los colores\", \"juego_piezas\": \"\", \"colores_zonas\": [], \"juego_catalogo_id\": null}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
 (331,26,'emocion',11,'{\"cantidad\": \"4\", \"instruccion\": \"¿Cómo te sentiste con esta actividad? Toca una cara.\"}',1,'2026-09-08 09:04:13','2026-09-10 09:16:03'),
-(332,26,'video',2,'{\"archivo\": \"Hola_bienvenidos_como_estan_amigos_karol_sevilla_6aa017fe4f6a7.mp4\", \"instruccion\": \"Observa\", \"descripcion_accesible\": null}',1,'2026-09-08 09:12:58','2026-09-10 09:16:03');
+(332,26,'video',2,'{\"archivo\": \"Hola_bienvenidos_como_estan_amigos_karol_sevilla_6aa017fe4f6a7.mp4\", \"instruccion\": \"Observa\", \"descripcion_accesible\": null}',1,'2026-09-08 09:12:58','2026-09-10 09:16:03'),
+(334,28,'bienvenida',1,'{\"video\": \"Hola_bienvenidos_como_estan_amigos_karol_sevilla_6acf85a0975e2.mp4\", \"imagen\": \"\", \"personaje\": \"personaje\", \"tipo_media\": \"video\", \"instruccion\": \"Hola\", \"descripcion_accesible\": null}',1,'2026-10-07 17:20:27','2026-10-14 08:39:14'),
+(335,28,'recompensa',5,'{\"tipo\": \"Trofeo\", \"insignia\": null, \"instruccion\": \"Felicitaciones\"}',1,'2026-10-07 17:20:27','2026-10-14 08:39:55'),
+(336,28,'imagen',2,'{\"archivo\": \"images_1__6acf85351c299.jpg\", \"descripcion\": null, \"instruccion\": \"Mira estos colores. ¿Reconoces alguno?” Observa muy bien, porque los colores nos ayudan a describir lo que vemos\"}',1,'2026-10-14 08:35:23','2026-10-14 08:39:14'),
+(337,28,'pregunta',3,'{\"fb_ok\": \"¡Muy bien!\", \"texto\": \"¿Qué pintamos de este color?\", \"fb_err\": \"Inténtalo de nuevo.\", \"imagen\": \"paint-splash-red-abstract-blot-burgundy-cartoon-paint-splatter-vector_6acf85d220d40.jpg\", \"intentos\": \"2\", \"opciones\": [{\"emoji\": null, \"texto\": null, \"imagen\": \"fire-truck-coloring-page-isolated-for-kids-free-vector_6acf85dc5ff72.jpg\", \"correcta\": true}, {\"emoji\": null, \"texto\": null, \"imagen\": \"Dibujo-Basico-Limon_6acf85e15ebd6.jpg\", \"correcta\": false}, {\"emoji\": null, \"texto\": null, \"imagen\": \"images_2__6acf85ec8e4b2.jpg\", \"correcta\": false}], \"al_agotar\": \"Mostrar respuesta correcta\", \"tipo_opts\": \"imagen_texto\", \"instruccion\": \"¿Qué pintamos de este color?\"}',1,'2026-10-14 08:37:59','2026-10-14 08:39:14'),
+(338,28,'emocion',4,'{\"cantidad\": \"4\", \"instruccion\": \"Ahora cuéntame, ¿cómo te sentiste?\"}',1,'2026-10-14 08:39:14','2026-10-14 08:39:28');
 
 /*Table structure for table `carga_docente` */
 
@@ -376,8 +381,8 @@ CREATE TABLE `clases` (
 /*Data for the table `clases` */
 
 insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values 
-(12,6,2,9,'Identifica los colores',NULL,'2026-10-06','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09'),
-(13,10,2,7,'Rompecabezas del cuerpo humano',NULL,'2026-10-06','activa',2026,'2026-09-22 10:26:20','2026-09-22 10:26:22');
+(12,6,2,9,'Identifica los colores',NULL,'2026-10-13','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09'),
+(13,10,2,7,'Rompecabezas del cuerpo humano',NULL,'2026-10-13','activa',2026,'2026-09-22 10:26:20','2026-09-22 10:26:22');
 
 /*Table structure for table `cola_sincronizacion` */
 
@@ -500,7 +505,7 @@ insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_
 (8,32,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-06-23 15:31:26','2026-06-23 16:03:33'),
 (9,33,'fas fa-star','#ff9019','fas fa-heart','#ff0606','fas fa-fish','#0f54ff',0,'2026-06-23 15:34:40','2026-06-23 15:34:40'),
 (10,34,'fas fa-fish','#0f54ff','fas fa-heart','#ff0606','fas fa-circle','#f933e9',0,'2026-06-23 15:35:48','2026-06-23 15:35:48'),
-(11,13,'fas fa-fish','#0f54ff','fas fa-fish','#0f54ff','fas fa-fish','#0f54ff',0,'2026-06-23 16:14:31','2026-09-28 08:46:28'),
+(11,13,'fas fa-fish','#0f54ff','fas fa-fish','#0f54ff','fas fa-fish','#0f54ff',0,'2026-06-23 16:14:31','2026-10-08 10:11:01'),
 (12,11,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:15:42','2026-10-06 10:51:04'),
 (13,5,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:16:06','2026-10-06 15:59:59'),
 (15,38,'fas fa-circle','#f933e9','fas fa-star','#ff9019','fas fa-circle','#f933e9',0,'2026-08-21 10:58:13','2026-08-21 10:58:13'),
@@ -848,7 +853,7 @@ insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacio
 (2,'Mateo',NULL,NULL,NULL,2222,'MA',NULL,'#0494FC',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (3,'Sofía',NULL,NULL,NULL,3333,'SO',NULL,'#0494FC',1,NULL,0,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (4,'Juan',NULL,NULL,NULL,4444,'JU',NULL,'#0494FC',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
-(5,'Camila','Perez','estudiantes/25glKD0qaCUEKlIzFsu4qMvjG2cqc19EdDOPASCZ.png','TI',5555,'CP','2','#18BC54',1,NULL,1,'2021-05-23','fggdfg','4534','2026-06-16 00:02:01','2026-09-30 15:21:03','no','masculino',0,NULL,'Valledupar',13,217,'asdasd','sadasdasdasdasd',NULL,NULL,1),
+(5,'Camila','Perez','estudiantes/25glKD0qaCUEKlIzFsu4qMvjG2cqc19EdDOPASCZ.png','TI',5555,'CP','2','#18BC54',1,NULL,1,'2020-05-23','fggdfg','4534','2026-06-16 00:02:01','2026-09-30 15:21:03','no','masculino',0,NULL,'Valledupar',13,217,'asdasd','sadasdasdasdasd',NULL,NULL,1),
 (6,'Luna',NULL,NULL,NULL,6666,'LU',NULL,'#0494FC',1,NULL,1,NULL,NULL,NULL,'2026-06-16 00:02:01','2026-06-16 00:02:01','no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (7,'José',NULL,NULL,NULL,134123123,'Jo','1','#0494FC',9,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:20','2026-09-07 14:37:45','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
 (8,'José',NULL,NULL,NULL,134123123,'Jo','1','#0494FC',10,NULL,1,NULL,'Juana','245234234','2026-06-18 16:04:36','2026-09-07 14:37:45','si',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1),
@@ -876,7 +881,7 @@ insert  into `estudiantes`(`id`,`nombre`,`apellido`,`avatar`,`tipo_identificacio
 (36,'Valentina','Madrid',NULL,'Otro',88880000,'VM','1','#18BC54',1,NULL,1,'2016-05-26','Yo mero','3232323','2026-06-26 16:44:51','2026-06-26 16:44:51','no','femenino',0,'Pasaporte','Aguachica - Cesar',20,9,'La Nevada','Manzana B casa 43',NULL,NULL,1),
 (37,'Nuevo','Magola',NULL,'TI',777666544,'NM','1','#18BC54',1,NULL,1,'2006-01-22','jjjhhhgfff','456456456','2026-08-01 10:20:50','2026-08-01 10:20:50','en_proceso','masculino',0,NULL,'valledupar',8,398,'Los cortijos','Carrera 51 #23-51','3042065930','grovveip@gmail.com',1),
 (38,'Juan José','Machado Rojas',NULL,'TI',123456789,'JM','2','#18BC54',1,NULL,1,'2022-08-20','Julitza rojas vuelvas','5800123','2026-08-21 10:58:13','2026-08-21 10:58:13','si','masculino',0,NULL,'Valledupar',20,9,'Los cortijos','Calle 16b #19c-45','5600903','a_penaloza@ingeer.co',1),
-(39,'Angelito','Diaz','estudiantes/FUAZZf9k3ZVcYQcI3W3YWftwgIqcBpwCdOWDf4VC.jpg','RC',12345678,'AD','1','#4C007C',1,NULL,1,'2023-08-12','yaleynis rincones','3125799611','2026-08-22 10:14:17','2026-09-30 15:19:08','si','masculino',0,NULL,'Valledupar',20,9,'Los cortijos','Calle 16b #19c-45','245567899','a_penaloza@ingeer.co',1),
+(39,'Angelito','Diaz','estudiantes/FUAZZf9k3ZVcYQcI3W3YWftwgIqcBpwCdOWDf4VC.jpg','RC',12345678,'AD','1','#4C007C',1,NULL,1,'2020-08-12','yaleynis rincones','3125799611','2026-08-22 10:14:17','2026-09-30 15:19:08','si','masculino',0,NULL,'Valledupar',20,9,'Los cortijos','Calle 16b #19c-45','245567899','a_penaloza@ingeer.co',1),
 (40,'',NULL,NULL,NULL,0,'',NULL,'#18BC54',1,NULL,1,NULL,NULL,NULL,NULL,NULL,'no',NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 
 /*Table structure for table `experiencia_materiales` */
@@ -932,7 +937,7 @@ CREATE TABLE `experiencias` (
 
 insert  into `experiencias`(`id`,`tematica_id`,`grado_id`,`nombre`,`objetivo`,`proposito`,`habilidades`,`duracion_minutos`,`referente_aprendizaje`,`estado`,`activo`,`creado_por`,`created_at`,`updated_at`) values 
 (26,7,1,'Colores — prueba de perfiles','Recorrido de prueba para validar adaptaciones del kiosco según perfil de aprendizaje (visual, audio, opciones, juegos, dibujo, timer, pausas).',NULL,NULL,30,NULL,'activa',1,1,'2026-08-28 15:37:38','2026-09-08 09:04:13'),
-(28,8,1,'Clase 1','Clase',NULL,NULL,20,NULL,'borrador',1,1,'2026-09-22 10:25:59','2026-09-22 10:25:59');
+(28,8,1,'Clase 1','Clase',NULL,NULL,20,NULL,'activa',1,1,'2026-09-22 10:25:59','2026-10-07 17:20:34');
 
 /*Table structure for table `failed_jobs` */
 
@@ -1065,7 +1070,7 @@ CREATE TABLE `instrucciones_audio` (
   PRIMARY KEY (`id`),
   KEY `instrucciones_audio_bloque_orden_idx` (`bloque_experiencia_id`,`orden`),
   CONSTRAINT `instrucciones_audio_bloque_experiencia_id_foreign` FOREIGN KEY (`bloque_experiencia_id`) REFERENCES `bloques_experiencia` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=310 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=369 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `instrucciones_audio` */
 
@@ -1081,7 +1086,13 @@ insert  into `instrucciones_audio`(`id`,`bloque_experiencia_id`,`instruccion`,`p
 (297,330,'Ordena las imágenes del uno al cuatro.','zoe',1,'2026-09-08 09:04:13','2026-09-08 09:04:13'),
 (298,331,'¿Cómo te sentiste con esta actividad? Toca una cara.','zoe',1,'2026-09-08 09:04:13','2026-09-08 09:04:13'),
 (305,332,'Observa','zoe',1,'2026-09-08 09:13:29','2026-09-08 09:13:29'),
-(309,329,'Arma el rompecabezas. Coloca cada pieza en su lugar.','zoe',1,'2026-09-09 17:25:59','2026-09-09 17:25:59');
+(309,329,'Arma el rompecabezas. Coloca cada pieza en su lugar.','zoe',1,'2026-09-09 17:25:59','2026-09-09 17:25:59'),
+(343,334,'Hola','zoe',1,'2026-10-14 08:37:47','2026-10-14 08:37:47'),
+(344,336,'Mira estos colores. ¿Reconoces alguno?”','zoe',1,'2026-10-14 08:37:50','2026-10-14 08:37:50'),
+(345,336,'Observa muy bien, porque los colores nos ayudan a describir lo que vemos','zeus',2,'2026-10-14 08:37:50','2026-10-14 08:37:50'),
+(355,337,'¿Qué pintamos de este color?','zoe',1,'2026-10-14 08:38:59','2026-10-14 08:38:59'),
+(360,338,'Ahora cuéntame, ¿cómo te sentiste?','zeus',1,'2026-10-14 08:39:28','2026-10-14 08:39:28'),
+(368,335,'Felicitaciones','zoe',1,'2026-10-14 08:39:55','2026-10-14 08:39:55');
 
 /*Table structure for table `juegos` */
 
@@ -1093,7 +1104,6 @@ CREATE TABLE `juegos` (
   `eje_id` bigint unsigned DEFAULT NULL,
   `tematica_id` bigint unsigned DEFAULT NULL,
   `modulo_id` bigint unsigned DEFAULT NULL,
-  `tipo_juego_id` bigint unsigned DEFAULT NULL,
   `ruta` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
@@ -1108,32 +1118,31 @@ CREATE TABLE `juegos` (
   KEY `juegos_ambiente_id_activo_orden_index` (`ambiente_id`,`activo`,`orden`),
   KEY `juegos_eje_id_activo_orden_index` (`eje_id`,`activo`,`orden`),
   KEY `juegos_tematica_id_activo_orden_index` (`tematica_id`,`activo`,`orden`),
-  KEY `juegos_tipo_juego_id_activo_orden_index` (`tipo_juego_id`,`activo`,`orden`),
   CONSTRAINT `juegos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `juegos_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `juegos_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `juegos_tipo_juego_id_foreign` FOREIGN KEY (`tipo_juego_id`) REFERENCES `tipos_juegos` (`id`) ON DELETE SET NULL
+  CONSTRAINT `juegos_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `juegos` */
 
-insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`tipo_juego_id`,`ruta`,`nombre`,`descripcion`,`imagen`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
-('arrastrar-y-soltar-objetos',7,NULL,NULL,NULL,9,'catalogo_juegos/Polimotor/ArrastrarYSoltarObjetos','Arrastrar y soltar objetos',NULL,'arrastrar.png','#ee6c84',7,1,'2026-09-18 10:30:49','2026-10-05 17:51:01'),
-('busca-la-sombra',9,NULL,NULL,NULL,11,'catalogo_juegos/Multisensorial/BuscaLaSombra','Busca la sombra',NULL,NULL,'#14b8a6',10,1,'2026-09-22 15:27:38','2026-09-23 15:07:44'),
-('busca-las-diferencias',9,NULL,NULL,NULL,2,'catalogo_juegos/Multisensorial/BuscaLasDiferencias','Busca las diferencias',NULL,NULL,'#84cc16',12,1,'2026-09-23 10:22:02','2026-09-23 10:22:10'),
-('completa-la-figura',9,NULL,NULL,NULL,2,'catalogo_juegos/Multisensorial/CompletaLaFigura','Completa La Figura',NULL,NULL,'#a855f7',11,1,'2026-09-23 08:48:41','2026-09-23 08:48:41'),
-('coordinacion-visual',7,NULL,NULL,NULL,7,'catalogo_juegos/Polimotor/CoordinacionVisual','Coordinación visual','Guiar el cohete por los aros con precisión según el nivel de edad.','cordinacion.png','#73a7e3',7,1,'2026-09-21 14:30:00','2026-10-05 17:50:32'),
-('encuentra-el-color',9,NULL,NULL,NULL,10,'catalogo_juegos/Multisensorial/EncuentraElColor','Encuentra el Color',NULL,NULL,'#f97316',9,1,'2026-09-21 09:34:08','2026-09-23 15:07:43'),
-('ensamblajes-sencillos',7,NULL,NULL,NULL,8,'catalogo_juegos/Polimotor/EnsamblajesSencillos','Ensamblajes sencillos','Armar el robot arrastrando piezas según el nivel de edad.','ensamblaje.png','#57b1a8',8,1,'2026-09-21 14:30:00','2026-10-05 17:51:17'),
-('juegos-de-precision',7,NULL,NULL,NULL,7,'catalogo_juegos/Polimotor/JuegosDePrecision','Juegos de precision',NULL,'precision.png','#e7a396',8,1,'2026-09-18 15:42:23','2026-10-05 17:51:34'),
-('laberintos-de-coordinacion',7,NULL,NULL,NULL,5,'catalogo_juegos/Polimotor/LaberintosDeCoordinacion','Laberintos de coordinacion',NULL,'laberinto.png','#ad92b1',5,1,'2026-09-12 08:48:03','2026-10-05 17:48:22'),
-('lateralidad',7,NULL,NULL,NULL,3,'catalogo_juegos/Polimotor/Lateralidad','Lateralidad','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','lateralidad.png','#a1b947',3,1,'2026-09-09 17:47:30','2026-10-05 17:47:38'),
-('memoria-corporal',7,NULL,NULL,NULL,4,'catalogo_juegos/Polimotor/MemoriaCorporal','Memoria Corporal',NULL,'memoria.png','#c46040',4,1,'2026-09-14 15:48:10','2026-10-05 17:47:58'),
-('memoria-visual',9,NULL,NULL,NULL,4,'catalogo_juegos/Multisensorial/MemoriaVisual','Memoria visual',NULL,NULL,'#f43f5e',13,1,'2026-10-05 10:16:39','2026-10-05 10:16:39'),
-('reconocimiento-de-partes-del-cuerpo',7,NULL,NULL,NULL,2,'catalogo_juegos/Polimotor/ReconocimientoDelCuerpo','Reconocimiento del cuerpo','Tocar las partes del cuerpo indicadas según el nivel de edad.','reconocimiento.png','#c64757',2,1,'2026-09-09 16:58:39','2026-10-05 17:52:01'),
-('rompecabezas-del-cuerpo',7,NULL,NULL,NULL,1,'catalogo_juegos/Polimotor/Rompecabezas','Rompecabezas del cuerpo','Armar el cuerpo humano arrastrando piezas según el nivel de edad.','rompecabeza.png','#f06747',1,1,'2026-09-09 16:58:39','2026-10-05 17:46:46'),
-('secuencia-de-movimiento',7,NULL,NULL,NULL,6,'catalogo_juegos/Polimotor/SecuenciaDeMovimiento','Secuencia de movimiento',NULL,'secuencia.png','#f49625',6,1,'2026-09-14 09:20:46','2026-10-05 17:49:30');
+insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`ruta`,`nombre`,`descripcion`,`imagen`,`color`,`orden`,`activo`,`created_at`,`updated_at`) values 
+('arrastrar-y-soltar-objetos',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/ArrastrarYSoltarObjetos','Arrastrar y soltar objetos',NULL,'arrastrar.png','#ee6c84',7,1,'2026-09-18 10:30:49','2026-10-05 17:51:01'),
+('busca-la-sombra',9,NULL,NULL,NULL,'catalogo_juegos/Multisensorial/BuscaLaSombra','Busca la sombra',NULL,NULL,'#14b8a6',10,1,'2026-09-22 15:27:38','2026-09-23 15:07:44'),
+('busca-las-diferencias',9,NULL,NULL,NULL,'catalogo_juegos/Multisensorial/BuscaLasDiferencias','Busca las diferencias',NULL,NULL,'#84cc16',12,1,'2026-09-23 10:22:02','2026-09-23 10:22:10'),
+('completa-la-figura',9,NULL,NULL,NULL,'catalogo_juegos/Multisensorial/CompletaLaFigura','Completa La Figura',NULL,NULL,'#a855f7',11,1,'2026-09-23 08:48:41','2026-09-23 08:48:41'),
+('coordinacion-visual',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/CoordinacionVisual','Coordinación visual','Guiar el cohete por los aros con precisión según el nivel de edad.','cordinacion.png','#73a7e3',7,1,'2026-09-21 14:30:00','2026-10-05 17:50:32'),
+('encuentra-el-color',9,NULL,NULL,NULL,'catalogo_juegos/Multisensorial/EncuentraElColor','Encuentra el Color',NULL,NULL,'#f97316',9,1,'2026-09-21 09:34:08','2026-09-23 15:07:43'),
+('encuentra-la-textura',9,NULL,NULL,NULL,'catalogo_juegos/Multisensorial/EncuentraLaTextura','Encuentra la textura',NULL,NULL,'#84cc16',14,1,'2026-10-13 16:31:13','2026-10-13 16:31:13'),
+('ensamblajes-sencillos',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/EnsamblajesSencillos','Ensamblajes sencillos','Armar el robot arrastrando piezas según el nivel de edad.','ensamblaje.png','#57b1a8',8,1,'2026-09-21 14:30:00','2026-10-05 17:51:17'),
+('juegos-de-precision',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/JuegosDePrecision','Juegos de precision',NULL,'precision.png','#e7a396',8,1,'2026-09-18 15:42:23','2026-10-05 17:51:34'),
+('laberintos-de-coordinacion',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/LaberintosDeCoordinacion','Laberintos de coordinacion',NULL,'laberinto.png','#ad92b1',5,1,'2026-09-12 08:48:03','2026-10-05 17:48:22'),
+('lateralidad',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/Lateralidad','Lateralidad','Discriminar derecha e izquierda tocando la parte del cuerpo indicada.','lateralidad.png','#a1b947',3,1,'2026-09-09 17:47:30','2026-10-05 17:47:38'),
+('memoria-corporal',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/MemoriaCorporal','Memoria Corporal',NULL,'memoria.png','#c46040',4,1,'2026-09-14 15:48:10','2026-10-05 17:47:58'),
+('memoria-visual',9,NULL,NULL,NULL,'catalogo_juegos/Multisensorial/MemoriaVisual','Memoria visual',NULL,NULL,'#f43f5e',13,1,'2026-10-05 10:16:39','2026-10-05 10:16:39'),
+('reconocimiento-de-partes-del-cuerpo',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/ReconocimientoDelCuerpo','Reconocimiento del cuerpo','Tocar las partes del cuerpo indicadas según el nivel de edad.','reconocimiento.png','#c64757',2,1,'2026-09-09 16:58:39','2026-10-05 17:52:01'),
+('rompecabezas-del-cuerpo',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/Rompecabezas','Rompecabezas del cuerpo','Armar el cuerpo humano arrastrando piezas según el nivel de edad.','rompecabeza.png','#f06747',1,1,'2026-09-09 16:58:39','2026-10-05 17:46:46'),
+('secuencia-de-movimiento',7,NULL,NULL,NULL,'catalogo_juegos/Polimotor/SecuenciaDeMovimiento','Secuencia de movimiento',NULL,'secuencia.png','#f49625',6,1,'2026-09-14 09:20:46','2026-10-05 17:49:30');
 
 /*Table structure for table `matriculas` */
 
@@ -1202,7 +1211,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `migrations` */
 
@@ -1265,7 +1274,8 @@ insert  into `migrations`(`id`,`migration`,`batch`) values
 (59,'2026_09_15_000002_seed_juegos_laberintos_y_secuencia',28),
 (60,'2026_10_06_000001_juegos_agregar_imagen',29),
 (61,'2026_10_06_000002_juegos_eliminar_icono',30),
-(62,'2026_10_06_000003_cola_sincronizacion_entidad_id_texto',31);
+(62,'2026_10_06_000003_cola_sincronizacion_entidad_id_texto',31),
+(63,'2026_10_14_000001_juegos_eliminar_tipo',32);
 
 /*Table structure for table `modulo_institucion` */
 
@@ -3253,7 +3263,7 @@ CREATE TABLE `registros_acceso` (
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=516 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=542 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `registros_acceso` */
 
@@ -3737,7 +3747,33 @@ insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) v
 (512,1,'127.0.0.1','multisensorial','2026-10-06 14:12:23','inicio_sesion'),
 (513,1,'127.0.0.1','multisensorial','2026-10-06 16:53:34','inicio_sesion'),
 (514,16,'127.0.0.1','multisensorial','2026-10-06 16:55:19','inicio_sesion'),
-(515,1,'127.0.0.1','multisensorial','2026-10-06 17:24:12','inicio_sesion');
+(515,1,'127.0.0.1','multisensorial','2026-10-06 17:24:12','inicio_sesion'),
+(516,1,'127.0.0.1','multisensorial','2026-10-07 08:50:45','inicio_sesion'),
+(517,16,'127.0.0.1','multisensorial','2026-10-07 08:51:10','inicio_sesion'),
+(518,1,'127.0.0.1','multisensorial','2026-10-07 08:51:39','inicio_sesion'),
+(519,1,'127.0.0.1','multisensorial','2026-10-07 11:11:36','inicio_sesion'),
+(520,1,'127.0.0.1','multisensorial','2026-10-07 15:05:53','inicio_sesion'),
+(521,1,'127.0.0.1','multisensorial','2026-10-08 08:03:11','inicio_sesion'),
+(522,1,'127.0.0.1','multisensorial','2026-10-08 14:13:16','inicio_sesion'),
+(523,1,'127.0.0.1','multisensorial','2026-10-09 09:16:31','inicio_sesion'),
+(524,1,'127.0.0.1','multisensorial','2026-10-09 09:18:36','inicio_sesion'),
+(525,1,'127.0.0.1','multisensorial','2026-10-09 09:23:08','inicio_sesion'),
+(526,1,'127.0.0.1','multisensorial','2026-10-09 09:23:14','inicio_sesion'),
+(527,1,'127.0.0.1','multisensorial','2026-10-09 09:26:01','inicio_sesion'),
+(528,1,'127.0.0.1','multisensorial','2026-10-09 09:29:15','inicio_sesion'),
+(529,1,'127.0.0.1','multisensorial','2026-10-09 09:42:40','inicio_sesion'),
+(530,1,'127.0.0.1','multisensorial','2026-10-09 14:06:57','inicio_sesion'),
+(531,1,'127.0.0.1','multisensorial','2026-10-10 08:00:33','inicio_sesion'),
+(532,1,'127.0.0.1','multisensorial','2026-10-10 08:20:30','inicio_sesion'),
+(533,1,'127.0.0.1','multisensorial','2026-10-10 08:20:53','inicio_sesion'),
+(534,1,'127.0.0.1','multisensorial','2026-10-13 08:04:55','inicio_sesion'),
+(535,1,'127.0.0.1','multisensorial','2026-10-13 14:54:34','inicio_sesion'),
+(536,1,'127.0.0.1','multisensorial','2026-10-13 17:31:43','inicio_sesion'),
+(537,1,'127.0.0.1','multisensorial','2026-10-14 08:09:59','inicio_sesion'),
+(538,1,'127.0.0.1','multisensorial','2026-10-14 08:16:06','inicio_sesion'),
+(539,1,'127.0.0.1','multisensorial','2026-10-14 08:18:38','inicio_sesion'),
+(540,1,'127.0.0.1','multisensorial','2026-10-14 08:31:20','inicio_sesion'),
+(541,1,'127.0.0.1','multisensorial','2026-10-14 08:31:27','inicio_sesion');
 
 /*Table structure for table `resultados_bloque` */
 
@@ -3873,7 +3909,7 @@ CREATE TABLE `seguridad_logs` (
   KEY `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
   CONSTRAINT `seguridad_logs_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `seguridad_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=492 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=518 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `seguridad_logs` */
 
@@ -4366,7 +4402,33 @@ insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripci
 (488,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-06 14:12:23','2026-10-06 14:12:23'),
 (489,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-06 16:53:34','2026-10-06 16:53:34'),
 (490,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-06 16:55:19','2026-10-06 16:55:19'),
-(491,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-06 17:24:12','2026-10-06 17:24:12');
+(491,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-06 17:24:12','2026-10-06 17:24:12'),
+(492,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-07 08:50:45','2026-10-07 08:50:45'),
+(493,16,16,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-07 08:51:10','2026-10-07 08:51:10'),
+(494,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-07 08:51:39','2026-10-07 08:51:39'),
+(495,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-07 11:11:36','2026-10-07 11:11:36'),
+(496,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-07 15:05:53','2026-10-07 15:05:53'),
+(497,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-08 08:03:11','2026-10-08 08:03:11'),
+(498,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-08 14:13:16','2026-10-08 14:13:16'),
+(499,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-09 09:16:31','2026-10-09 09:16:31'),
+(500,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36','2026-10-09 09:18:36','2026-10-09 09:18:36'),
+(501,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-09 09:23:08','2026-10-09 09:23:08'),
+(502,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-09 09:23:14','2026-10-09 09:23:14'),
+(503,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-09 09:26:01','2026-10-09 09:26:01'),
+(504,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-09 09:29:15','2026-10-09 09:29:15'),
+(505,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-09 09:42:40','2026-10-09 09:42:40'),
+(506,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-09 14:06:57','2026-10-09 14:06:57'),
+(507,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-10 08:00:33','2026-10-10 08:00:33'),
+(508,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-10 08:20:30','2026-10-10 08:20:30'),
+(509,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-10 08:20:53','2026-10-10 08:20:53'),
+(510,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-13 08:04:55','2026-10-13 08:04:55'),
+(511,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-13 14:54:34','2026-10-13 14:54:34'),
+(512,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-13 17:31:43','2026-10-13 17:31:43'),
+(513,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-14 08:09:59','2026-10-14 08:09:59'),
+(514,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-14 08:16:06','2026-10-14 08:16:06'),
+(515,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36','2026-10-14 08:18:38','2026-10-14 08:18:38'),
+(516,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-14 08:31:20','2026-10-14 08:31:20'),
+(517,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-14 08:31:27','2026-10-14 08:31:27');
 
 /*Table structure for table `sesiones_experiencia` */
 
@@ -4528,37 +4590,6 @@ insert  into `tematicas`(`id`,`eje_id`,`nombre`,`competencia`,`referente_alterna
 (3,8,'Prueba docente',NULL,NULL,0,1,0,1,'activa',1,4,'2026-08-15 08:28:19','2026-08-18 15:12:47'),
 (7,10,'Identifica los colores',NULL,NULL,0,0,1,NULL,'activa',1,1,'2026-08-28 15:31:20','2026-08-29 09:31:01'),
 (8,11,'Rompecabezas del cuerpo humano',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-09-10 09:11:10','2026-09-10 09:11:10');
-
-/*Table structure for table `tipos_juegos` */
-
-DROP TABLE IF EXISTS `tipos_juegos`;
-
-CREATE TABLE `tipos_juegos` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `slug` varchar(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `activo` tinyint(1) NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `tipos_juegos_slug_unique` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-/*Data for the table `tipos_juegos` */
-
-insert  into `tipos_juegos`(`id`,`slug`,`nombre`,`descripcion`,`activo`,`created_at`,`updated_at`) values 
-(1,'rompecabezas','Rompecabezas','Juego para armar el cuerpo humano mediante piezas.',1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
-(2,'reconocimiento','Reconocimiento','Juego para reconocer e identificar las diferentes partes del cuerpo.',1,'2026-09-09 16:58:39','2026-09-09 16:58:39'),
-(3,'lateralidad','Lateralidad','Juego para trabajar la identificación de derecha e izquierda.',1,'2026-09-09 17:47:30','2026-09-09 17:47:30'),
-(4,'memoria','Memoria','Juego de memoria relacionado con las partes del cuerpo.',1,'2026-09-14 15:48:10','2026-09-14 15:48:10'),
-(5,'laberinto','Laberinto','Juego de recorrido mediante laberintos para trabajar la coordinación.',1,'2026-09-12 08:48:03','2026-09-12 08:48:03'),
-(6,'secuencia_movimiento','Secuencia de movimiento','Juego para ordenar y reconocer secuencias de movimientos.',1,'2026-09-14 09:20:46','2026-09-14 09:20:46'),
-(7,'precision','Precisión','Juego de coordinación visual y precisión de movimiento.',1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
-(8,'ensamblaje','Ensamblaje','Juego para armar un robot mediante piezas sencillas.',1,'2026-09-21 14:30:00','2026-09-21 14:30:00'),
-(9,'arrastrar','Arrastrar',NULL,1,'2026-09-21 16:57:55','2026-09-21 16:57:55'),
-(10,'encuentra_color','Encuentra el color','Juego para reconocer e identificar colores en objetos.',1,'2026-09-22 14:44:26','2026-09-22 14:44:26'),
-(11,'busca_sombra','Busca la sombra','Juego para relacionar un objeto con su sombra por la forma.',1,'2026-09-22 15:38:20','2026-09-22 15:38:20');
 
 /*Table structure for table `users` */
 

@@ -88,7 +88,8 @@
 
     /**
      * Resuelve un nivel desde edad numérica, etiqueta o id.
-     * Buckets por etiqueta: ≤3 → "3 años", 4 → "4 años", ≥5 → "5-6 años".
+     * Primero un rango que contenga la edad ("3-4 años", "5-6 años").
+     * Si no hay: ≤3 → "3 años", 4 → "4 años", ≥5 → "5-6 años".
      * (Los id de nivel pueden ser conteos de piezas, no la edad.)
      */
     function resolverNivel(niveles, edad) {
@@ -109,6 +110,11 @@
         // Edad numérica → buckets por etiqueta (los id pueden ser # de piezas, no la edad).
         const num = parseInt(raw, 10);
         if (isFinite(num) && String(num) === raw.replace(/\s+/g, "")) {
+            const porRango = lista.find(function (n) {
+                const m = /^(\d+)\s*-\s*(\d+)/.exec(String(n.edad || "").trim());
+                return !!m && num >= parseInt(m[1], 10) && num <= parseInt(m[2], 10);
+            });
+            if (porRango) return porRango;
             if (num <= 3) {
                 return porEtiquetaEdad(lista, function (e) { return e.indexOf("3") === 0; })
                     || lista.find(function (n) { return String(n.id) === "3"; })

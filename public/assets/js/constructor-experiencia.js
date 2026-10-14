@@ -665,7 +665,6 @@
         const imagenUrl = j.imagen_url || '';
         const color = j.color || '#64748b';
         const cadena = j.cadena || {};
-        const tipoLabel = j.tipo_label || j.tipo || '';
         const descripcion = (j.descripcion || '').trim();
 
         const badges = [];
@@ -680,9 +679,6 @@
         }
         if (cadena.tematica_nombre) {
             badges.push(`<span class="stu-badge">${escapar(cadena.tematica_nombre)}</span>`);
-        }
-        if (tipoLabel) {
-            badges.push(`<span class="stu-badge stu-badge--apoyo">${escapar(tipoLabel)}</span>`);
         }
 
         const badgesHtml = badges.length
@@ -705,7 +701,6 @@
                 </div>
                 <div class="student-identity">
                     <h5>${escapar(j.nombre || 'Sin nombre')}</h5>
-                    <small>${escapar(tipoLabel)}</small>
                 </div>
             </div>
             ${badgesHtml}

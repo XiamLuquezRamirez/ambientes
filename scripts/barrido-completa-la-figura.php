@@ -3,8 +3,6 @@
 /**
  * Barrido: Completa La Figura (Multisensorial).
  * Uso: php scripts/barrido-completa-la-figura.php
- *
- * No modifica tipo_juego_id (debe permanecer reconocimiento).
  */
 
 require __DIR__.'/../vendor/autoload.php';
@@ -12,7 +10,6 @@ $app = require __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use App\Models\TiposJuego;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -43,7 +40,6 @@ function warn(string $msg): void
 
 $rel = 'Multisensorial/CompletaLaFigura';
 $dir = public_path('catalogo_juegos/'.$rel);
-$tipoEsperado = 'reconocimiento';
 
 echo "=== COMPLETA LA FIGURA: filesystem ===\n";
 
@@ -81,7 +77,8 @@ foreach ([
     'pantalla-inicio',
     'texto_voz.js',
     'id="zona-piezas"',
-    'id="figura-escena"',
+    'id="figura"',
+    'id="escenario"',
     'sweetalert',
 ] as $needle) {
     if (! str_contains($html, $needle)) {
@@ -94,8 +91,8 @@ foreach ([
 foreach ([
     'TextoVoz',
     'confirmarNivel',
-    'iniciarConsigna',
-    'resolverToque',
+    'iniciarReto',
+    'elegir',
     'pintarPiezas',
     'pintarFigura',
     'pednia:perfil',
@@ -107,7 +104,7 @@ foreach ([
     }
 }
 
-foreach (['.zona-piezas', '.pieza', '.figura-escena', '.pieza.is-acierto'] as $needle) {
+foreach (['.zona-piezas', '.pieza', '.figura', '.escenario'] as $needle) {
     if (! str_contains($css, $needle)) {
         fail("style.css sin '{$needle}'");
     } else {
@@ -123,32 +120,19 @@ if (! is_array($config)) {
     goto resumen;
 }
 
-$figuras = $config['figuras'] ?? [];
 $piezas = $config['piezas'] ?? [];
 
-foreach ($figuras as $id => $meta) {
-    foreach (['base', 'completa'] as $campo) {
-        $relImg = $meta[$campo] ?? '';
-        if ($relImg === '' || ! is_file($dir.'/'.ltrim($relImg, '/'))) {
-            fail("Falta figura {$id}.{$campo}: {$relImg}");
-        } else {
-            ok("Figura {$id}.{$campo}");
-        }
+$imagenesConfig = [];
+array_walk_recursive($config, function ($v) use (&$imagenesConfig) {
+    if (is_string($v) && preg_match('#^img/.+\.(svg|png|gif|jpe?g|webp)$#i', $v)) {
+        $imagenesConfig[$v] = true;
     }
-    $pc = $meta['piezaCorrecta'] ?? '';
-    if ($pc === '' || ! isset($piezas[$pc])) {
-        fail("Figura {$id}: piezaCorrecta inválida");
+});
+foreach (array_keys($imagenesConfig) as $relImg) {
+    if (! is_file($dir.'/'.$relImg)) {
+        fail("Falta imagen {$relImg}");
     } else {
-        ok("Figura {$id} → pieza {$pc}");
-    }
-}
-
-foreach ($piezas as $id => $meta) {
-    $relImg = $meta['img'] ?? '';
-    if ($relImg === '' || ! is_file($dir.'/'.ltrim($relImg, '/'))) {
-        fail("Falta pieza {$id}: {$relImg}");
-    } else {
-        ok("Pieza {$id}");
+        ok("Imagen {$relImg}");
     }
 }
 
@@ -179,9 +163,9 @@ if (! empty($config['stub'])) {
     ok('config sin stub');
 }
 
+// Documento: dos grupos (3-4 y 5-6 años).
 $esperados = [
     '3' => ['retos' => 3, 'opciones' => 3],
-    '4' => ['retos' => 3, 'opciones' => 4],
     '5' => ['retos' => 3, 'opciones' => 5],
 ];
 
@@ -191,7 +175,7 @@ foreach ($config['niveles'] ?? [] as $nivel) {
     $ids[] = $id;
     $esp = $esperados[$id] ?? null;
     if ($esp === null) {
-        warn("Nivel id={$id} fuera de 3/4/5");
+        fail("Nivel id={$id} fuera de 3 (3-4 años) / 5 (5-6 años)");
         continue;
     }
     $retos = $nivel['retos'] ?? [];
@@ -201,17 +185,13 @@ foreach ($config['niveles'] ?? [] as $nivel) {
         ok("Nivel {$id}: {$esp['retos']} retos");
     }
     foreach ($retos as $ri => $reto) {
-        $fig = $reto['figura'] ?? '';
+        $fig = $reto['figura'] ?? "#{$ri}";
         $ops = $reto['opciones'] ?? [];
-        if (! isset($figuras[$fig])) {
-            fail("Nivel {$id} reto {$ri}: figura desconocida {$fig}");
-            continue;
-        }
         if (count($ops) !== $esp['opciones']) {
             fail("Nivel {$id} reto {$fig}: ".count($ops)." opciones, esperado {$esp['opciones']}");
         }
-        $correcta = $figuras[$fig]['piezaCorrecta'] ?? '';
-        if (! in_array($correcta, $ops, true)) {
+        $correcta = $reto['correcta'] ?? '';
+        if ($correcta === '' || ! in_array($correcta, $ops, true)) {
             fail("Nivel {$id} reto {$fig}: la pieza correcta no está en opciones");
         }
         foreach ($ops as $p) {
@@ -238,6 +218,16 @@ if (! is_array($conv) || count($conv) < 1) {
 
 require __DIR__.'/barrido-multisensorial-shell.php';
 
+echo "\n=== COMPLETA LA FIGURA: reglas (node) ===\n";
+
+exec('node '.escapeshellarg(__DIR__.'/probar-completa-figura.js').' 2>&1', $salidaNode, $codigoNode);
+$ultimaNode = trim((string) end($salidaNode));
+if ($codigoNode !== 0) {
+    fail("probar-completa-figura.js: {$ultimaNode}");
+} else {
+    ok("probar-completa-figura.js: {$ultimaNode}");
+}
+
 echo "\n=== COMPLETA LA FIGURA: BD (sin cambiar tipo) ===\n";
 
 if (! Schema::hasTable('juegos')) {
@@ -253,17 +243,6 @@ if (! $fila) {
 if (! $fila) {
     fail('No hay fila en juegos para CompletaLaFigura (no se crea desde el barrido)');
     goto resumen;
-}
-
-$tipoSlug = null;
-if (! empty($fila->tipo_juego_id) && Schema::hasTable('tipos_juegos')) {
-    $tipoSlug = TiposJuego::query()->whereKey($fila->tipo_juego_id)->value('slug');
-}
-
-if ($tipoSlug !== $tipoEsperado) {
-    fail('BD tipo='.($tipoSlug ?: 'null').", esperado {$tipoEsperado} (no se modifica)");
-} else {
-    ok("BD tipo={$tipoSlug} intacto (id={$fila->tipo_juego_id})");
 }
 
 ok("BD slug={$fila->slug} activo=".((int) $fila->activo));
