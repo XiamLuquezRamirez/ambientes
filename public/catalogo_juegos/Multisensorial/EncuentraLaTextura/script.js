@@ -265,7 +265,7 @@
         }
 
         window.INTRO_CONFIG.dialogo.lineas = conversacion.map(function (linea) {
-            const indice = Number(linea.pj);
+            const indice = Number(linea.personaje);
             const def = personajesCfg[isFinite(indice) ? indice : 0] || personajesCfg[0] || {};
             const id = def.id || (indice === 1 ? "zoe" : "zeus");
             const nombre = (introConfig && introConfig.personajes && introConfig.personajes[indice] && introConfig.personajes[indice].nombre)

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240" preserveAspectRatio="xMidYMid slice">
+<defs><linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74c0fc"/><stop offset="1" stop-color="#d0ebff"/></linearGradient></defs>
+<rect width="320" height="240" fill="url(#cielo)"/>
+<circle cx="258" cy="50" r="24" fill="#ffd43b"/>
+<g fill="#fff" opacity="0.9"><ellipse cx="70" cy="44" rx="30" ry="11"/><ellipse cx="92" cy="36" rx="20" ry="11"/><ellipse cx="190" cy="66" rx="24" ry="9"/></g>
+<path d="M-10 190 L90 70 L150 140 L200 92 L330 190 Z" fill="#748ffc"/>
+<path d="M90 70 L68 96 L80 92 L92 102 L104 90 L114 100 Z" fill="#fff"/>
+<path d="M200 92 L184 108 L196 106 L206 114 L214 104 Z" fill="#fff"/>
+<path d="M-10 200 C60 176 120 186 170 196 C220 206 280 184 330 192 L330 240 L-10 240 Z" fill="#69db7c"/>
+<path d="M-10 222 C80 204 200 216 330 210 L330 240 L-10 240 Z" fill="#40c057"/>
+<g fill="#2b8a3e"><path d="M40 206 L52 176 L64 206 Z"/><path d="M262 202 L274 170 L286 202 Z"/></g>
+</svg>

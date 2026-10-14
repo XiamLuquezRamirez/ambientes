@@ -777,7 +777,13 @@
                 if (!gesto || gesto.id !== ev.pointerId) return;
                 const g = gesto;
                 gesto = null;
-                if (!g.arrastre) responder(punto(ev));
+                const p = punto(ev);
+                if (!g.arrastre) {
+                    responder(p);
+                } else if (reto && reto.soltarLupa && fase === "elegir" &&
+                    L.objetivoEn(p, escena, reto, encontrados, nivelElegido.minimo)) {
+                    responder(p);
+                }
             });
             frame.addEventListener("pointercancel", function () { gesto = null; });
         });

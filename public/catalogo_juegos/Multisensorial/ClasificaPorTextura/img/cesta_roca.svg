@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" width="240" height="180">
+<defs>
+<linearGradient id="cuerpo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ce99a"/><stop offset="1" stop-color="#2f9e44"/></linearGradient>
+<pattern id="grano" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.8" fill="#1b5e20" opacity="0.45"/><circle cx="9" cy="8" r="1.4" fill="#fff" opacity="0.35"/></pattern>
+</defs>
+<path d="M22 62 L218 62 L196 168 C160 176 80 176 44 168 Z" fill="url(#cuerpo)" stroke="#2b8a3e" stroke-width="5" stroke-linejoin="round"/>
+<path d="M26 66 L214 66 L196 164 C160 172 80 172 44 164 Z" fill="url(#grano)"/>
+<g fill="#868e96" stroke="#495057" stroke-width="3" stroke-linejoin="round">
+<polygon points="14,70 22,50 46,46 58,60 50,74"/><polygon points="50,74 58,56 84,50 98,62 88,76"/><polygon points="88,76 96,54 124,48 140,60 128,76"/><polygon points="128,76 138,56 164,50 178,62 168,76"/><polygon points="168,76 178,54 204,48 226,60 220,74"/>
+</g>
+<g fill="#5c636a"><circle cx="32" cy="62" r="2.5"/><circle cx="72" cy="64" r="3"/><circle cx="112" cy="62" r="2.5"/><circle cx="152" cy="64" r="3"/><circle cx="196" cy="62" r="2.5"/></g>
+<g stroke="#1b5e20" stroke-width="3" fill="none" opacity="0.5"><path d="M70 100 l10 12 l-6 14"/><path d="M160 104 l-8 12 l8 12"/><path d="M116 120 l8 10"/></g>
+</svg>

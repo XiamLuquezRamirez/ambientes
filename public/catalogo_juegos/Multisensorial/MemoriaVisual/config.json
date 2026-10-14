@@ -60,7 +60,7 @@
     "objetos": {
         "manzana": { "nombre": "Manzana", "genero": "f", "img": "img/manzana.png" },
         "pelota": { "nombre": "Pelota", "genero": "f", "img": "img/pelota.svg" },
-        "carro": { "nombre": "Carro", "genero": "m", "img": "img/carro.png" },
+        "carro": { "nombre": "Carro", "genero": "m", "img": "img/carro.png", "sonido": "pito" },
         "oso": { "nombre": "Oso de peluche", "hablado": "oso", "genero": "m", "img": "img/oso.png" },
         "estrella": { "nombre": "Estrella", "genero": "f", "img": "img/estrella.png" },
         "pez": { "nombre": "Pez", "genero": "m", "img": "img/pez.png" },
@@ -296,6 +296,7 @@
             "pista": "lupa",
             "cierre": "¡Eres un Superagente de la Memoria Visual!",
             "premio": { "tipo": "diploma", "img": "img/diploma_superagente.svg" },
+            "escenaCierre": "cajaFuerte",
             "demo": { "objetos": ["sol", "flor", "pez"], "nuevo": "estrella" },
             "conjuntos": {
                 "tesoros": { "grupo": "tesoros", "cantidad": 5 }

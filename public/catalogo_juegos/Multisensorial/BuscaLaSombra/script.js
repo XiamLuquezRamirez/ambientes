@@ -356,6 +356,7 @@
         if (!pantalla || pantalla.hidden || pantalla.classList.contains("is-out")) return;
         if (btn) btn.disabled = true;
         TextoVoz.desbloquear();
+        if (window.BuscaSombraSfx) BuscaSombraSfx.desbloquear();
         asegurarAudioFondo();
         sincronizarDialogoIntro3d();
         TextoVoz.precargar();
@@ -485,8 +486,13 @@
 
     function efecto(nombre, respaldo) {
         const a = gameConfig.audios || {};
-        const ruta = (a.efectos && a.efectos[nombre]) || (respaldo ? a[respaldo] : "");
-        if (ruta) reproducirAudio(ruta, 0.85, false);
+        const archivo = a.efectos && a.efectos[nombre];
+        if (archivo) {
+            reproducirAudio(archivo, 0.85, false);
+            return;
+        }
+        if (window.BuscaSombraSfx && BuscaSombraSfx.sonar(nombre)) return;
+        if (respaldo && a[respaldo]) reproducirAudio(a[respaldo], 0.85, false);
     }
 
     function marcarHablando(voz) {
