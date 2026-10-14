@@ -540,7 +540,7 @@ body:has(.selector-aula) .kiosco-fs-btn {
 
 .aula-confirma__btn img {
     display: block;
-    height: 18vh;
+    height: 120px;
     width: auto;
     pointer-events: none;
 }

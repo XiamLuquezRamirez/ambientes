@@ -134,11 +134,11 @@
                 </button>
             </div>
             <div class="aula-confirma__acciones">
-                <button type="button" class="aula-confirma__btn" id="aulaConfirmaOk" aria-label="Confirmar">
-                    <img src="{{ asset('assets/images/selector-aula/confirmar.png') }}?v={{ @filemtime(public_path('assets/images/selector-aula/confirmar.png')) }}" alt="">
-                </button>
                 <button type="button" class="aula-confirma__btn" id="aulaConfirmaNo" aria-label="Cancelar">
                     <img src="{{ asset('assets/images/selector-aula/cancelar.png') }}?v={{ @filemtime(public_path('assets/images/selector-aula/cancelar.png')) }}" alt="">
+                </button>
+                <button type="button" class="aula-confirma__btn" id="aulaConfirmaOk" aria-label="Confirmar">
+                    <img src="{{ asset('assets/images/selector-aula/confirmar.png') }}?v={{ @filemtime(public_path('assets/images/selector-aula/confirmar.png')) }}" alt="">
                 </button>
             </div>
         </div>
