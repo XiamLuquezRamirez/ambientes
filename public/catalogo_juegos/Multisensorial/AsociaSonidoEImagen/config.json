@@ -1,0 +1,180 @@
+{
+  "nombre": "Asocia sonido e imagen",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha el sonido y luego toca su imagen.",
+    "demostracionAcierto": "¡Así se une el sonido con su imagen!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      { "personaje": 1, "texto": "¡Escucha y mira muy bien!" },
+      { "personaje": 0, "texto": "¡Une el sonido con su imagen!" }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "sonido": "mugido",
+    "correcto": "vaca",
+    "opciones": ["gallo", "vaca"]
+  },
+  "elementos": {
+    "bicicleta": { "img": "img/bicicleta.svg", "nombre": "Bicicleta" },
+    "telefono": { "img": "img/telefono.svg", "nombre": "Teléfono" },
+    "reloj": { "img": "img/reloj.svg", "nombre": "Reloj", "fotogramas": ["img/reloj_b.svg"] },
+    "avion": { "img": "img/avion.svg", "nombre": "Avión" },
+    "aspiradora": { "img": "img/aspiradora.svg", "nombre": "Aspiradora" },
+    "tren": { "img": "img/tren.svg", "nombre": "Tren" },
+    "ambulancia": { "img": "img/ambulancia.svg", "nombre": "Ambulancia", "fotogramas": ["img/ambulancia_b.svg"] },
+    "puerta": { "img": "img/puerta.svg", "nombre": "Puerta", "fotogramas": ["img/puerta_abierta.svg"], "quedaAbierta": true },
+    "ventana": { "img": "img/ventana.svg", "nombre": "Ventana" },
+    "cajon": { "img": "img/cajon.svg", "nombre": "Cajón" },
+    "secador": { "img": "img/secador.svg", "nombre": "Secador de cabello" },
+    "licuadora": { "img": "img/licuadora.svg", "nombre": "Licuadora" },
+    "ventilador": { "img": "img/ventilador.svg", "nombre": "Ventilador" },
+    "camion": { "img": "img/camion.svg", "nombre": "Camión" },
+    "motocicleta": { "img": "img/motocicleta.svg", "nombre": "Motocicleta" },
+    "aplaudiendo": { "img": "img/aplaudiendo.svg", "nombre": "Personas aplaudiendo", "fotogramas": ["img/aplaudiendo_b.svg"] },
+    "corriendo": { "img": "img/corriendo.svg", "nombre": "Persona corriendo" },
+    "saltando": { "img": "img/saltando.svg", "nombre": "Persona saltando" },
+    "durmiendo": { "img": "img/durmiendo.svg", "nombre": "Persona durmiendo" },
+    "pluma": { "img": "img/pluma.svg", "nombre": "Pluma", "fotogramas": ["img/pluma_abierta.svg"], "quedaAbierta": true },
+    "ducha": { "img": "img/ducha.svg", "nombre": "Ducha" },
+    "fuente": { "img": "img/fuente.svg", "nombre": "Fuente" },
+    "lavadora": { "img": "img/lavadora.svg", "nombre": "Lavadora" },
+    "regadera": { "img": "img/regadera.svg", "nombre": "Regadera" },
+    "vaca": { "img": "img/vaca.svg", "nombre": "Vaca" },
+    "gallo": { "img": "img/gallo.svg", "nombre": "Gallo" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El álbum de los sonidos",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Escucha y mira muy bien!" },
+        { "personaje": 0, "texto": "¡Une el sonido con su imagen!" }
+      ],
+      "retos": [
+        {
+          "id": "que-suena",
+          "titulo": "¿Qué suena?",
+          "sonido": "timbre",
+          "opciones": ["bicicleta", "telefono", "reloj"],
+          "correcto": "bicicleta",
+          "acierto": { "animacion": "salta", "repetir": "completo", "efecto": "celebracion", "voz": "zoe", "texto": "¡Sí! ¡Es la bicicleta!" },
+          "error": { "voz": "zeus", "texto": "¡Escucha otra vez!" }
+        },
+        {
+          "id": "que-objeto-suena",
+          "titulo": "¿Qué objeto suena?",
+          "sonido": "telefono",
+          "opciones": ["telefono", "avion", "aspiradora"],
+          "correcto": "telefono",
+          "acierto": { "animacion": "vibra", "repetir": "completo", "voz": "zoe", "texto": "¡Lo encontraste!" }
+        },
+        {
+          "id": "escucha-y-asocia",
+          "titulo": "Escucha y asocia",
+          "sonido": "despertador",
+          "opciones": ["reloj", "bicicleta", "tren"],
+          "correcto": "reloj",
+          "acierto": { "animacion": "fotogramas", "repetir": "breve", "voz": "zeus", "texto": "¡Muy bien!" }
+        },
+        {
+          "id": "sonido-de-viaje",
+          "titulo": "Un sonido de viaje",
+          "sonido": "avion",
+          "opciones": ["avion", "tren", "ambulancia"],
+          "correcto": "avion",
+          "acierto": { "animacion": "despega", "repetir": "breve", "efecto": "recompensa", "voz": "zoe", "texto": "¡Correcto, es un avión!" }
+        },
+        {
+          "id": "que-escuchaste",
+          "titulo": "¿Qué escuchaste?",
+          "sonido": "tren",
+          "opciones": ["tren", "telefono", "reloj"],
+          "correcto": "tren",
+          "acierto": { "animacion": "avanza", "repetir": "completo", "efecto": "celebracion", "voz": "zeus", "texto": "¡Muy bien, lo reconociste!" }
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Escuchaste y encontraste las imágenes!" }
+      ],
+      "insignia": { "img": "img/insignia_experto.svg", "nombre": "Experto en asociar sonidos" }
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El laboratorio de las asociaciones",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Tenemos nuevos sonidos por descubrir!" },
+        { "personaje": 0, "texto": "¡Escucha y encuentra su imagen!" }
+      ],
+      "retos": [
+        {
+          "id": "sonido-y-objeto",
+          "titulo": "Sonido y objeto",
+          "sonido": "puerta",
+          "opciones": ["puerta", "ventana", "cajon", "telefono"],
+          "correcto": "puerta",
+          "acierto": { "animacion": "fotogramas", "repetir": "completo", "voz": "zoe", "texto": "¡Encontraste la imagen!" }
+        },
+        {
+          "id": "sonido-de-maquina",
+          "titulo": "Sonido de una máquina",
+          "sonido": "aspiradora",
+          "opciones": ["aspiradora", "secador", "licuadora", "ventilador"],
+          "correcto": "aspiradora",
+          "acierto": { "animacion": "limpia", "voz": "zeus", "texto": "¡Muy buen oído!" }
+        },
+        {
+          "id": "sonido-de-transporte",
+          "titulo": "Sonido de transporte",
+          "sonido": "sirena",
+          "opciones": ["ambulancia", "camion", "avion", "tren", "motocicleta"],
+          "correcto": "ambulancia",
+          "acierto": { "animacion": "fotogramas", "repetir": "breve", "voz": "zoe", "texto": "¡Sí! ¡Es la ambulancia!" }
+        },
+        {
+          "id": "sonido-de-accion",
+          "titulo": "Sonido de una acción",
+          "sonido": "aplausos",
+          "opciones": ["aplaudiendo", "corriendo", "saltando", "durmiendo"],
+          "correcto": "aplaudiendo",
+          "acierto": { "animacion": "fotogramas", "repetir": "breve", "voz": "zeus", "texto": "¡Lo descubriste!" }
+        },
+        {
+          "id": "sonido-del-agua",
+          "titulo": "Sonido del agua",
+          "sonido": "grifo",
+          "opciones": ["pluma", "ducha", "fuente", "lavadora", "regadera"],
+          "correcto": "pluma",
+          "acierto": { "animacion": "fotogramas", "repetir": "completo", "especial": true, "efecto": "celebracion", "voz": "zoe", "texto": "¡Lo asociaste correctamente!" }
+        },
+        {
+          "id": "gran-asociacion",
+          "titulo": "La gran asociación",
+          "sonido": "vibracion",
+          "opciones": ["telefono", "reloj", "bicicleta", "aspiradora", "puerta"],
+          "correcto": "telefono",
+          "acierto": { "animacion": "vibra", "repetir": "completo", "celebran": true, "efecto": "victoria" }
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Escuchaste con mucha atención!" },
+        { "voz": "zeus", "texto": "¡Y encontraste cada imagen!" }
+      ],
+      "insignia": { "img": "img/insignia_maestro.svg", "nombre": "Maestro de las asociaciones sonoras" }
+    }
+  ]
+}
