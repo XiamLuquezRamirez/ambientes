@@ -1,0 +1,179 @@
+{
+  "nombre": "Descubre el objeto",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha la pista, toca el objeto y llévalo hasta la cerradura del cofre.",
+    "demostracionAcierto": "¡Así se descubre el objeto escondido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Hoy vamos a descubrir objetos escondidos usando pistas de textura!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Escucha cada pista con atención y elige el objeto correcto."
+      },
+      {
+        "personaje": 1,
+        "texto": "Escucha, observa y descubre. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3"
+  },
+  "demo": {
+    "objeto": "pluma"
+  },
+  "objetos": {
+    "oso": { "img": "img/oso_peluche.svg", "nombre": "Oso de peluche", "sonido": "fluff" },
+    "peluche": { "img": "img/oso_peluche.svg", "nombre": "Peluche", "sonido": "fluff" },
+    "gato": { "img": "img/gato.svg", "nombre": "Gato", "sonido": "fluff" },
+    "piedra": { "img": "img/piedra.svg", "nombre": "Piedra", "sonido": "toc" },
+    "lija": { "img": "img/lija.svg", "nombre": "Lija", "sonido": "rasc" },
+    "corteza": { "img": "img/corteza.svg", "nombre": "Corteza", "sonido": "croc" },
+    "seda": { "img": "img/seda.svg", "nombre": "Seda", "sonido": "seda" },
+    "vidrio": { "img": "img/vidrio.svg", "nombre": "Vidrio", "sonido": "ting" },
+    "algodon": { "img": "img/algodon.svg", "nombre": "Algodón", "sonido": "fluff" },
+    "copo_algodon": { "img": "img/algodon.svg", "nombre": "Copo de algodón", "sonido": "fluff" },
+    "esponja": { "img": "img/esponja.svg", "nombre": "Esponja", "sonido": "squish" },
+    "madera_lisa": { "img": "img/madera_lisa.svg", "nombre": "Madera lisa", "sonido": "tap" },
+    "madera": { "img": "img/madera.svg", "nombre": "Madera", "sonido": "tap" },
+    "carton": { "img": "img/carton.svg", "nombre": "Cartón", "sonido": "tap" },
+    "pluma": { "img": "img/pluma.svg", "nombre": "Pluma", "sonido": "fluff" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "La Caja Misteriosa de Texturas",
+      "escenario": "cofre",
+      "retos": [
+        {
+          "id": "oso",
+          "tipo": "cofre",
+          "titulo": "¡Descubre el objeto escondido!",
+          "ambiente": "tiembla",
+          "opciones": ["oso", "gato", "piedra", "lija"],
+          "correcto": "oso",
+          "pista": { "voz": "zoe", "texto": "¡Escucha con atención! Es suave, tiene pelusitas y es un juguete. ¿Qué objeto es?" },
+          "acierto": { "efecto": "salto", "sonido": "tadaading", "voz": "zoe", "texto": "¡Excelente! Descubriste el oso de peluche." },
+          "errores": [
+            { "objetos": ["gato"], "efecto": "maulla", "sonido": "miau", "voz": "zeus", "texto": "El gatito tiene pelo y es suave, ¡pero es un animalito vivo, no un juguete! Escucha u observa nuevamente. ¡Inténtalo otra vez!" },
+            { "objetos": ["piedra", "lija"], "efecto": "toctoc", "sonido": "toctoc", "voz": "zeus", "texto": "Ese objeto no es suave... Observa nuevamente. ¡Inténtalo otra vez!" }
+          ]
+        },
+        {
+          "id": "corteza",
+          "tipo": "cofre",
+          "titulo": "¡Descubre el objeto escondido!",
+          "ambiente": "hojas",
+          "opciones": ["corteza", "seda", "vidrio", "algodon"],
+          "correcto": "corteza",
+          "pista": { "voz": "zeus", "texto": "¡Abre bien las orejitas! Es áspera y proviene del tronco de un árbol. ¿Qué objeto es?" },
+          "acierto": { "efecto": "hojitas", "sonido": "crocyay", "voz": "zeus", "texto": "¡Excelente! Descubriste la corteza." },
+          "errores": [
+            { "objetos": ["seda", "algodon"], "efecto": "grave", "sonido": "grave", "voz": "zoe", "texto": "¡Eso es muy suavecito! La pista dice que es áspera. ¡Inténtalo otra vez!" },
+            { "objetos": ["vidrio"], "voz": "zoe", "texto": "El vidrio es liso, no áspero. Escucha u observa nuevamente. ¡Inténtalo otra vez!" }
+          ]
+        },
+        {
+          "id": "vidrio",
+          "tipo": "cofre",
+          "titulo": "¡Descubre el objeto escondido!",
+          "ambiente": "reflejos",
+          "opciones": ["vidrio", "lija", "peluche", "esponja"],
+          "correcto": "vidrio",
+          "pista": { "voz": "zoe", "texto": "¡Última pista del cofre! Es liso, transparente y duro. ¿Qué objeto es?" },
+          "acierto": { "efecto": "cristal", "sonido": "chimeglimmer", "voz": "zoe", "texto": "¡Excelente! Descubriste el vidrio." },
+          "errores": [
+            { "objetos": ["lija"], "efecto": "raspa", "sonido": "raspa", "voz": "zeus", "texto": "La lija es áspera y no se puede ver a través de ella. ¡Inténtalo otra vez!" },
+            { "objetos": ["peluche", "esponja"], "voz": "zeus", "texto": "Buscamos algo duro y liso como el cristal. Escucha u observa nuevamente. ¡Inténtalo otra vez!" }
+          ]
+        }
+      ],
+      "cierreEscena": { "tipo": "galeria", "titulo": "La gran galería de hallazgos" },
+      "cierre": { "voz": "zoe", "texto": "¡Excelente! Usaste las pistas de textura para descubrir los objetos." },
+      "premio": { "titulo": "Medalla", "nombre": "Gran Detective de las Texturas", "icono": "fa-medal", "tipo": "medalla" }
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El Radar del Detective Sensorial",
+      "escenario": "radar",
+      "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha la pista, toca el objeto y llévalo hasta el radar.",
+      "luces": [
+        { "id": "textura", "nombre": "Textura", "icono": "fa-hand-pointer" },
+        { "id": "propiedad", "nombre": "Propiedad/origen", "icono": "fa-seedling" },
+        { "id": "uso", "nombre": "Uso/función", "icono": "fa-gear" }
+      ],
+      "retos": [
+        {
+          "id": "oso",
+          "tipo": "radar",
+          "titulo": "Descifrando la pista del oso de peluche",
+          "opciones": ["oso", "copo_algodon", "piedra", "lija"],
+          "correcto": "oso",
+          "pista": {
+            "voz": "zoe",
+            "partes": [
+              { "texto": "¡Atención, Detective! Primera pista: es suave,", "luz": "textura", "valor": "Suave" },
+              { "texto": "esponjoso", "luz": "propiedad", "valor": "Esponjoso" },
+              { "texto": "y sirve para abrazar.", "luz": "uso", "valor": "Sirve para abrazar" },
+              { "texto": "¿Qué objeto es?" }
+            ]
+          },
+          "acierto": { "efecto": "abrazo", "sonido": "triunfal", "voz": "zoe", "texto": "¡Excelente! Descubriste el oso de peluche." },
+          "errores": [
+            { "objetos": ["copo_algodon"], "radar": ["ok", "ok", "casi"], "voz": "zeus", "texto": "¡Cerca! Es suave y esponjoso, pero recuerda la última pista: ¡sirve para abrazar como un juguete! Escucha u observa nuevamente. ¡Inténtalo otra vez!" },
+            { "otros": true, "voz": "zeus", "texto": "Este no parece ser suave y esponjoso, sigue buscando." }
+          ]
+        },
+        {
+          "id": "corteza",
+          "tipo": "radar",
+          "titulo": "Descifrando la pista de la corteza",
+          "opciones": ["corteza", "madera_lisa", "carton", "seda", "vidrio"],
+          "correcto": "corteza",
+          "pista": {
+            "voz": "zeus",
+            "partes": [
+              { "texto": "Segunda pista del radar: es áspera,", "luz": "textura", "valor": "Áspera" },
+              { "texto": "natural", "luz": "propiedad", "valor": "Natural" },
+              { "texto": "y cubre el tronco del árbol.", "luz": "uso", "valor": "Cubre el tronco" },
+              { "texto": "¿Qué objeto es?" }
+            ]
+          },
+          "acierto": { "efecto": "hojasMagicas", "sonido": "crocleaf", "voz": "zeus", "texto": "¡Excelente! Descubriste la corteza." },
+          "errores": [
+            { "objetos": ["madera_lisa", "carton"], "voz": "zoe", "texto": "Tienen relación con los árboles, pero busca la capa áspera que está por FUERA del tronco. ¡Inténtalo otra vez!" },
+            { "otros": true, "voz": "zoe", "texto": "Sigue intentando, este no parece que sea el objeto que estamos buscando." }
+          ]
+        },
+        {
+          "id": "ventana",
+          "tipo": "limpieza",
+          "titulo": "Laboratorio de limpieza y revelado táctil",
+          "opciones": ["piedra", "madera", "vidrio"],
+          "correcto": "vidrio",
+          "consigna": { "voz": "zoe", "texto": "Este objeto es liso y duro. Limpia el panel opaco frotando con tu dedo para descubrir qué hay detrás y comprobar si es transparente." },
+          "limpiar": { "sonido": "schwik", "revelado": "glimmer", "umbral": 0.7 },
+          "pregunta": { "voz": "zeus", "texto": "¡Mira! Al limpiar la superficie lisa y dura, descubrimos que se puede ver la montaña del fondo... ¡Es transparente! ¿De qué material transparente está hecha esta ventana?" },
+          "acierto": { "efecto": "encaja", "sonido": "chimeglimmer" },
+          "errores": [
+            { "objetos": ["piedra", "madera"], "voz": "zeus", "texto": "¡Ese material no deja pasar la luz! Recuerda que debe ser transparente como el que acabas de limpiar. ¡Inténtalo otra vez!" }
+          ]
+        }
+      ],
+      "cierre": { "voz": "zoe", "texto": "¡Excelente! Usaste las pistas de textura para descubrir los objetos." }
+    }
+  ]
+}

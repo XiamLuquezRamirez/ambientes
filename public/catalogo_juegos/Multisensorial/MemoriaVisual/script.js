@@ -1246,7 +1246,7 @@ async function efectoAcierto(reto, el) {
         if (nuevo) {
             nuevo.classList.add("objeto-ok");
             pulso(nuevo, "objeto-destello", 900);
-            sfx("magia");
+            sfx(sonidoObjeto(ctx.correcto[0]) || "magia");
         }
         return;
     }
@@ -1733,6 +1733,43 @@ function mostrarPremio() {
     trofeo.classList.add("premio-" + (premio.tipo || "medalla"));
 }
 
+/** Cierre de 5-6: Zoe y Zeus abren la caja fuerte del museo y dentro brilla el diploma. */
+async function abrirCajaFuerte() {
+    const tablero = document.getElementById("tablero");
+    if (!tablero) return;
+    const movimiento = animacionesActivas();
+    const premio = (nivelElegido && nivelElegido.premio) || {};
+    limpiarUtileria();
+    setTitulo("");
+    setEnunciado("");
+    tablero.className = "tablero tablero-caja";
+    tablero.innerHTML =
+        '<div class="caja-escena" aria-hidden="true">' +
+            '<img class="caja-guia" id="caja-zoe" src="' + attrEsc(guiaImg("zoe")) + '" alt="" draggable="false">' +
+            '<div class="caja-fuerte">' +
+                '<div class="caja-interior">' +
+                    (premio.img ? '<img class="caja-premio" src="' + attrEsc(premio.img) + '" alt="" draggable="false">' : "") +
+                "</div>" +
+                '<div class="caja-puerta"><span class="caja-dial"></span><span class="caja-manija"></span></div>' +
+            "</div>" +
+            '<img class="caja-guia" id="caja-zeus" src="' + attrEsc(guiaImg("zeus")) + '" alt="" draggable="false">' +
+        "</div>";
+    const escena = tablero.querySelector(".caja-escena");
+    await sleep(movimiento ? 500 : 150);
+    escena.classList.add("girando");
+    for (let k = 0; k < 4; k++) {
+        sfx("tic", k % 2);
+        await sleep(movimiento ? 230 : 60);
+    }
+    escena.classList.add("abierta");
+    sfx("magia");
+    await sleep(movimiento ? 750 : 200);
+    sfx("fanfarria");
+    pulso(document.getElementById("caja-zoe"), "salta", 1400);
+    pulso(document.getElementById("caja-zeus"), "salta", 1400);
+    await sleep(movimiento ? 1600 : 400);
+}
+
 function terminarJuego() {
     if (juegoTerminado) return;
     juegoTerminado = true;
@@ -1741,6 +1778,11 @@ function terminarJuego() {
     prepararLupa();
     if (typeof Swal !== "undefined") Swal.close();
     pintarInsignias();
+    const escena = nivelElegido && nivelElegido.escenaCierre === "cajaFuerte" ? abrirCajaFuerte() : Promise.resolve();
+    escena.then(mostrarCierre, mostrarCierre);
+}
+
+function mostrarCierre() {
     reproducirAudio(audios().cierre);
     const cierre = cierrePersonalizado((nivelElegido && nivelElegido.cierre) || textos().cierre || "");
     hablarLinea({ texto: cierre, personaje: "zoe" }, false);

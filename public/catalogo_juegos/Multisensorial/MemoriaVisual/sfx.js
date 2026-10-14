@@ -122,6 +122,12 @@
                 timbre({ retraso: r, dur: 0.13, desde: 340 - k * 20, hasta: 290 - k * 20, corte: 1000, filtro: "bandpass", q: 2, vol: 0.3, ataque: 0.01, desafinar: [-8, 8] });
             });
         },
+        /** Pito de carro de juguete: «pii-piii». */
+        pito: function () {
+            [[0, 0.16], [0.24, 0.34]].forEach(function (n) {
+                timbre({ retraso: n[0], dur: n[1], desde: 440, corte: 1800, filtro: "bandpass", q: 1.5, vol: 0.26, ataque: 0.01, tipo: "square", desafinar: [0, 700] });
+            });
+        },
         /** Tambor: «pum, pum». */
         tambor: function () {
             [0, 0.22].forEach(function (r, k) {

@@ -16,7 +16,6 @@
         "rate": 5
     },
     "textos": {
-        "eligeCuerpo": "¿Qué cuerpo quieres explorar?",
         "eligeNivel": "Elige tu edad",
         "cierre": "Reconociste las partes del cuerpo.",
         "demostracion": "¡Vamos con un ejemplo! Mira: el dedo presiona la barriga.",
@@ -38,7 +37,7 @@
             },
             {
                 "personaje": 0,
-                "texto": "¡Tú puedes! <br> Primero eliges niña o niño y tu edad. ¡Concéntrate y demuestra lo que sabes!"
+                "texto": "¡Tú puedes! <br> Primero eliges tu edad. ¡Concéntrate y demuestra lo que sabes!"
             }
         ]
     },

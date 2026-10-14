@@ -142,6 +142,7 @@
           "id": "sol",
           "nombre": "¡El Sol Faltante en el Cielo!",
           "cambiosB": { "sol": null },
+          "soltarLupa": true,
           "objetivos": [
             { "id": "sol", "elemento": "sol", "previo": "target", "reaccion": "rayo" }
           ],

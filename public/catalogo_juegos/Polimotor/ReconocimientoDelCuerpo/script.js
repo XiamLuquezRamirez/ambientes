@@ -121,7 +121,7 @@ function empezarJuegoTrasIntro() {
     destruirIntro3d();
     document.body.classList.remove("esperando-inicio");
     $("#principal").css("display", "flex").hide().fadeIn(800);
-    elegirCuerpo();
+    iniciarPartida();
 }
 
 function empecemosJuego() {
@@ -364,39 +364,17 @@ function preguntaActual() {
     return preguntas[indicePregunta] || null;
 }
 
-function elegirCuerpo() {
-    const textos = gameConfig.textos;
-    const cuerpos = gameConfig.cuerpos;
-    TextoVoz.hablar(textos.eligeCuerpo, "zoe");
-    Swal.fire({
-        title: textos.eligeCuerpo,
-        html:
-            '<hr><div class="row">' +
-            '<div class="col-6 text-center"><button class="btn btn-warning btn-eleccion" onclick="confirmarCuerpo(\'nina\')">' + cuerpos.nina.nombre + '</button></div>' +
-            '<div class="col-6 text-center"><button class="btn btn-info btn-eleccion" onclick="confirmarCuerpo(\'nino\')">' + cuerpos.nino.nombre + '</button></div>' +
-            "</div><hr>",
-        showConfirmButton: false,
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        heightAuto: false,
-        scrollbarPadding: false
+var cuerpos = ["nino", "nina"];
+function iniciarPartida() {
+    cuerpoElegido = cuerpos[Math.floor(Math.random() * cuerpos.length)];
+    PedniaEdad.iniciarNivel({
+        niveles: (gameConfig && gameConfig.niveles) || [],
+        elegirManual: elegirNivel,
+        onElegido: function (nivel) {
+            if (nivel) window.confirmarNivel(nivel.id);
+        }
     });
 }
-
-function confirmarCuerpo(tipo) {
-    cuerpoElegido = tipo;
-    Swal.close();
-    setTimeout(function () {
-        PedniaEdad.iniciarNivel({
-            niveles: (gameConfig && gameConfig.niveles) || [],
-            elegirManual: elegirNivel,
-            onElegido: function (nivel) {
-                if (nivel) window.confirmarNivel(nivel.id);
-            }
-        });
-    }, 50);
-}
-window.confirmarCuerpo = confirmarCuerpo;
 
 function elegirNivel() {
     const textos = gameConfig.textos;

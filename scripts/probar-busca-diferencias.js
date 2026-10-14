@@ -114,6 +114,10 @@ assert(L.objetivoEn(centroDe(parque, "flor_roja"), parque, flor34, {}, n34.minim
 const flores56 = reto(n56, "flores");
 ["flor_1", "flor_3"].forEach((id) => assert(L.objetivoEn(centroDe(paisaje, id), paisaje, flores56, {}, n56.minimo) === null, id + " igual no acierta"));
 ["flor_2", "flor_4"].forEach((id) => assert(L.objetivoEn(centroDe(paisaje, id), paisaje, flores56, {}, n56.minimo) === id, id + " distinta acierta"));
+const sol56 = reto(n56, "sol");
+assert(sol56.soltarLupa === true, "5-6: el sol se resuelve soltando la lupa arrastrada");
+assert(config.niveles.every((n) => n.retos.every((r) => !r.soltarLupa || r === sol56)), "solo el reto del sol usa soltarLupa");
+assert(L.objetivoEn(centroDe(paisaje, "sol"), paisaje, sol56, {}, n56.minimo) === "sol", "soltar la lupa sobre el sol acierta");
 const rama = reto(n56, "rama");
 assert(L.objetivoEn(centroDe(paisaje, "hoja_2"), paisaje, rama, {}, n56.minimo) === "hoja", "hueco de la hoja acierta");
 assert(L.objetivoEn(centroDe(paisaje, "fruta_3"), paisaje, rama, {}, n56.minimo) === "fruta", "fruta diferente acierta");
