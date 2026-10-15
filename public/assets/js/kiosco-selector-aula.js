@@ -145,23 +145,136 @@
         });
     }
 
-    function hablar(texto) {
+    /* Deslizar: el dedo hacia la izquierda pasa adelante, como un carrusel. */
+    var DESLIZAR_MIN_PX = 60;
+    /* Más que esto ya no cuenta como toque: el click que sigue no abre la ficha. */
+    var TOQUE_MAX_PX = 12;
+    var RUEDA_MIN = 60;
+    /* El touchpad sigue mandando eventos por inercia: un gesto pasa una sola página. */
+    var RUEDA_QUIETA_MS = 250;
+    var gesto = null;
+    var anularClick = false;
+    var ruedaAcumulada = 0;
+    var ruedaUsada = false;
+    var timerRueda = 0;
+
+    function confirmaAbierta() {
+        return !!(confirma && !confirma.hidden);
+    }
+
+    raiz.addEventListener('pointerdown', function (ev) {
+        anularClick = false;
+        if (!ev.isPrimary || ev.button > 0 || confirmaAbierta() || paginas < 2) {
+            gesto = null;
+            return;
+        }
+        gesto = { id: ev.pointerId, x: ev.clientX, y: ev.clientY };
+    });
+
+    raiz.addEventListener('pointerup', function (ev) {
+        if (!gesto || ev.pointerId !== gesto.id) return;
+        var dx = ev.clientX - gesto.x;
+        var dy = ev.clientY - gesto.y;
+        gesto = null;
+        if (Math.abs(dx) > TOQUE_MAX_PX || Math.abs(dy) > TOQUE_MAX_PX) anularClick = true;
+        if (Math.abs(dx) >= DESLIZAR_MIN_PX && Math.abs(dx) > Math.abs(dy) * 1.5) {
+            ir(dx < 0 ? 1 : -1);
+        }
+    });
+
+    raiz.addEventListener('pointercancel', function () {
+        gesto = null;
+    });
+
+    raiz.addEventListener('click', function (ev) {
+        if (!anularClick) return;
+        anularClick = false;
+        ev.preventDefault();
+        ev.stopPropagation();
+    }, true);
+
+    /* Con mouse, arrastrar una foto inicia el drag nativo y se pierde el pointerup. */
+    raiz.addEventListener('dragstart', function (ev) {
+        ev.preventDefault();
+    });
+
+    raiz.addEventListener('wheel', function (ev) {
+        if (Math.abs(ev.deltaX) <= Math.abs(ev.deltaY)) return;
+        ev.preventDefault();
+        if (confirmaAbierta() || paginas < 2) return;
+
+        clearTimeout(timerRueda);
+        timerRueda = window.setTimeout(function () {
+            ruedaAcumulada = 0;
+            ruedaUsada = false;
+        }, RUEDA_QUIETA_MS);
+
+        if (ruedaUsada) return;
+        ruedaAcumulada += ev.deltaX;
+        if (Math.abs(ruedaAcumulada) >= RUEDA_MIN) {
+            ruedaUsada = true;
+            ir(ruedaAcumulada > 0 ? 1 : -1);
+        }
+    }, { passive: false });
+
+    var INSTRUCCION = 'Vamos a buscar quién eres. Mira muy bien las fotos que aparecen en la pantalla y encuentra la tuya. Cuando la encuentres, haz clic sobre ella para comenzar.';
+    var INDICACION_BOTONES = 'Toca el botón verde para continuar. De lo contrario, toca el botón rojo para cancelar.';
+    var INICIO_VOZ_MS = 500;
+    /* La entonación la decide la voz del sistema; subir el tono es lo único que se controla. */
+    var TONO_PREGUNTA = 1.25;
+    var timerInstruccion = 0;
+
+    /* partes: texto o lista de { texto, tono }; se encolan y suenan seguidas. */
+    function hablar(partes) {
+        clearTimeout(timerInstruccion);
         if (!window.speechSynthesis) return;
         window.speechSynthesis.cancel();
-        var frase = new SpeechSynthesisUtterance(texto);
-        frase.lang = 'es-CO';
-        frase.rate = 0.95;
-        window.speechSynthesis.speak(frase);
+        [].concat(partes).forEach(function (parte) {
+            var frase = new SpeechSynthesisUtterance(typeof parte === 'string' ? parte : parte.texto);
+            frase.lang = 'es-CO';
+            frase.rate = 0.95;
+            if (parte.tono) frase.pitch = parte.tono;
+            window.speechSynthesis.speak(frase);
+        });
     }
 
     function callar() {
+        clearTimeout(timerInstruccion);
         if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+
+    function aulaActiva() {
+        return raiz.isConnected && !raiz.hasAttribute('data-kiosco-saliente');
+    }
+
+    /* Sin un toque previo (F5 o URL directa) Chrome rechaza speak(); llegando desde /inicio sí suena. */
+    function leerInstruccion() {
+        if (!items.length) return;
+
+        function programar() {
+            timerInstruccion = window.setTimeout(function () {
+                if (aulaActiva() && !confirmaAbierta()) hablar(INSTRUCCION);
+            }, INICIO_VOZ_MS);
+        }
+
+        /* Montada debajo (inicio o PIN siguen encima animando su salida): se habla cuando quedan retiradas. */
+        var pane = document.getElementById('kioscoPane');
+        if (pane && pane.getAttribute('data-kiosco-superponiendo') === 'debajo') {
+            document.addEventListener('kiosco:superposicion-terminada', programar, { once: true });
+            return;
+        }
+        programar();
     }
 
     if (voz) {
         voz.addEventListener('click', function () {
-            hablar('¿Quién eres tú? Busca tu foto y tócala.');
+            hablar(INSTRUCCION);
         });
+    }
+
+    var volver = raiz.querySelector('.selector-aula__volver');
+    if (volver) {
+        volver.addEventListener('click', callar);
     }
 
     var confirma = document.getElementById('aulaConfirma');
@@ -176,6 +289,13 @@
     var pinUrl = '';
     var precargaPin = null;
     var yendoAlPin = false;
+
+    function hablarConfirma() {
+        hablar([
+            { texto: preguntaActual, tono: TONO_PREGUNTA },
+            INDICACION_BOTONES,
+        ]);
+    }
 
     function abrirConfirma(card) {
         if (!confirma || !card) return;
@@ -208,7 +328,7 @@
             void caja.offsetWidth;
             caja.style.animation = '';
         }
-        hablar(preguntaActual);
+        hablarConfirma();
         if (confirmaNo) confirmaNo.focus();
     }
 
@@ -269,9 +389,7 @@
         confirmaVelo.addEventListener('click', cerrarConfirma);
     }
     if (confirmaVoz) {
-        confirmaVoz.addEventListener('click', function () {
-            hablar(preguntaActual);
-        });
+        confirmaVoz.addEventListener('click', hablarConfirma);
     }
     function irAlPin() {
         if (yendoAlPin || !pinUrl || pinUrl === '#') return;
@@ -311,6 +429,7 @@
     });
 
     if (lista) pintar();
+    leerInstruccion();
     }
 
     window.KioscoSelectorAula = { init: init };

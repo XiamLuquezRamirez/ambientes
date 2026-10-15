@@ -31,8 +31,20 @@
             </div>
         </main>
     @else
+        @php
+            $nombreSaludo = explode(' ', trim((string) $estudiante->nombre))[0] ?? '';
+            $vozPin = ($nombreSaludo !== '' ? '¡Hola, ' . $nombreSaludo . '! ' : '¡Hola! ')
+                . 'Qué alegría verte. Busca tus tres figuras secretas y tócalas una por una para ingresar.';
+            $audioKiosco = fn ($archivo) => asset("assets/audio/kiosco/{$archivo}")
+                . '?v=' . @filemtime(public_path("assets/audio/kiosco/{$archivo}"));
+            $sonidosFigura = array_map(fn ($n) => $audioKiosco("figura-{$n}.wav"), [1, 2, 3]);
+        @endphp
         <main class="pin-wrap" id="kioscoPinApp" data-verificar="{{ route('auth.verificar-pin', $estudiante->id) }}"
-            data-csrf="{{ csrf_token() }}" data-catalogo='@json(collect($figuras)->keyBy('icon'))'>
+            data-csrf="{{ csrf_token() }}" data-catalogo='@json(collect($figuras)->keyBy('icon'))'
+            data-voz="{{ $vozPin }}"
+            data-sonido-acierto="{{ $audioKiosco('pin-acierto.mp3') }}"
+            data-sonido-error="{{ $audioKiosco('pin-error.mp3') }}"
+            data-sonidos-figura='@json($sonidosFigura)'>
             <div class="pin-izquierda">
                 @include('auth._ficha-aula')
                 <p class="pin-instruccion">Toca tus 3 figuras</p>

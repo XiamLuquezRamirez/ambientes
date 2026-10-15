@@ -50,6 +50,8 @@
         }
     }
     $emocionesBase = asset('assets/images/emociones');
+    $audioElegir = fn ($archivo) => asset("assets/audio/kiosco/{$archivo}")
+        . '?v=' . @filemtime(public_path("assets/audio/kiosco/{$archivo}"));
 @endphp
 <div id="rnApp" data-modo="{{ $modo }}" data-ui="{{ $ui }}" data-paso-inicial="{{ $pasoInicial }}"
     data-estudiante-nombre="{{ $nombreEstudiante }}" data-estudiante-iniciales="{{ $inicialesEstudiante }}"
@@ -65,7 +67,9 @@
     data-tarjeta-explorar="{{ $tarjetaExplorarImg ?? '' }}"
     data-tarjeta-jugar="{{ $tarjetaJugarImg ?? '' }}"
     data-tarjeta-explorar-reverso="{{ $tarjetaExplorarReversoImg ?? '' }}"
-    data-tarjeta-jugar-reverso="{{ $tarjetaJugarReversoImg ?? '' }}">
+    data-tarjeta-jugar-reverso="{{ $tarjetaJugarReversoImg ?? '' }}"
+    data-sonido-explorar="{{ $audioElegir('elegir-explorar.mp3') }}"
+    data-sonido-jugar="{{ $audioElegir('elegir-jugar.mp3') }}">
     <script type="application/json" id="rn-arbol">@json($arbol)</script>
     <template id="rnBotonIniciar">{!! file_get_contents(public_path('assets/images/vista_nino/boton_iniciar.svg')) !!}</template>
     @if (!empty($camino))

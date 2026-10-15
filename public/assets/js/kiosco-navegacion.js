@@ -97,6 +97,7 @@
         });
         const pane = document.getElementById(PANE_ID);
         if (pane) pane.removeAttribute('data-kiosco-superponiendo');
+        document.dispatchEvent(new CustomEvent('kiosco:superposicion-terminada'));
     }
 
     function sincronizarPerfil(doc) {

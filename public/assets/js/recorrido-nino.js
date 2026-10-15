@@ -22,6 +22,7 @@
     let tarjetaJugarReversoImg;
     let estudianteSexo;
     let montajeAlumnos = null;
+    let sonidosElegir = {};
 
     function escapar(str) {
         return String(str ?? '')
@@ -408,9 +409,79 @@
         frase.classList.add('is-on');
     }
 
+    /* Se crean al montar la portada para que suenen al instante del toque. */
+    function precargarSonidosElegir() {
+        sonidosElegir = {};
+        ['explorar', 'jugar'].forEach(function (tipo) {
+            const src = String($app.data('sonido-' + tipo) || '');
+            if (!src) return;
+            const audio = new Audio(src);
+            audio.preload = 'auto';
+            sonidosElegir[tipo] = audio;
+        });
+    }
+
+    /* La voz entra sobre el arranque del sonido y termina antes de que /alumnos dé su instrucción. */
+    const VOZ_ELECCION_MS = 300;
+    /* Fondo bajo para que "¡Vamos a…!" se entienda encima. */
+    const VOLUMEN_SONIDO_ELEGIR = 0.35;
+
+    /*
+     * Montar /alumnos pasa por KioscoCamino.destroy(), que llama speechSynthesis.cancel():
+     * la frase espera a que ese montaje termine o se cortaría según lo que tarde el servidor.
+     */
+    function decirEleccion(btn) {
+        if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
+        const conStickers = !!(tarjetaExplorarImg && tarjetaJugarImg);
+        let texto = '¡Vamos a jugar!';
+        if (btn.id !== 'rnBtnJugar') texto = conStickers ? '¡Vamos a explorar!' : '¡Vamos a la clase!';
+        window.setTimeout(function () {
+            Promise.resolve(montajeAlumnos).catch(function () { /* se habla igual */ }).then(function () {
+                window.speechSynthesis.cancel();
+                const frase = new SpeechSynthesisUtterance(texto);
+                frase.lang = 'es-CO';
+                frase.rate = 0.95;
+                window.speechSynthesis.speak(frase);
+            });
+        }, VOZ_ELECCION_MS);
+    }
+
+    const DESVANECER_SONIDO_MS = 400;
+
+    function desvanecer(audio) {
+        const pasos = 10;
+        const inicial = audio.volume;
+        let paso = 0;
+        const timer = window.setInterval(function () {
+            paso += 1;
+            audio.volume = Math.max(0, inicial * (1 - paso / pasos));
+            if (paso >= pasos) {
+                window.clearInterval(timer);
+                audio.pause();
+            }
+        }, DESVANECER_SONIDO_MS / pasos);
+    }
+
+    function sonarEleccion(btn) {
+        decirEleccion(btn);
+        const audio = sonidosElegir[btn.id === 'rnBtnJugar' ? 'jugar' : 'explorar'];
+        if (!audio) return;
+        try {
+            audio.volume = VOLUMEN_SONIDO_ELEGIR;
+            audio.currentTime = 0;
+            const promesa = audio.play();
+            if (promesa && promesa.catch) promesa.catch(function () { /* sin audio */ });
+        } catch (e) { /* sin audio */ }
+        /* La cola del archivo no debe pisar la instrucción de voz de /alumnos. */
+        document.addEventListener('kiosco:superposicion-terminada', function () {
+            if (!audio.paused) desvanecer(audio);
+        }, { once: true });
+    }
+
     function ampliarTarjeta(btn, despues) {
         if (saliendoTarjeta) return;
         saliendoTarjeta = true;
+        sonarEleccion(btn);
         const el = document.getElementById('rnElegir');
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (!el || reduce) {
@@ -739,6 +810,7 @@
         }
 
         enlazarEventosPortada();
+        precargarSonidosElegir();
         renderPortada();
     }
 

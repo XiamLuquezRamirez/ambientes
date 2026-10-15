@@ -15,6 +15,9 @@
     var PAUSA_TRAS_VOZ_MS = 700;
     /* Chrome a veces no dispara onend: tope para no dejar al niño atascado. */
     var ESPERA_MAX_MS = 14000;
+    /* Chrome puede quedar con speaking=true sin sonar: no se espera más que esto a la voz anterior. */
+    var ESPERA_VOZ_AJENA_MS = 4000;
+    var SONDEO_VOZ_MS = 150;
     /* La galería avisa con 'kiosco:vista-lista'; otras páginas no, y se espera solo un momento. */
     var ESPERA_VISTA_MS = 3000;
     var ESPERA_VISTA_SIN_AVISO_MS = 600;
@@ -160,12 +163,29 @@
         }
 
         despues(INICIO_VOZ_MS, function () {
-            hablar(texto, function (seEscucho) {
-                /* Si la voz falló, el niño tiene que leerlo: se respeta el mínimo de lectura. */
-                var minimo = seEscucho ? VISTA_MIN_MS : LECTURA_MIN_MS;
-                var restante = Math.max(minimo - (Date.now() - inicio), seEscucho ? PAUSA_TRAS_VOZ_MS : 0);
-                despues(restante, irAlRecorrido);
+            trasVozAjena(Date.now() + ESPERA_VOZ_AJENA_MS, function () {
+                hablarSaludo(texto, inicio);
             });
+        });
+    }
+
+    /* El "¡Muy bien!" del PIN puede seguir sonando: hablar() lo cortaría con cancel(). */
+    function trasVozAjena(limite, fn) {
+        var synth = window.speechSynthesis;
+        var pinPorHablar = !!(window.KioscoPin && window.KioscoPin.vozPendiente && window.KioscoPin.vozPendiente());
+        if (!synth || !(synth.speaking || synth.pending || pinPorHablar) || Date.now() >= limite) {
+            fn();
+            return;
+        }
+        despues(SONDEO_VOZ_MS, function () { trasVozAjena(limite, fn); });
+    }
+
+    function hablarSaludo(texto, inicio) {
+        hablar(texto, function (seEscucho) {
+            /* Si la voz falló, el niño tiene que leerlo: se respeta el mínimo de lectura. */
+            var minimo = seEscucho ? VISTA_MIN_MS : LECTURA_MIN_MS;
+            var restante = Math.max(minimo - (Date.now() - inicio), seEscucho ? PAUSA_TRAS_VOZ_MS : 0);
+            despues(restante, irAlRecorrido);
         });
     }
 
