@@ -30,7 +30,7 @@ class AdminSeeder extends Seeder
 
         // Docente demo — Expresión Artística, Jardín A
         $usuarioDocente = User::firstOrCreate(
-            ['email' => 'docente.musica@aulasreggio.test'],
+            ['email' => 'docente.expresion-artistica@aulasreggio.test'],
             [
                 'nombre' => 'Docente Expresión Artística',
                 'password' => Hash::make('password'),

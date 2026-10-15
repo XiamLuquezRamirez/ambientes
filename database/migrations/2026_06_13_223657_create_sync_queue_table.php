@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('entidad');
             $table->unsignedBigInteger('entidad_id');
             $table->enum('accion', ['create', 'update', 'delete', 'transfer']);
-            $table->string('servidor_origen')->default('musica');
+            $table->string('servidor_origen');
             $table->json('payload');
             $table->enum('estado', ['pendiente', 'enviado', 'confirmado', 'error'])->default('pendiente');
             $table->unsignedTinyInteger('intentos')->default(0);

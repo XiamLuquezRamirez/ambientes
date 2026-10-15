@@ -8,7 +8,7 @@ Idioma del código y de la UI: **español**. Conservar nombres de rutas, método
 
 | Capa | Dónde |
 |------|--------|
-| Rutas | `routes/web.php`, `routes/api.php`, `routes/ambientes/{slug}.php` |
+| Rutas | `routes/web.php`, `routes/api.php`, `routes/kiosco.php` |
 | Controladores | `app/Http/Controllers/{Admin,Panel,SuperAdmin,Auth,Ambientes,Api,Docente}` |
 | Modelos | `app/Models` (~50). Lógica de negocio extra en `app/Services` |
 | Vistas | `resources/views/{admin,panel,superAdmin,auth,ambientes,perfil}` |
@@ -29,14 +29,13 @@ Staff usa el guard de sesión **`docente`** sobre el modelo `User` (`users.rol`)
 | `admin` | `es.admin` | `/admin` | `layouts/admin` | `admin.ambientes` |
 | `docente` | `es.docente` | `/panel` | `layouts/panel` | `panel.principal` |
 
-El niño **no** usa guard Laravel: sesión `estudiante_id` + PIN de 3 figuras (`ConfiguracionPin`). Middleware `sesion.nino`. Rutas del ambiente: `require routes/ambientes/{slug}.php` según `config('ambiente.slug')`.
+El niño **no** usa guard Laravel: sesión `estudiante_id` + PIN de 3 figuras (`ConfiguracionPin`). Middleware `sesion.nino`. Rutas del kiosco: `routes/kiosco.php` (iguales en los 5 nodos; el ambiente se resuelve en `SesionNinoService::obtenerAmbiente()`).
 
 Login staff: `AuthDocenteController`. Login niño: `SesionNinoController`. Helpers en `User`: `esAdmin()`, `esDocente()`, `esSuperAdmin()`. Institución suspendida bloquea admin/docente.
 
 ## Dominio (términos fijos)
 
-- **Ambiente**: uno de 5 nodos fijos — `expresion-artistica` (Expresión Artística), `polimotor`, `multisaberes`, `multisensorial`, `tecnologia`. No crear un sexto sin decisión explícita.
-  - Nota: rutas kiosco / sync aún usan aliases legacy `musica` → Expresión Artística y `logico` → Multisaberes (`routes/ambientes/{AMBIENTE_SLUG}.php`, `config/red.php`).
+- **Ambiente**: uno de 5 nodos fijos — `expresion-artistica` (Expresión Artística), `polimotor`, `multisaberes`, `multisensorial`, `tecnologia` (`config('ambiente.slugs')`). No crear un sexto sin decisión explícita. No hay alias: `AMBIENTE_SLUG`, `SERVIDOR_AMBIENTE` y las claves de `config/red.php` usan el slug de la tabla `ambientes`.
 - **Institución**: colegio (multi-tenant vía `institucion_id`).
 - **Carga docente**: asignación `docente + ambiente + grado + grupo + año lectivo`. Unidad de trabajo del panel.
 - **Matrícula**: inscripción anual (`anio_lectivo`, suele filtrarse con `date('Y')`).

@@ -732,7 +732,7 @@ class DocenteAdminController extends Controller
     private function encolarAsignacionParaServidores(CargaDocente $carga, string $accion = 'create'): void
     {
         $servidores = array_keys(config('red.servidores', []));
-        $origen = config('red.servidor_actual') ?: config('ambiente.slug', 'admin');
+        $origen = config('red.servidor_actual') ?: (config('ambiente.slug') ?: 'admin');
 
         foreach ($servidores as $servidorDestino) {
             // La tabla no tiene servidor_destino; se incluye en payload para que el despachador pueda enviarlo por servidor.

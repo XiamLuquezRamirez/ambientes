@@ -4370,9 +4370,6 @@ const ALTURA_SUELO = 0.2;
         el.setAttribute('aria-label', 'Construyendo el mapa');
         const claveEscena = ({
             'expresion-artistica': 'artistica',
-            expresion_artistica: 'artistica',
-            musica: 'artistica',
-            logico: 'multisaberes',
         })[ambienteSlug] || ambienteSlug;
         const escena = ESCENAS_CARGA[claveEscena] || ESCENAS_CARGA.polimotor;
         el.style.setProperty('--rn3d-acc', escena.acento);

@@ -375,11 +375,8 @@ class AmbienteNinoController extends Controller
         return '';
     }
 
-    /** Alias legacy del nodo (musica/logico) → slug de archivo/BD. */
     private function slugImagenAmbiente(string $slug): string
     {
-        $slug = strtolower(trim($slug));
-
-        return (string) (config("ambiente.slugs_bd.{$slug}") ?: $slug);
+        return strtolower(trim($slug));
     }
 }

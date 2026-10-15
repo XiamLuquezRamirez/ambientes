@@ -1037,11 +1037,8 @@ function ponerLuces(scene, modesto) {
 
 const CASAS_AMBIENTE = {
     'expresion-artistica': '07_casas_tematicas/expresion_artistica',
-    'expresion_artistica': '07_casas_tematicas/expresion_artistica',
-    musica: '07_casas_tematicas/expresion_artistica',
     polimotor: '07_casas_tematicas/polimotor',
     multisaberes: '07_casas_tematicas/multisaberes',
-    logico: '07_casas_tematicas/multisaberes',
     multisensorial: '07_casas_tematicas/multisensorial',
     tecnologia: '07_casas_tematicas/tecnologia',
 };
@@ -1304,11 +1301,8 @@ export async function armarMundo(scene, { modesto = false, ambiente = '', escala
 
 const CARPETA_ESTACION = {
     'expresion-artistica': 'artistica',
-    expresion_artistica: 'artistica',
-    musica: 'artistica',
     polimotor: 'polimotor',
     multisaberes: 'multisaberes',
-    logico: 'multisaberes',
     multisensorial: 'multisensorial',
     tecnologia: 'tecnologia',
 };
