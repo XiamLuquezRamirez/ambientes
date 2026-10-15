@@ -9,9 +9,7 @@
     $nombreEstudiante = $esSesion ? $estudiante->nombre ?? 'Amigo' : 'Amigo';
     $inicialesEstudiante = $esSesion ? $estudiante->iniciales ?? 'AM' : 'AM';
     $colorEstudiante = $esSesion ? $estudiante->color_avatar ?? '#2563EB' : '#2563EB';
-    $slugPortada =
-        $arbol['ambiente']['slug'] ?? config('ambiente.slugs_bd.' . config('ambiente.slug'), config('ambiente.slug'));
-    $slugPortada = config('ambiente.slugs_bd.' . $slugPortada, $slugPortada);
+    $slugPortada = $arbol['ambiente']['slug'] ?? config('ambiente.slug');
     $portadaImg = $portadaImg ?? '/assets/images/ambientes/' . $slugPortada . '-portada.png';
     if ($portadaImg !== '' && ! file_exists(public_path(ltrim(parse_url($portadaImg, PHP_URL_PATH) ?: $portadaImg, '/')))) {
         $portadaImg = '';

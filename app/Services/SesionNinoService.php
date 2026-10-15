@@ -36,7 +36,11 @@ class SesionNinoService
     {
         $slug = config('ambiente.slug');
 
-        return config("ambiente.slugs_bd.{$slug}", $slug);
+        if (! is_string($slug) || $slug === '') {
+            throw new \RuntimeException('AMBIENTE_SLUG no está configurado en el .env de este nodo.');
+        }
+
+        return $slug;
     }
 
     /**

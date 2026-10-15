@@ -14,7 +14,7 @@ Laravel 10, Blade + Bootstrap + jQuery, español. Guía completa: `AGENTS.md`.
 
 ## Ambientes fijos
 
-`expresion-artistica` (Expresión Artística), `polimotor`, `multisaberes`, `multisensorial`, `tecnologia`. Cada servidor carga `routes/ambientes/{slug}.php` (aliases legacy: `musica`, `logico`).
+`expresion-artistica` (Expresión Artística), `polimotor`, `multisaberes`, `multisensorial`, `tecnologia` (lista en `config('ambiente.slugs')`). `AMBIENTE_SLUG` y `SERVIDOR_AMBIENTE` solo aceptan esos valores (validado en `AppServiceProvider`). Rutas del kiosco comunes en `routes/kiosco.php`. No hay alias.
 
 ## Capas
 

@@ -612,7 +612,7 @@ Route::middleware('sesion.nino')->group(function () {
     Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
     Route::get('/juegos', [AmbienteNinoController::class, 'juegos'])->name('ambiente.juegos');
     Route::post('/juegos/pin-accesibilidad', [\App\Http\Controllers\Ambientes\PinAccesibilidadJuegoController::class, 'verificar'])->name('ambiente.juegos.pin-accesibilidad');
-    require __DIR__.'/ambientes/'.config('ambiente.slug').'.php';
+    require __DIR__.'/kiosco.php';
 });
 
 // === PREVIEW TABLET (TEMPORAL — quitar antes de commit) ====================

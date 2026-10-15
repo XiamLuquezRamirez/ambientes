@@ -12,8 +12,6 @@
 (function () {
     'use strict';
 
-    const ALIAS = { musica: 'expresion-artistica', logico: 'multisaberes' };
-
     function normaliza(txt) {
         return String(txt || '')
             .toLowerCase()
@@ -25,18 +23,15 @@
         ['multisensorial', 'multisensorial'],
         ['polimotor', 'polimotor'],
         ['multisaberes', 'multisaberes'],
-        ['logico', 'multisaberes'],
         ['tecnologia', 'tecnologia'],
         ['expresion', 'expresion-artistica'],
         ['artistica', 'expresion-artistica'],
-        ['musica', 'expresion-artistica'],
     ];
 
     function detectarSlug() {
         const cfg = (window.INTRO_CONFIG && window.INTRO_CONFIG.ambiente) || '';
         if (cfg) {
-            const s = normaliza(cfg);
-            return ALIAS[s] || s;
+            return normaliza(cfg);
         }
         const ruta = normaliza(decodeURIComponent(location.pathname));
         for (const [clave, slug] of CLAVES) {
