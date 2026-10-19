@@ -51,7 +51,7 @@
             }
         </script>
         <script src="{{ asset('assets/js/panel/estudiante_index.js') }}"></script>
-        <script src="{{ asset('assets/js/estudiantes/index.js') }}"></script>
+        <script src="{{ asset('assets/js/estudiantes/index.js') }}?v=20261017a"></script>
         <script src="{{ asset('assets/js/estudiantes/pin.js') }}"></script>
         <script src="{{ asset('assets/js/panel/estudiantes.js') }}"></script>
     @endpush

@@ -91,14 +91,8 @@
         }
 
         .avatar-color-picker {
-            --silla-azul: #0494FC;
-            --silla-verde: #18BC54;
-            --silla-naranja: #FCB400;
-            --silla-morado: #4C007C;
-            --silla-rosa: #F8349C;
-            --silla-cian: #1CC8FC;
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(10, minmax(0, 1fr));
             gap: 8px;
             align-items: center;
             min-height: 42px;
@@ -106,11 +100,10 @@
             padding: 8px;
             border: 1px solid #cbd5e1;
             border-radius: 12px;
-            justify-content: space-between;
         }
 
         .avatar-color-option {
-            width: 64px;
+            width: 100%;
             height: 30px;
             border-radius: 11px;
             border: 2px solid #fff;
@@ -311,17 +304,21 @@
                                             class="form-control">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-8">
                                     <div class="form-group">
                                         <label id="color_avatar_label">Color de avatar</label>
                                         @php
                                             $coloresAvatar = [
-                                                ['nombre' => 'Azul', 'var' => '--silla-azul', 'hex' => '#0494FC'],
-                                                ['nombre' => 'Verde', 'var' => '--silla-verde', 'hex' => '#18BC54'],
-                                                ['nombre' => 'Naranja', 'var' => '--silla-naranja', 'hex' => '#FCB400'],
-                                                ['nombre' => 'Morado', 'var' => '--silla-morado', 'hex' => '#4C007C'],
-                                                ['nombre' => 'Rosa', 'var' => '--silla-rosa', 'hex' => '#F8349C'],
-                                                ['nombre' => 'Cian', 'var' => '--silla-cian', 'hex' => '#1CC8FC'],
+                                                ['nombre' => 'Coral', 'hex' => '#F06747'],
+                                                ['nombre' => 'Vino', 'hex' => '#C64757'],
+                                                ['nombre' => 'Lima', 'hex' => '#A1B947'],
+                                                ['nombre' => 'Terracota', 'hex' => '#C46040'],
+                                                ['nombre' => 'Lila', 'hex' => '#AD92B1'],
+                                                ['nombre' => 'Naranja', 'hex' => '#F49625'],
+                                                ['nombre' => 'Azul', 'hex' => '#73A7E3'],
+                                                ['nombre' => 'Rosa', 'hex' => '#EE6C84'],
+                                                ['nombre' => 'Turquesa', 'hex' => '#57B1A8'],
+                                                ['nombre' => 'Salmón', 'hex' => '#E7A396'],
                                             ];
                                         @endphp
                                         <div class="avatar-color-picker" id="avatar_color_picker" role="radiogroup"
@@ -330,26 +327,27 @@
                                                 <button type="button"
                                                     class="avatar-color-option {{ $loop->first ? 'is-selected' : '' }}"
                                                     data-color="{{ $colorAvatar['hex'] }}"
-                                                    style="--avatar-swatch: var({{ $colorAvatar['var'] }})"
+                                                    style="--avatar-swatch: {{ $colorAvatar['hex'] }}"
                                                     role="radio"
                                                     aria-checked="{{ $loop->first ? 'true' : 'false' }}"
                                                     aria-label="{{ $colorAvatar['nombre'] }}"
                                                     title="{{ $colorAvatar['nombre'] }}"></button>
                                             @endforeach
                                         </div>
-                                        <input type="hidden" name="color_avatar" id="color_avatar" value="#0494FC">
+                                        <input type="hidden" name="color_avatar" id="color_avatar" value="#F06747">
                                     </div>
                                 </div>
+                               
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="telefono">Teléfono</label>
+                                        <input type="text" name="telefono" id="telefono" class="form-control">
+                                    </div>
+                                </div> 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="direccion">Dirección</label>
                                         <input type="text" name="direccion" id="direccion" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="telefono">Teléfono</label>
-                                        <input type="text" name="telefono" id="telefono" class="form-control">
                                     </div>
                                 </div>
                                 <div class="col-md-6">

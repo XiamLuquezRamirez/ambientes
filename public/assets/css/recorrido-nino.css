@@ -389,7 +389,7 @@
     font-weight: 400;
     letter-spacing: .01em;
     text-align: center;
-    text-shadow: 0 2px 0 rgba(0, 0, 0, .08);
+    text-shadow: 2px 7px 0 rgba(55, 95, 10, 0.28);
     animation: rn-titulo-in .5s ease .18s both;
 }
 

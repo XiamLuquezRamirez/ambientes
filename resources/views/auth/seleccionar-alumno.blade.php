@@ -57,6 +57,9 @@
                     aria-label="{{ $nombreVisible }}{{ $tienePin ? '' : ' (sin PIN)' }}{{ $bloqueado ? ' (PIN bloqueado)' : '' }}"
                 >
                     <span class="marco-nino__caja">
+                    <span class="marco-nino__resplandor" aria-hidden="true">
+                        <span class="marco-nino__resplandor-forma"></span>
+                    </span>
                     <span class="marco-nino__marco" aria-hidden="true"></span>
                     <span class="marco-nino__foto">
                         @if ($estudiante->avatar_url)

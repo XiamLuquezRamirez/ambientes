@@ -18,7 +18,7 @@ window.INTRO_CONFIG = {
             id: "zeus",
             modelo: "models/nino.glb",
             // 1 = el GLB tal cual. Mayor crece, menor encoge.
-            escala: 2.65,
+            escala: 3.15,
             posicionY: -1,
             inicioX: -10.2,
             inicioZ: 0.15,
@@ -32,7 +32,7 @@ window.INTRO_CONFIG = {
         {
             id: "zoe",
             modelo: "models/nina.glb",
-            escala: 2.65,
+            escala: 3.15,
             posicionY: -1,
             inicioX: 10.2,
             inicioZ: 0.4,

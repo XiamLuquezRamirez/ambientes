@@ -3,7 +3,7 @@ const $modal = $('#modalRegistro');
 const modalBS = new bootstrap.Modal($modal[0]);
 var requiereApoyo = null;
 var idEstudianteEditar = null;
-const COLOR_AVATAR_DEFECTO = '#0494FC';
+const COLOR_AVATAR_DEFECTO = '#F06747';
 
 function aplicarColorAvatar(hex) {
     const color = (hex || COLOR_AVATAR_DEFECTO).toString().trim();
