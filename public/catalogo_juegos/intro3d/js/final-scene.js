@@ -10,8 +10,8 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 const MODELOS_BASE = new URL("../models/", import.meta.url);
 const WALK_SPEED = 3.8;
 // 1 = el GLB tal cual. Mayor crece, menor encoge.
-const ESCALA_NINO = 0.72;
-const ESCALA_NINA = 0.72;
+const ESCALA_NINO = 2.15;
+const ESCALA_NINA = 2.15;
 const CLIP_CAMINAR = ["Caminar"];
 const CLIP_QUIETO = ["Quieto"];
 const CLIP_SALUDAR = ["Saludar"];
@@ -27,6 +27,7 @@ let listoPromise = null;
 let actores = [];
 let mixers = [];
 let celebrando = false;
+let quiereCelebrar = false;
 
 function resolverModelo(nombre) {
     return new URL(nombre, MODELOS_BASE).href;
@@ -277,6 +278,7 @@ async function montarEscena() {
     redimensionar();
     activo = true;
     animar();
+    if (quiereCelebrar) arrancarActores();
 }
 
 function ensure() {
@@ -289,13 +291,7 @@ function ensure() {
     return listoPromise;
 }
 
-/** Entran caminando rápido → se paran → miran al frente → gesto. */
-function abrirVictoria() {
-    document.body.classList.add("final-3d-activa");
-    if (root) root.classList.add("is-visible");
-    if (renderer) renderer.setClearColor(0x000000, 0);
-
-    celebrando = true;
+function arrancarActores() {
     actores.forEach(function (a) {
         if (!a.mesh) return;
         a.mesh.position.set(a.inicioX, a.y, a.inicioZ);
@@ -305,6 +301,17 @@ function abrirVictoria() {
         a.espera = a.id === "zeus" ? 0.05 : 0.12;
         a.activo = null;
     });
+}
+
+/** Entran caminando rápido → se paran → miran al frente → gesto. */
+function abrirVictoria() {
+    document.body.classList.add("final-3d-activa");
+    if (root) root.classList.add("is-visible");
+    if (renderer) renderer.setClearColor(0x000000, 0);
+
+    celebrando = true;
+    quiereCelebrar = true;
+    if (activo) arrancarActores();
 
     return Promise.resolve();
 }
@@ -334,6 +341,7 @@ function dispose() {
     camera = null;
     clock = null;
     listoPromise = null;
+    quiereCelebrar = false;
     document.body.classList.remove("final-3d-activa");
     if (root) root.classList.remove("is-visible");
 }
@@ -343,7 +351,7 @@ window.Final3d = {
     cerrarCortinas: function () { return Promise.resolve(); },
     abrirVictoria: abrirVictoria,
     dispose: dispose,
-    listo: function () { return !!renderer; }
+    listo: function () { return activo && !!renderer; }
 };
 
 window.addEventListener("resize", function () {

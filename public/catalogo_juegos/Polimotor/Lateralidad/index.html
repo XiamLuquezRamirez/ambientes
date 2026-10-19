@@ -12,9 +12,17 @@
     <link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
     <script src="/assets/js/jquery-4.0.0.min.js"></script>
     <script src="/assets/js/sweetalert.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20261019f">
     <link rel="stylesheet" href="../comun/inicio-fondo.css?v=20261008a">
     <link rel="stylesheet" href="../comun/interfaz.css?v=20261008a">
+    <link rel="preload" as="image" href="../img/progreso.png">
+    <script>
+      (function () {
+        var fondoConteo = new Image();
+        fondoConteo.src = "../img/progreso.png";
+        if (fondoConteo.decode) fondoConteo.decode().catch(function () {});
+      })();
+    </script>
     <script src="../comun/inicio-fondo.js?v=20261008a"></script>
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
@@ -176,12 +184,13 @@
 	}
 	</script>
 	<script type="module" src="../../intro3d/js/three-scene.js?v=20261007a"></script>
+	<script type="module" src="../../intro3d/js/final-scene.js?v=20261019a"></script>
 		<script src="../../tutorial/tutorial.js"></script>
 	<script type="module" src="../../intro3d/js/tutorial-3d.js?v=20261007a"></script>
 	<script src="../../intro3d/js/intro.js?v=20261008a"></script>
 	<script src="../../shared/aplicar-perfil-juego.js?v=20261013a"></script>
 	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
-	<script src="script.js"></script>
+	<script src="script.js?v=20261019e"></script>
 </body>
 
 </html>
