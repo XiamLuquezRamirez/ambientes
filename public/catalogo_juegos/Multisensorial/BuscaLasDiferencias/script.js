@@ -795,6 +795,7 @@
     /* ── Flujo de retos ───────────────────────────────────────── */
 
     async function iniciarReto(gen) {
+    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
         if (gen !== rondaGen || juegoTerminado) return;
         reto = nivelElegido.retos[indiceReto];
         if (!reto) {
@@ -1136,7 +1137,7 @@
         demoActiva = true;
         fase = "";
         bloqueado = true;
-        PedniaTutorial.activarDemo();
+        await PedniaTutorial.activarDemo();
         escena = escenaDemo;
         reto = demo.reto;
         encontrados = Object.create(null);
@@ -1258,6 +1259,7 @@
             frasesExtra: frasesFijasTts()
         });
         enlazarMenuVol();
+        if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
         enlazarPaneles();
         window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
         imagenesPromise = precargarImagenesCriticas();

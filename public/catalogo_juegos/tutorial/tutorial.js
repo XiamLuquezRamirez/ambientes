@@ -15,18 +15,48 @@
         return !!(acc && acc.mostrarIntro);
     }
 
+    let vozDemo = null;
+
+    function engancharVozDemo() {
+        if (typeof TextoVoz === "undefined" || typeof TextoVoz.hablar !== "function" || TextoVoz.__vozDemo) return;
+        const orig = TextoVoz.hablar.bind(TextoVoz);
+        TextoVoz.hablar = function (texto, voz) {
+            const usar = (vozDemo && document.body.classList.contains("demo-voz")) ? vozDemo : voz;
+            return orig(texto, usar);
+        };
+        TextoVoz.__vozDemo = true;
+    }
+
+    function recordarVoz(quien) {
+        vozDemo = quien === "zeus" ? "zeus" : "zoe";
+        document.body.classList.add("demo-voz");
+        engancharVozDemo();
+        if (global.PersonajesJuego && typeof global.PersonajesJuego.hablar === "function") {
+            global.PersonajesJuego.hablar(vozDemo);
+        }
+    }
+
+    function soltarVozDemo() {
+        vozDemo = null;
+        document.body.classList.remove("demo-voz");
+        if (global.PersonajesJuego && typeof global.PersonajesJuego.callar === "function") {
+            global.PersonajesJuego.callar();
+        }
+    }
+
     async function hablarDemo(texto, minMs) {
         const minimo = minMs != null ? minMs : 2800;
+        const voz = vozDemo || "zoe";
         if (!texto || typeof TextoVoz === "undefined" || typeof TextoVoz.hablar !== "function") {
             await sleep(minimo);
             return;
         }
-        const p = TextoVoz.hablar(String(texto), "zoe");
-        const voz = (p && typeof p.then === "function")
+        const p = TextoVoz.hablar(String(texto), voz);
+        const promesa = (p && typeof p.then === "function")
             ? p.catch(function () { /* noop */ })
             : Promise.resolve();
         await Promise.all([
-            Promise.race([voz, sleep(14000)]),
+            Promise.race([promesa, sleep(14000)]),
             sleep(minimo)
         ]);
     }
@@ -52,9 +82,30 @@
         }, 650);
     }
 
+    let entradaDemo = 0;
+
+    function tienePersonaje3d() {
+        return !!(global.Tutorial3d
+            && typeof global.Tutorial3d.start === "function"
+            && document.getElementById("tutorial-3d"));
+    }
+
     function activarDemo() {
         document.body.classList.add("demo-activa");
-        mostrarZoe();
+        if (!tienePersonaje3d()) {
+            mostrarZoe();
+            recordarVoz("zoe");
+            return Promise.resolve("zoe");
+        }
+        const token = ++entradaDemo;
+        return entrarPersonaje().then(function (quien) {
+            const id = quien === "zeus" ? "zeus" : "zoe";
+            recordarVoz(id);
+            if (token !== entradaDemo || !document.body.classList.contains("demo-activa")) {
+                return despedirPersonaje().then(function () { return id; });
+            }
+            return id;
+        });
     }
 
     function activarDemo3d() {
@@ -62,11 +113,14 @@
     }
 
     function detenerDemo() {
+        entradaDemo += 1;
         document.body.classList.remove("demo-activa");
         document.querySelectorAll(".is-demo-target").forEach(function (el) {
             el.classList.remove("is-demo-target");
         });
         ocultarZoe(true);
+        if (tienePersonaje3d()) return despedirPersonaje();
+        return Promise.resolve();
     }
 
     function conTope(promesa, ms, valor) {
@@ -342,6 +396,7 @@
         }
         activarDemo3d();
         const quien = await entrarPersonaje();
+        recordarVoz(quien === "zeus" ? "zeus" : "zoe");
         if (cancelado()) {
             await despedirPersonaje();
             detenerDemo();
@@ -385,6 +440,8 @@
     global.PedniaTutorial = {
         sleep: sleep,
         mostrarIntroActiva: mostrarIntroActiva,
+        vozDemo: function () { return vozDemo; },
+        soltarVozDemo: soltarVozDemo,
         hablarDemo: hablarDemo,
         mostrarZoe: mostrarZoe,
         ocultarZoe: ocultarZoe,

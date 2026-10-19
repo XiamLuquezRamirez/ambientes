@@ -921,6 +921,7 @@
     }
 
     async function iniciarReto(gen) {
+    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
         if (!vivo(gen)) return;
         retoActual = retos[indiceReto] || null;
         if (!retoActual) {
@@ -1976,7 +1977,7 @@
         const demo = gameConfig.demo;
         demoActiva = true;
         bloquear(true);
-        if (window.PedniaTutorial) PedniaTutorial.activarDemo();
+        if (window.PedniaTutorial) await PedniaTutorial.activarDemo();
         retoActual = Object.assign({ mecanica: "encaje", colocada: "asa" }, demo);
         $id("mesa").className = "mesa mesa-" + (nivelElegido.tema === "taller" ? "madera" : "banco");
         pintarFigura(retoActual);
@@ -2195,6 +2196,7 @@
             volumenFondo: volumenFondoPct() / 100
         });
         enlazarMenuVol();
+        if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
         window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
         imagenesPromise = Promise.race([Promise.all(urlsImagenes().map(preloadUrl)), sleep(5000)]);
 

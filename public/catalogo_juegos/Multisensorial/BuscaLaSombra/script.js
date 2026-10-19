@@ -757,7 +757,7 @@
         if (gen !== rondaGen || juegoTerminado) return;
         demoActiva = true;
         aceptaToque = false;
-        if (window.PedniaTutorial) PedniaTutorial.activarDemo();
+        if (window.PedniaTutorial) await PedniaTutorial.activarDemo();
         else document.body.classList.add("demo-activa");
 
         const demo = nivel().demo;
@@ -776,9 +776,13 @@
         if (gen !== rondaGen || !demoActiva) return;
 
         const card = tarjeta(demo.objeto);
-        if (card) {
-            card.classList.add("is-demo-target");
-            await sleep(2600);
+        if (card && window.PedniaTutorial) {
+            await PedniaTutorial.animarMano({
+                punto: card,
+                holdMs: 700,
+                cancelado: function () { return gen !== rondaGen || !demoActiva; },
+                onPresionar: function () { card.classList.add("is-demo-target"); }
+            });
             if (gen !== rondaGen || !demoActiva) return;
             card.classList.remove("is-demo-target");
             await animacionAcierto(card, false);
@@ -802,6 +806,7 @@
     /* ── Flujo de retos ───────────────────────────────────────── */
 
     async function iniciarConsigna(gen) {
+    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
         if (gen !== rondaGen || juegoTerminado) return;
         retoActual = retosRonda[indiceReto] || null;
         if (!retoActual || !retoActual.objeto) {
@@ -1610,6 +1615,7 @@
             frasesExtra: frasesFijasTts()
         });
         enlazarMenuVol();
+        if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
         enlazarPuntero();
         window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
         imagenesPromise = precargarImagenesCriticas();

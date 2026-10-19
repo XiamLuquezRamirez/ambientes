@@ -1615,6 +1615,7 @@ function preguntar(reto) {
 }
 
 async function correrReto() {
+    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
     if (!nivelElegido || juegoTerminado) return;
     if (retoActual >= retosNivel.length) {
         terminarJuego();

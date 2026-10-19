@@ -467,7 +467,7 @@
         if (gen !== rondaGen || juegoTerminado) return;
         demoActiva = true;
         aceptaToque = false;
-        if (window.PedniaTutorial) PedniaTutorial.activarDemo();
+        if (window.PedniaTutorial) await PedniaTutorial.activarDemo();
         else document.body.classList.add("demo-activa");
 
         colorObjetivo = coloresRonda[0] || null;
@@ -504,13 +504,17 @@
 
         if (gen !== rondaGen || !demoActiva) return;
 
-        if (targetBtn) {
-            targetBtn.classList.add("is-demo-target");
-            await sleep(3800);
+        if (targetBtn && window.PedniaTutorial) {
+            await PedniaTutorial.animarMano({
+                punto: targetBtn,
+                holdMs: 700,
+                cancelado: function () { return gen !== rondaGen || !demoActiva; },
+                onPresionar: function () { targetBtn.classList.add("is-demo-target"); }
+            });
             if (gen !== rondaGen || !demoActiva) return;
             targetBtn.classList.remove("is-demo-target");
             targetBtn.classList.add("is-acierto");
-            await sleep(1400);
+            await sleep(900);
         }
 
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
@@ -553,6 +557,7 @@
     }
 
     function iniciarConsigna(gen) {
+    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
         if (gen !== rondaGen || juegoTerminado) return;
         colorObjetivo = coloresRonda[indiceColor] || null;
         if (!colorObjetivo) {
@@ -618,6 +623,10 @@
     }
 
     function feedbackActivo() {
+        var acc = (gameConfig && gameConfig.accesibilidad) || {};
+        if (Object.prototype.hasOwnProperty.call(acc, "mostrarFeedBack")) {
+            return acc.mostrarFeedBack !== false;
+        }
         return !gameConfig || gameConfig.mostrarFeedBack !== false;
     }
 
@@ -729,6 +738,7 @@
             frasesExtra: frasesFijasTts()
         });
         enlazarMenuVol();
+        if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
         window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
         imagenesPromise = precargarImagenesCriticas();
         precargarMediaSecundaria();

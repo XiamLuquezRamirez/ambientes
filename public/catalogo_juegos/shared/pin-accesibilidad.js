@@ -1,5 +1,6 @@
 /**
- * Antes de abrir el menú de accesibilidad pide el PIN de 4 dígitos de un docente.
+ * En la vista del niño, antes de abrir el menú de accesibilidad pide el PIN
+ * de 4 dígitos de un docente. El super admin prueba el juego sin ese PIN.
  * El PIN no sale del servidor: este archivo solo muestra el pad y envía los dígitos.
  */
 (function () {
@@ -169,6 +170,22 @@
         });
     }
 
+    function perfilActual() {
+        if (window.PedniaEdad && typeof PedniaEdad.perfil === 'function') {
+            var desdeEdad = PedniaEdad.perfil();
+            if (desdeEdad && typeof desdeEdad === 'object') return desdeEdad;
+        }
+        var local = window.__PEDNIA_PERFIL__;
+        return local && typeof local === 'object' ? local : null;
+    }
+
+    function esVistaNino() {
+        var perfil = perfilActual();
+        if (!perfil || perfil.fuente === 'preview_superadmin') return false;
+        var id = parseInt(perfil.estudiante_id, 10);
+        return perfil.activo === true && isFinite(id) && id > 0;
+    }
+
     document.addEventListener('click', function (e) {
         var teclaPin = e.target.closest ? e.target.closest('[data-pin]') : null;
         if (teclaPin && abierto) {
@@ -184,7 +201,7 @@
         if (!btn) return;
         var panel = document.getElementById('menu-acc-panel');
         var vaAAbrir = !panel || panel.hidden;
-        if (!vaAAbrir) return;
+        if (!vaAAbrir || !esVistaNino()) return;
         if (btn.dataset.pinOk === '1') {
             delete btn.dataset.pinOk;
             return;

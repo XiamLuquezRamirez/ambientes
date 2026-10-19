@@ -44,6 +44,13 @@ body.demo-activa .muestra-color {
     position: relative;
 }
 
+body.demo-activa .enunciado-wrap,
+body.demo-activa .cabecera,
+body.demo-activa .dialogo,
+body.demo-activa #enunciado {
+    z-index: 36;
+}
+
 body.demo-activa #progreso {
     color: #0f766e;
 }
@@ -52,6 +59,47 @@ body.demo-activa .demo-lock {
     pointer-events: none;
     z-index: 35;
 }
+
+/* Durante la demostración el personaje es el modelo 3D, no el GIF de los lados. */
+body.demo-activa .pj {
+    visibility: hidden;
+}
+
+.inicio-pj { display: none !important; }
+
+body.personajes-3d .dialogo-avatar { display: none !important; }
+
+.pj.pj-3d { position: relative; }
+.pj.pj-3d .pj-img,
+img.pj-3d-fuente { visibility: hidden !important; }
+.pj-3d-host { position: relative; display: inline-block; }
+.pj-3d-host > .pj-3d-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pj.pj-3d > .pj-3d-canvas {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: min(28vw, 180px);
+    height: min(40vh, 260px);
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+.pj.baila > .pj-3d-canvas { animation: pedniaBaila .45s ease 3; }
+@keyframes pedniaBaila {
+    0%, 100% { transform: translateX(-50%); }
+    50% { transform: translateX(-50%) translateY(-16px) rotate(-6deg); }
+}
+/* Más específico que .pj.pj-3d: si no, el modelo entra al flex y tapa el enunciado. */
+.pj.pj-3d.pj-3d-flotante {
+    position: fixed;
+    bottom: 0;
+    z-index: 6;
+    width: min(22vw, 180px);
+    height: min(42vh, 280px);
+    margin: 0;
+    pointer-events: none;
+}
+.pj.pj-zoe.pj-3d-flotante { left: 8px; right: auto; }
+.pj.pj-zeus.pj-3d-flotante { right: 8px; left: auto; }
 
 .tutorial-zoe {
     position: fixed;

@@ -1,0 +1,128 @@
+/* Botón de accesibilidad, a la izquierda del volumen. */
+#menu-acc {
+    position: fixed;
+    right: 92px;
+    bottom: 16px;
+    z-index: 1500;
+}
+
+body:not(:has(#menu-vol)) #menu-acc {
+    right: 16px;
+}
+
+body.esperando-inicio #menu-acc,
+body.intro3d-activa #menu-acc {
+    visibility: hidden;
+}
+
+#menu-acc .menu-acc-ops {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: min(70vh, 560px);
+    overflow: auto;
+}
+
+#menu-acc .menu-acc-op {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 4px;
+    border-radius: 8px;
+}
+
+#menu-acc .menu-acc-op input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+#menu-acc .menu-acc-rango {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    cursor: default;
+}
+
+#menu-acc .menu-acc-rango span {
+    display: flex;
+    justify-content: space-between;
+}
+
+#menu-acc .menu-acc-rango input[type="range"] {
+    width: 100%;
+    height: 22px;
+}
+
+body.alto-contraste {
+    background: var(--acc-fondo, #111) !important;
+    color: #fff !important;
+}
+
+body.alto-contraste .enunciado,
+body.alto-contraste #enunciado,
+body.alto-contraste .dialogo,
+body.alto-contraste .dialogo-texto,
+body.alto-contraste .reto-titulo {
+    color: #fff !important;
+    background-color: #000 !important;
+    border: 3px solid var(--acc-borde, #E5FF00) !important;
+}
+
+body.alto-contraste .objeto,
+body.alto-contraste .tarjeta,
+body.alto-contraste .opcion,
+body.alto-contraste .pieza,
+body.alto-contraste .btn-escuchar,
+body.alto-contraste #menu-acc .menu-acc-fab,
+body.alto-contraste #menu-acc .menu-acc-panel,
+body.alto-contraste #menu-vol .menu-acc-fab,
+body.alto-contraste #menu-vol .menu-acc-panel {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: var(--acc-borde, #E5FF00) !important;
+    box-shadow: none !important;
+}
+
+body.sin-nombres [class*="-nombre"] {
+    display: none !important;
+}
+
+body.sin-progreso #progreso,
+body.sin-progreso #insignias,
+body.sin-progreso #progreso-escena,
+body.sin-progreso .progreso,
+body.sin-progreso .hud-progreso,
+body.sin-progreso .progreso-escena,
+body.sin-progreso .objeto-progreso,
+body.sin-progreso .hud-insignias {
+    display: none !important;
+}
+
+body.sin-repetir #btn-escuchar,
+body.sin-repetir #btn-repetir {
+    display: none !important;
+}
+
+body.sin-barra-tiempo #barra-tiempo {
+    display: none !important;
+}
+
+body.sin-feedback .is-acierto,
+body.sin-feedback .is-error,
+body.sin-feedback .acierto,
+body.sin-feedback .error,
+body.sin-feedback .celebra,
+body.sin-feedback .abrazo {
+    animation: none !important;
+}
+
+body.sin-animaciones *:not(#pantalla-inicio):not(#pantalla-inicio *) {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+}

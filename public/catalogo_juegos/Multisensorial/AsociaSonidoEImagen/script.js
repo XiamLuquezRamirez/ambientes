@@ -761,6 +761,7 @@
     /* ── Flujo: escuchar → observar → asociar → tocar ─────────── */
 
     async function iniciarReto(gen) {
+    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
         if (!vivo(gen)) return;
         reto = nivelElegido.retos[indiceReto];
         if (!reto) {
@@ -1002,7 +1003,7 @@
         }
         demoActiva = true;
         fase = "";
-        PedniaTutorial.activarDemo();
+        await PedniaTutorial.activarDemo();
         const t = textos();
         const cancelado = function () { return !demoActiva || !vivo(gen); };
         habilitarEscuchar(true);
@@ -1136,6 +1137,7 @@
             frasesExtra: frasesFijasTts()
         });
         enlazarMenuVol();
+        if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
         enlazarOpciones();
         $id("btn-escuchar").addEventListener("click", escucharOtraVez);
         window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });

@@ -501,6 +501,7 @@
     }
 
     async function iniciarReto(gen) {
+    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
         if (!vivo(gen)) return;
         reto = nivelElegido.retos[indiceReto];
         if (!reto) { granCierre(gen); return; }
@@ -576,7 +577,7 @@
         if (!d || !d.faltante || !window.PedniaTutorial) { iniciarReto(gen); return; }
         demoActiva = true;
         fase = "";
-        PedniaTutorial.activarDemo();
+        await PedniaTutorial.activarDemo();
         limpiar();
         const ok = await presentar(d, gen, true);
         if (!ok) { detenerDemo(); return; }
@@ -686,6 +687,7 @@
         });
         enlazar();
         enlazarMenuVol();
+        if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
         imagenesPromise = precargar();
         sincronizarDialogoIntro3d();
         $id("btn-empecemos").addEventListener("click", empecemosJuego);
