@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Helado">
+  <ellipse cx="120" cy="228" rx="36" ry="6" fill="#000" opacity="0.1"/>
+  <path d="M78 130 L120 220 L162 130 Z" fill="#e8b86d" stroke="#c98c3a" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M90 150 L120 205 L150 150" fill="none" stroke="#c98c3a" stroke-width="3"/>
+  <circle cx="100" cy="88" r="42" fill="#ff8787"/>
+  <circle cx="140" cy="78" r="40" fill="#ff6b6b"/>
+  <circle cx="120" cy="58" r="38" fill="#fa5252"/>
+  <circle cx="120" cy="108" r="36" fill="#ff8787" stroke="#e03131" stroke-width="3"/>
+  <circle cx="88" cy="70" r="7" fill="#fff"/>
+  <circle cx="150" cy="55" r="5" fill="#fff"/>
+  <circle cx="105" cy="40" r="4" fill="#fcc419"/>
+  <circle cx="145" cy="95" r="4" fill="#339af0"/>
+  <circle cx="118" cy="90" r="4" fill="#51cf66"/>
+  <path d="M150 118 Q158 130 152 142" fill="none" stroke="#ff8787" stroke-width="8" stroke-linecap="round"/>
+</svg>

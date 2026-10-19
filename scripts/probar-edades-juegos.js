@@ -25,6 +25,8 @@ const juegos = [
   "Multisensorial/RepiteLaSecuencia",
   "Multisensorial/MemoriaAuditiva",
   "Multisensorial/AsociaSonidoEImagen",
+  "Multisensorial/EncuentraLaPareja",
+  "Multisensorial/ObservaYRecuerda",
   "Polimotor/Lateralidad",
   "Polimotor/ArrastrarYSoltarObjetos",
   "Polimotor/JuegosDePrecision",

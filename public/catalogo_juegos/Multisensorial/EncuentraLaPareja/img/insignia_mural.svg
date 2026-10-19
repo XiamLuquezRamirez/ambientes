@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Parejas sensoriales">
+  <path d="M84 170 L58 252 L92 234 L110 258 L124 184 Z" fill="#e64980"/>
+  <path d="M156 170 L182 252 L148 234 L130 258 L116 184 Z" fill="#1c7ed6"/>
+  <circle cx="120" cy="110" r="96" fill="#fcc419" stroke="#f08c00" stroke-width="8"/>
+  <circle cx="120" cy="110" r="78" fill="#ffe066"/>
+  <g stroke="#37474f" stroke-width="3" fill="#fff">
+    <circle cx="78" cy="90" r="22"/><circle cx="162" cy="90" r="22"/>
+    <circle cx="78" cy="145" r="22"/><circle cx="162" cy="145" r="22"/>
+  </g>
+  <circle cx="78" cy="90" r="10" fill="#4dabf7"/>
+  <circle cx="162" cy="90" r="10" fill="#ff6b6b"/>
+  <ellipse cx="78" cy="148" rx="8" ry="10" fill="#ffc9c9"/>
+  <path d="M154 138 Q162 155 170 138" fill="#ff6b6b" stroke="#c92a2a" stroke-width="2"/>
+  <path d="M120 162 L126 176 L141 177 L130 187 L133 202 L120 194 L107 202 L110 187 L99 177 L114 176 Z" fill="#fff" stroke="#f08c00" stroke-width="3"/>
+</svg>

@@ -32,52 +32,60 @@
         return '<i class="fa-solid fa-gamepad" aria-hidden="true"></i>';
     }
 
-    function botonCerrarVista() {
-        return '<button type="button" class="bj-cerrar" data-bj-volver aria-label="Cerrar">'
-            + '<i class="fa-solid fa-xmark" aria-hidden="true"></i> Cerrar</button>';
+    /** StudlyCase como en JuegoCatalogoService::segmentoCarpeta. */
+    function segmentoCarpeta(texto) {
+        return String(texto || '')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^A-Za-z0-9]+/g, ' ')
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean)
+            .map(function (w) {
+                return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            })
+            .join('');
     }
 
-    function esPaquetePolimotor(url) {
-        return /\/catalogo_juegos\/Polimotor\//i.test(String(url || ''));
-    }
-
-    function esAmbientePolimotor() {
+    function slugAmbiente() {
         try {
             const arbol = JSON.parse(document.getElementById('rn-arbol')?.textContent || '{}');
-            return /polimotor/i.test(String(arbol?.ambiente?.slug || ''));
+            return String(arbol?.ambiente?.slug || '').trim();
         } catch (e) {
-            return false;
+            return '';
         }
     }
 
-    function claseGaleria() {
-        return ctx.polimotor ? 'bj-galeria bj-galeria--polimotor' : 'bj-galeria';
+    /**
+     * Único punto personalizable del skin: fondo por ambiente.
+     * Convención: catalogo_juegos/{Ambiente}/img/fondo_catalogo.png
+     * Si no existe el archivo, el color de respaldo del CSS sigue viéndose.
+     */
+    function urlFondoGaleria() {
+        const fallback = '/catalogo_juegos/Polimotor/img/fondo_catalogo.png';
+        const seg = segmentoCarpeta(slugAmbiente());
+        if (!seg || seg === 'Polimotor') return fallback;
+        return '/catalogo_juegos/' + seg + '/img/fondo_catalogo.png';
+    }
+
+    function estiloFondoGaleria() {
+        return ' style="--bj-fondo:url(\'' + escapar(urlFondoGaleria()) + '\')"';
     }
 
     function cabeceraGaleria() {
-        if (ctx.polimotor) {
-            return `
-                <div class="bj-galeria-top">
-                    <button type="button" class="kiosco-volver bj-volver" data-bj-volver>
-                        <img src="/assets/images/selector-aula/volver.png" alt="Volver">
-                    </button>
-                    <h2 class="bj-galeria-titulo">
-                        <span class="bj-galeria-mando" aria-hidden="true"></span> Juegos
-                    </h2>
-                </div>`;
-        }
         return `
             <div class="bj-galeria-top">
+                <button type="button" class="kiosco-volver bj-volver" data-bj-volver>
+                    <img src="/assets/images/selector-aula/volver.png" alt="Volver">
+                </button>
                 <h2 class="bj-galeria-titulo">
-                    <span class="bj-emoji" aria-hidden="true">🎮</span> Juegos
+                    <span class="bj-galeria-mando" aria-hidden="true"></span> Juegos
                 </h2>
-                ${botonCerrarVista()}
             </div>`;
     }
 
     function renderCargando() {
         ctx.$paso.attr('data-paso', 'juegos').html(`
-            <div class="${claseGaleria()}">
+            <div class="bj-galeria"${estiloFondoGaleria()}>
                 ${cabeceraGaleria()}
                 <p class="bj-vacio">Cargando juegos del ambiente…</p>
             </div>
@@ -91,30 +99,259 @@
         `);
     }
 
-    function renderGaleria() {
-        if (!ctx.polimotor && juegos.some((j) => esPaquetePolimotor(j.url_paquete))) {
-            ctx.polimotor = true;
+    /** Misma paginación que la lista de alumnos: 8 por página (2×4) + slide. */
+    const BJ_POR_PAGINA = 8;
+    const BJ_COLS = 4;
+    let bjPagina = {
+        pagina: 0,
+        animando: false,
+        items: [],
+        paginas: 1,
+        timers: [],
+    };
+
+    function bjCancelarTimers() {
+        bjPagina.timers.forEach(clearTimeout);
+        bjPagina.timers = [];
+    }
+
+    function bjGrupo(indice) {
+        return bjPagina.items.slice(indice * BJ_POR_PAGINA, (indice + 1) * BJ_POR_PAGINA);
+    }
+
+    function bjAnunciar($galeria) {
+        const atras = $galeria.find('[data-bj-atras]')[0];
+        const adelante = $galeria.find('[data-bj-adelante]')[0];
+        const anuncio = $galeria.find('[data-bj-pagina]')[0];
+        const n = bjPagina.items.length;
+        const p = bjPagina.paginas;
+        if (atras) atras.disabled = bjPagina.animando || bjPagina.pagina <= 0 || p < 2;
+        if (adelante) adelante.disabled = bjPagina.animando || bjPagina.pagina >= p - 1 || p < 2;
+        if (anuncio) {
+            anuncio.textContent = n ? ('Página ' + (bjPagina.pagina + 1) + ' de ' + p) : '';
         }
-        const cards = juegos.map((j) => {
+        $galeria.toggleClass('bj-galeria--sin-paginas', p < 2);
+    }
+
+    function bjPintar($galeria) {
+        const lista = $galeria.find('.bj-grid')[0];
+        if (!lista) return;
+        bjPagina.items.forEach(function (el, i) {
+            const visible = i >= bjPagina.pagina * BJ_POR_PAGINA && i < (bjPagina.pagina + 1) * BJ_POR_PAGINA;
+            el.hidden = !visible;
+            el.style.position = '';
+            el.style.left = '';
+            el.style.top = '';
+            el.style.width = '';
+            el.style.height = '';
+            el.style.transform = '';
+            el.style.opacity = '';
+            el.style.transition = '';
+            el.style.visibility = '';
+            el.style.zIndex = '';
+            el.removeAttribute('aria-hidden');
+        });
+        $galeria.removeClass('bj-galeria--pasando');
+        bjAnunciar($galeria);
+    }
+
+    function bjEspera(n) {
+        return Math.max(0, n - 1) * 90 + 320;
+    }
+
+    function bjOrdenHorizontal(els, desdeLaDerecha) {
+        let orden = [];
+        for (let i = 0; i < els.length; i += BJ_COLS) {
+            let fila = els.slice(i, i + BJ_COLS);
+            if (desdeLaDerecha) fila = fila.slice().reverse();
+            orden = orden.concat(fila);
+        }
+        return orden;
+    }
+
+    function bjIr($galeria, delta) {
+        if (bjPagina.animando || !bjPagina.items.length) return;
+        const destino = bjPagina.pagina + delta;
+        if (destino < 0 || destino >= bjPagina.paginas) return;
+        const lista = $galeria.find('.bj-grid')[0];
+        if (!lista) return;
+
+        const reducir = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducir) {
+            bjPagina.pagina = destino;
+            bjPintar($galeria);
+            return;
+        }
+
+        bjCancelarTimers();
+        bjPagina.animando = true;
+        $galeria.addClass('bj-galeria--pasando');
+        bjAnunciar($galeria);
+
+        const salen = bjGrupo(bjPagina.pagina).slice();
+        const entran = bjGrupo(destino).slice();
+        const haciaAdelante = delta > 0;
+        const viaje = Math.round(window.innerWidth);
+        const saleX = haciaAdelante ? -viaje : viaje;
+        const entraX = -saleX;
+        const ordenSalida = bjOrdenHorizontal(salen, !haciaAdelante);
+        const ordenEntrada = bjOrdenHorizontal(entran, haciaAdelante);
+        const paso = 90;
+        const mov = 320;
+        const pausa = 60;
+        const transSalida = 'transform ' + mov + 'ms cubic-bezier(0.4, 0, 1, 1)';
+        const transEntrada = 'transform ' + mov + 'ms cubic-bezier(0, 0, 0.2, 1)';
+
+        ordenSalida.forEach(function (el, i) {
+            bjPagina.timers.push(window.setTimeout(function () {
+                el.style.zIndex = String(2 + i);
+                el.style.transition = transSalida;
+                el.style.transform = 'translateX(' + saleX + 'px)';
+                el.setAttribute('aria-hidden', 'true');
+            }, i * paso));
+        });
+
+        bjPagina.timers.push(window.setTimeout(function () {
+            salen.forEach(function (el) { el.hidden = true; });
+            entran.forEach(function (el) {
+                el.hidden = false;
+                el.style.transition = 'none';
+                el.style.opacity = '1';
+                el.style.transform = 'translateX(' + entraX + 'px)';
+                el.setAttribute('aria-hidden', 'true');
+            });
+            void lista.offsetWidth;
+            ordenEntrada.forEach(function (el, i) {
+                bjPagina.timers.push(window.setTimeout(function () {
+                    el.style.zIndex = String(2 + i);
+                    el.style.transition = transEntrada;
+                    el.style.transform = 'translateX(0)';
+                    el.removeAttribute('aria-hidden');
+                }, i * paso));
+            });
+        }, bjEspera(ordenSalida.length) + pausa));
+
+        bjPagina.timers.push(window.setTimeout(function () {
+            bjPagina.pagina = destino;
+            bjPagina.animando = false;
+            bjPintar($galeria);
+        }, bjEspera(salen.length) + pausa + bjEspera(entran.length) + 50));
+    }
+
+    function iniciarPaginacion($galeria) {
+        bjCancelarTimers();
+        const lista = $galeria.find('.bj-grid')[0];
+        bjPagina = {
+            pagina: 0,
+            animando: false,
+            items: lista ? Array.prototype.slice.call(lista.querySelectorAll('.bj-card')) : [],
+            paginas: 1,
+            timers: [],
+        };
+        bjPagina.paginas = Math.max(1, Math.ceil(bjPagina.items.length / BJ_POR_PAGINA));
+        bjPintar($galeria);
+
+        $galeria.off('click.bjpag').on('click.bjpag', '[data-bj-atras]', function (ev) {
+            ev.preventDefault();
+            bjIr($galeria, -1);
+        });
+        $galeria.off('click.bjpagfwd').on('click.bjpagfwd', '[data-bj-adelante]', function (ev) {
+            ev.preventDefault();
+            bjIr($galeria, 1);
+        });
+
+        /* Deslizar / rueda horizontal, igual que la lista de alumnos. */
+        const raiz = $galeria[0];
+        if (!raiz) return;
+
+        raiz.__bjGaleria = $galeria;
+        if (raiz.__bjGesto) return;
+        raiz.__bjGesto = true;
+
+        let gesto = null;
+        let anularClick = false;
+        let ruedaAcumulada = 0;
+        let ruedaUsada = false;
+        let timerRueda = 0;
+
+        raiz.addEventListener('pointerdown', function (ev) {
+            anularClick = false;
+            if (!ev.isPrimary || ev.button > 0 || bjPagina.paginas < 2) {
+                gesto = null;
+                return;
+            }
+            gesto = { id: ev.pointerId, x: ev.clientX, y: ev.clientY };
+        });
+        raiz.addEventListener('pointerup', function (ev) {
+            if (!gesto || ev.pointerId !== gesto.id) return;
+            const dx = ev.clientX - gesto.x;
+            const dy = ev.clientY - gesto.y;
+            gesto = null;
+            if (Math.abs(dx) > 12 || Math.abs(dy) > 12) anularClick = true;
+            if (Math.abs(dx) >= 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                bjIr(raiz.__bjGaleria || $galeria, dx < 0 ? 1 : -1);
+            }
+        });
+        raiz.addEventListener('pointercancel', function () { gesto = null; });
+        raiz.addEventListener('click', function (ev) {
+            if (!anularClick) return;
+            anularClick = false;
+            ev.preventDefault();
+            ev.stopPropagation();
+        }, true);
+        raiz.addEventListener('dragstart', function (ev) { ev.preventDefault(); });
+        raiz.addEventListener('wheel', function (ev) {
+            if (Math.abs(ev.deltaX) <= Math.abs(ev.deltaY)) return;
+            ev.preventDefault();
+            if (bjPagina.paginas < 2) return;
+            clearTimeout(timerRueda);
+            timerRueda = window.setTimeout(function () {
+                ruedaAcumulada = 0;
+                ruedaUsada = false;
+            }, 250);
+            if (ruedaUsada) return;
+            ruedaAcumulada += ev.deltaX;
+            if (Math.abs(ruedaAcumulada) >= 60) {
+                ruedaUsada = true;
+                bjIr(raiz.__bjGaleria || $galeria, ruedaAcumulada > 0 ? 1 : -1);
+            }
+        }, { passive: false });
+    }
+
+    function navHtml() {
+        return `
+            <button type="button" class="bj-nav bj-nav--atras" data-bj-atras aria-label="Ocho juegos anteriores" disabled>
+                <img src="/assets/images/selector-aula/atras.png" alt="">
+            </button>
+            <button type="button" class="bj-nav bj-nav--adelante" data-bj-adelante aria-label="Ocho juegos siguientes" disabled>
+                <img src="/assets/images/selector-aula/adelante.png" alt="">
+            </button>
+            <p class="bj-pagina" data-bj-pagina aria-live="polite"></p>`;
+    }
+
+    function renderGaleria() {
+        const cards = juegos.map((j, i) => {
             const color = j.color || '#2563eb';
-            const polimotor = esPaquetePolimotor(j.url_paquete);
-            const desc = polimotor ? '' : (j.descripcion || '');
+            const oculto = i >= BJ_POR_PAGINA ? ' hidden' : '';
             return `
-            <button type="button" class="bj-card${polimotor ? ' bj-card--polimotor' : ''}" data-juego-slug="${escapar(j.slug)}"
+            <button type="button" class="bj-card"${oculto} data-juego-slug="${escapar(j.slug)}"
                     data-url-paquete="${escapar(j.url_paquete || '')}"
                     style="--c:${escapar(color)}">
                 <span class="bj-card-emoji" aria-hidden="true">${iconoHtml(j)}</span>
                 <h3 class="bj-card-titulo">${escapar(j.nombre)}</h3>
-                ${desc ? `<p class="bj-card-desc">${escapar(desc)}</p>` : ''}
             </button>`;
         }).join('');
 
         ctx.$paso.attr('data-paso', 'juegos').html(`
-            <div class="${claseGaleria()}">
+            <div class="bj-galeria"${estiloFondoGaleria()}>
                 ${cabeceraGaleria()}
-                <div class="bj-grid">${cards || '<p class="bj-vacio">Aún no hay juegos en este ambiente.</p>'}</div>
+                <div class="bj-carrusel">
+                    ${navHtml()}
+                    <div class="bj-grid">${cards || '<p class="bj-vacio">Aún no hay juegos en este ambiente.</p>'}</div>
+                </div>
             </div>
         `);
+        if (juegos.length) iniciarPaginacion(ctx.$paso.find('.bj-galeria'));
     }
 
     function perfilPayload() {
@@ -335,7 +572,6 @@
             color: opciones.color || '',
             onVolver: opciones.onVolver || null,
             urlCatalogo: opciones.urlCatalogo || null,
-            polimotor: esAmbientePolimotor(),
         };
         if (ctx.color) ctx.$paso.css('--rn-color', ctx.color);
         escucharSalidaJuego();

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Mano">
+  <ellipse cx="120" cy="228" rx="55" ry="6" fill="#000" opacity="0.1"/>
+  <g fill="#ffc9c9" stroke="#e8590c" stroke-width="4" stroke-linejoin="round">
+    <path d="M78 130 V70 C78 55 95 50 102 62 V130"/>
+    <path d="M102 125 V48 C102 34 118 32 122 48 V125"/>
+    <path d="M122 125 V42 C122 28 138 28 142 44 V125"/>
+    <path d="M142 128 V55 C142 40 158 42 160 58 V130"/>
+    <path d="M70 145 C55 130 48 110 62 100 C72 93 85 102 88 115 L95 150"/>
+    <path d="M78 130 H160 L168 175 C170 200 150 215 120 215 C90 215 70 200 72 175 Z"/>
+  </g>
+</svg>
