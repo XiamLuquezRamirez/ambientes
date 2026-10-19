@@ -642,6 +642,10 @@
         $id("opciones").innerHTML = "";
         $id("opciones").className = "opciones";
         ocultarBarra();
+        const escena = $id("escena-juego");
+        if (escena) escena.classList.remove("con-linterna");
+        const baul = $id("baul");
+        if (baul) baul.classList.remove("cerrando", "abriendo");
         const cub = $id("cubierta");
         cub.hidden = true;
         cub.className = "cubierta";
@@ -677,6 +681,7 @@
         if (id == null) {
             b.className = "objeto hueco";
             b.setAttribute("aria-label", "Hueco vacío");
+            if (esMuseo()) marcarPedestal(b, i);
             return b;
         }
         const e = elemento(id);
@@ -684,7 +689,15 @@
         b.dataset.id = id;
         b.setAttribute("aria-label", e.nombre || id);
         b.appendChild(crearImg(e.img, "objeto-img"));
+        if (esMuseo()) marcarPedestal(b, i);
         return b;
+    }
+
+    function marcarPedestal(el, i) {
+        const n = document.createElement("span");
+        n.className = "num-pedestal";
+        n.textContent = String(i + 1);
+        el.appendChild(n);
     }
 
     async function pintarTablero(items, animado) {
@@ -756,21 +769,27 @@
 
     /* ── Observación, barra de tiempo y cubierta ─────────────── */
 
-    function correrBarra(ms) {
+    /** 3-4: reloj de arena. 5-6: temporizador circular. */
+    function correrReloj(ms) {
         const barra = $id("barra-tiempo");
-        barra.innerHTML = '<span class="barra-tiempo-relleno"></span>';
+        const museo = esMuseo();
         barra.hidden = false;
-        const rel = barra.firstChild;
-        rel.style.transition = "none";
-        rel.style.transform = "scaleX(1)";
-        void rel.offsetWidth;
-        rel.style.transition = "transform " + ms + "ms linear";
-        rel.style.transform = "scaleX(0)";
+        barra.className = "barra-tiempo " + (museo ? "reloj-circular" : "reloj-arena");
+        const dur = ' style="animation-duration:' + ms + 'ms"';
+        if (museo) {
+            barra.innerHTML = '<span class="reloj-aro"' + dur + '></span>';
+            return;
+        }
+        barra.innerHTML = '<span class="arena-vaso">' +
+            '<span class="arena-arriba"' + dur + '></span>' +
+            '<span class="arena-cuello"></span>' +
+            '<span class="arena-abajo"' + dur + '></span></span>';
     }
 
     function ocultarBarra() {
         const barra = $id("barra-tiempo");
         barra.hidden = true;
+        barra.className = "barra-tiempo";
         barra.innerHTML = "";
     }
 
@@ -783,9 +802,32 @@
         return '<span class="c-izq"></span><span class="c-der"></span>';
     }
 
+    /** El baúl se cierra sobre los objetos (reto 1 de 3-4). No usa la cortina. */
+    async function cerrarBaul(r, trasCubrir, sigue) {
+        const ms = Number(r.ocultamientoMs) > 0 ? Number(r.ocultamientoMs) : 2000;
+        const baul = $id("baul");
+        const tab = $id("tablero");
+        baul.classList.add("cerrando");
+        efecto(r.ocultamientoEfecto || "clackMagic");
+        await sleep(TRANSICION_CUBIERTA_MS);
+        if (!sigue()) return false;
+        tab.classList.add("oculto-baul");
+        await sleep(ms);
+        if (!sigue()) return false;
+        await trasCubrir();
+        if (!sigue()) return false;
+        tab.classList.remove("oculto-baul");
+        baul.classList.remove("cerrando");
+        baul.classList.add("abriendo");
+        await sleep(TRANSICION_CUBIERTA_MS);
+        baul.classList.remove("abriendo");
+        return sigue();
+    }
+
     /** Tapa el tablero; mientras está cubierto se llama a `trasCubrir` para pintar el desafío. */
     async function cubrir(r, trasCubrir, sigue) {
         const clave = r.ocultamiento || "cortina";
+        if (clave === "baul" && !esMuseo()) return cerrarBaul(r, trasCubrir, sigue);
         const tipo = CUBIERTA_VISUAL[clave] || "cortina";
         const ms = Number(r.ocultamientoMs) > 0 ? Number(r.ocultamientoMs) : OCULTAMIENTO_MS;
         const cub = $id("cubierta");
@@ -870,10 +912,17 @@
             if (!sigue()) return false;
         }
         const ms = Number(r.observacionMs) > 0 ? Number(r.observacionMs) : OBSERVACION_MS;
-        correrBarra(ms);
-        await sleep(ms);
+        const escena = $id("escena-juego");
+        if (esMuseo() && escena) escena.classList.add("con-linterna");
+        correrReloj(ms);
+        /* El reloj corre mientras habla el personaje. No se suma otro bloque después. */
+        await Promise.all([
+            Promise.resolve(opts.voz || null).catch(function () {}),
+            sleep(ms)
+        ]);
         if (!sigue()) return false;
         ocultarBarra();
+        if (escena) escena.classList.remove("con-linterna");
         return cubrir(r, function () { return pintarDesafio(r); }, sigue);
     }
 
@@ -1074,13 +1123,10 @@
         limpiarEscena();
         await sleep(250);
         if (!sigue()) return;
-        // Objetos visibles mientras suena la presentación (el doc pide mirarlos).
         await pintarTablero(reto.mostrar || [], true);
         if (!sigue()) return;
-        await decir(reto.presentacion);
-        if (!sigue()) return;
-
-        const ok = await secuenciaObservacion(reto, sigue, { yaPintado: true });
+        const voz = decir(reto.presentacion);
+        const ok = await secuenciaObservacion(reto, sigue, { yaPintado: true, voz: voz });
         if (!ok || !sigue()) return;
 
         await decir(reto.pregunta);
@@ -1119,11 +1165,14 @@
             const malo = ids.filter(function (id) { return par.indexOf(id) < 0; })[0];
             if (malo) idError = malo;
         }
+        const errorMuseoIntruso = esMuseo() && reto.mecanica === "intruso";
         els.forEach(function (el) {
             el.classList.remove("marcado");
-            el.classList.add("malo");
+            el.classList.add(errorMuseoIntruso ? "vibra-amarillo" : "malo");
             reiniciarClase(el, "tiembla", 600);
-            setTimeout(function () { el.classList.remove("malo"); }, 700);
+            setTimeout(function () {
+                el.classList.remove("malo", "vibra-amarillo");
+            }, 700);
         });
         marcados = [];
         const err = L.errorPara(reto, idError) || reto.errorOtro;
@@ -1194,9 +1243,15 @@
                 await sleep(1100);
                 break;
             case "encaja":
-                efecto("bloomChime");
+                efecto(esMuseo() ? "shineBloom" : "bloomChime");
                 reiniciarClase(el, "crece", 900);
-                particulas(c.x, c.y, { n: 14, tipo: "estrella", dist: 90, angulo: -Math.PI / 2, abanico: 2, colores: ["#ff6b6b", "#fcc419", "#51cf66"] });
+                particulas(c.x, c.y, {
+                    n: 12,
+                    tipo: esMuseo() ? "petalo" : "mariposa",
+                    dist: 110,
+                    angulo: -Math.PI / 2,
+                    abanico: 2.2
+                });
                 await sleep(1000);
                 break;
             case "gira":
@@ -1392,15 +1447,14 @@
     /* ── Cierre e insignia ───────────────────────────────────── */
 
     async function escenaCierreGaleria() {
-        const ids = (nivelElegido.retos[0] && nivelElegido.retos[0].mostrar)
-            ? nivelElegido.retos[0].mostrar.slice()
-            : ["manzana", "campana", "flor", "sol"];
-        if (nivelElegido.retos[1] && nivelElegido.retos[1].mostrar) {
-            nivelElegido.retos[1].mostrar.forEach(function (id) {
-                if (ids.indexOf(id) === -1) ids.push(id);
-            });
-        }
+        const faltante = (nivelElegido.retos || []).filter(function (r) { return r.mecanica === "faltante"; })[0];
+        const ids = (faltante && faltante.mostrar && faltante.mostrar.length)
+            ? faltante.mostrar.slice()
+            : ["manzana", "campana", "flor", "pelota"];
+        const baul = $id("baul");
+        if (baul) baul.classList.remove("cerrando", "abriendo");
         await pintarTablero(ids.slice(0, 4), true);
+        $id("tablero").classList.add("repisa");
         Array.prototype.forEach.call($id("tablero").children, function (el) {
             el.classList.add("gira-cierre");
         });

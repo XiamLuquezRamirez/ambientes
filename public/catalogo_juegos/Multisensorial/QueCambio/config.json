@@ -1,5 +1,198 @@
 {
-    "nombre": "¿Qué Cambió?",
-    "stub": true,
-    "creado_en": "2026-10-16T09:50:21-05:00"
+  "nombre": "¿Qué cambió?",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira cómo se juega! Primero observa la foto.",
+    "demostracionEstudio": "¡Mira cómo se juega! Primero observa la foto.",
+    "demostracionDetective": "¡Mira cómo se juega! Primero observa la repisa.",
+    "demostracionAcierto": "¡Así se descubre lo que cambió!",
+    "demostracionFin": "¡Ahora te toca a ti! Observa qué cambió.",
+    "conversacion": [
+      { "personaje": 1, "texto": "¡Vamos a tomar una foto!" },
+      { "personaje": 0, "texto": "¡Fíjate bien en lo que cambia!" }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "demo": {
+    "mecanica": "falta",
+    "mostrar": ["sol", "carro"],
+    "faltante": "sol",
+    "opciones": ["sol", "flor"],
+    "observacionMs": 2200,
+    "ocultamiento": "flash",
+    "ocultamientoMs": 900,
+    "ocultamientoEfecto": "flashSnap",
+    "presentacion": { "voz": "zoe", "texto": "¡Mira cómo se juega! Primero observa la foto." },
+    "pregunta": { "voz": "zeus", "texto": "¡Mira la nueva foto! Algo cambió." },
+    "detective": {
+      "ocultamiento": "apagon",
+      "ocultamientoEfecto": "clickShhh",
+      "presentacion": { "voz": "zoe", "texto": "¡Mira cómo se juega! Primero observa la repisa." },
+      "pregunta": { "voz": "zeus", "texto": "¡Luces encendidas! Algo cambió." }
+    }
+  },
+  "elementos": {
+    "manzana": { "img": "img/manzana.svg", "nombre": "Manzana" },
+    "pelota": {
+      "img": "img/pelota_azul.svg",
+      "nombre": "Pelota",
+      "variantes": {
+        "azul": "img/pelota_azul.svg",
+        "amarilla": "img/pelota_amarilla.svg",
+        "roja": "img/pelota_roja.svg",
+        "multi": "img/pelota_multi.svg"
+      }
+    },
+    "flor": { "img": "img/flor.svg", "nombre": "Flor" },
+    "campana": { "img": "img/campana.svg", "nombre": "Campana" },
+    "carro": { "img": "img/carro.svg", "nombre": "Carro" },
+    "sol": { "img": "img/sol.svg", "nombre": "Sol" },
+    "oso": { "img": "img/oso.svg", "nombre": "Oso" },
+    "helado": { "img": "img/helado.svg", "nombre": "Helado" },
+    "estrella": { "img": "img/estrella.svg", "nombre": "Estrella" },
+    "tambor": { "img": "img/tambor.svg", "nombre": "Tambor" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El fotógrafo mágico",
+      "escena": "estudio",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Bienvenido al estudio de fotos!" },
+        { "personaje": 0, "texto": "¡Descubre qué cambió en la foto!" }
+      ],
+      "retos": [
+        {
+          "id": "color-pelota",
+          "titulo": "El cambio de color de la pelota",
+          "mecanica": "color",
+          "mostrar": ["manzana", "pelota", "flor"],
+          "aspecto": { "pelota": "azul" },
+          "cambio": { "id": "pelota", "a": "amarilla" },
+          "observacionMs": 7000,
+          "ocultamiento": "flash",
+          "ocultamientoMs": 3000,
+          "ocultamientoEfecto": "flashSnap",
+          "presentacion": { "voz": "zoe", "texto": "¡Abran bien los ojos! Tomemos una foto a la manzana, la pelota azul y la flor." },
+          "pregunta": { "voz": "zeus", "texto": "¡Mira la nueva foto! Algo cambió en uno de los objetos. ¿Qué cambió?" },
+          "acierto": { "voz": "zoe", "texto": "¡Muy bien! La pelota cambió de color.", "efecto": "boingShine", "animacion": "rebota" },
+          "errorOtro": { "voz": "zeus", "texto": "Ese objeto no ha cambiado, sigue igual. Mira bien la pelota. ¡Inténtalo otra vez!", "efecto": "boing" }
+        },
+        {
+          "id": "falta-campana",
+          "titulo": "La desaparición de la campana",
+          "mecanica": "falta",
+          "mostrar": ["campana", "carro", "sol"],
+          "faltante": "campana",
+          "opciones": ["campana", "flor"],
+          "aceptaHueco": true,
+          "observacionMs": 7000,
+          "ocultamiento": "flash",
+          "ocultamientoMs": 3000,
+          "ocultamientoEfecto": "flashChick",
+          "presentacion": { "voz": "zeus", "texto": "¡Foto en 3, 2, 1... Click! Recuerda la campana, el carro y el sol." },
+          "pregunta": { "voz": "zoe", "texto": "¡Un objeto desapareció de la foto! Observa con atención. ¿Qué cambió?" },
+          "acierto": { "voz": "zoe", "texto": "¡Muy bien! Falta la campana.", "efecto": "dingDing", "animacion": "aparece" },
+          "errorOtro": { "voz": "zeus", "texto": "La flor no estaba en nuestra foto original. Revisa cuál de los objetos desapareció. ¡Inténtalo otra vez!", "efecto": "boing" }
+        },
+        {
+          "id": "aparece-estrella",
+          "titulo": "La aparición de la estrella",
+          "mecanica": "aparece",
+          "mostrar": ["oso", "flor", "helado"],
+          "intruso": "estrella",
+          "indiceIntruso": 1,
+          "observacionMs": 5000,
+          "ocultamiento": "flash",
+          "ocultamientoMs": 3000,
+          "ocultamientoEfecto": "flashSnap",
+          "presentacion": { "voz": "zoe", "texto": "¡Última foto del estudio! Mira con atención al oso, la flor y el helado." },
+          "pregunta": { "voz": "zeus", "texto": "¡Uy, llegó un visitante sorpresa a la foto! Observa con atención. ¿Qué cambió?" },
+          "acierto": { "voz": "zeus", "texto": "¡Muy bien! Aparece una estrella.", "efecto": "tadaaSparkle", "animacion": "chispas" },
+          "errorOtro": { "voz": "zoe", "texto": "Ellos ya estaban en la foto desde el principio. Busca al nuevo amigo que acaba de llegar. ¡Inténtalo otra vez!", "efecto": "boing" }
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Excelente! Observaste y descubriste todos los cambios." }
+      ],
+      "cierreEscena": "album",
+      "insignia": { "img": "img/insignia_fotografo.svg", "nombre": "Fotógrafo Detective" }
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El detective de cambios",
+      "escena": "detective",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Abre bien los ojos, detective!" },
+        { "personaje": 0, "texto": "¡La linterna te ayuda a ver qué cambió!" }
+      ],
+      "retos": [
+        {
+          "id": "color-pelota",
+          "titulo": "¿Qué cambió en la escena?",
+          "mecanica": "color",
+          "mostrar": ["manzana", "pelota", "flor", "campana"],
+          "aspecto": { "pelota": "azul" },
+          "cambio": { "id": "pelota", "a": "roja" },
+          "observacionMs": 7000,
+          "ocultamiento": "apagon",
+          "ocultamientoMs": 3000,
+          "ocultamientoEfecto": "clickShhh",
+          "presentacion": { "voz": "zoe", "texto": "¡Abre bien tus ojos, Detective! Mira atentamente los 4 objetos en la repisa antes de que apaguemos la luz." },
+          "pregunta": { "voz": "zeus", "texto": "¡Luces encendidas! Observa con atención. ¿Qué cambió?" },
+          "acierto": { "voz": "zoe", "texto": "¡Muy bien! La pelota cambia de color.", "efecto": "boingShine", "animacion": "rebota" },
+          "errorOtro": { "voz": "zeus", "texto": "Ese objeto no ha cambiado, sigue exactamente igual. Busca cuál tiene un color o tamaño diferente. ¡Inténtalo otra vez!", "efecto": "boing" }
+        },
+        {
+          "id": "falta-campana",
+          "titulo": "¿Qué objeto desapareció?",
+          "mecanica": "falta",
+          "mostrar": ["campana", "carro", "sol", "helado"],
+          "faltante": "campana",
+          "opciones": ["campana", "flor", "pelota"],
+          "observacionMs": 7000,
+          "ocultamiento": "apagon",
+          "ocultamientoMs": 3000,
+          "ocultamientoEfecto": "clickWhir",
+          "presentacion": { "voz": "zeus", "texto": "¡Siguiente pista! Memoriza la posición de la campana, el carro, el sol y el helado." },
+          "pregunta": { "voz": "zoe", "texto": "¡Oh no, un objeto desapareció mientras todo estaba a oscuras! Observa con atención. ¿Qué cambió?" },
+          "acierto": { "voz": "zoe", "texto": "¡Muy bien! Falta la campana.", "efecto": "dingDong", "animacion": "aparece" },
+          "errorOtro": { "voz": "zeus", "texto": "Ese objeto no estaba en la repisa antes. Revisa cuál de los 4 amigos faltó. ¡Inténtalo otra vez!", "efecto": "boing" }
+        },
+        {
+          "id": "aparece-estrella",
+          "titulo": "¿Qué objeto nuevo apareció?",
+          "mecanica": "aparece",
+          "mostrar": ["oso", "flor", "helado", "tambor"],
+          "intruso": "estrella",
+          "indiceIntruso": 2,
+          "observacionMs": 7000,
+          "ocultamiento": "apagon",
+          "ocultamientoMs": 3000,
+          "ocultamientoEfecto": "clickWhir",
+          "presentacion": { "voz": "zoe", "texto": "¡Último caso! Mira con cuidado al oso, la flor, el helado y el tambor." },
+          "pregunta": { "voz": "zeus", "texto": "¡Alguien se coló en la repisa! Observa con atención. ¿Qué cambió?" },
+          "acierto": { "voz": "zeus", "texto": "¡Muy bien! Aparece una estrella.", "efecto": "tadaaSparkle", "animacion": "chispas" },
+          "errorOtro": { "voz": "zoe", "texto": "Ellos ya estaban en la repisa. Busca al visitante que no estaba antes. ¡Inténtalo otra vez!", "efecto": "boing" }
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Excelente! Observaste y descubriste todos los cambios." }
+      ],
+      "cierreEscena": "vitrina",
+      "insignia": { "img": "img/insignia_detective.svg", "nombre": "Detective de Mirada Veloz" }
+    }
+  ]
 }
