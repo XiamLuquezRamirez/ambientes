@@ -448,31 +448,95 @@ body.museo-sensorial .inicio-el {
     color: #fff;
 }
 
-/* ── Barra de tiempo de observación ─────────────────────────── */
+/* ── Reloj de observación: arena (3-4) o aro (5-6) ─────────── */
 
 .barra-tiempo {
     flex: 0 0 auto;
-    width: min(560px, 80%);
-    height: 16px;
-    padding: 2px;
-    box-sizing: border-box;
-    border: 3px solid #fff;
-    border-radius: 999px;
-    background: rgba(0, 0, 0, 0.14);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
-    overflow: hidden;
+    align-self: center;
 }
 
 .barra-tiempo[hidden] { display: none !important; }
 
-.barra-tiempo-relleno {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #f03e3e 0%, #fcc419 45%, #51cf66 100%);
-    transform-origin: 0 50%;
+.reloj-arena {
+    width: 78px;
+    height: 108px;
 }
+
+.arena-vaso {
+    position: relative;
+    display: block;
+    width: 70px;
+    height: 100px;
+    margin: 0 auto;
+    border: 4px solid #4a2c12;
+    border-radius: 22px;
+    background: #fff8e1;
+    box-shadow: 0 4px 0 #c4a574;
+    overflow: hidden;
+}
+
+.arena-cuello {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    width: 8px;
+    height: 10px;
+    transform: translate(-50%, -50%);
+    background: #4a2c12;
+}
+
+.arena-arriba,
+.arena-abajo {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    height: 40px;
+    background: #f59f00;
+}
+
+.arena-arriba {
+    top: 4px;
+    clip-path: polygon(0 0, 100% 0, 62% 100%, 38% 100%);
+    transform-origin: 50% 0;
+    animation: arenaSale linear forwards;
+}
+
+.arena-abajo {
+    bottom: 4px;
+    clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    animation: arenaLlena linear forwards;
+}
+
+@keyframes arenaSale { to { transform: scaleY(0); } }
+@keyframes arenaLlena { to { transform: scaleY(1); } }
+
+@property --resto {
+    syntax: "<number>";
+    inherits: false;
+    initial-value: 1;
+}
+
+.reloj-circular {
+    width: 68px;
+    height: 68px;
+}
+
+.reloj-aro {
+    display: block;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: conic-gradient(#f59f00 calc(var(--resto) * 360deg), rgba(255, 255, 255, 0.35) 0);
+    -webkit-mask: radial-gradient(circle, transparent 58%, #000 60%);
+    mask: radial-gradient(circle, transparent 58%, #000 60%);
+    animation: relojVacia linear forwards;
+    box-shadow: 0 0 0 3px #fff, 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes relojVacia { to { --resto: 0; } }
 
 /* ── Escena de juego: baúl o museo + tablero + cubierta ─────── */
 
@@ -495,15 +559,30 @@ body.museo-sensorial .inicio-el {
 
 .baul[hidden] { display: none !important; }
 
+.baul.cerrando .baul-tapa,
+.baul.cerrado .baul-tapa {
+    z-index: 6;
+    height: 92%;
+    border-bottom: 7px solid #4a2c12;
+    border-radius: 26px;
+    transition: height 0.4s ease;
+}
+
+.tablero.oculto-baul {
+    visibility: hidden;
+}
+
 .baul-tapa {
     position: absolute;
     top: 0;
     left: 7%;
     right: 7%;
+    z-index: 1;
     height: 24%;
     border: 7px solid #4a2c12;
     border-bottom: 0;
     border-radius: 26px 26px 0 0;
+    transition: height 0.4s ease;
     background:
         linear-gradient(90deg, transparent 0 12%, #d4a017 12% 15%, transparent 15% 85%, #d4a017 85% 88%, transparent 88%),
         repeating-linear-gradient(180deg, #a0662d 0 14px, #8a5522 14px 16px);
@@ -564,6 +643,13 @@ body.museo-sensorial .inicio-el {
     max-width: 100%;
 }
 
+.tablero.repisa {
+    padding-bottom: 28px;
+    background: linear-gradient(180deg, transparent 62%, rgba(255, 236, 153, 0.95) 62%);
+    border-radius: 0 0 22px 22px;
+    box-shadow: 0 8px 0 #e0b000;
+}
+
 .tablero.cant-5 { --obj: min(110px, 16vh); }
 .tablero.cant-6 { --obj: min(96px, 14vh); gap: 12px; }
 .tablero.cant-7 { --obj: min(84px, 12vh); gap: 10px; }
@@ -601,6 +687,25 @@ body.museo-sensorial .objeto {
     background: none;
     box-shadow: none;
     overflow: visible;
+}
+
+.num-pedestal {
+    position: absolute;
+    left: 50%;
+    bottom: -38px;
+    z-index: 2;
+    transform: translateX(-50%);
+    font: 700 14px/1 'Fredoka', sans-serif;
+    color: #5c4033;
+}
+
+.escena-juego.con-linterna::after {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    z-index: 4;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 42%, transparent 0 26%, rgba(12, 16, 32, 0.62) 72%);
 }
 
 body.museo-sensorial .objeto::before {
@@ -720,6 +825,11 @@ body.museo-sensorial .objeto.correcta {
 .objeto.malo {
     outline: 3px solid #fd7e14;
     box-shadow: 0 0 0 6px rgba(253, 126, 20, 0.35);
+}
+
+.objeto.vibra-amarillo {
+    filter: drop-shadow(0 0 10px #fcc419);
+    box-shadow: 0 0 0 6px rgba(252, 196, 25, 0.85);
 }
 
 .objeto.vuela-globo {
@@ -942,6 +1052,18 @@ body.museo-sensorial .objeto.correcta {
     height: 16px;
     border-radius: 2px;
 }
+
+.p-mariposa,
+.p-petalo {
+    width: 22px;
+    height: 22px;
+    background: none !important;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.p-mariposa::before { content: "🦋"; }
+.p-petalo::before { content: "🌸"; }
 
 /* ── Final: insignia visual sin texto ───────────────────────── */
 
