@@ -20,14 +20,13 @@ body:has(.selector-aula) {
     position: absolute;
     inset: 0;
     background: #f5e0bb url("../images/selector-aula/fondo.png") center / cover no-repeat;
-    filter: blur(0);
-    transform: none;
-    transition: filter 0.42s ease, transform 0.42s ease;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    transition: filter 0.35s ease;
 }
 
 .selector-aula--confirma .selector-aula__escena {
     filter: blur(12px);
-    transform: scale(1.04);
     pointer-events: none;
 }
 
@@ -392,6 +391,8 @@ body:has(.selector-aula) .kiosco-fs-btn {
     display: grid;
     place-items: center;
     padding: 10vh 4vw 4vh;
+    overflow: hidden;
+    contain: paint;
 }
 
 .aula-confirma[hidden] {
@@ -405,88 +406,112 @@ body:has(.selector-aula) .kiosco-fs-btn {
 }
 
 .aula-confirma__caja {
-    --marco: #f5b400;
-    position: relative;
+    --marco: #f06747;
+    --caja-alto: calc(60vw * 506.97 / 805.97);
+    --caja-reposo: calc(50% - var(--caja-alto) / 2);
+    position: absolute;
     z-index: 1;
-    height: 62vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: min(720px, 92vw);
-    margin-top: clamp(48px, 8vh, 78px);
-    padding-top: 9.5%;
-    --avatar-top: 40px;
-    border-radius: 2.1rem;
-    border: 12px solid var(--marco);
-    background-color: color-mix(in srgb, var(--marco) 8%, #fff);
-    text-align: center;
-    animation: aula-confirma-entra 0.46s cubic-bezier(0.2, 1.15, 0.32, 1);
-    box-shadow: 9px 9px 0px -1px color-mix(in srgb, var(--marco, #111111) 66%, #111111);
+    left: 0;
+    right: 0;
+    width: 60vw;
+    height: var(--caja-alto);
+    margin-inline: auto;
+    top: 100%;
+    bottom: auto;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
 }
 
-.aula-confirma__fondo {
+.aula-confirma--entra .aula-confirma__caja {
+    animation: aula-confirma-entra 0.72s cubic-bezier(0.33, 0, 0.2, 1) both;
+}
+
+.aula-confirma__burbuja {
     position: absolute;
-    z-index: -1;
     inset: 0;
-    border-radius: calc(2.1rem - 12px);
-    overflow: hidden;
     pointer-events: none;
 }
 
-.aula-confirma__fondo svg {
+.aula-confirma__burbuja svg {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-.aula-confirma__fondo .aula-fondo__b0 { stop-color: color-mix(in srgb, var(--marco) 6%, #fff); }
-.aula-confirma__fondo .aula-fondo__b1 { stop-color: color-mix(in srgb, var(--marco) 8%, #fff); }
-.aula-confirma__fondo .aula-fondo__b2 { stop-color: color-mix(in srgb, var(--marco) 13%, #fff); }
-.aula-confirma__fondo .aula-fondo__f0 { stop-color: color-mix(in srgb, var(--marco) 33%, #fff); }
-.aula-confirma__fondo .aula-fondo__f1 { stop-color: color-mix(in srgb, var(--marco) 37%, #fff); }
-.aula-confirma__fondo .aula-fondo__o0 { stop-color: color-mix(in srgb, var(--marco) 27%, #fff); }
-.aula-confirma__fondo .aula-fondo__o1 { stop-color: color-mix(in srgb, var(--marco) 37%, #fff); }
-
-.aula-confirma__rayos {
-    position: absolute;
-    z-index: 1;
-    left: 50%;
-    top: var(--avatar-top);
-    width: 150px;
-    height: 150px;
-    transform: translate(-50%, -48%);
-    pointer-events: none;
+.aula-confirma__sombra {
+    fill: #1a1a1a;
+    opacity: 0.1;
 }
 
-.aula-confirma__rayos i {
+/* El relleno del globo (cls-2 de fondo_card.svg) toma el color del niño. */
+.aula-confirma__relleno {
+    fill: var(--marco);
+}
+
+.aula-confirma__trazo {
+    fill: none;
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 3px;
+}
+
+.aula-confirma__voz {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: var(--w);
-    height: var(--h);
-    border-radius: 999px;
-    background: var(--marco);
-    transform: translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r));
+    z-index: 3;
+    top: 7%;
+    right: 6.5%;
+}
+
+.aula-confirma__voz img {
+    width: clamp(52px, 8vh, 78px);
+}
+
+.aula-confirma__cuerpo {
+    position: absolute;
+    z-index: 2;
+    left: 5%;
+    right: 5%;
+    top: 8%;
+    bottom: 23%;
+    display: grid;
+    grid-template-columns: 0.74fr 1.26fr;
+    align-items: center;
+    column-gap: 3%;
+}
+
+.aula-confirma__ficha {
+    position: relative;
+    height: 92%;
+    aspect-ratio: 180.01 / 211.54;
+    justify-self: center;
+    container-type: size;
+}
+
+.aula-confirma__marco {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
 }
 
 .aula-confirma__foto {
     position: absolute;
-    z-index: 2;
-    left: 50%;
-    top: var(--avatar-top);
-    width: 182px;
+    z-index: 1;
+    left: 49.41%;
+    top: 41%;
+    width: 66%;
     aspect-ratio: 1;
-    transform: translate(-50%, -48%);
+    transform: translate(-50%, -50%);
     border-radius: 50%;
-    border: 14px solid var(--marco);
-    background: #fff;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--marco);
-    padding: 8px;
+    background: #fff;
 }
 
 .aula-confirma__foto img {
@@ -498,76 +523,71 @@ body:has(.selector-aula) .kiosco-fs-btn {
 .aula-confirma__foto .marco-nino__iniciales {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
-    background: var(--marco);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(2.2rem, 5vw, 3.4rem);
-    color: #fff;
+    background: transparent;
+    font-size: 28cqh;
+    color: var(--marco);
 }
 
 .aula-confirma__nombre {
-    position: relative;
+    position: absolute;
     z-index: 2;
-    margin: 0 0 0.15em;
-    max-width: 100%;
-    font-family: "Fredoka One", cursive;
-    text-transform: capitalize;
-    font-size: 68px;
-    font-weight: 400;
-    line-height: 1.02;
-    white-space: nowrap;
-    color: #1a2f7a;
-    -webkit-text-stroke: 0.31em #fff;
-    paint-order: stroke fill;
-}
-
-.aula-confirma__pregunta {
-    position: relative;
-    z-index: 2;
+    left: 49.41%;
+    top: 80.6%;
+    width: 78%;
+    height: 22%;
+    margin: 0;
+    transform: translate(-50%, -50%);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.28em;
-    width: fit-content;
-    margin: 0 auto clamp(10px, 2vh, 18px);
-    padding: 0 1.6rem 0.45em;
+    font-family: "Fredoka One", cursive;
+    font-size: 9.5cqh;
+    font-weight: 400;
+    line-height: 1.05;
+    text-align: center;
+    text-transform: capitalize;
+    color: var(--marco);
+    pointer-events: none;
 }
 
-.aula-confirma__linea {
-    position: relative;
-    display: inline-block;
+.aula-confirma__nombre span {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.aula-confirma__lado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5.6vh;
+    min-width: 0;
+    padding-top: 4%;
 }
 
 .aula-confirma__titulo {
     margin: 0;
     font-family: "Fredoka One", cursive;
-    font-size: clamp(1.7rem, 4.2vw, 2.85rem);
+    font-size: clamp(2.3rem, 5vw, 4rem);
     font-weight: 400;
     line-height: 1;
-    color: #3aaa28;
-}
-
-.aula-confirma__subrayado {
-    position: absolute;
-    left: 4%;
-    right: 4%;
-    bottom: -0.22em;
-    height: 0.22em;
-    border-radius: 999px;
-    background: var(--marco);
-}
-
-.aula-confirma__pregunta .selector-aula__voz img {
-    width: clamp(40px, 6.2vh, 58px);
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 0.12em 0 color-mix(in srgb, var(--marco) 35%, #1a1a1a91);
 }
 
 .aula-confirma__acciones {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(12px, 3vw, 40px);
+    gap: clamp(10px, 2vw, 28px);
 }
 
 .aula-confirma__btn {
@@ -582,7 +602,7 @@ body:has(.selector-aula) .kiosco-fs-btn {
 
 .aula-confirma__btn img {
     display: block;
-    height: 120px;
+    height: clamp(75px, 8.2vh, 92px);
     width: auto;
     pointer-events: none;
 }
@@ -598,10 +618,12 @@ body:has(.selector-aula) .kiosco-fs-btn {
 }
 
 .aula-confirma--sale .aula-confirma__caja {
-    animation: aula-confirma-sale 0.32s ease-in forwards;
+    animation: aula-confirma-sale 0.36s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
 .aula-confirma--yendo .aula-confirma__caja {
+    top: var(--caja-reposo);
+    bottom: auto;
     animation: aula-confirma-acepta 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
@@ -625,25 +647,25 @@ body:has(.selector-aula) .kiosco-fs-btn {
 
 @keyframes aula-confirma-entra {
     from {
-        transform: translateY(22px) scale(0.9);
-        opacity: 0;
+        top: 100%;
+        bottom: auto;
     }
 
     to {
-        transform: none;
-        opacity: 1;
+        top: var(--caja-reposo);
+        bottom: auto;
     }
 }
 
 @keyframes aula-confirma-sale {
     from {
-        transform: none;
-        opacity: 1;
+        top: var(--caja-reposo);
+        bottom: auto;
     }
 
     to {
-        transform: translateY(16px) scale(0.94);
-        opacity: 0;
+        top: 100%;
+        bottom: auto;
     }
 }
 
@@ -678,10 +700,19 @@ body:has(.selector-aula) .kiosco-fs-btn {
     .selector-aula__nav:not(:disabled) img,
     .selector-aula__escena,
     .aula-confirma__caja,
+    .aula-confirma--entra .aula-confirma__caja,
     .aula-confirma--sale .aula-confirma__caja,
     .aula-confirma--yendo .aula-confirma__caja,
     [data-kiosco-superponiendo="debajo"] > .selector-aula[data-kiosco-saliente].is-desvaneciendo {
         animation: none;
         transition: none;
+        transform: none;
+    }
+
+    .aula-confirma__caja,
+    .aula-confirma--entra .aula-confirma__caja,
+    .aula-confirma--sale .aula-confirma__caja {
+        top: var(--caja-reposo);
+        bottom: auto;
     }
 }

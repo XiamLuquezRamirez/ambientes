@@ -312,7 +312,10 @@
             if (img) confirmaFoto.appendChild(img.cloneNode(true));
             else if (iniciales) confirmaFoto.appendChild(iniciales.cloneNode(true));
         }
-        if (confirmaNombre) confirmaNombre.textContent = nombre;
+        if (confirmaNombre) {
+            var nombreEl = card.querySelector('.marco-nino__nombre');
+            confirmaNombre.innerHTML = nombreEl ? nombreEl.innerHTML : '';
+        }
         pinUrl = card.getAttribute('data-pin') || '';
         precargaPin = (pinUrl && window.KioscoNav && typeof window.KioscoNav.precargar === 'function')
             ? window.KioscoNav.precargar(pinUrl)
@@ -321,15 +324,13 @@
         if (alTerminarCierre) alTerminarCierre();
         cerrando = false;
         confirma.classList.remove('aula-confirma--sale');
+        confirma.classList.remove('aula-confirma--entra');
         raiz.classList.add('selector-aula--confirma');
         confirma.hidden = false;
-        if (caja) {
-            caja.style.animation = 'none';
-            void caja.offsetWidth;
-            caja.style.animation = '';
-        }
+        if (caja) void caja.offsetWidth;
+        confirma.classList.add('aula-confirma--entra');
         hablarConfirma();
-        if (confirmaNo) confirmaNo.focus();
+        if (confirmaNo) confirmaNo.focus({ preventScroll: true });
     }
 
     var cerrando = false;
@@ -343,13 +344,13 @@
         if (!caja || reducir) {
             confirma.hidden = true;
             confirma.classList.remove('aula-confirma--sale');
+            confirma.classList.remove('aula-confirma--entra');
             raiz.classList.remove('selector-aula--confirma');
             if (fichaOrigen) fichaOrigen.focus();
             return;
         }
         cerrando = true;
         confirma.classList.add('aula-confirma--sale');
-        raiz.classList.remove('selector-aula--confirma');
         var listo = false;
         var timer = 0;
         function terminar(ev) {
@@ -362,6 +363,8 @@
             cerrando = false;
             confirma.hidden = true;
             confirma.classList.remove('aula-confirma--sale');
+            confirma.classList.remove('aula-confirma--entra');
+            raiz.classList.remove('selector-aula--confirma');
             if (fichaOrigen) fichaOrigen.focus();
         }
         alTerminarCierre = function () {
