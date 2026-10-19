@@ -110,9 +110,10 @@ body.intro3d-activa #menu-acc {
 
 .inicio-kicker {
   margin: 0;
-  font-size: clamp(18px, 3.2vw, 28px);
+  font-size: clamp(32px, 4.6vw, 52px);
   font-weight: 700;
   color: #1e3a5f;
+  text-shadow: 0 3px 0 #fff;
 }
 
 .btn-empecemos {
@@ -257,9 +258,17 @@ body.intro3d-activa #menu-acc {
 }
 
 .enunciado-wrap h1 {
+  display: inline-block;
+  max-width: min(92vw, 980px);
   margin: 0;
-  font-size: clamp(20px, 2.8vw, 28px);
-  line-height: 1.25;
+  padding: 10px 28px 12px;
+  font-size: 30px;
+  line-height: 1.2;
+  color: #1e3a5f;
+  background: #fffdf6;
+  border: 5px solid #ffe27a;
+  border-radius: 28px;
+  box-shadow: 0 6px 0 #ffb300;
 }
 
 .escenario {
@@ -275,11 +284,15 @@ body.intro3d-activa #menu-acc {
   position: relative;
   width: min(96vw, 1100px);
   flex: 1;
-  max-height: calc(100dvh - 150px);
-  background: #fff;
-  border: 5px solid #fff;
-  border-radius: 24px;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
+  max-height: calc(100dvh - 168px);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 212, 59, 0.35) 0 18px, transparent 19px),
+    radial-gradient(circle at 88% 22%, rgba(77, 171, 247, 0.35) 0 16px, transparent 17px),
+    radial-gradient(circle at 80% 84%, rgba(81, 207, 102, 0.28) 0 20px, transparent 21px),
+    linear-gradient(180deg, #fffdf8 0%, #f3f7ff 100%);
+  border: 6px solid #fff;
+  border-radius: 32px;
+  box-shadow: 0 14px 0 rgba(30, 58, 95, 0.08), 0 18px 36px rgba(15, 23, 42, 0.14);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -313,28 +326,31 @@ body.intro3d-activa #menu-acc {
 .zona-slot {
   flex: 1 1 0;
   min-width: 0;
+  min-height: 0;
   max-width: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-  border-radius: 20px;
-  border: 4px dashed rgba(0, 0, 0, 0.08);
+  justify-content: center;
+  gap: 8px;
+  border-radius: 28px;
+  border: 6px solid transparent;
   background: #f8fafc;
-  padding: 10px 8px;
+  padding: 12px 12px 14px;
+  overflow: hidden;
+  box-sizing: border-box;
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
   cursor: pointer;
   user-select: none;
 }
 
-.zona-slot.izquierda { background: rgba(255, 212, 59, 0.22); }
-.zona-slot.centro { background: rgba(77, 171, 247, 0.22); }
-.zona-slot.derecha { background: rgba(81, 207, 102, 0.22); }
-.zona-slot.slot-0 { background: rgba(255, 212, 59, 0.2); }
-.zona-slot.slot-1 { background: rgba(77, 171, 247, 0.18); }
-.zona-slot.slot-2 { background: rgba(129, 201, 149, 0.2); }
-.zona-slot.slot-3 { background: rgba(81, 207, 102, 0.22); }
+.zona-slot.izquierda { background: #fff4c2; border-color: #f5b400; }
+.zona-slot.centro { background: #d7efff; border-color: #1c7ed6; }
+.zona-slot.derecha { background: #d3f9d8; border-color: #2f9e44; }
+.zona-slot.slot-0 { background: #fff4c2; border-color: #f5b400; }
+.zona-slot.slot-1 { background: #d7efff; border-color: #1c7ed6; }
+.zona-slot.slot-2 { background: #e5f8ec; border-color: #40c057; }
+.zona-slot.slot-3 { background: #d3f9d8; border-color: #2f9e44; }
 
 .zona-slot:active,
 .zona-slot.pulsando {
@@ -348,30 +364,44 @@ body.intro3d-activa #menu-acc {
 }
 
 .zona-etiqueta {
+  flex: 0 0 auto;
+  max-width: 100%;
   font-weight: 700;
-  font-size: 18px;
-  color: #334155;
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.1;
+  color: #1e3a5f;
   text-transform: capitalize;
+  text-align: center;
 }
 
 .tarjeta-obj {
-  width: min(140px, 18vw);
-  height: min(140px, 18vw);
+  position: relative;
+  box-sizing: border-box;
+  width: min(100%, 200px);
+  height: auto;
+  max-height: calc(100% - 44px);
+  aspect-ratio: 1;
+  min-width: 0;
+  min-height: 0;
+  flex: 0 1 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #fff;
-  border-radius: 18px;
-  border: 3px solid #fff;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  border-radius: 24px;
+  border: 5px solid #fff;
+  box-shadow: 0 8px 0 rgba(30, 58, 95, 0.08), 0 12px 20px rgba(15, 23, 42, 0.1);
   cursor: pointer;
-  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .tarjeta-obj img {
-  width: 88%;
-  height: 88%;
+  width: 78%;
+  height: 78%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
+  object-position: center center;
   pointer-events: none;
 }
 
@@ -390,8 +420,8 @@ body.intro3d-activa #menu-acc {
 
 .actor-movil {
   position: absolute;
-  width: min(180px, 28vw);
-  height: min(180px, 28vw);
+  width: min(180px, 22vw);
+  height: min(180px, 22vw);
   left: 50%;
   top: 48%;
   transform: translate(-50%, -50%);
@@ -409,6 +439,7 @@ body.intro3d-activa #menu-acc {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center center;
   filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.18));
   pointer-events: none;
 }
@@ -420,17 +451,25 @@ body.intro3d-activa #menu-acc {
 .mascota-panel {
   position: absolute;
   left: 50%;
-  top: 52%;
+  top: 62%;
   transform: translate(-50%, -50%);
-  width: min(260px, 42vw);
-  height: min(280px, 48vh);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center bottom;
+  width: min(210px, 24vw);
+  height: min(250px, 34vh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 6;
   pointer-events: none;
   transition: left 0.95s ease-in-out, top 0.5s ease;
+}
+
+.mascota-panel img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
   filter: drop-shadow(0 10px 14px rgba(15, 23, 42, 0.22));
+  pointer-events: none;
 }
 
 .tablero.modo-imitacion {
@@ -445,7 +484,7 @@ body.intro3d-activa #menu-acc {
   min-height: 0;
   max-height: none;
   justify-content: flex-start;
-  padding-top: 14px;
+  padding-top: 16px;
 }
 
 .mascota-panel.caminando {
@@ -498,46 +537,68 @@ body.intro3d-activa #menu-acc {
 
 .pareja-fijos {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   gap: 28px;
   width: 100%;
   height: 100%;
-  padding-bottom: 8%;
+  min-height: 0;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .pareja-fijos .figura {
-  width: min(200px, 30vw);
-  height: min(240px, 40vh);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center bottom;
+  width: min(200px, 30%);
+  height: min(240px, 78%);
+  max-height: 100%;
+  min-height: 0;
+  flex-shrink: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.pareja-fijos .figura img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
 }
 
 .pareja-fijos .tarjeta-obj {
-  width: min(180px, 28vw);
-  height: min(180px, 28vw);
+  width: min(180px, 26%);
+  height: auto;
+  max-height: 70%;
+  aspect-ratio: 1;
+  flex-shrink: 1;
 }
 
 .respuestas {
   display: flex;
   justify-content: center;
-  gap: 24px;
-  padding: 12px 16px 20px;
+  align-items: center;
+  gap: 28px;
+  padding: 18px 28px 22px;
   flex-shrink: 0;
   position: relative;
   z-index: 8;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 35%);
+  box-sizing: border-box;
+  background: #fff;
 }
 
 .respuestas[hidden] { display: none !important; }
 
 .btn-mano {
-  min-width: 120px;
-  min-height: 100px;
-  border-radius: 24px;
-  border: 5px solid #fff;
-  font-size: 20px;
+  position: relative;
+  box-sizing: border-box;
+  min-width: 168px;
+  min-height: 118px;
+  padding: 16px 26px 18px;
+  border-radius: 28px;
+  border: 6px solid #fff;
+  font-size: clamp(22px, 2.4vw, 32px);
   font-weight: 700;
   color: #1e293b;
   cursor: pointer;
@@ -546,10 +607,42 @@ body.intro3d-activa #menu-acc {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 8px;
+  overflow: visible;
 }
 
-.btn-mano i { font-size: 36px; line-height: 1; }
+.btn-mano i { font-size: 44px; line-height: 1; }
+
+.btn-mano.acerto,
+.zona-slot.acerto,
+.tarjeta-obj.acerto,
+.actor-movil.acerto {
+  animation: aciertoPop 0.6s ease;
+  z-index: 3;
+}
+
+.estrella-pop {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 6;
+  pointer-events: none;
+  font-size: 26px;
+  line-height: 1;
+  animation: estrellaVuela 0.7s ease-out forwards;
+}
+
+@keyframes aciertoPop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.1); }
+  60% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+@keyframes estrellaVuela {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.15); }
+}
 /* fa-hand es mano derecha: espejamos la izquierda para que se lean como izq / der. */
 .btn-mano.izquierda i.mano-izq {
   transform: scaleX(-1);
@@ -581,16 +674,16 @@ body.intro3d-activa #menu-acc {
 
 .zona-demo {
   flex: 1;
-  border-radius: 20px;
+  border-radius: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(22px, 3vw, 32px);
+  font-size: clamp(36px, 5vw, 64px);
   font-weight: 700;
   color: #1e293b;
   opacity: 0.35;
   transition: opacity 0.35s ease, transform 0.35s ease;
-  border: 4px solid transparent;
+  border: 6px solid transparent;
 }
 
 .zona-demo.zona-izquierda { background: #ffd43b; }
@@ -795,13 +888,23 @@ body.intro3d-activa #menu-acc {
 
 .btn-eleccion {
   width: 100%;
-  max-width: 320px;
-  min-height: 72px;
-  font-size: 22px;
+  max-width: 360px;
+  min-height: 84px;
+  font-size: clamp(26px, 3vw, 34px);
   font-weight: 700;
-  border-radius: 16px;
-  border: 4px solid #fff;
+  border-radius: 22px;
+  border: 5px solid #fff;
   line-height: 1.25;
+}
+
+.swal2-popup {
+  border-radius: 28px !important;
+  font-family: 'Fredoka', sans-serif;
+}
+
+.swal2-title {
+  font-size: clamp(28px, 3.4vw, 42px) !important;
+  line-height: 1.25 !important;
 }
 
 .swal2-html-container { overflow: hidden; }
@@ -811,7 +914,12 @@ body.intro3d-activa #menu-acc {
   .btn-empecemos-anillo,
   .btn-empecemos-anillo-2,
   .actor-movil,
-  .mascota-panel {
+  .mascota-panel,
+  .btn-mano.acerto,
+  .zona-slot.acerto,
+  .tarjeta-obj.acerto,
+  .actor-movil.acerto,
+  .estrella-pop {
     animation: none;
     transition: none;
   }

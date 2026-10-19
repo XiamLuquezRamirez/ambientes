@@ -267,24 +267,27 @@
                 resolve();
                 return;
             }
-            if (imgCache[url] && imgCache[url].complete) {
-                resolve(imgCache[url]);
+            const lista = imgCache[url];
+            if (lista && lista.complete && lista.naturalWidth) {
+                resolve(lista);
                 return;
             }
             const img = new Image();
-            const done = function () {
-                imgCache[url] = img;
-                resolve(img);
+            let settled = false;
+            const finish = function () {
+                if (settled) return;
+                settled = true;
+                resolve(imgCache[url] || null);
             };
-            img.onload = done;
-            img.onerror = function () { resolve(null); };
+            img.onload = function () {
+                imgCache[url] = img;
+                const dec = (img.decode ? img.decode() : Promise.resolve());
+                Promise.resolve(dec).then(finish, finish);
+            };
+            img.onerror = function () { finish(); };
             img.src = url;
-            setTimeout(function () {
-                if (!imgCache[url]) {
-                    imgCache[url] = img;
-                    resolve(img);
-                }
-            }, 600);
+            /* Si el archivo no responde, no lo damos por cargado. */
+            setTimeout(finish, 12000);
         });
     }
 
@@ -348,8 +351,10 @@
     function crearImgEl(url, alt) {
         const img = document.createElement("img");
         img.alt = alt || "";
-        img.decoding = "async";
+        img.draggable = false;
         const cached = imgCache[url];
+        const lista = cached && cached.complete && cached.naturalWidth;
+        img.decoding = lista ? "sync" : "auto";
         if (cached && cached.src) {
             img.src = cached.currentSrc || cached.src;
         } else {
@@ -364,13 +369,17 @@
         Object.keys(objs).forEach(function (id) {
             if (objs[id].img) urls.push(objs[id].img);
         });
+        urls.push(
+            "../../images/zeus_normal.gif",
+            "../../images/zoe_normal.gif",
+            "../../images/correcto.gif",
+            "../../images/incorrecto.gif"
+        );
         return Promise.all(urls.map(preloadUrl));
     }
 
     function precargarMediaSecundaria() {
         const urls = [
-            "../../images/correcto.gif",
-            "../../images/incorrecto.gif",
             "../../images/victoria.gif",
             "../../images/nube.png"
         ];
@@ -635,7 +644,7 @@
             }
             iniciarRetoActual(gen);
         };
-        esperarImagenesOTimeout(350).then(arrancar).catch(arrancar);
+        esperarImagenesOTimeout(8000).then(arrancar).catch(arrancar);
     };
 
     function ladoContrarioAlReto(respuesta) {
@@ -1168,7 +1177,7 @@
 
             const zeus = document.createElement("div");
             zeus.className = "figura";
-            zeus.style.backgroundImage = "url(" + gifPersonaje("zeus") + ")";
+            zeus.appendChild(crearImgEl(gifPersonaje("zeus"), "Zeus"));
 
             if (rt.ladoZeus === "izquierda") {
                 wrap.appendChild(zeus);
@@ -1196,7 +1205,7 @@
         const mascota = document.createElement("div");
         mascota.className = "mascota-panel";
         const gif = gifPersonaje(rt.mascota === "zoe" ? "zoe" : "zeus");
-        mascota.style.backgroundImage = "url(" + gif + ")";
+        mascota.appendChild(crearImgEl(gif, rt.mascota === "zoe" ? "Zoe" : "Zeus"));
         mascota.style.left = "50%";
         actorArea.appendChild(mascota);
 
@@ -1361,14 +1370,39 @@
         });
     }
 
+    function celebrarAcierto(valor) {
+        const v = String(valor);
+        const sel = '.btn-mano[data-zona="' + v + '"], .zona-slot[data-zona="' + v + '"], .tarjeta-obj[data-objeto="' + v + '"]';
+        const nodos = document.querySelectorAll(sel);
+        nodos.forEach(function (el) { el.classList.add("acerto"); });
+        const ancla = document.querySelector('.btn-mano[data-zona="' + v + '"]')
+            || document.querySelector('.tarjeta-obj[data-objeto="' + v + '"]')
+            || (nodos.length ? nodos[0] : null);
+        if (!ancla) return;
+        const colores = ["#ffd43b", "#ff6b6b", "#4dabf7", "#51cf66", "#ff922b"];
+        for (let i = 0; i < 8; i++) {
+            const s = document.createElement("span");
+            s.className = "estrella-pop";
+            s.textContent = i % 2 ? "★" : "✦";
+            const ang = (Math.PI * 2 * i) / 8;
+            s.style.color = colores[i % colores.length];
+            s.style.setProperty("--dx", Math.round(Math.cos(ang) * 78) + "px");
+            s.style.setProperty("--dy", Math.round(Math.sin(ang) * 64) + "px");
+            ancla.appendChild(s);
+            setTimeout(function () {
+                if (s.parentNode) s.parentNode.removeChild(s);
+            }, 720);
+        }
+    }
+
     function resolverAcierto(gen) {
         if (gen !== retoGen) return;
         esperandoFeedback = true;
         aceptaRespuesta = false;
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        celebrarAcierto(respuestaCorrectaActual());
 
-        // Sin modal/TTS por acierto: solo sonido y breve pausa visual.
-        sleep(350).then(function () {
+        sleep(720).then(function () {
             esperandoFeedback = false;
             if (gen !== retoGen) return;
             if (retoRuntime.pasos && retoRuntime.pasoIdx < retoRuntime.pasos.length - 1) {
@@ -1427,7 +1461,7 @@
         enlazarMenuAcc();
         window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
 
-        // Precarga: SVG de objetos bloquean poco; GIF/audio en segundo plano.
+        // Precarga objetos y GIF antes de mostrar el tablero. El tope evita bloquear si un archivo no responde.
         imagenesPromise = precargarImagenesCriticas();
         precargarMediaSecundaria();
 
