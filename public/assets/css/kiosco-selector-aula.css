@@ -94,7 +94,7 @@ body:has(.selector-aula) {
     line-height: 1;
     letter-spacing: 0.01em;
     color: #fff;
-    text-shadow: 0 0.08em 0 rgba(55, 95, 10, 0.28);
+    text-shadow: 2px 7px 0 rgba(55, 95, 10, 0.28);
 }
 
 .selector-aula__voz img {
@@ -119,10 +119,10 @@ body:has(.selector-aula) {
 .selector-aula__lista {
     position: absolute;
     z-index: 1;
-    left: 9%;
-    right: 9%;
-    top: 27%;
-    bottom: 4%;
+    left: 17%;
+    right: 17%;
+    top: 24%;
+    bottom: 13%;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-rows: repeat(2, minmax(0, 1fr));
@@ -130,6 +130,7 @@ body:has(.selector-aula) {
     align-items: center;
     column-gap: 1.2%;
     row-gap: 30px;
+    overflow: visible;
 }
 
 .marco-nino {
@@ -148,6 +149,7 @@ body:has(.selector-aula) {
     cursor: pointer;
     container-type: size;
     color: #fff;
+    overflow: visible;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -155,6 +157,7 @@ body:has(.selector-aula) {
     position: relative;
     width: min(100cqw, calc(100cqh * 180.01 / 211.54));
     aspect-ratio: 180.01 / 211.54;
+    overflow: visible;
 }
 
 .marco-nino[hidden] {
@@ -167,6 +170,31 @@ body:has(.selector-aula) {
 
 .marco-nino:active .marco-nino__caja {
     transform: scale(0.97);
+}
+
+.marco-nino__resplandor {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    pointer-events: none;
+    /* El filtro tiene que ir en el padre: si comparte máscara con la forma, el resplandor se recorta. */
+    filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 85px #fff);
+}
+
+.marco-nino__resplandor-forma {
+    position: absolute;
+    inset: 0;
+    background-color: #fff;
+    -webkit-mask-image: url("../images/selector-aula/marco_nino_resplandor.svg");
+    mask-image: url("../images/selector-aula/marco_nino_resplandor.svg");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
 }
 
 .marco-nino__marco,
@@ -187,20 +215,20 @@ body:has(.selector-aula) {
     mask-mode: alpha;
 }
 
-/* El círculo y el punteado quedan detrás de la foto; la placa del nombre, encima. */
+/* El círculo queda detrás de la foto; la placa del nombre, encima. */
 .marco-nino__marco {
-    z-index: 0;
+    z-index: 1;
     clip-path: inset(0 0 32% 0);
 }
 
 .marco-nino__placa {
-    z-index: 2;
+    z-index: 3;
     clip-path: inset(67% 0 0 0);
 }
 
 .marco-nino__foto {
     position: absolute;
-    z-index: 1;
+    z-index: 2;
     left: 49.41%;
     top: 42.39%;
     width: 72%;
@@ -232,7 +260,7 @@ body:has(.selector-aula) {
 
 .marco-nino__nombre {
     position: absolute;
-    z-index: 3;
+    z-index: 4;
     left: 49.41%;
     top: 80.6%;
     width: 76%;
@@ -261,7 +289,7 @@ body:has(.selector-aula) {
 
 .marco-nino__aviso {
     position: absolute;
-    z-index: 4;
+    z-index: 5;
     left: 73%;
     top: 19%;
     width: 1.9em;
