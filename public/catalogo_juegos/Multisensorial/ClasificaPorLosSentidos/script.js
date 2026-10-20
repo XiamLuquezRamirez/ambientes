@@ -492,6 +492,7 @@
     }
 
     async function iniciarReto(gen) {
+    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
         if (!vivo(gen)) return;
         reto = nivelElegido.retos[indiceReto];
         if (!reto) { granCierre(gen); return; }
@@ -567,7 +568,7 @@
         demoActiva = true;
         fase = "";
         entradaActiva = false;
-        PedniaTutorial.activarDemo();
+        await PedniaTutorial.activarDemo();
         const t = textos();
         limpiar();
         const tubos = d.tubos || ["vista"];
@@ -680,6 +681,7 @@
         introConfig = JSON.parse(readText("../../intro.json"));
         introConfig.conversacion = conversacionInicial();
         aplicarLetterSpacing();
+        if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
         const errores = L.validarConfig(gameConfig);
         if (errores && errores.length) console.warn("[ClasificaSentidos] config:", errores);
         TextoVoz.iniciar(gameConfig, introConfig, {

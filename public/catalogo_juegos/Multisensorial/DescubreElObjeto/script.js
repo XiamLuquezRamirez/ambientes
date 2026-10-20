@@ -1158,6 +1158,7 @@
     /* ── Flujo de retos ───────────────────────────────────────── */
 
     async function iniciarReto(gen) {
+    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
         if (!vivo(gen)) return;
         reto = nivelElegido.retos[indiceReto];
         if (!reto) {
@@ -1350,7 +1351,7 @@
         }
         demoActiva = true;
         fase = "";
-        PedniaTutorial.activarDemo();
+        await PedniaTutorial.activarDemo();
         $id("reto-titulo").textContent = "";
         if (esRadar()) prepararRadar();
         else await mostrarCofre(null);
@@ -1537,6 +1538,7 @@
             frasesExtra: frasesFijasTts()
         });
         enlazarMenuVol();
+        if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
         enlazarTarjetas();
         enlazarFrote();
         $id("btn-altavoz").addEventListener("click", repetirPista);
