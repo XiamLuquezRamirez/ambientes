@@ -1076,10 +1076,28 @@ body.alto-contraste .menu-acc-cerrar {
 }
 
 .enunciado {
-  margin: 0;
-  font-size: clamp(24px, 3.4vw, 54px);
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  max-width: min(820px, 92vw);
+  padding: 12px 34px 14px;
+  font-size: clamp(22px, 2.6vw, 34px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0.3px;
   text-align: center;
-  line-height: 1.2;
+  color: #1e3a5f;
+  background: linear-gradient(180deg, #fffef8 0%, #fff3c4 100%);
+  border: 3px solid #fff;
+  border-radius: 26px;
+  box-shadow:
+    0 0 0 3px #ffcc66,
+    0 7px 0 #f0b429;
+}
+
+.enunciado:empty {
+  display: none;
 }
 
 .cuenta {
@@ -1114,11 +1132,18 @@ body.alto-contraste .menu-acc-cerrar {
 }
 
 .cuenta-label {
-  font-size: 18px;
-  font-weight: 600;
-  color: #5b6b7c;
-  text-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 5px 16px 6px;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #1565c0;
+  background: #e7f3ff;
+  border-radius: 999px;
   line-height: 1.2;
+  text-shadow: none;
 }
 
 .secuencia {
@@ -1358,8 +1383,22 @@ body.alto-contraste .opcion-nombre {
   color: #fff;
 }
 
+body.alto-contraste .enunciado {
+  color: #ffeb3b;
+  background: #000;
+  border-color: #ffeb3b;
+  box-shadow: none;
+}
+
 body.alto-contraste .cuenta {
   color: #ffeb3b;
+  text-shadow: none;
+}
+
+body.alto-contraste .cuenta-label {
+  color: #ffeb3b;
+  background: #000;
+  box-shadow: inset 0 0 0 2px #ffeb3b;
 }
 
 

@@ -37,7 +37,7 @@ return [
     */
     'edge_tts' => [
         'url' => env('EDGE_TTS_URL', 'http://127.0.0.1:9000'),
-        'timeout' => (int) env('EDGE_TTS_TIMEOUT', 30),
+        'timeout' => (int) env('EDGE_TTS_TIMEOUT', 60),
     ],
 
 ];

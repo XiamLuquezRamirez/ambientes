@@ -829,8 +829,30 @@
         el.textContent = (indiceReto + 1) + "/" + retos.length;
     }
 
+    function subtituloBase() {
+        return (textos().enunciado) || "Observa la secuencia y elige la imagen que continúa.";
+    }
+
     function setEnunciado(texto) {
-        document.getElementById("enunciado").textContent = texto;
+        const titulo = document.getElementById("enunciado");
+        const sub = document.getElementById("enunciado-sub");
+        const t = String(texto || "").replace(/\s+/g, " ").trim();
+        if (!titulo || !t) return;
+        if (t.charAt(0) === "¿") {
+            titulo.textContent = "¿Qué sigue?";
+            return;
+        }
+        if (sub && t.length > 28) {
+            sub.textContent = t;
+            return;
+        }
+        titulo.textContent = t;
+    }
+
+    function restaurarSubtitulo() {
+        const sub = document.getElementById("enunciado-sub");
+        if (!sub) return;
+        sub.textContent = subtituloBase();
     }
 
     function limpiarEscena() {
@@ -909,10 +931,11 @@
         ops.hidden = false;
         ops.innerHTML = "";
         const ids = shuffle([reto.correcta].concat(reto.distractores || []));
-        ids.forEach(function (id) {
+        ids.forEach(function (id, i) {
             const btn = document.createElement("button");
             btn.type = "button";
-            btn.className = "tarjeta-opcion";
+            btn.className = "tarjeta-opcion entra";
+            btn.style.animationDelay = (i * 70) + "ms";
             btn.dataset.mov = id;
             btn.appendChild(crearImgEl(imgUrl(id), nombreMov(id)));
             const span = document.createElement("span");
@@ -935,9 +958,10 @@
         }
         limpiarEscena();
         actualizarProgreso();
+        restaurarSubtitulo();
         retoActual = retos[indiceReto];
         window.__secuenciaReto = retoActual;
-        setEnunciado(retoActual.titulo || textos().enunciado);
+        setEnunciado(retoActual.pregunta || textos().pregunta || "¿Qué sigue?");
 
         // Narración completa: cada pose del prefijo + pregunta (sin adelantar la correcta).
         await reproducirSecuencia(retoActual.prefijo || [], gen, true);

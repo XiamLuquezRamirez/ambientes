@@ -740,6 +740,7 @@ async function correrDemoMemoria() {
             caja.classList.remove("secuencia-pista", "secuencia-viva");
         }
     });
+    if (PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
     instruccionDicha = true;
 }
 
@@ -807,7 +808,8 @@ async function mostrarSecuenciaObjetivo() {
                 onInicio: function () { if (resolverInicio) resolverInicio(); }
             })
             : (resolverInicio(), Promise.resolve());
-        await audioInicio;
+        // Si onInicio no llega, el 3-2-1 no puede quedarse en el rótulo.
+        await Promise.race([audioInicio, sleep(4000)]);
         if (juegoTerminado) {
             if (typeof TextoVoz !== "undefined") TextoVoz.detener();
             return;

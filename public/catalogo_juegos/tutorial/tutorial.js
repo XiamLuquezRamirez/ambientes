@@ -20,9 +20,9 @@
     function engancharVozDemo() {
         if (typeof TextoVoz === "undefined" || typeof TextoVoz.hablar !== "function" || TextoVoz.__vozDemo) return;
         const orig = TextoVoz.hablar.bind(TextoVoz);
-        TextoVoz.hablar = function (texto, voz) {
+        TextoVoz.hablar = function (texto, voz, opts) {
             const usar = (vozDemo && document.body.classList.contains("demo-voz")) ? vozDemo : voz;
-            return orig(texto, usar);
+            return orig(texto, usar, opts);
         };
         TextoVoz.__vozDemo = true;
     }

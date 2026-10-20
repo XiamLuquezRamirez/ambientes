@@ -11,6 +11,8 @@ class JuegoTtsController extends Controller
 {
     public function tts(Request $request)
     {
+        set_time_limit(90);
+
         $datos = $request->validate([
             'texto' => ['required', 'string', 'max:800'],
             'personaje' => ['nullable', 'string', 'in:zoe,zeus'],
@@ -34,7 +36,7 @@ class JuegoTtsController extends Controller
 
         return response($binario, 200, [
             'Content-Type' => 'audio/mpeg',
-            'Cache-Control' => 'no-store',
+            'Cache-Control' => 'public, max-age=31536000, immutable',
         ]);
     }
 }
