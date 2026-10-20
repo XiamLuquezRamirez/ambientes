@@ -37,12 +37,8 @@ class TextoAVozService
     {
         $texto = $this->normalizarTexto($texto);
         $params = $this->parametrosDePersonaje($personaje, $rate);
-        $relativo = 'tts/'.$this->hashDe($texto, $params).'.mp3';
-
-        if (! Storage::disk('public')->exists($relativo)) {
-            Storage::disk('public')->makeDirectory('tts');
-            Storage::disk('public')->put($relativo, $this->solicitarMp3($texto, $params));
-        }
+        $relativo = $this->rutaMp3($texto, $params);
+        $this->mp3EnDisco($texto, $params);
 
         return $this->urlArchivoPublico($relativo);
     }
@@ -52,7 +48,7 @@ class TextoAVozService
         $texto = $this->normalizarTexto($texto);
         $params = $this->parametrosDePersonaje($personaje, $rate);
 
-        return $this->solicitarMp3($texto, $params);
+        return $this->mp3EnDisco($texto, $params);
     }
 
     public function vozDePersonaje(?string $personaje): string
@@ -120,6 +116,55 @@ class TextoAVozService
     /**
      * @param  array{voz: string, rate: string, pitch: string}  $params
      */
+    private function rutaMp3(string $texto, array $params): string
+    {
+        return 'tts/'.$this->hashDe($texto, $params).'.mp3';
+    }
+
+    /**
+     * Una sola generación a Microsoft a la vez. El juego dispara muchas frases
+     * distintas; sin caché ni candado cada una vuelve 502 por 429.
+     *
+     * @param  array{voz: string, rate: string, pitch: string}  $params
+     */
+    private function mp3EnDisco(string $texto, array $params): string
+    {
+        $relativo = $this->rutaMp3($texto, $params);
+        $disk = Storage::disk('public');
+        if ($disk->exists($relativo) && $disk->size($relativo) > 0) {
+            return $disk->get($relativo);
+        }
+
+        $lockPath = storage_path('app/tts-generate.lock');
+        if (! is_dir(dirname($lockPath))) {
+            mkdir(dirname($lockPath), 0777, true);
+        }
+        $handle = fopen($lockPath, 'c');
+        if ($handle === false) {
+            throw new RuntimeException('No se pudo bloquear TTS.');
+        }
+        if (! flock($handle, LOCK_EX)) {
+            fclose($handle);
+            throw new RuntimeException('No se pudo bloquear TTS.');
+        }
+        try {
+            if ($disk->exists($relativo) && $disk->size($relativo) > 0) {
+                return $disk->get($relativo);
+            }
+            $disk->makeDirectory('tts');
+            $binario = $this->solicitarMp3($texto, $params);
+            $disk->put($relativo, $binario);
+
+            return $binario;
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
+    }
+
+    /**
+     * @param  array{voz: string, rate: string, pitch: string}  $params
+     */
     private function solicitarMp3(string $texto, array $params): string
     {
         $base = rtrim((string) config('services.edge_tts.url'), '/');
@@ -127,30 +172,39 @@ class TextoAVozService
             throw new RuntimeException('Falta EDGE_TTS_URL.');
         }
 
-        $respuesta = Http::timeout((int) config('services.edge_tts.timeout', 30))
-            ->accept('audio/mpeg')
-            ->asJson()
-            ->post($base.'/api/tts', [
-                'text' => $texto,
-                'voice' => $params['voz'],
-                'pitch' => $params['pitch'],
-                'rate' => $params['rate'],
-            ]);
+        $timeout = (int) config('services.edge_tts.timeout', 60);
+        $url = $base.'/api/tts';
+        $ultimo = 'sin respuesta';
 
-        if (! $respuesta->successful()) {
+        for ($intento = 1; $intento <= 2; $intento++) {
+            $respuesta = Http::timeout($timeout)
+                ->connectTimeout(8)
+                ->accept('audio/mpeg')
+                ->asJson()
+                ->post($url, [
+                    'text' => $texto,
+                    'voice' => $params['voz'],
+                    'pitch' => $params['pitch'],
+                    'rate' => $params['rate'],
+                ]);
+
+            if ($respuesta->successful() && $respuesta->body() !== '') {
+                return $respuesta->body();
+            }
+
+            $ultimo = 'HTTP '.$respuesta->status();
             Log::warning('Edge TTS local falló', [
-                'url' => $base.'/api/tts',
+                'url' => $url,
                 'status' => $respuesta->status(),
+                'intento' => $intento,
                 'cuerpo' => substr($respuesta->body(), 0, 200),
             ]);
-            throw new RuntimeException('No se pudo generar la voz (HTTP '.$respuesta->status().').');
+
+            if ($intento < 2) {
+                usleep(3_000_000);
+            }
         }
 
-        $binario = $respuesta->body();
-        if ($binario === '') {
-            throw new RuntimeException('La voz llegó vacía.');
-        }
-
-        return $binario;
+        throw new RuntimeException('No se pudo generar la voz ('.$ultimo.').');
     }
 }

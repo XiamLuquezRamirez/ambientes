@@ -123,46 +123,64 @@
         return pj + "\n" + ttsRatePct() + "\n" + textoPlano(texto);
     }
 
-    function obtenerUrlTts(texto, personaje) {
+    function obtenerUrlTts(texto, personaje, urgente) {
         var t = textoPlano(texto);
         var pj = String(personaje || "zoe").toLowerCase() === "zeus" ? "zeus" : "zoe";
         if (!t) return Promise.resolve(null);
         var key = claveTts(t, pj);
-        if (Object.prototype.hasOwnProperty.call(ttsCache, key)) {
-            return Promise.resolve(ttsCache[key]);
-        }
+        if (ttsCache[key]) return Promise.resolve(ttsCache[key]);
         if (ttsPendientes[key]) return ttsPendientes[key];
 
-        ttsPendientes[key] = fetch(URL_TTS + "?" + new URLSearchParams({
-            texto: t,
-            personaje: pj,
-            rate: String(ttsRatePct())
-        }), {
-            headers: { Accept: "audio/mpeg" }
-        }).then(function (res) {
-            var tipo = (res.headers.get("content-type") || "").toLowerCase();
-            if (!res.ok || tipo.indexOf("audio") < 0) throw new Error("tts");
-            return res.blob();
-        }).then(function (blob) {
-            if (!blob || !blob.size) {
-                ttsCache[key] = null;
-                return null;
-            }
-            var src = URL.createObjectURL(blob);
-            ttsCache[key] = src;
-            return src;
-        }).catch(function () {
-            ttsCache[key] = null;
-            return null;
+        ttsPendientes[key] = new Promise(function (resolve) {
+            var item = { texto: t, personaje: pj, key: key, resolve: resolve };
+            if (urgente) ttsCola.unshift(item);
+            else ttsCola.push(item);
+            bombearColaTts();
         }).finally(function () {
             delete ttsPendientes[key];
         });
         return ttsPendientes[key];
     }
 
+    function esperar(ms) {
+        return new Promise(function (resolve) { setTimeout(resolve, ms); });
+    }
+
+    function fetchTts(texto, personaje) {
+        var intentos = 0;
+        function una() {
+            intentos += 1;
+            return fetch(URL_TTS + "?" + new URLSearchParams({
+                texto: texto,
+                personaje: personaje,
+                rate: String(ttsRatePct())
+            }), {
+                headers: { Accept: "audio/mpeg" }
+            }).then(function (res) {
+                var tipo = (res.headers.get("content-type") || "").toLowerCase();
+                if (!res.ok || tipo.indexOf("audio") < 0) {
+                    var err = new Error("tts " + res.status);
+                    err.status = res.status;
+                    throw err;
+                }
+                return res.blob();
+            }).then(function (blob) {
+                if (!blob || !blob.size) throw new Error("tts vacio");
+                var src = URL.createObjectURL(blob);
+                ttsCache[claveTts(texto, personaje)] = src;
+                return src;
+            }).catch(function (err) {
+                if (intentos >= 3) return null;
+                var status = err && err.status;
+                var espera = (status === 429 || status === 502) ? 2500 * intentos : 900 * intentos;
+                return esperar(espera).then(una);
+            });
+        }
+        return una();
+    }
+
     function encolarTts(texto, personaje) {
-        ttsCola.push({ texto: texto, personaje: personaje });
-        bombearColaTts();
+        obtenerUrlTts(texto, personaje, false);
     }
 
     function bombearColaTts() {
@@ -170,9 +188,17 @@
         var sig = ttsCola.shift();
         if (!sig) return;
         ttsColaAndando = true;
-        obtenerUrlTts(sig.texto, sig.personaje).finally(function () {
-            ttsColaAndando = false;
-            bombearColaTts();
+        var trabajo = ttsCache[sig.key]
+            ? Promise.resolve(ttsCache[sig.key])
+            : fetchTts(sig.texto, sig.personaje);
+        trabajo.then(function (src) {
+            if (typeof sig.resolve === "function") sig.resolve(src);
+        }).finally(function () {
+            var pausa = ttsCache[sig.key] ? 0 : 450;
+            setTimeout(function () {
+                ttsColaAndando = false;
+                bombearColaTts();
+            }, pausa);
         });
     }
 
@@ -202,15 +228,6 @@
             if (!f) return;
             if (typeof f === "string") encolarTts(f, "zoe");
             else if (f.texto) encolarTts(f.texto, f.personaje || "zoe");
-            var fb = accesibilidad().feedback || {};
-            var textos = (config && config.textos) || {};
-            ["zoe", "zeus"].forEach(function (pj) {
-                Object.keys(textos).forEach(function (k) {
-                    if (typeof textos[k] === "string" && textos[k]) encolarTts(textos[k], pj);
-                });
-                if (fb.acierto && fb.acierto.texto) encolarTts(fb.acierto.texto, pj);
-                if (fb.error && fb.error.texto) encolarTts(fb.error.texto, pj);
-            });
         });
     }
 
@@ -374,7 +391,7 @@
                 return;
             }
 
-            obtenerUrlTts(t, pj).then(function (src) {
+            obtenerUrlTts(t, pj, true).then(function (src) {
                 if (myToken !== ttsToken) return;
                 if (src) reproducirUrlTts(src, t, pj, myToken, done, duracionMs, avisarInicio);
                 else hablarNavegador(t, pj, myToken, done, avisarInicio);

@@ -95,54 +95,37 @@
     <div class="aula-confirma" id="aulaConfirma" hidden>
         <div class="aula-confirma__velo" id="aulaConfirmaVelo"></div>
         <div class="aula-confirma__caja" role="dialog" aria-modal="true" aria-labelledby="aulaConfirmaNombre aulaConfirmaTitulo">
-            <div class="aula-confirma__fondo" aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1663 920" preserveAspectRatio="xMidYMid slice">
-                    <defs>
-                        <linearGradient id="aulaFondoBase" x1="0" y1="0" x2="1" y2="1">
-                            <stop class="aula-fondo__b0" offset="0"/>
-                            <stop class="aula-fondo__b1" offset="0.52"/>
-                            <stop class="aula-fondo__b2" offset="1"/>
-                        </linearGradient>
-                        <linearGradient id="aulaFondoForma" x1="0" y1="0" x2="0.9" y2="1">
-                            <stop class="aula-fondo__f0" offset="0" stop-opacity="0.55"/>
-                            <stop class="aula-fondo__f1" offset="1" stop-opacity="0.32"/>
-                        </linearGradient>
-                        <linearGradient id="aulaFondoOla" x1="0" y1="0" x2="0" y2="1">
-                            <stop class="aula-fondo__o0" offset="0" stop-opacity="0.42"/>
-                            <stop class="aula-fondo__o1" offset="1" stop-opacity="0.62"/>
-                        </linearGradient>
-                    </defs>
-                    <rect width="1663" height="920" fill="url(#aulaFondoBase)"/>
-                    <path d="M0 155 C65 118 111 86 178 94 C247 102 290 150 287 195 C283 264 218 327 147 369 C96 399 46 415 0 424 Z" fill="url(#aulaFondoForma)"/>
-                    <path d="M1552 0 L1663 0 L1663 300 C1607 303 1550 285 1503 250 C1451 211 1421 164 1424 128 C1427 78 1482 31 1552 0 Z" fill="url(#aulaFondoForma)"/>
-                    <path d="M0 773 C117 713 231 690 354 696 C506 703 641 740 786 751 C922 761 1050 723 1179 703 C1347 676 1507 711 1663 765 L1663 920 L0 920 Z" fill="url(#aulaFondoOla)"/>
+            <div class="aula-confirma__burbuja" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 805.97 506.97">
+                    <path class="aula-confirma__sombra" d="M760.46,19.91H45.51A45.51,45.51,0,0,0,0,65.42V405.88a45.51,45.51,0,0,0,45.51,45.51h316.8l29,48.95a13.54,13.54,0,0,0,23.29,0l29-48.95h316.8A45.51,45.51,0,0,0,806,405.88V65.42A45.51,45.51,0,0,0,760.46,19.91Z"/>
+                    <path class="aula-confirma__relleno" d="M760.46,0H45.51A45.5,45.5,0,0,0,0,45.51V386a45.5,45.5,0,0,0,45.51,45.5h316.8l29,48.95a13.53,13.53,0,0,0,23.29,0l29-48.95h316.8A45.5,45.5,0,0,0,806,386V45.51A45.5,45.5,0,0,0,760.46,0Z"/>
+                    <path class="aula-confirma__trazo" d="M786.06,132.76V386a25.62,25.62,0,0,1-25.6,25.59H432.32L403,461l-29.33-49.47H330.36"/>
+                    <line class="aula-confirma__trazo" x1="786.06" y1="65.27" x2="786.06" y2="110.64"/>
+                    <path class="aula-confirma__trazo" d="M195.39,411.56H45.5A25.62,25.62,0,0,1,19.91,386V45.51A25.62,25.62,0,0,1,45.5,19.91h715a25.62,25.62,0,0,1,25.6,25.6"/>
+                    <line class="aula-confirma__trazo" x1="310.45" y1="411.56" x2="267.3" y2="411.56"/>
+                    <line class="aula-confirma__trazo" x1="245.72" y1="411.56" x2="217.51" y2="411.56"/>
                 </svg>
             </div>
-            <span class="aula-confirma__rayos" aria-hidden="true">
-                <i style="--x: -116px; --y: -20px; --w: 30px; --h: 13px; --r: 36deg"></i>
-                <i style="--x: -128px; --y: 15px; --w: 50px; --h: 13px; --r: -2deg"></i>
-                <i style="--x: -108px; --y: 49px; --w: 30px; --h: 13px; --r: -34deg"></i>
-                <i style="--x: 116px; --y: -20px; --w: 30px; --h: 13px; --r: -36deg"></i>
-                <i style="--x: 128px; --y: 15px; --w: 50px; --h: 13px; --r: 2deg"></i>
-                <i style="--x: 108px; --y: 49px; --w: 30px; --h: 13px; --r: 34deg"></i>
-            </span>
-            <span class="aula-confirma__foto" id="aulaConfirmaFoto"></span>
-            <p class="aula-confirma__nombre" id="aulaConfirmaNombre"></p>
-            <div class="aula-confirma__pregunta">
-                <span class="aula-confirma__linea">
+            <button type="button" class="selector-aula__voz aula-confirma__voz" id="aulaConfirmaVoz" aria-label="Escuchar la pregunta">
+                <img src="{{ asset('assets/images/selector-aula/sonido.png') }}" alt="">
+            </button>
+            <div class="aula-confirma__cuerpo">
+                <div class="aula-confirma__ficha">
+                    <img class="aula-confirma__marco" src="{{ asset('assets/images/selector-aula/marco_nino.svg') }}?v={{ @filemtime(public_path('assets/images/selector-aula/marco_nino.svg')) }}" alt="">
+                    <span class="aula-confirma__foto" id="aulaConfirmaFoto"></span>
+                    <p class="aula-confirma__nombre" id="aulaConfirmaNombre"></p>
+                </div>
+                <div class="aula-confirma__lado">
                     <p class="aula-confirma__titulo" id="aulaConfirmaTitulo">¿Eres tú?</p>
-                </span>
-                <button type="button" class="selector-aula__voz" id="aulaConfirmaVoz" aria-label="Escuchar la pregunta">
-                    <img src="{{ asset('assets/images/selector-aula/sonido.png') }}" alt="">
-                </button>
-            </div>
-            <div class="aula-confirma__acciones">
-                <button type="button" class="aula-confirma__btn" id="aulaConfirmaNo" aria-label="Cancelar">
-                    <img src="{{ asset('assets/images/selector-aula/cancelar.png') }}?v={{ @filemtime(public_path('assets/images/selector-aula/cancelar.png')) }}" alt="">
-                </button>
-                <button type="button" class="aula-confirma__btn" id="aulaConfirmaOk" aria-label="Confirmar">
-                    <img src="{{ asset('assets/images/selector-aula/confirmar.png') }}?v={{ @filemtime(public_path('assets/images/selector-aula/confirmar.png')) }}" alt="">
-                </button>
+                    <div class="aula-confirma__acciones">
+                        <button type="button" class="aula-confirma__btn" id="aulaConfirmaOk" aria-label="Confirmar">
+                            <img src="{{ asset('assets/images/selector-aula/confirmar.png') }}?v={{ @filemtime(public_path('assets/images/selector-aula/confirmar.png')) }}" alt="">
+                        </button>
+                        <button type="button" class="aula-confirma__btn" id="aulaConfirmaNo" aria-label="Cancelar">
+                            <img src="{{ asset('assets/images/selector-aula/cancelar.png') }}?v={{ @filemtime(public_path('assets/images/selector-aula/cancelar.png')) }}" alt="">
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

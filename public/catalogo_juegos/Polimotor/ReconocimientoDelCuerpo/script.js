@@ -470,8 +470,8 @@ function sizeLienzo() {
     if (!wrap || !lienzo || !cuerpo || !cuerpo.lienzo) return;
 
     const ar = Number(cuerpo.lienzo.w) / Number(cuerpo.lienzo.h);
-    const maxH = Math.max(120, wrap.clientHeight - 8);
-    const maxW = Math.max(120, Math.min(wrap.clientWidth - 8, 480));
+    const maxH = Math.max(120, Math.min(wrap.clientHeight - 12, 560));
+    const maxW = Math.max(120, Math.min(wrap.clientWidth * 0.46, 440));
     let h = maxH;
     let w = h * ar;
     if (w > maxW) {
