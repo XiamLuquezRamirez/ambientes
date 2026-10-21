@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <!-- bowl -->
+  <circle cx="92" cy="148" r="52" stroke="#94a3b8" stroke-width="22" stroke-dasharray="10 12" opacity=".55"/>
+  <!-- stem -->
+  <path d="M144 72v140" stroke="#94a3b8" stroke-width="22" stroke-linecap="round" stroke-dasharray="10 12" opacity=".55"/>
+</svg>
