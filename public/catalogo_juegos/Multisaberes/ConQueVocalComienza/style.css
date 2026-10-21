@@ -529,9 +529,30 @@ body.sin-feedback #dialogo { display: none !important; }
     box-shadow: 0 8px 0 rgba(0, 0, 0, 0.16), 0 0 28px 8px var(--c, #fbbf24);
 }
 
-.vocal-cuerpo.eleva { animation: eleva .8s ease; }
-.vocal-cuerpo.ilumina { animation: ilumina .6s ease; }
+.vocal-cuerpo.eleva,
+.globo.eleva,
+.vocal.eleva { animation: eleva .8s ease; }
+.vocal-cuerpo.ilumina,
+.globo.ilumina,
+.vocal.ilumina { animation: ilumina .6s ease; }
 .vocal.vuelve .vocal-cuerpo { animation: vuelve .45s ease; }
+
+/* Sin textos dirigidos al niño (requerimientos.md). */
+.btn-solo-icono {
+    min-width: 64px;
+    padding-left: 14px;
+    padding-right: 14px;
+}
+#intro3d-continuar .intro3d-titulo-wrap h2,
+#intro3d-continuar .intro3d-continuar-card > p,
+#final .texto-final,
+#final .final-pregunta {
+    display: none !important;
+}
+#btn-continuar-intro3d {
+    min-width: 88px;
+    min-height: 88px;
+}
 
 @keyframes entra {
     from { transform: scale(.6); opacity: 0; }
@@ -647,7 +668,11 @@ body.sin-feedback #dialogo { display: none !important; }
     .pj.celebra .pj-img,
     .vocal.entra .vocal-cuerpo,
     .vocal-cuerpo.eleva,
+    .globo.eleva,
+    .vocal.eleva,
     .vocal-cuerpo.ilumina,
+    .globo.ilumina,
+    .vocal.ilumina,
     .vocal.vuelve .vocal-cuerpo,
     .img-objeto.vuela,
     .img-objeto.trompa,

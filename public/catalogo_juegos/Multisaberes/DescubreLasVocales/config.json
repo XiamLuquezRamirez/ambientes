@@ -59,7 +59,7 @@
           "tipo": "fijo",
           "vocales": ["a", "e"],
           "correcto": "e",
-          "acierto": { "efecto": "ilumina", "sonido": "celebracion" }
+          "acierto": { "efecto": "ilumina", "sonido": "celebracion", "animar": true }
         },
         {
           "id": "busca-i",

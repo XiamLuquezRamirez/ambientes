@@ -256,6 +256,31 @@
         items[idx].classList.add("pulso");
     }
 
+    function aplicarEfectoPareja(ac, completa) {
+        var fx = (ac && ac.efecto) || "";
+        var escenario = $id("escenario");
+        if (!escenario) return;
+        if (fx === "flor" || fx === "luz") {
+            escenario.classList.add("pareja-" + fx);
+            setTimeout(function () { escenario.classList.remove("pareja-flor", "pareja-luz"); }, 700);
+        }
+        if (!completa) return;
+        if (fx === "jardin") {
+            document.querySelectorAll("#progreso .flor").forEach(function (f) {
+                f.classList.add("abierta", "celebrar");
+            });
+            escenario.classList.add("jardin-celebra");
+            setTimeout(function () { escenario.classList.remove("jardin-celebra"); }, 1200);
+        }
+        if (fx === "castillo") {
+            document.querySelectorAll("#luces .luz").forEach(function (l) {
+                l.classList.add("encendida", "celebrar");
+            });
+            escenario.classList.add("castillo-abre");
+            setTimeout(function () { escenario.classList.remove("castillo-abre"); }, 1400);
+        }
+    }
+
     function rutaReverso() {
         var key = (nivel && nivel.reverso) || "hoja";
         return (gameConfig.reversos && gameConfig.reversos[key]) || "img/reverso_hoja.svg";
@@ -379,6 +404,7 @@
             setTimeout(function () { celebrarPersonajes(false); }, 600);
             parejasHechas += 1;
             primera = null;
+            aplicarEfectoPareja(ac, false);
             pulsarProgresoActual();
             var completa = parejasHechas >= ronda.totalParejas;
             // Frases de acierto no deben congelar el tablero entre parejas.
@@ -391,6 +417,7 @@
                 completados += 1;
                 if (indice >= (nivel.retos || []).length - 1) abrirTodoProgreso();
                 else pintarProgreso();
+                aplicarEfectoPareja(ac, true);
                 if (ac.efecto === "jardin" || ac.efecto === "castillo") efecto("celebracion");
                 await sleep(reducir() ? 200 : 480);
                 if (!vivo(gen)) return;

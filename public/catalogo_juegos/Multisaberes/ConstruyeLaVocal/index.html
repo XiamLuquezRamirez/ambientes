@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css?v=20261020f">
+	<link rel="stylesheet" href="style.css?v=20261021a">
 	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261019e">
 	<link rel="stylesheet" href="../../shared/menu-accesibilidad.css?v=20261019d">
 	<link rel="stylesheet" href="../../final/final.css">
@@ -44,8 +44,8 @@
 	<div id="intro3d-root" hidden>
 		<div id="three-container"></div>
 		<div id="phaser-container"></div>
-		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;">
-			Omitir <i class="fa fa-forward" aria-hidden="true"></i>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning btn-solo-icono" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;" aria-label="Omitir">
+			<i class="fa fa-forward" aria-hidden="true"></i>
 		</button>
 		<div id="intro3d-continuar" hidden>
 			<div class="intro3d-continuar-card">
@@ -53,19 +53,19 @@
 					<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>
-					<h2>¡Listo!</h2>
+					
 					<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>
 				</div>
-				<p>Toca el botón para empezar el juego</p>
+				
 				<div class="intro3d-btn-wrap">
 					<span class="intro3d-ray intro3d-ray-bl1" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-bl2" aria-hidden="true"></span>
-					<button type="button" id="btn-continuar-intro3d">
+					<button type="button" id="btn-continuar-intro3d" aria-label="Continuar">
 						<span class="intro3d-btn-shine" aria-hidden="true"></span>
 						<span class="intro3d-play" aria-hidden="true"></span>
-						<span>CONTINUAR</span>
+						
 					</button>
 					<span class="intro3d-ray intro3d-ray-br1" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-br2" aria-hidden="true"></span>
@@ -81,7 +81,7 @@
 			<img src="../../img/fondo.png" class="fondo" alt="">
 			<div class="contenido">
 				<img src="../../img/excelente.png" class="excelente" alt="">
-				<p class="texto-final" id="texto_final"></p>
+				<p class="texto-final" id="texto_final" hidden aria-hidden="true"></p>
 				<img src="img/insignia_bloques.svg" class="trofeo" alt="">
 				<img src="../../img/zeus_normal.gif" class="personaje zeus" alt="">
 				<img src="../../img/zoe_normal.gif" class="personaje zoe" alt="">
@@ -94,10 +94,9 @@
 			<div class="confeti" id="confeti"></div>
 		</div>
 		<div class="final-acciones" id="final-acciones">
-			<p class="final-pregunta">¿Quieres jugar nuevamente?</p>
 			<div class="final-botones">
-				<button type="button" class="btn btn-success" onclick="window.location.reload(1)"><i class="fa-solid fa-play"></i> Sí</button>
-				<button type="button" class="btn btn-danger" onclick="history.back()"><i class="fa-solid fa-home"></i> No</button>
+				<button type="button" class="btn btn-success btn-solo-icono" onclick="window.location.reload(1)" aria-label="Jugar de nuevo"><i class="fa-solid fa-play" aria-hidden="true"></i></button>
+				<button type="button" class="btn btn-danger btn-solo-icono" onclick="history.back()" aria-label="Salir"><i class="fa-solid fa-home" aria-hidden="true"></i></button>
 			</div>
 		</div>
 	</div>
@@ -215,6 +214,6 @@
 	<script src="../../intro3d/js/intro.js?v=20261008a"></script>
 	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
 	<script src="../../shared/menu-accesibilidad.js?v=20261019d"></script>
-	<script src="script.js?v=20261020f"></script>
+	<script src="script.js?v=20261021a"></script>
 </body>
 </html>
