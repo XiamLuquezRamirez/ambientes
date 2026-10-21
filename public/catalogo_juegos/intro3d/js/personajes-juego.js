@@ -5,6 +5,7 @@
  */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { agregarLucesModelo } from "./luces-modelo.js";
 
 const BASE = new URL("../models/", import.meta.url);
 const MODELOS = {
@@ -103,10 +104,7 @@ async function crearVista(host, id, encuadre) {
     renderer.domElement.setAttribute("aria-hidden", "true");
     host.appendChild(renderer.domElement);
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 1.25));
-    const dir = new THREE.DirectionalLight(0xffffff, 1.05);
-    dir.position.set(1.5, 3, 2);
-    scene.add(dir);
+    agregarLucesModelo(scene);
 
     const vista = {
         id: id,

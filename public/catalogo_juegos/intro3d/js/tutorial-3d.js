@@ -4,6 +4,7 @@
  */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { agregarLucesModelo } from "./luces-modelo.js";
 
 const MODELOS_BASE = new URL("../models/", import.meta.url);
 // El GLB nuevo mide ~1,25 m. 1,35 / 1,40 los deja a la misma altura en el panel.
@@ -172,10 +173,7 @@ function asegurarEscena() {
         camera.position.set(0.05, 1.15, 4.6);
         camera.lookAt(0.05, 0.85, 0);
 
-        scene.add(new THREE.HemisphereLight(0xffffff, 0x334455, 1.2));
-        const dir = new THREE.DirectionalLight(0xffffff, 1.1);
-        dir.position.set(3, 6, 4);
-        scene.add(dir);
+        agregarLucesModelo(scene);
 
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));

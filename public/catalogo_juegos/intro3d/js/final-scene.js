@@ -6,6 +6,7 @@
  */
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { agregarLucesModelo } from "./luces-modelo.js";
 
 const MODELOS_BASE = new URL("../models/", import.meta.url);
 const WALK_SPEED = 3.8;
@@ -240,11 +241,7 @@ async function montarEscena() {
     root.appendChild(renderer.domElement);
     clock = new THREE.Clock();
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    scene.add(new THREE.HemisphereLight(0xfff0e0, 0x334455, 0.9));
-    const dir = new THREE.DirectionalLight(0xfff5e6, 1.1);
-    dir.position.set(3, 7, 5);
-    scene.add(dir);
+    agregarLucesModelo(scene);
 
     await Promise.all([
         cargarPersonaje({
