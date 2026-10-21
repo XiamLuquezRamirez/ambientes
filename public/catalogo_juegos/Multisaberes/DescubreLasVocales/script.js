@@ -3,7 +3,7 @@
     "use strict";
 
     var L = window.DescubreVocalesLogica;
-    var Sfx = window.VocalesSfx;
+    function Sfx() { return window.VocalesSfx || null; }
 
     var gameConfig = null;
     var introConfig = null;
@@ -118,8 +118,12 @@
         if (!audioFondo) {
             audioFondo = new Audio(ruta);
             audioFondo.loop = true;
+            audioFondo.preload = "auto";
         }
         audioFondo.volume = volumenPct() / 100;
+        if (window.TextoVoz && typeof TextoVoz.definirVolumenFondo === "function") {
+            TextoVoz.definirVolumenFondo(audioFondo.volume);
+        }
         var p = audioFondo.play();
         if (p && p.catch) p.catch(function () {});
     }
@@ -147,10 +151,20 @@
         if (inicio && document.body.classList.contains("esperando-inicio")) inicio.classList.add("sonando");
         duck(true);
         var ruta = gameConfig.audios && gameConfig.audios.sonidos && gameConfig.audios.sonidos[id];
-        // Sin grabación, la vocal la dice la misma voz del juego. El zumbido queda de reserva.
-        var sonido = ruta
-            ? playArchivo(ruta)
-            : (window.TextoVoz ? TextoVoz.hablar(id, "zoe") : (Sfx ? Sfx.vocal(id) : sleep(700)));
+        var sfx = Sfx();
+        var sonido;
+        if (ruta) {
+            sonido = playArchivo(ruta);
+        } else if (sfx) {
+            // WebAudio (+ WAV HTML si el contexto sigue suspended tras la intro).
+            sonido = sfx.vocal(id);
+        } else if (window.TextoVoz) {
+            // Una letra suelta suele salir muda; alargar fonética.
+            var fon = ({ a: "aaa", e: "eee", i: "iii", o: "ooo", u: "uuu" })[id] || id;
+            sonido = TextoVoz.hablar(fon, "zoe");
+        } else {
+            sonido = sleep(700);
+        }
         var hop = (reto && reto.pista && (fase === "sonando" || fase === "jugar"))
             ? animarPista(id) : Promise.resolve();
         return Promise.all([sonido, hop]).then(function () {
@@ -171,8 +185,16 @@
     }
 
     function efecto(nombre) {
-        if (!nombre || !Sfx) return;
-        Sfx.sonar(nombre);
+        var sfx = Sfx();
+        if (!nombre || !sfx) return;
+        sfx.sonar(nombre);
+    }
+
+    function despertarAudio() {
+        var sfx = Sfx();
+        if (sfx) sfx.desbloquear();
+        if (window.TextoVoz) TextoVoz.desbloquear();
+        asegurarFondo();
     }
 
     /* ── Voz y diálogo ── */
@@ -216,6 +238,7 @@
 
     function decir(linea, estadoDialogo) {
         if (!linea || !linea.texto || !window.TextoVoz) return Promise.resolve();
+        despertarAudio();
         var voz = "zoe";
         if (linea.voz) voz = linea.voz === "zeus" ? "zeus" : "zoe";
         else if (linea.personaje === 0) voz = "zeus";
@@ -352,33 +375,42 @@
         return String(nivel.id) === "5" && !!document.querySelector("#vocales .vocal");
     }
 
-    function celebrarPersonajes(si) {
-        $id("pj-zoe").classList.toggle("celebra", !!si);
-        $id("pj-zeus").classList.toggle("celebra", !!si);
+    function celebrarPersonajes(si, aparecer) {
+        ["pj-zoe", "pj-zeus"].forEach(function (id) {
+            var el = $id(id);
+            if (!el) return;
+            el.classList.toggle("celebra", !!si);
+            el.classList.toggle("aparece", !!(si && aparecer));
+            if (!si) el.classList.remove("aparece");
+        });
     }
 
     function estrellas(el, n) {
         if (!el || reducir()) return;
         var capa = $id("capa-efectos");
+        if (!capa) return;
+        // Cap y limpieza: WAAPI por partícula + filter en vocales costaba frames.
+        n = Math.min(Math.max(Number(n) || 8, 1), 10);
+        while (capa.childNodes.length > 16) capa.removeChild(capa.firstChild);
         var rect = el.getBoundingClientRect();
         var x = rect.left + rect.width / 2;
         var y = rect.top + rect.height / 2;
+        var colores = ["#fbbf24", "#fff", "#fb7185", "#38bdf8", "#4ade80"];
         var i;
         for (i = 0; i < n; i++) {
             var p = document.createElement("span");
+            var ang = Math.random() * Math.PI * 2;
+            var dist = 36 + Math.random() * 90;
             p.className = "particula";
             p.style.left = x + "px";
             p.style.top = y + "px";
-            p.style.background = ["#fbbf24", "#fff", "#fb7185", "#38bdf8", "#4ade80"][i % 5];
+            p.style.background = colores[i % 5];
+            p.style.setProperty("--dx", Math.cos(ang) * dist + "px");
+            p.style.setProperty("--dy", Math.sin(ang) * dist + "px");
             capa.appendChild(p);
-            var ang = Math.random() * Math.PI * 2;
-            var dist = 40 + Math.random() * 120;
-            p.animate([
-                { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
-                { transform: "translate(calc(-50% + " + Math.cos(ang) * dist + "px), calc(-50% + " + Math.sin(ang) * dist + "px)) scale(.4)", opacity: 0 }
-            ], { duration: 700 + Math.random() * 400, easing: "ease-out" }).finished.then(function () {
-                p.remove();
-            }).catch(function () { p.remove(); });
+            setTimeout(function (nodo) {
+                if (nodo && nodo.parentNode) nodo.parentNode.removeChild(nodo);
+            }, 850, p);
         }
     }
 
@@ -428,29 +460,38 @@
 
     function escuchar() {
         if (fase !== "jugar" || !objetivo) return;
+        despertarAudio();
         pronunciar(objetivo);
     }
 
-    function claseEfecto(nombre) {
+    function claseEfecto(nombre, extras) {
+        // Una sola animación compuesta: no apilar ilumina+salta/mueve (pelean por transform).
+        if (nombre === "salta") return "ilumina-salta";
+        if (nombre === "mueve") return "ilumina-mueve";
+        if (nombre === "ilumina" && extras && extras.animar) return "ilumina-mueve";
         if (nombre === "gira") return "gira";
-        if (nombre === "mueve") return "mueve";
-        if (nombre === "salta") return "salta";
-        return "salta";
+        if (nombre === "ilumina") return "ilumina";
+        if (nombre === "celebra") return "ilumina";
+        if (nombre === "estrellas" || nombre === "cierre") return "ilumina";
+        return "ilumina-salta";
     }
 
     async function acierto(btn, gen) {
         var a = reto.acierto || {};
         btn.classList.add("acierto");
         var cuerpo = btn.querySelector(".vocal-cuerpo");
-        if (cuerpo) cuerpo.classList.add(claseEfecto(a.efecto));
+        if (cuerpo) cuerpo.classList.add(claseEfecto(a.efecto, a));
         if (a.efecto === "cierre") {
             document.querySelectorAll("#vocales .vocal").forEach(function (v) { v.classList.add("acierto"); });
         }
-        if (a.efecto === "estrellas" || a.efecto === "cierre" || a.efecto === "celebra") {
+        if (a.efecto === "estrellas") {
+            celebrarPersonajes(true, true);
+            estrellas(btn, 10);
+        } else if (a.efecto === "cierre" || a.efecto === "celebra") {
             celebrarPersonajes(true);
-            estrellas(btn, a.efecto === "celebra" ? 16 : 28);
-        } else {
-            estrellas(btn, 12);
+            estrellas(btn, a.efecto === "celebra" ? 8 : 10);
+        } else if (a.efecto === "salta") {
+            estrellas(btn, 8);
         }
         if (a.repetir) await pronunciar(objetivo);
         efecto(a.sonido);
@@ -622,6 +663,7 @@
 
     function omitirIntro3d() {
         if (cerrado) return;
+        despertarAudio();
         var root = $id("intro3d-root");
         if (!root || root.hidden) {
             empezarJuegoTrasIntro();
@@ -635,7 +677,8 @@
         cerrado = true;
         cancelarIntroPendiente();
         if (window.TextoVoz) TextoVoz.detener();
-        asegurarFondo();
+        // Nuevo gesto (Omitir / Continuar): reabrir AudioContext tras la intro.
+        despertarAudio();
         destruirIntro3d();
         document.body.classList.remove("esperando-inicio");
         var principal = $id("principal");
@@ -661,9 +704,15 @@
         var btn = $id("btn-empecemos");
         if (!pantalla || pantalla.hidden || pantalla.classList.contains("is-out")) return;
         if (btn) btn.disabled = true;
-        if (window.TextoVoz) TextoVoz.desbloquear();
-        if (Sfx) Sfx.desbloquear();
-        asegurarFondo();
+        despertarAudio();
+        // Keep-alive + tono de prueba: si el gesto se “gasta” en la intro, el contexto sigue vivo.
+        var sfx = Sfx();
+        if (sfx) {
+            sfx.desbloquear().then(function () {
+                // Beep corto de confirmación (también valida que el audio del dispositivo funciona).
+                return sfx.sonar("recompensa");
+            });
+        }
         sincronizarDialogoIntro3d();
         if (window.TextoVoz && typeof TextoVoz.precargar === "function") TextoVoz.precargar();
         pantalla.classList.add("is-out");
@@ -884,8 +933,16 @@
         $id("vocales").addEventListener("click", function (ev) {
             if (demoActiva) return;
             var btn = ev.target.closest(".vocal");
-            if (btn) intentar(btn);
+            if (btn) {
+                despertarAudio();
+                intentar(btn);
+            }
         });
+        // Cualquier toque durante el juego reabre el contexto (Chrome lo suspende tras la intro).
+        document.addEventListener("pointerdown", function () {
+            if (document.body.classList.contains("esperando-inicio")) return;
+            despertarAudio();
+        }, { passive: true });
         window.addEventListener("pagehide", function () {
             if (window.TextoVoz) TextoVoz.vaciar();
         });

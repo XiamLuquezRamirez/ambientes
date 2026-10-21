@@ -136,7 +136,7 @@
           "faltan": ["pata"],
           "piezas": ["pata_u", "barra_corta"],
           "cinta": true,
-          "acierto": { "efecto": "ilumina", "sonido": "celebracion", "voz": "zoe", "texto": "¡La vocal u está lista!" }
+          "acierto": { "efecto": "ilumina", "sonido": "celebracion" }
         },
         {
           "id": "final",

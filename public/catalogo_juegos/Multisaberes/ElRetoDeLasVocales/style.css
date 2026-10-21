@@ -651,6 +651,151 @@ body.tema-planeta { background: #1e3a8a; }
     box-shadow: 0 0 28px #fcc419;
 }
 
+.gota.es-estrella .opcion-cuerpo,
+.opcion.es-estrella .opcion-cuerpo {
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    background: #fcc419;
+    box-shadow: 0 0 28px #f59f00;
+    animation: estrellaPop 0.7s ease;
+}
+
+@keyframes estrellaPop {
+    0% { transform: scale(0.6); }
+    50% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
+
+.escena-chrome {
+    position: absolute;
+    inset: 8% 6% 18%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 18px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.plataforma-puente,
+.roca,
+.cristal-escena,
+.paso-camino {
+    display: block;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.35);
+    border: 2px solid rgba(255, 255, 255, 0.55);
+}
+
+.plataforma-puente {
+    width: 70px;
+    height: 28px;
+}
+
+.plataforma-puente.ilumina {
+    background: #ffe066;
+    box-shadow: 0 0 18px #fcc419;
+}
+
+.roca {
+    width: 54px;
+    height: 42px;
+    border-radius: 40% 40% 20% 20%;
+    background: #868e96;
+}
+
+.roca.salta {
+    animation: rocaSalta 0.7s ease;
+}
+
+@keyframes rocaSalta {
+    40% { transform: translateY(-22px); }
+    100% { transform: none; }
+}
+
+.cristal-escena {
+    width: 28px;
+    height: 44px;
+    clip-path: polygon(50% 0, 100% 30%, 80% 100%, 20% 100%, 0 30%);
+    background: rgba(165, 216, 255, 0.55);
+}
+
+.cristal-escena.activo {
+    background: #74c0fc;
+    box-shadow: 0 0 16px #4dabf7;
+}
+
+.paso-camino {
+    width: 36px;
+    height: 18px;
+    border-radius: 999px;
+}
+
+.paso-camino.activo {
+    background: #69db7c;
+    box-shadow: 0 0 12px #40c057;
+}
+
+.planeta-core {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    margin: auto;
+    background: radial-gradient(circle at 35% 30%, #adb5bd, #495057 60%, #212529);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+.planeta-core.recuperado {
+    background: radial-gradient(circle at 35% 30%, #fff3bf, #74c0fc 55%, #4263eb);
+    box-shadow: 0 0 36px #748ffc;
+    animation: planetaOk 1s ease;
+}
+
+@keyframes planetaOk {
+    40% { transform: scale(1.12); }
+}
+
+.escenario.pj-avanza .pj-zoe,
+.escenario.pj-avanza .pj-zeus {
+    animation: pjAvanza 0.85s ease;
+}
+
+@keyframes pjAvanza {
+    40% { transform: translateX(18px); }
+    100% { transform: none; }
+}
+
+.cristal.pulso-energia,
+.estrella.pulso-energia {
+    animation: pulsoEnergia 0.65s ease;
+}
+
+@keyframes pulsoEnergia {
+    40% { transform: scale(1.4); filter: brightness(1.4); }
+    100% { transform: none; }
+}
+
+.escena-visual.fx-energia .cristal-escena,
+.escena-visual.fx-energia .paso-camino {
+    filter: brightness(1.2);
+}
+
+/* Sin textos dirigidos al niño (requerimientos.md). */
+.btn-solo-icono {
+    min-width: 64px;
+    padding-left: 14px;
+    padding-right: 14px;
+}
+#intro3d-continuar .intro3d-titulo-wrap h2,
+#intro3d-continuar .intro3d-continuar-card > p,
+#final .texto-final,
+#final .final-pregunta {
+    display: none !important;
+}
+#btn-continuar-intro3d {
+    min-width: 88px;
+    min-height: 88px;
+}
+
 .capa-efectos {
     position: fixed;
     inset: 0;

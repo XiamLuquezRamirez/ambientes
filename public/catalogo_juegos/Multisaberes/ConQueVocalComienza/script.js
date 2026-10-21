@@ -272,9 +272,11 @@
 
     function limpiarClases() {
         document.querySelectorAll("#vocales .vocal").forEach(function (v) {
-            v.classList.remove("acierto", "vuelve", "entra", "elegida");
+            v.classList.remove("acierto", "vuelve", "entra", "elegida", "eleva", "ilumina");
             var cuerpo = v.querySelector(".vocal-cuerpo");
             if (cuerpo) cuerpo.className = "vocal-cuerpo";
+            var globo = v.querySelector(".globo");
+            if (globo) globo.className = "globo";
         });
         var img = $id("img-objeto");
         if (img) img.className = "img-objeto";
@@ -446,11 +448,14 @@
 
     async function acierto(btn, gen) {
         var a = reto.acierto || {};
-        btn.classList.add("acierto");
+        var fx = claseEfecto(a.efecto);
+        btn.classList.add("acierto", fx);
         var cuerpo = btn.querySelector(".vocal-cuerpo");
-        if (cuerpo) cuerpo.classList.add(claseEfecto(a.efecto));
+        var globo = btn.querySelector(".globo");
+        if (cuerpo) cuerpo.classList.add(fx);
+        if (globo) globo.classList.add(fx);
         if (a.objeto) animarObjeto(a.objeto);
-        if (a.celebra || a.efecto === "eleva") celebrarPersonajes(true);
+        if (a.celebra) celebrarPersonajes(true);
         estrellas(btn, a.objeto === "especial" ? 22 : 12);
         efecto(a.sonido);
         if (a.texto) await decir(a, "acierto");

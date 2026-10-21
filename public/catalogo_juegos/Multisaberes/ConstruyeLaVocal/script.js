@@ -278,7 +278,10 @@
         if (banda) banda.innerHTML = "";
         if (flotante) flotante.innerHTML = "";
         if (tablero) {
-            tablero.classList.remove("completa", "salta", "gira", "ilumina", "cascada", "modelo-oculto");
+            tablero.classList.remove("completa", "salta", "gira", "ilumina", "cascada", "portal", "modelo-oculto");
+            document.querySelectorAll("#portales .portal.destello").forEach(function (p) {
+                p.classList.remove("destello");
+            });
         }
         if (flash) {
             flash.hidden = true;
@@ -562,11 +565,15 @@
             await iluminarCascada();
             if (!vivo(gen)) return;
             tablero.classList.add("completa", "ilumina");
+        } else if (fx === "portal") {
+            tablero.classList.add("completa", "ilumina", "portal");
+            var ports = document.querySelectorAll("#portales .portal");
+            if (ports[completados]) ports[completados].classList.add("activo", "destello");
         } else {
             tablero.classList.add("completa", fx === "maquina" || fx === "portales" ? "ilumina" : fx);
         }
         if ($id("maquina")) $id("maquina").classList.add("ok");
-        if (fx === "ilumina" || ronda.vocal === "u") {
+        if (fx === "ilumina" || fx === "portal" || ronda.vocal === "u") {
             $id("cinta").classList.add("ilumina-cinta");
         }
         efecto(ac.sonido || "celebracion");

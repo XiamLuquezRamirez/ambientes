@@ -404,6 +404,111 @@
             vacio.id = "chip-vacio";
             patron.appendChild(vacio);
             vis.appendChild(patron);
+            return;
+        }
+
+        if (r.tipo === "escuchar" || r.tipo === "reubicar" || r.tipo === "serie") {
+            var chrome = document.createElement("div");
+            chrome.className = "escena-chrome escena-" + (r.escena || "gen");
+            chrome.setAttribute("aria-hidden", "true");
+            var i;
+            var nodo;
+            if (r.escena === "puente") {
+                for (i = 0; i < 3; i++) {
+                    nodo = document.createElement("span");
+                    nodo.className = "plataforma-puente";
+                    chrome.appendChild(nodo);
+                }
+            } else if (r.escena === "rocas") {
+                for (i = 0; i < 3; i++) {
+                    nodo = document.createElement("span");
+                    nodo.className = "roca";
+                    chrome.appendChild(nodo);
+                }
+            } else if (r.escena === "cristales") {
+                for (i = 0; i < 5; i++) {
+                    nodo = document.createElement("span");
+                    nodo.className = "cristal-escena";
+                    chrome.appendChild(nodo);
+                }
+            } else if (r.escena === "camino") {
+                for (i = 0; i < 5; i++) {
+                    nodo = document.createElement("span");
+                    nodo.className = "paso-camino";
+                    chrome.appendChild(nodo);
+                }
+            } else if (r.escena === "planeta") {
+                nodo = document.createElement("span");
+                nodo.className = "planeta-core";
+                chrome.appendChild(nodo);
+            }
+            vis.appendChild(chrome);
+        }
+    }
+
+    function aplicarEfectoAcierto(ac, btn) {
+        var fx = (ac && ac.efecto) || "";
+        var vis = $id("escena-visual");
+        var escenario = $id("escenario");
+        if (btn) btn.classList.add("efecto-" + fx);
+        if (vis) {
+            vis.classList.add("fx-" + fx);
+            setTimeout(function () { vis.classList.remove("fx-" + fx); }, 1100);
+        }
+        if (fx === "avanza" && vis) {
+            var plats = vis.querySelectorAll(".plataforma-puente");
+            if (plats.length) plats[plats.length - 1].classList.add("ilumina");
+            celebrarPersonajes(true);
+            if (escenario) {
+                escenario.classList.add("pj-avanza");
+                setTimeout(function () { escenario.classList.remove("pj-avanza"); }, 900);
+            }
+        }
+        if (fx === "salta" && vis) {
+            var rocas = vis.querySelectorAll(".roca");
+            if (rocas.length) rocas[Math.min(1, rocas.length - 1)].classList.add("salta");
+        }
+        if (fx === "estrella" && btn) {
+            btn.classList.add("es-estrella");
+        }
+        if (fx === "energia") {
+            var box = $id("energia") || $id("progreso");
+            if (box) {
+                var items = box.querySelectorAll(".cristal, .estrella");
+                var idx = Math.min(completados, items.length - 1);
+                if (idx >= 0 && items[idx]) {
+                    items[idx].classList.add("pulso-energia");
+                    setTimeout(function () { items[idx].classList.remove("pulso-energia"); }, 700);
+                }
+            }
+            if (vis) {
+                vis.querySelectorAll(".cristal-escena, .paso-camino").forEach(function (el, i) {
+                    if (i <= completados) el.classList.add("activo");
+                });
+            }
+        }
+        if (fx === "planeta" && vis) {
+            var core = vis.querySelector(".planeta-core");
+            if (core) core.classList.add("recuperado");
+            document.querySelectorAll("#opciones .opcion").forEach(function (o) {
+                o.classList.add("acierto");
+            });
+        }
+        if (fx === "despega") {
+            var img = $id("objeto-img");
+            var marco = $id("rueda-marco");
+            if (marco) marco.classList.add("gira");
+            if (img) img.classList.add("despega");
+        }
+        if (fx === "abre") {
+            var puerta = $id("puerta");
+            var hueco = $id("hueco");
+            var vdP = defVocal(ronda && ronda.correcto);
+            if (hueco && vdP) {
+                hueco.classList.add("lleno");
+                hueco.innerHTML = '<img src="' + vdP.img + '" alt="' + ronda.correcto + '" draggable="false">';
+            }
+            if (puerta) puerta.classList.add("abierta");
         }
     }
 
@@ -552,23 +657,8 @@
         efecto(ac.sonido || ac.efecto || "celebracion");
         celebrarPersonajes(true);
         setTimeout(function () { celebrarPersonajes(false); }, 600);
+        aplicarEfectoAcierto(ac, btn);
 
-        if (ronda.tipo === "inicial" && ronda.escena === "rueda") {
-            var marco = $id("rueda-marco");
-            var img = $id("objeto-img");
-            if (marco) marco.classList.add("gira");
-            if (img) img.classList.add("despega");
-        }
-        if (ronda.tipo === "puerta") {
-            var puerta = $id("puerta");
-            var hueco = $id("hueco");
-            var vdP = defVocal(ronda.correcto);
-            if (hueco && vdP) {
-                hueco.classList.add("lleno");
-                hueco.innerHTML = '<img src="' + vdP.img + '" alt="' + ronda.correcto + '" draggable="false">';
-            }
-            if (puerta) puerta.classList.add("abierta");
-        }
         if (ronda.tipo === "secuencia") {
             var vacio = $id("chip-vacio");
             if (vacio) {
