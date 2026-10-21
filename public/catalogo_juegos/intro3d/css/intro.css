@@ -201,6 +201,113 @@
     }
 }
 
+/* Panel debug: cámara / posición / rotación del aula GLB */
+#aula-controles {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 5000;
+    width: min(320px, 92vw);
+    max-height: min(86vh, 640px);
+    overflow: auto;
+    background: rgba(12, 18, 28, 0.92);
+    color: #e8eef7;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    font: 12px/1.35 system-ui, sans-serif;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    pointer-events: auto;
+}
+
+#aula-controles.is-collapsed .aula-controles-body,
+#aula-controles.is-collapsed .aula-controles-foot {
+    display: none;
+}
+
+.aula-controles-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    position: sticky;
+    top: 0;
+    background: rgba(12, 18, 28, 0.96);
+}
+
+.aula-controles-head button,
+.aula-controles-foot button {
+    border: 0;
+    border-radius: 6px;
+    padding: 4px 8px;
+    background: #2f6fed;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+}
+
+.aula-controles-body {
+    padding: 8px 10px 4px;
+    display: grid;
+    gap: 6px;
+}
+
+.aula-ctrl-sep {
+    margin: 8px 0 2px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    opacity: 0.95;
+}
+
+.aula-ctrl-row {
+    display: grid;
+    grid-template-columns: 78px 1fr 58px;
+    align-items: center;
+    gap: 6px;
+}
+
+.aula-ctrl-select select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background: #0b1220;
+    color: #e8eef7;
+    padding: 3px 4px;
+}
+
+.aula-ctrl-label {
+    opacity: 0.9;
+    white-space: nowrap;
+}
+
+.aula-ctrl-row input[type="range"] {
+    width: 100%;
+}
+
+.aula-ctrl-row input[type="number"] {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background: #0b1220;
+    color: #e8eef7;
+    padding: 2px 4px;
+}
+
+.aula-controles-foot {
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    position: sticky;
+    bottom: 0;
+    background: rgba(12, 18, 28, 0.96);
+}
+
 /* Tutorial 3D (personaje en esquina; el juego solo pone #tutorial-3d en el HTML) */
 .tutorial-3d {
     position: fixed;
