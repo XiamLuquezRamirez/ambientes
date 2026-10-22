@@ -670,7 +670,7 @@
 
     function apagarZonasDemo() {
         document.querySelectorAll("#intro-lados .zona-demo").forEach(function (el) {
-            el.classList.remove("activa", "is-demo-target");
+            el.classList.remove("activa", "is-demo-target", "pasando");
         });
     }
 
@@ -688,41 +688,80 @@
         if (resta > 40) await sleep(resta);
     }
 
-    async function correrPaseTutorial(gen) {
-        const wrap = document.getElementById("intro-lados");
-        limpiarTableroTutorial();
+    function marcarPasando(wrap, activo) {
+        wrap.querySelectorAll(".zona-demo").forEach(function (el) {
+            el.classList.toggle("pasando", !!(activo && el !== activo));
+            if (el !== activo) el.classList.remove("activa", "is-demo-target");
+        });
+    }
+
+    function reducirMotionLat() {
+        return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+            || document.body.classList.contains("sin-animaciones");
+    }
+
+    async function mostrarIntroLadosAnimado(wrap) {
+        wrap.classList.remove("is-saliendo", "is-visible", "is-entrando");
         wrap.hidden = false;
+        wrap.setAttribute("aria-hidden", "false");
         wrap.querySelectorAll(".zona-demo").forEach(function (el) {
             el.hidden = false;
-            el.classList.remove("activa", "is-demo-target");
+            el.classList.remove("activa", "is-demo-target", "pasando");
         });
+        void wrap.offsetWidth;
+        wrap.classList.add("is-visible", "is-entrando");
+        await sleep(reducirMotionLat() ? 80 : 560);
+        wrap.classList.remove("is-entrando");
+    }
 
-        const orden = ["izquierda", "centro", "derecha"];
-        for (let i = 0; i < orden.length; i++) {
-            if (gen !== retoGen) break;
-            apagarZonasDemo();
-            const el = wrap.querySelector('.zona-demo[data-lado="' + orden[i] + '"]');
-            if (el) el.classList.add("activa");
-            await decirLado(gen, orden[i]);
-            if (gen !== retoGen) break;
-            if (el) el.classList.remove("activa");
-            await sleep(280);
-        }
-
-        if (gen !== retoGen) {
-            wrap.hidden = true;
-            apagarZonasDemo();
-            return;
-        }
-
-        const ejemplo = ladoContrarioAlReto((retosRuntime[0] && retosRuntime[0].respuesta) || "");
-        apagarZonasDemo();
-        const elegido = wrap.querySelector('.zona-demo[data-lado="' + ejemplo + '"]');
-        if (elegido) elegido.classList.add("activa", "is-demo-target");
-        await decirLado(gen, ejemplo);
-        if (gen === retoGen) await sleep(700);
-        apagarZonasDemo();
+    async function ocultarIntroLadosAnimado(wrap) {
+        wrap.classList.add("is-saliendo");
+        wrap.classList.remove("is-visible", "is-entrando");
+        await sleep(reducirMotionLat() ? 40 : 300);
+        wrap.classList.remove("is-saliendo");
         wrap.hidden = true;
+        wrap.setAttribute("aria-hidden", "true");
+        apagarZonasDemo();
+    }
+
+    function animarEntradaEjercicio() {
+        const esc = document.getElementById("escena-wrap");
+        if (!esc) return;
+        esc.classList.remove("is-ej-entrando");
+        void esc.offsetWidth;
+        esc.classList.add("is-ej-entrando");
+    }
+
+    async function correrPaseTutorial(gen) {
+        const wrap = document.getElementById("intro-lados");
+        try {
+            limpiarTableroTutorial();
+            await mostrarIntroLadosAnimado(wrap);
+            if (gen !== retoGen) return;
+
+            const orden = ["izquierda", "centro", "derecha"];
+            for (let i = 0; i < orden.length; i++) {
+                if (gen !== retoGen) break;
+                const el = wrap.querySelector('.zona-demo[data-lado="' + orden[i] + '"]');
+                marcarPasando(wrap, el);
+                if (el) el.classList.add("activa");
+                await decirLado(gen, orden[i]);
+                if (gen !== retoGen) break;
+                if (el) el.classList.remove("activa");
+                await sleep(280);
+            }
+
+            if (gen !== retoGen) return;
+
+            const ejemplo = ladoContrarioAlReto((retosRuntime[0] && retosRuntime[0].respuesta) || "");
+            const elegido = wrap.querySelector('.zona-demo[data-lado="' + ejemplo + '"]');
+            marcarPasando(wrap, elegido);
+            if (elegido) elegido.classList.add("activa");
+            await decirLado(gen, ejemplo);
+            if (gen === retoGen) await sleep(700);
+        } finally {
+            await ocultarIntroLadosAnimado(wrap);
+        }
     }
 
     /* ── UI helpers ───────────────────────────────────────────── */
@@ -759,17 +798,6 @@
         return btn;
     }
 
-    function iconoZona(zona) {
-        if (zona === "izquierda") {
-            return '<i class="fa-solid fa-hand mano-izq" aria-hidden="true"></i>';
-        }
-        if (zona === "centro") {
-            return '<i class="fa-solid fa-hand-point-up mano-centro" aria-hidden="true"></i>';
-        }
-        // derecha: mano natural de Font Awesome (derecha)
-        return '<i class="fa-solid fa-hand mano-der" aria-hidden="true"></i>';
-    }
-
     function renderZonasRespuesta(zonas, onPick) {
         const resp = document.getElementById("respuestas");
         resp.hidden = false;
@@ -780,7 +808,6 @@
             b.className = "btn-mano " + z;
             b.dataset.zona = z;
             b.setAttribute("aria-label", ZONA_LABEL[z] || z);
-            b.innerHTML = iconoZona(z) + "<span>" + (ZONA_LABEL[z] || z) + "</span>";
             b.addEventListener("click", function () {
                 if (!aceptaRespuesta || esperandoFeedback) return;
                 onPick(z);
@@ -1027,6 +1054,13 @@
         if (retoRuntime.tipo === "estatico") reproducirEstatico(retoRuntime, gen);
         else if (retoRuntime.tipo === "dinamico") reproducirDinamico(retoRuntime, gen);
         else reproducirImitacion(retoRuntime, gen);
+
+        /* Animar cuando el DOM del reto ya tiene nodos (no esperar animaciones largas del reto). */
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                if (gen === retoGen) animarEntradaEjercicio();
+            });
+        });
     }
 
     function reproducirEstatico(rt, gen) {

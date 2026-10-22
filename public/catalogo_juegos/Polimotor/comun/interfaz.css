@@ -6,7 +6,8 @@
  * ::before, más grande, para que la sombra pueda salirse de la caja sin agrandar la zona táctil.
  */
 .hud-nav .btn-round.btn,
-#btn-menu-vol.menu-acc-fab {
+#btn-menu-vol.menu-acc-fab,
+#btn-menu-acc.menu-acc-fab {
   position: relative;
   padding: 0;
   border: 0;
@@ -20,12 +21,14 @@
 }
 
 .hud-nav .btn-round.btn > i,
-#btn-menu-vol.menu-acc-fab > i {
+#btn-menu-vol.menu-acc-fab > i,
+#btn-menu-acc.menu-acc-fab > i {
   display: none;
 }
 
 .hud-nav .btn-round.btn::before,
-#btn-menu-vol.menu-acc-fab::before {
+#btn-menu-vol.menu-acc-fab::before,
+#btn-menu-acc.menu-acc-fab::before {
   content: "";
   position: absolute;
   left: -15.47%;
@@ -56,6 +59,10 @@
   background-image: url("../img/altavoz.png");
 }
 
+#btn-menu-acc.menu-acc-fab::before {
+  background-image: url("../img/accesibilidad.png");
+}
+
 /* Cada juego cambia el <i> a fa-volume-xmark con volumen 0; la imagen no lo refleja, así que ese caso se marca aparte. */
 #btn-menu-vol.menu-acc-fab > i.fa-volume-xmark {
   position: absolute;
@@ -78,18 +85,22 @@
 .hud-nav .btn-round.btn:focus,
 .hud-nav .btn-round.btn:active,
 #btn-menu-vol.menu-acc-fab:hover,
-#btn-menu-vol.menu-acc-fab:active {
+#btn-menu-vol.menu-acc-fab:active,
+#btn-menu-acc.menu-acc-fab:hover,
+#btn-menu-acc.menu-acc-fab:active {
   background: transparent;
   box-shadow: none;
 }
 
 .hud-nav .btn-round.btn:active,
-#btn-menu-vol.menu-acc-fab:active {
+#btn-menu-vol.menu-acc-fab:active,
+#btn-menu-acc.menu-acc-fab:active {
   transform: translateY(2px);
 }
 
 .hud-nav .btn-round.btn:focus-visible,
-#btn-menu-vol.menu-acc-fab:focus-visible {
+#btn-menu-vol.menu-acc-fab:focus-visible,
+#btn-menu-acc.menu-acc-fab:focus-visible {
   outline: 3px solid #fff;
   outline-offset: 2px;
 }

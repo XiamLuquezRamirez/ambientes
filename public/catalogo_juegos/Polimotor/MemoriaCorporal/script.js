@@ -647,6 +647,12 @@ function bloqueMemoria() {
     return document.querySelector(".memoria-bloque");
 }
 
+function animacionesActivas() {
+    if (acc().animaciones_opciones === false) return false;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    return true;
+}
+
 function iniciarFaseMemoria() {
     const bloque = bloqueMemoria();
     if (bloque) bloque.classList.add("fase-memoria");
@@ -660,6 +666,80 @@ function terminarFaseMemoria() {
         cuenta.hidden = true;
         cuenta.innerHTML = "";
     }
+}
+
+function limpiarClasesSecuencia(caja) {
+    if (!caja) return;
+    caja.classList.remove(
+        "secuencia-sale",
+        "secuencia-entra",
+        "secuencia-sube",
+        "secuencia-pista",
+        "secuencia-ok",
+        "secuencia-viva"
+    );
+}
+
+function salirOpciones() {
+    return new Promise(function (resolve) {
+        const caja = document.getElementById("opciones");
+        if (!caja || caja.hidden || !caja.children.length) {
+            if (caja) {
+                caja.innerHTML = "";
+                caja.hidden = true;
+            }
+            resolve();
+            return;
+        }
+        if (!animacionesActivas()) {
+            caja.innerHTML = "";
+            caja.hidden = true;
+            resolve();
+            return;
+        }
+        const btns = Array.prototype.slice.call(caja.querySelectorAll(".opcion-seq"));
+        btns.forEach(function (btn, i) {
+            btn.disabled = true;
+            btn.classList.remove("opcion-entra");
+            btn.classList.add("opcion-sale");
+            btn.style.animationDelay = (i * 55) + "ms";
+        });
+        window.setTimeout(function () {
+            caja.innerHTML = "";
+            caja.hidden = true;
+            resolve();
+        }, btns.length * 55 + 360);
+    });
+}
+
+function salirSecuencia() {
+    return new Promise(function (resolve) {
+        const caja = document.getElementById("secuencia");
+        if (!caja || caja.hidden || !caja.innerHTML) {
+            if (caja) {
+                limpiarClasesSecuencia(caja);
+                caja.hidden = true;
+                caja.innerHTML = "";
+            }
+            resolve();
+            return;
+        }
+        if (!animacionesActivas()) {
+            limpiarClasesSecuencia(caja);
+            caja.hidden = true;
+            caja.innerHTML = "";
+            resolve();
+            return;
+        }
+        caja.classList.remove("secuencia-entra", "secuencia-sube");
+        caja.classList.add("secuencia-sale");
+        window.setTimeout(function () {
+            limpiarClasesSecuencia(caja);
+            caja.hidden = true;
+            caja.innerHTML = "";
+            resolve();
+        }, 420);
+    });
 }
 
 function animarDedoEnOpcion(boton) {
@@ -758,8 +838,6 @@ async function iniciarRonda() {
     secuenciaObjetivo = rondasSesion[rondaActual].slice();
     huecoIndex = secuenciaObjetivo.length - 1;
     actualizarProgreso();
-    document.getElementById("opciones").innerHTML = "";
-    document.getElementById("secuencia").hidden = true;
     terminarFaseMemoria();
     aplicarAccesibilidadInicial();
 
@@ -772,20 +850,28 @@ async function iniciarRonda() {
 
     await mostrarSecuenciaObjetivo();
     if (juegoTerminado) return;
-    mostrarOpciones();
+    await mostrarOpciones();
 }
 
 async function mostrarSecuenciaObjetivo() {
     const caja = document.getElementById("secuencia");
     const cuenta = document.getElementById("cuenta");
+    const ops = document.getElementById("opciones");
     mostrandoMemoria = true;
     esperandoRespuesta = false;
     iniciarFaseMemoria();
-    document.getElementById("opciones").hidden = true;
+    if (ops) ops.hidden = true;
     setEnunciado(textos().memoriza || "¡Memoriza esta secuencia!");
+    limpiarClasesSecuencia(caja);
     caja.hidden = false;
     caja.classList.add("secuencia-viva");
     caja.innerHTML = htmlSecuencia(secuenciaObjetivo);
+    if (animacionesActivas()) {
+        caja.classList.add("secuencia-entra");
+        window.setTimeout(function () {
+            if (caja) caja.classList.remove("secuencia-entra");
+        }, 560);
+    }
     await hablarTexto(textos().memoriza);
     if (juegoTerminado) return;
     if (acc().cuentaRegresiva !== false) {
@@ -833,18 +919,16 @@ async function mostrarSecuenciaObjetivo() {
         if (juegoTerminado) return;
     }
     caja.classList.remove("secuencia-viva");
-    caja.hidden = true;
-    caja.innerHTML = "";
     terminarFaseMemoria();
     document.getElementById("opciones").hidden = false;
     mostrandoMemoria = false;
 }
 
 function mostrarOpciones() {
-    mostrarOpcionesFalta();
+    return mostrarOpcionesFalta();
 }
 
-function mostrarOpcionesFalta() {
+async function mostrarOpcionesFalta() {
     const correcto = secuenciaObjetivo[huecoIndex];
     const n = nivelElegido.opciones || 4;
     const dist = distractoresMovimiento(correcto, n - 1, secuenciaObjetivo);
@@ -855,10 +939,19 @@ function mostrarOpcionesFalta() {
     hablarTexto(textos().queFalta);
     const pista = document.getElementById("secuencia");
     pista.hidden = false;
-    pista.classList.remove("secuencia-viva", "secuencia-ok");
+    pista.classList.remove("secuencia-viva", "secuencia-ok", "secuencia-entra", "secuencia-sale");
     pista.classList.add("secuencia-pista");
     pista.innerHTML = htmlSecuenciaConHueco(secuenciaObjetivo, huecoIndex);
+    if (animacionesActivas()) {
+        pista.classList.remove("secuencia-sube");
+        void pista.offsetWidth;
+        pista.classList.add("secuencia-sube");
+        window.setTimeout(function () {
+            if (pista) pista.classList.remove("secuencia-sube");
+        }, 600);
+    }
     pintarOpcionesFalta(opcionesRonda);
+    if (animacionesActivas()) await sleep(180);
 }
 
 function pintarOpcionesFalta(lista) {
@@ -935,9 +1028,11 @@ function elegirOpcion(op, btn) {
         mostrarMarca(btn, "ok");
         revelarSecuenciaAcierto();
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto);
-        Promise.all([sleep(1200), hablarFeedback("acierto")]).then(function () {
+        Promise.all([sleep(1200), hablarFeedback("acierto")]).then(async function () {
             marcandoRespuesta = false;
             rondaActual += 1;
+            await Promise.all([salirOpciones(), salirSecuencia()]);
+            if (juegoTerminado) return;
             iniciarRonda();
         });
     } else {
@@ -983,9 +1078,17 @@ function restaurarPista() {
     const pista = document.getElementById("secuencia");
     if (!pista) return;
     pista.hidden = false;
-    pista.classList.remove("secuencia-viva", "secuencia-ok");
+    pista.classList.remove("secuencia-viva", "secuencia-ok", "secuencia-entra", "secuencia-sale");
     pista.classList.add("secuencia-pista");
     pista.innerHTML = htmlSecuenciaConHueco(secuenciaObjetivo, huecoIndex);
+    if (animacionesActivas()) {
+        pista.classList.remove("secuencia-sube");
+        void pista.offsetWidth;
+        pista.classList.add("secuencia-sube");
+        window.setTimeout(function () {
+            if (pista) pista.classList.remove("secuencia-sube");
+        }, 600);
+    }
 }
 
 function generarConfetis() {

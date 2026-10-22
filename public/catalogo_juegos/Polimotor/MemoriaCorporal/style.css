@@ -49,10 +49,10 @@ body.swal2-height-auto {
 body {
   overflow: hidden;
   background: #f7fbff;
-  background-image:
-    radial-gradient(circle at 8% 12%, #f8d7e8 0 80px, transparent 81px),
-    radial-gradient(circle at 92% 10%, #d6e8ff 0 90px, transparent 91px),
-    radial-gradient(circle at 90% 88%, #ffe3c4 0 100px, transparent 101px);
+  background-image: url(img/fondo.png);
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
   color: #262626;
 }
 
@@ -928,7 +928,6 @@ body.modo-tap .pieza {
 
 #menu-acc {
   right: 92px;
- bottom: 23px;
 }
 
 .menu-acc {
@@ -1108,8 +1107,8 @@ body.alto-contraste .menu-acc-cerrar {
   gap: 2px;
   font-size: 64px;
   font-weight: 700;
-  color: #1565c0;
-  text-shadow: 3px 3px 0 #fff;
+  color: #fff;
+  text-shadow: 0 3px 0 rgba(40, 20, 80, 0.28);
   box-sizing: border-box;
   width: 100%;
   height: 118px;
@@ -1119,6 +1118,10 @@ body.alto-contraste .menu-acc-cerrar {
 
 .cuenta:not([hidden]) {
   display: flex;
+}
+
+.cuenta strong {
+  color: #fff;
 }
 
 /* Solo en memorización: mantiene el hueco para que no salten las tarjetas. */
@@ -1139,11 +1142,11 @@ body.alto-contraste .menu-acc-cerrar {
   font-size: 17px;
   font-weight: 700;
   letter-spacing: 0.2px;
-  color: #1565c0;
-  background: #e7f3ff;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   line-height: 1.2;
-  text-shadow: none;
+  text-shadow: 0 1px 0 rgba(40, 20, 80, 0.25);
 }
 
 .secuencia {
@@ -1159,6 +1162,7 @@ body.alto-contraste .menu-acc-cerrar {
   background: transparent;
   border: 0;
   overflow-x: auto;
+  will-change: transform, opacity;
 }
 
 .secuencia-pista {
@@ -1168,6 +1172,52 @@ body.alto-contraste .menu-acc-cerrar {
 
 .secuencia-viva {
   outline: none;
+}
+
+.secuencia.secuencia-entra {
+  animation: secuenciaEntra 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.secuencia.secuencia-sube {
+  animation: secuenciaSube 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.secuencia.secuencia-sale {
+  animation: secuenciaSale 0.4s ease-in both;
+  pointer-events: none;
+}
+
+@keyframes secuenciaEntra {
+  from {
+    opacity: 0;
+    transform: translateY(36px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes secuenciaSube {
+  from {
+    opacity: 0.55;
+    transform: translateY(48px) scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes secuenciaSale {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-28px) scale(0.94);
+  }
 }
 
 .paso-img {
@@ -1220,16 +1270,17 @@ body.alto-contraste .menu-acc-cerrar {
 .paso-hueco {
   min-width: calc(var(--mc-img-pista) + 16px);
   min-height: calc(var(--mc-img-pista) + 16px);
-  border: 3px dashed #90a4ae;
-  background: rgba(255, 255, 255, 0.45);
+  border: 3px dashed #c4b4e0;
+  background: rgba(255, 255, 255, 0.78);
   box-shadow: none;
-  color: #607d8b;
+  color: #6b5a8a;
 }
 
 .paso-hueco-marca {
   font-size: calc(var(--mc-img-pista) * 0.55);
   font-weight: 700;
   line-height: 1;
+  color: #5a4a7a;
 }
 
 .paso-flecha {
@@ -1274,6 +1325,11 @@ body.alto-contraste .menu-acc-cerrar {
   animation: opcionEntrada 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.opcion-seq.opcion-sale {
+  animation: opcionSalida 0.34s ease-in both;
+  pointer-events: none;
+}
+
 @keyframes opcionEntrada {
   from {
     opacity: 0;
@@ -1285,8 +1341,23 @@ body.alto-contraste .menu-acc-cerrar {
   }
 }
 
+@keyframes opcionSalida {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(28px) scale(0.88);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .opcion-seq.opcion-entra {
+  .opcion-seq.opcion-entra,
+  .opcion-seq.opcion-sale,
+  .secuencia.secuencia-entra,
+  .secuencia.secuencia-sube,
+  .secuencia.secuencia-sale {
     animation: none;
   }
 }
