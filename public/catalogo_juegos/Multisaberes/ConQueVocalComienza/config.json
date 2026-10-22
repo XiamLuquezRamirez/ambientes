@@ -142,7 +142,7 @@
           "objeto": "oreja",
           "vocales": ["a", "e", "i", "o", "u"],
           "correcto": "o",
-          "acierto": { "efecto": "ilumina", "objeto": "mueve", "celebra": true, "voz": "zeus" }
+          "acierto": { "efecto": "ilumina", "objeto": "mueve", "celebra": true }
         },
         {
           "id": "una",
@@ -160,7 +160,10 @@
           "acierto": { "efecto": "ilumina", "objeto": "especial", "sonido": "celebracion" }
         }
       ],
-      "cierre": { "voz": "zoe", "texto": "¡Descubriste las vocales escondidas!" },
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Descubriste las vocales escondidas!" },
+        { "voz": "zeus", "texto": "¡Descubriste las vocales escondidas!" }
+      ],
       "insignia": { "img": "img/insignia_lupa.svg", "nombre": "Lupa mágica de las vocales" }
     }
   ]

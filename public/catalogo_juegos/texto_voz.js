@@ -146,8 +146,9 @@
         return new Promise(function (resolve) { setTimeout(resolve, ms); });
     }
 
-    function fetchTts(texto, personaje) {
+    function fetchTts(texto, personaje, maxIntentos) {
         var intentos = 0;
+        var tope = Math.max(1, Number(maxIntentos) || 3);
         function una() {
             intentos += 1;
             return fetch(URL_TTS + "?" + new URLSearchParams({
@@ -170,13 +171,18 @@
                 ttsCache[claveTts(texto, personaje)] = src;
                 return src;
             }).catch(function (err) {
-                if (intentos >= 3) return null;
+                if (intentos >= tope) return null;
                 var status = err && err.status;
                 var espera = (status === 429 || status === 502) ? 2500 * intentos : 900 * intentos;
                 return esperar(espera).then(una);
             });
         }
         return una();
+    }
+
+    /** Fetch fuera de cola: para hablar() sin esperar la precarga. */
+    function fetchTtsDirecto(texto, personaje, maxIntentos) {
+        return fetchTts(texto, personaje, maxIntentos || 1);
     }
 
     function encolarTts(texto, personaje) {
@@ -194,7 +200,7 @@
         trabajo.then(function (src) {
             if (typeof sig.resolve === "function") sig.resolve(src);
         }).finally(function () {
-            var pausa = ttsCache[sig.key] ? 0 : 450;
+            var pausa = ttsCache[sig.key] ? 0 : 120;
             setTimeout(function () {
                 ttsColaAndando = false;
                 bombearColaTts();
@@ -363,6 +369,13 @@
             }
 
             var duracionMs = opts.duracionMs != null ? Number(opts.duracionMs) : null;
+            // Si el servidor TTS tarda, no congelar el juego: voz del navegador y cachear después.
+            // fallbackNavegador:false → solo voz del personaje (servidor); si falla, onSinServidor o silencio.
+            var fallbackNavegador = opts.fallbackNavegador !== false;
+            var onSinServidor = typeof opts.onSinServidor === "function" ? opts.onSinServidor : null;
+            var esperarTtsMs = opts.esperarTtsMs != null ? Number(opts.esperarTtsMs) : 700;
+            if (!isFinite(esperarTtsMs) || esperarTtsMs < 0) esperarTtsMs = 700;
+            if (!fallbackNavegador) esperarTtsMs = Math.max(esperarTtsMs, 12000);
 
             ttsToken += 1;
             var myToken = ttsToken;
@@ -371,30 +384,85 @@
             ttsResolvers.push(resolve);
 
             var pj = String(personaje || "zoe").toLowerCase() === "zeus" ? "zeus" : "zoe";
+            var key = claveTts(t, pj);
             var safety = null;
+            var timerRapido = null;
+            var yaHablo = false;
             var done = function () {
                 if (myToken !== ttsToken) return;
                 if (safety) {
                     clearTimeout(safety);
                     safety = null;
                 }
+                if (timerRapido) {
+                    clearTimeout(timerRapido);
+                    timerRapido = null;
+                }
                 avisarInicio();
                 detenerReproduccionTts();
                 notificarTtsFin();
             };
-            safety = setTimeout(done, Math.max(15000, (isFinite(duracionMs) ? duracionMs : 0) + 4000));
+            safety = setTimeout(done, Math.max(20000, (isFinite(duracionMs) ? duracionMs : 0) + 4000));
             aplicarVolumenFondo(Math.min(VOLUMEN_DUCK, VOLUMEN_FONDO));
 
-            var cached = ttsCache[claveTts(t, pj)];
+            function sinServidor() {
+                if (myToken !== ttsToken || yaHablo) return;
+                yaHablo = true;
+                if (timerRapido) {
+                    clearTimeout(timerRapido);
+                    timerRapido = null;
+                }
+                if (onSinServidor) {
+                    Promise.resolve(onSinServidor()).catch(function () {}).then(done);
+                    return;
+                }
+                if (fallbackNavegador) {
+                    hablarNavegador(t, pj, myToken, done, avisarInicio);
+                    return;
+                }
+                done();
+            }
+
+            function hablarCon(src) {
+                if (myToken !== ttsToken || yaHablo) {
+                    return;
+                }
+                if (!src) {
+                    sinServidor();
+                    return;
+                }
+                yaHablo = true;
+                if (timerRapido) {
+                    clearTimeout(timerRapido);
+                    timerRapido = null;
+                }
+                reproducirUrlTts(src, t, pj, myToken, done, duracionMs, avisarInicio);
+            }
+
+            var cached = ttsCache[key];
             if (cached) {
-                reproducirUrlTts(cached, t, pj, myToken, done, duracionMs, avisarInicio);
+                hablarCon(cached);
                 return;
             }
 
-            obtenerUrlTts(t, pj, true).then(function (src) {
+            // Voz inmediata si el TTS no llega a tiempo (solo si se permite fallback de navegador).
+            if (fallbackNavegador) {
+                timerRapido = setTimeout(function () {
+                    sinServidor();
+                }, esperarTtsMs);
+            }
+
+            // Fetch directo, sin meterse detrás de la precarga.
+            var intentosTts = opts.intentosTts != null ? Number(opts.intentosTts) : 1;
+            if (!isFinite(intentosTts) || intentosTts < 1) intentosTts = 1;
+            fetchTtsDirecto(t, pj, intentosTts).then(function (src) {
+                if (src) ttsCache[key] = src;
                 if (myToken !== ttsToken) return;
-                if (src) reproducirUrlTts(src, t, pj, myToken, done, duracionMs, avisarInicio);
-                else hablarNavegador(t, pj, myToken, done, avisarInicio);
+                if (yaHablo) return;
+                hablarCon(src);
+            }).catch(function () {
+                if (myToken !== ttsToken || yaHablo) return;
+                sinServidor();
             });
         });
     }

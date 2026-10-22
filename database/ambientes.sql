@@ -384,9 +384,9 @@ CREATE TABLE `clases` (
 /*Data for the table `clases` */
 
 insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values 
-(12,6,2,9,'Identifica los colores',NULL,'2026-10-21','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09'),
-(13,10,2,7,'Rompecabezas del cuerpo humano',NULL,'2026-10-21','activa',2026,'2026-09-22 10:26:20','2026-09-22 10:26:22'),
-(14,2,2,8,'Descubre las vocales',NULL,'2026-10-21','activa',2026,'2026-10-19 16:09:00','2026-10-19 16:09:02');
+(12,6,2,9,'Identifica los colores',NULL,'2026-10-22','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09'),
+(13,10,2,7,'Rompecabezas del cuerpo humano',NULL,'2026-10-22','activa',2026,'2026-09-22 10:26:20','2026-09-22 10:26:22'),
+(14,2,2,8,'Descubre las vocales',NULL,'2026-10-22','activa',2026,'2026-10-19 16:09:00','2026-10-19 16:09:02');
 
 /*Table structure for table `cola_sincronizacion` */
 
@@ -649,7 +649,7 @@ CREATE TABLE `ejes` (
   CONSTRAINT `ejes_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `docentes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `ejes_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL,
   CONSTRAINT `ejes_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `ejes` */
 
@@ -669,7 +669,12 @@ insert  into `ejes`(`id`,`modulo_id`,`institucion_id`,`creado_por`,`nombre`,`slu
 (17,9,NULL,NULL,'Coordinación y orientación','coordinacion-y-orientacion',NULL,'ninguno',NULL,NULL,NULL,NULL,2,1,1,'2026-10-15 16:14:49','2026-10-15 16:14:49'),
 (18,9,NULL,NULL,'Habilidad y precisión','habilidad-y-precision',NULL,'ninguno',NULL,NULL,NULL,NULL,3,1,1,'2026-10-15 16:15:43','2026-10-15 16:15:43'),
 (19,3,NULL,NULL,'Comunicación y lenguaje','comunicacion-y-lenguaje',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,1,'2026-10-19 14:37:16','2026-10-19 14:37:16'),
-(20,3,NULL,NULL,'Pensamiento lógico y matemático','pensamiento-logico-y-matematico',NULL,'ninguno',NULL,NULL,NULL,NULL,2,1,1,'2026-10-21 08:50:19','2026-10-21 08:50:19');
+(20,3,NULL,NULL,'Pensamiento lógico y matemático','pensamiento-logico-y-matematico',NULL,'ninguno',NULL,NULL,NULL,NULL,2,1,1,'2026-10-21 08:50:19','2026-10-21 08:50:19'),
+(21,11,NULL,NULL,'Exploración musical','que-sonido-escuchas',NULL,'ninguno',NULL,NULL,NULL,NULL,1,1,1,'2026-10-22 17:23:36','2026-10-22 17:25:26'),
+(22,11,NULL,NULL,'Arte','descubre-el-instrumento',NULL,'ninguno',NULL,NULL,NULL,NULL,2,1,1,'2026-10-22 17:23:49','2026-10-22 17:26:09'),
+(23,11,NULL,NULL,'Teatro y expresión','sigue-el-ritmo',NULL,'ninguno',NULL,NULL,NULL,NULL,3,1,1,'2026-10-22 17:24:03','2026-10-22 17:27:07'),
+(24,11,NULL,NULL,'Creatividad','memoria-musical',NULL,'ninguno',NULL,NULL,NULL,NULL,4,1,1,'2026-10-22 17:24:12','2026-10-22 17:27:34'),
+(26,3,NULL,NULL,'Exploración del entorno','exploracion-del-entorno',NULL,'ninguno',NULL,NULL,NULL,NULL,3,1,1,'2026-10-22 17:40:28','2026-10-22 17:40:28');
 
 /*Table structure for table `emociones_sesion` */
 
@@ -1148,22 +1153,35 @@ insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`r
 ('busca-las-diferencias',9,12,12,10,'catalogo_juegos/Multisensorial/BuscaLasDiferencias','Busca las diferencias',NULL,NULL,'#84cc16',12,1,'2026-09-23 10:22:02','2026-10-15 15:58:07'),
 ('clasifica-por-los-sentidos',9,15,26,10,'catalogo_juegos/Multisensorial/ClasificaPorLosSentidos','Clasifica por los sentidos',NULL,NULL,'#0ea5e9',26,1,'2026-10-17 10:54:00','2026-10-17 10:54:00'),
 ('clasifica-por-textura',9,14,21,10,'catalogo_juegos/Multisensorial/ClasificaPorTextura','Clasifica por textura',NULL,NULL,'#14b8a6',16,1,'2026-10-14 10:12:58','2026-10-15 16:10:35'),
+('clasifica-y-descubre',6,24,64,11,'catalogo_juegos/ExpresionArtistica/ClasificaYDescubre','Clasifica y descubre',NULL,NULL,'#84cc16',60,1,'2026-10-22 17:55:46','2026-10-22 17:55:46'),
+('colores-y-formas',6,22,56,11,'catalogo_juegos/ExpresionArtistica/ColoresYFormas','Colores y formas',NULL,NULL,'#d946ef',52,1,'2026-10-22 17:50:53','2026-10-22 17:50:53'),
+('como-me-siento',6,23,58,11,'catalogo_juegos/ExpresionArtistica/ComoMeSiento','¿Cómo me siento?',NULL,NULL,'#ef4444',54,1,'2026-10-22 17:51:53','2026-10-22 17:51:53'),
+('completa-el-dibujo',6,22,54,11,'catalogo_juegos/ExpresionArtistica/CompletaElDibujo','Completa el dibujo',NULL,NULL,'#0ea5e9',50,1,'2026-10-22 17:49:57','2026-10-22 17:49:57'),
 ('completa-el-patron',8,20,47,3,'catalogo_juegos/Multisaberes/CompletaElPatron','Completa el patrón',NULL,NULL,'#ec4899',38,1,'2026-10-21 08:55:05','2026-10-21 08:55:05'),
+('completa-el-patron-2',6,24,67,11,'catalogo_juegos/ExpresionArtistica/CompletaElPatron','Completa el patrón',NULL,NULL,'#0f172a',63,1,'2026-10-22 17:57:04','2026-10-22 17:57:04'),
 ('completa-la-figura',9,12,11,10,'catalogo_juegos/Multisensorial/CompletaLaFigura','Completa La Figura',NULL,NULL,'#a855f7',11,1,'2026-09-23 08:48:41','2026-10-15 15:57:54'),
+('completa-la-melodia',6,21,52,11,'catalogo_juegos/ExpresionArtistica/CompletaLaMelodia','Completa la melodía',NULL,NULL,'#64748b',48,1,'2026-10-22 17:48:12','2026-10-22 17:48:12'),
 ('con-que-vocal-comienza',8,19,39,3,'catalogo_juegos/Multisaberes/ConQueVocalComienza','¿Con que vocal comienza?',NULL,NULL,'#84cc16',30,1,'2026-10-19 14:41:19','2026-10-19 14:41:19'),
 ('construye-la-vocal',8,19,40,3,'catalogo_juegos/Multisaberes/ConstruyeLaVocal','Construye la vocal',NULL,NULL,'#0ea5e9',31,1,'2026-10-19 14:41:52','2026-10-19 14:41:52'),
 ('coordinacion-visual',7,17,34,9,'catalogo_juegos/Polimotor/CoordinacionVisual','Coordinación visual','Guiar el cohete por los aros con precisión según el nivel de edad.','cordinacion.png','#73a7e3',7,1,'2026-09-21 14:30:00','2026-10-15 16:25:14'),
+('cual-es-diferente',6,24,66,11,'catalogo_juegos/ExpresionArtistica/CualEsDiferente','¿Cuál es diferente?',NULL,NULL,'#8b5cf6',62,1,'2026-10-22 17:56:39','2026-10-22 17:56:39'),
 ('cual-es-mayor',8,20,44,3,'catalogo_juegos/Multisaberes/CualEsMayor','¿Cuál es mayor?',NULL,NULL,'#84cc16',35,1,'2026-10-21 08:53:59','2026-10-21 08:53:59'),
 ('cuenta-los-objetos',8,20,43,3,'catalogo_juegos/Multisaberes/CuentaLosObjetos','Cuenta los objetos',NULL,NULL,'#ef4444',34,1,'2026-10-21 08:53:40','2026-10-21 08:53:40'),
+('descubre-el-instrumento',6,21,49,11,'catalogo_juegos/ExpresionArtistica/DescubreElInstrumento','Descubre el instrumento',NULL,NULL,'#84cc16',45,1,'2026-10-22 17:46:47','2026-10-22 17:46:47'),
 ('descubre-el-objeto',9,14,23,10,'catalogo_juegos/Multisensorial/DescubreElObjeto','Descubre el objeto',NULL,NULL,'#ef4444',18,1,'2026-10-14 10:47:30','2026-10-15 16:11:04'),
 ('descubre-las-vocales',8,19,38,3,'catalogo_juegos/Multisaberes/DescubreLasVocales','Descubre las vocales',NULL,NULL,'#ef4444',29,1,'2026-10-19 14:40:53','2026-10-19 14:40:53'),
+('donde-vive',8,26,71,3,'catalogo_juegos/Multisaberes/DondeVive','Donde Vive',NULL,NULL,'#8b5cf6',42,1,'2026-10-22 17:44:03','2026-10-22 17:44:03'),
+('el-mundo-de-los-colores',6,22,55,11,'catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores','El mundo de los colores',NULL,NULL,'#6366f1',51,1,'2026-10-22 17:50:29','2026-10-22 17:50:29'),
 ('el-reto-de-las-vocales',8,19,42,3,'catalogo_juegos/Multisaberes/ElRetoDeLasVocales','El reto de las vocales',NULL,NULL,'#f43f5e',33,1,'2026-10-19 14:42:46','2026-10-19 14:42:46'),
+('elige-el-escenario',6,23,59,11,'catalogo_juegos/ExpresionArtistica/EligeElEscenario','Elige el escenario',NULL,NULL,'#f59e0b',55,1,'2026-10-22 17:52:28','2026-10-22 17:52:28'),
 ('encuentra-el-color',9,12,9,10,'catalogo_juegos/Multisensorial/EncuentraElColor','Encuentra el Color',NULL,NULL,'#f97316',9,1,'2026-09-21 09:34:08','2026-10-15 15:56:56'),
 ('encuentra-el-sonido',9,13,15,10,'catalogo_juegos/Multisensorial/EncuentraElSonido','Encuentra el sonido',NULL,NULL,'#ef4444',20,1,'2026-10-14 15:15:36','2026-10-15 15:59:07'),
 ('encuentra-la-figura',8,20,46,3,'catalogo_juegos/Multisaberes/EncuentraLaFigura','Encuentra la figura',NULL,NULL,'#6366f1',37,1,'2026-10-21 08:54:43','2026-10-21 08:54:43'),
 ('encuentra-la-pareja',9,15,24,10,'catalogo_juegos/Multisensorial/EncuentraLaPareja','Encuentra la pareja',NULL,NULL,'#ec4899',24,1,'2026-10-16 08:26:52','2026-10-16 08:26:52'),
 ('encuentra-la-pareja-2',8,19,41,3,'catalogo_juegos/Multisaberes/EncuentraLaPareja','Encuentra la pareja',NULL,NULL,'#8b5cf6',32,1,'2026-10-19 14:42:18','2026-10-19 14:42:18'),
+('encuentra-la-sombra',6,24,65,11,'catalogo_juegos/ExpresionArtistica/EncuentraLaSombra','Encuentra la sombra',NULL,NULL,'#3b82f6',61,1,'2026-10-22 17:56:11','2026-10-22 17:56:11'),
 ('encuentra-la-textura',9,14,19,10,'catalogo_juegos/Multisensorial/EncuentraLaTextura','Encuentra la textura',NULL,NULL,'#84cc16',14,1,'2026-10-13 16:31:13','2026-10-15 16:10:09'),
+('encuentra-las-diferencias',6,22,57,11,'catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias','Encuentra las diferencias',NULL,NULL,'#14b8a6',53,1,'2026-10-22 17:51:19','2026-10-22 17:51:19'),
 ('ensamblajes-sencillos',7,18,36,9,'catalogo_juegos/Polimotor/EnsamblajesSencillos','Ensamblajes sencillos','Armar el robot arrastrando piezas según el nivel de edad.','ensamblaje.png','#57b1a8',8,1,'2026-09-21 14:30:00','2026-10-15 16:25:27'),
 ('explora-y-descubre',9,15,28,10,'catalogo_juegos/Multisensorial/ExploraYDescubre','Explora y descubre',NULL,NULL,'#8b5cf6',28,1,'2026-10-17 11:50:00','2026-10-17 11:50:00'),
 ('juegos-de-precision',7,18,37,9,'catalogo_juegos/Polimotor/JuegosDePrecision','Juegos de precision',NULL,'precision.png','#e7a396',8,1,'2026-09-18 15:42:23','2026-10-15 16:25:43'),
@@ -1172,16 +1190,28 @@ insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`r
 ('mas-menos-o-igual',8,20,45,3,'catalogo_juegos/Multisaberes/MasMenosOIgual','Más, menos o igual',NULL,NULL,'#06b6d4',36,1,'2026-10-21 08:54:20','2026-10-21 08:54:20'),
 ('memoria-auditiva',9,13,17,10,'catalogo_juegos/Multisensorial/MemoriaAuditiva','Memoria auditiva',NULL,NULL,'#22c55e',22,1,'2026-10-14 16:04:10','2026-10-15 15:59:47'),
 ('memoria-corporal',7,11,31,9,'catalogo_juegos/Polimotor/MemoriaCorporal','Memoria Corporal',NULL,'memoria.png','#c46040',4,1,'2026-09-14 15:48:10','2026-10-15 16:23:55'),
+('memoria-de-emociones',6,23,62,11,'catalogo_juegos/ExpresionArtistica/MemoriaDeEmociones','Memoria de emociones',NULL,NULL,'#64748b',58,1,'2026-10-22 17:54:14','2026-10-22 17:54:14'),
+('memoria-musical',6,21,51,11,'catalogo_juegos/ExpresionArtistica/MemoriaMusical','Memoria musical',NULL,NULL,'#8b5cf6',47,1,'2026-10-22 17:47:49','2026-10-22 17:47:49'),
 ('memoria-visual',9,12,13,10,'catalogo_juegos/Multisensorial/MemoriaVisual','Memoria visual',NULL,NULL,'#f43f5e',13,1,'2026-10-05 10:16:39','2026-10-15 15:58:19'),
+('mi-cuerpo',8,26,69,3,'catalogo_juegos/Multisaberes/MiCuerpo','Mi Cuerpo',NULL,NULL,'#84cc16',40,1,'2026-10-22 17:43:28','2026-10-22 17:43:28'),
+('mi-familia',8,26,70,3,'catalogo_juegos/Multisaberes/MiFamilia','Mi Familia',NULL,NULL,'#0ea5e9',41,1,'2026-10-22 17:43:45','2026-10-22 17:43:45'),
 ('observa-y-recuerda',9,15,25,10,'catalogo_juegos/Multisensorial/ObservaYRecuerda','Observa y recuerda',NULL,NULL,'#64748b',25,1,'2026-10-16 09:48:45','2026-10-16 09:48:45'),
+('ordena-la-historia',6,24,63,11,'catalogo_juegos/ExpresionArtistica/OrdenaLaHistoria','Ordena la historia',NULL,NULL,'#f97316',59,1,'2026-10-22 17:55:14','2026-10-22 17:55:14'),
 ('que-cambio',9,15,27,10,'catalogo_juegos/Multisensorial/QueCambio','¿Qué cambió?',NULL,NULL,'#f59e0b',27,1,'2026-10-17 11:20:00','2026-10-17 11:20:00'),
 ('que-sonido-escuchas',9,13,14,10,'catalogo_juegos/Multisensorial/QueSonidoEscuchas','¿Qué sonido escuchas?',NULL,NULL,'#84cc16',19,1,'2026-10-14 14:35:38','2026-10-15 15:58:52'),
+('que-sonido-escuchas-2',6,21,48,11,'catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas','¿Qué sonido escuchas?',NULL,NULL,'#ef4444',44,1,'2026-10-22 17:46:20','2026-10-22 17:46:20'),
+('que-transporte-es',8,26,72,3,'catalogo_juegos/Multisaberes/QueTransporteEs','Que Transporte Es',NULL,NULL,'#f43f5e',43,1,'2026-10-22 17:44:22','2026-10-22 17:44:22'),
+('quien-soy',8,26,68,3,'catalogo_juegos/Multisaberes/QuienSoy','Quien Soy',NULL,NULL,'#ef4444',39,1,'2026-10-22 17:43:01','2026-10-22 17:43:01'),
+('quien-usa-que',6,23,61,11,'catalogo_juegos/ExpresionArtistica/QuienUsaQue','¿Quién usa qué?',NULL,NULL,'#8b5cf6',57,1,'2026-10-22 17:53:48','2026-10-22 17:53:48'),
 ('reconocimiento-de-partes-del-cuerpo',7,11,29,9,'catalogo_juegos/Polimotor/ReconocimientoDelCuerpo','Reconocimiento del cuerpo','Tocar las partes del cuerpo indicadas según el nivel de edad.','reconocimiento.png','#c64757',2,1,'2026-09-09 16:58:39','2026-10-15 16:23:24'),
 ('relaciona-iguales',9,14,22,10,'catalogo_juegos/Multisensorial/RelacionaIguales','Relaciona iguales',NULL,NULL,'#eab308',17,1,'2026-10-14 10:33:24','2026-10-15 16:10:46'),
 ('repite-la-secuencia',9,13,16,10,'catalogo_juegos/Multisensorial/RepiteLaSecuencia','Repite la secuencia',NULL,NULL,'#a855f7',21,1,'2026-10-14 15:18:15','2026-10-15 15:59:23'),
+('rompecabezas-artistico',6,22,53,11,'catalogo_juegos/ExpresionArtistica/RompecabezasArtistico','Rompecabezas artístico',NULL,NULL,'#f59e0b',49,1,'2026-10-22 17:49:11','2026-10-22 17:49:11'),
 ('rompecabezas-del-cuerpo',7,11,8,9,'catalogo_juegos/Polimotor/Rompecabezas','Rompecabezas del cuerpo','Armar el cuerpo humano arrastrando piezas según el nivel de edad.','rompecabeza.png','#f06747',1,1,'2026-09-09 16:58:39','2026-10-15 16:13:53'),
 ('secuencia-de-movimiento',7,17,33,9,'catalogo_juegos/Polimotor/SecuenciaDeMovimiento','Secuencia de movimiento',NULL,'secuencia.png','#f49625',6,1,'2026-09-14 09:20:46','2026-10-15 16:24:49'),
-('suave-o-aspero',9,14,20,10,'catalogo_juegos/Multisensorial/SuaveOAspero','¿Suave o áspero?',NULL,NULL,'#0ea5e9',15,1,'2026-10-14 09:10:21','2026-10-15 16:11:48');
+('sigue-el-ritmo',6,21,50,11,'catalogo_juegos/ExpresionArtistica/SigueElRitmo','Sigue el ritmo',NULL,NULL,'#0ea5e9',46,1,'2026-10-22 17:47:20','2026-10-22 17:47:20'),
+('suave-o-aspero',9,14,20,10,'catalogo_juegos/Multisensorial/SuaveOAspero','¿Suave o áspero?',NULL,NULL,'#0ea5e9',15,1,'2026-10-14 09:10:21','2026-10-15 16:11:48'),
+('viste-al-artista',6,23,60,11,'catalogo_juegos/ExpresionArtistica/VisteAlArtista','Viste al artista',NULL,NULL,'#8b5cf6',56,1,'2026-10-22 17:52:58','2026-10-22 17:52:58');
 
 /*Table structure for table `matriculas` */
 
@@ -1333,7 +1363,7 @@ CREATE TABLE `modulo_institucion` (
   KEY `modulo_institucion_institucion_id_foreign` (`institucion_id`),
   CONSTRAINT `modulo_institucion_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE CASCADE,
   CONSTRAINT `modulo_institucion_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `modulo_institucion` */
 
@@ -1344,7 +1374,8 @@ insert  into `modulo_institucion`(`id`,`modulo_id`,`institucion_id`,`activo`,`cr
 (51,3,1,1,'2026-09-04 15:11:24','2026-09-04 15:11:24'),
 (52,8,1,1,'2026-09-04 15:11:24','2026-09-04 15:11:24'),
 (53,9,1,1,'2026-09-10 09:09:11','2026-09-10 09:09:11'),
-(54,10,1,1,'2026-10-15 15:30:22','2026-10-15 15:30:22');
+(54,10,1,1,'2026-10-15 15:30:22','2026-10-15 15:30:22'),
+(55,11,1,1,'2026-10-22 17:22:49','2026-10-22 17:22:49');
 
 /*Table structure for table `modulos` */
 
@@ -1372,7 +1403,7 @@ CREATE TABLE `modulos` (
   PRIMARY KEY (`id`),
   KEY `modulos_ambiente_id_foreign` (`ambiente_id`),
   CONSTRAINT `modulos_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `modulos` */
 
@@ -1383,7 +1414,8 @@ insert  into `modulos`(`id`,`ambiente_id`,`institucion_id`,`nombre`,`slug`,`desc
 (4,6,NULL,'Canto','canto',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,3,1,1,'2026-08-06 14:19:49','2026-08-06 14:42:48',1),
 (8,9,NULL,'Explorando los sentidos','explorando-los-sentidos',NULL,'video','local','df666626-2e4a-4ed2-9f15-8c475d02d67b.mp4',NULL,'directo',NULL,1,1,1,'2026-08-28 15:17:03','2026-08-29 08:17:20',1),
 (9,7,NULL,'Juegos de aprendizaje','juegos-de-aprendizaje',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,1,1,1,'2026-09-10 09:09:11','2026-09-10 09:09:11',1),
-(10,9,NULL,'Juegos de aprendizaje','juegos-de-aprendizaje',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,2,1,1,'2026-10-15 15:30:22','2026-10-15 15:30:22',1);
+(10,9,NULL,'Juegos de aprendizaje','juegos-de-aprendizaje',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,2,1,1,'2026-10-15 15:30:22','2026-10-15 15:30:22',1),
+(11,6,NULL,'Juegos de aprendizaje','juegos-de-aprendizaje',NULL,'ninguno',NULL,NULL,NULL,NULL,NULL,4,1,1,'2026-10-22 17:22:49','2026-10-22 17:22:49',1);
 
 /*Table structure for table `municipios` */
 
@@ -3305,7 +3337,7 @@ CREATE TABLE `registros_acceso` (
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=558 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=563 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `registros_acceso` */
 
@@ -3831,7 +3863,12 @@ insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) v
 (554,1,'127.0.0.1','multisensorial','2026-10-20 08:02:44','inicio_sesion'),
 (555,1,'127.0.0.1','multisensorial','2026-10-20 08:32:52','inicio_sesion'),
 (556,1,'127.0.0.1','multisensorial','2026-10-20 14:06:29','inicio_sesion'),
-(557,1,'127.0.0.1','multisensorial','2026-10-21 08:36:41','inicio_sesion');
+(557,1,'127.0.0.1','multisensorial','2026-10-21 08:36:41','inicio_sesion'),
+(558,1,'127.0.0.1','multisensorial','2026-10-21 14:06:28','inicio_sesion'),
+(559,1,'127.0.0.1','multisensorial','2026-10-22 08:07:31','inicio_sesion'),
+(560,1,'127.0.0.1','multisensorial','2026-10-22 09:54:38','inicio_sesion'),
+(561,1,'127.0.0.1','multisensorial','2026-10-22 11:42:11','inicio_sesion'),
+(562,1,'127.0.0.1','multisensorial','2026-10-22 14:07:57','inicio_sesion');
 
 /*Table structure for table `resultados_bloque` */
 
@@ -3969,7 +4006,7 @@ CREATE TABLE `seguridad_logs` (
   KEY `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
   CONSTRAINT `seguridad_logs_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `seguridad_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=534 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=539 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `seguridad_logs` */
 
@@ -4504,7 +4541,12 @@ insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripci
 (530,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-20 08:02:44','2026-10-20 08:02:44'),
 (531,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-20 08:32:52','2026-10-20 08:32:52'),
 (532,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-20 14:06:29','2026-10-20 14:06:29'),
-(533,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-21 08:36:41','2026-10-21 08:36:41');
+(533,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-21 08:36:41','2026-10-21 08:36:41'),
+(534,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-21 14:06:28','2026-10-21 14:06:28'),
+(535,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-22 08:07:31','2026-10-22 08:07:31'),
+(536,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-22 09:54:38','2026-10-22 09:54:38'),
+(537,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-22 11:42:11','2026-10-22 11:42:11'),
+(538,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-22 14:07:57','2026-10-22 14:07:57');
 
 /*Table structure for table `sesiones_experiencia` */
 
@@ -4657,7 +4699,7 @@ CREATE TABLE `tematicas` (
   CONSTRAINT `tematicas_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `tematicas_eje_id_foreign` FOREIGN KEY (`eje_id`) REFERENCES `ejes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `tematicas_institucion_id_foreign` FOREIGN KEY (`institucion_id`) REFERENCES `instituciones` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `tematicas` */
 
@@ -4704,7 +4746,32 @@ insert  into `tematicas`(`id`,`eje_id`,`nombre`,`competencia`,`referente_alterna
 (44,20,'¿Cuál es mayor?',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-21 08:51:40','2026-10-21 08:51:40'),
 (45,20,'Más, menos o igual',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-21 08:52:05','2026-10-21 08:52:05'),
 (46,20,'Encuentra la figura',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-21 08:52:22','2026-10-21 08:52:22'),
-(47,20,'Completa el patrón',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-21 08:52:37','2026-10-21 08:52:37');
+(47,20,'Completa el patrón',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-21 08:52:37','2026-10-21 08:52:37'),
+(48,21,'¿Qué sonido escuchas?',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:30:10','2026-10-22 17:30:10'),
+(49,21,'Descubre el instrumento',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:30:35','2026-10-22 17:30:35'),
+(50,21,'Sigue el ritmo',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:30:56','2026-10-22 17:30:56'),
+(51,21,'Memoria musical',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:31:13','2026-10-22 17:31:13'),
+(52,21,'Completa la melodía',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:31:32','2026-10-22 17:31:32'),
+(53,22,'Rompecabezas artístico',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:32:29','2026-10-22 17:32:29'),
+(54,22,'Completa el dibujo',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:32:49','2026-10-22 17:32:49'),
+(55,22,'El mundo de los colores',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:33:25','2026-10-22 17:33:25'),
+(56,22,'Colores y formas',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:33:38','2026-10-22 17:33:38'),
+(57,22,'Encuentra las diferencias',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:33:59','2026-10-22 17:33:59'),
+(58,23,'¿Cómo me siento?',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:34:32','2026-10-22 17:34:32'),
+(59,23,'Elige el escenario',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:34:48','2026-10-22 17:34:48'),
+(60,23,'Viste al artista',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:35:05','2026-10-22 17:35:05'),
+(61,23,'¿Quién usa qué?',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:35:23','2026-10-22 17:35:23'),
+(62,23,'Memoria de emociones',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:35:42','2026-10-22 17:35:42'),
+(63,24,'Ordena la historia',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:36:24','2026-10-22 17:36:24'),
+(64,24,'Clasifica y descubre',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:36:43','2026-10-22 17:36:43'),
+(65,24,'Encuentra la sombra',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:37:04','2026-10-22 17:37:04'),
+(66,24,'¿Cuál es diferente?',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:37:21','2026-10-22 17:37:21'),
+(67,24,'Completa el patrón',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:37:36','2026-10-22 17:37:36'),
+(68,26,'Quien Soy',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:40:52','2026-10-22 17:40:52'),
+(69,26,'Mi Cuerpo',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:41:05','2026-10-22 17:41:05'),
+(70,26,'Mi Familia',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:41:19','2026-10-22 17:41:19'),
+(71,26,'Donde Vive',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:41:34','2026-10-22 17:41:34'),
+(72,26,'Que Transporte Es',NULL,NULL,0,0,1,NULL,'borrador',1,1,'2026-10-22 17:41:45','2026-10-22 17:41:45');
 
 /*Table structure for table `users` */
 

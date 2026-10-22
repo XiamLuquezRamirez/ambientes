@@ -143,20 +143,33 @@
         return (gameConfig.objetos && gameConfig.objetos[id]) || null;
     }
 
+    function despertarAudio() {
+        if (window.TextoVoz) TextoVoz.desbloquear();
+        if (Sfx) Sfx.desbloquear();
+        asegurarFondo();
+    }
+
     function pronunciarObjeto(id) {
         var token = ++tokenSonido;
         var btn = $id("btn-escuchar");
         var inicio = $id("btn-empecemos");
+        despertarAudio();
         if (btn) btn.classList.add("sonando");
         if (inicio && document.body.classList.contains("esperando-inicio")) inicio.classList.add("sonando");
         duck(true);
         var def = defObjeto(id) || {};
         var ruta = gameConfig.audios && gameConfig.audios.objetos && gameConfig.audios.objetos[id];
         var frase = def.pronuncia || def.nombre || id;
-        var sonido = ruta
-            ? playArchivo(ruta)
-            : (window.TextoVoz ? TextoVoz.hablar(frase, "zoe") : sleep(900));
-        return Promise.resolve(sonido).then(function () {
+        var sonido;
+        if (ruta) {
+            sonido = playArchivo(ruta);
+        } else if (window.TextoVoz) {
+            TextoVoz.detener();
+            sonido = Promise.resolve(TextoVoz.hablar(frase, "zoe", { esperarTtsMs: 600 }));
+        } else {
+            sonido = sleep(900);
+        }
+        return Promise.resolve(sonido).catch(function () {}).then(function () {
             if (token !== tokenSonido) return;
             if (btn) btn.classList.remove("sonando");
             if (inicio) inicio.classList.remove("sonando");
@@ -165,7 +178,8 @@
     }
 
     function efecto(nombre) {
-        if (!nombre || !Sfx) return;
+        // Celebración/campanas del doc; sin beep de error (el reintento es reescuchar).
+        if (!nombre || !Sfx || nombre === "suave") return;
         Sfx.sonar(nombre);
     }
 
@@ -192,25 +206,31 @@
 
     function pintarDialogo(voz, texto, estadoDialogo) {
         var dialogo = $id("dialogo");
-        dialogo.dataset.voz = voz;
+        if (!dialogo) return;
+        dialogo.dataset.voz = voz || "";
         dialogo.classList.remove("es-acierto");
         if (estadoDialogo) dialogo.classList.add("es-" + estadoDialogo);
         dialogo.classList.add("visible");
-        $id("dialogo-avatar").src = gif(voz, true);
-        $id("enunciado").textContent = texto;
+        var avatar = $id("dialogo-avatar");
+        if (avatar) avatar.src = gif(voz, true);
+        var enunciado = $id("enunciado");
+        if (enunciado) enunciado.textContent = texto || "";
     }
 
     function limpiarDialogo() {
         var dialogo = $id("dialogo");
-        dialogo.classList.remove("visible", "es-acierto");
-        $id("enunciado").textContent = "";
+        if (dialogo) dialogo.classList.remove("visible", "es-acierto");
+        var enunciado = $id("enunciado");
+        if (enunciado) enunciado.textContent = "";
     }
 
     function decir(linea, estadoDialogo) {
         if (!linea || !linea.texto || !window.TextoVoz) return Promise.resolve();
+        despertarAudio();
         var voz = "zoe";
         if (linea.voz) voz = linea.voz === "zeus" ? "zeus" : "zoe";
         else if (linea.personaje === 0) voz = "zeus";
+        // Doc: voz, no texto que el niño tenga que leer.
         if (!document.body.classList.contains("sin-feedback") && !document.body.classList.contains("esperando-inicio")) {
             pintarDialogo(voz, linea.texto, estadoDialogo);
         }
@@ -219,7 +239,7 @@
         var escuchar = $id("btn-escuchar");
         if (inicio && document.body.classList.contains("esperando-inicio")) inicio.classList.add("sonando");
         if (escuchar && !document.body.classList.contains("esperando-inicio")) escuchar.classList.add("sonando");
-        return Promise.resolve(TextoVoz.hablar(linea.texto, voz)).catch(function () {}).then(function () {
+        return Promise.resolve(TextoVoz.hablar(linea.texto, voz, { esperarTtsMs: 600 })).catch(function () {}).then(function () {
             marcarHablando(voz, false);
             if (inicio) inicio.classList.remove("sonando");
             if (escuchar) escuchar.classList.remove("sonando");
@@ -235,12 +255,21 @@
             if (r.acierto && r.acierto.texto) lineas.push({ texto: r.acierto.texto, personaje: r.acierto.voz || "zoe" });
             if (r.error && r.error.texto) lineas.push({ texto: r.error.texto, personaje: r.error.voz || "zeus" });
         });
-        if (n.cierre) lineas.push({ texto: n.cierre.texto, personaje: n.cierre.voz || "zoe" });
-        Object.keys(gameConfig.objetos || {}).forEach(function (id) {
-            var o = gameConfig.objetos[id];
-            lineas.push({ texto: o.pronuncia || o.nombre, personaje: "zoe" });
-        });
+        if (Array.isArray(n.cierre)) {
+            n.cierre.forEach(function (l) {
+                if (l && l.texto) lineas.push({ texto: l.texto, personaje: l.voz || "zoe" });
+            });
+        } else if (n.cierre) {
+            lineas.push({ texto: n.cierre.texto, personaje: n.cierre.voz || "zoe" });
+        }
+        // Sin precargar todos los objetos: satura /juegos/tts y retrasa la primera voz.
         return lineas;
+    }
+
+    function lineasCierre(n) {
+        var c = (n && n.cierre) || { voz: "zoe", texto: "¡Descubriste los sonidos iniciales!" };
+        if (Array.isArray(c)) return c.filter(function (l) { return l && l.texto; });
+        return [c];
     }
 
     function crearVocal(id, lugar) {
@@ -256,7 +285,7 @@
             btn.style.left = lugar.x + "%";
             btn.style.top = lugar.y + "%";
         }
-        btn.innerHTML = '<span class="globo" aria-hidden="true"></span><span class="vocal-cuerpo"><span class="letra">' + id + '</span></span>';
+        btn.innerHTML = '<span class="globo" aria-hidden="true"></span><span class="vocal-cuerpo"><span class="letra">' + id + "</span></span>";
         return btn;
     }
 
@@ -322,7 +351,8 @@
 
     function colocar(ronda, mover) {
         var cont = $id("vocales");
-        var ids = ronda.vocales;
+        if (!cont || !ronda || !ronda.mapa) return Promise.resolve();
+        var ids = ronda.vocales || [];
         Array.prototype.forEach.call(cont.querySelectorAll(".vocal"), function (el) {
             if (ids.indexOf(el.dataset.vocal) === -1) el.remove();
         });
@@ -334,14 +364,16 @@
         var cambios = [];
         ids.forEach(function (id) {
             var el = vocalEl(id);
+            if (!el || !ronda.mapa[id]) return;
             var left = ronda.mapa[id].x + "%";
             var top = ronda.mapa[id].y + "%";
             if (el.style.left !== left || el.style.top !== top) cambios.push(el);
         });
         if (!mover || reducir() || !cambios.length) {
-            escenario.classList.remove("en-movimiento");
+            if (escenario) escenario.classList.remove("en-movimiento");
             ids.forEach(function (id) {
                 var el = vocalEl(id);
+                if (!el || !ronda.mapa[id]) return;
                 el.style.left = ronda.mapa[id].x + "%";
                 el.style.top = ronda.mapa[id].y + "%";
             });
@@ -351,6 +383,7 @@
         void escenario.offsetWidth;
         ids.forEach(function (id) {
             var el = vocalEl(id);
+            if (!el || !ronda.mapa[id]) return;
             el.style.left = ronda.mapa[id].x + "%";
             el.style.top = ronda.mapa[id].y + "%";
         });
@@ -364,32 +397,37 @@
     }
 
     function celebrarPersonajes(si) {
-        $id("pj-zoe").classList.toggle("celebra", !!si);
-        $id("pj-zeus").classList.toggle("celebra", !!si);
+        var zoe = $id("pj-zoe");
+        var zeus = $id("pj-zeus");
+        if (zoe) zoe.classList.toggle("celebra", !!si);
+        if (zeus) zeus.classList.toggle("celebra", !!si);
     }
 
     function estrellas(el, n) {
         if (!el || reducir()) return;
         var capa = $id("capa-efectos");
+        if (!capa) return;
+        n = Math.min(Math.max(Number(n) || 8, 1), 10);
+        while (capa.childNodes.length > 16) capa.removeChild(capa.firstChild);
         var rect = el.getBoundingClientRect();
         var x = rect.left + rect.width / 2;
         var y = rect.top + rect.height / 2;
+        var colores = ["#fbbf24", "#fff", "#fb7185", "#38bdf8", "#4ade80"];
         var i;
         for (i = 0; i < n; i++) {
             var p = document.createElement("span");
+            var ang = Math.random() * Math.PI * 2;
+            var dist = 36 + Math.random() * 90;
             p.className = "particula";
             p.style.left = x + "px";
             p.style.top = y + "px";
-            p.style.background = ["#fbbf24", "#fff", "#fb7185", "#38bdf8", "#4ade80"][i % 5];
+            p.style.background = colores[i % 5];
+            p.style.setProperty("--dx", Math.cos(ang) * dist + "px");
+            p.style.setProperty("--dy", Math.sin(ang) * dist + "px");
             capa.appendChild(p);
-            var ang = Math.random() * Math.PI * 2;
-            var dist = 40 + Math.random() * 120;
-            p.animate([
-                { transform: "translate(-50%,-50%) scale(1)", opacity: 1 },
-                { transform: "translate(calc(-50% + " + Math.cos(ang) * dist + "px), calc(-50% + " + Math.sin(ang) * dist + "px)) scale(.4)", opacity: 0 }
-            ], { duration: 700 + Math.random() * 400, easing: "ease-out" }).finished.then(function () {
-                p.remove();
-            }).catch(function () { p.remove(); });
+            setTimeout(function (nodo) {
+                if (nodo && nodo.parentNode) nodo.parentNode.removeChild(nodo);
+            }, 850, p);
         }
     }
 
@@ -397,8 +435,10 @@
         var cont = $id("progreso");
         if (!cont) return;
         var total = L.totalEstrellas(nivel);
-        cont.hidden = String(nivel.id) !== "5";
+        var mostrar = String(nivel.id) === "5" && acc().mostrarProgreso !== false;
+        cont.hidden = !mostrar;
         cont.innerHTML = "";
+        if (!mostrar) return;
         var i;
         for (i = 0; i < total; i++) {
             var s = document.createElement("span");
@@ -411,6 +451,7 @@
         completados += 1;
         var nodos = document.querySelectorAll("#progreso .estrella");
         if (nodos[completados - 1]) nodos[completados - 1].classList.add("hecha");
+        else pintarEstrellas();
     }
 
     function cancelarPista() {
@@ -474,7 +515,6 @@
         btn.classList.add("vuelve");
         var e = reto.error || {};
         if (e.texto) await decir(e);
-        else efecto("suave");
         if (e.repetir !== false) await pronunciarObjeto(objetoId);
         else await sleep(450);
         btn.classList.remove("vuelve", "elegida");
@@ -519,10 +559,11 @@
         await colocar(rondaActual, debeMover());
         if (!vivo(gen)) return;
         document.querySelectorAll("#vocales .vocal").forEach(function (el) {
-            var lugar = rondaActual.mapa[el.dataset.vocal];
+            var lugar = rondaActual.mapa && rondaActual.mapa[el.dataset.vocal];
             if (lugar) el.dataset.slot = lugar.slot;
         });
-        estado.ultimoSlot = rondaActual.mapa[objetivo] ? rondaActual.mapa[objetivo].slot : null;
+        estado.ultimoSlot = rondaActual.mapa && rondaActual.mapa[objetivo]
+            ? rondaActual.mapa[objetivo].slot : null;
         estado.ultimoMapa = rondaActual.mapa;
         fase = "sonando";
         await pronunciarObjeto(objetoId);
@@ -541,6 +582,31 @@
         trofeo.classList.add("insignia");
     }
 
+    function elevarCincoGlobos() {
+        // Doc 3-4: al completar, los cinco globos se elevan.
+        var cont = $id("vocales");
+        if (!cont || !L || !L.VOCALES) return;
+        cont.innerHTML = "";
+        var slots = [
+            { x: 10, y: 78 },
+            { x: 30, y: 62 },
+            { x: 50, y: 52 },
+            { x: 70, y: 62 },
+            { x: 90, y: 78 }
+        ];
+        L.VOCALES.forEach(function (id, i) {
+            var btn = crearVocal(id, slots[i]);
+            btn.disabled = true;
+            btn.classList.remove("entra");
+            btn.classList.add("acierto", "eleva");
+            var cuerpo = btn.querySelector(".vocal-cuerpo");
+            var globo = btn.querySelector(".globo");
+            if (cuerpo) cuerpo.classList.add("eleva");
+            if (globo) globo.classList.add("eleva");
+            cont.appendChild(btn);
+        });
+    }
+
     function granCierre(gen) {
         if (!vivo(gen) && juegoTerminado) return;
         fase = "";
@@ -548,17 +614,22 @@
         cancelarPista();
         habilitarVocales(false);
         celebrarPersonajes(true);
-        document.querySelectorAll("#vocales .vocal").forEach(function (v) {
-            v.classList.add("acierto");
-            var cuerpo = v.querySelector(".vocal-cuerpo");
-            if (cuerpo) cuerpo.classList.add("eleva");
-        });
-        var cierre = nivel.cierre || { voz: "zoe", texto: "¡Descubriste los sonidos iniciales!" };
+        elevarCincoGlobos();
+        var cierres = lineasCierre(nivel);
+        var primera = cierres[0] || { voz: "zoe", texto: "¡Descubriste los sonidos iniciales!" };
         var texto = $id("texto_final");
-        if (texto) texto.textContent = cierre.texto;
+        if (texto) texto.textContent = primera.texto;
         prepararInsignia();
+        despertarAudio();
         if (gameConfig.audios && gameConfig.audios.cierre) playArchivo(gameConfig.audios.cierre);
-        if (window.TextoVoz) TextoVoz.hablar(cierre.texto, cierre.voz === "zeus" ? "zeus" : "zoe");
+        if (window.TextoVoz) {
+            var cadena = Promise.resolve();
+            cierres.forEach(function (l) {
+                cadena = cadena.then(function () {
+                    return TextoVoz.hablar(l.texto, l.voz === "zeus" ? "zeus" : "zoe", { esperarTtsMs: 600 });
+                }).catch(function () {});
+            });
+        }
         setTimeout(function () {
             var caja = $id("final");
             if (caja) {
@@ -644,7 +715,7 @@
         cerrado = true;
         cancelarIntroPendiente();
         if (window.TextoVoz) TextoVoz.detener();
-        asegurarFondo();
+        despertarAudio();
         destruirIntro3d();
         document.body.classList.remove("esperando-inicio");
         var principal = $id("principal");
@@ -670,11 +741,8 @@
         var btn = $id("btn-empecemos");
         if (!pantalla || pantalla.hidden || pantalla.classList.contains("is-out")) return;
         if (btn) btn.disabled = true;
-        if (window.TextoVoz) TextoVoz.desbloquear();
-        if (Sfx) Sfx.desbloquear();
-        asegurarFondo();
+        despertarAudio();
         sincronizarDialogoIntro3d();
-        if (window.TextoVoz && typeof TextoVoz.precargar === "function") TextoVoz.precargar();
         pantalla.classList.add("is-out");
         mostrarIntro3d();
         var oculto = false;
@@ -770,7 +838,8 @@
         await decir({ voz: "zoe", texto: t.demostracionFin || "¡Ahora te toca a ti!" });
         detenerDemo();
         if (!vivo(gen)) return;
-        $id("vocales").innerHTML = "";
+        var contVocales = $id("vocales");
+        if (contVocales) contVocales.innerHTML = "";
         limpiarClases();
         var img = $id("img-objeto");
         if (img) { img.removeAttribute("src"); img.className = "img-objeto"; }
@@ -797,7 +866,8 @@
             var color = i === 0 ? "success" : "primary";
             botones += '<div class="col-12 text-center mb-2"><button type="button" class="btn btn-' + color + ' btn-eleccion" onclick="confirmarNivel(\'' + n.id + '\')"><strong>' + n.edad + "</strong><br><small>" + n.titulo + "</small></button></div>";
         });
-        if (window.TextoVoz) TextoVoz.hablar(textos().eligeNivel || "Elige tu edad", "zoe");
+        despertarAudio();
+        if (window.TextoVoz) TextoVoz.hablar(textos().eligeNivel || "Elige tu edad", "zoe", { esperarTtsMs: 600 });
         if (!window.Swal) {
             window.confirmarNivel(gameConfig.niveles[0].id);
             return;
@@ -870,7 +940,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        var crudo = readText("config.json?v=20261020m");
+        var crudo = readText("config.json?v=20261022d");
         gameConfig = JSON.parse(crudo);
         try { introConfig = JSON.parse(readText("../../intro.json")); } catch (e) { introConfig = {}; }
         var errores = L.validarConfig(gameConfig);

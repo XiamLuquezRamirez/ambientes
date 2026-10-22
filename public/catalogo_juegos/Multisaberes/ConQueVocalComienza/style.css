@@ -166,6 +166,17 @@ body.tema-laboratorio { background: #1e1b4b; }
 .pantalla-inicio .v4 { --c: #be4bdb; left: 64%; bottom: 36%; animation-delay: 1.1s; }
 .pantalla-inicio .v5 { --c: #37b24d; left: 80%; bottom: 18%; animation-delay: 1.5s; }
 
+/* 5-6: laboratorio — plataformas (no globos con cuerda). */
+.tema-laboratorio .pantalla-inicio .vi::before {
+    border-radius: 18px;
+    width: 1.35em;
+    height: 1.2em;
+    top: 58%;
+}
+.tema-laboratorio .pantalla-inicio .vi::after {
+    display: none;
+}
+
 .pantalla-inicio .inicio-pj {
     display: block !important;
     position: absolute;

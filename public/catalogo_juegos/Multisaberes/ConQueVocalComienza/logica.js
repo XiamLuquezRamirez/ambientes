@@ -208,7 +208,13 @@
                     errores.push(tag + ": bienvenida " + (i + 1) + " inválida");
                 }
             });
-            if (!esLinea(n.cierre)) errores.push(tag + ": cierre inválido");
+            if (Array.isArray(n.cierre)) {
+                if (!n.cierre.length || n.cierre.some(function (l) { return !esLinea(l); })) {
+                    errores.push(tag + ": cierre inválido");
+                }
+            } else if (!esLinea(n.cierre)) {
+                errores.push(tag + ": cierre inválido");
+            }
             if (!n.insignia || !n.insignia.img || !n.insignia.nombre) errores.push(tag + ": sin insignia");
 
             var retos = n.retos || [];

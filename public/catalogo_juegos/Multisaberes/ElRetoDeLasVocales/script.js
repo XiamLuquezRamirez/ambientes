@@ -88,22 +88,11 @@
     }
 
     function aplicarTema(n) {
-        var planeta = esPlaneta(n);
-        document.body.classList.toggle("tema-planeta", planeta);
-        document.body.classList.toggle("tema-parque", !planeta);
-        ["pantalla-inicio", "escenario"].forEach(function (id) {
-            var el = $id(id);
-            if (!el) return;
-            el.classList.toggle("tema-planeta", planeta);
-            el.classList.toggle("tema-parque", !planeta);
-        });
         var escenario = $id("escenario");
         if (n && escenario) {
             escenario.classList.toggle("edad-3", String(n.id) === "3");
             escenario.classList.toggle("edad-5", String(n.id) === "5");
         }
-        var icono = document.querySelector("#btn-empecemos i");
-        if (icono) icono.className = planeta ? "fa-solid fa-rocket" : "fa-solid fa-flag-checkered";
     }
 
     function temaInicial() {
@@ -169,20 +158,20 @@
     }
 
     function pintarDialogo(voz, texto, estadoDialogo) {
-        var dialogo = $id("dialogo");
-        dialogo.dataset.voz = voz;
-        dialogo.classList.remove("es-acierto", "es-error");
-        if (estadoDialogo) dialogo.classList.add("es-" + estadoDialogo);
-        dialogo.classList.add("visible");
-        $id("dialogo-avatar").src = gif(voz, true);
-        $id("enunciado").textContent = texto;
+        var enunciado = $id("enunciado");
+        if (!enunciado) return;
+        enunciado.dataset.voz = voz || "";
+        enunciado.classList.toggle("es-acierto", estadoDialogo === "acierto");
+        enunciado.classList.toggle("es-error", estadoDialogo === "error");
+        enunciado.textContent = texto || "";
     }
 
     function limpiarDialogo() {
-        var dialogo = $id("dialogo");
-        if (!dialogo) return;
-        dialogo.classList.remove("visible", "es-acierto", "es-error");
-        $id("enunciado").textContent = "";
+        var enunciado = $id("enunciado");
+        if (!enunciado) return;
+        enunciado.classList.remove("es-acierto", "es-error");
+        enunciado.textContent = "";
+        enunciado.dataset.voz = "";
     }
 
     function decir(linea, estadoDialogo) {
@@ -219,27 +208,16 @@
         var estrellas = $id("progreso");
         var energia = $id("energia");
         var total = (nivel && nivel.retos ? nivel.retos.length : 0) || 0;
-        var mostrar = acc().mostrarProgreso !== false;
+        var mostrar = acc().mostrarProgreso !== false && total > 0;
+        if (energia) energia.hidden = true;
+        if (!estrellas) return;
+        estrellas.hidden = !mostrar;
         if (!mostrar) {
-            if (estrellas) estrellas.hidden = true;
-            if (energia) energia.hidden = true;
+            estrellas.innerHTML = "";
             return;
         }
-        var planeta = esPlaneta(nivel);
-        var box = planeta ? energia : estrellas;
-        var otra = planeta ? estrellas : energia;
-        if (otra) otra.hidden = true;
-        if (!box) return;
-        box.hidden = false;
-        box.innerHTML = "";
-        var i;
-        var cls = planeta ? "cristal" : "estrella";
-        var done = planeta ? "activo" : "hecha";
-        for (i = 0; i < total; i++) {
-            var e = document.createElement("span");
-            e.className = cls + (i < completados ? " " + done : "");
-            box.appendChild(e);
-        }
+        estrellas.innerHTML = '<i class="fa-solid fa-star"></i> ' +
+            Math.min(completados, total) + " / " + total;
     }
 
     function defVocal(id) {
@@ -344,6 +322,24 @@
                     marco.appendChild(imgR);
                 }
                 vis.appendChild(marco);
+            } else if (r.escena === "robot") {
+                var robotWrap = document.createElement("div");
+                robotWrap.className = "robot-wrap";
+                robotWrap.id = "robot-wrap";
+                var robot = document.createElement("span");
+                robot.className = "robot-cuerpo";
+                robot.setAttribute("aria-hidden", "true");
+                robotWrap.appendChild(robot);
+                if (obj) {
+                    var imgRbt = document.createElement("img");
+                    imgRbt.className = "objeto-img";
+                    imgRbt.id = "objeto-img";
+                    imgRbt.src = obj.img;
+                    imgRbt.alt = obj.nombre || "";
+                    imgRbt.draggable = false;
+                    robotWrap.appendChild(imgRbt);
+                }
+                vis.appendChild(robotWrap);
             } else if (obj) {
                 var img = document.createElement("img");
                 img.className = "objeto-img";
@@ -485,6 +481,15 @@
                 vis.querySelectorAll(".cristal-escena, .paso-camino").forEach(function (el, i) {
                     if (i <= completados) el.classList.add("activo");
                 });
+                var robotWrap = $id("robot-wrap");
+                if (robotWrap) {
+                    robotWrap.classList.add("entrega");
+                    setTimeout(function () { robotWrap.classList.remove("entrega"); }, 900);
+                }
+            }
+            if (escenario) {
+                escenario.classList.add("energia-onda");
+                setTimeout(function () { escenario.classList.remove("energia-onda"); }, 900);
             }
         }
         if (fx === "planeta" && vis) {

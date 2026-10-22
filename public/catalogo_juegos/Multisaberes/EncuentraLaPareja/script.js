@@ -88,22 +88,11 @@
     }
 
     function aplicarTema(n) {
-        var castillo = esCastillo(n);
-        document.body.classList.toggle("tema-castillo", castillo);
-        document.body.classList.toggle("tema-jardin", !castillo);
-        ["pantalla-inicio", "escenario"].forEach(function (id) {
-            var el = $id(id);
-            if (!el) return;
-            el.classList.toggle("tema-castillo", castillo);
-            el.classList.toggle("tema-jardin", !castillo);
-        });
         var escenario = $id("escenario");
         if (n && escenario) {
             escenario.classList.toggle("edad-3", String(n.id) === "3");
             escenario.classList.toggle("edad-5", String(n.id) === "5");
         }
-        var icono = document.querySelector("#btn-empecemos i");
-        if (icono) icono.className = castillo ? "fa-solid fa-key" : "fa-solid fa-leaf";
     }
 
     function temaInicial() {
@@ -165,20 +154,20 @@
     }
 
     function pintarDialogo(voz, texto, estadoDialogo) {
-        var dialogo = $id("dialogo");
-        dialogo.dataset.voz = voz;
-        dialogo.classList.remove("es-acierto", "es-error");
-        if (estadoDialogo) dialogo.classList.add("es-" + estadoDialogo);
-        dialogo.classList.add("visible");
-        $id("dialogo-avatar").src = gif(voz, true);
-        $id("enunciado").textContent = texto;
+        var enunciado = $id("enunciado");
+        if (!enunciado) return;
+        enunciado.dataset.voz = voz || "";
+        enunciado.classList.toggle("es-acierto", estadoDialogo === "acierto");
+        enunciado.classList.toggle("es-error", estadoDialogo === "error");
+        enunciado.textContent = texto || "";
     }
 
     function limpiarDialogo() {
-        var dialogo = $id("dialogo");
-        if (!dialogo) return;
-        dialogo.classList.remove("visible", "es-acierto", "es-error");
-        $id("enunciado").textContent = "";
+        var enunciado = $id("enunciado");
+        if (!enunciado) return;
+        enunciado.classList.remove("es-acierto", "es-error");
+        enunciado.textContent = "";
+        enunciado.dataset.voz = "";
     }
 
     function decir(linea, estadoDialogo) {
@@ -215,27 +204,16 @@
         var flores = $id("progreso");
         var luces = $id("luces");
         var total = (nivel && nivel.retos ? nivel.retos.length : 0) || 0;
-        var mostrar = acc().mostrarProgreso !== false;
+        var mostrar = acc().mostrarProgreso !== false && total > 0;
+        if (luces) luces.hidden = true;
+        if (!flores) return;
+        flores.hidden = !mostrar;
         if (!mostrar) {
-            if (flores) flores.hidden = true;
-            if (luces) luces.hidden = true;
+            flores.innerHTML = "";
             return;
         }
-        var castillo = esCastillo(nivel);
-        var box = castillo ? luces : flores;
-        var otra = castillo ? flores : luces;
-        if (otra) otra.hidden = true;
-        if (!box) return;
-        box.hidden = false;
-        box.innerHTML = "";
-        var i;
-        var cls = castillo ? "luz" : "flor";
-        var done = castillo ? "encendida" : "abierta";
-        for (i = 0; i < total; i++) {
-            var e = document.createElement("span");
-            e.className = cls + (i < completados ? " " + done : "");
-            box.appendChild(e);
-        }
+        flores.innerHTML = '<i class="fa-solid fa-star"></i> ' +
+            Math.min(completados, total) + " / " + total;
     }
 
     function abrirTodoProgreso() {

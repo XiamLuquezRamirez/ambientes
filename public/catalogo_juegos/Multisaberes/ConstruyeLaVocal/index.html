@@ -11,61 +11,49 @@
 	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css?v=20261021a">
+	<link rel="preload" as="image" href="../../Polimotor/img/progreso.png">
+	<link rel="stylesheet" href="style.css?v=20261022e">
 	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261019e">
 	<link rel="stylesheet" href="../../shared/menu-accesibilidad.css?v=20261019d">
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
 </head>
-<body class="esperando-inicio tema-fabrica">
-	<div id="pantalla-inicio" class="pantalla-inicio tema-fabrica">
-		<div class="cielo" aria-hidden="true"></div>
-		<img class="inicio-pj inicio-zoe" id="inicio-zoe" src="../../img/zoe_normal.gif" alt="" draggable="false">
-		<img class="inicio-pj inicio-zeus" id="inicio-zeus" src="../../img/zeus_normal.gif" alt="" draggable="false">
-		<div class="maquina-inicio" aria-hidden="true">
-			<span class="engranaje eg1"></span>
-			<span class="engranaje eg2"></span>
-			<span class="tubo"></span>
+<body class="esperando-inicio">
+	<div id="pantalla-inicio" class="pantalla-inicio">
+		<div class="inicio-mancha" aria-hidden="true"></div>
+		<div class="inicio-contenido">
+			<p class="inicio-kicker" hidden>Construye la vocal</p>
+			<button type="button" id="btn-empecemos" class="btn-empecemos" aria-label="Empezar">
+				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
+				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
+				<i class="fa-solid fa-play btn-empecemos-icono" aria-hidden="true"></i>
+			</button>
 		</div>
-		<div class="arco" aria-hidden="true">
-			<span class="vi v1">a</span>
-			<span class="vi v2">e</span>
-			<span class="vi v3">i</span>
-			<span class="vi v4">o</span>
-			<span class="vi v5">u</span>
-		</div>
-		<button type="button" id="btn-empecemos" class="plataforma-central" aria-label="Empezar">
-			<span class="anillo" aria-hidden="true"></span>
-			<span class="anillo anillo-2" aria-hidden="true"></span>
-			<i class="fa-solid fa-hammer" aria-hidden="true"></i>
-		</button>
 	</div>
 
 	<div id="intro3d-root" hidden>
 		<div id="three-container"></div>
 		<div id="phaser-container"></div>
-		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning btn-solo-icono" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;" aria-label="Omitir">
-			<i class="fa fa-forward" aria-hidden="true"></i>
-		</button>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;">Omitir <i class="fa fa-forward" aria-hidden="true"></i></button>
 		<div id="intro3d-continuar" hidden>
 			<div class="intro3d-continuar-card">
 				<div class="intro3d-titulo-wrap">
 					<span class="intro3d-ray intro3d-ray-l1" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-l2" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-l3" aria-hidden="true"></span>
-					
+					<h2>¡Listo!</h2>
 					<span class="intro3d-ray intro3d-ray-r1" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-r2" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-r3" aria-hidden="true"></span>
 				</div>
-				
+				<p>Toca el botón para empezar el juego</p>
 				<div class="intro3d-btn-wrap">
 					<span class="intro3d-ray intro3d-ray-bl1" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-bl2" aria-hidden="true"></span>
-					<button type="button" id="btn-continuar-intro3d" aria-label="Continuar">
+					<button type="button" id="btn-continuar-intro3d">
 						<span class="intro3d-btn-shine" aria-hidden="true"></span>
 						<span class="intro3d-play" aria-hidden="true"></span>
-						
+						<span>CONTINUAR</span>
 					</button>
 					<span class="intro3d-ray intro3d-ray-br1" aria-hidden="true"></span>
 					<span class="intro3d-ray intro3d-ray-br2" aria-hidden="true"></span>
@@ -81,7 +69,7 @@
 			<img src="../../img/fondo.png" class="fondo" alt="">
 			<div class="contenido">
 				<img src="../../img/excelente.png" class="excelente" alt="">
-				<p class="texto-final" id="texto_final" hidden aria-hidden="true"></p>
+				<p class="texto-final" id="texto_final"></p>
 				<img src="img/insignia_bloques.svg" class="trofeo" alt="">
 				<img src="../../img/zeus_normal.gif" class="personaje zeus" alt="">
 				<img src="../../img/zoe_normal.gif" class="personaje zoe" alt="">
@@ -93,10 +81,11 @@
 			<img src="../../img/cortina_der.png" class="cortina cortina-der" alt="">
 			<div class="confeti" id="confeti"></div>
 		</div>
-		<div class="final-acciones" id="final-acciones">
+				<div class="final-acciones" id="final-acciones">
+			<p class="final-pregunta">¿Quieres jugar nuevamente?</p>
 			<div class="final-botones">
-				<button type="button" class="btn btn-success btn-solo-icono" onclick="window.location.reload(1)" aria-label="Jugar de nuevo"><i class="fa-solid fa-play" aria-hidden="true"></i></button>
-				<button type="button" class="btn btn-danger btn-solo-icono" onclick="history.back()" aria-label="Salir"><i class="fa-solid fa-home" aria-hidden="true"></i></button>
+				<button type="button" class="btn btn-success" onclick="window.location.reload(1)"><i class="fa-solid fa-play"></i> Sí</button>
+				<button type="button" class="btn btn-danger" onclick="history.back()"><i class="fa-solid fa-home"></i> No</button>
 			</div>
 		</div>
 	</div>
@@ -104,25 +93,19 @@
 	<div id="principal">
 		<div class="hud-top">
 			<div class="hud-nav">
+				
+				<div id="progreso" class="hud-progreso" hidden></div>
 				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
 				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</div>
 
-		<div class="cabecera">
-			<div id="dialogo" class="dialogo" aria-live="polite">
-				<img id="dialogo-avatar" class="dialogo-avatar" src="../../images/zoe_normal.gif" alt="">
-				<p id="enunciado" class="enunciado"></p>
-			</div>
+		<div class="enunciado-wrap">
+			<h1 class="borde enunciado" id="enunciado" aria-live="polite"></h1>
 		</div>
 
-		<div class="escenario tema-fabrica edad-3" id="escenario">
-			<div class="cielo" aria-hidden="true"></div>
-			<div class="pj pj-zoe" id="pj-zoe">
-				<img class="pj-img" id="pj-zoe-img" src="../../img/zoe_normal.gif" alt="" draggable="false">
-			</div>
+		<div class="escenario edad-3" id="escenario">
 			<div class="zona">
-				<div class="progreso" id="progreso" hidden aria-label="Avance"></div>
 				<div class="portales" id="portales" hidden aria-label="Portales"></div>
 				<div class="galeria-vocales" id="galeria-vocales" hidden aria-hidden="true"></div>
 				<div class="tablero-wrap">
@@ -148,9 +131,6 @@
 						<div class="cinta-banda" id="cinta-banda"></div>
 					</div>
 				</div>
-			</div>
-			<div class="pj pj-zeus" id="pj-zeus">
-				<img class="pj-img" id="pj-zeus-img" src="../../img/zeus_normal.gif" alt="" draggable="false">
 			</div>
 		</div>
 	</div>
@@ -214,6 +194,6 @@
 	<script src="../../intro3d/js/intro.js?v=20261008a"></script>
 	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
 	<script src="../../shared/menu-accesibilidad.js?v=20261019d"></script>
-	<script src="script.js?v=20261021a"></script>
+	<script src="script.js?v=20261022d"></script>
 </body>
 </html>
