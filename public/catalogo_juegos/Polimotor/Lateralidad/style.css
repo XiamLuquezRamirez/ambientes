@@ -47,10 +47,10 @@ body.swal2-height-auto {
 body {
   overflow: hidden;
   background: #f7fbff;
-  background-image:
-    radial-gradient(circle at 8% 12%, #f8d7e8 0 80px, transparent 81px),
-    radial-gradient(circle at 92% 10%, #d6e8ff 0 90px, transparent 91px),
-    radial-gradient(circle at 90% 88%, #ffe3c4 0 100px, transparent 101px);
+  background-image: url(img/fondo.png);
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
   color: #262626;
   font-family: 'Fredoka', sans-serif;
   touch-action: manipulation;
@@ -285,14 +285,7 @@ body.intro3d-activa #menu-acc {
   width: min(96vw, 1100px);
   flex: 1;
   max-height: calc(100dvh - 168px);
-  background:
-    radial-gradient(circle at 12% 18%, rgba(255, 212, 59, 0.35) 0 18px, transparent 19px),
-    radial-gradient(circle at 88% 22%, rgba(77, 171, 247, 0.35) 0 16px, transparent 17px),
-    radial-gradient(circle at 80% 84%, rgba(81, 207, 102, 0.28) 0 20px, transparent 21px),
-    linear-gradient(180deg, #fffdf8 0%, #f3f7ff 100%);
-  border: 6px solid #fff;
   border-radius: 32px;
-  box-shadow: 0 14px 0 rgba(30, 58, 95, 0.08), 0 18px 36px rgba(15, 23, 42, 0.14);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -585,7 +578,6 @@ body.intro3d-activa #menu-acc {
   position: relative;
   z-index: 8;
   box-sizing: border-box;
-  background: #fff;
 }
 
 .respuestas[hidden] { display: none !important; }
@@ -593,25 +585,31 @@ body.intro3d-activa #menu-acc {
 .btn-mano {
   position: relative;
   box-sizing: border-box;
-  min-width: 168px;
-  min-height: 118px;
-  padding: 16px 26px 18px;
-  border-radius: 28px;
-  border: 6px solid #fff;
-  font-size: clamp(22px, 2.4vw, 32px);
-  font-weight: 700;
-  color: #1e293b;
+  width: min(28vw, 170px);
+  aspect-ratio: 1 / 1;
+  min-width: 120px;
+  min-height: 120px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  font-size: 0;
+  color: transparent;
   cursor: pointer;
-  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.12);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  box-shadow: none;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
   overflow: visible;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.btn-mano i { font-size: 44px; line-height: 1; }
+.btn-mano.izquierda { background-image: url(img/btn_izquierda.png); }
+.btn-mano.centro { background-image: url(img/btn_centro.png); }
+.btn-mano.derecha { background-image: url(img/btn_derecha.png); }
+
+.btn-mano:active { transform: translateY(3px) scale(0.98); }
+.btn-mano:disabled { opacity: 0.45; cursor: default; }
 
 .btn-mano.acerto,
 .zona-slot.acerto,
@@ -643,57 +641,149 @@ body.intro3d-activa #menu-acc {
   0% { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
   100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.15); }
 }
-/* fa-hand es mano derecha: espejamos la izquierda para que se lean como izq / der. */
-.btn-mano.izquierda i.mano-izq {
-  transform: scaleX(-1);
-  display: inline-block;
-}
-.btn-mano.centro i.mano-centro {
-  font-size: 40px;
-}
-.btn-mano.izquierda { background: #ffd43b; }
-.btn-mano.centro { background: #4dabf7; color: #fff; }
-.btn-mano.derecha { background: #51cf66; color: #fff; }
-.btn-mano:active { transform: translateY(3px); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12); }
-.btn-mano.izquierda:active i.mano-izq {
-  transform: scaleX(-1);
-}
-.btn-mano:disabled { opacity: 0.45; cursor: default; }
 
+/* Intro de lados: cartas sueltas sobre el parque (sin lámina blanca). */
 .intro-lados {
   position: absolute;
   inset: 0;
   z-index: 8;
   display: flex;
-  background: rgba(248, 250, 252, 0.96);
-  padding: 24px;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 4%;
+  background: transparent;
+  pointer-events: none;
 }
 
 .intro-lados[hidden] { display: none !important; }
 
 .zona-demo {
-  flex: 1;
-  border-radius: 28px;
+  flex: 0 1 auto;
+  width: min(26vw, 260px);
+  aspect-ratio: 485 / 449;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(36px, 5vw, 64px);
-  font-weight: 700;
-  color: #1e293b;
-  opacity: 0.35;
+  font-size: 0;
+  color: transparent;
+  opacity: 1;
   transition: opacity 0.35s ease, transform 0.35s ease;
-  border: 6px solid transparent;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  box-sizing: border-box;
 }
 
-.zona-demo.zona-izquierda { background: #ffd43b; }
-.zona-demo.zona-centro { background: #4dabf7; color: #fff; }
-.zona-demo.zona-derecha { background: #51cf66; color: #fff; }
+.zona-demo.zona-izquierda {
+  background-image: url(img/izquierda.png);
+  border-bottom: 2px solid #9868a4;
+  border-left: 2px solid #9868a4;
+  border-top: 2px solid #9868a4;
+  border-radius: 25px 0px 0px 25px;
+}
+
+.zona-demo.zona-centro {
+  width: min(20vw, 210px);
+  aspect-ratio: 445 / 842;
+  background-image: url(img/centro.png);
+  border-bottom: 2px solid #9868a4;
+  border-left: 2px solid #9868a4;
+  border-top: 2px solid #9868a4;
+  border-right: 2px solid #9868a4;
+  border-radius: 25px 25px 25px 25px;
+}
+
+.zona-demo.zona-derecha {
+  background-image: url(img/derecha.png);
+  border-bottom: 2px solid #9868a4;
+  border-top: 2px solid #9868a4;
+  border-right: 2px solid #9868a4;
+  border-radius: 0px 25px 25px 0px;
+}
+
+.zona-demo.pasando {
+  opacity: 0.38;
+}
 
 .zona-demo.activa {
   opacity: 1;
   transform: scale(1.04);
   border-color: #1e3a5f;
+}
+
+/* Entrada / salida animada de las cartas del intro. */
+.intro-lados .zona-demo {
+  opacity: 0;
+  transform: translateY(36px) scale(0.86);
+}
+
+.intro-lados.is-visible .zona-demo {
+  opacity: 1;
+  transform: none;
+}
+
+.intro-lados.is-entrando .zona-demo {
+  animation: latCartaEntra 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.intro-lados.is-entrando .zona-izquierda { animation-delay: 0.04s; }
+.intro-lados.is-entrando .zona-centro { animation-delay: 0.16s; }
+.intro-lados.is-entrando .zona-derecha { animation-delay: 0.28s; }
+
+.intro-lados.is-visible .zona-demo.pasando {
+  opacity: 0.38;
+  transform: none;
+}
+
+.intro-lados.is-visible .zona-demo.activa {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+.intro-lados.is-saliendo .zona-demo {
+  animation: latCartaSale 0.28s ease both !important;
+  animation-delay: 0s !important;
+}
+
+@keyframes latCartaEntra {
+  from { opacity: 0; transform: translateY(36px) scale(0.86); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes latCartaSale {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: translateY(18px) scale(0.9); }
+}
+
+/* Entrada animada del tablero / respuestas al pasar a ejercicios. */
+.escena-wrap.is-ej-entrando #tablero,
+.escena-wrap.is-ej-entrando #actor-area:not([hidden]),
+.escena-wrap.is-ej-entrando #respuestas:not([hidden]) {
+  animation: latEjercicioEntra 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.escena-wrap.is-ej-entrando #respuestas:not([hidden]) {
+  animation-delay: 0.12s;
+}
+
+@keyframes latEjercicioEntra {
+  from { opacity: 0; transform: translateY(28px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-lados .zona-demo,
+  .intro-lados.is-visible .zona-demo,
+  .intro-lados.is-saliendo .zona-demo,
+  .escena-wrap.is-ej-entrando #tablero,
+  .escena-wrap.is-ej-entrando #actor-area:not([hidden]),
+  .escena-wrap.is-ej-entrando #respuestas:not([hidden]) {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .overlay {
@@ -864,9 +954,6 @@ body.intro3d-activa #menu-acc {
   to { bottom: -360px; }
 }
 
-  to { bottom: -360px; }
-}
-
 .overlay .btn-warning {
   padding: 16px 20px;
   border-radius: 3px;
@@ -929,7 +1016,7 @@ body.intro3d-activa #menu-acc {
 
 #menu-acc {
   right: 92px;
- bottom: 23px;
+ 
 }
 
 .menu-acc {

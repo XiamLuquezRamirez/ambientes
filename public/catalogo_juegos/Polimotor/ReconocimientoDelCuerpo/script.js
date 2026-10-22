@@ -449,8 +449,7 @@ function iniciarEscenario() {
             texto: (gameConfig.textos && gameConfig.textos.demostracion) || "",
             textoFin: (gameConfig.textos && gameConfig.textos.demostracionFin) || "",
             onTexto: function (t) {
-                const en = document.getElementById("enunciado");
-                if (en && t) en.textContent = t;
+                if (t) mostrarEnunciado(t);
             },
             jugar: function () {
                 return animarDedoEnBarriga();
@@ -566,12 +565,70 @@ function actualizarAyudasVisuales() {
     }
 }
 
+var enunciadoAnimTimer = null;
+
+function reducirMotion() {
+    return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+        || document.body.classList.contains("sin-animaciones");
+}
+
+/** Cambia el texto y anima width/height (CSS no interpola width:auto). */
 function mostrarEnunciado(texto, estado) {
     const en = document.getElementById("enunciado");
     if (!en) return;
+
+    const fromW = en.offsetWidth;
+    const fromH = en.offsetHeight;
+
     en.textContent = texto || "";
     en.classList.remove("es-acierto", "es-error");
     if (estado) en.classList.add("es-" + estado);
+
+    if (enunciadoAnimTimer) {
+        clearTimeout(enunciadoAnimTimer);
+        enunciadoAnimTimer = null;
+    }
+    en.style.width = "";
+    en.style.height = "";
+    en.style.minWidth = "";
+    en.style.overflow = "";
+    en.style.transition = "";
+
+    if (reducirMotion() || !fromW || !fromH) return;
+
+    const toW = en.offsetWidth;
+    const toH = en.offsetHeight;
+    if (Math.abs(toW - fromW) < 2 && Math.abs(toH - fromH) < 2) return;
+
+    en.style.minWidth = "0";
+    en.style.overflow = "hidden";
+    en.style.transition = "none";
+    en.style.width = fromW + "px";
+    en.style.height = fromH + "px";
+    void en.offsetWidth;
+    en.style.transition = "width 0.35s ease, height 0.35s ease";
+    en.style.width = toW + "px";
+    en.style.height = toH + "px";
+
+    const limpiar = function () {
+        en.style.width = "";
+        en.style.height = "";
+        en.style.minWidth = "";
+        en.style.overflow = "";
+        en.style.transition = "";
+        en.removeEventListener("transitionend", onEnd);
+        if (enunciadoAnimTimer) {
+            clearTimeout(enunciadoAnimTimer);
+            enunciadoAnimTimer = null;
+        }
+    };
+    const onEnd = function (ev) {
+        if (ev.target !== en) return;
+        if (ev.propertyName !== "width" && ev.propertyName !== "height") return;
+        limpiar();
+    };
+    en.addEventListener("transitionend", onEnd);
+    enunciadoAnimTimer = setTimeout(limpiar, 450);
 }
 
 /** El texto cambia cuando la voz arranca (no cuando se pide), para que lectura y audio coincidan. */

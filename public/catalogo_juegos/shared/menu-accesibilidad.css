@@ -15,6 +15,79 @@ body.intro3d-activa #menu-acc {
     visibility: hidden;
 }
 
+/*
+ * Accesibilidad = mismo tamaño/tratamiento que volumen (PNG Polimotor).
+ * Se aplica en todos los juegos que cargan este CSS (Multisaberes, Multisensorial, …).
+ */
+#btn-menu-acc.menu-acc-fab,
+#btn-menu-vol.menu-acc-fab {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent !important;
+    box-shadow: none !important;
+    font-size: 0;
+    color: transparent;
+    transition: transform 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#btn-menu-acc.menu-acc-fab > i,
+#btn-menu-vol.menu-acc-fab > i {
+    display: none;
+}
+
+#btn-menu-acc.menu-acc-fab::before,
+#btn-menu-vol.menu-acc-fab::before {
+    content: "";
+    position: absolute;
+    left: -15.47%;
+    top: -15.47%;
+    width: 138.4%;
+    height: 138.4%;
+    background: center / contain no-repeat;
+    pointer-events: none;
+}
+
+#btn-menu-acc.menu-acc-fab::before {
+    background-image: url("../Polimotor/img/accesibilidad.png");
+}
+
+#btn-menu-vol.menu-acc-fab::before {
+    background-image: url("../Polimotor/img/altavoz.png");
+}
+
+#btn-menu-vol.menu-acc-fab > i.fa-volume-xmark {
+    position: absolute;
+    z-index: 1;
+    top: -6px;
+    right: -6px;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #e53935;
+    color: #fff;
+    font-size: 13px;
+    line-height: 1;
+}
+
+#btn-menu-acc.menu-acc-fab:active,
+#btn-menu-vol.menu-acc-fab:active {
+    transform: translateY(2px);
+}
+
+#btn-menu-acc.menu-acc-fab:focus-visible,
+#btn-menu-vol.menu-acc-fab:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+
 #menu-acc .menu-acc-ops {
     display: flex;
     flex-direction: column;
@@ -78,13 +151,19 @@ body.alto-contraste .tarjeta,
 body.alto-contraste .opcion,
 body.alto-contraste .pieza,
 body.alto-contraste .btn-escuchar,
-body.alto-contraste #menu-acc .menu-acc-fab,
 body.alto-contraste #menu-acc .menu-acc-panel,
-body.alto-contraste #menu-vol .menu-acc-fab,
 body.alto-contraste #menu-vol .menu-acc-panel {
     background-color: #000 !important;
     color: #fff !important;
     border-color: var(--acc-borde, #E5FF00) !important;
+    box-shadow: none !important;
+}
+
+/* Los FAB usan PNG: no pintar fondo negro encima. */
+body.alto-contraste #btn-menu-acc.menu-acc-fab,
+body.alto-contraste #btn-menu-vol.menu-acc-fab {
+    background: transparent !important;
+    border: 0 !important;
     box-shadow: none !important;
 }
 
