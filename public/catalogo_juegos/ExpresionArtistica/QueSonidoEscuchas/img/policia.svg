@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Patrullero de polic&#237;a">
+  <ellipse cx="120" cy="206" rx="106" ry="8" fill="#000" opacity="0.1"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="96" y="66" width="22" height="16" rx="5" fill="#ff5252"/>
+    <rect x="122" y="66" width="22" height="16" rx="5" fill="#448aff"/>
+    <path d="M62 120 L84 84 H158 L182 120 Z" fill="#eceff1"/>
+    <path d="M76 116 L92 92 H118 V116 Z" fill="#b3e5fc"/>
+    <path d="M124 116 V92 H152 L168 116 Z" fill="#b3e5fc"/>
+    <rect x="18" y="116" width="206" height="56" rx="16" fill="#1e3a8a"/>
+  </g>
+  <rect x="20" y="136" width="202" height="14" fill="#eceff1"/>
+  <path d="M112 128 L120 122 L128 128 L126 138 H114 Z" fill="#fdd835" stroke="#37474f" stroke-width="2"/>
+  <rect x="206" y="124" width="14" height="10" rx="3" fill="#fff59d" stroke="#37474f" stroke-width="2"/>
+  <rect x="20" y="124" width="12" height="10" rx="3" fill="#ff8a80" stroke="#37474f" stroke-width="2"/>
+  <g stroke="#37474f" stroke-width="4">
+    <circle cx="66" cy="178" r="22" fill="#37474f"/>
+    <circle cx="176" cy="178" r="22" fill="#37474f"/>
+  </g>
+  <circle cx="66" cy="178" r="9" fill="#b0bec5"/>
+  <circle cx="176" cy="178" r="9" fill="#b0bec5"/>
+</svg>

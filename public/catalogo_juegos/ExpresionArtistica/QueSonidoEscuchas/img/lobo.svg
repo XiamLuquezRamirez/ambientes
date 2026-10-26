@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Lobo">
+  <ellipse cx="120" cy="222" rx="86" ry="9" fill="#000" opacity="0.1"/>
+  <circle cx="196" cy="40" r="22" fill="#fff9c4" stroke="#fdd835" stroke-width="3"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M150 170 C182 168 206 184 214 206 C192 204 170 196 150 186 Z" fill="#78909c"/>
+    <path d="M64 216 L74 150 C80 126 104 116 124 122 C150 130 160 160 156 216 Z" fill="#90a4ae"/>
+    <path d="M100 216 L104 168 C110 156 128 156 132 168 L134 216 Z" fill="#eceff1"/>
+    <path d="M70 70 L62 22 L96 50 Z" fill="#78909c"/>
+    <path d="M140 66 L156 22 L170 66 Z" fill="#78909c"/>
+    <path d="M64 70 C70 46 150 40 170 66 C186 86 182 112 166 128 L132 150 C112 160 84 152 72 134 C58 114 58 90 64 70 Z" fill="#90a4ae"/>
+    <path d="M120 118 L172 100 C186 98 194 108 188 118 L156 140 C140 150 120 144 120 132 Z" fill="#eceff1"/>
+  </g>
+  <path d="M74 32 L90 48" stroke="#eceff1" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="188" cy="110" r="7" fill="#263238"/>
+  <path d="M92 90 C98 84 108 84 112 90" fill="none" stroke="#263238" stroke-width="5" stroke-linecap="round"/>
+  <path d="M132 86 C138 80 148 80 152 86" fill="none" stroke="#263238" stroke-width="5" stroke-linecap="round"/>
+  <path d="M96 166 C104 174 128 174 132 166" fill="none" stroke="#b0bec5" stroke-width="4" stroke-linecap="round"/>
+</svg>

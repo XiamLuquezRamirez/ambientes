@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Caja">
+  <ellipse cx="120" cy="214" rx="90" ry="9" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M34 96 V168 C34 190 206 190 206 168 V96 Z" fill="#eceff1"/>
+    <ellipse cx="120" cy="96" rx="86" ry="26" fill="#fafafa"/>
+    <ellipse cx="120" cy="96" rx="64" ry="16" fill="none" stroke="#b0bec5" stroke-width="3"/>
+    <path d="M34 150 H206" stroke="#fdd835" stroke-width="8"/>
+    <g stroke="#90a4ae" stroke-width="2">
+      <path d="M60 168 V188 M90 168 V188 M120 168 V188 M150 168 V188 M180 168 V188"/>
+    </g>
+    <path d="M34 168 H206" stroke-width="4"/>
+  </g>
+  <circle cx="100" cy="132" r="6" fill="#263238"/>
+  <circle cx="140" cy="132" r="6" fill="#263238"/>
+  <path d="M106 148 C112 156 128 156 134 148" fill="none" stroke="#263238" stroke-width="4" stroke-linecap="round"/>
+</svg>

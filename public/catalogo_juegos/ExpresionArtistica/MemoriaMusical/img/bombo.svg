@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Bombo">
+<ellipse cx="120" cy="224" rx="70" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4">
+    <ellipse cx="120" cy="124" rx="86" ry="86" fill="#455a64"/>
+    <ellipse cx="120" cy="124" rx="64" ry="64" fill="#cfd8dc"/>
+    <circle cx="120" cy="124" r="14" fill="#ffca28"/>
+  </g>
+</svg>

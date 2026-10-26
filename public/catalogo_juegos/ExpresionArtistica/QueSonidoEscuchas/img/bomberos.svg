@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Camioneta de bomberos">
+  <ellipse cx="122" cy="212" rx="106" ry="8" fill="#000" opacity="0.1"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="34" y="56" width="112" height="10" rx="4" fill="#cfd8dc"/>
+    <path d="M44 56 V48 M70 56 V48 M96 56 V48 M122 56 V48" stroke-linecap="round"/>
+    <rect x="34" y="44" width="112" height="8" rx="4" fill="#cfd8dc"/>
+    <rect x="168" y="70" width="26" height="16" rx="5" fill="#ff5252"/>
+    <rect x="18" y="80" width="142" height="96" rx="8" fill="#e53935"/>
+    <path d="M160 88 H198 L224 128 V176 H160 Z" fill="#e53935"/>
+    <path d="M168 96 H194 L212 128 H168 Z" fill="#b3e5fc"/>
+    <rect x="16" y="172" width="210" height="12" rx="3" fill="#455a64"/>
+  </g>
+  <rect x="30" y="96" width="118" height="16" rx="4" fill="#fdd835"/>
+  <g stroke="#b71c1c" stroke-width="4">
+    <path d="M58 118 V168 M98 118 V168 M138 118 V168"/>
+  </g>
+  <circle cx="186" cy="150" r="9" fill="#fdd835" stroke="#37474f" stroke-width="3"/>
+  <g stroke="#37474f" stroke-width="4">
+    <circle cx="54" cy="190" r="20" fill="#37474f"/>
+    <circle cx="110" cy="190" r="20" fill="#37474f"/>
+    <circle cx="192" cy="190" r="20" fill="#37474f"/>
+  </g>
+  <circle cx="54" cy="190" r="8" fill="#b0bec5"/>
+  <circle cx="110" cy="190" r="8" fill="#b0bec5"/>
+  <circle cx="192" cy="190" r="8" fill="#b0bec5"/>
+  <rect x="214" y="150" width="10" height="10" rx="2" fill="#fff59d" stroke="#37474f" stroke-width="2"/>
+</svg>

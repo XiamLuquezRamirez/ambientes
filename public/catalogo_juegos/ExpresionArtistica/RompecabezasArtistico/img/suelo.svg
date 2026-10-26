@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Suelo con flores">
+
+  <rect x="16" y="120" width="208" height="80" rx="16" fill="#81c784" stroke="#2e7d32" stroke-width="4"/>
+  <circle cx="60" cy="150" r="12" fill="#ef5350"/><circle cx="120" cy="146" r="12" fill="#ffee58"/><circle cx="180" cy="152" r="12" fill="#ab47bc"/>
+</svg>

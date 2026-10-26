@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="B&#250;ho con los ojos brillando">
+  <defs>
+    <radialGradient id="brillo" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fffde7"/>
+      <stop offset="0.45" stop-color="#ffe082" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffc107" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="120" cy="222" rx="74" ry="9" fill="#000" opacity="0.1"/>
+  <path d="M24 206 C80 196 160 196 216 204" fill="none" stroke="#6d4c41" stroke-width="12" stroke-linecap="round"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M62 52 L70 22 L94 46 Z" fill="#8d6e63"/>
+    <path d="M178 52 L170 22 L146 46 Z" fill="#8d6e63"/>
+    <path d="M120 38 C176 38 192 86 190 132 C188 178 160 204 120 204 C80 204 52 178 50 132 C48 86 64 38 120 38 Z" fill="#8d6e63"/>
+    <path d="M120 112 C150 112 166 136 164 164 C160 190 142 200 120 200 C98 200 80 190 76 164 C74 136 90 112 120 112 Z" fill="#d7ccc8"/>
+    <path d="M52 112 C30 136 34 174 62 190 C70 166 68 134 52 112 Z" fill="#6d4c41"/>
+    <path d="M188 112 C210 136 206 174 178 190 C170 166 172 134 188 112 Z" fill="#6d4c41"/>
+    <circle cx="90" cy="88" r="30" fill="#efebe9"/>
+    <circle cx="150" cy="88" r="30" fill="#efebe9"/>
+  </g>
+  <circle cx="90" cy="88" r="44" fill="url(#brillo)"/>
+  <circle cx="150" cy="88" r="44" fill="url(#brillo)"/>
+  <circle cx="90" cy="88" r="20" fill="#ffd54f"/>
+  <circle cx="150" cy="88" r="20" fill="#ffd54f"/>
+  <circle cx="90" cy="88" r="7" fill="#5d4037"/>
+  <circle cx="150" cy="88" r="7" fill="#5d4037"/>
+  <circle cx="95" cy="82" r="4" fill="#fff"/>
+  <circle cx="155" cy="82" r="4" fill="#fff"/>
+  <path d="M110 108 L120 128 L130 108 Z" fill="#ff8f00" stroke="#37474f" stroke-width="3" stroke-linejoin="round"/>
+  <g fill="none" stroke="#a1887f" stroke-width="4" stroke-linecap="round">
+    <path d="M100 148 q6 6 12 0 M128 148 q6 6 12 0 M112 168 q8 6 16 0"/>
+  </g>
+  <g stroke="#ff8f00" stroke-width="5" stroke-linecap="round">
+    <path d="M102 200 V210 M112 200 V210 M128 200 V210 M138 200 V210"/>
+  </g>
+</svg>

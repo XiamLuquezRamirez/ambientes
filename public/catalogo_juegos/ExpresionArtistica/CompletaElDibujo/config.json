@@ -1,5 +1,195 @@
 {
-    "nombre": "Completa el dibujo",
-    "stub": true,
-    "creado_en": "2026-10-22T17:49:57-05:00"
+  "nombre": "Completa el dibujo",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira! Arrastra la pieza hasta el hueco parpadeante y se pega solita.",
+    "demostracionAcierto": "¡Así se completa el dibujo!",
+    "demostracionFin": "¡Ahora te toca a ti!"
+  },
+  "accesibilidad": { "letterSpacing": 2, "volumenFondo": 20, "rate": 5, "mostrarIntro": true },
+  "audios": { "cierre": "../../sounds/victory.mp3", "fondo": "../../sounds/fondo.mp3", "sonidos": {}, "efectos": {} },
+  "demo": { "elemento": "pieza_demo" },
+  "escenas": { "estudio": "img/escenas/estudio.svg", "diseno": "img/escenas/diseno.svg" },
+  "elementos": {
+    "pieza_demo": { "img": "img/pieza_demo.svg", "nombre": "Pieza de ejemplo" },
+    "mariquita_base": { "img": "img/mariquita_base.svg", "nombre": "Mariquita" },
+    "manchas": { "img": "img/manchas.svg", "nombre": "Manchitas" },
+    "carro_base": { "img": "img/carro_base.svg", "nombre": "Carro" },
+    "rueda": { "img": "img/rueda.svg", "nombre": "Rueda" },
+    "flor_centro": { "img": "img/flor_centro.svg", "nombre": "Centro de flor" },
+    "petalos": { "img": "img/petalos.svg", "nombre": "Pétalos" },
+    "casita_base": { "img": "img/casita_base.svg", "nombre": "Casita del árbol" },
+    "puerta": { "img": "img/puerta.svg", "nombre": "Puerta" },
+    "pajarito": { "img": "img/pajarito.svg", "nombre": "Pajarito" },
+    "mariposa_izq": { "img": "img/mariposa_izq.svg", "nombre": "Mariposa izquierda" },
+    "mariposa_der": { "img": "img/mariposa_der.svg", "nombre": "Ala derecha" },
+    "estrella_punto": { "img": "img/estrella_punto.svg", "nombre": "Estrella" },
+    "cohete": { "img": "img/cohete.svg", "nombre": "Cohete" },
+    "robot_base": { "img": "img/robot_base.svg", "nombre": "Robot" },
+    "brazo_ok": { "img": "img/brazo_ok.svg", "nombre": "Brazo correcto" },
+    "brazo_corto": { "img": "img/brazo_corto.svg", "nombre": "Brazo corto" },
+    "brazo_grueso": { "img": "img/brazo_grueso.svg", "nombre": "Brazo grueso" },
+    "castillo_base": { "img": "img/castillo_base.svg", "nombre": "Castillo" },
+    "almena": { "img": "img/almena.svg", "nombre": "Almena" },
+    "dibujo_mariquita": { "img": "img/dibujo_mariquita.svg", "nombre": "Mariquita completa" },
+    "dibujo_carro": { "img": "img/dibujo_carro.svg", "nombre": "Carro completo" },
+    "dibujo_flor": { "img": "img/dibujo_flor.svg", "nombre": "Flor completa" },
+    "dibujo_casita": { "img": "img/dibujo_casita.svg", "nombre": "Casita completa" },
+    "dibujo_mariposa": { "img": "img/dibujo_mariposa.svg", "nombre": "Mariposa completa" },
+    "dibujo_cohete": { "img": "img/dibujo_cohete.svg", "nombre": "Cohete completo" },
+    "dibujo_robot": { "img": "img/dibujo_robot.svg", "nombre": "Robot completo" },
+    "dibujo_castillo": { "img": "img/dibujo_castillo.svg", "nombre": "Castillo completo" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El estudio de dibujo",
+      "tema": "estudio",
+      "escena": "estudio",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Hola amiguito! Bienvenido al estudio de dibujo." },
+        { "personaje": 0, "texto": "Hoy vamos a completar dibujos con pegatinas y piezas." }
+      ],
+      "galeria": ["dibujo_mariquita", "dibujo_carro", "dibujo_flor", "dibujo_casita"],
+      "retos": [
+        {
+          "id": "mariquita",
+          "tipo": "encaje",
+          "titulo": "Las manchitas de la amiga mariquita",
+          "toqueColoca": true,
+          "festejo": "mariquita",
+          "fijos": [{ "id": "mariquita_base", "x": "50%", "y": "48%" }],
+          "piezas": [{ "id": "manchas", "hueco": "caparazon", "x": "50%", "y": "55%", "tam": "ancho" }],
+          "consigna": { "voz": "zoe", "texto": "¡Hola amiguito, esta mariquita tiene su traje rojo listo, pero le faltan sus manchitas de puntitos! Arrastra las manchitas negras sobre su caparazón." },
+          "acierto": { "voz": "zoe", "texto": "¡Quedó hermosa! Las manchitas negras hacen que esta mariquita luzca genial." }
+        },
+        {
+          "id": "carro",
+          "tipo": "encaje",
+          "titulo": "Ponle las ruedas al carro de carreras",
+          "toqueColoca": true,
+          "festejo": "carro",
+          "fijos": [{ "id": "carro_base", "x": "50%", "y": "40%" }],
+          "piezas": [
+            { "id": "rueda", "hueco": "eje_izq", "x": "32%", "y": "72%", "sonido": "tuerca" },
+            { "id": "rueda2", "elemento": "rueda", "hueco": "eje_der", "x": "68%", "y": "72%", "sonido": "tuerca" }
+          ],
+          "consigna": { "voz": "zeus", "texto": "¡Este carro quiere correr en la pista, pero olvidamos sus ruedas! Arrastra las llantas a los espacios vacíos abajo del carro." },
+          "acierto": { "voz": "zeus", "texto": "¡Listo para la carrera! Con sus cuatro ruedas, este carro puede ir a toda velocidad." }
+        },
+        {
+          "id": "flor",
+          "tipo": "encaje",
+          "titulo": "Los coloridos pétalos de la margarita",
+          "toqueColoca": true,
+          "festejo": "flor",
+          "fijos": [{ "id": "flor_centro", "x": "50%", "y": "52%" }],
+          "piezas": [{ "id": "petalos", "hueco": "corona", "x": "50%", "y": "40%", "tam": "grande" }],
+          "consigna": { "voz": "zoe", "texto": "¡La plantita necesita sus pétalos para convertirse en una flor alegre! Arrastra los pétalos alrededor del centro amarillo." },
+          "acierto": { "voz": "zoe", "texto": "¡Qué flor tan radiante! Le diste vida al jardín del estudio." }
+        },
+        {
+          "id": "casita",
+          "tipo": "encaje",
+          "titulo": "La puerta mágica de la casita del árbol",
+          "toqueColoca": true,
+          "festejo": "casita",
+          "fijos": [{ "id": "casita_base", "x": "50%", "y": "48%" }],
+          "piezas": [{ "id": "puerta", "hueco": "entrada", "x": "50%", "y": "62%" }],
+          "consigna": [
+            { "voz": "zoe", "texto": "¡El reto final! A esta casita del árbol le falta su puerta para que los animalitos puedan entrar." },
+            { "voz": "zeus", "texto": "Arrastra la puerta a su lugar exacto." }
+          ],
+          "acierto": [
+            { "voz": "zoe", "texto": "¡BRAVO! Completaste todos los dibujos del taller con mucho arte y diversión." },
+            { "voz": "zeus", "texto": "¡Eres un artista genial!" }
+          ]
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Increíble trabajo! Le devolviste las manchas a la mariquita, las ruedas al carro, los pétalos a la flor y la puerta a la casita." },
+        { "voz": "zeus", "texto": "¡Tus ideas y tus manos completaron cada dibujo a la perfección!" }
+      ],
+      "insignia": { "img": "img/medalla_artista.svg", "nombre": "Pequeño Artista Detallista", "sonido": "celebracion" }
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El estudio de diseño",
+      "tema": "diseno",
+      "escena": "diseno",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Bienvenido al estudio de diseño digital!" },
+        { "personaje": 0, "texto": "Hoy usaremos espejos, números y trazos para completar dibujos." }
+      ],
+      "galeria": ["dibujo_mariposa", "dibujo_cohete", "dibujo_robot", "dibujo_castillo"],
+      "retos": [
+        {
+          "id": "mariposa",
+          "tipo": "simetria",
+          "titulo": "El espejo de la mariposa",
+          "festejo": "mariposa",
+          "fijos": [{ "id": "mariposa_izq", "x": "38%", "y": "48%" }],
+          "revela": { "id": "mariposa_der", "x": "62%", "y": "48%" },
+          "zona": { "x": "70%", "y": "48%", "w": "36%", "h": "70%" },
+          "consigna": { "voz": "zoe", "texto": "¡Artista del diseño, necesitamos aplicar la magia de los espejos! La mariposa necesita su otro lado idéntico. Desliza tu dedo sobre el lado derecho para completar su ala." },
+          "acierto": { "voz": "zoe", "texto": "¡Simetría perfecta! Las dos alas son exactamente iguales. ¡La mariposa quedó bellísima!" }
+        },
+        {
+          "id": "cohete",
+          "tipo": "puntos",
+          "titulo": "Conecta las estrellas del cohete espacial",
+          "festejo": "cohete",
+          "puntos": [
+            { "n": 1, "x": "50%", "y": "18%" },
+            { "n": 2, "x": "68%", "y": "38%" },
+            { "n": 3, "x": "68%", "y": "68%" },
+            { "n": 4, "x": "32%", "y": "68%" },
+            { "n": 5, "x": "32%", "y": "38%" }
+          ],
+          "resultado": "cohete",
+          "consigna": { "voz": "zeus", "texto": "¡Viajero del espacio, vamos a trazar el curso del cohete conectando las estrellas en orden! Toca el número 1 para empezar." },
+          "acierto": { "voz": "zeus", "texto": "¡Trayectoria perfecta! Conectaste todas las estrellas y el cohete está listo para explorar el universo." }
+        },
+        {
+          "id": "robot",
+          "tipo": "elegir",
+          "titulo": "Restaura al robot artista",
+          "festejo": "robot",
+          "fijos": [{ "id": "robot_base", "x": "42%", "y": "48%" }],
+          "correcta": "brazo_ok",
+          "opciones": ["brazo_ok", "brazo_corto", "brazo_grueso"],
+          "hueco": { "id": "hombro", "x": "78%", "y": "48%" },
+          "consigna": { "voz": "zoe", "texto": "¡Nuestro amigo robot perdió su lado derecho! Busca en la bandeja la pieza exacta que encaja por tamaño y forma para completar su cuerpo." },
+          "acierto": { "voz": "zoe", "texto": "¡Excelente análisis de proporciones! El robot recuperó su movilidad por completo." }
+        },
+        {
+          "id": "castillo",
+          "tipo": "encaje",
+          "titulo": "Completa las torres del castillo",
+          "toqueColoca": true,
+          "festejo": "castillo",
+          "fijos": [{ "id": "castillo_base", "x": "50%", "y": "58%" }],
+          "piezas": [
+            { "id": "almena", "hueco": "torre_izq", "x": "22%", "y": "28%" },
+            { "id": "almena2", "elemento": "almena", "hueco": "torre_der", "x": "78%", "y": "28%" }
+          ],
+          "consigna": [
+            { "voz": "zoe", "texto": "¡Reto final de arquitectura artística!" },
+            { "voz": "zeus", "texto": "Arrastra los bloques en forma de sierra para completar las torres más altas del castillo." }
+          ],
+          "acierto": [
+            { "voz": "zoe", "texto": "¡MAGNÍFICO! Usaste la simetría, los números y los trazos para completar todas las obras de arte." },
+            { "voz": "zeus", "texto": "¡Eres un ilustrador estrella!" }
+          ]
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Increíble nivel de detalle! Dominaste la simetría de los espejos, conectaste constelaciones y completaste dibujos complejos." },
+        { "voz": "zeus", "texto": "¡Tu mente creativa y tus trazos precisos hacen que cada dibujo cobre vida!" }
+      ],
+      "insignia": { "img": "img/medalla_ilustrador.svg", "nombre": "Ilustrador Experto y Maestro del Trazo", "sonido": "fanfarria" }
+    }
+  ]
 }

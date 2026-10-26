@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Osito">
+<ellipse cx="120" cy="224" rx="72" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4">
+    <circle cx="72" cy="78" r="24" fill="#a1887f"/>
+    <circle cx="168" cy="78" r="24" fill="#a1887f"/>
+    <circle cx="120" cy="136" r="68" fill="#bcaaa4"/>
+    <ellipse cx="120" cy="154" rx="28" ry="20" fill="#efebe9"/>
+    <circle cx="98" cy="122" r="7" fill="#263238"/>
+    <circle cx="142" cy="122" r="7" fill="#263238"/>
+  </g>
+</svg>

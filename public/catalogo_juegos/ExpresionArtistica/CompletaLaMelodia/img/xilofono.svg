@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Xilofono">
+
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="28" y="70" width="36" height="120" rx="8" fill="#ef5350"/>
+    <rect x="70" y="86" width="36" height="104" rx="8" fill="#ffca28"/>
+    <rect x="112" y="102" width="36" height="88" rx="8" fill="#66bb6a"/>
+    <rect x="154" y="118" width="36" height="72" rx="8" fill="#42a5f5"/>
+    <path d="M40 40 L70 78" stroke="#8d6e63" stroke-width="6"/>
+    <circle cx="36" cy="36" r="8" fill="#ffca28"/>
+  </g>
+</svg>

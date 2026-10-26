@@ -219,10 +219,10 @@ if (! Schema::hasTable('juegos')) {
     goto resumen;
 }
 
-$fila = DB::table('juegos')->where('ruta', 'like', '%QueSonidoEscuchas%')->first();
+$fila = DB::table('juegos')->where('ruta', 'catalogo_juegos/'.$rel)->first();
 
 if (! $fila) {
-    fail('No hay fila en juegos para QueSonidoEscuchas (no se crea desde el barrido)');
+    fail("No hay fila en juegos para catalogo_juegos/{$rel} (no se crea desde el barrido)");
     goto resumen;
 }
 

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Uvas sin color">
+
+  <g fill="#eceff1" stroke="#90a4ae" stroke-width="3">
+    <circle cx="100" cy="110" r="28"/><circle cx="140" cy="110" r="28"/>
+    <circle cx="80" cy="150" r="28"/><circle cx="120" cy="150" r="28"/><circle cx="160" cy="150" r="28"/>
+  </g>
+</svg>

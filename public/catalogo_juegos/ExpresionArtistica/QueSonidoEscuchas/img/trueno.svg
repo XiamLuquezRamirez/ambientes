@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Trueno">
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M58 128 C30 128 22 92 48 82 C46 54 78 40 98 56 C110 26 158 26 168 60 C196 54 218 76 208 102 C226 112 218 140 194 140 H62 C60 140 58 134 58 128 Z" fill="#546e7a"/>
+    <path d="M118 130 L86 186 H116 L98 226 L158 156 H126 L148 130 Z" fill="#ffd600"/>
+  </g>
+  <path d="M70 92 C78 78 96 74 106 82" fill="none" stroke="#78909c" stroke-width="6" stroke-linecap="round"/>
+  <path d="M150 74 C164 70 176 78 180 90" fill="none" stroke="#78909c" stroke-width="6" stroke-linecap="round"/>
+  <g stroke="#ffd600" stroke-width="5" stroke-linecap="round">
+    <path d="M48 164 L64 156 M186 168 L170 158 M60 202 L76 190 M182 204 L168 192"/>
+  </g>
+</svg>
