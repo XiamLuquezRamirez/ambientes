@@ -109,6 +109,22 @@ document.addEventListener('DOMContentLoaded', function () {
         frame.onload = function () {
             inyectarPerfil();
         };
+        var colorPortada = '#64748b';
+        try {
+            colorPortada = new URL(url, window.location.origin).searchParams.get('color') || colorPortada;
+        } catch (e) { /* noop */ }
+        if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(colorPortada)) colorPortada = '#64748b';
+        var fondoPortada = '/catalogo_juegos/Polimotor/img/fondo_portada_juegos.png';
+        var ambientePortada = String(url).match(/\/catalogo_juegos\/([A-Za-z0-9]+)\//);
+        if (ambientePortada) {
+            fondoPortada = '/catalogo_juegos/' + ambientePortada[1] + '/img/fondo_portada_juegos.png';
+        }
+        var previewBody = document.getElementById('cjPreviewBody');
+        if (previewBody) {
+            previewBody.style.setProperty('--cj-preview-color', colorPortada);
+            previewBody.style.setProperty('--cj-preview-fondo', 'url("' + fondoPortada + '")');
+        }
+        frame.style.background = 'transparent';
         frame.src = url;
         requestAnimationFrame(ajustarEscalaTablet);
     }
@@ -117,6 +133,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!overlay) return;
         if (frame) {
             frame.onload = null;
+            try {
+                var win = frame.contentWindow;
+                if (win && win.PedniaSalir && typeof win.PedniaSalir.pararAudio === 'function') {
+                    win.PedniaSalir.pararAudio();
+                }
+            } catch (e) { /* noop */ }
             frame.src = 'about:blank';
         }
         urlActual = '';

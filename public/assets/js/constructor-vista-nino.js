@@ -1353,14 +1353,19 @@
             extra = renderSecuencia(d);
         } else if (catalogoUrl) {
             const nombre = d.juego_catalogo_nombre || d.juego_nombre || 'Juego';
+            const colorCatalogo = d.juego_catalogo_color || '#64748b';
             const urlConEdad = urlCatalogoConEdad(
-                urlCatalogoConColor(catalogoUrl, d.juego_catalogo_color),
+                urlCatalogoConIcono(
+                    urlCatalogoConColor(catalogoUrl, colorCatalogo),
+                    d.juego_catalogo_imagen
+                ),
                 perfilPayloadKiosco()
             );
+            const fondoPortada = fondoPortadaDePaquete(catalogoUrl);
             cardClass = 'juego juego-catalogo';
             headOpts = { catalogoNombre: nombre };
             extra = `
-                <div class="vn-catalogo-wrap" data-vn-catalogo-juego>
+                <div class="vn-catalogo-wrap" data-vn-catalogo-juego style="--juego-color:${escapar(colorCatalogo)};--fondo-portada:url('${escapar(fondoPortada)}')">
                     <iframe class="vn-catalogo-iframe"
                         title="${escapar(nombre)}"
                         src="${escapar(urlConEdad)}"
@@ -1995,7 +2000,14 @@
         clearTimeout(fbHideTimer);
         fbHideTimer = null;
         $body.removeData('vn-bloque-visto vn-bienvenida-video-ok vn-evidencia-ok');
-        $body.find('.vn-catalogo-iframe').attr('src', 'about:blank');
+        $body.find('.vn-catalogo-iframe').each(function () {
+            try {
+                const win = this.contentWindow;
+                if (win && win.PedniaSalir && typeof win.PedniaSalir.pararAudio === 'function') {
+                    win.PedniaSalir.pararAudio();
+                }
+            } catch (e) { /* noop */ }
+        }).attr('src', 'about:blank');
         $body.toggleClass('vn-body--paint', esBloquePintar(bloque));
         $body.html(renderBloque(bloque));
         $btnPrev.prop('disabled', index <= 0);
@@ -2341,6 +2353,24 @@
             const sep = String(url).indexOf('?') >= 0 ? '&' : '?';
             return url + sep + 'color=' + encodeURIComponent(String(color));
         }
+    }
+
+    function urlCatalogoConIcono(url, icono) {
+        if (!url || !icono) return url;
+        try {
+            const u = new URL(url, window.location.origin);
+            u.searchParams.set('icono', String(icono));
+            return u.pathname + u.search + u.hash;
+        } catch (e) {
+            const sep = String(url).indexOf('?') >= 0 ? '&' : '?';
+            return url + sep + 'icono=' + encodeURIComponent(String(icono));
+        }
+    }
+
+    function fondoPortadaDePaquete(url) {
+        const m = String(url || '').match(/\/catalogo_juegos\/([A-Za-z0-9]+)\//);
+        const seg = m ? m[1] : 'Polimotor';
+        return '/catalogo_juegos/' + seg + '/img/fondo_portada_juegos.png';
     }
 
     function urlCatalogoConEdad(url, perfil) {

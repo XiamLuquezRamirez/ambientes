@@ -94,19 +94,27 @@
             min-height: 0;
             padding: 0;
             overflow: hidden;
-            background: #0b1220;
+            background: var(--cj-preview-color, #0b1220);
             display: block;
         }
 
         #cjPreviewOverlay .vn-screen-body::before {
-            display: none;
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: var(--cj-preview-fondo, none) center / cover no-repeat;
+            opacity: 0.5;
         }
 
         #cjPreviewFrame {
+            position: relative;
+            z-index: 1;
             width: 100%;
             height: 100%;
             border: 0;
-            background: #fff;
+            background: transparent;
             display: block;
         }
 

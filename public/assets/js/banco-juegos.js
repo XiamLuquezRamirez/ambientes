@@ -67,6 +67,12 @@
         return '/catalogo_juegos/' + seg + '/img/fondo_catalogo.png';
     }
 
+    /** Trazo de la portada: catalogo_juegos/{Ambiente}/img/fondo_portada_juegos.png */
+    function urlFondoPortada() {
+        const seg = segmentoCarpeta(slugAmbiente()) || 'Polimotor';
+        return '/catalogo_juegos/' + seg + '/img/fondo_portada_juegos.png';
+    }
+
     function estiloFondoGaleria() {
         return ' style="--bj-fondo:url(\'' + escapar(urlFondoGaleria()) + '\')"';
     }
@@ -398,6 +404,11 @@
         return urlPaqueteConParam(url, 'color', color);
     }
 
+    /** ?icono=: imagen del juego en el catálogo, para la portada si el paquete no trae la suya. */
+    function urlPaqueteConIcono(url, icono) {
+        return urlPaqueteConParam(url, 'icono', icono);
+    }
+
     /**
      * ?volver=1: el paquete muestra su botón "Volver" de la pantalla de inicio, que avisa
      * con postMessage 'pednia:salir-juego' (ver escucharSalidaJuego).
@@ -434,11 +445,20 @@
         if (!win || !doc || win.__pedniaSalidaEnganchada) return;
         win.__pedniaSalidaEnganchada = true;
 
+        const pararAudioJuego = function () {
+            try {
+                if (win.PedniaSalir && typeof win.PedniaSalir.pararAudio === 'function') {
+                    win.PedniaSalir.pararAudio();
+                }
+            } catch (e) { /* noop */ }
+        };
+
         const salir = function (ev) {
             if (ev) {
                 ev.preventDefault();
                 ev.stopImmediatePropagation();
             }
+            pararAudioJuego();
             if (frame.isConnected) cerrarJuego();
         };
 
@@ -453,6 +473,7 @@
             const atras = win.history.back.bind(win.history);
             win.history.back = function () {
                 if (frame.isConnected) {
+                    pararAudioJuego();
                     cerrarJuego();
                     return;
                 }
@@ -464,14 +485,18 @@
     function montarJuego(juego) {
         const perfil = perfilPayload();
         const url = urlPaqueteConEdad(
-            urlPaqueteConVolver(urlPaqueteConColor(juego.url_paquete, juego.color)),
+            urlPaqueteConIcono(
+                urlPaqueteConVolver(urlPaqueteConColor(juego.url_paquete, juego.color)),
+                juego.imagen_url
+            ),
             perfil
         );
         if (!url) return;
 
+        const color = juego.color || '#64748b';
         const $g = ctx.$paso.find('.bj-galeria');
         const $player = $(`
-            <div class="bj-player" data-bj-player>
+            <div class="bj-player" data-bj-player style="--juego-color:${escapar(color)};--fondo-portada:url('${escapar(urlFondoPortada())}')">
                 <div class="bj-canvas-wrap" data-bj-canvas>
                     <iframe class="bj-iframe"
                         title="${escapar(juego.nombre)}"
@@ -492,7 +517,15 @@
     function cerrarJuego() {
         const $player = ctx.$paso.find('[data-bj-player]');
         const frame = $player.find('iframe')[0];
-        if (frame) frame.src = 'about:blank';
+        if (frame) {
+            try {
+                const win = frame.contentWindow;
+                if (win && win.PedniaSalir && typeof win.PedniaSalir.pararAudio === 'function') {
+                    win.PedniaSalir.pararAudio();
+                }
+            } catch (e) { /* noop */ }
+            frame.src = 'about:blank';
+        }
         $player.remove();
     }
 
