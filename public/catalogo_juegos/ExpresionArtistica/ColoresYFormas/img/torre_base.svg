@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="220" height="280" viewBox="0 0 220 280">
-  <rect x="40" y="40" width="140" height="200" fill="none" stroke="#90a4ae" stroke-width="3" stroke-dasharray="8 6" rx="8"/>
-  <line x1="40" y1="110" x2="180" y2="110" stroke="#b0bec5" stroke-width="2" stroke-dasharray="6 4"/>
-  <line x1="40" y1="175" x2="180" y2="175" stroke="#b0bec5" stroke-width="2" stroke-dasharray="6 4"/>
-  <text x="110" y="85" text-anchor="middle" fill="#78909c" font-size="14" font-family="sans-serif">3</text>
-  <text x="110" y="150" text-anchor="middle" fill="#78909c" font-size="14" font-family="sans-serif">2</text>
-  <text x="110" y="215" text-anchor="middle" fill="#78909c" font-size="14" font-family="sans-serif">1</text>
-</svg>

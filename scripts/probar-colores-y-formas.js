@@ -57,6 +57,70 @@ assert(L.evaluarMondrian(n56.retos[2], [], "c1", "rojo").estado === "bien", "mon
 assert(L.evaluarMondrian(n56.retos[2], [], "c1", "azul").estado === "mal", "mondrian mal");
 const ciudad = L.evaluarCiudad(n56.retos[3], ["cubo_azul", "piramide_amarilla", "cilindro_verde", "cono_naranja", "cubo_rojo"], "cubo_amarillo");
 assert(ciudad.estado === "completo", "ciudad completa");
+assert(L.evaluarEncaje(n56.retos[1], [], "cubo_amarillo", "medio").estado === "espera", "torre exige orden");
+assert(L.evaluarEncaje(n56.retos[1], [], "cubo_azul", "base").estado === "bien", "torre base primero");
+assert(n56.retos[2].celdas.find((c) => c.id === "c1").color === "rojo", "mondrian rojo arriba-izq");
+assert(n56.retos[2].celdas.find((c) => c.id === "c5").color === "azul", "mondrian azul abajo-der");
+assert(n56.retos[0].huecos.filter((h) => h.fijo).every((h) => h.x < 50), "mosaico patrón a la izquierda");
+
+console.log("=== Retos paso a paso ===");
+(function recorrerNivel(n) {
+    n.retos.forEach((r) => {
+        if (r.tipo === "semaforo" || r.tipo === "casita" || r.tipo === "tren" || r.tipo === "cohete" || r.tipo === "torre") {
+            let puestos = [];
+            const orden = r.orden || r.piezas.map((p) => p.id);
+            orden.forEach((id) => {
+                const pieza = r.piezas.find((p) => p.id === id);
+                const res = L.evaluarEncaje(r, puestos, id, pieza.hueco);
+                assert(res.estado === "bien" || res.estado === "completo", n.edad + " " + r.id + " " + id);
+                puestos = res.colocadas;
+            });
+            assert(puestos.length === r.piezas.length, n.edad + " " + r.id + " completo");
+        }
+        if (r.tipo === "mosaico") {
+            let puestos = [];
+            r.huecos.filter((h) => !h.fijo).forEach((h) => {
+                const pieza = r.piezas.find((p) => p.color === h.color && !puestos.some((c) => c.pieza === p.id));
+                const res = L.evaluarMosaico(r, puestos, pieza.id, h.id);
+                assert(res.estado === "bien" || res.estado === "completo", n.edad + " mosaico " + h.id);
+                puestos = res.colocadas;
+            });
+        }
+        if (r.tipo === "mondrian") {
+            let pintados = [];
+            r.celdas.forEach((c) => {
+                const res = L.evaluarMondrian(r, pintados, c.id, c.color);
+                assert(res.estado === "bien" || res.estado === "completo", n.edad + " mondrian " + c.id);
+                pintados = res.pintados;
+            });
+        }
+        if (r.tipo === "ciudad") {
+            let puestos = [];
+            const ids = r.piezas.slice(0, r.meta).map((p) => p.id);
+            ids.forEach((id) => {
+                const res = L.evaluarCiudad(r, puestos, id);
+                assert(res.estado === "bien" || res.estado === "completo", n.edad + " ciudad " + id);
+                puestos = res.colocadas;
+            });
+            assert(L.evaluarCiudad(r, puestos.slice(0, -1), ids[ids.length - 1]).estado === "completo", n.edad + " ciudad meta");
+        }
+    });
+})(n34);
+(function () {
+    const cohete = n34.retos.find((r) => r.id === "cohete");
+    const zonas = [
+        { id: "ventana2", x: 50, y: 58, area: 144 },
+        { id: "cuerpo", x: 50, y: 55, area: 720 },
+        { id: "ventana1", x: 50, y: 42, area: 144 },
+        { id: "punta", x: 50, y: 16, area: 504 }
+    ];
+    assert(typeof L.huecoParaPieza === "function", "huecoParaPieza existe");
+    assert(L.huecoParaPieza({ x: 50, y: 56 }, zonas, 110, cohete, [], "rectangulo_azul") === "cuerpo", "cohete cuerpo gana a ventana");
+    assert(L.huecoParaPieza({ x: 50, y: 58 }, zonas, 110, cohete, [], "circulo_verde") === "ventana2", "cohete ventana para círculo");
+})();
+assert(js.includes("efecto(\"cristal\")"), "script tiene cristal");
+assert(/async function retoMosaico[\s\S]*?efecto\("cristal"\)/.test(js), "mosaico usa cristal al encajar");
+assert(/async function retoCiudad[\s\S]*?efecto\("destello"\)/.test(js), "ciudad usa destello al anclar");
 
 console.log("=== Assets ===");
 const cfgTxt = JSON.stringify(config);
@@ -79,7 +143,14 @@ assert(html.includes("logica.js") && html.includes("sfx.js"), "html carga logica
 assert(js.includes("retoEncaje") && js.includes("retoMosaico") && js.includes("retoMondrian") && js.includes("retoCiudad"), "script retos");
 assert(css.includes("tema-fabrica") && css.includes("tema-atelier") && css.includes("est-geo"), "css temas");
 assert(!/\.destello\b/.test(css), "sin .destello");
+assert(!css.includes("estudio.svg") && !css.includes("laboratorio.svg"), "css sin escenas ajenas");
+assert(!css.includes(".gota") && !css.includes(".zona-arbol") && !css.includes(".zona-manzana"), "css sin restos de ElMundo");
+assert(css.includes("forma-circulo") && css.includes(".guia"), "css formas y guías");
+assert(html.includes("fa-shapes") || html.includes("fa-cube"), "inicio con iconos geométricos");
+assert(html.includes("cuadrado_amarillo") && html.includes("triangulo_rojo"), "vitrina con varias formas");
+assert(/estrell|star|polygon/i.test(fs.readFileSync(path.join(dir, "img/estrella_base.svg"), "utf8")), "estrella_base no es solo círculo");
 ["campana", "madera", "silbato", "cristal", "fanfarria"].forEach((e) => assert(Sfx.EFECTOS.includes(e), "sfx " + e));
+assert(js.includes("montarHueco") && js.includes("formaDeRef"), "script monta guías de forma");
 
 console.log("\n" + oks + " ok, " + fails + " fail");
 process.exit(fails ? 1 : 0);

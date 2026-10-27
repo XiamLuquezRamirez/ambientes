@@ -20,7 +20,8 @@
 
     function readText(ruta) {
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", ruta, false);
+        const url = ruta.indexOf("?") === -1 ? ruta + "?v=20261027c" : ruta;
+        xhr.open("GET", url, false);
         xhr.send();
         return xhr.status === 200 ? xhr.responseText : null;
     }
@@ -31,7 +32,7 @@
     function elemento(id) { return (gameConfig.elementos || {})[id] || {}; }
     function vivo(gen) { return gen === rondaGen && !juegoTerminado; }
     function sfx() { return window.ColoresYFormasSfx || null; }
-    function asset(url) { return !url || url.indexOf("?v=") !== -1 ? url : url + "?v=20261026a"; }
+    function asset(url) { return !url || url.indexOf("?v=") !== -1 ? url : url + "?v=20261027c"; }
     function volumenFondoPct() {
         const n = Number(acc().volumenFondo);
         return isFinite(n) ? Math.max(0, Math.min(100, n)) : 20;
@@ -372,7 +373,99 @@
         const prem = document.createElement("div");
         prem.className = premioId === "chimenea" ? "chimenea-premio" : "antena-premio";
         prem.appendChild(crearImg(elemento(premioId).img));
+        if (premioId === "chimenea") {
+            const humo = document.createElement("span");
+            humo.className = "humo-chimenea";
+            prem.appendChild(humo);
+        }
         lienzo.appendChild(prem);
+    }
+    function iluminarHueco(el) {
+        if (!el) return;
+        el.classList.add("ilumina");
+        setTimeout(function () { el.classList.remove("ilumina"); }, 700);
+    }
+    function cuentaAtrasCohete(lienzo) {
+        return new Promise(function (resolve) {
+            const capa = document.createElement("div");
+            capa.className = "cuenta-atras";
+            lienzo.appendChild(capa);
+            const fuego = document.createElement("div");
+            fuego.className = "fuego-cohete";
+            lienzo.appendChild(fuego);
+            let n = 3;
+            function tick() {
+                capa.textContent = String(n);
+                capa.classList.remove("pulso");
+                void capa.offsetWidth;
+                capa.classList.add("pulso");
+                efecto("campana");
+                n -= 1;
+                if (n >= 0) setTimeout(tick, 550);
+                else {
+                    capa.remove();
+                    lienzo.classList.add("despega");
+                    efecto("destello");
+                    setTimeout(resolve, 900);
+                }
+            }
+            tick();
+        });
+    }
+    function festividadTren(lienzo) {
+        lienzo.classList.add("tren-alegre");
+        for (let i = 0; i < 8; i++) {
+            const e = document.createElement("span");
+            e.className = "estrella-tren";
+            e.style.left = (20 + i * 10) + "%";
+            e.style.animationDelay = (i * 0.08) + "s";
+            e.textContent = "✦";
+            lienzo.appendChild(e);
+        }
+    }
+    function ventanasTorre(lienzo) {
+        ["38%", "55%", "72%"].forEach(function (top, i) {
+            const v = document.createElement("span");
+            v.className = "ventana-torre";
+            v.style.top = top;
+            v.style.left = (44 + (i % 2) * 8) + "%";
+            lienzo.appendChild(v);
+        });
+    }
+    function refElementoPieza(p) {
+        return (p && (p.elemento || p.id)) || "";
+    }
+    function formaDeRef(ref) {
+        const meta = elemento(ref);
+        if (meta && meta.forma) return meta.forma;
+        const id = String(ref || "");
+        if (id.indexOf("circulo") === 0) return "circulo";
+        if (id.indexOf("cuadrado") === 0) return "cuadrado";
+        if (id.indexOf("triangulo") === 0 || id.indexOf("tri_") === 0) return "triangulo";
+        if (id.indexOf("rectangulo") === 0) return "rectangulo";
+        if (id.indexOf("cubo") === 0) return "cubo";
+        if (id.indexOf("piramide") === 0) return "piramide";
+        if (id.indexOf("cilindro") === 0) return "cilindro";
+        if (id.indexOf("cono") === 0) return "cono";
+        return "";
+    }
+    function piezaParaHueco(reto, huecoId) {
+        return ((reto && reto.piezas) || []).find(function (p) { return p.hueco === huecoId; }) || null;
+    }
+    function montarHueco(h, reto) {
+        const el = document.createElement("div");
+        el.className = "hueco" + (h.fijo ? " fijo lleno" : "");
+        el.dataset.id = h.id;
+        posicionGeo(el, h);
+        const pieza = piezaParaHueco(reto, h.id);
+        const ref = pieza ? refElementoPieza(pieza) : (h.color ? trianguloDeColor(h.color) : "");
+        const forma = formaDeRef(ref) || (h.forma || "");
+        if (forma) el.classList.add("forma-" + forma);
+        if (!h.fijo && ref && elemento(ref).img) {
+            const guia = crearImg(elemento(ref).img, "guia");
+            el.appendChild(guia);
+        }
+        return el;
     }
 
     function festejar(tipo, lienzo) {
@@ -407,10 +500,7 @@
         }
         const huecos = {};
         (r.huecos || []).forEach(function (h) {
-            const el = document.createElement("div");
-            el.className = "hueco";
-            el.dataset.id = h.id;
-            posicionGeo(el, h);
+            const el = montarHueco(h, r);
             lienzo.appendChild(el);
             huecos[h.id] = el;
         });
@@ -418,12 +508,13 @@
         bandeja.className = "bandeja";
         const nodos = {};
         (r.piezas || []).forEach(function (p) {
+            const ref = refElementoPieza(p);
             const b = document.createElement("button");
             b.type = "button";
             b.className = "pieza";
             b.dataset.id = p.id;
-            b.setAttribute("aria-label", elemento(p.id).nombre || p.id);
-            b.appendChild(crearImg(elemento(p.id).img));
+            b.setAttribute("aria-label", elemento(ref).nombre || p.id);
+            b.appendChild(crearImg(elemento(ref).img));
             bandeja.appendChild(b);
             nodos[p.id] = b;
         });
@@ -449,13 +540,20 @@
                 nodo.style.transform = "";
                 huecos[huecoId].appendChild(nodo);
                 huecos[huecoId].classList.add("lleno");
+                if (r.tipo === "semaforo") iluminarHueco(huecos[huecoId]);
                 efecto(sonidoEncaje(r.tipo));
                 particulas(centroDe(huecos[huecoId]).x, centroDe(huecos[huecoId]).y);
                 if (res.estado === "completo") {
                     if (r.premio) mostrarPremio(lienzo, r.premio);
-                    if (r.tipo === "cohete") reiniciarClase(lienzo, "despega", 1400);
+                    if (r.tipo === "tren") festividadTren(lienzo);
+                    if (r.tipo === "torre") ventanasTorre(lienzo);
                     cancelarAyuda();
-                    resolve();
+                    if (r.tipo === "cohete" && r.cuentaAtras) {
+                        cuentaAtrasCohete(lienzo).then(resolve);
+                    } else {
+                        if (r.tipo === "cohete") reiniciarClase(lienzo, "despega", 1400);
+                        resolve();
+                    }
                 }
             }
             Object.keys(nodos).forEach(function (id) {
@@ -466,11 +564,8 @@
                     try { nodo.setPointerCapture(ev.pointerId); } catch (e) { /* noop */ }
                     nodo.classList.add("arrastrando");
                     const ox = ev.clientX, oy = ev.clientY;
-                    let movio = false;
                     function mover(e) {
-                        const dx = e.clientX - ox, dy = e.clientY - oy;
-                        if (Math.hypot(dx, dy) > 10) movio = true;
-                        nodo.style.transform = "translate(" + dx + "px," + dy + "px)";
+                        nodo.style.transform = "translate(" + (e.clientX - ox) + "px," + (e.clientY - oy) + "px)";
                     }
                     function soltar(e) {
                         nodo.removeEventListener("pointermove", mover);
@@ -478,16 +573,20 @@
                         nodo.removeEventListener("pointercancel", soltar);
                         nodo.classList.remove("arrastrando");
                         callar();
-                        const pieza = r.piezas.find(function (p) { return p.id === id; });
-                        const tap = Math.hypot(e.clientX - ox, e.clientY - oy) < 36;
-                        if (r.toqueColoca && (!movio || tap)) { colocar(id, pieza.hueco); return; }
+                        // Entre huecos cercanos, priorizar el que acepta esta pieza
+                        // (ventana vs cuerpo del cohete se solapan en el lienzo).
                         const zonas = Object.keys(huecos).filter(function (hid) {
                             return !huecos[hid].classList.contains("lleno");
                         }).map(function (hid) {
-                            const c = centroDe(huecos[hid]);
-                            return { id: hid, x: c.x, y: c.y };
+                            const el = huecos[hid];
+                            const c = centroDe(el);
+                            const area = el.offsetWidth * el.offsetHeight;
+                            return { id: hid, x: c.x, y: c.y, area: area };
                         });
-                        const cerca = L.huecoMasCercano({ x: e.clientX, y: e.clientY }, zonas, L.RADIO);
+                        const punto = { x: e.clientX, y: e.clientY };
+                        const cerca = (L.huecoParaPieza
+                            ? L.huecoParaPieza(punto, zonas, L.RADIO, r, puestos, id)
+                            : (L.huecoPreferido || L.huecoMasCercano)(punto, zonas, L.RADIO));
                         if (!cerca) { nodo.style.transform = ""; return; }
                         colocar(id, cerca);
                     }
@@ -518,11 +617,14 @@
         const huecos = {};
         (r.huecos || []).forEach(function (h) {
             const el = document.createElement("div");
-            el.className = "hueco" + (h.fijo ? " fijo lleno" : "");
+            el.className = "hueco forma-triangulo" + (h.fijo ? " fijo lleno" : "");
             el.dataset.id = h.id;
             posicionGeo(el, h);
             if (h.fijo) {
                 el.appendChild(crearImg(elemento(trianguloDeColor(h.color)).img));
+            } else {
+                const guia = crearImg(elemento(trianguloDeColor(h.color)).img, "guia");
+                el.appendChild(guia);
             }
             lienzo.appendChild(el);
             if (!h.fijo) huecos[h.id] = el;
@@ -562,7 +664,7 @@
                 nodo.style.transform = "";
                 huecos[huecoId].appendChild(nodo);
                 huecos[huecoId].classList.add("lleno");
-                efecto("campana");
+                efecto("cristal");
                 particulas(centroDe(huecos[huecoId]).x, centroDe(huecos[huecoId]).y);
                 if (res.estado === "completo") {
                     lienzo.classList.add("gira-estrella");
@@ -578,11 +680,8 @@
                     try { nodo.setPointerCapture(ev.pointerId); } catch (e) { /* noop */ }
                     nodo.classList.add("arrastrando");
                     const ox = ev.clientX, oy = ev.clientY;
-                    let movio = false;
                     function mover(e) {
-                        const dx = e.clientX - ox, dy = e.clientY - oy;
-                        if (Math.hypot(dx, dy) > 10) movio = true;
-                        nodo.style.transform = "translate(" + dx + "px," + dy + "px)";
+                        nodo.style.transform = "translate(" + (e.clientX - ox) + "px," + (e.clientY - oy) + "px)";
                     }
                     function soltar(e) {
                         nodo.removeEventListener("pointermove", mover);
@@ -590,16 +689,6 @@
                         nodo.removeEventListener("pointercancel", soltar);
                         nodo.classList.remove("arrastrando");
                         callar();
-                        const tap = Math.hypot(e.clientX - ox, e.clientY - oy) < 36;
-                        if (r.toqueColoca && (!movio || tap)) {
-                            const pieza = r.piezas.find(function (p) { return p.id === id; });
-                            const libre = (r.huecos || []).find(function (h) {
-                                return !h.fijo && huecos[h.id] && !huecos[h.id].classList.contains("lleno") && h.color === (pieza && pieza.color);
-                            });
-                            if (libre) colocar(id, libre.id);
-                            else nodo.style.transform = "";
-                            return;
-                        }
                         const zonas = Object.keys(huecos).filter(function (hid) {
                             return !huecos[hid].classList.contains("lleno");
                         }).map(function (hid) {
@@ -717,12 +806,13 @@
         bandeja.className = "bandeja";
         const nodos = {};
         (r.piezas || []).forEach(function (p) {
+            const ref = refElementoPieza(p);
             const b = document.createElement("button");
             b.type = "button";
             b.className = "pieza";
             b.dataset.id = p.id;
-            b.setAttribute("aria-label", elemento(p.id).nombre || p.id);
-            b.appendChild(crearImg(elemento(p.id).img));
+            b.setAttribute("aria-label", elemento(ref).nombre || p.id);
+            b.appendChild(crearImg(elemento(ref).img));
             bandeja.appendChild(b);
             nodos[p.id] = b;
         });
@@ -740,17 +830,27 @@
                 nodo.classList.add("puesta");
                 nodo.disabled = true;
                 nodo.style.visibility = "hidden";
+                const piezaCfg = r.piezas.find(function (p) { return p.id === id; });
+                const ref = refElementoPieza(piezaCfg);
                 const pieza = document.createElement("div");
                 pieza.className = "pieza puesta ciudad-pieza";
                 pieza.style.left = xPct + "%";
                 pieza.style.top = yPct + "%";
                 pieza.style.transform = "translate(-50%, -50%)";
-                pieza.appendChild(crearImg(elemento(id).img));
+                pieza.appendChild(crearImg(elemento(ref).img));
                 lienzo.appendChild(pieza);
-                efecto("suave");
+                efecto("destello");
                 particulas(centroDe(pieza).x, centroDe(pieza).y);
                 if (res.estado === "completo") {
                     lienzo.classList.add("ciudad-viva");
+                    for (let i = 0; i < 10; i++) {
+                        const f = document.createElement("span");
+                        f.className = "fuego-geo";
+                        f.style.left = (10 + Math.random() * 80) + "%";
+                        f.style.animationDelay = (Math.random() * 0.6) + "s";
+                        f.textContent = ["▲", "●", "■"][i % 3];
+                        lienzo.appendChild(f);
+                    }
                     cancelarAyuda();
                     resolve();
                 } else {

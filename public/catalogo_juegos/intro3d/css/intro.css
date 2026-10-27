@@ -35,6 +35,18 @@
     transition: opacity 0.45s ease;
 }
 
+#btn-omitir-intro3d {
+    position: absolute;
+    z-index: 5;
+    top: 18px;
+    left: 18px;
+    width: auto;
+    padding: 6pt 10pt;
+    border-radius: 8pt;
+    font-size: 24px;
+    color: #000;
+}
+
 #intro3d-continuar {
     position: absolute;
     inset: 0;

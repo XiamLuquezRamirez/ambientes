@@ -1,1 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eceff1"/><stop offset="100%" stop-color="#cfd8dc"/></linearGradient></defs><rect width="800" height="480" fill="url(#g)"/><rect x="80" y="100" width="280" height="200" fill="#fff" opacity=".7" stroke="#90a4ae" stroke-width="4"/><line x1="0" y1="360" x2="800" y2="360" stroke="#78909c" stroke-width="8"/><rect x="480" y="140" width="220" height="160" fill="#fffde7" opacity=".8" stroke="#ffd54f" stroke-width="3"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="cieloA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#eceff1"/>
+      <stop offset="100%" stop-color="#cfd8dc"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="480" fill="url(#cieloA)"/>
+  <rect x="0" y="360" width="800" height="120" fill="#90a4ae"/>
+  <rect x="0" y="360" width="800" height="8" fill="#78909c"/>
+  <!-- mesa lateral izquierda -->
+  <rect x="40" y="280" width="120" height="80" rx="8" fill="#fff" opacity=".45" stroke="#90a4ae" stroke-width="2"/>
+  <!-- mesa lateral derecha -->
+  <rect x="640" y="270" width="120" height="90" rx="8" fill="#fffde7" opacity=".4" stroke="#ffd54f" stroke-width="2"/>
+  <!-- reglas / herramientas sutiles -->
+  <rect x="70" y="200" width="10" height="70" rx="2" fill="#546e7a" opacity=".25"/>
+  <rect x="720" y="190" width="8" height="80" rx="2" fill="#455a64" opacity=".2"/>
+  <circle cx="100" cy="160" r="22" fill="#80d8ff" opacity=".15"/>
+  <circle cx="700" cy="150" r="28" fill="#ffd54f" opacity=".12"/>
+</svg>

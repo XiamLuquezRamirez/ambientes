@@ -1,5 +1,265 @@
 {
-    "nombre": "Viste al artista",
-    "stub": true,
-    "creado_en": "2026-10-22T17:52:58-05:00"
+  "nombre": "Viste al artista",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira! Arrastra la capa hacia el cuerpo de Zoe.",
+    "demostracionAcierto": "¡Así se viste al artista!",
+    "demostracionFin": "¡Ahora te toca a ti!"
+  },
+  "accesibilidad": { "letterSpacing": 2, "volumenFondo": 20, "rate": 5, "mostrarIntro": true },
+  "audios": { "cierre": "../../sounds/victory.mp3", "fondo": "../../sounds/fondo.mp3", "sonidos": {}, "efectos": {} },
+  "demo": { "elemento": "capa_roja", "personaje": "zoe_base" },
+  "escenas": {
+    "camerino": "img/escenas/camerino.svg",
+    "camerino_pro": "img/escenas/camerino_pro.svg"
+  },
+  "elementos": {
+    "zoe_base": { "img": "img/zoe_base.svg", "nombre": "Zoe" },
+    "zeus_base": { "img": "img/zeus_base.svg", "nombre": "Zeus" },
+    "capa_roja": { "img": "img/capa_roja.svg", "nombre": "Capa roja mágica" },
+    "gorro_cocinero": { "img": "img/gorro_cocinero.svg", "nombre": "Gorro de cocinero" },
+    "casco_bombero": { "img": "img/casco_bombero.svg", "nombre": "Casco rojo de bombero" },
+    "corona_rey": { "img": "img/corona_rey.svg", "nombre": "Corona de rey" },
+    "nariz_roja": { "img": "img/nariz_roja.svg", "nombre": "Nariz roja redonda" },
+    "gafas_oscuras": { "img": "img/gafas_oscuras.svg", "nombre": "Gafas oscuras" },
+    "sombrero_copa": { "img": "img/sombrero_copa.svg", "nombre": "Sombrero de copa" },
+    "varita": { "img": "img/varita.svg", "nombre": "Varita mágica" },
+    "conejo": { "img": "img/conejo.svg", "nombre": "Conejo" },
+    "casco_metal": { "img": "img/casco_metal.svg", "nombre": "Casco de metal" },
+    "pechera": { "img": "img/pechera.svg", "nombre": "Pechera de armadura" },
+    "espada": { "img": "img/espada.svg", "nombre": "Espada de utilería" },
+    "conjunto_rock": { "img": "img/conjunto_rock.svg", "nombre": "Chaqueta de cuero y gafas de sol" },
+    "casco_espacial": { "img": "img/casco_espacial.svg", "nombre": "Casco espacial blanco" },
+    "gabardina": { "img": "img/gabardina.svg", "nombre": "Gabardina" },
+    "sombrero_detective": { "img": "img/sombrero_detective.svg", "nombre": "Sombrero de detective" },
+    "lupa": { "img": "img/lupa.svg", "nombre": "Lupa" },
+    "manto_real": { "img": "img/manto_real.svg", "nombre": "Manto real" },
+    "cetro": { "img": "img/cetro.svg", "nombre": "Cetro" },
+    "sombrero_safari": { "img": "img/sombrero_safari.svg", "nombre": "Sombrero de safari" },
+    "chaleco": { "img": "img/chaleco.svg", "nombre": "Chaleco con bolsillos" },
+    "mochila": { "img": "img/mochila.svg", "nombre": "Mochila de viaje" },
+    "mapa": { "img": "img/mapa.svg", "nombre": "Mapa" },
+    "mini_superheroina": { "img": "img/mini_superheroina.svg", "nombre": "Súper heroína" },
+    "mini_bombero": { "img": "img/mini_bombero.svg", "nombre": "Bombero" },
+    "mini_payaso": { "img": "img/mini_payaso.svg", "nombre": "Payasita" },
+    "mini_mago": { "img": "img/mini_mago.svg", "nombre": "Mago" },
+    "mini_caballero": { "img": "img/mini_caballero.svg", "nombre": "Caballero" },
+    "mini_rock": { "img": "img/mini_rock.svg", "nombre": "Estrella de rock" },
+    "mini_detective": { "img": "img/mini_detective.svg", "nombre": "Detective" },
+    "mini_exploradora": { "img": "img/mini_exploradora.svg", "nombre": "Exploradora" },
+    "pieza_demo": { "img": "img/capa_roja.svg", "nombre": "Capa de ejemplo" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El Camerino",
+      "tema": "camerino",
+      "escena": "camerino",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Bienvenido al camerino del teatro! Aquí nos disfrazamos para cada obra." },
+        { "personaje": 0, "texto": "Hoy serás caracterizador: arrastra la prenda correcta a cada personaje." }
+      ],
+      "galeria": ["mini_superheroina", "mini_bombero", "mini_payaso", "mini_mago"],
+      "retos": [
+        {
+          "id": "superheroina",
+          "tipo": "arrastrePrenda",
+          "titulo": "La Capa de la Súper Heroína Zoe",
+          "personaje": "zoe_base",
+          "correcta": "capa_roja",
+          "opciones": ["capa_roja", "gorro_cocinero"],
+          "zonaDestino": { "x": 50, "y": 58, "w": 52, "h": 44 },
+          "slot": "cuerpo",
+          "efecto": "viento",
+          "consigna": { "voz": "zoe", "texto": "¡Hoy seré una súper heroína que salva el día! ¿Qué necesito ponerme? Arrastra el accesorio que me ayudará a convertirme en una heroína." },
+          "acierto": { "voz": "zoe", "texto": "¡Súper poderosa! Con esta capa lista, ¡a volar por el escenario!" },
+          "error": { "voz": "zeus", "texto": "¡Ese es un gorro para cocinar galletas! Para volar como súper heroína, necesito otro accesorio." }
+        },
+        {
+          "id": "bombero",
+          "tipo": "arrastrePrenda",
+          "titulo": "El Casco del Bombero Zeus",
+          "personaje": "zeus_base",
+          "correcta": "casco_bombero",
+          "opciones": ["casco_bombero", "corona_rey"],
+          "zonaDestino": { "x": 50, "y": 20, "w": 42, "h": 30 },
+          "slot": "cabeza",
+          "efecto": "sirena",
+          "consigna": { "voz": "zeus", "texto": "¡Al rescate! Voy a actuar como un bombero valiente. ¿Qué casco me pongo en la cabeza?" },
+          "acierto": { "voz": "zeus", "texto": "¡Excelente! Con mi casco rojo estoy protegido y listo para la acción." },
+          "error": { "voz": "zeus", "texto": "¡Necesito protegerme, intenta con otro casco!" }
+        },
+        {
+          "id": "payaso",
+          "tipo": "arrastrePrenda",
+          "titulo": "La Nariz Roja del Payasito",
+          "personaje": "zoe_base",
+          "correcta": "nariz_roja",
+          "opciones": ["nariz_roja", "gafas_oscuras"],
+          "zonaDestino": { "x": 50, "y": 34, "w": 28, "h": 22 },
+          "slot": "cara",
+          "efecto": "corneta",
+          "consigna": { "voz": "zoe", "texto": "¡Voy a salir a hacer tropezones y risas como un payasito! ¿Qué me pongo en la nariz?" },
+          "acierto": { "voz": "zoe", "texto": "¡Jajaja! ¡Qué nariz tan graciosa! ¡La función de risas va a comenzar!" },
+          "error": { "voz": "zeus", "texto": "¡Esas gafas no van en la nariz! Para el payasito necesito la nariz roja redonda." }
+        },
+        {
+          "id": "mago",
+          "tipo": "vestirMulti",
+          "titulo": "El Mago Mágico",
+          "personaje": "zeus_base",
+          "efecto": "magia",
+          "piezas": [
+            {
+              "id": "sombrero_copa",
+              "zonaDestino": { "x": 50, "y": 18, "w": 40, "h": 28 },
+              "slot": "cabeza"
+            },
+            {
+              "id": "varita",
+              "zonaDestino": { "x": 78, "y": 58, "w": 30, "h": 32 },
+              "slot": "mano"
+            }
+          ],
+          "distractores": [],
+          "consigna": [
+            { "voz": "zoe", "texto": "¡El gran truco final! Para convertir a Zeus en un mago de verdad, ponle el sombrero en la cabeza y dale la varita en la mano." },
+            { "voz": "zeus", "texto": "¡El gran truco final! Para convertir a Zeus en un mago de verdad, ponle el sombrero en la cabeza y dale la varita en la mano." }
+          ],
+          "acierto": [
+            { "voz": "zoe", "texto": "¡ABRACADABRA! Vestiste al mago a la perfección. ¡Eres el mejor caracterizador del camerino!" },
+            { "voz": "zeus", "texto": "¡ABRACADABRA! Vestiste al mago a la perfección. ¡Eres el mejor caracterizador del camerino!" }
+          ]
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Qué divertido fue disfrazarnos! Elegiste la ropa y los accesorios perfectos para cada papel." },
+        { "voz": "zeus", "texto": "¡Un buen disfraz nos transforma en cualquier personaje que queramos ser!" }
+      ],
+      "insignia": { "img": "img/medalla_caracterizador.svg", "nombre": "Caracterizador del Camerino", "sonido": "celebracion" }
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Camerino profesional",
+      "tema": "camerino-pro",
+      "escena": "camerino_pro",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Bienvenido al camerino profesional! Aquí armamos vestuarios completos." },
+        { "personaje": 0, "texto": "Hoy combinarás capas, accesorios y estilo según cada guion." }
+      ],
+      "galeria": ["mini_caballero", "mini_rock", "mini_detective", "mini_exploradora"],
+      "retos": [
+        {
+          "id": "caballero",
+          "tipo": "vestirMulti",
+          "titulo": "La Armadura del Caballero",
+          "personaje": "zeus_base",
+          "efecto": "trompeta",
+          "piezas": [
+            {
+              "id": "casco_metal",
+              "zonaDestino": { "x": 50, "y": 18, "w": 40, "h": 28 },
+              "slot": "cabeza"
+            },
+            {
+              "id": "pechera",
+              "zonaDestino": { "x": 50, "y": 55, "w": 50, "h": 40 },
+              "slot": "cuerpo"
+            },
+            {
+              "id": "espada",
+              "zonaDestino": { "x": 78, "y": 58, "w": 30, "h": 32 },
+              "slot": "mano"
+            }
+          ],
+          "distractores": [],
+          "consigna": { "voz": "zoe", "texto": "¡El actor Zeus sale a escena en un minuto! Vístelo como un caballero medieval completo: ponle el casco en la cabeza, la pechera en el cuerpo y la espada en su mano." },
+          "acierto": { "voz": "zoe", "texto": "¡Excelente caracterización! Las tres piezas combinan a la perfección para la obra medieval." }
+        },
+        {
+          "id": "rock",
+          "tipo": "arrastrePrenda",
+          "titulo": "El Vestuario de la Estrella de Rock",
+          "personaje": "zoe_base",
+          "correcta": "conjunto_rock",
+          "opciones": ["conjunto_rock", "casco_espacial"],
+          "zonaDestino": { "x": 50, "y": 48, "w": 55, "h": 55 },
+          "slot": "cuerpo",
+          "efecto": "guitarra",
+          "consigna": { "voz": "zeus", "texto": "¡Buscamos el vestuario para el gran concierto de rock! Elige el conjunto que tenga la actitud de una estrella de la música." },
+          "acierto": { "voz": "zeus", "texto": "¡Qué gran estilo! Zoe quedó lista para llenar el estadio de música y aplausos." },
+          "error": { "voz": "zoe", "texto": "Eso parece de astronauta, no de rock. ¡Elige el conjunto con actitud de estrella!" }
+        },
+        {
+          "id": "detective",
+          "tipo": "vestirMulti",
+          "titulo": "El Sombrero y la Lupa del Detective",
+          "personaje": "zeus_base",
+          "efecto": "misterio",
+          "piezas": [
+            {
+              "id": "sombrero_detective",
+              "zonaDestino": { "x": 50, "y": 18, "w": 42, "h": 28 },
+              "slot": "cabeza"
+            },
+            {
+              "id": "gabardina",
+              "zonaDestino": { "x": 50, "y": 55, "w": 50, "h": 42 },
+              "slot": "cuerpo"
+            },
+            {
+              "id": "lupa",
+              "zonaDestino": { "x": 78, "y": 58, "w": 30, "h": 32 },
+              "slot": "mano"
+            }
+          ],
+          "distractores": ["manto_real", "cetro"],
+          "consigna": { "voz": "zoe", "texto": "¡Zeus necesita resolver un misterio en la obra! Vístelo como todo un detective y dale la herramienta para examinar huellas." },
+          "acierto": { "voz": "zoe", "texto": "¡Cien por ciento acertado! El detective está listo para resolver todos los enigmas del guion." },
+          "error": { "voz": "zeus", "texto": "Eso es de rey, no de detective. ¡Busca gabardina, sombrero y lupa!" }
+        },
+        {
+          "id": "exploradora",
+          "tipo": "vestirMulti",
+          "titulo": "La Exploradora de la Selva",
+          "personaje": "zoe_base",
+          "efecto": "aventura",
+          "piezas": [
+            {
+              "id": "sombrero_safari",
+              "zonaDestino": { "x": 50, "y": 18, "w": 42, "h": 28 },
+              "slot": "cabeza"
+            },
+            {
+              "id": "chaleco",
+              "zonaDestino": { "x": 50, "y": 52, "w": 48, "h": 38 },
+              "slot": "cuerpo"
+            },
+            {
+              "id": "mochila",
+              "zonaDestino": { "x": 28, "y": 52, "w": 34, "h": 36 },
+              "slot": "espalda"
+            }
+          ],
+          "distractores": ["casco_espacial", "pechera", "capa_roja"],
+          "consigna": [
+            { "voz": "zoe", "texto": "¡Reto final de caracterización! Completa el traje de exploradora: ponle el sombrero de safari en la cabeza, el chaleco con bolsillos en el cuerpo y la mochila de viaje en la espalda." },
+            { "voz": "zeus", "texto": "¡Reto final de caracterización! Completa el traje de exploradora: ponle el sombrero de safari en la cabeza, el chaleco con bolsillos en el cuerpo y la mochila de viaje en la espalda." }
+          ],
+          "acierto": [
+            { "voz": "zoe", "texto": "¡PERFECTO! Combinaste sombrero, chaleco y mochila sin fallar una sola pieza. ¡Eres el diseñador de vestuario más talentoso del teatro!" },
+            { "voz": "zeus", "texto": "¡PERFECTO! Combinaste sombrero, chaleco y mochila sin fallar una sola pieza. ¡Eres el diseñador de vestuario más talentoso del teatro!" }
+          ],
+          "error": { "voz": "zoe", "texto": "Esa pieza no es del traje de exploradora. ¡Inténtalo otra vez!" }
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Qué gran trabajo de vestuario! Lograste combinar capas, accesorios y ropa acorde a cada personaje y guion." },
+        { "voz": "zeus", "texto": "¡El vestuario hace que la magia del teatro cobre vida antes de que se abra el telón!" }
+      ],
+      "insignia": { "img": "img/medalla_disenador.svg", "nombre": "Diseñador de Vestuario y Caracterizador Experto", "sonido": "celebracion" }
+    }
+  ]
 }

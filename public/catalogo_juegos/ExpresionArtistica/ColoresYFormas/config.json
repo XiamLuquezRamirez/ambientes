@@ -25,7 +25,9 @@
     "semaforo_base": { "img": "img/semaforo_base.svg", "nombre": "Semáforo" },
     "casita_silueta": { "img": "img/casita_silueta.svg", "nombre": "Casita" },
     "locomotora": { "img": "img/locomotora.svg", "nombre": "Locomotora" },
+    "tren_base": { "img": "img/tren_base.svg", "nombre": "Tren en cinta" },
     "cohete_silueta": { "img": "img/cohete_silueta.svg", "nombre": "Cohete" },
+    "cuadricula_iso": { "img": "img/cuadricula_iso.svg", "nombre": "Cuadrícula isométrica" },
     "cubo_azul": { "img": "img/cubo_azul.svg", "nombre": "Cubo azul", "color": "azul", "forma": "cubo" },
     "cubo_amarillo": { "img": "img/cubo_amarillo.svg", "nombre": "Cubo amarillo", "color": "amarillo", "forma": "cubo" },
     "cubo_rojo": { "img": "img/cubo_rojo.svg", "nombre": "Cubo rojo", "color": "rojo", "forma": "cubo" },
@@ -40,7 +42,7 @@
     "bote_amarillo": { "img": "img/bote_amarillo.svg", "nombre": "Pintura amarilla", "color": "amarillo" },
     "chimenea": { "img": "img/chimenea.svg", "nombre": "Chimenea" },
     "antena": { "img": "img/antena.svg", "nombre": "Antena" },
-    "torre_base": { "img": "img/torre_base.svg", "nombre": "Plano de torre" },
+    "torre_base": { "img": "img/cuadricula_iso.svg", "nombre": "Cuadrícula isométrica" },
     "cuadro_semaforo": { "img": "img/cuadro_semaforo.svg", "nombre": "Semáforo" },
     "cuadro_casita": { "img": "img/cuadro_casita.svg", "nombre": "Casita" },
     "cuadro_tren": { "img": "img/cuadro_tren.svg", "nombre": "Tren" },
@@ -67,17 +69,16 @@
           "id": "semaforo",
           "tipo": "semaforo",
           "titulo": "Los Círculos Bailarines del Semáforo",
-          "toqueColoca": true,
           "base": "semaforo_base",
           "piezas": [
-            { "id": "circulo_rojo", "hueco": "arriba", "x": 50, "y": 18 },
-            { "id": "circulo_amarillo", "hueco": "medio", "x": 50, "y": 40 },
-            { "id": "circulo_verde", "hueco": "abajo", "x": 50, "y": 62 }
+            { "id": "circulo_rojo", "hueco": "arriba" },
+            { "id": "circulo_amarillo", "hueco": "medio" },
+            { "id": "circulo_verde", "hueco": "abajo" }
           ],
           "huecos": [
-            { "id": "arriba", "x": 50, "y": 22, "w": 18, "h": 16 },
-            { "id": "medio", "x": 50, "y": 42, "w": 18, "h": 16 },
-            { "id": "abajo", "x": 50, "y": 62, "w": 18, "h": 16 }
+            { "id": "arriba", "x": 50, "y": 17, "w": 16, "h": 16 },
+            { "id": "medio", "x": 50, "y": 38, "w": 16, "h": 16 },
+            { "id": "abajo", "x": 50, "y": 59, "w": 16, "h": 16 }
           ],
           "consigna": { "voz": "zoe", "texto": "¡El semáforo de juguete perdió sus luces redondas! Arrastra cada círculo de color a su hueco correspondiente." },
           "acierto": { "voz": "zoe", "texto": "¡Perfecto! Rojo, amarillo y verde. ¡El semáforo ya puede dar paso a la diversión!" },
@@ -87,15 +88,14 @@
           "id": "casita",
           "tipo": "casita",
           "titulo": "Construye la Casita de Bloques",
-          "toqueColoca": true,
           "base": "casita_silueta",
           "piezas": [
-            { "id": "cuadrado_amarillo", "hueco": "base", "x": 50, "y": 68 },
-            { "id": "triangulo_rojo", "hueco": "techo", "x": 50, "y": 32 }
+            { "id": "cuadrado_amarillo", "hueco": "base" },
+            { "id": "triangulo_rojo", "hueco": "techo" }
           ],
           "huecos": [
-            { "id": "base", "x": 50, "y": 68, "w": 36, "h": 32 },
-            { "id": "techo", "x": 50, "y": 32, "w": 40, "h": 28 }
+            { "id": "base", "x": 50, "y": 70, "w": 34, "h": 34 },
+            { "id": "techo", "x": 50, "y": 32, "w": 40, "h": 32 }
           ],
           "premio": "chimenea",
           "consigna": { "voz": "zeus", "texto": "¡Vamos a construir una casita! Arrastra el cuadrado amarillo para formar la base de la casa, y pon el triángulo rojo arriba como techo." },
@@ -105,15 +105,14 @@
           "id": "tren",
           "tipo": "tren",
           "titulo": "Los Vagones Rectangulares del Tren",
-          "toqueColoca": true,
-          "base": "locomotora",
+          "base": "tren_base",
           "piezas": [
-            { "id": "rectangulo_azul", "hueco": "vagon1", "x": 48, "y": 55 },
-            { "id": "rectangulo_morado", "hueco": "vagon2", "x": 78, "y": 55 }
+            { "id": "rectangulo_azul", "hueco": "vagon1" },
+            { "id": "rectangulo_morado", "hueco": "vagon2" }
           ],
           "huecos": [
-            { "id": "vagon1", "x": 58, "y": 52, "w": 26, "h": 24 },
-            { "id": "vagon2", "x": 84, "y": 52, "w": 26, "h": 24 }
+            { "id": "vagon1", "x": 46, "y": 45, "w": 28, "h": 36 },
+            { "id": "vagon2", "x": 77, "y": 45, "w": 28, "h": 36 }
           ],
           "consigna": { "voz": "zoe", "texto": "¡El tren de los bloques necesita sus vagones! Arrastra los rectángulos de colores para alargar el tren." },
           "acierto": { "voz": "zoe", "texto": "¡El tren quedó larguísimo! Combinaste formas rectangulares y colores hermosos." }
@@ -122,19 +121,19 @@
           "id": "cohete",
           "tipo": "cohete",
           "titulo": "El Gran Cohete Geométrico",
-          "toqueColoca": true,
           "base": "cohete_silueta",
+          "cuentaAtras": true,
           "piezas": [
-            { "id": "triangulo_rojo", "hueco": "punta", "x": 50, "y": 18 },
-            { "id": "rectangulo_azul", "hueco": "cuerpo", "x": 50, "y": 48 },
-            { "id": "circulo_amarillo", "hueco": "ventana1", "x": 50, "y": 42 },
-            { "id": "circulo_verde", "hueco": "ventana2", "x": 50, "y": 58 }
+            { "id": "triangulo_rojo", "hueco": "punta" },
+            { "id": "rectangulo_azul", "hueco": "cuerpo" },
+            { "id": "circulo_amarillo", "hueco": "ventana1" },
+            { "id": "circulo_verde", "hueco": "ventana2" }
           ],
           "huecos": [
-            { "id": "punta", "x": 50, "y": 18, "w": 30, "h": 18 },
-            { "id": "cuerpo", "x": 50, "y": 52, "w": 28, "h": 36 },
-            { "id": "ventana1", "x": 50, "y": 42, "w": 14, "h": 12 },
-            { "id": "ventana2", "x": 50, "y": 58, "w": 14, "h": 12 }
+            { "id": "punta", "x": 50, "y": 20, "w": 30, "h": 20 },
+            { "id": "ventana1", "x": 50, "y": 46, "w": 14, "h": 12 },
+            { "id": "ventana2", "x": 50, "y": 62, "w": 14, "h": 12 },
+            { "id": "cuerpo", "x": 50, "y": 54, "w": 28, "h": 36 }
           ],
           "consigna": [
             { "voz": "zoe", "texto": "¡El reto de la fábrica!" },
@@ -168,15 +167,14 @@
           "id": "mosaico",
           "tipo": "mosaico",
           "titulo": "El Mosaico de Triángulos y Colores",
-          "toqueColoca": true,
           "base": "estrella_base",
           "huecos": [
-            { "id": "t0", "color": "rojo", "fijo": true, "x": 50, "y": 28, "rot": 0 },
-            { "id": "t1", "color": "amarillo", "fijo": true, "x": 68, "y": 42, "rot": 60 },
-            { "id": "t2", "color": "rojo", "fijo": true, "x": 68, "y": 68, "rot": 120 },
-            { "id": "t3", "color": "amarillo", "fijo": false, "x": 50, "y": 78, "rot": 180 },
-            { "id": "t4", "color": "rojo", "fijo": false, "x": 32, "y": 68, "rot": 240 },
-            { "id": "t5", "color": "amarillo", "fijo": false, "x": 32, "y": 42, "rot": 300 }
+            { "id": "t0", "color": "rojo", "fijo": true, "x": 38, "y": 30, "w": 24, "h": 24, "rot": 0 },
+            { "id": "t1", "color": "amarillo", "fijo": true, "x": 28, "y": 52, "w": 24, "h": 24, "rot": 60 },
+            { "id": "t2", "color": "rojo", "fijo": true, "x": 38, "y": 74, "w": 24, "h": 24, "rot": 120 },
+            { "id": "t3", "color": "amarillo", "fijo": false, "x": 62, "y": 74, "w": 24, "h": 24, "rot": 180 },
+            { "id": "t4", "color": "rojo", "fijo": false, "x": 72, "y": 52, "w": 24, "h": 24, "rot": 240 },
+            { "id": "t5", "color": "amarillo", "fijo": false, "x": 62, "y": 30, "w": 24, "h": 24, "rot": 300 }
           ],
           "piezas": [
             { "id": "tri_a", "elemento": "triangulo_amarillo", "color": "amarillo" },
@@ -191,17 +189,17 @@
           "id": "torre",
           "tipo": "torre",
           "titulo": "La Torre de los Cubos Mágicos",
-          "toqueColoca": true,
           "base": "torre_base",
+          "orden": ["cubo_azul", "cubo_amarillo", "cubo_rojo"],
           "piezas": [
-            { "id": "cubo_azul", "hueco": "base", "x": 50, "y": 78 },
-            { "id": "cubo_amarillo", "hueco": "medio", "x": 50, "y": 55 },
-            { "id": "cubo_rojo", "hueco": "cima", "x": 50, "y": 32 }
+            { "id": "cubo_azul", "hueco": "base" },
+            { "id": "cubo_amarillo", "hueco": "medio" },
+            { "id": "cubo_rojo", "hueco": "cima" }
           ],
           "huecos": [
-            { "id": "base", "x": 50, "y": 78, "w": 28, "h": 22 },
-            { "id": "medio", "x": 50, "y": 55, "w": 28, "h": 22 },
-            { "id": "cima", "x": 50, "y": 32, "w": 28, "h": 22 }
+            { "id": "base", "x": 50, "y": 78, "w": 26, "h": 20 },
+            { "id": "medio", "x": 50, "y": 58, "w": 26, "h": 20 },
+            { "id": "cima", "x": 50, "y": 38, "w": 26, "h": 20 }
           ],
           "premio": "antena",
           "consigna": { "voz": "zeus", "texto": "¡Hora de construir en tercera dimensión! Arrastra los cubos de colores para levantar la torre siguiendo el plano de altura." },
@@ -212,11 +210,11 @@
           "tipo": "mondrian",
           "titulo": "Diseña tu Cuadro Geométrico",
           "celdas": [
-            { "id": "c1", "color": "rojo", "x": 12, "y": 14, "w": 24, "h": 28 },
-            { "id": "c2", "color": "azul", "x": 42, "y": 14, "w": 24, "h": 28 },
-            { "id": "c3", "color": "amarillo", "x": 72, "y": 14, "w": 18, "h": 55 },
-            { "id": "c4", "color": "azul", "x": 12, "y": 52, "w": 24, "h": 32 },
-            { "id": "c5", "color": "rojo", "x": 42, "y": 52, "w": 24, "h": 32 }
+            { "id": "c1", "color": "rojo", "x": 22, "y": 26, "w": 30, "h": 32 },
+            { "id": "c2", "color": "amarillo", "x": 53, "y": 26, "w": 26, "h": 32 },
+            { "id": "c3", "color": "amarillo", "x": 81, "y": 26, "w": 24, "h": 32 },
+            { "id": "c4", "color": "amarillo", "x": 22, "y": 70, "w": 30, "h": 40 },
+            { "id": "c5", "color": "azul", "x": 70, "y": 72, "w": 42, "h": 36 }
           ],
           "colores": ["rojo", "azul", "amarillo"],
           "consigna": { "voz": "zoe", "texto": "¡Conviértete en un pintor abstracto! Llena los espacios rectangulares de este cuadro moderno usando solo los colores primarios." },
@@ -227,7 +225,8 @@
           "tipo": "ciudad",
           "titulo": "La Gran Ciudad Geométrica",
           "meta": 6,
-          "minTipos": 3,
+          "minTipos": 4,
+          "tiposRequeridos": ["cubo", "piramide", "cilindro", "cono"],
           "piezas": [
             { "id": "cubo_azul" },
             { "id": "cubo_rojo" },
@@ -235,8 +234,8 @@
             { "id": "piramide_amarilla" },
             { "id": "cilindro_verde" },
             { "id": "cono_naranja" },
-            { "id": "circulo_azul" },
-            { "id": "rectangulo_morado" }
+            { "id": "cubo_extra", "elemento": "cubo_azul" },
+            { "id": "piramide_extra", "elemento": "piramide_amarilla" }
           ],
           "consigna": [
             { "voz": "zoe", "texto": "¡El reto supremo de arquitectura y diseño!" },

@@ -58,15 +58,63 @@
         });
         return mejor;
     }
+
+    /** Como huecoMasCercano, pero prioriza huecos más pequeños (ventanas vs cuerpo). */
+    function huecoPreferido(punto, zonas, radio) {
+        const R = radio == null ? RADIO : radio;
+        let mejor = null;
+        let mejorScore = Infinity;
+        (zonas || []).forEach(function (z) {
+            const d = distancia(punto, z);
+            if (d > R) return;
+            const area = z.area != null ? z.area : 10000;
+            const score = d + Math.sqrt(Math.max(1, area)) * 0.12;
+            if (score < mejorScore) {
+                mejorScore = score;
+                mejor = z.id;
+            }
+        });
+        return mejor;
+    }
+
+    /**
+     * Entre huecos en radio, prioriza el que aceptaría la pieza (evita solape
+     * ventana/cuerpo del cohete). Si ninguno encaja, cae a huecoPreferido.
+     */
+    function huecoParaPieza(punto, zonas, radio, reto, puestos, piezaId) {
+        const R = radio == null ? RADIO : radio;
+        const candidatos = (zonas || []).filter(function (z) {
+            return distancia(punto, z) <= R;
+        }).slice().sort(function (a, b) {
+            const da = distancia(punto, a);
+            const db = distancia(punto, b);
+            const aa = a.area != null ? a.area : 10000;
+            const ab = b.area != null ? b.area : 10000;
+            return (da + Math.sqrt(Math.max(1, aa)) * 0.12) - (db + Math.sqrt(Math.max(1, ab)) * 0.12);
+        });
+        if (!candidatos.length) return null;
+        if (!reto || !piezaId || typeof evaluarEncaje !== "function") {
+            return candidatos[0].id;
+        }
+        let i;
+        for (i = 0; i < candidatos.length; i++) {
+            const res = evaluarEncaje(reto, puestos, piezaId, candidatos[i].id);
+            if (res.estado === "bien" || res.estado === "completo") return candidatos[i].id;
+        }
+        return candidatos[0].id;
+    }
     function hexDe(color) { return HEX[color] || "#9e9e9e"; }
 
-    /** Encaje clásico: pieza.id → hueco. */
+    /** Encaje clásico: pieza.id → hueco. Si hay `orden`, debe ir en secuencia. */
     function evaluarEncaje(reto, puestos, piezaId, huecoId) {
         const piezas = (reto && reto.piezas) || [];
         const colocadas = (puestos || []).slice();
         const pieza = piezas.find(function (p) { return p.id === piezaId; });
         if (!pieza) return { estado: "mal", colocadas: colocadas };
         if (colocadas.indexOf(piezaId) !== -1) return { estado: "puesta", colocadas: colocadas };
+        if (reto.orden && reto.orden[colocadas.length] !== piezaId) {
+            return { estado: "espera", colocadas: colocadas, esperado: reto.orden[colocadas.length] };
+        }
         const ocupado = colocadas.some(function (id) {
             const p = piezas.find(function (x) { return x.id === id; });
             return p && p.hueco === huecoId;
@@ -114,20 +162,26 @@
         };
     }
 
+    function tipoDePieza(id, reto) {
+        const piezas = (reto && reto.piezas) || [];
+        const p = piezas.find(function (x) { return x.id === id; });
+        const ref = (p && (p.elemento || p.id)) || id;
+        return String(ref).split("_")[0];
+    }
+
     function evaluarCiudad(reto, puestos, piezaId) {
         const meta = (reto && reto.meta) || 6;
         const minTipos = (reto && reto.minTipos) || 3;
+        const requeridos = (reto && reto.tiposRequeridos) || null;
         const colocadas = (puestos || []).slice();
         if (colocadas.indexOf(piezaId) !== -1) return { estado: "puesta", colocadas: colocadas };
         colocadas.push(piezaId);
         const tipos = {};
-        colocadas.forEach(function (id) {
-            const base = String(id).replace(/_\d+$/, "").replace(/_azul|_rojo|_amarillo|_verde|_naranja|_morado/g, "");
-            // cubo_azul → cubo; piramide_amarilla → piramide
-            const t = String(id).split("_")[0];
-            tipos[t] = true;
-        });
-        const okTipos = Object.keys(tipos).length >= minTipos;
+        colocadas.forEach(function (id) { tipos[tipoDePieza(id, reto)] = true; });
+        let okTipos = Object.keys(tipos).length >= minTipos;
+        if (requeridos && requeridos.length) {
+            okTipos = requeridos.every(function (t) { return !!tipos[t]; });
+        }
         return {
             estado: colocadas.length >= meta && okTipos ? "completo" : "bien",
             colocadas: colocadas,
@@ -194,6 +248,10 @@
                 }
                 if (r.tipo === "ciudad") {
                     if (!r.meta || r.meta < 4) errores.push(rt + ": meta de ciudad baja");
+                    (r.piezas || []).forEach(function (p) {
+                        const ref = p.elemento || p.id;
+                        if (!elementos[ref]) errores.push(rt + ": pieza inexistente " + ref);
+                    });
                 }
             });
         });
@@ -211,6 +269,8 @@
         mezclar: mezclar,
         distancia: distancia,
         huecoMasCercano: huecoMasCercano,
+        huecoPreferido: huecoPreferido,
+        huecoParaPieza: huecoParaPieza,
         hexDe: hexDe,
         evaluarEncaje: evaluarEncaje,
         evaluarMosaico: evaluarMosaico,

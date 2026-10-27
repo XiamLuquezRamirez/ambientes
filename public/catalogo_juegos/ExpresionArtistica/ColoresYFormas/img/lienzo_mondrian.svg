@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="280" height="220" viewBox="0 0 280 220"><rect width="280" height="220" fill="#fafafa"/><path d="M20 20h240v180H20z" fill="none" stroke="#212121" stroke-width="8"/><line x1="100" y1="20" x2="100" y2="200" stroke="#212121" stroke-width="8"/><line x1="180" y1="20" x2="180" y2="200" stroke="#212121" stroke-width="8"/><line x1="20" y1="90" x2="260" y2="90" stroke="#212121" stroke-width="8"/><line x1="20" y1="150" x2="260" y2="150" stroke="#212121" stroke-width="8"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="220" viewBox="0 0 280 220">
+  <rect width="280" height="220" fill="#fafafa"/>
+  <rect x="16" y="16" width="248" height="188" fill="none" stroke="#212121" stroke-width="8"/>
+  <!-- verticales -->
+  <line x1="110" y1="16" x2="110" y2="204" stroke="#212121" stroke-width="8"/>
+  <line x1="190" y1="16" x2="190" y2="204" stroke="#212121" stroke-width="8"/>
+  <!-- horizontales -->
+  <line x1="16" y1="100" x2="264" y2="100" stroke="#212121" stroke-width="8"/>
+  <line x1="110" y1="150" x2="264" y2="150" stroke="#212121" stroke-width="8"/>
+</svg>

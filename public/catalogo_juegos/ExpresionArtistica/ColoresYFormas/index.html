@@ -11,18 +11,18 @@
 	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css?v=20261026b">
-	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261019e">
-	<link rel="stylesheet" href="../../shared/menu-accesibilidad.css?v=20261022o">
+	<link rel="stylesheet" href="style.css?v=20261027d">
+	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261027a">
+	<link rel="stylesheet" href="../../shared/menu-accesibilidad.css?v=20261027a">
 	<link rel="stylesheet" href="../../final/final.css">
-	<link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="stylesheet" href="../../intro3d/css/intro.css?v=20261027a">
 </head>
 <body class="esperando-inicio tema-fabrica">
 	<div id="pantalla-inicio" class="pantalla-inicio">
 		<div class="inicio-mancha" aria-hidden="true"></div>
 		<div class="inicio-escena" aria-hidden="true">
-			<i class="fa-solid fa-droplet inicio-nota n1"></i>
-			<i class="fa-solid fa-palette inicio-nota n2"></i>
+			<i class="fa-solid fa-shapes inicio-nota n1"></i>
+			<i class="fa-solid fa-cube inicio-nota n2"></i>
 			<i class="fa-solid fa-star inicio-nota n3"></i>
 			<img class="inicio-pj inicio-zoe" src="../../img/zoe_normal.gif" alt="" draggable="false">
 			<img class="inicio-pj inicio-zeus" src="../../img/zeus_normal.gif" alt="" draggable="false">
@@ -30,8 +30,8 @@
 		<div class="inicio-contenido">
 			<div class="inicio-vitrina" aria-hidden="true">
 				<img class="inicio-inst i1" src="img/circulo_rojo.svg" alt="" draggable="false">
-				<img class="inicio-inst i2" src="img/circulo_amarillo.svg" alt="" draggable="false">
-				<img class="inicio-inst i3" src="img/circulo_azul.svg" alt="" draggable="false">
+				<img class="inicio-inst i2" src="img/cuadrado_amarillo.svg" alt="" draggable="false">
+				<img class="inicio-inst i3" src="img/triangulo_rojo.svg" alt="" draggable="false">
 			</div>
 			<button type="button" id="btn-empecemos" class="btn-empecemos" aria-label="Empezar">
 				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
@@ -43,7 +43,7 @@
 	<div id="intro3d-root" hidden>
 		<div id="three-container"></div>
 		<div id="phaser-container"></div>
-		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning" style="position:absolute;z-index:5;top:18px;left:18px;width:auto;padding:6pt 10pt;border-radius:8pt;font-size:24px;color:#000;">Omitir <i class="fa fa-forward"></i></button>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning">Omitir <i class="fa fa-forward"></i></button>
 		<div id="intro3d-continuar" hidden>
 			<div class="intro3d-continuar-card">
 				<div class="intro3d-titulo-wrap"><h2>¡Listo!</h2></div>
@@ -105,7 +105,7 @@
 			<div id="menu-acc-ops" class="menu-acc-ops"></div>
 		</div>
 	</div>
-	<div id="menu-vol" class="menu-acc" style="right:96px;">
+	<div id="menu-vol" class="menu-acc">
 		<button type="button" id="btn-menu-vol" class="menu-acc-fab" title="Volumen de fondo"><i class="fa-solid fa-volume-high"></i></button>
 		<div id="menu-vol-panel" class="menu-acc-panel" hidden>
 			<div class="menu-acc-cab"><strong>Volumen de fondo</strong><button type="button" id="btn-cerrar-vol" class="menu-acc-cerrar">×</button></div>
@@ -117,8 +117,8 @@
 	<script src="../../tutorial/tutorial.js?v=20261019b"></script>
 	<script src="../../final/final.js"></script>
 	<script src="../../shared/aplicar-perfil-juego.js"></script>
-	<script src="logica.js?v=20261026b"></script>
-	<script src="sfx.js?v=20261026b"></script>
+	<script src="logica.js?v=20261027c"></script>
+	<script src="sfx.js?v=20261027c"></script>
 	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
 	<script src="../../intro3d/js/config.js?v=20261007a"></script>
 	<script src="../../intro3d/js/ambientes-tema.js?v=20260930d"></script>
@@ -130,6 +130,6 @@
 	<script src="../../intro3d/js/intro.js?v=20261008a"></script>
 	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
 	<script src="../../shared/menu-accesibilidad.js?v=20261019d"></script>
-	<script src="script.js?v=20261026b"></script>
+	<script src="script.js?v=20261027c"></script>
 </body>
 </html>

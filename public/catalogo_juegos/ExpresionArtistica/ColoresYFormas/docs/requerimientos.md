@@ -117,3 +117,5 @@ Cierre del Tema y Gran Galería de Diseño
 2.	Mensaje Final del Sistema:
 o	Zoe: "¡Increíble recorrido por las formas y los colores! Creaste patrones simétricos, construiste volúmenes en 3D y diseñaste arte moderno."
 o	Zeus: "¡Tu pensamiento espacial y tu creatividad geométrica no tienen límites!"
+3.	Premio e Interfaz de Salida:
+o	Se otorga la medalla digital de "Diseñador Geométrico Prodigioso".
