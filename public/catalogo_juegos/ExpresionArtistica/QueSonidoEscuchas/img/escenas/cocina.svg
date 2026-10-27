@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Cocina colorida">
+  <defs>
+    <pattern id="baldosa" width="80" height="80" patternUnits="userSpaceOnUse">
+      <rect width="80" height="80" fill="#fff8e1"/>
+      <rect x="0" y="0" width="40" height="40" fill="#ffe0b2"/>
+      <rect x="40" y="40" width="40" height="40" fill="#ffe0b2"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="#fff3e0"/>
+  <rect x="0" y="380" width="1600" height="220" fill="url(#baldosa)"/>
+  <g stroke="#6d4c41" stroke-width="6" stroke-linejoin="round">
+    <rect x="80" y="60" width="380" height="250" rx="16" fill="#4fc3f7"/>
+    <rect x="1140" y="60" width="380" height="250" rx="16" fill="#f06292"/>
+    <path d="M270 60 V310 M1330 60 V310" fill="none"/>
+    <rect x="620" y="70" width="360" height="240" rx="16" fill="#b3e5fc"/>
+    <path d="M800 70 V310 M620 190 H980" fill="none" stroke="#fff" stroke-width="10"/>
+  </g>
+  <g fill="#fff59d">
+    <circle cx="248" cy="186" r="10"/><circle cx="292" cy="186" r="10"/>
+    <circle cx="1308" cy="186" r="10"/><circle cx="1352" cy="186" r="10"/>
+  </g>
+  <g fill="#66bb6a">
+    <circle cx="660" cy="300" r="26"/><circle cx="700" cy="290" r="30"/>
+    <rect x="650" y="300" width="70" height="40" rx="10" fill="#ff8a65"/>
+  </g>
+  <rect x="0" y="600" width="1600" height="40" fill="#8d6e63"/>
+  <g stroke="#6d4c41" stroke-width="6" stroke-linejoin="round">
+    <rect x="0" y="640" width="1600" height="260" fill="#ffb74d"/>
+    <rect x="60" y="680" width="300" height="190" rx="14" fill="#ffcc80"/>
+    <rect x="420" y="680" width="300" height="190" rx="14" fill="#ffcc80"/>
+    <rect x="880" y="680" width="300" height="190" rx="14" fill="#ffcc80"/>
+    <rect x="1240" y="680" width="300" height="190" rx="14" fill="#ffcc80"/>
+  </g>
+  <g fill="#6d4c41">
+    <rect x="190" y="700" width="40" height="12" rx="6"/>
+    <rect x="550" y="700" width="40" height="12" rx="6"/>
+    <rect x="1010" y="700" width="40" height="12" rx="6"/>
+    <rect x="1370" y="700" width="40" height="12" rx="6"/>
+  </g>
+  <g transform="translate(1260 520)" stroke="#6d4c41" stroke-width="5">
+    <rect x="0" y="40" width="140" height="44" rx="10" fill="#e57373"/>
+    <path d="M70 40 C70 0 120 0 120 30" fill="none"/>
+  </g>
+</svg>

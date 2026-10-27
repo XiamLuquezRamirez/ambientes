@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Bombo">
+  <ellipse cx="120" cy="220" rx="96" ry="10" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4">
+    <circle cx="120" cy="116" r="92" fill="#e53935"/>
+    <circle cx="120" cy="116" r="74" fill="#fafafa"/>
+    <circle cx="120" cy="116" r="58" fill="none" stroke="#fdd835" stroke-width="8"/>
+    <circle cx="120" cy="116" r="16" fill="#ffca28"/>
+    <path d="M120 208 V232" stroke-width="8" stroke-linecap="round"/>
+    <path d="M96 232 H144" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <circle cx="104" cy="108" r="6" fill="#263238"/>
+  <circle cx="136" cy="108" r="6" fill="#263238"/>
+  <path d="M108 126 C114 134 126 134 132 126" fill="none" stroke="#263238" stroke-width="4" stroke-linecap="round"/>
+</svg>

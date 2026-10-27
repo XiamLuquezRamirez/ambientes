@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Bosque de noche con estrellas">
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1033"/>
+      <stop offset="1" stop-color="#25306b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#cielo)"/>
+  <circle cx="1320" cy="160" r="80" fill="#fff9c4"/>
+  <circle cx="1354" cy="140" r="72" fill="#0f1640"/>
+  <g fill="#fff">
+    <circle cx="120" cy="90" r="4"/><circle cx="260" cy="180" r="3"/><circle cx="400" cy="70" r="5"/>
+    <circle cx="540" cy="200" r="3"/><circle cx="660" cy="110" r="4"/><circle cx="820" cy="60" r="3"/>
+    <circle cx="940" cy="170" r="5"/><circle cx="1080" cy="90" r="3"/><circle cx="1180" cy="240" r="4"/>
+    <circle cx="1500" cy="300" r="3"/><circle cx="1460" cy="80" r="4"/><circle cx="180" cy="300" r="3"/>
+    <circle cx="720" cy="300" r="3"/><circle cx="480" cy="330" r="4"/><circle cx="1000" cy="320" r="3"/>
+  </g>
+  <g fill="#ffe082">
+    <path d="M330 250 l6 14 14 6 -14 6 -6 14 -6 -14 -14 -6 14 -6 Z"/>
+    <path d="M1040 220 l5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5 Z"/>
+    <path d="M600 140 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z"/>
+  </g>
+  <path d="M0 620 C300 560 600 590 900 570 C1200 550 1400 560 1600 600 V900 H0 Z" fill="#14254a"/>
+  <g fill="#0d1a36">
+    <path d="M80 700 L180 380 L280 700 Z"/>
+    <path d="M220 720 L340 330 L460 720 Z"/>
+    <path d="M1180 720 L1300 340 L1420 720 Z"/>
+    <path d="M1340 700 L1440 400 L1540 700 Z"/>
+  </g>
+  <path d="M0 740 C400 700 1000 720 1600 700 V900 H0 Z" fill="#0a1430"/>
+  <g fill="#c6ff00" opacity="0.7">
+    <circle cx="520" cy="620" r="5"/><circle cx="760" cy="660" r="4"/><circle cx="1060" cy="610" r="5"/>
+  </g>
+</svg>

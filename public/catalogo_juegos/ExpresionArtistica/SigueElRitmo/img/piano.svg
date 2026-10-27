@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Piano">
+  <ellipse cx="120" cy="226" rx="100" ry="9" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="24" y="26" width="192" height="150" rx="12" fill="#37474f"/>
+    <rect x="36" y="40" width="168" height="64" rx="8" fill="#263238"/>
+    <path d="M16 176 H224 V196 C224 206 214 210 204 210 H36 C26 210 16 206 16 196 Z" fill="#eceff1"/>
+    <path d="M24 196 H216" stroke="#b0bec5" stroke-width="4"/>
+  </g>
+  <g fill="#fafafa" stroke="#37474f" stroke-width="2">
+    <rect x="44" y="150" width="20" height="46"/><rect x="66" y="150" width="20" height="46"/>
+    <rect x="88" y="150" width="20" height="46"/><rect x="110" y="150" width="20" height="46"/>
+    <rect x="132" y="150" width="20" height="46"/><rect x="154" y="150" width="20" height="46"/>
+    <rect x="176" y="150" width="20" height="46"/>
+  </g>
+  <g fill="#263238">
+    <rect x="60" y="150" width="12" height="28" rx="2"/><rect x="104" y="150" width="12" height="28" rx="2"/>
+    <rect x="126" y="150" width="12" height="28" rx="2"/><rect x="170" y="150" width="12" height="28" rx="2"/>
+  </g>
+  <circle cx="92" cy="74" r="7" fill="#fff"/>
+  <circle cx="148" cy="74" r="7" fill="#fff"/>
+  <circle cx="92" cy="74" r="3.5" fill="#263238"/>
+  <circle cx="148" cy="74" r="3.5" fill="#263238"/>
+  <path d="M100 94 C112 104 128 104 140 94" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+</svg>

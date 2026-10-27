@@ -1,5 +1,157 @@
 {
-    "nombre": "Sigue el ritmo",
-    "stub": true,
-    "creado_en": "2026-10-22T17:47:20-05:00"
+  "nombre": "Sigue el ritmo",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el tambor cuando se encienda la luz.",
+    "demostracionAcierto": "¡Así se sigue el ritmo!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      { "personaje": 1, "texto": "¡Hola! Bienvenido a la pista de baile." },
+      { "personaje": 0, "texto": "Hoy vamos a seguir el ritmo de la música." }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../sounds/victory.mp3",
+    "fondo": "../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "tambor"
+  },
+  "escenas": {
+    "pista": "img/escenas/pista.svg",
+    "estudio": "img/escenas/estudio.svg"
+  },
+  "animales": ["conejo", "oso", "pato"],
+  "elementos": {
+    "tambor": { "img": "img/tambor.svg", "nombre": "Tambor", "sonido": "tambor" },
+    "aplauso": { "img": "img/aplauso.svg", "nombre": "Aplausos", "sonido": "aplauso" },
+    "zapato": { "img": "img/zapato.svg", "nombre": "Zapatos", "sonido": "zapato" },
+    "piano": { "img": "img/piano.svg", "nombre": "Piano", "sonido": "piano" },
+    "guitarra": { "img": "img/guitarra.svg", "nombre": "Guitarra", "sonido": "guitarra" },
+    "bateria": { "img": "img/bateria.svg", "nombre": "Batería", "sonido": "bateria" },
+    "platillo": { "img": "img/platillos.svg", "nombre": "Platillo", "sonido": "platillo" },
+    "bombo": { "img": "img/bombo.svg", "nombre": "Bombo", "sonido": "bombo" },
+    "caja": { "img": "img/caja.svg", "nombre": "Caja", "sonido": "caja" },
+    "conejo": { "img": "img/conejo.svg", "nombre": "Conejo", "sonido": "aplauso" },
+    "oso": { "img": "img/oso.svg", "nombre": "Oso", "sonido": "aplauso" },
+    "pato": { "img": "img/pato.svg", "nombre": "Pato", "sonido": "aplauso" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "La pista de baile",
+      "tema": "pista",
+      "escena": "pista",
+      "bpm": 110,
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Hola! Bienvenido a la pista de baile." },
+        { "personaje": 0, "texto": "Hoy vamos a seguir el ritmo de la música." }
+      ],
+      "retos": [
+        {
+          "id": "pulso",
+          "tipo": "pulso",
+          "titulo": "Sigue el pulso del tambor mágico",
+          "elemento": "tambor",
+          "compases": 4,
+          "bpm": 80,
+          "consigna": { "voz": "zoe", "texto": "¡Vamos a marcar el ritmo de la fiesta! Toca el tambor cada vez que veas que se enciende con una luz dorada: ¡Un... dos... un... dos...!" },
+          "acierto": { "voz": "zoe", "texto": "¡Excelente! Seguiste el pulso del tambor perfectamente. ¡Tienes un ritmo genial!" },
+          "error": { "voz": "zeus", "texto": "¡Despacio y al compás! Escucha el latido: Bum... Bum... ¡Inténtalo otra vez!" }
+        },
+        {
+          "id": "aplausos",
+          "tipo": "pulso",
+          "titulo": "La canción de los aplausos",
+          "elemento": "aplauso",
+          "compases": 4,
+          "bpm": 100,
+          "melodia": ["do5", "mi5", "sol5", "do5"],
+          "consigna": { "voz": "zeus", "texto": "¡Ahora vamos a aplaudir con las manos! Toca el botón de los aplausos siguiendo el ritmo de la música que suena en la pista." },
+          "acierto": { "voz": "zeus", "texto": "¡Eso es! Tus manos llevan el ritmo exacto de la canción." }
+        },
+        {
+          "id": "pasos",
+          "tipo": "patron",
+          "titulo": "El baile de los pies",
+          "elemento": "zapato",
+          "bpm": 130,
+          "patron": [0, 1],
+          "pausa": 2,
+          "repeticiones": 2,
+          "consigna": { "voz": "zoe", "texto": "¡Vamos a bailar con los pies! Toca el botón del zapato dos veces seguidas y espera un momentito: ¡Paso, paso... y stop!" },
+          "acierto": [
+            { "voz": "zoe", "texto": "¡Lo lograste! Hiciste el ritmo de dos pasos y la pausa exacta." },
+            { "voz": "zeus", "texto": "¡Eres el rey de la pista de baile!" }
+          ]
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Qué gran sentido del ritmo tienes! Tus manos y tus oídos hicieron un equipo increíble." },
+        { "voz": "zeus", "texto": "¡La música se siente mucho mejor cuando seguimos el compás juntos!" }
+      ],
+      "insignia": { "img": "img/medalla_pista.svg", "nombre": "Rey de la Pista de Baile", "sonido": "celebracion" }
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El estudio de percusión",
+      "tema": "estudio",
+      "escena": "estudio",
+      "bpm": 104,
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Bienvenido al estudio de grabación!" },
+        { "personaje": 0, "texto": "Hoy vamos a tocar ritmos de verdad." }
+      ],
+      "retos": [
+        {
+          "id": "buho",
+          "tipo": "secuencia",
+          "titulo": "El compás del búho percusionista",
+          "pasos": ["aplauso", "tambor", "aplauso"],
+          "bpm": 96,
+          "consigna": { "voz": "zoe", "texto": "¡Ingeniero del ritmo! Vamos a tocar un compás de tres tiempos. Observa la pantalla: primero una palmada, luego un golpe de tambor y otra palmada. ¡Hazlo seguido!" },
+          "acierto": { "voz": "zoe", "texto": "¡Impresionante! Combinaste palmadas y tambores manteniendo el ritmo exacto." },
+          "error": { "voz": "zeus", "texto": "El orden era: Palmada, Tambor y Palmada. ¡Escucha el compás de nuevo y pruébalo otra vez!" }
+        },
+        {
+          "id": "instrumentos",
+          "tipo": "memoria",
+          "titulo": "Los grandes instrumentos",
+          "pasos": ["piano", "guitarra", "bateria"],
+          "bpm": 110,
+          "consigna": { "voz": "zeus", "texto": "¡Atención! Vamos a tocar los instrumentos en el orden que se iluminan y suenan. Atento." },
+          "acierto": { "voz": "zeus", "texto": "¡Perfecto! Seguiste la secuencia." },
+          "error": { "voz": "zoe", "texto": "Recuerda cual instrumento se ilumino y sonó primero, inténtalo nuevamente." }
+        },
+        {
+          "id": "bateria",
+          "tipo": "secuencia",
+          "titulo": "La gran batería del concierto de rock",
+          "pasos": ["platillo", "bombo", "caja", "tambor"],
+          "bpm": 104,
+          "consigna": { "voz": "zoe", "texto": "¡Reto final de percusión! Sigue la secuencia de los 4 instrumentos de la batería para encender el escenario de concierto." },
+          "acierto": [
+            { "voz": "zoe", "texto": "¡BRAVO! Tocaste la batería completa siguiendo los cuatro tiempos a la perfección." },
+            { "voz": "zeus", "texto": "¡Eres un músico de grandes ligas!" }
+          ],
+          "error": { "voz": "zeus", "texto": "¡Recuerda la secuencia, inténtalo otra vez!" }
+        }
+      ],
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Increíble trabajo rítmico! Demostraste un pulso y una memoria musical fantásticos." },
+        { "voz": "zeus", "texto": "¡Tus manos y tu sentido del compás son dignos de un verdadero baterista profesional!" }
+      ],
+      "insignia": { "img": "img/medalla_baterista.svg", "nombre": "Baterista y Maestro del Ritmo", "sonido": "aplausos" }
+    }
+  ]
 }

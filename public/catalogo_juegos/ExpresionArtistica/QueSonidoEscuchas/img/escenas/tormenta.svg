@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Tormenta el&#233;ctrica">
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#263238"/>
+      <stop offset="1" stop-color="#455a64"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#cielo)"/>
+  <g fill="#37474f">
+    <ellipse cx="200" cy="120" rx="260" ry="100"/>
+    <ellipse cx="640" cy="90" rx="300" ry="110"/>
+    <ellipse cx="1100" cy="110" rx="280" ry="100"/>
+    <ellipse cx="1500" cy="130" rx="240" ry="100"/>
+  </g>
+  <g fill="#546e7a">
+    <ellipse cx="420" cy="190" rx="220" ry="70"/>
+    <ellipse cx="900" cy="200" rx="240" ry="70"/>
+    <ellipse cx="1320" cy="210" rx="200" ry="60"/>
+  </g>
+  <g stroke="#90a4ae" stroke-width="4" stroke-linecap="round" opacity="0.55">
+    <path d="M100 300 l-20 50 M260 340 l-20 50 M420 290 l-20 50 M580 360 l-20 50 M740 300 l-20 50 M900 350 l-20 50 M1060 300 l-20 50 M1220 350 l-20 50 M1380 300 l-20 50 M1540 340 l-20 50"/>
+    <path d="M180 460 l-20 50 M340 500 l-20 50 M500 450 l-20 50 M660 510 l-20 50 M820 460 l-20 50 M980 500 l-20 50 M1140 450 l-20 50 M1300 510 l-20 50 M1460 460 l-20 50"/>
+  </g>
+  <path d="M0 700 C260 660 520 690 800 680 C1080 670 1340 650 1600 690 V900 H0 Z" fill="#1c2a30"/>
+  <g fill="#263238">
+    <rect x="160" y="560" width="120" height="160"/>
+    <rect x="1280" y="540" width="140" height="180"/>
+  </g>
+  <g fill="#ffee58" opacity="0.7">
+    <rect x="190" y="600" width="24" height="24"/><rect x="236" y="640" width="24" height="24"/>
+    <rect x="1310" y="580" width="24" height="24"/><rect x="1366" y="630" width="24" height="24"/>
+  </g>
+</svg>

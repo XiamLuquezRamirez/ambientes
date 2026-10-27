@@ -1,38 +1,1447 @@
-html, body {
-	margin: 0;
-	min-height: 100%;
-	font-family: "Nunito", system-ui, sans-serif;
-	background: #0f172a;
-	color: #e2e8f0;
+@font-face {
+    font-family: 'Fredoka';
+    src: url('../../fonts/Fredoka-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
 }
 
-.stub-wrap {
-	min-height: 100vh;
-	display: grid;
-	place-content: center;
-	gap: 0.5rem;
-	padding: 2rem;
-	text-align: center;
+@font-face {
+    font-family: 'Fredoka';
+    src: url('../../fonts/Fredoka-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 
-.stub-kicker {
-	margin: 0;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	font-size: 0.75rem;
-	color: #94a3b8;
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    letter-spacing: var(--mc-letter-spacing, 2px) !important;
 }
 
-.stub-titulo {
-	margin: 0;
-	font-size: 1.75rem;
+button,
+.btn {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    letter-spacing: var(--mc-letter-spacing, 2px) !important;
 }
 
-.stub-ayuda {
-	margin: 0;
-	color: #cbd5e1;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.enunciado {
+    font-weight: 700;
 }
 
-.stub-ayuda code {
-	color: #93c5fd;
+html.swal2-shown,
+html.swal2-height-auto,
+body.swal2-shown,
+body.swal2-height-auto {
+    height: 100% !important;
+    min-height: 100% !important;
+}
+
+body {
+    overflow: hidden;
+    background: #e9f7ff;
+    color: #262626;
+    font-family: 'Fredoka', sans-serif;
+    touch-action: manipulation;
+}
+
+body.tema-estudio {
+    background: #120b2e;
+}
+
+body.esperando-inicio #principal,
+body.esperando-inicio #menu-vol,
+body.esperando-inicio #escena-fondo,
+body.intro3d-activa #principal,
+body.intro3d-activa #menu-vol,
+body.intro3d-activa #escena-fondo {
+    visibility: hidden;
+}
+
+/* ── Pantalla de inicio: bosque mágico (3-4) o estudio (5-6) ── */
+
+.pantalla-inicio {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background: #b9e4ff url('img/escenas/bosque.svg') center / cover no-repeat;
+}
+
+.tema-estudio .pantalla-inicio {
+    background: #120b2e url('img/escenas/estudio.svg') center / cover no-repeat;
+}
+
+.pantalla-inicio[hidden] {
+    display: none !important;
+}
+
+.inicio-escena {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.inicio-nota {
+    position: absolute;
+    font-size: 42px;
+    opacity: 0.85;
+    animation: notaFlota 4s ease-in-out infinite;
+}
+
+.inicio-nota.n1 { left: 22%; top: 16%; color: #7048e8; }
+.inicio-nota.n2 { left: 72%; top: 22%; color: #f76707; font-size: 34px; animation-delay: -1.2s; }
+.inicio-nota.n3 { left: 30%; top: 64%; color: #1c7ed6; font-size: 30px; animation-delay: -2.1s; }
+.inicio-nota.n4 { left: 66%; top: 62%; color: #e64980; animation-delay: -0.6s; }
+.inicio-nota.n5 { left: 48%; top: 8%; color: #2f9e44; font-size: 28px; animation-delay: -3s; }
+
+.tema-estudio .inicio-nota { color: #69f0ae; text-shadow: 0 0 12px rgba(105, 240, 174, 0.8); }
+.tema-estudio .inicio-nota.n2 { color: #ff4081; text-shadow: 0 0 12px rgba(255, 64, 129, 0.8); }
+.tema-estudio .inicio-nota.n4 { color: #40c4ff; text-shadow: 0 0 12px rgba(64, 196, 255, 0.8); }
+
+.inicio-pj {
+    position: absolute;
+    bottom: 0;
+    height: min(62vh, 440px);
+    width: auto;
+    user-select: none;
+}
+
+.inicio-zoe { left: 4%; }
+.inicio-zeus { right: 4%; }
+
+.inicio-contenido {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 34px;
+    padding: 24px;
+}
+
+.inicio-escaner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(220px, 32vh);
+    height: min(220px, 32vh);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff 0 30%, #e5dbff 100%);
+    border: 8px solid #fff;
+    box-shadow: 0 0 0 8px rgba(151, 117, 250, 0.35), 0 14px 30px rgba(76, 47, 168, 0.3);
+}
+
+.inicio-bocina {
+    width: 72%;
+    height: 72%;
+    object-fit: contain;
+    user-select: none;
+}
+
+.inicio-cascos {
+    display: none;
+    font-size: min(110px, 16vh);
+    color: #69f0ae;
+    filter: drop-shadow(0 0 14px rgba(105, 240, 174, 0.8));
+}
+
+.tema-estudio .inicio-escaner {
+    background: radial-gradient(circle at 35% 30%, #3d2a8a 0 30%, #1b1240 100%);
+    border-color: #7c4dff;
+    box-shadow: 0 0 0 8px rgba(124, 77, 255, 0.35), 0 0 40px rgba(0, 229, 255, 0.45);
+}
+
+.tema-estudio .inicio-bocina { display: none; }
+.tema-estudio .inicio-cascos { display: block; }
+
+.inicio-escaner .onda,
+.btn-escaner .onda,
+.btn-maestro .onda {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 6px solid rgba(255, 107, 107, 0.6);
+    pointer-events: none;
+    animation: ondaSale 2.4s ease-out infinite;
+}
+
+.inicio-escaner .o2,
+.btn-escaner .o2,
+.btn-maestro .o2 { border-color: rgba(252, 196, 25, 0.6); animation-delay: 0.8s; }
+
+.inicio-escaner .o3,
+.btn-escaner .o3 { border-color: rgba(77, 171, 247, 0.6); animation-delay: 1.6s; }
+
+.btn-empecemos {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 132px;
+    height: 132px;
+    padding: 0;
+    border: 6px solid #fff;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #8ce99a 0%, #40c057 55%, #2f9e44 100%);
+    color: #fff;
+    font-size: 58px;
+    cursor: pointer;
+    box-shadow: 0 8px 0 #2b8a3e, 0 18px 28px rgba(43, 138, 62, 0.3);
+    animation: empecemosPulso 1.5s ease-in-out infinite;
+}
+
+.btn-empecemos-icono {
+    position: relative;
+    z-index: 1;
+    margin-left: 8px;
+}
+
+.btn-empecemos-anillo,
+.btn-empecemos-anillo-2 {
+    position: absolute;
+    inset: -14px;
+    border: 4px solid rgba(64, 192, 87, 0.55);
+    border-radius: 50%;
+    animation: empecemosAnillo 1.8s ease-out infinite;
+    pointer-events: none;
+}
+
+.btn-empecemos-anillo-2 {
+    animation-delay: 0.7s;
+}
+
+.inicio-mancha {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: #9775fa;
+    clip-path: circle(0px at 50% 50%);
+}
+
+.pantalla-inicio.is-out {
+    pointer-events: none;
+    animation: inicioDisuelve 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.pantalla-inicio.is-out .inicio-contenido,
+.pantalla-inicio.is-out .inicio-escena {
+    animation: inicioContenidoSalida 0.28s linear forwards;
+}
+
+.pantalla-inicio.is-out .btn-empecemos {
+    animation: none;
+    opacity: 0;
+}
+
+.pantalla-inicio.is-out .inicio-mancha {
+    animation: pinturaExpande 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+/* ── Escena de fondo (cambia en cada reto con un fundido) ──── */
+
+.escena-fondo {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.escena-capa {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+}
+
+.escena-capa.activa {
+    opacity: 1;
+}
+
+.escena-capa:not([src]) {
+    display: none;
+}
+
+/* ── Estructura ─────────────────────────────────────────────── */
+
+#principal {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px 12px;
+    box-sizing: border-box;
+}
+
+.hud-top {
+    position: absolute;
+    top: 10px;
+    left: 16px;
+    right: 16px;
+    z-index: 20;
+    display: flex;
+    justify-content: flex-end;
+    pointer-events: none;
+}
+
+.hud-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hud-top button {
+    pointer-events: auto;
+}
+
+.btn-round {
+    width: 70px;
+    height: 70px;
+    font-size: 31px;
+    border-radius: 50%;
+    border: 4px solid white;
+}
+
+/* ── Diálogo con el personaje que habla ─────────────────────── */
+
+.cabecera {
+    position: relative;
+    z-index: 15;
+    display: flex;
+    justify-content: center;
+    padding: 10px 170px 8px 0;
+}
+
+.dialogo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 900px;
+    min-height: 92px;
+    padding: 6px 18px 6px 6px;
+    box-sizing: border-box;
+    background: #fff;
+    border: 4px solid #ffb3d1;
+    border-radius: 22px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.dialogo[data-voz="zeus"] {
+    border-color: #ffd43b;
+}
+
+.dialogo.es-acierto {
+    border-color: #40c057;
+    background: #ebfbee;
+}
+
+.dialogo.pop {
+    animation: dialogoPop 0.35s ease;
+}
+
+.dialogo-avatar {
+    width: 58px;
+    height: 58px;
+    flex: 0 0 auto;
+    object-fit: contain;
+    border-radius: 50%;
+    background: #f1f3f5;
+}
+
+.enunciado {
+    margin: 0;
+    min-height: 1.3em;
+    font-size: clamp(16px, 1.6vw, 20px);
+    line-height: 1.25;
+    color: #262626;
+}
+
+/* ── Escenario ──────────────────────────────────────────────── */
+
+.escenario {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    gap: 10px;
+    padding-bottom: 6px;
+    grid-template-columns: 180px minmax(0, 1fr) 180px;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: "zoe centro zeus";
+}
+
+.pj-zoe { grid-area: zoe; }
+.pj-zeus { grid-area: zeus; }
+.centro { grid-area: centro; }
+
+.centro {
+    position: relative;
+    z-index: 7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(12px, 2.6vh, 24px);
+    min-height: 0;
+}
+
+.capa-efectos {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* ── Zoe y Zeus (con cascos de DJ en el estudio) ─────────────── */
+
+.pj {
+    position: relative;
+    z-index: 6;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    min-height: 0;
+    --pj-alto: min(52vh, 360px);
+}
+
+.pj-img {
+    flex: 0 0 auto;
+    height: var(--pj-alto);
+    width: auto;
+    max-width: none;
+    object-fit: contain;
+    transform-origin: 50% 100%;
+    user-select: none;
+    pointer-events: none;
+}
+
+.pj-cascos {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--pj-alto) * 0.74);
+    z-index: 2;
+    transform: translateX(-50%);
+    font-size: calc(var(--pj-alto) * 0.26);
+    color: #69f0ae;
+    filter: drop-shadow(0 0 10px rgba(105, 240, 174, 0.85));
+    pointer-events: none;
+}
+
+/* Solo sobre el GIF: con el modelo 3D no se conoce dónde queda la cabeza. */
+.tema-estudio .pj:not(.pj-3d) .pj-cascos {
+    display: block;
+}
+
+.pj.celebra .pj-img,
+.pj.celebra .pj-cascos {
+    animation: pjCelebra 0.7s ease-in-out infinite;
+}
+
+.pj.celebra .pj-cascos {
+    animation-name: pjCelebraCascos;
+}
+
+.pj-zeus.celebra .pj-img,
+.pj-zeus.celebra .pj-cascos {
+    animation-delay: 0.35s;
+}
+
+/* ── Progreso de los 3 retos (sin texto) ─────────────────────── */
+
+.progreso {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.progreso-punto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #d0bfff;
+    color: #d0bfff;
+    font-size: 13px;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.progreso-punto.actual {
+    border-color: #7048e8;
+    color: #7048e8;
+    transform: scale(1.2);
+}
+
+.progreso-punto.hecho {
+    background: #ffd43b;
+    border-color: #f59f00;
+    color: #fff;
+}
+
+.tema-estudio .progreso-punto {
+    background: #1b1240;
+    border-color: #5e35b1;
+    color: #5e35b1;
+}
+
+.tema-estudio .progreso-punto.actual {
+    border-color: #00e5ff;
+    color: #00e5ff;
+}
+
+.tema-estudio .progreso-punto.hecho {
+    background: #69f0ae;
+    border-color: #00c853;
+    color: #1b1240;
+}
+
+/* ── Zona central: bocina (3-4) o consola de mezclas (5-6) ──── */
+
+.zona-escucha {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 30px;
+}
+
+.btn-escaner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(168px, 24vh);
+    height: min(168px, 24vh);
+    padding: 0;
+    border: 7px solid #fff;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff 0 30%, #e5dbff 100%);
+    cursor: pointer;
+    box-shadow: 0 8px 0 #9775fa, 0 0 0 6px rgba(151, 117, 250, 0.25), 0 14px 26px rgba(76, 47, 168, 0.3);
+    transition: filter 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-escaner[hidden],
+.tema-estudio .btn-escaner {
+    display: none;
+}
+
+.escaner-img {
+    width: 76%;
+    height: 76%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+
+.btn-escaner .onda,
+.btn-maestro .onda {
+    opacity: 0;
+    animation-play-state: paused;
+}
+
+.btn-escaner.sonando .onda,
+.btn-maestro.sonando .onda {
+    opacity: 1;
+    animation-play-state: running;
+}
+
+.btn-escaner.sonando .escaner-img {
+    animation: bocinaSuena 0.45s ease-in-out infinite;
+}
+
+.btn-escaner.invita,
+.btn-maestro.invita {
+    animation: invitaEscuchar 1.2s ease-in-out infinite;
+}
+
+.btn-escaner.pulsa,
+.btn-maestro.pulsa {
+    animation: altavozSuena 0.5s ease;
+}
+
+.btn-escaner.recibe {
+    transform: scale(1.12);
+    box-shadow: 0 8px 0 #9775fa, 0 0 0 14px rgba(255, 212, 59, 0.6), 0 0 40px 10px rgba(255, 224, 102, 0.8);
+}
+
+.btn-escaner.bloqueado,
+.btn-maestro.bloqueado {
+    filter: grayscale(0.85);
+    opacity: 0.55;
+    cursor: default;
+}
+
+/* Consola de mezclas */
+
+.consola {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px 14px;
+    width: min(640px, 100%);
+    box-sizing: border-box;
+    border-radius: 26px;
+    background: linear-gradient(180deg, #2a1c5e 0%, #1b1240 100%);
+    border: 4px solid #7c4dff;
+    box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.18), 0 14px 30px rgba(0, 0, 0, 0.45);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.consola[hidden] {
+    display: none;
+}
+
+.consola-monitor {
+    position: relative;
+    width: 100%;
+    height: min(150px, 20vh);
+    overflow: hidden;
+    border-radius: 16px;
+    border: 3px solid #00e5ff;
+    background: #0b0820;
+}
+
+.monitor-capa {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+}
+
+.monitor-capa.activa {
+    opacity: 1;
+}
+
+.monitor-capa:not([src]) {
+    display: none;
+}
+
+.consola-monitor::before,
+.consola-monitor::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.consola[data-modo="noche"] .consola-monitor::after {
+    opacity: 1;
+    background-image:
+        radial-gradient(circle, #fff 0 2px, transparent 3px),
+        radial-gradient(circle, #fff59d 0 2px, transparent 3px),
+        radial-gradient(circle, #fff 0 1.5px, transparent 2.5px);
+    background-size: 90px 60px, 130px 80px, 60px 50px;
+    background-position: 10px 8px, 40px 20px, 25px 30px;
+    animation: titilar 2.2s ease-in-out infinite;
+}
+
+.consola[data-modo="tormenta"] .consola-monitor::before {
+    background: #fff;
+    animation: relampago 4s linear infinite;
+}
+
+.eq {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 70%;
+}
+
+.eq span {
+    width: 14px;
+    height: 18%;
+    border-radius: 7px;
+    background: linear-gradient(0deg, #00e5ff, #7c4dff 60%, #ff4081);
+    opacity: 0.85;
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+    transform-origin: 50% 100%;
+}
+
+.consola.sonando .eq span {
+    animation: eqSube 0.5s ease-in-out infinite alternate;
+}
+
+.consola.sonando .eq span:nth-child(2n) { animation-duration: 0.37s; }
+.consola.sonando .eq span:nth-child(3n) { animation-duration: 0.61s; animation-delay: -0.2s; }
+.consola.sonando .eq span:nth-child(4n) { animation-duration: 0.43s; animation-delay: -0.1s; }
+
+.consola.brillo-verde {
+    border-color: #69f0ae;
+    box-shadow: 0 0 0 6px rgba(105, 240, 174, 0.5), 0 0 50px 14px rgba(105, 240, 174, 0.55);
+}
+
+.consola.pausada {
+    animation: consolaPausa 0.7s ease;
+}
+
+.consola.relampaguea {
+    animation: consolaRelampaguea 0.9s ease;
+}
+
+.consola-mandos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+}
+
+.btn-maestro {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(84px, 12vh);
+    height: min(84px, 12vh);
+    flex: 0 0 auto;
+    padding: 0;
+    border: 5px solid #fff;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #69f0ae 0%, #00c853 100%);
+    color: #fff;
+    font-size: min(36px, 5vh);
+    cursor: pointer;
+    box-shadow: 0 6px 0 #009624, 0 0 22px rgba(105, 240, 174, 0.6);
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-maestro i {
+    margin-left: 5px;
+}
+
+.btn-maestro.sonando i {
+    animation: altavozSuena 0.6s ease-in-out infinite;
+}
+
+.pistas {
+    display: flex;
+    gap: 12px;
+}
+
+.pista {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: min(64px, 9vh);
+    padding: 0 14px;
+    border: 4px solid var(--pista-color, #00e5ff);
+    border-radius: 18px;
+    background: #120b2e;
+    color: var(--pista-color, #00e5ff);
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--pista-color, #00e5ff) 55%, transparent);
+    transition: opacity 0.2s ease, filter 0.2s ease, transform 0.15s ease;
+}
+
+.pista:active {
+    transform: scale(0.95);
+}
+
+.pista-eq {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 28px;
+}
+
+.pista-eq i {
+    width: 6px;
+    height: 30%;
+    border-radius: 3px;
+    background: var(--pista-color, #00e5ff);
+}
+
+.pista.sonando .pista-eq i {
+    animation: eqSube 0.45s ease-in-out infinite alternate;
+}
+
+.pista.sonando .pista-eq i:nth-child(2) { animation-duration: 0.33s; }
+.pista.sonando .pista-eq i:nth-child(3) { animation-duration: 0.57s; }
+
+.pista-estado {
+    font-size: 20px;
+}
+
+.pista.apagada {
+    opacity: 0.42;
+    filter: grayscale(0.6);
+    box-shadow: none;
+}
+
+.pista.apagada .pista-eq i {
+    animation: none;
+}
+
+.pista[disabled] {
+    cursor: default;
+}
+
+/* ── Tarjetas grandes (sin nombre escrito) ──────────────────── */
+
+.opciones {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(28px, 5vw, 70px);
+    min-height: min(240px, 33vh);
+}
+
+.opcion {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(230px, 31vh);
+    height: min(230px, 31vh);
+    padding: 12px;
+    border: 6px solid #fff;
+    border-radius: 30px;
+    background: radial-gradient(circle at 30% 25%, #fff 0 35%, #f1f3f5 100%);
+    box-shadow: 0 8px 0 #ced4da, 0 14px 24px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    touch-action: none;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.tema-estudio .opciones {
+    min-height: min(196px, 27vh);
+}
+
+.tema-estudio .opcion {
+    width: min(186px, 25vh);
+    height: min(186px, 25vh);
+    border-color: #b388ff;
+    box-shadow: 0 8px 0 #5e35b1, 0 0 18px rgba(124, 77, 255, 0.5);
+}
+
+.opcion-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+
+.opcion.toca {
+    animation: tocaOpcion 0.45s ease;
+}
+
+.opcion.arrastrando {
+    z-index: 50;
+    cursor: grabbing;
+    transition: none;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
+}
+
+.opcion.vuelve {
+    transition: transform 0.3s ease;
+}
+
+.opcion.correcta {
+    border-color: #69db7c;
+    box-shadow: 0 8px 0 #2f9e44, 0 0 0 6px rgba(105, 219, 124, 0.45), 0 14px 30px rgba(47, 158, 68, 0.35);
+}
+
+.opcion.apagada {
+    opacity: 0.35;
+    filter: grayscale(0.7);
+}
+
+.opcion.resalta {
+    animation: resaltaPulso 1.2s ease-in-out infinite;
+}
+
+.opcion.tiembla {
+    animation: tiembla 0.55s ease;
+}
+
+.opcion.salta {
+    animation: salta 1s ease;
+}
+
+.opcion.luz-emergencia {
+    animation: luzEmergencia 0.5s linear infinite;
+}
+
+.opcion.brillo-dorado {
+    border-color: #ffd54f;
+    animation: brilloDorado 0.6s ease-in-out infinite alternate;
+}
+
+/* ── Partículas y efectos ───────────────────────────────────── */
+
+.particula {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+}
+
+.p-estrella {
+    width: 16px;
+    height: 16px;
+    background: #ffd43b;
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.p-corazon {
+    width: 22px;
+    height: 20px;
+    background: #ff6b6b;
+    clip-path: path("M11 20 L2 10.5 C-1 7.5 0.5 1 5.5 1 C8 1 10 3 11 5 C12 3 14 1 16.5 1 C21.5 1 23 7.5 20 10.5 Z");
+}
+
+.p-confeti {
+    width: 10px;
+    height: 16px;
+    border-radius: 2px;
+}
+
+.p-nota {
+    width: auto;
+    height: auto;
+    font-size: 22px;
+    color: #7048e8;
+}
+
+/* Gotita luminosa que cae de la llave al lavabo */
+.gota-luz {
+    position: fixed;
+    width: 12px;
+    height: 18px;
+    margin: -9px 0 0 -6px;
+    border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+    background: radial-gradient(circle at 40% 60%, #e3fafc 0 25%, #66d9e8 60%, #1098ad 100%);
+    box-shadow: 0 0 10px 3px rgba(102, 217, 232, 0.9);
+    pointer-events: none;
+}
+
+.onda-lavabo {
+    position: fixed;
+    width: 30px;
+    height: 10px;
+    margin: -5px 0 0 -15px;
+    border: 3px solid rgba(102, 217, 232, 0.9);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Vehículo que cruza la pantalla a toda velocidad */
+.vehiculo-cruza {
+    position: fixed;
+    z-index: 950;
+    pointer-events: none;
+    filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.3));
+}
+
+.vehiculo-cruza.con-luz {
+    animation: luzVehiculo 0.35s linear infinite;
+}
+
+/* Rayo que cruza el panel de la consola */
+.rayo {
+    position: fixed;
+    z-index: 950;
+    pointer-events: none;
+    overflow: visible;
+    filter: drop-shadow(0 0 12px #fff59d) drop-shadow(0 0 26px #ffd600);
+}
+
+.rayo polyline {
+    fill: none;
+    stroke: #fffde7;
+    stroke-width: 10;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.destello-pantalla {
+    position: fixed;
+    inset: 0;
+    z-index: 940;
+    background: #fff;
+    pointer-events: none;
+}
+
+/* ── Concierto final ────────────────────────────────────────── */
+
+.concierto {
+    position: fixed;
+    inset: 0;
+    z-index: 800;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 14vh;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 40%, rgba(255, 243, 191, 0.55) 100%);
+}
+
+.concierto[hidden] {
+    display: none;
+}
+
+/* La mano de ayuda tiene que verse sobre los pads del concierto. */
+body.concierto-activo .demo-dedo {
+    z-index: 860;
+}
+
+.tema-estudio .concierto {
+    background: radial-gradient(ellipse at 50% 100%, rgba(124, 77, 255, 0.4) 0%, rgba(18, 11, 46, 0.25) 70%);
+}
+
+.concierto-tarima {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: clamp(24px, 5vw, 64px);
+    pointer-events: auto;
+}
+
+.concierto-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(200px, 26vh);
+    height: min(200px, 26vh);
+    padding: 10px;
+    border: 6px solid #fff;
+    border-radius: 30px;
+    background: radial-gradient(circle at 30% 25%, #fff 0 35%, #fff3bf 100%);
+    box-shadow: 0 8px 0 #f59f00, 0 14px 24px rgba(0, 0, 0, 0.18);
+    transform-origin: 50% 100%;
+}
+
+.concierto-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+}
+
+.concierto-item.canta {
+    animation: canta 0.45s ease;
+}
+
+/* 5-6: pads de la consola maestra que el niño enciende */
+.pad {
+    cursor: pointer;
+    border-color: #5e35b1;
+    background: #1b1240;
+    box-shadow: 0 8px 0 #311b92, 0 0 0 rgba(0, 0, 0, 0);
+    filter: grayscale(0.7) brightness(0.75);
+    transition: filter 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.pad.activo {
+    border-color: #69f0ae;
+    background: radial-gradient(circle at 30% 25%, #fff 0 35%, #e0f7fa 100%);
+    box-shadow: 0 8px 0 #00c853, 0 0 34px 8px rgba(105, 240, 174, 0.7);
+    filter: none;
+}
+
+.concierto-luces .cn {
+    position: absolute;
+    font-size: 46px;
+    color: #f76707;
+    opacity: 0.85;
+    animation: notaFlota 2.6s ease-in-out infinite;
+}
+
+.concierto-luces .n1 { left: 14%; top: 26%; }
+.concierto-luces .n2 { left: 34%; top: 14%; color: #7048e8; animation-delay: -0.6s; }
+.concierto-luces .n3 { left: 62%; top: 18%; color: #1c7ed6; animation-delay: -1.2s; }
+.concierto-luces .n4 { left: 82%; top: 28%; color: #e64980; animation-delay: -1.8s; }
+
+.tema-estudio .concierto-luces .cn {
+    color: #69f0ae;
+    text-shadow: 0 0 14px rgba(105, 240, 174, 0.9);
+}
+
+/* ── Final: insignia visual sin texto ───────────────────────── */
+
+.trofeo.insignia {
+    /* Más grande choca con los botones de "¿Quieres jugar nuevamente?" en 1280×720. */
+    width: min(10vw, 128px);
+    cursor: pointer;
+    pointer-events: auto;
+    filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
+}
+
+/* Tras el primer toque la insignia ya no repite el rebote de entrada al quitar el giro. */
+.mostrar-trofeo .trofeo.insignia.quieta {
+    animation: flotarTrofeo 2.5s ease-in-out infinite;
+}
+
+.mostrar-trofeo .trofeo.insignia.gira {
+    animation: giraInsignia 1s ease-in-out;
+}
+
+.final {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    width: 100%;
+    height: 100%;
+    background: #173f6d;
+}
+
+.final[hidden] {
+    display: none !important;
+}
+
+.btn-eleccion {
+    width: 100%;
+    max-width: 320px;
+    min-height: 72px;
+    font-size: 22px;
+    font-weight: 700;
+    border-radius: 16px;
+    border: 4px solid #fff;
+    line-height: 1.25;
+}
+
+.swal2-html-container {
+    overflow: hidden;
+}
+
+/* ── Menú de volumen ────────────────────────────────────────── */
+
+.menu-acc {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 1500;
+}
+
+.menu-acc-fab {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    background: #1565c0;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.menu-acc-fab:focus {
+    outline: 3px solid #ffd54f;
+    outline-offset: 2px;
+}
+
+.menu-acc-panel {
+    position: absolute;
+    right: 0;
+    bottom: 76px;
+    width: min(320px, calc(100vw - 32px));
+    max-height: min(70vh, 480px);
+    overflow: auto;
+    background: #fff;
+    color: #222;
+    border: 3px solid #1565c0;
+    border-radius: 16px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+    padding: 10px 12px 12px;
+}
+
+.menu-acc-cab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.menu-acc-cerrar {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: transparent;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    color: #222;
+}
+
+.menu-acc-op {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 4px;
+    border-radius: 8px;
+}
+
+.menu-acc-rango {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    cursor: default;
+}
+
+.menu-acc-rango span {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.menu-acc-rango input[type="range"] {
+    width: 100%;
+    height: 22px;
+}
+
+/* ── Pantallas bajas (1280×720 con barra del navegador) ─────── */
+
+@media (max-height: 760px) {
+    .dialogo { min-height: 76px; }
+    .dialogo-avatar { width: 50px; height: 50px; }
+    .zona-escucha { margin-top: 26px; }
+    .consola { padding: 8px 12px 10px; gap: 8px; }
+}
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+
+@keyframes empecemosPulso {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+@keyframes empecemosAnillo {
+    0% { transform: scale(0.92); opacity: 0.7; }
+    100% { transform: scale(1.35); opacity: 0; }
+}
+
+@keyframes inicioContenidoSalida {
+    to { opacity: 0; }
+}
+
+@keyframes pinturaExpande {
+    from { clip-path: circle(0px at 50% 50%); }
+    to { clip-path: circle(150vmax at 50% 50%); }
+}
+
+@keyframes inicioDisuelve {
+    0%, 58% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes notaFlota {
+    0%, 100% { transform: translateY(0) rotate(-8deg); }
+    50% { transform: translateY(-18px) rotate(8deg); }
+}
+
+@keyframes ondaSale {
+    0% { transform: scale(1); opacity: 0.85; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+@keyframes dialogoPop {
+    0% { transform: scale(0.97); }
+    60% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+@keyframes altavozSuena {
+    0%, 100% { transform: scale(1); }
+    40% { transform: scale(1.14); }
+}
+
+@keyframes bocinaSuena {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.08) rotate(-6deg); }
+}
+
+@keyframes invitaEscuchar {
+    0%, 100% { box-shadow: 0 8px 0 #9775fa, 0 0 0 0 rgba(255, 212, 59, 0.8); }
+    50% { box-shadow: 0 8px 0 #9775fa, 0 0 0 20px rgba(255, 212, 59, 0); }
+}
+
+@keyframes tocaOpcion {
+    0% { transform: none; }
+    35% { transform: scale(0.92); }
+    100% { transform: none; }
+}
+
+@keyframes resaltaPulso {
+    0%, 100% { box-shadow: 0 8px 0 #ced4da, 0 0 0 0 rgba(255, 212, 59, 0.9); }
+    50% { box-shadow: 0 8px 0 #ced4da, 0 0 0 14px rgba(255, 212, 59, 0); }
+}
+
+/* Estremecimiento suave: la tarjeta no "regaña", solo avisa. */
+@keyframes tiembla {
+    0%, 100% { transform: none; }
+    20% { transform: translateX(-6px) rotate(-1.5deg); }
+    40% { transform: translateX(6px) rotate(1.5deg); }
+    60% { transform: translateX(-4px) rotate(-1deg); }
+    80% { transform: translateX(4px) rotate(1deg); }
+}
+
+@keyframes salta {
+    0%, 100% { transform: none; }
+    25% { transform: translateY(-34px) scale(1.08); }
+    45% { transform: translateY(0) scale(1.06, 0.94); }
+    65% { transform: translateY(-14px) scale(1.04); }
+    85% { transform: none; }
+}
+
+@keyframes luzEmergencia {
+    0%, 100% { box-shadow: 0 8px 0 #2f9e44, 0 0 0 8px rgba(255, 82, 82, 0.75), 0 0 40px 12px rgba(255, 82, 82, 0.7); }
+    50% { box-shadow: 0 8px 0 #2f9e44, 0 0 0 8px rgba(68, 138, 255, 0.5), 0 0 30px 6px rgba(68, 138, 255, 0.4); }
+}
+
+@keyframes luzVehiculo {
+    0%, 100% { filter: drop-shadow(0 0 18px rgba(255, 82, 82, 0.95)); }
+    50% { filter: drop-shadow(0 0 4px rgba(255, 82, 82, 0.2)); }
+}
+
+@keyframes brilloDorado {
+    from { box-shadow: 0 8px 0 #f59f00, 0 0 0 6px rgba(255, 213, 79, 0.4), 0 0 20px 4px rgba(255, 213, 79, 0.5); }
+    to { box-shadow: 0 8px 0 #f59f00, 0 0 0 10px rgba(255, 213, 79, 0.8), 0 0 46px 14px rgba(255, 213, 79, 0.9); }
+}
+
+@keyframes eqSube {
+    from { height: 14%; }
+    to { height: 100%; }
+}
+
+@keyframes titilar {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
+@keyframes relampago {
+    0%, 86%, 90%, 100% { opacity: 0; }
+    87% { opacity: 0.8; }
+    88% { opacity: 0.1; }
+    89% { opacity: 0.6; }
+}
+
+@keyframes consolaPausa {
+    0%, 100% { border-color: #7c4dff; }
+    30%, 70% { border-color: #ffb300; box-shadow: 0 0 0 6px rgba(255, 179, 0, 0.35), 0 14px 30px rgba(0, 0, 0, 0.45); }
+}
+
+@keyframes consolaRelampaguea {
+    0%, 100% { filter: none; }
+    15% { filter: brightness(2.2); }
+    30% { filter: brightness(1); }
+    45% { filter: brightness(1.8); }
+}
+
+@keyframes canta {
+    0% { transform: none; }
+    35% { transform: translateY(-26px) scale(1.12, 0.92); }
+    65% { transform: translateY(0) scale(0.96, 1.06); }
+    100% { transform: none; }
+}
+
+@keyframes pjCelebra {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-24px) rotate(-3deg); }
+}
+
+@keyframes pjCelebraCascos {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, -24px) rotate(-3deg); }
+}
+
+@keyframes giraInsignia {
+    0% { transform: translate(-50%, 0) perspective(300px) rotateY(0deg); }
+    100% { transform: translate(-50%, 0) perspective(300px) rotateY(720deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn-empecemos,
+    .btn-empecemos-anillo,
+    .btn-empecemos-anillo-2,
+    .inicio-nota,
+    .inicio-escaner .onda,
+    .btn-escaner .onda,
+    .btn-maestro .onda,
+    .btn-escaner.sonando .escaner-img,
+    .btn-escaner.invita,
+    .btn-maestro.invita,
+    .consola.sonando .eq span,
+    .pista.sonando .pista-eq i,
+    .consola-monitor::before,
+    .consola-monitor::after,
+    .concierto-luces .cn,
+    .pj.celebra .pj-img,
+    .pj.celebra .pj-cascos,
+    .dialogo {
+        animation: none !important;
+        transition: none;
+    }
+
+    .pantalla-inicio.is-out {
+        opacity: 0;
+        animation: none;
+    }
+}
+
+body.alto-contraste .menu-acc-fab {
+    background: #000;
+    border-color: #ffeb3b;
+    color: #ffeb3b;
+}
+
+body.alto-contraste .menu-acc-panel {
+    background: #111;
+    color: #fff;
+    border-color: #ffeb3b;
+}
+
+body.alto-contraste .menu-acc-cerrar {
+    color: #fff;
 }

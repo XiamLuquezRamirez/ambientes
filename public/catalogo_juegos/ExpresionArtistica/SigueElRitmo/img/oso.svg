@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Oso">
+  <ellipse cx="120" cy="222" rx="74" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <circle cx="62" cy="78" r="30" fill="#8d6e63"/>
+    <circle cx="178" cy="78" r="30" fill="#8d6e63"/>
+    <circle cx="62" cy="78" r="16" fill="#d7ccc8"/>
+    <circle cx="178" cy="78" r="16" fill="#d7ccc8"/>
+    <circle cx="120" cy="140" r="74" fill="#a1887f"/>
+    <ellipse cx="120" cy="160" rx="40" ry="32" fill="#efebe9"/>
+    <ellipse cx="120" cy="150" rx="12" ry="9" fill="#6d4c41"/>
+    <circle cx="96" cy="128" r="8" fill="#263238"/>
+    <circle cx="144" cy="128" r="8" fill="#263238"/>
+    <circle cx="99" cy="125" r="3" fill="#fff"/>
+    <circle cx="147" cy="125" r="3" fill="#fff"/>
+    <path d="M100 176 C110 188 130 188 140 176" fill="none" stroke="#6d4c41" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

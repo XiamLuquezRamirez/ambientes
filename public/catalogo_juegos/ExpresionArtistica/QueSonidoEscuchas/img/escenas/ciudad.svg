@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Pista urbana con v&#237;as del tren">
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1f4d"/>
+      <stop offset="1" stop-color="#3b2a6b"/>
+    </linearGradient>
+    <pattern id="rejilla" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0 H0 V80" fill="none" stroke="#5c6bc0" stroke-width="1" opacity="0.35"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#cielo)"/>
+  <rect width="1600" height="900" fill="url(#rejilla)"/>
+  <g fill="#283593" stroke="#7986cb" stroke-width="3">
+    <rect x="40" y="300" width="180" height="340"/>
+    <rect x="240" y="220" width="160" height="420"/>
+    <rect x="420" y="340" width="200" height="300"/>
+    <rect x="980" y="260" width="180" height="380"/>
+    <rect x="1180" y="320" width="160" height="320"/>
+    <rect x="1360" y="230" width="200" height="410"/>
+  </g>
+  <g fill="#ffd54f" opacity="0.8">
+    <rect x="80" y="340" width="30" height="30"/><rect x="150" y="400" width="30" height="30"/>
+    <rect x="280" y="260" width="30" height="30"/><rect x="340" y="340" width="30" height="30"/>
+    <rect x="460" y="380" width="30" height="30"/><rect x="540" y="450" width="30" height="30"/>
+    <rect x="1020" y="300" width="30" height="30"/><rect x="1090" y="380" width="30" height="30"/>
+    <rect x="1220" y="360" width="30" height="30"/><rect x="1400" y="270" width="30" height="30"/>
+    <rect x="1480" y="350" width="30" height="30"/>
+  </g>
+  <rect x="0" y="640" width="1600" height="260" fill="#1b1f3b"/>
+  <g stroke="#9fa8da" stroke-width="10">
+    <path d="M0 730 H1600 M0 800 H1600"/>
+  </g>
+  <g stroke="#6d4c41" stroke-width="16">
+    <path d="M40 715 V815 M140 715 V815 M240 715 V815 M340 715 V815 M440 715 V815 M540 715 V815 M640 715 V815 M740 715 V815 M840 715 V815 M940 715 V815 M1040 715 V815 M1140 715 V815 M1240 715 V815 M1340 715 V815 M1440 715 V815 M1540 715 V815"/>
+  </g>
+  <g transform="translate(780 420)">
+    <rect x="-8" y="0" width="16" height="250" fill="#cfd8dc"/>
+    <g transform="translate(0 40)">
+      <rect x="-90" y="-16" width="180" height="32" rx="6" fill="#fafafa" transform="rotate(30)"/>
+      <rect x="-90" y="-16" width="180" height="32" rx="6" fill="#fafafa" transform="rotate(-30)"/>
+    </g>
+    <circle cx="-36" cy="110" r="20" fill="#ff5252"/>
+    <circle cx="36" cy="110" r="20" fill="#ff5252" opacity="0.4"/>
+  </g>
+</svg>
