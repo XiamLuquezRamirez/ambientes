@@ -1235,8 +1235,17 @@ function tamanoZona(id) {
 function aplicarTamanoHueco(el, id) {
     if (!el) return;
     const t = tamanoZona(id);
-    el.style.width = t.w + "px";
-    el.style.height = t.h + "px";
+    let w = t.w;
+    let h = t.h;
+    if (el.closest && el.closest("#bandeja")) {
+        const maxW = 190;
+        const maxH = 148;
+        const escala = Math.min(1, maxW / Math.max(w, 1), maxH / Math.max(h, 1));
+        w = Math.round(w * escala);
+        h = Math.round(h * escala);
+    }
+    el.style.width = w + "px";
+    el.style.height = h + "px";
 }
 
 function sizePiezasAHuecos() {

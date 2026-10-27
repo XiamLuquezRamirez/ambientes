@@ -152,27 +152,30 @@ $pares = $config['pares'] ?? [];
 $objetos = $config['objetos'] ?? [];
 $destinos = $config['destinos'] ?? [];
 
-foreach (['manzana', 'taladro', 'pato'] as $obj) {
+$porCaja = [];
+foreach ($pares as $obj => $dest) {
     if (empty($objetos[$obj]['img'])) {
         fail("objeto {$obj} sin img");
-    } elseif (! is_file($dir.'/'.ltrim($objetos[$obj]['img'], '/'))) {
-        fail("objeto {$obj} img no existe en disco");
-    } else {
-        ok("objeto {$obj} OK");
+        continue;
     }
-    $dest = $pares[$obj] ?? null;
-    if (! $dest || empty($destinos[$dest]['img'])) {
-        fail("par {$obj} → destino inválido");
+    $ruta = $dir.'/'.ltrim($objetos[$obj]['img'], '/');
+    if (! is_file($ruta)) {
+        fail("objeto {$obj} img no existe en disco");
+    }
+    if (empty($destinos[$dest]['img'])) {
+        fail("par {$obj} → destino inválido {$dest}");
     } else {
-        ok("par {$obj} → {$dest}");
+        $porCaja[$dest][] = $obj;
     }
 }
+ok('Objetos en catálogo: '.count($objetos));
 
-foreach (['caja_ropa', 'caja_alimentos'] as $d) {
-    if (empty($destinos[$d]['img'])) {
-        fail("destino distractor {$d} sin img");
+foreach (['caja_manzana', 'caja_herramientas', 'caja_juguetes', 'caja_ropa', 'caja_alimentos'] as $d) {
+    $n = count($porCaja[$d] ?? []);
+    if ($n < 6) {
+        fail("{$d} tiene {$n} objetos, se esperan al menos 6");
     } else {
-        ok("distractor {$d} OK");
+        ok("{$d}: {$n} objetos");
     }
 }
 
@@ -190,16 +193,12 @@ foreach ($config['niveles'] ?? [] as $nivel) {
     if ($rondas !== $esp) {
         fail("Nivel {$id}: se esperan {$esp} rondas, hay {$rondas}");
     } else {
-        ok("Nivel {$id}: {$rondas} rondas, destinos=".count($nivel['destinos'] ?? []));
-    }
-    foreach ($nivel['objetos'] ?? [] as $o) {
-        if (! isset($objetos[$o]) || ! isset($pares[$o])) {
-            fail("Nivel {$id}: objeto desconocido {$o}");
-        }
-    }
-    foreach ($nivel['destinos'] ?? [] as $d) {
-        if (! isset($destinos[$d])) {
-            fail("Nivel {$id}: destino desconocido {$d}");
+        $lugares = (int) ($nivel['lugares'] ?? 0);
+        $porRonda = (int) ($nivel['objetosPorRonda'] ?? 0);
+        if ($lugares < $porRonda || $porRonda < 1) {
+            fail("Nivel {$id}: lugares={$lugares} objetosPorRonda={$porRonda}");
+        } else {
+            ok("Nivel {$id}: {$rondas} rondas, lugares={$lugares}, objetos={$porRonda}");
         }
     }
 }

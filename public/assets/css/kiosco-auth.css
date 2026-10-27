@@ -281,7 +281,7 @@
     justify-content: center;
     gap: clamp(36px, 6vw, 96px);
     padding: clamp(20px, 4vh, 40px) clamp(20px, 5vw, 64px);
-    background-image: url("../images/vista_nino/fondo_pin.png");
+    background-image: var(--pin-fondo, url("../../catalogo_juegos/Polimotor/img/fondo_juegos.png"));
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 100% 100%;
@@ -355,6 +355,147 @@
     display: block;
     max-width: 100%;
     line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Multisensorial: la misma flor de la lista de alumnos. Las otras aulas siguen con la ficha de arriba. */
+.ficha-aula--flor {
+    display: block;
+    width: clamp(210px, 26vw, 280px);
+    aspect-ratio: 280.39 / 281.2;
+}
+
+.ficha-flor {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    container-type: size;
+}
+
+.ficha-flor::before,
+.ficha-flor::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.ficha-flor::before {
+    z-index: 0;
+    background: color-mix(in srgb, var(--marco, #ee6747) 40%, #000);
+    -webkit-mask-image: var(--aula-resplandor);
+    mask-image: var(--aula-resplandor);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 84.347% 85.103%;
+    mask-size: 84.347% 85.103%;
+    -webkit-mask-position: 52.405% 54.76%;
+    mask-position: 52.405% 54.76%;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+}
+
+.ficha-flor::after {
+    z-index: 6;
+    background: var(--marco, #ee6747);
+    -webkit-mask-image: var(--aula-punteado);
+    mask-image: var(--aula-punteado);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+}
+
+.ficha-flor__cuerpo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-color: var(--marco, #ee6747);
+    -webkit-mask-image: var(--aula-marco);
+    mask-image: var(--aula-marco);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+}
+
+.ficha-flor__foto {
+    position: absolute;
+    z-index: 2;
+    left: 24.2056%;
+    top: 15.3556%;
+    width: 51.5889%;
+    height: 51.6145%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    -webkit-mask-image: var(--aula-hueco);
+    mask-image: var(--aula-hueco);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+}
+
+.ficha-flor__foto .kiosco-avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    object-fit: cover;
+}
+
+.ficha-flor__foto:has(.ficha-flor__iniciales) {
+    background: #fff;
+}
+
+.ficha-flor__iniciales {
+    font-family: "Fredoka One", cursive;
+    font-size: 28cqmin;
+    line-height: 1;
+    color: var(--marco, #ee6747);
+}
+
+.ficha-flor__nombre {
+    position: absolute;
+    z-index: 4;
+    left: 49.41%;
+    top: 75.6%;
+    width: 76%;
+    height: 22%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: "Fredoka One", cursive;
+    font-size: 8cqh;
+    line-height: 1.05;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(110, 40, 20, 0.28);
+    pointer-events: none;
+}
+
+.ficha-flor__nombre span {
+    display: block;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

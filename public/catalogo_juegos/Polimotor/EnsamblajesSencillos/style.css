@@ -47,11 +47,7 @@ body.swal2-height-auto {
 
 body {
   overflow: hidden;
-  background: #f7fbff;
-  background-image:
-    radial-gradient(circle at 8% 12%, #f8d7e8 0 80px, transparent 81px),
-    radial-gradient(circle at 92% 10%, #d6e8ff 0 90px, transparent 91px),
-    radial-gradient(circle at 90% 88%, #ffe3c4 0 100px, transparent 101px);
+  background: #c5c9f8 url("img/fondo.png") center / cover no-repeat;
   color: #262626;
   font-family: 'Fredoka', sans-serif;
 }
@@ -240,8 +236,9 @@ body.intro3d-activa #menu-acc {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 0 16px 12px;
+  padding: 0;
   box-sizing: border-box;
+  background: transparent;
 }
 
 .hud-top {
@@ -288,8 +285,8 @@ body.intro3d-activa #menu-acc {
   text-align: center;
   font-size: clamp(120px, 22vw, 220px);
   font-weight: 700;
-  color: #1565c0;
-  text-shadow: 4px 4px 0 #fff;
+  color: #fff;
+  text-shadow: 0 4px 0 rgba(40, 20, 90, 0.28);
   pointer-events: none;
   line-height: 0.9;
 }
@@ -301,15 +298,18 @@ body.intro3d-activa #menu-acc {
 .cuenta-label {
   font-size: clamp(22px, 3.4vw, 40px);
   font-weight: 600;
-  color: #5b6b7c;
+  color: #fff;
   text-shadow: none;
   line-height: 1.2;
   max-width: 90%;
 }
 
 .referencia-completa {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 6;
   width: 140px;
-  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.7);
   border: 3px solid #fff;
   border-radius: 16px;
@@ -351,7 +351,7 @@ body.intro3d-activa #menu-acc {
   min-width: 64px;
   text-align: center;
   font-size: 29px;
-  color: #ececec;
+  color: #fff;
   background: #4500ae;
   border: 3px solid #fff;
   border-radius: 12px;
@@ -362,36 +362,72 @@ body.intro3d-activa #menu-acc {
   display: none !important;
 }
 
+#progreso.hud-progreso,
+#progreso.hud-progreso i,
+body.demo-activa #progreso.hud-progreso,
+body.demo-activa #progreso.hud-progreso i {
+  color: #fff;
+}
+
 .escenario {
+  position: relative;
   flex: 1;
-  display: flex;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: minmax(280px, 44%) minmax(320px, 1fr);
+  align-items: end;
   min-height: 0;
   height: 100%;
+  padding: 4vh 4vw 0 2vw;
+  box-sizing: border-box;
+  gap: 1vw;
 }
 
 .lienzo-wrap {
-  width: 44%;
+  position: relative;
+  width: auto;
+  height: 100%;
   display: flex;
   justify-content: center;
-  align-items: stretch;
+  align-items: flex-end;
+  padding-bottom: 0;
+}
+
+.lienzo-wrap::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 5vh;
+  z-index: 0;
+  width: min(520px, 90%);
+  height: 14vh;
+  transform: translateX(-50%);
+  background: url("img/base.png") center bottom / contain no-repeat;
+  pointer-events: none;
 }
 
 #lienzo {
   position: relative;
-  width: min(420px, 42vw);
-  height: 100%;
-  background: rgba(255, 255, 255, 0.72);
-  border: 4px dashed #9ec9ea;
-  border-radius: 24px;
-  overflow: hidden;
+  z-index: 1;
+  flex: 0 0 auto;
+  width: min(430px, 34vw);
+  height: auto;
+  aspect-ratio: 389 / 522;
+  margin-bottom: 19vh;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
 }
 
 body.modo-svg #lienzo {
-  width: auto;
-  height: 100%;
+  width: min(430px, 34vw);
+  height: auto;
   aspect-ratio: 389 / 522;
-  max-width: 45vw;
+  max-width: none;
+  flex: 0 0 auto;
+  margin-bottom: 19vh;
+  background: transparent;
+  border: 0;
 }
 
 #figura-svg {
@@ -570,18 +606,24 @@ body.viendo-completo #piezas-colocadas {
 
 .bandeja {
   position: relative;
-  flex: 1;
+  align-self: center;
+  justify-self: center;
+  width: min(740px, 54vw);
+  height: min(680px, 76vh);
+  margin-bottom: 4vh;
   display: flex;
   flex-wrap: wrap;
   align-content: center;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  overflow: auto;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.55);
-  border-radius: 20px;
-  border: 3px solid #fff;
+  gap: 18px;
+  overflow: hidden;
+  padding: 8% 7% 13%;
+  box-sizing: border-box;
+  background: url("img/tablero fichas.png") center / 100% 100% no-repeat;
+  border: 0;
+  border-radius: 0;
+  margin-top: 9vh;
 }
 
 .bandeja .pieza.pieza-entrada {
@@ -603,14 +645,17 @@ body.viendo-completo #piezas-colocadas {
   position: relative;
   flex: 0 0 auto;
   box-sizing: border-box;
-  border-radius: 12px;
-  border: 2px solid rgba(167, 167, 167, 0.85);
-  background-color: transparent;
-  background-size: 100% 100%;
+  border-radius: 16px;
+  border: 3px dashed #fff;
+  background-color: #fff8ee;
+  background-clip: padding-box;
+  background-size: 74% 74%;
   background-repeat: no-repeat;
   background-position: center;
   cursor: grab;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
   margin: 0;
   overflow: hidden;
@@ -628,6 +673,11 @@ body.viendo-completo #piezas-colocadas {
   height: 100%;
   display: block;
   pointer-events: none;
+}
+
+.pieza svg {
+  width: 74%;
+  height: 74%;
 }
 
 .pieza.arrastrando {

@@ -46,11 +46,11 @@ body.swal2-height-auto {
 
 body {
   overflow: hidden;
-  background: #f7fbff;
-  background-image:
-    radial-gradient(circle at 8% 12%, #f8d7e8 0 80px, transparent 81px),
-    radial-gradient(circle at 92% 10%, #d6e8ff 0 90px, transparent 91px),
-    radial-gradient(circle at 90% 88%, #ffe3c4 0 100px, transparent 101px);
+  background-color: #8eb6f8;
+  background-image: url(img/fondo.png);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
   color: #262626;
   font-family: 'Fredoka', sans-serif;
   touch-action: manipulation;
@@ -201,8 +201,9 @@ body.intro3d-activa #menu-acc {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 0 16px 12px;
+  padding: 0;
   box-sizing: border-box;
+  background: transparent;
 }
 
 .hud-top {
@@ -249,51 +250,65 @@ body.intro3d-activa #menu-acc {
 .hud-progreso[hidden] { display: none !important; }
 
 .enunciado-wrap {
-  position: relative;
-  z-index: 15;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 12;
+  width: min(720px, 62vw);
+  min-width: 340px;
+  transform: translateX(-50%);
   text-align: center;
-  padding: 88px 12px 8px;
+  padding: 0;
   pointer-events: none;
 }
 
 .enunciado-wrap h1 {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  aspect-ratio: 1650 / 580;
+  min-height: 0;
   margin: 0;
-  font-size: clamp(20px, 2.8vw, 28px);
-  line-height: 1.25;
+  padding: 0% 14% 18%;
+  background: url(img/nube.png) center / 100% 100% no-repeat;
+  background-position: 0vh -5vh;
+  color: #1d71b8;
+  font-size: 2.5vw;
+  line-height: 1.15;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .escenario {
-  flex: 1;
+  position: absolute;
+  inset: 0;
   display: flex;
-  justify-content: center;
-  align-items: stretch;
   min-height: 0;
-  padding-bottom: 8px;
+  padding: 0;
 }
 
 .escena-wrap {
   position: relative;
-  width: min(96vw, 1100px);
+  width: 100%;
+  height: 100%;
+  max-height: none;
   flex: 1;
-  max-height: calc(100dvh - 150px);
-  background: #fff url("img/FONDO.png") center / cover no-repeat;
-  border: 5px solid #fff;
-  border-radius: 24px;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
-  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  gap: 14px;
+  padding: 20vh 5vw 0;
+  gap: 0;
 }
 
 .escena-arrastre::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(247, 251, 255, 0.55), rgba(247, 251, 255, 0.78));
-  pointer-events: none;
-  z-index: 0;
+  content: none;
 }
 
 .zona-destinos,
@@ -304,39 +319,48 @@ body.intro3d-activa #menu-acc {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 14px;
+  gap: 26px;
   min-height: 0;
+  margin: 0 auto;
 }
 
 .zona-destinos {
-  flex: 1.15;
+  flex: 1 1 auto;
+  width: min(92%, 1180px);
   align-content: center;
-  padding: 8px;
+  padding: 0 2vw 1vh;
 }
 
 .zona-objetos {
-  flex: 0 0 auto;
-  padding: 10px 8px 4px;
-  border-top: 3px dashed rgba(30, 58, 95, 0.18);
+  flex: 0 0 27vh;
+  width: min(70%, 760px);
+  align-items: center;
+  padding: 1vh 8px 0;
+  border-top: 0;
 }
 
 .destino {
   position: relative;
-  width: min(180px, 28vw);
-  min-width: 120px;
-  height: min(170px, 26vw);
-  min-height: 110px;
-  border-radius: 22px;
-  border: 4px solid rgba(255, 255, 255, 0.95);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
+  width: clamp(124px, 15vw, 188px);
+  height: clamp(136px, 16.5vw, 200px);
+  border-radius: 18px;
+  border: 4px dashed #fff;
+  background-color: #fff8ee;
+  background-clip: padding-box;
+  box-shadow: 0 8px 0 rgba(120, 80, 40, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding: 8px;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+  padding: 8px 8px 10px;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.2s ease;
   touch-action: none;
+}
+
+.zona-destinos[data-n="4"] .destino,
+.zona-destinos[data-n="5"] .destino {
+  width: clamp(104px, 12.4vw, 156px);
+  height: clamp(124px, 14.6vw, 176px);
 }
 
 .destino img.destino-img {
@@ -349,9 +373,9 @@ body.intro3d-activa #menu-acc {
 
 .destino-nombre {
   margin: 2px 0 0;
-  font-size: clamp(12px, 1.6vw, 15px);
+  font-size: clamp(12px, 1.35vw, 15px);
   font-weight: 700;
-  color: #1e3a5f;
+  color: #3d5f86;
   text-align: center;
   line-height: 1.1;
   pointer-events: none;
@@ -359,56 +383,130 @@ body.intro3d-activa #menu-acc {
 
 .destino.is-over {
   transform: scale(1.05);
-  border-color: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.28), 0 12px 24px rgba(15, 23, 42, 0.18);
+  background-color: #fff;
+  border-color: #2a6fdb;
+  box-shadow: 0 0 0 5px rgba(42, 111, 219, 0.22);
 }
 
 .destino.is-lleno {
-  border-color: #22c55e;
-  background: rgba(220, 252, 231, 0.92);
+  background-color: #f4fff7;
+  border-color: #3dbe6e;
+  box-shadow: 0 0 0 5px rgba(61, 190, 110, 0.22);
+}
+
+.destino.is-demo-target {
+  animation: huecoDemo 0.9s ease-in-out infinite;
+}
+
+@keyframes huecoDemo {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(42, 111, 219, 0.15); }
+  50% { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(42, 111, 219, 0.18); }
+}
+
+.destino.is-rechazo {
+  animation: slotRechazo 0.42s ease;
+}
+
+.destino.is-celebra {
+  animation: destinoCelebra 0.55s ease;
+}
+
+.destino.is-celebra::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 24px;
+  border: 4px solid rgba(61, 190, 110, 0.75);
+  pointer-events: none;
+  animation: anilloOk 0.6s ease forwards;
+}
+
+@keyframes destinoCelebra {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+@keyframes anilloOk {
+  to { transform: scale(1.14); opacity: 0; }
+}
+
+@keyframes slotRechazo {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  55% { transform: translateX(8px); }
+  80% { transform: translateX(-4px); }
 }
 
 .destino .objeto-colocado {
   position: absolute;
-  top: 10%;
+  top: 12%;
   left: 50%;
-  width: 46%;
+  width: 48%;
   height: 46%;
   transform: translateX(-50%);
   object-fit: contain;
   pointer-events: none;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-  animation: objetoCae 0.28s ease;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.18));
+  animation: objetoAterriza 0.48s cubic-bezier(0.2, 0.9, 0.28, 1.15);
 }
 
-@keyframes objetoCae {
-  from { transform: translateX(-50%) scale(1.25); opacity: 0.4; }
-  to { transform: translateX(-50%) scale(1); opacity: 1; }
+@keyframes objetoAterriza {
+  0% { transform: translateX(-50%) translateY(-18px) scale(0.55); opacity: 0; }
+  62% { transform: translateX(-50%) translateY(0) scale(1.12); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+.ronda-entra .destino,
+.ronda-entra .objeto {
+  animation: slotEntra 0.5s cubic-bezier(0.22, 0.9, 0.28, 1.08) backwards;
+}
+
+.ronda-sale .destino,
+.ronda-sale .objeto {
+  animation: slotSale 0.32s ease forwards;
+}
+
+.ronda-entra .objeto.is-dragging,
+.ronda-entra .objeto.is-ghost {
+  animation: none;
+}
+
+@keyframes slotEntra {
+  from { opacity: 0; transform: translateY(26px) scale(0.82); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes slotSale {
+  to { opacity: 0; transform: translateY(-18px) scale(0.9); }
 }
 
 .objeto {
-  width: min(130px, 22vw);
-  min-width: 96px;
-  height: min(130px, 22vw);
-  min-height: 96px;
-  border: none;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.16);
+  position: relative;
+  width: clamp(112px, 12vw, 150px);
+  height: clamp(112px, 12vw, 150px);
+  border: 4px dashed #fff;
+  border-radius: 18px;
+  background-color: #fff8ee;
+  background-clip: padding-box;
+  box-shadow: 0 8px 0 rgba(120, 80, 40, 0.06);
   display: grid;
   place-items: center;
   cursor: grab;
   touch-action: none;
   user-select: none;
+  padding: 8px;
   transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
 }
 
 .objeto img {
-  width: 78%;
-  height: 78%;
+  width: 86%;
+  height: 86%;
   object-fit: contain;
   pointer-events: none;
   user-select: none;
+  position: relative;
+  z-index: 1;
 }
 
 .objeto:active,
@@ -442,9 +540,15 @@ body.intro3d-activa #menu-acc {
   object-fit: contain;
 }
 
-@media (max-width: 700px) {
-  .destino { width: min(140px, 42vw); height: min(140px, 42vw); }
-  .zona-destinos, .zona-objetos { gap: 10px; }
+@media (max-width: 900px) {
+  .enunciado-wrap { width: min(560px, 86vw); top: 0; }
+  .enunciado-wrap h1 { padding: 6% 12% 16%; font-size: 18px; }
+  .escena-wrap { padding-top: 22vh; }
+  .zona-destinos[data-n="4"] .destino,
+  .zona-destinos[data-n="5"] .destino,
+  .destino { width: min(132px, 30vw); height: min(148px, 32vw); }
+  .zona-objetos { flex-basis: 24vh; width: min(92%, 640px); }
+  .objeto { width: min(112px, 28vw); height: min(112px, 28vw); }
 }
 
 .overlay {
@@ -651,7 +755,16 @@ body.intro3d-activa #menu-acc {
   .btn-empecemos,
   .btn-empecemos-anillo,
   .btn-empecemos-anillo-2,
-  .destino, .objeto {
+  .destino, .objeto,
+  .destino.is-celebra,
+  .destino.is-celebra::after,
+  .destino.is-demo-target,
+  .destino.is-rechazo,
+  .ronda-entra .destino,
+  .ronda-entra .objeto,
+  .ronda-sale .destino,
+  .ronda-sale .objeto,
+  .objeto-colocado {
     animation: none;
     transition: none;
   }

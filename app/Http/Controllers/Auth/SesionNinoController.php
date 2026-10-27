@@ -71,6 +71,7 @@ class SesionNinoController extends Controller
         $sinPin = $estudiante->configuracionPin === null;
         $pinBloqueado = $estudiante->configuracionPin?->estaBloqueado() ?? false;
         $destino = $this->sesionNino->destinoPostPin($request);
+        $fondoPin = $this->sesionNino->urlFondoPin($ambiente);
 
         return view('auth.pin-figuras', compact(
             'ambiente',
@@ -78,7 +79,8 @@ class SesionNinoController extends Controller
             'figuras',
             'sinPin',
             'pinBloqueado',
-            'destino'
+            'destino',
+            'fondoPin'
         ));
     }
 

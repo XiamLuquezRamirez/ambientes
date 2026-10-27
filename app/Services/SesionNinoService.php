@@ -27,6 +27,8 @@ class SesionNinoService
 
     public const ARCHIVO_FONDO_BIENVENIDA = 'bienvenida_nino.png';
 
+    public const ARCHIVO_FONDO_PIN = 'fondo_juegos.png';
+
     public function __construct(
         private AccesoAmbienteService $accesoAmbiente,
         private ?AdaptacionKioscoService $adaptacionKiosco = null,
@@ -177,10 +179,26 @@ class SesionNinoService
     }
 
     /**
-     * Fondo de /listo: catalogo_juegos/{Ambiente}/img/bienvenida_nino.png (misma carpeta que
-     * JuegoCatalogoService::construirRutaPaquete). Mientras un ambiente no tenga el suyo, usa el de Polimotor.
+     * Fondo de /listo: catalogo_juegos/{Ambiente}/img/bienvenida_nino.png.
      */
     public function urlFondoBienvenida(Ambiente $ambiente): ?string
+    {
+        return $this->urlImagenCatalogoAmbiente($ambiente, self::ARCHIVO_FONDO_BIENVENIDA);
+    }
+
+    /**
+     * Fondo del PIN: catalogo_juegos/{Ambiente}/img/fondo_juegos.png.
+     */
+    public function urlFondoPin(Ambiente $ambiente): ?string
+    {
+        return $this->urlImagenCatalogoAmbiente($ambiente, self::ARCHIVO_FONDO_PIN);
+    }
+
+    /**
+     * Imagen en catalogo_juegos/{Ambiente}/img/ (misma carpeta que
+     * JuegoCatalogoService::construirRutaPaquete). Si el ambiente no tiene el archivo, usa Polimotor.
+     */
+    private function urlImagenCatalogoAmbiente(Ambiente $ambiente, string $archivo): ?string
     {
         $carpetas = [];
         try {
@@ -191,7 +209,7 @@ class SesionNinoService
         $carpetas[] = 'Polimotor';
 
         foreach (array_unique($carpetas) as $carpeta) {
-            $ruta = "catalogo_juegos/{$carpeta}/img/".self::ARCHIVO_FONDO_BIENVENIDA;
+            $ruta = "catalogo_juegos/{$carpeta}/img/{$archivo}";
             if (is_file(public_path($ruta))) {
                 return asset($ruta);
             }

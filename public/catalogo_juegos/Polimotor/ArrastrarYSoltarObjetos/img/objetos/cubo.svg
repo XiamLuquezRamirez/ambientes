@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 18 156 164">
+    <path d="M100 48l52 26v52l-52 26-52-26V74z" fill="#ffd15c"/>
+    <path d="M100 48v104l-52-26V74z" fill="#f0b429"/>
+    <path d="M100 48l52 26-52 26-52-26z" fill="#ffe28a"/>
+    <text x="100" y="112" text-anchor="middle" font-family="Arial, sans-serif" font-size="36" font-weight="700" fill="#e07a2f">A</text>
+  </svg>

@@ -19,7 +19,7 @@ body:has(.selector-aula) {
 .selector-aula__escena {
     position: absolute;
     inset: 0;
-    background: #f5e0bb url("../images/selector-aula/fondo.png") center / cover no-repeat;
+    background: #f5e0bb var(--aula-fondo) center / cover no-repeat;
     transform: translateZ(0);
     backface-visibility: hidden;
     transition: filter 0.35s ease;
@@ -130,6 +130,13 @@ body:has(.selector-aula) {
     column-gap: 1.2%;
     row-gap: 30px;
     overflow: visible;
+    transition: opacity 0.45s ease, visibility 0s linear;
+}
+
+.selector-aula--confirma .selector-aula__lista {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.45s ease, visibility 0s linear 0.45s;
 }
 
 .marco-nino {
@@ -184,8 +191,8 @@ body:has(.selector-aula) {
     position: absolute;
     inset: 0;
     background-color: #fff;
-    -webkit-mask-image: url("../images/selector-aula/marco_nino_resplandor.svg");
-    mask-image: url("../images/selector-aula/marco_nino_resplandor.svg");
+    -webkit-mask-image: var(--aula-resplandor);
+    mask-image: var(--aula-resplandor);
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
@@ -202,8 +209,8 @@ body:has(.selector-aula) {
     inset: 0;
     pointer-events: none;
     background-color: var(--marco, #ee6747);
-    -webkit-mask-image: url("../images/selector-aula/marco_nino.svg");
-    mask-image: url("../images/selector-aula/marco_nino.svg");
+    -webkit-mask-image: var(--aula-marco);
+    mask-image: var(--aula-marco);
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
     -webkit-mask-position: center;
@@ -245,6 +252,168 @@ body:has(.selector-aula) {
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
+}
+
+/* Multisensorial: la foto llena el hueco de la flor. El círculo de los demás no cambia. */
+.selector-aula--multisensorial .marco-nino__foto,
+.selector-aula--multisensorial .aula-confirma__foto {
+    left: 24.2056%;
+    top: 15.3556%;
+    width: 51.5889%;
+    height: 51.6145%;
+    aspect-ratio: auto;
+    transform: none;
+    border-radius: 0;
+    -webkit-mask-image: var(--aula-hueco);
+    mask-image: var(--aula-hueco);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+}
+
+.selector-aula--multisensorial .marco-nino__foto .kiosco-avatar-img,
+.selector-aula--multisensorial .aula-confirma__foto img {
+    border-radius: 0;
+}
+
+/* El marco es casi cuadrado: en el diálogo se encaja igual que en la lista, sin estirarlo.
+   El SVG trae un naranja fijo; la flor se pinta con el color del niño. */
+.selector-aula--multisensorial .aula-confirma__marco {
+    object-fit: contain;
+    visibility: hidden;
+}
+
+/* Sombra del marco: path de g.cls-1 en marco_nino_resplandor.svg, más oscura que el color del niño. */
+.selector-aula--multisensorial .marco-nino__caja::before,
+.selector-aula--multisensorial .aula-confirma__flor-sombra {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    background: color-mix(in srgb, var(--marco, #ee6747) 40%, #000);
+    -webkit-mask-image: var(--aula-resplandor);
+    mask-image: var(--aula-resplandor);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 84.347% 85.103%;
+    mask-size: 84.347% 85.103%;
+    -webkit-mask-position: 52.405% 54.76%;
+    mask-position: 52.405% 54.76%;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+}
+
+.selector-aula--multisensorial .marco-nino__caja::before {
+    content: "";
+    inset: 0;
+}
+
+.selector-aula--multisensorial .aula-confirma__flor-sombra {
+    left: 0;
+    right: 0;
+    top: 50%;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 280.39 / 281.2;
+    transform: translateY(-50%);
+}
+
+.selector-aula--multisensorial .marco-nino__nombre {
+    position: absolute;
+    z-index: 4;
+    left: 49.41%;
+    top: 75.6%;
+    width: 76%;
+    height: 22%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: "Fredoka One", cursive;
+    font-size: 16px;
+    line-height: 1.05;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(110, 40, 20, 0.28);
+    pointer-events: none;
+}
+
+.selector-aula--multisensorial .aula-confirma__ficha::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-color: var(--marco, #ee6747);
+    -webkit-mask-image: var(--aula-marco);
+    mask-image: var(--aula-marco);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+}
+
+.selector-aula--multisensorial .marco-nino__resplandor {
+    display: none;
+}
+
+/* En la lista el punteado sigue el color del marco. En «¿Eres tú?» queda blanco. */
+.selector-aula--multisensorial .marco-nino__caja::after,
+.selector-aula--multisensorial .aula-confirma__ficha::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    pointer-events: none;
+    background: var(--marco, #ee6747);
+    -webkit-mask-image: var(--aula-punteado);
+    mask-image: var(--aula-punteado);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-mode: alpha;
+    mask-mode: alpha;
+}
+
+.selector-aula--multisensorial .aula-confirma__ficha::after {
+    background: #fff;
+}
+
+/* La flor queda al centro de la escena, con aire entre marco y marco. */
+.selector-aula--multisensorial .selector-aula__lista {
+    left: 15%;
+    right: 15%;
+    top: 21%;
+    bottom: 10%;
+    column-gap: 2.4%;
+    row-gap: 22px;
+}
+
+.selector-aula--multisensorial .marco-nino__caja {
+    width: min(100cqw, calc(100cqh * 280.39 / 281.2));
+    aspect-ratio: 280.39 / 281.2;
+}
+
+/* Sin foto: el hueco queda blanco y las letras toman el color del niño. */
+.selector-aula--multisensorial .marco-nino__foto:has(.marco-nino__iniciales) {
+    background: #fff;
+}
+
+.selector-aula--multisensorial .marco-nino__iniciales {
+    font-size: 20cqmin;
+    color: var(--marco);
 }
 
 .marco-nino__foto:has(.marco-nino__iniciales) {
@@ -319,6 +488,15 @@ body:has(.selector-aula) {
     cursor: pointer;
     transform: translateY(-50%);
     -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.45s ease, visibility 0s linear;
+}
+
+.selector-aula--confirma .selector-aula__nav,
+.selector-aula--confirma .selector-aula__nav:disabled {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.45s ease, visibility 0s linear 0.45s;
 }
 
 .selector-aula__nav img {
@@ -562,6 +740,18 @@ body:has(.selector-aula) .kiosco-fs-btn {
     white-space: nowrap;
 }
 
+/* Multisensorial: el nombre va sobre el pétalo, en blanco y más chico para que entren las dos líneas. */
+.selector-aula--multisensorial .aula-confirma__nombre {
+    top: 76%;
+    width: 62%;
+    height: 16%;
+    font-size: 6.2cqh;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(90, 30, 10, 0.35);
+    position: relative;
+    top: 30vh;
+}
+
 .aula-confirma__lado {
     display: flex;
     flex-direction: column;
@@ -697,6 +887,10 @@ body:has(.selector-aula) .kiosco-fs-btn {
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .selector-aula__lista,
+    .selector-aula__nav,
+    .selector-aula--confirma .selector-aula__lista,
+    .selector-aula--confirma .selector-aula__nav,
     .selector-aula__nav:not(:disabled) img,
     .selector-aula__escena,
     .aula-confirma__caja,

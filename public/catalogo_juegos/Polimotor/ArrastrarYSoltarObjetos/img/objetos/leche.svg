@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 18 156 164">
+    <path d="M58 48h84l-10 112H68z" fill="#f4f7fb"/>
+    <path d="M70 48h60l6 16H64z" fill="#4aa3ff"/>
+    <rect x="74" y="86" width="52" height="36" rx="6" fill="#4aa3ff"/>
+    <text x="100" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#fff">Leche</text>
+  </svg>

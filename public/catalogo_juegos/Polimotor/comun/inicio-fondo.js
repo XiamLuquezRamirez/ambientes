@@ -1,6 +1,14 @@
 (function () {
   'use strict';
 
+  (function cargarPedniaSalir() {
+    if (window.PedniaSalir) return;
+    var s = document.createElement('script');
+    s.src = '/catalogo_juegos/PedniaSalir.js?v=20261027d';
+    s.async = false;
+    document.head.appendChild(s);
+  })();
+
   function aplicarColor() {
     var color = '';
     try {
@@ -14,6 +22,35 @@
     if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)) return;
 
     document.documentElement.style.setProperty('--juego-color', color);
+  }
+
+  /* Trazo de la portada del ambiente del paquete, no el fondo ilustrado. */
+  function aplicarFondoPortada() {
+    var partes = (window.location.pathname || '').split('/');
+    var i = partes.indexOf('catalogo_juegos');
+    var ambiente = (i >= 0 && partes[i + 1]) ? partes[i + 1] : 'Polimotor';
+    if (!/^[A-Za-z0-9]+$/.test(ambiente)) return;
+    var url = '/catalogo_juegos/' + ambiente + '/img/fondo_portada_juegos.png';
+    document.documentElement.style.setProperty('--fondo-portada', 'url("' + url + '")');
+  }
+
+  /* ?icono= solo acepta una imagen del mismo origen (la del juego en el catálogo). */
+  function iconoDeLaUrl() {
+    var valor = '';
+    try {
+      valor = new URLSearchParams(window.location.search).get('icono') || '';
+    } catch (e) {
+      return '';
+    }
+    if (!valor) return '';
+    try {
+      var u = new URL(valor, window.location.origin);
+      if (u.origin !== window.location.origin) return '';
+      if (!/\.(png|jpe?g|webp|gif|svg)$/i.test(u.pathname)) return '';
+      return u.pathname + u.search;
+    } catch (e2) {
+      return '';
+    }
   }
 
   /* Radio del arco en em: más grande = curva más suave. Igual para todas las líneas. */
@@ -130,6 +167,7 @@
     btn.addEventListener('click', function () {
       if (btn.dataset.saliendo === '1') return;
       btn.dataset.saliendo = '1';
+      if (window.PedniaSalir && window.PedniaSalir.pararAudio) window.PedniaSalir.pararAudio();
       /* Salir en el mismo clic quita el iframe antes de que se vea el hundido del botón. */
       btn.classList.add('is-pulsado');
       setTimeout(function () { btn.classList.remove('is-pulsado'); }, PULSADO_MS);
@@ -143,12 +181,59 @@
     });
   }
 
+  /*
+   * Iguala la portada de los paquetes que no traían icono, título o Volver:
+   * el icono sale de ?icono= y el título, del <title> del paquete.
+   */
+  function asegurarEstructura() {
+    var pantalla = document.querySelector('.pantalla-inicio');
+    if (!pantalla) return;
+    var btn = pantalla.querySelector('#btn-empecemos');
+    if (!btn) return;
+    if (!btn.classList.contains('btn-empecemos')) btn.classList.add('btn-empecemos');
+
+    if (!document.getElementById('btn-inicio-volver')) {
+      var volver = document.createElement('button');
+      volver.type = 'button';
+      volver.id = 'btn-inicio-volver';
+      volver.className = 'inicio-volver';
+      volver.hidden = true;
+      volver.innerHTML = '<img src="/assets/images/selector-aula/volver.png" alt="Volver">';
+      pantalla.insertBefore(volver, pantalla.firstChild);
+    }
+
+    var caja = pantalla.querySelector('.inicio-contenido') || btn.parentNode;
+    if (!pantalla.querySelector('.inicio-kicker')) {
+      var titulo = document.createElement('p');
+      titulo.className = 'inicio-kicker';
+      titulo.textContent = (document.title || '').replace(/\s+/g, ' ').trim();
+      if (btn.parentNode === caja) caja.insertBefore(titulo, btn);
+      else btn.parentNode.insertBefore(titulo, btn);
+    }
+
+    if (!pantalla.querySelector('.inicio-icono')) {
+      var src = iconoDeLaUrl();
+      if (src) {
+        var img = document.createElement('img');
+        img.className = 'inicio-icono';
+        img.alt = '';
+        img.setAttribute('aria-hidden', 'true');
+        img.draggable = false;
+        img.src = src;
+        var ancla = caja.querySelector('.inicio-kicker') || btn;
+        caja.insertBefore(img, ancla);
+      }
+    }
+  }
+
   function prepararPantallaInicio() {
+    asegurarEstructura();
     prepararVolver();
     curvarTitulo();
   }
 
   aplicarColor();
+  aplicarFondoPortada();
 
   /*
    * El título se oculta desde el <head> hasta quedar arqueado con la fuente final, para

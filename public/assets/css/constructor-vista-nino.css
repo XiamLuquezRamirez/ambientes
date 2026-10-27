@@ -1,4 +1,4 @@
-/* Vista Niño — overlay tablet simulada (constructor) */
+/* Vista Ni�o ? overlay tablet simulada (constructor) */
 
 .vn-overlay[hidden] {
     display: none !important;
@@ -120,7 +120,7 @@
     }
 }
 
-/* Escenario que escala la tablet horizontal 1280×800 */
+/* Escenario que escala la tablet horizontal 1280�800 */
 .vn-tablet-stage {
     display: flex;
     align-items: center;
@@ -185,7 +185,7 @@
     flex-shrink: 0;
 }
 
-/* Progreso en el pie del player (entre Atrás y ¡Sigue!) */
+/* Progreso en el pie del player (entre Atr�s y �Sigue!) */
 .vn-progress {
     display: flex;
     gap: 6px;
@@ -296,7 +296,7 @@
 }
 
 .vn-card::after {
-    content: '✨';
+    content: '?';
     position: absolute;
     right: 22px;
     top: 14px;
@@ -473,7 +473,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     font-weight: 600;
 }
 
-/* ── Contenido por bloque ── */
+/* ?? Contenido por bloque ?? */
 @keyframes vnPop {
     from {
         opacity: 0;
@@ -762,7 +762,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     animation: vnShake .35s ease;
 }
 
-/* Pregunta de selección: tipografía legible en tablet 1280×800 */
+/* Pregunta de selecci�n: tipograf�a legible en tablet 1280�800 */
 .vn-card--pregunta .vn-title {
     font-size: 2.15rem;
     margin-bottom: 12px;
@@ -925,7 +925,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     margin-top: 16px;
 }
 
-/* Emparejar: tipografía legible en tablet */
+/* Emparejar: tipograf�a legible en tablet */
 .vn-card--emparejar .vn-title {
     font-size: 2.15rem;
     margin-bottom: 12px;
@@ -978,7 +978,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     margin-top: 16px;
 }
 
-/* Clasificación / Arrastrar: tablero en dos columnas verticales */
+/* Clasificaci�n / Arrastrar: tablero en dos columnas verticales */
 .vn-sort-board {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1195,7 +1195,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     }
 }
 
-/* Clasificación: tipografía legible en tablet */
+/* Clasificaci�n: tipograf�a legible en tablet */
 .vn-card--clasificacion .vn-title {
     font-size: 2.15rem;
     margin-bottom: 12px;
@@ -1279,7 +1279,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     margin-top: 16px;
 }
 
-/* Arrastrar: tipografía legible en tablet + drag */
+/* Arrastrar: tipograf�a legible en tablet + drag */
 .vn-card--arrastrar .vn-title {
     font-size: 2.15rem;
     margin-bottom: 12px;
@@ -1419,7 +1419,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     max-width: 100%;
 }
 
-/* Audio: tipografía + botón interactivo */
+/* Audio: tipograf�a + bot�n interactivo */
 .vn-card--audio {
     text-align: center;
 }
@@ -1468,7 +1468,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     align-self: stretch;
 }
 
-/* Audio + video: botón grande unificado (play, replay, done) */
+/* Audio + video: bot�n grande unificado (play, replay, done) */
 .vn-audio-stage .vn-audio-btn,
 .vn-video-btn--hero,
 .vn-card--video .vn-video-stage .vn-video-btn,
@@ -1619,7 +1619,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     }
 }
 
-/* Video: tipografía + botón interactivo */
+/* Video: tipograf�a + bot�n interactivo */
 .vn-card--video {
     text-align: center;
 }
@@ -1746,7 +1746,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     display: none;
 }
 
-/* Imagen: tipografía legible en tablet */
+/* Imagen: tipograf�a legible en tablet */
 .vn-card--imagen {
     text-align: center;
 }
@@ -1807,7 +1807,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     cursor: grabbing;
 }
 
-/* Historia: tipografía + navegación Anterior/Siguiente */
+/* Historia: tipograf�a + navegaci�n Anterior/Siguiente */
 .vn-card--historia {
     text-align: center;
 }
@@ -2086,7 +2086,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     color: #9f1239;
 }
 
-/* Emoción: botones grandes para tablet / niño */
+/* Emoci�n: botones grandes para tablet / ni�o */
 .vn-card--emocion {
     text-align: center;
 }
@@ -2121,7 +2121,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     max-width: min(680px, 96%);
 }
 
-/* 6 emociones: 3×2 en horizontal para caber sin scroll en tablet */
+/* 6 emociones: 3�2 en horizontal para caber sin scroll en tablet */
 .vn-emociones[data-count="6"] {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: repeat(2, minmax(0, 1fr));
@@ -2198,7 +2198,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     filter: brightness(0.98);
 }
 
-/* Float solo en la ilustración: la celda del grid se queda fija */
+/* Float solo en la ilustraci�n: la celda del grid se queda fija */
 .vn-emocion-img {
     flex: 1 1 0;
     width: 100%;
@@ -2381,7 +2381,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     justify-content: center;
 }
 
-/* ── Paint: barra lateral + lienzo ───────────────────────── */
+/* ?? Paint: barra lateral + lienzo ????????????????????????? */
 .vn-block-fit .vn-paint {
     min-height: 0;
 }
@@ -2667,7 +2667,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     transform: scale(1.06);
 }
 
-/* Color personalizado: mismo tamaño que los demás, más fácil de tocar */
+/* Color personalizado: mismo tama�o que los dem�s, m�s f�cil de tocar */
 .vn-paint-swatch--custom {
     position: relative;
     display: flex;
@@ -2929,7 +2929,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     background: #f8fafc;
 }
 
-/* Memoria: tipografía y cartas grandes (tablet) */
+/* Memoria: tipograf�a y cartas grandes (tablet) */
 .vn-card--juego-memoria {
     text-align: center;
 }
@@ -2969,7 +2969,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     margin-top: 14px;
 }
 
-/* Colorear: tipografía + dibujo libre sobre imagen */
+/* Colorear: tipograf�a + dibujo libre sobre imagen */
 .vn-card--juego-colorear {
     text-align: center;
 }
@@ -3403,7 +3403,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     opacity: 0;
 }
 
-/* Secuencia: tipografía + ordenar por arrastre */
+/* Secuencia: tipograf�a + ordenar por arrastre */
 .vn-card--juego-secuencia {
     text-align: center;
 }
@@ -3494,7 +3494,7 @@ body.vn-dispositivo .vn-nav-center .vn-nav-meta,
     }
 }
 
-/* Tablet real: pantalla completa, sin marco (sin :has — se ignora en WebViews viejos) */
+/* Tablet real: pantalla completa, sin marco (sin :has ? se ignora en WebViews viejos) */
 html.vn-dispositivo {
     margin: 0;
     padding: 0;
@@ -3543,7 +3543,7 @@ body.vn-dispositivo .vn-tablet-screen {
     border-radius: 0 !important;
     flex-shrink: 1 !important;
     box-sizing: border-box !important;
-    /* anula el canvas fijo 1280×800 del overlay del constructor */
+    /* anula el canvas fijo 1280�800 del overlay del constructor */
     --vn-screen-w: 100vw;
     --vn-screen-h: 100dvh;
 }
@@ -3811,7 +3811,7 @@ body.rn-player-activo .vn-colorear-canvas,
     font-size: .78rem;
 }
 
-/* ── Niveles etarios (prejardín → primaria) ── */
+/* ?? Niveles etarios (prejard�n ? primaria) ?? */
 .vn-nivel--prejardin,
 .vn-nivel--jardin {
     --vn-touch-min: 56px;
@@ -3858,7 +3858,7 @@ body.rn-player-activo .vn-colorear-canvas,
     transform: scale(var(--vn-touch-scale, 1));
 }
 
-/* ── Progreso con iconos ── */
+/* ?? Progreso con iconos ?? */
 .vn-dot {
     width: 12px;
     height: 12px;
@@ -3911,7 +3911,7 @@ body.rn-player-activo .vn-colorear-canvas,
     font-size: .75rem;
 }
 
-/* ── Bienvenida ── */
+/* ?? Bienvenida ?? */
 .vn-bienvenida-hero {
     position: relative;
     text-align: center;
@@ -3981,7 +3981,7 @@ body.rn-player-activo .vn-colorear-canvas,
     }
 }
 
-/* ── Audio con ondas ── */
+/* ?? Audio con ondas ?? */
 .vn-audio-waves {
     position: absolute;
     inset: 0;
@@ -4033,7 +4033,7 @@ body.rn-player-activo .vn-colorear-canvas,
     }
 }
 
-/* ── Imagen zoom (tap en bienvenida) ── */
+/* ?? Imagen zoom (tap en bienvenida) ?? */
 .vn-media-zoomable {
     cursor: zoom-in;
     transition: transform .25s ease;
@@ -4058,7 +4058,7 @@ body.rn-player-activo .vn-colorear-canvas,
     margin: 4px 0 0;
 }
 
-/* ── Historia: una página con volteo ── */
+/* ?? Historia: una p�gina con volteo ?? */
 .vn-historia-libro {
     perspective: 1400px;
     flex: 1 1 auto;
@@ -4191,7 +4191,7 @@ body.rn-player-activo .vn-colorear-canvas,
     font-size: 1.1rem;
 }
 
-/* ── RA escáner ── */
+/* ?? RA esc�ner ?? */
 .vn-ra-scanner {
     display: flex;
     justify-content: center;
@@ -4318,7 +4318,7 @@ body.rn-player-activo .vn-colorear-canvas,
     box-shadow: none;
 }
 
-/* ── Evidencia con cámara ── */
+/* ?? Evidencia con c�mara ?? */
 .vn-card--evidencia {
     text-align: center;
 }
@@ -4366,7 +4366,7 @@ body.rn-player-activo .vn-colorear-canvas,
     justify-content: center;
 }
 
-/* Botón para cambiar entre cámara frontal y trasera (esquina del preview). */
+/* Bot�n para cambiar entre c�mara frontal y trasera (esquina del preview). */
 .vn-evidencia-flip {
     position: absolute;
     top: 12px;
@@ -4567,8 +4567,8 @@ body.rn-player-activo .vn-colorear-canvas,
     line-height: 1.1;
 }
 
-/* Botón "Iniciar grabación" (video): mismo formato que Detener pero en verde,
-   para que el niño lo distinga como "empezar". */
+/* Bot�n "Iniciar grabaci�n" (video): mismo formato que Detener pero en verde,
+   para que el ni�o lo distinga como "empezar". */
 .vn-evidencia-iniciar-btn {
     display: inline-flex;
     align-items: center;
@@ -4619,7 +4619,7 @@ body.rn-player-activo .vn-colorear-canvas,
     }
 }
 
-/* ── Recompensa ── */
+/* ?? Recompensa ?? */
 .vn-reward--celebrate {
     position: relative;
     text-align: center;
@@ -4663,7 +4663,7 @@ body.rn-player-activo .vn-colorear-canvas,
     }
 }
 
-/* ── Emociones pop ── */
+/* ?? Emociones pop ?? */
 .vn-emocion--pop {
     animation: vnEmocionPop .45s cubic-bezier(.34, 1.5, .64, 1);
 }
@@ -4698,7 +4698,7 @@ body.rn-player-activo .vn-colorear-canvas,
     object-fit: contain;
 }
 
-/* ── Celebración ── */
+/* ?? Celebraci�n ?? */
 .vn-celebrate {
     position: absolute;
     inset: 0;
@@ -4724,7 +4724,7 @@ body.rn-player-activo .vn-colorear-canvas,
     }
 }
 
-/* ── Hint arrastrar ── */
+/* ?? Hint arrastrar ?? */
 .vn-hint-drag {
     text-align: center;
     font-size: .88rem;
@@ -4741,7 +4741,7 @@ body.rn-player-activo .vn-colorear-canvas,
     font-size: 1rem;
 }
 
-/* ── Mejoras interactivas para niños ── */
+/* ?? Mejoras interactivas para ni�os ?? */
 
 .vn-pulse-hint {
     animation: vnPulseHint 1.4s ease-in-out infinite;
@@ -4961,7 +4961,7 @@ body.rn-player-activo .vn-colorear-canvas,
     display: none;
 }
 
-/* Nivel transición */
+/* Nivel transici�n */
 .vn-nivel--transicion .vn-title {
     font-size: calc(1.35rem * var(--vn-title-scale, 1.08));
 }
@@ -4971,7 +4971,7 @@ body.rn-player-activo .vn-colorear-canvas,
     min-height: calc(var(--vn-touch-min, 50px) * var(--vn-touch-scale, 1.1));
 }
 
-/* Feedback más visible */
+/* Feedback m�s visible */
 .vn-feedback.is-ok {
     animation: vnFbPop .4s cubic-bezier(.34, 1.4, .64, 1);
 }
@@ -4988,7 +4988,7 @@ body.rn-player-activo .vn-colorear-canvas,
     }
 }
 
-/* Chips arrastrables más táctiles */
+/* Chips arrastrables m�s t�ctiles */
 .vn-chip-drag:active {
     transform: scale(1.05);
 }
@@ -4997,14 +4997,14 @@ body.rn-player-activo .vn-colorear-canvas,
     opacity: .35;
 }
 
-/* Puzzle piezas más grandes en prejardín (solo en el pool) */
+/* Puzzle piezas m�s grandes en prejard�n (solo en el pool) */
 .vn-nivel--prejardin .vn-puzzle-pool .vn-puzzle-piece,
 .vn-nivel--jardin .vn-puzzle-pool .vn-puzzle-piece {
     min-width: 64px;
     min-height: 64px;
 }
 
-/* ── Zonas interactivas ── */
+/* ?? Zonas interactivas ?? */
 .vn-zone.is-target {
     outline: 3px dashed rgba(56, 189, 248, .6);
     outline-offset: 3px;
@@ -5041,7 +5041,7 @@ body.rn-player-activo .vn-colorear-canvas,
     }
 }
 
-/* Ajustes finales para experiencia real del niño en tablet */
+/* Ajustes finales para experiencia real del ni�o en tablet */
 #vnDispositivo,
 #vnDispositivo *,
 #vnDispositivo *::before,
@@ -5425,7 +5425,7 @@ body.rn-player-activo .vn-nav-btn {
     }
 }
 
-/* Experiencias 2-6 años: compactas, táctiles y sin desplazamiento */
+/* Experiencias 2-6 a�os: compactas, t�ctiles y sin desplazamiento */
 .rn-player .vn-card,
 body.vn-dispositivo .vn-card,
 body.rn-player-activo .vn-card {
@@ -5924,7 +5924,7 @@ body.rn-player-activo .vn-body--paint .vn-paint-swatch {
     }
 }
 
-/* ── Chrome 2–6 + landscape fill (kiosco y overlay) ── */
+/* ?? Chrome 2?6 + landscape fill (kiosco y overlay) ?? */
 
 .vn-chrome-simple .vn-step-label,
 .vn-nivel--prejardin .vn-step-label,
@@ -6631,7 +6631,7 @@ body.vn-dispositivo .vn-ra-scan-frame,
     height: 100%;
 }
 
-/* ── Layout unificado player (kiosco + overlay) ── */
+/* ?? Layout unificado player (kiosco + overlay) ?? */
 
 body.vn-dispositivo .vn-tablet-screen,
 .rn-player .vn-tablet-screen,
@@ -7016,7 +7016,7 @@ body.vn-dispositivo .vn-card--pregunta .vn-pregunta-head .vn-instruccion,
 body.vn-dispositivo .vn-card--pregunta .vn-pregunta-media,
 .rn-player .vn-card--pregunta .vn-pregunta-media {
     flex: 1 1 auto;
-    /* No usar 0: con opciones/títulos grandes la imagen desaparece */
+    /* No usar 0: con opciones/t�tulos grandes la imagen desaparece */
     min-height: clamp(160px, 26dvh, 320px);
     max-height: 48dvh;
     margin: 0 0 clamp(4px, 0.7vh, 8px);
@@ -7110,7 +7110,7 @@ body.vn-dispositivo .vn-card--reto .vn-option .vn-op-emoji,
     line-height: 1;
 }
 
-/* Sin imagen de enunciado hay más alto libre: el emoji debe llenar el botón */
+/* Sin imagen de enunciado hay m�s alto libre: el emoji debe llenar el bot�n */
 body.vn-dispositivo .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option .vn-op-emoji,
 .rn-player .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option .vn-op-emoji,
 #vnOverlay .vn-card--pregunta:not(:has(> .vn-card-body > .vn-pregunta-media)) .vn-option .vn-op-emoji {
@@ -7185,7 +7185,7 @@ body.vn-dispositivo .vn-card--reto .vn-feedback,
     }
 }
 
-/* ── Imágenes por bloque: llenan su contenedor sin desbordar ── */
+/* ?? Im�genes por bloque: llenan su contenedor sin desbordar ?? */
 
 /* Bienvenida / Imagen / Historia / Pregunta (media principal) */
 body.vn-dispositivo .vn-card--imagen .vn-card-body > .vn-media,
@@ -7262,7 +7262,7 @@ body.vn-dispositivo .vn-reward .vn-media img,
     margin: 0 !important;
 }
 
-/* Pregunta / Reto / Emparejar / Clasificar / Arrastrar: img dentro del botón */
+/* Pregunta / Reto / Emparejar / Clasificar / Arrastrar: img dentro del bot�n */
 body.vn-dispositivo .vn-option img,
 .rn-player .vn-option img,
 #vnOverlay .vn-option img,
@@ -7303,7 +7303,7 @@ body.vn-dispositivo .vn-seq-card img,
     object-fit: contain !important;
 }
 
-/* Emoción: llena el alto del botón menos la etiqueta */
+/* Emoci�n: llena el alto del bot�n menos la etiqueta */
 body.vn-dispositivo .vn-emocion-img,
 .rn-player .vn-emocion-img,
 #vnOverlay .vn-emocion-img {
@@ -7312,7 +7312,7 @@ body.vn-dispositivo .vn-emocion-img,
     object-fit: contain !important;
 }
 
-/* Paquete del cat�logo (iframe) dentro de Vista Ni�o / kiosco */
+/* Paquete del cat?logo (iframe) dentro de Vista Ni?o / kiosco */
 .vn-card.juego-catalogo {
     display: flex;
     flex-direction: column;
@@ -7325,15 +7325,26 @@ body.vn-dispositivo .vn-emocion-img,
     width: 100%;
     border-radius: 16px;
     overflow: hidden;
-    background: #0b1220;
+    background: var(--juego-color, #0b1220);
+}
+
+.vn-catalogo-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: var(--fondo-portada, none) center / cover no-repeat;
+    opacity: 0.5;
 }
 .vn-catalogo-iframe {
     position: absolute;
     inset: 0;
+    z-index: 1;
     width: 100%;
     height: 100%;
     border: 0;
-    background: #fff;
+    background: transparent;
 }
 .vn-card.juego-catalogo .vn-juego-head {
     flex: 0 0 auto;

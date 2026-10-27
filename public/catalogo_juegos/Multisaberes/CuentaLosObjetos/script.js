@@ -72,6 +72,12 @@
             || document.body.classList.contains("sin-decoracion");
     }
 
+    /** Vuelo a la canasta: no usar sin-decoracion (solo nubes del fondo). */
+    function reducirMovimiento() {
+        return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+            || document.body.classList.contains("sin-animaciones");
+    }
+
     function vivo(gen) { return gen === rondaGen && !juegoTerminado; }
 
     function textos() { return (gameConfig && gameConfig.textos) || {}; }
@@ -545,7 +551,7 @@
         var linea = { voz: "zoe", texto: L.textoAcierto(ronda.correcto) };
         decirYa(linea);
         var vueloMs = celebrar();
-        var espera = reducir() ? 400 : Math.max(900, vueloMs + 200);
+        var espera = reducirMovimiento() ? 400 : Math.max(2200, vueloMs + 450);
         window.setTimeout(function () {
             if (!vivo(rondaGen)) return;
             continuarTrasAcierto();
@@ -557,16 +563,47 @@
         if (zoe && !reducir() && pref("refuerzo_visual") !== false && pref("refuerzo_tipo") !== "solo_texto") {
             zoe.classList.add("celebra");
         }
-        if (pref("refuerzo_visual") === false || pref("refuerzo_tipo") === "solo_texto"
-            || pref("refuerzo_tipo") === "trofeo_estático" || pref("refuerzo_tipo") === "badge") {
+        if (pref("refuerzo_visual") === false) {
             return soltarEnCanasta(true);
         }
-        return soltarEnCanasta(reducir());
+        return soltarEnCanasta(reducirMovimiento());
+    }
+
+    function aterrizarEnCanasta(btn, canasta) {
+        btn.classList.remove("vuela-a-canasta");
+        btn.style.cssText = "";
+        btn.classList.add("en-cesta", "aterriza");
+        if (canasta) canasta.appendChild(btn);
+        window.setTimeout(function () {
+            if (btn.isConnected) btn.classList.remove("aterriza");
+        }, 420);
+    }
+
+    /** Brillo y chispas cuando la última manzana llega a la canasta. */
+    function brillarCanastaLlena(wrap) {
+        if (!wrap || reducirMovimiento()) return;
+        wrap.classList.remove("canasta-llena");
+        void wrap.offsetWidth;
+        wrap.classList.add("canasta-llena");
+        var i;
+        for (i = 0; i < 8; i++) {
+            var chispa = document.createElement("span");
+            chispa.className = "canasta-chispa";
+            chispa.style.setProperty("--a", (i * 45) + "deg");
+            chispa.style.setProperty("--d", (18 + (i % 3) * 10) + "px");
+            wrap.appendChild(chispa);
+            (function (el) {
+                window.setTimeout(function () { if (el.parentNode) el.remove(); }, 950);
+            })(chispa);
+        }
+        window.setTimeout(function () {
+            if (wrap.isConnected) wrap.classList.remove("canasta-llena");
+        }, 1500);
     }
 
     /**
-     * Lleva las manzanas a la canasta. Con animación: vuelan encogiéndose;
-     * al llegar quedan pequeñas dentro de #canasta-N.
+     * Lleva las manzanas a la canasta en arco, encogiéndose; al llegar quedan
+     * pequeñas en #canasta-N y la canasta brilla.
      * @returns {number} duración total aprox. en ms
      */
     function soltarEnCanasta(instantaneo) {
@@ -577,47 +614,95 @@
         if (!botones.length) return 0;
         var destino = canasta || wrap;
         var destRect = destino ? destino.getBoundingClientRect() : null;
-        var paso = 110;
-        var vuelo = 620;
+        var scaleFin = 0.28;
+        var minTotal = 2000;
+        var n = botones.length;
+        var vuelo = 1200;
+        var paso = n <= 1 ? 0 : Math.max(320, Math.ceil((minTotal - vuelo) / (n - 1)));
+        var totalMs = (n - 1) * paso + vuelo;
+        if (totalMs < minTotal) vuelo += minTotal - totalMs;
+        totalMs = (n - 1) * paso + vuelo;
 
-        botones.forEach(function (btn, i) {
-            if (instantaneo || !destRect || reducir()) {
+        if (instantaneo || !destRect) {
+            botones.forEach(function (btn) {
                 btn.classList.remove("cae", "vuela-a-canasta", "brilla-toque");
                 btn.style.cssText = "";
                 btn.classList.add("en-cesta");
                 if (canasta) canasta.appendChild(btn);
-                return;
-            }
+            });
+            brillarCanastaLlena(wrap);
+            return 0;
+        }
+
+        var pendientes = botones.length;
+
+        botones.forEach(function (btn, i) {
+            btn.classList.remove("cae", "brilla-toque");
+            btn.style.animation = "none";
+            void btn.offsetWidth;
             var from = btn.getBoundingClientRect();
-            var scaleFin = 0.32;
             var dx = destRect.left + destRect.width * 0.5 - from.width * scaleFin * 0.5 - from.left;
-            var dy = destRect.top + destRect.height * 0.28 - from.height * scaleFin * 0.5 - from.top;
-            btn.classList.remove("cae");
+            var dy = destRect.top + destRect.height * 0.32 - from.height * scaleFin * 0.5 - from.top;
+            var arco = Math.min(88, Math.max(44, Math.abs(dy) * 0.24));
+            var mx = dx * 0.48;
+            var my = dy * 0.38 - arco;
+            var inicio = i * paso;
+
+            /*
+             * .escena tiene transform: la manzana no puede volar en position:fixed
+             * dentro de ese contenedor. Se mueve al body con coords de viewport.
+             */
+            document.body.appendChild(btn);
             btn.classList.add("vuela-a-canasta");
             btn.style.position = "fixed";
             btn.style.left = from.left + "px";
             btn.style.top = from.top + "px";
             btn.style.width = from.width + "px";
             btn.style.height = from.height + "px";
-            btn.style.zIndex = String(60 + i);
+            btn.style.zIndex = String(900 + i);
             btn.style.margin = "0";
             btn.style.right = "auto";
             btn.style.bottom = "auto";
+            btn.style.transform = "translate(0px, 0px) scale(1)";
             btn.style.transition = "none";
-            btn.style.transform = "translate(0, 0) scale(1)";
             void btn.offsetWidth;
+
+            var terminado = false;
+            function alFin() {
+                if (terminado || btn.classList.contains("en-cesta")) return;
+                terminado = true;
+                if (btn.getAnimations) {
+                    btn.getAnimations().forEach(function (a) { a.cancel(); });
+                }
+                aterrizarEnCanasta(btn, canasta);
+                pendientes -= 1;
+                if (pendientes === 0) brillarCanastaLlena(wrap);
+            }
+
+            var keyframes = [
+                { transform: "translate(0px, 0px) scale(1)" },
+                { transform: "translate(" + mx + "px, " + my + "px) scale(0.55)" },
+                { transform: "translate(" + dx + "px, " + dy + "px) scale(" + scaleFin + ")" }
+            ];
+
             window.setTimeout(function () {
-                btn.style.transition = "transform " + vuelo + "ms cubic-bezier(.22,.8,.28,1), opacity " + vuelo + "ms ease";
+                if (!btn.isConnected || btn.classList.contains("en-cesta")) return;
+                if (btn.animate) {
+                    var anim = btn.animate(keyframes, {
+                        duration: vuelo,
+                        easing: "cubic-bezier(0.28, 0.85, 0.32, 1)",
+                        fill: "forwards"
+                    });
+                    anim.finished.then(alFin).catch(alFin);
+                    return;
+                }
+                btn.style.transition = "transform " + vuelo + "ms cubic-bezier(0.28, 0.85, 0.32, 1)";
                 btn.style.transform = "translate(" + dx + "px, " + dy + "px) scale(" + scaleFin + ")";
-            }, i * paso);
-            window.setTimeout(function () {
-                btn.classList.remove("vuela-a-canasta");
-                btn.style.cssText = "";
-                btn.classList.add("en-cesta");
-                if (canasta) canasta.appendChild(btn);
-            }, i * paso + vuelo);
+                window.setTimeout(alFin, vuelo);
+            }, inicio);
         });
-        return instantaneo || reducir() ? 0 : (botones.length - 1) * paso + vuelo;
+
+        return totalMs + 350;
     }
 
     function mostrarFeedback(tipo) {

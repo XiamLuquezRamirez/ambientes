@@ -372,8 +372,6 @@
         btn.style.transition = '';
         const elegir = document.getElementById('rnElegir');
         if (!elegir) return;
-        const jugar = btn.classList.contains('rn-elegir-btn--jugar');
-        elegir.style.setProperty('--rn-color-boton', jugar ? '#25aba6' : '#fc583a');
         elegir.style.setProperty('--rn-icono', Math.round(Math.max(ancho, alto)) + 'px');
     }
 

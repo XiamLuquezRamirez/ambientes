@@ -25,7 +25,7 @@
       },
       {
         "personaje": 0,
-        "texto": "¡Yo soy Zeus! Mira la manzana, el taladro y el patito. Cada uno tiene su caja."
+        "texto": "¡Yo soy Zeus! Hay manzanas, ropa, comida, juguetes y herramientas. Cada cosa tiene su caja."
       },
       {
         "personaje": 1,
@@ -49,13 +49,67 @@
   "fondo": "img/FONDO.png",
   "pares": {
     "manzana": "caja_manzana",
+    "manzana_verde": "caja_manzana",
+    "manzana_amarilla": "caja_manzana",
+    "manzana_hoja": "caja_manzana",
+    "manzanas": "caja_manzana",
+    "manzana_partida": "caja_manzana",
     "taladro": "caja_herramientas",
-    "pato": "caja_juguetes"
+    "martillo": "caja_herramientas",
+    "destornillador": "caja_herramientas",
+    "llave": "caja_herramientas",
+    "sierra": "caja_herramientas",
+    "alicate": "caja_herramientas",
+    "pato": "caja_juguetes",
+    "pelota": "caja_juguetes",
+    "carro": "caja_juguetes",
+    "oso": "caja_juguetes",
+    "cubo": "caja_juguetes",
+    "avion": "caja_juguetes",
+    "camiseta": "caja_ropa",
+    "pantalon": "caja_ropa",
+    "zapato": "caja_ropa",
+    "vestido": "caja_ropa",
+    "gorra": "caja_ropa",
+    "medias": "caja_ropa",
+    "pan": "caja_alimentos",
+    "leche": "caja_alimentos",
+    "queso": "caja_alimentos",
+    "galleta": "caja_alimentos",
+    "huevo": "caja_alimentos",
+    "zanahoria": "caja_alimentos"
   },
   "objetos": {
     "manzana": { "nombre": "Manzana", "img": "img/MANZANA.png" },
+    "manzana_verde": { "nombre": "Manzana verde", "img": "img/objetos/manzana_verde.svg" },
+    "manzana_amarilla": { "nombre": "Manzana amarilla", "img": "img/objetos/manzana_amarilla.svg" },
+    "manzana_hoja": { "nombre": "Manzana con hoja", "img": "img/objetos/manzana_hoja.svg" },
+    "manzanas": { "nombre": "Manzanas", "img": "img/objetos/manzanas.svg" },
+    "manzana_partida": { "nombre": "Manzana partida", "img": "img/objetos/manzana_partida.svg" },
     "taladro": { "nombre": "Taladro", "img": "img/TALADRO.png" },
-    "pato": { "nombre": "Pato", "img": "img/PATO.png" }
+    "martillo": { "nombre": "Martillo", "img": "img/objetos/martillo.svg" },
+    "destornillador": { "nombre": "Destornillador", "img": "img/objetos/destornillador.svg" },
+    "llave": { "nombre": "Llave", "img": "img/objetos/llave.svg" },
+    "sierra": { "nombre": "Sierra", "img": "img/objetos/sierra.svg" },
+    "alicate": { "nombre": "Alicate", "img": "img/objetos/alicate.svg" },
+    "pato": { "nombre": "Pato", "img": "img/PATO.png" },
+    "pelota": { "nombre": "Pelota", "img": "img/objetos/pelota.svg" },
+    "carro": { "nombre": "Carro", "img": "img/objetos/carro.svg" },
+    "oso": { "nombre": "Oso", "img": "img/objetos/oso.svg" },
+    "cubo": { "nombre": "Cubo", "img": "img/objetos/cubo.svg" },
+    "avion": { "nombre": "Avión", "img": "img/objetos/avion.svg" },
+    "camiseta": { "nombre": "Camiseta", "img": "img/objetos/camiseta.svg" },
+    "pantalon": { "nombre": "Pantalón", "img": "img/objetos/pantalon.svg" },
+    "zapato": { "nombre": "Zapato", "img": "img/objetos/zapato.svg" },
+    "vestido": { "nombre": "Vestido", "img": "img/objetos/vestido.svg" },
+    "gorra": { "nombre": "Gorra", "img": "img/objetos/gorra.svg" },
+    "medias": { "nombre": "Medias", "img": "img/objetos/medias.svg" },
+    "pan": { "nombre": "Pan", "img": "img/objetos/pan.svg" },
+    "leche": { "nombre": "Leche", "img": "img/objetos/leche.svg" },
+    "queso": { "nombre": "Queso", "img": "img/objetos/queso.svg" },
+    "galleta": { "nombre": "Galleta", "img": "img/objetos/galleta.svg" },
+    "huevo": { "nombre": "Huevo", "img": "img/objetos/huevo.svg" },
+    "zanahoria": { "nombre": "Zanahoria", "img": "img/objetos/zanahoria.svg" }
   },
   "destinos": {
     "caja_manzana": { "nombre": "Caja de manzanas", "img": "img/CAJA_MANZANA.png" },
@@ -70,30 +124,24 @@
       "edad": "3 años",
       "titulo": "1 ronda · 3 lugares",
       "rondas": 1,
-      "objetos": ["manzana", "taladro", "pato"],
-      "destinos": ["caja_manzana", "caja_herramientas", "caja_juguetes"],
-      "barajarDestinos": false,
-      "barajarObjetos": false
+      "lugares": 3,
+      "objetosPorRonda": 3
     },
     {
       "id": "4",
       "edad": "4 años",
       "titulo": "2 rondas · 4 lugares",
       "rondas": 2,
-      "objetos": ["manzana", "taladro", "pato"],
-      "destinos": ["caja_manzana", "caja_herramientas", "caja_juguetes", "caja_ropa"],
-      "barajarDestinos": true,
-      "barajarObjetos": false
+      "lugares": 4,
+      "objetosPorRonda": 3
     },
     {
       "id": "5",
       "edad": "5-6 años",
       "titulo": "3 rondas · 5 lugares",
       "rondas": 3,
-      "objetos": ["manzana", "taladro", "pato"],
-      "destinos": ["caja_manzana", "caja_herramientas", "caja_juguetes", "caja_ropa", "caja_alimentos"],
-      "barajarDestinos": true,
-      "barajarObjetos": true
+      "lugares": 5,
+      "objetosPorRonda": 3
     }
   ]
 }

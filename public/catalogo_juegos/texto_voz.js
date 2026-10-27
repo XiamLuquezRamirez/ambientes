@@ -99,6 +99,8 @@
 
     function detenerVoz() {
         ttsToken += 1;
+        ttsCola.length = 0;
+        ttsColaAndando = false;
         detenerReproduccionTts();
         notificarTtsFin();
     }
