@@ -12,6 +12,9 @@
 
     let ctx = null;
     let juegos = [];
+    let bjAbriendoJuego = false;
+
+    const BJ_APERTURA_MS = 720;
 
     function escapar(str) {
         return String(str ?? '')
@@ -482,7 +485,74 @@
         } catch (e) { /* noop */ }
     }
 
-    function montarJuego(juego) {
+    function reducirMovimientoApertura() {
+        return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+
+    function limpiarEstadoApertura($galeria) {
+        bjAbriendoJuego = false;
+        const $g = $galeria && $galeria.length ? $galeria : ctx.$paso.find('.bj-galeria');
+        $g.removeClass('bj-galeria--abriendo');
+        $g.find('.bj-card--elegida').removeClass('bj-card--elegida');
+        $g.find('.bj-apertura-fiesta').remove();
+    }
+
+    /** Chispas y destello desde la tarjeta (transición más “de niños”). */
+    function fiestaDesdeTarjeta($g, $card, color) {
+        if (!$g.length || !$card.length) return;
+        $g.find('.bj-apertura-fiesta').remove();
+
+        const galeria = $g[0];
+        const cardEl = $card[0];
+        const rect = cardEl.getBoundingClientRect();
+        const gRect = galeria.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2 - gRect.left;
+        const cy = rect.top + rect.height / 2 - gRect.top;
+
+        const fiesta = document.createElement('div');
+        fiesta.className = 'bj-apertura-fiesta';
+        fiesta.setAttribute('aria-hidden', 'true');
+        fiesta.style.setProperty('--ox', cx + 'px');
+        fiesta.style.setProperty('--oy', cy + 'px');
+        fiesta.style.setProperty('--flash', color || '#4d96ff');
+
+        const destello = document.createElement('div');
+        destello.className = 'bj-apertura-destello';
+        fiesta.appendChild(destello);
+
+        const colores = ['#ffe066', '#ff6b6b', '#4d96ff', '#6bcb77', '#ff9ff3', '#fff', '#ffb347'];
+        const formas = ['★', '●', '✦', '♥'];
+        let i;
+        for (i = 0; i < 18; i++) {
+            const p = document.createElement('span');
+            p.className = 'bj-apertura-chispa';
+            const ang = (i / 18) * 360 + (Math.random() * 28 - 14);
+            const dist = 90 + Math.random() * 150;
+            const rad = ang * Math.PI / 180;
+            p.style.setProperty('--dx', (Math.cos(rad) * dist) + 'px');
+            p.style.setProperty('--dy', (Math.sin(rad) * dist) + 'px');
+            p.style.setProperty('--rot', (Math.random() * 520 - 260) + 'deg');
+            p.style.setProperty('--c', colores[i % colores.length]);
+            p.style.setProperty('--delay', (Math.random() * 0.12) + 's');
+            p.style.setProperty('--s', (0.75 + Math.random() * 0.65).toFixed(2));
+            p.textContent = formas[i % formas.length];
+            fiesta.appendChild(p);
+        }
+
+        const mando = document.createElement('span');
+        mando.className = 'bj-apertura-mando';
+        mando.setAttribute('aria-hidden', 'true');
+        fiesta.appendChild(mando);
+
+        galeria.appendChild(fiesta);
+        window.setTimeout(function () {
+            if (fiesta.parentNode) fiesta.remove();
+        }, 1300);
+    }
+
+    function montarJuego(juego, $card) {
+        if (bjAbriendoJuego || ctx.$paso.find('[data-bj-player]').length) return;
+
         const perfil = perfilPayload();
         const url = urlPaqueteConEdad(
             urlPaqueteConIcono(
@@ -495,23 +565,61 @@
 
         const color = juego.color || '#64748b';
         const $g = ctx.$paso.find('.bj-galeria');
-        const $player = $(`
-            <div class="bj-player" data-bj-player style="--juego-color:${escapar(color)};--fondo-portada:url('${escapar(urlFondoPortada())}')">
-                <div class="bj-canvas-wrap" data-bj-canvas>
-                    <iframe class="bj-iframe"
-                        title="${escapar(juego.nombre)}"
-                        src="${escapar(url)}"
-                        allow="autoplay; fullscreen"
-                        referrerpolicy="same-origin"></iframe>
+        const reducir = reducirMovimientoApertura();
+        const espera = reducir ? 0 : BJ_APERTURA_MS;
+
+        bjAbriendoJuego = true;
+        if ($card && $card.length && !reducir) {
+            $g.find('.bj-card--elegida').removeClass('bj-card--elegida');
+            $card.addClass('bj-card--elegida');
+            $g.addClass('bj-galeria--abriendo');
+            fiestaDesdeTarjeta($g, $card, color);
+        }
+
+        function insertarPlayer() {
+            const $player = $(`
+                <div class="bj-player bj-player--entrada" data-bj-player style="--juego-color:${escapar(color)};--fondo-portada:url('${escapar(urlFondoPortada())}')">
+                    <div class="bj-apertura-cargando" aria-hidden="true">
+                        <span class="bj-apertura-cargando-icono"></span>
+                        <span class="bj-apertura-cargando-texto">¡Vamos!</span>
+                    </div>
+                    <div class="bj-canvas-wrap" data-bj-canvas>
+                        <iframe class="bj-iframe"
+                            title="${escapar(juego.nombre)}"
+                            src="${escapar(url)}"
+                            allow="autoplay; fullscreen"
+                            referrerpolicy="same-origin"></iframe>
+                    </div>
                 </div>
-            </div>
-        `);
-        $g.append($player);
-        const frame = $player.find('iframe')[0];
-        $(frame).on('load', function () {
-            inyectarPerfil(frame);
-            engancharSalida(frame);
-        });
+            `);
+            $g.append($player);
+            const frame = $player.find('iframe')[0];
+
+            window.requestAnimationFrame(function () {
+                window.requestAnimationFrame(function () {
+                    $player.removeClass('bj-player--entrada').addClass('bj-player--rebote');
+                });
+            });
+
+            $(frame).on('load', function () {
+                inyectarPerfil(frame);
+                engancharSalida(frame);
+                $player.addClass('bj-player--listo');
+                limpiarEstadoApertura($g);
+            });
+
+            window.setTimeout(function () {
+                if (!$player.isConnected) return;
+                $player.addClass('bj-player--listo');
+                limpiarEstadoApertura($g);
+            }, espera + 1100);
+        }
+
+        if (espera > 0) {
+            window.setTimeout(insertarPlayer, espera);
+        } else {
+            insertarPlayer();
+        }
     }
 
     function cerrarJuego() {
@@ -527,6 +635,7 @@
             frame.src = 'about:blank';
         }
         $player.remove();
+        limpiarEstadoApertura();
     }
 
     /**
@@ -567,7 +676,7 @@
                     url_paquete: url,
                 };
             }
-            if (juego.url_paquete) montarJuego(juego);
+            if (juego.url_paquete) montarJuego(juego, $card);
         });
     }
 
