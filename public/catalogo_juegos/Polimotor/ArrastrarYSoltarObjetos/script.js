@@ -22,6 +22,7 @@
     let imgCache = Object.create(null);
     let imagenesPromise = null;
     let dragState = null;
+    let usadosObjetos = [];
 
     function readText(ruta) {
         const xhr = new XMLHttpRequest();
@@ -493,6 +494,7 @@
         aceptaArrastre = false;
         TextoVoz.detener();
         indiceRonda = 0;
+        usadosObjetos = [];
         totalRondas = Math.max(1, Number(nivelElegido.rondas) || 1);
         document.getElementById("enunciado").textContent = textos().enunciado || "Arrastra cada objeto hasta su lugar";
         Promise.resolve(imagenesPromise).then(function () {
@@ -500,6 +502,7 @@
                 const prog = document.getElementById("progreso");
                 if (prog) prog.hidden = true;
                 pintarTablero(["manzana"], ["caja_manzana"]);
+                marcarEntrada();
                 aceptaArrastre = false;
                 return PedniaTutorial.correr({
                     texto: textos().demostracion,
@@ -534,16 +537,85 @@
         if (gen !== rondaGen || juegoTerminado) return;
         cancelarDrag();
         colocados = Object.create(null);
-        const objs = (nivelElegido.objetos || []).slice();
-        const dests = (nivelElegido.destinos || []).slice();
-        objetosPendientes = nivelElegido.barajarObjetos ? shuffle(objs) : objs;
-        const destinosRonda = nivelElegido.barajarDestinos ? shuffle(dests) : dests;
+        const ronda = armarRondaAleatoria(nivelElegido);
+        objetosPendientes = ronda.objetos;
+        const destinosRonda = ronda.destinos;
         actualizarProgreso();
-        pintarTablero(objetosPendientes, destinosRonda);
-        const en = document.getElementById("enunciado");
-        if (en) en.textContent = textos().enunciado || "Arrastra cada objeto hasta su lugar";
-        aceptaArrastre = true;
-        TextoVoz.hablar(textos().enunciado || "Arrastra cada objeto hasta su lugar", "zoe");
+        const frase = textos().enunciado || "Arrastra cada objeto hasta su lugar";
+        transicionTablero(function () {
+            if (gen !== rondaGen || juegoTerminado) return;
+            pintarTablero(objetosPendientes, destinosRonda);
+            const en = document.getElementById("enunciado");
+            if (en) en.textContent = frase;
+            aceptaArrastre = true;
+            TextoVoz.hablar(frase, "zoe");
+        });
+    }
+
+    function armarRondaAleatoria(nivel) {
+        const porCaja = Object.create(null);
+        Object.keys(gameConfig.pares || {}).forEach(function (id) {
+            const caja = gameConfig.pares[id];
+            if (!porCaja[caja]) porCaja[caja] = [];
+            porCaja[caja].push(id);
+        });
+        const cajas = Object.keys(porCaja);
+        const nObj = Math.min(cajas.length, Math.max(1, Number(nivel.objetosPorRonda) || 3));
+        const nLug = Math.min(cajas.length, Math.max(nObj, Number(nivel.lugares) || nObj));
+        const conLibre = [];
+        const sinLibre = [];
+        shuffle(cajas).forEach(function (caja) {
+            const libre = porCaja[caja].some(function (id) { return usadosObjetos.indexOf(id) === -1; });
+            (libre ? conLibre : sinLibre).push(caja);
+        });
+        const elegidas = conLibre.concat(sinLibre).slice(0, nObj);
+        const objetos = elegidas.map(function (caja) {
+            const libres = porCaja[caja].filter(function (id) { return usadosObjetos.indexOf(id) === -1; });
+            const pool = libres.length ? libres : porCaja[caja];
+            const id = pool[randInt(0, pool.length - 1)];
+            usadosObjetos.push(id);
+            return id;
+        });
+        const destinos = elegidas.slice();
+        const resto = shuffle(cajas.filter(function (caja) { return destinos.indexOf(caja) === -1; }));
+        while (destinos.length < nLug && resto.length) destinos.push(resto.shift());
+        return { objetos: shuffle(objetos), destinos: shuffle(destinos) };
+    }
+
+    function movimientoReducido() {
+        return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    }
+
+    let entradaTimer = 0;
+
+    function marcarEntrada() {
+        const escena = document.getElementById("escena-wrap");
+        if (!escena || movimientoReducido()) return;
+        escena.classList.remove("ronda-sale", "ronda-entra");
+        void escena.offsetWidth;
+        escena.classList.add("ronda-entra");
+        clearTimeout(entradaTimer);
+        entradaTimer = setTimeout(function () {
+            escena.classList.remove("ronda-entra");
+        }, 980);
+    }
+
+    function transicionTablero(pintar) {
+        const escena = document.getElementById("escena-wrap");
+        const hay = !!(escena && escena.querySelector(".destino"));
+        if (!hay || movimientoReducido()) {
+            pintar();
+            marcarEntrada();
+            return;
+        }
+        aceptaArrastre = false;
+        escena.classList.remove("ronda-entra");
+        escena.classList.add("ronda-sale");
+        setTimeout(function () {
+            escena.classList.remove("ronda-sale");
+            pintar();
+            marcarEntrada();
+        }, 340);
     }
 
     function llevarYDejar(obj, dest, objetoId) {
@@ -621,11 +693,14 @@
         const $objs = document.getElementById("zona-objetos");
         $dest.innerHTML = "";
         $objs.innerHTML = "";
+        $dest.dataset.n = String(destinos.length);
+        $objs.dataset.n = String(objetos.length);
 
-        destinos.forEach(function (id) {
+        destinos.forEach(function (id, i) {
             const m = metaDest(id);
             const el = document.createElement("div");
             el.className = "destino";
+            el.style.animationDelay = (i * 60) + "ms";
             el.dataset.destino = id;
             el.innerHTML =
                 '<img class="destino-img" src="' + escAttr(m.img) + '" alt="' + escAttr(m.nombre) + '">' +
@@ -633,11 +708,12 @@
             $dest.appendChild(el);
         });
 
-        objetos.forEach(function (id) {
+        objetos.forEach(function (id, i) {
             const m = metaObj(id);
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "objeto";
+            btn.style.animationDelay = (180 + i * 70) + "ms";
             btn.dataset.objeto = id;
             btn.setAttribute("aria-label", m.nombre || id);
             btn.innerHTML = '<img src="' + escAttr(m.img) + '" alt="">';
@@ -733,12 +809,55 @@
         const dest = state.over || destinoBajoPunto(ev.clientX, ev.clientY);
         limpiarListenersDrag(state.el);
         if (state.over) state.over.classList.remove("is-over");
-        if (state.proxy && state.proxy.parentNode) state.proxy.parentNode.removeChild(state.proxy);
-        state.el.classList.remove("is-dragging", "is-ghost");
         dragState = null;
 
-        if (!dest) return;
-        resolverSoltar(state.objetoId, dest.dataset.destino, state.el, dest);
+        if (!dest) {
+            volverProxy(state.proxy, state.el).then(function () {
+                soltarProxy(state.proxy, state.el);
+            });
+            return;
+        }
+        resolverSoltar(state.objetoId, dest.dataset.destino, state.el, dest, state.proxy);
+    }
+
+    function centroDe(el) {
+        const r = el.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+
+    function moverProxyHacia(proxy, x, y, escala, ms) {
+        return new Promise(function (resolve) {
+            if (!proxy) {
+                resolve();
+                return;
+            }
+            if (movimientoReducido()) {
+                resolve();
+                return;
+            }
+            proxy.style.transition = "left " + ms + "ms cubic-bezier(.22,.82,.28,1), top " + ms + "ms cubic-bezier(.22,.82,.28,1), transform " + ms + "ms cubic-bezier(.22,.82,.28,1)";
+            proxy.style.left = x + "px";
+            proxy.style.top = y + "px";
+            proxy.style.transform = "translate(-50%, -50%) scale(" + escala + ")";
+            setTimeout(resolve, ms + 20);
+        });
+    }
+
+    function volverProxy(proxy, el) {
+        if (!proxy || !el) return Promise.resolve();
+        const c = centroDe(el);
+        return moverProxyHacia(proxy, c.x, c.y, 1, 280);
+    }
+
+    function volarProxyAlDestino(proxy, elDestino) {
+        if (!proxy || !elDestino) return Promise.resolve();
+        const r = elDestino.getBoundingClientRect();
+        return moverProxyHacia(proxy, r.left + r.width / 2, r.top + r.height * 0.4, 0.62, 520);
+    }
+
+    function soltarProxy(proxy, el) {
+        if (proxy && proxy.parentNode) proxy.parentNode.removeChild(proxy);
+        if (el) el.classList.remove("is-dragging", "is-ghost");
     }
 
     function limpiarListenersDrag(el) {
@@ -757,17 +876,35 @@
         dragState = null;
     }
 
-    async function resolverSoltar(objetoId, destinoId, elObjeto, elDestino) {
-        if (!aceptaArrastre || esperandoFeedback || juegoTerminado) return;
+    async function resolverSoltar(objetoId, destinoId, elObjeto, elDestino, proxy) {
+        if (!aceptaArrastre || esperandoFeedback || juegoTerminado) {
+            soltarProxy(proxy, elObjeto);
+            return;
+        }
         const correcto = destinoCorrecto(objetoId);
         if (!correcto || destinoId !== correcto) {
+            aceptaArrastre = false;
+            if (elDestino) elDestino.classList.add("is-rechazo");
+            await volverProxy(proxy, elObjeto);
+            if (elDestino) elDestino.classList.remove("is-rechazo");
+            soltarProxy(proxy, elObjeto);
             await feedbackError();
             return;
         }
-        if (colocados[objetoId]) return;
+        if (colocados[objetoId]) {
+            soltarProxy(proxy, elObjeto);
+            return;
+        }
 
+        aceptaArrastre = false;
         colocados[objetoId] = destinoId;
+        await volarProxyAlDestino(proxy, elDestino);
+        soltarProxy(proxy, elObjeto);
         colocarEnDestino(objetoId, elObjeto, elDestino);
+        if (elDestino) {
+            elDestino.classList.add("is-celebra");
+            setTimeout(function () { elDestino.classList.remove("is-celebra"); }, 700);
+        }
 
         await feedbackAcierto();
 
@@ -776,7 +913,7 @@
 
         if (indiceRonda + 1 < totalRondas) {
             indiceRonda += 1;
-            await sleep(350);
+            await sleep(480);
             iniciarRonda(rondaGen);
             return;
         }

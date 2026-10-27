@@ -7,7 +7,13 @@
 @endpush
 
 @section('content')
-    <div class="rn-kiosco-shell"
+    @php
+        $slugElegir = strtolower(trim((string) ($ambiente->slug ?? '')));
+        $claseElegir = in_array($slugElegir, config('ambiente.slugs'), true)
+            ? 'rn-amb--'.$slugElegir
+            : '';
+    @endphp
+    <div class="rn-kiosco-shell {{ $claseElegir }}"
         @if ($modo === 'sesion') data-kiosco-sesion="1" @endif
         style="--rn-color: {{ $arbol['ambiente']['color_hex'] }};">
         @include('experiencias._recorrido-nino-app', array_merge(get_defined_vars(), ['enKioscoShell' => true]))

@@ -5,6 +5,35 @@
     $qsDestino = $destino === \App\Services\SesionNinoService::DESTINO_JUEGOS
         ? ['destino' => \App\Services\SesionNinoService::DESTINO_JUEGOS]
         : [];
+    $slugAula = strtolower(trim((string) ($ambiente->slug ?? '')));
+    if (! in_array($slugAula, config('ambiente.slugs'), true)) {
+        $slugAula = '';
+    }
+    $assetAula = function (string $archivo) use ($slugAula) {
+        if ($slugAula === '') {
+            return '';
+        }
+        $rel = 'assets/images/selector-aula/'.$slugAula.'/'.$archivo;
+        $abs = public_path($rel);
+        if (! is_file($abs)) {
+            return '';
+        }
+
+        return asset($rel).'?v='.@filemtime($abs);
+    };
+    $aulaFondo = $assetAula('fondo.png');
+    $aulaHeader = $assetAula('header.png');
+    $aulaMarco = $assetAula('marco_nino.svg');
+    $aulaResplandor = $assetAula('marco_nino_resplandor.svg');
+    $aulaHueco = $assetAula('marco_nino_hueco.svg');
+    $aulaPunteado = $assetAula('marco_nino_punteado.svg');
+    $aulaVars = array_filter([
+        $aulaFondo !== '' ? "--aula-fondo: url('{$aulaFondo}')" : '',
+        $aulaMarco !== '' ? "--aula-marco: url('{$aulaMarco}')" : '',
+        $aulaResplandor !== '' ? "--aula-resplandor: url('{$aulaResplandor}')" : '',
+        $aulaHueco !== '' ? "--aula-hueco: url('{$aulaHueco}')" : '',
+        $aulaPunteado !== '' ? "--aula-punteado: url('{$aulaPunteado}')" : '',
+    ]);
 @endphp
 
 @push('styles')
@@ -13,9 +42,11 @@
 @endpush
 
 @section('content')
-<main class="selector-aula">
+<main class="selector-aula{{ $slugAula !== '' ? ' selector-aula--'.$slugAula : '' }}" @if ($aulaVars !== []) style="{{ implode('; ', $aulaVars) }}" @endif>
     <div class="selector-aula__escena">
-    <img class="selector-aula__cielo" src="{{ asset('assets/images/selector-aula/header.png') }}?v={{ @filemtime(public_path('assets/images/selector-aula/header.png')) }}" alt="">
+    @if ($aulaHeader !== '')
+        <img class="selector-aula__cielo" src="{{ $aulaHeader }}" alt="">
+    @endif
     <header class="selector-aula__barra">
         <span class="selector-aula__hueco" aria-hidden="true"></span>
         <div class="selector-aula__centro">
@@ -111,7 +142,12 @@
             </button>
             <div class="aula-confirma__cuerpo">
                 <div class="aula-confirma__ficha">
-                    <img class="aula-confirma__marco" src="{{ asset('assets/images/selector-aula/marco_nino.svg') }}?v={{ @filemtime(public_path('assets/images/selector-aula/marco_nino.svg')) }}" alt="">
+                    @if ($slugAula === 'multisensorial')
+                        <span class="aula-confirma__flor-sombra" aria-hidden="true"></span>
+                    @endif
+                    @if ($aulaMarco !== '')
+                        <img class="aula-confirma__marco" src="{{ $aulaMarco }}" alt="">
+                    @endif
                     <span class="aula-confirma__foto" id="aulaConfirmaFoto"></span>
                     <p class="aula-confirma__nombre" id="aulaConfirmaNombre"></p>
                 </div>

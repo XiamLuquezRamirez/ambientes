@@ -813,7 +813,9 @@
                 const btn = document.querySelector('.tarjeta-opcion[data-mov="' + ejemplo.correcta + '"]');
                 await animarDedoEnOpcion(btn);
                 if (gen !== retoGen || juegoTerminado) return;
-                await dormir(400);
+                await colocarRespuestaEnHueco(ejemplo.correcta, btn);
+                if (gen !== retoGen || juegoTerminado) return;
+                await dormir(550);
                 document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
                 limpiarEscena();
             }
@@ -857,6 +859,7 @@
 
     function limpiarEscena() {
         aceptaRespuesta = false;
+        document.querySelectorAll(".tarjeta-vuelo").forEach(function (n) { n.remove(); });
         document.getElementById("riel").innerHTML = "";
         const ops = document.getElementById("opciones");
         ops.hidden = true;
@@ -1070,18 +1073,87 @@
         aceptaRespuesta = true;
     }
 
+    function movimientoReducido() {
+        return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    }
+
+    function moverTarjetaAlHueco(btnEl, hueco) {
+        const img = btnEl && btnEl.querySelector("img");
+        if (!btnEl || !img || !hueco || movimientoReducido()) return Promise.resolve(null);
+        const from = img.getBoundingClientRect();
+        const dest = hueco.getBoundingClientRect();
+        if (!from.width || !dest.width) return Promise.resolve(null);
+
+        const ghost = img.cloneNode(true);
+        ghost.className = "tarjeta-vuelo";
+        ghost.removeAttribute("id");
+        ghost.setAttribute("aria-hidden", "true");
+        ghost.style.animation = "none";
+        ghost.style.transition = "none";
+        ghost.style.left = from.left + "px";
+        ghost.style.top = from.top + "px";
+        ghost.style.width = from.width + "px";
+        ghost.style.height = from.height + "px";
+        ghost.style.margin = "0";
+        ghost.style.transform = "translate(0, 0) scale(1)";
+        document.body.appendChild(ghost);
+        btnEl.classList.add("elegida");
+        hueco.classList.add("espera-carta");
+
+        const dx = (dest.left + dest.width / 2) - (from.left + from.width / 2);
+        const dy = (dest.top + dest.height / 2) - (from.top + from.height / 2);
+        const scale = Math.min(dest.width / from.width, dest.height / from.height) * 0.92;
+        const ms = 640;
+
+        return new Promise(function (resolve) {
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    if (!ghost.isConnected) {
+                        resolve(null);
+                        return;
+                    }
+                    ghost.style.transition = "transform " + ms + "ms cubic-bezier(.22, .8, .24, 1)";
+                    ghost.style.transform = "translate(" + dx + "px, " + dy + "px) scale(" + scale + ")";
+                });
+            });
+            setTimeout(function () { resolve(ghost.isConnected ? ghost : null); }, ms + 20);
+        });
+    }
+
+    async function colocarRespuestaEnHueco(valor, btnEl) {
+        document.querySelectorAll(".tarjeta-opcion").forEach(function (b) {
+            b.disabled = true;
+            if (b !== btnEl) b.classList.add("descartada");
+        });
+        const hueco = document.querySelector("#riel .slot-pose.hueco");
+        const ghost = await moverTarjetaAlHueco(btnEl, hueco);
+        const sigue = !!(hueco && hueco.isConnected);
+        if (sigue) {
+            hueco.className = "slot-pose visible activa";
+            hueco.textContent = "";
+            hueco.dataset.mov = valor;
+            hueco.appendChild(crearImgEl(imgUrl(valor), nombreMov(valor)));
+        }
+        if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
+        return sigue;
+    }
+
     async function resolverAcierto(valor, gen) {
         if (gen !== retoGen) return;
         esperandoFeedback = true;
 
-        // Incorporar al riel
+        const btn = document.querySelector('.tarjeta-opcion[data-mov="' + valor + '"]');
         const completa = (retoActual.prefijo || []).concat([valor]);
-        renderRielEstatico(completa, false);
-        const last = document.querySelector(".slot-pose:last-child");
-        if (last) last.classList.add("entrando", "activa");
+        const puesto = await colocarRespuestaEnHueco(valor, btn);
+        if (gen !== retoGen) return;
+        if (!puesto) {
+            renderRielEstatico(completa, false);
+            const last = document.querySelector(".slot-pose:last-child");
+            if (last) last.classList.add("activa");
+        }
         document.getElementById("opciones").hidden = true;
 
-        await sleep(280);
+        await sleep(420);
         if (gen !== retoGen) return;
         await reproducirSecuencia(completa, gen, false);
         if (gen !== retoGen) return;

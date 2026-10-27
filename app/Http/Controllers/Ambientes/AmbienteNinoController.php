@@ -93,10 +93,10 @@ class AmbienteNinoController extends Controller
             'portadaImg' => $this->urlPortada($ambiente->slug),
             'fondoImg' => $this->urlFondo($ambiente->slug),
             'fondoElegirImg' => $this->urlFondoElegir($ambiente->slug),
-            'tarjetaExplorarImg' => $this->urlImagenFondos('explorar'),
-            'tarjetaJugarImg' => $this->urlImagenFondos('jugar'),
-            'tarjetaExplorarReversoImg' => $this->urlImagenFondos('explorar-reverso'),
-            'tarjetaJugarReversoImg' => $this->urlImagenFondos('jugar-reverso'),
+            'tarjetaExplorarImg' => $this->urlTarjetaAmbiente($ambiente->slug, 'explorar'),
+            'tarjetaJugarImg' => $this->urlTarjetaAmbiente($ambiente->slug, 'jugar'),
+            'tarjetaExplorarReversoImg' => $this->urlTarjetaAmbiente($ambiente->slug, 'explorar-reverso'),
+            'tarjetaJugarReversoImg' => $this->urlTarjetaAmbiente($ambiente->slug, 'jugar-reverso'),
             'pasoInicial' => 'portada',
         ]);
     }
@@ -357,15 +357,32 @@ class AmbienteNinoController extends Controller
     /**
      * Fondo del paso «¿Qué haremos hoy?» tras pulsar Iniciar.
      * Convención: public/assets/images/fondos_Ambientes/{slug}2.png
+     * (el mismo patrón en los cinco ambientes).
      */
     private function urlFondoElegir(string $slug): string
     {
         return $this->urlImagenFondos($this->slugImagenAmbiente($slug).'2');
     }
 
-    private function urlImagenFondos(string $nombre): string
+    /**
+     * Ilustración de Explorar / Jugar, propia de cada ambiente.
+     * Convención: public/assets/images/fondos_Ambientes/{slug}/{nombre}.png
+     */
+    private function urlTarjetaAmbiente(string $slug, string $nombre): string
     {
-        $relativo = 'assets/images/fondos_Ambientes/'.$nombre.'.png';
+        $slug = $this->slugImagenAmbiente($slug);
+        if (! in_array($slug, config('ambiente.slugs'), true)) {
+            return '';
+        }
+
+        return $this->urlImagenFondos($nombre, $slug);
+    }
+
+    private function urlImagenFondos(string $nombre, ?string $carpeta = null): string
+    {
+        $relativo = 'assets/images/fondos_Ambientes/'
+            .($carpeta !== null && $carpeta !== '' ? $carpeta.'/' : '')
+            .$nombre.'.png';
         $absoluto = public_path($relativo);
 
         if (File::exists($absoluto)) {

@@ -1240,6 +1240,41 @@
     transition: opacity .6s ease;
 }
 
+/* Destello al pulsar Explorar y Jugar. Cada ambiente define los dos;
+   los que aún no tienen paleta propia repiten la de Polimotor. */
+.rn-amb--expresion-artistica {
+    --rn-color-explorar: #fc583a;
+    --rn-color-jugar: #25aba6;
+}
+
+.rn-amb--polimotor {
+    --rn-color-explorar: #fc583a;
+    --rn-color-jugar: #25aba6;
+}
+
+.rn-amb--multisaberes {
+    --rn-color-explorar: #fc583a;
+    --rn-color-jugar: #25aba6;
+}
+
+.rn-amb--multisensorial {
+    --rn-color-explorar: #9065d8;
+    --rn-color-jugar: #4aa242;
+}
+
+.rn-amb--tecnologia {
+    --rn-color-explorar: #fc583a;
+    --rn-color-jugar: #25aba6;
+}
+
+.rn-elegir:has(.rn-elegir-btn--clase.is-elegida) {
+    --rn-color-boton: var(--rn-color-explorar, #fc583a);
+}
+
+.rn-elegir:has(.rn-elegir-btn--jugar.is-elegida) {
+    --rn-color-boton: var(--rn-color-jugar, #25aba6);
+}
+
 .rn-elegir-bloom {
     position: absolute;
     left: 50%;

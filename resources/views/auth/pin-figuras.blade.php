@@ -10,7 +10,7 @@
 
 @section('content')
     @if ($sinPin || $pinBloqueado)
-        <main class="pin-wrap">
+        <main class="pin-wrap" @if ($fondoPin) style="--pin-fondo: url('{{ $fondoPin }}');" @endif>
             <div class="pin-bloqueado" role="alert">
                 <span class="pin-bloqueado__icono" aria-hidden="true">
                     <i class="fas {{ $sinPin ? 'fa-lock' : 'fa-ban' }}"></i>
@@ -39,7 +39,8 @@
                 . '?v=' . @filemtime(public_path("assets/audio/kiosco/{$archivo}"));
             $sonidosFigura = array_map(fn ($n) => $audioKiosco("figura-{$n}.wav"), [1, 2, 3]);
         @endphp
-        <main class="pin-wrap" id="kioscoPinApp" data-verificar="{{ route('auth.verificar-pin', $estudiante->id) }}"
+        <main class="pin-wrap" id="kioscoPinApp" @if ($fondoPin) style="--pin-fondo: url('{{ $fondoPin }}');" @endif
+            data-verificar="{{ route('auth.verificar-pin', $estudiante->id) }}"
             data-csrf="{{ csrf_token() }}" data-catalogo='@json(collect($figuras)->keyBy('icon'))'
             data-voz="{{ $vozPin }}"
             data-sonido-acierto="{{ $audioKiosco('pin-acierto.mp3') }}"

@@ -78,8 +78,14 @@
         </style>
     @endif
     @stack('styles')
-    @if (request()->routeIs('ambiente.inicio'))
-        <link rel="preload" as="image" href="{{ asset('assets/images/selector-aula/fondo.png') }}">
+    @php
+        $slugAulaPreload = strtolower(trim((string) ($ambiente->slug ?? '')));
+        $fondoAulaRel = in_array($slugAulaPreload, config('ambiente.slugs'), true)
+            ? 'assets/images/selector-aula/'.$slugAulaPreload.'/fondo.png'
+            : '';
+    @endphp
+    @if (request()->routeIs('ambiente.inicio') && $fondoAulaRel !== '' && is_file(public_path($fondoAulaRel)))
+        <link rel="preload" as="image" href="{{ asset($fondoAulaRel) }}?v={{ @filemtime(public_path($fondoAulaRel)) }}">
     @endif
 </head>
 
