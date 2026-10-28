@@ -6,15 +6,13 @@
 	<title>¿Quién usa qué?</title>
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-	<meta http-equiv="Pragma" content="no-cache">
-	<meta http-equiv="Expires" content="0">
 	<link rel="stylesheet" href="/assets/css/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css">
 	<link rel="stylesheet" href="/assets/css/fonts.css">
 	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css?v=20261028a">
+	<link rel="stylesheet" href="style.css?v=20261028p7">
 	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261027a">
 	<link rel="stylesheet" href="../../shared/menu-accesibilidad.css?v=20261027a">
 	<link rel="stylesheet" href="../../final/final.css">
@@ -43,6 +41,7 @@
 			</button>
 		</div>
 	</div>
+
 	<div id="intro3d-root" hidden>
 		<div id="three-container"></div>
 		<div id="phaser-container"></div>
@@ -51,11 +50,17 @@
 			<div class="intro3d-continuar-card">
 				<div class="intro3d-titulo-wrap"><h2>¡Listo!</h2></div>
 				<p>Toca el botón para empezar el juego</p>
-				<div class="intro3d-btn-wrap"><button type="button" id="btn-continuar-intro3d"><span class="intro3d-play" aria-hidden="true"></span><span>CONTINUAR</span></button></div>
+				<div class="intro3d-btn-wrap">
+					<button type="button" id="btn-continuar-intro3d">
+						<span class="intro3d-play" aria-hidden="true"></span><span>CONTINUAR</span>
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
+
 	<div id="fondo_blanco" style="display:none;background:rgba(255,255,255,.66);width:100%;height:100%;position:fixed;z-index:100;"></div>
+
 	<div id="final" class="final" hidden>
 		<div id="victoria">
 			<img src="../../img/fondo.png" class="fondo" alt="">
@@ -79,28 +84,39 @@
 			</div>
 		</div>
 	</div>
-	<div id="escena-fondo" class="escena-fondo" aria-hidden="true"><img class="escena-capa activa" alt="" draggable="false"><img class="escena-capa" alt="" draggable="false"></div>
-	<div id="principal">
-		<div class="hud-top"><div class="hud-nav">
-			<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
-			<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
-		</div></div>
-		<div class="cabecera"><div id="dialogo" class="dialogo" aria-live="polite">
-			<img id="dialogo-avatar" class="dialogo-avatar" src="../../images/zoe_normal.gif" alt="Zoe">
-			<p id="enunciado" class="enunciado"></p>
-		</div></div>
-		<div class="escenario" id="escenario">
-			<div class="pj pj-zoe" id="pj-zoe"><img class="pj-img" src="../../img/zoe_normal.gif" alt="Zoe" draggable="false"></div>
-			<div class="centro"><div class="progreso" id="progreso" aria-label="Retos"></div><div class="estacion" id="estacion"></div></div>
-			<div class="pj pj-zeus" id="pj-zeus"><img class="pj-img" src="../../img/zeus_normal.gif" alt="Zeus" draggable="false"></div>
-		</div>
+
+	<div id="escena-fondo" class="escena-fondo" aria-hidden="true">
+		<img class="escena-capa activa" alt="" draggable="false">
+		<img class="escena-capa" alt="" draggable="false">
 	</div>
+
+	<div id="principal">
+		<div class="hud-top">
+			<div class="hud-nav">
+				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
+			</div>
+		</div>
+		<div class="cabecera">
+			<div id="dialogo" class="dialogo" aria-live="polite">
+				<img id="dialogo-avatar" class="dialogo-avatar" src="../../images/zoe_normal.gif" alt="Zoe">
+				<p id="enunciado" class="enunciado"></p>
+			</div>
+		</div>
+		<div class="escenario" id="escenario">
+			<div class="progreso" id="progreso" aria-label="Retos"></div>
+			<div id="phaser-juego" class="phaser-juego" aria-label="Tablero del juego"></div>
+		</div>
+		<div id="wipe-reto" class="wipe-reto" aria-hidden="true"></div>
+	</div>
+
 	<div id="concierto" class="concierto" hidden aria-hidden="true">
 		<div class="concierto-tarima" id="concierto-tarima"></div>
 	</div>
-	<div id="capa-efectos" class="capa-efectos" aria-hidden="true"></div>
+
 	<div id="tutorial-zoe" class="tutorial-zoe" hidden></div>
 	<div id="tutorial-3d" class="tutorial-3d" hidden></div>
+
 	<div id="menu-acc" class="menu-acc">
 		<button type="button" id="btn-menu-acc" class="menu-acc-fab" title="Accesibilidad"><i class="fa-solid fa-universal-access"></i></button>
 		<div id="menu-acc-panel" class="menu-acc-panel" hidden>
@@ -115,24 +131,34 @@
 			<label class="menu-acc-rango"><span>Volumen <strong id="vol-val">20</strong></span><input type="range" id="rango-volumen" min="0" max="100" step="1" value="20"></label>
 		</div>
 	</div>
+
 	<script src="../../texto_voz.js"></script>
 	<script src="../../shared/edad-nivel.js"></script>
 	<script src="../../tutorial/tutorial.js?v=20261019b"></script>
 	<script src="../../final/final.js"></script>
 	<script src="../../shared/aplicar-perfil-juego.js"></script>
-	<script src="logica.js?v=20261028a"></script>
-	<script src="sfx.js?v=20261028a"></script>
+	<script src="logica.js?v=20261028p7"></script>
+	<script src="sfx.js?v=20261028p7"></script>
 	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
+	<script src="../../../assets/vendor/gsap/gsap.min.js"></script>
+	<script src="../../runtime/pednia-phaser-host.js?v=20261028p7"></script>
 	<script src="../../intro3d/js/config.js?v=20261007a"></script>
 	<script src="../../intro3d/js/ambientes-tema.js?v=20260930d"></script>
 	<script type="importmap">{ "imports": { "three": "../../../assets/vendor/three/three.module.js", "three/addons/": "../../../assets/vendor/three/addons/" } }</script>
 	<script type="module" src="../../intro3d/js/three-scene.js?v=20261007a"></script>
 	<script type="module" src="../../intro3d/js/final-scene.js?v=20261021a"></script>
 	<script type="module" src="../../intro3d/js/tutorial-3d.js?v=20261021a"></script>
-	<script type="module" src="../../intro3d/js/personajes-juego.js?v=20261021a"></script>
-	<script src="../../intro3d/js/intro.js?v=20261028p4"></script>
+	<script src="../../intro3d/js/intro.js?v=20261028p7"></script>
 	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
 	<script src="../../shared/menu-accesibilidad.js?v=20261019d"></script>
-	<script src="script.js?v=20261028a"></script>
+	<script src="js/fx.js?v=20261028p7"></script>
+	<script src="js/escenas/EscenaBase.js?v=20261028p7"></script>
+	<script src="js/escenas/TallerArrastre.js?v=20261028p7"></script>
+	<script src="js/escenas/Telescopio.js?v=20261028p7"></script>
+	<script src="js/escenas/Lupa.js?v=20261028p7"></script>
+	<script src="js/escenas/Batuta.js?v=20261028p7"></script>
+	<script src="js/escenas/Notas.js?v=20261028p7"></script>
+	<script src="js/phaser-host-juego.js?v=20261028p7"></script>
+	<script src="js/shell.js?v=20261028p7"></script>
 </body>
 </html>
