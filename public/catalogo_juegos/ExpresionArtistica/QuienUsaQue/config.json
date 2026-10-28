@@ -1,5 +1,229 @@
 {
-    "nombre": "¿Quién usa qué?",
-    "stub": true,
-    "creado_en": "2026-10-22T17:53:48-05:00"
+  "nombre": "¿Quién usa qué?",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira! Arrastra el pincel hacia la mano de Zoe.",
+    "demostracionAcierto": "¡Así se entrega la herramienta correcta!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "demostracionLab": "¡En el laboratorio el orden importa! Primero el trípode, luego el tubo y al final el lente. Después apúntalo al cielo."
+  },
+  "accesibilidad": { "letterSpacing": 2, "volumenFondo": 20, "rate": 5, "mostrarIntro": true },
+  "audios": { "cierre": "../../sounds/victory.mp3", "fondo": "../../sounds/fondo.mp3", "sonidos": {}, "efectos": {} },
+  "demo": { "elemento": "pincel", "personaje": "zoe_pintora", "distractor": "saxofon" },
+  "escenas": {
+    "taller": "img/escenas/taller.svg",
+    "laboratorio": "img/escenas/laboratorio.svg"
+  },
+  "elementos": {
+    "zoe_pintora": { "img": "img/zoe_pintora.svg", "nombre": "Zoe pintora" },
+    "zeus_doctor": { "img": "img/zeus_doctor.svg", "nombre": "Zeus doctor" },
+    "zoe_chef": { "img": "img/zoe_chef.svg", "nombre": "Zoe chef" },
+    "zeus_cantante": { "img": "img/zeus_cantante.svg", "nombre": "Zeus cantante" },
+    "zoe_astronoma": { "img": "img/zoe_astronoma.svg", "nombre": "Zoe astrónoma" },
+    "zeus_arqueologo": { "img": "img/zeus_arqueologo.svg", "nombre": "Zeus arqueólogo" },
+    "zoe_directora": { "img": "img/zoe_directora.svg", "nombre": "Zoe directora" },
+    "pincel": { "img": "img/pincel.svg", "nombre": "Pincel de pintura" },
+    "saxofon": { "img": "img/saxofon.svg", "nombre": "Saxofón" },
+    "estetoscopio": { "img": "img/estetoscopio.svg", "nombre": "Estetoscopio" },
+    "martillo": { "img": "img/martillo.svg", "nombre": "Martillo de construcción" },
+    "cucharon": { "img": "img/cucharon.svg", "nombre": "Cucharón de madera" },
+    "pelota": { "img": "img/pelota.svg", "nombre": "Pelota de fútbol" },
+    "microfono": { "img": "img/microfono.svg", "nombre": "Micrófono de escenario" },
+    "escoba": { "img": "img/escoba.svg", "nombre": "Escoba" },
+    "tripode": { "img": "img/tripode.svg", "nombre": "Trípode" },
+    "tubo": { "img": "img/tubo.svg", "nombre": "Tubo óptico" },
+    "lente": { "img": "img/lente.svg", "nombre": "Lente de cristal" },
+    "telescopio": { "img": "img/telescopio.svg", "nombre": "Telescopio" },
+    "cielo": { "img": "img/cielo.svg", "nombre": "Cielo estrellado" },
+    "suelo": { "img": "img/suelo.svg", "nombre": "Suelo" },
+    "lupa": { "img": "img/lupa.svg", "nombre": "Lupa de explorador" },
+    "jeroglifico": { "img": "img/jeroglifico.svg", "nombre": "Jeroglífico" },
+    "batuta": { "img": "img/batuta.svg", "nombre": "Batuta" },
+    "nota_musical": { "img": "img/nota_musical.svg", "nombre": "Notas musicales" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El taller de utilería",
+      "tema": "taller",
+      "escena": "taller",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Bienvenido al taller de utilería del teatro! Aquí cada personaje necesita su herramienta." },
+        { "personaje": 0, "texto": "Arrastra el objeto correcto a quien lo usa para trabajar y actuar." }
+      ],
+      "galeria": ["pincel", "estetoscopio", "cucharon", "microfono"],
+      "retos": [
+        {
+          "id": "pintora",
+          "tipo": "arrastreHerramienta",
+          "titulo": "El Pincel de la Pintora Zoe",
+          "personaje": "zoe_pintora",
+          "correcta": "pincel",
+          "opciones": ["pincel", "saxofon"],
+          "zonaDestino": { "x": 72, "y": 58, "w": 28, "h": 26 },
+          "slot": "mano",
+          "efecto": "pincelada",
+          "efectoError": "saxofon",
+          "consigna": { "voz": "zoe", "texto": "¡Voy a pintar un cuadro lleno de colores! ¿Cuál es la herramienta que necesito para pintar en mi lienzo?" },
+          "acierto": { "voz": "zoe", "texto": "¡Exacto! El pintor usa el pincel para crear arte. ¡A pintar se ha dicho!" },
+          "error": { "voz": "zeus", "texto": "¡Ese es un instrumento para hacer música!" }
+        },
+        {
+          "id": "doctor",
+          "tipo": "arrastreHerramienta",
+          "titulo": "El Estetoscopio del Doctor Zeus",
+          "personaje": "zeus_doctor",
+          "correcta": "estetoscopio",
+          "opciones": ["estetoscopio", "martillo"],
+          "zonaDestino": { "x": 50, "y": 48, "w": 36, "h": 28 },
+          "slot": "pecho",
+          "efecto": "latido",
+          "efectoError": "martillo",
+          "consigna": { "voz": "zeus", "texto": "¡El osito vino a su chequeo médico! ¿Qué objeto usa el doctor para escuchar el corazón?" },
+          "acierto": { "voz": "zeus", "texto": "¡Muy bien! El doctor usa el estetoscopio para cuidar la salud. ¡El osito está muy sano!" },
+          "error": { "voz": "zoe", "texto": "¡Ese martillo es para construir! El doctor escucha el corazón con otra herramienta." }
+        },
+        {
+          "id": "chef",
+          "tipo": "arrastreHerramienta",
+          "titulo": "El Cucharón de la Chef Zoe",
+          "personaje": "zoe_chef",
+          "correcta": "cucharon",
+          "opciones": ["cucharon", "pelota"],
+          "zonaDestino": { "x": 68, "y": 62, "w": 30, "h": 28 },
+          "slot": "olla",
+          "efecto": "borbolleo",
+          "efectoError": "pelota",
+          "consigna": { "voz": "zoe", "texto": "¡Mmm, ¡qué rica huele la sopa! ¿Con qué objeto revuelvo mi comida en la olla?" },
+          "acierto": { "voz": "zoe", "texto": "¡Delicioso! El chef usa el cucharón para preparar recetas ricas." },
+          "error": { "voz": "zeus", "texto": "¡La pelota es para jugar! La sopa se revuelve con el cucharón." }
+        },
+        {
+          "id": "cantante",
+          "tipo": "arrastreHerramienta",
+          "titulo": "El Micrófono del Cantante Zeus",
+          "personaje": "zeus_cantante",
+          "correcta": "microfono",
+          "opciones": ["microfono", "escoba"],
+          "zonaDestino": { "x": 74, "y": 52, "w": 28, "h": 30 },
+          "slot": "mano",
+          "efecto": "melodia",
+          "efectoError": "escoba",
+          "consigna": [
+            { "voz": "zoe", "texto": "¡El gran concierto de cierre! ¿Qué objeto necesita el cantante para que todos en el teatro escuchen su voz?" },
+            { "voz": "zeus", "texto": "¡El gran concierto de cierre! ¿Qué objeto necesita el cantante para que todos en el teatro escuchen su voz?" }
+          ],
+          "acierto": [
+            { "voz": "zoe", "texto": "¡BRAVO! Le diste el micrófono al cantante. ¡Entregaste todas las herramientas a sus dueños con total éxito!" },
+            { "voz": "zeus", "texto": "¡BRAVO! Le diste el micrófono al cantante. ¡Entregaste todas las herramientas a sus dueños con total éxito!" }
+          ],
+          "error": { "voz": "zoe", "texto": "¡La escoba barre el escenario! El cantante necesita el micrófono para que lo escuchen." }
+        }
+      ],
+      "desfile": { "voz": "zoe", "texto": "¡La fiesta de las profesiones en el teatro! Mira el pincel, el estetoscopio, el cucharón y el micrófono." },
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Qué gran detective de herramientas eres! Le devolviste a cada personaje el objeto que necesita para trabajar y actuar." },
+        { "voz": "zeus", "texto": "¡Saber qué usa cada profesional nos ayuda a entender el mundo y a actuar en el teatro como ellos!" }
+      ],
+      "insignia": { "img": "img/medalla_detective.svg", "nombre": "Detective de Herramientas", "sonido": "celebracion" }
+    },
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Laboratorio de utilería",
+      "tema": "laboratorio",
+      "escena": "laboratorio",
+      "bienvenida": [
+        { "personaje": 1, "texto": "¡Bienvenido al laboratorio de utilería! Aquí armamos, encendemos y hacemos sonar las herramientas del escenario." },
+        { "personaje": 0, "texto": "Hoy vas a construir, seguir pistas, dirigir y crear una melodía." }
+      ],
+      "galeria": ["telescopio", "lupa", "batuta", "nota_musical"],
+      "retos": [
+        {
+          "id": "telescopio",
+          "tipo": "ensamblaje",
+          "titulo": "Construye el Telescopio Espacial",
+          "personaje": "zoe_astronoma",
+          "orden": ["tripode", "tubo", "lente"],
+          "efecto": "espacial",
+          "piezas": [
+            { "id": "tripode", "zonaDestino": { "x": 50, "y": 78, "w": 46, "h": 24 }, "slot": "base" },
+            { "id": "tubo", "zonaDestino": { "x": 50, "y": 52, "w": 34, "h": 26 }, "slot": "cuerpo" },
+            { "id": "lente", "zonaDestino": { "x": 50, "y": 30, "w": 26, "h": 20 }, "slot": "punta" }
+          ],
+          "apunte": {
+            "correcto": "cielo",
+            "pregunta": "¿Hacia dónde debe apuntar la astrónoma?",
+            "opciones": ["cielo", "suelo"],
+            "zonas": {
+              "cielo": { "x": 50, "y": 14, "w": 78, "h": 22 },
+              "suelo": { "x": 50, "y": 90, "w": 78, "h": 16 }
+            }
+          },
+          "consigna": { "voz": "zoe", "texto": "¡Voy a interpretar a una astrónoma que descubre una nueva estrella! Pero mi herramienta está en piezas. Une el trípode, el tubo de lente y la mira para armar el objeto que me permite ver el universo." },
+          "acierto": { "voz": "zoe", "texto": "¡Brillante! Armaste el telescopio pieza por pieza y lo apuntaste a las estrellas. ¡La astrónoma está lista para actuar!" },
+          "errorOrden": { "voz": "zeus", "texto": "¡Esa pieza no va todavía! El orden es trípode, luego tubo y al final el lente." },
+          "errorApunte": { "voz": "zeus", "texto": "¡Ahí no hay estrellas! Gira el telescopio hacia el cielo." }
+        },
+        {
+          "id": "lupa",
+          "tipo": "unirPuntos",
+          "titulo": "Enciende la Lupa Ultravioleta",
+          "personaje": "zeus_arqueologo",
+          "puntos": 8,
+          "efecto": "xilofono",
+          "jeroglifico": { "x": 50, "y": 46, "w": 22, "h": 22 },
+          "consigna": { "voz": "zeus", "texto": "¡Hay un mapa antiguo grabado en la pared! Para encender mi lupa de explorador, conecta los puntos del 1 al 8 siguiendo la secuencia numérica." },
+          "acierto": { "voz": "zeus", "texto": "¡Increíble precisión! Conectaste todos los números, encendiste la lupa y descubriste la entrada secreta." },
+          "errorSalto": { "voz": "zeus", "texto": "¡Esa línea se puso roja! Conecta el número que sigue, sin saltarte ninguno." }
+        },
+        {
+          "id": "batuta",
+          "tipo": "ritmoBatuta",
+          "titulo": "La Batuta Musical",
+          "personaje": "zoe_directora",
+          "direcciones": ["arriba", "abajo"],
+          "botones": [
+            { "id": "arriba", "etiqueta": "BATUTA ARRIBA" },
+            { "id": "abajo", "etiqueta": "BATUTA ABAJO" }
+          ],
+          "rondas": [
+            { "patron": ["arriba", "abajo", "arriba"], "tempoMs": 780, "instrumento": "violines" },
+            { "patron": ["arriba", "abajo", "arriba", "abajo"], "tempoMs": 600, "instrumento": "trompetas" },
+            { "patron": ["arriba", "abajo", "abajo", "arriba", "abajo"], "tempoMs": 440, "instrumento": "bateria" }
+          ],
+          "consigna": { "voz": "zoe", "texto": "¡La orquesta está desafinada! Para dirigirla, debes copiar el ritmo que yo marco." },
+          "casi": { "voz": "zoe", "texto": "¡Casi! Intenta otra vez siguiendo mi tempo" },
+          "acierto": { "voz": "zoe", "texto": "¡La orquesta quedó afinada! Sumaste violines, trompetas y batería." }
+        },
+        {
+          "id": "notas",
+          "tipo": "notasCarriles",
+          "titulo": "Atrapa las notas musicales",
+          "personaje": "zoe_directora",
+          "carriles": ["rojo", "amarillo", "azul"],
+          "siempreCompleta": true,
+          "notas": [
+            { "carril": 0, "f": 392 },
+            { "carril": 1, "f": 440 },
+            { "carril": 2, "f": 494 },
+            { "carril": 1, "f": 523 },
+            { "carril": 0, "f": 494 },
+            { "carril": 2, "f": 440 },
+            { "carril": 1, "f": 392 },
+            { "carril": 0, "f": 349 }
+          ],
+          "consigna": { "voz": "zoe", "texto": "¡Caen notas de colores! Toca el carril del mismo color antes de que lleguen al suelo. Si aciertas, suena la nota; si no, suena desafinada. La pista siempre se completa." },
+          "acierto": { "voz": "zoe", "texto": "Eres un experto en crear pistas musicales. ¡Felicidades!" }
+        }
+      ],
+      "desfile": { "voz": "zeus", "texto": "¡Mira el telescopio, la lupa, la batuta y la melodía que creaste para el escenario!" },
+      "cierre": [
+        { "voz": "zoe", "texto": "¡Demostraste una mente de gran detective y constructor! No solo asociaste las herramientas, sino que las armaste, las encendiste y creaste música." },
+        { "voz": "zeus", "texto": "¡El teatro necesita mentes creativas que sepan cómo funciona cada objeto en el escenario!" }
+      ],
+      "insignia": { "img": "img/medalla_maestro.svg", "nombre": "Maestro de la Lógica y las Herramientas Escénicas", "sonido": "celebracion" }
+    }
+  ]
 }
