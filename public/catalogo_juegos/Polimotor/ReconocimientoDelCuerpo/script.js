@@ -32,6 +32,23 @@ function sleep(ms) {
     });
 }
 
+// Capa de animación GSAP + partículas Phaser 4 (reconocimiento-anim.js). Solo visual:
+// si no está disponible se usa el comportamiento original.
+function anim() {
+    return (window.ReconocimientoAnim && window.ReconocimientoAnim.activo) ? window.ReconocimientoAnim : null;
+}
+
+// Audio compartido con Howler (../../shared/pednia-audio.js), tema del ambiente.
+// Si no está, se usa el audio original (new Audio).
+function sonido() {
+    return (window.PedniaAudio && window.PedniaAudio.activo) ? window.PedniaAudio : null;
+}
+
+/** Evento sonoro del tema; false si el tema no lo cubre. */
+function sonarEvento(nombre, opts) {
+    return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
+}
+
 function cancelarIntroPendiente() {
     introTimers.forEach(function (id) {
         clearTimeout(id);
@@ -157,6 +174,19 @@ function cerrar_anuncio() {
 
 function reproducirAudio(ruta, volumen, loop) {
     if (!ruta) return null;
+    if (loop && sonido()) {
+        // Música de fondo: la del tema (si la trae) con fundidos; TextoVoz la sigue manejando
+        // con .volume / play() / pause() (el adaptador tiene la forma de un <audio>).
+        const musica = sonido().musica(ruta);
+        if (musica) {
+            musica.volume = volumen != null ? volumen : 1;
+            musica.play();
+            audioFondo = musica;
+            return musica;
+        }
+    }
+    // Efectos sueltos: siguen con <audio> porque sonar() espera su "ended" y recorta la cola.
+    // Con el tema activo acierto/error/cierre ya no pasan por aquí (ver confirmar/terminarJuego).
     try {
         const audio = new Audio(ruta);
         audio.volume = volumen != null ? volumen : 1;
@@ -341,6 +371,7 @@ function actualizarProgreso() {
     const total = preguntas.length;
     el.hidden = !acc().mostrarProgreso || !tableroListo || !total;
     el.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> ' + Math.min(indicePregunta + 1, total) + " / " + total;
+    if (anim()) anim().progreso(el);
 }
 
 function aplicarAccesibilidadInicial() {
@@ -430,6 +461,11 @@ function iniciarEscenario() {
     sizeLienzo();
     armarZonas();
     document.getElementById("escenario").style.visibility = "visible";
+    if (anim()) {
+        anim().preparar();
+        anim().entradaFigura();
+    }
+    sonarEvento("aparece");
     tableroListo = true;
     aplicarAccesibilidadInicial();
     cargarMascaraFigura(src);
@@ -583,6 +619,7 @@ function mostrarEnunciado(texto, estado) {
     en.textContent = texto || "";
     en.classList.remove("es-acierto", "es-error");
     if (estado) en.classList.add("es-" + estado);
+    if (anim()) anim().enunciado(en, texto, estado);
 
     if (enunciadoAnimTimer) {
         clearTimeout(enunciadoAnimTimer);
@@ -812,7 +849,11 @@ function cfgFeedback(tipo) {
 function confirmar(tipo) {
     const cfg = cfgFeedback(tipo);
     const ruta = gameConfig.audios && gameConfig.audios[tipo];
-    return sonar(ruta).then(function () {
+    // Con el tema: efecto del sprite (encaje + aplausos / "toc toc") y la misma espera que
+    // tenía el MP3 recortado por sonar() (1.5 s), así la voz entra en el mismo momento.
+    // Sin tema: ok.mp3 / over.mp3 como siempre.
+    const efecto = sonarEvento(tipo === "acierto" ? "correcto" : "error") ? sleep(1500) : sonar(ruta);
+    return efecto.then(function () {
         return decir(cfg.texto, tipo === "error" ? "zeus" : "zoe", tipo, cfg.duracion);
     });
 }
@@ -844,6 +885,7 @@ function onToqueFigura(ev) {
         return targets.indexOf(id) !== -1;
     });
 
+    if (anim()) anim().toque(ev.clientX, ev.clientY, acertadas.length > 0);
     if (acertadas.length) {
         resolverAcierto([acertadas[0]]);
     } else {
@@ -855,6 +897,7 @@ function resolverAcierto(idsTocadas) {
     bloquearToques(true);
     limpiarEstadosZona();
     iluminarZonas(idsTocadas);
+    if (anim()) anim().acierto(idsTocadas);
     confirmar("acierto").then(function () {
         indicePregunta += 1;
         if (indicePregunta >= preguntas.length) {
@@ -872,6 +915,7 @@ function resolverError(idTocada) {
     fallosPregunta += 1;
     const zona = idTocada ? document.querySelector('.zona-toque[data-id="' + idTocada + '"]') : null;
     if (zona) zona.classList.add("error");
+    if (anim()) anim().error();
     confirmar("error").then(function () {
         if (zona) zona.classList.remove("error");
         actualizarAyudasVisuales();
@@ -888,8 +932,15 @@ function terminarJuego() {
     if (juegoTerminado) return;
     juegoTerminado = true;
     if (typeof Swal !== "undefined") Swal.close();
-    reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
+    if (sonarEvento("victoria")) {
+        // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+        // fanfarria son tonos puros agudos (se oía como "pitido").
+        sonido().agacharMusica(0.35);
+    } else {
+        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
+    }
     const cierre = (gameConfig.textos && gameConfig.textos.cierre) || "";
+    if (anim()) anim().celebrar();
     setTimeout(function () {
         const caja = document.getElementById("final");
         const texto = document.getElementById("texto_final");
@@ -911,6 +962,7 @@ $(document).ready(function () {
     introConfig = JSON.parse(readText("../../intro.json"));
     introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
     aplicarAccesibilidadInicial();
+    if (sonido()) sonido().usarTema(gameConfig.audios && gameConfig.audios.tema);
     TextoVoz.iniciar(gameConfig, introConfig, {
         obtenerAudioFondo: function () { return audioFondo; },
         volumenFondo: volumenFondoPct() / 100

@@ -1,0 +1,14 @@
+/* arrastrar-anim.css — complemento visual de arrastrar-anim.js (GSAP + partículas Phaser 4).
+   Todo va bajo body.gsap-anim: si GSAP no carga (o el sistema pide reducir movimiento)
+   el juego se ve exactamente como antes. El tablero (canvas Phaser) no se toca. */
+
+/* Enunciado: GSAP lo escala desde su centro (la nube .enunciado-wrap no se anima). */
+body.gsap-anim #enunciado {
+  transform-origin: 50% 40%;
+  will-change: transform, opacity;
+}
+
+/* Contador de rondas: salta desde su centro. */
+body.gsap-anim #progreso.hud-progreso {
+  transform-origin: 50% 50%;
+}

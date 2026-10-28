@@ -1,0 +1,67 @@
+/* rompecabezas-anim.css — complemento visual de rompecabezas-anim.js (GSAP + Phaser 4).
+   Todo lo que anula estilos de style.css va bajo body.gsap-anim: si GSAP no carga
+   (o el sistema pide reducir movimiento) el juego se ve exactamente como antes. */
+
+/* GSAP controla transform/opacity de las fichas: las transiciones CSS lo harían temblar. */
+body.gsap-anim .pieza,
+body.gsap-anim .bandeja .pieza.pieza-visible {
+  transition: none;
+}
+
+/* La ficha que sale la desvanece GSAP (antes lo hacía esta clase con una transición). */
+body.gsap-anim .bandeja .pieza.pieza-saliendo {
+  opacity: 1;
+  transition: none;
+}
+
+/* Encaje en modo imagen: ahora lo anima GSAP. */
+body.gsap-anim .pieza-colocada {
+  animation: none;
+}
+
+/* Pieza arrastrada: sombra más marcada para sensación de "levantada". */
+body.gsap-anim .pieza-fantasma {
+  filter: drop-shadow(0 14px 16px rgba(0, 0, 0, 0.32));
+  will-change: transform, left, top;
+}
+
+/* Número de la cuenta regresiva: GSAP lo escala desde su centro. */
+body.gsap-anim .cuenta strong {
+  display: inline-block;
+  transform-origin: 50% 55%;
+  will-change: transform, opacity;
+}
+
+/* Capa de partículas Phaser 4: encima del juego y del aviso de error,
+   debajo de la pantalla final (2000) y de la pieza arrastrada (5000). */
+#rompe-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  pointer-events: none;
+}
+
+#rompe-fx canvas {
+  pointer-events: none;
+}
+
+/* Anillo expansivo al encajar una pieza. */
+.rompe-anillo {
+  position: fixed;
+  z-index: 1500;
+  box-sizing: border-box;
+  border: 6px solid #ffd54f;
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.75), inset 0 0 12px rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+}
+
+/* Estrellitas de respaldo (si Phaser no está disponible). */
+.rompe-chispa {
+  position: fixed;
+  z-index: 1500;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}

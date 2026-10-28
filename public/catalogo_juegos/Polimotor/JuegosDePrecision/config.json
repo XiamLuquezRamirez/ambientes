@@ -44,6 +44,7 @@
         "rate": 5
     },
     "audios": {
+        "tema": "polimotor",
         "acierto": "../../sounds/ok.mp3",
         "error": "../../sounds/over.mp3",
         "cierre": "../../sounds/victory.mp3",

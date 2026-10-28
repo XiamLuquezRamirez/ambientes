@@ -35,6 +35,23 @@
         return new Promise(function (resolve) { setTimeout(resolve, ms); });
     }
 
+    // Capa de animación GSAP + partículas Phaser 4 (arrastrar-anim.js + shared/pednia-fx.js).
+    // Solo visual: si no está disponible se usa el comportamiento original.
+    function anim() {
+        return (window.ArrastrarAnim && window.ArrastrarAnim.activo) ? window.ArrastrarAnim : null;
+    }
+
+    // Audio compartido con Howler (../../shared/pednia-audio.js), tema del ambiente.
+    // Si no está, se usa el audio original (new Audio).
+    function sonido() {
+        return (window.PedniaAudio && window.PedniaAudio.activo) ? window.PedniaAudio : null;
+    }
+
+    /** Evento sonoro del tema; false si el tema no lo cubre. */
+    function sonarEvento(nombre, opts) {
+        return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
+    }
+
     function textos() { return (gameConfig && gameConfig.textos) || {}; }
     function acc() { return (gameConfig && gameConfig.accesibilidad) || {}; }
 
@@ -255,6 +272,21 @@
 
     function reproducirAudio(ruta, volumen, loop) {
         if (!ruta) return null;
+        if (sonido()) {
+            const vol = volumen != null ? volumen : 0.8;
+            if (loop) {
+                // Música de fondo: la del tema (si la trae) con fundidos; TextoVoz la sigue manejando.
+                const musica = sonido().musica(ruta);
+                if (musica) {
+                    musica.volume = vol;
+                    musica.play();
+                    audioFondo = musica;
+                    return musica;
+                }
+            } else if (sonido().archivo(ruta, vol)) {
+                return null;
+            }
+        }
         try {
             let audio = audioCache[ruta];
             if (!audio) {
@@ -295,7 +327,8 @@
             "../../images/victoria.gif",
             "../../images/nube.png"
         ];
-        const audios = [
+        // Con el tema de audio (Howler) los MP3 genéricos ya no suenan: no se descargan.
+        const audios = (sonido() && sonido().tieneTema()) ? [] : [
             gameConfig.audios && gameConfig.audios.acierto,
             gameConfig.audios && gameConfig.audios.error,
             gameConfig.audios && gameConfig.audios.cierre,
@@ -496,7 +529,20 @@
                 puedeInteractuar: function () {
                     return aceptaArrastre && !esperandoFeedback && !juegoTerminado;
                 },
-                onDrop: onPhaserDrop
+                onDrop: onPhaserDrop,
+                // Avisos solo de sonido/animación (no cambian el tablero).
+                onAgarrar: function (objetoId, go) {
+                    sonarEvento("agarrar");
+                    if (anim()) anim().agarrar(go);
+                },
+                onMover: function (objetoId, go, x) {
+                    if (anim()) anim().mover(go, x);
+                },
+                onSoltar: function (objetoId, go, sobreDestino) {
+                    if (anim()) anim().soltar(go);
+                    // Soltado fuera de las cajas: vuelve a su sitio.
+                    if (!sobreDestino) sonarEvento("soltar");
+                }
             }
         }).catch(function (err) {
             phaserListo = null;
@@ -513,6 +559,7 @@
         if (!correcto) {
             aceptaArrastre = false;
             PedniaArrastrePhaser.setInteractivo(false);
+            if (anim()) anim().error(PedniaArrastrePhaser.rectPantalla("destino", destinoId));
             return feedbackError().then(function () {
                 return { ok: false };
             });
@@ -524,6 +571,7 @@
         colocados[objetoId] = destinoId;
         aceptaArrastre = false;
         PedniaArrastrePhaser.setInteractivo(false);
+        if (anim()) anim().acierto(PedniaArrastrePhaser.rectPantalla("destino", destinoId));
 
         return feedbackAcierto().then(function () {
             const quedan = objetosPendientes.some(function (id) { return !colocados[id]; });
@@ -610,6 +658,7 @@
         if (!el) return;
         el.hidden = false;
         el.textContent = (indiceRonda + 1) + "/" + totalRondas;
+        if (anim()) anim().progreso(el, indiceRonda);
     }
 
     function iniciarRonda(gen) {
@@ -632,6 +681,9 @@
                 if (gen !== rondaGen || juegoTerminado) return;
                 const en = document.getElementById("enunciado");
                 if (en) en.textContent = frase;
+                if (anim()) anim().ronda(en);
+                // Los objetos entran con un bote (tweens del tablero Phaser).
+                sonarEvento("aparece");
                 aceptaArrastre = true;
                 PedniaArrastrePhaser.setInteractivo(true);
                 TextoVoz.hablar(frase, "zoe");
@@ -672,7 +724,10 @@
         esperandoFeedback = true;
         aceptaArrastre = false;
         if (window.PedniaArrastrePhaser) PedniaArrastrePhaser.setInteractivo(false);
-        reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        // Tema: encaje + aplausos suaves (sin ok.mp3).
+        if (!sonarEvento("correcto")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        }
         try {
             await sleep(350);
         } finally {
@@ -689,7 +744,10 @@
         const gif = (gameConfig.feedback && gameConfig.feedback.error && gameConfig.feedback.error.gif)
             || "../../images/incorrecto.gif";
         const minMs = Number(gameConfig.feedback && gameConfig.feedback.duracion) || 1300;
-        reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.85, false);
+        // Tema: "toc toc" de fallo (sin over.mp3).
+        if (!sonarEvento("error")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.85, false);
+        }
         const pVoz = TextoVoz.hablar(texto, "zeus");
         Swal.fire({
             title: texto,
@@ -722,8 +780,15 @@
         const cierre = (typeof textos === "function" ? textos().cierre : null) || "¡Excelente!";
         const texto = document.getElementById("texto_final");
         if (texto) texto.textContent = cierre;
-        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        if (sonarEvento("victoria")) {
+            // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+            // fanfarria son tonos puros agudos (se oía como "pitido").
+            sonido().agacharMusica(0.35);
+        } else {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        }
         TextoVoz.hablar(cierre, "zoe");
+        if (anim()) anim().celebrar();
         setTimeout(function () {
             const caja = document.getElementById("final");
             if (caja) {
@@ -746,6 +811,7 @@
         introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
         aplicarLetterSpacing();
 
+        if (sonido()) sonido().usarTema(gameConfig.audios && gameConfig.audios.tema);
         TextoVoz.iniciar(gameConfig, introConfig, {
             obtenerAudioFondo: function () { return audioFondo; },
             volumenFondo: volumenFondoPct() / 100,
