@@ -21,8 +21,8 @@
     let audioCache = Object.create(null);
     let imgCache = Object.create(null);
     let imagenesPromise = null;
-    let dragState = null;
     let usadosObjetos = [];
+    let phaserListo = null;
 
     function readText(ruta) {
         const xhr = new XMLHttpRequest();
@@ -484,6 +484,69 @@
         });
     }
 
+    function ensurePhaserMontado() {
+        if (window.PedniaArrastrePhaser && PedniaArrastrePhaser.listo()) {
+            return Promise.resolve();
+        }
+        if (phaserListo) return phaserListo;
+        phaserListo = PedniaArrastrePhaser.montar({
+            parent: "phaser-juego",
+            gameConfig: gameConfig,
+            callbacks: {
+                puedeInteractuar: function () {
+                    return aceptaArrastre && !esperandoFeedback && !juegoTerminado;
+                },
+                onDrop: onPhaserDrop
+            }
+        }).catch(function (err) {
+            phaserListo = null;
+            console.error("[ArrastrarYSoltar] Phaser:", err);
+            throw err;
+        });
+        return phaserListo;
+    }
+
+    function onPhaserDrop(objetoId, destinoId, correcto) {
+        if (!aceptaArrastre || esperandoFeedback || juegoTerminado) {
+            return Promise.resolve({ ok: false });
+        }
+        if (!correcto) {
+            aceptaArrastre = false;
+            PedniaArrastrePhaser.setInteractivo(false);
+            return feedbackError().then(function () {
+                return { ok: false };
+            });
+        }
+        if (colocados[objetoId]) {
+            return Promise.resolve({ ok: false });
+        }
+
+        colocados[objetoId] = destinoId;
+        aceptaArrastre = false;
+        PedniaArrastrePhaser.setInteractivo(false);
+
+        return feedbackAcierto().then(function () {
+            const quedan = objetosPendientes.some(function (id) { return !colocados[id]; });
+            if (quedan) {
+                aceptaArrastre = !juegoTerminado;
+                PedniaArrastrePhaser.setInteractivo(aceptaArrastre);
+                return { ok: true };
+            }
+
+            // Dejar que Phaser asiente el sprite antes de limpiar el tablero.
+            setTimeout(function () {
+                if (juegoTerminado) return;
+                if (indiceRonda + 1 < totalRondas) {
+                    indiceRonda += 1;
+                    sleep(480).then(function () { iniciarRonda(rondaGen); });
+                } else {
+                    mostrarCierre();
+                }
+            }, 40);
+            return { ok: true };
+        });
+    }
+
     window.confirmarNivel = function confirmarNivel(id) {
         nivelElegido = gameConfig.niveles.find(function (n) { return String(n.id) === String(id); });
         Swal.close();
@@ -497,34 +560,50 @@
         usadosObjetos = [];
         totalRondas = Math.max(1, Number(nivelElegido.rondas) || 1);
         document.getElementById("enunciado").textContent = textos().enunciado || "Arrastra cada objeto hasta su lugar";
-        Promise.resolve(imagenesPromise).then(function () {
-            if (acc().mostrarIntro && window.PedniaTutorial) {
-                const prog = document.getElementById("progreso");
-                if (prog) prog.hidden = true;
-                pintarTablero(["manzana"], ["caja_manzana"]);
-                marcarEntrada();
-                aceptaArrastre = false;
-                return PedniaTutorial.correr({
-                    texto: textos().demostracion,
-                    textoFin: textos().demostracionFin,
-                    cancelado: function () { return juegoTerminado; },
-                    onTexto: function (t) {
-                        const en = document.getElementById("enunciado");
-                        if (en && t) en.textContent = t;
-                    },
-                    jugar: function () {
-                        const obj = document.querySelector("#zona-objetos .objeto");
-                        const dest = document.querySelector('#zona-destinos .destino[data-destino="caja_manzana"]');
-                        if (dest) dest.classList.add("is-demo-target");
-                        return llevarYDejarConMano(obj, dest, "manzana");
-                    }
-                }).then(function () {
-                    iniciarRonda(rondaGen);
+        Promise.resolve(imagenesPromise)
+            .then(function () { return ensurePhaserMontado(); })
+            .then(function () {
+                if (acc().mostrarIntro && window.PedniaTutorial) {
+                    const prog = document.getElementById("progreso");
+                    if (prog) prog.hidden = true;
+                    aceptaArrastre = false;
+                    PedniaArrastrePhaser.setInteractivo(false);
+                    return PedniaArrastrePhaser.cargarRonda(["manzana"], ["caja_manzana"]).then(function () {
+                        return PedniaTutorial.correr({
+                            texto: textos().demostracion,
+                            textoFin: textos().demostracionFin,
+                            cancelado: function () { return juegoTerminado; },
+                            onTexto: function (t) {
+                                const en = document.getElementById("enunciado");
+                                if (en && t) en.textContent = t;
+                            },
+                            jugar: function () {
+                                return demoArrastrePhaser("manzana", "caja_manzana");
+                            }
+                        });
+                    }).then(function () {
+                        iniciarRonda(rondaGen);
+                    });
+                }
+                iniciarRonda(rondaGen);
+            })
+            .catch(function (err) {
+                console.error(err);
+                Swal.fire({
+                    icon: "error",
+                    title: "No se pudo iniciar el tablero",
+                    text: "Recarga e inténtalo de nuevo.",
+                    confirmButtonText: "Ok"
                 });
-            }
-            iniciarRonda(rondaGen);
-        });
+            });
     };
+
+    function demoArrastrePhaser(objetoId, destinoId) {
+        if (!window.PedniaArrastrePhaser) return Promise.resolve();
+        // Tween Phaser (sin GSAP). La mano tutorial DOM no mueve el canvas;
+        // el movimiento visible es demoLlevar.
+        return PedniaArrastrePhaser.demoLlevar(objetoId, destinoId);
+    }
 
     function actualizarProgreso() {
         const el = document.getElementById("progreso");
@@ -535,21 +614,28 @@
 
     function iniciarRonda(gen) {
         if (gen !== rondaGen || juegoTerminado) return;
-        cancelarDrag();
+        if (window.PedniaArrastrePhaser) PedniaArrastrePhaser.cancelarDrag();
         colocados = Object.create(null);
         const ronda = armarRondaAleatoria(nivelElegido);
         objetosPendientes = ronda.objetos;
         const destinosRonda = ronda.destinos;
         actualizarProgreso();
         const frase = textos().enunciado || "Arrastra cada objeto hasta su lugar";
-        transicionTablero(function () {
-            if (gen !== rondaGen || juegoTerminado) return;
-            pintarTablero(objetosPendientes, destinosRonda);
-            const en = document.getElementById("enunciado");
-            if (en) en.textContent = frase;
-            aceptaArrastre = true;
-            TextoVoz.hablar(frase, "zoe");
-        });
+        aceptaArrastre = false;
+        if (window.PedniaArrastrePhaser) PedniaArrastrePhaser.setInteractivo(false);
+
+        ensurePhaserMontado()
+            .then(function () {
+                return PedniaArrastrePhaser.cargarRonda(objetosPendientes, destinosRonda);
+            })
+            .then(function () {
+                if (gen !== rondaGen || juegoTerminado) return;
+                const en = document.getElementById("enunciado");
+                if (en) en.textContent = frase;
+                aceptaArrastre = true;
+                PedniaArrastrePhaser.setInteractivo(true);
+                TextoVoz.hablar(frase, "zoe");
+            });
     }
 
     function armarRondaAleatoria(nivel) {
@@ -582,360 +668,23 @@
         return { objetos: shuffle(objetos), destinos: shuffle(destinos) };
     }
 
-    function movimientoReducido() {
-        return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-    }
-
-    let entradaTimer = 0;
-
-    function marcarEntrada() {
-        const escena = document.getElementById("escena-wrap");
-        if (!escena || movimientoReducido()) return;
-        escena.classList.remove("ronda-sale", "ronda-entra");
-        void escena.offsetWidth;
-        escena.classList.add("ronda-entra");
-        clearTimeout(entradaTimer);
-        entradaTimer = setTimeout(function () {
-            escena.classList.remove("ronda-entra");
-        }, 980);
-    }
-
-    function transicionTablero(pintar) {
-        const escena = document.getElementById("escena-wrap");
-        const hay = !!(escena && escena.querySelector(".destino"));
-        if (!hay || movimientoReducido()) {
-            pintar();
-            marcarEntrada();
-            return;
-        }
-        aceptaArrastre = false;
-        escena.classList.remove("ronda-entra");
-        escena.classList.add("ronda-sale");
-        setTimeout(function () {
-            escena.classList.remove("ronda-sale");
-            pintar();
-            marcarEntrada();
-        }, 340);
-    }
-
-    function llevarYDejar(obj, dest, objetoId) {
-        return new Promise(function (resolve) {
-            if (!obj || !dest) {
-                resolve();
-                return;
-            }
-            const a = obj.getBoundingClientRect();
-            const b = dest.getBoundingClientRect();
-            const dx = (b.left + b.width / 2) - (a.left + a.width / 2);
-            const dy = (b.top + b.height / 2) - (a.top + a.height / 2);
-            obj.style.zIndex = "40";
-            obj.style.transition = "transform 1100ms ease";
-            obj.style.transform = "translate(" + dx + "px," + dy + "px)";
-            setTimeout(function () {
-                dest.classList.remove("is-demo-target");
-                colocarEnDestino(objetoId, obj, dest);
-                obj.style.transition = "";
-                obj.style.transform = "";
-                obj.style.zIndex = "";
-                resolve();
-            }, 1140);
-        });
-    }
-
-    function llevarYDejarConMano(obj, dest, objetoId) {
-        if (!obj || !dest || !window.PedniaTutorial || typeof PedniaTutorial.animarMano !== "function") {
-            return llevarYDejar(obj, dest, objetoId);
-        }
-        const reducir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const a = obj.getBoundingClientRect();
-        const b = dest.getBoundingClientRect();
-        const dx = (b.left + b.width / 2) - (a.left + a.width / 2);
-        const dy = (b.top + b.height / 2) - (a.top + a.height / 2);
-        const dur = reducir ? 220 : 1100;
-
-        return PedniaTutorial.animarMano({
-            punto: function () {
-                const r = obj.getBoundingClientRect();
-                return { x: r.left + r.width / 2, y: r.top + r.height * 0.45 };
-            },
-            holdMs: 280,
-            viajeMs: reducir ? 40 : 800,
-            arrastre: { dx: dx, dy: dy, durMs: dur, soltarEnDestino: true },
-            onPresionar: function () {
-                obj.style.zIndex = "40";
-            },
-            onDuranteArrastre: function () {
-                obj.style.transition = reducir ? "none" : ("transform " + dur + "ms ease");
-                obj.style.transform = "translate(" + dx + "px," + dy + "px)";
-            },
-            onSoltar: function () {
-                dest.classList.remove("is-demo-target");
-                colocarEnDestino(objetoId, obj, dest);
-                obj.style.transition = "";
-                obj.style.transform = "";
-                obj.style.zIndex = "";
-            }
-        });
-    }
-
-    function colocarEnDestino(objetoId, elObjeto, elDestino) {
-        if (elObjeto) elObjeto.classList.add("is-colocado");
-        elDestino.classList.add("is-lleno");
-        const img = document.createElement("img");
-        img.className = "objeto-colocado";
-        img.src = metaObj(objetoId).img || "";
-        img.alt = metaObj(objetoId).nombre || "";
-        elDestino.appendChild(img);
-    }
-
-    function pintarTablero(objetos, destinos) {
-        const $dest = document.getElementById("zona-destinos");
-        const $objs = document.getElementById("zona-objetos");
-        $dest.innerHTML = "";
-        $objs.innerHTML = "";
-        $dest.dataset.n = String(destinos.length);
-        $objs.dataset.n = String(objetos.length);
-
-        destinos.forEach(function (id, i) {
-            const m = metaDest(id);
-            const el = document.createElement("div");
-            el.className = "destino";
-            el.style.animationDelay = (i * 60) + "ms";
-            el.dataset.destino = id;
-            el.innerHTML =
-                '<img class="destino-img" src="' + escAttr(m.img) + '" alt="' + escAttr(m.nombre) + '">' +
-                '<p class="destino-nombre">' + escHtml(m.nombre) + "</p>";
-            $dest.appendChild(el);
-        });
-
-        objetos.forEach(function (id, i) {
-            const m = metaObj(id);
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "objeto";
-            btn.style.animationDelay = (180 + i * 70) + "ms";
-            btn.dataset.objeto = id;
-            btn.setAttribute("aria-label", m.nombre || id);
-            btn.innerHTML = '<img src="' + escAttr(m.img) + '" alt="">';
-            enlazarDrag(btn);
-            $objs.appendChild(btn);
-        });
-    }
-
-    function escAttr(s) {
-        return String(s || "")
-            .replace(/&/g, "&amp;")
-            .replace(/"/g, "&quot;")
-            .replace(/</g, "&lt;");
-    }
-
-    function escHtml(s) {
-        return String(s || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-    }
-
-    /* ── Arrastre (pointer events / tablet) ─────────────────────── */
-
-    function enlazarDrag(el) {
-        el.addEventListener("pointerdown", onPointerDown);
-    }
-
-    function onPointerDown(ev) {
-        if (!aceptaArrastre || esperandoFeedback || juegoTerminado) return;
-        const el = ev.currentTarget;
-        if (!el || el.classList.contains("is-colocado")) return;
-        if (ev.button != null && ev.button !== 0) return;
-        ev.preventDefault();
-        try { el.setPointerCapture(ev.pointerId); } catch (e) { /* noop */ }
-
-        const proxy = document.createElement("div");
-        proxy.className = "objeto-drag-proxy";
-        proxy.innerHTML = el.innerHTML;
-        document.body.appendChild(proxy);
-        moverProxy(proxy, ev.clientX, ev.clientY);
-
-        el.classList.add("is-dragging", "is-ghost");
-        dragState = {
-            pointerId: ev.pointerId,
-            objetoId: el.dataset.objeto,
-            el: el,
-            proxy: proxy,
-            over: null
-        };
-
-        el.addEventListener("pointermove", onPointerMove);
-        el.addEventListener("pointerup", onPointerUp);
-        el.addEventListener("pointercancel", onPointerUp);
-    }
-
-    function moverProxy(proxy, x, y) {
-        proxy.style.left = x + "px";
-        proxy.style.top = y + "px";
-    }
-
-    function onPointerMove(ev) {
-        if (!dragState || ev.pointerId !== dragState.pointerId) return;
-        ev.preventDefault();
-        moverProxy(dragState.proxy, ev.clientX, ev.clientY);
-        const dest = destinoBajoPunto(ev.clientX, ev.clientY);
-        if (dragState.over && dragState.over !== dest) {
-            dragState.over.classList.remove("is-over");
-        }
-        if (dest) dest.classList.add("is-over");
-        dragState.over = dest;
-    }
-
-    function destinoBajoPunto(x, y) {
-        const nodos = document.elementsFromPoint(x, y) || [];
-        for (let i = 0; i < nodos.length; i++) {
-            const n = nodos[i];
-            if (n && n.classList && n.classList.contains("destino") && !n.classList.contains("is-lleno")) {
-                return n;
-            }
-            if (n && n.closest) {
-                const d = n.closest(".destino");
-                if (d && !d.classList.contains("is-lleno")) return d;
-            }
-        }
-        return null;
-    }
-
-    function onPointerUp(ev) {
-        if (!dragState || ev.pointerId !== dragState.pointerId) return;
-        ev.preventDefault();
-        const state = dragState;
-        const dest = state.over || destinoBajoPunto(ev.clientX, ev.clientY);
-        limpiarListenersDrag(state.el);
-        if (state.over) state.over.classList.remove("is-over");
-        dragState = null;
-
-        if (!dest) {
-            volverProxy(state.proxy, state.el).then(function () {
-                soltarProxy(state.proxy, state.el);
-            });
-            return;
-        }
-        resolverSoltar(state.objetoId, dest.dataset.destino, state.el, dest, state.proxy);
-    }
-
-    function centroDe(el) {
-        const r = el.getBoundingClientRect();
-        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    }
-
-    function moverProxyHacia(proxy, x, y, escala, ms) {
-        return new Promise(function (resolve) {
-            if (!proxy) {
-                resolve();
-                return;
-            }
-            if (movimientoReducido()) {
-                resolve();
-                return;
-            }
-            proxy.style.transition = "left " + ms + "ms cubic-bezier(.22,.82,.28,1), top " + ms + "ms cubic-bezier(.22,.82,.28,1), transform " + ms + "ms cubic-bezier(.22,.82,.28,1)";
-            proxy.style.left = x + "px";
-            proxy.style.top = y + "px";
-            proxy.style.transform = "translate(-50%, -50%) scale(" + escala + ")";
-            setTimeout(resolve, ms + 20);
-        });
-    }
-
-    function volverProxy(proxy, el) {
-        if (!proxy || !el) return Promise.resolve();
-        const c = centroDe(el);
-        return moverProxyHacia(proxy, c.x, c.y, 1, 280);
-    }
-
-    function volarProxyAlDestino(proxy, elDestino) {
-        if (!proxy || !elDestino) return Promise.resolve();
-        const r = elDestino.getBoundingClientRect();
-        return moverProxyHacia(proxy, r.left + r.width / 2, r.top + r.height * 0.4, 0.62, 520);
-    }
-
-    function soltarProxy(proxy, el) {
-        if (proxy && proxy.parentNode) proxy.parentNode.removeChild(proxy);
-        if (el) el.classList.remove("is-dragging", "is-ghost");
-    }
-
-    function limpiarListenersDrag(el) {
-        el.removeEventListener("pointermove", onPointerMove);
-        el.removeEventListener("pointerup", onPointerUp);
-        el.removeEventListener("pointercancel", onPointerUp);
-    }
-
-    function cancelarDrag() {
-        if (!dragState) return;
-        const state = dragState;
-        limpiarListenersDrag(state.el);
-        if (state.over) state.over.classList.remove("is-over");
-        if (state.proxy && state.proxy.parentNode) state.proxy.parentNode.removeChild(state.proxy);
-        state.el.classList.remove("is-dragging", "is-ghost");
-        dragState = null;
-    }
-
-    async function resolverSoltar(objetoId, destinoId, elObjeto, elDestino, proxy) {
-        if (!aceptaArrastre || esperandoFeedback || juegoTerminado) {
-            soltarProxy(proxy, elObjeto);
-            return;
-        }
-        const correcto = destinoCorrecto(objetoId);
-        if (!correcto || destinoId !== correcto) {
-            aceptaArrastre = false;
-            if (elDestino) elDestino.classList.add("is-rechazo");
-            await volverProxy(proxy, elObjeto);
-            if (elDestino) elDestino.classList.remove("is-rechazo");
-            soltarProxy(proxy, elObjeto);
-            await feedbackError();
-            return;
-        }
-        if (colocados[objetoId]) {
-            soltarProxy(proxy, elObjeto);
-            return;
-        }
-
-        aceptaArrastre = false;
-        colocados[objetoId] = destinoId;
-        await volarProxyAlDestino(proxy, elDestino);
-        soltarProxy(proxy, elObjeto);
-        colocarEnDestino(objetoId, elObjeto, elDestino);
-        if (elDestino) {
-            elDestino.classList.add("is-celebra");
-            setTimeout(function () { elDestino.classList.remove("is-celebra"); }, 700);
-        }
-
-        await feedbackAcierto();
-
-        const quedan = objetosPendientes.some(function (id) { return !colocados[id]; });
-        if (quedan) return;
-
-        if (indiceRonda + 1 < totalRondas) {
-            indiceRonda += 1;
-            await sleep(480);
-            iniciarRonda(rondaGen);
-            return;
-        }
-        mostrarCierre();
-    }
-
     async function feedbackAcierto() {
         esperandoFeedback = true;
         aceptaArrastre = false;
+        if (window.PedniaArrastrePhaser) PedniaArrastrePhaser.setInteractivo(false);
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
-        // Sin modal/TTS por acierto: solo sonido (evita carga en cada colocación).
         try {
             await sleep(350);
         } finally {
             esperandoFeedback = false;
-            aceptaArrastre = !juegoTerminado;
+            // onPhaserDrop decide si se reactiva el arrastre (quedan objetos o no).
         }
     }
 
     async function feedbackError() {
         esperandoFeedback = true;
         aceptaArrastre = false;
+        if (window.PedniaArrastrePhaser) PedniaArrastrePhaser.setInteractivo(false);
         const texto = textos().error || "¡Inténtalo otra vez! Observa dónde corresponde.";
         const gif = (gameConfig.feedback && gameConfig.feedback.error && gameConfig.feedback.error.gif)
             || "../../images/incorrecto.gif";
@@ -962,6 +711,7 @@
             try { Swal.close(); } catch (e) { /* noop */ }
             esperandoFeedback = false;
             aceptaArrastre = !juegoTerminado;
+            if (window.PedniaArrastrePhaser) PedniaArrastrePhaser.setInteractivo(aceptaArrastre);
         }
     }
 

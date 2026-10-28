@@ -347,14 +347,15 @@ CREATE TABLE `clase_experiencias` (
   CONSTRAINT `clase_experiencias_experiencia_id_foreign` FOREIGN KEY (`experiencia_id`) REFERENCES `experiencias` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clase_experiencias_modulo_id_foreign` FOREIGN KEY (`modulo_id`) REFERENCES `modulos` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clase_experiencias_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `clase_experiencias` */
 
 insert  into `clase_experiencias`(`id`,`clase_id`,`experiencia_id`,`modulo_id`,`eje_id`,`tematica_id`,`orden`,`created_at`,`updated_at`) values 
 (14,12,26,8,10,7,1,'2026-08-29 10:56:06','2026-08-29 10:56:06'),
 (16,13,28,9,11,8,1,'2026-09-22 10:26:20','2026-09-22 10:26:20'),
-(17,14,29,3,19,38,1,'2026-10-19 16:09:00','2026-10-19 16:09:00');
+(17,14,29,3,19,38,1,'2026-10-19 16:09:00','2026-10-19 16:09:00'),
+(18,15,30,11,21,52,1,'2026-10-23 10:50:15','2026-10-23 10:50:15');
 
 /*Table structure for table `clases` */
 
@@ -379,14 +380,15 @@ CREATE TABLE `clases` (
   CONSTRAINT `clases_ambiente_id_foreign` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clases_carga_docente_id_foreign` FOREIGN KEY (`carga_docente_id`) REFERENCES `carga_docente` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clases_docente_id_foreign` FOREIGN KEY (`docente_id`) REFERENCES `docentes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `clases` */
 
 insert  into `clases`(`id`,`carga_docente_id`,`docente_id`,`ambiente_id`,`nombre`,`descripcion`,`fecha`,`estado`,`anio_lectivo`,`created_at`,`updated_at`) values 
-(12,6,2,9,'Identifica los colores',NULL,'2026-10-22','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09'),
-(13,10,2,7,'Rompecabezas del cuerpo humano',NULL,'2026-10-22','activa',2026,'2026-09-22 10:26:20','2026-09-22 10:26:22'),
-(14,2,2,8,'Descubre las vocales',NULL,'2026-10-22','activa',2026,'2026-10-19 16:09:00','2026-10-19 16:09:02');
+(12,6,2,9,'Identifica los colores',NULL,'2026-10-28','activa',2026,'2026-08-29 10:56:06','2026-08-29 10:56:09'),
+(13,10,2,7,'Rompecabezas del cuerpo humano',NULL,'2026-10-28','activa',2026,'2026-09-22 10:26:20','2026-09-22 10:26:22'),
+(14,2,2,8,'Descubre las vocales',NULL,'2026-10-28','activa',2026,'2026-10-19 16:09:00','2026-10-19 16:09:02'),
+(15,7,2,6,'Completa la melodía',NULL,'2026-10-28','activa',2026,'2026-10-23 10:50:15','2026-10-23 10:50:32');
 
 /*Table structure for table `cola_sincronizacion` */
 
@@ -509,7 +511,7 @@ insert  into `configuracion_pins`(`id`,`estudiante_id`,`figura_1`,`color_figura_
 (8,32,'fas fa-heart','#ff0606','fas fa-heart','#ff0606','fas fa-heart','#ff0606',0,'2026-06-23 15:31:26','2026-06-23 16:03:33'),
 (9,33,'fas fa-star','#ff9019','fas fa-heart','#ff0606','fas fa-fish','#0f54ff',0,'2026-06-23 15:34:40','2026-06-23 15:34:40'),
 (10,34,'fas fa-fish','#0f54ff','fas fa-heart','#ff0606','fas fa-circle','#f933e9',0,'2026-06-23 15:35:48','2026-06-23 15:35:48'),
-(11,13,'fas fa-fish','#0f54ff','fas fa-fish','#0f54ff','fas fa-fish','#0f54ff',0,'2026-06-23 16:14:31','2026-10-20 09:30:42'),
+(11,13,'fas fa-fish','#0f54ff','fas fa-fish','#0f54ff','fas fa-fish','#0f54ff',0,'2026-06-23 16:14:31','2026-10-27 10:27:11'),
 (12,11,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:15:42','2026-10-15 09:03:28'),
 (13,5,'fas fa-square','#437124','fas fa-square','#437124','fas fa-square','#437124',0,'2026-06-23 16:16:06','2026-10-06 15:59:59'),
 (15,38,'fas fa-circle','#f933e9','fas fa-star','#ff9019','fas fa-circle','#f933e9',0,'2026-08-21 10:58:13','2026-08-21 10:58:13'),
@@ -948,14 +950,15 @@ CREATE TABLE `experiencias` (
   CONSTRAINT `experiencias_creado_por_foreign` FOREIGN KEY (`creado_por`) REFERENCES `users` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `experiencias_grado_id_foreign` FOREIGN KEY (`grado_id`) REFERENCES `grados` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `experiencias_tematica_id_foreign` FOREIGN KEY (`tematica_id`) REFERENCES `tematicas` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `experiencias` */
 
 insert  into `experiencias`(`id`,`tematica_id`,`grado_id`,`nombre`,`objetivo`,`proposito`,`habilidades`,`duracion_minutos`,`referente_aprendizaje`,`estado`,`activo`,`creado_por`,`created_at`,`updated_at`) values 
 (26,7,1,'Colores — prueba de perfiles','Recorrido de prueba para validar adaptaciones del kiosco según perfil de aprendizaje (visual, audio, opciones, juegos, dibujo, timer, pausas).',NULL,NULL,30,NULL,'activa',1,1,'2026-08-28 15:37:38','2026-09-08 09:04:13'),
 (28,8,1,'Clase 1','Clase',NULL,NULL,20,NULL,'activa',1,1,'2026-09-22 10:25:59','2026-10-07 17:20:34'),
-(29,38,1,'Descubre las vocales','Descubre las vocales',NULL,NULL,20,NULL,'activa',1,1,'2026-10-19 16:08:13','2026-10-19 16:08:30');
+(29,38,1,'Descubre las vocales','Descubre las vocales',NULL,NULL,20,NULL,'activa',1,1,'2026-10-19 16:08:13','2026-10-19 16:08:30'),
+(30,52,1,'Completa la melodía','Completa la melodía',NULL,NULL,20,NULL,'borrador',1,1,'2026-10-23 10:49:51','2026-10-23 10:49:51');
 
 /*Table structure for table `failed_jobs` */
 
@@ -3337,7 +3340,7 @@ CREATE TABLE `registros_acceso` (
   PRIMARY KEY (`id`),
   KEY `login_logs_user_id_foreign` (`user_id`),
   CONSTRAINT `login_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=563 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=573 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `registros_acceso` */
 
@@ -3868,7 +3871,17 @@ insert  into `registros_acceso`(`id`,`user_id`,`ip`,`ambiente`,`fecha`,`tipo`) v
 (559,1,'127.0.0.1','multisensorial','2026-10-22 08:07:31','inicio_sesion'),
 (560,1,'127.0.0.1','multisensorial','2026-10-22 09:54:38','inicio_sesion'),
 (561,1,'127.0.0.1','multisensorial','2026-10-22 11:42:11','inicio_sesion'),
-(562,1,'127.0.0.1','multisensorial','2026-10-22 14:07:57','inicio_sesion');
+(562,1,'127.0.0.1','multisensorial','2026-10-22 14:07:57','inicio_sesion'),
+(563,1,'127.0.0.1','multisensorial','2026-10-23 08:12:00','inicio_sesion'),
+(564,1,'127.0.0.1','multisensorial','2026-10-23 09:12:21','inicio_sesion'),
+(565,4,'127.0.0.1','multisensorial','2026-10-23 10:49:58','inicio_sesion'),
+(566,1,'127.0.0.1','multisensorial','2026-10-23 10:51:19','inicio_sesion'),
+(567,1,'127.0.0.1','multisensorial','2026-10-23 14:06:19','inicio_sesion'),
+(568,1,'127.0.0.1','multisensorial','2026-10-24 08:15:33','inicio_sesion'),
+(569,1,'127.0.0.1','multisensorial','2026-10-26 14:03:25','inicio_sesion'),
+(570,1,'127.0.0.1','multisensorial','2026-10-27 08:04:27','inicio_sesion'),
+(571,1,'127.0.0.1','multisensorial','2026-10-27 14:09:18','inicio_sesion'),
+(572,1,'127.0.0.1','multisensorial','2026-10-28 08:09:29','inicio_sesion');
 
 /*Table structure for table `resultados_bloque` */
 
@@ -4006,7 +4019,7 @@ CREATE TABLE `seguridad_logs` (
   KEY `seguridad_logs_actor_user_id_foreign` (`actor_user_id`),
   CONSTRAINT `seguridad_logs_actor_user_id_foreign` FOREIGN KEY (`actor_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `seguridad_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=539 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=549 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*Data for the table `seguridad_logs` */
 
@@ -4546,7 +4559,17 @@ insert  into `seguridad_logs`(`id`,`user_id`,`actor_user_id`,`accion`,`descripci
 (535,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-22 08:07:31','2026-10-22 08:07:31'),
 (536,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-22 09:54:38','2026-10-22 09:54:38'),
 (537,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-22 11:42:11','2026-10-22 11:42:11'),
-(538,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-22 14:07:57','2026-10-22 14:07:57');
+(538,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-22 14:07:57','2026-10-22 14:07:57'),
+(539,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-23 08:12:00','2026-10-23 08:12:00'),
+(540,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-23 09:12:21','2026-10-23 09:12:21'),
+(541,4,4,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-23 10:49:58','2026-10-23 10:49:58'),
+(542,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-23 10:51:19','2026-10-23 10:51:19'),
+(543,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-23 14:06:19','2026-10-23 14:06:19'),
+(544,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-24 08:15:33','2026-10-24 08:15:33'),
+(545,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-26 14:03:25','2026-10-26 14:03:25'),
+(546,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36','2026-10-27 08:04:27','2026-10-27 08:04:27'),
+(547,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36','2026-10-27 14:09:18','2026-10-27 14:09:18'),
+(548,1,1,'login','Inicio de sesión exitoso.',NULL,'127.0.0.1','Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36','2026-10-28 08:09:29','2026-10-28 08:09:29');
 
 /*Table structure for table `sesiones_experiencia` */
 
