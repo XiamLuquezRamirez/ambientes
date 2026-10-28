@@ -58,6 +58,23 @@
         });
     }
 
+    // Capa de animación GSAP + partículas Phaser 4 (lateralidad-anim.js). Solo visual:
+    // si no está disponible se usa el comportamiento original.
+    function anim() {
+        return (window.LateralidadAnim && window.LateralidadAnim.activo) ? window.LateralidadAnim : null;
+    }
+
+    // Audio compartido con Howler (../../shared/pednia-audio.js), tema del ambiente.
+    // Si no está, se usa el audio original (new Audio).
+    function sonido() {
+        return (window.PedniaAudio && window.PedniaAudio.activo) ? window.PedniaAudio : null;
+    }
+
+    /** Evento sonoro del tema; false si el tema no lo cubre. */
+    function sonarEvento(nombre, opts) {
+        return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
+    }
+
     function textos() {
         return (gameConfig && gameConfig.textos) || {};
     }
@@ -325,6 +342,21 @@
 
     function reproducirAudio(ruta, volumen, loop) {
         if (!ruta) return null;
+        if (sonido()) {
+            const vol = volumen != null ? volumen : 1;
+            if (loop) {
+                // Música de fondo: la del tema (si la trae) con fundidos; TextoVoz la sigue manejando.
+                const musica = sonido().musica(ruta);
+                if (musica) {
+                    musica.volume = vol;
+                    musica.play();
+                    audioFondo = musica;
+                    return musica;
+                }
+            } else if (sonido().archivo(ruta, vol)) {
+                return null;
+            }
+        }
         try {
             let base = audioCache[ruta];
             if (!base) {
@@ -783,6 +815,7 @@
         if (!el || !retosRuntime.length) return;
         el.hidden = false;
         el.textContent = (indiceReto + 1) + "/" + retosRuntime.length;
+        if (anim()) anim().progreso(el);
     }
 
     function setEnunciado(texto) {
@@ -814,6 +847,8 @@
             });
             resp.appendChild(b);
         });
+        if (anim()) anim().opciones(resp);
+        sonarEvento("aparece");
     }
 
     function pctParaZona(zona) {
@@ -1079,6 +1114,8 @@
                 slot.appendChild(tarjeta);
                 tablero.appendChild(slot);
             });
+            if (anim()) anim().tarjetas(tablero);
+            sonarEvento("aparece");
             const paso = rt.pasos[rt.pasoIdx];
             setEnunciado(paso.consigna);
             TextoVoz.hablar(paso.consigna, "zoe");
@@ -1098,6 +1135,7 @@
             slot.appendChild(crearTarjeta(rt.colocacion[z], false));
             tablero.appendChild(slot);
         });
+        if (anim()) anim().tarjetas(tablero);
         setEnunciado(rt.consigna);
         TextoVoz.hablar(rt.consigna, "zoe");
         renderZonasRespuesta(rt.zonas, function (z) {
@@ -1134,6 +1172,7 @@
                 el.style.top = id === rt.actores[0] ? "35%" : "55%";
                 actorArea.appendChild(el);
                 els[id] = el;
+                if (anim()) anim().actor(el);
             });
             TextoVoz.hablar("Mira cómo se mueven.", "zoe");
             await sleep(400);
@@ -1169,6 +1208,7 @@
         el.appendChild(crearImgEl(imgUrl(rt.actor), nombreObj(rt.actor)));
         el.style.left = "50%";
         actorArea.appendChild(el);
+        if (anim()) anim().actor(el);
 
         TextoVoz.hablar("Mira con atención.", "zoe");
         await sleep(350);
@@ -1221,6 +1261,7 @@
                 wrap.appendChild(zeus);
             }
             tablero.appendChild(wrap);
+            if (anim()) anim().tarjetas(tablero);
             setEnunciado(rt.consigna);
             TextoVoz.hablar(rt.consigna, "zeus");
             renderZonasRespuesta(["izquierda", "derecha"], function (z) {
@@ -1242,6 +1283,7 @@
         mascota.appendChild(crearImgEl(gif, rt.mascota === "zoe" ? "Zoe" : "Zeus"));
         mascota.style.left = "50%";
         actorArea.appendChild(mascota);
+        if (anim()) anim().actor(mascota);
 
         const voz = rt.mascota === "zoe" ? "zoe" : "zeus";
         const caminarMs = Math.max(pasoMovMs(), 900);
@@ -1306,6 +1348,8 @@
         if (gen !== retoGen) return;
         if (!aceptaRespuesta || esperandoFeedback || juegoTerminado) return;
         const ok = String(valor) === String(respuestaCorrectaActual());
+        if (anim()) anim().toque(valor);
+        sonarEvento("agarrar");
         if (ok) resolverAcierto(gen);
         else resolverError(gen);
     }
@@ -1388,7 +1432,10 @@
         aceptaRespuesta = false;
         const fb = (gameConfig.feedback && gameConfig.feedback.error) || {};
         const texto = textos().error || fb.texto || "Inténtalo otra vez. ¡Tú puedes!";
-        reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
+        if (!sonarEvento("error")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
+        }
+        if (anim()) anim().error();
         feedbackConVoz(texto, {
             personaje: "zoe",
             gif: fb.gif || "../../images/incorrecto.gif"
@@ -1413,6 +1460,8 @@
             || document.querySelector('.tarjeta-obj[data-objeto="' + v + '"]')
             || (nodos.length ? nodos[0] : null);
         if (!ancla) return;
+        // Con la capa de animación: estrellas y anillo de PedniaFx en vez de las estrellitas CSS.
+        if (anim() && anim().acierto(ancla, (gameConfig.coloresZona || {})[v])) return;
         const colores = ["#ffd43b", "#ff6b6b", "#4dabf7", "#51cf66", "#ff922b"];
         for (let i = 0; i < 8; i++) {
             const s = document.createElement("span");
@@ -1433,7 +1482,9 @@
         if (gen !== retoGen) return;
         esperandoFeedback = true;
         aceptaRespuesta = false;
-        reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        if (!sonarEvento("correcto")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        }
         celebrarAcierto(respuestaCorrectaActual());
 
         sleep(720).then(function () {
@@ -1462,8 +1513,15 @@
         const cierre = (typeof textos === "function" ? textos().cierre : null) || "¡Excelente!";
         const texto = document.getElementById("texto_final");
         if (texto) texto.textContent = cierre;
-        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        if (sonarEvento("victoria")) {
+            // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+            // fanfarria son tonos puros agudos (se oía como "pitido").
+            sonido().agacharMusica(0.35);
+        } else {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        }
         TextoVoz.hablar(cierre, "zoe");
+        if (anim()) anim().celebrar();
         setTimeout(function () {
             const caja = document.getElementById("final");
             if (caja) {
@@ -1486,6 +1544,7 @@
         introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
         aplicarLetterSpacing();
 
+        if (sonido()) sonido().usarTema(gameConfig.audios && gameConfig.audios.tema);
         TextoVoz.iniciar(gameConfig, introConfig, {
             obtenerAudioFondo: function () { return audioFondo; },
             volumenFondo: volumenFondoPct() / 100,

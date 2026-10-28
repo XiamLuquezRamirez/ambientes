@@ -1,0 +1,39 @@
+/* ensamblajes-anim.css — complemento visual de ensamblajes-anim.js (GSAP + partículas Phaser 4).
+   Todo lo que anula estilos de style.css va bajo body.gsap-anim: si GSAP no carga
+   (o el sistema pide reducir movimiento) el juego se ve exactamente como antes.
+   Las partículas y el anillo traen su propio estilo (shared/pednia-fx.js). */
+
+/* GSAP controla transform/opacity de las fichas: las transiciones CSS lo harían temblar. */
+body.gsap-anim .pieza,
+body.gsap-anim .bandeja .pieza.pieza-visible {
+  transition: none;
+}
+
+/* La ficha que sale la desvanece GSAP (antes lo hacía esta clase con una transición). */
+body.gsap-anim .bandeja .pieza.pieza-saliendo {
+  opacity: 1;
+  transition: none;
+}
+
+/* Encaje en modo imagen: ahora lo anima GSAP. */
+body.gsap-anim .pieza-colocada {
+  animation: none;
+}
+
+/* Pieza arrastrada: sombra más marcada para sensación de "levantada". */
+body.gsap-anim .pieza-fantasma {
+  filter: drop-shadow(0 14px 16px rgba(0, 0, 0, 0.32));
+  will-change: transform, left, top;
+}
+
+/* Número de la cuenta regresiva: GSAP lo escala desde su centro. */
+body.gsap-anim .cuenta strong {
+  display: inline-block;
+  transform-origin: 50% 55%;
+  will-change: transform, opacity;
+}
+
+/* Contador de piezas: salta desde su centro. */
+body.gsap-anim #progreso.hud-progreso {
+  transform-origin: 50% 50%;
+}

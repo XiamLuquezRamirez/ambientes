@@ -1,0 +1,25 @@
+/* secuencia-anim.css — complemento visual de secuencia-anim.js (GSAP + Phaser 4).
+   Todo lo que anula estilos de style.css va bajo body.gsap-anim: si GSAP no carga
+   (o el sistema pide reducir movimiento) el juego se ve exactamente como antes. */
+
+/* Entrada de las tarjetas: ahora la hace GSAP con el mismo tiempo (0,42 s + 70 ms
+   por tarjeta). La animación CSS pelearía con el transform de GSAP. */
+body.gsap-anim .tarjeta-opcion.entra {
+  animation: none;
+}
+
+/* Solo mientras GSAP anima un elemento que tiene `transition: transform` en CSS. */
+body.gsap-anim .sec-gsap {
+  transition: none !important;
+}
+
+/* Saltito de la pose que se nombra y rebote de la pose que llega al hueco. */
+body.gsap-anim .slot-pose img {
+  transform-origin: 50% 80%;
+}
+
+/* Título y contador: escalan desde su centro. */
+body.gsap-anim .enunciado-titulo,
+body.gsap-anim #progreso {
+  transform-origin: 50% 50%;
+}

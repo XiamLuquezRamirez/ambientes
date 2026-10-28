@@ -1,0 +1,9 @@
+# Juegos del catálogo: el navegador / la tablet revalida SIEMPRE con el servidor (304 si no
+# cambió, así que casi no cuesta). Sin esto se quedaba con un index.html viejo que cargaba
+# versiones viejas de los scripts y de los sonidos (el "pitido" seguía aunque ya estaba
+# corregido). Como Apache ignora el ?v=, revalidar trae siempre el archivo actual.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|json|js|css|wav|mp3|ogg)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+</IfModule>

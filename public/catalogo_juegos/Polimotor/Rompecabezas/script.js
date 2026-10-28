@@ -50,6 +50,23 @@ function sleep(ms) {
     });
 }
 
+// Capa de animación GSAP + partículas Phaser 4 (rompecabezas-anim.js). Solo visual:
+// si no está disponible se usa el comportamiento original.
+function anim() {
+    return (window.RompeAnim && window.RompeAnim.activo) ? window.RompeAnim : null;
+}
+
+// Audio compartido con Howler (../../shared/pednia-audio.js), tema del ambiente.
+// Si no está, se usa el audio original (new Audio).
+function sonido() {
+    return (window.PedniaAudio && window.PedniaAudio.activo) ? window.PedniaAudio : null;
+}
+
+/** Evento sonoro del tema; false si el tema no lo cubre. */
+function sonarEvento(nombre, opts) {
+    return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
+}
+
 function renderPersonajes(personajes) {
     const container = document.getElementById("personajes-container");
     container.innerHTML = "";
@@ -458,6 +475,21 @@ function cerrar_anuncio() {
 
 function reproducirAudio(ruta, volumen, loop) {
     if (!ruta) return null;
+    if (sonido()) {
+        const vol = volumen != null ? volumen : 1;
+        if (loop) {
+            // Música de fondo: la del tema (si la trae) con fundidos; TextoVoz la sigue manejando.
+            const musica = sonido().musica(ruta);
+            if (musica) {
+                musica.volume = vol;
+                musica.play();
+                audioFondo = musica;
+                return musica;
+            }
+        } else if (sonido().archivo(ruta, vol)) {
+            return null;
+        }
+    }
     try {
         const audio = new Audio(ruta);
         audio.volume = volumen != null ? volumen : 1;
@@ -827,6 +859,7 @@ function actualizarProgreso() {
     const hechas = piezasEstado.filter(function (p) { return p.colocada; }).length;
     el.hidden = !acc().mostrarProgreso || !tableroListo || !total;
     el.innerHTML = '<i class="fa-solid fa-puzzle-piece"></i> ' + hechas + " / " + total;
+    if (anim()) anim().progreso(el, hechas);
 }
 
 function aplicarAccesibilidadInicial() {
@@ -901,6 +934,7 @@ window.confirmarNivel = confirmarNivel;
 function iniciarEscenario() {
     tableroListo = false;
     pistaPiezaId = null;
+    if (anim()) anim().reiniciarProgreso();
     ocultarVistaCompleta();
     const piezas = piezasDelNivel();
     piezasEstado = piezas.map(function (p) {
@@ -955,16 +989,19 @@ function mostrarColorSvg() {
     document.querySelectorAll("#figura-svg .svg-parte.sombra").forEach(function (g) {
         g.classList.remove("sombra");
     });
+    if (anim()) anim().mostrarColor();
 }
 
 function restaurarSombraSvg() {
     document.querySelectorAll("#figura-svg .svg-parte").forEach(function (g) {
         if (!g.classList.contains("colocada")) g.classList.add("sombra");
     });
+    if (anim()) anim().mostrarSombra();
 }
 
 async function mostrarFiguraCompleta() {
     document.getElementById("escenario").style.visibility = "visible";
+    if (anim()) anim().revelarLienzo();
     if (modoSvgActivo()) mostrarColorSvg();
     const ok = await correrCuentaRegresiva(acc().tiempoMostrarCompleto || 3000);
     if (!ok || juegoTerminado) return;
@@ -1016,6 +1053,7 @@ async function correrCuentaRegresiva(duracionMs) {
 
     cuenta.hidden = false;
     cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span>";
+    if (anim()) anim().cuentaEtiqueta(cuenta);
     if (typeof TextoVoz !== "undefined") await TextoVoz.hablar(etiqueta, voz);
     if (token !== cuentaToken || juegoTerminado) return false;
 
@@ -1040,6 +1078,8 @@ async function correrCuentaRegresiva(duracionMs) {
 
     for (let n = segundos; n >= 1; n--) {
         cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span><strong>" + n + "</strong>";
+        if (anim()) anim().cuentaTick(cuenta);
+        sonarEvento("tic");
         await sleep(pasoMs);
         if (token !== cuentaToken || juegoTerminado) {
             if (typeof TextoVoz !== "undefined") TextoVoz.detener();
@@ -1075,6 +1115,10 @@ function piezasActivasEnBandeja() {
 }
 
 function animarEntradaFichas(selector) {
+    if (anim()) {
+        anim().entradaFichas(document.querySelectorAll(selector));
+        return;
+    }
     document.querySelectorAll(selector).forEach(function (ficha, i) {
         setTimeout(function () {
             ficha.classList.add("pieza-visible");
@@ -1166,6 +1210,7 @@ function animarDedoEnCabeza() {
         holdMs: 360,
         arrastre: { dx: dx, dy: dy, durMs: reducir ? 180 : 700 },
         onPresionar: function () {
+            if (anim()) anim().liberar(ficha);
             ficha.classList.add("is-demo-agarrada");
         },
         onDuranteArrastre: function () {
@@ -1239,6 +1284,7 @@ function armarTablero() {
     tableroListo = true;
     actualizarProgreso();
     lanzarTutorialPieza();
+    if (anim()) anim().preparar();
 }
 
 function feedbackActivo() {
@@ -1431,8 +1477,12 @@ function seleccionarPieza(id) {
     document.querySelectorAll(".pieza").forEach(function (p) {
         const activa = p.dataset.id === id;
         p.classList.toggle("seleccionada", activa);
-        if (activa) reducirParaEncaje(p, id);
+        if (activa) {
+            reducirParaEncaje(p, id);
+            if (anim()) anim().seleccion(p);
+        }
     });
+    sonarEvento("agarrar");
     resaltarZona(id);
 }
 
@@ -1454,6 +1504,8 @@ function iniciarArrastre(ev, el, pieza) {
     fantasma.style.width = t.w + "px";
     fantasma.style.height = t.h + "px";
     document.body.appendChild(fantasma);
+    if (anim()) anim().fantasmaInicio(fantasma, el);
+    sonarEvento("agarrar");
     moverFantasma(ev);
     resaltarZona(pieza.id);
 }
@@ -1464,23 +1516,31 @@ function moverFantasma(ev) {
     const h = fantasma.offsetHeight || 140;
     fantasma.style.left = ev.clientX - w / 2 + "px";
     fantasma.style.top = ev.clientY - h / 2 + "px";
+    if (anim()) anim().fantasmaMover(fantasma, ev.clientX);
 }
 
-function cancelarArrastre(el) {
+// `destino` (opcional, solo visual): hueco correcto hacia el que vuela la pieza al soltarla.
+function cancelarArrastre(el, destino) {
     dragActivo = null;
     if (el) el.classList.remove("arrastrando");
     restaurarTamanoPiezas();
     if (fantasma) {
-        fantasma.remove();
+        const f = fantasma;
         fantasma = null;
+        if (anim()) anim().soltarFantasma(f, destino || null, el);
+        else f.remove();
     }
 }
 
 function finalizarArrastre(ev, el, pieza) {
+    // Geometría original del fantasma (sin escala/giro de la animación) antes de medir el solape.
+    if (anim()) anim().neutralizar(fantasma);
     const zonaId = zonaBajoPunto(ev.clientX, ev.clientY, pieza.id);
-    cancelarArrastre(el);
+    cancelarArrastre(el, zonaId === pieza.id ? destinoEl(pieza.id) : null);
     quitarResalte();
     if (!zonaId) {
+        // Soltada fuera de la figura: vuelve a la bandeja.
+        sonarEvento("soltar");
         rebotar(el);
         return;
     }
@@ -1637,6 +1697,7 @@ function colocarPieza(pieza) {
     if (ficha) {
         ficha.classList.remove("pieza-visible", "pieza-entrada", "seleccionada", "arrastrando");
         ficha.classList.add("pieza-saliendo");
+        if (anim()) anim().salidaFicha(ficha);
         setTimeout(function () {
             if (ficha.parentNode) ficha.remove();
             verificarSiguienteLote();
@@ -1665,8 +1726,11 @@ function colocarPieza(pieza) {
         if (zona) zona.style.visibility = "hidden";
     }
 
+    if (anim()) anim().encaje(pieza.id, pieza.color);
     actualizarProgreso();
-    reproducirAudio(gameConfig.audios && gameConfig.audios.acierto);
+    if (!sonarEvento("encaje")) {
+        reproducirAudio(gameConfig.audios && gameConfig.audios.acierto);
+    }
     mostrarFeedback("acierto").then(function () {
         if (piezasEstado.every(function (p) { return p.colocada; })) {
             terminarJuego();
@@ -1709,7 +1773,9 @@ function fallarPieza(pieza) {
     const ficha = document.querySelector('.pieza[data-id="' + pieza.id + '"]');
     rebotar(ficha);
     mostrarFeedback("error");
-    reproducirAudio(gameConfig.audios && gameConfig.audios.error);
+    if (!sonarEvento("error")) {
+        reproducirAudio(gameConfig.audios && gameConfig.audios.error);
+    }
 
     const zona = destinoEl(pieza.id);
     if (!zona || acc().pistaPorFallos === false) return;
@@ -1728,6 +1794,10 @@ function fallarPieza(pieza) {
 
 function rebotar(el) {
     if (!el) return;
+    if (anim()) {
+        anim().error(el);
+        return;
+    }
     el.classList.remove("rebote");
     void el.offsetWidth;
     el.classList.add("rebote");
@@ -1749,11 +1819,14 @@ function abrirZoom(pieza, el) {
         inner.style.backgroundColor = pieza.color;
     }
     overlay.hidden = false;
+    if (anim()) anim().zoomAbrir(overlay);
 }
 
 function cerrarZoom() {
     zoomAbierto = false;
-    document.getElementById("zoom-pieza").hidden = true;
+    const overlay = document.getElementById("zoom-pieza");
+    if (anim() && anim().zoomCerrar(overlay)) return;
+    overlay.hidden = true;
 }
 
 function mostrarReferenciaAyuda() {
@@ -1801,12 +1874,19 @@ function terminarJuego() {
     juegoTerminado = true;
     if (typeof Swal !== "undefined") Swal.close();
     ocultarVistaCompleta();
-    reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
+    if (sonarEvento("victoria")) {
+        // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+        // fanfarria son tonos puros agudos (se oía como "pitido").
+        sonido().agacharMusica(0.35);
+    } else {
+        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
+    }
     const cierre = (gameConfig.textos && gameConfig.textos.cierre) || "";
     const voz = Math.random() < 0.5 ? "zoe" : "zeus";
     if (feedbackActivo()) {
         TextoVoz.hablar(cierre, voz);
     }
+    if (anim()) anim().celebrar();
 
     setTimeout(function () {
         const caja = document.getElementById("final");
@@ -1837,6 +1917,7 @@ $(document).ready(function () {
             window.speechSynthesis.getVoices();
         });
     }
+    if (sonido()) sonido().usarTema(gameConfig.audios && gameConfig.audios.tema);
     TextoVoz.iniciar(gameConfig, introConfig, {
         obtenerAudioFondo: function () { return audioFondo; },
         volumenFondo: volumenFondoPct() / 100

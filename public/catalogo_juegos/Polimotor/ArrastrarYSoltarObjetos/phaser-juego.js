@@ -34,6 +34,25 @@
         return tipo + ':' + id;
     }
 
+    /** Escala del objeto en reposo en el tablero (la que fija setDisplaySize en layoutRound). */
+    function escalaTablero(slot) {
+        var w = slot && slot.sprite && slot.sprite.width;
+        return (w > 0 && slot.size > 0) ? slot.size / w : 1;
+    }
+
+    /**
+     * Avisos opcionales para las capas de sonido y animación (script.js → callbacks
+     * onAgarrar / onMover / onSoltar). SOLO notifican: no cambian el tablero ni el
+     * resultado del drop, y un fallo en ellos no interrumpe el juego.
+     */
+    function avisar(nombre) {
+        var fn = callbacks && callbacks[nombre];
+        if (typeof fn !== 'function') return;
+        try {
+            fn.apply(null, Array.prototype.slice.call(arguments, 1));
+        } catch (e) { /* noop */ }
+    }
+
     function puedeInteractuar() {
         if (busyDrop) return false;
         if (typeof callbacks.puedeInteractuar === 'function') {
@@ -89,13 +108,20 @@
             var self = this;
             var objs = gameConfig.objetos || {};
             var dests = gameConfig.destinos || {};
+            // Los SVG de objetos solo traen viewBox (sin width/height): cargados con
+            // load.image, WebGL los subía como cuadros NEGROS. load.svg los rasteriza en un
+            // canvas a tamaño fijo (escala 2 → nítidos en pantallas de alta densidad).
+            function cargar(key, url) {
+                if (/\.svg(\?|$)/i.test(url)) self.load.svg(key, url, { scale: 2 });
+                else self.load.image(key, url);
+            }
             Object.keys(objs).forEach(function (id) {
                 var img = objs[id] && objs[id].img;
-                if (img) self.load.image(texKey('obj', id), img);
+                if (img) cargar(texKey('obj', id), img);
             });
             Object.keys(dests).forEach(function (id) {
                 var img = dests[id] && dests[id].img;
-                if (img) self.load.image(texKey('dest', id), img);
+                if (img) cargar(texKey('dest', id), img);
             });
             if (gameConfig.fondo) {
                 this.load.image('fondo-tablero', gameConfig.fondo);
@@ -301,15 +327,19 @@
             this._dragBloqueado = null;
             this.dragGo = go;
             this.tweens.killTweensOf(go);
+            // La escala de Phaser es relativa a la imagen (un PNG de 1080 px se ve a ~100 px con
+            // escala ~0,1): levantar a 1.08 absoluto lo agrandaba 10 veces. Se usa la de tablero.
+            var base = escalaTablero(slot);
             this.tweens.add({
                 targets: go,
-                scaleX: 1.08,
-                scaleY: 1.08,
+                scaleX: base * 1.08,
+                scaleY: base * 1.08,
                 duration: 100,
                 ease: 'Power2'
             });
             this.children.bringToTop(this.capaObjetos);
             this.capaObjetos.bringToTop(go);
+            avisar('onAgarrar', id, go);
         },
 
         onDrag: function (pointer, go, dragX, dragY) {
@@ -325,6 +355,7 @@
             go.x = dragX;
             go.y = dragY;
             this.highlightDestinoAt(pointer.x, pointer.y);
+            avisar('onMover', go.getData('objetoId'), go, dragX);
         },
 
         onDragEnd: function (pointer, go) {
@@ -333,7 +364,7 @@
                 var slot0 = this.objetos[go.getData('objetoId')];
                 if (slot0) {
                     go.setPosition(slot0.homeX, slot0.homeY);
-                    go.setScale(1);
+                    go.setScale(escalaTablero(slot0));
                 }
                 return;
             }
@@ -346,12 +377,13 @@
 
             this.tweens.add({
                 targets: go,
-                scaleX: 1,
-                scaleY: 1,
+                scaleX: escalaTablero(slot),
+                scaleY: escalaTablero(slot),
                 duration: 100
             });
 
             var dest = this.destinoEnPunto(pointer.x, pointer.y);
+            avisar('onSoltar', id, go, !!dest);
             if (!dest) {
                 this.volverACasa(slot);
                 return;
@@ -447,11 +479,14 @@
             dest.colocadoImg = img;
 
             if (!movimientoReducido()) {
-                img.setScale(0.2);
+                // Escala final = la que dejó setDisplaySize (no 1, que es el tamaño de la imagen).
+                var finalX = img.scaleX;
+                var finalY = img.scaleY;
+                img.setScale(finalX * 0.2, finalY * 0.2);
                 this.tweens.add({
                     targets: img,
-                    scaleX: 1,
-                    scaleY: 1,
+                    scaleX: finalX,
+                    scaleY: finalY,
                     duration: 380,
                     ease: 'Back.easeOut'
                 });

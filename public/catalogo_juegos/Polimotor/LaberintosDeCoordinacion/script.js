@@ -53,6 +53,23 @@
         });
     }
 
+    // Capa de animación GSAP + partículas Phaser 4 (laberintos-anim.js). Solo visual:
+    // si no está disponible se usa el comportamiento original.
+    function anim() {
+        return (window.LaberintosAnim && window.LaberintosAnim.activo) ? window.LaberintosAnim : null;
+    }
+
+    // Audio compartido con Howler (../../shared/pednia-audio.js), tema del ambiente.
+    // Si no está, se usa el audio original (new Audio).
+    function sonido() {
+        return (window.PedniaAudio && window.PedniaAudio.activo) ? window.PedniaAudio : null;
+    }
+
+    /** Evento sonoro del tema; false si el tema no lo cubre. */
+    function sonarEvento(nombre, opts) {
+        return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
+    }
+
     function acc() {
         return (gameConfig && gameConfig.accesibilidad) || {};
     }
@@ -449,6 +466,21 @@
 
     function reproducirAudio(ruta, volumen, loop) {
         if (!ruta) return null;
+        if (sonido()) {
+            const vol = volumen != null ? volumen : 1;
+            if (loop) {
+                // Música de fondo: la del tema (si la trae) con fundidos; TextoVoz la sigue manejando.
+                const musica = sonido().musica(ruta);
+                if (musica) {
+                    musica.volume = vol;
+                    musica.play();
+                    audioFondo = musica;
+                    return musica;
+                }
+            } else if (sonido().archivo(ruta, vol)) {
+                return null;
+            }
+        }
         try {
             let base = audioCache[ruta];
             if (!base) {
@@ -591,7 +623,9 @@
         const fb = (gameConfig && gameConfig.feedback) || {};
         if (fb.acierto && fb.acierto.gif) urls.push(fb.acierto.gif);
         if (fb.error && fb.error.gif) urls.push(fb.error.gif);
-        const audios = [
+        // Con PedniaAudio los audios van por Howler (no usan audioCache): no se precargan
+        // como <audio> (evita descargar fondo.mp3 cuando el tema trae su propia música).
+        const audios = sonido() ? [] : [
             gameConfig.audios && gameConfig.audios.acierto,
             gameConfig.audios && gameConfig.audios.error,
             gameConfig.audios && gameConfig.audios.cierre,
@@ -1124,6 +1158,9 @@
             if (coheteVuelo.t >= coheteVuelo.prepFrames) {
                 coheteVuelo.fase = "subida";
                 coheteVuelo.tVuelo = 0;
+                // Despegue: zumbido del tema y chispas de fuego bajo el cohete (solo efecto).
+                sonarEvento("acierto");
+                if (anim()) anim().despegue(canvas, poseCohete(inicioMeta(laberintoActual()).meta, pelotaAnim));
             }
             return;
         }
@@ -1240,6 +1277,13 @@
         // Siguiente laberinto ya preparado: listo para jugar, sin feedback intermedio.
         esperandoFeedback = false;
         redibujar();
+        const labNuevo = laberintoActual();
+        if (labNuevo) {
+            sonarEvento("aparece");
+            if (anim()) {
+                anim().aterrizaje(canvas, aPixel(inicioMeta(labNuevo).meta), aPixel(personaje), tamanoCara());
+            }
+        }
     }
 
     function programarRedibujo() {
@@ -1256,6 +1300,7 @@
         if (!el || !laberintos.length) return;
         el.hidden = false;
         el.textContent = (indiceLaberinto + 1) + "/" + laberintos.length;
+        if (anim()) anim().progreso(el);
     }
 
     function muestrasLinea(pts) {
@@ -1340,6 +1385,8 @@
         esperandoFeedback = false;
         actualizarProgreso();
         redibujar();
+        sonarEvento("aparece");
+        if (anim()) anim().nuevoLaberinto(canvas, aPixel(personaje), tamanoCara(), !!lab.esDemo);
     }
 
     /* ── Interacción ──────────────────────────────────────────── */
@@ -1404,6 +1451,8 @@
         arrastrando = false;
         pointerId = null;
         canvas.classList.remove("arrastrando");
+        // Dónde estaba la carita antes de que la lógica la devuelva (solo para la animación).
+        const caraAntes = anim() ? aPixel(personaje) : null;
 
         const soltarInicio = !!(nivelElegido && nivelElegido.soltarEsFallo);
         if (soltarInicio) {
@@ -1414,10 +1463,16 @@
             personaje = { x: ultimoValido.x, y: ultimoValido.y };
         }
         redibujar();
+        if (anim()) {
+            anim().fallo(canvas, caraAntes, aPixel(personaje), tamanoCara(),
+                avatarImg && avatarImg.src, document.getElementById("enunciado"));
+        }
 
         const fb = (gameConfig.feedback && gameConfig.feedback.error) || {};
         const texto = mensaje || textos().error || fb.texto || "¡Te saliste del laberinto! Vuelve al pasillo.";
-        reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
+        if (!sonarEvento("error")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
+        }
 
         feedbackConVoz(texto, {
             personaje: "zoe",
@@ -1440,7 +1495,10 @@
 
         const lab = laberintoActual();
         const geo = inicioMeta(lab);
-        reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        if (!sonarEvento("correcto")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        }
+        if (anim()) anim().exito(canvas, aPixel(geo.meta));
         iniciarVueloCohete(geo.meta);
     }
 
@@ -1451,7 +1509,14 @@
         const cierre = (typeof textos === "function" ? textos().cierre : null) || "¡Excelente!";
         const texto = document.getElementById("texto_final");
         if (texto) texto.textContent = cierre;
-        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        if (sonarEvento("victoria")) {
+            // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+            // fanfarria son tonos puros agudos (se oía como "pitido").
+            sonido().agacharMusica(0.35);
+        } else {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        }
+        if (anim()) anim().celebrar(canvas);
         TextoVoz.hablar(cierre, "zoe");
         setTimeout(function () {
             const caja = document.getElementById("final");
@@ -1477,6 +1542,8 @@
         pointerId = ev.pointerId;
         canvas.setPointerCapture(ev.pointerId);
         canvas.classList.add("arrastrando");
+        if (anim()) anim().agarrar(canvas, aPixel(personaje), tamanoCara());
+        sonarEvento("agarrar");
         ev.preventDefault();
     }
 
@@ -1493,6 +1560,8 @@
         const radio = (anchoCamino() / 2) * 1.15;
 
         if (!dentroDeRed(p, red, radio)) {
+            // La capa visual anota por dónde se salió el dedo (origen del regreso animado).
+            if (anim()) anim().salida(ev.clientX, ev.clientY);
             falloCamino();
             return;
         }
@@ -1501,6 +1570,7 @@
         personaje = { x: proy.punto.x, y: proy.punto.y };
         ultimoValido = { x: personaje.x, y: personaje.y };
         programarRedibujo();
+        if (anim()) anim().mover(canvas, aPixel(personaje), tamanoCara());
 
         if (dist(personaje, geo.meta) <= metaRadio()) {
             exitoMeta();
@@ -1515,6 +1585,7 @@
         pointerId = null;
         canvas.classList.remove("arrastrando");
         try { canvas.releasePointerCapture(ev.pointerId); } catch (e) { /* noop */ }
+        if (anim() && estaba) anim().soltar();
 
         if (!estaba || esperandoFeedback || juegoTerminado) return;
 
@@ -1530,6 +1601,8 @@
 
         if (nivelElegido && nivelElegido.soltarEsFallo) {
             falloCamino("¡No sueltes! Sigue el camino sin levantar el dedo.");
+        } else {
+            sonarEvento("soltar");
         }
     }
 
@@ -1551,6 +1624,8 @@
         gameConfig = JSON.parse(readText("config.json"));
         introConfig = JSON.parse(readText("../../intro.json"));
         introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
+        // Tema de audio del ambiente (config.audios.tema), antes de TextoVoz.iniciar.
+        if (sonido()) sonido().usarTema(gameConfig.audios && gameConfig.audios.tema);
         aplicarLetterSpacing();
         try {
             laberintosFijos = JSON.parse(readText("laberintos-fijos.json"));

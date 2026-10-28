@@ -50,6 +50,23 @@
         return xhr.status === 200 ? xhr.responseText : null;
     }
 
+    // Capa de animación GSAP + partículas Phaser 4 (coordinacion-anim.js). Solo visual:
+    // si no está disponible se usa el comportamiento original.
+    function anim() {
+        return (window.CoordAnim && window.CoordAnim.activo) ? window.CoordAnim : null;
+    }
+
+    // Audio compartido con Howler (../../shared/pednia-audio.js). Si no está, se usa el
+    // audio original (new Audio).
+    function sonido() {
+        return (window.PedniaAudio && window.PedniaAudio.activo) ? window.PedniaAudio : null;
+    }
+
+    /** Evento sonoro del tema del juego; false si el tema no lo cubre. */
+    function sonarEvento(nombre, opts) {
+        return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
+    }
+
     function acc() {
         return (gameConfig && gameConfig.accesibilidad) || {};
     }
@@ -93,6 +110,7 @@
         }
         avisoSaliendoActivo = true;
         ritmoFondoAlerta(true);
+        if (anim()) anim().alerta(pelotaEl, true, primeraVez ? enunciado : null);
         // Suena cada vez que entra al aviso (al cambiar el texto).
         if (primeraVez && typeof TextoVoz !== "undefined" && feedbackActivo()) {
             TextoVoz.hablar(msg, "zoe");
@@ -106,6 +124,7 @@
         }
         ritmoFondoAlerta(false);
         mostrarInstruccionBase();
+        if (anim()) anim().alerta(pelotaEl, false);
     }
 
     function volumenFondoPct() {
@@ -357,7 +376,7 @@
         const ruta = gameConfig.audios && gameConfig.audios.fondo;
         if (!ruta) return;
         if (!audioFondo) {
-            audioFondo = new Audio(ruta);
+            audioFondo = (sonido() && sonido().musica(ruta)) || new Audio(ruta);
             audioFondo.loop = true;
         }
         audioFondo.volume = volumenFondoPct() / 100;
@@ -368,6 +387,7 @@
 
     function reproducirAudio(ruta, vol, loop) {
         if (!ruta) return;
+        if (sonido() && sonido().archivo(ruta, vol, loop)) return;
         let a = audioCache[ruta];
         if (!a) {
             a = new Audio(ruta);
@@ -758,6 +778,7 @@
 
         const lab = recorridoActual();
         const geo = inicioMeta(lab);
+        if (anim()) anim().enceste(pelotaEl, metaEnPantalla(), aroConjuntoEl);
         pelota = { x: geo.meta.x, y: geo.meta.y };
         if (pelotaDentroDelAro(pelota)) pelotaVisible = false;
         programarRedibujo();
@@ -955,6 +976,15 @@
         return Number(a.radioMeta != null ? a.radioMeta : 6.5);
     }
 
+    /** Solo lectura (para animación): la meta del aro en coordenadas de pantalla. */
+    function metaEnPantalla() {
+        if (!canvas) return null;
+        const r = canvas.getBoundingClientRect();
+        const m = metaFija();
+        if (!r.width || !r.height) return null;
+        return { x: r.left + (m.x / 100) * r.width, y: r.top + (m.y / 100) * r.height };
+    }
+
     /** Zona amplia para detectar llegada al aro. */
     function pelotaEnZonaAro(pos) {
         return dist(pos, metaFija()) <= radioMeta();
@@ -1123,6 +1153,7 @@
             if (aroBaseEl) aroBaseEl.hidden = false;
 
             reiniciarGifEnceste();
+            if (anim()) anim().gifEnceste(aroImgEl, aroEncesteEl);
 
             if (pelotaDentroDelAro(pelota)) {
                 pelotaVisible = false;
@@ -1224,6 +1255,7 @@
         pelotaEl.style.width = anchoPelota() + "%";
         pelotaEl.style.left = pelota.x + "%";
         pelotaEl.style.top = pelota.y + "%";
+        if (anim()) anim().pelotaMovida(pelotaEl, pelota.x, pelota.y);
     }
 
     function lerpColor(hexA, hexB, t) {
@@ -1290,12 +1322,28 @@
                     return pts.length >= 2;
                 })
             );
-            red.forEach(function (pts) {
-                dibujarPolilinea(pts, cols.borde, borde, false);
-            });
-            red.forEach(function (pts) {
-                dibujarPolilinea(pts, cols.linea, ancho, false);
-            });
+            if (window.CaminoReal && !acc().altoContraste) {
+                // Mismo trazado y mismo ancho que valida la lógica; solo cambia el acabado.
+                const aPx = function (pts) {
+                    return pts.map(function (p) {
+                        return { x: px(p.x, "x"), y: px(p.y, "y") };
+                    }).filter(function (p) { return isFinite(p.x) && isFinite(p.y); });
+                };
+                window.CaminoReal.dibujar(ctx, red.map(aPx), {
+                    ancho: px(ancho, "y"),
+                    borde: px(borde, "y"),
+                    inicio: { x: px(geo.inicio.x, "x"), y: px(geo.inicio.y, "y") },
+                    alerta: alertaDesvio,
+                    colores: (gameConfig && gameConfig.coloresCamino) || {}
+                });
+            } else {
+                red.forEach(function (pts) {
+                    dibujarPolilinea(pts, cols.borde, borde, false);
+                });
+                red.forEach(function (pts) {
+                    dibujarPolilinea(pts, cols.linea, ancho, false);
+                });
+            }
         }
 
         posicionarPelotaDom();
@@ -1350,12 +1398,16 @@
         const n = idxReal >= 0 ? idxReal + 1 : 1;
         el.innerHTML = '<i class="fa-solid fa-circle"></i> ' +
             n + " / " + reales.length;
+        if (anim()) anim().progreso(el);
     }
 
     function resetPelotaEnInicio() {
         const lab = recorridoActual();
         if (!lab) return;
         detenerDemostracion();
+        // El aro debe estar visible antes de anclar: si sigue oculto tras el
+        // enceste anterior, metaFija() cae a la meta de respaldo del config.
+        mostrarAroNormal();
         lab.path = anclarExtremosOrtogonales(lab.path);
         const geo = inicioMeta(lab);
         // Pelota exactamente en el primer punto de la línea.
@@ -1368,7 +1420,6 @@
         pointerId = null;
         if (canvas) canvas.classList.remove("arrastrando");
         ritmoFondoAlerta(false);
-        mostrarAroNormal();
         mostrarInstruccionBase();
         programarRedibujo();
     }
@@ -1377,6 +1428,11 @@
         esperandoFeedback = false;
         resetPelotaEnInicio();
         actualizarProgreso();
+        if (anim()) {
+            // La animación necesita la pelota ya colocada en la salida (solo DOM).
+            posicionarPelotaDom();
+            anim().nuevoRecorrido(canvas, pelotaEl, esRecorridoDemo());
+        }
         if (esRecorridoDemo()) {
             // Espera un frame de layout antes de animar.
             requestAnimationFrame(function () {
@@ -1394,11 +1450,15 @@
 
         alertaDesvio = 1;
         programarRedibujo();
+        if (anim()) anim().antesDeRegreso(pelotaEl);
         pelota = { x: ultimoValido.x, y: ultimoValido.y };
         alertaDesvio = 0;
         pelotaVisible = true;
         programarRedibujo();
-        reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
+        if (anim()) anim().regreso(pelotaEl);
+        if (!sonarEvento("error")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
+        }
 
         const mensaje = msg || textos().error || "¡Inténtalo otra vez! Sigue la línea con cuidado.";
         // Si ya habló el aviso de salida, no repetir TTS en el feedback.
@@ -1407,6 +1467,7 @@
             alertaDesvio = 0;
             ritmoFondoAlerta(false);
             programarRedibujo();
+            if (anim() && !juegoTerminado) anim().invitar(pelotaEl);
         });
     }
 
@@ -1429,6 +1490,7 @@
 
         const lab = recorridoActual();
         const geo = inicioMeta(lab);
+        if (anim()) anim().enceste(pelotaEl, metaEnPantalla(), aroConjuntoEl);
         // Lleva el balón al centro del aro; se oculta solo si ya entró >50%.
         pelota = { x: geo.meta.x, y: geo.meta.y };
         alertaDesvio = 0;
@@ -1437,7 +1499,12 @@
         }
         programarRedibujo();
 
-        reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        if (sonarEvento("acierto")) {
+            // Con animación, la red suena cuando la pelota cruza el aro (coordinacion-anim.js).
+            if (!anim()) sonarEvento("enRed", { retraso: 0.9 });
+        } else {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        }
         const mensaje = textos().acierto || "¡Muy bien! Llevaste la pelota hasta la canasta.";
 
         mostrarAroEnceste().then(function () {
@@ -1455,11 +1522,18 @@
         juegoTerminado = true;
         detenerDemostracion();
         if (typeof Swal !== "undefined") Swal.close();
-        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
+        if (sonarEvento("victoria")) {
+            // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+            // fanfarria son tonos puros agudos (se oía como "pitido").
+            sonido().agacharMusica(0.35);
+        } else {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
+        }
         const cierre = textos().cierre || "¡Excelente! Completaste los recorridos.";
         if (feedbackActivo()) {
             TextoVoz.hablar(cierre, Math.random() < 0.5 ? "zoe" : "zeus");
         }
+        if (anim()) anim().celebrar(pelotaEl, document.getElementById("lienzo-wrap"));
         setTimeout(function () {
             const caja = document.getElementById("final");
             const texto = document.getElementById("texto_final");
@@ -1538,6 +1612,7 @@
         const p = aNorm(ev.clientX, ev.clientY);
 
         if (acc().modoTap) {
+            sonarEvento("bote", { vol: 0.7 });
             moverPelotaA(p);
             ev.preventDefault();
             return;
@@ -1548,6 +1623,8 @@
         pointerId = ev.pointerId;
         canvas.setPointerCapture(ev.pointerId);
         canvas.classList.add("arrastrando");
+        if (anim()) anim().agarrar(pelotaEl);
+        sonarEvento("agarrar");
         ev.preventDefault();
     }
 
@@ -1567,6 +1644,8 @@
         pointerId = null;
         canvas.classList.remove("arrastrando");
         try { canvas.releasePointerCapture(ev.pointerId); } catch (e) { /* noop */ }
+        if (anim() && estaba) anim().soltar(pelotaEl);
+        if (estaba && !esperandoFeedback) sonarEvento("soltar");
 
         if (!estaba || esperandoFeedback || juegoTerminado) return;
 
@@ -1709,6 +1788,8 @@
                 window.speechSynthesis.getVoices();
             });
         }
+
+        if (sonido()) sonido().usarTema(gameConfig.audios && gameConfig.audios.tema);
 
         TextoVoz.iniciar(gameConfig, introConfig, {
             obtenerAudioFondo: function () { return audioFondo; },
