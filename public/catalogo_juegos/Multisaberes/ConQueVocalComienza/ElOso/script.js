@@ -1,0 +1,985 @@
+/* ¿Con qué vocal comienza? — Multisaberes */
+(function () {
+    "use strict";
+
+    var L = window.ConQueVocalLogica;
+    var Sfx = window.VocalesInicialesSfx;
+
+    var gameConfig = null;
+    var introConfig = null;
+    var audioFondo = null;
+    var audioCache = Object.create(null);
+
+    var nivel = null;
+    var reto = null;
+    var rondaActual = null;
+    var objetivo = null;
+    var objetoId = null;
+    var estado = { ultimoSlot: null, ultimoCorrecto: null, ultimoMapa: null, ultimoObjeto: null };
+    var indice = 0;
+    var completados = 0;
+    var fase = "";
+    var rondaGen = 0;
+    var tokenSonido = 0;
+    var juegoTerminado = false;
+    var arrancado = false;
+    var cerrado = false;
+    var demoActiva = false;
+    var pistaTimer = null;
+    var introTimers = [];
+
+    function $id(id) { return document.getElementById(id); }
+
+    function sleep(ms) {
+        return new Promise(function (resolve) { setTimeout(resolve, ms); });
+    }
+
+    function readText(ruta) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", ruta, false);
+        xhr.send();
+        return xhr.status === 200 ? xhr.responseText : null;
+    }
+
+    function acc() { return (gameConfig && gameConfig.accesibilidad) || {}; }
+
+    function vivo(gen) { return gen === rondaGen && !juegoTerminado; }
+
+    function reducir() {
+        return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+            || document.body.classList.contains("sin-animaciones");
+    }
+
+    function volumenPct() {
+        var n = Number(acc().volumenFondo);
+        return isFinite(n) ? Math.max(0, Math.min(100, n)) : 20;
+    }
+
+    function aplicarVolumen(pct) {
+        var n = Math.max(0, Math.min(100, Number(pct) || 0));
+        if (!gameConfig.accesibilidad) gameConfig.accesibilidad = {};
+        gameConfig.accesibilidad.volumenFondo = n;
+        var vol = n / 100;
+        if (window.TextoVoz && typeof TextoVoz.definirVolumenFondo === "function") {
+            TextoVoz.definirVolumenFondo(vol);
+        } else if (audioFondo) {
+            audioFondo.volume = vol;
+        }
+        var icono = document.querySelector("#btn-menu-vol i");
+        if (icono) {
+            icono.className = n <= 0
+                ? "fa-solid fa-volume-xmark"
+                : (n < 40 ? "fa-solid fa-volume-low" : "fa-solid fa-volume-high");
+        }
+    }
+
+    function duck(bajo) {
+        if (!window.TextoVoz) return;
+        var base = volumenPct() / 100;
+        TextoVoz.volumenFondo(bajo ? Math.min(0.04, base) : base);
+    }
+
+    function aplicarLetterSpacing() {
+        var n = Number(acc().letterSpacing);
+        document.documentElement.style.setProperty("--mc-letter-spacing", (isFinite(n) && n >= 0 ? n : 2) + "px");
+    }
+
+    function esLaboratorio(n) {
+        return String((n && n.edad) || "").indexOf("5") === 0;
+    }
+
+    function aplicarTema(n) {
+        var lab = esLaboratorio(n);
+        document.body.classList.toggle("tema-laboratorio", lab);
+        document.body.classList.toggle("tema-jardin", !lab);
+        ["pantalla-inicio", "escenario"].forEach(function (id) {
+            var el = $id(id);
+            if (!el) return;
+            el.classList.toggle("tema-laboratorio", lab);
+            el.classList.toggle("tema-jardin", !lab);
+        });
+        var escenario = $id("escenario");
+        if (n && escenario) {
+            escenario.classList.toggle("edad-3", String(n.id) === "3");
+            escenario.classList.toggle("edad-5", String(n.id) === "5");
+        }
+        var icono = document.querySelector("#btn-empecemos i");
+        if (icono) icono.className = lab ? "fa-solid fa-ear-listen" : "fa-solid fa-play";
+    }
+
+    function temaInicial() {
+        var edad = window.PedniaEdad ? PedniaEdad.edadSesion() : null;
+        return { edad: edad != null && edad >= 5 ? "5-6 años" : "3-4 años", id: edad != null && edad >= 5 ? "5" : "3" };
+    }
+
+    function asegurarFondo() {
+        var ruta = gameConfig.audios && gameConfig.audios.fondo;
+        if (!ruta) return;
+        if (!audioFondo) {
+            audioFondo = new Audio(ruta);
+            audioFondo.loop = true;
+        }
+        audioFondo.volume = volumenPct() / 100;
+        var p = audioFondo.play();
+        if (p && p.catch) p.catch(function () {});
+    }
+
+    function playArchivo(ruta) {
+        return new Promise(function (resolve) {
+            if (!ruta) { resolve(); return; }
+            var audio = audioCache[ruta] || new Audio(ruta);
+            audioCache[ruta] = audio;
+            var fin = function () { resolve(); };
+            try { audio.pause(); audio.currentTime = 0; } catch (e) { /* noop */ }
+            audio.onended = fin;
+            audio.onerror = fin;
+            var p = audio.play();
+            if (p && p.catch) p.catch(fin);
+            setTimeout(fin, 12000);
+        });
+    }
+
+    function defObjeto(id) {
+        return (gameConfig.objetos && gameConfig.objetos[id]) || null;
+    }
+
+    function despertarAudio() {
+        if (window.TextoVoz) TextoVoz.desbloquear();
+        if (Sfx) Sfx.desbloquear();
+        asegurarFondo();
+    }
+
+    function pronunciarObjeto(id) {
+        var token = ++tokenSonido;
+        var btn = $id("btn-escuchar");
+        var inicio = $id("btn-empecemos");
+        despertarAudio();
+        if (btn) btn.classList.add("sonando");
+        if (inicio && document.body.classList.contains("esperando-inicio")) inicio.classList.add("sonando");
+        duck(true);
+        var def = defObjeto(id) || {};
+        var ruta = gameConfig.audios && gameConfig.audios.objetos && gameConfig.audios.objetos[id];
+        var frase = def.pronuncia || def.nombre || id;
+        var sonido;
+        if (ruta) {
+            sonido = playArchivo(ruta);
+        } else if (window.TextoVoz) {
+            TextoVoz.detener();
+            sonido = Promise.resolve(TextoVoz.hablar(frase, "zoe", { esperarTtsMs: 600 }));
+        } else {
+            sonido = sleep(900);
+        }
+        return Promise.resolve(sonido).catch(function () {}).then(function () {
+            if (token !== tokenSonido) return;
+            if (btn) btn.classList.remove("sonando");
+            if (inicio) inicio.classList.remove("sonando");
+            duck(false);
+        });
+    }
+
+    function efecto(nombre) {
+        // Celebración/campanas del doc; sin beep de error (el reintento es reescuchar).
+        if (!nombre || !Sfx || nombre === "suave") return;
+        Sfx.sonar(nombre);
+    }
+
+    function gif(voz, hablando) {
+        var quien = voz === "zeus" ? "zeus" : "zoe";
+        if (hablando) return "../../../images/" + quien + "_hablando.gif";
+        return "../../../img/" + quien + "_normal.gif";
+    }
+
+    function textos() {
+        return (gameConfig && gameConfig.textos) || {};
+    }
+
+    function marcarHablando(voz, hablando) {
+        var id = voz === "zeus" ? "pj-zeus-img" : "pj-zoe-img";
+        var inicioId = voz === "zeus" ? "inicio-zeus" : "inicio-zoe";
+        var img = $id(id);
+        var inicio = $id(inicioId);
+        if (img) img.src = gif(voz, hablando);
+        if (inicio) inicio.src = gif(voz, hablando);
+        var avatar = $id("dialogo-avatar");
+        if (avatar && $id("dialogo").classList.contains("visible")) avatar.src = gif(voz, hablando);
+    }
+
+    function pintarDialogo(voz, texto, estadoDialogo) {
+        var dialogo = $id("dialogo");
+        if (!dialogo) return;
+        dialogo.dataset.voz = voz || "";
+        dialogo.classList.remove("es-acierto");
+        if (estadoDialogo) dialogo.classList.add("es-" + estadoDialogo);
+        dialogo.classList.add("visible");
+        var avatar = $id("dialogo-avatar");
+        if (avatar) avatar.src = gif(voz, true);
+        var enunciado = $id("enunciado");
+        if (enunciado) enunciado.textContent = texto || "";
+    }
+
+    function limpiarDialogo() {
+        var dialogo = $id("dialogo");
+        if (dialogo) dialogo.classList.remove("visible", "es-acierto");
+        var enunciado = $id("enunciado");
+        if (enunciado) enunciado.textContent = "";
+    }
+
+    function decir(linea, estadoDialogo) {
+        if (!linea || !linea.texto || !window.TextoVoz) return Promise.resolve();
+        despertarAudio();
+        var voz = "zoe";
+        if (linea.voz) voz = linea.voz === "zeus" ? "zeus" : "zoe";
+        else if (linea.personaje === 0) voz = "zeus";
+        // Doc: voz, no texto que el niño tenga que leer.
+        if (!document.body.classList.contains("sin-feedback") && !document.body.classList.contains("esperando-inicio")) {
+            pintarDialogo(voz, linea.texto, estadoDialogo);
+        }
+        marcarHablando(voz, true);
+        var inicio = $id("btn-empecemos");
+        var escuchar = $id("btn-escuchar");
+        if (inicio && document.body.classList.contains("esperando-inicio")) inicio.classList.add("sonando");
+        if (escuchar && !document.body.classList.contains("esperando-inicio")) escuchar.classList.add("sonando");
+        return Promise.resolve(TextoVoz.hablar(linea.texto, voz, { esperarTtsMs: 600 })).catch(function () {}).then(function () {
+            marcarHablando(voz, false);
+            if (inicio) inicio.classList.remove("sonando");
+            if (escuchar) escuchar.classList.remove("sonando");
+        });
+    }
+
+    function lineasDelNivel(n) {
+        var lineas = [];
+        (n.bienvenida || []).forEach(function (l) {
+            lineas.push({ texto: l.texto, personaje: l.personaje === 1 ? "zoe" : "zeus" });
+        });
+        (n.retos || []).forEach(function (r) {
+            if (r.acierto && r.acierto.texto) lineas.push({ texto: r.acierto.texto, personaje: r.acierto.voz || "zoe" });
+            if (r.error && r.error.texto) lineas.push({ texto: r.error.texto, personaje: r.error.voz || "zeus" });
+        });
+        if (Array.isArray(n.cierre)) {
+            n.cierre.forEach(function (l) {
+                if (l && l.texto) lineas.push({ texto: l.texto, personaje: l.voz || "zoe" });
+            });
+        } else if (n.cierre) {
+            lineas.push({ texto: n.cierre.texto, personaje: n.cierre.voz || "zoe" });
+        }
+        // Sin precargar todos los objetos: satura /juegos/tts y retrasa la primera voz.
+        return lineas;
+    }
+
+    function lineasCierre(n) {
+        var c = (n && n.cierre) || { voz: "zoe", texto: "¡Descubriste los sonidos iniciales!" };
+        if (Array.isArray(c)) return c.filter(function (l) { return l && l.texto; });
+        return [c];
+    }
+
+    function crearVocal(id, lugar) {
+        var def = (gameConfig.vocales || {})[id] || {};
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "vocal entra";
+        btn.dataset.vocal = id;
+        btn.setAttribute("aria-label", "Opción");
+        btn.disabled = true;
+        btn.style.setProperty("--c", def.color || "#38bdf8");
+        if (lugar) {
+            btn.style.left = lugar.x + "%";
+            btn.style.top = lugar.y + "%";
+        }
+        btn.innerHTML = '<span class="globo" aria-hidden="true"></span><span class="vocal-cuerpo"><span class="letra">' + id + "</span></span>";
+        return btn;
+    }
+
+    function vocalEl(id) {
+        return document.querySelector('#vocales .vocal[data-vocal="' + id + '"]');
+    }
+
+    function habilitarVocales(si) {
+        document.querySelectorAll("#vocales .vocal").forEach(function (b) { b.disabled = !si; });
+        var escuchar = $id("btn-escuchar");
+        if (escuchar) escuchar.disabled = !si;
+    }
+
+    function limpiarClases() {
+        document.querySelectorAll("#vocales .vocal").forEach(function (v) {
+            v.classList.remove("acierto", "vuelve", "entra", "elegida", "eleva", "ilumina");
+            var cuerpo = v.querySelector(".vocal-cuerpo");
+            if (cuerpo) cuerpo.className = "vocal-cuerpo";
+            var globo = v.querySelector(".globo");
+            if (globo) globo.className = "globo";
+        });
+        var img = $id("img-objeto");
+        if (img) img.className = "img-objeto";
+        celebrarPersonajes(false);
+    }
+
+    function mostrarObjeto(id) {
+        var def = defObjeto(id);
+        var img = $id("img-objeto");
+        if (!img || !def) return;
+        img.className = "img-objeto";
+        img.src = def.img;
+        img.alt = "";
+    }
+
+    function animarObjeto(nombre) {
+        var img = $id("img-objeto");
+        if (!img || !nombre || reducir()) return;
+        img.classList.remove("vuela", "trompa", "mueve", "patas", "salta", "brilla", "campanas", "especial");
+        void img.offsetWidth;
+        img.classList.add(nombre);
+        if (nombre === "campanas") efecto("campanas");
+    }
+
+    function esperaTransicion(el) {
+        return new Promise(function (resolve) {
+            var listo = false;
+            var fin = function () {
+                if (listo) return;
+                listo = true;
+                el.removeEventListener("transitionend", onEnd);
+                resolve();
+            };
+            var onEnd = function (ev) {
+                if (ev.target !== el) return;
+                if (ev.propertyName !== "left" && ev.propertyName !== "top") return;
+                fin();
+            };
+            el.addEventListener("transitionend", onEnd);
+            setTimeout(fin, reducir() ? 40 : 1000);
+        });
+    }
+
+    function colocar(ronda, mover) {
+        var cont = $id("vocales");
+        if (!cont || !ronda || !ronda.mapa) return Promise.resolve();
+        var ids = ronda.vocales || [];
+        Array.prototype.forEach.call(cont.querySelectorAll(".vocal"), function (el) {
+            if (ids.indexOf(el.dataset.vocal) === -1) el.remove();
+        });
+        ids.forEach(function (id) {
+            if (vocalEl(id)) return;
+            cont.appendChild(crearVocal(id, ronda.mapa[id]));
+        });
+        var escenario = $id("escenario");
+        var cambios = [];
+        ids.forEach(function (id) {
+            var el = vocalEl(id);
+            if (!el || !ronda.mapa[id]) return;
+            var left = ronda.mapa[id].x + "%";
+            var top = ronda.mapa[id].y + "%";
+            if (el.style.left !== left || el.style.top !== top) cambios.push(el);
+        });
+        if (!mover || reducir() || !cambios.length) {
+            if (escenario) escenario.classList.remove("en-movimiento");
+            ids.forEach(function (id) {
+                var el = vocalEl(id);
+                if (!el || !ronda.mapa[id]) return;
+                el.style.left = ronda.mapa[id].x + "%";
+                el.style.top = ronda.mapa[id].y + "%";
+            });
+            return Promise.resolve();
+        }
+        escenario.classList.add("en-movimiento");
+        void escenario.offsetWidth;
+        ids.forEach(function (id) {
+            var el = vocalEl(id);
+            if (!el || !ronda.mapa[id]) return;
+            el.style.left = ronda.mapa[id].x + "%";
+            el.style.top = ronda.mapa[id].y + "%";
+        });
+        return Promise.all(cambios.map(esperaTransicion)).then(function () {
+            escenario.classList.remove("en-movimiento");
+        });
+    }
+
+    function debeMover() {
+        return String(nivel.id) === "5" && !!document.querySelector("#vocales .vocal");
+    }
+
+    function celebrarPersonajes(si) {
+        var zoe = $id("pj-zoe");
+        var zeus = $id("pj-zeus");
+        if (zoe) zoe.classList.toggle("celebra", !!si);
+        if (zeus) zeus.classList.toggle("celebra", !!si);
+    }
+
+    function estrellas(el, n) {
+        if (!el || reducir()) return;
+        var capa = $id("capa-efectos");
+        if (!capa) return;
+        n = Math.min(Math.max(Number(n) || 8, 1), 10);
+        while (capa.childNodes.length > 16) capa.removeChild(capa.firstChild);
+        var rect = el.getBoundingClientRect();
+        var x = rect.left + rect.width / 2;
+        var y = rect.top + rect.height / 2;
+        var colores = ["#fbbf24", "#fff", "#fb7185", "#38bdf8", "#4ade80"];
+        var i;
+        for (i = 0; i < n; i++) {
+            var p = document.createElement("span");
+            var ang = Math.random() * Math.PI * 2;
+            var dist = 36 + Math.random() * 90;
+            p.className = "particula";
+            p.style.left = x + "px";
+            p.style.top = y + "px";
+            p.style.background = colores[i % 5];
+            p.style.setProperty("--dx", Math.cos(ang) * dist + "px");
+            p.style.setProperty("--dy", Math.sin(ang) * dist + "px");
+            capa.appendChild(p);
+            setTimeout(function (nodo) {
+                if (nodo && nodo.parentNode) nodo.parentNode.removeChild(nodo);
+            }, 850, p);
+        }
+    }
+
+    function pintarEstrellas() {
+        var cont = $id("progreso");
+        if (!cont) return;
+        var total = L.totalEstrellas(nivel);
+        var mostrar = String(nivel.id) === "5" && acc().mostrarProgreso !== false;
+        cont.hidden = !mostrar;
+        cont.innerHTML = "";
+        if (!mostrar) return;
+        var i;
+        for (i = 0; i < total; i++) {
+            var s = document.createElement("span");
+            s.className = "estrella" + (i < completados ? " hecha" : "");
+            cont.appendChild(s);
+        }
+    }
+
+    function marcarEstrella() {
+        completados += 1;
+        var nodos = document.querySelectorAll("#progreso .estrella");
+        if (nodos[completados - 1]) nodos[completados - 1].classList.add("hecha");
+        else pintarEstrellas();
+    }
+
+    function cancelarPista() {
+        clearTimeout(pistaTimer);
+        pistaTimer = null;
+        if (window.PedniaTutorial) PedniaTutorial.quitarManos();
+    }
+
+    function programarPista() {
+        cancelarPista();
+        if (!window.PedniaTutorial || document.body.classList.contains("sin-repetir")) return;
+        var gen = rondaGen;
+        pistaTimer = setTimeout(function () {
+            if (!vivo(gen) || fase !== "jugar") return;
+            var btn = $id("btn-escuchar");
+            PedniaTutorial.animarMano({
+                punto: btn,
+                holdMs: 450,
+                cancelado: function () { return fase !== "jugar" || !vivo(gen); },
+                onPresionar: function () { escuchar(); }
+            });
+        }, 10000);
+    }
+
+    function escuchar() {
+        if (fase !== "jugar" || !objetoId) return;
+        pronunciarObjeto(objetoId);
+    }
+
+    function claseEfecto(nombre) {
+        if (nombre === "eleva") return "eleva";
+        if (nombre === "ilumina") return "ilumina";
+        return "eleva";
+    }
+
+    async function acierto(btn, gen) {
+        var a = reto.acierto || {};
+        var fx = claseEfecto(a.efecto);
+        btn.classList.add("acierto", fx);
+        var cuerpo = btn.querySelector(".vocal-cuerpo");
+        var globo = btn.querySelector(".globo");
+        if (cuerpo) cuerpo.classList.add(fx);
+        if (globo) globo.classList.add(fx);
+        if (a.objeto) animarObjeto(a.objeto);
+        if (a.celebra) celebrarPersonajes(true);
+        estrellas(btn, a.objeto === "especial" ? 22 : 12);
+        efecto(a.sonido);
+        if (a.texto) await decir(a, "acierto");
+        else if (a.celebra && !a.texto) {
+            celebrarPersonajes(true);
+            await sleep(700);
+        } else await sleep(650);
+        if (!vivo(gen)) return;
+        marcarEstrella();
+        estado.ultimoCorrecto = objetivo;
+        estado.ultimoObjeto = objetoId;
+        siguiente(gen);
+    }
+
+    async function fallo(btn, gen) {
+        btn.classList.add("vuelve");
+        var e = reto.error || {};
+        if (e.texto) await decir(e);
+        if (e.repetir !== false) await pronunciarObjeto(objetoId);
+        else await sleep(450);
+        btn.classList.remove("vuelve", "elegida");
+        if (!vivo(gen)) return;
+        fase = "jugar";
+        habilitarVocales(true);
+        programarPista();
+    }
+
+    function intentar(btn) {
+        if (fase !== "jugar" || juegoTerminado || !btn || btn.disabled) return;
+        var gen = rondaGen;
+        fase = "feedback";
+        cancelarPista();
+        habilitarVocales(false);
+        btn.classList.add("elegida");
+        if (btn.dataset.vocal === objetivo) acierto(btn, gen);
+        else fallo(btn, gen);
+    }
+
+    function siguiente(gen) {
+        if (!vivo(gen)) return;
+        indice += 1;
+        if (!nivel.retos[indice]) granCierre(gen);
+        else presentar(gen);
+    }
+
+    async function presentar(gen) {
+        if (!vivo(gen)) return;
+        reto = nivel.retos[indice];
+        if (!reto) { granCierre(gen); return; }
+        fase = "presentacion";
+        cancelarPista();
+        limpiarDialogo();
+        limpiarClases();
+        habilitarVocales(false);
+        rondaActual = L.preparar(reto, estado, gameConfig.objetos, Math.random);
+        if (!rondaActual) { granCierre(gen); return; }
+        objetivo = rondaActual.correcto;
+        objetoId = rondaActual.objeto;
+        mostrarObjeto(objetoId);
+        await colocar(rondaActual, debeMover());
+        if (!vivo(gen)) return;
+        document.querySelectorAll("#vocales .vocal").forEach(function (el) {
+            var lugar = rondaActual.mapa && rondaActual.mapa[el.dataset.vocal];
+            if (lugar) el.dataset.slot = lugar.slot;
+        });
+        estado.ultimoSlot = rondaActual.mapa && rondaActual.mapa[objetivo]
+            ? rondaActual.mapa[objetivo].slot : null;
+        estado.ultimoMapa = rondaActual.mapa;
+        fase = "sonando";
+        await pronunciarObjeto(objetoId);
+        if (!vivo(gen)) return;
+        fase = "jugar";
+        habilitarVocales(true);
+        programarPista();
+    }
+
+    function prepararInsignia() {
+        var ins = nivel.insignia || {};
+        var trofeo = document.querySelector("#victoria img.trofeo");
+        if (!trofeo || !ins.img) return;
+        trofeo.src = ins.img;
+        trofeo.alt = ins.nombre || "";
+        trofeo.classList.add("insignia");
+    }
+
+    function elevarCincoGlobos() {
+        // Doc 3-4: al completar, los cinco globos se elevan.
+        var cont = $id("vocales");
+        if (!cont || !L || !L.VOCALES) return;
+        cont.innerHTML = "";
+        var slots = [
+            { x: 10, y: 78 },
+            { x: 30, y: 62 },
+            { x: 50, y: 52 },
+            { x: 70, y: 62 },
+            { x: 90, y: 78 }
+        ];
+        L.VOCALES.forEach(function (id, i) {
+            var btn = crearVocal(id, slots[i]);
+            btn.disabled = true;
+            btn.classList.remove("entra");
+            btn.classList.add("acierto", "eleva");
+            var cuerpo = btn.querySelector(".vocal-cuerpo");
+            var globo = btn.querySelector(".globo");
+            if (cuerpo) cuerpo.classList.add("eleva");
+            if (globo) globo.classList.add("eleva");
+            cont.appendChild(btn);
+        });
+    }
+
+    function granCierre(gen) {
+        if (!vivo(gen) && juegoTerminado) return;
+        fase = "";
+        juegoTerminado = true;
+        cancelarPista();
+        habilitarVocales(false);
+        celebrarPersonajes(true);
+        elevarCincoGlobos();
+        var cierres = lineasCierre(nivel);
+        var primera = cierres[0] || { voz: "zoe", texto: "¡Descubriste los sonidos iniciales!" };
+        var texto = $id("texto_final");
+        if (texto) texto.textContent = primera.texto;
+        prepararInsignia();
+        despertarAudio();
+        if (gameConfig.audios && gameConfig.audios.cierre) playArchivo(gameConfig.audios.cierre);
+        if (window.TextoVoz) {
+            var cadena = Promise.resolve();
+            cierres.forEach(function (l) {
+                cadena = cadena.then(function () {
+                    return TextoVoz.hablar(l.texto, l.voz === "zeus" ? "zeus" : "zoe", { esperarTtsMs: 600 });
+                }).catch(function () {});
+            });
+        }
+        setTimeout(function () {
+            var caja = $id("final");
+            if (caja) {
+                caja.hidden = false;
+                caja.style.display = "block";
+            }
+            if (typeof iniciarSecuenciaVictoria === "function") iniciarSecuenciaVictoria();
+            else if (typeof iniciarVictoria === "function") iniciarVictoria();
+        }, 500);
+    }
+
+    function conversacionInicial() {
+        var n = null;
+        if (window.PedniaEdad && !PedniaEdad.esPreviewCatalogo()) {
+            var edad = PedniaEdad.edadSesion();
+            if (edad != null) n = PedniaEdad.resolverNivel(gameConfig.niveles || [], edad);
+        }
+        return (n && n.bienvenida) || [];
+    }
+
+    function cancelarIntroPendiente() {
+        introTimers.forEach(function (id) {
+            clearTimeout(id);
+            clearInterval(id);
+        });
+        introTimers = [];
+    }
+
+    function sincronizarDialogoIntro3d() {
+        if (introConfig) introConfig.conversacion = conversacionInicial();
+        if (!window.INTRO_CONFIG) return;
+        if (!window.INTRO_CONFIG.dialogo) window.INTRO_CONFIG.dialogo = {};
+        var conversacion = conversacionInicial();
+        var personajesCfg = window.INTRO_CONFIG.personajes || [];
+        window.INTRO_CONFIG.dialogo.lineas = conversacion.map(function (linea) {
+            var indice = Number(linea.personaje);
+            var def = personajesCfg[isFinite(indice) ? indice : 0] || personajesCfg[0] || {};
+            var id = def.id || (indice === 1 ? "zoe" : "zeus");
+            return {
+                personaje: id,
+                nombre: id === "zoe" ? "Zoe" : "Zeus",
+                color: (window.INTRO_CONFIG.dialogo.colores && window.INTRO_CONFIG.dialogo.colores[id]) || "#fff",
+                texto: String(linea.texto || "").trim()
+            };
+        });
+    }
+
+    function mostrarIntro3d() {
+        var root = $id("intro3d-root");
+        if (root) root.hidden = false;
+        document.body.classList.add("intro3d-activa");
+        window.dispatchEvent(new CustomEvent("intro3d-start"));
+    }
+
+    function destruirIntro3d() {
+        document.body.classList.remove("intro3d-activa");
+        var root = $id("intro3d-root");
+        if (!root) return;
+        root.classList.add("is-closing");
+        setTimeout(function () {
+            root.hidden = true;
+            if (window.__introPhaser) {
+                try { window.__introPhaser.destroy(true); } catch (e) { /* noop */ }
+                window.__introPhaser = null;
+            }
+            if (typeof window.__intro3dDispose === "function") window.__intro3dDispose();
+            root.remove();
+        }, 450);
+    }
+
+    function omitirIntro3d() {
+        if (cerrado) return;
+        var root = $id("intro3d-root");
+        if (!root || root.hidden) {
+            empezarJuegoTrasIntro();
+            return;
+        }
+        window.dispatchEvent(new CustomEvent("intro3d-omitir"));
+    }
+
+    function empezarJuegoTrasIntro() {
+        if (cerrado) return;
+        cerrado = true;
+        cancelarIntroPendiente();
+        if (window.TextoVoz) TextoVoz.detener();
+        despertarAudio();
+        destruirIntro3d();
+        document.body.classList.remove("esperando-inicio");
+        var principal = $id("principal");
+        if (principal) {
+            principal.style.display = "flex";
+            if (window.jQuery) jQuery(principal).hide().fadeIn(800);
+        }
+        if (window.PedniaEdad) {
+            PedniaEdad.iniciarNivel({
+                niveles: (gameConfig && gameConfig.niveles) || [],
+                elegirManual: elegirNivel,
+                onElegido: function (n) {
+                    if (n) window.confirmarNivel(n.id);
+                }
+            });
+        } else {
+            window.confirmarNivel(gameConfig.niveles[0].id);
+        }
+    }
+
+    function empecemosJuego() {
+        var pantalla = $id("pantalla-inicio");
+        var btn = $id("btn-empecemos");
+        if (!pantalla || pantalla.hidden || pantalla.classList.contains("is-out")) return;
+        if (btn) btn.disabled = true;
+        despertarAudio();
+        sincronizarDialogoIntro3d();
+        pantalla.classList.add("is-out");
+        mostrarIntro3d();
+        var oculto = false;
+        var ocultar = function () {
+            if (oculto) return;
+            oculto = true;
+            pantalla.hidden = true;
+            pantalla.style.display = "none";
+            document.body.classList.remove("esperando-inicio");
+        };
+        pantalla.addEventListener("animationend", function (ev) {
+            if (ev.animationName === "sale" || ev.animationName === "inicioDisuelve") ocultar();
+        });
+        setTimeout(ocultar, 1250);
+    }
+
+    window.cerrar_anuncio = function cerrar_anuncio() {
+        empezarJuegoTrasIntro();
+    };
+
+    function mostrarIntroActiva() {
+        return window.PedniaTutorial
+            ? PedniaTutorial.mostrarIntroActiva(acc())
+            : !!acc().mostrarIntro;
+    }
+
+    function detenerDemo() {
+        demoActiva = false;
+        if (window.PedniaTutorial) PedniaTutorial.detenerDemo();
+        else document.body.classList.remove("demo-activa");
+    }
+
+    async function iniciarDemo(gen) {
+        var d = gameConfig.demo || {};
+        if (!d.objeto || !d.vocales || !d.correcto || !window.PedniaTutorial) {
+            await bienvenidaYJuego(gen);
+            return;
+        }
+        demoActiva = true;
+        fase = "";
+        aplicarTema(nivel);
+        pintarEstrellas();
+        await PedniaTutorial.activarDemo();
+        var t = textos();
+        var ronda = L.preparar({
+            tipo: "fijo",
+            objeto: d.objeto,
+            vocales: d.vocales,
+            correcto: d.correcto
+        }, {}, gameConfig.objetos, Math.random);
+        if (!ronda) {
+            await bienvenidaYJuego(gen);
+            return;
+        }
+        objetivo = ronda.correcto;
+        objetoId = ronda.objeto;
+        mostrarObjeto(objetoId);
+        await colocar(ronda, false);
+        habilitarVocales(false);
+        var escucharBtn = $id("btn-escuchar");
+        if (escucharBtn) escucharBtn.disabled = false;
+        await decir({ voz: "zoe", texto: t.demostracion || "¡Mira, escucha y toca la vocal!" });
+        if (!vivo(gen) || !demoActiva) return;
+        var cancelado = function () { return !demoActiva || !vivo(gen); };
+        var sonando = Promise.resolve();
+        await PedniaTutorial.animarMano({
+            punto: escucharBtn,
+            holdMs: 500,
+            cancelado: cancelado,
+            onPresionar: function () {
+                sonando = pronunciarObjeto(objetoId);
+            }
+        });
+        await sonando;
+        if (!vivo(gen) || !demoActiva) return;
+        var correcta = vocalEl(d.correcto);
+        await PedniaTutorial.animarMano({
+            punto: correcta,
+            holdMs: 500,
+            cancelado: cancelado,
+            onPresionar: function () {
+                if (!correcta) return;
+                correcta.classList.add("acierto", "elegida");
+                var cuerpo = correcta.querySelector(".vocal-cuerpo");
+                if (cuerpo) cuerpo.classList.add("eleva");
+                estrellas(correcta, 12);
+                efecto("celebracion");
+            }
+        });
+        if (!vivo(gen) || !demoActiva) return;
+        await decir({ voz: "zoe", texto: t.demostracionAcierto || "¡Así se juega!" }, "acierto");
+        if (!vivo(gen)) return;
+        await decir({ voz: "zoe", texto: t.demostracionFin || "¡Ahora te toca a ti!" });
+        detenerDemo();
+        if (!vivo(gen)) return;
+        var contVocales = $id("vocales");
+        if (contVocales) contVocales.innerHTML = "";
+        limpiarClases();
+        var img = $id("img-objeto");
+        if (img) { img.removeAttribute("src"); img.className = "img-objeto"; }
+        estado = { ultimoSlot: null, ultimoCorrecto: null, ultimoMapa: null, ultimoObjeto: null };
+        await bienvenidaYJuego(gen);
+    }
+
+    async function bienvenidaYJuego(gen) {
+        aplicarTema(nivel);
+        pintarEstrellas();
+        var lineas = nivel.bienvenida || [];
+        var i;
+        for (i = 0; i < lineas.length; i++) {
+            if (!vivo(gen)) return;
+            await decir(lineas[i]);
+        }
+        if (!vivo(gen)) return;
+        presentar(gen);
+    }
+
+    function elegirNivel() {
+        var botones = "";
+        gameConfig.niveles.forEach(function (n, i) {
+            var color = i === 0 ? "success" : "primary";
+            botones += '<div class="col-12 text-center mb-2"><button type="button" class="btn btn-' + color + ' btn-eleccion" onclick="confirmarNivel(\'' + n.id + '\')"><strong>' + n.edad + "</strong><br><small>" + n.titulo + "</small></button></div>";
+        });
+        despertarAudio();
+        if (window.TextoVoz) TextoVoz.hablar(textos().eligeNivel || "Elige tu edad", "zoe", { esperarTtsMs: 600 });
+        if (!window.Swal) {
+            window.confirmarNivel(gameConfig.niveles[0].id);
+            return;
+        }
+        Swal.fire({
+            title: textos().eligeNivel || "Elige tu edad",
+            html: '<hr><div class="row justify-content-center">' + botones + "</div><hr>",
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            heightAuto: false,
+            scrollbarPadding: false,
+            width: 460
+        });
+    }
+
+    window.confirmarNivel = function confirmarNivel(id) {
+        if (arrancado) return;
+        nivel = (gameConfig.niveles || []).find(function (n) { return String(n.id) === String(id); });
+        if (!nivel) return;
+        arrancado = true;
+        if (window.Swal) Swal.close();
+        if (window.TextoVoz) TextoVoz.detener();
+        rondaGen += 1;
+        juegoTerminado = false;
+        indice = 0;
+        completados = 0;
+        estado = { ultimoSlot: null, ultimoCorrecto: null, ultimoMapa: null, ultimoObjeto: null };
+        $id("vocales").innerHTML = "";
+        if (window.TextoVoz && typeof TextoVoz.encolarFrases === "function") {
+            TextoVoz.encolarFrases(lineasDelNivel(nivel));
+        }
+        aplicarTema(nivel);
+        if (mostrarIntroActiva()) iniciarDemo(rondaGen);
+        else bienvenidaYJuego(rondaGen);
+    };
+
+    function enlazarVolumen() {
+        var btn = $id("btn-menu-vol");
+        var cerrar = $id("btn-cerrar-vol");
+        var slider = $id("rango-volumen");
+        var panel = $id("menu-vol-panel");
+        function setAbierto(abierto) {
+            if (!panel || !btn) return;
+            panel.hidden = !abierto;
+            btn.setAttribute("aria-expanded", abierto ? "true" : "false");
+        }
+        if (btn) {
+            btn.addEventListener("click", function (ev) {
+                ev.stopPropagation();
+                setAbierto(panel.hidden);
+            });
+        }
+        if (cerrar) cerrar.addEventListener("click", function () { setAbierto(false); });
+        if (slider) {
+            slider.value = String(volumenPct());
+            var val = $id("vol-val");
+            if (val) val.textContent = slider.value;
+            slider.addEventListener("input", function () {
+                if (val) val.textContent = slider.value;
+                aplicarVolumen(slider.value);
+            });
+        }
+        document.addEventListener("pointerdown", function (ev) {
+            var menu = $id("menu-vol");
+            if (!menu || menu.contains(ev.target)) return;
+            setAbierto(false);
+        });
+        aplicarVolumen(volumenPct());
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var crudo = readText("config.json?v=20261022d");
+        gameConfig = JSON.parse(crudo);
+        try { introConfig = JSON.parse(readText("../../../intro.json")); } catch (e) { introConfig = {}; }
+        var errores = L.validarConfig(gameConfig);
+        if (errores.length) console.warn("[ConQueVocalComienza]", errores);
+        aplicarLetterSpacing();
+        aplicarTema(temaInicial());
+        if (window.TextoVoz) {
+            TextoVoz.iniciar(gameConfig, introConfig, {
+                obtenerAudioFondo: function () { return audioFondo; },
+                volumenFondo: volumenPct() / 100,
+                frasesExtra: [textos().eligeNivel, textos().demostracion, textos().demostracionAcierto, textos().demostracionFin].filter(Boolean)
+            });
+        }
+        if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
+        enlazarVolumen();
+        sincronizarDialogoIntro3d();
+        $id("btn-empecemos").addEventListener("click", empecemosJuego);
+        var btnOmitir = $id("btn-omitir-intro3d");
+        if (btnOmitir) btnOmitir.addEventListener("click", omitirIntro3d);
+        var btnContinuar = $id("btn-continuar-intro3d");
+        if (btnContinuar) {
+            btnContinuar.addEventListener("click", function (ev) {
+                ev.preventDefault();
+                empezarJuegoTrasIntro();
+            });
+        }
+        window.addEventListener("victory-continue", empezarJuegoTrasIntro);
+        $id("btn-escuchar").addEventListener("click", escuchar);
+        $id("vocales").addEventListener("click", function (ev) {
+            if (demoActiva) return;
+            var btn = ev.target.closest(".vocal");
+            if (btn) intentar(btn);
+        });
+        window.addEventListener("pagehide", function () {
+            if (window.TextoVoz) TextoVoz.vaciar();
+        });
+        window.addEventListener("message", function (ev) {
+            if (ev.origin !== window.location.origin) return;
+            if (ev.data && ev.data.type === "pednia:perfil") window.__PEDNIA_PERFIL__ = ev.data.perfil;
+        });
+    });
+})();

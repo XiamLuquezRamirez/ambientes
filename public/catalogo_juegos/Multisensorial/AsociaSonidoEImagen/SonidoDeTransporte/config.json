@@ -1,0 +1,215 @@
+{
+  "nombre": "Sonido De Transporte",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha el sonido y luego toca su imagen.",
+    "demostracionAcierto": "¡Así se une el sonido con su imagen!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Tenemos nuevos sonidos por descubrir!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Escucha y encuentra su imagen!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "sonido": "mugido",
+    "correcto": "vaca",
+    "opciones": [
+      "gallo",
+      "vaca"
+    ]
+  },
+  "elementos": {
+    "bicicleta": {
+      "img": "img/bicicleta.svg",
+      "nombre": "Bicicleta"
+    },
+    "telefono": {
+      "img": "img/telefono.svg",
+      "nombre": "Teléfono"
+    },
+    "reloj": {
+      "img": "img/reloj.svg",
+      "nombre": "Reloj",
+      "fotogramas": [
+        "img/reloj_b.svg"
+      ]
+    },
+    "avion": {
+      "img": "img/avion.svg",
+      "nombre": "Avión"
+    },
+    "aspiradora": {
+      "img": "img/aspiradora.svg",
+      "nombre": "Aspiradora"
+    },
+    "tren": {
+      "img": "img/tren.svg",
+      "nombre": "Tren"
+    },
+    "ambulancia": {
+      "img": "img/ambulancia.svg",
+      "nombre": "Ambulancia",
+      "fotogramas": [
+        "img/ambulancia_b.svg"
+      ]
+    },
+    "puerta": {
+      "img": "img/puerta.svg",
+      "nombre": "Puerta",
+      "fotogramas": [
+        "img/puerta_abierta.svg"
+      ],
+      "quedaAbierta": true
+    },
+    "ventana": {
+      "img": "img/ventana.svg",
+      "nombre": "Ventana"
+    },
+    "cajon": {
+      "img": "img/cajon.svg",
+      "nombre": "Cajón"
+    },
+    "secador": {
+      "img": "img/secador.svg",
+      "nombre": "Secador de cabello"
+    },
+    "licuadora": {
+      "img": "img/licuadora.svg",
+      "nombre": "Licuadora"
+    },
+    "ventilador": {
+      "img": "img/ventilador.svg",
+      "nombre": "Ventilador"
+    },
+    "camion": {
+      "img": "img/camion.svg",
+      "nombre": "Camión"
+    },
+    "motocicleta": {
+      "img": "img/motocicleta.svg",
+      "nombre": "Motocicleta"
+    },
+    "aplaudiendo": {
+      "img": "img/aplaudiendo.svg",
+      "nombre": "Personas aplaudiendo",
+      "fotogramas": [
+        "img/aplaudiendo_b.svg"
+      ]
+    },
+    "corriendo": {
+      "img": "img/corriendo.svg",
+      "nombre": "Persona corriendo"
+    },
+    "saltando": {
+      "img": "img/saltando.svg",
+      "nombre": "Persona saltando"
+    },
+    "durmiendo": {
+      "img": "img/durmiendo.svg",
+      "nombre": "Persona durmiendo"
+    },
+    "pluma": {
+      "img": "img/pluma.svg",
+      "nombre": "Pluma",
+      "fotogramas": [
+        "img/pluma_abierta.svg"
+      ],
+      "quedaAbierta": true
+    },
+    "ducha": {
+      "img": "img/ducha.svg",
+      "nombre": "Ducha"
+    },
+    "fuente": {
+      "img": "img/fuente.svg",
+      "nombre": "Fuente"
+    },
+    "lavadora": {
+      "img": "img/lavadora.svg",
+      "nombre": "Lavadora"
+    },
+    "regadera": {
+      "img": "img/regadera.svg",
+      "nombre": "Regadera"
+    },
+    "vaca": {
+      "img": "img/vaca.svg",
+      "nombre": "Vaca"
+    },
+    "gallo": {
+      "img": "img/gallo.svg",
+      "nombre": "Gallo"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El laboratorio de las asociaciones",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Tenemos nuevos sonidos por descubrir!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Escucha y encuentra su imagen!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "sonido-de-transporte",
+          "titulo": "Sonido de transporte",
+          "sonido": "sirena",
+          "opciones": [
+            "ambulancia",
+            "camion",
+            "avion",
+            "tren",
+            "motocicleta"
+          ],
+          "correcto": "ambulancia",
+          "acierto": {
+            "animacion": "fotogramas",
+            "repetir": "breve",
+            "voz": "zoe",
+            "texto": "¡Sí! ¡Es la ambulancia!"
+          },
+          "iOrigen": 2
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Escuchaste con mucha atención!"
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Y encontraste cada imagen!"
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_maestro.svg",
+        "nombre": "Maestro de las asociaciones sonoras"
+      }
+    }
+  ]
+}

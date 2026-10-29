@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Maestro Restaurador y Artista Espacial">
+
+  <circle cx="120" cy="132" r="78" fill="#ffd54f" stroke="#fff8e1" stroke-width="8"/>
+  <circle cx="120" cy="136" r="40" fill="#5c6bc0"/>
+  <path d="M120 70 L132 108 H168 L138 128 L150 168 L120 146 L90 168 L102 128 L72 108 H108 Z" fill="#fff"/>
+  <path d="M78 28 L102 100 H78 Z" fill="#7e57c2"/><path d="M162 28 L138 100 H162 Z" fill="#26c6da"/>
+</svg>

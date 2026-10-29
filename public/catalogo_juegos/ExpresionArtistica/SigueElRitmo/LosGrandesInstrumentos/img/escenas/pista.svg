@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Pista de baile con luces de neón">
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#24143f"/>
+      <stop offset="1" stop-color="#3d1d6e"/>
+    </linearGradient>
+    <linearGradient id="foco" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="baldosa" width="120" height="120" patternUnits="userSpaceOnUse">
+      <rect width="120" height="120" fill="#2a1748"/>
+      <rect x="6" y="6" width="108" height="108" rx="10" fill="#3a2262"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#fondo)"/>
+  <g fill="#ff4081"><circle cx="300" cy="40" r="10"/><circle cx="800" cy="30" r="12"/><circle cx="1300" cy="46" r="10"/></g>
+  <path d="M150 0 L430 620 H-130 Z" fill="url(#foco)" opacity="0.5"/>
+  <path d="M800 0 L1040 620 H560 Z" fill="#40c4ff" opacity="0.18"/>
+  <path d="M1450 0 L1730 620 H1170 Z" fill="#ff4081" opacity="0.18"/>
+  <g stroke="#00e5ff" stroke-width="6">
+    <rect x="70" y="250" width="150" height="250" rx="16" fill="#1a1030"/>
+    <rect x="1380" y="250" width="150" height="250" rx="16" fill="#1a1030"/>
+  </g>
+  <g fill="#120a22" stroke="#7c4dff" stroke-width="5">
+    <circle cx="145" cy="320" r="40"/>
+    <circle cx="145" cy="430" r="52"/>
+    <circle cx="1455" cy="320" r="40"/>
+    <circle cx="1455" cy="430" r="52"/>
+  </g>
+  <rect x="0" y="620" width="1600" height="280" fill="url(#baldosa)"/>
+  <g fill="#ff4081" opacity="0.85">
+    <rect x="6" y="626" width="108" height="108" rx="10"/>
+    <rect x="246" y="746" width="108" height="108" rx="10"/>
+    <rect x="486" y="626" width="108" height="108" rx="10" fill="#7c4dff"/>
+    <rect x="726" y="746" width="108" height="108" rx="10" fill="#00e5ff"/>
+    <rect x="966" y="626" width="108" height="108" rx="10"/>
+    <rect x="1206" y="746" width="108" height="108" rx="10" fill="#ffd740"/>
+    <rect x="1446" y="626" width="108" height="108" rx="10" fill="#69f0ae"/>
+  </g>
+  <g opacity="0.9">
+    <g fill="#ef5350"><ellipse cx="360" cy="150" rx="34" ry="46"/><path d="M360 196 C358 214 364 220 358 232" fill="none" stroke="#ef5350" stroke-width="3"/></g>
+    <g fill="#ffca28"><ellipse cx="640" cy="110" rx="28" ry="38"/><path d="M640 148 C638 164 644 170 638 182" fill="none" stroke="#ffca28" stroke-width="3"/></g>
+    <g fill="#42a5f5"><ellipse cx="1040" cy="140" rx="30" ry="42"/><path d="M1040 182 C1038 198 1044 204 1038 216" fill="none" stroke="#42a5f5" stroke-width="3"/></g>
+    <g fill="#ab47bc"><ellipse cx="1280" cy="96" rx="24" ry="34"/><path d="M1280 130 C1278 144 1284 150 1278 160" fill="none" stroke="#ab47bc" stroke-width="3"/></g>
+  </g>
+</svg>

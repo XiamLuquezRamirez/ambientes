@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Paraguas cerrado">
+  <ellipse cx="120" cy="214" rx="54" ry="10" fill="#000" opacity="0.12"/>
+  <path d="M120 22 L120 34" stroke="#455a64" stroke-width="8" stroke-linecap="round"/>
+  <path d="M120 30 C140 70 150 120 136 170 L104 170 C90 120 100 70 120 30 Z" fill="#e53935"/>
+  <path d="M120 30 C128 70 132 120 126 170 L114 170 C108 120 112 70 120 30 Z" fill="#c62828"/>
+  <path d="M106 112 L134 104" stroke="#fdd835" stroke-width="7" stroke-linecap="round"/>
+  <path d="M120 170 L120 196 C120 214 94 214 94 198" fill="none" stroke="#6d4c41" stroke-width="10" stroke-linecap="round"/>
+</svg>

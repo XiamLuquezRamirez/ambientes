@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Cami&#243;n">
+  <ellipse cx="122" cy="210" rx="106" ry="8" fill="#000" opacity="0.1"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="18" y="66" width="140" height="108" rx="6" fill="#fb8c00"/>
+    <path d="M158 98 H198 L224 136 V176 H158 Z" fill="#1e88e5"/>
+    <path d="M166 106 H194 L212 136 H166 Z" fill="#b3e5fc"/>
+    <rect x="16" y="172" width="210" height="12" rx="3" fill="#455a64"/>
+  </g>
+  <g stroke="#ef6c00" stroke-width="4">
+    <path d="M52 76 V164 M88 76 V164 M124 76 V164"/>
+  </g>
+  <g stroke="#37474f" stroke-width="4">
+    <circle cx="52" cy="190" r="20" fill="#37474f"/>
+    <circle cx="104" cy="190" r="20" fill="#37474f"/>
+    <circle cx="190" cy="190" r="20" fill="#37474f"/>
+  </g>
+  <circle cx="52" cy="190" r="8" fill="#b0bec5"/>
+  <circle cx="104" cy="190" r="8" fill="#b0bec5"/>
+  <circle cx="190" cy="190" r="8" fill="#b0bec5"/>
+  <rect x="214" y="150" width="10" height="10" rx="2" fill="#fff59d" stroke="#37474f" stroke-width="2"/>
+</svg>

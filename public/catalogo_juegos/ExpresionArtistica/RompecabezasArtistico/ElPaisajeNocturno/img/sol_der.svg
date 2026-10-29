@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Mitad derecha del sol">
+
+  <path d="M120 20 A100 100 0 0 1 120 220 Z" fill="#ffb300" stroke="#f9a825" stroke-width="4"/>
+  <circle cx="148" cy="108" r="8" fill="#5d4037"/>
+  <path d="M122 140 Q140 156 162 140" fill="none" stroke="#5d4037" stroke-width="4"/>
+  <path d="M168 40 L190 28 M176 70 L206 64 M176 120 L208 128" stroke="#ff8f00" stroke-width="6" stroke-linecap="round"/>
+</svg>

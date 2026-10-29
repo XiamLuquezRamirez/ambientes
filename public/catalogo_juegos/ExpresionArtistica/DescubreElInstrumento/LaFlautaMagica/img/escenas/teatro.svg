@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Gran teatro de &#243;pera">
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a0e12"/>
+      <stop offset="1" stop-color="#7a1a1f"/>
+    </linearGradient>
+    <linearGradient id="telon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8e0000"/>
+      <stop offset="0.5" stop-color="#d32f2f"/>
+      <stop offset="1" stop-color="#8e0000"/>
+    </linearGradient>
+    <linearGradient id="piso" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d7a26a"/>
+      <stop offset="1" stop-color="#a0683a"/>
+    </linearGradient>
+    <linearGradient id="foco" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff8e1" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#fff8e1" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#fondo)"/>
+  <path d="M380 640 V200 C380 80 1220 80 1220 200 V640 Z" fill="#5d0f14"/>
+  <path d="M400 640 V210 C400 100 1200 100 1200 210 V640" fill="none" stroke="#ffca28" stroke-width="14"/>
+  <g fill="url(#telon)">
+    <path d="M410 120 C460 260 440 480 470 640 H410 Z"/>
+    <path d="M1190 120 C1140 260 1160 480 1130 640 H1190 Z"/>
+  </g>
+  <g fill="#3a0a0d">
+    <rect x="0" y="130" width="360" height="190"/>
+    <rect x="1240" y="130" width="360" height="190"/>
+    <rect x="0" y="360" width="340" height="200"/>
+    <rect x="1260" y="360" width="340" height="200"/>
+  </g>
+  <g fill="#ffca28">
+    <rect x="0" y="300" width="360" height="22"/>
+    <rect x="1240" y="300" width="360" height="22"/>
+    <rect x="0" y="540" width="340" height="22"/>
+    <rect x="1260" y="540" width="340" height="22"/>
+  </g>
+  <g fill="#c58b5c">
+    <circle cx="60" cy="270" r="22"/><circle cx="130" cy="262" r="22"/><circle cx="200" cy="270" r="22"/><circle cx="270" cy="264" r="22"/>
+    <circle cx="1330" cy="264" r="22"/><circle cx="1400" cy="270" r="22"/><circle cx="1470" cy="262" r="22"/><circle cx="1540" cy="270" r="22"/>
+    <circle cx="60" cy="510" r="22"/><circle cx="130" cy="502" r="22"/><circle cx="200" cy="510" r="22"/><circle cx="270" cy="504" r="22"/>
+    <circle cx="1330" cy="504" r="22"/><circle cx="1400" cy="510" r="22"/><circle cx="1470" cy="502" r="22"/><circle cx="1540" cy="510" r="22"/>
+  </g>
+  <g fill="#8d5a3b">
+    <path d="M34 300 C34 280 86 280 86 300 Z"/><path d="M104 300 C104 280 156 280 156 300 Z"/><path d="M174 300 C174 280 226 280 226 300 Z"/><path d="M244 300 C244 280 296 280 296 300 Z"/>
+    <path d="M1304 300 C1304 280 1356 280 1356 300 Z"/><path d="M1374 300 C1374 280 1426 280 1426 300 Z"/><path d="M1444 300 C1444 280 1496 280 1496 300 Z"/><path d="M1514 300 C1514 280 1566 280 1566 300 Z"/>
+  </g>
+  <path d="M0 0 H1600 V90 C1500 130 1400 130 1300 90 C1200 130 1100 130 1000 90 C900 130 800 130 700 90 C600 130 500 130 400 90 C300 130 200 130 100 90 C60 110 30 110 0 100 Z" fill="url(#telon)"/>
+  <rect x="0" y="0" width="1600" height="26" fill="#ffca28"/>
+  <path d="M600 0 L420 640 H760 Z" fill="url(#foco)"/>
+  <path d="M1000 0 L840 640 H1180 Z" fill="url(#foco)"/>
+  <path d="M0 640 C400 610 1200 610 1600 640 V900 H0 Z" fill="url(#piso)"/>
+  <g stroke="#8d5a3b" stroke-width="3" opacity="0.6">
+    <path d="M0 700 C400 675 1200 675 1600 700 M0 770 C400 748 1200 748 1600 770 M0 840 C400 820 1200 820 1600 840"/>
+  </g>
+  <path d="M0 640 C400 610 1200 610 1600 640" fill="none" stroke="#ffca28" stroke-width="8"/>
+</svg>

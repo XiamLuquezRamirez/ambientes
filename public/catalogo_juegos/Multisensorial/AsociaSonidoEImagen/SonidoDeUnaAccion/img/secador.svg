@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Secador de cabello">
+  <ellipse cx="112" cy="222" rx="60" ry="7" fill="#000" opacity="0.1"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M98 118 L82 206 H118 L134 118 Z" fill="#ec407a"/>
+    <rect x="186" y="78" width="34" height="42" rx="6" fill="#ad1457"/>
+    <path d="M58 66 H172 C190 66 200 80 200 99 C200 118 190 132 172 132 H58 Z" fill="#ec407a"/>
+    <circle cx="60" cy="99" r="38" fill="#f48fb1"/>
+    <circle cx="60" cy="99" r="22" fill="#f06292"/>
+  </g>
+  <g stroke="#ad1457" stroke-width="4" stroke-linecap="round">
+    <path d="M48 99 H72 M60 87 V111"/>
+  </g>
+  <rect x="100" y="150" width="14" height="22" rx="4" fill="#fdd835" stroke="#37474f" stroke-width="3"/>
+</svg>

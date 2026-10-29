@@ -1,0 +1,156 @@
+{
+  "nombre": "¿Cuál Objeto Se Escondió Y Falta?: Memoria De Trabajo: Evocación Del Elemento Au",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira cómo se juega! Primero observa los objetos.",
+    "demostracionBaul": "¡Mira cómo se juega! Primero observa los objetos del baúl.",
+    "demostracionMuseo": "¡Mira cómo se juega! Primero observa las obras del museo.",
+    "demostracionAcierto": "¡Así se encuentra el objeto nuevo!",
+    "demostracionFin": "¡Ahora te toca a ti! Observa con mucha atención.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Abre bien tus ojos!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Observa y recuerda qué hay!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "barraTiempo": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "demo": {
+    "mecanica": "intruso",
+    "mostrar": [
+      "manzana",
+      "campana"
+    ],
+    "intruso": "lija",
+    "conservarOrden": false,
+    "observacionMs": 3500,
+    "ocultamiento": "baul",
+    "ocultamientoMs": 1600,
+    "ocultamientoEfecto": "clackMagic"
+  },
+  "elementos": {
+    "manzana": {
+      "img": "img/manzana.svg",
+      "nombre": "Manzana"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana"
+    },
+    "flor": {
+      "img": "img/flor.svg",
+      "nombre": "Flor"
+    },
+    "sol": {
+      "img": "img/sol.svg",
+      "nombre": "Sol"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota"
+    },
+    "helado": {
+      "img": "img/helado.svg",
+      "nombre": "Helado"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "nombre": "Lija"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor"
+    },
+    "vidrio": {
+      "img": "img/vidrio.svg",
+      "nombre": "Vidrio"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El baúl de los recuerdos",
+      "escena": "baul",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Abre bien tus ojos!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Observa y recuerda qué hay!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "faltante-baul",
+          "titulo": "¿Cuál objeto se escondió y FALTA?",
+          "mecanica": "faltante",
+          "mostrar": [
+            "manzana",
+            "campana",
+            "flor",
+            "pelota"
+          ],
+          "faltante": "flor",
+          "opciones": [
+            "flor",
+            "helado",
+            "lija"
+          ],
+          "observacionMs": 8000,
+          "ocultamiento": "cortina",
+          "ocultamientoMs": 2000,
+          "ocultamientoEfecto": "shhhZip",
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Atención de nuevo! Recuerda dónde está cada uno..."
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "¡Oh no, un objeto se escapó del baúl! ¿Cuál objeto falta?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Excelente! Recordaste el objeto que faltaba.",
+            "efecto": "bloomChime",
+            "animacion": "encaja"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "Ese objeto no estaba en nuestro baúl. Recuerda qué había junto a la campana y la manzana. ¡Inténtalo otra vez!",
+            "efecto": "boing"
+          },
+          "iOrigen": 1
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Excelente! Observaste y recordaste con mucha atención."
+        }
+      ],
+      "cierreEscena": "galeria",
+      "insignia": {
+        "img": "img/insignia_superobservador.svg",
+        "nombre": "Superobservador Sensorial"
+      }
+    }
+  ]
+}

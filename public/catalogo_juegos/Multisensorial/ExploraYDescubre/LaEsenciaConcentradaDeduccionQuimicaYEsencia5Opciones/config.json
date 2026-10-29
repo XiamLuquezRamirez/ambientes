@@ -1,0 +1,211 @@
+{
+  "nombre": "La Esencia Concentrada: Deducción Química Y Esencia | 5 Opciones",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira cómo se juega! Pasa la lupa por la caja.",
+    "demostracionEstudio": "¡Mira cómo se juega! Pasa la lupa por la caja.",
+    "demostracionDetective": "¡Mira cómo se juega! Escucha las dos pistas del radar.",
+    "demostracionAcierto": "¡Así se descubre lo que hay dentro!",
+    "demostracionFin": "¡Ahora te toca a ti! Explora la pista.",
+    "usaLupa": "¡Usa tu lupa mágica sobre la caja!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Enciende el radar sensorial!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Dos pistas y una hipótesis!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "demo": {
+    "mecanica": "lupa",
+    "pista": "visual",
+    "correcto": "pelota",
+    "opciones": [
+      "pelota",
+      "libro"
+    ],
+    "presentacion": {
+      "voz": "zoe",
+      "texto": "¡Mira cómo se juega! Pasa la lupa por la caja."
+    },
+    "efectoPista": "chispas",
+    "detective": {
+      "mecanica": "radar",
+      "presentacion": {
+        "voz": "zoe",
+        "texto": "¡Mira cómo se juega! Escucha las dos pistas del radar."
+      },
+      "pistas": [
+        {
+          "icono": "img/pista_ojo.svg",
+          "texto": "Rebota cuando la lanzas."
+        },
+        {
+          "icono": "img/pista_oreja.svg",
+          "texto": "No suena: es para jugar."
+        }
+      ]
+    }
+  },
+  "elementos": {
+    "arcoiris": {
+      "img": "img/arcoiris.svg",
+      "nombre": "Arcoíris"
+    },
+    "sol": {
+      "img": "img/sol.svg",
+      "nombre": "Sol"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana"
+    },
+    "flor": {
+      "img": "img/flor.svg",
+      "nombre": "Flor"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota"
+    },
+    "perfume": {
+      "img": "img/perfume.svg",
+      "nombre": "Perfume"
+    },
+    "helado": {
+      "img": "img/helado.svg",
+      "nombre": "Helado"
+    },
+    "carro": {
+      "img": "img/carro.svg",
+      "nombre": "Carro"
+    },
+    "algodon": {
+      "img": "img/algodon.svg",
+      "nombre": "Algodón"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "nombre": "Lija"
+    },
+    "libro": {
+      "img": "img/libro.svg",
+      "nombre": "Libro"
+    },
+    "bombillo": {
+      "img": "img/bombillo.svg",
+      "nombre": "Bombillo"
+    },
+    "trompeta": {
+      "img": "img/trompeta.svg",
+      "nombre": "Trompeta"
+    },
+    "jabon": {
+      "img": "img/jabon.svg",
+      "nombre": "Jabón"
+    },
+    "hielo": {
+      "img": "img/hielo.svg",
+      "nombre": "Cubo de hielo"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El radar de pistas sensoriales",
+      "escena": "radar",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Enciende el radar sensorial!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Dos pistas y una hipótesis!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "perfume",
+          "pista": "aroma",
+          "efectoPista": "sfffff",
+          "mecanica": "radar",
+          "correcto": "perfume",
+          "opciones": [
+            "perfume",
+            "campana",
+            "carro",
+            "algodon",
+            "jabon"
+          ],
+          "pistas": [
+            {
+              "icono": "img/pista_nariz.svg",
+              "texto": "Es un líquido que guardamos en frascos de cristal."
+            },
+            {
+              "icono": "img/pista_frasco.svg",
+              "texto": "Lo usamos para dar un aroma agradable y dulce a nuestra piel o ropa."
+            }
+          ],
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "Pista 1: Es un líquido que guardamos en frascos de cristal. Pista 2: Lo usamos para dar un aroma agradable y dulce a nuestra piel o ropa. ¿Qué elemento es?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Excelente! Descubriste el perfume.",
+            "efecto": "puffBloom",
+            "animacion": "abre"
+          },
+          "errores": [
+            {
+              "objetos": [
+                "jabon"
+              ],
+              "voz": "zeus",
+              "texto": "El jabón huele rico, pero no viene en frasco para rociar en líquido sobre la ropa. Revisa la pista e inténtalo otra vez.",
+              "efecto": "boing"
+            }
+          ],
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "Revisa las pistas e inténtalo otra vez!",
+            "efecto": "boing"
+          },
+          "iOrigen": 2
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Excelente! Usaste tus sentidos para explorar y descubrir."
+        }
+      ],
+      "cierreEscena": "laboratorio",
+      "insignia": {
+        "img": "img/insignia_analista.svg",
+        "nombre": "Analista Senior de Pistas Sensoriales"
+      }
+    }
+  ]
+}

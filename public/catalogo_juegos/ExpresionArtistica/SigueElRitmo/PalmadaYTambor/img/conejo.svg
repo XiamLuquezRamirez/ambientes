@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Conejo">
+  <ellipse cx="120" cy="222" rx="70" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M84 96 C84 40 104 24 112 60 C116 80 112 100 112 112 Z" fill="#f8bbd0"/>
+    <path d="M156 96 C156 40 136 24 128 60 C124 80 128 100 128 112 Z" fill="#f8bbd0"/>
+    <path d="M90 100 C90 44 106 30 112 62 Z" fill="#fce4ec"/>
+    <path d="M150 100 C150 44 134 30 128 62 Z" fill="#fce4ec"/>
+    <circle cx="120" cy="140" r="62" fill="#fafafa"/>
+    <ellipse cx="120" cy="168" rx="22" ry="16" fill="#f8bbd0"/>
+    <path d="M108 166 L120 176 L132 166" fill="none" stroke-width="3"/>
+    <circle cx="98" cy="132" r="7" fill="#263238"/>
+    <circle cx="142" cy="132" r="7" fill="#263238"/>
+    <circle cx="100" cy="130" r="2.5" fill="#fff"/>
+    <circle cx="144" cy="130" r="2.5" fill="#fff"/>
+  </g>
+</svg>

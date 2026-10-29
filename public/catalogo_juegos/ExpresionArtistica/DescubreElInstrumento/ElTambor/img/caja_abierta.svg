@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Caja abierta">
+  <ellipse cx="120" cy="226" rx="96" ry="9" fill="#000" opacity="0.14"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M30 120 L20 88 L104 70 L118 104 Z" fill="#9575cd"/>
+    <path d="M210 120 L224 86 L136 70 L122 104 Z" fill="#9575cd"/>
+    <path d="M30 110 H210 V212 C210 218 206 220 200 220 H40 C34 220 30 218 30 212 Z" fill="#7e57c2"/>
+    <path d="M30 110 L52 134 H188 L210 110 Z" fill="#4527a0"/>
+    <rect x="106" y="134" width="28" height="86" fill="#ff7043"/>
+  </g>
+  <g fill="#fff59d">
+    <path d="M60 52 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4 Z"/>
+    <path d="M178 46 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z"/>
+    <path d="M120 30 l5 11 11 5 -11 5 -5 11 -5 -11 -11 -5 11 -5 Z"/>
+  </g>
+</svg>

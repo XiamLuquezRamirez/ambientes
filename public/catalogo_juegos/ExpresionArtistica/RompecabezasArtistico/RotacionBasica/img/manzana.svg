@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Manzana roja">
+
+  <circle cx="120" cy="132" r="70" fill="#ef5350" stroke="#b71c1c" stroke-width="4"/>
+  <path d="M120 62 C120 30 150 40 140 62" fill="none" stroke="#2e7d32" stroke-width="6"/>
+  <ellipse cx="100" cy="110" rx="16" ry="24" fill="#fff" opacity="0.25"/>
+</svg>

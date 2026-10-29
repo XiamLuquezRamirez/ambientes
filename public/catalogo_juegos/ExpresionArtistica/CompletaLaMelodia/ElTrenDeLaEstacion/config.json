@@ -1,0 +1,201 @@
+{
+  "nombre": "El Tren de la Estación",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: la canción se queda a medias y tú tocas la nota que falta.",
+    "demostracionAcierto": "¡Así se completa la melodía!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Bienvenido a la estación musical."
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy vamos a completar las canciones."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "nota_demo"
+  },
+  "escenas": {
+    "estacion": "img/escenas/estacion.svg",
+    "estudio": "img/escenas/estudio.svg"
+  },
+  "elementos": {
+    "nota_demo": {
+      "img": "img/nota_demo.svg",
+      "nombre": "Nota de ejemplo"
+    },
+    "timbre": {
+      "img": "img/timbre.svg",
+      "nombre": "Timbre"
+    },
+    "puerta": {
+      "img": "img/puerta.svg",
+      "nombre": "Puerta"
+    },
+    "perro": {
+      "img": "img/perro.svg",
+      "nombre": "Perrito"
+    },
+    "oso": {
+      "img": "img/oso.svg",
+      "nombre": "Osito"
+    },
+    "xilofono": {
+      "img": "img/xilofono.svg",
+      "nombre": "Xilófono"
+    },
+    "nota_mi": {
+      "img": "img/nota_mi.svg",
+      "nombre": "Nota Mi"
+    },
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pajarito"
+    },
+    "nido": {
+      "img": "img/nido.svg",
+      "nombre": "Nido"
+    },
+    "nota_final": {
+      "img": "img/nota_final.svg",
+      "nombre": "Nota final"
+    },
+    "tren": {
+      "img": "img/tren.svg",
+      "nombre": "Tren"
+    },
+    "vagon": {
+      "img": "img/vagon.svg",
+      "nombre": "Vagón musical"
+    },
+    "nota_sol": {
+      "img": "img/nota_sol.svg",
+      "nombre": "Nota Sol"
+    },
+    "nota_re": {
+      "img": "img/nota_re.svg",
+      "nombre": "Nota Re"
+    },
+    "violin": {
+      "img": "img/violin.svg",
+      "nombre": "Violín"
+    },
+    "boton_acorde": {
+      "img": "img/boton_acorde.svg",
+      "nombre": "Acorde final"
+    },
+    "boton_suspenso": {
+      "img": "img/boton_suspenso.svg",
+      "nombre": "Sonido en suspenso"
+    },
+    "gran_acorde": {
+      "img": "img/gran_acorde.svg",
+      "nombre": "Gran acorde final"
+    },
+    "altavoz": {
+      "img": "img/altavoz.svg",
+      "nombre": "Altavoz"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "La estación musical",
+      "tema": "estacion",
+      "escena": "estacion",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hola! Bienvenido a la estación musical."
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy vamos a completar las canciones."
+        }
+      ],
+      "retos": [
+        {
+          "id": "tren",
+          "tipo": "arrastre",
+          "titulo": "Pasa el vagón musical al tren",
+          "adorno": "tren",
+          "piezas": [
+            "vagon"
+          ],
+          "solucion": [
+            "vagon"
+          ],
+          "pasoMs": 280,
+          "intro": [
+            {
+              "golpe": "chucu"
+            },
+            {
+              "golpe": "chucu"
+            },
+            {
+              "golpe": "chucu"
+            }
+          ],
+          "cierre": {
+            "golpe": "silbato"
+          },
+          "festejo": "tren",
+          "consigna": [
+            {
+              "voz": "zoe",
+              "texto": "¡El tren del Eje 1 va a llegar a la meta!"
+            },
+            {
+              "voz": "zeus",
+              "texto": "Arrastra el último vagón musical para completar la canción del tren."
+            }
+          ],
+          "acierto": [
+            {
+              "voz": "zoe",
+              "texto": "¡LO LOGRASTE! Completaste la melodía del tren y terminaste con éxito todo el Eje 1 de Exploración Musical."
+            },
+            {
+              "voz": "zeus",
+              "texto": "¡Eres un músico increíble!"
+            }
+          ],
+          "iOrigen": 3
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Terminaste todos los retos de la Exploración Musical! Reconociste sonidos, descubriste instrumentos, seguiste el ritmo, usaste tu memoria y completaste melodías."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Te has ganado el título de Superestrellita Musical!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_estrella.svg",
+        "nombre": "Superestrellita Musical",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

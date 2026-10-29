@@ -1,0 +1,283 @@
+{
+  "nombre": "Instrumentos de Juguete",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: cuando la nota se encienda, tócala.",
+    "demostracionAcierto": "¡Así se recuerda el sonido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Bienvenido al bosque musical."
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy vamos a recordar las canciones."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "nota_demo"
+  },
+  "escenas": {
+    "bosque": "img/escenas/bosque.svg",
+    "estudio": "img/escenas/estudio.svg"
+  },
+  "elementos": {
+    "nota_demo": {
+      "img": "img/nota_demo.svg",
+      "nombre": "Nota amarilla",
+      "sonido": "nota",
+      "nota": "mi4"
+    },
+    "nota_roja": {
+      "img": "img/nota_roja.svg",
+      "nombre": "Nota roja",
+      "sonido": "nota",
+      "nota": "do4"
+    },
+    "nota_azul": {
+      "img": "img/nota_azul.svg",
+      "nombre": "Nota azul",
+      "sonido": "nota",
+      "nota": "sol4"
+    },
+    "conejo": {
+      "img": "img/conejo.svg",
+      "nombre": "Conejo",
+      "sonido": "madera",
+      "nota": "mi4"
+    },
+    "oso": {
+      "img": "img/oso.svg",
+      "nombre": "Osito",
+      "sonido": "tambor",
+      "nota": "do3"
+    },
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pajarito",
+      "sonido": "flauta",
+      "nota": "do5"
+    },
+    "pad_amarillo": {
+      "img": "img/pad_amarillo.svg",
+      "nombre": "Tambor amarillo",
+      "sonido": "tambor",
+      "nota": "do3"
+    },
+    "pad_morado": {
+      "img": "img/pad_morado.svg",
+      "nombre": "Tambor morado",
+      "sonido": "tambor",
+      "nota": "sol3"
+    },
+    "pad_verde": {
+      "img": "img/pad_verde.svg",
+      "nombre": "Tambor verde",
+      "sonido": "tambor",
+      "nota": "do4"
+    },
+    "campana_rosa": {
+      "img": "img/campana_rosa.svg",
+      "nombre": "Campana rosa",
+      "sonido": "campana",
+      "nota": "do5"
+    },
+    "campana_celeste": {
+      "img": "img/campana_celeste.svg",
+      "nombre": "Campana celeste",
+      "sonido": "campana",
+      "nota": "mi5"
+    },
+    "campana_naranja": {
+      "img": "img/campana_naranja.svg",
+      "nombre": "Campana naranja",
+      "sonido": "campana",
+      "nota": "sol5"
+    },
+    "campana_violeta": {
+      "img": "img/campana_violeta.svg",
+      "nombre": "Campana violeta",
+      "sonido": "campana",
+      "nota": "do6"
+    },
+    "violin": {
+      "img": "img/violin.svg",
+      "nombre": "Violín",
+      "sonido": "violin",
+      "nota": "la4"
+    },
+    "flauta": {
+      "img": "img/flauta.svg",
+      "nombre": "Flauta",
+      "sonido": "flauta",
+      "nota": "do5"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor",
+      "sonido": "tambor",
+      "nota": "sol3"
+    },
+    "trompeta": {
+      "img": "img/trompeta.svg",
+      "nombre": "Trompeta",
+      "sonido": "trompeta",
+      "nota": "sol4"
+    },
+    "tecla_verde": {
+      "img": "img/tecla_verde.svg",
+      "nombre": "Tecla verde",
+      "sonido": "nota",
+      "nota": "mi4"
+    },
+    "tecla_amarilla": {
+      "img": "img/tecla_amarilla.svg",
+      "nombre": "Tecla amarilla",
+      "sonido": "nota",
+      "nota": "sol4"
+    },
+    "tecla_roja": {
+      "img": "img/tecla_roja.svg",
+      "nombre": "Tecla roja",
+      "sonido": "nota",
+      "nota": "do5"
+    },
+    "tecla_azul": {
+      "img": "img/tecla_azul.svg",
+      "nombre": "Tecla azul",
+      "sonido": "nota",
+      "nota": "la4"
+    },
+    "platillo": {
+      "img": "img/platillo.svg",
+      "nombre": "Platillo",
+      "sonido": "platillo"
+    },
+    "caja": {
+      "img": "img/caja.svg",
+      "nombre": "Caja",
+      "sonido": "caja"
+    },
+    "bombo": {
+      "img": "img/bombo.svg",
+      "nombre": "Bombo",
+      "sonido": "bombo"
+    },
+    "consola_rosa": {
+      "img": "img/consola_rosa.svg",
+      "nombre": "Pista rosa",
+      "sonido": "nota",
+      "nota": "do4"
+    },
+    "consola_naranja": {
+      "img": "img/consola_naranja.svg",
+      "nombre": "Pista naranja",
+      "sonido": "nota",
+      "nota": "re4"
+    },
+    "consola_amarillo": {
+      "img": "img/consola_amarillo.svg",
+      "nombre": "Pista amarilla",
+      "sonido": "nota",
+      "nota": "mi4"
+    },
+    "consola_verde": {
+      "img": "img/consola_verde.svg",
+      "nombre": "Pista verde",
+      "sonido": "nota",
+      "nota": "fa4"
+    },
+    "consola_celeste": {
+      "img": "img/consola_celeste.svg",
+      "nombre": "Pista celeste",
+      "sonido": "nota",
+      "nota": "sol4"
+    },
+    "consola_violeta": {
+      "img": "img/consola_violeta.svg",
+      "nombre": "Pista violeta",
+      "sonido": "nota",
+      "nota": "la4"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El bosque encantado",
+      "tema": "bosque",
+      "escena": "bosque",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hola! Bienvenido al bosque musical."
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy vamos a recordar las canciones."
+        }
+      ],
+      "retos": [
+        {
+          "id": "bateria",
+          "tipo": "secuencia",
+          "titulo": "La batería de colores de Zoe",
+          "pasos": [
+            "pad_amarillo",
+            "pad_morado",
+            "pad_verde"
+          ],
+          "pasoMs": 760,
+          "falloVisual": "naranja",
+          "festejo": "pads",
+          "consigna": {
+            "voz": "zoe",
+            "texto": "¡Zoe preparó una melodía especial de tambores! Mira y escucha el orden en que se encienden los pads."
+          },
+          "turno": {
+            "voz": "zeus",
+            "texto": "¡Tu turno de tocar el tambor mágico! Repite el mismo orden de colores."
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Ritmo y memoria perfectos! Tocaste la batería tal como Zoe te enseñó."
+          },
+          "error": {
+            "voz": "zeus",
+            "texto": "¡Recuerda el orden en el que se iluminaron y sonaron, inténtalo nuevamente!"
+          },
+          "iOrigen": 2
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Qué gran memoria musical tienes! Recordaste los sonidos y las notas sin equivocarte."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Tus orejas y tu memoria son de superhéroe musical!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_bosque.svg",
+        "nombre": "Memoria de Oro Musical",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

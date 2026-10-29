@@ -1,0 +1,113 @@
+{
+  "nombre": "¿Dónde Está La E?",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Escucha el sonido y toca la vocal!",
+    "demostracionAcierto": "¡Así se juega!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Vamos juntos a descubrir las vocales!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Escucha y toca la que suena!"
+      }
+    ]
+  },
+  "demo": {
+    "vocales": [
+      "o",
+      "u"
+    ],
+    "correcto": "o"
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "verBotonRepetir": true,
+    "mostrarProgreso": true,
+    "animaciones_opciones": true,
+    "efectosSonido": true,
+    "mostrarFeedBack": false
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "vocales": {
+    "a": {
+      "img": "img/vocal_a.svg?v=20261019b",
+      "color": "#ff4d4f",
+      "nombre": "a"
+    },
+    "e": {
+      "img": "img/vocal_e.svg?v=20261019b",
+      "color": "#fab005",
+      "nombre": "e"
+    },
+    "i": {
+      "img": "img/vocal_i.svg?v=20261019b",
+      "color": "#15aabf",
+      "nombre": "i"
+    },
+    "o": {
+      "img": "img/vocal_o.svg?v=20261019b",
+      "color": "#be4bdb",
+      "nombre": "o"
+    },
+    "u": {
+      "img": "img/vocal_u.svg?v=20261019b",
+      "color": "#37b24d",
+      "nombre": "u"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "La isla de las vocales mágicas",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Vamos juntos a descubrir las vocales!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Escucha y toca la que suena!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "donde-e",
+          "tipo": "fijo",
+          "vocales": [
+            "a",
+            "e"
+          ],
+          "correcto": "e",
+          "acierto": {
+            "efecto": "ilumina",
+            "sonido": "celebracion",
+            "animar": true
+          },
+          "iOrigen": 1
+        }
+      ],
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Descubriste las vocales!"
+      },
+      "insignia": {
+        "img": "img/insignia_estrella.svg",
+        "nombre": "Estrella de las cinco vocales"
+      }
+    }
+  ]
+}

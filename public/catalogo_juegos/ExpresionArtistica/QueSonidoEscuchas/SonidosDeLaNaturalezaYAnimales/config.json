@@ -1,0 +1,124 @@
+{
+  "nombre": "Sonidos de la Naturaleza y Animales",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el botón para escuchar y luego toca la imagen del sonido.",
+    "demostracionAcierto": "¡Así se descubre el sonido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Bienvenido al bosque mágico de los sonidos."
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy vamos a descubrir sonidos secretos."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "pajaro"
+  },
+  "escenas": {
+    "bosque": "img/escenas/bosque.svg",
+    "granja": "img/escenas/granja.svg"
+  },
+  "elementos": {
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pájaro",
+      "sonido": "trino"
+    },
+    "vaca": {
+      "img": "img/vaca.svg",
+      "nombre": "Vaca",
+      "sonido": "mugido"
+    },
+    "perro": {
+      "img": "img/perro.png",
+      "nombre": "Perro"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El bosque mágico de los sonidos",
+      "tema": "bosque",
+      "escena": "bosque",
+      "arrastre": true,
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hola! Bienvenido al bosque mágico de los sonidos."
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy vamos a descubrir sonidos secretos."
+        }
+      ],
+      "retos": [
+        {
+          "id": "establo",
+          "titulo": "¿Quién hace 'Muuu'?",
+          "escena": "granja",
+          "consigna": {
+            "voz": "zoe",
+            "texto": "¡Abre bien las orejas! Toca la bocina para escuchar un sonido secreto de la granja."
+          },
+          "esperaToque": true,
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "¿Qué animal hace ese sonido? Búscalo entre las opciones."
+          },
+          "opciones": [
+            "vaca",
+            "perro"
+          ],
+          "correcto": "vaca",
+          "acierto": {
+            "efecto": "vaca",
+            "voz": "zoe",
+            "texto": "¡Exacto! Es la vaca. ¡Buen trabajo, superoyente!"
+          },
+          "error": {
+            "voz": "zeus",
+            "texto": "Vuelve a escuchar el sonido de la bocina."
+          }
+        }
+      ],
+      "concierto": {
+        "tipo": "bosque",
+        "compases": 2,
+        "bpm": 100
+      },
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Increíble! Descubriste todos los sonidos ocultos del bosque."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Tus orejas son como antenas mágicas! Sigue escuchando los sonidos de todo lo que te rodea."
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_superoyente.svg",
+        "nombre": "Superoyente Musical",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Búho percusionista">
+  <ellipse cx="120" cy="224" rx="70" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M70 24 L78 4 L96 22 Z" fill="#8d6e63"/>
+    <path d="M170 24 L162 4 L144 22 Z" fill="#8d6e63"/>
+    <ellipse cx="120" cy="104" rx="78" ry="84" fill="#8d6e63"/>
+    <path d="M120 96 C146 96 160 116 158 140 C154 164 140 176 120 176 C100 176 86 164 82 140 C80 116 94 96 120 96 Z" fill="#d7ccc8"/>
+    <circle cx="92" cy="78" r="26" fill="#efebe9"/>
+    <circle cx="148" cy="78" r="26" fill="#efebe9"/>
+    <path d="M44 130 C24 150 28 184 54 196" fill="#6d4c41"/>
+    <path d="M196 130 C216 150 212 184 186 196" fill="#6d4c41"/>
+  </g>
+  <circle cx="92" cy="78" r="14" fill="#ffca28"/>
+  <circle cx="148" cy="78" r="14" fill="#ffca28"/>
+  <circle cx="92" cy="78" r="7" fill="#263238"/>
+  <circle cx="148" cy="78" r="7" fill="#263238"/>
+  <path d="M110 100 L120 116 L130 100 Z" fill="#ff8f00" stroke="#37474f" stroke-width="3" stroke-linejoin="round"/>
+  <g stroke="#8d6e63" stroke-width="6" stroke-linecap="round">
+    <path d="M30 150 L96 196"/>
+    <path d="M210 150 L144 196"/>
+  </g>
+  <g fill="#ffca28" stroke="#37474f" stroke-width="3">
+    <circle cx="28" cy="146" r="9"/>
+    <circle cx="212" cy="146" r="9"/>
+  </g>
+</svg>

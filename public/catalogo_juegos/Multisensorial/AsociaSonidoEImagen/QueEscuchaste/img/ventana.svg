@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Ventana">
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="38" y="30" width="164" height="160" rx="6" fill="#8d6e63"/>
+    <rect x="52" y="44" width="136" height="132" fill="#b3e5fc"/>
+  </g>
+  <circle cx="84" cy="76" r="16" fill="#fff59d"/>
+  <path d="M120 140 C120 128 136 122 146 130 C150 118 172 120 172 134 C182 134 184 148 172 150 H126 C116 150 114 140 120 140 Z" fill="#fff"/>
+  <rect x="116" y="44" width="8" height="132" fill="#8d6e63" stroke="#37474f" stroke-width="3"/>
+  <rect x="52" y="106" width="136" height="8" fill="#8d6e63" stroke="#37474f" stroke-width="3"/>
+  <rect x="26" y="188" width="188" height="16" rx="5" fill="#a1887f" stroke="#37474f" stroke-width="4"/>
+  <path d="M38 30 H82 C72 70 62 110 50 150 H38 Z" fill="#ef9a9a" stroke="#37474f" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M202 30 H158 C168 70 178 110 190 150 H202 Z" fill="#ef9a9a" stroke="#37474f" stroke-width="4" stroke-linejoin="round"/>
+</svg>

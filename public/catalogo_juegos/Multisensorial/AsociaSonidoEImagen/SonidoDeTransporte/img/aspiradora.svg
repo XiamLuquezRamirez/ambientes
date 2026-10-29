@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Aspiradora">
+  <ellipse cx="124" cy="216" rx="100" ry="8" fill="#000" opacity="0.1"/>
+  <path d="M132 150 C96 150 92 104 68 92" fill="none" stroke="#37474f" stroke-width="16" stroke-linecap="round"/>
+  <path d="M132 150 C96 150 92 104 68 92" fill="none" stroke="#78909c" stroke-width="10" stroke-linecap="round" stroke-dasharray="4 5"/>
+  <path d="M68 92 L44 196" stroke="#37474f" stroke-width="14" stroke-linecap="round"/>
+  <path d="M68 92 L44 196" stroke="#cfd8dc" stroke-width="8" stroke-linecap="round"/>
+  <rect x="14" y="192" width="66" height="18" rx="7" fill="#455a64" stroke="#37474f" stroke-width="4"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M122 156 C122 122 152 104 182 104 C208 104 226 124 226 152 V180 H122 Z" fill="#8e24aa"/>
+    <path d="M160 104 C160 84 204 84 204 104" fill="none" stroke-width="8"/>
+    <circle cx="146" cy="186" r="15" fill="#37474f"/>
+    <circle cx="206" cy="186" r="15" fill="#37474f"/>
+  </g>
+  <circle cx="146" cy="186" r="5" fill="#b0bec5"/>
+  <circle cx="206" cy="186" r="5" fill="#b0bec5"/>
+  <circle cx="190" cy="140" r="12" fill="#ce93d8" stroke="#37474f" stroke-width="3"/>
+  <circle cx="190" cy="140" r="4" fill="#fdd835"/>
+</svg>

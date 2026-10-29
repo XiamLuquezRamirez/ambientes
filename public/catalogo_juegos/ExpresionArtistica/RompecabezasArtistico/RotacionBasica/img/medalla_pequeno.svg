@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Pequeno Maestro del Rompecabezas">
+
+  <circle cx="120" cy="132" r="78" fill="#ffca28" stroke="#fff8e1" stroke-width="8"/>
+  <path d="M120 78 L136 118 L180 118 L146 144 L158 186 L120 162 L82 186 L94 144 L60 118 L104 118 Z" fill="#fff8e1"/>
+  <path d="M78 28 L102 100 H78 Z" fill="#ef5350"/><path d="M162 28 L138 100 H162 Z" fill="#42a5f5"/>
+</svg>

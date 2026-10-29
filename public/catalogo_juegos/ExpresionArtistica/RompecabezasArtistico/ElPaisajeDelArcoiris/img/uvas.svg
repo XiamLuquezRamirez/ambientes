@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Uvas moradas">
+
+  <g fill="#8e24aa" stroke="#4a148c" stroke-width="3">
+    <circle cx="100" cy="110" r="28"/><circle cx="140" cy="110" r="28"/>
+    <circle cx="80" cy="150" r="28"/><circle cx="120" cy="150" r="28"/><circle cx="160" cy="150" r="28"/>
+  </g>
+  <path d="M120 70 C130 40 160 50 150 78" fill="none" stroke="#2e7d32" stroke-width="6"/>
+</svg>

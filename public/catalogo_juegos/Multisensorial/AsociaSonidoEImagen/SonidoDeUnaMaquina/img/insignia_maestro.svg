@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Insignia Maestro de las asociaciones sonoras">
+  <path d="M78 160 L52 252 L88 232 L106 258 L120 176 Z" fill="#0c8599"/>
+  <path d="M162 160 L188 252 L152 232 L134 258 L120 176 Z" fill="#7048e8"/>
+  <path d="M120 10 L206 40 C206 120 180 170 120 200 C60 170 34 120 34 40 Z" fill="#0b7285" stroke="#ffd43b" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M120 30 L188 54 C186 118 166 156 120 180 C74 156 54 118 52 54 Z" fill="#15aabf"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M106 52 H134 V80 L160 132 C164 142 158 150 148 150 H92 C82 150 76 142 80 132 L106 80 Z" fill="#e3fafc"/>
+  </g>
+  <path d="M95 110 H145 L156 134 C158 140 154 144 148 144 H92 C86 144 82 140 84 134 Z" fill="#cc5de8"/>
+  <rect x="100" y="46" width="40" height="10" rx="5" fill="#37474f"/>
+  <circle cx="108" cy="124" r="5" fill="#fff"/>
+  <circle cx="128" cy="132" r="4" fill="#fff"/>
+  <circle cx="122" cy="96" r="5" fill="#e3fafc" stroke="#37474f" stroke-width="2"/>
+  <circle cx="132" cy="84" r="3.5" fill="#e3fafc" stroke="#37474f" stroke-width="2"/>
+  <g stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M66 82 C58 96 58 114 66 128"/>
+    <path d="M174 82 C182 96 182 114 174 128"/>
+  </g>
+  <g fill="#ffd43b">
+    <path d="M120 156 L124 166 L135 167 L127 174 L129 185 L120 179 L111 185 L113 174 L105 167 L116 166 Z"/>
+    <path d="M78 46 L81 53 L88 54 L83 59 L84 66 L78 62 L72 66 L73 59 L68 54 L75 53 Z"/>
+    <path d="M162 46 L165 53 L172 54 L167 59 L168 66 L162 62 L156 66 L157 59 L152 54 L159 53 Z"/>
+  </g>
+</svg>

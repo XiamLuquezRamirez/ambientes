@@ -1,0 +1,261 @@
+{
+  "nombre": "Identificación De La Textura Porosa Y Flexible",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: busca el objeto con la textura parecida y llévalo junto al modelo.",
+    "demostracionAcierto": "¡Así se relaciona! Las dos plumas tienen la misma textura.",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Hoy vamos a buscar objetos con texturas parecidas!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Mira el objeto modelo y encuentra su pareja."
+      },
+      {
+        "personaje": 1,
+        "texto": "Toca, compara y relaciona. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3"
+  },
+  "demo": {
+    "modelo": "pluma",
+    "pareja": "pluma"
+  },
+  "materiales": {
+    "algodon": {
+      "img": "img/algodon.svg",
+      "nombre": "Copo de algodón",
+      "tacto": "suave",
+      "sonido": "fluff"
+    },
+    "peluche": {
+      "img": "img/peluche.svg",
+      "nombre": "Peluche",
+      "tacto": "suave",
+      "sonido": "fluff"
+    },
+    "piedra": {
+      "img": "img/piedra.svg",
+      "nombre": "Piedra",
+      "tacto": "duro",
+      "sonido": "toc"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "nombre": "Lija",
+      "tacto": "aspero",
+      "sonido": "rasc"
+    },
+    "pluma": {
+      "img": "img/pluma.svg",
+      "nombre": "Pluma",
+      "tacto": "suave",
+      "sonido": "fluff"
+    },
+    "corteza": {
+      "img": "img/corteza.svg",
+      "nombre": "Corteza de árbol",
+      "tacto": "rugoso",
+      "sonido": "croc"
+    },
+    "esponja": {
+      "img": "img/esponja.svg",
+      "nombre": "Esponja",
+      "tacto": "poroso",
+      "sonido": "squish"
+    },
+    "seda": {
+      "img": "img/seda.svg",
+      "nombre": "Manta de seda",
+      "tacto": "liso",
+      "sonido": "seda"
+    },
+    "piedra_rugosa": {
+      "img": "img/piedra_rugosa.svg",
+      "nombre": "Piedra rugosa",
+      "tacto": "rugoso",
+      "sonido": "croc"
+    },
+    "tela": {
+      "img": "img/tela_suave.svg",
+      "nombre": "Tela suave",
+      "tacto": "suave",
+      "sonido": "fluff"
+    },
+    "vidrio": {
+      "img": "img/vidrio.svg",
+      "nombre": "Vidrio",
+      "tacto": "liso",
+      "sonido": "ting"
+    },
+    "piedra_lisa": {
+      "img": "img/piedra_lisa.svg",
+      "nombre": "Piedra lisa",
+      "tacto": "liso",
+      "sonido": "toc"
+    },
+    "bola_nieve": {
+      "img": "img/bola_nieve.svg",
+      "nombre": "Bola de nieve",
+      "tacto": "frio",
+      "sonido": "nieve"
+    },
+    "piedra_blanca": {
+      "img": "img/piedra_blanca.svg",
+      "nombre": "Piedra blanca",
+      "tacto": "duro",
+      "sonido": "toc"
+    },
+    "malla_metalica": {
+      "img": "img/malla_metalica.svg",
+      "nombre": "Malla metálica",
+      "tacto": "duro",
+      "sonido": "metal"
+    },
+    "papel_bond": {
+      "img": "img/papel_bond.svg",
+      "nombre": "Hoja de papel bond",
+      "tacto": "liso",
+      "sonido": "papel"
+    },
+    "almohadilla_seda": {
+      "img": "img/almohadilla_seda.svg",
+      "nombre": "Almohadilla de seda",
+      "tacto": "suave",
+      "sonido": "seda"
+    },
+    "plastico_burbujas": {
+      "img": "img/plastico_burbujas.svg",
+      "nombre": "Plástico de burbujas",
+      "tacto": "poroso",
+      "sonido": "pop"
+    },
+    "manzana": {
+      "img": "img/manzana.svg",
+      "nombre": "Manzana",
+      "tacto": "liso",
+      "sonido": "tap"
+    },
+    "saco_yute": {
+      "img": "img/saco_yute.svg",
+      "nombre": "Saco de yute",
+      "tacto": "aspero",
+      "sonido": "rasc"
+    },
+    "papel_periodico": {
+      "img": "img/papel_periodico.svg",
+      "nombre": "Papel de periódico",
+      "tacto": "liso",
+      "sonido": "papel"
+    },
+    "esponja_alambre": {
+      "img": "img/esponja_alambre.svg",
+      "nombre": "Esponja de alambre",
+      "tacto": "aspero",
+      "sonido": "metal"
+    },
+    "hielo": {
+      "img": "img/hielo.svg",
+      "nombre": "Cubito de hielo",
+      "tacto": "frio",
+      "sonido": "hielo"
+    },
+    "hoja_seca": {
+      "img": "img/hoja_seca.svg",
+      "nombre": "Hoja seca",
+      "tacto": "rugoso",
+      "sonido": "crujir"
+    },
+    "madera": {
+      "img": "img/madera.svg",
+      "nombre": "Bloque de madera",
+      "tacto": "duro",
+      "sonido": "toc"
+    },
+    "espuma": {
+      "img": "img/espuma.svg",
+      "nombre": "Bloque de espuma",
+      "tacto": "poroso",
+      "sonido": "squish"
+    },
+    "piedra_pomez": {
+      "img": "img/piedra_pomez.svg",
+      "nombre": "Piedra pómez",
+      "tacto": "aspero",
+      "sonido": "croc"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El Laboratorio de Texturas",
+      "escenario": "laboratorio",
+      "retos": [
+        {
+          "id": "esponja",
+          "titulo": "Identificación de la Textura Porosa y Flexible (Esponja)",
+          "propiedad": "Porosidad",
+          "categoria": "Poroso/Flexible",
+          "modelo": "esponja",
+          "nombres": {
+            "esponja": "Esponja de baño"
+          },
+          "opciones": [
+            "madera",
+            "espuma",
+            "piedra_pomez",
+            "vidrio",
+            "pluma"
+          ],
+          "correcto": "espuma",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "Llegamos al último análisis. La esponja es blanda, llena de diminutos orificios y recupera su forma. Encuentra el objeto que tiene una textura parecida a esponja."
+          },
+          "unir": {
+            "efecto": "compresion",
+            "sonido": "squeezebounce"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Esponja y Espuma tienen texturas semejantes."
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "La esponja se puede apretar y es blanda. Observa nuevamente. ¡Inténtalo otra vez!"
+          },
+          "iOrigen": 4
+        }
+      ],
+      "cierreEscena": {
+        "tipo": "tabla",
+        "titulo": "La Tabla Periódica de Texturas"
+      },
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Excelente! Relacionaste objetos con texturas semejantes."
+      },
+      "premio": {
+        "titulo": "Diploma",
+        "nombre": "Especialista en Análisis de Materiales",
+        "icono": "fa-scroll",
+        "tipo": "diploma"
+      },
+      "microscopio": true
+    }
+  ]
+}

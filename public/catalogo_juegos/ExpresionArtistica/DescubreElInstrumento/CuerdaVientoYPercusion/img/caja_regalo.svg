@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Caja sorpresa">
+  <defs>
+    <pattern id="papel" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="#7e57c2"/>
+      <path d="M10 6 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z" fill="#ffd54f"/>
+      <circle cx="30" cy="28" r="4" fill="#f48fb1"/>
+    </pattern>
+  </defs>
+  <ellipse cx="120" cy="226" rx="96" ry="9" fill="#000" opacity="0.14"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="30" y="96" width="180" height="124" rx="8" fill="url(#papel)"/>
+    <rect x="20" y="72" width="200" height="34" rx="8" fill="url(#papel)"/>
+    <rect x="106" y="72" width="28" height="148" fill="#ff7043"/>
+    <path d="M120 72 C92 30 54 40 66 62 C74 76 104 74 120 72 Z" fill="#ff7043"/>
+    <path d="M120 72 C148 30 186 40 174 62 C166 76 136 74 120 72 Z" fill="#ff7043"/>
+    <circle cx="120" cy="70" r="11" fill="#ffab91"/>
+  </g>
+  <circle cx="120" cy="158" r="34" fill="#fff" stroke="#37474f" stroke-width="4"/>
+  <path d="M106 148 C106 134 134 132 134 148 C134 158 122 160 122 170" fill="none" stroke="#7e57c2" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="122" cy="182" r="5" fill="#7e57c2"/>
+  <g fill="#fff59d">
+    <path d="M44 40 l4 9 9 4 -9 4 -4 9 -4 -9 -9 -4 9 -4 Z"/>
+    <path d="M200 34 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z"/>
+  </g>
+</svg>

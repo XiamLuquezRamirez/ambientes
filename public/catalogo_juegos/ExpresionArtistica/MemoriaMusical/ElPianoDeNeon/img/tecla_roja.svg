@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Tecla roja">
+
+  <rect x="28" y="18" width="184" height="204" rx="28" fill="#ef5350" stroke="#37474f" stroke-width="4"/>
+  <rect x="48" y="36" width="144" height="36" rx="16" fill="#fff" opacity="0.35"/>
+  <circle cx="120" cy="150" r="16" fill="#fff" opacity="0.55"/>
+</svg>

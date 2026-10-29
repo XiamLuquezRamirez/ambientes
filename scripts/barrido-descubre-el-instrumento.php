@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Barrido: Descubre el instrumento (Expresión Artística).
+ * Barrido: Descubre el instrumento (EA) — 7 juegos.
  * Uso: php scripts/barrido-descubre-el-instrumento.php
  */
 
@@ -38,211 +38,114 @@ function warn(string $msg): void
     echo "[WARN] {$msg}\n";
 }
 
-$rel = 'ExpresionArtistica/DescubreElInstrumento';
-$dir = public_path('catalogo_juegos/'.$rel);
-echo "=== DESCUBRE EL INSTRUMENTO: filesystem ===\n";
-
-if (! is_dir($dir)) {
-    fail("No existe {$rel}");
-    goto resumen;
-}
-
-foreach (['index.html', 'style.css', 'script.js', 'config.json', 'logica.js', 'sfx.js', 'docs/requerimientos.md', 'img/caja_regalo.svg', 'img/guitarra_muda.svg'] as $f) {
-    if (! is_file($dir.'/'.$f)) {
-        fail("Falta {$rel}/{$f}");
-    } else {
-        ok("Presente {$f}");
-    }
-}
-
-$html = file_get_contents($dir.'/index.html');
-$js = file_get_contents($dir.'/script.js');
-$css = file_get_contents($dir.'/style.css');
-
-if (str_contains($html, 'Paquete en construcción') || str_contains($html, 'stub-wrap')) {
-    fail('index.html aún muestra stub');
-} else {
-    ok('Stub visual eliminado');
-}
-
-foreach ([
-    'btn-empecemos',
-    'pantalla-inicio',
-    'inicio-vitrina',
-    'texto_voz.js',
-    'edad-nivel.js',
-    'aplicar-perfil-juego.js',
-    'logica.js',
-    'sfx.js',
-    'id="escena-fondo"',
-    'id="estacion"',
-    'id="progreso"',
-    'id="concierto"',
-    'id="pj-zoe"',
-    'id="pj-zeus"',
-    'id="dialogo"',
-    'sweetalert',
-] as $needle) {
-    if (! str_contains($html, $needle)) {
-        fail("index.html sin '{$needle}'");
-    } else {
-        ok("HTML tiene {$needle}");
-    }
-}
-
-foreach ([
-    'TextoVoz',
-    'confirmarNivel',
-    'conversacionInicial',
-    'hacerArrastrable',
-    'manoArrastrar',
-    'manoDeslizar',
-    'retoCaja',
-    'retoCuerdas',
-    'retoFlauta',
-    'retoEstuches',
-    'retoFamilias',
-    'retoDuelo',
-    'retoDirector',
-    'reproducirArreglo',
-    'lluviaDeNotas',
-    'prepararInsignia',
-    'granCierre',
-    'pednia:perfil',
-] as $needle) {
-    if (! str_contains($js, $needle)) {
-        fail("script.js sin '{$needle}'");
-    } else {
-        ok("JS tiene {$needle}");
-    }
-}
-
-foreach (['.tema-teatro', '.caja-zona', '.tambor-btn.bota', '.guitarra-wrap.afinada', '.cuerda-slot.puesta', '.rollo', '.tubo.dormido', '.guia-paso', '.estuche.cerrado', '.estuche-silueta', '.zona', '.foco', '.vibra-grave', '.vibra-agudo', '.casilla.llena', '.seccion.iluminada', '.concierto', '.trofeo.insignia', '.pj.celebra'] as $needle) {
-    if (! str_contains($css, $needle)) {
-        fail("style.css sin '{$needle}'");
-    } else {
-        ok("CSS tiene {$needle}");
-    }
-}
-
-echo "\n=== DESCUBRE EL INSTRUMENTO: config.json ===\n";
-
-$config = json_decode(file_get_contents($dir.'/config.json'), true);
-if (! is_array($config)) {
-    fail('config.json inválido');
-    goto resumen;
-}
-
-if (! empty($config['stub'])) {
-    fail('config aún con stub=true (el catálogo borraría la carpeta)');
-} else {
-    ok('config sin stub');
-}
-
-foreach ($config['instrumentos'] ?? [] as $id => $e) {
-    if (empty($e['img']) || ! is_file($dir.'/'.$e['img'])) {
-        fail("Instrumento {$id}: falta imagen ".($e['img'] ?? ''));
-    } elseif (empty($config['familias'][$e['familia'] ?? ''])) {
-        fail("Instrumento {$id}: familia desconocida");
-    } else {
-        ok("Instrumento {$id}");
-    }
-}
-
-foreach ($config['escenas'] ?? [] as $id => $img) {
-    if (! is_file($dir.'/'.$img)) {
-        fail("Escena {$id}: falta {$img}");
-    } else {
-        ok("Escena {$id}");
-    }
-}
-
-$esperados = [
-    '3' => ['3-4 años', 'tienda', ['caja', 'cuerdas', 'flauta', 'estuches']],
-    '5' => ['5-6 años', 'teatro', ['familias', 'duelo', 'director']],
+$juegos = [
+    ['carpeta' => 'ElTambor', 'slug' => 'el-tambor', 'reto' => 'caja-sorpresa', 'edad' => '3-4 años'],
+    ['carpeta' => 'LaGuitarra', 'slug' => 'la-guitarra', 'reto' => 'cuerdas', 'edad' => '3-4 años'],
+    ['carpeta' => 'LaFlautaMagica', 'slug' => 'la-flauta-magica', 'reto' => 'flauta-magica', 'edad' => '3-4 años'],
+    ['carpeta' => 'GuardarLosInstrumentos', 'slug' => 'guardar-los-instrumentos', 'reto' => 'estuches', 'edad' => '3-4 años'],
+    ['carpeta' => 'CuerdaVientoYPercusion', 'slug' => 'cuerda-viento-y-percusion', 'reto' => 'orquesta', 'edad' => '5-6 años'],
+    ['carpeta' => 'AgudoVsGrave', 'slug' => 'agudo-vs-grave', 'reto' => 'duelo', 'edad' => '5-6 años'],
+    ['carpeta' => 'DirectorDeOrquesta', 'slug' => 'director-de-orquesta', 'reto' => 'director', 'edad' => '5-6 años'],
 ];
-$ids = [];
-foreach ($config['niveles'] ?? [] as $nivel) {
-    $id = (string) ($nivel['id'] ?? '');
-    $ids[] = $id;
-    if (! isset($esperados[$id])) {
-        fail("Nivel id={$id} fuera de 3/5");
+
+echo "=== DESCUBRE EL INSTRUMENTO (EA): 7 paquetes ===\n";
+
+if (is_file(public_path('catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/config.json'))) {
+    fail('Queda un paquete plano en DescubreElInstrumento/');
+}
+
+foreach ($juegos as $meta) {
+    $rel = 'ExpresionArtistica/DescubreElInstrumento/'.$meta['carpeta'];
+    $dir = public_path('catalogo_juegos/'.$rel);
+    echo "\n--- {$meta['carpeta']} ---\n";
+
+    if (! is_dir($dir)) {
+        fail("No existe {$rel}");
         continue;
     }
-    [$edad, $tema, $tipos] = $esperados[$id];
-    if (($nivel['edad'] ?? '') !== $edad || ($nivel['tema'] ?? '') !== $tema) {
-        fail("Nivel {$id}: edad/tema ".($nivel['edad'] ?? '?').'/'.($nivel['tema'] ?? '?').", esperado {$edad}/{$tema}");
-    }
-    $tiposReales = array_map(fn ($r) => $r['tipo'] ?? '?', $nivel['retos'] ?? []);
-    if ($tiposReales !== $tipos) {
-        fail("Nivel {$id}: retos ".implode(',', $tiposReales).', esperado '.implode(',', $tipos));
-    } else {
-        ok("Nivel {$id}: ".count($tipos).' retos ('.implode(', ', $tipos).')');
-    }
-    foreach ($nivel['retos'] ?? [] as $r) {
-        if (empty($config['escenas'][$r['escena'] ?? ''])) {
-            fail("Nivel {$id} reto {$r['id']}: escena desconocida");
-        }
-    }
-    $insignia = $nivel['insignia']['img'] ?? '';
-    if (! $insignia || ! is_file($dir.'/'.$insignia)) {
-        fail("Nivel {$id}: falta la medalla");
-    } else {
-        ok("Nivel {$id}: medalla {$insignia}");
-    }
-}
 
-foreach (array_keys($esperados) as $idEsp) {
-    if (! in_array((string) $idEsp, $ids, true)) {
-        fail("Falta nivel id={$idEsp}");
-    }
-}
-
-$conv = $config['textos']['conversacion'] ?? [];
-if (! is_array($conv) || count($conv) < 1) {
-    fail('conversacion vacía');
-} else {
-    ok('conversación en config ('.count($conv).' líneas)');
-}
-
-if (empty($config['audios']['sonidos']) || ! is_array($config['audios']['sonidos'])) {
-    warn('Sin grabaciones en audios.sonidos: los instrumentos son sintetizados (provisionales)');
-} else {
-    foreach ($config['audios']['sonidos'] as $id => $ruta) {
-        if (! is_file($dir.'/'.$ruta)) {
-            fail("Grabación de {$id} no existe: {$ruta}");
+    foreach (['index.html', 'style.css', 'script.js', 'config.json', 'logica.js', 'sfx.js', 'docs/requerimientos.md'] as $f) {
+        if (! is_file($dir.'/'.$f)) {
+            fail("Falta {$rel}/{$f}");
         } else {
-            ok("Grabación {$id}");
+            ok("Presente {$f}");
         }
+    }
+
+    $config = json_decode((string) file_get_contents($dir.'/config.json'), true);
+    if (! is_array($config)) {
+        fail("config inválido en {$rel}");
+        continue;
+    }
+
+    $niveles = $config['niveles'] ?? [];
+    if (count($niveles) !== 1) {
+        fail("{$rel}: debe tener 1 nivel");
+    } else {
+        ok('1 nivel');
+    }
+
+    $nivel = $niveles[0] ?? [];
+    if (($nivel['edad'] ?? '') !== $meta['edad']) {
+        fail("{$rel}: edad esperada {$meta['edad']}");
+    } else {
+        ok('edad '.$meta['edad']);
+    }
+
+    $retos = $nivel['retos'] ?? [];
+    if (count($retos) !== 1 || ($retos[0]['id'] ?? '') !== $meta['reto']) {
+        fail("{$rel}: debe tener solo el reto {$meta['reto']}");
+    } else {
+        ok('reto '.$meta['reto']);
+    }
+
+    if (empty($nivel['cierre']) || empty($nivel['insignia']['img'])) {
+        fail("{$rel}: falta cierre/insignia");
+    } else {
+        ok('cierre e insignia');
+    }
+
+    if (! Schema::hasTable('juegos')) {
+        continue;
+    }
+
+    $fila = DB::table('juegos')->where('slug', $meta['slug'])->first();
+    if (! $fila) {
+        fail("BD: falta {$meta['slug']}");
+        continue;
+    }
+    if (! (int) $fila->activo) {
+        fail("BD: {$meta['slug']} inactivo");
+    } else {
+        ok("BD {$meta['slug']} activo");
+    }
+    if ((int) $fila->tematica_id !== 49) {
+        fail("BD: {$meta['slug']} tematica_id={$fila->tematica_id}, esperado 49");
+    } else {
+        ok('temática 49');
+    }
+    if ($fila->ruta !== 'catalogo_juegos/'.$rel) {
+        fail("BD ruta: {$fila->ruta}");
+    } else {
+        ok('ruta ok');
     }
 }
 
-require __DIR__.'/barrido-multisensorial-shell.php';
-
-echo "\n=== DESCUBRE EL INSTRUMENTO: BD (solo lectura) ===\n";
-
-if (! Schema::hasTable('juegos')) {
-    fail('Tabla juegos no existe');
-    goto resumen;
+if (Schema::hasTable('juegos')) {
+    echo "\n=== Legacy ===\n";
+    if (DB::table('juegos')->where('slug', 'descubre-el-instrumento')->exists()) {
+        fail('slug descubre-el-instrumento sigue en BD');
+    } else {
+        ok('sin slug único legacy');
+    }
+    $tem = DB::table('tematicas')->where('id', 49)->first();
+    if (! $tem || ! (int) $tem->activo) {
+        fail('temática 49 ausente o inactiva');
+    } else {
+        ok('temática 49: '.$tem->nombre);
+    }
 }
 
-$fila = DB::table('juegos')->where('ruta', 'catalogo_juegos/'.$rel)->first();
-
-if (! $fila) {
-    fail("No hay fila en juegos para catalogo_juegos/{$rel} (no se crea desde el barrido)");
-    goto resumen;
-}
-
-ok("BD slug={$fila->slug} activo=".((int) $fila->activo));
-
-$ambiente = DB::table('ambientes')->where('id', $fila->ambiente_id)->value('slug');
-if ($ambiente !== 'expresion-artistica') {
-    warn('ambiente_id='.$fila->ambiente_id.' ('.($ambiente ?? '?').'), esperado expresion-artistica');
-} else {
-    ok('ambiente Expresión Artística');
-}
-
-resumen:
 echo "\n========== RESUMEN DESCUBRE EL INSTRUMENTO ==========\n";
 echo 'OK: '.count($oks)."\n";
 echo 'WARN: '.count($avisos)."\n";

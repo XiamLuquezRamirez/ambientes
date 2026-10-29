@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Claro del bosque encantado">
+
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5c6bc0"/>
+      <stop offset="1" stop-color="#b39ddb"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#cielo)"/>
+  <circle cx="1240" cy="160" r="70" fill="#fff59d"/>
+  <g fill="#2e7d32">
+    <ellipse cx="180" cy="520" rx="220" ry="280"/>
+    <ellipse cx="1420" cy="500" rx="240" ry="300"/>
+    <ellipse cx="400" cy="430" rx="160" ry="220"/>
+  </g>
+  <rect x="0" y="620" width="1600" height="280" fill="#66bb6a"/>
+  <g fill="#43a047">
+    <ellipse cx="200" cy="760" rx="180" ry="40"/>
+    <ellipse cx="800" cy="800" rx="260" ry="46"/>
+    <ellipse cx="1360" cy="750" rx="200" ry="40"/>
+  </g>
+  <g stroke="#6d4c41" stroke-width="10" fill="none">
+    <path d="M560 760 Q800 560 1040 760"/>
+  </g>
+  <g fill="#ffca28">
+    <circle cx="620" cy="220" r="10"/>
+    <circle cx="900" cy="160" r="8"/>
+    <circle cx="1080" cy="240" r="12"/>
+  </g>
+</svg>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Cola del gatito">
+
+  <path d="M40 180 C40 40 200 40 180 120" fill="none" stroke="#ff8a65" stroke-width="28" stroke-linecap="round"/>
+  <path d="M40 180 C40 40 200 40 180 120" fill="none" stroke="#6d4c41" stroke-width="4"/>
+</svg>

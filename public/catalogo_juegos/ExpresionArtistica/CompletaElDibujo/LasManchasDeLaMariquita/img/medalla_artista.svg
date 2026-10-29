@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <circle cx="80" cy="80" r="70" fill="#ffca28" stroke="#f57f17" stroke-width="8"/>
+  <circle cx="80" cy="80" r="52" fill="#fff8e1"/>
+  <path d="M50 95 Q80 40 110 95" fill="none" stroke="#ef6c00" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="55" cy="55" r="10" fill="#ef5350"/><circle cx="105" cy="55" r="10" fill="#42a5f5"/>
+  <text x="80" y="125" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#e65100">ARTISTA</text>
+</svg>

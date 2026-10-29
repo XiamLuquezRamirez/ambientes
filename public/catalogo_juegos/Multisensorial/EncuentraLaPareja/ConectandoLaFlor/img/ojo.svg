@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Ojo">
+  <ellipse cx="120" cy="228" rx="55" ry="6" fill="#000" opacity="0.1"/>
+  <path d="M30 120 Q120 30 210 120 Q120 210 30 120 Z" fill="#fff" stroke="#37474f" stroke-width="5"/>
+  <circle cx="120" cy="120" r="48" fill="#74c0fc" stroke="#1c7ed6" stroke-width="3"/>
+  <circle cx="120" cy="120" r="24" fill="#212529"/>
+  <circle cx="108" cy="108" r="8" fill="#fff"/>
+</svg>

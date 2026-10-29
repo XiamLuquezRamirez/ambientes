@@ -1,0 +1,134 @@
+{
+  "nombre": "Efectos Especiales y Clima",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el botón para escuchar y luego toca la imagen del sonido.",
+    "demostracionAcierto": "¡Así se descubre el sonido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al estudio de grabación!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy seremos los DJ del sonido."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "pajaro"
+  },
+  "escenas": {
+    "estudio": "img/escenas/estudio.svg",
+    "tormenta": "img/escenas/tormenta.svg"
+  },
+  "elementos": {
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pájaro",
+      "sonido": "trino"
+    },
+    "trueno": {
+      "img": "img/trueno.svg",
+      "nombre": "Trueno",
+      "sonido": "trueno"
+    },
+    "lluvia": {
+      "img": "img/lluvia.svg",
+      "nombre": "Lluvia suave"
+    },
+    "mar": {
+      "img": "img/mar.svg",
+      "nombre": "Olas del mar"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El estudio de grabación",
+      "tema": "estudio",
+      "escena": "estudio",
+      "arrastre": false,
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al estudio de grabación!"
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy seremos los DJ del sonido."
+        }
+      ],
+      "retos": [
+        {
+          "id": "tormenta",
+          "titulo": "La gran tormenta eléctrica",
+          "escena": "tormenta",
+          "consigna": {
+            "voz": "zoe",
+            "texto": "¡Atención, DJ del sonido! En esta pista hay una tormenta. Escucha el sonido fuerte que retumba al final y sacude las ventanas."
+          },
+          "capas": [
+            {
+              "sonido": "viento"
+            },
+            {
+              "sonido": "trueno",
+              "principal": true,
+              "retrasoMs": 1600
+            }
+          ],
+          "opciones": [
+            "trueno",
+            "lluvia",
+            "mar"
+          ],
+          "correcto": "trueno",
+          "acierto": {
+            "efecto": "rayo",
+            "voz": "zoe",
+            "texto": "¡Impresionante! Identificaste el estruendo del trueno en medio de la tormenta."
+          },
+          "error": {
+            "voz": "zeus",
+            "texto": "La lluvia suena como un goteo constante y las olas van y vienen. ¡Prueba otra vez!"
+          }
+        }
+      ],
+      "concierto": {
+        "tipo": "mezcla",
+        "compases": 3,
+        "bpm": 96
+      },
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Increíble trabajo como ingeniero de sonido! Tus oídos detectaron detalles muy sutiles en cada pista."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Tienes un talento increíble para la música y el análisis acústico!"
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_maestro_audio.svg",
+        "nombre": "Maestro del Audio y los Sonidos",
+        "sonido": "aplausos"
+      }
+    }
+  ]
+}

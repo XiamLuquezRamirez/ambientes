@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Medalla de oro Baterista y Maestro del Ritmo">
+  <defs>
+    <radialGradient id="oro" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#fff8e1"/>
+      <stop offset="0.45" stop-color="#ffd54f"/>
+      <stop offset="1" stop-color="#ff8f00"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M74 8 H110 L130 86 L94 98 Z" fill="#4527a0"/>
+    <path d="M166 8 H130 L110 86 L146 98 Z" fill="#00838f"/>
+    <path d="M120 58 L138 70 L160 66 L168 86 L188 96 L184 118 L196 136 L182 152 L184 174 L164 182 L154 202 L132 198 L120 214 L108 198 L86 202 L76 182 L56 174 L58 152 L44 136 L56 118 L52 96 L72 86 L80 66 L102 70 Z" fill="url(#oro)"/>
+    <circle cx="120" cy="138" r="52" fill="#263238"/>
+  </g>
+  <g stroke="#37474f" stroke-width="3">
+    <ellipse cx="120" cy="156" rx="30" ry="12" fill="#fafafa"/>
+    <path d="M90 156 V170 C90 182 150 182 150 170 V156" fill="#e53935"/>
+    <path d="M78 118 L112 150" stroke="#ffd54f" stroke-width="5" stroke-linecap="round"/>
+    <path d="M162 118 L128 150" stroke="#ffd54f" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g fill="#ffca28" stroke="#37474f" stroke-width="2">
+    <circle cx="76" cy="114" r="6"/>
+    <circle cx="164" cy="114" r="6"/>
+  </g>
+  <g fill="#fff" opacity="0.95">
+    <path d="M62 52 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z"/>
+    <path d="M184 46 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z"/>
+  </g>
+</svg>

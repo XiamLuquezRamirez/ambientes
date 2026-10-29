@@ -1,0 +1,341 @@
+{
+  "nombre": "El Misterio Del Conejo Y Los Animales Del Bosque",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "enunciado": "Observa el objeto y encuentra su sombra",
+    "cierre": "¡Excelente! Encontraste todas las sombras.",
+    "errorGenerico": "¡Inténtalo otra vez! Observa muy bien su forma.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: observa el objeto y toca su sombra.",
+    "demostracionFin": "¡Ahora te toca a ti! Encuentra la sombra correcta.",
+    "ayudaRecorrido": "¡Te ayudo! Vamos juntos.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Observa muy bien el objeto y encuentra su sombra."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Cada objeto tiene una sombra con su misma forma. ¡Toca la correcta!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Mira con atención la forma y elige. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "acierto": "../../../sounds/ok.mp3",
+    "error": "../../../sounds/over.mp3",
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {
+      "boing": "",
+      "chispas": "",
+      "foco": "",
+      "vroom": "",
+      "burbujas": "",
+      "hojas": "",
+      "laser": "",
+      "escanerPausa": "",
+      "holograma": "",
+      "energia": "",
+      "salto": "",
+      "whoosh": "",
+      "nube": "",
+      "linterna": "",
+      "proyectar": ""
+    }
+  },
+  "escenas": {
+    "teatro": {
+      "fondo": ""
+    },
+    "laboratorio": {
+      "fondo": ""
+    }
+  },
+  "objetos": {
+    "manzana": {
+      "nombre": "la manzana",
+      "etiqueta": "Manzana",
+      "img": "img/objetos/manzana.svg",
+      "sombra": "img/sombras/manzana.svg"
+    },
+    "carro": {
+      "nombre": "el carro",
+      "etiqueta": "Carro",
+      "img": "img/objetos/carro.svg",
+      "sombra": "img/sombras/carro.svg"
+    },
+    "estrella": {
+      "nombre": "la estrella",
+      "etiqueta": "Estrella",
+      "img": "img/objetos/estrella.svg",
+      "sombra": "img/sombras/estrella.svg"
+    },
+    "pez": {
+      "nombre": "el pez",
+      "etiqueta": "Pez",
+      "img": "img/objetos/pez.svg",
+      "sombra": "img/sombras/pez.svg"
+    },
+    "arbol": {
+      "nombre": "el árbol",
+      "etiqueta": "Árbol",
+      "img": "img/objetos/arbol.svg",
+      "sombra": "img/sombras/arbol.svg"
+    },
+    "mariposa": {
+      "nombre": "la mariposa",
+      "etiqueta": "Mariposa",
+      "img": "img/objetos/mariposa.svg",
+      "sombra": "img/sombras/mariposa.svg"
+    },
+    "conejo": {
+      "nombre": "el conejo",
+      "etiqueta": "Conejo",
+      "img": "img/objetos/conejo.svg",
+      "sombra": "img/sombras/conejo.svg"
+    },
+    "flor": {
+      "nombre": "la flor",
+      "etiqueta": "Flor",
+      "img": "img/objetos/flor.svg",
+      "sombra": "img/sombras/flor.svg"
+    },
+    "pera": {
+      "nombre": "la pera",
+      "etiqueta": "Pera",
+      "img": "img/objetos/pera.svg",
+      "sombra": "img/sombras/pera.svg"
+    },
+    "pajaro": {
+      "nombre": "el pájaro",
+      "etiqueta": "Pájaro",
+      "img": "img/objetos/pajaro.svg",
+      "sombra": "img/sombras/pajaro.svg"
+    },
+    "tortuga": {
+      "nombre": "la tortuga",
+      "etiqueta": "Tortuga",
+      "img": "img/objetos/tortuga.svg",
+      "sombra": "img/sombras/tortuga.svg"
+    },
+    "girasol": {
+      "nombre": "el girasol",
+      "etiqueta": "Girasol",
+      "img": "img/objetos/girasol.svg",
+      "sombra": "img/sombras/girasol.svg"
+    },
+    "hoja": {
+      "nombre": "la hoja",
+      "etiqueta": "Hoja",
+      "img": "img/objetos/hoja.svg",
+      "sombra": "img/sombras/hoja.svg"
+    },
+    "mosca": {
+      "nombre": "la mosca",
+      "etiqueta": "Mosca",
+      "img": "img/objetos/mosca.svg",
+      "sombra": "img/sombras/mosca.svg"
+    },
+    "abeja": {
+      "nombre": "la abeja",
+      "etiqueta": "Abeja",
+      "img": "img/objetos/abeja.svg",
+      "sombra": "img/sombras/abeja.svg"
+    },
+    "gato": {
+      "nombre": "el gato",
+      "etiqueta": "Gato",
+      "img": "img/objetos/gato.svg",
+      "sombra": "img/sombras/gato.svg"
+    },
+    "perro": {
+      "nombre": "el perro",
+      "etiqueta": "Perro",
+      "img": "img/objetos/perro.svg",
+      "sombra": "img/sombras/perro.svg"
+    },
+    "ardilla": {
+      "nombre": "la ardilla",
+      "etiqueta": "Ardilla",
+      "img": "img/objetos/ardilla.svg",
+      "sombra": "img/sombras/ardilla.svg"
+    },
+    "zorro": {
+      "nombre": "el zorro",
+      "etiqueta": "Zorro",
+      "img": "img/objetos/zorro.svg",
+      "sombra": "img/sombras/zorro.svg"
+    },
+    "avion": {
+      "nombre": "el avión",
+      "etiqueta": "Avión",
+      "img": "img/objetos/avion.svg",
+      "sombra": "img/sombras/avion.svg"
+    },
+    "helicoptero": {
+      "nombre": "el helicóptero",
+      "etiqueta": "Helicóptero",
+      "img": "img/objetos/helicoptero.svg",
+      "sombra": "img/sombras/helicoptero.svg"
+    },
+    "cohete": {
+      "nombre": "el cohete",
+      "etiqueta": "Cohete",
+      "img": "img/objetos/cohete.svg",
+      "sombra": "img/sombras/cohete.svg"
+    },
+    "avioneta": {
+      "nombre": "la avioneta",
+      "etiqueta": "Avioneta",
+      "img": "img/objetos/avioneta.svg",
+      "sombra": "img/sombras/avioneta.svg"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El Laboratorio de Sombras",
+      "avanzado": true,
+      "tema": "laboratorio",
+      "progreso": "energia",
+      "linterna": false,
+      "lupa": true,
+      "pista": {
+        "modo": "detalle",
+        "errores": 2
+      },
+      "demo": {
+        "objeto": "tortuga",
+        "sombras": [
+          "tortuga",
+          "pez",
+          "pera",
+          "hoja",
+          "girasol"
+        ]
+      },
+      "retos": [
+        {
+          "objeto": "conejo",
+          "sombras": [
+            "gato",
+            "perro",
+            "conejo",
+            "ardilla",
+            "zorro"
+          ],
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Genial! Ahora analicemos a nuestro amigo el conejo. Hay muchos animales de cuatro patas en la lista, ¡no te confundas!"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Excelente observación! Sus orejas largas no fallan.",
+            "efecto": "holograma",
+            "recompensa": {
+              "tipo": "riel",
+              "voz": "zeus",
+              "texto": "¡Ahora lleva al conejo a su madriguera! Pasa por debajo de la rama y salta por el aro.",
+              "ruta": [
+                [
+                  10,
+                  78
+                ],
+                [
+                  34,
+                  76
+                ],
+                [
+                  60,
+                  56
+                ],
+                [
+                  86,
+                  66
+                ]
+              ],
+              "obstaculos": [
+                {
+                  "tipo": "rama",
+                  "en": 0.3
+                },
+                {
+                  "tipo": "aro",
+                  "en": 0.64
+                }
+              ],
+              "meta": {
+                "tipo": "madriguera"
+              },
+              "llegada": {
+                "voz": "zoe",
+                "texto": "¡Llegó a su madriguera! ¡Muy bien!"
+              },
+              "autoMs": 10000
+            }
+          },
+          "errores": {
+            "gato": {
+              "voz": "zoe",
+              "texto": "Mmm, observa las orejas. ¡Las del gato son cortitas y en triángulo!",
+              "reaccion": "zoom"
+            },
+            "perro": {
+              "voz": "zoe",
+              "texto": "Mmm, observa las orejas. ¡Las del perro están caídas!",
+              "reaccion": "zoom"
+            },
+            "ardilla": {
+              "voz": "zoe",
+              "texto": "Mmm, observa la cola. ¡La de la ardilla es gigante!",
+              "reaccion": "zoom"
+            },
+            "zorro": {
+              "voz": "zoe",
+              "texto": "Mmm, observa la cola. ¡La del zorro es ancha y larga!",
+              "reaccion": "zoom"
+            }
+          },
+          "pista": {
+            "voz": "zeus",
+            "texto": "¡Mira las orejas! El conejo tiene orejas muy largas y paradas.",
+            "zona": {
+              "x": 50,
+              "y": 22,
+              "w": 70,
+              "h": 44
+            }
+          },
+          "iOrigen": 1
+        }
+      ],
+      "final": {
+        "creador": {
+          "voz": "zoe",
+          "texto": "¡El medidor está lleno! Se encendió el Creador de Sombras Mágicas. Toca cada figura para proyectar su sombra."
+        },
+        "creadorFin": {
+          "voz": "zeus",
+          "texto": "¡Qué gran experimento, Científico!"
+        },
+        "autoMs": 20000
+      },
+      "premio": {
+        "tipo": "medalla",
+        "nombre": "Medalla de Científico Visionario",
+        "img": ""
+      },
+      "cierre": "¡Te ganaste la Medalla de Científico Visionario!"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fce4ec"/><stop offset="100%" stop-color="#f8bbd0"/></linearGradient>
+  </defs>
+  <rect width="800" height="480" fill="url(#g)"/>
+  <rect x="0" y="390" width="800" height="90" fill="#ad1457"/>
+  <!-- perchero / disfraces flotantes -->
+  <line x1="60" y1="80" x2="200" y2="80" stroke="#6d4c41" stroke-width="6"/>
+  <path d="M90 80 Q100 160 85 220" fill="none" stroke="#ec407a" stroke-width="14" stroke-linecap="round"/>
+  <path d="M140 80 Q155 150 130 230" fill="none" stroke="#42a5f5" stroke-width="14" stroke-linecap="round"/>
+  <path d="M180 80 Q170 140 190 210" fill="none" stroke="#ffca28" stroke-width="12" stroke-linecap="round"/>
+  <!-- mascaritas -->
+  <circle cx="680" cy="120" r="34" fill="#fff59d"/><circle cx="668" cy="112" r="5" fill="#5d4037"/><circle cx="692" cy="112" r="5" fill="#5d4037"/><path d="M665 130 Q680 145 695 130" fill="none" stroke="#ef6c00" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="720" cy="200" r="28" fill="#bbdefb"/><circle cx="710" cy="194" r="4" fill="#5d4037"/><circle cx="730" cy="194" r="4" fill="#5d4037"/><ellipse cx="720" cy="210" rx="8" ry="10" fill="#5d4037"/>
+  <!-- espejo con luces -->
+  <rect x="250" y="50" width="300" height="300" rx="24" fill="#fffde7" stroke="#ffd54f" stroke-width="22"/>
+  <circle cx="270" cy="70" r="9" fill="#ffeb3b"/><circle cx="310" cy="58" r="9" fill="#fff59d"/><circle cx="360" cy="52" r="9" fill="#ffeb3b"/><circle cx="410" cy="52" r="9" fill="#fff59d"/><circle cx="460" cy="58" r="9" fill="#ffeb3b"/><circle cx="530" cy="70" r="9" fill="#fff59d"/>
+  <circle cx="270" cy="330" r="9" fill="#fff59d"/><circle cx="310" cy="342" r="9" fill="#ffeb3b"/><circle cx="360" cy="348" r="9" fill="#fff59d"/><circle cx="410" cy="348" r="9" fill="#ffeb3b"/><circle cx="460" cy="342" r="9" fill="#fff59d"/><circle cx="530" cy="330" r="9" fill="#ffeb3b"/>
+  <circle cx="258" cy="120" r="9" fill="#ffeb3b"/><circle cx="258" cy="170" r="9" fill="#fff59d"/><circle cx="258" cy="220" r="9" fill="#ffeb3b"/><circle cx="258" cy="270" r="9" fill="#fff59d"/>
+  <circle cx="542" cy="120" r="9" fill="#fff59d"/><circle cx="542" cy="170" r="9" fill="#ffeb3b"/><circle cx="542" cy="220" r="9" fill="#fff59d"/><circle cx="542" cy="270" r="9" fill="#ffeb3b"/>
+</svg>

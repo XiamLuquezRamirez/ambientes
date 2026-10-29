@@ -1,0 +1,198 @@
+{
+  "nombre": "El Gran Concierto Final",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: la canción se queda a medias y tú tocas la nota que falta.",
+    "demostracionAcierto": "¡Así se completa la melodía!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al estudio de edición musical!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy vamos a cerrar las melodías que se quedaron a medias."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "nota_demo"
+  },
+  "escenas": {
+    "estacion": "img/escenas/estacion.svg",
+    "estudio": "img/escenas/estudio.svg"
+  },
+  "elementos": {
+    "nota_demo": {
+      "img": "img/nota_demo.svg",
+      "nombre": "Nota de ejemplo"
+    },
+    "timbre": {
+      "img": "img/timbre.svg",
+      "nombre": "Timbre"
+    },
+    "puerta": {
+      "img": "img/puerta.svg",
+      "nombre": "Puerta"
+    },
+    "perro": {
+      "img": "img/perro.svg",
+      "nombre": "Perrito"
+    },
+    "oso": {
+      "img": "img/oso.svg",
+      "nombre": "Osito"
+    },
+    "xilofono": {
+      "img": "img/xilofono.svg",
+      "nombre": "Xilófono"
+    },
+    "nota_mi": {
+      "img": "img/nota_mi.svg",
+      "nombre": "Nota Mi"
+    },
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pajarito"
+    },
+    "nido": {
+      "img": "img/nido.svg",
+      "nombre": "Nido"
+    },
+    "nota_final": {
+      "img": "img/nota_final.svg",
+      "nombre": "Nota final"
+    },
+    "tren": {
+      "img": "img/tren.svg",
+      "nombre": "Tren"
+    },
+    "vagon": {
+      "img": "img/vagon.svg",
+      "nombre": "Vagón musical"
+    },
+    "nota_sol": {
+      "img": "img/nota_sol.svg",
+      "nombre": "Nota Sol"
+    },
+    "nota_re": {
+      "img": "img/nota_re.svg",
+      "nombre": "Nota Re"
+    },
+    "violin": {
+      "img": "img/violin.svg",
+      "nombre": "Violín"
+    },
+    "boton_acorde": {
+      "img": "img/boton_acorde.svg",
+      "nombre": "Acorde final"
+    },
+    "boton_suspenso": {
+      "img": "img/boton_suspenso.svg",
+      "nombre": "Sonido en suspenso"
+    },
+    "gran_acorde": {
+      "img": "img/gran_acorde.svg",
+      "nombre": "Gran acorde final"
+    },
+    "altavoz": {
+      "img": "img/altavoz.svg",
+      "nombre": "Altavoz"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El estudio de edición",
+      "tema": "estudio",
+      "escena": "estudio",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al estudio de edición musical!"
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy vamos a cerrar las melodías que se quedaron a medias."
+        }
+      ],
+      "retos": [
+        {
+          "id": "concierto",
+          "tipo": "toque",
+          "titulo": "El gran cierre del concierto",
+          "boton": "gran_acorde",
+          "pasoMs": 360,
+          "intro": [
+            {
+              "nota": "do4"
+            },
+            {
+              "nota": "mi4"
+            },
+            {
+              "nota": "sol4"
+            },
+            {
+              "nota": "do5"
+            }
+          ],
+          "cierre": {
+            "golpe": "gran"
+          },
+          "festejo": "fuegos",
+          "consigna": [
+            {
+              "voz": "zoe",
+              "texto": "¡Es el momento cumbre del concierto! La orquesta está tocando la última nota larga..."
+            },
+            {
+              "voz": "zeus",
+              "texto": "Toca el botón maestro del Gran Acorde para terminar el concierto con un éxito rotundo."
+            }
+          ],
+          "acierto": [
+            {
+              "voz": "zoe",
+              "texto": "¡BRAVO! ¡MAGNÍFICO! Completaste la melodía y cerraste el concierto con broche de oro."
+            },
+            {
+              "voz": "zeus",
+              "texto": "¡Eres un compositor de conciertos oficial de PEDNIA!"
+            }
+          ],
+          "iOrigen": 3
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡BRAVO! ¡MAGNÍFICO! Completaste la melodía y cerraste el concierto con broche de oro."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Eres un compositor de conciertos oficial de PEDNIA!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_compositor.svg",
+        "nombre": "Compositor de Conciertos Oficial",
+        "sonido": "fanfarria"
+      }
+    }
+  ]
+}

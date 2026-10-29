@@ -1,0 +1,1552 @@
+[
+  {
+    "slug": "encuentra-el-rojo-3-4-anos",
+    "nombre": "Encuentra El Rojo (3-4 Años)",
+    "carpeta": "EncuentraElRojo34Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElRojo34Anos"
+  },
+  {
+    "slug": "encuentra-el-amarillo-3-4-anos",
+    "nombre": "Encuentra El Amarillo (3-4 Años)",
+    "carpeta": "EncuentraElAmarillo34Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElAmarillo34Anos"
+  },
+  {
+    "slug": "encuentra-el-azul-3-4-anos",
+    "nombre": "Encuentra El Azul (3-4 Años)",
+    "carpeta": "EncuentraElAzul34Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElAzul34Anos"
+  },
+  {
+    "slug": "encuentra-el-rojo-5-6-anos",
+    "nombre": "Encuentra El Rojo (5-6 Años)",
+    "carpeta": "EncuentraElRojo56Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElRojo56Anos"
+  },
+  {
+    "slug": "encuentra-el-amarillo-5-6-anos",
+    "nombre": "Encuentra El Amarillo (5-6 Años)",
+    "carpeta": "EncuentraElAmarillo56Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElAmarillo56Anos"
+  },
+  {
+    "slug": "encuentra-el-azul-5-6-anos",
+    "nombre": "Encuentra El Azul (5-6 Años)",
+    "carpeta": "EncuentraElAzul56Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElAzul56Anos"
+  },
+  {
+    "slug": "encuentra-el-verde-5-6-anos",
+    "nombre": "Encuentra El Verde (5-6 Años)",
+    "carpeta": "EncuentraElVerde56Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElVerde56Anos"
+  },
+  {
+    "slug": "encuentra-el-naranja-5-6-anos",
+    "nombre": "Encuentra El Naranja (5-6 Años)",
+    "carpeta": "EncuentraElNaranja56Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElNaranja56Anos"
+  },
+  {
+    "slug": "encuentra-el-morado-5-6-anos",
+    "nombre": "Encuentra El Morado (5-6 Años)",
+    "carpeta": "EncuentraElMorado56Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElMorado56Anos"
+  },
+  {
+    "slug": "encuentra-el-rosado-5-6-anos",
+    "nombre": "Encuentra El Rosado (5-6 Años)",
+    "carpeta": "EncuentraElRosado56Anos",
+    "padre": "EncuentraElColor",
+    "slugAntiguo": "encuentra-el-color",
+    "tematicaId": 9,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElRosado56Anos"
+  },
+  {
+    "slug": "la-manzana-perdida-y-el-proyector",
+    "nombre": "¡La Manzana Perdida Y El Proyector!",
+    "carpeta": "LaManzanaPerdidaYElProyector",
+    "padre": "BuscaLaSombra",
+    "slugAntiguo": "busca-la-sombra",
+    "tematicaId": 10,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLaSombra/LaManzanaPerdidaYElProyector"
+  },
+  {
+    "slug": "el-carro-de-sombras-animadas",
+    "nombre": "¡El Carro De Sombras Animadas!",
+    "carpeta": "ElCarroDeSombrasAnimadas",
+    "padre": "BuscaLaSombra",
+    "slugAntiguo": "busca-la-sombra",
+    "tematicaId": 10,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLaSombra/ElCarroDeSombrasAnimadas"
+  },
+  {
+    "slug": "la-mariposa-magica-y-el-misterio-de-la-luz",
+    "nombre": "La Mariposa Mágica Y El Misterio De La Luz",
+    "carpeta": "LaMariposaMagicaYElMisterioDeLaLuz",
+    "padre": "BuscaLaSombra",
+    "slugAntiguo": "busca-la-sombra",
+    "tematicaId": 10,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLaSombra/LaMariposaMagicaYElMisterioDeLaLuz"
+  },
+  {
+    "slug": "escaner-de-la-mariposa-magica",
+    "nombre": "Escáner De La Mariposa Mágica",
+    "carpeta": "EscanerDeLaMariposaMagica",
+    "padre": "BuscaLaSombra",
+    "slugAntiguo": "busca-la-sombra",
+    "tematicaId": 10,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLaSombra/EscanerDeLaMariposaMagica"
+  },
+  {
+    "slug": "el-misterio-del-conejo-y-los-animales-del-bosque",
+    "nombre": "El Misterio Del Conejo Y Los Animales Del Bosque",
+    "carpeta": "ElMisterioDelConejoYLosAnimalesDelBosque",
+    "padre": "BuscaLaSombra",
+    "slugAntiguo": "busca-la-sombra",
+    "tematicaId": 10,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLaSombra/ElMisterioDelConejoYLosAnimalesDelBosque"
+  },
+  {
+    "slug": "foco-discriminacion-de-formas-geometricas-aereas-y-proporciones",
+    "nombre": "**foco:** Discriminación De Formas Geométricas Aéreas Y Proporciones.",
+    "carpeta": "FocoDiscriminacionDeFormasGeometricasAereasYProporciones",
+    "padre": "BuscaLaSombra",
+    "slugAntiguo": "busca-la-sombra",
+    "tematicaId": 10,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLaSombra/FocoDiscriminacionDeFormasGeometricasAereasYProporciones"
+  },
+  {
+    "slug": "el-ala-magica-de-la-mariposa",
+    "nombre": "¡El Ala Mágica De La Mariposa!",
+    "carpeta": "ElAlaMagicaDeLaMariposa",
+    "padre": "CompletaLaFigura",
+    "slugAntiguo": "completa-la-figura",
+    "tematicaId": 11,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/CompletaLaFigura/ElAlaMagicaDeLaMariposa"
+  },
+  {
+    "slug": "el-rescate-en-el-lodo-y-taller-de-llantas",
+    "nombre": "¡El Rescate En El Lodo Y Taller De Llantas!",
+    "carpeta": "ElRescateEnElLodoYTallerDeLlantas",
+    "padre": "CompletaLaFigura",
+    "slugAntiguo": "completa-la-figura",
+    "tematicaId": 11,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/CompletaLaFigura/ElRescateEnElLodoYTallerDeLlantas"
+  },
+  {
+    "slug": "el-techo-de-la-casita-del-parque",
+    "nombre": "¡El Techo De La Casita Del Parque!",
+    "carpeta": "ElTechoDeLaCasitaDelParque",
+    "padre": "CompletaLaFigura",
+    "slugAntiguo": "completa-la-figura",
+    "tematicaId": 11,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/CompletaLaFigura/ElTechoDeLaCasitaDelParque"
+  },
+  {
+    "slug": "el-escaner-de-simetria-de-la-mariposa-magica",
+    "nombre": "¡El Escáner De Simetría De La Mariposa Mágica!",
+    "carpeta": "ElEscanerDeSimetriaDeLaMariposaMagica",
+    "padre": "CompletaLaFigura",
+    "slugAntiguo": "completa-la-figura",
+    "tematicaId": 11,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/CompletaLaFigura/ElEscanerDeSimetriaDeLaMariposaMagica"
+  },
+  {
+    "slug": "el-ajuste-de-diametro-en-el-carro-de-pruebas",
+    "nombre": "¡El Ajuste De Diámetro En El Carro De Pruebas!",
+    "carpeta": "ElAjusteDeDiametroEnElCarroDePruebas",
+    "padre": "CompletaLaFigura",
+    "slugAntiguo": "completa-la-figura",
+    "tematicaId": 11,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/CompletaLaFigura/ElAjusteDeDiametroEnElCarroDePruebas"
+  },
+  {
+    "slug": "el-ensamblaje-arquitectonico-de-la-casa",
+    "nombre": "¡El Ensamblaje Arquitectónico De La Casa!",
+    "carpeta": "ElEnsamblajeArquitectonicoDeLaCasa",
+    "padre": "CompletaLaFigura",
+    "slugAntiguo": "completa-la-figura",
+    "tematicaId": 11,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/CompletaLaFigura/ElEnsamblajeArquitectonicoDeLaCasa"
+  },
+  {
+    "slug": "donde-quedo-el-sol",
+    "nombre": "¿Dónde Quedó El Sol?",
+    "carpeta": "DondeQuedoElSol",
+    "padre": "BuscaLasDiferencias",
+    "slugAntiguo": "busca-las-diferencias",
+    "tematicaId": 12,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/DondeQuedoElSol"
+  },
+  {
+    "slug": "la-flor-perdida",
+    "nombre": "La Flor Perdida",
+    "carpeta": "LaFlorPerdida",
+    "padre": "BuscaLasDiferencias",
+    "slugAntiguo": "busca-las-diferencias",
+    "tematicaId": 12,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaFlorPerdida"
+  },
+  {
+    "slug": "la-pelota-traviesa",
+    "nombre": "La Pelota Traviesa",
+    "carpeta": "LaPelotaTraviesa",
+    "padre": "BuscaLasDiferencias",
+    "slugAntiguo": "busca-las-diferencias",
+    "tematicaId": 12,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaPelotaTraviesa"
+  },
+  {
+    "slug": "el-sol-faltante-en-el-cielo",
+    "nombre": "¡El Sol Faltante En El Cielo!",
+    "carpeta": "ElSolFaltanteEnElCielo",
+    "padre": "BuscaLasDiferencias",
+    "slugAntiguo": "busca-las-diferencias",
+    "tematicaId": 12,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/ElSolFaltanteEnElCielo"
+  },
+  {
+    "slug": "la-pelota-traviesa-2",
+    "nombre": "La Pelota Traviesa",
+    "carpeta": "LaPelotaTraviesa2",
+    "padre": "BuscaLasDiferencias",
+    "slugAntiguo": "busca-las-diferencias",
+    "tematicaId": 12,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaPelotaTraviesa2"
+  },
+  {
+    "slug": "la-flor-faltante-en-el-jardin",
+    "nombre": "La Flor Faltante En El Jardín",
+    "carpeta": "LaFlorFaltanteEnElJardin",
+    "padre": "BuscaLasDiferencias",
+    "slugAntiguo": "busca-las-diferencias",
+    "tematicaId": 12,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaFlorFaltanteEnElJardin"
+  },
+  {
+    "slug": "la-hoja-perdida-del-arbol",
+    "nombre": "La Hoja Perdida Del Árbol",
+    "carpeta": "LaHojaPerdidaDelArbol",
+    "padre": "BuscaLasDiferencias",
+    "slugAntiguo": "busca-las-diferencias",
+    "tematicaId": 12,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaHojaPerdidaDelArbol"
+  },
+  {
+    "slug": "mochila",
+    "nombre": "Mochila",
+    "carpeta": "Mochila",
+    "padre": "MemoriaVisual",
+    "slugAntiguo": "memoria-visual",
+    "tematicaId": 13,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaVisual/Mochila"
+  },
+  {
+    "slug": "hoja",
+    "nombre": "Hoja",
+    "carpeta": "Hoja",
+    "padre": "MemoriaVisual",
+    "slugAntiguo": "memoria-visual",
+    "tematicaId": 13,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaVisual/Hoja"
+  },
+  {
+    "slug": "globos",
+    "nombre": "Globos",
+    "carpeta": "Globos",
+    "padre": "MemoriaVisual",
+    "slugAntiguo": "memoria-visual",
+    "tematicaId": 13,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaVisual/Globos"
+  },
+  {
+    "slug": "caminito",
+    "nombre": "Caminito",
+    "carpeta": "Caminito",
+    "padre": "MemoriaVisual",
+    "slugAntiguo": "memoria-visual",
+    "tematicaId": 13,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaVisual/Caminito"
+  },
+  {
+    "slug": "vitrina",
+    "nombre": "Vitrina",
+    "carpeta": "Vitrina",
+    "padre": "MemoriaVisual",
+    "slugAntiguo": "memoria-visual",
+    "tematicaId": 13,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaVisual/Vitrina"
+  },
+  {
+    "slug": "desaparecido",
+    "nombre": "Desaparecido",
+    "carpeta": "Desaparecido",
+    "padre": "MemoriaVisual",
+    "slugAntiguo": "memoria-visual",
+    "tematicaId": 13,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaVisual/Desaparecido"
+  },
+  {
+    "slug": "posiciones",
+    "nombre": "Posiciones",
+    "carpeta": "Posiciones",
+    "padre": "MemoriaVisual",
+    "slugAntiguo": "memoria-visual",
+    "tematicaId": 13,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaVisual/Posiciones"
+  },
+  {
+    "slug": "sonidos-de-animales",
+    "nombre": "Sonidos De Animales",
+    "carpeta": "SonidosDeAnimales",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/SonidosDeAnimales"
+  },
+  {
+    "slug": "otros-sonidos-de-animales",
+    "nombre": "Otros Sonidos De Animales",
+    "carpeta": "OtrosSonidosDeAnimales",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/OtrosSonidosDeAnimales"
+  },
+  {
+    "slug": "otros-sonidos-de-la-naturaleza",
+    "nombre": "Otros Sonidos De La Naturaleza",
+    "carpeta": "OtrosSonidosDeLaNaturaleza",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/OtrosSonidosDeLaNaturaleza"
+  },
+  {
+    "slug": "sonidos-de-objetos",
+    "nombre": "Sonidos De Objetos",
+    "carpeta": "SonidosDeObjetos",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/SonidosDeObjetos"
+  },
+  {
+    "slug": "que-sonido-escuchas",
+    "nombre": "¿Qué Sonido Escuchas?",
+    "carpeta": "QueSonidoEscuchas",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/QueSonidoEscuchas"
+  },
+  {
+    "slug": "que-sonido-es",
+    "nombre": "¿Qué Sonido Es?",
+    "carpeta": "QueSonidoEs",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/QueSonidoEs"
+  },
+  {
+    "slug": "sonidos-similares",
+    "nombre": "Sonidos Similares",
+    "carpeta": "SonidosSimilares",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/SonidosSimilares"
+  },
+  {
+    "slug": "escucha-y-recuerda",
+    "nombre": "Escucha Y Recuerda",
+    "carpeta": "EscuchaYRecuerda",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/EscuchaYRecuerda"
+  },
+  {
+    "slug": "que-sonido-falta",
+    "nombre": "¿Qué Sonido Falta?",
+    "carpeta": "QueSonidoFalta",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/QueSonidoFalta"
+  },
+  {
+    "slug": "la-mision-final",
+    "nombre": "La Mision Final",
+    "carpeta": "LaMisionFinal",
+    "padre": "QueSonidoEscuchas",
+    "slugAntiguo": "que-sonido-escuchas",
+    "tematicaId": 14,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/QueSonidoEscuchas/LaMisionFinal"
+  },
+  {
+    "slug": "donde-esta-el-perro",
+    "nombre": "¿Donde Está El Perro?",
+    "carpeta": "DondeEstaElPerro",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/DondeEstaElPerro"
+  },
+  {
+    "slug": "encuentra-la-trompeta",
+    "nombre": "Encuentra La Trompeta",
+    "carpeta": "EncuentraLaTrompeta",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/EncuentraLaTrompeta"
+  },
+  {
+    "slug": "donde-esta-el-pajaro",
+    "nombre": "¿Donde Está El Pajaro?",
+    "carpeta": "DondeEstaElPajaro",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/DondeEstaElPajaro"
+  },
+  {
+    "slug": "encuentra-el-sonido-de-la-lluvia",
+    "nombre": "Encuentra El Sonido De La Lluvia",
+    "carpeta": "EncuentraElSonidoDeLaLluvia",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/EncuentraElSonidoDeLaLluvia"
+  },
+  {
+    "slug": "encuentra-el-sonido",
+    "nombre": "Encuentra El Sonido",
+    "carpeta": "EncuentraElSonido",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/EncuentraElSonido"
+  },
+  {
+    "slug": "localiza-el-sonido",
+    "nombre": "Localiza El Sonido",
+    "carpeta": "LocalizaElSonido",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/LocalizaElSonido"
+  },
+  {
+    "slug": "sonidos-en-diferentes-lugares",
+    "nombre": "Sonidos En Diferentes Lugares",
+    "carpeta": "SonidosEnDiferentesLugares",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/SonidosEnDiferentesLugares"
+  },
+  {
+    "slug": "encuentra-el-sonido-entre-distractores",
+    "nombre": "Encuentra El Sonido Entre Distractores",
+    "carpeta": "EncuentraElSonidoEntreDistractores",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/EncuentraElSonidoEntreDistractores"
+  },
+  {
+    "slug": "el-sonido-viajero",
+    "nombre": "El Sonido Viajero",
+    "carpeta": "ElSonidoViajero",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/ElSonidoViajero"
+  },
+  {
+    "slug": "mision-final-donde-esta",
+    "nombre": "Misión Final ¿Donde Está?",
+    "carpeta": "MisionFinalDondeEsta",
+    "padre": "EncuentraElSonido",
+    "slugAntiguo": "encuentra-el-sonido",
+    "tematicaId": 15,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraElSonido/MisionFinalDondeEsta"
+  },
+  {
+    "slug": "dos-sonidos",
+    "nombre": "Dos Sonidos",
+    "carpeta": "DosSonidos",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/DosSonidos"
+  },
+  {
+    "slug": "dos-instrumentos",
+    "nombre": "Dos Instrumentos",
+    "carpeta": "DosInstrumentos",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/DosInstrumentos"
+  },
+  {
+    "slug": "tres-sonidos",
+    "nombre": "Tres Sonidos",
+    "carpeta": "TresSonidos",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/TresSonidos"
+  },
+  {
+    "slug": "secuencia-con-distractor",
+    "nombre": "Secuencia Con Distractor",
+    "carpeta": "SecuenciaConDistractor",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/SecuenciaConDistractor"
+  },
+  {
+    "slug": "gran-secuencia-final",
+    "nombre": "Gran Secuencia Final",
+    "carpeta": "GranSecuenciaFinal",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/GranSecuenciaFinal"
+  },
+  {
+    "slug": "secuencia-de-3-sonidos",
+    "nombre": "Secuencia De 3 Sonidos",
+    "carpeta": "SecuenciaDe3Sonidos",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/SecuenciaDe3Sonidos"
+  },
+  {
+    "slug": "secuencia-de-3-sonidos-diferentes",
+    "nombre": "Secuencia De 3 Sonidos Diferentes",
+    "carpeta": "SecuenciaDe3SonidosDiferentes",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/SecuenciaDe3SonidosDiferentes"
+  },
+  {
+    "slug": "secuencia-de-4-sonidos",
+    "nombre": "Secuencia De 4 Sonidos",
+    "carpeta": "SecuenciaDe4Sonidos",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/SecuenciaDe4Sonidos"
+  },
+  {
+    "slug": "secuencia-con-cambio",
+    "nombre": "Secuencia Con Cambio",
+    "carpeta": "SecuenciaConCambio",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/SecuenciaConCambio"
+  },
+  {
+    "slug": "el-gran-codigo-secreto",
+    "nombre": "El Gran Codigo Secreto",
+    "carpeta": "ElGranCodigoSecreto",
+    "padre": "RepiteLaSecuencia",
+    "slugAntiguo": "repite-la-secuencia",
+    "tematicaId": 16,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/RepiteLaSecuencia/ElGranCodigoSecreto"
+  },
+  {
+    "slug": "que-escuchaste",
+    "nombre": "¿Qué Escuchaste?",
+    "carpeta": "QueEscuchaste",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/QueEscuchaste"
+  },
+  {
+    "slug": "recuerda-dos-sonidos",
+    "nombre": "Recuerda Dos Sonidos",
+    "carpeta": "RecuerdaDosSonidos",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/RecuerdaDosSonidos"
+  },
+  {
+    "slug": "que-sonido-se-repitio",
+    "nombre": "¿Qué Sonido Se Repitió?",
+    "carpeta": "QueSonidoSeRepitio",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/QueSonidoSeRepitio"
+  },
+  {
+    "slug": "que-sonido-desaparecio",
+    "nombre": "¿Qué Sonido Desapareció?",
+    "carpeta": "QueSonidoDesaparecio",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/QueSonidoDesaparecio"
+  },
+  {
+    "slug": "recuerda-el-sonido",
+    "nombre": "Recuerda El Sonido",
+    "carpeta": "RecuerdaElSonido",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/RecuerdaElSonido"
+  },
+  {
+    "slug": "recuerda-los-sonidos",
+    "nombre": "Recuerda Los Sonidos",
+    "carpeta": "RecuerdaLosSonidos",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/RecuerdaLosSonidos"
+  },
+  {
+    "slug": "el-sonido-repetido",
+    "nombre": "El Sonido Repetido",
+    "carpeta": "ElSonidoRepetido",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/ElSonidoRepetido"
+  },
+  {
+    "slug": "que-cambio",
+    "nombre": "¿Qué Cambió?",
+    "carpeta": "QueCambio",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/QueCambio"
+  },
+  {
+    "slug": "que-sonido-cambia",
+    "nombre": "¿Qué Sonido Cambia?",
+    "carpeta": "QueSonidoCambia",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/QueSonidoCambia"
+  },
+  {
+    "slug": "el-gran-desafio-de-memoria",
+    "nombre": "El Gran Desafío De Memoria",
+    "carpeta": "ElGranDesafioDeMemoria",
+    "padre": "MemoriaAuditiva",
+    "slugAntiguo": "memoria-auditiva",
+    "tematicaId": 17,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/MemoriaAuditiva/ElGranDesafioDeMemoria"
+  },
+  {
+    "slug": "que-suena",
+    "nombre": "¿Que Suena?",
+    "carpeta": "QueSuena",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/QueSuena"
+  },
+  {
+    "slug": "que-objeto-suena",
+    "nombre": "¿Qué Objeto Suena!",
+    "carpeta": "QueObjetoSuena",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/QueObjetoSuena"
+  },
+  {
+    "slug": "escucha-y-asocia",
+    "nombre": "Escucha Y Asocia",
+    "carpeta": "EscuchaYAsocia",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/EscuchaYAsocia"
+  },
+  {
+    "slug": "un-sonido-de-viaje",
+    "nombre": "Un Sonido De Viaje",
+    "carpeta": "UnSonidoDeViaje",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/UnSonidoDeViaje"
+  },
+  {
+    "slug": "que-escuchaste-2",
+    "nombre": "¿Qué Escuchaste?",
+    "carpeta": "QueEscuchaste",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/QueEscuchaste"
+  },
+  {
+    "slug": "sonido-y-objeto",
+    "nombre": "Sonido Y Objeto",
+    "carpeta": "SonidoYObjeto",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/SonidoYObjeto"
+  },
+  {
+    "slug": "sonido-de-una-maquina",
+    "nombre": "Sonido De Una Máquina",
+    "carpeta": "SonidoDeUnaMaquina",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/SonidoDeUnaMaquina"
+  },
+  {
+    "slug": "sonido-de-transporte",
+    "nombre": "Sonido De Transporte",
+    "carpeta": "SonidoDeTransporte",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/SonidoDeTransporte"
+  },
+  {
+    "slug": "sonido-de-una-accion",
+    "nombre": "Sonido De Una Acción",
+    "carpeta": "SonidoDeUnaAccion",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/SonidoDeUnaAccion"
+  },
+  {
+    "slug": "sonido-del-agua",
+    "nombre": "Sonido Del Agua",
+    "carpeta": "SonidoDelAgua",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/SonidoDelAgua"
+  },
+  {
+    "slug": "la-gran-asociacion",
+    "nombre": "La Gran Asociación",
+    "carpeta": "LaGranAsociacion",
+    "padre": "AsociaSonidoEImagen",
+    "slugAntiguo": "asocia-sonido-e-imagen",
+    "tematicaId": 18,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/AsociaSonidoEImagen/LaGranAsociacion"
+  },
+  {
+    "slug": "buscando-la-textura-suave-como-el-algodon",
+    "nombre": "¡Buscando La Textura Suave Como El Algodón!",
+    "carpeta": "BuscandoLaTexturaSuaveComoElAlgodon",
+    "padre": "EncuentraLaTextura",
+    "slugAntiguo": "encuentra-la-textura",
+    "tematicaId": 19,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaTextura/BuscandoLaTexturaSuaveComoElAlgodon"
+  },
+  {
+    "slug": "buscando-la-textura-aspera-de-la-lija",
+    "nombre": "¡Buscando La Textura Áspera De La Lija!",
+    "carpeta": "BuscandoLaTexturaAsperaDeLaLija",
+    "padre": "EncuentraLaTextura",
+    "slugAntiguo": "encuentra-la-textura",
+    "tematicaId": 19,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaTextura/BuscandoLaTexturaAsperaDeLaLija"
+  },
+  {
+    "slug": "buscando-la-textura-lisa-de-la-piedra-del-rio",
+    "nombre": "¡Buscando La Textura Lisa De La Piedra Del Río!",
+    "carpeta": "BuscandoLaTexturaLisaDeLaPiedraDelRio",
+    "padre": "EncuentraLaTextura",
+    "slugAntiguo": "encuentra-la-textura",
+    "tematicaId": 19,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaTextura/BuscandoLaTexturaLisaDeLaPiedraDelRio"
+  },
+  {
+    "slug": "el-sillon-incomodo-de-zeus",
+    "nombre": "¡El Sillón Incómodo De Zeus!",
+    "carpeta": "ElSillonIncomodoDeZeus",
+    "padre": "EncuentraLaTextura",
+    "slugAntiguo": "encuentra-la-textura",
+    "tematicaId": 19,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaTextura/ElSillonIncomodoDeZeus"
+  },
+  {
+    "slug": "la-mesa-magica-de-madera-rustica",
+    "nombre": "¡La Mesa Mágica De Madera Rústica!",
+    "carpeta": "LaMesaMagicaDeMaderaRustica",
+    "padre": "EncuentraLaTextura",
+    "slugAntiguo": "encuentra-la-textura",
+    "tematicaId": 19,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaTextura/LaMesaMagicaDeMaderaRustica"
+  },
+  {
+    "slug": "frotado-artistico-de-la-naturaleza",
+    "nombre": "¡Frotado Artístico De La Naturaleza!",
+    "carpeta": "FrotadoArtisticoDeLaNaturaleza",
+    "padre": "EncuentraLaTextura",
+    "slugAntiguo": "encuentra-la-textura",
+    "tematicaId": 19,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaTextura/FrotadoArtisticoDeLaNaturaleza"
+  },
+  {
+    "slug": "el-peluche-esponjoso",
+    "nombre": "¡El Peluche Esponjoso!",
+    "carpeta": "ElPelucheEsponjoso",
+    "padre": "SuaveOAspero",
+    "slugAntiguo": "suave-o-aspero",
+    "tematicaId": 20,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/SuaveOAspero/ElPelucheEsponjoso"
+  },
+  {
+    "slug": "la-hoja-de-lija-rugosa",
+    "nombre": "¡La Hoja De Lija Rugosa!",
+    "carpeta": "LaHojaDeLijaRugosa",
+    "padre": "SuaveOAspero",
+    "slugAntiguo": "suave-o-aspero",
+    "tematicaId": 20,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/SuaveOAspero/LaHojaDeLijaRugosa"
+  },
+  {
+    "slug": "el-copo-de-algodon-magico",
+    "nombre": "¡El Copo De Algodón Mágico!",
+    "carpeta": "ElCopoDeAlgodonMagico",
+    "padre": "SuaveOAspero",
+    "slugAntiguo": "suave-o-aspero",
+    "tematicaId": 20,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/SuaveOAspero/ElCopoDeAlgodonMagico"
+  },
+  {
+    "slug": "el-oso-de-peluche",
+    "nombre": "¡El Oso De Peluche!",
+    "carpeta": "ElOsoDePeluche",
+    "padre": "SuaveOAspero",
+    "slugAntiguo": "suave-o-aspero",
+    "tematicaId": 20,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/SuaveOAspero/ElOsoDePeluche"
+  },
+  {
+    "slug": "la-hoja-de-lija",
+    "nombre": "¡La Hoja De Lija!",
+    "carpeta": "LaHojaDeLija",
+    "padre": "SuaveOAspero",
+    "slugAntiguo": "suave-o-aspero",
+    "tematicaId": 20,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/SuaveOAspero/LaHojaDeLija"
+  },
+  {
+    "slug": "el-copo-de-algodon",
+    "nombre": "¡El Copo De Algodón!",
+    "carpeta": "ElCopoDeAlgodon",
+    "padre": "SuaveOAspero",
+    "slugAntiguo": "suave-o-aspero",
+    "tematicaId": 20,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/SuaveOAspero/ElCopoDeAlgodon"
+  },
+  {
+    "slug": "la-corteza-de-arbol",
+    "nombre": "¡La Corteza De Árbol!",
+    "carpeta": "LaCortezaDeArbol",
+    "padre": "SuaveOAspero",
+    "slugAntiguo": "suave-o-aspero",
+    "tematicaId": 20,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/SuaveOAspero/LaCortezaDeArbol"
+  },
+  {
+    "slug": "el-festin-de-la-cesta-nube",
+    "nombre": "¡El Festín De La Cesta Nube!",
+    "carpeta": "ElFestinDeLaCestaNube",
+    "padre": "ClasificaPorTextura",
+    "slugAntiguo": "clasifica-por-textura",
+    "tematicaId": 21,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorTextura/ElFestinDeLaCestaNube"
+  },
+  {
+    "slug": "la-coleccion-de-la-cesta-roca",
+    "nombre": "¡La Colección De La Cesta Roca!",
+    "carpeta": "LaColeccionDeLaCestaRoca",
+    "padre": "ClasificaPorTextura",
+    "slugAntiguo": "clasifica-por-textura",
+    "tematicaId": 21,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorTextura/LaColeccionDeLaCestaRoca"
+  },
+  {
+    "slug": "el-gran-granero-de-texturas",
+    "nombre": "¡El Gran Granero De Texturas!",
+    "carpeta": "ElGranGraneroDeTexturas",
+    "padre": "ClasificaPorTextura",
+    "slugAntiguo": "clasifica-por-textura",
+    "tematicaId": 21,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorTextura/ElGranGraneroDeTexturas"
+  },
+  {
+    "slug": "clasificacion-en-el-modulo-suave",
+    "nombre": "¡Clasificación En El Módulo Suave!",
+    "carpeta": "ClasificacionEnElModuloSuave",
+    "padre": "ClasificaPorTextura",
+    "slugAntiguo": "clasifica-por-textura",
+    "tematicaId": 21,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorTextura/ClasificacionEnElModuloSuave"
+  },
+  {
+    "slug": "clasificacion-en-la-tolva-aspera",
+    "nombre": "¡Clasificación En La Tolva Áspera!",
+    "carpeta": "ClasificacionEnLaTolvaAspera",
+    "padre": "ClasificaPorTextura",
+    "slugAntiguo": "clasifica-por-textura",
+    "tematicaId": 21,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorTextura/ClasificacionEnLaTolvaAspera"
+  },
+  {
+    "slug": "deslizamiento-en-el-modulo-liso",
+    "nombre": "¡Deslizamiento En El Módulo Liso!",
+    "carpeta": "DeslizamientoEnElModuloLiso",
+    "padre": "ClasificaPorTextura",
+    "slugAntiguo": "clasifica-por-textura",
+    "tematicaId": 21,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorTextura/DeslizamientoEnElModuloLiso"
+  },
+  {
+    "slug": "prueba-de-baches-en-el-modulo-rugoso",
+    "nombre": "¡Prueba De Baches En El Módulo Rugoso!",
+    "carpeta": "PruebaDeBachesEnElModuloRugoso",
+    "padre": "ClasificaPorTextura",
+    "slugAntiguo": "clasifica-por-textura",
+    "tematicaId": 21,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorTextura/PruebaDeBachesEnElModuloRugoso"
+  },
+  {
+    "slug": "buscando-la-pareja-suave-del-algodon",
+    "nombre": "¡Buscando La Pareja Suave Del Algodón!",
+    "carpeta": "BuscandoLaParejaSuaveDelAlgodon",
+    "padre": "RelacionaIguales",
+    "slugAntiguo": "relaciona-iguales",
+    "tematicaId": 22,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/RelacionaIguales/BuscandoLaParejaSuaveDelAlgodon"
+  },
+  {
+    "slug": "buscando-la-pareja-rasposa-de-la-lija",
+    "nombre": "¡Buscando La Pareja Rasposa De La Lija!",
+    "carpeta": "BuscandoLaParejaRasposaDeLaLija",
+    "padre": "RelacionaIguales",
+    "slugAntiguo": "relaciona-iguales",
+    "tematicaId": 22,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/RelacionaIguales/BuscandoLaParejaRasposaDeLaLija"
+  },
+  {
+    "slug": "buscando-la-pareja-delicada-de-la-seda",
+    "nombre": "¡Buscando La Pareja Delicada De La Seda!",
+    "carpeta": "BuscandoLaParejaDelicadaDeLaSeda",
+    "padre": "RelacionaIguales",
+    "slugAntiguo": "relaciona-iguales",
+    "tematicaId": 22,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/RelacionaIguales/BuscandoLaParejaDelicadaDeLaSeda"
+  },
+  {
+    "slug": "buscando-la-pareja-pulida-del-vidrio",
+    "nombre": "¡Buscando La Pareja Pulida Del Vidrio!",
+    "carpeta": "BuscandoLaParejaPulidaDelVidrio",
+    "padre": "RelacionaIguales",
+    "slugAntiguo": "relaciona-iguales",
+    "tematicaId": 22,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/RelacionaIguales/BuscandoLaParejaPulidaDelVidrio"
+  },
+  {
+    "slug": "identificacion-de-la-textura-muelle",
+    "nombre": "Identificación De La Textura Muelle",
+    "carpeta": "IdentificacionDeLaTexturaMuelle",
+    "padre": "RelacionaIguales",
+    "slugAntiguo": "relaciona-iguales",
+    "tematicaId": 22,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/RelacionaIguales/IdentificacionDeLaTexturaMuelle"
+  },
+  {
+    "slug": "identificacion-de-la-textura-abrasiva",
+    "nombre": "Identificación De La Textura Abrasiva",
+    "carpeta": "IdentificacionDeLaTexturaAbrasiva",
+    "padre": "RelacionaIguales",
+    "slugAntiguo": "relaciona-iguales",
+    "tematicaId": 22,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/RelacionaIguales/IdentificacionDeLaTexturaAbrasiva"
+  },
+  {
+    "slug": "identificacion-de-la-textura-sedosa",
+    "nombre": "Identificación De La Textura Sedosa",
+    "carpeta": "IdentificacionDeLaTexturaSedosa",
+    "padre": "RelacionaIguales",
+    "slugAntiguo": "relaciona-iguales",
+    "tematicaId": 22,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/RelacionaIguales/IdentificacionDeLaTexturaSedosa"
+  },
+  {
+    "slug": "identificacion-de-la-textura-pulida-y-lisa",
+    "nombre": "Identificación De La Textura Pulida Y Lisa",
+    "carpeta": "IdentificacionDeLaTexturaPulidaYLisa",
+    "padre": "RelacionaIguales",
+    "slugAntiguo": "relaciona-iguales",
+    "tematicaId": 22,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/RelacionaIguales/IdentificacionDeLaTexturaPulidaYLisa"
+  },
+  {
+    "slug": "identificacion-de-la-textura-porosa-y-flexible",
+    "nombre": "Identificación De La Textura Porosa Y Flexible",
+    "carpeta": "IdentificacionDeLaTexturaPorosaYFlexible",
+    "padre": "RelacionaIguales",
+    "slugAntiguo": "relaciona-iguales",
+    "tematicaId": 22,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/RelacionaIguales/IdentificacionDeLaTexturaPorosaYFlexible"
+  },
+  {
+    "slug": "descubre-el-objeto-escondido",
+    "nombre": "¡Descubre El Objeto Escondido!",
+    "carpeta": "DescubreElObjetoEscondido",
+    "padre": "DescubreElObjeto",
+    "slugAntiguo": "descubre-el-objeto",
+    "tematicaId": 23,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/DescubreElObjeto/DescubreElObjetoEscondido"
+  },
+  {
+    "slug": "descubre-el-objeto-escondido-2",
+    "nombre": "¡Descubre El Objeto Escondido!",
+    "carpeta": "DescubreElObjetoEscondido2",
+    "padre": "DescubreElObjeto",
+    "slugAntiguo": "descubre-el-objeto",
+    "tematicaId": 23,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/DescubreElObjeto/DescubreElObjetoEscondido2"
+  },
+  {
+    "slug": "descubre-el-objeto-escondido-3",
+    "nombre": "¡Descubre El Objeto Escondido!",
+    "carpeta": "DescubreElObjetoEscondido3",
+    "padre": "DescubreElObjeto",
+    "slugAntiguo": "descubre-el-objeto",
+    "tematicaId": 23,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/DescubreElObjeto/DescubreElObjetoEscondido3"
+  },
+  {
+    "slug": "descifrando-la-pista-del-oso-de-peluche",
+    "nombre": "Descifrando La Pista Del Oso De Peluche",
+    "carpeta": "DescifrandoLaPistaDelOsoDePeluche",
+    "padre": "DescubreElObjeto",
+    "slugAntiguo": "descubre-el-objeto",
+    "tematicaId": 23,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/DescubreElObjeto/DescifrandoLaPistaDelOsoDePeluche"
+  },
+  {
+    "slug": "descifrando-la-pista-de-la-corteza",
+    "nombre": "Descifrando La Pista De La Corteza",
+    "carpeta": "DescifrandoLaPistaDeLaCorteza",
+    "padre": "DescubreElObjeto",
+    "slugAntiguo": "descubre-el-objeto",
+    "tematicaId": 23,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/DescubreElObjeto/DescifrandoLaPistaDeLaCorteza"
+  },
+  {
+    "slug": "laboratorio-de-limpieza-y-revelado-tactil",
+    "nombre": "\"laboratorio De Limpieza Y Revelado Táctil\"",
+    "carpeta": "LaboratorioDeLimpiezaYReveladoTactil",
+    "padre": "DescubreElObjeto",
+    "slugAntiguo": "descubre-el-objeto",
+    "tematicaId": 23,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/DescubreElObjeto/LaboratorioDeLimpiezaYReveladoTactil"
+  },
+  {
+    "slug": "con-que-sentido-sentimos-la-campana-estimulo-sonoro-asociacion-con-el-senti",
+    "nombre": "¿Con Qué Sentido Sentimos La Campana?: Estímulo Sonoro | Asociación Con El Senti",
+    "carpeta": "ConQueSentidoSentimosLaCampanaEstimuloSonoroAsociacionConElSenti",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja",
+    "tematicaId": 24,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosLaCampanaEstimuloSonoroAsociacionConElSenti"
+  },
+  {
+    "slug": "con-que-sentido-sentimos-la-flor-estimulo-olfativo-asociacion-con-el-sentid",
+    "nombre": "¿Con Qué Sentido Sentimos La Flor?: Estímulo Olfativo | Asociación Con El Sentid",
+    "carpeta": "ConQueSentidoSentimosLaFlorEstimuloOlfativoAsociacionConElSentid",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja",
+    "tematicaId": 24,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosLaFlorEstimuloOlfativoAsociacionConElSentid"
+  },
+  {
+    "slug": "con-que-sentido-sentimos-el-heladoestimulo-gustativo-asociacion-con-el-sent",
+    "nombre": "¿Con Qué Sentido Sentimos El Helado?:estímulo Gustativo | Asociación Con El Sent",
+    "carpeta": "ConQueSentidoSentimosElHeladoEstimuloGustativoAsociacionConElSent",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja",
+    "tematicaId": 24,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosElHeladoEstimuloGustativoAsociacionConElSent"
+  },
+  {
+    "slug": "con-que-sentido-sentimos-el-sol-estimulo-luminosovisual-asociacion-con-el",
+    "nombre": "¿Con Qué Sentido Sentimos El Sol?: Estímulo Luminoso/visual | Asociación Con El",
+    "carpeta": "ConQueSentidoSentimosElSolEstimuloLuminosoVisualAsociacionConEl",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja",
+    "tematicaId": 24,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosElSolEstimuloLuminosoVisualAsociacionConEl"
+  },
+  {
+    "slug": "conectando-la-campana",
+    "nombre": "Conectando La Campana",
+    "carpeta": "ConectandoLaCampana",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja",
+    "tematicaId": 24,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoLaCampana"
+  },
+  {
+    "slug": "conectando-la-flor",
+    "nombre": "Conectando La Flor",
+    "carpeta": "ConectandoLaFlor",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja",
+    "tematicaId": 24,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoLaFlor"
+  },
+  {
+    "slug": "conectando-el-helado",
+    "nombre": "Conectando El Helado",
+    "carpeta": "ConectandoElHelado",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja",
+    "tematicaId": 24,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoElHelado"
+  },
+  {
+    "slug": "conectando-el-sol",
+    "nombre": "Conectando El Sol",
+    "carpeta": "ConectandoElSol",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja",
+    "tematicaId": 24,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoElSol"
+  },
+  {
+    "slug": "cual-objeto-es-el-intruso-que-no-estaba-antesmemoria-de-trabajo-reconocimien",
+    "nombre": "¿Cuál Objeto Es El Intruso Que No Estaba Antes?:memoria De Trabajo: Reconocimien",
+    "carpeta": "CualObjetoEsElIntrusoQueNoEstabaAntesMemoriaDeTrabajoReconocimien",
+    "padre": "ObservaYRecuerda",
+    "slugAntiguo": "observa-y-recuerda",
+    "tematicaId": 25,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/CualObjetoEsElIntrusoQueNoEstabaAntesMemoriaDeTrabajoReconocimien"
+  },
+  {
+    "slug": "cual-objeto-se-escondio-y-falta-memoria-de-trabajo-evocacion-del-elemento-au",
+    "nombre": "¿Cuál Objeto Se Escondió Y Falta?: Memoria De Trabajo: Evocación Del Elemento Au",
+    "carpeta": "CualObjetoSeEscondioYFaltaMemoriaDeTrabajoEvocacionDelElementoAu",
+    "padre": "ObservaYRecuerda",
+    "slugAntiguo": "observa-y-recuerda",
+    "tematicaId": 25,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/CualObjetoSeEscondioYFaltaMemoriaDeTrabajoEvocacionDelElementoAu"
+  },
+  {
+    "slug": "deteccion-del-objeto-intruso-memoria-de-trabajo",
+    "nombre": "Detección Del Objeto Intruso: Memoria De Trabajo",
+    "carpeta": "DeteccionDelObjetoIntrusoMemoriaDeTrabajo",
+    "padre": "ObservaYRecuerda",
+    "slugAntiguo": "observa-y-recuerda",
+    "tematicaId": 25,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/DeteccionDelObjetoIntrusoMemoriaDeTrabajo"
+  },
+  {
+    "slug": "identificacion-del-objeto-faltante-memoria-de-evocacion-ausente-identificar-el",
+    "nombre": "Identificación Del Objeto Faltante: Memoria De Evocación Ausente: Identificar El",
+    "carpeta": "IdentificacionDelObjetoFaltanteMemoriaDeEvocacionAusenteIdentificarEl",
+    "padre": "ObservaYRecuerda",
+    "slugAntiguo": "observa-y-recuerda",
+    "tematicaId": 25,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/IdentificacionDelObjetoFaltanteMemoriaDeEvocacionAusenteIdentificarEl"
+  },
+  {
+    "slug": "deteccion-de-cambio-de-posicion",
+    "nombre": "Detección De Cambio De Posición",
+    "carpeta": "DeteccionDeCambioDePosicion",
+    "padre": "ObservaYRecuerda",
+    "slugAntiguo": "observa-y-recuerda",
+    "tematicaId": 25,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/DeteccionDeCambioDePosicion"
+  },
+  {
+    "slug": "redisenado-canasta-de-la-vista",
+    "nombre": "Rediseñado: \"canasta De La Vista",
+    "carpeta": "RedisenadoCanastaDeLaVista",
+    "padre": "ClasificaPorLosSentidos",
+    "slugAntiguo": "clasifica-por-los-sentidos",
+    "tematicaId": 26,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/RedisenadoCanastaDeLaVista"
+  },
+  {
+    "slug": "canasta-del-oido",
+    "nombre": "Canasta Del Oído",
+    "carpeta": "CanastaDelOido",
+    "padre": "ClasificaPorLosSentidos",
+    "slugAntiguo": "clasifica-por-los-sentidos",
+    "tematicaId": 26,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/CanastaDelOido"
+  },
+  {
+    "slug": "canasta-del-olfato",
+    "nombre": "Canasta Del Olfato",
+    "carpeta": "CanastaDelOlfato",
+    "padre": "ClasificaPorLosSentidos",
+    "slugAntiguo": "clasifica-por-los-sentidos",
+    "tematicaId": 26,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/CanastaDelOlfato"
+  },
+  {
+    "slug": "clasificacion-doble",
+    "nombre": "Clasificación Doble",
+    "carpeta": "ClasificacionDoble",
+    "padre": "ClasificaPorLosSentidos",
+    "slugAntiguo": "clasifica-por-los-sentidos",
+    "tematicaId": 26,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/ClasificacionDoble"
+  },
+  {
+    "slug": "clasificacion-doble-2",
+    "nombre": "Clasificación Doble",
+    "carpeta": "ClasificacionDoble2",
+    "padre": "ClasificaPorLosSentidos",
+    "slugAntiguo": "clasifica-por-los-sentidos",
+    "tematicaId": 26,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/ClasificacionDoble2"
+  },
+  {
+    "slug": "multiple-discriminacion",
+    "nombre": "Múltiple Discriminación",
+    "carpeta": "MultipleDiscriminacion",
+    "padre": "ClasificaPorLosSentidos",
+    "slugAntiguo": "clasifica-por-los-sentidos",
+    "tematicaId": 26,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/MultipleDiscriminacion"
+  },
+  {
+    "slug": "el-cambio-de-color-de-la-pelota-cambio-de-atributo-cualitativo",
+    "nombre": "El Cambio De Color De La Pelota: Cambio De Atributo Cualitativo",
+    "carpeta": "ElCambioDeColorDeLaPelotaCambioDeAtributoCualitativo",
+    "padre": "QueCambio",
+    "slugAntiguo": "que-cambio",
+    "tematicaId": 27,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/QueCambio/ElCambioDeColorDeLaPelotaCambioDeAtributoCualitativo"
+  },
+  {
+    "slug": "la-desaparicion-de-la-campana-cambio-por-sustraccion-sustraccion-obvia-3-el",
+    "nombre": "La Desaparición De La Campana: Cambio Por Sustracción / Sustracción Obvia | 3 El",
+    "carpeta": "LaDesaparicionDeLaCampanaCambioPorSustraccionSustraccionObvia3El",
+    "padre": "QueCambio",
+    "slugAntiguo": "que-cambio",
+    "tematicaId": 27,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/QueCambio/LaDesaparicionDeLaCampanaCambioPorSustraccionSustraccionObvia3El"
+  },
+  {
+    "slug": "la-aparicion-de-la-estrella-cambio-por-adicion-aparicion-de-elemento-nuevo",
+    "nombre": "La Aparición De La Estrella: Cambio Por Adición / Aparición De Elemento Nuevo |",
+    "carpeta": "LaAparicionDeLaEstrellaCambioPorAdicionAparicionDeElementoNuevo",
+    "padre": "QueCambio",
+    "slugAntiguo": "que-cambio",
+    "tematicaId": 27,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisensorial/QueCambio/LaAparicionDeLaEstrellaCambioPorAdicionAparicionDeElementoNuevo"
+  },
+  {
+    "slug": "que-cambio-en-la-escena-cambio-de-atributo-cualitativo",
+    "nombre": "¿Qué Cambió En La Escena?: Cambio De Atributo Cualitativo",
+    "carpeta": "QueCambioEnLaEscenaCambioDeAtributoCualitativo",
+    "padre": "QueCambio",
+    "slugAntiguo": "que-cambio",
+    "tematicaId": 27,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisensorial/QueCambio/QueCambioEnLaEscenaCambioDeAtributoCualitativo"
+  },
+  {
+    "slug": "que-objeto-desapareciocambio-por-sustraccion-ausencia-de-elemento-4-eleme",
+    "nombre": "¿Qué Objeto Desapareció?:cambio Por Sustracción / Ausencia De Elemento | 4 Eleme",
+    "carpeta": "QueObjetoDesaparecioCambioPorSustraccionAusenciaDeElemento4Eleme",
+    "padre": "QueCambio",
+    "slugAntiguo": "que-cambio",
+    "tematicaId": 27,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisensorial/QueCambio/QueObjetoDesaparecioCambioPorSustraccionAusenciaDeElemento4Eleme"
+  },
+  {
+    "slug": "que-objeto-nuevo-apareciocambio-por-adicion-aparicion-de-elemento-intruso",
+    "nombre": "¿Qué Objeto Nuevo Apareció?:cambio Por Adición / Aparición De Elemento Intruso |",
+    "carpeta": "QueObjetoNuevoAparecioCambioPorAdicionAparicionDeElementoIntruso",
+    "padre": "QueCambio",
+    "slugAntiguo": "que-cambio",
+    "tematicaId": 27,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisensorial/QueCambio/QueObjetoNuevoAparecioCambioPorAdicionAparicionDeElementoIntruso"
+  },
+  {
+    "slug": "el-objeto-de-colores-en-el-cielo-deduccion-por-pista-visual-4-opciones",
+    "nombre": "El Objeto De Colores En El Cielo: Deducción Por Pista Visual | 4 Opciones.",
+    "carpeta": "ElObjetoDeColoresEnElCieloDeduccionPorPistaVisual4Opciones",
+    "padre": "ExploraYDescubre",
+    "slugAntiguo": "explora-y-descubre",
+    "tematicaId": 28,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisensorial/ExploraYDescubre/ElObjetoDeColoresEnElCieloDeduccionPorPistaVisual4Opciones"
+  },
+  {
+    "slug": "el-objeto-musical-ruidoso-deduccion-por-pista-auditiva-4-opciones",
+    "nombre": "El Objeto Musical Ruidoso: Deducción Por Pista Auditiva | 4 Opciones.",
+    "carpeta": "ElObjetoMusicalRuidosoDeduccionPorPistaAuditiva4Opciones",
+    "padre": "ExploraYDescubre",
+    "slugAntiguo": "explora-y-descubre",
+    "tematicaId": 28,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisensorial/ExploraYDescubre/ElObjetoMusicalRuidosoDeduccionPorPistaAuditiva4Opciones"
+  },
+  {
+    "slug": "el-objeto-de-aroma-dulce-deduccion-por-pista-olfativa-4-opciones",
+    "nombre": "El Objeto De Aroma Dulce: Deducción Por Pista Olfativa | 4 Opciones.",
+    "carpeta": "ElObjetoDeAromaDulceDeduccionPorPistaOlfativa4Opciones",
+    "padre": "ExploraYDescubre",
+    "slugAntiguo": "explora-y-descubre",
+    "tematicaId": 28,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisensorial/ExploraYDescubre/ElObjetoDeAromaDulceDeduccionPorPistaOlfativa4Opciones"
+  },
+  {
+    "slug": "el-objeto-dulce-y-frio-deduccion-por-pista-gustativatermica-4-opciones",
+    "nombre": "El Objeto Dulce Y Frío: Deducción Por Pista Gustativa/térmica | 4 Opciones.",
+    "carpeta": "ElObjetoDulceYFrioDeduccionPorPistaGustativaTermica4Opciones",
+    "padre": "ExploraYDescubre",
+    "slugAntiguo": "explora-y-descubre",
+    "tematicaId": 28,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisensorial/ExploraYDescubre/ElObjetoDulceYFrioDeduccionPorPistaGustativaTermica4Opciones"
+  },
+  {
+    "slug": "el-espectro-de-luz-deduccion-multivariable-5-opciones",
+    "nombre": "El Espectro De Luz: Deducción Multivariable | 5 Opciones",
+    "carpeta": "ElEspectroDeLuzDeduccionMultivariable5Opciones",
+    "padre": "ExploraYDescubre",
+    "slugAntiguo": "explora-y-descubre",
+    "tematicaId": 28,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisensorial/ExploraYDescubre/ElEspectroDeLuzDeduccionMultivariable5Opciones"
+  },
+  {
+    "slug": "el-instrumento-de-percusion-deduccion-por-accion-y-mecanica-del-sonido-5-opci",
+    "nombre": "El Instrumento De Percusión: Deducción Por Acción Y Mecánica Del Sonido | 5 Opci",
+    "carpeta": "ElInstrumentoDePercusionDeduccionPorAccionYMecanicaDelSonido5Opci",
+    "padre": "ExploraYDescubre",
+    "slugAntiguo": "explora-y-descubre",
+    "tematicaId": 28,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisensorial/ExploraYDescubre/ElInstrumentoDePercusionDeduccionPorAccionYMecanicaDelSonido5Opci"
+  },
+  {
+    "slug": "la-esencia-concentrada-deduccion-quimica-y-esencia-5-opciones",
+    "nombre": "La Esencia Concentrada: Deducción Química Y Esencia | 5 Opciones",
+    "carpeta": "LaEsenciaConcentradaDeduccionQuimicaYEsencia5Opciones",
+    "padre": "ExploraYDescubre",
+    "slugAntiguo": "explora-y-descubre",
+    "tematicaId": 28,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisensorial/ExploraYDescubre/LaEsenciaConcentradaDeduccionQuimicaYEsencia5Opciones"
+  },
+  {
+    "slug": "el-alimento-congelado-deduccion-termica-y-sensorial-doble-5-opciones",
+    "nombre": "El Alimento Congelado: Deducción Térmica Y Sensorial Doble | 5 Opciones",
+    "carpeta": "ElAlimentoCongeladoDeduccionTermicaYSensorialDoble5Opciones",
+    "padre": "ExploraYDescubre",
+    "slugAntiguo": "explora-y-descubre",
+    "tematicaId": 28,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisensorial/ExploraYDescubre/ElAlimentoCongeladoDeduccionTermicaYSensorialDoble5Opciones"
+  }
+]

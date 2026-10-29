@@ -1,0 +1,111 @@
+{
+  "nombre": "Abre El Castillo",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Toca una tarjeta y busca su pareja!",
+    "demostracionAcierto": "¡Así se encuentra la pareja!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡El castillo guarda parejas secretas!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Descubre las vocales iguales y abre sus puertas!"
+      }
+    ]
+  },
+  "demo": {
+    "parejas": [
+      "i"
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "verBotonRepetir": false,
+    "mostrarProgreso": true,
+    "animaciones_opciones": true,
+    "efectosSonido": true,
+    "mostrarFeedBack": false
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "vocales": {
+    "a": {
+      "img": "img/vocal_a.svg?v=a",
+      "color": "#ff6b6b"
+    },
+    "e": {
+      "img": "img/vocal_e.svg?v=a",
+      "color": "#fcc419"
+    },
+    "i": {
+      "img": "img/vocal_i.svg?v=a",
+      "color": "#22b8cf"
+    },
+    "o": {
+      "img": "img/vocal_o.svg?v=a",
+      "color": "#be4bdb"
+    },
+    "u": {
+      "img": "img/vocal_u.svg?v=a",
+      "color": "#51cf66"
+    }
+  },
+  "reversos": {
+    "hoja": "img/reverso_hoja.svg?v=a",
+    "espejo": "img/reverso_espejo.svg?v=a"
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El castillo de los espejos secretos",
+      "tema": "castillo",
+      "reverso": "espejo",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡El castillo guarda parejas secretas!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Descubre las vocales iguales y abre sus puertas!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "final",
+          "parejas": [
+            "a",
+            "e",
+            "i",
+            "o",
+            "u"
+          ],
+          "acierto": {
+            "efecto": "castillo",
+            "sonido": "celebracion"
+          },
+          "iOrigen": 3
+        }
+      ],
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Encontraste las parejas secretas del castillo!"
+      },
+      "insignia": {
+        "img": "img/insignia_llave.svg",
+        "nombre": "Llave mágica de las vocales"
+      }
+    }
+  ]
+}

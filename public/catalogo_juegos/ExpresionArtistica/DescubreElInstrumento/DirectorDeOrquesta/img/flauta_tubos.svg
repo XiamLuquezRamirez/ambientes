@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Flauta de tubos de colores">
+  <ellipse cx="120" cy="226" rx="84" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="34" y="30" width="38" height="186" rx="12" fill="#ef5350"/>
+    <rect x="76" y="30" width="38" height="156" rx="12" fill="#42a5f5"/>
+    <rect x="118" y="30" width="38" height="128" rx="12" fill="#ffca28"/>
+    <rect x="160" y="30" width="38" height="100" rx="12" fill="#66bb6a"/>
+    <rect x="26" y="62" width="180" height="22" rx="8" fill="#a1887f"/>
+  </g>
+  <g fill="#37474f">
+    <ellipse cx="53" cy="40" rx="11" ry="5"/>
+    <ellipse cx="95" cy="40" rx="11" ry="5"/>
+    <ellipse cx="137" cy="40" rx="11" ry="5"/>
+    <ellipse cx="179" cy="40" rx="11" ry="5"/>
+  </g>
+  <g fill="#fff" opacity="0.5">
+    <rect x="42" y="96" width="7" height="100" rx="3"/>
+    <rect x="84" y="96" width="7" height="72" rx="3"/>
+    <rect x="126" y="96" width="7" height="46" rx="3"/>
+    <rect x="168" y="96" width="7" height="22" rx="3"/>
+  </g>
+</svg>

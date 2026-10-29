@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Personas aplaudiendo">
+  <defs>
+    <g id="persona">
+      <path d="M110 146 L104 206 M130 146 L136 206" stroke="#37474f" stroke-width="13" stroke-linecap="round"/>
+      <ellipse cx="100" cy="208" rx="12" ry="7" fill="#37474f"/>
+      <ellipse cx="140" cy="208" rx="12" ry="7" fill="#37474f"/>
+      <rect x="98" y="82" width="44" height="68" rx="16" fill="currentColor" stroke="#37474f" stroke-width="4"/>
+      <path d="M104 94 Q84 124 102 110 M136 94 Q156 124 138 110" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
+      <circle cx="102" cy="110" r="9" fill="#ffcc80" stroke="#37474f" stroke-width="3"/>
+      <circle cx="138" cy="110" r="9" fill="#ffcc80" stroke="#37474f" stroke-width="3"/>
+      <circle cx="120" cy="56" r="25" fill="#ffcc80" stroke="#37474f" stroke-width="4"/>
+      <path d="M95 54 C95 26 145 26 145 54 C136 40 104 40 95 54 Z" fill="#5d4037"/>
+      <circle cx="111" cy="57" r="3.5" fill="#37474f"/>
+      <circle cx="129" cy="57" r="3.5" fill="#37474f"/>
+      <path d="M110 66 Q120 76 130 66" fill="none" stroke="#37474f" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </defs>
+  <ellipse cx="120" cy="222" rx="100" ry="7" fill="#000" opacity="0.1"/>
+  <use href="#persona" color="#ef5350" transform="translate(68 18) scale(0.86) translate(-120 0)"/>
+  <use href="#persona" color="#42a5f5" transform="translate(172 18) scale(0.86) translate(-120 0)"/>
+</svg>

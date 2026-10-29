@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Caj&#243;n">
+  <ellipse cx="120" cy="222" rx="90" ry="7" fill="#000" opacity="0.1"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="44" y="40" width="152" height="170" rx="8" fill="#a1887f"/>
+    <rect x="58" y="56" width="124" height="42" rx="4" fill="#bcaaa4"/>
+    <path d="M58 110 H182 L196 118 H44 Z" fill="#5d4037"/>
+    <rect x="38" y="118" width="164" height="46" rx="4" fill="#d7ccc8"/>
+    <rect x="58" y="172" width="124" height="28" rx="4" fill="#bcaaa4"/>
+    <rect x="104" y="72" width="32" height="9" rx="4.5" fill="#fdd835"/>
+    <rect x="102" y="136" width="36" height="10" rx="5" fill="#fdd835"/>
+    <rect x="104" y="182" width="32" height="9" rx="4.5" fill="#fdd835"/>
+    <path d="M56 210 V220 M184 210 V220" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

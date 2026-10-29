@@ -1,0 +1,217 @@
+{
+  "nombre": "Recuerda Dos Sonidos",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha el sonido y luego toca lo que escuchaste.",
+    "demostracionAcierto": "¡Así se recuerda un sonido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Escucha muy bien!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Vamos a recordar los sonidos!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "sonido": "gallo",
+    "opciones": [
+      "gallo",
+      "maracas"
+    ]
+  },
+  "elementos": {
+    "manos": {
+      "img": "img/manos.svg",
+      "imgAccion": "img/manos_juntas.svg",
+      "nombre": "Manos",
+      "sonido": "aplauso"
+    },
+    "tren": {
+      "img": "img/tren.svg",
+      "nombre": "Tren",
+      "sonido": "tren"
+    },
+    "trompeta": {
+      "img": "img/trompeta.svg",
+      "nombre": "Trompeta",
+      "sonido": "trompeta"
+    },
+    "botella": {
+      "img": "img/botella.svg",
+      "nombre": "Botella con semillas",
+      "sonido": "semillas"
+    },
+    "pollito": {
+      "img": "img/pollito.svg",
+      "nombre": "Pollito",
+      "sonido": "pollito"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana",
+      "sonido": "campana"
+    },
+    "perro": {
+      "img": "img/perro.png",
+      "nombre": "Perro",
+      "sonido": "ladrido"
+    },
+    "pasos": {
+      "img": "img/pasos.svg",
+      "nombre": "Pasos",
+      "sonido": "pasos"
+    },
+    "caballo": {
+      "img": "img/caballo.svg",
+      "nombre": "Caballo",
+      "sonido": "galope"
+    },
+    "reloj": {
+      "img": "img/reloj.svg",
+      "nombre": "Reloj",
+      "sonido": "reloj"
+    },
+    "vaca": {
+      "img": "img/vaca.svg",
+      "nombre": "Vaca",
+      "sonido": "mugido"
+    },
+    "burro": {
+      "img": "img/burro.svg",
+      "nombre": "Burro",
+      "sonido": "rebuzno"
+    },
+    "elefante": {
+      "img": "img/elefante.svg",
+      "nombre": "Elefante",
+      "sonido": "barrito"
+    },
+    "pato": {
+      "img": "img/pato.svg",
+      "nombre": "Pato",
+      "sonido": "cuac"
+    },
+    "leon": {
+      "img": "img/leon.svg",
+      "nombre": "León",
+      "sonido": "rugido"
+    },
+    "rana": {
+      "img": "img/rana.svg",
+      "nombre": "Rana",
+      "sonido": "croar"
+    },
+    "carro": {
+      "img": "img/carro.png",
+      "nombre": "Carro",
+      "sonido": "carro"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor",
+      "sonido": "tambor"
+    },
+    "gaita": {
+      "img": "img/gaita.svg",
+      "nombre": "Gaita",
+      "sonido": "gaita"
+    },
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pájaro",
+      "sonido": "trino"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota",
+      "sonido": "rebote"
+    },
+    "gato": {
+      "img": "img/gato.png",
+      "nombre": "Gato",
+      "sonido": "maullido"
+    },
+    "gallo": {
+      "img": "img/gallo.svg",
+      "nombre": "Gallo",
+      "sonido": "quiquiriqui"
+    },
+    "maracas": {
+      "img": "img/maracas.svg",
+      "nombre": "Maraca",
+      "sonido": "maracas"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Los sonidos escondidos",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Escucha muy bien!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Vamos a recordar los sonidos!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "dos-sonidos",
+          "titulo": "Recuerda dos sonidos",
+          "tipo": "varios",
+          "reproducciones": [
+            [
+              "botella",
+              "pollito"
+            ]
+          ],
+          "opciones": [
+            "campana",
+            "botella",
+            "pollito"
+          ],
+          "preguntas": [
+            {
+              "voz": "zoe",
+              "texto": "¿Cuáles escuchaste?"
+            }
+          ],
+          "acierto": {
+            "efecto": "marcar",
+            "sonido": "celebracion"
+          },
+          "iOrigen": 1
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Tienes muy buena memoria para los sonidos!"
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_logro.svg",
+        "nombre": "Insignia de logro"
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <rect width="800" height="480" fill="#1a237e"/>
+  <rect x="0" y="400" width="800" height="80" fill="#311b92"/>
+  <!-- focos cenitales -->
+  <ellipse cx="200" cy="40" rx="50" ry="18" fill="#fff59d" opacity=".85"/>
+  <ellipse cx="400" cy="28" rx="60" ry="20" fill="#ffe082" opacity=".9"/>
+  <ellipse cx="600" cy="40" rx="50" ry="18" fill="#fff59d" opacity=".85"/>
+  <path d="M200 55 L140 400 L260 400 Z" fill="#fff59d" opacity=".12"/>
+  <path d="M400 45 L300 400 L500 400 Z" fill="#ffe082" opacity=".14"/>
+  <path d="M600 55 L540 400 L660 400 Z" fill="#fff59d" opacity=".12"/>
+  <!-- telón -->
+  <path d="M0 0 Q80 120 0 240 Q80 360 0 480" fill="#b71c1c"/>
+  <path d="M800 0 Q720 120 800 240 Q720 360 800 480" fill="#b71c1c"/>
+  <!-- perchero disfraces -->
+  <line x1="70" y1="160" x2="70" y2="360" stroke="#5d4037" stroke-width="8"/>
+  <line x1="40" y1="170" x2="160" y2="170" stroke="#5d4037" stroke-width="6"/>
+  <path d="M55 170 Q70 260 50 330" fill="none" stroke="#ce93d8" stroke-width="16" stroke-linecap="round"/>
+  <path d="M100 170 Q110 250 95 320" fill="none" stroke="#80cbc4" stroke-width="14" stroke-linecap="round"/>
+  <!-- tablero de guiones -->
+  <rect x="620" y="140" width="140" height="180" rx="8" fill="#efebe9" stroke="#8d6e63" stroke-width="6"/>
+  <circle cx="655" cy="190" r="18" fill="#fff59d"/><path d="M646 196 Q655 205 664 196" fill="none" stroke="#ef6c00" stroke-width="3"/>
+  <circle cx="725" cy="190" r="18" fill="#ffcdd2"/><path d="M716 198 Q725 188 734 198" fill="none" stroke="#c62828" stroke-width="3"/>
+  <circle cx="655" cy="255" r="18" fill="#bbdefb"/><ellipse cx="655" cy="262" rx="6" ry="7" fill="#1565c0"/>
+  <circle cx="725" cy="255" r="18" fill="#e1bee7"/><ellipse cx="725" cy="262" rx="7" ry="9" fill="#6a1b9a"/>
+  <text x="690" y="310" text-anchor="middle" font-size="14" fill="#5d4037" font-family="Arial,sans-serif">Guion</text>
+</svg>

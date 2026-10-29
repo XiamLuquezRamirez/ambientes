@@ -1,0 +1,211 @@
+{
+  "nombre": "El Alimento Congelado: Deducción Térmica Y Sensorial Doble | 5 Opciones",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira cómo se juega! Pasa la lupa por la caja.",
+    "demostracionEstudio": "¡Mira cómo se juega! Pasa la lupa por la caja.",
+    "demostracionDetective": "¡Mira cómo se juega! Escucha las dos pistas del radar.",
+    "demostracionAcierto": "¡Así se descubre lo que hay dentro!",
+    "demostracionFin": "¡Ahora te toca a ti! Explora la pista.",
+    "usaLupa": "¡Usa tu lupa mágica sobre la caja!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Enciende el radar sensorial!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Dos pistas y una hipótesis!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "demo": {
+    "mecanica": "lupa",
+    "pista": "visual",
+    "correcto": "pelota",
+    "opciones": [
+      "pelota",
+      "libro"
+    ],
+    "presentacion": {
+      "voz": "zoe",
+      "texto": "¡Mira cómo se juega! Pasa la lupa por la caja."
+    },
+    "efectoPista": "chispas",
+    "detective": {
+      "mecanica": "radar",
+      "presentacion": {
+        "voz": "zoe",
+        "texto": "¡Mira cómo se juega! Escucha las dos pistas del radar."
+      },
+      "pistas": [
+        {
+          "icono": "img/pista_ojo.svg",
+          "texto": "Rebota cuando la lanzas."
+        },
+        {
+          "icono": "img/pista_oreja.svg",
+          "texto": "No suena: es para jugar."
+        }
+      ]
+    }
+  },
+  "elementos": {
+    "arcoiris": {
+      "img": "img/arcoiris.svg",
+      "nombre": "Arcoíris"
+    },
+    "sol": {
+      "img": "img/sol.svg",
+      "nombre": "Sol"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana"
+    },
+    "flor": {
+      "img": "img/flor.svg",
+      "nombre": "Flor"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota"
+    },
+    "perfume": {
+      "img": "img/perfume.svg",
+      "nombre": "Perfume"
+    },
+    "helado": {
+      "img": "img/helado.svg",
+      "nombre": "Helado"
+    },
+    "carro": {
+      "img": "img/carro.svg",
+      "nombre": "Carro"
+    },
+    "algodon": {
+      "img": "img/algodon.svg",
+      "nombre": "Algodón"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "nombre": "Lija"
+    },
+    "libro": {
+      "img": "img/libro.svg",
+      "nombre": "Libro"
+    },
+    "bombillo": {
+      "img": "img/bombillo.svg",
+      "nombre": "Bombillo"
+    },
+    "trompeta": {
+      "img": "img/trompeta.svg",
+      "nombre": "Trompeta"
+    },
+    "jabon": {
+      "img": "img/jabon.svg",
+      "nombre": "Jabón"
+    },
+    "hielo": {
+      "img": "img/hielo.svg",
+      "nombre": "Cubo de hielo"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El radar de pistas sensoriales",
+      "escena": "radar",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Enciende el radar sensorial!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Dos pistas y una hipótesis!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "helado",
+          "pista": "gusto",
+          "efectoPista": "hielo",
+          "mecanica": "radar",
+          "correcto": "helado",
+          "opciones": [
+            "helado",
+            "lija",
+            "tambor",
+            "libro",
+            "hielo"
+          ],
+          "pistas": [
+            {
+              "icono": "img/pista_boca.svg",
+              "texto": "Se elabora con leche o frutas congeladas y se mantiene a muy baja temperatura."
+            },
+            {
+              "icono": "img/pista_frio.svg",
+              "texto": "Lo saboreamos con la lengua y se derrite si le da el calor."
+            }
+          ],
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "Pista 1: Se elabora con leche o frutas congeladas y se mantiene a muy baja temperatura. Pista 2: Lo saboreamos con la lengua y se derrite si le da el calor. ¿Qué elemento es?"
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Excelente! Descubriste el helado.",
+            "efecto": "slurpFreeze",
+            "animacion": "abre"
+          },
+          "errores": [
+            {
+              "objetos": [
+                "hielo"
+              ],
+              "voz": "zoe",
+              "texto": "El hielo es frío, ¡pero el postre que buscamos es dulce y sabroso para comer en barquilla! ¡Inténtalo otra vez!",
+              "efecto": "boing"
+            }
+          ],
+          "errorOtro": {
+            "voz": "zoe",
+            "texto": "Revisa las pistas e inténtalo otra vez!",
+            "efecto": "boing"
+          },
+          "iOrigen": 3
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Excelente! Usaste tus sentidos para explorar y descubrir."
+        }
+      ],
+      "cierreEscena": "laboratorio",
+      "insignia": {
+        "img": "img/insignia_analista.svg",
+        "nombre": "Analista Senior de Pistas Sensoriales"
+      }
+    }
+  ]
+}

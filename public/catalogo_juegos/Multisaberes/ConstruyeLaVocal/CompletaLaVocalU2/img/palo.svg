@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <defs>
+    <linearGradient id="g" x1="40" y1="60" x2="70" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#868e96"/><stop offset="1" stop-color="#495057"/>
+    </linearGradient>
+  </defs>
+  <!-- distractor: palo descentrado -->
+  <path d="M48 70v120" stroke="url(#g)" stroke-width="22" stroke-linecap="round"/>
+</svg>

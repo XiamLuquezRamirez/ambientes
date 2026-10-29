@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Pintura amarilla">
+
+  <path d="M120 28 C120 28 48 120 48 156 A72 72 0 0 0 192 156 C192 120 120 28 120 28 Z" fill="#ffee58" stroke="#37474f" stroke-width="4"/>
+  <ellipse cx="96" cy="140" rx="16" ry="24" fill="#fff" opacity="0.35"/>
+</svg>

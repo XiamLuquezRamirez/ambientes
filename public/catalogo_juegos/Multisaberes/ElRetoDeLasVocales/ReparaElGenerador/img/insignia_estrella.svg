@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+  <circle cx="80" cy="80" r="72" fill="#fff3bf" stroke="#f59f00" stroke-width="8"/>
+  <path d="M80 28l12 36h38l-30 22 12 36-32-22-32 22 12-36-30-22h38z" fill="#fcc419" stroke="#e67700" stroke-width="4" stroke-linejoin="round"/>
+  <text x="42" y="128" font-family="Fredoka,sans-serif" font-size="14" font-weight="700" fill="#e67700">a e i o u</text>
+</svg>

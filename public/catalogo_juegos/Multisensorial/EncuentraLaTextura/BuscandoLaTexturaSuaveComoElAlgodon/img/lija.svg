@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+<rect x="26" y="34" width="108" height="92" rx="6" fill="#c08b5c" stroke="#8d5a3b" stroke-width="4" transform="rotate(-6 80 80)"/>
+<g fill="#7a4b2a" transform="rotate(-6 80 80)">
+<circle cx="40" cy="48" r="2.4"/><circle cx="54" cy="56" r="2"/><circle cx="68" cy="46" r="2.6"/><circle cx="84" cy="54" r="2.2"/><circle cx="100" cy="48" r="2.5"/><circle cx="116" cy="56" r="2"/>
+<circle cx="46" cy="70" r="2.2"/><circle cx="62" cy="78" r="2.6"/><circle cx="78" cy="70" r="2"/><circle cx="94" cy="78" r="2.5"/><circle cx="110" cy="72" r="2.3"/><circle cx="122" cy="82" r="2"/>
+<circle cx="40" cy="94" r="2.5"/><circle cx="56" cy="100" r="2"/><circle cx="72" cy="92" r="2.4"/><circle cx="88" cy="102" r="2.6"/><circle cx="104" cy="94" r="2"/><circle cx="118" cy="104" r="2.5"/>
+<circle cx="48" cy="114" r="2"/><circle cx="66" cy="112" r="2.3"/><circle cx="84" cy="116" r="2"/><circle cx="100" cy="112" r="2.4"/></g>
+<g fill="#e3b98d" transform="rotate(-6 80 80)"><circle cx="50" cy="62" r="1.6"/><circle cx="88" cy="64" r="1.6"/><circle cx="70" cy="104" r="1.6"/><circle cx="112" cy="90" r="1.6"/></g>
+</svg>

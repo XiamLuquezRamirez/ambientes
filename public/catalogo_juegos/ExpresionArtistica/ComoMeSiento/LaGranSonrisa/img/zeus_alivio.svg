@@ -1,0 +1,24 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="320" height="300" viewBox="0 0 320 300">
+  <rect width="320" height="300" fill="#283593"/>
+  <rect x="210" y="30" width="90" height="240" fill="#c62828"/>
+  <!-- gatito con sombrero -->
+  <ellipse cx="250" cy="160" rx="36" ry="40" fill="#ffcc80"/>
+  <polygon points="230,130 235,100 248,128" fill="#ffcc80"/>
+  <polygon points="270,130 265,100 252,128" fill="#ffcc80"/>
+  <circle cx="240" cy="155" r="5" fill="#3e2723"/><circle cx="260" cy="155" r="5" fill="#3e2723"/>
+  <ellipse cx="250" cy="170" rx="6" ry="4" fill="#ef9a9a"/>
+  <ellipse cx="250" cy="112" rx="28" ry="10" fill="#5d4037"/>
+  <rect x="236" y="88" width="28" height="28" rx="4" fill="#6d4c41"/>
+  <ellipse cx="250" cy="88" rx="22" ry="8" fill="#8d6e63"/>
+  <!-- Zeus riendo aliviado -->
+  <ellipse cx="120" cy="265" rx="55" ry="14" fill="#1a237e"/>
+  <rect x="90" y="175" width="60" height="80" rx="12" fill="#43a047"/>
+  <circle cx="120" cy="125" r="44" fill="#ffb74d"/>
+  <circle cx="105" cy="120" r="7" fill="#3e2723"/><circle cx="135" cy="120" r="7" fill="#3e2723"/>
+  <path d="M100 145 Q120 165 140 145" fill="none" stroke="#e65100" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="95" cy="135" r="7" fill="#ff8a65" opacity=".7"/><circle cx="145" cy="135" r="7" fill="#ff8a65" opacity=".7"/>
+  <path d="M70 200 Q95 170 105 185" stroke="#43a047" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <path d="M170 200 Q145 170 135 185" stroke="#43a047" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <circle cx="70" cy="200" r="14" fill="#ffb74d"/><circle cx="170" cy="200" r="14" fill="#ffb74d"/>
+  <text x="120" y="40" text-anchor="middle" font-size="20" fill="#c5cae9" font-family="Arial,sans-serif">¡Era un gatito!</text>
+</svg>

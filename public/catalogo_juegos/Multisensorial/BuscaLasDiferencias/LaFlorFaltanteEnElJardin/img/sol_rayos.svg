@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 76" width="76" height="76">
+<circle cx="38" cy="38" r="34" fill="#fff3bf" opacity="0.6"/>
+<g stroke="#fab005" stroke-width="3.5" stroke-linecap="round"><line x1="38" y1="4" x2="38" y2="12"/><line x1="38" y1="64" x2="38" y2="72"/><line x1="4" y1="38" x2="12" y2="38"/><line x1="64" y1="38" x2="72" y2="38"/><line x1="14" y1="14" x2="19.5" y2="19.5"/><line x1="56.5" y1="56.5" x2="62" y2="62"/><line x1="62" y1="14" x2="56.5" y2="19.5"/><line x1="14" y1="62" x2="19.5" y2="56.5"/><line x1="25" y1="7" x2="27.5" y2="14.5"/><line x1="51" y1="7" x2="48.5" y2="14.5"/><line x1="25" y1="69" x2="27.5" y2="61.5"/><line x1="51" y1="69" x2="48.5" y2="61.5"/></g>
+<circle cx="38" cy="38" r="20" fill="#fcc419" stroke="#f59f00" stroke-width="2"/>
+<circle cx="31" cy="31" r="6" fill="#fff" opacity="0.45"/>
+</svg>

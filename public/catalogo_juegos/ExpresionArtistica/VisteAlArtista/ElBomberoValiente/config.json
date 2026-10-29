@@ -1,0 +1,251 @@
+{
+  "nombre": "El Bombero Valiente",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira! Arrastra la capa hacia el cuerpo de Zoe.",
+    "demostracionAcierto": "¡Así se viste al artista!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al camerino del teatro! Aquí nos disfrazamos para cada obra."
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy serás caracterizador: arrastra la prenda correcta a cada personaje."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "capa_roja",
+    "personaje": "zoe_base"
+  },
+  "escenas": {
+    "camerino": "img/escenas/camerino.svg",
+    "camerino_pro": "img/escenas/camerino_pro.svg"
+  },
+  "elementos": {
+    "zoe_base": {
+      "img": "img/zoe_base.svg",
+      "nombre": "Zoe"
+    },
+    "zeus_base": {
+      "img": "img/zeus_base.svg",
+      "nombre": "Zeus"
+    },
+    "capa_roja": {
+      "img": "img/capa_roja.svg",
+      "nombre": "Capa roja mágica"
+    },
+    "gorro_cocinero": {
+      "img": "img/gorro_cocinero.svg",
+      "nombre": "Gorro de cocinero"
+    },
+    "casco_bombero": {
+      "img": "img/casco_bombero.svg",
+      "nombre": "Casco rojo de bombero"
+    },
+    "corona_rey": {
+      "img": "img/corona_rey.svg",
+      "nombre": "Corona de rey"
+    },
+    "nariz_roja": {
+      "img": "img/nariz_roja.svg",
+      "nombre": "Nariz roja redonda"
+    },
+    "gafas_oscuras": {
+      "img": "img/gafas_oscuras.svg",
+      "nombre": "Gafas oscuras"
+    },
+    "sombrero_copa": {
+      "img": "img/sombrero_copa.svg",
+      "nombre": "Sombrero de copa"
+    },
+    "varita": {
+      "img": "img/varita.svg",
+      "nombre": "Varita mágica"
+    },
+    "conejo": {
+      "img": "img/conejo.svg",
+      "nombre": "Conejo"
+    },
+    "casco_metal": {
+      "img": "img/casco_metal.svg",
+      "nombre": "Casco de metal"
+    },
+    "pechera": {
+      "img": "img/pechera.svg",
+      "nombre": "Pechera de armadura"
+    },
+    "espada": {
+      "img": "img/espada.svg",
+      "nombre": "Espada de utilería"
+    },
+    "conjunto_rock": {
+      "img": "img/conjunto_rock.svg",
+      "nombre": "Chaqueta de cuero y gafas de sol"
+    },
+    "casco_espacial": {
+      "img": "img/casco_espacial.svg",
+      "nombre": "Casco espacial blanco"
+    },
+    "gabardina": {
+      "img": "img/gabardina.svg",
+      "nombre": "Gabardina"
+    },
+    "sombrero_detective": {
+      "img": "img/sombrero_detective.svg",
+      "nombre": "Sombrero de detective"
+    },
+    "lupa": {
+      "img": "img/lupa.svg",
+      "nombre": "Lupa"
+    },
+    "manto_real": {
+      "img": "img/manto_real.svg",
+      "nombre": "Manto real"
+    },
+    "cetro": {
+      "img": "img/cetro.svg",
+      "nombre": "Cetro"
+    },
+    "sombrero_safari": {
+      "img": "img/sombrero_safari.svg",
+      "nombre": "Sombrero de safari"
+    },
+    "chaleco": {
+      "img": "img/chaleco.svg",
+      "nombre": "Chaleco con bolsillos"
+    },
+    "mochila": {
+      "img": "img/mochila.svg",
+      "nombre": "Mochila de viaje"
+    },
+    "mapa": {
+      "img": "img/mapa.svg",
+      "nombre": "Mapa"
+    },
+    "mini_superheroina": {
+      "img": "img/mini_superheroina.svg",
+      "nombre": "Súper heroína"
+    },
+    "mini_bombero": {
+      "img": "img/mini_bombero.svg",
+      "nombre": "Bombero"
+    },
+    "mini_payaso": {
+      "img": "img/mini_payaso.svg",
+      "nombre": "Payasita"
+    },
+    "mini_mago": {
+      "img": "img/mini_mago.svg",
+      "nombre": "Mago"
+    },
+    "mini_caballero": {
+      "img": "img/mini_caballero.svg",
+      "nombre": "Caballero"
+    },
+    "mini_rock": {
+      "img": "img/mini_rock.svg",
+      "nombre": "Estrella de rock"
+    },
+    "mini_detective": {
+      "img": "img/mini_detective.svg",
+      "nombre": "Detective"
+    },
+    "mini_exploradora": {
+      "img": "img/mini_exploradora.svg",
+      "nombre": "Exploradora"
+    },
+    "pieza_demo": {
+      "img": "img/capa_roja.svg",
+      "nombre": "Capa de ejemplo"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El Camerino",
+      "tema": "camerino",
+      "escena": "camerino",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al camerino del teatro! Aquí nos disfrazamos para cada obra."
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy serás caracterizador: arrastra la prenda correcta a cada personaje."
+        }
+      ],
+      "galeria": [
+        "mini_superheroina",
+        "mini_bombero",
+        "mini_payaso",
+        "mini_mago"
+      ],
+      "retos": [
+        {
+          "id": "bombero",
+          "tipo": "arrastrePrenda",
+          "titulo": "El Casco del Bombero Zeus",
+          "personaje": "zeus_base",
+          "correcta": "casco_bombero",
+          "opciones": [
+            "casco_bombero",
+            "corona_rey"
+          ],
+          "zonaDestino": {
+            "x": 50,
+            "y": 20,
+            "w": 42,
+            "h": 30
+          },
+          "slot": "cabeza",
+          "efecto": "sirena",
+          "consigna": {
+            "voz": "zeus",
+            "texto": "¡Al rescate! Voy a actuar como un bombero valiente. ¿Qué casco me pongo en la cabeza?"
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Excelente! Con mi casco rojo estoy protegido y listo para la acción."
+          },
+          "error": {
+            "voz": "zeus",
+            "texto": "¡Necesito protegerme, intenta con otro casco!"
+          },
+          "iOrigen": 1
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Qué divertido fue disfrazarnos! Elegiste la ropa y los accesorios perfectos para cada papel."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Un buen disfraz nos transforma en cualquier personaje que queramos ser!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_caracterizador.svg",
+        "nombre": "Caracterizador del Camerino",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

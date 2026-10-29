@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Pajarito triste">
+  <ellipse cx="120" cy="220" rx="60" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M58 150 L22 142 L36 170 Z" fill="#78909c"/>
+    <ellipse cx="116" cy="150" rx="62" ry="56" fill="#90a4ae"/>
+    <ellipse cx="124" cy="168" rx="36" ry="30" fill="#cfd8dc"/>
+    <circle cx="146" cy="100" r="42" fill="#90a4ae"/>
+    <path d="M92 142 C112 128 138 136 136 160 C118 168 98 162 92 142 Z" fill="#78909c"/>
+    <path d="M184 102 L212 112 L184 120 Z" fill="#ffb74d"/>
+  </g>
+  <path d="M148 92 C154 98 164 98 170 92" fill="none" stroke="#263238" stroke-width="4" stroke-linecap="round"/>
+  <path d="M146 80 L160 86" stroke="#263238" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="166" cy="112" r="4" fill="#4fc3f7"/>
+  <g stroke="#ff8f00" stroke-width="5" stroke-linecap="round">
+    <path d="M106 204 V214 M130 204 V214"/>
+  </g>
+</svg>

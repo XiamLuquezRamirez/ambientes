@@ -1,0 +1,291 @@
+{
+  "nombre": "El Cuadro de Frutas",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: arrastra la pieza hasta su lugar y el imán la encaja.",
+    "demostracionAcierto": "¡Así se arma el cuadro!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Bienvenido al taller de pintura."
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy vamos a armar cuadros."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "pieza_demo"
+  },
+  "escenas": {
+    "caballete": "img/escenas/caballete.svg",
+    "taller": "img/escenas/taller.svg"
+  },
+  "elementos": {
+    "pieza_demo": {
+      "img": "img/pieza_demo.svg",
+      "nombre": "Pieza de ejemplo"
+    },
+    "sol_izq": {
+      "img": "img/sol_izq.svg",
+      "nombre": "Mitad izquierda"
+    },
+    "sol_der": {
+      "img": "img/sol_der.svg",
+      "nombre": "Mitad derecha"
+    },
+    "cabeza": {
+      "img": "img/cabeza.svg",
+      "nombre": "Cabeza"
+    },
+    "cuerpo": {
+      "img": "img/cuerpo.svg",
+      "nombre": "Cuerpo"
+    },
+    "cola": {
+      "img": "img/cola.svg",
+      "nombre": "Cola"
+    },
+    "manzana": {
+      "img": "img/manzana.svg",
+      "nombre": "Manzana"
+    },
+    "manzana_gris": {
+      "img": "img/manzana_gris.svg",
+      "nombre": "Manzana sin color"
+    },
+    "banano": {
+      "img": "img/banano.svg",
+      "nombre": "Banano"
+    },
+    "banano_gris": {
+      "img": "img/banano_gris.svg",
+      "nombre": "Banano sin color"
+    },
+    "uvas": {
+      "img": "img/uvas.svg",
+      "nombre": "Uvas"
+    },
+    "uvas_gris": {
+      "img": "img/uvas_gris.svg",
+      "nombre": "Uvas sin color"
+    },
+    "pintura_roja": {
+      "img": "img/pintura_roja.svg",
+      "nombre": "Pintura roja"
+    },
+    "pintura_amarilla": {
+      "img": "img/pintura_amarilla.svg",
+      "nombre": "Pintura amarilla"
+    },
+    "pintura_morada": {
+      "img": "img/pintura_morada.svg",
+      "nombre": "Pintura morada"
+    },
+    "franja_roja": {
+      "img": "img/franja_roja.svg",
+      "nombre": "Franja roja"
+    },
+    "franja_amarilla": {
+      "img": "img/franja_amarilla.svg",
+      "nombre": "Franja amarilla"
+    },
+    "franja_azul": {
+      "img": "img/franja_azul.svg",
+      "nombre": "Franja azul"
+    },
+    "franja_verde": {
+      "img": "img/franja_verde.svg",
+      "nombre": "Franja verde"
+    },
+    "geo_1": {
+      "img": "img/geo_1.svg",
+      "nombre": "Pieza uno"
+    },
+    "geo_2": {
+      "img": "img/geo_2.svg",
+      "nombre": "Pieza dos"
+    },
+    "geo_3": {
+      "img": "img/geo_3.svg",
+      "nombre": "Pieza tres"
+    },
+    "geo_4": {
+      "img": "img/geo_4.svg",
+      "nombre": "Pieza cuatro"
+    },
+    "tronco": {
+      "img": "img/tronco.svg",
+      "nombre": "Tronco"
+    },
+    "copa_izq": {
+      "img": "img/copa_izq.svg",
+      "nombre": "Copa izquierda"
+    },
+    "copa_der": {
+      "img": "img/copa_der.svg",
+      "nombre": "Copa derecha"
+    },
+    "luna": {
+      "img": "img/luna.svg",
+      "nombre": "Luna"
+    },
+    "suelo": {
+      "img": "img/suelo.svg",
+      "nombre": "Suelo"
+    },
+    "techo": {
+      "img": "img/techo.svg",
+      "nombre": "Techo"
+    },
+    "casa": {
+      "img": "img/casa.svg",
+      "nombre": "Casa"
+    },
+    "puerta": {
+      "img": "img/puerta.svg",
+      "nombre": "Puerta"
+    },
+    "ventana": {
+      "img": "img/ventana.svg",
+      "nombre": "Ventana"
+    },
+    "canasta": {
+      "img": "img/canasta.svg",
+      "nombre": "Canasta"
+    },
+    "cuadro_sol": {
+      "img": "img/cuadro_sol.svg",
+      "nombre": "Sol"
+    },
+    "cuadro_gato": {
+      "img": "img/cuadro_gato.svg",
+      "nombre": "Gatito"
+    },
+    "cuadro_frutas": {
+      "img": "img/cuadro_frutas.svg",
+      "nombre": "Frutas"
+    },
+    "cuadro_arcoiris": {
+      "img": "img/cuadro_arcoiris.svg",
+      "nombre": "Arcoíris"
+    },
+    "cuadro_geo": {
+      "img": "img/cuadro_geo.svg",
+      "nombre": "Cuadro geométrico"
+    },
+    "cuadro_arbol": {
+      "img": "img/cuadro_arbol.svg",
+      "nombre": "Árbol"
+    },
+    "cuadro_globo": {
+      "img": "img/cuadro_globo.svg",
+      "nombre": "Globo"
+    },
+    "cuadro_casita": {
+      "img": "img/cuadro_casita.svg",
+      "nombre": "Casita"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El caballete gigante",
+      "tema": "caballete",
+      "escena": "caballete",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hola! Bienvenido al taller de pintura."
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy vamos a armar cuadros."
+        }
+      ],
+      "galeria": [
+        "cuadro_sol",
+        "cuadro_gato",
+        "cuadro_frutas",
+        "cuadro_arcoiris"
+      ],
+      "retos": [
+        {
+          "id": "frutas",
+          "tipo": "color",
+          "titulo": "La cesta de frutas",
+          "toqueColoca": true,
+          "festejo": "frutas",
+          "piezas": [
+            {
+              "id": "pintura_roja",
+              "hueco": "manzana",
+              "silueta": "manzana_gris",
+              "resultado": "manzana",
+              "sonido": "mordisco",
+              "x": "24%",
+              "y": "46%"
+            },
+            {
+              "id": "pintura_amarilla",
+              "hueco": "banano",
+              "silueta": "banano_gris",
+              "resultado": "banano",
+              "sonido": "mordisco",
+              "x": "50%",
+              "y": "48%"
+            },
+            {
+              "id": "pintura_morada",
+              "hueco": "uvas",
+              "silueta": "uvas_gris",
+              "resultado": "uvas",
+              "sonido": "mordisco",
+              "x": "76%",
+              "y": "46%"
+            }
+          ],
+          "consigna": {
+            "voz": "zoe",
+            "texto": "¡Hora de armar el cuadro de la frutería! Colorea cada fruta con su respectivo color, LA MANZANA ROJA, EL BANANO AMARILLO Y LAS UVAS MORADAS."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Qué cesta de frutas tan colorida y deliciosa pintaste!"
+          },
+          "iOrigen": 2
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Increíble trabajo! Uniste piezas, descubriste formas y armaste obras de arte preciosas."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Tus manitas son súper hábiles para el arte!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_pequeno.svg",
+        "nombre": "Pequeño Maestro del Rompecabezas",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

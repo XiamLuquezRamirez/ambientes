@@ -1,0 +1,137 @@
+{
+  "nombre": "¡El Oso De Peluche!",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: pasa el dedo sobre el objeto para sentir su textura y llévalo a su lugar.",
+    "demostracionAcierto": "¡Así se clasifica! La pluma es suave.",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Pasa el dedo sobre cada objeto y descubre cómo se siente."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Si se siente suave o áspero, ¡llévalo a su lugar!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Siente, compara y clasifica. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3"
+  },
+  "demo": {
+    "material": "pluma",
+    "nombre": "Pluma",
+    "exploracion": {
+      "tacto": "mecer",
+      "sonido": "fluff",
+      "particula": "nube",
+      "meta": 1
+    }
+  },
+  "materiales": {
+    "peluche": {
+      "img": "img/peluche.svg",
+      "clase": "suave"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "clase": "aspero"
+    },
+    "algodon": {
+      "img": "img/algodon.svg",
+      "clase": "suave"
+    },
+    "corteza": {
+      "img": "img/corteza.svg",
+      "clase": "aspero"
+    },
+    "pluma": {
+      "img": "img/pluma.svg",
+      "clase": "suave"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Laboratorio de Análisis y Discriminación Táctil",
+      "escenario": "laboratorio",
+      "destinos": [
+        {
+          "id": "suave",
+          "nombre": "Suave"
+        },
+        {
+          "id": "aspero",
+          "nombre": "Áspero"
+        },
+        {
+          "id": "liso",
+          "nombre": "Liso"
+        },
+        {
+          "id": "rugoso",
+          "nombre": "Rugoso"
+        },
+        {
+          "id": "esponjoso",
+          "nombre": "Esponjoso"
+        }
+      ],
+      "retos": [
+        {
+          "id": "peluche",
+          "material": "peluche",
+          "nombre": "Oso de peluche",
+          "correcta": "suave",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Iniciando escaneo! Pasa tu dedo sobre el peluche para sentir las fibras. ¿Cuál es su cualidad principal entre las 5 opciones?"
+          },
+          "exploracion": {
+            "tacto": "peinar",
+            "sonido": "swooshsoft",
+            "particula": "dorada",
+            "meta": 1.2
+          },
+          "respuesta": "abrazaNube",
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Excelente análisis! El peluche tiene una textura suave."
+          },
+          "rechazo": "calibrar",
+          "error": {
+            "voz": "zoe",
+            "texto": "No parece ser suave esta textura, intenta con otro elemento"
+          },
+          "iOrigen": 0
+        }
+      ],
+      "cierreEscena": {
+        "tipo": "matriz",
+        "titulo": "Matriz de Clasificación Completa"
+      },
+      "premio": {
+        "titulo": "Medalla",
+        "nombre": "Científico Máster en Análisis de Texturas",
+        "icono": "fa-medal"
+      },
+      "cierre": {
+        "voz": "zeus",
+        "texto": "¡Recibes la medalla de Científico Máster en Análisis de Texturas!"
+      }
+    }
+  ]
+}

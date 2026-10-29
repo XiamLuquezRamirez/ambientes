@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Pelota">
+  <defs>
+    <clipPath id="pelota-borde">
+      <circle cx="256" cy="246" r="200"/>
+    </clipPath>
+  </defs>
+  <ellipse cx="256" cy="474" rx="150" ry="20" fill="#000" opacity="0.12"/>
+  <g clip-path="url(#pelota-borde)">
+    <rect x="40" y="30" width="440" height="440" fill="#ffffff"/>
+    <path d="M256 246 L256 20 A226 226 0 0 1 452 133 Z" fill="#e53935"/>
+    <path d="M256 246 L452 133 A226 226 0 0 1 452 359 Z" fill="#ffffff"/>
+    <path d="M256 246 L452 359 A226 226 0 0 1 256 472 Z" fill="#fdd835"/>
+    <path d="M256 246 L256 472 A226 226 0 0 1 60 359 Z" fill="#ffffff"/>
+    <path d="M256 246 L60 359 A226 226 0 0 1 60 133 Z" fill="#1e88e5"/>
+    <path d="M256 246 L60 133 A226 226 0 0 1 256 20 Z" fill="#ffffff"/>
+    <circle cx="256" cy="246" r="200" fill="none" stroke="#000" stroke-opacity="0.08" stroke-width="36"/>
+  </g>
+  <circle cx="256" cy="246" r="200" fill="none" stroke="#3b2a1a" stroke-opacity="0.18" stroke-width="6"/>
+  <circle cx="256" cy="246" r="30" fill="#43a047"/>
+  <circle cx="256" cy="246" r="30" fill="none" stroke="#2e7d32" stroke-width="5"/>
+  <ellipse cx="180" cy="150" rx="46" ry="26" fill="#ffffff" opacity="0.55" transform="rotate(-35 180 150)"/>
+  <ellipse cx="142" cy="208" rx="12" ry="9" fill="#ffffff" opacity="0.5"/>
+</svg>

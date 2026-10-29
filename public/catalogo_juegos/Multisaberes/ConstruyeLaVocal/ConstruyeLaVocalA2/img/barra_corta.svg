@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <defs>
+    <linearGradient id="g" x1="70" y1="100" x2="140" y2="130" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#868e96"/><stop offset="1" stop-color="#495057"/>
+    </linearGradient>
+  </defs>
+  <!-- distractor: barra corta centrada, no encaja en ninguna vocal -->
+  <path d="M78 120h44" stroke="url(#g)" stroke-width="22" stroke-linecap="round"/>
+</svg>

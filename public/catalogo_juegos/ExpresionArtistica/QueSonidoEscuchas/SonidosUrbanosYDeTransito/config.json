@@ -1,0 +1,134 @@
+{
+  "nombre": "Sonidos Urbanos y de Tránsito",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el botón para escuchar y luego toca la imagen del sonido.",
+    "demostracionAcierto": "¡Así se descubre el sonido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al estudio de grabación!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy seremos los DJ del sonido."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "pajaro"
+  },
+  "escenas": {
+    "estudio": "img/escenas/estudio.svg",
+    "ciudad": "img/escenas/ciudad.svg"
+  },
+  "elementos": {
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pájaro",
+      "sonido": "trino"
+    },
+    "tren": {
+      "img": "img/tren.svg",
+      "nombre": "Tren de la ciudad",
+      "sonido": "tren"
+    },
+    "bomberos": {
+      "img": "img/bomberos.svg",
+      "nombre": "Camioneta de bomberos"
+    },
+    "policia": {
+      "img": "img/policia.svg",
+      "nombre": "Patrullero de policía"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El estudio de grabación",
+      "tema": "estudio",
+      "escena": "estudio",
+      "arrastre": false,
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al estudio de grabación!"
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy seremos los DJ del sonido."
+        }
+      ],
+      "retos": [
+        {
+          "id": "gran-ciudad",
+          "titulo": "¿Qué pasa en la gran ciudad?",
+          "escena": "ciudad",
+          "consigna": {
+            "voz": "zoe",
+            "texto": "¡Alerta en la consola de sonido! Escucha con muchísima atención esta pista de la ciudad. ¿Qué medio de transporte va por las vías metálicas?"
+          },
+          "capas": [
+            {
+              "sonido": "tren",
+              "principal": true
+            },
+            {
+              "sonido": "campanaCruce",
+              "retrasoMs": 600
+            }
+          ],
+          "opciones": [
+            "tren",
+            "bomberos",
+            "policia"
+          ],
+          "correcto": "tren",
+          "acierto": {
+            "efecto": "tren",
+            "voz": "zoe",
+            "texto": "¡Excelente afinación auditiva! Reconociste el sonido metálico de las ruedas del tren sobre los rieles."
+          },
+          "error": {
+            "voz": "zeus",
+            "texto": "Vuelve a escuchar el traqueteo sobre los rieles."
+          }
+        }
+      ],
+      "concierto": {
+        "tipo": "mezcla",
+        "compases": 3,
+        "bpm": 96
+      },
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Increíble trabajo como ingeniero de sonido! Tus oídos detectaron detalles muy sutiles en cada pista."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Tienes un talento increíble para la música y el análisis acústico!"
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_maestro_audio.svg",
+        "nombre": "Maestro del Audio y los Sonidos",
+        "sonido": "aplausos"
+      }
+    }
+  ]
+}

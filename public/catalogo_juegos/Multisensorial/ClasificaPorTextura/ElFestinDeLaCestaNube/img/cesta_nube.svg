@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" width="240" height="180">
+<defs>
+<linearGradient id="cuerpo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffdeeb"/><stop offset="1" stop-color="#f783ac"/></linearGradient>
+<pattern id="trenza" width="20" height="16" patternUnits="userSpaceOnUse"><path d="M0 8 Q5 0 10 8 T20 8" fill="none" stroke="#fff" stroke-width="2.5" opacity="0.55"/></pattern>
+</defs>
+<path d="M22 62 L218 62 L196 168 C160 176 80 176 44 168 Z" fill="url(#cuerpo)" stroke="#d6336c" stroke-width="5" stroke-linejoin="round"/>
+<path d="M26 74 L214 74 L196 164 C160 172 80 172 44 164 Z" fill="url(#trenza)"/>
+<g fill="#fff" stroke="#fcc2d7" stroke-width="3">
+<circle cx="30" cy="62" r="18"/><circle cx="58" cy="54" r="20"/><circle cx="90" cy="60" r="18"/><circle cx="120" cy="52" r="21"/><circle cx="150" cy="60" r="18"/><circle cx="182" cy="54" r="20"/><circle cx="210" cy="62" r="18"/>
+</g>
+<rect x="18" y="58" width="204" height="14" fill="#fff"/>
+<g fill="#f06595"><circle cx="96" cy="118" r="5"/><circle cx="144" cy="118" r="5"/></g>
+<path d="M104 134 Q120 146 136 134" fill="none" stroke="#c2255c" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,280 @@
+{
+  "nombre": "El Portal De Las Cinco Vocales",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Arrastra la pieza hasta el hueco!",
+    "demostracionAcierto": "¡Así se construye!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Tenemos una misión espacial!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Reconstruye las vocales y activa los portales!"
+      }
+    ]
+  },
+  "demo": {
+    "vocal": "u",
+    "faltan": [
+      "pata"
+    ],
+    "piezas": [
+      "pata_u",
+      "barra_corta"
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "verBotonRepetir": false,
+    "mostrarProgreso": true,
+    "animaciones_opciones": true,
+    "efectosSonido": true,
+    "mostrarFeedBack": false
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "formas": {
+    "arco_a": {
+      "img": "img/arco_a.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "palo_a": {
+      "img": "img/palo_a.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "palo_e": {
+      "img": "img/palo_e.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "barra_e_sup": {
+      "img": "img/barra_e_sup.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "barra_e_med": {
+      "img": "img/barra_e_med.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "barra_e_inf": {
+      "img": "img/barra_e_inf.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "punto_i": {
+      "img": "img/punto_i.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "palo_i": {
+      "img": "img/palo_i.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "arco_o": {
+      "img": "img/arco_o.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "arco_o_chico": {
+      "img": "img/arco_o_chico.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "arco_u": {
+      "img": "img/arco_u.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "pata_u": {
+      "img": "img/pata_u.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "barra_corta": {
+      "img": "img/barra_corta.svg?v=e",
+      "w": 200,
+      "h": 240
+    },
+    "palo": {
+      "img": "img/palo.svg?v=e",
+      "w": 200,
+      "h": 240
+    }
+  },
+  "vocales": {
+    "a": {
+      "silueta": "img/silueta_a.svg?v=e",
+      "color": "#ff6b6b",
+      "slots": [
+        {
+          "id": "cuerpo",
+          "forma": "arco_a",
+          "x": 18,
+          "y": 35,
+          "w": 55,
+          "h": 55
+        },
+        {
+          "id": "palo",
+          "forma": "palo_a",
+          "x": 62,
+          "y": 22,
+          "w": 22,
+          "h": 68
+        }
+      ]
+    },
+    "e": {
+      "silueta": "img/silueta_e.svg?v=e",
+      "color": "#fcc419",
+      "fijos": [
+        "palo_e"
+      ],
+      "slots": [
+        {
+          "id": "sup",
+          "forma": "barra_e_sup",
+          "x": 28,
+          "y": 14,
+          "w": 58,
+          "h": 18
+        },
+        {
+          "id": "med",
+          "forma": "barra_e_med",
+          "x": 28,
+          "y": 42,
+          "w": 48,
+          "h": 18
+        },
+        {
+          "id": "inf",
+          "forma": "barra_e_inf",
+          "x": 28,
+          "y": 68,
+          "w": 58,
+          "h": 18
+        }
+      ]
+    },
+    "i": {
+      "silueta": "img/silueta_i.svg?v=e",
+      "color": "#15aabf",
+      "slots": [
+        {
+          "id": "punto",
+          "forma": "punto_i",
+          "x": 38,
+          "y": 8,
+          "w": 24,
+          "h": 22
+        },
+        {
+          "id": "palo",
+          "forma": "palo_i",
+          "x": 40,
+          "y": 32,
+          "w": 20,
+          "h": 58
+        }
+      ]
+    },
+    "o": {
+      "silueta": "img/silueta_o.svg?v=e",
+      "color": "#be4bdb",
+      "slots": [
+        {
+          "id": "anillo",
+          "forma": "arco_o",
+          "x": 18,
+          "y": 22,
+          "w": 64,
+          "h": 64
+        }
+      ]
+    },
+    "u": {
+      "silueta": "img/silueta_u.svg?v=e",
+      "color": "#37b24d",
+      "slots": [
+        {
+          "id": "cuerpo",
+          "forma": "arco_u",
+          "x": 18,
+          "y": 16,
+          "w": 48,
+          "h": 72
+        },
+        {
+          "id": "pata",
+          "forma": "pata_u",
+          "x": 58,
+          "y": 16,
+          "w": 22,
+          "h": 58
+        }
+      ]
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "La misión: rescate de las vocales desarmadas",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Tenemos una misión espacial!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Reconstruye las vocales y activa los portales!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "final",
+          "tipo": "final",
+          "pool": [
+            "a",
+            "e",
+            "i",
+            "o",
+            "u"
+          ],
+          "distractores": 2,
+          "cincoSiluetas": true,
+          "modeloBreve": true,
+          "pistaTrasFallos": 2,
+          "acierto": {
+            "efecto": "portales",
+            "sonido": "celebracion"
+          },
+          "iOrigen": 5
+        }
+      ],
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Misión cumplida! ¡Reconstruiste las vocales!"
+      },
+      "insignia": {
+        "img": "img/insignia_nave.svg",
+        "nombre": "Nave de las cinco vocales"
+      }
+    }
+  ]
+}

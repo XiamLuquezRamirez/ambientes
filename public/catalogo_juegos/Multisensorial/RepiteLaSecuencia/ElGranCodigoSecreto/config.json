@@ -1,0 +1,148 @@
+{
+  "nombre": "El Gran Codigo Secreto",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha los sonidos y luego tócalos en el mismo orden.",
+    "demostracionAcierto": "¡Así se repite la secuencia!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "Escucha el sonido secreto."
+      },
+      {
+        "personaje": 0,
+        "texto": "Y repítelo en el mismo orden."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "secuencia": [
+      "vaca",
+      "gallo"
+    ]
+  },
+  "elementos": {
+    "perro": {
+      "img": "img/perro.png",
+      "nombre": "Perro",
+      "sonido": "ladrido"
+    },
+    "gato": {
+      "img": "img/gato.png",
+      "nombre": "Gato",
+      "sonido": "maullido"
+    },
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pájaro",
+      "sonido": "trino"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana",
+      "sonido": "campana"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor",
+      "sonido": "tambor"
+    },
+    "maracas": {
+      "img": "img/maracas.svg",
+      "nombre": "Maraca",
+      "sonido": "maracas"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota",
+      "sonido": "rebote"
+    },
+    "carro": {
+      "img": "img/carro.png",
+      "nombre": "Carro",
+      "sonido": "carro"
+    },
+    "vaca": {
+      "img": "img/vaca.svg",
+      "nombre": "Vaca",
+      "sonido": "mugido"
+    },
+    "gallo": {
+      "img": "img/gallo.svg",
+      "nombre": "Gallo",
+      "sonido": "quiquiriqui"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El código secreto de los sonidos",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "Escucha el sonido secreto."
+        },
+        {
+          "personaje": 0,
+          "texto": "Y repítelo en el mismo orden."
+        }
+      ],
+      "retos": [
+        {
+          "id": "gran-codigo",
+          "titulo": "El gran código secreto",
+          "secuencias": [
+            [
+              "tambor",
+              "pajaro",
+              "campana",
+              "perro",
+              "pelota"
+            ]
+          ],
+          "opciones": [
+            "tambor",
+            "pajaro",
+            "campana",
+            "perro",
+            "pelota",
+            "gato"
+          ],
+          "acierto": {
+            "efecto": "final",
+            "sonido": "victoria"
+          },
+          "iOrigen": 4
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Lo recordaste todo!"
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Eres un maestro de los sonidos!"
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_maestro.svg",
+        "nombre": "¡Maestro de las secuencias!"
+      }
+    }
+  ]
+}

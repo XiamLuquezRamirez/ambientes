@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Medalla de oro Maestro del Audio y los Sonidos">
+  <defs>
+    <radialGradient id="oro" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#fff8e1"/>
+      <stop offset="0.45" stop-color="#ffd54f"/>
+      <stop offset="1" stop-color="#ff8f00"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M74 8 H110 L130 86 L94 98 Z" fill="#3949ab"/>
+    <path d="M166 8 H130 L110 86 L146 98 Z" fill="#00acc1"/>
+    <path d="M120 58 L138 70 L160 66 L168 86 L188 96 L184 118 L196 136 L182 152 L184 174 L164 182 L154 202 L132 198 L120 214 L108 198 L86 202 L76 182 L56 174 L58 152 L44 136 L56 118 L52 96 L72 86 L80 66 L102 70 Z" fill="url(#oro)"/>
+    <circle cx="120" cy="138" r="52" fill="#263238"/>
+  </g>
+  <path d="M86 140 C86 110 154 110 154 140" fill="none" stroke="#b0bec5" stroke-width="9" stroke-linecap="round"/>
+  <g stroke="#37474f" stroke-width="3">
+    <rect x="76" y="134" width="20" height="30" rx="8" fill="#ff7043"/>
+    <rect x="144" y="134" width="20" height="30" rx="8" fill="#ff7043"/>
+  </g>
+  <g stroke-linecap="round" stroke-width="6">
+    <path d="M106 160 V146" stroke="#69f0ae"/>
+    <path d="M116 160 V134" stroke="#ffd740"/>
+    <path d="M126 160 V140" stroke="#40c4ff"/>
+    <path d="M136 160 V150" stroke="#ff4081"/>
+  </g>
+  <g fill="#fff" opacity="0.95">
+    <path d="M62 52 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z"/>
+    <path d="M184 46 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z"/>
+  </g>
+</svg>

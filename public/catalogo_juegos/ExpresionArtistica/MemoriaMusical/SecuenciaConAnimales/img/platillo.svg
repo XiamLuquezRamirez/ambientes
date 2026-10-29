@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Platillo">
+
+  <g stroke="#37474f" stroke-width="4">
+    <ellipse cx="120" cy="128" rx="90" ry="28" fill="#ffd54f"/>
+    <ellipse cx="120" cy="122" rx="70" ry="16" fill="#ffe082"/>
+    <circle cx="120" cy="124" r="8" fill="#f9a825"/>
+    <rect x="114" y="40" width="12" height="84" rx="4" fill="#90a4ae"/>
+  </g>
+</svg>

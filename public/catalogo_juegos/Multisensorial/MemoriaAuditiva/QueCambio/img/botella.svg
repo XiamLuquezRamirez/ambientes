@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Botella con semillas">
+  <ellipse cx="120" cy="222" rx="60" ry="9" fill="#000" opacity="0.1"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="98" y="16" width="44" height="22" rx="6" fill="#43a047"/>
+    <path d="M104 38 L136 38 L136 62 C136 72 170 82 170 110 L170 196 C170 210 160 216 148 216 L92 216 C80 216 70 210 70 196 L70 110 C70 82 104 72 104 62 Z" fill="#e1f5fe" fill-opacity="0.85"/>
+  </g>
+  <path d="M74 150 C100 140 140 160 166 148 L166 196 C166 208 158 212 148 212 L92 212 C82 212 74 208 74 196 Z" fill="#ffcc80"/>
+  <g fill="#8d6e63">
+    <ellipse cx="88" cy="168" rx="6" ry="4" transform="rotate(30 88 168)"/>
+    <ellipse cx="106" cy="182" rx="6" ry="4" transform="rotate(-20 106 182)"/>
+    <ellipse cx="124" cy="164" rx="6" ry="4" transform="rotate(50 124 164)"/>
+    <ellipse cx="140" cy="186" rx="6" ry="4" transform="rotate(10 140 186)"/>
+    <ellipse cx="154" cy="166" rx="6" ry="4" transform="rotate(-40 154 166)"/>
+    <ellipse cx="96" cy="198" rx="6" ry="4" transform="rotate(70 96 198)"/>
+    <ellipse cx="122" cy="200" rx="6" ry="4" transform="rotate(-10 122 200)"/>
+    <ellipse cx="148" cy="202" rx="6" ry="4" transform="rotate(35 148 202)"/>
+    <ellipse cx="112" cy="128" rx="5" ry="3.5" transform="rotate(20 112 128)"/>
+    <ellipse cx="138" cy="118" rx="5" ry="3.5" transform="rotate(-30 138 118)"/>
+  </g>
+  <path d="M84 104 C84 96 90 88 98 84" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+  <g stroke="#90a4ae" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M42 104 C34 116 34 132 42 144"/>
+    <path d="M198 104 C206 116 206 132 198 144"/>
+  </g>
+</svg>

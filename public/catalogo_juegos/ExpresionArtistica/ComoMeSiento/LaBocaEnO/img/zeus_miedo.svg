@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="300" viewBox="0 0 320 300">
+  <rect width="320" height="300" fill="#1a237e"/>
+  <rect x="210" y="30" width="90" height="240" fill="#c62828"/>
+  <ellipse cx="255" cy="95" rx="38" ry="55" fill="#263238" opacity=".9"/>
+  <ellipse cx="120" cy="265" rx="55" ry="14" fill="#283593"/>
+  <rect x="90" y="175" width="60" height="80" rx="12" fill="#43a047"/>
+  <circle cx="120" cy="125" r="44" fill="#ffb74d"/>
+  <ellipse cx="105" cy="120" rx="10" ry="14" fill="#3e2723"/>
+  <ellipse cx="135" cy="120" rx="10" ry="14" fill="#3e2723"/>
+  <circle cx="105" cy="120" r="4" fill="#fff"/>
+  <circle cx="135" cy="120" r="4" fill="#fff"/>
+  <ellipse cx="120" cy="148" rx="9" ry="7" fill="#0277bd"/>
+  <path d="M88 95 Q105 80 118 95" fill="none" stroke="#5d4037" stroke-width="4"/>
+  <path d="M122 95 Q135 80 152 95" fill="none" stroke="#5d4037" stroke-width="4"/>
+  <path d="M70 200 Q95 160 105 185" stroke="#43a047" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <path d="M170 200 Q145 160 135 185" stroke="#43a047" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <circle cx="70" cy="200" r="14" fill="#ffb74d"/>
+  <circle cx="170" cy="200" r="14" fill="#ffb74d"/>
+  <text x="120" y="40" text-anchor="middle" font-size="22" fill="#ef9a9a" font-family="Arial,sans-serif">¡Tuc!</text>
+</svg>

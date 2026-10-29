@@ -1,0 +1,216 @@
+{
+  "nombre": "El Arqueólogo",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira! Arrastra el pincel hacia la mano de Zoe.",
+    "demostracionAcierto": "¡Así se entrega la herramienta correcta!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "demostracionLab": "¡En el laboratorio el orden importa! Primero el trípode, luego el tubo y al final el lente. Después apúntalo al cielo.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al laboratorio de utilería! Aquí armamos, encendemos y hacemos sonar las herramientas del escenario."
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy vas a construir, seguir pistas, dirigir y crear una melodía."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "pincel",
+    "personaje": "zoe_pintora",
+    "distractor": "saxofon"
+  },
+  "escenas": {
+    "taller": "img/escenas/taller.svg",
+    "laboratorio": "img/escenas/laboratorio.svg"
+  },
+  "elementos": {
+    "zoe_pintora": {
+      "img": "img/zoe_pintora.svg",
+      "nombre": "Zoe pintora"
+    },
+    "zeus_doctor": {
+      "img": "img/zeus_doctor.svg",
+      "nombre": "Zeus doctor"
+    },
+    "zoe_chef": {
+      "img": "img/zoe_chef.svg",
+      "nombre": "Zoe chef"
+    },
+    "zeus_cantante": {
+      "img": "img/zeus_cantante.svg",
+      "nombre": "Zeus cantante"
+    },
+    "zoe_astronoma": {
+      "img": "img/zoe_astronoma.svg",
+      "nombre": "Zoe astrónoma"
+    },
+    "zeus_arqueologo": {
+      "img": "img/zeus_arqueologo.svg",
+      "nombre": "Zeus arqueólogo"
+    },
+    "zoe_directora": {
+      "img": "img/zoe_directora.svg",
+      "nombre": "Zoe directora"
+    },
+    "pincel": {
+      "img": "img/pincel.svg",
+      "nombre": "Pincel de pintura"
+    },
+    "saxofon": {
+      "img": "img/saxofon.svg",
+      "nombre": "Saxofón"
+    },
+    "estetoscopio": {
+      "img": "img/estetoscopio.svg",
+      "nombre": "Estetoscopio"
+    },
+    "martillo": {
+      "img": "img/martillo.svg",
+      "nombre": "Martillo de construcción"
+    },
+    "cucharon": {
+      "img": "img/cucharon.svg",
+      "nombre": "Cucharón de madera"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota de fútbol"
+    },
+    "microfono": {
+      "img": "img/microfono.svg",
+      "nombre": "Micrófono de escenario"
+    },
+    "escoba": {
+      "img": "img/escoba.svg",
+      "nombre": "Escoba"
+    },
+    "tripode": {
+      "img": "img/tripode.svg",
+      "nombre": "Trípode"
+    },
+    "tubo": {
+      "img": "img/tubo.svg",
+      "nombre": "Tubo óptico"
+    },
+    "lente": {
+      "img": "img/lente.svg",
+      "nombre": "Lente de cristal"
+    },
+    "telescopio": {
+      "img": "img/telescopio.svg",
+      "nombre": "Telescopio"
+    },
+    "cielo": {
+      "img": "img/cielo.svg",
+      "nombre": "Cielo estrellado"
+    },
+    "suelo": {
+      "img": "img/suelo.svg",
+      "nombre": "Suelo"
+    },
+    "lupa": {
+      "img": "img/lupa.svg",
+      "nombre": "Lupa de explorador"
+    },
+    "jeroglifico": {
+      "img": "img/jeroglifico.svg",
+      "nombre": "Jeroglífico"
+    },
+    "batuta": {
+      "img": "img/batuta.svg",
+      "nombre": "Batuta"
+    },
+    "nota_musical": {
+      "img": "img/nota_musical.svg",
+      "nombre": "Notas musicales"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Laboratorio de utilería",
+      "tema": "laboratorio",
+      "escena": "laboratorio",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al laboratorio de utilería! Aquí armamos, encendemos y hacemos sonar las herramientas del escenario."
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy vas a construir, seguir pistas, dirigir y crear una melodía."
+        }
+      ],
+      "galeria": [
+        "telescopio",
+        "lupa",
+        "batuta",
+        "nota_musical"
+      ],
+      "retos": [
+        {
+          "id": "lupa",
+          "tipo": "unirPuntos",
+          "titulo": "Enciende la Lupa Ultravioleta",
+          "personaje": "zeus_arqueologo",
+          "puntos": 8,
+          "efecto": "xilofono",
+          "jeroglifico": {
+            "x": 50,
+            "y": 46,
+            "w": 22,
+            "h": 22
+          },
+          "consigna": {
+            "voz": "zeus",
+            "texto": "¡Hay un mapa antiguo grabado en la pared! Para encender mi lupa de explorador, conecta los puntos del 1 al 8 siguiendo la secuencia numérica."
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Increíble precisión! Conectaste todos los números, encendiste la lupa y descubriste la entrada secreta."
+          },
+          "errorSalto": {
+            "voz": "zeus",
+            "texto": "¡Esa línea se puso roja! Conecta el número que sigue, sin saltarte ninguno."
+          },
+          "iOrigen": 1
+        }
+      ],
+      "desfile": {
+        "voz": "zeus",
+        "texto": "¡Mira el telescopio, la lupa, la batuta y la melodía que creaste para el escenario!"
+      },
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Demostraste una mente de gran detective y constructor! No solo asociaste las herramientas, sino que las armaste, las encendiste y creaste música."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡El teatro necesita mentes creativas que sepan cómo funciona cada objeto en el escenario!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_maestro.svg",
+        "nombre": "Maestro de la Lógica y las Herramientas Escénicas",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

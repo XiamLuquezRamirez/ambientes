@@ -1,0 +1,220 @@
+{
+  "nombre": "Clasificación Doble",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira cómo se juega! Toca lo que corresponde a la canasta.",
+    "demostracionLab": "¡Mira cómo se juega! Lleva cada cosa al tubo de su sentido.",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenidos al laboratorio!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Clasifica cada elemento en su tubo!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "sentidos": {
+    "vista": {
+      "nombre": "Vista",
+      "icono": "img/ojo.svg",
+      "color": "#4dabf7",
+      "efecto": "puffShine",
+      "reaccion": "parpadea"
+    },
+    "oido": {
+      "nombre": "Oído",
+      "icono": "img/oreja.svg",
+      "color": "#fcc419",
+      "efecto": "dingDongTam",
+      "reaccion": "baila"
+    },
+    "olfato": {
+      "nombre": "Olfato",
+      "icono": "img/nariz.svg",
+      "color": "#cc5de8",
+      "efecto": "sfffffBloom",
+      "reaccion": "aroma"
+    },
+    "gusto": {
+      "nombre": "Gusto",
+      "icono": "img/boca.svg",
+      "color": "#ff922b",
+      "efecto": "miamSour",
+      "reaccion": "sabor"
+    },
+    "tacto": {
+      "nombre": "Tacto",
+      "icono": "img/mano.svg",
+      "color": "#69db7c",
+      "efecto": "textura",
+      "reaccion": "siente"
+    }
+  },
+  "demo": {
+    "tubos": [
+      "vista"
+    ],
+    "opciones": [
+      "sol",
+      "tambor"
+    ],
+    "correcto": "sol"
+  },
+  "demoLab": {
+    "tubos": [
+      "vista",
+      "oido"
+    ],
+    "piezas": [
+      {
+        "id": "sol",
+        "tubo": "vista"
+      },
+      {
+        "id": "campana",
+        "tubo": "oido"
+      }
+    ]
+  },
+  "elementos": {
+    "arcoiris": {
+      "img": "img/arcoiris.svg",
+      "nombre": "Arcoíris"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor"
+    },
+    "chocolate": {
+      "img": "img/chocolate.svg",
+      "nombre": "Chocolate"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana"
+    },
+    "sol": {
+      "img": "img/sol.svg",
+      "nombre": "Sol"
+    },
+    "helado": {
+      "img": "img/helado.svg",
+      "nombre": "Helado"
+    },
+    "perfume": {
+      "img": "img/perfume.svg",
+      "nombre": "Perfume"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota"
+    },
+    "flor": {
+      "img": "img/flor.svg",
+      "nombre": "Flor"
+    },
+    "limon": {
+      "img": "img/limon.svg",
+      "nombre": "Limón"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "nombre": "Lija"
+    },
+    "sirena": {
+      "img": "img/sirena.svg",
+      "nombre": "Sirena"
+    },
+    "almohada": {
+      "img": "img/almohada.svg",
+      "nombre": "Almohada"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El laboratorio de clasificación",
+      "escena": "laboratorio",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenidos al laboratorio!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Clasifica cada elemento en su tubo!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "vista-oido",
+          "titulo": "Vista y oído",
+          "mecanica": "clasifica",
+          "tubos": [
+            "vista",
+            "oido"
+          ],
+          "piezas": [
+            {
+              "id": "sol",
+              "tubo": "vista"
+            },
+            {
+              "id": "campana",
+              "tubo": "oido"
+            },
+            {
+              "id": "arcoiris",
+              "tubo": "vista"
+            },
+            {
+              "id": "tambor",
+              "tubo": "oido"
+            }
+          ],
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Bienvenidos al Laboratorio! Clasifica los elementos que percibimos principalmente con la VISTA en el tubo azul y los del OÍDO en el tubo amarillo."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Clasificaste correctamente por los sentidos de la vista y el oído.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "¡Inténtalo otra vez!",
+            "efecto": "boing"
+          },
+          "iOrigen": 0
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Excelente! Clasificaste los elementos usando los sentidos."
+        }
+      ],
+      "cierreEscena": "organigrama",
+      "insignia": {
+        "img": "img/insignia_cientifico.svg",
+        "nombre": "Científico Máster en Sensopercepción"
+      }
+    }
+  ]
+}

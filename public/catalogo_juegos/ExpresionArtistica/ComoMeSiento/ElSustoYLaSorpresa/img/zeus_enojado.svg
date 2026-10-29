@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="300" viewBox="0 0 280 300">
+  <rect width="280" height="300" fill="#ffcdd2"/>
+  <ellipse cx="140" cy="255" rx="75" ry="16" fill="#e57373"/>
+  <rect x="100" y="165" width="80" height="90" rx="12" fill="#43a047"/>
+  <circle cx="140" cy="112" r="52" fill="#ffb74d"/>
+  <path d="M100 68 Q140 48 180 68" fill="#5d4037"/>
+  <circle cx="122" cy="110" r="8" fill="#3e2723"/>
+  <circle cx="158" cy="110" r="8" fill="#3e2723"/>
+  <path d="M108 95 L132 108" stroke="#3e2723" stroke-width="5" stroke-linecap="round"/>
+  <path d="M172 95 L148 108" stroke="#3e2723" stroke-width="5" stroke-linecap="round"/>
+  <path d="M118 145 L162 145" stroke="#bf360c" stroke-width="6" stroke-linecap="round"/>
+  <path d="M85 185 Q110 210 125 195" stroke="#43a047" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <path d="M195 185 Q170 210 155 195" stroke="#43a047" stroke-width="16" fill="none" stroke-linecap="round"/>
+  <circle cx="85" cy="185" r="14" fill="#ffb74d"/>
+  <circle cx="195" cy="185" r="14" fill="#ffb74d"/>
+  <text x="140" y="38" text-anchor="middle" font-size="24" fill="#c62828" font-family="Arial,sans-serif">¡Grr!</text>
+</svg>

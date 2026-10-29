@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <defs>
+    <linearGradient id="manz" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff8a80"/>
+      <stop offset="45%" stop-color="#ef5350"/>
+      <stop offset="100%" stop-color="#b71c1c"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="90" cy="100" rx="60" ry="55" fill="url(#manz)" stroke="#c62828" stroke-width="4"/>
+  <path d="M90 50 Q95 30 110 25" stroke="#6d4c41" stroke-width="5" fill="none"/>
+  <ellipse cx="105" cy="28" rx="14" ry="8" fill="#66bb6a"/>
+  <ellipse cx="68" cy="80" rx="14" ry="10" fill="#ffcdd2" opacity="0.7"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 380" role="img" aria-label="Medalla Superdetective de la Memoria">
+  <path d="M95 0 L150 120 L205 0 L250 0 L180 150 L120 150 L50 0 Z" fill="#1e88e5"/>
+  <path d="M120 0 L150 70 L180 0 Z" fill="#e53935"/>
+  <circle cx="150" cy="230" r="118" fill="#ffb300"/>
+  <circle cx="150" cy="230" r="100" fill="#ffd54f"/>
+  <circle cx="150" cy="230" r="100" fill="none" stroke="#ff8f00" stroke-width="6" stroke-dasharray="10 8"/>
+  <circle cx="135" cy="205" r="38" fill="#fff8e1" stroke="#5d4037" stroke-width="10"/>
+  <circle cx="135" cy="205" r="22" fill="#b3e5fc" opacity="0.8"/>
+  <path d="M162 232 L198 268" stroke="#5d4037" stroke-width="16" stroke-linecap="round"/>
+  <path d="M38 282 L262 282 L250 312 L262 342 L38 342 L50 312 Z" fill="#6a1b9a"/>
+  <text x="150" y="306" text-anchor="middle" font-family="Fredoka, Arial, sans-serif" font-weight="700" font-size="20" fill="#fff">SUPERDETECTIVE</text>
+  <text x="150" y="331" text-anchor="middle" font-family="Fredoka, Arial, sans-serif" font-weight="700" font-size="17" fill="#ffd54f">DE LA MEMORIA</text>
+</svg>

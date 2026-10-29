@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Manos">
+  <ellipse cx="120" cy="222" rx="84" ry="9" fill="#000" opacity="0.1"/>
+  <g fill="#ffcc80" stroke="#6d4c41" stroke-width="4" stroke-linejoin="round">
+    <g transform="rotate(-24 70 150)">
+      <rect x="44" y="160" width="44" height="52" rx="10" fill="#4fc3f7"/>
+      <path d="M44 166 L44 92 C44 82 56 82 56 92 L56 128 L56 74 C56 64 68 64 68 74 L68 126 L68 70 C68 60 80 60 80 70 L80 128 L80 84 C80 74 92 74 92 84 L92 150 C92 160 86 168 76 168 L56 168 C48 168 44 172 44 166 Z"/>
+      <path d="M44 140 C34 132 24 118 28 110 C34 104 42 112 46 122"/>
+    </g>
+    <g transform="rotate(24 170 150)">
+      <rect x="152" y="160" width="44" height="52" rx="10" fill="#4fc3f7"/>
+      <path d="M196 166 L196 92 C196 82 184 82 184 92 L184 128 L184 74 C184 64 172 64 172 74 L172 126 L172 70 C172 60 160 60 160 70 L160 128 L160 84 C160 74 148 74 148 84 L148 150 C148 160 154 168 164 168 L184 168 C192 168 196 172 196 166 Z"/>
+      <path d="M196 140 C206 132 216 118 212 110 C206 104 198 112 194 122"/>
+    </g>
+  </g>
+</svg>

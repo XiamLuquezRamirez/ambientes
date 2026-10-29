@@ -1,0 +1,342 @@
+{
+  "nombre": "¡El Rescate En El Lodo Y Taller De Llantas!",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! A esta taza le falta una pieza. Mira: toco la pieza que encaja en el hueco.",
+    "demostracionAcierto": "¡Así! La pieza encajó y la taza quedó completa.",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. Bienvenido a nuestro taller mágico."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! A algunos juguetes e inventos les falta una pieza importante."
+      },
+      {
+        "personaje": 1,
+        "texto": "Observa la forma y el tamaño, y encuentra la pieza que encaja. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {
+      "dingaling": "",
+      "boing": "",
+      "splash": "",
+      "ronquido": "",
+      "swoosh": "",
+      "clack": "",
+      "puff": "",
+      "vroom": "",
+      "clic": "",
+      "golpe": "",
+      "escaner": "",
+      "clackding": "",
+      "alerta": "",
+      "zzzpop": "",
+      "grua": "",
+      "pumclack": "",
+      "lluvia": "",
+      "viento": "",
+      "fanfarria": "",
+      "magia": ""
+    }
+  },
+  "piezas": {
+    "ala_mariposa": {
+      "nombre": "Ala de mariposa",
+      "img": "img/piezas/ala_mariposa.svg",
+      "w": 80,
+      "h": 139
+    },
+    "oreja_conejo": {
+      "nombre": "Oreja de conejo",
+      "img": "img/piezas/oreja_conejo.svg",
+      "w": 40,
+      "h": 110
+    },
+    "hoja": {
+      "nombre": "Hoja de árbol",
+      "img": "img/piezas/hoja.svg",
+      "w": 70,
+      "h": 89
+    },
+    "rueda": {
+      "nombre": "Rueda",
+      "img": "img/piezas/rueda.svg",
+      "w": 48,
+      "h": 48
+    },
+    "estrella": {
+      "nombre": "Estrella",
+      "img": "img/piezas/estrella.svg",
+      "w": 52,
+      "h": 52
+    },
+    "flor": {
+      "nombre": "Flor",
+      "img": "img/piezas/flor.svg",
+      "w": 52,
+      "h": 52
+    },
+    "techo": {
+      "nombre": "Techo triangular rojo",
+      "img": "img/piezas/techo.svg",
+      "w": 180,
+      "h": 80
+    },
+    "sol": {
+      "nombre": "Sol sonriente",
+      "img": "img/piezas/sol.svg",
+      "w": 70,
+      "h": 70
+    },
+    "arbol": {
+      "nombre": "Árbol verde",
+      "img": "img/piezas/arbol.svg",
+      "w": 70,
+      "h": 89
+    },
+    "ala_mec": {
+      "nombre": "Ala mecánica",
+      "img": "img/piezas/ala_mec.svg",
+      "w": 80,
+      "h": 139
+    },
+    "ala_mec_ondulada": {
+      "nombre": "Ala de bordes ondulados",
+      "img": "img/piezas/ala_mec_ondulada.svg",
+      "w": 80,
+      "h": 139
+    },
+    "ala_mec_pequena": {
+      "nombre": "Ala más pequeña",
+      "img": "img/piezas/ala_mec.svg",
+      "w": 60,
+      "h": 104
+    },
+    "hoja_ala": {
+      "nombre": "Hoja verde",
+      "img": "img/piezas/hoja_ala.svg",
+      "w": 80,
+      "h": 139
+    },
+    "ala_abeja": {
+      "nombre": "Ala de abeja",
+      "img": "img/piezas/ala_abeja.svg",
+      "w": 80,
+      "h": 139
+    },
+    "rueda_44": {
+      "nombre": "Rueda",
+      "img": "img/piezas/rueda.svg",
+      "w": 44,
+      "h": 44
+    },
+    "rueda_60": {
+      "nombre": "Rueda más grande",
+      "img": "img/piezas/rueda.svg",
+      "w": 60,
+      "h": 60
+    },
+    "rueda_32": {
+      "nombre": "Rueda más pequeña",
+      "img": "img/piezas/rueda.svg",
+      "w": 32,
+      "h": 32
+    },
+    "pelota": {
+      "nombre": "Pelota",
+      "img": "img/piezas/pelota.svg",
+      "w": 44,
+      "h": 44
+    },
+    "circulo_plano": {
+      "nombre": "Círculo plano",
+      "img": "img/piezas/circulo_plano.svg",
+      "w": 44,
+      "h": 44
+    },
+    "techo_mod": {
+      "nombre": "Techo",
+      "img": "img/piezas/techo_mod.svg",
+      "w": 170,
+      "h": 64
+    },
+    "techo_mod_ancho": {
+      "nombre": "Techo más ancho",
+      "img": "img/piezas/techo_mod.svg",
+      "w": 230,
+      "h": 64
+    },
+    "techo_mod_pequeno": {
+      "nombre": "Techo más pequeño",
+      "img": "img/piezas/techo_mod.svg",
+      "w": 120,
+      "h": 45
+    },
+    "techo_agudo": {
+      "nombre": "Triángulo puntiagudo",
+      "img": "img/piezas/techo_agudo.svg",
+      "w": 170,
+      "h": 130
+    },
+    "techo_trapecio": {
+      "nombre": "Techo trapezoidal",
+      "img": "img/piezas/techo_trapecio.svg",
+      "w": 170,
+      "h": 50,
+      "forma": "trapecio"
+    },
+    "asa": {
+      "nombre": "Asa de taza",
+      "img": "img/piezas/asa.svg",
+      "w": 46,
+      "h": 66
+    }
+  },
+  "demo": {
+    "figura": "taza",
+    "capas": [
+      {
+        "img": "img/figuras/taza_cuerpo.svg",
+        "clase": "cuerpo"
+      }
+    ],
+    "hueco": {
+      "x": 186,
+      "y": 108,
+      "w": 46,
+      "h": 66,
+      "img": "img/figuras/taza_hueco.svg"
+    },
+    "opciones": [
+      "asa",
+      "estrella",
+      "flor"
+    ],
+    "correcta": "asa"
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El Taller de Juguetes Mágicos",
+      "tema": "taller",
+      "retos": [
+        {
+          "figura": "carro",
+          "nombre": "Carro de carreras",
+          "mecanica": "lodo",
+          "arrastre": true,
+          "iman": true,
+          "capas": [
+            {
+              "img": "img/figuras/carro_cuerpo.svg",
+              "clase": "cuerpo"
+            },
+            {
+              "img": "img/piezas/rueda.svg",
+              "clase": "rueda rueda-delantera",
+              "x": 191,
+              "y": 148,
+              "w": 48,
+              "h": 48
+            },
+            {
+              "img": "img/piezas/rueda.svg",
+              "clase": "rueda rueda-perdida",
+              "x": 61,
+              "y": 148,
+              "w": 48,
+              "h": 48
+            }
+          ],
+          "hueco": {
+            "x": 61,
+            "y": 148,
+            "w": 48,
+            "h": 48,
+            "forma": "circulo"
+          },
+          "colocada": "rueda",
+          "escape": {
+            "x": 12,
+            "y": 160
+          },
+          "charco": {
+            "x": 28,
+            "y": 188,
+            "w": 120,
+            "h": 22
+          },
+          "opciones": [
+            "rueda",
+            "estrella",
+            "flor"
+          ],
+          "correcta": "rueda",
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Cuidado, coche en apuros! El lodo tapó las herramientas del taller. ¡Ayúdame a limpiar para encontrar la rueda!"
+          },
+          "lodo": {
+            "limpiezaMinima": 0.6,
+            "ayudaMs": 12000,
+            "ayuda": {
+              "voz": "zeus",
+              "texto": "¡Te ayudo a limpiar!"
+            }
+          },
+          "descubierta": {
+            "voz": "zoe",
+            "texto": "¡Ahí está la rueda! Tómala y conéctala en el eje del carro."
+          },
+          "inflar": {
+            "voz": "zeus",
+            "texto": "¡La llanta quedó desinflada! Toca la bomba de aire para inflarla.",
+            "bombazos": 3
+          },
+          "acierto": {
+            "efecto": "clack",
+            "celebracion": "carroArranca"
+          },
+          "errores": {
+            "estrella": {
+              "voz": "zoe",
+              "texto": "Mmm, ¡esa es una estrella! Busca la rueda.",
+              "reaccion": "rebote"
+            },
+            "flor": {
+              "voz": "zoe",
+              "texto": "Mmm, ¡esa es una flor! Busca la rueda.",
+              "reaccion": "rebote"
+            }
+          },
+          "iOrigen": 1
+        }
+      ],
+      "final": {
+        "tipo": "taller",
+        "titulo": "Gran Constructor del Taller",
+        "autoMs": 7000
+      },
+      "premio": {
+        "tipo": "trofeo",
+        "nombre": "Gran Constructor del Taller",
+        "img": ""
+      },
+      "cierre": "¡Recibiste el trofeo del Gran Constructor del Taller!"
+    }
+  ]
+}

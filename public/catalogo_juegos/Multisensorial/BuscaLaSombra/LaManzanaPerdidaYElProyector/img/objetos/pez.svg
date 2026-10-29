@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<rect width="200" height="200" fill="none"/>
+<ellipse cx="95" cy="100" rx="60" ry="38" fill="#15aabf"/>
+<polygon points="155,100 195,65 195,135" fill="#15aabf"/>
+<circle cx="60" cy="90" r="8" fill="#212529"/>
+<path d="M40 100 Q20 85 35 75" fill="none" stroke="#0b7285" stroke-width="4"/>
+</svg>

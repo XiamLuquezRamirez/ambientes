@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Tren">
+
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="18" y="88" width="150" height="80" rx="16" fill="#ef5350"/>
+    <rect x="118" y="48" width="70" height="58" rx="10" fill="#42a5f5"/>
+    <circle cx="58" cy="178" r="18" fill="#455a64"/>
+    <circle cx="128" cy="178" r="18" fill="#455a64"/>
+    <rect x="168" y="118" width="28" height="16" rx="4" fill="#ffca28"/>
+    <circle cx="40" cy="70" r="10" fill="#cfd8dc"/>
+  </g>
+</svg>

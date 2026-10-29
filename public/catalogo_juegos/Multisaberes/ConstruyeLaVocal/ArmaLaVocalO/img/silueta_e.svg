@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <path d="M62 48v144" stroke="#1e3a5f" stroke-width="22" stroke-linecap="round" stroke-dasharray="14 10" opacity=".72"/>
+  <path d="M62 55h100" stroke="#1e3a5f" stroke-width="22" stroke-linecap="round" stroke-dasharray="14 10" opacity=".72"/>
+  <path d="M62 120h80" stroke="#1e3a5f" stroke-width="22" stroke-linecap="round" stroke-dasharray="14 10" opacity=".72"/>
+  <path d="M62 185h100" stroke="#1e3a5f" stroke-width="22" stroke-linecap="round" stroke-dasharray="14 10" opacity=".72"/>
+</svg>

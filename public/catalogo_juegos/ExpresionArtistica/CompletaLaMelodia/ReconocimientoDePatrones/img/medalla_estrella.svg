@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Superestrellita Musical">
+
+  <circle cx="120" cy="132" r="78" fill="#ffca28" stroke="#fff8e1" stroke-width="8"/>
+  <path d="M120 70 L136 112 L182 116 L148 146 L158 192 L120 168 L82 192 L92 146 L58 116 L104 112 Z" fill="#fff8e1" stroke="#f9a825" stroke-width="3"/>
+  <path d="M78 28 L102 100 H78 Z" fill="#ef5350"/>
+  <path d="M162 28 L138 100 H162 Z" fill="#42a5f5"/>
+</svg>

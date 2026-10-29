@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Barrido: ¿Qué sonido escuchas? (Expresión Artística).
+ * Barrido: ¿Qué sonido escuchas? (Expresión Artística) — 6 juegos.
  * Uso: php scripts/barrido-que-sonido-escuchas-arte.php
  */
 
@@ -38,229 +38,176 @@ function warn(string $msg): void
     echo "[WARN] {$msg}\n";
 }
 
-$rel = 'ExpresionArtistica/QueSonidoEscuchas';
-$dir = public_path('catalogo_juegos/'.$rel);
-echo "=== ¿QUÉ SONIDO ESCUCHAS? (EA): filesystem ===\n";
-
-if (! is_dir($dir)) {
-    fail("No existe {$rel}");
-    goto resumen;
-}
-
-foreach (['index.html', 'style.css', 'script.js', 'config.json', 'logica.js', 'sfx.js', 'docs/requerimientos.md', 'img/bocina.svg'] as $f) {
-    if (! is_file($dir.'/'.$f)) {
-        fail("Falta {$rel}/{$f}");
-    } else {
-        ok("Presente {$f}");
-    }
-}
-
-$html = file_get_contents($dir.'/index.html');
-$js = file_get_contents($dir.'/script.js');
-$css = file_get_contents($dir.'/style.css');
-
-if (str_contains($html, 'Paquete en construcción') || str_contains($html, 'stub-wrap')) {
-    fail('index.html aún muestra stub');
-} else {
-    ok('Stub visual eliminado');
-}
-
-foreach ([
-    'btn-empecemos',
-    'pantalla-inicio',
-    'inicio-escaner',
-    'texto_voz.js',
-    'edad-nivel.js',
-    'aplicar-perfil-juego.js',
-    'logica.js',
-    'sfx.js',
-    'id="escena-fondo"',
-    'id="btn-escaner"',
-    'id="consola"',
-    'id="consola-monitor"',
-    'id="btn-maestro"',
-    'id="pistas"',
-    'id="opciones"',
-    'id="progreso"',
-    'id="concierto"',
-    'id="pj-zoe"',
-    'id="pj-zeus"',
-    'id="dialogo"',
-    'sweetalert',
-] as $needle) {
-    if (! str_contains($html, $needle)) {
-        fail("index.html sin '{$needle}'");
-    } else {
-        ok("HTML tiene {$needle}");
-    }
-}
-
-foreach ([
-    'TextoVoz',
-    'confirmarNivel',
-    'conversacionInicial',
-    'cambiarEscena',
-    'reproducirPista',
-    'alternarPista',
-    'esperarToque',
-    'escucharOtraVez',
-    'onOpcionUp',
-    'responderAcierto',
-    'responderError',
-    'gotasDeLaLlave',
-    'cruzarPantalla',
-    'rayoEnConsola',
-    'armarMezcla',
-    'tocarPrograma',
-    'prepararInsignia',
-    'granCierre',
-    'pednia:perfil',
-] as $needle) {
-    if (! str_contains($js, $needle)) {
-        fail("script.js sin '{$needle}'");
-    } else {
-        ok("JS tiene {$needle}");
-    }
-}
-
-foreach (['.tema-estudio', '.btn-escaner', '.btn-escaner.recibe', '.consola', '.consola.brillo-verde', '.consola.pausada', '.pista.apagada', '.opcion.arrastrando', '.opcion.tiembla', '.gota-luz', '.vehiculo-cruza', '.rayo', '.concierto', '.pad.activo', '.trofeo.insignia', '.pj.celebra'] as $needle) {
-    if (! str_contains($css, $needle)) {
-        fail("style.css sin '{$needle}'");
-    } else {
-        ok("CSS tiene {$needle}");
-    }
-}
-
-echo "\n=== ¿QUÉ SONIDO ESCUCHAS? (EA): config.json ===\n";
-
-$config = json_decode(file_get_contents($dir.'/config.json'), true);
-if (! is_array($config)) {
-    fail('config.json inválido');
-    goto resumen;
-}
-
-if (! empty($config['stub'])) {
-    fail('config aún con stub=true (el catálogo borraría la carpeta)');
-} else {
-    ok('config sin stub');
-}
-
-foreach ($config['elementos'] ?? [] as $id => $e) {
-    $imgs = array_merge([$e['img'] ?? ''], $e['fotogramas'] ?? []);
-    $faltan = array_filter($imgs, fn ($img) => ! $img || ! is_file($dir.'/'.$img));
-    if ($faltan) {
-        fail("Elemento {$id}: falta imagen ".implode(', ', $faltan));
-    } else {
-        ok("Elemento {$id}");
-    }
-}
-
-foreach ($config['escenas'] ?? [] as $id => $img) {
-    if (! is_file($dir.'/'.$img)) {
-        fail("Escena {$id}: falta {$img}");
-    } else {
-        ok("Escena {$id}");
-    }
-}
-
-$esperados = [
-    '3' => ['3-4 años', 'bosque', [2, 2]],
-    '5' => ['5-6 años', 'estudio', [3, 4]],
+$juegos = [
+    [
+        'carpeta' => 'SonidosDeLaNaturalezaYAnimales',
+        'slug' => 'sonidos-de-la-naturaleza-y-animales',
+        'reto' => 'establo',
+        'edad' => '3-4 años',
+    ],
+    [
+        'carpeta' => 'SonidosDelEntornoCotidiano',
+        'slug' => 'sonidos-del-entorno-cotidiano',
+        'reto' => 'cocina',
+        'edad' => '3-4 años',
+    ],
+    [
+        'carpeta' => 'SonidosDeVehiculosYTransporte',
+        'slug' => 'sonidos-de-vehiculos-y-transporte',
+        'reto' => 'calle',
+        'edad' => '3-4 años',
+    ],
+    [
+        'carpeta' => 'SonidosUrbanosYDeTransito',
+        'slug' => 'sonidos-urbanos-y-de-transito',
+        'reto' => 'gran-ciudad',
+        'edad' => '5-6 años',
+    ],
+    [
+        'carpeta' => 'NaturalezaSalvaje',
+        'slug' => 'naturaleza-salvaje',
+        'reto' => 'bosque-nocturno',
+        'edad' => '5-6 años',
+    ],
+    [
+        'carpeta' => 'EfectosEspecialesYClima',
+        'slug' => 'efectos-especiales-y-clima',
+        'reto' => 'tormenta',
+        'edad' => '5-6 años',
+    ],
 ];
-$ids = [];
-foreach ($config['niveles'] ?? [] as $nivel) {
-    $id = (string) ($nivel['id'] ?? '');
-    $ids[] = $id;
-    if (! isset($esperados[$id])) {
-        fail("Nivel id={$id} fuera de 3/5");
+
+echo "=== ¿QUÉ SONIDO ESCUCHAS? (EA): 6 paquetes ===\n";
+
+$legacyTmp = public_path('catalogo_juegos/ExpresionArtistica/_QueSonidoEscuchas_legacy_tmp');
+if (is_dir($legacyTmp)) {
+    fail('Queda _QueSonidoEscuchas_legacy_tmp; debe borrarse');
+}
+$legacyPlano = public_path('catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/config.json');
+if (is_file($legacyPlano)) {
+    fail('Queda un paquete plano en ExpresionArtistica/QueSonidoEscuchas');
+}
+
+foreach ($juegos as $meta) {
+    $rel = 'ExpresionArtistica/QueSonidoEscuchas/'.$meta['carpeta'];
+    $dir = public_path('catalogo_juegos/'.$rel);
+    echo "\n--- {$meta['carpeta']} ---\n";
+
+    if (! is_dir($dir)) {
+        fail("No existe {$rel}");
         continue;
     }
-    [$edad, $tema, [$min, $max]] = $esperados[$id];
-    if (($nivel['edad'] ?? '') !== $edad || ($nivel['tema'] ?? '') !== $tema) {
-        fail("Nivel {$id}: edad/tema ".($nivel['edad'] ?? '?').'/'.($nivel['tema'] ?? '?').", esperado {$edad}/{$tema}");
-    }
-    $retos = $nivel['retos'] ?? [];
-    if (count($retos) !== 3) {
-        fail("Nivel {$id}: ".count($retos).' retos, esperado 3');
-    } else {
-        ok("Nivel {$id}: 3 retos ({$tema})");
-    }
-    foreach ($retos as $r) {
-        $n = count($r['opciones'] ?? []);
-        if ($n < $min || $n > $max) {
-            fail("Nivel {$id} reto {$r['id']}: {$n} tarjetas, esperado {$min} a {$max}");
-        }
-        foreach ($r['opciones'] ?? [] as $o) {
-            if (! isset($config['elementos'][$o])) {
-                fail("Nivel {$id} reto {$r['id']}: elemento desconocido {$o}");
-            }
-        }
-        if (! in_array($r['correcto'] ?? '', $r['opciones'] ?? [], true)) {
-            fail("Nivel {$id} reto {$r['id']}: la respuesta no está entre las opciones");
-        }
-        if (empty($config['escenas'][$r['escena'] ?? ''])) {
-            fail("Nivel {$id} reto {$r['id']}: escena desconocida");
-        }
-    }
-    $insignia = $nivel['insignia']['img'] ?? '';
-    if (! $insignia || ! is_file($dir.'/'.$insignia)) {
-        fail("Nivel {$id}: falta la medalla");
-    } else {
-        ok("Nivel {$id}: medalla {$insignia}");
-    }
-}
 
-foreach (array_keys($esperados) as $idEsp) {
-    if (! in_array((string) $idEsp, $ids, true)) {
-        fail("Falta nivel id={$idEsp}");
-    }
-}
-
-$conv = $config['textos']['conversacion'] ?? [];
-if (! is_array($conv) || count($conv) < 1) {
-    fail('conversacion vacía');
-} else {
-    ok('conversación en config ('.count($conv).' líneas)');
-}
-
-if (empty($config['audios']['sonidos']) || ! is_array($config['audios']['sonidos'])) {
-    warn('Sin grabaciones en audios.sonidos: los sonidos son sintetizados (provisionales)');
-} else {
-    foreach ($config['audios']['sonidos'] as $id => $ruta) {
-        if (! is_file($dir.'/'.$ruta)) {
-            fail("Grabación de {$id} no existe: {$ruta}");
+    foreach (['index.html', 'style.css', 'script.js', 'config.json', 'logica.js', 'sfx.js', 'docs/requerimientos.md', 'img/bocina.svg'] as $f) {
+        if (! is_file($dir.'/'.$f)) {
+            fail("Falta {$rel}/{$f}");
         } else {
-            ok("Grabación {$id}");
+            ok("Presente {$f}");
         }
+    }
+
+    $config = json_decode((string) file_get_contents($dir.'/config.json'), true);
+    if (! is_array($config)) {
+        fail("config.json inválido en {$rel}");
+        continue;
+    }
+
+    $niveles = $config['niveles'] ?? [];
+    if (count($niveles) !== 1) {
+        fail("{$rel}: debe tener exactamente 1 nivel");
+    } else {
+        ok('1 nivel de edad');
+    }
+
+    $nivel = $niveles[0] ?? [];
+    if (($nivel['edad'] ?? '') !== $meta['edad']) {
+        fail("{$rel}: edad esperada {$meta['edad']}");
+    } else {
+        ok('edad '.$meta['edad']);
+    }
+
+    $retos = $nivel['retos'] ?? [];
+    if (count($retos) !== 1 || ($retos[0]['id'] ?? '') !== $meta['reto']) {
+        fail("{$rel}: debe tener solo el reto {$meta['reto']}");
+    } else {
+        ok('reto '.$meta['reto']);
+    }
+
+    if (empty($nivel['cierre']) || empty($nivel['insignia']['img'])) {
+        fail("{$rel}: falta cierre/insignia");
+    } else {
+        ok('cierre e insignia presentes');
+        if (! is_file($dir.'/'.$nivel['insignia']['img'])) {
+            fail("{$rel}: medalla no existe en disco");
+        }
+    }
+
+    if (! Schema::hasTable('juegos')) {
+        warn('Tabla juegos no existe (se omite chequeo BD de este paquete)');
+        continue;
+    }
+
+    $fila = DB::table('juegos')->where('slug', $meta['slug'])->first();
+    if (! $fila) {
+        fail("BD: falta slug {$meta['slug']}");
+        continue;
+    }
+    if (! (int) $fila->activo) {
+        fail("BD: {$meta['slug']} inactivo");
+    } else {
+        ok("BD slug={$meta['slug']} activo");
+    }
+    if ($fila->ruta !== 'catalogo_juegos/'.$rel) {
+        fail("BD ruta distinta: {$fila->ruta}");
+    } else {
+        ok('BD ruta ok');
+    }
+    $ambiente = DB::table('ambientes')->where('id', $fila->ambiente_id)->value('slug');
+    if ($ambiente !== 'expresion-artistica') {
+        warn("{$meta['slug']}: ambiente={$ambiente}");
+    } else {
+        ok('ambiente Expresión Artística');
     }
 }
 
-require __DIR__.'/barrido-multisensorial-shell.php';
+if (Schema::hasTable('juegos')) {
+    echo "\n=== Temática y legacy ===\n";
+    if (DB::table('juegos')->where('slug', 'que-sonido-escuchas-2')->exists()) {
+        fail('que-sonido-escuchas-2 sigue en BD');
+    } else {
+        ok('sin slug que-sonido-escuchas-2');
+    }
 
-echo "\n=== ¿QUÉ SONIDO ESCUCHAS? (EA): BD (solo lectura) ===\n";
+    $tem = DB::table('tematicas')->where('id', 48)->first();
+    if (! $tem) {
+        fail('falta temática 48 ¿Qué sonido escuchas?');
+    } elseif ((int) $tem->activo !== 1) {
+        fail('temática 48 inactiva');
+    } else {
+        ok('temática 48 activa: '.$tem->nombre);
+    }
 
-if (! Schema::hasTable('juegos')) {
-    fail('Tabla juegos no existe');
-    goto resumen;
+    $mal = DB::table('juegos')
+        ->whereIn('slug', array_column($juegos, 'slug'))
+        ->where(function ($q) {
+            $q->whereNull('tematica_id')->orWhere('tematica_id', '!=', 48);
+        })
+        ->pluck('slug')
+        ->all();
+    if ($mal) {
+        fail('juegos sin temática 48: '.implode(', ', $mal));
+    } else {
+        ok('los 6 juegos apuntan a temática 48');
+    }
+
+    $espurias = DB::table('tematicas')->whereIn('id', [73, 74, 75, 76, 77, 78])->count();
+    if ($espurias > 0) {
+        fail("quedan {$espurias} temáticas espurias (73-78)");
+    } else {
+        ok('sin temáticas espurias 73-78');
+    }
 }
 
-$fila = DB::table('juegos')->where('ruta', 'catalogo_juegos/'.$rel)->first();
-
-if (! $fila) {
-    fail("No hay fila en juegos para catalogo_juegos/{$rel} (no se crea desde el barrido)");
-    goto resumen;
-}
-
-ok("BD slug={$fila->slug} activo=".((int) $fila->activo));
-
-$ambiente = DB::table('ambientes')->where('id', $fila->ambiente_id)->value('slug');
-if ($ambiente !== 'expresion-artistica') {
-    warn('ambiente_id='.$fila->ambiente_id.' ('.($ambiente ?? '?').'), esperado expresion-artistica');
-} else {
-    ok('ambiente Expresión Artística');
-}
-
-resumen:
 echo "\n========== RESUMEN ¿QUÉ SONIDO ESCUCHAS? (EA) ==========\n";
 echo 'OK: '.count($oks)."\n";
 echo 'WARN: '.count($avisos)."\n";

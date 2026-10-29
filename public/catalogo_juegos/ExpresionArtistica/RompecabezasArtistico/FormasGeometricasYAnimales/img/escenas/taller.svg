@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Taller de restauracion">
+
+  <rect width="1600" height="900" fill="#263238"/>
+  <rect x="0" y="640" width="1600" height="260" fill="#37474f"/>
+  <rect x="80" y="80" width="220" height="16" fill="#ffca28"/>
+  <rect x="160" y="80" width="16" height="200" fill="#eceff1"/>
+  <rect x="1200" y="120" width="280" height="180" rx="8" fill="#455a64"/>
+  <circle cx="1340" cy="210" r="40" fill="#b0bec5" stroke="#fff" stroke-width="6"/>
+</svg>

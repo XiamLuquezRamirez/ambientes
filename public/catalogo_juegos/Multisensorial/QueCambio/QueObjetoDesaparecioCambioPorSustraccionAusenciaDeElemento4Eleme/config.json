@@ -1,0 +1,188 @@
+{
+  "nombre": "¿Qué Objeto Desapareció?:cambio Por Sustracción / Ausencia De Elemento | 4 Eleme",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira cómo se juega! Primero observa la foto.",
+    "demostracionEstudio": "¡Mira cómo se juega! Primero observa la foto.",
+    "demostracionDetective": "¡Mira cómo se juega! Primero observa la repisa.",
+    "demostracionAcierto": "¡Así se descubre lo que cambió!",
+    "demostracionFin": "¡Ahora te toca a ti! Observa qué cambió.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Abre bien los ojos, detective!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡La linterna te ayuda a ver qué cambió!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "demo": {
+    "mecanica": "falta",
+    "mostrar": [
+      "sol",
+      "carro"
+    ],
+    "faltante": "sol",
+    "opciones": [
+      "sol",
+      "flor"
+    ],
+    "observacionMs": 2200,
+    "ocultamiento": "flash",
+    "ocultamientoMs": 900,
+    "ocultamientoEfecto": "flashSnap",
+    "presentacion": {
+      "voz": "zoe",
+      "texto": "¡Mira cómo se juega! Primero observa la foto."
+    },
+    "pregunta": {
+      "voz": "zeus",
+      "texto": "¡Mira la nueva foto! Algo cambió."
+    },
+    "detective": {
+      "ocultamiento": "apagon",
+      "ocultamientoEfecto": "clickShhh",
+      "presentacion": {
+        "voz": "zoe",
+        "texto": "¡Mira cómo se juega! Primero observa la repisa."
+      },
+      "pregunta": {
+        "voz": "zeus",
+        "texto": "¡Luces encendidas! Algo cambió."
+      }
+    }
+  },
+  "elementos": {
+    "manzana": {
+      "img": "img/manzana.svg",
+      "nombre": "Manzana"
+    },
+    "pelota": {
+      "img": "img/pelota_azul.svg",
+      "nombre": "Pelota",
+      "variantes": {
+        "azul": "img/pelota_azul.svg",
+        "amarilla": "img/pelota_amarilla.svg",
+        "roja": "img/pelota_roja.svg",
+        "multi": "img/pelota_multi.svg"
+      }
+    },
+    "flor": {
+      "img": "img/flor.svg",
+      "nombre": "Flor"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana"
+    },
+    "carro": {
+      "img": "img/carro.svg",
+      "nombre": "Carro"
+    },
+    "sol": {
+      "img": "img/sol.svg",
+      "nombre": "Sol"
+    },
+    "oso": {
+      "img": "img/oso.svg",
+      "nombre": "Oso"
+    },
+    "helado": {
+      "img": "img/helado.svg",
+      "nombre": "Helado"
+    },
+    "estrella": {
+      "img": "img/estrella.svg",
+      "nombre": "Estrella"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El detective de cambios",
+      "escena": "detective",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Abre bien los ojos, detective!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡La linterna te ayuda a ver qué cambió!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "falta-campana",
+          "titulo": "¿Qué objeto desapareció?",
+          "mecanica": "falta",
+          "mostrar": [
+            "campana",
+            "carro",
+            "sol",
+            "helado"
+          ],
+          "faltante": "campana",
+          "opciones": [
+            "campana",
+            "flor",
+            "pelota"
+          ],
+          "observacionMs": 7000,
+          "ocultamiento": "apagon",
+          "ocultamientoMs": 3000,
+          "ocultamientoEfecto": "clickWhir",
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Siguiente pista! Memoriza la posición de la campana, el carro, el sol y el helado."
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "¡Oh no, un objeto desapareció mientras todo estaba a oscuras! Observa con atención. ¿Qué cambió?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Falta la campana.",
+            "efecto": "dingDong",
+            "animacion": "aparece"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "Ese objeto no estaba en la repisa antes. Revisa cuál de los 4 amigos faltó. ¡Inténtalo otra vez!",
+            "efecto": "boing"
+          },
+          "iOrigen": 1
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Excelente! Observaste y descubriste todos los cambios."
+        }
+      ],
+      "cierreEscena": "vitrina",
+      "insignia": {
+        "img": "img/insignia_detective.svg",
+        "nombre": "Detective de Mirada Veloz"
+      }
+    }
+  ]
+}

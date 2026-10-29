@@ -1,0 +1,375 @@
+{
+  "nombre": "El Vitral Geométrico",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira! Arrastra la forma de color hasta su hueco.",
+    "demostracionAcierto": "¡Así encajan las formas y los colores!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al estudio de arquitectura y diseño!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy crearemos mosaicos, torres y una ciudad del futuro."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "pieza_demo"
+  },
+  "escenas": {
+    "fabrica": "img/escenas/fabrica.svg",
+    "atelier": "img/escenas/atelier.svg"
+  },
+  "elementos": {
+    "pieza_demo": {
+      "img": "img/pieza_demo.svg",
+      "nombre": "Círculo de ejemplo"
+    },
+    "circulo_rojo": {
+      "img": "img/circulo_rojo.svg",
+      "nombre": "Círculo rojo",
+      "color": "rojo",
+      "forma": "circulo"
+    },
+    "circulo_amarillo": {
+      "img": "img/circulo_amarillo.svg",
+      "nombre": "Círculo amarillo",
+      "color": "amarillo",
+      "forma": "circulo"
+    },
+    "circulo_verde": {
+      "img": "img/circulo_verde.svg",
+      "nombre": "Círculo verde",
+      "color": "verde",
+      "forma": "circulo"
+    },
+    "circulo_azul": {
+      "img": "img/circulo_azul.svg",
+      "nombre": "Círculo azul",
+      "color": "azul",
+      "forma": "circulo"
+    },
+    "cuadrado_amarillo": {
+      "img": "img/cuadrado_amarillo.svg",
+      "nombre": "Cuadrado amarillo",
+      "color": "amarillo",
+      "forma": "cuadrado"
+    },
+    "triangulo_rojo": {
+      "img": "img/triangulo_rojo.svg",
+      "nombre": "Triángulo rojo",
+      "color": "rojo",
+      "forma": "triangulo"
+    },
+    "triangulo_amarillo": {
+      "img": "img/triangulo_amarillo.svg",
+      "nombre": "Triángulo amarillo",
+      "color": "amarillo",
+      "forma": "triangulo"
+    },
+    "rectangulo_azul": {
+      "img": "img/rectangulo_azul.svg",
+      "nombre": "Rectángulo azul",
+      "color": "azul",
+      "forma": "rectangulo"
+    },
+    "rectangulo_morado": {
+      "img": "img/rectangulo_morado.svg",
+      "nombre": "Rectángulo morado",
+      "color": "morado",
+      "forma": "rectangulo"
+    },
+    "rectangulo_rojo": {
+      "img": "img/rectangulo_rojo.svg",
+      "nombre": "Rectángulo rojo",
+      "color": "rojo",
+      "forma": "rectangulo"
+    },
+    "semaforo_base": {
+      "img": "img/semaforo_base.svg",
+      "nombre": "Semáforo"
+    },
+    "casita_silueta": {
+      "img": "img/casita_silueta.svg",
+      "nombre": "Casita"
+    },
+    "locomotora": {
+      "img": "img/locomotora.svg",
+      "nombre": "Locomotora"
+    },
+    "tren_base": {
+      "img": "img/tren_base.svg",
+      "nombre": "Tren en cinta"
+    },
+    "cohete_silueta": {
+      "img": "img/cohete_silueta.svg",
+      "nombre": "Cohete"
+    },
+    "cuadricula_iso": {
+      "img": "img/cuadricula_iso.svg",
+      "nombre": "Cuadrícula isométrica"
+    },
+    "cubo_azul": {
+      "img": "img/cubo_azul.svg",
+      "nombre": "Cubo azul",
+      "color": "azul",
+      "forma": "cubo"
+    },
+    "cubo_amarillo": {
+      "img": "img/cubo_amarillo.svg",
+      "nombre": "Cubo amarillo",
+      "color": "amarillo",
+      "forma": "cubo"
+    },
+    "cubo_rojo": {
+      "img": "img/cubo_rojo.svg",
+      "nombre": "Cubo rojo",
+      "color": "rojo",
+      "forma": "cubo"
+    },
+    "piramide_amarilla": {
+      "img": "img/piramide_amarilla.svg",
+      "nombre": "Pirámide amarilla",
+      "color": "amarillo",
+      "forma": "piramide"
+    },
+    "cilindro_verde": {
+      "img": "img/cilindro_verde.svg",
+      "nombre": "Cilindro verde",
+      "color": "verde",
+      "forma": "cilindro"
+    },
+    "cono_naranja": {
+      "img": "img/cono_naranja.svg",
+      "nombre": "Cono naranja",
+      "color": "naranja",
+      "forma": "cono"
+    },
+    "estrella_base": {
+      "img": "img/estrella_base.svg",
+      "nombre": "Estrella"
+    },
+    "lienzo_mondrian": {
+      "img": "img/lienzo_mondrian.svg",
+      "nombre": "Lienzo moderno"
+    },
+    "plano_ciudad": {
+      "img": "img/plano_ciudad.svg",
+      "nombre": "Plano urbano"
+    },
+    "bote_rojo": {
+      "img": "img/bote_rojo.svg",
+      "nombre": "Pintura roja",
+      "color": "rojo"
+    },
+    "bote_azul": {
+      "img": "img/bote_azul.svg",
+      "nombre": "Pintura azul",
+      "color": "azul"
+    },
+    "bote_amarillo": {
+      "img": "img/bote_amarillo.svg",
+      "nombre": "Pintura amarilla",
+      "color": "amarillo"
+    },
+    "chimenea": {
+      "img": "img/chimenea.svg",
+      "nombre": "Chimenea"
+    },
+    "antena": {
+      "img": "img/antena.svg",
+      "nombre": "Antena"
+    },
+    "torre_base": {
+      "img": "img/cuadricula_iso.svg",
+      "nombre": "Cuadrícula isométrica"
+    },
+    "cuadro_semaforo": {
+      "img": "img/cuadro_semaforo.svg",
+      "nombre": "Semáforo"
+    },
+    "cuadro_casita": {
+      "img": "img/cuadro_casita.svg",
+      "nombre": "Casita"
+    },
+    "cuadro_tren": {
+      "img": "img/cuadro_tren.svg",
+      "nombre": "Tren"
+    },
+    "cuadro_cohete": {
+      "img": "img/cuadro_cohete.svg",
+      "nombre": "Cohete"
+    },
+    "cuadro_mosaico": {
+      "img": "img/cuadro_mosaico.svg",
+      "nombre": "Mosaico"
+    },
+    "cuadro_torre": {
+      "img": "img/cuadro_torre.svg",
+      "nombre": "Torre"
+    },
+    "cuadro_mondrian": {
+      "img": "img/cuadro_mondrian.svg",
+      "nombre": "Cuadro abstracto"
+    },
+    "cuadro_ciudad": {
+      "img": "img/cuadro_ciudad.svg",
+      "nombre": "Ciudad"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El estudio de arquitectura",
+      "tema": "atelier",
+      "escena": "atelier",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al estudio de arquitectura y diseño!"
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy crearemos mosaicos, torres y una ciudad del futuro."
+        }
+      ],
+      "galeria": [
+        "cuadro_mosaico",
+        "cuadro_torre",
+        "cuadro_mondrian",
+        "cuadro_ciudad"
+      ],
+      "retos": [
+        {
+          "id": "mosaico",
+          "tipo": "mosaico",
+          "titulo": "El Mosaico de Triángulos y Colores",
+          "base": "estrella_base",
+          "huecos": [
+            {
+              "id": "t0",
+              "color": "rojo",
+              "fijo": true,
+              "x": 38,
+              "y": 30,
+              "w": 24,
+              "h": 24,
+              "rot": 0
+            },
+            {
+              "id": "t1",
+              "color": "amarillo",
+              "fijo": true,
+              "x": 28,
+              "y": 52,
+              "w": 24,
+              "h": 24,
+              "rot": 60
+            },
+            {
+              "id": "t2",
+              "color": "rojo",
+              "fijo": true,
+              "x": 38,
+              "y": 74,
+              "w": 24,
+              "h": 24,
+              "rot": 120
+            },
+            {
+              "id": "t3",
+              "color": "amarillo",
+              "fijo": false,
+              "x": 62,
+              "y": 74,
+              "w": 24,
+              "h": 24,
+              "rot": 180
+            },
+            {
+              "id": "t4",
+              "color": "rojo",
+              "fijo": false,
+              "x": 72,
+              "y": 52,
+              "w": 24,
+              "h": 24,
+              "rot": 240
+            },
+            {
+              "id": "t5",
+              "color": "amarillo",
+              "fijo": false,
+              "x": 62,
+              "y": 30,
+              "w": 24,
+              "h": 24,
+              "rot": 300
+            }
+          ],
+          "piezas": [
+            {
+              "id": "tri_a",
+              "elemento": "triangulo_amarillo",
+              "color": "amarillo"
+            },
+            {
+              "id": "tri_r1",
+              "elemento": "triangulo_rojo",
+              "color": "rojo"
+            },
+            {
+              "id": "tri_a2",
+              "elemento": "triangulo_amarillo",
+              "color": "amarillo"
+            }
+          ],
+          "consigna": {
+            "voz": "zoe",
+            "texto": "¡Arquitecto, vamos a crear un mosaico geométrico! Arrastra los triángulos de colores para completar el patrón simétrico de la estrella."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Patrón simétrico perfecto! Hiciste un mosaico digno de una catedral moderna."
+          },
+          "error": {
+            "voz": "zoe",
+            "texto": "¡Recuerda el patrón, rojo, amarillo, luego rojo…, inténtalo otra vez!"
+          },
+          "iOrigen": 0
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Increíble recorrido por las formas y los colores! Creaste patrones simétricos, construiste volúmenes en 3D y diseñaste arte moderno."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Tu pensamiento espacial y tu creatividad geométrica no tienen límites!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_disenador.svg",
+        "nombre": "Diseñador Geométrico Prodigioso",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

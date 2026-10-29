@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Guitarra">
+  <ellipse cx="120" cy="230" rx="62" ry="7" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="104" y="6" width="32" height="34" rx="6" fill="#6d4c41"/>
+    <rect x="110" y="36" width="20" height="92" fill="#8d6e63"/>
+    <path d="M120 112 C92 112 78 130 82 150 C64 160 58 186 72 206 C86 226 154 226 168 206 C182 186 176 160 158 150 C162 130 148 112 120 112 Z" fill="#ffb74d"/>
+    <circle cx="120" cy="160" r="16" fill="#5d4037"/>
+    <rect x="98" y="194" width="44" height="10" rx="4" fill="#5d4037"/>
+  </g>
+  <g fill="#fdd835" stroke="#37474f" stroke-width="2">
+    <circle cx="100" cy="14" r="5"/><circle cx="100" cy="30" r="5"/>
+    <circle cx="140" cy="14" r="5"/><circle cx="140" cy="30" r="5"/>
+  </g>
+  <g stroke="#bdbdbd" stroke-width="2">
+    <path d="M110 56 H130 M110 74 H130 M110 92 H130"/>
+  </g>
+  <g stroke="#fafafa" stroke-width="1.6">
+    <path d="M114 20 V198 M118 20 V198 M122 20 V198 M126 20 V198"/>
+  </g>
+</svg>
