@@ -1,0 +1,188 @@
+{
+  "nombre": "El Cambio de Color de la Pelota",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira cómo se juega! Primero observa la foto.",
+    "demostracionEstudio": "¡Mira cómo se juega! Primero observa la foto.",
+    "demostracionDetective": "¡Mira cómo se juega! Primero observa la repisa.",
+    "demostracionAcierto": "¡Así se descubre lo que cambió!",
+    "demostracionFin": "¡Ahora te toca a ti! Observa qué cambió.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al estudio de fotos!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Descubre qué cambió en la foto!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "demo": {
+    "mecanica": "falta",
+    "mostrar": [
+      "sol",
+      "carro"
+    ],
+    "faltante": "sol",
+    "opciones": [
+      "sol",
+      "flor"
+    ],
+    "observacionMs": 2200,
+    "ocultamiento": "flash",
+    "ocultamientoMs": 900,
+    "ocultamientoEfecto": "flashSnap",
+    "presentacion": {
+      "voz": "zoe",
+      "texto": "¡Mira cómo se juega! Primero observa la foto."
+    },
+    "pregunta": {
+      "voz": "zeus",
+      "texto": "¡Mira la nueva foto! Algo cambió."
+    },
+    "detective": {
+      "ocultamiento": "apagon",
+      "ocultamientoEfecto": "clickShhh",
+      "presentacion": {
+        "voz": "zoe",
+        "texto": "¡Mira cómo se juega! Primero observa la repisa."
+      },
+      "pregunta": {
+        "voz": "zeus",
+        "texto": "¡Luces encendidas! Algo cambió."
+      }
+    }
+  },
+  "elementos": {
+    "manzana": {
+      "img": "img/manzana.svg",
+      "nombre": "Manzana"
+    },
+    "pelota": {
+      "img": "img/pelota_azul.svg",
+      "nombre": "Pelota",
+      "variantes": {
+        "azul": "img/pelota_azul.svg",
+        "amarilla": "img/pelota_amarilla.svg",
+        "roja": "img/pelota_roja.svg",
+        "multi": "img/pelota_multi.svg"
+      }
+    },
+    "flor": {
+      "img": "img/flor.svg",
+      "nombre": "Flor"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana"
+    },
+    "carro": {
+      "img": "img/carro.svg",
+      "nombre": "Carro"
+    },
+    "sol": {
+      "img": "img/sol.svg",
+      "nombre": "Sol"
+    },
+    "oso": {
+      "img": "img/oso.svg",
+      "nombre": "Oso"
+    },
+    "helado": {
+      "img": "img/helado.svg",
+      "nombre": "Helado"
+    },
+    "estrella": {
+      "img": "img/estrella.svg",
+      "nombre": "Estrella"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El fotógrafo mágico",
+      "escena": "estudio",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al estudio de fotos!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Descubre qué cambió en la foto!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "color-pelota",
+          "titulo": "El cambio de color de la pelota",
+          "mecanica": "color",
+          "mostrar": [
+            "manzana",
+            "pelota",
+            "flor"
+          ],
+          "aspecto": {
+            "pelota": "azul"
+          },
+          "cambio": {
+            "id": "pelota",
+            "a": "amarilla"
+          },
+          "observacionMs": 7000,
+          "ocultamiento": "flash",
+          "ocultamientoMs": 3000,
+          "ocultamientoEfecto": "flashSnap",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Abran bien los ojos! Tomemos una foto a la manzana, la pelota azul y la flor."
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "¡Mira la nueva foto! Algo cambió en uno de los objetos. ¿Qué cambió?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! La pelota cambió de color.",
+            "efecto": "boingShine",
+            "animacion": "rebota"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "Ese objeto no ha cambiado, sigue igual. Mira bien la pelota. ¡Inténtalo otra vez!",
+            "efecto": "boing"
+          },
+          "iOrigen": 0
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Excelente! Observaste y descubriste todos los cambios."
+        }
+      ],
+      "cierreEscena": "album",
+      "insignia": {
+        "img": "img/insignia_fotografo.svg",
+        "nombre": "Fotógrafo Detective"
+      }
+    }
+  ]
+}

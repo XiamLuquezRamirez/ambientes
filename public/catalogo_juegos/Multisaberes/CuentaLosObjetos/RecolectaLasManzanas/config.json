@@ -1,123 +1,123 @@
 {
-  "nombre": "Recolecta Las Manzanas",
-  "textos": {
-    "eligeNivel": "¡Elige tu nivel!",
-    "demostracion": "¡Mira cómo contamos las manzanas!",
-    "demostracionFin": "¡Ahora te toca a ti!",
-    "conversacion": [
-      {
-        "personaje": 1,
-        "texto": "¡Bienvenido a la huerta mágica!"
-      },
-      {
-        "personaje": 0,
-        "texto": "¡Vamos a contar las manzanas!"
-      }
-    ]
-  },
-  "accesibilidad": {
-    "letterSpacing": 2,
-    "volumenFondo": 20,
-    "rate": 5,
-    "mostrarIntro": true
-  },
-  "audios": {
-    "cierre": "../../../sounds/victory.mp3",
-    "fondo": "../../../sounds/fondo.mp3",
-    "acierto": "../../../sounds/ok.mp3",
-    "efectos": {
-      "recompensa": "../../../sounds/ok.mp3"
-    }
-  },
-  "elementos": {
-    "manzana": {
-      "img": "img/manzana.png",
-      "nombre": "Manzana"
+    "nombre": "Recolecta las manzanas",
+    "textos": {
+        "eligeNivel": "¡Elige tu nivel!",
+        "demostracion": "¡Mira cómo contamos las manzanas!",
+        "demostracionFin": "¡Ahora te toca a ti!",
+        "conversacion": [
+            {
+                "personaje": 1,
+                "texto": "¡Bienvenido a la huerta mágica!"
+            },
+            {
+                "personaje": 0,
+                "texto": "¡Vamos a contar las manzanas!"
+            }
+        ]
     },
-    "canasta": {
-      "img": "img/canasta.png",
-      "nombre": "Canasta"
+    "accesibilidad": {
+        "letterSpacing": 2,
+        "volumenFondo": 20,
+        "rate": 5,
+        "mostrarIntro": true
     },
-    "arbol": {
-      "img": "img/arbol_principal.svg",
-      "nombre": "Árbol"
-    }
-  },
-  "demo": {
-    "cantidadObjetos": 2,
-    "piezasVisibles": 5,
-    "opciones": [
-      1,
-      2,
-      3,
-      4,
-      5
-    ],
-    "correcto": 2
-  },
-  "niveles": [
-    {
-      "id": "3",
-      "edad": "3-4 años",
-      "titulo": "Pequeños recolectores",
-      "escena": "huerta",
-      "bienvenida": [
-        {
-          "personaje": 1,
-          "texto": "¡Bienvenido a la huerta mágica!"
-        },
-        {
-          "personaje": 0,
-          "texto": "¡Vamos a contar las manzanas!"
+    "audios": {
+        "cierre": "..\/..\/..\/sounds\/victory.mp3",
+        "fondo": "..\/..\/..\/sounds\/fondo.mp3",
+        "acierto": "..\/..\/..\/sounds\/ok.mp3",
+        "efectos": {
+            "recompensa": "..\/..\/..\/sounds\/ok.mp3"
         }
-      ],
-      "retos": [
-        {
-          "id": "recolecta-2",
-          "titulo": "Recolecta las manzanas",
-          "mecanica": "contar",
-          "cantidadObjetos": 2,
-          "piezasVisibles": 5,
-          "opciones": [
+    },
+    "elementos": {
+        "manzana": {
+            "img": "img\/manzana.png",
+            "nombre": "Manzana"
+        },
+        "canasta": {
+            "img": "img\/canasta.png",
+            "nombre": "Canasta"
+        },
+        "arbol": {
+            "img": "img\/arbol_principal.svg",
+            "nombre": "Árbol"
+        }
+    },
+    "demo": {
+        "cantidadObjetos": 2,
+        "piezasVisibles": 5,
+        "opciones": [
             1,
             2,
             3,
             4,
             5
-          ],
-          "correcto": 2,
-          "presentacion": {
-            "voz": "zoe",
-            "texto": "¡Mira las manzanas del árbol!"
-          },
-          "pregunta": {
-            "voz": "zeus",
-            "texto": "Toca cada manzana para contar cuántas hay."
-          },
-          "acierto": {
-            "voz": "zoe",
-            "texto": "¡Muy bien! Contaste 2 manzanas.",
-            "efecto": "recompensa"
-          },
-          "errorOtro": {
-            "voz": "zeus",
-            "texto": "¡Vamos a contar otra vez! Toca las manzanas una por una.",
-            "efecto": "boing"
-          },
-          "iOrigen": 0
-        }
-      ],
-      "cierre": [
+        ],
+        "correcto": 2
+    },
+    "niveles": [
         {
-          "voz": "zoe",
-          "texto": "¡Excelente! ¡Has aprendido a contar las manzanas!"
+            "id": "3",
+            "edad": "3-4 años",
+            "titulo": "Pequeños recolectores",
+            "escena": "huerta",
+            "bienvenida": [
+                {
+                    "personaje": 1,
+                    "texto": "¡Bienvenido a la huerta mágica!"
+                },
+                {
+                    "personaje": 0,
+                    "texto": "¡Vamos a contar las manzanas!"
+                }
+            ],
+            "retos": [
+                {
+                    "id": "recolecta-2",
+                    "titulo": "Recolecta las manzanas",
+                    "mecanica": "contar",
+                    "cantidadObjetos": 2,
+                    "piezasVisibles": 5,
+                    "opciones": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ],
+                    "correcto": 2,
+                    "presentacion": {
+                        "voz": "zoe",
+                        "texto": "¡Mira las manzanas del árbol!"
+                    },
+                    "pregunta": {
+                        "voz": "zeus",
+                        "texto": "Toca cada manzana para contar cuántas hay."
+                    },
+                    "acierto": {
+                        "voz": "zoe",
+                        "texto": "¡Muy bien! Contaste 2 manzanas.",
+                        "efecto": "recompensa"
+                    },
+                    "errorOtro": {
+                        "voz": "zeus",
+                        "texto": "¡Vamos a contar otra vez! Toca las manzanas una por una.",
+                        "efecto": "boing"
+                    },
+                    "iOrigen": 0
+                }
+            ],
+            "cierre": [
+                {
+                    "voz": "zoe",
+                    "texto": "¡Excelente! ¡Has aprendido a contar las manzanas!"
+                }
+            ],
+            "cierreEscena": "recoleccion",
+            "insignia": {
+                "img": "img\/insignia_recolector.svg",
+                "nombre": "Recolector de Manzanas"
+            }
         }
-      ],
-      "cierreEscena": "recoleccion",
-      "insignia": {
-        "img": "img/insignia_recolector.svg",
-        "nombre": "Recolector de Manzanas"
-      }
-    }
-  ]
+    ]
 }

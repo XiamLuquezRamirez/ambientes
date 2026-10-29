@@ -46,9 +46,9 @@ return new class extends Migration
             'color' => '#0ea5e9',
         ],
         [
-            'nombre' => 'Los Grandes Instrumentos',
-            'slug' => 'los-grandes-instrumentos',
-            'carpeta' => 'LosGrandesInstrumentos',
+            'nombre' => 'Los Grandes Instrumentos (1-2-3)',
+            'slug' => 'los-grandes-instrumentos-1-2-3',
+            'carpeta' => 'LosGrandesInstrumentos123',
             'color' => '#8b5cf6',
         ],
         [

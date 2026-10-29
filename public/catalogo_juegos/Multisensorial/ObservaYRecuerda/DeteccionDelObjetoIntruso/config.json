@@ -1,0 +1,153 @@
+{
+  "nombre": "Detección del Objeto Intruso",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira cómo se juega! Primero observa los objetos.",
+    "demostracionBaul": "¡Mira cómo se juega! Primero observa los objetos del baúl.",
+    "demostracionMuseo": "¡Mira cómo se juega! Primero observa las obras del museo.",
+    "demostracionAcierto": "¡Así se encuentra el objeto nuevo!",
+    "demostracionFin": "¡Ahora te toca a ti! Observa con mucha atención.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al museo de recuerdos!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Memoriza cada obra con atención!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "barraTiempo": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "demo": {
+    "mecanica": "intruso",
+    "mostrar": [
+      "manzana",
+      "campana"
+    ],
+    "intruso": "lija",
+    "conservarOrden": false,
+    "observacionMs": 3500,
+    "ocultamiento": "baul",
+    "ocultamientoMs": 1600,
+    "ocultamientoEfecto": "clackMagic"
+  },
+  "elementos": {
+    "manzana": {
+      "img": "img/manzana.svg",
+      "nombre": "Manzana"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana"
+    },
+    "flor": {
+      "img": "img/flor.svg",
+      "nombre": "Flor"
+    },
+    "sol": {
+      "img": "img/sol.svg",
+      "nombre": "Sol"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota"
+    },
+    "helado": {
+      "img": "img/helado.svg",
+      "nombre": "Helado"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "nombre": "Lija"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor"
+    },
+    "vidrio": {
+      "img": "img/vidrio.svg",
+      "nombre": "Vidrio"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El museo sensorial de recuerdos",
+      "escena": "museo",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al museo de recuerdos!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Memoriza cada obra con atención!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "intruso-museo",
+          "titulo": "Detección del Objeto Intruso",
+          "mecanica": "intruso",
+          "mostrar": [
+            "manzana",
+            "campana",
+            "flor",
+            "pelota",
+            "helado"
+          ],
+          "intruso": "tambor",
+          "conservarOrden": true,
+          "observacionMs": 4000,
+          "ocultamiento": "apagon",
+          "ocultamientoMs": 1800,
+          "ocultamientoEfecto": "clickShhh",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Memoriza con atención, Guardián! Tienes 4 segundos para observar las 5 obras de arte del museo."
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "¡Alguien agregó una escultura sin permiso! ¿Cuál objeto NO estaba antes?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Recordaste lo que observaste. El tambor no estaba antes.",
+            "efecto": "ratataplanFly",
+            "animacion": "dron"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "¡Esa escultura ya pertenecía a la exposición! Mira bien cuál de todas es la recién llegada. ¡Inténtalo otra vez!",
+            "efecto": "boing"
+          },
+          "iOrigen": 0
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Excelente! Observaste y recordaste con mucha atención."
+        }
+      ],
+      "cierreEscena": "museoFiesta",
+      "insignia": {
+        "img": "img/insignia_conservador.svg",
+        "nombre": "Conservador Máster del Museo"
+      }
+    }
+  ]
+}
