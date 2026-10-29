@@ -20,7 +20,7 @@ return new class extends Migration
     private const JUEGOS = [
         ['slug' => "encuentra-la-a", 'nombre' => "Encuentra La A", 'carpeta' => "DescubreLasVocales/EncuentraLaA", 'tematica_id' => 38, 'color' => "#ef4444", 'slug_antiguo' => "descubre-las-vocales"],
         ['slug' => "donde-esta-la-e", 'nombre' => "¿Dónde Está La E?", 'carpeta' => "DescubreLasVocales/DondeEstaLaE", 'tematica_id' => 38, 'color' => "#f97316", 'slug_antiguo' => "descubre-las-vocales"],
-        ['slug' => "busca-la-bocal-i", 'nombre' => "Busca La Bocal I", 'carpeta' => "DescubreLasVocales/BuscaLaBocalI", 'tematica_id' => 38, 'color' => "#f59e0b", 'slug_antiguo' => "descubre-las-vocales"],
+        ['slug' => "busca-la-bocal-i", 'nombre' => "Busca La Vocal I", 'carpeta' => "DescubreLasVocales/BuscaLaBocalI", 'tematica_id' => 38, 'color' => "#f59e0b", 'slug_antiguo' => "descubre-las-vocales"],
         ['slug' => "encuentra-la-vocal-o", 'nombre' => "Encuentra La Vocal O", 'carpeta' => "DescubreLasVocales/EncuentraLaVocalO", 'tematica_id' => 38, 'color' => "#84cc16", 'slug_antiguo' => "descubre-las-vocales"],
         ['slug' => "donde-esta-la-u", 'nombre' => "¿Donde Está La U?", 'carpeta' => "DescubreLasVocales/DondeEstaLaU", 'tematica_id' => 38, 'color' => "#22c55e", 'slug_antiguo' => "descubre-las-vocales"],
         ['slug' => "descubre-la-vocal", 'nombre' => "Descubre La Vocal", 'carpeta' => "DescubreLasVocales/DescubreLaVocal", 'tematica_id' => 38, 'color' => "#14b8a6", 'slug_antiguo' => "descubre-las-vocales"],

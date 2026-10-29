@@ -105,7 +105,7 @@ return new class extends Migration
         ['slug' => 'el-astronomo', 'nombre' => "El Astrónomo", 'carpeta' => 'QuienUsaQue/ElAstronomo', 'tematica_id' => 61, 'color' => '#ef4444', 'slug_antiguo' => 'quien-usa-que'],
         ['slug' => 'el-arqueologo', 'nombre' => "El Arqueólogo", 'carpeta' => 'QuienUsaQue/ElArqueologo', 'tematica_id' => 61, 'color' => '#f97316', 'slug_antiguo' => 'quien-usa-que'],
         ['slug' => 'el-director-de-orquesta', 'nombre' => "El Director de Orquesta", 'carpeta' => 'QuienUsaQue/ElDirectorDeOrquesta', 'tematica_id' => 61, 'color' => '#f59e0b', 'slug_antiguo' => 'quien-usa-que'],
-        ['slug' => 'atrapa-las-notas-musicales', 'nombre' => "Atrapa las notas musicales:", 'carpeta' => 'QuienUsaQue/AtrapaLasNotasMusicales', 'tematica_id' => 61, 'color' => '#84cc16', 'slug_antiguo' => 'quien-usa-que'],
+        ['slug' => 'atrapa-las-notas-musicales', 'nombre' => 'Atrapa las notas musicales', 'carpeta' => 'QuienUsaQue/AtrapaLasNotasMusicales', 'tematica_id' => 61, 'color' => '#84cc16', 'slug_antiguo' => 'quien-usa-que'],
     ];
 
     public function up(): void
