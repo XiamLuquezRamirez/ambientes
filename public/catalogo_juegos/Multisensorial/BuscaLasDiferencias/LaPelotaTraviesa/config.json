@@ -210,60 +210,75 @@
   },
   "niveles": [
     {
-      "id": "3",
-      "edad": "3-4 años",
-      "titulo": "El Detective de Diferencias",
-      "escena": "parque",
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Superdetectives: el desafío de las 4 diferencias",
+      "escena": "paisaje",
       "etiquetas": {
-        "A": "Imagen A",
-        "B": "Imagen B"
+        "A": "Pantalla A",
+        "B": "Pantalla B"
       },
       "lupa": {
-        "nombre": "Lupa Dúo",
+        "nombre": "Lupa Doble",
         "diametro": 0.34,
-        "zoom": 1.6,
-        "alTocar": true
+        "zoom": 2,
+        "alTocar": false,
+        "reticula": true
       },
-      "minimo": 56,
+      "minimo": 44,
       "contador": 1,
+      "error": {
+        "voz": "zoe",
+        "texto": "Observa bien y descubre qué es diferente en la otra imagen."
+      },
       "retos": [
         {
-          "id": "pelota",
-          "nombre": "La Pelota Traviesa",
+          "id": "flores",
+          "nombre": "La Flor Faltante en el Jardín",
           "cambiosB": {
-            "pelota": "img/pelota_azul.svg"
+            "flor_2": "img/flor_jardin_sin_petalo.svg",
+            "flor_4": "img/flor_jardin_sin_petalo.svg"
+          },
+          "reticula": {
+            "zona": {
+              "x": 20,
+              "y": 196,
+              "w": 190,
+              "h": 104
+            },
+            "etiqueta": "4 flores"
           },
           "objetivos": [
             {
-              "id": "pelota",
-              "elemento": "pelota",
-              "previo": "circuloVerificacion",
-              "reaccion": "trompo"
+              "id": "flor_2",
+              "elemento": "flor_2",
+              "reaccion": "chispasMover"
+            },
+            {
+              "id": "flor_4",
+              "elemento": "flor_4",
+              "reaccion": "chispasMover"
             }
           ],
           "presentacion": {
             "voz": "zoe",
-            "texto": "¡Atención, detective! Las dos pelotas están ahí... pero ¡hay algo raro con sus colores! Míralas bien y descubre qué está diferente."
+            "texto": "¡Ajusta tu lente en el jardín! Hay un detalle en la vegetación que no coincide. Descubre las diferencias."
           },
           "acierto": {
             "voz": "zoe",
-            "texto": "¡Fantástico! Descubriste que la pelota era de otro color."
-          },
-          "error": {
-            "voz": "zoe",
-            "texto": "Observa bien y descubre qué es diferente en la otra imagen."
+            "texto": "¡Increíble ojo de detective! Había dos flores diferentes."
           },
           "iOrigen": 2
         }
       ],
       "premio": {
-        "tipo": "placa",
-        "titulo": "Placa Mágica",
-        "nombre": "Súper Detective de Diferencias"
+        "tipo": "insignia",
+        "titulo": "Insignia",
+        "nombre": "Super Detective Máster de Análisis Visual"
       },
       "cierre": {
         "voz": "zoe",
-        "texto": "¡Zoe y Zeus te entregan la Placa Mágica de Súper Detective de Diferencias!"
+        "texto": "¡Zoe y Zeus te entregan la Insignia de Super Detective Máster de Análisis Visual!"
       }
     }
   ]

@@ -200,11 +200,13 @@ class AmbienteNinoController extends Controller
 
     /**
      * Catálogo de paquetes del ambiente actual (kiosco: portada + recorrido).
+     * Filtra por edad del niño (?edad= o sesión) para no mezclar variantes 3-4 / 5-6.
      */
     public function juegosCatalogo(Request $request)
     {
         $ambiente = $this->sesionNino->obtenerAmbiente($request);
-        $juegos = $this->catalogoJuegos->listarActivosPorAmbiente((int) $ambiente->id);
+        $edad = $this->resolverEdadCatalogo($request);
+        $juegos = $this->catalogoJuegos->listarActivosPorAmbiente((int) $ambiente->id, $edad);
 
         return response()->json([
             'success' => true,
@@ -215,9 +217,45 @@ class AmbienteNinoController extends Controller
                     'nombre' => $ambiente->nombre,
                     'color_hex' => $ambiente->color_hex ?? null,
                 ],
+                'edad' => $edad,
                 'juegos' => $juegos,
             ],
         ]);
+    }
+
+    /**
+     * Edad en años para filtrar el catálogo: query ?edad=, perfil en sesión o grado.
+     */
+    private function resolverEdadCatalogo(Request $request): ?int
+    {
+        if ($request->filled('edad') && is_numeric($request->input('edad'))) {
+            $edadQuery = (int) $request->input('edad');
+            if ($edadQuery >= 1 && $edadQuery <= 12) {
+                return $edadQuery;
+            }
+        }
+
+        $estudiante = $request->attributes->get('estudiante_nino');
+        if (! $estudiante) {
+            $estudianteId = $request->session()->get(SesionNinoService::SESSION_ESTUDIANTE_ID);
+            $estudiante = $this->sesionNino->estudianteSesionValido(
+                is_numeric($estudianteId) ? (int) $estudianteId : null
+            );
+        }
+
+        if (! $estudiante) {
+            return null;
+        }
+
+        $edad = $estudiante->edad;
+        if ($edad !== null) {
+            return (int) $edad;
+        }
+
+        $estudiante->loadMissing('grado');
+        $edadGrado = $estudiante->grado->edad_anos ?? null;
+
+        return $edadGrado !== null ? (int) $edadGrado : null;
     }
 
     public function experiencia(Request $request, Experiencia $experiencia)

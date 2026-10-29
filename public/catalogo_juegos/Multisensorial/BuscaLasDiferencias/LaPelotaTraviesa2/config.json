@@ -233,28 +233,44 @@
       },
       "retos": [
         {
-          "id": "balon",
-          "nombre": "La Pelota Traviesa",
+          "id": "rama",
+          "nombre": "La Hoja Perdida del Árbol",
           "cambiosB": {
-            "balon": "img/balon_rojo_amarillo.svg"
+            "hoja_2": null,
+            "fruta_3": "img/pera.svg"
+          },
+          "lupaZona": {
+            "zona": {
+              "x": 270,
+              "y": 40,
+              "w": 130,
+              "h": 90
+            },
+            "zoom": 3
           },
           "objetivos": [
             {
-              "id": "balon",
-              "elemento": "balon",
-              "previo": "analisis",
-              "reaccion": "giroChispas"
+              "id": "hoja",
+              "elemento": "hoja_2",
+              "minimo": 26,
+              "reaccion": "hojaViento"
+            },
+            {
+              "id": "fruta",
+              "elemento": "fruta_3",
+              "minimo": 26,
+              "reaccion": "frutaCambia"
             }
           ],
           "presentacion": {
             "voz": "zeus",
-            "texto": "¡Atención a los colores de los objetos! Observa la pelota de la izquierda y compárala con la de la derecha. ¿Qué está diferente?"
+            "texto": "¡Cuidado! Este es un detalle de alta dificultad. Examina con cuidado las ramas del árbol y las frutas. Hay algo diferente, descubre qué es."
           },
           "acierto": {
             "voz": "zeus",
-            "texto": "¡Muy bien! Notaste el cambio de color."
+            "texto": "¡Impresionante! Encontraste la hoja que faltaba en la rama y descubriste la fruta diferente."
           },
-          "iOrigen": 1
+          "iOrigen": 3
         }
       ],
       "premio": {

@@ -1,0 +1,133 @@
+{
+  "nombre": "El Misterio del Bosque Nocturno (Búho vs. Lobo)",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el botón para escuchar y luego toca la imagen del sonido.",
+    "demostracionAcierto": "¡Así se descubre el sonido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al estudio de grabación!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy seremos los DJ del sonido."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "pajaro"
+  },
+  "escenas": {
+    "estudio": "img/escenas/estudio.svg",
+    "noche": "img/escenas/noche.svg"
+  },
+  "elementos": {
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pájaro",
+      "sonido": "trino"
+    },
+    "buho": {
+      "img": "img/buho.svg",
+      "nombre": "Búho",
+      "sonido": "buho",
+      "fotogramas": [
+        "img/buho_brillo.svg"
+      ]
+    },
+    "lobo": {
+      "img": "img/lobo.svg",
+      "nombre": "Lobo"
+    },
+    "rana": {
+      "img": "img/rana.svg",
+      "nombre": "Rana"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El estudio de grabación",
+      "tema": "estudio",
+      "escena": "estudio",
+      "arrastre": false,
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al estudio de grabación!"
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy seremos los DJ del sonido."
+        }
+      ],
+      "retos": [
+        {
+          "id": "bosque-nocturno",
+          "titulo": "El misterio del bosque nocturno",
+          "escena": "noche",
+          "consigna": {
+            "voz": "zeus",
+            "texto": "Estamos en el bosque de noche. Escucha este sonido grave que resuena entre los árboles. ¿Qué animal está cantando?"
+          },
+          "capas": [
+            {
+              "sonido": "buho",
+              "principal": true
+            }
+          ],
+          "opciones": [
+            "buho",
+            "lobo",
+            "rana"
+          ],
+          "correcto": "buho",
+          "acierto": {
+            "efecto": "buho",
+            "voz": "zeus",
+            "texto": "¡Muy bien! El búho emite ese sonido suave y grave cuando cae la noche."
+          },
+          "error": {
+            "voz": "zoe",
+            "texto": "El lobo aúlla a la luna de forma más alargada y la rana croa 'croac-croac'. ¡Inténtalo otra vez!"
+          }
+        }
+      ],
+      "concierto": {
+        "tipo": "mezcla",
+        "compases": 3,
+        "bpm": 96
+      },
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Increíble trabajo como ingeniero de sonido! Tus oídos detectaron detalles muy sutiles en cada pista."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Tienes un talento increíble para la música y el análisis acústico!"
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_maestro_audio.svg",
+        "nombre": "Maestro del Audio y los Sonidos",
+        "sonido": "aplausos"
+      }
+    }
+  ]
+}

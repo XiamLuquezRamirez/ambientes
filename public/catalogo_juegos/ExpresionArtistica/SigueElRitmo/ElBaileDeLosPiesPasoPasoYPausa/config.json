@@ -1,0 +1,169 @@
+{
+  "nombre": "El Baile de los Pies (Paso, Paso y Pausa)",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el tambor cuando se encienda la luz.",
+    "demostracionAcierto": "¡Así se sigue el ritmo!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Bienvenido a la pista de baile."
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy vamos a seguir el ritmo de la música."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "tambor"
+  },
+  "escenas": {
+    "pista": "img/escenas/pista.svg",
+    "estudio": "img/escenas/estudio.svg"
+  },
+  "animales": [
+    "conejo",
+    "oso",
+    "pato"
+  ],
+  "elementos": {
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor",
+      "sonido": "tambor"
+    },
+    "aplauso": {
+      "img": "img/aplauso.svg",
+      "nombre": "Aplausos",
+      "sonido": "aplauso"
+    },
+    "zapato": {
+      "img": "img/zapato.svg",
+      "nombre": "Zapatos",
+      "sonido": "zapato"
+    },
+    "piano": {
+      "img": "img/piano.svg",
+      "nombre": "Piano",
+      "sonido": "piano"
+    },
+    "guitarra": {
+      "img": "img/guitarra.svg",
+      "nombre": "Guitarra",
+      "sonido": "guitarra"
+    },
+    "bateria": {
+      "img": "img/bateria.svg",
+      "nombre": "Batería",
+      "sonido": "bateria"
+    },
+    "platillo": {
+      "img": "img/platillos.svg",
+      "nombre": "Platillo",
+      "sonido": "platillo"
+    },
+    "bombo": {
+      "img": "img/bombo.svg",
+      "nombre": "Bombo",
+      "sonido": "bombo"
+    },
+    "caja": {
+      "img": "img/caja.svg",
+      "nombre": "Caja",
+      "sonido": "caja"
+    },
+    "conejo": {
+      "img": "img/conejo.svg",
+      "nombre": "Conejo",
+      "sonido": "aplauso"
+    },
+    "oso": {
+      "img": "img/oso.svg",
+      "nombre": "Oso",
+      "sonido": "aplauso"
+    },
+    "pato": {
+      "img": "img/pato.svg",
+      "nombre": "Pato",
+      "sonido": "aplauso"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "La pista de baile",
+      "tema": "pista",
+      "escena": "pista",
+      "bpm": 110,
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hola! Bienvenido a la pista de baile."
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy vamos a seguir el ritmo de la música."
+        }
+      ],
+      "retos": [
+        {
+          "id": "pasos",
+          "tipo": "patron",
+          "titulo": "El baile de los pies",
+          "elemento": "zapato",
+          "bpm": 130,
+          "patron": [
+            0,
+            1
+          ],
+          "pausa": 2,
+          "repeticiones": 2,
+          "consigna": {
+            "voz": "zoe",
+            "texto": "¡Vamos a bailar con los pies! Toca el botón del zapato dos veces seguidas y espera un momentito: ¡Paso, paso... y stop!"
+          },
+          "acierto": [
+            {
+              "voz": "zoe",
+              "texto": "¡Lo lograste! Hiciste el ritmo de dos pasos y la pausa exacta."
+            },
+            {
+              "voz": "zeus",
+              "texto": "¡Eres el rey de la pista de baile!"
+            }
+          ]
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Qué gran sentido del ritmo tienes! Tus manos y tus oídos hicieron un equipo increíble."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡La música se siente mucho mejor cuando seguimos el compás juntos!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_pista.svg",
+        "nombre": "Rey de la Pista de Baile",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

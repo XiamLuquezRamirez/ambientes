@@ -1,0 +1,234 @@
+{
+  "nombre": "La Flor Traviesa Que Sobra",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira! Toca la diferencia en el cuadro travieso.",
+    "demostracionAcierto": "¡Así se encuentra la travesura!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Bienvenido a la galería de arte un poco alocada."
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy vamos a encontrar las diferencias entre los cuadros."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "pieza_demo"
+  },
+  "escenas": {
+    "galeria": "img/escenas/galeria.svg",
+    "museo": "img/escenas/museo.svg"
+  },
+  "elementos": {
+    "pieza_demo": {
+      "img": "img/pieza_demo.svg",
+      "nombre": "Diferencia de ejemplo"
+    },
+    "pincel": {
+      "img": "img/pincel.svg",
+      "nombre": "Pincel"
+    },
+    "estrella_sello": {
+      "img": "img/estrella_sello.svg",
+      "nombre": "Sello"
+    },
+    "sello_autentica": {
+      "img": "img/sello_autentica.svg",
+      "nombre": "Obra Auténtica"
+    },
+    "osito_completo": {
+      "img": "img/osito_completo.svg",
+      "nombre": "Osito completo"
+    },
+    "osito_sin_pincel": {
+      "img": "img/osito_sin_pincel.svg",
+      "nombre": "Osito sin pincel"
+    },
+    "gato_rojo": {
+      "img": "img/gato_rojo.svg",
+      "nombre": "Gato con sombrero rojo"
+    },
+    "gato_azul": {
+      "img": "img/gato_azul.svg",
+      "nombre": "Gato con sombrero azul"
+    },
+    "jardin_ok": {
+      "img": "img/jardin_ok.svg",
+      "nombre": "Jardín"
+    },
+    "jardin_extra": {
+      "img": "img/jardin_extra.svg",
+      "nombre": "Jardín con flor extra"
+    },
+    "paisaje_ok": {
+      "img": "img/paisaje_ok.svg",
+      "nombre": "Paisaje"
+    },
+    "paisaje_diff": {
+      "img": "img/paisaje_diff.svg",
+      "nombre": "Paisaje travieso"
+    },
+    "bodegon": {
+      "img": "img/bodegon.svg",
+      "nombre": "Bodegón"
+    },
+    "bodegon_sin_reloj": {
+      "img": "img/bodegon_sin_reloj.svg",
+      "nombre": "Bodegón sin reloj"
+    },
+    "campo_mariposa": {
+      "img": "img/campo_mariposa.svg",
+      "nombre": "Campo con mariposa"
+    },
+    "campo_abeja": {
+      "img": "img/campo_abeja.svg",
+      "nombre": "Campo con abeja"
+    },
+    "castillo_ok": {
+      "img": "img/castillo_ok.svg",
+      "nombre": "Castillo original"
+    },
+    "castillo_diff": {
+      "img": "img/castillo_diff.svg",
+      "nombre": "Castillo falso"
+    },
+    "castillo_ventana_ok": {
+      "img": "img/castillo_ventana_ok.svg",
+      "nombre": "Castillo ventana corregida"
+    },
+    "castillo_bandera_ok": {
+      "img": "img/castillo_bandera_ok.svg",
+      "nombre": "Castillo bandera corregida"
+    },
+    "caballero": {
+      "img": "img/caballero.svg",
+      "nombre": "Caballero"
+    },
+    "caballero_sin_tel": {
+      "img": "img/caballero_sin_tel.svg",
+      "nombre": "Caballero sin teléfono"
+    },
+    "cuadro_osito": {
+      "img": "img/cuadro_osito.svg",
+      "nombre": "Osito"
+    },
+    "cuadro_gato": {
+      "img": "img/cuadro_gato.svg",
+      "nombre": "Gato"
+    },
+    "cuadro_jardin": {
+      "img": "img/cuadro_jardin.svg",
+      "nombre": "Jardín"
+    },
+    "cuadro_paisaje": {
+      "img": "img/cuadro_paisaje.svg",
+      "nombre": "Paisaje"
+    },
+    "cuadro_bodegon": {
+      "img": "img/cuadro_bodegon.svg",
+      "nombre": "Bodegón"
+    },
+    "cuadro_campo": {
+      "img": "img/cuadro_campo.svg",
+      "nombre": "Campo"
+    },
+    "cuadro_castillo": {
+      "img": "img/cuadro_castillo.svg",
+      "nombre": "Castillo"
+    },
+    "cuadro_caballero": {
+      "img": "img/cuadro_caballero.svg",
+      "nombre": "Caballero"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "La galería de arte",
+      "tema": "galeria",
+      "escena": "galeria",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hola! Bienvenido a la galería de arte un poco alocada."
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy vamos a encontrar las diferencias entre los cuadros."
+        }
+      ],
+      "galeria": [
+        "cuadro_osito",
+        "cuadro_gato",
+        "cuadro_jardin",
+        "cuadro_paisaje"
+      ],
+      "retos": [
+        {
+          "id": "jardin",
+          "tipo": "extra",
+          "titulo": "La Flor Traviesa que Sobra",
+          "cuadroA": "jardin_ok",
+          "cuadroB": "jardin_extra",
+          "cuadroBResuelto": "jardin_ok",
+          "efecto": "desaparece",
+          "toqueEn": "travieso",
+          "objetivos": [
+            {
+              "id": "flor",
+              "x": 50,
+              "y": 40,
+              "w": 28,
+              "h": 34
+            }
+          ],
+          "consigna": {
+            "voz": "zoe",
+            "texto": "¡Una flor se coló en el jardín donde no debía estar! Toca la flor traviesa que sobra en el cuadro de la derecha."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Esa flor estaba de visita donde no le correspondía. ¡Excelente hallazgo!"
+          },
+          "error": {
+            "voz": "zoe",
+            "texto": "Busca la flor que no está en el cuadro de la izquierda."
+          },
+          "iOrigen": 2
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Terminaste todos los retos de Arte! Armaste rompecabezas, completaste dibujos, mezclaste colores, jugaste con formas geométricas y encontraste todas las diferencias."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Te has ganado el título de Maestro Supremo del Arte en PEDNIA!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_detective.svg",
+        "nombre": "Detective de la Galería",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

@@ -23,9 +23,22 @@
     }
 
     function urlCatalogo() {
-        if (ctx && ctx.urlCatalogo) return ctx.urlCatalogo;
+        const fromCtx = ctx && ctx.urlCatalogo ? String(ctx.urlCatalogo).trim() : '';
         const fromDom = document.getElementById('rnApp')?.getAttribute('data-url-juegos-catalogo');
-        return fromDom || '/juegos-catalogo';
+        const base = fromCtx || fromDom || '/juegos-catalogo';
+        const perfil = perfilPayload();
+        const edad = perfil && perfil.edad != null && perfil.edad !== ''
+            ? parseInt(String(perfil.edad), 10)
+            : NaN;
+        if (!isFinite(edad) || edad < 1) return base;
+        try {
+            const u = new URL(base, window.location.origin);
+            u.searchParams.set('edad', String(edad));
+            return u.pathname + u.search + u.hash;
+        } catch (e) {
+            const sep = base.indexOf('?') >= 0 ? '&' : '?';
+            return base + sep + 'edad=' + encodeURIComponent(String(edad));
+        }
     }
 
     function iconoHtml(juego) {

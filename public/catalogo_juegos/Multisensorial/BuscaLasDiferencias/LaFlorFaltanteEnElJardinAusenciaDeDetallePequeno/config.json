@@ -1,0 +1,270 @@
+{
+  "nombre": "La Flor Faltante en el Jardín (Ausencia de Detalle Pequeño)",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: compara las dos imágenes y toca el objeto que no aparece en la otra imagen.",
+    "demostracionAcierto": "¡Así! En la imagen derecha no estaba la mariposa.",
+    "demostracionFin": "¡Ahora te toca a ti! Encuentra las diferencias.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Observa muy bien las dos imágenes y encuentra las diferencias."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Parecen iguales, pero algo cambió. ¡Toca cada diferencia!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Compara con calma. Cuando encuentres todas, ¡habrás ganado!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3"
+  },
+  "demo": {
+    "escena": "demo",
+    "reto": {
+      "id": "demo",
+      "cambiosB": {
+        "mariposa": null
+      },
+      "objetivos": [
+        {
+          "id": "mariposa",
+          "elemento": "mariposa",
+          "reaccion": "pegatina"
+        }
+      ]
+    }
+  },
+  "escenas": {
+    "demo": {
+      "fondo": "img/parque_fondo.svg",
+      "elementos": {
+        "mariposa": {
+          "img": "img/mariposa_demo.svg",
+          "x": 112,
+          "y": 140,
+          "w": 60,
+          "h": 50
+        }
+      }
+    },
+    "parque": {
+      "fondo": "img/parque_fondo.svg",
+      "elementos": {
+        "sol": {
+          "img": "img/sol_sonriente.svg",
+          "x": 300,
+          "y": 12,
+          "w": 80,
+          "h": 80,
+          "animacionA": "brilla"
+        },
+        "flor_rosa": {
+          "img": "img/flor_rosa.svg",
+          "x": 98,
+          "y": 206,
+          "w": 40,
+          "h": 62,
+          "animacionA": "mece"
+        },
+        "flor_morada": {
+          "img": "img/flor_morada.svg",
+          "x": 140,
+          "y": 210,
+          "w": 40,
+          "h": 62,
+          "animacionA": "mece"
+        },
+        "flor_roja": {
+          "img": "img/flor_roja.svg",
+          "x": 182,
+          "y": 206,
+          "w": 40,
+          "h": 62,
+          "animacionA": "mece"
+        },
+        "pelota": {
+          "img": "img/pelota_roja_amarilla.svg",
+          "x": 292,
+          "y": 222,
+          "w": 58,
+          "h": 58
+        }
+      }
+    },
+    "paisaje": {
+      "fondo": "img/paisaje_fondo.svg",
+      "elementos": {
+        "sol": {
+          "img": "img/sol_rayos.svg",
+          "x": 14,
+          "y": 8,
+          "w": 76,
+          "h": 76,
+          "animacionA": "brilla"
+        },
+        "balon": {
+          "img": "img/balon_rojo_verde.svg",
+          "x": 270,
+          "y": 226,
+          "w": 44,
+          "h": 44
+        },
+        "flor_1": {
+          "img": "img/flor_jardin.svg",
+          "x": 33,
+          "y": 208,
+          "w": 34,
+          "h": 50
+        },
+        "flor_2": {
+          "img": "img/flor_jardin.svg",
+          "x": 73,
+          "y": 208,
+          "w": 34,
+          "h": 50
+        },
+        "flor_3": {
+          "img": "img/flor_jardin.svg",
+          "x": 113,
+          "y": 208,
+          "w": 34,
+          "h": 50
+        },
+        "flor_4": {
+          "img": "img/flor_jardin.svg",
+          "x": 153,
+          "y": 208,
+          "w": 34,
+          "h": 50
+        },
+        "hoja_1": {
+          "img": "img/hoja_rama.svg",
+          "x": 288,
+          "y": 85,
+          "w": 20,
+          "h": 14
+        },
+        "hoja_2": {
+          "img": "img/hoja_rama.svg",
+          "x": 308,
+          "y": 77,
+          "w": 20,
+          "h": 14
+        },
+        "hoja_3": {
+          "img": "img/hoja_rama.svg",
+          "x": 327,
+          "y": 69,
+          "w": 20,
+          "h": 14
+        },
+        "hoja_4": {
+          "img": "img/hoja_rama.svg",
+          "x": 346,
+          "y": 61,
+          "w": 20,
+          "h": 14
+        },
+        "hoja_5": {
+          "img": "img/hoja_rama.svg",
+          "x": 366,
+          "y": 53,
+          "w": 20,
+          "h": 14
+        },
+        "fruta_1": {
+          "img": "img/manzana.svg",
+          "x": 300,
+          "y": 97,
+          "w": 16,
+          "h": 20
+        },
+        "fruta_2": {
+          "img": "img/manzana.svg",
+          "x": 335,
+          "y": 83,
+          "w": 16,
+          "h": 20
+        },
+        "fruta_3": {
+          "img": "img/manzana.svg",
+          "x": 369,
+          "y": 69,
+          "w": 16,
+          "h": 20
+        }
+      }
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El Detective de Diferencias",
+      "escena": "parque",
+      "etiquetas": {
+        "A": "Imagen A",
+        "B": "Imagen B"
+      },
+      "lupa": {
+        "nombre": "Lupa Dúo",
+        "diametro": 0.34,
+        "zoom": 1.6,
+        "alTocar": true
+      },
+      "minimo": 56,
+      "contador": 1,
+      "retos": [
+        {
+          "id": "pelota",
+          "nombre": "La Pelota Traviesa",
+          "cambiosB": {
+            "pelota": "img/pelota_azul.svg"
+          },
+          "objetivos": [
+            {
+              "id": "pelota",
+              "elemento": "pelota",
+              "previo": "circuloVerificacion",
+              "reaccion": "trompo"
+            }
+          ],
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Atención, detective! Las dos pelotas están ahí... pero ¡hay algo raro con sus colores! Míralas bien y descubre qué está diferente."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Fantástico! Descubriste que la pelota era de otro color."
+          },
+          "error": {
+            "voz": "zoe",
+            "texto": "Observa bien y descubre qué es diferente en la otra imagen."
+          },
+          "iOrigen": 2
+        }
+      ],
+      "premio": {
+        "tipo": "placa",
+        "titulo": "Placa Mágica",
+        "nombre": "Súper Detective de Diferencias"
+      },
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Zoe y Zeus te entregan la Placa Mágica de Súper Detective de Diferencias!"
+      }
+    }
+  ]
+}

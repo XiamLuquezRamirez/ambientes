@@ -244,4 +244,54 @@ class JuegoCatalogoServiceTest extends TestCase
         $this->assertFalse(Juego::colorEsValido('2563eb'));
         $this->assertFalse(Juego::colorEsValido('azul'));
     }
+
+    public function test_extrae_rangos_edad_desde_nombre_y_carpeta(): void
+    {
+        $svc = new JuegoCatalogoService;
+
+        $this->assertSame(
+            [['min' => 3, 'max' => 4]],
+            $svc->extraerRangosEdadDeTexto('Encuentra El Rojo (3-4 Años)')
+        );
+        $this->assertSame(
+            [['min' => 5, 'max' => 6]],
+            $svc->extraerRangosEdadDeTexto('Encuentra El Rojo (5-6 Años)')
+        );
+        $this->assertSame(
+            [['min' => 3, 'max' => 4]],
+            $svc->extraerRangosEdadDeTexto('catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElRojo34Anos')
+        );
+        $this->assertSame(
+            [['min' => 3, 'max' => 3]],
+            $svc->extraerRangosEdadDeTexto('3 años')
+        );
+        $this->assertSame('Encuentra El Rojo', $svc->nombreSinSufijoEdad('Encuentra El Rojo (3-4 Años)'));
+    }
+
+    public function test_juego_apto_para_edad_por_nombre(): void
+    {
+        $svc = new JuegoCatalogoService;
+        $j34 = new Juego([
+            'slug' => 'encuentra-el-rojo-3-4-anos',
+            'nombre' => 'Encuentra El Rojo (3-4 Años)',
+            'ruta' => 'catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElRojo34Anos',
+        ]);
+        $j56 = new Juego([
+            'slug' => 'encuentra-el-rojo-5-6-anos',
+            'nombre' => 'Encuentra El Rojo (5-6 Años)',
+            'ruta' => 'catalogo_juegos/Multisensorial/EncuentraElColor/EncuentraElRojo56Anos',
+        ]);
+        $sinEdad = new Juego([
+            'slug' => 'juego-libre',
+            'nombre' => 'Juego libre',
+            'ruta' => '',
+        ]);
+
+        $this->assertTrue($svc->juegoAptoParaEdad($j34, 3));
+        $this->assertTrue($svc->juegoAptoParaEdad($j34, 4));
+        $this->assertFalse($svc->juegoAptoParaEdad($j34, 5));
+        $this->assertTrue($svc->juegoAptoParaEdad($j56, 5));
+        $this->assertFalse($svc->juegoAptoParaEdad($j56, 4));
+        $this->assertTrue($svc->juegoAptoParaEdad($sinEdad, 4));
+    }
 }
