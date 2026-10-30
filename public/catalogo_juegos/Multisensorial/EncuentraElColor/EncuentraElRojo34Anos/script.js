@@ -10,6 +10,8 @@
     let audioFondo = null;
 
     let nivelElegido = null;
+    let escenasRonda = [];
+    let indiceEscena = 0;
     let coloresRonda = [];
     let indiceColor = 0;
     let colorObjetivo = null;
@@ -22,6 +24,43 @@
     let audioCache = Object.create(null);
     let imgCache = Object.create(null);
     let imagenesPromise = null;
+    let phaserListo = null;
+
+    function anim() {
+        return (window.PedniaEncuentraColorAnim && window.PedniaEncuentraColorAnim.activo)
+            ? window.PedniaEncuentraColorAnim
+            : null;
+    }
+
+    function usaPhaser() {
+        return !!(window.PedniaEncuentraColorPhaser && PedniaEncuentraColorPhaser.listo());
+    }
+
+    function ensurePhaserMontado() {
+        if (!window.PedniaEncuentraColorPhaser) return Promise.resolve(false);
+        if (PedniaEncuentraColorPhaser.listo()) return Promise.resolve(true);
+        if (phaserListo) return phaserListo;
+        phaserListo = PedniaEncuentraColorPhaser.montar({
+            parent: "phaser-tablero",
+            gameConfig: gameConfig,
+            callbacks: {
+                puedeInteractuar: function () {
+                    return aceptaToque && !esperandoFeedback && !juegoTerminado && !demoActiva;
+                },
+                onToque: function (objetoId) {
+                    resolverToque(objetoId);
+                }
+            }
+        }).then(function () {
+            if (anim() && anim().preparar) anim().preparar();
+            return true;
+        }).catch(function (err) {
+            phaserListo = null;
+            console.error("[EncuentraElColor] Phaser:", err);
+            return false;
+        });
+        return phaserListo;
+    }
 
     function readText(ruta) {
         const xhr = new XMLHttpRequest();
@@ -392,6 +431,33 @@
 
     /* ── Edad / consignas ──────────────────────────────────────── */
 
+    function escenasDelNivel(nivel) {
+        if (!nivel) return [];
+        if (Array.isArray(nivel.escenas) && nivel.escenas.length) {
+            return nivel.escenas;
+        }
+        return [{
+            objetos: (nivel.objetos || []).slice(),
+            colores: (nivel.colores || []).slice()
+        }];
+    }
+
+    function escenaActual() {
+        return escenasRonda[indiceEscena] || {};
+    }
+
+    function objetosEscenaActual() {
+        const esc = escenaActual();
+        if (esc.objetos && esc.objetos.length) return esc.objetos.slice();
+        return ((nivelElegido && nivelElegido.objetos) || []).slice();
+    }
+
+    function coloresEscenaActual() {
+        const esc = escenaActual();
+        if (esc.colores && esc.colores.length) return esc.colores.slice();
+        return ((nivelElegido && nivelElegido.colores) || []).slice();
+    }
+
     function elegirNivel() {
         let botones = "";
         gameConfig.niveles.forEach(function (nivel, i) {
@@ -423,7 +489,9 @@
         esperandoFeedback = false;
         aceptaToque = false;
         TextoVoz.detener();
-        coloresRonda = (nivelElegido.colores || []).slice();
+        escenasRonda = escenasDelNivel(nivelElegido);
+        indiceEscena = 0;
+        coloresRonda = coloresEscenaActual();
         indiceColor = 0;
         Promise.resolve(imagenesPromise).then(function () {
             if (mostrarIntroActiva()) {
@@ -481,7 +549,9 @@
         if (prog) prog.hidden = true;
 
         pintarMuestraColor(colorObjetivo);
-        pintarObjetos(shuffle((nivelElegido.objetos || []).slice()));
+        await ensurePhaserMontado();
+        await pintarObjetos(shuffle(objetosEscenaActual()));
+        if (anim()) anim().consignaNueva();
 
         const metaDemo = metaColor(colorObjetivo);
         const msg = plantilla(
@@ -493,28 +563,44 @@
         if (enunciado) enunciado.textContent = msg;
         await hablarDemo(msg, 3000);
 
-        const targetId = (nivelElegido.objetos || []).find(function (oid) {
+        const targetId = objetosEscenaActual().find(function (oid) {
             return metaObj(oid).color === colorObjetivo;
         });
-        const targetBtn = targetId
-            ? Array.prototype.find.call(document.querySelectorAll(".objeto"), function (btn) {
-                return btn.dataset.objeto === targetId;
-            })
-            : null;
 
         if (gen !== rondaGen || !demoActiva) return;
 
-        if (targetBtn && window.PedniaTutorial) {
-            await PedniaTutorial.animarMano({
-                punto: targetBtn,
-                holdMs: 700,
-                cancelado: function () { return gen !== rondaGen || !demoActiva; },
-                onPresionar: function () { targetBtn.classList.add("is-demo-target"); }
-            });
-            if (gen !== rondaGen || !demoActiva) return;
-            targetBtn.classList.remove("is-demo-target");
-            targetBtn.classList.add("is-acierto");
-            await sleep(900);
+        if (targetId && window.PedniaTutorial) {
+            if (usaPhaser()) {
+                await PedniaEncuentraColorPhaser.pulseDemo(targetId);
+                const ancla = PedniaEncuentraColorPhaser.anclaDemo(targetId);
+                await PedniaTutorial.animarMano({
+                    punto: ancla,
+                    holdMs: 700,
+                    cancelado: function () { return gen !== rondaGen || !demoActiva; }
+                });
+                if (gen !== rondaGen || !demoActiva) return;
+                await PedniaEncuentraColorPhaser.marcarAcierto(targetId);
+                const rect = PedniaEncuentraColorPhaser.rectPantalla(targetId);
+                if (anim()) anim().acierto(rect);
+                await sleep(500);
+            } else {
+                const targetBtn = Array.prototype.find.call(
+                    document.querySelectorAll(".objeto"),
+                    function (btn) { return btn.dataset.objeto === targetId; }
+                );
+                if (targetBtn) {
+                    await PedniaTutorial.animarMano({
+                        punto: targetBtn,
+                        holdMs: 700,
+                        cancelado: function () { return gen !== rondaGen || !demoActiva; },
+                        onPresionar: function () { targetBtn.classList.add("is-demo-target"); }
+                    });
+                    if (gen !== rondaGen || !demoActiva) return;
+                    targetBtn.classList.remove("is-demo-target");
+                    targetBtn.classList.add("is-acierto");
+                    await sleep(900);
+                }
+            }
         }
 
         reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
@@ -539,10 +625,12 @@
     function actualizarProgreso() {
         const el = document.getElementById("progreso");
         if (!el) return;
-        const total = coloresRonda.length;
+        const totalEscenas = Math.max(escenasRonda.length, 1);
+        const totalColores = Math.max(coloresRonda.length, 1);
+        const paso = (indiceEscena * totalColores) + Math.min(indiceColor + 1, totalColores);
+        const total = totalEscenas * totalColores;
         el.hidden = !total;
-        el.innerHTML = '<i class="fa-solid fa-palette"></i> ' +
-            Math.min(indiceColor + 1, total) + " / " + total;
+        el.innerHTML = '<i class="fa-solid fa-palette"></i> ' + paso + " / " + total;
     }
 
     function pintarMuestraColor(colorId) {
@@ -557,7 +645,7 @@
     }
 
     function iniciarConsigna(gen) {
-    if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
+        if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
         if (gen !== rondaGen || juegoTerminado) return;
         colorObjetivo = coloresRonda[indiceColor] || null;
         if (!colorObjetivo) {
@@ -566,25 +654,34 @@
         }
         actualizarProgreso();
         pintarMuestraColor(colorObjetivo);
-        pintarObjetos(shuffle((nivelElegido.objetos || []).slice()));
 
         const meta = metaColor(colorObjetivo);
         const consigna = plantilla(
             textos().consignaPlantilla || "Encuentra el objeto de color {color}.",
             { color: meta.nombre }
         );
-        const enunciado = document.getElementById("enunciado");
-        if (enunciado) enunciado.textContent = consigna;
-        aceptaToque = true;
-        TextoVoz.hablar(consigna, "zoe");
+
+        aceptaToque = false;
+        ensurePhaserMontado()
+            .then(function () { return pintarObjetos(shuffle(objetosEscenaActual())); })
+            .then(function () {
+                if (gen !== rondaGen || juegoTerminado) return;
+                const enunciado = document.getElementById("enunciado");
+                if (enunciado) enunciado.textContent = consigna;
+                if (anim()) anim().consignaNueva();
+                aceptaToque = true;
+                TextoVoz.hablar(consigna, "zoe");
+            });
     }
 
-    function pintarObjetos(ids) {
-        const zona = document.getElementById("zona-objetos");
-        if (!zona) return;
-        zona.innerHTML = "";
-        const n = ids.length;
-        zona.dataset.count = String(n);
+    function pintarObjetosDom(ids, zona) {
+        Array.prototype.forEach.call(zona.querySelectorAll(".objeto"), function (el) {
+            el.remove();
+        });
+        const tablero = document.getElementById("phaser-tablero");
+        if (tablero) tablero.hidden = true;
+        zona.classList.add("modo-dom");
+        zona.classList.remove("modo-phaser");
         ids.forEach(function (id) {
             const m = metaObj(id);
             const btn = document.createElement("button");
@@ -603,19 +700,55 @@
         });
     }
 
+    function pintarObjetos(ids) {
+        const zona = document.getElementById("zona-objetos");
+        if (!zona) return Promise.resolve();
+        const n = ids.length;
+        zona.dataset.count = String(n);
+
+        if (usaPhaser()) {
+            Array.prototype.forEach.call(zona.querySelectorAll(".objeto"), function (el) {
+                el.remove();
+            });
+            const tablero = document.getElementById("phaser-tablero");
+            if (tablero) tablero.hidden = false;
+            zona.classList.add("modo-phaser");
+            zona.classList.remove("modo-dom");
+            return PedniaEncuentraColorPhaser.cargarEscena(ids);
+        }
+
+        pintarObjetosDom(ids, zona);
+        return Promise.resolve();
+    }
+
     async function resolverToque(objetoId, el) {
         if (demoActiva || !aceptaToque || esperandoFeedback || juegoTerminado) return;
         const m = metaObj(objetoId);
         const correcto = m.color === colorObjetivo;
         if (!correcto) {
+            if (usaPhaser()) await PedniaEncuentraColorPhaser.marcarError(objetoId);
             await feedbackError();
             return;
         }
-        el.classList.add("is-acierto");
+        if (usaPhaser()) {
+            await PedniaEncuentraColorPhaser.marcarAcierto(objetoId);
+            const rect = PedniaEncuentraColorPhaser.rectPantalla(objetoId);
+            if (anim()) anim().acierto(rect);
+        } else if (el) {
+            el.classList.add("is-acierto");
+        }
         await feedbackAcierto();
         if (indiceColor + 1 < coloresRonda.length) {
             indiceColor += 1;
             await sleep(280);
+            iniciarConsigna(rondaGen);
+            return;
+        }
+        if (indiceEscena + 1 < escenasRonda.length) {
+            indiceEscena += 1;
+            coloresRonda = coloresEscenaActual();
+            indiceColor = 0;
+            await sleep(320);
             iniciarConsigna(rondaGen);
             return;
         }
@@ -705,6 +838,7 @@
     function mostrarCierre() {
         juegoTerminado = true;
         aceptaToque = false;
+        if (anim()) anim().cierre();
         const cierre = textos().cierre || "¡Excelente!";
         const texto = document.getElementById("texto_final");
         if (texto) texto.textContent = cierre;
@@ -739,9 +873,16 @@
         });
         enlazarMenuVol();
         if (window.PedniaMenuAcc) PedniaMenuAcc.iniciar(gameConfig, aplicarLetterSpacing);
-        window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });
+        window.addEventListener("pagehide", function () {
+            TextoVoz.vaciar();
+            if (window.PedniaEncuentraColorPhaser) {
+                try { PedniaEncuentraColorPhaser.destruir(); } catch (e) { /* noop */ }
+            }
+            phaserListo = null;
+        });
         imagenesPromise = precargarImagenesCriticas();
         precargarMediaSecundaria();
+        if (anim() && anim().preparar) anim().preparar();
 
         sincronizarDialogoIntro3d();
         document.getElementById("btn-empecemos").addEventListener("click", empecemosJuego);

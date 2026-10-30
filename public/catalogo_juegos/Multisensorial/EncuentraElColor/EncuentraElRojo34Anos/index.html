@@ -13,8 +13,8 @@
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
 	<link rel="stylesheet" href="style.css">
-	<link rel="stylesheet" href="../../../Polimotor/comun/inicio-fondo.css?v=20261027a">
-	<script src="../../../Polimotor/comun/inicio-fondo.js?v=20261027d"></script>
+	<link rel="stylesheet" href="../../../Polimotor/comun/inicio-fondo.css?v=20261030d">
+	<script src="../../../Polimotor/comun/inicio-fondo.js?v=20261030d"></script>
 	<link rel="stylesheet" href="../../../tutorial/tutorial.css?v=20261019e">
 	<link rel="stylesheet" href="../../../shared/menu-accesibilidad.css?v=20261022o">
 	<link rel="stylesheet" href="../../../final/final.css">
@@ -31,7 +31,7 @@
 	<div id="pantalla-inicio" class="pantalla-inicio">
 		<div class="inicio-mancha" aria-hidden="true"></div>
 		<div class="inicio-contenido">
-			<p class="inicio-kicker">Encuentra el Color</p>
+			<p class="inicio-kicker">Encuentra El Rojo</p>
 			<button type="button" id="btn-empecemos" class="btn-empecemos">
 				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
 				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
@@ -113,7 +113,9 @@
 			<div id="muestra-color" class="muestra-color" hidden aria-hidden="true"></div>
 			<h1 class="borde" id="enunciado">Observa y encuentra el color</h1>
 		</div>
-		<div id="zona-objetos" class="zona-objetos" aria-label="Objetos de colores"></div>
+		<div id="zona-objetos" class="zona-objetos modo-phaser" aria-label="Objetos de colores">
+			<div id="phaser-tablero" class="phaser-tablero" aria-hidden="true"></div>
+		</div>
 	</div>
 
 		<div id="tutorial-zoe" class="tutorial-zoe" hidden aria-hidden="true"></div>
@@ -171,6 +173,11 @@
 	<script src="../../../shared/aplicar-perfil-juego.js?v=20261013a"></script>
 	<script src="../../../shared/pin-accesibilidad.js?v=20261019c"></script>
 		<script src="../../../shared/menu-accesibilidad.js?v=20261019d"></script>
-	<script src="script.js"></script>
+	<script src="../../../runtime/pednia-phaser-host.js?v=20261028p4"></script>
+	<script src="../comun/phaser-tablero.js?v=20261030a"></script>
+	<script src="../../../../assets/vendor/gsap/gsap.min.js"></script>
+	<script src="../../../shared/pednia-fx.js?v=20261029b"></script>
+	<script src="../comun/encuentra-color-anim.js?v=20261030a"></script>
+	<script src="script.js?v=20261030a"></script>
 </body>
 </html>

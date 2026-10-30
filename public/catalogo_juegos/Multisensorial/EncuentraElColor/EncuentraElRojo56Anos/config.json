@@ -13,7 +13,7 @@
   "textos": {
     "eligeNivel": "Elige tu edad",
     "enunciado": "Observa muy bien y encuentra el color que te indico",
-    "cierre": "¡Excelente! Encontraste todos los colores.",
+    "cierre": "¡Excelente! Encontraste el rojo en todas las escenas.",
     "aciertoPlantilla": "¡Muy bien! Encontraste el color {color}.",
     "error": "¡Inténtalo otra vez! Observa muy bien.",
     "consignaPlantilla": "Encuentra el objeto de color {color}.",
@@ -47,88 +47,66 @@
     "fondo": "../../../sounds/fondo.mp3"
   },
   "colores": {
-    "rojo": {
-      "nombre": "rojo",
-      "hex": "#e03131"
-    },
-    "amarillo": {
-      "nombre": "amarillo",
-      "hex": "#ffef00"
-    },
-    "azul": {
-      "nombre": "azul",
-      "hex": "#1c7ed6"
-    },
-    "verde": {
-      "nombre": "verde",
-      "hex": "#2f9e44"
-    },
-    "naranja": {
-      "nombre": "naranja",
-      "hex": "#fd7e14"
-    },
-    "morado": {
-      "nombre": "morado",
-      "hex": "#9c36b5"
-    },
-    "rosado": {
-      "nombre": "rosado",
-      "hex": "#f06595"
-    }
+    "rojo": { "nombre": "rojo", "hex": "#e03131" },
+    "amarillo": { "nombre": "amarillo", "hex": "#ffef00" },
+    "azul": { "nombre": "azul", "hex": "#1c7ed6" },
+    "verde": { "nombre": "verde", "hex": "#2f9e44" },
+    "naranja": { "nombre": "naranja", "hex": "#fd7e14" },
+    "morado": { "nombre": "morado", "hex": "#9c36b5" },
+    "rosado": { "nombre": "rosado", "hex": "#f06595" },
+    "celeste": { "nombre": "celeste", "hex": "#74c0fc" }
   },
   "objetos": {
-    "manzana": {
-      "nombre": "Manzana",
-      "img": "img/Manzana.png",
-      "color": "rojo"
-    },
-    "sol": {
-      "nombre": "Sol",
-      "img": "img/Sol.png",
-      "color": "amarillo"
-    },
-    "carro": {
-      "nombre": "Carro",
-      "img": "img/Carro.png",
-      "color": "azul"
-    },
-    "rana": {
-      "nombre": "Rana",
-      "img": "img/Rana.png",
-      "color": "verde"
-    },
-    "zanahoria": {
-      "nombre": "Zanahoria",
-      "img": "img/Zanahoria.png",
-      "color": "naranja"
-    },
-    "uvas": {
-      "nombre": "Uvas",
-      "img": "img/Uvas.png",
-      "color": "morado"
-    },
-    "flor": {
-      "nombre": "Flor",
-      "img": "img/Flor.png",
-      "color": "rosado"
-    }
+    "manzana": { "nombre": "Manzana", "img": "img/Manzana.png", "color": "rojo" },
+    "sol": { "nombre": "Sol", "img": "img/Sol.png", "color": "amarillo" },
+    "carro": { "nombre": "Carro", "img": "img/Carro.png", "color": "azul" },
+    "rana": { "nombre": "Rana", "img": "img/Rana.png", "color": "verde" },
+    "zanahoria": { "nombre": "Zanahoria", "img": "img/Zanahoria.png", "color": "naranja" },
+    "uvas": { "nombre": "Uvas", "img": "img/Uvas.png", "color": "morado" },
+    "flor": { "nombre": "Flor", "img": "img/Flor.png", "color": "rosado" },
+    "fresa": { "nombre": "Fresa", "img": "img/Fresa.svg", "color": "rojo" },
+    "platano": { "nombre": "Plátano", "img": "img/Platano.svg", "color": "amarillo" },
+    "pelota": { "nombre": "Pelota", "img": "img/Pelota.svg", "color": "azul" },
+    "corazon": { "nombre": "Corazón", "img": "img/Corazon.svg", "color": "rojo" },
+    "pez": { "nombre": "Pez", "img": "img/Pez.svg", "color": "azul" },
+    "hoja": { "nombre": "Hoja", "img": "img/Hoja.svg", "color": "verde" },
+    "mariquita": { "nombre": "Mariquita", "img": "img/Mariquita.svg", "color": "rojo" },
+    "queso": { "nombre": "Queso", "img": "img/Queso.svg", "color": "amarillo" },
+    "estrella": { "nombre": "Estrella", "img": "img/Estrella.svg", "color": "amarillo" },
+    "nube": { "nombre": "Nube", "img": "img/Nube.svg", "color": "celeste" },
+    "limon": { "nombre": "Limón", "img": "img/Limon.svg", "color": "amarillo" },
+    "tomate": { "nombre": "Tomate", "img": "img/Tomate.svg", "color": "rojo" },
+    "campana": { "nombre": "Campana", "img": "img/Campana.svg", "color": "amarillo" },
+    "libro": { "nombre": "Libro", "img": "img/Libro.svg", "color": "azul" }
   },
   "niveles": [
     {
       "id": "5",
       "edad": "5-6 años",
       "titulo": "Encuentra el rojo",
-      "objetos": [
-        "manzana",
-        "sol",
-        "carro",
-        "rana",
-        "zanahoria",
-        "uvas",
-        "flor"
-      ],
-      "colores": [
-        "rojo"
+      "colores": ["rojo"],
+      "objetos": ["manzana", "sol", "carro", "rana", "zanahoria", "uvas", "flor"],
+      "escenas": [
+        {
+          "titulo": "La manzana entre muchos",
+          "objetos": ["manzana", "sol", "carro", "rana", "zanahoria", "uvas", "flor"],
+          "colores": ["rojo"]
+        },
+        {
+          "titulo": "La fresa escondida",
+          "objetos": ["fresa", "platano", "pelota", "hoja", "queso", "nube", "estrella"],
+          "colores": ["rojo"]
+        },
+        {
+          "titulo": "El corazón entre distractores",
+          "objetos": ["corazon", "pez", "limon", "campana", "libro", "rana", "flor"],
+          "colores": ["rojo"]
+        },
+        {
+          "titulo": "El tomate jugoso",
+          "objetos": ["tomate", "sol", "carro", "uvas", "hoja", "queso", "nube"],
+          "colores": ["rojo"]
+        }
       ]
     }
   ]

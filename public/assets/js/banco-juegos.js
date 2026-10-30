@@ -425,6 +425,11 @@
         return urlPaqueteConParam(url, 'icono', icono);
     }
 
+    /** ?nombre=: título del reto en la portada del paquete (evita el kicker de la temática). */
+    function urlPaqueteConNombre(url, nombre) {
+        return urlPaqueteConParam(url, 'nombre', nombre);
+    }
+
     /**
      * ?volver=1: el paquete muestra su botón "Volver" de la pantalla de inicio, que avisa
      * con postMessage 'pednia:salir-juego' (ver escucharSalidaJuego).
@@ -568,9 +573,12 @@
 
         const perfil = perfilPayload();
         const url = urlPaqueteConEdad(
-            urlPaqueteConIcono(
-                urlPaqueteConVolver(urlPaqueteConColor(juego.url_paquete, juego.color)),
-                juego.imagen_url
+            urlPaqueteConNombre(
+                urlPaqueteConIcono(
+                    urlPaqueteConVolver(urlPaqueteConColor(juego.url_paquete, juego.color)),
+                    juego.imagen_url
+                ),
+                juego.nombre
             ),
             perfil
         );

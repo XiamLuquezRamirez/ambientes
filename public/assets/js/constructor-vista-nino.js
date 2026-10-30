@@ -1355,9 +1355,12 @@
             const nombre = d.juego_catalogo_nombre || d.juego_nombre || 'Juego';
             const colorCatalogo = d.juego_catalogo_color || '#64748b';
             const urlConEdad = urlCatalogoConEdad(
-                urlCatalogoConIcono(
-                    urlCatalogoConColor(catalogoUrl, colorCatalogo),
-                    d.juego_catalogo_imagen
+                urlCatalogoConNombre(
+                    urlCatalogoConIcono(
+                        urlCatalogoConColor(catalogoUrl, colorCatalogo),
+                        d.juego_catalogo_imagen
+                    ),
+                    nombre
                 ),
                 perfilPayloadKiosco()
             );
@@ -2364,6 +2367,18 @@
         } catch (e) {
             const sep = String(url).indexOf('?') >= 0 ? '&' : '?';
             return url + sep + 'icono=' + encodeURIComponent(String(icono));
+        }
+    }
+
+    function urlCatalogoConNombre(url, nombre) {
+        if (!url || !nombre) return url;
+        try {
+            const u = new URL(url, window.location.origin);
+            u.searchParams.set('nombre', String(nombre));
+            return u.pathname + u.search + u.hash;
+        } catch (e) {
+            const sep = String(url).indexOf('?') >= 0 ? '&' : '?';
+            return url + sep + 'nombre=' + encodeURIComponent(String(nombre));
         }
     }
 

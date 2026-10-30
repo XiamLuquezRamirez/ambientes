@@ -44,6 +44,19 @@ Paquete: `public/catalogo_juegos/Polimotor/ArrastrarYSoltarObjetos/`
 
 Flujo: intro3d destruye `__introPhaser` → `PedniaArrastrePhaser.montar` vía host → `cargarRonda` → drop valida con `pares` → feedback DOM/Swal existente.
 
+## Segundo piloto: Encuentra El Rojo
+
+Paquetes: `Multisensorial/EncuentraElColor/EncuentraElRojo{34,56}Anos/` (capa compartida en `EncuentraElColor/comun/`).
+
+| Pieza | Rol |
+|-------|-----|
+| `comun/phaser-tablero.js` | Tablero de toque Phaser 4.2.1, API `PedniaEncuentraColorPhaser` |
+| `comun/encuentra-color-anim.js` | HUD GSAP (consigna/muestra) + celebración vía `PedniaFx` |
+| `script.js` | Shell (escenas, TTS, Swal, demo); fallback DOM si Phaser no monta |
+| `index.html` | `#phaser-tablero` + host / gsap / pednia-fx / comun / script |
+
+Flujo: intro3d off → `PedniaEncuentraColorPhaser.montar` → `cargarEscena` → toque → tweens Phaser + HUD GSAP → Swal existente.
+
 ## Contrato de ciclo de vida
 
 1. **Intro activa:** solo `__introPhaser` (intro3d). No crear gameplay todavía.
