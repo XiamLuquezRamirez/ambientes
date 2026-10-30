@@ -8,6 +8,12 @@
 		},
 		{
 			"path": "../../../../control_acceso"
+		},
+		{
+			"path": "../../../../BiblioPED"
+		},
+		{
+			"path": "../../../../corrector"
 		}
 	],
 	"settings": {}

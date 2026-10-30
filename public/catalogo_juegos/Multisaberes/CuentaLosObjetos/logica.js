@@ -111,15 +111,42 @@
         return orden;
     }
 
-    function crearManzanas(cantidad) {
+    function esRetoConejos(reto) {
+        if (!reto) return false;
+        return reto.mecanica === "contar_conejos" || reto.id === "alimenta-conejos";
+    }
+
+    function esRetoPollitos(reto) {
+        if (!reto) return false;
+        return reto.mecanica === "contar_pollitos" || reto.id === "pollitos-granja";
+    }
+
+    function crearObjetos(cantidad, prefijo) {
         var total = entero(cantidad);
+        var base = String(prefijo || "manzana");
         var out = [];
         var i;
         if (total == null || total < 1) return out;
         for (i = 1; i <= total; i++) {
-            out.push({ id: "manzana-" + i, contada: false, orden: null });
+            out.push({ id: base + "-" + i, contada: false, orden: null });
         }
         return out;
+    }
+
+    function crearManzanas(cantidad) {
+        return crearObjetos(cantidad, "manzana");
+    }
+
+    function opcionesFijas(reto) {
+        if (!reto || reto.ordenOpciones !== "fijo") return null;
+        var lista = [];
+        (reto.opciones || []).forEach(function (opcion) {
+            var n = entero(opcion);
+            if (n == null || n < 1 || n > 9) return;
+            if (lista.indexOf(n) !== -1) return;
+            lista.push(n);
+        });
+        return lista.length ? lista : null;
     }
 
     function buscar(manzanas, id) {
@@ -159,6 +186,7 @@
         (manzanas || []).forEach(function (manzana) {
             manzana.contada = false;
             manzana.orden = null;
+            manzana.animLista = false;
         });
         return manzanas;
     }
@@ -239,7 +267,7 @@
         var elementos = (cfg && cfg.elementos) || {};
         if (!cfg || cfg.stub) errores.push("config aún es stub");
         if (!niveles.length) errores.push("Sin niveles");
-        ["manzana", "canasta", "arbol"].forEach(function (id) {
+        ["manzana", "zanahoria", "conejo", "conejoFeliz", "pollito", "nido", "huevo", "cascaron", "canasta", "arbol"].forEach(function (id) {
             var el = elementos[id];
             if (!el || !el.img) errores.push("Elemento " + id + ": sin imagen");
             if (!el || !el.nombre) errores.push("Elemento " + id + ": sin nombre");
@@ -251,7 +279,15 @@
             retos.forEach(function (reto, i) {
                 var rt = tag + " reto " + (i + 1);
                 var cantidad = cantidadDe(reto);
-                if (reto.mecanica !== "contar") errores.push(rt + ": se esperaba contar");
+                if (reto.mecanica !== "contar" && reto.mecanica !== "contar_conejos" && reto.mecanica !== "contar_pollitos") {
+                    errores.push(rt + ": mecánica desconocida");
+                }
+                if (reto.mecanica === "contar_conejos" && cantidad !== 5) {
+                    errores.push(rt + ": contar_conejos requiere cantidadObjetos 5");
+                }
+                if (reto.mecanica === "contar_pollitos" && cantidad !== 2) {
+                    errores.push(rt + ": contar_pollitos requiere cantidadObjetos 2");
+                }
                 /* cantidadObjetos es opcional: en juego se sortea 2–5. */
                 if (reto.cantidadObjetos != null && cantidad == null) {
                     errores.push(rt + ": cantidadObjetos fuera de 2 a 5");
@@ -292,7 +328,11 @@
         cantidadAleatoria: cantidadAleatoria,
         piezasVisiblesEfectivas: piezasVisiblesEfectivas,
         opcionesDe: opcionesDe,
+        esRetoConejos: esRetoConejos,
+        esRetoPollitos: esRetoPollitos,
+        crearObjetos: crearObjetos,
         crearManzanas: crearManzanas,
+        opcionesFijas: opcionesFijas,
         contadas: contadas,
         tocar: tocar,
         reiniciarConteo: reiniciarConteo,

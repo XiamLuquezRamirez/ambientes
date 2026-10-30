@@ -22,7 +22,7 @@ window.INTRO_CONFIG = {
         // El GLB ya trae luces (KHR_lights_punctual) con intensidades enormes de Blender.
         // escala: multiplica esas luces. Si sale blanco, bajá (0.0002–0.001).
         lucesModelo: {
-            escala: 0.0022
+            escala: 0.00155
         },
 
         // Relleno de escena (bajo: la luz fuerte viene del modelo).

@@ -195,7 +195,11 @@
     }
 
     function urlsImagenesCriticas() {
-        const urls = [];
+        const urls = [
+            "img/fondo.png",
+            "img/nube_texto.png",
+            "img/fondo_opcion.png"
+        ];
         Object.keys(gameConfig.objetos || {}).forEach(function (id) {
             if (metaObj(id).img) urls.push(metaObj(id).img);
         });

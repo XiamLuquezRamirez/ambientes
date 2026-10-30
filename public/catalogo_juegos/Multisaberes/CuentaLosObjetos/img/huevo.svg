@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Huevo">
+  <ellipse cx="50" cy="112" rx="28" ry="6" fill="#000" opacity=".12"/>
+  <ellipse cx="50" cy="58" rx="36" ry="48" fill="#fff8e7" stroke="#d6c3a0" stroke-width="3.5"/>
+  <ellipse cx="38" cy="42" rx="10" ry="14" fill="#fff" opacity=".55"/>
+  <path d="M28 70 C36 78 48 82 62 76" fill="none" stroke="#e7d3ad" stroke-width="3" stroke-linecap="round"/>
+</svg>

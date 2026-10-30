@@ -282,7 +282,7 @@ body.habla-zeus .dialogo::after { right: 28px; left: auto; top: auto; bottom: -1
     z-index: 2;
     display: grid;
     grid-template-columns: minmax(110px, 18vw) minmax(0, 1fr) minmax(110px, 18vw);
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr);
     align-items: stretch;
     gap: 0;
     padding: 0;
@@ -295,6 +295,8 @@ body.habla-zeus .dialogo::after { right: 28px; left: auto; top: auto; bottom: -1
 .escenario .controles,
 .escenario button,
 .escenario .manzana,
+.escenario .zanahoria,
+.escenario .pollito,
 .escenario .opcion,
 .escenario .btn-pag {
     pointer-events: auto;
@@ -332,6 +334,17 @@ body.habla-zeus .dialogo::after { right: 28px; left: auto; top: auto; bottom: -1
     width: 100%;
 }
 
+.pj.celebra {
+    animation: pjCelebra .7s ease-in-out 3;
+    transform-origin: 50% 90%;
+}
+
+@keyframes pjCelebra {
+    0%, 100% { transform: translateY(0) scale(1); }
+    35% { transform: translateY(-18px) scale(1.06) rotate(-3deg); }
+    60% { transform: translateY(-6px) scale(1.02) rotate(3deg); }
+}
+
 /* Mientras carga la huerta: no mostrar niños (entran caminando después). */
 body.esperando-escena .pj {
     visibility: hidden !important;
@@ -353,6 +366,8 @@ body.demo-activa #escenario {
     pointer-events: none;
 }
 body.demo-activa #escenario .manzana,
+body.demo-activa #escenario .zanahoria,
+body.demo-activa #escenario .pollito,
 body.demo-activa #escenario .opcion,
 body.demo-activa #escenario .btn-juego,
 body.demo-activa #escenario .btn-pag {
@@ -377,11 +392,87 @@ body.demo-activa .dialogo {
 }
 #retos { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .controles {
-    grid-column: 1 / -1;
-    grid-row: 2;
+    position: absolute;
+    left: clamp(10px, 1.6vw, 24px);
+    bottom: clamp(10px, 2vh, 22px);
     z-index: 22;
-    padding: 0 12px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: clamp(10px, 1.8vw, 18px);
+    padding: 0;
+    pointer-events: auto;
 }
+
+.btn-juego {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 76px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    color: #14532d;
+    filter: drop-shadow(0 6px 0 rgba(20, 83, 45, .18));
+    transition: transform .14s ease;
+}
+
+.btn-juego-icono {
+    display: grid;
+    place-items: center;
+    width: clamp(58px, 8vw, 72px);
+    height: clamp(58px, 8vw, 72px);
+    border-radius: 50%;
+    border: 4px solid #fff;
+    font-size: clamp(22px, 3.2vw, 28px);
+    color: #fff;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, .15);
+    box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .12), 0 5px 0 rgba(0, 0, 0, .18);
+}
+
+.btn-juego-ayuda .btn-juego-icono {
+    background: linear-gradient(180deg, #ffe066 0%, #f59f00 100%);
+    box-shadow: inset 0 -4px 0 rgba(146, 64, 14, .22), 0 5px 0 #b45309;
+}
+
+.btn-juego-oir .btn-juego-icono {
+    background: linear-gradient(180deg, #7dd3fc 0%, #2563eb 100%);
+    box-shadow: inset 0 -4px 0 rgba(30, 58, 138, .25), 0 5px 0 #1e3a8a;
+}
+
+.btn-juego-contar .btn-juego-icono {
+    background: linear-gradient(180deg, #bef264 0%, #16a34a 100%);
+    box-shadow: inset 0 -4px 0 rgba(21, 128, 61, .28), 0 5px 0 #166534;
+}
+
+.btn-juego .nombre-btn {
+    font: 800 14px/1 system-ui, sans-serif;
+    letter-spacing: .02em;
+    color: #14532d;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .85);
+    background: rgba(255, 255, 255, .82);
+    border: 2px solid rgba(20, 83, 45, .2);
+    border-radius: 999px;
+    padding: 4px 10px;
+}
+
+.btn-juego:active {
+    transform: translateY(3px);
+}
+
+.btn-juego:active .btn-juego-icono {
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .12), 0 2px 0 rgba(0, 0, 0, .16);
+}
+
+body.sin-repetir #btn-escuchar { display: none !important; }
 
 .pj-img {
     width: 100%;
@@ -469,8 +560,10 @@ body.demo-activa .dialogo {
 
 .huerta .escena,
 .huerta .manzana,
+.huerta .zanahoria,
 .huerta .btn-pag,
-.huerta .canasta-wrap {
+.huerta .canasta-wrap,
+.huerta .huerto-frente {
     pointer-events: auto;
 }
 
@@ -908,74 +1001,498 @@ body.sin-nombres .nombre-btn { display: none !important; }
     display: flex;
     flex-wrap: nowrap;
     justify-content: center;
-    gap: var(--btn-gap, 12px);
+    align-items: stretch;
+    gap: clamp(14px, 2.4vw, 28px);
     flex: none;
     margin-top: auto;
-    padding: 32px;
+    padding: 28px 24px 36px;
 }
 
 .opcion {
+    position: relative;
+    isolation: isolate;
     flex: 1 1 0;
-    min-width: 68px;
-    max-width: var(--opcion-w, 160px);
-    min-height: max(64px, var(--btn-size, 72px));
-    border-radius: 22px;
-    border: 4px solid #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 84px;
+    max-width: var(--opcion-w, 168px);
+    min-height: max(78px, var(--btn-size, 84px));
+    padding: 10px 18px 14px;
+    border-radius: 28px;
+    border: 5px solid #fff;
     color: #fff;
-    text-shadow: 0 2px 0 rgba(0, 0, 0, .18);
-    font-size: var(--letra-btn, 40px);
-    font-weight: 700;
-    letter-spacing: 0;
+    text-shadow: 0 3px 0 rgba(0, 0, 0, .22);
+    font-size: var(--letra-btn, 44px);
+    font-weight: 800;
+    letter-spacing: .02em;
+    line-height: 1;
     cursor: pointer;
     touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transform: translateY(0);
+    transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
 }
 
-.opcion::before { content: "["; margin-right: .15em; }
-.opcion::after { content: "]"; margin-left: .15em; }
+.opcion::before { content: "["; margin-right: .12em; opacity: .92; }
+.opcion::after { content: "]"; margin-left: .12em; opacity: .92; }
 
-.opcion:nth-child(3n+1) { background: linear-gradient(#ff8fb8, #e11d68); box-shadow: 0 5px 0 #9f1239; }
-.opcion:nth-child(3n+2) { background: linear-gradient(#bef264, #22c55e); box-shadow: 0 5px 0 #166534; }
-.opcion:nth-child(3n+3) { background: linear-gradient(#7dd3fc, #2563eb); box-shadow: 0 5px 0 #1e3a8a; }
+/* Brillo superior para volumen (menos plano). */
+.opcion::before,
+.opcion::after {
+    position: relative;
+    z-index: 1;
+}
+
+.opcion .opcion-num {
+    position: relative;
+    z-index: 1;
+}
+
+.opcion-gloss {
+    position: absolute;
+    inset: 5px 8px auto;
+    height: 38%;
+    border-radius: 20px 20px 40% 40%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0));
+    pointer-events: none;
+    z-index: 0;
+}
+
+.opcion:nth-child(3n+1),
+.opcion.tono-rosa {
+    background: linear-gradient(180deg, #ffb4d4 0%, #ff5aa5 42%, #db2777 100%);
+    box-shadow:
+        0 8px 0 #9d174d,
+        0 14px 22px rgba(157, 23, 77, .32),
+        inset 0 3px 0 rgba(255, 255, 255, .4),
+        inset 0 -5px 0 rgba(136, 19, 55, .22);
+}
+.opcion:nth-child(3n+2),
+.opcion.tono-verde {
+    background: linear-gradient(180deg, #d9f99d 0%, #4ade80 42%, #16a34a 100%);
+    box-shadow:
+        0 8px 0 #166534,
+        0 14px 22px rgba(22, 101, 52, .3),
+        inset 0 3px 0 rgba(255, 255, 255, .42),
+        inset 0 -5px 0 rgba(21, 128, 61, .25);
+}
+.opcion:nth-child(3n+3),
+.opcion.tono-azul {
+    background: linear-gradient(180deg, #bae6fd 0%, #38bdf8 40%, #2563eb 100%);
+    box-shadow:
+        0 8px 0 #1e3a8a,
+        0 14px 22px rgba(30, 58, 138, .32),
+        inset 0 3px 0 rgba(255, 255, 255, .42),
+        inset 0 -5px 0 rgba(29, 78, 216, .28);
+}
+
+.opcion:active:not(:disabled) {
+    transform: translateY(6px);
+    filter: brightness(.98);
+}
+.opcion:nth-child(3n+1):active:not(:disabled),
+.opcion.tono-rosa:active:not(:disabled) {
+    box-shadow:
+        0 2px 0 #9d174d,
+        0 6px 12px rgba(157, 23, 77, .28),
+        inset 0 2px 0 rgba(255, 255, 255, .28),
+        inset 0 -3px 0 rgba(136, 19, 55, .2);
+}
+.opcion:nth-child(3n+2):active:not(:disabled),
+.opcion.tono-verde:active:not(:disabled) {
+    box-shadow:
+        0 2px 0 #166534,
+        0 6px 12px rgba(22, 101, 52, .26),
+        inset 0 2px 0 rgba(255, 255, 255, .28),
+        inset 0 -3px 0 rgba(21, 128, 61, .22);
+}
+.opcion:nth-child(3n+3):active:not(:disabled),
+.opcion.tono-azul:active:not(:disabled) {
+    box-shadow:
+        0 2px 0 #1e3a8a,
+        0 6px 12px rgba(30, 58, 138, .26),
+        inset 0 2px 0 rgba(255, 255, 255, .28),
+        inset 0 -3px 0 rgba(29, 78, 216, .24);
+}
+
+.opciones-entran .opcion {
+    opacity: 0;
+    transform: translateY(28px) scale(.86);
+}
+
+.opcion.opcion-entra {
+    animation: opcionEntrada .48s cubic-bezier(.22, 1, .36, 1) both;
+    transition: none;
+}
+
+@keyframes opcionEntrada {
+    from {
+        opacity: 0;
+        transform: translateY(28px) scale(.86);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .opcion.opcion-entra { animation: none; }
+}
 
 .opcion:disabled { opacity: 1; cursor: default; }
 .opcion.atenuada:not(.revelada) { filter: grayscale(.55) brightness(1.15); }
-.opcion.err { outline: 4px solid #7f1d1d; filter: saturate(.4); }
-.opcion.ok, .opcion.revelada { outline: 4px solid #fff; box-shadow: 0 0 0 4px #15803d, 0 5px 0 #166534; }
-body.sin-error .opcion.err { background: #fff; }
+.opcion.err {
+    outline: 4px solid #7f1d1d;
+    filter: saturate(.45);
+}
+.opcion.ok,
+.opcion.revelada {
+    outline: 4px solid #fff;
+    box-shadow:
+        0 0 0 5px #15803d,
+        0 8px 0 #166534,
+        0 14px 22px rgba(22, 101, 52, .28),
+        inset 0 3px 0 rgba(255, 255, 255, .35);
+}
+body.sin-error .opcion.err { background: #fff; color: #111; text-shadow: none; }
 
-.controles {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--btn-gap, 12px);
-    padding-bottom: 4px;
+/* ====== Reto 2: misma huerta que reto 1; primer plano = conejo + zanahorias ====== */
+.reto-conejos {
+    --zanahoria-h: clamp(70px, 13vh, 100px);
 }
 
-.btn-juego {
+.escena-conejos {
+    left: 50%;
+    bottom: 14%;
+    width: min(68vw, 600px);
+    max-width: min(74vw, 640px);
+    height: min(48vh, 400px);
+    max-height: 52vh;
+    aspect-ratio: auto;
+    transform: translateX(-50%);
+}
+
+/* Opciones bien abajo, sin tapar las zanahorias. */
+.reto-conejos .opciones {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(10px, 2.2vh, 22px);
+    transform: translateX(-50%);
+    z-index: 26;
+    width: min(92%, 540px);
+    margin: 0;
+    padding: 0;
+}
+
+.reto-conejos .opciones[hidden] {
+    display: none !important;
+}
+
+.reto-conejos .escena-conejos {
+    bottom: 26%;
+}
+
+.conejo-wrap {
+    position: absolute;
+    left: 50%;
+    bottom: 48%;
+    transform: translateX(-50%);
+    z-index: 4;
+    width: clamp(48px, 7vw, 72px);
+    pointer-events: none;
+}
+
+.conejo {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 0 rgba(80, 40, 10, .16));
+    transform-origin: 50% 100%;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+body:not(.sin-animaciones):not(.sin-decoracion) .conejo {
+    animation: conejo-respira 2.4s ease-in-out infinite;
+}
+
+.conejo-premio {
+    position: absolute;
+    right: -28%;
+    top: 42%;
+    width: 48%;
+    height: auto;
+    transform: rotate(28deg) scale(0);
+    transform-origin: 20% 90%;
+    filter: drop-shadow(0 4px 0 rgba(120, 53, 15, .25));
+    pointer-events: none;
+    z-index: 5;
+}
+
+.conejo-wrap.festeja .conejo-premio {
+    display: block !important;
+    animation: premio-aparece .55s cubic-bezier(.22, 1.2, .36, 1) .12s both;
+}
+
+.conejo-estrellas {
+    position: absolute;
+    left: 50%;
+    top: 18%;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.conejo-estrella {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 14px;
+    height: 14px;
+    margin: -7px;
+    background: #fde047;
+    clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: conejo-estrella-vuela .9s ease-out var(--delay, 0s) forwards;
+    opacity: 0;
+}
+
+.huerto-frente {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 52%;
+    z-index: 5;
+    overflow: visible;
+}
+
+/* Montículo de tierra: recorta las zanahorias enterradas. */
+.huerto-frente::before {
+    content: "";
+    position: absolute;
+    left: 3%;
+    right: 3%;
+    bottom: 0;
+    height: 30%;
+    border-radius: 42% 42% 16% 16% / 60% 60% 28% 28%;
+    background:
+        radial-gradient(120% 80% at 50% 0%, rgba(255, 220, 150, .22), transparent 55%),
+        linear-gradient(180deg, #b45309 0%, #854d0e 48%, #5c3d1e 100%);
+    box-shadow:
+        inset 0 10px 0 rgba(255, 255, 255, .12),
+        0 8px 0 rgba(69, 26, 3, .28);
+    pointer-events: none;
+    z-index: 3;
+}
+
+.zanahorias {
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    bottom: 18%;
+    height: 90%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    z-index: 2;
+}
+
+.zanahoria {
+    position: relative;
     flex: 0 0 auto;
-    min-width: var(--btn-size, 72px);
-    min-height: var(--btn-size, 72px);
-    border-radius: 18px;
-    border: 3px solid #14532d;
+    width: clamp(48px, 8.5vw, 78px);
+    height: calc(var(--zanahoria-h) + 36px);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    touch-action: manipulation;
+    transform-origin: 50% 100%;
+    filter: drop-shadow(0 4px 0 rgba(120, 53, 15, .22));
+    /* Enterrada: mitad superior visible por encima del montículo. */
+    transform: translateY(28%);
+    transition: transform .15s ease;
+}
+
+.zanahoria img {
+    width: 100%;
+    height: var(--zanahoria-h);
+    object-fit: contain;
+    object-position: bottom center;
+    pointer-events: none;
+}
+
+body:not(.sin-animaciones):not(.sin-decoracion) .zanahoria:not(.contada):not(.comida) img {
+    animation: zanahoria-tiembla 2.6s ease-in-out infinite;
+}
+
+.zanahoria.slot-1 img { animation-delay: -.6s; }
+.zanahoria.slot-2 img { animation-delay: -1.1s; }
+.zanahoria.slot-3 img { animation-delay: -.2s; }
+.zanahoria.slot-4 img { animation-delay: -1.6s; }
+
+.zanahoria .orden {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%, -40%);
+    min-width: 34px;
+    height: 34px;
+    border-radius: 50%;
     background: #fff;
-    font-size: 22px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    padding: 6px 10px;
+    border: 3px solid #e03131;
+    color: #b91c1c;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 28px;
+    text-align: center;
+    box-shadow: 0 4px 0 rgba(127, 29, 29, .25);
+    z-index: 4;
+    animation: orden-pop .45s cubic-bezier(.22, 1.2, .36, 1) both;
 }
 
-.btn-juego .nombre-btn {
-    font-size: 16px;
-    line-height: 1.1;
-    letter-spacing: 0;
-    white-space: nowrap;
+/* Contada pero aún enterrada: no subir hasta terminar el temblor. */
+.zanahoria.contada:not(.sacada):not(.tiembla-saca) {
+    transform: translateY(28%);
+    z-index: 4;
 }
 
-.btn-continuar { background: #bbf7d0; }
-body.sin-repetir #btn-escuchar { display: none !important; }
+/* Temblor fuerte justo antes de salir. */
+.zanahoria.tiembla-saca {
+    z-index: 5;
+    animation: zanahoria-tiembla-fuerte .56s ease-in-out both;
+    transition: none;
+}
+
+/* Desentierro al tocar: sale completa de la tierra (solo la primera vez). */
+.zanahoria.sacada:not(.sacada-fija),
+.zanahoria.contada.sacada:not(.sacada-fija) {
+    animation: zanahoria-desentierra .7s cubic-bezier(.22, 1.15, .36, 1) forwards;
+    z-index: 5;
+    transition: none;
+}
+
+.zanahoria.sacada-fija {
+    animation: none !important;
+    transform: translateY(-8%);
+    z-index: 5;
+    transition: none;
+}
+
+.zanahoria.brilla-toque {
+    filter: drop-shadow(0 0 16px #fde047) drop-shadow(0 0 6px #fff) drop-shadow(0 4px 0 rgba(120, 53, 15, .22));
+}
+
+.zanahoria.comida {
+    pointer-events: none;
+    animation: zanahoria-comida .5s ease forwards;
+}
+
+.zanahoria.pista-brillo {
+    outline: 6px solid #f59f00;
+    outline-offset: 4px;
+    border-radius: 12px;
+}
+
+.conejo-feliz {
+    animation: conejo-saltos .65s ease-in-out 3 !important;
+}
+
+.conejo-wrap.festeja .conejo {
+    animation: conejo-saltos .65s ease-in-out 3 !important;
+}
+
+@keyframes conejo-respira {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-4px) scale(1.03); }
+}
+
+@keyframes conejo-saltos {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    35% { transform: translateY(-22px) rotate(-6deg); }
+    55% { transform: translateY(-8px) rotate(4deg); }
+}
+
+@keyframes premio-aparece {
+    0% { transform: rotate(10deg) scale(0) translateY(12px); opacity: 0; }
+    60% { transform: rotate(32deg) scale(1.15) translateY(-4px); opacity: 1; }
+    100% { transform: rotate(28deg) scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes zanahoria-tiembla {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-3px) rotate(1.8deg); }
+}
+
+@keyframes zanahoria-tiembla-fuerte {
+    0%, 100% { transform: translateY(28%) rotate(0deg); }
+    12% { transform: translateY(26%) rotate(-14deg); }
+    25% { transform: translateY(31%) rotate(14deg); }
+    38% { transform: translateY(24%) rotate(-12deg); }
+    52% { transform: translateY(30%) rotate(11deg); }
+    68% { transform: translateY(25%) rotate(-9deg); }
+    84% { transform: translateY(29%) rotate(7deg); }
+}
+
+@keyframes zanahoria-desentierra {
+    0% { transform: translateY(28%) scale(1) rotate(0deg); }
+    35% { transform: translateY(6%) scale(1.06) rotate(-8deg); }
+    65% { transform: translateY(-14%) scale(1.1) rotate(5deg); }
+    100% { transform: translateY(-8%) scale(1.04) rotate(0deg); }
+}
+
+.terron {
+    position: absolute;
+    left: 50%;
+    bottom: 28%;
+    width: 10px;
+    height: 8px;
+    margin-left: -5px;
+    border-radius: 40% 50% 45% 55%;
+    background: #854d0e;
+    box-shadow: 0 1px 0 #5c3d1e;
+    pointer-events: none;
+    z-index: 6;
+    animation: terron-vuela .55s ease-out var(--delay, 0s) forwards;
+}
+
+@keyframes terron-vuela {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx, 0), var(--ty, -20px)) scale(0.4);
+        opacity: 0;
+    }
+}
+
+@keyframes zanahoria-comida {
+    0% { transform: translateY(-6%) scale(1.04); opacity: 1; }
+    100% { transform: translateY(-70%) scale(0.2); opacity: 0; }
+}
+
+@keyframes orden-pop {
+    0% { transform: translate(-50%, -40%) scale(0); opacity: 0; }
+    70% { transform: translate(-50%, -40%) scale(1.15); opacity: 1; }
+    100% { transform: translate(-50%, -40%) scale(1); opacity: 1; }
+}
+
+@keyframes conejo-estrella-vuela {
+    0% {
+        transform: rotate(var(--a, 0deg)) translateY(0) scale(0);
+        opacity: 0;
+    }
+    20% { opacity: 1; }
+    100% {
+        transform: rotate(var(--a, 0deg)) translateY(calc(-1 * var(--d, 30px))) scale(1);
+        opacity: 0;
+    }
+}
 
 .pausa, .zoom {
     position: fixed;
@@ -997,12 +1514,292 @@ body.sin-repetir #btn-escuchar { display: none !important; }
 #zoom-img { width: min(60vw, 280px); background: #fff; border-radius: 24px; padding: 16px; }
 #zoom-cerrar { position: absolute; top: 16px; right: 16px; width: 64px; height: 64px; font-size: 32px; }
 
+/* ====== Reto 3: pollitos en el nido ====== */
+.reto-pollitos .opciones {
+    position: relative;
+    z-index: 14;
+    margin-top: auto;
+    padding: 8px 24px clamp(100px, 16vh, 140px);
+}
+
+.reto-pollitos .opciones[hidden] {
+    display: none !important;
+}
+
+.escena-pollitos {
+    left: 50%;
+    bottom: 12%;
+    width: min(72vw, 620px);
+    max-width: min(78vw, 680px);
+    height: min(46vh, 380px);
+    max-height: 50vh;
+    aspect-ratio: auto;
+    transform: translateX(-50%);
+}
+
+.nido-escena {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: min(100%, 420px);
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.nido-img {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 100%;
+    height: auto;
+    max-height: 42%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 0 rgba(60, 30, 10, .18));
+    z-index: 1;
+}
+
+.pollitos {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: 22%;
+    height: 62%;
+    z-index: 3;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: clamp(18px, 4vw, 48px);
+    pointer-events: auto;
+}
+
+.pollito {
+    position: relative;
+    flex: 0 0 auto;
+    width: clamp(88px, 14vw, 128px);
+    height: clamp(120px, 22vh, 170px);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    touch-action: manipulation;
+    transform-origin: 50% 85%;
+    filter: drop-shadow(0 6px 0 rgba(80, 40, 10, .16));
+    overflow: visible;
+}
+
+.pollito .huevo {
+    position: absolute;
+    left: 50%;
+    bottom: 6%;
+    width: 72%;
+    transform: translateX(-50%);
+    z-index: 3;
+    pointer-events: none;
+    transition: opacity .15s ease;
+}
+
+.pollito .cascaron {
+    position: absolute;
+    left: 50%;
+    bottom: 6%;
+    width: 72%;
+    height: auto;
+    transform: translateX(-50%);
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+    object-fit: contain;
+}
+
+.pollito .cascaron-izq {
+    clip-path: polygon(0 0, 54% 0, 50% 100%, 0 100%);
+}
+
+.pollito .cascaron-der {
+    clip-path: polygon(46% 0, 100% 0, 100% 100%, 50% 100%);
+}
+
+.pollito .pollito-img {
+    position: absolute;
+    left: 50%;
+    bottom: 10%;
+    width: 88%;
+    max-height: 78%;
+    transform: translateX(-50%) translateY(48px) scale(0.12);
+    opacity: 0;
+    z-index: 5;
+    pointer-events: none;
+    object-fit: contain;
+    object-position: bottom center;
+}
+
+/* Antes de nacer: solo se ve el huevo. */
+.pollito:not(.contada) .pollito-img,
+.pollito:not(.contada) .cascaron {
+    opacity: 0;
+}
+
+.pollito.rompe .huevo {
+    z-index: 3;
+    animation: huevo-rompe .52s ease-in-out both;
+}
+
+.pollito.rompe .cascaron {
+    opacity: 1;
+}
+
+.pollito.rompe .cascaron-izq {
+    animation: cascara-izq .85s cubic-bezier(.2, .8, .3, 1) .18s both;
+}
+
+.pollito.rompe .cascaron-der {
+    animation: cascara-der .85s cubic-bezier(.2, .8, .3, 1) .18s both;
+}
+
+.pollito.nace .pollito-img,
+.pollito.nacido:not(.nacido-fijo) .pollito-img {
+    opacity: 1;
+    animation: pollito-nace .7s cubic-bezier(.22, 1.2, .36, 1) both;
+}
+
+.pollito.nacido-fijo .huevo,
+.pollito.nacido .huevo {
+    opacity: 0;
+}
+
+.pollito.nacido-fijo .pollito-img {
+    animation: none !important;
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.pollito.nacido-fijo .cascaron,
+.pollito.nacido .cascaron {
+    opacity: .85;
+    transform: translateX(-50%) translateY(10px) scale(.9);
+}
+
+.pollito.nacido-fijo .cascaron-izq,
+.pollito.nacido .cascaron-izq {
+    transform: translateX(-70%) translateY(18px) rotate(-28deg) scale(.85);
+}
+
+.pollito.nacido-fijo .cascaron-der,
+.pollito.nacido .cascaron-der {
+    transform: translateX(-30%) translateY(18px) rotate(28deg) scale(.85);
+}
+
+.pollito .orden {
+    position: absolute;
+    left: 50%;
+    top: -2%;
+    transform: translate(-50%, -20%);
+    z-index: 6;
+    min-width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(180deg, #fb7185, #e11d48);
+    border: 3px solid #fff;
+    color: #fff;
+    font: 800 18px/1 system-ui, sans-serif;
+    box-shadow: 0 4px 0 rgba(136, 19, 55, .35);
+}
+
+.pollito.pista-brillo {
+    outline: 4px dashed #f59f00;
+    outline-offset: 4px;
+    border-radius: 20px;
+}
+
+.pio-globo {
+    position: absolute;
+    left: 62%;
+    top: 8%;
+    z-index: 7;
+    padding: 4px 10px;
+    border-radius: 14px;
+    background: #fff;
+    color: #9a3412;
+    font: 800 14px/1.1 system-ui, sans-serif;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, .12);
+    animation: pio-sale .85s ease-out both;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.pollito.baila .pollito-img {
+    animation: pollito-baila .55s ease-in-out infinite;
+}
+
+@keyframes huevo-rompe {
+    0% { transform: translateX(-50%) scale(1) rotate(0deg); opacity: 1; }
+    18% { transform: translateX(-50%) scale(1.04) rotate(-6deg); opacity: 1; }
+    36% { transform: translateX(-50%) scale(1.04) rotate(6deg); opacity: 1; }
+    54% { transform: translateX(-50%) scale(1.06) rotate(-5deg); opacity: 1; }
+    72% { transform: translateX(-50%) scale(1.1) rotate(4deg); opacity: .95; }
+    88% { transform: translateX(-50%) scale(1.14); opacity: .4; }
+    100% { transform: translateX(-50%) scale(1.16); opacity: 0; }
+}
+
+@keyframes cascara-izq {
+    0% { transform: translateX(-50%) rotate(0deg); opacity: 0; }
+    8% { opacity: 1; }
+    100% { transform: translateX(-125%) translateY(26px) rotate(-48deg); opacity: .92; }
+}
+
+@keyframes cascara-der {
+    0% { transform: translateX(-50%) rotate(0deg); opacity: 0; }
+    8% { opacity: 1; }
+    100% { transform: translateX(25%) translateY(26px) rotate(48deg); opacity: .92; }
+}
+
+@keyframes pollito-nace {
+    0% { transform: translateX(-50%) translateY(52px) scale(0.15); opacity: 0; }
+    45% { transform: translateX(-50%) translateY(-6px) scale(1.12); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes pio-sale {
+    0% { opacity: 0; transform: translateY(8px) scale(.8); }
+    25% { opacity: 1; transform: translateY(0) scale(1.05); }
+    100% { opacity: 0; transform: translateY(-18px) scale(.95); }
+}
+
+@keyframes pollito-baila {
+    0%, 100% { transform: translateX(-50%) rotate(-6deg) translateY(0); }
+    50% { transform: translateX(-50%) rotate(7deg) translateY(-10px); }
+}
+
+.reto-pollitos .opciones {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(10px, 2.2vh, 22px);
+    transform: translateX(-50%);
+    z-index: 26;
+    width: min(92%, 540px);
+    margin: 0;
+    padding: 0;
+}
+
+.reto-1 .opciones,
+#reto-1 .opciones {
+    position: relative;
+    z-index: 14;
+}
+
 body.lectura-facil .enunciado,
 body.lectura-facil .pista-texto { line-height: 1.45; font-weight: 700; }
 
 body.bordes-juego .manzana,
+body.bordes-juego .zanahoria,
+body.bordes-juego .pollito,
 body.bordes-juego .opcion,
-body.bordes-juego .btn-juego,
+body.bordes-juego .btn-juego-icono,
 body.contraste-maximo .manzana,
 body.contraste-maximo .opcion,
 body.alto-contraste .opcion,
@@ -1047,6 +1844,38 @@ body.cursor-grande, body.cursor-grande * {
 
 body.sin-animaciones *,
 body.sin-decoracion * { animation: none !important; }
+
+/* Mecánica del reto (no es decoración del fondo): sin-decoracion no debe anularla. */
+body.sin-decoracion .zanahoria.tiembla-saca {
+    animation: zanahoria-tiembla-fuerte .56s ease-in-out both !important;
+}
+body.sin-decoracion .zanahoria.sacada,
+body.sin-decoracion .zanahoria.contada.sacada {
+    animation: zanahoria-desentierra .7s cubic-bezier(.22, 1.15, .36, 1) forwards !important;
+}
+body.sin-decoracion .pollito.rompe .huevo {
+    animation: huevo-rompe .52s ease-in-out both !important;
+}
+body.sin-decoracion .pollito.rompe .cascaron-izq {
+    animation: cascara-izq .85s cubic-bezier(.2, .8, .3, 1) .18s both !important;
+}
+body.sin-decoracion .pollito.rompe .cascaron-der {
+    animation: cascara-der .85s cubic-bezier(.2, .8, .3, 1) .18s both !important;
+}
+body.sin-decoracion .pollito.nace .pollito-img,
+body.sin-decoracion .pollito.nacido .pollito-img {
+    animation: pollito-nace .7s cubic-bezier(.22, 1.2, .36, 1) both !important;
+}
+body.sin-decoracion .pollito.baila .pollito-img {
+    animation: pollito-baila .55s ease-in-out infinite !important;
+}
+body.sin-decoracion .opcion.opcion-entra {
+    animation: opcionEntrada .48s cubic-bezier(.22, 1, .36, 1) both !important;
+}
+body.sin-decoracion .zanahoria .orden,
+body.sin-decoracion .pollito .orden {
+    animation: orden-pop .45s cubic-bezier(.22, 1.2, .36, 1) both !important;
+}
 
 /* La entrada de ¡Empecemos! no es una animación del reto: sigue igual que en Polimotor. */
 body.sin-animaciones .pantalla-inicio .btn-empecemos,

@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css?v=20261027c">
+	<link rel="stylesheet" href="style.css?v=20261028d">
 	<link rel="stylesheet" href="../../Polimotor/comun/inicio-fondo.css?v=20261027c">
 	<link rel="stylesheet" href="../../Polimotor/comun/interfaz.css?v=20261022o">
 	<script src="../../Polimotor/comun/inicio-fondo.js?v=20261027d"></script>
@@ -140,18 +140,82 @@
 						<p class="subtitulo-conteo" id="sub-1" hidden></p>
 						<div class="opciones" id="opciones-1" role="group" aria-label="¿Cuántas manzanas?"></div>
 					</section>
-					<!-- Retos 2 y 3: el div existe; la mecánica entra en el siguiente corte. -->
-					<section id="reto-2" class="reto" hidden aria-hidden="true"></section>
-					<section id="reto-3" class="reto" hidden aria-hidden="true"></section>
+					<section id="reto-2" class="reto reto-conejos" data-reto="alimenta-conejos" data-listo="1" hidden aria-hidden="true">
+						<div class="cartel-wrap">
+							<h2 class="banner-reto" id="titulo-reto-2">RETO 2: ALIMENTA A LOS CONEJOS</h2>
+						</div>
+						<div class="huerta huerta-conejos">
+							<div class="escena-huerta" aria-hidden="true">
+								<div class="cielo" id="cielo-nubes-2">
+									<img class="nube" src="img/nube1.svg" alt="" draggable="false" data-nube="1">
+									<img class="nube" src="img/nube2.svg" alt="" draggable="false" data-nube="2">
+									<img class="nube" src="img/nube3.svg" alt="" draggable="false" data-nube="3">
+								</div>
+								<img class="capa suelo" src="img/suelo.svg" alt="">
+								<img class="capa molino molino-izq" src="img/molino.svg" alt="">
+								<img class="capa arbol-fondo arbol-fondo-a" src="img/arbol2.svg" alt="">
+								<img class="capa arbol-fondo arbol-fondo-b" src="img/arbol2.svg" alt="">
+								<img class="capa molino molino-a" src="img/molino.svg" alt="">
+								<img class="capa molino molino-b" src="img/molino_granero.svg" alt="">
+								<img class="capa granero granero-a" src="img/granero1.svg" alt="">
+								<img class="capa granero granero-b" src="img/granero2.svg" alt="">
+								<img class="capa espantapajaros" src="img/espanta_pajaros.svg" alt="">
+							</div>
+							<div class="escena escena-conejos">
+								<div class="conejo-wrap">
+									<img class="conejo" id="conejo-2" src="img/conejo.png" alt="" draggable="false" data-src-normal="img/conejo.png" data-src-feliz="img/conejo_feliz.png">
+									<img class="conejo-premio" id="conejo-premio-2" src="img/zanahoria.png" alt="" draggable="false" hidden>
+									<div class="conejo-estrellas" id="conejo-estrellas-2" aria-hidden="true"></div>
+								</div>
+								<div class="huerto-frente">
+									<div class="zanahorias" id="zanahorias-2" aria-label="Zanahorias en la tierra"></div>
+								</div>
+							</div>
+						</div>
+						<p class="pista-texto" id="pista-2" hidden></p>
+						<div class="opciones" id="opciones-2" role="group" aria-label="¿Cuántas zanahorias?" hidden></div>
+					</section>
+					<section id="reto-3" class="reto reto-pollitos" data-reto="pollitos-granja" data-listo="1" hidden aria-hidden="true">
+						<div class="cartel-wrap">
+							<h2 class="banner-reto" id="titulo-reto-3">RETO 3: LOS POLLITOS DE LA GRANJA</h2>
+						</div>
+						<div class="huerta huerta-pollitos">
+							<div class="escena-huerta" aria-hidden="true">
+								<div class="cielo" id="cielo-nubes-3">
+									<img class="nube" src="img/nube1.svg" alt="" draggable="false" data-nube="1">
+									<img class="nube" src="img/nube2.svg" alt="" draggable="false" data-nube="2">
+									<img class="nube" src="img/nube3.svg" alt="" draggable="false" data-nube="3">
+								</div>
+								<img class="capa suelo" src="img/suelo.svg" alt="">
+								<img class="capa molino molino-izq" src="img/molino.svg" alt="">
+								<img class="capa arbol-fondo arbol-fondo-a" src="img/arbol2.svg" alt="">
+								<img class="capa arbol-fondo arbol-fondo-b" src="img/arbol2.svg" alt="">
+								<img class="capa molino molino-a" src="img/molino.svg" alt="">
+								<img class="capa molino molino-b" src="img/molino_granero.svg" alt="">
+								<img class="capa granero granero-a" src="img/granero1.svg" alt="">
+								<img class="capa granero granero-b" src="img/granero2.svg" alt="">
+								<img class="capa espantapajaros" src="img/espanta_pajaros.svg" alt="">
+							</div>
+							<div class="escena escena-pollitos">
+								<div class="nido-escena">
+									<img class="nido-img" src="img/nido.svg" alt="" draggable="false">
+									<div class="pollitos" id="pollitos-3" aria-label="Pollitos"></div>
+								</div>
+							</div>
+						</div>
+						<p class="pista-texto" id="pista-3" hidden></p>
+						<div class="opciones" id="opciones-3" role="group" aria-label="¿Cuántos pollitos?" hidden></div>
+					</section>
 				</div>
 			</div>
 			<div class="pj pj-zoe" id="pj-zoe">
 				<img class="pj-img" src="../../img/zoe_normal.gif" alt="" draggable="false">
 			</div>
 			<div class="controles">
-				<button type="button" id="btn-ayuda" class="btn-juego" aria-label="Ayuda"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i><span class="nombre-btn">Ayuda</span></button>
-				<button type="button" id="btn-escuchar" class="btn-juego" aria-label="Escuchar otra vez"><i class="fa-solid fa-volume-high" aria-hidden="true"></i><span class="nombre-btn">Otra vez</span></button>
-				<button type="button" id="btn-repetir" class="btn-juego" aria-label="Volver a contar"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span class="nombre-btn">Contar</span></button>
+				<button type="button" id="btn-ayuda" class="btn-juego btn-juego-ayuda" aria-label="Ayuda">
+					<span class="btn-juego-icono" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
+					<span class="nombre-btn">Ayuda</span>
+				</button>
 			</div>
 		</div>
 	</div>
@@ -199,7 +263,7 @@
 	<script src="../../tutorial/tutorial.js?v=20261019b"></script>
 	<script src="../../final/final.js"></script>
 	<script src="../../shared/aplicar-perfil-juego.js?v=20261013a"></script>
-	<script src="logica.js?v=20261022i"></script>
+	<script src="logica.js?v=20261028d"></script>
 	<script src="sfx.js?v=20261021a"></script>
 	<script src="../../../assets/vendor/phaser/phaser.min.js"></script>
 	<script src="../../intro3d/js/config.js?v=20261007a"></script>
@@ -214,6 +278,6 @@
 	<script src="../../intro3d/js/intro.js?v=20261008a"></script>
 	<script src="../../shared/pin-accesibilidad.js?v=20261019c"></script>
 	<script src="../../shared/menu-accesibilidad.js?v=20261019d"></script>
-	<script src="script.js?v=20261027c"></script>
+	<script src="script.js?v=20261028d"></script>
 </body>
 </html>

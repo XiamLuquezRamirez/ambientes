@@ -12,13 +12,16 @@
 	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
 	<script src="/assets/js/jquery-4.0.0.min.js"></script>
 	<script src="/assets/js/sweetalert.js"></script>
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="style.css?v=20261030b">
 	<link rel="stylesheet" href="../../Polimotor/comun/inicio-fondo.css?v=20261027a">
 	<script src="../../Polimotor/comun/inicio-fondo.js?v=20261027d"></script>
 	<link rel="stylesheet" href="../../tutorial/tutorial.css?v=20261019e">
 	<link rel="stylesheet" href="../../shared/menu-accesibilidad.css?v=20261022o">
 	<link rel="stylesheet" href="../../final/final.css">
 	<link rel="stylesheet" href="../../intro3d/css/intro.css">
+	<link rel="preload" as="image" href="img/fondo.png">
+	<link rel="preload" as="image" href="img/nube_texto.png">
+	<link rel="preload" as="image" href="img/fondo_opcion.png">
 	<link rel="preload" as="image" href="img/Manzana.png">
 	<link rel="preload" as="image" href="img/Sol.png">
 	<link rel="preload" as="image" href="img/Carro.png">
@@ -102,18 +105,24 @@
 	</div>
 
 	<div id="principal">
+		<img class="juego-fondo" src="img/fondo.png" alt="" aria-hidden="true" draggable="false">
 		<div class="hud-top">
 			<div class="hud-nav">
 				<div id="progreso" class="hud-progreso" hidden></div>
 				<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
-				<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
+				<button type="button" onclick="history.back()" class="btn btn-warning btn-round btn-salir" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
 			</div>
 		</div>
-		<div class="enunciado-wrap">
-			<div id="muestra-color" class="muestra-color" hidden aria-hidden="true"></div>
-			<h1 class="borde" id="enunciado">Observa y encuentra el color</h1>
+		<div class="cabecera-nube" aria-live="polite">
+			<p id="enunciado" class="enunciado-nube">Observa y encuentra el color</p>
 		</div>
-		<div id="zona-objetos" class="zona-objetos" aria-label="Objetos de colores"></div>
+		<div class="escenario-color" id="escenario">
+			<div id="muestra-color" class="muestra-color" hidden aria-hidden="true"></div>
+			<div id="zona-objetos" class="zona-objetos" aria-label="Objetos de colores"></div>
+			<div class="pj pj-zoe" id="pj-zoe">
+				<img class="pj-img" src="../../img/zoe_normal.gif" alt="Zoe" draggable="false">
+			</div>
+		</div>
 	</div>
 
 		<div id="tutorial-zoe" class="tutorial-zoe" hidden aria-hidden="true"></div>

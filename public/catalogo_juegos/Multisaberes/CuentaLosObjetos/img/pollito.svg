@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Pollito">
+  <ellipse cx="120" cy="222" rx="70" ry="9" fill="#000" opacity="0.1"/>
+  <g stroke="#ef6c00" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M100 194 V214 M90 216 H110"/>
+    <path d="M140 194 V214 M130 216 H150"/>
+  </g>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <ellipse cx="120" cy="150" rx="70" ry="56" fill="#ffeb3b"/>
+    <circle cx="120" cy="82" r="46" fill="#ffeb3b"/>
+    <path d="M60 142 C40 136 36 160 56 168 C64 170 70 162 70 156" fill="#fdd835"/>
+    <path d="M180 142 C200 136 204 160 184 168 C176 170 170 162 170 156" fill="#fdd835"/>
+    <path d="M110 92 L130 92 L120 110 Z" fill="#ff9800"/>
+  </g>
+  <path d="M112 38 C110 26 118 22 122 34 C126 24 134 28 128 40" fill="#ffeb3b" stroke="#37474f" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="102" cy="76" r="7" fill="#263238"/>
+  <circle cx="138" cy="76" r="7" fill="#263238"/>
+  <circle cx="104" cy="74" r="2.5" fill="#fff"/>
+  <circle cx="140" cy="74" r="2.5" fill="#fff"/>
+  <ellipse cx="88" cy="96" rx="9" ry="6" fill="#ffab91" opacity="0.8"/>
+  <ellipse cx="152" cy="96" rx="9" ry="6" fill="#ffab91" opacity="0.8"/>
+</svg>
