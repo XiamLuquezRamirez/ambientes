@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Persona saltando">
+  <ellipse cx="120" cy="226" rx="46" ry="6" fill="#000" opacity="0.12"/>
+  <g stroke="#90a4ae" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M84 206 Q90 196 96 206 M144 206 Q150 196 156 206"/>
+  </g>
+  <path d="M110 138 L92 164 L106 184 M130 138 L148 164 L134 184" fill="none" stroke="#37474f" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="110" cy="188" rx="12" ry="7" fill="#37474f"/>
+  <ellipse cx="130" cy="188" rx="12" ry="7" fill="#37474f"/>
+  <rect x="98" y="76" width="44" height="66" rx="16" fill="#ffa726" stroke="#37474f" stroke-width="4"/>
+  <path d="M104 88 L82 56 L74 30 M136 88 L158 56 L166 30" fill="none" stroke="#ffa726" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="74" cy="26" r="9" fill="#ffcc80" stroke="#37474f" stroke-width="3"/>
+  <circle cx="166" cy="26" r="9" fill="#ffcc80" stroke="#37474f" stroke-width="3"/>
+  <circle cx="120" cy="50" r="25" fill="#ffcc80" stroke="#37474f" stroke-width="4"/>
+  <path d="M95 48 C95 20 145 20 145 48 C136 34 104 34 95 48 Z" fill="#5d4037"/>
+  <circle cx="111" cy="51" r="3.5" fill="#37474f"/>
+  <circle cx="129" cy="51" r="3.5" fill="#37474f"/>
+  <path d="M110 60 Q120 72 130 60 Z" fill="#37474f"/>
+</svg>

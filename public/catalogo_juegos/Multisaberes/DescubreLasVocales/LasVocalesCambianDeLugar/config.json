@@ -1,0 +1,115 @@
+{
+  "nombre": "Las Vocales Cambian De Lugar",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Escucha el sonido y toca la vocal!",
+    "demostracionAcierto": "¡Así se juega!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Las cinco vocales te esperan!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Escucha y encuentra la correcta!"
+      }
+    ]
+  },
+  "demo": {
+    "vocales": [
+      "o",
+      "u"
+    ],
+    "correcto": "o"
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "verBotonRepetir": true,
+    "mostrarProgreso": true,
+    "animaciones_opciones": true,
+    "efectosSonido": true,
+    "mostrarFeedBack": false
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "vocales": {
+    "a": {
+      "img": "img/vocal_a.svg?v=20261019b",
+      "color": "#ff4d4f",
+      "nombre": "a"
+    },
+    "e": {
+      "img": "img/vocal_e.svg?v=20261019b",
+      "color": "#fab005",
+      "nombre": "e"
+    },
+    "i": {
+      "img": "img/vocal_i.svg?v=20261019b",
+      "color": "#15aabf",
+      "nombre": "i"
+    },
+    "o": {
+      "img": "img/vocal_o.svg?v=20261019b",
+      "color": "#be4bdb",
+      "nombre": "o"
+    },
+    "u": {
+      "img": "img/vocal_u.svg?v=20261019b",
+      "color": "#37b24d",
+      "nombre": "u"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El desafío de las cinco vocales",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Las cinco vocales te esperan!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Escucha y encuentra la correcta!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "cambian",
+          "tipo": "reubicar",
+          "vocales": [
+            "a",
+            "e",
+            "i",
+            "o",
+            "u"
+          ],
+          "correcto": "a",
+          "acierto": {
+            "efecto": "ilumina",
+            "repetir": true
+          },
+          "iOrigen": 3
+        }
+      ],
+      "cierre": {
+        "voz": "zeus",
+        "texto": "¡Reconociste las cinco vocales!"
+      },
+      "insignia": {
+        "img": "img/insignia_corona.svg",
+        "nombre": "Corona de las cinco vocales"
+      }
+    }
+  ]
+}

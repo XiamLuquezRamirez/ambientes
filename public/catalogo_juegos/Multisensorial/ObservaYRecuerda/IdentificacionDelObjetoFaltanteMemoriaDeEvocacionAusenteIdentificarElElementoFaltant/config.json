@@ -1,0 +1,159 @@
+{
+  "nombre": "Identificación del Objeto Faltante: Memoria de Evocación Ausente: Identificar el Elemento Faltant…",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira cómo se juega! Primero observa los objetos.",
+    "demostracionBaul": "¡Mira cómo se juega! Primero observa los objetos del baúl.",
+    "demostracionMuseo": "¡Mira cómo se juega! Primero observa las obras del museo.",
+    "demostracionAcierto": "¡Así se encuentra el objeto nuevo!",
+    "demostracionFin": "¡Ahora te toca a ti! Observa con mucha atención.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al museo de recuerdos!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Memoriza cada obra con atención!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "barraTiempo": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "demo": {
+    "mecanica": "intruso",
+    "mostrar": [
+      "manzana",
+      "campana"
+    ],
+    "intruso": "lija",
+    "conservarOrden": false,
+    "observacionMs": 3500,
+    "ocultamiento": "baul",
+    "ocultamientoMs": 1600,
+    "ocultamientoEfecto": "clackMagic"
+  },
+  "elementos": {
+    "manzana": {
+      "img": "img/manzana.svg",
+      "nombre": "Manzana"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana"
+    },
+    "flor": {
+      "img": "img/flor.svg",
+      "nombre": "Flor"
+    },
+    "sol": {
+      "img": "img/sol.svg",
+      "nombre": "Sol"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota"
+    },
+    "helado": {
+      "img": "img/helado.svg",
+      "nombre": "Helado"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "nombre": "Lija"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor"
+    },
+    "vidrio": {
+      "img": "img/vidrio.svg",
+      "nombre": "Vidrio"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El museo sensorial de recuerdos",
+      "escena": "museo",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al museo de recuerdos!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Memoriza cada obra con atención!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "faltante-museo",
+          "titulo": "Identificación del Objeto Faltante",
+          "mecanica": "faltante",
+          "mostrar": [
+            "manzana",
+            "campana",
+            "flor",
+            "pelota",
+            "helado"
+          ],
+          "faltante": "flor",
+          "indiceFaltante": 2,
+          "opciones": [
+            "flor",
+            "sol",
+            "vidrio",
+            "lija"
+          ],
+          "observacionMs": 5000,
+          "ocultamiento": "niebla",
+          "ocultamientoMs": 2000,
+          "ocultamientoEfecto": "shhhZip",
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Fotografía los 5 objetos con tu mente en 3, 2, 1...!"
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "¡Una obra de arte ha desaparecido del pedestal! ¿Cuál objeto falta?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Excelente! Recordaste el objeto que faltaba.",
+            "efecto": "shineBloom",
+            "animacion": "encaja"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "Ese objeto no estaba en nuestra exposición original. Recuerda qué había entre la campana y la pelota. ¡Inténtalo otra vez!",
+            "efecto": "boing"
+          },
+          "iOrigen": 1
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Excelente! Observaste y recordaste con mucha atención."
+        }
+      ],
+      "cierreEscena": "museoFiesta",
+      "insignia": {
+        "img": "img/insignia_conservador.svg",
+        "nombre": "Conservador Máster del Museo"
+      }
+    }
+  ]
+}

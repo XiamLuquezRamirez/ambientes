@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Pajarito feliz">
+  <defs>
+    <linearGradient id="arcoiris" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ef5350"/>
+      <stop offset="0.3" stop-color="#ffca28"/>
+      <stop offset="0.6" stop-color="#66bb6a"/>
+      <stop offset="1" stop-color="#42a5f5"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M62 140 C30 96 18 70 34 58 C54 76 76 104 92 132 Z" fill="url(#arcoiris)"/>
+    <path d="M170 138 C206 96 222 72 206 58 C184 76 162 104 148 130 Z" fill="url(#arcoiris)"/>
+    <path d="M70 168 L30 176 L48 200 Z" fill="#7e57c2"/>
+    <ellipse cx="118" cy="150" rx="60" ry="54" fill="#42a5f5"/>
+    <ellipse cx="124" cy="166" rx="34" ry="28" fill="#fff59d"/>
+    <circle cx="140" cy="98" r="42" fill="#29b6f6"/>
+    <path d="M178 98 L208 106 L178 116 Z" fill="#ff9800"/>
+    <path d="M128 58 C126 42 140 36 148 46 C152 34 168 34 168 48" fill="none" stroke-width="5"/>
+  </g>
+  <circle cx="152" cy="92" r="10" fill="#fff"/>
+  <circle cx="155" cy="93" r="6" fill="#263238"/>
+  <circle cx="157" cy="90" r="2" fill="#fff"/>
+  <ellipse cx="142" cy="114" rx="8" ry="5" fill="#f48fb1"/>
+  <g fill="#fff59d">
+    <path d="M212 30 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z"/>
+    <path d="M26 30 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3 Z"/>
+  </g>
+</svg>

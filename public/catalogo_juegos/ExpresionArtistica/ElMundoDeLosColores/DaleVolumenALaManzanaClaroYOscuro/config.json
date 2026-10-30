@@ -1,0 +1,278 @@
+{
+  "nombre": "Dale Volumen a la Manzana (Claro y Oscuro)",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira! Arrastra una gota de color hacia la otra para mezclarlas.",
+    "demostracionAcierto": "¡Así nace un color nuevo!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al taller de diseño cromático!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy mezclaremos colores y pintaremos con volumen."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "pieza_demo"
+  },
+  "escenas": {
+    "estudio": "img/escenas/estudio.svg",
+    "laboratorio": "img/escenas/laboratorio.svg"
+  },
+  "elementos": {
+    "pieza_demo": {
+      "img": "img/pieza_demo.svg",
+      "nombre": "Gota de ejemplo"
+    },
+    "gota_roja": {
+      "img": "img/gota_roja.svg",
+      "nombre": "Rojo",
+      "color": "rojo"
+    },
+    "gota_azul": {
+      "img": "img/gota_azul.svg",
+      "nombre": "Azul",
+      "color": "azul"
+    },
+    "gota_amarilla": {
+      "img": "img/gota_amarilla.svg",
+      "nombre": "Amarillo",
+      "color": "amarillo"
+    },
+    "gota_verde": {
+      "img": "img/gota_verde.svg",
+      "nombre": "Verde",
+      "color": "verde"
+    },
+    "gota_naranja": {
+      "img": "img/gota_naranja.svg",
+      "nombre": "Naranja",
+      "color": "naranja"
+    },
+    "gota_morada": {
+      "img": "img/gota_morada.svg",
+      "nombre": "Morado",
+      "color": "morado"
+    },
+    "gota_marron": {
+      "img": "img/gota_marron.svg",
+      "nombre": "Marrón",
+      "color": "marron"
+    },
+    "paleta": {
+      "img": "img/paleta.svg",
+      "nombre": "Paleta"
+    },
+    "arbol_pelado": {
+      "img": "img/arbol_pelado.svg",
+      "nombre": "Árbol"
+    },
+    "bote_rojo": {
+      "img": "img/bote_rojo.svg",
+      "nombre": "Pintura roja",
+      "color": "rojo"
+    },
+    "bote_amarillo": {
+      "img": "img/bote_amarillo.svg",
+      "nombre": "Pintura amarilla",
+      "color": "amarillo"
+    },
+    "bote_naranja": {
+      "img": "img/bote_naranja.svg",
+      "nombre": "Pintura naranja",
+      "color": "naranja"
+    },
+    "bote_azul": {
+      "img": "img/bote_azul.svg",
+      "nombre": "Pintura azul",
+      "color": "azul"
+    },
+    "bote_verde": {
+      "img": "img/bote_verde.svg",
+      "nombre": "Pintura verde",
+      "color": "verde"
+    },
+    "bote_celeste": {
+      "img": "img/bote_celeste.svg",
+      "nombre": "Pintura celeste",
+      "color": "celeste"
+    },
+    "flor_roja": {
+      "img": "img/flor_roja.svg",
+      "nombre": "Flor roja"
+    },
+    "tren": {
+      "img": "img/tren.svg",
+      "nombre": "Tren"
+    },
+    "mancha_roja": {
+      "img": "img/mancha_roja.svg",
+      "nombre": "Mancha roja",
+      "color": "rojo"
+    },
+    "mancha_amarilla": {
+      "img": "img/mancha_amarilla.svg",
+      "nombre": "Mancha amarilla",
+      "color": "amarillo"
+    },
+    "mancha_azul": {
+      "img": "img/mancha_azul.svg",
+      "nombre": "Mancha azul",
+      "color": "azul"
+    },
+    "pipeta": {
+      "img": "img/pipeta.svg",
+      "nombre": "Pipeta"
+    },
+    "vaso": {
+      "img": "img/vaso.svg",
+      "nombre": "Vaso de mezcla"
+    },
+    "sol": {
+      "img": "img/sol.svg",
+      "nombre": "Sol cálido"
+    },
+    "copo": {
+      "img": "img/copo.svg",
+      "nombre": "Copo frío"
+    },
+    "manzana_bn": {
+      "img": "img/manzana_bn.svg",
+      "nombre": "Manzana"
+    },
+    "manzana_pintada": {
+      "img": "img/manzana_pintada.svg",
+      "nombre": "Manzana con volumen"
+    },
+    "pincel": {
+      "img": "img/pincel.svg",
+      "nombre": "Pincel"
+    },
+    "cuadro_mezcla": {
+      "img": "img/cuadro_mezcla.svg",
+      "nombre": "Mezcla de colores"
+    },
+    "cuadro_arbol": {
+      "img": "img/cuadro_arbol.svg",
+      "nombre": "Árbol de huellas"
+    },
+    "cuadro_tren": {
+      "img": "img/cuadro_tren.svg",
+      "nombre": "Tren de colores"
+    },
+    "cuadro_fuegos": {
+      "img": "img/cuadro_fuegos.svg",
+      "nombre": "Fuegos artificiales"
+    },
+    "cuadro_lab": {
+      "img": "img/cuadro_lab.svg",
+      "nombre": "Laboratorio"
+    },
+    "cuadro_clima": {
+      "img": "img/cuadro_clima.svg",
+      "nombre": "Cálidos y fríos"
+    },
+    "cuadro_manzana": {
+      "img": "img/cuadro_manzana.svg",
+      "nombre": "Manzana en volumen"
+    },
+    "cuadro_abstracto": {
+      "img": "img/cuadro_abstracto.svg",
+      "nombre": "Cuadro abstracto"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El laboratorio cromático",
+      "tema": "laboratorio",
+      "escena": "laboratorio",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al taller de diseño cromático!"
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy mezclaremos colores y pintaremos con volumen."
+        }
+      ],
+      "galeria": [
+        "cuadro_lab",
+        "cuadro_clima",
+        "cuadro_manzana",
+        "cuadro_abstracto"
+      ],
+      "retos": [
+        {
+          "id": "lab",
+          "tipo": "laboratorio",
+          "titulo": "El laboratorio de mezclas",
+          "meta": 2,
+          "mezclas": [
+            {
+              "a": "rojo",
+              "b": "amarillo",
+              "resultado": "naranja",
+              "estacion": "A"
+            },
+            {
+              "a": "azul",
+              "b": "rojo",
+              "resultado": "morado",
+              "estacion": "B"
+            },
+            {
+              "a": "rojo",
+              "b": "verde",
+              "resultado": "marron",
+              "estacion": "A",
+              "opcional": true
+            }
+          ],
+          "consigna": {
+            "voz": "zoe",
+            "texto": "¡Diseñador, entramos al laboratorio cromático! Vamos a crear colores secundarios. Usa las pipetas para mezclar Rojo con Amarillo en la primera estación, y Azul con Rojo en la segunda."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Perfecto! Obtuviste Naranja y Morado. Tu paleta de color ya es de un artista profesional."
+          },
+          "iOrigen": 0
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Increíble recorrido por el mundo del color! Mezclaste tintas como un científico, jugaste con la temperatura y creaste un cuadro abstracto digno de una galería de arte."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Tu ojo artístico y tu manejo del color son extraordinarios!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_maestro.svg",
+        "nombre": "Maestro del Cromatismo y Diseñador Artístico",
+        "sonido": "fanfarria"
+      }
+    }
+  ]
+}

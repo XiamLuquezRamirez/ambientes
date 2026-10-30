@@ -1,0 +1,146 @@
+{
+  "nombre": "La Mision Final",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el botón para escuchar y luego toca la imagen del sonido.",
+    "demostracionAcierto": "¡Así se descubre el sonido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Bienvenidos, hoy tenemos una misión."
+      },
+      {
+        "personaje": 0,
+        "texto": "Escucha con mucha atención."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "sonido": "vaca"
+  },
+  "sonidos": {
+    "perro": {
+      "img": "img/perro.png",
+      "nombre": "Perro",
+      "sonido": "ladrido"
+    },
+    "gato": {
+      "img": "img/gato.png",
+      "nombre": "Gato",
+      "sonido": "maullido"
+    },
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "nombre": "Pájaro",
+      "sonido": "trino"
+    },
+    "vaca": {
+      "img": "img/vaca.svg",
+      "nombre": "Vaca",
+      "sonido": "mugido"
+    },
+    "gallo": {
+      "img": "img/gallo.svg",
+      "nombre": "Gallo",
+      "sonido": "quiquiriqui"
+    },
+    "lluvia": {
+      "img": "img/lluvia.svg",
+      "nombre": "Lluvia",
+      "sonido": "lluvia"
+    },
+    "mar": {
+      "img": "img/mar.svg",
+      "nombre": "Mar",
+      "sonido": "olas"
+    },
+    "viento": {
+      "img": "img/viento.svg",
+      "nombre": "Viento",
+      "sonido": "viento"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana",
+      "sonido": "campana"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota",
+      "sonido": "rebote"
+    },
+    "carro": {
+      "img": "img/carro.png",
+      "nombre": "Carro",
+      "sonido": "carro"
+    },
+    "triangulo": {
+      "img": "img/triangulo.svg",
+      "nombre": "Triángulo",
+      "sonido": "triangulo"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor",
+      "sonido": "tambor"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Los detectives de los sonidos",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hola! Bienvenidos, hoy tenemos una misión."
+        },
+        {
+          "personaje": 0,
+          "texto": "Escucha con mucha atención."
+        }
+      ],
+      "retos": [
+        {
+          "id": "mision-final",
+          "tipo": "diferido",
+          "titulo": "La misión final",
+          "opciones": [
+            "lluvia",
+            "mar",
+            "viento"
+          ],
+          "correcto": "lluvia",
+          "pausaMs": 600,
+          "acierto": {
+            "efecto": "especial",
+            "sonido": "victoria"
+          },
+          "iOrigen": 4
+        }
+      ],
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Misión cumplida!"
+      },
+      "insignia": {
+        "img": "img/insignia_experto.svg",
+        "nombre": "Eres un experto en sonidos",
+        "sonido": "aplausos"
+      }
+    }
+  ]
+}

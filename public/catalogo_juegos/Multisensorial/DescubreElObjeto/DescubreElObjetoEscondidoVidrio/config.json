@@ -1,0 +1,180 @@
+{
+  "nombre": "¡Descubre el Objeto Escondido! (vidrio)",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: escucha la pista, toca el objeto y llévalo hasta la cerradura del cofre.",
+    "demostracionAcierto": "¡Así se descubre el objeto escondido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Hoy vamos a descubrir objetos escondidos usando pistas de textura!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Escucha cada pista con atención y elige el objeto correcto."
+      },
+      {
+        "personaje": 1,
+        "texto": "Escucha, observa y descubre. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3"
+  },
+  "demo": {
+    "objeto": "pluma"
+  },
+  "objetos": {
+    "oso": {
+      "img": "img/oso_peluche.svg",
+      "nombre": "Oso de peluche",
+      "sonido": "fluff"
+    },
+    "peluche": {
+      "img": "img/oso_peluche.svg",
+      "nombre": "Peluche",
+      "sonido": "fluff"
+    },
+    "gato": {
+      "img": "img/gato.svg",
+      "nombre": "Gato",
+      "sonido": "fluff"
+    },
+    "piedra": {
+      "img": "img/piedra.svg",
+      "nombre": "Piedra",
+      "sonido": "toc"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "nombre": "Lija",
+      "sonido": "rasc"
+    },
+    "corteza": {
+      "img": "img/corteza.svg",
+      "nombre": "Corteza",
+      "sonido": "croc"
+    },
+    "seda": {
+      "img": "img/seda.svg",
+      "nombre": "Seda",
+      "sonido": "seda"
+    },
+    "vidrio": {
+      "img": "img/vidrio.svg",
+      "nombre": "Vidrio",
+      "sonido": "ting"
+    },
+    "algodon": {
+      "img": "img/algodon.svg",
+      "nombre": "Algodón",
+      "sonido": "fluff"
+    },
+    "copo_algodon": {
+      "img": "img/algodon.svg",
+      "nombre": "Copo de algodón",
+      "sonido": "fluff"
+    },
+    "esponja": {
+      "img": "img/esponja.svg",
+      "nombre": "Esponja",
+      "sonido": "squish"
+    },
+    "madera_lisa": {
+      "img": "img/madera_lisa.svg",
+      "nombre": "Madera lisa",
+      "sonido": "tap"
+    },
+    "madera": {
+      "img": "img/madera.svg",
+      "nombre": "Madera",
+      "sonido": "tap"
+    },
+    "carton": {
+      "img": "img/carton.svg",
+      "nombre": "Cartón",
+      "sonido": "tap"
+    },
+    "pluma": {
+      "img": "img/pluma.svg",
+      "nombre": "Pluma",
+      "sonido": "fluff"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "La Caja Misteriosa de Texturas",
+      "escenario": "cofre",
+      "retos": [
+        {
+          "id": "vidrio",
+          "tipo": "cofre",
+          "titulo": "¡Descubre el objeto escondido!",
+          "ambiente": "reflejos",
+          "opciones": [
+            "vidrio",
+            "lija",
+            "peluche",
+            "esponja"
+          ],
+          "correcto": "vidrio",
+          "pista": {
+            "voz": "zoe",
+            "texto": "¡Última pista del cofre! Es liso, transparente y duro. ¿Qué objeto es?"
+          },
+          "acierto": {
+            "efecto": "cristal",
+            "sonido": "chimeglimmer",
+            "voz": "zoe",
+            "texto": "¡Excelente! Descubriste el vidrio."
+          },
+          "errores": [
+            {
+              "objetos": [
+                "lija"
+              ],
+              "efecto": "raspa",
+              "sonido": "raspa",
+              "voz": "zeus",
+              "texto": "La lija es áspera y no se puede ver a través de ella. ¡Inténtalo otra vez!"
+            },
+            {
+              "objetos": [
+                "peluche",
+                "esponja"
+              ],
+              "voz": "zeus",
+              "texto": "Buscamos algo duro y liso como el cristal. Escucha u observa nuevamente. ¡Inténtalo otra vez!"
+            }
+          ],
+          "iOrigen": 2
+        }
+      ],
+      "cierreEscena": {
+        "tipo": "galeria",
+        "titulo": "La gran galería de hallazgos"
+      },
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Excelente! Usaste las pistas de textura para descubrir los objetos."
+      },
+      "premio": {
+        "titulo": "Medalla",
+        "nombre": "Gran Detective de las Texturas",
+        "icono": "fa-medal",
+        "tipo": "medalla"
+      }
+    }
+  ]
+}

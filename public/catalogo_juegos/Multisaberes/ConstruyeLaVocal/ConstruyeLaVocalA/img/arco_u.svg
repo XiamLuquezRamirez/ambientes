@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <defs>
+    <linearGradient id="g" x1="50" y1="50" x2="140" y2="210" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#51cf66"/><stop offset="1" stop-color="#2f9e44"/>
+    </linearGradient>
+  </defs>
+  <!-- pierna izq + base hasta el arranque de la pierna der (142,152) -->
+  <path d="M58 52v100c0 34 19 58 42 58s42-24 42-58" stroke="url(#g)" stroke-width="22" stroke-linecap="round"/>
+  <path d="M58 52v100c0 34 19 58 42 58s42-24 42-58" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".28"/>
+</svg>

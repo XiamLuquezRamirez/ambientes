@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+<defs>
+<radialGradient id="b" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#d0ebff" stop-opacity="0.7"/><stop offset="1" stop-color="#74c0fc" stop-opacity="0.8"/></radialGradient>
+<pattern id="p" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="11" cy="11" r="8" fill="url(#b)" stroke="#74c0fc" stroke-width="1.5"/></pattern>
+</defs>
+<path d="M26 40 L132 30 L136 124 L30 132 Z" fill="#e7f5ff" fill-opacity="0.6" stroke="#74c0fc" stroke-width="4" stroke-linejoin="round"/>
+<path d="M30 44 L128 35 L132 120 L34 128 Z" fill="url(#p)"/>
+</svg>

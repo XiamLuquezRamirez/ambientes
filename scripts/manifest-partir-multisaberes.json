@@ -1,0 +1,542 @@
+[
+  {
+    "slug": "encuentra-la-a",
+    "nombre": "Encuentra La A",
+    "carpeta": "EncuentraLaA",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/EncuentraLaA"
+  },
+  {
+    "slug": "donde-esta-la-e",
+    "nombre": "¿Dónde Está La E?",
+    "carpeta": "DondeEstaLaE",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/DondeEstaLaE"
+  },
+  {
+    "slug": "busca-la-bocal-i",
+    "nombre": "Busca La Bocal I",
+    "carpeta": "BuscaLaBocalI",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/BuscaLaBocalI"
+  },
+  {
+    "slug": "encuentra-la-vocal-o",
+    "nombre": "Encuentra La Vocal O",
+    "carpeta": "EncuentraLaVocalO",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/EncuentraLaVocalO"
+  },
+  {
+    "slug": "donde-esta-la-u",
+    "nombre": "¿Donde Está La U?",
+    "carpeta": "DondeEstaLaU",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/DondeEstaLaU"
+  },
+  {
+    "slug": "descubre-la-vocal",
+    "nombre": "Descubre La Vocal",
+    "carpeta": "DescubreLaVocal",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/DescubreLaVocal"
+  },
+  {
+    "slug": "encuentra-la-vocal-que-suena",
+    "nombre": "Encuentra La Vocal Que Suena",
+    "carpeta": "EncuentraLaVocalQueSuena",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/EncuentraLaVocalQueSuena"
+  },
+  {
+    "slug": "una-nueva-vocal",
+    "nombre": "Una Nueva Vocal",
+    "carpeta": "UnaNuevaVocal",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/UnaNuevaVocal"
+  },
+  {
+    "slug": "escucha-y-reconoce",
+    "nombre": "Escucha Y Reconoce",
+    "carpeta": "EscuchaYReconoce",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/EscuchaYReconoce"
+  },
+  {
+    "slug": "las-vocales-cambian-de-lugar",
+    "nombre": "Las Vocales Cambian De Lugar",
+    "carpeta": "LasVocalesCambianDeLugar",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/LasVocalesCambianDeLugar"
+  },
+  {
+    "slug": "reconoce-sin-ayudas-visuales",
+    "nombre": "Reconoce Sin Ayudas Visuales",
+    "carpeta": "ReconoceSinAyudasVisuales",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/ReconoceSinAyudasVisuales"
+  },
+  {
+    "slug": "el-gran-desafio",
+    "nombre": "El Gran Desafío",
+    "carpeta": "ElGranDesafio",
+    "padre": "DescubreLasVocales",
+    "slugAntiguo": "descubre-las-vocales",
+    "tematicaId": 38,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisaberes/DescubreLasVocales/ElGranDesafio"
+  },
+  {
+    "slug": "el-avion",
+    "nombre": "El Avión",
+    "carpeta": "ElAvion",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/ElAvion"
+  },
+  {
+    "slug": "el-elefante",
+    "nombre": "El Elefante",
+    "carpeta": "ElElefante",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/ElElefante"
+  },
+  {
+    "slug": "la-iguana",
+    "nombre": "La Iguana",
+    "carpeta": "LaIguana",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/LaIguana"
+  },
+  {
+    "slug": "el-oso",
+    "nombre": "El Oso",
+    "carpeta": "ElOso",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/ElOso"
+  },
+  {
+    "slug": "las-uvas",
+    "nombre": "Las Uvas",
+    "carpeta": "LasUvas",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/LasUvas"
+  },
+  {
+    "slug": "la-vocal-a-escondida",
+    "nombre": "La Vocal A Escondida",
+    "carpeta": "LaVocalAEscondida",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/LaVocalAEscondida"
+  },
+  {
+    "slug": "la-vocal-e-escondida",
+    "nombre": "La Vocal E Escondida",
+    "carpeta": "LaVocalEEscondida",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/LaVocalEEscondida"
+  },
+  {
+    "slug": "la-vocal-i-escondida",
+    "nombre": "La Vocal I Escondida",
+    "carpeta": "LaVocalIEscondida",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/LaVocalIEscondida"
+  },
+  {
+    "slug": "la-vocal-o-escondida",
+    "nombre": "La Vocal O Escondida",
+    "carpeta": "LaVocalOEscondida",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/LaVocalOEscondida"
+  },
+  {
+    "slug": "la-vocal-u-escondida",
+    "nombre": "La Vocal U Escondida",
+    "carpeta": "LaVocalUEscondida",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/LaVocalUEscondida"
+  },
+  {
+    "slug": "el-detective-de-las-vocales",
+    "nombre": "El Detective De Las Vocales",
+    "carpeta": "ElDetectiveDeLasVocales",
+    "padre": "ConQueVocalComienza",
+    "slugAntiguo": "con-que-vocal-comienza",
+    "tematicaId": 39,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisaberes/ConQueVocalComienza/ElDetectiveDeLasVocales"
+  },
+  {
+    "slug": "construye-la-vocal-a",
+    "nombre": "Construye La Vocal A",
+    "carpeta": "ConstruyeLaVocalA",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/ConstruyeLaVocalA"
+  },
+  {
+    "slug": "las-piezas-de-la-vocal-e",
+    "nombre": "Las Piezas De La Vocal E",
+    "carpeta": "LasPiezasDeLaVocalE",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/LasPiezasDeLaVocalE"
+  },
+  {
+    "slug": "la-vocal-i-necesita-ayuda",
+    "nombre": "La Vocal I Necesita Ayuda",
+    "carpeta": "LaVocalINecesitaAyuda",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/LaVocalINecesitaAyuda"
+  },
+  {
+    "slug": "arma-la-vocal-o",
+    "nombre": "Arma La Vocal O",
+    "carpeta": "ArmaLaVocalO",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/ArmaLaVocalO"
+  },
+  {
+    "slug": "completa-la-vocal-u",
+    "nombre": "Completa La Vocal U",
+    "carpeta": "CompletaLaVocalU",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/CompletaLaVocalU"
+  },
+  {
+    "slug": "activa-las-maquinas-de-las-vocales",
+    "nombre": "Activa Las Maquinas De Las Vocales",
+    "carpeta": "ActivaLasMaquinasDeLasVocales",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/ActivaLasMaquinasDeLasVocales"
+  },
+  {
+    "slug": "construye-la-vocal-a-2",
+    "nombre": "Construye La Vocal A",
+    "carpeta": "ConstruyeLaVocalA2",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/ConstruyeLaVocalA2"
+  },
+  {
+    "slug": "la-vocal-e-perdio-sus-segmentos",
+    "nombre": "La Vocal E Perdió Sus Segmentos",
+    "carpeta": "LaVocalEPerdioSusSegmentos",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/LaVocalEPerdioSusSegmentos"
+  },
+  {
+    "slug": "la-vocal-i-en-gravedad-cero",
+    "nombre": "La Vocal I En Gravedad Cero",
+    "carpeta": "LaVocalIEnGravedadCero",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/LaVocalIEnGravedadCero"
+  },
+  {
+    "slug": "el-anillo-de-la-vocal-o",
+    "nombre": "El Anillo De La Vocal O",
+    "carpeta": "ElAnilloDeLaVocalO",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/ElAnilloDeLaVocalO"
+  },
+  {
+    "slug": "completa-la-vocal-u-2",
+    "nombre": "Completa La Vocal U",
+    "carpeta": "CompletaLaVocalU2",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/CompletaLaVocalU2"
+  },
+  {
+    "slug": "el-portal-de-las-cinco-vocales",
+    "nombre": "El Portal De Las Cinco Vocales",
+    "carpeta": "ElPortalDeLasCincoVocales",
+    "padre": "ConstruyeLaVocal",
+    "slugAntiguo": "construye-la-vocal",
+    "tematicaId": 40,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisaberes/ConstruyeLaVocal/ElPortalDeLasCincoVocales"
+  },
+  {
+    "slug": "descubre-la-primera-pareja",
+    "nombre": "Descubre La Primera Pareja",
+    "carpeta": "DescubreLaPrimeraPareja",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja-2",
+    "tematicaId": 41,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisaberes/EncuentraLaPareja/DescubreLaPrimeraPareja"
+  },
+  {
+    "slug": "una-nueva-pareja",
+    "nombre": "Una Nueva Pareja",
+    "carpeta": "UnaNuevaPareja",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja-2",
+    "tematicaId": 41,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisaberes/EncuentraLaPareja/UnaNuevaPareja"
+  },
+  {
+    "slug": "el-jardin-florecido",
+    "nombre": "El Jardín Florecido",
+    "carpeta": "ElJardinFlorecido",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja-2",
+    "tematicaId": 41,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisaberes/EncuentraLaPareja/ElJardinFlorecido"
+  },
+  {
+    "slug": "los-primeros-espejos",
+    "nombre": "Los Primeros Espejos",
+    "carpeta": "LosPrimerosEspejos",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja-2",
+    "tematicaId": 41,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisaberes/EncuentraLaPareja/LosPrimerosEspejos"
+  },
+  {
+    "slug": "el-espejo-cambiante",
+    "nombre": "El Espejo Cambiante",
+    "carpeta": "ElEspejoCambiante",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja-2",
+    "tematicaId": 41,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisaberes/EncuentraLaPareja/ElEspejoCambiante"
+  },
+  {
+    "slug": "la-camara-de-las-cinco-vocales",
+    "nombre": "La Camara De Las Cinco Vocales",
+    "carpeta": "LaCamaraDeLasCincoVocales",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja-2",
+    "tematicaId": 41,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisaberes/EncuentraLaPareja/LaCamaraDeLasCincoVocales"
+  },
+  {
+    "slug": "abre-el-castillo",
+    "nombre": "Abre El Castillo",
+    "carpeta": "AbreElCastillo",
+    "padre": "EncuentraLaPareja",
+    "slugAntiguo": "encuentra-la-pareja-2",
+    "tematicaId": 41,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisaberes/EncuentraLaPareja/AbreElCastillo"
+  },
+  {
+    "slug": "el-puente-de-la-vocal",
+    "nombre": "El Puente De La Vocal",
+    "carpeta": "ElPuenteDeLaVocal",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#0ea5e9",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/ElPuenteDeLaVocal"
+  },
+  {
+    "slug": "la-rueda-de-las-imagenes",
+    "nombre": "La Rueda De Las Imágenes",
+    "carpeta": "LaRuedaDeLasImagenes",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#3b82f6",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/LaRuedaDeLasImagenes"
+  },
+  {
+    "slug": "las-rocas-saltarinas",
+    "nombre": "Las Rocas Saltarinas",
+    "carpeta": "LasRocasSaltarinas",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#6366f1",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/LasRocasSaltarinas"
+  },
+  {
+    "slug": "la-puerta-misteriosa",
+    "nombre": "La Puerta Misteriosa",
+    "carpeta": "LaPuertaMisteriosa",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#8b5cf6",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/LaPuertaMisteriosa"
+  },
+  {
+    "slug": "la-lluvia-de-vocales",
+    "nombre": "La Lluvia De Vocales",
+    "carpeta": "LaLluviaDeVocales",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#a855f7",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/LaLluviaDeVocales"
+  },
+  {
+    "slug": "los-cristales-perdidos",
+    "nombre": "Los Cristales Perdidos",
+    "carpeta": "LosCristalesPerdidos",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#ec4899",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/LosCristalesPerdidos"
+  },
+  {
+    "slug": "el-robot-despistado",
+    "nombre": "El Robot Despistado",
+    "carpeta": "ElRobotDespistado",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#ef4444",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/ElRobotDespistado"
+  },
+  {
+    "slug": "el-camino-de-las-vocales",
+    "nombre": "El Camino De Las Vocales",
+    "carpeta": "ElCaminoDeLasVocales",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#f97316",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/ElCaminoDeLasVocales"
+  },
+  {
+    "slug": "repara-el-generador",
+    "nombre": "Repara El Generador",
+    "carpeta": "ReparaElGenerador",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#f59e0b",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/ReparaElGenerador"
+  },
+  {
+    "slug": "el-desafio-de-las-imagenes",
+    "nombre": "El Desafío De Las Imágenes",
+    "carpeta": "ElDesafioDeLasImagenes",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#84cc16",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/ElDesafioDeLasImagenes"
+  },
+  {
+    "slug": "activa-el-planeta",
+    "nombre": "Activa El Planeta",
+    "carpeta": "ActivaElPlaneta",
+    "padre": "ElRetoDeLasVocales",
+    "slugAntiguo": "el-reto-de-las-vocales",
+    "tematicaId": 42,
+    "color": "#22c55e",
+    "ruta": "catalogo_juegos/Multisaberes/ElRetoDeLasVocales/ActivaElPlaneta"
+  },
+  {
+    "slug": "recolecta-las-manzanas",
+    "nombre": "Recolecta Las Manzanas",
+    "carpeta": "RecolectaLasManzanas",
+    "padre": "CuentaLosObjetos",
+    "slugAntiguo": "cuenta-los-objetos",
+    "tematicaId": 43,
+    "color": "#14b8a6",
+    "ruta": "catalogo_juegos/Multisaberes/CuentaLosObjetos/RecolectaLasManzanas"
+  }
+]

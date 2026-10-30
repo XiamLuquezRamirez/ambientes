@@ -1,0 +1,165 @@
+{
+  "nombre": "Sonidos En Diferentes Lugares",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el botón para escuchar y luego toca de dónde viene el sonido.",
+    "demostracionAcierto": "¡Así se encuentra el sonido!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Hoy tenemos una misión muy divertida."
+      },
+      {
+        "personaje": 0,
+        "texto": "Encuentra de dónde viene el sonido."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "vaca"
+  },
+  "elementos": {
+    "perro": {
+      "img": "img/perro.png",
+      "nombre": "Perro",
+      "sonido": "ladrido"
+    },
+    "gato": {
+      "img": "img/gato.png",
+      "nombre": "Gato",
+      "sonido": "maullido"
+    },
+    "pajaro": {
+      "img": "img/pajaro.svg",
+      "imgAlas": "img/pajaro_alas.svg",
+      "nombre": "Pájaro",
+      "sonido": "trino"
+    },
+    "gallo": {
+      "img": "img/gallo.svg",
+      "nombre": "Gallo",
+      "sonido": "quiquiriqui"
+    },
+    "vaca": {
+      "img": "img/vaca.svg",
+      "nombre": "Vaca",
+      "sonido": "mugido"
+    },
+    "carro": {
+      "img": "img/carro.png",
+      "nombre": "Carro",
+      "sonido": "carro"
+    },
+    "bicicleta": {
+      "img": "img/bicicleta.svg",
+      "nombre": "Bicicleta",
+      "sonido": "timbre"
+    },
+    "pelota": {
+      "img": "img/pelota.svg",
+      "nombre": "Pelota",
+      "sonido": "rebote"
+    },
+    "arbol": {
+      "img": "img/arbol.svg",
+      "nombre": "Árbol",
+      "sonido": "viento"
+    },
+    "paraguas": {
+      "img": "img/paraguas.svg",
+      "imgAbierto": "img/paraguas_abierto.svg",
+      "nombre": "Paraguas",
+      "sonido": "lluvia"
+    },
+    "trompeta": {
+      "img": "img/trompeta.svg",
+      "nombre": "Trompeta",
+      "sonido": "trompeta"
+    },
+    "campana": {
+      "img": "img/campana.svg",
+      "nombre": "Campana",
+      "sonido": "campana"
+    },
+    "triangulo": {
+      "img": "img/triangulo.svg",
+      "nombre": "Triángulo",
+      "sonido": "triangulo"
+    },
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor",
+      "sonido": "tambor"
+    },
+    "pandereta": {
+      "img": "img/pandereta.svg",
+      "nombre": "Pandereta",
+      "sonido": "pandereta"
+    },
+    "maracas": {
+      "img": "img/maracas.svg",
+      "nombre": "Maracas",
+      "sonido": "maracas"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "La ruta secreta de los sonidos",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hola! Hoy tenemos una misión muy divertida."
+        },
+        {
+          "personaje": 0,
+          "texto": "Encuentra de dónde viene el sonido."
+        }
+      ],
+      "retos": [
+        {
+          "id": "lugares",
+          "tipo": "zonas",
+          "titulo": "Sonidos en diferentes lugares",
+          "elementos": [
+            "campana",
+            "tambor",
+            "trompeta",
+            "triangulo"
+          ],
+          "correcto": "campana",
+          "acierto": {
+            "efecto": "ilumina",
+            "repetir": "completo",
+            "sonido": "recompensa",
+            "voz": "zeus",
+            "texto": "¡La encontraste!"
+          },
+          "iOrigen": 1
+        }
+      ],
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Lo lograste! ¡Eres un experto escuchando!"
+      },
+      "insignia": {
+        "img": "img/insignia_explorador.svg",
+        "nombre": "Explorador de sonidos"
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Nariz">
+  <ellipse cx="120" cy="228" rx="45" ry="6" fill="#000" opacity="0.1"/>
+  <path d="M120 30 C95 55 70 100 62 145 C58 165 70 190 95 200 L120 205 L145 200 C170 190 182 165 178 145 C170 100 145 55 120 30 Z" fill="#ffc9c9" stroke="#e8590c" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="95" cy="175" rx="16" ry="12" fill="#ffa8a8" stroke="#e8590c" stroke-width="3"/>
+  <ellipse cx="145" cy="175" rx="16" ry="12" fill="#ffa8a8" stroke="#e8590c" stroke-width="3"/>
+  <g fill="none" stroke="#b197fc" stroke-width="4" stroke-linecap="round" opacity="0.8">
+    <path d="M55 80 Q40 70 45 55"/><path d="M185 80 Q200 70 195 55"/>
+  </g>
+</svg>

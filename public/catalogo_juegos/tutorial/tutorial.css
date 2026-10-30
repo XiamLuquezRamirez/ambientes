@@ -68,6 +68,8 @@ body.demo-activa .pj {
 .inicio-pj { display: none !important; }
 
 body.personajes-3d .dialogo-avatar { display: none !important; }
+/* Oculta el GIF 2D cuando personajes-juego monta el canvas 3D encima. */
+body.personajes-3d .pj-img { opacity: 0 !important; }
 
 .pj.pj-3d { position: relative; }
 .pj.pj-3d .pj-img,

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Insignia: eres un experto en sonidos">
+  <path d="M80 172 L56 252 L90 234 L106 260 L126 180 Z" fill="#8e24aa"/>
+  <path d="M160 172 L184 252 L150 234 L134 260 L114 180 Z" fill="#00897b"/>
+  <circle cx="120" cy="106" r="96" fill="#ffca28" stroke="#ff8f00" stroke-width="8"/>
+  <circle cx="120" cy="106" r="76" fill="#7e57c2" stroke="#fff3e0" stroke-width="6"/>
+  <path d="M74 118 C70 72 92 50 120 50 C148 50 170 72 166 118" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+  <rect x="62" y="108" width="28" height="44" rx="12" fill="#ff7043" stroke="#fff" stroke-width="5"/>
+  <rect x="150" y="108" width="28" height="44" rx="12" fill="#ff7043" stroke="#fff" stroke-width="5"/>
+  <g fill="#ffe082">
+    <path d="M110 88 L110 128 C104 124 94 126 92 134 C90 142 100 146 108 142 C114 140 118 134 118 128 L118 100 L132 104 L132 92 Z"/>
+    <path d="M120 20 L125 32 L138 32 L128 40 L132 52 L120 45 L108 52 L112 40 L102 32 L115 32 Z"/>
+    <path d="M48 70 L52 79 L62 79 L54 85 L57 94 L48 88 L39 94 L42 85 L34 79 L44 79 Z"/>
+    <path d="M192 70 L196 79 L206 79 L198 85 L201 94 L192 88 L183 94 L186 85 L178 79 L188 79 Z"/>
+  </g>
+</svg>

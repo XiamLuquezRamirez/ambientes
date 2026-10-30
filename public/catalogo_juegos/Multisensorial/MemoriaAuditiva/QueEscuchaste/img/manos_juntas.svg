@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Manos aplaudiendo">
+  <ellipse cx="120" cy="222" rx="84" ry="9" fill="#000" opacity="0.1"/>
+  <g stroke="#ffb300" stroke-width="6" stroke-linecap="round">
+    <path d="M120 40 V18"/>
+    <path d="M78 54 L64 36"/>
+    <path d="M162 54 L176 36"/>
+    <path d="M60 86 L38 78"/>
+    <path d="M180 86 L202 78"/>
+  </g>
+  <g fill="#ffcc80" stroke="#6d4c41" stroke-width="4" stroke-linejoin="round">
+    <rect x="76" y="164" width="44" height="50" rx="10" fill="#4fc3f7"/>
+    <rect x="120" y="164" width="44" height="50" rx="10" fill="#4fc3f7"/>
+    <path d="M120 70 C112 70 106 76 104 86 L92 132 C86 136 80 128 76 120 C70 112 62 116 64 126 C70 144 80 160 96 168 L120 168 Z"/>
+    <path d="M120 70 C128 70 134 76 136 86 L148 132 C154 136 160 128 164 120 C170 112 178 116 176 126 C170 144 160 160 144 168 L120 168 Z"/>
+  </g>
+  <path d="M120 72 V166" stroke="#6d4c41" stroke-width="4"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Insignia: explorador de sonidos">
+  <path d="M80 172 L56 252 L90 234 L106 260 L126 180 Z" fill="#6d4c41"/>
+  <path d="M160 172 L184 252 L150 234 L134 260 L114 180 Z" fill="#2e7d32"/>
+  <circle cx="120" cy="106" r="96" fill="#ffca28" stroke="#ff8f00" stroke-width="8"/>
+  <circle cx="120" cy="106" r="76" fill="#4fc3f7" stroke="#fff3e0" stroke-width="6"/>
+  <path d="M46 132 C70 120 92 126 120 132 C148 138 172 128 194 136 L190 160 C160 182 80 182 50 160 Z" fill="#66bb6a"/>
+  <path d="M120 176 C114 160 122 148 116 138" fill="none" stroke="#fff8e1" stroke-width="6" stroke-dasharray="8 8" stroke-linecap="round"/>
+  <path d="M74 74 C74 52 166 52 166 74 L178 80 C178 88 62 88 62 80 Z" fill="#a1887f"/>
+  <path d="M88 76 C88 40 152 40 152 76 Z" fill="#8d6e63"/>
+  <rect x="88" y="66" width="64" height="10" fill="#4e342e"/>
+  <path d="M96 104 C96 92 108 86 118 88 C130 90 134 102 130 112 C126 120 118 120 116 130" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <path d="M142 96 C148 104 148 116 142 124 M152 90 C162 102 162 118 152 130" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M120 20 L125 32 L138 32 L128 40 L132 52 L120 45 L108 52 L112 40 L102 32 L115 32 Z" fill="#fff59d"/>
+</svg>

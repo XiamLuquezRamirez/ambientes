@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Globo">
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M120 20 C70 20 44 66 44 112 C44 162 78 190 120 190 C162 190 196 162 196 112 C196 66 170 20 120 20 Z" fill="#ef5350"/>
+    <path d="M108 190 C112 200 110 208 120 214 C130 208 128 200 132 190" fill="#fafafa"/>
+    <path d="M120 214 C116 226 124 232 118 238" fill="none" stroke-width="3"/>
+  </g>
+  <ellipse cx="92" cy="78" rx="16" ry="26" fill="#fff" opacity="0.35" transform="rotate(-24 92 78)"/>
+</svg>

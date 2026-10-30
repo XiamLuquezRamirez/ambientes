@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Puerta musical">
+
+  <rect x="48" y="36" width="144" height="180" rx="16" fill="#6d4c41" stroke="#3e2723" stroke-width="4"/>
+  <rect x="64" y="52" width="112" height="148" rx="10" fill="#8d6e63"/>
+  <circle cx="156" cy="128" r="8" fill="#ffca28"/>
+  <path d="M70 70 H160 M70 96 H160 M70 122 H160" stroke="#ffd54f" stroke-width="4" opacity="0.7"/>
+  <path d="M36 40 L120 8 L204 40" fill="#7e57c2" stroke="#4527a0" stroke-width="4"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <circle cx="80" cy="80" r="70" fill="#ffd54f" stroke="#f9a825" stroke-width="8"/>
+  <circle cx="80" cy="80" r="52" fill="#fffde7"/>
+  <circle cx="80" cy="78" r="28" fill="none" stroke="#ef5350" stroke-width="6"/>
+  <circle cx="80" cy="78" r="18" fill="none" stroke="#42a5f5" stroke-width="5"/>
+  <circle cx="80" cy="78" r="8" fill="#ffca28"/>
+  <text x="80" y="132" text-anchor="middle" font-family="Arial" font-size="10" font-weight="bold" fill="#f57f17">CROMATISMO</text>
+</svg>

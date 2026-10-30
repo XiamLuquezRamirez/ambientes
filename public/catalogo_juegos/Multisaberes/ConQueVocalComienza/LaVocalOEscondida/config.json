@@ -1,0 +1,176 @@
+{
+  "nombre": "La Vocal O Escondida",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira el dibujo, escucha el nombre y toca la vocal!",
+    "demostracionAcierto": "¡Así se juega!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hay una vocal escondida en cada palabra!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Escucha y descubre cual es!"
+      }
+    ]
+  },
+  "demo": {
+    "objeto": "iglu",
+    "vocales": [
+      "i",
+      "a"
+    ],
+    "correcto": "i"
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "verBotonRepetir": true,
+    "mostrarProgreso": true,
+    "animaciones_opciones": true,
+    "efectosSonido": true,
+    "mostrarFeedBack": false
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "objetos": {},
+    "efectos": {}
+  },
+  "vocales": {
+    "a": {
+      "color": "#ff4d4f"
+    },
+    "e": {
+      "color": "#fab005"
+    },
+    "i": {
+      "color": "#15aabf"
+    },
+    "o": {
+      "color": "#be4bdb"
+    },
+    "u": {
+      "color": "#37b24d"
+    }
+  },
+  "objetos": {
+    "avion": {
+      "img": "img/avion.svg?v=20261020a",
+      "nombre": "avión",
+      "pronuncia": "AAvión",
+      "vocal": "a"
+    },
+    "elefante": {
+      "img": "img/elefante.svg?v=20261020a",
+      "nombre": "elefante",
+      "pronuncia": "EElefante",
+      "vocal": "e"
+    },
+    "iguana": {
+      "img": "img/iguana.svg?v=20261020a",
+      "nombre": "iguana",
+      "pronuncia": "IIguana",
+      "vocal": "i"
+    },
+    "oso": {
+      "img": "img/oso.svg?v=20261020a",
+      "nombre": "oso",
+      "pronuncia": "OOso",
+      "vocal": "o"
+    },
+    "uvas": {
+      "img": "img/uvas.svg?v=20261020a",
+      "nombre": "uvas",
+      "pronuncia": "UUvas",
+      "vocal": "u"
+    },
+    "estrella": {
+      "img": "img/estrella.svg?v=20261020a",
+      "nombre": "estrella",
+      "pronuncia": "estrella",
+      "vocal": "e"
+    },
+    "iglesia": {
+      "img": "img/iglesia.svg?v=20261020a",
+      "nombre": "iglesia",
+      "pronuncia": "iglesia",
+      "vocal": "i"
+    },
+    "oreja": {
+      "img": "img/oreja.svg?v=20261020a",
+      "nombre": "oreja",
+      "pronuncia": "oreja",
+      "vocal": "o"
+    },
+    "una": {
+      "img": "img/una.svg?v=20261020a",
+      "nombre": "uña",
+      "pronuncia": "uña",
+      "vocal": "u"
+    },
+    "iglu": {
+      "img": "img/iglu.svg?v=20261020a",
+      "nombre": "iglú",
+      "pronuncia": "iglú",
+      "vocal": "i"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El misterio de la vocal escondida",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hay una vocal escondida en cada palabra!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Escucha y descubre cual es!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "oreja",
+          "tipo": "fijo",
+          "objeto": "oreja",
+          "vocales": [
+            "a",
+            "e",
+            "i",
+            "o",
+            "u"
+          ],
+          "correcto": "o",
+          "acierto": {
+            "efecto": "ilumina",
+            "objeto": "mueve",
+            "celebra": true
+          },
+          "iOrigen": 3
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Descubriste las vocales escondidas!"
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Descubriste las vocales escondidas!"
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_lupa.svg",
+        "nombre": "Lupa mágica de las vocales"
+      }
+    }
+  ]
+}

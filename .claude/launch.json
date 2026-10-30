@@ -9,6 +9,18 @@
         "dev"
       ],
       "port": 5173
+    },
+    {
+      "name": "juegos-estatico",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8010",
+        "--directory",
+        "public"
+      ],
+      "port": 8010
     }
   ]
 }

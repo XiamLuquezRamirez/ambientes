@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Boton celeste">
+
+  <circle cx="120" cy="120" r="92" fill="#80deea" stroke="#fff" stroke-width="8"/>
+  <circle cx="120" cy="120" r="58" fill="#fff" opacity="0.2"/>
+  <circle cx="96" cy="96" r="16" fill="#fff" opacity="0.45"/>
+</svg>

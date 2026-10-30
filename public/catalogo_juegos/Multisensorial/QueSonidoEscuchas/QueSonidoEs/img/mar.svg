@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Mar">
+  <defs>
+    <clipPath id="mar-marco"><rect x="20" y="20" width="200" height="200" rx="40"/></clipPath>
+  </defs>
+  <g clip-path="url(#mar-marco)">
+    <rect x="20" y="20" width="200" height="200" fill="#bbdefb"/>
+    <circle cx="170" cy="62" r="22" fill="#ffd54f"/>
+    <path d="M20 112 C50 92 80 92 110 112 C140 132 170 132 220 108 L220 220 L20 220 Z" fill="#1e88e5"/>
+    <path d="M20 146 C50 126 80 126 110 146 C140 166 170 166 220 142 L220 220 L20 220 Z" fill="#1565c0"/>
+    <path d="M20 182 C50 162 80 162 110 182 C140 202 170 202 220 178 L220 220 L20 220 Z" fill="#0d47a1"/>
+    <path d="M30 108 C50 96 70 96 88 106" fill="none" stroke="#e3f2fd" stroke-width="6" stroke-linecap="round"/>
+    <path d="M124 140 C144 128 164 128 182 138" fill="none" stroke="#e3f2fd" stroke-width="6" stroke-linecap="round"/>
+    <path d="M44 176 C64 164 84 164 102 174" fill="none" stroke="#e3f2fd" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <rect x="20" y="20" width="200" height="200" rx="40" fill="none" stroke="#0d47a1" stroke-opacity="0.25" stroke-width="5"/>
+</svg>

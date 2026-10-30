@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fc8ff"/>
+      <stop offset="1" stop-color="#dff2ff"/>
+    </linearGradient>
+    <linearGradient id="pasto" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9bd96f"/>
+      <stop offset="1" stop-color="#5fae3e"/>
+    </linearGradient>
+    <radialGradient id="brillo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#fff8c4" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#fff8c4" stop-opacity="0"/>
+    </radialGradient>
+    <g id="nube">
+      <ellipse cx="0" cy="0" rx="90" ry="34" fill="#fff"/>
+      <ellipse cx="-48" cy="-14" rx="46" ry="34" fill="#fff"/>
+      <ellipse cx="34" cy="-26" rx="56" ry="42" fill="#fff"/>
+    </g>
+    <g id="arbolito">
+      <rect x="-9" y="-10" width="18" height="44" rx="4" fill="#7b4f35"/>
+      <circle cx="-22" cy="-24" r="32" fill="#3d9a41"/>
+      <circle cx="22" cy="-26" r="34" fill="#46a84a"/>
+      <circle cx="0" cy="-52" r="34" fill="#52b556"/>
+    </g>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#cielo)"/>
+  <circle cx="1720" cy="120" r="300" fill="url(#brillo)"/>
+
+  <use href="#nube" transform="translate(300 170) scale(1.1)" opacity="0.95"/>
+  <use href="#nube" transform="translate(1600 290) scale(0.9)" opacity="0.9"/>
+  <use href="#nube" transform="translate(240 560) scale(0.7)" opacity="0.8"/>
+  <use href="#nube" transform="translate(1700 600) scale(0.75)" opacity="0.8"/>
+
+  <!-- Colinas lejanas, horizonte bajo para dejar cielo a los globos -->
+  <path d="M0 740 Q300 650 640 720 T1280 700 T1920 710 V800 H0 Z" fill="#b6e39a"/>
+  <path d="M0 770 Q420 710 860 760 T1920 750 V800 H0 Z" fill="#a3d982"/>
+
+  <use href="#arbolito" transform="translate(140 760)"/>
+  <use href="#arbolito" transform="translate(260 772) scale(0.8)"/>
+  <use href="#arbolito" transform="translate(1660 758)"/>
+  <use href="#arbolito" transform="translate(1790 770) scale(0.85)"/>
+
+  <rect y="778" width="1920" height="302" fill="url(#pasto)"/>
+  <path d="M0 778 Q480 794 960 784 T1920 780 V806 H0 Z" fill="#8fd062" opacity="0.7"/>
+</svg>

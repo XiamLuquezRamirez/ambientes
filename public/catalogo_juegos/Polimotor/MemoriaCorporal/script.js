@@ -42,6 +42,23 @@ function acc() {
     return (gameConfig && gameConfig.accesibilidad) || {};
 }
 
+// Capa de animación GSAP + partículas Phaser 4 (memoria-anim.js). Solo visual:
+// si no está disponible se usa el comportamiento original.
+function anim() {
+    return (window.MemoriaAnim && window.MemoriaAnim.activo) ? window.MemoriaAnim : null;
+}
+
+// Audio compartido con Howler (../../shared/pednia-audio.js), tema del ambiente.
+// Si no está, se usa el audio original (new Audio).
+function sonido() {
+    return (window.PedniaAudio && window.PedniaAudio.activo) ? window.PedniaAudio : null;
+}
+
+/** Evento sonoro del tema; false si el tema no lo cubre. */
+function sonarEvento(nombre, opts) {
+    return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
+}
+
 function cancelarIntroPendiente() {
     introTimers.forEach(function (id) {
         clearTimeout(id);
@@ -168,6 +185,21 @@ window.cerrar_anuncio = cerrar_anuncio;
 
 function reproducirAudio(ruta, volumen, loop) {
     if (!ruta) return null;
+    if (sonido()) {
+        const vol = volumen != null ? volumen : 1;
+        if (loop) {
+            // Música de fondo: la del tema (si la trae) con fundidos; TextoVoz la sigue manejando.
+            const musica = sonido().musica(ruta);
+            if (musica) {
+                musica.volume = vol;
+                musica.play();
+                audioFondo = musica;
+                return musica;
+            }
+        } else if (sonido().archivo(ruta, vol)) {
+            return null;
+        }
+    }
     try {
         const audio = new Audio(ruta);
         audio.volume = volumen != null ? volumen : 1;
@@ -403,6 +435,7 @@ function actualizarProgreso() {
     const total = rondasSesion.length || (nivelElegido && nivelElegido.rondas ? nivelElegido.rondas.length : 0);
     el.hidden = !acc().mostrarProgreso || !total || juegoTerminado;
     el.innerHTML = '<i class="fa-solid fa-brain"></i> ' + Math.min(rondaActual + 1, total) + " / " + total;
+    if (anim()) anim().progreso(el);
 }
 
 function px(valor, fallback) {
@@ -871,7 +904,9 @@ async function mostrarSecuenciaObjetivo() {
         window.setTimeout(function () {
             if (caja) caja.classList.remove("secuencia-entra");
         }, 560);
+        if (anim()) anim().secuencia(caja);
     }
+    sonarEvento("aparece");
     await hablarTexto(textos().memoriza);
     if (juegoTerminado) return;
     if (acc().cuentaRegresiva !== false) {
@@ -879,6 +914,7 @@ async function mostrarSecuenciaObjetivo() {
         const etiqueta = textos().seOcultan || "Se ocultarán en...";
         const vozConteo = vozAleatoria();
         cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span>";
+        if (anim()) anim().cuentaEtiqueta(cuenta);
         await hablarConVoz(etiqueta, vozConteo);
         if (juegoTerminado) return;
         const segundos = 3;
@@ -902,6 +938,8 @@ async function mostrarSecuenciaObjetivo() {
         }
         for (let n = segundos; n >= 1; n--) {
             cuenta.innerHTML = '<span class="cuenta-label">' + etiqueta + "</span><strong>" + n + "</strong>";
+            if (anim()) anim().cuentaTick(cuenta);
+            sonarEvento("tic");
             await sleep(Math.round(espera / segundos));
             if (juegoTerminado) {
                 if (typeof TextoVoz !== "undefined") TextoVoz.detener();
@@ -949,6 +987,7 @@ async function mostrarOpcionesFalta() {
         window.setTimeout(function () {
             if (pista) pista.classList.remove("secuencia-sube");
         }, 600);
+        if (anim()) anim().pista(pista);
     }
     pintarOpcionesFalta(opcionesRonda);
     if (animacionesActivas()) await sleep(180);
@@ -981,7 +1020,9 @@ function pintarOpcionesFalta(lista) {
         }
         caja.appendChild(btn);
     });
+    sonarEvento("aparece", { retraso: 0.15 });
     if (animar) {
+        if (anim()) anim().entradaOpciones(caja);
         esperandoRespuesta = false;
         timerEntradaOpciones = setTimeout(function () {
             timerEntradaOpciones = null;
@@ -1023,11 +1064,15 @@ function elegirOpcion(op, btn) {
     if (!esperandoRespuesta || juegoTerminado || mostrandoMemoria || marcandoRespuesta) return;
     esperandoRespuesta = false;
     marcandoRespuesta = true;
+    sonarEvento("agarrar");
     if (op.ok) {
         btn.classList.add("opcion-ok");
         mostrarMarca(btn, "ok");
         revelarSecuenciaAcierto();
-        reproducirAudio(gameConfig.audios && gameConfig.audios.acierto);
+        if (anim()) anim().acierto(btn, document.querySelector("#secuencia .paso-acierto"));
+        if (!sonarEvento("correcto")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.acierto);
+        }
         Promise.all([sleep(1200), hablarFeedback("acierto")]).then(async function () {
             marcandoRespuesta = false;
             rondaActual += 1;
@@ -1038,7 +1083,10 @@ function elegirOpcion(op, btn) {
     } else {
         btn.classList.add("opcion-error");
         mostrarMarca(btn, "error");
-        reproducirAudio(gameConfig.audios && gameConfig.audios.error);
+        if (anim()) anim().error(btn);
+        if (!sonarEvento("error")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.error);
+        }
         fallosRonda += 1;
         const umbral = umbralAtenuar();
         if (umbral > 0 && fallosRonda % umbral === 0) {
@@ -1088,6 +1136,7 @@ function restaurarPista() {
         window.setTimeout(function () {
             if (pista) pista.classList.remove("secuencia-sube");
         }, 600);
+        if (anim()) anim().pista(pista);
     }
 }
 
@@ -1135,9 +1184,16 @@ function terminarJuego() {
     if (juegoTerminado) return;
     juegoTerminado = true;
     if (typeof Swal !== "undefined") Swal.close();
-    reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
+    if (sonarEvento("victoria")) {
+        // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+        // fanfarria son tonos puros agudos (se oía como "pitido").
+        sonido().agacharMusica(0.35);
+    } else {
+        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
+    }
     const cierre = (gameConfig.textos && gameConfig.textos.cierre) || "";
     hablarTexto(cierre);
+    if (anim()) anim().celebrar();
     const texto = document.getElementById("texto_final");
     if (texto) texto.textContent = cierre;
     setTimeout(function () {
@@ -1161,6 +1217,7 @@ $(document).ready(function () {
     sincronizarDialogoIntro3d();
     aplicarVisual();
     aplicarAccesibilidadInicial();
+    if (sonido()) sonido().usarTema(gameConfig.audios && gameConfig.audios.tema);
     TextoVoz.iniciar(gameConfig, introConfig, {
         obtenerAudioFondo: function () { return audioFondo; },
         volumenFondo: volumenFondoPct() / 100

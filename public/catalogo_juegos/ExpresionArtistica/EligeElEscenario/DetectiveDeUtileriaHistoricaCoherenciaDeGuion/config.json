@@ -1,0 +1,256 @@
+{
+  "nombre": "Detective de Utilería Histórica (Coherencia de Guion)",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Mira! Arrastra el telón correcto hacia la tarima.",
+    "demostracionAcierto": "¡Así se arma el escenario!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido a la mesa de control del gran teatro profesional!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy dirigirás luces, capas de profundidad y utilería histórica."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "elemento": "telon_mar"
+  },
+  "escenas": {
+    "teatro": "img/escenas/teatro.svg",
+    "control": "img/escenas/control.svg"
+  },
+  "elementos": {
+    "telon_blanco": {
+      "img": "img/telon_blanco.svg",
+      "nombre": "Telón blanco"
+    },
+    "telon_mar": {
+      "img": "img/telon_mar.svg",
+      "nombre": "Telón del Fondo del Mar"
+    },
+    "telon_desierto": {
+      "img": "img/telon_desierto.svg",
+      "nombre": "Telón del Desierto"
+    },
+    "telon_castillo": {
+      "img": "img/telon_castillo.svg",
+      "nombre": "Telón del Castillo"
+    },
+    "telon_espacio": {
+      "img": "img/telon_espacio.svg",
+      "nombre": "Telón Oscuro de Estrellas"
+    },
+    "telon_granja": {
+      "img": "img/telon_granja.svg",
+      "nombre": "Establo de granja"
+    },
+    "telon_bosque": {
+      "img": "img/telon_bosque.svg",
+      "nombre": "Bosque"
+    },
+    "telon_medieval": {
+      "img": "img/telon_medieval.svg",
+      "nombre": "Castillo medieval"
+    },
+    "telon_circo": {
+      "img": "img/telon_circo.svg",
+      "nombre": "Parque de circo"
+    },
+    "pececito": {
+      "img": "img/pececito.svg",
+      "nombre": "Pececito de Colores"
+    },
+    "zeus_rey": {
+      "img": "img/zeus_rey.svg",
+      "nombre": "Zeus rey"
+    },
+    "tractor": {
+      "img": "img/tractor.svg",
+      "nombre": "Un Tractor Rojo"
+    },
+    "cohete": {
+      "img": "img/cohete.svg",
+      "nombre": "Un Cohete"
+    },
+    "luna": {
+      "img": "img/luna.svg",
+      "nombre": "Luna Sonriente"
+    },
+    "astronautas": {
+      "img": "img/astronautas.svg",
+      "nombre": "Zoe y Zeus astronautas"
+    },
+    "zoe_exploradora": {
+      "img": "img/zoe_exploradora.svg",
+      "nombre": "Zoe exploradora"
+    },
+    "foco_dia": {
+      "img": "img/foco_dia.svg",
+      "nombre": "Foco amarillo de día"
+    },
+    "foco_noche": {
+      "img": "img/foco_noche.svg",
+      "nombre": "Foco Azul Nocturno"
+    },
+    "mar_fondo": {
+      "img": "img/mar_fondo.svg",
+      "nombre": "Fondo del Océano"
+    },
+    "barco": {
+      "img": "img/barco.svg",
+      "nombre": "Barco Pirata"
+    },
+    "cofre": {
+      "img": "img/cofre.svg",
+      "nombre": "Cofre del Tesoro"
+    },
+    "antorchas": {
+      "img": "img/antorchas.svg",
+      "nombre": "Antorchas de Fuego"
+    },
+    "trono": {
+      "img": "img/trono.svg",
+      "nombre": "Un Trono de Piedra"
+    },
+    "televisor": {
+      "img": "img/televisor.svg",
+      "nombre": "Un Televisor de Pantalla Plana"
+    },
+    "carpa": {
+      "img": "img/carpa.svg",
+      "nombre": "Una carpa de circo"
+    },
+    "mini_mar": {
+      "img": "img/mini_mar.svg",
+      "nombre": "Mar"
+    },
+    "mini_castillo": {
+      "img": "img/mini_castillo.svg",
+      "nombre": "Castillo"
+    },
+    "mini_granja": {
+      "img": "img/mini_granja.svg",
+      "nombre": "Granja"
+    },
+    "mini_espacio": {
+      "img": "img/mini_espacio.svg",
+      "nombre": "Espacio"
+    },
+    "vaquita": {
+      "img": "img/vaquita.svg",
+      "nombre": "Vaquita"
+    },
+    "pieza_demo": {
+      "img": "img/pieza_demo.svg",
+      "nombre": "Telón de ejemplo"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "Mesa de control",
+      "tema": "control",
+      "escena": "control",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido a la mesa de control del gran teatro profesional!"
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy dirigirás luces, capas de profundidad y utilería histórica."
+        }
+      ],
+      "galeria": [
+        "telon_bosque",
+        "mar_fondo",
+        "telon_medieval",
+        "telon_circo"
+      ],
+      "retos": [
+        {
+          "id": "piratas",
+          "tipo": "capas",
+          "titulo": "Montaje en Profundidad",
+          "rieles": [
+            {
+              "id": "fondo",
+              "etiqueta": "Riel A: Fondo",
+              "y": 22
+            },
+            {
+              "id": "centro",
+              "etiqueta": "Riel B: Centro",
+              "y": 48
+            },
+            {
+              "id": "frente",
+              "etiqueta": "Riel C: Frente",
+              "y": 74
+            }
+          ],
+          "piezas": [
+            {
+              "id": "mar_fondo",
+              "riel": "fondo"
+            },
+            {
+              "id": "barco",
+              "riel": "centro"
+            },
+            {
+              "id": "cofre",
+              "riel": "frente"
+            }
+          ],
+          "efecto": "engranaje",
+          "consigna": {
+            "voz": "zeus",
+            "texto": "¡Montemos la obra de piratas! Para que el escenario tenga profundidad, organiza los elementos en las capas correctas: el mar va al fondo, el barco en el centro y el cofre en el frente."
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Impresionante composición en profundidad! El público sentirá que está dentro del barco pirata."
+          },
+          "error": {
+            "voz": "zoe",
+            "texto": "Intenta en otro elemento"
+          },
+          "iOrigen": 1
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Qué talento para la producción teatral! Dominaste el uso de las luces, la profundidad espacial por capas y la utilería histórica."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡Convertiste una tarima vacía en mundos mágicos e inolvidables!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_director_arte.svg",
+        "nombre": "Director de Arte y Producción Escénica",
+        "sonido": "celebracion"
+      }
+    }
+  ]
+}

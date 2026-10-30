@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Pajarito">
+<ellipse cx="120" cy="224" rx="70" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <ellipse cx="120" cy="132" rx="58" ry="46" fill="#4fc3f7"/>
+    <ellipse cx="168" cy="128" rx="28" ry="18" fill="#81d4fa"/>
+    <path d="M168 122 L206 132 L168 142 Z" fill="#ffb74d"/>
+    <circle cx="100" cy="118" r="8" fill="#263238"/>
+    <circle cx="102" cy="116" r="3" fill="#fff"/>
+    <path d="M70 150 C40 120 36 168 78 176" fill="#0288d1"/>
+  </g>
+</svg>

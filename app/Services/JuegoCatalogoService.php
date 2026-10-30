@@ -79,10 +79,12 @@ class JuegoCatalogoService
 
     /**
      * Paquetes activos del ambiente (catálogo kiosco / recorrido niño).
+     * Si $edadAnos está definido, oculta variantes etarias que no apliquen
+     * (p. ej. "Encuentra el rojo (5-6 años)" a un niño de 3).
      *
      * @return list<array<string, mixed>>
      */
-    public function listarActivosPorAmbiente(int $ambienteId): array
+    public function listarActivosPorAmbiente(int $ambienteId, ?int $edadAnos = null): array
     {
         $consulta = Juego::query()
             ->activos()
@@ -96,7 +98,162 @@ class JuegoCatalogoService
             ->orderBy('slug')
             ->get();
 
-        return $this->serializarColeccionJson($juegos);
+        if ($edadAnos !== null) {
+            $juegos = $juegos
+                ->filter(fn (Juego $juego) => $this->juegoAptoParaEdad($juego, $edadAnos))
+                ->values();
+        }
+
+        return $this->serializarColeccionJson($juegos, $edadAnos !== null);
+    }
+
+    /**
+     * True si el paquete no declara edad o si la edad del niño cae en algún rango del juego.
+     */
+    public function juegoAptoParaEdad(Juego $juego, int $edadAnos): bool
+    {
+        $rangos = $this->rangosEdadDelJuego($juego);
+
+        if ($rangos === null) {
+            return true;
+        }
+
+        foreach ($rangos as $rango) {
+            if ($edadAnos >= $rango['min'] && $edadAnos <= $rango['max']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Rangos etarios del paquete (nombre, ruta o config.json). Null = sin restricción.
+     *
+     * @return list<array{min:int, max:int}>|null
+     */
+    public function rangosEdadDelJuego(Juego $juego): ?array
+    {
+        $textos = [];
+
+        foreach ([(string) $juego->nombre, (string) $juego->slug, (string) $juego->ruta] as $texto) {
+            if ($texto !== '') {
+                $textos[] = $texto;
+            }
+        }
+
+        foreach ($this->edadesDesdeConfigPaquete($juego) as $edad) {
+            $textos[] = $edad;
+        }
+
+        $rangos = [];
+        $vistos = [];
+
+        foreach ($textos as $texto) {
+            foreach ($this->extraerRangosEdadDeTexto($texto) as $rango) {
+                $clave = $rango['min'].'-'.$rango['max'];
+                if (isset($vistos[$clave])) {
+                    continue;
+                }
+                $vistos[$clave] = true;
+                $rangos[] = $rango;
+            }
+        }
+
+        return $rangos === [] ? null : $rangos;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function edadesDesdeConfigPaquete(Juego $juego): array
+    {
+        $ruta = trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, (string) $juego->ruta), DIRECTORY_SEPARATOR);
+        if ($ruta === '') {
+            return [];
+        }
+
+        $configPath = public_path($ruta.DIRECTORY_SEPARATOR.'config.json');
+        if (! is_file($configPath)) {
+            return [];
+        }
+
+        $cfg = json_decode((string) file_get_contents($configPath), true);
+        if (! is_array($cfg)) {
+            return [];
+        }
+
+        $edades = [];
+        foreach ($cfg['niveles'] ?? [] as $nivel) {
+            if (! is_array($nivel) || empty($nivel['edad'])) {
+                continue;
+            }
+            $edades[] = trim((string) $nivel['edad']);
+        }
+
+        return array_values(array_unique(array_filter($edades)));
+    }
+
+    /**
+     * @return list<array{min:int, max:int}>
+     */
+    public function extraerRangosEdadDeTexto(string $texto): array
+    {
+        $rangos = [];
+        $restante = $texto;
+
+        // Carpetas / slugs: EncuentraElRojo34Anos, encuentra-el-rojo-3-4-anos
+        if (preg_match_all('/(\d)(\d)Anos/i', $restante, $m, PREG_SET_ORDER)) {
+            foreach ($m as $hit) {
+                $rangos[] = $this->normalizarRango((int) $hit[1], (int) $hit[2]);
+            }
+            $restante = preg_replace('/(\d)(\d)Anos/i', ' ', $restante) ?? $restante;
+        }
+
+        if (preg_match_all('/(\d)-(\d)-anos/i', $restante, $m, PREG_SET_ORDER)) {
+            foreach ($m as $hit) {
+                $rangos[] = $this->normalizarRango((int) $hit[1], (int) $hit[2]);
+            }
+            $restante = preg_replace('/(\d)-(\d)-anos/i', ' ', $restante) ?? $restante;
+        }
+
+        // "3-4 años" / "(5-6 Años)" — consumir antes que la edad suelta.
+        if (preg_match_all('/(\d{1,2})\s*[-–]\s*(\d{1,2})\s*a[ñn]os?/iu', $restante, $m, PREG_SET_ORDER)) {
+            foreach ($m as $hit) {
+                $rangos[] = $this->normalizarRango((int) $hit[1], (int) $hit[2]);
+            }
+            $restante = preg_replace('/(\d{1,2})\s*[-–]\s*(\d{1,2})\s*a[ñn]os?/iu', ' ', $restante) ?? $restante;
+        }
+
+        if (preg_match_all('/(\d{1,2})\s*a[ñn]os?/iu', $restante, $m, PREG_SET_ORDER)) {
+            foreach ($m as $hit) {
+                $n = (int) $hit[1];
+                $rangos[] = $this->normalizarRango($n, $n);
+            }
+        }
+
+        return $rangos;
+    }
+
+    /**
+     * Quita sufijos "(3-4 Años)" del título para la tarjeta del kiosco.
+     */
+    public function nombreSinSufijoEdad(string $nombre): string
+    {
+        $limpio = preg_replace('/\s*\(\s*\d{1,2}(?:\s*[-–]\s*\d{1,2})?\s*a[ñn]os?\s*\)\s*/iu', ' ', $nombre) ?? $nombre;
+
+        return trim(preg_replace('/\s+/u', ' ', $limpio) ?? $limpio);
+    }
+
+    /**
+     * @return array{min:int, max:int}
+     */
+    private function normalizarRango(int $a, int $b): array
+    {
+        return [
+            'min' => min($a, $b),
+            'max' => max($a, $b),
+        ];
     }
 
     /**
@@ -144,10 +301,10 @@ class JuegoCatalogoService
     /**
      * @return list<array<string, mixed>>
      */
-    public function serializarColeccionJson(Collection $juegos): array
+    public function serializarColeccionJson(Collection $juegos, bool $ocultarSufijoEdad = false): array
     {
         return $juegos
-            ->map(fn (Juego $juego) => $this->serializarTarjeta($juego))
+            ->map(fn (Juego $juego) => $this->serializarTarjeta($juego, $ocultarSufijoEdad))
             ->values()
             ->all();
     }
@@ -155,15 +312,19 @@ class JuegoCatalogoService
     /**
      * @return array<string, mixed>
      */
-    public function serializarTarjeta(Juego $juego): array
+    public function serializarTarjeta(Juego $juego, bool $ocultarSufijoEdad = false): array
     {
         $cadena = $juego->cadenaCurricularResuelta();
+        $nombre = (string) $juego->nombre;
+        if ($ocultarSufijoEdad) {
+            $nombre = $this->nombreSinSufijoEdad($nombre);
+        }
 
         return [
             'slug' => $juego->slug,
             'ruta' => $juego->ruta,
             'url_paquete' => $juego->urlPaquete(),
-            'nombre' => $juego->nombre,
+            'nombre' => $nombre,
             'descripcion' => $juego->descripcion ?? '',
             'imagen_url' => $juego->urlImagen(),
             'color' => $juego->color ?: '#64748b',

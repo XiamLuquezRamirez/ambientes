@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Tel&#233;fono">
+  <ellipse cx="120" cy="226" rx="56" ry="7" fill="#000" opacity="0.1"/>
+  <rect x="70" y="16" width="100" height="204" rx="20" fill="#263238" stroke="#37474f" stroke-width="4"/>
+  <rect x="80" y="38" width="80" height="156" rx="8" fill="#4fc3f7"/>
+  <rect x="106" y="25" width="28" height="5" rx="2.5" fill="#90a4ae"/>
+  <circle cx="120" cy="207" r="6" fill="#546e7a"/>
+  <circle cx="120" cy="86" r="22" fill="#e1f5fe"/>
+  <circle cx="120" cy="80" r="9" fill="#0288d1"/>
+  <path d="M104 102 C106 92 134 92 136 102 Z" fill="#0288d1"/>
+  <rect x="96" y="118" width="48" height="6" rx="3" fill="#e1f5fe"/>
+  <circle cx="120" cy="158" r="20" fill="#43a047" stroke="#fff" stroke-width="3"/>
+  <path d="M110 148 C112 146 115 146 116 148 L119 152 C120 154 119 156 117 157 L116 158 C117 161 120 164 123 165 L124 164 C125 162 127 161 129 162 L133 165 C135 166 135 169 133 171 L131 173 C127 177 117 172 112 167 C107 162 106 152 110 148 Z" fill="#fff"/>
+</svg>

@@ -1,0 +1,1234 @@
+[
+  {
+    "grupo": "ExpresionArtistica/ColoresYFormas",
+    "newSlug": "los-circulos-bailarines-del-semaforo",
+    "newNombre": "Los Círculos Bailarines del Semáforo",
+    "oldCarpeta": "ConstruyeLaCasitaDeBloques",
+    "newCarpeta": "LosCirculosBailarinesDelSemaforo",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/ConstruyeLaCasitaDeBloques",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/LosCirculosBailarinesDelSemaforo"
+  },
+  {
+    "grupo": "ExpresionArtistica/ColoresYFormas",
+    "newSlug": "construye-la-casita-de-bloques",
+    "newNombre": "Construye la Casita de Bloques",
+    "oldCarpeta": "DisenaTuCuadroGeometricoLineasYBloquesPrimarios",
+    "newCarpeta": "ConstruyeLaCasitaDeBloques",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/DisenaTuCuadroGeometricoLineasYBloquesPrimarios",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/ConstruyeLaCasitaDeBloques"
+  },
+  {
+    "grupo": "ExpresionArtistica/ColoresYFormas",
+    "newSlug": "los-vagones-rectangulares-del-tren",
+    "newNombre": "Los Vagones Rectangulares del Tren",
+    "oldCarpeta": "ElGranCoheteGeometrico",
+    "newCarpeta": "LosVagonesRectangularesDelTren",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/ElGranCoheteGeometrico",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/LosVagonesRectangularesDelTren"
+  },
+  {
+    "grupo": "ExpresionArtistica/ColoresYFormas",
+    "newSlug": "el-gran-cohete-geometrico",
+    "newNombre": "El Gran Cohete Geométrico",
+    "oldCarpeta": "ElMosaicoDeTriangulosYColoresPatronesSimetricos",
+    "newCarpeta": "ElGranCoheteGeometrico",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/ElMosaicoDeTriangulosYColoresPatronesSimetricos",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/ElGranCoheteGeometrico"
+  },
+  {
+    "grupo": "ExpresionArtistica/ColoresYFormas",
+    "newSlug": "el-mosaico-de-triangulos-y-colores-patrones-simetricos",
+    "newNombre": "El Mosaico de Triángulos y Colores (Patrones Simétricos)",
+    "oldCarpeta": "LaGranCiudadGeometricaRetoSupremo",
+    "newCarpeta": "ElMosaicoDeTriangulosYColoresPatronesSimetricos",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/LaGranCiudadGeometricaRetoSupremo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/ElMosaicoDeTriangulosYColoresPatronesSimetricos"
+  },
+  {
+    "grupo": "ExpresionArtistica/ColoresYFormas",
+    "newSlug": "la-torre-de-los-cubos-magicos-volumen-y-perspectiva",
+    "newNombre": "La Torre de los Cubos Mágicos (Volumen y Perspectiva)",
+    "oldCarpeta": "LaTorreDeLosCubosMagicosVolumenYPerspectiva",
+    "newCarpeta": "LaTorreDeLosCubosMagicosVolumenYPerspectiva",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/LaTorreDeLosCubosMagicosVolumenYPerspectiva",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/LaTorreDeLosCubosMagicosVolumenYPerspectiva"
+  },
+  {
+    "grupo": "ExpresionArtistica/ColoresYFormas",
+    "newSlug": "disena-tu-cuadro-geometrico-lineas-y-bloques-primarios",
+    "newNombre": "Diseña Tu Cuadro Geométrico (Líneas y Bloques Primarios)",
+    "oldCarpeta": "LosCirculosBailarinesDelSemaforo",
+    "newCarpeta": "DisenaTuCuadroGeometricoLineasYBloquesPrimarios",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/LosCirculosBailarinesDelSemaforo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/DisenaTuCuadroGeometricoLineasYBloquesPrimarios"
+  },
+  {
+    "grupo": "ExpresionArtistica/ColoresYFormas",
+    "newSlug": "la-gran-ciudad-geometrica-reto-supremo",
+    "newNombre": "La Gran Ciudad Geométrica (Reto Supremo)",
+    "oldCarpeta": "LosVagonesRectangularesDelTren",
+    "newCarpeta": "LaGranCiudadGeometricaRetoSupremo",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/LosVagonesRectangularesDelTren",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ColoresYFormas/LaGranCiudadGeometricaRetoSupremo"
+  },
+  {
+    "grupo": "ExpresionArtistica/ComoMeSiento",
+    "newSlug": "el-ceno-fruncido-de-zeus-identifica-el-enojo",
+    "newNombre": "El Ceño Fruncido de Zeus (Identifica el Enojo)",
+    "oldCarpeta": "ElCenoFruncidoDeZeusIdentificaElEnojo",
+    "newCarpeta": "ElCenoFruncidoDeZeusIdentificaElEnojo",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/ElCenoFruncidoDeZeusIdentificaElEnojo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/ElCenoFruncidoDeZeusIdentificaElEnojo"
+  },
+  {
+    "grupo": "ExpresionArtistica/ComoMeSiento",
+    "newSlug": "el-gran-ensayo-de-baile-de-zoe-manejo-de-la-frustracion",
+    "newNombre": "El Gran Ensayo de Baile de Zoe (Manejo de la Frustración)",
+    "oldCarpeta": "ElGranEnsayoDeBaileDeZoeManejoDeLaFrustracion",
+    "newCarpeta": "ElGranEnsayoDeBaileDeZoeManejoDeLaFrustracion",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/ElGranEnsayoDeBaileDeZoeManejoDeLaFrustracion",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/ElGranEnsayoDeBaileDeZoeManejoDeLaFrustracion"
+  },
+  {
+    "grupo": "ExpresionArtistica/ComoMeSiento",
+    "newSlug": "la-caja-regalo-sorpresa-la-expresion-de-asombro",
+    "newNombre": "¡La Caja Regalo Sorpresa! (La Expresión de Asombro)",
+    "oldCarpeta": "LaCajaRegaloSorpresaLaExpresionDeAsombro",
+    "newCarpeta": "LaCajaRegaloSorpresaLaExpresionDeAsombro",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaCajaRegaloSorpresaLaExpresionDeAsombro",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaCajaRegaloSorpresaLaExpresionDeAsombro"
+  },
+  {
+    "grupo": "ExpresionArtistica/ComoMeSiento",
+    "newSlug": "la-entrega-del-premio-teatral-ajuste-de-intensidad",
+    "newNombre": "La Entrega del Premio Teatral (Ajuste de Intensidad)",
+    "oldCarpeta": "LaEntregaDelPremioTeatralAjusteDeIntensidad",
+    "newCarpeta": "LaEntregaDelPremioTeatralAjusteDeIntensidad",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaEntregaDelPremioTeatralAjusteDeIntensidad",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaEntregaDelPremioTeatralAjusteDeIntensidad"
+  },
+  {
+    "grupo": "ExpresionArtistica/ComoMeSiento",
+    "newSlug": "la-lagrima-del-conejito-identifica-la-tristeza",
+    "newNombre": "La Lágrima del Conejito (Identifica la Tristeza)",
+    "oldCarpeta": "LaLagrimaDelConejitoIdentificaLaTristeza",
+    "newCarpeta": "LaLagrimaDelConejitoIdentificaLaTristeza",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaLagrimaDelConejitoIdentificaLaTristeza",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaLagrimaDelConejitoIdentificaLaTristeza"
+  },
+  {
+    "grupo": "ExpresionArtistica/ComoMeSiento",
+    "newSlug": "la-obra-de-mimo-de-zeus-lectura-de-gestos-sin-hablar",
+    "newNombre": "La Obra de Mimo de Zeus (Lectura de Gestos Sin Hablar)",
+    "oldCarpeta": "LaObraDeMimoDeZeusLecturaDeGestosSinHablar",
+    "newCarpeta": "LaObraDeMimoDeZeusLecturaDeGestosSinHablar",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaObraDeMimoDeZeusLecturaDeGestosSinHablar",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaObraDeMimoDeZeusLecturaDeGestosSinHablar"
+  },
+  {
+    "grupo": "ExpresionArtistica/ComoMeSiento",
+    "newSlug": "la-sonrisa-de-zoe-identifica-la-alegria",
+    "newNombre": "La Sonrisa de Zoe (Identifica la Alegría)",
+    "oldCarpeta": "LaSonrisaDeZoeIdentificaLaAlegria",
+    "newCarpeta": "LaSonrisaDeZoeIdentificaLaAlegria",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaSonrisaDeZoeIdentificaLaAlegria",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ComoMeSiento/LaSonrisaDeZoeIdentificaLaAlegria"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaElDibujo",
+    "newSlug": "las-manchitas-de-la-amiga-mariquita",
+    "newNombre": "Las Manchitas de la Amiga Mariquita",
+    "oldCarpeta": "CompletaLasTorresDelCastilloPatronesDeLineas",
+    "newCarpeta": "LasManchitasDeLaAmigaMariquita",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/CompletaLasTorresDelCastilloPatronesDeLineas",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/LasManchitasDeLaAmigaMariquita"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaElDibujo",
+    "newSlug": "ponle-las-ruedas-al-carro-de-carreras",
+    "newNombre": "Ponle las Ruedas al Carro de Carreras",
+    "oldCarpeta": "ConectaLasEstrellasDelCoheteEspacialUnirPuntos",
+    "newCarpeta": "PonleLasRuedasAlCarroDeCarreras",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/ConectaLasEstrellasDelCoheteEspacialUnirPuntos",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/PonleLasRuedasAlCarroDeCarreras"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaElDibujo",
+    "newSlug": "los-coloridos-petalos-de-la-margarita",
+    "newNombre": "Los Coloridos Pétalos de la Margarita",
+    "oldCarpeta": "ElEspejoDeLaMariposaCompletaElLadoSimetrico",
+    "newCarpeta": "LosColoridosPetalosDeLaMargarita",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/ElEspejoDeLaMariposaCompletaElLadoSimetrico",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/LosColoridosPetalosDeLaMargarita"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaElDibujo",
+    "newSlug": "la-puerta-magica-de-la-casita-del-arbol",
+    "newNombre": "La Puerta Mágica de la Casita del Árbol",
+    "oldCarpeta": "LaPuertaMagicaDeLaCasitaDelArbol",
+    "newCarpeta": "LaPuertaMagicaDeLaCasitaDelArbol",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/LaPuertaMagicaDeLaCasitaDelArbol",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/LaPuertaMagicaDeLaCasitaDelArbol"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaElDibujo",
+    "newSlug": "el-espejo-de-la-mariposa-completa-el-lado-simetrico",
+    "newNombre": "El Espejo de la Mariposa (Completa el Lado Simétrico)",
+    "oldCarpeta": "LasManchitasDeLaAmigaMariquita",
+    "newCarpeta": "ElEspejoDeLaMariposaCompletaElLadoSimetrico",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/LasManchitasDeLaAmigaMariquita",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/ElEspejoDeLaMariposaCompletaElLadoSimetrico"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaElDibujo",
+    "newSlug": "conecta-las-estrellas-del-cohete-espacial-unir-puntos",
+    "newNombre": "Conecta las Estrellas del Cohete Espacial (Unir Puntos)",
+    "oldCarpeta": "LosColoridosPetalosDeLaMargarita",
+    "newCarpeta": "ConectaLasEstrellasDelCoheteEspacialUnirPuntos",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/LosColoridosPetalosDeLaMargarita",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/ConectaLasEstrellasDelCoheteEspacialUnirPuntos"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaElDibujo",
+    "newSlug": "restaura-al-robot-artista-encuentra-la-mitad-faltante",
+    "newNombre": "Restaura al Robot Artista (Encuentra la Mitad Faltante)",
+    "oldCarpeta": "PonleLasRuedasAlCarroDeCarreras",
+    "newCarpeta": "RestauraAlRobotArtistaEncuentraLaMitadFaltante",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/PonleLasRuedasAlCarroDeCarreras",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/RestauraAlRobotArtistaEncuentraLaMitadFaltante"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaElDibujo",
+    "newSlug": "completa-las-torres-del-castillo-patrones-de-lineas",
+    "newNombre": "Completa las Torres del Castillo (Patrones de Líneas)",
+    "oldCarpeta": "RestauraAlRobotArtistaEncuentraLaMitadFaltante",
+    "newCarpeta": "CompletaLasTorresDelCastilloPatronesDeLineas",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/RestauraAlRobotArtistaEncuentraLaMitadFaltante",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaElDibujo/CompletaLasTorresDelCastilloPatronesDeLineas"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaLaMelodia",
+    "newSlug": "quien-llama-a-la-puerta-ding-dong",
+    "newNombre": "¿Quién Llama a la Puerta? (Ding-Dong...)",
+    "oldCarpeta": "CompletaLaEscalaMagicaDoReMiFa",
+    "newCarpeta": "QuienLlamaALaPuertaDingDong",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/CompletaLaEscalaMagicaDoReMiFa",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/QuienLlamaALaPuertaDingDong"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaLaMelodia",
+    "newSlug": "la-escalerita-de-notas-do-re",
+    "newNombre": "La Escalerita de Notas (Do-Re-...)",
+    "oldCarpeta": "ElFinalDelHimnoDeLaEstacion",
+    "newCarpeta": "LaEscaleritaDeNotasDoRe",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/ElFinalDelHimnoDeLaEstacion",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/LaEscaleritaDeNotasDoRe"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaLaMelodia",
+    "newSlug": "el-final-feliz-del-pajarito",
+    "newNombre": "El Final Feliz del Pajarito",
+    "oldCarpeta": "ElFinalFelizDelPajarito",
+    "newCarpeta": "ElFinalFelizDelPajarito",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/ElFinalFelizDelPajarito",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/ElFinalFelizDelPajarito"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaLaMelodia",
+    "newSlug": "pasa-el-vagon-musical-al-tren",
+    "newNombre": "Pasa el Vagón Musical al Tren",
+    "oldCarpeta": "ElGranCierreDelConciertoRetoSupremo",
+    "newCarpeta": "PasaElVagonMusicalAlTren",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/ElGranCierreDelConciertoRetoSupremo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/PasaElVagonMusicalAlTren"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaLaMelodia",
+    "newSlug": "completa-la-escala-magica-do-re-mi-fa",
+    "newNombre": "Completa la Escala Mágica (Do-Re-Mi-Fa-...)",
+    "oldCarpeta": "LaEscaleritaDeNotasDoRe",
+    "newCarpeta": "CompletaLaEscalaMagicaDoReMiFa",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/LaEscaleritaDeNotasDoRe",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/CompletaLaEscalaMagicaDoReMiFa"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaLaMelodia",
+    "newSlug": "el-final-del-himno-de-la-estacion",
+    "newNombre": "El Final del Himno de la Estación",
+    "oldCarpeta": "PasaElVagonMusicalAlTren",
+    "newCarpeta": "ElFinalDelHimnoDeLaEstacion",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/PasaElVagonMusicalAlTren",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/ElFinalDelHimnoDeLaEstacion"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaLaMelodia",
+    "newSlug": "repara-la-partitura-rota-del-violin",
+    "newNombre": "Repara la Partitura Rota del Violín",
+    "oldCarpeta": "QuienLlamaALaPuertaDingDong",
+    "newCarpeta": "ReparaLaPartituraRotaDelViolin",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/QuienLlamaALaPuertaDingDong",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/ReparaLaPartituraRotaDelViolin"
+  },
+  {
+    "grupo": "ExpresionArtistica/CompletaLaMelodia",
+    "newSlug": "el-gran-cierre-del-concierto-reto-supremo",
+    "newNombre": "El Gran Cierre del Concierto (Reto Supremo)",
+    "oldCarpeta": "ReparaLaPartituraRotaDelViolin",
+    "newCarpeta": "ElGranCierreDelConciertoRetoSupremo",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/ReparaLaPartituraRotaDelViolin",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/CompletaLaMelodia/ElGranCierreDelConciertoRetoSupremo"
+  },
+  {
+    "grupo": "ExpresionArtistica/DescubreElInstrumento",
+    "newSlug": "que-hay-en-la-caja-sorpresa-el-tambor-magico",
+    "newNombre": "¿Qué Hay en la Caja Sorpresa? (El Tambor Mágico)",
+    "oldCarpeta": "CadaInstrumentoEnSuCasitaArrastreYOrden",
+    "newCarpeta": "QueHayEnLaCajaSorpresaElTamborMagico",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/CadaInstrumentoEnSuCasitaArrastreYOrden",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/QueHayEnLaCajaSorpresaElTamborMagico"
+  },
+  {
+    "grupo": "ExpresionArtistica/DescubreElInstrumento",
+    "newSlug": "haz-vibrar-las-cuerdas-de-la-guitarra",
+    "newNombre": "Haz Vibrar las Cuerdas de la Guitarra",
+    "oldCarpeta": "ConduceLaMelodiaSigueLaBatutaDeZoe",
+    "newCarpeta": "HazVibrarLasCuerdasDeLaGuitarra",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/ConduceLaMelodiaSigueLaBatutaDeZoe",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/HazVibrarLasCuerdasDeLaGuitarra"
+  },
+  {
+    "grupo": "ExpresionArtistica/DescubreElInstrumento",
+    "newSlug": "la-flauta-magica",
+    "newNombre": "La Flauta Mágica",
+    "oldCarpeta": "ElDueloDeInstrumentosQuienSuenaMasGrave",
+    "newCarpeta": "LaFlautaMagica",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/ElDueloDeInstrumentosQuienSuenaMasGrave",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/LaFlautaMagica"
+  },
+  {
+    "grupo": "ExpresionArtistica/DescubreElInstrumento",
+    "newSlug": "cada-instrumento-en-su-casita-arrastre-y-orden",
+    "newNombre": "Cada Instrumento en Su Casita (Arrastre y Orden)",
+    "oldCarpeta": "HazVibrarLasCuerdasDeLaGuitarra",
+    "newCarpeta": "CadaInstrumentoEnSuCasitaArrastreYOrden",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/HazVibrarLasCuerdasDeLaGuitarra",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/CadaInstrumentoEnSuCasitaArrastreYOrden"
+  },
+  {
+    "grupo": "ExpresionArtistica/DescubreElInstrumento",
+    "newSlug": "organiza-la-orquesta-en-el-escenario",
+    "newNombre": "Organiza la Orquesta en el Escenario",
+    "oldCarpeta": "OrganizaLaOrquestaEnElEscenario",
+    "newCarpeta": "OrganizaLaOrquestaEnElEscenario",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/OrganizaLaOrquestaEnElEscenario",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/OrganizaLaOrquestaEnElEscenario"
+  },
+  {
+    "grupo": "ExpresionArtistica/DescubreElInstrumento",
+    "newSlug": "el-duelo-de-instrumentos-quien-suena-mas-grave",
+    "newNombre": "El Duelo de Instrumentos (¿Quién Suena Más Grave?)",
+    "oldCarpeta": "QueHayEnLaCajaSorpresaElTamborMagico",
+    "newCarpeta": "ElDueloDeInstrumentosQuienSuenaMasGrave",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/QueHayEnLaCajaSorpresaElTamborMagico",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/ElDueloDeInstrumentosQuienSuenaMasGrave"
+  },
+  {
+    "grupo": "ExpresionArtistica/DescubreElInstrumento",
+    "oldSlug": "la-flauta-magica",
+    "newSlug": "conduce-la-melodia-sigue-la-batuta-de-zoe",
+    "oldNombre": "La Flauta Mágica",
+    "newNombre": "Conduce la Melodía (Sigue la Batuta de Zoe)",
+    "oldCarpeta": "LaFlautaMagica",
+    "newCarpeta": "ConduceLaMelodiaSigueLaBatutaDeZoe",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/LaFlautaMagica",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/DescubreElInstrumento/ConduceLaMelodiaSigueLaBatutaDeZoe"
+  },
+  {
+    "grupo": "ExpresionArtistica/EligeElEscenario",
+    "newSlug": "decora-el-escenario-de-la-granja",
+    "newNombre": "Decora el Escenario de la Granja",
+    "oldCarpeta": "DecoraElEscenarioDeLaGranja",
+    "newCarpeta": "DecoraElEscenarioDeLaGranja",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/DecoraElEscenarioDeLaGranja",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/DecoraElEscenarioDeLaGranja"
+  },
+  {
+    "grupo": "ExpresionArtistica/EligeElEscenario",
+    "newSlug": "detective-de-utileria-historica-coherencia-de-guion",
+    "newNombre": "Detective de Utilería Histórica (Coherencia de Guion)",
+    "oldCarpeta": "DetectiveDeUtileriaHistoricaCoherenciaDeGuion",
+    "newCarpeta": "DetectiveDeUtileriaHistoricaCoherenciaDeGuion",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/DetectiveDeUtileriaHistoricaCoherenciaDeGuion",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/DetectiveDeUtileriaHistoricaCoherenciaDeGuion"
+  },
+  {
+    "grupo": "ExpresionArtistica/EligeElEscenario",
+    "newSlug": "el-escenario-del-pececito-cantor",
+    "newNombre": "El Escenario del Pececito Cantor",
+    "oldCarpeta": "ElEscenarioDelPececitoCantor",
+    "newCarpeta": "ElEscenarioDelPececitoCantor",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/ElEscenarioDelPececitoCantor",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/ElEscenarioDelPececitoCantor"
+  },
+  {
+    "grupo": "ExpresionArtistica/EligeElEscenario",
+    "newSlug": "el-escenario-del-rey-y-la-corona",
+    "newNombre": "El Escenario del Rey y la Corona",
+    "oldCarpeta": "ElEscenarioDelReyYLaCorona",
+    "newCarpeta": "ElEscenarioDelReyYLaCorona",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/ElEscenarioDelReyYLaCorona",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/ElEscenarioDelReyYLaCorona"
+  },
+  {
+    "grupo": "ExpresionArtistica/EligeElEscenario",
+    "newSlug": "el-viaje-a-las-estrellas-escenario-completo",
+    "newNombre": "El Viaje a las Estrellas (Escenario Completo)",
+    "oldCarpeta": "ElViajeALasEstrellasEscenarioCompleto",
+    "newCarpeta": "ElViajeALasEstrellasEscenarioCompleto",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/ElViajeALasEstrellasEscenarioCompleto",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/ElViajeALasEstrellasEscenarioCompleto"
+  },
+  {
+    "grupo": "ExpresionArtistica/EligeElEscenario",
+    "newSlug": "montaje-en-profundidad-fondo-plano-medio-y-primer-plano",
+    "newNombre": "Montaje en Profundidad (Fondo, Plano Medio y Primer Plano)",
+    "oldCarpeta": "MontajeEnProfundidadFondoPlanoMedioYPrimerPlano",
+    "newCarpeta": "MontajeEnProfundidadFondoPlanoMedioYPrimerPlano",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/MontajeEnProfundidadFondoPlanoMedioYPrimerPlano",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EligeElEscenario/MontajeEnProfundidadFondoPlanoMedioYPrimerPlano"
+  },
+  {
+    "grupo": "ExpresionArtistica/ElMundoDeLosColores",
+    "newSlug": "dale-volumen-a-la-manzana-claro-y-oscuro",
+    "newNombre": "Dale Volumen a la Manzana (Claro y Oscuro)",
+    "oldCarpeta": "DaleVolumenALaManzanaClaroYOscuro",
+    "newCarpeta": "DaleVolumenALaManzanaClaroYOscuro",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/DaleVolumenALaManzanaClaroYOscuro",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/DaleVolumenALaManzanaClaroYOscuro"
+  },
+  {
+    "grupo": "ExpresionArtistica/ElMundoDeLosColores",
+    "newSlug": "el-arbol-de-huellas-de-colores-finger-painting",
+    "newNombre": "El Árbol de Huellas de Colores (Finger Painting)",
+    "oldCarpeta": "ElArbolDeHuellasDeColoresFingerPainting",
+    "newCarpeta": "ElArbolDeHuellasDeColoresFingerPainting",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/ElArbolDeHuellasDeColoresFingerPainting",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/ElArbolDeHuellasDeColoresFingerPainting"
+  },
+  {
+    "grupo": "ExpresionArtistica/ElMundoDeLosColores",
+    "newSlug": "el-clima-del-arte-colores-calidos-y-frios",
+    "newNombre": "El Clima del Arte (Colores Cálidos y Fríos)",
+    "oldCarpeta": "ElClimaDelArteColoresCalidosYFrios",
+    "newCarpeta": "ElClimaDelArteColoresCalidosYFrios",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/ElClimaDelArteColoresCalidosYFrios",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/ElClimaDelArteColoresCalidosYFrios"
+  },
+  {
+    "grupo": "ExpresionArtistica/ElMundoDeLosColores",
+    "newSlug": "el-pocillo-magico-mezcla-azul-y-amarillo",
+    "newNombre": "El Pocillo Mágico (Mezcla Azul y Amarillo)",
+    "oldCarpeta": "ElPocilloMagicoMezclaAzulYAmarillo",
+    "newCarpeta": "ElPocilloMagicoMezclaAzulYAmarillo",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/ElPocilloMagicoMezclaAzulYAmarillo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/ElPocilloMagicoMezclaAzulYAmarillo"
+  },
+  {
+    "grupo": "ExpresionArtistica/ElMundoDeLosColores",
+    "newSlug": "la-gran-obra-abstracta-el-lienzo-de-autor",
+    "newNombre": "La Gran Obra Abstracta (El Lienzo de Autor)",
+    "oldCarpeta": "LaGranObraAbstractaElLienzoDeAutor",
+    "newCarpeta": "LaGranObraAbstractaElLienzoDeAutor",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/LaGranObraAbstractaElLienzoDeAutor",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/LaGranObraAbstractaElLienzoDeAutor"
+  },
+  {
+    "grupo": "ExpresionArtistica/ElMundoDeLosColores",
+    "newSlug": "los-vagones-de-colores-clasifica-la-pintura",
+    "newNombre": "Los Vagones de Colores (Clasifica la Pintura)",
+    "oldCarpeta": "LosVagonesDeColoresClasificaLaPintura",
+    "newCarpeta": "LosVagonesDeColoresClasificaLaPintura",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/LosVagonesDeColoresClasificaLaPintura",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/LosVagonesDeColoresClasificaLaPintura"
+  },
+  {
+    "grupo": "ExpresionArtistica/ElMundoDeLosColores",
+    "newSlug": "salpicadura-de-colores-el-gran-cuadro-libre",
+    "newNombre": "Salpicadura de Colores (El Gran Cuadro Libre)",
+    "oldCarpeta": "SalpicaduraDeColoresElGranCuadroLibre",
+    "newCarpeta": "SalpicaduraDeColoresElGranCuadroLibre",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/SalpicaduraDeColoresElGranCuadroLibre",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/ElMundoDeLosColores/SalpicaduraDeColoresElGranCuadroLibre"
+  },
+  {
+    "grupo": "ExpresionArtistica/EncuentraLasDiferencias",
+    "newSlug": "que-le-falta-al-sombrero-del-osito",
+    "newNombre": "¿Qué Le Falta al Sombrero del Osito?",
+    "oldCarpeta": "ElCuadroHistoricoDelCaballeroEncuentraElObjetoAnacronico",
+    "newCarpeta": "QueLeFaltaAlSombreroDelOsito",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElCuadroHistoricoDelCaballeroEncuentraElObjetoAnacronico",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/QueLeFaltaAlSombreroDelOsito"
+  },
+  {
+    "grupo": "ExpresionArtistica/EncuentraLasDiferencias",
+    "newSlug": "el-sombrero-cambiado-del-gatito",
+    "newNombre": "El Sombrero Cambiado del Gatito",
+    "oldCarpeta": "ElJuegoDeLasEstatuasMemorizaYDetectaElCambio",
+    "newCarpeta": "ElSombreroCambiadoDelGatito",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElJuegoDeLasEstatuasMemorizaYDetectaElCambio",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElSombreroCambiadoDelGatito"
+  },
+  {
+    "grupo": "ExpresionArtistica/EncuentraLasDiferencias",
+    "newSlug": "la-flor-traviesa-que-sobra",
+    "newNombre": "La Flor Traviesa Que Sobra",
+    "oldCarpeta": "ElObjetoExtranoEnElBodegonQueNoVaAqui",
+    "newCarpeta": "LaFlorTraviesaQueSobra",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElObjetoExtranoEnElBodegonQueNoVaAqui",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/LaFlorTraviesaQueSobra"
+  },
+  {
+    "grupo": "ExpresionArtistica/EncuentraLasDiferencias",
+    "newSlug": "el-sol-con-gafas-y-la-nube-sonriente",
+    "newNombre": "El Sol Con Gafas y la Nube Sonriente",
+    "oldCarpeta": "ElReflejoRotoComparaElOriginalYElFalso",
+    "newCarpeta": "ElSolConGafasYLaNubeSonriente",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElReflejoRotoComparaElOriginalYElFalso",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElSolConGafasYLaNubeSonriente"
+  },
+  {
+    "grupo": "ExpresionArtistica/EncuentraLasDiferencias",
+    "newSlug": "el-objeto-extrano-en-el-bodegon-que-no-va-aqui",
+    "newNombre": "El Objeto Extraño en el Bodegón (¿Qué No Va Aquí?)",
+    "oldCarpeta": "ElSolConGafasYLaNubeSonriente",
+    "newCarpeta": "ElObjetoExtranoEnElBodegonQueNoVaAqui",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElSolConGafasYLaNubeSonriente",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElObjetoExtranoEnElBodegonQueNoVaAqui"
+  },
+  {
+    "grupo": "ExpresionArtistica/EncuentraLasDiferencias",
+    "newSlug": "el-juego-de-las-estatuas-memoriza-y-detecta-el-cambio",
+    "newNombre": "El Juego de las Estatuas (Memoriza y Detecta el Cambio)",
+    "oldCarpeta": "ElSombreroCambiadoDelGatito",
+    "newCarpeta": "ElJuegoDeLasEstatuasMemorizaYDetectaElCambio",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElSombreroCambiadoDelGatito",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElJuegoDeLasEstatuasMemorizaYDetectaElCambio"
+  },
+  {
+    "grupo": "ExpresionArtistica/EncuentraLasDiferencias",
+    "newSlug": "el-reflejo-roto-compara-el-original-y-el-falso",
+    "newNombre": "El Reflejo Roto (Compara el Original y el Falso)",
+    "oldCarpeta": "LaFlorTraviesaQueSobra",
+    "newCarpeta": "ElReflejoRotoComparaElOriginalYElFalso",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/LaFlorTraviesaQueSobra",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElReflejoRotoComparaElOriginalYElFalso"
+  },
+  {
+    "grupo": "ExpresionArtistica/EncuentraLasDiferencias",
+    "newSlug": "el-cuadro-historico-del-caballero-encuentra-el-objeto-anacronico",
+    "newNombre": "El Cuadro Histórico del Caballero (Encuentra el Objeto Anacrónico)",
+    "oldCarpeta": "QueLeFaltaAlSombreroDelOsito",
+    "newCarpeta": "ElCuadroHistoricoDelCaballeroEncuentraElObjetoAnacronico",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/QueLeFaltaAlSombreroDelOsito",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/EncuentraLasDiferencias/ElCuadroHistoricoDelCaballeroEncuentraElObjetoAnacronico"
+  },
+  {
+    "grupo": "ExpresionArtistica/MemoriaMusical",
+    "newSlug": "la-cancion-de-2-notas-del-conejito",
+    "newNombre": "La Canción de 2 Notas del Conejito",
+    "oldCarpeta": "ElCodigoSecretoDeLaOrquestaSecuenciaDe4",
+    "newCarpeta": "LaCancionDe2NotasDelConejito",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/ElCodigoSecretoDeLaOrquestaSecuenciaDe4",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/LaCancionDe2NotasDelConejito"
+  },
+  {
+    "grupo": "ExpresionArtistica/MemoriaMusical",
+    "newSlug": "el-trio-musical-del-bosque",
+    "newNombre": "El Trío Musical del Bosque",
+    "oldCarpeta": "ElEspejoMusicalDeAtrasHaciaAdelante",
+    "newCarpeta": "ElTrioMusicalDelBosque",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/ElEspejoMusicalDeAtrasHaciaAdelante",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/ElTrioMusicalDelBosque"
+  },
+  {
+    "grupo": "ExpresionArtistica/MemoriaMusical",
+    "newSlug": "la-bateria-de-colores-de-zoe",
+    "newNombre": "La Batería de Colores de Zoe",
+    "oldCarpeta": "ElGranPianoLaserSecuenciaDe5Notas",
+    "newCarpeta": "LaBateriaDeColoresDeZoe",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/ElGranPianoLaserSecuenciaDe5Notas",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/LaBateriaDeColoresDeZoe"
+  },
+  {
+    "grupo": "ExpresionArtistica/MemoriaMusical",
+    "newSlug": "las-campanas-del-puente-encantado",
+    "newNombre": "Las Campanas del Puente Encantado",
+    "oldCarpeta": "ElTrioMusicalDelBosque",
+    "newCarpeta": "LasCampanasDelPuenteEncantado",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/ElTrioMusicalDelBosque",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/LasCampanasDelPuenteEncantado"
+  },
+  {
+    "grupo": "ExpresionArtistica/MemoriaMusical",
+    "newSlug": "el-codigo-secreto-de-la-orquesta-secuencia-de-4",
+    "newNombre": "El Código Secreto de la Orquesta (Secuencia de 4)",
+    "oldCarpeta": "LaBateriaDeColoresDeZoe",
+    "newCarpeta": "ElCodigoSecretoDeLaOrquestaSecuenciaDe4",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/LaBateriaDeColoresDeZoe",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/ElCodigoSecretoDeLaOrquestaSecuenciaDe4"
+  },
+  {
+    "grupo": "ExpresionArtistica/MemoriaMusical",
+    "newSlug": "el-gran-piano-laser-secuencia-de-5-notas",
+    "newNombre": "El Gran Piano Láser (Secuencia de 5 Notas)",
+    "oldCarpeta": "LaCancionDe2NotasDelConejito",
+    "newCarpeta": "ElGranPianoLaserSecuenciaDe5Notas",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/LaCancionDe2NotasDelConejito",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/ElGranPianoLaserSecuenciaDe5Notas"
+  },
+  {
+    "grupo": "ExpresionArtistica/MemoriaMusical",
+    "newSlug": "el-espejo-musical-de-atras-hacia-adelante",
+    "newNombre": "El Espejo Musical (De Atrás Hacia Adelante)",
+    "oldCarpeta": "LasCampanasDelPuenteEncantado",
+    "newCarpeta": "ElEspejoMusicalDeAtrasHaciaAdelante",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/LasCampanasDelPuenteEncantado",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/ElEspejoMusicalDeAtrasHaciaAdelante"
+  },
+  {
+    "grupo": "ExpresionArtistica/MemoriaMusical",
+    "newSlug": "la-sinfonia-del-estudio-maestro",
+    "newNombre": "La Sinfonía del Estudio Maestro",
+    "oldCarpeta": "LaSinfoniaDelEstudioMaestro",
+    "newCarpeta": "LaSinfoniaDelEstudioMaestro",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/LaSinfoniaDelEstudioMaestro",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/MemoriaMusical/LaSinfoniaDelEstudioMaestro"
+  },
+  {
+    "grupo": "ExpresionArtistica/QueSonidoEscuchas",
+    "newSlug": "quien-hace-muuu-el-animal-del-establo",
+    "newNombre": "¿Quién Hace 'Muuu'? (El Animal del Establo)",
+    "oldCarpeta": "ElMisterioDelBosqueNocturnoBuhoVsLobo",
+    "newCarpeta": "QuienHaceMuuuElAnimalDelEstablo",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/ElMisterioDelBosqueNocturnoBuhoVsLobo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/QuienHaceMuuuElAnimalDelEstablo"
+  },
+  {
+    "grupo": "ExpresionArtistica/QueSonidoEscuchas",
+    "newSlug": "que-suena-en-la-cocina-el-sonido-del-agua",
+    "newNombre": "¿Qué Suena en la Cocina? (El Sonido del Agua)",
+    "oldCarpeta": "LaGranTormentaElectricaTruenoYViento",
+    "newCarpeta": "QueSuenaEnLaCocinaElSonidoDelAgua",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/LaGranTormentaElectricaTruenoYViento",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/QueSuenaEnLaCocinaElSonidoDelAgua"
+  },
+  {
+    "grupo": "ExpresionArtistica/QueSonidoEscuchas",
+    "newSlug": "que-vehiculo-pasa-por-la-calle-la-ambulancia",
+    "newNombre": "¿Qué Vehículo Pasa por la Calle? (La Ambulancia)",
+    "oldCarpeta": "QuePasaEnLaGranCiudadTrenVsCamion",
+    "newCarpeta": "QueVehiculoPasaPorLaCalleLaAmbulancia",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/QuePasaEnLaGranCiudadTrenVsCamion",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/QueVehiculoPasaPorLaCalleLaAmbulancia"
+  },
+  {
+    "grupo": "ExpresionArtistica/QueSonidoEscuchas",
+    "newSlug": "que-pasa-en-la-gran-ciudad-tren-vs-camion",
+    "newNombre": "¿Qué Pasa en la Gran Ciudad? (Tren vs. Camión)",
+    "oldCarpeta": "QueSuenaEnLaCocinaElSonidoDelAgua",
+    "newCarpeta": "QuePasaEnLaGranCiudadTrenVsCamion",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/QueSuenaEnLaCocinaElSonidoDelAgua",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/QuePasaEnLaGranCiudadTrenVsCamion"
+  },
+  {
+    "grupo": "ExpresionArtistica/QueSonidoEscuchas",
+    "newSlug": "el-misterio-del-bosque-nocturno-buho-vs-lobo",
+    "newNombre": "El Misterio del Bosque Nocturno (Búho vs. Lobo)",
+    "oldCarpeta": "QueVehiculoPasaPorLaCalleLaAmbulancia",
+    "newCarpeta": "ElMisterioDelBosqueNocturnoBuhoVsLobo",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/QueVehiculoPasaPorLaCalleLaAmbulancia",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/ElMisterioDelBosqueNocturnoBuhoVsLobo"
+  },
+  {
+    "grupo": "ExpresionArtistica/QueSonidoEscuchas",
+    "newSlug": "la-gran-tormenta-electrica-trueno-y-viento",
+    "newNombre": "La Gran Tormenta Eléctrica (Trueno y Viento)",
+    "oldCarpeta": "QuienHaceMuuuElAnimalDelEstablo",
+    "newCarpeta": "LaGranTormentaElectricaTruenoYViento",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/QuienHaceMuuuElAnimalDelEstablo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QueSonidoEscuchas/LaGranTormentaElectricaTruenoYViento"
+  },
+  {
+    "grupo": "ExpresionArtistica/QuienUsaQue",
+    "newSlug": "el-pincel-de-la-pintora-zoe",
+    "newNombre": "El Pincel de la Pintora Zoe",
+    "oldCarpeta": "ConstruyeElTelescopioEspacialEnsamblajeYRazonamiento",
+    "newCarpeta": "ElPincelDeLaPintoraZoe",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ConstruyeElTelescopioEspacialEnsamblajeYRazonamiento",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ElPincelDeLaPintoraZoe"
+  },
+  {
+    "grupo": "ExpresionArtistica/QuienUsaQue",
+    "newSlug": "el-estetoscopio-del-doctor-zeus",
+    "newNombre": "El Estetoscopio del Doctor Zeus",
+    "oldCarpeta": "ElCucharonDeLaChefZoe",
+    "newCarpeta": "ElEstetoscopioDelDoctorZeus",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ElCucharonDeLaChefZoe",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ElEstetoscopioDelDoctorZeus"
+  },
+  {
+    "grupo": "ExpresionArtistica/QuienUsaQue",
+    "newSlug": "el-cucharon-de-la-chef-zoe",
+    "newNombre": "El Cucharón de la Chef Zoe",
+    "oldCarpeta": "ElEstetoscopioDelDoctorZeus",
+    "newCarpeta": "ElCucharonDeLaChefZoe",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ElEstetoscopioDelDoctorZeus",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ElCucharonDeLaChefZoe"
+  },
+  {
+    "grupo": "ExpresionArtistica/QuienUsaQue",
+    "newSlug": "el-microfono-del-cantante-zeus",
+    "newNombre": "El Micrófono del Cantante Zeus",
+    "oldCarpeta": "ElMicrofonoDelCantanteZeus",
+    "newCarpeta": "ElMicrofonoDelCantanteZeus",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ElMicrofonoDelCantanteZeus",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ElMicrofonoDelCantanteZeus"
+  },
+  {
+    "grupo": "ExpresionArtistica/QuienUsaQue",
+    "newSlug": "construye-el-telescopio-espacial",
+    "newNombre": "Construye el Telescopio Espacial",
+    "oldCarpeta": "ElPincelDeLaPintoraZoe",
+    "newCarpeta": "ConstruyeElTelescopioEspacial",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ElPincelDeLaPintoraZoe",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/ConstruyeElTelescopioEspacial"
+  },
+  {
+    "grupo": "ExpresionArtistica/QuienUsaQue",
+    "newSlug": "enciende-la-lupa-ultravioleta-unir-puntos-y-seguir-pistas",
+    "newNombre": "Enciende la Lupa Ultravioleta (Unir Puntos y Seguir Pistas)",
+    "oldCarpeta": "EnciendeLaLupaUltravioletaUnirPuntosYSeguirPistas",
+    "newCarpeta": "EnciendeLaLupaUltravioletaUnirPuntosYSeguirPistas",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/EnciendeLaLupaUltravioletaUnirPuntosYSeguirPistas",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/EnciendeLaLupaUltravioletaUnirPuntosYSeguirPistas"
+  },
+  {
+    "grupo": "ExpresionArtistica/QuienUsaQue",
+    "newSlug": "la-batuta-musical",
+    "newNombre": "La Batuta Musical",
+    "oldCarpeta": "LaBatutaMusicalDesafioDeMovimientoYRitmo",
+    "newCarpeta": "LaBatutaMusical",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/LaBatutaMusicalDesafioDeMovimientoYRitmo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/QuienUsaQue/LaBatutaMusical"
+  },
+  {
+    "grupo": "ExpresionArtistica/RompecabezasArtistico",
+    "newSlug": "completa-el-sol-sonriente-rompecabezas-de-2-mitades",
+    "newNombre": "Completa el Sol Sonriente (Rompecabezas de 2 Mitades)",
+    "oldCarpeta": "CompletaElSolSonrienteRompecabezasDe2Mitades",
+    "newCarpeta": "CompletaElSolSonrienteRompecabezasDe2Mitades",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/CompletaElSolSonrienteRompecabezasDe2Mitades",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/CompletaElSolSonrienteRompecabezasDe2Mitades"
+  },
+  {
+    "grupo": "ExpresionArtistica/RompecabezasArtistico",
+    "newSlug": "el-gatito-de-colores-rompecabezas-de-3-piezas",
+    "newNombre": "El Gatito de Colores (Rompecabezas de 3 Piezas)",
+    "oldCarpeta": "ElCuadradoMagicoDeFormasRestauraElCuadroGeometrico",
+    "newCarpeta": "ElGatitoDeColoresRompecabezasDe3Piezas",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElCuadradoMagicoDeFormasRestauraElCuadroGeometrico",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElGatitoDeColoresRompecabezasDe3Piezas"
+  },
+  {
+    "grupo": "ExpresionArtistica/RompecabezasArtistico",
+    "newSlug": "la-cesta-de-frutas-encaje-de-siluetas",
+    "newNombre": "La Cesta de Frutas (Encaje de Siluetas)",
+    "oldCarpeta": "ElGatitoDeColoresRompecabezasDe3Piezas",
+    "newCarpeta": "LaCestaDeFrutasEncajeDeSiluetas",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElGatitoDeColoresRompecabezasDe3Piezas",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/LaCestaDeFrutasEncajeDeSiluetas"
+  },
+  {
+    "grupo": "ExpresionArtistica/RompecabezasArtistico",
+    "newSlug": "el-gran-arcoiris-magico-el-cuadro-final",
+    "newNombre": "El Gran Arcoíris Mágico (El Cuadro Final)",
+    "oldCarpeta": "ElGranArbolBajoLaLunaRompecabezasDeSiluetas",
+    "newCarpeta": "ElGranArcoirisMagicoElCuadroFinal",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElGranArbolBajoLaLunaRompecabezasDeSiluetas",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElGranArcoirisMagicoElCuadroFinal"
+  },
+  {
+    "grupo": "ExpresionArtistica/RompecabezasArtistico",
+    "newSlug": "el-cuadrado-magico-de-formas-restaura-el-cuadro-geometrico",
+    "newNombre": "El Cuadrado Mágico de Formas (Restaura el Cuadro Geométrico)",
+    "oldCarpeta": "ElGranArcoirisMagicoElCuadroFinal",
+    "newCarpeta": "ElCuadradoMagicoDeFormasRestauraElCuadroGeometrico",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElGranArcoirisMagicoElCuadroFinal",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElCuadradoMagicoDeFormasRestauraElCuadroGeometrico"
+  },
+  {
+    "grupo": "ExpresionArtistica/RompecabezasArtistico",
+    "newSlug": "el-gran-arbol-bajo-la-luna-rompecabezas-de-siluetas",
+    "newNombre": "El Gran Árbol Bajo la Luna (Rompecabezas de Siluetas)",
+    "oldCarpeta": "ElGranGloboAerostaticoArmaLosColores",
+    "newCarpeta": "ElGranArbolBajoLaLunaRompecabezasDeSiluetas",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElGranGloboAerostaticoArmaLosColores",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElGranArbolBajoLaLunaRompecabezasDeSiluetas"
+  },
+  {
+    "grupo": "ExpresionArtistica/RompecabezasArtistico",
+    "newSlug": "el-gran-globo-aerostatico-arma-los-colores",
+    "newNombre": "El Gran Globo Aerostático (Arma los Colores)",
+    "oldCarpeta": "LaCasitaDelPintorEncajeDeFormas",
+    "newCarpeta": "ElGranGloboAerostaticoArmaLosColores",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/LaCasitaDelPintorEncajeDeFormas",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/ElGranGloboAerostaticoArmaLosColores"
+  },
+  {
+    "grupo": "ExpresionArtistica/RompecabezasArtistico",
+    "newSlug": "la-casita-del-pintor-encaje-de-formas",
+    "newNombre": "La Casita del Pintor (Encaje de Formas)",
+    "oldCarpeta": "LaCestaDeFrutasEncajeDeSiluetas",
+    "newCarpeta": "LaCasitaDelPintorEncajeDeFormas",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/LaCestaDeFrutasEncajeDeSiluetas",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/RompecabezasArtistico/LaCasitaDelPintorEncajeDeFormas"
+  },
+  {
+    "grupo": "ExpresionArtistica/SigueElRitmo",
+    "newSlug": "sigue-el-pulso-del-tambor-magico",
+    "newNombre": "Sigue el Pulso del Tambor Mágico",
+    "oldCarpeta": "ElBaileDeLosPiesPasoPasoYPausa",
+    "newCarpeta": "SigueElPulsoDelTamborMagico",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/ElBaileDeLosPiesPasoPasoYPausa",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/SigueElPulsoDelTamborMagico"
+  },
+  {
+    "grupo": "ExpresionArtistica/SigueElRitmo",
+    "newSlug": "la-cancion-de-los-aplausos",
+    "newNombre": "La Canción de los Aplausos",
+    "oldCarpeta": "ElCompasDelBuhoPercusionistaPalmadaTamborPalmada",
+    "newCarpeta": "LaCancionDeLosAplausos",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/ElCompasDelBuhoPercusionistaPalmadaTamborPalmada",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/LaCancionDeLosAplausos"
+  },
+  {
+    "grupo": "ExpresionArtistica/SigueElRitmo",
+    "newSlug": "el-baile-de-los-pies-paso-paso-y-pausa",
+    "newNombre": "El Baile de los Pies (Paso, Paso y Pausa)",
+    "oldCarpeta": "LaCancionDeLosAplausos",
+    "newCarpeta": "ElBaileDeLosPiesPasoPasoYPausa",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/LaCancionDeLosAplausos",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/ElBaileDeLosPiesPasoPasoYPausa"
+  },
+  {
+    "grupo": "ExpresionArtistica/SigueElRitmo",
+    "newSlug": "el-compas-del-buho-percusionista-palmada-tambor-palmada",
+    "newNombre": "El Compás del Búho Percusionista (Palmada - Tambor - Palmada)",
+    "oldCarpeta": "LaGranBateriaDelConciertoDeRock",
+    "newCarpeta": "ElCompasDelBuhoPercusionistaPalmadaTamborPalmada",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/LaGranBateriaDelConciertoDeRock",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/ElCompasDelBuhoPercusionistaPalmadaTamborPalmada"
+  },
+  {
+    "grupo": "ExpresionArtistica/SigueElRitmo",
+    "newSlug": "los-grandes-instrumentos-1-2-3",
+    "newNombre": "Los Grandes Instrumentos (1-2-3)",
+    "oldCarpeta": "SigueElPulsoDelTamborMagico",
+    "newCarpeta": "LosGrandesInstrumentos123",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/SigueElPulsoDelTamborMagico",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/LosGrandesInstrumentos123"
+  },
+  {
+    "grupo": "ExpresionArtistica/SigueElRitmo",
+    "oldSlug": "los-grandes-instrumentos-1-2-3",
+    "newSlug": "la-gran-bateria-del-concierto-de-rock",
+    "oldNombre": "Los Grandes Instrumentos (1-2-3)",
+    "newNombre": "La Gran Batería del Concierto de Rock",
+    "oldCarpeta": "LosGrandesInstrumentos123",
+    "newCarpeta": "LaGranBateriaDelConciertoDeRock",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/LosGrandesInstrumentos123",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/SigueElRitmo/LaGranBateriaDelConciertoDeRock"
+  },
+  {
+    "grupo": "ExpresionArtistica/VisteAlArtista",
+    "newSlug": "la-capa-de-la-super-heroina-zoe",
+    "newNombre": "La Capa de la Súper Heroína Zoe",
+    "oldCarpeta": "ElCascoDelBomberoZeus",
+    "newCarpeta": "LaCapaDeLaSuperHeroinaZoe",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElCascoDelBomberoZeus",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/LaCapaDeLaSuperHeroinaZoe"
+  },
+  {
+    "grupo": "ExpresionArtistica/VisteAlArtista",
+    "newSlug": "el-casco-del-bombero-zeus",
+    "newNombre": "El Casco del Bombero Zeus",
+    "oldCarpeta": "ElGranDesafioDeCaracterizacion3PiezasDeExtremoAExtremo",
+    "newCarpeta": "ElCascoDelBomberoZeus",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElGranDesafioDeCaracterizacion3PiezasDeExtremoAExtremo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElCascoDelBomberoZeus"
+  },
+  {
+    "grupo": "ExpresionArtistica/VisteAlArtista",
+    "newSlug": "la-nariz-roja-del-payasito",
+    "newNombre": "La Nariz Roja del Payasito",
+    "oldCarpeta": "ElMagoMagicoRetoFinalDe2Piezas",
+    "newCarpeta": "LaNarizRojaDelPayasito",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElMagoMagicoRetoFinalDe2Piezas",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/LaNarizRojaDelPayasito"
+  },
+  {
+    "grupo": "ExpresionArtistica/VisteAlArtista",
+    "newSlug": "el-mago-magico-reto-final-de-2-piezas",
+    "newNombre": "El Mago Mágico (Reto Final de 2 Piezas)",
+    "oldCarpeta": "ElSombreroYLaLupaDelDetectiveRolDeInvestigacion",
+    "newCarpeta": "ElMagoMagicoRetoFinalDe2Piezas",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElSombreroYLaLupaDelDetectiveRolDeInvestigacion",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElMagoMagicoRetoFinalDe2Piezas"
+  },
+  {
+    "grupo": "ExpresionArtistica/VisteAlArtista",
+    "newSlug": "la-armadura-del-caballero-de-la-obra",
+    "newNombre": "La Armadura del Caballero de la Obra",
+    "oldCarpeta": "ElVestuarioDeLaEstrellaDeRockSeleccionDeEstilo",
+    "newCarpeta": "LaArmaduraDelCaballeroDeLaObra",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElVestuarioDeLaEstrellaDeRockSeleccionDeEstilo",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/LaArmaduraDelCaballeroDeLaObra"
+  },
+  {
+    "grupo": "ExpresionArtistica/VisteAlArtista",
+    "newSlug": "el-vestuario-de-la-estrella-de-rock",
+    "newNombre": "El Vestuario de la Estrella de Rock",
+    "oldCarpeta": "LaArmaduraDelCaballeroDeLaObra",
+    "newCarpeta": "ElVestuarioDeLaEstrellaDeRock",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/LaArmaduraDelCaballeroDeLaObra",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElVestuarioDeLaEstrellaDeRock"
+  },
+  {
+    "grupo": "ExpresionArtistica/VisteAlArtista",
+    "newSlug": "el-sombrero-y-la-lupa-del-detective-rol-de-investigacion",
+    "newNombre": "El Sombrero y la Lupa del Detective (Rol de Investigación)",
+    "oldCarpeta": "LaCapaDeLaSuperHeroinaZoe",
+    "newCarpeta": "ElSombreroYLaLupaDelDetectiveRolDeInvestigacion",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/LaCapaDeLaSuperHeroinaZoe",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElSombreroYLaLupaDelDetectiveRolDeInvestigacion"
+  },
+  {
+    "grupo": "ExpresionArtistica/VisteAlArtista",
+    "newSlug": "el-gran-desafio-de-caracterizacion-3-piezas-de-extremo-a-extremo",
+    "newNombre": "El Gran Desafío de Caracterización (3 Piezas de Extremo a Extremo)",
+    "oldCarpeta": "LaNarizRojaDelPayasito",
+    "newCarpeta": "ElGranDesafioDeCaracterizacion3PiezasDeExtremoAExtremo",
+    "oldRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/LaNarizRojaDelPayasito",
+    "newRuta": "catalogo_juegos/ExpresionArtistica/VisteAlArtista/ElGranDesafioDeCaracterizacion3PiezasDeExtremoAExtremo"
+  },
+  {
+    "grupo": "Multisaberes/DescubreLasVocales",
+    "newSlug": "encuentra-la-a",
+    "newNombre": "Encuentra la a",
+    "oldCarpeta": "BuscaLaVocalI",
+    "newCarpeta": "EncuentraLaA",
+    "oldRuta": "catalogo_juegos/Multisaberes/DescubreLasVocales/BuscaLaVocalI",
+    "newRuta": "catalogo_juegos/Multisaberes/DescubreLasVocales/EncuentraLaA"
+  },
+  {
+    "grupo": "Multisaberes/DescubreLasVocales",
+    "oldSlug": "encuentra-la-a",
+    "newSlug": "donde-esta-la-e",
+    "oldNombre": "Encuentra La A",
+    "newNombre": "¿Dónde Está la E?",
+    "oldCarpeta": "EncuentraLaA",
+    "newCarpeta": "DondeEstaLaE",
+    "oldRuta": "catalogo_juegos/Multisaberes/DescubreLasVocales/EncuentraLaA",
+    "newRuta": "catalogo_juegos/Multisaberes/DescubreLasVocales/DondeEstaLaE"
+  },
+  {
+    "grupo": "Multisaberes/DescubreLasVocales",
+    "oldSlug": "donde-esta-la-e",
+    "newSlug": "busca-la-vocal-i",
+    "oldNombre": "¿Dónde Está La E?",
+    "newNombre": "Busca la Vocal I",
+    "oldCarpeta": "DondeEstaLaE",
+    "newCarpeta": "BuscaLaVocalI",
+    "oldRuta": "catalogo_juegos/Multisaberes/DescubreLasVocales/DondeEstaLaE",
+    "newRuta": "catalogo_juegos/Multisaberes/DescubreLasVocales/BuscaLaVocalI"
+  },
+  {
+    "grupo": "Multisensorial/BuscaLasDiferencias",
+    "newSlug": "donde-quedo-el-sol-ausencia-de-elemento",
+    "newNombre": "¿Dónde Quedó el Sol? (Ausencia de Elemento)",
+    "oldCarpeta": "DondeQuedoElSolAusenciaDeElemento",
+    "newCarpeta": "DondeQuedoElSolAusenciaDeElemento",
+    "oldRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/DondeQuedoElSolAusenciaDeElemento",
+    "newRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/DondeQuedoElSolAusenciaDeElemento"
+  },
+  {
+    "grupo": "Multisensorial/BuscaLasDiferencias",
+    "newSlug": "la-flor-perdida-ausencia-de-detalle-fino",
+    "newNombre": "La Flor Perdida (Ausencia de Detalle Fino)",
+    "oldCarpeta": "ElSolFaltanteEnElCieloAusenciaDeElemento",
+    "newCarpeta": "LaFlorPerdidaAusenciaDeDetalleFino",
+    "oldRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/ElSolFaltanteEnElCieloAusenciaDeElemento",
+    "newRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaFlorPerdidaAusenciaDeDetalleFino"
+  },
+  {
+    "grupo": "Multisensorial/BuscaLasDiferencias",
+    "newSlug": "la-pelota-traviesa-3",
+    "newNombre": "La Pelota Traviesa",
+    "oldCarpeta": "LaFlorFaltanteEnElJardinAusenciaDeDetallePequeno",
+    "newCarpeta": "LaPelotaTraviesa",
+    "oldRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaFlorFaltanteEnElJardinAusenciaDeDetallePequeno",
+    "newRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaPelotaTraviesa"
+  },
+  {
+    "grupo": "Multisensorial/BuscaLasDiferencias",
+    "newSlug": "el-sol-faltante-en-el-cielo-ausencia-de-elemento",
+    "newNombre": "¡El Sol Faltante en el Cielo! (Ausencia de Elemento)",
+    "oldCarpeta": "LaFlorPerdidaAusenciaDeDetalleFino",
+    "newCarpeta": "ElSolFaltanteEnElCieloAusenciaDeElemento",
+    "oldRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaFlorPerdidaAusenciaDeDetalleFino",
+    "newRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/ElSolFaltanteEnElCieloAusenciaDeElemento"
+  },
+  {
+    "grupo": "Multisensorial/BuscaLasDiferencias",
+    "newSlug": "la-pelota-traviesa-4",
+    "newNombre": "La Pelota Traviesa",
+    "oldCarpeta": "LaHojaPerdidaDelArbolAusenciaDeMicroElemento",
+    "newCarpeta": "LaPelotaTraviesa2",
+    "oldRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaHojaPerdidaDelArbolAusenciaDeMicroElemento",
+    "newRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaPelotaTraviesa2"
+  },
+  {
+    "grupo": "Multisensorial/BuscaLasDiferencias",
+    "newSlug": "la-flor-faltante-en-el-jardin-ausencia-de-detalle-pequeno",
+    "newNombre": "La Flor Faltante en el Jardín (Ausencia de Detalle Pequeño)",
+    "oldCarpeta": "LaPelotaTraviesaCambioDeColor",
+    "newCarpeta": "LaFlorFaltanteEnElJardinAusenciaDeDetallePequeno",
+    "oldRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaPelotaTraviesaCambioDeColor",
+    "newRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaFlorFaltanteEnElJardinAusenciaDeDetallePequeno"
+  },
+  {
+    "grupo": "Multisensorial/BuscaLasDiferencias",
+    "newSlug": "la-hoja-perdida-del-arbol-ausencia-de-micro-elemento",
+    "newNombre": "La Hoja Perdida del Árbol (Ausencia de Micro-Elemento)",
+    "oldCarpeta": "LaPelotaTraviesaCambioDeColor2",
+    "newCarpeta": "LaHojaPerdidaDelArbolAusenciaDeMicroElemento",
+    "oldRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaPelotaTraviesaCambioDeColor2",
+    "newRuta": "catalogo_juegos/Multisensorial/BuscaLasDiferencias/LaHojaPerdidaDelArbolAusenciaDeMicroElemento"
+  },
+  {
+    "grupo": "Multisensorial/ClasificaPorLosSentidos",
+    "newSlug": "canasta-de-la-vista-el-ojo",
+    "newNombre": "Canasta de la Vista (El Ojo)",
+    "oldCarpeta": "CanastaDeLaVistaElOjo",
+    "newCarpeta": "CanastaDeLaVistaElOjo",
+    "oldRuta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/CanastaDeLaVistaElOjo",
+    "newRuta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/CanastaDeLaVistaElOjo"
+  },
+  {
+    "grupo": "Multisensorial/ClasificaPorLosSentidos",
+    "newSlug": "canasta-del-oido-la-oreja",
+    "newNombre": "Canasta del Oído (La Oreja)",
+    "oldCarpeta": "CanastaDelOidoLaOreja",
+    "newCarpeta": "CanastaDelOidoLaOreja",
+    "oldRuta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/CanastaDelOidoLaOreja",
+    "newRuta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/CanastaDelOidoLaOreja"
+  },
+  {
+    "grupo": "Multisensorial/ClasificaPorLosSentidos",
+    "newSlug": "canasta-del-olfato-la-nariz",
+    "newNombre": "Canasta del Olfato (La Nariz)",
+    "oldCarpeta": "CanastaDelOlfatoLaNariz",
+    "newCarpeta": "CanastaDelOlfatoLaNariz",
+    "oldRuta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/CanastaDelOlfatoLaNariz",
+    "newRuta": "catalogo_juegos/Multisensorial/ClasificaPorLosSentidos/CanastaDelOlfatoLaNariz"
+  },
+  {
+    "grupo": "Multisensorial/EncuentraLaPareja",
+    "newSlug": "con-que-sentido-sentimos-la-campana",
+    "newNombre": "¿Con Qué Sentido Sentimos la Campana?",
+    "oldCarpeta": "ConectandoElHeladoGusto",
+    "newCarpeta": "ConQueSentidoSentimosLaCampana",
+    "oldRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoElHeladoGusto",
+    "newRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosLaCampana"
+  },
+  {
+    "grupo": "Multisensorial/EncuentraLaPareja",
+    "newSlug": "con-que-sentido-sentimos-la-flor",
+    "newNombre": "¿Con Qué Sentido Sentimos la Flor?",
+    "oldCarpeta": "ConectandoElSolVista",
+    "newCarpeta": "ConQueSentidoSentimosLaFlor",
+    "oldRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoElSolVista",
+    "newRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosLaFlor"
+  },
+  {
+    "grupo": "Multisensorial/EncuentraLaPareja",
+    "newSlug": "con-que-sentido-sentimos-el-helado",
+    "newNombre": "¿Con Qué Sentido Sentimos el Helado?",
+    "oldCarpeta": "ConectandoLaCampanaAudicion",
+    "newCarpeta": "ConQueSentidoSentimosElHelado",
+    "oldRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoLaCampanaAudicion",
+    "newRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosElHelado"
+  },
+  {
+    "grupo": "Multisensorial/EncuentraLaPareja",
+    "newSlug": "con-que-sentido-sentimos-el-sol",
+    "newNombre": "¿Con Qué Sentido Sentimos el Sol?",
+    "oldCarpeta": "ConectandoLaFlorOlfato",
+    "newCarpeta": "ConQueSentidoSentimosElSol",
+    "oldRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoLaFlorOlfato",
+    "newRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosElSol"
+  },
+  {
+    "grupo": "Multisensorial/EncuentraLaPareja",
+    "newSlug": "conectando-la-campana-audicion",
+    "newNombre": "Conectando la Campana (Audición)",
+    "oldCarpeta": "ConQueSentidoSentimosElHelado",
+    "newCarpeta": "ConectandoLaCampanaAudicion",
+    "oldRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosElHelado",
+    "newRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoLaCampanaAudicion"
+  },
+  {
+    "grupo": "Multisensorial/EncuentraLaPareja",
+    "newSlug": "conectando-la-flor-olfato",
+    "newNombre": "Conectando la Flor (Olfato)",
+    "oldCarpeta": "ConQueSentidoSentimosElSol",
+    "newCarpeta": "ConectandoLaFlorOlfato",
+    "oldRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosElSol",
+    "newRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoLaFlorOlfato"
+  },
+  {
+    "grupo": "Multisensorial/EncuentraLaPareja",
+    "newSlug": "conectando-el-helado-gusto",
+    "newNombre": "Conectando el Helado (Gusto)",
+    "oldCarpeta": "ConQueSentidoSentimosLaCampana",
+    "newCarpeta": "ConectandoElHeladoGusto",
+    "oldRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosLaCampana",
+    "newRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoElHeladoGusto"
+  },
+  {
+    "grupo": "Multisensorial/EncuentraLaPareja",
+    "newSlug": "conectando-el-sol-vista",
+    "newNombre": "Conectando el Sol (Vista)",
+    "oldCarpeta": "ConQueSentidoSentimosLaFlor",
+    "newCarpeta": "ConectandoElSolVista",
+    "oldRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConQueSentidoSentimosLaFlor",
+    "newRuta": "catalogo_juegos/Multisensorial/EncuentraLaPareja/ConectandoElSolVista"
+  },
+  {
+    "grupo": "Multisensorial/MemoriaVisual",
+    "newSlug": "el-intruso-en-la-mochila",
+    "newNombre": "¡El Intruso en la Mochila!",
+    "oldCarpeta": "LasPosicionesCambiadasTrampaEspacial",
+    "newCarpeta": "ElIntrusoEnLaMochila",
+    "oldRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/LasPosicionesCambiadasTrampaEspacial",
+    "newRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElIntrusoEnLaMochila"
+  },
+  {
+    "grupo": "Multisensorial/MemoriaVisual",
+    "oldSlug": "el-intruso-en-la-mochila",
+    "newSlug": "quien-se-escondio",
+    "oldNombre": "¡El Intruso en la Mochila!",
+    "newNombre": "¿Quién se Escondió?",
+    "oldCarpeta": "ElIntrusoEnLaMochila",
+    "newCarpeta": "QuienSeEscondio",
+    "oldRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElIntrusoEnLaMochila",
+    "newRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/QuienSeEscondio"
+  },
+  {
+    "grupo": "Multisensorial/MemoriaVisual",
+    "oldSlug": "quien-se-escondio",
+    "newSlug": "el-toque-magico-que-cambio",
+    "oldNombre": "¿Quién se Escondió?",
+    "newNombre": "El Toque Mágico (¿Qué Cambió?)",
+    "oldCarpeta": "QuienSeEscondio",
+    "newCarpeta": "ElToqueMagicoQueCambio",
+    "oldRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/QuienSeEscondio",
+    "newRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElToqueMagicoQueCambio"
+  },
+  {
+    "grupo": "Multisensorial/MemoriaVisual",
+    "oldSlug": "el-toque-magico-que-cambio",
+    "newSlug": "el-caminito-de-las-estrellas",
+    "oldNombre": "El Toque Mágico (¿Qué Cambió?)",
+    "newNombre": "El Caminito de las Estrellas",
+    "oldCarpeta": "ElToqueMagicoQueCambio",
+    "newCarpeta": "ElCaminitoDeLasEstrellas",
+    "oldRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElToqueMagicoQueCambio",
+    "newRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElCaminitoDeLasEstrellas"
+  },
+  {
+    "grupo": "Multisensorial/MemoriaVisual",
+    "oldSlug": "el-caminito-de-las-estrellas",
+    "newSlug": "el-intruso-en-la-vitrina-del-museo",
+    "oldNombre": "El Caminito de las Estrellas",
+    "newNombre": "¡El Intruso en la Vitrina del Museo!",
+    "oldCarpeta": "ElCaminitoDeLasEstrellas",
+    "newCarpeta": "ElIntrusoEnLaVitrinaDelMuseo",
+    "oldRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElCaminitoDeLasEstrellas",
+    "newRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElIntrusoEnLaVitrinaDelMuseo"
+  },
+  {
+    "grupo": "Multisensorial/MemoriaVisual",
+    "oldSlug": "el-intruso-en-la-vitrina-del-museo",
+    "newSlug": "el-misterio-del-tesoro-desaparecido",
+    "oldNombre": "¡El Intruso en la Vitrina del Museo!",
+    "newNombre": "El Misterio del Tesoro Desaparecido",
+    "oldCarpeta": "ElIntrusoEnLaVitrinaDelMuseo",
+    "newCarpeta": "ElMisterioDelTesoroDesaparecido",
+    "oldRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElIntrusoEnLaVitrinaDelMuseo",
+    "newRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElMisterioDelTesoroDesaparecido"
+  },
+  {
+    "grupo": "Multisensorial/MemoriaVisual",
+    "oldSlug": "el-misterio-del-tesoro-desaparecido",
+    "newSlug": "las-posiciones-cambiadas-trampa-espacial",
+    "oldNombre": "El Misterio del Tesoro Desaparecido",
+    "newNombre": "Las Posiciones Cambiadas (Trampa Espacial)",
+    "oldCarpeta": "ElMisterioDelTesoroDesaparecido",
+    "newCarpeta": "LasPosicionesCambiadasTrampaEspacial",
+    "oldRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/ElMisterioDelTesoroDesaparecido",
+    "newRuta": "catalogo_juegos/Multisensorial/MemoriaVisual/LasPosicionesCambiadasTrampaEspacial"
+  },
+  {
+    "grupo": "Multisensorial/ObservaYRecuerda",
+    "newSlug": "cual-objeto-es-el-intruso-que-no-estaba-antes",
+    "newNombre": "¿Cuál Objeto Es el Intruso Que No Estaba Antes?",
+    "oldCarpeta": "IdentificacionDelObjetoFaltanteMemoriaDeEvocacionAusenteIdentificarElElementoFaltant",
+    "newCarpeta": "CualObjetoEsElIntrusoQueNoEstabaAntes",
+    "oldRuta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/IdentificacionDelObjetoFaltanteMemoriaDeEvocacionAusenteIdentificarElElementoFaltant",
+    "newRuta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/CualObjetoEsElIntrusoQueNoEstabaAntes"
+  },
+  {
+    "grupo": "Multisensorial/ObservaYRecuerda",
+    "oldSlug": "cual-objeto-es-el-intruso-que-no-estaba-antes",
+    "newSlug": "cual-objeto-se-escondio-y-falta",
+    "oldNombre": "¿Cuál Objeto Es el Intruso Que No Estaba Antes?",
+    "newNombre": "¿Cuál Objeto se Escondió y Falta?",
+    "oldCarpeta": "CualObjetoEsElIntrusoQueNoEstabaAntes",
+    "newCarpeta": "CualObjetoSeEscondioYFalta",
+    "oldRuta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/CualObjetoEsElIntrusoQueNoEstabaAntes",
+    "newRuta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/CualObjetoSeEscondioYFalta"
+  },
+  {
+    "grupo": "Multisensorial/ObservaYRecuerda",
+    "oldSlug": "cual-objeto-se-escondio-y-falta",
+    "newSlug": "deteccion-del-objeto-intruso",
+    "oldNombre": "¿Cuál Objeto se Escondió y Falta?",
+    "newNombre": "Detección del Objeto Intruso",
+    "oldCarpeta": "CualObjetoSeEscondioYFalta",
+    "newCarpeta": "DeteccionDelObjetoIntruso",
+    "oldRuta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/CualObjetoSeEscondioYFalta",
+    "newRuta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/DeteccionDelObjetoIntruso"
+  },
+  {
+    "grupo": "Multisensorial/ObservaYRecuerda",
+    "oldSlug": "deteccion-del-objeto-intruso",
+    "newSlug": "identificacion-del-objeto-faltante-memoria-de-evocacion-ausente-identificar-el-elemento-faltant",
+    "oldNombre": "Detección del Objeto Intruso",
+    "newNombre": "Identificación del Objeto Faltante: Memoria de Evocación Ausente: Identificar el Elemento Faltant…",
+    "oldCarpeta": "DeteccionDelObjetoIntruso",
+    "newCarpeta": "IdentificacionDelObjetoFaltanteMemoriaDeEvocacionAusenteIdentificarElElementoFaltant",
+    "oldRuta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/DeteccionDelObjetoIntruso",
+    "newRuta": "catalogo_juegos/Multisensorial/ObservaYRecuerda/IdentificacionDelObjetoFaltanteMemoriaDeEvocacionAusenteIdentificarElElementoFaltant"
+  }
+]

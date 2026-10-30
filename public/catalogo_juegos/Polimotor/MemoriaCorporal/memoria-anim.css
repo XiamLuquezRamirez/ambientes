@@ -1,0 +1,23 @@
+/* memoria-anim.css — complemento visual de memoria-anim.js (GSAP + Phaser 4).
+   Todo va bajo body.gsap-anim: si GSAP no carga (o el sistema pide reducir
+   movimiento) el juego se ve exactamente como antes.
+   Las estrellas, el anillo y el confeti los dibuja ../../shared/pednia-fx.js
+   (inyecta sus propios estilos). */
+
+/* La entrada de las opciones la hace GSAP (mismo retardo i·140 ms que la original);
+   la animación CSS la taparía porque las animaciones CSS ganan al estilo en línea.
+   La clase opcion-entra se conserva: la lógica la quita al salir. */
+body.gsap-anim .opcion-seq.opcion-entra {
+  animation: none;
+}
+
+/* Número y rótulo de la cuenta regresiva: GSAP los escala desde su centro. */
+body.gsap-anim .cuenta strong,
+body.gsap-anim .cuenta-label {
+  transform-origin: 50% 55%;
+  will-change: transform, opacity;
+}
+
+body.gsap-anim .opcion-marca-circulo {
+  will-change: transform;
+}

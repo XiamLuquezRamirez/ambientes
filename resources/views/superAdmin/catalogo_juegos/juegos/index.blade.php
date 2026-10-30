@@ -8,6 +8,10 @@
     <link rel="stylesheet"
         href="{{ asset('assets/css/superAdmin/catalogo-juegos.css') }}?v={{ @filemtime(public_path('assets/css/superAdmin/catalogo-juegos.css')) }}">
     <style>
+        #juegosPage .student-card {
+            min-width: 0;
+        }
+
         /* Hueco del header: play (36) + gap + menú (36) ≈ 80px */
         #juegosPage .student-top {
             padding-right: 88px;
@@ -59,13 +63,14 @@
 
         #juegosPage .cj-card-ruta {
             display: block;
+            width: 0;
             max-width: 100%;
             font-size: .68rem;
             color: #64748b;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            flex: 1 1 auto;
+            flex: 1 1 0;
             min-width: 0;
         }
 

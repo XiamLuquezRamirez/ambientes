@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff3e0"/>
+      <stop offset="100%" stop-color="#ffe0b2"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="480" fill="url(#g)"/>
+  <rect x="0" y="380" width="800" height="100" fill="#8d6e63"/>
+  <rect x="0" y="380" width="800" height="10" fill="#6d4c41"/>
+  <!-- reflectores -->
+  <circle cx="120" cy="48" r="22" fill="#ffecb3" opacity=".75"/>
+  <circle cx="400" cy="36" r="16" fill="#fffde7" opacity=".55"/>
+  <circle cx="680" cy="48" r="22" fill="#ffecb3" opacity=".75"/>
+  <path d="M120 70 L80 200 L160 200 Z" fill="#fff8e1" opacity=".18"/>
+  <path d="M680 70 L640 200 L720 200 Z" fill="#fff8e1" opacity=".18"/>
+  <!-- marcos laterales de ambiente -->
+  <rect x="36" y="140" width="110" height="90" rx="6" fill="#fff" opacity=".35" stroke="#8d6e63" stroke-width="6"/>
+  <rect x="654" y="140" width="110" height="90" rx="6" fill="#fff" opacity=".35" stroke="#8d6e63" stroke-width="6"/>
+  <circle cx="90" cy="185" r="18" fill="#ef5350" opacity=".25"/>
+  <rect x="690" y="170" width="36" height="36" rx="4" fill="#42a5f5" opacity=".25"/>
+</svg>

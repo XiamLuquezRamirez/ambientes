@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Ventana redonda">
+<circle cx="120" cy="120" r="78" fill="#42a5f5" stroke="#1565c0" stroke-width="6"/><path d="M120 42 V198 M42 120 H198" stroke="#fff" stroke-width="6"/>
+</svg>

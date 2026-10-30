@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Estudio de edicion musical">
+
+  <rect width="1600" height="900" fill="#120a28"/>
+  <g stroke="#00e5ff" stroke-width="3" opacity="0.65">
+    <path d="M80 160 H1520"/>
+    <path d="M80 220 H1520"/>
+    <path d="M80 280 H1520"/>
+    <path d="M80 340 H1520"/>
+  </g>
+  <g fill="#ffca28">
+    <circle cx="260" cy="220" r="14"/>
+    <circle cx="520" cy="280" r="14"/>
+    <circle cx="860" cy="160" r="14"/>
+    <circle cx="1180" cy="340" r="14"/>
+  </g>
+  <rect x="160" y="460" width="1280" height="220" rx="24" fill="#1a1440" stroke="#7c4dff" stroke-width="6"/>
+  <rect x="0" y="700" width="1600" height="200" fill="#1b1038"/>
+</svg>

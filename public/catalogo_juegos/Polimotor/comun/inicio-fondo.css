@@ -55,8 +55,29 @@ body .pantalla-inicio .arco {
   display: none !important;
 }
 
-.pantalla-inicio .inicio-contenido {
-  gap: clamp(14px, 2.4vh, 22px);
+/*
+ * Título + botón en un solo eje vertical centrado. Los style.css de cada paquete
+ * a veces posicionan .inicio-contenido; aquí se fuerza el layout común.
+ */
+body .pantalla-inicio .inicio-contenido {
+  position: relative !important;
+  z-index: 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: min(92vw, 720px) !important;
+  max-width: 92vw !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  gap: clamp(16px, 2.8vh, 28px) !important;
+  text-align: center !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  translate: none !important;
 }
 
 /*
@@ -117,27 +138,34 @@ body .pantalla-inicio .arco {
   animation: inicioIconoFlota 2.4s ease-in-out infinite;
 }
 
-.pantalla-inicio .inicio-kicker {
-  max-width: min(92vw, 13em);
-  margin: 0 0 clamp(6px, 2vh, 18px);
-  font-family: 'Fredoka Inicio', 'Fredoka', sans-serif;
-  font-size: clamp(34px, 6.6vw, 68px);
-  font-weight: 700;
-  line-height: 1.12;
-  text-align: center;
-  text-transform: uppercase;
+body .pantalla-inicio .inicio-kicker {
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 0.25em !important;
+  font-family: 'Fredoka Inicio', 'Fredoka', sans-serif !important;
+  font-size: clamp(28px, 5.4vw, 56px) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.01em !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
   text-wrap: balance;
+  overflow-wrap: normal;
+  hyphens: none;
   color: #fff !important;
   text-shadow:
     0 3px 0 rgba(0, 0, 0, 0.12),
     0 6px 16px rgba(0, 0, 0, 0.28) !important;
+  transition: opacity 0.15s ease-out;
 }
 
-.pantalla-inicio .inicio-kicker {
-  transition: opacity 0.2s ease-out;
+body .pantalla-inicio .inicio-kicker.inicio-kicker--largo {
+  font-size: clamp(22px, 4.2vw, 42px) !important;
 }
 
-/* inicio-fondo.js pone la clase en <html> y la quita cuando el arco ya está calculado. */
 .inicio-titulo-pendiente .pantalla-inicio .inicio-kicker {
   opacity: 0;
 }
@@ -147,7 +175,7 @@ body .pantalla-inicio .arco {
   white-space: nowrap;
 }
 
-/* --arco-y / --arco-r las calcula inicio-fondo.js por letra según su posición en la línea. */
+/* --arco-y / --arco-r: inicio-fondo.js según la posición en la línea. */
 .inicio-titulo-letra {
   display: inline-block;
   transform: translateY(var(--arco-y, 0)) rotate(var(--arco-r, 0deg));
@@ -165,16 +193,18 @@ body .pantalla-inicio #btn-empecemos {
   right: auto !important;
   top: auto !important;
   bottom: auto !important;
-  translate: none;
-  transform: none;
+  align-self: center !important;
+  translate: none !important;
+  transform: none !important;
   z-index: 2;
-  display: block;
+  display: block !important;
   width: clamp(230px, 34vw, 420px) !important;
+  max-width: 100% !important;
   height: auto !important;
-  min-width: 0;
-  min-height: 0;
+  min-width: 0 !important;
+  min-height: 0 !important;
   aspect-ratio: 460 / 101;
-  margin: 0;
+  margin: 0 auto !important;
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;

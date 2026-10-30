@@ -1,0 +1,40 @@
+/* coordinacion-anim.css — complemento visual de coordinacion-anim.js (GSAP + Phaser 4).
+   Si GSAP no carga (o el sistema pide reducir movimiento) estas reglas no aplican. */
+
+/* La pelota la anima GSAP (rodar, levantar, volver al punto válido). */
+body.gsap-anim .pelota-img {
+  will-change: transform, filter;
+}
+
+/* La pelota que vuela en arco al aro y se posa donde empieza la pelota de aro2.gif.
+   Vive dentro de #lienzo-wrap, encima del aro (z 4) como la pelota real (z 5). */
+.coord-pelota-vuelo {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  user-select: none;
+  object-fit: contain;
+  border-radius: 50%;
+  will-change: transform, left, top, width, height;
+}
+
+/* Mientras la pelota llega: el aro normal sigue visible y el GIF espera oculto
+   (ya cargado) para arrancar justo cuando la pelota está en su sitio. */
+#aro-conjunto.coord-gif-espera #aro-img {
+  display: block !important;
+}
+
+#aro-conjunto.coord-gif-espera #aro-enceste {
+  display: none !important;
+}
+
+/* Reproductor propio de aro2.gif (cuadro a cuadro). Usa la misma caja que .aro-img
+   y va encima del aro normal mientras se ve el enceste. */
+.coord-gif-lienzo {
+  display: none;
+  z-index: 3;
+}
+
+.coord-gif-lienzo.is-on {
+  display: block;
+}

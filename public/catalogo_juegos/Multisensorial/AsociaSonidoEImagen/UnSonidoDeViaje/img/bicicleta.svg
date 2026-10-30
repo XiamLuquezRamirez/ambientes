@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Bicicleta">
+  <ellipse cx="120" cy="206" rx="100" ry="10" fill="#000" opacity="0.12"/>
+  <circle cx="62" cy="150" r="46" fill="none" stroke="#37474f" stroke-width="10"/>
+  <circle cx="182" cy="150" r="46" fill="none" stroke="#37474f" stroke-width="10"/>
+  <circle cx="62" cy="150" r="6" fill="#90a4ae"/>
+  <circle cx="182" cy="150" r="6" fill="#90a4ae"/>
+  <path d="M62 150 L104 150 L150 92 L88 92 Z M104 150 L82 76 M150 92 L182 150 M150 92 L142 62" fill="none" stroke="#e53935" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M66 72 L100 72" stroke="#263238" stroke-width="12" stroke-linecap="round"/>
+  <path d="M128 60 L158 54" stroke="#263238" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="104" cy="150" r="12" fill="#fdd835" stroke="#37474f" stroke-width="4"/>
+  <circle cx="160" cy="48" r="9" fill="#fdd835" stroke="#f9a825" stroke-width="3"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="300" viewBox="0 0 320 300">
+  <rect width="320" height="300" fill="#ffe0b2"/>
+  <ellipse cx="160" cy="270" rx="85" ry="16" fill="#ffb74d"/>
+  <rect x="118" y="165" width="84" height="100" rx="14" fill="#1e88e5"/>
+  <circle cx="160" cy="112" r="52" fill="#ffb74d"/>
+  <path d="M118 88 Q160 58 202 88" fill="#ef6c00"/>
+  <circle cx="140" cy="112" r="8" fill="#3e2723"/>
+  <circle cx="180" cy="112" r="8" fill="#3e2723"/>
+  <path d="M128 98 L148 110" stroke="#5d4037" stroke-width="5" stroke-linecap="round"/>
+  <path d="M192 98 L172 110" stroke="#5d4037" stroke-width="5" stroke-linecap="round"/>
+  <path d="M138 145 L182 140" stroke="#bf360c" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="100" cy="205" r="16" fill="#ffb74d"/>
+  <circle cx="220" cy="205" r="16" fill="#ffb74d"/>
+  <path d="M100 205 L118 185" stroke="#1e88e5" stroke-width="14" stroke-linecap="round"/>
+  <path d="M220 205 L202 185" stroke="#1e88e5" stroke-width="14" stroke-linecap="round"/>
+  <text x="160" y="42" text-anchor="middle" font-size="28" fill="#e65100" font-family="Arial,sans-serif">¡Uf!</text>
+</svg>

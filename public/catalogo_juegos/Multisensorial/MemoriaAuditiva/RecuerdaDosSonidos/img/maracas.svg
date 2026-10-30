@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Maracas">
+  <ellipse cx="120" cy="214" rx="86" ry="11" fill="#000" opacity="0.12"/>
+  <g transform="rotate(-22 92 120)">
+    <rect x="84" y="128" width="16" height="84" rx="8" fill="#8d6e63"/>
+    <ellipse cx="92" cy="84" rx="44" ry="56" fill="#e53935"/>
+    <path d="M56 70 C76 82 108 82 128 70 M52 98 C76 110 108 110 132 98" fill="none" stroke="#fdd835" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="74" cy="54" r="9" fill="#fff" opacity="0.55"/>
+  </g>
+  <g transform="rotate(22 150 120)">
+    <rect x="142" y="128" width="16" height="84" rx="8" fill="#8d6e63"/>
+    <ellipse cx="150" cy="84" rx="44" ry="56" fill="#43a047"/>
+    <path d="M114 70 C134 82 166 82 186 70 M110 98 C134 110 166 110 190 98" fill="none" stroke="#fdd835" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="132" cy="54" r="9" fill="#fff" opacity="0.55"/>
+  </g>
+</svg>

@@ -1,0 +1,39 @@
+/* reconocimiento-anim.css — complemento visual de reconocimiento-anim.js (GSAP + Phaser 4).
+   Si GSAP no carga (o el sistema pide reducir movimiento) estas reglas no aplican:
+   la marca del toque solo existe cuando la crea la capa de animación. */
+
+/* La burbuja del enunciado la escala GSAP desde su centro (el <h1> se mide con
+   offsetWidth, que no cambia con transform). */
+body.gsap-anim .enunciado-burbuja {
+  transform-origin: 50% 60%;
+  will-change: transform, opacity;
+}
+
+/* Contador del HUD: salta desde su centro. */
+body.gsap-anim #progreso {
+  transform-origin: 50% 50%;
+}
+
+body.gsap-anim #progreso i {
+  display: inline-block;
+}
+
+/* Marca del toque: círculo que se expande donde tocó el niño. Capa fija, sin toques,
+   encima del juego y debajo de la pantalla final. */
+.recon-toque {
+  position: fixed;
+  z-index: 1500;
+  width: 70px;
+  height: 70px;
+  box-sizing: border-box;
+  border: 5px solid #00e5ff;
+  border-radius: 50%;
+  background: rgba(0, 229, 255, 0.18);
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+}
+
+.recon-toque.recon-toque-error {
+  border-color: #ef5350;
+  background: rgba(239, 83, 80, 0.2);
+}

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Bosque soleado con un &#225;rbol m&#225;gico">
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#bfe8ff"/>
+      <stop offset="1" stop-color="#fff6d8"/>
+    </linearGradient>
+    <radialGradient id="sol" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fffde7"/>
+      <stop offset="1" stop-color="#ffe082" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#cielo)"/>
+  <circle cx="1320" cy="120" r="220" fill="url(#sol)"/>
+  <circle cx="1320" cy="120" r="70" fill="#ffe066"/>
+  <g fill="#8bc34a" opacity="0.6">
+    <circle cx="120" cy="420" r="160"/><circle cx="330" cy="380" r="140"/>
+    <circle cx="1300" cy="420" r="150"/><circle cx="1500" cy="380" r="160"/>
+  </g>
+  <g fill="#6d4c41" opacity="0.6">
+    <rect x="100" y="480" width="40" height="220"/><rect x="1480" y="460" width="40" height="240"/>
+  </g>
+  <path d="M0 640 C300 600 600 630 800 620 C1000 610 1300 600 1600 640 V900 H0 Z" fill="#9ccc65"/>
+  <g>
+    <path d="M720 900 C740 760 730 520 690 300 L910 300 C870 520 860 760 880 900 Z" fill="#795548" stroke="#4e342e" stroke-width="8"/>
+    <path d="M760 820 C770 700 770 560 740 420 M840 820 C830 700 830 560 860 420" fill="none" stroke="#5d4037" stroke-width="6"/>
+    <path d="M700 320 C600 300 480 280 380 300" fill="none" stroke="#795548" stroke-width="34" stroke-linecap="round"/>
+    <path d="M900 320 C1000 300 1120 280 1220 300" fill="none" stroke="#795548" stroke-width="34" stroke-linecap="round"/>
+    <g fill="#66bb6a">
+      <circle cx="800" cy="170" r="200"/><circle cx="560" cy="210" r="150"/><circle cx="1040" cy="210" r="150"/>
+      <circle cx="380" cy="270" r="100"/><circle cx="1220" cy="270" r="100"/>
+    </g>
+    <g fill="#81c784">
+      <circle cx="740" cy="110" r="90"/><circle cx="900" cy="140" r="80"/><circle cx="560" cy="170" r="70"/><circle cx="1060" cy="170" r="70"/>
+    </g>
+  </g>
+  <g fill="#ffd54f">
+    <circle cx="620" cy="160" r="10"/><circle cx="980" cy="120" r="10"/><circle cx="820" cy="60" r="9"/>
+    <circle cx="440" cy="250" r="8"/><circle cx="1160" cy="250" r="8"/>
+  </g>
+  <path d="M0 740 C400 700 1200 720 1600 700 V900 H0 Z" fill="#7cb342"/>
+  <g>
+    <g transform="translate(320 780)"><rect x="-8" y="-24" width="16" height="32" rx="6" fill="#fff3e0"/><path d="M-36 -20 C-36 -58 36 -58 36 -20 Z" fill="#ef5350"/><circle cx="-12" cy="-36" r="6" fill="#fff"/></g>
+    <g transform="translate(1260 790)"><rect x="-8" y="-24" width="16" height="32" rx="6" fill="#fff3e0"/><path d="M-32 -20 C-32 -54 32 -54 32 -20 Z" fill="#ff7043"/><circle cx="10" cy="-34" r="5" fill="#fff"/></g>
+  </g>
+  <g fill="#f48fb1"><circle cx="200" cy="820" r="9"/><circle cx="560" cy="840" r="8"/><circle cx="1080" cy="830" r="9"/><circle cx="1440" cy="840" r="8"/></g>
+  <g fill="#fff59d"><circle cx="210" cy="820" r="4"/><circle cx="570" cy="840" r="3"/><circle cx="1090" cy="830" r="4"/></g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Campana">
+  <ellipse cx="120" cy="222" rx="70" ry="9" fill="#000" opacity="0.1"/>
+  <path d="M108 30 C108 18 132 18 132 30 L132 40 L108 40 Z" fill="#8d6e63"/>
+  <circle cx="120" cy="22" r="10" fill="none" stroke="#6d4c41" stroke-width="6"/>
+  <path d="M120 38 C78 38 64 76 62 116 C60 150 52 168 36 182 L204 182 C188 168 180 150 178 116 C176 76 162 38 120 38 Z" fill="#fbc02d"/>
+  <path d="M120 38 C96 40 86 70 84 110 C82 146 76 166 64 182 L96 182 C92 160 96 120 100 92 C104 62 110 46 120 38 Z" fill="#fff59d" opacity="0.7"/>
+  <path d="M36 182 L204 182 C204 196 36 196 36 182 Z" fill="#f57f17"/>
+  <rect x="30" y="176" width="180" height="14" rx="7" fill="#f9a825"/>
+  <path d="M70 150 C100 158 140 158 170 150" fill="none" stroke="#f57f17" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="120" cy="204" r="16" fill="#f57f17"/>
+  <circle cx="114" cy="198" r="5" fill="#ffe082"/>
+</svg>

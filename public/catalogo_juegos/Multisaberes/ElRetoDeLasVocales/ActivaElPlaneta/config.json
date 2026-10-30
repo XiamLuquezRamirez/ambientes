@@ -1,0 +1,145 @@
+{
+  "nombre": "Activa El Planeta",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Escucha y toca la vocal!",
+    "demostracionAcierto": "¡Así se supera el reto!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡El planeta necesita recuperar su energía!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Resuelve los desafíos de vocales!"
+      }
+    ]
+  },
+  "demo": {
+    "tipo": "escuchar",
+    "vocales": [
+      "e",
+      "u"
+    ],
+    "correcto": "e",
+    "escena": "rocas"
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "verBotonRepetir": true,
+    "mostrarProgreso": true,
+    "animaciones_opciones": true,
+    "efectosSonido": true,
+    "mostrarFeedBack": false
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "vocales": {
+    "a": {
+      "img": "img/vocal_a.svg?v=a",
+      "color": "#ff6b6b",
+      "nombre": "a"
+    },
+    "e": {
+      "img": "img/vocal_e.svg?v=a",
+      "color": "#fcc419",
+      "nombre": "e"
+    },
+    "i": {
+      "img": "img/vocal_i.svg?v=a",
+      "color": "#22b8cf",
+      "nombre": "i"
+    },
+    "o": {
+      "img": "img/vocal_o.svg?v=a",
+      "color": "#be4bdb",
+      "nombre": "o"
+    },
+    "u": {
+      "img": "img/vocal_u.svg?v=a",
+      "color": "#51cf66",
+      "nombre": "u"
+    }
+  },
+  "objetos": {
+    "avion": {
+      "img": "img/avion.svg?v=a",
+      "nombre": "avión",
+      "pronuncia": "AAvión",
+      "vocal": "a"
+    },
+    "estrella": {
+      "img": "img/estrella.svg?v=a",
+      "nombre": "estrella",
+      "pronuncia": "estrella",
+      "vocal": "e"
+    },
+    "oso": {
+      "img": "img/oso.svg?v=a",
+      "nombre": "oso",
+      "pronuncia": "OOso",
+      "vocal": "o"
+    },
+    "uvas": {
+      "img": "img/uvas.svg?v=a",
+      "nombre": "uvas",
+      "pronuncia": "UUvas",
+      "vocal": "u"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "La gran misión: salva el planeta de las vocales",
+      "tema": "planeta",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡El planeta necesita recuperar su energía!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Resuelve los desafíos de vocales!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "final",
+          "tipo": "serie",
+          "escena": "planeta",
+          "vocales": [
+            "a",
+            "e",
+            "i",
+            "o",
+            "u"
+          ],
+          "rondas": 3,
+          "acierto": {
+            "efecto": "planeta",
+            "sonido": "celebracion"
+          },
+          "iOrigen": 5
+        }
+      ],
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Misión cumplida! ¡Devolviste la energía al planeta de las vocales!"
+      },
+      "insignia": {
+        "img": "img/insignia_planeta.svg",
+        "nombre": "Planeta de las vocales"
+      }
+    }
+  ]
+}

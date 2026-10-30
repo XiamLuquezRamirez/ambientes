@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Ventilador">
+  <ellipse cx="120" cy="222" rx="66" ry="7" fill="#000" opacity="0.1"/>
+  <rect x="113" y="160" width="14" height="50" fill="#90a4ae" stroke="#37474f" stroke-width="4"/>
+  <ellipse cx="120" cy="212" rx="58" ry="12" fill="#546e7a" stroke="#37474f" stroke-width="4"/>
+  <circle cx="120" cy="90" r="76" fill="#e3f2fd" stroke="#37474f" stroke-width="4"/>
+  <g fill="#4fc3f7" stroke="#37474f" stroke-width="3">
+    <ellipse cx="120" cy="52" rx="20" ry="36"/>
+    <ellipse cx="120" cy="52" rx="20" ry="36" transform="rotate(120 120 90)"/>
+    <ellipse cx="120" cy="52" rx="20" ry="36" transform="rotate(240 120 90)"/>
+  </g>
+  <g fill="none" stroke="#90a4ae" stroke-width="3">
+    <circle cx="120" cy="90" r="50"/>
+    <path d="M120 14 V166 M44 90 H196 M66 36 L174 144 M174 36 L66 144"/>
+  </g>
+  <circle cx="120" cy="90" r="76" fill="none" stroke="#37474f" stroke-width="6"/>
+  <circle cx="120" cy="90" r="15" fill="#37474f"/>
+  <circle cx="120" cy="90" r="6" fill="#b0bec5"/>
+</svg>

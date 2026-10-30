@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Campana violeta">
+<ellipse cx="120" cy="224" rx="70" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <path d="M120 36 L120 52" fill="none"/>
+    <path d="M78 150 C78 86 162 86 162 150 L176 168 H64 Z" fill="#b39ddb"/>
+    <ellipse cx="120" cy="168" rx="56" ry="12" fill="#b39ddb"/>
+    <circle cx="120" cy="186" r="10" fill="#ffca28"/>
+    <ellipse cx="104" cy="108" rx="14" ry="22" fill="#fff" opacity="0.35"/>
+  </g>
+</svg>

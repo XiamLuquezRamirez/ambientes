@@ -1,0 +1,206 @@
+{
+  "nombre": "¡Buscando La Textura Áspera De La Lija!",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: pasa el dedo sobre la muestra para sentirla y tócala para elegirla.",
+    "demostracionAcierto": "¡Así se elige una textura!",
+    "demostracionFin": "¡Ahora te toca a ti! Encuentra la textura que te pidamos.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Pasa el dedo sobre cada muestra y descubre cómo se siente."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Hay cosas suaves, ásperas, duras y lisas. ¡Toca la textura que te pidamos!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Siente, compara y elige. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3"
+  },
+  "demo": {
+    "muestra": "pluma"
+  },
+  "gestos": {
+    "suave": {
+      "zoe": "acariciar",
+      "zeus": "acariciar"
+    },
+    "aspero": {
+      "zoe": "arrugar",
+      "zeus": "rascar"
+    },
+    "duro": {
+      "zoe": "golpear",
+      "zeus": "golpear"
+    }
+  },
+  "materiales": {
+    "algodon": {
+      "nombre": "Algodón",
+      "img": "img/algodon.svg",
+      "sensacion": "suave",
+      "tacto": "hundir",
+      "sonido": "fluff",
+      "particula": "nube"
+    },
+    "piedra": {
+      "nombre": "Piedra",
+      "img": "img/piedra.svg",
+      "sensacion": "duro",
+      "tacto": "firme",
+      "sonido": "toctoc"
+    },
+    "lija": {
+      "nombre": "Lija",
+      "img": "img/lija.svg",
+      "sensacion": "aspero",
+      "tacto": "raspar",
+      "sonido": "rasch",
+      "particula": "polvo"
+    },
+    "peluche": {
+      "nombre": "Peluche",
+      "img": "img/peluche.svg",
+      "sensacion": "suave",
+      "tacto": "peinar",
+      "sonido": "jeje"
+    },
+    "piedra_lisa": {
+      "nombre": "Piedra lisa",
+      "img": "img/piedra_lisa.svg",
+      "sensacion": "duro",
+      "tacto": "deslizar",
+      "sonido": "fiiiu",
+      "sonidoToque": "tactac",
+      "particula": "brillo"
+    },
+    "esponja": {
+      "nombre": "Esponja",
+      "img": "img/esponja.svg",
+      "sensacion": "suave",
+      "tacto": "comprimir",
+      "sonido": "squeak",
+      "particula": "burbuja"
+    },
+    "madera": {
+      "nombre": "Madera",
+      "img": "img/madera.svg",
+      "sensacion": "duro",
+      "tacto": "firme",
+      "sonido": "toc"
+    },
+    "madera_rugosa": {
+      "nombre": "Madera rugosa",
+      "img": "img/madera_rugosa.svg",
+      "sensacion": "aspero",
+      "tacto": "raspar",
+      "sonido": "rasch",
+      "particula": "astilla"
+    },
+    "seda": {
+      "nombre": "Seda",
+      "img": "img/seda.svg",
+      "sensacion": "suave",
+      "tacto": "ondular",
+      "sonido": "frufru"
+    },
+    "vidrio": {
+      "nombre": "Vidrio",
+      "img": "img/vidrio.svg",
+      "sensacion": "duro",
+      "tacto": "deslizar",
+      "sonido": "tin",
+      "particula": "brillo"
+    },
+    "corteza": {
+      "nombre": "Corteza de árbol",
+      "img": "img/corteza.svg",
+      "sensacion": "aspero",
+      "tacto": "raspar",
+      "sonido": "crac",
+      "particula": "migas"
+    },
+    "madera_lisa": {
+      "nombre": "Madera lisa",
+      "img": "img/madera_lisa.svg",
+      "sensacion": "duro",
+      "tacto": "deslizar",
+      "sonido": "toc"
+    },
+    "pluma": {
+      "nombre": "Pluma",
+      "img": "img/pluma.svg",
+      "sensacion": "suave",
+      "tacto": "mecer",
+      "sonido": "fluff"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El Mundo Sensorial de las Texturas",
+      "escenario": "mesa",
+      "muestrasPorReto": 3,
+      "retos": [
+        {
+          "id": "aspera",
+          "nombre": "¡Buscando la Textura Áspera de la Lija!",
+          "correcta": "lija",
+          "muestras": [
+            "lija",
+            "peluche",
+            "algodon"
+          ],
+          "respuesta": "pulir",
+          "presentacion": [
+            {
+              "voz": "zeus",
+              "texto": "¡Siguiente misión sensorial! Necesito encontrar algo rasposo y carrasposo, como una hoja de lija. ¡Pasa tu dedo sobre ellos!"
+            }
+          ],
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Ajá! ¡Encontraste la lija! Se siente bien áspera y rasposa."
+          },
+          "errores": {
+            "peluche": {
+              "voz": "zeus",
+              "texto": "¡Ese peluche es muy blandito! Queremos algo áspero que rasque un poquito."
+            },
+            "algodon": {
+              "voz": "zeus",
+              "texto": "¡Ese algodón es muy blandito! Queremos algo áspero que rasque un poquito."
+            }
+          },
+          "iOrigen": 1
+        }
+      ],
+      "cierreEscena": {
+        "tipo": "caja",
+        "titulo": "La Caja de las Texturas"
+      },
+      "premio": {
+        "titulo": "Medalla",
+        "nombre": "Maestro Explorador de Texturas"
+      },
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Recibes la medalla del Maestro Explorador de Texturas!"
+      }
+    }
+  ]
+}

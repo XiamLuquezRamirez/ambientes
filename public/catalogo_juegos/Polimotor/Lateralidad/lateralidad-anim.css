@@ -1,0 +1,11 @@
+/* lateralidad-anim.css — complemento visual de lateralidad-anim.js (GSAP + Phaser 4).
+   Todo va bajo body.gsap-anim: si GSAP no carga (o el sistema pide reducir
+   movimiento) el juego se ve exactamente como antes.
+   Las estrellas del acierto y el confeti final los dibuja ../../shared/pednia-fx.js
+   (inyecta sus propios estilos). */
+
+/* Botones de respuesta y tarjetas: GSAP los hace aparecer con rebote. */
+body.gsap-anim .btn-mano,
+body.gsap-anim .tarjeta-obj {
+  will-change: transform, opacity;
+}

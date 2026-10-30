@@ -39,6 +39,23 @@
         return new Promise(function (resolve) { setTimeout(resolve, ms); });
     }
 
+    // Capa de animación GSAP + partículas Phaser 4 (precision-anim.js). Solo visual:
+    // si no está disponible se usa el comportamiento original.
+    function anim() {
+        return (window.PrecisionAnim && window.PrecisionAnim.activo) ? window.PrecisionAnim : null;
+    }
+
+    // Audio compartido con Howler (../../shared/pednia-audio.js), tema del ambiente.
+    // Si no está, se usa el audio original (new Audio).
+    function sonido() {
+        return (window.PedniaAudio && window.PedniaAudio.activo) ? window.PedniaAudio : null;
+    }
+
+    /** Evento sonoro del tema; false si el tema no lo cubre. */
+    function sonarEvento(nombre, opts) {
+        return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
+    }
+
     function textos() { return (gameConfig && gameConfig.textos) || {}; }
     function acc() { return (gameConfig && gameConfig.accesibilidad) || {}; }
 
@@ -232,6 +249,21 @@
 
     function reproducirAudio(ruta, volumen, loop) {
         if (!ruta) return null;
+        if (sonido()) {
+            const vol = volumen != null ? volumen : 0.8;
+            if (loop) {
+                // Música de fondo: la del tema (si la trae) con fundidos; TextoVoz la sigue manejando.
+                const musica = sonido().musica(ruta);
+                if (musica) {
+                    musica.volume = vol;
+                    musica.play();
+                    audioFondo = musica;
+                    return musica;
+                }
+            } else if (sonido().archivo(ruta, vol)) {
+                return null;
+            }
+        }
         try {
             let audio = audioCache[ruta];
             if (!audio) {
@@ -276,7 +308,9 @@
             "../../images/victoria.gif",
             "../../images/nube.png"
         ];
-        const audios = [
+        // Con PedniaAudio los audios van por Howler (no usan audioCache): no se precargan
+        // como <audio> (evita descargar fondo.mp3 cuando el tema trae su propia música).
+        const audios = sonido() ? [] : [
             gameConfig.audios && gameConfig.audios.acierto,
             gameConfig.audios && gameConfig.audios.error,
             gameConfig.audios && gameConfig.audios.cierre,
@@ -722,6 +756,8 @@
         dragState = { pointerId: ev.pointerId, ox: frac.x - x0, oy: frac.y - y0 };
         lastPointer = { x: x0, y: y0 };
         coheteEl.classList.add("is-dragging");
+        if (anim()) anim().agarrar(coheteEl);
+        sonarEvento("agarrar");
         coheteEl.addEventListener("pointermove", onPointerMove);
         coheteEl.addEventListener("pointerup", onPointerUp);
         coheteEl.addEventListener("pointercancel", onPointerUp);
@@ -746,9 +782,12 @@
         limpiarListenersDrag();
         dragState = null;
         if (coheteEl) coheteEl.classList.remove("is-dragging");
+        if (anim()) anim().soltar(coheteEl);
         // Si soltó sobre la estrella sin completar aros → error.
         if (arosPasados < aroNodes.length && tocaMeta(fx, fy)) {
             fallarYReiniciar();
+        } else {
+            sonarEvento("soltar");
         }
     }
 
@@ -775,6 +814,7 @@
         limpiarListenersDrag();
         dragState = null;
         if (coheteEl) coheteEl.classList.remove("is-dragging");
+        if (anim()) anim().soltar(coheteEl);
     }
 
     function radioHit(aro) {
@@ -808,7 +848,11 @@
             if (distanciaPx(fx, fy, next.x, next.y) <= radioHit(next)) {
                 arosPasados += 1;
                 actualizarEstilosAros();
-                reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.7, false);
+                if (anim()) anim().aroPasado(next, colorAro(next.idx), arosPasados >= aroNodes.length);
+                // Tema: el cohete "zumba" al cruzar el aro (sin ok.mp3).
+                if (!sonarEvento("acierto")) {
+                    reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.7, false);
+                }
             }
         }
 
@@ -823,11 +867,15 @@
         esperandoFeedback = true;
         aceptaArrastre = false;
         if (coheteEl) coheteEl.classList.add("is-bloqueado");
+        if (anim()) anim().fallo(coheteEl, document.getElementById("enunciado"));
         await feedbackError();
         if (juegoTerminado) return;
         arosPasados = 0;
         actualizarEstilosAros();
+        // La capa visual recuerda dónde estaba el cohete y lo ve volar de vuelta al inicio.
+        if (anim()) anim().antesDeRegreso(coheteEl);
         if (rutaActual) colocarCohete(rutaActual.inicio[0], rutaActual.inicio[1], 0);
+        if (anim()) anim().regreso(coheteEl);
         if (coheteEl) coheteEl.classList.remove("is-bloqueado");
         esperandoFeedback = false;
         aceptaArrastre = true;
@@ -839,6 +887,7 @@
         esperandoFeedback = true;
         aceptaArrastre = false;
         if (coheteEl) coheteEl.classList.add("is-bloqueado");
+        if (anim()) anim().llegada(document.getElementById("meta-estrella"), coheteEl);
         const gen = rutaGen;
         await feedbackAciertoRecorrido();
         if (gen !== rutaGen || juegoTerminado) return;
@@ -862,7 +911,9 @@
     }
 
     async function feedbackAciertoRecorrido() {
-        reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        if (!sonarEvento("correcto")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        }
         limpiarSwalResidual();
         // Sin modal/TTS por acierto de recorrido: solo sonido.
         try {
@@ -877,7 +928,9 @@
         const gif = (gameConfig.feedback && gameConfig.feedback.error && gameConfig.feedback.error.gif)
             || "../../images/incorrecto.gif";
         const minMs = Number(gameConfig.feedback && gameConfig.feedback.duracion) || 1200;
-        reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.85, false);
+        if (!sonarEvento("error")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.85, false);
+        }
         limpiarSwalResidual();
         const pVoz = TextoVoz.hablar(texto, "zeus");
         if (gameConfig.mostrarFeedBack !== false) {
@@ -910,7 +963,14 @@
         const cierre = (typeof textos === "function" ? textos().cierre : null) || "¡Excelente!";
         const texto = document.getElementById("texto_final");
         if (texto) texto.textContent = cierre;
-        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        if (sonarEvento("victoria")) {
+            // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+            // fanfarria son tonos puros agudos (se oía como "pitido").
+            sonido().agacharMusica(0.35);
+        } else {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        }
+        if (anim()) anim().celebrar(document.getElementById("escena-wrap"));
         TextoVoz.hablar(cierre, "zoe");
         setTimeout(function () {
             const caja = document.getElementById("final");
@@ -975,6 +1035,7 @@
         if (!el) return;
         el.hidden = false;
         el.textContent = (indiceRuta + 1) + "/" + totalRutas;
+        if (anim()) anim().progreso(el);
     }
 
     async function correrDemoPrecision() {
@@ -988,6 +1049,7 @@
         // El tablero del ejemplo ya está puesto cuando el personaje entra.
         aceptaArrastre = false;
         pintarRuta(demo);
+        if (anim()) anim().nuevaRuta(aroNodes, document.getElementById("meta-estrella"), coheteEl, true);
         const enun = document.getElementById("enunciado");
         if (enun) enun.textContent = textos().demostracion || "";
         await PedniaTutorial.correr({
@@ -1018,7 +1080,10 @@
                             if (distanciaPx(x, y, next.x, next.y) <= radioHit(next)) {
                                 arosPasados += 1;
                                 actualizarEstilosAros();
-                                reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.7, false);
+                                if (anim()) anim().aroPasado(next, colorAro(next.idx), arosPasados >= aroNodes.length);
+                                if (!sonarEvento("acierto")) {
+                                    reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.7, false);
+                                }
                                 aroMarcado = true;
                             }
                         }
@@ -1043,6 +1108,7 @@
         }
         actualizarProgreso();
         pintarRuta(rutas[indiceRuta]);
+        if (anim()) anim().nuevaRuta(aroNodes, document.getElementById("meta-estrella"), coheteEl, false);
         aceptaArrastre = true;
         esperandoFeedback = false;
         TextoVoz.hablar(textos().enunciado || "Lleva el cohete por cada aro hasta la estrella", "zoe");
@@ -1063,6 +1129,9 @@
             document.body.innerHTML = "<p style='padding:24px;font-family:sans-serif'>No se pudo cargar el juego.</p>";
             return;
         }
+
+        // Tema de audio del ambiente (config.audios.tema) antes de configurar la voz.
+        if (sonido()) sonido().usarTema(gameConfig.audios && gameConfig.audios.tema);
 
         aplicarLetterSpacing();
         enlazarMenuVol();
@@ -1099,10 +1168,14 @@
         precargarMediaSecundaria();
 
         if (typeof TextoVoz !== "undefined") {
-            TextoVoz.configurar({
-                rate: (acc().rate != null ? acc().rate : 5),
-                frases: frasesFijasTts()
+            // Antes llamaba a TextoVoz.configurar(), que no existe (TypeError): la voz nunca
+            // conocía la música de fondo (sin bajarla al hablar) ni el volumen del menú.
+            // iniciar() toma el config (velocidad: accesibilidad.rate) y la música de fondo.
+            TextoVoz.iniciar(gameConfig, introConfig, {
+                obtenerAudioFondo: function () { return audioFondo; },
+                volumenFondo: volumenFondoPct() / 100
             });
+            TextoVoz.encolarFrases(frasesFijasTts());
         }
 
         try {

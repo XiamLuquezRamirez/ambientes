@@ -23,9 +23,22 @@
     }
 
     function urlCatalogo() {
-        if (ctx && ctx.urlCatalogo) return ctx.urlCatalogo;
+        const fromCtx = ctx && ctx.urlCatalogo ? String(ctx.urlCatalogo).trim() : '';
         const fromDom = document.getElementById('rnApp')?.getAttribute('data-url-juegos-catalogo');
-        return fromDom || '/juegos-catalogo';
+        const base = fromCtx || fromDom || '/juegos-catalogo';
+        const perfil = perfilPayload();
+        const edad = perfil && perfil.edad != null && perfil.edad !== ''
+            ? parseInt(String(perfil.edad), 10)
+            : NaN;
+        if (!isFinite(edad) || edad < 1) return base;
+        try {
+            const u = new URL(base, window.location.origin);
+            u.searchParams.set('edad', String(edad));
+            return u.pathname + u.search + u.hash;
+        } catch (e) {
+            const sep = base.indexOf('?') >= 0 ? '&' : '?';
+            return base + sep + 'edad=' + encodeURIComponent(String(edad));
+        }
     }
 
     function iconoHtml(juego) {
@@ -412,6 +425,11 @@
         return urlPaqueteConParam(url, 'icono', icono);
     }
 
+    /** ?nombre=: título del reto en la portada del paquete (evita el kicker de la temática). */
+    function urlPaqueteConNombre(url, nombre) {
+        return urlPaqueteConParam(url, 'nombre', nombre);
+    }
+
     /**
      * ?volver=1: el paquete muestra su botón "Volver" de la pantalla de inicio, que avisa
      * con postMessage 'pednia:salir-juego' (ver escucharSalidaJuego).
@@ -555,9 +573,12 @@
 
         const perfil = perfilPayload();
         const url = urlPaqueteConEdad(
-            urlPaqueteConIcono(
-                urlPaqueteConVolver(urlPaqueteConColor(juego.url_paquete, juego.color)),
-                juego.imagen_url
+            urlPaqueteConNombre(
+                urlPaqueteConIcono(
+                    urlPaqueteConVolver(urlPaqueteConColor(juego.url_paquete, juego.color)),
+                    juego.imagen_url
+                ),
+                juego.nombre
             ),
             perfil
         );

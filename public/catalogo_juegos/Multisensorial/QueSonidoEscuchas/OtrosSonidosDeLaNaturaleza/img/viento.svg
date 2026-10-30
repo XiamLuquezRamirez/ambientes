@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Viento">
+  <path d="M168 196 C164 160 152 132 128 112" fill="none" stroke="#6d4c41" stroke-width="10" stroke-linecap="round"/>
+  <g fill="#66bb6a">
+    <path d="M128 112 C112 92 116 74 132 66 C144 82 142 100 128 112 Z" transform="rotate(-35 128 112)"/>
+    <path d="M146 140 C134 118 140 100 156 96 C166 114 160 132 146 140 Z" transform="rotate(-40 146 140)"/>
+  </g>
+  <g fill="none" stroke="#4fc3f7" stroke-width="12" stroke-linecap="round">
+    <path d="M24 76 L136 76 C160 76 168 50 150 42 C136 36 124 48 132 58"/>
+    <path d="M24 116 L184 116 C210 116 218 144 198 154 C182 160 170 146 178 136"/>
+    <path d="M40 156 L120 156 C140 156 146 178 132 186 C120 192 110 182 116 174"/>
+  </g>
+  <g fill="#a5d6a7">
+    <path d="M200 66 C192 56 196 46 206 44 C212 54 208 64 200 66 Z"/>
+    <path d="M214 92 C204 86 204 76 212 72 C222 78 222 88 214 92 Z"/>
+  </g>
+</svg>

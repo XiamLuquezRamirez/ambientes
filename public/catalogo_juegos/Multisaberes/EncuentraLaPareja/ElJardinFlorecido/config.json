@@ -1,0 +1,108 @@
+{
+  "nombre": "El Jardín Florecido",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Toca una tarjeta y busca su pareja!",
+    "demostracionAcierto": "¡Así se encuentra la pareja!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hay vocales escondidas en el jardín!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Encuentra las que son iguales!"
+      }
+    ]
+  },
+  "demo": {
+    "parejas": [
+      "i"
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true,
+    "verBotonRepetir": false,
+    "mostrarProgreso": true,
+    "animaciones_opciones": true,
+    "efectosSonido": true,
+    "mostrarFeedBack": false
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "efectos": {}
+  },
+  "vocales": {
+    "a": {
+      "img": "img/vocal_a.svg?v=a",
+      "color": "#ff6b6b"
+    },
+    "e": {
+      "img": "img/vocal_e.svg?v=a",
+      "color": "#fcc419"
+    },
+    "i": {
+      "img": "img/vocal_i.svg?v=a",
+      "color": "#22b8cf"
+    },
+    "o": {
+      "img": "img/vocal_o.svg?v=a",
+      "color": "#be4bdb"
+    },
+    "u": {
+      "img": "img/vocal_u.svg?v=a",
+      "color": "#51cf66"
+    }
+  },
+  "reversos": {
+    "hoja": "img/reverso_hoja.svg?v=a",
+    "espejo": "img/reverso_espejo.svg?v=a"
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Los nidos mágicos de las vocales",
+      "tema": "jardin",
+      "reverso": "hoja",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Hay vocales escondidas en el jardín!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Encuentra las que son iguales!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "final",
+          "parejas": [
+            "i",
+            "a"
+          ],
+          "acierto": {
+            "efecto": "jardin",
+            "sonido": "celebracion"
+          },
+          "iOrigen": 2
+        }
+      ],
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Encontraste todas las parejas!"
+      },
+      "insignia": {
+        "img": "img/insignia_flor.svg",
+        "nombre": "Flor mágica de las vocales"
+      }
+    }
+  ]
+}

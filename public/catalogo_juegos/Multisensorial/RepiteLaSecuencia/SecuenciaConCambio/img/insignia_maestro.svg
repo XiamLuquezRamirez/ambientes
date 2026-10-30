@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Maestro de las secuencias">
+  <path d="M80 160 L54 250 L90 232 L108 258 L120 176 Z" fill="#1c7ed6"/>
+  <path d="M160 160 L186 250 L150 232 L132 258 L120 176 Z" fill="#7048e8"/>
+  <circle cx="120" cy="128" r="90" fill="#5f3dc4"/>
+  <circle cx="120" cy="128" r="90" fill="none" stroke="#fcc419" stroke-width="9"/>
+  <circle cx="120" cy="128" r="70" fill="#7950f2"/>
+  <path d="M58 30 L84 58 L120 18 L156 58 L182 30 L174 82 H66 Z" fill="#ffd43b" stroke="#f59f00" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="58" cy="30" r="8" fill="#ff6b6b"/>
+  <circle cx="120" cy="18" r="9" fill="#51cf66"/>
+  <circle cx="182" cy="30" r="8" fill="#339af0"/>
+  <g fill="#fff">
+    <ellipse cx="102" cy="150" rx="15" ry="11"/>
+    <ellipse cx="146" cy="140" rx="15" ry="11"/>
+    <rect x="111" y="96" width="7" height="54" rx="3"/>
+    <rect x="155" y="86" width="7" height="54" rx="3"/>
+    <path d="M111 96 L162 86 L162 100 L111 110 Z"/>
+  </g>
+  <g transform="translate(64 186)">
+    <circle cx="8" cy="8" r="8" fill="#ff6b6b"/>
+    <circle cx="36" cy="8" r="8" fill="#ffa94d"/>
+    <circle cx="64" cy="8" r="8" fill="#ffd43b"/>
+    <circle cx="92" cy="8" r="8" fill="#51cf66"/>
+    <circle cx="120" cy="8" r="8" fill="#339af0"/>
+  </g>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Flor">
+  <ellipse cx="120" cy="228" rx="40" ry="6" fill="#000" opacity="0.1"/>
+  <path d="M120 120 V210" stroke="#2f9e44" stroke-width="10" stroke-linecap="round"/>
+  <ellipse cx="96" cy="170" rx="22" ry="12" fill="#51cf66" transform="rotate(-35 96 170)"/>
+  <ellipse cx="148" cy="185" rx="22" ry="12" fill="#40c057" transform="rotate(40 148 185)"/>
+  <g fill="#ff6b6b" stroke="#c92a2a" stroke-width="3">
+    <circle cx="120" cy="78" r="28"/>
+    <circle cx="88" cy="98" r="26"/>
+    <circle cx="152" cy="98" r="26"/>
+    <circle cx="96" cy="58" r="24"/>
+    <circle cx="144" cy="58" r="24"/>
+  </g>
+  <circle cx="120" cy="82" r="22" fill="#fcc419" stroke="#f08c00" stroke-width="3"/>
+  <g fill="#ffe066" opacity="0.85">
+    <circle cx="70" cy="40" r="6"/><circle cx="170" cy="36" r="5"/><circle cx="50" cy="90" r="4"/>
+    <circle cx="190" cy="88" r="5"/><circle cx="120" cy="28" r="4"/>
+  </g>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Bocina">
+  <defs>
+    <linearGradient id="cuerpo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd54f"/>
+      <stop offset="1" stop-color="#ff9800"/>
+    </linearGradient>
+    <linearGradient id="campana" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff7043"/>
+      <stop offset="1" stop-color="#ec407a"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#37474f" stroke-width="5" stroke-linejoin="round">
+    <rect x="34" y="92" width="44" height="56" rx="10" fill="url(#cuerpo)"/>
+    <path d="M78 96 L150 50 C158 46 166 52 166 60 V180 C166 188 158 194 150 190 L78 144 Z" fill="url(#campana)"/>
+    <rect x="58" y="146" width="22" height="40" rx="8" fill="#8d6e63"/>
+  </g>
+  <path d="M96 100 L146 68" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity="0.6"/>
+  <g fill="none" stroke-linecap="round" stroke-width="9">
+    <path d="M184 92 C196 108 196 132 184 148" stroke="#4dd0e1"/>
+    <path d="M200 74 C222 100 222 140 200 166" stroke="#9575cd"/>
+  </g>
+  <circle cx="56" cy="120" r="8" fill="#fff59d" stroke="#37474f" stroke-width="3"/>
+</svg>

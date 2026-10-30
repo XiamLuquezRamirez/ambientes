@@ -483,8 +483,9 @@ function iniciarIntro() {
         cargarDialogoDesdeConfig();
     };
 
+    // Phaser 4: CANVAS está deprecado; WEBGL transparente sobre el overlay Three.
     window.__introPhaser = new Phaser.Game({
-        type: Phaser.CANVAS,
+        type: Phaser.AUTO,
         parent: 'phaser-container',
         width: window.innerWidth,
         height: window.innerHeight,
@@ -495,6 +496,7 @@ function iniciarIntro() {
         },
         scene
     });
+
 
     requestAnimationFrame(() => {
         if (window.__introPhaser && window.__introPhaser.scale) {

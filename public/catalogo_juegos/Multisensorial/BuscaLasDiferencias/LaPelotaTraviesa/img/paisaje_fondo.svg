@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+<defs><linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5d8ff"/><stop offset="1" stop-color="#e7f5ff"/></linearGradient></defs>
+<rect width="400" height="300" fill="url(#cielo)"/>
+<ellipse cx="90" cy="214" rx="140" ry="40" fill="#b2f2bb"/>
+<ellipse cx="330" cy="218" rx="130" ry="34" fill="#b2f2bb"/>
+<rect y="200" width="400" height="100" fill="#8ce99a"/>
+<rect y="200" width="400" height="7" fill="#69db7c"/>
+<rect x="26" y="258" width="172" height="34" rx="6" fill="#8d5a3b"/>
+<rect x="30" y="256" width="164" height="8" rx="3" fill="#6f4428"/>
+<rect x="226" y="120" width="20" height="95" rx="3" fill="#8d6e63"/>
+<g><circle cx="235" cy="88" r="50" fill="#2f9e44"/><circle cx="205" cy="110" r="32" fill="#37b24d"/><circle cx="268" cy="106" r="32" fill="#40c057"/><circle cx="232" cy="56" r="32" fill="#40c057"/></g>
+<path d="M280 106 L394 60" stroke="#7b5a46" stroke-width="6" stroke-linecap="round"/>
+<path d="M352 77 L362 64" stroke="#7b5a46" stroke-width="3" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,12 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="280" height="300" viewBox="0 0 280 300">
+  <rect width="280" height="300" fill="#fff9c4"/>
+  <ellipse cx="140" cy="255" rx="72" ry="16" fill="#ffe082"/>
+  <rect x="100" y="160" width="80" height="95" rx="14" fill="#1e88e5"/>
+  <circle cx="140" cy="110" r="52" fill="#ffb74d"/>
+  <path d="M95 72 Q140 38 185 72" fill="#6d4c41"/>
+  <circle cx="122" cy="105" r="8" fill="#3e2723"/><circle cx="158" cy="105" r="8" fill="#3e2723"/>
+  <path d="M112 128 Q140 155 168 128" fill="none" stroke="#e65100" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="108" cy="118" r="8" fill="#ff8a65" opacity=".7"/><circle cx="172" cy="118" r="8" fill="#ff8a65" opacity=".7"/>
+  <text x="140" y="36" text-anchor="middle" font-size="18" fill="#f9a825" font-family="Arial,sans-serif">Muy feliz</text>
+  <circle cx="90" cy="210" r="18" fill="#ffca28"/><text x="90" y="216" text-anchor="middle" font-size="14" fill="#5d4037" font-family="Arial,sans-serif">2</text>
+</svg>

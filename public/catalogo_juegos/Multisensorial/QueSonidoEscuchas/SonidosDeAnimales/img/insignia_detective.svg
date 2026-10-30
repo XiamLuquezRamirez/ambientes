@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Insignia de detective de los sonidos">
+  <path d="M84 168 L60 250 L92 232 L108 258 L126 176 Z" fill="#e53935"/>
+  <path d="M156 168 L180 250 L148 232 L132 258 L114 176 Z" fill="#1e88e5"/>
+  <path d="M120 10 L142 34 L174 28 L180 60 L210 74 L196 104 L210 134 L180 148 L174 180 L142 174 L120 198 L98 174 L66 180 L60 148 L30 134 L44 104 L30 74 L60 60 L66 28 L98 34 Z" fill="#fbc02d" stroke="#f57f17" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="120" cy="104" r="64" fill="#fff8e1" stroke="#f9a825" stroke-width="6"/>
+  <path d="M104 70 C130 58 156 76 152 104 C150 120 138 124 136 136 C134 150 118 156 108 146" fill="none" stroke="#ff8a65" stroke-width="12" stroke-linecap="round"/>
+  <path d="M116 88 C126 84 136 92 134 104 C132 112 124 112 122 120" fill="none" stroke="#ff8a65" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="92" cy="122" r="22" fill="#e3f2fd" fill-opacity="0.7" stroke="#5d4037" stroke-width="7"/>
+  <path d="M76 138 L58 156" stroke="#5d4037" stroke-width="10" stroke-linecap="round"/>
+  <g fill="none" stroke="#7e57c2" stroke-width="5" stroke-linecap="round">
+    <path d="M168 84 C176 94 176 110 168 120"/>
+    <path d="M180 74 C194 92 194 112 180 130"/>
+  </g>
+</svg>

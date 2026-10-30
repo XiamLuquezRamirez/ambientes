@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="300" viewBox="0 0 280 300">
+  <rect width="280" height="300" fill="#fff176"/>
+  <ellipse cx="140" cy="255" rx="75" ry="16" fill="#ffca28"/>
+  <rect x="100" y="155" width="80" height="95" rx="14" fill="#1e88e5"/>
+  <circle cx="140" cy="100" r="50" fill="#ffb74d"/>
+  <path d="M95 62 Q140 28 185 62" fill="#6d4c41"/>
+  <circle cx="122" cy="95" r="8" fill="#3e2723"/>
+  <circle cx="158" cy="95" r="8" fill="#3e2723"/>
+  <path d="M112 118 Q140 145 168 118" fill="none" stroke="#e65100" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="70" cy="140" r="14" fill="#ffb74d"/>
+  <circle cx="210" cy="140" r="14" fill="#ffb74d"/>
+  <path d="M70 140 L100 170" stroke="#1e88e5" stroke-width="16" stroke-linecap="round"/>
+  <path d="M210 140 L180 170" stroke="#1e88e5" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="55" cy="55" r="8" fill="#ef5350"/>
+  <circle cx="225" cy="48" r="7" fill="#42a5f5"/>
+  <circle cx="240" cy="90" r="6" fill="#66bb6a"/>
+  <rect x="120" y="48" width="40" height="18" rx="4" fill="#ffd54f" stroke="#f9a825" stroke-width="2"/>
+  <text x="140" y="36" text-anchor="middle" font-size="20" fill="#e65100" font-family="Arial,sans-serif">¡YA!</text>
+</svg>

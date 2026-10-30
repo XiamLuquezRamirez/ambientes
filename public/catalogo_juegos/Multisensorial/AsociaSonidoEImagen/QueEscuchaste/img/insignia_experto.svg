@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Insignia Experto en asociar sonidos">
+  <path d="M84 170 L58 252 L92 234 L110 258 L124 184 Z" fill="#e64980"/>
+  <path d="M156 170 L182 252 L148 234 L130 258 L116 184 Z" fill="#1c7ed6"/>
+  <circle cx="120" cy="110" r="96" fill="#fcc419" stroke="#f08c00" stroke-width="8"/>
+  <circle cx="120" cy="110" r="78" fill="#ffe066"/>
+  <g stroke="#f08c00" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M60 86 C50 100 50 120 60 134"/>
+    <path d="M46 74 C30 96 30 124 46 146"/>
+  </g>
+  <g stroke="#7048e8" stroke-width="4" stroke-linejoin="round">
+    <path d="M78 74 V128" stroke-linecap="round"/>
+    <path d="M78 74 L98 68 V80 L78 86 Z" fill="#7048e8"/>
+  </g>
+  <ellipse cx="70" cy="130" rx="11" ry="9" fill="#7048e8"/>
+  <path d="M92 110 H112" stroke="#e64980" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 10"/>
+  <g stroke="#37474f" stroke-width="4" stroke-linejoin="round">
+    <rect x="114" y="70" width="76" height="76" rx="10" fill="#fff"/>
+  </g>
+  <rect x="124" y="80" width="56" height="56" rx="5" fill="#a5d8ff"/>
+  <circle cx="164" cy="94" r="8" fill="#fcc419"/>
+  <path d="M124 136 L144 106 L160 126 L168 116 L180 132 V136 Z" fill="#51cf66"/>
+  <path d="M120 162 L126 176 L141 177 L130 187 L133 202 L120 194 L107 202 L110 187 L99 177 L114 176 Z" fill="#fff" stroke="#f08c00" stroke-width="3" stroke-linejoin="round"/>
+</svg>

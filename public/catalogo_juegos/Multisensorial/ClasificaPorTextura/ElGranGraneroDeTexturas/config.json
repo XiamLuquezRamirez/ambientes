@@ -1,0 +1,240 @@
+{
+  "nombre": "¡El Gran Granero De Texturas!",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el objeto para sentir su textura y llévalo a su grupo.",
+    "demostracionAcierto": "¡Así se clasifica! La pluma es suave.",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Hoy vamos a clasificar objetos según su textura!"
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Toca cada objeto para sentirlo y llévalo a su grupo."
+      },
+      {
+        "personaje": 1,
+        "texto": "Siente, compara y clasifica. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3"
+  },
+  "demo": {
+    "material": "pluma"
+  },
+  "materiales": {
+    "algodon": {
+      "img": "img/algodon.svg",
+      "nombre": "Algodón",
+      "texturas": [
+        "suave"
+      ],
+      "tacto": "suave",
+      "sonido": "fluff",
+      "friccion": 0.15
+    },
+    "peluche": {
+      "img": "img/peluche.svg",
+      "nombre": "Peluche",
+      "texturas": [
+        "suave"
+      ],
+      "tacto": "suave",
+      "sonido": "fluff",
+      "friccion": 0.2
+    },
+    "seda": {
+      "img": "img/seda.svg",
+      "nombre": "Seda",
+      "texturas": [
+        "suave",
+        "liso"
+      ],
+      "tacto": "liso",
+      "sonido": "seda",
+      "friccion": 0.05
+    },
+    "esponja": {
+      "img": "img/esponja.svg",
+      "nombre": "Esponja",
+      "texturas": [
+        "suave"
+      ],
+      "tacto": "suave",
+      "sonido": "squish",
+      "friccion": 0.3
+    },
+    "tela": {
+      "img": "img/tela_algodon.svg",
+      "nombre": "Tela de algodón",
+      "texturas": [
+        "suave"
+      ],
+      "tacto": "suave",
+      "sonido": "fluff",
+      "friccion": 0.2
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "nombre": "Lija",
+      "texturas": [
+        "aspero",
+        "rugoso"
+      ],
+      "tacto": "aspero",
+      "sonido": "rasc",
+      "friccion": 1
+    },
+    "corteza": {
+      "img": "img/corteza.svg",
+      "nombre": "Corteza de árbol",
+      "texturas": [
+        "aspero",
+        "rugoso"
+      ],
+      "tacto": "rugoso",
+      "sonido": "croc",
+      "friccion": 0.85
+    },
+    "piedra_rugosa": {
+      "img": "img/piedra_rugosa.svg",
+      "nombre": "Piedra rugosa",
+      "texturas": [
+        "aspero",
+        "rugoso"
+      ],
+      "tacto": "rugoso",
+      "sonido": "croc",
+      "friccion": 0.8
+    },
+    "carton": {
+      "img": "img/carton.svg",
+      "nombre": "Cartón",
+      "texturas": [
+        "liso"
+      ],
+      "tacto": "liso",
+      "sonido": "tap",
+      "friccion": 0.35
+    },
+    "vidrio": {
+      "img": "img/vidrio.svg",
+      "nombre": "Vidrio",
+      "texturas": [
+        "liso"
+      ],
+      "tacto": "liso",
+      "sonido": "ting",
+      "friccion": 0
+    },
+    "piedra_lisa": {
+      "img": "img/piedra_lisa.svg",
+      "nombre": "Piedra lisa",
+      "texturas": [
+        "liso"
+      ],
+      "tacto": "liso",
+      "sonido": "toc",
+      "friccion": 0.1
+    },
+    "pluma": {
+      "img": "img/pluma.svg",
+      "nombre": "Pluma",
+      "texturas": [
+        "suave"
+      ],
+      "tacto": "suave",
+      "sonido": "fluff",
+      "friccion": 0.05
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Las Cestas Sensoriales: Clasifica por Textura",
+      "escenario": "cestas",
+      "grupos": [
+        {
+          "id": "nube",
+          "nombre": "Cesta Nube Suave",
+          "textura": "suave",
+          "img": "img/cesta_nube.svg",
+          "reaccion": "swooshfluff"
+        },
+        {
+          "id": "roca",
+          "nombre": "Cesta Roca Áspera",
+          "textura": "aspero",
+          "img": "img/cesta_roca.svg",
+          "reaccion": "clackcroc"
+        }
+      ],
+      "retos": [
+        {
+          "id": "granero",
+          "titulo": "¡El Gran Granero de Texturas!",
+          "grupo": "nube",
+          "objetos": [
+            "esponja",
+            "tela",
+            "peluche",
+            "corteza"
+          ],
+          "correctos": [
+            "esponja",
+            "tela",
+            "peluche"
+          ],
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Último desafío! Selecciona y lleva al grupo de objetos suaves los que correspondan."
+          },
+          "colocar": {
+            "efecto": "estrellasMulticolor",
+            "sonido": "puffyay"
+          },
+          "completo": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Clasificaste los objetos suaves."
+          },
+          "rechazo": {
+            "efecto": "vibraExpulsa",
+            "sonido": "vibra"
+          },
+          "error": {
+            "voz": "zeus",
+            "texto": "¡Esa corteza es áspera y rugosa! Prueba con otro objeto."
+          },
+          "iOrigen": 2
+        }
+      ],
+      "cierreEscena": {
+        "tipo": "desfile",
+        "titulo": "Desfile Sensorial de Cestas"
+      },
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Excelente! Clasificaste los objetos según su textura."
+      },
+      "premio": {
+        "titulo": "Medalla",
+        "nombre": "Gran Clasificador Sensorial",
+        "icono": "fa-medal",
+        "tipo": "medalla"
+      },
+      "celebracion": "baile"
+    }
+  ]
+}

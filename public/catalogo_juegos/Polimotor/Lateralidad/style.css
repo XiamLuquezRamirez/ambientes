@@ -613,10 +613,19 @@ body.intro3d-activa #menu-acc {
 
 .btn-mano.acerto,
 .zona-slot.acerto,
-.tarjeta-obj.acerto,
-.actor-movil.acerto {
+.tarjeta-obj.acerto {
   animation: aciertoPop 0.6s ease;
   z-index: 3;
+}
+
+/* El actor se centra con translate(-50%,-50%): aciertoPop (solo scale) lo pisaba y el actor
+   saltaba 0,6 s. El "pop" va en su imagen; el contenedor conserva su centrado. */
+.actor-movil.acerto {
+  z-index: 3;
+}
+
+.actor-movil.acerto img {
+  animation: aciertoPop 0.6s ease;
 }
 
 .estrella-pop {
@@ -1006,6 +1015,7 @@ body.intro3d-activa #menu-acc {
   .zona-slot.acerto,
   .tarjeta-obj.acerto,
   .actor-movil.acerto,
+  .actor-movil.acerto img,
   .estrella-pop {
     animation: none;
     transition: none;

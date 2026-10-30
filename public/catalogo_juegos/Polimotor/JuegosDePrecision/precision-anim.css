@@ -1,0 +1,21 @@
+/* precision-anim.css — complemento visual de precision-anim.js (GSAP + Phaser 4).
+   Si GSAP no carga (o el sistema pide reducir movimiento) estas reglas no aplican.
+   OJO: nada de transform/filter/opacity en .aro, .capa-aros ni #escena-wrap
+   (el cohete se intercala entre las capas del aro y la lógica mide el escenario). */
+
+/* GSAP anima solo el <img> interior del cohete (levantar, temblar, volver al inicio).
+   El transform del .cohete lo escribe la lógica en cada movimiento. */
+body.gsap-anim .cohete img {
+  will-change: transform, filter;
+  transform-origin: 50% 50%;
+}
+
+/* La estrella conserva su animación CSS (en .meta-estrella); GSAP anima su <img>. */
+body.gsap-anim .meta-estrella img {
+  transform-origin: 50% 50%;
+}
+
+/* Las dos capas del aro crecen desde su centro, juntas. */
+body.gsap-anim .aro-capa {
+  transform-origin: 50% 50%;
+}

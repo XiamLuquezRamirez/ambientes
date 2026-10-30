@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Memoria de Oro Musical">
+
+  <circle cx="120" cy="132" r="78" fill="#ffca28" stroke="#fff8e1" stroke-width="8"/>
+  <circle cx="120" cy="132" r="58" fill="#fff8e1"/>
+  <path d="M78 28 L102 108 H78 Z" fill="#ef5350"/>
+  <path d="M162 28 L138 108 H162 Z" fill="#42a5f5"/>
+  <path d="M108 150 L120 96 L132 150 L120 138 Z" fill="#f9a825"/>
+</svg>

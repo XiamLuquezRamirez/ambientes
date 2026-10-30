@@ -1,0 +1,267 @@
+{
+  "nombre": "El Duelo de Instrumentos (¿Quién Suena Más Grave?)",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el instrumento para hacerlo sonar.",
+    "demostracionAcierto": "¡Así suena!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al gran teatro de la música!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Hoy vas a conocer a toda la orquesta."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "sonidos": {},
+    "efectos": {}
+  },
+  "demo": {
+    "instrumento": "maracas"
+  },
+  "escenas": {
+    "tienda": "img/escenas/tienda.svg",
+    "bosque": "img/escenas/bosque.svg",
+    "teatro": "img/escenas/teatro.svg"
+  },
+  "familias": {
+    "cuerda": {
+      "nombre": "Familia de cuerda",
+      "color": "#339af0",
+      "icono": "violin"
+    },
+    "viento": {
+      "nombre": "Familia de viento",
+      "color": "#40c057",
+      "icono": "trompeta"
+    },
+    "percusion": {
+      "nombre": "Familia de percusión",
+      "color": "#fab005",
+      "icono": "tambor"
+    }
+  },
+  "instrumentos": {
+    "tambor": {
+      "img": "img/tambor.svg",
+      "nombre": "Tambor",
+      "familia": "percusion",
+      "sonido": "tambor",
+      "rol": "ritmo"
+    },
+    "guitarra": {
+      "img": "img/guitarra.svg",
+      "nombre": "Guitarra",
+      "familia": "cuerda",
+      "sonido": "guitarra",
+      "rol": "armonia"
+    },
+    "flautaTubos": {
+      "img": "img/flauta_tubos.svg",
+      "nombre": "Flauta de colores",
+      "familia": "viento",
+      "sonido": "flautaTubos",
+      "rol": "melodia"
+    },
+    "violin": {
+      "img": "img/violin.svg",
+      "nombre": "Violín",
+      "familia": "cuerda",
+      "sonido": "violin",
+      "rol": "melodia"
+    },
+    "trompeta": {
+      "img": "img/trompeta.svg",
+      "nombre": "Trompeta",
+      "familia": "viento",
+      "sonido": "trompeta",
+      "rol": "armonia"
+    },
+    "flauta": {
+      "img": "img/flauta.svg",
+      "nombre": "Flauta",
+      "familia": "viento",
+      "sonido": "flauta",
+      "rol": "melodia"
+    },
+    "platillos": {
+      "img": "img/platillos.svg",
+      "nombre": "Platillos",
+      "familia": "percusion",
+      "sonido": "platillos",
+      "rol": "ritmo"
+    },
+    "contrabajo": {
+      "img": "img/contrabajo.svg",
+      "nombre": "Contrabajo",
+      "familia": "cuerda",
+      "sonido": "contrabajo",
+      "rol": "bajo"
+    },
+    "maracas": {
+      "img": "img/maracas.svg",
+      "nombre": "Maracas",
+      "familia": "percusion",
+      "sonido": "maracas"
+    }
+  },
+  "niveles": [
+    {
+      "id": "5",
+      "edad": "5-6 años",
+      "titulo": "El gran teatro de la orquesta",
+      "tema": "teatro",
+      "escena": "teatro",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al gran teatro de la música!"
+        },
+        {
+          "personaje": 0,
+          "texto": "Hoy vas a conocer a toda la orquesta."
+        }
+      ],
+      "retos": [
+        {
+          "id": "duelo",
+          "tipo": "duelo",
+          "titulo": "El duelo de instrumentos",
+          "escena": "teatro",
+          "opciones": [
+            "contrabajo",
+            "violin"
+          ],
+          "correcto": "contrabajo",
+          "consigna": {
+            "voz": "zeus",
+            "texto": "¡Escucha con atención este sonido profundo y ronco que parece un oso gigante!"
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "¿Qué instrumento emitió ese sonido grave?"
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Perfecto! El contrabajo es grande y sus cuerdas gruesas producen sonidos graves. El violín, en cambio, suena mucho más agudo."
+          },
+          "error": {
+            "voz": "zoe",
+            "texto": "El violín suena como un pajarito brillante y agudo. El sonido que escuchamos es hondo y ronco, ¡Inténtalo otra vez!"
+          }
+        }
+      ],
+      "concierto": {
+        "tipo": "teatro",
+        "instrumentos": [
+          "violin",
+          "flauta",
+          "trompeta",
+          "guitarra",
+          "contrabajo",
+          "tambor",
+          "platillos"
+        ],
+        "bpm": 96,
+        "cancion": {
+          "melodia": [
+            [
+              "do5",
+              1
+            ],
+            [
+              "do5",
+              1
+            ],
+            [
+              "sol5",
+              1
+            ],
+            [
+              "sol5",
+              1
+            ],
+            [
+              "la5",
+              1
+            ],
+            [
+              "la5",
+              1
+            ],
+            [
+              "sol5",
+              2
+            ],
+            [
+              "fa5",
+              1
+            ],
+            [
+              "fa5",
+              1
+            ],
+            [
+              "mi5",
+              1
+            ],
+            [
+              "mi5",
+              1
+            ],
+            [
+              "re5",
+              1
+            ],
+            [
+              "re5",
+              1
+            ],
+            [
+              "do5",
+              2
+            ]
+          ],
+          "acordes": [
+            "C",
+            "C",
+            "F",
+            "C",
+            "F",
+            "C",
+            "G",
+            "C"
+          ],
+          "tiemposAcorde": 2
+        }
+      },
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Increíble trabajo en la orquesta! Clasificaste instrumentos, descubriste sonidos graves y dirigiste tu propia melodía."
+        },
+        {
+          "voz": "zeus",
+          "texto": "¡La música cobra vida cuando la tocamos con tanta pasión!"
+        }
+      ],
+      "insignia": {
+        "img": "img/medalla_director.svg",
+        "nombre": "Director de Orquesta Maestro",
+        "sonido": "aplausos"
+      }
+    }
+  ]
+}

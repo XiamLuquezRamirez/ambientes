@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Gran acorde final">
+
+  <circle cx="120" cy="120" r="96" fill="#ffca28" stroke="#fff" stroke-width="10"/>
+  <circle cx="120" cy="120" r="64" fill="#f57f17"/>
+  <path d="M120 70 V170 M70 120 H170" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+</svg>

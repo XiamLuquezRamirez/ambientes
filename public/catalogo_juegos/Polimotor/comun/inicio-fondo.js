@@ -53,13 +53,12 @@
     }
   }
 
-  /* Radio del arco en em: más grande = curva más suave. Igual para todas las líneas. */
-  var RADIO_ARCO_EM = 40;
+  /* Radio del arco en em: más grande = curva más suave. */
+  var RADIO_ARCO_EM = 36;
 
   /*
-   * Coloca cada línea del título sobre un arco (centro arriba, puntas abajo, letras
-   * giradas según la tangente). Las líneas dependen del ancho, así que se mide tras el layout;
-   * transform no altera el layout, por eso las mediciones son estables entre llamadas.
+   * Arco por letra (centro arriba, puntas abajo). Tras curvar, reserva padding-bottom
+   * con la caída máxima para que el botón ¡Empecemos! no quede “encimado” al arco.
    */
   function arquearTitulo(titulo) {
     var letras = titulo.querySelectorAll('.inicio-titulo-letra');
@@ -72,6 +71,7 @@
       (lineas[clave] = lineas[clave] || []).push(span);
     });
 
+    var maxCaida = 0;
     Object.keys(lineas).forEach(function (clave) {
       var fila = lineas[clave];
       var izquierda = fila[0].offsetLeft;
@@ -85,14 +85,13 @@
         var giro = Math.asin(Math.max(-1, Math.min(1, x / RADIO_ARCO_EM))) * 180 / Math.PI;
         span.style.setProperty('--arco-y', caida.toFixed(3) + 'em');
         span.style.setProperty('--arco-r', giro.toFixed(2) + 'deg');
+        if (caida > maxCaida) maxCaida = caida;
       });
     });
+
+    titulo.style.paddingBottom = (maxCaida * 0.85).toFixed(3) + 'em';
   }
 
-  /*
-   * Título en curva: cada letra en un span; las palabras en bloques sin corte para que
-   * el salto de línea sea entre palabras.
-   */
   function mostrarTitulo() {
     document.documentElement.classList.remove(CLASE_PENDIENTE);
   }
@@ -110,6 +109,9 @@
       mostrarTitulo();
       return;
     }
+
+    if (texto.length >= 42) titulo.classList.add('inicio-kicker--largo');
+    else titulo.classList.remove('inicio-kicker--largo');
 
     titulo.dataset.curvo = '1';
     titulo.setAttribute('aria-label', texto);
@@ -182,8 +184,36 @@
   }
 
   /*
+   * Título de portada: ?nombre= (catálogo PedNia) > <title> del paquete > kicker HTML.
+   * Muchos paquetes partidos dejaron el kicker con el nombre de la temática
+   * ("Memoria visual") mientras <title>/config ya tienen el del reto.
+   */
+  function nombreDesdeQuery() {
+    try {
+      return (new URLSearchParams(window.location.search).get('nombre') || '').trim();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function nombreParaPortada(raw) {
+    return String(raw || '')
+      .replace(/\s*\(\s*\d{1,2}(?:\s*[-–]\s*\d{1,2})?\s*a[ñn]os?\s*\)\s*$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function resolverTituloPortada(kickerActual) {
+    var desdeQuery = nombreParaPortada(nombreDesdeQuery());
+    if (desdeQuery) return desdeQuery;
+    var desdeTitle = nombreParaPortada(document.title || '');
+    if (desdeTitle) return desdeTitle;
+    return nombreParaPortada(kickerActual || '');
+  }
+
+  /*
    * Iguala la portada de los paquetes que no traían icono, título o Volver:
-   * el icono sale de ?icono= y el título, del <title> del paquete.
+   * el icono sale de ?icono=; el título, de ?nombre= / <title> / kicker.
    */
   function asegurarEstructura() {
     var pantalla = document.querySelector('.pantalla-inicio');
@@ -203,12 +233,20 @@
     }
 
     var caja = pantalla.querySelector('.inicio-contenido') || btn.parentNode;
-    if (!pantalla.querySelector('.inicio-kicker')) {
-      var titulo = document.createElement('p');
-      titulo.className = 'inicio-kicker';
-      titulo.textContent = (document.title || '').replace(/\s+/g, ' ').trim();
-      if (btn.parentNode === caja) caja.insertBefore(titulo, btn);
-      else btn.parentNode.insertBefore(titulo, btn);
+    var kicker = pantalla.querySelector('.inicio-kicker');
+    if (!kicker) {
+      kicker = document.createElement('p');
+      kicker.className = 'inicio-kicker';
+      if (btn.parentNode === caja) caja.insertBefore(kicker, btn);
+      else btn.parentNode.insertBefore(kicker, btn);
+    }
+    kicker.hidden = false;
+    kicker.removeAttribute('hidden');
+    if (kicker.dataset.curvo !== '1') {
+      var titulo = resolverTituloPortada(kicker.textContent);
+      if (titulo) kicker.textContent = titulo;
+      if (titulo && titulo.length >= 42) kicker.classList.add('inicio-kicker--largo');
+      else kicker.classList.remove('inicio-kicker--largo');
     }
 
     if (!pantalla.querySelector('.inicio-icono')) {
@@ -236,8 +274,7 @@
   aplicarFondoPortada();
 
   /*
-   * El título se oculta desde el <head> hasta quedar arqueado con la fuente final, para
-   * que no se vea plano y luego "salte". La descarga de la fuente arranca ya mismo.
+   * El título se oculta hasta quedar arqueado con la fuente final.
    */
   var CLASE_PENDIENTE = 'inicio-titulo-pendiente';
   var ESPERA_FUENTE_MS = 800;
@@ -253,8 +290,7 @@
 
   /*
    * No esperar a DOMContentLoaded: los juegos cargan scripts pesados al final del <body>
-   * (Three.js, intro, juego) y eso retrasa el evento ~0.5 s. Se curva en cuanto el parser
-   * deja atrás el título (ya existe #btn-empecemos, que va después).
+   * (Three.js, intro, juego) y eso retrasa el evento ~0.5 s.
    */
   if (document.readyState === 'loading' && window.MutationObserver) {
     var observador = new MutationObserver(function () {

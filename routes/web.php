@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\SyncLogController;
 use App\Http\Controllers\Admin\TematicasAdminController;
 use App\Http\Controllers\Admin\UsuarioAdminController;
 use App\Http\Controllers\Ambientes\AmbienteNinoController;
+use App\Http\Controllers\Ambientes\PinAccesibilidadJuegoController;
 use App\Http\Controllers\Auth\AuthDocenteController;
 use App\Http\Controllers\Auth\SesionNinoController;
 use App\Http\Controllers\Docente\DocenteDashboardController;
@@ -71,6 +72,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function (Request $request) {
     return redirect()->route('ambiente.inicio', $request->query());
 });
+
+Route::view('/prueba-phaser', 'juegos.prueba-phaser');
+Route::view('/prueba-phaser4', 'juegos.prueba-phaser4'); // Lab Phaser 4 + GSAP (HUD)
+
+
 
 // ── Autenticacion del nino (público) ───────────────────────────────────────
 Route::get('/bienvenida', [SesionNinoController::class, 'mostrarBienvenida'])->name('auth.bienvenida');
@@ -611,7 +617,7 @@ Route::middleware('sesion.nino')->group(function () {
     Route::get('/listo', [SesionNinoController::class, 'mostrarBienvenidaAmbiente'])->name('auth.bienvenida-ambiente');
     Route::post('/salir', [SesionNinoController::class, 'cerrarSesion'])->name('auth.salir');
     Route::get('/juegos', [AmbienteNinoController::class, 'juegos'])->name('ambiente.juegos');
-    Route::post('/juegos/pin-accesibilidad', [\App\Http\Controllers\Ambientes\PinAccesibilidadJuegoController::class, 'verificar'])->name('ambiente.juegos.pin-accesibilidad');
+    Route::post('/juegos/pin-accesibilidad', [PinAccesibilidadJuegoController::class, 'verificar'])->name('ambiente.juegos.pin-accesibilidad');
     require __DIR__.'/kiosco.php';
 });
 

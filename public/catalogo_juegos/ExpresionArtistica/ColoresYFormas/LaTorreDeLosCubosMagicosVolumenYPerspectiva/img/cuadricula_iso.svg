@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="260" viewBox="0 0 280 260">
+  <defs>
+    <pattern id="iso" width="40" height="24" patternUnits="userSpaceOnUse" patternTransform="skewX(-30)">
+      <path d="M0 24h40M0 0v24" stroke="#b0bec5" stroke-width="1" fill="none"/>
+    </pattern>
+  </defs>
+  <rect width="280" height="260" fill="#eceff1"/>
+  <rect x="40" y="30" width="200" height="200" fill="url(#iso)" opacity=".7"/>
+  <polygon points="140,40 220,90 140,140 60,90" fill="none" stroke="#90a4ae" stroke-width="2" stroke-dasharray="6 4"/>
+  <polygon points="140,90 220,140 140,190 60,140" fill="none" stroke="#90a4ae" stroke-width="2" stroke-dasharray="6 4"/>
+  <polygon points="140,140 220,190 140,240 60,190" fill="none" stroke="#90a4ae" stroke-width="2" stroke-dasharray="6 4"/>
+</svg>

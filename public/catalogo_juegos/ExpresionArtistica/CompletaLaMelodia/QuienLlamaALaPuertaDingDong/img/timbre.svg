@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Timbre">
+<ellipse cx="120" cy="224" rx="72" ry="8" fill="#000" opacity="0.12"/>
+  <g stroke="#37474f" stroke-width="4">
+    <circle cx="120" cy="118" r="72" fill="#ffca28"/>
+    <circle cx="120" cy="118" r="46" fill="#fff59d"/>
+    <circle cx="120" cy="118" r="16" fill="#f57f17"/>
+    <rect x="108" y="188" width="24" height="22" rx="6" fill="#8d6e63"/>
+  </g>
+</svg>

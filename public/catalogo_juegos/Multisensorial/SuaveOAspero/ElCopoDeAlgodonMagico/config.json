@@ -1,0 +1,125 @@
+{
+  "nombre": "¡El Copo De Algodón Mágico!",
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: pasa el dedo sobre el objeto para sentir su textura y llévalo a su lugar.",
+    "demostracionAcierto": "¡Así se clasifica! La pluma es suave.",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Pasa el dedo sobre cada objeto y descubre cómo se siente."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Si se siente suave o áspero, ¡llévalo a su lugar!"
+      },
+      {
+        "personaje": 1,
+        "texto": "Siente, compara y clasifica. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3"
+  },
+  "demo": {
+    "material": "pluma",
+    "nombre": "Pluma",
+    "exploracion": {
+      "tacto": "mecer",
+      "sonido": "fluff",
+      "particula": "nube",
+      "meta": 1
+    }
+  },
+  "materiales": {
+    "peluche": {
+      "img": "img/peluche.svg",
+      "clase": "suave"
+    },
+    "lija": {
+      "img": "img/lija.svg",
+      "clase": "aspero"
+    },
+    "algodon": {
+      "img": "img/algodon.svg",
+      "clase": "suave"
+    },
+    "corteza": {
+      "img": "img/corteza.svg",
+      "clase": "aspero"
+    },
+    "pluma": {
+      "img": "img/pluma.svg",
+      "clase": "suave"
+    }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "El Clasificador Mágico: ¿Suave o Áspero?",
+      "escenario": "clasificador",
+      "destinos": [
+        {
+          "id": "suave",
+          "nombre": "El Tobogán de la Suavidad",
+          "sonido": "suave"
+        },
+        {
+          "id": "aspero",
+          "nombre": "La Trampilla Áspera",
+          "sonido": "carrasposo"
+        }
+      ],
+      "retos": [
+        {
+          "id": "algodon",
+          "material": "algodon",
+          "nombre": "Copo de algodón",
+          "correcta": "suave",
+          "flota": true,
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Mira este objeto blanco! Tócalo para probar su textura."
+          },
+          "exploracion": {
+            "tacto": "hundir",
+            "sonido": "puffboing",
+            "particula": "chispitas",
+            "meta": 1
+          },
+          "respuesta": "almohada",
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Excelente! El algodón es súper suave."
+          },
+          "rechazo": "expulsar",
+          "error": null,
+          "iOrigen": 2
+        }
+      ],
+      "cierreEscena": {
+        "tipo": "tubo",
+        "titulo": "La Gran Prueba del Tubo Clasificador"
+      },
+      "premio": {
+        "titulo": "Insignia",
+        "nombre": "Especialista en Texturas Suaves y Ásperas",
+        "icono": "fa-award"
+      },
+      "cierre": {
+        "voz": "zoe",
+        "texto": "¡Zoe y Zeus te entregan la insignia de Especialista en Texturas Suaves y Ásperas!"
+      }
+    }
+  ]
+}

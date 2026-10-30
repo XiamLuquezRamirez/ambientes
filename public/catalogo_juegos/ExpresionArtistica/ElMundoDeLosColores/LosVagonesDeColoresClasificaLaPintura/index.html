@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Los Vagones de Colores (Clasifica la Pintura)</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="/assets/css/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/assets/css/fontawesome/css/all.min.css">
+	<link rel="stylesheet" href="/assets/css/fonts.css">
+	<link rel="stylesheet" href="/assets/css/sweetalert2.min.css">
+	<script src="/assets/js/jquery-4.0.0.min.js"></script>
+	<script src="/assets/js/sweetalert.js"></script>
+	<link rel="stylesheet" href="style.css?v=20261026c">
+	<link rel="stylesheet" href="../../../Polimotor/comun/inicio-fondo.css?v=20261030d">
+	<script src="../../../Polimotor/comun/inicio-fondo.js?v=20261030d"></script>
+	<link rel="stylesheet" href="../../../tutorial/tutorial.css?v=20261027a">
+	<link rel="stylesheet" href="../../../shared/menu-accesibilidad.css?v=20261027a">
+	<link rel="stylesheet" href="../../../final/final.css">
+	<link rel="stylesheet" href="../../../intro3d/css/intro.css?v=20261027a">
+</head>
+<body class="esperando-inicio tema-estudio">
+	<div id="pantalla-inicio" class="pantalla-inicio">
+		<div class="inicio-mancha" aria-hidden="true"></div>
+		<div class="inicio-escena" aria-hidden="true">
+			<i class="fa-solid fa-droplet inicio-nota n1"></i>
+			<i class="fa-solid fa-palette inicio-nota n2"></i>
+			<i class="fa-solid fa-star inicio-nota n3"></i>
+			<img class="inicio-pj inicio-zoe" src="../../../img/zoe_normal.gif" alt="" draggable="false">
+			<img class="inicio-pj inicio-zeus" src="../../../img/zeus_normal.gif" alt="" draggable="false">
+		</div>
+		<div class="inicio-contenido">
+			<div class="inicio-vitrina" aria-hidden="true">
+				<img class="inicio-inst i1" src="img/gota_roja.svg" alt="" draggable="false">
+				<img class="inicio-inst i2" src="img/gota_amarilla.svg" alt="" draggable="false">
+				<img class="inicio-inst i3" src="img/gota_azul.svg" alt="" draggable="false">
+			</div>
+			<p class="inicio-kicker">Los Vagones de Colores (Clasifica la Pintura)</p>
+			<button type="button" id="btn-empecemos" class="btn-empecemos" aria-label="Empezar">
+				<span class="btn-empecemos-anillo" aria-hidden="true"></span>
+				<span class="btn-empecemos-anillo btn-empecemos-anillo-2" aria-hidden="true"></span>
+				<i class="fa-solid fa-play btn-empecemos-icono" aria-hidden="true"></i>
+			</button>
+		</div>
+	</div>
+	<div id="intro3d-root" hidden>
+		<div id="three-container"></div>
+		<div id="phaser-container"></div>
+		<button type="button" id="btn-omitir-intro3d" class="btn btn-warning">Omitir <i class="fa fa-forward"></i></button>
+		<div id="intro3d-continuar" hidden>
+			<div class="intro3d-continuar-card">
+				<div class="intro3d-titulo-wrap"><h2>¡Listo!</h2></div>
+				<p>Toca el botón para empezar el juego</p>
+				<div class="intro3d-btn-wrap"><button type="button" id="btn-continuar-intro3d"><span class="intro3d-play" aria-hidden="true"></span><span>CONTINUAR</span></button></div>
+			</div>
+		</div>
+	</div>
+	<div id="fondo_blanco" style="display:none;background:rgba(255,255,255,.66);width:100%;height:100%;position:fixed;z-index:100;"></div>
+	<div id="final" class="final" hidden>
+		<div id="victoria">
+			<img src="../../../img/fondo.png" class="fondo" alt="">
+			<div class="contenido">
+				<img src="../../../img/excelente.png" class="excelente" alt="¡Excelente!">
+				<p class="texto-final" id="texto_final"></p>
+				<img src="../../../img/trofeo.png" class="trofeo" alt="Trofeo">
+				<img src="../../../img/zeus_normal.gif" class="personaje zeus" alt="Zeus">
+				<img src="../../../img/zoe_normal.gif" class="personaje zoe" alt="Zoe">
+				<div class="destello destello-1"></div><div class="destello destello-2"></div><div class="destello destello-3"></div>
+			</div>
+			<img src="../../../img/cortina_izq.png" class="cortina cortina-izq" alt="">
+			<img src="../../../img/cortina_der.png" class="cortina cortina-der" alt="">
+			<div class="confeti" id="confeti"></div>
+		</div>
+		<div class="final-acciones" id="final-acciones">
+			<p class="final-pregunta">¿Quieres jugar nuevamente?</p>
+			<div class="final-botones">
+				<button type="button" class="btn btn-success" onclick="window.location.reload(1)"><i class="fa-solid fa-play"></i> Sí</button>
+				<button type="button" class="btn btn-danger" onclick="history.back()"><i class="fa-solid fa-home"></i> No</button>
+			</div>
+		</div>
+	</div>
+	<div id="escena-fondo" class="escena-fondo" aria-hidden="true"><img class="escena-capa activa" alt="" draggable="false"><img class="escena-capa" alt="" draggable="false"></div>
+	<div id="principal">
+		<div class="hud-top"><div class="hud-nav">
+			<button type="button" onclick="location.reload()" class="btn btn-warning btn-round" title="Reiniciar"><i class="fa-solid fa-rotate"></i></button>
+			<button type="button" onclick="history.back()" class="btn btn-danger btn-round" title="Salir"><i class="fa-solid fa-arrow-left"></i></button>
+		</div></div>
+		<div class="cabecera"><div id="dialogo" class="dialogo" aria-live="polite">
+			<img id="dialogo-avatar" class="dialogo-avatar" src="../../../images/zoe_normal.gif" alt="Zoe">
+			<p id="enunciado" class="enunciado"></p>
+		</div></div>
+		<div class="escenario" id="escenario">
+			<div class="pj pj-zoe" id="pj-zoe"><img class="pj-img" src="../../../img/zoe_normal.gif" alt="Zoe" draggable="false"></div>
+			<div class="centro"><div class="progreso" id="progreso" aria-label="Retos"></div><div class="estacion" id="estacion"></div></div>
+			<div class="pj pj-zeus" id="pj-zeus"><img class="pj-img" src="../../../img/zeus_normal.gif" alt="Zeus" draggable="false"></div>
+		</div>
+	</div>
+	<div id="concierto" class="concierto" hidden aria-hidden="true">
+		<div class="concierto-tarima" id="concierto-tarima"></div>
+	</div>
+	<div id="capa-efectos" class="capa-efectos" aria-hidden="true"></div>
+	<div id="tutorial-zoe" class="tutorial-zoe" hidden></div>
+	<div id="tutorial-3d" class="tutorial-3d" hidden></div>
+	<div id="menu-acc" class="menu-acc">
+		<button type="button" id="btn-menu-acc" class="menu-acc-fab" title="Accesibilidad"><i class="fa-solid fa-universal-access"></i></button>
+		<div id="menu-acc-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab"><strong>Accesibilidad</strong><button type="button" id="btn-cerrar-acc" class="menu-acc-cerrar">&times;</button></div>
+			<div id="menu-acc-ops" class="menu-acc-ops"></div>
+		</div>
+	</div>
+	<div id="menu-vol" class="menu-acc">
+		<button type="button" id="btn-menu-vol" class="menu-acc-fab" title="Volumen de fondo"><i class="fa-solid fa-volume-high"></i></button>
+		<div id="menu-vol-panel" class="menu-acc-panel" hidden>
+			<div class="menu-acc-cab"><strong>Volumen de fondo</strong><button type="button" id="btn-cerrar-vol" class="menu-acc-cerrar">×</button></div>
+			<label class="menu-acc-rango"><span>Volumen <strong id="vol-val">20</strong></span><input type="range" id="rango-volumen" min="0" max="100" step="1" value="20"></label>
+		</div>
+	</div>
+	<script src="../../../texto_voz.js"></script>
+	<script src="../../../shared/edad-nivel.js"></script>
+	<script src="../../../tutorial/tutorial.js?v=20261019b"></script>
+	<script src="../../../final/final.js"></script>
+	<script src="../../../shared/aplicar-perfil-juego.js"></script>
+	<script src="logica.js?v=20261026a"></script>
+	<script src="sfx.js?v=20261026a"></script>
+	<script src="../../../../assets/vendor/phaser/phaser.min.js"></script>
+	<script src="../../../intro3d/js/config.js?v=20261007a"></script>
+	<script src="../../../intro3d/js/ambientes-tema.js?v=20260930d"></script>
+	<script type="importmap">{ "imports": { "three": "../../../../assets/vendor/three/three.module.js", "three/addons/": "../../../../assets/vendor/three/addons/" } }</script>
+	<script type="module" src="../../../intro3d/js/three-scene.js?v=20261007a"></script>
+	<script type="module" src="../../../intro3d/js/final-scene.js?v=20261021a"></script>
+	<script type="module" src="../../../intro3d/js/tutorial-3d.js?v=20261021a"></script>
+	<script type="module" src="../../../intro3d/js/personajes-juego.js?v=20261021a"></script>
+	<script src="../../../intro3d/js/intro.js?v=20261028p4"></script>
+	<script src="../../../shared/pin-accesibilidad.js?v=20261019c"></script>
+	<script src="../../../shared/menu-accesibilidad.js?v=20261019d"></script>
+	<script src="script.js?v=20261026c"></script>
+</body>
+</html>

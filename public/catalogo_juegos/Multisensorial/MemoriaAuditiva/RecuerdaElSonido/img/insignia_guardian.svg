@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Insignia Guardi&#225;n de la memoria auditiva">
+  <path d="M78 160 L52 252 L88 232 L106 258 L120 176 Z" fill="#1c7ed6"/>
+  <path d="M162 160 L188 252 L152 232 L134 258 L120 176 Z" fill="#7048e8"/>
+  <path d="M120 10 L206 40 C206 120 180 170 120 200 C60 170 34 120 34 40 Z" fill="#364fc7" stroke="#ffd43b" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M120 30 L188 54 C186 118 166 156 120 180 C74 156 54 118 52 54 Z" fill="#4c6ef5"/>
+  <g fill="#ffd43b" stroke="#f59f00" stroke-width="4" stroke-linejoin="round">
+    <rect x="80" y="74" width="80" height="62" rx="8"/>
+    <path d="M80 82 L120 108 L160 82"/>
+  </g>
+  <rect x="80" y="74" width="80" height="62" rx="8" fill="none" stroke="#f59f00" stroke-width="4"/>
+  <circle cx="120" cy="114" r="12" fill="#e64980" stroke="#fff" stroke-width="3"/>
+  <g stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M64 92 C58 102 58 116 64 126"/>
+    <path d="M176 92 C182 102 182 116 176 126"/>
+  </g>
+  <g fill="#ffd43b">
+    <path d="M120 146 L124 156 L135 157 L127 164 L129 175 L120 169 L111 175 L113 164 L105 157 L116 156 Z"/>
+  </g>
+</svg>

@@ -35,6 +35,23 @@
         });
     }
 
+    // Capa de animación GSAP + partículas Phaser 4 (secuencia-anim.js). Solo visual:
+    // si no está disponible se usa el comportamiento original.
+    function anim() {
+        return (window.SecuenciaAnim && window.SecuenciaAnim.activo) ? window.SecuenciaAnim : null;
+    }
+
+    // Audio compartido con Howler (../../shared/pednia-audio.js), tema del ambiente.
+    // Si no está, se usa el audio original (new Audio).
+    function sonido() {
+        return (window.PedniaAudio && window.PedniaAudio.activo) ? window.PedniaAudio : null;
+    }
+
+    /** Evento sonoro del tema; false si el tema no lo cubre. */
+    function sonarEvento(nombre, opts) {
+        return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
+    }
+
     function textos() {
         return (gameConfig && gameConfig.textos) || {};
     }
@@ -364,6 +381,22 @@
 
     function reproducirAudio(ruta, volumen, loop) {
         if (!ruta) return null;
+        if (sonido()) {
+            const vol = volumen != null ? volumen : 1;
+            if (loop) {
+                // Música de fondo: la del tema (si la trae) con fundidos. TextoVoz y el video de
+                // presentación la siguen manejando con .volume / play() / pause().
+                const musica = sonido().musica(ruta);
+                if (musica) {
+                    musica.volume = vol;
+                    musica.play();
+                    audioFondo = musica;
+                    return musica;
+                }
+            } else if (sonido().archivo(ruta, vol)) {
+                return null;
+            }
+        }
         try {
             let base = audioCache[ruta];
             if (!base) {
@@ -591,6 +624,7 @@
         nivelElegido = gameConfig.niveles.find(function (n) { return String(n.id) === String(id); });
         Swal.close();
         if (!nivelElegido) return;
+        if (anim()) anim().preparar();
         retoGen += 1;
         const gen = retoGen;
         esperandoFeedback = false;
@@ -829,6 +863,7 @@
         if (!el || !retos.length) return;
         el.hidden = false;
         el.textContent = (indiceReto + 1) + "/" + retos.length;
+        if (anim()) anim().progreso(el);
     }
 
     function subtituloBase() {
@@ -842,6 +877,7 @@
         if (!titulo || !t) return;
         if (t.charAt(0) === "¿") {
             titulo.textContent = "¿Qué sigue?";
+            if (anim()) anim().enunciado(titulo);
             return;
         }
         if (sub && t.length > 28) {
@@ -849,6 +885,7 @@
             return;
         }
         titulo.textContent = t;
+        if (anim()) anim().enunciado(titulo);
     }
 
     function restaurarSubtitulo() {
@@ -910,6 +947,7 @@
         for (let i = 0; i < secuencia.length; i++) {
             if (gen !== retoGen) return;
             slots[i].classList.add("activa");
+            if (anim()) anim().pasoActivo(slots[i]);
             const nombre = nombreMov(secuencia[i]);
             const t0 = Date.now();
             if (nombre) {
@@ -950,6 +988,8 @@
             });
             ops.appendChild(btn);
         });
+        if (anim()) anim().entradaOpciones(ops);
+        sonarEvento("aparece");
     }
 
     async function iniciarRetoActual(gen) {
@@ -1050,7 +1090,10 @@
             btnEl.classList.add("rechazo");
             setTimeout(function () { btnEl.classList.remove("rechazo"); }, 600);
         }
-        reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
+        if (anim()) anim().error(btnEl);
+        if (!sonarEvento("error")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.error, 0.8, false);
+        }
         try {
             await feedbackConVoz(texto, {
                 personaje: "zeus",
@@ -1125,6 +1168,8 @@
             b.disabled = true;
             if (b !== btnEl) b.classList.add("descartada");
         });
+        if (anim()) anim().elegir(btnEl);
+        sonarEvento("agarrar");
         const hueco = document.querySelector("#riel .slot-pose.hueco");
         const ghost = await moverTarjetaAlHueco(btnEl, hueco);
         const sigue = !!(hueco && hueco.isConnected);
@@ -1133,6 +1178,8 @@
             hueco.textContent = "";
             hueco.dataset.mov = valor;
             hueco.appendChild(crearImgEl(imgUrl(valor), nombreMov(valor)));
+            if (anim()) anim().encajar(hueco);
+            sonarEvento("soltar");
         }
         if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
         return sigue;
@@ -1158,7 +1205,11 @@
         await reproducirSecuencia(completa, gen, false);
         if (gen !== retoGen) return;
 
-        reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        // Con el tema: encaje + aplausos suaves ("respuesta correcta"); sin tema, ok.mp3.
+        if (!sonarEvento("correcto")) {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
+        }
+        if (anim()) anim().acierto();
         // Sin modal/TTS por acierto: solo sonido.
         await sleep(350);
         if (gen !== retoGen) return;
@@ -1175,8 +1226,15 @@
         const cierre = (typeof textos === "function" ? textos().cierre : null) || "¡Excelente!";
         const texto = document.getElementById("texto_final");
         if (texto) texto.textContent = cierre;
-        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        if (sonarEvento("victoria")) {
+            // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+            // fanfarria son tonos puros agudos (se oía como "pitido").
+            sonido().agacharMusica(0.35);
+        } else {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);
+        }
         TextoVoz.hablar(cierre, "zoe");
+        if (anim()) anim().celebrar();
         setTimeout(function () {
             const caja = document.getElementById("final");
             if (caja) {
@@ -1200,6 +1258,7 @@
         resolverCuerpo();
         aplicarLetterSpacing();
 
+        if (sonido()) sonido().usarTema(gameConfig.audios && gameConfig.audios.tema);
         TextoVoz.iniciar(gameConfig, introConfig, {
             obtenerAudioFondo: function () { return audioFondo; },
             volumenFondo: volumenFondoPct() / 100,

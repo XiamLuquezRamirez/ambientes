@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Ducha">
+  <rect x="10" y="10" width="220" height="220" rx="12" fill="#e0f7fa"/>
+  <g stroke="#b2ebf2" stroke-width="3">
+    <path d="M10 66 H230 M10 122 H230 M10 178 H230 M66 10 V230 M122 10 V230 M178 10 V230"/>
+  </g>
+  <path d="M206 10 V54 C206 66 198 72 186 72 H150" fill="none" stroke="#37474f" stroke-width="14" stroke-linecap="round"/>
+  <path d="M206 10 V54 C206 66 198 72 186 72 H150" fill="none" stroke="#b0bec5" stroke-width="8" stroke-linecap="round"/>
+  <path d="M110 70 H168 L180 98 H98 Z" fill="#cfd8dc" stroke="#37474f" stroke-width="4" stroke-linejoin="round"/>
+  <g stroke="#4fc3f7" stroke-width="5" stroke-linecap="round">
+    <path d="M108 112 L100 136 M96 156 L88 180"/>
+    <path d="M126 112 L122 136 M118 158 L114 182 M110 200 L106 218"/>
+    <path d="M144 112 L144 136 M144 158 L144 182"/>
+    <path d="M162 112 L166 136 M170 158 L174 182 M178 200 L182 218"/>
+    <path d="M178 110 L186 132 M192 152 L200 176"/>
+  </g>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-label="Insignia de logro">
+  <path d="M78 150 L52 248 L88 228 L106 256 L120 168 Z" fill="#e64980"/>
+  <path d="M162 150 L188 248 L152 228 L134 256 L120 168 Z" fill="#7048e8"/>
+  <circle cx="120" cy="112" r="96" fill="#fcc419"/>
+  <circle cx="120" cy="112" r="96" fill="none" stroke="#f59f00" stroke-width="8"/>
+  <circle cx="120" cy="112" r="76" fill="#fff3bf"/>
+  <path d="M120 44 L136 78 L174 82 L146 106 L154 144 L120 125 L86 144 L94 106 L66 82 L104 78 Z" fill="#ffd43b" stroke="#f59f00" stroke-width="5" stroke-linejoin="round"/>
+  <g transform="translate(70 150)">
+    <circle cx="10" cy="10" r="11" fill="#ff6b6b"/>
+    <circle cx="50" cy="10" r="11" fill="#51cf66"/>
+    <circle cx="90" cy="10" r="11" fill="#339af0"/>
+    <path d="M21 10 H39 M61 10 H79" stroke="#868e96" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 6"/>
+  </g>
+  <g fill="#7048e8">
+    <ellipse cx="38" cy="58" rx="10" ry="8"/>
+    <rect x="45" y="22" width="5" height="36" rx="2"/>
+    <ellipse cx="204" cy="62" rx="10" ry="8"/>
+    <rect x="211" y="26" width="5" height="36" rx="2"/>
+  </g>
+</svg>

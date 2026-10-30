@@ -1,0 +1,104 @@
+{
+  "nombre": "Encuentra El Rojo (3-4 Años)",
+  "mostrarFeedBack": true,
+  "feedback": {
+    "duracion": 1400,
+    "acierto": {
+      "gif": "../../../images/correcto.gif"
+    },
+    "error": {
+      "gif": "../../../images/incorrecto.gif"
+    }
+  },
+  "textos": {
+    "eligeNivel": "Elige tu edad",
+    "enunciado": "Observa muy bien y encuentra el color que te indico",
+    "cierre": "¡Excelente! Encontraste el rojo en todas las escenas.",
+    "aciertoPlantilla": "¡Muy bien! Encontraste el color {color}.",
+    "error": "¡Inténtalo otra vez! Observa muy bien.",
+    "consignaPlantilla": "Encuentra el objeto de color {color}.",
+    "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: toca el objeto de color {color}.",
+    "demostracionFin": "¡Ahora te toca a ti! Encuentra el color que te digamos.",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hola! Soy Zoe. ¡Vamos a jugar! Observa muy bien los objetos y encuentra el color que te voy a indicar."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Yo soy Zeus! Mira los colores: toca el objeto del color que te digamos."
+      },
+      {
+        "personaje": 1,
+        "texto": "Escucha con atención, observa y toca. ¡Tú puedes!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "acierto": "../../../sounds/ok.mp3",
+    "error": "../../../sounds/over.mp3",
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3"
+  },
+  "colores": {
+    "rojo": { "nombre": "rojo", "hex": "#e03131" },
+    "amarillo": { "nombre": "amarillo", "hex": "#ffef00" },
+    "azul": { "nombre": "azul", "hex": "#1c7ed6" },
+    "verde": { "nombre": "verde", "hex": "#2f9e44" },
+    "naranja": { "nombre": "naranja", "hex": "#fd7e14" },
+    "morado": { "nombre": "morado", "hex": "#9c36b5" },
+    "rosado": { "nombre": "rosado", "hex": "#f06595" },
+    "celeste": { "nombre": "celeste", "hex": "#74c0fc" }
+  },
+  "objetos": {
+    "manzana": { "nombre": "Manzana", "img": "img/Manzana.png", "color": "rojo" },
+    "sol": { "nombre": "Sol", "img": "img/Sol.png", "color": "amarillo" },
+    "carro": { "nombre": "Carro", "img": "img/Carro.png", "color": "azul" },
+    "fresa": { "nombre": "Fresa", "img": "img/Fresa.svg", "color": "rojo" },
+    "platano": { "nombre": "Plátano", "img": "img/Platano.svg", "color": "amarillo" },
+    "pelota": { "nombre": "Pelota", "img": "img/Pelota.svg", "color": "azul" },
+    "corazon": { "nombre": "Corazón", "img": "img/Corazon.svg", "color": "rojo" },
+    "pez": { "nombre": "Pez", "img": "img/Pez.svg", "color": "azul" },
+    "hoja": { "nombre": "Hoja", "img": "img/Hoja.svg", "color": "verde" },
+    "mariquita": { "nombre": "Mariquita", "img": "img/Mariquita.svg", "color": "rojo" },
+    "queso": { "nombre": "Queso", "img": "img/Queso.svg", "color": "amarillo" },
+    "estrella": { "nombre": "Estrella", "img": "img/Estrella.svg", "color": "amarillo" }
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Encuentra el rojo",
+      "colores": ["rojo"],
+      "objetos": ["manzana", "sol", "carro"],
+      "escenas": [
+        {
+          "titulo": "La manzana roja",
+          "objetos": ["manzana", "sol", "carro"],
+          "colores": ["rojo"]
+        },
+        {
+          "titulo": "La fresa dulce",
+          "objetos": ["fresa", "platano", "pelota"],
+          "colores": ["rojo"]
+        },
+        {
+          "titulo": "El corazón brillante",
+          "objetos": ["corazon", "pez", "hoja"],
+          "colores": ["rojo"]
+        },
+        {
+          "titulo": "La mariquita",
+          "objetos": ["mariquita", "queso", "estrella"],
+          "colores": ["rojo"]
+        }
+      ]
+    }
+  ]
+}
