@@ -322,16 +322,21 @@ body.intro3d-activa #menu-acc {
 }
 
 .cabecera-nube {
-    position: relative;
+    position: absolute;
     z-index: 12;
     flex: 0 0 auto;
-    width: min(1040px, 94vw);
+    width: 44vw;
+    display: flex;
+    height: 29vh;
     aspect-ratio: 1000 / 195;
-    margin: 68px auto 0;
-    padding: 9% 7% 16%;
     box-sizing: border-box;
-    background: url("img/nube_texto.png") no-repeat center top / 100% 100%;
+    background: url(img/nube_texto.png) no-repeat center top / 100% 100%;
     pointer-events: none;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 3vh;
+    left: 28%;
+    top: -14px;
 }
 
 .enunciado-nube {
