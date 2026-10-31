@@ -29,7 +29,7 @@
     function textoPlano(html) {
         if (!html) return "";
         var tmp = document.createElement("div");
-        tmp.innerHTML = html;
+        tmp.innerHTML = String(html).replace(/<br\s*\/?>/gi, " ");
         return String(tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ").trim();
     }
 
@@ -497,6 +497,7 @@
         encolarFrases: encolarFrases,
         hablar: hablar,
         textoConteo: textoConteo,
+        textoPlano: textoPlano,
         detener: detenerVoz,
         desbloquear: desbloquearAudioTts,
         vaciar: vaciarCacheTts,
