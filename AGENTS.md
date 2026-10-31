@@ -86,8 +86,11 @@ Rutas con nombre: `admin.*`, `panel.*`, `superadmin.*`, `auth.*`, `docente.login
 
 ## Grafo de conocimiento (graphify)
 
-`graphify-out/` tiene un grafo del código (AST, sin LLM): `graph.json`, `GRAPH_REPORT.md` (resumen, nodos más conectados, comunidades) y `graph.html` (visor). `graphify-out/memory/` guarda rastreos ya hechos.
+`graphify-out/` tiene un grafo del código (AST, sin LLM): `graph.json` (~39 000 nodos), `GRAPH_REPORT.md`, `graph.html` (visor) y `memory/` (rastreos ya hechos). Úsalo **antes** de explorar el código a ciegas: para "¿dónde está / quién llama / qué depende de X?" una consulta al grafo cuesta mucho menos que leer archivos.
 
-- Consultar: `pip install graphifyy` y `graphify query "<pregunta>"`, o leer `GRAPH_REPORT.md`.
-- Aristas `INFERRED` entre archivos pueden ser coincidencias de nombre: verificar con grep. No enlaza llamadas a miembro (`TextoVoz.textoPlano()`); los métodos de traits PHP cuelgan del archivo, no del trait.
-- Al regenerarlo, desactivar la deduplicación difusa (fusiona clases de nombre parecido, p. ej. controladores Admin/Panel) y compactar `graph.json` (sin sangría pesa ~58 MB).
+- Skill del proyecto: `.claude/skills/graphify` (`/graphify query "<pregunta>"`). Requiere una vez `pip install graphifyy` y crear el puntero al intérprete que la skill espera: `python -c "import sys; open('graphify-out/.graphify_python','w').write(sys.executable)"`.
+- Consulta directa: `graphify query "<términos>" --budget 1500` (BFS) o `--dfs` para rastrear un camino; `graphify explain "<nodo>"`, `graphify path "<A>" "<B>"`. Usar los nombres tal como están en el código (el buscador no traduce ni hace sinónimos).
+- **No leer `GRAPH_REPORT.md` completo** (~500 KB ≈ 125 000 tokens): buscar dentro con grep (p. ej. `God Nodes`, el nombre de una clase o comunidad).
+- Antes de rastrear algo, revisar `graphify-out/memory/` por si ya está respondido.
+- Limitaciones: aristas `INFERRED` entre archivos pueden ser coincidencias de nombre (verificar con grep); no enlaza llamadas a miembro (`TextoVoz.textoPlano()`); los métodos de traits PHP cuelgan del archivo, no del trait. El grafo es una foto: si el código cambió, confirmar en los archivos.
+- Regenerarlo: no usar `graphify update`, `--update` ni `graphify hook install` tal cual, porque aplican la deduplicación difusa (fusiona clases de nombre parecido, p. ej. controladores Admin/Panel). Reconstruir completo con `extract(..., parallel=False)`, `graphify.dedup._ENTROPY_THRESHOLD = inf`, `to_json(..., force=True)` y compactar `graph.json` (con sangría pesa ~58 MB).
