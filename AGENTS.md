@@ -83,3 +83,11 @@ Rutas con nombre: `admin.*`, `panel.*`, `superadmin.*`, `auth.*`, `docente.login
 ## Docs internas
 
 `docs/superpowers/plans/` (paneles y ambientes/grados) y `docs/panel-header-institucion.md`.
+
+## Grafo de conocimiento (graphify)
+
+`graphify-out/` tiene un grafo del código (AST, sin LLM): `graph.json`, `GRAPH_REPORT.md` (resumen, nodos más conectados, comunidades) y `graph.html` (visor). `graphify-out/memory/` guarda rastreos ya hechos.
+
+- Consultar: `pip install graphifyy` y `graphify query "<pregunta>"`, o leer `GRAPH_REPORT.md`.
+- Aristas `INFERRED` entre archivos pueden ser coincidencias de nombre: verificar con grep. No enlaza llamadas a miembro (`TextoVoz.textoPlano()`); los métodos de traits PHP cuelgan del archivo, no del trait.
+- Al regenerarlo, desactivar la deduplicación difusa (fusiona clases de nombre parecido, p. ej. controladores Admin/Panel) y compactar `graph.json` (sin sangría pesa ~58 MB).
