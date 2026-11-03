@@ -674,6 +674,18 @@
         });
     }
 
+    /** Título visible, es-ES: sin distinguir mayúsculas ni tildes; ñ después de n. */
+    function ordenarAlfabeticamente(lista) {
+        return lista.slice().sort(function (a, b) {
+            const cmp = String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es', {
+                sensitivity: 'base',
+                numeric: true,
+            });
+            if (cmp !== 0) return cmp;
+            return String(a.slug || '').localeCompare(String(b.slug || ''), 'es');
+        });
+    }
+
     function juegoPorSlug(slug) {
         const clave = String(slug || '').trim();
         if (!clave) return null;
@@ -716,6 +728,7 @@
                 juegos = Array.isArray(json.data?.juegos)
                     ? json.data.juegos.filter((j) => j.slug && j.url_paquete)
                     : [];
+                juegos = ordenarAlfabeticamente(juegos);
                 renderGaleria();
                 enlazar();
             })

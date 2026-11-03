@@ -93,10 +93,7 @@ class JuegoCatalogoService
 
         $this->aplicarFiltroAmbiente($consulta, $ambienteId);
 
-        $juegos = $consulta
-            ->orderBy('orden')
-            ->orderBy('slug')
-            ->get();
+        $juegos = $consulta->get();
 
         if ($edadAnos !== null) {
             $juegos = $juegos
@@ -104,7 +101,59 @@ class JuegoCatalogoService
                 ->values();
         }
 
+        $juegos = $this->ordenarPorNombreVisible($juegos, $edadAnos !== null);
+
         return $this->serializarColeccionJson($juegos, $edadAnos !== null);
+    }
+
+    /**
+     * Orden alfabético del título que ve el niño (sin el sufijo de edad cuando se oculta).
+     * Ignora mayúsculas y tildes; la ñ va después de la n. El campo `orden` no interviene.
+     */
+    public function ordenarPorNombreVisible(Collection $juegos, bool $ocultarSufijoEdad = false): Collection
+    {
+        return $juegos
+            ->sort(function (Juego $a, Juego $b) use ($ocultarSufijoEdad) {
+                $cmp = strcmp(
+                    $this->claveOrdenAlfabetico($this->nombreVisible($a, $ocultarSufijoEdad)),
+                    $this->claveOrdenAlfabetico($this->nombreVisible($b, $ocultarSufijoEdad))
+                );
+                if ($cmp !== 0) {
+                    return $cmp;
+                }
+
+                return strcmp((string) $a->slug, (string) $b->slug);
+            })
+            ->values();
+    }
+
+    private function nombreVisible(Juego $juego, bool $ocultarSufijoEdad): string
+    {
+        $nombre = (string) $juego->nombre;
+        if ($ocultarSufijoEdad) {
+            $nombre = $this->nombreSinSufijoEdad($nombre);
+        }
+
+        return $nombre;
+    }
+
+    private function claveOrdenAlfabetico(string $nombre): string
+    {
+        $nombre = mb_strtolower(trim($nombre), 'UTF-8');
+        $nombre = strtr($nombre, [
+            'á' => 'a', 'à' => 'a', 'ä' => 'a', 'â' => 'a',
+            'é' => 'e', 'è' => 'e', 'ë' => 'e', 'ê' => 'e',
+            'í' => 'i', 'ì' => 'i', 'ï' => 'i', 'î' => 'i',
+            'ó' => 'o', 'ò' => 'o', 'ö' => 'o', 'ô' => 'o',
+            'ú' => 'u', 'ù' => 'u', 'ü' => 'u', 'û' => 'u',
+            'ñ' => 'n~',
+        ]);
+
+        return preg_replace_callback(
+            '/\d+/',
+            static fn (array $coincidencia) => str_pad($coincidencia[0], 6, '0', STR_PAD_LEFT),
+            $nombre
+        ) ?? $nombre;
     }
 
     /**

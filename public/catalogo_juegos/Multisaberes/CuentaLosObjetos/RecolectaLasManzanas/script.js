@@ -264,7 +264,14 @@
 
     function seccionDe(reto) {
         var id = reto && reto.id;
+        /* id puede ser "recolecta-2" o "recolecta-2-1": prueba exacto y luego por prefijo antes del guion+numero final. */
         var propia = id ? document.querySelector('.reto[data-listo="1"][data-reto="' + id + '"]') : null;
+        if (!propia && id) {
+            var prefijo = id.replace(/-\d+$/, "");
+            if (prefijo && prefijo !== id) {
+                propia = document.querySelector('.reto[data-listo="1"][data-reto="' + prefijo + '"]');
+            }
+        }
         return propia || document.querySelector('.reto[data-listo="1"]');
     }
 
@@ -292,22 +299,14 @@
         var conejos = esConejos(reto);
         var pollitos = esPollitos(reto);
         var cantidad;
-        if (conejos) {
-            cantidad = L.cantidadDe(reto) || 5;
-        } else if (pollitos) {
-            cantidad = L.cantidadDe(reto) || 2;
-        } else if (esDemo && L.respuestaDe(reto)) {
+        if (esDemo && L.respuestaDe(reto)) {
             cantidad = L.respuestaDe(reto);
         } else {
-            cantidad = L.cantidadAleatoria(Math.random);
+            cantidad = L.cantidadAleatoria(Math.random, reto);
         }
         var prefijo = conejos ? "zanahoria" : (pollitos ? "pollito" : "manzana");
         var fijas = L.opcionesFijas(reto);
         var correcto = cantidad;
-        if (conejos || pollitos) {
-            var nCfg = Number(reto && reto.correcto);
-            if (isFinite(nCfg) && nCfg > 0) correcto = Math.floor(nCfg);
-        }
         var seccion = seccionDe(reto);
         return {
             reto: reto,
@@ -398,7 +397,90 @@
         if (!ronda) return;
         var banner = ronda.seccion && ronda.seccion.querySelector(".banner-reto");
         var nombre = (ronda.reto && ronda.reto.titulo) || "Recolecta las manzanas";
-        if (banner) banner.textContent = "RETO " + (sufijo(ronda.seccion) || "1") + ": " + String(nombre).toUpperCase();
+        if (banner) banner.textContent = "RETO " + (ronda.demo ? 1 : indice + 1) + ": " + String(nombre).toUpperCase();
+    }
+
+    function crearBotonObjeto(manzana, i, clase, etiqueta) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = clase + " slot-" + i;
+        btn.dataset.id = manzana.id;
+        if (manzana.orden) btn.dataset.orden = String(manzana.orden);
+        btn.setAttribute("aria-pressed", "false");
+        btn.setAttribute("aria-label", etiqueta);
+        if (ronda.pollitos) {
+            var nido = document.createElement("img");
+            nido.className = "nido-propio nido-atras";
+            nido.src = "img/nido.svg";
+            nido.alt = "";
+            nido.draggable = false;
+            btn.appendChild(nido);
+            var nidoFrente = document.createElement("img");
+            nidoFrente.className = "nido-propio nido-frente";
+            nidoFrente.src = "img/nido.svg";
+            nidoFrente.alt = "";
+            nidoFrente.draggable = false;
+            btn.appendChild(nidoFrente);
+            var huevo = document.createElement("img");
+            huevo.className = "huevo";
+            huevo.src = imgHuevo();
+            huevo.alt = "";
+            huevo.draggable = false;
+            btn.appendChild(huevo);
+            var casIzq = document.createElement("img");
+            casIzq.className = "cascaron cascaron-izq";
+            casIzq.src = imgHuevo();
+            casIzq.alt = "";
+            casIzq.draggable = false;
+            btn.appendChild(casIzq);
+            var casDer = document.createElement("img");
+            casDer.className = "cascaron cascaron-der";
+            casDer.src = imgHuevo();
+            casDer.alt = "";
+            casDer.draggable = false;
+            btn.appendChild(casDer);
+        }
+        var img = document.createElement("img");
+        img.className = ronda.pollitos ? "pollito-img" : "";
+        img.src = imgObjetoConteo();
+        img.alt = "";
+        img.draggable = false;
+        btn.appendChild(img);
+        if (!ronda.conejos && !ronda.pollitos) {
+            btn.addEventListener("pointerdown", function () { armarZoom(btn, manzana); });
+            btn.addEventListener("pointerup", soltarZoom);
+            btn.addEventListener("pointercancel", soltarZoom);
+        }
+        btn.addEventListener("click", function () { alTocarManzana(manzana.id); });
+        return btn;
+    }
+
+    function actualizarBotonObjeto(btn, manzana, etiqueta) {
+        var contada = !!manzana.contada;
+        btn.setAttribute("aria-pressed", contada ? "true" : "false");
+        btn.setAttribute("aria-label", etiqueta + (contada ? ", contada, " + manzana.orden : ""));
+        var esAnimando = ronda.objetoAnimando === manzana.id;
+        var badge = btn.querySelector(".orden");
+        if (contada) {
+            btn.classList.add("contada");
+            if (ronda.conejos && !esAnimando) {
+                btn.classList.add("sacada");
+                if (manzana.animLista) btn.classList.add("sacada-fija");
+            }
+            if (ronda.pollitos && !esAnimando) {
+                btn.classList.add("nacido");
+                if (manzana.animLista) btn.classList.add("nacido-fijo");
+            }
+            if (!badge) {
+                badge = document.createElement("span");
+                badge.className = "orden";
+                btn.appendChild(badge);
+            }
+            badge.textContent = String(manzana.orden);
+        } else {
+            btn.classList.remove("contada", "sacada", "sacada-fija", "nacido", "nacido-fijo", "rompe", "nace", "contado-vivo", "comida", "baila");
+            if (badge) badge.remove();
+        }
     }
 
     function pintarManzanas() {
@@ -409,66 +491,34 @@
         if (!caja) return;
         var vista = L.pagina(ronda.manzanas, ronda.visibles, ronda.pagina);
         ronda.pagina = vista.pagina;
-        caja.innerHTML = "";
         var etiqueta = etiquetaObjetoConteo();
         var clase = claseObjetoConteo();
+        /* Index botones existentes por id. */
+        var existentes = {};
+        var hijos = Array.prototype.slice.call(caja.children);
+        hijos.forEach(function (el) {
+            if (el.dataset && el.dataset.id) existentes[el.dataset.id] = el;
+        });
+        var usados = {};
         vista.items.forEach(function (manzana, i) {
-            var btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = clase + " slot-" + i + (manzana.contada ? " contada" : "");
-            btn.dataset.id = manzana.id;
-            if (manzana.orden) btn.dataset.orden = String(manzana.orden);
-            btn.setAttribute("aria-pressed", manzana.contada ? "true" : "false");
-            btn.setAttribute("aria-label", etiqueta + (manzana.contada ? ", contada, " + manzana.orden : ""));
-            if (ronda.pollitos) {
-                var huevo = document.createElement("img");
-                huevo.className = "huevo";
-                huevo.src = imgHuevo();
-                huevo.alt = "";
-                huevo.draggable = false;
-                btn.appendChild(huevo);
-                var casIzq = document.createElement("img");
-                casIzq.className = "cascaron cascaron-izq";
-                casIzq.src = imgHuevo();
-                casIzq.alt = "";
-                casIzq.draggable = false;
-                btn.appendChild(casIzq);
-                var casDer = document.createElement("img");
-                casDer.className = "cascaron cascaron-der";
-                casDer.src = imgHuevo();
-                casDer.alt = "";
-                casDer.draggable = false;
-                btn.appendChild(casDer);
+            var btn = existentes[manzana.id];
+            if (!btn) {
+                btn = crearBotonObjeto(manzana, i, clase, etiqueta);
+                caja.appendChild(btn);
+            } else {
+                /* Mantener posicion visual pero actualizar slot si cambia. */
+                btn.className = btn.className.replace(/\bslot-\d+\b/g, "").trim();
+                btn.classList.add("slot-" + i);
+                if (btn.parentNode !== caja) caja.appendChild(btn);
             }
-            var img = document.createElement("img");
-            img.className = ronda.pollitos ? "pollito-img" : "";
-            img.src = imgObjetoConteo();
-            img.alt = "";
-            img.draggable = false;
-            btn.appendChild(img);
-            if (manzana.contada) {
-                btn.classList.add("contada");
-                var esAnimando = ronda.objetoAnimando === manzana.id;
-                if (ronda.conejos && !esAnimando) {
-                    btn.classList.add("sacada");
-                    if (manzana.animLista) btn.classList.add("sacada-fija");
-                }
-                if (ronda.pollitos && !esAnimando) {
-                    btn.classList.add("nacido");
-                    if (manzana.animLista) btn.classList.add("nacido-fijo");
-                }
-                var badge = document.createElement("span");
-                badge.className = "orden";
-                badge.textContent = String(manzana.orden);
-                btn.appendChild(badge);
+            actualizarBotonObjeto(btn, manzana, etiqueta);
+            usados[manzana.id] = true;
+        });
+        /* Quitar los que ya no estan en la pagina actual. */
+        hijos.forEach(function (el) {
+            if (el.dataset && el.dataset.id && !usados[el.dataset.id]) {
+                el.remove();
             }
-            if (!ronda.conejos && !ronda.pollitos) {
-                btn.addEventListener("pointerdown", function () { armarZoom(btn, manzana); });
-                btn.addEventListener("pointerup", soltarZoom);
-                btn.addEventListener("pointercancel", soltarZoom);
-            }
-            btn.addEventListener("click", function () { alTocarManzana(manzana.id); });
-            caja.appendChild(btn);
         });
         if (pager) pager.hidden = true;
         if (ind) ind.textContent = "";
@@ -479,10 +529,13 @@
         if (!ronda || !ronda.seccion) return;
         var caja = $id("opciones-" + sufijo(ronda.seccion));
         if (!caja) return;
+        var visibles = ronda.fase === "seleccion_respuesta"
+            || ronda.fase === "respuesta_incorrecta"
+            || ronda.fase === "respuesta_correcta";
         var habilitadas = ronda.fase === "seleccion_respuesta" || ronda.fase === "respuesta_incorrecta";
         if (ocultarOpcionesHastaResponder()) {
-            caja.hidden = !habilitadas;
-            if (!habilitadas) {
+            caja.hidden = !visibles;
+            if (!visibles) {
                 caja.innerHTML = "";
                 return;
             }
@@ -494,25 +547,45 @@
         var tonos = ["tono-rosa", "tono-verde", "tono-azul"];
         var animarEntrada = habilitadas && !ronda.opcionesEntraron && animacionesUi();
         if (habilitadas) ronda.opcionesEntraron = true;
-        caja.innerHTML = "";
+        /* Index botones existentes por valor para render incremental. */
+        var existentes = {};
+        Array.prototype.slice.call(caja.children).forEach(function (el) {
+            if (el.dataset && el.dataset.valor) existentes[el.dataset.valor] = el;
+        });
         caja.classList.toggle("opciones-entran", !!animarEntrada);
         var botones = [];
+        var usados = {};
         ronda.opciones.forEach(function (n, i) {
-            var btn = document.createElement("button");
-            btn.type = "button";
+            var clave = String(n);
+            var btn = existentes[clave];
+            var nuevo = false;
+            if (!btn) {
+                btn = document.createElement("button");
+                btn.type = "button";
+                btn.dataset.valor = clave;
+                btn.innerHTML = '<span class="opcion-gloss" aria-hidden="true"></span><span class="opcion-num">' + clave + "</span>";
+                btn.addEventListener("click", function () { alElegir(n); });
+                caja.appendChild(btn);
+                nuevo = true;
+            } else {
+                var num = btn.querySelector(".opcion-num");
+                if (num) num.textContent = clave;
+            }
+            /* Reset de clases de estado (preservando *-anim si corresponde a esta seleccion). */
             btn.className = "opcion " + tonos[i % tonos.length];
-            btn.dataset.valor = String(n);
-            btn.innerHTML = '<span class="opcion-gloss" aria-hidden="true"></span><span class="opcion-num">' + String(n) + "</span>";
             btn.disabled = !habilitadas || ronda.demo;
             if (revelar && n === ronda.correcto) btn.classList.add("revelada");
             if (atenuar && n !== ronda.correcto) btn.classList.add("atenuada");
             if (ronda.seleccion === n && n !== ronda.correcto) btn.classList.add("err");
             if (ronda.seleccion === n && n === ronda.correcto) btn.classList.add("ok");
-            btn.addEventListener("click", function () { alElegir(n); });
-            caja.appendChild(btn);
-            botones.push({ el: btn, i: i });
+            usados[clave] = true;
+            botones.push({ el: btn, i: i, nuevo: nuevo });
         });
-        if (animarEntrada && botones.length) {
+        /* Quitar botones que ya no estan en opciones. */
+        Object.keys(existentes).forEach(function (k) {
+            if (!usados[k]) existentes[k].remove();
+        });
+        if (animarEntrada) {
             void caja.offsetWidth;
             window.requestAnimationFrame(function () {
                 window.requestAnimationFrame(function () {
@@ -524,6 +597,13 @@
                 });
             });
         }
+    }
+
+    function botonSeleccionado() {
+        if (!ronda || !ronda.seccion || ronda.seleccion == null) return null;
+        var caja = $id("opciones-" + sufijo(ronda.seccion));
+        if (!caja) return null;
+        return caja.querySelector('.opcion[data-valor="' + ronda.seleccion + '"]');
     }
 
     var zoomTimer = null;
@@ -711,20 +791,69 @@
         if (ronda.ayuda >= 2) decirYa({ voz: "zeus", texto: $id("pista-" + sufijo(ronda.seccion)).textContent });
     }
 
+    function efectoBotonOpcion(tipo) {
+        var btn = botonSeleccionado();
+        if (!btn) return;
+        btn.classList.remove("ok-anim", "err-anim");
+        void btn.offsetWidth;
+        btn.classList.add(tipo === "ok" ? "ok-anim" : "err-anim");
+        if (reducir()) return;
+        var rect = btn.getBoundingClientRect();
+        var cx = rect.left + rect.width / 2;
+        var cy = rect.top + rect.height / 2;
+        var overlay = document.createElement("div");
+        overlay.className = "opcion-fx";
+        overlay.style.left = cx + "px";
+        overlay.style.top = cy + "px";
+        if (tipo === "ok") {
+            overlay.classList.add("opcion-fx-ok");
+            var halo = document.createElement("span");
+            halo.className = "opcion-fx-halo";
+            overlay.appendChild(halo);
+            var i;
+            for (i = 0; i < 16; i++) {
+                var chispa = document.createElement("span");
+                chispa.className = "opcion-fx-chispa";
+                chispa.style.setProperty("--a", (i * (360 / 16)) + "deg");
+                chispa.style.setProperty("--d", (46 + (i % 4) * 18) + "px");
+                chispa.style.setProperty("--delay", (i * 0.02) + "s");
+                overlay.appendChild(chispa);
+            }
+        } else {
+            overlay.classList.add("opcion-fx-err");
+            var aro = document.createElement("span");
+            aro.className = "opcion-fx-aro";
+            overlay.appendChild(aro);
+            var j;
+            for (j = 0; j < 8; j++) {
+                var cruz = document.createElement("span");
+                cruz.className = "opcion-fx-cruz";
+                cruz.style.setProperty("--a", ((j * 45) - 90) + "deg");
+                cruz.style.setProperty("--d", (36 + (j % 3) * 14) + "px");
+                cruz.style.setProperty("--delay", (j * 0.03) + "s");
+                overlay.appendChild(cruz);
+            }
+        }
+        document.body.appendChild(overlay);
+        window.setTimeout(function () { if (overlay.parentNode) overlay.remove(); }, 1400);
+    }
+
     function fallar() {
         ronda.intentos += 1;
         ronda.fase = "respuesta_incorrecta";
         pintarOpciones();
+        efectoBotonOpcion("err");
         aplicarPistaVisual();
         var tono = sfx();
         if (tono && efectosActivos()) tono.sonar("error");
-        var espera = Number(pref("feedback_demora_ms", 0)) || 0;
         var linea = (ronda.reto && ronda.reto.errorOtro) || { voz: "zeus", texto: L.textoError() };
+        decirYa(linea);
+        /* Deja ver el boton rojo + animacion ~2s, luego limpia y vuelve al color normal. */
+        var espera = reducir() ? 400 : 2000;
         window.setTimeout(function () {
             if (!ronda) return;
-            decirYa(linea);
-            mostrarFeedback("error");
             ronda.fase = "seleccion_respuesta";
+            ronda.seleccion = null;
             pintarOpciones();
         }, espera);
     }
@@ -733,16 +862,22 @@
         ronda.fase = "respuesta_correcta";
         detenerReloj();
         pintarOpciones();
+        efectoBotonOpcion("ok");
         var ruta = gameConfig.audios && (gameConfig.audios.acierto || (gameConfig.audios.efectos && gameConfig.audios.efectos.recompensa));
         if (pref("refuerzo_sonido", true) !== false) playArchivo(ruta);
         var linea = (ronda.reto && ronda.reto.acierto) || { voz: "zoe", texto: L.textoAcierto(ronda.correcto) };
-        decirYa(linea);
-        var vueloMs = celebrar();
-        var espera = reducirMovimiento() ? 400 : Math.max(2200, vueloMs + 450);
+        /* Primero deja ver la animacion del boton verde ~900ms, luego celebra escena. */
+        var retardoCelebrar = reducir() ? 100 : 900;
         window.setTimeout(function () {
             if (!vivo(rondaGen)) return;
-            continuarTrasAcierto();
-        }, espera);
+            decirYa(linea);
+            var vueloMs = celebrar();
+            var espera = reducirMovimiento() ? 400 : Math.max(2200, vueloMs + 450);
+            window.setTimeout(function () {
+                if (!vivo(rondaGen)) return;
+                continuarTrasAcierto();
+            }, espera);
+        }, retardoCelebrar);
     }
 
     function celebrarPersonajes() {
@@ -884,6 +1019,40 @@
         }, 560);
     }
 
+    function volarZanahoriaAlConejo(zanahoriaOrigen, conejoEl) {
+        if (!zanahoriaOrigen || !conejoEl) return 0;
+        var from = zanahoriaOrigen.getBoundingClientRect();
+        var to = conejoEl.getBoundingClientRect();
+        if (!from.width || !to.width) return 0;
+        var clon = document.createElement("img");
+        clon.src = imgObjetoConteo();
+        clon.alt = "";
+        clon.className = "zanahoria-volando";
+        clon.style.left = from.left + "px";
+        clon.style.top = from.top + "px";
+        clon.style.width = from.width + "px";
+        clon.style.height = from.height + "px";
+        document.body.appendChild(clon);
+        var dx = to.left + to.width * 0.5 - (from.left + from.width * 0.5);
+        var dy = to.top + to.height * 0.4 - (from.top + from.height * 0.5);
+        var mx = dx * 0.5;
+        var my = dy * 0.3 - Math.min(140, Math.max(60, Math.abs(dy) * 0.4));
+        var dur = 900;
+        var kf = [
+            { transform: "translate(0, 0) scale(1) rotate(0deg)", opacity: 1 },
+            { transform: "translate(" + mx + "px, " + my + "px) scale(.85) rotate(140deg)", opacity: 1, offset: .55 },
+            { transform: "translate(" + dx + "px, " + dy + "px) scale(.2) rotate(360deg)", opacity: 0 }
+        ];
+        var fin = function () { if (clon.parentNode) clon.remove(); };
+        if (clon.animate) {
+            var a = clon.animate(kf, { duration: dur, easing: "cubic-bezier(.28,.85,.32,1)", fill: "forwards" });
+            a.finished.then(fin).catch(fin);
+        } else {
+            window.setTimeout(fin, dur);
+        }
+        return dur;
+    }
+
     function celebrarConejos() {
         if (!ronda || !ronda.seccion) return 0;
         var instant = pref("refuerzo_visual") === false || reducirMovimiento();
@@ -893,39 +1062,51 @@
         var estrellas = ronda.seccion.querySelector(".conejo-estrellas");
         var zanahorias = ronda.seccion.querySelectorAll(".zanahoria.contada");
         var i;
-        if (conejo) {
-            conejo.src = imgConejo(true);
-            conejo.classList.add("conejo-feliz");
+        /* Vuela UNA zanahoria al conejo antes de la celebracion. */
+        var vueloMs = 0;
+        if (!instant && zanahorias.length && conejo) {
+            vueloMs = volarZanahoriaAlConejo(zanahorias[0], conejo);
         }
-        if (premio) {
-            premio.hidden = false;
-            premio.src = imgObjetoConteo();
-        }
-        if (wrap) {
-            wrap.classList.remove("festeja");
-            void wrap.offsetWidth;
-            wrap.classList.add("festeja");
-        }
-        if (estrellas && !instant) {
-            estrellas.innerHTML = "";
-            for (i = 0; i < 10; i++) {
-                var s = document.createElement("span");
-                s.className = "conejo-estrella";
-                s.style.setProperty("--a", (i * 36) + "deg");
-                s.style.setProperty("--d", (24 + (i % 4) * 14) + "px");
-                s.style.setProperty("--delay", (i * 0.05) + "s");
-                estrellas.appendChild(s);
+        var retraso = instant ? 0 : vueloMs;
+        window.setTimeout(function () {
+            if (conejo) {
+                conejo.src = imgConejo(true);
+                conejo.classList.add("conejo-feliz");
+                conejo.classList.add("mastica");
+                window.setTimeout(function () {
+                    if (conejo.isConnected) conejo.classList.remove("mastica");
+                }, 1200);
             }
-            window.setTimeout(function () {
-                if (estrellas.isConnected) estrellas.innerHTML = "";
-            }, 1400);
-        }
-        zanahorias.forEach(function (z, idx) {
-            window.setTimeout(function () {
-                if (z.isConnected) z.classList.add("comida");
-            }, instant ? 0 : 180 + idx * 120);
-        });
-        return instant ? 400 : 2200;
+            if (premio) {
+                premio.hidden = false;
+                premio.src = imgObjetoConteo();
+            }
+            if (wrap) {
+                wrap.classList.remove("festeja");
+                void wrap.offsetWidth;
+                wrap.classList.add("festeja");
+            }
+            if (estrellas && !instant) {
+                estrellas.innerHTML = "";
+                for (i = 0; i < 10; i++) {
+                    var s = document.createElement("span");
+                    s.className = "conejo-estrella";
+                    s.style.setProperty("--a", (i * 36) + "deg");
+                    s.style.setProperty("--d", (24 + (i % 4) * 14) + "px");
+                    s.style.setProperty("--delay", (i * 0.05) + "s");
+                    estrellas.appendChild(s);
+                }
+                window.setTimeout(function () {
+                    if (estrellas.isConnected) estrellas.innerHTML = "";
+                }, 1400);
+            }
+            zanahorias.forEach(function (z, idx) {
+                window.setTimeout(function () {
+                    if (z.isConnected) z.classList.add("comida");
+                }, instant ? 0 : 180 + idx * 120);
+            });
+        }, retraso);
+        return instant ? 400 : (vueloMs + 2200);
     }
 
     function resetConejoEscena(seccion) {
@@ -1157,6 +1338,16 @@
                 p.classList.remove("rompe", "nace", "nacido", "contado-vivo", "baila");
             });
         }
+        if (!ronda.conejos && !ronda.pollitos && ronda.seccion) {
+            /* Vaciar canasta del reto anterior: las manzanas del vuelo quedan en #canasta-N
+               (o fueron movidas al body). Se quitan antes de pintar el nuevo reto. */
+            var canastaPrev = $id("canasta-" + sufijo(ronda.seccion));
+            if (canastaPrev) canastaPrev.innerHTML = "";
+            ronda.seccion.querySelectorAll(".manzana.en-cesta, .manzana.vuela-a-canasta").forEach(function (m) { m.remove(); });
+            document.querySelectorAll("body > .manzana").forEach(function (m) { m.remove(); });
+            var wrap = ronda.seccion.querySelector(".canasta-wrap");
+            if (wrap) wrap.classList.remove("canasta-llena");
+        }
         pintarManzanas();
         pintarOpciones();
         pintarProgreso();
@@ -1195,7 +1386,7 @@
 
     function continuarTrasAcierto() {
         indice += 1;
-        if (!nivel.retos[indice] || !seccionDe(nivel.retos[indice]) || seccionDe(nivel.retos[indice]).dataset.reto !== nivel.retos[indice].id) {
+        if (!nivel.retos[indice] || !seccionDe(nivel.retos[indice])) {
             descansar(function () { cierre(rondaGen); });
             return;
         }
@@ -1259,7 +1450,7 @@
             L.tocar(ronda.manzanas, ronda.manzanas[i].id);
             pintarManzanas();
             pintarProgreso();
-            var demoBtn = ronda.seccion.querySelector('.manzana[data-id="' + ronda.manzanas[i].id + '"]');
+            var demoBtn = ronda.seccion.querySelector('.' + claseObjetoConteo() + '[data-id="' + ronda.manzanas[i].id + '"]');
             if (demoBtn) encenderManzana(demoBtn);
             await decir({ voz: "zoe", texto: L.textoNumero(i + 1) });
             if (!vivo(gen)) return;

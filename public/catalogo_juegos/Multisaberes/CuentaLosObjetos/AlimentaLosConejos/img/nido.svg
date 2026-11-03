@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" role="img" aria-label="Nido">
+  <ellipse cx="160" cy="118" rx="140" ry="18" fill="#000" opacity=".12"/>
+  <ellipse cx="160" cy="96" rx="148" ry="36" fill="#8d6e3b"/>
+  <ellipse cx="160" cy="88" rx="132" ry="28" fill="#a67c3d"/>
+  <path d="M30 90 C50 50 90 40 120 58 C140 40 180 38 200 58 C230 36 280 48 300 90 C260 78 220 86 200 98 C170 110 150 110 120 98 C90 86 60 78 30 90Z" fill="#6d4c2b"/>
+  <path d="M48 92 C70 62 110 58 140 72 C160 56 200 54 230 72 C255 58 290 68 300 92" fill="none" stroke="#c49a5a" stroke-width="6" stroke-linecap="round"/>
+  <path d="M60 100 C95 78 130 78 155 92 C185 76 235 78 270 100" fill="none" stroke="#5a3a1c" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+</svg>

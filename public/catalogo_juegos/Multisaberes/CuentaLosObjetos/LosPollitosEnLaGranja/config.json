@@ -1,0 +1,249 @@
+{
+  "nombre": "Los pollitos en la granja",
+  "textos": {
+    "eligeNivel": "¡Elige tu nivel!",
+    "demostracion": "¡Mira cómo contamos los pollitos!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Algo se mueve en el nido!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Vamos a contar los pollitos que van a nacer."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "acierto": "../../../sounds/ok.mp3",
+    "efectos": {
+      "recompensa": "../../../sounds/ok.mp3"
+    }
+  },
+  "elementos": {
+    "manzana": {
+      "img": "img/manzana.png",
+      "nombre": "Manzana"
+    },
+    "zanahoria": {
+      "img": "img/zanahoria.png",
+      "nombre": "Zanahoria"
+    },
+    "conejo": {
+      "img": "img/conejo.png",
+      "nombre": "Conejito"
+    },
+    "conejoFeliz": {
+      "img": "img/conejo_feliz.png",
+      "nombre": "Conejito feliz"
+    },
+    "pollito": {
+      "img": "img/pollito.svg",
+      "nombre": "Pollito"
+    },
+    "nido": {
+      "img": "img/nido.svg",
+      "nombre": "Nido"
+    },
+    "huevo": {
+      "img": "img/huevo.svg",
+      "nombre": "Huevo"
+    },
+    "cascaron": {
+      "img": "img/cascaron.svg",
+      "nombre": "Cascaron"
+    },
+    "canasta": {
+      "img": "img/canasta.png",
+      "nombre": "Canasta"
+    },
+    "arbol": {
+      "img": "img/arbol_principal.svg",
+      "nombre": "Arbol"
+    }
+  },
+  "demo": {
+    "id": "pollitos-granja",
+    "mecanica": "contar_pollitos",
+    "cantidadObjetos": 2,
+    "piezasVisibles": 5,
+    "opciones": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "correcto": 2
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Los pollitos en la granja",
+      "escena": "huerta",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido a la granja!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Vamos a contar los pollitos!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "pollitos-granja-1",
+          "titulo": "Primeros pollitos",
+          "mecanica": "contar_pollitos",
+          "cantidadMin": 2,
+          "cantidadMax": 3,
+          "piezasVisibles": 3,
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Los primeros pollitos acaban de nacer!"
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "¿Cuántos pollitos ves en el nido?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Contaste bien las pollitos.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "¡Vamos a contar otra vez las pollitos!",
+            "efecto": "boing"
+          }
+        },
+        {
+          "id": "pollitos-granja-2",
+          "titulo": "Más pollitos",
+          "mecanica": "contar_pollitos",
+          "cantidadMin": 3,
+          "cantidadMax": 4,
+          "piezasVisibles": 4,
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Nacieron más pollitos!"
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "Cuenta los pollitos del nido."
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Muy bien! Contaste bien las pollitos.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zoe",
+            "texto": "¡Vamos a contar otra vez las pollitos!",
+            "efecto": "boing"
+          }
+        },
+        {
+          "id": "pollitos-granja-3",
+          "titulo": "Nido lleno",
+          "mecanica": "contar_pollitos",
+          "cantidadMin": 3,
+          "cantidadMax": 5,
+          "piezasVisibles": 5,
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡El nido se llenó de pollitos!"
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "¿Cuántos pollitos hay ahora?"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Contaste bien las pollitos.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "¡Vamos a contar otra vez las pollitos!",
+            "efecto": "boing"
+          }
+        },
+        {
+          "id": "pollitos-granja-4",
+          "titulo": "Granja ruidosa",
+          "mecanica": "contar_pollitos",
+          "cantidadMin": 4,
+          "cantidadMax": 6,
+          "piezasVisibles": 6,
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Qué granja tan ruidosa!"
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "Toca cada pollito para contarlos."
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Muy bien! Contaste bien las pollitos.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zoe",
+            "texto": "¡Vamos a contar otra vez las pollitos!",
+            "efecto": "boing"
+          }
+        },
+        {
+          "id": "pollitos-granja-5",
+          "titulo": "Gran familia",
+          "mecanica": "contar_pollitos",
+          "cantidadMin": 4,
+          "cantidadMax": 7,
+          "piezasVisibles": 7,
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡La granja es toda una familia!"
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "Cuenta todos los pollitos."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Contaste bien las pollitos.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "¡Vamos a contar otra vez las pollitos!",
+            "efecto": "boing"
+          }
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zoe",
+          "texto": "¡Fantástico! ¡Contaste todos los pollitos de la granja!"
+        }
+      ],
+      "cierreEscena": "recoleccion",
+      "insignia": {
+        "img": "img/insignia_recolector.svg",
+        "nombre": "Cuidador de Pollitos"
+      }
+    }
+  ]
+}
