@@ -270,13 +270,6 @@
         const personajesCfg = window.INTRO_CONFIG.personajes || [];
         const colores = (window.INTRO_CONFIG.dialogo.colores) || {};
 
-        function textoPlano(html) {
-            if (!html) return "";
-            const tmp = document.createElement("div");
-            tmp.innerHTML = String(html).replace(/<br\s*\/?>/gi, " ");
-            return String(tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ").trim();
-        }
-
         window.INTRO_CONFIG.dialogo.lineas = conversacion.map(function (linea) {
             const indice = Number(linea.personaje);
             const def = personajesCfg[isFinite(indice) ? indice : 0] || personajesCfg[0] || {};
@@ -288,7 +281,7 @@
                 personaje: id,
                 nombre: nombre,
                 color: colores[id] || (id === "zoe" ? "#8ec5ff" : "#f0c14d"),
-                texto: textoPlano(linea.texto)
+                texto: TextoVoz.textoPlano(linea.texto)
             };
         });
     }
