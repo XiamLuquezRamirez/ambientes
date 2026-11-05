@@ -83,6 +83,66 @@ module.exports = {
             }
         },
         {
+            descripcion: 'retosValidos acepta retos con rango aleatorio',
+            fn: function () {
+                var L = modulo();
+                var lista = L.retosValidos({
+                    retos: [{ cantidadMin: 3, cantidadMax: 5 }, {}, { cantidadMin: 7, cantidadMax: 10 }]
+                });
+                igual(lista.length, 2, 'acepta los dos con rango');
+            }
+        },
+        {
+            descripcion: 'sortearObjetivo respeta el rango del reto',
+            fn: function () {
+                var L = modulo();
+                igual(L.sortearObjetivo({ cantidadMin: 4, cantidadMax: 7 }, function () { return 0; }), 4, 'extremo bajo');
+                igual(L.sortearObjetivo({ cantidadMin: 4, cantidadMax: 7 }, function () { return 0.999; }), 7, 'extremo alto');
+                igual(L.sortearObjetivo({ cantidadMin: 6, cantidadMax: 6 }, function () { return 0.5; }), 6, 'rango de uno');
+            }
+        },
+        {
+            descripcion: 'sortearObjetivo acota a los topes 3 y 10 del juego',
+            fn: function () {
+                var L = modulo();
+                igual(L.OBJETIVO_MIN, 3, 'mínimo del juego');
+                igual(L.OBJETIVO_MAX, 10, 'máximo del juego');
+                igual(L.sortearObjetivo({ cantidadMin: 1, cantidadMax: 2 }, function () { return 0; }), 3, 'sube al mínimo');
+                igual(L.sortearObjetivo({ cantidadMin: 12, cantidadMax: 20 }, function () { return 0; }), 12, 'min por encima del tope manda');
+                igual(L.sortearObjetivo({ cantidadMin: 8, cantidadMax: 40 }, function () { return 0.999; }), 10, 'recorta al máximo');
+            }
+        },
+        {
+            descripcion: 'sortearObjetivo sin rango cae en el objetivo fijo',
+            fn: function () {
+                var L = modulo();
+                igual(L.sortearObjetivo({ cantidadObjetivo: 6 }, function () { return 0.5; }), 6, 'usa el fijo');
+                igual(L.sortearObjetivo({}, function () { return 0.5; }), null, 'sin nada');
+            }
+        },
+        {
+            descripcion: 'toda ronda sorteada cae dentro de 3 y 10',
+            fn: function () {
+                var L = modulo();
+                var retos = [
+                    { cantidadMin: 3, cantidadMax: 5 }, { cantidadMin: 4, cantidadMax: 7 },
+                    { cantidadMin: 6, cantidadMax: 9 }, { cantidadMin: 7, cantidadMax: 10 }
+                ];
+                var i, j;
+                for (i = 0; i < retos.length; i++) {
+                    for (j = 0; j <= 20; j++) {
+                        var e = L.crearEstado(retos[i], function () { return j / 21; });
+                        if (e.objetivo < 3 || e.objetivo > 10) {
+                            throw new Error('objetivo fuera de rango: ' + e.objetivo);
+                        }
+                        if (e.deposito.length < e.objetivo + 2) {
+                            throw new Error('depósito sin margen: ' + e.deposito.length + ' para ' + e.objetivo);
+                        }
+                    }
+                }
+            }
+        },
+        {
             descripcion: 'plantilla sustituye solo las marcas conocidas',
             fn: function () {
                 var L = modulo();

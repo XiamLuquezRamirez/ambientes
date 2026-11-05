@@ -7,6 +7,8 @@
 
     var GRADOS_MAX = 16;
     var MARGEN_DEPOSITO = 2;
+    var OBJETIVO_MIN = 3;
+    var OBJETIVO_MAX = 10;
 
     function entero(valor) {
         var n = Number(valor);
@@ -18,11 +20,29 @@
         return n != null && n >= 1 ? n : null;
     }
 
-    function cristalesEnDeposito(reto) {
-        var objetivo = cantidadObjetivo(reto);
-        if (objetivo == null) return 0;
+    /**
+     * Cantidad de la ronda, sorteada entre los topes del reto y acotada al
+     * rango del juego. Sin `cantidadMin`/`cantidadMax` cae en el objetivo fijo.
+     */
+    function sortearObjetivo(reto, aleatorio) {
+        var rnd = typeof aleatorio === "function" ? aleatorio : Math.random;
+        var min = entero(reto && reto.cantidadMin);
+        var max = entero(reto && reto.cantidadMax);
+        if (min == null || max == null) return cantidadObjetivo(reto);
+
+        min = Math.max(OBJETIVO_MIN, min);
+        max = Math.min(OBJETIVO_MAX, max);
+        if (max < min) max = min;
+        return min + Math.floor(rnd() * (max - min + 1));
+    }
+
+    /** `objetivo` explícito cuando la ronda lo sorteó; si no, el del reto. */
+    function cristalesEnDeposito(reto, objetivo) {
+        var meta = entero(objetivo);
+        if (meta == null) meta = cantidadObjetivo(reto);
+        if (meta == null) return 0;
         var pedido = entero(reto && reto.cristalesEnDeposito) || 0;
-        return Math.max(pedido, objetivo + MARGEN_DEPOSITO);
+        return Math.max(pedido, meta + MARGEN_DEPOSITO);
     }
 
     function estadoBalanza(izquierda, derecha) {
@@ -43,7 +63,10 @@
 
     function retosValidos(nivel) {
         var lista = (nivel && nivel.retos) || [];
-        return lista.filter(function (r) { return cantidadObjetivo(r) != null; });
+        return lista.filter(function (r) {
+            return cantidadObjetivo(r) != null
+                || (entero(r && r.cantidadMin) != null && entero(r && r.cantidadMax) != null);
+        });
     }
 
     function plantilla(texto, datos) {
@@ -54,13 +77,13 @@
 
     /* ---------- Estado de depósito y platillos ---------- */
 
-    function crearEstado(reto) {
-        var objetivo = cantidadObjetivo(reto);
-        var total = cristalesEnDeposito(reto);
+    function crearEstado(reto, aleatorio) {
+        var objetivo = sortearObjetivo(reto, aleatorio) || 0;
+        var total = cristalesEnDeposito(reto, objetivo);
         var deposito = [];
         var i;
         for (i = 0; i < total; i++) deposito.push("c" + i);
-        return { objetivo: objetivo || 0, deposito: deposito, colocados: [] };
+        return { objetivo: objetivo, deposito: deposito, colocados: [] };
     }
 
     function mover(origen, destino, id) {
@@ -88,7 +111,10 @@
 
     global.NivelaBalanzaLogica = {
         GRADOS_MAX: GRADOS_MAX,
+        OBJETIVO_MIN: OBJETIVO_MIN,
+        OBJETIVO_MAX: OBJETIVO_MAX,
         cantidadObjetivo: cantidadObjetivo,
+        sortearObjetivo: sortearObjetivo,
         cristalesEnDeposito: cristalesEnDeposito,
         estadoBalanza: estadoBalanza,
         esVictoria: esVictoria,

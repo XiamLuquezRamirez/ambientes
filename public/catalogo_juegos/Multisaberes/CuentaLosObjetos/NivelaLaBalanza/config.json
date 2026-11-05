@@ -63,8 +63,6 @@
           "id": "nivela-balanza-1",
           "titulo": "Primera carga",
           "mecanica": "nivelar_balanza",
-          "cantidadObjetivo": 4,
-          "cristalesEnDeposito": 8,
           "presentacion": {
             "voz": "zeus",
             "texto": "¡Nuestra primera carga espacial!"
@@ -87,14 +85,14 @@
             "voz": "zoe",
             "texto": "¡Cuidado! Hay demasiados cristales. Retira uno.",
             "efecto": "boing"
-          }
+          },
+          "cantidadMin": 3,
+          "cantidadMax": 5
         },
         {
           "id": "nivela-balanza-2",
           "titulo": "Carga espacial",
           "mecanica": "nivelar_balanza",
-          "cantidadObjetivo": 6,
-          "cristalesEnDeposito": 10,
           "presentacion": {
             "voz": "zoe",
             "texto": "¡Llegó más carga a la estación!"
@@ -117,14 +115,14 @@
             "voz": "zeus",
             "texto": "¡Cuidado! Hay demasiados cristales. Retira uno.",
             "efecto": "boing"
-          }
+          },
+          "cantidadMin": 4,
+          "cantidadMax": 7
         },
         {
           "id": "nivela-balanza-3",
           "titulo": "Equilibrio avanzado",
           "mecanica": "nivelar_balanza",
-          "cantidadObjetivo": 8,
-          "cristalesEnDeposito": 12,
           "presentacion": {
             "voz": "zeus",
             "texto": "¡Esta carga es más pesada!"
@@ -147,14 +145,14 @@
             "voz": "zoe",
             "texto": "¡Cuidado! Hay demasiados cristales. Retira uno.",
             "efecto": "boing"
-          }
+          },
+          "cantidadMin": 6,
+          "cantidadMax": 9
         },
         {
           "id": "nivela-balanza-4",
           "titulo": "Maestros del equilibrio",
           "mecanica": "nivelar_balanza",
-          "cantidadObjetivo": 10,
-          "cristalesEnDeposito": 14,
           "presentacion": {
             "voz": "zoe",
             "texto": "¡La última carga de la misión!"
@@ -177,7 +175,9 @@
             "voz": "zeus",
             "texto": "¡Cuidado! Hay demasiados cristales. Retira uno.",
             "efecto": "boing"
-          }
+          },
+          "cantidadMin": 7,
+          "cantidadMax": 10
         }
       ],
       "cierre": [

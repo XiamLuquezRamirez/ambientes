@@ -247,7 +247,7 @@
         var reto = retoActual();
         rondaGen += 1;
         var gen = rondaGen;
-        estado = L.crearEstado(reto);
+        estado = L.crearEstado(reto, Math.random);
         comprobando = false;
 
         var titulo = $id("titulo-reto-balanza");
