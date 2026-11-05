@@ -3,7 +3,7 @@
  * window.Tutorial3d = { start, despedir, stop, reaccionar, preload, personaje }
  */
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { crearCargadorGltf } from "./cargador-gltf.js";
 import { agregarLucesModelo } from "./luces-modelo.js";
 
 const MODELOS_BASE = new URL("../models/", import.meta.url);
@@ -53,7 +53,7 @@ let goneResolve = null;
 
 /** Cache de GLTF por URL: evita re-descargar ~4–5 MB en cada tutorial. */
 const gltfCache = Object.create(null);
-const loader = new GLTFLoader();
+const loader = crearCargadorGltf();
 
 function tomarClip(actions, nombres) {
     const claves = Object.keys(actions);

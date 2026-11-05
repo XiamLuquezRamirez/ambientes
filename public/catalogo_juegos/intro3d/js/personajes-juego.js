@@ -12,7 +12,7 @@
  * Enojado, Porra_con_pompones.
  */
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { crearCargadorGltf } from "./cargador-gltf.js";
 import { agregarLucesModelo } from "./luces-modelo.js";
 
 const BASE = new URL("../models/", import.meta.url);
@@ -29,7 +29,7 @@ const WALK_SPEED = 1.35;
 /* Distancia corta: el canvas lateral es estrecho; si arrancan muy lejos no se ve el clip. */
 const WALK_INICIO = 1.25;
 
-const loader = new GLTFLoader();
+const loader = crearCargadorGltf();
 const cache = Object.create(null);
 const escenaUsada = Object.create(null);
 const vistas = [];

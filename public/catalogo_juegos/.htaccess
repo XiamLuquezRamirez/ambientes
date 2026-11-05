@@ -3,7 +3,7 @@
 # versiones viejas de los scripts y de los sonidos (el "pitido" seguía aunque ya estaba
 # corregido). Como Apache ignora el ?v=, revalidar trae siempre el archivo actual.
 <IfModule mod_headers.c>
-    <FilesMatch "\.(html|json|js|css|wav|mp3|ogg)$">
+    <FilesMatch "\.(html|json|js|css|wav|mp3|ogg|glb)$">
         Header set Cache-Control "no-cache, must-revalidate"
     </FilesMatch>
 </IfModule>
