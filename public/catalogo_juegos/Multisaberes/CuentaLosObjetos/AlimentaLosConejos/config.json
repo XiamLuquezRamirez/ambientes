@@ -1,0 +1,249 @@
+{
+  "nombre": "Alimenta los conejos",
+  "textos": {
+    "eligeNivel": "¡Elige tu nivel!",
+    "demostracion": "¡Mira cómo contamos las zanahorias!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡El conejito tiene mucha hambre!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Vamos a contar las zanahorias para darle de comer."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "acierto": "../../../sounds/ok.mp3",
+    "efectos": {
+      "recompensa": "../../../sounds/ok.mp3"
+    }
+  },
+  "elementos": {
+    "manzana": {
+      "img": "img/manzana.png",
+      "nombre": "Manzana"
+    },
+    "zanahoria": {
+      "img": "img/zanahoria.png",
+      "nombre": "Zanahoria"
+    },
+    "conejo": {
+      "img": "img/conejo.png",
+      "nombre": "Conejito"
+    },
+    "conejoFeliz": {
+      "img": "img/conejo_feliz.png",
+      "nombre": "Conejito feliz"
+    },
+    "pollito": {
+      "img": "img/pollito.svg",
+      "nombre": "Pollito"
+    },
+    "nido": {
+      "img": "img/nido.svg",
+      "nombre": "Nido"
+    },
+    "huevo": {
+      "img": "img/huevo.svg",
+      "nombre": "Huevo"
+    },
+    "cascaron": {
+      "img": "img/cascaron.svg",
+      "nombre": "Cascaron"
+    },
+    "canasta": {
+      "img": "img/canasta.png",
+      "nombre": "Canasta"
+    },
+    "arbol": {
+      "img": "img/arbol_principal.svg",
+      "nombre": "Arbol"
+    }
+  },
+  "demo": {
+    "id": "alimenta-conejos",
+    "mecanica": "contar_conejos",
+    "cantidadObjetos": 2,
+    "piezasVisibles": 5,
+    "opciones": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "correcto": 2
+  },
+  "niveles": [
+    {
+      "id": "3",
+      "edad": "3-4 años",
+      "titulo": "Alimenta los conejos",
+      "escena": "huerta",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido a la huerta mágica!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Vamos a alimentar al conejito!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "alimenta-conejos-1",
+          "titulo": "Primer bocado",
+          "mecanica": "contar_conejos",
+          "cantidadMin": 2,
+          "cantidadMax": 3,
+          "piezasVisibles": 3,
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡El conejito espera su primera comida!"
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "¿Cuántas zanahorias hay en la tierra?"
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Muy bien! Contaste bien las zanahorias.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zoe",
+            "texto": "¡Vamos a contar otra vez las zanahorias!",
+            "efecto": "boing"
+          }
+        },
+        {
+          "id": "alimenta-conejos-2",
+          "titulo": "Más zanahorias",
+          "mecanica": "contar_conejos",
+          "cantidadMin": 3,
+          "cantidadMax": 4,
+          "piezasVisibles": 4,
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Mira cuántas zanahorias crecieron!"
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "Cuenta las zanahorias para el conejito."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Contaste bien las zanahorias.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "¡Vamos a contar otra vez las zanahorias!",
+            "efecto": "boing"
+          }
+        },
+        {
+          "id": "alimenta-conejos-3",
+          "titulo": "Conejito glotón",
+          "mecanica": "contar_conejos",
+          "cantidadMin": 3,
+          "cantidadMax": 5,
+          "piezasVisibles": 5,
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡El conejito quiere más!"
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "¿Cuántas zanahorias puede comerse?"
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Muy bien! Contaste bien las zanahorias.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zoe",
+            "texto": "¡Vamos a contar otra vez las zanahorias!",
+            "efecto": "boing"
+          }
+        },
+        {
+          "id": "alimenta-conejos-4",
+          "titulo": "Huerta generosa",
+          "mecanica": "contar_conejos",
+          "cantidadMin": 4,
+          "cantidadMax": 6,
+          "piezasVisibles": 6,
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡La huerta dio muchas zanahorias!"
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "Cuenta las zanahorias que hay aquí."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Muy bien! Contaste bien las zanahorias.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zeus",
+            "texto": "¡Vamos a contar otra vez las zanahorias!",
+            "efecto": "boing"
+          }
+        },
+        {
+          "id": "alimenta-conejos-5",
+          "titulo": "Gran banquete",
+          "mecanica": "contar_conejos",
+          "cantidadMin": 4,
+          "cantidadMax": 7,
+          "piezasVisibles": 7,
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Hoy es día de banquete!"
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "Cuenta todas las zanahorias para el conejito."
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Muy bien! Contaste bien las zanahorias.",
+            "efecto": "recompensa"
+          },
+          "errorOtro": {
+            "voz": "zoe",
+            "texto": "¡Vamos a contar otra vez las zanahorias!",
+            "efecto": "boing"
+          }
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zeus",
+          "texto": "¡Excelente! ¡El conejito quedó feliz y bien alimentado!"
+        }
+      ],
+      "cierreEscena": "recoleccion",
+      "insignia": {
+        "img": "img/insignia_recolector.svg",
+        "nombre": "Amigo de los Conejos"
+      }
+    }
+  ]
+}

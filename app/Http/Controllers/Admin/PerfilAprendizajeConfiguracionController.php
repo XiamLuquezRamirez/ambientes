@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PerfilAprendizajeInclusion;
 use App\Models\PerfilAprendizajeOrden;
 use App\Models\Estudiante;
-use App\Services\ParametrosPerfilAprendizajeService;
+use App\Services\PersonalizacionPerfilAprendizajeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -15,7 +15,7 @@ class PerfilAprendizajeConfiguracionController extends Controller
     public function index(Request $request)
     {
         $institucionId = $this->institucionId();
-        $this->asegurarPersonalizacion($institucionId);
+        app(PersonalizacionPerfilAprendizajeService::class)->asegurarInclusion($institucionId);
 
         $consulta = PerfilAprendizajeOrden::query()
             ->where('perfil_aprendizaje_orden.institucion_id', $institucionId)
@@ -145,41 +145,6 @@ class PerfilAprendizajeConfiguracionController extends Controller
             ],
             'estudiantes' => $estudiantes,
         ]);
-    }
-
-    private function asegurarPersonalizacion(int $institucionId): void
-    {
-        $catalogoIds = PerfilAprendizajeInclusion::query()->pluck('id');
-        $existentes = PerfilAprendizajeOrden::query()
-            ->where('institucion_id', $institucionId)
-            ->pluck('perfil_aprendizaje_id');
-
-        $faltantes = $catalogoIds->diff($existentes);
-        if ($faltantes->isEmpty()) {
-            return;
-        }
-
-        $orden = (int) (PerfilAprendizajeOrden::query()
-            ->where('institucion_id', $institucionId)
-            ->max('orden') ?? -1);
-        $ahora = now();
-        $filas = [];
-
-        foreach ($faltantes as $perfilAprendizajeId) {
-            $orden++;
-            $filas[] = [
-                'institucion_id' => $institucionId,
-                'perfil_aprendizaje_id' => (int) $perfilAprendizajeId,
-                'orden' => $orden,
-                'activa' => 1,
-                'created_at' => $ahora,
-                'updated_at' => $ahora,
-            ];
-        }
-
-        PerfilAprendizajeOrden::query()->insert($filas);
-
-        app(ParametrosPerfilAprendizajeService::class)->sembrarInstitucion($institucionId);
     }
 
     /**

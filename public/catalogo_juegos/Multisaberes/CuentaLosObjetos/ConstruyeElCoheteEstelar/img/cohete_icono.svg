@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220" width="160" height="220">
+  <defs>
+    <linearGradient id="fuse" x1="0" x2="1">
+      <stop offset="0" stop-color="#e8eeff"/>
+      <stop offset="0.5" stop-color="#b8c5f0"/>
+      <stop offset="1" stop-color="#8fa0d8"/>
+    </linearGradient>
+    <linearGradient id="punta" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#ff6b6b"/>
+      <stop offset="1" stop-color="#c91a1a"/>
+    </linearGradient>
+  </defs>
+  <path d="M80 10 C100 40 110 55 110 80 L50 80 C50 55 60 40 80 10 Z" fill="url(#punta)"/>
+  <rect x="40" y="80" width="80" height="110" rx="20" fill="url(#fuse)"/>
+  <circle cx="80" cy="110" r="18" fill="#00e5ff" stroke="#fff" stroke-width="3"/>
+  <circle cx="80" cy="110" r="10" fill="#0b1540"/>
+  <path d="M40 160 L10 200 L40 185 Z" fill="#ff3dd1"/>
+  <path d="M120 160 L150 200 L120 185 Z" fill="#ff3dd1"/>
+  <rect x="55" y="190" width="50" height="14" rx="4" fill="#3b4bba"/>
+  <path d="M70 205 Q80 220 90 205 Z" fill="#ffcf2d"/>
+</svg>

@@ -49,9 +49,14 @@
         return cantidadDe(reto);
     }
 
-    /** Cantidad de manzanas al azar (2–5), independiente de las opciones del reto. */
-    function cantidadAleatoria(aleatorio) {
+    /** Cantidad de objetos al azar. Si el reto trae cantidadMin/cantidadMax los respeta. */
+    function cantidadAleatoria(aleatorio, reto) {
         var rnd = typeof aleatorio === "function" ? aleatorio : Math.random;
+        var min = reto ? entero(reto.cantidadMin) : null;
+        var max = reto ? entero(reto.cantidadMax) : null;
+        if (min != null && max != null && min >= 1 && max >= min) {
+            return min + Math.floor(rnd() * (max - min + 1));
+        }
         return CANTIDADES[Math.floor(rnd() * CANTIDADES.length)];
     }
 

@@ -10,6 +10,7 @@ use App\Models\Estudiante;
 use App\Models\EstudiantePerfilAprendizajePersonalizado;
 use App\Services\EstudiantePerfilAprendizajePersonalizadoService;
 use App\Services\ParametrosPerfilAprendizajeService;
+use App\Services\PersonalizacionPerfilAprendizajeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
     public function index(Request $request)
     {
         $institucionId = $this->institucionId();
-        $this->asegurarPersonalizacion($institucionId);
+        app(PersonalizacionPerfilAprendizajeService::class)->asegurarPersonalizado($institucionId);
 
         $consulta = PerfilAprendizajePersonalizadoOrden::query()
             ->where('perfil_aprendizaje_personalizado_orden.institucion_id', $institucionId)
@@ -318,45 +319,6 @@ class PerfilAprendizajePersonalizadoConfiguracionController extends Controller
                 Rule::exists('perfil_aprendizaje', 'id'),
             ],
         ]);
-    }
-
-    private function asegurarPersonalizacion(int $institucionId): void
-    {
-        $catalogoIds = PerfilAprendizajePersonalizado::query()
-            ->where(function ($q) use ($institucionId) {
-                $q->whereNull('institucion_id')
-                    ->orWhere('institucion_id', $institucionId);
-            })
-            ->pluck('id');
-
-        $existentes = PerfilAprendizajePersonalizadoOrden::query()
-            ->where('institucion_id', $institucionId)
-            ->pluck('perfil_aprendizaje_personalizado_id');
-
-        $faltantes = $catalogoIds->diff($existentes);
-        if ($faltantes->isEmpty()) {
-            return;
-        }
-
-        $orden = (int) (PerfilAprendizajePersonalizadoOrden::query()
-            ->where('institucion_id', $institucionId)
-            ->max('orden') ?? -1);
-        $ahora = now();
-        $filas = [];
-
-        foreach ($faltantes as $transitoriaId) {
-            $orden++;
-            $filas[] = [
-                'institucion_id' => $institucionId,
-                'perfil_aprendizaje_personalizado_id' => (int) $transitoriaId,
-                'orden' => $orden,
-                'activa' => 1,
-                'created_at' => $ahora,
-                'updated_at' => $ahora,
-            ];
-        }
-
-        PerfilAprendizajePersonalizadoOrden::query()->insert($filas);
     }
 
     /**

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Recolector de manzanas">
+  <circle cx="120" cy="120" r="100" fill="#fff3bf" stroke="#e67700" stroke-width="10"/>
+  <ellipse cx="120" cy="132" rx="46" ry="42" fill="#e03131" stroke="#7f1d1d" stroke-width="6"/>
+  <rect x="114" y="72" width="10" height="24" rx="4" fill="#6b3f24"/>
+  <ellipse cx="148" cy="84" rx="22" ry="12" fill="#2f9e44" stroke="#14532d" stroke-width="4" transform="rotate(28 148 84)"/>
+  <polygon points="120,28 132,64 170,66 140,90 150,128 120,108 90,128 100,90 70,66 108,64" fill="#ffd43b" stroke="#e67700" stroke-width="4"/>
+</svg>

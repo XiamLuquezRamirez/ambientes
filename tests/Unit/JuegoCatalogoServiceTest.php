@@ -294,4 +294,30 @@ class JuegoCatalogoServiceTest extends TestCase
         $this->assertFalse($svc->juegoAptoParaEdad($j56, 4));
         $this->assertTrue($svc->juegoAptoParaEdad($sinEdad, 4));
     }
+
+    public function test_ordenar_por_nombre_visible_ignora_orden_y_tildes(): void
+    {
+        $svc = new JuegoCatalogoService;
+        $juegos = collect([
+            new Juego(['slug' => 'zorro', 'nombre' => 'Zorro (5-6 años)', 'orden' => 1]),
+            new Juego(['slug' => 'nandu', 'nombre' => 'Ñandú', 'orden' => 2]),
+            new Juego(['slug' => 'arbol', 'nombre' => 'Árbol de colores', 'orden' => 0]),
+            new Juego(['slug' => 'gato', 'nombre' => 'El gato (3-4 años)', 'orden' => 9]),
+            new Juego(['slug' => 'juego-10', 'nombre' => 'Juego 10', 'orden' => 3]),
+            new Juego(['slug' => 'juego-2', 'nombre' => 'Juego 2', 'orden' => 4]),
+        ]);
+
+        $nombres = $svc->ordenarPorNombreVisible($juegos, true)
+            ->map(fn (Juego $juego) => $svc->nombreSinSufijoEdad((string) $juego->nombre))
+            ->all();
+
+        $this->assertSame([
+            'Árbol de colores',
+            'El gato',
+            'Juego 2',
+            'Juego 10',
+            'Ñandú',
+            'Zorro',
+        ], $nombres);
+    }
 }

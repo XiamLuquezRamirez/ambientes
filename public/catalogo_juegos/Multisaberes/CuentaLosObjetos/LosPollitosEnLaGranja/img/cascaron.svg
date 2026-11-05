@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 90" role="img" aria-label="Cascarón">
+  <path d="M18 48 C22 18 50 6 60 6 C70 6 98 18 102 48 L88 52 C84 36 72 28 60 28 C48 28 36 36 32 52 Z" fill="#fff8e7" stroke="#d6c3a0" stroke-width="3"/>
+  <path d="M18 48 L28 58 L38 50 L50 62 L62 48 L74 60 L86 50 L102 48 L96 70 C90 82 74 88 60 88 C46 88 30 82 24 70 Z" fill="#fffdf6" stroke="#d6c3a0" stroke-width="3"/>
+  <path d="M34 56 L42 64 M58 52 L64 66 M78 54 L84 64" stroke="#e7d3ad" stroke-width="3" stroke-linecap="round"/>
+</svg>
