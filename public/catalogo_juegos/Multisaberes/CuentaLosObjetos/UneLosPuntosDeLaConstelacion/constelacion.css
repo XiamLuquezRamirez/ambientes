@@ -1,0 +1,481 @@
+/**
+ * Interfaz sobre el canvas de Phaser.
+ *
+ * Solo HUD, personajes y botones: el escenario entero (cielo, estrellas,
+ * líneas, planetas, nave) lo dibuja Phaser. Archivo propio del juego, para no
+ * tocar el style.css que comparten los ocho subjuegos de la categoría.
+ */
+
+:root {
+	--cons-cian: #22d3ee;
+	--cons-cian-claro: #a5f3fc;
+	--cons-azul: #38bdf8;
+	--cons-noche: #050b24;
+	--cons-noche-2: #0b1538;
+	--cons-oro: #fbbf24;
+	--cons-texto: #e0f2fe;
+}
+
+html, body {
+	height: 100%;
+	margin: 0;
+	background: var(--cons-noche);
+	overflow: hidden;
+	/* Sin resaltado azul ni menú al mantener pulsado: durante el trazado el
+	   navegador intentaría seleccionar texto o abrir el menú contextual. */
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
+	user-select: none;
+}
+
+/* El trazado es un arrastre largo sobre el canvas: sin esto, el navegador
+   móvil interpreta el gesto como scroll o "pull to refresh" (spec §11). */
+body.tema-constelacion {
+	overscroll-behavior: none;
+	touch-action: none;
+}
+
+/* ------------------------------------------------------------------
+   Pantalla de inicio
+   inicio-fondo.css solo aporta display:flex y el color: si el juego no la
+   posiciona, la portada queda `static` y a media pantalla.
+   ------------------------------------------------------------------ */
+.pantalla-inicio {
+	position: fixed;
+	inset: 0;
+	z-index: 4000;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	background:
+		radial-gradient(1200px 620px at 50% 12%, #1e3a8a 0%, transparent 62%),
+		linear-gradient(180deg, #0b1538 0%, #050b24 100%);
+}
+
+body.esperando-inicio #principal,
+body.esperando-inicio #menu-vol,
+body.esperando-inicio #menu-acc {
+	display: none !important;
+}
+
+.inicio-icono {
+	width: clamp(120px, 17vw, 190px);
+	height: auto;
+	margin-bottom: 10px;
+	filter: drop-shadow(0 10px 26px rgba(34, 211, 238, 0.45));
+	animation: cons-flota 3.4s ease-in-out infinite;
+}
+
+@keyframes cons-flota {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-14px); }
+}
+
+.inicio-kicker {
+	color: var(--cons-texto);
+	font-weight: 800;
+	font-size: clamp(26px, 4vw, 46px);
+	text-align: center;
+	letter-spacing: 1px;
+	text-shadow: 0 4px 18px rgba(2, 10, 30, 0.9);
+	margin: 0 0 22px;
+}
+
+/* ------------------------------------------------------------------
+   Escenario
+   ------------------------------------------------------------------ */
+#principal {
+	position: fixed;
+	inset: 0;
+	display: block;
+	background: var(--cons-noche);
+}
+
+.phaser-juego {
+	position: absolute;
+	inset: 0;
+}
+
+.phaser-juego canvas {
+	display: block;
+	margin: 0 auto;
+}
+
+/* La UI flota sobre el canvas, pero no puede robarle los toques: solo los
+   controles concretos vuelven a aceptarlos. */
+.capa-ui {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 20;
+}
+
+.capa-ui button,
+.capa-ui .medallas-niveles {
+	pointer-events: auto;
+}
+
+/* ------------------------------------------------------------------
+   Barra superior
+   ------------------------------------------------------------------ */
+.barra-superior {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 14px;
+	padding: 14px 18px;
+}
+
+.barra-botones-izq {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.btn-circular-cons {
+	width: 62px;
+	height: 62px;
+	border-radius: 50%;
+	border: 3px solid rgba(165, 243, 252, 0.55);
+	background: linear-gradient(180deg, #1e3a8a 0%, #0b1538 100%);
+	color: var(--cons-cian-claro);
+	font-size: 23px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 6px 16px rgba(2, 10, 30, 0.6), inset 0 2px 6px rgba(165, 243, 252, 0.2);
+	transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+.btn-circular-cons:hover {
+	transform: translateY(-2px) scale(1.05);
+	box-shadow: 0 10px 22px rgba(34, 211, 238, 0.4);
+}
+
+.btn-circular-cons:active { transform: scale(0.95); }
+
+.btn-circular-cons.btn-mini {
+	width: 48px;
+	height: 48px;
+	font-size: 18px;
+}
+
+.lbl-circular {
+	font-size: 8.5px;
+	font-weight: 800;
+	letter-spacing: 0.4px;
+	margin-top: 2px;
+	opacity: 0.85;
+}
+
+.centro-barra {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.banner-nivel {
+	background: linear-gradient(180deg, rgba(30, 58, 138, 0.95) 0%, rgba(11, 21, 56, 0.95) 100%);
+	border: 3px solid rgba(165, 243, 252, 0.5);
+	border-radius: 999px;
+	color: var(--cons-texto);
+	font-weight: 800;
+	font-size: clamp(14px, 1.7vw, 23px);
+	letter-spacing: 0.6px;
+	padding: 9px 26px;
+	text-align: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
+	box-shadow: 0 6px 20px rgba(2, 10, 30, 0.65);
+}
+
+.medallas-niveles {
+	display: flex;
+	gap: 7px;
+}
+
+.medalla-nivel {
+	width: 31px;
+	height: 31px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 14px;
+	font-weight: 800;
+	border: 2.5px solid rgba(165, 243, 252, 0.45);
+	background: rgba(11, 21, 56, 0.9);
+	color: #64748b;
+}
+
+.medalla-nivel.es-abierto { color: var(--cons-cian-claro); }
+
+.medalla-nivel.es-completo {
+	background: linear-gradient(180deg, var(--cons-oro) 0%, #b45309 100%);
+	border-color: #fde68a;
+	color: #452503;
+}
+
+.medalla-nivel.es-cerrado { opacity: 0.45; }
+
+.medalla-nivel.es-actual {
+	box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.55);
+	transform: scale(1.14);
+}
+
+.progreso-estrella {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	background: rgba(11, 21, 56, 0.9);
+	border: 3px solid rgba(165, 243, 252, 0.45);
+	border-radius: 999px;
+	padding: 8px 16px;
+	color: var(--cons-texto);
+	font-weight: 800;
+}
+
+.estrella-oro {
+	color: var(--cons-oro);
+	font-size: 21px;
+	filter: drop-shadow(0 2px 5px rgba(251, 191, 36, 0.6));
+}
+
+.barra-progreso {
+	width: clamp(70px, 10vw, 136px);
+	height: 13px;
+	border-radius: 999px;
+	background: rgba(2, 10, 30, 0.75);
+	overflow: hidden;
+	border: 1.5px solid rgba(165, 243, 252, 0.3);
+}
+
+.barra-progreso-rel {
+	height: 100%;
+	width: 0;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--cons-cian) 0%, var(--cons-oro) 100%);
+	transition: width 0.3s ease;
+}
+
+.contador-estrellas { font-size: 17px; }
+
+.pista-numero {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--cons-cian-claro);
+	background: rgba(2, 10, 30, 0.6);
+	border-radius: 999px;
+	padding: 3px 11px;
+	white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------
+   Zeus y Zoe
+   ------------------------------------------------------------------ */
+.personaje-cons {
+	position: absolute;
+	bottom: 6px;
+	width: clamp(100px, 13vw, 168px);
+	z-index: 22;
+}
+
+.personaje-cons img {
+	width: 100%;
+	height: auto;
+	filter: drop-shadow(0 8px 18px rgba(2, 10, 30, 0.75));
+}
+
+.personaje-cons.pj-zoe { left: 10px; }
+.personaje-cons.pj-zeus { right: 10px; }
+
+/* personajes-juego.js reconoce .pj-zoe / .pj-zeus, monta un personaje 3D
+   dentro y marca el GIF con .pj-3d-fuente (oculto por tutorial.css). Usar
+   esas clases evita que el sistema cree además un par flotante duplicado.
+   Si el 3D no llega a montarse (WebGL no disponible, GLB que no carga), el
+   GIF vuelve a mostrarse para que el niño no se quede sin personaje. */
+.personaje-cons .pj-3d-host:not(:has(.pj-3d-canvas)) img.pj-3d-fuente {
+	visibility: visible !important;
+}
+
+.personaje-cons .pj-3d-host {
+	position: relative;
+	width: 100%;
+}
+
+.personaje-cons .pj-3d-canvas {
+	width: 100% !important;
+	height: auto !important;
+}
+
+.bocadillo {
+	position: absolute;
+	bottom: 78%;
+	min-width: 190px;
+	max-width: 330px;
+	background: rgba(240, 249, 255, 0.97);
+	color: #0b1538;
+	border-radius: 18px;
+	padding: 11px 15px 12px;
+	font-size: clamp(12px, 1.25vw, 17px);
+	font-weight: 600;
+	line-height: 1.32;
+	box-shadow: 0 10px 26px rgba(2, 10, 30, 0.55);
+	/* Oculto por defecto: solo se ve cuando el personaje habla. */
+	opacity: 0;
+	transform: translateY(10px) scale(0.96);
+	transition: opacity 0.26s ease, transform 0.26s ease;
+	pointer-events: none;
+}
+
+.pj-zoe .bocadillo { left: 72%; }
+.pj-zeus .bocadillo { right: 72%; }
+
+.personaje-cons.hablando .bocadillo {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+}
+
+.bocadillo::after {
+	content: "";
+	position: absolute;
+	bottom: -12px;
+	border: 12px solid transparent;
+	border-top-color: rgba(240, 249, 255, 0.97);
+	border-bottom: 0;
+}
+
+.pj-zoe .bocadillo::after { left: 20px; }
+.pj-zeus .bocadillo::after { right: 20px; }
+
+.bocadillo-nombre {
+	display: block;
+	font-size: 11px;
+	font-weight: 900;
+	letter-spacing: 1.1px;
+	text-transform: uppercase;
+	margin-bottom: 3px;
+}
+
+.bocadillo-zoe .bocadillo-nombre { color: #0369a1; }
+.bocadillo-zeus .bocadillo-nombre { color: #a16207; }
+
+.bocadillo p { margin: 0; }
+
+.capa-efectos {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 30;
+}
+
+/* ------------------------------------------------------------------
+   Pantallas pequeñas (spec §11)
+   ------------------------------------------------------------------ */
+@media (max-width: 900px) {
+	.lbl-circular { display: none; }
+
+	.btn-circular-cons {
+		width: 52px;
+		height: 52px;
+		font-size: 19px;
+	}
+
+	.btn-circular-cons.btn-mini {
+		width: 42px;
+		height: 42px;
+		font-size: 15px;
+	}
+
+	.personaje-cons { width: clamp(78px, 15vw, 112px); }
+
+	.bocadillo {
+		min-width: 142px;
+		max-width: 218px;
+		font-size: 12px;
+		padding: 8px 11px 9px;
+	}
+}
+
+/* Pantalla estrecha (móvil en vertical): la barra de tres bloques no cabe en
+   una fila y se apilaba sobre el escenario, tapando estrellas. Aquí pasa a
+   ser una sola fila compacta, con los controles repartidos y sin envolver. */
+@media (max-width: 560px) {
+	.barra-superior {
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 10px;
+		background: linear-gradient(180deg, rgba(5, 11, 36, 0.96) 0%, rgba(5, 11, 36, 0.75) 78%, transparent 100%);
+	}
+
+	.barra-botones-izq {
+		flex-wrap: nowrap;
+		gap: 5px;
+	}
+
+	.btn-circular-cons {
+		width: 40px;
+		height: 40px;
+		font-size: 15px;
+		border-width: 2px;
+	}
+
+	.btn-circular-cons.btn-mini {
+		width: 34px;
+		height: 34px;
+		font-size: 13px;
+	}
+
+	.centro-barra { display: none; }
+
+	.progreso-estrella {
+		padding: 5px 9px;
+		gap: 5px;
+		border-width: 2px;
+	}
+
+	.barra-progreso { width: 54px; height: 10px; }
+	.contador-estrellas { font-size: 14px; }
+	.estrella-oro { font-size: 16px; }
+
+	/* Los personajes flotan sobre el canvas y en vertical tapan estrellas:
+	   se reducen y se pegan a las esquinas inferiores. */
+	.personaje-cons { width: 72px; }
+
+	.bocadillo {
+		min-width: 128px;
+		max-width: 60vw;
+		font-size: 11.5px;
+	}
+}
+
+/* En apaisado de móvil sobra muy poca altura: los personajes se encogen y las
+   burbujas se acercan para no tapar las estrellas. */
+@media (max-height: 520px) {
+	.personaje-cons { width: clamp(64px, 11vw, 92px); }
+	.barra-superior { padding: 8px 12px; }
+	.medallas-niveles { display: none; }
+	.bocadillo { bottom: 92%; }
+}
+
+@media (max-width: 620px) {
+	.progreso-estrella {
+		padding: 6px 10px;
+		gap: 6px;
+	}
+
+	.pista-numero { display: none; }
+	.banner-nivel { font-size: 13px; padding: 7px 14px; }
+}

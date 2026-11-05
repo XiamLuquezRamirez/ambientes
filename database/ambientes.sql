@@ -1493,7 +1493,8 @@ insert  into `juegos`(`slug`,`ambiente_id`,`eje_id`,`tematica_id`,`modulo_id`,`r
 ('tres-sonidos',9,13,16,10,'catalogo_juegos/Multisensorial/RepiteLaSecuencia/TresSonidos','Tres Sonidos',NULL,NULL,'#3b82f6',292,1,'2026-10-29 14:42:01','2026-10-29 15:39:20'),
 ('un-sonido-de-viaje',9,13,18,10,'catalogo_juegos/Multisensorial/AsociaSonidoEImagen/UnSonidoDeViaje','Un Sonido De Viaje',NULL,NULL,'#22c55e',313,1,'2026-10-29 14:42:01','2026-10-29 15:39:20'),
 ('una-nueva-pareja',8,19,41,3,'catalogo_juegos/Multisaberes/EncuentraLaPareja/UnaNuevaPareja','Una Nueva Pareja',NULL,NULL,'#ef4444',207,1,'2026-10-29 14:33:30','2026-10-29 15:39:20'),
-('una-nueva-vocal',8,19,38,3,'catalogo_juegos/Multisaberes/DescubreLasVocales/UnaNuevaVocal','Una Nueva Vocal',NULL,NULL,'#3b82f6',178,1,'2026-10-29 14:33:30','2026-10-29 15:39:20');
+('una-nueva-vocal',8,19,38,3,'catalogo_juegos/Multisaberes/DescubreLasVocales/UnaNuevaVocal','Una Nueva Vocal',NULL,NULL,'#3b82f6',178,1,'2026-10-29 14:33:30','2026-10-29 15:39:20'),
+('une-los-puntos-de-la-constelacion',8,20,43,3,'catalogo_juegos/Multisaberes/CuentaLosObjetos/UneLosPuntosDeLaConstelacion','Une los Puntos de la Constelación',NULL,NULL,'#38bdf8',400,1,'2026-11-05 10:00:00','2026-11-05 10:00:00');
 
 /*Table structure for table `matriculas` */
 
