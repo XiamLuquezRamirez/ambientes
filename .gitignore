@@ -1,6 +1,5 @@
 /.phpunit.cache
 /node_modules
-/public/build
 /public/hot
 /public/storage
 /storage/*.key
@@ -23,3 +22,5 @@ yarn-error.log
 /graphify-out/.graphify_*
 !/graphify-out/.graphify_labels.json
 /graphify-out/.needs_update
+cookies.txt
+/storage/framework/lsp-*.php
