@@ -291,6 +291,51 @@ body.habla-zeus .bocadillo-zeus { box-shadow: 0 0 0 4px var(--balanza-neon), 0 1
     display: flex;
     justify-content: center;
 }
+
+/* Al margen derecho: centrado abajo taparía el depósito de cristales. */
+.zona-comprobar {
+    position: absolute;
+    right: 24px; bottom: 96px;
+}
+
+.btn-comprobar {
+    padding: 13px 30px;
+    background: linear-gradient(180deg, #a8ff9a 0%, #28c244 45%, #0a6b1c 100%);
+    border: 3px solid #fff;
+    border-radius: 34px;
+    color: #fff;
+    font-weight: 800;
+    font-size: 21px;
+    letter-spacing: 2px;
+    box-shadow:
+        0 7px 0 #075014,
+        0 14px 26px rgba(0,0,0,0.6),
+        inset 0 3px 10px rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s, filter 0.2s;
+}
+.btn-comprobar i { margin-right: 8px; }
+.btn-comprobar:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 0 #075014, 0 18px 30px rgba(0,0,0,0.6), inset 0 3px 10px rgba(255,255,255,0.4);
+}
+.btn-comprobar:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 3px 0 #075014, inset 0 3px 10px rgba(255,255,255,0.3);
+}
+.btn-comprobar:disabled {
+    filter: grayscale(0.75) brightness(0.6);
+    cursor: not-allowed;
+    box-shadow: 0 5px 0 rgba(0,0,0,0.5);
+}
+/* Listo para comprobar: llama la atención sin decir si la cantidad es correcta. */
+.btn-comprobar.activo {
+    animation: latir-comprobar 1.1s ease-in-out infinite;
+}
+@keyframes latir-comprobar {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
 .subtitulo-balanza {
     margin: 0;
     padding: 8px 22px;

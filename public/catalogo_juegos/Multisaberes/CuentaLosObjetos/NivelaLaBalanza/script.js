@@ -17,8 +17,7 @@
     var arrancado = false;
     var vozGen = 0;
     var ultimaLinea = null;
-    var temporizadorVictoria = null;
-    var ultimoAviso = 0;
+    var comprobando = false;
 
     function $id(id) { return document.getElementById(id); }
     function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
@@ -152,13 +151,6 @@
         return !juegoTerminado && !!estado;
     }
 
-    function cancelarVictoria() {
-        if (temporizadorVictoria) {
-            clearTimeout(temporizadorVictoria);
-            temporizadorVictoria = null;
-        }
-    }
-
     function actualizarProgreso() {
         var c = L.conteo(estado);
         var bar = $id("barra-progreso-rel");
@@ -167,38 +159,45 @@
         if (cont) cont.textContent = c.derecha + "/" + c.izquierda;
     }
 
-    function avisarDesequilibrio(c) {
-        var ahora = Date.now();
-        if (ahora - ultimoAviso < 2500) return;
-        ultimoAviso = ahora;
-        var reto = retoActual();
-        if (c.derecha > c.izquierda) {
-            decirYa(reto.errorMuchos || { voz: "zoe", texto: dialogo("sobran", { n: c.derecha - c.izquierda }) });
-        } else if (c.izquierda - c.derecha === 1) {
-            pintarBocadillo("zoe", dialogo("cerca", {}));
-        }
+    /** Un cambio en los platillos: recalcula balanza, progreso y el botón. */
+    /**
+     * El botón se habilita en cuanto hay carga, sin delatar si la cantidad es
+     * correcta: comprobar es parte del reto, no una consecuencia de acertar.
+     */
+    function actualizarComprobar() {
+        var btn = $id("btn-comprobar");
+        if (!btn) return;
+        var c = L.conteo(estado);
+        var listo = !juegoTerminado && c.derecha > 0;
+        btn.disabled = !listo;
+        btn.classList.toggle("activo", listo);
     }
 
-    /** Un cambio en los platillos: recalcula balanza, progreso y posible victoria. */
     function trasCambio() {
         var c = L.conteo(estado);
         if (PH) PH.actualizarBalanza(c.izquierda, c.derecha);
         actualizarProgreso();
-        cancelarVictoria();
+        actualizarComprobar();
+    }
+
+    /** Respuesta del niño: aquí se decide si la ronda está superada. */
+    function comprobar() {
+        if (!puedeInteractuar() || comprobando) return;
+        var c = L.conteo(estado);
+        if (!c.derecha) return;
 
         if (L.esVictoria(c.izquierda, c.derecha)) {
-            var gen = rondaGen;
-            /* margen para que el niño siga corrigiendo sin cerrar la ronda */
-            temporizadorVictoria = setTimeout(function () {
-                temporizadorVictoria = null;
-                if (gen !== rondaGen || juegoTerminado) return;
-                var cc = L.conteo(estado);
-                if (L.esVictoria(cc.izquierda, cc.derecha)) ganarRonda();
-            }, 450);
+            comprobando = true;
+            ganarRonda();
             return;
         }
 
-        avisarDesequilibrio(c);
+        sfxSonar("error");
+        if (PH) PH.senalarDesequilibrio();
+        var reto = retoActual();
+        decirYa(c.derecha > c.izquierda
+            ? (reto.errorMuchos || { voz: "zoe", texto: dialogo("sobran", { n: c.derecha - c.izquierda }) })
+            : (reto.errorPocos || { voz: "zoe", texto: dialogo("faltan", { n: c.izquierda - c.derecha }) }));
     }
 
     function alColocar(id) {
@@ -220,8 +219,9 @@
     function ganarRonda() {
         var reto = retoActual();
         var c = L.conteo(estado);
-        juegoTerminado = false;
         if (PH) PH.habilitarArrastre(false);
+        var btn = $id("btn-comprobar");
+        if (btn) { btn.disabled = true; btn.classList.remove("activo"); }
         sfxSonar("equilibrio");
 
         decirYa(reto.acierto || { voz: "zeus", texto: dialogo("equilibrio", { n: c.izquierda }) });
@@ -242,12 +242,13 @@
         rondaGen += 1;
         var gen = rondaGen;
         estado = L.crearEstado(reto);
-        ultimoAviso = 0;
+        comprobando = false;
 
         var titulo = $id("titulo-reto-balanza");
         if (titulo) titulo.textContent = (reto.titulo || "").toUpperCase();
 
         actualizarProgreso();
+        actualizarComprobar();
 
         if (PH) PH.habilitarArrastre(false);
 
@@ -327,7 +328,7 @@
                 onColocar: alColocar,
                 onRetirar: alRetirar,
                 onSoltarFuera: function () { sfxSonar("regreso"); },
-                onAgarrar: function () { sfxSonar("agarrar"); cancelarVictoria(); },
+                onAgarrar: function () { sfxSonar("agarrar"); },
                 onImpacto: function () { sfxSonar("impacto"); },
                 onGema: function () { sfxSonar("gema"); }
             }
@@ -344,6 +345,9 @@
     }
 
     function enlazarUI() {
+        var btnC = $id("btn-comprobar");
+        if (btnC) btnC.addEventListener("click", comprobar);
+
         var btnP = $id("btn-pregunta-balanza");
         if (btnP) btnP.addEventListener("click", function () {
             if (!estado) return;

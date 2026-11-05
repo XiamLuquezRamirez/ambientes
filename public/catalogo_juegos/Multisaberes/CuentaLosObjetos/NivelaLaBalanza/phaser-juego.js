@@ -288,12 +288,13 @@
         g.destroy();
     }
 
+    /** Alto ajustado al radio del cuadrante: más larga, se sale por abajo. */
     function texAguja(scene) {
-        var W = 16, H = 78;
+        var W = 16, H = 48;
         var g = scene.make.graphics({ x: 0, y: 0, add: false });
         g.fillStyle(0xffffff, 1);
-        g.fillTriangle(W / 2, 0, W - 2, H - 12, 2, H - 12);
-        g.fillCircle(W / 2, H - 10, 7);
+        g.fillTriangle(W / 2, 0, W - 3, H - 8, 3, H - 8);
+        g.fillCircle(W / 2, H - 7, 6);
         g.generateTexture('aguja', W, H);
         g.destroy();
     }
@@ -527,8 +528,10 @@
 
         /* Medidor empotrado en la consola del soporte: es parte de la balanza. */
         var cuadrante = scene.add.image(INDICADOR_X, INDICADOR_Y, 'cuadrante').setDepth(9);
+        /* El eje de giro coincide con el centro de las marcas del cuadrante
+           (su `cy`, a 12 px del borde inferior de una textura de 78). */
         aguja = scene.add.image(INDICADOR_X, INDICADOR_Y + 27, 'aguja').setDepth(10);
-        aguja.setOrigin(0.5, 1).setScale(0.78);
+        aguja.setOrigin(0.5, 1).setScale(1);
         aguja.setTint(0x4ade80);
 
         balanza = {
@@ -995,6 +998,25 @@
         });
     }
 
+    /** Comprobación fallida: sacude la balanza y parpadea el medidor en rojo. */
+    function senalarDesequilibrio() {
+        if (!escena || !balanza) return;
+        var scene = escena;
+        scene.cameras.main.shake(260, 0.006);
+        if (aguja) {
+            scene.tweens.add({
+                targets: aguja, scale: 1.2, duration: 150,
+                yoyo: true, repeat: 2
+            });
+        }
+        if (balanza.cuadrante) {
+            balanza.cuadrante.setTint(0xff6b6b);
+            tras(900, function () {
+                if (balanza && balanza.cuadrante) balanza.cuadrante.clearTint();
+            });
+        }
+    }
+
     function habilitarArrastre(activo) {
         bloqueado = !activo;
         if (!escena) return;
@@ -1233,6 +1255,7 @@
         destruir: destruir,
         prepararRonda: prepararRonda,
         habilitarArrastre: habilitarArrastre,
+        senalarDesequilibrio: senalarDesequilibrio,
         colocarCristal: colocarCristal,
         retirarCristal: retirarCristal,
         actualizarBalanza: actualizarBalanza,
