@@ -528,6 +528,24 @@
         return { x: cx / estrellas.length, y: cy / estrellas.length };
     }
 
+    function ocultarPuzzleParaViaje() {
+        vistaEstrellas.forEach(function (v) {
+            if (v.sprite && v.sprite.setVisible) v.sprite.setVisible(false);
+            if (v.texto && v.texto.setVisible) v.texto.setVisible(false);
+            if (v.anillo && v.anillo.setVisible) v.anillo.setVisible(false);
+        });
+        if (lineas && lineas.setVisible) lineas.setVisible(false);
+        if (escena) {
+            escena.children.list.filter(function (o) {
+                return o.getData && o.getData("esNumeroEstrella");
+            }).forEach(function (o) { if (o.setVisible) o.setVisible(false); });
+        }
+        fondoPiezas.forEach(function (p) {
+            if (!p || !p.texture || !p.setVisible) return;
+            if (p.texture.key.indexOf("neb-") === 0) p.setVisible(false);
+        });
+    }
+
     function celebrar() {
         var tiempoSeg = Math.round((Date.now() - inicioMs) / 1000);
 
@@ -555,11 +573,26 @@
 
         temporizadores.push(tras(420, function () {
             if (!nave) return;
-            nave.secuenciaVictoria(function () {
+            var avisado = false;
+            var alFin = function () {
+                if (avisado) return;
+                avisado = true;
                 avisar("naveDespego", { nivel: nivelActual.id });
-            }, function (paso) {
-                avisar("pasoNave", { paso: paso });
-            });
+            };
+            var pasos = function (paso) { avisar("pasoNave", { paso: paso }); };
+            if (nivelActual.id === N.total()) {
+                nave.viajeFinal(alFin, pasos, {
+                    ancho: ANCHO,
+                    alto: ALTO,
+                    estrellas: fondoPiezas.filter(function (p) {
+                        return p.texture && p.texture.key === "polvo";
+                    }),
+                    niveles: N.NIVELES,
+                    ocultarPuzzle: ocultarPuzzleParaViaje
+                });
+            } else {
+                nave.secuenciaVictoria(alFin, pasos);
+            }
         }));
     }
 

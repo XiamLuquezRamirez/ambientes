@@ -291,6 +291,7 @@
         if (typeof window.iniciarSecuenciaVictoria === "function") {
             window.iniciarSecuenciaVictoria();
         }
+        document.body.classList.remove("viaje-final");
     }
 
     // ------------------------------------------------------------------

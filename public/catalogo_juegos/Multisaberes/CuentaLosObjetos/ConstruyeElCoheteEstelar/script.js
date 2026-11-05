@@ -231,8 +231,15 @@
 
         if (esUltimoMundo()) {
             juegoTerminado = true;
-            if (PH) PH.despegar(secuenciaVictoria);
-            else setTimeout(secuenciaVictoria, 900);
+            document.body.classList.add("viaje-final");
+            if (PH && typeof PH.viajeFinal === "function") {
+                setTimeout(secuenciaVictoria, 10000);
+                PH.viajeFinal(secuenciaVictoria);
+            } else if (PH) {
+                PH.despegar(secuenciaVictoria);
+            } else {
+                setTimeout(secuenciaVictoria, 900);
+            }
             return;
         }
 
@@ -244,17 +251,19 @@
 
         if (PH) {
             var aterrizado = false;
+            document.body.classList.add("viaje-final");
             var llegar = function () {
                 if (aterrizado) return;
                 aterrizado = true;
+                document.body.classList.remove("viaje-final");
                 indiceMundo = siguiente;
                 estado = est;
                 viajando = false;
                 presentarMundo();
             };
             /* red de seguridad: si una animación se interrumpe, no dejar el
-               juego bloqueado para siempre. */
-            setTimeout(llegar, 9000);
+               juego bloqueado para siempre. El crucero dura unos 4,5 s. */
+            setTimeout(llegar, 11000);
             PH.viajar({
                 ambiente: destino.ambiente || {},
                 meta: est.meta,
@@ -301,7 +310,12 @@
             .catch(function () {});
     }
 
+    var victoriaMostrada = false;
+
     function secuenciaVictoria() {
+        if (victoriaMostrada) return;
+        victoriaMostrada = true;
+        document.body.classList.remove("viaje-final");
         var texto = (nivel && nivel.cierre && nivel.cierre[0] && nivel.cierre[0].texto)
             || "¡Excelente! ¡Visitaste todos los mundos del espacio!";
 

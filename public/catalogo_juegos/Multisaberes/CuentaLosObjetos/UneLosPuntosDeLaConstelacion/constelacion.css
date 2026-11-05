@@ -35,6 +35,13 @@ body.tema-constelacion {
 	touch-action: none;
 }
 
+body.viaje-final .capa-ui,
+body.viaje-final #menu-acc,
+body.viaje-final #menu-vol {
+	opacity: 0;
+	pointer-events: none;
+}
+
 /* ------------------------------------------------------------------
    Pantalla de inicio
    inicio-fondo.css solo aporta display:flex y el color: si el juego no la

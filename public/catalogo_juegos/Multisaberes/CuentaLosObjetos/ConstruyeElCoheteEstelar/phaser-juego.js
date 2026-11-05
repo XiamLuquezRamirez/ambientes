@@ -36,6 +36,9 @@
     var minimapa = null;
     var tituloAlmacen = null;
     var etiquetaMotor = null;
+    var plataforma = null;
+    var cruceroId = null;
+    var baseFinal = null;
     var bloqueado = false;
 
     function avisar(nombre) {
@@ -397,7 +400,7 @@
 
             capaSuelo = scene.add.graphics().setDepth(3);
 
-            scene.add.image(COHETE_X, ALTO - 104, 'plataforma').setDepth(4).setScale(0.92);
+            plataforma = scene.add.image(COHETE_X, ALTO - 104, 'plataforma').setDepth(4).setScale(0.92);
             halo = scene.add.image(COHETE_X, COHETE_Y + 40, 'nebulosa')
                 .setDepth(4).setAlpha(0.22).setScale(0.9);
             cohete = scene.add.image(COHETE_X, COHETE_Y, 'cohete').setDepth(6).setScale(COHETE_ESCALA);
@@ -762,83 +765,156 @@
     /* ================= Viaje entre mundos ================= */
 
     /**
-     * Despegue → transición atmosférica → aterrizaje en el mundo destino.
-     * @param {object} cfg {ambiente, meta, total, indiceDestino}
+     * La nave se queda en cuadro, el espacio corre y el planeta destino pasa.
+     * Después baja a la plataforma del mundo nuevo. Sin velo blanco.
+     * @param {object} cfg {ambiente, meta, total, secuencia, indiceDestino}
      * @param {function} onAterrizado
      */
     function viajar(cfg, onAterrizado) {
         if (!escena) { if (onAterrizado) onAterrizado(); return; }
         bloqueado = true;
+        pararCrucero();
         var scene = escena;
+        var terminado = false;
+        cfg = cfg || {};
 
-        var piezas = piezasDelCohete();
-
-        scene.tweens.killTweensOf(cohete);
-        if (llama) llama.start();
-        scene.cameras.main.shake(800, 0.008);
-
-        /* FASE 1: despegue.
-           La secuencia NO cuelga del onComplete de un tween de grupo: cualquier
-           killTweensOf() sobre una de las piezas (p. ej. al rechazar un bloque)
-           mataría el tween entero y la cadena se quedaría a medias. El avance de
-           fase va por temporizador, que nada externo cancela. */
-        scene.tweens.add({ targets: piezas, y: '-=50', duration: 600, ease: 'Sine.inOut' });
-        tras(600, function () {
-            scene.tweens.add({ targets: piezas, y: '-=1100', duration: 1100, ease: 'Cubic.in' });
-        });
-        tras(1700, function () {
-            faseCrucero(cfg, piezas, onAterrizado);
-        });
-
-        if (halo) scene.tweens.add({ targets: halo, alpha: 0.6, scale: 1.4, duration: 600 });
-        moverMinimapa(cfg.indiceDestino);
-    }
-
-    /** FASE 2: estrellas en movimiento y cambio de atmósfera. */
-    function faseCrucero(cfg, piezas, onAterrizado) {
-        var scene = escena;
-        if (!scene) return;
-
-        if (llama) llama.stop();
-        /* Ojo: no matar aquí los tweens de `piezas` en bloque — el tween que
-           invoca esta fase está dentro y su cadena se abortaría. Basta con
-           ocultar; prepararMundo() los reposiciona después. */
-        piezas.forEach(function (p) {
-            if (p !== cohete && p !== llama && p && p.scene) p.setVisible(false);
-        });
-        /* prepararMundo() (en el onYoyo de abajo) es quien los devuelve al
-           almacén; aquí solo se ocultan durante el destello. */
-        bloquesVista.forEach(function (v) {
-            v.sprite.setVisible(false);
-            v.etiqueta.setVisible(false);
-        });
-
-        /* estrellas se estiran hacia abajo simulando velocidad */
-        estrellas.forEach(function (e) {
-            scene.tweens.add({
-                targets: e, scaleY: 6, alpha: 0.9,
-                duration: 420, yoyo: true, repeat: 1
-            });
-        });
-
-        var velo = scene.add.rectangle(ANCHO / 2, ALTO / 2, ANCHO, ALTO, 0xffffff, 0)
-            .setDepth(60);
-        /* Dos tweens encadenados en vez de yoyo+onYoyo: el cambio de mundo debe
-           ocurrir con el velo opaco, y onYoyo no es fiable para eso. */
-        scene.tweens.add({ targets: velo, fillAlpha: 0.9, duration: 420 });
-        tras(430, function () {
+        function llegar() {
+            if (terminado) return;
+            terminado = true;
+            pararCrucero();
+            if (!scene.sys) {
+                bloqueado = false;
+                if (onAterrizado) onAterrizado();
+                return;
+            }
+            restaurarEstrellas(scene);
             prepararMundo({
                 meta: cfg.meta, total: cfg.total,
                 secuencia: cfg.secuencia,
                 ambiente: cfg.ambiente, instantaneo: true
             });
-            colocarCoheteArriba();
-            scene.tweens.add({ targets: velo, fillAlpha: 0, duration: 420, delay: 120 });
+            mostrarTaller();
+            ocultar(scene.__columna);
+            slotsVista.forEach(function (s) {
+                ocultar(s.img);
+                ocultar(s.texto);
+            });
+            var escalaEntrada = COHETE_ESCALA * 0.7;
+            scene.tweens.killTweensOf(cohete);
+            scene.tweens.add({
+                targets: cohete,
+                x: COHETE_X,
+                y: COHETE_Y - ALTURA_ENTRADA,
+                scale: escalaEntrada,
+                duration: reducido() ? 0 : 480,
+                ease: 'Sine.inOut'
+            });
+            if (llama) {
+                scene.tweens.killTweensOf(llama);
+                llama.start();
+                scene.tweens.add({
+                    targets: llama,
+                    x: COHETE_X,
+                    y: COHETE_Y - ALTURA_ENTRADA + DESPLAZAMIENTO_LLAMA,
+                    duration: reducido() ? 0 : 480,
+                    ease: 'Sine.inOut'
+                });
+            }
+            tras(reducido() ? 40 : 500, function () {
+                colocarCoheteArriba();
+                faseAterrizaje(onAterrizado);
+            });
+        }
+
+        scene.tweens.killTweensOf(cohete);
+        if (llama) {
+            scene.tweens.killTweensOf(llama);
+            llama.start();
+        }
+        ocultarTaller();
+        scene.cameras.main.shake(420, 0.006);
+
+        var destinoX = ANCHO * 0.46;
+        var destinoY = ALTO * 0.42;
+        var escala = COHETE_ESCALA * 0.72;
+        scene.tweens.add({
+            targets: cohete,
+            x: destinoX, y: destinoY, scale: escala,
+            duration: reducido() ? 0 : 700, ease: 'Sine.out'
         });
-        tras(1000, function () {
-            if (velo.scene) velo.destroy();
-            faseAterrizaje(onAterrizado);
+        if (llama) {
+            scene.tweens.add({
+                targets: llama,
+                x: destinoX,
+                y: destinoY + DESPLAZAMIENTO_LLAMA * (escala / COHETE_ESCALA),
+                duration: reducido() ? 0 : 700, ease: 'Sine.out'
+            });
+        }
+
+        estrellas.forEach(function (e) {
+            scene.tweens.killTweensOf(e);
+            e.setScale(e.scaleX, reducido() ? e.scaleX : 4.6);
+            e.setAlpha(0.95);
+            e.__vel = 14 + Math.random() * 18;
         });
+
+        var llamaBase = destinoY + DESPLAZAMIENTO_LLAMA * (escala / COHETE_ESCALA);
+        if (!reducido()) {
+            tras(720, function () {
+                if (terminado || !cohete || !cohete.scene) return;
+                var t0 = Date.now();
+                cruceroId = setInterval(function () {
+                    if (!cohete || !cohete.scene) return;
+                    var wobble = Math.sin((Date.now() - t0) / 240) * 6;
+                    cohete.y = destinoY + wobble;
+                    cohete.x = destinoX;
+                    if (llama) {
+                        llama.y = llamaBase + wobble;
+                        llama.x = destinoX;
+                    }
+                    estrellas.forEach(function (e) {
+                        if (!e.scene) return;
+                        e.y += e.__vel || 16;
+                        if (e.y > ALTO + 24) {
+                            e.y = -24;
+                            e.x = Phaser.Math.Between(0, ANCHO);
+                        }
+                    });
+                }, 16);
+            });
+        }
+
+        var indice = cfg.indiceDestino;
+        if (!reducido() && indice != null) {
+            tras(450, function () {
+                if (terminado || !scene.sys || !scene.textures.exists('planeta-' + indice)) return;
+                var planeta = scene.add.image(ANCHO * 0.74, -130, 'planeta-' + indice)
+                    .setDepth(8).setScale(0.32);
+                scene.tweens.add({
+                    targets: planeta,
+                    y: ALTO * 0.5,
+                    x: ANCHO * 0.8,
+                    scale: 1.65,
+                    duration: 1500,
+                    ease: 'Sine.in',
+                    onComplete: function () {
+                        if (!planeta.scene) return;
+                        scene.tweens.add({
+                            targets: planeta,
+                            y: ALTO + 220,
+                            x: ANCHO + 60,
+                            scale: 2.3,
+                            duration: 650,
+                            ease: 'Sine.in',
+                            onComplete: function () { if (planeta.scene) planeta.destroy(); }
+                        });
+                    }
+                });
+            });
+        }
+
+        moverMinimapa(indice);
+        tras(reducido() ? 700 : 2700, llegar);
     }
 
     /** Altura de entrada: el conjunto baja ALTURA_ENTRADA hasta su sitio. */
@@ -850,8 +926,8 @@
         cohete.setScale(COHETE_ESCALA * 0.7);
         /* Posición absoluta, no delta: prepararMundo() ya dejó cada pieza en su
            sitio definitivo, así que subirlas en bloque es reversible exacto. */
-        cohete.y = COHETE_Y - ALTURA_ENTRADA;
-        if (llama) llama.y = cohete.y + DESPLAZAMIENTO_LLAMA;
+        cohete.setPosition(COHETE_X, COHETE_Y - ALTURA_ENTRADA);
+        if (llama) llama.setPosition(COHETE_X, cohete.y + DESPLAZAMIENTO_LLAMA);
         slotsVista.forEach(function (s) {
             s.img.y -= ALTURA_ENTRADA;
             s.texto.y -= ALTURA_ENTRADA;
@@ -925,6 +1001,293 @@
         }).setDepth(10);
         polvo.explode(28);
         tras(1100, function () { polvo.destroy(); });
+    }
+
+    function ocultar(obj) {
+        if (obj && obj.setVisible) obj.setVisible(false);
+    }
+
+    /** Quita taller, bloques y ruta para que el crucero se vea solo. */
+    function ocultarTaller() {
+        ocultar(capaSuelo);
+        ocultar(plataforma);
+        ocultar(halo);
+        ocultar(tituloAlmacen);
+        if (escena && escena.__columna) ocultar(escena.__columna);
+        if (escena && escena.__almacen) ocultar(escena.__almacen);
+        if (etiquetaMotor) {
+            ocultar(etiquetaMotor.texto);
+            ocultar(etiquetaMotor.flecha);
+        }
+        slotsVista.forEach(function (s) {
+            ocultar(s.img);
+            ocultar(s.texto);
+            if (s.bloque) {
+                ocultar(s.bloque.sprite);
+                ocultar(s.bloque.etiqueta);
+            }
+        });
+        bloquesVista.forEach(function (v) {
+            ocultar(v.sprite);
+            ocultar(v.etiqueta);
+        });
+        if (minimapa) {
+            ocultar(minimapa.fondo);
+            ocultar(minimapa.titulo);
+            ocultar(minimapa.ruta);
+            ocultar(minimapa.nave);
+            (minimapa.iconos || []).forEach(function (ic) {
+                ocultar(ic.img);
+                ocultar(ic.texto);
+            });
+        }
+        nebulosas.forEach(ocultar);
+    }
+
+    function mostrar(obj) {
+        if (obj && obj.setVisible) obj.setVisible(true);
+    }
+
+    /** Devuelve el taller después del crucero. Las casillas nuevas las crea prepararMundo. */
+    function mostrarTaller() {
+        mostrar(capaSuelo);
+        mostrar(plataforma);
+        mostrar(halo);
+        mostrar(tituloAlmacen);
+        if (escena && escena.__almacen) mostrar(escena.__almacen);
+        if (etiquetaMotor) {
+            mostrar(etiquetaMotor.texto);
+            mostrar(etiquetaMotor.flecha);
+        }
+        nebulosas.forEach(mostrar);
+        if (minimapa) {
+            mostrar(minimapa.fondo);
+            mostrar(minimapa.titulo);
+            mostrar(minimapa.ruta);
+            mostrar(minimapa.nave);
+            (minimapa.iconos || []).forEach(function (ic) {
+                mostrar(ic.img);
+                mostrar(ic.texto);
+            });
+        }
+    }
+
+    function restaurarEstrellas(scene) {
+        estrellas.forEach(function (e) {
+            if (!e.scene) return;
+            scene.tweens.killTweensOf(e);
+            e.setScale(e.scaleX);
+            e.setAlpha(Phaser.Math.FloatBetween(0.35, 1));
+            if (!reducido()) {
+                scene.tweens.add({
+                    targets: e,
+                    alpha: Phaser.Math.FloatBetween(0.15, 0.5),
+                    duration: Phaser.Math.Between(1200, 3600),
+                    yoyo: true, repeat: -1
+                });
+            }
+        });
+    }
+
+    function pararCrucero() {
+        if (cruceroId) {
+            clearInterval(cruceroId);
+            cruceroId = null;
+        }
+    }
+
+    /**
+     * Cierre de los cuatro mundos: la nave se queda en cuadro y el espacio
+     * (estrellas y los planetas visitados) pasa de largo.
+     */
+    function viajeFinal(onFin) {
+        if (!escena) { if (onFin) onFin(); return; }
+        bloqueado = true;
+        pararCrucero();
+        var scene = escena;
+        var avisado = false;
+        function avisarFin() {
+            if (avisado) return;
+            avisado = true;
+            if (onFin) onFin();
+        }
+
+        scene.tweens.killTweensOf(cohete);
+        if (llama) {
+            scene.tweens.killTweensOf(llama);
+            llama.start();
+        }
+        ocultarTaller();
+        pintarAmbiente(scene, {
+            cieloAlto: '#020617',
+            cieloBajo: '#000000',
+            suelo: '#000000',
+            sueloBorde: '#000000',
+            rejilla: '#000000',
+            nebulosaA: '#312e81',
+            nebulosaB: '#1e1b4b',
+            acento: '#00e5ff'
+        }, true);
+        ocultar(capaSuelo);
+
+        var destinoX = ANCHO * 0.42;
+        var destinoY = ALTO * 0.46;
+        var escala = COHETE_ESCALA * 0.78;
+        scene.cameras.main.shake(500, 0.006);
+        scene.tweens.add({
+            targets: cohete,
+            x: destinoX, y: destinoY, scale: escala,
+            duration: 700, ease: 'Sine.out'
+        });
+        if (llama) {
+            scene.tweens.add({
+                targets: llama,
+                x: destinoX,
+                y: destinoY + DESPLAZAMIENTO_LLAMA * (escala / COHETE_ESCALA),
+                duration: 700, ease: 'Sine.out'
+            });
+        }
+
+        estrellas.forEach(function (e) {
+            scene.tweens.killTweensOf(e);
+            e.setScale(e.scaleX, 4.2);
+            e.setAlpha(0.95);
+            e.__vel = 10 + Math.random() * 16;
+        });
+
+        var llamaBase = destinoY + DESPLAZAMIENTO_LLAMA * (escala / COHETE_ESCALA);
+        tras(720, function () {
+            var t0 = Date.now();
+            cruceroId = setInterval(function () {
+                if (!cohete || !cohete.scene) return;
+                var wobble = Math.sin((Date.now() - t0) / 260) * 7;
+                cohete.y = destinoY + wobble;
+                cohete.x = destinoX;
+                if (llama) {
+                    llama.y = llamaBase + wobble;
+                    llama.x = destinoX;
+                }
+                estrellas.forEach(function (e) {
+                    if (!e.scene) return;
+                    e.y += e.__vel || 12;
+                    if (e.y > ALTO + 24) {
+                        e.y = -24;
+                        e.x = Phaser.Math.Between(0, ANCHO);
+                    }
+                });
+            }, 16);
+        });
+
+        var n = (opciones.mundos && opciones.mundos.length) || 4;
+        var i;
+        for (i = 0; i < n; i++) {
+            (function (indice) {
+                tras(350 + indice * 1100, function () {
+                    if (!scene.sys || !scene.textures.exists('planeta-' + indice)) return;
+                    var izquierda = indice % 2 === 0;
+                    var x0 = izquierda ? 210 : ANCHO - 210;
+                    var planeta = scene.add.image(x0, -140, 'planeta-' + indice)
+                        .setDepth(8).setScale(0.55);
+                    scene.tweens.add({
+                        targets: planeta,
+                        y: ALTO + 180,
+                        x: x0 + (izquierda ? 90 : -90),
+                        scale: 2.6,
+                        duration: 1400,
+                        ease: 'Linear',
+                        onComplete: function () { if (planeta.scene) planeta.destroy(); }
+                    });
+                });
+            })(i);
+        }
+
+        /* Los cuatro mundos cruzan y después la nave aterriza en la base. */
+        tras(reducido() ? 400 : 350 + n * 1100, llegarABase);
+
+        function llegarABase() {
+            if (avisado) return;
+            pararCrucero();
+            if (!scene.sys || !cohete) { avisarFin(); return; }
+            restaurarEstrellas(scene);
+            texBaseFinal(scene);
+            if (baseFinal && baseFinal.scene) baseFinal.destroy();
+
+            var baseY = 628;
+            baseFinal = scene.add.image(ANCHO / 2, ALTO + 200, 'base-final')
+                .setDepth(5);
+            scene.tweens.add({
+                targets: baseFinal, y: baseY,
+                duration: reducido() ? 0 : 780, ease: 'Cubic.out'
+            });
+
+            var naveY = 424;
+            var escalaAterrizaje = 0.6;
+            scene.tweens.killTweensOf(cohete);
+            scene.tweens.add({
+                targets: cohete,
+                x: ANCHO / 2, y: naveY, scale: escalaAterrizaje,
+                duration: reducido() ? 0 : 900, ease: 'Cubic.out'
+            });
+            if (llama) {
+                scene.tweens.killTweensOf(llama);
+                scene.tweens.add({
+                    targets: llama,
+                    x: ANCHO / 2,
+                    y: naveY + DESPLAZAMIENTO_LLAMA * (escalaAterrizaje / COHETE_ESCALA),
+                    duration: reducido() ? 0 : 900, ease: 'Cubic.out'
+                });
+            }
+
+            tras(reducido() ? 40 : 940, function () {
+                if (!scene.sys) { avisarFin(); return; }
+                if (llama) llama.stop();
+                cohete.setPosition(ANCHO / 2, naveY).setScale(escalaAterrizaje);
+                scene.cameras.main.shake(180, 0.004);
+                var polvo = scene.add.particles(ANCHO / 2, 548, 'chispa', {
+                    speed: { min: 40, max: 160 },
+                    angle: { min: 200, max: 340 },
+                    scale: { start: 0.7, end: 0 },
+                    lifespan: 500, quantity: 8,
+                    tint: [0xe2e8f0, 0x67e8f9],
+                    alpha: { start: 0.7, end: 0 },
+                    emitting: false
+                }).setDepth(9);
+                polvo.explode(16);
+                tras(700, function () { if (polvo.scene) polvo.destroy(); });
+                tras(reducido() ? 80 : 520, avisarFin);
+            });
+        }
+    }
+
+    function texBaseFinal(scene) {
+        if (scene.textures.exists('base-final')) return;
+        var W = 760, H = 280;
+        var g = scene.make.graphics({ x: 0, y: 0, add: false });
+        g.fillStyle(0x1e293b, 1);
+        g.fillRoundedRect(64, 48, 92, 190, 14);
+        g.fillRoundedRect(W - 156, 48, 92, 190, 14);
+        g.fillStyle(0x0f172a, 1);
+        g.fillRoundedRect(78, 64, 64, 36, 6);
+        g.fillRoundedRect(W - 142, 64, 64, 36, 6);
+        g.fillStyle(0x22d3ee, 0.95);
+        g.fillRoundedRect(86, 72, 48, 18, 4);
+        g.fillRoundedRect(W - 134, 72, 48, 18, 4);
+        g.fillStyle(0xfbbf24, 1);
+        g.fillCircle(110, 132, 6);
+        g.fillCircle(W - 110, 132, 6);
+        g.fillStyle(0x0f172a, 1);
+        g.fillEllipse(W / 2, 78, 540, 74);
+        g.fillStyle(0x334155, 1);
+        g.fillEllipse(W / 2, 70, 460, 54);
+        g.lineStyle(5, 0x22d3ee, 0.95);
+        g.strokeEllipse(W / 2, 66, 310, 36);
+        g.lineStyle(2, 0xffffff, 0.4);
+        g.strokeEllipse(W / 2, 66, 170, 18);
+        g.fillStyle(0x475569, 1);
+        g.fillRect(W / 2 - 22, 96, 16, 160);
+        g.fillRect(W / 2 + 6, 96, 16, 160);
+        g.generateTexture('base-final', W, H);
+        g.destroy();
     }
 
     /** Despegue final (sin destino): el cohete sale y se llama onFin. */
@@ -1086,6 +1449,7 @@
         senalarFaltantes: senalarFaltantes,
         viajar: viajar,
         despegar: despegar,
+        viajeFinal: viajeFinal,
         marcarMinimapa: marcarMinimapa,
         ANCHO: ANCHO,
         ALTO: ALTO

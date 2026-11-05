@@ -331,6 +331,26 @@ body.habla-zeus .bocadillo-zeus { box-shadow: 0 0 0 4px var(--cohete-neon), 0 10
 /* Final sobre fondo espacial */
 #final.final { background: radial-gradient(ellipse at center, #1a1f5c 0%, #06082a 80%); }
 
+body.viaje-final .capa-ui,
+body.viaje-final #menu-acc,
+body.viaje-final #menu-vol {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* La medalla va encima de Jugar/Salir: si crece hacia arriba, los botones la tapan. */
+#final .trofeo {
+    width: min(22vh, 210px);
+    bottom: calc(9% + 100px);
+    z-index: 30;
+    filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.4));
+}
+
+#final .final-acciones {
+    bottom: 14%;
+    z-index: 130;
+}
+
 /* Responsive */
 @media (max-width: 1100px) {
     .banner-reto-cohete { font-size: 17px; padding: 10px 24px; }
