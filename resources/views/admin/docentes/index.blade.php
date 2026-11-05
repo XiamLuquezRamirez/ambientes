@@ -152,7 +152,7 @@
                                             <strong class="form-label" id="lblVistaPreviaFirma">Vista previa de la
                                                 firma</strong>
                                             <img id="imgPreviewFirma" class="w-50"
-                                                src="/assets/images/no-image.png"
+                                                src="{{ asset('assets/images/no-image.png') }}"
                                                 alt="Firma del docente">
                                         </div>
                                     </div>
@@ -341,7 +341,7 @@
 
         function cerrarModalBSPasswordGenerada() {
             document.getElementById('imgPreviewFirma').src =
-                '/assets/images/no-image.png';
+                '{{ asset('assets/images/no-image.png') }}';
             limpiarErroresModal();
             document.activeElement?.blur();
             modalBSPasswordGenerada.hide();
@@ -350,7 +350,7 @@
         /* ── Cerrar modal Nuevo Docente ─────────────────────────── */
         function cerrarModalDocente() {
             document.getElementById('imgPreviewFirma').src =
-                '/assets/images/no-image.png';
+                '{{ asset('assets/images/no-image.png') }}';
             limpiarErroresModal();
             document.activeElement?.blur();
             modalBS.hide();
@@ -742,7 +742,7 @@
             $('#imgPreviewFirma').attr(
                 'src',
                 data.firma_url ||
-                '/assets/images/no-image.png'
+                '{{ asset('assets/images/no-image.png') }}'
             );
             id_editar = data.user.id;
         }

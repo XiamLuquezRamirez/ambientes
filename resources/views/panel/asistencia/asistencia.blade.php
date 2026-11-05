@@ -40,7 +40,7 @@
         </table>
     </div>
     <div class="d-flex justify-content-end mt-4">
-        <button class="btn btn-outline-secondary" onclick="window.location.href = '/panel/principal'">
+        <button class="btn btn-outline-secondary" onclick="window.location.href = '{{ url('/panel/principal') }}'">
             <i class="fa-solid fa-arrow-left"></i> Volver
         </button>
         <button class="btn btn-success" onclick="registrarAsistencia()">
@@ -53,7 +53,7 @@
 @push('scripts')
     <script>
         const CARGA_DOCENTE_ID = {{ $carga->id }};
-        const URL_REGISTRAR_ASISTENCIA = '/panel/asistencia/registrar-asistencia';
+        const URL_REGISTRAR_ASISTENCIA = @json(url('/panel/asistencia/registrar-asistencia'));
 
         document.querySelectorAll('.btn-asistencia').forEach(switchAsistencia => {
 

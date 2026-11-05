@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Ambientes;
 
+use App\Support\SubcarpetaPublica;
 use App\Http\Controllers\Controller;
 use App\Models\BloqueExperiencia;
 use App\Models\Experiencia;
@@ -88,7 +89,7 @@ class AmbienteNinoController extends Controller
             'urlExperienciaTemplate' => '',
             'urlTts' => '',
             'urlSalir' => '',
-            'urlContinuar' => '/alumnos',
+            'urlContinuar' => SubcarpetaPublica::url('/alumnos'),
             'urlJuegosCatalogo' => route('ambiente.juegos-catalogo'),
             'portadaImg' => $this->urlPortada($ambiente->slug),
             'fondoImg' => $this->urlFondo($ambiente->slug),
@@ -151,9 +152,9 @@ class AmbienteNinoController extends Controller
             'arbol' => $arbol,
             'camino' => $camino,
             'estudiante' => $estudiante,
-            'urlExperienciaTemplate' => '/experiencia/__ID__',
-            'urlTts' => '/tts',
-            'urlSalir' => '/salir',
+            'urlExperienciaTemplate' => SubcarpetaPublica::url('/experiencia/__ID__'),
+            'urlTts' => SubcarpetaPublica::url('/tts'),
+            'urlSalir' => SubcarpetaPublica::url('/salir'),
             'urlContinuar' => '',
             'urlJuegosCatalogo' => route('ambiente.juegos-catalogo'),
             'portadaImg' => $this->urlPortada($ambiente->slug),
@@ -189,7 +190,7 @@ class AmbienteNinoController extends Controller
             'estudiante' => $estudiante,
             'urlExperienciaTemplate' => '',
             'urlTts' => route('ambiente.tts'),
-            'urlSalir' => '/salir',
+            'urlSalir' => SubcarpetaPublica::url('/salir'),
             'urlContinuar' => '',
             'urlJuegosCatalogo' => route('ambiente.juegos-catalogo'),
             'portadaImg' => '',
@@ -377,7 +378,7 @@ class AmbienteNinoController extends Controller
         $absoluto = public_path($relativo);
 
         if (File::exists($absoluto)) {
-            return '/'.$relativo;
+            return SubcarpetaPublica::url($relativo);
         }
 
         return '';
@@ -424,7 +425,7 @@ class AmbienteNinoController extends Controller
         $absoluto = public_path($relativo);
 
         if (File::exists($absoluto)) {
-            return '/'.$relativo.'?v='.@filemtime($absoluto);
+            return SubcarpetaPublica::url($relativo).'?v='.@filemtime($absoluto);
         }
 
         return '';

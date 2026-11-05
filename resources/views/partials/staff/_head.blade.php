@@ -1,6 +1,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
+@include('partials._base-url')
 <title>@yield('title', $titleDefault ?? 'PedNia') — PedNia</title>
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
@@ -9,6 +10,7 @@
 <link rel="icon" href="{{ asset('assets/images/favicon.ico') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/sweetalert2.min.css') }}">
 <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
+<script>window.pedniaEngancharJquery && window.pedniaEngancharJquery();</script>
 <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
 @include('partials.sidebar-init')
 <link rel="stylesheet" href="{{ asset('assets/css/perfil.css') }}">

@@ -44,7 +44,7 @@
             estudiantes.forEach(estudiante => {
 
                 const avatar = estudiante.avatar ?
-                    `/storage/${estudiante.avatar}` :
+                    `${window.PEDNIA_BASE || ''}/storage/${estudiante.avatar}` :
                     null;
 
                 grid.innerHTML += `

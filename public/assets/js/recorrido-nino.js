@@ -565,7 +565,7 @@
     function irConDesvanecido(url) {
         const path = url.split('?')[0];
         if (!window.KioscoNav || !window.KioscoNav.esRutaKiosco(path)) {
-            window.location.href = url;
+            window.location.href = (window.pedniaUrl || String)(url);
             return;
         }
         asegurarAlumnos(url).then(function () {
@@ -612,7 +612,7 @@
                 window.KioscoNav.ir('/inicio', true);
                 return;
             }
-            window.location.href = '/inicio';
+            window.location.href = (window.pedniaUrl || String)('/inicio');
         }
 
         if (!urlSalir) {

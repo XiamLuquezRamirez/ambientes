@@ -15,7 +15,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // asset_url '/' da rutas '/assets/...'; en ingeer.co/ambientes/ deben llevar la base.
+        // Se ajusta aquí (antes de crear el UrlGenerator) para que valga también con config:cache.
+        if ($this->app->bound('request') && config('app.asset_url') === '/') {
+            $base = rtrim((string) $this->app->make('request')->getBaseUrl(), '/');
+            if ($base !== '') {
+                config(['app.asset_url' => $base]);
+            }
+        }
     }
 
     /**

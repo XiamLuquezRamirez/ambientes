@@ -932,7 +932,7 @@ class ParametrosPerfilAprendizajeService
         return [
             'nombre' => $nombre,
             'ruta' => '../../images/'.$nombre,
-            'url' => '/catalogo_juegos/images/'.rawurlencode($nombre),
+            'url' => \App\Support\SubcarpetaPublica::url('catalogo_juegos/images/'.rawurlencode($nombre)),
         ];
     }
 }

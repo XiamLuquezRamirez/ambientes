@@ -1,7 +1,13 @@
 (function (global) {
+    /* Base de la app ("" en la raíz, "/ambientes" en ingeer.co/ambientes/), deducida de la URL de este script. */
+    var PEDNIA_BASE = (function () {
+        var src = (document.currentScript && document.currentScript.src) || window.location.href;
+        var m = new URL(src, window.location.href).pathname.match(/^(.*?)\/catalogo_juegos\//);
+        return m ? m[1] : "";
+    })();
     var VOLUMEN_FONDO = 0.2;
     var VOLUMEN_DUCK = 0.05;
-    var URL_TTS = "/juegos/tts";
+    var URL_TTS = PEDNIA_BASE + "/juegos/tts";
 
     var config = {};
     var intro = {};

@@ -22,9 +22,9 @@
         const el = document.getElementById('cmRutas');
         if (!el) {
             return {
-                foto: '/captura/foto',
-                audio: '/captura/audio',
-                video: '/captura/video',
+                foto: ((window.PEDNIA_BASE || '') + '/captura/foto'),
+                audio: ((window.PEDNIA_BASE || '') + '/captura/audio'),
+                video: ((window.PEDNIA_BASE || '') + '/captura/video'),
             };
         }
         try {
@@ -166,7 +166,7 @@
             $iframe.off('load.cmIntegracion').one('load.cmIntegracion', function () {
                 esperarApiIframe(tipo);
             });
-            $iframe.attr('src', rutas[tipo] || ('/captura/' + tipo));
+            $iframe.attr('src', rutas[tipo] || (((window.PEDNIA_BASE || '') + '/captura/') + tipo));
         });
     }
 

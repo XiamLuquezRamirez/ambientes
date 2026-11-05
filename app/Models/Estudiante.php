@@ -40,7 +40,7 @@ class Estudiante extends Model
     {
         return Attribute::make(
             get: fn () => $this->avatar
-                ? Storage::url($this->avatar)
+                ? \App\Support\SubcarpetaPublica::url('storage/'.ltrim($this->avatar, '/'))
                 : null
         );
     }

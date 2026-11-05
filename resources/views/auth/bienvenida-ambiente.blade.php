@@ -12,7 +12,7 @@
 
 @section('content')
 <main class="bienambiente-wrap{{ $fondoBienvenida ? ' is-armando' : '' }}" data-kiosco-sesion="1" data-kiosco-superponible
-    data-redirect-inicio="{{ $redirectInicio ?? '/recorrido' }}"
+    data-redirect-inicio="{{ $redirectInicio ?? url('/recorrido') }}"
     data-voz="¡Acompáñame al ambiente {{ $ambiente->nombre }}!"
     @if ($fondoBienvenida) data-fondo="{{ $fondoBienvenida }}" @endif>
     <div class="bienambiente-escena"

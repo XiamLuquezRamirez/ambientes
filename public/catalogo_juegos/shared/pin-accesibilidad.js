@@ -6,7 +6,13 @@
 (function () {
     'use strict';
 
-    var URL = '/juegos/pin-accesibilidad';
+    /* Base de la app ("" en la raíz, "/ambientes" en ingeer.co/ambientes/), deducida de la URL de este script. */
+    var PEDNIA_BASE = (function () {
+        var src = (document.currentScript && document.currentScript.src) || window.location.href;
+        var m = new URL(src, window.location.href).pathname.match(/^(.*?)\/catalogo_juegos\//);
+        return m ? m[1] : '';
+    })();
+    var URL = PEDNIA_BASE + '/juegos/pin-accesibilidad';
     var abierto = false;
     var digitos = '';
     var enviando = false;
@@ -102,7 +108,7 @@
             tecla('borrar', '←', ''), tecla('0'), tecla('limpiar', 'C', ''),
             '</div>',
             '<p class="pin-acc-error" id="pin-acc-error"></p>',
-            '<button type="button" class="pin-acc-cancelar" data-pin="cerrar" aria-label="Cancelar"><img src="/assets/images/selector-aula/cancelar.png" alt=""></button>',
+            '<button type="button" class="pin-acc-cancelar" data-pin="cerrar" aria-label="Cancelar"><img src="' + PEDNIA_BASE + '/assets/images/selector-aula/cancelar.png" alt=""></button>',
             '</div>',
         ].join('');
         modal.addEventListener('click', function (e) {
