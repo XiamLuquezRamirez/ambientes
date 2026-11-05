@@ -113,9 +113,15 @@
         document.body.classList.toggle("habla-zeus", activo && voz === "zeus");
     }
 
+    /**
+     * Solo se ve el bocadillo del que habla: con los dos fijos en pantalla se
+     * quedaba el mensaje anterior del otro personaje, de otro momento del juego.
+     */
     function pintarBocadillo(voz, texto) {
         var el = $id(voz === "zeus" ? "bocadillo-zeus-texto" : "bocadillo-zoe-texto");
         if (el && texto) el.textContent = texto;
+        document.body.classList.toggle("turno-zoe", voz === "zoe");
+        document.body.classList.toggle("turno-zeus", voz === "zeus");
     }
 
     function decir(linea) {

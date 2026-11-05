@@ -276,6 +276,20 @@ body.esperando-inicio #menu-acc {
     box-shadow: 0 2px 0 rgba(0,0,0,0.2);
 }
 .bocadillo p { margin: 0; }
+
+/* Un bocadillo a la vez: el del personaje que tiene el turno de habla.
+   `display` y no `opacity`: con el bocadillo oculto pero presente, el
+   saliente seguía ocupando su sitio sobre el escenario. */
+.personaje-balanza .bocadillo { display: none; }
+body.turno-zoe .pj-zoe-balanza .bocadillo,
+body.turno-zeus .pj-zeus-balanza .bocadillo { display: block; }
+/* El personaje callado se atenúa, para que la atención vaya al que habla. */
+.personaje-balanza img { transition: filter 0.25s, opacity 0.25s; }
+body.turno-zeus .pj-zoe-balanza img,
+body.turno-zoe .pj-zeus-balanza img {
+    opacity: 0.55;
+    filter: grayscale(0.4) drop-shadow(0 8px 14px rgba(0,0,0,0.65));
+}
 body.habla-zoe .bocadillo-zoe,
 body.habla-zeus .bocadillo-zeus {
     transform: scale(1.04);
