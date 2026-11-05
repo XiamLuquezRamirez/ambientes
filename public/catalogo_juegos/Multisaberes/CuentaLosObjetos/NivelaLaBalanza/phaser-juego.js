@@ -163,17 +163,41 @@
         g.destroy();
     }
 
+    /** Cuenco con pared y fondo, no un disco plano: los cristales se posan dentro. */
     function texPlatillo(scene) {
-        var W = 230, H = 56;
+        var W = 230, H = 92;
+        var cx = W / 2;
+        var bordeY = 26;
+        var fondoY = 62;
         var g = scene.make.graphics({ x: 0, y: 0, add: false });
+
+        /* pared exterior del cuenco */
+        g.fillStyle(0x475569, 1);
+        g.beginPath();
+        g.moveTo(10, bordeY);
+        g.lineTo(W - 10, bordeY);
+        g.lineTo(W - 46, fondoY);
+        g.lineTo(46, fondoY);
+        g.closePath();
+        g.fillPath();
+        g.fillEllipse(cx, fondoY, W - 92, 20);
+
+        /* sombra interior */
+        g.fillStyle(0x1e293b, 1);
+        g.fillEllipse(cx, bordeY, W - 20, 30);
         g.fillStyle(0x334155, 1);
-        g.fillEllipse(W / 2, 30, W - 8, 34);
-        g.fillStyle(0x94a3b8, 1);
-        g.fillEllipse(W / 2, 24, W - 14, 30);
-        g.fillStyle(0xcbd5e1, 1);
-        g.fillEllipse(W / 2, 20, W - 40, 20);
-        g.lineStyle(3, 0x67e8f9, 0.7);
-        g.strokeEllipse(W / 2, 22, W - 18, 28);
+        g.fillEllipse(cx, bordeY + 4, W - 34, 24);
+
+        /* brillo del borde */
+        g.lineStyle(5, 0xcbd5e1, 1);
+        g.strokeEllipse(cx, bordeY, W - 20, 30);
+        g.lineStyle(3, 0x67e8f9, 0.75);
+        g.strokeEllipse(cx, bordeY, W - 28, 24);
+
+        /* reflejo en la pared */
+        g.fillStyle(0x94a3b8, 0.55);
+        g.fillTriangle(24, bordeY + 8, 54, bordeY + 8, 50, fondoY - 2);
+
         g.generateTexture('platillo', W, H);
         g.destroy();
     }
@@ -485,8 +509,10 @@
         var platilloIzq = scene.add.image(PIVOTE_X - BRAZO, PIVOTE_Y + 62, 'platillo').setDepth(8);
         var platilloDer = scene.add.image(PIVOTE_X + BRAZO, PIVOTE_Y + 62, 'platillo').setDepth(8);
 
-        var cadenaIzq = scene.add.graphics().setDepth(6);
-        var cadenaDer = scene.add.graphics().setDepth(6);
+        /* Por encima de los cristales (depth 9): si no, el enganche del brazo
+           queda tapado por la carga del plato. */
+        var cadenaIzq = scene.add.graphics().setDepth(11);
+        var cadenaDer = scene.add.graphics().setDepth(11);
 
         /* contadores bajo cada platillo */
         var estiloNum = {
@@ -494,9 +520,9 @@
             fontStyle: 'bold', color: '#ffffff'
         };
         /* El contador va bajo el platillo: encima lo taparían los cristales. */
-        marcaIzq = scene.add.text(PIVOTE_X - BRAZO, PIVOTE_Y + 104, '0', estiloNum)
+        marcaIzq = scene.add.text(PIVOTE_X - BRAZO, PIVOTE_Y + 124, '0', estiloNum)
             .setOrigin(0.5).setDepth(16).setShadow(2, 2, '#000000cc', 4);
-        marcaDer = scene.add.text(PIVOTE_X + BRAZO, PIVOTE_Y + 104, '0', estiloNum)
+        marcaDer = scene.add.text(PIVOTE_X + BRAZO, PIVOTE_Y + 124, '0', estiloNum)
             .setOrigin(0.5).setDepth(16).setShadow(2, 2, '#000000cc', 4);
 
         /* Medidor empotrado en la consola del soporte: es parte de la balanza. */
@@ -516,6 +542,11 @@
     }
 
     /** Las cadenas se redibujan en cada cambio: unen el extremo del brazo al platillo. */
+    /**
+     * Los cables salen de un único punto en el extremo del brazo y se abren
+     * hacia los bordes del plato: colgados en paralelo, alguno queda en el aire
+     * cuando la barra se inclina.
+     */
     function dibujarCadenas() {
         if (!balanza) return;
         var rad = inclinacionActual * Math.PI / 180;
@@ -529,10 +560,15 @@
          [balanza.cadenaDer, derX, derY, balanza.platilloDer]].forEach(function (par) {
             var g = par[0], x = par[1], y = par[2], pl = par[3];
             g.clear();
-            g.lineStyle(3, 0x94a3b8, 0.95);
-            g.lineBetween(x - 46, y, pl.x - 46, pl.y - 12);
-            g.lineBetween(x + 46, y, pl.x + 46, pl.y - 12);
-            g.lineBetween(x, y, pl.x, pl.y - 16);
+            /* enganche en el brazo */
+            g.fillStyle(0x94a3b8, 1);
+            g.fillCircle(x, y, 6);
+            g.fillStyle(0x22d3ee, 0.9);
+            g.fillCircle(x, y, 3);
+            /* dos cables que convergen en ese punto */
+            g.lineStyle(3, 0xcbd5e1, 0.95);
+            g.lineBetween(x, y + 4, pl.x - 62, pl.y - 6);
+            g.lineBetween(x, y + 4, pl.x + 62, pl.y - 6);
         });
     }
 
@@ -591,7 +627,7 @@
             var enFila = Math.min(porFila, cantidad - fila * porFila);
             out.push({
                 dx: -(enFila - 1) * pasoX / 2 + col * pasoX,
-                dy: -22 - (filas - 1 - fila) * pasoY
+                dy: -26 - (filas - 1 - fila) * pasoY
             });
         }
         return out;
@@ -837,7 +873,7 @@
         acomodarEnPlatillo();
 
         var dx = vista.destinoDx || 0;
-        var dy = vista.destinoDy || -24;
+        var dy = vista.destinoDy || -26;
         escena.tweens.add({
             targets: vista.sprite,
             x: balanza.platilloDer.x + dx,
@@ -892,9 +928,11 @@
 
         var dur = reducido() ? 0 : 520;
 
+        /* El lado con más peso baja: en Phaser un ángulo horario sube la
+           izquierda, así que la rotación lleva el signo contrario. */
         scene.tweens.add({
             targets: balanza.barra,
-            angle: est.inclinacionGrados,
+            angle: -est.inclinacionGrados,
             duration: dur, ease: 'Back.easeOut',
             onUpdate: function (tw, target) {
                 inclinacionActual = target.angle;
@@ -943,8 +981,8 @@
     /** Los cristales fijos y colocados siguen a su platillo mientras se inclina. */
     function moverCristalesPlatillo() {
         if (!balanza) return;
-        if (marcaIzq) marcaIzq.y = balanza.platilloIzq.y + 42;
-        if (marcaDer) marcaDer.y = balanza.platilloDer.y + 42;
+        if (marcaIzq) marcaIzq.y = balanza.platilloIzq.y + 62;
+        if (marcaDer) marcaDer.y = balanza.platilloDer.y + 62;
         if (balanza.fijos) {
             balanza.fijos.forEach(function (f) {
                 if (f.sprite.scene) f.sprite.y = balanza.platilloIzq.y + f.dy;
@@ -952,7 +990,7 @@
         }
         cristales.forEach(function (c) {
             if (c.enPlatillo && !c.animando && c.sprite.scene) {
-                c.sprite.y = balanza.platilloDer.y + (c.destinoDy || -24);
+                c.sprite.y = balanza.platilloDer.y + (c.destinoDy || -26);
             }
         });
     }
