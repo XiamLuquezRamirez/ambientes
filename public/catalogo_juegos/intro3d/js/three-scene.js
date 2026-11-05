@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { crearCargadorGltf } from './cargador-gltf.js';
 
 const CONFIG = window.INTRO_CONFIG || {};
 const container = document.getElementById('three-container');
@@ -179,7 +179,7 @@ const bombillosLuces = [];
     });
 })();
 
-const loader = new GLTFLoader();
+const loader = crearCargadorGltf();
 const clock = new THREE.Clock();
 const actores = [];
 let listoEnviado = false;
@@ -252,6 +252,16 @@ function ajustarCamaraAAula(box) {
     camera.lookAt(lookX, lookY, lookZ);
 }
 
+/** Caja del aula en mundo: la fijada en ambientes-tema.js o, si no hay, la del modelo. */
+function cajaAula(root) {
+    const caja = TEMA.cajaAula;
+    if (!caja) return new THREE.Box3().setFromObject(root);
+    return new THREE.Box3(
+        new THREE.Vector3().fromArray(caja.min),
+        new THREE.Vector3().fromArray(caja.max)
+    ).applyMatrix4(root.matrixWorld);
+}
+
 /** Idempotente: se puede llamar varias veces al mover sliders. */
 function colocarAula(root) {
     if (!root) return null;
@@ -268,7 +278,7 @@ function colocarAula(root) {
     );
     root.updateMatrixWorld(true);
 
-    const box0 = new THREE.Box3().setFromObject(root);
+    const box0 = cajaAula(root);
     const size0 = new THREE.Vector3();
     box0.getSize(size0);
 
@@ -280,7 +290,7 @@ function colocarAula(root) {
     root.scale.setScalar(escala);
     root.updateMatrixWorld(true);
 
-    const box1 = new THREE.Box3().setFromObject(root);
+    const box1 = cajaAula(root);
     const center = new THREE.Vector3();
     box1.getCenter(center);
 
@@ -292,7 +302,7 @@ function colocarAula(root) {
     );
     root.updateMatrixWorld(true);
 
-    const boxBase = new THREE.Box3().setFromObject(root);
+    const boxBase = cajaAula(root);
     // Cámara sigue el origen del aula, no el offset → posicion mueve el modelo en pantalla.
     ajustarCamaraAAula(boxBase);
 
@@ -303,7 +313,7 @@ function colocarAula(root) {
     root.position.z += num3(pos.z, 0);
     root.updateMatrixWorld(true);
 
-    const boxFinal = new THREE.Box3().setFromObject(root);
+    const boxFinal = cajaAula(root);
     const half = Math.max(boxFinal.max.x - boxFinal.min.x, boxFinal.max.z - boxFinal.min.z) * 0.55;
     key.shadow.camera.left = -half;
     key.shadow.camera.right = half;

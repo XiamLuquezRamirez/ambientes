@@ -5,7 +5,7 @@
  * window.Final3d = { ensure, abrirVictoria, dispose, listo }
  */
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { crearCargadorGltf } from "./cargador-gltf.js";
 import { agregarLucesModelo } from "./luces-modelo.js";
 
 const MODELOS_BASE = new URL("../models/", import.meta.url);
@@ -163,7 +163,7 @@ function animar() {
 
 function cargarPersonaje(def) {
     return new Promise(function (resolve, reject) {
-        const loader = new GLTFLoader();
+        const loader = crearCargadorGltf();
         loader.load(
             resolverModelo(def.archivo),
             function (gltf) {

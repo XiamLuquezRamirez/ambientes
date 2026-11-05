@@ -23,26 +23,35 @@
         ['artistica', 'expresion-artistica'],
     ];
 
+    // cajaAula: caja del modelo sin optimizar. colocarAula() la usa para escalar, centrar y
+    // apuntar la cámara, así el escenario no se mueve al optimizar o reorganizar el GLB.
+    const CAJA_BASE = { min: [-3.814217, -0.010283, -1.789044], max: [4.263455, 2.112918, 3.507199] };
+
     const MODELOS = {
         'expresion-artistica': {
             nombre: 'Expresión Artística',
             modeloAula: 'models/aulas/expresion_artistica.glb',
+            cajaAula: CAJA_BASE,
         },
         multisaberes: {
             nombre: 'Multisaberes',
             modeloAula: 'models/aulas/multisaberes.glb',
+            cajaAula: CAJA_BASE,
         },
         multisensorial: {
             nombre: 'Multisensorial',
             modeloAula: 'models/aulas/multisensorial.glb',
+            cajaAula: { min: [-3.814217, -0.091539, 1.050247], max: [4.263455, 1.557115, 6.346491] },
         },
         polimotor: {
             nombre: 'Polimotor',
             modeloAula: 'models/aulas/polimotor.glb',
+            cajaAula: CAJA_BASE,
         },
         tecnologia: {
             nombre: 'Tecnología y Robótica',
             modeloAula: 'models/aulas/tecnologia.glb',
+            cajaAula: CAJA_BASE,
         },
     };
 
