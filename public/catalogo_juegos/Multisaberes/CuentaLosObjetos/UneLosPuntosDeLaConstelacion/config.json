@@ -1,0 +1,73 @@
+{
+  "nombre": "Une los Puntos de la Constelación",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "¡Vamos al espacio!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hay una señal perdida en el espacio!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Une las estrellas en orden y activaremos la nave."
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "acierto": "../../../sounds/ok.mp3",
+    "efectos": {
+      "recompensa": "../../../sounds/ok.mp3"
+    }
+  },
+  "dialogos": {
+    "inicio": "¡Hay una señal perdida! Une los puntos siguiendo el orden numérico para activar la nave espacial.",
+    "inicioNivel": "¡Nueva constelación! Esta vez son {n} estrellas. Empieza por el número 1.",
+    "error": "¡Cuidado! Busca el siguiente número: el {n}.",
+    "pista": "Ahora toca la estrella número {n}.",
+    "completo": "¡Increíble! Uniste todas las estrellas en orden y activaste la nave.",
+    "mapa": "Este es el mapa estelar. Toca un planeta para viajar hasta él.",
+    "desbloqueo": "¡Se abrió un mundo nuevo! El nivel {nivel} ya te espera."
+  },
+  "niveles": [
+    {
+      "id": "5-6",
+      "edad": "5-6 años",
+      "titulo": "Une los Puntos de la Constelación",
+      "escena": "espacio",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al radar espacial!"
+        },
+        {
+          "personaje": 0,
+          "texto": "Vamos a unir estrellas para activar la nave."
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zeus",
+          "texto": "¡Lo lograste! Uniste las cinco constelaciones y la nave recorrió todo el espacio."
+        },
+        {
+          "voz": "zoe",
+          "texto": "¡Eres un gran navegante de estrellas!"
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_constelacion.svg",
+        "nombre": "Navegante de Estrellas",
+        "sonido": "fanfarria"
+      }
+    }
+  ]
+}

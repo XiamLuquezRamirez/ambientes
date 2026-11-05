@@ -1,0 +1,99 @@
+/*
+ * Encuentra el Sonido: portada propia de cada juego y demostración sin velo.
+ * Se carga después de style.css; no toca los estilos compartidos de Polimotor.
+ */
+
+/* tutorial.css pone un velo negro (38 %) sobre toda la pantalla durante la demostración.
+   En estos juegos el escenario es el canvas a pantalla completa: el velo lo oscurecía todo. */
+body.demo-activa::before {
+    display: none !important;
+}
+
+/* ── Portada dibujada ─────────────────────────────────────── */
+
+.inicio-parque[data-portada] .parque-fondo > span {
+    display: none;
+}
+
+.inicio-parque[data-portada] .parque-fondo {
+    background: #a5d8ff;
+}
+
+.portada-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Elementos de la portada: posición y tamaño los pone portada.js (en %). */
+.inicio-parque[data-portada] .inicio-el {
+    width: auto;
+    margin: 0;
+    aspect-ratio: auto;
+    transform-origin: 50% 100%;
+}
+
+.inicio-parque[data-portada] .inicio-el.pt-salta { animation: ptSalta 1.6s ease-in-out infinite; }
+.inicio-parque[data-portada] .inicio-el.pt-mece { animation: ptMece 2.4s ease-in-out infinite; }
+.inicio-parque[data-portada] .inicio-el.pt-flota { animation: elFlota 3.2s ease-in-out infinite; }
+.inicio-parque[data-portada] .inicio-el.pt-pasa { animation: ptPasa 5s ease-in-out infinite; }
+
+@keyframes ptSalta {
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    12% { transform: translateY(0) scaleY(0.92); }
+    40% { transform: translateY(-14%) scaleY(1.04); }
+    70% { transform: translateY(0) scaleY(1); }
+}
+
+@keyframes ptMece {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+@keyframes ptPasa {
+    0%, 100% { transform: translateX(-6%); }
+    50% { transform: translateX(6%); }
+}
+
+/* Piezas animadas dentro del SVG. */
+.portada-svg .pt-nube { animation: ptNube 14s linear infinite; }
+.portada-svg .pt-nube.lenta { animation-duration: 22s; }
+.portada-svg .pt-ondea { transform-box: fill-box; transform-origin: 0 50%; animation: ptOndea 1.2s ease-in-out infinite; }
+.portada-svg .pt-titila { animation: ptTitila 1.8s ease-in-out infinite; }
+.portada-svg .pt-nota { animation: ptNota 2.6s ease-out infinite; }
+.portada-svg .pt-gota { animation: ptGota 0.9s linear infinite; }
+.portada-svg .pt-humo { animation: ptHumo 2.4s ease-out infinite; }
+.portada-svg .pt-haz { animation: ptHaz 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 0 50%; }
+
+@keyframes ptNube { from { transform: translateX(-120px); } to { transform: translateX(920px); } }
+@keyframes ptOndea { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(0.82); } }
+@keyframes ptTitila { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes ptNota { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-70px); opacity: 0; } }
+@keyframes ptGota { from { transform: translateY(-20px); opacity: 0.9; } to { transform: translateY(60px); opacity: 0; } }
+@keyframes ptHumo { 0% { transform: translate(0, 0) scale(0.6); opacity: 0.9; } 100% { transform: translate(-40px, -60px) scale(1.6); opacity: 0; } }
+@keyframes ptHaz { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .portada-svg *,
+    .inicio-parque[data-portada] .inicio-el { animation: none !important; }
+}
+
+/* El título se dibuja encima del escenario: sombra más marcada para que se lea en fondos claros. */
+body .pantalla-inicio .inicio-parque[data-portada] .inicio-kicker {
+    text-shadow: 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 12px rgba(0, 0, 0, 0.55), 0 0 26px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Sin salto al armarse: la escena (fondo y elementos) queda invisible hasta que portada.js
+   la arma y cargan sus imágenes; entonces aparece de una vez. */
+.inicio-parque[data-portada] .parque-fondo,
+.inicio-parque[data-portada] .inicio-el {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.inicio-parque[data-portada].portada-lista .parque-fondo,
+.inicio-parque[data-portada].portada-lista .inicio-el {
+    opacity: 1;
+}

@@ -171,9 +171,10 @@
             var w = this.scale.width;
             var h = this.scale.height;
             var RX = Math.min(w * 0.36, h * 0.66);
-            var RY = h * 0.25;
+            // La copa y el nido quedan bajo el diálogo y el progreso (arriba hasta ~24 % del alto).
+            var RY = h * 0.2;
             var cx = w * 0.5;
-            var cy = h * 0.36;
+            var cy = h * 0.49;
             var s = this.suelo();
             var ramaY = cy + RY * 1.05;
             var ramaX = Math.min(RX * 0.95, w * 0.3);
@@ -207,7 +208,7 @@
                 g.fillStyle(Phaser.Display.Color.GetColor(c.r, c.g, c.b), 1);
                 g.fillRect(0, (s / 20) * b - 1, w, s / 20 + 2);
             }
-            this.sol.setPosition(w * 0.9, h * 0.16).setRadius(Math.min(w, h) * 0.055);
+            this.sol.setPosition(w * 0.06, h * 0.32).setRadius(Math.min(w, h) * 0.055);
             this.nubes.forEach(function (n) {
                 if (!n.listo) { n.x = w * n.base; n.listo = true; }
                 n.y = h * n.alto;

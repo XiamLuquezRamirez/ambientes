@@ -784,7 +784,8 @@
         /** Ejemplo guiado: un solo pasajero quieto en el andén. */
         demo: function (id) {
             this.destruirPasajeros();
-            var p = this.crearPasajero(id, this.scale.width * 0.5);
+            // A un lado: abajo al centro están el botón de escuchar y la mano del tutorial.
+            var p = this.crearPasajero(id, this.scale.width * 0.3);
             this.pasajeros.push(p);
             this.demoObj = p;
         },
