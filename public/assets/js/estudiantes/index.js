@@ -80,7 +80,7 @@ function limpiarModal() {
 
     //resetear el preview del avatar
     $('#avatar').val('');
-    $('#previewAvatar').attr('src', '/assets/images/avatar.png');
+    $('#previewAvatar').attr('src', ((window.PEDNIA_BASE || '') + '/assets/images/avatar.png'));
     aplicarColorAvatar(COLOR_AVATAR_DEFECTO);
 
     //resetear el valor de la configuracion de pin (solo el contenedor del modal Nuevo/Editar)
@@ -462,7 +462,7 @@ async function mapearDatosEstudiante(datos) {
 
     //previsualizar avatar
     if (datos.avatar) {
-        $('#previewAvatar').attr('src', `/storage/${datos.avatar}`);
+        $('#previewAvatar').attr('src', `${window.PEDNIA_BASE || ''}/storage/${datos.avatar}`);
     } 
 
     // En panel docente el PIN se gestiona en modal aparte; no pintar en el modal de registro.

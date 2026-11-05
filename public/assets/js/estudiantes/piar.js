@@ -289,7 +289,7 @@ function agregarFirmaDocente() {
                     <tr><th>Firma</th></tr>
                     <tr>
                         <td class="d-flex justify-content-between align-items-center gap-2">
-                            <img id="img_firma_docente_${firmas_docentes_cuenta}" class="firma-img" src="/assets/images/firma.png" alt="Firma" class="img-fluid">
+                            <img id="img_firma_docente_${firmas_docentes_cuenta}" class="firma-img" src="${window.PEDNIA_BASE || ''}/assets/images/firma.png" alt="Firma" class="img-fluid">
                         </td>
                     </tr>
                 </thead>
@@ -527,9 +527,9 @@ function buscarDocentePiar(texto) {
                 docentes = response.data;
                 response.data.forEach(function(docente){
                     if(docente.firma_url != '' && docente.firma_url != null) {
-                        var url_firma = '/storage/' + docente.firma_url;
+                        var url_firma = ((window.PEDNIA_BASE || '') + '/storage/') + docente.firma_url;
                     } else {
-                        var url_firma = '/assets/images/firma.png';
+                        var url_firma = ((window.PEDNIA_BASE || '') + '/assets/images/firma.png');
                     }
 
                     html += '<tr>';
@@ -592,9 +592,9 @@ function seleccionarDocente(docente_id) {
 
 function colocarFirma(id_img, url_firma) {
     if(url_firma != null && url_firma != '') {
-        $('#' + id_img).attr('src', '/storage/' + url_firma);
+        $('#' + id_img).attr('src', ((window.PEDNIA_BASE || '') + '/storage/') + url_firma);
     } else {
-        $('#' + id_img).attr('src', '/assets/images/firma.png');
+        $('#' + id_img).attr('src', ((window.PEDNIA_BASE || '') + '/assets/images/firma.png'));
     }
 }
 
@@ -951,8 +951,8 @@ function setValueInput(name_input, value) {
 
 function setValueImg(id_img, url_img) {
     if(url_img) {
-        $('#' + id_img).attr('src', '/storage/' + url_img);
+        $('#' + id_img).attr('src', ((window.PEDNIA_BASE || '') + '/storage/') + url_img);
     } else {
-        $('#' + id_img).attr('src', '/assets/images/firma.png');
+        $('#' + id_img).attr('src', ((window.PEDNIA_BASE || '') + '/assets/images/firma.png'));
     }
 }

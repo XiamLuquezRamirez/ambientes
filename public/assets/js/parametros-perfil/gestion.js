@@ -337,7 +337,7 @@
     function urlDeImagenJuego(ruta) {
         const nombre = String(ruta || '').split('/').pop();
         if (!nombre || nombre.includes('..') || nombre.includes('\\')) return '';
-        return '/catalogo_juegos/images/' + encodeURIComponent(nombre);
+        return ((window.PEDNIA_BASE || '') + '/catalogo_juegos/images/') + encodeURIComponent(nombre);
     }
 
     function abrirBuscadorImagen(ctx, key, path) {

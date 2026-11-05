@@ -131,7 +131,7 @@
                                                 <strong class="form-label" id="lblVistaPreviaFirma">Vista previa de la
                                                     firma</strong>
                                                 <img id="imgPreviewFirma" class="w-50"
-                                                    src="/assets/images/no-image.png"
+                                                    src="{{ asset('assets/images/no-image.png') }}"
                                                     alt="Firma del docente">
                                             </div>
                                         </div>

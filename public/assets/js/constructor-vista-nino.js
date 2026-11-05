@@ -462,7 +462,7 @@
     function emocionesAssetsBase() {
         const base = $root.data('emociones-base')
             || $('#rnApp').data('emociones-base')
-            || '/assets/images/emociones';
+            || ((window.PEDNIA_BASE || '') + '/assets/images/emociones');
         return String(base).replace(/\/$/, '');
     }
 
@@ -2385,7 +2385,7 @@
     function fondoPortadaDePaquete(url) {
         const m = String(url || '').match(/\/catalogo_juegos\/([A-Za-z0-9]+)\//);
         const seg = m ? m[1] : 'Polimotor';
-        return '/catalogo_juegos/' + seg + '/img/fondo_portada_juegos.png';
+        return ((window.PEDNIA_BASE || '') + '/catalogo_juegos/') + seg + '/img/fondo_portada_juegos.png';
     }
 
     function urlCatalogoConEdad(url, perfil) {

@@ -20,6 +20,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @include('partials._base-url')
     <title>{{ $ambiente->nombre }} — PedNia</title>
     <link rel="icon" href="{{ asset('assets/images/isotipo.png') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
@@ -96,6 +97,7 @@
     @stack('scripts')
     <script src="{{ asset('assets/js/kiosco-fs-core.js') }}"></script>
     <script src="{{ asset('assets/js/jquery-4.0.0.min.js') }}"></script>
+    <script>window.pedniaEngancharJquery && window.pedniaEngancharJquery();</script>
     @include('partials._captura-multimedia')
     <script type="application/json" id="kiosco-perfil-params">@json($kioscoPerfil)</script>
     <script

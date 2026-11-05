@@ -92,7 +92,7 @@ class TextoAVozService
 
     private function urlArchivoPublico(string $rutaRelativa): string
     {
-        return '/storage/'.ltrim(str_replace('\\', '/', $rutaRelativa), '/');
+        return \App\Support\SubcarpetaPublica::url('storage/'.ltrim(str_replace('\\', '/', $rutaRelativa), '/'));
     }
 
     private function normalizarTexto(string $texto): string

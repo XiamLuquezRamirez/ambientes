@@ -13,13 +13,17 @@
     let superposicion = null;
     let desvaneciendo = false;
 
+    /* App servida en subcarpeta (ingeer.co/ambientes/): ver partials/_base-url. */
+    const conBase = window.pedniaUrl || function (u) { return u; };
+    const sinBase = window.pedniaRuta || function (p) { return p; };
+
     function csrfToken() {
         const meta = document.querySelector('meta[name="csrf-token"]');
         return meta ? meta.getAttribute('content') : '';
     }
 
     function esRutaKiosco(pathname) {
-        return /^\/(inicio|recorrido|juegos|bienvenida|alumnos(\/\d+\/pin)?|listo)$/.test(pathname);
+        return /^\/(inicio|recorrido|juegos|bienvenida|alumnos(\/\d+\/pin)?|listo)$/.test(sinBase(pathname));
     }
 
     function esEnlaceInterno(link) {
@@ -211,7 +215,7 @@
     }
 
     function destinoAbsoluto(url) {
-        return url.startsWith('http') ? url : (window.location.origin + url);
+        return url.startsWith('http') ? url : (window.location.origin + conBase(url));
     }
 
     function pathDe(url) {
@@ -257,6 +261,7 @@
      * opciones.precarga: promesa de precargar(url) para no volver a pedir la página.
      */
     function ir(url, reemplazar, opciones) {
+        url = conBase(url);
         opciones = opciones || {};
         const modo = opciones.debajo ? 'debajo' : (opciones.superponer ? 'encima' : null);
         const pathSolicitado = pathDe(url);
@@ -334,13 +339,13 @@
                     ? new URL(redirect).pathname
                     : redirect;
                 if (!esRutaKiosco(path)) {
-                    window.location.href = path;
+                    window.location.href = conBase(path);
                     return;
                 }
                 return ir(path, true);
             })
             .catch(function () {
-                window.location.href = '/inicio';
+                window.location.href = conBase('/inicio');
             });
     }
 
@@ -359,11 +364,11 @@
         e.preventDefault();
         const url = new URL(link.href, window.location.origin);
         const destino = url.pathname + url.search;
-        if (pinVisible() && pathDe(destino) === '/alumnos') {
+        if (pinVisible() && sinBase(pathDe(destino)) === '/alumnos') {
             desvanecerHacia(destino, false, '#kioscoPane > .pin-wrap[data-kiosco-saliente]');
             return;
         }
-        if (aulaVisible() && pathDe(destino) === '/inicio') {
+        if (aulaVisible() && sinBase(pathDe(destino)) === '/inicio') {
             desvanecerHacia(destino, false, '#kioscoPane > .selector-aula[data-kiosco-saliente]');
             return;
         }
@@ -373,11 +378,11 @@
     window.addEventListener('popstate', function () {
         if (!esRutaKiosco(window.location.pathname)) return;
         const destino = window.location.pathname + window.location.search;
-        if (pinVisible() && pathDe(destino) === '/alumnos') {
+        if (pinVisible() && sinBase(pathDe(destino)) === '/alumnos') {
             desvanecerHacia(destino, true, '#kioscoPane > .pin-wrap[data-kiosco-saliente]');
             return;
         }
-        if (aulaVisible() && pathDe(destino) === '/inicio') {
+        if (aulaVisible() && sinBase(pathDe(destino)) === '/inicio') {
             desvanecerHacia(destino, true, '#kioscoPane > .selector-aula[data-kiosco-saliente]');
             return;
         }

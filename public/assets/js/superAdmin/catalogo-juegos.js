@@ -114,10 +114,10 @@ document.addEventListener('DOMContentLoaded', function () {
             colorPortada = new URL(url, window.location.origin).searchParams.get('color') || colorPortada;
         } catch (e) { /* noop */ }
         if (!/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(colorPortada)) colorPortada = '#64748b';
-        var fondoPortada = '/catalogo_juegos/Polimotor/img/fondo_portada_juegos.png';
+        var fondoPortada = ((window.PEDNIA_BASE || '') + '/catalogo_juegos/Polimotor/img/fondo_portada_juegos.png');
         var ambientePortada = String(url).match(/\/catalogo_juegos\/([A-Za-z0-9]+)\//);
         if (ambientePortada) {
-            fondoPortada = '/catalogo_juegos/' + ambientePortada[1] + '/img/fondo_portada_juegos.png';
+            fondoPortada = ((window.PEDNIA_BASE || '') + '/catalogo_juegos/') + ambientePortada[1] + '/img/fondo_portada_juegos.png';
         }
         var previewBody = document.getElementById('cjPreviewBody');
         if (previewBody) {

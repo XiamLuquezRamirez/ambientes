@@ -1,10 +1,17 @@
 (function () {
   'use strict';
 
+  /* Base de la app ("" en la raíz, "/ambientes" en ingeer.co/ambientes/), deducida de la URL de este script. */
+  var PEDNIA_BASE = (function () {
+    var src = (document.currentScript && document.currentScript.src) || window.location.href;
+    var m = new URL(src, window.location.href).pathname.match(/^(.*?)\/catalogo_juegos\//);
+    return m ? m[1] : '';
+  })();
+
   (function cargarPedniaSalir() {
     if (window.PedniaSalir) return;
     var s = document.createElement('script');
-    s.src = '/catalogo_juegos/PedniaSalir.js?v=20261027d';
+    s.src = PEDNIA_BASE + '/catalogo_juegos/PedniaSalir.js?v=20261027d';
     s.async = false;
     document.head.appendChild(s);
   })();
@@ -30,7 +37,7 @@
     var i = partes.indexOf('catalogo_juegos');
     var ambiente = (i >= 0 && partes[i + 1]) ? partes[i + 1] : 'Polimotor';
     if (!/^[A-Za-z0-9]+$/.test(ambiente)) return;
-    var url = '/catalogo_juegos/' + ambiente + '/img/fondo_portada_juegos.png';
+    var url = PEDNIA_BASE + '/catalogo_juegos/' + ambiente + '/img/fondo_portada_juegos.png';
     document.documentElement.style.setProperty('--fondo-portada', 'url("' + url + '")');
   }
 
@@ -228,7 +235,7 @@
       volver.id = 'btn-inicio-volver';
       volver.className = 'inicio-volver';
       volver.hidden = true;
-      volver.innerHTML = '<img src="/assets/images/selector-aula/volver.png" alt="Volver">';
+      volver.innerHTML = '<img src="' + PEDNIA_BASE + '/assets/images/selector-aula/volver.png" alt="Volver">';
       pantalla.insertBefore(volver, pantalla.firstChild);
     }
 

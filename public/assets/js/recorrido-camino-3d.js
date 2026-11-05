@@ -1336,7 +1336,7 @@ const ALTURA_SUELO = 0.2;
             window.KioscoNav.ir('/inicio', true);
             return;
         }
-        window.location.href = '/inicio';
+        window.location.href = (window.pedniaUrl || String)('/inicio');
     }
 
     function volverPersonajeAlInicio() {

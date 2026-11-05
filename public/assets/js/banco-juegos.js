@@ -29,7 +29,7 @@
     function urlCatalogo() {
         const fromCtx = ctx && ctx.urlCatalogo ? String(ctx.urlCatalogo).trim() : '';
         const fromDom = document.getElementById('rnApp')?.getAttribute('data-url-juegos-catalogo');
-        const base = fromCtx || fromDom || '/juegos-catalogo';
+        const base = fromCtx || fromDom || ((window.PEDNIA_BASE || '') + '/juegos-catalogo');
         const perfil = perfilPayload();
         const edad = perfil && perfil.edad != null && perfil.edad !== ''
             ? parseInt(String(perfil.edad), 10)
@@ -81,16 +81,16 @@
      * Si no existe el archivo, el color de respaldo del CSS sigue viéndose.
      */
     function urlFondoGaleria() {
-        const fallback = '/catalogo_juegos/Polimotor/img/fondo_catalogo.png';
+        const fallback = ((window.PEDNIA_BASE || '') + '/catalogo_juegos/Polimotor/img/fondo_catalogo.png');
         const seg = segmentoCarpeta(slugAmbiente());
         if (!seg || seg === 'Polimotor') return fallback;
-        return '/catalogo_juegos/' + seg + '/img/fondo_catalogo.png';
+        return ((window.PEDNIA_BASE || '') + '/catalogo_juegos/') + seg + '/img/fondo_catalogo.png';
     }
 
     /** Trazo de la portada: catalogo_juegos/{Ambiente}/img/fondo_portada_juegos.png */
     function urlFondoPortada() {
         const seg = segmentoCarpeta(slugAmbiente()) || 'Polimotor';
-        return '/catalogo_juegos/' + seg + '/img/fondo_portada_juegos.png';
+        return ((window.PEDNIA_BASE || '') + '/catalogo_juegos/') + seg + '/img/fondo_portada_juegos.png';
     }
 
     function estiloFondoGaleria() {
@@ -102,7 +102,7 @@
         return `
             <div class="bj-galeria-top">
                 <button type="button" class="kiosco-volver bj-volver" data-bj-volver>
-                    <img src="/assets/images/selector-aula/volver.png" alt="${enTema ? 'Volver a las temáticas' : 'Volver'}">
+                    <img src="${window.PEDNIA_BASE || ''}/assets/images/selector-aula/volver.png" alt="${enTema ? 'Volver a las temáticas' : 'Volver'}">
                 </button>
                 <h2 class="bj-galeria-titulo${enTema ? ' bj-galeria-titulo--tema' : ''}">
                     <span class="bj-galeria-mando" aria-hidden="true"></span> ${escapar(titulo || 'Juegos')}
@@ -376,10 +376,10 @@
     function navHtml() {
         return `
             <button type="button" class="bj-nav bj-nav--atras" data-bj-atras aria-label="Página anterior" disabled>
-                <img src="/assets/images/selector-aula/atras.png" alt="">
+                <img src="${window.PEDNIA_BASE || ''}/assets/images/selector-aula/atras.png" alt="">
             </button>
             <button type="button" class="bj-nav bj-nav--adelante" data-bj-adelante aria-label="Página siguiente" disabled>
-                <img src="/assets/images/selector-aula/adelante.png" alt="">
+                <img src="${window.PEDNIA_BASE || ''}/assets/images/selector-aula/adelante.png" alt="">
             </button>
             <p class="bj-pagina" data-bj-pagina aria-live="polite"></p>`;
     }

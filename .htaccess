@@ -1,0 +1,18 @@
+# Solo actúa cuando la raíz web es la carpeta del proyecto (ingeer.co/ambientes/).
+# En los nodos LAN la raíz web es public/ y este archivo no se lee.
+#
+# Todo se sirve desde public/: .env, código, storage y vendor quedan fuera de la web.
+# La base /ambientes la deduce App\Support\SubcarpetaPublica (public/index.php).
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(?!public/)(.*)$ public/$1 [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

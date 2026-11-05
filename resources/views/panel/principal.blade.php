@@ -1292,7 +1292,7 @@
             const desde = document.getElementById('fechaInicio').value;
             const hasta = document.getElementById('fechaFin').value;
 
-            window.open(`/panel/asistencia/reporte/${cargaId}/pdf?desde=${desde}&hasta=${hasta}`, '_blank');
+            window.open(`${window.PEDNIA_BASE || ''}/panel/asistencia/reporte/${cargaId}/pdf?desde=${desde}&hasta=${hasta}`, '_blank');
 
         }
 

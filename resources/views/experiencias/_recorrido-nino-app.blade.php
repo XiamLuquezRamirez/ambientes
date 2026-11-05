@@ -10,15 +10,20 @@
     $inicialesEstudiante = $esSesion ? $estudiante->iniciales ?? 'AM' : 'AM';
     $colorEstudiante = $esSesion ? $estudiante->color_avatar ?? '#2563EB' : '#2563EB';
     $slugPortada = $arbol['ambiente']['slug'] ?? config('ambiente.slug');
-    $portadaImg = $portadaImg ?? '/assets/images/ambientes/' . $slugPortada . '-portada.png';
-    if ($portadaImg !== '' && ! file_exists(public_path(ltrim(parse_url($portadaImg, PHP_URL_PATH) ?: $portadaImg, '/')))) {
+    $portadaImg = $portadaImg ?? \App\Support\SubcarpetaPublica::url('assets/images/ambientes/' . $slugPortada . '-portada.png');
+    $rutaPortada = parse_url($portadaImg, PHP_URL_PATH) ?: $portadaImg;
+    $basePortada = rtrim(request()->getBaseUrl(), '/');
+    if ($basePortada !== '' && str_starts_with($rutaPortada, $basePortada . '/')) {
+        $rutaPortada = substr($rutaPortada, strlen($basePortada));
+    }
+    if ($portadaImg !== '' && ! file_exists(public_path(ltrim($rutaPortada, '/')))) {
         $portadaImg = '';
     }
     $fondoImg = $fondoImg ?? '';
     if ($fondoImg === '') {
         $fondoRel = 'assets/images/fondos_Ambientes/' . $slugPortada . '.png';
         if (file_exists(public_path($fondoRel))) {
-            $fondoImg = '/' . $fondoRel . '?v=' . @filemtime(public_path($fondoRel));
+            $fondoImg = \App\Support\SubcarpetaPublica::url($fondoRel) . '?v=' . @filemtime(public_path($fondoRel));
         }
     }
     $shellClase = match ($pasoInicial) {

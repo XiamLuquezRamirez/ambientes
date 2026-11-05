@@ -33,6 +33,9 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 
 require __DIR__.'/../vendor/autoload.php';
 
+// Despliegue en subcarpeta de URL (p. ej. ingeer.co/ambientes/): ver App\Support\SubcarpetaPublica.
+App\Support\SubcarpetaPublica::ajustar($_SERVER);
+
 /*
 |--------------------------------------------------------------------------
 | Run The Application

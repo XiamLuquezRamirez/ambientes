@@ -63,7 +63,7 @@
         var tipoPost = 1; // 1: Crear, 2: Editar
         var id_editar = '';
         const FIRMA_PLACEHOLDER =
-            '/assets/images/no-image.png';
+            '{{ asset('assets/images/no-image.png') }}';
 
         /* ── Bootstrap Modal ─────────────────────────────────────────── */
         const modalBSUsuario = new bootstrap.Modal(document.getElementById('modalUsuario'));
