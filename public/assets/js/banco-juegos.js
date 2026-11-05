@@ -12,6 +12,10 @@
 
     let ctx = null;
     let juegos = [];
+    /** Carpetas por temática: [{ clave, nombre, juegos }]. */
+    let tematicas = [];
+    /** Clave de la temática abierta; null = vista de carpetas. */
+    let tematicaActual = null;
     let bjAbriendoJuego = false;
 
     const BJ_APERTURA_MS = 720;
@@ -93,16 +97,45 @@
         return ' style="--bj-fondo:url(\'' + escapar(urlFondoGaleria()) + '\')"';
     }
 
-    function cabeceraGaleria() {
+    function cabeceraGaleria(titulo) {
+        const enTema = !!titulo;
         return `
             <div class="bj-galeria-top">
                 <button type="button" class="kiosco-volver bj-volver" data-bj-volver>
-                    <img src="/assets/images/selector-aula/volver.png" alt="Volver">
+                    <img src="/assets/images/selector-aula/volver.png" alt="${enTema ? 'Volver a las temáticas' : 'Volver'}">
                 </button>
-                <h2 class="bj-galeria-titulo">
-                    <span class="bj-galeria-mando" aria-hidden="true"></span> Juegos
+                <h2 class="bj-galeria-titulo${enTema ? ' bj-galeria-titulo--tema' : ''}">
+                    <span class="bj-galeria-mando" aria-hidden="true"></span> ${escapar(titulo || 'Juegos')}
                 </h2>
             </div>`;
+    }
+
+    /**
+     * Agrupa los juegos por temática (cadena curricular; coincide con la carpeta
+     * de categoría del paquete). Conserva el orden del catálogo.
+     */
+    function agruparPorTematica(lista) {
+        const grupos = [];
+        const porClave = {};
+        lista.forEach(function (j) {
+            const cadena = j.cadena || {};
+            const id = cadena.tematica_id;
+            const clave = id != null && id !== '' ? 't' + id : 'sin-tematica';
+            if (!porClave[clave]) {
+                porClave[clave] = {
+                    clave: clave,
+                    nombre: id != null && id !== '' ? String(cadena.tematica_nombre || 'Juegos') : 'Más juegos',
+                    juegos: [],
+                };
+                grupos.push(porClave[clave]);
+            }
+            porClave[clave].juegos.push(j);
+        });
+        return grupos;
+    }
+
+    function grupoPorClave(clave) {
+        return tematicas.find((g) => g.clave === clave) || null;
     }
 
     function renderCargando() {
@@ -342,38 +375,108 @@
 
     function navHtml() {
         return `
-            <button type="button" class="bj-nav bj-nav--atras" data-bj-atras aria-label="Ocho juegos anteriores" disabled>
+            <button type="button" class="bj-nav bj-nav--atras" data-bj-atras aria-label="Página anterior" disabled>
                 <img src="/assets/images/selector-aula/atras.png" alt="">
             </button>
-            <button type="button" class="bj-nav bj-nav--adelante" data-bj-adelante aria-label="Ocho juegos siguientes" disabled>
+            <button type="button" class="bj-nav bj-nav--adelante" data-bj-adelante aria-label="Página siguiente" disabled>
                 <img src="/assets/images/selector-aula/adelante.png" alt="">
             </button>
             <p class="bj-pagina" data-bj-pagina aria-live="polite"></p>`;
     }
 
-    function renderGaleria() {
-        const cards = juegos.map((j, i) => {
-            const color = j.color || '#2563eb';
-            const oculto = i >= BJ_POR_PAGINA ? ' hidden' : '';
-            return `
+    /** Retraso escalonado de entrada por posición dentro de la página. */
+    function estiloEntrada(i) {
+        return '--bj-i:' + (i % BJ_POR_PAGINA);
+    }
+
+    function tarjetaJuegoHtml(j, i) {
+        const color = j.color || '#2563eb';
+        const oculto = i >= BJ_POR_PAGINA ? ' hidden' : '';
+        return `
             <button type="button" class="bj-card"${oculto} data-juego-slug="${escapar(j.slug)}"
                     data-url-paquete="${escapar(j.url_paquete || '')}"
-                    style="--c:${escapar(color)}">
+                    style="--c:${escapar(color)};${estiloEntrada(i)}">
                 <span class="bj-card-emoji" aria-hidden="true">${iconoHtml(j)}</span>
                 <h3 class="bj-card-titulo">${escapar(j.nombre)}</h3>
             </button>`;
-        }).join('');
+    }
 
+    /** Carpeta de temática: pestaña y hojas asomando arriba, portada del primer juego y contador. */
+    function tarjetaTematicaHtml(g, i) {
+        const portada = g.juegos[0] || {};
+        const color = portada.color || '#2563eb';
+        const oculto = i >= BJ_POR_PAGINA ? ' hidden' : '';
+        const n = g.juegos.length;
+        return `
+            <button type="button" class="bj-card bj-card--tema"${oculto} data-bj-tema="${escapar(g.clave)}"
+                    aria-label="${escapar(g.nombre)}: ${n} ${n === 1 ? 'juego' : 'juegos'}"
+                    style="--c:${escapar(color)};${estiloEntrada(i)}">
+                <span class="bj-tema-pestana" aria-hidden="true"></span>
+                <span class="bj-tema-hoja bj-tema-hoja--1" aria-hidden="true"></span>
+                <span class="bj-tema-hoja bj-tema-hoja--2" aria-hidden="true"></span>
+                <span class="bj-tema-cuenta" aria-hidden="true">
+                    <i class="fa-solid fa-gamepad"></i>${n}
+                </span>
+                <span class="bj-card-emoji" aria-hidden="true">${iconoHtml(portada)}</span>
+                <h3 class="bj-card-titulo">${escapar(g.nombre)}</h3>
+            </button>`;
+    }
+
+    function pintarGaleria(titulo, cards, vacio, modo) {
         ctx.$paso.attr('data-paso', 'juegos').html(`
-            <div class="bj-galeria"${estiloFondoGaleria()}>
-                ${cabeceraGaleria()}
+            <div class="bj-galeria" data-bj-modo="${modo}"${estiloFondoGaleria()}>
+                ${cabeceraGaleria(titulo)}
                 <div class="bj-carrusel">
                     ${navHtml()}
-                    <div class="bj-grid">${cards || '<p class="bj-vacio">Aún no hay juegos en este ambiente.</p>'}</div>
+                    <div class="bj-grid bj-grid--entra">${cards || `<p class="bj-vacio">${escapar(vacio)}</p>`}</div>
                 </div>
             </div>
         `);
-        if (juegos.length) iniciarPaginacion(ctx.$paso.find('.bj-galeria'));
+        if (cards) iniciarPaginacion(ctx.$paso.find('.bj-galeria'));
+        // Sin la clase, la animación no se repite al paginar ni al cerrar un juego.
+        const $grid = ctx.$paso.find('.bj-grid--entra');
+        window.setTimeout(function () {
+            $grid.removeClass('bj-grid--entra');
+        }, BJ_POR_PAGINA * 45 + 500);
+    }
+
+    /**
+     * Hay carpetas solo si alguna temática agrupa varios juegos y hay más de una
+     * temática (Polimotor: una temática por juego → lista directa como antes).
+     */
+    function usaCarpetas() {
+        return tematicas.length > 1 && tematicas.some((g) => g.juegos.length > 1);
+    }
+
+    /** Una temática con un solo juego no necesita carpeta: se muestra el juego. */
+    function tarjetaNivelTematicasHtml(g, i) {
+        return g.juegos.length === 1 ? tarjetaJuegoHtml(g.juegos[0], i) : tarjetaTematicaHtml(g, i);
+    }
+
+    function renderGaleria() {
+        const grupo = tematicaActual ? grupoPorClave(tematicaActual) : null;
+        if (grupo) {
+            pintarGaleria(grupo.nombre, grupo.juegos.map(tarjetaJuegoHtml).join(''),
+                'Aún no hay juegos en esta temática.', 'juegos');
+            return;
+        }
+        tematicaActual = null;
+        if (usaCarpetas()) {
+            // Carpetas primero; los juegos sueltos (temática de uno) al final.
+            const nivel = tematicas.filter((g) => g.juegos.length > 1)
+                .concat(tematicas.filter((g) => g.juegos.length === 1));
+            pintarGaleria('', nivel.map(tarjetaNivelTematicasHtml).join(''),
+                'Aún no hay juegos en este ambiente.', 'tematicas');
+            return;
+        }
+        pintarGaleria('', juegos.map(tarjetaJuegoHtml).join(''),
+            'Aún no hay juegos en este ambiente.', 'juegos');
+    }
+
+    function abrirTematica(clave) {
+        if (!grupoPorClave(clave)) return;
+        tematicaActual = clave;
+        renderGaleria();
     }
 
     function perfilPayload() {
@@ -684,9 +787,17 @@
         ctx.$paso.off('click.bj');
         ctx.$paso.on('click.bj', '[data-bj-volver]', function () {
             cerrarJuego();
+            if (tematicaActual && usaCarpetas()) {
+                tematicaActual = null;
+                renderGaleria();
+                return;
+            }
             if (ctx.onVolver) ctx.onVolver();
         });
-        ctx.$paso.on('click.bj', '.bj-card', function () {
+        ctx.$paso.on('click.bj', '.bj-card[data-bj-tema]', function () {
+            abrirTematica($(this).attr('data-bj-tema'));
+        });
+        ctx.$paso.on('click.bj', '.bj-card:not([data-bj-tema])', function () {
             const $card = $(this);
             let juego = juegoPorSlug($card.attr('data-juego-slug'));
             if (!juego) {
@@ -716,6 +827,7 @@
                 juegos = Array.isArray(json.data?.juegos)
                     ? json.data.juegos.filter((j) => j.slug && j.url_paquete)
                     : [];
+                tematicas = agruparPorTematica(juegos);
                 renderGaleria();
                 enlazar();
             })
@@ -739,6 +851,8 @@
         if (ctx.color) ctx.$paso.css('--rn-color', ctx.color);
         escucharSalidaJuego();
         juegos = [];
+        tematicas = [];
+        tematicaActual = null;
         cargarYRender();
     }
 

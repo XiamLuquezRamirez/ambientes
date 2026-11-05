@@ -47,9 +47,11 @@
                 puedeInteractuar: function () {
                     return aceptaToque && !esperandoFeedback && !juegoTerminado && !demoActiva;
                 },
-                onToque: function (objetoId) {
-                    resolverToque(objetoId);
-                }
+                onAtrapado: alAtrapar,
+                onFallo: alFallar,
+                onInactivo: alQuedarseQuieto,
+                onEvento: alEvento,
+                onCompleto: function () { mostrarCierre(); }
             }
         }).then(function () {
             if (anim() && anim().preparar) anim().preparar();
@@ -273,6 +275,26 @@
             frases.push(plantilla(t.consignaPlantilla || "Encuentra el objeto de color {color}.", { color: c.nombre }));
             frases.push(plantilla(t.aciertoPlantilla || "¡Muy bien! Encontraste el color {color}.", { color: c.nombre }));
         });
+        // Frases del juego de burbujas (solo el color objetivo de este nivel).
+        (gameConfig.niveles || []).forEach(function (nivel) {
+            const c = metaColor((nivel.colores || [])[0]).nombre;
+            if (!c) return;
+            frases.push(
+                plantilla("¡Revienta las burbujas que tienen algo {color}!", { color: c }),
+                plantilla("¡Mira! Las burbujas suben. Revienta la que tiene algo {color}.", { color: c }),
+                plantilla("¡Muy bien! ¡Otro {color}!", { color: c }),
+                plantilla("¡Lluvia de {color}! ¡Atrápalas!", { color: c }),
+                plantilla("¿Dónde hay algo {color}? ¡Mira las burbujas que brillan!", { color: c }),
+                plantilla("¡Excelente! Devolviste el color {color} a todo el mundo.", { color: c }),
+                "¡Así! Ahora te toca a ti. ¡Atrapa muchas!",
+                "¡Solo falta uno!",
+                "¡Súper! ¡Qué rápido!",
+                "¡Una dorada! ¡Vale doble!",
+                "¡Reventaste la gigante!",
+                "¡Una burbuja gigante! Tócala dos veces.",
+                "¡Una nube traviesa tapa las burbujas! Tócala para soplarla."
+            );
+        });
         return frases.filter(Boolean);
     }
 
@@ -493,14 +515,196 @@
         indiceEscena = 0;
         coloresRonda = coloresEscenaActual();
         indiceColor = 0;
-        Promise.resolve(imagenesPromise).then(function () {
-            if (mostrarIntroActiva()) {
-                iniciarDemo(rondaGen);
-            } else {
-                iniciarConsigna(rondaGen);
+        const gen = rondaGen;
+        Promise.resolve(imagenesPromise)
+            .then(ensurePhaserMontado)
+            .then(function (ok) {
+                if (gen !== rondaGen) return;
+                if (ok && usaPhaser()) {
+                    jugarArcade(gen);
+                    return;
+                }
+                // Respaldo sin canvas: versión de tarjetas en DOM.
+                if (anim() && anim().medidorIniciar) {
+                    const primerColor = (coloresRonda[0] && metaColor(coloresRonda[0]).hex) || null;
+                    anim().medidorIniciar(totalPasosJuego(), primerColor);
+                }
+                if (mostrarIntroActiva()) {
+                    iniciarDemo(gen);
+                } else {
+                    iniciarConsigna(gen);
+                }
+            });
+    };
+
+    /* ── Burbujas de color (juego continuo en Phaser) ───────────── */
+
+    let metaPartida = 0;
+    let ultimaVozMs = 0;
+
+    function esEdadMayor() {
+        const edad = String((nivelElegido && nivelElegido.edad) || "").toLowerCase();
+        return /5\s*-?\s*6|6\s*a/.test(edad);
+    }
+
+    function nombreColor(id) {
+        return metaColor(id).nombre || id;
+    }
+
+    /** Voz corta que no se pisa con la anterior (el juego no se detiene a hablar). */
+    function decir(texto, separacionMs) {
+        const ahora = Date.now();
+        if (ahora - ultimaVozMs < (separacionMs || 2500)) return;
+        ultimaVozMs = ahora;
+        TextoVoz.hablar(texto, "zoe");
+    }
+
+    function actualizarProgresoArcade(hecho) {
+        const el = document.getElementById("progreso");
+        if (!el) return;
+        el.hidden = false;
+        el.innerHTML = '<i class="fa-solid fa-palette"></i> ' + hecho + " / " + metaPartida;
+    }
+
+    async function jugarArcade(gen) {
+        const P = PedniaEncuentraColorPhaser;
+        colorObjetivo = ((nivelElegido && nivelElegido.colores) || [])[0] || coloresRonda[0] || null;
+        if (!colorObjetivo) return;
+        const nombre = nombreColor(colorObjetivo);
+        const hex = metaColor(colorObjetivo).hex;
+        metaPartida = esEdadMayor() ? 12 : 8;
+
+        // Fuera del juego los colores que un niño pequeño confunde con el objetivo.
+        const confusos = { azul: ["celeste"], celeste: ["azul"] }[colorObjetivo] || [];
+        const pool = Object.keys(gameConfig.objetos || {}).filter(function (id) {
+            return confusos.indexOf(metaObj(id).color) === -1;
+        });
+
+        pintarMuestraColor(colorObjetivo);
+        await P.prepararPartida({
+            color: colorObjetivo,
+            pool: pool,
+            meta: metaPartida,
+            dificultad: esEdadMayor() ? "56" : "34",
+            textos: {
+                lluvia: plantilla(textos().lluviaPlantilla || "¡Lluvia de {color}!", { color: nombre }),
+                final: textos().finalArcade || "¡Lo lograste!",
+                album: textos().album || "¡Tu colección!",
+                seguir: textos().seguir || "¡Seguir!"
             }
         });
-    };
+        if (gen !== rondaGen) return;
+        if (anim() && anim().medidorIniciar) anim().medidorIniciar(metaPartida, hex);
+        actualizarProgresoArcade(0);
+
+        if (mostrarIntroActiva()) {
+            await demoArcade(gen);
+            if (gen !== rondaGen || juegoTerminado) return;
+        }
+
+        const consigna = plantilla(
+            textos().consignaArcade || "¡Revienta las burbujas que tienen algo {color}!",
+            { color: nombre }
+        );
+        const enunciado = document.getElementById("enunciado");
+        if (enunciado) enunciado.textContent = consigna;
+        if (anim()) anim().consignaNueva();
+        ultimaVozMs = Date.now();
+        TextoVoz.hablar(consigna, "zoe");
+        aceptaToque = true;
+        P.iniciar();
+    }
+
+    async function demoArcade(gen) {
+        const P = PedniaEncuentraColorPhaser;
+        demoActiva = true;
+        aceptaToque = false;
+        if (window.PedniaTutorial) await PedniaTutorial.activarDemo();
+        else document.body.classList.add("demo-activa");
+
+        const nombre = nombreColor(colorObjetivo);
+        const enunciado = document.getElementById("enunciado");
+        const msg = plantilla(
+            textos().demostracionArcade || "¡Mira! Las burbujas suben. Revienta la que tiene algo {color}.",
+            { color: nombre }
+        );
+        const idObjetivo = P.demo();
+        if (enunciado) enunciado.textContent = msg;
+        if (anim()) anim().consignaNueva();
+        await hablarDemo(msg, 3200);
+        if (gen !== rondaGen || !demoActiva) return;
+
+        if (idObjetivo != null && window.PedniaTutorial) {
+            await PedniaTutorial.animarMano({
+                punto: P.anclaDemo(idObjetivo),
+                holdMs: 700,
+                cancelado: function () { return gen !== rondaGen || !demoActiva; }
+            });
+            if (gen !== rondaGen || !demoActiva) return;
+        }
+        await P.reventarDemo(idObjetivo);
+        P.limpiarDemo();
+
+        const fin = textos().demostracionFinArcade || "¡Así! Ahora te toca a ti. ¡Atrapa muchas!";
+        if (enunciado) enunciado.textContent = fin;
+        await hablarDemo(fin, 2400);
+        if (gen !== rondaGen) return;
+        detenerDemo();
+        if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
+    }
+
+    // El sonido de cada reventón lo sintetiza el motor; aquí solo HUD y voz.
+    function alAtrapar(n, meta, combo, tipo) {
+        if (anim() && anim().medidorAvanzar) {
+            anim().medidorAvanzar(n, meta, metaColor(colorObjetivo).hex);
+        }
+        actualizarProgresoArcade(n);
+        if (n >= meta) return;
+        const nombre = nombreColor(colorObjetivo);
+        if (tipo === "dorada") {
+            ultimaVozMs = 0;
+            decir("¡Una dorada! ¡Vale doble!");
+        } else if (tipo === "gigante") {
+            ultimaVozMs = 0;
+            decir("¡Reventaste la gigante!");
+        } else if (combo >= 3) {
+            decir("¡Súper! ¡Qué rápido!", 2000);
+        } else if (n === meta - 1) {
+            decir("¡Solo falta uno!", 1200);
+        } else if (n % 3 === 0) {
+            decir(plantilla("¡Muy bien! ¡Otro {color}!", { color: nombre }));
+        }
+    }
+
+    function alFallar(objetoId) {
+        const colorTocado = metaObj(objetoId).color;
+        const texto = colorTocado
+            ? plantilla("Ese es {tocado}. ¡Busca el {color}!", {
+                tocado: nombreColor(colorTocado),
+                color: nombreColor(colorObjetivo)
+            })
+            : plantilla("¡Busca el {color}!", { color: nombreColor(colorObjetivo) });
+        decir(texto, 3500);
+    }
+
+    function alQuedarseQuieto() {
+        decir(plantilla("¿Dónde hay algo {color}? ¡Mira las burbujas que brillan!", {
+            color: nombreColor(colorObjetivo)
+        }), 4000);
+    }
+
+    function alEvento(tipo) {
+        if (tipo === "lluvia") {
+            ultimaVozMs = 0;
+            decir(plantilla("¡Lluvia de {color}! ¡Atrápalas!", { color: nombreColor(colorObjetivo) }));
+        } else if (tipo === "gigante") {
+            ultimaVozMs = 0;
+            decir("¡Una burbuja gigante! Tócala dos veces.");
+        } else if (tipo === "nube") {
+            ultimaVozMs = 0;
+            decir("¡Una nube traviesa tapa las burbujas! Tócala para soplarla.");
+        }
+    }
 
     function mostrarIntroActiva() {
         return window.PedniaTutorial
@@ -549,7 +753,6 @@
         if (prog) prog.hidden = true;
 
         pintarMuestraColor(colorObjetivo);
-        await ensurePhaserMontado();
         await pintarObjetos(shuffle(objetosEscenaActual()));
         if (anim()) anim().consignaNueva();
 
@@ -570,36 +773,21 @@
         if (gen !== rondaGen || !demoActiva) return;
 
         if (targetId && window.PedniaTutorial) {
-            if (usaPhaser()) {
-                await PedniaEncuentraColorPhaser.pulseDemo(targetId);
-                const ancla = PedniaEncuentraColorPhaser.anclaDemo(targetId);
+            const targetBtn = Array.prototype.find.call(
+                document.querySelectorAll(".objeto"),
+                function (btn) { return btn.dataset.objeto === targetId; }
+            );
+            if (targetBtn) {
                 await PedniaTutorial.animarMano({
-                    punto: ancla,
+                    punto: targetBtn,
                     holdMs: 700,
-                    cancelado: function () { return gen !== rondaGen || !demoActiva; }
+                    cancelado: function () { return gen !== rondaGen || !demoActiva; },
+                    onPresionar: function () { targetBtn.classList.add("is-demo-target"); }
                 });
                 if (gen !== rondaGen || !demoActiva) return;
-                await PedniaEncuentraColorPhaser.marcarAcierto(targetId);
-                const rect = PedniaEncuentraColorPhaser.rectPantalla(targetId);
-                if (anim()) anim().acierto(rect);
-                await sleep(500);
-            } else {
-                const targetBtn = Array.prototype.find.call(
-                    document.querySelectorAll(".objeto"),
-                    function (btn) { return btn.dataset.objeto === targetId; }
-                );
-                if (targetBtn) {
-                    await PedniaTutorial.animarMano({
-                        punto: targetBtn,
-                        holdMs: 700,
-                        cancelado: function () { return gen !== rondaGen || !demoActiva; },
-                        onPresionar: function () { targetBtn.classList.add("is-demo-target"); }
-                    });
-                    if (gen !== rondaGen || !demoActiva) return;
-                    targetBtn.classList.remove("is-demo-target");
-                    targetBtn.classList.add("is-acierto");
-                    await sleep(900);
-                }
+                targetBtn.classList.remove("is-demo-target");
+                targetBtn.classList.add("is-acierto");
+                await sleep(900);
             }
         }
 
@@ -622,13 +810,38 @@
         iniciarConsigna(gen);
     }
 
+    function totalPasosJuego() {
+        const totalEscenas = Math.max(escenasRonda.length, 1);
+        // Cada escena aporta tantos pasos como colores pida (hoy 1 por escena).
+        let total = 0;
+        for (let i = 0; i < totalEscenas; i++) {
+            const esc = escenasRonda[i] || {};
+            const cols = (esc.colores && esc.colores.length)
+                ? esc.colores.length
+                : Math.max((nivelElegido && nivelElegido.colores || []).length, 1);
+            total += Math.max(cols, 1);
+        }
+        return Math.max(total, 1);
+    }
+
+    function pasoActualJuego() {
+        const totalColores = Math.max(coloresRonda.length, 1);
+        let previos = 0;
+        for (let i = 0; i < indiceEscena; i++) {
+            const esc = escenasRonda[i] || {};
+            const cols = (esc.colores && esc.colores.length)
+                ? esc.colores.length
+                : totalColores;
+            previos += Math.max(cols, 1);
+        }
+        return previos + indiceColor; // aciertos ya completados
+    }
+
     function actualizarProgreso() {
         const el = document.getElementById("progreso");
         if (!el) return;
-        const totalEscenas = Math.max(escenasRonda.length, 1);
-        const totalColores = Math.max(coloresRonda.length, 1);
-        const paso = (indiceEscena * totalColores) + Math.min(indiceColor + 1, totalColores);
-        const total = totalEscenas * totalColores;
+        const total = totalPasosJuego();
+        const paso = Math.min(pasoActualJuego() + 1, total);
         el.hidden = !total;
         el.innerHTML = '<i class="fa-solid fa-palette"></i> ' + paso + " / " + total;
     }
@@ -662,8 +875,7 @@
         );
 
         aceptaToque = false;
-        ensurePhaserMontado()
-            .then(function () { return pintarObjetos(shuffle(objetosEscenaActual())); })
+        pintarObjetos(shuffle(objetosEscenaActual()))
             .then(function () {
                 if (gen !== rondaGen || juegoTerminado) return;
                 const enunciado = document.getElementById("enunciado");
@@ -700,23 +912,11 @@
         });
     }
 
+    /** Respaldo sin canvas: tarjetas DOM. */
     function pintarObjetos(ids) {
         const zona = document.getElementById("zona-objetos");
         if (!zona) return Promise.resolve();
-        const n = ids.length;
-        zona.dataset.count = String(n);
-
-        if (usaPhaser()) {
-            Array.prototype.forEach.call(zona.querySelectorAll(".objeto"), function (el) {
-                el.remove();
-            });
-            const tablero = document.getElementById("phaser-tablero");
-            if (tablero) tablero.hidden = false;
-            zona.classList.add("modo-phaser");
-            zona.classList.remove("modo-dom");
-            return PedniaEncuentraColorPhaser.cargarEscena(ids);
-        }
-
+        zona.dataset.count = String(ids.length);
         pintarObjetosDom(ids, zona);
         return Promise.resolve();
     }
@@ -726,16 +926,13 @@
         const m = metaObj(objetoId);
         const correcto = m.color === colorObjetivo;
         if (!correcto) {
-            if (usaPhaser()) await PedniaEncuentraColorPhaser.marcarError(objetoId);
             await feedbackError();
             return;
         }
-        if (usaPhaser()) {
-            await PedniaEncuentraColorPhaser.marcarAcierto(objetoId);
-            const rect = PedniaEncuentraColorPhaser.rectPantalla(objetoId);
-            if (anim()) anim().acierto(rect);
-        } else if (el) {
-            el.classList.add("is-acierto");
+        if (el) el.classList.add("is-acierto");
+        if (anim() && anim().medidorAvanzar) {
+            const hecho = pasoActualJuego() + 1; // este acierto incluido
+            anim().medidorAvanzar(hecho, totalPasosJuego(), metaColor(colorObjetivo).hex);
         }
         await feedbackAcierto();
         if (indiceColor + 1 < coloresRonda.length) {
@@ -839,7 +1036,11 @@
         juegoTerminado = true;
         aceptaToque = false;
         if (anim()) anim().cierre();
-        const cierre = textos().cierre || "¡Excelente!";
+        const cierre = usaPhaser()
+            ? plantilla(textos().cierreArcade || "¡Excelente! Devolviste el color {color} a todo el mundo.", {
+                color: nombreColor(colorObjetivo)
+            })
+            : (textos().cierre || "¡Excelente!");
         const texto = document.getElementById("texto_final");
         if (texto) texto.textContent = cierre;
         reproducirAudio(gameConfig.audios && gameConfig.audios.cierre, 0.9, false);

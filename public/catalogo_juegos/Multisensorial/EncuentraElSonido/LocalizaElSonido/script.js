@@ -599,6 +599,8 @@
             sumar(r.error);
         });
         sumar(nivel.cierre);
+        FRASES_ACIERTO.forEach(function (t) { sumar({ texto: t, voz: "zoe" }); });
+        Object.keys(INTRO_RONDA).forEach(function (k, i) { sumar({ texto: INTRO_RONDA[k], voz: i % 2 ? "zeus" : "zoe" }); });
         return lineas;
     }
 
@@ -622,12 +624,279 @@
         detenerViaje();
         if (typeof TextoVoz.encolarFrases === "function") TextoVoz.encolarFrases(lineasDelNivel(nivelElegido));
         montarEscenario();
-        Promise.resolve(imagenesPromise).then(function () {
-            if (!vivo(gen)) return;
-            if (mostrarIntroActiva()) iniciarDemo(gen);
-            else iniciarReto(gen);
-        });
+        Promise.resolve(imagenesPromise)
+            .then(asegurarEscondite)
+            .then(function (ok) {
+                if (!vivo(gen)) return;
+                if (ok) {
+                    modoEscondite = true;
+                    rondas = planRondas();
+                    indiceRonda = 0;
+                    pintarProgreso(-1);
+                    if (mostrarIntroActiva()) iniciarDemoEscondite(gen);
+                    else iniciarRonda(gen);
+                    return;
+                }
+                // Respaldo sin canvas: el reto de siempre en DOM.
+                if (mostrarIntroActiva()) iniciarDemo(gen);
+                else iniciarReto(gen);
+            });
     };
+
+    /* ── "Linterna en la noche": frío o caliente con la linterna (Phaser) ── */
+
+    const FRASES_ACIERTO = ["¡Ahí estaba!", "¡Muy buen oído!", "¡La encontraste en la oscuridad!", "¡Lo lograste!"];
+
+    /** Presentación de cada ronda; la dice Zoe o Zeus (no hay texto en el canvas). */
+    const INTRO_RONDA = {
+        luna: "¡Es de noche! Mueve la linterna: el sonido se oye más fuerte cuando te acercas.",
+        mas: "¡Llegaron instrumentos parecidos! Escucha con mucha atención.",
+        pasos: "¡Shh! En la oscuridad las cosas cambian de lugar.",
+        pila: "¡A la linterna le queda poca pila! Busca con cuidado.",
+        estrella: "¡Se encendió una estrella en el cielo!"
+    };
+
+    let modoEscondite = false;
+    let rondas = [];
+    let indiceRonda = 0;
+    let erroresRonda = 0;
+    let repeticion = null;
+    let vozActiva = false;
+    let esconditeListo = null;
+
+    function E() { return window.PedniaLinterna; }
+
+    function esMayor() {
+        return /5\s*-?\s*6/.test(String((nivelElegido && nivelElegido.edad) || ""));
+    }
+
+    function asegurarEscondite() {
+        if (!window.PedniaLinterna || !window.PedniaPhaserHost) return Promise.resolve(false);
+        if (E().listo()) return Promise.resolve(true);
+        if (esconditeListo) return esconditeListo;
+        esconditeListo = E().montar({
+            gameConfig: gameConfig,
+            callbacks: {
+                puedeTocar: function () {
+                    return modoEscondite && !demoActiva && !juegoTerminado && (fase === "jugar" || fase === "escuchando");
+                },
+                onAcierto: function (id) { aciertoEscondite(id); },
+                onError: function (id, info) { errorEscondite(id, info); }
+            }
+        }).then(function () { return true; }).catch(function (err) {
+            console.error("[LocalizaElSonido] linterna:", err);
+            esconditeListo = null;
+            return false;
+        });
+        return esconditeListo;
+    }
+
+    const SONIDOS_INSTRUMENTO = ["campana", "triangulo", "tambor", "trompeta", "pandereta", "maracas"];
+    const SONIDOS_ANIMAL = ["ladrido", "maullido", "trino", "mugido", "quiquiriqui"];
+
+    function categoria(id) {
+        const s = elemento(id).sonido;
+        if (SONIDOS_INSTRUMENTO.indexOf(s) !== -1) return "instrumento";
+        if (SONIDOS_ANIMAL.indexOf(s) !== -1) return "animal";
+        return "otro";
+    }
+
+    /** Cosas nuevas del catálogo: en 5-6 de la misma familia que el objetivo (más difícil, como pide el documento). */
+    function elegirExtras(n, objetivoId, r) {
+        if (n <= 0) return [];
+        const demo = (gameConfig.demo || {}).elemento;
+        const sonidoObj = elemento(objetivoId).sonido;
+        const familia = categoria(objetivoId);
+        const pool = L.mezclar(Object.keys(gameConfig.elementos || {}).filter(function (id) {
+            return r.elementos.indexOf(id) === -1 && id !== demo &&
+                elemento(id).img && elemento(id).sonido !== sonidoObj;
+        }));
+        pool.sort(function (a, b) {
+            const pa = (categoria(a) === familia) === esMayor() ? 0 : 1;
+            const pb = (categoria(b) === familia) === esMayor() ? 0 : 1;
+            return pa - pb;
+        });
+        return pool.slice(0, n);
+    }
+
+    /**
+     * Cuatro noches, siempre buscando la pandereta (el documento: "Localiza el sonido"):
+     *   1 luna  → las 4 cosas del reto, linterna grande
+     *   2 mas   → dos cosas parecidas más; más oscuro
+     *   3 pasos → las cosas cambian de lugar en la oscuridad
+     *   4 pila  → linterna chica que parpadea
+     */
+    function planRondas() {
+        const r = nivelElegido.retos[0];
+        const obj = r.correcto === "azar" ? L.elegirCorrecto(r) : r.correcto;
+        const extras = elegirExtras(2, obj, r);
+        return [
+            { objetivo: obj, modo: "luna", elementos: r.elementos.slice(), intro: "luna" },
+            { objetivo: obj, modo: "mas", elementos: r.elementos.concat(extras), intro: "mas" },
+            { objetivo: obj, modo: "pasos", elementos: r.elementos.concat(extras), intro: "pasos" },
+            { objetivo: obj, modo: "pila", elementos: r.elementos.concat(extras), intro: "pila" }
+        ];
+    }
+
+    /** Frío o caliente: más fuerte cuanto más cerca apunta la linterna; sale de su lado. */
+    function sonarObjetivo(o) {
+        const vol = 0.3 + 0.7 * (E().cercania(objetivo) || 0);
+        return reproducirSonido(objetivo, Object.assign({ pan: E().panDe(objetivo) || 0, vol: vol }, o || {}));
+    }
+
+    function detenerRepeticion() {
+        clearInterval(repeticion);
+        repeticion = null;
+    }
+
+    async function iniciarRonda(gen) {
+        if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
+        if (!vivo(gen)) return;
+        reto = nivelElegido.retos[0];
+        const ronda = rondas[indiceRonda];
+        if (!reto || !ronda) {
+            cierreEscondite(gen);
+            return;
+        }
+        objetivo = ronda.objetivo;
+        fase = "presentacion";
+        erroresRonda = 0;
+        detenerRepeticion();
+        cancelarPista();
+        pintarProgreso(indiceRonda);
+        habilitarEscuchar(false);
+        $id("btn-escuchar").classList.remove("invita");
+
+        const listos = E().prepararRonda({
+            elementos: ronda.elementos,
+            objetivo: objetivo,
+            modo: ronda.modo,
+            dificultad: esMayor() ? "56" : "34",
+            ronda: indiceRonda
+        });
+        if (ronda.intro) await decir({ voz: indiceRonda % 2 ? "zeus" : "zoe", texto: INTRO_RONDA[ronda.intro] }, { minMs: 1200 });
+        await listos;
+        if (!vivo(gen) || fase !== "presentacion") return;
+        fase = "jugar";
+        habilitarEscuchar(true);
+        E().jugar();
+        sonarObjetivo();
+        // Suena seguido: es la guía para mover la linterna (más fuerte al acercarse).
+        repeticion = setInterval(function () {
+            if (fase === "jugar" && !vozActiva && vivo(gen)) sonarObjetivo({ breve: true });
+        }, 2800);
+        programarPista(pistaEscuchar, 9000);
+    }
+
+    async function aciertoEscondite(id) {
+        const gen = rondaGen;
+        fase = "animando";
+        detenerRepeticion();
+        cancelarPista();
+        tokenDialogo += 1;
+        TextoVoz.detener();
+        detenerSonido();
+        habilitarEscuchar(false);
+        E().resaltar(id, false);
+        const a = reto.acierto || {};
+        // Documento: la pandereta se mueve y se reproduce nuevamente su sonido.
+        await Promise.all([E().celebrar(id), repetirSonido(a)]);
+        if (!vivo(gen)) return;
+        efecto(a.sonido || "recompensa");
+        const texto = indiceRonda === 0 && a.texto ? a.texto : FRASES_ACIERTO[indiceRonda % FRASES_ACIERTO.length];
+        await decir({ voz: a.voz || "zoe", texto: texto }, { estado: "acierto", minMs: 900 });
+        if (!vivo(gen)) return;
+        // Premio de este juego: una estrella se enciende en el cielo.
+        const subir = E().encenderEstrella(id);
+        if (indiceRonda === 0) await decir({ voz: "zeus", texto: INTRO_RONDA.estrella }, { minMs: 600 });
+        await subir;
+        if (!vivo(gen)) return;
+        pintarProgreso(indiceRonda + 1);
+        indiceRonda += 1;
+        iniciarRonda(gen);
+    }
+
+    /** Sin castigo: lo alumbrado que no era salta y suena como es. */
+    async function errorEscondite(id, info) {
+        if (fase !== "jugar" && fase !== "escuchando") return;
+        const gen = rondaGen;
+        erroresRonda += 1;
+        cancelarPista();
+        // Pistas suaves: tras dos intentos la pandereta brilla un instante en la oscuridad;
+        // tras tres, parpadea hasta encontrarla.
+        if (erroresRonda >= 2) E().pista(objetivo);
+        if (erroresRonda >= 3) E().resaltar(objetivo, true);
+        vozActiva = true;
+        await reproducirSonido(id, { breve: true, pan: info && info.pan });
+        if (!vivo(gen) || fase === "animando") { vozActiva = false; return; }
+        if (reto.error && erroresRonda % 2 === 1) await decir(reto.error);
+        else efecto("suave");
+        vozActiva = false;
+        if (!vivo(gen) || fase === "animando") return;
+        $id("btn-escuchar").classList.add("invita");
+        programarPista(pistaEscuchar, 8000);
+    }
+
+    async function iniciarDemoEscondite(gen) {
+        const d = gameConfig.demo || {};
+        if (!d.elemento || !elemento(d.elemento).img || !window.PedniaTutorial) {
+            iniciarRonda(gen);
+            return;
+        }
+        demoActiva = true;
+        fase = "";
+        await PedniaTutorial.activarDemo();
+        const t = textos();
+        habilitarEscuchar(true);
+        E().demo(d.elemento);
+        await decir({ voz: "zoe", texto: t.demostracion }, { minMs: 2500 });
+        if (!vivo(gen) || !demoActiva) return;
+        const cancelado = function () { return !demoActiva || !vivo(gen); };
+        const btn = $id("btn-escuchar");
+        let sonando = Promise.resolve();
+        await PedniaTutorial.animarMano({
+            punto: btn,
+            holdMs: 500,
+            cancelado: cancelado,
+            onPresionar: function () {
+                reiniciarClase(btn, "pulsa", 500);
+                sonando = reproducirSonido(d.elemento, { pan: E().panDe(d.elemento) });
+            }
+        });
+        await sonando;
+        if (!vivo(gen) || !demoActiva) return;
+        await PedniaTutorial.animarMano({
+            punto: function () { return E().rectDe(d.elemento); },
+            holdMs: 500,
+            cancelado: cancelado,
+            onPresionar: function () {
+                efecto("recompensa");
+                E().celebrar(d.elemento);
+            }
+        });
+        if (!vivo(gen) || !demoActiva) return;
+        await decir({ voz: "zoe", texto: t.demostracionAcierto }, { estado: "acierto", minMs: 1800 });
+        if (!vivo(gen)) return;
+        await decir({ voz: "zoe", texto: t.demostracionFin }, { minMs: 1500 });
+        detenerDemo();
+        if (!vivo(gen)) return;
+        await E().limpiarDemo();
+        indiceRonda = 0;
+        iniciarRonda(gen);
+    }
+
+    async function cierreEscondite(gen) {
+        fase = "";
+        juegoTerminado = true;
+        detenerRepeticion();
+        cancelarPista();
+        habilitarEscuchar(false);
+        celebrarPersonajes(true);
+        efecto("celebracion");
+        await E().fiestaFinal();
+        if (gen !== rondaGen) return;
+        mostrarCierre();
+    }
 
     /* ── Escenario ────────────────────────────────────────────── */
 
@@ -641,7 +910,7 @@
 
     function pintarProgreso(actual) {
         const cont = $id("progreso");
-        const total = (nivelElegido.retos || []).length;
+        const total = modoEscondite ? rondas.length : (nivelElegido.retos || []).length;
         if (cont.children.length !== total) {
             cont.innerHTML = "";
             for (let i = 0; i < total; i++) {
@@ -680,7 +949,7 @@
         tokenDialogo += 1;
         TextoVoz.detener();
         $id("btn-escuchar").classList.remove("invita");
-        await reproducirSonido(objetivo);
+        await (modoEscondite ? sonarObjetivo() : reproducirSonido(objetivo, {}));
         if (!vivo(gen) || fase !== "escuchando") return;
         fase = "jugar";
         programarPista(pistaEscuchar, 8000);
@@ -969,7 +1238,9 @@
     /** "Se reproduce nuevamente": breve o completo según el reto; sin repetición solo una pausa. */
     function repetirSonido(a) {
         if (!a.repetir) return sleep(500);
-        return reproducirSonido(objetivo, { breve: a.repetir === "breve" });
+        const o = { breve: a.repetir === "breve" };
+        if (modoEscondite) o.pan = E().panDe(objetivo);
+        return reproducirSonido(objetivo, o);
     }
 
     /** Alterna la imagen con alas arriba mientras canta; devuelve la función que lo detiene. */

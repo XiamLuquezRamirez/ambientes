@@ -3,6 +3,7 @@
     $imagenUrl = $juego->urlImagen();
     $color = $juego->color ?: '#64748b';
     $urlPaquete = $juego->urlPaquete();
+    $etiquetaEdad = app(\App\Services\JuegoCatalogoService::class)->etiquetaEdadDelJuego($juego);
 @endphp
 
 <div class="student-card" data-juego-id="{{ $juego->slug }}">
@@ -19,6 +20,12 @@
 
         <div class="student-identity">
             <h5>{{ $juego->nombre }}</h5>
+            @if ($etiquetaEdad)
+                <span class="stu-badge cj-badge-edad" title="Edad para la que está diseñado el juego">
+                    <i class="fa-solid fa-child-reaching" aria-hidden="true"></i>
+                    {{ $etiquetaEdad }}
+                </span>
+            @endif
         </div>
     </div>
 

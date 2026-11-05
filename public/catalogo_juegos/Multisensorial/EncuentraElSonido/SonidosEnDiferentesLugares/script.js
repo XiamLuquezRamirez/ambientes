@@ -599,6 +599,8 @@
             sumar(r.error);
         });
         sumar(nivel.cierre);
+        FRASES_ACIERTO.forEach(function (t) { sumar({ texto: t, voz: "zoe" }); });
+        Object.keys(INTRO_RONDA).forEach(function (k, i) { sumar({ texto: INTRO_RONDA[k], voz: i % 2 ? "zeus" : "zoe" }); });
         return lineas;
     }
 
@@ -622,12 +624,277 @@
         detenerViaje();
         if (typeof TextoVoz.encolarFrases === "function") TextoVoz.encolarFrases(lineasDelNivel(nivelElegido));
         montarEscenario();
-        Promise.resolve(imagenesPromise).then(function () {
-            if (!vivo(gen)) return;
-            if (mostrarIntroActiva()) iniciarDemo(gen);
-            else iniciarReto(gen);
-        });
+        Promise.resolve(imagenesPromise)
+            .then(asegurarEscondite)
+            .then(function (ok) {
+                if (!vivo(gen)) return;
+                if (ok) {
+                    modoEscondite = true;
+                    rondas = planRondas();
+                    indiceRonda = 0;
+                    pintarProgreso(-1);
+                    if (mostrarIntroActiva()) iniciarDemoEscondite(gen);
+                    else iniciarRonda(gen);
+                    return;
+                }
+                // Respaldo sin canvas: el reto de siempre en DOM.
+                if (mostrarIntroActiva()) iniciarDemo(gen);
+                else iniciarReto(gen);
+            });
     };
+
+    /* ── "El castillo de las 4 ventanas": zonas arriba/abajo/izquierda/derecha (Phaser) ── */
+
+    const FRASES_ACIERTO = ["¡Ahí estaba!", "¡Muy buen oído!", "¡La encontraste!", "¡Lo lograste!"];
+
+    /** Presentación de cada ronda; la dice Zoe o Zeus (no hay texto en el canvas). */
+    const INTRO_RONDA = {
+        abiertas: "¡Bienvenidos al castillo! Escucha: ¿de qué ventana viene el sonido?",
+        postigos: "¡Cerraron las ventanas! Se abren de a una. Escucha bien.",
+        cambio: "¡Los instrumentos cambian de ventana! Síguelos con los ojos.",
+        noche: "¡Es de noche en el castillo! Solo puedes usar tu oído.",
+        bandera: "¡Una bandera sube a la torre!"
+    };
+
+    let modoEscondite = false;
+    let rondas = [];
+    let indiceRonda = 0;
+    let erroresRonda = 0;
+    let repeticion = null;
+    let vozActiva = false;
+    let esconditeListo = null;
+
+    function E() { return window.PedniaCastillo; }
+
+    function esMayor() {
+        return /5\s*-?\s*6/.test(String((nivelElegido && nivelElegido.edad) || ""));
+    }
+
+    function asegurarEscondite() {
+        if (!window.PedniaCastillo || !window.PedniaPhaserHost) return Promise.resolve(false);
+        if (E().listo()) return Promise.resolve(true);
+        if (esconditeListo) return esconditeListo;
+        esconditeListo = E().montar({
+            gameConfig: gameConfig,
+            callbacks: {
+                puedeTocar: function () {
+                    return modoEscondite && !demoActiva && !juegoTerminado && (fase === "jugar" || fase === "escuchando");
+                },
+                onAcierto: function (id) { aciertoEscondite(id); },
+                onError: function (id, info) { errorEscondite(id, info); }
+            }
+        }).then(function () { return true; }).catch(function (err) {
+            console.error("[SonidosEnDiferentesLugares] castillo:", err);
+            esconditeListo = null;
+            return false;
+        });
+        return esconditeListo;
+    }
+
+    const SONIDOS_INSTRUMENTO = ["campana", "triangulo", "tambor", "trompeta", "pandereta", "maracas"];
+    const SONIDOS_ANIMAL = ["ladrido", "maullido", "trino", "mugido", "quiquiriqui"];
+
+    function categoria(id) {
+        const s = elemento(id).sonido;
+        if (SONIDOS_INSTRUMENTO.indexOf(s) !== -1) return "instrumento";
+        if (SONIDOS_ANIMAL.indexOf(s) !== -1) return "animal";
+        return "otro";
+    }
+
+    /** Elementos nuevos del catálogo (aquí no se usan: el castillo tiene 4 ventanas fijas). */
+    function elegirExtras(n, objetivoId, r) {
+        if (n <= 0) return [];
+        const demo = (gameConfig.demo || {}).elemento;
+        const sonidoObj = elemento(objetivoId).sonido;
+        const familia = categoria(objetivoId);
+        const pool = L.mezclar(Object.keys(gameConfig.elementos || {}).filter(function (id) {
+            return r.elementos.indexOf(id) === -1 && id !== demo &&
+                elemento(id).img && elemento(id).sonido !== sonidoObj;
+        }));
+        pool.sort(function (a, b) {
+            const pa = (categoria(a) === familia) === esMayor() ? 0 : 1;
+            const pb = (categoria(b) === familia) === esMayor() ? 0 : 1;
+            return pa - pb;
+        });
+        return pool.slice(0, n);
+    }
+
+    /**
+     * Cuatro visitas al castillo, siempre buscando la campana (el documento: zonas; la campana
+     * cambia de ventana en cada visita):
+     *   1 abiertas → las 4 ventanas abiertas (reto del documento)
+     *   2 postigos → cerradas; se abren de a una un momento
+     *   3 cambio   → los instrumentos saltan de ventana
+     *   4 noche    → todo cerrado y oscuro: solo el oído
+     */
+    function planRondas() {
+        const r = nivelElegido.retos[0];
+        const obj = r.correcto === "azar" ? L.elegirCorrecto(r) : r.correcto;
+        return [
+            { objetivo: obj, modo: "abiertas", elementos: r.elementos.slice(), intro: "abiertas" },
+            { objetivo: obj, modo: "postigos", elementos: r.elementos.slice(), intro: "postigos" },
+            { objetivo: obj, modo: "cambio", elementos: r.elementos.slice(), intro: "cambio" },
+            { objetivo: obj, modo: "noche", elementos: r.elementos.slice(), intro: "noche" }
+        ];
+    }
+
+    /** El sonido sale del lado de su ventana. */
+    function sonarObjetivo(o) {
+        return reproducirSonido(objetivo, Object.assign({ pan: E().panDe(objetivo) || 0 }, o || {}));
+    }
+
+    function detenerRepeticion() {
+        clearInterval(repeticion);
+        repeticion = null;
+    }
+
+    async function iniciarRonda(gen) {
+        if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
+        if (!vivo(gen)) return;
+        reto = nivelElegido.retos[0];
+        const ronda = rondas[indiceRonda];
+        if (!reto || !ronda) {
+            cierreEscondite(gen);
+            return;
+        }
+        objetivo = ronda.objetivo;
+        fase = "presentacion";
+        erroresRonda = 0;
+        detenerRepeticion();
+        cancelarPista();
+        pintarProgreso(indiceRonda);
+        habilitarEscuchar(false);
+        $id("btn-escuchar").classList.remove("invita");
+
+        const listos = E().prepararRonda({
+            elementos: ronda.elementos,
+            objetivo: objetivo,
+            modo: ronda.modo,
+            dificultad: esMayor() ? "56" : "34",
+            ronda: indiceRonda
+        });
+        if (ronda.intro) await decir({ voz: indiceRonda % 2 ? "zeus" : "zoe", texto: INTRO_RONDA[ronda.intro] }, { minMs: 1200 });
+        await listos;
+        if (!vivo(gen) || fase !== "presentacion") return;
+        fase = "jugar";
+        habilitarEscuchar(true);
+        E().jugar();
+        sonarObjetivo();
+        // Vuelve a sonar cada tanto desde su ventana (si salta de ventana, el sonido la sigue).
+        repeticion = setInterval(function () {
+            if (fase === "jugar" && !vozActiva && vivo(gen)) sonarObjetivo({ breve: true });
+        }, ronda.modo === "noche" ? 3500 : 4500);
+        programarPista(pistaEscuchar, 9000);
+    }
+
+    async function aciertoEscondite(id) {
+        const gen = rondaGen;
+        fase = "animando";
+        detenerRepeticion();
+        cancelarPista();
+        tokenDialogo += 1;
+        TextoVoz.detener();
+        detenerSonido();
+        habilitarEscuchar(false);
+        E().resaltar(id, false);
+        const a = reto.acierto || {};
+        // Documento: la campana se ilumina, se reproduce el sonido y hay animación de confirmación.
+        await Promise.all([E().celebrar(id), repetirSonido(a)]);
+        if (!vivo(gen)) return;
+        efecto(a.sonido || "recompensa");
+        const texto = indiceRonda === 0 && a.texto ? a.texto : FRASES_ACIERTO[indiceRonda % FRASES_ACIERTO.length];
+        await decir({ voz: a.voz || "zoe", texto: texto }, { estado: "acierto", minMs: 900 });
+        if (!vivo(gen)) return;
+        // Premio de este juego: una bandera sube a una de las 4 torres.
+        const subir = E().izarBandera(id);
+        if (indiceRonda === 0) await decir({ voz: "zoe", texto: INTRO_RONDA.bandera }, { minMs: 600 });
+        await subir;
+        if (!vivo(gen)) return;
+        pintarProgreso(indiceRonda + 1);
+        indiceRonda += 1;
+        iniciarRonda(gen);
+    }
+
+    /** Sin castigo: el instrumento equivocado se mueve, suena como es y su ventana se cierra. */
+    async function errorEscondite(id, info) {
+        if (fase !== "jugar" && fase !== "escuchando") return;
+        const gen = rondaGen;
+        erroresRonda += 1;
+        cancelarPista();
+        // Pistas suaves: tras dos intentos los postigos de su ventana tiemblan; tras tres, brilla.
+        if (erroresRonda >= 2) E().pista(objetivo);
+        if (erroresRonda >= 3) E().resaltar(objetivo, true);
+        vozActiva = true;
+        await reproducirSonido(id, { breve: true, pan: info && info.pan });
+        if (!vivo(gen) || fase === "animando") { vozActiva = false; return; }
+        if (reto.error && erroresRonda % 2 === 1) await decir(reto.error);
+        else efecto("suave");
+        vozActiva = false;
+        if (!vivo(gen) || fase === "animando") return;
+        $id("btn-escuchar").classList.add("invita");
+        programarPista(pistaEscuchar, 8000);
+    }
+
+    async function iniciarDemoEscondite(gen) {
+        const d = gameConfig.demo || {};
+        if (!d.elemento || !elemento(d.elemento).img || !window.PedniaTutorial) {
+            iniciarRonda(gen);
+            return;
+        }
+        demoActiva = true;
+        fase = "";
+        await PedniaTutorial.activarDemo();
+        const t = textos();
+        habilitarEscuchar(true);
+        E().demo(d.elemento);
+        await decir({ voz: "zoe", texto: t.demostracion }, { minMs: 2500 });
+        if (!vivo(gen) || !demoActiva) return;
+        const cancelado = function () { return !demoActiva || !vivo(gen); };
+        const btn = $id("btn-escuchar");
+        let sonando = Promise.resolve();
+        await PedniaTutorial.animarMano({
+            punto: btn,
+            holdMs: 500,
+            cancelado: cancelado,
+            onPresionar: function () {
+                reiniciarClase(btn, "pulsa", 500);
+                sonando = reproducirSonido(d.elemento, { pan: E().panDe(d.elemento) });
+            }
+        });
+        await sonando;
+        if (!vivo(gen) || !demoActiva) return;
+        await PedniaTutorial.animarMano({
+            punto: function () { return E().rectDe(d.elemento); },
+            holdMs: 500,
+            cancelado: cancelado,
+            onPresionar: function () {
+                efecto("recompensa");
+                E().celebrar(d.elemento);
+            }
+        });
+        if (!vivo(gen) || !demoActiva) return;
+        await decir({ voz: "zoe", texto: t.demostracionAcierto }, { estado: "acierto", minMs: 1800 });
+        if (!vivo(gen)) return;
+        await decir({ voz: "zoe", texto: t.demostracionFin }, { minMs: 1500 });
+        detenerDemo();
+        if (!vivo(gen)) return;
+        await E().limpiarDemo();
+        indiceRonda = 0;
+        iniciarRonda(gen);
+    }
+
+    async function cierreEscondite(gen) {
+        fase = "";
+        juegoTerminado = true;
+        detenerRepeticion();
+        cancelarPista();
+        habilitarEscuchar(false);
+        celebrarPersonajes(true);
+        efecto("celebracion");
+        await E().fiestaFinal();
+        if (gen !== rondaGen) return;
+        mostrarCierre();
+    }
 
     /* ── Escenario ────────────────────────────────────────────── */
 
@@ -641,7 +908,7 @@
 
     function pintarProgreso(actual) {
         const cont = $id("progreso");
-        const total = (nivelElegido.retos || []).length;
+        const total = modoEscondite ? rondas.length : (nivelElegido.retos || []).length;
         if (cont.children.length !== total) {
             cont.innerHTML = "";
             for (let i = 0; i < total; i++) {
@@ -680,7 +947,7 @@
         tokenDialogo += 1;
         TextoVoz.detener();
         $id("btn-escuchar").classList.remove("invita");
-        await reproducirSonido(objetivo);
+        await reproducirSonido(objetivo, modoEscondite ? { pan: E().panDe(objetivo) } : {});
         if (!vivo(gen) || fase !== "escuchando") return;
         fase = "jugar";
         programarPista(pistaEscuchar, 8000);
@@ -969,7 +1236,9 @@
     /** "Se reproduce nuevamente": breve o completo según el reto; sin repetición solo una pausa. */
     function repetirSonido(a) {
         if (!a.repetir) return sleep(500);
-        return reproducirSonido(objetivo, { breve: a.repetir === "breve" });
+        const o = { breve: a.repetir === "breve" };
+        if (modoEscondite) o.pan = E().panDe(objetivo);
+        return reproducirSonido(objetivo, o);
     }
 
     /** Alterna la imagen con alas arriba mientras canta; devuelve la función que lo detiene. */

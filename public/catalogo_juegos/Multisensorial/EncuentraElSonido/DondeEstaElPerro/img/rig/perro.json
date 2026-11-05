@@ -1,0 +1,131 @@
+{
+ "sentado": {
+  "ancho": 372,
+  "alto": 512,
+  "piezas": [
+   {
+    "nombre": "cabeza",
+    "capa": "frente",
+    "padre": null,
+    "pivote": [
+     180,
+     268
+    ],
+    "parpadeo": true
+   },
+   {
+    "nombre": "orejaIzq",
+    "capa": "frente",
+    "padre": "cabeza",
+    "pivote": [
+     88,
+     30
+    ]
+   },
+   {
+    "nombre": "orejaDer",
+    "capa": "frente",
+    "padre": "cabeza",
+    "pivote": [
+     252,
+     32
+    ]
+   }
+  ]
+ },
+ "parado": {
+  "ancho": 306,
+  "alto": 512,
+  "piezas": [
+   {
+    "nombre": "cola",
+    "capa": "atras",
+    "padre": null,
+    "pivote": [
+     36,
+     294
+    ]
+   },
+   {
+    "nombre": "pataAtras",
+    "capa": "frente",
+    "padre": null,
+    "pivote": [
+     55,
+     338
+    ]
+   },
+   {
+    "nombre": "pataMedio",
+    "capa": "frente",
+    "padre": null,
+    "pivote": [
+     150,
+     362
+    ]
+   },
+   {
+    "nombre": "pataFrente",
+    "capa": "frente",
+    "padre": null,
+    "pivote": [
+     215,
+     340
+    ]
+   },
+   {
+    "nombre": "cabeza",
+    "capa": "frente",
+    "padre": null,
+    "pivote": [
+     188,
+     198
+    ],
+    "parpadeo": true
+   }
+  ]
+ },
+ "pelota": {
+  "ancho": 406,
+  "alto": 512,
+  "piezas": [
+   {
+    "nombre": "cola",
+    "capa": "atras",
+    "padre": null,
+    "pivote": [
+     62,
+     262
+    ]
+   },
+   {
+    "nombre": "pataAtras",
+    "capa": "frente",
+    "padre": null,
+    "pivote": [
+     98,
+     338
+    ]
+   },
+   {
+    "nombre": "pataFrente",
+    "capa": "frente",
+    "padre": null,
+    "pivote": [
+     256,
+     350
+    ]
+   },
+   {
+    "nombre": "cabeza",
+    "capa": "frente",
+    "padre": null,
+    "pivote": [
+     232,
+     198
+    ],
+    "parpadeo": true
+   }
+  ]
+ }
+}

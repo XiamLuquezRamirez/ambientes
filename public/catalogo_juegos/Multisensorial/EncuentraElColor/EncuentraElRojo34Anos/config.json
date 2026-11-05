@@ -47,56 +47,203 @@
     "fondo": "../../../sounds/fondo.mp3"
   },
   "colores": {
-    "rojo": { "nombre": "rojo", "hex": "#e03131" },
-    "amarillo": { "nombre": "amarillo", "hex": "#ffef00" },
-    "azul": { "nombre": "azul", "hex": "#1c7ed6" },
-    "verde": { "nombre": "verde", "hex": "#2f9e44" },
-    "naranja": { "nombre": "naranja", "hex": "#fd7e14" },
-    "morado": { "nombre": "morado", "hex": "#9c36b5" },
-    "rosado": { "nombre": "rosado", "hex": "#f06595" },
-    "celeste": { "nombre": "celeste", "hex": "#74c0fc" }
+    "rojo": {
+      "nombre": "rojo",
+      "hex": "#e03131"
+    },
+    "amarillo": {
+      "nombre": "amarillo",
+      "hex": "#ffef00"
+    },
+    "azul": {
+      "nombre": "azul",
+      "hex": "#1c7ed6"
+    },
+    "verde": {
+      "nombre": "verde",
+      "hex": "#2f9e44"
+    },
+    "naranja": {
+      "nombre": "naranja",
+      "hex": "#fd7e14"
+    },
+    "morado": {
+      "nombre": "morado",
+      "hex": "#9c36b5"
+    },
+    "rosado": {
+      "nombre": "rosado",
+      "hex": "#f06595"
+    },
+    "celeste": {
+      "nombre": "celeste",
+      "hex": "#74c0fc"
+    }
   },
   "objetos": {
-    "manzana": { "nombre": "Manzana", "img": "img/Manzana.png", "color": "rojo" },
-    "sol": { "nombre": "Sol", "img": "img/Sol.png", "color": "amarillo" },
-    "carro": { "nombre": "Carro", "img": "img/Carro.png", "color": "azul" },
-    "fresa": { "nombre": "Fresa", "img": "img/Fresa.svg", "color": "rojo" },
-    "platano": { "nombre": "Plátano", "img": "img/Platano.svg", "color": "amarillo" },
-    "pelota": { "nombre": "Pelota", "img": "img/Pelota.svg", "color": "azul" },
-    "corazon": { "nombre": "Corazón", "img": "img/Corazon.svg", "color": "rojo" },
-    "pez": { "nombre": "Pez", "img": "img/Pez.svg", "color": "azul" },
-    "hoja": { "nombre": "Hoja", "img": "img/Hoja.svg", "color": "verde" },
-    "mariquita": { "nombre": "Mariquita", "img": "img/Mariquita.svg", "color": "rojo" },
-    "queso": { "nombre": "Queso", "img": "img/Queso.svg", "color": "amarillo" },
-    "estrella": { "nombre": "Estrella", "img": "img/Estrella.svg", "color": "amarillo" }
+    "manzana": {
+      "nombre": "Manzana",
+      "img": "img/Manzana.png",
+      "color": "rojo"
+    },
+    "sol": {
+      "nombre": "Sol",
+      "img": "img/Sol.png",
+      "color": "amarillo"
+    },
+    "carro": {
+      "nombre": "Carro",
+      "img": "img/Carro.png",
+      "color": "azul"
+    },
+    "fresa": {
+      "nombre": "Fresa",
+      "img": "img/Fresa.svg",
+      "color": "rojo"
+    },
+    "platano": {
+      "nombre": "Plátano",
+      "img": "img/Platano.svg",
+      "color": "amarillo"
+    },
+    "pelota": {
+      "nombre": "Pelota",
+      "img": "img/Pelota.svg",
+      "color": "azul"
+    },
+    "corazon": {
+      "nombre": "Corazón",
+      "img": "img/Corazon.svg",
+      "color": "rojo"
+    },
+    "pez": {
+      "nombre": "Pez",
+      "img": "img/Pez.svg",
+      "color": "azul"
+    },
+    "hoja": {
+      "nombre": "Hoja",
+      "img": "img/Hoja.svg",
+      "color": "verde"
+    },
+    "mariquita": {
+      "nombre": "Mariquita",
+      "img": "img/Mariquita.svg",
+      "color": "rojo"
+    },
+    "queso": {
+      "nombre": "Queso",
+      "img": "img/Queso.svg",
+      "color": "amarillo"
+    },
+    "estrella": {
+      "nombre": "Estrella",
+      "img": "img/Estrella.svg",
+      "color": "amarillo"
+    },
+    "rana": {
+      "nombre": "Rana",
+      "img": "img/Rana.png",
+      "color": "verde"
+    },
+    "zanahoria": {
+      "nombre": "Zanahoria",
+      "img": "img/Zanahoria.png",
+      "color": "naranja"
+    },
+    "uvas": {
+      "nombre": "Uvas",
+      "img": "img/Uvas.png",
+      "color": "morado"
+    },
+    "flor": {
+      "nombre": "Flor",
+      "img": "img/Flor.png",
+      "color": "rosado"
+    },
+    "nube": {
+      "nombre": "Nube",
+      "img": "img/Nube.svg",
+      "color": "celeste"
+    },
+    "limon": {
+      "nombre": "Limón",
+      "img": "img/Limon.svg",
+      "color": "amarillo"
+    },
+    "tomate": {
+      "nombre": "Tomate",
+      "img": "img/Tomate.svg",
+      "color": "rojo"
+    },
+    "campana": {
+      "nombre": "Campana",
+      "img": "img/Campana.svg",
+      "color": "amarillo"
+    },
+    "libro": {
+      "nombre": "Libro",
+      "img": "img/Libro.svg",
+      "color": "azul"
+    }
   },
   "niveles": [
     {
       "id": "3",
       "edad": "3-4 años",
       "titulo": "Encuentra el rojo",
-      "colores": ["rojo"],
-      "objetos": ["manzana", "sol", "carro"],
+      "colores": [
+        "rojo"
+      ],
+      "objetos": [
+        "manzana",
+        "sol",
+        "carro"
+      ],
       "escenas": [
         {
           "titulo": "La manzana roja",
-          "objetos": ["manzana", "sol", "carro"],
-          "colores": ["rojo"]
+          "objetos": [
+            "manzana",
+            "sol",
+            "carro"
+          ],
+          "colores": [
+            "rojo"
+          ]
         },
         {
           "titulo": "La fresa dulce",
-          "objetos": ["fresa", "platano", "pelota"],
-          "colores": ["rojo"]
+          "objetos": [
+            "fresa",
+            "platano",
+            "pelota"
+          ],
+          "colores": [
+            "rojo"
+          ]
         },
         {
           "titulo": "El corazón brillante",
-          "objetos": ["corazon", "pez", "hoja"],
-          "colores": ["rojo"]
+          "objetos": [
+            "corazon",
+            "pez",
+            "hoja"
+          ],
+          "colores": [
+            "rojo"
+          ]
         },
         {
           "titulo": "La mariquita",
-          "objetos": ["mariquita", "queso", "estrella"],
-          "colores": ["rojo"]
+          "objetos": [
+            "mariquita",
+            "queso",
+            "estrella"
+          ],
+          "colores": [
+            "rojo"
+          ]
         }
       ]
     }

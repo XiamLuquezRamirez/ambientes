@@ -786,6 +786,146 @@
     background: #fff;
 }
 
+/* ====== Carpetas por temática (vista previa a los juegos) ====== */
+/* Nombre de la temática en la cabecera: puede ser largo, se reduce y recorta. */
+.bj-galeria-titulo--tema {
+    max-width: 70cqw;
+    font-size: min(4.2cqw, 7.6cqh);
+}
+
+.bj-galeria-titulo--tema .bj-galeria-mando {
+    flex: 0 0 auto;
+}
+
+/*
+ * Vista de temáticas: tarjetas algo más chicas y más separadas, con hueco arriba
+ * para la pestaña y las hojas que asoman de cada carpeta.
+ */
+.bj-galeria[data-bj-modo="tematicas"] .bj-grid {
+    --card-w: min(15cqw, 24.5cqh);
+    gap: 7cqh 3.4cqw;
+    padding-top: 3cqh;
+}
+
+/*
+ * Carpeta: todo lo que asoma queda DENTRO del ancho de la tarjeta (solo sobresale
+ * hacia arriba), así no invade a las vecinas.
+ */
+.bj-tema-pestana,
+.bj-tema-hoja {
+    position: absolute;
+    z-index: -1 !important;
+    pointer-events: none;
+}
+
+/* Pestaña de la carpeta, arriba a la izquierda, en un tono más oscuro del color. */
+.bj-tema-pestana {
+    top: -7%;
+    left: 7%;
+    width: 42%;
+    height: 20%;
+    border-radius: calc(var(--card-w, 160px) * .07) calc(var(--card-w, 160px) * .07) 0 0;
+    background: color-mix(in srgb, var(--c, #3a6ea5) 72%, #000);
+}
+
+/* Hojas (los juegos) asomando por el borde superior, entre la pestaña y el contador. */
+.bj-tema-hoja {
+    top: -9%;
+    left: 24%;
+    width: 46%;
+    height: 30%;
+    border-radius: calc(var(--card-w, 160px) * .045);
+    background: #fff;
+    box-shadow: 0 -1px 4px rgba(80, 50, 10, .18);
+    transform-origin: 50% 100%;
+    transition: transform .25s cubic-bezier(.34, 1.45, .64, 1);
+}
+
+.bj-tema-hoja--1 {
+    background: color-mix(in srgb, var(--c, #3a6ea5) 22%, #fff);
+    transform: rotate(-4deg);
+}
+
+.bj-tema-hoja--2 {
+    top: -5.5%;
+    left: 30%;
+    transform: rotate(3deg);
+}
+
+/* Al pasar el mouse las hojas suben un poco; en táctil no (el :hover se queda pegado). */
+@media (hover: hover) {
+    .bj-card--tema:hover .bj-tema-hoja--1 {
+        transform: translateY(-14%) rotate(-6deg);
+    }
+
+    .bj-card--tema:hover .bj-tema-hoja--2 {
+        transform: translateY(-10%) rotate(5deg);
+    }
+}
+
+.bj-card--tema:focus-visible .bj-tema-hoja--1 {
+    transform: translateY(-14%) rotate(-6deg);
+}
+
+.bj-card--tema:active {
+    transform: scale(.97);
+}
+
+/* Contador de juegos: etiqueta sobre el borde superior derecho, sin salirse a los lados. */
+.bj-tema-cuenta {
+    position: absolute !important;
+    top: -3.5%;
+    right: 5%;
+    z-index: 3 !important;
+    display: inline-flex;
+    align-items: center;
+    gap: .3em;
+    padding: .26em .55em;
+    border-radius: 999px;
+    background: #ffd23f;
+    color: #5a3a00;
+    border: max(2px, calc(var(--card-w, 160px) * .014)) solid #fff;
+    box-shadow: 0 3px 6px rgba(80, 50, 10, .25);
+    font: 700 calc(var(--card-w, 160px) * .095)/1 'Fredoka Juegos', 'Fredoka One', sans-serif;
+}
+
+.bj-tema-cuenta i {
+    font-size: .85em;
+}
+
+/* Entrada escalonada al cambiar de temáticas a juegos y viceversa. */
+.bj-grid--entra .bj-card:not([hidden]) {
+    animation: bj-card-entra .42s cubic-bezier(.34, 1.45, .64, 1) backwards;
+    animation-delay: calc(var(--bj-i, 0) * 45ms);
+}
+
+/* La paginación y la apertura animan con transform inline: no competir con ellas. */
+.bj-galeria--pasando .bj-card,
+.bj-galeria--abriendo .bj-card:not(.bj-card--elegida) {
+    animation: none;
+}
+
+@keyframes bj-card-entra {
+    0% {
+        opacity: 0;
+        transform: translateY(18px) scale(.86);
+    }
+
+    100% {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .bj-grid--entra .bj-card:not([hidden]),
+    .bj-tema-hoja {
+        animation: none;
+        transition: none;
+    }
+}
+
 /* ====== Reproductor (iframe del paquete) ====== */
 .bj-player {
     position: absolute;
