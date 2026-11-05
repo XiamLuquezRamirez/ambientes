@@ -1,0 +1,170 @@
+{
+  "nombre": "Constructores del Espacio",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "¡Elige tu nivel!",
+    "demostracion": "¡Mira cómo apilo los bloques!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Hora de construir! El cohete necesita bloques de energía en la columna del motor."
+      },
+      {
+        "personaje": 0,
+        "texto": "¡Arrastra cada bloque a la casilla que tiene su número!"
+      }
+    ]
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "acierto": "../../../sounds/ok.mp3",
+    "efectos": {
+      "recompensa": "../../../sounds/ok.mp3"
+    }
+  },
+  "mundos": [
+    {
+      "id": "taller",
+      "nombre": "Taller Estelar",
+      "titulo": "MISIÓN 1: EL TALLER ESTELAR",
+      "totalBloquesAlmacen": 12,
+      "ambiente": {
+        "cieloAlto": "#1a1f5c",
+        "cieloBajo": "#06082a",
+        "suelo": "#0f172a",
+        "sueloBorde": "#1e293b",
+        "rejilla": "#00e5ff",
+        "nebulosaA": "#4c1d95",
+        "nebulosaB": "#1e3a8a",
+        "acento": "#00e5ff"
+      },
+      "planeta": { "color": "#38bdf8", "nombre": "Taller" },
+      "bienvenida": {
+        "voz": "zeus",
+        "texto": "¡Bienvenido al taller espacial! Aquí preparamos el cohete."
+      },
+      "acierto": {
+        "voz": "zoe",
+        "texto": "¡El motor quedó perfecto! ¡Prepárate para despegar!"
+      }
+    },
+    {
+      "id": "rojo",
+      "nombre": "Planeta Rojo",
+      "titulo": "MISIÓN 2: EL PLANETA ROJO",
+      "totalBloquesAlmacen": 12,
+      "ambiente": {
+        "cieloAlto": "#7c2d12",
+        "cieloBajo": "#1c0a05",
+        "suelo": "#7f1d1d",
+        "sueloBorde": "#b45309",
+        "rejilla": "#fb923c",
+        "nebulosaA": "#9a3412",
+        "nebulosaB": "#b91c1c",
+        "acento": "#fb923c"
+      },
+      "planeta": { "color": "#ef4444", "nombre": "Rojo" },
+      "bienvenida": {
+        "voz": "zoe",
+        "texto": "¡Aterrizamos en el Planeta Rojo! Hay polvo por todas partes."
+      },
+      "acierto": {
+        "voz": "zeus",
+        "texto": "¡Muy bien! El cohete ya puede salir del Planeta Rojo."
+      }
+    },
+    {
+      "id": "hielo",
+      "nombre": "Mundo Helado",
+      "titulo": "MISIÓN 3: EL MUNDO HELADO",
+      "totalBloquesAlmacen": 12,
+      "ambiente": {
+        "cieloAlto": "#0e7490",
+        "cieloBajo": "#041e2e",
+        "suelo": "#164e63",
+        "sueloBorde": "#67e8f9",
+        "rejilla": "#a5f3fc",
+        "nebulosaA": "#0891b2",
+        "nebulosaB": "#1e40af",
+        "acento": "#a5f3fc"
+      },
+      "planeta": { "color": "#22d3ee", "nombre": "Hielo" },
+      "bienvenida": {
+        "voz": "zeus",
+        "texto": "¡Qué frío! Este mundo está cubierto de hielo brillante."
+      },
+      "acierto": {
+        "voz": "zoe",
+        "texto": "¡Excelente! Los motores aguantaron el hielo."
+      }
+    },
+    {
+      "id": "gaseoso",
+      "nombre": "Gigante Gaseoso",
+      "titulo": "MISIÓN 4: EL GIGANTE GASEOSO",
+      "totalBloquesAlmacen": 12,
+      "ambiente": {
+        "cieloAlto": "#6b21a8",
+        "cieloBajo": "#1e0433",
+        "suelo": "#4c1d95",
+        "sueloBorde": "#c084fc",
+        "rejilla": "#e9d5ff",
+        "nebulosaA": "#7e22ce",
+        "nebulosaB": "#a21caf",
+        "acento": "#e9d5ff"
+      },
+      "planeta": { "color": "#a855f7", "nombre": "Gigante" },
+      "bienvenida": {
+        "voz": "zoe",
+        "texto": "¡El Gigante Gaseoso! Sus nubes de colores giran sin parar."
+      },
+      "acierto": {
+        "voz": "zeus",
+        "texto": "¡Lo lograste! El cohete está listo para volver a casa."
+      }
+    }
+  ],
+  "dialogos": {
+    "pedir": "El cohete necesita {n} bloques: del {desde} al {hasta}. ¡Mira los números del motor!",
+    "siguiente": "Ahora busca el bloque número {n}.",
+    "fueraDeOrden": "¡Ese no! El cohete espera el bloque número {n}.",
+    "incompleto": "¡Nos faltan motores! Todavía faltan bloques para despegar.",
+    "despegue": "¡Despegamos! Siguiente parada: {mundo}."
+  },
+  "niveles": [
+    {
+      "id": "5-6",
+      "edad": "5-6 años",
+      "titulo": "Constructores del Espacio",
+      "escena": "espacio",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido al taller espacial!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Vamos a construir el cohete y viajar por el espacio!"
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zeus",
+          "texto": "¡Excelente! ¡Visitaste todos los mundos del espacio!"
+        }
+      ],
+      "insignia": {
+        "img": "img/insignia_cohete.svg",
+        "nombre": "Ingeniero Espacial"
+      }
+    }
+  ]
+}
