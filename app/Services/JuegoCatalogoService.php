@@ -213,6 +213,40 @@ class JuegoCatalogoService
     }
 
     /**
+     * Texto corto de la edad para la que está diseñado el juego ("3-4 años", "5 años").
+     * Une rangos contiguos o solapados (3, 4 y 5-6 → "3-6 años"). Null si el paquete no declara edad.
+     */
+    public function etiquetaEdadDelJuego(Juego $juego): ?string
+    {
+        $rangos = $this->rangosEdadDelJuego($juego);
+        if ($rangos === null) {
+            return null;
+        }
+
+        usort($rangos, fn (array $a, array $b) => [$a['min'], $a['max']] <=> [$b['min'], $b['max']]);
+
+        $unidos = [];
+        foreach ($rangos as $rango) {
+            $ultimo = count($unidos) - 1;
+            if ($ultimo >= 0 && $rango['min'] <= $unidos[$ultimo]['max'] + 1) {
+                $unidos[$ultimo]['max'] = max($unidos[$ultimo]['max'], $rango['max']);
+                continue;
+            }
+            $unidos[] = $rango;
+        }
+
+        $partes = array_map(
+            fn (array $r) => $r['min'] === $r['max'] ? (string) $r['min'] : $r['min'].'-'.$r['max'],
+            $unidos
+        );
+
+        $ultimaParte = array_pop($partes);
+        $texto = $partes === [] ? $ultimaParte : implode(', ', $partes).' y '.$ultimaParte;
+
+        return $texto.($texto === '1' ? ' año' : ' años');
+    }
+
+    /**
      * @return list<string>
      */
     public function edadesDesdeConfigPaquete(Juego $juego): array

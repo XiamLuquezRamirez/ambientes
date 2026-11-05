@@ -73,6 +73,14 @@
     font-size: 1.15rem;
 }
 
+.cj-badge-edad {
+    gap: .3rem;
+    margin-top: .3rem;
+    background: #FEF3C7;
+    border-color: #FDE68A;
+    color: #B45309;
+}
+
 .cj-color-picker {
     display: flex;
     flex-wrap: wrap;

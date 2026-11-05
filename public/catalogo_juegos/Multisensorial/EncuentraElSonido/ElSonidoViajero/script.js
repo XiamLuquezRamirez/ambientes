@@ -592,6 +592,8 @@
             sumar(r.error);
         });
         sumar(nivel.cierre);
+        FRASES_ACIERTO.forEach(function (t) { sumar({ texto: t, voz: "zoe" }); });
+        Object.keys(INTRO_RONDA).forEach(function (k, i) { sumar({ texto: INTRO_RONDA[k], voz: i % 2 ? "zeus" : "zoe" }); });
         return lineas;
     }
 
@@ -615,12 +617,297 @@
         detenerViaje();
         if (typeof TextoVoz.encolarFrases === "function") TextoVoz.encolarFrases(lineasDelNivel(nivelElegido));
         montarEscenario();
-        Promise.resolve(imagenesPromise).then(function () {
-            if (!vivo(gen)) return;
-            if (mostrarIntroActiva()) iniciarDemo(gen);
-            else iniciarReto(gen);
-        });
+        Promise.resolve(imagenesPromise)
+            .then(asegurarEscondite)
+            .then(function (ok) {
+                if (!vivo(gen)) return;
+                if (ok) {
+                    modoEscondite = true;
+                    rondas = planRondas();
+                    indiceRonda = 0;
+                    pintarProgreso(-1);
+                    if (mostrarIntroActiva()) iniciarDemoEscondite(gen);
+                    else iniciarRonda(gen);
+                    return;
+                }
+                // Respaldo sin canvas: el reto de siempre en DOM.
+                if (mostrarIntroActiva()) iniciarDemo(gen);
+                else iniciarReto(gen);
+            });
     };
+
+    /* ── "Paseo por la granja": seguir al que sonó cuando cambia de lugar (Phaser) ── */
+
+    const FRASES_ACIERTO = ["¡Lo seguiste! ¡Muy bien!", "¡Qué buena vista y buen oído!", "¡No se te escapó!", "¡Lo lograste!"];
+
+    /** Presentación de cada ronda; la dice Zoe o Zeus (no hay texto en el canvas). */
+    const INTRO_RONDA = {
+        paseo: "¡Vamos de paseo por la granja! Escucha quién suena y síguelo con los ojos.",
+        corral: "¡Ahora están en el corral y se mueven rápido!",
+        pajar: "¡Cuidado! Se esconden detrás de la paja.",
+        todos: "¡Llegó la vaca y todos caminan! Síguelo bien.",
+        granero: "¡Al granero! Mira cómo se asoma por la ventanita."
+    };
+
+    let modoEscondite = false;
+    let rondas = [];
+    let indiceRonda = 0;
+    let erroresRonda = 0;
+    let repeticion = null;
+    let vozActiva = false;
+    let esconditeListo = null;
+
+    function E() { return window.PedniaGranja; }
+
+    function esMayor() {
+        return /5\s*-?\s*6/.test(String((nivelElegido && nivelElegido.edad) || ""));
+    }
+
+    function asegurarEscondite() {
+        if (!window.PedniaGranja || !window.PedniaPhaserHost) return Promise.resolve(false);
+        if (E().listo()) return Promise.resolve(true);
+        if (esconditeListo) return esconditeListo;
+        esconditeListo = E().montar({
+            gameConfig: gameConfig,
+            callbacks: {
+                puedeTocar: function () {
+                    return modoEscondite && !demoActiva && !juegoTerminado && (fase === "jugar" || fase === "escuchando");
+                },
+                onAcierto: function (id) { aciertoEscondite(id); },
+                onError: function (id, info) { errorEscondite(id, info); }
+            }
+        }).then(function () { return true; }).catch(function (err) {
+            console.error("[ElSonidoViajero] granja:", err);
+            esconditeListo = null;
+            return false;
+        });
+        return esconditeListo;
+    }
+
+    const SONIDOS_INSTRUMENTO = ["campana", "triangulo", "tambor", "trompeta", "pandereta", "maracas"];
+    const SONIDOS_ANIMAL = ["ladrido", "maullido", "trino", "mugido", "quiquiriqui"];
+
+    function categoria(id) {
+        const s = elemento(id).sonido;
+        if (SONIDOS_INSTRUMENTO.indexOf(s) !== -1) return "instrumento";
+        if (SONIDOS_ANIMAL.indexOf(s) !== -1) return "animal";
+        return "otro";
+    }
+
+    /** Animales nuevos del catálogo: en 5-6 de la misma familia (más parecidos). */
+    function elegirExtras(n, objetivoId, r) {
+        if (n <= 0) return [];
+        const demo = (gameConfig.demo || {}).elemento;
+        const sonidoObj = elemento(objetivoId).sonido;
+        const familia = categoria(objetivoId);
+        const pool = L.mezclar(Object.keys(gameConfig.elementos || {}).filter(function (id) {
+            return r.elementos.indexOf(id) === -1 && id !== demo &&
+                elemento(id).img && elemento(id).sonido !== sonidoObj;
+        }));
+        pool.sort(function (a, b) {
+            const pa = (categoria(a) === familia) === esMayor() ? 0 : 1;
+            const pb = (categoria(b) === familia) === esMayor() ? 0 : 1;
+            return pa - pb;
+        });
+        return pool.slice(0, n);
+    }
+
+    /**
+     * Cuatro paseos. El reto es "azar": en cada paseo suena un animal distinto. El documento:
+     * suena, después de un momento cambia de posición y hay que seguirlo y tocarlo.
+     *   1 paseo  → caminan despacio (reto del documento)
+     *   2 corral → juntos en el corral, más rápido
+     *   3 pajar  → se esconde detrás de un fardo de paja
+     *   4 todos  → llega la vaca y todos caminan
+     */
+    function planRondas() {
+        const r = nivelElegido.retos[0];
+        const objs = r.correcto === "azar" ? L.mezclar(r.elementos).slice(0, 4) : [r.correcto, r.correcto, r.correcto, r.correcto];
+        while (objs.length < 4) objs.push(objs[objs.length - 1]);
+        // La vaca llega a la granja en el último paseo (aunque sea el animal de la demostración).
+        const extra = elemento("vaca").img && r.elementos.indexOf("vaca") === -1 ? ["vaca"] : elegirExtras(1, objs[3], r);
+        return [
+            { objetivo: objs[0], modo: "paseo", elementos: r.elementos.slice(), intro: "paseo" },
+            { objetivo: objs[1], modo: "corral", elementos: r.elementos.slice(), intro: "corral" },
+            { objetivo: objs[2], modo: "pajar", elementos: r.elementos.slice(), intro: "pajar" },
+            { objetivo: objs[3], modo: "todos", elementos: r.elementos.concat(extra), intro: "todos" }
+        ];
+    }
+
+    let viajeTimer = null;
+
+    /** Documento: "después de un momento, el elemento cambia de posición". */
+    function programarViaje(gen) {
+        clearTimeout(viajeTimer);
+        viajeTimer = setTimeout(function () {
+            if (fase === "jugar" && vivo(gen)) E().viajar();
+        }, 1800);
+    }
+
+    /** El sonido sale de donde está el animal en ese momento (si camina, lo sigue). */
+    function sonarObjetivo(o) {
+        return reproducirSonido(objetivo, Object.assign({ pan: E().panDe(objetivo) || 0 }, o || {}));
+    }
+
+    function detenerRepeticion() {
+        clearInterval(repeticion);
+        repeticion = null;
+        clearTimeout(viajeTimer);
+    }
+
+    async function iniciarRonda(gen) {
+        if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
+        if (!vivo(gen)) return;
+        reto = nivelElegido.retos[0];
+        const ronda = rondas[indiceRonda];
+        if (!reto || !ronda) {
+            cierreEscondite(gen);
+            return;
+        }
+        objetivo = ronda.objetivo;
+        fase = "presentacion";
+        erroresRonda = 0;
+        detenerRepeticion();
+        cancelarPista();
+        pintarProgreso(indiceRonda);
+        habilitarEscuchar(false);
+        $id("btn-escuchar").classList.remove("invita");
+
+        const listos = E().prepararRonda({
+            elementos: ronda.elementos,
+            objetivo: objetivo,
+            modo: ronda.modo,
+            dificultad: esMayor() ? "56" : "34",
+            ronda: indiceRonda
+        });
+        if (ronda.intro) await decir({ voz: indiceRonda % 2 ? "zeus" : "zoe", texto: INTRO_RONDA[ronda.intro] }, { minMs: 1200 });
+        await listos;
+        if (!vivo(gen) || fase !== "presentacion") return;
+        fase = "jugar";
+        habilitarEscuchar(true);
+        E().jugar();
+        sonarObjetivo();
+        programarViaje(gen);
+        // Vuelve a sonar cada tanto desde donde quedó.
+        repeticion = setInterval(function () {
+            if (fase === "jugar" && !vozActiva && vivo(gen)) sonarObjetivo({ breve: true });
+        }, 5000);
+        programarPista(pistaEscuchar, 9000);
+    }
+
+    async function aciertoEscondite(id) {
+        const gen = rondaGen;
+        fase = "animando";
+        detenerRepeticion();
+        cancelarPista();
+        tokenDialogo += 1;
+        TextoVoz.detener();
+        detenerSonido();
+        habilitarEscuchar(false);
+        E().resaltar(id, false);
+        const a = reto.acierto || {};
+        // Documento: el elemento se detiene, se reproduce el sonido y hay animación especial.
+        await Promise.all([E().celebrar(id), repetirSonido(a)]);
+        if (!vivo(gen)) return;
+        efecto(a.sonido || "recompensa");
+        const texto = indiceRonda === 0 && a.texto ? a.texto : FRASES_ACIERTO[indiceRonda % FRASES_ACIERTO.length];
+        await decir({ voz: a.voz || "zoe", texto: texto }, { estado: "acierto", minMs: 900 });
+        if (!vivo(gen)) return;
+        // Premio de este juego: el animal entra al granero y se asoma por una ventanita.
+        const subir = E().guardarEnGranero(id);
+        if (indiceRonda === 0) await decir({ voz: "zoe", texto: INTRO_RONDA.granero }, { minMs: 600 });
+        await subir;
+        if (!vivo(gen)) return;
+        pintarProgreso(indiceRonda + 1);
+        indiceRonda += 1;
+        iniciarRonda(gen);
+    }
+
+    /** Sin castigo: el animal equivocado salta y suena como es; luego se repite el ejercicio. */
+    async function errorEscondite(id, info) {
+        if (fase !== "jugar" && fase !== "escuchando") return;
+        const gen = rondaGen;
+        erroresRonda += 1;
+        cancelarPista();
+        // Pistas suaves: tras dos intentos el animal da un salto donde está; tras tres, brilla.
+        if (erroresRonda >= 2) E().pista(objetivo);
+        if (erroresRonda >= 3) E().resaltar(objetivo, true);
+        vozActiva = true;
+        await reproducirSonido(id, { breve: true, pan: info && info.pan });
+        if (!vivo(gen) || fase === "animando") { vozActiva = false; return; }
+        if (reto.error && erroresRonda % 2 === 1) await decir(reto.error);
+        else efecto("suave");
+        vozActiva = false;
+        if (!vivo(gen) || fase === "animando") return;
+        // Documento: si se equivoca, se repite el ejercicio: vuelven a su lugar, suena y viaja otra vez.
+        await E().volverInicio();
+        if (!vivo(gen) || fase !== "jugar") return;
+        sonarObjetivo();
+        programarViaje(gen);
+        $id("btn-escuchar").classList.add("invita");
+        programarPista(pistaEscuchar, 8000);
+    }
+
+    async function iniciarDemoEscondite(gen) {
+        const d = gameConfig.demo || {};
+        if (!d.elemento || !elemento(d.elemento).img || !window.PedniaTutorial) {
+            iniciarRonda(gen);
+            return;
+        }
+        demoActiva = true;
+        fase = "";
+        await PedniaTutorial.activarDemo();
+        const t = textos();
+        habilitarEscuchar(true);
+        E().demo(d.elemento);
+        await decir({ voz: "zoe", texto: t.demostracion }, { minMs: 2500 });
+        if (!vivo(gen) || !demoActiva) return;
+        const cancelado = function () { return !demoActiva || !vivo(gen); };
+        const btn = $id("btn-escuchar");
+        let sonando = Promise.resolve();
+        await PedniaTutorial.animarMano({
+            punto: btn,
+            holdMs: 500,
+            cancelado: cancelado,
+            onPresionar: function () {
+                reiniciarClase(btn, "pulsa", 500);
+                sonando = reproducirSonido(d.elemento, { pan: E().panDe(d.elemento) });
+            }
+        });
+        await sonando;
+        if (!vivo(gen) || !demoActiva) return;
+        await PedniaTutorial.animarMano({
+            punto: function () { return E().rectDe(d.elemento); },
+            holdMs: 500,
+            cancelado: cancelado,
+            onPresionar: function () {
+                efecto("recompensa");
+                E().celebrar(d.elemento);
+            }
+        });
+        if (!vivo(gen) || !demoActiva) return;
+        await decir({ voz: "zoe", texto: t.demostracionAcierto }, { estado: "acierto", minMs: 1800 });
+        if (!vivo(gen)) return;
+        await decir({ voz: "zoe", texto: t.demostracionFin }, { minMs: 1500 });
+        detenerDemo();
+        if (!vivo(gen)) return;
+        await E().limpiarDemo();
+        indiceRonda = 0;
+        iniciarRonda(gen);
+    }
+
+    async function cierreEscondite(gen) {
+        fase = "";
+        juegoTerminado = true;
+        detenerRepeticion();
+        cancelarPista();
+        habilitarEscuchar(false);
+        celebrarPersonajes(true);
+        efecto("celebracion");
+        await E().fiestaFinal();
+        if (gen !== rondaGen) return;
+        mostrarCierre();
+    }
 
     /* ── Escenario ────────────────────────────────────────────── */
 
@@ -634,7 +921,7 @@
 
     function pintarProgreso(actual) {
         const cont = $id("progreso");
-        const total = (nivelElegido.retos || []).length;
+        const total = modoEscondite ? rondas.length : (nivelElegido.retos || []).length;
         if (cont.children.length !== total) {
             cont.innerHTML = "";
             for (let i = 0; i < total; i++) {
@@ -673,7 +960,7 @@
         tokenDialogo += 1;
         TextoVoz.detener();
         $id("btn-escuchar").classList.remove("invita");
-        await reproducirSonido(objetivo);
+        await (modoEscondite ? sonarObjetivo() : reproducirSonido(objetivo, {}));
         if (!vivo(gen) || fase !== "escuchando") return;
         fase = "jugar";
         programarPista(pistaEscuchar, 8000);
@@ -962,7 +1249,9 @@
     /** "Se reproduce nuevamente": breve o completo según el reto; sin repetición solo una pausa. */
     function repetirSonido(a) {
         if (!a.repetir) return sleep(500);
-        return reproducirSonido(objetivo, { breve: a.repetir === "breve" });
+        const o = { breve: a.repetir === "breve" };
+        if (modoEscondite) o.pan = E().panDe(objetivo);
+        return reproducirSonido(objetivo, o);
     }
 
     /** Alterna la imagen con alas arriba mientras canta; devuelve la función que lo detiene. */
