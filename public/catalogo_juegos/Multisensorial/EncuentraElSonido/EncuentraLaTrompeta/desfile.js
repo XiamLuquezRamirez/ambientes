@@ -728,7 +728,8 @@
         demo: function (id) {
             this.destruirCarrozas();
             var c = this.crearCarroza(id, 0, CARROZA[0]);
-            c.x = this.scale.width / 2;
+            // A un lado: abajo al centro están el botón de escuchar y la mano del tutorial.
+            c.x = this.scale.width * 0.3;
             c.cont.x = c.x;
             this.carrozas.push(c);
             this.carriles[0] = { i: 0, dir: 1, vel: 0, base: 0, largo: 1e9, W: c.W, parado: true };

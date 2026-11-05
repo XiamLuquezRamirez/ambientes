@@ -636,27 +636,35 @@
             });
     };
 
-    /* ── Escondite sonoro (juego por rondas en Phaser) ────────── */
+    /* ── "La expedición": escuchar, buscar mirando a los lados y tocar (Phaser) ── */
 
-    const FRASES_ACIERTO = ["¡Ahí estaba!", "¡Muy buen oído!", "¡Lo encontraste!", "¡Lo descubriste!"];
+    const FRASES_ACIERTO = ["¡Lo encontraste!", "¡Qué buen explorador!", "¡Muy buen oído!", "¡Lo lograste!"];
+
+    /** Presentación de cada ronda; la dice Zoe o Zeus (no hay texto en el canvas). */
+    const INTRO_RONDA = {
+        selva: "¡Empieza la expedición en la selva! Arrastra el paisaje para mirar a los lados.",
+        desierto: "¡Llegamos al desierto! Escucha de qué lado viene el sonido.",
+        cueva: "¡Entramos a una cueva oscura! Busca con cuidado.",
+        cima: "¡La cima de la montaña! Es la última parada.",
+        mapa: "¡Lo marcamos en el mapa de la expedición!"
+    };
 
     let modoEscondite = false;
     let rondas = [];
     let indiceRonda = 0;
     let erroresRonda = 0;
     let repeticion = null;
-    let ultimoSonidoAuto = 0;
     let vozActiva = false;
     let esconditeListo = null;
 
-    function E() { return window.PedniaEscondite; }
+    function E() { return window.PedniaExpedicion; }
 
     function esMayor() {
         return /5\s*-?\s*6/.test(String((nivelElegido && nivelElegido.edad) || ""));
     }
 
     function asegurarEscondite() {
-        if (!window.PedniaEscondite || !window.PedniaPhaserHost) return Promise.resolve(false);
+        if (!window.PedniaExpedicion || !window.PedniaPhaserHost) return Promise.resolve(false);
         if (E().listo()) return Promise.resolve(true);
         if (esconditeListo) return esconditeListo;
         esconditeListo = E().montar({
@@ -665,13 +673,11 @@
                 puedeTocar: function () {
                     return modoEscondite && !demoActiva && !juegoTerminado && (fase === "jugar" || fase === "escuchando");
                 },
-                onAsoma: alAsomarse,
                 onAcierto: function (id) { aciertoEscondite(id); },
-                onError: function (id, info) { errorEscondite(id, info); },
-                onToqueEscondite: alTocarEscondite
+                onError: function (id, info) { errorEscondite(id, info); }
             }
         }).then(function () { return true; }).catch(function (err) {
-            console.error("[EncuentraElSonido] escondite:", err);
+            console.error("[MisionFinalDondeEsta] expedicion:", err);
             esconditeListo = null;
             return false;
         });
@@ -681,15 +687,6 @@
     const SONIDOS_INSTRUMENTO = ["campana", "triangulo", "tambor", "trompeta", "pandereta", "maracas"];
     const SONIDOS_ANIMAL = ["ladrido", "maullido", "trino", "mugido", "quiquiriqui"];
 
-    /** Presentación corta de cada forma de jugar (sin texto en el canvas: la dice Zoe). */
-    const INTRO_RONDA = {
-        mas: "¡Llegaron más amigos a esconderse!",
-        escucha: "¡Ahora nadie se asoma! Escucha bien y toca el escondite de donde viene el sonido.",
-        vuela: "¡Ahora vuela de un escondite a otro! Síguelo con los ojos.",
-        corre: "¡Ahora corre de un escondite a otro! Síguelo con los ojos.",
-        final: "¡Misión final! Encuéntralo una vez más."
-    };
-
     function categoria(id) {
         const s = elemento(id).sonido;
         if (SONIDOS_INSTRUMENTO.indexOf(s) !== -1) return "instrumento";
@@ -697,10 +694,7 @@
         return "otro";
     }
 
-    /**
-     * Distractores nuevos del catálogo para la ronda "llegaron más amigos". En 5-6 se parecen
-     * al objetivo (misma familia de sonidos), como pide el documento; en 3-4 son distintos.
-     */
+    /** Cosas nuevas del catálogo: en 5-6 de la misma familia que el objetivo (más parecidas). */
     function elegirExtras(n, objetivoId, r) {
         if (n <= 0) return [];
         const demo = (gameConfig.demo || {}).elemento;
@@ -719,85 +713,34 @@
     }
 
     /**
-     * Arco de rondas: el objetivo fijo ("¿Dónde está el pájaro?") se busca en todas, pero
-     * cada ronda cambia la forma de encontrarlo:
-     *   asoma   → el reto del documento tal cual (se asoman a ratos)
-     *   más     → llegan distractores nuevos y se asoman más rápido
-     *   escucha → nadie se asoma: se ubica solo por el oído
-     *   vuela   → el objetivo cambia de escondite a la vista
-     *   final   → (5-6) vuela + un distractor más
-     * Con "azar" el objetivo además rota entre los elementos del reto.
+     * Cuatro regiones de la expedición. El reto es "azar" con 5 elementos (el documento: el
+     * escenario más complejo); en cada región suena uno distinto y está en otro sitio:
+     *   1 selva    → paisaje de 1,6 pantallas
+     *   2 desierto → 1,9 pantallas
+     *   3 cueva    → 2,1 pantallas, en penumbra
+     *   4 cima     → 2,4 pantallas y una cosa más
      */
     function planRondas() {
         const r = nivelElegido.retos[0];
-        const n = r.elementos.length;
-        let modos;
-        if (r.tipo === "zonas") {
-            // Cuatro zonas fijas: se alterna mirar y solo escuchar.
-            modos = [{ modo: "asoma" }, { modo: "escucha", intro: "escucha" }, { modo: "asoma" },
-                { modo: "escucha" }, { modo: "asoma", intro: "final" }];
-        } else if (esMayor()) {
-            modos = [{ modo: "asoma" }, { modo: "asoma", extras: 2, intro: "mas" },
-                { modo: "escucha", intro: "escucha" }, { modo: "vuela", intro: "vuela" },
-                { modo: "vuela", extras: 1, intro: "final" }];
-        } else {
-            modos = [{ modo: "asoma" }, { modo: "asoma", extras: 1, intro: "mas" },
-                { modo: "escucha", intro: "escucha" }, { modo: "vuela", intro: "vuela" }];
-        }
-        modos = modos.slice(0, esMayor() ? 5 : 4);
-
-        let objetivos;
-        if (r.correcto !== "azar") {
-            objetivos = modos.map(function () { return r.correcto; });
-        } else {
-            const primero = L.elegirCorrecto(r);
-            objetivos = [primero].concat(L.mezclar(r.elementos.filter(function (id) { return id !== primero; })));
-            while (objetivos.length < modos.length) {
-                const op = L.mezclar(r.elementos).filter(function (id) { return id !== objetivos[objetivos.length - 1]; });
-                objetivos.push(op[0]);
-            }
-        }
-
-        return modos.map(function (m, i) {
-            const viaja = m.modo === "vuela" || (i === 0 && r.tipo === "viajero");
-            const maxExtras = Math.max(0, 7 - n - (viaja ? 2 : 0));
-            const extras = r.tipo === "zonas" ? [] : elegirExtras(Math.min(m.extras || 0, maxExtras), objetivos[i], r);
-            let intro = m.intro || null;
-            if (intro === "vuela" && !elemento(objetivos[i]).imgAlas) intro = "corre";
-            return {
-                objetivo: objetivos[i],
-                modo: m.modo,
-                // La primera ronda es el reto del documento con su tipo (buscar/zonas/viajero).
-                tipo: i === 0 || r.tipo === "zonas" ? r.tipo : "buscar",
-                elementos: r.elementos.concat(extras),
-                intro: intro
-            };
-        });
+        const objs = r.correcto === "azar" ? L.mezclar(r.elementos).slice(0, 4) : [r.correcto, r.correcto, r.correcto, r.correcto];
+        while (objs.length < 4) objs.push(objs[objs.length - 1]);
+        const extra = elegirExtras(1, objs[3], r);
+        return [
+            { objetivo: objs[0], modo: "selva", elementos: r.elementos.slice(), intro: "selva" },
+            { objetivo: objs[1], modo: "desierto", elementos: r.elementos.slice(), intro: "desierto" },
+            { objetivo: objs[2], modo: "cueva", elementos: r.elementos.slice(), intro: "cueva" },
+            { objetivo: objs[3], modo: "cima", elementos: r.elementos.concat(extra), intro: "cima" }
+        ];
     }
 
+    /** El sonido sale del lado donde está respecto de lo que se mira (aunque no se vea). */
     function sonarObjetivo(o) {
-        const pan = E().panDe(objetivo) || 0;
-        return reproducirSonido(objetivo, Object.assign({ pan: pan }, o || {}));
+        return reproducirSonido(objetivo, Object.assign({ pan: E().panDe(objetivo) || 0 }, o || {}));
     }
 
     function detenerRepeticion() {
         clearInterval(repeticion);
         repeticion = null;
-    }
-
-    /** 3-4: el sonido suena cuando su dueño se asoma (escuchar y ver van juntos). */
-    function alAsomarse(id) {
-        if (esMayor() || fase !== "jugar" || id !== objetivo || vozActiva) return;
-        if (Date.now() - ultimoSonidoAuto < 2600) return;
-        ultimoSonidoAuto = Date.now();
-        sonarObjetivo({ breve: true });
-    }
-
-    /** Frío o caliente: tocar un escondite hace sonar el objetivo más fuerte si está cerca. */
-    function alTocarEscondite(info) {
-        if (fase !== "jugar") return;
-        efecto("crujido");
-        reproducirSonido(objetivo, { breve: true, pan: info.pan, vol: 0.2 + 0.8 * info.cercania });
     }
 
     async function iniciarRonda(gen) {
@@ -818,18 +761,9 @@
         habilitarEscuchar(false);
         $id("btn-escuchar").classList.remove("invita");
 
-        // Con objetivo fijo, lo que se encuentra vuelve a su hogar (nido, casita, caja…).
-        if (indiceRonda === 0 && reto.correcto !== "azar") E().crearHogar(reto.correcto, rondas.length);
-
-        if (ronda.intro === "final") {
-            efecto("magia");
-            await E().cartel("¡Misión final!", "#f76707");
-            if (!vivo(gen)) return;
-        }
         const listos = E().prepararRonda({
             elementos: ronda.elementos,
             objetivo: objetivo,
-            tipo: ronda.tipo,
             modo: ronda.modo,
             dificultad: esMayor() ? "56" : "34",
             ronda: indiceRonda
@@ -840,16 +774,11 @@
         fase = "jugar";
         habilitarEscuchar(true);
         E().jugar();
-        ultimoSonidoAuto = Date.now();
         sonarObjetivo();
-        // Solo se escucha: el sonido es la única pista, suena seguido. 5-6: se repite solo.
-        // 3-4 (asoma/vuela): suena cuando su dueño se asoma (alAsomarse).
-        const cada = ronda.modo === "escucha" ? 3200 : (esMayor() ? 6500 : 0);
-        if (cada) {
-            repeticion = setInterval(function () {
-                if (fase === "jugar" && !vozActiva && vivo(gen)) sonarObjetivo(ronda.modo === "escucha" ? { breve: true } : {});
-            }, cada);
-        }
+        // Vuelve a sonar cada tanto: al mirar a los lados, el sonido cambia de lado.
+        repeticion = setInterval(function () {
+            if (fase === "jugar" && !vozActiva && vivo(gen)) sonarObjetivo({ breve: true });
+        }, 4000);
         programarPista(pistaEscuchar, 9000);
     }
 
@@ -864,33 +793,34 @@
         habilitarEscuchar(false);
         E().resaltar(id, false);
         const a = reto.acierto || {};
-        await Promise.all([E().celebrar(id, a.efecto), repetirSonido(a)]);
+        // Documento: lo elegido se anima, suena otra vez y Zoe y Zeus aparecen celebrando.
+        celebrarPersonajes(true);
+        await Promise.all([E().celebrar(id), repetirSonido(a)]);
         if (!vivo(gen)) return;
         efecto(a.sonido || "recompensa");
-        // La primera ronda dice la frase del documento; luego varía para no repetirse.
-        const texto = indiceRonda === 0 && a.texto
-            ? a.texto
-            : FRASES_ACIERTO[indiceRonda % FRASES_ACIERTO.length];
+        const texto = indiceRonda === 0 && a.texto ? a.texto : FRASES_ACIERTO[indiceRonda % FRASES_ACIERTO.length];
         await decir({ voz: a.voz || "zoe", texto: texto }, { estado: "acierto", minMs: 900 });
         if (!vivo(gen)) return;
-        await E().guardarAmigo(id);
+        celebrarPersonajes(false);
+        // Premio de este juego: lo encontrado queda sellado en el mapa de la expedición.
+        const subir = E().marcarMapa(id);
+        if (indiceRonda === 0) await decir({ voz: "zeus", texto: INTRO_RONDA.mapa }, { minMs: 600 });
+        await subir;
         if (!vivo(gen)) return;
         pintarProgreso(indiceRonda + 1);
         indiceRonda += 1;
         iniciarRonda(gen);
     }
 
-    /** Sin castigo: el elemento equivocado se presenta con su propio sonido y se vuelve a esconder. */
+    /** Sin castigo: lo tocado salta y suena como es; no se quitan opciones (documento). */
     async function errorEscondite(id, info) {
         if (fase !== "jugar" && fase !== "escuchando") return;
         const gen = rondaGen;
         erroresRonda += 1;
         cancelarPista();
-        const ronda = rondas[indiceRonda] || {};
-        // Documento: en el sonido viajero, un error repite el ejercicio desde el inicio.
-        if (ronda.tipo === "viajero") E().volverInicio();
-        // Solo se escucha: tras dos intentos, el objetivo se asoma un momento como pista.
-        if (ronda.modo === "escucha" && erroresRonda >= 2) E().asomarObjetivo();
+        // Pistas suaves: tras dos intentos la vista gira hacia el objetivo y este salta;
+        // tras tres, brilla.
+        if (erroresRonda >= 2) E().pista(objetivo);
         if (erroresRonda >= 3) E().resaltar(objetivo, true);
         vozActiva = true;
         await reproducirSonido(id, { breve: true, pan: info && info.pan });
@@ -937,7 +867,7 @@
             cancelado: cancelado,
             onPresionar: function () {
                 efecto("recompensa");
-                E().celebrar(d.elemento, "anima");
+                E().celebrar(d.elemento);
             }
         });
         if (!vivo(gen) || !demoActiva) return;
@@ -1015,7 +945,7 @@
         tokenDialogo += 1;
         TextoVoz.detener();
         $id("btn-escuchar").classList.remove("invita");
-        await reproducirSonido(objetivo, modoEscondite ? { pan: E().panDe(objetivo) } : {});
+        await (modoEscondite ? sonarObjetivo() : reproducirSonido(objetivo, {}));
         if (!vivo(gen) || fase !== "escuchando") return;
         fase = "jugar";
         programarPista(pistaEscuchar, 8000);

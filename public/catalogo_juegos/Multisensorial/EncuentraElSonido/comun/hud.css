@@ -1,0 +1,91 @@
+/*
+ * Encuentra el Sonido: diálogo de Zoe y Zeus como globo compacto.
+ * Antes era una barra blanca de 900 px × 92 px arriba al centro que tapaba el escenario
+ * y quedaba vacía cuando nadie hablaba. Se carga después de style.css.
+ */
+
+.cabecera {
+    justify-content: flex-start;
+    padding: 12px 0 0 14px !important;
+    pointer-events: none;
+}
+
+.dialogo {
+    --globo: #fff0f6;
+    --borde: #f783ac;
+    position: relative;
+    width: auto;
+    max-width: min(520px, calc(100vw - 170px));
+    min-height: 0;
+    gap: 10px;
+    padding: 6px 18px 6px 6px;
+    border: 0;
+    border-radius: 30px;
+    background: linear-gradient(180deg, #fff 0%, var(--globo) 100%);
+    box-shadow: 0 4px 0 var(--borde), 0 12px 22px rgba(0, 0, 0, 0.18);
+    transform-origin: 30px 100%;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: auto;
+}
+
+/* Nombre de quien habla, en una etiqueta de su color (el avatar se oculta en el modo 3D). */
+.dialogo::before {
+    content: "Zoe";
+    position: absolute;
+    left: 18px;
+    top: -11px;
+    padding: 1px 10px;
+    border-radius: 999px;
+    background: var(--borde);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.dialogo[data-voz="zeus"]::before {
+    content: "Zeus";
+}
+
+body.personajes-3d .dialogo {
+    padding: 12px 20px 10px;
+}
+
+.dialogo[data-voz="zeus"] {
+    --globo: #fff9db;
+    --borde: #fab005;
+    border: 0;
+}
+
+.dialogo.es-acierto {
+    --globo: #ebfbee;
+    --borde: #40c057;
+    border: 0;
+    background: linear-gradient(180deg, #fff 0%, var(--globo) 100%);
+}
+
+.dialogo-avatar {
+    width: 46px;
+    height: 46px;
+    background: #fff;
+    box-shadow: 0 0 0 3px var(--borde);
+}
+
+.enunciado {
+    font-size: clamp(14px, 1.25vw, 17px);
+    line-height: 1.3;
+    color: #343a40;
+}
+
+/* Si nadie habla, el globo se esconde (no queda una barra vacía). */
+.dialogo:has(.enunciado:empty) {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.92);
+    pointer-events: none;
+}
+
+@media (max-width: 640px) {
+    .dialogo { max-width: calc(100vw - 130px); }
+    .dialogo-avatar { width: 38px; height: 38px; }
+}

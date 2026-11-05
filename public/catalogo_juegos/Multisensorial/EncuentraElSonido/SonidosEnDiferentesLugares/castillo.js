@@ -127,9 +127,55 @@
         create: function () {
             this.cielo = this.add.graphics().setDepth(-30);
             this.estrellasNoche = this.add.graphics().setDepth(-29).setAlpha(0);
+            // Sol (de día) y luna (de noche).
+            this.sol = this.add.container(0, 0).setDepth(-29);
+            this.sol.add(this.add.circle(0, 0, 60, 0xfff3bf, 0.45));
+            this.sol.add(this.add.circle(0, 0, 40, 0xffd43b, 1));
+            // La luna va sobre el velo de la noche (no tapa el castillo: está a la izquierda).
+            this.luna = this.add.container(0, 0).setDepth(8.5).setAlpha(0);
+            this.luna.add(this.add.circle(0, 0, 54, 0xfff9db, 0.18));
+            this.luna.add(this.add.circle(0, 0, 34, 0xfff3bf, 1));
+            // Luna llena con cráteres suaves.
+            this.luna.add(this.add.circle(-10, -8, 7, 0xffe8a3, 1));
+            this.luna.add(this.add.circle(9, 6, 9, 0xffe8a3, 1));
+            this.luna.add(this.add.circle(12, -13, 4, 0xffe8a3, 1));
+            this.montanas = this.add.graphics().setDepth(-28);
+            this.nubes = [];
+            for (var i = 0; i < 4; i++) {
+                var n = this.add.container(0, 0).setDepth(-27);
+                n.add(this.add.circle(-30, 8, 22, 0xffffff, 0.95));
+                n.add(this.add.circle(0, -6, 32, 0xffffff, 0.95));
+                n.add(this.add.circle(32, 8, 21, 0xffffff, 0.95));
+                n.vel = 6 + i * 3;
+                n.base = [0.08, 0.36, 0.62, 0.9][i];
+                n.alto = [0.12, 0.2, 0.08, 0.17][i];
+                this.nubes.push(n);
+            }
+            this.pajaros = [];
+            for (var j = 0; j < 3; j++) {
+                var pj = this.add.graphics().setDepth(-26);
+                pj.fase = j * 1.7;
+                pj.vel = 30 + j * 12;
+                pj.alto = 0.22 + j * 0.06;
+                this.pajaros.push(pj);
+            }
+            this.campo = this.add.graphics().setDepth(-20);
+            this.agua = this.add.graphics().setDepth(-11);
             this.muro = this.add.graphics().setDepth(-10);
             this.puente = this.add.graphics().setDepth(-9);
             this.noche = this.add.rectangle(0, 0, 10, 10, 0x0b1730, 0).setOrigin(0).setDepth(8);
+            // Antorchas junto a la puerta: brillan por encima de la noche.
+            this.antorchas = [0, 1].map(function () {
+                var c = this.add.container(0, 0).setDepth(9);
+                var halo = this.add.circle(0, -10, 34, 0xffd43b, 0.18);
+                var llama = this.add.ellipse(0, -10, 14, 22, 0xff922b);
+                var centro = this.add.ellipse(0, -7, 7, 12, 0xffe066);
+                var palo = this.add.rectangle(0, 8, 6, 22, 0x5c3d1e);
+                c.add([halo, palo, llama, centro]);
+                c.llama = llama;
+                c.halo = halo;
+                return c;
+            }, this);
             this.dibujar();
             var scene = this;
             this.scale.on('resize', function () { scene.dibujar(); scene.reubicar(); });
@@ -139,6 +185,17 @@
                 readyResolve = null;
             }
             this.input.on('pointerdown', this.alTocar, this);
+        },
+
+        /** De día o de noche: sol/luna, nubes y estrellas, y el brillo de las antorchas. */
+        ponerNoche: function (si, ms) {
+            var d = reducido() ? 1 : (ms || 800);
+            this.esNoche = !!si;
+            this.tweens.add({ targets: this.noche, fillAlpha: si ? 0.55 : 0, duration: d });
+            this.tweens.add({ targets: this.estrellasNoche, alpha: si ? 1 : 0, duration: d });
+            this.tweens.add({ targets: this.sol, alpha: si ? 0 : 1, duration: d });
+            this.tweens.add({ targets: this.luna, alpha: si ? 1 : 0, duration: d });
+            this.tweens.add({ targets: this.nubes, alpha: si ? 0.25 : 1, duration: d });
         },
 
         shutdown: function () {
@@ -166,74 +223,231 @@
             var m = this.medidas();
             var w = m.w;
             var h = m.h;
+            var scene = this;
+            var k;
+
+            // Cielo en degradado.
             var g = this.cielo;
             g.clear();
-            g.fillStyle(0x74c0fc, 1);
-            g.fillRect(0, 0, w, h);
-            g.fillStyle(0xa5d8ff, 1);
-            g.fillRect(0, h * 0.4, w, h * 0.3);
-            g.fillStyle(0x8ce99a, 1);
-            g.fillEllipse(w * 0.15, h * 0.8, w * 0.6, h * 0.3);
-            g.fillEllipse(w * 0.85, h * 0.8, w * 0.6, h * 0.3);
-            g.fillStyle(0x51cf66, 1);
-            g.fillRect(0, m.base, w, h - m.base);
-            // Foso.
-            g.fillStyle(0x339af0, 1);
-            g.fillRect(m.izq - 30, m.base, m.ancho + 60, h * 0.05);
+            for (var b = 0; b < 18; b++) {
+                var c0 = Phaser.Display.Color.Interpolate.ColorWithColor(
+                    Phaser.Display.Color.ValueToColor(0x4dabf7), Phaser.Display.Color.ValueToColor(0xd0ebff), 100, Math.round(b / 17 * 100));
+                g.fillStyle(Phaser.Display.Color.GetColor(c0.r, c0.g, c0.b), 1);
+                g.fillRect(0, (h * 0.7 / 18) * b - 1, w, h * 0.7 / 18 + 2);
+            }
+            g.fillStyle(0xd0ebff, 1);
+            g.fillRect(0, h * 0.7, w, h * 0.3);
+            this.sol.setPosition(w * 0.08, h * 0.32).setScale(Math.max(0.7, h / 800));
+            this.luna.setPosition(w * 0.08, h * 0.32).setScale(Math.max(0.7, h / 800));
+            this.nubes.forEach(function (n) {
+                if (!n.listo) { n.x = w * n.base; n.listo = true; }
+                n.y = h * n.alto + h * 0.1;
+                n.setScale(Math.min(1.3, w / 1000));
+            });
             var e = this.estrellasNoche;
             e.clear();
             e.fillStyle(0xffffff, 1);
-            for (var s = 0; s < 40; s++) e.fillCircle(((s * 83) % 100) / 100 * w, ((s * 41) % 100) / 100 * h * 0.45, 1.5 + (s % 3) * 0.6);
+            for (var s = 0; s < 50; s++) e.fillCircle(((s * 83) % 100) / 100 * w, ((s * 41) % 100) / 100 * h * 0.5, 1.2 + (s % 3) * 0.7);
             this.noche.setSize(w, h);
 
-            // Castillo: muro central, dos torres grandes a los lados y dos torrecitas al centro.
+            // Montañas lejanas con nieve y colinas con arbolitos.
+            var mo = this.montanas;
+            mo.clear();
+            var horiz = m.base - h * 0.06;
+            [[0.0, 0.42, 0x9fb3e8], [0.22, 0.5, 0xb0c4f0], [0.55, 0.46, 0x9fb3e8], [0.8, 0.52, 0xb0c4f0]].forEach(function (p) {
+                var x = w * p[0];
+                var ancho = w * 0.42;
+                var cima = horiz - h * p[1] * 0.7;
+                mo.fillStyle(p[2], 1);
+                mo.fillTriangle(x - ancho * 0.1, horiz, x + ancho * 0.4, cima, x + ancho * 0.9, horiz);
+                mo.fillStyle(0xffffff, 0.95);
+                mo.fillTriangle(x + ancho * 0.31, cima + h * 0.06, x + ancho * 0.4, cima, x + ancho * 0.49, cima + h * 0.06);
+            });
+            mo.fillStyle(0x8ce99a, 1);
+            mo.fillEllipse(w * 0.12, horiz + h * 0.02, w * 0.7, h * 0.22);
+            mo.fillEllipse(w * 0.9, horiz + h * 0.02, w * 0.7, h * 0.2);
+            for (k = 0; k < 9; k++) {
+                var ax = w * (0.03 + k * 0.12) + ((k * 37) % 20);
+                if (ax > m.izq - 20 && ax < m.der + 20) continue;
+                var ay = horiz - h * 0.01 - ((k * 13) % 3) * h * 0.012;
+                mo.fillStyle(0x8d5524, 1);
+                mo.fillRect(ax - 3, ay - h * 0.04, 6, h * 0.04);
+                mo.fillStyle(k % 2 ? 0x2f9e44 : 0x37b24d, 1);
+                mo.fillCircle(ax, ay - h * 0.06, h * 0.035);
+                mo.fillCircle(ax - h * 0.02, ay - h * 0.045, h * 0.024);
+                mo.fillCircle(ax + h * 0.02, ay - h * 0.045, h * 0.024);
+            }
+
+            // Pasto, camino de piedra hacia el puente, flores y arbustos.
+            var cp = this.campo;
+            cp.clear();
+            cp.fillStyle(0x69db7c, 1);
+            cp.fillRect(0, horiz + h * 0.02, w, h);
+            cp.fillStyle(0x51cf66, 1);
+            cp.fillRect(0, m.base + h * 0.05, w, h);
+            var pw = m.ancho * 0.16;
+            cp.fillStyle(0xced4da, 1);
+            cp.beginPath();
+            cp.moveTo(m.cx - pw * 0.55, m.base + h * 0.05);
+            cp.lineTo(m.cx + pw * 0.55, m.base + h * 0.05);
+            cp.lineTo(m.cx + pw * 1.3, h);
+            cp.lineTo(m.cx - pw * 1.3, h);
+            cp.closePath();
+            cp.fillPath();
+            cp.lineStyle(2, 0xadb5bd, 1);
+            for (k = 1; k < 4; k++) {
+                var yy = m.base + h * 0.05 + (h - m.base - h * 0.05) * (k / 4);
+                var mitad = pw * (0.55 + 0.75 * (k / 4));
+                cp.lineBetween(m.cx - mitad, yy, m.cx + mitad, yy);
+            }
+            [[0.06, 0], [0.2, 1], [0.8, 2], [0.94, 3]].forEach(function (a) {
+                var bx = w * a[0];
+                var by = m.base + h * 0.02;
+                cp.fillStyle(0x2b8a3e, 1);
+                cp.fillCircle(bx, by, h * 0.035);
+                cp.fillCircle(bx + h * 0.04, by + 4, h * 0.03);
+                cp.fillCircle(bx - h * 0.035, by + 5, h * 0.026);
+            });
+            var FLOR = [0xff6b6b, 0xfcc419, 0xffffff, 0xcc5de8, 0xff922b];
+            for (k = 0; k < 26; k++) {
+                var fx = ((k * 61) % 100) / 100 * w;
+                if (Math.abs(fx - m.cx) < pw * 1.3) continue;
+                var fy = m.base + h * 0.07 + ((k * 29) % 100) / 100 * (h - m.base - h * 0.09);
+                cp.fillStyle(0x40c057, 1);
+                cp.fillTriangle(fx - 4, fy + 8, fx + 4, fy + 8, fx, fy - 2);
+                cp.fillStyle(FLOR[k % FLOR.length], 1);
+                cp.fillCircle(fx, fy - 3, 4);
+            }
+
+            // Castillo: muro central, dos torres grandes y dos torrecitas al centro.
             var c = this.muro;
             c.clear();
             var piedra = 0xced4da;
-            var sombra = 0xadb5bd;
+            var claro = 0xdee2e6;
+            var junta = 0xadb5bd;
+            var sombra = 0x9aa3ad;
             var muroTop = m.base - m.muroH;
-            c.fillStyle(piedra, 1);
-            c.fillRect(m.izq + m.torreW * 0.8, muroTop, m.ancho - m.torreW * 1.6, m.muroH);
-            // Almenas del muro.
-            var nA = 8;
-            var aw = (m.ancho - m.torreW * 1.6) / (nA * 2 - 1);
-            for (var i = 0; i < nA; i++) c.fillRect(m.izq + m.torreW * 0.8 + i * aw * 2, muroTop - aw * 0.8, aw, aw * 0.8);
-            // Torrecitas centrales (2 de las 4 torres).
+            var muroX0 = m.izq + m.torreW * 0.8;
+            var muroW = m.ancho - m.torreW * 1.6;
+
+            /** Bloques de piedra en hileras desplazadas dentro de un rectángulo. */
+            function piedras(x0, y0, ancho, alto) {
+                var fila = Math.max(14, h * 0.032);
+                var bloque = fila * 1.9;
+                for (var y = y0, n = 0; y < y0 + alto - 2; y += fila, n++) {
+                    var desfase = (n % 2) * bloque / 2;
+                    for (var x = x0 - desfase; x < x0 + ancho; x += bloque) {
+                        var xa = Math.max(x0, x) + 1.5;
+                        var xb = Math.min(x0 + ancho, x + bloque) - 1.5;
+                        if (xb - xa < 4) continue;
+                        var tono = Math.abs(Math.floor(x / bloque) * 7 + n * 3) % 5;
+                        c.fillStyle(tono === 0 ? claro : (tono === 1 ? 0xc5cbd3 : piedra), 1);
+                        c.fillRoundedRect(xa, y + 1.5, xb - xa, Math.min(fila, y0 + alto - y) - 3, 3);
+                    }
+                }
+            }
+
+            function almenas(x0, ancho, y, n) {
+                var aw = ancho / (n * 2 - 1);
+                for (var i = 0; i < n; i++) {
+                    c.fillStyle(piedra, 1);
+                    c.fillRect(x0 + i * aw * 2, y - aw * 0.8, aw, aw * 0.8 + 2);
+                    c.fillStyle(junta, 1);
+                    c.fillRect(x0 + i * aw * 2 + aw - 3, y - aw * 0.8, 3, aw * 0.8);
+                }
+            }
+
+            function techo(x0, ancho, y, alto, color, oscuro) {
+                c.fillStyle(color, 1);
+                c.fillTriangle(x0 - 10, y, x0 + ancho + 10, y, x0 + ancho / 2, y - alto);
+                c.fillStyle(oscuro, 1);
+                c.fillTriangle(x0 + ancho / 2, y - alto, x0 + ancho + 10, y, x0 + ancho / 2, y);
+                // Tejas: franjas.
+                c.lineStyle(2, oscuro, 0.6);
+                for (var f = 1; f < 4; f++) {
+                    var yt = y - alto * (f / 4);
+                    var md = (ancho / 2 + 10) * (1 - f / 4);
+                    c.lineBetween(x0 + ancho / 2 - md, yt, x0 + ancho / 2 + md, yt);
+                }
+            }
+
+            // Muro central.
+            c.fillStyle(junta, 1);
+            c.fillRect(muroX0, muroTop, muroW, m.muroH);
+            piedras(muroX0, muroTop, muroW, m.muroH);
+            almenas(muroX0, muroW, muroTop, 8);
+
+            // Torrecitas centrales.
             var tcW = m.torreW * 0.55;
             var tcH = m.muroH * 0.55;
-            this.puntas = [];
             [m.cx - m.ancho * 0.14, m.cx + m.ancho * 0.14].forEach(function (tx) {
-                c.fillStyle(piedra, 1);
+                c.fillStyle(junta, 1);
                 c.fillRect(tx - tcW / 2, muroTop - tcH, tcW, tcH);
-                c.fillStyle(0x7048e8, 1);
-                c.fillTriangle(tx - tcW / 2 - 8, muroTop - tcH, tx + tcW / 2 + 8, muroTop - tcH, tx, muroTop - tcH - tcW * 0.7);
+                piedras(tx - tcW / 2, muroTop - tcH, tcW, tcH);
+                c.fillStyle(sombra, 0.5);
+                c.fillRect(tx + tcW / 2 - 6, muroTop - tcH, 6, tcH);
+                techo(tx - tcW / 2, tcW, muroTop - tcH, tcW * 0.7, 0x7048e8, 0x5f3dc4);
             });
+
             // Torres grandes.
-            var scene = this;
             var tops = [];
-            [m.izq, m.der - m.torreW].forEach(function (tx) {
+            [m.izq, m.der - m.torreW].forEach(function (tx, i) {
                 var tTop = m.base - m.torreH;
-                c.fillStyle(piedra, 1);
+                c.fillStyle(junta, 1);
                 c.fillRect(tx, tTop, m.torreW, m.torreH);
-                c.fillStyle(sombra, 1);
-                c.fillRect(tx + m.torreW - 8, tTop, 8, m.torreH);
-                c.fillStyle(0xe03131, 1);
-                c.fillTriangle(tx - 10, tTop, tx + m.torreW + 10, tTop, tx + m.torreW / 2, tTop - m.torreW * 0.6);
-                tops.push({ x: tx + m.torreW / 2, y: tTop - m.torreW * 0.6 });
+                piedras(tx, tTop, m.torreW, m.torreH);
+                c.fillStyle(sombra, 0.45);
+                c.fillRect(tx + m.torreW - 10, tTop, 10, m.torreH);
+                // Cornisa bajo el techo.
+                c.fillStyle(0xadb5bd, 1);
+                c.fillRect(tx - 6, tTop - 4, m.torreW + 12, 10);
+                techo(tx, m.torreW, tTop - 4, m.torreW * 0.6, 0xe03131, 0xc92a2a);
+                tops.push({ x: tx + m.torreW / 2, y: tTop - 4 - m.torreW * 0.6 });
+                // Estandarte colgado bajo la ventana de arriba.
+                var ex = tx + m.torreW / 2;
+                var ey = tTop + m.torreH * 0.52;
+                var ew = m.torreW * 0.34;
+                var eh = m.torreH * 0.24;
+                var color = i ? 0x1c7ed6 : 0xe03131;
+                c.fillStyle(0x495057, 1);
+                c.fillRect(ex - ew / 2 - 4, ey - 4, ew + 8, 5);
+                c.fillStyle(color, 1);
+                c.beginPath();
+                c.moveTo(ex - ew / 2, ey);
+                c.lineTo(ex + ew / 2, ey);
+                c.lineTo(ex + ew / 2, ey + eh);
+                c.lineTo(ex, ey + eh * 0.8);
+                c.lineTo(ex - ew / 2, ey + eh);
+                c.closePath();
+                c.fillPath();
+                c.fillStyle(0xfcc419, 1);
+                c.fillCircle(ex, ey + eh * 0.4, ew * 0.22);
+                c.fillStyle(color, 1);
+                c.fillCircle(ex, ey + eh * 0.4, ew * 0.1);
             });
             // Puntas en orden izquierda → derecha: torre izq, torrecita izq, torrecita der, torre der.
             this.puntas = [tops[0],
                 { x: m.cx - m.ancho * 0.14, y: muroTop - tcH - tcW * 0.7 },
                 { x: m.cx + m.ancho * 0.14, y: muroTop - tcH - tcW * 0.7 },
                 tops[1]];
-            // Ladrillos sugeridos.
-            c.lineStyle(2, sombra, 0.6);
-            for (var by = muroTop + 24; by < m.base; by += 26) {
-                c.lineBetween(m.izq + m.torreW * 0.8, by, m.der - m.torreW * 0.8, by);
+
+            // Hiedra trepando por la torre izquierda.
+            for (k = 0; k < 14; k++) {
+                var hx = m.izq + 6 + Math.sin(k * 1.3) * 10 + (k % 3) * 6;
+                var hy = m.base - 8 - k * m.torreH * 0.035;
+                c.fillStyle(k % 2 ? 0x2f9e44 : 0x40c057, 1);
+                c.fillCircle(hx, hy, 7 - k * 0.25);
             }
-            // Puerta con puente levadizo (abajo al centro).
+
+            // Antorchas a los lados de la puerta.
+            var pa = m.muroH * 0.5;
+            this.antorchas.forEach(function (a, i) {
+                a.setPosition(m.cx + (i ? 1 : -1) * (pw / 2 + m.ancho * 0.0125), m.base - pa * 1.05);
+                a.setScale(Math.max(0.8, h / 760));
+            });
+
             this.dibujarPuente(this.puenteBajo ? 1 : 0);
-            this.banderas.forEach(function (b, k) { var p = scene.puntas[k]; b.setPosition(p.x, p.y); });
+            this.banderas.forEach(function (bd, n) { var p = scene.puntas[n]; bd.setPosition(p.x, p.y); });
         },
 
         dibujarPuente: function (t) {
@@ -242,7 +456,10 @@
             p.clear();
             var pw = m.ancho * 0.16;
             var ph = m.muroH * 0.5;
-            p.fillStyle(0x495057, 1);
+            // Arco de piedra alrededor de la puerta.
+            p.fillStyle(0x868e96, 1);
+            p.fillRoundedRect(m.cx - pw / 2 - 10, m.base - ph - 10, pw + 20, ph + 10, { tl: pw / 2 + 10, tr: pw / 2 + 10, bl: 0, br: 0 });
+            p.fillStyle(0x343a40, 1);
             p.fillRoundedRect(m.cx - pw / 2, m.base - ph, pw, ph, { tl: pw / 2, tr: pw / 2, bl: 0, br: 0 });
             // Tablones: de pie (cerrado) a acostado (abierto).
             var largo = ph * (1 - t) + m.h * 0.06 * t;
@@ -251,6 +468,11 @@
             else p.fillRect(m.cx - pw / 2, m.base, pw, m.h * 0.06);
             p.lineStyle(2, 0x5c3d1e, 1);
             for (var k = 1; k < 4; k++) p.lineBetween(m.cx - pw / 2 + (pw / 4) * k, m.base - (t < 1 ? largo : 0), m.cx - pw / 2 + (pw / 4) * k, m.base + (t < 1 ? 0 : m.h * 0.06));
+            // Cadenas del puente levadizo.
+            var extremo = t < 1 ? m.base - largo : m.base + m.h * 0.06;
+            p.lineStyle(3, 0x495057, 1);
+            p.lineBetween(m.cx - pw / 2 + 4, extremo, m.cx - pw / 2 - 6, m.base - ph - 4);
+            p.lineBetween(m.cx + pw / 2 - 4, extremo, m.cx + pw / 2 + 6, m.base - ph - 4);
         },
 
         /** Centro de cada ventana (zona): arriba en las torres, abajo en el muro. */
@@ -260,17 +482,39 @@
             var abajo = m.base - m.muroH * 0.48;
             var xi = m.izq + m.torreW / 2;
             var xd = m.der - m.torreW / 2;
-            var xbi = m.cx - m.ancho * 0.24;
-            var xbd = m.cx + m.ancho * 0.24;
+            // Las de abajo van entre la puerta y las torres (sin montarse en ellas).
+            var xbi = m.cx - m.ancho * 0.175;
+            var xbd = m.cx + m.ancho * 0.175;
             return {
                 arribaIzq: { x: xi, y: arriba }, arribaDer: { x: xd, y: arriba },
                 abajoIzq: { x: xbi, y: abajo }, abajoDer: { x: xbd, y: abajo }
             }[z];
         },
 
-        tamVentana: function () {
+        /** Arriba (torres) más grandes; abajo (muro) más angostas para caber junto a la puerta. */
+        tamVentana: function (zona) {
             var m = this.medidas();
-            return { w: m.torreW * 0.78, h: Math.min(m.torreW * 0.95, m.muroH * 0.62) };
+            if (zona && zona.indexOf('abajo') === 0) return { w: m.ancho * 0.14, h: m.muroH * 0.5 };
+            return { w: m.torreW * 0.7, h: Math.min(m.torreW * 0.9, m.torreH * 0.36) };
+        },
+
+        /** Media ventana de arco (k = 0 izquierda, 1 derecha), con el centro en (0, 0). */
+        hojaArco: function (g, t, k) {
+            var r = t.w / 2;
+            var cy = -t.h / 2 + r;
+            g.beginPath();
+            if (!k) {
+                g.moveTo(-r, t.h / 2);
+                g.lineTo(-r, cy);
+                g.arc(0, cy, r, Math.PI, Math.PI * 1.5, false);
+                g.lineTo(0, t.h / 2);
+            } else {
+                g.moveTo(0, t.h / 2);
+                g.lineTo(0, -t.h / 2);
+                g.arc(0, cy, r, Math.PI * 1.5, Math.PI * 2, false);
+                g.lineTo(r, t.h / 2);
+            }
+            g.closePath();
         },
 
         crearVentanas: function () {
@@ -293,7 +537,7 @@
 
         dibujarVentana: function (v) {
             var p = this.posZona(v.zona);
-            var t = this.tamVentana();
+            var t = this.tamVentana(v.zona);
             v.x = p.x;
             v.y = p.y;
             v.w = t.w;
@@ -309,14 +553,35 @@
             v.marco.strokeRoundedRect(-t.w / 2, -t.h / 2, t.w, t.h, { tl: t.w / 2, tr: t.w / 2, bl: 4, br: 4 });
             v.marco.fillStyle(0x868e96, 1);
             v.marco.fillRect(-t.w / 2 - 8, t.h / 2 - 2, t.w + 16, 10);
-            // Postigos: dos hojas de madera que giran sobre las bisagras.
+            // Postigos: dos hojas de madera con la forma del arco, que giran sobre sus bisagras.
+            var scene = this;
+            var r = t.w / 2;
+            var cyArco = -t.h / 2 + r;
             [v.izq, v.der].forEach(function (g, k) {
+                var lado = k ? 1 : -1;
                 g.clear();
-                g.fillStyle(0xa9713c, 1);
-                g.fillRect(k ? 0 : -t.w / 2, -t.h / 2 + t.w * 0.18, t.w / 2, t.h - t.w * 0.18);
+                g.fillStyle(0xb7793f, 1);
+                scene.hojaArco(g, t, k);
+                g.fillPath();
+                // Tablas verticales (hasta la curva del arco).
+                g.lineStyle(2, 0x8a5a2b, 1);
+                for (var q = 1; q < 3; q++) {
+                    var x = lado * r * (q / 3);
+                    var arriba = cyArco - Math.sqrt(Math.max(0, r * r - x * x));
+                    g.lineBetween(x, arriba + 2, x, t.h / 2 - 2);
+                }
+                // Herrajes y borde.
+                g.fillStyle(0x495057, 1);
+                [0.42, 0.8].forEach(function (f) {
+                    var y = -t.h / 2 + t.h * f;
+                    g.fillRect(k ? 2 : -r + 2, y - 3, r - 4, 6);
+                    g.fillCircle(lado * (r - 7), y, 3.5);
+                });
+                g.fillStyle(0xfcc419, 1);
+                g.fillCircle(lado * 6, t.h * 0.1, Math.max(3, r * 0.08));
                 g.lineStyle(3, 0x7f4f24, 1);
-                for (var q = 1; q < 4; q++) g.lineBetween(k ? 0 : -t.w / 2, -t.h / 2 + t.w * 0.18 + q * (t.h - t.w * 0.18) / 4, k ? t.w / 2 : 0, -t.h / 2 + t.w * 0.18 + q * (t.h - t.w * 0.18) / 4);
-                g.x = k ? 0 : 0;
+                scene.hojaArco(g, t, k);
+                g.strokePath();
             });
             v.izq.x = 0;
             v.der.x = 0;
@@ -334,7 +599,7 @@
         /** Abre o cierra los postigos (escala de cada hoja hacia su bisagra). */
         postigar: function (v, cerrar, ms) {
             v.cerrada = cerrar;
-            var t = this.tamVentana();
+            var t = this.tamVentana(v.zona);
             var dur = reducido() ? 1 : (ms || 260);
             // Hoja izquierda: gira sobre su borde izquierdo; derecha: sobre su borde derecho.
             this.tweens.add({ targets: v.izq, scaleX: cerrar ? 1 : 0.08, x: cerrar ? 0 : -t.w / 2 * 0.92, duration: dur });
@@ -352,7 +617,7 @@
         },
 
         sentarEn: function (mu, v, sinMover) {
-            var t = this.tamVentana();
+            var t = this.tamVentana(v.zona);
             var caja = Math.min(t.w, t.h) * 0.82;
             mu.esc = Math.min(caja / (mu.img.width || 1), caja / (mu.img.height || 1));
             mu.img.setScale(mu.esc);
@@ -368,8 +633,7 @@
             this.ronda = o.ronda || 0;
             this.objetivo = o.objetivo;
             this.crearVentanas();
-            this.tweens.add({ targets: this.noche, fillAlpha: this.modo === 'noche' ? 0.55 : 0, duration: 800 });
-            this.tweens.add({ targets: this.estrellasNoche, alpha: this.modo === 'noche' ? 1 : 0, duration: 800 });
+            this.ponerNoche(this.modo === 'noche');
             var ids = o.elementos.slice(0, 4);
             // Cada ronda el objetivo cambia de ventana (el documento: cambiar la ubicación).
             var previa = this.musicos[o.objetivo] && this.musicos[o.objetivo].ventana ? this.musicos[o.objetivo].ventana.i : -1;
@@ -441,7 +705,7 @@
                 if (!mu) return;
                 var desde = { x: mu.img.x, y: mu.img.y };
                 var t = { k: 0 };
-                var hasta = { x: v.x, y: v.y + scene.tamVentana().h * 0.08 };
+                var hasta = { x: v.x, y: v.y + scene.tamVentana(v.zona).h * 0.08 };
                 scene.tweens.add({
                     targets: t, k: 1, duration: reducido() ? 1 : 900, ease: 'Sine.easeInOut',
                     onUpdate: function () {
@@ -459,8 +723,49 @@
             this.jugando = false;
         },
 
-        update: function (time) {
+        update: function (time, delta) {
             var scene = this;
+            var w = this.scale.width;
+            var h = this.scale.height;
+            var dt = Math.min(delta || 16, 50) / 1000;
+            var quieto = reducido();
+            this.nubes.forEach(function (n) {
+                if (!quieto) n.x += n.vel * dt;
+                if (n.x > w + 90) n.x = -90;
+            });
+            // Pájaros: una "v" que aletea y cruza el cielo (de noche no salen).
+            this.pajaros.forEach(function (pj) {
+                pj.clear();
+                if (scene.esNoche || quieto) return;
+                var x = ((time / 1000) * pj.vel + pj.fase * 300) % (w + 200) - 100;
+                var y = h * pj.alto + Math.sin(time / 600 + pj.fase) * 10;
+                var ala = 6 + Math.sin(time / 120 + pj.fase) * 5;
+                pj.lineStyle(3, 0x495057, 1);
+                pj.lineBetween(x - 10, y - ala, x, y);
+                pj.lineBetween(x, y, x + 10, y - ala);
+            });
+            // Agua del foso con ondas que se mueven.
+            var m = this.medidas();
+            var ag = this.agua;
+            ag.clear();
+            var y0 = m.base;
+            var alto = h * 0.05;
+            ag.fillStyle(0x1c7ed6, 1);
+            ag.fillRect(m.izq - 40, y0, m.ancho + 80, alto);
+            ag.fillStyle(0x4dabf7, 1);
+            ag.fillRect(m.izq - 40, y0, m.ancho + 80, alto * 0.35);
+            ag.lineStyle(2, 0xd0ebff, 0.8);
+            for (var o = 0; o < 9; o++) {
+                var ox = m.izq - 20 + ((o * (m.ancho + 40)) / 9 + (quieto ? 0 : time / 40)) % (m.ancho + 40);
+                ag.lineBetween(ox, y0 + alto * 0.6, ox + 16, y0 + alto * 0.6);
+            }
+            // Llamas que titilan; de noche iluminan más.
+            this.antorchas.forEach(function (a, i) {
+                var f = quieto ? 1 : 1 + 0.12 * Math.sin(time / 90 + i * 2) + 0.06 * Math.sin(time / 37 + i);
+                a.llama.setScale(f, 1 + (f - 1) * 1.6);
+                a.halo.fillAlpha = scene.esNoche ? 0.16 + 0.05 * Math.sin(time / 110 + i) : 0.08;
+                a.halo.setScale(scene.esNoche ? 1.15 : 0.8);
+            });
             this.ventanas.forEach(function (v) {
                 if (v.resaltada) v.luz.fillAlpha = 0.35 + 0.3 * Math.sin(time / 140);
                 else if (!v.encendida) v.luz.fillAlpha = 0;
@@ -581,8 +886,7 @@
         fiestaFinal: function () {
             var scene = this;
             this.jugando = false;
-            this.tweens.add({ targets: this.noche, fillAlpha: 0, duration: 600 });
-            this.tweens.add({ targets: this.estrellasNoche, alpha: 0, duration: 600 });
+            this.ponerNoche(false, 600);
             this.ventanas.forEach(function (v) { scene.postigar(v, false); });
             var t = { k: 0 };
             sfx('puerta');

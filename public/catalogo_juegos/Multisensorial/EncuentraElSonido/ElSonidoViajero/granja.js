@@ -124,9 +124,53 @@
 
         create: function () {
             this.cielo = this.add.graphics().setDepth(-30);
+            // Sol con rayos que giran despacio.
+            this.sol = this.add.container(0, 0).setDepth(-29);
+            var rayos = this.add.graphics();
+            rayos.fillStyle(0xffe066, 0.7);
+            for (var r = 0; r < 12; r++) {
+                var a = (Math.PI * 2 / 12) * r;
+                rayos.fillTriangle(Math.cos(a - 0.12) * 46, Math.sin(a - 0.12) * 46, Math.cos(a + 0.12) * 46, Math.sin(a + 0.12) * 46, Math.cos(a) * 70, Math.sin(a) * 70);
+            }
+            this.sol.add([rayos, this.add.circle(0, 0, 44, 0xfcc419), this.add.circle(-10, -10, 16, 0xffe066)]);
+            this.sol.rayos = rayos;
+            this.nubes = [];
+            for (var i = 0; i < 4; i++) {
+                var n = this.add.container(0, 0).setDepth(-28);
+                n.add(this.add.circle(-30, 8, 22, 0xffffff, 0.95));
+                n.add(this.add.circle(0, -6, 32, 0xffffff, 0.95));
+                n.add(this.add.circle(32, 8, 21, 0xffffff, 0.95));
+                n.vel = 6 + i * 3;
+                n.base = [0.12, 0.4, 0.62, 0.86][i];
+                n.alto = [0.12, 0.2, 0.09, 0.17][i];
+                this.nubes.push(n);
+            }
+            this.pajaros = [];
+            for (var j = 0; j < 3; j++) {
+                var pj = this.add.graphics().setDepth(-27);
+                pj.fase = j * 1.9;
+                pj.vel = 34 + j * 10;
+                pj.alto = 0.16 + j * 0.05;
+                this.pajaros.push(pj);
+            }
+            this.fondo = this.add.graphics().setDepth(-26);
+            // Molino de viento en la colina (las aspas giran).
+            this.molino = this.add.graphics().setDepth(-25);
+            this.aspas = this.add.graphics().setDepth(-24);
             this.campo = this.add.graphics().setDepth(-20);
+            this.silo = this.add.graphics().setDepth(-13);
             this.granero = this.add.graphics().setDepth(-12);
             this.puertas = this.add.graphics().setDepth(-11);
+            this.veleta = this.add.graphics().setDepth(-12);
+            this.mariposas = [0xff8787, 0xffd43b, 0xb197fc].map(function (col, k) {
+                var m = this.add.container(0, 0).setDepth(900);
+                var a1 = this.add.ellipse(-6, 0, 12, 16, col);
+                var a2 = this.add.ellipse(6, 0, 12, 16, col);
+                m.add([a1, a2, this.add.rectangle(0, 0, 3, 13, 0x495057)]);
+                m.alas = [a1, a2];
+                m.fase = k * 2.3;
+                return m;
+            }, this);
             this.dibujar();
             var scene = this;
             this.scale.on('resize', function () { scene.dibujar(); });
@@ -161,56 +205,136 @@
             var w = this.scale.width;
             var h = this.scale.height;
             var hz = this.horizonte();
+            var k;
+
+            // Cielo en degradado, sol, nubes.
             var g = this.cielo;
             g.clear();
-            g.fillStyle(0x74c0fc, 1);
-            g.fillRect(0, 0, w, hz);
-            g.fillStyle(0xffd43b, 1);
-            g.fillCircle(w * 0.88, h * 0.16, Math.min(w, h) * 0.05);
+            for (var b = 0; b < 16; b++) {
+                var c0 = Phaser.Display.Color.Interpolate.ColorWithColor(
+                    Phaser.Display.Color.ValueToColor(0x4dabf7), Phaser.Display.Color.ValueToColor(0xe7f5ff), 100, Math.round(b / 15 * 100));
+                g.fillStyle(Phaser.Display.Color.GetColor(c0.r, c0.g, c0.b), 1);
+                g.fillRect(0, (hz + 20) / 16 * b - 1, w, (hz + 20) / 16 + 2);
+            }
+            this.sol.setPosition(w * 0.76, h * 0.2).setScale(Math.max(0.7, h / 820));
+            this.nubes.forEach(function (n) {
+                if (!n.listo) { n.x = w * n.base; n.listo = true; }
+                n.y = h * n.alto + h * 0.08;
+                n.setScale(Math.min(1.3, w / 1000));
+            });
+
+            // Colinas lejanas, árbol grande y huerto.
+            var f = this.fondo;
+            f.clear();
+            f.fillStyle(0xb2f2bb, 1);
+            f.fillEllipse(w * 0.2, hz + 10, w * 0.8, h * 0.24);
+            f.fillStyle(0xa9e34b, 1);
+            f.fillEllipse(w * 0.75, hz + 6, w * 0.9, h * 0.3);
+            f.fillStyle(0x94d82d, 1);
+            f.fillEllipse(w * 0.45, hz + 20, w * 0.9, h * 0.16);
+            // Árbol a la derecha.
+            var ax = w * 0.93;
+            f.fillStyle(0x8d5524, 1);
+            f.fillRect(ax - 8, hz - h * 0.14, 16, h * 0.18);
+            f.fillStyle(0x2b8a3e, 1);
+            f.fillCircle(ax, hz - h * 0.19, h * 0.075);
+            f.fillCircle(ax - h * 0.05, hz - h * 0.13, h * 0.055);
+            f.fillCircle(ax + h * 0.05, hz - h * 0.13, h * 0.055);
+            f.fillStyle(0xff6b6b, 1);
+            [[-0.03, -0.18], [0.02, -0.12], [0.04, -0.2], [-0.05, -0.12]].forEach(function (p) { f.fillCircle(ax + h * p[0], hz + h * p[1], 5); });
+
+            // Molino en la colina de la izquierda.
+            var mo = this.molino;
+            mo.clear();
+            var mx = w * 0.52;
+            var my = hz - h * 0.02;
+            var mt = h * 0.2;
+            mo.fillStyle(0xf8f9fa, 1);
+            mo.fillTriangle(mx - mt * 0.18, my, mx + mt * 0.18, my, mx + mt * 0.1, my - mt);
+            mo.fillTriangle(mx - mt * 0.18, my, mx - mt * 0.1, my - mt, mx + mt * 0.1, my - mt);
+            mo.fillStyle(0xc92a2a, 1);
+            mo.fillTriangle(mx - mt * 0.14, my - mt, mx + mt * 0.14, my - mt, mx, my - mt * 1.18);
+            mo.fillStyle(0x8d5524, 1);
+            mo.fillRect(mx - mt * 0.05, my - mt * 0.22, mt * 0.1, mt * 0.22);
+            this.ejeMolino = { x: mx, y: my - mt * 0.95, r: mt * 0.62 };
+
+            // Pasto en franjas, huerto, camino al granero y flores.
             var c = this.campo;
             c.clear();
-            c.fillStyle(0x94d82d, 1);
-            c.fillEllipse(w * 0.3, hz + 10, w * 0.9, h * 0.2);
             c.fillStyle(0x82c91e, 1);
-            c.fillEllipse(w * 0.8, hz + 14, w * 0.8, h * 0.18);
-            c.fillStyle(0x74b816, 1);
             c.fillRect(0, hz + h * 0.04, w, h);
-            // Surcos del huerto al fondo.
-            c.fillStyle(0x8d5524, 1);
-            for (var s = 0; s < 4; s++) c.fillRect(w * 0.42, hz + h * 0.06 + s * h * 0.022, w * 0.36, h * 0.01);
-            c.fillStyle(0x2f9e44, 1);
-            for (var p = 0; p < 14; p++) c.fillCircle(w * 0.43 + p * w * 0.026, hz + h * 0.055 + (p % 4) * h * 0.022, 5);
-            // Cerca del corral.
-            var co = this.corral();
-            c.lineStyle(5, 0xffffff, 1);
-            c.lineBetween(co.x0, co.y0 - 10, co.x1, co.y0 - 10);
-            c.lineBetween(co.x0, co.y0 - 10, co.x0, co.y0 + h * 0.05);
-            for (var f = co.x0; f <= co.x1; f += 40) c.lineBetween(f, co.y0 - 30, f, co.y0 - 4);
-            c.lineBetween(co.x0, co.y0 - 22, co.x1, co.y0 - 22);
-            // Matas de pasto y flores.
-            for (var m = 0; m < 30; m++) {
-                var mx = ((m * 89) % 100) / 100 * w;
-                var my = hz + h * 0.08 + ((m * 57) % 100) / 100 * h * 0.44;
-                c.fillStyle(0x5c940d, 1);
-                c.fillTriangle(mx - 6, my, mx + 6, my, mx - 2, my - 14);
-                c.fillTriangle(mx, my, mx + 10, my, mx + 6, my - 11);
-                if (m % 3 === 0) { c.fillStyle(FIESTA[m % FIESTA.length], 1); c.fillCircle(mx + 12, my - 8, 4); }
+            for (k = 0; k < 6; k++) {
+                c.fillStyle(k % 2 ? 0x74b816 : 0x82c91e, 1);
+                c.fillRect(0, hz + h * 0.04 + k * (h - hz) / 6, w, (h - hz) / 6 + 1);
             }
-            // Árbol grande a la derecha, al fondo.
+            // Huerto con hileras de plantas.
+            var hx = w * 0.44;
+            var hw = w * 0.34;
             c.fillStyle(0x8d5524, 1);
-            c.fillRect(w * 0.9, hz - h * 0.12, 14, h * 0.16);
-            c.fillStyle(0x2f9e44, 1);
-            c.fillCircle(w * 0.9 + 7, hz - h * 0.16, h * 0.07);
-            c.fillCircle(w * 0.9 - h * 0.04, hz - h * 0.11, h * 0.05);
-            c.fillCircle(w * 0.9 + h * 0.05, hz - h * 0.11, h * 0.05);
-            // Camino de tierra hacia el granero.
+            c.fillRoundedRect(hx, hz + h * 0.05, hw, h * 0.1, 8);
+            for (k = 0; k < 4; k++) {
+                var fy = hz + h * 0.065 + k * h * 0.022;
+                c.fillStyle(0x6f3f1a, 1);
+                c.fillRect(hx + 6, fy + 6, hw - 12, 3);
+                for (var q = 0; q < 12; q++) {
+                    var px = hx + 14 + q * (hw - 28) / 11;
+                    c.fillStyle(0x2f9e44, 1);
+                    c.fillCircle(px, fy + 2, 5);
+                    if ((q + k) % 4 === 0) { c.fillStyle(0xff922b, 1); c.fillCircle(px, fy + 5, 3); }
+                }
+            }
+            // Camino de tierra desde el granero.
             c.fillStyle(0xd9a066, 1);
-            c.fillEllipse(w * 0.2, h * 0.72, w * 0.22, h * 0.08);
+            c.beginPath();
+            c.moveTo(w * 0.1, h * 0.7);
+            c.lineTo(w * 0.24, h * 0.7);
+            c.lineTo(w * 0.42, h * 0.84);
+            c.lineTo(w * 0.36, h * 0.92);
+            c.lineTo(w * 0.12, h * 0.76);
+            c.closePath();
+            c.fillPath();
+            c.fillStyle(0xc08a4d, 1);
+            [[0.16, 0.73], [0.24, 0.77], [0.31, 0.82], [0.37, 0.87]].forEach(function (p) { c.fillEllipse(w * p[0], h * p[1], 14, 6); });
+            // Flores y matas.
+            for (k = 0; k < 34; k++) {
+                var mx2 = ((k * 89) % 100) / 100 * w;
+                var my2 = hz + h * 0.17 + ((k * 57) % 100) / 100 * h * 0.36;
+                c.fillStyle(0x5c940d, 1);
+                c.fillTriangle(mx2 - 6, my2, mx2 + 6, my2, mx2 - 2, my2 - 14);
+                c.fillTriangle(mx2, my2, mx2 + 10, my2, mx2 + 6, my2 - 11);
+                if (k % 3 === 0) { c.fillStyle(FIESTA[k % FIESTA.length], 1); c.fillCircle(mx2 + 12, my2 - 8, 4); c.fillStyle(0xffffff, 1); c.fillCircle(mx2 + 12, my2 - 8, 1.5); }
+            }
+            // Cerca de madera del corral, con girasoles.
+            var co = this.corral();
+            var yA = co.y0 - 30;
+            c.fillStyle(0xa9713c, 1);
+            c.fillRect(co.x0, yA + 6, co.x1 - co.x0, 7);
+            c.fillRect(co.x0, yA + 18, co.x1 - co.x0, 7);
+            for (var fx = co.x0; fx <= co.x1; fx += 42) {
+                c.fillStyle(0x8d5524, 1);
+                c.fillRect(fx - 4, yA, 9, 34);
+                c.fillTriangle(fx - 4, yA, fx + 5, yA, fx + 0.5, yA - 7);
+            }
+            c.fillRect(co.x0 - 4, yA, 9, h * 0.1);
+            [0.15, 0.5, 0.85].forEach(function (t) {
+                var sx = co.x0 + (co.x1 - co.x0) * t;
+                c.fillStyle(0x2f9e44, 1);
+                c.fillRect(sx - 2, yA - 34, 4, 40);
+                c.fillEllipse(sx + 7, yA - 14, 12, 6);
+                c.fillStyle(0xfcc419, 1);
+                for (var p = 0; p < 10; p++) {
+                    var an = (Math.PI * 2 / 10) * p;
+                    c.fillEllipse(sx + Math.cos(an) * 9, yA - 40 + Math.sin(an) * 9, 8, 8);
+                }
+                c.fillStyle(0x8d5524, 1);
+                c.fillCircle(sx, yA - 40, 7);
+            });
+
             this.dibujarGranero(this.graneroAbierto ? 1 : 0);
             this.ubicarFardos();
         },
 
-        /** Granero rojo a la izquierda con 4 ventanitas arriba (ahí se asoman los encontrados). */
+        /** Granero de tablas con altillo (4 ventanitas: ahí se asoman los encontrados) y silo. */
         dibujarGranero: function (abierto) {
             var w = this.scale.width;
             var h = this.scale.height;
@@ -219,14 +343,52 @@
             var gy = h * 0.7;
             var gh = h * 0.36;
             this.graneroPos = { x: gx, w: gw, y: gy, h: gh, puertaX: gx + gw / 2, puertaY: gy };
+            // Silo detrás, a la derecha del granero.
+            var s = this.silo;
+            s.clear();
+            var sx = gx + gw + 6;
+            var sw = gw * 0.3;
+            var sh = gh * 1.05;
+            s.fillStyle(0xadb5bd, 1);
+            s.fillRect(sx, gy - sh, sw, sh);
+            s.fillStyle(0xced4da, 1);
+            s.fillRect(sx, gy - sh, sw * 0.4, sh);
+            s.fillStyle(0x868e96, 1);
+            for (var r = 1; r < 6; r++) s.fillRect(sx, gy - sh + r * sh / 6, sw, 3);
+            s.fillStyle(0x495057, 1);
+            s.fillEllipse(sx + sw / 2, gy - sh, sw, sw * 0.7);
+            s.fillStyle(0x868e96, 1);
+            s.fillEllipse(sx + sw / 2, gy - sh - 2, sw * 0.8, sw * 0.5);
+
             var g = this.granero;
             g.clear();
+            // Pared de tablas verticales.
             g.fillStyle(0xc92a2a, 1);
             g.fillRect(gx, gy - gh, gw, gh);
-            g.fillTriangle(gx - 12, gy - gh, gx + gw + 12, gy - gh, gx + gw / 2, gy - gh - gh * 0.35);
+            g.lineStyle(2, 0xa61e1e, 1);
+            for (var t = gx + gw / 10; t < gx + gw; t += gw / 10) g.lineBetween(t, gy - gh + 4, t, gy - 4);
+            // Techo de tejas con borde blanco.
+            var tope = gy - gh - gh * 0.35;
+            g.fillStyle(0x7f4f24, 1);
+            g.fillTriangle(gx - 14, gy - gh, gx + gw + 14, gy - gh, gx + gw / 2, tope);
+            g.lineStyle(2, 0x5c3d1e, 0.7);
+            for (var q = 1; q < 4; q++) {
+                var yy = gy - gh - (gh * 0.35) * (q / 4);
+                var md = (gw / 2 + 14) * (1 - q / 4);
+                g.lineBetween(gx + gw / 2 - md, yy, gx + gw / 2 + md, yy);
+            }
             g.fillStyle(0xffffff, 1);
-            g.fillRect(gx - 12, gy - gh - 6, gw + 24, 8);
+            g.fillRect(gx - 14, gy - gh - 6, gw + 28, 8);
             g.fillRect(gx, gy - 6, gw, 6);
+            g.fillRect(gx, gy - gh, 6, gh);
+            g.fillRect(gx + gw - 6, gy - gh, 6, gh);
+            // Puerta del pajar en el triángulo.
+            g.fillStyle(0xfff3bf, 1);
+            g.fillRect(gx + gw * 0.42, gy - gh - gh * 0.2, gw * 0.16, gh * 0.14);
+            g.lineStyle(3, 0xffffff, 1);
+            g.strokeRect(gx + gw * 0.42, gy - gh - gh * 0.2, gw * 0.16, gh * 0.14);
+            g.fillStyle(0xfab005, 1);
+            g.fillTriangle(gx + gw * 0.44, gy - gh - gh * 0.06, gx + gw * 0.56, gy - gh - gh * 0.06, gx + gw * 0.5, gy - gh - gh * 0.12);
             // Ventanitas del altillo.
             this.ventanitas = [];
             for (var i = 0; i < 4; i++) {
@@ -236,11 +398,22 @@
                 g.fillRect(vx - gw * 0.08, vy - gw * 0.08, gw * 0.16, gw * 0.16);
                 g.lineStyle(3, 0xffffff, 1);
                 g.strokeRect(vx - gw * 0.08, vy - gw * 0.08, gw * 0.16, gw * 0.16);
+                g.lineBetween(vx, vy - gw * 0.08, vx, vy + gw * 0.08);
                 this.ventanitas.push({ x: vx, y: vy, t: gw * 0.16 });
             }
+            // Veleta con gallo en la punta del techo.
+            var v = this.veleta;
+            v.clear();
+            v.lineStyle(3, 0x343a40, 1);
+            v.lineBetween(gx + gw / 2, tope, gx + gw / 2, tope - h * 0.07);
+            v.lineBetween(gx + gw / 2 - 12, tope - h * 0.035, gx + gw / 2 + 12, tope - h * 0.035);
+            v.fillStyle(0x343a40, 1);
+            v.fillTriangle(gx + gw / 2 - 2, tope - h * 0.07, gx + gw / 2 + 18, tope - h * 0.065, gx + gw / 2 - 2, tope - h * 0.09);
+            v.fillCircle(gx + gw / 2 + 4, tope - h * 0.09, 5);
+
             this.dibujarPuertas(abierto);
             var scene = this;
-            this.enGranero.forEach(function (im, k) { var v = scene.ventanitas[k % 4]; im.setPosition(v.x, v.y + v.t / 2); });
+            this.enGranero.forEach(function (im, k) { var vv = scene.ventanitas[k % 4]; im.setPosition(vv.x, vv.y + vv.t / 2); });
         },
 
         dibujarPuertas: function (t) {
@@ -281,13 +454,24 @@
                 var x = z.x0 + (z.x1 - z.x0) * (0.18 + i * 0.32);
                 var y = z.y0 + (z.y1 - z.y0) * (i % 2 ? 0.75 : 0.35);
                 f.clear();
+                f.fillStyle(0x000000, 0.12);
+                f.fillEllipse(0, 0, fw * 1.05, fh * 0.25);
                 f.fillStyle(0xfab005, 1);
                 f.fillRoundedRect(-fw / 2, -fh, fw, fh, 10);
-                f.lineStyle(3, 0xe67700, 1);
-                for (var k = 1; k < 4; k++) f.lineBetween(-fw / 2 + 6, -fh + k * fh / 4, fw / 2 - 6, -fh + k * fh / 4);
+                f.fillStyle(0xffd43b, 1);
+                f.fillRoundedRect(-fw / 2 + 4, -fh + 4, fw - 8, fh * 0.3, 8);
+                // Pajitas sueltas.
+                f.lineStyle(2, 0xe67700, 1);
+                for (var k = 0; k < 14; k++) {
+                    var px = -fw / 2 + 8 + ((k * 37) % 100) / 100 * (fw - 16);
+                    var py = -fh + 8 + ((k * 53) % 100) / 100 * (fh - 16);
+                    f.lineBetween(px, py, px + 8, py + ((k % 2) ? 3 : -3));
+                }
                 f.fillStyle(0xc92a2a, 1);
                 f.fillRect(-fw * 0.28, -fh, 6, fh);
                 f.fillRect(fw * 0.22, -fh, 6, fh);
+                f.fillStyle(0xfcc419, 1);
+                for (var e = 0; e < 7; e++) f.fillTriangle(-fw / 2 + e * fw / 7, -fh + 2, -fw / 2 + e * fw / 7 + 8, -fh + 2, -fw / 2 + e * fw / 7 + 4, -fh - 6);
                 f.setPosition(x, y);
                 f.fw = fw;
                 f.fh = fh;
@@ -449,8 +633,57 @@
             this.jugando = false;
         },
 
-        update: function (time) {
+        update: function (time, delta) {
             var scene = this;
+            var w = this.scale.width;
+            var h = this.scale.height;
+            var dt = Math.min(delta || 16, 50) / 1000;
+            var quieto = reducido();
+            this.nubes.forEach(function (n) {
+                if (!quieto) n.x += n.vel * dt;
+                if (n.x > w + 90) n.x = -90;
+            });
+            if (!quieto) this.sol.rayos.rotation += dt * 0.15;
+            this.pajaros.forEach(function (pj) {
+                pj.clear();
+                if (quieto) return;
+                var x = ((time / 1000) * pj.vel + pj.fase * 300) % (w + 200) - 100;
+                var y = h * pj.alto + Math.sin(time / 600 + pj.fase) * 10;
+                var ala = 6 + Math.sin(time / 120 + pj.fase) * 5;
+                pj.lineStyle(3, 0x495057, 1);
+                pj.lineBetween(x - 10, y - ala, x, y);
+                pj.lineBetween(x, y, x + 10, y - ala);
+            });
+            // Aspas del molino.
+            var e = this.ejeMolino;
+            var as = this.aspas;
+            as.clear();
+            if (e) {
+                var giro = quieto ? 0.3 : time / 900;
+                for (var k = 0; k < 4; k++) {
+                    var an = giro + (Math.PI / 2) * k;
+                    var cx = Math.cos(an);
+                    var cy = Math.sin(an);
+                    var px = -cy;
+                    var py = cx;
+                    as.fillStyle(0xf1f3f5, 1);
+                    as.fillTriangle(e.x + px * 3, e.y + py * 3, e.x + cx * e.r + px * 9, e.y + cy * e.r + py * 9, e.x + cx * e.r - px * 2, e.y + cy * e.r - py * 2);
+                    as.lineStyle(2, 0x8d5524, 1);
+                    as.lineBetween(e.x, e.y, e.x + cx * e.r, e.y + cy * e.r);
+                }
+                as.fillStyle(0x5c3d1e, 1);
+                as.fillCircle(e.x, e.y, 5);
+            }
+            // Mariposas que revolotean sobre el campo.
+            var z = this.zona();
+            this.mariposas.forEach(function (m) {
+                m.setVisible(!quieto);
+                if (quieto) return;
+                var t = time / 1000 + m.fase;
+                m.x = z.x0 + (z.x1 - z.x0) * (0.5 + 0.45 * Math.sin(t * 0.21));
+                m.y = z.y0 - h * 0.12 + Math.sin(t * 0.9) * h * 0.05;
+                m.alas.forEach(function (al) { al.scaleX = 0.3 + 0.7 * Math.abs(Math.sin(t * 9)); });
+            });
             Object.keys(this.animales).forEach(function (id) {
                 var a = scene.animales[id];
                 if (!a.img.visible) return;
