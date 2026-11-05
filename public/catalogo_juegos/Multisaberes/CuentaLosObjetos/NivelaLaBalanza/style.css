@@ -223,10 +223,10 @@ body.esperando-inicio #menu-acc {
     align-items: flex-start;
     gap: 4px;
 }
-/* Zeus va a la derecha y el bocadillo abre hacia la izquierda: abajo a la
-   izquierda taparía los cristales del depósito. */
-.pj-zoe-balanza { top: 96px; left: 12px; }
-.pj-zeus-balanza { top: 96px; right: 12px; flex-direction: row-reverse; }
+/* Los dos a la izquierda y en el mismo sitio: solo uno se ve a la vez, y a
+   la derecha el bocadillo taparía el cofre de gemas. */
+.pj-zoe-balanza,
+.pj-zeus-balanza { top: 96px; left: 12px; }
 
 .personaje-balanza img {
     width: 110px; height: auto;
@@ -257,12 +257,6 @@ body.esperando-inicio #menu-acc {
     width: 0; height: 0;
     border: 11px solid transparent;
     border-right-color: #fff;
-}
-/* Zeus habla desde la derecha: la punta apunta hacia su lado. */
-.pj-zeus-balanza .bocadillo::after {
-    left: auto; right: -11px;
-    border-right-color: transparent;
-    border-left-color: #fff;
 }
 .bocadillo-nombre {
     display: inline-block;
