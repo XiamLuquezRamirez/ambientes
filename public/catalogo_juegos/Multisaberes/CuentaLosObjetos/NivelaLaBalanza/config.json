@@ -1,0 +1,196 @@
+{
+  "nombre": "Nivela la balanza",
+  "stub": false,
+  "textos": {
+    "eligeNivel": "¡Elige tu nivel!",
+    "demostracion": "¡Mira cómo igualamos los dos lados!",
+    "demostracionFin": "¡Ahora te toca a ti!",
+    "conversacion": [
+      {
+        "personaje": 1,
+        "texto": "¡Bienvenido al laboratorio espacial!"
+      },
+      {
+        "personaje": 0,
+        "texto": "Vamos a nivelar la balanza de carga con cristales."
+      }
+    ]
+  },
+  "dialogos": {
+    "faltan": "¡La balanza está inclinada! Faltan {n} cristales.",
+    "sobran": "¡Cuidado! Hay {n} cristales de más. Retira uno.",
+    "cerca": "¡Muy bien! Ya casi lo consigues.",
+    "equilibrio": "¡Perfecto! {n} cristales a cada lado. ¡Son IGUALES!"
+  },
+  "accesibilidad": {
+    "letterSpacing": 2,
+    "volumenFondo": 20,
+    "rate": 5,
+    "mostrarIntro": true
+  },
+  "audios": {
+    "cierre": "../../../sounds/victory.mp3",
+    "fondo": "../../../sounds/fondo.mp3",
+    "acierto": "../../../sounds/ok.mp3",
+    "efectos": {
+      "recompensa": "../../../sounds/ok.mp3"
+    }
+  },
+  "demo": {
+    "id": "nivela-balanza-demo",
+    "mecanica": "nivelar_balanza",
+    "cantidadObjetivo": 3,
+    "cristalesEnDeposito": 5
+  },
+  "niveles": [
+    {
+      "id": "5-6",
+      "edad": "5-6 años",
+      "titulo": "Nivela la balanza",
+      "escena": "laboratorio",
+      "bienvenida": [
+        {
+          "personaje": 1,
+          "texto": "¡Bienvenido a la estación de carga espacial!"
+        },
+        {
+          "personaje": 0,
+          "texto": "¡Vamos a equilibrar la balanza con cristales!"
+        }
+      ],
+      "retos": [
+        {
+          "id": "nivela-balanza-1",
+          "titulo": "Primera carga",
+          "mecanica": "nivelar_balanza",
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Nuestra primera carga espacial!"
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "En el lado izquierdo hay {cantidad} cristales. Arrastra {cantidad} cristales al lado derecho."
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Perfecto! Los dos lados tienen lo mismo.",
+            "efecto": "recompensa"
+          },
+          "errorPocos": {
+            "voz": "zoe",
+            "texto": "¡La balanza está inclinada! Sigue contando y agrega los que faltan.",
+            "efecto": "boing"
+          },
+          "errorMuchos": {
+            "voz": "zoe",
+            "texto": "¡Cuidado! Hay demasiados cristales. Retira uno.",
+            "efecto": "boing"
+          },
+          "cantidadMin": 3,
+          "cantidadMax": 5
+        },
+        {
+          "id": "nivela-balanza-2",
+          "titulo": "Carga espacial",
+          "mecanica": "nivelar_balanza",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡Llegó más carga a la estación!"
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "Ahora hay {cantidad} cristales a la izquierda. ¡Iguala el lado derecho!"
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Excelente! La balanza quedó nivelada.",
+            "efecto": "recompensa"
+          },
+          "errorPocos": {
+            "voz": "zeus",
+            "texto": "¡La balanza está inclinada! Faltan cristales.",
+            "efecto": "boing"
+          },
+          "errorMuchos": {
+            "voz": "zeus",
+            "texto": "¡Cuidado! Hay demasiados cristales. Retira uno.",
+            "efecto": "boing"
+          },
+          "cantidadMin": 4,
+          "cantidadMax": 7
+        },
+        {
+          "id": "nivela-balanza-3",
+          "titulo": "Equilibrio avanzado",
+          "mecanica": "nivelar_balanza",
+          "presentacion": {
+            "voz": "zeus",
+            "texto": "¡Esta carga es más pesada!"
+          },
+          "pregunta": {
+            "voz": "zoe",
+            "texto": "Cuenta bien: hay {cantidad} cristales a la izquierda."
+          },
+          "acierto": {
+            "voz": "zeus",
+            "texto": "¡Muy bien! Contaste todos los cristales.",
+            "efecto": "recompensa"
+          },
+          "errorPocos": {
+            "voz": "zoe",
+            "texto": "¡La balanza está inclinada! Sigue contando.",
+            "efecto": "boing"
+          },
+          "errorMuchos": {
+            "voz": "zoe",
+            "texto": "¡Cuidado! Hay demasiados cristales. Retira uno.",
+            "efecto": "boing"
+          },
+          "cantidadMin": 6,
+          "cantidadMax": 9
+        },
+        {
+          "id": "nivela-balanza-4",
+          "titulo": "Maestros del equilibrio",
+          "mecanica": "nivelar_balanza",
+          "presentacion": {
+            "voz": "zoe",
+            "texto": "¡La última carga de la misión!"
+          },
+          "pregunta": {
+            "voz": "zeus",
+            "texto": "¡El reto final! Hay {cantidad} cristales a la izquierda."
+          },
+          "acierto": {
+            "voz": "zoe",
+            "texto": "¡Increíble! Eres un maestro del equilibrio.",
+            "efecto": "recompensa"
+          },
+          "errorPocos": {
+            "voz": "zeus",
+            "texto": "¡La balanza está inclinada! Faltan cristales.",
+            "efecto": "boing"
+          },
+          "errorMuchos": {
+            "voz": "zeus",
+            "texto": "¡Cuidado! Hay demasiados cristales. Retira uno.",
+            "efecto": "boing"
+          },
+          "cantidadMin": 7,
+          "cantidadMax": 10
+        }
+      ],
+      "cierre": [
+        {
+          "voz": "zeus",
+          "texto": "¡Excelente! ¡Nivelaste todas las balanzas de la estación!"
+        }
+      ],
+      "cierreEscena": "laboratorio",
+      "insignia": {
+        "img": "img/insignia_balanza.svg",
+        "nombre": "Maestro del Equilibrio"
+      }
+    }
+  ]
+}
