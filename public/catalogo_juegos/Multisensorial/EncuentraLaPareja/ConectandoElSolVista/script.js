@@ -475,7 +475,44 @@
         $id("dialogo-avatar").src = avatarDe(dialogo.dataset.voz === "zeus" ? "zeus" : "zoe", false);
     }
 
+    /*
+     * Cola de voz: la frase que está sonando siempre termina antes de que hable el otro personaje
+     * (TextoVoz.hablar corta la anterior). Si se juntan varias, solo espera la más reciente.
+     */
+    let vozActual = null;
+    let vozPendiente = null;
+
     function decir(linea, opts) {
+        if (!linea || !linea.texto) return Promise.resolve();
+        return new Promise(function (resolve) {
+            if (vozPendiente) vozPendiente.resolve();
+            vozPendiente = { linea: linea, opts: opts || {}, resolve: resolve };
+            if (!vozActual) siguienteVoz();
+        });
+    }
+
+    function siguienteVoz() {
+        const it = vozPendiente;
+        vozPendiente = null;
+        if (!it) {
+            vozActual = null;
+            return;
+        }
+        vozActual = decirAhora(it.linea, it.opts).then(function () {
+            it.resolve();
+            siguienteVoz();
+        });
+    }
+
+    /** Descarta lo que esperaba turno, sin cortar la frase que está sonando. */
+    function callarVoz() {
+        if (vozPendiente) {
+            vozPendiente.resolve();
+            vozPendiente = null;
+        }
+    }
+
+    function decirAhora(linea, opts) {
         opts = opts || {};
         if (!linea || !linea.texto) return Promise.resolve();
         const token = ++tokenDialogo;
@@ -606,10 +643,70 @@
         montarEscenario();
         Promise.resolve(imagenesPromise).then(function () {
             if (!vivo(gen)) return;
+            if (window.PedniaJuego) {
+                iniciarMotor(gen);
+                return;
+            }
             if (mostrarIntroActiva()) iniciarDemo(gen);
             else iniciarReto(gen);
         });
     };
+
+    /* ── Motor Phaser del juego (cada juego trae el suyo) ───────── */
+
+    function ctxMotor(gen) {
+        return {
+            decir: function (linea, opts) { return vivo(gen) ? decir(linea, opts) : Promise.resolve(); },
+            callar: function () {
+                callarVoz();
+            },
+            mano: function (opts) {
+                if (!window.PedniaTutorial) return Promise.resolve();
+                return PedniaTutorial.animarMano(opts);
+            },
+            quitarMano: function () { if (window.PedniaTutorial) PedniaTutorial.quitarManos(); },
+            efecto: efecto,
+            vivo: function () { return vivo(gen); },
+            enDemo: function () { return demoActiva; },
+            textos: textos(),
+            reto: (nivelElegido.retos || [])[0] || {},
+            nivel: nivelElegido,
+            elemento: elemento,
+            celebrar: celebrarPersonajes
+        };
+    }
+
+    async function iniciarMotor(gen) {
+        const M = window.PedniaJuego;
+        try {
+            await M.montar({ gameConfig: gameConfig, nivel: nivelElegido, ctx: ctxMotor(gen) });
+        } catch (e) {
+            console.warn("[EncuentraLaPareja] motor no disponible, uso el respaldo DOM:", e);
+            window.PedniaJuego = null;
+            if (mostrarIntroActiva()) iniciarDemo(gen);
+            else iniciarReto(gen);
+            return;
+        }
+        if (!vivo(gen)) return;
+        try {
+            if (M.frases && typeof TextoVoz.encolarFrases === "function") TextoVoz.encolarFrases(M.frases());
+        } catch (e) { /* noop */ }
+        if (mostrarIntroActiva() && window.PedniaTutorial) {
+            demoActiva = true;
+            await PedniaTutorial.activarDemo();
+            await M.demo();
+            detenerDemo();
+            if (!vivo(gen)) return;
+        }
+        if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
+        await M.jugar();
+        if (!vivo(gen)) return;
+        juegoTerminado = true;
+        celebrarPersonajes(true);
+        await M.fiestaFinal();
+        if (gen !== rondaGen) return;
+        mostrarCierre();
+    }
 
     /* ── Escenario ────────────────────────────────────────────── */
 
@@ -857,8 +954,7 @@
         const r = L.evaluar(reto, id);
         fase = "animando";
         cancelarPista();
-        tokenDialogo += 1;
-        TextoVoz.detener();
+        callarVoz();
         reiniciarClase(el, "toca", 450);
         ocultarCable();
         limpiarDestinosArrastre();

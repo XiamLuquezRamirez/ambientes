@@ -12,7 +12,7 @@
         var m = new URL(src, window.location.href).pathname.match(/^(.*?)\/catalogo_juegos\//);
         return m ? m[1] : '';
     })();
-    var URL = PEDNIA_BASE + '/juegos/pin-accesibilidad';
+    var URL_PIN = PEDNIA_BASE + '/juegos/pin-accesibilidad';
     var abierto = false;
     var digitos = '';
     var enviando = false;
@@ -148,7 +148,7 @@
         enviando = true;
         mensaje('Comprobando…');
         var pin = digitos;
-        fetch(URL, {
+        fetch(URL_PIN, {
             method: 'POST',
             credentials: 'same-origin',
             headers: cabeceras(),
