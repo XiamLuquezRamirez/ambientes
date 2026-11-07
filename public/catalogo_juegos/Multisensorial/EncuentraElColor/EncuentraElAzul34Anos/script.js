@@ -544,12 +544,40 @@
         return metaColor(id).nombre || id;
     }
 
-    /** Voz corta que no se pisa con la anterior (el juego no se detiene a hablar). */
+    /*
+     * Voz corta que nunca corta a la anterior (TextoVoz.hablar interrumpe lo que suena): mientras Zoe
+     * habla, la frase nueva espera; si llega otra, reemplaza a la que esperaba, y una frase que esperó
+     * más de 3 s se descarta porque ya no corresponde a lo que pasa en el juego.
+     */
+    let vozSonando = false;
+    let vozEnEspera = null;
+
     function decir(texto, separacionMs) {
         const ahora = Date.now();
-        if (ahora - ultimaVozMs < (separacionMs || 2500)) return;
-        ultimaVozMs = ahora;
-        TextoVoz.hablar(texto, "zoe");
+        if (!vozSonando && ahora - ultimaVozMs < (separacionMs || 2500)) return;
+        if (vozSonando) {
+            vozEnEspera = { texto: texto, t: ahora };
+            return;
+        }
+        hablarYa(texto);
+    }
+
+    function hablarYa(texto) {
+        vozSonando = true;
+        ultimaVozMs = Date.now();
+        let terminado = false;
+        const fin = function () {
+            if (terminado) return;
+            terminado = true;
+            vozSonando = false;
+            const sig = vozEnEspera;
+            vozEnEspera = null;
+            if (sig && Date.now() - sig.t < 3000) hablarYa(sig.texto);
+        };
+        let p;
+        try { p = TextoVoz.hablar(texto, "zoe"); } catch (e) { p = null; }
+        Promise.resolve(p).catch(function () {}).then(fin);
+        setTimeout(fin, 9000);
     }
 
     function actualizarProgresoArcade(hecho) {
@@ -602,8 +630,7 @@
         const enunciado = document.getElementById("enunciado");
         if (enunciado) enunciado.textContent = consigna;
         if (anim()) anim().consignaNueva();
-        ultimaVozMs = Date.now();
-        TextoVoz.hablar(consigna, "zoe");
+        hablarYa(consigna);
         aceptaToque = true;
         P.iniciar();
     }

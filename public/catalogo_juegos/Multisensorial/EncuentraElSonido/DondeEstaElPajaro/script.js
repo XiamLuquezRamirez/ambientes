@@ -536,7 +536,44 @@
     }
 
     /** Muestra el texto cuando la voz empieza de verdad (no antes) y resuelve cuando termina. */
+    /*
+     * Cola de voz: la frase que está sonando siempre termina antes de que hable el otro personaje
+     * (TextoVoz.hablar corta la anterior). Si se juntan varias, solo espera la más reciente.
+     */
+    let vozActual = null;
+    let vozPendiente = null;
+
     function decir(linea, opts) {
+        if (!linea || !linea.texto) return Promise.resolve();
+        return new Promise(function (resolve) {
+            if (vozPendiente) vozPendiente.resolve();
+            vozPendiente = { linea: linea, opts: opts || {}, resolve: resolve };
+            if (!vozActual) siguienteVoz();
+        });
+    }
+
+    function siguienteVoz() {
+        const it = vozPendiente;
+        vozPendiente = null;
+        if (!it) {
+            vozActual = null;
+            return;
+        }
+        vozActual = decirAhora(it.linea, it.opts).then(function () {
+            it.resolve();
+            siguienteVoz();
+        });
+    }
+
+    /** Descarta lo que esperaba turno, sin cortar la frase que está sonando. */
+    function callarVoz() {
+        if (vozPendiente) {
+            vozPendiente.resolve();
+            vozPendiente = null;
+        }
+    }
+
+    function decirAhora(linea, opts) {
         opts = opts || {};
         if (!linea || !linea.texto) return Promise.resolve();
         const token = ++tokenDialogo;
@@ -759,8 +796,7 @@
         fase = "animando";
         detenerRepeticion();
         cancelarPista();
-        tokenDialogo += 1;
-        TextoVoz.detener();
+        callarVoz();
         detenerSonido();
         habilitarEscuchar(false);
         E().resaltar(id, false);
@@ -909,8 +945,7 @@
         tokenIntento += 1;
         fase = "escuchando";
         cancelarPista();
-        tokenDialogo += 1;
-        TextoVoz.detener();
+        callarVoz();
         $id("btn-escuchar").classList.remove("invita");
         await reproducirSonido(objetivo, modoEscondite ? { pan: E().panDe(objetivo) } : {});
         if (!vivo(gen) || fase !== "escuchando") return;
@@ -1134,8 +1169,7 @@
         fase = "animando";
         cancelarPista();
         detenerViaje();
-        tokenDialogo += 1;
-        TextoVoz.detener();
+        callarVoz();
         detenerSonido();
         reiniciarClase(el, "toca", 450);
         $id("btn-escuchar").classList.remove("invita");
