@@ -618,8 +618,13 @@
             : !!acc().mostrarIntro;
     }
 
+    /** Capa de ambiente (Phaser): existe solo si ambiente.js cargó bien. */
+    function ambiente() { return window.CompletaFiguraAmbiente || null; }
+
     function aplicarTema() {
         const tema = nivelElegido.tema;
+        const amb = ambiente();
+        if (amb && !amb.activo()) amb.iniciar();
         document.body.classList.toggle("tema-taller", tema === "taller");
         document.body.classList.toggle("tema-ingenieria", tema === "ingenieria");
         $id("estante").hidden = tema !== "taller";
@@ -667,7 +672,12 @@
         escala = Math.max(0.45, Math.min(2.1, sH, sStage, sMesa));
         document.documentElement.style.setProperty("--s", escala.toFixed(3));
         $id("escenario").style.marginTop = u(arriba);
-        $id("mesa").style.minHeight = Math.round(maxH * escala + relleno + 24) + "px";
+        /* Con el panel de control de mesa, las tarjetas necesitan más margen
+           dentro para que el marco del panel se vea alrededor. */
+        const margenMesa = ambiente() && ambiente().activo() ? 96 : 24;
+        $id("mesa").style.minHeight = Math.round(maxH * escala + relleno + margenMesa) + "px";
+        /* El panel se mide contra la mesa ya maquetada, de ahí el frame de espera. */
+        if (ambiente()) requestAnimationFrame(function () { ambiente().recolocar(); });
         if (fase === "limpiar") ajustarLodo(false);
     }
 
@@ -700,7 +710,6 @@
             esc.setAttribute("aria-hidden", "true");
         }
         if (reto.charco) crearDiv("charco", reto.charco, extras);
-        if (reto.mecanica === "simetria") pintarSimetria(reto);
         if (reto.mecanica === "calibrador") pintarRampa(reto);
         if (reto.mecanica === "clima") pintarPlataforma(reto);
     }
@@ -1320,16 +1329,6 @@
 
     /* ── Mecánica 5-6: escáner de simetría ────────────────────── */
 
-    function pintarSimetria(reto) {
-        const fig = $id("figura");
-        crearDiv("marco-prueba", reto.hueco, fig);
-        const eje = crearDiv("eje-simetria", { x: reto.ejeX - 1, y: reto.hueco.y - 14, w: 2, h: reto.hueco.h + 28 }, fig);
-        eje.hidden = true;
-        const fantasma = crearImg(reto.fantasma, "fantasma", { x: 0, y: 0, w: 300, h: 240 });
-        fantasma.hidden = true;
-        fig.appendChild(fantasma);
-    }
-
     async function simetria(id, card, clon, ok, gen) {
         const reto = retoActual;
         const p = pieza(id);
@@ -1338,33 +1337,23 @@
         if (!vivo(gen)) return;
         const colocada = colocarEnFigura(id, destino);
         const fig = $id("figura");
-        const eje = fig.querySelector(".eje-simetria");
-        const fantasma = fig.querySelector(".fantasma");
-        const marco = fig.querySelector(".marco-prueba");
-        marco.classList.add("escaneando");
         efecto("escaner");
-        eje.hidden = false;
-        fantasma.hidden = false;
-        eje.classList.remove("dorado");
-        await sleep(1400);
-        marco.classList.remove("escaneando");
+        const amb = ambiente();
+        if (amb) amb.escanear();
+        await sleep(1100);
 
         if (ok) {
-            eje.classList.add("dorado");
             efecto(reto.acierto.efecto);
-            fantasma.hidden = true;
+            if (amb) amb.veredicto(true);
             fig.querySelector(".hueco").classList.add("oculto");
             await animar(colocada, [{ transform: "scale(1.08)" }, { transform: "scale(1)" }], { duration: 300, fill: "none" });
             await sleep(500);
-            eje.hidden = true;
-            marco.classList.add("oculto");
             await celebrar(reto, gen);
             await retoCompletado(gen);
             return;
         }
 
-        fantasma.hidden = true;
-        eje.hidden = true;
+        if (amb) amb.veredicto(false);
         const e = lineaError(id) || {};
         fig.classList.add("viva");
         const vuelo = animar(fig, [
@@ -2176,7 +2165,7 @@
     /* ── Boot ─────────────────────────────────────────────────── */
 
     $(document).ready(function () {
-        gameConfig = JSON.parse(readText("config.json"));
+        gameConfig = JSON.parse(readText("config.json?v=20261106g"));
         introConfig = JSON.parse(readText("../../../intro.json"));
         introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
         aplicarLetterSpacing();

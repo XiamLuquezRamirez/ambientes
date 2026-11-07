@@ -18,6 +18,10 @@
     let aceptaRespuesta = false;
     let retoRuntime = null;
     let retoGen = 0;
+    let senderoEscena = null;
+    let nivelEscena = null;
+    /* Cada nivel se juega varias veces seguidas: ronda que va y cuántas son. */
+    let rondaActual = 0;
     let audioCache = Object.create(null);
     let imgCache = Object.create(null);
     let mediaLista = false;
@@ -631,6 +635,10 @@
             return instanciarReto(plantilla);
         });
         indiceReto = 0;
+        rondaActual = 0;
+        ponerEscena("general");
+        /* Partida nueva: el recorrido del sendero empieza vacío. */
+        if (window.LateralidadSendero) window.LateralidadSendero.reiniciar();
         window.__lateralidadNivel = nivelElegido.id;
 
         // Precargar TTS de consignas mientras corre la intro de lados.
@@ -807,8 +815,22 @@
         const el = document.getElementById("progreso");
         if (!el || !retosRuntime.length) return;
         el.hidden = false;
-        el.textContent = (indiceReto + 1) + "/" + retosRuntime.length;
+        const total = rondasDelReto();
+        /* "2/5" es el nivel; si tiene varias rondas se añade "· 1 de 3". */
+        el.textContent = (indiceReto + 1) + "/" + retosRuntime.length
+            + (total > 1 ? " · " + (rondaActual + 1) + " de " + total : "");
         if (anim()) anim().progreso(el);
+    }
+
+    function ponerEscena(tipo) {
+        const capas = document.querySelectorAll("#escena-fondo .escena-capa");
+        let hay = false;
+        capas.forEach(function (c) { if (c.dataset.escena === tipo) hay = true; });
+        const destino = hay ? tipo : "general";
+        capas.forEach(function (c) {
+            c.classList.toggle("activa", c.dataset.escena === destino);
+        });
+        document.body.dataset.escena = destino;
     }
 
     function setEnunciado(texto) {
@@ -1055,16 +1077,269 @@
         };
     }
 
+    /** Objetos cuyo nombre lleva artículo femenino en las consignas. */
+    const FEMENINOS = ["manzana", "mariposa", "tortuga", "pelota"];
+
+    function esFem(id) { return FEMENINOS.indexOf(id) >= 0; }
+
+    /** "el perro" / "la manzana". */
+    function conArticulo(id) {
+        return (esFem(id) ? "la " : "el ") + nombreObj(id);
+    }
+
+    /** Contrae "a el" en "al" y "de el" en "del" tras armar la frase. */
+    function limpiarArticulos(texto) {
+        return texto
+            .replace(/\ba el\b/g, "al")
+            .replace(/\bde el\b/g, "del")
+            .replace(/\s{2,}/g, " ")
+            .trim();
+    }
+
+    /** "del perro" / "de la manzana". */
+    function conDe(id) {
+        return (esFem(id) ? "de la " : "del ") + nombreObj(id);
+    }
+
+    /** "la Izquierda" / "el Centro". */
+    function ladoConArticulo(z) {
+        return (z === "centro" ? "el " : "la ") + (ZONA_LABEL[z] || z);
+    }
+
+    /**
+     * Nivel 1 — El Sendero: una bifurcación por tramo. El lado correcto se
+     * sortea y el premio de ese ramal es el que el niño se lleva.
+     */
+    function instanciarSendero(plantilla, zonasNivel) {
+        const zonas = ordenarZonas(
+            (plantilla.zonas && plantilla.zonas.length ? plantilla.zonas : zonasNivel)
+        );
+        const correcta = pick(zonas);
+        const pool = shuffle(plantilla.pool || []);
+        const objetivo = pool[0] || "oso";
+        /* Las otras puertas guardan otra cosa: nunca el objeto que se busca. */
+        const otros = [];
+        pool.forEach(function (id) {
+            if (id !== objetivo && otros.indexOf(id) < 0) otros.push(id);
+        });
+        Object.keys((gameConfig && gameConfig.objetos) || {}).forEach(function (id) {
+            if (id === objetivo || id === "mariposa_movimiento") return;
+            if (otros.indexOf(id) < 0) otros.push(id);
+        });
+        const premios = {};
+        let k = 0;
+        zonas.forEach(function (z) {
+            if (z === correcta) {
+                premios[z] = objetivo;
+                return;
+            }
+            premios[z] = otros.length ? otros[k % otros.length] : "perro";
+            k += 1;
+        });
+        const consigna = limpiarArticulos(
+            (plantilla.consignaPlantilla || "Toca el camino de {lado}.")
+                .replace("{lado}", ladoConArticulo(correcta))
+                .replace("{objetivo}", conArticulo(objetivo)));
+        return {
+            tipo: "sendero",
+            titulo: plantilla.titulo,
+            personaje: plantilla.personaje || "zeus",
+            zonas: zonas,
+            premios: premios,
+            respuesta: correcta,
+            consigna: consigna,
+            modoRespuesta: "zona"
+        };
+    }
+
+    /** Nivel 2 — Atrapa: el objeto cae por un lado y hay que llevar la cesta. */
+    function instanciarAtrapa(plantilla, zonasNivel) {
+        const zonas = ordenarZonas(
+            (plantilla.zonas && plantilla.zonas.length ? plantilla.zonas : zonasNivel)
+        );
+        const origen = pick(zonas);
+        const objeto = pick(plantilla.pool || ["manzana"]);
+        const consigna = limpiarArticulos(
+            (plantilla.consignaPlantilla || "¡Cae por {lado}! Lleva la cesta.")
+                .replace("{lado}", ladoConArticulo(origen))
+                .replace("{objetivo}", conArticulo(objeto)));
+        return {
+            tipo: "atrapa",
+            titulo: plantilla.titulo,
+            zonas: zonas,
+            objeto: objeto,
+            origen: origen,
+            respuesta: origen,
+            consigna: consigna,
+            modoRespuesta: "zona"
+        };
+    }
+
+    /**
+     * Nivel 3 — Parejas: una fila de amigos. Se señala a uno y el niño toca
+     * al que está a su derecha o a su izquierda dentro de la fila.
+     */
+    function instanciarParejas(plantilla) {
+        const cuantos = Math.max(3, Math.min(4, Number(plantilla.cuantos) || 3));
+        const orden = shuffle(plantilla.pool || []).slice(0, cuantos);
+        const lado = pick(["izquierda", "derecha"]);
+
+        /* El ancla no puede ser el del extremo hacia el que se pregunta. */
+        const posibles = [];
+        orden.forEach(function (id, i) {
+            const vecino = lado === "izquierda" ? i - 1 : i + 1;
+            if (vecino >= 0 && vecino < orden.length) posibles.push(i);
+        });
+        const iAncla = pick(posibles);
+        const iResp = lado === "izquierda" ? iAncla - 1 : iAncla + 1;
+
+        const consigna = limpiarArticulos(
+            (plantilla.consignaPlantilla || "¿Quién está a la {lado} {ancla}?")
+                .replace("{lado}", ZONA_LABEL[lado] || lado)
+                .replace("{ancla}", conDe(orden[iAncla])));
+
+        return {
+            tipo: "parejas",
+            titulo: plantilla.titulo,
+            orden: orden,
+            ancla: orden[iAncla],
+            lado: lado,
+            respuesta: orden[iResp],
+            consigna: consigna,
+            modoRespuesta: "objeto"
+        };
+    }
+
+    /** Nivel 4 — Estante: colocar la pieza a un lado del objeto ancla. */
+    function instanciarEstante(plantilla) {
+        const pool = shuffle(plantilla.pool || []);
+        const ancla = pool[0];
+        const piezaId = pool[1] || pool[0];
+        const lado = pick(["izquierda", "derecha"]);
+        const consigna = limpiarArticulos(
+            (plantilla.consignaPlantilla || "Pon {objetivo} a la {lado} {ancla}.")
+                .replace("{objetivo}", conArticulo(piezaId))
+                .replace("{lado}", ZONA_LABEL[lado] || lado)
+                .replace("{ancla}", conDe(ancla)));
+        return {
+            tipo: "estante",
+            titulo: plantilla.titulo,
+            ancla: ancla,
+            pieza: piezaId,
+            respuesta: lado,
+            consigna: consigna,
+            modoRespuesta: "zona"
+        };
+    }
+
     function instanciarReto(plantilla) {
         const zonas = nivelElegido.zonas.filter(function (z) {
             return z === "izquierda" || z === "centro" || z === "derecha";
         });
+        if (plantilla.tipo === "sendero") return instanciarSendero(plantilla, zonas);
+        if (plantilla.tipo === "atrapa") return instanciarAtrapa(plantilla, zonas);
+        if (plantilla.tipo === "parejas") return instanciarParejas(plantilla);
+        if (plantilla.tipo === "estante") return instanciarEstante(plantilla);
         if (plantilla.tipo === "estatico") return instanciarEstatico(plantilla, zonas);
         if (plantilla.tipo === "dinamico") return instanciarDinamico(plantilla, zonas);
         return instanciarImitacion(plantilla, zonas);
     }
 
     /* ── Ejecutar retos ───────────────────────────────────────── */
+
+    /** Cuántas veces se repite el nivel que se está jugando. */
+    function rondasDelReto() {
+        const p = retos[indiceReto];
+        const n = p && Number(p.rondas);
+        return isFinite(n) && n > 0 ? n : 1;
+    }
+
+    function despacharReto(rt, gen) {
+        if (rt.tipo === "sendero") reproducirSendero(rt, gen);
+        else if (rt.tipo === "atrapa") reproducirAtrapa(rt, gen);
+        else if (rt.tipo === "parejas") reproducirParejas(rt, gen);
+        else if (rt.tipo === "estante") reproducirEstante(rt, gen);
+        else if (rt.tipo === "estatico") reproducirEstatico(rt, gen);
+        else if (rt.tipo === "dinamico") reproducirDinamico(rt, gen);
+        else reproducirImitacion(rt, gen);
+
+        /* Las piezas del nivel entran escalonadas, no todas de golpe. */
+        if (anim() && anim().entrada) {
+            requestAnimationFrame(function () {
+                if (gen === retoGen) anim().entrada(document.getElementById("tablero"));
+            });
+        }
+    }
+
+    /**
+     * Siguiente ejercicio del mismo reto. La vista se queda: solo cambian
+     * la consigna y lo que hay que resolver. Si no se puede, se arma de nuevo
+     * sin la entrada que parece una recarga.
+     */
+    function reinstanciarRonda(gen) {
+        if (gen !== retoGen) return;
+        aceptaRespuesta = false;
+        actualizarProgreso();
+        retoRuntime = instanciarReto(retos[indiceReto]);
+        retosRuntime[indiceReto] = retoRuntime;
+        window.__lateralidadReto = retoRuntime;
+        if (continuarRonda(retoRuntime, gen)) return;
+        limpiarEscena();
+        despacharReto(retoRuntime, gen);
+    }
+
+    function apiReto() {
+        return { imgUrl: imgUrl, nombreObj: nombreObj };
+    }
+
+    /** true si la ronda nueva cabe en la escena que ya está en pantalla. */
+    function continuarRonda(rt, gen) {
+        let hecho = false;
+        if (rt.tipo === "sendero" && senderoEscena && window.LateralidadSendero) {
+            const S = window.LateralidadSendero;
+            S.iniciar({
+                total: retosRuntime.length,
+                hecho: indiceReto,
+                api: apiReto()
+            });
+            hecho = S.renovar(senderoEscena, {
+                zonas: rt.zonas,
+                premios: rt.premios
+            });
+        } else if (rt.tipo === "atrapa" && nivelEscena && window.LateralidadAtrapa) {
+            hecho = window.LateralidadAtrapa.renovar(nivelEscena, {
+                zonas: rt.zonas,
+                objeto: rt.objeto,
+                origen: rt.origen,
+                api: apiReto()
+            });
+        } else if (rt.tipo === "parejas" && nivelEscena && window.LateralidadParejas) {
+            const P = window.LateralidadParejas;
+            if (P.renovar(nivelEscena, { orden: rt.orden, ancla: rt.ancla, api: apiReto() })) {
+                P.esperarEleccion(nivelEscena, function (id) {
+                    if (!aceptaRespuesta || esperandoFeedback || gen !== retoGen) return;
+                    P.congelar(nivelEscena);
+                    resolverRespuesta(id, gen);
+                });
+                hecho = Promise.resolve();
+            }
+        } else if (rt.tipo === "estante" && nivelEscena && window.LateralidadEstante) {
+            hecho = window.LateralidadEstante.renovar(nivelEscena, {
+                ancla: rt.ancla,
+                pieza: rt.pieza,
+                api: apiReto()
+            });
+        }
+        if (!hecho) return false;
+        setEnunciado(rt.consigna);
+        TextoVoz.hablar(rt.consigna, "zoe");
+        aceptaRespuesta = false;
+        Promise.resolve(hecho).then(function () {
+            if (gen !== retoGen) return;
+            aceptaRespuesta = true;
+        });
+        return true;
+    }
 
     function iniciarRetoActual(gen) {
         if (gen == null) gen = retoGen;
@@ -1077,11 +1352,10 @@
         actualizarProgreso();
         retoRuntime = retosRuntime[indiceReto];
         window.__lateralidadReto = retoRuntime;
+        ponerEscena(retoRuntime.tipo);
         setEnunciado(retoRuntime.titulo || textos().enunciado);
 
-        if (retoRuntime.tipo === "estatico") reproducirEstatico(retoRuntime, gen);
-        else if (retoRuntime.tipo === "dinamico") reproducirDinamico(retoRuntime, gen);
-        else reproducirImitacion(retoRuntime, gen);
+        despacharReto(retoRuntime, gen);
 
         /* Animar cuando el DOM del reto ya tiene nodos (no esperar animaciones largas del reto). */
         requestAnimationFrame(function () {
@@ -1089,6 +1363,178 @@
                 if (gen === retoGen) animarEntradaEjercicio();
             });
         });
+    }
+
+    /**
+     * Nivel 1 — El Sendero. El niño toca un ramal, el personaje camina hasta
+     * allá y recoge el premio si acertó; si no, vuelve al tronco. El feedback
+     * y el avance de reto los sigue manejando resolverRespuesta.
+     */
+    function reproducirSendero(rt, gen) {
+        if (gen !== retoGen) return;
+        const S = window.LateralidadSendero;
+        const tablero = document.getElementById("tablero");
+        if (!S) {
+            console.warn("Lateralidad: falta sendero.js");
+            return;
+        }
+
+        /* El mapa refleja el avance del juego completo, no solo del sendero. */
+        S.iniciar({
+            total: retosRuntime.length,
+            hecho: indiceReto,
+            api: { imgUrl: imgUrl, nombreObj: nombreObj }
+        });
+
+        const escena = S.bifurcacion(tablero, {
+            zonas: rt.zonas,
+            premios: rt.premios,
+            personaje: rt.personaje || "zeus",
+            personajeImg: gifPersonaje(rt.personaje || "zeus")
+        });
+        senderoEscena = escena;
+
+        setEnunciado(rt.consigna);
+        TextoVoz.hablar(rt.consigna, "zoe");
+        sonarEvento("aparece");
+
+        S.esperarEleccion(escena, function (z) {
+            if (!aceptaRespuesta || esperandoFeedback || gen !== retoGen) return;
+            S.congelar(escena);
+            resolverRespuesta(z, gen);
+        });
+        aceptaRespuesta = true;
+    }
+
+    /** Nivel 2 — Atrapa en el Aire. */
+    async function reproducirAtrapa(rt, gen) {
+        if (gen !== retoGen) return;
+        const A = window.LateralidadAtrapa;
+        if (!A) {
+            console.warn("Lateralidad: falta atrapa.js");
+            return;
+        }
+        const escena = A.montar(document.getElementById("tablero"), {
+            zonas: rt.zonas,
+            objeto: rt.objeto,
+            origen: rt.origen,
+            api: { imgUrl: imgUrl, nombreObj: nombreObj }
+        });
+        nivelEscena = escena;
+
+        setEnunciado(rt.consigna);
+        TextoVoz.hablar(rt.consigna, "zoe");
+        sonarEvento("aparece");
+        await A.anunciar(escena);
+        if (gen !== retoGen) return;
+
+        A.esperarEleccion(escena, function (z) {
+            if (!aceptaRespuesta || esperandoFeedback || gen !== retoGen) return;
+            A.congelar(escena);
+            resolverRespuesta(z, gen);
+        });
+        aceptaRespuesta = true;
+    }
+
+    /** Nivel 3 — ¿Quién está al lado? */
+    function reproducirParejas(rt, gen) {
+        if (gen !== retoGen) return;
+        const P = window.LateralidadParejas;
+        if (!P) {
+            console.warn("Lateralidad: falta parejas.js");
+            return;
+        }
+        const escena = P.montar(document.getElementById("tablero"), {
+            orden: rt.orden,
+            ancla: rt.ancla,
+            api: { imgUrl: imgUrl, nombreObj: nombreObj }
+        });
+        nivelEscena = escena;
+
+        setEnunciado(rt.consigna);
+        TextoVoz.hablar(rt.consigna, "zoe");
+        sonarEvento("aparece");
+
+        P.esperarEleccion(escena, function (id) {
+            if (!aceptaRespuesta || esperandoFeedback || gen !== retoGen) return;
+            P.congelar(escena);
+            resolverRespuesta(id, gen);
+        });
+        aceptaRespuesta = true;
+    }
+
+    /** Nivel 4 — Ordena el Estante. */
+    function reproducirEstante(rt, gen) {
+        if (gen !== retoGen) return;
+        const T = window.LateralidadEstante;
+        if (!T) {
+            console.warn("Lateralidad: falta estante.js");
+            return;
+        }
+        const escena = T.montar(document.getElementById("tablero"), {
+            ancla: rt.ancla,
+            pieza: rt.pieza,
+            api: { imgUrl: imgUrl, nombreObj: nombreObj }
+        });
+        nivelEscena = escena;
+
+        setEnunciado(rt.consigna);
+        TextoVoz.hablar(rt.consigna, "zoe");
+        sonarEvento("aparece");
+
+        T.esperarEleccion(escena, function (z) {
+            if (!aceptaRespuesta || esperandoFeedback || gen !== retoGen) return;
+            T.congelar(escena);
+            resolverRespuesta(z, gen);
+        });
+        aceptaRespuesta = true;
+    }
+
+    /**
+     * Anima la respuesta de los niveles 2-4 antes del feedback: la acción
+     * (cesta, mano, pieza) ocurre en la escena, no en un botón.
+     */
+    function animarNivelRespuesta(tipo, zona, ok) {
+        const esc = nivelEscena;
+        if (!esc) return Promise.resolve();
+
+        if (tipo === "atrapa") {
+            const A = window.LateralidadAtrapa;
+            /* La cesta se coloca y recién entonces cae algo por ese tubo. */
+            return A.moverCesta(esc, zona)
+                .then(function () { return A.caer(esc, zona, ok); })
+                .then(function () { if (!ok) A.reactivar(esc); });
+        }
+        if (tipo === "parejas") {
+            const P = window.LateralidadParejas;
+            if (ok) return P.acertar(esc, zona);
+            return P.fallar(esc, zona).then(function () { P.reactivar(esc); });
+        }
+        if (tipo === "estante") {
+            const T = window.LateralidadEstante;
+            if (ok) return T.colocar(esc, zona);
+            return T.devolver(esc, zona).then(function () { T.reactivar(esc); });
+        }
+        return Promise.resolve();
+    }
+
+    /**
+     * Camina hasta el ramal tocado antes de que salga el feedback, para que
+     * la respuesta se vea como un recorrido y no como un botón.
+     */
+    function animarSenderoRespuesta(zona, ok) {
+        const S = window.LateralidadSendero;
+        if (!S || !senderoEscena) return Promise.resolve();
+        const escena = senderoEscena;
+        if (!ok) {
+            return S.caminarA(escena, zona)
+                .then(function () { return S.mostrarOtro(escena, zona); })
+                .then(function () { return S.volver(escena, zona); })
+                .then(function () { S.reactivar(escena); });
+        }
+        return S.caminarA(escena, zona)
+            .then(function () { return S.recoger(escena, zona); })
+            .then(function () { return S.avanzar(escena); });
     }
 
     function reproducirEstatico(rt, gen) {
@@ -1343,6 +1789,23 @@
         const ok = String(valor) === String(respuestaCorrectaActual());
         if (anim()) anim().toque(valor);
         sonarEvento("agarrar");
+
+        /* Los niveles nuevos animan la acción en la escena antes del feedback. */
+        const tipo = retoRuntime && retoRuntime.tipo;
+        if (tipo === "sendero" || tipo === "atrapa" || tipo === "parejas" || tipo === "estante") {
+            esperandoFeedback = true;
+            const animacion = tipo === "sendero"
+                ? animarSenderoRespuesta(valor, ok)
+                : animarNivelRespuesta(tipo, valor, ok);
+            animacion.then(function () {
+                esperandoFeedback = false;
+                if (gen !== retoGen) return;
+                if (ok) resolverAcierto(gen);
+                else resolverError(gen);
+            });
+            return;
+        }
+
         if (ok) resolverAcierto(gen);
         else resolverError(gen);
     }
@@ -1444,11 +1907,30 @@
         });
     }
 
+    /** Último acierto de un nivel, o del juego entero: se festeja más fuerte. */
+    function gradoCelebracion() {
+        const ultimaRonda = rondaActual >= rondasDelReto() - 1;
+        if (!ultimaRonda) return "ronda";
+        return indiceReto >= retosRuntime.length - 1 ? "final" : "nivel";
+    }
+
     function celebrarAcierto(valor) {
         const v = String(valor);
-        const sel = '.btn-mano[data-zona="' + v + '"], .zona-slot[data-zona="' + v + '"], .tarjeta-obj[data-objeto="' + v + '"]';
+        const sel = '.btn-mano[data-zona="' + v + '"], .zona-slot[data-zona="' + v + '"], .tarjeta-obj[data-objeto="' + v + '"]'
+            + ', .sendero-ramal[data-zona="' + v + '"], .atrapa-carril[data-zona="' + v + '"]'
+            + ', .estante-hueco[data-zona="' + v + '"], .parejas-puesto[data-objeto="' + v + '"]';
         const nodos = document.querySelectorAll(sel);
         nodos.forEach(function (el) { el.classList.add("acerto"); });
+
+        /* Los niveles nuevos tienen su propio festejo, con intensidad creciente. */
+        const color = (gameConfig.coloresZona || {})[v];
+        if (anim() && anim().festejar) {
+            anim().festejar(v, gradoCelebracion(), color);
+        }
+        if (window.LateralidadPersonaje && window.LateralidadPersonaje.festejar) {
+            window.LateralidadPersonaje.festejar();
+        }
+
         const ancla = document.querySelector('.btn-mano[data-zona="' + v + '"]')
             || document.querySelector('.tarjeta-obj[data-objeto="' + v + '"]')
             || (nodos.length ? nodos[0] : null);
@@ -1491,6 +1973,14 @@
                 TextoVoz.hablar(paso.consigna, "zoe");
                 return;
             }
+            /* Un nivel se juega en varias rondas: se sortea otra situación
+               con la misma mecánica hasta completarlas todas. */
+            if (rondaActual < rondasDelReto() - 1) {
+                rondaActual += 1;
+                reinstanciarRonda(gen);
+                return;
+            }
+            rondaActual = 0;
             indiceReto += 1;
             iniciarRetoActual(gen);
         }).catch(function () {
@@ -1532,7 +2022,7 @@
     /* ── Boot ─────────────────────────────────────────────────── */
 
     $(document).ready(function () {
-        gameConfig = JSON.parse(readText("config.json"));
+        gameConfig = JSON.parse(readText("config.json?v=20261107d"));
         introConfig = JSON.parse(readText("../../intro.json"));
         introConfig.conversacion = (gameConfig.textos && gameConfig.textos.conversacion) || [];
         aplicarLetterSpacing();

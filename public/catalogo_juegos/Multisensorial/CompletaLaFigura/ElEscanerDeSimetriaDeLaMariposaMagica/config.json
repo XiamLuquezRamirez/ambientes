@@ -108,32 +108,32 @@
       "h": 89
     },
     "ala_mec": {
-      "nombre": "Ala mecánica",
-      "img": "img/piezas/ala_mec.svg",
+      "nombre": "Ala de mariposa",
+      "img": "img/piezas/ala_ilu.svg",
       "w": 80,
       "h": 139
     },
     "ala_mec_ondulada": {
       "nombre": "Ala de bordes ondulados",
-      "img": "img/piezas/ala_mec_ondulada.svg",
+      "img": "img/piezas/ala_ilu_ondulada.svg",
       "w": 80,
       "h": 139
     },
     "ala_mec_pequena": {
       "nombre": "Ala más pequeña",
-      "img": "img/piezas/ala_mec.svg",
+      "img": "img/piezas/ala_ilu.svg",
       "w": 60,
       "h": 104
     },
     "hoja_ala": {
       "nombre": "Hoja verde",
-      "img": "img/piezas/hoja_ala.svg",
+      "img": "img/piezas/ala_ilu_hoja.svg",
       "w": 80,
       "h": 139
     },
     "ala_abeja": {
-      "nombre": "Ala de abeja",
-      "img": "img/piezas/ala_abeja.svg",
+      "nombre": "Ala con engranajes",
+      "img": "img/piezas/ala_ilu_tuerca.svg",
       "w": 80,
       "h": 139
     },
@@ -245,11 +245,7 @@
           "medida": "alto",
           "capas": [
             {
-              "img": "img/figuras/mariposa_mec_ala_izq.svg",
-              "clase": "ala ala-izq"
-            },
-            {
-              "img": "img/figuras/mariposa_mec_cuerpo.svg",
+              "img": "img/figuras/mariposa_ilu_cuerpo.svg",
               "clase": "cuerpo"
             }
           ],
@@ -258,9 +254,8 @@
             "y": 45,
             "w": 80,
             "h": 139,
-            "img": "img/figuras/mariposa_mec_hueco.svg"
+            "img": "img/figuras/mariposa_ilu_hueco.svg"
           },
-          "fantasma": "img/figuras/mariposa_mec_fantasma.svg",
           "ejeX": 150,
           "colocada": "ala ala-der",
           "opciones": [
@@ -305,7 +300,7 @@
             },
             "ala_abeja": {
               "voz": "zoe",
-              "texto": "¡Alerta de Desequilibrio! El patrón de manchas no coincide.",
+              "texto": "¡Alerta de Desequilibrio! El patrón de engranajes no coincide.",
               "reaccion": "inclinaVuelo",
               "tipo": "forma",
               "alerta": true

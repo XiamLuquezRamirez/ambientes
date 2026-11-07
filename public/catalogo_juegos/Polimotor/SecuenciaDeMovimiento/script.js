@@ -818,9 +818,8 @@
             onTexto: setEnunciado,
             jugar: async function () {
                 const dormir = PedniaTutorial.sleep;
-                await reproducirSecuencia(ejemplo.prefijo, gen, true);
+                await presentarSecuencia(ejemplo.prefijo, gen);
                 if (gen !== retoGen || juegoTerminado) return;
-                renderRielEstatico(ejemplo.prefijo, true);
                 const pregunta = textos().pregunta || "¿Qué movimiento sigue?";
                 setEnunciado(pregunta);
                 try {
@@ -843,6 +842,8 @@
                 await colocarRespuestaEnHueco(ejemplo.correcta, btn);
                 if (gen !== retoGen || juegoTerminado) return;
                 await dormir(550);
+                document.getElementById("opciones").hidden = true;
+                await partirTren(gen);
                 document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
                 limpiarEscena();
             }
@@ -911,53 +912,219 @@
         return slot;
     }
 
-    function renderRielEstatico(secuencia, mostrarHueco) {
-        const riel = document.getElementById("riel");
-        riel.innerHTML = "";
-        secuencia.forEach(function (id) {
-            riel.appendChild(crearSlotPose(id, { visible: true }));
-        });
-        if (mostrarHueco) riel.appendChild(crearSlotPose(null, { hueco: true }));
+    /* ── El tren de la secuencia ──────────────────────────────────
+       Una locomotora y un vagón por pose; el último vagón trae el "?". */
+
+    const MS_LLEGADA = 1600;
+    const MS_PARTIDA = 1400;
+
+    function crearRueda(clase) {
+        const r = document.createElement("span");
+        r.className = "tren-rueda" + (clase ? " " + clase : "");
+        r.setAttribute("aria-hidden", "true");
+        return r;
     }
 
-    async function reproducirSecuencia(secuencia, gen, lento) {
+    function crearLocomotora() {
+        const loco = document.createElement("div");
+        loco.className = "tren-loco";
+        loco.setAttribute("aria-hidden", "true");
+        loco.innerHTML =
+            '<span class="loco-humo h1"></span><span class="loco-humo h2"></span><span class="loco-humo h3"></span>' +
+            '<span class="loco-chimenea"></span>' +
+            '<span class="loco-caldera"><span class="loco-faro"></span></span>' +
+            '<span class="loco-cabina"><span class="loco-ventana"></span></span>' +
+            '<span class="loco-base"></span>' +
+            '<span class="loco-quitapiedras"></span>';
+        loco.appendChild(crearRueda("chica r1"));
+        loco.appendChild(crearRueda("chica r2"));
+        loco.appendChild(crearRueda("grande r3"));
+        return loco;
+    }
+
+    function crearVagon(i, slot) {
+        const vagon = document.createElement("div");
+        vagon.className = "tren-vagon color-" + (i % 4);
+        vagon.appendChild(slot);
+        const caja = document.createElement("span");
+        caja.className = "vagon-caja";
+        caja.setAttribute("aria-hidden", "true");
+        vagon.appendChild(caja);
+        vagon.appendChild(crearRueda("v1"));
+        vagon.appendChild(crearRueda("v2"));
+        return vagon;
+    }
+
+    /** Arma el tren fuera de la pantalla, con los vagones vacíos. */
+    function montarTren(cantidad) {
         const riel = document.getElementById("riel");
         riel.innerHTML = "";
-        const pausa = timings().pausaEntrePasosMs != null ? timings().pausaEntrePasosMs : 100;
-        const minPaso = lento
-            ? (timings().pasoLentoMs || 950)
-            : (timings().pasoMs || 650);
-        const slots = [];
-        const quien = "zoe";
+        const via = document.createElement("div");
+        via.className = "tren-via";
+        via.setAttribute("aria-hidden", "true");
+        riel.appendChild(via);
 
-        // Todas las poses visibles de inmediato; ritmo = highlight + narración.
-        secuencia.forEach(function (id) {
-            const s = crearSlotPose(id, { visible: true });
-            riel.appendChild(s);
-            slots.push(s);
+        const tren = document.createElement("div");
+        tren.className = "tren";
+        tren.appendChild(crearLocomotora());
+        for (let i = 0; i < cantidad; i++) {
+            const slot = crearSlotPose(null, { visible: true });
+            slot.classList.add("vacio");
+            tren.appendChild(crearVagon(i, slot));
+        }
+        const hueco = crearSlotPose(null, { hueco: true });
+        hueco.classList.add("oculto");
+        const ultimo = crearVagon(cantidad, hueco);
+        ultimo.classList.add("vagon-pregunta");
+        tren.appendChild(ultimo);
+        riel.appendChild(tren);
+        return tren;
+    }
+
+    function trenActual() {
+        return document.querySelector("#riel .tren");
+    }
+
+    function moverTren(tren, destino, ms, curva) {
+        return new Promise(function (resolve) {
+            if (!tren) { resolve(); return; }
+            if (movimientoReducido()) {
+                tren.style.transition = "none";
+                tren.style.transform = destino;
+                resolve();
+                return;
+            }
+            tren.classList.add("andando");
+            tren.style.transition = "transform " + ms + "ms " + curva;
+            tren.style.transform = destino;
+            setTimeout(function () {
+                tren.classList.remove("andando");
+                resolve();
+            }, ms + 30);
         });
+    }
 
+    /** Entra desde la derecha, frena y los vagones se mecen. */
+    async function llegarTren(gen) {
+        const tren = trenActual();
+        if (!tren) return;
+        tren.style.transition = "none";
+        tren.style.transform = "translateX(100vw)";
+        void tren.offsetWidth;
+        sonarEvento("acierto", { vol: 0.5 });
+        await moverTren(tren, "translateX(0)", MS_LLEGADA, "cubic-bezier(.16,.72,.28,1)");
+        if (gen !== retoGen || !tren.isConnected) return;
+        tren.classList.remove("frena");
+        void tren.offsetWidth;
+        tren.classList.add("frena");
+        sonarEvento("bote", { vol: 0.35 });
+        await sleep(380);
+    }
+
+    /** Sale por la izquierda acelerando. */
+    async function partirTren(gen) {
+        const tren = trenActual();
+        if (!tren || gen !== retoGen) return;
+        tren.classList.remove("frena");
+        sonarEvento("acierto", { vol: 0.6 });
+        await moverTren(tren, "translateX(calc(-100% - 20vw))", MS_PARTIDA, "cubic-bezier(.55,0,.85,.45)");
+    }
+
+    /** Golpe de ritmo: el vagón rebota y aparece su número grande. */
+    function golpeVagon(vagon, numero) {
+        if (!vagon) return;
+        sonarEvento("bote", { vol: 0.8 });
+        vagon.classList.remove("golpe");
+        void vagon.offsetWidth;
+        vagon.classList.add("golpe");
+        if (numero == null) return;
+        const previo = vagon.querySelector(".tren-conteo");
+        if (previo) previo.remove();
+        const n = document.createElement("span");
+        n.className = "tren-conteo";
+        n.textContent = String(numero);
+        n.setAttribute("aria-hidden", "true");
+        vagon.appendChild(n);
+        setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, 1100);
+    }
+
+    /** Nombra el movimiento con el ritmo mínimo del paso. */
+    async function narrarPaso(id, gen, lento) {
+        const minPaso = lento ? (timings().pasoLentoMs || 950) : (timings().pasoMs || 650);
+        const nombre = nombreMov(id);
+        const t0 = Date.now();
+        if (nombre) {
+            try {
+                await Promise.race([
+                    TextoVoz.hablar(nombre, "zoe").catch(function () {}),
+                    sleep(Math.max(minPaso + 1800, 3200))
+                ]);
+            } catch (e) { /* noop */ }
+        }
+        if (gen !== retoGen) return;
+        const restante = minPaso - (Date.now() - t0);
+        if (restante > 40) await sleep(restante);
+    }
+
+    /** Cada pose cae en su vagón al ritmo, con conteo 1, 2, 3... */
+    async function cargarTren(secuencia, gen) {
+        const pausa = timings().pausaEntrePasosMs != null ? timings().pausaEntrePasosMs : 100;
+        const vagones = document.querySelectorAll("#riel .tren-vagon");
         for (let i = 0; i < secuencia.length; i++) {
             if (gen !== retoGen) return;
-            slots[i].classList.add("activa");
-            if (anim()) anim().pasoActivo(slots[i]);
-            const nombre = nombreMov(secuencia[i]);
-            const t0 = Date.now();
-            if (nombre) {
-                try {
-                    await Promise.race([
-                        TextoVoz.hablar(nombre, quien).catch(function () {}),
-                        sleep(Math.max(minPaso + 1800, 3200))
-                    ]);
-                } catch (e) { /* noop */ }
-            }
+            const vagon = vagones[i];
+            const slot = vagon && vagon.querySelector(".slot-pose");
+            if (!slot) continue;
+            slot.classList.remove("vacio");
+            slot.dataset.mov = secuencia[i];
+            slot.appendChild(crearImgEl(imgUrl(secuencia[i]), nombreMov(secuencia[i])));
+            slot.classList.add("cae", "activa");
+            golpeVagon(vagon, i + 1);
+            await narrarPaso(secuencia[i], gen, true);
             if (gen !== retoGen) return;
-            const restante = minPaso - (Date.now() - t0);
-            if (restante > 40) await sleep(restante);
-            if (gen !== retoGen) return;
-            slots[i].classList.remove("activa");
+            slot.classList.remove("cae", "activa");
             await sleep(pausa);
         }
+    }
+
+    /** El último vagón muestra su "?". */
+    async function mostrarPregunta(gen) {
+        const hueco = document.querySelector("#riel .slot-pose.hueco");
+        if (!hueco || gen !== retoGen) return;
+        hueco.classList.remove("oculto");
+        hueco.classList.add("aparece");
+        golpeVagon(hueco.closest(".tren-vagon"), null);
+        await sleep(420);
+        hueco.classList.remove("aparece");
+    }
+
+    /** Repasa los vagones ya cargados al ritmo (tras un error o al completar). */
+    async function repasarTren(secuencia, gen, lento) {
+        const pausa = timings().pausaEntrePasosMs != null ? timings().pausaEntrePasosMs : 100;
+        const vagones = document.querySelectorAll("#riel .tren-vagon");
+        for (let i = 0; i < secuencia.length; i++) {
+            if (gen !== retoGen) return;
+            const vagon = vagones[i];
+            const slot = vagon && vagon.querySelector(".slot-pose");
+            if (!slot) continue;
+            slot.classList.add("activa");
+            golpeVagon(vagon, i + 1);
+            if (anim()) anim().pasoActivo(slot);
+            await narrarPaso(secuencia[i], gen, lento);
+            if (gen !== retoGen) return;
+            slot.classList.remove("activa");
+            await sleep(pausa);
+        }
+    }
+
+    /** Tren nuevo: llega, se carga con la secuencia y enseña el "?". */
+    async function presentarSecuencia(secuencia, gen) {
+        montarTren(secuencia.length);
+        await llegarTren(gen);
+        if (gen !== retoGen) return;
+        await cargarTren(secuencia, gen);
+        if (gen !== retoGen) return;
+        await mostrarPregunta(gen);
     }
 
     function renderOpciones(reto, gen) {
@@ -1000,9 +1167,7 @@
         setEnunciado(retoActual.pregunta || textos().pregunta || "¿Qué sigue?");
 
         // Narración completa: cada pose del prefijo + pregunta (sin adelantar la correcta).
-        await reproducirSecuencia(retoActual.prefijo || [], gen, true);
-        if (gen !== retoGen) return;
-        renderRielEstatico(retoActual.prefijo || [], true);
+        await presentarSecuencia(retoActual.prefijo || [], gen);
         if (gen !== retoGen) return;
 
         const pregunta = retoActual.pregunta || textos().pregunta || "¿Qué movimiento sigue?";
@@ -1095,9 +1260,8 @@
         } catch (e) { /* noop */ }
         if (gen !== retoGen) return;
         document.getElementById("opciones").hidden = true;
-        await reproducirSecuencia(retoActual.prefijo || [], gen, true);
+        await repasarTren(retoActual.prefijo || [], gen, true);
         if (gen !== retoGen) return;
-        renderRielEstatico(retoActual.prefijo || [], true);
         const pregunta = retoActual.pregunta || textos().pregunta || "¿Qué movimiento sigue?";
         setEnunciado(pregunta);
         try {
@@ -1184,18 +1348,13 @@
 
         const btn = document.querySelector('.tarjeta-opcion[data-mov="' + valor + '"]');
         const completa = (retoActual.prefijo || []).concat([valor]);
-        const puesto = await colocarRespuestaEnHueco(valor, btn);
+        await colocarRespuestaEnHueco(valor, btn);
         if (gen !== retoGen) return;
-        if (!puesto) {
-            renderRielEstatico(completa, false);
-            const last = document.querySelector(".slot-pose:last-child");
-            if (last) last.classList.add("activa");
-        }
         document.getElementById("opciones").hidden = true;
 
         await sleep(420);
         if (gen !== retoGen) return;
-        await reproducirSecuencia(completa, gen, false);
+        await repasarTren(completa, gen, false);
         if (gen !== retoGen) return;
 
         // Con el tema: encaje + aplausos suaves ("respuesta correcta"); sin tema, ok.mp3.
@@ -1203,8 +1362,10 @@
             reproducirAudio(gameConfig.audios && gameConfig.audios.acierto, 0.85, false);
         }
         if (anim()) anim().acierto();
-        // Sin modal/TTS por acierto: solo sonido.
-        await sleep(350);
+        // Sin modal/TTS por acierto: el tren completo se va.
+        await sleep(650);
+        if (gen !== retoGen) return;
+        await partirTren(gen);
         if (gen !== retoGen) return;
         esperandoFeedback = false;
         indiceReto += 1;

@@ -1,0 +1,732 @@
+/* ════════════════════════════════════════════════════════════
+   Niveles 2, 3 y 4 de Lateralidad.
+   El sendero (nivel 1) tiene su propia hoja en sendero.css.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Nivel 2: Atrapa en el Aire ─────────────────────────────── */
+
+.tablero.atrapa {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: clamp(6px, 1.4vh, 14px);
+    box-sizing: border-box;
+    background: none;
+}
+
+/* Sacudida de cámara al recibir o estrellarse el objeto. */
+.tablero.atrapa.sacude {
+    animation: atrapaCamara 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+.tablero.atrapa.sacude-fuerte {
+    animation: atrapaCamaraFuerte 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes atrapaCamara {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(-4px, 3px);
+    }
+
+    60% {
+        transform: translate(4px, -2px);
+    }
+}
+
+@keyframes atrapaCamaraFuerte {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    15% {
+        transform: translate(-9px, 6px) rotate(-0.7deg);
+    }
+
+    40% {
+        transform: translate(8px, -5px) rotate(0.6deg);
+    }
+
+    70% {
+        transform: translate(-5px, 3px) rotate(-0.3deg);
+    }
+}
+
+.atrapa-cielo {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: stretch;
+    gap: clamp(8px, 2.4vw, 32px);
+}
+
+/* Cada tubo: una boca arriba y el nombre del lado, bien grande. */
+.atrapa-carril {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 4px solid rgba(255, 255, 255, 0.55);
+    box-shadow: inset 0 10px 18px rgba(255, 255, 255, 0.28);
+    transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+
+.atrapa-carril.izquierda { background: rgba(255, 212, 59, 0.22); }
+.atrapa-carril.centro { background: rgba(77, 171, 247, 0.22); }
+.atrapa-carril.derecha { background: rgba(81, 207, 102, 0.22); }
+
+.atrapa-cielo::before,
+.atrapa-cielo::after {
+    content: "";
+    position: absolute;
+    height: 22px;
+    border-radius: 40px;
+    background: rgba(255, 255, 255, 0.72);
+    pointer-events: none;
+    z-index: 0;
+    animation: atrapaNube 16s linear infinite;
+}
+
+.atrapa-cielo::before {
+    width: 78px;
+    top: 10%;
+    left: -12%;
+    box-shadow: 26px -12px 0 -2px rgba(255, 255, 255, 0.65), 54px 2px 0 -6px rgba(255, 255, 255, 0.5);
+}
+
+.atrapa-cielo::after {
+    width: 64px;
+    top: 24%;
+    left: 8%;
+    animation-duration: 22s;
+    animation-delay: -8s;
+}
+
+@keyframes atrapaNube {
+    from { transform: translateX(0); }
+    to { transform: translateX(70vw); }
+}
+
+.atrapa-carril.elegible {
+    cursor: pointer;
+}
+
+.atrapa-carril.elegible:hover,
+.atrapa-carril.elegible:focus-visible {
+    background: rgba(255, 255, 255, 0.38);
+    transform: translateY(-4px);
+    outline: none;
+}
+
+/* El tubo por el que va a caer algo se ilumina. */
+.atrapa-carril.activo {
+    border-style: solid;
+    border-color: #ffd43b;
+    background: rgba(255, 212, 59, 0.26);
+}
+
+/* Boca del tubo, pegada al borde superior. */
+.atrapa-boca {
+    position: absolute;
+    top: 0;
+    width: clamp(70px, 16vw, 150px);
+    height: clamp(16px, 3.4vh, 30px);
+    border-radius: 0 0 999px 999px;
+    background: linear-gradient(180deg, #63b84a, #3f8a2a);
+    box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.25), 0 4px 0 rgba(40, 80, 20, 0.25);
+}
+
+.atrapa-carril.activo .atrapa-boca {
+    background: linear-gradient(180deg, #ffd43b, #e8a200);
+}
+
+/* El nombre del lado: grande y centrado en el tubo. */
+.atrapa-cartel {
+    padding: clamp(6px, 1.4vh, 14px) clamp(12px, 2.6vw, 28px);
+    border-radius: 16px;
+    background: #fff;
+    border: 4px solid #ffb703;
+    color: #3a2a00;
+    font-size: clamp(20px, 4.6vh, 46px);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.14);
+}
+
+.atrapa-carril.izquierda .atrapa-cartel {
+    border-color: #ffd43b;
+}
+
+.atrapa-carril.centro .atrapa-cartel {
+    border-color: #4dabf7;
+}
+
+.atrapa-carril.derecha .atrapa-cartel {
+    border-color: #51cf66;
+}
+
+/* El objeto espera oculto dentro del tubo y baja al elegir. */
+.atrapa-objeto {
+    position: absolute;
+    top: clamp(10px, 2.4vh, 22px);
+    width: clamp(54px, 11vh, 100px);
+    height: clamp(54px, 11vh, 100px);
+    margin-left: calc(clamp(54px, 11vh, 100px) / -2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    z-index: 3;
+    transition: top 0.62s cubic-bezier(0.45, 0, 0.7, 1), opacity 0.2s ease;
+}
+
+.atrapa-objeto img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+}
+
+.atrapa-objeto.asomando {
+    opacity: 1;
+}
+
+.atrapa-objeto.cayendo {
+    top: 62%;
+}
+
+.atrapa-objeto.atrapado {
+    top: 78%;
+    transform: scale(0.5);
+    opacity: 0;
+    transition: top 0.34s ease-in, transform 0.34s ease-in, opacity 0.26s ease-in 0.12s;
+}
+
+.atrapa-objeto.al-suelo {
+    top: 88%;
+    transform: rotate(34deg);
+    opacity: 0;
+    transition: top 0.42s cubic-bezier(0.5, 0, 0.9, 0.6), transform 0.42s ease, opacity 0.28s ease 0.2s;
+}
+
+/* Suelo con la cesta que se desplaza. */
+.atrapa-suelo {
+    position: relative;
+    flex: 0 0 auto;
+    height: clamp(64px, 13vh, 120px);
+    border-radius: 22px;
+    background: linear-gradient(180deg, #9ad672 0%, #6fbf4c 55%, #58a83a 100%);
+    box-shadow: inset 0 6px 0 rgba(255, 255, 255, 0.35);
+}
+
+.atrapa-cesta {
+    position: absolute;
+    bottom: clamp(6px, 1.4vh, 14px);
+    width: clamp(84px, 18vh, 160px);
+    margin-left: calc(clamp(84px, 18vh, 160px) / -2);
+    transition: left 0.42s cubic-bezier(0.34, 0.8, 0.4, 1);
+    animation: atrapaCestaFlota 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 8px 0 rgba(120, 40, 70, 0.18));
+}
+
+@keyframes atrapaCestaFlota {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+.atrapa-cesta-boca {
+    height: clamp(11px, 2.2vh, 20px);
+    border-radius: 999px;
+    background: #b5763c;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18);
+}
+
+.atrapa-cesta-cuerpo {
+    height: clamp(32px, 6.8vh, 62px);
+    margin: 0 clamp(5px, 1vh, 10px);
+    border-radius: 0 0 18px 18px;
+    background:
+        repeating-linear-gradient(90deg,
+            #d79a5b 0 10px,
+            #c4853f 10px 20px);
+    box-shadow: inset 0 -5px 8px rgba(0, 0, 0, 0.2);
+}
+
+.atrapa-cesta.recibe {
+    animation: atrapaRebote 0.5s ease;
+}
+
+.atrapa-objeto.cayendo img {
+    animation: atrapaGiro 0.5s linear infinite;
+}
+
+.atrapa-objeto.atrapado img,
+.atrapa-objeto.al-suelo img {
+    animation: none;
+}
+
+@keyframes atrapaGiro {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes atrapaRebote {
+
+    0%,
+    100% {
+        transform: scaleY(1);
+    }
+
+    35% {
+        transform: scaleY(0.84) scaleX(1.08);
+    }
+}
+
+/* ── Nivel 3: ¿Quién está al lado? ──────────────────────────── */
+
+.tablero.parejas {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: clamp(6px, 1.4vh, 14px);
+    box-sizing: border-box;
+    background: none;
+}
+
+.parejas-escena {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.parejas-fila {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: clamp(8px, 2.4vw, 34px);
+}
+
+.parejas-puesto {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(3px, 0.8vh, 8px);
+    padding: clamp(5px, 1.2vh, 12px);
+    border-radius: 18px;
+    border: 4px solid transparent;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.parejas-puesto.elegible {
+    cursor: pointer;
+}
+
+.parejas-puesto.elegible:hover,
+.parejas-puesto.elegible:focus-visible {
+    transform: translateY(-7px);
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.3);
+    outline: none;
+}
+
+/* El de referencia va marcado con estrella y borde dorado. */
+.parejas-puesto.es-ancla {
+    border-color: #ffd43b;
+    background: rgba(255, 212, 59, 0.3);
+}
+
+.parejas-marca {
+    position: absolute;
+    top: calc(-1 * clamp(14px, 3vh, 26px));
+    font-size: clamp(20px, 4vh, 38px);
+    color: #ffd43b;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+    animation: parejasMarca 1.4s ease-in-out infinite;
+}
+
+@keyframes parejasMarca {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.parejas-carta {
+    width: clamp(96px, 22vh, 210px);
+    height: clamp(96px, 22vh, 210px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.26);
+    animation: parejasRespira 2.6s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * 0.18s);
+}
+
+@keyframes parejasRespira {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.parejas-carta img {
+    width: 82%;
+    height: 82%;
+    object-fit: contain;
+}
+
+.parejas-puesto.ok .parejas-carta {
+    background: #b2f2bb;
+    box-shadow: 0 0 0 5px #2f9e44, 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.parejas-puesto.ok {
+    animation: parejasSalto 0.55s ease;
+}
+
+@keyframes parejasSalto {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-20px);
+    }
+}
+
+.parejas-puesto.ok-ancla .parejas-carta {
+    box-shadow: 0 0 0 5px #ffd43b, 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.parejas-puesto.mal {
+    animation: parejasMal 0.5s ease;
+}
+
+.parejas-puesto.mal .parejas-carta {
+    background: #ffc9c9;
+}
+
+@keyframes parejasMal {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+.parejas-banca {
+    display: block;
+    position: relative;
+    width: min(92%, 840px);
+    height: clamp(16px, 2.6vh, 26px);
+    margin-top: -4px;
+    border-radius: 14px;
+    background:
+        repeating-linear-gradient(90deg, transparent 0 60px, rgba(90, 50, 20, 0.25) 60px 63px),
+        linear-gradient(180deg, #d9a066 0%, #b97a3e 100%);
+    box-shadow: 0 9px 0 #8a5527, 0 16px 14px rgba(40, 60, 20, 0.2);
+}
+
+.parejas-banca::before,
+.parejas-banca::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    width: 14px;
+    height: clamp(14px, 2.4vh, 22px);
+    background: #3d4a5c;
+    border-radius: 0 0 5px 5px;
+}
+
+.parejas-banca::before { left: 14%; }
+.parejas-banca::after { right: 14%; }
+
+/* ── Nivel 4: Ordena el Estante ─────────────────────────────── */
+
+.tablero.estante {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 2vh, 22px);
+    width: 100%;
+    height: 100%;
+    padding: clamp(6px, 1.4vh, 14px);
+    box-sizing: border-box;
+    background: none;
+}
+
+.estante-mueble {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.estante-repisa {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: clamp(8px, 2.4vw, 32px);
+    padding: 0 clamp(8px, 3vw, 40px);
+}
+
+/* Huecos donde va la pieza. */
+.estante-hueco {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(4px, 1vh, 10px);
+    width: clamp(104px, 23vh, 215px);
+    height: clamp(104px, 23vh, 215px);
+    border-radius: 16px;
+    border: 4px dashed rgba(160, 110, 60, 0.6);
+    background: rgba(255, 255, 255, 0.45);
+    transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.estante-hueco.izquierda {
+    border-color: #ffd43b;
+}
+
+.estante-hueco.derecha {
+    border-color: #51cf66;
+}
+
+.estante-hueco.elegible {
+    cursor: pointer;
+    animation: estanteHueco 1.8s ease-in-out infinite;
+}
+
+@keyframes estanteHueco {
+    0%, 100% { box-shadow: inset 0 0 0 0 rgba(255, 255, 255, 0); }
+    50% { box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.55); }
+}
+
+.estante-hueco.elegible:hover,
+.estante-hueco.elegible:focus-visible {
+    background: rgba(255, 255, 255, 0.42);
+    transform: translateY(-4px);
+    outline: none;
+}
+
+.estante-hueco.lleno {
+    border-style: solid;
+    background: rgba(178, 242, 187, 0.55);
+}
+
+.estante-hueco.mal {
+    animation: estanteMal 0.5s ease;
+    background: rgba(255, 168, 168, 0.6);
+}
+
+@keyframes estanteMal {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+.estante-cartel {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    padding: clamp(3px, 0.7vh, 7px) clamp(8px, 1.8vw, 16px);
+    border-radius: 10px;
+    background: #fff;
+    color: #5a1f3e;
+    font-size: clamp(11px, 1.8vh, 18px);
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* El objeto de referencia, en el centro de la repisa. */
+.estante-ancla {
+    width: clamp(104px, 23vh, 215px);
+    height: clamp(104px, 23vh, 215px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.estante-ancla img {
+    width: 82%;
+    height: 82%;
+    object-fit: contain;
+}
+
+.estante-tabla {
+    display: block;
+    width: min(94%, 780px);
+    height: clamp(16px, 2.6vh, 26px);
+    margin: -6px auto 0;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #ffe3bf, #e2a25e);
+    box-shadow: 0 8px 0 #c98442, 0 14px 14px rgba(90, 40, 20, 0.16);
+}
+
+/* La pieza que hay que colocar espera abajo. */
+.estante-mesa {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: clamp(70px, 15vh, 130px);
+}
+
+.estante-pieza {
+    width: clamp(92px, 20vh, 184px);
+    height: clamp(92px, 20vh, 184px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+    animation: estanteLatido 2.2s ease-in-out infinite;
+    transition: transform 0.6s cubic-bezier(0.34, 0.8, 0.4, 1);
+}
+
+.estante-pieza img {
+    width: 82%;
+    height: 82%;
+    object-fit: contain;
+}
+
+.estante-pieza.volando {
+    animation: none;
+    z-index: 5;
+}
+
+@keyframes estanteLatido {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.06);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .atrapa-objeto,
+    .atrapa-cesta,
+    .estante-pieza {
+        transition-duration: 0.12s;
+    }
+
+    .atrapa-cesta,
+    .atrapa-cesta.recibe,
+    .atrapa-objeto.cayendo img,
+    .atrapa-cielo::before,
+    .atrapa-cielo::after,
+    .parejas-puesto.mal,
+    .parejas-marca,
+    .parejas-carta,
+    .estante-hueco.mal,
+    .estante-hueco.elegible,
+    .estante-pieza {
+        animation: none;
+    }
+}
+
+/* Arrastre de la pieza del estante. */
+.estante-pieza.arrastrable {
+    cursor: grab;
+    touch-action: none;
+}
+
+.estante-pieza.arrastrando {
+    cursor: grabbing;
+    animation: none;
+    transition: none;
+    z-index: 10;
+    box-shadow: 0 14px 26px rgba(0, 0, 0, 0.42);
+}
+
+/* Hueco bajo la pieza que se está arrastrando. */
+.estante-hueco.encima {
+    background: rgba(255, 255, 255, 0.55);
+    transform: scale(1.06);
+}
+
+/* Rastro de estrellitas que deja la pieza al arrastrarse. */
+.estante-chispa {
+    position: fixed;
+    z-index: 9999;
+    margin: -10px 0 0 -10px;
+    color: #ffd43b;
+    font-size: clamp(14px, 2.6vh, 24px);
+    line-height: 1;
+    pointer-events: none;
+    text-shadow: 0 0 8px rgba(255, 212, 59, 0.9);
+    animation: estanteChispa 0.74s ease-out forwards;
+}
+
+@keyframes estanteChispa {
+    0% {
+        opacity: 1;
+        transform: scale(1) rotate(var(--giro, 0deg));
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(var(--dx, 0), 26px) scale(0.2) rotate(calc(var(--giro, 0deg) + 160deg));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .estante-chispa {
+        display: none;
+    }
+}
