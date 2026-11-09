@@ -48,11 +48,7 @@ body.swal2-height-auto {
 
 body {
   overflow: hidden;
-  background: #f7fbff;
-  background-image: url(img/fondo.png);
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: #0f1b3d;
   color: #262626;
 }
 
@@ -234,6 +230,7 @@ body.intro3d-activa #menu-acc {
 
 #principal {
   position: relative;
+  z-index: 1;
   height: 100%;
   min-height: 100vh;
   min-height: 100dvh;
@@ -1281,6 +1278,279 @@ body.alto-contraste .menu-acc-cerrar {
   font-weight: 700;
   line-height: 1;
   color: #5a4a7a;
+}
+
+/* ── Teatro ───────────────────────────────────────────────── */
+
+.teatro {
+  position: relative;
+  width: min(96vw, 1040px);
+  min-height: calc(var(--mc-img-pista) + 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 14px 28px;
+  box-sizing: border-box;
+  border-radius: 18px 18px 8px 8px;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.1), transparent 60%),
+    linear-gradient(180deg, #3b1f5c 0%, #241238 100%);
+  box-shadow: 0 14px 30px rgba(20, 8, 40, 0.35), inset 0 0 0 4px #c9a227;
+  overflow: hidden;
+}
+
+.teatro-piso {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 26px;
+  background: repeating-linear-gradient(90deg, #a86b32 0 60px, #93592a 60px 120px);
+  box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+.teatro-cenefa {
+  position: absolute;
+  z-index: 6;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 34px;
+  background:
+    radial-gradient(circle at 30px 34px, transparent 22px, #b3122e 23px) 0 0 / 60px 34px repeat-x;
+  border-top: 6px solid #c9a227;
+  pointer-events: none;
+}
+
+.telon {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  bottom: 0;
+  width: 50.5%;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0, 0, 0, 0.18) 0 6px, transparent 6px 22px, rgba(255, 255, 255, 0.08) 22px 28px, transparent 28px 40px),
+    linear-gradient(180deg, #d01f3c, #8f0f26);
+  transition: transform 0.65s cubic-bezier(.55, 0, .3, 1);
+  pointer-events: none;
+}
+
+.telon-izq { left: 0; border-right: 4px solid #c9a227; }
+.telon-der { right: 0; border-left: 4px solid #c9a227; }
+
+/* Abierto, cada mitad queda recogida a su lado como cortina lateral. */
+.teatro.abierto .telon-izq { transform: translateX(-92%); }
+.teatro.abierto .telon-der { transform: translateX(92%); }
+
+.teatro-foco {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 70%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 100%, rgba(255, 244, 200, 0.55), transparent 65%);
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.teatro.foco-on .teatro-foco { opacity: 1; }
+
+.teatro .secuencia {
+  position: relative;
+  z-index: 2;
+  overflow: visible;
+}
+
+/* Movimiento en grande, bajo el foco. */
+.teatro-estrella {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--mc-img) * 1.75);
+  height: calc(var(--mc-img) * 1.75);
+  margin: calc(var(--mc-img) * -0.875) 0 0 calc(var(--mc-img) * -0.875);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffbea 0 58%, #ffe9a8 59% 66%, transparent 67%);
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+}
+
+.teatro-estrella[hidden] { display: none; }
+
+.teatro-estrella .paso-img {
+  width: 82%;
+  height: 82%;
+}
+
+.estrella-num {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #3a2500;
+  background: #ffd43b;
+  border: 4px solid #fff;
+  letter-spacing: 0;
+}
+
+.teatro-estrella.entra {
+  animation: estrellaEntra 0.5s cubic-bezier(.3, 1.6, .5, 1);
+}
+
+@keyframes estrellaEntra {
+  0% { transform: scale(0.2) rotate(-12deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+.carta-vuelo {
+  position: fixed;
+  z-index: 90;
+  margin: 0;
+  object-fit: contain;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ── Cartas que se voltean ───────────────────────────────── */
+
+.paso-mov.carta {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  min-width: 0;
+  min-height: 0;
+  perspective: 800px;
+}
+
+.carta-giro {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(.4, .2, .2, 1);
+}
+
+.carta.boca-abajo .carta-giro { transform: rotateY(180deg); }
+
+.carta-cara {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 22px;
+}
+
+.carta-frente {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: calc(var(--mc-img) + 28px);
+  min-height: calc(var(--mc-img) + 44px);
+  padding: 12px 14px 10px;
+  background: #f5f7e9;
+  border: 3px solid #fff;
+  box-shadow: 0 10px 22px rgba(10, 4, 30, 0.35);
+}
+
+.carta-dorso {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotateY(180deg);
+  border: 3px solid #fff;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.14) 0 10px, transparent 10px 20px),
+    linear-gradient(135deg, #7048e8, #4c2bb5);
+  box-shadow: 0 10px 22px rgba(10, 4, 30, 0.35);
+}
+
+.carta-dorso-marca {
+  font-style: normal;
+  font-size: calc(var(--mc-img-pista) * 0.5);
+  color: #ffd43b;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.carta.paso-mini .carta-frente {
+  min-width: calc(var(--mc-img-pista) + 16px);
+  min-height: calc(var(--mc-img-pista) + 16px);
+  padding: 8px;
+  gap: 0;
+}
+
+.carta.por-llegar { opacity: 0; }
+
+.carta.llega .carta-frente {
+  animation: cartaLlega 0.4s cubic-bezier(.3, 1.6, .5, 1);
+}
+
+@keyframes cartaLlega {
+  0% { transform: scale(0.8); }
+  100% { transform: scale(1); }
+}
+
+.carta.ola {
+  animation: cartaOla 0.55s ease both;
+}
+
+@keyframes cartaOla {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-22px) rotate(-4deg); }
+  70% { transform: translateY(4px); }
+}
+
+.carta.paso-acierto .carta-frente {
+  border-color: #2e7d32;
+  background: #e8f5e9;
+}
+
+.paso-hueco.oculto .paso-hueco-marca { opacity: 0; }
+
+.paso-hueco.aparece {
+  animation: huecoAparece 0.5s cubic-bezier(.3, 1.6, .5, 1);
+}
+
+@keyframes huecoAparece {
+  0% { transform: scale(0.5); }
+  100% { transform: scale(1); }
+}
+
+body.alto-contraste .carta-frente {
+  background: #000;
+  color: #fff;
+  border: 3px solid #ffeb3b;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .telon,
+  .carta-giro {
+    transition-duration: 0.1s;
+  }
+
+  .teatro-estrella.entra,
+  .carta.llega .carta-frente,
+  .carta.ola,
+  .paso-hueco.aparece {
+    animation: none;
+  }
 }
 
 .paso-flecha {

@@ -47,7 +47,8 @@ body.swal2-height-auto {
 
 body {
   overflow: hidden;
-  background: #c5c9f8 url("img/fondo.png") center / cover no-repeat;
+  /* El laboratorio animado (laboratorio.js) dibuja el fondo. */
+  background: #b7bdf6;
   color: #262626;
   font-family: 'Fredoka', sans-serif;
 }
@@ -231,6 +232,7 @@ body.intro3d-activa #menu-acc {
 
 #principal {
   position: relative;
+  z-index: 1;
   height: 100%;
   min-height: 100vh;
   min-height: 100dvh;

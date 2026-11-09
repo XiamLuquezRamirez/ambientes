@@ -14,6 +14,7 @@
     "eligeNivel": "Elige tu edad",
     "enunciado": "Arrastra cada objeto hasta el lugar donde corresponde",
     "cierre": "Ubicaste todos los objetos correctamente.",
+    "pedidoListo": "¡Pedido listo! El camión se lleva las cajas.",
     "demostracion": "¡Vamos con un ejemplo! Mira cómo se hace: la manzana va a su caja.",
     "demostracionFin": "¡Ahora te toca a ti! Arrastra cada objeto hasta su lugar.",
     "acierto": "¡Muy bien! Colocaste el objeto en su lugar.",
@@ -47,7 +48,6 @@
     "cierre": "../../sounds/victory.mp3",
     "fondo": "../../sounds/fondo.mp3"
   },
-  "fondo": "img/FONDO.png",
   "pares": {
     "manzana": "caja_manzana",
     "manzana_verde": "caja_manzana",
@@ -78,7 +78,15 @@
     "queso": "caja_alimentos",
     "galleta": "caja_alimentos",
     "huevo": "caja_alimentos",
-    "zanahoria": "caja_alimentos"
+    "zanahoria": "caja_alimentos",
+    "brocha": "caja_herramientas",
+    "metro": "caja_herramientas",
+    "tambor": "caja_juguetes",
+    "cometa": "caja_juguetes",
+    "bufanda": "caja_ropa",
+    "chaqueta": "caja_ropa",
+    "banano": "caja_alimentos",
+    "jugo": "caja_alimentos"
   },
   "objetos": {
     "manzana": { "nombre": "Manzana", "img": "img/MANZANA.png" },
@@ -90,7 +98,7 @@
     "taladro": { "nombre": "Taladro", "img": "img/TALADRO.png" },
     "martillo": { "nombre": "Martillo", "img": "img/objetos/martillo.svg" },
     "destornillador": { "nombre": "Destornillador", "img": "img/objetos/destornillador.svg" },
-    "llave": { "nombre": "Llave", "img": "img/objetos/llave.svg" },
+    "llave": { "nombre": "Llave inglesa", "img": "img/objetos/llave.svg" },
     "sierra": { "nombre": "Sierra", "img": "img/objetos/sierra.svg" },
     "alicate": { "nombre": "Alicate", "img": "img/objetos/alicate.svg" },
     "pato": { "nombre": "Pato", "img": "img/PATO.png" },
@@ -110,7 +118,15 @@
     "queso": { "nombre": "Queso", "img": "img/objetos/queso.svg" },
     "galleta": { "nombre": "Galleta", "img": "img/objetos/galleta.svg" },
     "huevo": { "nombre": "Huevo", "img": "img/objetos/huevo.svg" },
-    "zanahoria": { "nombre": "Zanahoria", "img": "img/objetos/zanahoria.svg" }
+    "zanahoria": { "nombre": "Zanahoria", "img": "img/objetos/zanahoria.svg" },
+    "brocha": { "nombre": "Brocha", "img": "img/objetos/brocha.svg" },
+    "metro": { "nombre": "Cinta métrica", "img": "img/objetos/metro.svg" },
+    "tambor": { "nombre": "Tambor", "img": "img/objetos/tambor.svg" },
+    "cometa": { "nombre": "Cometa", "img": "img/objetos/cometa.svg" },
+    "bufanda": { "nombre": "Bufanda", "img": "img/objetos/bufanda.svg" },
+    "chaqueta": { "nombre": "Chaqueta", "img": "img/objetos/chaqueta.svg" },
+    "banano": { "nombre": "Banano", "img": "img/objetos/banano.svg" },
+    "jugo": { "nombre": "Jugo", "img": "img/objetos/jugo.svg" }
   },
   "destinos": {
     "caja_manzana": { "nombre": "Caja de manzanas", "img": "img/CAJA_MANZANA.png" },
@@ -126,7 +142,8 @@
       "titulo": "1 ronda · 3 lugares",
       "rondas": 1,
       "lugares": 3,
-      "objetosPorRonda": 3
+      "objetosPorRonda": 3,
+      "segundosCinta": 11
     },
     {
       "id": "4",
@@ -134,7 +151,8 @@
       "titulo": "2 rondas · 4 lugares",
       "rondas": 2,
       "lugares": 4,
-      "objetosPorRonda": 3
+      "objetosPorRonda": 3,
+      "segundosCinta": 9
     },
     {
       "id": "5",
@@ -142,7 +160,8 @@
       "titulo": "3 rondas · 5 lugares",
       "rondas": 3,
       "lugares": 5,
-      "objetosPorRonda": 3
+      "objetosPorRonda": 3,
+      "segundosCinta": 7
     }
   ]
 }

@@ -1439,11 +1439,22 @@ function tamanoZona(id) {
     };
 }
 
+/** Relleno + borde de la tarjeta, para que el dibujo de adentro mida lo que su hueco. */
+function margenTarjeta(el) {
+    const cs = getComputedStyle(el);
+    const n = function (v) { return parseFloat(v) || 0; };
+    return {
+        x: n(cs.paddingLeft) + n(cs.paddingRight) + n(cs.borderLeftWidth) + n(cs.borderRightWidth),
+        y: n(cs.paddingTop) + n(cs.paddingBottom) + n(cs.borderTopWidth) + n(cs.borderBottomWidth)
+    };
+}
+
 function aplicarTamanoHueco(el, id) {
     if (!el) return;
     const t = tamanoZona(id);
-    el.style.width = t.w + "px";
-    el.style.height = t.h + "px";
+    const m = margenTarjeta(el);
+    el.style.width = Math.round(t.w + m.x) + "px";
+    el.style.height = Math.round(t.h + m.y) + "px";
 }
 
 function sizePiezasAHuecos() {

@@ -64,6 +64,11 @@ function sonido() {
 }
 
 /** Evento sonoro del tema; false si el tema no lo cubre. */
+/** Laboratorio animado del fondo (laboratorio.js); null si no cargó. */
+function lab() {
+    return window.Laboratorio || null;
+}
+
 function sonarEvento(nombre, opts) {
     return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
 }
@@ -674,6 +679,7 @@ function actualizarProgreso() {
     el.hidden = !acc().mostrarProgreso || !tableroListo || !total;
     el.innerHTML = '<i class="fa-solid fa-puzzle-piece"></i> ' + hechas + " / " + total;
     if (anim()) anim().progreso(el, hechas);
+    if (lab()) lab().progreso(tableroListo ? hechas : 0, tableroListo ? total : 0);
 }
 
 function aplicarAccesibilidadInicial() {
@@ -1342,6 +1348,7 @@ function iniciarArrastre(ev, el, pieza) {
     sonarEvento("agarrar");
     moverFantasma(ev);
     resaltarZona(pieza.id);
+    if (lab()) lab().arrastre(true, pieza.id, !!acc().resaltarDestino);
 }
 
 function moverFantasma(ev) {
@@ -1356,6 +1363,7 @@ function moverFantasma(ev) {
 // `destino` (opcional, solo visual): hueco correcto hacia el que vuela la pieza al soltarla.
 function cancelarArrastre(el, destino) {
     dragActivo = null;
+    if (lab()) lab().arrastre(false);
     if (el) el.classList.remove("arrastrando");
     restaurarTamanoPiezas();
     if (fantasma) {
@@ -1561,6 +1569,7 @@ function colocarPieza(pieza) {
     }
 
     if (anim()) anim().encaje(pieza.id, pieza.color);
+    if (lab()) lab().acierto(pieza.id);
     actualizarProgreso();
     // Tema: encaje de la pieza + aplausos suaves (sin ok.mp3).
     if (!sonarEvento("encaje")) {
@@ -1608,6 +1617,7 @@ function fallarPieza(pieza) {
     const ficha = document.querySelector('.pieza[data-id="' + pieza.id + '"]');
     rebotar(ficha);
     mostrarFeedback("error");
+    if (lab()) lab().error();
     // Tema: "toc toc" de fallo (sin over.mp3).
     if (!sonarEvento("error")) {
         reproducirAudio(gameConfig.audios && gameConfig.audios.error);
@@ -1710,18 +1720,35 @@ function terminarJuego() {
     juegoTerminado = true;
     if (typeof Swal !== "undefined") Swal.close();
     ocultarVistaCompleta();
-    if (sonarEvento("victoria")) {
-        // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
-        // fanfarria son tonos puros agudos (se oía como "pitido").
-        sonido().agacharMusica(0.35);
-    } else {
-        reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
-    }
     const cierre = (gameConfig.textos && gameConfig.textos.cierre) || "";
-    if (feedbackActivo()) {
-        TextoVoz.hablar(cierre, "zoe");
-    }
-    if (anim()) anim().celebrar();
+    const t = gameConfig.textos || {};
+    // Gran final del laboratorio: palanca, encendido y despegue; después la victoria.
+    const escena = lab()
+        ? lab().final({
+            textoPalanca: t.palanca || "¡Enciende tu robot!",
+            saludo: t.saludoRobot || "¡Hola! ¡Gracias por armarme!",
+            hablar: function (texto) {
+                return feedbackActivo() ? TextoVoz.hablar(texto, "zoe") : Promise.resolve();
+            }
+        }).catch(function () {})
+        : Promise.resolve();
+    escena.then(function () {
+        if (sonarEvento("victoria")) {
+            // Redoble + ovación del tema, con la música más baja. Sin victory.mp3: su
+            // fanfarria son tonos puros agudos (se oía como "pitido").
+            sonido().agacharMusica(0.35);
+        } else {
+            reproducirAudio(gameConfig.audios && gameConfig.audios.cierre);
+        }
+        if (feedbackActivo()) {
+            TextoVoz.hablar(cierre, "zoe");
+        }
+        if (anim()) anim().celebrar();
+        mostrarVictoria(cierre);
+    });
+}
+
+function mostrarVictoria(cierre) {
     setTimeout(function () {
         const caja = document.getElementById("final");
         const texto = document.getElementById("texto_final");
