@@ -459,27 +459,353 @@ body.presentacion-activa #escena-wrap {
   flex-direction: column;
   align-items: stretch;
   padding: 4px 0 0;
-  gap: 12vh;
+  gap: clamp(10px, 3.5vh, 56px);
 }
 
 .riel {
+  --slot-w: clamp(60px, min(8.6vw, 13vh), 112px);
+  --slot-h: calc(var(--slot-w) * 1.12);
+  position: relative;
   flex: 0 0 auto;
-  min-height: 170px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  gap: 12px;
-  flex-wrap: nowrap;
-  padding: 16px 14px;
-  overflow-x: auto;
-  border-radius: 28px;
+  padding: 46px 14px 8px;
+  overflow: visible;
+}
+
+/* ── Tren ─────────────────────────────────────────────────── */
+
+.tren-via {
+  position: absolute;
+  left: calc(50% - 50vw);
+  width: 100vw;
+  bottom: 4px;
+  height: 18px;
+  background:
+    linear-gradient(180deg, transparent 0 2px, #6b7280 2px 6px, transparent 6px 12px, #6b7280 12px 16px, transparent 16px),
+    repeating-linear-gradient(90deg, #8d5a32 0 10px, transparent 10px 30px);
+  pointer-events: none;
+}
+
+.tren {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding-bottom: 14px;
+  will-change: transform;
+}
+
+.tren-rueda {
+  position: absolute;
+  bottom: -12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 4px solid #2f3542;
+  background:
+    linear-gradient(0deg, transparent 44%, #2f3542 44% 56%, transparent 56%),
+    linear-gradient(90deg, transparent 44%, #2f3542 44% 56%, transparent 56%),
+    #ced6e0;
+  box-sizing: border-box;
+  z-index: 3;
+}
+
+.tren.andando .tren-rueda {
+  animation: trenRueda 0.35s linear infinite;
+}
+
+@keyframes trenRueda {
+  to { transform: rotate(-360deg); }
+}
+
+/* Locomotora de vapor mirando a la izquierda (va al frente). */
+.tren-loco {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(var(--slot-w) * 1.5);
+  height: calc(var(--slot-h) * 0.95);
+}
+
+.loco-base {
+  position: absolute;
+  left: 6%;
+  right: 0;
+  bottom: 0;
+  height: 16%;
+  border-radius: 6px;
+  background: #2f3542;
+}
+
+.loco-caldera {
+  position: absolute;
+  left: 8%;
+  width: 58%;
+  bottom: 14%;
+  height: 40%;
+  border-radius: 40px 10px 10px 40px;
+  background: linear-gradient(180deg, #4dabf7, #1c7ed6);
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.15);
+}
+
+.loco-faro {
+  position: absolute;
+  left: -6px;
+  top: 22%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffe066;
+  box-shadow: 0 0 10px 3px rgba(255, 224, 102, 0.8);
+}
+
+.loco-chimenea {
+  position: absolute;
+  left: 18%;
+  bottom: 52%;
+  width: 16%;
+  height: 26%;
+  border-radius: 4px 4px 0 0;
+  background: #2f3542;
+}
+
+.loco-chimenea::before {
+  content: "";
+  position: absolute;
+  left: -25%;
+  right: -25%;
+  top: -6px;
+  height: 10px;
+  border-radius: 4px;
+  background: #2f3542;
+}
+
+.loco-cabina {
+  position: absolute;
+  right: 0;
+  width: 38%;
+  bottom: 14%;
+  height: 76%;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #ff6b6b, #e03131);
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.15);
+}
+
+.loco-cabina::before {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: -10px;
+  height: 14px;
+  border-radius: 6px;
+  background: #2f3542;
+}
+
+.loco-ventana {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  top: 16%;
+  height: 32%;
+  border-radius: 6px;
+  background: #d0ebff;
+  border: 3px solid #fff;
+}
+
+.loco-quitapiedras {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 14%;
+  height: 24%;
+  background: #f59f00;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.tren-loco .tren-rueda.chica { width: 22px; height: 22px; }
+.tren-loco .tren-rueda.r1 { left: 14%; }
+.tren-loco .tren-rueda.r2 { left: 38%; }
+.tren-loco .tren-rueda.grande { right: 8%; width: 34px; height: 34px; bottom: -14px; }
+
+.loco-humo {
+  position: absolute;
+  left: 20%;
+  bottom: 74%;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 2px 6px rgba(80, 100, 130, 0.25);
+  opacity: 0;
+  animation: locoHumo 2.4s ease-out infinite;
+  pointer-events: none;
+}
+
+.loco-humo.h2 { animation-delay: 0.8s; }
+.loco-humo.h3 { animation-delay: 1.6s; }
+
+.tren.andando .loco-humo { animation-duration: 0.9s; }
+.tren.andando .loco-humo.h2 { animation-delay: 0.3s; }
+.tren.andando .loco-humo.h3 { animation-delay: 0.6s; }
+
+@keyframes locoHumo {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  20% { opacity: 0.95; }
+  100% { opacity: 0; transform: translate(34px, -58px) scale(1.9); }
+}
+
+/* Vagón: la tarjeta va dentro de una caja abierta. */
+.tren-vagon {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 8px;
+}
+
+.tren-vagon::before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  bottom: 10px;
+  width: 12px;
+  height: 6px;
+  background: #2f3542;
+}
+
+.vagon-caja {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: calc(100% + 0px);
+  height: calc(var(--slot-h) * 0.3);
+  margin-top: calc(var(--slot-h) * -0.22);
+  border-radius: 6px 6px 10px 10px;
+  background: var(--vagon, #ffd43b);
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.15), inset 0 4px 0 rgba(255, 255, 255, 0.35);
+}
+
+.tren-vagon.color-0 { --vagon: #ffd43b; }
+.tren-vagon.color-1 { --vagon: #51cf66; }
+.tren-vagon.color-2 { --vagon: #ff922b; }
+.tren-vagon.color-3 { --vagon: #cc5de8; }
+.tren-vagon.vagon-pregunta { --vagon: #4dabf7; }
+
+.tren-vagon .tren-rueda.v1 { left: 16%; }
+.tren-vagon .tren-rueda.v2 { right: 16%; }
+
+/* Al frenar, cada vagón se mece un poco después del anterior. */
+.tren.frena .tren-vagon {
+  animation: vagonFrena 0.5s ease-out;
+}
+
+.tren.frena .tren-vagon:nth-child(3) { animation-delay: 0.04s; }
+.tren.frena .tren-vagon:nth-child(4) { animation-delay: 0.08s; }
+.tren.frena .tren-vagon:nth-child(5) { animation-delay: 0.12s; }
+.tren.frena .tren-vagon:nth-child(6) { animation-delay: 0.16s; }
+.tren.frena .tren-vagon:nth-child(7) { animation-delay: 0.2s; }
+
+@keyframes vagonFrena {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  35% { transform: translateX(-7px) rotate(-2deg); }
+  70% { transform: translateX(3px) rotate(1deg); }
+}
+
+/* Golpe de ritmo. */
+.tren-vagon.golpe {
+  animation: vagonGolpe 0.42s cubic-bezier(.3, 1.6, .5, 1);
+}
+
+@keyframes vagonGolpe {
+  0% { transform: translateY(0) scale(1, 1); }
+  30% { transform: translateY(4px) scale(1.06, 0.92); }
+  60% { transform: translateY(-10px) scale(0.97, 1.05); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+.tren-conteo {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: calc(100% + 4px);
+  font-size: clamp(34px, 4.8vw, 58px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--vagon, #ffd43b);
+  -webkit-text-stroke: 7px #fff;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 3px 0 rgba(30, 58, 95, 0.55));
+  letter-spacing: 0;
+  pointer-events: none;
+  animation: trenConteo 1.05s ease-out forwards;
+}
+
+@keyframes trenConteo {
+  0% { opacity: 0; transform: translate(-50%, 16px) scale(0.3); }
+  25% { opacity: 1; transform: translate(-50%, 0) scale(1.25); }
+  45% { transform: translate(-50%, 0) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -18px) scale(1); }
+}
+
+/* La pose cae desde arriba dentro del vagón. */
+.tren-vagon .slot-pose.cae img {
+  animation: poseCae 0.5s cubic-bezier(.3, 1.4, .5, 1);
+}
+
+@keyframes poseCae {
+  0% { opacity: 0; transform: translateY(-70px) scale(0.7); }
+  60% { opacity: 1; transform: translateY(6px) scale(1.04); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+.tren-vagon .slot-pose.visible {
+  border-style: solid;
+  background: #fff;
+}
+
+.tren-vagon .slot-pose.vacio {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.tren-vagon .slot-pose.hueco.oculto {
+  color: transparent;
+}
+
+.tren-vagon .slot-pose.hueco.aparece {
+  animation: huecoAparece 0.45s cubic-bezier(.3, 1.6, .5, 1);
+}
+
+@keyframes huecoAparece {
+  0% { transform: scale(0.6); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tren.andando .tren-rueda,
+  .loco-humo,
+  .tren.frena .tren-vagon,
+  .tren-vagon.golpe,
+  .tren-vagon .slot-pose.cae img,
+  .tren-vagon .slot-pose.hueco.aparece {
+    animation: none;
+  }
+
+  .tren-conteo {
+    animation: none;
+    transform: translateX(-50%);
+  }
 }
 
 .slot-pose {
-  width: clamp(92px, 11vw, 124px);
-  height: clamp(104px, 13vw, 138px);
-  min-width: 92px;
-  min-height: 104px;
+  position: relative;
+  z-index: 1;
+  width: var(--slot-w, clamp(92px, 11vw, 124px));
+  height: var(--slot-h, clamp(104px, 13vw, 138px));
   flex: 0 0 auto;
   border-radius: 18px;
   border: 4px dashed #fff;

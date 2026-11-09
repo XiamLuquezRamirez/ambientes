@@ -46,11 +46,7 @@ body.swal2-height-auto {
 
 body {
   overflow: hidden;
-  background: #f7fbff;
-  background-image: url(img/fondo.png);
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: #bfe6ff;
   color: #262626;
   font-family: 'Fredoka', sans-serif;
   touch-action: manipulation;
@@ -195,8 +191,50 @@ body.intro3d-activa #menu-acc {
   100% { opacity: 0; }
 }
 
+/* Escenario de fondo: uno por reto, con fundido al cambiar. */
+.escena-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.escena-capa {
+  position: absolute;
+  inset: 0;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+
+.escena-capa.activa { opacity: 1; }
+
+.escena-capa[data-escena="general"] { background-image: url(img/escenas/general.svg); }
+/* El césped empieza donde se apoyan las torres (--suelo-sendero lo mide sendero.js). */
+.escena-capa[data-escena="sendero"] {
+  background-image:
+    linear-gradient(180deg,
+      transparent var(--suelo-sendero, 62%),
+      #6aae48 var(--suelo-sendero, 62%),
+      #86c95f calc(var(--suelo-sendero, 62%) + 10px),
+      #4f9a35 100%),
+    url(img/escenas/castillo.svg);
+  background-size: 100% 100%, cover;
+  background-position: center, center top;
+}
+.escena-capa[data-escena="atrapa"] { background-image: url(img/escenas/huerto.svg); }
+.escena-capa[data-escena="parejas"] { background-image: url(img/escenas/parque.svg); }
+.escena-capa[data-escena="estante"] { background-image: url(img/escenas/cuarto.svg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .escena-capa { transition-duration: 0.15s; }
+}
+
 #principal {
   position: relative;
+  z-index: 1;
   height: 100%;
   min-height: 100vh;
   min-height: 100dvh;

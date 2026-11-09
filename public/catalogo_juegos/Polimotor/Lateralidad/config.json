@@ -55,15 +55,42 @@
     "introLadoMs": 550
   },
   "objetos": {
-    "oso": { "nombre": "oso", "img": "img/Oso.png" },
-    "perro": { "nombre": "perrito", "img": "img/Perro.png" },
-    "gato": { "nombre": "gato", "img": "img/Gato.png" },
-    "dino": { "nombre": "dinosaurio", "img": "img/Dinosaurio.png" },
-    "celular": { "nombre": "celular", "img": "img/Celular.png" },
-    "manzana": { "nombre": "manzana", "img": "img/Manzana.png" },
-    "mariposa": { "nombre": "mariposa", "img": "img/Mariposa.png" },
-    "mariposa_movimiento": { "nombre": "mariposa", "img": "img/Mariposa.png" },
-    "conejo": { "nombre": "conejo", "img": "img/Conejo.png" }
+    "oso": {
+      "nombre": "oso",
+      "img": "img/Oso.png"
+    },
+    "perro": {
+      "nombre": "perrito",
+      "img": "img/Perro.png"
+    },
+    "gato": {
+      "nombre": "gato",
+      "img": "img/Gato.png"
+    },
+    "dino": {
+      "nombre": "dinosaurio",
+      "img": "img/Dinosaurio.png"
+    },
+    "celular": {
+      "nombre": "celular",
+      "img": "img/Celular.png"
+    },
+    "manzana": {
+      "nombre": "manzana",
+      "img": "img/Manzana.png"
+    },
+    "mariposa": {
+      "nombre": "mariposa",
+      "img": "img/Mariposa.png"
+    },
+    "mariposa_movimiento": {
+      "nombre": "mariposa",
+      "img": "img/Mariposa.png"
+    },
+    "conejo": {
+      "nombre": "conejo",
+      "img": "img/Conejo.png"
+    }
   },
   "coloresZona": {
     "izquierda": "#ffd43b",
@@ -75,37 +102,74 @@
       "id": "3",
       "edad": "3 años",
       "titulo": "3 retos",
-      "zonas": ["izquierda", "derecha"],
+      "zonas": [
+        "izquierda",
+        "derecha"
+      ],
       "retos": [
         {
-          "id": "a3-r1",
-          "tipo": "estatico",
-          "titulo": "¿Dónde está mi amigo?",
-          "modoRespuesta": "zona",
-          "consignaPlantilla": "¿Dónde está el {objetivo}? ¿A la izquierda o a la derecha?",
-          "pool": ["oso", "perro"],
-          "objetivoPool": ["perro", "oso"]
+          "id": "a3-n1",
+          "tipo": "sendero",
+          "titulo": "El Sendero",
+          "rondas": 2,
+          "personaje": "zeus",
+          "consignaPlantilla": "Toma el camino de {lado} y alcanza a {objetivo}.",
+          "pool": [
+            "oso",
+            "perro",
+            "gato"
+          ]
         },
         {
-          "id": "a3-r2",
-          "tipo": "dinamico",
-          "titulo": "¿Hacia dónde se fue?",
-          "modoRespuesta": "zona",
-          "consignaPlantilla": "Mira a la mariposa... ¿Hacia dónde voló, izquierda o derecha?",
-          "actor": "mariposa_movimiento",
-          "trayectoria": ["centro", "destino"],
-          "destinoPool": ["izquierda", "derecha"],
-          "salirEscena": true
+          "id": "a3-n2",
+          "tipo": "atrapa",
+          "titulo": "Atrapa en el Aire",
+          "rondas": 2,
+          "consignaPlantilla": "¡Mira! Algo cae por {lado}. ¡Lleva la cesta allá!",
+          "pool": [
+            "manzana",
+            "mariposa",
+            "pelota"
+          ]
         },
         {
-          "id": "a3-r3",
-          "tipo": "imitacion",
-          "titulo": "Sigue a Zeus",
-          "modoRespuesta": "zona",
-          "consignaPlantilla": "Zeus te está señalando un lado... ¡Toca hacia donde señala!",
-          "mascota": "zeus",
-          "senales": ["destino"],
-          "destinoPool": ["izquierda", "derecha"]
+          "id": "a3-n3",
+          "tipo": "parejas",
+          "titulo": "¿Quién está al lado?",
+          "rondas": 2,
+          "cuantos": 3,
+          "consignaPlantilla": "¿Quién está a la {lado} {ancla}?",
+          "pool": [
+            "oso",
+            "perro",
+            "gato",
+            "conejo"
+          ]
+        },
+        {
+          "id": "a3-n4",
+          "tipo": "estante",
+          "titulo": "Ordena el Estante",
+          "rondas": 2,
+          "consignaPlantilla": "Arrastra {objetivo} a la {lado} {ancla}.",
+          "pool": [
+            "oso",
+            "perro",
+            "gato"
+          ]
+        },
+        {
+          "id": "a3-n5",
+          "tipo": "sendero",
+          "titulo": "El Sendero",
+          "rondas": 2,
+          "personaje": "zoe",
+          "consignaPlantilla": "¡Última misión! Camina por {lado}.",
+          "pool": [
+            "gato",
+            "conejo",
+            "mariposa"
+          ]
         }
       ]
     },
@@ -113,40 +177,76 @@
       "id": "4",
       "edad": "4 años",
       "titulo": "3 retos",
-      "zonas": ["izquierda", "centro", "derecha"],
+      "zonas": [
+        "izquierda",
+        "centro",
+        "derecha"
+      ],
       "retos": [
         {
-          "id": "a4-r1",
-          "tipo": "estatico",
-          "titulo": "¿Dónde está mi amigo?",
-          "modoRespuesta": "zona",
-          "consignaPlantilla": "¿Dónde está el {objetivo}? ¿Izquierda, centro o derecha?",
-          "pool": ["gato", "dino", "celular"],
-          "objetivoPool": ["gato", "dino", "celular"]
+          "id": "a4-n1",
+          "tipo": "sendero",
+          "titulo": "El Sendero",
+          "rondas": 3,
+          "personaje": "zeus",
+          "consignaPlantilla": "El camino se abre en tres. Toma el de {lado}.",
+          "pool": [
+            "gato",
+            "dino",
+            "celular"
+          ]
         },
         {
-          "id": "a4-r2",
-          "tipo": "dinamico",
-          "titulo": "¿Hacia dónde se fue?",
-          "modoRespuesta": "zona",
-          "consignaPlantilla": "Mira bien a la mariposa... se movió dos veces. ¿En qué lado quedó al final?",
-          "actor": "mariposa_movimiento",
-          "trayectoria": ["centro", "paso1", "destino"],
-          "pasoPool": ["izquierda", "centro", "derecha"],
-          "destinoPool": ["izquierda", "centro", "derecha"],
-          "salirEscena": false
+          "id": "a4-n2",
+          "tipo": "atrapa",
+          "titulo": "Atrapa en el Aire",
+          "rondas": 3,
+          "consignaPlantilla": "{objetivo} cae por {lado}. ¡Corre con la cesta!",
+          "pool": [
+            "manzana",
+            "mariposa",
+            "celular"
+          ]
         },
         {
-          "id": "a4-r3",
-          "tipo": "imitacion",
-          "titulo": "Sigue a Zoe",
-          "modoRespuesta": "zona",
-          "consignaPlantilla": "Mira bien hacia dónde camina Zoe al final. ¡Toca ese lugar!",
-          "mascota": "zoe",
-          "senales": ["paso1", "destino"],
-          "pasoPool": ["izquierda", "centro", "derecha"],
-          "destinoPool": ["izquierda", "centro", "derecha"],
-          "caminaAlFinal": true
+          "id": "a4-n3",
+          "tipo": "parejas",
+          "titulo": "¿Quién está al lado?",
+          "rondas": 3,
+          "cuantos": 3,
+          "consignaPlantilla": "¿Quién está a la {lado} {ancla}?",
+          "pool": [
+            "gato",
+            "dino",
+            "celular",
+            "manzana",
+            "conejo"
+          ]
+        },
+        {
+          "id": "a4-n4",
+          "tipo": "estante",
+          "titulo": "Ordena el Estante",
+          "rondas": 3,
+          "consignaPlantilla": "Arrastra {objetivo} a la {lado} {ancla}.",
+          "pool": [
+            "gato",
+            "dino",
+            "manzana",
+            "celular"
+          ]
+        },
+        {
+          "id": "a4-n5",
+          "tipo": "atrapa",
+          "titulo": "Atrapa en el Aire",
+          "rondas": 3,
+          "consignaPlantilla": "¡Última ronda! Atrapa lo que cae por {lado}.",
+          "pool": [
+            "conejo",
+            "mariposa",
+            "manzana"
+          ]
         }
       ]
     },
@@ -154,48 +254,82 @@
       "id": "5",
       "edad": "5-6 años",
       "titulo": "3 retos",
-      "zonas": ["izquierda", "centro", "derecha"],
+      "zonas": [
+        "izquierda",
+        "centro",
+        "derecha"
+      ],
       "retos": [
         {
-          "id": "a5-r1",
-          "tipo": "estatico",
-          "titulo": "¿Dónde está mi amigo?",
-          "modoRespuesta": "objeto",
-          "pasos": [
-            {
-              "consignaPlantilla": "¿Qué está a la derecha {ancla}?",
-              "relacion": "derecha_de",
-              "anclaPool": ["gato", "dino", "manzana", "celular"]
-            },
-            {
-              "consignaPlantilla": "¿Qué está a la izquierda {ancla}?",
-              "relacion": "izquierda_de",
-              "anclaPool": ["gato", "dino", "manzana", "celular"]
-            }
-          ],
-          "pool": ["gato", "dino", "celular", "manzana"]
+          "id": "a5-n1",
+          "tipo": "sendero",
+          "titulo": "El Sendero",
+          "rondas": 3,
+          "personaje": "zeus",
+          "consignaPlantilla": "Tres caminos. Recorre el de {lado} y busca a {objetivo}.",
+          "pool": [
+            "gato",
+            "dino",
+            "manzana"
+          ]
         },
         {
-          "id": "a5-r2",
-          "tipo": "dinamico",
-          "titulo": "¿Hacia dónde se fue?",
-          "modoRespuesta": "objeto",
-          "consignaPlantilla": "El conejo y la mariposa se movieron. ¿Quién quedó a la derecha del conejo?",
-          "actores": [
-            { "id": "conejo", "destinoPool": ["izquierda", "derecha"] },
-            { "id": "mariposa_movimiento", "destinoPool": ["izquierda", "derecha"] }
-          ],
-          "pregunta": { "relacion": "derecha_de", "ancla": "conejo" }
+          "id": "a5-n2",
+          "tipo": "atrapa",
+          "titulo": "Atrapa en el Aire",
+          "rondas": 3,
+          "consignaPlantilla": "Atento: {objetivo} viene por {lado}.",
+          "pool": [
+            "celular",
+            "conejo",
+            "mariposa"
+          ]
         },
         {
-          "id": "a5-r3",
-          "tipo": "imitacion",
-          "titulo": "Zeus se acomoda",
-          "modoRespuesta": "botones",
-          "consignaPlantilla": "Mira bien. Zeus se puso a un lado del conejo. ¿Zeus está a la izquierda o a la derecha del conejo?",
-          "fijo": "conejo",
-          "movil": "zeus",
-          "ladoPool": ["izquierda", "derecha"]
+          "id": "a5-n3",
+          "tipo": "parejas",
+          "titulo": "¿Quién está al lado?",
+          "rondas": 3,
+          "cuantos": 4,
+          "consignaPlantilla": "Mira bien la fila. ¿Quién está a la {lado} {ancla}?",
+          "pool": [
+            "gato",
+            "dino",
+            "manzana",
+            "celular",
+            "conejo",
+            "oso"
+          ]
+        },
+        {
+          "id": "a5-n4",
+          "tipo": "estante",
+          "titulo": "Ordena el Estante",
+          "rondas": 3,
+          "consignaPlantilla": "Arrastra {objetivo} a la {lado} {ancla}.",
+          "pool": [
+            "gato",
+            "dino",
+            "manzana",
+            "celular",
+            "conejo"
+          ]
+        },
+        {
+          "id": "a5-n5",
+          "tipo": "parejas",
+          "titulo": "¿Quién está al lado?",
+          "rondas": 3,
+          "cuantos": 4,
+          "consignaPlantilla": "¡Última misión! ¿Quién está a la {lado} {ancla}?",
+          "pool": [
+            "oso",
+            "perro",
+            "gato",
+            "dino",
+            "manzana",
+            "celular"
+          ]
         }
       ]
     }

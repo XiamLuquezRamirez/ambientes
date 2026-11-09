@@ -531,6 +531,10 @@
                 onMover: function (objetoId, go, x) {
                     if (anim()) anim().mover(go, x);
                 },
+                // Cada caja que se cierra o salta al camión suena.
+                onCaja: function () {
+                    sonarEvento("bote", { vol: 0.6 });
+                },
                 onSoltar: function (objetoId, go, sobreDestino) {
                     if (anim()) anim().soltar(go);
                     // Soltado fuera de las cajas: vuelve a su sitio.
@@ -574,16 +578,27 @@
                 return { ok: true };
             }
 
-            // Dejar que Phaser asiente el sprite antes de limpiar el tablero.
+            // Pedido completo: se cierran las cajas; al final, el camión se las lleva.
+            const gen = rondaGen;
+            const final = indiceRonda + 1 >= totalRondas;
             setTimeout(function () {
-                if (juegoTerminado) return;
-                if (indiceRonda + 1 < totalRondas) {
-                    indiceRonda += 1;
-                    sleep(480).then(function () { iniciarRonda(rondaGen); });
-                } else {
-                    mostrarCierre();
+                if (juegoTerminado || gen !== rondaGen) return;
+                const en = document.getElementById("enunciado");
+                if (final) {
+                    const frase = textos().pedidoListo || "¡Pedido listo! El camión se lleva las cajas.";
+                    if (en) en.textContent = frase;
+                    TextoVoz.hablar(frase, "zoe");
                 }
-            }, 40);
+                PedniaArrastrePhaser.cerrarPedido(final).catch(function () {}).then(function () {
+                    if (juegoTerminado || gen !== rondaGen) return;
+                    if (!final) {
+                        indiceRonda += 1;
+                        iniciarRonda(rondaGen);
+                    } else {
+                        mostrarCierre();
+                    }
+                });
+            }, 500);
             return { ok: true };
         });
     }
@@ -668,7 +683,9 @@
 
         ensurePhaserMontado()
             .then(function () {
-                return PedniaArrastrePhaser.cargarRonda(objetosPendientes, destinosRonda);
+                return PedniaArrastrePhaser.cargarRonda(objetosPendientes, destinosRonda, {
+                    segundosCinta: nivelElegido && nivelElegido.segundosCinta
+                });
             })
             .then(function () {
                 if (gen !== rondaGen || juegoTerminado) return;

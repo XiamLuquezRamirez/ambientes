@@ -69,12 +69,28 @@
 
     // Elemento animable de una respuesta: en los actores, su imagen (el contenedor
     // lleva el translate del CSS y se mueve con `left`).
+    // En los niveles nuevos se anima la pieza visible, no el contenedor, que suele
+    // llevar transiciones propias (puertas que giran, cestas que se deslizan).
     function objetivoVisual(el) {
         if (!el) return null;
-        if (el.classList && el.classList.contains('actor-movil')) {
-            return el.querySelector('img') || null;
-        }
+        var c = el.classList;
+        if (!c) return el;
+        if (c.contains('actor-movil')) return el.querySelector('img') || null;
+        if (c.contains('sendero-ramal')) return el.querySelector('.sendero-puerta') || el;
+        if (c.contains('atrapa-carril')) return el.querySelector('.atrapa-cartel') || el;
+        if (c.contains('parejas-puesto')) return el.querySelector('.parejas-carta') || el;
+        if (c.contains('estante-hueco')) return el;
         return el;
+    }
+
+    // Dónde está la respuesta recién tocada, en cualquiera de los niveles.
+    function anclaDe(valor) {
+        var v = String(valor);
+        return doc.querySelector('.sendero-ramal[data-zona="' + v + '"]')
+            || doc.querySelector('.atrapa-carril[data-zona="' + v + '"]')
+            || doc.querySelector('.estante-hueco[data-zona="' + v + '"]')
+            || doc.querySelector('.parejas-puesto[data-objeto="' + v + '"]')
+            || null;
     }
 
     var ultimoTocado = null;
@@ -138,7 +154,7 @@
             ultimoTocado = doc.querySelector('.btn-mano[data-zona="' + v + '"]')
                 || doc.querySelector('.tarjeta-obj.seleccionable[data-objeto="' + v + '"]')
                 || doc.querySelector('.actor-movil[data-actor="' + v + '"]')
-                || null;
+                || anclaDe(v);
         },
 
         // Acierto: brillo en el elemento correcto + estrellas y anillo (Phaser).
@@ -204,6 +220,90 @@
         celebrar: function () {
             if (!activo || !fx()) return;
             fx().celebracion(rectUtil(doc.getElementById('escena-wrap')));
+        },
+
+        /**
+         * Premio de cada acierto, con tres intensidades:
+         * "ronda" una chispa, "nivel" un estallido doble, "final" confeti.
+         */
+        festejar: function (valor, grado, color) {
+            if (!activo) return;
+            var ancla = anclaDe(valor);
+            var obj = objetivoVisual(ancla) || ancla;
+            var tono = color || '#ffd54f';
+
+            if (obj) {
+                detener(obj);
+                gsap.fromTo(obj,
+                    { scale: 1 },
+                    {
+                        scale: grado === 'ronda' ? 1.12 : 1.22,
+                        duration: 0.22,
+                        ease: 'power2.out',
+                        yoyo: true,
+                        repeat: 1,
+                        clearProps: 'transform'
+                    });
+            }
+
+            if (!fx() || !ancla) return;
+            var r = rectUtil(ancla);
+            if (!r) return;
+            var c = centro(r);
+            fx().estallido(c.x, c.y, tono, grado === 'ronda' ? 14 : 26);
+            fx().anillo(r, tono);
+            if (grado === 'nivel') {
+                setTimeout(function () {
+                    fx().estallido(c.x, c.y, '#51cf66', 22);
+                }, 190);
+            }
+            if (grado === 'final') {
+                fx().celebracion(rectUtil(doc.getElementById('escena-wrap')));
+            }
+        },
+
+        /** La escena del reto entra escalonada en vez de aparecer de golpe. */
+        entrada: function (tablero) {
+            if (!activo || !tablero) return;
+            if (fx()) fx().preparar();
+            var piezas = lista(tablero.querySelectorAll(
+                '.sendero-ramal, .atrapa-carril, .parejas-puesto, .estante-hueco, .estante-ancla, .estante-pieza'
+            ));
+            piezas.forEach(function (p, i) {
+                detener(p);
+                gsap.fromTo(p,
+                    { y: 26, opacity: 0, scale: 0.88 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.5,
+                        delay: i * 0.07,
+                        ease: 'back.out(1.7)',
+                        clearProps: 'transform,opacity'
+                    });
+            });
+        },
+
+        /** La escena sale antes de dar paso a la ronda siguiente. */
+        salida: function (tablero) {
+            if (!activo || !tablero) return Promise.resolve();
+            var piezas = lista(tablero.querySelectorAll(
+                '.sendero-ramal, .atrapa-carril, .parejas-puesto, .estante-hueco, .estante-ancla, .estante-pieza'
+            ));
+            if (!piezas.length) return Promise.resolve();
+            return new Promise(function (resolve) {
+                gsap.to(piezas, {
+                    y: -18,
+                    opacity: 0,
+                    scale: 0.9,
+                    duration: 0.26,
+                    stagger: 0.04,
+                    ease: 'power2.in',
+                    onComplete: resolve
+                });
+                setTimeout(resolve, 650);
+            });
         }
     };
 

@@ -55,6 +55,11 @@ function sonido() {
 }
 
 /** Evento sonoro del tema; false si el tema no lo cubre. */
+/** Sala de teatro animada del fondo (fondo-vivo.js); null si no cargó. */
+function fondo() {
+    return window.FondoVivo || null;
+}
+
 function sonarEvento(nombre, opts) {
     return !!(sonido() && sonido().tieneTema() && sonido().evento(nombre, opts));
 }
@@ -584,25 +589,163 @@ function htmlFigura(id) {
     return '<img class="paso-img" src="' + attrEsc(rutaMovimiento(id)) + '" alt="' + attrEsc(m.nombre) + '" onerror="this.classList.add(\'is-broken\')">';
 }
 
-function htmlPaso(id, extraClass) {
-    const m = datoMovimiento(id);
-    return '<div class="paso-mov ' + (extraClass || "") + '" data-mov="' + id + '">' +
-        htmlFigura(id) +
-        "<span>" + attrEsc(m.nombre) + "</span></div>";
-}
-
 function htmlHueco() {
     return '<div class="paso-mov paso-hueco" aria-label="Falta un movimiento"><span class="paso-hueco-marca">?</span></div>';
 }
 
-function htmlSecuencia(ids) {
-    return ids.map(function (id) { return htmlPaso(id); }).join('<span class="paso-flecha" aria-hidden="true"></span>');
+/* ── Teatro: cartas que se voltean y un telón ──────────────────── */
+
+const MS_TELON = 650;
+
+/** Carta con frente (el movimiento) y dorso, para poder voltearla. */
+function htmlCarta(id, opts) {
+    opts = opts || {};
+    const m = datoMovimiento(id);
+    return '<div class="paso-mov carta' + (opts.mini ? " paso-mini" : "") + (opts.abajo ? " boca-abajo" : "") +
+        '" data-mov="' + id + '"><div class="carta-giro">' +
+        '<div class="carta-cara carta-frente">' + htmlFigura(id) + "<span>" + attrEsc(m.nombre) + "</span></div>" +
+        '<div class="carta-cara carta-dorso"><i class="carta-dorso-marca">★</i></div>' +
+        "</div></div>";
 }
 
-function htmlSecuenciaConHueco(ids, hueco) {
-    return ids.map(function (id, i) {
-        return i === hueco ? htmlHueco() : htmlPaso(id, "paso-mini");
+function htmlSecuencia(ids) {
+    return ids.map(function (id) { return htmlCarta(id); }).join('<span class="paso-flecha" aria-hidden="true"></span>');
+}
+
+function teatro() {
+    return document.getElementById("teatro");
+}
+
+function telonAbierto() {
+    const t = teatro();
+    return !!(t && t.classList.contains("abierto"));
+}
+
+async function moverTelon(abrir) {
+    const t = teatro();
+    if (!t || telonAbierto() === abrir) return;
+    t.classList.toggle("abierto", abrir);
+    sonarEvento("acierto", { vol: 0.35 });
+    await sleep(animacionesActivas() ? MS_TELON : 60);
+}
+
+function abrirTelon() { return moverTelon(true); }
+function cerrarTelon() { return moverTelon(false); }
+
+/** Copia volante de una imagen que viaja de un elemento a otro. */
+function volar(desde, hasta, ms) {
+    return new Promise(function (resolve) {
+        if (!desde || !hasta || !animacionesActivas()) { resolve(); return; }
+        const a = desde.getBoundingClientRect();
+        const b = hasta.getBoundingClientRect();
+        if (!a.width || !b.width) { resolve(); return; }
+        const fantasma = desde.cloneNode(true);
+        fantasma.className = "carta-vuelo";
+        fantasma.removeAttribute("id");
+        fantasma.style.left = a.left + "px";
+        fantasma.style.top = a.top + "px";
+        fantasma.style.width = a.width + "px";
+        fantasma.style.height = a.height + "px";
+        document.body.appendChild(fantasma);
+        const dx = (b.left + b.width / 2) - (a.left + a.width / 2);
+        const dy = (b.top + b.height / 2) - (a.top + a.height / 2);
+        const escala = Math.min(b.width / a.width, b.height / a.height);
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                fantasma.style.transition = "transform " + ms + "ms cubic-bezier(.3,.7,.3,1)";
+                fantasma.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + escala + ")";
+            });
+        });
+        setTimeout(function () {
+            if (fantasma.parentNode) fantasma.parentNode.removeChild(fantasma);
+            resolve();
+        }, ms + 30);
+    });
+}
+
+/**
+ * Se abre el telón y cada movimiento sale en grande bajo el foco; luego se
+ * encoge y vuela a su carta de la fila.
+ */
+async function presentarMemoria(ids) {
+    const caja = document.getElementById("secuencia");
+    const estrella = document.getElementById("estrella");
+    const t = teatro();
+    if (fondo()) fondo().fase("memoria");
+    limpiarClasesSecuencia(caja);
+    caja.hidden = false;
+    caja.classList.add("secuencia-viva");
+    caja.innerHTML = htmlSecuencia(ids);
+    const cartas = caja.querySelectorAll(".carta");
+    cartas.forEach(function (c) { c.classList.add("por-llegar"); });
+    await abrirTelon();
+    if (t) t.classList.add("foco-on");
+    for (let i = 0; i < ids.length; i++) {
+        if (juegoTerminado) return;
+        estrella.innerHTML = htmlFigura(ids[i]) + '<span class="estrella-num">' + (i + 1) + "</span>";
+        estrella.hidden = false;
+        estrella.classList.remove("entra");
+        void estrella.offsetWidth;
+        estrella.classList.add("entra");
+        sonarEvento("bote", { vol: 0.8 });
+        await sleep(animacionesActivas() ? 800 : 300);
+        if (juegoTerminado) return;
+        const destino = cartas[i] && cartas[i].querySelector(".paso-img");
+        const vuelo = volar(estrella.querySelector(".paso-img"), destino, 420);
+        estrella.hidden = true;
+        await vuelo;
+        if (cartas[i]) {
+            cartas[i].classList.remove("por-llegar");
+            cartas[i].classList.add("llega");
+        }
+        sonarEvento("tic");
+        await sleep(120);
+    }
+    if (t) t.classList.remove("foco-on");
+}
+
+/** Todas las cartas se voltean boca abajo, una tras otra, y cae el telón. */
+async function esconderCartas() {
+    const cartas = document.querySelectorAll("#secuencia .carta");
+    for (let i = 0; i < cartas.length; i++) {
+        cartas[i].classList.add("boca-abajo");
+        sonarEvento("tic");
+        await sleep(animacionesActivas() ? 140 : 0);
+    }
+    await sleep(animacionesActivas() ? 520 : 100);
+    await cerrarTelon();
+}
+
+/**
+ * Tras el telón la fila vuelve boca abajo; se abre y se destapan una por
+ * una, salvo la que falta, que queda como "?".
+ */
+async function revelarPista(ids, hueco) {
+    const pista = document.getElementById("secuencia");
+    if (fondo()) fondo().fase("opciones");
+    if (telonAbierto()) await cerrarTelon();
+    limpiarClasesSecuencia(pista);
+    pista.hidden = false;
+    pista.classList.add("secuencia-pista");
+    pista.innerHTML = ids.map(function (id, i) {
+        return i === hueco ? htmlHueco() : htmlCarta(id, { mini: true, abajo: true });
     }).join("");
+    const huecoEl = pista.querySelector(".paso-hueco");
+    if (huecoEl) huecoEl.classList.add("oculto");
+    await abrirTelon();
+    const cartas = pista.querySelectorAll(".carta");
+    for (let i = 0; i < cartas.length; i++) {
+        if (juegoTerminado) return;
+        cartas[i].classList.remove("boca-abajo");
+        sonarEvento("tic");
+        await sleep(animacionesActivas() ? 220 : 0);
+    }
+    if (huecoEl) {
+        huecoEl.classList.remove("oculto");
+        huecoEl.classList.add("aparece");
+        sonarEvento("bote", { vol: 0.6 });
+    }
+    if (anim()) anim().pista(pista);
 }
 
 function barajar(arr) {
@@ -738,34 +881,14 @@ function salirOpciones() {
     });
 }
 
-function salirSecuencia() {
-    return new Promise(function (resolve) {
-        const caja = document.getElementById("secuencia");
-        if (!caja || caja.hidden || !caja.innerHTML) {
-            if (caja) {
-                limpiarClasesSecuencia(caja);
-                caja.hidden = true;
-                caja.innerHTML = "";
-            }
-            resolve();
-            return;
-        }
-        if (!animacionesActivas()) {
-            limpiarClasesSecuencia(caja);
-            caja.hidden = true;
-            caja.innerHTML = "";
-            resolve();
-            return;
-        }
-        caja.classList.remove("secuencia-entra", "secuencia-sube");
-        caja.classList.add("secuencia-sale");
-        window.setTimeout(function () {
-            limpiarClasesSecuencia(caja);
-            caja.hidden = true;
-            caja.innerHTML = "";
-            resolve();
-        }, 420);
-    });
+/** Cae el telón y la fila se retira tras él. */
+async function salirSecuencia() {
+    await cerrarTelon();
+    const caja = document.getElementById("secuencia");
+    if (!caja) return;
+    limpiarClasesSecuencia(caja);
+    caja.hidden = true;
+    caja.innerHTML = "";
 }
 
 function animarDedoEnOpcion(boton) {
@@ -799,9 +922,6 @@ async function correrDemoMemoria() {
     if (prog) prog.hidden = true;
     const caja = document.getElementById("secuencia");
     const ops = document.getElementById("opciones");
-    caja.hidden = false;
-    caja.classList.add("secuencia-viva");
-    caja.innerHTML = htmlSecuencia(ids);
     setEnunciado(textos().demostracion);
     await PedniaTutorial.correr({
         texto: textos().demostracion,
@@ -810,12 +930,13 @@ async function correrDemoMemoria() {
         onTexto: setEnunciado,
         jugar: async function () {
             const dormir = PedniaTutorial.sleep;
-            await dormir(2600);
+            await presentarMemoria(ids);
             if (juegoTerminado) return;
-            caja.classList.remove("secuencia-viva");
-            caja.classList.add("secuencia-pista");
-            caja.innerHTML = htmlSecuenciaConHueco(ids, ids.length - 1);
-            await dormir(1800);
+            await dormir(1400);
+            await esconderCartas();
+            if (juegoTerminado) return;
+            await revelarPista(ids, ids.length - 1);
+            await dormir(700);
             if (juegoTerminado) return;
             const correcto = ids[ids.length - 1];
             const lista = barajar([correcto].concat(distractoresMovimiento(correcto, 2, ids)));
@@ -841,6 +962,7 @@ async function correrDemoMemoria() {
             document.querySelectorAll(".demo-dedo").forEach(function (n) { n.remove(); });
             ops.innerHTML = "";
             ops.hidden = true;
+            await cerrarTelon();
             caja.innerHTML = "";
             caja.hidden = true;
             caja.classList.remove("secuencia-pista", "secuencia-viva");
@@ -888,19 +1010,11 @@ async function mostrarSecuenciaObjetivo() {
     iniciarFaseMemoria();
     if (ops) ops.hidden = true;
     setEnunciado(textos().memoriza || "¡Memoriza esta secuencia!");
-    limpiarClasesSecuencia(caja);
-    caja.hidden = false;
-    caja.classList.add("secuencia-viva");
-    caja.innerHTML = htmlSecuencia(secuenciaObjetivo);
-    if (animacionesActivas()) {
-        caja.classList.add("secuencia-entra");
-        window.setTimeout(function () {
-            if (caja) caja.classList.remove("secuencia-entra");
-        }, 560);
-        if (anim()) anim().secuencia(caja);
-    }
-    sonarEvento("aparece");
-    await hablarTexto(textos().memoriza);
+    if (fondo()) fondo().fase("memoria");
+    if (telonAbierto()) await cerrarTelon();
+    const pMemoriza = hablarTexto(textos().memoriza);
+    await presentarMemoria(secuenciaObjetivo);
+    await pMemoriza;
     if (juegoTerminado) return;
     if (acc().cuentaRegresiva !== false) {
         cuenta.hidden = false;
@@ -942,13 +1056,14 @@ async function mostrarSecuenciaObjetivo() {
         await pVoz;
         cuenta.hidden = true;
         cuenta.innerHTML = "";
-        await sleep(1000);
         if (juegoTerminado) return;
     } else {
         cuenta.hidden = true;
         await sleep(2500);
         if (juegoTerminado) return;
     }
+    await esconderCartas();
+    if (juegoTerminado) return;
     caja.classList.remove("secuencia-viva");
     terminarFaseMemoria();
     document.getElementById("opciones").hidden = false;
@@ -968,20 +1083,9 @@ async function mostrarOpcionesFalta() {
     ));
     setEnunciado(textos().queFalta || "¿Qué movimiento falta?");
     hablarTexto(textos().queFalta);
-    const pista = document.getElementById("secuencia");
-    pista.hidden = false;
-    pista.classList.remove("secuencia-viva", "secuencia-ok", "secuencia-entra", "secuencia-sale");
-    pista.classList.add("secuencia-pista");
-    pista.innerHTML = htmlSecuenciaConHueco(secuenciaObjetivo, huecoIndex);
-    if (animacionesActivas()) {
-        pista.classList.remove("secuencia-sube");
-        void pista.offsetWidth;
-        pista.classList.add("secuencia-sube");
-        window.setTimeout(function () {
-            if (pista) pista.classList.remove("secuencia-sube");
-        }, 600);
-        if (anim()) anim().pista(pista);
-    }
+    if (fondo()) fondo().fase("opciones");
+    await revelarPista(secuenciaObjetivo, huecoIndex);
+    if (juegoTerminado) return;
     pintarOpcionesFalta(opcionesRonda);
     if (animacionesActivas()) await sleep(180);
 }
@@ -1042,15 +1146,24 @@ function quitarMarca(btn) {
     if (m) m.remove();
 }
 
-function revelarSecuenciaAcierto() {
+/** La opción elegida vuela al hueco, se vuelve carta y la fila salta en ola. */
+async function revelarSecuenciaAcierto(btn) {
     const pista = document.getElementById("secuencia");
-    if (!pista) return;
-    pista.hidden = false;
-    pista.classList.remove("secuencia-pista");
+    const hueco = pista && pista.querySelector(".paso-hueco");
+    if (!pista || !hueco) return;
+    const id = secuenciaObjetivo[huecoIndex];
+    await volar(btn && btn.querySelector(".paso-img"), hueco, 520);
+    const tmp = document.createElement("div");
+    tmp.innerHTML = htmlCarta(id, { mini: true });
+    const carta = tmp.firstChild;
+    carta.classList.add("paso-acierto", "llega");
+    hueco.replaceWith(carta);
     pista.classList.add("secuencia-ok");
-    pista.innerHTML = htmlSecuencia(secuenciaObjetivo);
-    const pasos = pista.querySelectorAll(".paso-mov");
-    if (pasos.length) pasos[pasos.length - 1].classList.add("paso-acierto");
+    sonarEvento("soltar");
+    pista.querySelectorAll(".carta").forEach(function (c, i) {
+        c.style.animationDelay = (i * 90) + "ms";
+        c.classList.add("ola");
+    });
 }
 
 function elegirOpcion(op, btn) {
@@ -1061,8 +1174,9 @@ function elegirOpcion(op, btn) {
     if (op.ok) {
         btn.classList.add("opcion-ok");
         mostrarMarca(btn, "ok");
-        revelarSecuenciaAcierto();
-        if (anim()) anim().acierto(btn, document.querySelector("#secuencia .paso-acierto"));
+        revelarSecuenciaAcierto(btn);
+        if (anim()) anim().acierto(btn, null);
+        if (fondo()) fondo().acierto(btn);
         if (!sonarEvento("correcto")) {
             reproducirAudio(gameConfig.audios && gameConfig.audios.acierto);
         }
@@ -1077,6 +1191,7 @@ function elegirOpcion(op, btn) {
         btn.classList.add("opcion-error");
         mostrarMarca(btn, "error");
         if (anim()) anim().error(btn);
+        if (fondo()) fondo().error(btn);
         if (!sonarEvento("error")) {
             reproducirAudio(gameConfig.audios && gameConfig.audios.error);
         }
@@ -1104,9 +1219,12 @@ function atenuarOpcionFallida(btnErr) {
 
 function verDeNuevo() {
     if (!secuenciaObjetivo.length || juegoTerminado || mostrandoMemoria || marcandoRespuesta) return;
-    mostrarSecuenciaObjetivo().then(function () {
+    mostrarSecuenciaObjetivo().then(async function () {
         if (juegoTerminado) return;
-        restaurarPista();
+        mostrandoMemoria = true;
+        await restaurarPista();
+        mostrandoMemoria = false;
+        if (juegoTerminado) return;
         const caja = document.getElementById("opciones");
         if (caja) caja.hidden = false;
         esperandoRespuesta = true;
@@ -1114,23 +1232,10 @@ function verDeNuevo() {
 }
 
 function restaurarPista() {
+    if (fondo()) fondo().fase("opciones");
     setEnunciado(textos().queFalta || "¿Qué movimiento falta?");
     hablarTexto(textos().queFalta);
-    const pista = document.getElementById("secuencia");
-    if (!pista) return;
-    pista.hidden = false;
-    pista.classList.remove("secuencia-viva", "secuencia-ok", "secuencia-entra", "secuencia-sale");
-    pista.classList.add("secuencia-pista");
-    pista.innerHTML = htmlSecuenciaConHueco(secuenciaObjetivo, huecoIndex);
-    if (animacionesActivas()) {
-        pista.classList.remove("secuencia-sube");
-        void pista.offsetWidth;
-        pista.classList.add("secuencia-sube");
-        window.setTimeout(function () {
-            if (pista) pista.classList.remove("secuencia-sube");
-        }, 600);
-        if (anim()) anim().pista(pista);
-    }
+    return revelarPista(secuenciaObjetivo, huecoIndex);
 }
 
 function generarConfetis() {
@@ -1187,6 +1292,7 @@ function terminarJuego() {
     const cierre = (gameConfig.textos && gameConfig.textos.cierre) || "";
     hablarTexto(cierre);
     if (anim()) anim().celebrar();
+    if (fondo()) fondo().celebrar();
     const texto = document.getElementById("texto_final");
     if (texto) texto.textContent = cierre;
     setTimeout(function () {

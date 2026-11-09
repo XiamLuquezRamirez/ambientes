@@ -46,11 +46,8 @@ body.swal2-height-auto {
 
 body {
   overflow: hidden;
-  background-color: #8eb6f8;
-  background-image: url(img/fondo.png);
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  /* Mismos colores que la fábrica de Phaser: no se ve otro fondo mientras carga. */
+  background: linear-gradient(180deg, #d6e6f5 0 62%, #a3b1c2 62% 100%);
   color: #262626;
   font-family: 'Fredoka', sans-serif;
   touch-action: manipulation;
@@ -559,7 +556,6 @@ body.intro3d-activa #menu-acc {
 @media (max-width: 900px) {
   .enunciado-wrap { width: min(560px, 86vw); top: 0; }
   .enunciado-wrap h1 { padding: 6% 12% 16%; font-size: 18px; }
-  .escena-wrap { padding-top: 22vh; }
   .zona-destinos[data-n="4"] .destino,
   .zona-destinos[data-n="5"] .destino,
   .destino { width: min(132px, 30vw); height: min(148px, 32vw); }

@@ -542,6 +542,24 @@ body.tema-ingenieria {
     animation: aleteo 0.26s ease-in-out infinite alternate;
 }
 
+/* La mariposa ilustrada trae las dos alas en un solo dibujo: el aleteo se
+   aplica a la figura entera para que no se vea asimétrica. */
+.figura.viva.figura-mariposa .capa.cuerpo,
+.figura.viva.figura-mariposa .colocada.ala-der {
+    transform-origin: 50% 42%;
+    animation: aleteoEntero 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes aleteoEntero {
+    from {
+        transform: scaleX(1);
+    }
+
+    to {
+        transform: scaleX(0.9);
+    }
+}
+
 /* Carro */
 .figura.andando .rueda {
     animation: girar 0.28s linear infinite;
@@ -1692,6 +1710,7 @@ body.juego-bloqueado .pieza {
     .hueco-circulo,
     .figura.viva .ala-izq,
     .figura.viva .colocada.ala-der,
+    .figura.viva.figura-mariposa .capa.cuerpo,
     .figura.roncando,
     .btn-accion.pulso,
     .fila-juguetes.bailando .mini {
@@ -1828,3 +1847,189 @@ body.alto-contraste .menu-acc-cerrar {
     color: #fff;
 }
 
+
+/* ── Ambiente Phaser: taller dibujado detrás del juego ──────── */
+
+#ambiente-fondo {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+#ambiente-fondo canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Con el taller dibujado, el fondo plano del tema sobra: el canvas vive en
+   z-index -1, así que el body debe dejarlo ver. */
+body.con-ambiente,
+body.con-ambiente.tema-ingenieria,
+body.con-ambiente.tema-taller {
+    background-image: none;
+    background-color: transparent;
+}
+
+body.con-ambiente::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: #1f2a3d;
+}
+
+/* La mesa la dibuja el panel de control del canvas: aquí solo se reserva
+   el espacio y se dejan las tarjetas encima. */
+body.con-ambiente .mesa,
+body.con-ambiente .mesa-cinta,
+body.con-ambiente .mesa-banco,
+body.con-ambiente .mesa-madera {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0 clamp(12px, 3vw, 48px) clamp(10px, 2.4vh, 26px);
+}
+
+/* Las tarjetas se reparten dentro de la pantalla oscura del panel. El 6.8%
+   lateral es el mismo margen que usa ambiente.js para situar esa pantalla;
+   el vertical va en em para no depender del ancho. */
+body.con-ambiente .zona-piezas {
+    gap: clamp(8px, 1.6vw, 24px);
+    padding: 0 6.8%;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+}
+
+body.con-ambiente .mesa {
+    align-items: stretch;
+}
+
+/* Las piezas viajan en tarjetas del taller (card.svg) sobre la cinta. */
+body.con-ambiente .pieza,
+body.con-ambiente.tema-ingenieria .pieza {
+    border: 0;
+    border-radius: 0;
+    background: url("img/card.svg") center/100% 100% no-repeat;
+    padding: clamp(10px, 1.6vw, 18px);
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+}
+
+/* El dibujo del ala se achica dentro de su tarjeta sin cambiar la caja que
+   el juego mide para volar la pieza al hueco. */
+body.con-ambiente .pieza .pieza-img {
+    transform: scale(0.8);
+}
+
+/* Las tarjetas caben dentro de la pantalla del panel (62.4% de su alto). */
+body.con-ambiente .pieza {
+    max-height: 62%;
+    align-self: center;
+}
+
+body.con-ambiente .pieza:focus-visible {
+    outline: 4px solid #ffd43b;
+    outline-offset: 4px;
+}
+
+body.con-ambiente .medidor,
+body.con-ambiente .estante {
+    position: relative;
+    z-index: 6;
+}
+
+
+
+/* Zoe y Zeus hablan desde un bocadillo arriba a la izquierda. */
+body.con-ambiente .dialogo {
+    position: absolute;
+    z-index: 7;
+    top: clamp(6px, 1.5vh, 16px);
+    left: clamp(10px, 3vw, 40px);
+    width: min(430px, 46vw);
+    margin: 0;
+    padding: 12px 16px;
+    background: #fdf6e3;
+    border: 3px solid #d9c9a3;
+    border-radius: 20px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* Cola del bocadillo, apuntando a la figura. */
+body.con-ambiente .dialogo::after {
+    content: "";
+    position: absolute;
+    left: 42px;
+    bottom: -17px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-top: 18px solid #fdf6e3;
+    filter: drop-shadow(0 3px 0 #d9c9a3);
+}
+
+body.con-ambiente .dialogo-avatar {
+    display: none;
+}
+
+body.con-ambiente .enunciado {
+    font-size: clamp(14px, 1.7vw, 19px);
+    color: #3a2f1c;
+}
+
+body.con-ambiente .dialogo.es-acierto {
+    background: #e9f8ea;
+    border-color: #8cc98f;
+}
+
+body.con-ambiente .dialogo.es-acierto::after {
+    border-top-color: #e9f8ea;
+    filter: drop-shadow(0 3px 0 #8cc98f);
+}
+
+body.con-ambiente .dialogo.es-error {
+    background: #fdefdc;
+    border-color: #e0a860;
+}
+
+body.con-ambiente .dialogo.es-error::after {
+    border-top-color: #fdefdc;
+    filter: drop-shadow(0 3px 0 #e0a860);
+}
+
+/* Gran final: el panel de control manda, con el título debajo. */
+body.con-ambiente .gran-final.final-ingenieria {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2vh;
+    background: url("img/fondo.svg") center/cover no-repeat, #1f2a3d;
+}
+
+body.con-ambiente .final-ingenieria .gran-final-escena {
+    width: min(82vw, 900px);
+    max-height: 66vh;
+    aspect-ratio: 834 / 346;
+    padding: 5% 11%;
+    background: url("img/panel.svg") center/contain no-repeat;
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.5));
+}
+
+body.con-ambiente .final-ingenieria .gran-final-titulo {
+    order: 2;
+    font-size: clamp(22px, 3.4vw, 40px);
+}
+
+/* El túnel se dibuja dentro de la pantalla del panel. */
+body.con-ambiente .final-ingenieria .tunel {
+    width: 100%;
+    height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #ambiente-fondo {
+        opacity: 0.85;
+    }
+}

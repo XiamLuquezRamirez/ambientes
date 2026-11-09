@@ -1,0 +1,181 @@
+/* Sala de teatro animada detrás del juego (fondo-vivo.js). */
+
+.fondo-vivo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: #0f1b3d;
+}
+
+.fondo-vivo .fv {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Bombillas que titilan en cadena. */
+.fv-bombilla {
+  animation: fvTitila 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.13s);
+}
+
+@keyframes fvTitila {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.fv.acierto .fv-bombilla {
+  animation-duration: 0.35s;
+}
+
+.fv.fase-memoria .fv-bombilla {
+  animation-duration: 3.2s;
+}
+
+/* Reflectores: barren solos y, si hay a quién apuntar, lo siguen. */
+.fv-barrido {
+  transform-box: view-box;
+  animation: fvBarridoIzq 7s ease-in-out infinite;
+}
+
+.fv-barrido.der {
+  animation-name: fvBarridoDer;
+}
+
+@keyframes fvBarridoIzq {
+  0%, 100% { transform: rotate(-40deg); }
+  50% { transform: rotate(-8deg); }
+}
+
+@keyframes fvBarridoDer {
+  0%, 100% { transform: rotate(40deg); }
+  50% { transform: rotate(8deg); }
+}
+
+.fv.apuntando .fv-barrido {
+  animation: none;
+  transform: none;
+}
+
+.fv-haz {
+  transition: transform 0.45s cubic-bezier(.3, .8, .3, 1);
+}
+
+.fv-cono {
+  fill: url(#fv-luz);
+  opacity: 0.7;
+  mix-blend-mode: screen;
+  transition: opacity 0.3s ease;
+}
+
+.fv.apuntando .fv-cono { opacity: 0.95; }
+
+/* La opción a la que apuntan los reflectores brilla. */
+.opcion-seq {
+  transition: box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.opcion-seq.fv-iluminada {
+  box-shadow:
+    0 0 0 4px #ffd43b,
+    0 0 36px 12px rgba(255, 220, 110, 0.7),
+    0 12px 24px rgba(30, 58, 95, 0.12);
+  filter: brightness(1.06);
+}
+
+.fv-luz-error .opcion-seq.fv-iluminada {
+  box-shadow:
+    0 0 0 4px #ff6b6b,
+    0 0 36px 12px rgba(255, 107, 107, 0.6);
+}
+.fv.acierto .fv-cono { fill: url(#fv-oro); opacity: 1; }
+.fv.error .fv-cono { fill: url(#fv-rojo); opacity: 0.9; }
+
+/* Sala a oscuras mientras se memoriza. */
+.fv-oscuro {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.fv.fase-memoria .fv-oscuro { opacity: 0.45; }
+
+/* Destellos que suben despacio. */
+.fv-destello {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvSube 6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.55s);
+  opacity: 0;
+}
+
+@keyframes fvSube {
+  0% { opacity: 0; translate: 0 40px; scale: 0.5; }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; translate: 0 -160px; scale: 1.1; rotate: 120deg; }
+}
+
+/* Público: se mece; al acertar salta con los brazos arriba. */
+.fv-cuerpo {
+  animation: fvMece 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.3s);
+}
+
+@keyframes fvMece {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-4px) rotate(2deg); }
+}
+
+.fv-brazos {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.fv.acierto .fv-brazos { opacity: 1; }
+
+.fv.acierto .fv-cuerpo {
+  animation: fvSalta 0.5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.07s);
+}
+
+@keyframes fvSalta {
+  0%, 100% { transform: translateY(0); }
+  45% { transform: translateY(-34px); }
+}
+
+.fv.error .fv-cuerpo {
+  animation: fvOh 0.9s ease;
+}
+
+@keyframes fvOh {
+  0%, 100% { transform: rotate(0); }
+  30% { transform: rotate(-7deg) translateY(6px); }
+  65% { transform: rotate(5deg) translateY(6px); }
+}
+
+/* Confeti que cae al acertar. */
+.fv-papel {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: fvCae;
+  animation-timing-function: cubic-bezier(.3, .5, .6, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes fvCae {
+  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  100% { transform: translate(var(--dx), 980px) rotate(var(--giro)); opacity: 0.8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fv-bombilla,
+  .fv-barrido,
+  .fv-destello,
+  .fv-cuerpo,
+  .fv.acierto .fv-cuerpo,
+  .fv.error .fv-cuerpo {
+    animation: none;
+  }
+
+  .fv-destello { opacity: 0.6; }
+}

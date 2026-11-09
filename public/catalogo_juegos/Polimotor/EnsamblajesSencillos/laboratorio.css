@@ -1,0 +1,581 @@
+/* Laboratorio de robots animado (laboratorio.js). */
+
+.lab-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: #b7bdf6;
+}
+
+.lab-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lab-capa {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* ── Fondo: siempre en movimiento ───────────────────────── */
+
+.lab-led {
+  animation: labTitila 1.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.17s);
+}
+
+@keyframes labTitila {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.lab-codigo {
+  animation: labCodigo 9s linear infinite;
+}
+
+@keyframes labCodigo {
+  from { transform: translateY(0); }
+  to { transform: translateY(-192px); }
+}
+
+.lab-engranaje {
+  animation: labGira 8s linear infinite;
+}
+
+.lab-engranaje.g2 {
+  animation-direction: reverse;
+  animation-duration: 5.5s;
+}
+
+@keyframes labGira {
+  to { transform: rotate(360deg); }
+}
+
+.lab-estrella {
+  animation: labTitila 2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.23s);
+}
+
+.lab-puerta {
+  transition: transform 1.1s cubic-bezier(.6, 0, .3, 1);
+}
+
+.lab-rayo {
+  opacity: 0;
+  transition: opacity 0.8s ease 0.5s;
+}
+
+.lab-svg.techo-abierto .lab-puerta.izq { transform: translateX(-300px); }
+.lab-svg.techo-abierto .lab-puerta.der { transform: translateX(300px); }
+.lab-svg.techo-abierto .lab-rayo { opacity: 1; }
+
+/* Al arrastrar una pieza la sala se atenúa. */
+.lab-sombra {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.lab-svg.arrastrando .lab-sombra { opacity: 0.28; }
+
+/* Acierto y error: destello, mensaje en la pantalla y luces. */
+.lab-destello { opacity: 0; }
+
+.lab-svg.ok .lab-destello,
+.lab-svg.error .lab-destello {
+  animation: labDestello 0.7s ease-out;
+}
+
+@keyframes labDestello {
+  0% { opacity: 0.35; }
+  100% { opacity: 0; }
+}
+
+.lab-svg.ok .lab-msj,
+.lab-svg.error .lab-msj,
+.lab-svg.ok .lab-msj-fondo,
+.lab-svg.error .lab-msj-fondo {
+  opacity: 1;
+}
+
+.lab-svg.ok .lab-led { fill: #69db7c; animation-duration: 0.3s; }
+.lab-svg.error .lab-led { fill: #ff6b6b; animation-duration: 0.25s; }
+.lab-svg.ok .lab-engranaje { animation-duration: 1.2s; }
+.lab-svg.error .lab-msj { animation: labTitila 0.25s steps(1) 3; }
+
+.lab-svg.cargando .lab-led { animation-duration: 0.18s; fill: #ffd43b; }
+.lab-svg.cargando .lab-engranaje { animation-duration: 0.8s; }
+
+/* ── Batería de energía ─────────────────────────────────── */
+
+.lab-bateria {
+  position: fixed;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+
+.lab-bateria[hidden] { display: none; }
+
+.lab-bateria-tapa {
+  width: 10px;
+  height: 44%;
+  border-radius: 0 4px 4px 0;
+  background: #2b2260;
+}
+
+.lab-bateria-cuerpo {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  padding: 7px;
+  box-sizing: border-box;
+  border-radius: 14px;
+  background: #2b2260;
+  box-shadow: 0 8px 0 rgba(20, 10, 60, 0.25), inset 0 0 0 4px #4a3f9a;
+}
+
+.lab-celda {
+  flex: 1;
+  border-radius: 6px;
+  background: #4a3f9a;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.lab-celda.llena {
+  background: linear-gradient(180deg, #8ce99a, #38d9a9);
+  box-shadow: 0 0 12px rgba(105, 219, 124, 0.8);
+}
+
+.lab-celda.recien {
+  animation: labCelda 0.6s ease;
+}
+
+@keyframes labCelda {
+  0% { transform: scaleY(0.4); filter: brightness(2); }
+  100% { transform: scaleY(1); filter: brightness(1); }
+}
+
+.lab-bateria-rayo {
+  order: 3;
+  margin-right: 8px;
+  font-size: 26px;
+  line-height: 1;
+  filter: grayscale(1) opacity(0.6);
+  transition: filter 0.3s ease;
+}
+
+.lab-bateria.completa .lab-bateria-rayo { filter: none; }
+
+.lab-bateria.cargando .lab-celda.llena {
+  animation: labCarga 0.25s ease-in-out infinite alternate;
+}
+
+@keyframes labCarga {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.8); box-shadow: 0 0 20px #ffd43b; }
+}
+
+/* ── Brazo robótico que suelda ──────────────────────────── */
+
+.lab-brazo {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 0;
+  --largo: 200px;
+}
+
+.lab-brazo-riel {
+  position: absolute;
+  left: -34px;
+  top: 0;
+  width: 68px;
+  height: 22px;
+  border-radius: 0 0 12px 12px;
+  background: #2b2260;
+}
+
+.lab-brazo-tubo {
+  position: absolute;
+  left: -9px;
+  top: 0;
+  width: 18px;
+  height: 30px;
+  background: repeating-linear-gradient(180deg, #7c86e0 0 14px, #6b74d6 14px 20px);
+  border-radius: 0 0 6px 6px;
+  transition: height 0.4s cubic-bezier(.4, 1.4, .5, 1);
+}
+
+.lab-brazo-cabeza {
+  position: absolute;
+  left: -22px;
+  top: 26px;
+  width: 44px;
+  height: 34px;
+  border-radius: 10px 10px 4px 4px;
+  background: #ffa94d;
+  box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.15);
+  transition: top 0.4s cubic-bezier(.4, 1.4, .5, 1);
+}
+
+.lab-brazo-punta {
+  position: absolute;
+  left: 14px;
+  bottom: -14px;
+  width: 16px;
+  height: 16px;
+  background: #495057;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.lab-brazo.baja .lab-brazo-tubo { height: calc(var(--largo) - 44px); }
+.lab-brazo.baja .lab-brazo-cabeza { top: calc(var(--largo) - 48px); }
+
+.lab-brazo.suelda .lab-brazo-punta::after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 6px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 25%, #74c0fc 45%, transparent 70%);
+  animation: labSoldadura 0.12s steps(2) infinite;
+}
+
+@keyframes labSoldadura {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.6; transform: scale(1.3); }
+}
+
+.lab-chispa {
+  position: fixed;
+  width: 7px;
+  height: 7px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: #ffd43b;
+  box-shadow: 0 0 8px #ffa94d;
+  animation: labChispa 0.7s ease-out forwards;
+}
+
+@keyframes labChispa {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), calc(var(--dy) + 40px)) scale(0.3); opacity: 0; }
+}
+
+/* ── Escáner láser al arrastrar ─────────────────────────── */
+
+.lab-escaner {
+  position: fixed;
+  border-radius: 14px;
+  border: 3px solid rgba(56, 217, 169, 0.55);
+  box-shadow: 0 0 18px rgba(56, 217, 169, 0.35), inset 0 0 22px rgba(56, 217, 169, 0.18);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  overflow: hidden;
+}
+
+.lab-escaner.activo { opacity: 1; }
+
+.lab-escaner-linea {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 6px;
+  background: linear-gradient(90deg, transparent, #38d9a9, #e6fcf5, #38d9a9, transparent);
+  box-shadow: 0 0 14px #38d9a9;
+  animation: labEscanea 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes labEscanea {
+  from { top: 0; }
+  to { top: calc(100% - 6px); }
+}
+
+/* ── Gran final ─────────────────────────────────────────── */
+
+body.lab-final #bandeja {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  opacity: 0;
+  transform: translateX(40px);
+  pointer-events: none;
+}
+
+.lab-palanca {
+  position: fixed;
+  right: 12vw;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transform: translate(0, -50%) scale(0.6);
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(.3, 1.6, .5, 1);
+  pointer-events: auto;
+}
+
+.lab-palanca.visible {
+  opacity: 1;
+  transform: translate(0, -50%) scale(1);
+}
+
+.lab-palanca-texto {
+  margin: 0;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: #fff;
+  color: #2b2260;
+  font-size: clamp(20px, 2.6vw, 30px);
+  font-weight: 700;
+  box-shadow: 0 6px 0 #c5c9f8;
+}
+
+.lab-palanca-boton {
+  position: relative;
+  width: 170px;
+  height: 230px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.lab-palanca-base {
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  bottom: 0;
+  height: 110px;
+  border-radius: 20px;
+  background: #2b2260;
+  box-shadow: inset 0 0 0 6px #4a3f9a, 0 8px 0 rgba(20, 10, 60, 0.3);
+}
+
+.lab-palanca-base::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  width: 26px;
+  height: 66px;
+  margin-left: -13px;
+  border-radius: 13px;
+  background: #120a35;
+}
+
+.lab-palanca-brazo {
+  position: absolute;
+  left: 50%;
+  bottom: 60px;
+  width: 18px;
+  height: 140px;
+  margin-left: -9px;
+  border-radius: 9px;
+  background: linear-gradient(90deg, #adb5bd, #e9ecef, #adb5bd);
+  transform-origin: 50% 100%;
+  transform: rotate(-32deg);
+  transition: transform 0.35s cubic-bezier(.6, 0, .3, 1.4);
+}
+
+.lab-palanca-bola {
+  position: absolute;
+  left: 50%;
+  top: -26px;
+  width: 52px;
+  height: 52px;
+  margin-left: -26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff8787, #e03131 60%, #a51111);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+}
+
+.lab-palanca:not(.abajo) .lab-palanca-bola {
+  animation: labPulso 0.9s ease-in-out infinite;
+}
+
+@keyframes labPulso {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+  50% { box-shadow: 0 0 0 18px rgba(255, 107, 107, 0); }
+}
+
+.lab-palanca.abajo .lab-palanca-brazo { transform: rotate(32deg); }
+
+/* El robot armado espera apagado y se enciende. */
+body.lab-final #lienzo {
+  transition: filter 0.6s ease;
+  filter: grayscale(1) brightness(0.55);
+}
+
+body.lab-final #lienzo.robot-encendido {
+  filter: none;
+  animation: labEncendido 0.9s ease;
+}
+
+@keyframes labEncendido {
+  0% { filter: brightness(0.7); }
+  20% { filter: brightness(2) drop-shadow(0 0 30px #74c0fc); }
+  35% { filter: brightness(0.8); }
+  55% { filter: brightness(1.8) drop-shadow(0 0 40px #74c0fc); }
+  100% { filter: brightness(1) drop-shadow(0 0 16px rgba(116, 192, 252, 0.8)); }
+}
+
+/* Mientras saluda, el robot solo rebota suave: el saludo lo hace el brazo. */
+#lienzo.robot-saluda {
+  animation: labSaluda 0.6s ease-in-out 4;
+}
+
+@keyframes labSaluda {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Brazo y mano giran juntos sobre el hombro (laboratorio.js pone el pivote). */
+#figura-svg .svg-parte.lab-saluda {
+  transform-box: view-box;
+  animation: labSaludoBrazo 2.8s ease-in-out forwards;
+}
+
+@keyframes labSaludoBrazo {
+  0% { transform: translate(var(--tx), var(--ty)) rotate(0deg); }
+  20% { transform: translate(var(--tx), var(--ty)) rotate(calc(var(--giro) * -105deg)); }
+  32% { transform: translate(var(--tx), var(--ty)) rotate(calc(var(--giro) * -125deg)); }
+  44% { transform: translate(var(--tx), var(--ty)) rotate(calc(var(--giro) * -95deg)); }
+  56% { transform: translate(var(--tx), var(--ty)) rotate(calc(var(--giro) * -125deg)); }
+  68% { transform: translate(var(--tx), var(--ty)) rotate(calc(var(--giro) * -95deg)); }
+  82% { transform: translate(var(--tx), var(--ty)) rotate(calc(var(--giro) * -110deg)); }
+  100% { transform: translate(var(--tx), var(--ty)) rotate(0deg); }
+}
+
+#lienzo.robot-propulsores {
+  animation: labVibra 0.08s linear infinite;
+}
+
+@keyframes labVibra {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(2px, -2px); }
+}
+
+/* Nace en la planta de cada pie (laboratorio.js pone left/top) y sale hacia abajo. */
+.lab-fuego {
+  position: absolute;
+  width: 46px;
+  height: 90px;
+  margin-left: -23px;
+  border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+  background: radial-gradient(ellipse at 50% 20%, #fff 0 15%, #ffd43b 35%, #ff922b 60%, transparent 72%);
+  transform-origin: 50% 0;
+  animation: labLlama 0.12s ease-in-out infinite alternate;
+  z-index: -1;
+}
+
+
+@keyframes labLlama {
+  from { transform: scaleY(0.85) scaleX(0.95); }
+  to { transform: scaleY(1.25) scaleX(1.05); }
+}
+
+#lienzo.robot-despega {
+  animation: labDespega 1.9s cubic-bezier(.55, 0, .9, .45) forwards;
+}
+
+@keyframes labDespega {
+  0% { transform: translateY(0); }
+  15% { transform: translateY(12px); }
+  100% { transform: translateY(-130vh); }
+}
+
+.lab-humo {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  animation: labHumo 1.3s ease-out forwards;
+}
+
+@keyframes labHumo {
+  0% { transform: scale(0.4); opacity: 0.95; }
+  100% { transform: translate(var(--dx, 0), 60px) scale(2.6); opacity: 0; }
+}
+
+body.lab-temblor #principal,
+body.lab-temblor .lab-fondo {
+  animation: labTemblor 0.12s linear infinite;
+}
+
+@keyframes labTemblor {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-3px, 2px); }
+  75% { transform: translate(3px, -2px); }
+}
+
+.lab-burbuja {
+  position: fixed;
+  max-width: min(340px, 40vw);
+  padding: 14px 22px;
+  border-radius: 24px;
+  background: #fff;
+  color: #2b2260;
+  font-size: clamp(18px, 2.2vw, 26px);
+  font-weight: 700;
+  box-shadow: 0 8px 0 #c5c9f8;
+  transform: scale(0.4);
+  opacity: 0;
+  transform-origin: 0 100%;
+  transition: transform 0.35s cubic-bezier(.3, 1.6, .5, 1), opacity 0.25s ease;
+}
+
+.lab-burbuja::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  bottom: -16px;
+  border: 10px solid transparent;
+  border-top: 14px solid #fff;
+  border-bottom: 0;
+}
+
+.lab-burbuja.visible {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.lab-fuego-artificial {
+  position: fixed;
+  width: 9px;
+  height: 9px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  animation: labFuegoArtificial 1.2s cubic-bezier(.2, .7, .3, 1) forwards;
+}
+
+@keyframes labFuegoArtificial {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(var(--dx), calc(var(--dy) + 30px)) scale(0.4); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-led,
+  .lab-codigo,
+  .lab-engranaje,
+  .lab-estrella,
+  .lab-escaner-linea,
+  #lienzo.robot-saluda,
+  #lienzo.robot-propulsores,
+  body.lab-temblor #principal,
+  body.lab-temblor .lab-fondo,
+  .lab-palanca:not(.abajo) .lab-palanca-bola {
+    animation: none;
+  }
+}

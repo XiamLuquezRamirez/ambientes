@@ -172,7 +172,7 @@
             if (!textoLinea(reto.inflar) || !(reto.inflar.bombazos > 0)) errores.push(pre + "falta la fase de inflar");
             if (!reto.lodo || !(reto.lodo.limpiezaMinima > 0 && reto.lodo.limpiezaMinima < 1)) errores.push(pre + "lodo sin limpieza mínima");
         }
-        if (reto.mecanica === "simetria" && (!reto.fantasma || typeof reto.ejeX !== "number")) errores.push(pre + "simetría sin eje o fantasma");
+        if (reto.mecanica === "simetria" && typeof reto.ejeX !== "number") errores.push(pre + "simetría sin eje");
         if (reto.mecanica === "calibrador" && (!reto.rampa || !esRect(reto.nivel))) errores.push(pre + "calibrador sin rampa o nivel");
         if (reto.mecanica === "clima") {
             if (!esRect(reto.paredes)) errores.push(pre + "clima sin paredes");

@@ -1,0 +1,513 @@
+/* ── Nivel 1: El Sendero ─────────────────────────────────────
+   Caminos de color desde una plaza hasta una puerta por lado. */
+
+.tablero.sendero {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 1vh, 10px);
+    width: 100%;
+    height: 100%;
+    padding: clamp(4px, 1vh, 10px) clamp(6px, 1.4vh, 14px);
+    box-sizing: border-box;
+    background: none;
+}
+
+.sendero-mapa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 2vw, 20px);
+    flex: 0 0 auto;
+}
+
+.sendero-hito {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(26px, 4.4vh, 40px);
+    height: clamp(26px, 4.4vh, 40px);
+    border: 3px dashed rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 2px 0 rgba(90, 30, 50, 0.18);
+    color: #fff;
+    font-size: clamp(14px, 2.4vh, 22px);
+    line-height: 1;
+}
+
+.sendero-hito.hecho {
+    border-style: solid;
+    border-color: #ffd43b;
+    background: #ffd43b;
+    color: #7a4a00;
+}
+
+.sendero-hito.recien {
+    animation: senderoHito 0.5s ease;
+}
+
+@keyframes senderoHito {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.45); }
+    100% { transform: scale(1); }
+}
+
+.sendero-pista {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.sendero-caminos {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.sendero-borde,
+.sendero-via,
+.sendero-guia,
+.sendero-plaza {
+    pointer-events: none;
+}
+
+/* Los tres caminos son iguales: de tierra. */
+.sendero-borde { stroke: #b8935a; }
+.sendero-via { stroke: #ecd6a6; }
+
+.sendero-via.resaltado,
+.sendero-borde.resaltado {
+    filter: brightness(1.12);
+}
+
+.sendero-guia {
+    stroke: rgba(255, 255, 255, 0.95);
+    stroke-dasharray: 2 16;
+    stroke-linecap: round;
+    animation: senderoGuia 0.55s linear infinite;
+}
+
+@keyframes senderoGuia {
+    to { stroke-dashoffset: -18; }
+}
+
+.sendero-plaza {
+    fill: #d9d4e2;
+    stroke: #a49db3;
+    stroke-width: 6;
+}
+
+.sendero-hit {
+    stroke: transparent;
+    pointer-events: none;
+    cursor: pointer;
+}
+
+.sendero-ramales {
+    /* Medidas de cada torre alrededor de su puerta. */
+    --torre-sobre: clamp(34px, 6vh, 58px);
+    --torre-techo: clamp(52px, 10vh, 100px);
+    --torre-lado: clamp(20px, 3.4vh, 38px);
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex: 0 0 auto;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    gap: clamp(64px, 6.5vw, 110px);
+    padding: calc(var(--torre-sobre) + var(--torre-techo)) calc(clamp(78px, 7vw, 140px) + var(--torre-lado)) 0;
+    pointer-events: none;
+}
+
+/* Cuerpo de piedra de la torre. */
+.sendero-ramal::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: calc(-1 * var(--torre-sobre));
+    bottom: 0;
+    left: calc(-1 * var(--torre-lado));
+    right: calc(-1 * var(--torre-lado));
+    border-radius: 4px 4px 0 0;
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 10px, transparent 10px calc(100% - 12px), rgba(0, 0, 0, 0.12) calc(100% - 12px)),
+        repeating-linear-gradient(0deg, transparent 0 30px, #857e94 30px 33px),
+        repeating-linear-gradient(90deg, transparent 0 44px, #857e94 44px 47px),
+        #aaa3b9;
+    box-shadow: 0 8px 0 rgba(40, 30, 60, 0.18);
+    pointer-events: none;
+}
+
+/* Tejado cónico con la bandera del color del lado. */
+.sendero-ramal::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    bottom: calc(100% + var(--torre-sobre) - 2px);
+    left: calc(-1 * var(--torre-lado) - 12px);
+    right: calc(-1 * var(--torre-lado) - 12px);
+    height: var(--torre-techo);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Crect x='28' y='0' width='4' height='30' fill='%236b5a3a'/%3E%3Cpath d='M32 2 L60 9 L32 17Z' fill='%23ffd43b'/%3E%3C/svg%3E") center top / 44px 22px no-repeat,
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M50 0 L100 100 H0Z' fill='%23c2413d'/%3E%3Cpath d='M50 0 L100 100 H50Z' fill='%23a8322f'/%3E%3C/svg%3E") center bottom / 100% calc(100% - 20px) no-repeat;
+    pointer-events: none;
+}
+
+.sendero-ramal.centro::after {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Crect x='28' y='0' width='4' height='30' fill='%236b5a3a'/%3E%3Cpath d='M32 2 L60 9 L32 17Z' fill='%234dabf7'/%3E%3C/svg%3E") center top / 44px 22px no-repeat,
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M50 0 L100 100 H0Z' fill='%23c2413d'/%3E%3Cpath d='M50 0 L100 100 H50Z' fill='%23a8322f'/%3E%3C/svg%3E") center bottom / 100% calc(100% - 20px) no-repeat;
+}
+
+.sendero-ramal.derecha::after {
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30'%3E%3Crect x='28' y='0' width='4' height='30' fill='%236b5a3a'/%3E%3Cpath d='M32 2 L60 9 L32 17Z' fill='%2351cf66'/%3E%3C/svg%3E") center top / 44px 22px no-repeat,
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M50 0 L100 100 H0Z' fill='%23c2413d'/%3E%3Cpath d='M50 0 L100 100 H50Z' fill='%23a8322f'/%3E%3C/svg%3E") center bottom / 100% calc(100% - 20px) no-repeat;
+}
+
+.sendero-ramal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(4px, 0.8vh, 8px);
+    pointer-events: auto;
+}
+
+.sendero-ramal.elegible {
+    cursor: pointer;
+}
+
+.sendero-marco {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    filter: drop-shadow(0 8px 8px rgba(80, 30, 50, 0.22));
+}
+
+.sendero-ramal.elegible .sendero-marco {
+    animation: senderoMarco 2.8s ease-in-out infinite;
+}
+
+.sendero-ramal.resaltado .sendero-marco,
+.sendero-ramal.elegible:hover .sendero-marco,
+.sendero-ramal.elegible:focus-visible .sendero-marco {
+    animation: none;
+    transform: translateY(-8px);
+}
+
+.sendero-ramal.abierta .sendero-marco {
+    animation: none;
+    transform: none;
+}
+
+@keyframes senderoMarco {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.sendero-techo {
+    width: calc(100% + 22px);
+    height: clamp(12px, 2.2vh, 20px);
+    border-radius: 7px 7px 3px 3px;
+    background: linear-gradient(180deg, #d9d4e2, #a49db3);
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.sendero-puerta {
+    position: relative;
+    width: clamp(92px, 16vh, 168px);
+    height: clamp(118px, 22vh, 214px);
+    margin-top: -2px;
+    border-radius: 84px 84px 8px 8px;
+    background: #2e2838;
+    box-shadow:
+        inset 0 0 0 7px #d9d4e2,
+        inset 0 0 0 10px #8b84a0,
+        0 8px 0 rgba(40, 30, 60, 0.2);
+    overflow: hidden;
+}
+
+.sendero-ramal.elegible:focus-visible {
+    outline: none;
+}
+
+.sendero-ramal.elegible:focus-visible .sendero-puerta {
+    outline: 5px solid #fff;
+    outline-offset: 4px;
+}
+
+/* Rendija de luz: algo hay dentro, pero no se ve qué. */
+.sendero-puerta::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 10px;
+    height: 7px;
+    border-radius: 7px;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.sendero-ramal.elegible .sendero-puerta::after {
+    animation: senderoRendija 2.2s ease-in-out infinite;
+}
+
+@keyframes senderoRendija {
+    0%, 100% {
+        opacity: 0.15;
+        box-shadow: 0 0 0 0 rgba(255, 210, 90, 0);
+        background: rgba(255, 230, 150, 0.2);
+    }
+    50% {
+        opacity: 1;
+        box-shadow: 0 0 16px 5px rgba(255, 196, 60, 0.9);
+        background: #ffe08a;
+    }
+}
+
+.sendero-ramal.abierta .sendero-puerta::after {
+    animation: none;
+    opacity: 0;
+}
+
+.sendero-hueco {
+    position: absolute;
+    inset: clamp(7px, 1.2vh, 12px);
+    border-radius: 78px 78px 4px 4px;
+    background:
+        radial-gradient(circle at 50% 38%, #fff4d4, #e7c48a 72%, #c99655);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.sendero-premio {
+    width: 74%;
+    height: 74%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+    transform: scale(0.35);
+    opacity: 0;
+    transition: transform 0.42s cubic-bezier(0.3, 0.9, 0.4, 1.4), opacity 0.28s ease;
+}
+
+.sendero-premio img {
+    width: 82%;
+    height: 82%;
+    object-fit: contain;
+}
+
+.sendero-ramal.abierta .sendero-premio {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.sendero-ramal.fallo .sendero-premio {
+    box-shadow: 0 0 0 5px #ff6b6b, 0 8px 14px rgba(0, 0, 0, 0.25);
+    animation: senderoNoEs 0.55s ease;
+}
+
+@keyframes senderoNoEs {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.06) rotate(-8deg); }
+    70% { transform: scale(1.06) rotate(8deg); }
+}
+
+.sendero-premio.recogido {
+    animation: senderoRecoge 0.48s ease forwards;
+}
+
+@keyframes senderoRecoge {
+    to {
+        transform: translateY(-46px) scale(0.3);
+        opacity: 0;
+    }
+}
+
+.sendero-hoja {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: 84px 84px 8px 8px;
+    background:
+        linear-gradient(180deg, transparent 0 26%, #4a4552 26% 30%, transparent 30% 66%, #4a4552 66% 70%, transparent 70%),
+        repeating-linear-gradient(90deg,
+            rgba(60, 30, 10, 0.22) 0 3px,
+            transparent 3px 22px),
+        linear-gradient(180deg, #a8693a, #7a4622);
+    box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.35);
+    transform-origin: left center;
+    transition: transform 0.55s cubic-bezier(0.4, 0.1, 0.3, 1);
+    backface-visibility: hidden;
+}
+
+.sendero-ramal.abierta .sendero-hoja {
+    transform: perspective(640px) rotateY(-112deg);
+}
+
+.sendero-bisagra {
+    position: absolute;
+    left: 5px;
+    width: 8px;
+    height: 18px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #5c5866, #34303b);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.sendero-bisagra.a { top: 24%; }
+.sendero-bisagra.b { top: 62%; }
+
+.sendero-pomo {
+    position: absolute;
+    right: 14%;
+    top: 54%;
+    width: clamp(10px, 1.8vh, 16px);
+    height: clamp(10px, 1.8vh, 16px);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f1f3f5, #8f8a99 55%, #4a4552);
+    box-shadow: 0 0 0 3px rgba(30, 20, 40, 0.35);
+}
+
+.sendero-felpudo {
+    width: 62%;
+    height: clamp(7px, 1.3vh, 12px);
+    margin-top: 5px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #d9d4e2, #a49db3);
+    box-shadow: 0 3px 0 rgba(40, 30, 60, 0.25);
+}
+
+/* El cartel va al lado de la puerta: el personaje llega por abajo y no lo tapa. */
+.sendero-cartel {
+    position: absolute;
+    top: 38%;
+    z-index: 4;
+    padding: clamp(3px, 0.7vh, 7px) clamp(10px, 1.8vw, 18px);
+    border-radius: 12px;
+    background: #fff;
+    border: 3px solid #ffb703;
+    color: #4a3200;
+    font-size: clamp(14px, 2.2vh, 22px);
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12);
+}
+
+.sendero-ramal.izquierda .sendero-cartel {
+    right: calc(100% + var(--torre-lado) + 8px);
+}
+
+.sendero-ramal.derecha .sendero-cartel {
+    left: calc(100% + var(--torre-lado) + 8px);
+}
+
+/* En la torre del centro el letrero va en la piedra, sobre la puerta. */
+.sendero-ramal.centro .sendero-cartel {
+    top: calc(-1 * var(--torre-sobre) + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sendero-ramal.izquierda .sendero-cartel { border-color: #ffd43b; }
+.sendero-ramal.centro .sendero-cartel { border-color: #4dabf7; }
+.sendero-ramal.derecha .sendero-cartel { border-color: #51cf66; }
+
+.sendero-caminante {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: clamp(110px, 22vh, 200px);
+    height: clamp(110px, 22vh, 200px);
+    margin: 0;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.sendero-caminante img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    display: block;
+    filter: drop-shadow(0 6px 6px rgba(60, 20, 40, 0.28));
+}
+
+.sendero-sombra-pj {
+    position: absolute;
+    left: 16%;
+    right: 16%;
+    bottom: 2px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(80, 30, 60, 0.28);
+}
+
+.sendero-caminante.andando img {
+    animation: senderoPaso 0.24s ease-in-out infinite alternate;
+}
+
+.sendero-lienzo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.sendero-caminante.tiene-3d img,
+.sendero-caminante.tiene-3d.andando img {
+    display: none;
+    animation: none;
+}
+
+.sendero-caminante.mira-izq img {
+    transform: scaleX(-1);
+}
+
+.sendero-caminante.mira-izq.andando img {
+    animation-name: senderoPasoIzq;
+}
+
+@keyframes senderoPaso {
+    from { transform: translateY(0) rotate(-3deg); }
+    to { transform: translateY(-7px) rotate(3deg); }
+}
+
+@keyframes senderoPasoIzq {
+    from { transform: scaleX(-1) translateY(0) rotate(3deg); }
+    to { transform: scaleX(-1) translateY(-7px) rotate(-3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sendero-guia,
+    .sendero-hito.recien,
+    .sendero-ramal.elegible .sendero-marco,
+    .sendero-ramal.elegible .sendero-puerta::after,
+    .sendero-caminante.andando img,
+    .sendero-premio.recogido,
+    .sendero-ramal.fallo .sendero-premio {
+        animation: none;
+    }
+
+    .sendero-hoja,
+    .sendero-premio {
+        transition-duration: 0.12s;
+    }
+}

@@ -31,6 +31,8 @@
     "instruccion": "Hola, soy Zoe. ¡Vamos a armar el robot! Observa las piezas y colócalas en su lugar.",
     "seOcultan": "El robot se esconderá en...",
     "cierre": "Completaste el ensamblaje del robot.",
+        "palanca": "¡Enciende tu robot! Baja la palanca.",
+        "saludoRobot": "¡Hola! ¡Gracias por armarme!",
     "demostracion": "¡Vamos con un ejemplo! Mira: el dedo toma la pierna y la mueve un poco.",
     "demostracionFin": "¡Ahora te toca a ti! Arma la figura tú.",
     "acierto": "¡Muy bien, esa pieza va ahí!",

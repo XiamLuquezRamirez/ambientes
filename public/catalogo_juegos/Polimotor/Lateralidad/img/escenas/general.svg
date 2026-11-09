@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="cielo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7cc8f5"/>
+      <stop offset="1" stop-color="#d9f1ff"/>
+    </linearGradient>
+    <linearGradient id="pasto" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fd16a"/>
+      <stop offset="1" stop-color="#5daa3e"/>
+    </linearGradient>
+    <g id="nube" fill="#fff">
+      <ellipse cx="0" cy="0" rx="70" ry="34"/>
+      <ellipse cx="-55" cy="12" rx="48" ry="26"/>
+      <ellipse cx="60" cy="14" rx="52" ry="24"/>
+      <ellipse cx="10" cy="-22" rx="44" ry="30"/>
+    </g>
+  </defs>
+  <rect width="1600" height="900" fill="url(#cielo)"/>
+  <circle cx="1380" cy="140" r="70" fill="#ffe36e"/>
+  <circle cx="1380" cy="140" r="100" fill="#ffe36e" opacity="0.25"/>
+  <use href="#nube" x="260" y="150" opacity="0.95"/>
+  <use href="#nube" x="820" y="110" transform="scale(1)" opacity="0.85"/>
+  <use href="#nube" x="1120" y="250" opacity="0.7"/>
+  <path d="M0 560 Q250 430 520 520 T1050 500 T1600 520 V900 H0 Z" fill="#b5e08f"/>
+  <path d="M0 620 Q300 540 640 600 T1300 590 T1600 600 V900 H0 Z" fill="url(#pasto)"/>
+  <g fill="#ffffff" opacity="0.9">
+    <circle cx="180" cy="760" r="7"/><circle cx="420" cy="820" r="6"/><circle cx="760" cy="740" r="7"/>
+    <circle cx="1040" cy="800" r="6"/><circle cx="1320" cy="760" r="7"/><circle cx="1500" cy="840" r="6"/>
+  </g>
+  <g fill="#ffd43b">
+    <circle cx="180" cy="760" r="3"/><circle cx="420" cy="820" r="3"/><circle cx="760" cy="740" r="3"/>
+    <circle cx="1040" cy="800" r="3"/><circle cx="1320" cy="760" r="3"/><circle cx="1500" cy="840" r="3"/>
+  </g>
+</svg>

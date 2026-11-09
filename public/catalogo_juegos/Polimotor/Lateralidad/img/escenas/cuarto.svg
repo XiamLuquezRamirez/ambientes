@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="papel" width="120" height="120" patternUnits="userSpaceOnUse">
+      <rect width="120" height="120" fill="#fdf1d8"/>
+      <rect width="60" height="120" fill="#fbe7c2"/>
+      <path d="M30 26 l5 10 l11 1 l-8 7 l3 11 l-11 -6 l-11 6 l3 -11 l-8 -7 l11 -1 Z" fill="#ffd8a8"/>
+      <circle cx="90" cy="84" r="6" fill="#bde0fe"/>
+    </pattern>
+    <pattern id="madera" width="240" height="60" patternUnits="userSpaceOnUse">
+      <rect width="240" height="60" fill="#d39c62"/>
+      <rect width="240" height="30" fill="#c98f55"/>
+      <path d="M0 30 H240 M0 60 H240 M80 0 V30 M200 30 V60" stroke="#a96f38" stroke-width="3"/>
+    </pattern>
+    <linearGradient id="vista" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7cc8f5"/>
+      <stop offset="1" stop-color="#d9f1ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#papel)"/>
+  <!-- ventana -->
+  <g>
+    <rect x="1230" y="110" width="260" height="230" rx="10" fill="url(#vista)" stroke="#fff" stroke-width="16"/>
+    <path d="M1240 270 Q1300 230 1360 260 T1480 250 V330 H1240 Z" fill="#8fd16a"/>
+    <circle cx="1440" cy="160" r="22" fill="#ffe36e"/>
+    <path d="M1360 110 V340 M1230 225 H1490" stroke="#fff" stroke-width="12"/>
+    <path d="M1200 96 H1520" stroke="#b9874e" stroke-width="12" stroke-linecap="round"/>
+    <path d="M1212 100 q20 130 -4 260 h50 q-14 -130 4 -260 Z" fill="#ff8fab"/>
+    <path d="M1508 100 q-20 130 4 260 h-50 q14 -130 -4 -260 Z" fill="#ff8fab"/>
+  </g>
+  <!-- cuadro -->
+  <g>
+    <rect x="110" y="140" width="200" height="150" rx="6" fill="#fff" stroke="#b9874e" stroke-width="12"/>
+    <path d="M130 270 L190 190 L230 240 L260 210 L292 270 Z" fill="#69db7c"/>
+    <circle cx="260" cy="180" r="16" fill="#ffd43b"/>
+  </g>
+  <!-- banderines -->
+  <path d="M380 70 Q800 160 1180 70" fill="none" stroke="#b9874e" stroke-width="4"/>
+  <g>
+    <path d="M440 88 l26 6 l-18 40 Z" fill="#ffd43b"/>
+    <path d="M540 108 l28 4 l-20 40 Z" fill="#4dabf7"/>
+    <path d="M650 120 l28 2 l-16 42 Z" fill="#51cf66"/>
+    <path d="M770 124 l28 0 l-14 42 Z" fill="#ff8fab"/>
+    <path d="M890 120 l28 -2 l-12 42 Z" fill="#ffd43b"/>
+    <path d="M1000 110 l28 -4 l-8 42 Z" fill="#4dabf7"/>
+    <path d="M1100 94 l26 -6 l-6 42 Z" fill="#51cf66"/>
+  </g>
+  <!-- piso -->
+  <rect x="0" y="660" width="1600" height="240" fill="url(#madera)"/>
+  <rect x="0" y="640" width="1600" height="24" fill="#fff"/>
+  <rect x="0" y="660" width="1600" height="6" fill="#e6d2b5"/>
+  <!-- alfombra -->
+  <ellipse cx="800" cy="800" rx="520" ry="80" fill="#a5d8ff"/>
+  <ellipse cx="800" cy="800" rx="460" ry="58" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="18 14"/>
+  <!-- baúl de juguetes -->
+  <g>
+    <rect x="70" y="560" width="200" height="120" rx="12" fill="#e8590c"/>
+    <rect x="60" y="540" width="220" height="40" rx="12" fill="#fd7e14"/>
+    <circle cx="170" cy="610" r="14" fill="#ffd43b"/>
+  </g>
+  <!-- pelota -->
+  <g>
+    <circle cx="1440" cy="660" r="46" fill="#4dabf7"/>
+    <path d="M1394 660 a46 46 0 0 0 92 0" fill="#ffd43b"/>
+    <path d="M1400 640 a46 20 0 0 1 80 0" fill="none" stroke="#fff" stroke-width="6"/>
+  </g>
+</svg>
