@@ -1238,6 +1238,9 @@
         dataURL: dataURL,
         globo: globo,
         existe: function (n) { return !!DIBUJOS[n]; },
-        nombres: Object.keys(DIBUJOS)
+        nombres: Object.keys(DIBUJOS),
+        /** Otras temáticas suman sus dibujos (mismo lienzo de 100 u) y reusan los pinceles. */
+        registrar: function (mapa) { Object.keys(mapa).forEach(function (k) { DIBUJOS[k] = mapa[k]; }); },
+        pinceles: { lg: lg, rg: rg, elipse: elipse, redondo: redondo, PIEL: PIEL }
     };
 })(typeof window !== 'undefined' ? window : this);
