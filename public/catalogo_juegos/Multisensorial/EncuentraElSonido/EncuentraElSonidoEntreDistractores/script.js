@@ -630,7 +630,7 @@
         });
         sumar(nivel.cierre);
         FRASES_ACIERTO.forEach(function (t) { sumar({ texto: t, voz: "zoe" }); });
-        Object.keys(INTRO_RONDA).forEach(function (k, i) { sumar({ texto: INTRO_RONDA[k], voz: i % 2 ? "zeus" : "zoe" }); });
+        Object.keys(INTRO_RONDA).forEach(function (k, i) { sumar({ texto: textoRonda(INTRO_RONDA[k], objetivoDeLaPartida((nivel.retos || [])[0] || {})), voz: i % 2 ? "zeus" : "zoe" }); });
         return lineas;
     }
 
@@ -675,15 +675,43 @@
 
     /* ── "La orquesta": reconocer las maracas dentro de la mezcla (Phaser) ── */
 
-    const FRASES_ACIERTO = ["¡Muy buen oído!", "¡Las reconociste!", "¡Qué buen oído tienes!", "¡Lo lograste!"];
+    const FRASES_ACIERTO = ["¡Muy buen oído!", "¡Lo reconociste!", "¡Qué buen oído tienes!", "¡Lo lograste!"];
 
-    /** Presentación de cada ronda; la dice Zoe o Zeus (no hay texto en el canvas). */
+    /** Presentación de cada ronda; la dice Zoe o Zeus (no hay texto en el canvas). {obj} = el instrumento buscado. */
     const INTRO_RONDA = {
-        duo: "¡Ahora suenan dos instrumentos a la vez! ¿Dónde están las maracas?",
+        duo: "¡Ahora suenan dos instrumentos a la vez! ¿Dónde {esta} {obj}?",
         trio: "¡Subió otro instrumento y suenan tres juntos! Escucha muy bien.",
-        tutti: "¡Toca toda la orquesta! Y cambiaron de lugar. ¿Dónde están las maracas?",
+        tutti: "¡Toca toda la orquesta! Y cambiaron de lugar. ¿Dónde {esta} {obj}?",
         nota: "¡Una nota dorada para el pentagrama!"
     };
+
+    /** Cómo se nombra cada instrumento en las frases (artículo y verbo concuerdan). */
+    const NOMBRE_INSTRUMENTO = {
+        maracas: ["las maracas", "están"], campana: ["la campana", "está"], triangulo: ["el triángulo", "está"],
+        pandereta: ["la pandereta", "está"], tambor: ["el tambor", "está"], trompeta: ["la trompeta", "está"]
+    };
+
+    /**
+     * El instrumento que se busca en TODA la partida (en la ronda 1 suena solo y el niño lo aprende;
+     * en las demás hay que reconocerlo en la mezcla). Se sortea entre los del reto y no repite el de
+     * la partida anterior, para que el niño no memorice que siempre son las maracas.
+     */
+    let objetivoPartida = null;
+    function objetivoDeLaPartida(r) {
+        if (objetivoPartida) return objetivoPartida;
+        const clave = "encuentra_obj_" + location.pathname;
+        let antes = null;
+        try { antes = localStorage.getItem(clave); } catch (e) { /* sin almacenamiento */ }
+        const opciones = (r.elementos || []).filter(function (id) { return id !== antes; });
+        objetivoPartida = L.mezclar(opciones.length ? opciones : r.elementos)[0] || r.correcto;
+        try { localStorage.setItem(clave, objetivoPartida); } catch (e) { /* sin almacenamiento */ }
+        return objetivoPartida;
+    }
+
+    function textoRonda(t, id) {
+        const n = NOMBRE_INSTRUMENTO[id] || ["el instrumento", "está"];
+        return t.replace("{obj}", n[0]).replace("{esta}", n[1]);
+    }
 
     let modoEscondite = false;
     let rondas = [];
@@ -749,16 +777,18 @@
     }
 
     /**
-     * Cuatro piezas, siempre buscando las maracas (el documento: distractores de la misma
+     * Cuatro piezas buscando el MISMO instrumento, sorteado por partida (el documento: distractores de la misma
      * familia). Cada vez suenan más instrumentos a la vez:
-     *   1 solo  → solo las maracas (reto del documento)
-     *   2 duo   → las maracas y otro
+     *   1 solo  → solo el instrumento buscado (así el niño lo aprende)
+     *   2 duo   → el buscado y otro
      *   3 trio  → tres juntos; sube un instrumento más
      *   4 tutti → todos; antes cambian de atril
      */
     function planRondas() {
         const r = nivelElegido.retos[0];
-        const obj = r.correcto === "azar" ? L.elegirCorrecto(r) : r.correcto;
+        // El instrumento buscado se sortea por partida (la próxima vez será otro).
+        const obj = objetivoDeLaPartida(r);
+        objetivoPartida = null;
         const extras = elegirExtras(1, obj, r);
         const otros = L.mezclar(r.elementos.filter(function (id) { return id !== obj; }));
         const todos = r.elementos.concat(extras);
@@ -813,7 +843,7 @@
             dificultad: esMayor() ? "56" : "34",
             ronda: indiceRonda
         });
-        if (ronda.intro) await decir({ voz: indiceRonda % 2 ? "zeus" : "zoe", texto: INTRO_RONDA[ronda.intro] }, { minMs: 1200 });
+        if (ronda.intro) await decir({ voz: indiceRonda % 2 ? "zeus" : "zoe", texto: textoRonda(INTRO_RONDA[ronda.intro], ronda.objetivo) }, { minMs: 1200 });
         await listos;
         if (!vivo(gen) || fase !== "presentacion") return;
         fase = "jugar";

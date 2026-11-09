@@ -167,10 +167,26 @@
             // Tanque de la casa (se llena con cada acierto).
             var tg = this.tanqueG;
             tg.clear();
-            var tx = L.tanque.x, ty = L.tanque.y, tw2 = 44, th = 54;
-            tg.fillStyle(0xdee2e6, 1); tg.fillRoundedRect(tx - tw2 / 2, ty - th, tw2, th, 8);
-            tg.fillStyle(0x339af0, 1); tg.fillRoundedRect(tx - tw2 / 2 + 4, ty - 4 - (th - 8) * this.tanque, tw2 - 8, (th - 8) * this.tanque, 5);
-            tg.lineStyle(3, 0x495057, 1); tg.strokeRoundedRect(tx - tw2 / 2, ty - th, tw2, th, 8);
+            // Tinaco sobre la cañería: cuerpo, tapa, aros, mirilla con el nivel y una gota pintada.
+            var tx = L.tanque.x, ty = L.tanque.y, tw2 = 50, th = 58;
+            var x0 = tx - tw2 / 2, y0 = ty - th;
+            tg.fillStyle(0x000000, 0.15); tg.fillEllipse(tx + 3, ty + 2, tw2 + 6, 10);
+            tg.fillStyle(0x1c7ed6, 1); tg.fillRoundedRect(x0, y0, tw2, th, 10);
+            tg.fillStyle(0x4dabf7, 1); tg.fillRoundedRect(x0 + 4, y0 + 2, tw2 * 0.35, th - 4, 8);
+            tg.lineStyle(3, 0x1864ab, 1);
+            [0.3, 0.7].forEach(function (k) { tg.lineBetween(x0 + 2, y0 + th * k, x0 + tw2 - 2, y0 + th * k); });
+            tg.fillStyle(0x1864ab, 1); tg.fillEllipse(tx, y0 + 1, tw2 * 0.9, 12);
+            tg.fillStyle(0x339af0, 1); tg.fillEllipse(tx, y0 - 2, tw2 * 0.55, 8);
+            // Mirilla: se llena con cada acierto.
+            var mw = 12, mx = x0 + tw2 - mw - 6, my0 = y0 + 8, mh = th - 16;
+            tg.fillStyle(0xe7f5ff, 1); tg.fillRoundedRect(mx, my0, mw, mh, 5);
+            if (this.tanque > 0.01) { tg.fillStyle(0x74c0fc, 1); tg.fillRoundedRect(mx + 2, my0 + mh - 2 - (mh - 4) * this.tanque, mw - 4, (mh - 4) * this.tanque, 3); }
+            tg.lineStyle(2, 0x1864ab, 1); tg.strokeRoundedRect(mx, my0, mw, mh, 5);
+            // Gota blanca en el cuerpo.
+            var gx = x0 + tw2 * 0.36, gy = y0 + th * 0.52;
+            tg.fillStyle(0xffffff, 0.95);
+            tg.fillCircle(gx, gy + 3, 6);
+            tg.fillTriangle(gx - 5.5, gy + 1, gx + 5.5, gy + 1, gx, gy - 9);
         },
 
         /* ── Cosas de agua ── */
@@ -322,6 +338,60 @@
         },
 
         zonaFiesta: function () { var L = this.L; return { x: L.cuartos.x0, y: L.cuartos.y0 + (L.cuartos.y1 - L.cuartos.y0) * 0.55, w: L.cuartos.x1 - L.cuartos.x0 }; },
+
+        /* ── Escena final: el tinaco riega todo. Se llena, el agua corre por la cañería, se abren
+              todas las válvulas a la vez (cada aparato con su sonido) y sale un arcoíris. ── */
+
+        escenaFinal: async function () {
+            var self = this;
+            var L = this.L;
+            this.cosas.forEach(function (c) { c.actor.cont.setAlpha(1); });
+            // 1) El tinaco se llena con un gorgoteo.
+            var o = { v: this.tanque };
+            K.ruido({ f: 300, q: 1.2, dur: 1.0, vol: 0.06 });
+            await tw(this, { targets: o, v: 1, duration: 900, ease: 'Sine.easeInOut', onUpdate: function () { self.tanque = o.v; } });
+            Ut.estallido(this, L.tanque.x, L.tanque.y - 60, { n: 8, tex: 'burbuja', tam: 18, dist: 50, angulo: -Math.PI / 2, abanico: 1.2, depth: 30 });
+            if (!this.sigue()) return;
+            // 2) El agua corre por la cañería principal hacia los cuartos.
+            var x1 = L.cuartos.x0 + this.cosas.length * L.ancho;
+            var ag = this.add.graphics().setDepth(14);
+            var frente = { x: L.tanque.x };
+            K.ruido({ f: 700, q: 0.8, dur: 0.9, vol: 0.05 });
+            await tw(this, {
+                targets: frente, x: x1, duration: 900, ease: 'Sine.easeIn',
+                onUpdate: function () { ag.clear(); ag.lineStyle(6, 0x4dabf7, 0.9); ag.lineBetween(L.tanque.x, L.tubo, frente.x, L.tubo); }
+            });
+            // 3) Todas las válvulas se abren a la vez y cada aparato hace lo suyo.
+            var tope = this.vueltaNecesaria();
+            this.cosas.forEach(function (c, k) {
+                self.time.delayedCall(k * 170, function () {
+                    var g0 = c.giro;
+                    var q = { g: g0 };
+                    self.tweens.add({
+                        targets: q, g: tope, duration: 450, ease: 'Sine.easeOut',
+                        onUpdate: function () { var d = q.g - c.giro; c.giro = q.g; c.valv.rueda.rotation -= d; c.abierto = Math.min(1, c.giro / tope); }
+                    });
+                    c.valv.rueda.list[0].setStrokeStyle(L.valvula * 0.28, 0x2f9e44);
+                    self.escuchar(c.actor.sonido, { breve: true, bocina: false, vol: 0.6 });
+                    if (c.actor.acierto) c.actor.acierto(1800);
+                });
+            });
+            await esperar(this, this.cosas.length * 170 + 900);
+            if (!this.sigue()) return;
+            // 4) Arcoíris sobre los cuartos.
+            var cx = (L.cuartos.x0 + x1) / 2, R0 = (x1 - L.cuartos.x0) * 0.42;
+            var cy = L.cuartos.y0 + R0 * 0.95;
+            // Detrás de cañerías (12), válvulas (30) y aparatos (20): se ve en el fondo de los cuartos.
+            var arco = this.add.graphics().setDepth(3).setAlpha(0);
+            [0xff6b6b, 0xff922b, 0xffd43b, 0x51cf66, 0x339af0, 0x845ef7].forEach(function (col, i) {
+                arco.lineStyle(Math.max(6, R0 * 0.045), col, 0.85);
+                arco.beginPath(); arco.arc(cx, cy, R0 - i * Math.max(6, R0 * 0.045), Math.PI, 0); arco.strokePath();
+            });
+            K.tono({ f: 800, f2: 1600, dur: 0.6, vol: 0.04 });
+            await tw(this, { targets: arco, alpha: 1, duration: 800 });
+            Ut.estallido(this, cx, cy - R0, { n: 14, tex: 'chispa', tam: 22, dist: 120, colores: [0xffffff, 0xffe066, 0x74c0fc], depth: 41 });
+            await esperar(this, 700);
+        },
 
         antesDeFiesta: async function () {
             // Las que no se usaron quedan atenuadas; cada aparato reaparece en su cuarto final.

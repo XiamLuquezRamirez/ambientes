@@ -99,11 +99,25 @@
             }
             // Ventanilla de objetos perdidos: arco con vidrio y marco.
             var v = L.vent, vy0 = L.mostrador - L.tam * 0.9, vy1 = L.cinta.y + 4;
+            var ym = L.mostrador;   // el mostrador es el alféizar: vidrio arriba, boca abierta abajo
             x.fillStyle = '#495057'; K.rr(x, v.x - v.w / 2 - 14, vy0 - 14, v.w + 28, vy1 - vy0 + 14, 18); x.fill();
-            x.fillStyle = '#fff3bf'; K.rr(x, v.x - v.w / 2, vy0, v.w, vy1 - vy0, 12); x.fill();
+            // Vidrio iluminado de la ventanilla (solo hasta el mostrador).
+            x.fillStyle = '#fff3bf'; K.rr(x, v.x - v.w / 2, vy0, v.w, ym - vy0 + 4, 12); x.fill();
             var luz = x.createRadialGradient(v.x, vy0 + 20, 4, v.x, vy0 + 20, v.w);
             luz.addColorStop(0, 'rgba(255,255,255,0.8)'); luz.addColorStop(1, 'rgba(255,255,255,0)');
-            x.fillStyle = luz; x.fillRect(v.x - v.w / 2, vy0, v.w, vy1 - vy0);
+            x.fillStyle = luz; x.fillRect(v.x - v.w / 2, vy0, v.w, ym - vy0);
+            // Reflejo en diagonal sobre el vidrio.
+            x.fillStyle = 'rgba(255,255,255,0.35)';
+            x.beginPath(); x.moveTo(v.x - v.w * 0.3, vy0 + 6); x.lineTo(v.x - v.w * 0.12, vy0 + 6); x.lineTo(v.x - v.w * 0.42, ym - 6); x.lineTo(v.x - v.w * 0.5 + 4, ym - 6); x.closePath(); x.fill();
+            // Boca del puesto bajo el mostrador: hueco en sombra por donde pasa la cinta.
+            var bocaY = ym + 12;
+            var g2 = x.createLinearGradient(0, bocaY, 0, vy1);
+            g2.addColorStop(0, '#2b3035'); g2.addColorStop(1, '#495057');
+            x.fillStyle = g2; x.fillRect(v.x - v.w / 2, bocaY, v.w, vy1 - bocaY);
+            // Franjas de aviso en los costados de la boca.
+            for (var fr = bocaY; fr < vy1 - 6; fr += 16) {
+                x.fillStyle = '#fcc419'; x.fillRect(v.x - v.w / 2, fr, 6, 8); x.fillRect(v.x + v.w / 2 - 6, fr, 6, 8);
+            }
             // Cartel con lupa y objetos (sin texto para el niño).
             x.fillStyle = '#1971c2'; K.rr(x, v.x - v.w * 0.45, vy0 - 52, v.w * 0.9, 34, 8); x.fill();
             x.strokeStyle = '#ffffff'; x.lineWidth = 4;
@@ -398,6 +412,82 @@
         antesDeFiesta: async function () {
             this.velMeta = 0;
             this.objs.forEach(function (o) { o.actor.cont.setAlpha(0.3); });
+        },
+
+        /* ── Escena final: Zeus y Zoe vienen a la ventanilla con un carrito cada uno; los objetos
+              entregados saltan a los carritos (cada uno con su sonido) y se van felices. ── */
+
+        escenaFinal: async function () {
+            var self = this;
+            var L = this.L, V = L.vent;
+            var vistos = {};
+            var lista = this.coleccion.filter(function (a) { if (!a.cont || !a.cont.active || vistos[a.id]) return false; vistos[a.id] = 1; return true; });
+            this.coleccion.forEach(function (a) { if (lista.indexOf(a) < 0 && a.cont) a.cont.setVisible(false); });
+            this.objs.forEach(function (o) { self.tweens.add({ targets: o.actor.cont, alpha: 0, duration: 300 }); });
+            if (this.palanca) this.tweens.add({ targets: this.palanca, alpha: 0, duration: 300 });
+            var P3 = global.AsociaPj3D;
+            var alto = Math.max(110, Math.min(L.tam * 2.3, L.H * 0.32));
+            var piso = L.H - 14;
+            var yc = piso - alto / 2;
+            var sep = Math.min(L.W * 0.22, alto * 0.9);
+            var metas = [V.x - sep, V.x + sep * 0.55];
+            if (this.pres && this.pres.visible) this.pres.visible(false);
+            // Cada uno con su carrito (va detrás, del lado de donde vienen).
+            var carros = metas.map(function () {
+                var c = self.add.container(-alto, piso - alto * 0.12).setDepth(46);
+                var w = alto * 0.5, h = alto * 0.2;
+                var g = self.add.graphics();
+                g.fillStyle(0x000000, 0.15); g.fillEllipse(0, h * 0.75, w * 1.1, h * 0.35);
+                g.fillStyle(0xd9480f, 1); g.fillRoundedRect(-w / 2, -h / 2, w, h, 6);
+                g.fillStyle(0xff922b, 1); g.fillRect(-w / 2 + 4, -h / 2 + 3, w - 8, 5);
+                g.lineStyle(4, 0x495057, 1); g.lineBetween(w / 2, -h * 0.1, w / 2 + alto * 0.18, -h * 0.9);
+                g.fillStyle(0x343a40, 1); g.fillCircle(-w * 0.3, h * 0.55, h * 0.3); g.fillCircle(w * 0.3, h * 0.55, h * 0.3);
+                g.fillStyle(0xadb5bd, 1); g.fillCircle(-w * 0.3, h * 0.55, h * 0.12); g.fillCircle(w * 0.3, h * 0.55, h * 0.12);
+                c.add(g);
+                c.w = w; c.h = h; c.carga = [];
+                return c;
+            });
+            var pjs = P3 ? [P3.crear('nino', { alto: alto, clip: 'Correr', mira: 'derecha' }), P3.crear('nina', { alto: alto, clip: 'Correr', mira: 'derecha' })] : [];
+            var ubicar = function (k, x) {
+                carros[k].x = x - alto * 0.42;
+                carros[k].carga.forEach(function (a, i) { a.cont.x = carros[k].x + (i - (carros[k].carga.length - 1) / 2) * carros[k].w * 0.3; });
+                if (pjs[k]) pjs[k].ubicar(x, yc);
+            };
+            // 1) Llegan corriendo desde la izquierda.
+            var o = { t: 0 };
+            var x0 = [-alto * 0.6, -alto * 1.6];
+            K.ruido({ f: 300, q: 1, dur: 0.6, vol: 0.04 });
+            await tw(this, { targets: o, t: 1, duration: 1700, ease: 'Sine.easeOut', onUpdate: function () { metas.forEach(function (m, k) { ubicar(k, x0[k] + (m - x0[k]) * o.t); }); } });
+            pjs.forEach(function (p) { p.clip('Saludar'); p.mirar('frente'); });
+            if (!this.sigue()) return;
+            await esperar(this, 500);
+            // 2) Cada objeto pasa por el mostrador y salta a un carrito.
+            for (var i = 0; i < lista.length; i++) {
+                var a = lista[i], k = i % 2, car = carros[k];
+                a.cont.setVisible(true).setAlpha(1).setAngle(0).setDepth(47);
+                var esc = Math.min(car.w * 0.42, L.tam * 0.6) / a.tam;
+                await this.saltarA(a.cont, V.x, L.mostrador - L.tam * 0.4, { ms: 380, alto: L.tam * 0.5 });
+                this.escuchar(a.sonido, { breve: true, bocina: false, vol: 0.75 });
+                if (a.saltito) a.saltito(0.1, 1);
+                car.carga.push(a);
+                var n = car.carga.length;
+                var dx = (n - 1 - (n - 1) / 2) * car.w * 0.3;
+                await this.saltarA(a.cont, car.x + dx, car.y - car.h * 0.55 - (n > 2 ? 6 : 0), { ms: 520, alto: L.tam * 0.6, esc: esc });
+                car.carga.forEach(function (b, j) { b.cont.x = car.x + (j - (n - 1) / 2) * car.w * 0.3; });
+                K.tono({ f: 650, dur: 0.06, vol: 0.04 });
+                Ut.estallido(this, car.x, car.y - car.h, { n: 5, tex: 'corazon', tam: 20, dist: 60, depth: 50 });
+                if (pjs[k]) { pjs[k].clip('Aplaudir'); }
+            }
+            if (!this.sigue()) return;
+            // 3) Celebran, saludan y se van corriendo con sus carritos.
+            pjs.forEach(function (p) { p.clip('Celebrar'); });
+            await esperar(this, 1300);
+            pjs.forEach(function (p) { p.mirar('derecha'); p.clip('Correr'); });
+            var ini = metas.slice();
+            var o2 = { t: 0 };
+            await tw(this, { targets: o2, t: 1, duration: 1800, ease: 'Sine.easeIn', onUpdate: function () { ini.forEach(function (m, k) { ubicar(k, m + (L.W + alto * 1.5 - m) * o2.t); }); } });
+            pjs.forEach(function (p) { p.destruir(); });
+            if (this.pres && this.pres.visible && L.pres) this.pres.visible(true);
         },
 
         demo: async function () {

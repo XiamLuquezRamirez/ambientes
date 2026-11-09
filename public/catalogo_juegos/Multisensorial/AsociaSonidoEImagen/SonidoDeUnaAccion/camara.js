@@ -213,6 +213,7 @@
             var L = this.L;
             var w = L.tam * 0.9, h = L.tam * 1.05;
             var c = this.add.container(x, y).setDepth(85).setScale(0.2);
+            c.idFoto = id;
             c.add(this.add.rectangle(4, 6, w, h, 0x000000, 0.25));
             c.add(this.add.rectangle(0, 0, w, h, 0xffffff).setStrokeStyle(1, 0xdee2e6));
             c.add(this.add.rectangle(0, -h * 0.08, w * 0.86, h * 0.68, 0x8ce99a));
@@ -310,6 +311,89 @@
         },
 
         zonaFiesta: function () { var L = this.L; return { x: L.W * 0.08, y: L.suelo + (L.H - L.suelo) * 0.42, w: L.W * 0.84 }; },
+
+        /* ── Escena final: álbum de fotos. Se abre un álbum grande; cada foto vuela a su página y se
+              pega con cinta mientras la persona repite su sonido; el álbum se cierra con una estrella. ── */
+
+        escenaFinal: async function () {
+            var self = this;
+            var L = this.L;
+            var fotos = this.fotos.filter(function (f) { return f && f.active; }).slice(0, 8);
+            if (!fotos.length) return;
+            if (this.visor && this.visor.setVisible) this.visor.setVisible(false);
+            // Las personas son 3D (capa encima del lienzo): se ocultan mientras el álbum está abierto.
+            if (global.AsociaPj3D && global.AsociaPj3D.capa) global.AsociaPj3D.capa(false);
+            var cintas = [];
+            var velo = this.add.rectangle(0, 0, L.W, L.H, 0x1b2a3a, 0).setOrigin(0, 0).setDepth(86);
+            this.tweens.add({ targets: velo, fillAlpha: 0.35, duration: 400 });
+            var w = Math.min(L.W * 0.9, 760), h = Math.min(L.H * 0.5, w * 0.62);
+            var cx = L.W / 2, cy = L.H * 0.52;
+            var libro = this.add.container(cx, cy).setDepth(87).setScale(0.3).setAlpha(0);
+            var g = this.add.graphics();
+            g.fillStyle(0x000000, 0.25); g.fillRoundedRect(-w / 2 + 6, -h / 2 + 8, w, h, 12);
+            g.fillStyle(0x7048e8, 1); g.fillRoundedRect(-w / 2 - 8, -h / 2 - 8, w + 16, h + 16, 14);   // tapas
+            g.fillStyle(0xfff9db, 1); g.fillRoundedRect(-w / 2, -h / 2, w / 2 - 2, h, 8);           // hoja izquierda
+            g.fillRoundedRect(2, -h / 2, w / 2 - 2, h, 8);                                         // hoja derecha
+            g.fillStyle(0xe9d8a6, 1); g.fillRect(-3, -h / 2, 6, h);                                // lomo
+            g.lineStyle(1, 0xe9d8a6, 1);
+            for (var r = 1; r < 8; r++) { g.lineBetween(-w / 2 + 10, -h / 2 + h * r / 8, -10, -h / 2 + h * r / 8); g.lineBetween(10, -h / 2 + h * r / 8, w / 2 - 10, -h / 2 + h * r / 8); }
+            libro.add(g);
+            // Tapa (cubre la hoja derecha; se abre girando sobre el lomo).
+            var tapa = this.add.container(0, 0);
+            var tg = this.add.graphics();
+            tg.fillStyle(0x845ef7, 1); tg.fillRoundedRect(0, -h / 2 - 8, w / 2 + 8, h + 16, 14);
+            tg.lineStyle(4, 0xffd43b, 1); tg.strokeRoundedRect(14, -h / 2 + 6, w / 2 - 20, h - 12, 10);
+            var marcoT = this.add.rectangle(w / 4 + 4, 0, w * 0.2, w * 0.2, 0xfff9db).setStrokeStyle(3, 0xffd43b);
+            tapa.add([tg, marcoT]);
+            libro.add(tapa);
+            K.efecto(this, 'magia');
+            await tw(this, { targets: libro, scale: 1, alpha: 1, duration: 450, ease: 'Back.easeOut' });
+            K.ruido({ f: 1800, q: 0.7, dur: 0.3, vol: 0.06 });   // hoja que se abre
+            await tw(this, { targets: tapa, scaleX: 0, duration: 380, ease: 'Sine.easeIn' });
+            tapa.setVisible(false);
+            if (!this.sigue()) return;
+            // Huecos: 2×2 por hoja.
+            var huecos = [];
+            [-1, 1].forEach(function (lado) {
+                for (var f = 0; f < 2; f++) for (var c = 0; c < 2; c++) {
+                    huecos.push({ x: cx + lado * w / 4 + (c - 0.5) * w * 0.22, y: cy + (f - 0.5) * h * 0.48 });
+                }
+            });
+            var escF = Math.min(w * 0.19, h * 0.4) / (L.tam * 1.05);
+            for (var i = 0; i < fotos.length; i++) {
+                var fo = fotos[i], hq = huecos[i];
+                fo.setDepth(88);
+                K.ruido({ f: 1500, q: 0.8, dur: 0.18, vol: 0.05 });
+                await tw(this, { targets: fo, x: hq.x, y: hq.y, scale: escF, angle: (i % 2 ? 4 : -4), duration: 420, ease: 'Sine.easeInOut' });
+                // Cinta en dos esquinas.
+                var fw = L.tam * 0.9 * escF, fh = L.tam * 1.05 * escF;
+                [-1, 1].forEach(function (s) {
+                    cintas.push(self.add.rectangle(hq.x + s * fw * 0.42, hq.y - fh * 0.48, fw * 0.32, fh * 0.12, 0xfff3bf, 0.85).setAngle(s * 35).setDepth(89));
+                });
+                K.ruido({ f: 3500, q: 1, dur: 0.06, vol: 0.06 });
+                // La persona de esa foto repite su sonido.
+                var gp = this.gente.filter(function (q) { return q.id === fo.idFoto; })[0];
+                if (gp) this.escuchar(gp.actor.sonido, { breve: true, bocina: false, vol: 0.7 });
+                await esperar(this, 420);
+                if (!this.sigue()) return;
+            }
+            await esperar(this, 500);
+            // Se cierra con una estrella en la tapa.
+            tapa.setVisible(true).setDepth(1);
+            libro.bringToTop(tapa);
+            await tw(this, { targets: tapa, scaleX: 1, duration: 380, ease: 'Sine.easeOut' });
+            fotos.forEach(function (fo) { fo.setVisible(false); });
+            cintas.forEach(function (o) { o.destroy(); });
+            // Libro cerrado: queda solo la tapa, centrada.
+            this.tweens.add({ targets: g, alpha: 0, duration: 250 });
+            await tw(this, { targets: libro, x: cx - w / 4 - 4, duration: 320, ease: 'Sine.easeInOut' });
+            var est = this.add.image(w / 4 + 4, 0, global.PedniaArte.textura(this, 'estrella', 128)).setDisplaySize(10, 10);
+            libro.add(est);
+            K.efecto(this, 'recompensa');
+            await tw(this, { targets: est, displayWidth: w * 0.16, displayHeight: w * 0.16, duration: 420, ease: 'Back.easeOut' });
+            Ut.estallido(this, cx, cy, { n: 14, tex: 'estrella', tam: 24, dist: 140, sinTinte: true, depth: 91 });
+            await esperar(this, 700);
+        },
 
         antesDeFiesta: async function () {
             this.gente.forEach(function (g) { if (g.estrella) g.estrella.destroy(); if (!g.hecho) g.actor.cont.setAlpha(0.36); });

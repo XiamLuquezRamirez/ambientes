@@ -239,6 +239,25 @@
         x.beginPath(); x.moveTo(px + pw * 0.1, py + ph * 0.05); x.lineTo(px + pw * 0.3, py + ph * 0.05); x.lineTo(px + pw * 0.12, py + ph * 0.45); x.lineTo(px + pw * 0.05, py + ph * 0.45); x.fill();
     }
 
+    /**
+     * Orden al azar de los objetivos de los niveles 1-3: el reto oficial (correcto) más dos de los
+     * otros, barajados. Si sale la misma secuencia que en la partida anterior de este juego, se
+     * vuelve a sortear (se recuerda en localStorage; si no hay almacenamiento, igual es al azar).
+     */
+    function ordenObjetivos(scene, correcto, otros, extra) {
+        var clave = 'asocia_orden_' + (scene.config && scene.config.id || global.location && global.location.pathname || 'juego');
+        var antes = null;
+        try { antes = global.localStorage.getItem(clave); } catch (e) { /* sin almacenamiento */ }
+        var orden;
+        for (var k = 0; k < 6; k++) {
+            // Primero opciones del reto; los extras solo si faltan.
+            orden = mezclar([correcto].concat(mezclar(otros).concat(mezclar(extra || [])).slice(0, 2)));
+            if (orden.join(',') !== antes) break;
+        }
+        try { global.localStorage.setItem(clave, orden.join(',')); } catch (e) { /* sin almacenamiento */ }
+        return orden;
+    }
+
     /** Sombra elíptica difusa (para apoyar objetos en el piso). */
     function sombra(x, cx, cy, rx, ry, a) {
         var g = x.createRadialGradient(cx, cy, 1, cx, cy, rx);
@@ -266,6 +285,8 @@
             this.vivos = [];
             this.ultimoSonido = -99999;
             if (this.iniciar) this.iniciar();
+            // Movimiento reducido: sin sacudidas de cámara.
+            if (Ut.reducido()) this.cameras.main.shake = function () { return this; };
             this.armar(false);
             this.input.on('pointerdown', function (p) {
                 actx();
@@ -443,8 +464,10 @@
             var otros = ops.filter(function (x) { return x !== correcto; });
             var extra = mezclar((o.extra || []).filter(function (e) { return ops.indexOf(e) < 0; }));
             var todos = ops.concat(extra);
-            var t2 = otros[0] || extra[0];
-            var t3 = otros[1] || extra[1];
+            // Qué se pide en cada nivel: al azar (el reto oficial siempre aparece en los niveles 1-3),
+            // para que el niño no memorice la secuencia.
+            var orden = ordenObjetivos(this, correcto, otros, extra);
+            var t1 = orden[0], t2 = orden[1], t3 = orden[2];
             var n = o.n || [ops.length, ops.length + 1, ops.length + 1, ops.length + 2];
             var pool = function (obj, k, copias) {
                 copias = copias || 1;
@@ -454,7 +477,7 @@
                 return mezclar(ids.concat(resto.slice(0, Math.max(1, k - copias))));
             };
             return [
-                { objetivo: correcto, ids: mezclar(ops), meta: o.meta1 || 1 },
+                { objetivo: t1, ids: ops.indexOf(t1) >= 0 ? mezclar(ops) : pool(t1, ops.length), meta: o.meta1 || 1 },
                 // Nivel 2: si copias2, hay dos iguales y hay que encontrar los dos; si no, meta 1 con más objetos.
                 { objetivo: t2, ids: pool(t2, n[1], o.copias2 ? 2 : 1), meta: o.copias2 ? 2 : 1 },
                 { objetivo: t3, ids: pool(t3, n[2], o.copias3 ? 2 : 1), meta: o.copias3 ? 2 : 1, dificil: true },
@@ -570,6 +593,8 @@
             var p = o.punto || { x: a.cont.x, y: a.cont.y - a.tam * 0.2 };
             Ut.estallido(this, p.x, p.y, { n: ac.especial || ac.efecto === 'celebracion' ? 22 : 14, tex: 'estrella', tam: 30, dist: 170, sinTinte: true, depth: 85 });
             if (ac.especial) Ut.confeti(this, 50);
+            // El escenario también festeja (pájaros que alzan vuelo, sol que sonríe…).
+            if (this.vidaAmb && this.vidaAmb.reaccionar) this.vidaAmb.reaccionar('acierto', p);
             if (ac.celebran && this.ctx.celebrar) { this.ctx.celebrar(true); Ut.confeti(this, 80); }
             var linea = principal && ac.texto ? { voz: ac.voz || 'zoe', texto: ac.texto } : (this.cuenta === 1 ? this.elogio(a.id) : null);
             if (principal) this.dijoReto = true;
@@ -597,6 +622,8 @@
             efecto(this, 'suave');
             this.escuchar(a.sonido, { breve: true, vol: 0.7, bocina: false });
             var sac = a.sacudir ? a.sacudir() : null;
+            // El escenario se sorprende un poco (nube que pasa, gato asustado), sin castigo.
+            if (this.vidaAmb && this.vidaAmb.reaccionar && a.cont) this.vidaAmb.reaccionar('error', { x: a.cont.x, y: a.cont.y });
             if (this.time.now - (this.ultimoReclamo || -99999) > 7000) {
                 this.ultimoReclamo = this.time.now;
                 var e = this.reto.error || {};
@@ -615,6 +642,18 @@
             this.fase = 'fin';
             this.pista.parar();
             if (this.antesDeFiesta) await this.antesDeFiesta();
+            // Escena final propia del juego (castillo, desfile, álbum…); al terminar, baile y victoria.
+            if (this.escenaFinal) {
+                this.reaccion('Celebrar', 60000);
+                await this.escenaFinal();
+                if (!this.sigue()) return;
+                efecto(this, 'victoria');
+                Ut.confeti(this, 90);
+                this.reaccion('Bailar', 60000);
+                await esperar(this, 1600);
+                if (global.AsociaPj3D && global.AsociaPj3D.capa) global.AsociaPj3D.capa(false);
+                return;
+            }
             efecto(this, 'victoria');
             Ut.confeti(this, 110);
             this.reaccion('Bailar', 60000);
@@ -632,6 +671,40 @@
             });
             await esperar(this, 3200);
             if (global.AsociaPj3D && global.AsociaPj3D.capa) global.AsociaPj3D.capa(false);
+        },
+
+        /* ── Ayudas para las escenas finales ── */
+
+        /**
+         * ¿Sigue viva la escena? En la fiesta final no sirve ctx.vivo(): script.js ya marcó el juego
+         * como terminado antes de llamar a fiestaFinal(), así que siempre daría falso.
+         */
+        sigue: function () { return !!(this.sys && this.sys.isActive && this.sys.isActive()); },
+
+        /** El objeto hace su acción real con su propio sonido (breve). */
+        lucirse: function (a, ms) {
+            if (!a || !a.cont || !a.cont.active) return Promise.resolve();
+            return Promise.all([
+                this.escuchar(a.sonido, { breve: true, bocina: false, vol: 0.8 }),
+                a.acierto ? a.acierto(ms || 1200) : null
+            ]);
+        },
+
+        /** Lleva un objeto (o contenedor) en arco hasta (x, y); o.alto = cuánto sube, o.esc = escala final. */
+        saltarA: function (obj, x, y, o) {
+            o = o || {};
+            var x0 = obj.x, y0 = obj.y, e0 = obj.scale;
+            var cima = Math.min(y0, y) - (o.alto != null ? o.alto : 80);
+            var k = { t: 0 };
+            return tw(this, {
+                targets: k, t: 1, duration: o.ms || 600, ease: o.ease || 'Sine.easeInOut',
+                onUpdate: function () {
+                    var t = k.t;
+                    obj.x = x0 + (x - x0) * t;
+                    obj.y = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * cima + t * t * y;
+                    if (o.esc != null) obj.setScale(e0 + (o.esc - e0) * t);
+                }
+            });
         },
 
         estado: function () {
@@ -698,6 +771,6 @@
         crear: crear,
         ruido: ruido, tono: tono, actx: actx,
         textura: textura, rr: rr, grano: grano, madera: madera, pared: pared, piso: piso, ventana: ventana, sombra: sombra,
-        efecto: efecto
+        efecto: efecto, ordenObjetivos: ordenObjetivos
     };
 })(typeof window !== 'undefined' ? window : this);

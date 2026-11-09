@@ -142,6 +142,14 @@
         dibujarOjos: function (abiertos) {
             var o = this.oso, g = o.ojos, t = o.t;
             g.clear();
+            if (abiertos === 'feliz') {
+                // Ojitos felices (^ ^) y mejillas.
+                g.lineStyle(3, 0x3b2410, 1);
+                g.beginPath(); g.arc(-t * 0.15, -t * 0.08, t * 0.06, Math.PI + 0.2, -0.2); g.strokePath();
+                g.beginPath(); g.arc(t * 0.15, -t * 0.08, t * 0.06, Math.PI + 0.2, -0.2); g.strokePath();
+                g.fillStyle(0xff8787, 0.55); g.fillCircle(-t * 0.27, t * 0.04, t * 0.06); g.fillCircle(t * 0.27, t * 0.04, t * 0.06);
+                return;
+            }
             if (abiertos) {
                 g.fillStyle(0x1b1b1b, 1);
                 g.fillCircle(-t * 0.15, -t * 0.1, t * 0.06);
@@ -351,8 +359,12 @@
                 this.fase = 'premio';
                 a.cont.setDepth(60);
                 var s0 = a.cont.scale;
+                var s1 = Math.max(s0 * 1.4, 0.9);
+                // Agrandado no debe salirse por el borde (columna derecha en pantallas angostas).
+                var medio = a.cont.getBounds().width / 2 * (s1 / s0) + 8;
+                var x1 = Math.max(medio, Math.min(this.L.W - medio, a.cont.x));
                 K.efecto(this, 'whoosh');
-                await tw(this, { targets: a.cont, y: cj.r.y - this.L.tam * 0.25, scale: Math.max(s0 * 1.4, 0.9), duration: 380, ease: 'Back.easeOut' });
+                await tw(this, { targets: a.cont, x: x1, y: cj.r.y - this.L.tam * 0.25, scale: s1, duration: 380, ease: 'Back.easeOut' });
                 if (cj.id === 'reloj' || this.objetivo === this.reto.correcto) this.despertarOso();
                 await this.celebrar(a);
                 cj.actor = null;          // ya no es del cajón: que al cerrarse no lo esconda
@@ -444,6 +456,91 @@
             var self = this;
             await Promise.all(this.cajones.filter(function (c) { return c.abierto; }).map(function (c) { return self.cerrar(c); }));
             this.dibujarOjos(true);
+        },
+
+        /* ── Escena final: el osito despierta, abre los cajones, juega con los juguetes y los abraza ── */
+
+        escenaFinal: async function () {
+            var self = this;
+            var L = this.L, o = this.oso, t = o.t;
+            var vistos = {};
+            var lista = this.coleccion.filter(function (a) { if (!a.cont || !a.cont.active || vistos[a.id]) return false; vistos[a.id] = 1; return true; });
+            var x0 = o.x, y0 = o.y;
+            // 1) Abre los ojos, bosteza y se estira; se sienta y asoma el cuerpo sobre la cobija.
+            this.dibujarOjos(true);
+            var boca = this.add.ellipse(0, t * 0.2, t * 0.1, t * 0.02, 0x3b2410);
+            o.add(boca);
+            K.tono({ f: 420, f2: 210, dur: 0.7, vol: 0.05, tipo: 'triangle' });
+            await tw(this, { targets: boca, displayHeight: t * 0.14, duration: 350, yoyo: true, hold: 250 });
+            boca.destroy();
+            var cafe = 0xb07d4f, claro = 0xe3b98c;
+            var cuerpo = this.add.container(0, 0);
+            cuerpo.add([
+                this.add.ellipse(-t * 0.2, t * 1.0, t * 0.26, t * 0.18, cafe),
+                this.add.ellipse(t * 0.2, t * 1.0, t * 0.26, t * 0.18, cafe),
+                this.add.ellipse(0, t * 0.62, t * 0.7, t * 0.74, cafe),
+                this.add.ellipse(0, t * 0.68, t * 0.42, t * 0.46, claro)
+            ]);
+            var brazoI = this.add.ellipse(-t * 0.36, t * 0.5, t * 0.18, t * 0.4, cafe).setAngle(25);
+            var brazoD = this.add.ellipse(t * 0.36, t * 0.5, t * 0.18, t * 0.4, cafe).setAngle(-25);
+            cuerpo.add([brazoI, brazoD]);
+            cuerpo.setScale(1, 0).setAlpha(0);
+            o.addAt(cuerpo, 0);
+            o.setDepth(44);
+            await tw(this, { targets: cuerpo, scaleY: 1, alpha: 1, duration: 380, ease: 'Back.easeOut' });
+            await tw(this, { targets: [brazoI, brazoD], angle: { getEnd: function (tg) { return tg === brazoI ? 150 : -150; } }, duration: 300, yoyo: true, ease: 'Sine.easeInOut' });
+            if (!this.sigue()) return;
+            // 2) Salta de la cama al piso, frente a la cómoda.
+            var d = L.comoda;
+            var px = d.x + d.w * 0.5, py = Math.min(L.H - t * 1.1, d.y + d.h + t * 0.05);
+            K.efecto(this, 'whoosh');
+            await this.saltarA(o, px, py, { ms: 650, alto: t * 1.4 });
+            K.ruido({ f: 200, q: 1, dur: 0.15, vol: 0.12 });
+            this.granos(px, py + t * 1.05, 6, { colores: [0xdee2e6, 0xffffff], dist: 40, cae: 6, depth: 46 });
+            // 3) Los seis cajones se abren en cascada.
+            for (var i = 0; i < this.cajones.length; i++) {
+                (function (cj, k) {
+                    self.time.delayedCall(k * 110, function () {
+                        var r = cj.r;
+                        K.ruido({ f: 260 + k * 30, q: 0.9, dur: 0.2, vol: 0.08 });
+                        self.tweens.add({ targets: cj.frente, y: r.y + r.h * 1.05, displayWidth: r.w * 1.08, displayHeight: r.h * 0.62, duration: 260, ease: 'Quad.easeOut', yoyo: true, hold: 900 });
+                    });
+                })(this.cajones[i], i);
+            }
+            await esperar(this, 700);
+            // 4) Los juguetes bajan de la repisa y juegan alrededor del osito; cada uno suena.
+            var n = lista.length;
+            var tamJ = Math.min(L.tam * 0.85, (L.W * 0.85) / Math.max(1, n));
+            for (var j = 0; j < n; j++) {
+                var a = lista[j];
+                var ang = Math.PI + (j + 0.5) / n * Math.PI;   // medio círculo por delante
+                var rx = Math.min(L.W * 0.4, t * 1.6 + n * 8);
+                var qx = Math.max(tamJ * 0.6, Math.min(L.W - tamJ * 0.6, px + Math.cos(ang) * rx));
+                var qy = py + t * 0.9 - Math.sin(ang) * t * 0.35;
+                a.cont.setDepth(46 + qy * 0.001).setAngle(0);
+                this.saltarA(a.cont, qx, qy, { ms: 480, alto: L.tam * 0.7, esc: tamJ / a.tam });
+                await esperar(this, 380);
+                this.escuchar(a.sonido, { breve: true, bocina: false, vol: 0.75 });
+                if (a.saltito) a.saltito(0.12, 1);
+                this.tweens.add({ targets: o, angle: j % 2 ? 8 : -8, duration: 160, yoyo: true });
+                await esperar(this, 380);
+            }
+            if (!this.sigue()) return;
+            // 5) Vuelve a la cama con todos y los abraza.
+            await this.saltarA(o, x0, y0, { ms: 650, alto: t * 1.4 });
+            o.setDepth(44);
+            var c = L.cama;
+            lista.forEach(function (a, k) {
+                // Sobre la cobija, a su lado (los de la fila de atrás un poco más arriba).
+                var bx = c.x + c.w * (0.45 + 0.5 * (k + 0.5) / n);
+                var tamC = Math.min(tamJ, c.w * 0.5 / Math.max(1, Math.ceil(n / 2)) * 1.4);
+                self.time.delayedCall(k * 90, function () { self.saltarA(a.cont, bx, c.y + c.h * 0.05 - (k % 2) * tamC * 0.3, { ms: 460, alto: L.tam * 0.6, esc: tamC / a.tam }).then(function () { a.cont.setDepth(43 + (k % 2 ? 0 : 0.5)); }); });
+            });
+            await esperar(this, 460 + n * 90);
+            await tw(this, { targets: [brazoI, brazoD], angle: { getEnd: function (tg) { return tg === brazoI ? -40 : 40; } }, x: { getEnd: function (tg) { return tg === brazoI ? -t * 0.18 : t * 0.18; } }, duration: 300, ease: 'Back.easeOut' });
+            this.dibujarOjos('feliz');
+            Ut.estallido(this, o.x, o.y - t * 0.3, { n: 10, tex: 'corazon', tam: 26, dist: 110, depth: 60 });
+            await esperar(this, 700);
         },
 
         /* ── Demostración ── */

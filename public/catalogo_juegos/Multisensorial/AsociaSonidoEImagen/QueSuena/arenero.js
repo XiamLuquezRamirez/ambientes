@@ -728,6 +728,7 @@
             this.reaccion('Decir_no', 1500);
             efecto(this, 'suave');
             this.escuchar(a.sonido, { breve: true, vol: 0.7, bocina: false });
+            if (this.vidaAmb && this.vidaAmb.reaccionar) this.vidaAmb.reaccionar('error', { x: a.cont.x, y: a.cont.y });
             await a.sacudir();
             // La arena se escurre de los bordes hacia el hoyo.
             for (var k = 0; k < 4; k++) {
@@ -795,7 +796,8 @@
             await Promise.all([sonido, a.acierto(this.ctx.duracionSonido ? this.ctx.duracionSonido() : 1500)]);
             if (!this.ctx.vivo()) return;
             efecto(this, ac.efecto || 'recompensa');
-            this.cameras.main.shake(140, 0.003);
+            if (!Ut.reducido()) this.cameras.main.shake(140, 0.003);
+            if (this.vidaAmb && this.vidaAmb.reaccionar) this.vidaAmb.reaccionar('acierto', { x: a.cont.x, y: a.cont.y });
             Ut.estallido(this, a.cont.x, a.cont.y - L.tam * 0.2, { n: ac.especial || ac.efecto === 'celebracion' ? 22 : 14, tex: 'estrella', tam: 30, dist: 170, sinTinte: true });
             var linea = principal && ac.texto ? { voz: ac.voz || 'zoe', texto: ac.texto } : (this.cuenta === 1 ? this.elogio() : null);
             if (principal) this.dijoReto = true;
@@ -960,8 +962,16 @@
             var correcto = r.correcto || ops[0];
             var otros = ops.filter(function (o) { return o !== correcto; });
             var extra = mezclar(EXTRA.filter(function (e) { return ops.indexOf(e) < 0; }));
-            var t2 = otros[0] || extra[0];
-            var t3 = otros[1] || extra[1];
+            // Qué se pide en cada nivel: al azar (la bicicleta del reto siempre aparece en 1-3) y
+            // distinto de la partida anterior, para que el niño no memorice la secuencia.
+            var clave = 'asocia_orden_QueSuena', antes = null, orden;
+            try { antes = global.localStorage.getItem(clave); } catch (e) { /* sin almacenamiento */ }
+            for (var k = 0; k < 6; k++) {
+                orden = mezclar([correcto].concat(mezclar(otros).concat(extra).slice(0, 2)));
+                if (orden.join(',') !== antes) break;
+            }
+            try { global.localStorage.setItem(clave, orden.join(',')); } catch (e) { /* sin almacenamiento */ }
+            var t1 = orden[0], t2 = orden[1], t3 = orden[2];
             var pool = function (obj, n, copias) {
                 var resto = mezclar(ops.concat(extra).filter(function (e) { return e !== obj; }));
                 var ids = [];
@@ -969,10 +979,10 @@
                 return mezclar(ids.concat(resto.slice(0, n - copias)));
             };
             return [
-                { objetivo: correcto, ids: mezclar(ops), meta: 1 },
+                { objetivo: t1, ids: mezclar(ops), meta: 1 },
                 { objetivo: t2, ids: pool(t2, 5, 2), meta: 2 },
                 { objetivo: t3, ids: pool(t3, 5, 2), meta: 2, topo: true },
-                { objetivo: null, ids: mezclar([correcto, t2, t3].concat(extra.slice(2, 4))), meta: 3, topo: true, cambia: true }
+                { objetivo: null, ids: mezclar([t1, t2, t3].concat(extra.slice(2, 4))), meta: 3, topo: true, cambia: true }
             ];
         },
 
@@ -1135,31 +1145,154 @@
             await esperar(this, 300);
         },
 
-        /* ── Fiesta final: los juguetes saltan del carrito y hacen su acción todos juntos ── */
+        /* ── Escena final: castillo de arena. Cada juguete salta del carrito y, al caer, levanta
+              una parte del castillo; al final sube la bandera y todos festejan alrededor. ── */
 
         fiestaFinal: async function () {
             var self = this;
             var L = this.L;
             this.fase = 'fin';
             this.pista.parar();
-            // El rastrillo deja la arena lisa para la fiesta.
+            // El rastrillo deja la arena lisa para construir.
             this.quitarJuguetes();
             await this.rastrillar();
+            if (!this.sigue()) return;
+            this.reaccion('Celebrar', 60000);
+            var cas = this.armarCastillo();
+            var lista = this.enCarrito.filter(function (a) { return a.cont && a.cont.active; });
+            var sitios = this.sitiosCastillo(lista.length, cas);
+            var i;
+            for (i = 0; i < lista.length; i++) {
+                var a = lista[i], s = sitios[i];
+                a.cont.setDepth(45 + s.y * 0.001).setAngle(0);
+                efecto(this, 'whoosh');
+                await this.saltoArco(a.cont, s.x, s.y, s.esc, 480);
+                if (!this.sigue()) return;
+                this.granos(s.x, s.y + L.tam * 0.2, 8, { dist: 40 });
+                if (cas.partes[i]) { this.crecerParte(cas.partes[i]); rasguno(1, true); }
+                var son = this.escuchar(a.sonido, { breve: true, bocina: false, vol: 0.75 });
+                if (a.acierto && a.id !== 'tren' && a.id !== 'avion') a.acierto(900);
+                else this.tweens.add({ targets: a.cont, y: s.y - 14, duration: 160, yoyo: true });
+                await Promise.race([son, esperar(this, 700)]);
+            }
+            // Si hubo menos juguetes que partes, el castillo termina de levantarse solo.
+            for (; i < cas.partes.length; i++) { this.crecerParte(cas.partes[i]); rasguno(0.8, true); await esperar(this, 260); }
+            await esperar(this, 300);
+            await this.izarBandera(cas);
+            if (!this.sigue()) return;
             efecto(this, 'victoria');
             Ut.confeti(this, 110);
             this.reaccion('Bailar', 60000);
-            var n = this.enCarrito.length;
-            this.enCarrito.forEach(function (a, i) {
-                var x = L.R.x + L.R.w * (i + 0.5) / n;
-                var y = L.R.y + L.R.h * 0.5;
-                self.time.delayedCall(i * 140, function () {
-                    if (!a.cont.active) return;
-                    a.cont.setDepth(45);
-                    self.tweens.add({ targets: a.cont, x: x, y: y, scale: Math.min(1, (L.R.w / n) / a.tam * 0.9), angle: 0, duration: 650, ease: 'Back.easeOut', onComplete: function () { a.acierto(1600); } });
-                });
-            });
-            await esperar(this, 3200);
+            lista.forEach(function (a, k) { self.time.delayedCall(k * 130, function () { if (a.cont.active && a.acierto) a.acierto(1600); }); });
+            await esperar(this, 3000);
             if (global.AsociaPj3D && global.AsociaPj3D.capa) global.AsociaPj3D.capa(false);
+        },
+
+        /** ¿Sigue viva la escena? (en la fiesta final ctx.vivo() ya es falso). */
+        sigue: function () { return !!(this.sys && this.sys.isActive && this.sys.isActive()); },
+
+        /** Salto en arco de un contenedor hasta (x, y) con escala final. */
+        saltoArco: function (c, x, y, esc, ms) {
+            var x0 = c.x, y0 = c.y, s0 = c.scale, cima = Math.min(y0, y) - this.L.tam * 0.9, o = { t: 0 };
+            return tw(this, {
+                targets: o, t: 1, duration: ms || 500, ease: 'Sine.easeInOut',
+                onUpdate: function () {
+                    var t = o.t;
+                    c.x = x0 + (x - x0) * t;
+                    c.y = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * cima + t * t * y;
+                    c.setScale(s0 + (esc - s0) * t);
+                }
+            });
+        },
+
+        /** Castillo de arena en el centro del arenero: partes ocultas (escala 0) que crecen desde el suelo. */
+        armarCastillo: function () {
+            var self = this;
+            var R = this.L.R;
+            var S = Math.min(R.w * 0.6, R.h * 0.62);
+            var cx = R.x + R.w / 2, by = R.y + R.h * 0.56;
+            var ARENA = 0xe6c588, SOMBRA = 0xcfa868, LUZ = 0xf4ddb0, BORDE = 0xb48a4e, HUECO = 0x8a6536;
+            var partes = [];
+            // Sombra en la arena.
+            var piso = this.add.ellipse(cx, by + 4, S * 1.25, S * 0.14, 0x7a5a2a, 0.25).setDepth(30);
+            function bloque(px, w, h, o) {
+                o = o || {};
+                var c = self.add.container(cx + px, by).setDepth(31 + (o.z || 0)).setScale(1, 0);
+                var g = self.add.graphics();
+                g.fillStyle(ARENA, 1); g.fillRect(-w / 2, -h, w, h);
+                g.fillStyle(SOMBRA, 1); g.fillRect(w * 0.18, -h, w * 0.32, h);
+                g.fillStyle(LUZ, 1); g.fillRect(-w / 2, -h, w, 4);
+                // Almenas.
+                var n = Math.max(3, Math.round(w / (S * 0.07)));
+                var aw = w / (n * 2 - 1);
+                for (var k = 0; k < n; k++) {
+                    g.fillStyle(ARENA, 1); g.fillRect(-w / 2 + k * aw * 2, -h - aw * 0.9, aw, aw * 0.9);
+                    g.fillStyle(LUZ, 1); g.fillRect(-w / 2 + k * aw * 2, -h - aw * 0.9, aw, 3);
+                }
+                g.lineStyle(2, BORDE, 0.8); g.strokeRect(-w / 2, -h, w, h);
+                // Granitos y marcas del balde.
+                g.fillStyle(BORDE, 0.45);
+                for (var q = 0; q < Math.round(w * h / 260); q++) g.fillCircle(rnd(-w / 2 + 3, w / 2 - 3), -rnd(3, h - 3), rnd(0.8, 1.8));
+                g.lineStyle(1.5, SOMBRA, 0.9);
+                for (var r = 1; r < 3; r++) g.lineBetween(-w / 2 + 3, -h * r / 3, w / 2 - 3, -h * r / 3);
+                if (o.ventana) { g.fillStyle(HUECO, 1); g.fillRoundedRect(-w * 0.14, -h * 0.72, w * 0.28, h * 0.2, { tl: w * 0.14, tr: w * 0.14, bl: 0, br: 0 }); }
+                if (o.puerta) { g.fillStyle(HUECO, 1); g.fillRoundedRect(-w * 0.13, -h * 0.62, w * 0.26, h * 0.62, { tl: w * 0.13, tr: w * 0.13, bl: 0, br: 0 }); }
+                c.add(g);
+                c.alto = h + aw * 0.9;
+                partes.push(c);
+                return c;
+            }
+            bloque(0, S * 0.92, S * 0.3, { z: 0, puerta: true });                    // muralla con puerta
+            bloque(-S * 0.42, S * 0.2, S * 0.52, { z: 1, ventana: true });           // torre izquierda
+            bloque(S * 0.42, S * 0.2, S * 0.52, { z: 1, ventana: true });            // torre derecha
+            var centro = bloque(0, S * 0.28, S * 0.74, { z: 0.5, ventana: true });    // torre del medio
+            // La puerta va por delante de la torre del medio.
+            bloque(0, S * 0.3, S * 0.22, { z: 2, puerta: true });
+            return { partes: partes, cx: cx, by: by, S: S, centro: centro, piso: piso };
+        },
+
+        crecerParte: function (c) {
+            this.tweens.add({ targets: c, scaleY: 1, duration: 420, ease: 'Back.easeOut' });
+            this.granos(c.x, c.y - 6, 10, { dist: 50, colores: [0xe6c588, 0xcfa868, 0xf4ddb0, 0xb48a4e] });
+        },
+
+        /** Los juguetes se ubican delante del castillo, en una o dos filas (la de atrás, corrida a medio paso). */
+        sitiosCastillo: function (n, cas) {
+            var L = this.L, R = L.R;
+            var filas = n > 4 ? 2 : 1;
+            var porFila = Math.ceil(n / filas);
+            var libre = R.y + R.h - cas.by - 10;
+            var tam = Math.min(L.tam * 0.75, (R.w - 20) / porFila / 1.1, libre / (filas * 0.95 + 0.2));
+            var sitios = [];
+            for (var i = 0; i < n; i++) {
+                var f = Math.floor(i / porFila), k = i % porFila;
+                var enFila = f === filas - 1 ? n - f * porFila : porFila;
+                var paso = (R.w - 20) / porFila;
+                var x = R.x + R.w / 2 + (k - (enFila - 1) / 2) * paso;
+                var y = cas.by + tam * 0.55 + f * tam * 0.95;
+                sitios.push({ x: x, y: y, esc: tam / L.tam });
+            }
+            return sitios;
+        },
+
+        izarBandera: async function (cas) {
+            var tope = cas.by - cas.centro.alto;
+            var c = this.add.container(cas.cx, tope).setDepth(31.6).setScale(1, 0);
+            // Que la bandera no se salga del arenero (en pantallas bajas la torre ya llega arriba).
+            var alto = Math.max(26, Math.min(cas.S * 0.3, tope - this.L.R.y - 6));
+            var palo = this.add.rectangle(0, -alto / 2, 4, alto, 0x8c5a2b);
+            var tela = this.add.container(2, -alto + 2);
+            var g = this.add.graphics();
+            g.fillStyle(0xff6b6b, 1); g.fillTriangle(0, 0, alto * 0.62, alto * 0.17, 0, alto * 0.34);
+            g.fillStyle(0xffd43b, 1); g.fillCircle(alto * 0.16, alto * 0.17, alto * 0.06);
+            tela.add(g);
+            c.add([palo, tela]);
+            efecto(this, 'magia');
+            await tw(this, { targets: c, scaleY: 1, duration: 500, ease: 'Back.easeOut' });
+            // Ondea con el viento.
+            this.tweens.add({ targets: tela, scaleX: 0.78, duration: 380, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+            Ut.estallido(this, cas.cx, tope - alto, { n: 16, tex: 'estrella', tam: 26, dist: 130, sinTinte: true, depth: 60 });
+            await esperar(this, 500);
         },
 
         estado: function () {

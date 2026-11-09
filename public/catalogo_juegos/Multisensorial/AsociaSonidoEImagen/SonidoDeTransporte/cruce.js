@@ -32,14 +32,16 @@
             var hueco = Math.max(60, H * 0.16);
             L.bocina = { x: W / 2, y: Math.max(60, Math.min(96, 54 + hueco * 0.2)), r: Math.max(28, Math.min(38, hueco * 0.3)) };
             L.pres = W >= 760 ? { x: W - 66, piso: H - 104, alto: Math.min(150, H * 0.26), modelo: 'nino' } : null;
-            var top = L.bocina.y + L.bocina.r + 16;
+            var vertical = H > W * 1.15;
+            // En vertical el semáforo de la pista quedaría bajo la bocina: los carriles bajan un poco más.
+            var top = L.bocina.y + L.bocina.r + (vertical ? 44 : 16);
             var alto = H - top - 10;
-            L.tam = Math.max(64, Math.min(130, alto * 0.2, W / 7.5));
-            // Cinco carriles de atrás (lejos, más chicos) hacia adelante.
+            L.tam = Math.max(64, Math.min(130, alto * 0.2, W / (vertical ? 6.2 : 7.5)));
+            // Cinco carriles de atrás (lejos, más chicos) hacia adelante. El avión, aunque esté lejos, debe leerse.
             L.lanes = [0.13, 0.33, 0.53, 0.71, 0.9].map(function (k, i) {
-                return { y: top + alto * k, esc: 0.62 + i * 0.1, tipo: i === 0 ? 'pista' : (i === 1 ? 'via' : 'calle') };
+                return { y: top + alto * k, esc: i === 0 ? 0.8 : 0.62 + i * 0.1, tipo: i === 0 ? 'pista' : (i === 1 ? 'via' : 'calle') };
             });
-            L.xEspera = W * 0.36;
+            L.xEspera = W * (vertical ? 0.3 : 0.36);
             L.xSenal = L.xEspera + L.tam * 0.95;
             return L;
         },
@@ -242,10 +244,11 @@
             var r = this.reto;
             var correcto = r.correcto || 'ambulancia';
             var otros = (r.opciones || []).filter(function (o) { return o !== correcto; });
-            var t2 = otros[(Math.random() * otros.length) | 0] || 'tren';
-            var t3 = otros.filter(function (o) { return o !== t2; })[0] || 'avion';
+            // Orden al azar de lo que se pide en los niveles 1-3 (el reto oficial siempre está).
+            var orden = K.ordenObjetivos(this, correcto, otros.length ? otros : ['tren', 'avion']);
+            var t1 = orden[0], t2 = orden[1], t3 = orden[2];
             return [
-                { objetivo: correcto, meta: 1 },
+                { objetivo: t1, meta: 1 },
                 { objetivo: t2, meta: 1 },
                 { objetivo: t3, meta: 1, lejos: true },
                 { objetivo: null, meta: 3, cambia: true }
@@ -291,9 +294,63 @@
 
         zonaFiesta: function () { var L = this.L; return { x: L.W * 0.05, y: L.lanes[3].y - L.tam * 0.4, w: L.W * 0.75 }; },
 
-        antesDeFiesta: async function () {
-            this.carriles.forEach(function (c) { if (c && c.actor && c.estado === 'espera') c.actor.cont.setAlpha(0.3); });
-            this.coleccion.forEach(function (a) { a.cont.setVisible(true).setAlpha(1).setAngle(0).setPosition(-100, a.cont.y); });
+        /* ── Escena final: todos en verde. Los cinco semáforos se ponen en verde, sale el desfile
+              de los cinco carriles (cada uno suena al pasar su señal) y la ciudad prende sus ventanas;
+              dan la vuelta y vuelven a quedar en el centro. ── */
+
+        escenaFinal: async function () {
+            var self = this;
+            var L = this.L, ln = L.lanes;
+            var vehs = [];
+            this.carriles.forEach(function (c, i) { if (c && c.actor && c.actor.cont && c.actor.cont.active) vehs.push({ c: c, i: i, a: c.actor }); });
+            vehs.forEach(function (v) { v.a.cont.setVisible(true).setAlpha(1).setAngle(0); v.x0 = v.a.cont.x; v.y0 = v.a.cont.y; });
+            // Ventanas de la ciudad (mismas cuentas que pintarCruce).
+            var ventanas = [];
+            var base = ln[0].y - L.tam * 0.55;
+            for (var b = 0; b < 14; b++) {
+                var bw = L.W / 14, bh = 30 + ((b * 37) % 60), top = base - bh;
+                for (var yy = top + 8; yy < base - 8; yy += 12) for (var v = 0; v < 3; v++) if (b * bw + 6 + v * 10 + 5 < (b + 1) * bw - 4) ventanas.push({ x: b * bw + 6 + v * 10, y: yy });
+            }
+            ventanas = Ut.mezclar(ventanas);
+            var vg = this.add.graphics().setDepth(0.5);
+            var prendidas = 0;
+            // 1) Los cinco semáforos en verde, de arriba abajo.
+            for (var i = 0; i < this.senales.length; i++) { this.ponerSenal(i, true); await esperar(this, 140); }
+            if (!this.sigue()) return;
+            // 2) ¡Desfile! Cada uno suena al pasar su señal; la ciudad prende ventanas.
+            vehs.forEach(function (v) { v.sono = false; });
+            var o = { t: 0 };
+            var ultHumo = 0;
+            var fin = L.W + L.tam * 1.4;
+            await tw(this, {
+                targets: o, t: 1, duration: 2800, ease: 'Quad.easeIn',
+                onUpdate: function () {
+                    vehs.forEach(function (v, k) {
+                        var t = Math.max(0, Math.min(1, (o.t - k * 0.06) / (1 - 0.24)));
+                        var c = v.a.cont;
+                        c.x = v.x0 + (fin - v.x0) * t * t;
+                        if (v.a.id === 'avion') { c.y = v.y0 - Math.max(0, t - 0.5) * L.tam * 2.2; c.angle = t > 0.5 ? -12 : 0; }
+                        if (!v.sono && c.x > L.xSenal) {
+                            v.sono = true;
+                            self.escuchar(v.a.sonido, { breve: true, bocina: false, vol: 0.7 });
+                        }
+                        if (v.a.id === 'tren' && t > 0 && t < 1 && self.time.now - ultHumo > 200) {
+                            ultHumo = self.time.now;
+                            Ut.estallido(self, c.x + L.tam * 0.2, c.y - L.tam * 0.45, { n: 2, tex: 'humo', tam: 22, dist: 36, angulo: -Math.PI / 2, abanico: 0.6, depth: 45 });
+                        }
+                    });
+                    var meta = Math.floor(ventanas.length * Math.min(1, o.t * 1.2));
+                    for (; prendidas < meta; prendidas++) { var w = ventanas[prendidas]; vg.fillStyle(0xffe066, 0.95); vg.fillRect(w.x, w.y, 5, 6); }
+                }
+            });
+            if (!this.sigue()) return;
+            // 3) Dan la vuelta y vuelven a entrar por la izquierda hasta el centro.
+            vehs.forEach(function (v) { v.a.cont.setPosition(-L.tam * 1.2, v.y0).setAngle(0); });
+            await Promise.all(vehs.map(function (v, k) {
+                return esperar(self, k * 120).then(function () { return tw(self, { targets: v.a.cont, x: L.W * 0.62, duration: 1100, ease: 'Cubic.easeOut' }); });
+            }));
+            K.tono({ f: 700, f2: 1000, dur: 0.15, vol: 0.05 });
+            await esperar(this, 300);
         },
 
         demo: async function () {

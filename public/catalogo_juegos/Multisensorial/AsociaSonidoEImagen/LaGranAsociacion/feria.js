@@ -272,7 +272,9 @@
                 if (q < dmin) { dmin = q; mejor = p; }
             });
             if (mejor) d = { x: mejor.cuello.x, y: mejor.cuello.y };
-            this.vuela = { x: L.aro.x, y: L.aro.y, esc: 1, ang: 0 };
+            // Cada tiro mueve su propio aro: un acierto anterior todavía puede estar terminando
+            // (nivel 4: cierra el telón y anuncia otro sonido) y no debe borrar este.
+            var v = this.vuela = { x: L.aro.x, y: L.aro.y, esc: 1, ang: 0 };
             K.ruido({ f: 1200, q: 0.6, dur: 0.3, vol: 0.06 });
             var x0 = L.aro.x, y0 = L.aro.y, cima = Math.min(y0, d.y) - L.tam * 1.2;
             var o = { t: 0 };
@@ -280,35 +282,36 @@
                 targets: o, t: 1, duration: 650, ease: 'Sine.easeIn',
                 onUpdate: function () {
                     var t = o.t;
-                    self.vuela.x = x0 + (d.x - x0) * t;
-                    self.vuela.y = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * cima + t * t * d.y;
-                    self.vuela.esc = 1 - t * 0.35;
-                    self.vuela.ang = t * 12;
+                    v.x = x0 + (d.x - x0) * t;
+                    v.y = (1 - t) * (1 - t) * y0 + 2 * (1 - t) * t * cima + t * t * d.y;
+                    v.esc = 1 - t * 0.35;
+                    v.ang = t * 12;
                 }
             });
-            if (mejor && !mejor.hecho) await this.embocar(mejor);
-            else await this.caeAlPiso();
-            this.vuela = null;
+            if (mejor && !mejor.hecho) await this.embocar(mejor, v);
+            else await this.caeAlPiso(v);
+            if (this.vuela === v) this.vuela = null;
         },
 
-        caeAlPiso: async function () {
-            var v = this.vuela;
+        caeAlPiso: async function (v) {
+            v = v || this.vuela;
+            if (!v) return;
             K.ruido({ f: 300, q: 1, dur: 0.15, vol: 0.1 });
             await tw(this, { targets: v, y: this.L.esc.y1 + 10, esc: 0.5, duration: 300, ease: 'Bounce.easeOut' });
             await esperar(this, 250);
         },
 
-        embocar: async function (p) {
+        embocar: async function (p, v) {
             var self = this;
             var a = p.actor;
-            var v = this.vuela;
+            v = v || this.vuela;
             // El aro baja por el objeto girando y queda en el poste.
             K.tono({ f: 1300, dur: 0.12, vol: 0.06 });
             await tw(this, { targets: v, y: p.cuello.y + 8, ang: 0, duration: 220, ease: 'Bounce.easeOut' });
             if (p.id === this.objetivo) {
                 p.hecho = true;
                 p.aro = { x: v.x, y: v.y };
-                this.vuela = null;
+                if (this.vuela === v) this.vuela = null;
                 this.fase = 'premio';
                 await this.celebrar(a);
                 if (this.ctx.celebrar) { this.ctx.celebrar(true); this.time.delayedCall(2200, function () { self.ctx.celebrar(false); }); }
@@ -320,7 +323,7 @@
             } else {
                 // Rebota: salta del poste y cae.
                 await tw(this, { targets: v, y: v.y - 50, x: v.x + rnd(-40, 40), duration: 220, ease: 'Quad.easeOut' });
-                this.caeAlPiso();
+                this.caeAlPiso(v);
                 await this.fallar(a);
             }
         },
@@ -427,6 +430,95 @@
             if (this.ctx.celebrar) this.ctx.celebrar(true);
         },
 
+        /* ── Escena final: gran premio. Suena la campana, baja un peluche gigante, hay fuegos
+              artificiales sobre la noria y los objetos ganados bailan en el escenario. ── */
+
+        escenaFinal: async function () {
+            var self = this;
+            var L = this.L, E = L.esc;
+            this.postes.forEach(function (p) { if (!p.hecho) self.tweens.add({ targets: p.actor.cont, alpha: 0, duration: 300 }); });
+            // 1) La campana de la feria.
+            var bx = E.x0 + (E.x1 - E.x0) * 0.14, by = E.y0 + 14;
+            var camp = this.add.container(bx, by).setDepth(60);
+            var cg = this.add.graphics();
+            var r = Math.max(18, L.tam * 0.28);
+            cg.fillStyle(0x495057, 1); cg.fillRect(-2, -14, 4, 16);
+            cg.fillStyle(0xfab005, 1); cg.fillTriangle(-r, r * 1.5, r, r * 1.5, 0, 0);
+            cg.fillCircle(0, r * 0.55, r * 0.75); cg.fillRoundedRect(-r * 1.1, r * 1.35, r * 2.2, r * 0.3, 4);
+            cg.fillStyle(0xffe066, 1); cg.fillCircle(-r * 0.3, r * 0.45, r * 0.22);
+            cg.fillStyle(0x8f5a00, 1); cg.fillCircle(0, r * 1.75, r * 0.2);
+            camp.add(cg);
+            for (var d = 0; d < 3; d++) {
+                [1320, 1980, 2640].forEach(function (f, i) { self.time.delayedCall(d * 380, function () { K.tono({ f: f, dur: 0.9 - i * 0.2, vol: 0.05 / (i + 1) }); }); });
+                this.tweens.add({ targets: camp, angle: d % 2 ? -22 : 22, duration: 180, yoyo: true, delay: d * 380 });
+            }
+            await esperar(this, 1200);
+            if (!this.sigue()) return;
+            // 2) Baja el peluche gigante colgado de una cuerda.
+            var arriba = Math.min.apply(null, this.postes.map(function (p) { return p.actor.cont.y - L.tam * 0.7; }));
+            var t = Math.max(60, Math.min(L.tam * 1.5, (arriba - E.y0) * 0.75));
+            var ox = (E.x0 + E.x1) / 2, oy = E.y0 + t * 0.62;
+            var oso = this.add.container(ox, -t).setDepth(61);
+            var cafe = 0xc48a54, claro = 0xf1c9a0;
+            var og = this.add.graphics();
+            og.lineStyle(3, 0xf8f9fa, 1); og.lineBetween(0, -t * 0.45, 0, -L.H);   // cuerda
+            og.fillStyle(cafe, 1);
+            og.fillEllipse(0, t * 0.5, t * 0.75, t * 0.7);                       // cuerpo
+            og.fillCircle(-t * 0.3, t * 0.42, t * 0.13); og.fillCircle(t * 0.3, t * 0.42, t * 0.13);   // brazos
+            og.fillEllipse(-t * 0.2, t * 0.85, t * 0.26, t * 0.18); og.fillEllipse(t * 0.2, t * 0.85, t * 0.26, t * 0.18);
+            og.fillCircle(-t * 0.28, -t * 0.3, t * 0.14); og.fillCircle(t * 0.28, -t * 0.3, t * 0.14);  // orejas
+            og.fillCircle(0, 0, t * 0.38);                                        // cabeza
+            og.fillStyle(claro, 1);
+            og.fillEllipse(0, t * 0.55, t * 0.42, t * 0.42);
+            og.fillCircle(-t * 0.28, -t * 0.3, t * 0.07); og.fillCircle(t * 0.28, -t * 0.3, t * 0.07);
+            og.fillEllipse(0, t * 0.1, t * 0.32, t * 0.24);
+            og.fillStyle(0x3b2410, 1); og.fillEllipse(0, t * 0.04, t * 0.1, t * 0.07);
+            og.fillCircle(-t * 0.13, -t * 0.08, t * 0.045); og.fillCircle(t * 0.13, -t * 0.08, t * 0.045);
+            og.lineStyle(2.5, 0x3b2410, 1); og.beginPath(); og.arc(0, t * 0.12, t * 0.08, 0.3, Math.PI - 0.3); og.strokePath();
+            og.fillStyle(0xff6b6b, 1);                                            // moño de premio
+            og.fillTriangle(0, t * 0.27, -t * 0.2, t * 0.17, -t * 0.2, t * 0.37);
+            og.fillTriangle(0, t * 0.27, t * 0.2, t * 0.17, t * 0.2, t * 0.37);
+            og.fillCircle(0, t * 0.27, t * 0.05);
+            oso.add(og);
+            K.efecto(this, 'whoosh');
+            await tw(this, { targets: oso, y: oy, duration: 900, ease: 'Bounce.easeOut' });
+            this.tweens.add({ targets: oso, angle: 4, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+            Ut.estallido(this, ox, oy, { n: 12, tex: 'corazon', tam: 26, dist: 140, depth: 62 });
+            if (!this.sigue()) return;
+            // 3) Los objetos ganados bailan en el escenario mientras hay fuegos sobre la noria.
+            this.postes.forEach(function (p, k) {
+                if (!p.hecho) return;
+                var c = p.actor.cont;
+                self.tweens.add({ targets: c, y: c.y - L.tam * 0.18, angle: k % 2 ? 8 : -8, duration: 260, yoyo: true, repeat: 5, delay: k * 90, ease: 'Sine.easeInOut', onComplete: function () { c.angle = 0; } });
+            });
+            var hechos = this.postes.filter(function (p) { return p.hecho; });
+            var nx = L.W * 0.78, ny = Math.max(50, E.y0 - 40);
+            for (var f = 0; f < 6; f++) {
+                var fx = nx + rnd(-L.W * 0.2, L.W * 0.12), fy = rnd(30, Math.max(60, ny * 0.8));
+                this.cohete(fx, fy);
+                if (hechos[f]) this.escuchar(hechos[f].actor.sonido, { breve: true, bocina: false, vol: 0.6 });
+                await esperar(this, 420);
+                if (!this.sigue()) return;
+            }
+            await esperar(this, 600);
+        },
+
+        /** Un fuego artificial: sube con estela y estalla en chispas de colores. */
+        cohete: function (x, y) {
+            var self = this;
+            var c = this.add.circle(x, this.L.H * 0.55, 3, 0xfff3bf).setDepth(0.7);
+            K.ruido({ f: 2400, q: 0.8, dur: 0.35, vol: 0.03 });
+            this.tweens.add({
+                targets: c, y: y, duration: 520, ease: 'Quad.easeOut',
+                onComplete: function () {
+                    c.destroy();
+                    K.ruido({ f: 180, q: 0.7, dur: 0.35, vol: 0.1 });
+                    var col = [0xff6b6b, 0xffd43b, 0x74c0fc, 0x8ce99a, 0xe599f7][(Math.random() * 5) | 0];
+                    Ut.estallido(self, x, y, { n: 18, tex: 'chispa', tam: 16, dist: 90, colores: [col, 0xffffff], depth: 0.8, ms: 1100 });
+                }
+            });
+        },
+
         demo: async function () {
             var self = this;
             var ctx = this.ctx;
@@ -466,9 +558,9 @@
             if (!ctx.vivo() || !ctx.enDemo()) return limpiar();
             this.honda = null;
             // Vuelo hasta la vaca.
-            this.vuela = { x: L.aro.x, y: L.aro.y, esc: 1, ang: 0 };
+            var v = this.vuela = { x: L.aro.x, y: L.aro.y, esc: 1, ang: 0 };
             var o = { t: 0 }, x0 = L.aro.x, y0 = L.aro.y, cima = Math.min(y0, vaca.cuello.y) - L.tam * 1.2;
-            await tw(this, { targets: o, t: 1, duration: 650, onUpdate: function () { var k = o.t; self.vuela.x = x0 + (vaca.cuello.x - x0) * k; self.vuela.y = (1 - k) * (1 - k) * y0 + 2 * (1 - k) * k * cima + k * k * vaca.cuello.y; self.vuela.esc = 1 - k * 0.35; } });
+            await tw(this, { targets: o, t: 1, duration: 650, onUpdate: function () { var k = o.t; v.x = x0 + (vaca.cuello.x - x0) * k; v.y = (1 - k) * (1 - k) * y0 + 2 * (1 - k) * k * cima + k * k * vaca.cuello.y; v.esc = 1 - k * 0.35; } });
             vaca.aro = { x: vaca.cuello.x, y: vaca.cuello.y + 8 };
             this.vuela = null;
             K.efecto(this, 'recompensa');

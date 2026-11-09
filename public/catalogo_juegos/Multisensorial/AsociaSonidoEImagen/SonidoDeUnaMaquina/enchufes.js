@@ -321,8 +321,60 @@
         zonaFiesta: function () { var L = this.L; return { x: L.meson.x0, y: L.meson.y - L.tam * 0.45, w: L.meson.x1 - L.meson.x0 }; },
 
         antesDeFiesta: async function () {
-            // Todas a la vez sobre el mesón.
-            this.maqs.forEach(function (m) { if (m.estado !== 'listo') m.actor.cont.setAlpha(0.35); });
+            this.coleccion.forEach(function (a) { if (a.cont && a.cont.active) a.cont.setAlpha(1); });
+        },
+
+        /* ── Escena final: orquesta de máquinas. Todas se enchufan a la regleta (que se prende en
+              cadena) y suenan por turnos al compás, moviéndose con el ritmo. ── */
+
+        escenaFinal: async function () {
+            var self = this;
+            var L = this.L, R = L.regleta;
+            var maqs = this.maqs.filter(function (m) { return m.actor && m.actor.cont && m.actor.cont.active; });
+            var n = maqs.length;
+            if (!n) return;
+            maqs.forEach(function (m) { m.actor.cont.setAlpha(1); if (m.luz) m.luz.destroy(); });
+            // Luces de la regleta: una por máquina.
+            var leds = maqs.map(function (m, k) {
+                return self.add.circle(R.x - R.w * 0.38 + R.w * 0.76 * (k + 0.5) / n, R.y - R.h * 0.05, 5, 0x868e96).setStrokeStyle(1.5, 0xffffff).setDepth(62);
+            });
+            // 1) Se enchufan una tras otra.
+            for (var i = 0; i < n; i++) {
+                var m = maqs[i];
+                m.enchufe.setAlpha(1).setDepth(61);
+                await tw(this, { targets: m.enchufe, x: leds[i].x, y: R.y - 4, duration: 320, ease: 'Quad.easeInOut' });
+                K.ruido({ f: 2500, q: 3, dur: 0.05, vol: 0.1 });
+                leds[i].setFillStyle(0x40c057);
+                Ut.estallido(this, leds[i].x, leds[i].y, { n: 4, tex: 'chispa', tam: 12, dist: 24, colores: [0xfff3bf, 0x74c0fc], depth: 63 });
+                this.tweens.add({ targets: m.actor.cont, angle: 4, duration: 60, yoyo: true, repeat: 2 });
+            }
+            if (!this.sigue()) return;
+            await esperar(this, 300);
+            // 2) Al compás: cada golpe suena una máquina; todas saltan con el golpe.
+            var esc0 = maqs.map(function (m) { return m.actor.cont.scale; });
+            var golpes = Math.max(8, n * 2);
+            for (var b = 0; b < golpes; b++) {
+                var k = b % n;
+                var a = maqs[k].actor;
+                K.ruido({ f: 120, q: 1, dur: 0.12, vol: 0.12 });            // bombo
+                if (b % 2) K.ruido({ f: 5000, q: 1.5, dur: 0.05, vol: 0.05 });   // platillo
+                maqs.forEach(function (q, j) {
+                    self.tweens.add({ targets: q.actor.cont, scaleY: esc0[j] * (j === k ? 1.18 : 1.06), scaleX: esc0[j] * (j === k ? 0.92 : 0.97), duration: 110, yoyo: true, ease: 'Quad.easeOut' });
+                });
+                leds.forEach(function (l, j) { l.setFillStyle(j === k ? 0xfcc419 : 0x40c057); });
+                this.escuchar(a.sonido, { breve: true, bocina: false, vol: 0.65 });
+                Ut.estallido(this, a.cont.x, a.cont.y - L.tam * 0.45, { n: 3, tex: 'nota', tam: 24, dist: 80, angulo: -Math.PI / 2, abanico: 1.2, depth: 60 });
+                await esperar(this, 430);
+                if (!this.sigue()) return;
+            }
+            // 3) Final todas juntas.
+            K.ruido({ f: 100, q: 0.8, dur: 0.4, vol: 0.14 });
+            maqs.forEach(function (q, j) {
+                if (q.actor.acierto && q.actor.id !== 'aspiradora') q.actor.acierto(900);
+                Ut.estallido(self, q.actor.cont.x, q.actor.cont.y - L.tam * 0.4, { n: 5, tex: 'nota', tam: 26, dist: 110, depth: 60 });
+            });
+            leds.forEach(function (l) { l.setFillStyle(0x40c057); });
+            await esperar(this, 900);
         },
 
         demo: async function () {

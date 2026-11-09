@@ -416,6 +416,113 @@
             this.autos.forEach(function (c) { if (c.estado === 'quieto') c.actor.cont.setAlpha(0.3); });
         },
 
+        /* ── Escena final: desfile por la ciudad. Todos los que viajaron salen a la vez por su camino
+              (pista, vía o calle), suenan al pasar el cruce, el tren echa humo y el avión despega,
+              da una vuelta sobre la alfombra y aterriza. ── */
+
+        escenaFinal: async function () {
+            var self = this;
+            var L = this.L, A0 = L.alf;
+            var vistos = {};
+            var lista = this.coleccion.filter(function (a) { if (!a.cont || !a.cont.active || vistos[a.id]) return false; vistos[a.id] = 1; return true; });
+            // Los de niveles anteriores se destruyen al estacionar el nivel siguiente: se recrean
+            // en el estacionamiento de recuerdos para que desfilen todos los que viajaron.
+            this.coleccion.forEach(function (a) {
+                if (vistos[a.id]) return;
+                vistos[a.id] = 1;
+                var d = self.lugarRecuerdo(lista.length);
+                var nuevo = Act.crear(self, a.id, d.x, d.y, L.tam);
+                if (nuevo.animarIdle) nuevo.animarIdle(false);
+                nuevo.sonido = self.sonidoDe(a.id);
+                nuevo.cont.setScale(d.esc).setDepth(40);
+                lista.push(nuevo);
+            });
+            this.coleccion.forEach(function (a) { if (lista.indexOf(a) < 0 && a.cont && a.cont.active) a.cont.setVisible(false); });
+            this.autos.forEach(function (c) { if (lista.indexOf(c.actor) < 0) self.tweens.add({ targets: c.actor.cont, alpha: 0, duration: 300 }); });
+            this.rastroG.clear();
+            if (!lista.length) return;
+            var tamV = L.tam * 0.85;
+            var porTipo = {};
+            var plan = lista.map(function (a) {
+                var tipo = self.tipoDe(a.id);
+                var idx = porTipo[tipo] = (porTipo[tipo] || 0) + 1;
+                return { a: a, tipo: tipo, idx: idx - 1, y: L.rutas[tipo].y };
+            });
+            plan.forEach(function (p) { p.cuantos = porTipo[p.tipo]; });
+            // 1) Cada uno salta del estacionamiento al comienzo de su camino (en fila si comparten).
+            await Promise.all(plan.map(function (p, k) {
+                var x = L.conn + tamV * (0.4 + (p.cuantos - 1 - p.idx) * 1.05);
+                p.x0 = x;
+                p.x1 = A0.x + A0.w - tamV * (0.6 + p.idx * 1.05);
+                p.a.cont.setVisible(true).setAlpha(1).setAngle(0).setDepth(40 + p.y * 0.001);
+                return esperar(self, k * 140).then(function () {
+                    K.ruido({ f: 900, q: 2, dur: 0.06, vol: 0.05 });
+                    return self.saltarA(p.a.cont, x, p.y, { ms: 480, alto: L.tam * 0.6, esc: tamV / p.a.tam });
+                });
+            }));
+            await esperar(this, 300);
+            if (!this.sigue()) return;
+            // 2) ¡Salen todos a la vez! Cada uno suena al pasar el cruce del medio.
+            var o = { t: 0 };
+            var xCruce = A0.x + A0.w * 0.5;
+            plan.forEach(function (p) { p.sono = false; });
+            var ultHumo = 0, ultMotor = 0;
+            await tw(this, {
+                targets: o, t: 1, duration: 3600, ease: 'Sine.easeInOut',
+                onUpdate: function () {
+                    plan.forEach(function (p) {
+                        var c = p.a.cont;
+                        c.x = p.x0 + (p.x1 - p.x0) * o.t;
+                        c.y = p.y - Math.abs(Math.sin(o.t * 50 + p.idx)) * 2;
+                        if (!p.sono && c.x > xCruce - tamV * 0.2 * p.idx) {
+                            p.sono = true;
+                            self.escuchar(p.a.sonido, { breve: true, bocina: false, vol: 0.7 });
+                            if (p.a.saltito) p.a.saltito(0.08, 1);
+                        }
+                        if (p.a.id === 'tren' && self.time.now - ultHumo > 220) {
+                            ultHumo = self.time.now;
+                            Ut.estallido(self, c.x + tamV * 0.25, c.y - tamV * 0.45, { n: 2, tex: 'humo', tam: 22, dist: 36, angulo: -Math.PI / 2, abanico: 0.6, depth: 45 });
+                        }
+                    });
+                    if (self.time.now - ultMotor > 260) { ultMotor = self.time.now; K.ruido({ f: 200, q: 1.4, dur: 0.14, vol: 0.04 }); }
+                }
+            });
+            if (!this.sigue()) return;
+            // 3) El avión despega, da una vuelta sobre la alfombra y aterriza en su pista.
+            var av = plan.filter(function (p) { return p.a.id === 'avion'; })[0];
+            if (av) {
+                // La alfombra se ve desde arriba: el avión "sube" agrandándose y su sombra queda en el piso.
+                var c = av.a.cont, e0 = c.scaleY;
+                var cx = A0.x + A0.w * 0.5, cy = A0.y + A0.h * 0.42, rx = A0.w * 0.34, ry = Math.abs(cy - av.y);
+                var xs = c.x, ys = c.y;
+                var sombra = this.add.ellipse(xs, ys + tamV * 0.25, tamV * 0.8, tamV * 0.22, 0x000000, 0.18).setDepth(39);
+                c.setDepth(60);
+                var k2 = { t: 0 };
+                var prevX = xs;
+                K.ruido({ f: 1200, q: 0.6, dur: 0.6, vol: 0.06 });
+                await tw(this, {
+                    targets: k2, t: 1, duration: 3000, ease: 'Sine.easeInOut',
+                    onUpdate: function () {
+                        var t = k2.t, ang = t * Math.PI * 2;
+                        var alto = Math.sin(t * Math.PI);                  // 0 en la pista, 1 en lo más alto
+                        var ox = cx + Math.sin(ang) * rx, oy = cy - Math.cos(ang) * ry;
+                        var x = xs + (ox - xs) * Math.min(1, alto * 2), y = ys + (oy - ys) * Math.min(1, alto * 2);
+                        var dir = x >= prevX ? 1 : -1;
+                        prevX = x;
+                        c.x = x; c.y = y - alto * tamV * 0.5;
+                        c.scaleY = e0 * (1 + alto * 0.35);
+                        c.scaleX = c.scaleY * dir;
+                        sombra.setPosition(x, y + tamV * 0.25).setScale(1 - alto * 0.3).setAlpha(1 - alto * 0.4);
+                    }
+                });
+                c.scaleX = Math.abs(c.scaleY); c.angle = 0;
+                sombra.destroy();
+                c.setDepth(40 + av.y * 0.001);
+                K.ruido({ f: 500, q: 0.8, dur: 0.25, vol: 0.06 });
+            }
+            await esperar(this, 300);
+        },
+
         demo: async function () {
             var self = this;
             var ctx = this.ctx;

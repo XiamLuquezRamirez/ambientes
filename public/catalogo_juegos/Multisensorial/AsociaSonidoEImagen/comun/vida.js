@@ -358,15 +358,23 @@
         function gato(x, y, tam) {
             var g = keep(scene.add.graphics().setDepth(tam && tam.depth || 55));
             var t0 = tam && tam.t || 14;
-            var m = item({ tipo: 'gato', g: g, cierre: 0, prox: 0 });
+            var m = item({ tipo: 'gato', g: g, cierre: 0, prox: 0, feliz: 0, susto: 0 });
             m.paso = function (t, dt) {
                 if (t > m.prox) { m.cierre = 160; m.prox = t + rnd(2500, 5000); }
                 if (m.cierre > 0) m.cierre -= dt;
+                if (m.feliz > 0) m.feliz -= dt;
+                if (m.susto > 0) m.susto -= dt;
                 g.clear();
-                var h = m.cierre > 0 ? 1.5 : t0 * 0.55;
+                // Contento (ronronea): ojos en arco. Asustado: ojos grandes y redondos.
+                if (m.feliz > 0) {
+                    g.lineStyle(3, 0xc0eb75, 1);
+                    [-1, 1].forEach(function (s) { g.beginPath(); g.arc(x + s * t0, y + t0 * 0.15, t0 * 0.4, Math.PI * 1.15, Math.PI * 1.85); g.strokePath(); });
+                    return;
+                }
+                var h = m.cierre > 0 ? 1.5 : t0 * (m.susto > 0 ? 0.9 : 0.55);
                 [-1, 1].forEach(function (s) {
-                    g.fillStyle(0xc0eb75, 0.95); g.fillEllipse(x + s * t0, y, t0 * 0.9, h);
-                    if (m.cierre <= 0) { g.fillStyle(0x212529, 1); g.fillEllipse(x + s * t0, y, t0 * 0.2, h * 0.9); }
+                    g.fillStyle(0xc0eb75, 0.95); g.fillEllipse(x + s * t0, y, t0 * (m.susto > 0 ? 1.05 : 0.9), h);
+                    if (m.cierre <= 0) { g.fillStyle(0x212529, 1); g.fillEllipse(x + s * t0, y, t0 * (m.susto > 0 ? 0.55 : 0.2), h * (m.susto > 0 ? 0.55 : 0.9)); }
                 });
             };
             m.toca = function (p) { return Math.hypot(p.x - x, p.y - y) < t0 * 2.4; };
@@ -586,12 +594,73 @@
             return m;
         }
 
+        /* ── El escenario reacciona al juego: festeja aciertos, se sorprende con errores (sin castigo) ── */
+
+        function cerca(it, p) {
+            var o = it.c || it;
+            var x = o.x != null ? o.x : 0;
+            return p ? Math.abs(x - p.x) : 0;
+        }
+
+        var ALEGRE = {
+            sol: function (s) { s.guino = 1100; s.dibujar(); scene.tweens.add({ targets: s.c, scale: 1.25, duration: 220, yoyo: true, ease: 'Back.easeOut' }); },
+            pajaro: function (p) { p.asustado = 1300; },
+            mariposa: function (b) { b.prisa = 1300; },
+            arbol: function (a, p, i) {
+                if (cerca(a, p) > scene.scale.width * 0.3 && i % 2) return;
+                a.sacudida = 500;
+                for (var k = 0; k < 3; k++) hoja(a.c.x + rnd(-30, 30) * a.k, a.c.y - rnd(60, 110) * a.k, 0x69db7c);
+            },
+            estrellas: function (e) { e.fugaz = { x: rnd(40, scene.scale.width * 0.5), y: rnd(20, 80), dx: rnd(80, 140), dy: rnd(30, 60), k: 0 }; },
+            pato: function (d) { d.onda = 900; scene.tweens.add({ targets: d.c, y: d.c.y - 10, duration: 140, yoyo: true, repeat: 1 }); },
+            gato: function (m) { m.feliz = 1200; },
+            noria: function (n) { n.vel = 4; },
+            paloma: function (d, p, i) { if (i % 2 === 0) d.vuela = 1300; },
+            movil: function (m) { m.vel = 4; },
+            ropa: function (r) { r.viento = 900; },
+            globo: function (g) { scene.tweens.add({ targets: g.c, y: g.c.y - 26, duration: 380, ease: 'Back.easeOut' }); }
+        };
+
+        var SUSTO = {
+            sol: function (s) { scene.tweens.add({ targets: s.c, alpha: 0.55, duration: 260, yoyo: true, hold: 700 }); },
+            nube: function (n, p, i) {
+                if (i > 1) return;   // una o dos nubes se oscurecen un momento
+                n.c.list.forEach(function (b) {
+                    if (!b.setFillStyle) return;
+                    var col = b.fillColor, al = b.fillAlpha;
+                    b.setFillStyle(0xadb5bd, al);
+                    scene.time.delayedCall(1100, function () { if (b.active) b.setFillStyle(col, al); });
+                });
+                scene.tweens.add({ targets: n.c, y: n.c.y + 6, duration: 300, yoyo: true, hold: 500 });
+            },
+            pajaro: function (p) { p.asustado = 700; },
+            gato: function (m) { m.susto = 1000; },
+            pato: function (d) { scene.tweens.add({ targets: d.c, angle: 8, duration: 70, yoyo: true, repeat: 3, onComplete: function () { d.c.angle = 0; } }); },
+            mariposa: function (b) { b.prisa = 700; },
+            paloma: function (d) { d.vuela = 900; }
+        };
+
+        function reaccionar(tipo, p) {
+            var tabla = tipo === 'acierto' ? ALEGRE : SUSTO;
+            var cuenta = {};
+            items.forEach(function (it) {
+                var f = tabla[it.tipo];
+                if (!f) return;
+                cuenta[it.tipo] = (cuenta[it.tipo] || 0) + 1;
+                try { f(it, p, cuenta[it.tipo] - 1); } catch (e) { /* un adorno nunca debe romper el juego */ }
+            });
+        }
+
+        var lento = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
         var api = {
+            reaccionar: reaccionar,
             movil: movil,
             parque: parque, sol: sol, nube: nube, pajaros: pajaros, arbol: arbol, mariposas: mariposas, globos: globos,
             estrellas: estrellas, pato: pato, gato: gato, lluvia: lluvia, noria: noria, pendulo: pendulo, palomas: palomas,
             burbujas: burbujas, gotas: gotas, ropa: ropa, hoja: hoja, sonido: SON,
-            actualizar: function (t, dt) { items.forEach(function (it) { if (it.paso) it.paso(t, dt); }); },
+            // Movimiento reducido: el ambiente sigue vivo pero a un tercio de la velocidad.
+            actualizar: function (t, dt) { if (lento) dt *= 0.33; items.forEach(function (it) { if (it.paso) it.paso(t, dt); }); },
             tocar: function (p) {
                 for (var i = items.length - 1; i >= 0; i--) {
                     var it = items[i];
@@ -599,7 +668,9 @@
                 }
                 return false;
             },
-            elementos: function () { return items.map(function (it) { return it.tipo; }); }
+            elementos: function () { return items.map(function (it) { return it.tipo; }); },
+            /** Los elementos de un tipo (p. ej. para que una escena final use el gato). */
+            buscar: function (tipo) { return items.filter(function (it) { return it.tipo === tipo; }); }
         };
         return api;
     }

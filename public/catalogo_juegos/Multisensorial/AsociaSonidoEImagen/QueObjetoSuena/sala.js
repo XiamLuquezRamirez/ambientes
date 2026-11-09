@@ -477,6 +477,77 @@
             this.juguetes.forEach(function (j) { if (j.estado === 'quieto') j.actor.cont.setAlpha(0.35); });
         },
 
+        /* ── Escena final: desfile por la sala. Salen de la caja, dan la vuelta a la alfombra al
+              ritmo del reloj (cada uno suena al pasar por delante) y suben a la repisa. ── */
+
+        escenaFinal: async function () {
+            var self = this;
+            var L = this.L, A0 = L.alfombra;
+            var vistos = {};
+            var lista = this.coleccion.filter(function (a) { if (!a.cont || !a.cont.active || vistos[a.id]) return false; vistos[a.id] = 1; return true; });
+            this.coleccion.forEach(function (a) { if (lista.indexOf(a) < 0 && a.cont) a.cont.setVisible(false); });
+            // Los juguetes del último nivel que no se eligieron se van: la sala queda para el desfile.
+            this.juguetes.forEach(function (j) { if (lista.indexOf(j.actor) < 0 && j.actor.cont) self.tweens.add({ targets: j.actor.cont, alpha: 0, duration: 300 }); });
+            var n = lista.length;
+            if (!n) return;
+            var tamD = Math.min(L.tam * 0.62, (2 * Math.PI * A0.rx) / n * 0.9);
+            var rx = Math.max(A0.rx * 1.05, tamD * 1.2), ry = Math.max(A0.ry * 1.35, tamD * 0.5);
+            var punto = function (ang) { return { x: A0.x + Math.cos(ang) * rx, y: A0.y + Math.sin(ang) * ry - tamD * 0.35 }; };
+            var gap = Math.min(0.75, (Math.PI * 2) / n);
+            // 1) Salen de la caja uno tras otro y se forman en la alfombra.
+            for (var i = 0; i < n; i++) {
+                var a = lista[i];
+                a.cont.setVisible(true).setAlpha(1).setAngle(0).setDepth(45);
+                var p = punto(Math.PI - i * gap);
+                K.tono({ f: 500 + i * 60, f2: 900 + i * 60, dur: 0.12, vol: 0.04 });
+                this.saltarA(a.cont, p.x, p.y, { ms: 420, alto: L.tam * 0.6, esc: tamD / a.tam });
+                await esperar(this, 220);
+            }
+            await esperar(this, 450);
+            if (!this.sigue()) return;
+            // 2) Vuelta a la alfombra; el péndulo del reloj marca el paso.
+            var o = { t: 0 };
+            var sono = lista.map(function () { return false; });
+            var ultTic = 0;
+            await tw(this, {
+                targets: o, t: 1, duration: Math.max(3600, n * 700), ease: 'Sine.easeInOut',
+                onUpdate: function () {
+                    lista.forEach(function (a, k) {
+                        var ang = Math.PI - k * gap + o.t * Math.PI * 2;
+                        var q = punto(ang);
+                        a.cont.x = q.x;
+                        a.cont.y = q.y + Math.abs(Math.sin(o.t * 40 + k)) * -6;   // pasitos
+                        a.cont.scaleX = Math.abs(a.cont.scaleX) * (Math.sin(ang) >= 0 ? -1 : 1);
+                        a.cont.setDepth(45 + Math.sin(ang));
+                        // Al pasar por delante (abajo de la alfombra) suena y salta.
+                        var frente = ((ang % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+                        if (!sono[k] && Math.abs(frente - Math.PI / 2) < 0.25) {
+                            sono[k] = true;
+                            self.escuchar(a.sonido, { breve: true, bocina: false, vol: 0.75 });
+                            if (a.saltito) a.saltito(0.12, 1);
+                        }
+                    });
+                    if (self.time.now - ultTic > 480) { ultTic = self.time.now; K.ruido({ f: 3200, q: 5, dur: 0.035, vol: 0.06 }); }
+                }
+            });
+            lista.forEach(function (a) { a.cont.scaleX = Math.abs(a.cont.scaleX); });
+            if (!this.sigue()) return;
+            // 3) Suben a la repisa (los que no caben quedan en fila sobre la alfombra).
+            var R = L.repisa;
+            var cabe = Math.max(1, Math.floor(R.w / (tamD * 0.95)));
+            var enRepisa = Math.min(n, cabe), resto = n - enRepisa;
+            var proms = lista.map(function (a, k) {
+                var x, y;
+                if (k < enRepisa) { x = R.x + R.w * (k + 0.5) / enRepisa; y = R.y - tamD * 0.42; }
+                else { var j = k - enRepisa; x = A0.x + (j - (resto - 1) / 2) * tamD * 1.05; y = A0.y - tamD * 0.2; }
+                return esperar(self, k * 160).then(function () {
+                    return self.saltarA(a.cont, x, y, { ms: 520, alto: L.tam * 0.8 });
+                }).then(function () { a.cont.setDepth(k < enRepisa ? 30 : 46); K.tono({ f: 700, dur: 0.05, vol: 0.04 }); });
+            });
+            await Promise.all(proms);
+            await esperar(this, 300);
+        },
+
         /* ── Demostración: vaca y gallo de peluche ── */
 
         demo: async function () {
