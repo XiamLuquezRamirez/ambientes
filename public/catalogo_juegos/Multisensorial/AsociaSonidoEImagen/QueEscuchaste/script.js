@@ -29,6 +29,7 @@
     let demoActiva = false;
     let opcionesActivas = false;
     let audioSonido = null;
+    let ultimaDuracionMs = 2000;
     let pista = { timer: null, gen: 0 };
     let audioCache = Object.create(null);
     let imgCache = Object.create(null);
@@ -470,6 +471,7 @@
         const ruta = rutasSonidos()[nombre];
         let espera;
         if (ruta) {
+            ultimaDuracionMs = o.breve ? 1500 : 3000;
             const a = reproducirAudio(ruta, 1, false);
             audioSonido = a;
             espera = new Promise(function (resolve) {
@@ -480,7 +482,8 @@
             });
         } else {
             const seg = window.AsociaSonidoSfx ? AsociaSonidoSfx.reproducir(nombre, o) : 0;
-            espera = sleep(Math.max(300, seg * 1000));
+            ultimaDuracionMs = Math.max(300, seg * 1000);
+            espera = sleep(ultimaDuracionMs);
         }
         return espera.then(function () {
             if (token !== tokenSonido) return;
@@ -516,8 +519,45 @@
         $id("dialogo-avatar").src = avatarDe(dialogo.dataset.voz === "zeus" ? "zeus" : "zoe", false);
     }
 
-    /** Muestra el texto cuando la voz empieza de verdad (no antes) y resuelve cuando termina. */
+    /*
+     * Cola de voz: la frase que está sonando siempre termina antes de que hable el otro personaje
+     * (TextoVoz.hablar corta la anterior). Si se juntan varias, solo espera la más reciente.
+     */
+    let vozActual = null;
+    let vozPendiente = null;
+
     function decir(linea, opts) {
+        if (!linea || !linea.texto) return Promise.resolve();
+        return new Promise(function (resolve) {
+            if (vozPendiente) vozPendiente.resolve();
+            vozPendiente = { linea: linea, opts: opts || {}, resolve: resolve };
+            if (!vozActual) siguienteVoz();
+        });
+    }
+
+    function siguienteVoz() {
+        const it = vozPendiente;
+        vozPendiente = null;
+        if (!it) {
+            vozActual = null;
+            return;
+        }
+        vozActual = decirAhora(it.linea, it.opts).then(function () {
+            it.resolve();
+            siguienteVoz();
+        });
+    }
+
+    /** Descarta lo que esperaba turno, sin cortar la frase que está sonando. */
+    function callarVoz() {
+        if (vozPendiente) {
+            vozPendiente.resolve();
+            vozPendiente = null;
+        }
+    }
+
+    /** Muestra el texto cuando la voz empieza de verdad (no antes) y resuelve cuando termina. */
+    function decirAhora(linea, opts) {
         opts = opts || {};
         if (!linea || !linea.texto) return Promise.resolve();
         const token = ++tokenDialogo;
@@ -597,10 +637,71 @@
         montarEscenario();
         Promise.resolve(imagenesPromise).then(function () {
             if (!vivo(gen)) return;
+            if (window.PedniaJuego) {
+                iniciarMotor(gen);
+                return;
+            }
             if (mostrarIntroActiva()) iniciarDemo(gen);
             else iniciarReto(gen);
         });
     };
+
+    /* ── Motor Phaser propio del juego (comun/kit.js + su motor); si no monta, queda el juego de tarjetas ── */
+
+    function ctxMotor(gen) {
+        return {
+            decir: function (linea, opts) { return vivo(gen) ? decir(linea, opts) : Promise.resolve(); },
+            callar: callarVoz,
+            mano: function (opts) {
+                if (!window.PedniaTutorial) return Promise.resolve();
+                return PedniaTutorial.animarMano(opts);
+            },
+            quitarMano: function () { if (window.PedniaTutorial) PedniaTutorial.quitarManos(); },
+            sonido: function (nombre, o) { return reproducirSonido(nombre, o); },
+            callarSonido: detenerSonido,
+            duracionSonido: function () { return ultimaDuracionMs; },
+            efecto: efecto,
+            vivo: function () { return vivo(gen); },
+            enDemo: function () { return demoActiva; },
+            textos: textos(),
+            reto: (nivelElegido.retos || [])[0] || {},
+            nivel: nivelElegido,
+            elemento: elemento,
+            celebrar: celebrarPersonajes
+        };
+    }
+
+    async function iniciarMotor(gen) {
+        const M = window.PedniaJuego;
+        try {
+            await M.montar({ gameConfig: gameConfig, nivel: nivelElegido, ctx: ctxMotor(gen) });
+        } catch (e) {
+            console.warn("[AsociaSonidoEImagen] motor no disponible, uso las tarjetas:", e);
+            window.PedniaJuego = null;
+            if (mostrarIntroActiva()) iniciarDemo(gen);
+            else iniciarReto(gen);
+            return;
+        }
+        if (!vivo(gen)) return;
+        try {
+            if (M.frases && typeof TextoVoz.encolarFrases === "function") TextoVoz.encolarFrases(M.frases());
+        } catch (e) { /* noop */ }
+        if (mostrarIntroActiva() && window.PedniaTutorial) {
+            demoActiva = true;
+            await PedniaTutorial.activarDemo();
+            await M.demo();
+            detenerDemo();
+            if (!vivo(gen)) return;
+        }
+        if (window.PedniaTutorial && PedniaTutorial.soltarVozDemo) PedniaTutorial.soltarVozDemo();
+        await M.jugar();
+        if (!vivo(gen)) return;
+        juegoTerminado = true;
+        celebrarPersonajes(true);
+        await M.fiestaFinal();
+        if (gen !== rondaGen) return;
+        mostrarCierre();
+    }
 
     /* ── Escenario ────────────────────────────────────────────── */
 
@@ -707,8 +808,7 @@
     function escucharOtraVez() {
         if (!reto || juegoTerminado || demoActiva || (fase !== "jugar" && fase !== "error")) return;
         tokenIntento += 1;
-        tokenDialogo += 1;
-        TextoVoz.detener();
+        callarVoz();
         presentar(rondaGen);
     }
 
@@ -806,8 +906,7 @@
         const r = L.evaluar(reto, el.dataset.id);
         fase = "animando";
         cancelarPista();
-        tokenDialogo += 1;
-        TextoVoz.detener();
+        callarVoz();
         detenerSonido();
         reiniciarClase(el, "toca", 450);
         $id("btn-escuchar").classList.remove("invita");

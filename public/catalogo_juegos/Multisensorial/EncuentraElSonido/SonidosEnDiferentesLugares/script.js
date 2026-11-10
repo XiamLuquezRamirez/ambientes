@@ -675,7 +675,7 @@
 
     /* ── "El castillo de las 4 ventanas": zonas arriba/abajo/izquierda/derecha (Phaser) ── */
 
-    const FRASES_ACIERTO = ["¡Ahí estaba!", "¡Muy buen oído!", "¡La encontraste!", "¡Lo lograste!"];
+    const FRASES_ACIERTO = ["¡Ahí estaba!", "¡Muy buen oído!", "¡Lo encontraste!", "¡Lo lograste!"];
 
     /** Presentación de cada ronda; la dice Zoe o Zeus (no hay texto en el canvas). */
     const INTRO_RONDA = {
@@ -757,14 +757,36 @@
      *   3 cambio   → los instrumentos saltan de ventana
      *   4 noche    → todo cerrado y oscuro: solo el oído
      */
+    /**
+     * Cada ronda busca un objeto distinto: los del reto en orden al azar y distinto del de la
+     * partida anterior, para que el niño no memorice que siempre es el mismo. Aquí siempre suena
+     * solo el que se busca, así que cambiarlo en cada ronda no lo confunde.
+     */
+    function rotarObjetivos(r) {
+        const clave = "encuentra_orden_" + location.pathname;
+        let antes = null;
+        try { antes = localStorage.getItem(clave); } catch (e) { /* sin almacenamiento */ }
+        let objs = [];
+        for (let k = 0; k < 8; k++) {
+            objs = L.mezclar(r.elementos).slice(0, 4);
+            if (objs.join(",") !== antes) break;
+        }
+        while (objs.length < 4) {
+            const ultimo = objs[objs.length - 1];
+            objs.push(L.mezclar(r.elementos.filter(function (id) { return id !== ultimo; }))[0] || ultimo);
+        }
+        try { localStorage.setItem(clave, objs.join(",")); } catch (e) { /* sin almacenamiento */ }
+        return objs;
+    }
+
     function planRondas() {
         const r = nivelElegido.retos[0];
-        const obj = r.correcto === "azar" ? L.elegirCorrecto(r) : r.correcto;
+        const objs = rotarObjetivos(r);
         return [
-            { objetivo: obj, modo: "abiertas", elementos: r.elementos.slice(), intro: "abiertas" },
-            { objetivo: obj, modo: "postigos", elementos: r.elementos.slice(), intro: "postigos" },
-            { objetivo: obj, modo: "cambio", elementos: r.elementos.slice(), intro: "cambio" },
-            { objetivo: obj, modo: "noche", elementos: r.elementos.slice(), intro: "noche" }
+            { objetivo: objs[0], modo: "abiertas", elementos: r.elementos.slice(), intro: "abiertas" },
+            { objetivo: objs[1], modo: "postigos", elementos: r.elementos.slice(), intro: "postigos" },
+            { objetivo: objs[2], modo: "cambio", elementos: r.elementos.slice(), intro: "cambio" },
+            { objetivo: objs[3], modo: "noche", elementos: r.elementos.slice(), intro: "noche" }
         ];
     }
 
@@ -831,7 +853,7 @@
         await Promise.all([E().celebrar(id), repetirSonido(a)]);
         if (!vivo(gen)) return;
         efecto(a.sonido || "recompensa");
-        const texto = indiceRonda === 0 && a.texto ? a.texto : FRASES_ACIERTO[indiceRonda % FRASES_ACIERTO.length];
+        const texto = indiceRonda === 0 && a.texto && objetivo === reto.correcto ? a.texto : FRASES_ACIERTO[indiceRonda % FRASES_ACIERTO.length];
         await decir({ voz: a.voz || "zoe", texto: texto }, { estado: "acierto", minMs: 900 });
         if (!vivo(gen)) return;
         // Premio de este juego: una bandera sube a una de las 4 torres.

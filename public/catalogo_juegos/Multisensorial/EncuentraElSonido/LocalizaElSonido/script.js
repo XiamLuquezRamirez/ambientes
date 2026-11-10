@@ -675,7 +675,7 @@
 
     /* ── "Linterna en la noche": frío o caliente con la linterna (Phaser) ── */
 
-    const FRASES_ACIERTO = ["¡Ahí estaba!", "¡Muy buen oído!", "¡La encontraste en la oscuridad!", "¡Lo lograste!"];
+    const FRASES_ACIERTO = ["¡Ahí estaba!", "¡Muy buen oído!", "¡Lo encontraste en la oscuridad!", "¡Lo lograste!"];
 
     /** Presentación de cada ronda; la dice Zoe o Zeus (no hay texto en el canvas). */
     const INTRO_RONDA = {
@@ -756,15 +756,39 @@
      *   3 pasos → las cosas cambian de lugar en la oscuridad
      *   4 pila  → linterna chica que parpadea
      */
+    /**
+     * Cada ronda busca un objeto distinto: los del reto en orden al azar y distinto del de la
+     * partida anterior, para que el niño no memorice que siempre es el mismo. Aquí siempre suena
+     * solo el que se busca, así que cambiarlo en cada ronda no lo confunde.
+     */
+    function rotarObjetivos(r) {
+        const clave = "encuentra_orden_" + location.pathname;
+        let antes = null;
+        try { antes = localStorage.getItem(clave); } catch (e) { /* sin almacenamiento */ }
+        let objs = [];
+        for (let k = 0; k < 8; k++) {
+            objs = L.mezclar(r.elementos).slice(0, 4);
+            if (objs.join(",") !== antes) break;
+        }
+        while (objs.length < 4) {
+            const ultimo = objs[objs.length - 1];
+            objs.push(L.mezclar(r.elementos.filter(function (id) { return id !== ultimo; }))[0] || ultimo);
+        }
+        try { localStorage.setItem(clave, objs.join(",")); } catch (e) { /* sin almacenamiento */ }
+        return objs;
+    }
+
     function planRondas() {
         const r = nivelElegido.retos[0];
-        const obj = r.correcto === "azar" ? L.elegirCorrecto(r) : r.correcto;
-        const extras = elegirExtras(2, obj, r);
+        const objs = rotarObjetivos(r);
+        // Los que llegan en la ronda 2 son de la familia del objeto del reto (instrumentos parecidos a la
+        // pandereta, como dice la frase), aunque el que se busca cambie de ronda en ronda.
+        const extras = elegirExtras(2, r.correcto, r);
         return [
-            { objetivo: obj, modo: "luna", elementos: r.elementos.slice(), intro: "luna" },
-            { objetivo: obj, modo: "mas", elementos: r.elementos.concat(extras), intro: "mas" },
-            { objetivo: obj, modo: "pasos", elementos: r.elementos.concat(extras), intro: "pasos" },
-            { objetivo: obj, modo: "pila", elementos: r.elementos.concat(extras), intro: "pila" }
+            { objetivo: objs[0], modo: "luna", elementos: r.elementos.slice(), intro: "luna" },
+            { objetivo: objs[1], modo: "mas", elementos: r.elementos.concat(extras), intro: "mas" },
+            { objetivo: objs[2], modo: "pasos", elementos: r.elementos.concat(extras), intro: "pasos" },
+            { objetivo: objs[3], modo: "pila", elementos: r.elementos.concat(extras), intro: "pila" }
         ];
     }
 
@@ -832,7 +856,7 @@
         await Promise.all([E().celebrar(id), repetirSonido(a)]);
         if (!vivo(gen)) return;
         efecto(a.sonido || "recompensa");
-        const texto = indiceRonda === 0 && a.texto ? a.texto : FRASES_ACIERTO[indiceRonda % FRASES_ACIERTO.length];
+        const texto = indiceRonda === 0 && a.texto && objetivo === reto.correcto ? a.texto : FRASES_ACIERTO[indiceRonda % FRASES_ACIERTO.length];
         await decir({ voz: a.voz || "zoe", texto: texto }, { estado: "acierto", minMs: 900 });
         if (!vivo(gen)) return;
         // Premio de este juego: una estrella se enciende en el cielo.

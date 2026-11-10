@@ -50,6 +50,7 @@
         o = o || {};
         var A = global.PedniaArte;
         var n = o.n || 14;
+        if (reducido()) n = Math.min(n, 5);
         var colores = o.colores || [0xff6b6b, 0xfcc419, 0x51cf66, 0x339af0, 0xcc5de8, 0xff922b];
         for (var i = 0; i < n; i++) {
             var a = (o.angulo != null ? o.angulo : -Math.PI / 2) + (Math.random() - 0.5) * (o.abanico || Math.PI * 2);
@@ -77,7 +78,9 @@
         var w = scene.scale.width;
         var h = scene.scale.height;
         var colores = [0xff6b6b, 0xfcc419, 0x51cf66, 0x339af0, 0xcc5de8, 0xff922b];
-        for (var i = 0; i < (n || 70); i++) {
+        n = n || 70;
+        if (reducido()) n = Math.min(n, 12);   // movimiento reducido: un poco de color, sin lluvia
+        for (var i = 0; i < n; i++) {
             var p = scene.add.rectangle(rnd(0, w), rnd(-h * 0.4, -10), rnd(7, 12), rnd(10, 18), colores[i % 6]).setDepth(80);
             scene.tweens.add({
                 targets: p, y: h + 30, x: p.x + rnd(-80, 80), angle: rnd(-360, 360),
