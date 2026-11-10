@@ -81,7 +81,6 @@
     "toleranciaFlexion": 32,
     "radioEncaje": 46,
     "radioEncajeOrientada": 70,
-    "posturasPorEtapa": 5,
     "personajes": ["zeus", "zoe"],
     "ordenPasos": [["cabeza", "tronco"], ["brazo_izq"], ["pierna_der"], ["brazo_der", "pierna_izq"]]
   },

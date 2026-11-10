@@ -132,4 +132,16 @@ prueba("los textos de paso cubren los órdenes configurados", () => {
     });
 });
 
+prueba("datos: 5 posturas por nivel (15 en total) y sin ids repetidos", () => {
+    assert.strictEqual(config.etapas.length, 3);
+    const ids = [];
+    config.etapas.forEach((e) => {
+        assert.strictEqual(e.posturas.length, 5, "nivel " + e.id);
+        e.posturas.forEach((p) => ids.push(p.id));
+    });
+    assert.strictEqual(ids.length, 15);
+    assert.strictEqual(new Set(ids).size, 15, "ids repetidos");
+    assert.ok(!("posturasPorEtapa" in config.juego), "la partida siempre juega 1 por nivel");
+});
+
 console.log("\n" + pruebas + " pruebas OK");

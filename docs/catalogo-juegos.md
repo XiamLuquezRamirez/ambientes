@@ -63,7 +63,7 @@ y migraciones `database/migrations/2026_10_29_*partir*`.
 
 `{Ambiente}/{Juego}/` con `index.html` directo.
 
-- **Polimotor** (11 juegos): patrón antiguo (EspejoDeLasPosiciones, el más nuevo, ya separa responsabilidades en módulos; ver `docs/juegos-escenas-animadas.md`); `script.js` monolítico, `*-anim.css/js`, algunos con
+- **Polimotor** (11 juegos): patrón antiguo (EspejoDeLasPosiciones y PuzleDeSiluetasEnAccion, los más nuevos, ya separan responsabilidades en módulos; ver `docs/juegos-escenas-animadas.md`); `script.js` monolítico, `*-anim.css/js`, algunos con
   `phaser-juego.js`; comparte `Polimotor/comun/` (`inicio-fondo.*`, `interfaz.css`).
   Ojo: los subjuegos de otros ambientes también cargan `Polimotor/comun/inicio-fondo.*`.
 - **Stubs** (`"stub": true` en `config.json`): paquetes creados desde superAdmin sin implementar

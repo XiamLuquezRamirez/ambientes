@@ -1,0 +1,249 @@
+/* El Puzle de Siluetas en Acción — piezas, silueta, controles de giro y transformación. */
+
+/* ---------------------------------------------------------------- plataforma y bandeja */
+
+.t-aro {
+  fill: none;
+  stroke: var(--sil-neon);
+  stroke-width: 4;
+  opacity: 0.7;
+  animation: aroLate 2.4s ease-in-out infinite;
+}
+
+.t-aro-2 { stroke: var(--sil-rosa); animation-delay: -1.2s; }
+
+@keyframes aroLate {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
+}
+
+.t-bandeja-borde {
+  fill: none;
+  stroke: var(--sil-neon);
+  stroke-width: 4;
+  stroke-dasharray: 22 12;
+  animation: bordeCorre 6s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(124, 243, 255, 0.8));
+}
+
+@keyframes bordeCorre { to { stroke-dashoffset: -340; } }
+
+/* Sin piezas sueltas la bandeja se apaga: toda la atención va al atleta. */
+.t-bandeja { transition: opacity 0.6s ease; }
+.t-fondo.bandeja-vacia .t-bandeja { opacity: 0.3; }
+
+/* ---------------------------------------------------------------- silueta */
+
+.sil-contornos .pz-forma { fill: #0d0b26; stroke: #0d0b26; stroke-width: 7; stroke-linejoin: round; }
+.sil-rellenos .pz-forma { fill: #1d1a45; stroke: none; }
+.sil-tobillos { opacity: 0.95; }
+.sil-resaltes .pz-forma { fill: none; stroke: transparent; stroke-width: 5; stroke-linejoin: round; transition: stroke 0.2s; }
+
+/* Se ilumina donde va la pieza elegida (amarillo que late). */
+.sil-resalte.objetivo .pz-forma {
+  stroke: #ffe066;
+  animation: silLate 1.1s ease-in-out infinite;
+}
+
+/* La pieza ya tiene la inclinación correcta: verde. */
+.sil-resalte.listo .pz-forma { stroke: #69db7c; stroke-width: 6; animation: none; }
+
+/* Arrastrando cerca del hueco: brillo blanco fuerte. */
+.sil-resalte.cerca .pz-forma { stroke: #ffffff; stroke-width: 8; filter: drop-shadow(0 0 8px #fff); }
+
+/* "¡Observa!": parpadeo naranja tras un error o al pedir ayuda. */
+.sil-resalte.mira .pz-forma { stroke: #ff922b; stroke-width: 7; animation: silMira 0.5s ease-in-out infinite alternate; }
+
+@keyframes silLate {
+  0%, 100% { stroke-opacity: 1; stroke-width: 5; }
+  50% { stroke-opacity: 0.45; stroke-width: 9; }
+}
+
+@keyframes silMira {
+  from { stroke-opacity: 1; }
+  to { stroke-opacity: 0.35; }
+}
+
+.t-figura.aparece .f-silueta { animation: siluetaAparece 0.9s ease-out; }
+
+@keyframes siluetaAparece {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Pista: sombra punteada con la orientación correcta. */
+.pz-pista .pz-forma {
+  fill: rgba(124, 243, 255, 0.18);
+  stroke: #7cf3ff;
+  stroke-width: 3.5;
+  stroke-dasharray: 8 6;
+  animation: pistaRespira 1.4s ease-in-out infinite;
+}
+
+@keyframes pistaRespira {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------- piezas */
+
+.pieza .pz-neon .pz-forma { fill: none; stroke: transparent; stroke-width: 10; stroke-linejoin: round; }
+.pieza .pz-sombra { opacity: 0; pointer-events: none; }
+.pieza .pz-sombra .pz-forma { fill: #1d1a45; stroke: none; }
+.pz-toque { fill: transparent; }
+
+.pieza-libre { cursor: grab; }
+.pieza .pz-cuerpo,
+.pieza .pz-color { transform-box: fill-box; transform-origin: center; }
+.pieza-libre .pz-cuerpo { filter: drop-shadow(0 6px 6px rgba(10, 5, 40, 0.45)); transition: filter 0.2s; }
+.pieza-libre.fuera-paso { opacity: 0.5; }
+.pieza-libre.en-paso .pz-neon .pz-forma { stroke: rgba(255, 224, 102, 0.85); animation: piezaPaso 1.3s ease-in-out infinite; }
+
+.pieza-libre.elegida .pz-neon .pz-forma { stroke: #ffe066; stroke-width: 12; animation: none; }
+.pieza-libre.elegida .pz-cuerpo { filter: drop-shadow(0 0 10px rgba(255, 224, 102, 0.9)) drop-shadow(0 10px 10px rgba(10, 5, 40, 0.5)); }
+.pieza-libre.orientada .pz-neon .pz-forma { stroke: #69db7c; stroke-width: 13; }
+.pieza-libre.orientada .pz-cuerpo { filter: drop-shadow(0 0 12px rgba(105, 219, 124, 0.95)); }
+.pieza-libre.cerca .pz-neon .pz-forma { stroke: #ffffff; stroke-width: 15; }
+
+.pieza-libre.demo-foco .pz-neon .pz-forma,
+.pieza-libre.ayuda .pz-neon .pz-forma { stroke: #ff922b; stroke-width: 14; animation: piezaPaso 0.55s ease-in-out infinite; }
+
+@keyframes piezaPaso {
+  0%, 100% { stroke-opacity: 1; }
+  50% { stroke-opacity: 0.3; }
+}
+
+.pieza-libre.sacudir .pz-cuerpo { animation: piezaSacude 0.5s ease; }
+
+@keyframes piezaSacude {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-9px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(4px); }
+}
+
+/* Piezas que llegan flotando a la bandeja y se mecen. */
+.t-libres.entran .pieza-libre .pz-cuerpo { animation: piezaEntra 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+@keyframes piezaEntra {
+  from { opacity: 0; transform: translateY(-40px) scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+
+.pieza-libre:not(.elegida) .pz-color { animation: piezaFlota 3.2s ease-in-out infinite; }
+.pieza-libre:nth-child(2n) .pz-color { animation-delay: -1.1s; }
+.pieza-libre:nth-child(3n) .pz-color { animation-delay: -2.2s; }
+
+@keyframes piezaFlota {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Pieza encajada: entra en la sombra con borde neón. */
+.f-neon .neon-parte .pz-forma {
+  fill: none;
+  stroke: var(--sil-neon);
+  stroke-width: 9;
+  stroke-linejoin: round;
+  filter: url(#t-neon-blur);
+  opacity: 0.85;
+}
+
+.pj-zoe .f-neon .neon-parte .pz-forma { stroke: var(--sil-rosa); }
+
+.pieza-encajada .pz-sombra { opacity: 0.74; transition: opacity 0.6s ease; }
+.pieza-encajada .pz-detalle { opacity: 0.25; transition: opacity 0.6s ease; }
+.pieza-encajada.lado-izq .pz-color { filter: brightness(0.82); }
+.pieza-encajada.recien .pz-sombra { animation: encajeDestello 0.85s ease-out; }
+
+@keyframes encajeDestello {
+  0% { opacity: 0; }
+  35% { opacity: 0.2; fill: #ffffff; }
+  100% { opacity: 0.74; }
+}
+
+.sil-parte.encendida .pz-forma { transition: fill 0.4s; }
+.sil-rellenos .sil-parte.encendida .pz-forma { fill: #2a2366; }
+
+.f-chispa-in { animation: chispaSale 0.85s ease-out forwards; }
+
+@keyframes chispaSale {
+  0% { opacity: 1; transform: scale(0.3) rotate(0deg); }
+  60% { opacity: 1; transform: scale(1.6) rotate(45deg); }
+  100% { opacity: 0; transform: scale(2) rotate(90deg); }
+}
+
+/* ---------------------------------------------------------------- transformación final */
+
+.t-figura.tr-neon .f-neon .neon-parte .pz-forma {
+  stroke-width: 16;
+  opacity: 1;
+  animation: neonFuerte 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes neonFuerte {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+.t-figura.tr-sin-silueta .f-silueta { opacity: 0; transition: opacity 0.8s ease; }
+.t-figura.cobra-vida .pieza-encajada.viva .pz-sombra { opacity: 0; }
+.t-figura.cobra-vida .pieza-encajada.viva .pz-color { filter: none; }
+.t-figura.tr-detalles .pieza-encajada .pz-detalle { opacity: 1; }
+.t-figura.cobra-vida:not(.tr-neon) .f-neon { opacity: 0.35; transition: opacity 0.8s; }
+
+/* Figura de la presentación del estadio (siempre a color). */
+.est-fig .pieza.viva .pz-sombra { opacity: 0; transition: opacity 0.8s ease; }
+.est-fig .pieza .pz-neon .pz-forma { fill: none; stroke: transparent; }
+.est-fig .pieza.lado-izq .pz-color { filter: brightness(0.84); }
+
+/* ---------------------------------------------------------------- flechas de giro */
+
+.t-controles { opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.t-controles.visible { opacity: 1; }
+.t-controles.visible .rot-btn { pointer-events: all; cursor: pointer; }
+
+.rot-aro {
+  fill: none;
+  stroke: rgba(255, 224, 102, 0.75);
+  stroke-width: 3.5;
+  stroke-dasharray: 10 9;
+  animation: aroGira 8s linear infinite;
+}
+
+.rot-aro-2 { stroke: rgba(124, 243, 255, 0.5); stroke-width: 2; animation-direction: reverse; }
+.t-controles.orientada .rot-aro { stroke: rgba(105, 219, 124, 0.95); }
+
+@keyframes aroGira { to { stroke-dashoffset: -190; } }
+
+.rot-sombra { fill: rgba(10, 5, 40, 0.4); }
+.rot-fondo { fill: #4c6ef5; stroke: #ffffff; stroke-width: 5; }
+.rot-izq .rot-fondo { fill: #7048e8; }
+.rot-flecha { fill: none; stroke: #ffffff; stroke-width: 6.5; stroke-linecap: round; }
+.rot-punta { fill: #ffffff; stroke: #ffffff; stroke-width: 2; stroke-linejoin: round; }
+.rot-cuerpo { transition: transform 0.12s; }
+.rot-btn.pulsado .rot-cuerpo { transform: scale(0.86); }
+.rot-btn .rot-cuerpo { animation: rotInvita 1.6s ease-in-out infinite; }
+
+@keyframes rotInvita {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
+body.alto-contraste .sil-rellenos .pz-forma { fill: #000; }
+body.alto-contraste .sil-contornos .pz-forma { stroke: #ffeb3b; }
+
+@media (prefers-reduced-motion: reduce) {
+  .t-aro,
+  .t-bandeja-borde,
+  .sil-resalte .pz-forma,
+  .pz-pista .pz-forma,
+  .pieza-libre .pz-color,
+  .pieza-libre .pz-neon .pz-forma,
+  .t-libres.entran .pieza-libre .pz-cuerpo,
+  .rot-aro,
+  .rot-btn .rot-cuerpo {
+    animation: none !important;
+  }
+}

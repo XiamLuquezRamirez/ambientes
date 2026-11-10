@@ -102,10 +102,15 @@ function textos() {
     return textosPara(personajeActual);
 }
 
-/** Quién se mira en el espejo en cada postura (juego.personajes, por defecto Zeus y Zoe alternados). */
-function personajeDeRonda(i) {
+function personajesValidos() {
     const lista = (cfgJuego().personajes || ["zeus", "zoe"]).filter(function (p) { return PERSONAJES[p]; });
-    return lista.length ? lista[i % lista.length] : "zeus";
+    return lista.length ? lista : ["zeus"];
+}
+
+/** Quién se mira en el espejo en la ronda i (se sortea al armar las rondas). */
+function personajeDeRonda(i) {
+    const r = rondas[i];
+    return (r && r.personaje) || personajesValidos()[0];
 }
 
 function usarPersonaje(pj) {
@@ -474,12 +479,22 @@ function barajar(lista) {
     return a;
 }
 
+/**
+ * Una partida = 3 posturas: UNA al azar de cada nivel (de las 5 que tiene cada uno en config.json),
+ * y para cada una, Zeus o Zoe al azar como modelo (salvo que la postura fije "personaje").
+ */
 function armarRondas() {
-    const n = Math.max(1, Number(cfgJuego().posturasPorEtapa) || 1);
+    const personajes = personajesValidos();
     rondas = [];
     (gameConfig.etapas || []).forEach(function (etapa) {
-        barajar(etapa.posturas || []).slice(0, n).forEach(function (p) {
-            rondas.push({ etapa: etapa, postura: p });
+        const posturas = etapa.posturas || [];
+        if (!posturas.length) return;
+        const postura = posturas[Math.floor(Math.random() * posturas.length)];
+        const fijo = postura.personaje && PERSONAJES[postura.personaje] ? postura.personaje : null;
+        rondas.push({
+            etapa: etapa,
+            postura: postura,
+            personaje: fijo || personajes[Math.floor(Math.random() * personajes.length)]
         });
     });
 }
