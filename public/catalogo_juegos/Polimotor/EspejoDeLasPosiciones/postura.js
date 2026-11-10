@@ -217,8 +217,8 @@
     /** Pose neutra (de pie, brazos un poco abiertos) para animar desde/hacia ella. */
     function neutra() {
         return {
-            brazo_izq: { a: 12, b: 0 },
-            brazo_der: { a: 12, b: 0 },
+            brazo_izq: { a: 15, b: 0 },
+            brazo_der: { a: 15, b: 0 },
             pierna_izq: { a: 4, b: 0 },
             pierna_der: { a: 4, b: 0 }
         };

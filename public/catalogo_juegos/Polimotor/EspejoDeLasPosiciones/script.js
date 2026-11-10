@@ -71,8 +71,50 @@ function cfgJuego() {
     return gameConfig.juego || {};
 }
 
+/** Personajes del espejo: nombre y pronombre que usan los textos ({nombre}, {el}). */
+const PERSONAJES = {
+    zeus: { nombre: "Zeus", el: "él" },
+    zoe: { nombre: "Zoe", el: "ella" }
+};
+let personajeActual = "zeus";
+const textosPorPersonaje = {};
+
+function textosPara(pj) {
+    const base = gameConfig.textos || {};
+    const guardado = textosPorPersonaje[pj];
+    if (guardado && guardado.base === base) return guardado.textos;
+    const datos = PERSONAJES[pj] || PERSONAJES.zeus;
+    const sustituir = function (v) {
+        if (typeof v === "string") return v.replace(/\{nombre\}/g, datos.nombre).replace(/\{el\}/g, datos.el);
+        if (Array.isArray(v)) return v.map(sustituir);
+        if (v && typeof v === "object") {
+            const o = {};
+            Object.keys(v).forEach(function (k) { o[k] = sustituir(v[k]); });
+            return o;
+        }
+        return v;
+    };
+    textosPorPersonaje[pj] = { base: base, textos: sustituir(base) };
+    return textosPorPersonaje[pj].textos;
+}
+
 function textos() {
-    return gameConfig.textos || {};
+    return textosPara(personajeActual);
+}
+
+/** Quién se mira en el espejo en cada postura (juego.personajes, por defecto Zeus y Zoe alternados). */
+function personajeDeRonda(i) {
+    const lista = (cfgJuego().personajes || ["zeus", "zoe"]).filter(function (p) { return PERSONAJES[p]; });
+    return lista.length ? lista[i % lista.length] : "zeus";
+}
+
+function usarPersonaje(pj) {
+    personajeActual = Muneco.usarPersonaje(pj);
+    const nombre = PERSONAJES[personajeActual].nombre;
+    const rotulo = document.getElementById("modelo-personaje");
+    if (rotulo) rotulo.textContent = nombre;
+    const svg = svgModelo();
+    if (svg) svg.setAttribute("aria-label", nombre + " haciendo la postura");
 }
 
 function feedbackActivo() {
@@ -448,6 +490,7 @@ async function iniciarJuego() {
     partidaIniciada = true;
     juegoTerminado = false;
     armarRondas();
+    usarPersonaje(personajeDeRonda(0));
     montarTablero();
     document.body.classList.add("demo-lock");
     ponerMision("", textos().nombreCorto || "El Espejo de las Posiciones", []);
@@ -546,6 +589,13 @@ function montarTablero() {
     if (sockets) svg.appendChild(sockets);
 }
 
+/** La silueta punteada sigue al personaje de la postura (pantalón de Zeus o falda de Zoe). */
+function repintarSilueta() {
+    const svg = svgConstruccion();
+    const cuerpo = svg && svg.querySelector(".c-silueta-cuerpo");
+    if (cuerpo) Muneco.pintar(cuerpo, Muneco.siluetaCuerpo());
+}
+
 function limpiarConstruccion() {
     const raiz = raizConstruccion();
     if (raiz) raiz.querySelectorAll(".m-slot").forEach(function (g) { g.innerHTML = ""; });
@@ -627,6 +677,7 @@ function cargarPostura(posturaCruda, etapa, opts) {
     };
     seleccionId = null;
     limpiarConstruccion();
+    repintarSilueta();
     montarModeloNeutro();
     pintarBandeja(ronda.etapa);
     taller().vaciar("Toca una pieza");
@@ -733,6 +784,7 @@ async function empezarRonda(i) {
         return;
     }
     bloqueo = true;
+    usarPersonaje(personajeDeRonda(i));
     const anterior = rondas[i - 1];
     if (!anterior || anterior.etapa !== r.etapa) {
         if (estudio()) {
@@ -1136,6 +1188,13 @@ $(document).ready(function () {
     TextoVoz.iniciar(gameConfig, introConfig, {
         obtenerAudioFondo: function () { return audioFondo; },
         volumenFondo: volumenFondoPct() / 100
+    });
+    // Voces ya resueltas de las frases que nombran al personaje del espejo.
+    Object.keys(PERSONAJES).forEach(function (pj) {
+        const t = textosPara(pj);
+        TextoVoz.encolarFrases(Object.keys(t).filter(function (k) {
+            return typeof gameConfig.textos[k] === "string" && gameConfig.textos[k].indexOf("{nombre}") !== -1;
+        }).map(function (k) { return { texto: t[k], personaje: "zoe" }; }));
     });
     enlazarMenus();
     window.addEventListener("pagehide", function () { TextoVoz.vaciar(); });

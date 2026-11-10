@@ -396,21 +396,34 @@ body.demo-lock .tablero * {
 
 /* ---------------------------------------------------------------- figura (Muneco) */
 
-.m-contorno .m-piel { fill: #b9786a; stroke: #b9786a; }
-.m-contorno .m-camiseta { fill: #1d5e48; stroke: #1d5e48; }
-.m-contorno .m-short { fill: #03324a; stroke: #03324a; }
-.m-contorno .m-pelo { fill: #4a230d; stroke: #4a230d; }
-.m-contorno .m-media { fill: #aeb6c2; stroke: #aeb6c2; }
-.m-contorno .m-zapato { fill: #1d5e48; stroke: #1d5e48; }
-.m-contorno * { stroke-width: 4.6; stroke-linejoin: round; }
+/* Contorno fino, apenas más oscuro que el relleno (los personajes oficiales no llevan línea negra).
+   Sigue tapando la unión de codo y rodilla al girar. */
+.m-contorno .m-piel { fill: #e2ad9f; stroke: #e2ad9f; }
+.m-contorno .m-camiseta { fill: #22745d; stroke: #22745d; }
+.m-contorno .m-short { fill: #003f58; stroke: #003f58; }
+.m-contorno .m-pelo { fill: #6b3415; stroke: #6b3415; }
+.m-contorno .m-pelo-zoe { fill: #823f24; stroke: #823f24; }
+.m-contorno .m-media { fill: #dfe4ea; stroke: #dfe4ea; }
+.m-contorno .m-zapato { fill: #22745d; stroke: #22745d; }
+/* Prendas de Zoe */
+.m-contorno .m-blusa { fill: #7cc0e3; stroke: #7cc0e3; }
+.m-contorno .m-vestido { fill: #c95d88; stroke: #c95d88; }
+.m-contorno .m-calceta { fill: #d47aa0; stroke: #d47aa0; }
+.m-contorno .m-zapato-zoe { fill: #69c2e4; stroke: #69c2e4; }
+.m-contorno * { stroke-width: 2.4; stroke-linejoin: round; }
 .m-relleno .base * { stroke: none; }
 
-.m-relleno .m-piel { fill: #f3c6b6; }
-.m-relleno .m-camiseta { fill: #2f8f70; }
-.m-relleno .m-short { fill: #0a5677; }
-.m-relleno .m-pelo { fill: #7d3f1b; }
-.m-relleno .m-media { fill: #ffffff; }
-.m-relleno .m-zapato { fill: #2f8f70; }
+.m-relleno .m-piel { fill: #f2c6b9; }
+.m-relleno .m-camiseta { fill: #2b896f; }
+.m-relleno .m-short { fill: #004f6d; }
+.m-relleno .m-pelo { fill: #7f3f1a; }
+.m-relleno .m-pelo-zoe { fill: #984c2c; }
+.m-relleno .m-media { fill: #fffdfc; }
+.m-relleno .m-zapato { fill: #2b896f; }
+.m-relleno .m-blusa { fill: #95d3f0; }
+.m-relleno .m-vestido { fill: #e1709c; }
+.m-relleno .m-calceta { fill: #e892b5; }
+.m-relleno .m-zapato-zoe { fill: #a4daf4; }
 
 #modelo-svg .m-figura {
   transform-box: fill-box;

@@ -1,8 +1,9 @@
 /**
- * Muneco — dibujo SVG articulado de Zeus (modelo, figura armada, fichas y fantasma).
+ * Muneco — dibujo SVG articulado de Zeus o Zoe (modelo, figura armada, fichas y fantasma).
  *
- * Las formas salen de los archivos img/{cabeza,tronco,brazo_izq,brazo_der,pierna_izq,pierna_der}.svg
+ * Las formas salen de los archivos img/<personaje>/{cabeza,tronco,brazo_izq,brazo_der,pierna_izq,pierna_der}.svg
  * (generados por scripts/generar-svg-espejo-posiciones.js). Se leen una vez al cargar.
+ * Los dos personajes comparten el esqueleto de postura.js: cambiar de personaje no cambia el juego.
  *
  * Cada pieza se dibuja en DOS pasadas: primero el contorno (las formas de g.base engrosadas con
  * el color del borde, ver style.css → .m-contorno) y encima el relleno (g.base + g.detalle).
@@ -18,7 +19,9 @@
     "use strict";
 
     var P = global.Postura;
-    var VERSION_SVG = "20261110c";
+    var VERSION_SVG = "20261110i";
+    var PERSONAJES = ["zeus", "zoe"];
+    var personaje = "zeus";
 
     // Carpeta img/ junto a este script (sirve dentro del iframe del kiosco y en la vista previa).
     var CARPETA = (function () {
@@ -33,14 +36,21 @@
     }
 
     function leer(id) {
+        var ruta = personaje + "/" + id + ".svg";
         try {
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", CARPETA + id + ".svg?v=" + VERSION_SVG, false);
+            xhr.open("GET", CARPETA + ruta + "?v=" + VERSION_SVG, false);
             xhr.send();
             if (xhr.status === 200 || (xhr.status === 0 && xhr.responseText)) return xhr.responseText;
         } catch (e) { /* noop */ }
-        console.warn("[Muneco] No se pudo leer img/" + id + ".svg");
+        console.warn("[Muneco] No se pudo leer img/" + ruta);
         return "";
+    }
+
+    /** Personaje que dibujan las funciones siguientes ("zeus" | "zoe"). */
+    function usarPersonaje(id) {
+        if (PERSONAJES.indexOf(id) !== -1) personaje = id;
+        return personaje;
     }
 
     function interior(nodo) {
@@ -58,7 +68,8 @@
 
     /** Formas de una pieza: { base, detalle } o, en extremidades, { arriba, abajo, largo }. */
     function formas(id) {
-        if (cache[id]) return cache[id];
+        var clave = personaje + "/" + id;
+        if (cache[clave]) return cache[clave];
         var texto = leer(id);
         var doc = texto ? new DOMParser().parseFromString(texto, "image/svg+xml") : null;
         var raiz = doc ? doc.documentElement : null;
@@ -74,8 +85,12 @@
                 base: interior(raiz && raiz.querySelector(":scope > .base")),
                 detalle: interior(raiz && raiz.querySelector(":scope > .detalle"))
             };
+            var sil = raiz && raiz.querySelector(":scope > .silueta");
+            if (sil) datos.silueta = sil.getAttribute("d");
         }
-        cache[id] = datos;
+        // El viewBox del archivo es el encuadre de la ficha en la bandeja.
+        datos.vista = raiz && raiz.getAttribute("viewBox");
+        cache[clave] = datos;
         return datos;
     }
 
@@ -111,9 +126,14 @@
         return simple("cabeza", "m-cabeza-giro");
     }
 
-    /** Lee las seis piezas ya (evita una pausa al primer dibujo). */
+    /** Lee las seis piezas de cada personaje ya (evita una pausa al primer dibujo). */
     function precargar() {
-        P.IDS.forEach(formas);
+        var actual = personaje;
+        PERSONAJES.forEach(function (pj) {
+            personaje = pj;
+            P.IDS.forEach(formas);
+        });
+        personaje = actual;
     }
 
     /** Pieza dibujada con su pivote en (0,0): cuello, pecho, hombro o cadera. */
@@ -151,15 +171,21 @@
         }).join("") + "</g>";
     }
 
-    /** Silueta vacía: cabeza y tronco punteados y las articulaciones donde encajan las piezas. */
-    function silueta() {
+    var SILUETA_TRONCO = "M-16,-61 Q0,-52 16,-61 L31,-59.5 Q43,-57 45.5,-45 L44.5,28 L45.5,66 Q33,72.5 20,70.5 L6,56 Q0,53 -6,56 L-20,70.5 Q-33,72.5 -45.5,66 L-44.5,28 L-45.5,-45 Q-43,-57 -31,-59.5 Z";
+
+    /** Interior de g.c-silueta-cuerpo: cabeza y tronco punteados del personaje activo. */
+    function siluetaCuerpo() {
         var S = P.ESQUELETO.sockets;
         var ch = S.cuello;
         var pe = S.pecho;
-        var html = '<g class="c-silueta-cuerpo">' +
-            '<circle class="c-sil-cabeza" cx="' + ch.x + '" cy="' + (ch.y - 40) + '" r="40"/>' +
-            '<path class="c-sil-tronco" transform="translate(' + pe.x + "," + pe.y + ')" d="M-16,-61 Q0,-52 16,-61 L31,-59.5 Q43,-57 45.5,-45 L44.5,28 L45.5,66 Q33,72.5 20,70.5 L6,56 Q0,53 -6,56 L-20,70.5 Q-33,72.5 -45.5,66 L-44.5,28 L-45.5,-45 Q-43,-57 -31,-59.5 Z"/>' +
-            "</g>";
+        return '<circle class="c-sil-cabeza" cx="' + ch.x + '" cy="' + (ch.y - 40) + '" r="40"/>' +
+            '<path class="c-sil-tronco" transform="translate(' + pe.x + "," + pe.y + ')" d="' + (formas("tronco").silueta || SILUETA_TRONCO) + '"/>';
+    }
+
+    /** Silueta vacía: cabeza y tronco punteados y las articulaciones donde encajan las piezas. */
+    function silueta() {
+        var S = P.ESQUELETO.sockets;
+        var html = '<g class="c-silueta-cuerpo">' + siluetaCuerpo() + "</g>";
         html += '<g class="c-sockets">';
         Object.keys(S).forEach(function (k) {
             var s = S[k];
@@ -199,6 +225,8 @@
 
     /** viewBox de la ficha de la bandeja (ajustado a la pieza estirada). */
     function vistaFicha(id) {
+        var vista = formas(id).vista;
+        if (vista) return vista;
         if (id === "cabeza") return "-48 -100 96 100";
         if (id === "tronco") return "-58 -76 116 152";
         // La ficha muestra la extremidad estirada hacia abajo: el giro se ve en el taller.
@@ -225,7 +253,11 @@
     }
 
     global.Muneco = {
+        PERSONAJES: PERSONAJES,
+        usarPersonaje: usarPersonaje,
+        personaje: function () { return personaje; },
         precargar: precargar,
+        siluetaCuerpo: siluetaCuerpo,
         ORDEN_CAPAS: ORDEN_CAPAS,
         parte: parte,
         figura: figura,
